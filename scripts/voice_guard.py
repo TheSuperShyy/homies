@@ -200,10 +200,31 @@ def voice_with_guard(voice, chunk=None):
 #
 # minCharacters is raised too, so a two-word acknowledgement is not flushed on
 # its own while the rest of the sentence is still arriving.
-SPEECH = {
+# WITHDRAWN 5 Aug, the same day it went in. Kept here, unused, because the
+# reasoning below is sound and the evidence against it is circumstantial —
+# but circumstantial evidence from a real call beats sound reasoning.
+#
+# Two English calls came back mangled: "I understand. someone from the office
+# get back to you about it." — words simply gone from the middle of a fixed
+# line. A full config diff against the previous night, when the same agent
+# was working well, found ONE functional difference on the English side: this
+# block. Same model, same voice, same transcriber, same prompt, same eight
+# tools, same guard, same endpointing. Only the chunk plan was new.
+#
+# That does not prove it caused the dropped words. It does mean it is the
+# only candidate, and a change made to improve prosody is not worth a
+# sentence losing words. The fragmented-Hebrew problem it was written for is
+# real and still unsolved; it needs to be fixed without this, or with this
+# reintroduced one field at a time against recorded calls.
+_SPEECH_WITHDRAWN = {
     "minCharacters": 60,
     "punctuationBoundaries": [".", "!", "?"],
 }
+
+# Nothing sets a chunk plan now. voice_with_guard(voice) leaves chunkPlan
+# carrying only formatPlan, which is what every assistant ran the night the
+# calls were good.
+SPEECH = {}
 
 
 # ---------------------------------------------------------------------------

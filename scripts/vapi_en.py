@@ -59,7 +59,7 @@ DEBT_STACK = {
     # file sets the stack explicitly rather than inheriting it. An English twin
     # without the filter would be the one assistant that can still read JSON at
     # a client — and it is the one used for demos. voice_guard.py, layer 2.
-    "voice": voice_with_guard({"provider": "vapi", "voiceId": "Elliot"}, chunk=SPEECH),
+    "voice": voice_with_guard({"provider": "vapi", "voiceId": "Elliot"}),
     # gpt-5.4, not -mini, and the reason is not latency.
     #
     # -mini was chosen to save ~860ms. On 4 Aug it spoke a tool call out loud to
@@ -128,7 +128,7 @@ INTAKE_STACK = {
     # The rename is not a transliteration: Elliot reads "Michal" as "McCall" every
     # time, and no spelling hint in a prompt changes what a voice does with a name
     # it is handed.
-    "voice": voice_with_guard({"provider": "vapi", "voiceId": "Elliot"}, chunk=SPEECH),
+    "voice": voice_with_guard({"provider": "vapi", "voiceId": "Elliot"}),
     # gpt-4.1-mini — matching the Hebrew twin, and NOT following the debt twin up
     # to gpt-5.4.
     #

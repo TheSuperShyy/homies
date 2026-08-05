@@ -102,8 +102,7 @@ BASE = {
     # edited in the dashboard, which is exactly what happened on 5 Aug. See
     # scripts/voice_guard.py.
     "voice": voice_with_guard(
-        {"provider": "vapi", "voiceId": "Leah", "version": "2", "language": "he"},
-        chunk=SPEECH),
+        {"provider": "vapi", "voiceId": "Leah", "version": "2", "language": "he"}),
     "model": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.3},
     "firstMessageMode": "assistant-speaks-first",
     "artifactPlan": {"recordingEnabled": True},
@@ -242,8 +241,7 @@ TARGETS = {
             # the inbound assistant, whose prompt is feminine throughout, and one
             # string in the wrong file would break it silently.
             "voice": voice_with_guard(
-                {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"},
-                chunk=SPEECH),
+                {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}),
             # Target is a two-minute call. Anything past four is a call that
             # should have been handed over.
             "maxDurationSeconds": 240,
