@@ -990,6 +990,24 @@ design. That is what layer 3 and the checker are for.
 **Noticed while measuring:** the debt system prompt is now 33,191 characters.
 Prompt reduction was already on the list; it has moved up.
 
+### 5 Aug — Apps Script redeployed; the partial-request net is live
+
+`save_partial_request` answered `unknown tool` from the deployed writer all
+afternoon. Because the tool is async, n8n had already told the agent `ok:true` —
+so every partial would have been lost silently, on calls that were already going
+wrong. Redeployed by hand; it now returns `{ok:true}` and `partial_requests`
+created itself on the first write, as `tab()` is designed to.
+
+Two smoke rows left behind, both marked `SMOKE TEST` — one in `partial_requests`,
+two in `call_requests` including the earlier probe. Clearable with
+`?key=…&clear=partial_requests`, left in place rather than cleared unasked.
+
+**The secret is still in the source.** The plan was to fold the move to Script
+Properties into this same paste and it missed the window; it costs nothing to
+carry to the next redeploy, and there will be one. It matters because the repo
+now exists: `sheets/Code.gs` is in git history, so making that repo public later
+is a history rewrite rather than a file edit.
+
 ### 5 Aug — the debt agent is male, and that is seven edits rather than one
 
 Asked for directly, after the 5 Aug correction had gone the other way. Voice
