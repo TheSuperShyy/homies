@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Echo Stone — pick the ten seconds</title>
+<style>
+  :root {
+    --bg: #faf9f7; --fg: #171614; --dim: #6b6862;
+    --line: #e2dfd9; --card: #ffffff; --accent: #7a4b2a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; }
+  }
+  :root[data-theme="light"] {
+    --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a;
+  }
+  :root[data-theme="dark"] {
+    --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 3rem 1.5rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 46rem; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 .35rem; letter-spacing: -.01em; text-wrap: balance; }
+  .sub { color: var(--dim); margin: 0 0 2.5rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 1.15rem 1.25rem; margin-bottom: 1rem;
+  }
+  .card.pick { border-color: var(--accent); }
+  .head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; margin-bottom: .1rem; }
+  .name { font-weight: 650; }
+  .tag {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 99px; padding: .1rem .5rem;
+  }
+  .meta { color: var(--dim); font-size: .875rem; margin: 0 0 .8rem; }
+  .meta b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+  audio { width: 100%; margin-top: .2rem; }
+  .note { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.5rem; color: var(--dim); font-size: .925rem; }
+  .note b { color: var(--fg); }
+  code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .85em;
+    background: color-mix(in srgb, var(--fg) 7%, transparent);
+    padding: .12em .4em; border-radius: 4px;
+  }
+  ul { padding-left: 1.1rem; }
+  li { margin-bottom: .4rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Echo Stone — pick the ten seconds</h1>
+  <p class="sub">Cartesia clones from a clip of <b>up to 10 seconds</b>. These three were cut
+  from the longest silence-free stretches of your 220-second recording. The clone is only
+  ever as good as the ten seconds it was built from.</p>
+
+  <div class="card pick">
+    <div class="head"><span class="name">Candidate A</span><span class="tag">default</span></div>
+    <p class="meta">from <b>162–172s</b> · level <b>−20.7 dB</b> · steadiness <b>1.21</b> · quietest second <b>−22.8 dB</b><br>
+    Loudest of the three while staying steady.</p>
+    <audio controls preload="metadata" src="clone-candidate-a.wav"></audio>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">Candidate B</span></div>
+    <p class="meta">from <b>150–160s</b> · level <b>−21.0 dB</b> · steadiness <b>1.01</b> · quietest second <b>−23.1 dB</b><br>
+    The most even delivery — least variation second to second.</p>
+    <audio controls preload="metadata" src="clone-candidate-b.wav"></audio>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">Candidate C</span></div>
+    <p class="meta">from <b>31–41s</b> · level <b>−20.6 dB</b> · steadiness <b>1.42</b> · quietest second <b>−23.1 dB</b><br>
+    Early in the recording, so different content and possibly a different energy.</p>
+    <audio controls preload="metadata" src="clone-candidate-c.wav"></audio>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">The full recording</span></div>
+    <p class="meta">220s · cleaned to mono 44.1kHz, peak pulled from <b>+0.29 dB</b> to <b>−0.50 dB</b><br>
+    Reference only — too long to clone from.</p>
+    <audio controls preload="none" src="echo-stone-sample.wav"></audio>
+  </div>
+
+  <div class="note">
+    <p><b>What to listen for.</b> Not audio quality — all three measure fine. Listen for
+    whether it sounds like <em>you talking</em>, because that is what gets copied:</p>
+    <ul>
+      <li><b>No pauses.</b> Cartesia's docs say pauses in the clip are mimicked by the clone.
+      A gap here becomes a voice that hesitates on every call.</li>
+      <li><b>Ordinary pace.</b> If you were reading, or speeding up, the clone inherits it
+      and there is no setting that undoes it.</li>
+      <li><b>Nothing clipped at the ends</b> — no half-word at the start or finish.</li>
+    </ul>
+    <p>Then clone from whichever you picked:</p>
+    <p><code>python scripts/voice_clone.py --go</code> for A, or
+    <code>python scripts/voice_clone.py --go --clip voice/clone-candidate-b.wav</code></p>
+    <p style="margin-bottom:0"><b>Nothing here has been uploaded anywhere.</b> This page reads the
+    files off your disk. Your voice has not left this machine — it is gitignored, so it is not
+    in GitHub either.</p>
+  </div>
+</main>
+</body>
+</html>
