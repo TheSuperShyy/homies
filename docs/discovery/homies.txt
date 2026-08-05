@@ -1,0 +1,15 @@
+Voice Agent & Chatbot
+- open request
+- Status req
+- Update payment info in ox
+
+flow:
+The bot > ox truncate the payment > the user will update manually
+
+Payment link using ox system sent to users
+
+Customer support:
+Open tickets for complain
+
+numbers of users:
+50 to 80 but prepare for at least 200 users per day

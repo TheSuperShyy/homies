@@ -1,0 +1,9 @@
+A website for the price quotation
+Send him a summary of the landing page that shows the portfolio
+same design of the main landing page but only has the portfolio
+
+homies:
+
+3 scenarios
+- voice chat for support and chat support
+- voice outbound

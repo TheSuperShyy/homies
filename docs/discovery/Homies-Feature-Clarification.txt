@@ -1,0 +1,84 @@
+Homies AI & Automation — Feature Clarification
+
+Prepared by: CLIX
+Source: Homies Initial AI & Automation Specification
+Date: 24 July 2026
+Purpose: Restate each feature in plain terms so Homies can confirm we understood it correctly before Phase 1. Please mark each feature "Correct" or note what needs adjusting.
+
+
+THE GOAL
+
+Free your team from repetitive work — without replacing anyone. Three AI-driven pillars sit on top of your existing Ox and Monday systems and your WhatsApp activity, handling routine calls, messages, and lookups so staff can focus on the cases that need a human.
+
+
+FEATURE 1 — VOICE COLLECTION AGENT (OUTBOUND)
+
+What it does: Automatically calls residents who owe money, in a controlled and organized way, so the collections team isn't buried in repetitive calls.
+
+How it works:
+- Takes a debtor list from Ox (Excel for now) with tenant name, phone, address, building, debt amount, debt type, payment link, alternative payment details, collection status, and notes.
+- Calls residents in a priority order you define.
+- Introduces itself as a Homies representative, explains the open balance, and states the amount due.
+- Offers to send a payment link by WhatsApp, or provides account/payment details.
+- Logs the result of every call.
+- Detects when a resident wants a human and hands the case to the collections team.
+- Marks calls that weren't answered and schedules a retry.
+- Produces a daily summary: calls made, answered, links requested, human transfers, no-answers, failed calls, who needs manual handling, and who to keep reminding automatically.
+
+The point: proactive, consistent collection outreach at scale, with a clear paper trail — and no duplicate nagging of the same resident.
+
+
+FEATURE 2 — VOICE SERVICE AGENT (INBOUND PHONE EXTENSION)
+
+What it does: Answers incoming service calls on a dedicated extension in your existing phone menu, handling routine requests before they reach a human.
+
+How it works:
+- A new service option is added to your current IVR (phone menu). Choosing it connects the resident to the AI agent instead of a person.
+- Understands why the resident is calling and asks for identifying details and their building/address.
+- Logs the complaint or request.
+- Checks the status of an existing service call.
+- Opens a new service ticket when needed.
+- Emails a summary of the interaction to the team.
+- Escalates sensitive cases to a human representative.
+- Stays calm and service-oriented with upset callers, offering a follow-up or callback.
+
+Typical calls it handles: "my intercom is broken" (logs it, opens a ticket, emails the team), "what's happening with the ticket I opened last week" (checks and reports status), "do I owe anything" (checks and answers, or sends a payment link), and "I want to speak to a person" (transfers or logs a callback).
+
+The point: fewer repetitive calls reaching your reps, while every request is still captured and tracked.
+
+
+FEATURE 3 — CENTRALIZED WHATSAPP SYSTEM WITH AI BOT
+
+What it does: Brings all your scattered WhatsApp activity into one organized platform on a single business number, with an AI bot handling routine messages and staff stepping in whenever needed.
+
+How it works:
+- One central business WhatsApp number, with seats for employees that can grow over time.
+- Routing to departments: Collections, Operations, Management, Service.
+- Chats can be transferred between agents, assigned to a department, and marked open or closed.
+- The AI bot can be switched on or off per conversation, so a human can take over seamlessly at any moment.
+- Full chat logs, automatic conversation summaries, and topic tags.
+- The bot can send payment links, answer common questions, open service tickets, check ticket status, and check balance/debt status.
+
+Important: the bot must never feel like being "thrown to a robot." It communicates calmly, respectfully, and clearly, matching your service standards.
+
+The point: one tidy inbox instead of many numbers, with the bot filtering routine traffic and humans owning the rest.
+
+
+SUPPORTING PIECE — CONNECTING TO OX (INTERIM)
+
+Ox has no live API yet (expected around Q2 2027), so in the meantime the three features connect to Ox data in one of two ways:
+- Excel-based: export data from Ox, process it, and produce a summary file. Simpler, but partly manual.
+- Automated script (RPA): a process that logs into Ox and acts like a human user — searching residents, checking balances, opening tickets, sending payment links, updating fields. More automated, but requires testing, permissions, and approval.
+
+This is done carefully, with your approval and within strict access controls.
+
+
+PRINCIPLES THAT APPLY TO ALL THREE FEATURES
+
+- Always human-first: a smooth handoff to a real person is available at every step. The AI filters, documents, and handles routine work — it does not replace the human touch.
+- No duplicates: safeguards check last-contact dates and history so no resident gets called or messaged twice for the same balance.
+- Data security: role-based access, audit logs, retention rules, and separation between users protect sensitive resident and financial data.
+- Gradual rollout: start with a small pilot (a few buildings or one department), measure, then expand.
+
+
+Please confirm each feature above reflects what you intended. Anything you mark for adjustment, we'll correct before locking the Phase 1 scope.

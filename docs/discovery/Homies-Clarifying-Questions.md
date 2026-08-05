@@ -1,0 +1,123 @@
+# Homies AI & Automation — Understanding & Clarifying Questions
+
+**Prepared by:** CLIX
+**Source documents:** `Homie-HE-PRD.pdf` (English), `homies_translated_spec.pdf` (Hebrew original)
+**Date:** 2026-07-24
+**Purpose:** Confirm we have correctly understood the initial specification before Phase 1 (In-Depth Discovery). Each section restates *our understanding* of a feature, then lists the open questions we need answered to lock scope.
+
+> **How to use this doc:** For each "Our understanding" block, please mark ✅ correct / ✏️ needs correction. For each question, a short answer is enough at this stage — anything marked **[Blocker]** affects architecture and we'd like it resolved first.
+
+---
+
+## 0. Overall Understanding
+
+**Our understanding:** Homies manages ~200 buildings / ~10,000 apartments with ~19 employees, running a full-service model (collections, service calls, operations, resident/supplier/HOA liaison). Today you work primarily in **Ox** (buildings, residents, collections, service calls, operational data) and **Monday** (internal tasks, maintenance, docs, invoices, back-office), plus fragmented WhatsApp activity (previously via ManageChat). The goal is **not to replace staff** but to remove repetitive work via three pillars: (1) Voice Collection Agent, (2) Voice Service Agent, (3) Centralized WhatsApp + AI bot.
+
+**Questions:**
+1. Is the three-pillar priority order (Collection → Service → WhatsApp) also your **rollout** priority, or would you prefer WhatsApp first because it's the most fragmented today?
+2. What does "success" look like in measurable terms after 3 months — e.g. % of collection calls handled without a human, % reduction in inbound service calls, response-time targets? **[Blocker for scoping metrics]**
+3. Primary language(s) for all agents and the bot — Hebrew only, or Hebrew + others (Arabic, Russian, English)?
+4. Are there existing call scripts, message templates, or tone/brand guidelines we should build from, or do we author them in Phase 1?
+
+---
+
+## 1. Voice Collection Agent
+
+**Our understanding:** The system ingests a debtor list exported from Ox (Excel now; automatic integration later) containing tenant name, phone, address, building, debt amount, debt type, payment link, alternative payment details, collection status, and internal notes. The agent then places **outbound** calls in a pre-defined priority order, introduces itself as a Homies representative, states the balance and amount due, offers to send a payment link via WhatsApp (or gives account details), logs the outcome, detects requests for a human and transfers to the collections department, marks no-answers and schedules retries, and produces a daily summary report (calls made, answered, links requested, human transfers, no-answers, failed, manual-handling clients, continue-reminder clients).
+
+**Questions:**
+1. **[Blocker]** How is the debtor list delivered — someone manually exports an Excel from Ox on a schedule, or should we build an automated pull? What's the expected update frequency (daily / real-time)?
+2. What are the **priority rules** for call order (highest debt first, oldest debt, debt type, building)? Who defines them?
+3. Can the agent **negotiate or take payment** in any way (e.g. read out installment options, capture a commitment-to-pay date), or is it strictly "inform + send link + log"?
+4. When a link is "sent via WhatsApp" — does that go through the new centralized WhatsApp system (Pillar 3), or a separate sending mechanism? Should it work before Pillar 3 exists?
+5. **Calling hours & volume:** allowed call windows/days (and legal constraints in Israel for collection calls), and expected daily call volume so we size telephony capacity.
+6. **Retry policy:** how many retries per debtor, over what interval, before flagging for manual handling?
+7. **Duplicate prevention** (also raised in Standards): should the agent check last-contact date and last outcome *per debt* and skip anyone contacted within N days? Is Ox or our system the source of truth for "last contacted"?
+8. Where do call outcomes get written **back** — Ox, Monday, a Homies dashboard, or all three? Given Ox has no API yet, is write-back Excel-only for now?
+9. Who receives the daily summary report, in what format (email, dashboard, Monday board), and at what time?
+10. Should the agent **identify/verify** the person who answers before discussing debt (privacy — confirming it's the tenant, not a family member)? **[Blocker for compliance]**
+11. What happens on voicemail/answering machine — leave a message, or hang up and retry?
+
+---
+
+## 2. Voice Service Agent (Phone Extension)
+
+**Our understanding:** A dedicated service extension is added to the existing IVR router. When a resident selects it, they reach a voice AI agent (instead of a human) that identifies intent, asks for identifying details + building/address, logs complaints/requests, checks status of existing service calls, opens new service tickets, emails an interaction summary to the team, escalates sensitive cases to a human, and de-escalates upset callers with follow-ups/callbacks. Example flows: intercom issue → open ticket/email; status inquiry → look up and report; balance check → retrieve and give details/link; "talk to a human" → transfer or log callback.
+
+**Questions:**
+1. **[Blocker]** Which **IVR/telephony platform** do you use today, and can we add an extension + integrate the AI agent into it? Vendor and account access matter for feasibility.
+2. Since Ox has no API, how does the agent **check service-call status / balance in real time** during a live call? Is there a periodically-refreshed export it queries, an RPA lookup, or is real-time lookup out of scope until the API/RPA is ready? **[Blocker]**
+3. Where are **new service tickets** created — Ox, Monday, or both? What are the required fields to open a valid ticket?
+4. How does the agent **identify the caller/unit** — by inbound caller-ID match, by asking for an ID/apartment number, or both? What if it can't match them?
+5. Which cases count as "**sensitive**" and must always go to a human (e.g. safety, security, elderly residents, legal threats)?
+6. What are the **human-agent availability hours**? Outside them, is the behavior "log a callback task" only?
+7. Should the service agent also **handle the debt/balance question** (overlaps with Pillar 1), and if so should it offer the payment link too?
+8. Who owns the **team email** that receives summaries, and should summaries also land in Monday as a task?
+
+---
+
+## 3. Centralized WhatsApp System + AI Bot
+
+**Our understanding:** Consolidate all WhatsApp activity onto **one central business number** with employee "seats" (scalable), department routing (Collections, Operations, Management, Service), chat transfer between agents, department assignment, open/closed ticket status, per-conversation bot on/off toggle for seamless human handover, full chat logs, automatic thread summaries, and topic tagging. The bot can send payment links, answer FAQs, open service tickets, check ticket status, and check balance/debt status. Critical requirement: it must **not feel robotic** — calm, respectful, clear, service-oriented tone. Migrating off ManageChat is in scope.
+
+**Questions:**
+1. **[Blocker]** Do you have a preferred platform, or should we recommend one? (e.g. Twilio/360dialog + custom UI, or an off-the-shelf shared-inbox like Rasayel/Trengo/Wati.) Budget and build-vs-buy stance drive this heavily.
+2. **[Blocker]** WhatsApp requires an approved **WhatsApp Business API / official number**. Do you already have a verified Business number and Facebook Business Manager, or do we register one? What happens to the existing multiple numbers — consolidate into one, or keep some and route them in?
+3. How many concurrent **agent seats** at launch, and what's the growth expectation?
+4. Do you want a **brand-new interface** we build, or to operate inside a third-party inbox product? (Affects timeline and cost significantly.)
+5. What are the exact **departments and routing rules** — keyword-based, menu-based, or bot-classified by intent?
+6. Same real-time data question as Pillar 2: without an Ox API, how does the bot "check balance / ticket status" live? Cached export, RPA, or deferred? **[Blocker]**
+7. **Permissions:** what should each department/role be able to see and do (view all chats vs. only their department, reassign, close, toggle bot)?
+8. Should the bot **proactively initiate** outbound WhatsApp (e.g. the collection payment links from Pillar 1 originate here), or is it inbound-response only?
+9. Data migration from ManageChat — do you need **historical chat history** carried over, or just cut over new conversations?
+
+---
+
+## 4. Ox Integration (Interim, Pre-API)
+
+**Our understanding:** Ox has **no active API**; an official API is expected ~Q2 2027. Two interim options: **(A) Excel-based** — export from Ox, load, process, export a summary file (simple, but manual/semi-manual); **(B) RPA / user-emulation script** — an automated script logs into Ox and performs searches, balance checks, ticket opening, link sending, field updates (deeper automation, but needs stability testing, permission alignment, Ox coordination, and legal/operational sign-off). Any pre-API work must be cautious, client-approved, and within strict access controls / ToS compliance.
+
+**Questions:**
+1. **[Blocker]** Which direction do you want to commit to first — **Excel (A)**, **RPA (B)**, or a hybrid (Excel for collection batches, RPA for live lookups)? This is the single biggest architectural fork.
+2. For RPA specifically: is Ox a **web app or desktop app**? Is there MFA/2FA on login? Are there per-user seat limits or ToS clauses that would prohibit automation? **[Blocker for Option B]**
+3. Do you have written or verbal **approval** from Ox's vendor to automate against it, or is that something to secure in Phase 1?
+4. Can we get a **sandbox/test Ox account** and sample Excel exports (with fields and realistic data) to work against?
+5. When the official API arrives (~Q2 2027), do you want us to architect now so the interim layer can be swapped for the API cleanly (adapter pattern)?
+
+---
+
+## 5. Cross-Cutting: Standards, Security, Rollout
+
+**Our understanding:** Agents must stay calm/polite/non-robotic; a human-handoff path must always exist; strict duplicate-prevention (last-contact checks) especially in collections; role-based access, audit logging, data-retention rules, and system segregation for sensitive resident/financial data; and gradual rollout via controlled pilots (a few buildings or one department) before full deployment.
+
+**Questions:**
+1. What **pilot scope** do you want for the first go-live — which buildings or which single department, and how many residents?
+2. Any **regulatory/privacy** obligations we must design to (Israeli Privacy Protection Law, call-recording consent, debt-collection regulations)? Do calls need a recording-consent notice? **[Blocker for compliance]**
+3. **Data retention:** how long do we keep call recordings, transcripts, and chat logs?
+4. Where does the system "**live**" — your cloud, our hosting, on-prem? Any data-residency requirement (data must stay in Israel/EU)?
+5. Who are the **admins/owners** on your side per pillar (a point person for collections, service, WhatsApp)?
+6. Does Monday play an active role (tickets/tasks flowing into it), or is it out of scope for v1?
+
+---
+
+## 6. Project Phases & Logistics
+
+**Our understanding:** Six phases — (1) In-depth spec & discovery, (2) infrastructure setup, (3) Collection agent, (4) Service agent, (5) WhatsApp deployment + ManageChat migration, (6) implementation, training & optimization. Immediate next step is executing Phase 1.
+
+**Questions:**
+1. Is there a **target timeline or hard deadline** (e.g. must launch collections before a specific billing cycle)?
+2. Is there a **budget range** so we can right-size build-vs-buy decisions (especially WhatsApp platform and RPA)?
+3. Who from Homies will be our **Phase 1 counterparts** for mapping processes (collections lead, service lead, IT/Ox admin), and can we schedule those sessions?
+4. Do you have any **existing recordings/transcripts** of real collection and service calls we can study to build accurate scripts?
+
+---
+
+## Summary of the "must-answer-first" blockers
+- **§0.2** Success metrics
+- **§1.1** How debtor data is delivered
+- **§1.10** Caller identity verification (privacy)
+- **§2.1** Which IVR/telephony platform
+- **§2.2 / §3.6** Real-time Ox lookups without an API
+- **§3.1 / §3.2** WhatsApp platform choice + verified Business number
+- **§4.1 / §4.2** Excel vs. RPA commitment + Ox automation feasibility
+- **§5.2** Privacy / call-recording-consent obligations

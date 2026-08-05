@@ -1,0 +1,45 @@
+# Secrets — never commit. Keys live here, not in chat, code, or docs.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# The demo page is its OWN repository and its own deployment.
+#
+#   github.com/TheSuperShyy/homies-voice-demo  ->  Vercel
+#
+# Nested here because that is where it is worked on, but committing it into this
+# repo would either swallow its history or leave a broken submodule pointer.
+# Push it from inside web/ — `cd web && git push` — not from here.
+web/
+
+# Scratch
+tmp/
+*.log
+# A dump of whatever system prompt was live when someone last debugged a call.
+# Stale the moment it is written, and the real one lives in docs/ — two copies
+# of a prompt is how they drift.
+scripts/_live_prompt.txt
