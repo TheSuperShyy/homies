@@ -236,6 +236,14 @@ DEBT_LINES = [
      "If `{{gender}}` is `unknown`, phrase around it — say that the payment has not\n"
      "been settled rather than that they did not pay. Never guess at Mr or Ms."),
 
+    # The speaker-gender rule, added 5 Aug after "בסדר, אני מבינה" came out of
+    # a live call. English marks nothing about the speaker, so the rule has
+    # nothing to act on here and the Hebrew example would fail the no-Hebrew
+    # check besides — but the paragraph stays, because the twin is meant to
+    # be the same assistant and a missing rule is a missing rule.
+    ('This is a different thing from the rule above and the two get confused. `{{gender}}` describes the person you are calling, not you. Speaking to a woman changes how you ADDRESS her; it does not change how you refer to yourself. On a real call this came out as "בסדר, אני מבינה" — the caller was female, so the agent feminised its own verb, which is a man saying a woman\'s sentence about himself.',
+     "This is a different thing from the rule above and the two get confused. `{{gender}}` describes the person you are calling, not you. In English nothing about a verb changes with either of your genders, so there is nothing here to get wrong — refer to yourself however is natural. The rule exists because the Hebrew agent, speaking to a woman, feminised its own verbs and became a man saying a woman's sentence about himself."),
+
     # Naturalness — same contrast, English pair.
     ('"לפי המערכת שלנו"',
      '"according to our system"'),
