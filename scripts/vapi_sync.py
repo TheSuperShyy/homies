@@ -250,7 +250,43 @@ TARGETS = {
             # Outbound: a silent line is an answering machine or a hang-up, not
             # someone thinking.
             "silenceTimeoutSeconds": 20,
-            "endCallFunctionEnabled": True,
+            # OFF since 5 Aug, reversing the 4 Aug decision, because the failure
+            # it was protecting against has swapped ends.
+            #
+            # It went on when two calls spoke the whole closing and then sat
+            # there — endCallPhrases had not matched, so nothing ended the call.
+            # Giving the model `endCall` fixed that. What it also did was let the
+            # model end a call WITHOUT saying anything it was told to say, and
+            # that is now the failure actually happening:
+            #
+            #   wrong party  -> log_call_outcome{wrong_party} -> endCall
+            #                   spoken, in full: "Goodbye."
+            #   refusal      -> log_call_outcome{refused}     -> endCall
+            #                   spoken, in full: "Goodbye."
+            #
+            # Both outcomes were logged correctly, so the model understood the
+            # situation perfectly and simply skipped the words. The prompt
+            # already says "Close with a full sentence, not a single word" two
+            # lines above the closing line, and says "Say exactly this" above the
+            # not-the-account-holder line. Both were read and ignored, which is
+            # what makes this a structural problem rather than a wording one: a
+            # rule the model can decline is not a rule.
+            #
+            # With this off the only way to end a call is to SAY the closing
+            # line, because endCallPhrases matches on speech. Saying the line
+            # becomes a precondition of hanging up rather than a request.
+            #
+            # The 4 Aug risk is real and is now bounded on both sides:
+            # maxDurationSeconds caps a stuck call at four minutes, and
+            # silenceTimeoutSeconds closes a dead line in twenty seconds. A call
+            # that overstays costs a few cents. A resident told "Goodbye." and
+            # cut off — or a wrong number never given the privacy line — costs
+            # the relationship, and it is the one they will describe to the
+            # building.
+            #
+            # WATCH THIS. If calls start failing to end, the phrase is not
+            # matching and this goes back to True while that is fixed.
+            "endCallFunctionEnabled": False,
             # A backstop, because endCallFunctionEnabled alone is not reliable.
             # On 4 Aug two consecutive English calls spoke the whole closing —
             # "thank you for your time, have a good day, and goodbye" — and then
