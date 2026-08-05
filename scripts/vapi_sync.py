@@ -362,6 +362,14 @@ TARGETS = {
             # deliberate, so it stays there.
             "model": {"provider": "openai", "model": "gpt-5.4"},
         },
+        # "Echo Stone" — this agent takes a cloned voice when one exists. See
+        # cloned_voice() below. The debt agent and not the inbound one because
+        # the voice being cloned is male and this prompt is already masculine
+        # throughout: מיכאל, מדבר, שולח, מעביר. Pointing a male clone at the
+        # inbound agent instead would mean rewriting the same seven passages that
+        # have already been flipped three times. Nothing in the prompt changes
+        # here — only the voice block.
+        "cloneable": True,
         "tools": DEBT_TOOLS,
     },
 }
@@ -439,12 +447,70 @@ def tool_server():
     return None
 
 
+def cloned_voice(fallback):
+    """The Echo Stone voice — a clone of a real person — or None if there is none.
+
+    Returns None whenever CARTESIA_VOICE_ID is unset, which is the state this
+    project is in until a Cartesia account exists. That is deliberate: with the
+    variable absent this function changes nothing at all, so the file can carry
+    the wiring long before the voice exists and `--apply` stays safe to run.
+
+    WHY CARTESIA AND NOT ELEVENLABS, WHICH IS WHAT EVERYONE REACHES FOR
+    A cloned voice cannot run on `provider: vapi` at all. VapiVoice.voiceId is a
+    closed enum of thirty names in Vapi's own OpenAPI spec — Elliot and Leah are
+    two of them — with no slot for a custom id. CloneVoiceDTO exists in that spec
+    and is referenced by no path and no other schema. So the clone lives in a
+    provider account and Vapi points at it, whichever provider that is.
+
+    Of the ones that accept a free-text voiceId, Cartesia is the only strong fit
+    for Hebrew: `he` is declared in its 42-language enum. ElevenLabs declares
+    `language` as free text, so nothing in the spec says whether Hebrew works —
+    it would ride on eleven_v3 — and the spec carries the error
+    `eleven-labs-blocked-using-instant-voice-clone-and-requested-upgrade`, so its
+    cloning is plan-gated too. Paying to find out is the wrong order. PlayHT,
+    LMNT and Rime also declare Hebrew and are the backups if Cartesia disappoints.
+
+    Cartesia also keeps `chunkPlan`, which is where the output guard lives. A
+    provider without it would silently drop the filter that stops the model
+    reading its own tool calls aloud — see scripts/voice_guard.py.
+
+    THE FALLBACK IS NOT OPTIONAL
+    The Hebrew transcriber already falls back Hebrew-to-Hebrew so no path ends
+    with an English engine listening to a Hebrew resident. The voice needs the
+    same care for the same reason. A cloned voice is one account and one
+    provider away from failing, and the failure would land mid-call; falling back
+    to Elliot means a call continues in a male Hebrew voice reading masculine
+    verbs, which is wrong-sounding but grammatical. FallbackVapiVoice carries
+    chunkPlan, so the guard survives the fallback.
+    """
+    vid = os.environ.get("CARTESIA_VOICE_ID", "").strip()
+    if not vid:
+        return None
+    voice = voice_with_guard({
+        "provider": "cartesia",
+        "voiceId": vid,
+        # sonic-3 by default. Overridable because the model list moves faster
+        # than this file does, and because the right one is decided by ear.
+        "model": os.environ.get("CARTESIA_MODEL", "sonic-3").strip(),
+        # The same thing `language: he` does on the Vapi voices: without it a
+        # multilingual voice reads Hebrew text as though it were English.
+        "language": "he",
+    })
+    voice["fallbackPlan"] = {"voices": [dict(fallback, provider="vapi")]}
+    return voice
+
+
 def build(target, first_message, system_prompt):
     body = json.loads(json.dumps(BASE))
     body.update(target["extra"])
     body["name"] = target["name"]
     body["firstMessage"] = first_message
     body["model"]["messages"] = [{"role": "system", "content": system_prompt}]
+
+    if target.get("cloneable"):
+        cloned = cloned_voice(body["voice"])
+        if cloned:
+            body["voice"] = cloned
 
     server = tool_server()
     if target.get("tools") and server:
@@ -498,6 +564,12 @@ def main():
                                      payload["transcriber"].get("model", "")
                                      or payload["transcriber"].get("language", "")))
     print("model         : %s" % payload["model"]["model"])
+    v = payload["voice"]
+    fb = (v.get("fallbackPlan") or {}).get("voices") or []
+    print("voice         : %s %s%s%s" % (
+        v["provider"], v["voiceId"],
+        " (cloned)" if v["provider"] == "cartesia" else "",
+        "  fallback -> %s %s" % (fb[0]["provider"], fb[0]["voiceId"]) if fb else ""))
     print("endpointing   : wait %ss, noPunct %ss, number %ss, backoff %ss" % (
         sp["waitSeconds"],
         sp["transcriptionEndpointingPlan"]["onNoPunctuationSeconds"],

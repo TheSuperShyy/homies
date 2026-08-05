@@ -36,6 +36,30 @@ desktop.ini
 # Push it from inside web/ — `cd web && git push` — not from here.
 web/
 
+# Voice recordings — a person's voice, dropped in for reference or for cloning.
+#
+# `New Recording 154.m4a (1).mp4` landed in the project root on 5 Aug and was
+# untracked but NOT ignored, which meant the next `git add -A` would have pushed
+# 3.5 minutes of somebody's speech to GitHub. It missed the 10:xx commit by
+# minutes, and that was luck rather than anything working.
+#
+# A voice recording is biometric-adjacent: it identifies a person, and once it is
+# in a repo's history removing it is a rewrite, not a delete. Call recordings from
+# Vapi carry a resident on the other end of them too. None of it belongs here.
+# Keep them local, or in a store with access control — never in git.
+*.m4a
+*.mp3
+*.wav
+*.ogg
+*.opus
+*.flac
+*.aac
+*.webm
+# Phone recorders name their exports .m4a and Windows appends .mp4 on download,
+# so the extension alone does not catch it.
+New Recording*
+*.m4a*
+
 # Scratch
 tmp/
 *.log
