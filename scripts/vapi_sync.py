@@ -224,8 +224,19 @@ TARGETS = {
             # It costs latency (Azure was the slower of the two) and it is a
             # purpose-built Hebrew voice rather than a multilingual one, which
             # for a Hebrew-only assistant is a fair trade.
+            # Back to Leah, and back to a feminine prompt with it — the same
+            # paired change as before, run in reverse. Elliot went in on request
+            # at 12:17 and came out at 13:2x when the earlier Hebrew was judged
+            # more natural; that earlier text is מיכל throughout, so the voice
+            # had to follow it rather than the other way round.
+            #
+            # This entry stays here rather than moving back into BASE. BASE is
+            # shared with the inbound assistant, and the whole reason this
+            # override exists is that the two prompts can disagree about the
+            # speaker's gender. They happen to agree again today. They will not
+            # always.
             "voice": voice_with_guard(
-                {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"},
+                {"provider": "vapi", "voiceId": "Leah", "version": "2", "language": "he"},
                 chunk=SPEECH),
             # Target is a two-minute call. Anything past four is a call that
             # should have been handed over.

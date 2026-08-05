@@ -990,6 +990,49 @@ design. That is what layer 3 and the checker are for.
 **Noticed while measuring:** the debt system prompt is now 33,191 characters.
 Prompt reduction was already on the list; it has moved up.
 
+### 5 Aug — the Hebrew debt prompt reverted to yesterday's wording, keeping one section
+
+Asked to go back to "the version before this one, the one we were building
+yesterday". Those are two different prompts, and the difference mattered:
+
+- **the previous version** was two hours old — identical but for the seven
+  gender passages
+- **yesterday's** was 33,191 chars, 2,691 smaller, and lived only in
+  `docs/handover/vapi-export-old-account.json`
+
+**Vapi keeps version history and it does not go back far enough.** Ten versions
+on the debt assistant, all from 10:09–12:17 *today*, because the assistant was
+created at 09:31 in the migration. The list endpoint returns stubs; the content
+is under `data` on each entry, and reading it showed the whole afternoon: the
+voice moving `he-IL-HilaNeural` → Elliot → Leah → Elliot, and the 12:12 entry
+that is the dashboard revert — feminine prompt against a male voice.
+
+The answer was neither option whole: yesterday's Hebrew, **plus** the
+YOU ARE BEING HEARD, NOT READ section, which was judged worth keeping. Merged by
+splicing three blocks into yesterday's text at anchors present in both — the
+spoken-delivery section, the money rule (`שקלים`, never `ש"ח`, never digits in
+pieces) and the fixed-line re-inflection rule for the *caller's* gender. The
+latter two were kept without being asked for: both were written to fix defects
+heard on real calls, and both serve naturalness rather than working against it.
+Removing either is one word.
+
+35,921 chars, verified byte-identical between the document and the live
+assistant.
+
+**The seven spoken lines are yesterday's again**, and they are feminine, so the
+voice went back to **Leah** in the same push. Same paired change as this morning,
+run in reverse — and the override stays on the debt target rather than moving
+back into `BASE`, because the point of it is that the two prompts can disagree
+about the speaker's gender. They agree today. They will not always.
+
+**The English twin refused to build, which is the guard working.** Nine
+`DEBT_LINES` entries keyed on Hebrew that had just changed, and the script listed
+all nine rather than shipping a half-translated prompt. Repointed at strings read
+out of the live prompt rather than retyped, so a transcription slip could not
+introduce a mismatch that still matched. Four English lines were reworded too —
+yesterday's Hebrew says "for this amount… complete it yourself" and "anyone who
+is not the account holder", which the previous English no longer rendered.
+
 ### 5 Aug — the demo page was blank, and it took three wrong diagnoses to read the console
 
 The deployed page rendered no resident list, the tag stuck on `loading…`, and

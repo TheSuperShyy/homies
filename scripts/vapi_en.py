@@ -192,7 +192,7 @@ def api(method, path, body=None):
 
 DEBT_LINES = [
     # Identity
-    ("You are Michael (מיכאל), the AI voice assistant of Homies (הומיז), a building",
+    ("You are Michal (מיכל), the AI voice assistant of Homies (הומיז), a building",
      "You are Michael, the AI voice assistant of Homies, a building"),
     # Both twins are Michael since 5 Aug, so this entry now only strips the
     # Hebrew spelling — מיכאל is unpronounceable to an English voice and would
@@ -207,7 +207,7 @@ DEBT_LINES = [
     ("You are making an outbound phone call to a resident regarding an unpaid ועד בית\npayment.",
      "You are making an outbound phone call to a resident regarding an unpaid\nbuilding committee payment."),
 
-    ('"אני עוזר דיגיטלי של הומיז."',
+    ('"אני עוזרת דיגיטלית של הומיז."',
      '"I\'m a digital assistant from Homies."'),
 
     # Style — the register is Israeli call-centre; in English keep the register,
@@ -250,33 +250,31 @@ DEBT_LINES = [
     # Replaced the card-authorisation line on 4 Aug. "you can complete it
     # yourself" is doing real work: it is what stops the resident waiting for
     # someone at Homies to do the next thing.
-    ("> מצוין. אני שולח לך עכשיו קישור לתשלום, ואפשר להסדיר את זה ישירות דרכו.",
-     "> Great. I'm sending you a payment link now, and you can settle it "
-     "straight through it."),
+    ("> מצוין. אני שולחת לך קישור לתשלום על הסכום הזה, ותוכל להשלים את זה בעצמך.",
+     "> Great. I'm sending you a payment link for this amount, and you can "
+     "complete it yourself."),
 
     # The refusal callback offer. It went in on 5 Aug written in English, which
     # meant the Hebrew assistant carried an English line among six Hebrew ones —
     # the only spoken line in the prompt that was not in the language of the call.
-    ("> רוצה שנציג מהמשרד יחזור אליך בנושא?",
-     "> Would you like someone from the office to get back to you about it?"),
+    ("> אפשר שנציג מהמשרד יחזור אליך בנושא?",
+     "> Could someone from the office get back to you about it?"),
 
-    ("> שלום, מדבר מיכאל מהומיז, חברת הניהול של הבניין. אני מדבר עם {{first_name}}?",
+    ("> שלום, מדברת מיכל מהומיז, חברת הניהול של הבניין. אני מדברת עם {{first_name}}?",
      "> Hello, this is Michael from Homies, the building management company. "
      "Am I speaking with {{first_name}}?"),
 
     ("Once they confirm, say why you are calling: the ועד בית payment for",
      "Once they confirm, say why you are calling: the building committee payment for"),
 
-    ("> סליחה על ההפרעה, אני יכול למסור פרטים רק למי שהחשבון על שמו. "
-     "אפשר לבקש מ{{first_name}} ליצור איתנו קשר?",
-     "> Sorry to disturb you. I can only share details with the person whose "
-     "name the account is in. Could you ask {{first_name}} to get in touch?"),
+    ("> סליחה על ההפרעה, אני לא יכולה למסור פרטים למי שאינו בעל החשבון. אפשר לבקש ש{{first_name}} יחזור אלינו?",
+     "> Sorry to disturb you. I can't share details with anyone who is not the "
+     "account holder. Could you ask {{first_name}} to get back to us?"),
 
-    ("> שלום, מדבר מיכאל מחברת הניהול הומיז, לגבי הבניין ב{{building}}. "
-     "יש נושא שנשמח להסדיר, אפשר לחזור אלינו למספר {{callback_number}}. תודה ויום טוב.",
+    ("> שלום, מדברת מיכל מחברת הניהול הומיז לגבי בניין {{building}}. יש נושא שנשמח להסדיר איתך, אפשר לחזור אלינו למספר {{callback_number}}. תודה ויום טוב.",
      "> Hello, this is Michael from Homies building management, regarding "
-     "{{building}}. There's something we'd like to sort out with you. Please call "
-     "us back on {{callback_number}}. Thank you and have a good day."),
+     "building {{building}}. There's a matter we'd be glad to settle with you. "
+     "Please call us back on {{callback_number}}. Thank you and have a good day."),
 
     ("Say nothing about money. Not the amount, not the month, not the word חוב. Use",
      "Say nothing about money. Not the amount, not the month, not the word debt. Use"),
@@ -284,7 +282,7 @@ DEBT_LINES = [
     ("No amount. No month. Not the word חוב.",
      "No amount. No month. Not the word debt."),
 
-    ("> רגע אחד, אני מעביר אותך לנציג מהצוות שלנו. נא להישאר על הקו.",
+    ("> רגע אחד, אני מעבירה אותך לנציג מהצוות שלנו. נא להישאר על הקו.",
      "> One moment, I'm transferring you to someone from our team. "
      "Please stay on the line."),
 
@@ -296,8 +294,8 @@ DEBT_LINES = [
     # streaming TTS on punctuation, and " — " left "Great" as a chunk of its own,
     # short enough to be swallowed while the previous sentence was still playing.
     # The Hebrew line has no dash and has never lost a word.
-    ("> מצוין, תודה רבה. שיהיה יום טוב ולהתראות.",
-     "> Great, thank you. Have a good day, and goodbye."),
+    ("> מצוין, תודה רבה על הזמן. שיהיה יום טוב ולהתראות.",
+     "> Great, thank you for your time. Have a good day, and goodbye."),
 
     # The vav is what makes ולהתראות unreachable by a bare goodbye, and "and" is
     # the English equivalent — both are what the call actually ends on, so the
