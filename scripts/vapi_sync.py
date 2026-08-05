@@ -206,6 +206,9 @@ TARGETS = {
             # failure this whole change exists to remove.
             "endCallFunctionEnabled": False,
         },
+        # Female, matching מיכל and the feminine prompt. This assistant ran on
+        # Azure HilaNeural until 5 Aug, so it is a return rather than a new stack.
+        "native_voice": "he-IL-HilaNeural",
         "tools": INTAKE_TOOLS,
     },
     "debt": {
@@ -370,6 +373,8 @@ TARGETS = {
         # have already been flipped three times. Nothing in the prompt changes
         # here — only the voice block.
         "cloneable": True,
+        # Male, matching מיכאל and the masculine prompt. See native_voice().
+        "native_voice": "he-IL-AvriNeural",
         "tools": DEBT_TOOLS,
     },
 }
@@ -447,6 +452,47 @@ def tool_server():
     return None
 
 
+def native_voice(target, fallback):
+    """Azure's purpose-built Hebrew voices, when VOICE_PROFILE=native.
+
+    THE AMERICAN ACCENT IS NOT A SETTING, IT IS THE VOICE
+    `vapi/Elliot` with `language: he` is an ENGLISH voice model being told to
+    read Hebrew text. The language flag changes which letters it pronounces, not
+    which language it learned to speak, so an English accent is not a
+    misconfiguration to tune out — it is what that voice is. No amount of
+    prompt work or speed adjustment reaches it.
+
+    `azure/he-IL-AvriNeural` is a voice model trained on Hebrew. Note that it
+    takes NO `language` property at all, which is the tell: the locale is in the
+    name because the voice IS Hebrew rather than a multilingual voice pointed at
+    it. Avri is male and Hila is female, matching the two prompts as written.
+
+    THE TRADE, AND IT IS REAL
+    Vapi's dashboard rates its own v2 voices at 93 for humanness against Azure's
+    2019-generation neural output, and at ~440ms against Azure's slower. So this
+    swaps an American accent for an older-sounding voice, and which of the two is
+    worse is a question only ears answer. Hence the toggle rather than a
+    decision: run one call each way and keep the better.
+
+        VOICE_PROFILE=native  python scripts/vapi_sync.py debt --apply
+        VOICE_PROFILE=        python scripts/vapi_sync.py debt --apply
+
+    Both were tested against the live API before this was written; Vapi accepts
+    either voiceId with a 200.
+
+    The third option beats both and is parked: a cloned voice speaking Hebrew has
+    neither problem, because it is a real Hebrew speaker's voice rather than a
+    model imitating one. This toggle is what to use until that exists.
+    """
+    vid = target.get("native_voice")
+    if not vid or os.environ.get("VOICE_PROFILE", "").strip().lower() != "native":
+        return None
+    # No `language` key: Azure rejects one, and the voice name carries the locale.
+    voice = voice_with_guard({"provider": "azure", "voiceId": vid})
+    voice["fallbackPlan"] = {"voices": [dict(fallback, provider="vapi")]}
+    return voice
+
+
 def cloned_voice(fallback):
     """The Echo Stone voice — a clone of a real person — or None if there is none.
 
@@ -507,10 +553,17 @@ def build(target, first_message, system_prompt):
     body["firstMessage"] = first_message
     body["model"]["messages"] = [{"role": "system", "content": system_prompt}]
 
+    # Precedence: a cloned voice beats a native one beats the stock Vapi voice.
+    # The clone is the goal, `native` is the stopgap for the accent, and the
+    # stock voice is what ships when neither is configured.
     if target.get("cloneable"):
         cloned = cloned_voice(body["voice"])
         if cloned:
             body["voice"] = cloned
+    if body["voice"]["provider"] == "vapi":
+        native = native_voice(target, body["voice"])
+        if native:
+            body["voice"] = native
 
     server = tool_server()
     if target.get("tools") and server:
