@@ -422,15 +422,15 @@ Speak Hebrew, only Hebrew, for the whole call. You speak about yourself in the
 feminine first person.
 
 If the caller speaks something other than Hebrew, do not attempt it. Say
-"רק רגע, אני מעבירה אותך לנציג", call transfer_to_human with reason
-"language", and stop.""",
+"רק רגע, אני מעבירה את זה לנציג שיחזור אליך", call transfer_to_human with reason
+"language", then close the call.""",
      """## Language
 
 Speak English, only English, for the whole call.
 
 If the caller speaks something other than English, do not attempt it. Say
-"One moment, I'm putting you through to someone", call transfer_to_human with
-reason "language", and stop.
+"One moment — I'm passing this to someone who'll get back to you", call
+transfer_to_human with reason "language", then close the call.
 
 NOTE ON THIS VERSION
 
@@ -442,12 +442,13 @@ soften, shorten or improve anything relative to what you are told below."""),
     # The refusal that replaced the status lookup. The most important line in the
     # prompt to get right in both languages: it is the one standing between a
     # caller and an invented answer.
-    ("    אין לי גישה לסטטוס של פניות קיימות. אני מעבירה אותך לנציג שיוכל לבדוק.",
-     "    I don't have access to the status of existing requests. Let me put you\n"
-     "    through to someone who can check."),
+    ("    אין לי גישה לסטטוס של פניות קיימות. אני מעבירה את זה לנציג שיחזור אליך.",
+     "    I don't have access to the status of existing requests. I'm passing this\n"
+     "    to someone who can check, and they'll get back to you."),
 
-    ("    זה משהו שנציג צריך לטפל בו. אני מעבירה אותך.",
-     "    That's something a person needs to handle. I'll put you through."),
+    ("    זה משהו שנציג צריך לטפל בו. אני מעבירה את זה, ומישהו יחזור אליך.",
+     "    That's something a person needs to handle. I'm passing it on and someone\n"
+     "    will get back to you."),
 
     # The two questions the whole call depends on.
     ("""1. **Building.** באיזה בניין מדובר?
@@ -500,8 +501,8 @@ soften, shorten or improve anything relative to what you are told below."""),
      "    I'm struggling to hear you. I've saved what I could make out along with\n"
      "    the recording, and someone will call you back."),
 
-    ("    זה נשמע דחוף. אני מעבירה אותך עכשיו לנציג.",
-     "    That sounds urgent. I'm putting you through to someone right now."),
+    ("    זה נשמע דחוף. אני מסמנת את זה כדחוף ומעבירה לנציג עכשיו.",
+     "    That sounds urgent. I'm marking it urgent and passing it to someone now."),
 
     # The emergency numbers do NOT translate. The caller is in Israel whichever
     # language they rang in, and 101 and 102 are the numbers that work there.
@@ -511,8 +512,20 @@ soften, shorten or improve anything relative to what you are told below."""),
      "    If anyone is in immediate danger, call an ambulance on 101 or the fire\n"
      "    service on 102."),
 
-    ("    אני מבינה. אני מעבירה אותך לנציג שיוכל לעזור.",
-     "    I understand. I'm putting you through to someone who can help."),
+    ("    אני מבינה. אני מעבירה את זה לנציג שיחזור אליך.",
+     "    I understand. I'm passing this to someone who'll get back to you."),
+
+    # The closing, added 5 Aug. Both halves matter: "and goodbye" is what the
+    # endCallPhrases entry matches on, exactly as ולהתראות is on the Hebrew side,
+    # so this pair is load-bearing rather than cosmetic. A translation that
+    # dropped the conjunction would leave the English twin unable to hang up.
+    ("    משהו נוסף?", "    Anything else?"),
+
+    ("    תודה שהתקשרת להומיז, יום טוב, ולהתראות.",
+     "    Thanks for calling Homies, have a good day, and goodbye."),
+
+    ("**Say the whole line.** Not להתראות on its own, not a shortened version, not",
+     "**Say the whole line.** Not \"goodbye\" on its own, not a shortened version, not"),
 
     ('saying "הלו?".', 'saying "Hello?".'),
 

@@ -268,8 +268,10 @@ INTAKE_TOOLS = [
     ),
     _fn(
         "transfer_to_human",
-        "Call after telling the caller you are putting them through, never before and "
-        "never on its own. The call stays open afterwards — do not end it.",
+        "Call after telling the caller a representative will get back to them, never "
+        "before and never on its own. This hands the call to the office in writing; it "
+        "does not connect anyone to anyone, so do not say you are putting them through. "
+        "Close the call after calling it.",
         {"reason": {"type": "string", "enum": INTAKE_TRANSFER_REASONS}},
         ["reason"],
     ),

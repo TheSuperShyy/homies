@@ -181,6 +181,30 @@ TARGETS = {
             # Untouched. Inbound silence is usually someone reading a meter number
             # off a wall, not a dead line.
             "silenceTimeoutSeconds": 30,
+            # Added 5 Aug. Until now this assistant had NO WAY TO END A CALL —
+            # no endCall function, no phrases, and no closing line in the prompt
+            # to trigger one with. Every call it has ever handled ended
+            # `customer-ended-call`, which looked fine because a caller who rang
+            # in usually does hang up. What it hides is the shape underneath: the
+            # agent reads out a reference number, stops talking, and the line
+            # sits open for thirty seconds of silence before Vapi closes it. The
+            # caller is left listening to nothing, wondering whether it worked.
+            #
+            # Same mechanism as the debt agent and for the same reason: the model
+            # can decline to call a function, so the words are made the mechanism
+            # rather than a request. With no endCall available, SAYING the closing
+            # line is the only way to hang up.
+            #
+            # ולהתראות carries the vav, so a bare להתראות does not match it — the
+            # one-word goodbye that ended a debt call mid-question on 5 Aug cannot
+            # reach this. "and goodbye" does the same job for the English twin,
+            # which shares this file's reasoning through vapi_en.py.
+            "endCallPhrases": ["and goodbye", "ולהתראות"],
+            # Explicit rather than inherited. It is already Vapi's default, but
+            # a dashboard visit can flip it without saying so, and if it comes on
+            # the model gets a way to hang up WITHOUT speaking — which is the
+            # failure this whole change exists to remove.
+            "endCallFunctionEnabled": False,
         },
         "tools": INTAKE_TOOLS,
     },

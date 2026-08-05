@@ -770,6 +770,54 @@ Recorded as not transferring: call history and recordings, the free US number,
 the eval suite, and anything ever edited in the dashboard and not written back
 here — that last one exists nowhere else and a rebuild will quietly not have it.
 
+### 5 Aug — the inbound call had no ending, and every transfer was a promise nobody could keep
+
+Two omissions in the inbound agent, found by reading the live config rather than
+a transcript. Both are the same mistake: a thing the prompt describes that the
+platform was never told to do.
+
+**Nothing could end an inbound call.** `endCallPhrases: None`,
+`endCallFunctionEnabled: None`, and no closing line anywhere in the prompt to
+trigger one with. All three calls on record ended `customer-ended-call`, which
+is why it never looked like a bug — someone who rang in does normally hang up.
+The shape underneath is worse than that reading: the agent reads out the
+reference number, stops, and the line stays open in silence for thirty seconds
+until `silenceTimeoutSeconds` closes it. The caller is left listening to nothing
+with no way to tell whether their request was written down.
+
+Fixed the way the debt agent was, because it is the same problem: an `## Ending
+the call` section with a fixed closing, `endCallPhrases: ["and goodbye",
+"ולהתראות"]`, and `endCallFunctionEnabled: False` set explicitly so a dashboard
+visit cannot quietly hand the model a way to hang up without speaking. Saying
+the line is the mechanism, not a request. One `משהו נוסף?` gates it — the only
+extra turn the style section tolerates, and it is there because ending a call is
+the one irreversible act in the flow.
+
+**Every transfer path promised a live handoff that does not exist.**
+`transfer_to_human` posts a row to n8n. There is no `transferPlan`, no
+destination, no extension — verified on the live assistant, both fields null.
+The prompt said *"אני מעבירה אותך לנציג"* in five separate places, so the caller
+was told they were being put through and then sat on an open line waiting for a
+voice that was never coming. All five now say a representative will get back to
+them, which is what the row actually causes; `transfer_to_human`'s own
+description says so too, so the model is not reading one thing in the prompt and
+another in the tool; and absolute rule 9 forbids the old phrasing outright. When
+a real extension exists, the wording and a `transferPlan` go back together.
+
+The 08:56 English test call is worth separating from this. It thanked the caller
+for reporting a leak and explained a fallback before it was needed — both
+explicitly forbidden — but the assistants were re-synced at 10:30, so that call
+predates the `Say less than you think you should` section rather than ignoring
+it. It has not been retested since, and it is the thing to watch on the next
+call, along with the fact that 97 seconds of leak, building and apartment
+produced zero tool calls.
+
+English twin rebuilt from the Hebrew: 24 substitutions, all matched exactly
+once, no Hebrew remaining. `and goodbye` and `ולהתראות` are a matched pair here
+rather than a translation — each is what its own `endCallPhrases` entry fires
+on, so a twin that dropped the conjunction would be a twin that could not hang
+up.
+
 ### 5 Aug — four faults in one call, one of them the worst yet
 
 Test call to משה on the link flow.
