@@ -990,6 +990,64 @@ design. That is what layer 3 and the checker are for.
 **Noticed while measuring:** the debt system prompt is now 33,191 characters.
 Prompt reduction was already on the list; it has moved up.
 
+### 5 Aug — the demo page was blank, and it took three wrong diagnoses to read the console
+
+The deployed page rendered no resident list, the tag stuck on `loading…`, and
+nothing on screen said why. Cause, once actually looked at:
+
+```
+Uncaught ReferenceError: Cannot access 'ALT' before initialization
+```
+
+`const ALT` was declared twelve lines below the array that used it. `const` is
+hoisted but not initialised, so reading it from above its own declaration throws
+while the module's top level is still executing — and **a module that throws at
+top level is discarded whole**. `drawPeople()` and `loadQueue()` are called on
+the last three lines and never ran, which is why the label kept the placeholder
+the markup shipped with. `node --check` passes it happily; it is a runtime fault
+in something that looks like data.
+
+**Two commits went out against a problem that did not exist.** The blank-page
+symptom is identical whether a module dies on a failed import or on its own
+data, so the symptom carried no information — and a CDN theory was built that
+fitted it perfectly. Worse, node had printed `Cannot access 'ALT' before
+initialization` with a caret on the exact line during an earlier syntax check,
+and it was read as a harmless missing-`document` error and skipped past. The
+evidence was on screen an hour before it was used.
+
+What settled it in one command:
+
+```sh
+chrome --headless=new --enable-logging=stderr --dump-dom <url>
+```
+
+Ten residents or zero, the label's text, and the console — from the deployed URL,
+in a clean profile, in about twenty seconds.
+
+**Neither wrong commit was reverted, on purpose.** The SDK now ships from
+`web/vendor/` instead of esm.sh, and a failed import no longer takes the page
+down. Both are worth having on their own, and the second is what would have put
+this error on the page rather than only in a console nobody had open.
+
+**Then it was still blank in a real browser while a clean Chrome rendered it
+fine** — which is cache, not code. Vercel was sending
+`public, max-age=0, must-revalidate` with `X-Vercel-Cache: HIT`. `web/vercel.json`
+now sends `no-store` for the HTML and a year of `immutable` for `vendor/`, which
+is the right split: the page changes constantly, the pinned SDK never does.
+
+**The header carries a build stamp**, from `document.lastModified` — no build
+step, nothing to bump. It separates the two failures that had been confusing each
+other all afternoon: a timestamp older than the last push means a cached copy; the
+words "script did not run" mean the module crashed. Identical from the outside,
+opposite fixes.
+
+**The gap this exposed is real and still open.** Every assistant push is verified
+against the Vapi API — voice, tools, prompt, no feminine forms left — which is
+why that side has been reliable all day. The web page had no equivalent, so the
+only check was a human opening it. The same headless command above, asserting
+buttons > 0 and no console errors, would have caught this in thirty seconds.
+Offered, not yet built.
+
 ### 5 Aug — Apps Script redeployed; the partial-request net is live
 
 `save_partial_request` answered `unknown tool` from the deployed writer all
