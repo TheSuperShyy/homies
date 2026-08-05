@@ -56,27 +56,31 @@
 <body>
 <main>
   <h1>Echo Stone — pick the ten seconds</h1>
-  <p class="sub">Cartesia clones from a clip of <b>up to 10 seconds</b>. These three were cut
-  from the longest silence-free stretches of your 220-second recording. The clone is only
-  ever as good as the ten seconds it was built from.</p>
+  <p class="sub">Cartesia clones from a clip of <b>up to 10 seconds</b>. The clone is only
+  ever as good as the ten seconds it was built from — so these are cut to <b>begin and end
+  inside a natural pause</b>, with no long pause in between.</p>
+
+  <p class="sub" style="margin-top:-1.6rem">The first attempt optimised for no silence at
+  all, which sounded chopped for a reason: a window containing no pauses necessarily starts
+  and ends mid-word. These land on breaths instead.</p>
 
   <div class="card pick">
     <div class="head"><span class="name">Candidate A</span><span class="tag">default</span></div>
-    <p class="meta">from <b>162–172s</b> · level <b>−20.7 dB</b> · steadiness <b>1.21</b> · quietest second <b>−22.8 dB</b><br>
-    Loudest of the three while staying steady.</p>
+    <p class="meta">from <b>143.7–153.7s</b> · <b>9.93s</b> · longest pause inside <b>0.00s</b><br>
+    An unbroken run of speech with a breath at each end. The cleanest of the three.</p>
     <audio controls preload="metadata" src="clone-candidate-a.wav"></audio>
   </div>
 
   <div class="card">
     <div class="head"><span class="name">Candidate B</span></div>
-    <p class="meta">from <b>150–160s</b> · level <b>−21.0 dB</b> · steadiness <b>1.01</b> · quietest second <b>−23.1 dB</b><br>
-    The most even delivery — least variation second to second.</p>
+    <p class="meta">from <b>114.9–124.8s</b> · <b>9.85s</b> · longest pause inside <b>0.25s</b><br>
+    One short breath in the middle — natural rather than hesitant.</p>
     <audio controls preload="metadata" src="clone-candidate-b.wav"></audio>
   </div>
 
   <div class="card">
     <div class="head"><span class="name">Candidate C</span></div>
-    <p class="meta">from <b>31–41s</b> · level <b>−20.6 dB</b> · steadiness <b>1.42</b> · quietest second <b>−23.1 dB</b><br>
+    <p class="meta">from <b>29.9–39.9s</b> · <b>10.00s</b> · longest pause inside <b>0.31s</b><br>
     Early in the recording, so different content and possibly a different energy.</p>
     <audio controls preload="metadata" src="clone-candidate-c.wav"></audio>
   </div>
