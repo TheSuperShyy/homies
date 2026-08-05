@@ -770,6 +770,62 @@ Recorded as not transferring: call history and recordings, the free US number,
 the eval suite, and anything ever edited in the dashboard and not written back
 here — that last one exists nowhere else and a rebuild will quietly not have it.
 
+### 5 Aug — "Echo Stone": the debt agent is wired for a cloned voice, and two dead ends ruled out first
+
+Asked for the debt agent to speak in a recording of a real person's voice. The
+recording is good material — 220 seconds, only 11 seconds of silence across
+seven gaps, single speaker — but it peaked at **+0.29 dBFS**, i.e. at or above
+full scale, and clipping bakes distortion into a clone permanently. Cleaned to
+mono 44.1kHz at −0.50 dB peak as `voice/echo-stone-sample.wav`.
+
+**Vapi cannot host a cloned voice, and this is settled rather than suspected.**
+`VapiVoice.voiceId` is a closed enum of thirty names in Vapi's own OpenAPI spec
+— Elliot and Leah among them — with no slot for a custom id. `CloneVoiceDTO`
+exists in that spec and is referenced by no path and no other schema. Both
+accounts, old and new, report zero credentials, zero provider voices and zero
+files, which is consistent: a clone is created *in a provider account*, and with
+no provider connected there is nowhere for one to be created.
+
+**"Custom voice" in the dashboard is not voice cloning.** It looked like the
+answer and it is the opposite: `CustomVoice` requires a `server`, and the
+request flows *outward* — Vapi POSTs text to a URL you run and expects audio
+back. It is a bring-your-own-engine hook for providers Vapi has not integrated.
+The giveaway is that the panel has no upload field at all, only Provider, Server
+URL and Voice ID. Saving that screen as it stood — Custom voice with an empty
+Server URL — would have left the debt agent with no TTS whatsoever *and* wiped
+the 27-replacement output guard, which lives inside `voice`. Caught before save;
+the assistant still reads `provider: vapi`, `voiceId: Elliot`, guard intact.
+
+**Cartesia, not ElevenLabs, and the reason is Hebrew.** Cartesia declares `he`
+in a 42-language enum and takes a free-text `voiceId`, so a cloned id fits. It
+also keeps `chunkPlan`, so the guard survives the move. ElevenLabs declares
+`language` as free text, meaning nothing in the spec states whether Hebrew works
+there — it would ride on `eleven_v3` — and the spec carries the error
+`eleven-labs-blocked-using-instant-voice-clone-and-requested-upgrade`, so its
+cloning is plan-gated as well. Paying to find out is the wrong order. PlayHT,
+LMNT and Rime also declare Hebrew and are the backups.
+
+**The debt agent takes the voice, not the inbound one.** The voice is male and
+this prompt is already masculine throughout — מיכאל, מדבר, שולח, מעביר — so not
+one word changes. Pointing a male clone at the inbound agent would mean flipping
+the same seven passages that have already been flipped three times.
+
+Wired as `cloned_voice()` in `vapi_sync.py`, gated on `CARTESIA_VOICE_ID`. With
+the variable unset it returns None and nothing changes — verified by running the
+dry run both ways, `vapi Elliot` against `cartesia <id> (cloned) fallback -> vapi
+Elliot`. The fallback is not decoration: a cloned voice failing mid-call would
+otherwise end it, and `FallbackVapiVoice` carries `chunkPlan`, so the guard
+survives the fallback too.
+
+Still open, and it is the one claim in the chain that cannot be checked from
+here: **whether a cloned voice speaks good Hebrew.** Only a call answers it, and
+it should be answered before a resident hears it.
+
+**Audio is now gitignored.** `New Recording 154.m4a (1).mp4` was sitting
+untracked *and un-ignored* in the project root and missed the previous commit by
+minutes. A voice recording identifies a person, and removing one from git
+history is a rewrite rather than a delete.
+
 ### 5 Aug — the inbound call had no ending, and every transfer was a promise nobody could keep
 
 Two omissions in the inbound agent, found by reading the live config rather than
