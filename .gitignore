@@ -36,6 +36,15 @@ desktop.ini
 # Push it from inside web/ — `cd web && git push` — not from here.
 web/
 
+# Real resident data. sheets/residents.csv IS committed and stays committed —
+# it is ten invented people and it is the fixture the whole demo runs on. Any
+# other CSV in here is presumed real until proven otherwise, because the one
+# produced from a live OXS collection report carries real names against real
+# debts, and that is the file nobody would notice going public.
+sheets/*.csv
+!sheets/residents.csv
+*-real.csv
+
 # Voice recordings — a person's voice, dropped in for reference or for cloning.
 #
 # `New Recording 154.m4a (1).mp4` landed in the project root on 5 Aug and was

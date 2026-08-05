@@ -158,6 +158,16 @@ def main():
     ap.add_argument("--out", help="write here; omit for a summary only")
     ap.add_argument("--show", action="store_true",
                     help="print names and numbers. Off by default: this is real personal data.")
+    ap.add_argument("--include-projected", action="store_true",
+                    help="also take residents whose arrears sit in the year-end column "
+                         "rather than in 'debt today'")
+    ap.add_argument("--assume-handed-over", action="store_true",
+                    help="set handed_over TRUE so the rows are callable. FOR TESTING ONLY: "
+                         "chasing a debt on an apartment that was never handed over is the "
+                         "one mistake this column exists to prevent.")
+    ap.add_argument("--test-phones", action="store_true",
+                    help="replace every phone with a distinct synthetic one, for testing "
+                         "before the real numbers exist")
     a = ap.parse_args()
 
     rows = read_xlsx(a.report)
@@ -173,7 +183,7 @@ def main():
     # wrong number once per resident, reading each of them somebody else's debt.
     # Silently dropping the rows would hide that; so would importing them.
     seen = {str(r.get(H_PHONE, "")).strip() for r in rows if str(r.get(H_PHONE, "")).strip()}
-    if len(seen) == 1 and len(rows) > 2:
+    if len(seen) == 1 and len(rows) > 2 and not a.test_phones:
         print("STOP — every phone in this report is the same value: %s" % seen.pop())
         print("That is a placeholder, not %d residents. Importing it would mean" % len(rows))
         print("calling one number repeatedly and reading it each resident's debt.")
@@ -185,14 +195,27 @@ def main():
     for r in rows:
         if len(out) >= a.limit:
             break
-        amount = money(r.get(H_DEBT))
+        amount = money(r.get(H_DEBT)) or (money(r.get("חוב לסוף השנה")) if a.include_projected else 0)
         if amount <= 0:
             dropped_nodebt += 1
             continue
-        phone = e164(r.get(H_PHONE))
-        if not phone:
-            dropped_phone += 1
-            continue
+        if a.test_phones:
+            # DISTINCT, not one number repeated. sheets/Code.gs joins on the
+            # phone, so fifteen rows sharing a value collapse to whichever one
+            # matches first and the other fourteen become unreachable — the
+            # import would look complete and only one resident would ever load.
+            #
+            # +972-50-000-00NN is a valid Israeli mobile shape (05X + 7 digits)
+            # and is obviously synthetic at a glance, which is the point: nobody
+            # should ever mistake one of these for a real resident's number.
+            # Nothing dials them either way — the whole system is web calls, and
+            # the phone is a join key rather than a destination.
+            phone = "+9725000000%02d" % (len(out) + 1)
+        else:
+            phone = e164(r.get(H_PHONE))
+            if not phone:
+                dropped_phone += 1
+                continue
         month = latest_unpaid_month(r)
         if not month:
             no_month += 1
@@ -207,7 +230,7 @@ def main():
             "month": month or "",
             "status": "unpaid",
             "attempts": 0,
-            "handed_over": "FALSE",  # nobody is callable until this is confirmed
+            "handed_over": "TRUE" if a.assume_handed_over else "FALSE",
             "do_not_call": "FALSE",
             "alt_payment": "",
         })
@@ -221,8 +244,12 @@ def main():
     print("FIELDS THIS REPORT CANNOT FILL, and what each costs:")
     print("  gender      : %d blank — decides how the agent addresses them, and" % len(out))
     print("                Hebrew marks it on every verb. Not guessed from names.")
-    print("  handed_over : %d FALSE — isEligible() requires TRUE, so NOTHING here" % len(out))
-    print("                is callable until each one is confirmed by hand.")
+    if a.assume_handed_over:
+        print("  handed_over : %d forced TRUE by --assume-handed-over. NOT VERIFIED." % len(out))
+        print("                Confirm against OXS before any of these is really called.")
+    else:
+        print("  handed_over : %d FALSE — isEligible() requires TRUE, so NOTHING here" % len(out))
+        print("                is callable until each one is confirmed by hand.")
     print("  card_last4  : %d blank — fine. The prompt branches to alt_payment." % len(out))
     if no_month:
         print("  month       : %d blank — no month in the year carried a balance." % no_month)
