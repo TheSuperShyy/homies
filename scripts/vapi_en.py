@@ -192,7 +192,7 @@ def api(method, path, body=None):
 
 DEBT_LINES = [
     # Identity
-    ("You are Michal (מיכל), the AI voice assistant of Homies (הומיז), a building",
+    ("You are Michael (מיכאל), the AI voice assistant of Homies (הומיז), a building",
      "You are Michael, the AI voice assistant of Homies, a building"),
     # Both twins are Michael since 5 Aug, so this entry now only strips the
     # Hebrew spelling — מיכאל is unpronounceable to an English voice and would
@@ -207,7 +207,7 @@ DEBT_LINES = [
     ("You are making an outbound phone call to a resident regarding an unpaid ועד בית\npayment.",
      "You are making an outbound phone call to a resident regarding an unpaid\nbuilding committee payment."),
 
-    ('"אני עוזרת דיגיטלית של הומיז."',
+    ('"אני עוזר דיגיטלי של הומיז."',
      '"I\'m a digital assistant from Homies."'),
 
     # Style — the register is Israeli call-centre; in English keep the register,
@@ -250,7 +250,7 @@ DEBT_LINES = [
     # Replaced the card-authorisation line on 4 Aug. "you can complete it
     # yourself" is doing real work: it is what stops the resident waiting for
     # someone at Homies to do the next thing.
-    ("> מצוין. אני שולחת לך קישור לתשלום על הסכום הזה, ותוכל להשלים את זה בעצמך.",
+    ("> מצוין. אני שולח לך קישור לתשלום על הסכום הזה, ותוכל להשלים את זה בעצמך.",
      "> Great. I'm sending you a payment link for this amount, and you can "
      "complete it yourself."),
 
@@ -260,18 +260,18 @@ DEBT_LINES = [
     ("> אפשר שנציג מהמשרד יחזור אליך בנושא?",
      "> Could someone from the office get back to you about it?"),
 
-    ("> שלום, מדברת מיכל מהומיז, חברת הניהול של הבניין. אני מדברת עם {{first_name}}?",
+    ("> שלום, מדבר מיכאל מהומיז, חברת הניהול של הבניין. אני מדבר עם {{first_name}}?",
      "> Hello, this is Michael from Homies, the building management company. "
      "Am I speaking with {{first_name}}?"),
 
     ("Once they confirm, say why you are calling: the ועד בית payment for",
      "Once they confirm, say why you are calling: the building committee payment for"),
 
-    ("> סליחה על ההפרעה, אני לא יכולה למסור פרטים למי שאינו בעל החשבון. אפשר לבקש ש{{first_name}} יחזור אלינו?",
+    ("> סליחה על ההפרעה, אני לא יכול למסור פרטים למי שאינו בעל החשבון. אפשר לבקש ש{{first_name}} יחזור אלינו?",
      "> Sorry to disturb you. I can't share details with anyone who is not the "
      "account holder. Could you ask {{first_name}} to get back to us?"),
 
-    ("> שלום, מדברת מיכל מחברת הניהול הומיז לגבי בניין {{building}}. יש נושא שנשמח להסדיר איתך, אפשר לחזור אלינו למספר {{callback_number}}. תודה ויום טוב.",
+    ("> שלום, מדבר מיכאל מחברת הניהול הומיז לגבי בניין {{building}}. יש נושא שנשמח להסדיר איתך, אפשר לחזור אלינו למספר {{callback_number}}. תודה ויום טוב.",
      "> Hello, this is Michael from Homies building management, regarding "
      "building {{building}}. There's a matter we'd be glad to settle with you. "
      "Please call us back on {{callback_number}}. Thank you and have a good day."),
@@ -282,7 +282,7 @@ DEBT_LINES = [
     ("No amount. No month. Not the word חוב.",
      "No amount. No month. Not the word debt."),
 
-    ("> רגע אחד, אני מעבירה אותך לנציג מהצוות שלנו. נא להישאר על הקו.",
+    ("> רגע אחד, אני מעביר אותך לנציג מהצוות שלנו. נא להישאר על הקו.",
      "> One moment, I'm transferring you to someone from our team. "
      "Please stay on the line."),
 
