@@ -529,6 +529,36 @@ def cloned_voice(fallback):
     verbs, which is wrong-sounding but grammatical. FallbackVapiVoice carries
     chunkPlan, so the guard survives the fallback.
     """
+    # ElevenLabs first, because if both are set the one someone just configured
+    # is the one they mean, and 11labs is the account people already have.
+    #
+    # HEBREW EXISTS ON ONE ELEVENLABS MODEL AND ONLY ONE.
+    # eleven_multilingual_v2 — the default, and what you get by saying nothing —
+    # covers 29 languages and Hebrew is not among them. eleven_v3 covers 74 and
+    # does include it. Getting this wrong is not a subtle degradation: it is an
+    # engine that never learned the language reading Hebrew letters, which is the
+    # same failure as Vapi's Elliot in a different accent.
+    #
+    # The cost of being right is latency. v3 is ElevenLabs' expressive model, not
+    # their realtime one — Flash and Turbo are the low-latency pair, and neither
+    # does Hebrew. So on this stack Hebrew and speed are in direct tension, and
+    # the target here is under 800ms voice-to-voice. MEASURE IT with
+    # scripts/vapi_latency.py before trusting it on a live call; if v3 is too
+    # slow, Cartesia is the way back out rather than a different 11labs model.
+    #
+    # `language` is deliberately not set. Vapi's schema says that field is
+    # "enforced for the model. Currently only Turbo v2.5" — so on v3 it does
+    # nothing, and setting it would only look like it was doing something.
+    vid = os.environ.get("ELEVENLABS_VOICE_ID", "").strip()
+    if vid:
+        voice = voice_with_guard({
+            "provider": "11labs",
+            "voiceId": vid,
+            "model": os.environ.get("ELEVENLABS_MODEL", "eleven_v3").strip(),
+        })
+        voice["fallbackPlan"] = {"voices": [dict(fallback, provider="vapi")]}
+        return voice
+
     vid = os.environ.get("CARTESIA_VOICE_ID", "").strip()
     if not vid:
         return None
