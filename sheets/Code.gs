@@ -1,8 +1,9 @@
   /**
   * Homies — resident lookup for the Vapi debt agent.
   *
-  * Paste this into Extensions → Apps Script on the residents sheet, set SECRET,
-  * then Deploy → New deployment → Web app → Execute as *me*, Access *Anyone*.
+  * Paste this into Extensions → Apps Script on the residents sheet, set the
+  * HOMIES_SECRET script property (see getSecret below), then Deploy → New
+  * deployment → Web app → Execute as *me*, Access *Anyone*.
   * The deployment URL is what the Vapi tool points at.
   *
   * Two entry points:
@@ -11,7 +12,7 @@
   *
   * PRIVACY, AND THIS IS NOT OPTIONAL
   * A web app deployed with Access=Anyone is reachable by anyone holding the URL.
-  * SECRET below is the only thing standing in front of it, and a Google Apps
+  * The HOMIES_SECRET script property is the only thing in front of it, and Apps
   * Script web app cannot read custom request headers, so the secret must travel
   * in the query string — where it lands in logs. That is acceptable for the ten
   * fictional residents in residents.csv. It is NOT acceptable for real Homies
@@ -19,12 +20,30 @@
   * to happen. Move to Supabase before any real resident row goes in here.
   */
 
-  // Generated, not chosen — 32 URL-safe characters from a CSPRNG. Paste and go.
+  // THE SECRET IS NOT IN THIS FILE ANY MORE, AND MUST NOT COME BACK.
   //
-  // It lives in this file because it guards ten fictional residents and nothing
-  // else. The moment a real Homies row goes in, regenerate it AND move off Apps
-  // Script — see the privacy note above. Those are the same moment.
-  var SECRET = 'CITX7qjFXG7yj0JNrbLJOt8pXkG2cY2U';
+  // It used to be a literal here. That was sized for ten fictional residents and
+  // it stopped being acceptable the moment real Homies data was proposed: the
+  // literal is in this repository's git history, so anyone who ever gets a copy
+  // of the repo has it, and deleting the line does not remove it from history.
+  //
+  // It now lives in Script Properties — Apps Script's own store, which is not in
+  // the file, not in git, and not visible to anyone without edit access to the
+  // script itself. Set it at:
+  //
+  //     Extensions > Apps Script > Project Settings (gear) > Script Properties
+  //     Add property:  HOMIES_SECRET  =  <the new value>
+  //
+  // Read at call time rather than cached, so rotating the property takes effect
+  // on the next request with no redeploy. Changing THIS FILE still needs a
+  // redeploy; changing the secret does not.
+  //
+  // If the property is missing, getSecret() returns '' and checkSecret() then
+  // refuses everything. That is deliberate — a missing secret must close the
+  // door, never open it.
+  function getSecret() {
+    return PropertiesService.getScriptProperties().getProperty('HOMIES_SECRET') || '';
+  }
 
   var SHEET_NAME = 'residents';
 
@@ -446,7 +465,8 @@
     // No open-by-default branch. A ship-with-a-real-secret file does not need one,
     // and an "if unset, allow everything" escape hatch is how these end up public.
     var given = (e && e.parameter && e.parameter.key) || '';
-    return Boolean(SECRET) && given === SECRET;
+    var secret = getSecret();
+    return Boolean(secret) && given === secret;
   }
 
   function json(obj) {
