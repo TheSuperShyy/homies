@@ -817,9 +817,50 @@ Elliot`. The fallback is not decoration: a cloned voice failing mid-call would
 otherwise end it, and `FallbackVapiVoice` carries `chunkPlan`, so the guard
 survives the fallback too.
 
+**PARKED, same day.** Staying on Vapi `Elliot` v2 `language: he` for now — which
+is what the assistant already carried, so nothing was changed to park it. Everything
+for the clone is built and waits on one thing only: a Cartesia API key in `.env`.
+`scripts/voice_clone.py --go` then does the rest, and `cloned_voice()` in
+`vapi_sync.py` returns None while `CARTESIA_VOICE_ID` is unset, so the wiring is
+inert rather than half-applied.
+
+Two corrections worth carrying forward, because both were stated wrongly here
+first:
+
+- **Instant cloning is free.** The "$49/month Pro tier" came from third-party
+  pricing write-ups; Cartesia's own docs say training instant clones is "fast and
+  free" and put the paid tier on *Pro* cloning, a different feature. A free
+  account is worth trying before assuming a bill.
+- **The full recording cannot be used, in either mode.** At 3m40s it is 22x over
+  instant cloning's 10-second limit and 8x under Pro cloning's 30-minute minimum,
+  so it falls in the gap between the two. Using "the whole file" on the instant
+  endpoint does not use the whole file; it lets the API pick the ten seconds. If
+  the full-fidelity version is ever wanted, the answer is to record **30 minutes
+  to 2 hours**, not to send this one — and to note that Pro clones bill TTS at
+  1.5 credits per character against 1, a permanent 50% rise on a line already
+  over budget.
+
+**Vapi cannot clone, and this is now proven rather than read.** A PATCH setting
+`voice.voiceId` to a custom string returns 400 with the enum in the error:
+
+    voice.voiceId must be one of the following values: Clara, Godfrey, Elliot,
+    Savannah, Nico, Kai, Emma, Sagar, Neil, Layla, Sid, Gustavo, Kylie, Rohan,
+    Lily, Hana, Neha, Cole, Harry, Paige, Spencer, Naina, Leah, Tara, Jess,
+    Leo, Dan, Mia, Zac, Zoe
+
+The request was rejected, so the assistant was untouched by the test. Thirty
+names, no thirty-first.
+
 Still open, and it is the one claim in the chain that cannot be checked from
 here: **whether a cloned voice speaks good Hebrew.** Only a call answers it, and
 it should be answered before a resident hears it.
+
+Also worth revisiting whichever way the clone goes: **Elliot was never chosen.**
+It is Vapi's default and arrived on this assistant through a dashboard edit on
+5 Aug. Fourteen of the thirty are male — Godfrey, Nico, Kai, Sagar, Neil, Sid,
+Gustavo, Rohan, Cole, Harry, Spencer, Leo, Dan, Zac — and none has been heard
+against Hebrew. Vapi has no standalone TTS endpoint, so auditioning them means
+the dashboard preview or a call.
 
 **Audio is now gitignored.** `New Recording 154.m4a (1).mp4` was sitting
 untracked *and un-ignored* in the project root and missed the previous commit by
