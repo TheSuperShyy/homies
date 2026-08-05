@@ -22,10 +22,20 @@ cloning is plan-gated too. Cartesia also keeps `chunkPlan`, which is where the
 output guard lives; a provider without it would silently drop the filter that
 stops the model reading its own tool calls aloud.
 
-WHAT THIS COSTS
-Instant Voice Cloning starts on Cartesia's Pro tier. Free and Starter do not
-include cloning, and the call below returns 403 rather than failing usefully if
-the plan is wrong. That is the only thing between here and a working clone.
+WHAT THIS COSTS, AND A CORRECTION
+Third-party pricing write-ups say cloning needs the Pro tier at about $49/month.
+Cartesia's own documentation says training instant clones is "fast and free" and
+puts the paid tier on PRO voice cloning — a different feature that needs at least
+30 minutes of audio and up to 3 hours of training. The primary source wins here,
+so a free account is worth trying first; a 402 or 403 from --go is what proves
+otherwise, and costs nothing to find out.
+
+TEN SECONDS VERSUS THE WHOLE RECORDING
+Asked for, and it is not available: the source recording is 3m40s, which is 22x
+over instant cloning's 10-second limit and 8x under Pro cloning's 30-minute
+minimum. It falls in the gap between the two modes. Sending the whole file to the
+instant endpoint does not use the whole file — it lets the API choose which ten
+seconds to keep instead of choosing them deliberately. Hence the candidates below.
 """
 
 import json
@@ -97,7 +107,10 @@ def load_env():
     if not key:
         sys.exit(
             "CARTESIA_API_KEY is empty in .env\n"
-            "  1. Create a Cartesia account. Cloning needs the Pro tier.\n"
+            "  1. Create a Cartesia account at cartesia.ai — a free one may be enough.\n"
+            "     Cartesia's docs say training instant clones is 'fast and free'. The\n"
+            "     paid tier is for PRO cloning, which is the 30-minute one, not this.\n"
+            "     If --go returns 402 or 403 anyway, the plan is the reason.\n"
             "  2. Dashboard > API Keys. The key starts sk_car_.\n"
             "  3. Put it in .env as CARTESIA_API_KEY=... — in the file, not in chat."
         )
