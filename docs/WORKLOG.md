@@ -11,6 +11,49 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### It never says goodbye, which is why the goodbye never ends the call
+
+Two fixes from the last hour confirmed working before anything else. `019fdb49`
+called **`send_payment_link`** — the tool-first change holds. And two calls ended
+with `endedReason: assistant-said-end-call-phrase`, so the widened `יום טוב`
+phrase releases the line exactly as intended.
+
+So the complaint — *"the bot does not end the call when it says goodbye"* — has
+the wrong subject. **The goodbye works. The agent never gets to it.**
+
+It said the link line, the resident said אוקיי, and it said the link line again.
+Then again. Three times, reworded each time, and the resident hung up on the
+third. The closing was never reached, so nothing ever matched an end phrase, so
+the call sat open.
+
+Same fault as the amount, the transfer details and the payment link before it:
+**the turn after the link line was never written down.** The section said *"two
+turns, in this order, with the resident speaking in between"* and then described
+the second turn in English instead of writing it. So there was nothing to say,
+and the nearest written line was the one just said.
+
+Now, directly under both copies of the link line — 811 and 647 characters away
+respectively, against a cross-reference before:
+
+> אוקיי, תודה על הזמן. שיהיה לך יום טוב, ולהתראות.
+
+with **whatever comes back, you close** stated as the rule, and
+`log_call_outcome` after it. Verified live: every copy of the closing contains a
+phrase that ends the call.
+
+Also written down, because it came out unprompted and was not in the file:
+**a tool call needs no announcement.** The agent said *"תן לי רגע"* while calling
+`send_payment_link`. The resident hears a pause either way, and a pause is
+shorter than a pause with an excuse in it.
+
+Live at 61,689 chars.
+
+**Five branches are still described in English with no Hebrew written under
+them** — promise-to-pay, refusal, hardship, standing order, and a maintenance
+request raised mid-call. Every fault of this shape today has come from exactly
+that, and each one has been found by a test call rather than by reading. They
+should be written before the next round rather than after it.
+
 ### The link was never sent, so the agent kept asking permission to send it
 
 Call `019fdb43`. The resident said כן to *"רוצה שאני אשלח לך לינק לתשלום?"* and
