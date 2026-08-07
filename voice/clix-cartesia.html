@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cartesia vs Azure — Hebrew, same words</title>
+<style>
+  :root { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --good:#2f6b46; --bad:#94402c; --alt:#3d5a80; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --good:#6bbd8c; --bad:#e08a70; --alt:#8ab0d9; } }
+  :root[data-theme="light"] { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --good:#2f6b46; --bad:#94402c; --alt:#3d5a80; }
+  :root[data-theme="dark"]  { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --good:#6bbd8c; --bad:#e08a70; --alt:#8ab0d9; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:3rem 1.5rem 5rem; background:var(--bg); color:var(--fg); font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:48rem; margin:0 auto; display:flex; flex-direction:column; gap:.9rem; }
+  h1 { font-size:1.5rem; margin:0 0 .35rem; letter-spacing:-.01em; text-wrap:balance; }
+  .sub { color:var(--dim); margin:0 0 1rem; }
+  h2 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); margin:1.6rem 0 -.2rem; font-weight:650; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.05rem 1.2rem; }
+  .card.win { border-color:var(--good); }
+  .heb { direction:rtl; text-align:right; font-size:1.08rem; line-height:1.9; padding:.5rem .8rem; border-right:2px solid var(--line); margin:0 0 .8rem; }
+  .heb mark { background:transparent; color:var(--accent); font-weight:700; }
+  .ab { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+  @media (max-width:38rem) { .ab { grid-template-columns:1fr; } }
+  .side { border:1px solid var(--line); border-radius:8px; padding:.7rem .8rem; }
+  .side.c { border-color:var(--alt); }
+  .lbl { font-size:.68rem; text-transform:uppercase; letter-spacing:.09em; font-weight:650; margin-bottom:.4rem; display:flex; gap:.5rem; align-items:baseline; }
+  .side.c .lbl { color:var(--alt); } .side.a .lbl { color:var(--dim); }
+  .lbl span { margin-left:auto; font-variant-numeric:tabular-nums; font-weight:400; color:var(--dim); letter-spacing:0; text-transform:none; }
+  audio { width:100%; }
+  .listen { font-size:.88rem; color:var(--dim); margin:.7rem 0 0; }
+  .listen b { color:var(--fg); font-weight:600; }
+  .warn { border:1px solid var(--bad); border-radius:10px; padding:1rem 1.2rem; font-size:.92rem; }
+  .warn b { color:var(--bad); }
+  table { border-collapse:collapse; width:100%; font-size:.9rem; }
+  th,td { text-align:left; padding:.4rem .6rem; border-bottom:1px solid var(--line); }
+  th { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); }
+  td.num { font-variant-numeric:tabular-nums; text-align:right; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Cartesia <code>sonic-3</code> vs Azure — identical Hebrew</h1>
+    <p class="sub">
+      Left is <b>Noam — Broadcaster</b>, a native Hebrew voice on Cartesia.
+      Right is <b>Avri</b>, the Azure voice you called robotic. Same words, same
+      punctuation, nothing else changed.
+    </p>
+  </header>
+
+  <div class="warn">
+    <b>Still not your voice.</b> Cartesia returned
+    <code>402 plan_upgrade_required</code> — Instant Voice Cloning is Pro-tier,
+    not free as I previously said. Both voices here are stock. The question on
+    this page is narrower and worth settling first: <b>is Cartesia expressive
+    enough to be worth paying for at all?</b>
+  </div>
+
+  <h2>The greeting</h2>
+  <div class="card">
+    <p class="heb">שלום, מדבר אסף מקליקס. איך אפשר לעזור?</p>
+    <div class="ab">
+      <div class="side c"><div class="lbl">Cartesia · Noam <span>3.71s</span></div>
+        <audio controls preload="none" src="samples/c0-greeting.mp3"></audio></div>
+      <div class="side a"><div class="lbl">Azure · Avri <span>2.33s</span></div>
+        <audio controls preload="none" src="samples/h0-greeting.mp3"></audio></div>
+    </div>
+  </div>
+
+  <h2>Debt line — no filler</h2>
+  <div class="card">
+    <p class="heb">רציתי לעדכן אותך לגבי החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, וצריך להסדיר אותו עד סוף השבוע.</p>
+    <div class="ab">
+      <div class="side c"><div class="lbl">Cartesia <span>6.50s</span></div>
+        <audio controls preload="none" src="samples/c1-debt-none.mp3"></audio></div>
+      <div class="side a"><div class="lbl">Azure <span>4.78s</span></div>
+        <audio controls preload="none" src="samples/h1-debt-none.mp3"></audio></div>
+    </div>
+    <p class="listen"><b>Baseline pace:</b> Cartesia is 36% slower on identical
+      text. That is the voice, not the fillers — and it is adjustable.</p>
+  </div>
+
+  <h2>Debt line — אה three times</h2>
+  <div class="card win">
+    <p class="heb"><mark>אה</mark>, רציתי לעדכן אותך לגבי, <mark>אה</mark>, החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, ו, <mark>אה</mark>, צריך להסדיר אותו עד סוף השבוע.</p>
+    <div class="ab">
+      <div class="side c"><div class="lbl">Cartesia <span>10.34s</span></div>
+        <audio controls preload="none" src="samples/c2-debt-eh.mp3"></audio></div>
+      <div class="side a"><div class="lbl">Azure <span>6.24s</span></div>
+        <audio controls preload="none" src="samples/h2-debt-eh.mp3"></audio></div>
+    </div>
+    <p class="listen"><b>This is the comparison that matters.</b> Cartesia gives
+      the hesitation <b>+3.84s</b> over its own clean version; Azure gives it
+      +1.46s. Cartesia treats <code>אה</code> as a real hesitation. Azure treats
+      it as a syllable to get through.</p>
+  </div>
+
+  <h2>Debt line — mixed, the one I'd ship</h2>
+  <div class="card">
+    <p class="heb"><mark>אה</mark>, רציתי לעדכן אותך לגבי<mark>...</mark> החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, ו, <mark>אה</mark>, צריך להסדיר אותו עד סוף השבוע.</p>
+    <div class="ab">
+      <div class="side c"><div class="lbl">Cartesia <span>7.94s</span></div>
+        <audio controls preload="none" src="samples/c4-debt-mixed.mp3"></audio></div>
+      <div class="side a"><div class="lbl">Azure <span>6.04s</span></div>
+        <audio controls preload="none" src="samples/h4-debt-mixed.mp3"></audio></div>
+    </div>
+  </div>
+
+  <h2>Emotion — a control Azure does not have at all</h2>
+  <div class="card">
+    <p class="listen" style="margin:0 0 .8rem">Same mixed line, with Cartesia's
+      <code>experimentalControls.emotion</code>. On a debt call this is
+      load-bearing: the identical sentence read flat reads as a threat.</p>
+    <div class="ab">
+      <div class="side c"><div class="lbl">positivity:low <span>9.20s</span></div>
+        <audio controls preload="none" src="samples/c5-debt-warm.mp3"></audio></div>
+      <div class="side c"><div class="lbl">curiosity:low <span>8.02s</span></div>
+        <audio controls preload="none" src="samples/c6-debt-curious.mp3"></audio></div>
+    </div>
+  </div>
+
+  <h2>The support agent, female</h2>
+  <div class="card">
+    <p class="heb">שלום, הגעת לקליקס. איך אפשר לעזור?</p>
+    <div class="ab">
+      <div class="side c"><div class="lbl">Cartesia · Yarden <span>2.74s</span></div>
+        <audio controls preload="none" src="samples/c7-support-fem.mp3"></audio></div>
+      <div class="side a"><div class="lbl">Azure · Hila <span>3.10s</span></div>
+        <audio controls preload="none" src="samples/inbound-greeting.mp3"></audio></div>
+    </div>
+  </div>
+
+  <h2>What Cartesia costs you in minutes</h2>
+  <div class="card">
+    <table>
+      <tr><th>Line</th><th class="num">Azure</th><th class="num">Cartesia</th><th class="num">slower by</th></tr>
+      <tr><td>Greeting</td><td class="num">2.33s</td><td class="num">3.71s</td><td class="num">+59%</td></tr>
+      <tr><td>Debt, clean</td><td class="num">4.78s</td><td class="num">6.50s</td><td class="num">+36%</td></tr>
+      <tr><td>Debt, אה ×3</td><td class="num">6.24s</td><td class="num">10.34s</td><td class="num">+66%</td></tr>
+      <tr><td>Debt, mixed</td><td class="num">6.04s</td><td class="num">7.94s</td><td class="num">+31%</td></tr>
+    </table>
+    <p class="listen"><b>Expression is not free.</b> Longer speech means longer
+      calls, and calls are billed by the minute — a 35% slower voice pushes the
+      5,000 min/month estimate toward 6,750. Cartesia exposes
+      <code>generationConfig.speed</code> (0.6–1.5) and
+      <code>experimentalControls.speed</code>, so this is tunable rather than
+      fixed. Worth deciding how much of the extra time is the expression you
+      wanted and how much is just slow.</p>
+  </div>
+
+</main>
+</body>
+</html>

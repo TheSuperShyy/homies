@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eleven Hebrew men — pick one</title>
+<style>
+  :root { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --alt:#3d5a80; --bad:#94402c; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --alt:#8ab0d9; --bad:#e08a70; } }
+  :root[data-theme="light"] { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --alt:#3d5a80; --bad:#94402c; }
+  :root[data-theme="dark"]  { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --alt:#8ab0d9; --bad:#e08a70; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:3rem 1.5rem 5rem; background:var(--bg); color:var(--fg); font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:46rem; margin:0 auto; display:flex; flex-direction:column; gap:.75rem; }
+  h1 { font-size:1.5rem; margin:0 0 .35rem; letter-spacing:-.01em; text-wrap:balance; }
+  .sub { color:var(--dim); margin:0 0 .5rem; }
+  h2 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); margin:1.5rem 0 -.15rem; font-weight:650; }
+  .heb { direction:rtl; text-align:right; font-size:1.05rem; line-height:1.9; padding:.6rem .9rem; border-right:2px solid var(--accent); margin:0; background:var(--card); border-radius:8px; }
+  .heb mark { background:transparent; color:var(--accent); font-weight:700; }
+  .row { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.75rem .95rem; display:flex; align-items:center; gap:.9rem; flex-wrap:wrap; }
+  .row.cur { border-color:var(--alt); }
+  .who { font-weight:650; min-width:6.5rem; }
+  .who small { display:block; font-weight:400; color:var(--dim); font-size:.76rem; }
+  .t { color:var(--dim); font-size:.85rem; font-variant-numeric:tabular-nums; min-width:3.5rem; text-align:right; }
+  audio { flex:1 1 16rem; min-width:12rem; }
+  .tag { font-size:.66rem; text-transform:uppercase; letter-spacing:.08em; border-radius:99px; padding:.08rem .45rem; border:1px solid currentColor; color:var(--alt); }
+  .note { border:1px dashed var(--line); border-radius:10px; padding:1rem 1.2rem; font-size:.89rem; color:var(--dim); }
+  .note b { color:var(--fg); }
+  .warn { border:1px solid var(--bad); border-radius:10px; padding:1rem 1.2rem; font-size:.9rem; }
+  .warn b { color:var(--bad); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Eleven Hebrew men, one line each</h1>
+    <p class="sub">All on <code>sonic-3.5</code>. Same sentence, same hesitation,
+      same punctuation. The only variable is the voice.</p>
+  </header>
+
+  <p class="heb"><mark>אה</mark>, רציתי לעדכן אותך לגבי<mark>...</mark> החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, ו, <mark>אה</mark>, צריך להסדיר אותו עד סוף השבוע.</p>
+
+  <div class="warn">
+    <b>I got this wrong the first time.</b> I fetched one page of Cartesia's
+    voice list, saw 4 Hebrew voices, and reported that as the whole catalogue.
+    There are <b>29</b>, eleven of them masculine. You were judging Cartesia on
+    one voice out of eleven.
+  </div>
+
+  <h2>The current one</h2>
+  <div class="row cur">
+    <span class="who">Noam <small>Broadcaster</small></span>
+    <span class="tag">live now</span>
+    <audio controls preload="none" src="samples/m-noam.mp3"></audio><span class="t">8.91s</span>
+  </div>
+
+  <h2>The other ten</h2>
+
+  <div class="row">
+    <span class="who">Asaf <small>Steady Advisor</small></span>
+    <audio controls preload="none" src="samples/m-asaf.mp3"></audio><span class="t">10.84s</span>
+  </div>
+  <div class="row">
+    <span class="who">Gil <small>Friendly Host</small></span>
+    <audio controls preload="none" src="samples/m-gil.mp3"></audio><span class="t">9.95s</span>
+  </div>
+  <div class="row">
+    <span class="who">Oren <small>Steady Advisor</small></span>
+    <audio controls preload="none" src="samples/m-oren.mp3"></audio><span class="t">11.00s</span>
+  </div>
+  <div class="row">
+    <span class="who">Eitan <small>Modern Communicator</small></span>
+    <audio controls preload="none" src="samples/m-eitan.mp3"></audio><span class="t">9.87s</span>
+  </div>
+  <div class="row">
+    <span class="who">Ido <small>Calm Communicator</small></span>
+    <audio controls preload="none" src="samples/m-ido.mp3"></audio><span class="t">11.15s</span>
+  </div>
+  <div class="row">
+    <span class="who">Ronen <small>Calm Consultant</small></span>
+    <audio controls preload="none" src="samples/m-ronen.mp3"></audio><span class="t">11.00s</span>
+  </div>
+  <div class="row">
+    <span class="who">Eyal <small>Grounded Guide</small></span>
+    <audio controls preload="none" src="samples/m-eyal.mp3"></audio><span class="t">9.48s</span>
+  </div>
+  <div class="row">
+    <span class="who">Itai <small>Measured Advisor</small></span>
+    <audio controls preload="none" src="samples/m-itai.mp3"></audio><span class="t">10.92s</span>
+  </div>
+  <div class="row">
+    <span class="who">Avi <small>Calm Consultant</small></span>
+    <audio controls preload="none" src="samples/m-avi.mp3"></audio><span class="t">9.80s</span>
+  </div>
+  <div class="row">
+    <span class="who">Yonatan <small>Measured Professional</small></span>
+    <audio controls preload="none" src="samples/m-yonatan.mp3"></audio><span class="t">11.55s</span>
+  </div>
+
+  <h2>Model check — same voice, two models</h2>
+  <div class="row">
+    <span class="who">Noam <small>sonic-3.5</small></span>
+    <audio controls preload="none" src="samples/m-noam.mp3"></audio><span class="t">8.91s</span>
+  </div>
+  <div class="row">
+    <span class="who">Noam <small>sonic-3</small></span>
+    <span class="tag">what you heard</span>
+    <audio controls preload="none" src="samples/m-noam-sonic3.mp3"></audio><span class="t">8.44s</span>
+  </div>
+
+  <div class="note">
+    <b>Longer is usually more expressive here.</b> Noam is the fastest of the
+    eleven at 8.91s and also the flattest — the voices that take 11 seconds are
+    spending it on the hesitation and the phrasing you said was missing. That
+    time is billed by the minute, so the pick is a real trade rather than a free
+    upgrade. <b>Choose on sound; I'll tell you what it costs.</b>
+  </div>
+
+</main>
+</body>
+</html>

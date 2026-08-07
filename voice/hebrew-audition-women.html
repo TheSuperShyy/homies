@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eighteen Hebrew women — pick one for support</title>
+<style>
+  :root { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --alt:#3d5a80; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --alt:#8ab0d9; } }
+  :root[data-theme="light"] { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --alt:#3d5a80; }
+  :root[data-theme="dark"]  { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --alt:#8ab0d9; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:3rem 1.5rem 5rem; background:var(--bg); color:var(--fg); font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:46rem; margin:0 auto; display:flex; flex-direction:column; gap:.7rem; }
+  h1 { font-size:1.5rem; margin:0 0 .35rem; letter-spacing:-.01em; text-wrap:balance; }
+  .sub { color:var(--dim); margin:0 0 .5rem; }
+  h2 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); margin:1.4rem 0 -.15rem; font-weight:650; }
+  .heb { direction:rtl; text-align:right; font-size:1.05rem; line-height:1.9; padding:.6rem .9rem; border-right:2px solid var(--accent); margin:0; background:var(--card); border-radius:8px; }
+  .heb mark { background:transparent; color:var(--accent); font-weight:700; }
+  .row { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.7rem .9rem; display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; }
+  .who { font-weight:650; min-width:6.5rem; }
+  .who small { display:block; font-weight:400; color:var(--dim); font-size:.75rem; }
+  .t { color:var(--dim); font-size:.85rem; font-variant-numeric:tabular-nums; min-width:3.4rem; text-align:right; }
+  audio { flex:1 1 15rem; min-width:11rem; }
+  .note { border:1px dashed var(--line); border-radius:10px; padding:1rem 1.2rem; font-size:.89rem; color:var(--dim); }
+  .note b { color:var(--fg); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Eighteen Hebrew women, one line each</h1>
+    <p class="sub">For the support agent, which is still on stock Vapi Leah. All
+      on <code>sonic-3.5</code>, same sentence, sorted fastest to slowest.</p>
+  </header>
+
+  <p class="heb">שלום, הגעת להומיז, חברת ניהול הבניינים. איך אפשר לעזור? <mark>אה</mark>, רגע אחד, אני בודקת<mark>...</mark> כן, מצאתי.</p>
+
+  <div class="note">
+    The line carries both jobs at once: <b>the greeting</b>, which is the first
+    thing any resident ever hears, and <b>a hesitation mid-sentence</b>, which is
+    what you have been listening for. It is feminine throughout — אני בודקת —
+    because this agent uses feminine verbs about itself.
+  </div>
+
+  <h2>Fastest</h2>
+  <div class="row"><span class="who">Tehila <small>Calm Specialist</small></span><audio controls preload="none" src="samples/w-tehila.mp3"></audio><span class="t">8.05s</span></div>
+  <div class="row"><span class="who">Tamar <small>Crisp Announcer</small></span><audio controls preload="none" src="samples/w-tamar.mp3"></audio><span class="t">8.12s</span></div>
+  <div class="row"><span class="who">Alma <small>Clear Advisor</small></span><audio controls preload="none" src="samples/w-alma.mp3"></audio><span class="t">8.28s</span></div>
+  <div class="row"><span class="who">Yardena <small>Expert Facilitator</small></span><audio controls preload="none" src="samples/w-yardena.mp3"></audio><span class="t">8.28s</span></div>
+  <div class="row"><span class="who">Hila <small>Warm Guide</small></span><audio controls preload="none" src="samples/w-hila.mp3"></audio><span class="t">8.44s</span></div>
+  <div class="row"><span class="who">Ayala <small>Expert Narrator</small></span><audio controls preload="none" src="samples/w-ayala.mp3"></audio><span class="t">8.52s</span></div>
+
+  <h2>Middle</h2>
+  <div class="row"><span class="who">Neta <small>Clear Professional</small></span><audio controls preload="none" src="samples/w-neta.mp3"></audio><span class="t">8.52s</span></div>
+  <div class="row"><span class="who">Talia <small>Approachable Guide</small></span><audio controls preload="none" src="samples/w-talia.mp3"></audio><span class="t">8.75s</span></div>
+  <div class="row"><span class="who">Yarden <small>Trusted Advisor</small></span><audio controls preload="none" src="samples/w-yarden.mp3"></audio><span class="t">8.75s</span></div>
+  <div class="row"><span class="who">Nava <small>Warm Specialist</small></span><audio controls preload="none" src="samples/w-nava.mp3"></audio><span class="t">8.83s</span></div>
+  <div class="row"><span class="who">Dafna <small>Supportive Guide</small></span><audio controls preload="none" src="samples/w-dafna.mp3"></audio><span class="t">8.99s</span></div>
+  <div class="row"><span class="who">Liora <small>Gentle Guide</small></span><audio controls preload="none" src="samples/w-liora.mp3"></audio><span class="t">9.17s</span></div>
+
+  <h2>Slowest</h2>
+  <div class="row"><span class="who">Adi <small>Efficient Expert</small></span><audio controls preload="none" src="samples/w-adi.mp3"></audio><span class="t">9.72s</span></div>
+  <div class="row"><span class="who">Aviva <small>Patient Guide</small></span><audio controls preload="none" src="samples/w-aviva.mp3"></audio><span class="t">9.72s</span></div>
+  <div class="row"><span class="who">Maayan <small>Refined Speaker</small></span><audio controls preload="none" src="samples/w-maayan.mp3"></audio><span class="t">9.72s</span></div>
+  <div class="row"><span class="who">Yael <small>Casual Presence</small></span><audio controls preload="none" src="samples/w-yael.mp3"></audio><span class="t">9.80s</span></div>
+  <div class="row"><span class="who">Rina <small>Articulate Coordinator</small></span><audio controls preload="none" src="samples/w-rina.mp3"></audio><span class="t">10.03s</span></div>
+  <div class="row"><span class="who">Shira <small>Comforting Presence</small></span><audio controls preload="none" src="samples/w-shira.mp3"></audio><span class="t">10.61s</span></div>
+
+  <div class="note">
+    <b>Sorted by length, not by quality.</b> On the men's audition you picked
+    Eyal, who was third-fastest of eleven — so slower did not mean better, and
+    the ordering here is a way to move through the list rather than a ranking.
+    Name one and it goes live.
+  </div>
+
+</main>
+</body>
+</html>

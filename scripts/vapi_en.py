@@ -191,6 +191,37 @@ def api(method, path, body=None):
 # ---------------------------------------------------------------------------
 
 DEBT_LINES = [
+    # HESITATION — added 7 Aug.
+    #
+    # `um` rather than the `uhh` that was asked for. Measured on Azure
+    # en-US-AndrewNeural, one word changed in an otherwise identical sentence:
+    # um +0.42s, erm +0.32s, uhm +0.31s, umm +0.26s, uhh +0.22s, uh +0.13s.
+    # The intuitive spelling is the weak one, and doubling is not reliable in
+    # either direction — um beats umm, but uhh beats uh.
+    #
+    # CAVEAT WORTH KEEPING: that was measured on Azure and this twin speaks
+    # through vapi/Elliot, a different engine with a different lexicon. The
+    # ranking is evidence, not proof, until someone hears Elliot say it.
+    ("אה     — a hesitation sound, mid-sentence, between commas",
+     "um     — a hesitation sound, mid-sentence, between commas"),
+    ('"אה, רציתי לעדכן אותך לגבי... החוב שלך."',
+     '"Um, I wanted to update you about... your debt."'),
+    ('"במערכת שלנו הוא עדיין לא הוסדר, ו, אה, צריך להסדיר אותו."',
+     '"In our system it is still unsettled, and, um, it needs to be settled."'),
+    ("Alternate them. Never use אה twice in a row.",
+     "Alternate them. Never use um twice in a row."),
+    ("Write אה. Never אההה, never אהה.",
+     "Write um. Never umm, never uhhh."),
+    # The English twin's endCallPhrases is "and goodbye" where the Hebrew is
+    # ולהתראות. Translating the phrase but not the rule would leave the English
+    # agent guarding a string it never says.
+    ("Not in the closing line. Not near ולהתראות, ever.",
+     'Not in the closing line. Not near "and goodbye", ever.'),
+    ('Not inside an amount. "מאה, אה, שקלים" is unacceptable.',
+     'Not inside an amount. "one hundred, um, shekels" is unacceptable.'),
+    ("11. Never hesitate in the closing line, and never near ולהתראות. That phrase is",
+     '11. Never hesitate in the closing line, and never near "and goodbye". That phrase is'),
+
     # Identity
     ("You are Michael (מיכאל), the AI voice assistant of Homies (הומיז), a building",
      "You are Michael, the AI voice assistant of Homies, a building"),

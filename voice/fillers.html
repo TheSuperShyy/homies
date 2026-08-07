@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hebrew fillers — which one sounds human</title>
+<style>
+  :root {
+    --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9;
+    --card:#fff; --accent:#7a4b2a; --good:#2f6b46; --bad:#94402c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --good:#6bbd8c; --bad:#e08a70; }
+  }
+  :root[data-theme="light"] { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --good:#2f6b46; --bad:#94402c; }
+  :root[data-theme="dark"]  { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --good:#6bbd8c; --bad:#e08a70; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:3rem 1.5rem 5rem; background:var(--bg); color:var(--fg);
+    font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width:46rem; margin:0 auto; display:flex; flex-direction:column; gap:.9rem; }
+  h1 { font-size:1.5rem; margin:0 0 .35rem; letter-spacing:-.01em; text-wrap:balance; }
+  .sub { color:var(--dim); margin:0 0 1.25rem; }
+  h2 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); margin:1.6rem 0 -.2rem; font-weight:650; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.05rem 1.2rem; }
+  .card.win { border-color:var(--good); }
+  .card.fail { border-color:var(--bad); }
+  .head { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; margin-bottom:.5rem; }
+  .name { font-weight:650; }
+  .tag { font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; border-radius:99px; padding:.1rem .5rem; border:1px solid currentColor; }
+  .tag.g { color:var(--good); } .tag.b { color:var(--bad); } .tag.n { color:var(--accent); }
+  .delta { margin-left:auto; color:var(--dim); font-size:.85rem; font-variant-numeric:tabular-nums; }
+  .heb { direction:rtl; text-align:right; font-size:1.05rem; line-height:1.9; padding:.5rem .8rem; border-right:2px solid var(--line); margin:0 0 .6rem; }
+  .heb mark { background:transparent; color:var(--accent); font-weight:700; }
+  audio { width:100%; margin-bottom:.5rem; }
+  .listen { font-size:.88rem; color:var(--dim); margin:0; }
+  .listen b { color:var(--fg); font-weight:600; }
+  .note { border:1px dashed var(--line); border-radius:10px; padding:1rem 1.2rem; font-size:.89rem; color:var(--dim); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Which filler actually sounds like a person</h1>
+    <p class="sub">
+      Every clip below is the <em>same sentence</em> in <code>he-IL-AvriNeural</code>,
+      changing only the filler. Play the control first, then compare. The
+      question is not "did it make a sound" — it is
+      <b>does it sound like hesitation, or like the voice reading a word.</b>
+    </p>
+  </header>
+
+  <div class="card">
+    <div class="head"><span class="name">Control — no filler</span><span class="tag n">baseline</span><span class="delta">2.49s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f0-control.mp3"></audio>
+    <p class="listen">This is the agent today. Fluent, correct, no soul.</p>
+  </div>
+
+  <h2>The real Hebrew fillers</h2>
+
+  <div class="card win">
+    <div class="head"><span class="name">אה — "eh"</span><span class="tag g">best candidate</span><span class="delta">+0.61s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של, <mark>אה</mark>, ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f1-eh-plain.mp3"></audio>
+    <p class="listen"><b>Listen for:</b> a hesitation sound, not the letters
+      "alef-he". This is the Hebrew equivalent of "uhh" and it produced more
+      audio than any other option.</p>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">אֶה — with niqqud</span><span class="delta">+0.51s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של, <mark>אֶה</mark>, ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f3-eh-niqqud.mp3"></audio>
+    <p class="listen">Niqqud forces the vowel. Only worth the complexity if the
+      plain version above is read as letter names.</p>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">אם — "em"</span><span class="delta">+0.31s</span></div>
+    <p class="heb">אז, <mark>אם</mark>, מדובר בתשלום ועד בית של ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f2-em-plain.mp3"></audio>
+    <p class="listen"><b>Risk:</b> אם unpointed is also the Hebrew word
+      <em>"if"</em>. If it reads as a word rather than a hum, this option is out
+      regardless of how it sounds.</p>
+  </div>
+
+  <div class="card fail">
+    <div class="head"><span class="name">אההה — elongated</span><span class="tag b">backfires</span><span class="delta">+0.16s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של, <mark>אההה</mark>, ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f5-ehh-long.mp3"></audio>
+    <p class="listen">Writing extra letters to get a longer "uhhh" produces
+      <b>a quarter</b> of the sound that plain אה does. The intuitive move is
+      the wrong one.</p>
+  </div>
+
+  <h2>No word at all</h2>
+
+  <div class="card">
+    <div class="head"><span class="name">Ellipsis</span><span class="tag n">zero risk</span><span class="delta">+0.49s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של<mark>...</mark> ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f6-ellipsis.mp3"></audio>
+    <p class="listen">Pure hesitation, no lexical risk — nothing can be
+      mispronounced because there is no word. Nearly the same added time as אה.
+      <b>If this is enough, it is the safest option available.</b></p>
+  </div>
+
+  <h2>English fillers, which is what you asked for</h2>
+
+  <div class="card fail">
+    <div class="head"><span class="name">uhm</span><span class="tag b">barely renders</span><span class="delta">+0.15s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של, <mark>uhm</mark>, ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f9-english-uhm.mp3"></audio>
+    <p class="listen">A Hebrew voice handed Latin text. Almost nothing comes out.</p>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">uh</span><span class="delta">+0.35s</span></div>
+    <p class="heb">אז מדובר בתשלום ועד בית של, <mark>uh</mark>, ארבע מאות וחמישים שקלים עבור חודש יולי.</p>
+    <audio controls preload="none" src="samples/f11-uh-english.mp3"></audio>
+    <p class="listen">Renders more than "uhm", but <b>listen for the accent
+      switch</b> — an English syllable mid-Hebrew is the same artefact that makes
+      the reference number sound wrong.</p>
+  </div>
+
+  <h2>Where a filler is most natural</h2>
+
+  <div class="card">
+    <div class="head"><span class="name">Turn opening</span><span class="tag n">latency mask</span></div>
+    <p class="heb">שלום, <mark>אה</mark>, מדבר מיכאל מהומיז, חברת הניהול של הבניין.</p>
+    <audio controls preload="none" src="samples/f10-opening.mp3"></audio>
+    <p class="listen">A filler at the <em>start</em> of a turn does double duty:
+      it sounds human, and it covers the gap while the model is still thinking.
+      Given the build measures worse than its 800ms target, this is the one
+      placement that pays twice.</p>
+  </div>
+
+  <div class="note">
+    <b>Judge on sound, not on the numbers.</b> The added-seconds figures only
+    prove something was produced. They cannot tell the difference between a
+    convincing hesitation and the engine pronouncing letter names, and that
+    distinction decides the whole feature. Pick the one that sounds like a person
+    who lost their place for half a second.
+  </div>
+
+</main>
+</body>
+</html>

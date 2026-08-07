@@ -101,8 +101,20 @@ BASE = {
     # can switch it off — but note that it therefore dies whenever the voice is
     # edited in the dashboard, which is exactly what happened on 5 Aug. See
     # scripts/voice_guard.py.
+    # ELLIOT, NOT LEAH, SINCE 7 AUG — and this is the second time this one line
+    # has been the whole argument, in the opposite direction.
+    #
+    # It was Leah because the intake prompt was feminine first person and a male
+    # voice reading מדברת is a grammatical error in every sentence, not a
+    # stylistic mismatch. The client has since asked for a male voice on both
+    # agents, so the prompt was flipped to masculine — nine passages in
+    # demo-inbound.md — and this line follows it rather than leading.
+    #
+    # The rule survives the reversal: THE VOICE AND THE PROMPT'S GENDER ARE ONE
+    # CHANGE. Whoever edits this next must check demo-inbound.md in the same
+    # commit, in whichever direction they are going.
     "voice": voice_with_guard(
-        {"provider": "vapi", "voiceId": "Leah", "version": "2", "language": "he"}),
+        {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}),
     "model": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.3},
     "firstMessageMode": "assistant-speaks-first",
     "artifactPlan": {"recordingEnabled": True},
@@ -206,9 +218,21 @@ TARGETS = {
             # failure this whole change exists to remove.
             "endCallFunctionEnabled": False,
         },
-        # Female, matching מיכל and the feminine prompt. This assistant ran on
-        # Azure HilaNeural until 5 Aug, so it is a return rather than a new stack.
-        "native_voice": "he-IL-HilaNeural",
+        # MALE since 7 Aug. This agent was מיכל and feminine throughout until the
+        # client asked for a male voice on both agents.
+        #
+        # The prompt moved with it, because in Hebrew it has to: מדבר not מדברת,
+        # מעביר not מעבירה, רושם not רושמת, מסמן not מסמנת, מבין not מבינה,
+        # העוזר הדיגיטלי not העוזרת הדיגיטלית, and מיכאל not מיכל. Nine passages
+        # in docs/assistant/demo-inbound.md, verified with a count-checked
+        # replacement rather than by eye. Changing the voice without those would
+        # leave a male voice reading feminine verbs in every sentence it has.
+        "native_voice": "he-IL-AvriNeural",
+        # "Eyal — Grounded Guide", the same voice chosen by ear for the debt
+        # agent. One person across both front doors is a product decision, not an
+        # oversight — a resident who hears the same voice for a leak and for a
+        # payment is hearing one company.
+        "cartesia_voice": "a976c076-3e31-4bf2-a178-8c3ce3d52b2a",
         "tools": INTAKE_TOOLS,
     },
     "debt": {
@@ -375,6 +399,21 @@ TARGETS = {
         "cloneable": True,
         # Male, matching מיכאל and the masculine prompt. See native_voice().
         "native_voice": "he-IL-AvriNeural",
+        # "Eyal — Grounded Guide", masculine. Chosen by ear on 7 Aug from all
+        # eleven of Cartesia's masculine Hebrew voices, auditioned on one
+        # identical sentence — see HEBREW_MEN.
+        #
+        # Noam held this slot for a few hours and was rejected as robotic. It
+        # was also the only Hebrew voice I had found at that point, because the
+        # first voice-list fetch read one page of nine and I reported 4 Hebrew
+        # voices when there are 29. Paginate before concluding a catalogue is
+        # small.
+        #
+        # Eyal at 9.48s is near the fast end of the eleven, which is worth
+        # noting against the theory that slower simply meant more expressive:
+        # the two slowest, Yonatan at 11.55s and Ido at 11.15s, were not chosen.
+        # Duration was a useful sort order and a bad judge.
+        "cartesia_voice": "a976c076-3e31-4bf2-a178-8c3ce3d52b2a",
         "tools": DEBT_TOOLS,
     },
 }
@@ -562,6 +601,53 @@ def cloned_voice(fallback):
     vid = os.environ.get("CARTESIA_VOICE_ID", "").strip()
     if not vid:
         return None
+    return cartesia_voice(vid, fallback)
+
+
+# Cartesia's eleven masculine `language: he` voices, by name so a switch is one
+# word instead of a uuid. Auditioned 7 Aug on one identical sentence; the seconds
+# are that render, and they matter — same words, so a voice taking 11.55s is
+# spending 2.6s more on hesitation and phrasing than Noam does at 8.91s. That is
+# the difference between "expressive" and "robotic" as far as this project can
+# measure it, and it is also billed by the minute.
+#
+# The full list is 29 voices, 18 of them feminine; see cartesia_tts.py --list.
+HEBREW_MEN = {
+    "noam":    ("3e32f3c5-9ac0-4192-9994-87fdb277120f", 8.91),   # Broadcaster — fastest, flattest
+    "eyal":    ("a976c076-3e31-4bf2-a178-8c3ce3d52b2a", 9.48),   # Grounded Guide
+    "avi":     ("858c98dc-db9e-4d1a-9435-557cdf77685c", 9.80),   # Calm Consultant
+    "eitan":   ("daa4d6bb-da62-4e16-8065-76cd87942475", 9.87),   # Modern Communicator
+    "gil":     ("84b969ad-19c7-428d-b742-48d387f7f138", 9.95),   # Friendly Host
+    "asaf":    ("52271edb-c161-4c76-9e33-c5c1d39de6e3", 10.84),  # Steady Advisor
+    "itai":    ("db3dc8a6-d8f8-4ca5-add9-559c849a6fa0", 10.92),  # Measured Advisor
+    "oren":    ("431b7e77-b46d-4eda-8362-db430ac0913c", 11.00),  # Steady Advisor
+    "ronen":   ("921f4026-af53-4761-ac56-1c32e44856e8", 11.00),  # Calm Consultant
+    "ido":     ("33124162-0d74-48af-ab1c-c1c01bac0247", 11.15),  # Calm Communicator
+    "yonatan": ("95d91579-a3f1-4bb3-b5e1-9a97ef401628", 11.55),  # Measured Professional — slowest
+}
+
+
+def cartesia_voice(vid, fallback):
+    """A Cartesia voice object with the guard and an Elliot fallback attached.
+
+    Split out of cloned_voice() on 7 Aug because the clone stopped being the only
+    reason to reach for Cartesia. `POST /voices/clone` returns
+    402 `plan_upgrade_required` — Instant Voice Cloning is Pro-tier, and the
+    earlier note in this file that it was "fast and free" was wrong: that phrase
+    is about training being free once you are on a plan that has the feature.
+
+    What the free tier *does* carry is four voices with `language: he` — real
+    Hebrew voices on a current model, which is the combination nothing else had.
+    Azure's he-IL voices are native and flat; vapi/Elliot is expressive with an
+    American accent. Measured on identical text, Cartesia gave `אה` +3.84s of
+    hesitation against Azure's +1.46s, which is the difference being chased.
+
+    THE PRICE IS WALL-CLOCK, AND IT IS BILLED.
+    Cartesia ran 31-66% longer than Azure on the same sentences. Calls are billed
+    per minute, so a 35% slower voice moves the ~5,000 min/month estimate toward
+    6,750. If that shows up on the bill, `generationConfig.speed` accepts
+    0.6-1.5 on sonic-3 — tune there before changing provider.
+    """
     voice = voice_with_guard({
         "provider": "cartesia",
         "voiceId": vid,
@@ -583,13 +669,39 @@ def build(target, first_message, system_prompt):
     body["firstMessage"] = first_message
     body["model"]["messages"] = [{"role": "system", "content": system_prompt}]
 
-    # Precedence: a cloned voice beats a native one beats the stock Vapi voice.
-    # The clone is the goal, `native` is the stopgap for the accent, and the
-    # stock voice is what ships when neither is configured.
+    # Precedence, most specific first:
+    #   1. a clone of a real person          CARTESIA_VOICE_ID / ELEVENLABS_VOICE_ID
+    #   2. Cartesia's native Hebrew voice    VOICE_PROFILE=cartesia
+    #   3. Azure's native Hebrew voice       VOICE_PROFILE=native
+    #   4. the stock Vapi voice              nothing configured
+    #
+    # 2 and 3 are BOTH native Hebrew and they are not interchangeable: Azure is
+    # accurate and flat, Cartesia is expressive and ~35% slower. Which one is
+    # right is a judgement about the call, not a fact about the language, so both
+    # stay reachable and the profile picks.
     if target.get("cloneable"):
         cloned = cloned_voice(body["voice"])
         if cloned:
             body["voice"] = cloned
+    if body["voice"]["provider"] == "vapi":
+        vid = target.get("cartesia_voice")
+        # HEBREW_VOICE=asaf picks by name, so auditioning is one word rather than
+        # a uuid pasted from a browser. Masculine list only — putting a male
+        # voice on the feminine intake agent is a grammatical error, not a
+        # preference, so the override is refused rather than silently applied.
+        pick = os.environ.get("HEBREW_VOICE", "").strip().lower()
+        if pick:
+            if pick not in HEBREW_MEN:
+                sys.exit("HEBREW_VOICE=%s is not one of: %s"
+                         % (pick, ", ".join(sorted(HEBREW_MEN))))
+            if target.get("native_voice", "").endswith("AvriNeural"):
+                vid = HEBREW_MEN[pick][0]
+            else:
+                sys.exit("HEBREW_VOICE only applies to agents with a masculine "
+                         "prompt. Both are masculine as of 7 Aug; if this fires, "
+                         "a target's native_voice was changed without its prompt.")
+        if vid and os.environ.get("VOICE_PROFILE", "").strip().lower() == "cartesia":
+            body["voice"] = cartesia_voice(vid, body["voice"])
     if body["voice"]["provider"] == "vapi":
         native = native_voice(target, body["voice"])
         if native:
@@ -651,7 +763,11 @@ def main():
     fb = (v.get("fallbackPlan") or {}).get("voices") or []
     print("voice         : %s %s%s%s" % (
         v["provider"], v["voiceId"],
-        " (cloned)" if v["provider"] == "cartesia" else "",
+        # Say which it is. A stock Cartesia voice and a clone of a real person
+        # are the same shape in this payload, and printing "cloned" for both is
+        # how someone later believes a clone exists when it does not.
+        (" (cloned)" if os.environ.get("CARTESIA_VOICE_ID", "").strip()
+         else " (stock he voice)") if v["provider"] == "cartesia" else "",
         "  fallback -> %s %s" % (fb[0]["provider"], fb[0]["voiceId"]) if fb else ""))
     print("endpointing   : wait %ss, noPunct %ss, number %ss, backoff %ss" % (
         sp["waitSeconds"],

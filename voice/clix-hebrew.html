@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>אסף מקליקס — the script in Hebrew</title>
+<style>
+  :root { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --good:#2f6b46; --bad:#94402c; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --good:#6bbd8c; --bad:#e08a70; } }
+  :root[data-theme="light"] { --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a; --good:#2f6b46; --bad:#94402c; }
+  :root[data-theme="dark"]  { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; --good:#6bbd8c; --bad:#e08a70; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:3rem 1.5rem 5rem; background:var(--bg); color:var(--fg); font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:46rem; margin:0 auto; display:flex; flex-direction:column; gap:.9rem; }
+  h1 { font-size:1.5rem; margin:0 0 .35rem; letter-spacing:-.01em; text-wrap:balance; }
+  .sub { color:var(--dim); margin:0 0 1rem; }
+  h2 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); margin:1.6rem 0 -.2rem; font-weight:650; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.05rem 1.2rem; }
+  .card.win { border-color:var(--good); }
+  .head { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; margin-bottom:.5rem; }
+  .name { font-weight:650; }
+  .tag { font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; border-radius:99px; padding:.1rem .5rem; border:1px solid currentColor; }
+  .tag.g { color:var(--good); } .tag.n { color:var(--accent); }
+  .delta { margin-left:auto; color:var(--dim); font-size:.85rem; font-variant-numeric:tabular-nums; }
+  .heb { direction:rtl; text-align:right; font-size:1.1rem; line-height:1.95; padding:.55rem .85rem; border-right:2px solid var(--line); margin:0 0 .55rem; }
+  .heb mark { background:transparent; color:var(--accent); font-weight:700; }
+  .en { font-size:.84rem; color:var(--dim); font-style:italic; margin:0 0 .6rem; padding-right:.85rem; }
+  audio { width:100%; margin-bottom:.5rem; }
+  .listen { font-size:.88rem; color:var(--dim); margin:0; }
+  .listen b { color:var(--fg); font-weight:600; }
+  .warn { border:1px solid var(--bad); border-radius:10px; padding:1rem 1.2rem; font-size:.92rem; }
+  .warn b { color:var(--bad); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>אסף מקליקס — your script, in Hebrew</h1>
+    <p class="sub">Same words you wrote, in Hebrew, with the hesitation in three
+      different strengths.</p>
+  </header>
+
+  <div class="warn">
+    <b>This is still not your voice.</b> It is <code>he-IL-AvriNeural</code>.
+    Your <code>Voice-record-sample-to-clone.ogg</code> has been analysed and cut
+    into three 10-second candidates, but <b>no clone has been made</b> — that
+    needs a Cartesia or ElevenLabs API key, and the account has neither. Judge
+    the <em>words and the pacing</em> here; the timbre comes later.
+  </div>
+
+  <h2>The greeting</h2>
+
+  <div class="card">
+    <div class="head"><span class="name">No hesitation</span><span class="tag n">correct here</span><span class="delta">2.33s</span></div>
+    <p class="heb">שלום, מדבר אסף מקליקס. איך אפשר לעזור?</p>
+    <p class="en">Hello, this is Assaf from CLIX. How can I help you?</p>
+    <audio controls preload="none" src="samples/h0-greeting.mp3"></audio>
+    <p class="listen">The greeting stays clean. An agent that hesitates over its
+      own name sounds unsure it belongs there.</p>
+  </div>
+
+  <h2>The debt line — pick a strength</h2>
+
+  <div class="card">
+    <div class="head"><span class="name">No filler</span><span class="tag n">today</span><span class="delta">4.78s</span></div>
+    <p class="heb">רציתי לעדכן אותך לגבי החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, וצריך להסדיר אותו עד סוף השבוע.</p>
+    <p class="en">I wanted to update you about your debt, which is one hundred shekels. In our system it is still unsettled, and it needs to be settled by the end of the week.</p>
+    <audio controls preload="none" src="samples/h1-debt-none.mp3"></audio>
+    <p class="listen">The robotic baseline.</p>
+  </div>
+
+  <div class="card win">
+    <div class="head"><span class="name">אה three times</span><span class="tag g">closest to what you asked for</span><span class="delta">6.24s</span></div>
+    <p class="heb"><mark>אה</mark>, רציתי לעדכן אותך לגבי, <mark>אה</mark>, החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, ו, <mark>אה</mark>, צריך להסדיר אותו עד סוף השבוע.</p>
+    <p class="en">Uhh, I wanted to update you about, uhh, your debt… and, uhh, it needs to be settled by the end of the week.</p>
+    <audio controls preload="none" src="samples/h2-debt-eh.mp3"></audio>
+    <p class="listen"><b>+1.46s over the clean version.</b> This is the "uhh" you
+      described, in the form Israelis actually use.</p>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">Ellipsis only</span><span class="delta">5.95s</span></div>
+    <p class="heb">רציתי לעדכן אותך לגבי<mark>...</mark> החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, ו<mark>...</mark> צריך להסדיר אותו עד סוף השבוע.</p>
+    <audio controls preload="none" src="samples/h3-debt-ellipsis.mp3"></audio>
+    <p class="listen">Hesitation with no word to mispronounce. Reads as thinking
+      rather than stumbling.</p>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="name">Mixed — אה then a pause</span><span class="tag n">most varied</span><span class="delta">6.04s</span></div>
+    <p class="heb"><mark>אה</mark>, רציתי לעדכן אותך לגבי<mark>...</mark> החוב שלך, שהוא מאה שקלים. במערכת שלנו הוא עדיין לא הוסדר, ו, <mark>אה</mark>, צריך להסדיר אותו עד סוף השבוע.</p>
+    <audio controls preload="none" src="samples/h4-debt-mixed.mp3"></audio>
+    <p class="listen">Real speech does not repeat the same filler three times.
+      Alternating a sound with a silent beat is what stops it reading as a tic.
+      <b>This is the one I would ship.</b></p>
+  </div>
+
+</main>
+</body>
+</html>
