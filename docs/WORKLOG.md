@@ -51,6 +51,59 @@ the agent is standing, with every open question dead.
 
 Live on `0ef11cb5`, 48,326 chars. Guard passes.
 
+### Stop banning the repeat, enumerate the alternatives
+
+The turn-3 line pushed at 07:18 did not work. The call at **07:22:32 ran on it**
+— assistant `updatedAt` 07:18:05, call four minutes later, checked rather than
+assumed — and the agent still answered "אוקיי" by restating the amount in fresh
+words, then answered a second "אוקיי" by restating the bank details in fresh
+words.
+
+**Two things the server transcript settled that the feed could not.** The
+greeting appears **once** in Vapi's own record, so the doubled greeting on screen
+is the page, and the opening fix from this morning is working. The amount and the
+bank details each really do appear twice. And `אוקיי, ומה עושים?` appears twice
+in the user stream — the page sent it twice, which is a separate bug: the presets
+are `<button>` elements, so one that still has focus after a click re-fires on
+Enter.
+
+**Why the line did not take.** It was correct and it was in the wrong place — in
+HOW PAYMENT ACTUALLY WORKS, ~16k characters away from THE OPENING, where the
+model is anchored when it has just said the amount. When a model is unsure what
+comes next it reaches for the nearest written-out line, and the nearest one was
+the sentence it had just said. That is the same mechanism as the greeting on
+6 Aug and the payment line on 7 Aug: **written-out lines get spoken, and
+proximity decides which.**
+
+**The deeper reason four rules failed.** REPETITION says an acknowledgement is
+not a turn. "Rephrasing is repeating" says the synonym does not help. "A question
+asked once has been asked" was added this morning. All three are prohibitions,
+and a prohibition tells a model what not to say without telling it what to say —
+under a forced turn there is nothing left but the sentence it just used.
+
+So the fix is not a fifth prohibition. Directly after the amount line, 442
+characters away, there is now an enumeration: **exactly four things you may say
+next, and no fifth** — acknowledgement → ask for the yes; agreement → the link
+line; a question → answer it then ask; anything else → that branch. Plus a
+default that removes the failure mode entirely: *if you cannot tell which of the
+four you are in, you are in 1.* And the general form, which applies everywhere in
+the file: **asking a question you have not yet asked is always better than
+repeating a sentence you have already said.**
+
+The turn-3 line now exists exactly once in the file, in the menu, with the
+payment section pointing at it rather than holding a second copy.
+
+**Why English never had this fault**, since it is the obvious question: the
+English twin is running a 38,533-character prompt last updated at 02:54, which
+predates every patch made today. Hebrew is at 56,564 and has grown 38% in a day.
+The English agent asked "would you like me to send you a payment link?" off the
+identical acknowledgement — so the flow was always right and the Hebrew simply
+never had the sentence. It is also worth saying plainly that a prompt growing by
+a third in one day is its own risk, and the next session should be spent cutting
+rather than adding.
+
+Live on `0ef11cb5`, 56,564 chars.
+
 ### The main path had no third turn, and the link stopped being the only answer
 
 **The Hebrew call restated the amount three times.** Not a branch — the main
