@@ -11,6 +11,61 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### The loop was the demo page, and most of this morning was spent on the prompt
+
+Vapi's context for call `019fdb2e` has three messages in it:
+
+```
+[assistant] greeting + reason for call + 450 שקלים     ← one turn
+[user]      כן אוקיי אוקיי                              ← one turn
+[assistant] reason for call again
+```
+
+Three separate clicks arrived as one user turn. The greeting and the amount left
+as one assistant turn. `turnLatencies` is empty and `numUserInterrupted` is 0 —
+there was no turn-taking to measure, because none happened.
+
+**The mechanism.** A typed turn goes in as `add-message` with
+`triggerResponseEnabled: true`, which asks the model to answer immediately —
+including while it is still speaking, and before its own last answer has been
+written into the server-side history. The model is handed a transcript in which
+it has not replied yet, so it replies again. Same context, fresh sample, a
+different hesitation word each time: אההה the first time, אמממ the second. Two
+generations, not a decision to repeat.
+
+That also explains the digit that went missing from the bank account on
+`019fdb24` — the second reading was a second sample, not a re-reading, and
+sampling an eight-digit string twice is how you get seven.
+
+And it answers the English question properly, which the prompt-size argument only
+half did. `019fdb11` alternates cleanly the whole way down because whoever ran it
+waited for the agent to stop talking before clicking. Same code, same race, not
+triggered.
+
+**Three fixes in the page**, none in the prompt:
+
+- Typed turns queue and go out one at a time, 300ms after `speech-end`. Buttons
+  disable while the agent talks and the status line says why.
+- Identical text within 1.5s is dropped, and buttons blur on click — a preset
+  that still holds focus re-fires on Enter, which is how
+  *"אוקיי, ומה עושים?"* reached Vapi twice.
+- The feed tracks the open partial **per speaker** instead of collapsing whatever
+  sits at the bottom of the list. Interim guesses were stranding as their own
+  lines the moment the speakers interleaved, which is why three transcripts
+  showed a doubled greeting the server had only once.
+
+Live at `7872ec2` on the demo repo.
+
+**What this cost.** Four prompt patches this morning were aimed at a fault the
+prompt did not have, using transcripts the page had corrupted. Two of them are
+worth keeping on their own merits — the enumeration after the amount, and the
+transfer receipt line — and one, deleting the offer to repeat, was argued from
+evidence that turns out to be an artifact. It stays deleted anyway; an offer to
+repeat an account number earns its place back or it does not.
+
+**Nothing about the debt prompt should be judged from a transcript recorded
+before this deploy.** The next round of tests starts from zero.
+
 ### The loop moved down one level, and the repeat corrupted the account number
 
 The enumeration after the amount worked. Call `019fdb24` asked
