@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### Cut the debt prompt in half
+
+67,789 characters to **33,523** — 51%, and below the English twin's 38,533 for
+the first time.
+
+**Nothing was removed for being wrong.** What came out was the evidence. A day of
+*"on 7 Aug a resident said X and the agent did Y, which is why this rule
+exists"* — 53 dated narratives, now zero. Every one of those stories is in this
+file, which is where a reader looking for the reasoning should come. The model
+does not need the reasoning. It needs the rule, once, close to where it acts.
+
+Also removed: four sections that said the same thing in different words (LANGUAGE,
+STYLE, NATURALNESS and YOU ARE BEING HEARD are now one), three variants of the
+closing where one will do, and the blank-line padding that made HESITATION five
+thousand characters for six rules.
+
+**Verified rather than trusted.** All 24 unique fixed Hebrew lines were extracted
+from the old prompt first and checked against the new one; 22 are present
+verbatim and the two absences are the shorter closing variants, deliberately
+collapsed into the canonical one — which is the redundancy that broke the goodbye
+this morning. Twenty-four behavioural rules that each cost a live call today were
+probed by name and all twenty-four are present. Voice, tools, end-call phrases and
+all 27 output-filter replacements unchanged.
+
+The file now opens with the rules for editing itself, because the ones that
+mattered were learned expensively and are invisible in the result: every turn has
+a written Hebrew line; the next turn is written where the previous one ends;
+enumerate rather than prohibit; every list has a default; a `>` line is spoken.
+
+**On the knowledge-base idea** — worth doing, but not for this. A KB is retrieval
+over reference material, and it would help with things the agent might be *asked*:
+building addresses, office hours, what the ועד בית covers. It cannot help with
+behaviour, because behaviour is not looked up mid-sentence. Every loop today came
+from a missing or distant instruction, and retrieval would have made that worse by
+putting the instruction further away still. Cutting was the fix.
+
+**The prompt grew 50% in one day and has now shrunk 51%.** That is not a wash: it
+is the same content with a day of investigation taken out of it and moved
+somewhere a person can read.
+
 ### Why the English one sounds smoother, and it is not the language
 
 A clean English call was held up as the target: opening, amount, link offer,
