@@ -11,6 +11,49 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### The loop moved down one level, and the repeat corrupted the account number
+
+The enumeration after the amount worked. Call `019fdb24` asked
+*"רוצה שאני אשלח לך לינק לתשלום?"* once, off a plain "אוקיי", in the right place —
+and `019fdb22` ran the already-paid branch clean. Both faults from this morning
+are closed.
+
+The same fault then reappeared one turn further down. The resident said they do
+not use links, the agent read `{{alt_payment}}`, the resident said "אוקיי", and
+the agent read `{{alt_payment}}` again. Identical shape, identical cause: a turn
+ended and the next one was never written. The alt-payment branch finished on an
+English instruction — *"then offer to send the link as well so they have both"* —
+with no Hebrew under it, so there was nothing to say and the nearest written line
+was the one just said.
+
+**The repeat was not merely a repeat.** The second reading came back
+*אחת, שתיים, שלוש, ארבע, חמש, שבע, שמונה* — seven digits where the first had
+eight. שש was dropped. The resident who trusted the second reading would have
+sent the money nowhere. This is the argument the file was missing: a detail said
+once is right, a detail said twice is a coin flip, and the second reading is the
+one they write down. That went into the identifier rule as evidence.
+
+The offer to repeat is now gone rather than capped. It was capped at one this
+morning after it produced a loop; capping a thing that both loops and corrupts is
+the wrong move. Say it once, repeat only if they ask in words, never ask whether
+they caught it.
+
+**And the branch now has a next turn, which is the one Homies actually needs.** A
+transfer does not announce itself — nobody watches the account, so a resident who
+pays and sends nothing gets called again next month about a debt they settled.
+The receipt line asks them to send the confirmation to `{{verification_email}}`,
+with the feminine inflection written out, followed by the same three-option
+enumeration and the same default: if you cannot tell which you are in, you are in
+the first one.
+
+Server-side again disagrees with the screen: the greeting appears **once** in
+Vapi's record. Vapi collapses consecutive bot turns into one message while the
+user's ASR buffers, which is why the pasted transcript shows the greeting twice
+and shows the agent answering questions the resident had not yet asked. The demo
+page's rendering is now costing more time than it saves.
+
+Live at 58,610 chars on `0ef11cb5`, receipt line present exactly once.
+
 ### The already-paid branch looped, twice, in two different ways
 
 Two test calls, same branch, and the agent never got out of it. In the first it
