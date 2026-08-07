@@ -51,6 +51,61 @@ the agent is standing, with every open question dead.
 
 Live on `0ef11cb5`, 48,326 chars. Guard passes.
 
+### Four test calls on the rewritten branches: three fixes held, four new faults
+
+**Held.** The already-paid branch ran clean — month asked once, "כן" taken as a
+yes, discrepancy stated, no loop, where two calls this morning could not escape
+it. The handover said the new line and the call ended. The bank account came out
+digit by digit.
+
+**1. The opening was generated a second time, twice.** Once after a plain "כן" —
+greeting, greeting again, then the reason for the call. Once to an answering
+machine, which was greeted before the message was left. The prompt has said "the
+opening is said once and never again" since 5 Aug, and it kept saying it into a
+gap: `firstMessage` is spoken by Vapi before the model produces anything, and
+nothing told the model that. It read a fixed line under a heading called Opening
+and did what the file appeared to ask. It now says, at the top of that section,
+that the line has already gone out and the model's first turn is the answer to
+whatever came back.
+
+**2. A bare "לא" closed the call without the not-the-account-holder line.** The
+person was never told why the call ended and the office got no `wrong_party` row.
+The opening cross-referenced that branch by name; the branch is now written out
+inline, where the decision is actually made. It costs a duplicated fixed line —
+`vapi_en.py` will need a count of 2 for that pair — and a live agent that says
+the line beats a build script that likes the file.
+
+**3. The voicemail message could never end a call.** It closed on תודה ויום טוב.
+`endCallPhrases` are שיהיה יום טוב and ולהתראות, and `endCallFunctionEnabled` is
+false, so there was no other way to hang up: the message was left perfectly and
+the call then sat open against an answering machine until it timed out. Now ends
+on the phrase that releases the line. The English twin never had this bug — it
+closed on "have a good day", which IS one of its phrases, purely by luck of
+translation.
+
+Also removed the dead goodbye from the explanation of its own removal. A verify
+probe caught it still in the file, inside the paragraph describing it, and this
+prompt's whole history is written-out lines being spoken.
+
+**4. A new loop, and I wrote it.** The identifier rule added this morning ended
+"and you offer to say it once more" — an offer with no cap. The bank details were
+read, offered again, read again, offered again, and the call was still offering
+when the resident gave up. Same shape as the address check fixed this morning,
+which the general "a question asked once has been asked" rule did not catch,
+because an offer to repeat does not feel like a question being re-asked. Capped
+at one offer, any answer ends it. **An offer to repeat is a courtesy, not a
+checkpoint.**
+
+Also: the branch number was שמונה מאות on the first reading and שמונה, אפס, אפס
+on the second. Same digits the same way each time, now stated.
+
+**Not a fault, worth recording so nobody chases it:** אה renders as אההה and אמ
+as אמממ in the transcript. `firstMessage` is a fixed string containing אה and it
+still shows as אההה, so that is the transcriber rendering a drawn-out sound in
+the agent's own audio, not the model ignoring "write אה, never אההה".
+
+Live on `0ef11cb5`, 52,661 chars.
+
 ### Elliot for English, Eyal for Hebrew — and the voice stops living in the shell
 
 The two Hebrew agents were speaking in two different voices and nothing in any

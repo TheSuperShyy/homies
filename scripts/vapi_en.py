@@ -316,11 +316,24 @@ DEBT_LINES = [
     ("Once they confirm, say why you are calling: the ועד בית payment for",
      "Once they confirm, say why you are calling: the building committee payment for"),
 
+    # APPEARS TWICE IN THE HEBREW SINCE 7 AUG, so the exactly-once rule below
+    # will reject it and the rebuild has to allow a count of 2 for this one pair.
+    # The duplication is deliberate: the opening used to cross-reference this
+    # line by name and the agent closed on a bare "לא" without ever saying it, so
+    # it is now written out where the decision is made as well as where it is
+    # catalogued. A live agent that says the line beats a build script that likes
+    # the file.
     ("> סליחה על ההפרעה, אני לא יכול למסור פרטים למי שאינו בעל החשבון. אפשר לבקש ש{{first_name}} יחזור אלינו?",
      "> Sorry to disturb you. I can't share details with anyone who is not the "
      "account holder. Could you ask {{first_name}} to get back to us?"),
 
-    ("> שלום, מדבר מיכאל מחברת הניהול הומיז לגבי בניין {{building}}. יש נושא שנשמח להסדיר איתך, אפשר לחזור אלינו למספר {{callback_number}}. תודה ויום טוב.",
+    # The Hebrew changed on 7 Aug and the English did not have to. This message
+    # ended "תודה ויום טוב", which matches no endCallPhrase, so the voicemail was
+    # left perfectly and the call then sat open against an answering machine
+    # until it timed out. The English twin ended "have a good day" — which IS one
+    # of its phrases — and so never had the bug. Both now end on the phrase that
+    # releases the line, in their own language.
+    ("> שלום, מדבר מיכאל מחברת הניהול הומיז לגבי בניין {{building}}. יש נושא שנשמח להסדיר איתך, אפשר לחזור אלינו למספר {{callback_number}}. תודה. שיהיה יום טוב.",
      "> Hello, this is Michael from Homies building management, regarding "
      "building {{building}}. There's a matter we'd be glad to settle with you. "
      "Please call us back on {{callback_number}}. Thank you and have a good day."),
