@@ -56,6 +56,27 @@ triggered.
 
 Live at `7872ec2` on the demo repo.
 
+**That first fix was incomplete and the next test caught it.** Gating on
+`agentSpeaking` leaves open the window where the damage actually happens: between
+a turn being sent and the first audio coming back the model is generating and not
+speaking, so a second click in that gap sails through and triggers a second
+response off the same context.
+
+That window is one to two seconds — exactly the gap between clicking *כן* and
+clicking *אוקיי*. It also explains the thing that looked like a content
+difference: *"אוקיי, ומה עושים?"* worked every time because it is a longer button
+that takes longer to find and read, so the window had closed before it was
+clicked. Nothing to do with which words were sent.
+
+Sends now hold until `speech-end` rather than merely while speech plays, with a
+12s escape hatch for a turn answered by a tool call and no words, and calls start
+held because the greeting goes out on connect. Status reads
+*"Michael is thinking…"* so the wait is visible instead of a dead button.
+
+There is also a build tag in the status bar now, because two rounds of tests were
+argued about this morning before anyone could say whether the page in the browser
+had the fix in it. `ba2489a`, build `2026-08-07b`, confirmed live on Vercel.
+
 **What this cost.** Four prompt patches this morning were aimed at a fault the
 prompt did not have, using transcripts the page had corrupted. Two of them are
 worth keeping on their own merits — the enumeration after the amount, and the
