@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### The already-paid steps had no exits, so they cycled
+
+First test on the cut prompt. The link path ran clean end to end — asked once,
+tool called, link line, closing, call ended itself. The already-paid path cycled
+between step 1 and step 2 until the resident gave up.
+
+The four steps were numbered and had no transitions. Step 2 says what the system
+shows and ends on a statement, so the resident answers it with "אוקיי" — and
+nothing said what to do with that. The nearest written line above was step 1's
+question, so step 1 is what came out. Then step 2 again. Then step 1.
+
+**Numbering is not a transition.** A model that has just finished a turn does not
+read a list and infer that the next item follows; it looks for a written line and
+uses the nearest one. Every step now ends with **"then go to N, whatever they
+said"**, and the block opens with the rule the numbering was silently assuming:
+**these steps only go forwards.** No going back to check, no repeating a step
+because the answer was thin, no step said twice in a call.
+
+Also written out: the feminine form of step 1. The line flipped between
+*את מדברת* and *אתה מדבר* inside one call — correct twice, wrong once, on a
+resident passed as `gender: f`. Repetition does not just annoy, it degrades, and
+that is now the third time today one line has come out different on a second
+reading.
+
+34,308 chars, still half of where the day started.
+
 ### Cut the debt prompt in half
 
 67,789 characters to **33,523** — 51%, and below the English twin's 38,533 for
