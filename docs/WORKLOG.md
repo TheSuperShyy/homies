@@ -51,6 +51,51 @@ the agent is standing, with every open question dead.
 
 Live on `0ef11cb5`, 48,326 chars. Guard passes.
 
+### Elliot for English, Eyal for Hebrew — and the voice stops living in the shell
+
+The two Hebrew agents were speaking in two different voices and nothing in any
+file said so. Inbound was on `cartesia/a976c076` (Eyal), debt was on
+`vapi/Elliot`. Both targets name the same `cartesia_voice`, so the code was never
+the difference: Cartesia sat behind `VOICE_PROFILE=cartesia`, inbound was pushed
+once with that set, debt never was, and the divergence then survived every
+subsequent sync of either agent.
+
+**A voice is not an environment concern.** Anything that can silently differ
+between two runs of the same command does not belong in an environment variable,
+and this one produced two front doors of one company sounding like two companies
+for two days.
+
+Cartesia is now the default for any target carrying a `cartesia_voice`, which is
+both Hebrew agents. The English twins set their own `vapi/Elliot` in
+`vapi_en.py` and never reach that code, so they were already right and stay
+untouched.
+
+Why not simply put Elliot on Hebrew as well, which is the easier way to make them
+match: `vapi/Elliot` with `language: he` is an English voice model being told to
+read Hebrew, and the American accent is not a setting that can be tuned out — it
+is what that voice is. Eyal is a Hebrew voice on a Hebrew model. The price is
+wall-clock; Cartesia ran 31-66% longer on identical sentences and calls bill by
+the minute, so `generationConfig.speed` is where to look before the bill argues
+back.
+
+Both escape hatches still work and were dry-run before applying:
+`VOICE_PROFILE=vapi` puts Elliot back on Hebrew for an A/B, `VOICE_PROFILE=native`
+reaches Azure `he-IL-AvriNeural`. An empty profile no longer means Elliot, which
+is the one thing to remember about this change.
+
+Live, all four, guard intact at 27 replacements on each:
+
+| assistant | voice |
+|---|---|
+| Debt Follow-up (he) `0ef11cb5` | cartesia Eyal, fallback vapi Elliot |
+| Inbound Intake (he) `51bbe77a` | cartesia Eyal, fallback vapi Elliot |
+| Debt Follow-up (en) `eaa390ec` | vapi Elliot |
+| Inbound Intake (en) `fd991d71` | vapi Elliot |
+
+Unheard as of the push. Vapi's cost records report `voiceId: Elliot` for every
+call on the vapi provider regardless of what was spoken, so billing has never
+been evidence of what came out — only a call answers it.
+
 ### The debt agent stops promising a transfer it cannot make
 
 Walked every branch of the debt prompt against the live config. Two things broke

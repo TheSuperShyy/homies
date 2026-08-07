@@ -533,7 +533,11 @@ def native_voice(target, fallback):
     decision: run one call each way and keep the better.
 
         VOICE_PROFILE=native  python scripts/vapi_sync.py debt --apply
-        VOICE_PROFILE=        python scripts/vapi_sync.py debt --apply
+        VOICE_PROFILE=vapi    python scripts/vapi_sync.py debt --apply
+
+    An empty VOICE_PROFILE no longer means Elliot — since 7 Aug it means
+    Cartesia, because Hebrew's default voice stopped being an environment
+    setting. `vapi` is the way back to Elliot.
 
     Both were tested against the live API before this was written; Vapi accepts
     either voiceId with a 200.
@@ -711,19 +715,43 @@ def build(target, first_message, system_prompt):
 
     # Precedence, most specific first:
     #   1. a clone of a real person          CARTESIA_VOICE_ID / ELEVENLABS_VOICE_ID
-    #   2. Cartesia's native Hebrew voice    VOICE_PROFILE=cartesia
-    #   3. Azure's native Hebrew voice       VOICE_PROFILE=native
-    #   4. the stock Vapi voice              nothing configured
+    #   2. Azure's native Hebrew voice       VOICE_PROFILE=native
+    #   3. the stock Vapi voice              VOICE_PROFILE=vapi
+    #   4. Cartesia's native Hebrew voice    the default
     #
-    # 2 and 3 are BOTH native Hebrew and they are not interchangeable: Azure is
-    # accurate and flat, Cartesia is expressive and ~35% slower. Which one is
-    # right is a judgement about the call, not a fact about the language, so both
-    # stay reachable and the profile picks.
+    # ELLIOT FOR ENGLISH, EYAL FOR HEBREW — AND THAT IS A PROPERTY OF THE AGENT,
+    # NOT OF SOMEBODY'S SHELL. Cartesia used to sit behind VOICE_PROFILE=cartesia,
+    # which meant the voice a Hebrew agent ended up with depended on which
+    # environment variable happened to be set the last time anyone ran this. That
+    # is not a hypothetical failure: the inbound agent was pushed once with the
+    # profile set and the debt agent never was, so the two front doors of one
+    # company spoke in two different voices for two days and no file said so.
+    # Anything that can silently differ between two runs of the same command does
+    # not belong in an environment variable.
+    #
+    # The English twins set their own voice in vapi_en.py and never reach this
+    # code, so they keep Elliot without needing to know about any of it.
+    #
+    # WHY NOT ELLIOT FOR HEBREW TOO, WHICH IS SIMPLER: `vapi/Elliot` with
+    # `language: he` is an English voice model being told to read Hebrew. The
+    # American accent is not a setting that can be tuned out, it is what that
+    # voice is. Eyal is a Hebrew voice on a Hebrew model. The price is wall-clock
+    # — Cartesia ran 31-66% longer on identical sentences, and calls bill by the
+    # minute — see cartesia_voice() for where to tune that before changing
+    # provider.
+    #
+    # VOICE_PROFILE=vapi puts Elliot back on Hebrew for an A/B, without editing
+    # anything. VOICE_PROFILE=native reaches Azure, which is the other native
+    # Hebrew option: accurate and flat where Cartesia is expressive and slower.
+    # Which of those is right is a judgement about the call rather than a fact
+    # about the language, so both stay reachable.
+    profile = os.environ.get("VOICE_PROFILE", "").strip().lower()
+
     if target.get("cloneable"):
         cloned = cloned_voice(body["voice"])
         if cloned:
             body["voice"] = cloned
-    if body["voice"]["provider"] == "vapi":
+    if body["voice"]["provider"] == "vapi" and profile != "vapi":
         vid = target.get("cartesia_voice")
         # HEBREW_VOICE=asaf picks by name, so auditioning is one word rather than
         # a uuid pasted from a browser. Masculine list only — putting a male
@@ -740,7 +768,7 @@ def build(target, first_message, system_prompt):
                 sys.exit("HEBREW_VOICE only applies to agents with a masculine "
                          "prompt. Both are masculine as of 7 Aug; if this fires, "
                          "a target's native_voice was changed without its prompt.")
-        if vid and os.environ.get("VOICE_PROFILE", "").strip().lower() == "cartesia":
+        if vid and profile != "native":
             body["voice"] = cartesia_voice(vid, body["voice"])
     if body["voice"]["provider"] == "vapi":
         native = native_voice(target, body["voice"])
