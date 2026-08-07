@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### Why the English one sounds smoother, and it is not the language
+
+A clean English call was held up as the target: opening, amount, link offer,
+link, standing order, close. It is smoother than the Hebrew, and the two reasons
+are both mechanical.
+
+**The English twin has sentences where the Hebrew has descriptions.** The
+standing order is the visible one. The English prompt says *"Would you like to
+set up a standing order for next time?"* — the Hebrew said *"then, once only,
+offer the standing order"*, in English, with no Hebrew line under it. So the
+English offers it on almost every call and the Hebrew hardly ever did. Same
+flow, one written down.
+
+Four branches were in that state and all four now have Hebrew: the standing
+order (offer, accept, decline), paying later, hardship, and a maintenance
+request raised mid-call. The promise-to-pay branch also gained the rule it never
+had — **a vague date is still a date.** אחרי החג and בסוף החודש are answers, and
+pressing for a number loses the intent along with the date.
+
+**The second reason is one word.** On 7 Aug בסדר opened five turns out of six.
+Every sentence after it was fine; the call still sounded like a machine, because
+a person reaching for the same word five times running is not a person reaching
+for a word. The register section listed seven openers and never said not to
+repeat one. It does now — never twice in a row, never one word for most of a
+call — and it says the thing the list implied and never stated: **most turns take
+no lead-in at all.** The English twin opens two turns in five with nothing, and
+that is most of the difference in feel.
+
+Live at 67,789 chars on `3303317e`. The five unwritten branches are down to
+none.
+
 ### The rule against mishearing a yes stopped it hearing one at all
 
 Two calls, two minutes apart, same script but for one button.
