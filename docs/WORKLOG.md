@@ -11,6 +11,54 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### I turned the Hebrew prompt into a script, and scripts loop
+
+The complaint was that the conversation runs by steps and the English twin
+adapts. Measured rather than argued:
+
+| | Hebrew | English |
+|---|---|---|
+| verbatim `>` lines | **23** | **7** |
+| "exactly N things you may say next" | 5 | 0 |
+| "then go to N" transitions | 7 | 2 |
+| bold imperatives | 130 | 53 |
+
+The English twin has the same four numbered steps in the already-paid branch. The
+difference is that it says *"if they confirm, say what the system shows and leave
+it there"* and lets the model compose the sentence, where the Hebrew dictated the
+sentence and then had to dictate the transition out of it too.
+
+**Every one of those 23 lines went in as a loop fix, and the loops were mostly not
+prompt bugs** — the demo page triggering the model twice, `send_payment_link`
+never being called, a closing that did not match its own `endCallPhrase`. Real
+bugs, fixed. But each one also got a written line and a rule about what comes
+after it, and eighteen of those accumulated into a state machine. A model that has
+been handed a script and does not know which line comes next replays the last one.
+**That is the loop, and I built it.**
+
+The file's own oldest rule said so: *"the prompt does not script Hebrew lines,
+with five exceptions — everything else describes what to convey, and the model
+generates the Hebrew natively."* Broken eighteen times in one day, one reasonable
+patch at a time.
+
+Reverted to describing. **8 fixed lines against the English twin's 7**, zero
+enumerations, and the four already-paid steps now read like the English ones.
+What stays verbatim needs one of three reasons and no others: Vapi speaks it
+literally (the opening), the wording carries legal or privacy weight
+(not-the-account-holder, voicemail), or a test proved the model does something
+worse unscripted (the handover line, which went silent on a hardship disclosure).
+The closing is fixed because `endCallPhrases` matches on its words.
+
+What did **not** revert, because these constrain substance rather than sentences:
+call the tool before speaking, ask for the yes once, take the yes that follows a
+question, the steps only go forwards, the closing must carry יום טוב.
+
+The header now carries the distinction, since it is the one that was expensive to
+learn: **constrain substance, not sentences.** *Call the tool before you speak* is
+a rule. *Say these exact words* is a script.
+
+33,891 chars.
+
 ### The already-paid steps had no exits, so they cycled
 
 First test on the cut prompt. The link path ran clean end to end — asked once,
