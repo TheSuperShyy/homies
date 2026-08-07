@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### "Stop, ask nothing" was the instruction nearest the acknowledgement
+
+The isolation was exact: a plain "אוקיי" loops, "אוקיי, ומה עושים?" proceeds. Same
+call, same prompt, one word of difference — so it is not the flow and not the
+line, it is what the model reads at that moment.
+
+Two things were fighting, and both were mine.
+
+**The amount turn ended with *"then stop, ask nothing, and read where they
+are."*** That was meant as *do not append the question to this same turn*. What it
+says, to a model that has just been acknowledged and needs to produce something,
+is **do not ask** — and it was the nearest instruction. The question it should
+have asked was 881 characters away under a different heading.
+
+**And the acknowledgement rule was a prohibition with nowhere to go:**
+*"'אוקיי' and a hum are not turns. Do not answer them and do not restate what you
+just said."* Both halves are correct and neither says what to do instead. A model
+that must produce a turn and has been told not to ask and not to restate has one
+thing left: the content it already has, in new words. Which is exactly what came
+out — *"זה תשלום של יולי, 450 שקלים"*.
+
+A question rescued it because a question is content. It has something to answer,
+so it never reaches the dead end.
+
+Fixed both. The acknowledgement is now the **cue** for the question and the
+question sits **554 characters** after the amount rather than 881 under another
+heading. *"Ask nothing"* is gone. And the acknowledgement rule points forward
+instead of only fencing: *they mean carry on — so carry on to the next thing,
+never back over the last one.*
+
+The general form, stated where it happens: **the way out of a turn with nothing in
+it is a question you have not asked, never a sentence you have already said.**
+
+Still nine fixed lines, still zero enumerations. 34,715 chars.
+
 ### One line earns its place back, and the data says which one
 
 Removing the scripting brought the amount loop back — four restatements off
