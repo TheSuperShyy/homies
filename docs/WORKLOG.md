@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### The closing could not hang up, because the prompt recommended a phrase that does not match
+
+Call `019fdb38` said the whole closing three times and stayed on the line. Not a
+model fault and not the page race — a contradiction between two files we wrote.
+
+`endCallPhrases` held `שיהיה יום טוב`. ENDING THE CALL offered this as a closing:
+
+> אוקיי, תודה על הזמן. שיהיה לך יום טוב.
+
+and then said, in as many words, that *"the lead-in and the לך are optional and
+worth varying"*. **`שיהיה לך יום טוב` does not contain `שיהיה יום טוב`.** One
+word in the middle, and the phrase that releases the line stops matching. So the
+file recommended a closing that could not hang up, the model took the
+recommendation, and the call stayed open. The resident said אוקיי, the model had
+nothing left but the closing, and said it again. Three times. It ended only when
+one of them happened to drop the לך.
+
+`endCallPhrases` now matches on **`יום טוב`**, which every form of the goodbye
+contains — with the לך, without it, either gender. Nothing in a call about an
+unpaid ועד בית reaches for those two words except a farewell, so it cannot fire
+early. A phrase that only matches the one phrasing nobody chose is not a backstop.
+
+**The inbound agent had the identical latent fault** and was fixed in the same
+push, before it cost a caller a hung line.
+
+The prompt now finishes on ולהתראות rather than offering it as optional. That is
+the beat that makes a goodbye sound like a goodbye instead of a line going dead —
+which is what was actually being asked for by "wait two seconds before ending".
+**Vapi has no wait-then-hang-up setting**; the call ends when the assistant
+finishes speaking the matched phrase, so the goodbye is never clipped, and the
+tail is how you buy the pause.
+
+Both live, verified: every closing the file recommends now contains a phrase that
+ends the call.
+
 ### The loop was the demo page, and most of this morning was spent on the prompt
 
 Vapi's context for call `019fdb2e` has three messages in it:

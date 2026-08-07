@@ -228,7 +228,13 @@ TARGETS = {
             # one-word goodbye that ended a debt call mid-question on 5 Aug cannot
             # reach this. "and goodbye" does the same job for the English twin,
             # which shares this file's reasoning through vapi_en.py.
-            "endCallPhrases": ["שיהיה יום טוב", "ולהתראות",
+            #
+            # 7 Aug: widened to יום טוב for the reason written out on the debt
+            # target below. שיהיה לך יום טוב is ordinary Hebrew and does not
+            # contain שיהיה יום טוב, so the narrow phrase left a call unable to
+            # end. This one has the same latent fault and gets the same fix
+            # before it costs an inbound caller a hung line.
+            "endCallPhrases": ["יום טוב", "ולהתראות",
                                "have a good day", "and goodbye"],
             # Explicit rather than inherited. It is already Vapi's default, but
             # a dashboard visit can flip it without saying so, and if it comes on
@@ -380,7 +386,21 @@ TARGETS = {
             # ולהתראות carries the vav, so a bare להתראות does not match it.
             # Short enough to survive rephrasing, specific enough not to fire
             # mid-conversation. endCallFunctionEnabled above is still the backstop.
-            "endCallPhrases": ["שיהיה יום טוב", "ולהתראות",
+            #
+            # 7 Aug: שיהיה יום טוב was too narrow, and the prompt itself was what
+            # broke it. ENDING THE CALL offers שיהיה לך יום טוב as a closing and
+            # says in as many words that the לך is optional and worth varying —
+            # so the model varied it, the phrase stopped matching, and the call
+            # would not hang up. The resident said אוקיי, the model had nothing
+            # left but the closing, and said it again. Three times. The call ended
+            # only when a later closing happened to drop the לך.
+            #
+            # So this matches on יום טוב, which every form of the goodbye
+            # contains — with the לך, without it, feminine or masculine. It cannot
+            # fire mid-conversation: nothing in a call about an unpaid ועד בית
+            # reaches for those two words except a farewell. A phrase that only
+            # matches the one phrasing nobody chose is not a backstop.
+            "endCallPhrases": ["יום טוב", "ולהתראות",
                                "have a good day", "and goodbye"],
             # Overrides BASE. Was gpt-5.5, set in the dashboard on 3 Aug for more
             # natural Hebrew. Moved to gpt-5.4 on 5 Aug on cost.
