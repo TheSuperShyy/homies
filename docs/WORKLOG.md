@@ -11,6 +11,45 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### The link was never sent, so the agent kept asking permission to send it
+
+Call `019fdb43`. The resident said כן to *"רוצה שאני אשלח לך לינק לתשלום?"* and
+was asked the same question **four more times** across 116 seconds, each time in
+fresh words. **`send_payment_link` was never called.** Zero tool calls on the
+whole call.
+
+**This one is not the demo page and it was wrong to keep looking there.** The
+stereo recording settles it: the caller channel is silent for 115 of 116 seconds
+— RMS 0 per second, one burst in second 1 as the mic connected before mute took
+effect, which is where the phantom *"מה לא הבאת?"* came from. The typed turns are
+about eleven seconds apart. There was no race left to blame.
+
+Two faults, both structural, both ours.
+
+**The tool was attached to the wrong end of the sentence.** The prompt said *say
+the line, then call `send_payment_link`* — so the line got said and the call was
+optional in practice. It now calls the tool **first, before speaking**. A sentence
+can be talked out of; a tool result is a fact sitting in the context. Once the
+tool has been called there is nothing left to ask, and that is stated where the
+model is standing rather than as a rule elsewhere.
+
+**And there were two competing payment-link lines, 25 lines apart.** One under
+*"when the caller agrees, say exactly this"*, another under *"call the tool, then
+tell them it is on its way"* — two written-out sentences for the same moment, with
+the tool call anchored to neither. The model produced variations of both plus
+improvisations of its own. Collapsed to one line, one moment.
+
+**The menu's option 2 was a pointer, and pointers do not get followed.** *"They
+agreed → go to the payment-link line in HOW PAYMENT ACTUALLY WORKS"* sent the
+model twenty thousand characters away, so it stayed where it was and re-asked
+option 1 — which is exactly the loop in the transcript. Option 2 now carries the
+tool call and the line inline. **188 characters from the question to what to do
+with the answer**, against a section reference before.
+
+Live at 60,187 chars. Same lesson as the amount, the transfer details and the
+closing, four times in one day: **the next turn has to be written where the model
+is standing.**
+
 ### The closing could not hang up, because the prompt recommended a phrase that does not match
 
 Call `019fdb38` said the whole closing three times and stayed on the line. Not a
