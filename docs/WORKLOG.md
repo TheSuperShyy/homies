@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### One line earns its place back, and the data says which one
+
+Removing the scripting brought the amount loop back — four restatements off
+"אוקיי", each one freshly worded, no link sent. So the question was which of the
+eighteen removed lines was actually doing work, and that is answerable rather
+than arguable.
+
+Twelve calls today, checked for two things: did the agent ever ask whether to send
+the link, and did the link go out.
+
+| | asked for the yes | amount said | link sent |
+|---|---|---|---|
+| 5 calls | **no** | 1–4 times | **0 of 5** |
+| 7 calls | **yes** | mostly once | 4 of 7 |
+
+**Every call that sent a link is a call that asked.** No exceptions in either
+direction. And the two calls after the de-scripting are both in the top row.
+
+So: described as an intention — *"ask for the yes, plainly, in your own words"* —
+the agent does not compose the question. It re-delivers the message it has already
+given, in fresh words each time, which is the loop. Written as a line, it asks.
+
+That is precisely the file's own third criterion for a fixed line: a test proved
+the model does worse unscripted. The ask-for-the-yes is back, **as one line and
+nothing else** — no menu, no four options, no transitions. Nine fixed lines
+against the English twin's seven, zero enumerations, 881 characters from the
+amount to the question.
+
+Worth naming the general shape, because it cost the day: **a turn the model will
+not produce on its own has to be written; a turn it produces fine has to not
+be.** Everything between those is where the scripting crept in.
+
 ### I turned the Hebrew prompt into a script, and scripts loop
 
 The complaint was that the conversation runs by steps and the English twin

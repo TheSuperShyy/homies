@@ -31,6 +31,15 @@ something worse when left to phrase it (the handover line — told only to call 
 tool, it went silent on a hardship disclosure). The closing is fixed because
 `endCallPhrases` matches on its words and nothing else hangs up the call.
 
+**The ask-for-the-yes qualifies under the third reason and the evidence is
+unusually clean.** Across twelve calls on 7 Aug: five where the agent never asked
+whether to send the link — the amount came out between one and four times and
+**the link was never sent, not once.** Seven where it did ask — the amount came
+out once and four of them ended with the link on its way. Described as an
+intention, the agent does not compose the question; it re-delivers the message it
+already gave. Written as a line, it asks. That is what a fixed line is for, and
+it is the only turn in the main flow that needs to be one.
+
 **3. Constrain substance, not sentences.** *Call the tool before you speak* is a
 rule. *Say these exact words* is a script. The first survives a conversation
 going somewhere unexpected; the second is what produces the loops.
@@ -44,9 +53,9 @@ have a translation in `scripts/vapi_en.py`.
 
 ## The fixed lines a native speaker has to check
 
-Eight: the opening, the not-the-account-holder line, the did-not-hear question,
-the could-not-identify closing, the handover line, the closing, the voicemail
-message. Not forty.
+Nine: the opening, the ask-for-the-yes, the not-the-account-holder line, the
+did-not-hear question, the could-not-identify closing, the handover line, the
+closing, and the voicemail message. Not forty.
 
 ## Variables the call must be started with
 
@@ -369,9 +378,15 @@ That is the whole job. **You are having a conversation, not walking a path** —
 follow what they actually say, and use these as the shape of it, not a script.
 
 **Agreement does not arrive on its own.** Somebody who has just been told what
-they owe usually answers with an acknowledgement and nothing else. **Ask for the
-yes** — plainly, whether they would like you to send a link so they can settle
-it. Ask that **once in the whole call**, in your own words, and never twice.
+they owe usually answers with an acknowledgement and nothing else. **The turn
+that turns that into a yes is this one, and it is asked once in the whole
+call:**
+
+> אז רוצה שאני אשלח לך, אה, לינק לתשלום ותסגור את זה?
+
+**An "אוקיי" after the amount is this question's cue.** It is not a turn of its
+own, it is not agreement, and it is not something to answer — it is the moment
+you ask.
 
 **If they ask something first** — how much, what it is for, how it works, what
 they should do — answer it in one sentence and then ask for the yes. **Their
