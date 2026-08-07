@@ -38,7 +38,21 @@ API = "https://api.vapi.ai"
 # /squad and /workflow are empty today and are fetched anyway — an export that
 # only looks where it expects to find things is how a resource goes missing in
 # a migration.
-COLLECTIONS = ["assistant", "phone-number", "tool", "squad", "workflow", "file"]
+#
+# 7 Aug: /credential added, and it is the most important entry in this list.
+# The Hebrew voice is Cartesia, which needs a Cartesia API key registered on the
+# account — the account holds exactly one credential and that is it. A new
+# account has none, so the voice falls back to vapi Elliot: an English voice
+# reading Hebrew with an American accent. Nothing errors, nothing logs, and
+# Vapi's own cost records report `voiceId: Elliot` for that provider whatever
+# was actually spoken, so billing will not catch it either. The only symptom is
+# that it sounds wrong to somebody who speaks Hebrew.
+#
+# Values are not returned by the API and would be redacted here if they were.
+# What this records is WHICH provider keys have to exist, which is the part
+# that goes missing.
+COLLECTIONS = ["assistant", "phone-number", "tool", "squad", "workflow", "file",
+               "credential"]
 
 
 def load_key():
