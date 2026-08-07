@@ -331,9 +331,14 @@ DEBT_LINES = [
     ("No amount. No month. Not the word חוב.",
      "No amount. No month. Not the word debt."),
 
-    ("> רגע אחד, אני מעביר אותך לנציג מהצוות שלנו. נא להישאר על הקו.",
-     "> One moment, I'm transferring you to someone from our team. "
-     "Please stay on the line."),
+    # Rewritten 7 Aug. The old pair promised a transfer that does not exist —
+    # transfer_to_human is a function that writes a row, not a transferCall, and
+    # the account has no destination. Both twins now say the true thing: it goes
+    # to the office and somebody rings back. Note what is NOT here: any word
+    # about when. "Shortly" is the ceiling in both languages.
+    ("> אוקיי, אני מעביר את זה, אה, לנציג מהצוות שלנו, והוא יחזור אליך בהקדם.",
+     "> Okay, I'm passing this to, um, someone on our team, and they'll get back "
+     "to you shortly."),
 
     # The closing. Added 4 Aug after a test call ended on a bare "Goodbye" —
     # the section said "a short warm closing" and gave no example, so the model

@@ -190,8 +190,16 @@ DEBT_TOOLS = [
     ),
     _fn(
         "transfer_to_human",
-        "Call after saying the handover line, never before and never on its own. The "
-        "call stays open afterwards — do not end it.",
+        # 7 Aug: this used to say the call stays open, which is what the debt
+        # prompt told the agent to do — say "stay on the line" and wait. There is
+        # nothing to wait for. This is a function, not a transferCall, and there
+        # is no destination configured anywhere; the resident got twenty seconds
+        # of silence and then a dropped line. The intake twin has said the honest
+        # thing since it was written and this now matches it.
+        "Call after telling the resident a representative will get back to them, never "
+        "before and never on its own. This hands the call to the office in writing; it "
+        "does not connect anyone to anyone, so do not say you are putting them through "
+        "and never ask them to hold. Close the call after calling it.",
         {
             "reason": {"type": "string", "enum": TRANSFER_REASONS},
             "posture_reached": POSTURE,

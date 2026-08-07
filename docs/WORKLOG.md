@@ -51,6 +51,58 @@ the agent is standing, with every open question dead.
 
 Live on `0ef11cb5`, 48,326 chars. Guard passes.
 
+### The debt agent stops promising a transfer it cannot make
+
+Walked every branch of the debt prompt against the live config. Two things broke
+and both were the same shape: the prompt describing a capability the account does
+not have.
+
+**The handover asked residents to hold for nobody.** `transfer_to_human` on this
+assistant is `type: "function"`, `async: true`, posting to n8n. It is not a
+`transferCall` and there is no destination configured anywhere. The prompt's
+three steps were *say the line, call the tool, stay on the line and say nothing*
+— so the agent said *"נא להישאר על הקו"* and went quiet, and with
+`silenceTimeoutSeconds: 20` the call dropped twenty seconds later. Six paths
+reach that: hardship, hot, language, not_understood, caller_request, and a
+dispute that turns angry. The prompt calls a resident who asked for a person and
+got a dial tone the worst outcome in the file; it was the outcome of every one of
+those calls.
+
+The intake twin has said the honest thing since it was written — *"it does not
+connect anyone to anyone, so do not say you are putting them through"* — and the
+debt agent simply never got that change. It now matches:
+
+> אוקיי, אני מעביר את זה, אה, לנציג מהצוות שלנו, והוא יחזור אליך בהקדם.
+
+Step 3 is now *say the closing and end the call, warmly*. בהקדם is the ceiling on
+what may be promised; no time may be attached to it. Handover moved from the
+never-end list to the end-the-call-once list, and the tool description was
+rewritten to match, since a model reads that too.
+
+**Identifiers were being read as quantities.** "Say numbers as Hebrew words, not
+digits" had no exception in it, which is right for ארבע מאות וחמישים שקלים and
+catastrophic for everything else. `{{alt_payment}}` in the demo carries
+`חשבון 12345678`; as a spoken number that is *שנים עשר מיליון שלוש מאות ארבעים
+וחמישה אלף…*, which is a sum of money and not an account anybody can use. Same
+for `{{callback_number}}`, and the email address had already been heard coming
+out as one mashed token.
+
+The carve-out is stated as a test rather than a list, so it covers whatever comes
+next: **an amount is understood, an identifier is copied.** Anything being copied
+gets digits, in small groups, with a beat between them, and an offer to repeat.
+
+Live on `0ef11cb5`, 50,104 chars.
+
+**Not fixed, and known:** voicemail still cannot fire — `voicemailDetection` is
+null, so the written voicemail line is unreachable and an answering machine most
+likely logs `wrong_party`. `server` and `serverMessages` are still null, so every
+fault continues to be found by reading transcripts by hand. Seven branches still
+have no written Hebrew and improvise at runtime — promise-to-pay first, which has
+no rule at all for a vague date. `docs/diagrams/Homies-System-Flow.excalidraw`
+still shows "hand over, stay on the line", but it also still shows the card
+authorisation flow retired on 4 Aug, so it needs regenerating rather than
+patching.
+
 ---
 
 ## 2026-08-04
