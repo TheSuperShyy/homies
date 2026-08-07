@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-08-07
 
+### The rule against mishearing a yes stopped it hearing one at all
+
+Two calls, two minutes apart, same script but for one button.
+
+`019fdb6a` ran clean end to end: asked for the yes once, called
+`send_payment_link`, said the link line, closed, and ended on
+`assistant-said-end-call-phrase`. Every fix from today held.
+
+`019fdb6b` differed in exactly one turn — the resident asked
+*"אוקיי, ומה עושים?"* instead of just acknowledging. It explained how the link
+works, asked whether to send it, was told כן, and asked again. Then again. Four
+times, reworded every time. **`send_payment_link` was never called.**
+
+**It is not the typing.** Both calls were typed, both had the mic muted, both had
+clean turn-taking. The only variable was which preset was clicked.
+
+**The cause is a rule that used to be right.** On 5 Aug a resident said
+*"Okay. And what should we do?"* and was told *"Great, I'm sending you a payment
+link"* — a question treated as consent. So the prompt gained
+*"a question is never agreement"*. That rule is correct about the question. It
+said nothing about the answer that comes after it, so the model kept applying it:
+the resident had asked something at some point, so every subsequent כן still
+smelled like it belonged to the question, and the safe move was to ask once more.
+Forever.
+
+Two fixes, both stated where the model is standing.
+
+Menu option 3 stops pointing at option 1 and carries the question itself — 1,173
+characters from the first copy, because a numbered cross-reference two items away
+was enough to make it improvise its own wording instead. And it now says where it
+goes next: *"then you are in 2, and the next thing they say is the answer to
+it."* The question is asked once in the whole call, in any wording, before their
+question or after it.
+
+The 5 Aug rule keeps its warning and gains its limit: *"and then you take the
+answer."* **A rule that stops you mishearing a yes has to stop somewhere short of
+never hearing one.**
+
+Live at 64,784 chars on `3303317e`, the new account.
+
 ### It never says goodbye, which is why the goodbye never ends the call
 
 Two fixes from the last hour confirmed working before anything else. `019fdb49`
