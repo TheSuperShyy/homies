@@ -9,6 +9,50 @@ conversation that produced it.
 
 ---
 
+## 2026-08-07
+
+### The already-paid branch looped, twice, in two different ways
+
+Two test calls, same branch, and the agent never got out of it. In the first it
+asked *"את מתכוונת לתשלום של יולי?"* three times in three wordings. In the second
+it fused the whole branch into one sentence — check the month, state the
+discrepancy, give the email, ask if it was heard — and said that sentence four
+times, the last one after the resident had said goodbye.
+
+Four causes, and only the first was about repetition.
+
+- **The reflex ask did not count.** Step 1 was written as an action to perform,
+  not a fact that becomes true. The agent's surprised *"רגע, שילמת על יולי?"*
+  asked the question, then it ran step 1 and asked it again properly.
+- **The prompt licensed the second ask.** Step 1 said "once"; step 2 ended "do
+  not ask a third time", which tells a model that twice is fine. Deleted.
+- **The address check was a gate, not a turn.** *"Ask whether they got it… do not
+  skip this check"* had no branch for an answer that is neither yes nor no, so
+  "אוקיי" and "תודה" left the agent still waiting, and it re-asked. Since the
+  turn was fused, re-asking the check re-said the entire branch.
+- **The branch had no Hebrew in it.** `שילמ` appeared zero times in the whole
+  prompt — four English instructions and not one written line, in a file where
+  every other branch has its lines set down. Two calls, two completely different
+  improvisations, both looping. That is what an unwritten branch produces.
+
+Rewritten as four steps that are four separate turns, with the Hebrew written
+out. Any answer that is not an explicit correction counts as a yes. The address
+check is asked once and accepts anything. A goodbye ends the call from wherever
+the agent is standing, with every open question dead.
+
+- **General rule added to REPETITION**, because this class will come back
+  elsewhere: *a question you have asked once has been asked.* It never starts as
+  repetition — it starts as diligence about a check too important to leave
+  unresolved. No check on this call is worth asking twice; log it and let a
+  person follow it up.
+- **Email address delivery.** It was spoken as one mashed token
+  (`officeathomeys.co.il`). The branch now says how to say it: the name, שטרודל,
+  then the domain broken at every dot. Not verified on a call yet.
+
+Live on `0ef11cb5`, 48,326 chars. Guard passes.
+
+---
+
 ## 2026-08-04
 
 ### Two English test calls, and what they actually showed
