@@ -51,6 +51,60 @@ the agent is standing, with every open question dead.
 
 Live on `0ef11cb5`, 48,326 chars. Guard passes.
 
+### The main path had no third turn, and the link stopped being the only answer
+
+**The Hebrew call restated the amount three times.** Not a branch — the main
+path. The agent says what is owed and stops, per THE OPENING. The resident says
+"אוקיי". And there was no line for what comes next: nothing in the file asked for
+the yes. HOW PAYMENT ACTUALLY WORKS said *"if it is not a clear yes, do not ask a
+second time"*, which assumes a first ask that was never written anywhere. So the
+agent had said the amount and had nowhere to go, and said it again. Three times,
+identical but for הוסדר/שולם.
+
+The English twin did not have this fault — it asked *"Would you like me to send
+you a payment link?"* off the same acknowledgement — which is worth noting only
+because it means the flow was always right and the Hebrew never had the sentence.
+
+Turn 3 is now written: *"אז רוצה שאני אשלח לך, אה, לינק לתשלום ותסגור את זה?"*,
+asked once, with the amount never said twice. **Restating what somebody has just
+acknowledged is the loop this prompt keeps producing, and it appears wherever a
+turn ends and the next one was never written down.** That is now stated as the
+general shape, next to the specific line, because this is the fourth instance of
+it in two days.
+
+**The link stopped being the only outcome.** In the English call a resident said
+their connection was too poor to open links, said it twice, and asked whether the
+office could handle it. The agent offered the transfer, then sent the link
+anyway. Every sentence was polite and correct; nothing in it was listening. There
+was no rule for a resident who has ruled out both payment methods — the office
+route existed only for `alt_payment: none` and for missing variables.
+
+Now: when neither fits, stop offering things and put it in front of the office —
+*"אני יכול, אה, להעביר את זה למשרד ושייצרו איתך קשר"* — then `office_to_contact`
+and close. **A resident who could not pay and now expects a call back is better
+served than one offered the same link a third time.** And never send a link to
+somebody who has said they cannot open one.
+
+**"Of course" attached to a request that was refused.** The same resident said "I
+give you permission to charge the card you have on your system" and the reply
+opened *"Of course."* Nothing was charged and nothing could be — but that is not
+what the sentence said to the person hearing it. Someone who believes they have
+authorised a payment does not pay, and is angry twice: when the debt is still
+open, and when they remember agreeing to settle it. No בטח, כמובן, אין בעיה or
+בשמחה in front of an answer that declines something. Warmth is a tone, not a
+first word that concedes.
+
+Live on `0ef11cb5`, 55,336 chars.
+
+**Display, not agent, and it matters for reading these transcripts:** the first
+Hebrew line was the greeting cut off at *"אני מדבר עם"* and the next was the same
+greeting complete, with "הומיז" in quotes the second time. Two transcriptions of
+one utterance. `web/index.html` renders `transcriptType: "partial"` into the feed
+and `say()` only collapses a partial when it is still the last node, so partials
+strand as soon as the two speakers interleave. Some of what reads as repetition
+in these pastes is the page. The amount three times was not — user turns sit
+between them.
+
 ### Four test calls on the rewritten branches: three fixes held, four new faults
 
 **Held.** The already-paid branch ran clean — month asked once, "כן" taken as a
