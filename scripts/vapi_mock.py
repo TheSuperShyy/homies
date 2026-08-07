@@ -36,7 +36,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-SOURCE = "0ef11cb5-81ce-49e7-864d-8a3e4d5728b9"   # Homies — Debt Follow-up (he)
+SOURCE = "3303317e-43b6-4a84-9527-f86b905751d6"   # Homies — Debt Follow-up (he)
 PREFIX = "Homies — Debt TEST: "
 
 # Org-level constants. Not per-resident, so they are not in the seed.

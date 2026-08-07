@@ -27,14 +27,20 @@ The 11labs transcriber (`scribe_v2_realtime`) needs **no** credential — it is
 billed through Vapi. Cartesia is the one exception, and it is the one that
 matters.
 
-**2. Both English twins currently fail to build.** `vapi_en.py` requires every
-substitution in its table to match the live Hebrew prompt exactly once, and it
-exits rather than shipping a half-translation. As of 7 Aug the debt table has
-**7** stale entries and the intake table has **9** — the intake prompt went from
-מיכל to מיכאל, and the debt prompt was rewritten five times on 7 Aug. Fix the
-tables *before* the move, or accept that the new account has Hebrew only.
+**2. The English twins cannot be regenerated from the Hebrew today, so they are
+copied instead.** `vapi_en.py` requires every substitution in its table to match
+the live Hebrew prompt exactly once and exits rather than shipping a
+half-translation. The debt table's stale entries were fixed on 7 Aug and the
+counts are now explicit, but **109 Hebrew passages in the prompt still have no
+English pair** — the prompt went from 33k to 63k characters and most of that
+growth is prose quoting Hebrew. The intake table has 9 stale entries from the
+מיכל → מיכאל change.
 
-Check where they stand at any time:
+So step 5 copies the existing English assistants across verbatim rather than
+rebuilding them. They are complete, working assistants — but they were last
+regenerated at **02:54 on 7 Aug** and carry none of that day's fixes. **Do not
+use an English twin to judge whether a Hebrew fix worked.** Check where the
+rebuild stands at any time:
 
 ```
 python scripts/vapi_en.py debt --dry
@@ -68,7 +74,7 @@ account you just left. The convention in this folder:
 | File | Account |
 |---|---|
 | `vapi-export.json` | whichever account is current |
-| `vapi-export-account2-05aug.json` | the 5 Aug–7 Aug account, as it stood on 7 Aug |
+| `vapi-export-account2-05aug.json` | the 5 Aug–7 Aug account, as it stood at the 7 Aug move |
 | `vapi-export-old-account.json` | the original account, as it stood on 5 Aug |
 
 ## What does not come across at all
@@ -81,7 +87,8 @@ account you just left. The convention in this folder:
 - **The eval suite.** Recreate with `python scripts/vapi_eval.py --setup`.
   Deliberately not part of the rebuild: it creates billable resources.
 - **The duel resident** (`vapi_duel.py --setup`). Same reason.
-- **`Riley`** (`f4bf6cdc`) — not ours, arrived with the account, never used.
+- **`Riley`** — not ours. Every new account arrives with one; the id differs each
+  time, so do not grep for the old one.
 - **Anything edited in the dashboard and never written back here.** Diff the new
   assistant against `vapi-export.json` if you are unsure.
 
@@ -128,15 +135,28 @@ blocker 1.
 on a stale-but-valid key it would silently build from the old account's prompt.
 On a wrong key it fails cleanly with a 404.
 
-**5. Build the two English twins:**
+**5. The two English twins.** If `--dry` is clean, regenerate them:
 
 ```
 python scripts/vapi_en.py debt --create
 python scripts/vapi_en.py intake --create
 ```
 
-If either stops with *"Update the table in this file before creating anything"*,
-that is blocker 2 and you skipped step 0. Fix the table; do not force it.
+If it is not clean — which is the case today, see blocker 2 — copy the existing
+ones across instead. Read both from the old key, strip the server's own fields,
+POST to the new one:
+
+```python
+READ_ONLY = {"id", "orgId", "createdAt", "updatedAt",
+             "isServerUrlSecretSet", "latestVersion", "version", "credentialIds"}
+body = {k: v for k, v in old_assistant.items() if k not in READ_ONLY}
+```
+
+`latestVersion` is the one that is not obvious — Vapi returns it and rejects it,
+with a 400 that names the field.
+
+**Never do this for a Hebrew assistant.** They rebuild from the markdown in
+seconds and a copy would be a fork of the source of truth.
 
 **6. Repoint everything that hardcodes an id.** This is the step that breaks
 things, because a wrong id does not error — it starts a call with the wrong
@@ -156,7 +176,7 @@ agent, or with one that no longer exists.
 Find every one of them:
 
 ```
-grep -rn "0ef11cb5\|eaa390ec\|51bbe77a\|fd991d71\|ce1a1da7" \
+grep -rn "3303317e\|7449bc9a\|86a01f13\|3edbe85b\|ddd7e209" \
   --include=*.py --include=*.html --include=*.md .
 ```
 
@@ -224,3 +244,35 @@ place.
   edit to a Hebrew fixed line breaks them, and they are only rebuilt when someone
   remembers. If English is going to be the language demos are given in, that
   needs to be a step in the push, not a separate script somebody runs later.
+
+## The 7 Aug move, as it actually ran
+
+Second migration. About forty minutes, most of it spent finding out that the
+English twins could not be regenerated.
+
+| | Account 2 | Account 3 |
+|---|---|---|
+| Debt (he) | `0ef11cb5` | `3303317e-43b6-4a84-9527-f86b905751d6` |
+| Debt (en) | `eaa390ec` | `7449bc9a-6952-4625-a3c6-8bf73f8660f5` |
+| Intake (he) | `51bbe77a` | `86a01f13-3474-4332-89d2-4c5f1fcf9751` |
+| Intake (en) | `fd991d71` | `3edbe85b-f151-48a1-8502-ae4e4d2b582c` |
+| Public key | `ce1a1da7` | `ddd7e209-990d-4f17-995e-6d216542218a` |
+| Cartesia credential | `4c870a67` | `bf29045b-44e1-4552-a33d-d7cf0e54d9fc` |
+| Phone number | none | none |
+
+**Verified rather than assumed.** All four prompts are byte-identical to account
+2's — 63,053 / 38,533 / 15,551 / 15,056 characters — with the same tools (8 and
+3), the same end-call phrases (4 Hebrew, 2 English), and all 27 output-filter
+replacements on every one. Both Hebrew assistants resolve
+`cartesia/a976c076…`; both English keep `vapi/Elliot`, which is correct, because
+Elliot is an English voice being asked to read English.
+
+`check_tools.py` passes 10/10 against the new account, because the tools post to
+n8n and n8n does not know or care which Vapi account called it.
+
+The Cartesia credential was added **before** the first push, which is the whole
+point of step 2 — pushed after, the assistants would have been created with a
+silent Elliot fallback and re-synced without complaint.
+
+`.env.backup-before-move` holds the previous file. It is covered by `.env.*` in
+`.gitignore`; check that before you make one.

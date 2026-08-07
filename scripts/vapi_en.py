@@ -215,10 +215,8 @@ DEBT_LINES = [
     # The English twin's endCallPhrases is "and goodbye" where the Hebrew is
     # ולהתראות. Translating the phrase but not the rule would leave the English
     # agent guarding a string it never says.
-    ("Not in the closing line. Not near ולהתראות, ever.",
-     'Not in the closing line. Not near "and goodbye", ever.'),
-    ('Not inside an amount. "מאה, אה, שקלים" is unacceptable.',
-     'Not inside an amount. "one hundred, um, shekels" is unacceptable.'),
+    ("Not in the closing line, and never near ולהתראות.",
+     'Not in the closing line, and never near "and goodbye".'),
     ("11. Never hesitate in the closing line, and never near ולהתראות. That phrase is",
      '11. Never hesitate in the closing line, and never near "and goodbye". That phrase is'),
 
@@ -293,15 +291,11 @@ DEBT_LINES = [
     # the noun being reached for. A written-out line delivered fluently is the
     # flattest moment in a call, because it is the one place where nothing was
     # being composed. Both twins hesitate here or neither does.
-    ("> יופי. אז אני שולח לך, אה, לינק לתשלום על הסכום הזה, ותוכל לסגור את זה לבד.",
-     "> Great. So I'm sending you, um, a payment link for this amount, and you "
-     "can take care of it yourself."),
-
     # Added 7 Aug with the two-turn ending. This line is a turn on its own — the
     # closing does not ride along with it.
     ("> אוקיי, הלינק בדרך אלייך. תוכל לשלם, אמ, מתי שבא לך, אין לחץ.",
      "> Okay, the link is on its way to you. You can pay, um, whenever suits "
-     "you, no rush."),
+     "you, no rush.", 2),
 
     # The refusal callback offer. It went in on 5 Aug written in English, which
     # meant the Hebrew assistant carried an English line among six Hebrew ones —
@@ -309,9 +303,9 @@ DEBT_LINES = [
     ("> אפשר שנציג מהמשרד יחזור אליך בנושא?",
      "> Could someone from the office get back to you about it?"),
 
-    ("> שלום, מדבר מיכאל מהומיז, חברת הניהול של הבניין. אני מדבר עם {{first_name}}?",
-     "> Hello, this is Michael from Homies, the building management company. "
-     "Am I speaking with {{first_name}}?"),
+    ("> שלום, אה, מדבר מיכאל מהומיז, חברת הניהול של הבניין. אני מדבר עם {{first_name}}?",
+     "> Hello, uh, this is Michael from Homies, the building management "
+     "company. Am I speaking with {{first_name}}?"),
 
     ("Once they confirm, say why you are calling: the ועד בית payment for",
      "Once they confirm, say why you are calling: the building committee payment for"),
@@ -325,7 +319,7 @@ DEBT_LINES = [
     # the file.
     ("> סליחה על ההפרעה, אני לא יכול למסור פרטים למי שאינו בעל החשבון. אפשר לבקש ש{{first_name}} יחזור אלינו?",
      "> Sorry to disturb you. I can't share details with anyone who is not the "
-     "account holder. Could you ask {{first_name}} to get back to us?"),
+     "account holder. Could you ask {{first_name}} to get back to us?", 2),
 
     # The Hebrew changed on 7 Aug and the English did not have to. This message
     # ended "תודה ויום טוב", which matches no endCallPhrase, so the voicemail was
@@ -361,14 +355,30 @@ DEBT_LINES = [
     # streaming TTS on punctuation, and " — " left "Great" as a chunk of its own,
     # short enough to be swallowed while the previous sentence was still playing.
     # The Hebrew line has no dash and has never lost a word.
-    ("> מצוין, תודה רבה על הזמן. שיהיה יום טוב ולהתראות.",
-     "> Great, thank you for your time. Have a good day, and goodbye."),
+    ("> תודה על הזמן, שיהיה יום טוב.",
+     "> Thank you for your time, have a good day."),
+    ("> אוקיי, תודה על הזמן. שיהיה לך יום טוב.",
+     "> Okay, thank you for your time. Have a good day."),
+    # Three homes since 7 Aug: after the link, after the handover, and in
+    # ENDING THE CALL itself. Written where each turn is taken, because a
+    # cross-reference to another section is a turn the model does not take.
+    ("> אוקיי, תודה על הזמן. שיהיה לך יום טוב, ולהתראות.",
+     "> Okay, thank you for your time. Have a good day, and goodbye.", 3),
 
-    # The vav is what makes ולהתראות unreachable by a bare goodbye, and "and" is
-    # the English equivalent — both are what the call actually ends on, so the
-    # rule has to name the right two words in each language.
-    ("**But the last two words are fixed: the line ends \"ולהתראות\", with the vav, and\nnothing after it.** Not \"להתראות\" on its own, not \"ביי\", not a goodbye and then\none more helpful sentence.",
-     "**But the last two words are fixed: the line ends \"and goodbye\", with the\n\"and\", and nothing after it.** Not \"goodbye\" on its own, not \"bye\", not a\ngoodbye and then one more helpful sentence."),
+    # 7 Aug: this used to say the last two words were fixed and named
+    # ולהתראות. That stopped being true when the phrase widened. The Hebrew
+    # matched on שיהיה יום טוב while the prompt recommended שיהיה לך יום טוב —
+    # one word in the middle, no match, and a call that said the whole closing
+    # three times without ever hanging up. Matching moved to יום טוב, which
+    # every form of the goodbye contains. The English twin never had the bug
+    # because "have a good day" is one of its phrases by luck of translation,
+    # and the rule now names the right words in each language.
+    ("**The words יום טוב are what physically release the line, and nothing else does.**",
+     "**The words \"good day\" are what physically release the line, and nothing "
+     "else does.**"),
+    ("כל טוב, נתראה, ביי — leaves the resident holding an open line with nobody on it,",
+     "all the best, see you, bye — leaves the resident holding an open line with "
+     "nobody on it,"),
 
     # The language-barrier fixed path inverts.
     ("**They do not speak Hebrew.** Apologise once and hand over with reason\n"
@@ -604,7 +614,7 @@ soften, shorten or improve anything relative to what you are told below."""),
 
 TWINS = {
     "debt": {
-        "source": "0ef11cb5-81ce-49e7-864d-8a3e4d5728b9",   # Debt Follow-up (he)
+        "source": "3303317e-43b6-4a84-9527-f86b905751d6",   # Debt Follow-up (he)
         "name": "Homies — Debt Follow-up (en)",
         "stack": DEBT_STACK,
         "lines": DEBT_LINES,
@@ -615,7 +625,7 @@ TWINS = {
         ),
     },
     "intake": {
-        "source": "51bbe77a-dd86-4629-8c0b-b0da06ca4461",   # Inbound Intake (he)
+        "source": "86a01f13-3474-4332-89d2-4c5f1fcf9751",   # Inbound Intake (he)
         "name": "Homies — Inbound Intake (en)",
         "stack": INTAKE_STACK,
         "lines": INTAKE_LINES,
@@ -642,9 +652,18 @@ def englished(prompt, twin):
             sys.exit("LANGUAGE block did not match. The Hebrew prompt has changed.")
 
     missed = []
-    for old, new in twin["lines"]:
-        if out.count(old) != 1:
-            missed.append(old.splitlines()[0][:70])
+    for pair in twin["lines"]:
+        # A third element is how many times the passage is expected to appear.
+        # Default 1, and that default is the safety property: a Hebrew line that
+        # quietly gains a second home is a Hebrew line somebody duplicated
+        # without deciding to. Where the duplication IS the decision — a fixed
+        # line written out both where it is catalogued and where it is actually
+        # said — the count says so out loud, in this file, next to the line.
+        old, new = pair[0], pair[1]
+        want = pair[2] if len(pair) > 2 else 1
+        if out.count(old) != want:
+            missed.append("[x%d, found %d] %s"
+                          % (want, out.count(old), old.splitlines()[0][:70]))
             continue
         out = out.replace(old, new)
 

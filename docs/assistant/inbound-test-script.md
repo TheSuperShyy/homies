@@ -10,8 +10,8 @@ amount and a month out of two empty variables. Inbound has no variables today, s
 the dashboard would work — but the habit is what matters, and the habit was worth
 one wasted diagnosis already.
 
-Assistant: **`51bbe77a-dd86-4629-8c0b-b0da06ca4461`** — *Homies — Inbound Intake
-(he)*. The English twin is `fd991d71-…` and takes the same script translated.
+Assistant: **`86a01f13-3474-4332-89d2-4c5f1fcf9751`** — *Homies — Inbound Intake
+(he)*. The English twin is `3edbe85b-…` and takes the same script translated.
 
 > **The Hebrew below is written, not transcribed.** Same caveat as the prompt
 > itself: no native speaker has read it aloud. If a line sounds wrong when you
