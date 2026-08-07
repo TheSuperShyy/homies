@@ -289,9 +289,19 @@ DEBT_LINES = [
     # Replaced the card-authorisation line on 4 Aug. "you can complete it
     # yourself" is doing real work: it is what stops the resident waiting for
     # someone at Homies to do the next thing.
-    ("> מצוין. אני שולח לך קישור לתשלום על הסכום הזה, ותוכל להשלים את זה בעצמך.",
-     "> Great. I'm sending you a payment link for this amount, and you can "
-     "complete it yourself."),
+    # The "um" is in the Hebrew line too, in the same slot — immediately before
+    # the noun being reached for. A written-out line delivered fluently is the
+    # flattest moment in a call, because it is the one place where nothing was
+    # being composed. Both twins hesitate here or neither does.
+    ("> יופי. אז אני שולח לך, אה, לינק לתשלום על הסכום הזה, ותוכל לסגור את זה לבד.",
+     "> Great. So I'm sending you, um, a payment link for this amount, and you "
+     "can take care of it yourself."),
+
+    # Added 7 Aug with the two-turn ending. This line is a turn on its own — the
+    # closing does not ride along with it.
+    ("> אוקיי, הלינק בדרך אלייך. תוכל לשלם, אמ, מתי שבא לך, אין לחץ.",
+     "> Okay, the link is on its way to you. You can pay, um, whenever suits "
+     "you, no rush."),
 
     # The refusal callback offer. It went in on 5 Aug written in English, which
     # meant the Hebrew assistant carried an English line among six Hebrew ones —

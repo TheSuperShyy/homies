@@ -36,11 +36,9 @@ API = "https://api.vapi.ai"
 #
 # On the Hebrew transcriber: this used to say Azure was the only one that exists.
 # That was true of Deepgram nova-2, which has no `he` at all, but nova-3 added
-# it — and 11labs, speechmatics and soniox accept `he` too. Azure stays the
-# default because it is the one that has actually been heard transcribing
-# Hebrew; the alternatives are an untested opportunity, not a recommendation.
-# Swap by replacing this line, and measure with scripts/vapi_latency.py:
-#     {"provider": "deepgram", "model": "nova-3", "language": "he"}
+# it — and 11labs, speechmatics and soniox accept `he` too. Azure is no longer
+# the default; it is the fallback. See the transcriber block below for what
+# replaced it and on what evidence. Measure any swap with scripts/vapi_latency.py.
 BASE = {
     # The stack chosen in the dashboard on 5 Aug, captured here so it survives.
     #
@@ -65,9 +63,28 @@ BASE = {
     # the long-term option and the only one that can run where the data does. It
     # needs `provider: custom-transcriber` and a websocket server, so it is a
     # project rather than a config line.
+    #
+    # 7 Aug: scribe_v2 -> scribe_v2_realtime. Same family, and the enum offers
+    # three — scribe_v1, scribe_v2, scribe_v2_realtime. The first two are batch
+    # models; only the third is built to stream, and this is a live phone call.
+    # Published numbers put Scribe at 3.1% WER on FLEURS Hebrew and 5.5% on
+    # Common Voice Hebrew, and the realtime variant leads multilingual realtime
+    # accuracy at 93.5% on FLEURS. Nothing else tested close in Hebrew: Soniox
+    # measured 7.5% WER, Speechmatics claims ~90% at sub-second latency.
+    #
+    # CHECKED BEFORE SWITCHING, because a realtime model can carry a narrower
+    # language set than its batch sibling: scribe_v2_realtime covers 90+
+    # languages and Hebrew is one of them.
+    #
+    # Vapi's own language enum is NOT what settled this. 11labs, cartesia,
+    # soniox and vapi all publish the identical 185-entry list, and it contains
+    # Volapük, Church Slavonic and Avestan — it is a copy of ISO 639-1, not a
+    # support matrix. `he` appearing there is evidence of nothing. The curated
+    # lists, where an entry means something, are azure 143, deepgram 89,
+    # speechmatics 62 and openai 57.
     "transcriber": {
         "provider": "11labs",
-        "model": "scribe_v2",
+        "model": "scribe_v2_realtime",
         "language": "he",
         "fallbackPlan": {
             "transcribers": [{"provider": "azure", "language": "he-IL"}],
@@ -211,7 +228,8 @@ TARGETS = {
             # one-word goodbye that ended a debt call mid-question on 5 Aug cannot
             # reach this. "and goodbye" does the same job for the English twin,
             # which shares this file's reasoning through vapi_en.py.
-            "endCallPhrases": ["and goodbye", "ולהתראות"],
+            "endCallPhrases": ["שיהיה יום טוב", "ולהתראות",
+                               "have a good day", "and goodbye"],
             # Explicit rather than inherited. It is already Vapi's default, but
             # a dashboard visit can flip it without saying so, and if it comes on
             # the model gets a way to hang up WITHOUT speaking — which is the
@@ -362,7 +380,8 @@ TARGETS = {
             # ולהתראות carries the vav, so a bare להתראות does not match it.
             # Short enough to survive rephrasing, specific enough not to fire
             # mid-conversation. endCallFunctionEnabled above is still the backstop.
-            "endCallPhrases": ["and goodbye", "ולהתראות"],
+            "endCallPhrases": ["שיהיה יום טוב", "ולהתראות",
+                               "have a good day", "and goodbye"],
             # Overrides BASE. Was gpt-5.5, set in the dashboard on 3 Aug for more
             # natural Hebrew. Moved to gpt-5.4 on 5 Aug on cost.
             #
@@ -651,6 +670,27 @@ def cartesia_voice(vid, fallback):
     voice = voice_with_guard({
         "provider": "cartesia",
         "voiceId": vid,
+        # WARMTH, ADDED 7 AUG. Cartesia is the only provider Vapi supports that
+        # exposes emotion at all — Azure has no equivalent at any price.
+        #
+        # `positivity:low` and not `high`. This agent calls people about money
+        # they owe, and an audibly cheerful collector is worse than a flat one:
+        # it reads as insincere at exactly the moment sincerity is being judged.
+        # Low is the difference between "polite" and "clipped", which is the
+        # complaint this is answering, and it stops there.
+        #
+        # Overridable because the right level is a judgement by ear, and one
+        # person's warm is another's saccharine:
+        #     CARTESIA_EMOTION=positivity:high python scripts/vapi_sync.py debt
+        # A LIST, THOUGH THE SPEC SAYS STRING. CartesiaExperimentalControls
+        # declares `emotion` as `type: string` with an enum, and sending a string
+        # gets 400 "Only one emotion intensity level per emotion type is
+        # allowed" — the server reads it as a sequence of characters. The spec's
+        # own `example` is `["happiness:high"]`, which is the tell. Trust the
+        # example over the type here.
+        "experimentalControls": {
+            "emotion": [os.environ.get("CARTESIA_EMOTION", "positivity:low").strip()],
+        },
         # sonic-3 by default. Overridable because the model list moves faster
         # than this file does, and because the right one is decided by ear.
         "model": os.environ.get("CARTESIA_MODEL", "sonic-3").strip(),

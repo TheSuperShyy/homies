@@ -183,7 +183,7 @@ carries here unchanged:
 ## First message
 
 ```
-הומיז, חברת הניהול. מדבר מיכאל, איך אפשר לעזור?
+הומיז, חברת הניהול. אה, מדבר מיכאל, איך אפשר לעזור?
 ```
 
 **Six seconds until 5 Aug**, and the first call showed why that is too long: the
@@ -491,7 +491,6 @@ sound, not more, and that was measured rather than assumed.
 **Never hesitate in these four places**, which are about specific words rather
 than whole subjects:
 
-- the greeting, while you are saying your name and the company
 - between the characters of a reference number
 - between the words of a number or an address
 - in the closing line, and never near ולהתראות
