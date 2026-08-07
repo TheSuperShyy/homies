@@ -137,8 +137,11 @@ BASE = {
     "artifactPlan": {"recordingEnabled": True},
     # See the assistant docs for why each of these departs from the default.
     "startSpeakingPlan": {
-        # 0.6 -> 0.4, matching the English twin.
-        "waitSeconds": 0.4,
+        # 0.6 -> 0.4, matching the English twin. Then 0.4 -> 0.25 on 7 Aug when
+        # a turn was measured end to end at 5,283ms: this is dead time added to
+        # every single turn before any work starts, and at that total it is the
+        # cheapest 150ms in the stack.
+        "waitSeconds": 0.25,
         # Both shipped endpointing models are English-trained, so on Hebrew this
         # is unlikely to fire and the transcription timer below carries every
         # turn. Left on because it costs nothing when it does not fire.
@@ -150,13 +153,13 @@ BASE = {
             # Vapi's own panel reported ~1,600ms because it excludes this stage
             # entirely.
             #
-            # 1.0 and not the English twin's 0.8, deliberately. Azure he-IL
-            # punctuates Hebrew far less reliably than Deepgram Flux punctuates
-            # English, so on Hebrew almost every turn takes this path and the
-            # timer is the only signal there is. Cutting a caller off mid-sentence
-            # is a worse failure than 200ms of extra wait, and this is a call
-            # about money.
-            "onNoPunctuationSeconds": 1.0,
+            # 1.0 -> 0.8 on 7 Aug, matching the English twin after all. The 1.0
+            # was set for Azure he-IL, which punctuates Hebrew poorly, so the
+            # timer carried every turn. The transcriber is 11labs scribe now and
+            # Vapi reports endpointing at 301ms average, which means punctuation
+            # IS arriving and this timer is not the path most turns take. The
+            # reasoning for 1.0 outlived the transcriber it was written about.
+            "onNoPunctuationSeconds": 0.8,
             # Digits are dictated with gaps. A card or a date needs longer than
             # ordinary speech, or the agent cuts in halfway through the number.
             "onNumberSeconds": 1.0,
