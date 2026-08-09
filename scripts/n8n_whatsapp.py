@@ -1335,29 +1335,51 @@ def workflow(e):
                 credentials=({"httpHeaderAuth": {"id": send_cred, "name": SEND_CRED}}
                              if send_cred else {}),
             ),
-            # --- The options, again, after a completed flow -----------------
+            # --- The options, again, after a dead-end reply -----------------
             # Chained AFTER Send, which is the only ordering Meta respects: two
             # parallel HTTP calls can arrive swapped, and a menu that lands
-            # before the reference number reads as changing the subject.
+            # before the reply reads as changing the subject.
             #
-            # The test is for a reference number in the outgoing reply — the
-            # marker of a completed flow, and the model cannot fake it because
-            # rule one of the prompt is that references come from the tool.
-            # isExecuted guards the canned and menu branches, where the agent
-            # never ran and referencing its output would throw.
+            # The test was a reference number in the reply, and it was too
+            # narrow: "אוקיי." to a pasted sentence, and the handover line,
+            # are both dead ends and both left the resident staring at a wall
+            # — on a real handset, twice, with a prompt rule against it that
+            # history outvoted. The deterministic version: a reply that asks a
+            # question is mid-flow and gets no menu; a reply that asks nothing
+            # has nowhere to go, so the options follow it. This covers the
+            # reference replies the old test caught, the bare acknowledgements
+            # it missed, and the handover line.
+            #
+            # Reads the text from whichever node produced it — Hand over
+            # instead on the error branch FIRST, because on that branch the
+            # agent's main output is empty and .first() on it throws. Canned
+            # branches produce neither, evaluate to '', and fail notEmpty —
+            # correctly, since every canned line ends with a question anyway.
             node(
-                id="hasref", name="Ticket in the reply?", type="n8n-nodes-base.if",
+                id="hasref", name="Dead end reply?", type="n8n-nodes-base.if",
                 typeVersion=2, position=[1680, 60],
                 parameters={"conditions": {
                     "options": {"caseSensitive": True, "leftValue": "",
                                 "typeValidation": "loose"},
                     "conditions": [{
-                        "id": "r",
-                        "leftValue": "={{ $('Answer the resident').isExecuted"
+                        "id": "sent",
+                        "leftValue": "={{ $('Hand over instead').isExecuted"
+                                     " ? ($('Hand over instead').first().json.text || '')"
+                                     " : ($('Answer the resident').isExecuted"
                                      " ? ($('Answer the resident').first().json.output || '')"
-                                     " : '' }}",
-                        "rightValue": "HM-\\d{4}-\\d+",
-                        "operator": {"type": "string", "operation": "regex"},
+                                     " : '') }}",
+                        "rightValue": "",
+                        "operator": {"type": "string", "operation": "notEmpty",
+                                     "singleValue": True},
+                    }, {
+                        "id": "noq",
+                        "leftValue": "={{ $('Hand over instead').isExecuted"
+                                     " ? ($('Hand over instead').first().json.text || '')"
+                                     " : ($('Answer the resident').isExecuted"
+                                     " ? ($('Answer the resident').first().json.output || '')"
+                                     " : '') }}",
+                        "rightValue": "?",
+                        "operator": {"type": "string", "operation": "notContains"},
                     }],
                     "combinator": "and",
                 }},
@@ -1434,12 +1456,12 @@ def workflow(e):
             "Hand over instead": {"main": [[
                 {"node": "Send", "type": "main", "index": 0},
                 {"node": "Log reply", "type": "main", "index": 0}]]},
-            # After every text send, ask whether a flow just completed. The If
-            # answers no on every branch except an agent reply carrying a
-            # reference, so chaining here costs nothing on the others.
+            # After every text send, ask whether the reply was a dead end. A
+            # reply that asked a question continues the conversation and the
+            # If answers no; anything else gets the options list after it.
             "Send": {"main": [[
-                {"node": "Ticket in the reply?", "type": "main", "index": 0}]]},
-            "Ticket in the reply?": {"main": [[
+                {"node": "Dead end reply?", "type": "main", "index": 0}]]},
+            "Dead end reply?": {"main": [[
                 {"node": "Options again", "type": "main", "index": 0}]]},
             "Options again": {"main": [[
                 {"node": "Send menu", "type": "main", "index": 0},

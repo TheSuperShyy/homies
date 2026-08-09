@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### A reply with no question gets the menu after it — decided in the workflow
+
+The prompt rule against bare acknowledgements lost to history on its first
+real test ("אוקיי." to a pasted sentence, minutes after the rule went live)
+— the same history-beats-prompt failure the language choice hit on 8 Aug,
+and the same fix: take the decision away from the model. "Ticket in the
+reply?" became "Dead end reply?": a reply that asks a question is mid-flow,
+no menu; a reply that asks nothing is a dead end and the options list
+follows it. Covers the reference replies the old regex caught, the bare
+acknowledgements it missed, and the handover line. Error branch read first
+in the expression — on that path the agent's main output is empty and
+.first() throws. One prompt line added: mid-collection messages must end
+with a question, or the menu reads them as the end of the flow.
+
 ### "OK." is not a reply
 
 The resident pasted the bot's own status sentence back and got "OK." — a
