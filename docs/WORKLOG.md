@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### Ticket status is editable from the dashboard
+
+Each row's status pill became a select + save, posting to a server action —
+no client JS, anon key only. The write permission is migration 011, and the
+blast radius is one column by construction: `grant update (status)` to anon
+after revoking table-wide update, so a request touching any other column
+fails at the grant before RLS is consulted, and the check constraint rejects
+invented statuses. All three verified live: status change 200, description
+change 401, "nonsense" 400. Same demo-mode expiry as 010 — the re-lock
+(drop policy, revoke grant) is written in the migration header. Stale
+`needs_review` tab replaced with `cancelled`, which is what the constraint
+actually holds.
+
 ### Test tickets cleared
 
 All 8 open requests deleted on request — HM-2026-1011…1019, the residue of

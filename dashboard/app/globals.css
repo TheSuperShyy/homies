@@ -73,6 +73,14 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); 
 .open { color: var(--open); } .in_progress { color: var(--progress); }
 .resolved { color: var(--done); } .needs_review { color: var(--review); }
 .cancelled { color: var(--muted); }
+/* The status cell's editor: the select wears the same pill as the old static
+   badge, the save button sits beside it and stays out of the way. */
+.status-edit { display: flex; gap: 6px; align-items: center; }
+.status-edit select.pill { background: transparent; cursor: pointer; }
+.status-edit button.pill {
+  background: transparent; cursor: pointer; color: var(--muted);
+}
+.status-edit button.pill:hover { color: var(--accent); border-color: var(--accent); }
 .empty { padding: 34px; text-align: center; color: var(--muted); }
 /* A chat, laid out as one. dir="auto" on each bubble so Hebrew renders
    right-to-left and a reference number stays left-to-right inside it. */

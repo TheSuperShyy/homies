@@ -1,4 +1,24 @@
+import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase-server';
+
+// The four values the check constraint on requests.status accepts. The list is
+// duplicated from the schema on purpose: the server action validates against
+// it before touching the database, so a forged form posts a clean error here
+// rather than a Postgres constraint failure.
+const STATUSES = ['open', 'in_progress', 'resolved', 'cancelled'];
+
+// A server action rather than a route handler: the form posts here with no
+// client JS, and the anon key is all it carries — migration 011 grants that
+// role UPDATE on the status column and nothing else, so even a hand-crafted
+// request through this action cannot rewrite a description or a reference.
+async function updateStatus(formData: FormData) {
+  'use server';
+  const reference = String(formData.get('reference') ?? '');
+  const status = String(formData.get('status') ?? '');
+  if (!reference || !STATUSES.includes(status)) return;
+  await serverClient().from('requests').update({ status }).eq('reference', reference);
+  revalidatePath('/tickets');
+}
 
 // `searchParams` rather than client-side state: a filtered view should be a URL
 // somebody can send to a colleague.
@@ -14,7 +34,7 @@ export default async function Tickets({
   if (status) q = q.eq('status', status);
   const { data, error } = await q;
 
-  const tabs = ['', 'open', 'in_progress', 'needs_review', 'resolved'];
+  const tabs = ['', ...STATUSES];
 
   return (
     <>
@@ -43,7 +63,16 @@ export default async function Tickets({
                   <td dir="auto">{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
                   <td className="muted">{r.type}</td>
                   <td>{r.urgency}</td>
-                  <td><span className={`pill ${r.status}`}>{r.status}</span></td>
+                  <td>
+                    <form action={updateStatus} className="status-edit">
+                      <input type="hidden" name="reference" value={r.reference} />
+                      <select name="status" defaultValue={r.status}
+                              className={`pill ${r.status}`}>
+                        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                      <button type="submit" className="pill">save</button>
+                    </form>
+                  </td>
                   <td className="muted">{r.opened_via}</td>
                   <td className="muted mono">{r.created_at.slice(0, 16).replace('T', ' ')}</td>
                 </tr>
