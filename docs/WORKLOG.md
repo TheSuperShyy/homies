@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### A bare "1020" flipped the conversation to English
+
+The Hebrew scenario test: reference quoted back as digits only, and the
+answer came back in English. Sort's per-message language detection read
+"not Hebrew" as "English", and a number contains no Hebrew. Now only
+letters vote — Hebrew script sets he, Latin letters set en, and digits,
+punctuation and emoji leave the preference where it was. The status flow
+explicitly invites a digits-only message, so this was the flow contradicting
+itself. Re-applied, re-activated.
+
 ### Ticket status is editable from the dashboard
 
 Each row's status pill became a select + save, posting to a server action —

@@ -771,7 +771,14 @@ if (tapped === 'lang_en' || /\benglish\b/i.test(text) || /אנגלית/.test(tex
 } else if (text.trim()) {
   // No explicit request: the script of THIS message decides, and updates the
   // preference — someone who goes back to typing Hebrew wants Hebrew back.
-  store.lang[from] = /[֐-׿]/.test(text) ? 'he' : 'en';
+  //
+  // Only LETTERS get a vote. A bare "1020" — a resident quoting a reference
+  // number back, which the status flow explicitly invites — carries no script
+  // at all, and on 9 Aug it flipped a Hebrew conversation to English because
+  // "not Hebrew" was being read as "English". Digits, punctuation and emoji
+  // say nothing about language; they leave the choice where it was.
+  if (/[֐-׿]/.test(text)) store.lang[from] = 'he';
+  else if (/[a-z]/i.test(text)) store.lang[from] = 'en';
 }
 // A photo carries no words to detect, so it falls back to what was already
 // chosen, and to Hebrew for someone whose first ever message is an image.
