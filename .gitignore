@@ -76,3 +76,15 @@ tmp/
 # Stale the moment it is written, and the real one lives in docs/ — two copies
 # of a prompt is how they drift.
 scripts/_live_prompt.txt
+
+# Chatwoot production secrets — server only
+deploy/chatwoot/.env
+
+# Dashboard local env
+dashboard/.env.local
+dashboard/node_modules/
+dashboard/.next/
+
+# Written by `vercel link` on first deploy. Project and org IDs, not secrets,
+# but they tie this checkout to one Vercel account and do not belong in git.
+dashboard/.vercel/
