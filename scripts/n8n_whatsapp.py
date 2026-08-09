@@ -254,10 +254,10 @@ MENU = {
         "action": {
             "button": "Options",
             "sections": [{"title": "Options", "rows": [
-                {"id": "open", "title": "Open a service call",
+                {"id": "open", "title": "Open a ticket",
                  "description": "Leak, power, lift, lobby, gate"},
-                {"id": "status", "title": "Check an existing call",
-                 "description": "What is happening with a call"},
+                {"id": "status", "title": "Check an existing ticket",
+                 "description": "What is happening with a ticket"},
                 {"id": "balance", "title": "Balance and payments",
                  "description": "Balance, debt, receipt, payment method"},
                 {"id": "human", "title": "Talk to a person",
