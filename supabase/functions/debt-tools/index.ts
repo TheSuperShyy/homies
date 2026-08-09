@@ -414,6 +414,83 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
   },
 
   /**
+   * How much does this apartment owe. Read-only: amounts and months, nothing
+   * that moves money — payments, receipts and disputes stay with the team.
+   *
+   * The identity story is honest rather than solved. The caller's own WhatsApp
+   * number is tried first, because it is the one fact the resident did not
+   * type and cannot choose. Building+unit and a name are the fallbacks the
+   * client asked for; PRD §13 #1 (proving who is asking before money is read
+   * out) is still open, and until it closes this answers whoever asks — the
+   * accepted demo posture, same as the no-login dashboard.
+   *
+   * A name that matches two residents returns nobody. Between neighbours with
+   * similar names, a guess read out with amounts attached is a privacy leak
+   * dressed as an answer.
+   */
+  async get_balance(args, ctx) {
+    const fields = "id,full_name,building,unit";
+    let resident: any = null;
+
+    if (channel(ctx) === "whatsapp") {
+      const phone = "+" + ctx.callId.slice(3).replace(/^\+/, "");
+      const { data } = await db.from("residents").select(fields)
+        .eq("phone", phone).maybeSingle();
+      resident = data;
+    }
+    if (!resident && ctx.residentId) {
+      const { data } = await db.from("residents").select(fields)
+        .eq("id", ctx.residentId).maybeSingle();
+      resident = data;
+    }
+    if (!resident) {
+      const building = String(args?.building ?? "").trim();
+      const unit = String(args?.unit ?? "").trim();
+      if (building && unit) {
+        const { data } = await db.from("residents").select(fields)
+          .eq("building", building).eq("unit", unit).limit(1);
+        resident = data?.[0] ?? null;
+      }
+    }
+    if (!resident) {
+      const name = String(args?.name ?? "").trim();
+      if (name.length >= 2) {
+        const { data } = await db.from("residents").select(fields)
+          .ilike("full_name", "%" + name + "%").limit(2);
+        if (data && data.length > 1) return { ok: true, found: 0, ambiguous_name: true };
+        resident = data?.[0] ?? null;
+      }
+    }
+    if (!resident) return { ok: true, found: 0 };
+
+    const { data: charges, error } = await db
+      .from("charges")
+      .select("period,amount,status")
+      .eq("resident_id", resident.id)
+      .order("period", { ascending: true });
+    if (error) return { ok: false, error: error.message };
+
+    const owed = (charges ?? []).filter((c) => c.status === "unpaid");
+    return {
+      ok: true,
+      found: 1,
+      resident: resident.full_name,
+      building: resident.building,
+      unit: resident.unit,
+      owed_total: owed.reduce((s, c) => s + Number(c.amount), 0),
+      owed_months: owed.map((c) => ({
+        period: String(c.period).slice(0, 7),
+        amount: Number(c.amount),
+      })),
+      // Disputed and pending rows are facts the agent should not hide behind
+      // a clean zero — "in review with the team" is the truthful phrasing.
+      in_review: (charges ?? [])
+        .filter((c) => c.status === "disputed" || c.status === "pending_charge")
+        .map((c) => ({ period: String(c.period).slice(0, 7), status: c.status })),
+    };
+  },
+
+  /**
    * A maintenance issue raised during a debt call, and the whole job of the
    * inbound intake agent. Acceptance criterion 7 is zero silent drops, so this
    * writes a real requests row and hands back the real reference — the agent is

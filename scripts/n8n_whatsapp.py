@@ -193,7 +193,9 @@ MEDIA_LINE = {
 # The tap already says what they want; the only useful reply is the first
 # question of that flow, and that question is the same every time — which is
 # the definition of a canned line. 'human' and 'balance' still go to the
-# agent, whose job on both is transfer_to_human.
+# agent: 'human' becomes transfer_to_human, and 'balance' becomes a
+# get_balance call — which needs no arguments on its first try (the caller's
+# own number is the lookup key), so there is no first question to can.
 #
 # Same grammar rule as every other fixed line: nothing addresses the resident
 # in a gendered form.
@@ -215,13 +217,13 @@ TAP_LINE = {
 # characters, description 72, the button that opens the list 20, and ten rows
 # across all sections.
 #
-# ONE OF THESE ROWS DOES NOT WORK YET. `balance` needs a resident to prove who
-# they are before anything money-shaped is read out, which is PRD §13 #1 and
-# still unanswered — a tap lands on the handover path and reaches a human,
-# which is what happens today anyway when somebody asks in words. The row stays
-# on the menu deliberately: it makes the gap visible instead of pretending the
-# capability is absent. `status` worked its way off this list on 9 Aug when
-# get_request_status arrived — read-only, nothing money-shaped in the answer.
+# Every row works now. `balance` was the last holdout — it handed over to a
+# human until 9 Aug, when get_balance arrived. The identity question that kept
+# it there (PRD §13 #1) has a demo-grade answer rather than a real one: the
+# caller's own WhatsApp number is matched first, and building+unit or a name
+# are open fallbacks. Reading amounts is all it does; paying, receipts and
+# disputes still reach the team. `status` came off the handover path the same
+# day get_request_status arrived.
 #
 # The Hebrew here obeys the same rule the prompt does: nothing addresses the
 # resident with a gendered form. "אפשרויות" rather than "בחר", which is
@@ -622,6 +624,30 @@ TOOLS = [
             "required": ["reason"],
         },
     },
+    {
+        "name": "get_balance",
+        "description": (
+            "Call when the resident asks about their balance, their debt, or "
+            "how much they owe — including a tap on the balance row of the "
+            "options list. Call it with NO arguments first: the system "
+            "matches the caller's own WhatsApp number. Pass building+unit, or "
+            "a full name, only when that finds nobody or they ask about a "
+            "specific apartment. Returns the resident's name, apartment, "
+            "total owed and the unpaid months. Read-only — it cannot take a "
+            "payment; anyone who wants to actually pay, needs a receipt or "
+            "disputes an amount goes to the team."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "building": {"type": "string", "description": "Street and number."},
+                "unit": {"type": "string", "description": "Apartment number."},
+                "name": {"type": "string",
+                         "description": "The resident's full name, as given."},
+            },
+            "required": [],
+        },
+    },
 ]
 
 
@@ -823,7 +849,7 @@ if (asked && leftover.length < 3) {
 // 'open' and 'status' get the first question of their flow directly — the tap
 // already said what the resident wants, and a model round-trip here produced a
 // re-greeting on a real handset. 'human' and 'balance' fall through to the
-// agent, which answers both by calling transfer_to_human.
+// agent: 'human' becomes transfer_to_human, 'balance' becomes get_balance.
 if (tapped === 'open' || tapped === 'status') {
   return [{ json: {
     _reply: '', _work: false, _canned: true, _menu: false,
@@ -1300,6 +1326,41 @@ def workflow(e):
                                                  "name": "Homies tool secret"}}
                              if status_cred else {}),
             ),
+            # Same direct-to-Edge-Function route as the status lookup, for the
+            # same reason: a balance answer has to be synchronous and live. The
+            # phone in the envelope is what the function matches on first, and
+            # it comes off the Sort item — the model cannot supply a different
+            # caller.
+            node(
+                id="tool_balance", name="get_balance",
+                type="n8n-nodes-base.httpRequestTool",
+                typeVersion=4.2, position=[2160, 420],
+                parameters={
+                    "method": "POST",
+                    "url": fn_url,
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendBody": True, "specifyBody": "json",
+                    "jsonBody": TOOL_BODY % (
+                        "get_balance",
+                        "building: %s, unit: %s, name: %s" % (
+                            from_ai("building",
+                                    "Street and number, only if the caller's own "
+                                    "number found nobody or they asked about a "
+                                    "specific apartment. Empty otherwise."),
+                            from_ai("unit", "Apartment number, if given."),
+                            from_ai("name",
+                                    "The resident's full name as they gave it, "
+                                    "if no building and unit. Empty otherwise."),
+                        )),
+                    "options": {"timeout": 25000},
+                    "descriptionType": "manual",
+                    "toolDescription": TOOLS[3]["description"],
+                },
+                credentials=({"httpHeaderAuth": {"id": status_cred,
+                                                 "name": "Homies tool secret"}}
+                             if status_cred else {}),
+            ),
             # The error branch. Not a nicety: this is the sentence the Code node
             # used to produce from its own catch block, and without it a model
             # failure is a resident who is never answered at all.
@@ -1478,6 +1539,8 @@ def workflow(e):
             "get_request_status": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "transfer_to_human": {"ai_tool": [[
+                {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
+            "get_balance": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
         },
     }
