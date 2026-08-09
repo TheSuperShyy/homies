@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### The English menu says ticket
+
+"Open a service call" / "Check an existing call" → "Open a ticket" / "Check
+an existing ticket", asked for off a screenshot. The second title is exactly
+24 characters, which is Meta's hard cap on a row title, so it fits with
+nothing to spare. Hebrew rows untouched — קריאת שירות is the trade's own
+word and was chosen deliberately over פנייה.
+
 ### The options come back after a flow completes
 
 Asked for: after a ticket is opened, offer the options again instead of
