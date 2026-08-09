@@ -11,6 +11,49 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### Dashboard: Debts page — who owes what, largest first
+
+New /debts view, one row per resident rather than per charge: name,
+building·unit, phone, the months owed, anything disputed or pending under
+"in review", and the total. Three cards on top — total open, residents
+owing, months in review. Grouping done in the page (the table is hundreds
+of rows at pilot scale); no new migration — anon read on charges and
+residents arrived with 010. Same demo posture as the rest of the dashboard.
+
+### The voice agents answer balance too
+
+Same get_balance tool, attached to both inbound Vapi assistants (he 86a01f13,
+en 3edbe85b) with the shared Edge Function URL and secret. Web calls carry no
+caller ID, so voice always goes through building+apartment — the two facts the
+call already collects — or a full name; the WhatsApp phone-first shortcut
+simply doesn't fire. Prompts: scope widened from two things to three, the
+"one lookup" rule became "two lookups", and a Balance and debt section
+mirrors the WhatsApp rules with voice manners — amounts spoken as words
+(ארבע מאות חמישים שקלים), never a digit sequence. Money that moves still
+transfers. Verified with a voice-shaped envelope: הרצל 14/12 → דוד כהן,
+₪450 open for 2026-07. Prompts still live only in the scratchpad — no repo
+source doc for either inbound prompt yet, which stays on the open list.
+
+### The balance row works: get_balance, caller's own number first
+
+The last menu row that handed over to a human now answers. New `get_balance`
+tool in debt-tools (version 13): read-only — total owed and the unpaid
+months, nothing that moves money. Lookup order is the identity story: the
+caller's own WhatsApp number first (the one fact they didn't type), then
+building+unit, then full name — a name matching two residents returns
+nobody rather than guessing between neighbours. Disputed and pending months
+come back under `in_review` so a clean zero can't hide them. Wired into the
+WhatsApp workflow as a fourth tool on the same direct-to-Edge-Function
+route as the status lookup; prompt gained a יתרה וחוב section ("call it
+with no arguments first") and the transfer section shrank to money that
+*moves* — pay, receipt, dispute, payment method. All four lookup paths
+verified against the live function. PRD §13 #1 (proving who asks) remains
+open; this is the accepted demo posture, same as the no-login dashboard.
+
+Also reverted mid-flight: a close_request tool (bot closes tickets on
+request) was built and then dropped on the client's direction — closing
+stays with the team; the balance lookup is what was wanted.
+
 ### A reply with no question gets the menu after it — decided in the workflow
 
 The prompt rule against bare acknowledgements lost to history on its first

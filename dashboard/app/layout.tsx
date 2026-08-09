@@ -25,6 +25,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           <nav>
             <a href="/">Overview</a>
             <a href="/tickets">Tickets</a>
+            <a href="/debts">Debts</a>
             <a href="/conversations">Conversations</a>
             <a href="/calls">Calls</a>
           </nav>
