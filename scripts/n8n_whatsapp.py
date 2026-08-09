@@ -856,9 +856,16 @@ if (!tapped && GREETING.test(bare)) {
 // `tapped` is the row id, and it is carried through NOT for routing — the agent
 // reads the title like any other message — but so an execution can be read back
 // later and tell a tap from someone typing the same words.
+//
+// `followup` is the options list again, body "עוד משהו?", sent by the tail of
+// the workflow when the reply carries a reference number. Built HERE, in code,
+// because a menu is JSON full of `}}` and an n8n {{ expression }} is cut at
+// the first `}}` it meets — embedding it in a Set node fails as "invalid
+// syntax" with the cause invisible.
 return [{ json: { _reply: '', _work: true, _canned: false, _menu: false,
                   to: from, text, tapped, lang, message_id: id,
-                  in_text: inText, msg_type: msgType } }];
+                  in_text: inText, msg_type: msgType,
+                  followup: __FOLLOWUP_MENU__[lang] } }];
 """
 
 
@@ -980,7 +987,8 @@ def workflow(e):
                                          APP_SECRET=app_secret,
                                          MEDIA_LINE=MEDIA_LINE, MENU=MENU,
                                          SWITCH_LINE=SWITCH_LINE,
-                                         TAP_LINE=TAP_LINE)},
+                                         TAP_LINE=TAP_LINE,
+                                         FOLLOWUP_MENU=FOLLOWUP_MENU)},
             ),
             node(
                 id="respond", name="Answer Meta",
@@ -1349,7 +1357,10 @@ def workflow(e):
             ),
             # Rebuilds the flat to/menu shape the Send menu node reads, so the
             # follow-up rides the same node as the greeting menu. The body
-            # differs — "עוד משהו?" — the rows are identical on purpose.
+            # differs — "עוד משהו?" — the rows are identical on purpose. The
+            # menu itself comes from Sort, which built it in code: a menu is
+            # JSON full of `}}`, and an n8n expression is cut at the first
+            # `}}` it meets, so it cannot be inlined here.
             node(
                 id="followup", name="Options again", type="n8n-nodes-base.set",
                 typeVersion=3.4, position=[1920, 60],
@@ -1357,9 +1368,7 @@ def workflow(e):
                     {"id": "to", "name": "to", "type": "string",
                      "value": "={{ $('Sort').first().json.to }}"},
                     {"id": "menu", "name": "menu", "type": "object",
-                     "value": "={{ $('Sort').first().json.lang === 'en' ? %s : %s }}"
-                              % (json.dumps(FOLLOWUP_MENU["en"], ensure_ascii=False),
-                                 json.dumps(FOLLOWUP_MENU["he"], ensure_ascii=False))},
+                     "value": "={{ $('Sort').first().json.followup }}"},
                 ]}, "options": {}},
             ),
         ],

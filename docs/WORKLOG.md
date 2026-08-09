@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### The follow-up menu died on a `}}`, found in the execution log
+
+Ticket HM-2026-1019 opened cleanly and no menu followed. Execution 363: the
+If matched, "Options again" failed — "invalid syntax", no description. The
+cause: the menu JSON was inlined into a Set-node {{ expression }}, and a
+menu is JSON full of `}}` — n8n cuts an expression at the first `}}` it
+meets, so the node was handed a truncated fragment. Moved the follow-up menu
+into Sort's output (a Code node has no such tokenizer), and the Set now just
+reads `$('Sort').first().json.followup`. Re-applied, re-activated.
+
 ### The bot's brain ran out of money, and moved to key 2
 
 "theres a water outage" got the handover line — not a decision, the error
