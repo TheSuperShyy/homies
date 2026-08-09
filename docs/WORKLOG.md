@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### The reference number, slowed to writing speed
+
+The read-back example wrote the code as one token — HM-2026-1001 — and the
+TTS said it like one word, too fast for a pen. The voice paces from
+punctuation, so the fix is in the writing: step 4 now sends the code out in
+pieces with a comma after each — HM, 2026, 1, 0, 0, 1 — followed by an offer
+to repeat, and a repeat is the same pieces, not faster. Same rule added to
+the status section's ask-for-it read-back. Both inbound twins (he 17,555 /
+en 16,980 chars), demo-inbound.md synced.
+
 ### Everything pushed, and the dashboard is on the internet
 
 Commit `b77435b` — 32 files, the whole week — pushed to
