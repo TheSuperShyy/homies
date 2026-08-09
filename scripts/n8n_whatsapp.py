@@ -270,6 +270,19 @@ MENU = {
 }
 
 
+# The menu again, after a flow completes. Asked for 9 Aug: once a ticket is
+# opened, the resident should be offered the options again rather than left
+# with a reference number and silence. The body changes — "עוד משהו?" is a
+# follow-up, the greeting body would read like amnesia — and the rows stay
+# identical. Sent by the workflow, not the model: the trigger is a reference
+# number in the outgoing reply, which is exactly the marker of a completed
+# flow (open or status — both end with a reference, both deserve the offer).
+FOLLOWUP_BODY = {"he": "עוד משהו?", "en": "Anything else?"}
+FOLLOWUP_MENU = {
+    lang: dict(MENU[lang], body={"text": FOLLOWUP_BODY[lang]}) for lang in MENU
+}
+
+
 def env():
     return dict(
         l.strip().split("=", 1)
@@ -1307,6 +1320,48 @@ def workflow(e):
                 credentials=({"httpHeaderAuth": {"id": send_cred, "name": SEND_CRED}}
                              if send_cred else {}),
             ),
+            # --- The options, again, after a completed flow -----------------
+            # Chained AFTER Send, which is the only ordering Meta respects: two
+            # parallel HTTP calls can arrive swapped, and a menu that lands
+            # before the reference number reads as changing the subject.
+            #
+            # The test is for a reference number in the outgoing reply — the
+            # marker of a completed flow, and the model cannot fake it because
+            # rule one of the prompt is that references come from the tool.
+            # isExecuted guards the canned and menu branches, where the agent
+            # never ran and referencing its output would throw.
+            node(
+                id="hasref", name="Ticket in the reply?", type="n8n-nodes-base.if",
+                typeVersion=2, position=[1680, 60],
+                parameters={"conditions": {
+                    "options": {"caseSensitive": True, "leftValue": "",
+                                "typeValidation": "loose"},
+                    "conditions": [{
+                        "id": "r",
+                        "leftValue": "={{ $('Answer the resident').isExecuted"
+                                     " ? ($('Answer the resident').first().json.output || '')"
+                                     " : '' }}",
+                        "rightValue": "HM-\\d{4}-\\d+",
+                        "operator": {"type": "string", "operation": "regex"},
+                    }],
+                    "combinator": "and",
+                }},
+            ),
+            # Rebuilds the flat to/menu shape the Send menu node reads, so the
+            # follow-up rides the same node as the greeting menu. The body
+            # differs — "עוד משהו?" — the rows are identical on purpose.
+            node(
+                id="followup", name="Options again", type="n8n-nodes-base.set",
+                typeVersion=3.4, position=[1920, 60],
+                parameters={"assignments": {"assignments": [
+                    {"id": "to", "name": "to", "type": "string",
+                     "value": "={{ $('Sort').first().json.to }}"},
+                    {"id": "menu", "name": "menu", "type": "object",
+                     "value": "={{ $('Sort').first().json.lang === 'en' ? %s : %s }}"
+                              % (json.dumps(FOLLOWUP_MENU["en"], ensure_ascii=False),
+                                 json.dumps(FOLLOWUP_MENU["he"], ensure_ascii=False))},
+                ]}, "options": {}},
+            ),
         ],
         "connections": {
             # TWO OUTPUTS, NOT ONE. `multipleMethods` gives the webhook node one
@@ -1362,6 +1417,16 @@ def workflow(e):
             ]},
             "Hand over instead": {"main": [[
                 {"node": "Send", "type": "main", "index": 0},
+                {"node": "Log reply", "type": "main", "index": 0}]]},
+            # After every text send, ask whether a flow just completed. The If
+            # answers no on every branch except an agent reply carrying a
+            # reference, so chaining here costs nothing on the others.
+            "Send": {"main": [[
+                {"node": "Ticket in the reply?", "type": "main", "index": 0}]]},
+            "Ticket in the reply?": {"main": [[
+                {"node": "Options again", "type": "main", "index": 0}]]},
+            "Options again": {"main": [[
+                {"node": "Send menu", "type": "main", "index": 0},
                 {"node": "Log reply", "type": "main", "index": 0}]]},
             # Sub-nodes connect UP into the agent on their own connection types,
             # and the direction is the part that catches people out: the model,

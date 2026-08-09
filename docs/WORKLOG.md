@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### The options come back after a flow completes
+
+Asked for: after a ticket is opened, offer the options again instead of
+leaving the resident with a reference number and silence. Two new nodes
+chained AFTER Send (parallel sends can arrive swapped, and a menu landing
+before the reference reads as changing the subject): an If that looks for a
+reference number in the outgoing reply — the marker of a completed flow,
+which the model cannot fake because references only come from the tool — and
+a Set that rebuilds the flat to/menu shape so the follow-up rides the
+existing Send menu node. Body "עוד משהו?" / "Anything else?", rows identical
+to the greeting menu. Fires after status answers too, deliberately — both
+flows end with a reference and both deserve the offer. One prompt line so
+the model does not also ask "עוד משהו?" itself. isExecuted guards the canned
+branches where the agent never ran.
+
 ### The WhatsApp bot answers status now, and a tap stopped being smalltalk
 
 Two faults off one screenshot. A tap on "Open a service call" reached the
