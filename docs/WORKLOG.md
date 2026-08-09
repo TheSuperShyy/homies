@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### The bot's brain ran out of money, and moved to key 2
+
+"theres a water outage" got the handover line — not a decision, the error
+branch: OpenRouter 402, key 1's balance at $0.00 with the negative-balance
+grace exhausted, the model failing in 253ms. The fallback did exactly its
+job; a resident got a sentence instead of silence. Swapped the n8n
+credential to OPENROUTER_API_KEY_2 ($45 credits, $43.80 already used —
+about $1.20 of headroom, ~2,400 flash messages), workflow re-applied and
+re-activated, key-1 credential deleted from n8n. That headroom is testing
+money, not pilot money.
+
 ### The English menu says ticket
 
 "Open a service call" / "Check an existing call" → "Open a ticket" / "Check
