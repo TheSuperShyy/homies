@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### Test tickets cleared
+
+All 8 open requests deleted on request — HM-2026-1011…1019, the residue of
+today's WhatsApp and voice testing. HM-2026-1001 (in_progress) left: the ask
+was open tickets. The 1013 voice-status test target is gone with them; open
+a fresh ticket before testing that flow.
+
 ### The follow-up menu died on a `}}`, found in the execution log
 
 Ticket HM-2026-1019 opened cleanly and no menu followed. Execution 363: the
