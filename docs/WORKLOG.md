@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### "OK." is not a reply
+
+The resident pasted the bot's own status sentence back and got "OK." — a
+dead end in either language. New prompt section for a message that carries
+nothing actionable (pasted text, a statement with no question, a repeat):
+never a bare acknowledgement; say briefly that you didn't get it and name
+what you can do — open a ticket, check a status, or pick from the list — in
+the conversation's language, phrasing the model's own. Distinguished from
+the media line, which is fixed; this one is described, not scripted, per
+editing rule 1.
+
 ### A bare "1020" flipped the conversation to English
 
 The Hebrew scenario test: reference quoted back as digits only, and the
