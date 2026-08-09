@@ -51,6 +51,15 @@ chart could show anything.
 
 - **The end-of-call webhook not firing,** leaving an interaction with no latency
   or transcript. Check after the first rehearsal call, not on the day.
+  **This happened, for six days, and nothing reported it.** All four assistants
+  carried `serverUrl: null` and `serverMessages: []` from 2 to 8 Aug, so Vapi
+  computed the report and posted it nowhere. `interactions` stayed at zero rows
+  across eleven test calls while the tools wrote stub rows into it that were
+  never completed. Nothing failed, nothing errored, and the only symptom was an
+  empty table nobody was querying yet. Wired on 8 Aug once the `debt-tools` Edge
+  Function existed to receive it. **The lesson is the shape, not the field: an
+  instrumentation gap is silent by construction — the thing that would have told
+  you is the thing that is missing.**
 - **Ambiguous re-ask counting.** Does a clarification count as a re-ask? Define
   it once — an ask is any question targeting a slot that is not yet captured —
   and apply it consistently, or the headline number means nothing.

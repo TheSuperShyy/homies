@@ -30,13 +30,12 @@ export async function middleware(request: NextRequest) {
 
   // getUser(), not getSession(). getSession() reads the cookie and believes it;
   // getUser() asks the auth server whether the token is real.
-  const { data: { user } } = await supabase.auth.getUser();
+  await supabase.auth.getUser();
 
-  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
-  }
+  // Demo mode (9 Aug 2026): no login wall. The redirect to /login is removed
+  // and migration 010 gives the anon role read access, so a logged-out visitor
+  // sees data rather than empty tables. To re-lock, restore the redirect here
+  // and drop the anon_read policies — see supabase/010_open_dashboard.sql.
   return response;
 }
 

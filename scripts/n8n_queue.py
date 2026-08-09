@@ -38,6 +38,9 @@ import sys
 import urllib.error
 import urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from n8n_layout import check, LayoutError
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 WF_NAME = "Homies — call queue (read)"
@@ -149,6 +152,11 @@ def main():
     apply = "--apply" in sys.argv
     wf = workflow()
     existing = find()
+
+    try:
+        check(wf["nodes"], WF_NAME)
+    except LayoutError as ex:
+        sys.exit("\n%s\n" % ex)
 
     print("workflow : %s" % WF_NAME)
     print("webhook  : GET %s/webhook/%s" % (env()["N8N_BASE_URL"].strip(), WEBHOOK_PATH))

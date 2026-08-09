@@ -9,7 +9,1642 @@ conversation that produced it.
 
 ---
 
+## 2026-08-09
+
+### Dashboard: full-bleed, and the calls page learned outbound questions
+
+`main` lost its 1180px cap — the tables now use the whole screen. The calls
+page grew a view switcher (state in the URL, so views are bookmarkable): All /
+Inbound / Outbound / No answer / Links sent. "No answer" reads
+`call_outcomes` where outcome is `no_answer`, joined to the resident — name,
+phone, building, attempt. "Links sent" reads `payment_links` with the
+resident and status, and carries the schema's own caveat under the table:
+`sent` means OXS confirmed it went out, and nothing on our side can see
+whether it was paid, so the view never counts money.
+
+### The amount-loop returned, and the cause was config, not prompt
+
+Test call (שרה, gender f passed correctly): the agent restated the
+why-you're-calling sentence three times against an "אוקיי", wrote אההה
+against the written rule, and produced actual Hebrew typos — מאומיז, ועד בק,
+בד בית are in Vapi's own bot log, so the model wrote them; they were not
+mishearings. The live model object had **no temperature at all** — the design
+value 0.3 was lost when the assistant was rebuilt — so gpt-5.4 ran at its
+default, and there was no maxTokens cap to stop a runaway turn.
+
+Set temperature 0.3 and maxTokens 200 by PATCH. The gender complaint from the
+same call needed no change: `gender: "f"` was passed and the GRAMMAR rules
+were armed; the call simply never reached a turn with a verb aimed at her —
+מדבר מיכאל is the agent speaking about himself, masculine by identity.
+
+Noted in passing: the demo still passes `card_last4` and `has_card`, retired
+4 Aug ("neither may return"). The prompt no longer references them so they do
+nothing, but the demo's variable list should be cleaned.
+
+**The loop survived temperature 0.3 — model switched back to gpt-4.1-mini.**
+Post-fix calls split: 09:57 ran the whole flow cleanly (ask, link, outcome,
+end-call phrase), but 09:44 and 09:52 looped the amount exactly as before,
+with a mid-word cut where a degenerating turn hit the 200-token cap. An
+inconsistent failure at 0.3 points at the model, and gpt-5.4 is not the
+design: the notes chose mini-class deliberately, the 7-Aug twelve-call
+validation ran against it, and nobody ever validated 5.4 on this prompt.
+Switched to gpt-4.1-mini, temp 0.3 and the token cap kept. If the loop
+survives the mini too, the next suspect is Vapi's message history — the call
+artifact shows all assistant speech merged into one message and all user
+speech into another, and if that is what each inference actually receives,
+no prompt can fix it.
+
+**Status + anti-dupe extended to the English twin.** The en intake assistant
+(`3edbe85b`) got the same treatment as he: get_request_status attached, the
+"cannot look anything up" block replaced, the Status section added with
+statuses in plain English, rule 3 rewritten, `modelOutputInMessagesEnabled`
+on. Both prompts also gained one line under the no-live-transfer section —
+**the transfer line is said once, ever** — after a test call where the en
+agent said it twice back to back; the history fix should remove the cause,
+the line removes the excuse.
+
+**The inbound agent can now answer ticket status.** New `get_request_status`
+in the debt-tools Edge Function (v11 deployed, tested against live rows):
+read-only, reference-tail matching ("1013" finds HM-2026-1013) then
+resident-on-call then building+unit — the open_request asymmetry, reused. The
+tool points STRAIGHT at the Edge Function with the TOOL_SECRET header, not
+through n8n — n8n answers Vapi locally and forwards writes async, which is
+wrong for a lookup that needs a real synchronous answer. The status answer is
+live truth, not the nightly export, so no §2.2 freshness caveat is owed —
+that caveat belongs to OXS-side status, which this deliberately does not
+touch. Prompt rewritten where it used to forbid lookups ("you cannot look
+anything up" → "the one lookup you have"), a Status section added with the
+status names in the caller's Hebrew, absolute rule 3 rewritten, and two
+stowaways fixed: the stale feminine-first-person line (the voice has been
+male Eyal since the Cartesia move — its own fixed lines were already
+masculine) and `modelOutputInMessagesEnabled` turned on for inbound too,
+before the debt agent's loop bites here. Live on `86a01f13` (16,971 chars)
+and synced back to demo-inbound.md, which was byte-identical to live before
+the edit.
+
+**Expressiveness pass.** Voice: `positivity:low` → `curiosity:high` on the
+Cartesia experimental controls — low positivity was flattening every line;
+curiosity keeps the leaning-in sound without making a collections call
+chipper. Prompt: one HUMAN LAYER paragraph — the TTS reads punctuation, so
+write the melody; one bright word on genuinely good moments, shorter and
+flatter on heavy ones; brightness is a moment, never a mood. 37,629 chars.
+
+**The loop's likely root cause, found on the third pass:
+`modelOutputInMessagesEnabled` was off.** By default Vapi builds the
+assistant's own turns in conversation history from the transcription of its
+TTS audio, not from what the model wrote. Evidence that this was the story
+all along: the "typos" (מאומיז, לבד בית, ועד בק, "ה- link", "רוצה שאת עדכן")
+appear in the bot's *logged* turns — they are Azure mis-transcribing
+Michael's own speech, fed back to the model as its own words. A model whose
+memory of what it said is garbled Hebrew cannot obey a never-repeat rule; it
+does not recognise its own turns. The gpt-4.1-mini call showed the shape
+clearly: flow correct (amount → ask → link → standing order, feminine forms
+right), but the last line re-delivered verbatim after every acknowledgement.
+Flag now true — history is the model's actual output. If the loop survives
+THIS, the remaining suspect list is short and Vapi support is on it.
+
+**Gender, second pass — reviewer criticism, not one bad call.** Three
+reinforcements to GRAMMAR: the inflection table gained את/תרצי/תסגרי rows; a
+new rule that the third person about {{first_name}} carries her gender too
+(the not-the-account-holder line's יחזור → תחזור — the fixed-line inflection
+rule covered endings aimed at the caller but nothing said about the resident
+in the third person); and gender joined the BEFORE EVERY REPLY checklist, so
+the check runs where the model acts instead of five sections away. Also
+name-based inference: gender `unknown` + an unambiguous Israeli name (שרה,
+יוסי) now resolves from the name; phrase-around only when the name settles
+nothing. Prompt 36,443 → 37,129 chars, pushed by PATCH.
+
+### The super-skills doc, distilled into a HUMAN LAYER — most of it rejected
+
+The root-folder `hebrew-voice-super-skills (1).md` (20 techniques for
+humanlike voice agents) was asked into the debt agent. It went in as one
+compact section — THE HUMAN LAYER, after the budgets — not as twenty, because
+most of the doc either already exists in stronger form or directly conflicts
+with rules this prompt earned the hard way on 7 Aug.
+
+Taken (5): pace mirroring (never temperature — hot already has its own rule),
+content-matched answer timing, specific acknowledgement over bare אני מבין,
+one genuine reaction to a personal detail, the demonstrated-memory callback in
+the closing lead-in, warm bridges between subjects.
+
+Rejected, with reasons: varied human goodbyes (the closing is fixed because
+`endCallPhrases` matches on its words — vary it and the call stops ending);
+calculated vulnerability ("יום ארוך", "אני עדיין לומד את המערכת" — the agent
+never pretends to be human); slang examples (סבבה/יאללה banned); the discount
+no-that-feels-like-yes (absolute rule 4 — no discounts, ever); free-value tips
+(invented facts risk); temporal anchoring (no date/weather variables exist);
+time-check and planted callback (wrong length of call). Per the file's own
+editing rules: described what to convey, wrote no Hebrew lines, so no
+`vapi_en.py` change.
+
+Prompt: 34,715 → 36,443 chars. Pushed by direct PATCH to `3303317e` keeping
+the live model object intact — **not** `vapi_sync.py`, whose BASE block still
+says gpt-4.1-mini + Azure and would have downgraded the live gpt-5.4 +
+Cartesia config. That mismatch is now the standing hazard: running
+`vapi_sync.py debt --apply` today clobbers model and voice. The script needs
+its BASE brought up to the live truth before anyone runs it again.
+
+### Demo voice outage: Cartesia credits, two broken signups, and a discovery
+
+The web demo was ending every call at pickup. Call logs showed
+`pipeline-error-cartesia-voice-failed`; a direct TTS test against Cartesia
+returned 402 — the account had hit its credit limit, and the Elliot fallback
+was not rescuing the call. Two fresh Cartesia accounts both stuck at
+"processing your subscription details" and returned 500 on every synthesis
+call until provisioning cleared (their status page showed green throughout —
+the 500s were account-side, not an outage).
+
+The discovery that ended it: **the demo's voice was never a clone.**
+`a976c076` "Eyal - Grounded Guide" is a public Cartesia library voice
+(`is_public: true`, language `he`), usable on a free account. The Pro tier
+gates cloning only. Pointed Vapi's Cartesia credential at the new free-tier
+account, restored the assistant's original voice block (sonic-3, `he`,
+positivity:low, chunkPlan guards, Elliot fallback), and the demo speaks again.
+
+Along the way the assistant briefly ran Azure `he-IL-AvriNeural` as a
+stopgap — rejected as robotic within one test call, which is a real A/B data
+point for the native-voices question.
+
+Open: free-tier credits are small, so heavy rehearsal can drain them; the
+"Echo Stone" clone from `voice/echo-stone-sample.wav` still exists on no
+account (needs a working Pro subscription, or ElevenLabs Starter + eleven_v3
+with latency unmeasured); one or two $5 Pro charges may have gone through on
+the abandoned accounts — check billing, refund via support@cartesia.ai.
+
+### Credentials checklist written; .env.example generalised
+
+`docs/reference/Homies-Credentials-Checklist.md` now lists every account the
+build needs, per the day's decisions: telephony provider undecided (generic
+BYO SIP trunk — gateway IP, SIP username/password), WhatsApp number provided
+by Homies, Meta Business Manager from zero (verification is critical path
+alongside Israeli DID KYC), chatbot LLM via OpenRouter. `.env.example`
+telephony block generalised from Telnyx/Twilio to SIP_* variables; WhatsApp,
+OpenRouter, Google Sheets and Monday blocks added. Domain split in two: n8n
+and Chatwoot subdomains needed at build time (Meta webhook wants HTTPS), the
+CRM's branded domain deferred to handover — Vercel's own URL until then.
+
+### Dashboard pushed — `a2b361b`, the first commit in two days
+
+Twenty-two files: the whole of `dashboard/`, migrations 008 and 009, and the
+feature doc. Everything else from the last two days — Chatwoot, the WhatsApp
+menu and language work, `check_whatsapp.py`, the Supabase writer switch — is
+still uncommitted in the working tree.
+
+Checked before staging rather than after: `.env`, `dashboard/.env.local`,
+`node_modules` and `.next` all ignored, and the staged list confirmed empty of
+them. `.env.local` holds only the URL and the anon key — no service role key
+was ever in it. Added `dashboard/.vercel/` to `.gitignore` ahead of the deploy,
+since `vercel link` writes it on first run.
+
+`dashboard/.env.example` documents the two variables Vercel needs and says
+plainly why the service role key is not among them. **Root Directory must be
+set to `dashboard`** in the Vercel project — the app is not at the repo root,
+and Vercel will otherwise build the repository and find no `package.json`.
+
+## 2026-08-08
+
+### A dashboard, and the three things it would have shown as facts
+
+Asked for a dashboard over tickets, calls, concerns and transcripts, with
+everything in Supabase. Most of the work was the second half of that sentence.
+
+**Chat transcripts were not stored anywhere.** The conversation lived in n8n's
+memory node — context for the model, never a record: capped at 30 messages, not
+queryable, gone on restore. Migration 008 adds `messages`, one row per message
+both directions, plus `v_conversations`. A child table rather than a bigger
+`transcript` column because chat has no end-of-call moment to write one at, and
+a read-modify-write of a growing string loses one of two concurrent messages.
+
+**Every WhatsApp interaction was filed as an outbound voice call.**
+`interactionId()` hardcoded `channel` and `direction` from when Vapi was the
+only caller — the same shape as `opened_via` that morning. A calls page would
+have reported calls that were never placed. Fixed; the four bad rows deleted.
+
+**The log wrote our words as the resident's.** On the media and menu branches
+Sort's `text` holds the *reply*, not the message, so the transcript had the bot
+greeting itself. `in_text` is now carried separately from the first line.
+
+**And logging was downstream of a failure.** `Log reply` sat to the right of
+`Send`, so when Send failed — a recipient off the test allow-list — the run
+aborted and nothing was logged. executionOrder v1 walks the canvas top to
+bottom, so the node moved above Send. A send failure is exactly when the record
+matters most.
+
+Verified end to end: a four-message conversation, both sides, correct types,
+`interactive` for the menu, `(no text)` for the image.
+
+**Then the leak.** `messages` shipped in 008 without RLS. Every other table has
+it on — the anon key reads nothing from them — and `messages` returned real
+rows to it. **The anon key is public by design; it ships in the browser
+bundle.** Anyone with it and the project URL could read every resident's
+conversation. Live about an hour, four test threads, no real resident. Luck.
+
+Migration 009 enables RLS, grants `staff_read` to `authenticated` and never to
+`public` (which includes `anon`), sets `security_invoker` on the views — a view
+otherwise reads with its owner's rights and hands rows out regardless of who
+asked, which is what `v_conversations` was doing — and **fails the migration**
+if any table in `public` has no RLS. 008 got through because nothing looked.
+
+The dashboard itself is Next.js 14, seven pages, no CSS framework, builds
+clean. Read-only by construction: no write policy exists, and an insert from a
+staff session returns `42501`. Confirmed with a temporary auth user — signed in
+reads all five tables, writes are refused, signed out reads nothing — then the
+user was deleted.
+
+Two build failures worth keeping. A single `lib/supabase.ts` exporting both
+clients cannot compile: the login page is a Client Component and importing a
+module that touches `next/headers` fails even unused. And the cookie callbacks
+needed explicit types under `strict`.
+
+Not deployed — Vercel needs their account. `NEXT_PUBLIC_SUPABASE_ANON_KEY` and
+nothing else; the service role key in a browser bundle would hand a stranger the
+whole database.
+
+### Chatwoot is up at chat.srv1879140.hstgr.cloud
+
+Deployed to the VPS that already runs n8n. Four containers, valid certificate,
+`4.16.2`, `queue_services: ok` and `data_services: ok` — sidekiq and Postgres
+both actually connected, not merely running.
+
+Three assumptions were wrong and each was caught by reading the box instead of
+trusting the plan.
+
+**There is no Traefik network.** `ss` showed `traefik` itself owning :80 and
+:443 rather than `docker-proxy`, which means host networking. The compose file
+had declared `proxy` as `external: true` and would have refused to start.
+Traefik reaches containers at their bridge IP through the Docker socket, so
+Chatwoot needs only its own network plus labels — and with
+`--providers.docker.exposedbydefault=false`, the labels are not optional.
+
+**The certresolver was not worth guessing.** It is `letsencrypt`, copied
+verbatim from n8n's own labels on the same box.
+
+**No DNS work was needed at all.** `*.srv1879140.hstgr.cloud` is a wildcard —
+`chat.`, `n8n-zqvb.` and a random string all already resolve to
+186.240.147.235. HTTP-01 only needs the name to point at a box we control, not
+ownership of the zone, so the certificate issued on first boot. The free domain
+hPanel offers was never a blocker.
+
+Two smaller things. `base: &base` is written as a service in Chatwoot's own
+published compose, and compose obligingly starts it as a container that does
+nothing; it is an `x-` extension field here. And `db:chatwoot_prepare` logs
+`PG::UndefinedTable: relation "installation_configs" does not exist` in red —
+an initializer running before the schema exists, with `Loading Installation
+config` succeeding four lines later. Alarming and harmless.
+
+`ENABLE_ACCOUNT_SIGNUP=false` does not lock out the first admin: every route
+redirects to `/installation/onboarding` until an account exists. Verified before
+handing the URL over, since the opposite would have meant a fresh install
+nobody could log into.
+
+Memory caps — rails 2g, sidekiq 1g — are there to protect n8n, which shares the
+box. `curl` against n8n returned `HTTP/2 200` after the deploy.
+
+### Chatwoot: self-hosted, and it owns the number
+
+Two decisions, both taken 8 Aug.
+
+**Self-hosted on Hostinger.** At 19 staff, Chatwoot Cloud is $19/agent/month —
+about $361/month against a VPS at $7–15. The trade is that upgrades and backups
+become ours, which is the trade already made for n8n on the same provider.
+
+**Chatwoot owns the WhatsApp number**, with n8n behind it as an *agent bot*.
+The alternative — n8n keeps the number, Chatwoot mirrors conversations read-only
+— is less disruptive today and leaves the per-conversation AI toggle and real
+human handover permanently impossible, which are two of the six capabilities
+being asked for. A webhook answers every message by definition: there is no seat
+to assign to, no second participant to hand to, and nowhere for "the bot is off
+for this thread" to live.
+
+The bot itself does not change. Agent, prompt, both tools, the Supabase writer —
+all stay. What changes is who calls them.
+
+Written: `deploy/chatwoot/` (compose, Caddyfile, env template) and
+`docs/features/12-chatwoot/feature.md`. Four services — rails and sidekiq are
+separate processes sharing one image, and running rails alone gives a working
+dashboard that delivers nothing. Postgres must be **pgvector**, not plain, or
+`db:chatwoot_prepare` fails. Caddy terminates TLS because Meta will not deliver
+to a self-signed callback, so the certificate is the channel rather than a
+nicety. `deploy/chatwoot/.env` is gitignored.
+
+Not deployed — it needs DNS and an SSH session, which are the user's.
+
+**It goes on the VPS that already runs n8n**, srv1879140 / 186.240.147.235,
+KVM 2, at 11% memory and 4% disk on 8 Aug. A second VPS buys isolation for
+another $7–15/month and is not worth it at this size.
+
+Two things changed once the actual box was looked at rather than assumed.
+
+**The Caddy service was deleted.** Port 80 there answers a bare `301 Moved
+Permanently` with no `Server` header — Traefik, which is what Hostinger's n8n
+template ships. A second proxy would have fought for 443, and the process that
+failed to bind might have been the one serving n8n. Chatwoot now attaches to
+the existing Traefik by labels, publishes no ports at all, and keeps Postgres
+and Redis on a private network the n8n containers cannot see.
+
+**Memory limits were added, to protect n8n rather than Chatwoot.** This box
+runs the bot. If Rails leaks on 2 vCPU the OOM killer picks its victim by size,
+and the victim could be n8n — taking WhatsApp down to fix nothing. `rails` 2g,
+`sidekiq` 1g.
+
+The two Traefik values — network name and certresolver — are discovered on the
+box, not guessed. A wrong network means Traefik cannot see the container; a
+wrong resolver means no certificate, and Meta will not deliver to a callback it
+cannot verify.
+
+The risky step is documented and is the only one: moving the callback means a
+few minutes where Meta points at something not yet answering, and inbound
+messages in that window are lost rather than queued. The test number has no
+residents on it, so the first pass is free.
+
+### Supabase is the store of record, and three guardrails now hold it there
+
+Asked for Supabase, duplicate protection, and guardrails against the whole
+thing unravelling again. All three, in that order.
+
+**The writer moved.** `_writer()` in `n8n_deploy.py` returns the Supabase Edge
+Function instead of the Apps Script URL, with the shared secret in a header
+rather than the query string. Smaller than it sounds: both stores answer in the
+same Vapi shape, and both writer nodes forward the untouched original envelope,
+so a URL and a header changed and nothing in the graph moved. Voice and
+WhatsApp both write to Supabase now. Apps Script stays deployed as the export
+target and is no longer the store of record.
+
+**The duplicate guard is in the Edge Function**, not in the prompt, because a
+guard the model can decline is not a guard. Same building, same type, same unit
+(`.is()` for NULL, since `.eq()` never matches it and common-area faults are
+the ones most likely to be reported twice), still open, inside 30 minutes → the
+existing reference comes back with `duplicate: true`. Not keyed on the
+description: two people describing one lobby leak will not phrase it alike, and
+substring matching on free text is the kind of clever that fails silently.
+Verified across five cases — same place dedupes, different building does not,
+same building with a unit is distinct from the same building without one.
+
+**`scripts/check_whatsapp.py` checks consequences, not configuration.** It
+posts a real signed message at the live URL and then looks in the database for
+the row, because every serious fault this bot has had was silent and would have
+passed a config audit: the half-wired webhook, the wrong WABA subscription, the
+truncated reference, a week of tickets in a spreadsheet, a regex full of
+backspace characters. Seventeen assertions, exits non-zero, cleans up after
+itself.
+
+It failed twice on its first two runs, which is the point.
+
+**Once on a bad fixture of mine** — the building was `__selfcheck__` and the bot
+asked which building, correctly, because no building is called that. A fixture
+the system is right to reject is a broken fixture.
+
+**Once on a real bug.** A lobby leak wrote `unit = "שטחים משותפים"` — "common
+areas". The prompt says common property has no apartment and the model complied
+with the idea while filling in the field. Nothing errors, the row reads
+correctly to a person, and it is wrong to every query: `unit IS NULL` stops
+finding common-area faults, grouping by unit invents a flat called Common
+Areas, and the new duplicate guard stops matching. **A model told to leave a
+field empty will often name the emptiness instead.** `unitOf()` now decides:
+a unit is short and contains a digit, and a label is not a unit.
+
+`opened_via` was hardcoded `"voice"` at all three insert sites and was about to
+start lying, since WhatsApp writes through the same function. `channel()` reads
+the `wa:` call-id prefix.
+
+Four test rows deleted afterwards; `requests` is back to the one real row.
+
+### Every ticket opened today went to a spreadsheet, not to Supabase
+
+Asked whether `HM-2026-8282` was in the database. It is not, and neither is any
+other reference the bot has read out today.
+
+`requests` in Supabase holds **one row** — `HM-2026-1001`, 08:06, from a direct
+test of the Edge Function. Checked with the service-role key, so this is not RLS
+hiding rows; the anon key sees zero.
+
+The tool webhook the bot calls, `homies-debt-tools` on n8n, does not post to
+Supabase at all. Its writer node posts to the **Google Apps Script bridge**, and
+`call_requests` on that spreadsheet now holds 28 rows. The reference comes back
+from the sheet, which is why it looks real: it *is* real, in the wrong place.
+
+So the two halves of this system have been drifting apart in plain sight. The
+Edge Function got three fixes today — the `open_request` building bug, the
+urgency validator, `save_partial_request` — and **nothing calls it except the
+end-of-call report**. The voice agents and WhatsApp both write through the same
+n8n router, and that router writes to Sheets.
+
+Nothing is lost; every ticket exists. But the CRM in Phase 6 reads Supabase, the
+migrations describe Supabase, and `requests.reference` is generated by a Postgres
+default that has produced exactly one value.
+
+Not fixed — repointing the writer is a one-node change, but it swaps the store
+of record for the voice agents at the same time, and that is a decision rather
+than a repair.
+
+### The language stopped being the model's decision
+
+Reported a second time from a handset, after the bilingual fixed lines were
+already in: English menu, `Balance and payments` tapped, Hebrew handover line
+back. The prompt said the right thing and the model did not do it — a rule
+competing against a conversation history that was largely Hebrew, and history
+kept winning.
+
+So it is no longer a rule. **Sort decides the language in code and remembers
+it**, per phone, in the same workflow static data that holds duplicate
+suppression:
+
+- an explicit request — the menu row, or the word in either language — sets a
+  preference and it **sticks**;
+- otherwise the script of the message decides, and updates the preference, so
+  someone who goes back to typing Hebrew gets Hebrew back;
+- a photo, which carries no words, falls back to whatever was already chosen.
+
+The decision then rides **on every turn** as a directive at the top of the
+message (`[Answer this message in ENGLISH.]`), rather than sitting in a constant
+system prompt — a constant instruction is precisely what was already failing
+against live context. Same caveat as the dedupe map: static data does not
+survive an n8n restore, and the cost of losing it is one message in the wrong
+language.
+
+Two things fell out of testing it:
+
+**A bare `speak english` was answered with the media line** — *"I can only read
+text here"*, in reply to text. Nothing about that message needs a model: the
+switch is a fact Sort has already established. It now gets a fixed confirmation
+in the new language. Guarded by a leftover check, so *"speak english, there is a
+leak in the lobby at Herzl 14"* still reaches the agent, in English, with the
+leak intact — verified.
+
+**And the first attempt at that guard silently did nothing.** The patch script
+wrote `"\b"` into the regexes, which in Python is a **backspace character**, not
+a word boundary. `/\benglish\b/` shipped as `/‹BS›english‹BS›/` — a valid regex
+that matches nothing. No error anywhere; the Hebrew branch worked because its
+patterns have no `\b`, so half the feature passed its test and the other half
+quietly did not. Ten of them across the file, now repaired.
+
+### A fixed line was fixed in one language
+
+Found by the client on a real handset, which is the only place it could have
+been found. English was tapped from the menu, the intro came back in English,
+then *"any update on my ticket?"* was answered with
+`אני מעביר את זה לצוות, נחזור בהקדם.` — an all-English conversation ending in
+Hebrew.
+
+The language rules written an hour earlier were obeyed exactly. The handover
+line is not written by the model: the prompt names it verbatim as one of two
+**fixed lines**, and a fixed line is fixed in the language it was written in.
+Two correct rules, and the newer one had no authority over the older one.
+
+Both fixed lines now exist in both languages, with the rule stated where it was
+missing: *a fixed line stays fixed, but it does not stay Hebrew.* The error
+branch's copy is an expression over the language Sort detected, so a model
+failure cannot undo the language choice either.
+
+Re-tested end to end on the same sequence: `hi` → English menu → tap English →
+*"Hi, Michael from Homies. How can I help?"* → *"any update on my ticket?"* →
+*"I'm passing this to the team, we'll get back to you shortly."*
+
+Third instance today of one shape: **a rule that reads as absolute silently
+outranks the rule that should have qualified it.** After the apartment question
+and the announcement, this one crossed languages rather than sections.
+
+**`transfer_to_human` remains unreliable** — called on the ticket-status
+question, not called on *"how much do I owe?"*, both in the same batch. The line
+is delivered either way, so the resident is told a human is coming while nobody
+is told anything. Not fixed.
+
+### A menu on the first message, and English when asked
+
+Two asks: buttons to choose from, and an English mode triggered by saying so.
+
+**The menu is a list, not reply buttons** — buttons cap at three and the client
+picked five options. Meta's limits are hard: row title 24 characters,
+description 72, list button 20, ten rows total. Two of the five rows,
+`status` and `balance`, are **not built** and route to a human. That was the
+explicit choice: the gap is visible rather than hidden, and a tap lands exactly
+where the same question in words already lands.
+
+**The menu appears only for a bare greeting.** `שלום` gets it; `שלום, יש נזילה
+בלובי בהרצל 14` does not — it opens a ticket, because answering a stated fault
+with a menu would undo the morning's rule about not asking what happened when
+already told. The greeting test is anchored and whole-string, after stripping
+emoji and trailing punctuation.
+
+**Parsing taps had to land in the same change.** An `interactive` message
+carries no `text` field, so under the old parser a resident tapping a button we
+had just sent them would have been told *"I can only read text"*. Sort now reads
+`button_reply` and `list_reply`, keeping the row id for the log and passing the
+title on as the message.
+
+**Menu language is chosen by script detection** — one Hebrew character decides
+it — because the menu is sent without a model call.
+
+**English mode lives in the conversation memory**, whose window went 12 → 30.
+That is the whole mechanism, and its boundary is worth writing down: the switch
+survives exactly as long as the request is still inside the window. A hard
+per-phone language field belongs in an n8n Data Table, which this instance
+supports (`/api/v1/data-tables` responds) and which is the right fix when the
+toggle must survive indefinitely.
+
+Seven paths tested. Hebrew greeting → Hebrew menu; `hi` → English menu; a
+balance tap → handover **with `transfer_to_human` actually called**, which is
+the tool that was narrated-but-not-called earlier today; an `open` tap → asks
+what happened; greeting-plus-fault → ticket `HM-2026-9030`, no menu; and
+`speak english please` mid-conversation → *"Hey, Michael from Homies. How can I
+help?"*.
+
+Every send in those runs failed `131030` on invented numbers, which proves the
+allow-list and **not** the payload — Meta may check the recipient first. So the
+Hebrew menu was sent for real to the registered test number and delivered
+(`wamid.HBgMNjM5NjAzOTEzNTE0…`). The list payload is valid.
+
+### The bot introduces itself now — and was truncating reference numbers
+
+First real WhatsApp exchange, execution 82: `hi` in, `שלום, מה קרה?` out,
+delivered. Correct, brief, and from nobody — a resident has no way to tell they
+reached the building company rather than a wrong number. The first message in a
+conversation now carries a name and a company (`היי, מיכאל מהומיז. מה קרה?`),
+written as a rule rather than a third fixed line, plus two explicit guards: do
+not introduce yourself twice, and do not ask `מה קרה?` when the first message
+already said what happened. Both verified.
+
+**Found while checking that: the model was silently truncating the reference
+number.** `open_request` returned `HM-2026-8884` and the resident was told
+`2026-8884`. Both test tickets, so it is default behaviour, not a one-off.
+
+Nothing errors, the ticket is real, the reply reads perfectly, and the resident
+writes down an identifier that will not be found when they quote it to staff.
+The prompt already said *do not invent a reference number* and that rule was
+obeyed — the number came from the tool. Passing a value through to a human
+**unaltered** is a different instruction and had to be written separately, with
+the exact failure named, because "exactly" is what the model already believed it
+was doing. Re-tested: `HM-2026-8894` in, `HM-2026-8894` out.
+
+### A rule loses to the headline above it — twice, in the same reply
+
+Execution 89, a stuck lift with the floor given, answered
+`אני פותח קריאה על מעלית תקועה. יש מספר דירה?`. Two faults, and both rules
+already existed.
+
+**The apartment question.** The rule was not too weak, it was in the wrong
+place. The section opened *"ארבעה דברים: מה התקלה, באיזה בניין, **באיזו דירה**,
+וכמה זה דחוף"* — four required things stated unconditionally — with the
+common-property exception three paragraphs below. The model followed the
+headline, which is what a headline is for. Folded the exception into the
+definition instead: **three** things now, and *where* is one question with two
+answers — inside a flat needs building and unit, common property needs the
+building and nothing else, not the floor either.
+
+**The announcement.** `אני פותח` was said before `open_request` ran, in a
+message that then asked a question instead of calling it. The tool never ran.
+The old rule said *do not say you opened a ticket before the tool returned*, and
+the present tense complied with the letter of it.
+
+Tightening that surfaced a third habit on the next run: `אני פותח קריאה על שער
+חניון שלא נסגר. זה בסדר?` — asking permission to do the one thing it exists to
+do. A resident who reports a gate has already asked. Added: never ask to open,
+only ask for what is missing.
+
+Four fault types re-tested afterwards, all correct — gate, bulb and lift open
+without asking anything, an in-flat leak with a unit opens, an in-flat fault
+without one asks for the unit, and a lift asked first whether anyone was
+trapped, which is the safety rule working unprompted. References matched the
+tool in every case.
+
+**The general lesson, and it appeared twice in one day: an exception placed
+after a categorical statement does not modify it.** Fold it into the statement,
+or stop the statement being categorical.
+
+**Judgement call left open:** *"יש רעש מהגג כל הלילה"* was answered with
+*"איזה רעש?"*. The prompt says do not ask a resident to re-describe a fault; a
+real service worker probably would ask this one. Not changed.
+
+### The WABA was subscribed to the wrong app, and nothing would have said so
+
+With the API Setup token in hand, `GET /{waba}/subscribed_apps` listed exactly
+one app — **"WA DevX Webhook Events 1P App"**, Meta's own dev-tools listener.
+Not HOMIES. App-level registration (done 8 Aug) tells Meta *where* to deliver;
+it does not subscribe the Business Account to the app. Both are required and
+only one of them is the step anyone writes down.
+
+The failure mode is the one this workflow keeps producing: the callback URL
+shows verified in the dashboard, the workflow shows active, the number accepts
+messages, and no execution ever runs. Third time the same silent-success shape
+has appeared here — after `multipleMethods` output 1 and after `serverUrl: null`
+on the voice assistants. `POST /{waba}/subscribed_apps` with the user token
+fixed it; both apps are now listed.
+
+Then a full end-to-end run against the live URL with a correctly signed
+envelope — *"יש נזילת מים בלובי של הרצל 14"*:
+
+    WhatsApp → Sign the raw body → Sort → Answer Meta (200 in 0.8s)
+    → Is there a message? → OpenRouter + open_request
+    → "פתחתי קריאה 2026-8884. אעדכן בהמשך."
+    → Send  ✗ 131030 Recipient phone number not in allowed list
+
+Nine nodes correct, one refusal, and the refusal is the right one: the test
+number only delivers to hand-registered recipients. Reproduced the same error
+straight against Graph to prove it was the allow-list and not the credential —
+`131030`, not a `190`. The credential works.
+
+Note the row: reference **2026-8884** in `requests` is test data written against
+the invented number 972500000001.
+
+### The send token goes in n8n's credential store, not in the workflow
+
+Asked to run on Meta's **test number** for now, which is the right call — it
+needs no Business verification, so it un-blocks the last row of the checklist
+today instead of in one to two weeks. Two limits come with it: it only sends to
+up to five recipient numbers you register by hand, and its access token expires
+roughly every 24 hours.
+
+Neither of the two values can be fetched by API. `APP_ID`/`APP_SECRET` reach the
+app, and the phone number id and access token hang off the **WhatsApp Business
+Account** — `/{app-id}/whatsapp_business_accounts` and both its owned/client
+variants return `(#100) nonexisting field`, because those edges live on the
+Business, which an app token cannot see. They have to be copied from the
+dashboard.
+
+What did change is where the token lands. The Send node carried
+`Authorization: Bearer <token>` as a plain header parameter, which writes the
+token into the workflow JSON — readable by anyone with n8n access, and carried
+into every export and backup. It is the same mistake the Crypto node stopped us
+making with `APP_SECRET` yesterday, except n8n *refused to publish* that one and
+nothing refuses this one. `ensure_send_cred()` now creates an `httpHeaderAuth`
+credential and the node references it by id.
+
+It deletes and recreates on every `--apply` rather than reusing the id. n8n's
+public API can create and delete a credential but not update one, and a 24-hour
+test token means rotation is routine — reusing the id would mean silently
+sending yesterday's token. Recreating guarantees the value in `.env` is the
+value in n8n.
+
+### The voice agents now record their own calls — eleven of them were thrown away
+
+`interactions` had zero rows. Eleven test calls happened on 7 Aug and every
+transcript, every ended reason and every latency figure from them lives in the
+Vapi dashboard and nowhere the CRM, the scoreboard in
+[08-instrumentation](features/08-instrumentation/feature.md) or a native Hebrew
+reviewer can reach. The table has had columns for `transcript`, `summary`,
+`audio_url`, `duration_seconds` and `latency_ms` since `001` on 2 Aug and
+nothing has ever written one. The tools created stub rows during a call and no
+second half ever arrived.
+
+The cause was one missing field. All four assistants had `serverUrl: null` and
+`serverMessages: []`, so Vapi computed the end-of-call report and posted it
+nowhere.
+
+**This was blocked and stopped being blocked today.** `vapi_sync.py` has said
+since 5 Aug that the proper fix for the duration cap "needs a server URL that
+does not exist yet". Deploying `debt-tools` this morning created one.
+
+Now live on all four:
+
+```
+server         https://…supabase.co/functions/v1/debt-tools
+serverMessages ["end-of-call-report"]
+```
+
+**One message and not eleven.** `conversation-update` and `speech-update` fire
+several times a second, each a round trip to Tokyo into a function that writes
+the same row. The end-of-call report carries the transcript, the recording, the
+duration, the ended reason and the latency in a single POST *after* the call is
+over, where nothing it does can cost the caller a millisecond.
+
+The report endpoint is resolved by its own `report_server()`, deliberately not
+by `tool_server()`. They are the same URL today and they are not the same
+decision: the tool endpoint follows where the integrations live and currently
+picks n8n, which has no handler for a server message at all. Pointing the report
+there would have returned 200 and written nothing — the failure that leaves no
+trace anywhere.
+
+Verified against the live function with four cases before anything was pushed: a
+`status-update` acknowledged and ignored; a report writing one filled row; a
+tool firing first and the report updating that same row rather than making a
+second, keeping the more specific `transfer:hardship` over `caller_hung_up`; and
+a cut-off call salvaged. Test rows deleted.
+
+### Three bugs the wiring turned up on the way
+
+**`open_request` was dropping the inbound caller's building.** It read
+`ctx.building ?? ""` — the value the campaign runner attaches to an outbound
+call. Inbound there is no caller ID and no lookup, so the building only ever
+arrives as a tool argument, and this file never read it. Every intake ticket
+written through Supabase would have carried an empty building while the agent
+read a real reference number back to the caller. n8n does it right
+(`ctx.building || args.building || ''`), which is why nothing has shown up yet:
+the live assistants post to n8n. It would have appeared on the day we switched.
+
+**`save_partial_request` did not exist in the Edge Function.** The live intake
+assistant carries the tool. Pointing it at Supabase would have answered `unknown
+tool save_partial_request` at the exact moment it was salvaging a failing call —
+the one outcome feature [07](features/07-partial-ticket/feature.md) says is not
+allowed. Written now, against the `needs_review` status migration `003` added for
+it, and it never refuses: an empty description is a real answer, because it says
+the audio was unusable.
+
+**`urgency` is validated in the function instead of by Postgres.** Yesterday's
+`urgent` reached the database and came back as an English constraint message
+mid-Hebrew-call. There is now a small synonym map — `urgent`→`high`,
+`critical`→`emergency` — and anything unrecognised lands on `normal`, not `low`:
+the failure that matters is an emergency filed as routine.
+
+### The duration cap has a net under it that the model cannot decline
+
+Vapi hangs up on the second `maxDurationSeconds` expires, mid-word, and never
+tells the model it is coming — so the agent cannot be relied on to call
+`save_partial_request` first. The report handler now sees `endedReason:
+max-duration-exceeded` or `silence-timed-out`, checks whether the call produced
+any row at all, and if not writes a `needs_review` request with the transcript in
+it verbatim.
+
+Verbatim rather than summarised, deliberately. Summarising means guessing the
+building, and a guessed building on a maintenance ticket sends somebody to the
+wrong address.
+
+### Voicemail detection was off on both outbound agents
+
+`voicemailDetection: {}` is not a neutral default on an agent that dials people.
+It is the agent holding a full debt conversation with an answering machine,
+reading a resident's balance into a recording anyone in the household can play
+back, and hanging up having logged nothing. `voicemail` has been a value in
+`log_call_outcome`'s enum since 4 Aug; nothing was ever detecting it.
+
+On now, Vapi's own model rather than a beep timeout — Israeli carrier greetings
+run long, and a fixed timer either cuts off a real person who paused or waits
+through the whole greeting. **No `voicemailMessage`.** Leaving a recorded message
+about somebody's debt on a machine is a disclosure to whoever plays it, which is
+a decision for Homies and their lawyer rather than a config default. Detect, log,
+hang up, let the campaign runner try again.
+
+### Both English twins have diverged and refuse to rebuild
+
+`vapi_en.py intake` and `vapi_en.py debt` both stop rather than build:
+
+```
+intake  9 passages no longer match — including "You are Michal…"
+debt    LANGUAGE block did not match. The Hebrew prompt has changed.
+```
+
+That is the safety property doing exactly what it was written to do. The cost is
+that both live English assistants are stale copies of prompts that no longer
+exist — the intake twin is still feminine *Michal* while the Hebrew agent has
+been masculine *Michael* since 7 Aug. **An English twin that has quietly stopped
+representing the Hebrew one is worse than no twin, because it gets trusted.**
+
+The two changes that do not touch a prompt were applied to them directly:
+`waitSeconds` and the report endpoint. Rewriting the two substitution tables is a
+job of its own and is not done.
+
+`waitSeconds` was still 0.4 on both twins — the 7 Aug latency fix only reached
+the Hebrew pair. That field is dead time before any work starts, so unlike the
+punctuation timers around it, it is not a property of the language, and leaving
+it made the twin 150ms slower than the assistant it exists to represent.
+
+### Meta is connected to n8n, and the webhook is no longer forgeable
+
+`APP_ID` and `APP_SECRET` arrived in `.env`. They are **not** the two values the
+workflow needs to send — that is still `WHATSAPP_PHONE_NUMBER_ID` and
+`WHATSAPP_ACCESS_TOKEN`, which live on the WABA rather than on the app, and an
+app access token can reach neither. What they *are* good for turned out to be
+two things that mattered.
+
+**One: the callback is registered, by API rather than by hand.**
+`POST /{app-id}/subscriptions` accepts an app access token, so the dashboard
+step is now a script:
+
+```
+object     whatsapp_business_account
+callback   https://n8n-zqvb.srv1879140.hstgr.cloud/webhook/homies-whatsapp
+fields     ['messages']
+active     True
+```
+
+Meta called the GET challenge as part of that and got the right answer, so
+verification passed on the first attempt.
+
+**Two: the webhook was an open endpoint that files service tickets, and now it
+is not.** Every POST Meta sends carries `X-Hub-Signature-256`, an HMAC-SHA256 of
+the raw body keyed on the app secret. Nothing was checking it. Anyone who
+learned the URL could have posted a forged envelope with any phone number in it
+and opened a real ticket against a real resident — as I did repeatedly today
+with `curl`, which is exactly the point.
+
+```
+correctly signed   -> passes, opens the ticket, replies
+no signature       -> dropped, "unsigned"
+wrong signature    -> dropped, "bad signature"
+GET verification   -> still echoes the challenge
+```
+
+All four answer **200**. Meta must never be told to retry, and a caller who is
+not Meta learns nothing from the response.
+
+**Two things went wrong on the way, and both are worth keeping.**
+
+`require('crypto')` in the Code node throws **`Module 'crypto' is disallowed`** —
+this n8n runs Code in a task-runner sandbox with builtins blocked, which is a
+server setting we cannot reach from here. It broke every message for a few
+minutes before the executions showed why. The fix is n8n's native Crypto node,
+which needs no module and takes the secret from the credential store instead of
+from a string baked into this repo's source. Better in both directions.
+
+Then n8n **refused to publish** the first attempt:
+
+```
+Cannot publish workflow: Node "Sign the raw body":
+  Missing or invalid required parameters: secret
+```
+
+`typeVersion: 1` of the Crypto node takes the secret as a plain node parameter,
+which would have written `APP_SECRET` into the workflow JSON. V2 reads it from a
+`crypto` credential. The server-side validation caught a real mistake before it
+shipped — the same check `validate_workflow` would have made, arriving from the
+other direction.
+
+Two n8n credentials now hold secrets that used to be, or would have been, in
+files: `Homies OpenRouter` and `Homies Meta app secret`.
+
+### The real WhatsApp requirement arrived, and the bot is one sixth of it
+
+PRD item 3, from the client, saved verbatim in
+[11-whatsapp-bot/prd.md](features/11-whatsapp-bot/prd.md). It is not a request
+for a bot. It is a request for a **centralised WhatsApp system** — one business
+number, employee seats, four departments (Collections, Operations, Management,
+Service), chat transfer between agents, open/closed ticket tracking, full logs
+with automatic summaries and topic tagging, and an AI bot that is **one
+participant in that inbox** rather than the thing itself.
+
+Six capabilities are named. **We have one.** Opening service tickets works end
+to end; sending payment links exists but belongs to the debt agent and is not
+attached here; FAQs, ticket status and balance/debt do not exist.
+
+**The structural item is the per-conversation on/off toggle.** Today the webhook
+answers every message that reaches it — that is what a webhook is. There is no
+per-conversation state and nowhere to keep it. Meta's Cloud API delivers to
+exactly one callback URL, so whatever owns the inbox owns that URL and n8n moves
+behind it. That is not a feature to add later; it decides the shape.
+
+**And it reopens a question that was closed by accident.** The bot identifies
+nobody: it takes the phone off the envelope and files a ticket against it, which
+is safe *because it only ever writes*. Three of the six new capabilities — ticket
+status, balance, debt — **read** personal financial data back to whoever is
+holding a handset. PRD §13 #1, the verification method, has been open since the
+first spec and blocked nothing. It now blocks two capabilities.
+
+**The Chatwoot decision from 7 Aug is worth revisiting on its own terms.** It was
+deferred partly because the only VPS was shared production carrying four other
+clients — an objection that died this morning when Homies' own n8n turned up.
+What is left of the argument is real (a Rails stack to run and maintain) but the
+thing it was deferred *for* — a handover inbox nobody had asked for — is now
+explicitly asked for, in writing, four times over.
+
+### The bot is male, the resident is not assumed to be — and it stopped sounding like a bot
+
+Asked for: Hebrew as the main language, natural and local and casual so it reads
+as a person, and **male** — masculine forms only, with better words where a word
+carries too many meanings.
+
+**The male half is easy. The other half is the one that can hurt somebody.**
+Hebrew marks gender on the imperative and the second person, so `תכתוב לי` and
+`אתה גר` are said to a man, and roughly half of ~10,000 apartments are not men.
+Nothing in the WhatsApp envelope gives a resident's gender; a display name is a
+guess. So the prompt now carries two rules, not one:
+
+| | Rule |
+|---|---|
+| About **himself** | Masculine, always — `אני פותח`, `אני מעביר`, `רשמתי`. |
+| About **the resident** | Never gendered — `אפשר לכתוב`, `יש כתובת?`, `מה קרה?` |
+
+This costs nothing in register, which is why it works: `אפשר לכתוב לי מה קרה?`
+is *more* natural in a service context than `תכתוב לי מה קרה`, not less.
+
+**And the first draft of the handover line broke that rule.** `יחזרו אליך
+בהקדם` — without niqqud `אליך` is *elecha*, addressed to a man. The fix is not a
+slash or a spelling trick: drop the addressee. `נחזור בהקדם` is first person
+plural, which is how a company talks anyway, and carries no gender at all. Both
+fixed lines were re-checked for the same fault afterwards.
+
+**Three words were replaced for carrying too many meanings:**
+
+| Was | Now | Why |
+|---|---|---|
+| פנייה | קריאה / קריאת שירות | `פנייה` first means *turning*. `מספר קריאה` reads as a reference number without needing context. |
+| בעיה | תקלה | `בעיה` is any problem, including a personal one. `תקלה` is a fault in something meant to work. |
+| נציג מהצוות שלנו | הצוות | Translated-sounding, and `הוא יחזור` genders a colleague nobody has met. |
+
+**The register section names the tells rather than describing a tone.** No
+`איך אוכל לסייע`, no `מה שלומך`, no `תודה שפנית אלינו`, no `אשמח לעזור`, no
+emoji, no openers and no sign-offs. Written formal Hebrew is what a model
+reaches for by default and is exactly what makes it read as a machine.
+
+**Four faults found by testing, three of them mine.**
+
+1. `אוקיי` was listed as approved vocabulary, so the model opened a conversation
+   with it — *"אוקיי, מה קרה?"* to a bare `שלום`. Those words are acknowledgements
+   of something already said, not openers, and the prompt now says so. Now:
+   *"היי, מה קרה?"*
+2. Two questions in one message to a frustrated resident. The one-question rule
+   was a sentence; it is now a hard count — **one question mark per message**.
+3. `מישהו שכועס` sent every irritated person to a human. Someone frustrated that
+   a fault has not been fixed does not want to be passed on, they want it
+   written down. Split: frustrated → open the ticket; angry **at us**, or
+   demanding a manager → transfer.
+4. **A contradiction I wrote myself.** `מעלית תקועה עם אדם בפנים` sat in the
+   urgency examples *and* under the safety rule that says never open a ticket.
+   The model obeyed the first and opened a ticket for people trapped in a lift.
+   Removed from the urgency list; the safety rule now names the cases and says
+   explicitly not to do both.
+
+**Verified live through the webhook after each fix:**
+
+```
+"שלום"                              היי, מה קרה?
+"הדלת של הכניסה לא נסגרת"           באיזה בניין מדובר?        (building, not apartment)
+"המעלית תקועה, יש בפנים אנשים"      transfer_to_human only, no ticket
+"נזילה במקלחת, ויצמן 8 דירה 4"      טיפלתי. מספר קריאה HM-2026-3496.
+"שלום, החניון מוצף מים"             אוקיי, יש הצפה בחניון. באיזה בניין זה קרה?
+"כבר פניתי פעמיים… תעבירו למנהל"    transfer_to_human {reason: caller_request}
+```
+
+Every reply carries exactly one question mark or none, addresses nobody by
+gender, and speaks in active first person.
+
+**Still not reviewed by a native speaker,** which is the same standing gap the
+voice prompts carry and it has now grown. Every line above was written, not
+transcribed. The three to put in front of an Israeli first are the handover
+line, `טיפלתי` as a closing, and whether `קריאה` or `פנייה` is what Homies'
+own staff actually say.
+
+### Gemini 2.5 Flash, and the WhatsApp bot answered a resident for the first time
+
+Model switched from `anthropic/claude-opus-5` to `google/gemini-2.5-flash`, asked
+for directly. Slug verified against `openrouter.ai/api/v1/models` rather than
+typed from memory — it exists, carries `tools` in `supported_parameters`, and has
+a 1M context.
+
+```
+                    in $/1M   out $/1M   one real turn   latency
+claude-opus-5         5.00      25.00      $0.02040       6,195ms
+gemini-2.5-flash      0.30       2.50      $0.00051       2,321ms
+```
+
+**Forty times cheaper and nearly three times faster on the same message**, against
+the same 2,598-character prompt with both tools attached. It also made the bot
+work *today* rather than when credits arrive: OpenRouter pre-authorises
+`max_tokens` against the balance, and 4096 tokens of Opus exceeded it while 4096
+tokens of Flash sits comfortably inside.
+
+**And then it ran, all the way through:**
+
+```
+Sort                 success
+Answer Meta          success     Meta answered in 762ms, before any model work
+OpenRouter           success     x2 — the tool round trip
+open_request         success
+Answer the resident  success
+Send                 error       Authorization failed (placeholder Meta token)
+```
+
+The reply, in Hebrew: *"היי, פתחתי עכשיו קריאת שירות עבור הנזילה בלובי, מספר
+הפנייה הוא HM-2026-9318."* The reference is real — the tool webhook wrote the row
+and handed the number back, and the debt-tools execution confirms it:
+`type: plumbing, urgency: high, building: הרצל 14, unit: 12`, description in the
+resident's own words. **The one thing this bot must never do is invent a
+reference number, and it did not.**
+
+Only `Send` fails, on the Meta token that has never been filled in.
+
+### The tool node I used was deprecated, and n8n said so at runtime
+
+`@n8n/n8n-nodes-langchain.toolHttpRequest` failed with:
+
+```
+has a "supplyData" method but no "execute" method
+```
+
+Reading the node source explains it: `hidden: true`, with the comment *"Replaced
+by a `usableAsTool` version of the standalone HttpRequest node."* The current way
+is `n8n-nodes-base.httpRequestTool` — the ordinary HTTP Request node in tool mode
+— with `descriptionType: 'manual'` plus `toolDescription`, and arguments declared
+through `$fromAI()` instead of `{placeholder}` tokens and a placeholder table.
+
+This is exactly the drift the skills warn about, and it is worth noting that the
+skill pack did not catch it either: `references/TOOLS.md` names the four tool
+types, and the deprecation is only visible in the node source. Empirical testing
+found it; nothing else would have.
+
+**`$fromAI()` also made the security rule easier to see.** Anything wrapped in it
+is a parameter the model fills. Anything not wrapped is fixed by us. The phone
+number is `$('Sort').first().json.to` — `.first()` on a named node rather than
+`$json`, because a tool runs inside the agent's execution where the current item
+is the agent's own and pairing back to the trigger is not guaranteed. The phone
+decides whose ticket this is, so it has to be deterministic.
+
+### The OpenRouter key works and the account is still empty — the $1,000 is a cap
+
+The key in `.env` was already in use: the n8n credential `Homies OpenRouter`
+(`f95jN4EnTPL6CQuJ`) was created from that exact value, which is why the agent
+run failed with **Payment required** rather than *unauthorized*. A 402 is the
+account answering, not the key being rejected.
+
+**`GET /api/v1/key` reports `limit: 1000` and that is not money.** It is a
+spend ceiling on the key. The account balance is what runs out, and OpenRouter
+pre-authorises `max_tokens` against it:
+
+```
+max_tokens 4096   402  "you requested up to 4096 tokens, but can only afford 1459"
+max_tokens 1400   200  6,195ms  finish_reason=tool_calls
+max_tokens 800    200  4,053ms
+```
+
+**So the key is fine and the model is good.** Against the real 2,598-character
+system prompt with both tools attached, it called `open_request` with
+`building: הרצל 14`, `unit: 12`, `type: plumbing`, `urgency: high` — a valid
+enum value, so this morning's constraint fix holds through the whole chain — and
+the description in the resident's own Hebrew.
+
+**Lowering `max_tokens` is still the wrong fix, and now there are numbers.** The
+prompt alone is **2,671 tokens, $0.0134**, before the model writes a word. A full
+turn measured **$0.0204**. `max_tokens` only gates the pre-authorisation; it
+barely moves the bill. At roughly **2¢ a message**, $5 of credit is about 250
+messages and $20 is about a thousand. That is the decision, not the token cap.
+
+**And the agent swap lost prompt caching, which is most of that cost.** The
+response reports `cached_tokens: 0`. The old Code node set an explicit
+`cache_control` breakpoint on the system prompt; the OpenRouter node has no such
+option, so every message now pays full price for the same 2,598 characters.
+Together with the missing reasoning parameter, that is the second thing the AI
+node cannot express that hand-written HTTP could. Worth knowing before the
+volume matters: at 200 messages a day the difference is real money.
+
+### The WhatsApp bot is an AI Agent node now, not 150 lines of JavaScript
+
+Asked for directly: use an AI node. The `Brain` Code node — which ran the whole
+tool-use loop by hand against OpenRouter's HTTP API — is replaced by
+`@n8n/n8n-nodes-langchain.agent` with four sub-nodes.
+
+```
+Answer the resident  (agent)
+  ├── OpenRouter            lmChatOpenRouter   credential f95jN4EnTPL6CQuJ
+  ├── Conversation so far   memoryBufferWindow keyed on the phone, window 12
+  ├── open_request          toolHttpRequest
+  └── transfer_to_human     toolHttpRequest
+```
+
+**What it bought, in order of how much it matters.** The model key is in n8n's
+credential store instead of interpolated into a code string, so an exported
+workflow carries no secret. Conversation memory is a node rather than workflow
+static data, which does not survive an n8n restore. And the two tools are objects
+on the canvas the agent can reach, not a URL buried in a `fetch`.
+
+**What it cost, and this is real.** The old loop sent
+`reasoning: {effort: "low"}`. **The OpenRouter node has no reasoning parameter** —
+its options collection is frequency penalty, max tokens, response format,
+presence penalty, temperature, timeout, max retries and top P, and nothing else.
+Confirmed by reading the node source, not by assuming. So thinking now runs at
+the model's own default. That is the *safe* direction, because the failure this
+project cares about — a tool call written into visible text instead of emitted
+as one — happens when thinking is OFF. It is slower and dearer per message.
+`EFFORT` stays in the file, renamed to say it is no longer sent, so this is
+written down rather than rediscovered.
+
+**The error branch had to be rebuilt, and is not optional.** The Code node
+caught a failed model call in a try/catch and answered with the handover line.
+An Agent node that errors just fails. So the agent carries
+`onError: continueErrorOutput` and its second output runs a Set node holding
+that same sentence. Without it, a model failure is a resident who is never
+answered at all.
+
+**Verified against the live instance, which is the only way to check anything
+without the MCP connected:**
+
+```
+Sort                 success
+Answer Meta          success       (Meta answered before any model work)
+Conversation so far  success
+OpenRouter           error         Payment required
+Answer the resident  success       -> error output
+Hand over instead    success       to=972500000011, the Hebrew handover line
+Send                 error         Authorization failed (placeholder Meta token)
+```
+
+Both remaining failures are the two things already known to be missing —
+OpenRouter credit and the Meta token. Everything between them works, and the
+LangChain node types are confirmed present on this n8n at the typeVersions used.
+
+**The phone is interpolated, never a placeholder.** Both tool nodes build the
+Vapi-shaped envelope with `{{ $json.to }}` for the phone and `{placeholder}`
+tokens only for what the model is allowed to decide. A placeholder is something
+the model fills in, and the model must never be able to choose whose ticket
+this is — the same rule the voice agents follow for the amount and the month.
+
+Dead code removed: 152 lines of `BRAIN` JavaScript and the `openai_tools()`
+converter that existed only to feed it.
+
+**The layout checker caught two things on the way.** My own `Hand over instead`
+node, 60 apart from `Send` — fixed before the push. And then the debt-tools
+canvas, whose nodes had drifted to `[720, 64]` and `[976, 224]`: somebody
+dragged them in the n8n UI. Re-pushed from the script, which is the source of
+truth, and that is precisely the drift these scripts exist to prevent.
+
+### Two nodes had been drawn on top of each other since the day it was written
+
+New rule from the client side: a workflow has to be presentable — no
+overlapping nodes, human readable. Applied to all three and **encoded rather
+than remembered**, in [scripts/n8n_layout.py](../scripts/n8n_layout.py). It
+raises before any push if two nodes sit within 200×180 of each other, if a node
+still carries a default name (`Code`, `If1`, `HTTP Request2`), or if the
+workflow has no sticky notes at all. All three deploy scripts call it first
+thing in `main()`, and `python scripts/n8n_layout.py` audits the whole instance.
+
+**What it found immediately.** `Anything to write?` and `Needs the real answer?`
+were both at exactly `[460, 120]` in the debt-tools workflow — identical
+coordinates, one node drawn perfectly on top of the other, so the canvas showed
+seven nodes where there were eight. **Nothing ever failed.** The workflow has
+run correctly the entire time. It simply could not be read, and the two IFs that
+decide whether the caller waits for a write were the pair you could not see.
+
+Everything is now on a 240-wide grid with rows in multiples of 60 — one column
+per stage, one row per branch, trigger at the left.
+
+**Sticky notes were added and then removed the same hour.** They were not asked
+for: *"no text box no description just the nodes to be very well placed no
+overlapping nodes."* The canvas shows the shape of the flow and nothing else,
+and the reasoning stays in the script that builds it, beside the code it
+describes and under version control. Two homes for one explanation is two places
+to drift, which is the argument these scripts already make about prompts.
+
+```
+  ok    Homies — call queue (read)
+  ok    Homies — debt tools (Vapi)
+  ok    Homies — WhatsApp bot
+3 of 3 workflows are readable.
+```
+
+Re-verified after the move, because a relayout that breaks a wire is worse than
+an ugly canvas: `check_tools.py` **10 passed, 0 failed**, and a WhatsApp message
+still answers in 862ms.
+
+### Homies has its own n8n, and everything had been going to the wrong one
+
+`https://n8n-zqvb.srv1879140.hstgr.cloud` — empty, community edition, Homies'.
+Its API key **was already in `.env`**, under the name `N8N_MAIN_CLIENT_ID`, which
+reads like a client identifier rather than a credential for a second instance,
+so nothing ever looked at it. `N8N_BASE_URL` and `N8N_API_KEY` both pointed at
+`srv1135333` — the shared production instance carrying 26 workflows for four
+other clients — and so every Homies workflow ever deployed, including the
+WhatsApp bot created an hour earlier, was built there.
+
+**The name is the whole cause.** Both keys are opaque JWTs and either would look
+correct next to the other. Renamed: `N8N_BASE_URL` / `N8N_API_KEY` are now the
+Homies instance, and the shared one is `N8N_SHARED_BASE_URL` /
+`N8N_SHARED_API_KEY` with a comment saying nothing should deploy there.
+
+Moved, in order, verifying each:
+
+| | New id | Check |
+|---|---|---|
+| `Homies — debt tools (Vapi)` | `lXofknAbE5wu5nwQ` | `check_tools.py` **10 passed, 0 failed** |
+| `Homies — WhatsApp bot` | `u2JjrbcNPYyyh3yl` | 200 in 688ms, Brain ran, Send fails on the placeholder token |
+| `Homies — call queue (read)` | `i3VMdCnXZGooI1Dj` | returns the real queue with resident names |
+
+All four Vapi assistants re-pointed at the new webhook — the two Hebrew ones
+through `vapi_sync.py --apply`, the two English twins by PATCH, since
+`vapi_en.py` still refuses to rebuild them.
+
+**Nothing needed re-crediting, and that is worth knowing.** The tool workflow
+writes through Apps Script over plain HTTP rather than a Google Sheets node, so
+it carries no n8n credential at all and moved as pure JSON. A Sheets node would
+have moved with a credential id belonging to the old instance and failed *after*
+answering Vapi 200 — the response is computed before the write by design, so a
+missing credential would have been invisible in the response.
+
+**Two of three are deactivated on the shared instance; the queue is still live
+there deliberately.** `web/index.html` is deployed separately on Vercel and
+still calls the old queue URL. The file now points at the new one, and the old
+workflow must stay running until that page ships — deactivating it first breaks
+the demo page. Nothing was deleted: deactivation is reversible and this is
+somebody else's production box.
+
+### The WhatsApp workflow is live in n8n — and it was silently dropping every message
+
+`Homies — WhatsApp bot`, workflow `fDVRNLvsALcOe3ld`, active. Callback URL:
+
+```
+https://n8n.srv1135333.hstgr.cloud/webhook/homies-whatsapp
+```
+
+**The bug, which is the reason this was worth testing before connecting Meta.**
+`multipleMethods: true` gives the webhook node **one output per method**, in the
+order they are listed — GET on output 0, POST on output 1. The workflow
+connected only output 0.
+
+Everything you would think to check passes. Meta's verification is a GET, so the
+callback URL saves and the dashboard shows a verified webhook. Then every actual
+message arrives as a POST on output 1, lands on nothing, and the execution ends
+**`success` having run a single node**. No error, no retry, no reply. A resident
+messages Homies and is never answered, and there is nothing in n8n that looks
+wrong.
+
+Found by posting a real message envelope at the live URL before touching the
+Meta app. The verification handshake — the test everybody runs — would have said
+it was fine.
+
+**Verified after the fix, four payload shapes, all against the live webhook:**
+
+| Sent | Result |
+|---|---|
+| Hebrew text, "יש נזילה בלובי של הבניין" | 200 in **898ms**, then Brain → Send |
+| the same message id again | `_work: false`, never reaches the model — one reply per message, not one per retry |
+| an image with no caption | canned Hebrew reply, no model call at all |
+| a delivery receipt | 200, nothing written |
+
+The 898ms matters: Meta retries anything not answered within a few seconds, and
+a retry is a second copy of the same message. The workflow answers Meta *before*
+it thinks, so the model's latency can never turn into a duplicate reply.
+
+**The Brain ran and produced Hebrew.** Not a real answer — OpenRouter is still
+out of credit, so it took its catch path and returned the handover line, *"אני
+מעביר את זה לנציג מהצוות שלנו"*. Which is the graceful failure working as
+designed, and also exactly the shape flagged on 7 Aug: a valid key and a bot
+that always hands over reads as "the model is broken" rather than "the account
+is empty."
+
+**`Send` fails, deliberately, and the deploy gate was wrong about it.** The
+script demanded `WHATSAPP_PHONE_NUMBER_ID` and `WHATSAPP_ACCESS_TOKEN` before it
+would push anything. Both are only needed to *send* — and a send cannot happen
+until Meta has verified the callback URL, which needs the workflow live first.
+The gate blocked the step that has to come first, and that ordering is Meta's,
+not ours. Split into `need()` and `later()`: hard-fail on the verify token and
+the model key, deploy with a loud warning on the two send credentials. Safe only
+because a number that has not been connected in the Meta app receives nothing,
+so there is no window where a real resident goes unanswered.
+
+`WHATSAPP_WEBHOOK_VERIFY_TOKEN` was generated rather than typed and is in `.env`.
+It is a shared secret with Meta, and a value invented at a keyboard tends to be
+one that can be guessed.
+
+### Vapi is out of credit, so none of this has been heard on a real call
+
+Everything above was verified by posting real Vapi payload shapes at the live
+Edge Function. **The one thing that cannot be proved that way is that Vapi
+actually sends the report** — that needs a call, and the account has no balance.
+This is the third Vapi account since 5 Aug and there is no API endpoint that
+reports a balance; `/subscription` is 404 on all three keys.
+
+Two consequences worth having written down before the next move rather than
+after it.
+
+**The export now redacts something that matters.** `vapi_export.py` has always
+replaced `server.headers` values with `<redacted>`, written when those headers
+were empty, on the reasoning that a file which is safe only by accident is not
+safe. As of today they carry `TOOL_SECRET`, so that decision is now the only
+thing keeping the secret out of a committed file. It also means the export is
+**not** a restore path for the report endpoint: an account rebuilt from it posts
+reports with a header of the literal string `<redacted>`, gets a 401, and throws
+away every transcript exactly as before — silently, because nothing about the
+call fails. `vapi_sync.py --apply` reads the real secret from `.env` and is the
+route.
+
+**The rebuild checklist now ends on `interactions`.** Added to
+[new-vapi.md](handover/new-vapi.md) as the last item, because it arrives last:
+the report fires after the call is over, not during it. An empty table means the
+`server` block did not survive the move, and there is no other symptom — the
+call sounds perfect and nothing errors.
+
+### Supabase exists, all six migrations are applied — and it is in Tokyo
+
+Project `HOMIES / main`, ref `nmxlhlmcnnggnnuxyelt`, free plan. The six SQL files
+that had been written and never run since 2 Aug are now applied, by
+[scripts/supabase_migrate.py](../scripts/supabase_migrate.py) — a new runner that
+keeps a `schema_migrations` ledger, wraps each file in its own transaction, and
+stops at the first failure rather than leaving half a schema behind.
+
+```
+residents           10 rows    charges             10 rows
+requests             1 row     payment_tickets      0
+interactions         0         payment_links        0
+call_outcomes        0         promises_to_pay      0
+                               payment_disputes     0
+```
+
+Nine tables, 32 indexes, two functions (`touch_updated_at`,
+`bump_charge_attempt`), **RLS on with a policy on every one**. Verified from both
+sides: the publishable key gets `[]` from `residents`, the secret key gets the
+row. RLS is doing its job rather than merely being switched on.
+
+**The region is `ap-northeast-1` — Tokyo.** Nobody chose that; it is the default
+if you do not change it at project creation, and it was not changed. Israel to
+Tokyo is roughly a quarter of a second each way, and every tool call the voice
+agent makes crosses it — against a turn that already measures 5,283 ms. Frankfurt
+`eu-central-1` is the closest region Supabase offers.
+
+Supabase cannot move a project between regions on the free plan. The fix is to
+delete this project and create it again in Frankfurt, which right now costs
+nothing: the only contents are ten fictional residents and the seed rows, and
+the migration runner replays the whole schema in about a minute. It stops being
+free the moment anything real is in there, so this is worth deciding now rather
+than later.
+
+**Finding the database was not straightforward.** `db.<ref>.supabase.co` does not
+resolve at all on this project — no A record, no AAAA — so the direct connection
+route does not exist and the Supavisor pooler is the only way in. The pooler
+hostname embeds the region, which the dashboard shows and we did not have, so it
+was found by trying all 34 hostnames until one accepted the tenant. Port 5432
+(session mode) rather than 6543, because transaction mode rejects some DDL.
+
+**Also fixed: `.env` had two Supabase blocks.** `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` each appeared twice, once
+empty and once filled. Which value wins depends on the parser, and the symptom
+would have been an authentication error rather than anything pointing at a
+duplicated line. Merged into one block.
+
+`SUPABASE_ACCESS_TOKEN` is still empty — that is the CLI token, and without it
+the `debt-tools` Edge Function cannot be deployed.
+
+### First real resident data is in Supabase — 12 people, 9 charges, ₪12,200
+
+Imported `sheets/residents-real.csv` by
+[scripts/import_oxs_csv.py](../scripts/import_oxs_csv.py). Residents upsert on
+`phone`, charges on `(resident_id, period)`, so a nightly export can be replayed
+without duplicating anybody — which is the whole point of an import script rather
+than a one-off paste.
+
+```
+residents by source   oxs 12   seed 10
+charges   by source   oxs  9   seed 10
+period                2025-12-01   9 charges   ₪12,200
+```
+
+**A new column, `source`, in migration `007`.** Ten fictional residents from
+`002_slice_seed.sql` were already in that table, and `residents` is what the
+outbound debt agent reads to decide who to call. With real numbers and seed
+numbers sitting together and nothing to tell them apart, the only thing between a
+test run and phoning a real person about a real debt is somebody remembering
+which is which. `oxs_ref` could not do this job — it holds the id in OXS, and a
+CSV export does not carry one.
+
+**Three charges were not created, deliberately.** Lines 3, 4 and 11 carry an
+amount — ₪1,500, ₪1,000 and ₪900 — and no month. `charges.period` is a not-null
+date, and the honest options were to invent a month or to skip the charge. The
+residents imported; the charges did not. ₪3,400 is therefore in the CSV and not
+in the database, and that is a data question for Homies rather than something to
+paper over.
+
+**The year is an assumption and it is flagged as one.** `month` arrives as
+`דצמבר` — a Hebrew month name with no year at all. December 2025 is the only
+December that has happened as of today, so that is what was used, it is printed
+on every run, and `--year` overrides it. A charge filed under the wrong year is a
+resident called about a debt from a different December.
+
+**All 12 have `do_not_call = FALSE`.** That is faithful to the export and it is
+the thing to know before anything dials. Nothing can place a call today — the
+campaign runner is Phase 7 and does not exist — but the row is armed the day it
+does.
+
+**And this is the argument for moving the region that the latency numbers only
+hinted at.** The project is in `ap-northeast-1`. Twelve Israeli residents' names,
+phone numbers and debts are now stored in Tokyo. While the table held ten
+invented people that was a performance question; with real personal data in it,
+it is a data-protection question as well, and the answer to both is Frankfurt.
+The cost of moving is still close to zero — delete, recreate, replay seven
+migrations and re-run this import.
+
+### OXS is read-only, decided — and the API guide turns out to document no API
+
+**The rule, from the client side of this build:** nothing we build writes to OXS,
+ever. Asked specifically whether creating a new service request was an exception,
+since PRD §2.1 assumes exactly that: *"strictly do not edit anything on oxs we
+just import data to clone in supabase."* So the bot does not open tickets in OXS
+either. One direction only — OXS out, Supabase in.
+
+This costs something real and it is worth naming. A resident's ticket now exists
+in Supabase and **not** in the tool the staff actually work in, so somebody has
+to look at a second place. That is the adoption risk the plan already flagged
+against the CRM, now applied to intake. The counterweight is that a write to a
+system of record for 10,000 apartments is not a bug you roll back — it is a
+corrupted resident record inside a live business, and the rule removes that
+entire failure class rather than guarding against it.
+
+**OXS enforces most of it for us.** From the guide's module table:
+
+| Module | Access levels | Scope |
+|---|---|---|
+| Service Requests | Read-Only **/ Full Control** | view, create, update status, delete |
+| Tenant Debts | Read-Only only | balances, payment details, outstanding amounts |
+| General Information | Read-Only only | buildings, apartments, tenants, payment histories |
+
+Two of the three modules have no write permission in existence, so `OXS_KEY_DEBTS`
+and `OXS_KEY_GENERAL` are read-only by construction. Service Requests is the only
+module where a key *can* write, which makes `OXS_KEY_REQUESTS` the only one the
+rule has to be enforced on — it should be re-issued as Read-Only so the
+permission cannot be used by accident. Nothing enforces a rule as well as not
+having the capability.
+
+Verified today that **no code in this repo reads any OXS key at all** — the three
+values sit in `.env` and nothing has ever called with them.
+
+**And the guide documents no endpoints.** `OXS_API_Keys_Guide_EN.pdf` is four
+pages on creating, rotating and expiring keys. Searching all four for anything
+URL-shaped returns one hit, and it is the phrase "target system". No base URL, no
+paths, no request or response shapes. So the import is blocked on OXS Support
+sending the API documentation — the same team that has to activate API access.
+
+Two operational facts from the guide that will matter later: rate limits are **60
+requests per minute and 1,000 per hour** across all keys, which shapes how ~10,000
+apartments get paged; and **every key expires**, one year by default and two at
+most, with email reminders at 30, 7 and 1 days. A silently expired key looks
+exactly like an outage.
+
+**Two PRD lines are now stale.** §2.2 says making status requests live "requires
+either an OXS API (none exists)" — one exists, and we hold keys for it. And §5
+specifies the OXS bridge as a nightly Google Sheets batch. A read-only API pull is
+strictly better than that: fresher, no manual export step, and it removes the "as
+of last night" caveat the flow currently has to say out loud. Both should be
+revised once the endpoints arrive.
+
+### debt-tools is deployed, and the smoke test caught a bug I had written
+
+`debt-tools` is live at
+`https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools`, version 1,
+`verify_jwt: false`. Pushed by
+[scripts/supabase_functions.py](../scripts/supabase_functions.py), which uses the
+Management API rather than the CLI so that nothing has to be installed and
+`supabase init` does not restructure the repo.
+
+`TOOL_SECRET` was empty and is now generated, in `.env`, and pushed as a project
+secret. That mattered more than it looks: the function's guard is
+`!== SECRET || !SECRET`, so it **fails closed on an empty value** — deploying
+without one produces a function that 401s every caller and reads as a broken
+deploy rather than a missing variable.
+
+The door was tested from both sides. No header → 401. Wrong header → 401. Right
+header → 200.
+
+**Then the third call failed, and it was our bug.**
+
+```
+{"ok":false,"error":"new row for relation \"requests\"
+ violates check constraint \"requests_urgency_check\""}
+```
+
+`requests.urgency` has been constrained to `low / normal / high / emergency`
+since `001` on 2 Aug, and [scripts/vapi_tools.py](../scripts/vapi_tools.py)
+declares exactly those four. The WhatsApp bot I wrote yesterday declared
+`normal / urgent`. **`urgent` is not a value**, so every urgent WhatsApp ticket
+would have hit this constraint — and the model would have received an English
+Postgres error in the middle of a Hebrew conversation.
+
+This is the third collision of the same kind in two days: I invent an identifier
+the established file has already fixed. The first two were
+`WHATSAPP_TOKEN`/`WHATSAPP_VERIFY_TOKEN`. Fixed to the four schema values, with
+the constraint named in a comment so the next person does not re-invent them.
+
+Re-run after the fix: `HM-2026-1003` written, `plumbing / high`, Hebrew
+description intact, `opened_via: voice`. Test row deleted afterwards.
+
+**Left alone, worth knowing.** `open_request` in the Edge Function passes
+`urgency` straight to Postgres with no validation, so an invalid value is caught
+by the database rather than the function. Fail-closed is the right direction; the
+cost is that the agent gets a constraint message instead of something it can act
+on. Also `requests.type` has **no** constraint, and the two channels declare
+different vocabularies — voice offers four types, the WhatsApp bot seven. Both
+insert fine and will make the type column awkward to report on.
+
+### The key works, the balance does not — and the whole Brain call ran for real
+
+`OPENROUTER_API_KEY` arrived and authenticates. `GET /api/v1/key` returns the
+account, and a real request to `anthropic/claude-opus-5` came back in **5,141 ms**
+with 2,632 input and 48 output tokens. That request was not a toy: it used the
+script's own constants, the real 2,598-character Hebrew system prompt, both tools
+converted to the OpenAI shape, `reasoning: {effort: "low"}` and the
+`cache_control` breakpoint. So the model slug, the tool shape, the reasoning
+parameter and the caching block are all confirmed accepted by the live endpoint
+rather than assumed.
+
+**The finding that matters: the balance is about four cents, and OpenRouter
+pre-authorises `max_tokens` against it.** The first attempt failed —
+
+```
+HTTP 402  You requested up to 4096 tokens, but can only afford 1600
+```
+
+`MAX_TOKENS` in the script is 4096, sized deliberately so thinking and the reply
+fit together. That means **every message would 402** on this balance, with a
+valid key. The Brain catches the throw and answers with the handover line, so the
+failure is graceful — a resident is told a person will get back to them — but the
+bot would never once call `open_request`. A working key and a bot that silently
+never works is exactly the shape that gets diagnosed as "the model is broken."
+
+Credits fix it. Lowering `max_tokens` also clears the 402 and is the wrong fix:
+it buys a working request by risking a reply truncated mid-sentence, which is the
+failure `MAX_TOKENS = 4096` exists to prevent.
+
+### The lobby leak asked for an apartment number, on the first real message
+
+The test message was the demo narrative from the plan — *"there is a water leak
+in the lobby at Herzl 14, it's urgent."* The reply was `באיזו דירה אתה גר?` —
+*which apartment do you live in?*
+
+A lobby is a common area. Nobody lives in it. This gap was flagged when the
+prompt was written and it reproduced on the first live message, which is a
+stronger argument than the one made for it in the abstract. The prompt asks for
+building **and** apartment unconditionally; it needs to skip the apartment when
+the problem is in a shared space. Not yet fixed.
+
+### Still empty: `OXS_KEY_REQUESTS`
+
+Diffed `.env` against the pre-OpenRouter backup: **one line changed**, the
+OpenRouter key. `OXS_KEY_DEBTS` and `OXS_KEY_GENERAL` were already set and are
+untouched; `OXS_KEY_REQUESTS` is still blank. It is the key that writes service
+requests — the exact row this bot creates — and it blocks nothing today only
+because tickets go to the Sheet.
+
+Three WhatsApp values are still absent: `WHATSAPP_WEBHOOK_VERIFY_TOKEN`,
+`WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`.
+
+---
+
 ## 2026-08-07
+
+### WhatsApp bot built end to end, blocked on four values
+
+Feature [11](features/11-whatsapp-bot/feature.md) — inbound support in Hebrew,
+reusing the tool webhook the voice agents already call. Written and verified;
+not pushed.
+
+**The channel was a real decision.** Three options, and the fastest one was
+rejected: another client on this same n8n box already runs WhatsApp through
+GreenAPI (`Inventory - 20 Availability Bot`), which is proven-here and would have
+demoed today. It drives WhatsApp Web unofficially, breaks WhatsApp's business
+terms, and the number can be banned. Twilio was ruled out on measurement rather
+than opinion — `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` are in `.env` and
+**empty**, so it costs a new signup, adds a BSP markup, and still needs the same
+Meta verification. Chose the Meta Cloud API test number: free, no business
+verification, five hand-registered recipients, and the move to Homies' real
+number is a phone-number id and a token.
+
+**Business verification gates the production number, not the build.** That is
+what let this start today rather than in two weeks.
+
+**Chatwoot deferred**, and not on preference: it is Rails + Postgres + Redis +
+Sidekiq, and the only VPS is `srv1135333`, which carries four other clients'
+production workflows. Adding it later costs one field in the Meta app config.
+
+**Thinking stays on at low effort — the counterintuitive call.** Every instinct
+says disable it for a chat bot. With thinking disabled this model occasionally
+writes a tool call into its *visible text* instead of emitting a structured call:
+the turn returns 200, the reply reads fine, and the tool never runs. No error, no
+failed call to catch. For an agent whose whole job is `open_request`, that is a
+resident told their request is logged when no row exists. Also `max_tokens` caps
+thinking and reply together on this model, so it is sized for both.
+
+**Answer Meta first, work after.** Meta retries any webhook that does not return
+200 quickly, and a retry is a second reply to one question. Same shape the tool
+webhook already uses. Duplicates are suppressed on Meta's message id, never on
+content — a resident who sends "כן" twice means it twice.
+
+Verified before hand-off: prompt extracts (2,598 chars, **2** verbatim lines
+against the debt prompt's 23 at its worst); both Code nodes parse under
+`node --check`; all seven workflow nodes reachable with no dangling connections;
+the media-with-no-text branch reaches Send (it did not on the first pass — the If
+routed it nowhere and acceptance #5 would have failed).
+
+Two contradictions in our own docs surfaced. The build-stack checklist says the
+chatbot brain is Claude; the credentials checklist says OpenRouter — resolved to
+the Anthropic API directly, because the tool calls here are load-bearing.
+And `sheets/README.md` still prints the **rotated, dead** Apps Script secret in
+plaintext; harmless but it should not read as live.
+
+Blocked on four values, which the script prints rather than a document listing:
+`WHATSAPP_WEBHOOK_VERIFY_TOKEN`, `OPENROUTER_API_KEY`,
+`WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`. Nothing has been created in
+Meta or pushed to n8n.
+
+### Chatbot moved to OpenRouter, and two name collisions found
+
+The brain was written against the Anthropic API. `.env.example` has said
+OpenRouter since it was written, and the user confirmed it — so it moved.
+`anthropic/claude-opus-5` was checked against `openrouter.ai/api/v1/models`
+rather than assumed to exist: it does, at the same $5 / $25 per million tokens.
+A slug that does not exist fails as a 404 at call time, which on a chat bot is
+silence rather than an error anyone sees.
+
+The shape change is not cosmetic. OpenRouter speaks OpenAI chat-completions, so
+tool arguments arrive as a **JSON string** rather than an object, and every tool
+call must be answered by its own `role: "tool"` message carrying the matching
+`tool_call_id` or the next request is rejected outright. Tools are still declared
+once, in Anthropic's shape, and converted on the way out — one canonical list,
+nothing to drift.
+
+**Two variable names I invented collided with names `.env.example` already
+established** — `WHATSAPP_TOKEN` against `WHATSAPP_ACCESS_TOKEN`, and
+`WHATSAPP_VERIFY_TOKEN` against `WHATSAPP_WEBHOOK_VERIFY_TOKEN`. The script was
+wrong, not the template; fixed to match. Worth noticing that this only surfaced
+because someone asked about the env file — nothing would have failed until
+deploy day, and then it would have looked like Meta's fault.
+
+Also found while checking: **`OXS_KEY_REQUESTS` is empty** while the debts and
+general keys are set. That is the key that writes service requests. It blocks
+nothing today, because tickets go to the Sheet, and it blocks everything the day
+they stop.
 
 ### "Stop, ask nothing" was the instruction nearest the acknowledgement
 

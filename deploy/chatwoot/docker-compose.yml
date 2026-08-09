@@ -1,0 +1,137 @@
+# Homies — Chatwoot, on the VPS that already runs n8n.
+#
+# Four services, and NO reverse proxy of its own. That is the important part.
+#
+# HOW THIS BOX ROUTES, read off it on 8 Aug rather than assumed:
+#
+#   traefik-traefik-1   traefik:latest      --providers.docker=true
+#                                           --providers.docker.exposedbydefault=false
+#                                           --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+#   n8n-zqvb-n8n-1      docker.n8n.io/n8nio/n8n
+#   :80 and :443 owned by `traefik` itself — NOT by docker-proxy
+#
+# That last line is the one that matters. A container publishing ports appears
+# in `ss` as docker-proxy; seeing traefik there means it runs with HOST
+# networking. So there is no Traefik network to attach to — an earlier draft of
+# this file declared one `external: true` and would have refused to start,
+# which is the kind of confident guess this project keeps paying for.
+#
+# Traefik on the host reaches containers at their bridge IP through the Docker
+# socket, which is how n8n is already served. Chatwoot needs only its own
+# network and the right labels. `exposedbydefault=false` means the labels are
+# not optional: without `traefik.enable=true` the container is simply ignored.
+#
+# The labels below mirror n8n's, which are the working example on this box:
+#
+#   traefik.http.routers.n8n-zqvb.rule=Host(`n8n-zqvb.srv1879140.hstgr.cloud`)
+#   traefik.http.routers.n8n-zqvb.entrypoints=websecure
+#   traefik.http.routers.n8n-zqvb.tls.certresolver=letsencrypt
+#   traefik.http.services.n8n-zqvb.loadbalancer.server.port=5678
+#
+# Run it:
+#   cp env.example .env      # fill in the secrets and the host
+#   docker compose run --rm rails bundle exec rails db:chatwoot_prepare
+#   docker compose up -d
+#
+# db:chatwoot_prepare is not optional. `up -d` against an empty database gives
+# a container that restarts forever with a Postgres error buried in the logs.
+
+# An extension field, not a service. Written as `base: &base` — which is how
+# Chatwoot's own published compose does it — compose treats it as a real service
+# and starts a container that does nothing.
+x-base: &base
+  image: chatwoot/chatwoot:latest
+  env_file: .env
+  volumes:
+    - storage:/app/storage
+  restart: unless-stopped
+  networks:
+    - chatwoot
+
+services:
+  rails:
+    <<: *base
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    entrypoint: docker/entrypoints/rails.sh
+    command: ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+    # NO `ports:`. Publishing 3000 would serve the dashboard over plain HTTP
+    # beside the TLS one, and Meta delivers to whichever URL it was given.
+    # Traefik reaches this container on the bridge network instead.
+    #
+    # The memory cap is here to protect n8n, not Chatwoot. This box runs the
+    # bot. If Rails leaks under load on a 2-vCPU KVM the OOM killer picks its
+    # victim by size, and without a ceiling that victim can be n8n — taking
+    # WhatsApp down to fix nothing.
+    mem_limit: 2g
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=chatwoot
+      - traefik.http.routers.chatwoot.rule=Host(`${CHATWOOT_HOST}`)
+      - traefik.http.routers.chatwoot.entrypoints=websecure
+      - traefik.http.routers.chatwoot.tls.certresolver=letsencrypt
+      - traefik.http.services.chatwoot.loadbalancer.server.port=3000
+
+  # The half everyone forgets. Rails serves the dashboard; sidekiq does the work
+  # that must not block a request — sending messages, firing webhooks, email.
+  # Run rails alone and you get a dashboard that looks perfect and delivers
+  # nothing, which is the same silent-success shape as every other fault this
+  # project has hit.
+  sidekiq:
+    <<: *base
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+    mem_limit: 1g
+
+  postgres:
+    # pgvector, NOT plain postgres. Chatwoot 3.x has vector columns and the
+    # migrations will not run without the extension — a postgres:16 image fails
+    # at db:chatwoot_prepare, which is the one mercy in it.
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    networks:
+      - chatwoot
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: chatwoot
+      POSTGRES_USER: chatwoot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatwoot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - chatwoot
+    command: ["sh", "-c", "redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis:/data
+
+networks:
+  # Chatwoot's own, and the only one. Postgres and Redis live here, unpublished
+  # — n8n shares this box and has no business reaching them. Traefik reaches
+  # `rails` from the host side.
+  #
+  # Explicit `name:` so the traefik.docker.network label above is right whatever
+  # the compose project ends up being called.
+  chatwoot:
+    name: chatwoot
+
+volumes:
+  storage:
+  postgres:
+  redis:

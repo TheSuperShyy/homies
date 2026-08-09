@@ -48,6 +48,9 @@ import sys
 import urllib.error
 import urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from n8n_layout import check, LayoutError
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -82,12 +85,36 @@ SHEET_ID = "1WHktpyNWOpxUtgWftZppd77c6UD2AwWnF9H_KahS8Pg"
 # rescues one host breaks the other. A 404 here means almost nothing until the
 # user-agent has been ruled out.
 def _writer():
+    """Where a tool call is actually written. Supabase since 8 Aug.
+
+    It was the Apps Script bridge until then, and the swap is the whole reason
+    this is a function rather than a constant. Both stores answer in the SAME
+    Vapi shape — {results: [{toolCallId, result}]} — and both writer nodes post
+    the untouched original envelope, so the change is a URL and a header and
+    nothing else in the graph moves.
+
+    Why it had to change: the CRM reads Supabase, the six migrations describe
+    Supabase, and `requests.reference` is a Postgres default. On 8 Aug the
+    spreadsheet held 28 rows in `call_requests` and Supabase held one, because
+    every ticket either agent had ever opened went to the sheet. Nothing was
+    lost and nothing was visible to the thing built to show it.
+
+    The Apps Script endpoint stays deployed and stays the export target. It is
+    no longer the store of record.
+    """
     e = dict(
         l.strip().split("=", 1)
         for l in open(os.path.join(ROOT, ".env"), encoding="utf-8")
         if l.strip() and not l.startswith("#") and "=" in l
     )
-    return e["WEB_APP_URL"].strip() + "?key=" + e["APPS_SCRIPT_SECRET"].strip()
+    url = e.get("SUPABASE_URL", "").strip().rstrip("/")
+    secret = e.get("TOOL_SECRET", "").strip()
+    if not url or not secret:
+        raise SystemExit(
+            "SUPABASE_URL and TOOL_SECRET must both be set — the writer is "
+            "Supabase now. Set them in .env and re-run."
+        )
+    return url + "/functions/v1/debt-tools", secret
 
 
 def env():
@@ -341,7 +368,7 @@ return [{
 """
 
 
-WRITER_URL = _writer()
+WRITER_URL, WRITER_SECRET = _writer()
 
 
 def workflow():
@@ -350,6 +377,8 @@ def workflow():
         "name": WF_NAME,
         "settings": {"executionOrder": "v1"},
         "nodes": [
+            # The canvas explains itself, because the person who opens it will be
+            # doing so while it is failing and will not have this file to hand.
             node(
                 id="webhook", name="Vapi tool call", type="n8n-nodes-base.webhook",
                 typeVersion=2, position=[0, 0],
@@ -370,13 +399,13 @@ def workflow():
             ),
             node(
                 id="decide", name="Decide", type="n8n-nodes-base.code",
-                typeVersion=2, position=[220, 0],
+                typeVersion=2, position=[240, 0],
                 parameters={"jsCode": DECIDE},
             ),
             node(
                 id="respond", name="Answer Vapi", type="n8n-nodes-base.respondToWebhook",
                 # 1.1 is what the working workflows on this instance use.
-                typeVersion=1.1, position=[460, -100],
+                typeVersion=1.1, position=[720, 60],
                 parameters={
                     "respondWith": "json",
                     "responseBody": "={{ JSON.stringify($json._vapi) }}",
@@ -385,7 +414,7 @@ def workflow():
             ),
             node(
                 id="shouldwrite", name="Anything to write?", type="n8n-nodes-base.if",
-                typeVersion=2, position=[460, 120],
+                typeVersion=2, position=[720, 240],
                 parameters={"conditions": {
                     "options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose"},
                     "conditions": [{
@@ -399,7 +428,7 @@ def workflow():
             ),
             node(
                 id="issync", name="Needs the real answer?", type="n8n-nodes-base.if",
-                typeVersion=2, position=[460, 120],
+                typeVersion=2, position=[480, 0],
                 parameters={"conditions": {
                     "options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose"},
                     "conditions": [{
@@ -413,9 +442,13 @@ def workflow():
             ),
             node(
                 id="writesync", name="Write, then answer", type="n8n-nodes-base.httpRequest",
-                typeVersion=4.2, position=[700, 40],
+                typeVersion=4.2, position=[720, -120],
                 parameters={
                     "method": "POST", "url": WRITER_URL,
+                    "sendHeaders": True,
+                    "headerParameters": {"parameters": [
+                        {"name": "x-homies-secret", "value": WRITER_SECRET},
+                    ]},
                     "sendBody": True, "specifyBody": "json",
                     "jsonBody": "={{ JSON.stringify($json._original) }}",
                     "options": {"timeout": 25000},
@@ -424,7 +457,7 @@ def workflow():
             node(
                 id="answersync", name="Answer from writer",
                 type="n8n-nodes-base.respondToWebhook", typeVersion=1.1,
-                position=[940, 40],
+                position=[960, -120],
                 parameters={"respondWith": "json",
                             "responseBody": "={{ JSON.stringify($json) }}",
                             "options": {}},
@@ -432,13 +465,19 @@ def workflow():
             node(
                 id="writeasync", name="Write after answering",
                 type="n8n-nodes-base.httpRequest", typeVersion=4.2,
-                position=[700, 220],
+                position=[960, 240],
                 parameters={
                     "method": "POST", "url": WRITER_URL,
+                    "sendHeaders": True,
+                    "headerParameters": {"parameters": [
+                        {"name": "x-homies-secret", "value": WRITER_SECRET},
+                    ]},
                     "sendBody": True, "specifyBody": "json",
                     "jsonBody": "={{ JSON.stringify($json._original) }}",
-                    # Long, because nobody is waiting: Apps Script takes 13s from
-                    # cold. That is the entire point of this branch.
+                    # Long because nobody is waiting. Apps Script needed it —
+                    # 13s from cold — and an Edge Function does not, but the
+                    # branch exists for the general case and the ceiling costs
+                    # nothing when it is not reached.
                     "options": {"timeout": 30000},
                 },
             ),
@@ -470,6 +509,13 @@ def find():
 
 def main():
     wf = workflow()
+    # Before anything is pushed, and before the dry run prints, because a layout
+    # nobody can read is not a smaller problem than a wrong URL.
+    try:
+        check(wf["nodes"], WF_NAME)
+    except LayoutError as ex:
+        sys.exit("\n%s\n" % ex)
+
     existing = find()
     base = env()["N8N_BASE_URL"].strip()
 

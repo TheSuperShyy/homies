@@ -326,6 +326,26 @@ TARGETS = {
             # Outbound: a silent line is an answering machine or a hang-up, not
             # someone thinking.
             "silenceTimeoutSeconds": 20,
+            # Added 8 Aug. This was `{}` on the live assistant, which is not a
+            # neutral default on an outbound agent — it is the agent conducting a
+            # full debt conversation with an answering machine, reading a real
+            # resident's balance into a recording anyone in the household can
+            # play back, and hanging up having logged nothing.
+            #
+            # `voicemail` is already a value in log_call_outcome's enum, so the
+            # outcome this produces has had somewhere to go since 4 Aug; nothing
+            # was detecting it. Vapi's own model rather than the beep timeout —
+            # Israeli carrier greetings run long, and a fixed timer either cuts
+            # off a real person who paused or waits through the whole greeting.
+            #
+            # No voicemailMessage. Leaving a recorded message about somebody's
+            # debt on a machine is a disclosure to whoever plays it, which is a
+            # decision for Homies and their lawyer, not a config default. Detect,
+            # log, hang up, let the campaign runner try again inside call hours.
+            "voicemailDetection": {
+                "provider": "vapi",
+                "backoffPlan": {"maxRetries": 2, "startAtSeconds": 5, "frequencySeconds": 5},
+            },
             # OFF since 5 Aug, reversing the 4 Aug decision, because the failure
             # it was protecting against has swapped ends.
             #
@@ -530,6 +550,27 @@ def tool_server():
     if url and secret:
         return url, secret, "query", "apps script (stopgap)"
 
+    return None
+
+
+def report_server():
+    """Where the end-of-call report goes: (url, secret), or None.
+
+    Supabase only, and NOT whatever tool_server() picked. The two are the same
+    URL today and they are not the same decision: the tool endpoint is chosen by
+    where the integrations live, and the report endpoint is chosen by where the
+    `interactions` table is. n8n serves the tools and has no handler for a
+    server message at all — pointing the report there would give Vapi a 200 and
+    write nothing, which is the failure that leaves no trace anywhere.
+
+    None rather than a guess. An assistant with a server URL that 404s makes Vapi
+    retry the report six times and then drop it, and the only place that shows up
+    is a Vapi log nobody reads.
+    """
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    secret = os.environ.get("TOOL_SECRET", "")
+    if url and secret:
+        return url + "/functions/v1/debt-tools", secret
     return None
 
 
@@ -802,6 +843,20 @@ def build(target, first_message, system_prompt):
     if target.get("tools") and server:
         url, secret, mode, _ = server
         body["model"]["tools"] = with_server(target["tools"], url, secret, mode)
+
+    report = report_server()
+    if report:
+        url, secret = report
+        # `server` on the assistant, not the deprecated top-level serverUrl —
+        # that form takes no headers, and this endpoint authenticates on one.
+        body["server"] = {"url": url, "headers": {"x-homies-secret": secret}}
+        # Exactly one message, deliberately. Vapi offers eleven and the tempting
+        # ones — conversation-update, speech-update — fire several times a
+        # SECOND, each a round trip to Tokyo from a function that writes to the
+        # same row. The end-of-call report carries the transcript, the recording,
+        # the duration, the ended reason and the latency in one POST after the
+        # call is over, where nothing it does can cost the caller a millisecond.
+        body["serverMessages"] = ["end-of-call-report"]
     return body
 
 
@@ -878,6 +933,17 @@ def main():
         print("tools         : NONE ATTACHED — set SUPABASE_URL + TOOL_SECRET,")
         print("                or WEB_APP_URL + APPS_SCRIPT_SECRET, in .env")
         print("                the agent will say it opened a ticket and write nothing")
+
+    if payload.get("server"):
+        print("report        : %s %s" % (payload["server"]["url"],
+                                         payload.get("serverMessages", [])))
+    else:
+        print("report        : NONE — every transcript, latency figure and ended")
+        print("                reason is discarded when the call ends")
+
+    vm = payload.get("voicemailDetection")
+    print("voicemail     : %s" % (vm.get("provider") if vm else "off — the agent will "
+                                  "hold the whole call with an answering machine"))
 
     print("target        : %s" % (("update " + existing[0]["id"]) if existing else "create new"))
 

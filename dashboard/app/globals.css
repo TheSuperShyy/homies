@@ -27,7 +27,21 @@ header.top nav { display: flex; gap: 18px; }
 header.top nav a { color: var(--muted); font-size: 14px; }
 header.top nav a:hover, header.top nav a.on { color: var(--ink); }
 header.top form { margin-inline-start: auto; }
-main { padding: 26px; max-width: 1180px; }
+main { padding: 26px; }
+/* View switcher on the calls page. Links, not buttons — the state lives in the
+   URL so a view can be bookmarked and shared. */
+.tabs { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
+.tabs a {
+  padding: 6px 14px; font-size: 13px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+}
+.tabs a:hover { color: var(--ink); }
+.tabs a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pager {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 14px; margin-top: 14px; font-size: 14px;
+}
+.pager a { color: var(--accent); }
 h1 { font-size: 19px; margin: 0 0 18px; font-weight: 600; letter-spacing: -0.01em; }
 h2 { font-size: 14px; margin: 26px 0 10px; font-weight: 600; color: var(--muted); }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }

@@ -91,7 +91,12 @@ DEBT_STACK = {
     # numbers differ by language: Hebrew punctuation from the transcriber is less
     # reliable, so it needs a longer floor than English does.
     "startSpeakingPlan": {
-        "waitSeconds": 0.4,
+        # 0.4 -> 0.25 on 8 Aug, following the Hebrew twins. This is dead time
+        # before any work starts, so unlike the punctuation timers below it is not
+        # a property of the language at all — and leaving it made the English
+        # twin, whose whole job is to represent the Hebrew one, 150ms slower than
+        # the thing it represents.
+        "waitSeconds": 0.25,
         "smartEndpointingPlan": {"provider": "vapi"},
         "transcriptionEndpointingPlan": {
             "onPunctuationSeconds": 0.3,
@@ -145,7 +150,8 @@ INTAKE_STACK = {
     # not a twin.
     "model": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.3},
     "startSpeakingPlan": {
-        "waitSeconds": 0.4,
+        # 0.4 -> 0.25, for the reason written out on the debt stack above.
+        "waitSeconds": 0.25,
         "smartEndpointingPlan": {"provider": "vapi"},
         "transcriptionEndpointingPlan": {
             "onPunctuationSeconds": 0.3,

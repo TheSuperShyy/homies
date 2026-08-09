@@ -18,20 +18,22 @@ export default async function Layout({ children }: { children: React.ReactNode }
   return (
     <html lang="en">
       <body>
-        {user && (
-          <header className="top">
-            <strong>Homies</strong>
-            <nav>
-              <a href="/">Overview</a>
-              <a href="/tickets">Tickets</a>
-              <a href="/conversations">Conversations</a>
-              <a href="/calls">Calls</a>
-            </nav>
+        {/* Demo mode: the nav shows for everyone — there is no login to gate it
+            behind. The sign-out button only appears when a session exists. */}
+        <header className="top">
+          <strong>Homies</strong>
+          <nav>
+            <a href="/">Overview</a>
+            <a href="/tickets">Tickets</a>
+            <a href="/conversations">Conversations</a>
+            <a href="/calls">Calls</a>
+          </nav>
+          {user && (
             <form action={signOut}>
               <button>Sign out</button>
             </form>
-          </header>
-        )}
+          )}
+        </header>
         <main>{children}</main>
       </body>
     </html>

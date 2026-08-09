@@ -15,10 +15,20 @@ create, so nothing here can be pushed back verbatim into a different account.
 The rebuild is `docs/handover/new-vapi.md`.
 
 WHAT IS DELIBERATELY NOT IN IT
-Server header values are redacted. They are empty today — the n8n webhook takes
-no secret, which is its own problem — but this file is meant to be safe to
-commit on the day that changes, and a dump that is safe only by accident is not
-safe.
+Server header values are redacted. **That stopped being theoretical on 8 Aug**:
+every assistant now carries `x-homies-secret` on its `server` block for the
+end-of-call report, so the dump would otherwise put TOOL_SECRET into a committed
+file. This was written when the headers were empty, on the reasoning that a file
+which is safe only by accident is not safe — which is the whole return on
+writing it that way.
+
+The consequence for a rebuild: `<redacted>` is not a value. An account restored
+from this export has four assistants that post their end-of-call reports with a
+header of the literal string `<redacted>`, get a 401 from the Edge Function, and
+throw away every transcript exactly as they did before 8 Aug — silently, because
+nothing about a call fails. Re-run `vapi_sync.py --apply`, which reads the real
+secret from `.env`, rather than restoring the server block from here. See
+`docs/handover/new-vapi.md`.
 """
 
 import json

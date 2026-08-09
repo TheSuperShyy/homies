@@ -23,7 +23,8 @@ docs/
 │   ├── 07-partial-ticket/
 │   ├── 08-instrumentation/
 │   ├── 09-sheets-mirror/
-│   └── 10-debt-followup/          outbound — release 2, not the week-3 demo
+│   ├── 10-debt-followup/          outbound — release 2, not the week-3 demo
+│   └── 11-whatsapp-bot/           the second front door — release 2
 ├── specs/                         designs, one per milestone
 │   └── 2026-08-02-demo-design.md  the week-3 demo
 ├── prd/                           what we told the client we would build
@@ -93,8 +94,8 @@ order, not priority order: identity before intake because you cannot open a
 request for nobody, intake before recall because you cannot look up a request
 that was never created.
 
-Release-2 work — WhatsApp, the metrics CRM, outbound debt calls, the live OXS
-bridge — has no folder yet. It gets one when it gets a design.
+Release-2 work gets a folder when it gets a design. Outbound debt calls (10) and
+the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 
 ## Status
 
@@ -118,6 +119,13 @@ bridge — has no folder yet. It gets one when it gets a design.
 | # | Feature | Est. | State |
 |---|---|---|---|
 | 10 | [Outbound debt follow-up](features/10-debt-followup/feature.md) | 4d | prompt drafted |
+| 11 | [WhatsApp bot](features/11-whatsapp-bot/feature.md) | 3d | built, not deployed |
+
+Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
+the voice agents already call. Everything but the channel is written and
+verified; the model key is in and a full request has been served against it, so
+what remains is a Meta developer app. `python scripts/n8n_whatsapp.py` prints
+exactly which values it is waiting for.
 
 Feature 10 is **Phase 7 work, weeks 6–8** — it is not part of the week-3 demo,
 and features 01–09 are written against inbound intake. It was drafted early
