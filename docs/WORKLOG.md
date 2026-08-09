@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### Everything pushed, and the dashboard is on the internet
+
+Commit `b77435b` — 32 files, the whole week — pushed to
+`TheSuperShyy/homies`. Then `scripts/vercel_deploy.py --apply` (token taken
+from the logged-in Vercel CLI's auth store, written to `.env`, never echoed):
+project `homies-dashboard` created git-linked with `rootDirectory: dashboard`,
+the two `NEXT_PUBLIC_` vars set before the first build, one deployment,
+READY. Live at **https://homies-dashboard.vercel.app** — verified 200 and the
+calls tabs render with no login gate. Only the anon key went up; the script's
+role check ran. Later pushes to `main` deploy themselves.
+
+This is the open demo build — `anon_read` policies and no login. The URL is
+unlisted but public: **re-lock before real resident data** (drop 010, restore
+the middleware redirect), and the Supabase auth URL config + first staff user
+are still owed when login returns.
+
 ### Dashboard: full-bleed, and the calls page learned outbound questions
 
 `main` lost its 1180px cap — the tables now use the whole screen. The calls
