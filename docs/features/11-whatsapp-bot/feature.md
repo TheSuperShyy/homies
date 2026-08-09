@@ -17,11 +17,15 @@ and the fact that the conversation is written rather than spoken.
 
 ## Scope of this slice
 
-**Inbound support only, in Hebrew, on the Meta test number.** Two flows:
+**Inbound support only, in Hebrew, on the Meta test number.** Three flows:
 
 1. **Open a request** — a resident describes a problem, the bot captures type,
    description, building, unit and urgency, and reads back a real reference.
-2. **Hand over** — anything outside those two flows goes to a person.
+2. **Check an existing request** — a resident quotes a reference in any form
+   (or gives building + apartment) and gets the live status back. Read-only,
+   straight at the Edge Function — the same `get_request_status` the voice
+   agents call, added 9 Aug.
+3. **Hand over** — anything outside those flows goes to a person.
 
 Deliberately not in this slice: the debt/payment flows, outbound messages,
 Chatwoot, the team inbox, and any flow that needs identity verification. Those

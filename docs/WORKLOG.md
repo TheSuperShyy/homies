@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-08-09
 
+### The WhatsApp bot answers status now, and a tap stopped being smalltalk
+
+Two faults off one screenshot. A tap on "Open a service call" reached the
+model as four bare words and it re-greeted — a menu answering a menu. Now
+'open' and 'status' taps get the first question of their flow as a canned
+line straight from Sort, no model round-trip; 'human' and 'balance' still go
+to the agent, whose job on both is transfer_to_human.
+
+And "any update on ticket HM-2026-1018?" got the handover line, because the
+prompt explicitly said the bot cannot read requests and the only other tool
+was transfer. `get_request_status` is now the bot's third tool — pointed
+STRAIGHT at the Edge Function like the voice twins (the n8n router answers
+locally and forwards async, wrong for a synchronous lookup), secret in a new
+n8n credential ("Homies tool secret"), phone riding on the `wa:` call id.
+Prompt: the you-cannot-read-requests block replaced with a status section —
+bare reference message is a status question, statuses in the resident's
+language, tool result is everything you know, deeper questions still go to
+the team. Balance stays behind the identity question (PRD §13 #1); status is
+read-only and stopped waiting for it. Verified against live rows: "1018" →
+HM-2026-1018, open, electrical. Workflow updated and re-activated.
+
 ### The reference number, slowed to writing speed
 
 The read-back example wrote the code as one token — HM-2026-1001 — and the

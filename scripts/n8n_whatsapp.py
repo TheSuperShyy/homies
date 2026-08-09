@@ -186,6 +186,28 @@ MEDIA_LINE = {
     "en": "I can only read text here. Can you write what happened?",
 }
 
+# What a tap on 'open' or 'status' gets, without a model round-trip. Before
+# 9 Aug those taps went to the agent as bare row titles — "Open a service call"
+# — and the model, handed four words with no verb of the resident's own,
+# re-introduced itself and asked what's up, which is a menu answering a menu.
+# The tap already says what they want; the only useful reply is the first
+# question of that flow, and that question is the same every time — which is
+# the definition of a canned line. 'human' and 'balance' still go to the
+# agent, whose job on both is transfer_to_human.
+#
+# Same grammar rule as every other fixed line: nothing addresses the resident
+# in a gendered form.
+TAP_LINE = {
+    "open": {
+        "he": "מה התקלה, ובאיזה בניין?",
+        "en": "What's the fault, and which building?",
+    },
+    "status": {
+        "he": "מה מספר הקריאה? אפשר גם רק את הספרות האחרונות — ואם אין מספר, בניין ודירה.",
+        "en": "What's the reference number? The last digits are enough — or if you don't have it, the building and apartment.",
+    },
+}
+
 # The menu, sent ONLY when someone opens with a bare greeting.
 #
 # A list rather than reply buttons because reply buttons cap at three and the
@@ -193,12 +215,13 @@ MEDIA_LINE = {
 # characters, description 72, the button that opens the list 20, and ten rows
 # across all sections.
 #
-# TWO OF THESE ROWS DO NOT WORK YET. `status` and `balance` both need a resident
-# to prove who they are before anything is read out to them, which is PRD §13 #1
-# and still unanswered. They are on the menu deliberately — a tap lands on the
-# handover path and reaches a human, which is what happens today anyway when
-# somebody asks in words. The menu makes the gap visible instead of pretending
-# the capability is absent.
+# ONE OF THESE ROWS DOES NOT WORK YET. `balance` needs a resident to prove who
+# they are before anything money-shaped is read out, which is PRD §13 #1 and
+# still unanswered — a tap lands on the handover path and reaches a human,
+# which is what happens today anyway when somebody asks in words. The row stays
+# on the menu deliberately: it makes the gap visible instead of pretending the
+# capability is absent. `status` worked its way off this list on 9 Aug when
+# get_request_status arrived — read-only, nothing money-shaped in the answer.
 #
 # The Hebrew here obeys the same rule the prompt does: nothing addresses the
 # resident with a gendered form. "אפשרויות" rather than "בחר", which is
@@ -405,6 +428,35 @@ def ensure_log_cred(e):
     return cid
 
 
+def ensure_status_cred(e):
+    """The Edge Function's shared secret, in n8n's credential store.
+
+    get_request_status calls the Supabase Edge Function directly, and the
+    function admits callers on an X-Homies-Secret header. Same rule as the two
+    credentials above: a secret as a plain header parameter is a secret written
+    into the workflow JSON, so it goes into the store instead. And the same
+    delete-and-recreate dance, for the same reason — the public API cannot
+    update a credential, and reuse would silently outlive a rotation.
+    """
+    secret = e.get("TOOL_SECRET", "").strip()
+    if not secret:
+        return ""
+    old = e.get("N8N_TOOLSECRET_CRED_ID", "").strip()
+    if old:
+        try:
+            api("DELETE", "/api/v1/credentials/%s" % old)
+        except urllib.error.HTTPError as ex:
+            if ex.code != 404:
+                raise
+    cid = api("POST", "/api/v1/credentials", {
+        "name": "Homies tool secret", "type": "httpHeaderAuth",
+        "data": {"name": "x-homies-secret", "value": secret},
+    })["id"]
+    set_env("N8N_TOOLSECRET_CRED_ID", cid)
+    print("credential: Homies tool secret -> %s" % cid)
+    return cid
+
+
 def check_env():
     if MISSING:
         print("\nMissing from .env - nothing can be pushed until these exist:\n")
@@ -459,10 +511,16 @@ def api(method, path, body=None):
 # ---------------------------------------------------------------------------
 # The tools offered to the model
 # ---------------------------------------------------------------------------
-# Deliberately two. The tool webhook answers nine, but this slice is inbound
+# Deliberately three. The tool webhook answers nine, but this slice is inbound
 # support only — every payment and debt tool needs an identity check whose method
 # Homies has not defined yet (PRD §13 #1), and a payment flow behind an undefined
-# identity check is worse than no payment flow.
+# identity check is worse than no payment flow. get_request_status joined on
+# 9 Aug: it is read-only and returns nothing money-shaped, which is why it does
+# not wait for the identity decision — the same call the voice agents already
+# make. It goes STRAIGHT at the Edge Function rather than through the n8n tool
+# webhook, because that webhook answers locally and forwards writes async — the
+# right shape for a write, and exactly wrong for a lookup that needs a real
+# synchronous answer.
 #
 # The descriptions say WHEN to call, not just what the tool does. On this model
 # that is worth real accuracy: it reaches for tools conservatively, and a
@@ -505,6 +563,29 @@ TOOLS = [
                 },
             },
             "required": ["description"],
+        },
+    },
+    {
+        "name": "get_request_status",
+        "description": (
+            "Call when the resident asks about an existing service call — its "
+            "status, a follow-up, what happened to it. Pass the reference if "
+            "they quoted one, in any form (HM-2026-1013 or just the digits). "
+            "Without a reference it finds recent calls for the building and "
+            "apartment. Returns up to 3 calls with reference, status "
+            "(open / in_progress / resolved / cancelled), dates and "
+            "description. Read-only; the answer is live from the system."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "reference": {"type": "string",
+                              "description": "The reference the resident quoted, as written."},
+                "building": {"type": "string",
+                             "description": "Street and number, if no reference was quoted."},
+                "unit": {"type": "string", "description": "Apartment number, if given."},
+            },
+            "required": [],
         },
     },
     {
@@ -718,6 +799,19 @@ if (asked && leftover.length < 3) {
   } }];
 }
 
+// --- A menu row that starts a flow ------------------------------------------
+// 'open' and 'status' get the first question of their flow directly — the tap
+// already said what the resident wants, and a model round-trip here produced a
+// re-greeting on a real handset. 'human' and 'balance' fall through to the
+// agent, which answers both by calling transfer_to_human.
+if (tapped === 'open' || tapped === 'status') {
+  return [{ json: {
+    _reply: '', _work: false, _canned: true, _menu: false,
+    to: from, lang, text: __TAP_LINE__[tapped][lang],
+    in_text: inText, msg_type: msgType, message_id: id,
+  } }];
+}
+
 // --- A greeting, and nothing else ------------------------------------------
 // This is the only case that gets the menu. Someone who opens with "שלום" has
 // told us nothing, so offering choices is genuinely useful. Someone who opens
@@ -810,6 +904,8 @@ def workflow(e):
     send_cred = e.get("N8N_WHATSAPP_CRED_ID", "").strip()
     log_cred = e.get("N8N_SUPABASE_CRED_ID", "").strip()
     log_url = e.get("SUPABASE_URL", "").strip().rstrip("/") + "/rest/v1/messages"
+    status_cred = e.get("N8N_TOOLSECRET_CRED_ID", "").strip()
+    fn_url = e.get("SUPABASE_URL", "").strip().rstrip("/") + "/functions/v1/debt-tools"
     base = e["N8N_BASE_URL"].strip().rstrip("/")
 
     return {
@@ -870,7 +966,8 @@ def workflow(e):
                 parameters={"jsCode": js(SORT, VERIFY_TOKEN=verify,
                                          APP_SECRET=app_secret,
                                          MEDIA_LINE=MEDIA_LINE, MENU=MENU,
-                                         SWITCH_LINE=SWITCH_LINE)},
+                                         SWITCH_LINE=SWITCH_LINE,
+                                         TAP_LINE=TAP_LINE)},
             ),
             node(
                 id="respond", name="Answer Meta",
@@ -1135,12 +1232,45 @@ def workflow(e):
                         "transfer_to_human",
                         "reason: %s" % from_ai(
                             "reason", "One of " + "/".join(
-                                TOOLS[1]["input_schema"]["properties"]["reason"]["enum"])),
+                                TOOLS[2]["input_schema"]["properties"]["reason"]["enum"])),
                     ),
+                    "options": {"timeout": 25000},
+                    "descriptionType": "manual",
+                    "toolDescription": TOOLS[2]["description"],
+                },
+            ),
+            # The one tool that skips the n8n router. The router answers Vapi
+            # locally and forwards writes async — right for a write, wrong for
+            # a lookup that needs a real synchronous answer. Same envelope,
+            # same Edge Function the voice agents' status tool calls, secret
+            # in the credential store.
+            node(
+                id="tool_status", name="get_request_status",
+                type="n8n-nodes-base.httpRequestTool",
+                typeVersion=4.2, position=[1920, 420],
+                parameters={
+                    "method": "POST",
+                    "url": fn_url,
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendBody": True, "specifyBody": "json",
+                    "jsonBody": TOOL_BODY % (
+                        "get_request_status",
+                        "reference: %s, building: %s, unit: %s" % (
+                            from_ai("reference",
+                                    "The reference the resident quoted, exactly as "
+                                    "written — HM-2026-1013 or just the digits. "
+                                    "Empty if none was quoted."),
+                            from_ai("building", "Street and number, if no reference."),
+                            from_ai("unit", "Apartment number, if given."),
+                        )),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
                     "toolDescription": TOOLS[1]["description"],
                 },
+                credentials=({"httpHeaderAuth": {"id": status_cred,
+                                                 "name": "Homies tool secret"}}
+                             if status_cred else {}),
             ),
             # The error branch. Not a nicety: this is the sentence the Code node
             # used to produce from its own catch block, and without it a model
@@ -1242,6 +1372,8 @@ def workflow(e):
                 {"node": "Answer the resident", "type": "ai_memory", "index": 0}]]},
             "open_request": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
+            "get_request_status": {"ai_tool": [[
+                {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "transfer_to_human": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
         },
@@ -1262,6 +1394,7 @@ def main():
     if "--apply" in sys.argv:
         ensure_send_cred(e)
         ensure_log_cred(e)
+        ensure_status_cred(e)
         e = env()
     wf = workflow(e)
     check_env()
