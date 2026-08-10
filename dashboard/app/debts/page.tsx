@@ -1,4 +1,5 @@
 import { serverClient } from '@/lib/supabase-server';
+import { Pager, pageFrom, pageSlice } from '@/components/pager';
 
 // One row per resident, not per charge: the person reading this is deciding
 // who to chase, and a resident owing three months is one decision, not three.
@@ -13,7 +14,10 @@ type Charge = {
 const month = (p: string) => p.slice(0, 7);
 const shekels = (n: number) => '₪' + n.toLocaleString('en-US');
 
-export default async function Debts() {
+export default async function Debts({
+  searchParams,
+}: { searchParams?: { page?: string } }) {
+  const page = pageFrom(searchParams);
   const { data, error } = await serverClient()
     .from('charges')
     .select('period,amount,status,residents(full_name,building,unit,phone)')
@@ -40,8 +44,11 @@ export default async function Debts() {
     }
     byResident.set(key, row);
   }
+  // Totals are over everybody who owes, never over the visible page — a
+  // figure that changed when you turned the page would be worse than none.
   const rows = [...byResident.values()].sort((a, b) => b.owed - a.owed);
   const total = rows.reduce((s, r) => s + r.owed, 0);
+  const visible = pageSlice(rows, page);
 
   const cards = [
     ['Total open', shekels(total)],
@@ -71,7 +78,7 @@ export default async function Debts() {
               <th>Months owed</th><th>In review</th><th>Owed</th>
             </tr></thead>
             <tbody>
-              {rows.map((r) => (
+              {visible.map((r) => (
                 <tr key={r.phone}>
                   <td dir="auto">{r.name}</td>
                   <td dir="auto">{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
@@ -85,6 +92,7 @@ export default async function Debts() {
           </table>
         ) : !error && <div className="empty">Nobody owes anything.</div>}
       </div>
+      <Pager page={page} total={rows.length} basePath="/debts" unit="residents" />
     </>
   );
 }

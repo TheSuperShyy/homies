@@ -1,5 +1,6 @@
 import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase-server';
+import { Pager, pageFrom, pageRange } from '@/components/pager';
 
 // The four values the check constraint on requests.status accepts. The list is
 // duplicated from the schema on purpose: the server action validates against
@@ -24,15 +25,18 @@ async function updateStatus(formData: FormData) {
 // somebody can send to a colleague.
 export default async function Tickets({
   searchParams,
-}: { searchParams: { status?: string } }) {
+}: { searchParams: { status?: string; page?: string } }) {
   const status = searchParams.status;
+  const page = pageFrom(searchParams);
+  const [from, to] = pageRange(page);
   let q = serverClient()
     .from('requests')
-    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at')
-    .order('created_at', { ascending: false })
-    .limit(200);
+    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at',
+            { count: 'exact' });
   if (status) q = q.eq('status', status);
-  const { data, error } = await q;
+  const { data, error, count } = await q
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   const tabs = ['', ...STATUSES];
 
@@ -81,6 +85,8 @@ export default async function Tickets({
           </table>
         ) : !error && <div className="empty">No tickets{status ? ` with status ${status}` : ''}.</div>}
       </div>
+      <Pager page={page} total={count ?? 0} basePath="/tickets"
+             params={{ status }} unit="tickets" />
     </>
   );
 }

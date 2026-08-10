@@ -1,4 +1,5 @@
 import { serverClient } from '@/lib/supabase-server';
+import { PAGE_SIZE } from '@/components/pager';
 
 // One page, four views, state in the URL. The two extra views answer the two
 // questions ops actually asks after an outbound day: who never picked up, and
@@ -10,8 +11,6 @@ const TABS = [
   ['no_answer', 'No answer'],
   ['links', 'Links sent'],
 ] as const;
-
-const PAGE_SIZE = 50;
 
 function href(view: string, page: number) {
   const q = new URLSearchParams();
