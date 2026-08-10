@@ -1,146 +1,235 @@
 # Homies — Accounts & Credentials Checklist
 
-What has to exist, who provides it, and when it's needed. Built from
-[PRD v2](../prd/Homies-PRD-v2.md) §9 and the decisions of 3 August 2026:
-telephony provider **undecided (generic SIP)**, WhatsApp number **provided by
-Homies**, Meta presence **starting from zero**, chatbot LLM via **OpenRouter**.
+What has to exist, who provides it, and what is still missing. **Status column
+verified against the live `.env` on 2026-08-10** (variable names and whether
+they are populated — values were never read or printed).
 
 Secrets live in the n8n credential store or `.env` — never in code or chat
 (PRD §13). See [.env.example](../../.env.example) for the exact variable names.
 
----
-
-## Critical path — start these two immediately
-
-The only clocks that cannot be compressed. Everything else on this page is an
-afternoon each.
-
-1. **Meta business verification** — needs Homies' legal docs (company
-   registration, matching domain). Unverified caps WhatsApp at 250
-   conversations/day, which blocks the pilot, not the dev work.
-2. **Israeli DID KYC** — 1–3 weeks elapsed at any provider. A number already
-   sitting in someone's account has served that time (see
-   [Vapi account notes](Homies-Vapi-Account-Notes.md)).
+Legend: **DONE** = populated and in use · **MISSING** = still to obtain ·
+**N/A** = retired from the architecture.
 
 ---
 
-## 1. Meta / WhatsApp Cloud API *(from zero)*
+## The short answer: what is actually still outstanding
 
-| Item | Notes |
+Almost everything is in place. Only four groups remain:
+
+| # | What | Blocking |
+|---|---|---|
+| 1 | **Omnitelecom SIP** — 4 values | Outbound/inbound phone calls. Nothing dials today. |
+| 2 | **Google service account + sheet ID** | The nightly OXS sheet bridge |
+| 3 | **Monday token + board ID** | Staff task hand-off (client-provided) |
+| 4 | **Meta business verification** *(account state, not a key)* | Caps WhatsApp at 250 conversations/day |
+
+Everything below that is already done.
+
+---
+
+## 1. Telecom — Omnitelecom *(the main gap)*
+
+Provider **decided**: Omnitelecom (omnitelecom.com / omnitelecom.co.il, Ramat
+Gan, `*9163`). No self-service and no public API — ordering is a phone call or
+the contact form.
+
+**Order exactly two products.** `OmniDID` (the +972 number) and `SIP Trunk
+Solutions`. On the Hebrew site: **מספר וירטואלי** and **קו SIP**. Skip Hosted
+PBX, Cloud PBX, contact centre and IVR — that is a phone platform you would be
+replacing, not something Vapi needs.
+
+**The four values Vapi needs** — the number alone does not give these:
+
+| Env var | What it is | Status |
+|---|---|---|
+| `SIP_GATEWAY_IP` | Gateway host — **IP, not FQDN** (Vapi 400s on hostnames) | **MISSING** |
+| `SIP_USERNAME` | SIP auth user | **MISSING** |
+| `SIP_PASSWORD` | SIP auth password | **MISSING** |
+| `SIP_PHONE_NUMBER` | The DID in +972 E.164 | **MISSING** |
+
+**Ask before paying — this decides whether it works at all:** does the trunk run
+over the **public internet**, or does it require a dedicated line? A dedicated
+line cannot reach Vapi.
+
+**Also specify when ordering:**
+
+- **Digest auth, not IP-based.** Vapi's SIP servers are shared; IP auth
+  misroutes between customers.
+- **Outbound caller ID presenting the DID** — the debt agent is outbound.
+- **G.711 (PCMU/PCMA), not G.729.**
+- **DTMF RFC 2833.**
+- **≥10 concurrent channels** for the pilot.
+
+**Omni must allow, on their side:**
+
+- SIP signalling from `44.229.228.186` and `44.238.177.138` (Vapi US)
+- RTP media on UDP `40000-60000` — **media source IPs vary per call.** Vapi
+  publishes static IPs for *signalling only*. Carriers who whitelist signalling
+  alone produce connected calls with no audio. This is the single most common
+  failure and worth stating explicitly to them.
+
+**Israeli DIDs need company documents — Homies' registration, not yours.**
+That is the long pole (1–3 weeks KYC) and it is a client task.
+
+*Confirmed empirically against the live Vapi account (4 Aug 2026), not from
+docs:* `POST /credential {"provider":"byo-sip-trunk"}` → "gateways should not be
+empty", and `POST /phone-number {"provider":"byo-phone-number"}` → "Credential
+Not Found". Both shapes are accepted, so BYO SIP works on this account.
+
+**Retired:** `TELNYX_API_KEY`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` are
+present but empty — **N/A**, not needed. Rotate and retire the old Telnyx
+account (see security items).
+
+---
+
+## 2. Meta / Facebook — WhatsApp chatbot *(credentials DONE)*
+
+All Meta credentials are already obtained and populated. Nothing to order here.
+
+| Env var | What it is | Status |
+|---|---|---|
+| `APP_ID` | Meta developer app ID | **DONE** |
+| `APP_SECRET` | App secret — signs the webhook payload | **DONE** |
+| `WHATSAPP_WABA_ID` | WhatsApp Business Account ID | **DONE** |
+| `WHATSAPP_PHONE_NUMBER_ID` | Phone Number ID (not the number itself) | **DONE** |
+| `WHATSAPP_ACCESS_TOKEN` | Access token | **DONE** |
+| `SYSTEM_USER_ACCESS_TOKEN` | Permanent system-user token — not the 24h dashboard token | **DONE** |
+| `WHATSAPP_TOKEN` | Third token, longest of the three | **DONE** |
+| `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | Self-chosen secret, shared with n8n | **DONE** |
+| `WHATSAPP_TEST_RECIPIENT` | Number the self-check messages | **DONE** |
+| `N8N_WHATSAPP_CRED_ID` | The credential's ID inside n8n | **DONE** |
+
+**Two things still to confirm — neither is a key:**
+
+- **Business verification status.** This is account state, not an env var, so it
+  cannot be checked from the repo. Unverified caps the WABA at **250
+  conversations/day**, which blocks the *pilot*, not the dev work. Needs Homies'
+  legal docs (company registration + matching domain). If not yet started, this
+  is critical path.
+- **Three overlapping tokens.** `WHATSAPP_ACCESS_TOKEN` (198 chars),
+  `SYSTEM_USER_ACCESS_TOKEN` (198) and `WHATSAPP_TOKEN` (289) all coexist. Only
+  the permanent system-user token should be doing real work; the others are
+  likely leftovers from setup and are a rotation hazard — a temp token expiring
+  looks exactly like an outage. Worth reducing to one.
+
+**The account must be Homies-controlled, not personal** — this is the
+Vapi-on-a-personal-Gmail problem, and the point was to avoid repeating it here.
+
+**Verify the whole chain works** (posts a real signed message and checks the
+database row, then cleans up):
+
+```
+python scripts/check_whatsapp.py
+```
+
+Use that rather than eyeballing config. Every serious fault this bot has had was
+silent — a webhook wired to the wrong output, a WABA subscribed to Meta's own
+dev-tools app — and each one *looked* fine in the dashboard.
+
+---
+
+## 3. Vapi (voice agent) — DONE, one warning
+
+| Env var | Status |
 |---|---|
-| Facebook account (BM admin) | Homies-controlled, **not personal** — the Vapi-on-personal-Gmail problem, avoided this time |
-| Meta Business Manager | Create, then start **business verification** (critical path) |
-| Meta developer app | With the WhatsApp product added |
-| WABA ID + Phone Number ID | Created when the number is registered |
-| Dedicated WhatsApp number | **Homies provides.** Must never have been on the WhatsApp app (or removed 30+ days). Only needs to receive one verification SMS/call |
-| Permanent system-user access token | Not the 24-hour temp token from the app dashboard |
-| Webhook verify token | Self-chosen secret, shared with n8n/Chatwoot |
+| `VAPI_PRIVATE_KEY` | **DONE** |
+| `VAPI_ASSISTANT_ID` | **DONE** |
+| `VAPI_PRIVATE_KEY_ACCOUNT2`, `VAPI_PRIVATE_KEY_OLD` | **DONE** (migration leftovers) |
 
-## 2. Vapi (voice agent)
+- ⚠️ The current key was **exposed in plaintext during scoping and is not
+  confirmed rotated** — rotate before production.
+- **Card on file + auto-reload.** An empty card with auto-reload off means calls
+  die mid-sentence when credits hit zero.
+- Account ownership (personal Gmail vs Homies) is still an open handover
+  question. See [Vapi account notes](Homies-Vapi-Account-Notes.md).
 
-| Item | Notes |
+## 4. Supabase — DONE
+
+`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+`SUPABASE_DB_URL`, `SUPABASE_DB_PASSWORD`, `SUPABASE_ACCESS_TOKEN` — all
+**DONE**. Project is live and holds the 12 real OXS residents.
+Service-role key is server-side only, never shipped to a browser.
+
+## 5. n8n — DONE
+
+`N8N_BASE_URL`, `N8N_SHARED_BASE_URL`, `N8N_SHARED_API_KEY`, `N8N_API_KEY`,
+`N8N_WEBHOOK_SECRET`, and the credential IDs (`N8N_CRYPTO_CRED_ID`,
+`N8N_OPENROUTER_CRED_ID`, `N8N_WHATSAPP_CRED_ID`, `N8N_SUPABASE_CRED_ID`,
+`N8N_TOOLSECRET_CRED_ID`) — all **DONE**. `N8N_MCP_TOKEN` is empty but only
+needed if n8n is exposed as an MCP server.
+
+**Back up the n8n encryption key.** Losing it loses every credential stored in
+n8n — this is not recoverable and is not in `.env`.
+
+## 6. OXS — keys DONE, endpoints unresolved
+
+`OXS_KEY_GENERAL`, `OXS_KEY_DEBTS`, `OXS_KEY_REQUESTS` — all **DONE** (70-char
+`oxs_k_` tokens). API host verified as `api.oxs.co.il`. See
+[HANDOVER.md](../../HANDOVER.md) — phones are the open question; run
+`python scripts/oxs_probe.py`.
+
+Open: re-issue `OXS_KEY_REQUESTS` as Read-Only if it was created Full Control.
+
+## 7. OpenRouter — DONE
+
+`OPENROUTER_API_KEY`, `OPENROUTER_API_KEY_2` — **DONE**. Covers the
+WhatsApp/team chatbot only; the voice agent's LLM is billed through Vapi at
+pass-through, so there is no separate key on the voice path.
+
+## 8. Cartesia (TTS) — partially done
+
+`CARTESIA_API_KEY` **DONE**, `CARTESIA_MODEL` **DONE**,
+`CARTESIA_VOICE_ID` **EMPTY** — needed only if using a cloned/custom voice.
+ElevenLabs vars (`ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL`, `VOICE_PROFILE`)
+are **MISSING** and only matter if that path is revived.
+
+## 9. Google (Sheets bridge — nightly OXS export) — MISSING
+
+| Env var | Status |
 |---|---|
-| Account login | Currently a personal Gmail — ownership decision open |
-| `VAPI_PRIVATE_KEY` | ⚠️ Current key compromised — **rotate before production** |
-| Assistant IDs | In `.env.example` |
-| Card on file + auto-reload | Empty card + auto-reload off = calls die mid-sentence at zero credits |
+| `GOOGLE_SERVICE_ACCOUNT_KEY_FILE` | **MISSING** — service-account JSON key |
+| `OXS_EXPORT_SHEET_ID` | **MISSING** |
 
-## 3. Telephony — virtual number *(provider undecided, kept generic)*
+Needs a Google account/Workspace, a Cloud project with the Sheets API enabled,
+and **the sheet shared with the service-account email** — easy to forget, and
+reads then fail silently as 403.
 
-| Item | Notes |
+## 10. Monday — MISSING (client-provided)
+
+| Env var | Status |
 |---|---|
-| Provider account | Any ITSP/DID vendor that exposes SIP termination |
-| +972 DID (E.164) | **KYC docs required — critical path** |
-| SIP gateway IP | IP, not FQDN — Vapi returns 400 on hostnames |
-| SIP username + password | Becomes a Vapi `byo-sip-trunk` credential; provider forwards inbound to `{number}@<credential_id>.sip.vapi.ai` |
-| Port / outbound proxy | If the provider specifies one (usually 5060) |
+| `MONDAY_API_TOKEN` | **MISSING** — client-provided, PRD §16 #9 |
+| `MONDAY_BOARD_ID` | **MISSING** — depends where staff actually work (§16 #7) |
 
-If the number ends up in a Twilio-style account instead, this collapses to
-Account SID + Auth Token and a dashboard import.
+## 11. Vercel + GitHub (CRM dashboard) — DONE
 
-## 4. Hostinger — VPS (n8n + Chatwoot)
+`VERCEL_TOKEN`, `VERCEL_API` — **DONE**. Runs on the free `*.vercel.app` URL
+through build and pilot.
 
-| Item | Notes |
-|---|---|
-| Hostinger account + VPS root/SSH key | |
-| Domain + Cloudflare account | See **§11 Domain** for what's needed when |
-| n8n admin login | |
-| n8n **encryption key** | **Back it up** — losing it loses every credential stored in n8n |
-| `N8N_WEBHOOK_SECRET` | Shared with Vapi tool calls |
-| Chatwoot super-admin login | |
-| Chatwoot API access token | n8n uses it for bot on/off per conversation |
-| Chatwoot agent accounts | Per department (PRD §4) |
-| SMTP credentials | Chatwoot email notifications |
+## 12. Hostinger VPS (n8n + Chatwoot)
 
-## 5. Supabase
+Not represented in `.env` (server-side). Still needed: Hostinger account +
+root/SSH key, Chatwoot super-admin login, Chatwoot API access token, per-department
+agent accounts, and SMTP credentials for Chatwoot notifications.
 
-| Item | Notes |
-|---|---|
-| Org + project | Not created yet |
-| `SUPABASE_URL` | |
-| Anon key | Browser-safe |
-| Service-role key | Server-side only, never shipped to a browser |
-| Database password | |
-
-## 6. OpenRouter (chatbot brain in n8n)
-
-| Item | Notes |
-|---|---|
-| `OPENROUTER_API_KEY` | Covers the WhatsApp/team chatbot only |
-| Model choice | Open — needs a Hebrew quality check |
-
-The **voice** agent's LLM is billed through Vapi at pass-through — no separate
-key on the voice path.
-
-## 7. Google (Sheets bridge — nightly OXS export)
-
-| Item | Notes |
-|---|---|
-| Google account / Workspace | |
-| Cloud project + Sheets API enabled | |
-| Service-account JSON key | n8n reads the sheet as this identity |
-| Sheet shared with the service-account email | Easy to forget; reads fail silently as 403 |
-
-## 8. Monday
-
-| Item | Notes |
-|---|---|
-| API token | **Client-provided** — PRD open item §16 #9 |
-| Target board ID | Same open item — depends on where staff actually work (§16 #7) |
-
-## 9. OXS
-
-**No system credentials in release 1** — v2 removed all RPA. Needed instead:
-
-- Sample export file + agreed nightly delivery mechanism (PRD §16 #3)
-- OXS Fintech confirmation on how payment links arrive
-- (Optional) a read-only staff login for manual reference — staff-owned, not a
-  system credential
-
-## 10. Vercel + GitHub (CRM)
-
-| Item | Notes |
-|---|---|
-| GitHub org/repo | Code home |
-| Vercel account + project | Linked to the repo; env vars set in Vercel |
-
-## 11. Domain
-
-Two different needs, two different clocks:
+## 13. Domain
 
 | Need | When | Why |
 |---|---|---|
-| Subdomains for n8n + Chatwoot (e.g. `n8n.…`, `inbox.…`) | **During the build** (weeks 3–4) | Meta's webhook requires a public HTTPS callback URL; Chatwoot needs a stable inbox address |
-| Custom domain for the CRM dashboard | **After the project**, at handover | The CRM runs on the free `*.vercel.app` URL through build and pilot; the branded domain is attached when Homies takes over |
+| Subdomains for n8n + Chatwoot | **During the build** | Meta's webhook requires a public HTTPS callback; Chatwoot needs a stable inbox address |
+| Custom domain for the CRM dashboard | **At handover** | The CRM runs on `*.vercel.app` until Homies takes over |
 
-Decide domain ownership (CLIX vs Homies) at the same time as the Vapi account
-ownership question — same handover conversation.
+Decide domain ownership (CLIX vs Homies) alongside the Vapi account ownership
+question — same conversation.
 
 ---
 
 ## Outstanding security items
 
 - ⚠️ Three keys exposed in plaintext during scoping, **not confirmed rotated**:
-  Vapi, Telnyx, Retell (PRD §13). Rotate before any goes near production.
-- The Retell and Telnyx accounts are otherwise unused in the current
-  architecture — rotate and retire.
+  Vapi, Telnyx, Retell (PRD §13).
+- Retell and Telnyx are otherwise unused in the current architecture — rotate
+  and **retire** both accounts.
+- Reduce the three overlapping WhatsApp tokens to the one permanent system-user
+  token.
+- Back up the n8n encryption key somewhere that is not the VPS.

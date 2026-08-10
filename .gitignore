@@ -45,6 +45,23 @@ sheets/*.csv
 !sheets/residents.csv
 *-real.csv
 
+# Same rule, different shape. The arrears sweep writes every resident OXS says
+# is behind — name, mobile, building, apartment, months owed, amount. The
+# 2026 run held 740 real numbers. THIS REPOSITORY IS PUBLIC. The scripts that
+# produce these files are committed and are the useful part; their output is
+# a debtors list and belongs nowhere near GitHub.
+docs/reference/arrears-*.json
+
+# OXS's own API documentation. No credentials in it, but it is their internal
+# surface and not ours to publish. Keep it local.
+OXS_External_API_v1.pdf
+
+# Next.js incremental typecheck cache
+dashboard/tsconfig.tsbuildinfo
+
+# Other clients worked on from this desktop. Not Homies, not this repo.
+Lotosclean-*
+
 # Voice recordings — a person's voice, dropped in for reference or for cloning.
 #
 # `New Recording 154.m4a (1).mp4` landed in the project root on 5 Aug and was

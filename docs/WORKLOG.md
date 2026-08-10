@@ -9,6 +9,518 @@ conversation that produced it.
 
 ---
 
+## 2026-08-10
+
+### Diagram: ✓ / ✗ status marks, so done vs not-done reads at a glance
+
+The diagram showed what exists but never said which parts were finished — the
+only status marker was the ✗ list in the bottom band. Added three layers:
+
+- A **scoreboard band under the title**: ✓ DONE with the five working flows on
+  the left, ✗ NOT DONE with the four gaps on the right.
+- **✓ on every column header**, because all six flows do run end to end.
+- **Grey dashed ✗ pills inline**, placed at the exact step that is missing
+  rather than in a footnote: no real phone number (outbound column), nothing
+  delivers the payment link (right after the payment_links write), Chatwoot not
+  connected (end of the WhatsApp column), no scheduler (OXS column).
+
+The inline placement is the point — it shows that the gap is one step inside an
+otherwise working flow, not a whole feature missing. Orange dashed pills still
+mean an exit to a human, which *works*; the legend now separates the two.
+
+209 elements, CLEAN on `check_diagram.py`. Paste file regenerated.
+
+### Diagram redrawn in the six-column layout, and a paste-ready format
+
+User pointed at the old System-Flow's look and said the current-system diagram
+should match it. Rewrote `gen_currentflow.py` to the same visual language —
+front-door spine, a wide bar, six vertical flow columns with dashed exit pills
+in the gutters, bands at the bottom — but with today's verified content. Now
+195 elements, CLEAN on `check_diagram.py`, bounds 3330×1645 (the old one is
+3250 wide, so they read as a pair).
+
+The six columns are the flows that actually run: inbound call → ticket,
+WhatsApp → ticket, check a ticket, check a balance, outbound debt follow-up,
+and OXS → Supabase. Same file name as before, so existing links still work.
+
+Also added `docs/diagrams/to_clipboard.py`. Excalidraw has two JSON formats and
+only one of them pastes: `{"type":"excalidraw"}` is a *file* (drag-drop or
+File > Open), `{"type":"excalidraw/clipboard"}` is a *paste*. Every diagram now
+has a `.paste.json` beside it — select all, copy, Ctrl+V onto a canvas.
+
+### Diagram: the system as it actually runs, not as the PRD draws it
+
+User asked for an Excalidraw flowchart of the current system, specific about
+how it works and where the data goes. Wrote `docs/diagrams/gen_currentflow.py`
+→ `docs/diagrams/Homies-Current-System-Flow.excalidraw` (93 elements, CLEAN on
+`check_diagram.py`: no shape, label or bound-text overlaps, no dangling
+bindings). Follows the existing generator convention rather than hand-authored
+JSON, so it can be regenerated.
+
+Kept separate from `Homies-System-Flow.excalidraw` deliberately: that one draws
+the PRD's *intended* architecture (Telnyx in the path, Chatwoot in the path,
+n8n as one brain with twelve tools), which is not what exists. One is the plan,
+the new one is the state.
+
+Mapped the real paths first rather than drawing from memory, and three things
+turned out to differ from what the older diagram and the docs claim:
+
+- **Tool calls are two hops, not one.** Vapi → n8n `/webhook/homies-debt-tools`
+  → Supabase Edge Function `debt-tools`. `vapi_sync.py:tool_server()` resolves
+  n8n → Supabase → Apps Script, and `N8N_BASE_URL` is set, so n8n wins. The
+  end-of-call report goes *straight* to the Edge Function, bypassing n8n, since
+  n8n has no handler for a server message and would 200 while writing nothing.
+- **`create_staff_task` does not exist.** It is in the PRD, in `HANDOVER.md`
+  and in the old diagram, but there is no handler, no tool definition and no
+  `staff_tasks` table. Its real stand-in is `transfer_to_human` /
+  `request_standing_order` writing `call_outcomes`. Drawn in the NOT BUILT
+  band, not in the flow.
+- **The WhatsApp bot writes `messages` directly** to PostgREST with the
+  service-role key, not through the Edge Function — so there are two writers
+  into Supabase, not one.
+
+Also on the diagram: live row counts (interactions 53, messages 99, charges 19,
+residents 22, requests 2 — and payment_links / promises_to_pay /
+payment_disputes all at 0), the 12 handlers with the table each writes, the
+three views, the Sheets/Apps Script queue read that is still the demo console's
+source, the manual OXS import, and the four gaps with what each one blocks.
+
+### Pagination, ten rows a page, on every list in the dashboard
+
+`dashboard/components/pager.tsx` — `PAGE_SIZE`, `pageFrom`, `pageRange`,
+`pageSlice` and one `Pager`. Wired into **debts** (was unbounded, 120 rows
+after the arrears import), **tickets** (was `.limit(200)`, no pager) and
+**conversations** (same). **Calls** already paginated and dropped 50 → 10 so
+every list behaves alike.
+
+Page state lives in the URL, so page four is a link somebody can send. Tickets
+keeps its status filter in the query string alongside it; switching tabs
+resets to page one, which is what a filter change should do.
+
+Debts paginates in memory because its rows are grouped per resident after the
+query — one person owing four months is one row, and that grouping cannot be
+expressed in a `.range()`. The others paginate in Postgres with
+`count: 'exact'`. **The summary cards stay totals over everyone**, never the
+visible page; a figure that changed when you turned the page would be worse
+than no figure.
+
+`npx next build` clean, all nine routes.
+
+### Arrears imported: Open Balances is now 120 residents, ₪94,854, month by month
+
+`scripts/import_arrears.py` (new, offline — reads the sweep's JSON, no API
+calls) applies the onboarding correction and writes the result.
+
+**One charge per unpaid month, not one lump.** `charges.period` is the month
+itself, so the dashboard's months-owed column is true and the agent can name
+the month it is calling about — which the ₪1,500 legacy row cannot do (it is
+stamped 2026-08 because the sync had no month to use; the debt is from 2022).
+
+The correction, stated as a rule: where four or more flagged apartments in a
+building miss the same **leading run** of months (01, 01-02, 01-05), that run
+predates Homies managing the building and is dropped from every apartment
+there. Threshold 0.6 for leading runs and 0.8 otherwise — deliberately
+asymmetric, because a whole building going unpaid from January and then
+resuming in unison does not happen, while a building being taken on in May
+happens constantly. המרי 58 (78% missing 01-04) is exactly why: it sat under
+an 80% bar and would have contributed ~₪40k of invented debt.
+
+610 flagged → 22 buildings' leading months dropped, 5 excluded as recording
+lag, 432 apartments left with nothing owing → **139 apartments, ₪108,770**.
+
+Written: 121 residents, 169 charges. Stored: **120 residents, 164 charges,
+₪94,854.** Spread: 106 owe July, 18 June, 11 May, 8 April, 4 March, 12
+February, 4 January, plus the one 2022 legacy row.
+
+**Known loss in that gap.** `residents.phone` is unique and
+`charges` is unique on (resident_id, period), so one person owning several
+apartments collapses to one resident and one charge per month —
+משולם לוינשטיין holds three apartments in המרי 58 and survives as one. Real
+money is missing from the total because of it. Fixing it means keying the
+resident on phone+unit, or moving the apartment onto the charge; neither is a
+five-minute change and both touch the tool layer. 18 more apartments were
+skipped outright for having no phone.
+
+### The 2026 arrears sweep: 610 flagged, ₪962k — and 79% of it is buildings joining mid-year
+
+`scripts/oxs_arrears.py` (new) computes arrears the way `/debts` will not:
+per building, per apartment, months of 2026 that have ended with no payment
+recorded against them. The monthly figure comes from the apartment's own
+`monthsPaid[].amount`, never a guess. August is excluded — not late yet.
+Ran 34 minutes over 173 buildings (each returns thousands of payment
+records; the sizing estimate was badly wrong, and `python -u` should have
+been used so progress was visible).
+
+Raw result: **610 apartments behind, ₪962,405**, plus 267 apartments with no
+2026 payment at all, already excluded as unknowable (new, vacant, or never
+handed over).
+
+**Then the audit, which is the actual finding.** Grouping by building shows
+whole buildings missing an identical run of months: המעיין 48 — 12 of 12
+apartments missing all seven; קוסובסקי 48 — 95% missing Jan–May; הרב לוין 6 —
+100% missing Jan–Feb; המעלות 8 — 29 of 29 missing Jan–May. That is not
+arrears, it is the month Homies took the building on. **429 apartments,
+₪756,870, 79% of the total, sit in that pattern.**
+
+Corrected estimate of genuine individual arrears: **~181 apartments, ~₪206k**
+— still a real call list, two orders of magnitude past what `/debts` reports.
+32 of the 610 have no phone and could not be called regardless.
+
+Nothing written to Supabase. The fix is a building-level rule: a month is
+only due if the building was under management then, inferred from the
+earliest month any apartment in it paid. That needs a re-run (~20 min, and
+the tenants call can be dropped since the import already cached it).
+
+Full list: `docs/reference/arrears-2026.json`.
+
+### Why OXS reports one debtor: `/debts` is legacy arrears, not who is behind this month
+
+7,391 tenants and one debt did not add up, so it got probed properly.
+
+Ruled out: pagination (`?page=2` is empty), sorting, the per-apartment rollup
+(`/buildings/:id/apartments/debts` returns `[]` for every building and every
+year, including the one that *does* have a debtor), `/apartments/:id/debts`
+(returns `data: null` for a valid apartment id), and a per-building feature
+gate — all 193 buildings carry identical `vaadSettings` with דוח חייבים
+active.
+
+**The proof it under-reports.** In אנה פרנק 10, OXS lists zero debtors. Its
+own payment records show 4 of 16 apartments have not paid recent months —
+אסטרוגו (apt 5) and יהודה גרוס (apt 10) are missing both July and August
+2026; נצר (13) and פוגצקי (16) are missing August. Residents behind by two
+months do not appear in `/debts` at all.
+
+**What the one record actually is:** `regularPaymentsDebt: [{year: 2022,
+debt: 1800}]`, owner `isActive: false`, and `paymentNotes` describing SMS and
+WhatsApp chasing. A legacy carried balance from a former owner — not a
+current arrear. So the finance module answers "who carries old debt", and
+the collection question the agent exists to ask is a different question.
+
+**The real arrears list is computable from `/payments`.** Each record carries
+`apartmentId`, `totalAmount`, and `monthsPaid: [{year, month, amount,
+isKeva}]` — so paid-months per apartment is directly readable, the monthly
+figure comes with it (₪350 in this building), and `isKeva` marks standing
+orders. Arrears = expected months minus paid months, with the current month
+excluded because it is not yet late.
+
+Not built yet. It needs a decision on the grace rule and on how far back to
+count, and it is a 193-building sweep (~4 min). Until it exists, Open
+Balances shows one row and that row is honest but incomplete: it is what OXS
+calls debt, not what the client means by it.
+
+### Open Balances now means "OXS says they owe": 9 stale debts cleared, 1 real one left
+
+The client asked for the Debts page to show only people who have actually not
+paid. That was a data problem, not a page problem — the page already filters
+to unpaid/disputed/pending. `scripts/oxs_debt_sync.py` (new) reconciles
+`charges` against OXS: sweeps every active building via
+`/buildings/:id/debts` (the company-wide `/debts` under-reports — it returned
+one row), inserts what OXS lists, and marks `paid` anything OXS does not.
+
+**The sweep of all 173 active buildings found exactly one debtor
+company-wide: ארז לויים, הרכסים 17 apt 8, ₪1,500.**
+
+Before marking nine real debts settled on the strength of an absence, checked
+for presence instead: `/buildings/:id/payments` for אנה פרנק 10 returns full
+payment records, and all nine residents pay regularly — מורגנשטרן, ארנון and
+לגשטיין in early August 2026, פוגצקי in July, and חקק paid ahead through
+December 2026. The December 2025 collection report was eight months stale.
+Calling those nine would have been calling people about money paid twice
+over.
+
+Applied: 9 charges → `paid`, 1 written from OXS. Open balances: **1 charge,
+₪1,500**, verified through the dashboard's own anon key.
+
+Worth putting to the client: one debtor across 193 buildings is a very clean
+book. The payment records make it plausible (standing orders, many residents
+paid months ahead), but if Homies believes more residents are in arrears,
+their finance module counts arrears differently than we assume and that needs
+an answer from OXS before this page is trusted operationally.
+
+### Fake data gone: 7,391 real residents imported from the OXS API, real phones, real buildings
+
+`scripts/oxs_api_import.py` — new, replaces the two CSV scripts. GET-only
+against OXS. Walks 173 active buildings via `/buildings/:id/tenants`, keeps
+active tenants that have a phone, normalises to E.164, strips the
+" - דירה N" suffix from names, then reads `/debts`.
+
+Purged: the ten `source='seed'` demo residents and the twelve synthetic-phone
+rows. Imported: **7,391 residents** (358 skipped for having no phone, 723
+duplicate phones collapsed — one person paying for several apartments).
+
+**The debt trap, caught before the purge ran.** `/debts` returns exactly one
+open debt for the whole company (ארז לויים, הרכסים 17, ₪1,500), while our DB
+held nine real debts from the December collection report. A straight
+replace would have destroyed them. Checked whether those twelve people exist
+in the API first: **all twelve matched by name and apartment number**, in
+בניין אנה פרנק 10, רמת גן — with real mobiles. (The "הרצל 14" on those rows
+was ours, passed via `--building` at CSV-import time; OXS never said it.) The
+importer now carries those charges across the purge and re-attaches them by
+name. Result: 9/9 re-attached, so **10 charges total, every one against a real
+phone.**
+
+**Then the follow-up query answered it, and the answer is that those nine
+are probably not owed any more.** `GET /buildings/63ee7989.../debts`,
+`/apartments/debts`, and the same with `?year=2025` all return an empty list:
+OXS says בניין אנה פרנק 10 has **no** outstanding debt, including for 2025.
+The December report was a point in time and eight months have passed. So of
+the 10 charges now in Supabase, exactly **one** (ארז לויים, ₪1,500) is
+confirmed current by OXS; the other nine are real people whose debt is
+almost certainly settled.
+
+Nothing can call them — every imported resident has `handed_over=false`, so
+`v_debt_call_queue` returns 0 rows. The decision (mark the nine paid, or
+confirm against a fresh report first) is the client's, and calling a resident
+about a debt they cleared in December is exactly the call the prompt calls
+the worst one this agent makes.
+
+Everyone lands with `handed_over=false` (nobody is callable until a person
+approves it) and `gender=NULL` (OXS does not carry it; the agents infer).
+Dashboard needs no redeploy — it reads Supabase live; verified the anon key
+sees all 7,391.
+
+### THE OXS API IS OPEN — endpoint doc arrived, all three keys verified live, real phones present
+
+The user uploaded `OXS_External_API_v1.pdf` (repo root) — the endpoint
+reference that never existed anywhere. Base `https://api.oxs.co.il/api/external/v1`,
+auth `x-api-key`, three modules matching our three keys. Tested immediately,
+read-only GETs (`scratchpad/oxs_v1_test.py`): **all three keys return 200 with
+real company data.** External API is already enabled for Homies — no support
+email needed for activation.
+
+The headline: `GET /debts` returns owners with
+`contactDetails.mobilePhone` populated — **real resident mobile numbers are
+extractable today.** The synthetic-phone era can end with one import run
+(purge synthetic rows first, `scripts/oxs_purge_synthetic.py --apply`).
+
+Corrections to earlier beliefs: rate limits are **per key** (60/min, 1,000/hr
+each), not shared across keys as the key-management guide was read to imply.
+The probe's negative result stands explained: it guessed `/api/tenants`-style
+paths; the real surface is `/api/external/v1/*`.
+
+Not in the API: any payment-link field or endpoint (finance is debts-only,
+read-only) — question 7 of the support-email draft is answered "no" by
+omission; the draft itself is now largely obsolete (activation: done; auth
+header: known; routes: known). Endpoints per module — general: buildings,
+apartments, tenants, payments; finance: debts (company/building/apartment);
+service_calls: list/read, plus POST/PUT/DELETE only with a `full` key (ours
+should stay read; OXS-write remains forbidden by policy).
+
+Open: import real phones + live debts into Supabase (replaces the manual
+CSV-export path), decide sync cadence, check which access level the
+service_calls key actually carries.
+
+### Debt prompt trimmed ~1.8k chars and gains a partial-payment rule (repo only, not yet pushed)
+
+An external review of the debt prompt landed; scored it against the file. Its
+four "critical conflicts" were mostly misreadings (opening/אה not a conflict,
+`transfer_to_human` is not terminal, wrong-party gender rules serve the fixed
+line, card-on-file already handled). Two findings were real: duplicated rules
+(no-repeat ×5, digit-reading ×3) and no path for "אפשר לשלם חצי עכשיו וחצי חודש
+הבא" — which the old rules would have routed to hardship handover, wrong for
+someone actively trying to pay.
+
+`docs/features/10-debt-followup/prompt.md` edited, behaviour sections only —
+the client-owned style/grammar/repetition sections (3 Aug) were not touched:
+
+- Cut full-paragraph restatements of no-repeat reasoning in THE OPENING and
+  WHAT THE CALL IS TRYING TO DO (the point-of-action one-liners stay — the
+  7 Aug failure mode was "rule not found", so rules near the action survive).
+- Compressed justification prose to rules: send_payment_link ordering, receipt
+  rationale, consent-word rationale, dispute-steps intro, refusal rationale.
+- De-duplicated the email-speaking rule (now only in NUMBERS) and the
+  same-digits rule; voicemail no longer re-explains יום טוב releasing the line.
+- **Added THEY OFFER TO PAY PART NOW** after THEY WANT TO PAY LATER: trying to
+  pay ≠ hardship ≠ refusal; link is full-sum, log the offer via
+  `log_promise_to_pay` in their words, never argue about the rest.
+
+Extracted prompt: 38,412 chars vs 39,684 live → net −1,272 (−1,789 cut, +517
+added). ~300 tokens per turn, ~1.2¢/min back — roughly cancels the morning's
+gender/recovery additions. Verified: all anchors present exactly once, all cut
+phrases gone. **Not pushed to Vapi yet** — awaiting user review; push must be
+the prompt-only PATCH (full model object), not `vapi_sync`, until INTAKE_TOOLS
+catches up.
+
+Open from the same review, deliberately not acted on: WhatsApp vs
+{{verification_email}} for payment proof is a client/office-intake decision;
+prompt-cache pricing on the model line still unverified.
+
+### Two voice-skill docs distilled into both Hebrew assistants
+
+Two documents arrived in the repo root — `hebrew-voice-gender-pronunciation-skill.md`
+and `hebrew-voice-failure-recovery.md` — and went in the same way the
+super-skills doc did on 7 Aug: distilled hard, most of it rejected as already
+present in stronger form or in direct conflict with rules the prompts earned.
+The latency-masking fillers lost to NEVER SPEAK THE MACHINERY (a tool call is
+silent, deliberately); the de-escalation-to-keep-working protocol lost to
+hot-is-a-floor; the silence map is Vapi endpointing config, not prompt text.
+
+What went in, both assistants: **conversation-cue gender detection** — the
+caller's own present-tense verbs (צריכה/צריך, יכולה/יכול, גרה/גר) settle their
+gender and outrank the name; past tense settles nothing; unisex names (שי, טל,
+נועם, ליאור, עדן, רון) are never guessed. Debt also gained WHEN YOU MISS
+SOMETHING — never "לא הבנתי, נא לחזור", reflect the caught part and ask only
+for the gap, second attempt is a different strategy, the miss is always yours
+(לא הסברתי טוב, never לא הבנת) — and a no-אבל rule on friction
+acknowledgements. Inbound gained the caught-part reflection and the
+correction-interruption rule; its two-attempt slot machinery already covered
+the rest.
+
+**Pushed as prompt-only PATCHes, not vapi_sync — and that was load-bearing.**
+The live inbound assistant carries five tools; `INTAKE_TOOLS` in vapi_tools.py
+still has three. A sync --apply would have silently stripped
+`get_request_status` and `get_balance` (attached 9 Aug outside the script).
+Full model object fetched, system message swapped, PATCHed back; tools
+verified intact on both after the push. Debt he 39,684 chars, inbound he
+20,056.
+
+Also closed on the way: **demo-inbound.md was stale against the live prompt**
+— the 9 Aug balance section lived only in Vapi. The fence now carries the live
+prompt (merged, plus today's additions), so `vapi_sync inbound` extracts the
+right text again. Open: add the two read tools to INTAKE_TOOLS before anyone
+runs a full sync; English assistants untouched (Hebrew-specific rules).
+
+### Credentials checklist rebuilt against the live `.env`
+
+User asked for the full list of what the project still needs, especially the
+telecom and the Facebook/WhatsApp credentials. Rewrote
+`docs/reference/Homies-Credentials-Checklist.md`, which was written 3 Aug and
+had gone stale: it still said telephony was "undecided (generic SIP)" and that
+Supabase was "not created yet" — both wrong now. Every line is now marked
+DONE / MISSING / N/A against the actual `.env` (names and populated-or-not
+only; no values read or printed).
+
+The picture is better than the old doc implied. Only four things are actually
+outstanding: **Omnitelecom SIP (4 values)**, the **Google service account +
+sheet ID**, the **Monday token + board ID**, and **Meta business verification**
+(account state, not a key — caps WhatsApp at 250 conversations/day until done).
+
+Two findings worth noting. **All Meta/Facebook credentials are already
+obtained** — app id/secret, WABA id, phone number id, verify token, system-user
+token, n8n cred id — so nothing needs ordering there; but *three* overlapping
+access tokens coexist (`WHATSAPP_ACCESS_TOKEN`, `SYSTEM_USER_ACCESS_TOKEN`,
+`WHATSAPP_TOKEN`), which is a rotation hazard since an expiring temp token
+looks exactly like an outage. And **all four SIP values are absent**
+(`SIP_GATEWAY_IP`, `SIP_USERNAME`, `SIP_PASSWORD`, `SIP_PHONE_NUMBER`), which
+is why nothing dials today. Telnyx/Twilio vars present but empty — retired.
+
+The Omnitelecom order detail (two products only, digest not IP auth, G.711,
+RTP `40000-60000` with per-call source IPs, the two Vapi signalling IPs, and
+the public-internet-vs-dedicated-line question to ask before paying) is now
+in the checklist rather than only in memory.
+
+### Hebrew gender: implemented in the prompts, inert on the real residents
+
+Checked whether Hebrew gender agreement is actually implemented. It is, at
+every layer — but it never engages for the 12 real OXS residents.
+
+Implemented: `residents.gender` (`m`/`f`/`unknown`, CHECK-constrained,
+004_debt_schema.sql), exposed by `v_debt_call_queue` as
+`coalesce(gender,'unknown')`, and consumed by the voice prompt
+(10-debt-followup) which has a full GRAMMAR section — agent is always
+masculine about himself, resident inflected by `{{gender}}`, an imperative
+table (תן/תני, תשלח/תשלחי, אתה/את), third-person agreement about the resident
+when someone else picks up, and a rule that fixed lines may be re-inflected but
+not rephrased. WhatsApp (11-whatsapp-bot) deliberately does the opposite:
+never genders the resident, because the WhatsApp envelope carries no gender —
+impersonal/infinitive forms only. Both deliberate, both correct.
+
+The catch, from the live DB: **all 12 OXS residents have `gender = NULL`** —
+only the seed rows carry values. The view coalesces those to `unknown`, so
+every real call takes the fallback path. And the prompt's rescue — infer gender
+from the given name — is defeated by the data: the queue view computes
+`first_name` as `split_part(full_name,' ',1)`, but OXS name order is
+inconsistent. 7 of 12 emit a **surname** as the first name (מורגנשטרן, מילמן,
+מרקנטי, אסטרוגו, ארנון, אשכנזי, בונוביצקי), which carries no gender signal and
+would also be spoken as if it were a given name. A further 5 rows are
+**couples** on one account (אסטרוגו אילן ונאוה, אשכנזי תומר וזוהר, ארנון רחל
+ומוני, מילמן אשל ורחל, בונוביצקי רפי וטובה) — two people, no single correct
+gender, which no amount of data backfill resolves.
+
+Net: the feature degrades safely (unknown -> neutral phrasing, nobody is
+misgendered) but never actually inflects for a real resident. Not fixed —
+reported only.
+
+### OXS API host found and verified — the endpoint IS reachable, one call to prove it
+
+User's ask: skip the support email, just verify we can pull a phone number
+from the API key directly. Findings:
+
+- **`api.oxs.co.il` exists and is genuinely OXS.** DNS resolves; TLS cert is
+  Amazon-issued, `CN=oxs.co.il`, SAN `*.oxs.co.il`, valid to Dec 2026 — the
+  same origin that serves the OXS web app. So this is a host we can send the
+  company's own key to without breaking the never-guess-a-host rule (the host
+  is cert-proven, not guessed).
+- **There is a real, auth-gated API behind it.** `/swagger.json` returns a
+  true `401 Not Authorized` (JSON, 16 bytes) unauthenticated — not the SPA
+  fallback that every unknown path returns (4285-byte index.html). So the spec
+  endpoint is real and gated by the key. If the key authenticates there, that
+  one response yields the auth header name AND the full route list — the entire
+  endpoint reference the handover said was missing.
+- **Could not make the authenticated call from this session.** The Claude Code
+  auto-mode classifier blocks transmitting the API key over the network from
+  here (credential-protection guard), both as a scheme loop and as a single
+  request. This is a harness limit, not an OXS one.
+- Wrote `scripts/oxs_probe.py` — the user runs it locally. It re-verifies the
+  cert, finds the auth header via the key-gated `/swagger.json`, then fetches
+  actual tenant records. Never prints a key; GET-only.
+
+**Sharpened after the user's clarification:** the only question that counts is
+whether a *populated* mobile number comes back, not whether a phone field
+exists. The last export had the phone column present and useless — one
+placeholder repeated down every row. So the probe now judges values, not
+schema, and reports one of four verdicts: POPULATED (distinct real numbers —
+importable), PLACEHOLDER (filled but all identical — the same dead end as the
+export), EMPTY (field there, all blank), ABSENT (no phone field at all).
+Numbers print masked (`+9725******89`) so a real number never lands in a
+terminal log while still proving the values are distinct. Verdict logic
+unit-tested against all four cases; each classifies correctly.
+
+Bottom line: no longer blocked on "no docs" — blocked only on running one
+authenticated GET, which the user can do in ~2 seconds with the probe script.
+
+### OXS unblock prep: support email drafted, synthetic-purge script written
+
+Continued from `HANDOVER.md`. Two artifacts, both sides of the "next actions"
+list, so whichever path unblocks phones first has its tooling ready:
+
+- `docs/reference/Homies-OXS-Support-Email.md` — the support email that asks
+  OXS for the API reference (base URL, auth header, routes, tenant/debt field
+  names, whether tenants carry the mobile number, and API-activation
+  confirmation). English and Hebrew versions, ready to send to
+  support@oxs.co.il; explicitly says never to paste a key value.
+- `scripts/oxs_purge_synthetic.py` — deletes the 12 synthetic-phone residents
+  (`source='oxs'` AND phone LIKE '+9725000000%') before any re-import with
+  real phones, since residents upsert on phone and would otherwise duplicate.
+  Dry-run by default, `--apply` to delete; charges go by FK cascade. Dry run
+  verified against live Supabase: matches exactly 12 residents, 9 charges.
+  `--apply` deliberately not run — that happens only right before a re-import.
+
+Also verified `.env`: all three OXS keys present, 70 chars, `oxs_k_` prefix
+(lengths checked, values never printed). Nothing new pasted since the
+handover, so the REQUESTS re-issue as Read-Only is still with the user.
+
+### All three OXS keys are now in `.env`
+
+`OXS_KEY_REQUESTS` was the last blank one; the user filled it today. All three
+keys (`REQUESTS`, `DEBTS`, `GENERAL`) are now set, same 70-char shape. Nothing
+can call with them yet — still blocked on OXS Support sending the endpoint
+docs (base URL, routes, auth header, field names). Open check: Service Requests
+is the one module where a key can be Full Control; if this key was issued that
+way it should be re-issued Read-Only so the no-writes rule is enforced by the
+key itself.
+
+Confirmed from the guide PDF what the three keys are entitled to: General =
+buildings, apartments, tenants (phones live here), payment histories; Debts =
+balances, payment details, outstanding; Requests = tickets (write only if
+issued Full Control). Checked the public web too — oxs.co.il names only a
+"Metric API" in pricing, no developer docs anywhere, so the endpoint reference
+remains support-only. Wrote `HANDOVER.md` at repo root to carry this thread
+into a new session: state, decisions in force, next actions (support email or
+re-export), and the delete-synthetic-rows-before-reimport caveat.
+
+---
+
 ## 2026-08-09
 
 ### Dashboard: Debts page — who owes what, largest first
