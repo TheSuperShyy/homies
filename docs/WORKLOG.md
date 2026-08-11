@@ -11,6 +11,169 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### The English twin rebuilt — both demo languages now show the same call
+
+A test call in English quoted Dana's ₪1,230 with no apartments named and
+answered "why is it a thousand shekels?" with a non-answer: the stale twin,
+frozen since its translation table broke in the 7 Aug prompt cut, and carried
+across two account moves as a verbatim copy. The client asked for the rebuild
+and handed the account-4 keys; the page push the move entry below left pending
+went out as web `67cbb2e` in the same session.
+
+**The table was rebuilt in two layers** (`vapi_en.py`): four whole-section
+regex blocks for the sections that are ABOUT Hebrew — HOW YOU SPEAK, NUMBERS,
+GRAMMAR, HESITATION — where a line-by-line translation would produce English
+instructions for speaking Hebrew (GRAMMAR collapses to "English does not
+inflect; never invent a title"; the formality table maps register, not words);
+plus **52 exact line pairs** for the fixed lines and scattered quotes, feature
+14's included — the ownership offer, the breakdown-question triggers, the
+one-apartment dispute example. `englished()` now takes a list of blocks, and
+each still has to match exactly once or the build refuses.
+
+Pushed over account 4's `41d370b2`: **42,917 chars, zero Hebrew remaining**,
+verified live — feature-14 phrases present in English, the current 7-tool set
+(`flag_not_handed_over` gone), n8n server URLs intact, and `endCallPhrases`
+inherited from the Hebrew source already carrying both English release
+phrases. This also retires the copied twin's *"please stay on the line"*
+handover noted below. `vapi-export.json` regenerated after the push.
+
+The safety property held the whole way: the build refused for four days rather
+than ship a half-translation, and the fix was the table, not the check.
+`vapi_en.py debt --dry` is the health check; it exits loudly the next time a
+Hebrew fixed line changes. **The intake twin's table is still the pre-cut
+one** — the same rebuild is owed there before English intake demos are trusted.
+
+### Account 4: the third Vapi migration, and the first one that just worked
+
+*"lets swap vapi account use this for now"*, with a private and a public key.
+Ran `docs/handover/new-vapi.md` end to end. Fifteen minutes, no surprises — the
+runbook has now paid for itself.
+
+Which key was which was **tested, not assumed**: `...829a3d` returned 200 on
+`GET /assistant`, `...789c2e` returned Vapi's own *"you may be using the private
+key instead of the public key"*. The new org is
+`8eb82c4d-bc85-4c45-bd0a-fee0000de58f`, and it held one stock `Riley`, no
+numbers, no tools, no credentials.
+
+| | Account 3 | Account 4 |
+|---|---|---|
+| Debt (he) | `3303317e` | `9e2034d1-7a4f-4e3b-89ee-6a6155091ed7` |
+| Debt (en) | `7449bc9a` | `41d370b2-b531-4d45-b2eb-4b00f881f87a` |
+| Intake (he) | `86a01f13` | `f482abc1-db69-422b-afdd-f7b40ca9d995` |
+| Intake (en) | `3edbe85b` | `8b98016b-310a-4286-bed8-c8077b603773` |
+| Public key | `ddd7e209` | `944c3b38-…` |
+| Cartesia credential | `bf29045b` | `4c9be89b-f62e-42e7-bd2d-35faf51e0969` |
+
+**Cartesia went in before the first push**, which is the whole point of step 2 —
+an assistant created without it falls back to `vapi/Elliot`, sounds American, and
+logs nothing. `POST /credential` works; the dashboard is not required, contrary
+to the runbook's wording, which is now corrected.
+
+**The Hebrew pair was rebuilt from the repo** (`vapi_sync.py debt --apply`,
+`inbound --apply`) — they are generated, so a copy would fork the source of
+truth. **The English pair was copied verbatim**, because `vapi_en.py --dry`
+still refuses: the debt LANGUAGE block no longer matches and the intake table
+has ten unmatched passages. Same blocker as 7 Aug, unchanged.
+
+**Server secrets travel on a copy.** They are redacted in `vapi-export.json`,
+which is why the runbook says never to restore from JSON — but a live
+`GET /assistant/<id>` returns `server.headers` and every tool's headers in full.
+Both twins came across with the report endpoint and all eight tool secrets
+intact, so nothing needed restoring.
+
+Verified before trusting it: four prompts byte-identical to account 3 (44,040 /
+38,533 / 20,056 / 18,315), both Hebrew resolving `cartesia/a976c076…`, 27 output
+filters on all four, `server` headers on all four, `check_tools.py` **10/10**.
+
+Repointed all ten files the runbook lists, plus `vapi_en.py`'s two source ids
+before the twins were touched. `.env` now carries `VAPI_PRIVATE_KEY` (account 4),
+`VAPI_PUBLIC_KEY`, and account 3's key as `VAPI_PRIVATE_KEY_ACCOUNT3` — call
+history and recordings stay on the old account and **recordings die after 14
+days**. Previous export archived as `vapi-export-account3-11aug.json` before
+`vapi_export.py` overwrote it.
+
+**One thing that cost ten minutes and is now written down:** Vapi 403s Python's
+`urllib` on every valid key while `curl` with the same key gets 200. It is the
+default User-Agent. The repo's scripts already set one; anything written fresh
+must too.
+
+**Not pushed.** `web/index.html` carries the new ids, the new public key and
+`BUILD 2026-08-11b`, but it is its own repo and its own Vercel deployment — the
+page keeps calling account 3 until someone runs `cd web && git push`. The English
+debt twin also came across still carrying the *"please stay on the line"*
+handover, unfixed; the account move deliberately changed nothing about prompts.
+
+### The English twin promises a transfer, because it was told to
+
+A demo call in English ended: *"One moment, I'm transferring you to someone from
+our team. Please stay on the line."* Then nothing. Reported as "it does not do
+anything".
+
+**The agent obeyed its prompt exactly.** Pulled the live assistant —
+`7449bc9a-6952-4625-a3c6-8bf73f8660f5`, *Homies — Debt Follow-up (en)*,
+`updatedAt 2026-08-09T08:24:53Z`, gpt-5.4, 38,533 chars. Its HANDING OVER
+section reads:
+
+> 1. Say the handover line. 2. Call `transfer_to_human`. 3. **Stay on the line.**
+> "One moment, I'm transferring you to someone from our team. Please stay on the line."
+> **Never end the call on a handover.**
+
+That is the *reversed* design, still live. The Hebrew prompt
+(`docs/features/10-debt-followup/prompt.md`) now says the opposite in bold —
+nothing is being connected, say the line once, close warmly — because
+`transfer_to_human` writes a row and connects nobody. Not a model failure; a
+stale prompt encoding an intention we abandoned.
+
+**The same staleness explains the rest of that call.** The English twin's
+variables are `alt_payment, amount, building, callback_number, first_name,
+gender, month, verification_email` — no `apartments_phrase`,
+`breakdown_phrase`, `has_card` or `charges`. So "why is it so expensive?" got a
+generic answer about monthly expenses instead of *₪450 for apartment 4 and ₪780
+for apartment 9*; it has no per-apartment structure to speak from. It also still
+carries `flag_not_handed_over`, which the Hebrew prompt records as **gone**.
+
+**One genuine misfire, separate from staleness.** "But for what building is it?"
+tripped the scam-check branch — the one written for *"prove it, tell me my
+address"* — and the resident was told personal details cannot be read out over
+the phone. The building is the subject of the call, not a detail being extracted
+from the agent. That branch needs to exclude what the agent itself already named.
+
+Not fixed. The English twin needs regenerating from the current Hebrew prompt;
+until then every English demo call ends on a promise the system cannot keep.
+
+### Payment method is importable — it lives on the payment, not on the person
+
+Asked whether we can pull *how* a resident pays out of OXS. Probed the live API
+read-only, printing field names and non-personal values only.
+
+**Yes, and richly — but only from `/buildings/:id/payments`.** Every payment
+record carries `paymentType` (int) and `paymentTypeLabel` (Hebrew). Across one
+building's payments the five values in use are: `6` כרטיס אשראי בהו"ק
+(credit-card standing order), `2` העברה בנקאית (bank transfer), `1` כרטיס אשראי
+(one-off card), `5` הוראת קבע בנקאית (bank standing order), `4` צ'ק (cheque).
+`monthsPaid[].isKeva` (and `isBankKeva`) says per month whether a standing order
+covered it, and `wasCancelled` / `cancelReason` mark reversals.
+
+**The tenant record carries none of it.** `/buildings/:id/tenants` returns only
+name, number, phone, email, `isActive`, `payerType` (owner vs tenant),
+`orderIndex`, `job`. So there is no "this resident is on standing order" flag to
+read — the arrangement is inferred from what they last actually paid with. Good
+enough, and more honest than a stored flag nobody maintains.
+
+**What we deliberately will not import.** `paymentDetails[]` carries instrument
+data — card last-four `digits`, `token`, `shvaParams`, `dealNumber`, expiry, and
+for transfers `transferBank` / `transferBranch` / `transferAccount`. None of it
+belongs in our database. Only the method category has any use to the agent.
+
+**Why it matters to the debt agent.** A resident in arrears whose last payments
+were `6`/`5` did not forget — their standing order failed or lapsed, and that is
+a different call than one to somebody who pays by transfer each month. The payer
+record even has an `automatedCreditFailedMessage` field, unread so far.
+
+Not implemented. `oxs_debt_sync.py` reads `monthsPaid` only and ignores
+`paymentType` today; adding it is a column plus one line in the sweep, and no
+extra API calls — the field is already in the response we fetch.
+
 ### Feature 14 built and deployed: one call per resident, every apartment in it
 
 The freeze was lifted (*"implement the handling"*) with one scope cut:

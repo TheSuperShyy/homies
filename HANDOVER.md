@@ -182,7 +182,7 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 
 | System | Env vars |
 |---|---|
-| Vapi | `VAPI_PRIVATE_KEY` (+ `_OLD`, `_ACCOUNT2`) |
+| Vapi | `VAPI_PRIVATE_KEY`, `VAPI_PUBLIC_KEY` (+ `_OLD`, `_ACCOUNT2`, `_ACCOUNT3`) |
 | Supabase | `SUPABASE_URL`, `_ANON_KEY`, `_SERVICE_ROLE_KEY`, `_DB_URL`, `_DB_PASSWORD` |
 | n8n | `N8N_BASE_URL`, `N8N_API_KEY`, `N8N_WEBHOOK_SECRET` |
 | OXS | `OXS_KEY_GENERAL`, `OXS_KEY_DEBTS`, `OXS_KEY_REQUESTS` |
@@ -228,11 +228,15 @@ resolved:
    One scope cut, by the client: apartments that owe nothing are not counted
    or spoken — only what owes is on the call.
 
-**Left stale, on purpose:** `vapi_en.py debt` exits ("LANGUAGE block did not
-match") — its substitution table predates the 7 Aug prompt cut, so the English
-twin is frozen at its last build. It fails closed; rebuilding the table is its
-own task. The demo page still sends `month` (singular) so the stale English
-assistant's sentences stay whole.
+**The English debt twin is CURRENT again** (rebuilt 11 Aug, evening): its
+substitution table was rebuilt against the post-cut prompt — four whole-section
+blocks plus 52 line pairs, feature 14 included — and pushed to account 4. Both
+demo languages now show the same call. `vapi_en.py debt --dry` is the health
+check; it exits loudly whenever a Hebrew fixed line changes, and the fix is the
+table, never the check. **The intake twin's table is still pre-cut** — the same
+rebuild is owed before English intake demos are trusted. The demo page still
+sends `month` (singular) alongside the phrases; harmless, and the intake twin
+relies on nothing else.
 
 Nothing dials: no phone number exists, all 7,391 residents are
 `handed_over = false`, and both queue views return 0 rows.
