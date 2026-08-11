@@ -11,6 +11,70 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### A charge belongs to an apartment, not to a phone — ₪6,665.40 recovered
+
+Asked: *"I want to know what apartment isn't paid yet and how much."* The page
+could not answer it and no page change would have — the second apartment's debt
+was not hidden by the query, it was **absent from the database**.
+
+`residents.phone` is unique and `charges` was unique on `(resident_id, period)`,
+so when `import_arrears.py` met the same phone twice it ran `do update set
+amount = excluded.amount` and the second apartment **overwrote** the first.
+Measured before changing anything: two owners, two invisible apartments,
+₪6,665.40 missing from a reported ₪94,854.30 — one second flat carrying four
+months at ₪5,572, the other two months at ₪1,093.40. (Both owners are in the
+same building; naming it here alongside apartment numbers and amounts would put
+a debtor record in a public repo.)
+
+**Migration 012** puts the apartment on the charge: `charges.unit`, backfilled
+from the resident, `NOT NULL` defaulting to `''` — nullable would have let
+Postgres treat two unknown apartments as distinct and reopen the same duplicate
+— and the unique key becomes `(resident_id, period, unit)`.
+`v_debt_call_queue` now takes `unit` from the charge, or an owner of two flats
+would be told the amount for one and the apartment number of the other.
+
+Chosen over keying residents on `(phone, unit)`. Every identity path starts
+from a phone — `get_balance` on WhatsApp, the n8n memory window,
+`v_conversations` — and making phone non-unique turns a balance question into a
+disambiguation mid-call. What made the charge-side fix cheap was checking
+first: every write tool keys off the `charge_id` the campaign runner attached
+to the call, never off `(resident, period)`, so not one of them needed touching.
+Also rejected: hand-patching the two rows, which would have re-collapsed on the
+next import.
+
+**Two hazards the pre-flight caught, both inside the statement being rewritten.**
+Nine charges were already `paid`, and the import ended its upsert with
+`status = 'unpaid'` — re-running it would have resurrected nine settled debts
+against real people. It now leaves `status` alone; a snapshot from one sweep is
+not evidence that a paid debt is open again. And all 173 real charges carried
+`source = 'seed'` while their residents correctly said `oxs`, because the column
+defaults to seed and the import never set it — meaning the whole arrears list
+sat one purge away from deletion by a query written to be careful (007 exists to
+make `source` exactly that filter). Both fixed.
+
+**Verified after applying:** ₪101,519.70 across 170 charges, 122 apartments,
+120 residents. Nine paid charges still paid. Zero duplicate
+`(resident, period, apartment)`. All 179 charges now `source = 'oxs'`.
+`v_debt_call_queue` still **0 rows** — the handed-over interlock is untouched
+and nothing can dial. Migration re-run to prove it is idempotent.
+
+Dashboard groups on phone+apartment with an Apartment column from the charge,
+and counts apartments and residents separately because they stopped being the
+same number. `get_balance` answers for one apartment when the caller identified
+themselves by apartment, and for everything they own — split under
+`owed_apartments` — when found by phone or name; months are summed across flats
+rather than listed twice. It also had to learn to find a caller through their
+*charge*, since `residents.unit` names only one flat and apartment 601 was
+otherwise reachable as 103 and invisible as itself.
+
+**The Edge Function is written but NOT deployed** — it is the live writer voice
+calls hit, and that is a separate decision. Until it ships, the two multi-flat
+owners get a combined balance and their second apartment is not findable by
+building+apartment. Nothing else is affected; every write tool is unchanged.
+
+Defect 2 in `HANDOVER.md` is closed. Defect 1 (the 2022 debt stamped `2026-08`)
+is still open.
+
 ### Debts page filters by month, and opens on the month being called
 
 The page answered "who owes the most, ever". Collection is worked one month at

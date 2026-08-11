@@ -427,10 +427,22 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * A name that matches two residents returns nobody. Between neighbours with
    * similar names, a guess read out with amounts attached is a privacy leak
    * dressed as an answer.
+   *
+   * SINCE MIGRATION 012, DEBT BELONGS TO AN APARTMENT
+   * How the caller was identified decides what they are told. Identified by
+   * building+apartment, the answer covers that apartment only. Identified by
+   * their phone or their name, it covers everything they own, with
+   * `owed_apartments` splitting it — because an owner of three flats asking
+   * "how much do I owe" means all three, and the same owner asking about 601
+   * does not.
    */
   async get_balance(args, ctx) {
     const fields = "id,full_name,building,unit";
     let resident: any = null;
+    // Set only when the caller identified themselves *by apartment*. Then the
+    // answer is about that apartment and no other — an owner of three flats
+    // asking about 601 must not be read the total for all three.
+    let askedUnit: string | null = null;
 
     if (channel(ctx) === "whatsapp") {
       const phone = "+" + ctx.callId.slice(3).replace(/^\+/, "");
@@ -450,6 +462,23 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         const { data } = await db.from("residents").select(fields)
           .eq("building", building).eq("unit", unit).limit(1);
         resident = data?.[0] ?? null;
+        if (resident) askedUnit = unit;
+
+        // `residents.unit` names only ONE of an owner's flats — since
+        // migration 012 the apartment that owes lives on the charge. So a
+        // caller from the second flat is absent from the lookup above and has
+        // to be found through their debt instead. Without this, the owner of
+        // 601 and 103 is reachable as 103 and invisible as 601.
+        if (!resident) {
+          const { data: viaCharge } = await db.from("charges")
+            .select("unit,residents!inner(id,full_name,building,unit)")
+            .eq("unit", unit).eq("residents.building", building).limit(1);
+          const hit: any = viaCharge?.[0]?.residents ?? null;
+          if (hit) {
+            resident = hit;
+            askedUnit = unit;
+          }
+        }
       }
     }
     if (!resident) {
@@ -463,25 +492,51 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     }
     if (!resident) return { ok: true, found: 0 };
 
-    const { data: charges, error } = await db
+    let q = db
       .from("charges")
-      .select("period,amount,status")
-      .eq("resident_id", resident.id)
-      .order("period", { ascending: true });
+      .select("period,amount,status,unit")
+      .eq("resident_id", resident.id);
+    if (askedUnit !== null) q = q.eq("unit", askedUnit);
+    const { data: charges, error } = await q.order("period", { ascending: true });
     if (error) return { ok: false, error: error.message };
 
     const owed = (charges ?? []).filter((c) => c.status === "unpaid");
+
+    // Months are summed across apartments rather than listed twice. An owner of
+    // two flats owing April on both owes April once, for the sum — "April, and
+    // also April" is not a sentence anybody should hear read back to them.
+    const byMonth = new Map<string, number>();
+    for (const c of owed) {
+      const p = String(c.period).slice(0, 7);
+      byMonth.set(p, (byMonth.get(p) ?? 0) + Number(c.amount));
+    }
+
+    // The per-apartment split, and only when there is one to make. A single
+    // apartment is the overwhelming majority — 117 of 119 — and an extra array
+    // on every answer is one more thing for the model to read out unasked.
+    const units = [...new Set(owed.map((c) => String(c.unit)))];
+    const byApartment = units.length > 1
+      ? units.map((u) => ({
+        unit: u,
+        total: owed.filter((c) => String(c.unit) === u)
+          .reduce((s, c) => s + Number(c.amount), 0),
+        months: owed.filter((c) => String(c.unit) === u)
+          .map((c) => String(c.period).slice(0, 7)),
+      }))
+      : undefined;
+
     return {
       ok: true,
       found: 1,
       resident: resident.full_name,
       building: resident.building,
-      unit: resident.unit,
+      // The apartment asked about; or the only one that owes; or null when
+      // several do, which is the signal to use owed_apartments rather than
+      // naming a flat the caller did not mention.
+      unit: askedUnit ?? (units.length === 1 ? units[0] : null),
       owed_total: owed.reduce((s, c) => s + Number(c.amount), 0),
-      owed_months: owed.map((c) => ({
-        period: String(c.period).slice(0, 7),
-        amount: Number(c.amount),
-      })),
+      owed_months: [...byMonth].map(([period, amount]) => ({ period, amount })),
+      owed_apartments: byApartment,
       // Disputed and pending rows are facts the agent should not hide behind
       // a clean zero — "in review with the team" is the truthful phrasing.
       in_review: (charges ?? [])

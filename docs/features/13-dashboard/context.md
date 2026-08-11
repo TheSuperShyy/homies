@@ -64,6 +64,72 @@ The `2026-08` tab still renders and is still linkable. Hiding a row because it
 is wrong would leave the dashboard disagreeing with the database, which is a
 worse failure than an odd-looking tab.
 
+### A row became an apartment — 11 Aug
+
+Asked for straight after the month filter shipped: *"I can see that residents
+have multiple apartments, so I can't really resolve that. I want to know what
+apartment isn't paid yet and how much."*
+
+The page could not answer it, and no amount of page work would have. The debt
+for the second flat was not hidden by the query — it was **absent from the
+database**. `residents.phone` was unique and `charges` was unique on
+`(resident_id, period)`, so `import_arrears.py` hit its own `do update set
+amount = excluded.amount` on the second apartment and overwrote the first
+instead of adding to it. Measured before touching anything: two owners, two
+invisible apartments, **₪6,665.40** missing from a reported ₪94,854.30.
+
+### Why the apartment went on the charge
+
+`residents.phone` unique is load-bearing in a way that is easy to underrate.
+Every identity path in the system starts from a phone: `get_balance` on
+WhatsApp, the n8n memory window, `v_conversations`. Keying residents on
+`(phone, unit)` would have made all of them return several rows, which turns a
+balance question into a disambiguation in the middle of a call — for a gain the
+other option also delivers.
+
+Putting the apartment on the charge costs one column and no lookups. What made
+it cheap was checking first: every write tool keys off the `charge_id` the
+campaign runner attached to the call, never off `(resident, period)`, so the
+constraint beneath them could change without one of them noticing.
+
+Rejected: patching the two rows by hand. It would have shown the right total
+that afternoon and re-collapsed on the next import, which is the kind of fix
+that costs more the second time it is discovered.
+
+### Two things the pre-flight caught
+
+Neither was part of the task, both were in the statement being rewritten.
+
+**Nine settled charges would have been resurrected.** `import_arrears.py` ended
+its upsert with `status = 'unpaid'`, so re-running it would have reopened nine
+debts that `oxs_debt_sync.py` had marked paid — against real people. The import
+now leaves `status` alone: the arrears file is a snapshot from one sweep, not
+evidence that a settled debt is open again.
+
+**Every real charge claimed to be fictional.** All 173 carried
+`source = 'seed'` while their residents correctly said `oxs`, because the
+column defaults to `'seed'` and the import never set it. Migration 007 exists
+to make `source` the thing every destructive query filters on — so the entire
+arrears list was one purge away from deletion *by a query written to be
+careful*. Now `oxs`, scoped to charges whose resident came from OXS so a future
+seeded fixture stays seed.
+
+### What the agent says now
+
+Identified by building+apartment, `get_balance` answers for that apartment
+alone. Identified by phone or name, it answers for everything they own and
+splits it under `owed_apartments`. An owner of three flats asking "how much do
+I owe" means all three; the same owner asking about 601 does not.
+
+Months are summed across apartments rather than listed twice, because "April,
+and also April" is not a sentence to read back to somebody.
+
+There is also a lookup that would have quietly broken: voice has no caller ID
+and finds people by building+apartment against `residents.unit`, which now
+names only one flat. The caller from the second flat had to be found through
+their charge instead, or an owner would have been reachable under one of their
+apartment numbers and invisible under the other.
+
 ### Empty months are shown, not redirected
 
 A well-formed month nobody owes for renders "Nobody owes for 2026-03" rather

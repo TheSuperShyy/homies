@@ -52,7 +52,8 @@ unpaid, handed over, not do-not-call, attempts < 4), `v_conversations`,
 **The dashboard.** Next.js 14 on Vercel at `homies-dashboard.vercel.app`.
 Pages: overview, tickets, debts, conversations, calls, call detail. Anon key,
 no login since 9 Aug, read-only except `requests.status`. Ten rows a page
-everywhere, via `dashboard/components/pager.tsx`. Debts filters by month —
+everywhere, via `dashboard/components/pager.tsx`. Debts is one row per
+**apartment**, not per person, and filters by month —
 `/debts?month=2026-07`, tabs derived from the data, `?month=all` for the
 lifetime view — and opens on the newest **completed** month, because the
 current month is never chased and the newest month carrying a charge is
@@ -99,11 +100,15 @@ writes the call to the office. Never say anyone is being put through.
   buildings. All carry `handed_over = false`, so **`v_debt_call_queue` is
   empty and nothing can dial**. A person must flip that flag before any
   campaign. This is the safety interlock; do not remove it casually.
-- **120 residents owing ₪94,854**, one charge per unpaid month across
-  2026-01 → 2026-07. 106 owe July, tapering to 4 owing January.
+- **122 apartments owing ₪101,519.70, held by 120 residents** — one charge per
+  apartment per unpaid month across 2026-01 → 2026-07. July is 108 apartments
+  and 106 people, tapering to 4 owing January. Apartments and residents are
+  different numbers and the dashboard counts both.
 - Plus one legacy row, ₪1,500 — a 2022 balance, and the only thing OXS's
   `/debts` endpoint reports for the entire company.
-- Zero demo or synthetic rows; both were purged on 10 Aug.
+- Zero demo or synthetic rows; both were purged on 10 Aug. Every charge carries
+  `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
+  every destructive query filters on.
 
 ### Three known defects
 
@@ -111,12 +116,11 @@ writes the call to the office. Never say anyone is being put through.
    use. The agent would name August, which that resident would dispute. The
    dashboard routes around it — Debts opens on the newest *completed* month —
    but the row itself is still wrong and the voice agent still reads it.
-2. **People owning several apartments collapse into one row.**
-   `residents.phone` is unique and `charges` is unique on
-   `(resident_id, period)`, so one owner with three apartments in the same
-   building survives as one resident and one charge per month. Real money is
-   missing from the ₪94,854. The fix is keying the resident on phone+unit, or
-   moving the apartment onto the charge; both touch the tool layer.
+2. ~~People owning several apartments collapse into one row.~~ **Fixed 11 Aug**
+   by migration 012: the apartment lives on the charge, unique on
+   `(resident_id, period, unit)`. Recovered ₪6,665.40 across two owners.
+   `residents.unit` still exists but names only one of an owner's flats and is
+   **not authoritative for debt** — read `charges.unit`.
 3. **18 apartments have no phone in OXS** and were skipped. Not callable.
 
 ---
@@ -191,7 +195,12 @@ exists. Never print a value, never commit one, never paste one into chat.
 
 ## Next moves, in order
 
-1. Fix the two data defects (month stamp, multi-apartment collapse).
+0. **Deploy `debt-tools`.** The Edge Function in the repo is ahead of what is
+   live: `get_balance` gained the per-apartment answer and the ability to find
+   a caller by their second flat. Until it ships, two multi-flat owners get a
+   combined balance and their second apartment is not findable by
+   building+apartment. No write tool changed, so nothing else is waiting on it.
+1. Fix the remaining data defect (the 2022 debt stamped `2026-08`).
 2. Schedule the sync — `oxs_debt_sync.py` nightly, plus a pre-flight debt
    check immediately before any call, so nobody is chased for something they
    paid yesterday.

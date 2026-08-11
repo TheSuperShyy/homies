@@ -22,6 +22,19 @@ excluded too, and reported.
 One row per unpaid month, not one lump: `charges.period` is the month itself,
 so the dashboard's "months owed" column is true and the agent can name the
 month it is calling about.
+
+ONE ROW PER APARTMENT PER MONTH
+An owner with several flats gets one charge per flat per month. Until 11 Aug
+`charges` was unique on (resident_id, period) and this script did
+`do update set amount = excluded.amount`, so the second apartment overwrote the
+first rather than joining it: two owners, two invisible apartments, ₪6,665.40
+absent. Migration 012 puts the apartment on the charge; this writes it.
+
+WHAT THIS DELIBERATELY DOES NOT TOUCH
+`status`. A charge marked `paid` by `oxs_debt_sync.py` stays paid — the arrears
+file is a snapshot from one sweep and is not evidence that a settled debt is
+open again. The old `do update set ... status = 'unpaid'` would have resurrected
+nine settled charges on the next run.
 """
 import argparse
 import json
@@ -109,6 +122,19 @@ def main():
     if len(rows) > 15:
         print(f"  ... and {len(rows)-15} more")
 
+    # Printed every run, because this is the case the old schema silently ate.
+    # If it ever reads "0 owners", that is worth distrusting before believing.
+    multi = defaultdict(list)
+    for r in rows:
+        if r["phone"]:
+            multi[r["phone"]].append(r)
+    multi = {p: rs for p, rs in multi.items() if len(rs) > 1}
+    print(f"\nOWNERS WITH MORE THAN ONE APARTMENT IN ARREARS: {len(multi)}")
+    for p, rs in sorted(multi.items(), key=lambda kv: -sum(x["amount"] for x in kv[1])):
+        print(f"  {rs[0]['name'][:24]:<24} {len(rs)} apartments  "
+              f"₪{sum(x['amount'] for x in rs):>8,.0f}  "
+              f"apt {', '.join(str(x['unit']) for x in rs)}")
+
     if not a.apply:
         print("\nDry run — Supabase untouched. Re-run with --apply.")
         return
@@ -122,21 +148,34 @@ def main():
                 if not r["phone"]:
                     skipped += 1
                     continue
+                # `unit` is set when the resident is first seen and not
+                # overwritten afterwards. For an owner of several flats every
+                # apartment is an equally true answer, so overwriting made
+                # residents.unit depend on the order rows happen to arrive in.
+                # The authoritative apartment for a debt is charges.unit.
                 conn.execute("""
                     insert into residents (full_name, phone, building, unit, source,
                                            handed_over, do_not_call)
                     values (%s, %s, %s, %s, 'oxs', false, false)
                     on conflict (phone) do update set
-                      building = excluded.building, unit = excluded.unit
+                      building = excluded.building
                 """, (r["name"] or "דייר", r["phone"], r["building"], r["unit"]))
                 residents += 1
                 for m in r["months"]:
+                    # source='oxs': these are real people's real debts. The
+                    # column defaults to 'seed', and 007 makes 'seed' the thing
+                    # every destructive query filters on — so leaving the
+                    # default here put the whole arrears list one purge away
+                    # from deletion. Status is left alone on conflict; see the
+                    # module docstring.
                     conn.execute("""
-                        insert into charges (resident_id, period, amount, status)
-                        select id, %s, %s, 'unpaid' from residents where phone = %s
-                        on conflict (resident_id, period) do update set
-                          amount = excluded.amount, status = 'unpaid'
-                    """, (date(YEAR, int(m), 1), r["monthly"], r["phone"]))
+                        insert into charges (resident_id, period, unit, amount,
+                                             status, source)
+                        select id, %s, %s, %s, 'unpaid', 'oxs'
+                          from residents where phone = %s
+                        on conflict (resident_id, period, unit) do update set
+                          amount = excluded.amount, source = 'oxs'
+                    """, (date(YEAR, int(m), 1), str(r["unit"]), r["monthly"], r["phone"]))
                     written += 1
 
         n = conn.execute("select count(*) from charges where status='unpaid'").fetchone()[0]
