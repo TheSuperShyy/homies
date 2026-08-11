@@ -92,6 +92,14 @@ writes the call to the office. Never say anyone is being put through.
 - **Chatwoot in the message path.** It runs and owns the number; it is not
   wired to the bot.
 - **Any scheduler.** Every import and sync is run by hand.
+- **A campaign runner.** Nothing has ever iterated `v_debt_call_queue`.
+  **Read this before writing one:** the view is one row per charge, which since
+  11 Aug means one row per *apartment per month*. An owner with two flats owing
+  four months each is **eight rows, and a naive runner places eight calls**.
+  Collapsing is the runner's job — the view's contract is only that a row
+  carries everything one call needs. How a call should be grouped (per
+  resident, per apartment, per charge) is **deliberately undecided as of
+  11 Aug**; see "Deferred by decision" below.
 
 ---
 
@@ -194,13 +202,32 @@ exists. Never print a value, never commit one, never paste one into chat.
    grant Business Manager access rather than hand over a login.
 4. **Chatwoot seats** — how many users, names and emails, which inboxes.
 
+## Deferred by decision — do not restart these unasked
+
+**The voice agent is frozen as of 11 Aug.** Not blocked, chosen. Do not edit the
+prompt, the queue grouping, or the assistants.
+
+Two consequences to state plainly rather than quietly work around:
+
+1. **`debt-tools` in the repo is ahead of what is deployed.** `get_balance`
+   gained a per-apartment answer and the ability to find a caller through their
+   second flat; neither is live. On a call today, the two multi-apartment
+   owners get one combined balance, and their second apartment cannot be found
+   by building+apartment. No write tool changed, so nothing else waits on it.
+   **Deploying it is a decision, not a chore.**
+2. **How a call is grouped is undecided.** One call per resident (everything
+   they owe), per apartment, or per charge as today. It is not only a queue
+   change: `{{month}}` and `{{amount}}` are single values and the prompt
+   refuses a call without them, and `log_promise_to_pay`, `send_payment_link`
+   and `log_disputed_payment` each write against one `charge_id`. A call
+   covering eight charges has nowhere to record a promise against eight. The
+   tool layer is the real work.
+
+Nothing is urgent: no phone number exists, all 7,391 residents are
+`handed_over = false`, and the queue returns 0 rows.
+
 ## Next moves, in order
 
-0. **Deploy `debt-tools`.** The Edge Function in the repo is ahead of what is
-   live: `get_balance` gained the per-apartment answer and the ability to find
-   a caller by their second flat. Until it ships, two multi-flat owners get a
-   combined balance and their second apartment is not findable by
-   building+apartment. No write tool changed, so nothing else is waiting on it.
 1. Fix the remaining data defect (the 2022 debt stamped `2026-08`).
 2. Schedule the sync — `oxs_debt_sync.py` nightly, plus a pre-flight debt
    check immediately before any call, so nobody is chased for something they

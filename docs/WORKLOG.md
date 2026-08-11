@@ -11,6 +11,43 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### The voice agent is frozen, and what that leaves open
+
+Asked how the agent would handle an owner with several apartments — three
+calls, or one covering all of them. Answered from what is built rather than
+from intent, then **decided: do not edit the voice agent for now.**
+
+The honest answer was worse than the question assumed. `v_debt_call_queue` is
+one row per charge, which since this morning means one row per *apartment per
+month* — so an owner with two flats owing four months each is eight rows, and a
+runner iterating the view places eight calls. The multi-month half of that
+predates today; putting the apartment on the charge turned four into eight.
+
+It is not a decision anyone has made, because **no campaign runner exists** and
+nothing has ever read the view. Collapsing was always the runner's job; the
+view's contract is only that a row carries everything one call needs, which is
+why it refuses to emit a row missing an amount or a month.
+
+One call per person is not a queue tweak. `{{month}}` and `{{amount}}` are
+single values and the prompt forbids placing a call without them, so the script
+is built around one debt. And `log_promise_to_pay`, `send_payment_link` and
+`log_disputed_payment` each write against a single `ctx.chargeId` — a call
+covering eight charges has nowhere to record a promise against eight. That tool
+layer is the work, which is the argument for settling it before a runner is
+written rather than after.
+
+Frozen means frozen: the prompt, the queue grouping and the assistants are
+untouched, and `debt-tools` stays undeployed even though the repo copy is
+ahead. Both consequences are written into `HANDOVER.md` under "Deferred by
+decision" so they are visible rather than rediscovered — in particular the
+eight-calls trap, which a future runner would otherwise walk straight into.
+
+Also recorded: exactly two owners hold more than one indebted apartment,
+₪9,143.80 between them. How many own several apartments *overall* is unknown
+and not in Supabase — both import scripts upsert `on conflict (phone)`, so
+`residents` keeps one row per person carrying one apartment. Only flats that
+earned a charge exist per-apartment. Answering that needs another OXS sweep.
+
 ### Owner view on Debts, because the apartment split broke a second question
 
 Splitting rows per apartment answered *what does this flat owe* and quietly
