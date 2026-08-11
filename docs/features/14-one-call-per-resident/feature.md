@@ -1,0 +1,177 @@
+# 14 — One call per resident
+
+**Estimate:** 3d
+**Depends on:** 10-debt-followup, migration 012
+**Status:** not started — the voice agent is frozen as of 11 Aug
+
+## Purpose
+
+Today the call queue is one row per charge, which since migration 012 means one
+row per **apartment per month**. An owner of two flats owing four months each is
+eight rows, and a runner iterating the queue places eight calls to one person
+about one debt. That is not a collection call, it is harassment with a schedule.
+
+This makes the unit of a call a **person**. One call, every apartment they hold,
+every month still open, one total, settled in one conversation.
+
+What breaks if it does not exist: the first real campaign rings the two known
+multi-apartment owners repeatedly, and each call names an amount without naming
+which flat it is for — which the 11 Aug demo call did, leaving the resident
+unable to tell which of her two July payments was being discussed.
+
+## Behaviour
+
+The agent opens knowing four things, and says three of them unprompted:
+
+1. **How many apartments the resident holds** — all of them, not only those in
+   arrears. "You have three apartments with us" is what makes the rest credible.
+2. **Which of those have an open balance** — named, always. Never "the July
+   payment" to somebody with two July payments.
+3. **The total across every open apartment and month.**
+4. **Which months are open**, per apartment.
+
+The call then settles all of it: a promise to pay, a payment link, a dispute, or
+a refusal — for the whole balance, or for one named apartment.
+
+### The opening, in substance
+
+State the building, the apartments with something open, the months, and the
+total. A resident holding three flats where two are settled hears that two are
+up to date and one is not; the agent does not read out amounts for apartments
+that owe nothing.
+
+Then the same four responses the current prompt already handles — will pay, has
+paid, disputes, refuses — except each may now be about **one apartment or all of
+them**, and the agent must carry which.
+
+### The apartment is always named
+
+`{{unit}}` is currently "not spoken unless the caller asks"
+(`docs/features/10-debt-followup/prompt.md`). That flips. An amount without an
+apartment is unverifiable for anybody with more than one, and the resident
+cannot ask their way out of it — on 11 Aug the caller asked which building and
+was refused, because the model read the question as a challenge to its
+legitimacy and fired the anti-scam rule.
+
+That rule is narrowed here: **the building, apartment, month and amount of the
+charge being discussed are always sayable to a confirmed account holder.** What
+stays forbidden is reading details back to *prove who you are* to an unverified
+caller. The prompt already accepts saying the building to an answering machine
+it cannot verify at all, so refusing it to the confirmed resident was never
+consistent.
+
+## Interface
+
+### The queue
+
+One row per resident, replacing per-charge rows. Every spoken phrase is composed
+**in the view**, not by the model — the same reason `v_debt_call_queue` already
+composes the Hebrew month name in SQL.
+
+| Field | Type | Notes |
+|---|---|---|
+| `resident_id` | uuid | |
+| `phone` | text | still the key every write lands on |
+| `first_name` | text | given name only |
+| `gender` | text | |
+| `card_last4` | text | empty string when none |
+| `building` | text | joined when the apartments span more than one |
+| `apartments_held` | int | **all** apartments, settled included |
+| `apartments_owing` | text[] | units with an open charge |
+| `charges` | jsonb | `[{charge_id, unit, period, amount}]` — the whitelist |
+| `amount` | text | total across every open charge |
+| `apartments_phrase` | text | composed, e.g. `דירות 4 ו-9` |
+| `breakdown_phrase` | text | composed, e.g. `450 על דירה 4 ו-780 על דירה 9` |
+| `months_phrase` | text | composed, e.g. `יולי` or `אפריל עד יולי` |
+| `attempt` | text | |
+
+A row appears only when every field a call needs is present, which is the
+existing view's contract and the reason it refuses to emit a row without an
+amount or a month.
+
+### The tools
+
+`ctx` gains the `charges` array. Tools split in two:
+
+**Call-level** — `log_promise_to_pay`, `send_payment_link`,
+`request_standing_order`, `log_call_outcome`, `transfer_to_human`. These write
+against **every** charge on the call. No new argument; the agent supplies
+nothing it does not already supply.
+
+**Apartment-level** — `log_disputed_payment`, `flag_not_handed_over`. These gain
+one optional argument:
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `unit` | string | no | The apartment the resident named. Omitted means all of them. |
+
+**The agent selects; it never supplies.** `unit` is resolved server-side against
+the `charges` array attached to the call. A unit not on that list is refused with
+`{ok: false, error: "apartment not on this call"}`. So the rule this whole file
+layer exists to enforce still holds: the model cannot invent a charge, redirect
+one, or be talked into collecting a different debt — it can only point at
+something the runner already put in front of it.
+
+Returns are unchanged in shape, with a `charges_written` count added.
+
+## Data
+
+**New: `apartments`.**
+
+| Column | Notes |
+|---|---|
+| `id` | uuid |
+| `resident_id` | fk residents |
+| `building` | text |
+| `unit` | text |
+| `oxs_ref` | text |
+| | unique `(building, unit)` |
+
+Populated by `oxs_arrears.py`, which already sweeps every building's payment
+records and sees every apartment — it currently keeps only the ones behind and
+discards the rest. Recording the settled ones is what makes `apartments_held`
+answerable; the expensive half-hour sweep already happens.
+
+`residents.unit` becomes display-only and is **not** authoritative for anything,
+the same status `charges.unit` gave it on 11 Aug.
+
+Reads: `charges`, `residents`, `apartments`. Writes: unchanged tables, more rows
+per call.
+
+## Acceptance
+
+1. A resident with one apartment in arrears produces exactly one queue row, and
+   the call wording differs from today's only by naming the apartment.
+2. A resident with two apartments in arrears produces exactly **one** queue row.
+3. For any queue row, `amount` equals the sum of `amount` across its `charges`.
+4. `apartments_owing` names every apartment with an open charge and no others;
+   `apartments_held` is greater than or equal to its length.
+5. Placing calls for N eligible residents results in N calls, not one per charge.
+   Measured against the two known multi-apartment owners: 2 calls, not 10.
+6. A promise to pay on a two-apartment call writes `promises_to_pay` rows
+   covering every charge on that call.
+7. `log_disputed_payment` with `unit: "4"` sets only apartment 4's charge to
+   `disputed`; apartment 9's stays `unpaid`.
+8. `log_disputed_payment` with a unit not on the call returns `ok: false` and
+   writes nothing.
+9. `log_disputed_payment` with no unit sets every charge on the call to
+   `disputed`.
+10. Ten consecutive multi-apartment calls produce zero rows against a charge that
+    was not on the call that produced them.
+11. `residents.handed_over` is not written by any part of this feature.
+
+## Out of scope
+
+- **`handed_over` becoming an apartment-level fact.** It is described in the
+  schema as "false when the apartment has not been handed over" but lives on the
+  resident, so flagging one flat stops calls about every other flat that owner
+  holds. Real, and the same shape as the bug migration 012 fixed. It is also the
+  interlock keeping the queue empty, so it moves on its own change with its own
+  verification, not inside this one. Until then `flag_not_handed_over` on a
+  multi-apartment owner is a blunt instrument and the prompt should route those
+  to a human.
+- **Payment link delivery.** Still nothing sends them; feature 10 owns that.
+- **Placing any call.** No phone number exists, every resident is
+  `handed_over = false`, and a campaign needs explicit approval every time.
+- **The campaign runner itself.** This defines the queue it reads and the tools
+  it calls, not the thing that iterates them.

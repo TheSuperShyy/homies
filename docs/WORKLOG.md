@@ -11,6 +11,65 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### Spec: one call per resident, every apartment in it
+
+Decided, after watching the demo call to the two-apartment owner: *"calling
+multiple times to a single person is not the best way. The best way is to
+determine how many apartments this person has, what specific apartments have the
+balance not yet settled, how much is the total and what month still has an open
+balance, so we can complete all transactions in a single short call."*
+
+Written up as `docs/features/14-one-call-per-resident/`. Nothing built, nothing
+live changed — the voice agent is still frozen.
+
+That requirement is stronger than what I had proposed an hour earlier, and it
+kills the smaller version. My v1 was "one call covering the total, per-apartment
+arguments deferred". It does not survive **complete all transactions**: a
+resident who says "I already paid for number 4" in a call that can only dispute
+everything has settled nothing, and the office gets a ticket claiming both flats
+are contested when one is not.
+
+**The counting requirement sounded like the expensive half and is the cheap
+half.** "How many apartments does this person have" needs apartments owing
+nothing, which Supabase does not hold — both import paths upsert
+`on conflict (phone)`. But `oxs_arrears.py` already sweeps every active
+building's payment records and iterates every apartment in them; it keeps the
+ones behind and silently drops the settled. The half-hour sweep and the rate
+limit are already spent. What is missing is a list it chooses not to write down.
+
+**The expensive half is the tool layer**, where `log_promise_to_pay`,
+`send_payment_link` and `log_disputed_payment` each write against one
+`ctx.chargeId`. Resolved without breaking the rule the Edge Function exists to
+enforce: the call carries a whitelist of `{charge_id, unit, period, amount}`,
+and the agent passes a **unit** — a thing the resident said out loud, not an
+identifier it could invent. The server maps unit to charge id against that list
+and refuses anything absent. The model can point at a debt already in front of
+it and cannot reach one that is not.
+
+**Composition moves into the view, not the prompt.** The queue hands over
+finished Hebrew — `דירות 4 ו-9`, `450 על דירה 4 ו-780 על דירה 9` — so the prompt
+keeps one sentence form and has no branch to get wrong. Teaching it two shapes
+was rejected: every turn re-sends the whole prompt, and the 7 Aug failures were
+already "the model did not find the rule". `v_debt_call_queue` composing the
+Hebrew month name in SQL is the same instinct.
+
+Also folded in from the demo call: the apartment is now always spoken, and the
+anti-scam rule is narrowed. It fired on "on what building?" from a resident who
+had already confirmed her identity. The prompt contradicted itself there — the
+voicemail line says `לגבי בניין {{building}}` to an unverified answering machine
+while the agent refused the same fact to the confirmed account holder.
+
+Left explicitly broken: `residents.handed_over` is an apartment fact stored on
+the resident, so flagging one flat stops calls about all of them. Same category
+error migration 012 fixed for charges. Not fixed here because that flag is the
+interlock keeping the queue empty, and a change whose failure mode is placing
+calls that should not happen gets its own approval.
+
+Published as an artifact for reading: the plan in plain language, with the
+worked call script.
+
+## 2026-08-11
+
 ### A multi-apartment owner in the demo caller list
 
 Asked for a sample on the test console covering one owner with several
