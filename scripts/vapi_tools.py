@@ -15,6 +15,14 @@ the variableValues attached to the call, which the model can read but cannot
 change. If a parameter for the amount existed, a model that misheard — or a
 resident who insisted the figure was different — could write the wrong number
 into a payment ticket. There is no such parameter, so it cannot.
+
+`unit` IS THE ONE EXCEPTION, AND IT IS NOT ONE (added 11 Aug, feature 14)
+A call now covers every apartment a resident owes on, so a write has to be able
+to mean one of them. The agent passes an apartment NUMBER — a thing the resident
+said out loud — and the webhook maps it to a charge id against the list attached
+to the call, refusing anything absent from it. So the agent still supplies no
+identifier and can still reach no debt it was not handed. It selects; it does
+not supply.
 """
 
 
@@ -57,15 +65,46 @@ POSTURE = {
     "description": "The highest posture the call reached, not the current one. Hot is a floor.",
 }
 
-TRANSFER_REASONS = ["hardship", "dispute", "distress", "language", "not_understood", "caller_request"]
+TRANSFER_REASONS = [
+    "hardship", "dispute", "distress", "language", "not_understood", "caller_request",
+    # 11 Aug. "That flat is not mine", "I have no keys", "the protocol was never
+    # signed" — one shape, and the one that replaced flag_not_handed_over. The
+    # agent does not act on the claim; the apartment is paused and a person
+    # checks it. It is the only reason that changes anything besides the record,
+    # which is why it is a reason and not a separate tool.
+    "ownership",
+]
 
-# Where the request happened. Present on the inbound tool and absent from the
-# outbound one, and the asymmetry is the point.
+# The apartment a write is about, on a call that covers more than one.
 #
-# On an outbound call the building and the apartment are already known — they
-# ride on the call as variableValues, which the model can read and cannot
-# change. Giving it parameters for them would hand it a way to overwrite a fact
-# it was given, which is the same mistake as a parameter for the amount.
+# Left out means the whole call, which is the common case — 117 of the 119
+# residents with arrears hold one flat — so the agent reaches the right
+# behaviour by saying nothing. It is never required and never guessed: an
+# apartment that is not on the call is refused by the webhook rather than
+# widened back to everything, because a mishearing on "I paid for four" must not
+# dispute a flat the resident never mentioned.
+UNIT_ON_CALL = {
+    "unit": {
+        "type": "string",
+        "description": (
+            "Apartment number, digits only, only if the resident named ONE apartment "
+            "for this. Leave it out for the whole balance. Never guess it."
+        ),
+    },
+}
+
+# Where the request happened. The inbound tool takes both; the outbound one takes
+# the apartment only and never the building, and the asymmetry is the point.
+#
+# On an outbound call the BUILDING is always known — it rides on the call as a
+# variableValue, which the model can read and cannot change. Giving it a
+# parameter would hand it a way to overwrite a fact it was given, which is the
+# same mistake as a parameter for the amount. That has not changed.
+#
+# The apartment stopped being always-known on 11 Aug. A call covering several
+# flats sends `unit` empty because no single value is true, so the outbound tool
+# takes one — checked against the apartments on the call, ctx winning wherever it
+# is present, so the single-apartment call behaves exactly as it did.
 #
 # On an inbound call nothing is known. There is no caller ID on a web call and
 # no lookup behind it, so the only source for either field is what the caller
@@ -105,8 +144,17 @@ def _open_request(location):
             "enum": ["low", "normal", "high", "emergency"],
         },
     }
-    if location:
+    if location == "full":
         props.update(LOCATION)
+    elif location == "unit":
+        # Outbound, since feature 14. The building is still a fact on the call
+        # and stays absent, but a call covering several apartments sends `unit`
+        # empty on purpose — no single value is true — so a leak reported by a
+        # two-flat owner has no apartment on it unless the agent can pass what
+        # they said. The webhook only accepts an apartment already on the call,
+        # and drops anything else to empty rather than sending a technician to a
+        # guessed address.
+        props["unit"] = LOCATION["unit"]
     return _fn(
         "open_request",
         "Call when the resident raises a maintenance issue during the call. Wait for "
@@ -123,15 +171,20 @@ DEBT_TOOLS = [
         "Call when the resident has agreed to settle. OXS sends them a payment link for "
         "the amount on this call; nothing is charged and no card is involved. Do not "
         "call it before they have agreed, and do not call it twice on one call.",
-        # No parameters, deliberately. It had an optional `note` and on 5 Aug the
+        # `unit` and nothing else. It had an optional `note` and on 5 Aug the
         # model SPOKE IT: the resident heard "Note," and then, as a separate
         # utterance, "resident asked how to proceed and was sent the payment link
         # after agreeing to settle." Tool arguments leaking into the voice channel
         # is a recurring failure on this stack — gpt-5.4-mini did it with harmony
-        # syntax on 4 Aug — and a free-text field is the easiest thing for it to
-        # leak. Everything this tool needs is on the call already, so there is
-        # nothing to pass and nothing to say out loud.
-        None,
+        # syntax on 4 Aug — and a FREE-TEXT field is the easiest thing for it to
+        # leak. That is the specific risk, and it is why `note` is still gone.
+        #
+        # An apartment number is the opposite kind of field: a digit or two, from
+        # a fixed list, which the agent has already said out loud in this call.
+        # Leaked, it costs one stray "four" in a sentence. Absent, a resident who
+        # agrees to clear one flat and not the other gets a link for both, which
+        # is a link they did not ask for about money they are disputing.
+        dict(UNIT_ON_CALL),
         None,
         # Sync, again. It was briefly async because Apps Script took 13 seconds
         # and its 404s made the model retry three times on one call — 82,018
@@ -168,6 +221,7 @@ DEBT_TOOLS = [
                 "type": "string",
                 "description": "YYYY-MM-DD, only if they named a date clearly enough to be sure.",
             },
+            **UNIT_ON_CALL,
         },
         ["said"],
     ),
@@ -179,15 +233,25 @@ DEBT_TOOLS = [
     _fn(
         "log_disputed_payment",
         "Call when the resident says they have already paid. Do not ask when or how. "
-        "Do not send anything alongside this.",
+        "Do not send anything alongside this. If they named one apartment, pass it as "
+        "`unit` so only that apartment is disputed.",
+        dict(UNIT_ON_CALL),
     ),
-    _open_request(location=False),
-    _fn(
-        "flag_not_handed_over",
-        "Call when the resident says they have no keys, the apartment has not been "
-        "handed over, or the handover protocol is unsigned. This stops all future "
-        "calls for this apartment and cannot be undone.",
-    ),
+    _open_request(location="unit"),
+    # `flag_not_handed_over` was here until 11 Aug and is retired, the same way
+    # open_payment_ticket was on 4 Aug and for the same reason: a tool the agent
+    # should not be deciding to use is a tool it should not be offered.
+    #
+    # It set residents.handed_over = false and waived the charge on an unverified
+    # verbal claim made to an automated caller. That made "this flat was never
+    # mine" the sentence that ends any call about money. It was also on the
+    # RESIDENT, so flagging one flat stopped calls about every other flat that
+    # owner holds — the bug migration 012 fixed for charges, one table over.
+    #
+    # The path now is `transfer_to_human` with reason `ownership`: the apartment
+    # is paused, a person checks it, and nothing about who holds it moves on a
+    # phone call. The handler survives in the Edge Function, defanged, so a stale
+    # assistant gets an answer rather than an error.
     _fn(
         "transfer_to_human",
         # 7 Aug: this used to say the call stays open, which is what the debt
@@ -199,10 +263,13 @@ DEBT_TOOLS = [
         "Call after telling the resident a representative will get back to them, never "
         "before and never on its own. This hands the call to the office in writing; it "
         "does not connect anyone to anyone, so do not say you are putting them through "
-        "and never ask them to hold. Close the call after calling it.",
+        "and never ask them to hold. Close the call after calling it. Use reason "
+        "`ownership` when they say an apartment is not theirs or was never handed over "
+        "to them, and pass that apartment as `unit`.",
         {
             "reason": {"type": "string", "enum": TRANSFER_REASONS},
             "posture_reached": POSTURE,
+            **UNIT_ON_CALL,
         },
         ["reason"],
     ),
@@ -250,7 +317,7 @@ INTAKE_TRANSFER_REASONS = [
 # caller accepts, and the answer is invented. So the tools are absent and the
 # prompt no longer offers either. Both come back with the database, not before.
 INTAKE_TOOLS = [
-    _open_request(location=True),
+    _open_request(location="full"),
     _fn(
         "save_partial_request",
         "Call when the call is going to end without a complete request — the line is "

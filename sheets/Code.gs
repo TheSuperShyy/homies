@@ -426,7 +426,7 @@
       // notices. Kept in step with REASONS in scripts/n8n_deploy.py and
       // INTAKE_TRANSFER_REASONS in scripts/vapi_tools.py.
       var reasons = ['hardship', 'dispute', 'distress', 'language', 'not_understood',
-                     'caller_request',
+                     'caller_request', 'ownership',
                      'out_of_scope', 'emergency', 'repeated_failure'];
       var reason = reasons.indexOf(args.reason) >= 0 ? args.reason : 'caller_request';
       write('call_outcomes', {

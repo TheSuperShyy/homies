@@ -11,6 +11,109 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### Feature 14 built and deployed: one call per resident, every apartment in it
+
+The freeze was lifted (*"implement the handling"*) with one scope cut:
+apartments that owe nothing are not counted — *"we just need the apartment that
+has an open balance."* That deleted the `apartments` table, the OXS sweep change
+and `apartments_held` from the spec, and turned 3 estimated days into one
+session. Shipped end to end:
+
+- **Migration 013** (applied). `v_debt_call_queue_person`: one row per resident,
+  layered on `v_debt_call_queue` so the eligibility predicate stays written
+  once. Composes `apartments_phrase` / `breakdown_phrase` / `months_phrase` in
+  SQL, plus the `charges` jsonb whitelist. Two helpers: `money_say()` — the old
+  `FM999999` format ROUNDED, so a ₪1,971.80 charge would have been spoken as a
+  figure that appears nowhere — and `hebrew_list()` with the maqaf rule (`ו-9`
+  before digits, `ויולי` before words). Caught `ו5572` on the live data and
+  fixed the breakdown to hyphen=true. Verified against the two real
+  multi-apartment owners inside a rolled-back transaction: 12 charge rows → 2
+  person rows, totals exact, `unit` empty when several owe. The interlock is
+  untouched — both views still return 0 rows live.
+- **Edge Function v15** (deployed). `ctx.charges` parsed from variableValues
+  (string or array; single-charge calls fold into a one-element list so there
+  is no branch). `targets()`: no `unit` argument means every charge on the
+  call; a unit is resolved against the whitelist and an off-call unit is
+  REFUSED, never widened. `send_payment_link` / `log_promise_to_pay` /
+  `log_disputed_payment` write per charge with each charge's own amount and
+  period; `log_call_outcome` writes ONE row (an outcome is a fact about the
+  call) but bumps every charge's attempt counter — one un-bumped charge would
+  keep the resident in the queue forever, because the person view takes the
+  max. `flag_not_handed_over` DEFANGED: it no longer touches `handed_over` or
+  waives anything — it pauses the named apartment to `pending_charge` and files
+  a transfer with reason `ownership`, same as the new posture. Kept answering
+  so a stale assistant gets a result, not an error.
+- **n8n router** (deployed, activated, probed live). The Decide node mirrors
+  the whitelist refusal — it answers Vapi before the writer runs, so a refusal
+  living only downstream would arrive after the agent was told yes. Month
+  guard accepts `months_phrase`; the forward merge only promotes `args.unit`
+  into variableValues when it is on the whitelist. Probed all seven cases:
+  on-call unit ok, off-call unit refused with the apartment list, no unit ok.
+  Probe rows deleted from Supabase after.
+- **Tool schemas.** Optional `unit` ("the resident named ONE apartment — never
+  guess it") on the three writes and on outbound `open_request`;
+  `transfer_to_human` gains reason `ownership`; `flag_not_handed_over` removed
+  from the agent's toolset — the open_payment_ticket retirement, again.
+  `ownership` added to the n8n and Code.gs validation lists (an unlisted
+  reason silently becomes `caller_request` forever).
+- **Prompt** (synced to the live Hebrew assistant, 44,040 chars). The call
+  covers every apartment that owes; the three phrases arrive composed so there
+  is no one-vs-several branch to get wrong; **the apartment is always named**
+  — an amount without one is unverifiable, which is what the 11 Aug demo call
+  proved. The anti-scam rule narrowed to what it was for: never read details
+  to PROVE yourself; always answer a confirmed resident about their own
+  charge. Already-paid flow carries which apartment; a claim about one flat
+  never widens to all of them. New fixed line (the ownership offer): the agent
+  states once that the system shows the apartment against them, offers to pass
+  it to the office — *"רוצה שאני אעביר את זה לצוות שיבדקו ויחזרו אליך?"* — and
+  acts on nothing. English translation added to vapi_en.py's table.
+- **Demo page** (committed, pushed, Vercel deploys). `personify()` groups rows
+  by phone into one card per person: Dana is one card, ₪1,230, `דירות 4 ו-9`,
+  charges whitelist attached — the byte-identical phrases the SQL view emits,
+  verified by simulation. English mode recomposes rather than transliterates.
+  12 rows → 11 cards.
+
+**Found stale, not fixed here:** `vapi_en.py debt` exits on "LANGUAGE block did
+not match" — its anchor text died in the 7 Aug prompt cut, before today. It
+fails closed by design; the English twin is frozen at its last build until the
+substitution table is rebuilt against the cut prompt. The demo keeps sending
+`month` (singular) so the stale English assistant's sentences stay whole.
+
+**Still open:** the campaign runner (acceptance 5, 6, 9, 10, 13 wait on it);
+the 2022 waive statement still awaits approval; 18 phoneless apartments.
+
+Asked whether we can pull *how* a resident pays out of OXS. Probed the live API
+read-only, printing field names and non-personal values only.
+
+**Yes, and richly — but only from `/buildings/:id/payments`.** Every payment
+record carries `paymentType` (int) and `paymentTypeLabel` (Hebrew). Across one
+building's 201 payments the five values in use are: `6` כרטיס אשראי בהו"ק
+(credit-card standing order), `2` העברה בנקאית (bank transfer), `1` כרטיס אשראי
+(one-off card), `5` הוראת קבע בנקאית (bank standing order), `4` צ'ק (cheque).
+`monthsPaid[].isKeva` (and `isBankKeva`) says per month whether a standing order
+covered it, and `wasCancelled` / `cancelReason` mark reversals.
+
+**The tenant record carries none of it.** `/buildings/:id/tenants` returns only
+name, number, phone, email, `isActive`, `payerType` (owner vs tenant),
+`orderIndex`, `job`. So there is no "this resident is on standing order" flag to
+read — the arrangement is inferred from what they last actually paid with. Good
+enough, and more honest than a stored flag that nobody maintains.
+
+**What we deliberately will not import.** `paymentDetails[]` carries instrument
+data — card last-four `digits`, `token`, `shvaParams`, `dealNumber`, expiry, and
+for transfers `transferBank` / `transferBranch` / `transferAccount`. None of it
+belongs in our database. Only the method category has any use to the agent.
+
+**Why it matters to the debt agent.** A resident in arrears whose last payments
+were `6`/`5` did not forget — their standing order failed or lapsed, and that is
+a different call than one to somebody who pays by transfer each month. The payer
+record even has an `automatedCreditFailedMessage` field, unread so far.
+
+Not implemented. `oxs_debt_sync.py` reads `monthsPaid` only and ignores
+`paymentType` today; adding it is a column on `charges` or `residents` plus one
+line in the sweep, and no extra API calls — the field is already in the response
+we fetch.
+
 ### The agent insists on ownership, and acts on nothing
 
 Reading the "left broken" note, decided: *"the agent should insist since the

@@ -22,6 +22,18 @@
 // talked into collecting a different debt, still writes the right row — because
 // the row is not built from anything it said. This is the same principle as
 // verify_identity being server-side: never the agent's own claim.
+//
+// ONE CALL, SEVERAL APARTMENTS (feature 14, 11 Aug)
+// A call is now about a PERSON, not a charge: v_debt_call_queue_person hands the
+// runner one row per resident carrying every apartment of theirs that owes. So
+// `ctx.charges` is the list, and every write below runs over it.
+//
+// THE AGENT SELECTS; IT NEVER SUPPLIES. A tool that can act on one apartment
+// takes an optional `unit` — the apartment the resident said out loud, which is
+// a thing they told us and not an identifier a model could invent. `targets()`
+// maps it to charge ids against the call's own list and refuses anything absent
+// from it. So the rule above still holds exactly: the model can point at a debt
+// already in front of it, and cannot reach one that is not.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -31,6 +43,14 @@ const db = createClient(
 );
 
 const SECRET = Deno.env.get("TOOL_SECRET") ?? "";
+
+/** One open charge on this call: an apartment, a month, a sum. */
+type Charge = {
+  charge_id: string;
+  unit: string;
+  period: string | null; // first of the month, e.g. 2026-07-01
+  amount: number | null;
+};
 
 /** What the campaign runner attached to the call. Set once, never from the model. */
 type CallContext = {
@@ -42,7 +62,37 @@ type CallContext = {
   cardLast4: string | null;
   building: string | null;
   unit: string | null;
+  /** Every open charge this call covers. The whitelist. Never empty on a real call. */
+  charges: Charge[];
 };
+
+/**
+ * The charges array as it survives the trip through Vapi.
+ *
+ * variableValues are template substitutions, so anything that is not a string
+ * arrives as one on some versions and as itself on others. Both are read rather
+ * than picking one and being wrong on a version bump — the same reason
+ * `context()` reads four places for variableValues.
+ *
+ * A malformed array is treated as no array at all, which falls back to the
+ * single-charge shape below. Losing the split is survivable; throwing here
+ * would take down every tool on the call.
+ */
+function parseCharges(raw: unknown): Charge[] {
+  let v: any = raw;
+  if (typeof v === "string") {
+    try { v = JSON.parse(v); } catch { return []; }
+  }
+  if (!Array.isArray(v)) return [];
+  return v
+    .map((c: any) => ({
+      charge_id: String(c?.charge_id ?? c?.id ?? "").trim(),
+      unit: String(c?.unit ?? "").trim(),
+      period: c?.period ?? null,
+      amount: Number.isFinite(Number(c?.amount)) ? Number(c.amount) : null,
+    }))
+    .filter((c) => c.charge_id);
+}
 
 /**
  * Vapi nests the call one or two levels deep depending on the event, and
@@ -63,16 +113,72 @@ function context(message: any): CallContext {
     return Number.isFinite(n) && n > 0 ? n : null;
   };
 
+  // A person call carries `charges`. A single-charge call — WhatsApp, a stale
+  // assistant, anything started before feature 14 — carries charge_id and the
+  // loose amount/period/unit, and is folded into the same one-element list here
+  // so every tool below has exactly one code path. There is no "does this call
+  // have several apartments" branch anywhere in this file.
+  const charges = parseCharges(v.charges);
+  const chargeId = v.charge_id ?? null;
+  if (!charges.length && chargeId) {
+    charges.push({
+      charge_id: String(chargeId),
+      unit: String(v.unit ?? "").trim(),
+      period: v.period ?? null,
+      amount: num(v.amount),
+    });
+  }
+
   return {
     callId: call?.id ?? message?.callId ?? "",
-    chargeId: v.charge_id ?? null,
+    chargeId,
     residentId: v.resident_id ?? null,
     amount: num(v.amount),
     period: v.period ?? null,
     cardLast4: v.card_last4 ? String(v.card_last4) : null,
     building: v.building ?? null,
     unit: v.unit ?? null,
+    charges,
   };
+}
+
+/**
+ * Which charges a write lands on.
+ *
+ * No `unit` argument means the whole call, which is the common case and the one
+ * the agent reaches by saying nothing. A `unit` narrows it to one apartment, and
+ * only to an apartment already on the call: a unit the runner did not attach is
+ * refused, not created, not guessed and not silently widened back to everything.
+ *
+ * Widening on a bad unit is the failure worth naming, because it is the tempting
+ * one. A resident says "I already paid for four", the model hears "arba" as
+ * something else, and a lenient fallback would dispute both flats on a claim
+ * about one. Refusing gives the agent an error it can act on; guessing gives
+ * the office a dispute nobody made.
+ */
+type Targets = { ok: true; charges: Charge[] } | { ok: false; error: string };
+
+function targets(ctx: CallContext, args: any): Targets {
+  if (!ctx.charges.length) return { ok: false, error: "no charge on this call" };
+
+  const asked = String(args?.unit ?? "").trim();
+  if (!asked) return { ok: true, charges: ctx.charges };
+
+  const hit = ctx.charges.filter((c) => c.unit === asked);
+  if (!hit.length) {
+    return {
+      ok: false,
+      error: `apartment ${asked} is not on this call — apartments on this call: ` +
+        [...new Set(ctx.charges.map((c) => c.unit))].join(", "),
+    };
+  }
+  return { ok: true, charges: hit };
+}
+
+/** Move a set of charges to a status. Used by dispute and by the ownership pause. */
+async function setStatus(charges: Charge[], status: string) {
+  if (!charges.length) return;
+  await db.from("charges").update({ status }).in("id", charges.map((c) => c.charge_id));
 }
 
 /**
@@ -225,21 +331,28 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * resident out of the call queue for something they have not done yet.
    */
   async send_payment_link(args, ctx) {
-    if (!ctx.chargeId) return { ok: false, error: "no charge on this call" };
+    const t = targets(ctx, args);
+    if (!t.ok) return { ok: false, error: t.error };
     const iid = await interactionId(ctx);
 
-    const { error } = await db.from("payment_links").insert({
-      charge_id: ctx.chargeId,
-      resident_id: ctx.residentId,
-      interaction_id: iid,
-      amount: ctx.amount,
-      period: ctx.period,
-      status: "requested",
-      note: args?.note ?? null,
-    });
+    // A row per charge, each carrying its OWN amount and period. Using ctx.amount
+    // here would have written the call total against every apartment — two rows
+    // of 1,230 for a resident who owes 450 and 780 — and the link the office
+    // sends is built from this row.
+    const { error } = await db.from("payment_links").insert(
+      t.charges.map((c) => ({
+        charge_id: c.charge_id,
+        resident_id: ctx.residentId,
+        interaction_id: iid,
+        amount: c.amount,
+        period: c.period,
+        status: "requested",
+        note: args?.note ?? null,
+      })),
+    );
 
     if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    return { ok: true, charges_written: t.charges.length };
   },
 
   /**
@@ -297,17 +410,23 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * kept beside it and outranks it when a promise is disputed.
    */
   async log_promise_to_pay(args, ctx) {
-    if (!ctx.chargeId) return { ok: false, error: "no charge on this call" };
     if (!args?.said) return { ok: false, error: "said is required" };
+    const t = targets(ctx, args);
+    if (!t.ok) return { ok: false, error: t.error };
 
-    const { error } = await db.from("promises_to_pay").insert({
-      charge_id: ctx.chargeId,
-      interaction_id: await interactionId(ctx),
-      promised_date: args?.promised_date ?? null,
-      said: String(args.said),
-    });
+    const iid = await interactionId(ctx);
+    const { error } = await db.from("promises_to_pay").insert(
+      t.charges.map((c) => ({
+        charge_id: c.charge_id,
+        interaction_id: iid,
+        promised_date: args?.promised_date ?? null,
+        said: String(args.said),
+      })),
+    );
 
-    return error ? { ok: false, error: error.message } : { ok: true };
+    return error
+      ? { ok: false, error: error.message }
+      : { ok: true, charges_written: t.charges.length };
   },
 
   /**
@@ -316,9 +435,13 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * flag on the outcome, which is where a person will look for it.
    */
   async request_standing_order(_args, ctx) {
-    if (!ctx.chargeId) return { ok: false, error: "no charge on this call" };
+    if (!ctx.charges.length) return { ok: false, error: "no charge on this call" };
+    // Call-level, and takes no apartment. A standing order is an arrangement
+    // with a person about their monthly payment; "a standing order for flat 4
+    // only" is not a thing the office sets up, so offering the split here would
+    // let the agent record a request nobody can act on.
     await db.from("call_outcomes").insert({
-      charge_id: ctx.chargeId,
+      charge_id: ctx.charges.length === 1 ? ctx.charges[0].charge_id : null,
       resident_id: ctx.residentId,
       interaction_id: await interactionId(ctx),
       outcome: "office_to_contact",
@@ -327,19 +450,31 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     return { ok: true };
   },
 
-  /** They say they already paid. The agent never asks when or how. */
-  async log_disputed_payment(_args, ctx) {
-    if (!ctx.chargeId) return { ok: false, error: "no charge on this call" };
+  /**
+   * They say they already paid. The agent never asks when or how.
+   *
+   * Takes an apartment, and this is the tool the whole feature turns on. A
+   * resident with two flats who says "I paid for four" has disputed four. Before
+   * this, the only shape available was disputing the call — so the office
+   * received a claim against both flats, one of which the resident never made,
+   * and the honest one got buried in it.
+   */
+  async log_disputed_payment(args, ctx) {
+    const t = targets(ctx, args);
+    if (!t.ok) return { ok: false, error: t.error };
 
-    const { error } = await db.from("payment_disputes").insert({
-      charge_id: ctx.chargeId,
-      interaction_id: await interactionId(ctx),
-      receipt_requested: true,
-    });
+    const iid = await interactionId(ctx);
+    const { error } = await db.from("payment_disputes").insert(
+      t.charges.map((c) => ({
+        charge_id: c.charge_id,
+        interaction_id: iid,
+        receipt_requested: true,
+      })),
+    );
     if (error) return { ok: false, error: error.message };
 
-    await db.from("charges").update({ status: "disputed" }).eq("id", ctx.chargeId);
-    return { ok: true };
+    await setStatus(t.charges, "disputed");
+    return { ok: true, charges_written: t.charges.length };
   },
 
   /**
@@ -564,8 +699,23 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // silently wrong inbound: every intake ticket would have carried an empty
     // building while the agent read a reference number back to the caller.
     const building = ctx.building || args?.building || "";
-    const unit = unitOf(ctx.unit || args?.unit);
     const type = args?.type ?? "other";
+
+    // ctx first, argument second — outbound the apartment is a fact attached to
+    // the call and the model may not overwrite it.
+    //
+    // Since feature 14 there is a third case: a call covering SEVERAL
+    // apartments, where the view deliberately sends `unit` empty because no
+    // single value is true. Then the only source is what the resident just said,
+    // and it is checked against the apartments actually on the call — a flat
+    // that is not one of theirs is dropped to null, which files the ticket for a
+    // person to read rather than dispatching a technician to a guess.
+    let unit = unitOf(ctx.unit);
+    if (!unit) {
+      const said = unitOf(args?.unit);
+      const known = new Set(ctx.charges.map((c) => c.unit).filter(Boolean));
+      unit = said && (known.size === 0 || known.has(said)) ? said : null;
+    }
 
     // --- The duplicate guard ------------------------------------------------
     //
@@ -673,18 +823,43 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
   },
 
   /**
-   * Not handed over. This stops every future call for the apartment, which is
-   * why the agent cannot undo it — the tool contract says irreversible and there
-   * is deliberately no tool that sets handed_over back to true.
+   * RETIRED 11 AUG, and no longer offered to the agent. Kept so a stale
+   * assistant gets an answer rather than `unknown tool`, and DEFANGED so a stale
+   * assistant cannot do what this used to do.
+   *
+   * It used to set `residents.handed_over = false` and waive the charge, on an
+   * unverified verbal claim, made to an automated caller, by somebody with an
+   * obvious incentive. That made "this flat was never mine" the sentence that
+   * ends any call about money, and it is not a sentence anybody has to prove.
+   *
+   * Two further reasons it had to go, both structural rather than a judgement
+   * about residents. `handed_over` lives on the RESIDENT, so setting it for one
+   * flat stopped calls about every other flat that owner holds — the same
+   * category error migration 012 fixed for charges. And who holds an apartment
+   * is exactly the kind of change CONTEXT.md says becomes staff work rather than
+   * an API call; an agent recording it unilaterally is the OXS write-back
+   * mistake one layer down.
+   *
+   * So it now does what the ownership branch does: pauses the apartment and
+   * routes it to a person. `pending_charge` is excluded from the queue, so the
+   * resident is not rung again next week about something the office is checking,
+   * and nothing about the ownership record has moved on their say-so.
    */
-  async flag_not_handed_over(_args, ctx) {
+  async flag_not_handed_over(args, ctx) {
     if (!ctx.residentId) return { ok: false, error: "no resident on this call" };
+    const t = targets(ctx, args);
+    if (!t.ok) return { ok: false, error: t.error };
 
-    await db.from("residents").update({ handed_over: false }).eq("id", ctx.residentId);
-    if (ctx.chargeId) {
-      await db.from("charges").update({ status: "waived" }).eq("id", ctx.chargeId);
-    }
-    return { ok: true };
+    await db.from("call_outcomes").insert({
+      charge_id: t.charges.length === 1 ? t.charges[0].charge_id : null,
+      resident_id: ctx.residentId,
+      interaction_id: await interactionId(ctx),
+      outcome: "transferred",
+      transfer_reason: "ownership",
+    });
+    await setStatus(t.charges, "pending_charge");
+
+    return { ok: true, charges_written: t.charges.length, paused: true };
   },
 
   /**
@@ -692,11 +867,31 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * so the reason survives even when no rep is free and the transfer fails.
    */
   async transfer_to_human(args, ctx) {
-    const reasons = ["hardship", "dispute", "distress", "language", "not_understood", "caller_request"];
+    const reasons = [
+      "hardship", "dispute", "distress", "language", "not_understood",
+      "caller_request", "ownership",
+    ];
     const reason = reasons.includes(args?.reason) ? args.reason : "caller_request";
 
+    // `ownership` is the one reason that changes anything besides the record:
+    // the resident says an apartment is not theirs, or was never handed over.
+    // The claim is not acted on — the ownership record is untouched — but the
+    // apartment is PAUSED, because the alternative is ringing them again next
+    // week about the thing the office has not finished checking.
+    //
+    // Scoped to the apartment they actually named. A two-flat owner contesting
+    // one of them keeps getting called about the other, which is correct: they
+    // did not dispute it.
+    let paused = 0;
+    if (reason === "ownership") {
+      const t = targets(ctx, args);
+      if (!t.ok) return { ok: false, error: t.error };
+      await setStatus(t.charges, "pending_charge");
+      paused = t.charges.length;
+    }
+
     await db.from("call_outcomes").insert({
-      charge_id: ctx.chargeId,
+      charge_id: ctx.charges.length === 1 ? ctx.charges[0].charge_id : null,
       resident_id: ctx.residentId,
       interaction_id: await interactionId(ctx),
       outcome: "transferred",
@@ -710,7 +905,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .update({ disposition: `transfer:${reason}` })
       .eq("external_call_id", ctx.callId);
 
-    return { ok: true, reason };
+    return { ok: true, reason, charges_paused: paused };
   },
 
   /**
@@ -728,8 +923,14 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       return { ok: false, error: `outcome must be one of: ${outcomes.join(", ")}` };
     }
 
+    // ONE ROW, however many apartments the call covered. An outcome is a fact
+    // about the call — it was answered, it went to voicemail, the wrong person
+    // picked up — and writing it per charge would put a two-flat owner twice in
+    // the dashboard's no-answer list off a single unanswered call. charge_id is
+    // kept when there is exactly one it could mean and left null otherwise,
+    // rather than pointing at whichever charge happened to sort first.
     const { error } = await db.from("call_outcomes").insert({
-      charge_id: ctx.chargeId,
+      charge_id: ctx.charges.length === 1 ? ctx.charges[0].charge_id : null,
       resident_id: ctx.residentId,
       interaction_id: await interactionId(ctx),
       outcome: args.outcome,
@@ -738,17 +939,25 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     });
     if (error) return { ok: false, error: error.message };
 
-    // The attempt counter gates the queue at four. Properly this belongs to the
-    // campaign runner, which knows a call was placed even when the agent never
-    // reached this tool; doing it here too is the backstop, not the design.
-    if (ctx.chargeId) {
-      await db.rpc("bump_charge_attempt", { p_charge_id: ctx.chargeId }).then(
-        () => {},
-        () => {}, // the view still works without it; never fail a call over a counter
-      );
-    }
+    // The attempt counter gates the queue at four, and it is per charge — so
+    // EVERY charge on the call is bumped, not just one. Missing the others would
+    // leave them at the same count forever: the person view takes the max
+    // attempt across the row, so one un-bumped charge is enough to keep the
+    // resident in the queue after the fourth call.
+    //
+    // Properly this belongs to the campaign runner, which knows a call was
+    // placed even when the agent never reached this tool; doing it here too is
+    // the backstop, not the design.
+    await Promise.all(
+      ctx.charges.map((c) =>
+        db.rpc("bump_charge_attempt", { p_charge_id: c.charge_id }).then(
+          () => {},
+          () => {}, // the view still works without it; never fail a call over a counter
+        )
+      ),
+    );
 
-    return { ok: true };
+    return { ok: true, charges_bumped: ctx.charges.length };
   },
 };
 

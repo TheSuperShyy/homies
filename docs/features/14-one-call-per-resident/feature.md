@@ -2,7 +2,17 @@
 
 **Estimate:** 3d
 **Depends on:** 10-debt-followup, migration 012
-**Status:** not started — the voice agent is frozen as of 11 Aug
+**Status:** BUILT and deployed, 11 Aug — freeze lifted by the client the same
+day. Migration 013 applied; Edge Function v15 live; n8n router updated and
+probed; Hebrew assistant synced; demo page groups Dana into one call.
+
+**One cut from the spec below, on the client's instruction:** apartments that
+owe nothing are not counted or spoken. *"We don't need to look for the
+apartments that owe nothing... just the apartment that has an open balance."*
+So there is no `apartments` table, no OXS sweep change, no `apartments_held`,
+and the opening does not say how many flats somebody holds — only which ones owe.
+Sections below that describe the counting are the original spec, kept for when
+the client wants it; everything else is as built.
 
 ## Purpose
 
@@ -21,14 +31,13 @@ unable to tell which of her two July payments was being discussed.
 
 ## Behaviour
 
-The agent opens knowing four things, and says three of them unprompted:
+The agent opens knowing three things, and says all of them unprompted
+(*"how many apartments they hold altogether" was a fourth, cut — see Status*):
 
-1. **How many apartments the resident holds** — all of them, not only those in
-   arrears. "You have three apartments with us" is what makes the rest credible.
-2. **Which of those have an open balance** — named, always. Never "the July
+1. **Which apartments have an open balance** — named, always. Never "the July
    payment" to somebody with two July payments.
-3. **The total across every open apartment and month.**
-4. **Which months are open**, per apartment.
+2. **The total across every open apartment and month.**
+3. **Which months are open**, and the per-apartment split when asked.
 
 The call then settles all of it: a promise to pay, a payment link, a dispute, or
 a refusal — for the whole balance, or for one named apartment.
@@ -36,9 +45,8 @@ a refusal — for the whole balance, or for one named apartment.
 ### The opening, in substance
 
 State the building, the apartments with something open, the months, and the
-total. A resident holding three flats where two are settled hears that two are
-up to date and one is not; the agent does not read out amounts for apartments
-that owe nothing.
+total. Apartments that owe nothing are not on the call at all — the agent does
+not know about them and must never imply that it does.
 
 Then the same four responses the current prompt already handles — will pay, has
 paid, disputes, refuses — except each may now be about **one apartment or all of
@@ -89,9 +97,16 @@ consistent.
 
 ### The queue
 
-One row per resident, replacing per-charge rows. Every spoken phrase is composed
-**in the view**, not by the model — the same reason `v_debt_call_queue` already
-composes the Hebrew month name in SQL.
+**As built:** `v_debt_call_queue_person` (migration 013), one row per resident,
+layered ON TOP of `v_debt_call_queue` rather than replacing it — the eligibility
+predicate stays written once and the charge view keeps serving the dashboard.
+`apartments_held` was cut with the counting; everything else in the table below
+exists, plus `money_say()` (no rounding — `to_char FM999999` would have said
+₪1,972 about a charge of ₪1,971.80) and `hebrew_list()` (maqaf before digits:
+`ו-9`, never `ו9`).
+
+Every spoken phrase is composed **in the view**, not by the model — the same
+reason `v_debt_call_queue` already composes the Hebrew month name in SQL.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -141,36 +156,30 @@ Returns are unchanged in shape, with a `charges_written` count added.
 
 ## Data
 
-**New: `apartments`.**
+**No new table.** The `apartments` table the original spec called for existed
+only to answer `apartments_held`, and that was cut with the counting. If the
+counting ever comes back, the table comes back with it — `oxs_arrears.py`
+already iterates every apartment in every building's payment records and merely
+declines to write down the settled ones.
 
-| Column | Notes |
-|---|---|
-| `id` | uuid |
-| `resident_id` | fk residents |
-| `building` | text |
-| `unit` | text |
-| `oxs_ref` | text |
-| | unique `(building, unit)` |
+`residents.unit` is display-only and **not** authoritative for anything, the
+same status `charges.unit` gave it on 11 Aug.
 
-Populated by `oxs_arrears.py`, which already sweeps every building's payment
-records and sees every apartment — it currently keeps only the ones behind and
-discards the rest. Recording the settled ones is what makes `apartments_held`
-answerable; the expensive half-hour sweep already happens.
-
-`residents.unit` becomes display-only and is **not** authoritative for anything,
-the same status `charges.unit` gave it on 11 Aug.
-
-Reads: `charges`, `residents`, `apartments`. Writes: unchanged tables, more rows
-per call.
+Reads: `charges`, `residents`. Writes: unchanged tables, more rows per call.
 
 ## Acceptance
+
+Verified 11 Aug: 1–4 against the live data (the two real multi-apartment owners,
+gate flipped inside a rolled-back transaction), 8 and the refusal half of 7/12
+against the live n8n webhook. 5, 6, 9, 10, 13 need the campaign runner or a
+placed call, which still do not exist.
 
 1. A resident with one apartment in arrears produces exactly one queue row, and
    the call wording differs from today's only by naming the apartment.
 2. A resident with two apartments in arrears produces exactly **one** queue row.
 3. For any queue row, `amount` equals the sum of `amount` across its `charges`.
-4. `apartments_owing` names every apartment with an open charge and no others;
-   `apartments_held` is greater than or equal to its length.
+4. `apartments_owing` names every apartment with an open charge and no others.
+   (*`apartments_held` cut with the counting.*)
 5. Placing calls for N eligible residents results in N calls, not one per charge.
    Measured against the two known multi-apartment owners: 2 calls, not 10.
 6. A promise to pay on a two-apartment call writes `promises_to_pay` rows

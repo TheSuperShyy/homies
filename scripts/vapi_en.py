@@ -353,6 +353,15 @@ DEBT_LINES = [
      "> Okay, I'm passing this to, um, someone on our team, and they'll get back "
      "to you shortly."),
 
+    # 11 Aug. The ownership offer — a resident says the apartment is not theirs.
+    # It is a QUESTION, unlike the handover line above, because the agent is
+    # asking permission rather than announcing what it has done, and it has to
+    # survive a no. Same discipline as its neighbour: "pass this to the team",
+    # never "put you through", and not a word about when they will hear back.
+    ("> רוצה שאני אעביר את זה לצוות שיבדקו ויחזרו אליך?",
+     "> Would you like me to pass this to the team, so they can check it and get "
+     "back to you?"),
+
     # The closing. Added 4 Aug after a test call ended on a bare "Goodbye" —
     # the section said "a short warm closing" and gave no example, so the model
     # took the one concrete word nearby and used that.

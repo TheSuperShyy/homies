@@ -170,11 +170,42 @@ const ctx = {
   phone:      v.phone || '',
   first_name: v.first_name || '',
   amount:     v.amount || '',
-  month:      v.month || '',
+  // A person call (feature 14) carries months_phrase, not month. Either counts
+  // as "this call knows what it is collecting" for the guards below.
+  month:      v.month || v.months_phrase || '',
   card_last4: v.card_last4 || '',
   building:   v.building || '',
   unit:       v.unit || '',
 };
+
+// The charges whitelist a person call rides in on. variableValues are template
+// substitutions, so it can arrive as JSON text or as itself; both are read.
+// Absent or malformed means a single-charge call, and every check below then
+// passes everything through — exactly the old behaviour.
+let chargesOnCall = [];
+try {
+  let c = v.charges;
+  if (typeof c === 'string') c = JSON.parse(c);
+  if (Array.isArray(c)) chargesOnCall = c;
+} catch (e) { /* single-charge call */ }
+const unitsOnCall = [];
+for (const c of chargesOnCall) {
+  const u = String((c && c.unit) || '').trim();
+  if (u && unitsOnCall.indexOf(u) < 0) unitsOnCall.push(u);
+}
+
+// Mirrors targets() in the Supabase writer, and has to: this node answers Vapi
+// BEFORE the writer runs, so a refusal that exists only downstream would arrive
+// after the agent had already been told yes. A unit that is not on the call is
+// refused, never widened back to the whole call — a mishearing on "I paid for
+// four" must not dispute a flat the resident never mentioned.
+function badUnit(args) {
+  const asked = String((args && args.unit) || '').trim();
+  if (!asked || !unitsOnCall.length) return null;
+  if (unitsOnCall.indexOf(asked) >= 0) return null;
+  return { ok: false, error: 'apartment ' + asked + ' is not on this call — ' +
+           'apartments on this call: ' + unitsOnCall.join(', ') };
+}
 
 const tc = (msg.toolCalls || [])[0] || {};
 const fn = tc.function || {};
@@ -193,7 +224,7 @@ const OUTCOMES = ['link_sent','authorized','promised','disputed','refused',
 // a bug anyone sees, it is a column that quietly says the wrong thing forever.
 // Kept in step with INTAKE_TRANSFER_REASONS in scripts/vapi_tools.py.
 const REASONS  = ['hardship','dispute','distress','language','not_understood',
-                  'caller_request',
+                  'caller_request','ownership',
                   'out_of_scope','emergency','repeated_failure'];
 
 let result = { ok: false, error: 'unknown tool ' + fn.name };
@@ -205,9 +236,11 @@ switch (fn.name) {
     // Refused rather than written: a link request with no amount is a row a
     // person cannot action, and the agent must not be told one is on its way.
     if (!ctx.amount || !ctx.month) { result = { ok:false, error:'no amount or month on this call' }; break; }
+    const bad = badUnit(args); if (bad) { result = bad; break; }
     tab = 'payment_links';
     row = { at, call_id: ctx.call_id, phone: ctx.phone, first_name: ctx.first_name,
-            amount: ctx.amount, month: ctx.month, status: 'requested', note: args.note || '' };
+            amount: ctx.amount, month: ctx.month, status: 'requested',
+            unit: String(args.unit || '').trim(), note: args.note || '' };
     result = { ok: true };
     break;
   }
@@ -233,9 +266,11 @@ switch (fn.name) {
   }
   case 'log_promise_to_pay': {
     if (!args.said) { result = { ok:false, error:'said is required' }; break; }
+    const bad = badUnit(args); if (bad) { result = bad; break; }
     tab = 'promises';
     row = { at, call_id: ctx.call_id, phone: ctx.phone, first_name: ctx.first_name,
-            promised_date: args.promised_date || '', said: String(args.said) };
+            promised_date: args.promised_date || '', said: String(args.said),
+            unit: String(args.unit || '').trim() };
     result = { ok: true };
     break;
   }
@@ -247,9 +282,10 @@ switch (fn.name) {
     break;
   }
   case 'log_disputed_payment': {
+    const bad = badUnit(args); if (bad) { result = bad; break; }
     tab = 'disputes';
     row = { at, call_id: ctx.call_id, phone: ctx.phone, first_name: ctx.first_name,
-            receipt_requested: true };
+            receipt_requested: true, unit: String(args.unit || '').trim() };
     result = { ok: true };
     break;
   }
@@ -290,18 +326,29 @@ switch (fn.name) {
     break;
   }
   case 'flag_not_handed_over': {
+    // Retired 11 Aug and no longer offered to the agent; answered so a stale
+    // assistant does not get 'unknown tool' mid-call. The Supabase writer no
+    // longer flags anything on this path — it pauses the apartment and routes
+    // it to a person, same as transfer_to_human with reason ownership.
+    const bad = badUnit(args); if (bad) { result = bad; break; }
     tab = 'call_outcomes';
     row = { at, call_id: ctx.call_id, phone: ctx.phone, first_name: ctx.first_name,
-            outcome: 'not_handed_over' };
-    result = { ok: true };
+            outcome: 'transferred', transfer_reason: 'ownership',
+            unit: String(args.unit || '').trim() };
+    result = { ok: true, paused: true };
     break;
   }
   case 'transfer_to_human': {
     const reason = REASONS.indexOf(args.reason) >= 0 ? args.reason : 'caller_request';
+    // ownership is the one reason that also pauses an apartment, so the unit it
+    // names has to be on the call — mirroring the writer's refusal, which would
+    // otherwise arrive after the agent had been told yes.
+    if (reason === 'ownership') { const bad = badUnit(args); if (bad) { result = bad; break; } }
     tab = 'call_outcomes';
     row = { at, call_id: ctx.call_id, phone: ctx.phone, first_name: ctx.first_name,
             outcome: 'transferred', transfer_reason: reason,
-            posture_reached: args.posture_reached || '' };
+            posture_reached: args.posture_reached || '',
+            unit: String(args.unit || '').trim() };
     result = { ok: true, reason };
     break;
   }
@@ -351,9 +398,17 @@ const forward = JSON.parse(JSON.stringify(body));
 forward.message = forward.message || {};
 forward.message.call = forward.message.call || {};
 forward.message.call.assistantOverrides = forward.message.call.assistantOverrides || {};
+// The writer treats variableValues.unit as a fact of the call, so the agent's
+// argument only fills the gap when it names an apartment the call actually
+// covers (or when there is no whitelist — inbound, where what the caller said
+// is the only source there is). An off-call unit stays out: the writer files
+// the ticket with no apartment for a person to read, rather than trusting a
+// guess promoted to a fact by this merge.
+const argUnit = String(args.unit || '').trim();
+const safeUnit = (!unitsOnCall.length || unitsOnCall.indexOf(argUnit) >= 0) ? argUnit : '';
 forward.message.call.assistantOverrides.variableValues = Object.assign({}, v, {
   building: ctx.building || args.building || '',
-  unit:     ctx.unit     || args.unit     || '',
+  unit:     ctx.unit     || safeUnit      || '',
 });
 
 return [{

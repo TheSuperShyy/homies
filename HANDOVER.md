@@ -46,8 +46,11 @@ the end-of-call report and the two read-only tools (`get_balance`,
 Tables: `residents`, `charges`, `interactions`, `requests`, `messages`,
 `call_outcomes`, `payment_links`, `promises_to_pay`, `payment_disputes`,
 `payment_tickets`. Views: `v_debt_call_queue` (the eligibility guard —
-unpaid, handed over, not do-not-call, attempts < 4), `v_conversations`,
-`v_pending_payment_tickets`.
+unpaid, handed over, not do-not-call, attempts < 4, one row per apartment per
+month), `v_debt_call_queue_person` (**the call queue since 11 Aug** — one row
+per resident, every apartment they owe on, composed Hebrew phrases and the
+`charges` whitelist; built on the charge view so the predicate exists once),
+`v_conversations`, `v_pending_payment_tickets`.
 
 **The dashboard.** Next.js 14 on Vercel at `homies-dashboard.vercel.app`.
 Pages: overview, tickets, debts, conversations, calls, call detail. Anon key,
@@ -62,10 +65,17 @@ defect 1 below.
 
 **The 12 tools:** `open_request`, `save_partial_request`, `send_payment_link`,
 `log_promise_to_pay`, `request_standing_order`, `log_disputed_payment`,
-`flag_not_handed_over`, `transfer_to_human`, `log_call_outcome`,
-`get_balance` (read), `get_request_status` (read), and `open_payment_ticket`
-(retired 4 Aug, not offered). `transfer_to_human` **connects nobody** — it
-writes the call to the office. Never say anyone is being put through.
+`transfer_to_human`, `log_call_outcome`, `get_balance` (read),
+`get_request_status` (read), and two retired-but-answered:
+`open_payment_ticket` (4 Aug) and `flag_not_handed_over` (11 Aug — **defanged**:
+it no longer touches `handed_over` or waives anything; it pauses the apartment
+and routes to a person). Since 11 Aug the three debt writes take an optional
+`unit` — the agent **selects** an apartment already on the call, resolved
+server-side against the `charges` whitelist; an off-call unit is refused, never
+widened. `transfer_to_human` gained reason `ownership` ("that flat is not
+mine"): pauses the named apartment to `pending_charge`, changes no ownership
+record. It still **connects nobody** — it writes the call to the office. Never
+say anyone is being put through.
 
 ---
 
@@ -92,14 +102,14 @@ writes the call to the office. Never say anyone is being put through.
 - **Chatwoot in the message path.** It runs and owns the number; it is not
   wired to the bot.
 - **Any scheduler.** Every import and sync is run by hand.
-- **A campaign runner.** Nothing has ever iterated `v_debt_call_queue`.
-  **Read this before writing one:** the view is one row per charge, which since
-  11 Aug means one row per *apartment per month*. An owner with two flats owing
-  four months each is **eight rows, and a naive runner places eight calls**.
-  Collapsing is the runner's job — the view's contract is only that a row
-  carries everything one call needs. How a call should be grouped (per
-  resident, per apartment, per charge) is **deliberately undecided as of
-  11 Aug**; see "Deferred by decision" below.
+- **A campaign runner.** Nothing has ever iterated the queue. **A runner reads
+  `v_debt_call_queue_person`, never `v_debt_call_queue`.** The person view is
+  one row per resident and IS the grouping decision, made 11 Aug: one call
+  covers every apartment they owe on. The charge view underneath is one row per
+  apartment per month — an owner with two flats owing four months is eight rows
+  there, and a runner iterating it places eight calls. Pass the whole person
+  row as `variableValues`, `charges` included: the tools resolve apartment
+  writes against that whitelist.
 
 ---
 
@@ -202,29 +212,30 @@ exists. Never print a value, never commit one, never paste one into chat.
    grant Business Manager access rather than hand over a login.
 4. **Chatwoot seats** — how many users, names and emails, which inboxes.
 
-## Deferred by decision — do not restart these unasked
+## The freeze was lifted 11 Aug, and feature 14 shipped through it
 
-**The voice agent is frozen as of 11 Aug.** Not blocked, chosen. Do not edit the
-prompt, the queue grouping, or the assistants.
+The voice-agent freeze (11 Aug, morning) was lifted the same day by the client
+— *"implement the handling"* — and both of its deferred consequences are
+resolved:
 
-Two consequences to state plainly rather than quietly work around:
+1. **`debt-tools` is deployed (v15).** The multi-apartment `get_balance`, and
+   the whole feature-14 tool layer: `ctx.charges` whitelist, per-apartment
+   writes via an optional `unit` the server resolves, `flag_not_handed_over`
+   defanged, `ownership` transfers pausing the named apartment.
+2. **Call grouping is decided and built: one call per resident.**
+   `v_debt_call_queue_person` is the queue; the phrases are composed in SQL;
+   the live Hebrew assistant carries the person-call prompt and tool schemas.
+   One scope cut, by the client: apartments that owe nothing are not counted
+   or spoken — only what owes is on the call.
 
-1. **`debt-tools` in the repo is ahead of what is deployed.** `get_balance`
-   gained a per-apartment answer and the ability to find a caller through their
-   second flat; neither is live. On a call today, the two multi-apartment
-   owners get one combined balance, and their second apartment cannot be found
-   by building+apartment. No write tool changed, so nothing else waits on it.
-   **Deploying it is a decision, not a chore.**
-2. **How a call is grouped is undecided.** One call per resident (everything
-   they owe), per apartment, or per charge as today. It is not only a queue
-   change: `{{month}}` and `{{amount}}` are single values and the prompt
-   refuses a call without them, and `log_promise_to_pay`, `send_payment_link`
-   and `log_disputed_payment` each write against one `charge_id`. A call
-   covering eight charges has nowhere to record a promise against eight. The
-   tool layer is the real work.
+**Left stale, on purpose:** `vapi_en.py debt` exits ("LANGUAGE block did not
+match") — its substitution table predates the 7 Aug prompt cut, so the English
+twin is frozen at its last build. It fails closed; rebuilding the table is its
+own task. The demo page still sends `month` (singular) so the stale English
+assistant's sentences stay whole.
 
-Nothing is urgent: no phone number exists, all 7,391 residents are
-`handed_over = false`, and the queue returns 0 rows.
+Nothing dials: no phone number exists, all 7,391 residents are
+`handed_over = false`, and both queue views return 0 rows.
 
 ## Next moves, in order
 

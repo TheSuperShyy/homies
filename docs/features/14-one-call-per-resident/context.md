@@ -19,6 +19,16 @@ resident who says "I already paid for number 4" in a call that can only record a
 dispute against everything has not completed anything, and the office receives a
 ticket saying both flats are contested when one of them is not.
 
+## The counting was cut, later the same day
+
+Everything below about counting apartments that owe nothing is the original
+spec. Reading the plan back, the client cut it: *"we don't need to look for the
+apartments that owe nothing... just the apartment that has an open balance."*
+That removed the `apartments` table, the sweep change and `apartments_held` —
+the whole data-collection half — and the feature shipped the same day. The
+section is kept because the cheap path it describes is still the right one if
+the counting ever comes back.
+
 ## The counting requirement is the expensive-sounding part, and it is not
 
 "How many apartments this person has" needs apartments that owe **nothing**,
