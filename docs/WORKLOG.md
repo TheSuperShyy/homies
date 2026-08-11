@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### A multi-apartment owner in the demo caller list
+
+Asked for a sample on the test console covering one owner with several
+apartments. Added דנה רוזן, הרצל 14 — apartment 4 at ₪450 and apartment 9 at
+₪780, one phone across both.
+
+**Two rows, not one combined row**, and that is the point rather than a
+shortcut. `unit` and `amount` are single template variables and the prompt
+refuses a call without them, so a combined row would demo a call the agent
+cannot currently place. Two rows is what `v_debt_call_queue` actually produces.
+Picking either card rings her about that apartment only, which makes the
+undecided question tangible: as built, this owner gets two calls.
+
+Two cards with the same name read as a duplicated row, so each carries a marker
+naming the other apartment and the combined ₪1,230 — the same device the
+dashboard uses, for the same reason. Grouped on phone, since that is the only
+field identifying a person here.
+
+The marker is computed at draw time and never stored on the person object:
+`variablesFor()` forwards every field it does not explicitly drop, so an extra
+key would have reached the agent as a template variable it could read aloud.
+Appended after the existing tag rather than folded into it, because that chain
+is a priority ladder — no phone, no Latin name, blocked, card — and every rung
+is there because a call once went out without it.
+
+Verified: 12 rows, exactly one owner with more than one apartment, markers
+correct on both cards, no unintended phone collisions, page script parses.
+
+**No assistant, prompt or queue change.** This is a fixture in the test
+console; the voice agent freeze holds.
+
 ### A resident was sent the single word "אני" — a failed generation, sent as an answer
 
 Reported from a real handset: a resident asked for their balance, was asked for
