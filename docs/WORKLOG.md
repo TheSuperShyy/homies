@@ -11,6 +11,49 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### The agent insists on ownership, and acts on nothing
+
+Reading the "left broken" note, decided: *"the agent should insist since the
+system says otherwise, and would say would you like me to forward you to the
+office regarding this concern?"*
+
+Right, and for a bigger reason than this feature. `flag_not_handed_over` sets
+`handed_over = false` and waives the charge **on an unverified verbal claim**,
+made to an automated caller, by somebody with an obvious incentive. That makes
+"this flat was never mine" the phrase that ends any call about money, and nobody
+has to prove it. It also runs against a standing decision already written down:
+OXS is read-only and a change a resident asks for becomes staff work. Who owns
+an apartment is exactly that, and the agent recording it unilaterally is the
+same mistake as writing it back to OXS one layer down.
+
+**One wording correction to the instruction.** "Forward you to the office"
+promises a live transfer and `transfer_to_human` connects nobody — it writes the
+call to the office. `HANDOVER.md` states the rule outright. The line is "shall I
+pass this to the office so they can check it and come back to you?"
+
+**Pause, not waive.** On acceptance the contested apartment's charges move to
+`pending_charge`, which `v_debt_call_queue` already excludes since it only emits
+`unpaid`. Existing machinery, exact fit: the resident is not rung again next week
+about something the office is still checking, the other apartment carries on,
+and the ownership record is untouched. Waiving would have answered the question
+the transfer exists to ask.
+
+`flag_not_handed_over` comes off the agent's toolset — the same retirement
+`open_payment_ticket` got on 4 Aug, for the same reason: a tool the agent should
+not be deciding to use should not be offered to it. The handler stays in the
+Edge Function so a stale assistant gets an answer rather than an error.
+
+**This removed a blocker rather than deferring one.** Nothing automatic writes
+`handed_over` any more, so the multi-apartment blast radius on that flag never
+opens and feature 14 no longer depends on moving the interlock.
+
+The cost, on the record: a resident who genuinely is not responsible keeps
+getting called until a person acts. `pending_charge` bounds that to the
+apartment they contested rather than all of them, but it is a promise that the
+office follow-up actually happens.
+
+Spec and artifact both updated.
+
 ### Spec: one call per resident, every apartment in it
 
 Decided, after watching the demo call to the two-apartment owner: *"calling

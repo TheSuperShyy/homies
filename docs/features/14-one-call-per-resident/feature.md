@@ -44,6 +44,31 @@ Then the same four responses the current prompt already handles — will pay, ha
 paid, disputes, refuses — except each may now be about **one apartment or all of
 them**, and the agent must carry which.
 
+### "That flat was never mine"
+
+The agent does **not** act on this. The system holds a record saying the
+apartment is theirs; a verbal claim on a collection call does not outrank it,
+and treating it as though it does turns "this isn't my flat" into the phrase
+that ends any call about money.
+
+So the agent says plainly that the system shows the apartment against them, once
+— not an argument, and not a second attempt at the same sentence — and offers
+the office:
+
+> Shall I pass this to the office so they can check it and come back to you?
+
+**It never says anyone is being put through.** `transfer_to_human` connects
+nobody; it writes the call to the office. The existing rule stands.
+
+On acceptance: `transfer_to_human`, and **the charges for that apartment move to
+`pending_charge`**. That pauses them — `v_debt_call_queue` only emits `unpaid` —
+so the resident is not rung again next week about the thing the office is still
+checking, while nothing about the ownership record has been changed on their
+say-so.
+
+`flag_not_handed_over` is **not offered to the agent** under this feature. See
+Out of scope.
+
 ### The apartment is always named
 
 `{{unit}}` is currently "not spoken unless the caller asks"
@@ -98,8 +123,8 @@ amount or a month.
 against **every** charge on the call. No new argument; the agent supplies
 nothing it does not already supply.
 
-**Apartment-level** — `log_disputed_payment`, `flag_not_handed_over`. These gain
-one optional argument:
+**Apartment-level** — `log_disputed_payment` and, if it is ever re-offered,
+`flag_not_handed_over`. These gain one optional argument:
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
@@ -158,18 +183,34 @@ per call.
    `disputed`.
 10. Ten consecutive multi-apartment calls produce zero rows against a charge that
     was not on the call that produced them.
-11. `residents.handed_over` is not written by any part of this feature.
+11. `residents.handed_over` is not written by any part of this feature, on any
+    path, including a resident stating an apartment is not theirs.
+12. A resident claiming an apartment is not theirs produces a
+    `transfer_to_human` row and moves that apartment's charges to
+    `pending_charge`; the other apartment's charges stay `unpaid`.
+13. That resident does not reappear in the queue for the paused apartment, and
+    **does** still appear for the apartment they did not contest.
+14. No reply on that path contains a phrase promising a live transfer.
 
 ## Out of scope
 
 - **`handed_over` becoming an apartment-level fact.** It is described in the
   schema as "false when the apartment has not been handed over" but lives on the
-  resident, so flagging one flat stops calls about every other flat that owner
-  holds. Real, and the same shape as the bug migration 012 fixed. It is also the
-  interlock keeping the queue empty, so it moves on its own change with its own
-  verification, not inside this one. Until then `flag_not_handed_over` on a
-  multi-apartment owner is a blunt instrument and the prompt should route those
-  to a human.
+  resident, so setting it for one flat would stop calls about every other flat
+  that owner holds — the same shape as the bug migration 012 fixed. It is also
+  the interlock keeping the queue empty, so it moves on its own change, with its
+  own verification and its own approval.
+
+  **This feature no longer needs it to move.** Because the agent does not act on
+  an ownership claim at all, nothing automatic writes that flag, and the
+  multi-apartment blast radius never opens. `flag_not_handed_over` comes off the
+  agent's toolset — the same retirement `open_payment_ticket` got on 4 Aug, and
+  for the same reason: a tool the agent should not be deciding to use is a tool
+  it should not be offered. The handler stays in the Edge Function so a stale
+  assistant still gets an answer rather than an error.
+
+  Whether a person should later flip that flag per apartment is a real question
+  and belongs with the change that moves it.
 - **Payment link delivery.** Still nothing sends them; feature 10 owns that.
 - **Placing any call.** No phone number exists, every resident is
   `handed_over = false`, and a campaign needs explicit approval every time.

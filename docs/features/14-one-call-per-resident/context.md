@@ -97,6 +97,53 @@ is a defect rather than a judgement call: the voicemail line says
 `לגבי בניין {{building}}` to an answering machine belonging to nobody in
 particular, while the agent refused the same fact to the confirmed resident.
 
+## The ownership claim: the agent insists, and does not act
+
+Decided 11 Aug, reading the "left broken" note above:
+
+> *"The agent should insist, since the system says otherwise, and would say
+> would you like me to forward you to the office regarding this concern?"*
+
+This is the right call for a reason beyond this feature. `flag_not_handed_over`
+sets `handed_over = false` and waives the charge **on an unverified verbal
+claim**, made to an automated caller, by someone with an obvious incentive. That
+makes "this flat was never mine" the phrase that ends any call about money, and
+it is not a phrase anybody has to prove.
+
+It also runs against a standing decision already in `CONTEXT.md`: OXS is
+read-only and **a change a resident asks for becomes staff work, not an API
+call.** Who owns an apartment is precisely that kind of change. The agent
+recording it unilaterally is the same mistake as writing it back to OXS, one
+layer down.
+
+So the posture is: say once, plainly, that the system shows the apartment
+against them; offer the office; do not argue and do not repeat the sentence.
+That fits the prompt's existing temperament — hot is a floor, and de-escalating
+into further persuasion loses.
+
+**One wording correction to the instruction as given.** "Forward you to the
+office" promises a live transfer, and `transfer_to_human` connects nobody — it
+writes the call to the office for a person to pick up. `HANDOVER.md` states the
+rule outright: never say anyone is being put through. The line is *"shall I pass
+this to the office so they can check it and come back to you?"*
+
+**Pause, do not waive.** On acceptance the apartment's charges move to
+`pending_charge`, which `v_debt_call_queue` already excludes because it only
+emits `unpaid`. That machinery exists for disputes and fits exactly: the
+resident is not rung again next week about something the office is still
+checking, and the ownership record is untouched. Waiving would have decided the
+question the transfer exists to ask.
+
+The side effect worth naming: this **removed** the blocker rather than deferring
+it. Nothing automatic writes `handed_over` any more, so the multi-apartment
+blast radius on that flag never opens, and this feature stops depending on a
+change to the interlock.
+
+The cost is real and belongs on the record: a resident who genuinely is not
+responsible keeps receiving calls until a person acts. `pending_charge` bounds
+that to the apartment they contested rather than all of them, but it is a
+promise that the office follow-up actually happens.
+
 ## What this deliberately leaves broken
 
 `residents.handed_over` is documented as "false when the apartment has not been
