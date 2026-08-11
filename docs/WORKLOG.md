@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### Owner view on Debts, because the apartment split broke a second question
+
+Splitting rows per apartment answered *what does this flat owe* and quietly
+broke *what does this person owe*. Rows sort by amount independently, so one
+owner's two flats scatter — ₪5,572 third on page one, ₪1,838 on page two —
+with nothing saying they are one phone call worth ₪7,409.60.
+
+Both halves shipped, not either:
+
+- `?by=owner` — one row per resident, flats merged into an `Apartments` cell,
+  months deduped across them, sorted by what they owe in total.
+- A marker on the apartment rows — `· also apt 103 · ₪7,409.60 total` — so the
+  default view cannot mislead somebody who never finds the toggle.
+
+The toggle alone was rejected because the default would stay wrong-by-omission;
+the marker alone because reading a position off two rows on two pages is work
+the page should already have done. Month and view are independent in the URL —
+switching either keeps the other — and the cards are computed from the
+apartment grouping in both views, since a `Total open` that moved when you
+regrouped rows would look like a discovery rather than a rendering choice.
+
+Verified against a local production build before pushing: `all` 122 apartments
+/ 120 residents, July 108 / 106, toggle links preserve the month, and the two
+multi-flat owners merge correctly in owner view and carry the marker in
+apartment view.
+
 ### A charge belongs to an apartment, not to a phone — ₪6,665.40 recovered
 
 Asked: *"I want to know what apartment isn't paid yet and how much."* The page

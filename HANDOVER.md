@@ -53,7 +53,8 @@ unpaid, handed over, not do-not-call, attempts < 4), `v_conversations`,
 Pages: overview, tickets, debts, conversations, calls, call detail. Anon key,
 no login since 9 Aug, read-only except `requests.status`. Ten rows a page
 everywhere, via `dashboard/components/pager.tsx`. Debts is one row per
-**apartment**, not per person, and filters by month —
+**apartment**, with `?by=owner` for one row per person and a marker on
+apartment rows whose owner holds another flat. It filters by month —
 `/debts?month=2026-07`, tabs derived from the data, `?month=all` for the
 lifetime view — and opens on the newest **completed** month, because the
 current month is never chased and the newest month carrying a charge is

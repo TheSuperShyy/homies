@@ -130,6 +130,34 @@ names only one flat. The caller from the second flat had to be found through
 their charge instead, or an owner would have been reachable under one of their
 apartment numbers and invisible under the other.
 
+### The owner view, and the problem the apartment split created — 11 Aug
+
+Asked immediately after: *"How about for the people that own multiple
+apartments and have debts on those apartments — how can I see that without any
+issues?"*
+
+Splitting rows per apartment answered "what does this flat owe" and quietly
+broke "what does this person owe". Rows sort by amount independently, so one
+owner's flats scatter — the ₪5,572 one third on page one, the ₪1,838 one on
+page two — with nothing marking them as one phone call worth ₪7,409.60.
+
+Fixed with both halves rather than either:
+
+- `?by=owner`, one row per resident, flats merged and months deduped. This is
+  the view for deciding what to say on a call.
+- A marker on the apartment rows naming the owner's other flats and their
+  combined total, so the apartment view cannot mislead even when nobody
+  toggles.
+
+The toggle alone was rejected because the default view would still have been
+wrong-by-omission for anybody who never found the switch. The marker alone was
+rejected because reading an owner's position off two rows on two pages is work
+the page should have already done.
+
+The cards are computed from the apartment grouping in both views on purpose. A
+`Total open` that moved when you changed how rows were grouped would look like
+a discovery rather than a rendering choice.
+
 ### Empty months are shown, not redirected
 
 A well-formed month nobody owes for renders "Nobody owes for 2026-03" rather

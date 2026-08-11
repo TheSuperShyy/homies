@@ -111,6 +111,29 @@ held by 120 residents**. For July it is 108 apartments and 106 people.
 `Apartments owing` and `Residents owing` are separate cards for that reason.
 The pager counts apartments.
 
+### Two views, because there are two questions
+
+`?by=owner` switches to one row per resident: their flats merged into an
+`Apartments` cell, months deduped across them, and the total they owe. The
+default stays one row per apartment.
+
+Both are real questions and neither is the truth. *What does apartment 601 owe*
+is the apartment view. *What do I say when I ring this person* is the owner
+view — and it needed its own view because sorting by amount scatters one
+owner's flats: a ₪5,572 flat lands third while its ₪1,838 sibling lands on
+page two.
+
+So the apartment view also carries a marker — `· also apt 103 · ₪7,409.60
+total` — on any row whose owner holds another flat in arrears. Without it two
+rows a page apart read as two unrelated people, which is the failure the
+per-apartment split introduced.
+
+The month and the view are independent in the URL: switching either preserves
+the other, and `/debts?month=2026-07&by=owner` is a link somebody can send.
+The cards do not move when the toggle does — the money owed is the same
+either way, and a total that changed with the view would be a bug pretending
+to be a feature.
+
 Hebrew is handled with `dir="auto"` per element rather than a right-to-left
 layout: Hebrew flows correctly while a reference like `HM-2026-1013` inside the
 same sentence stays left-to-right. A full RTL chrome is a bigger job and belongs
