@@ -1217,6 +1217,11 @@ def workflow(e):
                 # on every call while the balance is empty, and a resident who
                 # gets silence is worse off than one told a person will follow up.
                 onError="continueErrorOutput",
+                # Absorbs a transient provider blip before it reaches a resident.
+                # It does NOT cover the 11 Aug failure — see "Reply usable?",
+                # where the generation errored and the node still reported
+                # success — but it covers the failures that do throw.
+                retryOnFail=True, maxTries=3, waitBetweenTries=5000,
             ),
             node(
                 id="model", name="OpenRouter", type="@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -1224,6 +1229,7 @@ def workflow(e):
                 parameters={"model": MODEL, "options": {"maxTokens": MAX_TOKENS}},
                 credentials={"openRouterApi": {"id": e.get("N8N_OPENROUTER_CRED_ID", "").strip(),
                                                "name": "Homies OpenRouter"}},
+                retryOnFail=True, maxTries=3, waitBetweenTries=5000,
             ),
             # Keyed on the phone number off the WhatsApp envelope, which is the
             # same rule as everywhere else here: never anything the resident
@@ -1416,6 +1422,44 @@ def workflow(e):
             # agent's main output is empty and .first() on it throws. Canned
             # branches produce neither, evaluate to '', and fail notEmpty —
             # correctly, since every canned line ends with a question anyway.
+            # --- Is what the model produced actually a reply? ---------------
+            # On 11 Aug a resident asked for their balance, gave their name,
+            # and was sent the single word "אני". The tool had worked:
+            # get_balance returned ₪9,984 across two months. What failed was the
+            # generation *after* it — OpenRouter returned
+            # finish_reason "error" with one completion token, and the agent
+            # node reported success carrying that one word as its answer.
+            #
+            # This is why onError and retryOnFail are not enough on their own.
+            # Neither fires, because nothing threw. The node succeeded; it
+            # succeeded with a fragment.
+            #
+            # The test is word count, not length. Every reply this agent has any
+            # business sending is a sentence — it answers a question or asks
+            # one — and the canned one-liners are on other branches entirely. A
+            # single word is a broken generation whatever the word is, and
+            # "אני" is exactly as long as a legitimate Hebrew word, so length
+            # cannot tell them apart.
+            #
+            # Failing this sends the handover line instead, which is the honest
+            # answer: we could not produce one, and a person will follow up.
+            node(
+                id="usable", name="Reply usable?", type="n8n-nodes-base.if",
+                typeVersion=2, position=[1200, 60],
+                parameters={"conditions": {
+                    "options": {"caseSensitive": True, "leftValue": "",
+                                "typeValidation": "loose"},
+                    "conditions": [{
+                        "id": "words",
+                        "leftValue": "={{ (($json.output || '').trim()"
+                                     ".split(/\\s+/).filter(Boolean)).length >= 2 }}",
+                        "rightValue": "",
+                        "operator": {"type": "boolean", "operation": "true",
+                                     "singleValue": True},
+                    }],
+                    "combinator": "and",
+                }},
+            ),
             node(
                 id="hasref", name="Dead end reply?", type="n8n-nodes-base.if",
                 typeVersion=2, position=[1680, 60],
@@ -1509,7 +1553,17 @@ def workflow(e):
             # main[0] is the answer, main[1] is the error output opened by
             # onError. Both end at Send, because either way the resident gets a
             # message — that is the whole point of having a second branch.
+            #
+            # main[0] no longer goes straight to Send: a generation can fail
+            # without throwing, so the answer is checked before it is sent.
             "Answer the resident": {"main": [
+                [{"node": "Reply usable?", "type": "main", "index": 0}],
+                [{"node": "Hand over instead", "type": "main", "index": 0}],
+            ]},
+            # true — a real sentence, send it. false — a fragment, so join the
+            # error branch and send the handover line. Both ends already exist;
+            # this only decides which one a degenerate reply takes.
+            "Reply usable?": {"main": [
                 [{"node": "Send", "type": "main", "index": 0},
                  {"node": "Log reply", "type": "main", "index": 0}],
                 [{"node": "Hand over instead", "type": "main", "index": 0}],

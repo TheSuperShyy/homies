@@ -11,6 +11,51 @@ conversation that produced it.
 
 ## 2026-08-11
 
+### A resident was sent the single word "אני" — a failed generation, sent as an answer
+
+Reported from a real handset: a resident asked for their balance, was asked for
+a name, gave one, and got back **"אני"** followed by the options list.
+
+The tool was not the problem, and neither was the data. Execution 613 shows the
+whole turn:
+
+| | |
+|---|---|
+| OpenRouter run 0 | `finish_reason: tool_calls`, 40 completion tokens |
+| `get_balance` | `found:1`, ₪9,984, 2026-06 + 2026-07 — correct |
+| OpenRouter run 1 | **`finish_reason: "error"`, 1 completion token, `"אני"`** |
+
+So the model called the tool properly, got the right answer back, and then its
+final generation failed upstream after one token. The agent node reported
+**success** carrying that one word, and the workflow sent it.
+
+Two wrong guesses discarded on the way, both recorded because they are the
+obvious ones to reach for again. It is **not** the `maxTokens` ceiling — a cap
+gives `finish_reason: "length"`, not `"error"`, and the code comment predicting
+a mid-sentence truncation sent me down that path. And it is **not** a missing
+tool call — the tool node was invisible in my first dump only because tools
+emit on `ai_tool`, not `main`, so a filter on `main` hid it.
+
+**Why `onError` and `retryOnFail` do not cover this.** Neither fires, because
+nothing threw. The existing error branch is real and correct and simply never
+saw this: the node succeeded, it just succeeded with a fragment.
+
+Fixed with a `Reply usable?` IF between the agent and Send. Fewer than two
+words routes to the existing handover line instead of to the resident. The test
+is **word count, not length** — "אני" is exactly as long as a legitimate Hebrew
+word, so length cannot separate them, while every reply this agent has business
+sending is a sentence and the one-liners are all on canned branches. Verified
+against eight cases including the exact failing string.
+
+`retryOnFail: 3 tries, 5s apart` added to the agent and model nodes too. It
+does nothing for this failure and covers the ones that do throw — the 402s when
+OpenRouter credit runs out, most obviously.
+
+Deployed to `u2JjrbcNPYyyh3yl`; confirmed still active, 22 nodes, no
+overlapping positions. The "Not active yet" line the deploy prints is
+unconditional when `--activate` is absent and does not reflect the real state —
+the workflow was active throughout.
+
 ### The voice agent is frozen, and what that leaves open
 
 Asked how the agent would handle an owner with several apartments — three

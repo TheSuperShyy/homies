@@ -1,24 +1,32 @@
 #!/usr/bin/env python
-"""Reconcile Supabase `charges` against what OXS says is owed, right now.
+"""Report what OXS's debts endpoints say. **Reports only — it cannot write.**
 
-    python scripts/oxs_debt_sync.py            # dry run: report only
-    python scripts/oxs_debt_sync.py --apply
+    python scripts/oxs_debt_sync.py
 
-`GET /debts` returns one row for the whole company, which is not the whole
-truth — debts are also readable per building. This sweeps every active
-building (`/buildings/:id/debts`), which is the complete current picture, and
-makes Supabase match it:
+WHY THIS NO LONGER WRITES — 11 Aug 2026
+It was built to reconcile: sweep `/buildings/:id/debts` across every active
+building, and mark `paid` any Supabase charge that OXS does not list, on the
+premise that "OXS is the record; if OXS does not list it, it is settled."
 
-  in OXS, not in Supabase   -> insert a charge (and the resident if missing)
-  in Supabase, not in OXS   -> mark the charge `paid`
-  in both                   -> update the amount to the OXS figure
+That premise is false, and the cost of it was measured rather than guessed. A
+full sweep of all 173 active buildings on 11 Aug returned **one apartment
+owing ₪1,500** — a 2022 balance against an owner marked inactive. Supabase at
+that moment held 170 unpaid charges, all of them real. Running `--apply` would
+have marked **169 real debts as paid** and destroyed the arrears list.
 
-The second rule is the important one. A charge nobody has cleared is a call
-to somebody who paid months ago, which the debt prompt calls the worst call
-this agent makes. OXS is the record; if OXS does not list it, it is settled.
+The debts endpoints are a **collections ledger**, not an arrears tracker: a
+place a case is filed once it escalates past normal chasing, which is why the
+only entry is four years old and belongs to somebody who left. Month-to-month
+arrears are never entered there. They are computed from payment records, which
+is what `oxs_arrears.py` and `import_arrears.py` do, and that is the only path
+that may write charges.
 
-Read-only against OXS. GETs only, one per building, ~1.05s apart for the
-60/min per-key limit.
+It also stamped every debt it found with `date.today()`, because these records
+carry no month — which is how a 2022 balance came to be labelled 2026-08 and
+sat on the dashboard as a phantom current debt until it was retired.
+
+What survives is the useful half: seeing what OXS's collections ledger holds.
+Read-only against OXS, GETs only, ~1.05s apart for the 60/min per-key limit.
 """
 import argparse
 import json
@@ -27,7 +35,6 @@ import re
 import sys
 import time
 import urllib.request
-from datetime import date
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -101,9 +108,24 @@ def sweep():
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--apply", action="store_true")
+    ap = argparse.ArgumentParser(description=__doc__)
+    # Kept, so anybody reaching for the old flag gets the reason rather than a
+    # usage error and a workaround.
+    ap.add_argument("--apply", action="store_true",
+                    help="removed 11 Aug 2026 — see the module docstring")
     a = ap.parse_args()
+
+    if a.apply:
+        sys.exit(
+            "--apply was removed on 11 Aug 2026.\n\n"
+            "This script used to mark a charge 'paid' whenever OXS did not list\n"
+            "it. A full sweep of all 173 buildings that day returned ONE debt,\n"
+            "against 170 real unpaid charges in Supabase — so applying it would\n"
+            "have marked 169 real debts as settled.\n\n"
+            "The debts endpoints are a collections ledger, not an arrears\n"
+            "tracker. Arrears are computed from payment records:\n"
+            "  scripts/oxs_arrears.py    -> compute\n"
+            "  scripts/import_arrears.py -> write\n")
 
     found = sweep()
     total = sum(f["amount"] for f in found)
@@ -116,65 +138,25 @@ def main():
     dsn = E.get("SUPABASE_DB_URL", "").strip()
     if not dsn:
         sys.exit("SUPABASE_DB_URL is empty in .env.")
-    period = date.today().replace(day=1)
-    live_phones = {f["phone"] for f in found if f["phone"]}
 
+    # Read-only, and stated as a comparison rather than a reconciliation. The
+    # gap between the two numbers below is the finding — it is what showed that
+    # these endpoints do not describe monthly arrears at all.
+    live_phones = {f["phone"] for f in found if f["phone"]}
     with psycopg.connect(dsn, connect_timeout=15) as conn:
         current = conn.execute("""
             select r.phone, r.full_name, c.amount, c.period
             from charges c join residents r on r.id = c.resident_id
             where c.status = 'unpaid'
         """).fetchall()
-        stale = [c for c in current if c[0] not in live_phones]
+        absent = [c for c in current if c[0] not in live_phones]
 
-        print(f"\nin Supabase now: {len(current)} unpaid charges")
-        print(f"OXS does not list {len(stale)} of them — these are settled:")
-        for phone, name, amount, per in stale:
-            print(f"  {name[:24]:<24} {float(amount):>9,.0f}  {per}  {phone}")
-
-        if not a.apply:
-            print("\nDry run — nothing written. Re-run with --apply.")
-            return
-
-        with conn.transaction():
-            paid = conn.execute("""
-                update charges c set status = 'paid'
-                from residents r
-                where r.id = c.resident_id
-                  and c.status = 'unpaid'
-                  and not (r.phone = any(%s))
-            """, (list(live_phones),)).rowcount
-
-            added = updated = nophone = 0
-            for f in found:
-                if not f["phone"]:
-                    nophone += 1
-                    continue
-                conn.execute("""
-                    insert into residents (full_name, phone, building, unit, oxs_ref,
-                                           source, handed_over, do_not_call)
-                    values (%s, %s, %s, %s, %s, 'oxs', false, false)
-                    on conflict (phone) do update set
-                      building = excluded.building, unit = excluded.unit
-                """, (f["name"], f["phone"], f["address"], f["unit"], f["oxs_ref"]))
-                n = conn.execute("""
-                    insert into charges (resident_id, period, amount, status, oxs_ref)
-                    select id, %s, %s, 'unpaid', %s from residents where phone = %s
-                    on conflict (resident_id, period) do update set
-                      amount = excluded.amount, status = 'unpaid',
-                      oxs_ref = excluded.oxs_ref
-                """, (period, f["amount"], f["oxs_ref"], f["phone"])).rowcount
-                added += n
-                updated += (1 - n)
-
-        n_unpaid = conn.execute(
-            "select count(*) from charges where status = 'unpaid'").fetchone()[0]
-        owed = conn.execute(
-            "select coalesce(sum(amount),0) from charges where status='unpaid'").fetchone()[0]
-
-    print(f"\nmarked {paid} charges paid")
-    print(f"wrote {added + updated} charges from OXS ({nophone} skipped, no phone)")
-    print(f"open balances now: {n_unpaid} charges, ₪{float(owed):,.0f}")
+    print(f"\nin Supabase now: {len(current)} unpaid charges")
+    print(f"OXS's debts endpoints do not mention {len(absent)} of them.")
+    print("That is expected, and is NOT evidence they are settled — arrears")
+    print("live in payment records, not in the debts endpoints. This script")
+    print("used to mark exactly these as 'paid'.\n")
+    print("To refresh arrears: scripts/oxs_arrears.py then import_arrears.py.")
 
 
 if __name__ == "__main__":
