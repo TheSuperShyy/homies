@@ -181,9 +181,10 @@ grep -rn "3303317e\|7449bc9a\|86a01f13\|3edbe85b\|ddd7e209" \
   --include=*.py --include=*.html --include=*.md .
 ```
 
-Those five are the current values — debt (he), debt (en), intake (he),
-intake (en), public key. Earlier accounts used `56935b35`, `731193bf`,
-`a594a4ce`, `27382abf`; grep for those too if something still misbehaves.
+**Those five are account 3's values, kept here because the grep above is what you
+run *before* the swap.** The current account is 4; its ids are in the 11 Aug table
+at the bottom. Earlier accounts used `56935b35`, `731193bf`, `a594a4ce`,
+`27382abf`; grep for those too if something still misbehaves.
 
 **`web/index.html` is its own git repository**, `TheSuperShyy/homies-voice-demo`,
 which auto-deploys to Vercel on push. It is not a file you upload. Bump `BUILD`
@@ -282,3 +283,45 @@ silent Elliot fallback and re-synced without complaint.
 
 `.env.backup-before-move` holds the previous file. It is covered by `.env.*` in
 `.gitignore`; check that before you make one.
+
+## The 11 Aug move, as it actually ran
+
+Third migration, and the first one where the runbook was followed rather than
+written. About fifteen minutes, no surprises.
+
+| | Account 3 | Account 4 |
+|---|---|---|
+| Debt (he) | `3303317e` | `9e2034d1-7a4f-4e3b-89ee-6a6155091ed7` |
+| Debt (en) | `7449bc9a` | `41d370b2-b531-4d45-b2eb-4b00f881f87a` |
+| Intake (he) | `86a01f13` | `f482abc1-db69-422b-afdd-f7b40ca9d995` |
+| Intake (en) | `3edbe85b` | `8b98016b-310a-4286-bed8-c8077b603773` |
+| Public key | `ddd7e209` | `944c3b38-e465-446d-b1d7-c98eae789c2e` |
+| Cartesia credential | `bf29045b` | `4c9be89b-f62e-42e7-bd2d-35faf51e0969` |
+| Org | — | `8eb82c4d-bc85-4c45-bd0a-fee0000de58f` |
+| Phone number | none | none |
+
+**Both blockers behaved exactly as written.** The new account had one credential
+slot and nothing in it, so Cartesia went in first — `POST /credential` with
+`{provider, apiKey, name}` works and the dashboard is not required. And
+`vapi_en.py --dry` still refuses: the debt LANGUAGE block does not match, the
+intake table has ten unmatched passages. So step 5 copied both twins verbatim
+again.
+
+**Server secrets do travel on a copy.** They are redacted in
+`vapi-export.json` but a live `GET /assistant/<id>` returns
+`server.headers` and every tool's `server.headers` in full, so the POSTed body
+carries them and there is nothing to restore afterwards. Verified on both twins.
+
+**Python cannot talk to the Vapi API from this machine** — `urllib` gets a blanket
+403 on every key while `curl` with the same key gets 200. It is the default
+User-Agent. The repo's own scripts are unaffected; anything written fresh should
+shell out to curl or set a User-Agent.
+
+Verified rather than assumed: all four prompts are byte-identical to account 3's
+— 44,040 / 38,533 / 20,056 / 18,315 characters — both Hebrew assistants resolve
+`cartesia/a976c076…`, both English keep `vapi/Elliot`, all four carry 27 output
+filters and a `server` block with headers, and `check_tools.py` passes 10/10.
+
+Account 3's private key is kept in `.env` as `VAPI_PRIVATE_KEY_ACCOUNT3`. Call
+history and recordings stay behind, and **recordings are deleted after 14 days**
+— pull anything from before 11 Aug that still matters.
