@@ -9,6 +9,76 @@ conversation that produced it.
 
 ---
 
+## 2026-08-11
+
+### Debts page filters by month, and opens on the month being called
+
+The page answered "who owes the most, ever". Collection is worked one month at
+a time, so it now opens on a single month, with `?month=2026-07` in the URL the
+way the ticket filter already works. Tabs are derived from the months that
+carry an unpaid charge, so nothing is hardcoded and a month leaves when its
+last charge is paid. `?month=all` is the previous view, unchanged.
+
+Chosen over a month-by-month grid (seven columns today, one more every month,
+and the number a caller needs buried in a row of dashes) and over tabs-plus-
+breakdown, which is the right second version once somebody has used this one.
+Filtering stays in the page rather than in Postgres: the query already pulls
+every open charge in one round trip, and pushing it down would need a second
+query just to build the tab list. Rationale and the point at which that flips
+are in `docs/features/13-dashboard/context.md`.
+
+**The verification changed the design.** Cross-checked every month against the
+database before pushing: the eight months sum to ₪94,854.30, exactly the `all`
+total. But the newest month carrying debt is `2026-08` — the 2022 legacy row
+stamped with the current month by a sync that had no month to use. "Open on the
+newest month" would have landed staff on one phantom debtor owing ₪1,500 while
+106 people owed for July.
+
+Fixed not with a special case but by applying a rule the project already holds:
+arrears are months that have *ended* unpaid, and the current month is never
+chased — what `oxs_arrears.py` computes on. The default is the newest
+**completed** month, correct on its own terms and still correct once the month
+stamp is fixed. The `2026-08` tab still renders; hiding a row for being wrong
+would put the dashboard at odds with the database.
+
+A well-formed month nobody owes for shows "Nobody owes for 2026-03" rather than
+redirecting — a forwarded link to a collected month should say it is clear, not
+quietly show a different month's numbers.
+
+Type-check and production build clean. Defect 1 in `HANDOVER.md` — the 2022
+debt stamped `2026-08` — is routed around, not fixed; it is still open.
+
+## 2026-08-10
+
+### Feature status doc for the client — features, not plumbing
+
+User asked for documentation of what is done and not done, explicitly **system
+features only, no technical detail**. Wrote
+`docs/reference/Homies-Feature-Status.md` and published it as an artifact so
+there is a link to send rather than a repo path.
+
+Rule applied throughout: no table names, no tool names, no endpoints, no env
+vars. A feature is described as the thing a resident or a staff member can
+actually do. Organised by who is doing it — resident by voice, resident by
+WhatsApp, the office — rather than by subsystem, because that is how the client
+will read it.
+
+Each ❌ item names **what it is waiting on**, which is the part the client can
+act on: the phone line waits on Homies' company registration documents (1–3
+weeks, the long pole); payment-link delivery waits on a decision about who
+sends it, since OXS exposes no way to generate one; the human handover waits on
+wiring the inbox that is already running; the nightly refresh waits on nothing
+external.
+
+Included the things that would embarrass us in a pilot if unsaid: the dashboard
+currently has no login, every resident is flagged not-handed-over so nothing
+can dial, multi-apartment owners collapse into one row so **₪94,854 understates
+the real total**, one 2022 debt carries the current month, 18 apartments have
+no phone, and the arrears list is ours rather than OXS-confirmed.
+
+Ends with five decisions needed from Homies, so the client has an action list
+rather than a status report.
+
 ## 2026-08-10
 
 ### Diagram: ✓ / ✗ status marks, so done vs not-done reads at a glance
@@ -84,6 +154,41 @@ residents 22, requests 2 — and payment_links / promises_to_pay /
 payment_disputes all at 0), the 12 handlers with the table each writes, the
 three views, the Sheets/Apps Script queue read that is still the demo console's
 source, the manual OXS import, and the four gaps with what each one blocks.
+
+### HANDOVER.md made self-sufficient: "read the handover" is now the whole briefing
+
+The first pass at HANDOVER.md was a pointer — it assumed the reader would go
+and find the architecture elsewhere. The user's actual requirement is that
+*saying "read the handover" is enough*, so it now carries the system itself:
+the two front doors, the Vapi/n8n runtime, the one-writer tool layer through
+the Edge Function, the tables and the three views, the dashboard, all 12 tool
+handlers, and a credentials map by env-var name (never values).
+
+Personal names were removed on the way — "one owner with three apartments"
+rather than naming him. A handover doc gets pasted into new contexts, and real
+residents do not need to travel with it.
+
+### CONTEXT.md and HANDOVER.md are now the handover pair, updated every task
+
+Standing instruction from the user: a fresh Claude window should be able to
+take over without reading the repo or querying the database, and should behave
+the same way this one does.
+
+`CONTEXT.md` (new) is the **rules**: what Homies is, the standing decisions
+that must not be relitigated (OXS read-only, Supabase is the store, the repo
+is public, nothing dials), the prompt-editing rules and the prompt-only PATCH
+warning, how to work (worklog first, verify before claiming, look before
+deleting), how the user wants to be answered, and the script inventory with
+the rate-limit facts that make a sweep half an hour instead of five minutes.
+
+`HANDOVER.md` (rewritten from the OXS-thread version, which was obsolete
+within a day) is the **present tense**: what works, what does not exist, the
+data as it stands with its three known defects, the OXS finding and the
+arrears correction, open questions for the client, next moves.
+
+Neither duplicates this file. WORKLOG is the chronology with the reasoning;
+HANDOVER is only now; CONTEXT is only the rules. Both are rewritten rather
+than appended to, and updating them is part of finishing a task.
 
 ### Pagination, ten rows a page, on every list in the dashboard
 

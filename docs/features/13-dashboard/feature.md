@@ -63,6 +63,38 @@ for work.
   target per call rather than averaged, because an average hides the bad ones
 - **Call** — transcript, recording, and the tool calls, which are what the agent
   *did* as opposed to what it said it did
+- **Debts** — one row per resident, largest first, filtered by month
+
+### The month filter on Debts
+
+Collection is worked one month at a time, so the page opens on one month rather
+than on a lifetime total. `?month=2026-07` is in the URL, like the ticket
+filter, so a round can be sent to a colleague.
+
+The tabs are the months that actually carry an unpaid charge — nothing is
+hardcoded, so a month appears when the sync writes into it and leaves when its
+last charge is paid. Newest first, next to `all`.
+
+With a month selected, `Owed` is that month's amount, the cards read
+`Open in 2026-07`, and the `Months owed` column drops out, being the selected
+month repeated. `?month=all` is the lifetime view.
+
+**The default is the newest *completed* month, not the newest month.** Arrears
+are months that have ended unpaid; the current month is never chased. It also
+sidesteps a real defect: the 2022 legacy debt is stamped with the current month
+by a sync that had no month to use, so "newest month" lands on one phantom
+debtor owing ₪1,500 instead of the 106 owing for the month just gone. That tab
+still exists and is reachable; the page does not open on it.
+
+Acceptance, checked 11 Aug against the database:
+
+1. Each month tab's `Open in <month>` equals
+   `sum(amount) where status='unpaid'` for that period.
+2. The eight tabs sum to the `all` total — ₪94,854.30, matching
+   `sum(amount) where status='unpaid'` company-wide.
+3. `/debts` with no query lands on `2026-07`, not `2026-08`.
+4. A well-formed month nobody owes for renders "Nobody owes for `<month>`"
+   rather than redirecting; a malformed one falls back to the default.
 
 Hebrew is handled with `dir="auto"` per element rather than a right-to-left
 layout: Hebrew flows correctly while a reference like `HM-2026-1013` inside the
