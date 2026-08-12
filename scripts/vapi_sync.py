@@ -82,11 +82,23 @@ BASE = {
     # support matrix. `he` appearing there is evidence of nothing. The curated
     # lists, where an entry means something, are azure 143, deepgram 89,
     # speechmatics 62 and openai 57.
+    #
+    # NOVA-3, NOT SCRIBE, SINCE 12 AUG — the client reversed this in the
+    # dashboard, and on the axis the paragraphs above never weighed: latency.
+    # Scribe measured 700ms in Vapi's panel against nova-3's 300ms, and the
+    # 12 Aug diagnosis of "why is Hebrew slower than English" put the
+    # transcriber as the largest single contributor. The WER argument stands
+    # unrefuted (scribe still tops the Hebrew benchmarks) — it lost to 400ms
+    # on every turn of every call. If the Hebrew mishears audibly worsen,
+    # this block is the first thing to put back. confidenceThreshold and the
+    # autoFallback flag are part of the dashboard change, captured verbatim.
     "transcriber": {
-        "provider": "11labs",
-        "model": "scribe_v2_realtime",
+        "provider": "deepgram",
+        "model": "nova-3",
         "language": "he",
+        "confidenceThreshold": 0.4,
         "fallbackPlan": {
+            "autoFallback": {"enabled": True},
             "transcribers": [{"provider": "azure", "language": "he-IL"}],
         },
     },
@@ -175,6 +187,12 @@ BASE = {
     # which is what produced "The the" / "The the bill" on the 4 Aug English call,
     # three times in one exchange.
     "stopSpeakingPlan": {"numWords": 2, "voiceSeconds": 0.3, "backoffSeconds": 1.0},
+    # Both asked for on 12 Aug. The office ambience covers the tool-call
+    # pauses that pure silence turns into "הלו?"; the denoising filters the
+    # resident's side before the transcriber hears it, which matters more now
+    # that the transcriber was chosen for speed rather than accuracy.
+    "backgroundSound": "office",
+    "backgroundDenoisingEnabled": True,
 }
 
 TARGETS = {
@@ -449,7 +467,12 @@ TARGETS = {
             # No temperature: the dashboard change dropped it and the gpt-5.x
             # models may not accept one. The 0.3 on the inbound assistant was
             # deliberate, so it stays there.
-            "model": {"provider": "openai", "model": "gpt-5.4"},
+            #
+            # 5.4 -> 5.2, set in the dashboard on 12 Aug in the same edit that
+            # swapped the transcriber; captured here so a sync does not revert
+            # it. Note the English twin still runs gpt-5.4 — vapi_en.py copies
+            # the prompt, not this block.
+            "model": {"provider": "openai", "model": "gpt-5.2"},
         },
         # "Echo Stone" — this agent takes a cloned voice when one exists. See
         # cloned_voice() below. The debt agent and not the inbound one because

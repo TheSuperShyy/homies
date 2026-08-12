@@ -325,3 +325,44 @@ filters and a `server` block with headers, and `check_tools.py` passes 10/10.
 Account 3's private key is kept in `.env` as `VAPI_PRIVATE_KEY_ACCOUNT3`. Call
 history and recordings stay behind, and **recordings are deleted after 14 days**
 — pull anything from before 11 Aug that still matters.
+
+## 12 Aug: account 5, configured as a standby — NOT a move
+
+The client supplied a fifth pair of keys and asked for the account to be made
+ready **without switching to it**. So the rebuild ran (steps 2, 3 and 5) but
+step 6 deliberately did not: **nothing points at account 5.** The demo page,
+`.env`'s `VAPI_PRIVATE_KEY`, and every hardcoded id still belong to account 4,
+which remains the live account. Switching later is only step 6 plus a `BUILD`
+bump — the account itself is done.
+
+| | Account 5 (standby) |
+|---|---|
+| Debt (he) | `489aa39c-223d-402b-b07f-3fe53276b35b` |
+| Debt (en) | `3b0e384d-05a3-4e57-8958-ad3aa726652a` |
+| Intake (he) | `7813da25-f242-4a8d-888e-51caa2ec8b3f` |
+| Intake (en) | `9ed5e788-0f50-4806-8377-905a559f7296` |
+| Keys | `.env` → `VAPI_PRIVATE_KEY_ACCOUNT5` / `VAPI_PUBLIC_KEY_ACCOUNT5` |
+| Cartesia credential | `52e0bca2-…` (added before the first push, per step 2) |
+| Org | `4cedeed3-7055-4124-be14-daddfe78e018` |
+| Phone number | none |
+
+Two things differ from a plain copy of account 4, both asked for on 12 Aug and
+both now in `vapi_sync.py`'s `BASE`, so they are the default everywhere from
+here on: `backgroundSound: office` and `backgroundDenoisingEnabled: true`, on
+all four assistants. The Hebrew pair also carries the 12 Aug stack — Deepgram
+**nova-3** transcriber (`confidenceThreshold` 0.4, Azure `he-IL` fallback) and
+gpt-5.2 on debt — because the sync script pushed it, which was the point of
+capturing the dashboard change in `BASE` the same day.
+
+The Hebrew pair was **pushed** by `vapi_sync.py` (rebuilt from the markdown);
+the English pair was **copied** live from account 4 with the office/denoise
+fields set in the same write. The copied intake (en) still carries its stale
+5-tool set — the known pre-cut staleness travelling with it, not a new fault.
+
+Verified: cartesia `a976c076…` resolves on both Hebrew assistants (not Elliot),
+prompts are 44,040 / 42,917 / 20,056 / 18,315 chars — byte-identical lengths to
+account 4 — and every assistant has its `server` headers.
+
+**Do not run `vapi_export.py` while `VAPI_PRIVATE_KEY` is overridden to account
+5** — it writes to the fixed path and would overwrite the record of the live
+account with the standby's.

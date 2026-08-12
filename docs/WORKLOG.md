@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-08-12
 
+### Account 5 stands ready, and nothing points at it
+
+A fifth pair of Vapi keys, with an instruction that is new: *"im not telling
+you to change account just configure it"*. So the runbook ran minus its
+repoint step — Cartesia credential first (`52e0bca2`), both Hebrew assistants
+pushed by `vapi_sync.py`, both English twins copied live from account 4 —
+and the page, `.env`, and every hardcoded id still belong to account 4.
+Switching later is step 6 of `new-vapi.md` plus a BUILD bump, nothing more.
+
+Two settings were asked for by name and are now in `BASE`, so they are the
+default on every future push: `backgroundSound: office` and
+`backgroundDenoisingEnabled: true` (the STT-side noise filter). The same
+commit captures yesterday's dashboard stack into the script — nova-3
+transcriber with the Azure fallback, gpt-5.2 on debt — closing the gap where
+the next `--apply` would have silently reverted the client's own change.
+
+Ids in the standby table at the bottom of `new-vapi.md`. Verified: cartesia
+voice resolves on both Hebrew assistants, all four carry office + denoise,
+prompt lengths byte-match account 4, server headers present. The copied
+intake (en) carries its known stale 5-tool set — travelled, not introduced.
+
 ### Nova 3 Hebrew is the new default transcriber — the old stack archived
 
 The client changed the Hebrew debt agent in the dashboard: transcriber from
