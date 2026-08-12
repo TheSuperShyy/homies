@@ -22,7 +22,7 @@
       "firstMessageMode": "assistant-speaks-first",
       "id": "8b98016b-310a-4286-bed8-c8077b603773",
       "isServerUrlSecretSet": false,
-      "latestVersion": "v2",
+      "latestVersion": "v1",
       "maxDurationSeconds": 180,
       "model": {
         "messages": [
@@ -231,7 +231,6 @@
         "headers": {
           "x-homies-secret": "<redacted>"
         },
-        "timeoutSeconds": 20,
         "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
       },
       "serverMessages": [
@@ -264,7 +263,7 @@
         "model": "flux-general-en",
         "provider": "deepgram"
       },
-      "updatedAt": "2026-08-11T13:44:56.551Z",
+      "updatedAt": "2026-08-11T12:11:57.486Z",
       "voice": {
         "chunkPlan": {
           "formatPlan": {
@@ -1114,7 +1113,6 @@
       "artifactPlan": {
         "recordingEnabled": true
       },
-      "backgroundSound": "office",
       "createdAt": "2026-08-11T12:10:37.986Z",
       "endCallFunctionEnabled": false,
       "endCallPhrases": [
@@ -1127,7 +1125,7 @@
       "firstMessageMode": "assistant-speaks-first",
       "id": "f482abc1-db69-422b-afdd-f7b40ca9d995",
       "isServerUrlSecretSet": false,
-      "latestVersion": "v3",
+      "latestVersion": "v1",
       "maxDurationSeconds": 180,
       "model": {
         "messages": [
@@ -1273,7 +1271,6 @@
         "headers": {
           "x-homies-secret": "<redacted>"
         },
-        "timeoutSeconds": 20,
         "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
       },
       "serverMessages": [
@@ -1297,7 +1294,6 @@
         "voiceSeconds": 0.3
       },
       "transcriber": {
-        "confidenceThreshold": 0.4,
         "fallbackPlan": {
           "autoFallback": {
             "enabled": true
@@ -1310,10 +1306,10 @@
           ]
         },
         "language": "he",
-        "model": "nova-3",
-        "provider": "deepgram"
+        "model": "scribe_v2_realtime",
+        "provider": "11labs"
       },
-      "updatedAt": "2026-08-12T05:37:44.326Z",
+      "updatedAt": "2026-08-11T12:10:37.986Z",
       "voice": {
         "chunkPlan": {
           "formatPlan": {
@@ -1842,8 +1838,6 @@
       "artifactPlan": {
         "recordingEnabled": true
       },
-      "backgroundDenoisingEnabled": true,
-      "backgroundSound": "office",
       "createdAt": "2026-08-11T12:10:35.477Z",
       "endCallFunctionEnabled": false,
       "endCallPhrases": [
@@ -1856,7 +1850,7 @@
       "firstMessageMode": "assistant-speaks-first",
       "id": "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7",
       "isServerUrlSecretSet": false,
-      "latestVersion": "v7",
+      "latestVersion": "v1",
       "maxDurationSeconds": 240,
       "model": {
         "messages": [
@@ -1865,7 +1859,7 @@
             "role": "system"
           }
         ],
-        "model": "gpt-5.2",
+        "model": "gpt-5.4",
         "provider": "openai",
         "tools": [
           {
@@ -2128,7 +2122,6 @@
         "headers": {
           "x-homies-secret": "<redacted>"
         },
-        "timeoutSeconds": 20,
         "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
       },
       "serverMessages": [
@@ -2152,7 +2145,6 @@
         "voiceSeconds": 0.3
       },
       "transcriber": {
-        "confidenceThreshold": 0.4,
         "fallbackPlan": {
           "autoFallback": {
             "enabled": true
@@ -2165,10 +2157,10 @@
           ]
         },
         "language": "he",
-        "model": "nova-3",
-        "provider": "deepgram"
+        "model": "scribe_v2_realtime",
+        "provider": "11labs"
       },
-      "updatedAt": "2026-08-12T05:10:12.743Z",
+      "updatedAt": "2026-08-11T12:10:35.477Z",
       "voice": {
         "chunkPlan": {
           "formatPlan": {

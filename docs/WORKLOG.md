@@ -9,9 +9,28 @@ conversation that produced it.
 
 ---
 
-## 2026-08-11
+## 2026-08-12
 
-### The English twin rebuilt — both demo languages now show the same call
+### Nova 3 Hebrew is the new default transcriber — the old stack archived
+
+The client changed the Hebrew debt agent in the dashboard: transcriber from
+ElevenLabs Scribe v2 realtime (700ms) to **Deepgram Nova 3 Hebrew (300ms)**,
+with an Azure `he-IL` fallback and `confidenceThreshold` 0.4, and the model
+from gpt-5.4 to **gpt-5.2**. This answers most of yesterday's "why is Hebrew
+slower" — the transcriber was the biggest single contributor.
+
+Asked whether the intake agent should match fully; the answer was **transcriber
+only** — intake keeps gpt-4.1-mini (faster reply at 580ms vs 820ms, and ~6x
+cheaper for the simpler front-desk job). Applied the same Nova 3 transcriber
+object verbatim to intake (he) via PATCH; model and prompt untouched.
+
+The pre-change config is archived at
+`docs/handover/vapi-export-account4-pre-nova3-12aug.json` (Scribe + gpt-5.4 on
+debt he), and `vapi-export.json` regenerated with the new default. Note the
+divergence this leaves: **debt (en) still runs gpt-5.4** while debt (he) runs
+gpt-5.2 — flagged, not changed; the client changed only the Hebrew agent.
+
+
 
 A test call in English quoted Dana's ₪1,230 with no apartments named and
 answered "why is it a thousand shekels?" with a non-answer: the stale twin,
