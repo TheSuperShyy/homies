@@ -162,6 +162,13 @@ def sweep():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
+    # --quiet EXISTS FOR CI AND IS NOT COSMETIC.
+    # The block below is a debtor list: name, amount, months, building, flat and
+    # phone, forty rows of it. GitHub Actions logs on a PUBLIC repository are
+    # readable by anyone, so a scheduled run without this publishes exactly the
+    # document the repo rules forbid committing. The workflow always passes it.
+    ap.add_argument("--quiet", action="store_true",
+                    help="totals only, no per-apartment lines. Required in CI.")
     a = ap.parse_args()
 
     behind, unknown = sweep()
@@ -169,7 +176,7 @@ def main():
     total = sum(r["amount"] for r in behind)
 
     print(f"\n{'='*78}\nBEHIND ON {YEAR}: {len(behind)} apartments, ₪{total:,.0f}\n")
-    for r in behind[:40]:
+    for r in ([] if a.quiet else behind[:40]):
         print(f"  {r['name'][:22]:<22} {r['amount']:>8,.0f}  "
               f"{len(r['months'])}m ({','.join(r['months'])})  "
               f"{r['building'][:26]:<26} apt {r['unit']:<4} {r['phone'] or 'NO PHONE'}")
@@ -179,10 +186,16 @@ def main():
     print(f"\nNO {YEAR} PAYMENT ON RECORD: {len(unknown)} apartments — "
           f"not chased, no monthly figure to trust (new, vacant, or not handed over)")
 
-    out = os.path.join(ROOT, "docs", "reference", f"arrears-{YEAR}.json")
-    json.dump({"behind": behind, "unknown": unknown},
-              open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    print(f"\nfull list written to {out}")
+    # Gitignored either way (`docs/reference/arrears-*.json`), but a scheduled
+    # runner has no reader for it, and one fewer copy of a debtor list on a
+    # machine we do not own is worth the two lines.
+    if a.quiet:
+        print("\nfull list not written (--quiet)")
+    else:
+        out = os.path.join(ROOT, "docs", "reference", f"arrears-{YEAR}.json")
+        json.dump({"behind": behind, "unknown": unknown},
+                  open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print(f"\nfull list written to {out}")
 
     if not a.apply:
         print("\nDry run — Supabase untouched. Re-run with --apply.")

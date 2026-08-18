@@ -1,0 +1,119 @@
+# Pull OXS into Supabase twice a day: midnight and 15:00 Israel time.
+#
+# WHY FOUR CRONS FOR TWO RUNS
+# GitHub's cron is UTC only and has no notion of daylight saving. Israel is
+# UTC+3 in summer (IDT) and UTC+2 in winter (IST), so midnight local is 21:00
+# UTC for half the year and 22:00 UTC for the other half. Four triggers fire,
+# and the guard step below lets exactly one of each pair through by asking what
+# time it actually is in Jerusalem. A fixed pair of crons would have been one
+# line shorter and wrong for five months of the year.
+#
+# WHY --quiet IS ON EVERY COMMAND
+# This repository is PUBLIC, and Actions logs on a public repository are
+# readable by anyone with the URL. Two of these scripts print residents by name,
+# phone and amount owed. Without --quiet a scheduled run publishes a debtor list
+# to the internet every twelve hours. The flag is a security control, not a
+# preference — see its note in each script.
+#
+# OXS IS READ-ONLY, AND STAYS THAT WAY. Every call here is a GET. The writes all
+# land in Supabase.
+name: OXS sync
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 00:00 Israel, summer (IDT)
+    - cron: "0 22 * * *"   # 00:00 Israel, winter (IST)
+    - cron: "0 12 * * *"   # 15:00 Israel, summer
+    - cron: "0 13 * * *"   # 15:00 Israel, winter
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and report, write nothing"
+        type: boolean
+        default: false
+
+concurrency:
+  group: oxs-sync
+  cancel-in-progress: false   # a half-finished import is worse than a late one
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45       # a full run is ~10 min; this is a hang guard
+
+    steps:
+      - name: Is it actually midnight or 15:00 in Jerusalem?
+        id: when
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          now = datetime.now(ZoneInfo("Asia/Jerusalem"))
+          manual = "${{ github.event_name }}" == "workflow_dispatch"
+          go = manual or now.hour in (0, 15)
+          print(f"go={'true' if go else 'false'}")
+          print(f"local={now:%Y-%m-%d %H:%M %Z}")
+          PY
+
+      - name: Report the skip
+        if: steps.when.outputs.go != 'true'
+        run: |
+          echo "Jerusalem is ${{ steps.when.outputs.local }} — not a sync hour."
+          echo "This is the daylight-saving twin firing. Nothing to do."
+
+      - uses: actions/checkout@v4
+        if: steps.when.outputs.go == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.when.outputs.go == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Install psycopg
+        if: steps.when.outputs.go == 'true'
+        run: pip install --quiet "psycopg[binary]"
+
+      - name: Write .env from secrets
+        if: steps.when.outputs.go == 'true'
+        env:
+          OXS_KEY_GENERAL: ${{ secrets.OXS_KEY_GENERAL }}
+          OXS_KEY_DEBTS: ${{ secrets.OXS_KEY_DEBTS }}
+          OXS_KEY_REQUESTS: ${{ secrets.OXS_KEY_REQUESTS }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          # The scripts read .env rather than the environment, so it is built
+          # here and deleted in the always() step at the end. Never committed:
+          # .gitignore line 2 covers it, and nothing here pushes.
+          for k in OXS_KEY_GENERAL OXS_KEY_DEBTS OXS_KEY_REQUESTS \
+                   SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY SUPABASE_DB_URL; do
+            if [ -z "${!k}" ]; then
+              echo "::error::$k is not set as a repository secret."
+              exit 1
+            fi
+            printf '%s=%s\n' "$k" "${!k}" >> .env
+          done
+          echo "wrote .env with 6 values"
+
+      - name: Residents
+        if: steps.when.outputs.go == 'true'
+        run: |
+          python scripts/oxs_api_import.py --quiet --skip-charges \
+            ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
+
+      - name: Arrears
+        if: steps.when.outputs.go == 'true'
+        run: |
+          python scripts/oxs_arrears.py --quiet \
+            ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
+
+      - name: Maintenance requests
+        if: steps.when.outputs.go == 'true'
+        run: |
+          python scripts/oxs_requests_sync.py \
+            ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
+
+      - name: Shred .env
+        if: always()
+        run: rm -f .env

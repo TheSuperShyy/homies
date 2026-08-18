@@ -91,6 +91,44 @@ def main():
             print("  %-28s ok" % f)
 
         print("\nAll %d applied." % len(pending))
+        audit(conn)
+
+
+# The same assertion 009 carries, run after every migration instead of once.
+#
+# 009 wrote it to stop a table shipping without row-level security, because 008
+# had just done exactly that. It could not do its job: a migration runs once, so
+# the check in 009 looked at the database as it stood on 9 August and never
+# again. 016 added `buildings` and `apartments` on 13 August with no RLS, the
+# anon key could read the client's whole portfolio, and nothing said a word —
+# the guard had had its only turn four days earlier.
+#
+# A check that runs once is documentation. This is the same SQL somewhere it can
+# actually see what was just applied.
+#
+# Warns rather than exits. By the time this runs the migrations are committed,
+# so failing here would report a problem it cannot undo while implying it did;
+# the fix is always another migration.
+AUDIT = """
+select coalesce(string_agg(c.relname, ', ' order by c.relname), '')
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relkind = 'r'
+  and not c.relrowsecurity
+  and c.relname <> 'schema_migrations'
+"""
+
+
+def audit(conn):
+    unguarded = conn.execute(AUDIT).fetchone()[0]
+    if not unguarded:
+        print("RLS: every table guarded.")
+        return
+    print("\n!! NO ROW-LEVEL SECURITY: %s" % unguarded)
+    print("!! The anon key ships in the dashboard bundle and is public by")
+    print("!! design, so these tables are readable by anyone holding it.")
+    print("!! Fix with a migration: alter table <name> enable row level security;")
 
 
 if __name__ == "__main__":

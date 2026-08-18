@@ -43,6 +43,10 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = "https://api.oxs.co.il/api/external/v1"
 
+# Set by --quiet. Suppresses every line that carries a name, a phone or an
+# amount. See the flag's note in main().
+QUIET = False
+
 
 def env():
     d = {}
@@ -147,8 +151,9 @@ def fetch_all():
     print(f"\nresidents with a phone: {len(residents)}   "
           f"(skipped, no phone: {skipped_nophone}; duplicate phones: {dupes})")
     print(f"open debts: {len(charges)}")
-    for c in charges:
-        print(f"  {c['owner']:<25} {c['address']:<28} {c['amount']:>9.2f}  {c['phone']}")
+    if not QUIET:
+        for c in charges:
+            print(f"  {c['owner']:<25} {c['address']:<28} {c['amount']:>9.2f}  {c['phone']}")
     return list(residents.values()), charges
 
 
@@ -232,9 +237,28 @@ def apply(residents, charges):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
+    # --quiet EXISTS FOR CI AND IS NOT COSMETIC.
+    # The per-debt line below prints an owner's name, address, amount and phone
+    # number. GitHub Actions logs on a PUBLIC repository are readable by anyone,
+    # so an unfiltered scheduled run publishes a debtor list to the internet —
+    # the precise thing .gitignore and the repo rules exist to prevent. The
+    # scheduled workflow always passes this; a human at a terminal never needs
+    # to.
+    ap.add_argument("--quiet", action="store_true",
+                    help="counts only, no per-resident lines. Required in CI.")
+    # /debts is a collections ledger, not an arrears list: it returns a single
+    # company-wide record, a 2022 balance against a departed owner. Importing it
+    # twice a day re-creates that phantom charge for ever. Real arrears come
+    # from oxs_arrears.py, which runs straight after this one.
+    ap.add_argument("--skip-charges", action="store_true",
+                    help="residents only; leave `charges` to oxs_arrears.py.")
     a = ap.parse_args()
 
+    global QUIET
+    QUIET = a.quiet
     residents, charges = fetch_all()
+    if a.skip_charges:
+        charges = []
     if not a.apply:
         print("\nDry run — nothing written. Re-run with --apply.")
         return

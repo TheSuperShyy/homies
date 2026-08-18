@@ -250,6 +250,11 @@ async function interactionId(ctx: CallContext): Promise<string | null> {
  * call id of `wa:<phone>` precisely because this function was written for Vapi
  * and expects a call to exist.
  */
+// The marker `request_standing_order` finds its own tickets by. Deliberately
+// not a status or a type: a standing order is not a category of fault, and
+// `requests.type` is constrained to Homies' eleven facility categories.
+const STANDING_ORDER_REF = "standing_order";
+
 function channel(ctx: { callId?: string | null }): string {
   return String(ctx?.callId ?? "").startsWith("wa:") ? "whatsapp" : "voice";
 }
@@ -278,6 +283,249 @@ function unitOf(value: unknown): string | null {
   // ticket a human still reads, and the cost of keeping a label is silent.
   if (v.length > 12 || !/\d/.test(v)) return null;
   return v;
+}
+
+/**
+ * A street or a spoken address, flattened for comparison. Never for display.
+ *
+ * The quote marks are the point. ז'בוטינסקי arrives with U+05F3, with an ASCII
+ * apostrophe, and with nothing at all, from the same person on different days;
+ * a transcriber picks whichever it likes. None of those are a different street.
+ * `רחוב` and `רח'` are dropped for the same reason — they are the word "street"
+ * and carry no information, but they do stop a containment test from matching.
+ *
+ * Kept identical to `norm()` in scripts/oxs_buildings_sync.py, which writes
+ * `buildings.street_norm`. If the two ever disagree the column stops matching
+ * what is compared against it, and the symptom is a building that simply
+ * cannot be found.
+ */
+function norm(value: unknown): string {
+  return String(value ?? "")
+    .replace(/["'`׳״]/g, "")
+    .replace(/(^|\s)(רחוב|רח)(\s|$)/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * The one number inside a quoted ticket reference that identifies the ticket.
+ *
+ * Three shapes reach this, and the middle of one is the end of another:
+ *
+ *   255-1047-26     ours since 18 Aug   - OXS's shape, serial in the MIDDLE
+ *   255-26277-26    theirs, imported    - same shape, five-digit serial
+ *   HM-2026-1013    ours before 18 Aug  - serial at the END, 2026 is a year
+ *
+ * All three are `A-B-C`, so counting segments cannot tell them apart. What can
+ * is that only the OXS shape has three NUMERIC segments: `HM` is a prefix we
+ * invented and never was a number. So the three-number pattern is tried first
+ * and yields its middle; what is left over is the old shape and yields its
+ * tail. Reading `2026` out of the old one instead is the failure that matters -
+ * it matches nothing, and the resident is told their own ticket does not exist.
+ *
+ * Matched anywhere in the string rather than against the whole of it, because
+ * the model passes what the resident wrote and residents write sentences.
+ * Anything with no such pattern is taken as the serial itself: what a resident
+ * usually types is `1047`, or says into a phone for a transcriber to render as
+ * digits. The four-digit floor is what stops an apartment number in that
+ * argument from going looking for a ticket.
+ */
+function serialOf(value: unknown): string | null {
+  const raw = String(value ?? "").trim();
+
+  const oxs = raw.match(/(\d{3})-(\d{4,6})-(\d{2})(?!\d)/);
+  if (oxs) return oxs[2];
+
+  const legacy = raw.match(/(\d{4})-(\d{3,6})(?!\d)/);
+  if (legacy) return legacy[2];
+
+  const bare = raw.replace(/\D/g, "");
+  return bare.length >= 4 && bare.length <= 6 ? bare : null;
+}
+
+/**
+ * The active building list, held between invocations.
+ *
+ * 173 rows of five short columns — about 25KB, and it changes when Homies takes
+ * on or drops a building, which is not something that happens during a
+ * conversation. Fetching it per tool call would add a round trip to a lookup
+ * that sits in the middle of a resident waiting for an answer.
+ *
+ * Five minutes rather than forever, because an Edge Function instance can live
+ * a long time and the failure of a stale list is invisible: a building imported
+ * this morning is reported as one we do not manage, and nobody finds out until
+ * a resident is turned away.
+ */
+let buildingCache: { at: number; rows: any[] } | null = null;
+
+async function buildingList(): Promise<any[]> {
+  if (buildingCache && Date.now() - buildingCache.at < 5 * 60 * 1000) {
+    return buildingCache.rows;
+  }
+  const { data } = await db.from("buildings")
+    .select("id,address,street,street_norm,number,city")
+    .eq("active", true);
+  // Longest street name first, so `אלתרמן נתן` is tested before a street
+  // called `אלתרמן` would be. Containment matches both, and the more specific
+  // one has to win — otherwise every address on the two-word street resolves
+  // to the one-word one. Sorted here rather than in the query because this is
+  // by LENGTH, and `.order()` would sort alphabetically.
+  const rows = (data ?? []).sort(
+    (a: any, b: any) => b.street_norm.length - a.street_norm.length,
+  );
+  // A failed fetch is not cached. Caching an empty list would answer "we do not
+  // manage that building" for every caller for five minutes.
+  if (rows.length) buildingCache = { at: Date.now(), rows };
+  return rows;
+}
+
+/**
+ * Which building a resident just named, if any.
+ *
+ * Shared by `verify_address`, which reports the outcome to the bot, and by
+ * `open_request`, which uses it to file the ticket against the address as we
+ * write it. One matcher, because two would drift and the direction they drift
+ * is a ticket verified against one building and filed against another.
+ *
+ * Returns a discriminated outcome rather than a boolean, because the useful
+ * answers are not found/not-found. `number_off_street` — the street is real,
+ * that number is not — is what lets the caller be told something true instead
+ * of being made to repeat themselves.
+ */
+type Match =
+  | { status: "empty" }
+  | { status: "found"; building: any }
+  | { status: "street_unknown" }
+  | { status: "ambiguous"; candidates: any[] }
+  | { status: "need_number" | "number_off_street"; street: any; numbers: string[] };
+
+async function matchBuilding(saidRaw: unknown): Promise<Match> {
+  const said = norm(saidRaw);
+  if (!said) return { status: "empty" };
+
+  const all = await buildingList();
+  // The house number is asked for as a standalone token, so `14` cannot match
+  // inside another number and `6-8` matches as the single thing it is.
+  const tokens = new Set(said.split(/[\s,.]+/).filter(Boolean));
+
+  // Pass one: the sentence contains the registered street whole. Substring
+  // rather than token overlap, because a street is one or two words said in
+  // order, and overlap alone would match `נתן` against every building on a
+  // street called אלתרמן נתן.
+  let onStreet = all.filter((b: any) => said.includes(b.street_norm));
+  let exact = onStreet.filter((b: any) => tokens.has(b.number));
+
+  // Pass two: the street as registered is longer than the street as spoken.
+  // `אלתרמן נתן 6-8` is a real address and nobody says the poet's first name —
+  // they say אלתרמן. Pass one cannot match that, because the sentence does not
+  // contain the whole registered name.
+  //
+  // Runs only when pass one found nothing, and only ever alongside an exact
+  // house number: one shared word is weak evidence, and the number is what
+  // makes the pair specific. Words of one or two letters are ignored, because a
+  // Hebrew preposition glued to the next word is not a street name.
+  if (!exact.length) {
+    const partial = all.filter((b: any) =>
+      tokens.has(b.number) &&
+      b.street_norm.split(" ").some((w: string) => w.length > 2 && tokens.has(w))
+    );
+    if (partial.length) {
+      onStreet = partial;
+      exact = partial;
+    }
+  }
+
+  if (!onStreet.length) return { status: "street_unknown" };
+
+  if (!exact.length) {
+    // The street is real. Either no number was said at all, or the one that was
+    // said is not a building we manage — a different sentence in each case, so
+    // a different answer. `onStreet[0]` is the longest matching street name,
+    // because the list is sorted that way, and the numbers offered have to
+    // belong to the most specific street the caller named.
+    const street = onStreet[0].street_norm;
+    const same = onStreet.filter((b: any) => b.street_norm === street);
+    return {
+      status: /\d/.test(said) ? "number_off_street" : "need_number",
+      street: same[0],
+      numbers: [...new Set(same.map((b: any) => String(b.number)))].slice(0, 12),
+    };
+  }
+
+  // Measured 13 Aug: this cannot happen on today's data — street+number is
+  // unique across all 173 buildings. Handled anyway, because that is a property
+  // of the data and not a promise, and the failure it prevents is a confident
+  // wrong answer. `oxs_buildings_sync.py` refuses to write if the uniqueness
+  // ever breaks, so reaching here means the sync was bypassed.
+  if (exact.length > 1) return { status: "ambiguous", candidates: exact };
+
+  return { status: "found", building: exact[0] };
+}
+
+/** The address as we write it, or "" when what was said resolves to nothing. */
+async function canonicalAddress(said: unknown): Promise<string> {
+  const m = await matchBuilding(said);
+  return m.status === "found" ? String(m.building.address) : "";
+}
+
+/**
+ * A phone number as it is stored, or nothing.
+ *
+ * `residents.phone` is E.164 (+972501234567) everywhere — the seed writes it
+ * that way and every OXS importer normalises to it. A person typing their own
+ * number into WhatsApp does not: they write 050-123-4567, or 0501234567, or
+ * paste it back with the country code. Comparing those to the column as typed
+ * fails on a number that is genuinely theirs, and a security check that rejects
+ * the honest case is a security check nobody keeps.
+ *
+ * Deliberately conservative about what it accepts. Anything that does not land
+ * on a plausible Israeli number returns null and is treated as *not given* —
+ * the caller is asked again rather than matched loosely.
+ */
+function phoneOf(value: unknown): string | null {
+  const digits = String(value ?? "").replace(/\D+/g, "");
+  if (!digits) return null;
+  // With the country code, however it was written: +972-50…, 00972 50…, 972…
+  if (digits.startsWith("00972")) return e164(digits.slice(5));
+  if (digits.startsWith("972")) return e164(digits.slice(3));
+  // Local form, with the trunk zero.
+  if (digits.startsWith("0")) return e164(digits.slice(1));
+  // A mobile with the leading zero left off — 50 1234567.
+  if (/^5\d{8}$/.test(digits)) return e164(digits);
+  return null;
+}
+
+function e164(national: string): string | null {
+  const n = national.replace(/^0+/, "");
+  // Israeli national numbers are 8 (landline) or 9 (mobile) digits.
+  return n.length === 8 || n.length === 9 ? "+972" + n : null;
+}
+
+/**
+ * Is this the name on the record — said by someone who knows it, not guessed?
+ *
+ * Compared as a set of words rather than as a string, because `יוסי כהן` and
+ * `כהן יוסי` are the same person and an exact-string test would reject the
+ * second. Two distinct words are the floor: a surname on its own is shared by
+ * a whole family and half a building, and it is exactly what a neighbour would
+ * try.
+ *
+ * Containment rather than equality, so a record carrying a middle name still
+ * matches the two words its owner actually says. The looseness is bounded — a
+ * stranger still has to produce words that are all on the record — and the
+ * phone is the other half of the check.
+ */
+function sameName(stored: unknown, given: unknown): boolean {
+  const words = (v: unknown) =>
+    String(v ?? "")
+      .replace(/["'`׳״]/g, "")
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+  const on = new Set(words(stored));
+  const said = new Set(words(given));
+  if (on.size < 2 || said.size < 2) return false;
+  return [...said].every((w) => on.has(w));
 }
 
 /**
@@ -431,11 +679,25 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
   /**
    * There is no standing_orders table and there should not be one — the agent
-   * cannot set a standing order up, only record that they asked for one. It is a
-   * flag on the outcome, which is where a person will look for it.
+   * cannot set a standing order up, only record that they asked for one.
+   *
+   * IT WRITES TWO ROWS, AND THE SECOND ONE IS WHY THIS WORKS AT ALL.
+   * Until 18 Aug it wrote only the `call_outcomes` flag, with a comment saying
+   * that was "where a person will look for it". Nobody looks there: the Calls
+   * page has five tabs and none of them filters on `standing_order_requested`
+   * or `office_to_contact`. Two residents had agreed to set one up and were
+   * waiting on an office that had never been told. So it now also opens a
+   * request — the queue staff actually work from, with a reference the resident
+   * can quote — and the flag stays, because the flag is what the collections
+   * side reads off the call.
+   *
+   * The same silence still applies to `transfer_to_human`, which writes the
+   * same table and is read by nobody. That one is open.
    */
   async request_standing_order(_args, ctx) {
     if (!ctx.charges.length) return { ok: false, error: "no charge on this call" };
+    const iid = await interactionId(ctx);
+
     // Call-level, and takes no apartment. A standing order is an arrangement
     // with a person about their monthly payment; "a standing order for flat 4
     // only" is not a thing the office sets up, so offering the split here would
@@ -443,11 +705,68 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     await db.from("call_outcomes").insert({
       charge_id: ctx.charges.length === 1 ? ctx.charges[0].charge_id : null,
       resident_id: ctx.residentId,
-      interaction_id: await interactionId(ctx),
+      interaction_id: iid,
       outcome: "office_to_contact",
       standing_order_requested: true,
     });
-    return { ok: true };
+
+    // `requests.building` is NOT NULL, and an outbound call carries the building
+    // in its variables — but a call started without them would otherwise fail
+    // the insert and turn a resident who said yes into an error. Fall back to
+    // what we hold on the resident, and if there is still nothing, keep the flag
+    // and skip the ticket rather than failing the tool. A recorded yes with no
+    // ticket is bad; a yes that errors out mid-call is worse.
+    let building = ctx.building;
+    if (!building && ctx.residentId) {
+      const { data: r } = await db.from("residents").select("building")
+        .eq("id", ctx.residentId).limit(1);
+      building = r?.[0]?.building ?? null;
+    }
+    if (!building) return { ok: true, request_opened: false };
+
+    // One open ticket per resident, with NO time window — unlike open_request's
+    // 30-minute guard. A leak reported again next morning is a new fact; a
+    // standing order asked for again next month is the same unmet request, and
+    // stacking a second ticket on it tells the office there are two arrangements
+    // to set up when there is one.
+    const { data: already } = await db
+      .from("requests")
+      .select("reference")
+      .eq("oxs_ref", STANDING_ORDER_REF)
+      .eq("resident_id", ctx.residentId)
+      .in("status", ["open", "in_progress", "needs_review"])
+      .limit(1);
+    if (already && already.length) {
+      return { ok: true, reference: already[0].reference, duplicate: true };
+    }
+
+    const { data, error } = await db
+      .from("requests")
+      .insert({
+        resident_id: ctx.residentId,
+        interaction_id: iid,
+        type: "other",
+        description:
+          "בקשה להוראת קבע. הדייר ביקש בשיחה להסדיר את התשלום החודשי " +
+          "בהוראת קבע — יש ליצור איתו קשר להסדרה.",
+        building,
+        unit: ctx.unit,
+        urgency: "normal",
+        opened_via: channel(ctx),
+        // Not an OXS id. Same use as save_partial_request's `partial:` sentinel:
+        // a marker this handler can find its own rows by. The unique index on
+        // this column is scoped to `opened_via = 'oxs'`, so repeating it here is
+        // legal and deliberate.
+        oxs_ref: STANDING_ORDER_REF,
+      })
+      .select("reference")
+      .single();
+
+    // The flag is already written and the resident already said yes. A failed
+    // insert loses the ticket, not the outcome, so it is reported and not thrown.
+    return error
+      ? { ok: true, request_opened: false, error: error.message }
+      : { ok: true, reference: data.reference };
   },
 
   /**
@@ -485,20 +804,140 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    *
    * Lookup order mirrors open_request's asymmetry: an explicit reference wins,
    * then the resident on the call, then building+unit — context first,
-   * arguments second. The reference matches on its numeric tail, because a
-   * caller says "אלף שלוש עשרה", not "HM-2026-1013".
+   * arguments second. The reference matches on its serial alone - see
+   * `serialOf` - because a caller says "אלף שלוש עשרה", not "255-1013-26", and
+   * because tickets opened before 18 Aug still carry the old HM- shape.
    */
+  /**
+   * Is this a building we manage, and does that apartment exist in it.
+   *
+   * Asked for 13 Aug. The bot asks a resident which building and which
+   * apartment they are reporting from, and until now there was nothing to
+   * check the answer against: `residents.building` is a string composed at
+   * import time and stored, which is enough to file a ticket and useless for
+   * verifying one. A caller who named a street we do not manage, or apartment
+   * 40 in a building with 25 flats, was recorded verbatim and the ticket went
+   * to a person to puzzle out.
+   *
+   * The matching itself is `matchBuilding()` above, shared with
+   * `open_request` so a ticket is filed against the same building that was
+   * verified. This handler is the part that turns an outcome into something a
+   * bot can say.
+   *
+   * THE THREE ANSWERS, AND WHY THE THIRD ONE MATTERS MOST
+   * Found, not found, and *found the street but not that number* — which is
+   * the one that lets the bot say something true and useful. "We manage הרצל
+   * 12 and הרצל 16, not 14" ends the conversation correctly; "not found" makes
+   * the resident repeat themselves at a machine that will fail again. Same for
+   * apartments: the flat range comes back with the refusal, so the reply can
+   * be "that building has flats 1 to 25".
+   *
+   * AMBIGUITY IS RETURNED, NEVER RESOLVED
+   * Two candidates come back as two candidates for the bot to ask about. This
+   * is feature 01's confidence floor: below it, unmatched beats guessed. A
+   * ticket filed against a confidently wrong building reads correct to
+   * everyone who sees it and sends a van to the wrong street.
+   */
+  async verify_address(args, ctx) {
+    const unit = unitOf(args?.unit);
+    const m = await matchBuilding(args?.building);
+
+    if (m.status === "empty") {
+      return { ok: true, building_found: false, reason: "need_building" };
+    }
+    if (m.status === "street_unknown") {
+      return { ok: true, building_found: false, reason: "street_unknown" };
+    }
+    if (m.status === "need_number" || m.status === "number_off_street") {
+      return {
+        ok: true,
+        building_found: false,
+        // The bot says a different sentence for each, which is the whole point
+        // of keeping them apart: nothing was said is not the wrong thing said.
+        reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
+        street: m.street.street,
+        numbers_we_manage: m.numbers,
+      };
+    }
+    if (m.status === "ambiguous") {
+      return {
+        ok: true,
+        building_found: false,
+        reason: "ambiguous",
+        candidates: m.candidates.map((b: any) => b.address).slice(0, 5),
+      };
+    }
+
+    const b: any = m.building;
+    const out: Record<string, unknown> = {
+      ok: true,
+      building_found: true,
+      // The string the ticket should carry: the address as we write it, not as
+      // the resident phrased it. `open_request` re-derives the same value
+      // server-side, so a bot that ignores this cannot file a differently
+      // spelled duplicate — but it is returned so the bot can read it back for
+      // confirmation, which is the one place a wrong match gets caught.
+      building: b.address,
+      city: b.city,
+    };
+
+    const { data: flats } = await db.from("apartments")
+      .select("number,order_index").eq("building_id", b.id)
+      .order("order_index", { ascending: true });
+    const numbers = (flats ?? []).map((f: any) => String(f.number).trim());
+    // A building with no apartments imported is a gap in the sync, not a
+    // building with no flats. Saying "that flat does not exist" off missing
+    // data would be a confident lie, so the unit is left unchecked instead.
+    const known = numbers.length > 0;
+    if (known) {
+      out.apartment_count = numbers.length;
+      // The spoken range comes from the NUMERIC flats only. 138 of the 4,092
+      // are labels rather than numbers — חנות, מסחר 2, מחסן, חניה 43,
+      // דירת ועד — and they sort by `order_index` like anything else, so the
+      // last row of a building is quite often a shop. Read straight off the
+      // ends of the list, the helpful sentence becomes "this building has
+      // apartments 1 to חנות".
+      const digits = numbers.filter((n) => /^\d+$/.test(n)).map(Number);
+      if (digits.length) {
+        out.first_unit = String(Math.min(...digits));
+        out.last_unit = String(Math.max(...digits));
+      }
+    }
+
+    if (!unit) {
+      // Not an error. A lift, a lobby or a stairwell has no apartment, and the
+      // prompt has said so since 8 Aug — the tool must not push back on the one
+      // case the prompt spent a section getting right.
+      out.unit_checked = false;
+      return out;
+    }
+
+    out.unit_checked = known;
+    if (known) {
+      // Compared through norm() on BOTH sides, for the same reason street names
+      // are. `לואי מרשל 41` numbers its flats `1א'`, `1ב'`, `2א'` — number plus
+      // a Hebrew letter plus a geresh — and nobody types the geresh. A raw
+      // string compare tells a resident of 3א that their own flat does not
+      // exist, which is the most insulting possible way for this feature to be
+      // wrong.
+      const want = norm(unit);
+      out.unit_found = numbers.some((n) => norm(n) === want);
+      out.unit = unit;
+    }
+    return out;
+  },
+
   async get_request_status(args, ctx) {
     const fields =
       "reference,type,description,status,urgency,building,unit,created_at,updated_at";
     let rows: any[] | null = null;
 
-    const tail = String(args?.reference ?? "").replace(/\D/g, "").slice(-4);
-    if (tail.length === 4) {
+    const serial = serialOf(args?.reference);
+    if (serial) {
       const { data, error } = await db
         .from("requests")
         .select(fields)
-        .like("reference", "%-" + tail)
+        .or(`reference.like.%-${serial}-%,reference.like.%-${serial}`)
         .order("created_at", { ascending: false })
         .limit(3);
       if (error) return { ok: false, error: error.message };
@@ -552,16 +991,32 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * How much does this apartment owe. Read-only: amounts and months, nothing
    * that moves money — payments, receipts and disputes stay with the team.
    *
-   * The identity story is honest rather than solved. The caller's own WhatsApp
-   * number is tried first, because it is the one fact the resident did not
-   * type and cannot choose. Building+unit and a name are the fallbacks the
-   * client asked for; PRD §13 #1 (proving who is asking before money is read
-   * out) is still open, and until it closes this answers whoever asks — the
-   * accepted demo posture, same as the no-login dashboard.
+   * IDENTITY, ON CHAT, IS TWO FACTS OR NOTHING (asked for 13 Aug)
+   * PRD §13 #1 — prove who is asking before money is read out — was open until
+   * now, and the demo posture was to answer whoever asked. On chat it no longer
+   * is. A resident who wants a balance gives a full name *and* a phone number,
+   * and the two have to land on the same record before a single shekel is read
+   * back.
    *
-   * A name that matches two residents returns nobody. Between neighbours with
-   * similar names, a guess read out with amounts attached is a privacy leak
-   * dressed as an answer.
+   * What that closes: a name on its own, and a building with an apartment
+   * number on its own, were both enough. Both are things a neighbour knows. So
+   * were they enough for anyone who found the WhatsApp number — the bot would
+   * read out a stranger's debt to whoever typed their name.
+   *
+   * The envelope number is no longer a shortcut past the question either. It
+   * is a good signal and it is not proof: a handset gets lent, sold and shared,
+   * and answering it silently means the bot never asks anybody anything. One
+   * rule, no exception — an exception here is how the whole gate gets skipped.
+   *
+   * The two failures are told apart for the agent and not for the resident.
+   * `need_identity` means it has not asked yet; `identity_failed` means the
+   * pair did not match, and says nothing about *which* half was wrong. Telling
+   * a caller their name was right but the number was not turns this into a
+   * machine for testing guesses.
+   *
+   * On voice, nothing changes here. The debt agent dials a known resident and
+   * `ctx.residentId` is already the answer; inbound identity is its own
+   * problem and not this one.
    *
    * SINCE MIGRATION 012, DEBT BELONGS TO AN APARTMENT
    * How the caller was identified decides what they are told. Identified by
@@ -580,10 +1035,29 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     let askedUnit: string | null = null;
 
     if (channel(ctx) === "whatsapp") {
-      const phone = "+" + ctx.callId.slice(3).replace(/^\+/, "");
+      const given = String(args?.name ?? "").trim();
+      const phone = phoneOf(args?.phone);
+      if (!given || !phone) {
+        return {
+          ok: true,
+          found: 0,
+          need_identity: true,
+          missing: [!given ? "name" : null, !phone ? "phone" : null].filter(Boolean),
+        };
+      }
       const { data } = await db.from("residents").select(fields)
         .eq("phone", phone).maybeSingle();
+      // One flag for both halves. See the note above: a per-half answer is an
+      // oracle, and an oracle plus a list of surnames is a search.
+      if (!data || !sameName(data.full_name, given)) {
+        return { ok: true, found: 0, identity_failed: true };
+      }
       resident = data;
+      // An apartment named alongside the identification still narrows the
+      // answer, exactly as it did before — but now only among the flats this
+      // verified resident actually owns, because the charge query is already
+      // filtered by their id.
+      askedUnit = unitOf(args?.unit);
     }
     if (!resident && ctx.residentId) {
       const { data } = await db.from("residents").select(fields)
@@ -698,8 +1172,26 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // This read `ctx.building ?? ""` until 8 Aug, which is correct outbound and
     // silently wrong inbound: every intake ticket would have carried an empty
     // building while the agent read a reference number back to the caller.
-    const building = ctx.building || args?.building || "";
+    const said = ctx.building || args?.building || "";
     const type = args?.type ?? "other";
+
+    // The address as WE write it, when what was said resolves to a building we
+    // manage. Added 13 Aug alongside `verify_address`.
+    //
+    // Normalising, not refusing. `open_request` is shared with both voice
+    // agents, and only the chat bot has been taught to verify first — making
+    // this reject an unresolvable building would start silently dropping
+    // inbound voice tickets, which is a worse failure than the one it fixes.
+    // The refusal lives where the resident can be asked about it: the bot
+    // calls `verify_address`, hears "we do not manage that street", and says
+    // so. This is the backstop for the ticket that gets filed anyway.
+    //
+    // Worth it even on its own, because the duplicate guard below matches on
+    // `building` as a string. Two reports of one lobby leak written
+    // `יואב 14` and `רחוב יואב 14 רמת גן` are two buildings to that guard and
+    // one building to everybody else, so the second report mints a second
+    // ticket and dispatches a second van.
+    const building = (await canonicalAddress(said)) || said;
 
     // ctx first, argument second — outbound the apartment is a fact attached to
     // the call and the model may not overwrite it.
@@ -715,6 +1207,33 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       const said = unitOf(args?.unit);
       const known = new Set(ctx.charges.map((c) => c.unit).filter(Boolean));
       unit = said && (known.size === 0 || known.has(said)) ? said : null;
+    }
+
+    // WHERE THE PERSON LIVES, which is not where the fault is (13 Aug).
+    //
+    // The chat bot now asks for a building and an apartment on every report,
+    // including a lobby leak, because it is asking WHO IS THIS — there is no
+    // caller ID on chat and until now nothing ever looked the sender up, so a
+    // WhatsApp ticket carried no resident at all.
+    //
+    // That is not a reversal of the lift rule from 8 Aug. `unit` still means
+    // where the fault is and stays null for common property, so every query
+    // that finds common-area faults with `unit is null` keeps working and the
+    // duplicate guard still groups two reports of one lobby leak. The
+    // reporter's flat goes in its own column.
+    //
+    // `fault_location` is the one distinction the model has to make, and it
+    // already had to make it — it used to express it by omitting `unit`, which
+    // is the kind of implicit branch this file has been burned by before. Said
+    // out loud it can at least be checked: anything that is not the string
+    // "apartment" is treated as common property, because a fault wrongly filed
+    // as common gets read by a person, and one wrongly pinned to a flat sends a
+    // technician to knock on a stranger's door.
+    const reportedUnit = unitOf(args?.reporter_unit);
+    if (reportedUnit && String(args?.fault_location ?? "") !== "apartment") {
+      unit = null;
+    } else if (reportedUnit && !unit) {
+      unit = reportedUnit;
     }
 
     // --- The duplicate guard ------------------------------------------------
@@ -762,15 +1281,29 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       return { ok: true, reference: existing[0].reference, duplicate: true };
     }
 
+    // Who this is, when the call did not already say. Outbound we dialled them
+    // and `ctx.residentId` is the answer; on chat nothing has ever looked the
+    // sender up, and now the verified building+flat can. Best-effort on purpose:
+    // a flat with no phone number on file has no `residents` row at all, which
+    // is exactly why `reported_unit` is stored separately rather than being
+    // reduced to this lookup.
+    let residentId = ctx.residentId;
+    if (!residentId && reportedUnit && building) {
+      const { data: who } = await db.from("residents").select("id")
+        .eq("building", building).eq("unit", reportedUnit).limit(1);
+      residentId = who?.[0]?.id ?? null;
+    }
+
     const { data, error } = await db
       .from("requests")
       .insert({
-        resident_id: ctx.residentId,
+        resident_id: residentId,
         interaction_id: await interactionId(ctx),
         type,
         description: String(args.description),
         building,
         unit,
+        reported_unit: reportedUnit,
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
       })
