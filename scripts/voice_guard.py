@@ -41,7 +41,7 @@ all of them and keeps covering them when a new tool is added.
 
 The one thing to watch: if a value the agent legitimately reads aloud ever
 contains an underscore, it will be eaten. Today none does — {{callback_number}}
-is digits, {{verification_email}} is office@homies.co.il, {{building}} is a
+is digits, {{verification_email}} is Office@homies-management.co.il, {{building}} is a
 street. Check this before putting a real Homies email in.
 
 TWO LAYERS, BECAUSE THE STRUCTURE IS GONE BY THE TIME ANYONE SEES IT
@@ -147,6 +147,46 @@ BRACKETS = ["{", "}", "[", "]"]
 # missed it on the capital O, which is why these are regexes.
 _ICASE = [{"type": "ignore-case", "enabled": True}]
 
+# ---------------------------------------------------------------------------
+# Pronunciation. The same mechanism, used to rewrite rather than to delete.
+# ---------------------------------------------------------------------------
+#
+# Everything above deletes; these substitute. They share this file because they
+# share one `formatPlan`, and splitting them across two modules would mean the
+# second one silently overwrote the first — the same trap documented on
+# chunkPlan below.
+#
+# WHY THIS IS NOT ONLY A PROMPT FIX
+# The client heard the opening line as "מיכאל מלאומיז" on 12 Aug. The cause is
+# that Hebrew glues a one-letter preposition onto the following word, so
+# מ + הומיז is written מהומיז and the voice reads the pair as one unfamiliar
+# word. The opening is a fixed line and was corrected there — but the model
+# composes most of its sentences, and the next time it writes the company name
+# after a preposition it will write it glued, because that is correct Hebrew.
+# A rule cannot reach a form the language itself produces. This can.
+#
+# The substitutions are grammatical in any sentence: "מיכאל מהומיז" becomes
+# "מיכאל מחברת הומיז", "התקשרת להומיז" becomes "התקשרת לחברת הומיז". The company
+# name always ends up standing on its own, which is the whole point.
+#
+# ANYTHING ADDED HERE MUST BE CHECKED BY EAR, not by argument. A replacement
+# that fixes one word and breaks the sentence around it is worse than the word.
+PRONUNCIATION = [
+    ("מהומיז", "מחברת הומיז"),
+    ("להומיז", "לחברת הומיז"),
+    # "בית לא נשמע כמו בעברית" — 12 Aug. The word he would have heard it in is
+    # ועד בית, which is how the prompt wrote it and is not how anyone says it:
+    # Israelis say ועד הבית, with the article. Without it the two nouns collide
+    # into va'ad-bayit and the second one lands as a bare dictionary word rather
+    # than part of a phrase. Fixed in the prompt too; this catches the sentences
+    # the model composes.
+    #
+    # NOT PROVEN. It is the best available reading of a complaint about a sound,
+    # and a sound needs an ear. If ועד הבית still lands wrong, the problem is the
+    # voice rather than the phrase, and that is a different change.
+    ("ועד בית", "ועד הבית"),
+]
+
 
 def spoken_patterns():
     """SPOKEN as bounded regexes, for the filter and the checker alike."""
@@ -161,6 +201,12 @@ def replacements():
     out.append({"type": "regex", "regex": NOTE_PREFIX, "value": "", "options": _ICASE})
     out += [{"type": "exact", "key": b, "value": "", "replaceAllEnabled": True}
             for b in BRACKETS]
+    # Last, and substituting rather than deleting. Nothing above can match a
+    # Hebrew word, so the order is not load-bearing — but a deletion that ran
+    # after a substitution could eat what the substitution just wrote, and this
+    # way round that cannot happen.
+    out += [{"type": "exact", "key": k, "value": v, "replaceAllEnabled": True}
+            for k, v in PRONUNCIATION]
     return out
 
 

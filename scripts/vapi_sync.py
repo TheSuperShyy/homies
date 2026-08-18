@@ -193,6 +193,44 @@ BASE = {
     # that the transcriber was chosen for speed rather than accuracy.
     "backgroundSound": "office",
     "backgroundDenoisingEnabled": True,
+    # NOTHING SPOKE INTO SILENCE UNTIL 12 AUG, on either agent.
+    #
+    # The client's note was that when he stopped answering, the agent never
+    # asked "הלו? אתה כאן?" — and he was exactly right, because there was no
+    # mechanism for it. The agent finished its turn, heard nothing, and waited
+    # for silenceTimeoutSeconds to close the line. Four of his ten calls ended
+    # that way, one of them with a question still hanging.
+    #
+    # This is not a prompt rule and could never have been one: the model is not
+    # invoked while nobody is talking, so it has no turn in which to notice. It
+    # is a platform feature that was simply never switched on.
+    #
+    # THE LINES CARRY NO GENDER. אתה כאן? would be wrong for half of callers on
+    # a line with no caller ID, and this is the worst possible turn to guess in
+    # — the caller has already gone quiet once.
+    "messagePlan": {
+        "idleMessages": ["הלו? שומעים אותי?", "עדיין על הקו?"],
+        # Eight seconds. Long enough that someone reading an apartment number
+        # off a door is not interrupted, short enough that it lands before the
+        # caller concludes the call has dropped.
+        # 12, not 8, since 18 Aug. At 8 the prompt fired "Still with me?" while a
+        # resident was thinking mid-answer, twice on real calls, and it reads as
+        # impatience. It also fights the closing handshake: that ends on a beat
+        # where the agent asks and then waits, and a prod at 8 seconds lands in
+        # exactly the pause the handshake exists to create.
+        "idleTimeoutSeconds": 12,
+        # Twice, then stop. A third is nagging, and the silence timeout is the
+        # thing that should end a genuinely dead line.
+        "idleMessageMaxSpokenCount": 2,
+        # The two are per stretch of silence, not per call — otherwise a caller
+        # who pauses twice early has spent them, and the one that matters, later
+        # on, never comes.
+        "idleMessageResetCountOnUserSpeechEnabled": True,
+        # The last thing they hear is now a goodbye rather than nothing. This is
+        # the other half of the same complaint: a line that closes on a timeout
+        # closes in silence, and the caller cannot tell a hangup from a fault.
+        "silenceTimeoutMessage": "נראה שאין קליטה. תודה שהתקשרת להומיז, יום טוב, ולהתראות.",
+    },
 }
 
 TARGETS = {

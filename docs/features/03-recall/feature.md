@@ -14,7 +14,7 @@ knows what happened.
 
 Two routes in, tried in order:
 
-1. **By reference.** The caller reads back `HM-2026-1001`. Exact match, cheapest
+1. **By reference.** The caller reads back `255-1001-26`. Exact match, cheapest
    and most reliable.
 2. **By location.** No reference — most callers will not have kept it — so the
    agent identifies them via [01-identity](../01-identity/feature.md) and lists
@@ -56,7 +56,7 @@ Returns:
   "found": true,
   "requests": [
     {
-      "reference": "HM-2026-1001",
+      "reference": "255-1001-26",
       "type": "plumbing",
       "description": "...",
       "status": "open",

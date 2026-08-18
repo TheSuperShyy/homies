@@ -135,9 +135,16 @@ def _open_request(location):
             "type": "string",
             "description": "What is wrong, in Hebrew, in their words where possible.",
         },
+        # HOMIES' OWN CATEGORIES, not ours. Until 12 Aug this was four invented
+        # values and the WhatsApp bot declared a different seven, so the same
+        # fault was filed under two vocabularies depending on the channel.
+        # These eleven are what their dispatchers actually use, read off their
+        # live service calls, and migration 014 constrains the column to them.
         "type": {
             "type": "string",
-            "enum": ["plumbing", "electrical", "cleaning", "other"],
+            "enum": ["plumbing", "electrical", "lighting", "elevator",
+                     "cleaning", "gardening", "pest_control", "locksmith",
+                     "fire_safety", "maintenance", "other"],
         },
         "urgency": {
             "type": "string",
@@ -157,7 +164,8 @@ def _open_request(location):
         props["unit"] = LOCATION["unit"]
     return _fn(
         "open_request",
-        "Call when the resident raises a maintenance issue during the call. Wait for "
+        "Call when the resident raises a maintenance issue during the call, asks "
+        "outright for a request to be opened, or accepts the offer of one. Wait for "
         "the reference this returns before telling them a request was opened.",
         props,
         ["description"],

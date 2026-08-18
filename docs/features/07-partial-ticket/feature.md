@@ -54,7 +54,7 @@ value of the row is that a human can trust the parts that are filled in.
 Returns:
 
 ```json
-{ "reference": "HM-2026-1042", "request_id": "uuid", "status": "needs_review" }
+{ "reference": "255-1042-26", "request_id": "uuid", "status": "needs_review" }
 ```
 
 The reference is still generated and still read aloud if the caller can hear it.

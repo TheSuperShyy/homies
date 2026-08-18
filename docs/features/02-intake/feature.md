@@ -38,10 +38,16 @@ either way, default to `normal` and do not ask. The emergency branch lives in
 
 **Read-back before writing.** One sentence, then the reference:
 
-> "רשמתי: נזילה מהתקרה באמבטיה, הרצל 14 דירה 12. מספר הפנייה שלך HM-2026-1001."
+> "רשמתי: נזילה מהתקרה באמבטיה, הרצל 14 דירה 12. מספר הקריאה שלך: 1, 0, 0, 1."
 
-The reference is read digit-comprehensible and repeated once if asked. It is
-what makes [03-recall](../03-recall/feature.md) work.
+**Spoken, only the tail is read out.** `open_request` returns
+`255-1001-26`; the caller hears `1, 0, 0, 1`. The office code and the year are
+constant across every reference in the system, so they add nothing but four
+more chances to mishear on the one line that has to be written down correctly.
+Lookup is unaffected — `get_request_status` matches on the tail already, which
+is what makes [03-recall](../03-recall/feature.md) work, and the WhatsApp bot
+accepts it in either form. The full reference is still what is stored and what
+the dashboard shows.
 
 If the read-back is corrected, the correction updates the row rather than
 opening a second one.
@@ -63,7 +69,7 @@ opening a second one.
 Returns:
 
 ```json
-{ "reference": "HM-2026-1001", "request_id": "uuid" }
+{ "reference": "255-1001-26", "request_id": "uuid" }
 ```
 
 Partial calls take a different path entirely — see

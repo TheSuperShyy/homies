@@ -10,8 +10,8 @@ amount and a month out of two empty variables. Inbound has no variables today, s
 the dashboard would work — but the habit is what matters, and the habit was worth
 one wasted diagnosis already.
 
-Assistant: **`f482abc1-db69-422b-afdd-f7b40ca9d995`** — *Homies — Inbound Intake
-(he)*. The English twin is `8b98016b-…` and takes the same script translated.
+Assistant: **`7813da25-f242-4a8d-888e-51caa2ec8b3f`** — *Homies — Inbound Intake
+(he)*. The English twin is `9ed5e788-…` and takes the same script translated.
 
 > **The Hebrew below is written, not transcribed.** Same caveat as the prompt
 > itself: no native speaker has read it aloud. If a line sounds wrong when you
@@ -38,7 +38,7 @@ phrase is not matching and that is the finding.
 
 **Step 4 is the other one.** A 97-second English call on 5 Aug got a leak, a
 building and an apartment and called **no tools at all**. If you get a reference
-number that starts `HM-`, the write path worked.
+number shaped `255-NNNN-YY`, the write path worked.
 
 ---
 
@@ -50,7 +50,7 @@ a reference number and it will feel like you have handed it the answer.
 | | You say | What should happen |
 |---|---|---|
 | 1 | **שלום, רציתי לבדוק מה קורה עם הפנייה שפתחתי בשבוע שעבר** | Refuses plainly: `אין לי גישה לסטטוס של פניות קיימות`. |
-| 2 | **המספר הוא HM-2026-1001** | Still refuses. It must **not** say it is checking, must not read the number back as though confirmed, and must not say the request "is open" or "is being handled". |
+| 2 | **המספר הוא 255-1001-26** | Still refuses. It must **not** say it is checking, must not read the number back as though confirmed, and must not say the request "is open" or "is being handled". |
 | 3 | **בסדר, תודה** | Says a representative will get back to you, then closes. |
 
 **Listen for what it does not say.** It must never say `אני מעבירה אותך` — nobody

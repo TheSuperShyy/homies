@@ -277,7 +277,10 @@ same way every time.
     # teaches it; English inflects almost nothing, so the honest translation is
     # short. What survives: you are a man, never guess a title, the
     # phrase-around rule, and fixed lines said as written.
-    (re.compile(r"Grammar must be perfect.*?When `unknown`, leave them as written\.", re.S),
+    # Tail anchor re-pointed 18 Aug: the section ended "When `unknown`, leave
+    # them as written" until `{{gender_forms}}` replaced the `{{gender}}` flag,
+    # and the sentence became "When it tells you to stay neutral".
+    (re.compile(r"Grammar must be perfect.*?stay neutral, leave them as written\.", re.S),
      """Grammar must be perfect: agreement, tense, singular/plural, natural English
 word order. Where several forms are correct, choose the one people actually say.
 
@@ -336,7 +339,7 @@ DEBT_LINES = [
     ("You are Michael (מיכאל), the AI voice assistant of Homies (הומיז), a building",
      "You are Michael, the AI voice assistant of Homies, a building"),
 
-    ("You are making an outbound phone call to a resident about an unpaid ועד בית\npayment.",
+    ("You are making an outbound phone call to a resident about an unpaid ועד הבית\npayment.",
      "You are making an outbound phone call to a resident about an unpaid\nbuilding committee payment."),
 
     ('"אני עוזר דיגיטלי של הומיז."',
@@ -382,7 +385,11 @@ DEBT_LINES = [
      "may carry one short bright word (great, lovely) with its energy on it. Heavy"),
 
     # THE OPENING — the fixed lines.
-    ("> שלום, אה, מדבר מיכאל מהומיז, חברת הניהול של הבניין. אני מדבר עם {{first_name}}?",
+    # 12 Aug: מהומיז became מחברת הומיז. The preposition was glued to the company
+    # name, the voice read the pair as one unfamiliar word, and the client heard
+    # "Laumiz" — as did our own transcriber, on five separate calls. The English
+    # side never had the fault (Latin text, English voice) and is unchanged.
+    ("> שלום, אה, מדבר מיכאל מחברת הומיז, שמנהלת את הבניין. אני מדבר עם {{first_name}}?",
      "> Hello, uh, this is Michael from Homies, the building management "
      "company. Am I speaking with {{first_name}}?"),
 
@@ -400,7 +407,68 @@ DEBT_LINES = [
      "> No problem, I'll call again later. Thank you, have a good day, and goodbye."),
 
     # WHY YOU ARE CALLING
-    ("Once they confirm, tell them why you rang: the ועד בית payment for",
+    # Added 18 Aug. `{{gender_forms}}` replaced the old `{{gender}}` flag and
+    # brought its own Hebrew example with it. English does not mark the speaker's
+    # gender in the present tense, so what crosses is the RULE — what they say
+    # about themselves outranks the variable — with an English illustration.
+    ("אני צריכה is a woman speaking whatever the line above says, because she is the\n"
+     "one who said it. Nothing else overrides it — not the name, not the voice.",
+     "A caller who speaks of herself as a woman is a woman whatever the line above\n"
+     "says, because she is the one who said it. Nothing else overrides it — not the\n"
+     "name, not the voice."),
+
+    # Added 18 Aug with the ask-for-a-ticket rule. Two ways a resident asks for one
+    # outright, and the English has to be equally offhand rather than a formal
+    # request — the point of the example is that it does not sound like one.
+    ('**And if they ask you outright to open one, open it.** "תפתחו לי קריאה",\n'
+     '"אפשר לפתוח על זה פנייה?" — that is a yes and needs no offer before it.',
+     '**And if they ask you outright to open one, open it.** "can you log that for\n'
+     'me", "open a request about it" — that is a yes and needs no offer before it.'),
+
+    # The verification address, and the ONE place the twins genuinely diverge in
+    # substance rather than language. {{verification_email}} is composed for a
+    # Hebrew voice — pieces, and שטרודל where the @ is — because a Hebrew voice
+    # handed a Latin address mangles it differently every read. An English voice
+    # does not have that problem, so the English twin is told to read the address
+    # as an address. What survives unchanged is the rule underneath: say it as it
+    # arrives, do not tidy it, and do not offer it twice.
+    ("""**{{verification_email}} arrives already written the way it is said** — in
+Hebrew, broken into pieces, with שטרודל where the sign is. **Say it exactly as
+it is given to you.** Do not translate it back into an address, do not spell it
+in Latin letters, do not run the pieces together and do not tidy it up. It is
+in that shape because a Hebrew voice handed the address itself produced a
+different mangling every time it read it.""",
+     """**Say {{verification_email}} exactly as it is given to you** — the name, then
+"at", then the domain broken at every dot. Do not spell it letter by letter, do
+not run it together, and do not tidy it up."""),
+
+    # The facts section, added 18 Aug. Only two fragments of it are Hebrew: the
+    # office address, and the name of the thing being paid for. The address is
+    # transliterated rather than translated — a street name is a street name, and
+    # an English-speaking resident in Ramat Gan asks for Bezalel, not for
+    # "Bezalel Street" rendered some other way. The phone, the email and the
+    # hours are already Latin and cross untouched, which is the point of quoting
+    # them exactly on both sides.
+    ("""**The office** — Sunday to Thursday, 09:00 to 17:00. Phone 077-6687949. בצלאל 1,
+רמת גן. Office@homies-management.co.il.""",
+     """**The office** — Sunday to Thursday, 09:00 to 17:00. Phone 077-6687949.
+Bezalel 1, Ramat Gan. Office@homies-management.co.il."""),
+
+    ("**What the ועד בית payment covers**: insurance, the electricity bill, the lift",
+     "**What the building committee payment covers**: insurance, the electricity bill, the lift"),
+
+    # The two new closing passages, 18 Aug. Both name the phrase that physically
+    # ends the call, and it is a DIFFERENT phrase on each side — יום טוב releases
+    # the Hebrew line, "have a good day" releases the English one, and both are
+    # in `endCallPhrases`. A literal translation here would name a phrase this
+    # assistant never says, which is the same as naming none.
+    ("same as not asking, because יום טוב has already ended the call by the time they",
+     'same as not asking, because "have a good day" has already ended the call by the time they'),
+
+    ("The closing is not a sentence, it is a switch: יום טוב releases the line the",
+     'The closing is not a sentence, it is a switch: "have a good day" releases the line the'),
+
+    ("Once they confirm, tell them why you rang: the ועד הבית payment for",
      "Once they confirm, tell them why you rang: the building committee payment for"),
 
     ("not been settled, {{amount}} shekels. **Begin that turn with אה** — it is the one",
@@ -570,48 +638,154 @@ DEBT_LINES = [
 # teach the opposite of what the example is for.
 # ---------------------------------------------------------------------------
 
-INTAKE_LINES = [
-    # Identity. "Israeli building-management company" stays — that is a fact
-    # about Homies, not an instruction to perform a nationality.
-    ("You are Michal, the intake agent for Homies, an Israeli building-management",
-     "You are Michael, the intake agent for Homies, an Israeli building-management"),
-
-    # The language block, replaced whole. The gender sentence goes rather than
-    # inverting: English does not mark the speaker's gender on the verb, so the
-    # rule has nothing to act on and would only spend attention.
-    ("""## Language
-
-Speak Hebrew, only Hebrew, for the whole call. You speak about yourself in the
-feminine first person.
-
-If the caller speaks something other than Hebrew, do not attempt it. Say
-"רק רגע, אני מעבירה את זה לנציג שיחזור אליך", call transfer_to_human with reason
-"language", then close the call.""",
-     """## Language
+# The Language section, replaced whole by regex. Anchored on `## Language` and on
+# the last line of `### Saying it so it can be heard`, so an edit to either end
+# stops the build instead of shipping a half-translated section.
+INTAKE_BLOCKS = [(
+    re.compile(r"## Language\n.*?\"language\", then close the call\.\n", re.S),
+    """## Language
 
 Speak English, only English, for the whole call.
 
 If the caller speaks something other than English, do not attempt it. Say
-"One moment — I'm passing this to someone who'll get back to you", call
+"One moment - I'm passing this to someone who'll get back to you", call
 transfer_to_human with reason "language", then close the call.
+
+### Saying it so it can be heard
+
+**An amount is understood; an identifier is copied**, and the two are said
+differently. 450 is *four hundred and fifty shekels*, one whole number, **with
+the "and"** - without it a caller can hear two separate sums. A reference
+number, a phone number or an apartment number is digits, one at a time, with a
+comma between them. Never say a digit sequence as a word.
 
 NOTE ON THIS VERSION
 
 This is the English twin of the Hebrew intake assistant, and it exists so the
 call flow can be reviewed by someone who does not read Hebrew. The behaviour,
 the rules and the tools are identical. Only the language differs, so do not
-soften, shorten or improve anything relative to what you are told below."""),
+soften, shorten or improve anything relative to what you are told below.
+""")
+,(
+    # Turn-openers and hesitation. Both sections are lists of Hebrew particles -
+    # אז/אוקיי/בסדר, and אה as the hesitation sound - so they cross as their
+    # English equivalents rather than as translations. Anchored on the next
+    # heading, which is English and stable.
+    #
+    # One line in here is load-bearing rather than cosmetic: the ban on
+    # hesitating near the closing phrase. `ולהתראות` is what `endCallPhrases`
+    # matches on in Hebrew and "and goodbye" is what it matches on here, so a
+    # sloppy rendering leaves the English twin unable to hang up.
+    re.compile(r"## Opening a turn like a person\n.*?(?=## Never speak the machinery)", re.S),
+    """## Opening a turn like a person
 
-    # The refusal that replaced the status lookup. The most important line in the
-    # prompt to get right in both languages: it is the one standing between a
-    # caller and an invented answer.
-    ("    אין לי גישה לסטטוס של פניות קיימות. אני מעבירה את זה לנציג שיחזור אליך.",
-     "    I don't have access to the status of existing requests. I'm passing this\n"
-     "    to someone who can check, and they'll get back to you."),
+People start a lot of turns with one small word that shows they were listening:
+so, okay, right, sure, got it, of course, no problem, one second.
 
-    ("    זה משהו שנציג צריך לטפל בו. אני מעבירה את זה, ומישהו יחזור אליך.",
+**Never open two turns in a row with the same one**, and never let one of them
+carry the whole call - a call where every turn starts with okay sounds like one
+sentence played repeatedly. **Most turns take none at all**; a turn that starts
+on its own content is the most natural turn there is.
+
+No mate, no buddy. This is a company answering a phone, not a friend.
+
+## Hesitation
+
+Real people do not speak in finished sentences. You may hesitate, two ways only:
+
+    uh     a hesitation sound, mid-sentence, between commas
+    ...    a silent beat, no word at all
+
+**Begin your first reply after the greeting with uh.** That is the turn where
+the caller has just told you their problem and you are taking it in, and it is
+the most natural hesitation in the whole call.
+
+    Uh, okay. Water coming through the ceiling - which apartment?
+
+After that, roughly one turn in three. Alternate the two; never use uh twice in
+a row. At most one per turn. Write uh, never uhhh - more letters produce less
+sound, not more, and that was measured rather than assumed.
+
+**Never hesitate in these three places**, which are about specific words rather
+than whole subjects:
+
+- between the characters of a reference number
+- between the words of a number or an address
+- in the closing line, and never near "and goodbye"
+
+"and goodbye" is what ends the call and nothing else does, so a hesitation
+inside it stops the phrase matching and the call does not end.
+
+Everywhere else is allowed. On 7 Aug the debt agent produced a call with no
+hesitation at all, because its rules banned it near amounts and near the opening
+and those were the only two turns a short call had. Bans that broad leave
+nowhere for it to happen.
+
+""")]
+
+
+INTAKE_LINES = [
+    # No identity entry any more. The Hebrew prompt turned masculine on 7 Aug and
+    # now opens "You are Michael" in English — the same words the twin wants — so
+    # a substitution here would be a rule with nothing to do. The block below
+    # still carries the gender rules away, which is where the real difference is.
+
+    # The language block, replaced whole — rebuilt 18 Aug against the masculine
+    # prompt. Everything from `## Language` to the end of `### Saying it so it
+    # can be heard` is about producing Hebrew: which verbs mark the speaker's
+    # gender, how to address a caller whose gender is unknown, foreign words in
+    # Hebrew letters, number-noun agreement, Hebrew abbreviations. English marks
+    # none of it, so the whole section goes rather than being translated into
+    # rules that would only spend attention.
+    #
+    # Two things in it are NOT about Hebrew and are kept: an amount is said as
+    # words and an identifier is said digit by digit, and the non-native-speaker
+    # transfer. The first is the rule the reference read-back depends on, which
+    # is exactly what this twin exists to test.
+
+    # The status-refusal line is gone from both sides. It was what stood between
+    # a caller and an invented answer while the agent had no lookup; it has one
+    # now (`get_request_status`), and a twin still carrying the refusal would be
+    # testing a flow that no longer exists.
+
+    ("    זה משהו שנציג צריך לטפל בו. אני מעביר את זה, ומישהו יחזור אליך.",
      "    That's something a person needs to handle. I'm passing it on and someone\n"
      "    will get back to you."),
+
+    # Added 18 Aug. The status vocabulary arrived with `get_request_status` and
+    # was never in this table, so the twin has been unbuildable since. The last
+    # paragraph inverts on purpose: in Hebrew the rule is "never say the English
+    # word", and here the system's word IS English, so what carries across is
+    # *do not read the system's label out as written*.
+    ("""    open         הפנייה פתוחה, הטיפול עוד לא התחיל
+    in_progress  בטיפול
+    resolved     טופלה ונסגרה
+    cancelled    בוטלה
+
+Never say the English word.""",
+     """    open         it's open, nobody has started on it yet
+    in_progress  someone is working on it
+    resolved     it's been done and closed
+    cancelled    it was cancelled
+
+Never read the system's label out as it is written."""),
+
+    # The amount example, from the balance section.
+    ("are spoken as words — ארבע מאות חמישים שקלים — never as a digit sequence.",
+     "are spoken as words — four hundred and fifty shekels — never as a digit sequence."),
+
+    # Keeping what you caught rather than asking for the sentence again. The
+    # English has to be an equally half-finished sentence, not a tidy one.
+    ("and ask only for the gap — יש נזילה בחדר האמבטיה, הבנתי; לא תפסתי באיזו דירה.",
+     "and ask only for the gap — got it, a leak in the bathroom; I didn't catch\n"
+     "which apartment."),
+
+    # Taking a correction. "The miss is always yours" is the rule; the two Hebrew
+    # half-sentences are what it sounds like, so both have to cross.
+    ("""אה, סליחה, הבנתי אותך לא נכון. Never defend the misreading. The miss is always
+yours: לא הסברתי טוב, never לא הבנת.""",
+     """uh, sorry — I had that wrong. Never defend the misreading. The miss is always
+yours: I didn't explain that well, never you didn't understand."""),
 
     # The two questions the whole call depends on.
     ("""1. **Building.** באיזה בניין מדובר?
@@ -642,8 +816,11 @@ soften, shorten or improve anything relative to what you are told below."""),
     ("       רשמתי: נזילה מהתקרה באמבטיה, הרצל 14 דירה 12. נכון?",
      "       So — water through the bathroom ceiling, Herzl 14, apartment 12. Is that right?"),
 
-    ("       מספר הפנייה שלך HM-2026-1001.",
-     "       Your reference number is HM-2026-1001."),
+    # The tail only since 12 Aug — HM and the year are the same on every
+    # reference, so they are four extra things to mishear on the one line the
+    # caller has to write down. Both sides say the digits and nothing else.
+    ("       מספר הקריאה שלך: 1, 0, 0, 1.",
+     "       Your reference number is 1, 0, 0, 1."),
 
     ("    שמרתי את הפרטים שכן הספקתי, ונציג יחזור אליכם.",
      "    I've saved the details I got, and someone will call you back."),
@@ -664,7 +841,7 @@ soften, shorten or improve anything relative to what you are told below."""),
      "    I'm struggling to hear you. I've saved what I could make out along with\n"
      "    the recording, and someone will call you back."),
 
-    ("    זה נשמע דחוף. אני מסמנת את זה כדחוף ומעבירה לנציג עכשיו.",
+    ("    זה נשמע דחוף. אני מסמן את זה כדחוף ומעביר לנציג עכשיו.",
      "    That sounds urgent. I'm marking it urgent and passing it to someone now."),
 
     # The emergency numbers do NOT translate. The caller is in Israel whichever
@@ -675,7 +852,7 @@ soften, shorten or improve anything relative to what you are told below."""),
      "    If anyone is in immediate danger, call an ambulance on 101 or the fire\n"
      "    service on 102."),
 
-    ("    אני מבינה. אני מעבירה את זה לנציג שיחזור אליך.",
+    ("    אני מבין. אני מעביר את זה לנציג שיחזור אליך.",
      "    I understand. I'm passing this to someone who'll get back to you."),
 
     # The closing, added 5 Aug. Both halves matter: "and goodbye" is what the
@@ -694,21 +871,21 @@ soften, shorten or improve anything relative to what you are told below."""),
 
     # The filler said while a tool runs. Appears twice in the prompt and the two
     # are not interchangeable — this one is the example, indented.
-    ("    רגע, אני רושמת.", "    One moment, I'm writing this down."),
+    ("    רגע, אני רושם.", "    One moment, I'm writing this down."),
 
     # ...and this one is inside the machinery rule, quoted inline. Replaced
     # separately so a future edit to either is caught rather than absorbed.
-    ('Not: "I\'m opening a request now." Just: "רגע, אני רושמת."',
+    ('Not: "I\'m opening a request now." Just: "רגע, אני רושם."',
      'Not: "I\'m opening a request now." Just: "One moment, I\'m writing this down."'),
 
-    ("    אני העוזרת הדיגיטלית של הומיז, אני פותחת פניות. איך אפשר לעזור?",
+    ("    אני העוזר הדיגיטלי של הומיז, אני פותח פניות. איך אפשר לעזור?",
      "    I'm the Homies digital assistant — I open maintenance requests. How can I help?"),
 ]
 
 
 TWINS = {
     "debt": {
-        "source": "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7",   # Debt Follow-up (he)
+        "source": "489aa39c-223d-402b-b07f-3fe53276b35b",   # Debt Follow-up (he)
         "name": "Homies — Debt Follow-up (en)",
         "stack": DEBT_STACK,
         "lines": DEBT_LINES,
@@ -719,14 +896,16 @@ TWINS = {
         ),
     },
     "intake": {
-        "source": "f482abc1-db69-422b-afdd-f7b40ca9d995",   # Inbound Intake (he)
+        "source": "7813da25-f242-4a8d-888e-51caa2ec8b3f",   # Inbound Intake (he)
         "name": "Homies — Inbound Intake (en)",
         "stack": INTAKE_STACK,
         "lines": INTAKE_LINES,
-        # No regex block: the intake prompt's language section is replaced as an
-        # ordinary exact-match entry in the table above, which gives the same
-        # match-exactly-once guarantee with less machinery.
-        "block": None,
+        # A regex block since 18 Aug. The language section used to be one exact
+        # entry in the table; it grew from 8 lines to 69 when the caller-gender
+        # rules went in, and an exact match that long breaks on every unrelated
+        # edit inside it. Anchored at both ends instead, which keeps the
+        # match-exactly-once guarantee where it is load-bearing.
+        "block": INTAKE_BLOCKS,
         # Shortened 5 Aug from "Hello, you've reached Homies building management.
         # This is Michael. How can I help?" — 6.4 seconds of TTS, and the caller
         # started speaking 0.5s in on the first real call and was talked over.
@@ -805,6 +984,25 @@ def build(source, twin):
     body["startSpeakingPlan"] = json.loads(json.dumps(stack["startSpeakingPlan"]))
     body["stopSpeakingPlan"] = json.loads(json.dumps(stack["stopSpeakingPlan"]))
     body["firstMessage"] = twin["first_message"]
+    # The idle prompts went into the shared BASE on 12 Aug, so the copy above
+    # brings the HEBREW ones across. Nothing else in this file would catch that:
+    # englished() rewrites the system prompt and nothing else, and these live in
+    # a config field. An English caller hearing "הלו? שומעים אותי?" is the exact
+    # failure the twins exist to make visible.
+    body["messagePlan"] = {
+        "idleMessages": ["Hello? Are you still there?", "Still with me?"],
+        # 12, not 8, since 18 Aug. At 8 the prompt fired "Still with me?" while a
+        # resident was thinking mid-answer, twice on real calls, and it reads as
+        # impatience. It also fights the closing handshake: that ends on a beat
+        # where the agent asks and then waits, and a prod at 8 seconds lands in
+        # exactly the pause the handshake exists to create.
+        "idleTimeoutSeconds": 12,
+        "idleMessageMaxSpokenCount": 2,
+        "idleMessageResetCountOnUserSpeechEnabled": True,
+        "silenceTimeoutMessage":
+            "It sounds like we've lost the line. Thanks for calling Homies, "
+            "have a good day, and goodbye.",
+    }
     return body
 
 

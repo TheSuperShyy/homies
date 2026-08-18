@@ -52,7 +52,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-MICHAL_ASSISTANT = "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7"
+MICHAL_ASSISTANT = "489aa39c-223d-402b-b07f-3fe53276b35b"
 SUITE_NAME = "Homies — Debt Follow-up (he)"
 
 # The variables the prompt declares. Michal is the target, so these ride in on
@@ -64,12 +64,16 @@ SUITE_NAME = "Homies — Debt Follow-up (he)"
 VARIABLES = {
     "first_name": "אליה",
     "gender": "f",
+    # The finished forms, not the code. See web/index.html: the prompt stopped
+    # branching on {{gender}} on 12 Aug, after an agent handed gender="m" said
+    # תשלחי anyway. A composed value cannot be conjugated wrongly.
+    "gender_forms": "הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי.",
     "building": "בי ג'י סי אפטאון",
     "unit": "123",
     "month": "אוגוסט",
     "amount": "500",
     "callback_number": "03-1234567",
-    "verification_email": "homiesemail@gmail.com",
+    "verification_email": "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל",
     "attempt": "1",
 }
 

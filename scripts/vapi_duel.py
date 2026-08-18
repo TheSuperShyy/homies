@@ -36,7 +36,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-MICHAL_ASSISTANT = "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7"
+MICHAL_ASSISTANT = "489aa39c-223d-402b-b07f-3fe53276b35b"
 # Empty since the 5 Aug account migration — a number does not come across with a
 # rebuild, and the new account has none. The resident's own line below is created
 # by this script when missing, so only Michal's side needs filling in by hand.
@@ -49,13 +49,17 @@ RESIDENT_NUMBER_NAME = "Homies test resident line"
 VARIABLES = {
     "first_name": "אליה",
     "gender": "f",
+    # The finished forms, not the code. See web/index.html: the prompt stopped
+    # branching on {{gender}} on 12 Aug, after an agent handed gender="m" said
+    # תשלחי anyway. A composed value cannot be conjugated wrongly.
+    "gender_forms": "הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי.",
     "building": "בי ג'י סי אפטאון",
     "unit": "123",
     "month": "אוגוסט",
     "amount": "500",
     "card_last4": "0715",
     "callback_number": "03-1234567",
-    "verification_email": "homiesemail@gmail.com",
+    "verification_email": "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל",
     "attempt": "1",
 }
 

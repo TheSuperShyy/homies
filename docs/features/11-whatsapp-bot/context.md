@@ -114,9 +114,14 @@ that thought first. The value in the script is sized for both.
 
 ## What is deliberately not here
 
-**The payment and debt flows.** They need identity verification, and the
-verification method is still open with Homies (PRD §13 #1). A payment flow behind
-an undefined identity check is worse than no payment flow.
+**The payment flows.** Anything that *moves* money still goes to a person.
+
+Reading a balance no longer does, and the identity method it was waiting on
+(PRD §13 #1) was settled on 13 Aug: a full name and a phone number, both typed
+by the resident, both landing on the same `residents` row, checked inside the
+Edge Function rather than asked for by the prompt. That answers reading, not
+paying — taking a payment needs more than knowing who is asking, and a payment
+flow behind an identity check built for reading is worse than no payment flow.
 
 **Media and voice notes.** A voice note is genuinely interesting — it is the
 voice agent's transcriber reachable from a text channel. It is also a second

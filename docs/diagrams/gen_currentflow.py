@@ -17,7 +17,7 @@ What changed against the older diagram, and why each is not a style choice:
     report and the two chat read-tools go straight to it.
   * No identify_resident and no create_staff_task. Neither exists in code.
   * open_request writes Supabase `requests`, never OXS. OXS is read-only.
-  * References are ours - HM-YYYY-NNNN from a Postgres sequence.
+  * References are ours - 255-NNNN-YY, OXS's shape, from a Postgres sequence.
 
 Colour says WHICH SYSTEM IS TOUCHED, not who is talking.
 """
@@ -283,7 +283,7 @@ column(CX[0], FLOW_Y, [
     (["Vapi  \u00b7  Inbound Intake (he/en)", "gpt-4.1-mini  \u00b7  180s cap"], AGENT),
     (["Captures type, description,", "building, unit, urgency"], AGENT),
     (["open_request", "via n8n \u2192 Edge Function", "30-minute duplicate guard"], TOOL),
-    (["requests row", "reference HM-YYYY-NNNN", "ours, a Postgres sequence"], DATA),
+    (["requests row", "reference 255-NNNN-YY", "ours, a Postgres sequence"], DATA),
     (["transfer_to_human", "\u2192 call_outcomes"], PERSON, "exit"),
     (["Reads the reference back", "once, slowly, never twice"], AGENT),
     (["end-of-call report", "interactions + transcript"], DATA),

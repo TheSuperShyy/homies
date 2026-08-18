@@ -74,6 +74,16 @@ whoever holds a handset is a different risk, and PRD §13 #1 (the verification
 method) has been open since the first spec. It now blocks two capabilities
 rather than none.
 
+> **Answered 13 Aug, for balance.** The client's security feedback settled it:
+> a balance costs a **full name and a phone number**, both typed by the
+> resident, both landing on the same `residents` row. The envelope number is a
+> signal and not an identity — a handset gets lent, shared and sold. The
+> refusal is enforced in the Edge Function rather than in the prompt, because a
+> prompt rule is a request and this one guards money. Ticket status is
+> deliberately left open: a reference number is itself a weak secret, and
+> nothing in a status answer is financial. See
+> [prompt.md](prompt.md#a-balance-needs-a-name-and-a-number-and-the-check-is-not-in-the-prompt).
+
 **Where does the data come from?** Ticket status and balance both live in OXS,
 and OXS is read-only by client rule of the same day — which is fine, because
 reading is all this needs. They are served from the Supabase copy, so their

@@ -61,9 +61,18 @@ attributing a request to the wrong person in the right flat.
 
 ## Open questions
 
-- Does Homies have a canonical building list we can import, or is it free text
-  in OXS? Settled by the OXS sample export (PRD §13 #9). Determines whether
-  loose matching is a permanent design or a stopgap.
+- ~~Does Homies have a canonical building list we can import, or is it free text
+  in OXS?~~ **Answered 13 Aug: canonical, and imported.** `/buildings` returns
+  193 records (173 active) and `/buildings/:id/apartments` returns their 4,092
+  flats; both now live in Supabase (migration 016) and refresh via
+  `scripts/oxs_buildings_sync.py`. So loose matching is a **fallback, not the
+  design** — an address is matched against the real list, and what does not
+  match is refused rather than recorded. Two measured facts changed the shape
+  of it: street + number is unique across the whole portfolio, so *the city is
+  never worth asking for*; and the registered street name is sometimes longer
+  than the spoken one (`אלתרמן נתן`), so matching needs a second,
+  number-anchored pass. See
+  [11-whatsapp-bot/prompt.md](../11-whatsapp-bot/prompt.md).
 - Should an unmatched caller be asked for a callback number? It is the one piece
   of information that makes an unmatched ticket actionable. Deferred to
   rehearsal — it costs a turn, and turns are expensive on a call.

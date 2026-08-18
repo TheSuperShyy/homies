@@ -26,7 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-ASSISTANT_ID = "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7"   # Homies — Debt Follow-up (he)
+ASSISTANT_ID = "489aa39c-223d-402b-b07f-3fe53276b35b"   # Homies — Debt Follow-up (he)
 # Empty since the 5 Aug account migration. A phone number does not come across
 # with a rebuild — the free US number (+16576083115) stayed on the old account,
 # and the new one has none. Buy or import one, then put its id here.
@@ -48,13 +48,17 @@ CUSTOMER_NUMBER = "+639910967962"
 VARIABLES = {
     "first_name": "אליה",
     "gender": "f",
+    # The finished forms, not the code. See web/index.html: the prompt stopped
+    # branching on {{gender}} on 12 Aug, after an agent handed gender="m" said
+    # תשלחי anyway. A composed value cannot be conjugated wrongly.
+    "gender_forms": "הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי.",
     "building": "בי ג'י סי אפטאון",
     "unit": "123",
     "month": "אוגוסט",            # "this month" — today is 3 Aug 2026
     "amount": "500",
     "card_last4": "0715",         # supplied as 715, padded: the field is four digits
     "callback_number": "03-1234567",
-    "verification_email": "homiesemail@gmail.com",
+    "verification_email": "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל",
     "attempt": "1",
 }
 

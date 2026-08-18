@@ -1,0 +1,116 @@
+HOMIES — THE FACTS THE BOT ANSWERS FROM
+=======================================
+
+Supplied by the client on 18 August 2026, in Hebrew, as twelve numbered
+answers to a thirteen-question list. Recorded here verbatim.
+
+THIS IS THE SOURCE, NOT THE DEPLOYMENT.
+The bot does not read this file. These facts are written into the system
+prompt, in the section headed "מידע על הומיז", in
+docs/features/11-whatsapp-bot/prompt.md — which IS the prompt, read directly
+by scripts/n8n_whatsapp.py at deploy time.
+
+So if a fact changes: edit the prompt, run `python scripts/n8n_whatsapp.py
+--apply`, and update this file to match. Editing only this file changes
+nothing the bot says. Two copies of a fact is how they drift, and this
+project has already lost an afternoon to exactly that — the greeting lived in
+the prompt and in the menu node, one was changed, and residents kept getting
+the old one.
+
+
+THE ANSWERS, AS GIVEN
+---------------------
+
+1.  שעות פעילות
+    א׳ - ה׳ 09:00-17:00
+
+2.  טלפון המשרד
+    077-6687949
+
+3.  כתובת המשרד
+    בצלאל 1 רמת גן
+
+4.  מייל
+    Office@homies-management.co.il
+
+5.  מספר לתקלות דחופות / מחוץ לשעות
+    077-6687949
+
+6.  מה כלול בתשלום ועד הבית
+    ביטוח, חשבון חשמל, חשבון מעלית, בודק מעליות, ניקיון, גינון, ביקורת גילוי
+    אש, ביקורת מערכת לשחרור עשן, טיפול במערכת המשאבות, חיטוי מאגר מים, קופה
+    קטנה לתקלות קטנות, קווי בזק למעלית ולמערכת האש, עמלות בנק, ניהול, אחזקה,
+    גביית כספים (חברת ניהול)
+
+7.  מה לא כלול
+    לא כולל עבור תיקונים או תקלות שלא מן השוטף, תקלות עקב בלאי, עקב שבר, לא
+    כולל פרוייקטים מיוחדים, לא כולל דברים שאינם נכללים בתקציב השוטף.
+
+8.  מתי משלמים
+    עד ה10 לכל חודש נוכחי, בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.
+
+9.  אמצעי תשלום
+    העברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.
+
+10. איך מגיעים לוועד הבית
+    במידה והדייר אינו מכיר את ועד הבית של הבניין, הדייר יכול לפנות אלינו,
+    ואנחנו נקשר בינהם.
+
+11. זמני טיפול
+    תקלות חירום המוגדרות בהסכם - עד 4 שעות. תקלות לא חירום - עד 3 ימי עסקים.
+
+12. אחריות הדייר מול אחריות הבניין
+    כל מה שהוגדר כחוק כ"רכוש משותף" נמצא באחריות משותף, ועד הבית וחברת ניהול,
+    כל מה שהוגדר בחוק כרכוש פרטי, נמצא תחת אחריות הדייר, במקרים בהם יש ספקות,
+    ניתן לפנות אלינו לבדיקה.
+
+
+WHAT WAS ASKED FOR AND NOT ANSWERED
+-----------------------------------
+
+* WEBSITE. Question 5 of the original thirteen. No answer given, so the bot
+  treats a website as something it does not have and hands the question to the
+  team. If Homies has one, it is one line in the prompt.
+
+
+TWO THINGS TO CHECK WITH YARIV
+------------------------------
+
+* THE EMERGENCY NUMBER IS THE OFFICE NUMBER. Answers 2 and 5 are the same, so
+  the prompt states plainly that there is no separate out-of-hours line, and
+  forbids the bot from inventing one. It follows that a resident with a burst
+  pipe at 22:00 is given a number that rings an empty office until 09:00. The
+  prompt is accurate; whether the situation is intended is a different
+  question, and the bot will now state it confidently.
+
+* THE SERVICE LEVELS ARE A COMMITMENT. "Emergencies within 4 hours,
+  everything else within 3 business days" is now something the bot will say to
+  residents. The prompt is careful that this describes the standard and never
+  a specific ticket — "yours will be done tomorrow" remains forbidden — but it
+  is still Homies' promise being repeated at scale. Confirm they are happy for
+  it to be quoted.
+
+
+RULES ATTACHED TO THESE FACTS IN THE PROMPT
+-------------------------------------------
+
+Recorded here so they are not lost if the prompt is ever rewritten:
+
+* Phone, address and email are QUOTED, never rephrased or reformatted. A
+  resident copies them; a wrong number is worse than no number.
+
+* Service levels are policy, not a promise about anyone's ticket. A specific
+  ticket is answered only from get_request_status.
+
+* Answer the question, do not recite the list. Item 6 has thirteen entries;
+  somebody asking whether cleaning is included gets "yes, cleaning is
+  included".
+
+* Never adjudicate responsibility. Item 12 ends with "in case of doubt,
+  contact us", and that ending is the operative part: where it is not
+  perfectly clear, the bot says we will check and hands over. Getting it wrong
+  costs a resident money.
+
+* Anything not on this page does not exist. No staff names, no prices, no
+  contract clauses beyond these. Those go to the team rather than being
+  guessed at.

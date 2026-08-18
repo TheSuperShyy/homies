@@ -36,12 +36,29 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-SOURCE = "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7"   # Homies — Debt Follow-up (he)
+SOURCE = "489aa39c-223d-402b-b07f-3fe53276b35b"   # Homies — Debt Follow-up (he)
 PREFIX = "Homies — Debt TEST: "
 
 # Org-level constants. Not per-resident, so they are not in the seed.
 CALLBACK_NUMBER = "03-1234567"
-VERIFICATION_EMAIL = "homiesemail@gmail.com"
+# Spoken, not written. See web/index.html for why this is a sentence rather
+than an address: a Hebrew voice given Latin text sounds it out, and guesses
+differently every reading.
+VERIFICATION_EMAIL = "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל"
+
+# The three finished forms {{gender_forms}} can take. Kept in step with the copy
+# in web/index.html by hand — there is no shared source between a Python script
+# and a static page, and both are demo-side. When the caller becomes real these
+# move into the view beside apartments_phrase and this constant goes.
+GENDER_FORMS = {
+    "f": "הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, "
+         "תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי.",
+    "m": "הנמען גבר. פנה אליו בזכר לאורך כל השיחה: אתה, שלְךָ, לְךָ, איתְּךָ, "
+         "תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה.",
+    "unknown": "מין הנמען לא ידוע. דבר בניסוחים נייטרליים בלבד ואל תנחש: צריך, "
+               "אפשר, בואו נראה, מה תרצו, אשמח לדעת. אם הוא או היא חושפים מין "
+               "בדיבור על עצמם — אני צריכה מול אני צריך — עבור מיד להטיה הזאת.",
+}
 
 # The six rows `v_debt_call_queue` returns from 002 + 005. Transcribed rather
 # than queried because Supabase is not stood up yet; when it is, replace this
@@ -137,6 +154,11 @@ def filled(source, row):
     values.pop("note", None)
     values["callback_number"] = CALLBACK_NUMBER
     values["verification_email"] = VERIFICATION_EMAIL
+    # Composed from `gender`, not passed alongside it. The prompt stopped
+    # branching on the code on 12 Aug — see web/index.html, which composes the
+    # same three strings for a live call. Derived here rather than added to the
+    # seed so the seed stays a transcription of the view.
+    values["gender_forms"] = GENDER_FORMS[row.get("gender", "unknown")]
 
     text = json.dumps(body, ensure_ascii=False)
     for k, v in values.items():

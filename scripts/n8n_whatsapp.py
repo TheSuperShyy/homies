@@ -157,12 +157,19 @@ GRAPH_VERSION = "v21.0"
 # speaker's gender on the verb, so this is grammar, not tone.
 HANDOVER_LINE = "אני מעביר את זה לצוות, נחזור בהקדם."
 
-# The same line for a conversation being held in English. Added 8 Aug after a
-# resident tapped English from the menu, was answered in English, asked about a
-# ticket, and got the Hebrew handover line back — because a "fixed line" was
-# fixed in one language. The error branch below picks between the two on the
-# language Sort detected, so a fallback cannot undo the language choice either.
-HANDOVER_LINE_EN = "I'm passing this to the team, we'll get back to you shortly."
+# HEBREW ONLY, ASKED FOR 12 AUG: *"i want the english to be removed 100% for
+# now"*. The English half of every line, the English menu, the English row and
+# the whole language-switch path are gone — not disabled behind a flag, removed,
+# because a switch that nobody can reach is a thing the next person has to read
+# and rule out. What is left is `lang`, pinned to 'he': it is written on every
+# `messages` row and the dashboard reads it, so the field stays even though it
+# now has one value.
+#
+# What went with it: HANDOVER_LINE_EN, SWITCH_LINE and MEDIA_LINE's English
+# twin (both added 8 Aug, when a fixed line fixed in one language came back in
+# the other), the lang_en / lang_he menu rows, and Sort's switch detection.
+# `git log` has them if English is ever wanted back — and the prompt section
+# that goes with them is in the same commit.
 
 # The one line for a message that carries no words. It is quoted in
 # docs/features/11-whatsapp-bot/prompt.md as one of the bot's two fixed lines,
@@ -170,20 +177,8 @@ HANDOVER_LINE_EN = "I'm passing this to the team, we'll get back to you shortly.
 # "אני קורא כאן רק טקסט" while the code sent "אני יכול לקרוא רק טקסט כרגע".
 # The code is the one a resident actually reads, so the code was made to match
 # the document rather than the other way round.
-# What a bare "speak english" gets. It is answered without the model because the
-# model answered it badly: given a message whose entire content is a request to
-# switch language, gemini-2.5-flash reached for the media line — "I can only read
-# text here" — in reply to text. There is nothing to reason about here anyway.
-# The switch is a fact Sort already established; this just confirms it and asks
-# the question that gets the conversation moving.
-SWITCH_LINE = {
-    "he": "אין בעיה, ממשיכים בעברית. מה קרה?",
-    "en": "Sure, English from here. What's up?",
-}
-
 MEDIA_LINE = {
     "he": "אני קורא כאן רק טקסט. אפשר לכתוב לי מה קרה?",
-    "en": "I can only read text here. Can you write what happened?",
 }
 
 # What a tap on 'open' or 'status' gets, without a model round-trip. Before
@@ -193,20 +188,31 @@ MEDIA_LINE = {
 # The tap already says what they want; the only useful reply is the first
 # question of that flow, and that question is the same every time — which is
 # the definition of a canned line. 'human' and 'balance' still go to the
-# agent: 'human' becomes transfer_to_human, and 'balance' becomes a
-# get_balance call — which needs no arguments on its first try (the caller's
-# own number is the lookup key), so there is no first question to can.
+# agent: 'human' becomes transfer_to_human, and 'balance' now opens with the
+# identity question (13 Aug).
+#
+# Balance is the one flow whose first question is fixed and still is NOT canned,
+# which is worth the sentence. A canned line never reaches the model, so the
+# agent has no record of having asked it — and the answer to *this* question is
+# a name and a number, which on their own could belong to any flow. 'open' and
+# 'status' get away with it because their answers say what they are: a fault
+# description or a reference number. So the model asks this one itself, and
+# remembers it.
 #
 # Same grammar rule as every other fixed line: nothing addresses the resident
 # in a gendered form.
 TAP_LINE = {
+    # The fault only, and not the building with it. Tapping this row IS the
+    # explicit request, so the offer the prompt now opens with ("shall I open a
+    # ticket?") would re-ask a question already answered — which is the one case
+    # the offer is skipped. What follows is the model asking building and
+    # apartment together, so asking for the building here would split that pair
+    # across two messages and leave the apartment dangling on its own.
     "open": {
-        "he": "מה התקלה, ובאיזה בניין?",
-        "en": "What's the fault, and which building?",
+        "he": "בסדר. מה התקלה?",
     },
     "status": {
         "he": "מה מספר הקריאה? אפשר גם רק את הספרות האחרונות — ואם אין מספר, בניין ודירה.",
-        "en": "What's the reference number? The last digits are enough — or if you don't have it, the building and apartment.",
     },
 }
 
@@ -219,19 +225,30 @@ TAP_LINE = {
 #
 # Every row works now. `balance` was the last holdout — it handed over to a
 # human until 9 Aug, when get_balance arrived. The identity question that kept
-# it there (PRD §13 #1) has a demo-grade answer rather than a real one: the
-# caller's own WhatsApp number is matched first, and building+unit or a name
-# are open fallbacks. Reading amounts is all it does; paying, receipts and
-# disputes still reach the team. `status` came off the handover path the same
-# day get_request_status arrived.
+# it there (PRD §13 #1) is answered as of 13 Aug: a balance needs a full name
+# and a phone number, typed by the resident, landing on the same record. The
+# WhatsApp envelope, a name alone and building+apartment alone were all enough
+# before, and all three are things somebody else knows. Reading amounts is all
+# it does; paying, receipts and disputes still reach the team. `status` came
+# off the handover path the same day get_request_status arrived.
 #
 # The Hebrew here obeys the same rule the prompt does: nothing addresses the
 # resident with a gendered form. "אפשרויות" rather than "בחר", which is
 # masculine imperative, and "הצוות יחזור בהקדם" rather than "יחזור אליך".
+# THE BODY IS THE GREETING, AND IT IS THE SECOND COPY OF IT.
+# A bare "היי" never reaches the model — the GREETING regex in the Sort node
+# short-circuits and this list message is sent by the workflow. So the opener
+# lives in two places that cannot share a value: the system prompt in
+# docs/features/11-whatsapp-bot/prompt.md, and here. They must say the same
+# thing, and on 13 Aug they did not: the prompt was rewritten to
+# "היי, כאן שירות הלקוחות של הומיז. במה אפשר לעזור?" and this line was left at
+# the old "היי, כאן הומיז. מה קרה?", so every resident who opened with a plain
+# hello got the old greeting from a prompt that no longer contained it. Verified
+# live on 14 Aug from a real handset. Change both or neither.
 MENU = {
     "he": {
         "type": "list",
-        "body": {"text": "היי, מיכאל מהומיז. מה קרה?"},
+        "body": {"text": "היי, כאן שירות הלקוחות של הומיז. במה אפשר לעזור?"},
         "footer": {"text": "אפשר גם לבחור מהרשימה"},
         "action": {
             "button": "אפשרויות",
@@ -244,28 +261,6 @@ MENU = {
                  "description": "יתרה, חוב, קבלה, אמצעי תשלום"},
                 {"id": "human", "title": "לדבר עם נציג",
                  "description": "הצוות יחזור בהקדם"},
-                {"id": "lang_en", "title": "English",
-                 "description": "Continue in English"},
-            ]}],
-        },
-    },
-    "en": {
-        "type": "list",
-        "body": {"text": "Hey, Michael from Homies. What's up?"},
-        "footer": {"text": "Or pick from the list"},
-        "action": {
-            "button": "Options",
-            "sections": [{"title": "Options", "rows": [
-                {"id": "open", "title": "Open a ticket",
-                 "description": "Leak, power, lift, lobby, gate"},
-                {"id": "status", "title": "Check an existing ticket",
-                 "description": "What is happening with a ticket"},
-                {"id": "balance", "title": "Balance and payments",
-                 "description": "Balance, debt, receipt, payment method"},
-                {"id": "human", "title": "Talk to a person",
-                 "description": "The team will get back to you"},
-                {"id": "lang_he", "title": "עברית",
-                 "description": "להמשיך בעברית"},
             ]}],
         },
     },
@@ -279,7 +274,7 @@ MENU = {
 # identical. Sent by the workflow, not the model: the trigger is a reference
 # number in the outgoing reply, which is exactly the marker of a completed
 # flow (open or status — both end with a reference, both deserve the offer).
-FOLLOWUP_BODY = {"he": "עוד משהו?", "en": "Anything else?"}
+FOLLOWUP_BODY = {"he": "עוד משהו?"}
 FOLLOWUP_MENU = {
     lang: dict(MENU[lang], body={"text": FOLLOWUP_BODY[lang]}) for lang in MENU
 }
@@ -501,7 +496,34 @@ def system_prompt():
     text = m.group(1).strip()
     if len(text) < 500:
         sys.exit("System prompt is %d chars — that is too short to be right." % len(text))
+    check_greeting(text)
     return text
+
+
+def check_greeting(prompt):
+    """The menu body and the prompt's opener must be the same sentence.
+
+    A bare "היי" never reaches the model: the GREETING regex in the Sort node
+    short-circuits and MENU is sent by the workflow. That makes the opener the
+    one line living in two places, and on 13 Aug they drifted — the prompt was
+    rewritten and MENU was not, so anyone starting with a plain hello got an
+    opener the prompt no longer contained, from a workflow that had just been
+    deployed and verified. Verifying the system prompt could not have caught it,
+    because the system prompt was correct.
+
+    So it is asserted rather than remembered. The prompt carries the opener as a
+    worked example, verbatim, which is exactly what makes this checkable: if the
+    two stop matching, the deploy stops.
+    """
+    body = MENU["he"]["body"]["text"]
+    if body not in prompt:
+        sys.exit(
+            "The menu greeting and the prompt's opener have drifted.\n"
+            "  MENU  : %s\n"
+            "  ...is not in %s\n"
+            "A bare greeting is answered by MENU, not by the model, so these two\n"
+            "have to be the same sentence. Fix whichever is stale, then re-run."
+            % (body, os.path.relpath(PROMPT_DOC, ROOT)))
 
 
 def api(method, path, body=None):
@@ -526,10 +548,15 @@ def api(method, path, body=None):
 # ---------------------------------------------------------------------------
 # The tools offered to the model
 # ---------------------------------------------------------------------------
-# Deliberately three. The tool webhook answers nine, but this slice is inbound
-# support only — every payment and debt tool needs an identity check whose method
-# Homies has not defined yet (PRD §13 #1), and a payment flow behind an undefined
-# identity check is worse than no payment flow. get_request_status joined on
+# Deliberately five. The tool webhook answers more, but this slice is inbound
+# support only — every tool that MOVES money still goes to a person. Reading a
+# balance stopped waiting on PRD §13 #1 on 13 Aug, when the identity method was
+# settled (a full name and a phone number, checked in the Edge Function); paying
+# has not, and a payment flow behind an identity check built for reading is
+# worse than no payment flow. `verify_address` joined 13 Aug: it is read-only,
+# returns nothing about any person, and is what lets the bot refuse a building
+# we do not manage instead of filing a ticket against it. get_request_status
+# joined on
 # 9 Aug: it is read-only and returns nothing money-shaped, which is why it does
 # not wait for the identity decision — the same call the voice agents already
 # make. It goes STRAIGHT at the Edge Function rather than through the n8n tool
@@ -541,15 +568,29 @@ def api(method, path, body=None):
 # that is worth real accuracy: it reaches for tools conservatively, and a
 # description that only states a capability under-triggers.
 
+def tool(name):
+    """One tool definition, by name.
+
+    By name and not by index. These were `TOOLS[0]`, `TOOLS[1]`, `TOOLS[3]`
+    until 13 Aug, and inserting `verify_address` into the middle of the list
+    silently repointed two nodes at the wrong descriptions — a bug that
+    deploys cleanly and shows up as a model that calls the wrong tool.
+    """
+    for t in TOOLS:
+        if t["name"] == name:
+            return t
+    raise KeyError("no tool named %r" % name)
+
+
 TOOLS = [
     {
         "name": "open_request",
         "description": (
             "Open a maintenance or service ticket for this resident. Call this "
-            "once you know what the problem is, which building and which "
-            "apartment. Returns the real reference number — you must not invent "
-            "one, and you must not tell the resident a ticket exists before this "
-            "returns."
+            "once you know what the problem is and you have run verify_address "
+            "on the building and apartment they live in. Returns the real "
+            "reference number — you must not invent one, and you must not tell "
+            "the resident a ticket exists before this returns."
         ),
         "input_schema": {
             "type": "object",
@@ -558,13 +599,49 @@ TOOLS = [
                     "type": "string",
                     "description": "What the resident said is wrong, in Hebrew, in their own words.",
                 },
+                # The same eleven the voice agents use, and the same eleven
+                # migration 014 allows: Homies' own categories, taken off their
+                # live service calls. `security` and `structural` were ours and
+                # are gone; existing rows carrying them were mapped to `other`
+                # and `maintenance` by that migration.
                 "type": {
                     "type": "string",
-                    "enum": ["plumbing", "electrical", "elevator", "cleaning",
-                             "security", "structural", "other"],
+                    "enum": ["plumbing", "electrical", "lighting", "elevator",
+                             "cleaning", "gardening", "pest_control",
+                             "locksmith", "fire_safety", "maintenance",
+                             "other"],
                 },
                 "building": {"type": "string", "description": "Street and number."},
-                "unit": {"type": "string", "description": "Apartment number."},
+                # Two apartment fields, because there are two facts and they are
+                # not the same one. `unit` is where the fault is; a lift and a
+                # lobby belong to nobody, so it is empty for them. `reporter_unit`
+                # is where the person lives, and is always sent — it is who
+                # reported this, and on chat there is no caller ID to tell us.
+                #
+                # The model does not have to keep both straight: it sends
+                # `reporter_unit` plus `fault_location`, and the server decides
+                # what `unit` becomes. That is deliberate — the old design had
+                # the model express "this is a common-area fault" by OMITTING a
+                # field, and an implicit branch is the kind this file has been
+                # burned by before.
+                "reporter_unit": {
+                    "type": "string",
+                    "description": "The apartment the person reporting LIVES in. "
+                                   "Send this every time, including for a fault "
+                                   "in the lobby or the lift. Verify it with "
+                                   "verify_address first.",
+                },
+                "fault_location": {
+                    "type": "string",
+                    "enum": ["apartment", "common"],
+                    "description": "Where the FAULT is, not where they live. "
+                                   "'apartment' for a leak in their kitchen; "
+                                   "'common' for a lift, lobby, stairwell, "
+                                   "roof, car park, gate or yard.",
+                },
+                "unit": {"type": "string",
+                         "description": "Leave empty. The server fills this from "
+                                        "reporter_unit and fault_location."},
                 "urgency": {
                     "type": "string",
                     # These four are a check constraint on requests.urgency, not
@@ -581,11 +658,41 @@ TOOLS = [
         },
     },
     {
+        "name": "verify_address",
+        "description": (
+            "Check a building — and an apartment, if there is one — against the "
+            "list of buildings Homies actually manages. Call this BEFORE "
+            "open_request, every time, as soon as the resident names where they "
+            "are. Pass `building` exactly as they wrote it; the whole sentence "
+            "is fine. Pass `unit` only for a fault inside a flat; leave it out "
+            "for a lift, lobby, stairwell or anything else in the common areas. "
+            "Returns building_found, and when the building is real: the "
+            "canonical address to file the call against, how many apartments it "
+            "has, and unit_found. When it is not real it says why — an unknown "
+            "street, or a street we manage at other numbers, and it lists those "
+            "numbers so you can offer them."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "building": {"type": "string",
+                             "description": "The building as the resident wrote "
+                                            "it — street and number, in any "
+                                            "phrasing. Required."},
+                "unit": {"type": "string",
+                         "description": "Apartment number. Only for a fault "
+                                        "inside a flat. Omit for common areas."},
+            },
+            "required": ["building"],
+        },
+    },
+    {
         "name": "get_request_status",
         "description": (
             "Call when the resident asks about an existing service call — its "
             "status, a follow-up, what happened to it. Pass the reference if "
-            "they quoted one, in any form (HM-2026-1013 or just the digits). "
+            "they quoted one, in any form (255-1013-26 whole, the old HM-2026-1013, "
+            "or just the serial). "
             "Without a reference it finds recent calls for the building and "
             "apartment. Returns up to 3 calls with reference, status "
             "(open / in_progress / resolved / cancelled), dates and "
@@ -629,23 +736,32 @@ TOOLS = [
         "description": (
             "Call when the resident asks about their balance, their debt, or "
             "how much they owe — including a tap on the balance row of the "
-            "options list. Call it with NO arguments first: the system "
-            "matches the caller's own WhatsApp number. Pass building+unit, or "
-            "a full name, only when that finds nobody or they ask about a "
-            "specific apartment. Returns the resident's name, apartment, "
-            "total owed and the unpaid months. Read-only — it cannot take a "
-            "payment; anyone who wants to actually pay, needs a receipt or "
-            "disputes an amount goes to the team."
+            "options list. IDENTITY FIRST: this needs the resident's full name "
+            "AND their phone number, both typed by them in this conversation. "
+            "Do not call it without both, do not use the number they are "
+            "messaging from, and never fill either from a guess. If they have "
+            "not given both yet, ask — one message, both facts. Returns the "
+            "resident's name, apartment, total owed and the unpaid months, or "
+            "`identity_failed` when the name and the number do not belong to "
+            "the same resident. Read-only — it cannot take a payment; anyone "
+            "who wants to actually pay, needs a receipt or disputes an amount "
+            "goes to the team."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "building": {"type": "string", "description": "Street and number."},
-                "unit": {"type": "string", "description": "Apartment number."},
                 "name": {"type": "string",
-                         "description": "The resident's full name, as given."},
+                         "description": "The resident's full name, as they typed "
+                                        "it. First name and surname, both."},
+                "phone": {"type": "string",
+                          "description": "The phone number as they typed it, "
+                                         "digits and all. Not the number the "
+                                         "message arrived from."},
+                "unit": {"type": "string",
+                         "description": "Apartment number, only when they asked "
+                                        "about one specific apartment."},
             },
-            "required": [],
+            "required": ["name", "phone"],
         },
     },
 ]
@@ -769,46 +885,35 @@ inText = text.trim() ? text : null;
 const msgType = tapped ? 'interactive' : String(msg.type || 'text');
 
 // --- Which language to answer in -------------------------------------------
-// DECIDED HERE, IN CODE, AND REMEMBERED. It was the model's job until 8 Aug and
-// it did not hold: an English menu, an English row tapped, and the Hebrew
-// handover line came back anyway — twice, reported from a real handset both
-// times. A prompt rule was competing against a conversation history that was
-// mostly Hebrew, and history won. A preference the resident set is a fact, not
-// something to re-infer from context on every turn.
+// There is one. Hebrew.
 //
-// Script detection settles the ordinary case with no guessing, because Hebrew
-// has its own Unicode block and one Hebrew character is decisive. An explicit
-// request — the menu row, or the word in either language — overrides it and
-// STICKS, which is the whole meaning of "mode".
+// The history, because this field looks vestigial and is not: language was the
+// model's job until 8 Aug and it did not hold (an English row tapped, the Hebrew
+// handover line back anyway, twice, from a real handset), so it moved into code
+// as a per-phone preference with script detection. Script detection then kept
+// firing on things that are not a language — a resident quoting HM-2026-1013 at
+// a Hebrew conversation got answered in English — so on 12 Aug it was removed
+// and Hebrew became the default with an explicit request as the only way out.
+// Later the same day the request was to remove English entirely, so the way out
+// went too.
 //
-// Stored in workflow static data, the same place duplicate suppression lives,
-// keyed on the phone. Same caveat as that map: it does not survive an n8n
-// restore. Losing it costs one message in the wrong language, which is a real
-// cost and a smaller one than the two this replaces.
-store.lang = store.lang || {};
-let asked = false;
+// `lang` stays as a constant because it is written on every `messages` row and
+// the dashboard reads it. One value today; the column does not have to change
+// if a second language ever comes back.
+const lang = 'he';
 
-if (tapped === 'lang_en' || /\benglish\b/i.test(text) || /אנגלית/.test(text)) {
-  store.lang[from] = 'en';
-  asked = true;
-} else if (tapped === 'lang_he' || /\bhebrew\b/i.test(text) || /עברית/.test(text)) {
-  store.lang[from] = 'he';
-  asked = true;
-} else if (text.trim()) {
-  // No explicit request: the script of THIS message decides, and updates the
-  // preference — someone who goes back to typing Hebrew wants Hebrew back.
-  //
-  // Only LETTERS get a vote. A bare "1020" — a resident quoting a reference
-  // number back, which the status flow explicitly invites — carries no script
-  // at all, and on 9 Aug it flipped a Hebrew conversation to English because
-  // "not Hebrew" was being read as "English". Digits, punctuation and emoji
-  // say nothing about language; they leave the choice where it was.
-  if (/[֐-׿]/.test(text)) store.lang[from] = 'he';
-  else if (/[a-z]/i.test(text)) store.lang[from] = 'en';
-}
-// A photo carries no words to detect, so it falls back to what was already
-// chosen, and to Hebrew for someone whose first ever message is an image.
-const lang = store.lang[from] || 'he';
+// --- Has this handset already been spoken to? ------------------------------
+// The menu, the two tap lines and the switch line are all sent WITHOUT the
+// model, so none of them are in the agent's memory. On 12 Aug that produced
+// exactly the fault the prompt forbids: "היי" was answered with the menu, the
+// resident wrote what broke, and the agent — looking at what it had every
+// reason to read as the first message of the conversation — introduced itself
+// a second time. No prompt rule can fix that, because from where the model
+// sits it IS the first message. So the fact is carried in on the turn, the
+// same way the language is.
+store.greeted = store.greeted || {};
+const greeted = store.greeted[from] === true;
+store.greeted[from] = true;
 
 // Media, location, stickers and reactions get the did-not-understand line
 // without touching the model. A voice note is the interesting case and is
@@ -819,28 +924,6 @@ if (!text.trim()) {
   return [{ json: {
     _reply: '', _work: false, _canned: true, _menu: false,
     to: from, lang, text: __MEDIA_LINE__[lang],
-    in_text: inText, msg_type: msgType, message_id: id,
-  } }];
-}
-
-// --- "speak english" and nothing else --------------------------------------
-// Answered here rather than by the model. Everything the request contained has
-// already been acted on above, so there is nothing left to reason about — and
-// when the model was left to do it, it replied with the media line.
-//
-// Only when the request is the WHOLE message: "speak english, there is a leak
-// in the lobby" still goes to the agent, in English, with the leak intact.
-const leftover = text
-  .replace(/\benglish\b|\bhebrew\b/ig, '')
-  .replace(/אנגלית|עברית/g, '')
-  .replace(/\b(speak|switch|to|in|please|can|you|talk|write|lets|let's)\b/ig, '')
-  .replace(/אפשר|בבקשה|לדבר|לכתוב|תדבר|תכתוב|בוא/g, '')
-  .replace(/[\s,.!?־-]/g, '');
-
-if (asked && leftover.length < 3) {
-  return [{ json: {
-    _reply: '', _work: false, _canned: true, _menu: false,
-    to: from, lang, text: __SWITCH_LINE__[lang],
     in_text: inText, msg_type: msgType, message_id: id,
   } }];
 }
@@ -896,7 +979,7 @@ if (!tapped && GREETING.test(bare)) {
 // the first `}}` it meets — embedding it in a Set node fails as "invalid
 // syntax" with the cause invisible.
 return [{ json: { _reply: '', _work: true, _canned: false, _menu: false,
-                  to: from, text, tapped, lang, message_id: id,
+                  to: from, text, tapped, lang, greeted, message_id: id,
                   in_text: inText, msg_type: msgType,
                   followup: __FOLLOWUP_MENU__[lang] } }];
 """
@@ -913,6 +996,12 @@ def from_ai(name, description):
     and the description become the tool's schema, so the description is prompt
     text and not a comment. Anything NOT wrapped in this is fixed by us and the
     model cannot touch it — which is how the phone number stays off the model.
+
+    `get_balance` has a `phone` argument, and it is not that phone. The one this
+    docstring means is the sender's, minted into the call id from the envelope
+    and untouchable. The argument is a number the resident *typed*, which is
+    half of proving who they are — and it is only worth anything because the
+    model cannot substitute the envelope one for it.
     """
     return "$fromAI('%s', %s, 'string')" % (name, json.dumps(description, ensure_ascii=False))
 
@@ -1019,7 +1108,6 @@ def workflow(e):
                 parameters={"jsCode": js(SORT, VERIFY_TOKEN=verify,
                                          APP_SECRET=app_secret,
                                          MEDIA_LINE=MEDIA_LINE, MENU=MENU,
-                                         SWITCH_LINE=SWITCH_LINE,
                                          TAP_LINE=TAP_LINE,
                                          FOLLOWUP_MENU=FOLLOWUP_MENU)},
             ),
@@ -1197,19 +1285,27 @@ def workflow(e):
                 typeVersion=3, position=[960, 60],
                 parameters={
                     "promptType": "define",
-                    # The turn carries the language decision with it, rather
-                    # than leaving the model to re-derive it from a history
-                    # that may be mostly the other language. Sort decided it
-                    # deterministically; this makes the decision impossible to
-                    # miss, on every single turn, at the top of the message.
+                    # The turn opens with the language directive even now that
+                    # there is only one language, because the failure it guards
+                    # against is not a choice between two — it is a model
+                    # answering an English-looking message in English out of
+                    # habit. A resident who writes "ok" gets Hebrew back.
                     #
                     # A directive inside the user turn rather than in the system
                     # prompt on purpose: the system prompt is constant and this
                     # is not, and a constant instruction is exactly what the
                     # model was already failing to apply against live context.
-                    "text": "={{ ($json.lang === 'en'"
-                            " ? '[Answer this message in ENGLISH.]'"
-                            " : '[ענה על ההודעה הזאת בעברית.]')"
+                    #
+                    # `greeted` rides beside it and is a fact the agent cannot
+                    # see for itself: Sort knows a menu or a tap line went out
+                    # without a model round-trip, and without being told, the
+                    # agent introduces itself again on what it reads as message
+                    # one.
+                    "text": "={{ '[ענה על ההודעה הזאת בעברית, תמיד, גם אם"
+                            " ההודעה באנגלית.]'"
+                            " + ($json.greeted"
+                            " ? ' [כבר הצגת את עצמך בשיחה הזאת. בלי שלום, בלי היי,"
+                            " ובלי להציג את עצמך שוב.]' : '')"
                             " + '\\n' + $json.text }}",
                     "options": {"systemMessage": system_prompt()},
                 },
@@ -1267,17 +1363,26 @@ def workflow(e):
                     "sendBody": True, "specifyBody": "json",
                     "jsonBody": TOOL_BODY % (
                         "open_request",
-                        "description: %s, type: %s, building: %s, unit: %s, urgency: %s" % (
-                            from_ai("description", TOOLS[0]["input_schema"]["properties"]["description"]["description"]),
-                            from_ai("type", "One of " + "/".join(TOOLS[0]["input_schema"]["properties"]["type"]["enum"])),
-                            from_ai("building", "Street and number."),
-                            from_ai("unit", "Apartment number, digits only."),
-                            from_ai("urgency", TOOLS[0]["input_schema"]["properties"]["urgency"]["description"]
+                        "description: %s, type: %s, building: %s, reporter_unit: %s,"
+                        " fault_location: %s, urgency: %s" % (
+                            from_ai("description", tool("open_request")["input_schema"]["properties"]["description"]["description"]),
+                            from_ai("type", "One of " + "/".join(tool("open_request")["input_schema"]["properties"]["type"]["enum"])),
+                            from_ai("building", "Street and number, as verify_address returned it."),
+                            # `unit` is deliberately NOT offered to the model.
+                            # The server derives it from these two, so there is
+                            # no way for the model to pin a lobby leak to a flat
+                            # by filling the wrong field.
+                            from_ai("reporter_unit",
+                                    tool("open_request")["input_schema"]["properties"]["reporter_unit"]["description"]),
+                            from_ai("fault_location",
+                                    tool("open_request")["input_schema"]["properties"]["fault_location"]["description"]
+                                    + " One of apartment/common."),
+                            from_ai("urgency", tool("open_request")["input_schema"]["properties"]["urgency"]["description"]
                                     + " One of low/normal/high/emergency."),
                         )),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
-                    "toolDescription": TOOLS[0]["description"],
+                    "toolDescription": tool("open_request")["description"],
                 },
             ),
             node(
@@ -1292,11 +1397,11 @@ def workflow(e):
                         "transfer_to_human",
                         "reason: %s" % from_ai(
                             "reason", "One of " + "/".join(
-                                TOOLS[2]["input_schema"]["properties"]["reason"]["enum"])),
+                                tool("transfer_to_human")["input_schema"]["properties"]["reason"]["enum"])),
                     ),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
-                    "toolDescription": TOOLS[2]["description"],
+                    "toolDescription": tool("transfer_to_human")["description"],
                 },
             ),
             # The one tool that skips the n8n router. The router answers Vapi
@@ -1319,24 +1424,30 @@ def workflow(e):
                         "reference: %s, building: %s, unit: %s" % (
                             from_ai("reference",
                                     "The reference the resident quoted, exactly as "
-                                    "written — HM-2026-1013 or just the digits. "
+                                    "written — 255-1013-26, an old HM-2026-1013, or just the "
+                                    "serial. "
                                     "Empty if none was quoted."),
                             from_ai("building", "Street and number, if no reference."),
                             from_ai("unit", "Apartment number, if given."),
                         )),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
-                    "toolDescription": TOOLS[1]["description"],
+                    "toolDescription": tool("get_request_status")["description"],
                 },
                 credentials=({"httpHeaderAuth": {"id": status_cred,
                                                  "name": "Homies tool secret"}}
                              if status_cred else {}),
             ),
             # Same direct-to-Edge-Function route as the status lookup, for the
-            # same reason: a balance answer has to be synchronous and live. The
-            # phone in the envelope is what the function matches on first, and
-            # it comes off the Sort item — the model cannot supply a different
-            # caller.
+            # same reason: a balance answer has to be synchronous and live.
+            #
+            # Both identity fields come from the model, which means they come
+            # from what the resident typed — that is the point. The envelope
+            # number stopped being an identity on 13 Aug: the function no
+            # longer looks at it for a balance, so there is nothing here to
+            # take off the Sort item. The check is the function's, not this
+            # node's; a model that calls the tool with a blank name gets
+            # `need_identity` back and has to go and ask.
             node(
                 id="tool_balance", name="get_balance",
                 type="n8n-nodes-base.httpRequestTool",
@@ -1349,19 +1460,61 @@ def workflow(e):
                     "sendBody": True, "specifyBody": "json",
                     "jsonBody": TOOL_BODY % (
                         "get_balance",
-                        "building: %s, unit: %s, name: %s" % (
-                            from_ai("building",
-                                    "Street and number, only if the caller's own "
-                                    "number found nobody or they asked about a "
-                                    "specific apartment. Empty otherwise."),
-                            from_ai("unit", "Apartment number, if given."),
+                        "name: %s, phone: %s, unit: %s" % (
                             from_ai("name",
-                                    "The resident's full name as they gave it, "
-                                    "if no building and unit. Empty otherwise."),
+                                    "The resident's full name exactly as they "
+                                    "typed it in this conversation — first name "
+                                    "and surname. Required."),
+                            from_ai("phone",
+                                    "The phone number exactly as they typed it "
+                                    "in this conversation. NOT the number the "
+                                    "message arrived from. Required."),
+                            from_ai("unit",
+                                    "Apartment number, only if they asked about "
+                                    "one specific apartment. Empty otherwise."),
                         )),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
-                    "toolDescription": TOOLS[3]["description"],
+                    "toolDescription": tool("get_balance")["description"],
+                },
+                credentials=({"httpHeaderAuth": {"id": status_cred,
+                                                 "name": "Homies tool secret"}}
+                             if status_cred else {}),
+            ),
+            # Straight at the Edge Function for the third time, and for the
+            # same reason as the other two: this is a lookup a resident is
+            # waiting on, not a write that can be forwarded async.
+            #
+            # It reads nothing about any person — buildings and apartment
+            # numbers only — so unlike the balance tool it has no identity
+            # question to answer. What it does have is a job to do BEFORE
+            # open_request, which is the one ordering the prompt has to enforce
+            # and this node cannot.
+            node(
+                id="tool_address", name="verify_address",
+                type="n8n-nodes-base.httpRequestTool",
+                typeVersion=4.2, position=[2400, 420],
+                parameters={
+                    "method": "POST",
+                    "url": fn_url,
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendBody": True, "specifyBody": "json",
+                    "jsonBody": TOOL_BODY % (
+                        "verify_address",
+                        "building: %s, unit: %s" % (
+                            from_ai("building",
+                                    "The building as the resident wrote it — "
+                                    "street and number, any phrasing. The whole "
+                                    "sentence is fine. Required."),
+                            from_ai("unit",
+                                    "Apartment number, only for a fault inside "
+                                    "a flat. Empty for a lift, lobby, stairwell "
+                                    "or anything in the common areas."),
+                        )),
+                    "options": {"timeout": 25000},
+                    "descriptionType": "manual",
+                    "toolDescription": tool("verify_address")["description"],
                 },
                 credentials=({"httpHeaderAuth": {"id": status_cred,
                                                  "name": "Homies tool secret"}}
@@ -1376,10 +1529,10 @@ def workflow(e):
                 parameters={"assignments": {"assignments": [
                     {"id": "to", "name": "to", "type": "string",
                      "value": "={{ $('Sort').item.json.to }}"},
+                    # A literal, not an expression: one language, one line. It
+                    # picked between two on `lang` until 12 Aug.
                     {"id": "text", "name": "text", "type": "string",
-                     "value": "={{ $('Sort').first().json.lang === 'en' ? %s : %s }}"
-                              % (json.dumps(HANDOVER_LINE_EN, ensure_ascii=False),
-                                 json.dumps(HANDOVER_LINE, ensure_ascii=False))},
+                     "value": HANDOVER_LINE},
                 ]}, "options": {}},
             ),
             node(
@@ -1596,6 +1749,8 @@ def workflow(e):
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "get_balance": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
+            "verify_address": {"ai_tool": [[
+                {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
         },
     }
 
@@ -1660,7 +1815,18 @@ def main():
         wid = api("POST", "/api/v1/workflows", wf)["id"]
         print("\ncreated %s" % wid)
     print("%s/workflow/%s" % (base, wid))
-    print("\nNot active yet. Run with --activate, then add the callback URL in Meta.")
+
+    # Read the state back rather than asserting one. This printed "Not active
+    # yet. Run with --activate" unconditionally, including after updating a
+    # workflow that was already live and stayed live — which on 13 Aug read as
+    # "the deploy just took the bot down" and cost a scare and a round of
+    # checking. A PUT does not deactivate anything; the line was simply never
+    # true on the update path.
+    state = api("GET", "/api/v1/workflows/%s" % wid)
+    if state.get("active"):
+        print("\nActive. The change is live now — n8n reloads the workflow on save.")
+    else:
+        print("\nNot active. Run with --activate, then add the callback URL in Meta.")
 
 
 if __name__ == "__main__":

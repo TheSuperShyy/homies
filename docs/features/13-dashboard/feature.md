@@ -135,7 +135,7 @@ either way, and a total that changed with the view would be a bug pretending
 to be a feature.
 
 Hebrew is handled with `dir="auto"` per element rather than a right-to-left
-layout: Hebrew flows correctly while a reference like `HM-2026-1013` inside the
+layout: Hebrew flows correctly while a reference like `255-1013-26` inside the
 same sentence stays left-to-right. A full RTL chrome is a bigger job and belongs
 with the Hebrew review of the whole product.
 
