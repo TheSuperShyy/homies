@@ -1,54 +1,97 @@
-// Ten rows a page, everywhere. A list nobody can see the end of reads as
-// "there is more" and hides its own size; a pager states the total and lets
-// somebody link a colleague to page four.
+// The pager, and the page size, for every list on the dashboard.
+//
+// A list nobody can see the end of reads as "there is more" and hides its own
+// size; a pager states the total and lets somebody link a colleague to page
+// four. The size picker is part of that link: reviewing a hundred debtors and
+// checking one ticket are different jobs, and ten rows is only right for one of
+// them.
 //
 // Offset-based over a stable sort. Rows arriving between clicks shift the
 // window slightly, which is the right trade for a review dashboard.
-export const PAGE_SIZE = 10;
+export const PAGE_SIZES = [10, 25, 50] as const;
+export const PAGE_SIZE = PAGE_SIZES[0];
+
+export type PagerParams = Record<string, string | undefined>;
 
 export function pageFrom(searchParams?: { page?: string }) {
   return Math.max(1, parseInt(searchParams?.page ?? '1', 10) || 1);
 }
 
+/** The rows-per-page from the URL. Anything not on the list falls back to 10,
+ *  so `?per=1000` cannot be used to pull the whole table down in one request. */
+export function sizeFrom(searchParams?: { per?: string }): number {
+  const n = parseInt(searchParams?.per ?? '', 10);
+  return (PAGE_SIZES as readonly number[]).includes(n) ? n : PAGE_SIZE;
+}
+
+/** What `per` should carry in a link — omitted at the default so the common
+ *  URL stays clean and a shared link means what it looks like. */
+export function perParam(size: number): string | undefined {
+  return size === PAGE_SIZE ? undefined : String(size);
+}
+
 /** [from, to] for Supabase `.range()`. */
-export function pageRange(page: number): [number, number] {
-  const from = (page - 1) * PAGE_SIZE;
-  return [from, from + PAGE_SIZE - 1];
+export function pageRange(page: number, size: number = PAGE_SIZE): [number, number] {
+  const from = (page - 1) * size;
+  return [from, from + size - 1];
 }
 
 /** The slice of an in-memory array for this page. */
-export function pageSlice<T>(rows: T[], page: number): T[] {
-  const [from] = pageRange(page);
-  return rows.slice(from, from + PAGE_SIZE);
+export function pageSlice<T>(rows: T[], page: number, size: number = PAGE_SIZE): T[] {
+  const [from] = pageRange(page, size);
+  return rows.slice(from, from + size);
 }
 
 export function Pager({
   page, total, basePath, params = {}, unit = 'rows',
+  size = PAGE_SIZE, prev = 'Previous', next = 'Next',
 }: {
   page: number;
   total: number;
   basePath: string;
-  params?: Record<string, string | undefined>;
+  params?: PagerParams;
   unit?: string;
+  size?: number;
+  prev?: string;
+  next?: string;
 }) {
-  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  if (pages <= 1) return null;
+  const pages = Math.max(1, Math.ceil(total / size));
 
-  const href = (p: number) => {
+  // Hidden only when no size on offer would change what is on screen. With
+  // more rows than the smallest size the picker still earns its place even on
+  // a single page — that is how somebody at 50 gets back to 10.
+  if (total <= PAGE_SIZE) return null;
+
+  const href = (p: number, s: number) => {
     const q = new URLSearchParams();
     for (const [k, v] of Object.entries(params)) if (v) q.set(k, v);
+    const per = perParam(s);
+    if (per) q.set('per', per);
     if (p > 1) q.set('page', String(p));
-    const s = q.toString();
-    return s ? `${basePath}?${s}` : basePath;
+    const str = q.toString();
+    return str ? `${basePath}?${str}` : basePath;
   };
 
   return (
     <div className="pager">
-      {page > 1 ? <a href={href(page - 1)}>&larr; Previous</a>
-                : <span className="muted">&larr; Previous</span>}
+      {/* Changing the size always lands on page one. Page nine of ninety at
+          ten rows is page two at fifty, and there is no honest way to guess
+          which of those somebody meant — the first page is the one that is
+          never empty. */}
+      <span className="per">
+        <span className="muted">rows</span>
+        {PAGE_SIZES.map((n) => (
+          <a key={n} href={href(1, n)} className={n === size ? 'on' : ''}
+             aria-current={n === size ? 'true' : undefined}>{n}</a>
+        ))}
+      </span>
       <span className="muted mono">page {page} of {pages} · {total} {unit}</span>
-      {page < pages ? <a href={href(page + 1)}>Next &rarr;</a>
-                    : <span className="muted">Next &rarr;</span>}
+      <span className="nav">
+        {page > 1 ? <a href={href(page - 1, size)}>&larr; {prev}</a>
+                  : <span className="muted">&larr; {prev}</span>}
+        {page < pages ? <a href={href(page + 1, size)}>{next} &rarr;</a>
+                      : <span className="muted">{next} &rarr;</span>}
+      </span>
     </div>
   );
 }

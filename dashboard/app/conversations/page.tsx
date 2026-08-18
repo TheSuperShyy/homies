@@ -1,11 +1,12 @@
 import { serverClient } from '@/lib/supabase-server';
-import { Pager, pageFrom, pageRange } from '@/components/pager';
+import { Pager, pageFrom, pageRange, sizeFrom } from '@/components/pager';
 
 export default async function Conversations({
   searchParams,
-}: { searchParams?: { page?: string } }) {
+}: { searchParams?: { page?: string; per?: string } }) {
   const page = pageFrom(searchParams);
-  const [from, to] = pageRange(page);
+  const size = sizeFrom(searchParams);
+  const [from, to] = pageRange(page, size);
   const { data, error, count } = await serverClient()
     .from('v_conversations').select('*', { count: 'exact' })
     .order('last_message_at', { ascending: false }).range(from, to);
@@ -45,7 +46,7 @@ export default async function Conversations({
           </table>
         ) : !error && <div className="empty">No conversations yet.</div>}
       </div>
-      <Pager page={page} total={count ?? 0} basePath="/conversations"
+      <Pager page={page} size={size} total={count ?? 0} basePath="/conversations"
              unit="conversations" />
     </>
   );

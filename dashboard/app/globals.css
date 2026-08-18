@@ -39,9 +39,24 @@ main { padding: 26px; }
 .tabs a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .pager {
   display: flex; justify-content: space-between; align-items: center;
-  gap: 14px; margin-top: 14px; font-size: 14px;
+  gap: 14px; margin-top: 14px; font-size: 14px; flex-wrap: wrap;
 }
 .pager a { color: var(--accent); }
+/* Three groups, so the count stays centred whether or not the size picker is
+   showing. `nav` keeps Previous and Next together at the right rather than
+   pushed to opposite ends by the space-between. */
+.pager .per, .pager .nav { display: flex; align-items: center; gap: 8px; }
+.pager .per { font-size: 12px; }
+/* Links, not a <select>: every other control on this dashboard is a URL, and a
+   dropdown would need client JS to navigate. */
+.pager .per a {
+  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line);
+  color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.pager .per a:hover { color: var(--ink); border-color: var(--muted); }
+.pager .per a.on {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
 h1 { font-size: 19px; margin: 0 0 18px; font-weight: 600; letter-spacing: -0.01em; }
 h2 { font-size: 14px; margin: 26px 0 10px; font-weight: 600; color: var(--muted); }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }

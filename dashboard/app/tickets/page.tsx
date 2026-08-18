@@ -1,6 +1,6 @@
 import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase-server';
-import { Pager, pageFrom, pageRange } from '@/components/pager';
+import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
 
 // The four values the check constraint on requests.status accepts. The list is
 // duplicated from the schema on purpose: the server action validates against
@@ -25,10 +25,11 @@ async function updateStatus(formData: FormData) {
 // somebody can send to a colleague.
 export default async function Tickets({
   searchParams,
-}: { searchParams: { status?: string; page?: string } }) {
+}: { searchParams: { status?: string; page?: string; per?: string } }) {
   const status = searchParams.status;
   const page = pageFrom(searchParams);
-  const [from, to] = pageRange(page);
+  const size = sizeFrom(searchParams);
+  const [from, to] = pageRange(page, size);
   let q = serverClient()
     .from('requests')
     .select('reference,description,building,unit,type,urgency,status,opened_via,created_at',
@@ -40,12 +41,23 @@ export default async function Tickets({
 
   const tabs = ['', ...STATUSES];
 
+  // The chosen size survives a change of tab. Picking 50 and then filtering to
+  // "open" should not quietly hand back ten rows.
+  const per = perParam(size);
+  const tabHref = (t: string) => {
+    const q = new URLSearchParams();
+    if (t) q.set('status', t);
+    if (per) q.set('per', per);
+    const s = q.toString();
+    return s ? `/tickets?${s}` : '/tickets';
+  };
+
   return (
     <>
       <h1>Tickets</h1>
       <nav style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
         {tabs.map((t) => (
-          <a key={t || 'all'} href={t ? `/tickets?status=${t}` : '/tickets'}
+          <a key={t || 'all'} href={tabHref(t)}
              className="pill" style={{ opacity: (status ?? '') === t ? 1 : 0.55 }}>
             {t || 'all'}
           </a>
@@ -85,7 +97,7 @@ export default async function Tickets({
           </table>
         ) : !error && <div className="empty">No tickets{status ? ` with status ${status}` : ''}.</div>}
       </div>
-      <Pager page={page} total={count ?? 0} basePath="/tickets"
+      <Pager page={page} size={size} total={count ?? 0} basePath="/tickets"
              params={{ status }} unit="tickets" />
     </>
   );

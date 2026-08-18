@@ -1,5 +1,5 @@
 import { serverClient } from '@/lib/supabase-server';
-import { PAGE_SIZE } from '@/components/pager';
+import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
 
 // One page, four views, state in the URL. The two extra views answer the two
 // questions ops actually asks after an outbound day: who never picked up, and
@@ -12,40 +12,37 @@ const TABS = [
   ['links', 'Links sent'],
 ] as const;
 
-function href(view: string, page: number) {
+// Tabs and pager both go through the shared component now, so the only local
+// concern left is that switching view keeps the rows-per-page and drops the
+// page number: page four of "all calls" is not page four of "no answer".
+function tabHref(view: string, size: number) {
   const q = new URLSearchParams();
   if (view !== 'all') q.set('view', view);
-  if (page > 1) q.set('page', String(page));
+  const per = perParam(size);
+  if (per) q.set('per', per);
   const s = q.toString();
   return s ? `/calls?${s}` : '/calls';
 }
 
-function Tabs({ view }: { view: string }) {
+function Tabs({ view, size }: { view: string; size: number }) {
   return (
     <nav className="tabs">
       {TABS.map(([key, label]) => (
-        <a key={key} href={href(key, 1)} className={view === key ? 'on' : ''}>{label}</a>
+        <a key={key} href={tabHref(key, size)} className={view === key ? 'on' : ''}>{label}</a>
       ))}
     </nav>
   );
 }
 
-// Pagination is offset-based over a created_at-descending order. New rows
-// arriving between clicks shift the window slightly; for a review dashboard
-// that beats cursor bookkeeping.
-function Pager({ view, page, total }: { view: string; page: number; total: number }) {
-  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  if (pages <= 1) return null;
+// Newer/Older rather than Previous/Next: every view here is ordered newest
+// first, and "previous" is ambiguous about which way that runs.
+function CallPager({ view, page, size, total }: {
+  view: string; page: number; size: number; total: number;
+}) {
   return (
-    <div className="pager">
-      {page > 1
-        ? <a href={href(view, page - 1)}>&larr; Newer</a>
-        : <span className="muted">&larr; Newer</span>}
-      <span className="muted mono">page {page} of {pages} · {total} rows</span>
-      {page < pages
-        ? <a href={href(view, page + 1)}>Older &rarr;</a>
-        : <span className="muted">Older &rarr;</span>}
-    </div>
+    <Pager basePath="/calls" page={page} size={size} total={total}
+           params={{ view: view === 'all' ? undefined : view }}
+           prev="Newer" next="Older" unit="rows" />
   );
 }
 
@@ -53,13 +50,8 @@ function when(ts?: string | null) {
   return ts ? ts.slice(0, 16).replace('T', ' ') : '—';
 }
 
-function range(page: number): [number, number] {
-  const from = (page - 1) * PAGE_SIZE;
-  return [from, from + PAGE_SIZE - 1];
-}
-
-async function NoAnswer({ page }: { page: number }) {
-  const [from, to] = range(page);
+async function NoAnswer({ page, size }: { page: number; size: number }) {
+  const [from, to] = pageRange(page, size);
   const { data, error, count } = await serverClient()
     .from('call_outcomes')
     .select('id,attempt,created_at,residents(full_name,phone,building,unit)', { count: 'exact' })
@@ -91,13 +83,13 @@ async function NoAnswer({ page }: { page: number }) {
           </table>
         ) : !error && <div className="empty">Nobody has gone unanswered yet.</div>}
       </div>
-      <Pager view="no_answer" page={page} total={count ?? 0} />
+      <CallPager view="no_answer" page={page} size={size} total={count ?? 0} />
     </>
   );
 }
 
-async function LinksSent({ page }: { page: number }) {
-  const [from, to] = range(page);
+async function LinksSent({ page, size }: { page: number; size: number }) {
+  const [from, to] = pageRange(page, size);
   const { data, error, count } = await serverClient()
     .from('payment_links')
     .select('id,amount,period,status,created_at,residents(full_name,phone,building,unit)', { count: 'exact' })
@@ -129,7 +121,7 @@ async function LinksSent({ page }: { page: number }) {
           </table>
         ) : !error && <div className="empty">No payment links sent yet.</div>}
       </div>
-      <Pager view="links" page={page} total={count ?? 0} />
+      <CallPager view="links" page={page} size={size} total={count ?? 0} />
       <p className="muted" style={{ fontSize: 13 }}>
         &ldquo;sent&rdquo; means OXS confirmed the link went out — whether it was <em>paid</em> is
         only visible in OXS, so nothing here counts as money received.
@@ -138,9 +130,11 @@ async function LinksSent({ page }: { page: number }) {
   );
 }
 
-async function CallList({ view, page }: { view: string; page: number }) {
+async function CallList({ view, page, size }: {
+  view: string; page: number; size: number;
+}) {
   const direction = view === 'inbound' || view === 'outbound' ? view : undefined;
-  const [from, to] = range(page);
+  const [from, to] = pageRange(page, size);
   let q = serverClient()
     .from('interactions')
     .select('id,external_call_id,direction,caller_phone,summary,transcript,disposition,duration_seconds,latency_ms,started_at', { count: 'exact' })
@@ -186,21 +180,24 @@ async function CallList({ view, page }: { view: string; page: number }) {
           </div>
         )}
       </div>
-      <Pager view={view} page={page} total={count ?? 0} />
+      <CallPager view={view} page={page} size={size} total={count ?? 0} />
     </>
   );
 }
 
-export default async function Calls({ searchParams }: { searchParams?: { view?: string; page?: string } }) {
+export default async function Calls({
+  searchParams,
+}: { searchParams?: { view?: string; page?: string; per?: string } }) {
   const view = searchParams?.view ?? 'all';
-  const page = Math.max(1, parseInt(searchParams?.page ?? '1', 10) || 1);
+  const page = pageFrom(searchParams);
+  const size = sizeFrom(searchParams);
   return (
     <>
       <h1>Calls</h1>
-      <Tabs view={view} />
-      {view === 'no_answer' ? <NoAnswer page={page} />
-        : view === 'links' ? <LinksSent page={page} />
-        : <CallList view={view} page={page} />}
+      <Tabs view={view} size={size} />
+      {view === 'no_answer' ? <NoAnswer page={page} size={size} />
+        : view === 'links' ? <LinksSent page={page} size={size} />
+        : <CallList view={view} page={page} size={size} />}
     </>
   );
 }

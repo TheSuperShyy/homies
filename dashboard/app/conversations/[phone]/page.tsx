@@ -33,7 +33,7 @@ export default async function Thread({ params }: { params: { phone: string } }) 
                   {m.message_type !== 'text' && ` · ${m.message_type}`}
                 </div>
                 {/* dir="auto" per bubble: Hebrew flows right-to-left while a
-                    reference like HM-2026-1013 inside it stays left-to-right. */}
+                    reference like 255-1013-26 inside it stays left-to-right. */}
                 <div dir="auto">{m.body ?? <span className="muted">({m.message_type}, no text)</span>}</div>
               </div>
             ))}
