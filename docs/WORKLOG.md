@@ -9,7 +9,2186 @@ conversation that produced it.
 
 ---
 
+## 2026-08-18
+
+### It stopped deciding the call was over — and the line it closed on was the worst one yet
+
+Fourth English debt call. The resident refused, then gave the reason: *"I'm
+paying, and the elevator is still not fixed."* The agent opened a request, asked
+if there was anything else, heard *"No. I mean, I already created a ticket, I
+forwarded this to the office two weeks ago, and—"*, and said:
+
+> I hear that the lift has been open with the office for two weeks, and it's
+> still broken. **Since you don't want to pay this, I'll leave it there.**
+> Thank you for your time. Have a good day.
+
+Reported as *"it decides for itself"*, which is exactly right. Four separate
+things, and they compound.
+
+**1. A "no" with a sentence after it is not a no.** The handshake pushed an hour
+earlier says a reply that is not a yes or a no puts you back in the call. This
+reply *started* with "no" and then kept going, and the word was taken as the
+answer while the sentence was still running. Now written as its own rule: a
+*but*, an *I mean*, a fact, a complaint — **that** is the answer, and the answer
+is that they have not finished. Wait for a turn that stops.
+
+**2. Never say why you are ending the call.** Absolute rule 14. Saying somebody's
+own position back to them as the reason for hanging up is a company deciding a
+person is not worth talking to, on the one subject where they were owed an
+answer. **A closing that explains itself is a closing that is blaming somebody**,
+and they are allowed to say no. Every call closes the same way whatever happened
+in it.
+
+**3. Withholding payment because something is broken now has its own path**, and
+it needed one — it is the commonest reason a resident in a managed building stops
+paying, and the prompt had nothing for it. It is not a refusal to be accepted and
+closed on: it is one sentence with a refusal and a complaint in it. Say back the
+specific broken thing in their words, then `transfer_to_human` with reason
+`dispute`, because money set against a service failure is a judgement nobody on
+this call may make. **And do not explain what the fee covers here** — in that
+position it reads as an argument for why they should pay for something that does
+not work.
+
+**4. It opened a duplicate ticket.** The resident had already reported the lift to
+the office two weeks earlier; the agent filed a second request before hearing
+that, and this call has no way to see the first — the debt agent carries
+`open_request` and not `get_request_status`. Now: *"I opened a ticket"* or *"I've
+been on to the office for two weeks"* means do **not** file another. Two rows for
+one broken lift tells the office nothing it did not know. Hand it over instead.
+
+Hebrew 61,363 chars, English twin 59,935, 7 tools with servers on both, idle 12s.
+
+**Worth noticing about the shape of these four calls:** every fix so far has been
+a rule against something the model did once. Three of the four today were the
+model *deciding* — that a beat was answered, that a refusal was terminal, that a
+complaint had been dealt with by filing it. The prompt is now explicit that the
+resident ends the call, not the agent, and that is the through-line.
+
+
+### The closing becomes a handshake, and the idle prompt stops interrupting
+
+A third English debt call, ending: *"can you make it slower" / "let me lower" ->
+number re-read -> "have a good day"*. Asked why the call ended automatically.
+
+**Because the words are the switch.** `endCallPhrases` carries "have a good day",
+and `endCallFunctionEnabled` is **false** — so the model has no tool to hang up
+with and the phrase match is the only way a call ends short of a timeout. That is
+deliberate, and it is why the prompt insists the closing never drifts into כל טוב
+or ביי. The cost is that a premature closing cannot be recovered from: there is
+no turn after it.
+
+**Why it chose to say it there** is the actual bug. It asked *"is there anything
+else?"* — but bolted onto the end of the turn that read out the office number.
+What came back was *"can you make it slower"*, which is not an answer to that
+question. It re-read the number, counted the beat as answered, and closed. **A
+question sharing a turn with a fact gets answered about the fact.**
+
+So the four beats became a handshake, and three things that are not style:
+
+- **Nothing shares a turn with the "anything else?".** Not a phone number, not a
+  reference, not the handover line, not a thank-you.
+- **Nothing shares a turn with the closing.** No last detail, no thanks-then-close
+  in one breath — the phrase ends the call and anything saved for afterwards is
+  never said.
+- **A reply that is not a yes or no to that question is not an answer to it.** A
+  repeat request, a correction, a number said back — all put you back in the
+  call. Handle it, ask again in its own turn, wait again. **No limit on how many
+  times that loop runs.** The call ends when they say it does, not when the agent
+  has run out of business.
+
+Now **absolute rule 13** as well, since rule 12 said to ask and this says how.
+
+**Rule 10 gained the failure by name.** The same call had the agent say
+*"Reason. Dispute. Friction."* out loud — the argument to `transfer_to_human`,
+read as though it were a sentence. The rule already forbade speaking a value; it
+now names what happened, on the same principle as the reference read-back fix:
+"exactly" is what the model already thought it was doing.
+
+**`idleTimeoutSeconds` 8 -> 12 on all four assistants.** At 8 the prompt fired
+"Still with me?" into a resident's thinking pause, twice on real calls. It also
+worked against the change above: the handshake ends on a beat where the agent
+asks and then waits, and a prod at 8 seconds lands in exactly the pause the
+handshake exists to create.
+
+**And it was hardcoded in two build scripts**, which is the part that would have
+undone it silently: `vapi_en.py` writes `messagePlan` on every twin rebuild and
+`vapi_sync.py` on every Hebrew push, both with 8. Patched with the reason, or the
+next routine rebuild reverts a live setting and nothing reports it.
+
+Hebrew 58,784 chars, English twin 57,356, 59 passages + 4 blocks, 7 tools with
+servers on both.
+
+**Still open from the same transcript:** the TTS says "HOMEies" for Homies, on the
+first word of every call.
+
+
+### The call stops hanging up on people, and the email it was reading out was invented
+
+A second English debt call from the client. Three things wrong in it, and the one
+that was not reported is the one that costs money.
+
+**The email was wrong.** The agent said *"send the confirmation to office at
+homies dot co dot e l"*. There is no such address. The real one arrived this
+morning in the client's own FAQ — `Office@homies-management.co.il` — and the demo
+page had been sending `office@homies.co.il` since 12 Aug, with the test scripts
+saying `homiesemail@gmail.com`. Both invented, both flagged in HANDOVER as
+"nobody has confirmed either is real", and today one of them was read to a
+resident who was asked to send proof of payment to it. **A wrong address does not
+bounce to us. It bounces to them, days later, after they think the dispute is
+being looked at.** Corrected in `web/index.html` (both the Hebrew spoken form and
+the English), `docs/assistant/debt-followup.md`, `scripts/voice_guard.py` and
+HANDOVER. The hyphen is now said — מקף — because without it the address is a
+different one.
+
+**The call hung up on her.** Reported as *"it auto ends the call"*. It does, and
+not metaphorically: `endCallPhrases` carries "have a good day", so the phrase
+**is** the switch — Vapi releases the line the instant the model says it, and
+there is no turn afterwards for the resident to be in. The rule added this
+morning ("before you close, ask whether there is anything else") lives in ENDING
+THE CALL, and this call went out through the handover path, which said in as many
+words: *"do not ask another question."*
+
+So it is now an **absolute rule (12)**, in the section that the fixed paths do
+not override, and the close is written as a sequence rather than a preference:
+
+    1. the last piece of business
+    2. their answer to it
+    3. "anything else?"   <- ITS OWN TURN. Stop. Wait.
+    4. their answer, and only then the closing
+
+**Beat 3 holds on every path**, handovers included — somebody being passed to the
+office is the person most likely to have one more thing to say — and including a
+resident who has just said stop calling me, which is a reason to be quick and not
+a reason to hang up mid-thought. The handover path is four steps now, not three.
+And the failure mode is named, because it is the one a model reaches for:
+*"anything else? okay, have a good day"* in one breath is the same as not asking,
+since the phrase has already ended the call.
+
+**And the middle of the call was nonsense, which was the "not solid" part.** The
+call was about apartment 7. She said *"actually, apartment twelve. Not apartment
+seven."* The agent replied that apartment 7 was still open, *"so the records don't
+match on apartment twelve"*, and offered a link for apartment 7. She was not
+disputing a payment — she was saying the call had the wrong flat, and the tools
+will not take a flat that is not on the call anyway. The dispute section now
+handles an apartment that is **not on this call** separately: name the apartment
+this call is about, ask once whether it is theirs, and if it is not, stop
+collecting — `transfer_to_human` with reason `ownership`.
+
+Hebrew 56,692 chars, English twin 55,264, 59 passages + 4 blocks, no Hebrew left.
+The two new closing passages needed real entries rather than translations: each
+names the phrase that ends the call, and it is a **different phrase per language**
+— יום טוב against "have a good day", both in `endCallPhrases`. A literal rendering
+would have named a phrase the English twin never says, which is the same as
+naming none.
+
+**Not changed, and worth a decision:** `idleTimeoutSeconds` is 8. "Still with me?"
+fired while she was thinking, mid-exchange, and reads as impatience in the
+transcript. The four-beat close now depends on a pause at beat 4 being allowed to
+happen, so 8 seconds may be too short for the thing it is meant to protect.
+
+
+### The account move is one script now, and blocker 1 turned out to be soluble
+
+Asked for the Vapi setup cloned 100% and ready to transfer. Written as
+`scripts/vapi_transfer.py`.
+
+**Blocker 1 of the runbook is gone, and it was the dangerous one.**
+`new-vapi.md` has said since 7 Aug that the Cartesia credential "does not travel"
+and must be re-added by hand — and that losing it makes no noise, because Vapi
+falls back to `vapi/Elliot` and the Hebrew agent talks with an American accent
+while nothing errors and the billing reports Elliot either way. **`CARTESIA_API_KEY`
+is in `.env`.** The credential can simply be created through the API, so the
+script does, and refuses to continue if the key is absent rather than producing
+an account that sounds wrong to one person in ten.
+
+**Step 6 is the one that has broken every move**, and it is now mechanical:
+**17 ids across 10 files**, rewritten from the map that creating the assistants
+produced. That step is dangerous precisely because a wrong id does not error —
+the call connects to the wrong agent, or to one that no longer exists. It is how
+the demo page spent a day calling account 3 after everything else had moved.
+
+    web/index.html                         4     docs/assistant/demo-inbound.md    3
+    scripts/vapi_en.py                     2     docs/assistant/debt-followup.md   2
+    vapi_call / duel / eval / mock         1 ea   inbound-test-script.md           1
+                                                 04-interruption-pacing/feature.md 1
+
+**It copies all four assistants rather than rebuilding the Hebrew pair, and that
+is deliberate.** The runbook rebuilds from markdown, which is right when the goal
+is a working account. It is wrong when the goal is a *clone*: a rebuild produces
+what the repo says should be live, a copy produces what **is** live, and those
+differ the moment somebody edits the dashboard. Finding that out after a
+migration is the failure this exists to prevent.
+
+**Guards, each from something in this file's history:**
+
+- `--to` names the **variable** in `.env`, never the key. A key on a command line
+  lands in shell history and this repository is public.
+- Refuses a target that already holds Homies assistants — creating by name again
+  gives four duplicates and no error, and the repoint would pick whichever came
+  back first. Verified against account 4, which still holds all four.
+- Refuses to clone onto the account it is reading from.
+- `restore()` puts real values back where the export wrote `<redacted>`, for the
+  `--from-export` path. A tool server header restored with the literal string
+  authenticates as nobody: 401 from the Edge Function, nothing about the call
+  fails, and the resident is told a request was opened that does not exist.
+- It does **not** move `VAPI_PRIVATE_KEY`. The old account stays reachable until
+  somebody decides otherwise.
+
+**A dry run against account 4 collided, and that exposed a flaw in my own
+script:** it exited on the collision and printed no plan. A dry run that refuses
+to tell you what it would have done is useless. It now warns and continues; only
+`--apply` stops. Full dry run verified end to end — 4 creates, 17 id rewrites.
+
+**What still cannot be automated: the public key.** `GET /org` returns 401 to a
+private key, so there is no way to read it. It goes in `.env` and in
+`web/index.html` by hand, and without it the demo page loads and no call starts.
+Call history, transcripts and recordings stay behind — recordings are deleted
+after 14 days regardless. Riley is not ours and is skipped; each account mints
+its own.
+
+**Found on the way: `VAPI_ASSISTANT_ID` in `.env` is stale and nothing reads
+it.** It points at no live assistant, and a grep across `scripts/`, `web/` and
+`dashboard/` returns nothing. Dead config — left alone rather than edited,
+since `.env` is the client's, but it should go.
+
+
+### The Vapi export is refreshed and hardened — after I wrote a duplicate of it
+
+Asked to back up what is live. **I wrote `scripts/vapi_backup.py` and a
+`vapi/backup/` tree, then found `scripts/vapi_export.py` already existed**,
+already written to `docs/handover/vapi-export.json`, already referenced by
+`new-vapi.md`, and already fetching two collections mine missed — `/credential`
+and `/workflow`. `/credential` is the important one: it is the Cartesia key,
+which is blocker 1 of the whole account move. Mine was deleted and its two real
+improvements folded into the existing script. Two backup mechanisms is the exact
+drift this session has spent all day warning about.
+
+**What went in:**
+
+- **Redaction by value, not by field name.** It blanked anything under a key
+  called `headers`. It now also loads every credential-shaped value from `.env`
+  and replaces it wherever it appears under any key, then **refuses to write** if
+  one survives. A list of field names misses the field somebody adds next month.
+- **`--check`**, which re-scans every export on disk.
+- **`--archive <label>`**, which writes the dated copy in the same run. The
+  historical exports — `vapi-export-account3-11aug.json` and friends — were
+  named by hand, which means they were made when somebody remembered.
+
+**And then the first `--check` cried wolf, which is worth recording.** It flagged
+six leaks across the historical exports: `N8N_SHARED_BASE_URL`, `N8N_BASE_URL`,
+`SUPABASE_URL`, `VAPI_ASSISTANT_ID`. **None of them is a secret** — `SUPABASE_URL`
+is compiled into the dashboard's browser bundle on every build. Over-redaction
+looked like the safe direction and is not: the next person reads six warnings,
+finds all six harmless, and stops reading warnings. A check nobody believes
+protects nothing.
+
+So a plain `http(s)` URL and a bare uuid are now classed as identifiers and left
+alone. **The URL test requires no `@` in it**, deliberately: `SUPABASE_DB_URL` is
+also a URL and carries the database password in its userinfo. It is a secret
+wearing a URL's clothes, and the single most dangerous value in the file. All six
+exports now scan clean, and the four `.json` archives needed no change — they
+never held a secret, only the false positives.
+
+40 values redacted, 5 assistants, 1 credential (Cartesia), everything else empty.
+
+### The account-move runbook was wrong in the one place it mattered
+
+`new-vapi.md` blocker 2 said the English twins **cannot** be regenerated and must
+be copied verbatim — 109 unpaired Hebrew passages on debt, 9 stale intake entries
+from מיכל → מיכאל — and warned *"do not use an English twin to judge whether a
+Hebrew fix worked"*. Both tables were rebuilt today and both `--dry` runs are
+clean, so step 5 regenerates now and the warning is gone. Left standing: a
+refusal means the table is stale and the fix is the table, never the check.
+
+**Blocker 1 stands and is unchanged.** Cartesia does not travel, a new account
+has none, and the fallback to `vapi/Elliot` is silent — the call connects, the
+agent talks, and only a Hebrew speaker notices it is American.
+
+
+### The Vapi account is snapshotted, and the snapshot is safe to commit
+
+Asked for a backup of what is live. Written as `scripts/vapi_backup.py` rather
+than a one-off dump, because a backup you cannot retake is a photograph.
+
+**The prompt is not the assistant.** `docs/` holds the prompts and
+`scripts/vapi_tools.py` holds the tools, but the live object also carries the
+model, the voice, the transcriber, `endCallPhrases`, `maxDurationSeconds`, both
+endpointing plans, `messagePlan`, and a `server` block per tool — and several of
+those have only ever been set in the Vapi dashboard, which leaves no trace here.
+This project has twice found an assistant running a stack nobody could point at
+a commit for. Now there is a record.
+
+    assistant        5   (4 Homies + riley-2, which is not ours)
+    phone-number     0        tool  0        file  0
+    knowledge-base   0       squad  0
+    517 KB total, 12 files
+
+**The redaction is the reason this is a script and not `curl`.** Every tool on
+both debt assistants carries
+
+    "headers": { "x-homies-secret": "<the live secret>" }
+
+which is the credential standing between the open internet and every resident's
+balance. `curl > file.json` inside this checkout puts it one `git add -A` from
+GitHub. So the script does not strip a list of field names — that misses the
+field somebody adds next month. It loads **every value in `.env`**, replaces each
+one wherever it appears under any key, then re-scans and **refuses to write** if
+anything survived. `--check` re-scans every snapshot on disk; all 12 clean.
+
+**Found on the way: the tool secret and `N8N_WEBHOOK_SECRET` are the same
+value.** The redaction named it, which is how it surfaced — the placeholder reads
+`<redacted:N8N_WEBHOOK_SECRET>` in a header called `x-homies-secret`. Not wrong,
+and worth knowing before either is rotated: rotating one breaks the other.
+
+**Ids are deliberately not redacted**, and the README says why. An assistant or
+credential id identifies a thing and opens nothing; a snapshot with them stripped
+cannot be read or restored from.
+
+**There is no `--restore`, on purpose.** Pushing a whole assistant object back is
+exactly how tools get replaced by a stale list — the failure `CONTEXT.md` already
+warns about for `vapi_sync.py`, and the one that would have stripped all seven
+server blocks this morning. The README documents restoring by hand: read the
+field you want, PATCH only that, put the two `<redacted:…>` values back from
+`.env` first, and verify the tools survived.
+
+Empty collections are recorded **because** they are empty. The day a phone number
+or a knowledge base appears, the diff says so.
+
+Nothing committed — the files are written and clean, and the commit is the
+client's call.
+
+
+### A standing order now opens a ticket, because the flag it used to set reached nobody
+
+Asked after finding that `request_standing_order` wrote one row to
+`call_outcomes` — `outcome: 'office_to_contact'`, `standing_order_requested:
+true` — and nothing else. No ticket, no reference, no notification.
+
+**The old comment on the handler said the flag was "where a person will look for
+it".** That is the part that was wrong. The dashboard's Calls page has five tabs
+— all, inbound, outbound, no answer, links sent — and none of them filters on
+either field. Two rows were sitting there from 11 Aug. Both carry a null
+`resident_id`, so they are web-demo artefacts rather than residents waiting, but
+under a real campaign they would have been two people who agreed to pay every
+month and were never contacted.
+
+**The tool now writes both.** The flag stays — it is what the collections side
+reads off the call — and a `requests` row goes in beside it, which is the queue
+staff actually work from. Edge Function v21.
+
+    type        other      (the eleven categories are faults; this is not one)
+    urgency     normal
+    opened_via  voice
+    oxs_ref     standing_order      the marker the handler finds its own rows by
+    description בקשה להוראת קבע — יש ליצור איתו קשר להסדרה
+
+**The dedupe has no time window, unlike `open_request`'s thirty minutes.** That
+guard is right for faults — "the leak is back" next morning is a new fact and
+deserves a row. A standing order asked for again next month is the *same* unmet
+request, and a second ticket tells the office there are two arrangements to set
+up when there is one. So: one open standing-order ticket per resident, and a
+repeat returns the existing reference.
+
+**`requests.building` is NOT NULL and the tool takes no arguments**, so a call
+started without building in its variables would have failed the insert and turned
+a resident's yes into an error mid-call. It falls back to the resident's own
+building, and if there is still nothing it keeps the flag and skips the ticket. A
+recorded yes with no ticket is bad; a yes that errors is worse.
+
+Tested live against the deployed function with a real resident and a real unpaid
+charge: first call returned `255-1052-26`, second returned the same reference with
+`duplicate: true`. Both test rows and their interactions deleted after.
+
+**The prompt had to say so too, or we would get two tickets.** The agent has
+`open_request` and now a reason to reach for it. Both the standing-order section
+and the tools catalogue now say the one tool does all of it and must never be
+paired with `open_request`. Hebrew 54,030 chars, English twin 52,582.
+
+**`transfer_to_human` is the same defect and is still open** — same table, same
+five tabs, 16 rows. Fixing standing orders by opening a ticket does not fix it,
+because a handover is not a request; it needs the Follow-ups view.
+
+
+### A real English debt call, and the three things it got wrong
+
+The client ran the rebuilt English twin and sent the transcript. The agent
+answered questions it should have answered, reached for the office twice on
+questions it could have answered, never came back to the payment, and closed on
+the resident's "no" without asking whether there was anything else.
+
+**Worse than any of that, and not what was reported: it invented facts.** Asked
+what the fee covers it said *"cleaning, lighting, and general maintenance"* and
+later *"cleaning, lighting, elevator, plumbing, common areas"*. Lighting is not
+on Homies' list — the electricity **bill** is — and neither is plumbing. Gardening,
+insurance, the lift inspector, the fire and smoke inspections, the pumps and the
+water-tank disinfection were all dropped. It got the office hours right, which
+was luck: **the debt prompt had no facts in it at all.** Confirmed the same
+morning — neither voice prompt carried the FAQ section or even the office number.
+
+So "answer instead of escalating" could not be shipped on its own. Told to stop
+handing over and not given anything to answer from, the agent invents more
+confidently, which is worse than the brush-off it replaces.
+
+**Three changes, all four now live on both twins.**
+
+**1. A questions ladder.** New section, and a question is no longer a reason to
+hand the call over:
+
+    1. Answer it, from the facts.
+    2. Cannot answer it -> offer to open a request. `open_request`, type `other`.
+    3. Only then the office.
+
+With the reason written in: reaching for the office on an answerable question
+reads as a brush-off, and a resident working himself round to paying stops. Two
+in a row and the call is over whatever comes next — which is exactly what the
+transcript shows.
+
+**2. The facts themselves.** A compact `WHAT YOU ACTUALLY KNOW ABOUT HOMIES`:
+office hours, phone, address, email, the full covered list, what is excluded,
+when and how to pay, reaching the committee, response times, and the
+responsibility line. The same four rules that govern them on the chatbot travel
+with them — quote contacts exactly, answer rather than recite, service levels are
+policy never a promise, and never adjudicate responsibility.
+
+**3. The call comes back to the payment, and does not slam shut.** The answer and
+the ask are joined in one turn, because there is no later turn — they ask the
+next question. And before the closing: ask whether there is anything else, and if
+the payment is still unsettled put it back on the table **once** — except on a
+handover, where the existing rule against offering the link on the way out still
+holds. Once, then take the no and close warmly.
+
+**Prompt 48,827 -> 53,569 chars**, which is a real cost paid deliberately: the
+prompt's own editing rules warn that length is money and that the 7 Aug failures
+were "the model did not find the rule". The facts are worth it; a bot that
+invents what a resident is paying for is worse than one that says it will check.
+
+**English twin: 57 passages + 4 blocks, 52,121 chars, no Hebrew left.** Only two
+fragments of the new section needed crossing — the office address, transliterated
+rather than translated (Bezalel 1, Ramat Gan), and ועד בית. The phone, email and
+hours are Latin already and cross untouched, which is the point of quoting them
+exactly on both sides.
+
+**Not fixed, and visible in the transcript:** one turn came back as the fragment
+*"I don't have"* before a second turn carried the real answer. Same shape as the
+11 Aug single-word generation on WhatsApp — the node succeeds carrying a
+fragment. The chatbot has a word-count guard for this; voice has none.
+
+
+### The debt agent opens tickets, and "I already paid" gets somewhere to go
+
+Asked for: the collection agent should be able to open a request when asked, and
+the disputed-payment path should offer the link, then — if that is refused — a
+ticket or the office, rather than ending on a logged dispute and nothing the
+resident can hold.
+
+**The tools were already there.** Both debt twins have carried `open_request`
+since feature 14 and `log_disputed_payment` since the start. What was missing was
+the prompt: `open_request` was taught for exactly one case, a maintenance issue
+raised mid-call, and the dispute flow ended at step 4 with *"do not offer the
+link"* written into it.
+
+**The dispute flow is now six steps, and steps 3 and 4 are new.**
+
+    3. Offer the link once, as an option, in the same breath as the discrepancy.
+       One obvious reason two records disagree is that their payment never
+       reached us.
+    4. If they say no, take the no. Understand it, say once that our side still
+       shows it open, and name the two things you can actually do: open a
+       request about it with a number they can quote, or pass it to the office.
+
+**This reverses "do not offer the link", deliberately and on instruction.** That
+rule existed to stop the agent pressing somebody who says they have paid, and
+half of it survives: no arguing, no repeating the amount, no asking them to pay
+in the meantime, and never a second offer. What changed is that one offer is now
+allowed, because a resident whose payment genuinely failed is better served by a
+link than by a promise that the team will look.
+
+**The dispute is logged whichever they choose, including neither.** A request is
+something the resident holds; `log_disputed_payment` writes `payment_disputes`
+**and** sets the charge to `disputed`, which is what the debts dashboard shows
+and what stops them being chased again next month. The ticket never replaces it.
+Checked before writing the rule rather than assumed.
+
+**And a request opened on request is now a yes, not an offer.** "תפתחו לי
+קריאה" needs nothing asked first. The tool description was widened to match —
+raised, asked for, or accepted — because the description is what the model reads
+when it decides whether the tool applies, and it said only "raises".
+
+**Pushed by hand, not by `vapi_sync.py`, and the reason is worth recording.** The
+live tool objects carry a `server` block — webhook URL and the shared secret —
+that `vapi_tools.py` does not. Replacing `model.tools` with the repo's list would
+have stripped all seven and left an agent whose every tool call goes nowhere. The
+description was edited in place on the fetched objects instead; 7 tools with
+server before, 7 after.
+
+**Third copy of the read-back rule found and fixed.** The debt prompt has its own:
+*"give the last four digits only — never the letters and never the year"*. Under
+`255-1043-26` the last four digits are `4326`. Now the middle part, with the trap
+named. That is three copies in two prompts, all found only by reading for
+something else, which is an argument for the rule living in one place.
+
+**The English debt twin was two drifts behind and is rebuilt.** Its table had
+been refusing since `{{gender_forms}}` replaced `{{gender}}`: a section anchor
+ended on a sentence that no longer exists, and two entries still said `ועד בית`
+where the prompt now says `ועד הבית`. Three passages had never been in the table.
+55 passages + 4 blocks, 47,363 chars, no Hebrew left, all 7 tools with servers.
+
+**One entry I added was already there**, and the check caught it: a duplicate
+finds zero occurrences on its second pass, because the first already replaced
+them. The failure reads identically to a drifted anchor and is not one.
+
+**The one place the twins diverge in substance rather than language.**
+`{{verification_email}}` is composed for a Hebrew voice — pieces, with שטרודל
+where the @ is — because a Hebrew voice handed a Latin address mangles it
+differently every read. English has no such problem, so the English twin reads it
+as an address. The rule underneath is unchanged: say it as it arrives, once.
+
+
+### The English intake twin is rebuilt, and the Hebrew one it copies is current again
+
+Asked for: an English clone of the Hebrew voice agent to review the call flow
+without reading Hebrew. Both twins already existed; the intake one had refused to
+build since 7 Aug and was frozen at a prompt two rewrites old.
+
+**The Hebrew prompt went up first, because a clone of a stale source is a stale
+clone.** `demo-inbound.md` and the live assistant differed in exactly one place -
+the reference read-back - and pushed prompt-only: GET, swap
+`model.messages[system].content`, PATCH the whole `model` back. Tools verified
+before and after: `open_request`, `save_partial_request`, `transfer_to_human`,
+all three survived. 23,309 -> 23,583 chars.
+
+**A second copy of the read-back rule turned up while reading for the table.**
+The status section carries its own: *"the same way a new one goes out: the last
+part only... no HM and no year"*. This morning's edit fixed the opening-a-request
+copy and missed this one, which would have had the agent read a caller the year
+on every status call. Both now say *the middle part... no 255 and no year*.
+
+**Why the table had refused for eleven days**, in the order the build found it:
+
+1. The agent turned masculine on 7 Aug. Every fixed Hebrew line in the table was
+   still feminine - `מעבירה`, `מסמנת`, `מבינה`, `רושמת`, `העוזרת הדיגיטלית`. Five entries.
+2. The identity entry translated *Michal* to *Michael* and the prompt already
+   said Michael, so the substitution had nothing to do. Removed.
+3. The status-refusal line - *"I don't have access to the status of existing
+   requests"* - no longer exists on either side. The agent has a lookup now.
+   Removed rather than translated: a twin carrying the refusal would be testing
+   a flow that is gone.
+4. The Language section grew from 8 lines to 69 when the caller-gender rules went
+   in. An exact match that long breaks on every unrelated edit inside it, so it
+   became a regex block anchored at both ends, like the debt twin's.
+5. Four passages had never been in the table at all, because they arrived after
+   it was last built: the four status labels, the spoken-amount example, the
+   keep-what-you-caught example, and the taking-a-correction pair.
+6. `## Opening a turn like a person` and `## Hesitation` are two sections of
+   Hebrew discourse particles - אז/אוקיי/בסדר, and אה as the hesitation sound.
+   Second regex block, crossed as English equivalents rather than translations.
+
+**One inversion worth recording.** The Hebrew rule is *"never say the English
+word"* about status labels. In English the system's label IS English, so a
+faithful translation would have told the twin to do the opposite of what the rule
+means. It crosses as *never read the system's label out as it is written*.
+
+Built and pushed: 25 passages + 2 section blocks, 21,734 chars, no Hebrew
+remaining, same three tools, same 180-second cap, same endpointing. Read back
+from the API. `endCallPhrases` already carried both languages, so the twin can
+still hang up - which the table's own comment had warned about.
+
+Reachable now at homies-voice-demo.vercel.app: the deployed page is build
+`2026-08-12a` but carries the account-5 assistant ids, so it calls the twin that
+was just rebuilt.
+
+**Found and NOT fixed: the intake prompt calls two tools the assistant does not
+have.** `## Status of an existing request` instructs `get_request_status` and
+`## Balance and debt` instructs `get_balance`; the live assistant carries three
+tools and neither is among them. `vapi_tools.py` still says both are
+"deliberately absent" because "this project has no read path" - which was true
+when it was written and has not been true since the Edge Function shipped. This
+is the 5 Aug failure shape exactly: the prompt tells it to call something, there
+is nothing to call, and the agent invents the answer. It applies to the Hebrew
+agent equally; the twin inherits it rather than causing it. Attaching tools is a
+behaviour change to a live assistant and was left for a decision.
+
+
+### Ticket numbers take Homies' shape
+
+**Deployed.** Asked for as *"the creation of ticket it should match the homies
+format not the HM"* — the same instruction as 12 Aug's categories, one field on.
+
+Ours was `HM-2026-1046`, a prefix invented on day one. Theirs, on all 34 calls
+imported from OXS, is `255-26372-26`: their code for Homies, a running serial,
+the year in two digits. Measured before changing anything — `255` constant across
+every record, the serial monotonic with date (19502 on 10 Feb, 26372 on 12 Aug),
+never reset. A resident reporting a leak in their app and one reporting it here
+were getting numbers that did not look like the same company.
+
+**Migration 020.** The default is now
+`'255-' || lpad(nextval(...),4,'0') || '-' || to_char(now(),'YY')`. First minted:
+`255-1047-26`, continuing the sequence rather than restarting it, so no number is
+issued twice across the change.
+
+**Four digits, and that is not cosmetic.** `requests.reference` is unique and
+`oxs_requests_sync.py` upserts on it, so the day OXS's counter reached a number we
+had already issued, **their call would overwrite our row**. We cannot reserve a
+number from them — their API is twelve GET endpoints. So we mint below a counter
+that only climbs, and theirs passed five digits in February. A check constraint
+now rejects any `255-` reference of ours outside the four-digit band, which is
+what stops a later hand widening it back by accident.
+
+**The lookup had to learn both shapes at once.** `get_request_status` matched on
+the last four digits — which in `255-1047-26` is the year. Every ticket opened
+before today still carries `HM-` and residents are still holding those numbers.
+`serialOf()` in the Edge Function reads the serial out of either: the middle of a
+three-number reference, the tail of a lettered one, matched anywhere in the
+string because the model passes what the resident wrote and residents write
+sentences. The four-digit floor stays, so an apartment number in that argument
+still does not go looking for a ticket.
+
+Tested live against the deployed function, one ticket minted and deleted:
+
+    255-1047-26 quoted whole    -> found      255-26277-26 (theirs) -> found
+    just 1047                   -> found      just 26277            -> found
+    HM-2026-1001 (old)          -> found      "המספר הוא 255-1048-26" -> found
+
+**The read-back rule was rewritten, not just re-exampled.** It was built on 8 Aug
+around a real failure — the model returned `2026-8884` for `HM-2026-8884`, reading
+the letters as decoration. The new shape has no letters to drop, so the rule now
+names what *this* shape loses (`1048`, `255-1048`, `1048-26`) and says the three
+parts and the hyphens are all of it. Prompt 26,496 → 26,718 chars, read back from
+the live workflow and byte-identical to the file.
+
+**The voice prompt had to change too, and it is the one thing not pushed.** Its
+read-back rule says *only the last part* — correct for `HM-2026-1001`, and under
+the new shape it makes the agent read out the year: *2, 6*. `demo-inbound.md` now
+says *only the middle part* and names the trap. **Not pushed to Vapi**, under the
+standing chatbot-first instruction; the voice line takes no real calls (web only),
+so this is a demo-quality break, not a resident-facing one. It needs the
+prompt-only PATCH, not `vapi_sync.py`.
+
+Rows opened before today keep the numbers they were issued with. A number already
+told to a resident is not rewritten behind them, so the dashboard shows both
+shapes and `opened_via` remains the way to tell whose ticket is whose.
+
+
+### A missing fact stops being a staff task, and the bot gets a fence
+
+**Deployed**, 24,747 → 26,496 chars. Two decisions, both the client's.
+
+**A fact we do not hold is not an escalation.** Half an hour earlier the bot had
+been told to say *"I'll check and get back to you"* and call
+`transfer_to_human`. That is now reversed on instruction, and the instruction is
+right: a missing website is not work — nobody needs to do anything, and every
+such question would have filled the office with empty tasks.
+
+What replaced it is better than either version. The bot says it does not have
+that detail **and gives the office phone and email**, which it does know:
+
+> אין לי את הפרט הזה. אפשר לשאול את המשרד ב־077-6687949 או ב־Office@homies-management.co.il.
+
+**And no "I'll get back to you".** Written into the prompt as the reason:
+a promise nobody recorded is a polite lie, and a phone number that works right
+now beats an undertaking no one is holding. This also stops making the
+`transfer_to_human`-notifies-nobody defect worse, which the earlier version
+would have done.
+
+**The topic fence, open since the feedback session, is now closed.** Weather,
+news, sport, politics, medical or legal advice, suppliers who are not ours,
+calculations, translation, general knowledge — declined in one friendly
+sentence with a way back to the building, and **never** escalated. The load-
+bearing line is *knowing the answer is not a reason to give it*: the resident
+wrote to a management company, not a search engine, and a bot that explains
+tomorrow's weather spends the credibility it needs when it states what somebody
+owes.
+
+**Three things that look out of scope and are not**, written in because a fence
+without them is worse than none: ordinary courtesy (`תודה`, `יום טוב`) gets a
+human reply, not a scope refusal; a building question phrased generally
+("power cut in the area?", "can I keep a bike in the lobby?") is in scope even
+when the answer is not known; and a complaint about a neighbour or noise is
+common property, which is ours.
+
+Escalation now happens only for what it was built for — money that moves,
+complaints about a person, danger, anger at us, identity that failed twice, and
+a responsibility question too close to call.
+
+### First real handset test of the register, and two bugs it found
+
+Fourteen lines sent from a phone. **The register held.** No `בנוסף`, no
+`כמו כן`, no bureaucratese, short sentences throughout, `גרים` everywhere it
+mattered, and the casual probe (`אחי המעלית תקועה שוב חבל על הזמן`) came back
+`אוי, זה מעצבן. יש מישהו בתוך המעלית?` — relaxed exactly one step and asked the
+danger question before anything else, which is the rule working rather than
+luck. The formal probe correctly skipped the offer, because `ברצוני לדווח` *is*
+an explicit request and the offer is only for someone who has merely mentioned a
+fault.
+
+**Two real defects, both fixed and deployed** (24,151 chars):
+
+**1. `לך`.** The reply `אני לא יכול להגיד לך מתי יטפלו בקריאה שלך` genders the
+resident twice. The prompt has forbidden gendering since 8 Aug and never named
+the word that carries it most often — `לך` is written identically for both and
+said two different ways, and the same trap sits in `שלך` and `אליך`. Now named
+with the fix: delete the word. `אני לא יכול להגיד מתי בדיוק` loses nothing.
+Notable that the *voice* prompt already carried this exact warning and the chat
+prompt never inherited it.
+
+**2. `אין לנו אתר אינטרנט`.** Asked whether Homies has a website, the bot said
+they do not. Nobody told us that. The knowledge section said *what is not
+written here you do not have and do not invent*, and the model read the absence
+of a fact as a fact. Now separated explicitly: **not having a detail is not the
+same as the detail not existing.** It says it does not have it and hands over —
+a claim about the world is not one it can make.
+
+**One thing that is not a bug but reads like a fault.** `עוד משהו?` plus the
+options list fired after four consecutive replies. The workflow appends it
+whenever a reply has no question mark — but the code comment beside
+`FOLLOWUP_MENU` says it is sent *when the reply carries a reference number*.
+Comment and implementation disagree, and the implementation is far broader. The
+effect is a support desk that reads like a kiosk. Not changed yet; it is a
+behaviour decision, not a defect.
+
+**Inconclusive:** the kitchen-leak probe. Both messages arrived batched, so the
+`כן` answered an offer that had not been made yet and the test proved nothing
+about the offer-then-ask order.
+
+### The register gets a floor, not just a ceiling
+
+**Deployed.** Prompt 21,920 → 23,504 chars.
+
+Asked for natural, local, casual Hebrew out of Gemini 2.5 Flash. Checked the
+model settings first: only `maxTokens` is set, so temperature sits at Gemini's
+default. There was no sampling knob to reach for — this was always prompt work.
+
+**What was missing was the floor.** Every register rule in the file pointed one
+way: not `הנני`, not `יש באפשרותי`, not `פנייתך נקלטה`. None of them said how
+casual is too casual, and a management company's bot writing `יאללה אחי` is
+exactly as fake as one writing `ברצוני`. The section now sets both edges as a
+three-column band — clerical / the band / street — with `וואלה`, `סבבה` and
+`תכל'ס` marked as borderline under a rule worth keeping: **never lead with
+slang, and match a resident down at most one step.**
+
+**Flash's actual failure mode is translationese, so it is named.** The words are
+correct Hebrew that nobody types into a message: `בנוסף`, `כמו כן`, `לפיכך`,
+`על מנת`, `במידה ו`, `יש לציין`, `אנא`, `נא לפנות`. Replacements given, because
+rule 4 of this file says a prohibition leaves the model reaching for its own
+last message.
+
+**And spoken Hebrew drops words.** `אני אבדוק את זה ואחזור אליך עם תשובה` is a
+correct sentence no Israeli writes; it is `אבדוק ואחזור`. Five to eight words,
+one idea, half-sentences allowed.
+
+Five contrastive rewrites carry it — written/spoken pairs drawn from this bot's
+own situations rather than generic ones, which keeps them teaching register
+instead of becoming lines to replay. The last pair's spoken column is empty on
+purpose: `נשמח לעמוד לרשותך בכל שאלה נוספת` has no colloquial equivalent because
+you simply do not write it.
+
+**Closed with the guard that makes it safe:** casual is not sloppy. Reference
+numbers, phones, addresses and amounts stay exact — pointing back at the
+warmth rule rather than restating it, so there is one statement of that
+principle and not two.
+
+**Untested.** Whether Flash actually holds the band across a conversation is the
+open question, and only a real handset answers it.
+
+### The facts get a home that is not the prompt
+
+`docs/reference/homies-faq.txt` — the twelve answers verbatim as the client
+sent them, plus the question each one answers.
+
+**Written to open with what it is not.** The bot does not read this file. The
+facts are deployed inside the system prompt, and a change here alone changes
+nothing a resident hears. That warning is first because this project has
+already lost an afternoon to exactly that failure: the greeting lived in the
+prompt and in the menu node, one copy was updated, and residents kept getting
+the old one for two days.
+
+It also carries what the prompt cannot: that **website** was asked for and never
+answered, that the emergency number is the office number so a burst pipe at
+22:00 reaches an empty office until 09:00, and that the 4-hour / 3-business-day
+service levels are now a commitment the bot repeats at scale and Yariv should
+confirm he is happy being quoted on. The four rules attached to the facts —
+quote the contacts, never promise a specific ticket, answer rather than recite,
+never adjudicate responsibility — are recorded there too, so they survive a
+future rewrite of the prompt.
+
+**Not gitignored.** It holds no resident data — office contacts, contract scope
+and service levels — so it does not meet any rule in `.gitignore`. It is still
+client commercial detail heading for a public repository, which is the user's
+call rather than a default.
+
+### The bot finally knows something about Homies
+
+**Deployed.** Prompt 19,438 → 21,920 chars, read back from the running workflow
+as identical to the file.
+
+Twelve answers from the client, and they close the gap that had been the most
+visible one: until today the prompt carried **no facts about the company at
+all**. Hours, phone, address, what the ועד בית payment covers — every one of
+them reached a human, which is safe, thin, and not what a support desk is.
+
+**One collision had to be resolved, and it is the interesting part.** The prompt
+has said since 8 Aug: *never promise a date — "tomorrow morning" is a promise
+somebody else has to keep.* Answer 11 supplies service levels: emergencies
+within 4 hours, everything else within 3 business days. Read carelessly, the new
+facts repeal the old rule.
+
+They do not, and the distinction is now written into both places. **A service
+level describes the standard; a date is a claim about *your* ticket.**
+"Emergencies are handled within four hours" is a fact about the company and may
+be said exactly as written. "Yours will be done by tomorrow" stays forbidden —
+and stays forbidden *because* there are now numbers to hand, which makes it far
+easier to say by accident. Specific tickets are still answered only from
+`get_request_status`.
+
+**Three guards went in with the facts:**
+
+- **Phone, address and email are quotes, not phrasings.** The warmth rule
+  already separates the sentence from the fact; these are facts a resident
+  copies and uses, and a wrong number is worse than no number.
+- **Answer the question, do not recite the list.** The covered-items list runs
+  to thirteen entries. Somebody asking whether cleaning is included gets "yes,
+  cleaning is included" — the full list only on request.
+- **Never adjudicate responsibility.** Answer 12 draws the line at what the law
+  calls common versus private property and ends with *in case of doubt, contact
+  us*. That ending is the operative part: where it is not perfectly clear the
+  bot says we will check and hands over. Getting this wrong costs a resident
+  money.
+
+**Recorded because it is absent:** no website among the answers, and no staff
+names, prices or contract clauses. The section opens by saying so — anything not
+written there does not exist and goes to the team rather than being guessed. The
+emergency number is the office number; there is no separate out-of-hours line,
+and the bot is told not to invent one.
+
+**Still open: the topic fence.** Nothing stops the bot answering questions with
+nothing to do with building management, and a knowledge base makes that more
+pressing rather than less — a bot that now answers real questions well is one a
+resident will push further.
+
+## 2026-08-17
+
+### The 2022 debt is gone, and the arrears window stays on the current year
+
+**Asked whether 2022 could be dropped since the window of interest is 2025
+onwards. It turned out 2022 was never in the sweep.** `oxs_arrears.py` runs on
+`YEAR = date.today().year` and ended months only, so it has always been 2026-01
+→ 2026-07 and nothing older. The whole of 2022 in this database was **one row**.
+
+That row: ₪1,500, `oxs_ref 62980672…`, period `2026-08-01`, ארז לויים,
+הרכסים 17 apt 8, `handed_over=false`. It was the entire output of OXS's
+`/debts` endpoint — one company-wide record, a balance on a departed owner —
+stamped with the run month because the endpoint carries none. Verified as the
+only row in the table with an `oxs_ref` before deleting it, and deleted by id
+rather than by period or amount.
+
+`charges` now: **178 rows, ₪100,020 open, 2026-01 → 2026-07, no `oxs_ref`
+anywhere.** It cannot come back: `--skip-charges` means the scheduled import
+never reads `/debts` at all.
+
+**The window stayed on the current year, deliberately.** Extending to 2025 was
+offered and declined, and the reason is worth recording: it is not a filter
+change. 2025's unpaid months would roughly **double** the amount owed by
+long-standing debtors and start residents being chased for debts up to twenty
+months old. That is a collections policy for Homies to set, not a default to
+drift into. It also costs a fourth call per building, ~692 per run against a
+1,000/hour limit.
+
+**One workaround retired.** The dashboard's "open on the newest *completed*
+month" rule existed partly to dodge this phantom. The rule stays — the current
+month is not late yet, which was always the better half of the reasoning — but
+the comment no longer claims a row that is no longer there.
+
+### OXS pulls itself twice a day, and the log had to be muzzled first
+
+`.github/workflows/oxs-sync.yml`. Midnight and 15:00 Israel time: residents,
+then arrears, then maintenance requests. **Written, not yet live** — `.github/`
+is untracked and a scheduled workflow only runs from the default branch.
+
+**Four crons for two runs.** GitHub's cron is UTC and knows nothing about
+daylight saving. Israel is UTC+3 in summer and UTC+2 in winter, so midnight
+local is 21:00 UTC for half the year and 22:00 UTC for the other half. Four
+triggers fire and a guard step asks Jerusalem what time it is, letting exactly
+one of each pair through. Verified both ways: 21:00/12:00 UTC in August,
+22:00/13:00 in December.
+
+**The thing that nearly went wrong.** `oxs_api_import.py` prints every open debt
+as owner, address, amount and phone. `oxs_arrears.py` prints forty debtors with
+name, months, building, flat and phone. **Actions logs on a public repository
+are readable by anyone with the URL**, so a scheduled run would have published a
+debtor list to the internet twice a day, for ever — the exact document
+`.gitignore` exists to keep out of this repo. Both scripts gained `--quiet`,
+documented in each as a security control rather than a preference, and the
+workflow passes it every time. `--quiet` also skips writing
+`docs/reference/arrears-*.json`; it is gitignored anyway, but a runner we do not
+own has no reader for it.
+
+**`--skip-charges` on the residents import.** `/debts` is a collections ledger,
+not an arrears list — one company-wide record, a 2022 balance against a departed
+owner. Importing it twice a day would re-create that phantom charge for ever.
+Real arrears come from `oxs_arrears.py`, which runs straight after.
+
+**Buildings deliberately excluded.** `oxs_buildings_sync.py` is 173 calls and
+about three minutes, against a list that changes a few times a year. Twice a day
+is rate limit spent on nothing.
+
+The existing safety rails still hold on a schedule: the import refuses to purge
+and re-import if it fetches fewer than 50 residents, every OXS call is a GET,
+and `.env` is built from secrets at the start and shredded in an `always()` step
+at the end.
+
+**Six repository secrets are needed** before the first run: `OXS_KEY_GENERAL`,
+`OXS_KEY_DEBTS`, `OXS_KEY_REQUESTS`, `SUPABASE_URL`,
+`SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL`. The workflow fails loudly with
+the missing name rather than running half a sync.
+
+## 2026-08-16
+
+### Nothing shipped, and one live defect found
+
+A day of answers rather than deploys, which is worth saying plainly rather than
+dressing up as progress. The workflow is unchanged since 14 Aug.
+
+**The find that matters: `transfer_to_human` notifies nobody.** It writes a row
+to `call_outcomes`, stamps `interactions.disposition`, and stops there. No
+email, no Slack, no push — and the dashboard has no transfers view either, which
+a grep over `dashboard/` confirms returns nothing. So
+`אני מעביר את זה לצוות, נחזור בהקדם` is a promise that depends on somebody
+looking somewhere that does not display it.
+
+That is worse than declining to answer. A resident who is told help is coming
+stops chasing. Every handover since the bot went up is sitting in a table nobody
+opens.
+
+It also reorders the remaining work. The knowledge base is the *visible* gap and
+the one the client will notice; this is the one that is actually wrong. It is
+also the smallest of the four — a dashboard view, or a notification, or both.
+
+**A dating error, corrected.** Entries were being stamped from the n8n server's
+clock rather than the machine's, which put two days of work under 14 Aug that
+belonged there and this day's under it too. File mtimes settle it: `prompt.md`
+and `n8n_whatsapp.py` are 14 Aug, `meta-anydesk-session.md` is 16 Aug.
+
+### The Meta go-live is written down before it is attempted
+
+`docs/handover/meta-anydesk-session.md`, and an artifact for use during the call
+itself: https://claude.ai/code/artifact/f502a879-5bc8-437d-b051-493059600dd4
+
+Prepared on request, to be produced when the session is booked. The bot runs on
+a Meta **test number** today; this is everything between that and Homies' own.
+
+**Six values, not five.** The earlier answer missed `WHATSAPP_WABA_ID`. It is
+not used by `n8n_whatsapp.py` — which is why grepping that one file found five —
+but `check_whatsapp.py` needs it for `GET /{waba}/subscribed_apps`, the check
+that caught a silently missing subscription on 11 Aug.
+
+**A claim corrected in the same conversation.** Asked whether `APP_ID` and
+`APP_SECRET` allow editing the Meta app, the first answer was a flat no. That is
+wrong: `POST /{app-id}/subscriptions` accepts an app access token, which is
+exactly how the current callback was registered by script rather than by hand.
+The real boundary is **app-level versus WABA-level** — the app pair governs
+where Meta delivers webhooks and lets a token be inspected; anything touching a
+phone number or an actual message needs the WABA credentials.
+
+**The three things recorded because they are what actually goes wrong:** a
+number still live on the WhatsApp Business app cannot be added and loses its
+history when removed; business verification takes days, so the call will likely
+not finish the job; and the API Setup token expires after 24 hours, which is
+dangerous precisely because it works — live all afternoon, dead by morning.
+`check_whatsapp.py` already asserts the token has no expiry.
+
+The page has **no input fields**, deliberately. It names the five values to
+capture and says they go straight into `.env`; a web page is the wrong place to
+type an app secret.
+
+## 2026-08-14
+
+### An address we do not manage is an answer, not a task for the office
+
+**Deployed**, prompt 18,447 → 19,438 chars.
+
+Found from a real handset. `בניין 1 דירה 30` was correctly refused and asked for
+a street; `ג'ובסטריט`, an invented one, was answered with
+`אני מעביר את זה לצוות`. A made-up address had become a job in somebody's queue.
+
+The prompt was working exactly as written — `street_unknown` said hand it to the
+team, because a building might be registered under a name we do not recognise
+and only a person can check that. The reasoning is real, and it is the same
+class of problem as `אלתרמן` being stored as `אלתרמן נתן`. It was just applied
+to everyone, and the cost landed on the office.
+
+**The trigger moved from the address to the claim.** An unknown street is now
+answered plainly — Homies opens tickets only for buildings it manages, please
+check the street and number as registered — with no transfer. The escape hatch
+survives but has to be used: **if the person says they are our resident, it goes
+to the team**, which is precisely the case where a differently-stored name is
+the likely explanation. An address that is not ours, from somebody not claiming
+to live there, gets a clear answer and nothing else.
+
+**Only `street_unknown` changed.** `unit_found: false` and
+`number_not_on_street` never transferred anyway — they ask again with the
+numbers we do manage, because there the street *is* ours and the person is
+almost certainly a resident who typed something slightly off.
+
+**It also corrected yesterday's warmth block**, which told the bot that somebody
+hearing "not found" *is* our resident and we merely failed to find them. True
+when the street is ours; false here. A bot that reassures an unknown address it
+is definitely on the list is warm in the one direction that costs money.
+
+### The greeting lived in two places and only one of them was changed
+
+Caught from a real handset, which is the only reason it was caught at all. A
+bare `היי` came back `היי, כאן הומיז. מה קרה?` — the old opener — hours after
+the new one was deployed and read back from the running workflow as identical
+to the file.
+
+**Both facts were true.** A bare greeting never reaches the model. The
+`GREETING` regex in the Sort node matches it and short-circuits to `MENU`, a
+WhatsApp interactive list whose body text is hardcoded in
+`scripts/n8n_whatsapp.py`. The system prompt was correct, was deployed, and was
+irrelevant to the message on screen.
+
+**The verification was sound and still proved nothing.** Reading the system
+prompt back from n8n confirms exactly one thing — that the model will receive
+those instructions. It cannot say whether the model is consulted. Every reply
+carrying the `אפשרויות` list button is workflow-authored; the tell was in the
+screenshot before the text was.
+
+Fixed, and then made unshippable: `check_greeting()` asserts the `MENU` body
+appears verbatim in the extracted system prompt and exits the deploy if it does
+not. The opener survives in the prompt as a worked example, which is precisely
+what makes it checkable. Tested both ways — passes on the real file, fires on a
+stale one.
+
+The old greeting now returns **zero** matches anywhere in the live workflow.
+The new one returns four, which is two real copies (Sort's `MENU`, the agent's
+system prompt) mirrored in n8n's `activeVersion` record.
+
+**The general shape, worth keeping.** Anything a user sees that a canned path
+can also produce has two sources, and updating the intelligent one is the
+easier half. The n8n instance is full of this pattern — `TAP_LINE`,
+`FOLLOWUP_MENU`, the media line — and each is a place where a prompt change
+silently does nothing.
+
+### The opener stops assuming something is broken
+
+**Deployed**, prompt 17,914 → 18,447 chars.
+
+Asked for: *"hey this is homies support, how can we help you today?"* The 8 Aug
+line was `היי, כאן הומיז. מה קרה?` — it named the company but opened with a
+question about a fault, which assumes there is one. Somebody writing in about a
+balance, a ticket status or opening hours was met as though something had
+broken. It now names the **desk**, not just the company, and makes an open
+offer:
+
+> היי, כאן שירות הלקוחות של הומיז. במה אפשר לעזור?
+
+**Not a literal translation, deliberately.** *"How can we help you today"* comes
+into Hebrew as `כיצד נוכל לסייע לך היום` — a formal letter with a call-centre
+`היום` bolted on, and the exact register this whole section exists to keep out.
+`במה אפשר לעזור?` is what an Israeli service person says. Impersonal `אפשר`
+rather than `נוכל` for a second reason: the bot writes as *I* everywhere else
+(`פתחתי`, `רשמתי`), and a `we` in the greeting is what a model then carries into
+`we opened a ticket`, which the prompt forbids.
+
+**One rule was narrowed rather than deleted.** The bot-speak list banned
+`איך אוכל לסייע לך?` outright and pointed at `מה קרה?` instead — a direct
+contradiction of the new opener once it landed. The ban was never about
+offering help; it was register. `לסייע` is letter-Hebrew for `לעזור`, `כיצד`
+for `איך`, and the trailing `לך` marks gender at the moment we know least about
+who is writing. The list keeps all three objections and drops the conclusion.
+
+**Two guards went in with it**, both being ways this obviously breaks: an open
+*how can we help* after somebody has already described their problem is the
+clearest possible signal nothing was read, so the "they already told you" rule
+now names the new line; and `במה אפשר לעזור?` is marked first-message-only,
+because on message four it is a bot that has reset itself.
+
+Read back from the running workflow: 18,447 chars, identical to the file, old
+opener absent.
+
+## 2026-08-13
+
+### A warmer chatbot, with the facts held exactly where they were
+
+**Deployed.** `u2JjrbcNPYyyh3yl`, prompt 15,058 → 17,914 chars.
+
+The ask was warmer *and* no less accurate when filing a ticket. Those only
+fight each other if warmth is allowed near the facts, so the prompt now draws
+the line instead of hoping the model finds it: **the details pass through
+verbatim — building, apartment, reference number, amount, months, status — and
+every sentence around them is the model's to write like a person.** A warm
+phrasing may not change a number, soften `not found` into *maybe*, or add a
+promise nobody made. Where warmth would cost precision the fact wins with
+nothing to weigh — there is no balance to strike, one half was never available.
+
+**The greeting was already fixed earlier today and was not where the coldness
+lived.** Four other moments were:
+
+- **Refusals.** `street_unknown`, `unit_found: false`, `number_not_on_street`
+  were pure correctness rules with no guidance on phrasing, so the model
+  reached for the flattest thing to hand. Somebody who typed their own address
+  and got *not found* hears an accusation — or that they are not our resident.
+  They are; we just did not find what they typed. Now three things are
+  required: what we *do* have, no blame, and a way forward. Followed
+  immediately by what did not move — the address check is unchanged, and being
+  kind is not the same as agreeing.
+- **Handing over the reference number.** It already demanded "what happens
+  now"; it now also demands *what the ticket is about, in the resident's own
+  words*. That clause is the difference between a cloakroom stub and evidence
+  somebody listened.
+- **A failed identity check on a balance.** Most people who fail it are real
+  residents who gave a first name only or transposed two digits. "I could not
+  verify you" treats them as a suspect. The gate is untouched; the sentence is.
+- **The acknowledgement.** Once per *conversation* was stingy — a chat that
+  opens with a leak and moves to a debt is two things. Now once per thing that
+  happened, and **sized to it**: nobody is devastated by a burnt bulb.
+
+**Two guards, because "be warmer" is an instruction a model overshoots.**
+Warmth is a word or two and never an extra sentence — a message that grew in
+order to sound nice sounds like a call centre. And the acknowledgement scales
+to the event.
+
+**A live bug fell out of writing it.** The worked example for the address
+question read `באיזה בניין ואיזו דירה אתה גר?` — masculine, aimed at the
+resident, twenty lines under the rule forbidding exactly that, and the one
+place in the conversation where marking gender by accident is easiest because
+the question is always *about them*. Every other example in the file was clean;
+this one shipped and the model had been copying it. Now `גרים`, with the reason
+attached so it does not get "corrected" back.
+
+Voice untouched, per the standing chatbot-first scoping. Still not tested on a
+real handset — every claim here is about the prompt, not an observed
+conversation.
+
+### The dashboard's page size becomes a choice: 10, 25 or 50
+
+Every list was fixed at ten rows. Ten is right for glancing at today's tickets
+and wrong for working through 108 apartments that owe for July — that was
+eleven page-turns with the total on screen the whole time, taunting.
+
+`per=25` / `per=50` now rides in the URL beside `page`, on all four lists:
+tickets, debts, conversations, calls. Three things worth recording:
+
+- **Links, not a `<select>`.** Every other control on this dashboard is a URL,
+  and a dropdown that navigates needs client JS. The build confirms it: the list
+  pages still ship 158 B each, exactly as before.
+- **The size is validated against the list.** `?per=1000` falls back to ten
+  rather than pulling the whole `residents` table through PostgREST in one
+  request. Anything not 10/25/50 is not a size.
+- **Changing the size lands on page one**, and the size survives every other
+  filter — the month tabs and the apartment/owner toggle on `/debts`, the
+  status tabs on `/tickets`, the five view tabs on `/calls`. Picking 50 and
+  then filtering to "open" handing back ten rows is the bug this avoids.
+
+`/calls` had grown its own private copy of the pager, with `Newer`/`Older`
+instead of `Previous`/`Next`. Rather than add the size picker twice, the shared
+component took `prev`/`next` labels and the copy went. `pageRange` and
+`pageSlice` now take the size; both still default to ten, so nothing that
+does not pass one changed behaviour.
+
+One visible consequence: the pager used to disappear entirely on a single page
+of results. It now shows whenever there are more than ten rows, because that is
+the only way somebody sitting at 50 gets back to 10.
+
+Not deployed — Vercel still points at the old Supabase project and that
+repointing is waiting on the region decision.
+
+### The database moves to the client's own Supabase project
+
+**Done and verified. Production still points at the old project.**
+
+The blocker was never technical. `SUPABASE_ACCESS_TOKEN` 403'd on the target,
+its data-plane keys 401'd against the Management API, and PostgREST does not do
+DDL — so nothing here could create the first table. A personal access token on
+the target account resolved it in one step, and the Management API's
+`POST /v1/projects/{ref}/database/query` runs SQL directly, so no connection
+string was needed after all.
+
+**Who owns it, which is the actual point of the move.** The target is
+`yariv@homies-management.co.il's Project` — the client's own Supabase account.
+That is an ownership change, not a performance one, and it is a good reason on
+its own.
+
+**What went across**, migrations 001–019 run in order, then every table:
+
+| | rows | | rows |
+|---|---|---|---|
+| residents | 7,391 | interactions | 119 |
+| apartments | 4,092 | requests | 53 |
+| messages | 306 | call_outcomes | 34 |
+| buildings | 193 | charges | 179 |
+
+Counts match on every table, both directions. 13 tables, 5 views, 5 functions,
+17 ledger rows, no table without RLS. Spot-checked through both keys: the
+dashboard's tables read via the publishable key, and `buildings` / `apartments`
+return **0 rows to anon and everything to the service role** — migration 019
+survived the move intact. `v_debt_call_queue_person` returns 0 rows, which is
+correct: every resident still carries `handed_over = false`.
+
+**One real bug, found by the copy failing.** `messages` refused every row with
+`column "inserted_at" does not exist` — on a table whose columns were byte-for-byte
+identical on both sides. The column belongs to neither. `pk_of()` in
+`supabase_move.py` joined `table_constraints` to `key_column_usage` on
+`constraint_name` **alone**, and constraint names are only unique per schema:
+Supabase ships `realtime.messages`, partitioned, whose primary key is also
+called `messages_pkey` and is `(id, inserted_at)`. So the primary key of
+`public.messages` came back as `id, id, inserted_at`, the upsert URL named a
+column that exists on neither table, and PostgREST blamed the target. Fixed by
+joining on `constraint_schema` too.
+
+Worth keeping because of how it hid: `messages` is the only table here whose
+name collides with a Supabase-internal one, so eleven tables copied cleanly and
+the twelfth failed in a way that pointed at the wrong thing entirely.
+
+**REGION: `ap-northeast-2` — Seoul.** The old project is `ap-northeast-1`,
+Tokyo. Both are roughly 8,000–9,000 km from Israel, so this move buys **no
+latency improvement**, and a project's region cannot be changed after creation.
+Raised before repointing anything, because the voice agent makes tool calls
+mid-conversation and the client has already commented on responsiveness.
+`eu-central-1` is about 2,700 km from Tel Aviv.
+
+**Not done, deliberately:** the Edge Function is not deployed to the new
+project, and n8n, the Vapi assistants and the dashboard all still point at the
+old one. Nothing has moved in production, and the old project is untouched and
+remains the rollback.
+
+### The security work goes live
+
+Deployed on the client's instruction: the Edge Function and the WhatsApp
+workflow. **The demo page was deliberately left alone**, so nothing about the
+voice agents changed.
+
+- **`debt-tools` version 17, ACTIVE.** Carries the balance identity gate,
+  `verify_address`, and `open_request` writing `reported_unit` and the
+  canonical address.
+- **WhatsApp workflow updated**, five tools live, prompt at 15,058 chars.
+  Confirmed by reading the deployed workflow back: `verify_address` node
+  present, the balance node sending name and phone, and the prompt carrying the
+  identity rule, the address rule and the offer-then-ask shape.
+
+**Smoke-tested against the deployed function, not against the repo.** Five
+address cases — real building with a real flat, real building with flat 999,
+real street at a number we do not manage, a street we do not manage at all, and
+the partial-street case `אלתרמן 6-8` — all correct. Three identity cases —
+nothing given, name only, mismatched pair — returned `need_identity` twice with
+the right `missing` list, then `identity_failed`.
+
+**A false alarm worth recording, because the fix is in the tooling.**
+`n8n_whatsapp.py --apply` printed *"Not active yet. Run with --activate"* after
+updating a workflow that was already live and stayed live. Read back from the
+API, the bot was `active: true` throughout — a PUT does not deactivate
+anything, and that line had simply never been true on the update path. It cost
+a scare and a round of checking on a live client bot. The script now reads the
+state back and prints what is actually true.
+
+**And a correction to yesterday's numbers.** The scratch test that verified the
+address matcher reported 26 flats at יואב 14; the true figure is 25. The test
+paginated `apartments` ordered by `order_index`, which is not unique, so a row
+repeated across a page boundary. The deployed function queries per building
+without pagination and was always right. Membership tests are unaffected — a
+duplicated number does not change whether a flat exists — so every pass/fail
+result stands; only the count was wrong.
+
+### Preparing the Supabase move, and finding a live security hole while doing it
+
+Asked for: migrate to the new Supabase project. **It did not run, and the
+reason is access, not readiness.** PostgREST cannot execute DDL, and
+`SUPABASE_ACCESS_TOKEN` belongs to the old account — asked for its project
+list it returns exactly one entry, HOMIES. Nothing on this machine can create a
+table in `tfldjbwtghfgdwoyauio`. Everything downstream of that is now scripted
+and tested.
+
+**The schema file was five migrations stale** — generated 12 Aug covering
+001–013, while the database had reached 018 that morning. Regenerated to
+001–019, 87,774 characters, plus a new `supabase-ledger.sql`, without which
+`supabase_migrate.py` would replay all seventeen files against the new project.
+
+**How the schema was verified, which is the part worth keeping.** Running it
+against the live database proves nothing: every migration is
+`create ... if not exists`, so on a database where the objects exist they all
+no-op and the run is green having tested nothing. The trick is a throwaway
+schema first on the `search_path`, inside a transaction that is always rolled
+back — unqualified creates land in it and unqualified references resolve to it,
+so it behaves as an empty database while touching nothing. Result: 12 tables,
+5 views, 5 functions.
+
+**It failed the first time, and the failure was live.** 009 carries an
+assertion that raises if any table in `public` lacks row-level security. It
+fired on `buildings` and `apartments` — created that same morning by my own
+migration 016 with no RLS — which meant the anon key that ships in the
+dashboard's browser bundle could read the client's entire portfolio: 173
+addresses and 4,092 flats. Confirmed against the live project with the real
+anon key before fixing anything (it returned rows), then fixed by **migration
+019**, then confirmed closed the same way (anon returns 0, service role still
+reads, so `verify_address` is unaffected).
+
+**No anon policy on either table, unlike 010.** 010 opened everything to anon
+for the no-login demo dashboard and says in its own header that this is a trade
+to reverse before real data arrives. Nothing in the dashboard reads buildings
+or apartments, so there is no feature to weigh against it.
+
+**The guard could not have caught this, and now it can.** A migration runs
+once: 009 looked at the database as it stood on 9 August and never again, so a
+table added on the 13th was never in scope. The same assertion now runs inside
+`scripts/supabase_migrate.py` after every run, where it sees what was just
+applied. It warns rather than exits — by then the migrations are committed, so
+failing would report a problem it cannot undo.
+
+**`scripts/supabase_move.py`** does the data copy: reads the old project over
+its database connection (exact types), writes the new one over PostgREST,
+upserts on the primary key so an interrupted run resumes by re-running.
+
+**The copy order in the plan was wrong.** It said
+`residents → charges → requests → interactions`, and `requests.interaction_id`
+references `interactions`, so requests must come last. Twenty FK constraints
+across twelve tables is more than anyone should hold in their head, so the
+script sorts them topologically from the live catalogue instead of trusting a
+typed list. IDs are carried verbatim — eight columns point at other tables'
+keys, and fresh uuids would orphan all of them while the copy reported success.
+
+### The bot offers before it asks, and an 8 Aug rule is reversed on purpose
+
+Asked for after reading the flow back: a resident writes *"there is no light in
+building X"* and the wanted reply is *"Hi, this is Homies support. Ok, I
+understand — do you want me to open a ticket so this goes to the office?"*
+
+**This reverses the rule that said never ask permission.** That rule has been
+in the prompt since 8 Aug: no *"shall I open a call?"*, because somebody
+reporting a broken gate has already asked, and bouncing the decision back is a
+way of not doing the job.
+
+The reasoning was sound and it came from the **voice** agents, where a turn
+costs seconds of a live call. On chat the arithmetic is different: turns are
+cheap, nobody is holding a phone, and what is actually expensive is tone. The
+old rule produced the wrong one — a resident mentions a dead bulb and gets two
+questions about their address back. They end up with what they wanted and it
+feels like filling in a form. The offer costs two messages and buys the
+difference between a service desk and a survey.
+
+New shape: **acknowledge → offer, saying where the ticket goes → then, only
+after yes, building and apartment.** The address question moved out of the
+first reply, which is what made the earlier version read as an interrogation.
+
+Two cases still skip the offer, and both are the old rule surviving where it
+was right: a resident who asked outright ("open a ticket", "send someone")
+should not be re-asked, and nobody in danger is asked whether they would like
+assistance — that transfers immediately with no ticket at all.
+
+The `open` menu row changed with it, from *"what's the fault, and which
+building?"* to just *"ok. what's the fault?"* — tapping that row is itself the
+explicit request, so the offer is skipped, and asking for the building there
+would split the building+apartment pair across two messages and leave the
+apartment on its own.
+
+### "Which apartment do you live in" is a different question from "where is the fault"
+
+Asked for after the first flow walkthrough: a resident says *"there is no light
+in the building"*, and the bot should answer like a person — acknowledge it,
+then ask **which building and which apartment they live in, in one message,
+saying it is so a ticket can be opened**.
+
+**This looked like a reversal of the rule from 8 Aug** — never ask "which
+apartment?" about a stuck lift, because a lift belongs to nobody, and asking
+wastes a whole turn of a resident's patience. It is not a reversal. They are
+two different questions that happen to use the same words:
+
+| | |
+|---|---|
+| `requests.unit` | **where the fault is.** NULL for common property. |
+| `requests.reported_unit` | **where the person lives.** Always, once verified. |
+
+A lobby leak reported by flat 3 is now `unit = null, reported_unit = '3'`.
+Every query that finds common-area faults with `unit is null` still works, the
+duplicate guard still groups two reports of one lobby leak — and we finally
+know who told us. **Before this a WhatsApp ticket carried no resident at all**:
+there is no caller ID on chat and nothing ever looked the sender up.
+`resident_id` is now filled from the same verified pair, best-effort, because a
+flat with no phone on file has no `residents` row — which is exactly why the
+flat is stored as a column rather than reduced to that lookup. Migration 018.
+
+**The model no longer expresses "this is a common-area fault" by leaving a
+field empty.** It sends `reporter_unit` plus `fault_location`
+(`apartment` / `common`), and the server derives `unit`. `unit` is not offered
+to the model at all any more. The old design had an implicit branch — omit the
+field and mean something by it — and this file has been burned by implicit
+branches before. Anything that is not literally `"apartment"` is treated as
+common property, because a fault wrongly filed as common gets read by a person,
+and one wrongly pinned to a flat sends a technician to knock on a stranger's
+door.
+
+**The second exception to one-question-per-message**, and the last. Building
+and apartment are asked together, with the reason attached — *"ok, that's
+annoying. which building and which apartment do you live in? I'll open a call
+for you"*. Two facts that cannot be confused for one another, so a partial
+answer is obvious; the same argument that allowed name+phone before a balance.
+Both exceptions are now written into the rule itself rather than trailing it.
+
+Voice is untouched: `reporter_unit` is absent on a voice call, and when it is
+absent nothing about `unit` changes.
+
+### The building list arrives, and an address stops being free text
+
+Asked for: when a resident reports a fault the bot should ask which building
+and which apartment, and say so when the answer does not exist.
+
+**There was nothing to check an answer against.** `residents.building` is a
+string composed at import time and stored — enough to file a ticket, useless
+for verifying one. A resident who named a street Homies does not manage, or
+apartment 40 in a building with 25 flats, was recorded verbatim, handed a real
+reference number, and left believing a technician was coming. Apartments had
+never been fetched from OXS at all.
+
+**What came in.** Migration 016 adds `buildings` and `apartments`, mirrors of
+OXS's own, filled by the new `scripts/oxs_buildings_sync.py`: **173 active
+buildings** (193 total, 20 disabled and carried anyway, because a building
+Homies dropped still appears on old tickets) and **4,092 apartments** — median
+23 flats per building, smallest 2, largest 72. Five cities: רמת גן 94,
+תל אביב־יפו 48, גבעתיים 22, רמת השרון 7, הרצליה 2. 104 distinct streets.
+
+**The measurement that shaped everything else: street + number is unique across
+the whole portfolio.** Zero duplicate addresses; zero cases of one street+number
+in two cities. So `הרצל 14` identifies a building on its own and **the agent
+never has to ask which city** — a whole turn saved on every report. Three
+street names span two cities (גולומב, החשמונאים, סוקולוב) and never at the same
+house number. This is a property of today's data and not a promise, so the sync
+re-checks it every run and **refuses to write** if it stops holding, rather than
+warning: every check it makes guards against the matcher returning one confident
+answer where there are two.
+
+**Reconciliation, before trusting any of it.** All 7,391 residents'
+`building` strings resolve to an active OXS building, nothing in our table is
+absent from theirs, and 172 of the 173 have residents on file. One building has
+none yet.
+
+**`verify_address` is the new tool**, read-only, returning nothing about any
+person. The bot must call it before `open_request`.
+
+**Matching compares against the list rather than parsing the sentence.** The
+obvious design — split what the resident wrote into street and number, then
+query — breaks on the real data: `אלתרמן נתן 6-8` is two words and a hyphenated
+number, and people write `רחוב יואב 14 רמת גן` or bury the address mid-sentence.
+Asking instead whether the sentence *contains* a registered street and one of
+its numbers sidesteps the parse completely. Tested against all 173 addresses in
+three phrasings — full, street+number, and with a `רחוב` prefix — **173/173
+each**.
+
+Two passes, because one was not enough. Strict wants the registered street
+whole. The second fires only when strict finds nothing and only alongside an
+exact house number: `אלתרמן נתן` is registered with the poet's first name and
+nobody says it, so `אלתרמן 6-8` has to resolve. One shared word is weak
+evidence; the house number is what makes the pair specific. Quote marks are
+stripped before comparison — ז'בוטינסקי arrives with U+05F3, with an ASCII
+apostrophe, and with nothing at all, and all three now match.
+
+**Three answers, and the third is the one that earns its keep.** Found, not
+found, and *the street is real but not that number*, which lets the bot say
+something true: "we manage 12 and 16 on that street, not 14". A bare "not found"
+makes the resident repeat themselves at a machine that will fail again. Same for
+flats: the range comes back with the refusal, so the reply is "that building has
+apartments 1 to 25". `need_number` is kept separate from `number_not_on_street`
+for the same reason — nothing said is not the wrong thing said.
+
+**Ambiguity is returned, never resolved.** Two candidates come back as two
+candidates to ask about. Feature 01's confidence floor: below it, unmatched
+beats guessed. A ticket filed against a confidently wrong building reads correct
+to everyone who sees it and sends a van to the wrong street.
+
+**`open_request` normalises but does not refuse**, and the asymmetry is
+deliberate. It is shared with both voice agents, and only the chat bot has been
+taught to verify first — making it reject an unresolvable building would start
+silently dropping inbound voice tickets, a worse failure than the one it fixes.
+So it files against the canonical address when it resolves and files anyway
+when it does not. That is worth having on its own: the duplicate guard matches
+`building` as a string, so `יואב 14` and `רחוב יואב 14 רמת גן` were two
+buildings to the guard and one to everybody else — the second report minted a
+second ticket and dispatched a second van.
+
+**An apartment number is not always a number, and the first full import is
+what said so.** Migration 016 put `unique (building_id, number)` on
+`apartments`, from a four-building sample where every flat was 1..N. The real
+sweep rejected it with a 409 partway through: **זבולון 17 in Tel Aviv has two
+separate units, both called `חנות`** — two ground-floor shops, neither
+numbered. Across the 4,092 flats, **138 are labels rather than numbers**:
+חנות, מסחר 1–4, מחסן, חניה 43, דירת ועד, חברי וועד, a company name, and one
+flat called `1.5`. Two are blank.
+
+The constraint was also redundant — `id` is the OXS `_id` and is already the
+primary key, so a double import cannot duplicate a flat, which is the only
+thing that index was protecting against. Migration 017 drops it and keeps the
+pair as a plain index, since the lookup it supports is real.
+
+It changed the agent's wording too. The flat range was read off the ends of the
+list ordered by `order_index`, and the last row of a building is quite often a
+shop — so "this building has apartments 1 to 25" would have come out as
+"apartments 1 to חנות". The range is now computed from the numeric flats only.
+The sync prints both counts on every run, so the next person meets this in the
+output rather than in a 409.
+
+**And a flat number is not always a flat number either.** Tested against the
+imported rows rather than a fixture, which is what caught it: `לואי מרשל 41`
+numbers its flats `1א'`, `1ב'`, `2א'` — a number, a Hebrew letter, and a
+geresh nobody types. A raw string compare tells a resident of 3א that their own
+flat does not exist, which is the most insulting possible way for this to be
+wrong. Units are now compared through the same `norm()` as street names, on
+both sides. Verified: `3א` and `3א'` both accepted, `99ג` still refused.
+
+Three buildings have **no numeric flats at all** — `סוקולוב 29, הרצליה` is
+fifteen shops, ten offices, a club and three cinemas; `היצירה 24` is offices
+and parking bays named by direction (`1 מזרחי`, `חניה- רנדי בע"מ`). For those
+the tool returns no range, and the prompt now says not to invent one.
+
+**Verification, against the live tables:** 173/173 addresses resolve in all
+three phrasings; 240/240 real flats accepted; 40/40 invented flat numbers
+refused; 173/173 spoken ranges numeric; commercial units (`חנות 4`,
+`1 מזרחי`) accepted.
+
+**One bug found and fixed on the way.** The n8n tool nodes referenced their
+descriptions as `TOOLS[0]`, `TOOLS[1]`, `TOOLS[3]`. Inserting `verify_address`
+into the middle of that list silently repointed two nodes at the wrong
+descriptions — it deploys cleanly and shows up as a model calling the wrong
+tool. Replaced with a lookup by name.
+
+**Also caught: an exploratory one-liner had dumped 340KB of client building
+data into the repo root.** This repository is public. Never staged, never
+committed, moved out of the tree. The rule earned again: check what a script
+writes and where, not just what it prints.
+
+### A balance now costs a name and a number, and the gate is not in the prompt
+
+Out of the client's security feedback: the WhatsApp bot must ask for the
+tenant's full name and full phone number before it reads out an open balance.
+
+**What was open.** `get_balance` identified a caller three ways, in order: the
+WhatsApp number the message arrived from, then building+apartment, then a name.
+The bottom two are things a neighbour knows — a surname and a flat number are
+not secrets in a building of ten flats — so anyone who found the WhatsApp
+number could type a name and be read a stranger's debt. The envelope number is
+better and still not proof: a handset gets lent, shared and sold, and matching
+it silently means the bot never asks anybody anything.
+
+**Now it is one rule with no fallbacks.** A full name *and* a phone number,
+both typed by the resident in that conversation, both landing on the same
+`residents` row. The envelope number is not a shortcut past the question; the
+building+apartment and name-alone paths are gone from chat entirely.
+
+**The check moved into the Edge Function.** This is the part worth recording. A
+prompt rule is a request, and this one guards money — a resident who insists,
+or a message shaped like an instruction, is exactly the case a prompt loses. So
+`get_balance` refuses on its own: missing either half returns `need_identity`
+and the model has to go and ask, a mismatched pair returns `identity_failed`
+and no amount is ever assembled. The prompt section makes it ask *well*; it is
+not what makes it ask.
+
+**One flag for both halves, deliberately.** `identity_failed` does not say
+which half was wrong. A per-half answer is an oracle — try a surname against a
+number you hold, learn the number is real — and an oracle plus a list of
+surnames is a search tool.
+
+**Two smaller calls.** The name is compared as a set of words, so `יוסי כהן`
+and `כהן יוסי` both pass and a lone surname does not; two distinct words is the
+floor, and containment lets a record with a middle name still match what its
+owner actually says. The phone normalises to E.164 first, because the column
+holds `+972501234567` and a person types `050-123-4567` — a gate that rejects
+the honest case is a gate that gets removed a week later. Both helpers were
+tested against the twenty inputs a real handset produces.
+
+**Asking for both in one message breaks the one-question rule on purpose,** and
+the exception is written into that rule rather than left to trail it. Two
+questions normally come back answered once with no way to tell which; a name
+and a number can be told apart at a glance. This is the lift lesson from 8 Aug
+applied before it bit: an exception placed after a categorical statement does
+not modify it.
+
+**Not touched, and it is the same hole.** The inbound voice agent calls the
+same `get_balance` and still identifies by building+apartment or by name —
+standing instruction is to leave those alone. The gate is scoped to
+`channel(ctx) === "whatsapp"`. Voice inbound identity is open.
+
+Deploy is pending: the Edge Function has to be pushed and the n8n workflow
+re-synced before any of this is live.
+
+---
+
 ## 2026-08-12
+
+### Gender stops being a branch, and בית gets its article back
+
+Second pass over what was left. Both agents re-synced.
+
+**`{{gender}}` is gone from the prompt.** Not softened — removed. The variable
+handed the model a letter and put the instructions for it two hundred lines
+away, and on 12 Aug that failed cleanly: `gender = "m"`, name יוסי, and the
+agent said תשלחי one turn after using the masculine form. Nothing was missing
+and nothing was guessed. The model did not carry the branch through the
+sentence.
+
+This file already knows what branches cost. `apartments_phrase` and
+`breakdown_phrase` are composed in SQL for exactly that reason — *"if one
+apartment say this, if several say that"* was removed rather than explained
+better. Gender was the last branch left, and it now follows the same pattern:
+**`{{gender_forms}}` arrives finished, in Hebrew, at the top of the prompt** —
+*הנמען גבר. פנה אליו בזכר לאורך כל השיחה: אתה, שלְךָ, לְךָ, תגיד, תשלח…* — and
+a composed value cannot be conjugated wrongly because there is nothing left to
+conjugate. `unknown` is not a third gender to guess at; it is an instruction to
+stay out of the question, with the neutral forms listed.
+
+The one thing that still outranks it is the person's own speech: אני צריכה is a
+woman speaking whatever the variable says, because she is the one who said it.
+
+**This does not make the Hebrew perfect** and the entry above should not be read
+as claiming it. Free sentences are still the model's and Hebrew marks gender on
+almost all of them. What is gone is the failure that was provably bookkeeping
+rather than Hebrew.
+
+**ועד בית → ועד הבית.** The best available reading of "כשהוא אומר בית זה לא
+נשמע כמו בעברית". The phrase he would have heard it in was the one the prompt
+wrote without the article, which is not how anyone says it — without the ה the
+two nouns collide and בית lands as a bare dictionary word instead of half a
+phrase. Fixed in the prompt and added to the pronunciation list for the
+sentences the model composes. **Unproven**: it is a complaint about a sound, and
+a sound needs an ear. If ועד הבית still lands wrong, the voice is the problem
+and that is a different change.
+
+**Inbound got the lead-in repertoire** — אז, אוקיי, בסדר, ברור, הבנתי — with
+the rule that no two turns in a row open the same way and most turns open with
+nothing at all. The debt prompt has had this since it was written; intake never
+did, which is half of why it reads flatter. אחי and סבבה stay out: a company
+answering a phone is not a friend. **The actual slang question is still Yariv's**
+— he is disagreeing with a rule that bans slang on purpose, and that is a
+decision to take with him rather than guess at.
+
+**THE DEMO PAGE MUST BE DEPLOYED BEFORE THE NEXT TEST CALL.** `gender_forms` is
+composed in `web/index.html`, and a call placed from the old build sends nothing
+for it — the guard strips the empty placeholder and the agent runs with no
+gender instruction at all, which is worse than what it had this morning. Build
+tag `2026-08-12b`.
+
+### Four of Yariv's seven fixed, and the inbound agent finally gets the language skill
+
+Both Hebrew assistants re-synced and live. What changed:
+
+**The Hebrew language skill was never applied to inbound.** The client's guess,
+and it was right. `hebrew-voice-gender-pronunciation-skill.md` had been worked
+into the debt prompt — the formal-to-spoken table, the numbers rules, the email
+rule are all there — and the intake prompt had none of it beyond a short gender
+paragraph. It now carries the parts that earn their place on a call with **no
+caller ID**, where the agent is neutral for longer than the outbound one ever
+is: the neutral-phrasing table, the לך trap (*lekha* to a man, *lakh* to a
+woman, same spelling), foreign words in Hebrew letters, gendered numerals, and
+the point that trips models hardest — **the past tense carries no gender at all**,
+so רשמתי is safe and רושם has to be checked. 21,000 → 22,767 characters.
+
+**The greeting.** `מהומיז` → `מחברת הומיז, שמנהלת את הבניין`. One-letter
+prepositions glue to the next word in Hebrew, so the voice read מ+הומיז as a
+single unfamiliar word. Backed by a substitution in `voice_guard.py` — the
+first entry there that rewrites rather than deletes — because the fixed line was
+only one occurrence and the model composes the rest, and it will write the glued
+form again since that is correct Hebrew. A rule cannot reach a form the language
+itself produces.
+
+**Idle messages, on both agents, which had never existed.** `messagePlan` was
+null: no mechanism at all for speaking into silence, which is why no prompt
+change could have produced the "הלו? אתה כאן?" he was missing — the model is not
+invoked while nobody is talking. Two lines, first at 8s, twice per stretch of
+silence with the count reset by speech. **Both are genderless** — אתה כאן? would
+be wrong for half of callers on a line with no caller ID, and after someone has
+already gone quiet is the worst turn to guess in. Plus a `silenceTimeoutMessage`,
+so a line that dies now ends on a goodbye rather than on nothing.
+
+**A tool is never the last thing you do.** New block in the debt prompt, and the
+substance of his dropped call. There is no endCall function on either agent by
+design, so a turn ending in a tool call and no speech leaves an open silent line
+until it times out. Paired with the request that produced it: the payment link
+**can** be sent — `send_payment_link` does exactly that — and everything else
+cannot, so it says so and hands over instead of going quiet.
+
+**The email address is now stored the way it is said**, in Hebrew, broken into
+pieces: `אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל`. Nothing parses it
+— it is spoken and nothing else — so a spoken form is the honest type. The
+English twin keeps the address itself and gets it through a `variablesFor`
+branch, since Latin text read by an English voice was never the problem.
+
+**The debt agent read a whole reference number out** — `hm20261043`, and once
+`h מינוס studious money 6.1404`. The tail-only rule asked for days ago went into
+intake and never here; the prompt had no rule either way and the model invented
+the behaviour. It now does not read one at all on a payment call, and gives four
+digits if asked.
+
+**One thing reported this morning was wrong and is withdrawn.** The empty
+`log_disputed_payment{}` was called correct. That tool takes exactly one
+optional field, `unit`, and its description says to leave it out unless the
+resident named a single apartment — which he did not. The empty call was the
+tool being used properly. The only fault in that turn was the silence after it.
+
+**Not fixed, and both need an ear rather than an edit:** whether בית sounds
+wrong across the board or is one word, and the register complaint — which is
+aimed at a rule that bans slang outright, so it is a disagreement with a
+decision, not a defect.
+
+**Found on the way:** `vapi_en.py intake` has been unbuildable since 7 Aug. Its
+substitution table still expects `You are Michal` and `אני מעבירה`, from before
+the agent was made male. The Hebrew is the deployed one and the twin exists for
+review only, so nothing live is affected — but the English intake assistant on
+the account is stale and cannot currently be regenerated. The debt table was
+kept in step with today's greeting change.
+
+### Yariv called the debt agent ten times, and every complaint is in the logs
+
+Saved verbatim to `feedback-yariv-voice-2026-08-12.txt` — WhatsApp, Facebook and
+seven points on the voice agent. Nothing edited yet. Each point was traced to the
+recordings rather than reasoned about, and six of the seven reproduce.
+
+**He was talking to the debt agent, not intake.** Its opening line is
+`מדבר מיכאל מהומיז` — one word, preposition glued to the name — and he heard
+"לאומיז". Our own transcriber, listening back to the agent's own audio across
+five of his calls, wrote it down as לאומיז, נעמיז, מהומיס and once מיכם. The
+intake greeting says `הומיז, חברת הניהול` and does not have this.
+
+**Nothing is configured to speak into silence.** `messagePlan` is null on both
+Hebrew assistants, so there is no "הלו? אתה כאן?" anywhere — the agent talks,
+hears nothing, and waits for `silenceTimeoutSeconds` to close the line. Four of
+his calls today ended `silence-timed-out`.
+
+**The email readback was reproduced twice in one call, differently each time:**
+`אופיס שטרודל הומיז.C או.IL`, then `oofficetrudle homeis.c .il`. The rule in the
+prompt is fine; the address arrives as Latin text through
+`{{verification_email}}` and a Hebrew voice is left to sound it out. The fix is
+to pass it already spelled the way it should be said.
+
+**The gender fault is worse than reported and is not a guess.** Call
+`019ff5c4`, `variableValues.gender = "m"`, `first_name = יוסי` — and the agent
+said **תשלחי**, having said the masculine form one turn earlier. The value was
+known. That makes it a model limit rather than a missing rule, so the prompt fix
+(gendered forms written out beside each fixed line, instead of a GRAMMAR section
+far from them) improves it and will not close it.
+
+**"The call disconnected" has a root cause, and it is not a crash.** Same call:
+he asked the agent to send *him* an email instead. The agent called
+`log_disputed_payment` **with empty arguments**, then `log_call_outcome
+{disputed, friction}`, and then said nothing at all. It decided the call was
+over and filed the paperwork. Saying the closing line is the only thing that
+hangs up here, so skipping it left an open line that Vapi closed twenty seconds
+later. Three faults stacked: no answer exists for "you send it to me", nothing
+forbids a tool call from being the last thing it does, and the missing idle
+message would have covered both.
+
+**Two of his points are not defects.** The slang complaint is aimed at a rule
+that bans slang outright — deliberate, and he disagrees with it. And every
+Hebrew line in both agents was written rather than transcribed, with no native
+speaker ever having read them aloud; that caveat has been in `demo-inbound.md`
+since the first day and this is it arriving. Both belong in the meeting he asked
+for, alongside porting the script from his existing bot.
+
+**One thing a log cannot settle:** whether בית sounds wrong is about audio, not
+text, and the text going in is correct. Worth one listening session against the
+retained recordings, marking every word that lands badly, rather than fixing
+them one complaint at a time.
+
+Nothing changed in the repo beyond the saved feedback file. Comparison published
+at https://claude.ai/code/artifact/6da41405-57af-4823-9956-bccfe95474b7
+
+### Their tickets are in, and their categories are now everyone's categories
+
+Asked for after the survey: import their maintenance calls and adopt their
+category vocabulary. Both done, live.
+
+**Migration 014.** `opened_via` gains `oxs`, because a staff member has to see
+which system owns the row in front of them — we cannot close a ticket over
+there. `category_he` holds their exact wording, `oxs_category_id` survives a
+rename on their side, and `type` becomes a slug per THEIR category, constrained
+so a stale value fails the migration rather than being written tomorrow by a
+tool nobody updated. Our two orphans were mapped rather than dropped:
+`structural` → `maintenance`, `security` → `other`. Also `reported_by_name`,
+`reported_by_phone`, `source_platform`, `image_count`, and `oxs_created_at` —
+the last one because THEIR timestamp and ours are months apart on a backlog and
+the dashboard must sort on theirs.
+
+**Two things went wrong and both were worth the trip.**
+
+A plain unique index on `oxs_ref` failed: `save_partial_request` writes the
+sentinel `partial:cut_off` into that column, so every abandoned call shares a
+value. The index is now scoped to `opened_via = 'oxs'`.
+
+Then the upsert failed with `42P10`, "no unique or exclusion constraint matching
+the ON CONFLICT specification", which reads like a missing index and is not one:
+Postgres will not infer a conflict target from a **partial** index unless the
+statement repeats the WHERE clause, and PostgREST cannot express that. The
+upsert runs on `reference` instead, which carries a plain unique constraint and
+holds their `taskNumber`.
+
+**The join is the address, not the phone.** The survey said `reportedBy.phone`
+was the key between the two systems. It is populated on **zero of 34 records** —
+the field exists and is always empty, which is the same shape-versus-value trap
+the original OXS phone probe was written to catch, and reading the shape instead
+of the values walked straight into it. `apartmentNumber` is filled on 32 of 34,
+their address string is the one ours is built from, and building + apartment
+matches **30 of 34**. One address carried a double space, so matching collapses
+whitespace while the stored value stays verbatim.
+
+**34 tickets imported**, 27 buildings, February to today, 30 attached to a
+resident. Re-running writes 34 and leaves 34. `requests` now holds 51 rows from
+four sources: oxs 34, voice 9, whatsapp 7, staff 1.
+
+**Migration 015** fills `category_he` from the slug by trigger, so a dashboard
+listing both sources does not show their rows labelled in Hebrew and ours blank.
+A trigger and not a change to `open_request`, because the label is a fact about
+the slug rather than about the caller, and the tool version would need every
+future writer to remember. Every ticket in the table now carries a label.
+
+Verified by conversation, not by inspection: *"יש נורה שרופה בלובי ביואב 30"* →
+ticket written with `type: lighting`, which did not exist as a value this
+morning.
+
+**Two regressions seen on the way and not fixed.** A burnt bulb in a corridor
+was answered with *"באיזו קומה?"* — the floor question the prompt forbids for
+common areas, back again. And *"לא, זה הכל"* was answered with the handover
+line, so declining further help hands the resident to the office.
+
+### OXS holds a ticket system nobody had looked at
+
+Asked for the full list of what the three keys can extract, so twelve endpoints
+were tried against all three, GET only, field names recorded and no value
+reproduced. Written up in `docs/reference/oxs-extractable.md`.
+
+Four families answer — `/buildings`, `/buildings/:id/{tenants,apartments,payments}`,
+`/debts`, `/service-calls`. Eight do not exist on any key: `/apartments`,
+`/tenants`, `/requests`, `/suppliers`, `/payments`, `/expenses`, `/employees`,
+`/committees`, `/documents`, nor the per-building forms of most of those.
+Buildings are the only collection with sub-resources. Scoping is real: `/debts`
+403s the general key, `/service-calls` 403s both general and debts.
+
+**`/service-calls` returns 33 open maintenance calls and we have never touched
+it.** 27 buildings, 10 Feb → 12 Aug, reported through a resident app (29) and
+web (4), 6 priority, 12 with photos. Residents have been reporting faults this
+way for six months. Our intake agent writes tickets into Supabase that OXS knows
+nothing about, and OXS holds tickets our agent cannot read — so "what is
+happening with my request" gets a different answer depending on which door the
+resident came through.
+
+Two things it cannot tell us on its own. Every one of the 33 reads `פתוחה` and
+one is six months old, so either the endpoint returns open calls only or nothing
+is ever closed — very different facts, same response. And `reportedBy.phone` is
+the same key as `residents.phone`, so ticket history joins to the debt queue
+with no new identifier and no matching logic.
+
+`facilityCategory.name` is their own fault vocabulary — אחר, תאורה, אחזקה, חשמל,
+אינסטלציה, מעלית, הדברה, מנעולן, ניקיון, גינון, כיבוי אש. Ours was invented.
+Theirs should win.
+
+Also found sitting inside endpoints the importer already calls, each one field
+on an existing sync: `payerType` (owner or renter — who a debt call should
+reach), `email`, `legalActions` (never cold-call someone already in
+collections), `automatedCreditFailedMessage` (a bounced standing order is a
+different conversation), `communicationTypes`, and `paymentByUser`.
+`/buildings/:id/payments` is a list of lists, which is why a naive walker over
+it returns nothing.
+
+### A second Supabase project appears, and is prepared rather than switched to
+
+Two keys arrived — `sb_publishable_…` and `sb_secret_…`, the new-style
+replacements for `anon` and `service_role` — with a dashboard URL pointing at
+project **`tfldjbwtghfgdwoyauio`**. Probed before anything was changed, which
+is the whole reason this is a preparation and not an outage:
+
+- both keys authenticate; PostgREST answers them
+- the project has **zero tables** — not a missing one, none
+- it is on a **different Supabase account**: `SUPABASE_ACCESS_TOKEN` lists
+  exactly one project, `nmxlhlmcnnggnnuxyelt` (*HOMIES*), and this is not it
+
+So this is not a key rotation. Pointing `SUPABASE_URL` at it would have emptied
+the system rather than updated it — 7,391 residents, 179 charges, 234 messages,
+103 interactions, and both Edge Functions, all still on the old project and all
+still the only copy.
+
+Asked, and the answer was *"just prepare for migration"*. Done, and nothing is
+live:
+
+- keys staged in `.env` as `SUPABASE_NEW_*`, read by nothing, with a comment
+  above them saying so
+- `supabase/schema.sql` generated — 001–013 concatenated, 64,624 chars, ready to
+  paste into the target's SQL editor. **002 and 005 excluded**: they seed demo
+  residents and charges, both purged on 10 Aug, and a fresh project should not
+  be born holding rows somebody deliberately deleted
+- `docs/handover/supabase-migration.md` written: row counts to verify a copy
+  against, the dependency order for the data, the five places that hardcode the
+  old project, and the two things still missing
+
+The two missing things are both for the **new** account, which our token cannot
+reach: its database password (for the data copy) and a personal access token
+(to deploy `debt-tools` and set its secrets). Neither blocks the schema step.
+
+The failure mode to fear here is not an error. Every repoint target keeps
+working after a half-migration, because the old project stays up and answering —
+a system writing to two databases looks perfectly healthy from the outside.
+
+### The bot stopped because OpenRouter ran out, and a new key put it back
+
+A resident wrote *"אין לי אור ביחידה"* and got the handover line back. It was
+not the model deciding to hand over — **the model never ran**. Execution 1003:
+
+    NodeApiError — Payment required
+    "You requested up to 4096 tokens, but can only afford 770."
+
+Three retries, all 402, then the error branch, which sent
+*"אני מעביר את זה לצוות, נחזור בהקדם"* rather than leaving the resident with
+silence. That branch worked exactly as designed and is the reason this looked
+like a bad answer instead of a dead bot.
+
+Both keys were empty when checked: `OPENROUTER_API_KEY` at −$0.15 (never funded,
+`is_free_tier: true`, and on a **different account** — different
+`creator_user_id`), `OPENROUTER_API_KEY_2` at −$0.19 against $45 granted.
+
+**Where the $45 went, since the obvious answer is wrong.** claude-opus-5 ran
+exactly once, on 8 Aug, as a documented probe: 2,632 in / 48 out, about 1.5
+cents. It never served a resident — OpenRouter pre-authorises the whole
+`max_tokens` against the balance and 4,096 tokens of Opus exceeded it, which is
+*why* the switch to Flash happened. So Opus is not the explanation. What the key
+reports: $25.70 lifetime on this key, $12.47 of it this month, $0.19 today —
+and an account total of $45.19, meaning **$19.49 was spent by a key that is not
+in this repo at all**. Today's nineteen cents is ours and is about sixty model
+calls at Flash prices. The rest cannot be attributed without a management key;
+`/api/v1/activity` refuses an ordinary one.
+
+**The fix.** The account was topped up to $65 and a new key arrived in `.env` as
+`OPEN_ROUTER_MAIN`. Promoted to `OPENROUTER_API_KEY` (old one kept as
+`OPENROUTER_API_KEY_EMPTY`, since it is a different account and may still be
+wanted) and the extra name dropped — one key, one name, the same rule the Vapi
+`_ACCOUNTn` suffixes follow.
+
+n8n's public API has **no PATCH for credentials**, so the key could not be
+updated in place: a new `openRouterApi` credential was created
+(`Wj4HhLTx6yNAQ3IU`), `N8N_OPENROUTER_CRED_ID` repointed, and the workflow
+re-pushed. The old credential was left rather than deleted — shared production
+instance, and a credential holding a dead key harms nothing.
+
+Verified by conversation, not by balance: *"אין אור במסדרון שלי"* → *"אני מבין.
+באיזה בניין נמצא המסדרון?"* → ticket `HM-2026-1033`, `unit: null`, deleted after.
+
+**Then moved again, to key 2, on request.** The 12-Aug key carries a $15 cap of
+its own; key 2 is uncapped and sits on the same account, so it reaches the whole
+$19.80 instead of stopping at $15 with money still there. `.env` shuffled the
+same way (`OPENROUTER_API_KEY_CAPPED15` steps aside), credential
+`92ZNHDhByavmNP5T` created, workflow re-pushed and re-activated, and the live
+node confirmed pointing at it rather than assumed.
+
+Three OpenRouter credentials now exist on the shared n8n and two are dead. That
+is the cost of an API with no PATCH: every key change leaves one behind, and
+deleting them on an instance carrying other clients' workflows is not worth the
+risk for the tidiness.
+
+Worth noting from the last run — *"מה קורה עם הקריאה שלי?"* answered *"הקריאה
+על החושך במסדרון עדיין פתוחה, היא אצל הצוות"*, which is the phrasing the prompt
+teaches, and it found the ticket by building this time. The lookup failure
+recorded above did not reproduce.
+
+### Hebrew only, and a bot that sounds like it means it
+
+A real WhatsApp conversation came back from the client's own handset — correct
+throughout, and cold. *"זה תיאור הולם?"*, *"פתחתי קריאה, המספר שלה הוא
+HM-2026-1030."*, *"קריאת שירות HM-2026-1030 על אין אור במסדרון ליד דירה 107
+פתוחה ותטופל."* Not one of those is wrong. All three read like a form. Asked for
+two things: English gone entirely, and a bot that is kind without being a robot.
+
+**English removed, not disabled.** `HANDOVER_LINE_EN`, `SWITCH_LINE`, the English
+half of `MEDIA_LINE` and `TAP_LINE`, the whole English `MENU`, the `lang_en` /
+`lang_he` rows, Sort's switch detection and its leftover-token check, and the
+prompt's English section and second fixed lines — all deleted. A switch nobody
+can reach is a thing the next reader has to rule out. `lang` survives as a
+constant `'he'` because it is written on every `messages` row and the dashboard
+reads it; `git log` has the rest if English is ever wanted back.
+
+The agent's per-turn directive changed with it, from *answer in the language
+Sort chose* to **answer in Hebrew even if the message is English** — which is
+the failure that actually remained: a model answering an English-looking message
+in English out of habit. Tested with *"thanks, can you check my balance?"* and
+the reply came back in Hebrew.
+
+**Sincerity, written as two mechanics rather than as an adjective.** The prompt
+already forbade "אשמח לעזור" and "בשמחה רבה" — correctly; they are what every
+bot writes — and forbidding them without a replacement is what produced the
+clipped register. So it now says what warmth actually consists of here: one
+short acknowledgement that you understood what happened, **once in a
+conversation** (someone who commiserates every message reads as more false than
+someone who never did), and always saying what happens next rather than handing
+over a bare number. The three dead lines above are quoted in the prompt with
+their replacements, because naming the exact sentence is what worked for the
+truncated reference number.
+
+Same three turns, after:
+
+    אין אור במסדרון שלי   → באיזה בניין?
+    בניין 1              → רשמתי קריאה על חוסר אור במסדרון בבניין 1,
+                            מספר HM-2026-1032. זה עובר לצוות התחזוקה.
+
+**"המסדרון שלי" is still a corridor.** The client's transcript has the bot
+asking *"איזה מסדרון? איזו קומה?"* and then storing `unit = 107` on a
+common-area fault — the possessive read as *inside my flat*. `מסדרון` was
+missing from the common-property list, so it has been added along with the
+reading rule. The row now comes out `unit: null`, and the apartment question is
+not asked.
+
+**Still open, seen in the same run.** *"מה קורה עם הקריאה שלי?"* with a building
+and no reference answered *"לא מצאתי קריאות פתוחות בבניין 1. יכול להיות שהיא
+נסגרה?"* — about a ticket opened forty seconds earlier in that conversation. The
+lookup by building alone found nothing, and the model then offered a theory for
+why. Two faults in one sentence and the second is the worse one: it is the
+prompt's own rule about not inventing, broken in the friendliest possible voice.
+
+### New Cartesia key, proved before it was trusted
+
+Cartesia ran out of credits and a replacement key arrived. Wired in this order,
+which is the only order that catches the interesting failure:
+
+1. **Cartesia first.** `GET /voices/a976c076…` on the new key → 200, *"Eyal -
+   Grounded Guide"*, which is the voice both Hebrew assistants actually use.
+2. **Then a real synthesis**, because a metadata GET proves the key is valid and
+   says nothing about credits — which is exactly what just ran out.
+   `POST /tts/bytes`, `sonic-3`, `language: he` → 200 and 21,360 bytes of audio.
+3. **Then `.env`**, then Vapi.
+
+The Vapi side was a `PATCH` of credential `52e0bca2-863e-4bf5-8a3b-9b090f10f4ca`
+rather than a new credential, so the id did not change and nothing had to be
+repointed. Both Hebrew assistants re-checked after: `cartesia/a976c076`, Vapi
+fallback, unchanged.
+
+This is blocker 1 in a new costume. A Cartesia credential that is present but
+broke — wrong key, no credits — fails exactly like one that never travelled:
+Vapi drops to the `vapi` fallback voice, the call completes, nothing errors and
+nothing logs, and the only symptom is a Hebrew agent with an American accent.
+Proving the key against Cartesia directly is what turns that into something a
+script can see.
+
+### Account 5 goes live, six hours after being built not to
+
+*"ok now switch vapi account to the new one we have"* — so step 6 of
+`new-vapi.md`, the one the morning deliberately skipped, ran this afternoon.
+
+`.env` first: the account-4 pair archived to `VAPI_PRIVATE_KEY_ACCOUNT4` /
+`VAPI_PUBLIC_KEY_ACCOUNT4`, the account-5 pair promoted to the unsuffixed names,
+and the `_ACCOUNT5` lines deleted — `_ACCOUNTn` has always meant *old*, and
+leaving a line that means *current* under that suffix is how the next person
+picks the wrong key. Values were moved by a script that prints lengths, and the
+first eight characters of the public keys only.
+
+Then 23 id replacements across 11 files: the four assistant UUIDs, the public
+key, and the eight-character short forms that `web/README.md` and the assistant
+documents use in prose. `docs/WORKLOG.md`, `new-vapi.md`'s history tables and
+the export JSONs were left alone on purpose — they are the record of what the
+ids *were*.
+
+Then both Hebrew assistants were re-pushed. This was not ceremony: account 5 was
+built this morning, the intake prompt changed at midday (the reference tail), and
+a standby account built before a prompt change is a standby account carrying the
+old prompt. The English debt twin was rebuilt from the new Hebrew source in the
+same pass — 52 passages and 4 section blocks, all matched. Both pushes resolved
+account 5's assistants **by name**, without being handed an id, which is the
+cheapest possible proof that the key swap took.
+
+Verified: `vapi_export.py --show` → four assistants, the Cartesia credential
+`52e0bca2`, no phone number. `check_tools.py` → 10 passed, 0 failed. The one
+failing n8n execution it reports is this morning's WhatsApp conversation test,
+whose Send node cannot deliver to a handset that is not on Meta's allow-list.
+The tool check's own ticket, `HM-2026-1029`, was deleted after.
+
+**Nobody has placed a call on account 5.** Blocker 1 — a missing Cartesia
+credential — has no symptom except an American accent, and the credential
+resolving in the API is not the same evidence as hearing it. `web/index.html`
+carries the new ids, the new public key and `BUILD 2026-08-12a`, but it is its
+own repository and **has not been pushed**, so the live page is still calling
+account 4 until it is.
+
+### Three turns through the live bot, and what they turned up
+
+Asked to see the flow rather than read about it, so a scripted conversation went
+in at the real callback URL, signed the way Meta signs it, and the replies came
+back out of the `messages` log. Test handset, ticket and chat rows deleted after.
+
+    היי                                → היי, כאן הומיז. מה קרה?           [menu]
+    המעלית בבניין תקועה                 → אוקיי, באיזה בניין?
+    אף אחד לא בפנים. הרצל 14, דירה 12   → רשמתי קריאה דחופה למעלית תקועה
+                                          בבניין הרצל 14, מספר קריאה HM-2026-1028.
+
+Right: no name, no second greeting, Hebrew throughout, the building asked for
+and not the apartment, `type=elevator`, `urgency=high` inferred and not asked,
+reference quoted whole.
+
+**The double greeting was not a prompt fault, and the prompt could not have
+fixed it.** First run: `היי` → menu, `המעלית תקועה` → *"היי, כאן הומיז. באיזה
+בניין…"*. The menu, both tap lines and the switch line are sent without a model
+round-trip, so none of them are in the agent's memory — from where the model
+sat, the second message *was* the first message of the conversation and the
+introduction was correct. Sort now carries a `greeted` flag per handset, on the
+turn, exactly like the language decision, and the agent is told in as many
+words not to introduce itself again. Second run, same three turns: clean.
+
+**Found, not fixed — the handover line can go out without the tool.** One run
+answered `המעלית בבניין תקועה` with *"אני מעביר את זה לצוות, נחזור בהקדם"* and
+`transfer_to_human` appears nowhere in the execution. The line is real, the
+resident is told a person is coming, and nothing was written — the same shape as
+the invented reference number, which is the failure mode this project keeps
+meeting. The prompt already says to call the tool *before* writing; it was
+obeyed on the other runs and not on this one, so a prompt rule is not the guard.
+The workflow can see it: an agent output matching a fixed line with no tool call
+in the run is detectable in "Reply usable?".
+
+**Found, not fixed — a common-area ticket kept the apartment number.** The lift
+row carries `unit = 12`, volunteered by the resident and never asked for. The
+bot correctly did not ask, and `check_whatsapp.py` asserts a common-area fault
+has no unit, so the written contract and the written row disagree. A dispatcher
+reading unit 12 on a lift call has been told something untrue.
+
+Non-determinism worth knowing: `המעלית בבניין תקועה` was read once as a danger
+(people possibly inside → transfer) and once as an ordinary fault (→ ask which
+building). Both are defensible against the prompt, which routes on whether
+anyone is trapped and cannot know from that sentence. The bot asked
+*מישהו תקוע בפנים?* on the run where it mattered.
+
+### The bot is Homies, stops saying hello twice, and stops guessing English
+
+Four changes asked for after a real Hebrew exchange on the handset. Three land
+on the WhatsApp bot, one on the inbound voice agent. All four are live.
+
+**No more Michael.** The bot had been a named man since 7 Aug; it is now the
+company's support desk with no first name, and the prompt says not to invent one
+if asked. Both menu bodies changed with it — `היי, כאן הומיז. מה קרה?` and
+`Hi, this is Homies Support. How can I help?`. The masculine self-reference
+stays: Hebrew marks the speaker's gender on the verb, so `אני פותח` is grammar
+and not a persona, and both alternatives are things this prompt already forbids
+(a company-voice plural, or the passive).
+
+**The greeting was coming back mid-thread**, most often on the message that
+confirms a ticket's details. *Introduce yourself once* had been in the prompt
+since 8 Aug and the model read it as a rule about introductions rather than
+about the word `היי`. It now names that message specifically and shows the
+replacement — `רשמתי נזילה בלובי…`, no opener — because a prohibition with
+nothing to put in its place gets filled with the last thing said.
+
+**Script detection is gone from the Sort node.** A Hebrew speaker quoted their
+own reference back and was answered in English: `HM-2026-1013` carries Latin
+letters and tripped `/[a-z]/i`. The digits-only version of this was patched on
+9 Aug by making digits abstain; the prefix is the same bug wearing letters, and
+so are `ok`, `hi`, `toda` and any Latin-script address. No character class
+separates *typed a Latin character* from *wants English*, so the inference was
+removed rather than tuned. Hebrew is the default; the menu row and an explicit
+request are the only two doors into English, and both already stick.
+
+**The voice agent reads out the tail of the reference only.** `HM-2026-1001`
+becomes `1, 0, 0, 1`. The prefix and the year are identical on every reference
+in the system, so they are four more things to mishear on the single line of the
+call that has to be written down correctly. Nothing is lost: `get_request_status`
+has matched on the tail since 9 Aug and the WhatsApp bot takes either form. The
+full reference is still what is stored and what the dashboard shows — and the
+WhatsApp bot still quotes it whole, because there it is text being copied, not
+speech being transcribed by ear.
+
+Pushed: n8n workflow `u2JjrbcNPYyyh3yl` updated and re-activated (the update
+clears the active flag), Vapi intake `f482abc1` updated, 20,504 chars.
+`vapi_en.py`'s intake table got the matching English pair, though that twin is
+still the stale copy from the 11 Aug move and is not regenerated.
+
+Not done, and not asked for: the **voice** agents still introduce themselves as
+מיכאל — the inbound first message is `הומיז, חברת הניהול. אה, מדבר מיכאל, איך
+אפשר לעזור?`. The name change was asked for on the chatbot only.
 
 ### Account 5 stands ready, and nothing points at it
 
