@@ -27,20 +27,20 @@ The 11labs transcriber (`scribe_v2_realtime`) needs **no** credential — it is
 billed through Vapi. Cartesia is the one exception, and it is the one that
 matters.
 
-**2. The English twins cannot be regenerated from the Hebrew today, so they are
-copied instead.** `vapi_en.py` requires every substitution in its table to match
-the live Hebrew prompt exactly once and exits rather than shipping a
-half-translation. The debt table's stale entries were fixed on 7 Aug and the
-counts are now explicit, but **109 Hebrew passages in the prompt still have no
-English pair** — the prompt went from 33k to 63k characters and most of that
-growth is prose quoting Hebrew. The intake table has 9 stale entries from the
-מיכל → מיכאל change.
+**2. ✅ RESOLVED 18 Aug — both English twins rebuild from the Hebrew again.**
+This used to say the twins could not be regenerated and had to be copied
+verbatim: 109 unpaired Hebrew passages on debt, 9 stale intake entries from the
+מיכל → מיכאל change. Both tables were rebuilt on 18 Aug — debt is 57 passages
+plus 4 section blocks, intake is 25 plus 2 — and both `--dry` runs are clean.
 
-So step 5 copies the existing English assistants across verbatim rather than
-rebuilding them. They are complete, working assistants — but they were last
-regenerated at **02:54 on 7 Aug** and carry none of that day's fixes. **Do not
-use an English twin to judge whether a Hebrew fix worked.** Check where the
-rebuild stands at any time:
+**So step 5 regenerates, and the warning that used to follow this is gone:** an
+English twin now reflects the Hebrew it was built from, and can be used to judge
+whether a Hebrew fix worked.
+
+`vapi_en.py` still requires every substitution to match the live Hebrew prompt
+exactly once and exits rather than shipping a half-translation — that is the
+check working, not a fault. **A refusal means the table is stale, and the fix is
+always the table, never the check.** Confirm where it stands before a move:
 
 ```
 python scripts/vapi_en.py debt --dry
@@ -93,10 +93,53 @@ account you just left. The convention in this folder:
 - **Anything edited in the dashboard and never written back here.** Diff the new
   assistant against `vapi-export.json` if you are unsure.
 
+**Refresh the export before a move, and keep the old one:**
+
+```
+python scripts/vapi_export.py --archive account5-18aug   # writes both files
+python scripts/vapi_export.py --check                    # re-scan before committing
+```
+
+Since 18 Aug the export redacts **every credential-shaped value in `.env`**
+wherever it appears, not only fields called `headers`, and refuses to write if
+any survives. Plain URLs and bare uuids are left alone on purpose — `SUPABASE_URL`
+is public by design and ships in the dashboard's browser bundle, and a check that
+flags six harmless things is a check nobody reads.
+
 There is **no phone number** on the account and none to move. Web calls from the
 demo page need none, which is how all testing has been done since 4 Aug.
 
 ## The rebuild
+
+**Since 18 Aug most of this is one script.** `scripts/vapi_transfer.py` does
+steps 2, 3, 5 and 6 — creates the Cartesia credential, copies all four assistants
+verbatim, and rewrites all 17 hardcoded ids across the 10 files from the map that
+creating them produced. Step 6 is the one that has broken every move so far,
+because a wrong assistant id does not error.
+
+```
+python scripts/vapi_transfer.py --preflight                 # what is here, what is needed
+python scripts/vapi_transfer.py --to VAPI_KEY_NEW --dry     # the plan, and the id rewrite
+python scripts/vapi_transfer.py --to VAPI_KEY_NEW --apply
+```
+
+`--to` names the **variable in .env**, never the key — a key on a command line
+lands in shell history, and this repo is public. It refuses to run into an
+account that already holds Homies assistants, because creating by name again
+gives four duplicates and no error.
+
+**It copies rather than rebuilds, and that is the difference from the steps
+below.** A rebuild produces what the repo says should be live; a copy produces
+what **is** live. Those differ whenever somebody has touched the dashboard, and a
+migration is the wrong moment to find out. Rebuild deliberately afterwards with
+`vapi_sync.py` and `vapi_en.py`, not as a side effect.
+
+**What it cannot do: the public key.** `GET /org` is 401 to a private key, so
+nothing can read it. Copy it from the dashboard into `VAPI_PUBLIC_KEY` and into
+`web/index.html`, or the demo page loads and no call ever starts.
+
+The steps below remain the manual path, and are what the script automates.
+
 
 **0. Fix the two blockers above.** Then continue.
 
@@ -143,8 +186,9 @@ python scripts/vapi_en.py debt --create
 python scripts/vapi_en.py intake --create
 ```
 
-If it is not clean — which is the case today, see blocker 2 — copy the existing
-ones across instead. Read both from the old key, strip the server's own fields,
+If it is not clean — it was clean on 18 Aug, so a refusal means the Hebrew has
+moved since and the table needs the same treatment — copy the existing ones
+across instead, and fix the table before trusting an English demo. Read both from the old key, strip the server's own fields,
 POST to the new one:
 
 ```python
@@ -326,25 +370,39 @@ Account 3's private key is kept in `.env` as `VAPI_PRIVATE_KEY_ACCOUNT3`. Call
 history and recordings stay behind, and **recordings are deleted after 14 days**
 — pull anything from before 11 Aug that still matters.
 
-## 12 Aug: account 5, configured as a standby — NOT a move
+## 12 Aug: account 5, made standby in the morning and switched to in the afternoon
 
 The client supplied a fifth pair of keys and asked for the account to be made
-ready **without switching to it**. So the rebuild ran (steps 2, 3 and 5) but
-step 6 deliberately did not: **nothing points at account 5.** The demo page,
-`.env`'s `VAPI_PRIVATE_KEY`, and every hardcoded id still belong to account 4,
-which remains the live account. Switching later is only step 6 plus a `BUILD`
-bump — the account itself is done.
+ready **without switching to it**, so the rebuild ran (steps 2, 3 and 5) and
+step 6 deliberately did not. Later the same day: *"ok now switch vapi account to
+the new one we have"* — so step 6 ran too, and **account 5 is now the live
+account**.
 
-| | Account 5 (standby) |
-|---|---|
-| Debt (he) | `489aa39c-223d-402b-b07f-3fe53276b35b` |
-| Debt (en) | `3b0e384d-05a3-4e57-8958-ad3aa726652a` |
-| Intake (he) | `7813da25-f242-4a8d-888e-51caa2ec8b3f` |
-| Intake (en) | `9ed5e788-0f50-4806-8377-905a559f7296` |
-| Keys | `.env` → `VAPI_PRIVATE_KEY_ACCOUNT5` / `VAPI_PUBLIC_KEY_ACCOUNT5` |
-| Cartesia credential | `52e0bca2-…` (added before the first push, per step 2) |
-| Org | `4cedeed3-7055-4124-be14-daddfe78e018` |
-| Phone number | none |
+| | Account 4 | Account 5 (current) |
+|---|---|---|
+| Debt (he) | `9e2034d1` | `489aa39c-223d-402b-b07f-3fe53276b35b` |
+| Debt (en) | `41d370b2` | `3b0e384d-05a3-4e57-8958-ad3aa726652a` |
+| Intake (he) | `f482abc1` | `7813da25-f242-4a8d-888e-51caa2ec8b3f` |
+| Intake (en) | `8b98016b` | `9ed5e788-0f50-4806-8377-905a559f7296` |
+| Public key | `944c3b38` | `a1ca7090-b4b9-4015-9220-dad1d6ce0279` |
+| Cartesia credential | `4c9be89b` | `52e0bca2-863e-4bf5-8a3b-9b090f10f4ca` |
+| Org | `8eb82c4d` | `4cedeed3-7055-4124-be14-daddfe78e018` |
+| Phone number | none | none |
+
+**The switch, as it ran.** `.env` first — the account-4 pair archived to
+`VAPI_PRIVATE_KEY_ACCOUNT4` / `VAPI_PUBLIC_KEY_ACCOUNT4` and the account-5 pair
+promoted to the unsuffixed names, with the `_ACCOUNT5` lines deleted so that
+`_ACCOUNTn` keeps meaning *old*. Then 23 id replacements across 11 files, full
+UUIDs and the eight-character short forms prose uses. Then, because the intake
+prompt had changed that same morning and account 5 was built before it, both
+Hebrew assistants were re-pushed by `vapi_sync.py` and the English debt twin
+rebuilt from the new Hebrew source — which is also what proved the key swap:
+both syncs resolved account 5's ids by name without being told them.
+
+Verified after: `vapi_export.py --show` lists the four assistants and the
+Cartesia credential (plus Vapi's stock *Riley* sample, which is not ours),
+`check_tools.py` 10 passed 0 failed. **Not verified — nobody has placed a call
+on account 5 yet.** Blocker 1 has no symptom but the sound of it.
 
 Two things differ from a plain copy of account 4, both asked for on 12 Aug and
 both now in `vapi_sync.py`'s `BASE`, so they are the default everywhere from
