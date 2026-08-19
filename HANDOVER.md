@@ -536,12 +536,26 @@ handset.**
    up is sitting unread. Smallest of the open items and the only one that is a
    live correctness fault rather than a missing feature.
 4. **18 apartments have no phone in OXS** and were skipped. Not callable.
-5. **The WhatsApp bot can send the handover line without calling
-   `transfer_to_human`** — seen once on 12 Aug. The resident is told a person
-   will come back to them and no row is written. The prompt already orders the
-   tool before the sentence and was obeyed on every other run, so the guard has
-   to be in the workflow: a fixed line in the agent output with no tool call in
-   the execution is visible at "Reply usable?".
+5. **CONTAINED, NOT FIXED — the WhatsApp bot claims work it did not do.** Two
+   faces of one fault. The handover line without `transfer_to_human`, seen
+   12 Aug; and on 19 Aug, with the execution in hand, *"פתחתי קריאה … מספר
+   255-1048-26"* having called only `verify_address`. No row, and that reference
+   belongs to somebody else's ticket, so a resident quoting it later quotes a
+   stranger's fault.
+
+   **The guard is live at "Reply usable?"** — a reply carrying a reference, or
+   claiming a request was opened, with no `open_request` output behind it takes
+   the false branch into "Hand over instead". Proven on a real run: the phantom
+   was replaced with *אני מעביר את זה לצוות* and the resident got a person
+   instead of a fabricated number. **The cause is untouched and intermittent** —
+   one run in the same session called the tool correctly.
+
+   Two n8n traps found building it, both worth knowing before editing any
+   expression here: **`}}` anywhere inside an expression ends it** — n8n closes
+   on the first one, so an arrow function's natural `}})()` truncates everything
+   and the node reports "invalid syntax" at run time rather than at deploy; and
+   **`isExecuted` is useless on a tool node** — it returned true on a run whose
+   execution shows the tool was never called. Use the node's output instead.
 6. **A common-area ticket keeps an apartment number if the resident offers
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
