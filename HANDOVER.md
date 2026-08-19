@@ -199,6 +199,23 @@ trusting this line. **Call history, transcripts and recordings did not
 move and cannot**; everything before 19 Aug 12:00 lives on account 5, and Vapi
 deletes recordings after 14 days.
 
+**THE CARTESIA KEY LIVES IN VAPI, NOT IN `.env`.** Changed 19 Aug. It is a Vapi
+provider credential — "Cartesia (Hebrew TTS)", `4c9be89b-f62e-42e7-bd2d-35faf51e0969`
+— and that is the copy that pays for Hebrew speech. `.env` feeds only the three
+local scripts (`cartesia_tts.py`, `voice_clone.py`, `vapi_transfer.py`); no n8n
+workflow touches it. **Editing `.env` alone leaves the old account billing while
+everything looks migrated.** Update both:
+`PATCH /credential/{id}` with `{provider, apiKey, name}`. Vapi never reads the
+value back, so the only proof is a Hebrew call. Superseded keys are kept as
+`CARTESIA_API_KEY_ACCOUNT<n>`.
+
+**The Hebrew voice cannot be lost in a move.** `a976c076-3e31-4bf2-a178-8c3ce3d52b2a`
+— *Eyal - Grounded Guide* — is a **public** Cartesia voice, so it belongs to no
+account. And a voice listing's `owner_id` is the **voice's** owner, never the
+caller's: all three of our keys report `org_3AOx…` because that is who published
+the first public voice in the list. It looks like an account identifier and is
+not one.
+
 **Cartesia has no balance endpoint, and it is in the live Hebrew path.**
 `/usage`, `/balance`, `/account`, `/credits` are all 404 and a successful call
 returns no quota headers — checked 19 Aug. Both keys in `.env`

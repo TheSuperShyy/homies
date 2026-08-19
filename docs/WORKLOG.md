@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The Cartesia key moves, and `.env` was the least important place it lived
+
+A new Cartesia key, and the move is two edits — one of which is easy to miss and
+is the only one in the live path.
+
+**Vapi holds the key, not this repo.** It is stored as a provider credential
+("Cartesia (Hebrew TTS)", `4c9be89b`, added 11 Aug) and that is what pays for
+every Hebrew utterance. Changing `.env` alone would have left the old account
+billing indefinitely while everything looked migrated. `PATCH /credential/{id}`
+with the new key, and Vapi never returns the value back, so it is write-only from
+here — the proof has to come from a call.
+
+**What was checked before touching anything.** The key authenticates. The Hebrew
+voice `a976c076` — *Eyal - Grounded Guide*, `he` — is **public**, so it belongs to
+no account and cannot be lost in a move; that was the one thing that could have
+silenced Hebrew and it cannot. Nothing else holds a Cartesia key: no n8n workflow
+mentions it, and the three scripts that read it (`cartesia_tts.py`,
+`voice_clone.py`, `vapi_transfer.py`) all take it from `.env`.
+
+**What could not be checked.** Whether this really is a different account. All
+three keys see the same 889 public voices and none of the accounts owns a private
+one, so there is nothing account-shaped to compare — and Cartesia exposes no
+endpoint that names the org behind a key. The `org_3AOx…` in a voice listing is
+the *voice's* owner, not the caller's, which is a trap worth naming because it
+looks exactly like an answer.
+
+The outgoing key is kept as `CARTESIA_API_KEY_ACCOUNT1` rather than deleted, the
+same convention every superseded Vapi pair follows. `CARTESIA_VOICE_ID` in `.env`
+is and was empty — the assistant's voice comes from the sync config, so nothing
+depended on it.
+
+**The key was pasted into chat, doubled** — the same string twice, 29 characters
+each. Worth rotating once the account settles. Nothing real was ever committed:
+the three tracked files matching `sk_car_` are all documentation placeholders,
+and `.env` is gitignored.
+
 ### The agent told a caller about somebody else's stolen parcel
 
 A caller asked about the lift in building one. The agent read back **two**
