@@ -11,6 +11,65 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The call was correct, and it was cold
+
+The first call on the new account went through cleanly. A resident reported a bag
+taken from outside their door, gave the building, gave the apartment, got a
+reference number, and answered three follow-up questions. Every field the office
+needs was captured. The verdict on it was one line: *"looks too not polite and
+not human."*
+
+Six things in that transcript were the agent's:
+
+- **Not one answer was acknowledged.** The caller gave the colour of the bag, the
+  time they left it out, what was in it — and each answer was met with the next
+  question and nothing in between. This came from *this* file: "Say less than you
+  think you should" bans thanking someone and bans repeating what they said, and
+  the model read the pair as *say nothing*. Brevity was the rule; silence is what
+  arrived. There is now a fifth item on that list, and it is the only one phrased
+  as a requirement: **receive the answer before you ask the next thing.** Two
+  words. הבנתי. טוב. Not a sentence.
+- **The same question three times.** *"Anything else the office should know?"* —
+  the exact yes/no filler the follow-up section exists to replace, asked once
+  after each real question, until the caller was answering about the time while
+  still describing the colour. The section said "two is usually plenty" and the
+  call ran to five. It now says **two, and then you stop**, and bans that
+  sentence outright inside the follow-ups. There is one *משהו נוסף?* in a call
+  and it is the last thing before the close.
+- **A question rode in on the reference number.** *"Your reference number is one
+  zero six two. What was in the bag?"* — one turn. That is the only line in the
+  call the caller is writing down, and a question on top of it costs them one or
+  the other. The number now gets its own turn and nothing else goes in it.
+- **The offer was made in our vocabulary, not theirs.** *"I can open a request"*
+  got *"I don't quite understand what you want"* back, and the agent's own
+  recovery — *"I can write down your problem so the office knows about it"* — was
+  the better sentence. That recovery is now the first attempt: לרשום למשרד, not
+  לפתוח קריאה. A smaller second wording sits behind it for a caller who still
+  does not follow.
+- **"I cannot say when it will be resolved. Anything else?"** Both sentences
+  true, and together the least helpful turn in the call. Rules 1 and 2 forbid
+  giving a date and that is not in question — but a bare refusal is a door
+  closing, so it now goes out with what we *do* know attached: it is written
+  down with them and they come back about it. Never a bare refusal, and never a
+  guess to soften one.
+- **The goodbye arrived on its own.** *"Thanks for calling Homies. Have a good
+  day."* … *"and goodbye."* — a full stop in the middle of a one-sentence
+  closing, so the voice spoke it as two and left a pause long enough for the
+  caller to start talking into. Commas, not full stops, and the prompt now says
+  so next to the line.
+
+Plus one rule that catches all of it: **never say the same sentence twice in one
+call.** A phrase arriving a second time in the same wording is the clearest
+signal a caller gets that nobody is listening.
+
+Both twins pushed, `f482abc1` and `8b98016b`. Six new fixed lines joined
+`SAFE_SENTENCES`, and that list learned something in the process: an entry can
+now be a **pair**, meaning *this line is supposed to change, and here is exactly
+what to*. The Hebrew closing is the first one — the pronunciation substitution
+rewrites להומיז as לחברת הומיז so the voice says the company's name rather than
+an unfamiliar word, and a check that called that damage would have taught
+everyone to ignore the check.
+
 ### The mirror gets promoted, which is why it existed
 
 The overdrawn account had a spare that was already identical — account 4, made a

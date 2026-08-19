@@ -756,9 +756,22 @@ INTAKE_LINES = [
     # twin testing a flow that does not exist.
     ("אני מצטער לשמוע.", "I'm sorry to hear that."),
 
-    ("    אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
-     "    I can open a request for this, so the office has it in writing and comes\n"
+    ("    אני יכול לרשום את זה למשרד, ואז זה אצלם בכתב ומישהו חוזר אליך. רוצה?",
+     "    I can write this down for the office, so they've got it and someone gets\n"
      "    back to you. Would you like me to?"),
+
+    # ...and the plainer second attempt, for a caller who did not follow the
+    # first. Both sides have to be equally small words; a tidy English sentence
+    # here would be testing a flow the Hebrew twin does not have.
+    ("*לפתוח קריאה* is what this", "*opening a request* is what this"),
+
+    ("company calls it internally; *לרשום למשרד* is what it means to somebody",
+     "company calls it internally; *writing it down for the office* is what it\n"
+     "means to somebody"),
+
+    ("    אני רושם את הבעיה, במשרד רואים את זה וחוזרים אליך. בסדר?",
+     "    I'll write the problem down, the office sees it, and they get back to\n"
+     "    you. Alright?"),
 
     # The phone number is a fact and stays exactly as it is. Only the sentence
     # around it is translated - same rule as every other contact detail in this
@@ -897,6 +910,70 @@ yours: I didn't explain that well, never you didn't understand."""),
 
     ("    אני העוזר הדיגיטלי של הומיז, אני פותח פניות. איך אפשר לעזור?",
      "    I'm the Homies digital assistant — I open maintenance requests. How can I help?"),
+
+    # ---- 19 Aug: the call was correct and cold ----------------------------
+    # A real English call answered every one of the caller's answers with the
+    # next question and nothing else. These six pairs are the repair, and they
+    # are all quoted speech, which is why they are all in this table.
+
+    # The two words that go in front of the next question.
+    ("""Two words. הבנתי. טוב. אוקיי, רשמתי. Not a sentence, not a thank-you, and not
+a repeat of what they said — the rule above bans repeating an answer back, and
+it does not ban hearing one.
+
+    Not:  באיזו שעה השארת את זה בחוץ?
+    But:  הבנתי. באיזו שעה השארת את זה בחוץ?""",
+     """Two words. Got it. Okay. Right, I have that. Not a sentence, not a thank-you,
+and not a repeat of what they said — the rule above bans repeating an answer
+back, and it does not ban hearing one.
+
+    Not:  What time did you leave it out?
+    But:  Got it. What time did you leave it out?"""),
+
+    # The filler question that got asked three times, and the one place it is
+    # still allowed. Both quotes are the SAME English sentence in the real call,
+    # which is exactly why the ban and the exception have to be separate entries.
+    ("""ran to five, three of which were the same sentence — *משהו נוסף שכדאי
+שהמשרד ידע?* — and by the third the caller was answering a question about the""",
+     """ran to five, three of which were the same sentence — *anything else the office
+should know?* — and by the third the caller was answering a question about the"""),
+
+    ("nothing. There is exactly one *משהו נוסף?* in this call and it comes at the very",
+     "nothing. There is exactly one *anything else?* in this call and it comes at the very"),
+
+    # The turn that put a question on top of the reference number.
+    ("*מספר הקריאה שלך: 1, 0, 6, 2. מה היה בתיק?*",
+     "*your reference number is 1, 0, 6, 2. What was in the bag?*"),
+
+    # Not knowing, said as a person rather than as a wall.
+    ("""with it. You do not know, and rules 1 and 2 hold — but a bare *אני לא יכול
+להגיד* is a door closing in someone's face""",
+     """with it. You do not know, and rules 1 and 2 hold — but a bare *I cannot
+say* is a door closing in someone's face"""),
+
+    ("    אני לא יודע להגיד כמה זמן זה ייקח, אבל זה רשום אצלם והם חוזרים לגבי זה.",
+     "    I can't tell you how long it will take, but it's written down with them\n"
+     "    and they do come back about it."),
+
+    ("""a report about a stolen parcel would take and heard *אני לא יכול להגיד מתי
+זה ייפתר. משהו נוסף?* Both sentences were true.""",
+     """a report about a stolen parcel would take and heard *I cannot say when it will
+be resolved. Anything else?* Both sentences were true."""),
+
+    # The closing, which split in two on the wire. Load-bearing on this side as
+    # well: "and goodbye" is what endCallPhrases matches, and a full stop before
+    # it is what stopped it arriving attached to the rest.
+    ("**Commas, not full stops.** תודה שהתקשרת להומיז, יום טוב, ולהתראות is one",
+     "**Commas, not full stops.** Thanks for calling Homies, have a good day, and\n"
+     "goodbye is one"),
+
+    # The improvised waiting line. The Hebrew quotes what the English twin
+    # actually said, translated back, so both twins are warned off the same
+    # sentence.
+    ("""On 19 Aug it came out as *זה ייקח
+רק שנייה* — a sentence about the machine""",
+     """On 19 Aug it came out as *this will
+just take a sec* — a sentence about the machine"""),
 ]
 
 

@@ -510,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, eight fixed and kept for the record
+### Known defects — six still open, nine fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -546,6 +546,13 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+9. ~~**The intake call is correct and cold.**~~ **Fixed 19 Aug.** Every field
+   captured, every answer met with the next question and no acknowledgement;
+   the same filler question three times; a follow-up jammed onto the reference
+   number; a bare "I cannot say"; the goodbye split off into its own utterance.
+   All six were the prompt's, not the model's — the pacing rules banned enough
+   speech that the model removed the rest. **When editing those rules, add an
+   example of what is still wanted**, not only what is banned.
 8. ~~**The agent's sentences arrive with holes in them.**~~ **Fixed 19 Aug.** A
    resident heard *"Would you like me to  though."* — two spaces, no verb.
    Nothing was interrupted; `voice_guard.py` strips phrases so a tool name can
@@ -553,7 +560,10 @@ handset.**
    removed, all of them ordinary English. The rule that should have caught it was
    already written in that file and unenforced, so it now is: `SAFE_SENTENCES`,
    checked by `python scripts/vapi_leak_check.py --safe`. **Run that after any
-   change to the spoken filter.**
+   change to the spoken filter.** `SAFE_SENTENCES` entries may be a bare string
+   (must survive untouched) or a **pair** (must come out as the second half) —
+   the pair form is for the deliberate pronunciation rewrites, such as להומיז
+   becoming לחברת הומיז, which are the filter working rather than damage.
 7. ~~**An inbound ticket carries an address the caller never gave.**~~ **Fixed
    19 Aug.** `255-1056-26` was filed against Herzl 14, flat 12, for a caller who
    said *"Herzo"* and did not know their apartment. The agent captured it

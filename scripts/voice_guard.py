@@ -183,7 +183,24 @@ SAFE_SENTENCES = [
     "I can request a standing order for you.",
     "It sounds like I have the wrong party.",
     "That's something a person needs to handle.",
+    # Intake, 19 Aug — the lines added when the call came back correct and cold.
+    # The rung-two offer was reworded out of the system's vocabulary and into a
+    # resident's, so both wordings are here: the new one because it is said, the
+    # old one because a filter that breaks it would break the new one too.
+    "I can write this down for the office, so they've got it and someone gets back to you.",
+    "I'll write the problem down, the office sees it, and they get back to you.",
+    "I can't tell you how long it will take, but it's written down with them.",
+    "Got it. What time did you leave it out?",
+    "One moment, I'm writing this down.",
+    "Thanks for calling Homies, have a good day, and goodbye.",
     # Hebrew, where the pronunciation substitutions also run.
+    "אני יכול לרשום את זה למשרד, ואז זה אצלם בכתב ומישהו חוזר אליך. רוצה?",
+    "אני לא יודע להגיד כמה זמן זה ייקח, אבל זה רשום אצלם והם חוזרים לגבי זה.",
+    # A pair, because this one is meant to change: the pronunciation
+    # substitution rewrites להומיז, and the second half is what it must become.
+    # Getting anything else — a hole, a different rewrite — is the failure.
+    ("תודה שהתקשרת להומיז, יום טוב, ולהתראות.",
+     "תודה שהתקשרת לחברת הומיז, יום טוב, ולהתראות."),
     "אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
     "אפשר לפנות למשרד ב־077-6687949.",
     "מספר הקריאה שלך: 1, 0, 0, 1.",
@@ -388,9 +405,13 @@ def safe_sentence_failures():
     reporting a stolen parcel heard "Would you like me to  though."
     """
     out = []
-    for sentence in SAFE_SENTENCES:
+    for entry in SAFE_SENTENCES:
+        # A bare string must survive the filter unchanged. A pair says the line
+        # is expected to change and gives the exact result — that is how the
+        # deliberate pronunciation rewrites are told apart from holes.
+        sentence, want = entry if isinstance(entry, tuple) else (entry, entry)
         after = filtered(sentence)
-        if after != sentence:
+        if after != want:
             out.append((sentence, after))
     return out
 

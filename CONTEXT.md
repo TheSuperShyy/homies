@@ -134,6 +134,23 @@ managed building stops paying: it goes to a person, and the fee is **not**
 explained in that moment — there it argues for paying for something that does not
 work. Decided 18 Aug.
 
+**Short is not the same as cold — an answer gets two words before the next
+question.** The pacing rules were written against a seventeen-second turn and
+they worked; what they also did was strip out every acknowledgement, because
+*do not repeat what they said* reads to a model as *say nothing*. The call of
+19 Aug captured every field the office needed and met three consecutive answers
+with three consecutive questions. הבנתי, טוב, אוקיי — two words, not a sentence,
+not a thank-you, and not a repeat. **Any rule in a prompt that bans a kind of
+speech gets an example of the speech that is still wanted**, or the model
+resolves the ambiguity by removing more than was asked. Decided 19 Aug.
+
+**A yes/no question is not a follow-up, and asking it twice is worse than not
+asking it.** *"Anything else the office should know?"* collects nothing and
+sounds like a form; the ticket learns something only from a question about the
+actual thing — what was in the bag, what time it was left. Two follow-ups per
+call and then stop, and never the same sentence twice in one call. Decided
+19 Aug, after a call asked five and repeated one of them three times.
+
 **A filter that deletes words is checked against real sentences, every time.**
 `voice_guard.py` strips phrases from the spoken channel so a tool name can never
 be read aloud, and on 19 Aug it deleted the verb out of the intake agent's
