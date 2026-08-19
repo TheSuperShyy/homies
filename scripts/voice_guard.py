@@ -113,23 +113,80 @@ PATTERNS = [
 #   "first name"       — "can I take your first name?"
 #   "callback number"  — a resident may ask for the callback number by name
 #   open / friction / hot / dispute / hardship / language — ordinary words
+#
+# SIX MORE LEFT ON 19 AUG, AND THIS IS THE FAILURE THAT REMOVED THEM
+# A resident reporting a parcel taken from outside their door heard:
+#
+#     "Would you like me to  though."
+#
+# The model had written "Would you like me to open request though." and this
+# filter deleted the verb. Nothing errored, nothing was logged, and the sentence
+# arrived at the speaker with a hole in it. `open request` even carried the
+# comment "I'll open a request does not match this" — true, and beside the point:
+# a model that drops an article is not a model that has leaked a tool name.
+#
+# The test at the top of this block was written for a COLLECTION call and never
+# re-applied when the intake agent shipped, whose single commonest sentence is an
+# offer to open a request. So the test is now enforced rather than remembered —
+# see SAFE_SENTENCES below, checked by scripts/vapi_leak_check.py.
+#
+# What went, and the sentence that took it:
+#
+#   "open request"           — "would you like me to open request?"
+#   "office to contact"      — "I'll ask the office to contact you"
+#   "wrong party"            — "it sounds like I have the wrong party"
+#   "caller request"         — marginal, and two ordinary words either way
+#   "send payment link"      — "I'll send payment link now"
+#   "request standing order" — "I can request standing order for you"
+#
+# All six are still caught in their raw form by the snake-case pattern above,
+# which is the shape a real leak arrives in. What is given up is the second layer
+# on the already-formatted spelling — and a leak read aloud once is a smaller
+# failure than a sentence with a hole in it on every call.
+#
+# THE RULE FOR ADDING ANYTHING HERE
+# Three words or more, and it must read as machinery rather than as English. A
+# two-word entry is almost always an ordinary phrase in one of the two languages
+# and belongs in the prompt instead.
 SPOKEN = [
     "open payment ticket",      # retired tool, and the one that actually leaked
-    "send payment link",
     "log promise to pay",
-    "request standing order",
     "log disputed payment",
     "flag not handed over",
     "log call outcome",
     "transfer to human",
-    "open request",             # "I'll open a request" does not match this
     "authorization captured",
     "posture reached",
     "promised date",
     "transfer reason",
-    "office to contact",
-    "wrong party",
-    "caller request",
+]
+
+# Sentences both agents actually say, which must survive the filter untouched.
+#
+# This exists because the rule above was correct, written down, and still broken:
+# a rule nothing checks is a comment. Every one of these is taken from a live
+# prompt or a real transcript, and `scripts/vapi_leak_check.py --safe` fails if
+# the filter changes any of them by a single character.
+#
+# Add to this list whenever a prompt gains a fixed line. It costs nothing and it
+# is the only thing standing between a new SPOKEN entry and a call full of holes.
+SAFE_SENTENCES = [
+    # Intake, 19 Aug — the three rungs, the ones that broke.
+    "I can open a request for this so the office has it in writing and comes back to you.",
+    "Would you like me to open request though?",
+    "I will open request for the missing baggage.",
+    "I'll ask the office to contact you.",
+    "Would you like me to add anything else the office should know about?",
+    "Your reference number is 1, 0, 6, 1.",
+    # Debt.
+    "I'll send you a payment link now.",
+    "I can request a standing order for you.",
+    "It sounds like I have the wrong party.",
+    "That's something a person needs to handle.",
+    # Hebrew, where the pronunciation substitutions also run.
+    "אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
+    "אפשר לפנות למשרד ב־077-6687949.",
+    "מספר הקריאה שלך: 1, 0, 0, 1.",
 ]
 
 # The 5 Aug shape: a note parameter announced by its own field name. "Please
@@ -303,6 +360,39 @@ def checks():
             + [("spoken-note", "(?i)" + NOTE_PREFIX)]
             + [(n, "(?i)" + rx) for n, rx in spoken_patterns()]
             + PROSE)
+
+
+def filtered(text):
+    """The text as the speaker would receive it, with every replacement applied.
+
+    Mirrors what Vapi does to a chunk, so a sentence can be tested against the
+    filter without placing a call. Vapi strips the FIRST match per pattern per
+    chunk — no global flag — so `count=1` here rather than a blanket sub; a
+    stricter test than the real thing would report damage that never happens.
+    """
+    import re
+    for rep in replacements():
+        if rep["type"] == "regex":
+            flags = re.I if rep.get("options") else 0
+            text = re.sub(rep["regex"], rep["value"], text, count=1, flags=flags)
+        else:
+            text = text.replace(rep["key"], rep["value"])
+    return text
+
+
+def safe_sentence_failures():
+    """Sentences the agents really say that this filter would damage.
+
+    Empty is the only acceptable answer. A non-empty list means a SPOKEN entry
+    is eating ordinary speech, which is what happened on 19 Aug: a resident
+    reporting a stolen parcel heard "Would you like me to  though."
+    """
+    out = []
+    for sentence in SAFE_SENTENCES:
+        after = filtered(sentence)
+        if after != sentence:
+            out.append((sentence, after))
+    return out
 
 
 def leaks(text):

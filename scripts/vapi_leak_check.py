@@ -36,6 +36,7 @@ import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import voice_guard
 from voice_guard import PATTERNS, PROSE, checks
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -124,6 +125,24 @@ def report(call, verbose=False):
 
 
 def main():
+    # The check that runs without a call, and the one that would have caught
+    # 19 Aug. Everything else here reads transcripts and asks "did machinery
+    # get out?"; this asks the opposite and equally important question — "did
+    # the filter eat a real sentence?" A leak is heard once and sounds odd. A
+    # filter chewing a hole in the agent's commonest sentence happens on every
+    # call and reads as the model being broken.
+    if "--safe" in sys.argv:
+        bad = voice_guard.safe_sentence_failures()
+        print("checking %d sentences the agents really say" % len(voice_guard.SAFE_SENTENCES))
+        for before, after in bad:
+            print("\nDAMAGED  %s" % before)
+            print("  became   %s" % after)
+        print("\n%d damaged." % len(bad))
+        if bad:
+            print("A SPOKEN entry in voice_guard.py is eating ordinary speech.")
+            print("Three words or more, and it must read as machinery, not English.")
+        sys.exit(1 if bad else 0)
+
     key = load_key()
     arg = sys.argv[1] if len(sys.argv) > 1 else "20"
 

@@ -11,6 +11,66 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The agent was not being cut off. My own filter was eating its sentences.
+
+A test call, reported as *"it's being cut off mid sentence"*. What the resident
+heard, verbatim from the record:
+
+> Would you like me to  though.
+
+Two spaces, and a sentence with a hole in it. **Nothing was interrupted.** The
+Vapi timeline shows one continuous bot utterance with a duration; there is no
+barge-in anywhere in the call. The text arrived at the speaker already broken.
+
+`scripts/voice_guard.py` strips phrases from the spoken channel so a tool name
+can never be read aloud — built after 4 Aug, when a resident heard *"Open payment
+ticket. two functions... authorization captured. True."* The list included
+**`open request`**, with the comment *"I'll open a request does not match this"*.
+True, and beside the point: the model wrote *"Would you like me to open request
+though."* and the filter deleted the verb.
+
+**The file already carried the right rule** — *"could a resident or the agent say
+this in the course of an ordinary collection call? Anything that could is left
+out"* — and it was applied to a **collection** call and never re-applied when the
+intake agent shipped, whose commonest sentence is an offer to open a request.
+
+Five more were the same trap, all confirmed against the live replacement list:
+
+    "I'll ask the office to contact you."     -> "I'll ask the  you."
+    "It sounds like I have the wrong party."  -> "It sounds like I have the  ."
+    "I'll send payment link now."             -> "I'll  now."
+    "I can request standing order for you."   -> "I can  for you."
+    "That was a caller request."              -> "That was a ."
+
+All six removed. The raw shapes are still caught by the snake-case pattern, which
+is the form a real leak arrives in; what is given up is the second layer on the
+already-formatted spelling. **A leak heard once is a smaller failure than a hole
+in every call**, and the hole is silent — nothing errors, nothing is logged.
+
+**The rule is now enforced instead of remembered.** `SAFE_SENTENCES` holds
+thirteen lines both agents really say, and `vapi_leak_check.py --safe` fails if
+the filter changes one of them by a character. A rule nothing checks is a
+comment. New SPOKEN entries must be three words or more and must read as
+machinery rather than as English — a two-word entry is nearly always an ordinary
+phrase in one of the two languages and belongs in the prompt.
+
+**Two prompt faults from the same call.** The follow-up came out as *"would you
+like me to add anything else the office should know?"* — a yes/no question that
+gets a yes or a no, and the row still says only *missing baggage*. It now says:
+ask the question, never ask whether to ask it. *What was in the bag. What time
+did you leave it out.* And the resident said *"I wanted to check the cameras"*
+three times, in three wordings, and it never reached the ticket — so: something
+they name that they want done **is** part of the request, and goes in with
+add_request_detail in their words.
+
+**Still open from that call:** the agent accepted *"building one"* as an address.
+`verify_address` exists and only the chat bot calls it; the intake voice agent
+carries four tools and that is not one of them. Same shape as the
+`get_request_status` gap in HANDOVER next-move 3.
+
+Intake prompt 28,333 chars, English twin 26,560. Thirty replacements down to
+twenty-four, on all four assistants, tools and server blocks intact.
+
 ### The inbound agent stops handing people to the office empty-handed
 
 Two English intake calls, and both failed the same way. Somebody asked for a CCTV
