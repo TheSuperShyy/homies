@@ -143,12 +143,18 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
-**Neither language is a translation of the other.** The twins are the same
-*flow*, not the same words: carry the meaning across and then pick the words that
-language actually uses. Hebrew is written the way an Israeli says it, not the way
-an English sentence maps onto Hebrew — and the same in reverse. Word-for-word is
-the failure mode in both directions, and it produces something grammatical that
-nobody says.
+**Hebrew is the source, English is derived, and the derivation is not word for
+word.** The prompt is written with every spoken line in Hebrew and pushed to the
+Hebrew assistant; `vapi_en.py` reads *that live assistant* and swaps each Hebrew
+line for an English one. The English twin is never hand-edited — it is rebuilt,
+which is why editing it in the dashboard loses silently.
+
+So the translation in the pipeline runs **Hebrew → English**: carry the meaning
+across, then pick the English a person actually says. The twins are the same
+*flow*, not the same words. The reverse direction still matters, earlier and
+invisibly — a Hebrew line composed in English first and rendered across comes out
+grammatical and unsaid, and nothing here catches that, because by then Hebrew is
+the source of truth.
 
 The case that settled it: לפתוח קריאה is completely ordinary Hebrew, what a
 building-management office says and what a resident says back. Its literal
