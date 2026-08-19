@@ -37,7 +37,14 @@ sooner — and the turn ends on a question rather than a recommendation dressed 
 one. Once they choose, the choice is theirs: the office option now hands over the
 number and stops, with no second attempt at selling the ticket.
 
-**And the word is not the same on both sides.** לפתוח קריאה is ordinary Hebrew —
+**And neither language is a translation of the other.** Corrected same day,
+because the version above was written from the English side only — as though
+Hebrew were the source and English the thing that needed care. It runs both ways.
+Carry the meaning across, then pick the words that language actually uses; a line
+rendered by matching words comes out grammatical and unsaid. Now a standing
+decision in `CONTEXT.md` and a memory, phrased for both directions.
+
+**The word is not the same on both sides.** לפתוח קריאה is ordinary Hebrew —
 it is what the office says and what a resident says back. Its literal English,
 "open a request", is not ordinary English, which is exactly why a caller heard it
 this morning and said they did not follow. English has its own everyday word and

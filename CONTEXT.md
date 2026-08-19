@@ -143,13 +143,25 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
-**The twins are the same flow, not the same words.** Where the ordinary word in
-one language is jargon in the other, the translation follows the *register*, not
-the dictionary — לפתוח קריאה is what an Israeli office and resident both say;
-"open a request" is not what an English speaker says, and one heard it and said
-so. The English is "open a ticket". Every such divergence is written next to its
-entry in `vapi_en.py`, because the default there is word-for-word and this is a
-deliberate exception to it. Decided 19 Aug.
+**Neither language is a translation of the other.** The twins are the same
+*flow*, not the same words: carry the meaning across and then pick the words that
+language actually uses. Hebrew is written the way an Israeli says it, not the way
+an English sentence maps onto Hebrew — and the same in reverse. Word-for-word is
+the failure mode in both directions, and it produces something grammatical that
+nobody says.
+
+The case that settled it: לפתוח קריאה is completely ordinary Hebrew, what a
+building-management office says and what a resident says back. Its literal
+English, "open a request", is not ordinary English — a caller heard it on 19 Aug
+and said they did not follow. English has its own everyday word and it is
+**ticket**. A faithful translation was wrong in the room.
+
+The substitution table in `vapi_en.py` defaults to word-for-word and that default
+is usually right, so **every deliberate divergence carries a comment next to its
+entry** naming the register it follows. The test, in either direction, is whether
+a person speaking that language would say it that way — never whether it matches
+the other side. Applies to the WhatsApp bot's Hebrew as much as to the voice
+agents. Decided 19 Aug.
 
 **Short is not the same as cold — an answer gets two words before the next
 question.** The pacing rules were written against a seventeen-second turn and
