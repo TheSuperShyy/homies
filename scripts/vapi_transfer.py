@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Clone the whole Vapi setup onto another account, and repoint the repo at it.
 
+    python scripts/vapi_transfer.py --balance
     python scripts/vapi_transfer.py --preflight
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --dry
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --apply
@@ -158,7 +159,59 @@ def source_assistants(e, from_export):
     return [a for a in rows if OURS.match(a.get("name", ""))]
 
 
+# A UUID that is correctly shaped and belongs to nobody. The point is that it can
+# never name a real assistant, so this request can never create a call and can
+# never bill — see `balance()`.
+NO_SUCH_ASSISTANT = "11111111-2222-4333-8444-555555555555"
+
+
+def balance(public_key):
+    """Whether the account can start a call, and why not when it cannot.
+
+    `GET /org` is 401 to a private key and the public key cannot read anything,
+    so the balance was written off as unreadable — the runbook still says so and
+    said so for a fortnight. It is readable, from an angle: **Vapi checks the
+    wallet BEFORE it looks the assistant up**, so a POST to /call/web naming an
+    assistant that does not exist returns the wallet message when the account is
+    overdrawn and "assistant not found" when it is not. Nothing is created on
+    either path, so this costs nothing and can be run as often as you like.
+
+    WHY IT IS WORTH A FUNCTION
+    19 Aug, an afternoon: the demo would not start, the page said
+    "Error: [object Object]", and Vapi's call list showed nothing at all,
+    because a refused call is never recorded. Every piece of evidence pointed at
+    the code that had just changed. The account was eleven cents overdrawn.
+
+    Returns (ok, message).
+    """
+    try:
+        api("POST", "/call/web", public_key, {"assistantId": NO_SUCH_ASSISTANT})
+        return True, "a call was created, which should be impossible"
+    except urllib.error.HTTPError as exc:
+        try:
+            body = json.loads(exc.read() or b"{}")
+        except Exception:
+            return False, "HTTP %s, unreadable body" % exc.code
+        msg = body.get("message")
+        if isinstance(msg, list):
+            msg = "; ".join(str(m) for m in msg)
+        msg = str(msg or exc.code)
+        # The wallet check fires first, so its message means the account cannot
+        # place a call whatever else is right. Anything else here means it can.
+        if "wallet" in msg.lower() or "credit" in msg.lower():
+            return False, msg
+        return True, "in credit (refused for the expected reason: %s)" % msg
+
+
 def preflight(e):
+    pub = e.get("VAPI_PUBLIC_KEY")
+    if pub:
+        ok, msg = balance(pub)
+        print("BALANCE  %s" % ("OK — " if ok else "BLOCKED — ") + msg)
+    else:
+        print("BALANCE  VAPI_PUBLIC_KEY not in .env, cannot check")
+    print()
+
     print("SOURCE")
     try:
         rows = api("GET", "/assistant?limit=100", e["VAPI_PRIVATE_KEY"])
@@ -199,6 +252,7 @@ def preflight(e):
     print("\nCANNOT BE AUTOMATED")
     print("  VAPI_PUBLIC_KEY — GET /org is 401 to a private key. Copy it from")
     print("  Dashboard -> Organization -> API Keys, into .env and web/index.html.")
+    print("  (The BALANCE line above IS readable, via /call/web — see balance().)")
 
 
 def repoint(mapping, apply):
@@ -271,6 +325,14 @@ def mirror(ours, target, var):
 def main():
     argv = sys.argv[1:]
     e = env()
+
+    if "--balance" in argv:
+        pub = e.get("VAPI_PUBLIC_KEY")
+        if not pub:
+            sys.exit("VAPI_PUBLIC_KEY is not in .env")
+        ok, msg = balance(pub)
+        print(("OK      " if ok else "BLOCKED ") + msg)
+        sys.exit(0 if ok else 1)
 
     if "--preflight" in argv or not argv:
         preflight(e)

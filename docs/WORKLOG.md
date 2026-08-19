@@ -11,6 +11,48 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The demo would not start, and it was eleven cents
+
+Reported as *"still error"*, on a page showing:
+
+    Error: [object Object]
+
+An afternoon went into this and the cause was the account being **overdrawn by
+$0.11**. Every signal pointed the wrong way, and each one is worth naming:
+
+- **Vapi's call list showed nothing.** A refused call is never recorded, so the
+  history looked healthy and the last call was hours old. Asked earlier the same
+  day whether the key was out of credit, the honest answer available at the time
+  was *the calls that exist all billed normally, and the balance is unreadable*.
+- **The page said `[object Object]`.** My own handler. It tried four shapes and
+  fell back to `JSON.stringify` — which looks thorough and is not: every branch
+  assumed a string, and the first that matched an object went into string
+  concatenation. **The one piece of evidence that existed was destroyed on its
+  way to the screen.** Now it walks the shapes, takes the first that is genuinely
+  a string, spells out NestJS's array-of-validation-errors form, says the status
+  code out loud when there is no text, and logs the raw object to the console
+  every time.
+- **The timing was perfect for a false lead.** It broke on the build that
+  changed how the demo starts a call, so the code that had just moved was the
+  obvious suspect. It was untouched: the debt path returns exactly what it
+  returned before.
+
+**The balance IS readable, and free.** `GET /org` is 401 to a private key and the
+public key reads nothing, so this was written off as impossible and the runbook
+has said so for a fortnight. It is possible from an angle: **Vapi checks the
+wallet before it looks the assistant up**, so a POST to `/call/web` naming a
+correctly-shaped UUID that belongs to nobody returns the wallet message when the
+account is overdrawn, and *assistant not found* when it is not. Nothing is
+created on either path, so it costs nothing and can be run as often as you like.
+
+Now `vapi_transfer.py --balance`, and the first line of `--preflight`:
+
+    BLOCKED Your Wallet Balance is -0.11. Please Purchase More Credits...
+
+Exit code 1 when blocked, so it can gate anything that is about to place a call.
+
+**Needs the client**: topping the account up is a money action.
+
 ### Account 4 becomes a mirror, and `vapi_transfer.py` learns the difference
 
 Asked to clone all four agents into the account we moved away from on 12 Aug.
