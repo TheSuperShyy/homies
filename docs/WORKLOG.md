@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### Account 4 becomes a mirror, and `vapi_transfer.py` learns the difference
+
+Asked to clone all four agents into the account we moved away from on 12 Aug.
+Its copies were frozen there: debt 44,040 chars against 61,363 live, intake
+20,504 against 28,333, `idleTimeoutSeconds` unset, and the Hebrew intake agent
+still carrying three tools.
+
+**`--apply` refuses a target that already holds Homies assistants**, and that
+refusal is right — creating by name again gives eight assistants and no error.
+But the refusal was the whole answer, and there was no way to say *make that
+account match this one*. So `--mirror`, and the distinction is worth naming:
+
+- **`--apply` MOVES.** Creates on the target, then rewrites every id in the repo
+  to point at them. The target becomes the live account.
+- **`--mirror` KEEPS IN STEP.** Matches by name, overwrites in place so no id
+  moves, and **does not touch the repo at all.** A mirror is a second copy of the
+  agents that is not the one being called.
+
+It creates only what is missing, and anything on the target that is not ours is
+not read, not written and not counted — a mirror is not a takeover of somebody
+else's account.
+
+Ran it. Four overwritten, ids unchanged, and the two accounts now fingerprint
+identically on prompt length, tool list, server blocks, voice, transcriber, idle
+timeout and max duration. The English intake agent lost a fifth tool it had been
+carrying since 11 Aug and the live one does not have; that is what a mirror
+means.
+
+**Not automated, and cannot be**: the public key differs per account and `GET
+/org` is 401 to a private key. If this mirror is ever promoted to live, that one
+value comes off the dashboard by hand.
+
+**Worth recording about how it was asked.** Both keys arrived pasted into the
+conversation, and both were already in `.env` as `VAPI_PRIVATE_KEY_ACCOUNT4` and
+`VAPI_PUBLIC_KEY_ACCOUNT4` — which is the argument for `--to <ENV_VAR>` rather
+than `--to <key>` in one line. The private one should be rotated: it is in a
+chat log now, and nothing else about it changed.
+
 ### The agent was not being cut off. My own filter was eating its sentences.
 
 A test call, reported as *"it's being cut off mid sentence"*. What the resident

@@ -4,6 +4,23 @@
     python scripts/vapi_transfer.py --preflight
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --dry
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --apply
+    python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_OLD --mirror
+
+MOVE OR MIRROR, AND THEY ARE NOT THE SAME OPERATION
+
+`--apply` MOVES: it creates the assistants on the target and rewrites every id in
+the repo to point at them. It refuses a target that already holds Homies
+assistants, because creating by name again gives duplicates and no error.
+
+`--mirror` KEEPS IN STEP: it matches by name and overwrites in place, so the ids
+on the target do not change, and **it does not touch the repo at all**. That is
+the whole difference — a mirror is a second copy of the agents that is not the
+one being called. Account 4 is exactly this: the account we moved away from on
+12 Aug, kept current so it can be picked up if the live one is lost.
+
+A mirror creates only what is missing. Anything on the target that is not on the
+source is left alone; anything with a matching name is replaced whole, tools and
+server blocks included, so the two accounts really do behave the same.
 
 `--to` names the **variable in .env** holding the target account's private key,
 never the key itself. A key pasted on a command line lands in shell history, and
@@ -205,6 +222,52 @@ def repoint(mapping, apply):
     print("  %d in total" % total)
 
 
+def mirror(ours, target, var):
+    """Make the target's Homies assistants identical to ours, in place.
+
+    Overwrites rather than creates, so nothing is duplicated and no id moves.
+    Anything on the target that is not one of ours is not read, not written and
+    not counted — a mirror is not a takeover of somebody else's account.
+    """
+    existing = {a["name"]: a for a in api("GET", "/assistant?limit=100", target)
+                if OURS.match(a.get("name", ""))}
+
+    print("MIRROR  current account -> %s" % var)
+    print("  the repo is NOT repointed. The live account stays the live one.")
+    for a in ours:
+        there = existing.get(a["name"])
+        m = a.get("model") or {}
+        mine = len((m.get("messages") or [{}])[0].get("content") or "")
+        if there:
+            tm = there.get("model") or {}
+            theirs = len((tm.get("messages") or [{}])[0].get("content") or "")
+            print("  overwrite  %-32s %6d -> %6d chars, %d -> %d tools" % (
+                a["name"][:32], theirs, mine,
+                len(tm.get("tools") or []), len(m.get("tools") or [])))
+        else:
+            print("  create     %-32s %6d chars" % (a["name"][:32], mine))
+
+    if "--apply" not in sys.argv:
+        print("\nPlan only. Add --apply to write.")
+        return
+
+    for a in ours:
+        body = {k: v for k, v in a.items() if k not in READ_ONLY}
+        there = existing.get(a["name"])
+        if there:
+            made = api("PATCH", "/assistant/" + there["id"], target, body)
+            what = "overwritten"
+        else:
+            made = api("POST", "/assistant", target, body)
+            what = "created"
+        print("  %-12s %-32s %s" % (what, made["name"][:32], made["id"]))
+
+    print("\nSTILL TO DO BY HAND")
+    print("  The public key differs per account and cannot be read through the")
+    print("  API. If this mirror is ever promoted to live, take it from")
+    print("  Dashboard -> Organization -> API Keys and put it in web/index.html.")
+
+
 def main():
     argv = sys.argv[1:]
     e = env()
@@ -228,6 +291,12 @@ def main():
     ours = source_assistants(e, "--from-export" in argv)
     if not ours:
         sys.exit("No Homies assistants found to copy.")
+
+    # Before the collision check below, because a mirror WANTS the collision:
+    # the assistants already there are the ones being brought up to date.
+    if "--mirror" in argv:
+        mirror(ours, target, var)
+        return
 
     # Refuse to run into an account that already has some. Creating by name would
     # give four duplicates and no error, and the repoint below would then pick
