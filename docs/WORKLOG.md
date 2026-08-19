@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### Reading the call instead of the transcript
+
+"The building lookup is still not working." Vapi records the arguments the agent
+passed, so rather than guess, I read them:
+
+    12:13  get_request_status {"type":"elevator","building":"building one"}  ->  found 0
+    11:33  get_request_status {"type":"elevator","unit":"300","building":"building one"}  ->  found 0
+    11:33  get_request_status {"reference":"106"}  ->  found 0
+
+The first is the type filter, fixed an hour before those words were typed —
+replayed against the live function it now returns two, including the elevator
+ticket. **No call has been placed since that deploy**, so nothing about it had
+been retested.
+
+The other two were still real, and both are the model poisoning its own query:
+
+**It passed an apartment for a lift.** Twice — 300, then 107 — after the prompt
+had been changed to tell it not to. An instruction the model can ignore is not a
+constraint, so this now lives in the function: five categories that cannot be
+inside anybody's flat — elevator, lighting, cleaning, gardening, fire_safety —
+drop the apartment regardless of what arrived with it.
+
+**It passed a reference one digit short.** The caller said *one zero six three*
+and the tool received **106**. Three digits is below a serial's length, so the
+lookup returned nothing and the caller was told their reference does not exist;
+`255-1063-26` was open in the table. Spoken digits already worked — *"one zero
+six three"* resolves — so nothing was wrong with the input the caller gave. It
+was tidied on the way.
+
+A short reference is now a near miss rather than a dead end: the missing digit
+becomes a wildcard and the matches come back flagged `partial_reference`.
+
+**And the first version of that was worse than the bug.** With `limit(4)`, "106"
+came back as 1064 to 1067 and cut off 1063 — the one the caller actually wanted.
+A recovery that confidently offers the wrong four is worse than the dead end it
+replaced. Ten now, because a missing digit has ten possible values; and **more
+than three is not a question anybody can answer out loud**, so it says there are
+several and asks for the number again rather than reading near-identical
+references down a phone.
+
 ### The filter I added an hour ago hid the ticket it was meant to find
 
 A caller asked about the lift in building one and heard *"I couldn't find any

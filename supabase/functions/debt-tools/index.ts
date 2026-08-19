@@ -1029,6 +1029,59 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       rows = data;
     }
 
+    // A REFERENCE ONE DIGIT SHORT IS A NEAR MISS, NOT A DEAD END.
+    // On 19 Aug a caller said "one zero six three" and the agent passed "106" —
+    // it dropped a digit somewhere between the transcriber and the tool call.
+    // Three digits is below a serial's length, so this returned nothing and the
+    // caller was told their reference does not exist. It did: 255-1063-26.
+    //
+    // Rather than fail, fill the missing digit with a wildcard and hand back the
+    // handful that match. `partial_reference` is the agent's cue to read them
+    // back and ask which — never to pick one, because picking is how somebody is
+    // told about a stranger's fault.
+    if (!rows?.length) {
+      const short = String(args?.reference ?? "").replace(/\D/g, "");
+      if (short.length === 3) {
+        // Ten, because the missing digit has ten possible values and a limit
+        // below that silently drops candidates. Measured at four: "106" came
+        // back as 1064-1067 and cut off 1063, which was the one the caller
+        // actually wanted — a near-miss recovery that confidently offers the
+        // wrong four is worse than the dead end it replaced.
+        const { data } = await db
+          .from("requests")
+          .select(fields)
+          .like("reference", `%-${short}_-%`)
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        // More than three is not a question anybody can answer out loud. Say
+        // there are several and ask for the number again, rather than reading a
+        // list of near-identical references down a phone.
+        if (data && data.length > 3) {
+          return { ok: true, found: 0, partial_reference: true,
+                   too_many: data.length, requests: [] };
+        }
+
+        if (data?.length) {
+          return {
+            ok: true,
+            found: data.length,
+            partial_reference: true,
+            as_of: "live",
+            requests: data.map((r: any) => ({
+              reference: r.reference,
+              status: r.status,
+              type: r.type,
+              urgency: r.urgency,
+              opened: String(r.created_at).slice(0, 10),
+              last_update: String(r.updated_at).slice(0, 10),
+              description: r.description ? String(r.description).slice(0, 200) : null,
+            })),
+          };
+        }
+      }
+    }
+
     if (!rows?.length && ctx.residentId) {
       const { data, error } = await db
         .from("requests")
@@ -1058,7 +1111,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     //    a question with no answer. The building alone is now a complete query.
     if (!rows?.length) {
       const building = ctx.building || args?.building || "";
-      const unit = unitOf(ctx.unit || args?.unit);
+      let unit = unitOf(ctx.unit || args?.unit);
+
+      // A LIFT IS NOT IN A FLAT, AND THIS IS WHERE THAT STOPS BEING ADVICE.
+      // The prompt tells the agent not to ask for an apartment when the fault is
+      // a shared one, and on 19 Aug it asked anyway — twice in one call — then
+      // passed the answers through: `{type: elevator, unit: "300"}`, and again
+      // with "107". Both filtered the building's requests down to a flat that
+      // has nothing to do with the lift, and both returned nothing while the
+      // ticket sat there.
+      //
+      // An instruction the model can ignore is not a constraint. These five
+      // categories cannot be inside anybody's apartment, so the apartment is
+      // dropped here regardless of what arrived with it.
+      if (unit && ["elevator", "lighting", "cleaning", "gardening",
+                   "fire_safety"].includes(String(args?.type ?? ""))) {
+        unit = null;
+      }
+
       if (building) {
         let q = db.from("requests").select(fields).ilike("building", `%${building}%`);
         if (unit) q = q.eq("unit", unit);

@@ -143,6 +143,23 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**When a caller says something is broken, read the tool calls, not the
+transcript.** Vapi records the arguments the agent passed and what came back, and
+that is the difference between "the lookup is broken" and "the model sent 106
+instead of 1063". Twice on 19 Aug the transcript pointed at the database and the
+arguments pointed at the model.
+
+**An instruction the model can ignore is not a constraint.** Where a rule can be
+enforced in the function, enforce it there and leave the prompt to explain why:
+the agent kept passing an apartment for a lift after being told not to, so five
+common-area categories now drop the apartment server-side. The prompt persuades;
+the function decides.
+
+**A recovery that guesses confidently is worse than the failure it replaces.**
+The near-miss reference lookup first offered four candidates and had silently cut
+off the right one. If a recovery cannot be complete, it has to say so and ask —
+never present a partial list as the answer. Decided 19 Aug.
+
 **A filter narrows an answer; it never causes there to be none.** Where a query
 is narrowed by something the system inferred — a category, a label, a guess made
 at write time — and the question comes from a person, the person is the one who

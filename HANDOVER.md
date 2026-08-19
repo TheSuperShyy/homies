@@ -510,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, fourteen fixed and kept for the record
+### Known defects — six still open, fifteen fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -560,6 +560,14 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+15. ~~**The model poisons its own lookup — an apartment for a lift, a reference
+    a digit short.**~~ **Fixed 19 Aug, in the function rather than the prompt.**
+    Five common-area categories drop the apartment whatever the agent passes; a
+    three-digit reference becomes a wildcard search returning `partial_reference`
+    — one or two candidates get read back, more than three asks for the number
+    again. **Read the tool-call arguments in Vapi before believing a transcript**
+    — twice the transcript blamed the database and the arguments blamed the
+    model.
 14. ~~**The type filter hid the ticket it was meant to find, and "never mind"
     got a transfer.**~~ **Fixed 19 Aug.** The `type` filter on
     `get_request_status` is soft now — it narrows, and falls back when that
