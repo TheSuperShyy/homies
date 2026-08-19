@@ -11,6 +11,54 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The agent told a caller about somebody else's stolen parcel
+
+A caller asked about the lift in building one. The agent read back **two**
+requests — the elevator, and "missing baggage outside the front door" — and then,
+asked what that second one was, **explained it**: a parcel taken from outside the
+front door. Another resident's incident, described to an anonymous caller who had
+named nothing but a street.
+
+That was my soft fallback from earlier the same day. When the `elevator` filter
+matched nothing — because that ticket is filed `other` — it dropped the filter and
+handed back the whole building. The fallback fixed a false not-found by creating a
+disclosure.
+
+**Both are fixed by matching the words instead of widening the query.** A
+category is now matched against the ticket's `type` **or** the words in its
+description, in both languages — `elevator` finds "elevator issue" and "מעלית"
+without ever touching the parcel. Everything in the building still comes back
+from the database; what the caller named is answered in full, and the rest is
+**a number**. `other_open` is a count and a count is the whole of what the agent
+may say about it.
+
+    building one + elevator   found 1, other_open 1
+    Herzl 14 + plumbing       found 1, other_open 5
+    building one, nothing named   identify_needed, descriptions withheld
+
+That last case is the one with no clean answer: a caller who gives a building and
+names no fault cannot be told apart from their neighbour, so the descriptions are
+withheld and the agent asks what the request was about rather than reading a list
+of other people's business.
+
+**And the call had no memory of itself.** Having just read out that a parcel
+request existed, the agent was asked *"did someone steal the package?"* — plainly
+a question about that request — and answered *"I'm sorry to hear that, I can open
+a ticket for this."* Then again, when the caller corrected it. The whole
+transcript was in its context and it still heard a report where there was a
+question.
+
+The prompt now has a section for what the call has established: a question about
+something you mentioned is not a new fault; an offer turned down stays turned
+down; "it" and "that one" mean the last thing named; and a ticket you already
+opened is not opened twice because somebody asked a follow-up. Nothing is stored
+— it is the difference between having the transcript and using it.
+
+Decided with the client, both explicitly: **a caller may hear how many requests
+are open in their building and never what any of them is**, and **memory is
+within the call only** — no storage, no identity surface, and it works on a web
+call with no number attached.
+
 ### Reading the call instead of the transcript
 
 "The building lookup is still not working." Vapi records the arguments the agent

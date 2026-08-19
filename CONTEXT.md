@@ -143,6 +143,28 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**A caller hears about their own request and a count of everything else.**
+Somebody who names a street is not entitled to their neighbours' business. A
+status lookup may return how many other requests are open in the building — a
+number, nothing more — and never a description, a reference or a category for one
+the caller did not ask about. Where nothing was named to match on, the
+descriptions are withheld and the agent asks what the request was about rather
+than reading the list. Decided with the client 19 Aug, after a caller asking about
+a lift was told about a stolen parcel and then had it explained.
+
+**A fix that removes a false negative must not create a disclosure.** The soft
+fallback that stopped a lift enquiry returning nothing did it by widening to the
+whole building, which is how the parcel leaked. Matching the caller's words
+against the description finds their request without widening. When a broadening
+is the fix, ask what else it lets through.
+
+**Memory is within the call, and it is not storage.** The transcript is already
+in context; what was missing was the instruction to use it. A question about
+something the agent mentioned is not a new fault, an offer turned down stays
+turned down, and "it" means the last thing named. Anything across calls waits on
+the identity question, which nothing today answers. Decided with the client
+19 Aug.
+
 **When a caller says something is broken, read the tool calls, not the
 transcript.** Vapi records the arguments the agent passed and what came back, and
 that is the difference between "the lookup is broken" and "the model sent 106

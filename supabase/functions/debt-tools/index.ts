@@ -384,6 +384,38 @@ function digitsFromWords(raw: string): string {
     .join("");
 }
 
+// What each category sounds like when somebody says it, in both languages.
+//
+// A ticket's `type` is chosen by the agent that opened it and is wrong often
+// enough to matter — `255-1063-26` reads "elevator issue" and is filed `other`.
+// Filtering on the category alone therefore misses the caller's own request;
+// dropping the filter instead hands back the whole building, which on 19 Aug
+// read another resident's stolen parcel out to a stranger.
+//
+// Matching the words against the description as well as the category is what
+// finds the caller's request without widening to everybody's.
+const TYPE_WORDS: Record<string, string[]> = {
+  elevator: ["elevator", "lift", "מעלית"],
+  lighting: ["light", "lighting", "bulb", "נורה", "תאורה", "אור"],
+  plumbing: ["leak", "water", "pipe", "drain", "נזילה", "מים", "צנרת", "ביוב"],
+  electrical: ["electric", "power", "socket", "חשמל", "שקע"],
+  cleaning: ["clean", "rubbish", "bin", "ניקיון", "אשפה", "זבל"],
+  gardening: ["garden", "tree", "גינה", "עץ", "גינון"],
+  pest_control: ["pest", "rat", "cockroach", "מזיקים", "ג'וקים", "עכבר"],
+  locksmith: ["lock", "key", "door", "מנעול", "מפתח", "דלת"],
+  fire_safety: ["fire", "smoke", "extinguisher", "אש", "עשן", "מטפה"],
+  maintenance: ["maintenance", "תחזוקה"],
+};
+
+/** Does this row look like the thing the caller named? */
+function matchesType(row: any, type: string): boolean {
+  if (!type) return true;
+  if (String(row?.type ?? "") === type) return true;
+  const words = TYPE_WORDS[type] ?? [type];
+  const text = String(row?.description ?? "").toLowerCase();
+  return words.some((w) => text.includes(w.toLowerCase()));
+}
+
 function serialOf(value: unknown): string | null {
   let raw = String(value ?? "").trim();
 
@@ -1016,6 +1048,13 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const fields =
       "reference,type,description,status,urgency,building,unit,created_at,updated_at";
     let rows: any[] | null = null;
+    // How many recent requests in this building are NOT the one the caller
+    // asked about. A count and nothing else — it is the most the agent is
+    // allowed to say about somebody else's fault.
+    let othersInBuilding = 0;
+    // True when the caller named a building and nothing else, so their own
+    // request cannot be told from a neighbour's.
+    let namedNothing = false;
 
     const serial = serialOf(args?.reference);
     if (serial) {
@@ -1150,22 +1189,28 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         // is a soft filter: narrow with it, and if that empties the answer,
         // ask again without it. The cost is one extra query on the runs that
         // would otherwise have returned nothing.
+        // One query, unfiltered by category, and the sorting happens here.
+        //
+        // The category filter used to run in the database and fall back to the
+        // whole building when it matched nothing — which is how a caller asking
+        // about the lift was read another resident's stolen parcel. Now
+        // everything in the building comes back and `matchesType` splits it:
+        // what the caller named is answered in full, and the rest is a NUMBER.
+        // Never a description, never a reference, never a category.
         const type = String(args?.type ?? "").trim();
-        const recent = (b: any) => b
+        const { data, error } = await q
           .order("created_at", { ascending: false })
-          .limit(unit ? 3 : 8);
-
-        let { data, error } = await recent(type ? q.eq("type", type) : q);
+          .limit(unit ? 5 : 12);
         if (error) return { ok: false, error: error.message };
 
-        if (type && !data?.length) {
-          let wide = db.from("requests").select(fields).ilike("building", `%${building}%`);
-          if (unit) wide = wide.eq("unit", unit);
-          const second = await recent(wide);
-          if (second.error) return { ok: false, error: second.error.message };
-          data = second.data;
-        }
-        rows = data;
+        const all = data ?? [];
+        const mine = type ? all.filter((r) => matchesType(r, type)) : all;
+        othersInBuilding = all.length - mine.length;
+        // Nothing was named to match on, so there is no way to tell the
+        // caller's request from a neighbour's. The agent asks what it was
+        // about; see `identify_needed` below.
+        namedNothing = !type && all.length > 1;
+        rows = mine.slice(0, unit ? 3 : 8);
 
         // A loose match can span two buildings — "Herzl" is Herzl 14 and
         // Herzl 22. Reading one building's requests to somebody standing in
@@ -1183,14 +1228,25 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       ok: true,
       found: rows?.length ?? 0,
       as_of: "live", // our own system of record, not a nightly export
+      // A count, deliberately. Decided 19 Aug: the agent may say how many
+      // requests are open in a building and may not say what any of them is.
+      // Somebody who names a street is not thereby entitled to their
+      // neighbours' business.
+      other_open: othersInBuilding,
+      // The caller gave a building and named no fault, so nothing here can be
+      // attributed to them. Descriptions are withheld and the agent asks what
+      // it was about rather than reading the list.
+      identify_needed: namedNothing || undefined,
       requests: (rows ?? []).map((r) => ({
         reference: r.reference,
         status: r.status, // open | in_progress | resolved | cancelled
-        type: r.type,
-        urgency: r.urgency,
+        type: namedNothing ? undefined : r.type,
+        urgency: namedNothing ? undefined : r.urgency,
         opened: String(r.created_at).slice(0, 10),
         last_update: String(r.updated_at).slice(0, 10),
-        description: r.description ? String(r.description).slice(0, 200) : null,
+        description: namedNothing
+          ? undefined
+          : (r.description ? String(r.description).slice(0, 200) : null),
       })),
     };
   },

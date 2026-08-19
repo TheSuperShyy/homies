@@ -510,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, fifteen fixed and kept for the record
+### Known defects — six still open, sixteen fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -560,6 +560,16 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+16. ~~**A caller was told about another resident's request, and the call had no
+    memory of itself.**~~ **Fixed 19 Aug.** The category is matched against the
+    description as well as the `type`, so a lift enquiry finds the caller's
+    ticket without widening to the building; everything else comes back as
+    `other_open`, **a count, which is the most the agent may say**. A building
+    with no fault named returns `identify_needed` and withheld descriptions. The
+    prompt gained a within-call memory section — a question about something the
+    agent mentioned is not a new fault, a declined offer is not re-offered.
+    **Client decisions, both explicit:** how many but never what; memory within
+    the call only.
 15. ~~**The model poisons its own lookup — an apartment for a lift, a reference
     a digit short.**~~ **Fixed 19 Aug, in the function rather than the prompt.**
     Five common-area categories drop the apartment whatever the agent passes; a

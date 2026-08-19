@@ -925,6 +925,14 @@ yours: I didn't explain that well, never you didn't understand."""),
     ('Not: "I\'m opening a request now." Just: "רגע, אני רושם."',
      'Not: "I\'m opening a request now." Just: "One moment, I\'m writing this down."'),
 
+    # Added 19 Aug with the privacy split: a caller who gives a building and
+    # names no fault is asked what it was about, because the descriptions that
+    # would let them recognise their own also identify their neighbours'.
+    ("""Do not read the list. Ask what it was about — *על מה הייתה
+הפנייה?* — and look again with their answer.""",
+     """Do not read the list. Ask what it was about — *what was the request
+about?* — and look again with their answer."""),
+
     ("    אני העוזר הדיגיטלי של הומיז, אני פותח פניות. איך אפשר לעזור?",
      "    I'm the Homies digital assistant — I open maintenance requests. How can I help?"),
 
