@@ -345,8 +345,57 @@ function norm(value: unknown): string {
  * digits. The four-digit floor is what stops an apartment number in that
  * argument from going looking for a ticket.
  */
+// Digits as they are SPOKEN, in both languages.
+//
+// The agent reads a reference out one digit at a time — "1, 0, 6, 3" — and the
+// resident reads it back the same way. What the transcriber then hands over is
+// "one zero six three", and on 19 Aug the agent passed exactly that through and
+// was told the reference does not exist. It did exist; 255-1063-26 was sitting
+// in the table the whole call.
+//
+// Measured before the fix: "1063", "1, 0, 6, 3", "10 63", "255-1063-26" and
+// "HM-2026-1063" all found it. "one zero six three" found nothing. The one form
+// a person actually says out loud was the only one that failed.
+//
+// Hebrew carries both genders because a digit read aloud takes whichever the
+// speaker reaches for, and "oh" for zero because English speakers say it more
+// often than "zero".
+const SPOKEN_DIGITS: Record<string, string> = {
+  zero: "0", oh: "0", o: "0", nought: "0",
+  one: "1", two: "2", three: "3", four: "4", five: "5",
+  six: "6", seven: "7", eight: "8", nine: "9",
+  "אפס": "0",
+  "אחת": "1", "אחד": "1",
+  "שתיים": "2", "שניים": "2", "שתי": "2", "שני": "2",
+  "שלוש": "3", "שלושה": "3",
+  "ארבע": "4", "ארבעה": "4",
+  "חמש": "5", "חמישה": "5",
+  "שש": "6", "שישה": "6",
+  "שבע": "7", "שבעה": "7",
+  "שמונה": "8",
+  "תשע": "9", "תשעה": "9",
+};
+
+/** "one zero six three" -> "1063". Anything not a spoken digit is left alone. */
+function digitsFromWords(raw: string): string {
+  return raw
+    .split(/[\s,.\-–—]+/)
+    .map((w) => SPOKEN_DIGITS[w.toLowerCase()] ?? w)
+    .join("");
+}
+
 function serialOf(value: unknown): string | null {
-  const raw = String(value ?? "").trim();
+  let raw = String(value ?? "").trim();
+
+  // Only when the string does not already carry a serial's worth of digits, so
+  // a well-formed reference is never touched by this. A half-and-half string —
+  // "255, one zero six three, 26" — still fails, and is left failing on purpose:
+  // the agent reads out the middle four and nothing else, so that is not a
+  // shape anybody says.
+  if (!/\d{4}/.test(raw)) {
+    const spoken = digitsFromWords(raw);
+    if (/\d{4}/.test(spoken)) raw = spoken;
+  }
 
   const oxs = raw.match(/(\d{3})-(\d{4,6})-(\d{2})(?!\d)/);
   if (oxs) return oxs[2];

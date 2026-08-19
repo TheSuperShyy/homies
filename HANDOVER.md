@@ -510,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, twelve fixed and kept for the record
+### Known defects — six still open, thirteen fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -546,6 +546,12 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+13. ~~**A reference quoted by a caller is not found, and a correction gets a
+    transfer.**~~ **Fixed 19 Aug.** `serialOf` now reads spoken digits — "one
+    zero six three" and `אחת אפס שש שלוש` both resolve. The apartment question
+    moved its condition into the capture section, because two sections disagreed
+    and the model followed the general one. A correction after a not-found is a
+    new search, never a transfer.
 12. ~~**The status lookup only matches an exact building name, and demands an
     apartment for a shared fault.**~~ **Fixed 19 Aug.** `ilike` not `.eq`;
     apartment optional; optional `type` filter; `ambiguous_building` when the

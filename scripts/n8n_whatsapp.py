@@ -693,10 +693,15 @@ TOOLS = [
             "status, a follow-up, what happened to it. Pass the reference if "
             "they quoted one, in any form (255-1013-26 whole, the old HM-2026-1013, "
             "or just the serial). "
-            "Without a reference it finds recent calls for the building and "
-            "apartment. Returns up to 3 calls with reference, status "
-            "(open / in_progress / resolved / cancelled), dates and "
-            "description. Read-only; the answer is live from the system."
+            "Without a reference the building finds them; the apartment only "
+            "narrows it. DO NOT ASK FOR AN APARTMENT when the fault is not in "
+            "one — a lift, a lobby light, a gate and the bin store belong to the "
+            "building, and asking which flat somebody's elevator is in is a "
+            "question with no answer. Name the type when they named it. Returns "
+            "reference, status (open / in_progress / resolved / cancelled), "
+            "dates and description; or `ambiguous_building` with the names when "
+            "what they typed fits more than one, and then you ask which rather "
+            "than choosing. Read-only; the answer is live from the system."
         ),
         "input_schema": {
             "type": "object",
@@ -704,8 +709,17 @@ TOOLS = [
                 "reference": {"type": "string",
                               "description": "The reference the resident quoted, as written."},
                 "building": {"type": "string",
-                             "description": "Street and number, if no reference was quoted."},
-                "unit": {"type": "string", "description": "Apartment number, if given."},
+                             "description": "Street and number, if no reference was quoted. "
+                                            "A partial name is fine — the match is loose."},
+                "unit": {"type": "string",
+                         "description": "Apartment number. Leave out for a fault that is "
+                                        "not inside a flat."},
+                "type": {"type": "string",
+                         "enum": ["plumbing", "electrical", "lighting", "elevator",
+                                  "cleaning", "gardening", "pest_control", "locksmith",
+                                  "fire_safety", "maintenance", "other"],
+                         "description": "What they named, if they named it — "
+                                        "'the elevator' is elevator."},
             },
             "required": [],
         },
@@ -1421,14 +1435,23 @@ def workflow(e):
                     "sendBody": True, "specifyBody": "json",
                     "jsonBody": TOOL_BODY % (
                         "get_request_status",
-                        "reference: %s, building: %s, unit: %s" % (
+                        "reference: %s, building: %s, unit: %s, type: %s" % (
                             from_ai("reference",
                                     "The reference the resident quoted, exactly as "
                                     "written — 255-1013-26, an old HM-2026-1013, or just the "
                                     "serial. "
                                     "Empty if none was quoted."),
-                            from_ai("building", "Street and number, if no reference."),
-                            from_ai("unit", "Apartment number, if given."),
+                            from_ai("building", "Street and number, if no reference. "
+                                                "A partial name is fine."),
+                            # Empty for anything shared. Since 19 Aug the handler
+                            # no longer requires it, and requiring it here would
+                            # put the unanswerable question back one layer down.
+                            from_ai("unit", "Apartment number. Empty for a lift, a lobby "
+                                            "light, a gate — anything not inside a flat."),
+                            from_ai("type", "One of plumbing/electrical/lighting/elevator/"
+                                            "cleaning/gardening/pest_control/locksmith/"
+                                            "fire_safety/maintenance/other, if they named "
+                                            "the thing. Empty otherwise."),
                         )),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",

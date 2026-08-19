@@ -143,6 +143,20 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**Anything spoken arrives as words.** A reference read aloud digit by digit
+comes back from the transcriber as "one zero six three", and a lookup that only
+parses digits fails on the one form the design itself produces. Spoken digits are
+normalised before matching, in both languages. The general rule: **whatever the
+agent reads out, it must be able to read back in.** Decided 19 Aug, after a
+caller quoted a real reference and was told it did not exist.
+
+**When two parts of a prompt disagree, the model follows the general one.** Not
+the more specific, not the more recent. A condition that matters has to live in
+the section that states the rule, not in a section three screens away that
+qualifies it — the status section said not to ask for an apartment for a shared
+fault, the capture section said to ask always, and the agent asked twice.
+Decided 19 Aug.
+
 **A lookup takes what a caller says, not what the database stores.** Exact
 matching on anything a person speaks aloud is a lookup that fails silently and
 looks like "no records" — a building matched with `.eq` wanted its punctuation

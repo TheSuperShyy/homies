@@ -830,11 +830,11 @@ yours: I didn't explain that well, never you didn't understand."""),
     ("""1. **Building.** באיזה בניין מדובר?
    Ask that and stop. Only if they say they do not know the name, ask for the
    street — as its own turn, later: באיזה רחוב זה?
-2. **Apartment.** ומה מספר הדירה?""",
+2. **Apartment — only when the fault is inside a flat.** ומה מספר הדירה?""",
      """1. **Building.** Which building is this about?
    Ask that and stop. Only if they say they do not know the name, ask for the
    street — as its own turn, later: Which street is it on?
-2. **Apartment.** And the apartment number?"""),
+2. **Apartment — only when the fault is inside a flat.** And the apartment number?"""),
 
     # The description example, which is the difference between a ticket a
     # dispatcher can act on and one they have to phone back about.

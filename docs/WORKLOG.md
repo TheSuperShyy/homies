@@ -11,6 +11,45 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The reference existed. The agent said it did not.
+
+A caller quoted reference one zero six three and was told no such request
+exists. It existed — `255-1063-26`, open, in the table for the whole call.
+
+The agent passed on what the transcriber gave it, which is **words**. Measured
+against the live webhook:
+
+    "1063"              found        "255-1063-26"       found
+    "1, 0, 6, 3"        found        "HM-2026-1063"      found
+    "10 63"             found        "one zero six three"  NOTHING
+
+The one form a person actually says out loud was the only one that failed —
+and it is the form the whole design produces, because the agent reads a
+reference out digit by digit and the resident reads it back the same way.
+`serialOf` now converts spoken digits before matching, in both languages and
+both Hebrew genders. `אחת אפס שש שלוש` resolves too.
+
+**Two sections of the prompt were telling the agent opposite things.** "Status of
+an existing request" said not to ask for an apartment when the fault is not in
+one. "Where — before you can write anything" said to ask for it always, and that
+is the one the model obeyed: it asked which apartment the caller's elevator was
+in, twice, got two flat numbers that had nothing to do with the lift, and both
+lookups failed. The capture section now carries the condition itself rather than
+leaving it to a section three screens away. A contradiction between two parts of
+a prompt is not resolved by the more recent one or the more specific one — it is
+resolved by whichever the model reads as the general rule.
+
+**And a correction was answered with a transfer.** The caller, told nothing was
+found, said *"it's for building one, just the word one"* — handing over a better
+query — and heard *"I'm passing this to someone who'll get back to you."* That is
+the one response that reads as being brushed off, because they had just supplied
+exactly what was asked for. New information is a new search. Transfer when they
+ask for a person, or after looking twice.
+
+Also added: before declaring nothing found, look the other way — a building and
+apartment that came back empty gets a second look at the building alone with the
+type. One tool call, and it is the difference between an answer and a shrug.
+
 ### A lift is not in an apartment, and nobody says a building's name exactly
 
 The status lookup worked, and then it was asked the obvious question — *"any
