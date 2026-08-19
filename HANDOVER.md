@@ -174,6 +174,36 @@ aloud — a tool argument spoken as a sentence. Absolute rule 10 now names it, b
 it is a prompt rule against a generation habit, so watch for it. And the TTS says
 **"HOMEies"** for Homies, on the first word of every call.
 
+**THE LIVE VAPI ACCOUNT CHANGED ON 19 AUG. Read this before touching anything
+that dials.** The account live since 12 Aug — "account 5" — went **$0.11
+overdrawn**, and Vapi refuses a web call *before* it creates one, so every
+attempt failed with no call record on either side and nothing in the history to
+find. **Account 4 is now the live one.** Its four assistants had been mirrored an
+hour earlier and were byte-identical, so nothing was copied: 19 ids across 11
+files plus the public key were repointed, and `.env` swapped.
+
+| | now live | retired |
+|---|---|---|
+| Keys | `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` (account 4) | `VAPI_*_KEY_ACCOUNT5` |
+| Debt (he) | `9e2034d1-7a4f-4e3b-89ee-6a6155091ed7` | `489aa39c-…` |
+| Debt (en) | `41d370b2-b531-4d45-b2eb-4b00f881f87a` | `3b0e384d-…` |
+| Intake (he) | `f482abc1-db69-422b-afdd-f7b40ca9d995` | `7813da25-…` |
+| Intake (en) | `8b98016b-310a-4286-bed8-c8077b603773` | `9ed5e788-…` |
+
+Account 5 is still complete and still current — the two are mirrors of each
+other, so going back is the same command in reverse — but it stays overdrawn
+until somebody tops it up. **Call history, transcripts and recordings did not
+move and cannot**; everything before 19 Aug 12:00 lives on account 5, and Vapi
+deletes recordings after 14 days.
+
+**Check the balance before a test session, not after.**
+`python scripts/vapi_transfer.py --balance` — exit 0 in credit, exit 1 blocked.
+It was thought impossible until 19 Aug: `GET /org` is 401 to a private key and
+the public key reads nothing. But **Vapi checks the wallet before it looks the
+assistant up**, so a POST to `/call/web` naming a correctly-shaped uuid that
+belongs to nobody returns the wallet message when overdrawn and *assistant not
+found* when not. Nothing is created either way, so it is free.
+
 **New 18 Aug — moving Vapi accounts is one script.**
 `scripts/vapi_transfer.py --preflight` shows what is here and what a move needs;
 `--to <ENV_VAR> --dry` shows the plan; `--apply` does it. It creates the Cartesia
@@ -193,6 +223,23 @@ assistant id does not error, it just calls the wrong agent.
 - **The public key is the one manual step.** `GET /org` is 401 to a private key.
   It goes in `.env` and `web/index.html` by hand, and without it the demo page
   loads and no call ever starts.
+
+**Two more verbs, added 19 Aug, and they are not the same as `--apply`.**
+
+- **`--mirror`** keeps a second account in step: matches by name, overwrites in
+  place so no id moves, creates only what is missing, and **does not touch the
+  repo**. Anything on the target that is not ours is not read, not written and
+  not counted. This is what made the promotion below cost nothing.
+- **`--promote`** makes a mirror the live one. Creates nothing, copies nothing —
+  repoints every id in the repo at the twin already there, carries the **public
+  key** along in the same rewrite (it is not an assistant id, and with the wrong
+  one the page loads, looks perfect, and every call is rejected), and swaps the
+  `.env` pair while keeping the outgoing one under its account number. It
+  **refuses a target that cannot place a call**, because promoting onto a second
+  overdrawn account leaves everything repointed and the same invisible symptom.
+
+`--apply` still refuses a target that already holds Homies assistants; that
+refusal is right, and `--mirror` / `--promote` are what to reach for instead.
 
 **Refreshed 18 Aug — the Vapi export.** `scripts/vapi_export.py` is the backup,
 and it now redacts by **value** rather than by field name: every
@@ -463,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, seven fixed and kept for the record
+### Known defects — six still open, eight fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -499,6 +546,14 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+8. ~~**The agent's sentences arrive with holes in them.**~~ **Fixed 19 Aug.** A
+   resident heard *"Would you like me to  though."* — two spaces, no verb.
+   Nothing was interrupted; `voice_guard.py` strips phrases so a tool name can
+   never be read aloud, and `open request` was on the list. Six two-word entries
+   removed, all of them ordinary English. The rule that should have caught it was
+   already written in that file and unenforced, so it now is: `SAFE_SENTENCES`,
+   checked by `python scripts/vapi_leak_check.py --safe`. **Run that after any
+   change to the spoken filter.**
 7. ~~**An inbound ticket carries an address the caller never gave.**~~ **Fixed
    19 Aug.** `255-1056-26` was filed against Herzl 14, flat 12, for a caller who
    said *"Herzo"* and did not know their apartment. The agent captured it
@@ -597,7 +652,7 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 
 | System | Env vars |
 |---|---|
-| Vapi | `VAPI_PRIVATE_KEY`, `VAPI_PUBLIC_KEY` — **account 5 since 12 Aug** (+ `_OLD`, `_ACCOUNT2`, `_ACCOUNT3`, `_ACCOUNT4`) |
+| Vapi | `VAPI_PRIVATE_KEY`, `VAPI_PUBLIC_KEY` — **account 4 since 19 Aug**, promoted when account 5 went overdrawn (+ `_OLD`, `_ACCOUNT2`, `_ACCOUNT3`, `_ACCOUNT5`). Every superseded pair is kept: the one time a key was dropped it took a day to work out which account a stale assistant id belonged to |
 | Supabase | `SUPABASE_URL`, `_ANON_KEY`, `_SERVICE_ROLE_KEY`, `_DB_URL`, `_DB_PASSWORD` |
 | n8n | `N8N_BASE_URL`, `N8N_API_KEY`, `N8N_WEBHOOK_SECRET` |
 | OXS | `OXS_KEY_GENERAL`, `OXS_KEY_DEBTS`, `OXS_KEY_REQUESTS` |
@@ -661,6 +716,11 @@ Nothing dials: no phone number exists, all 7,391 residents are
 
 ## Next moves, in order
 
+0. **Place one web call in each language, on the new account.** Nothing has been
+   called since the promotion — the assistants are verified identical and the
+   balance is verified in credit, and neither of those is a call. The intake
+   agent is the one to try: it gained a ladder, follow-up questions and a fourth
+   tool today, and none of it has been heard out loud.
 1. **Test the chatbot on a real handset.** Both 13 Aug changes are **deployed**
    — `debt-tools` v17 ACTIVE, WhatsApp workflow updated and still active — and
    smoke-tested against the live function. What has *not* happened is a real

@@ -134,6 +134,40 @@ managed building stops paying: it goes to a person, and the fee is **not**
 explained in that moment — there it argues for paying for something that does not
 work. Decided 18 Aug.
 
+**A filter that deletes words is checked against real sentences, every time.**
+`voice_guard.py` strips phrases from the spoken channel so a tool name can never
+be read aloud, and on 19 Aug it deleted the verb out of the intake agent's
+commonest sentence: a resident heard *"Would you like me to  though."* Six
+two-word entries were ordinary English — `open request`, `office to contact`,
+`wrong party`, `caller request`, `send payment link`, `request standing order` —
+and every one produced a hole, silently, on every call. **An entry must be three
+words or more and must read as machinery rather than as English**; two words is
+nearly always an ordinary phrase in one of the two languages and belongs in the
+prompt. The rule existed before this and was unenforced, which is the actual
+lesson: `SAFE_SENTENCES` now holds the lines both agents really say, and
+`vapi_leak_check.py --safe` fails if the filter changes one by a character. A
+leak heard once is a smaller failure than a hole in every call. Decided 19 Aug.
+
+**Check the Vapi balance before a test session, not after.**
+`vapi_transfer.py --balance`, exit 1 when blocked. An overdrawn account refuses
+every web call **before Vapi creates one**, so there is no call record, no error
+in the history, and no trace anywhere except a rejection in the browser — an
+afternoon on 19 Aug went to a false lead because the break coincided with a
+deploy. The balance was thought unreadable (`GET /org` is 401 to a private key);
+it is readable because **Vapi checks the wallet before it looks the assistant
+up**, so asking for a uuid that belongs to nobody returns the wallet message when
+overdrawn. Nothing is created, so it is free. Decided 19 Aug.
+
+**A second account is kept mirrored, and promoting it is bookkeeping, not a
+migration.** `--mirror` overwrites in place so no id moves and the repo is not
+touched; `--promote` then repoints 19 ids across 11 files, carries the **public
+key** with them, and swaps the `.env` pair. The public key is the half that is
+easy to forget and impossible to diagnose: with the wrong one the page loads,
+looks perfect, and every call is rejected by an account that does not own the
+assistant. Promotion **refuses a target that cannot place a call**. Superseded
+key pairs are kept under their account number, never deleted. Live account since
+19 Aug: **account 4**. Decided 19 Aug.
+
 **Nobody is handed to the office without being offered a ticket first.** Three
 rungs, in order: say the human thing, offer to open a request, and only then give
 the office number — with what it costs, because *"there are a lot of calls at the
@@ -290,7 +324,7 @@ why and rejected alternatives).
 | `vapi_tools.py` | Tool definitions; `INTAKE_TOOLS` is behind the live assistant |
 | `vapi_en.py` | The English twins. `--dry` is the health check; a refusal means the table is stale |
 | `vapi_export.py` | Redacted snapshot of the whole account. `--check` before committing |
-| `vapi_transfer.py` | Clone onto a new account and repoint all 17 hardcoded ids |
+| `vapi_transfer.py` | `--balance` first. Then `--apply` to move, `--mirror` to keep a spare in step, `--promote` to make that spare live |
 | `n8n_deploy.py`, `n8n_layout.py` | Workflow deploy and layout enforcement |
 
 Long sweeps: run with `python -u` so progress is visible, and in the
