@@ -546,7 +546,11 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
-9. ~~**The intake call is correct and cold.**~~ **Fixed 19 Aug.** Every field
+9. ~~**The intake call is correct and cold**, and the offer sounded like a
+   script.~~ **Fixed 19 Aug**, in two passes — the second because the first kept
+   a three-rung structure that was never asked for. The offer is now one turn
+   carrying both options and the honest wait on the slower one; the English says
+   "ticket", not "request". Every field
    captured, every answer met with the next question and no acknowledgement;
    the same filler question three times; a follow-up jammed onto the reference
    number; a bare "I cannot say"; the goodbye split off into its own utterance.

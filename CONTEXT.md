@@ -134,6 +134,23 @@ managed building stops paying: it goes to a person, and the fee is **not**
 explained in that moment — there it argues for paying for something that does not
 work. Decided 18 Aug.
 
+**Every way out of a turn is offered in the same breath, and the honest cost
+comes with it.** A resident who cannot be helped by the agent hears both options
+at once — a ticket, or the office with a wait — and picks. Offering them one at a
+time, so the second only appears after the first is refused, turns an offer into
+a funnel and reads as a script advancing rather than a person talking. The caveat
+on the slower option is said because it is true, once, and the turn ends on a
+question rather than a recommendation. Once they have chosen, that is the answer:
+no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
+
+**The twins are the same flow, not the same words.** Where the ordinary word in
+one language is jargon in the other, the translation follows the *register*, not
+the dictionary — לפתוח קריאה is what an Israeli office and resident both say;
+"open a request" is not what an English speaker says, and one heard it and said
+so. The English is "open a ticket". Every such divergence is written next to its
+entry in `vapi_en.py`, because the default there is word-for-word and this is a
+deliberate exception to it. Decided 19 Aug.
+
 **Short is not the same as cold — an answer gets two words before the next
 question.** The pacing rules were written against a seventeen-second turn and
 they worked; what they also did was strip out every acknowledgement, because

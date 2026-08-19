@@ -756,19 +756,31 @@ INTAKE_LINES = [
     # twin testing a flow that does not exist.
     ("אני מצטער לשמוע.", "I'm sorry to hear that."),
 
-    ("    אני יכול לרשום את זה למשרד, ואז זה אצלם בכתב ומישהו חוזר אליך. רוצה?",
-     "    I can write this down for the office, so they've got it and someone gets\n"
-     "    back to you. Would you like me to?"),
+    # One sentence carrying both ways out, since 19 Aug. The two used to be
+    # separate rungs and the caller had to refuse the first before hearing the
+    # second, which read as a script advancing rather than as a person saying
+    # what they can do.
+    #
+    # THE WORD IS NOT THE SAME ON BOTH SIDES, AND THAT IS THE POINT.
+    # לפתוח קריאה is ordinary Hebrew — it is what an Israeli building-management
+    # office says and what a resident says back. Its literal English, "open a
+    # request", is not ordinary English: a caller on 19 Aug heard it and said
+    # they did not follow it. English has its own everyday word for the same
+    # thing and it is "ticket". A translation that matched word for word here
+    # would be faithful to the Hebrew and wrong in the room.
+    ("""    אני יכול לפתוח על זה קריאה, או להעביר את זה למשרד — אבל יש שם המון פניות
+    כרגע, אז זה ייקח זמן. מה עדיף?""",
+     """    I can open a ticket for this, or pass it to the office — but they're taking
+    a lot of calls at the moment, so that would be a wait. Which would you
+    prefer?"""),
 
-    # ...and the plainer second attempt, for a caller who did not follow the
-    # first. Both sides have to be equally small words; a tidy English sentence
-    # here would be testing a flow the Hebrew twin does not have.
-    ("*לפתוח קריאה* is what this", "*opening a request* is what this"),
+    ("do not push — the sentence ends on *מה עדיף?*, which is a question, not a",
+     "do not push — the sentence ends on *which would you prefer?*, which is a\n"
+     "question, not a"),
 
-    ("company calls it internally; *לרשום למשרד* is what it means to somebody",
-     "company calls it internally; *writing it down for the office* is what it\n"
-     "means to somebody"),
-
+    # The plainer second attempt, for a caller who did not follow the first.
+    # Both sides have to be equally small words; a tidy English sentence here
+    # would be testing a flow the Hebrew twin does not have.
     ("    אני רושם את הבעיה, במשרד רואים את זה וחוזרים אליך. בסדר?",
      "    I'll write the problem down, the office sees it, and they get back to\n"
      "    you. Alright?"),
@@ -776,11 +788,8 @@ INTAKE_LINES = [
     # The phone number is a fact and stays exactly as it is. Only the sentence
     # around it is translated - same rule as every other contact detail in this
     # table.
-    ("""    אין בעיה. אפשר לפנות למשרד ב־077-6687949. רק שתדע, יש שם הרבה פניות
-    כרגע, אז קריאה רשומה בדרך כלל מהירה יותר.""",
-     """    That's no problem. You can reach the office on 077-6687949. Just so you
-    know, they're taking a lot of calls at the moment, so a written request is
-    usually quicker."""),
+    ("    אין בעיה. אפשר לפנות למשרד ב־077-6687949.",
+     "    That's no problem. You can reach the office on 077-6687949."),
 
     # Added 18 Aug. The status vocabulary arrived with `get_request_status` and
     # was never in this table, so the twin has been unbuildable since. The last

@@ -187,14 +187,14 @@ SAFE_SENTENCES = [
     # The rung-two offer was reworded out of the system's vocabulary and into a
     # resident's, so both wordings are here: the new one because it is said, the
     # old one because a filter that breaks it would break the new one too.
-    "I can write this down for the office, so they've got it and someone gets back to you.",
+    "I can open a ticket for this, or pass it to the office — but they're taking a lot of calls.",
     "I'll write the problem down, the office sees it, and they get back to you.",
     "I can't tell you how long it will take, but it's written down with them.",
     "Got it. What time did you leave it out?",
     "One moment, I'm writing this down.",
     "Thanks for calling Homies, have a good day, and goodbye.",
     # Hebrew, where the pronunciation substitutions also run.
-    "אני יכול לרשום את זה למשרד, ואז זה אצלם בכתב ומישהו חוזר אליך. רוצה?",
+    "אני יכול לפתוח על זה קריאה, או להעביר את זה למשרד. מה עדיף?",
     "אני לא יודע להגיד כמה זמן זה ייקח, אבל זה רשום אצלם והם חוזרים לגבי זה.",
     # A pair, because this one is meant to change: the pronunciation
     # substitution rewrites להומיז, and the second half is what it must become.

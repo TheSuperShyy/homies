@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The ladder becomes one sentence, because it was never a ladder
+
+The three-rung structure from earlier today was mine, not the ask. It was written
+as: say the human thing, offer a request, and only if they refuse, mention the
+office. Read back the live line and it is obvious what that sounds like — *"I can
+open a request for this. So the office has it in writing and comes back to you.
+Would you like me to?"* — a script advancing a step, not a person saying what
+they can do.
+
+The ask, given twice now and in almost the same words both times, was one turn
+with both ways in it: *I can open a ticket for that, or forward it to the office
+if you'd like, but that will take a while since they're getting a lot of calls.*
+That is what is live now:
+
+    אני יכול לפתוח על זה קריאה, או להעביר את זה למשרד — אבל יש שם המון פניות
+    כרגע, אז זה ייקח זמן. מה עדיף?
+
+**Holding the second option back was wrong twice over.** It made the caller
+refuse something before they had been told what else there was, and it turned an
+offer into a funnel. Somebody standing outside their own door with a parcel gone
+wants to hear the choice, not be walked down it. The caveat stays because it is
+true — the office is taking a lot of calls and a written request is looked at
+sooner — and the turn ends on a question rather than a recommendation dressed as
+one. Once they choose, the choice is theirs: the office option now hands over the
+number and stops, with no second attempt at selling the ticket.
+
+**And the word is not the same on both sides.** לפתוח קריאה is ordinary Hebrew —
+it is what the office says and what a resident says back. Its literal English,
+"open a request", is not ordinary English, which is exactly why a caller heard it
+this morning and said they did not follow. English has its own everyday word and
+it is **ticket**. The substitution table now says so, next to the entry: a
+translation that matched word for word here would be faithful to the Hebrew and
+wrong in the room.
+
 ### The call was correct, and it was cold
 
 The first call on the new account went through cleanly. A resident reported a bag
