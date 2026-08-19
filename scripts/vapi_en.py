@@ -1000,7 +1000,7 @@ be resolved. Anything else?* Both sentences were true."""),
 
 TWINS = {
     "debt": {
-        "source": "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7",   # Debt Follow-up (he)
+        "source": "8f927b15-a02f-436d-a87d-acf23abecb9b",   # Debt Follow-up (he)
         "name": "Homies — Debt Follow-up (en)",
         "stack": DEBT_STACK,
         "lines": DEBT_LINES,
@@ -1011,7 +1011,7 @@ TWINS = {
         ),
     },
     "intake": {
-        "source": "f482abc1-db69-422b-afdd-f7b40ca9d995",   # Inbound Intake (he)
+        "source": "12a4c01d-85ac-4955-a195-ed4c42b09927",   # Inbound Intake (he)
         "name": "Homies — Inbound Intake (en)",
         "stack": INTAKE_STACK,
         "lines": INTAKE_LINES,

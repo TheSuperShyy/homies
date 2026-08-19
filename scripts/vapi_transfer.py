@@ -256,8 +256,30 @@ def preflight(e):
     print("  (The BALANCE line above IS readable, via /call/web — see balance().)")
 
 
-def repoint(mapping, apply):
-    """Rewrite every old id to its new one, and say what changed."""
+def repoint(mapping, apply, skip_in_env=()):
+    """Rewrite every old id to its new one, and say what changed.
+
+    `skip_in_env` names values that must NOT be substituted inside `.env`, and it
+    exists because of real damage done on 19 Aug.
+
+    WHAT HAPPENED
+    `promote()` adds the public key to the mapping, because the key is hardcoded
+    in web/index.html and has to travel with the assistant ids. This function
+    then did a blind text replace over every file in ID_FILES — `.env` among
+    them — so every historical `VAPI_PUBLIC_KEY_ACCOUNT<n>` holding the outgoing
+    public key was rewritten to the incoming one. The keys kept "so you can work
+    out later which account something belonged to" were overwritten by the very
+    step that claims to preserve them, and `.env` is gitignored, so there is no
+    history to recover them from.
+
+    It ran twice before anyone noticed, which is the part that matters: after the
+    first promotion, account 5's public key had already become account 4's, and a
+    balance check on `VAPI_PUBLIC_KEY_ACCOUNT5` was therefore checking account 4
+    and reporting a healthy balance for an account nobody had looked at.
+
+    `.env` is `swap_env()`'s territory; it knows which name each key belongs
+    under. Nothing else should be rewriting keys in there.
+    """
     total = 0
     for f in ID_FILES:
         p = os.path.join(ROOT, f)
@@ -265,10 +287,13 @@ def repoint(mapping, apply):
             print("  %-46s missing, skipped" % f)
             continue
         text = open(p, encoding="utf-8", errors="replace").read()
-        n = sum(text.count(old) for old in mapping)
+        # In .env, assistant ids still move; keys do not.
+        here = ({k: v for k, v in mapping.items() if k not in skip_in_env}
+                if f == ".env" else mapping)
+        n = sum(text.count(old) for old in here)
         if not n:
             continue
-        for old, new in mapping.items():
+        for old, new in here.items():
             text = text.replace(old, new)
         if apply:
             open(p, "w", encoding="utf-8", newline="\n").write(text)
@@ -376,7 +401,9 @@ def promote(e, ours, target, var, pubvar):
 
     print("\nRepoint:")
     apply = "--apply" in sys.argv
-    repoint(mapping, apply=apply)
+    # The public key travels through every file EXCEPT .env, where swap_env owns
+    # the naming and a blind replace destroys the retired accounts' keys.
+    repoint(mapping, apply=apply, skip_in_env=(old_pub,) if old_pub else ())
 
     if not apply:
         print("\n.env would change:")

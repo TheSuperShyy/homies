@@ -174,8 +174,14 @@ aloud — a tool argument spoken as a sentence. Absolute rule 10 now names it, b
 it is a prompt rule against a generation habit, so watch for it. And the TTS says
 **"HOMEies"** for Homies, on the first word of every call.
 
-**THE LIVE VAPI ACCOUNT CHANGED ON 19 AUG. Read this before touching anything
-that dials.** The account live since 12 Aug — "account 5" — went **$0.11
+**THE LIVE VAPI ACCOUNT CHANGED TWICE ON 19 AUG. Read this before touching
+anything that dials.** The second move, in the afternoon, was to a fresh account
+— the one below. **A new account starts with no provider credentials**, so the
+Cartesia key had to be created on it by hand before the Hebrew agents had a
+voice; `--mirror` does not carry credentials, only assistants. Check
+`GET /credential` on any new target before believing a migration is complete.
+
+**The first move, that morning:** The account live since 12 Aug — "account 5" — went **$0.11
 overdrawn**, and Vapi refuses a web call *before* it creates one, so every
 attempt failed with no call record on either side and nothing in the history to
 find. **Account 4 is now the live one.** Its four assistants had been mirrored an
@@ -184,18 +190,27 @@ files plus the public key were repointed, and `.env` swapped.
 
 | | now live | retired |
 |---|---|---|
-| Keys | `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` (account 4) | `VAPI_*_KEY_ACCOUNT5` |
-| Debt (he) | `9e2034d1-7a4f-4e3b-89ee-6a6155091ed7` | `489aa39c-…` |
-| Debt (en) | `41d370b2-b531-4d45-b2eb-4b00f881f87a` | `3b0e384d-…` |
-| Intake (he) | `f482abc1-db69-422b-afdd-f7b40ca9d995` | `7813da25-…` |
-| Intake (en) | `8b98016b-310a-4286-bed8-c8077b603773` | `9ed5e788-…` |
+| Keys | `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` (account 6, live 19 Aug pm) | `VAPI_*_KEY_ACCOUNT7` (the old account 4), `_ACCOUNT5` |
+| Debt (he) | `8f927b15-a02f-436d-a87d-acf23abecb9b` | `9e2034d1-…`, `489aa39c-…` |
+| Debt (en) | `cc8e43b4-be81-46c4-9772-893ee2a0c98a` | `41d370b2-…`, `3b0e384d-…` |
+| Intake (he) | `12a4c01d-85ac-4955-a195-ed4c42b09927` | `f482abc1-…`, `7813da25-…` |
+| Intake (en) | `9cae6bf7-0ac6-45eb-ad66-dcca018cb710` | `8b98016b-…`, `9ed5e788-…` |
 
-Account 5 is still complete and still current — the two are mirrors of each
-other, so going back is the same command in reverse — and **as of 19 Aug
-afternoon it is back in credit**, so the fallback is real again. It was $0.11
-overdrawn that morning; nobody here topped it up, so either the client did or a
-monthly allowance reset. Check with `--balance` before relying on it rather than
-trusting this line. **Call history, transcripts and recordings did not
+Account 5's balance is **unknown**, and the earlier claim here that it was back
+in credit was wrong. `VAPI_PUBLIC_KEY_ACCOUNT5` in `.env` does not hold account
+5's public key — a promote overwrote it (see below) — so that check was reading
+the live account twice and reporting its balance under another name. The private
+key is correct; the public one has to come from account 5's own dashboard before
+its balance can be read at all.
+
+**Retired public keys in `.env` are not trustworthy.** `repoint()` rewrote every
+occurrence of the outgoing public key across every file, `.env` included, so each
+`VAPI_PUBLIC_KEY_ACCOUNT<n>` was overwritten with the incoming key by the very
+step meant to preserve it — and `.env` is gitignored, so there is nothing to
+recover them from. **Fixed 19 Aug** (`skip_in_env`: keys are `swap_env()`'s
+territory, ids still move), but the values already lost stay lost. Every retired
+**private** key is intact. Take a retired public key from that account's
+dashboard, Organization → API Keys. **Call history, transcripts and recordings did not
 move and cannot**; everything before 19 Aug 12:00 lives on account 5, and Vapi
 deletes recordings after 14 days.
 

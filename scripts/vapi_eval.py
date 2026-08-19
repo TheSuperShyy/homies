@@ -52,7 +52,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-MICHAL_ASSISTANT = "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7"
+MICHAL_ASSISTANT = "8f927b15-a02f-436d-a87d-acf23abecb9b"
 SUITE_NAME = "Homies — Debt Follow-up (he)"
 
 # The variables the prompt declares. Michal is the target, so these ride in on
