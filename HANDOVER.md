@@ -210,6 +210,22 @@ balance in credit says nothing about whether the Hebrew agent can speak. The onl
 way to read what is left is the Cartesia dashboard. The English twins use Vapi's
 own Elliot voice and are unaffected.
 
+**Do not spend another hour looking for it.** Swept 19 Aug against both keys and
+both API versions: `/usage`, `/balance`, `/account`, `/credits`, `/billing`,
+`/subscription`, `/quota`, `/org`, `/v1/*` and a dozen more are all 404, and a
+successful call carries no quota, credit or rate headers. Two endpoints answer at
+all — `/status`, which is a public health check, and **`/api-keys`, which returns
+401 "you must be logged in"**. That is the shape of the whole thing: Cartesia's
+account surface is behind a dashboard *session*, and an API key is not one.
+
+**And the Vapi wallet trick does not port.** It works there because Vapi checks
+the wallet *before* it validates the request. Cartesia validates first — an empty
+transcript and a nonexistent voice id both come back as plain 400s — so a
+deliberately unsynthesisable request tells you nothing about credit. The only
+signal an API key can give is *"this key still authenticates"*, which catches a
+revoked key and never an empty balance. Anything stronger is a real synthesis,
+which bills.
+
 **Check the balance before a test session, not after.**
 `python scripts/vapi_transfer.py --balance` — exit 0 in credit, exit 1 blocked.
 It was thought impossible until 19 Aug: `GET /org` is 401 to a private key and
