@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The mirror gets promoted, which is why it existed
+
+The overdrawn account had a spare that was already identical — account 4, made a
+mirror an hour earlier — and that spare is in credit. So instead of buying
+credits to unblock a test session, the live pointer moved.
+
+**Promoting a mirror creates nothing and copies nothing.** It is two pieces of
+bookkeeping: point every id in the repo at the twin already sitting there, and
+swap the two keys in `.env`. Nineteen ids across eleven files, plus the public
+key, which is **not** an assistant id and rides in the same rewrite — without it
+the page loads, looks perfect, and every call is rejected by an account that does
+not own the assistant it is being asked for.
+
+`--promote` is its own verb for a reason. `--apply` moves by CREATING and refuses
+a target that already holds Homies assistants — which is exactly the target this
+is for; copying again would give duplicates and the repoint would then pick
+whichever came back first.
+
+**The balance is checked first and hard.** Promoting onto a second overdrawn
+account would leave everything repointed, nothing working, and the same invisible
+symptom that cost this afternoon. A target that cannot place a call is not a
+target.
+
+The outgoing pair is kept as `VAPI_PRIVATE_KEY_ACCOUNT5` / `VAPI_PUBLIC_KEY_ACCOUNT5`
+rather than deleted. Every previous account's key is still in that file for the
+same reason: the one time a key was dropped it took a day to work out which
+account a stale assistant id belonged to.
+
+Verified after: `--balance` reads OK against the new pair, `VAPI_PRIVATE_KEY`
+reaches all four assistants with 4/4 and 7/7 server blocks, and the old public
+key is gone from `web/index.html`.
+
+**What did not move, and cannot**: call history, transcripts and recordings stay
+on the old account. Recordings are deleted after 14 days regardless, so anything
+wanted from today's calls has to be pulled from there.
+
 ### The demo would not start, and it was eleven cents
 
 Reported as *"still error"*, on a page showing:

@@ -902,7 +902,7 @@ yours: I didn't explain that well, never you didn't understand."""),
 
 TWINS = {
     "debt": {
-        "source": "489aa39c-223d-402b-b07f-3fe53276b35b",   # Debt Follow-up (he)
+        "source": "9e2034d1-7a4f-4e3b-89ee-6a6155091ed7",   # Debt Follow-up (he)
         "name": "Homies — Debt Follow-up (en)",
         "stack": DEBT_STACK,
         "lines": DEBT_LINES,
@@ -913,7 +913,7 @@ TWINS = {
         ),
     },
     "intake": {
-        "source": "7813da25-f242-4a8d-888e-51caa2ec8b3f",   # Inbound Intake (he)
+        "source": "f482abc1-db69-422b-afdd-f7b40ca9d995",   # Inbound Intake (he)
         "name": "Homies — Inbound Intake (en)",
         "stack": INTAKE_STACK,
         "lines": INTAKE_LINES,

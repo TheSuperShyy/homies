@@ -1,17 +1,17 @@
 # The week-3 demo assistant — inbound intake
 
-Vapi assistant **`7813da25-f242-4a8d-888e-51caa2ec8b3f`** — *Homies — Inbound
+Vapi assistant **`f482abc1-db69-422b-afdd-f7b40ca9d995`** — *Homies — Inbound
 Intake (he)*. Created 3 Aug 2026 and live. Called *(demo)* until 5 Aug, renamed
 the day it gained an English twin — `vapi_sync.py` finds its target **by name**,
 so that string and the live name have to move together or the next `--apply`
 creates a second assistant instead of failing.
 
-**The English twin is `9ed5e788-0f50-4806-8377-905a559f7296`** — *Homies —
+**The English twin is `8b98016b-310a-4286-bed8-c8077b603773`** — *Homies —
 Inbound Intake (en)*. It is not edited directly and has no document of its own:
 `scripts/vapi_en.py intake` reads this assistant live and applies 21
 substitutions, each of which must match exactly once or it refuses to build.
 Change the Hebrew here, re-sync, then re-run that script with `--update
-9ed5e788-0f50-4806-8377-905a559f7296`. If a passage in the table stops matching
+8b98016b-310a-4286-bed8-c8077b603773`. If a passage in the table stops matching
 it stops rather than shipping half a translation, which is the only reason the
 twin can be trusted to represent the Hebrew one.
 

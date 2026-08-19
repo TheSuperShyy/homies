@@ -6,6 +6,7 @@
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --dry
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --apply
     python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_OLD --mirror
+    python scripts/vapi_transfer.py --to VAPI_PRIVATE_KEY_OLD --promote
 
 MOVE OR MIRROR, AND THEY ARE NOT THE SAME OPERATION
 
@@ -322,6 +323,128 @@ def mirror(ours, target, var):
     print("  Dashboard -> Organization -> API Keys and put it in web/index.html.")
 
 
+def promote(e, ours, target, var, pubvar):
+    """Make an account that is ALREADY a mirror into the live one.
+
+    Creates nothing and copies nothing. A mirror is by definition already
+    identical, so promoting it is only two pieces of bookkeeping: point every id
+    in the repo at the twin that is already there, and swap the two keys in
+    `.env`. Both accounts keep working; only which one gets called changes.
+
+    WHY THIS IS SEPARATE FROM --apply
+    `--apply` moves by CREATING, and refuses a target that already holds Homies
+    assistants — which is exactly the target this is for. Copying again would
+    give duplicates and the repoint would then pick whichever came back first.
+
+    WHY THE BALANCE IS CHECKED FIRST AND HARD
+    This was written on 19 Aug because the live account went eleven cents
+    overdrawn and every call was refused before Vapi recorded it. Promoting onto
+    a second overdrawn account would leave everything repointed, nothing working,
+    and the same invisible symptom — so a target that cannot place a call is not
+    a target.
+
+    THE ONE THING THAT DOES NOT COME ACROSS
+    Call history, transcripts and recordings stay on the old account. They are
+    not moved and cannot be; recordings are deleted after 14 days regardless.
+    """
+    ok, msg = balance(e.get(pubvar, ""))
+    print("TARGET BALANCE  %s" % msg)
+    if not ok:
+        sys.exit("Refusing: that account cannot place a call either.")
+
+    there = {a["name"]: a for a in api("GET", "/assistant?limit=100", target)
+             if OURS.match(a.get("name", ""))}
+    missing = [a["name"] for a in ours if a["name"] not in there]
+    if missing:
+        sys.exit("Not a mirror — these are not on the target: %s\n"
+                 "Run --mirror --apply first." % ", ".join(missing))
+
+    mapping = {a["id"]: there[a["name"]]["id"] for a in ours}
+    # The public key is hardcoded in web/index.html and is NOT an assistant id,
+    # so it rides along in the same rewrite. Without it the page loads, looks
+    # perfect, and every call is rejected by an account that does not own the
+    # assistant it is asking for.
+    old_pub, new_pub = e.get("VAPI_PUBLIC_KEY"), e.get(pubvar)
+    if old_pub and new_pub and old_pub != new_pub:
+        mapping[old_pub] = new_pub
+
+    print("\nPROMOTE  %s -> live" % var)
+    for a in ours:
+        print("  %-32s %s -> %s" % (a["name"][:32], a["id"], there[a["name"]]["id"]))
+    if old_pub in mapping:
+        print("  %-32s public key rewritten in web/index.html" % "")
+
+    print("\nRepoint:")
+    apply = "--apply" in sys.argv
+    repoint(mapping, apply=apply)
+
+    if not apply:
+        print("\n.env would change:")
+        print("  VAPI_PRIVATE_KEY -> the value now in %s" % var)
+        print("  VAPI_PUBLIC_KEY  -> the value now in %s" % pubvar)
+        print("\nDry run. Re-run with --apply.")
+        return
+
+    swap_env(var, pubvar)
+    print("\nSTILL TO DO")
+    print("  1. cd web && git add -A && git commit && git push  (its own repo)")
+    print("  2. python scripts/vapi_transfer.py --balance   (now reads the new account)")
+    print("  3. One web call in each language before believing any of it.")
+    print("  Call history and recordings stay on the old account. They do not move.")
+
+
+def swap_env(var, pubvar):
+    """Point VAPI_PRIVATE_KEY / VAPI_PUBLIC_KEY at the promoted account.
+
+    Rewrites two lines and adds two, and touches nothing else in the file. The
+    outgoing values are kept under their own account name rather than deleted —
+    every previous account's key is still in this file for exactly that reason,
+    and the one time a key was dropped it took a day to work out which account a
+    stale assistant id belonged to.
+    """
+    path = os.path.join(ROOT, ".env")
+    lines = io_lines(path)
+    cur = {}
+    for line in lines:
+        t = line.strip()
+        if t and not t.startswith("#") and "=" in t:
+            k, v = t.split("=", 1)
+            cur[k.strip()] = v.strip().strip('"').strip("'")
+
+    new_priv, new_pub = cur.get(var), cur.get(pubvar)
+    old_priv, old_pub = cur.get("VAPI_PRIVATE_KEY"), cur.get("VAPI_PUBLIC_KEY")
+
+    # Where the outgoing pair goes. Named for the account it belonged to, and
+    # never overwriting a name already in use.
+    n = 5
+    while "VAPI_PRIVATE_KEY_ACCOUNT%d" % n in cur:
+        n += 1
+    keep_priv = "VAPI_PRIVATE_KEY_ACCOUNT%d" % n
+    keep_pub = "VAPI_PUBLIC_KEY_ACCOUNT%d" % n
+
+    out = []
+    for line in lines:
+        t = line.strip()
+        if t.startswith("VAPI_PRIVATE_KEY="):
+            out.append("VAPI_PRIVATE_KEY=%s\n" % new_priv)
+        elif t.startswith("VAPI_PUBLIC_KEY="):
+            out.append("VAPI_PUBLIC_KEY=%s\n" % new_pub)
+        else:
+            out.append(line)
+    out.append("\n# Retired %s, when the account above went overdrawn.\n" % keep_priv[-9:])
+    out.append("%s=%s\n" % (keep_priv, old_priv))
+    out.append("%s=%s\n" % (keep_pub, old_pub))
+
+    open(path, "w", encoding="utf-8", newline="\n").writelines(out)
+    print("  .env: VAPI_PRIVATE_KEY and VAPI_PUBLIC_KEY now the %s pair;" % var)
+    print("        the outgoing pair kept as %s / %s" % (keep_priv, keep_pub))
+
+
+def io_lines(path):
+    with open(path, encoding="utf-8") as fh:
+        return fh.readlines()
+
+
 def main():
     argv = sys.argv[1:]
     e = env()
@@ -358,6 +481,17 @@ def main():
     # the assistants already there are the ones being brought up to date.
     if "--mirror" in argv:
         mirror(ours, target, var)
+        return
+
+    if "--promote" in argv:
+        # The public key lives under the matching name. VAPI_PRIVATE_KEY_ACCOUNT4
+        # pairs with VAPI_PUBLIC_KEY_ACCOUNT4, which is the convention this file
+        # has followed since the first move.
+        pubvar = var.replace("PRIVATE", "PUBLIC")
+        if pubvar not in e:
+            sys.exit("%s is not in .env. The public key cannot be read through "
+                     "the API, so it has to be there before promoting." % pubvar)
+        promote(e, ours, target, var, pubvar)
         return
 
     # Refuse to run into an account that already has some. Creating by name would
