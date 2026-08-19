@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The filter I added an hour ago hid the ticket it was meant to find
+
+A caller asked about the lift in building one and heard *"I couldn't find any
+recent request about the elevator in building one."* `255-1063-26` was in the
+table, description **"elevator issue"**, and its `type` is `other` — because the
+agent that opened it inferred the category and got it wrong.
+
+The `type` filter added this morning was a hard `.eq`, so it trusted that
+inference over the caller. **The type is written by a guess and the question is
+asked by a person; where they disagree the person is the one who knows.** It is a
+soft filter now: narrow with it, and if that empties the answer, ask again
+without it. One extra query on exactly the runs that would otherwise have
+returned nothing.
+
+    building one + elevator    was 0   now 2
+    building one               2       2
+    Herzl 14 + elevator        1       1     (still narrows)
+    a building nobody has      0       0
+
+Everything the fix was for still holds — a typed question still narrows, so the
+lift enquiry does not read out somebody's leak — and it can no longer be the
+reason there is no answer at all.
+
+**And "never mind" was answered with everything they had just declined.** Told
+nothing was found, the caller said *"no, never mind"* and in one turn got the
+office phone number, *"I'm passing this to someone who'll get back to you"*, and
+the goodbye. Declining is an answer. The only correct response is to accept it,
+check whether there is anything else, and close.
+
+That needed rule 7 amended rather than worked around: *never end a call without a
+request, a partial or a transfer* is why the agent reached for a transfer it had
+just been told not to make. It now carves out the case it was never meant to
+cover — **a question you answered is a complete call**, and so is a not-found the
+caller chose to leave there. The rule exists so nobody hangs up with nothing, not
+so that something gets filed against somebody who wanted an answer and got one.
+
 ### The bot said it had opened a ticket. It had not.
 
 Chased down while answering "is the chatbot fixed now", and the answer turned

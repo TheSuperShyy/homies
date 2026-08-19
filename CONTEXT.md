@@ -143,6 +143,19 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**A filter narrows an answer; it never causes there to be none.** Where a query
+is narrowed by something the system inferred — a category, a label, a guess made
+at write time — and the question comes from a person, the person is the one who
+knows. Narrow, and if that empties the result, ask again without the narrowing.
+Added as a hard filter on 19 Aug and wrong within the hour: a lift enquiry
+returned nothing because the matching ticket had been filed as `other`.
+
+**A rule written to guarantee an outcome will manufacture one.** *Never end a
+call without a request, a partial or a transfer* made the agent transfer a caller
+who had just declined a transfer. Any rule of that shape needs the case it was
+never meant to cover written into it — a question asked and answered is a
+complete call. Decided 19 Aug.
+
 **A rule the model follows most of the time is not a guard.** Where the cost of
 disobedience is a resident being told something untrue, the check goes where it
 can read what actually happened — the workflow, the tool output, the execution —

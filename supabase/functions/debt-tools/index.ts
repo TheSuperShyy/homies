@@ -1066,12 +1066,35 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         // lighting". Without it, a building with no apartment given returns
         // every recent request in the building and the agent reads out
         // somebody else's leak.
+        //
+        // BUT IT NARROWS AN ANSWER; IT NEVER CAUSES THERE TO BE NONE.
+        // Added as a hard `.eq` on 19 Aug and wrong within the hour. A caller
+        // asked about the lift and heard "I could not find any recent request
+        // about the elevator" while `255-1063-26` — description "elevator
+        // issue" — sat in the table. The row's `type` is `other`, because the
+        // agent that opened it inferred the category and got it wrong, and the
+        // filter then trusted that mistake over the caller.
+        //
+        // The type is written by an inference and the question is asked by a
+        // person; where they disagree, the person is the one who knows. So it
+        // is a soft filter: narrow with it, and if that empties the answer,
+        // ask again without it. The cost is one extra query on the runs that
+        // would otherwise have returned nothing.
         const type = String(args?.type ?? "").trim();
-        if (type) q = q.eq("type", type);
-        const { data, error } = await q
+        const recent = (b: any) => b
           .order("created_at", { ascending: false })
           .limit(unit ? 3 : 8);
+
+        let { data, error } = await recent(type ? q.eq("type", type) : q);
         if (error) return { ok: false, error: error.message };
+
+        if (type && !data?.length) {
+          let wide = db.from("requests").select(fields).ilike("building", `%${building}%`);
+          if (unit) wide = wide.eq("unit", unit);
+          const second = await recent(wide);
+          if (second.error) return { ok: false, error: second.error.message };
+          data = second.data;
+        }
         rows = data;
 
         // A loose match can span two buildings — "Herzl" is Herzl 14 and
