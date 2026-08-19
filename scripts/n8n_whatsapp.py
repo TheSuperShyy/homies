@@ -1632,6 +1632,64 @@ def workflow(e):
                         "rightValue": "",
                         "operator": {"type": "boolean", "operation": "true",
                                      "singleValue": True},
+                    }, {
+                        # THE PHANTOM TICKET, caught 19 Aug with the run in front
+                        # of me. The agent answered an address with "\u05e4\u05ea\u05d7\u05ea\u05d9 \u05e7\u05e8\u05d9\u05d0\u05d4
+                        # \u05e2\u05dc \u05e0\u05d6\u05d9\u05dc\u05ea \u05de\u05d9\u05dd \u05d1\u05dc\u05d5\u05d1\u05d9, \u05de\u05e1\u05e4\u05e8 255-1048-26" and the
+                        # execution shows one tool call, verify_address. No row
+                        # was written, and the number it read out belongs to
+                        # somebody else's ticket. The resident is left believing
+                        # a request exists, holding a reference that will resolve
+                        # to a stranger's fault if they ever quote it.
+                        #
+                        # Known since 12 Aug as defect 5 and left to the prompt,
+                        # which already forbids it and was obeyed on every other
+                        # run. A rule the model follows most of the time is not a
+                        # guard; this is, because it reads the execution rather
+                        # than the intention.
+                        #
+                        # False sends the reply to "Hand over instead" — the same
+                        # branch a degenerate answer takes — so the resident gets
+                        # a person instead of a number that is not real.
+                        "id": "phantom",
+                        "leftValue":
+                            # TWO THINGS THIS EXPRESSION HAS TO SURVIVE, both of
+                            # which bit on 19 Aug and neither of which is about
+                            # the logic:
+                            #
+                            # 1. `}}` ANYWHERE INSIDE ENDS THE EXPRESSION. n8n
+                            #    closes on the first `}}` it meets, so an arrow
+                            #    function's `}` next to the closing brace \u2014 the
+                            #    natural `}})()` \u2014 truncates the whole thing and
+                            #    the node reports "invalid syntax". Every brace
+                            #    that would touch another has a space in it.
+                            #
+                            # 2. The backslashes are SINGLE. Written `\\b` in
+                            #    Python source they reach n8n as `\\b`, which in
+                            #    a JS regex is a literal backslash followed by b
+                            #    \u2014 a valid pattern that matches nothing here. A
+                            #    raw string keeps them as the word boundaries
+                            #    they are meant to be.
+                            r"={{ (() => {"
+                            r" const t = String($json.output || '');"
+                            r" const claims = /\b\d{3}-\d{4}-\d{2}\b|\bHM-\d{4}-\d{3,6}\b"
+                            "|\u05e4\u05ea\u05d7\u05ea\u05d9 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e4\u05ea\u05d7\u05e0\u05d5 \u05e7\u05e8\u05d9\u05d0\u05d4/.test(t);"
+                            " if (!claims) return true;"
+                            # `isExecuted` is useless on a tool node: it reported
+                            # true on the 19 Aug run where the execution shows
+                            # verify_address as the only tool called. It appears
+                            # to describe the node being reachable rather than
+                            # having been invoked. The node's OUTPUT is the
+                            # honest signal - a tool the agent never called has
+                            # produced no items, and asking for them throws.
+                            " try {"
+                            "  const r = $('open_request').all();"
+                            "  return Array.isArray(r) && r.length > 0;"
+                            " } catch (e) { return false; }"
+                            " } )() }}",
+                        "rightValue": "",
+                        "operator": {"type": "boolean", "operation": "true",
+                                     "singleValue": True},
                     }],
                     "combinator": "and",
                 }},

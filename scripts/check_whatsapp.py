@@ -46,8 +46,37 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # fixture. It has to look like an address to the model and like a test to a
 # human, and the row is deleted either way. Matched on the number rather than
 # the whole string, since the model may drop the definite article.
-BUILDING = "הבדיקה 999"
-BUILDING_MATCH = "requests?building=like.*999*"
+# A REAL building, resolved at run time, and a marker to find the rows by.
+#
+# This used to be the fictional "הבדיקה 999", chosen so the check's own rows were
+# unmistakable and safe to delete. That stopped working the day `verify_address`
+# became mandatory before `open_request`: the bot now checks every address
+# against the portfolio and refuses one it does not manage, so a conversation
+# about a building that does not exist can never produce a row. The check was
+# asserting one anyway and had been red ever since — reading as a broken bot,
+# and it was a broken check.
+#
+# So the address is real and the MARKER is what makes the row ours. It goes in
+# the resident's own words, which is where the bot copies the description from,
+# and every query and the cleanup match on it. Nothing is matched on the
+# building any more, because the building now belongs to Homies and its real
+# requests must never be in range of this file's DELETE.
+MARKER = "בדיקת-מערכת-999"
+BUILDING_MATCH = "requests?description=like.*%D7%91%D7%93%D7%99%D7%A7%D7%AA-%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA-999*"
+
+
+def a_real_building():
+    """One address the portfolio actually contains, for the end-to-end walk.
+
+    Read rather than hard-coded: the buildings table is imported from OXS and
+    the names change when Homies takes a building on or lets one go. A constant
+    here would fail silently one morning and look exactly like a bot failure,
+    which is the whole problem this comment exists because of.
+    """
+    ok, rows = sb("buildings?select=address&active=is.true&limit=1")
+    if not rows:
+        sys.exit("No active buildings — import them before running this.")
+    return rows[0]["address"]
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -190,11 +219,36 @@ def main():
     before = sb(BUILDING_MATCH + "&select=reference")[1]
     check("forged messages wrote nothing", len(before) == 0, "%d rows" % len(before))
 
-    # --- 4. A real message reaches the database -----------------------------
+    # --- 4. A real conversation reaches the database ------------------------
     # The only check that matters. Everything above can pass while this fails.
+    #
+    # THREE MESSAGES, NOT ONE, AND THAT IS THE FIX OF 19 AUG.
+    # This sent one message and asserted one row, and it had been failing for
+    # some time while everything else passed — which reads as a broken bot and
+    # was a broken check. The prompt is explicit that the first reply is an
+    # OFFER and not an interrogation: "אתה מציע לפתוח קריאה — לא מתחיל לחקור",
+    # and the address is asked for *after* they say yes. The reply the bot
+    # actually gives is the prompt's own worked example, word for word.
+    #
+    # So one message can never produce a row, by design, and a check that
+    # demanded one was testing a contract nobody agreed to. It now walks the
+    # conversation the prompt promises: report, accept, address. If THAT does
+    # not produce a row, something is genuinely wrong.
     print("\nend to end")
-    text = "יש נזילת מים בלובי של %s, דחוף" % BUILDING
-    check("signed message answers 200", post_message(frm, text) == 200)
+    building = a_real_building()
+    print("  building:", building)
+    turns = [
+        "יש נזילת מים בלובי, דחוף. %s" % MARKER,   # the report, carrying the marker
+        "כן, תפתח קריאה בבקשה",                     # accepting the offer
+        "%s, דירה 4" % building,                    # where they live — a real address
+    ]
+    for i, text in enumerate(turns, 1):
+        check("message %d answers 200" % i, post_message(frm, text) == 200,
+              text[:38])
+        # The agent has to answer before the next message means anything; a
+        # burst arrives as three unanswered turns and tests nothing.
+        if i < len(turns):
+            time.sleep(12)
 
     rows, waited = [], 0
     while waited < 45:
@@ -211,7 +265,7 @@ def main():
               str(rows[0]["unit"]))
 
         # --- 5. And a second report of it does not become a second ticket ---
-        post_message(frm, "הנזילה ב%s עדיין שם" % BUILDING)
+        post_message(frm, "הנזילה עדיין שם. %s" % MARKER)
         time.sleep(12)
         again = sb(BUILDING_MATCH + "&select=reference")[1]
         check("duplicate did not open a second ticket", len(again) == 1,
@@ -219,7 +273,7 @@ def main():
 
     # --- Clean up after ourselves -------------------------------------------
     left = sb(BUILDING_MATCH, "DELETE")[0]
-    print("\ncleanup: deleted %s rows (HTTP %s)" % (BUILDING, left))
+    print("\ncleanup: deleted %s rows (HTTP %s)" % (MARKER, left))
 
     print()
     if FAILED:

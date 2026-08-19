@@ -143,6 +143,19 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**A rule the model follows most of the time is not a guard.** Where the cost of
+disobedience is a resident being told something untrue, the check goes where it
+can read what actually happened — the workflow, the tool output, the execution —
+not into another line of prompt. The bot claimed to have opened a ticket and
+quoted a reference while calling only `verify_address`; the prompt had forbidden
+exactly that since 12 Aug and was obeyed on every other run. Decided 19 Aug.
+
+**A test fixture the system under test is right to reject is a broken fixture.**
+Learned twice on the same file: `__selfcheck__` as a building name, then the
+invented `הבדיקה 999` once `verify_address` began refusing addresses outside the
+portfolio. Isolation has to come from something the system does not validate — a
+marker in the text — not from making the input wrong. Decided 19 Aug.
+
 **Anything spoken arrives as words.** A reference read aloud digit by digit
 comes back from the transcriber as "one zero six three", and a lookup that only
 parses digits fails on the one form the design itself produces. Spoken digits are

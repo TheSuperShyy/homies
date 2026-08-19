@@ -11,6 +11,67 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The bot said it had opened a ticket. It had not.
+
+Chased down while answering "is the chatbot fixed now", and the answer turned
+out to be worse than the failing check suggested.
+
+`check_whatsapp.py` had been red on its one important assertion — a real message
+reaching the database — while everything else passed. **Two of its own faults
+first**, and neither was the bot:
+
+- **It sent one message and demanded one row.** The prompt is explicit that the
+  first reply is an offer and not an interrogation — *"אתה מציע לפתוח קריאה — לא
+  מתחיל לחקור"* — and the address is asked for after they say yes. The reply the
+  bot gives is the prompt's own worked example, word for word. One message can
+  never produce a row **by design**, so the check was asserting a contract
+  nobody agreed to. It walks the three-turn conversation now: report, accept,
+  address.
+- **Its test building could not survive the address gate.** `הבדיקה 999` was
+  invented so the check's rows were unmistakable and safe to delete. Then
+  `verify_address` became mandatory before `open_request`, and the bot began —
+  correctly — refusing an address Homies does not manage. The same lesson as the
+  first fixture, `__selfcheck__`: **a fixture the system under test is right to
+  reject is a broken fixture.** The address is real now and a marker in the
+  resident's own words carries the identity, so the DELETE can never reach a
+  real request.
+
+**Then the real one.** With the check finally walking a conversation the bot
+could complete, turn three came back:
+
+    פתחתי קריאה על הנזילה בלובי בסוקולוב 86, דירה 4, מספר 255-1048-26
+
+"I've opened a request… number 255-1048-26." The execution shows **one tool
+call, `verify_address`**. No row was written. And that reference belongs to
+somebody else's ticket, so a resident quoting it later is quoting a stranger's
+fault.
+
+This is known defect 5, recorded 12 Aug and left to the prompt — which already
+forbids it and was obeyed on every other run. **A rule the model follows most of
+the time is not a guard.** The guard is now in the workflow, at "Reply usable?",
+where it reads the execution rather than the intention: a reply carrying a
+reference or claiming a request was opened, with no `open_request` output behind
+it, takes the false branch into "Hand over instead". Proven live — the phantom
+was replaced with *אני מעביר את זה לצוות, נחזור בהקדם* and the resident got a
+person instead of a number that is not real.
+
+**Two n8n traps cost three deploys**, and both are about the expression language
+rather than the logic:
+
+- **`}}` anywhere inside an expression ends it.** n8n closes on the first one it
+  meets, so an arrow function's natural `}})()` truncates everything and the node
+  reports "invalid syntax" at run time — not at deploy. Every brace that would
+  touch another now has a space in it.
+- **`isExecuted` is useless on a tool node.** It returned true on a run whose
+  execution shows the tool was never called; it appears to describe the node
+  being reachable rather than invoked. The node's output is the honest signal —
+  a tool the agent never called has produced no items.
+
+**Still open:** the containment works and the cause does not go away. The agent
+skips `open_request` intermittently — one run in this session called it
+correctly. The check is now honestly red for a real defect rather than dishonestly
+red for a bad fixture, which is the difference between a signal and noise.
+
 ### The reference existed. The agent said it did not.
 
 A caller quoted reference one zero six three and was told no such request
