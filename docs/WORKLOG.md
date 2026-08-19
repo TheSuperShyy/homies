@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The waiting line stops being the model's to say
+
+*"This will just take a sec"* came back on the status call, hours after being
+pinned. The prompt already said which line to use and, since this morning, said
+"that line, not your own version of it" as well. The model said its own version
+anyway. A third instruction was not going to hold.
+
+So the line is no longer an instruction. Vapi tools take a **request-start
+message** — spoken by Vapi the moment the call begins, before the model gets the
+turn — and the three sync tools now carry one: `רגע, אני רושם` on open_request,
+`רגע, אני בודק` on the two reads, because checking is not writing and a line
+about writing would be a small lie. The prompt section that used to teach the
+line now says the opposite: **say nothing, it is spoken for you**, and warns that
+speaking as well is heard twice, which is worse than either version alone.
+
+A tool message is spoken, and the twins share their tools verbatim — so this is
+the one place a Hebrew sentence could reach an English caller's ear. `vapi_en.py`
+now translates them through `TOOL_MESSAGES`, and exits on one it does not
+recognise rather than shipping it. Verified on both live assistants.
+
+Two more from the same call:
+
+- **The address was read back twice inside twenty seconds** — once when the
+  apartment was captured, once in the confirmation before the write. Both were
+  the prompt's doing: "always read it back" on the apartment field, and the
+  read-back in the write order. Confirming something confirmed a moment ago does
+  not make it more certain, it makes the call sound like it lost its place. One
+  read-back now, the one that carries the fault as well as the address — unless
+  the apartment was genuinely not heard, which is the one field worth a turn.
+- **The digit-by-digit apartment question was asked first**, with no attempt at
+  the plain one, because the previous answer had been hard to hear. A difficult
+  turn behind you is not a failed attempt at this one; spelling something out
+  unprompted asks a person to do more work than they were going to have to.
+
 ### The agent could not read a status, so it wrote a ticket instead
 
 A resident rang to ask where their elevator ticket stood. The agent took the

@@ -510,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, ten fixed and kept for the record
+### Known defects — six still open, eleven fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -546,6 +546,12 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+11. ~~**The agent improvises the waiting line, and reads the address back
+    twice.**~~ **Fixed 19 Aug.** The waiting line is a request-start message on
+    the three sync tools now, not an instruction — the model ignored the
+    instruction twice. **The prompt tells the agent to stay silent there; do not
+    put the line back in the prompt, or it is heard twice.** New tool messages
+    need an entry in `TOOL_MESSAGES` in `vapi_en.py` or the twin build exits.
 10. ~~**The agent cannot read a request status, and opens a second ticket
     instead.**~~ **Fixed 19 Aug.** `get_request_status` and `get_balance` are now
     declared in `INTAKE_TOOLS` and routed in the n8n Decide node; the handlers

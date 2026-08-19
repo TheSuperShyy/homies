@@ -26,7 +26,7 @@ not supply.
 """
 
 
-def _fn(name, description, properties=None, required=None, wait=False):
+def _fn(name, description, properties=None, required=None, wait=False, waiting=None):
     """wait=True means the agent needs the answer before it can speak.
 
     Only two tools do. `open_request` hands back a real reference that gets read
@@ -56,6 +56,28 @@ def _fn(name, description, properties=None, required=None, wait=False):
     }
     if not wait:
         tool["async"] = True
+
+    # `waiting` is what Vapi SAYS when the call starts, in place of whatever the
+    # model would have improvised.
+    #
+    # Only sync tools get one, because only a sync tool has a gap to fill. The
+    # prompt used to carry this job — "while a tool runs, say רגע, אני רושם" —
+    # and the model ignored it twice on 19 Aug in favour of "this will just take
+    # a sec", a sentence about the machine and how long it needs said to somebody
+    # waiting to hear whether their problem was written down. The instruction was
+    # tightened after the first time and the second happened anyway.
+    #
+    # A line the model is told to say is a suggestion; a request-start message is
+    # spoken by Vapi and the model never gets the turn. That is the difference,
+    # and it is why the prompt now tells the agent to stay QUIET here rather than
+    # what to say — two sources for one line would be heard as a stutter.
+    #
+    # The string is Hebrew because the Hebrew assistant is the source. The
+    # English twin translates it in vapi_en.py, alongside every other spoken
+    # line; a tool message left untranslated is the one place Hebrew could reach
+    # an English caller's ear, since the twins share their tools verbatim.
+    if waiting:
+        tool["messages"] = [{"type": "request-start", "content": waiting}]
     return tool
 
 
@@ -166,10 +188,12 @@ def _open_request(location):
         "open_request",
         "Call when the resident raises a maintenance issue during the call, asks "
         "outright for a request to be opened, or accepts the offer of one. Wait for "
-        "the reference this returns before telling them a request was opened.",
+        "the reference this returns before telling them a request was opened. Say "
+        "nothing while it runs — the waiting line is spoken for you.",
         props,
         ["description"],
         wait=True,
+        waiting="רגע, אני רושם.",
     )
 
 
@@ -416,6 +440,9 @@ INTAKE_TOOLS = [
         # stating one it did not just get back, so there is nothing for it to do
         # while this runs. Same reason open_request waits.
         wait=True,
+        # Checking, not writing — the caller asked a question and nothing is
+        # being recorded, so a line about writing would be a small lie.
+        waiting="רגע, אני בודק.",
     ),
     _fn(
         "get_balance",
@@ -432,6 +459,7 @@ INTAKE_TOOLS = [
         },
         [],
         wait=True,
+        waiting="רגע, אני בודק.",
     ),
 ]
 

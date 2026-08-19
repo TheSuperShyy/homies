@@ -906,14 +906,22 @@ yours: I didn't explain that well, never you didn't understand."""),
     ("**Say the whole line.** Not להתראות on its own, not a shortened version, not",
      "**Say the whole line.** Not \"goodbye\" on its own, not a shortened version, not"),
 
-    ('saying "הלו?".', 'saying "Hello?".'),
+    # The waiting line stopped being the agent's to say on 19 Aug — it is a
+    # request-start message on the tool now, translated in TOOL_MESSAGES above,
+    # and the prompt tells the agent to stay quiet rather than what to say. The
+    # entries for the indented example and for the "hello?" silence rule went
+    # with the section that held them; what is left is the two places the line
+    # is still QUOTED, once as history and once inside the machinery rule.
+    ("say it — and on 19 Aug you twice said *זה ייקח רק שנייה* instead, which is a",
+     "say it — and on 19 Aug you twice said *this will just take a sec* instead,\n"
+     "which is a"),
 
-    # The filler said while a tool runs. Appears twice in the prompt and the two
-    # are not interchangeable — this one is the example, indented.
-    ("    רגע, אני רושם.", "    One moment, I'm writing this down."),
+    ("This used to be your job — the prompt gave you *רגע, אני רושם* and asked you to",
+     "This used to be your job — the prompt gave you *one moment, I'm writing this\n"
+     "down* and asked you to"),
 
-    # ...and this one is inside the machinery rule, quoted inline. Replaced
-    # separately so a future edit to either is caught rather than absorbed.
+    # Inside the machinery rule, quoted inline. Replaced separately so a future
+    # edit to either is caught rather than absorbed.
     ('Not: "I\'m opening a request now." Just: "רגע, אני רושם."',
      'Not: "I\'m opening a request now." Just: "One moment, I\'m writing this down."'),
 
@@ -979,10 +987,6 @@ be resolved. Anything else?* Both sentences were true."""),
     # The improvised waiting line. The Hebrew quotes what the English twin
     # actually said, translated back, so both twins are warned off the same
     # sentence.
-    ("""On 19 Aug it came out as *זה ייקח
-רק שנייה* — a sentence about the machine""",
-     """On 19 Aug it came out as *this will
-just take a sec* — a sentence about the machine"""),
 ]
 
 
@@ -1062,6 +1066,34 @@ def englished(prompt, twin):
     return out
 
 
+# What Vapi says while a sync tool runs, in both languages. Short, and about the
+# caller rather than about the machine: the model's own improvisation on 19 Aug
+# was "this will just take a sec", which is a sentence about how long a computer
+# needs said to somebody waiting to hear whether their problem was written down.
+TOOL_MESSAGES = {
+    "רגע, אני רושם.": "One moment, I'm writing this down.",
+    "רגע, אני בודק.": "One moment, let me check.",
+}
+
+
+def _englished_tool(tool):
+    """A tool with its spoken messages translated and nothing else touched."""
+    msgs = tool.get("messages")
+    if not msgs:
+        return tool
+    out = []
+    for m in msgs:
+        content = m.get("content")
+        if content is not None and HEBREW.search(content):
+            if content not in TOOL_MESSAGES:
+                sys.exit("A tool message has no English: %r\n"
+                         "Add it to TOOL_MESSAGES in this file. A tool message is "
+                         "spoken, and the twins share their tools verbatim." % content)
+            m = dict(m, content=TOOL_MESSAGES[content])
+        out.append(m)
+    return dict(tool, messages=out)
+
+
 def build(source, twin):
     """The English assistant body, everything but language held constant."""
     stack = twin["stack"]
@@ -1077,6 +1109,12 @@ def build(source, twin):
     # carries — tools above all — so only the stack diverges. The tools are the
     # reason this is a copy rather than a second assistant: both twins post to
     # the same webhook, so a flow proved in English is the same flow in Hebrew.
+    # Tool request-start messages are SPOKEN, and the twins share their tools
+    # verbatim — so an untranslated one is the single place a Hebrew sentence
+    # reaches an English caller's ear. Added 19 Aug with the messages themselves.
+    # Anything unlisted stops the build rather than shipping in Hebrew, the same
+    # rule the prompt table follows.
+    model["tools"] = [_englished_tool(t) for t in (model.get("tools") or [])]
     model.update(stack["model"])
     if "temperature" not in stack["model"]:
         model.pop("temperature", None)      # gpt-5.x rejects one

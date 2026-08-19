@@ -143,6 +143,17 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**A line the model must say every time is not the model's line.** Where the
+wording is fixed and non-negotiable, it goes somewhere the model cannot reach:
+`voice.chunkPlan.formatPlan.replacements` for what must never be said, a tool's
+**request-start message** for what must always be said while that tool runs. An
+instruction is a suggestion — the waiting line was instructed, then instructed
+more firmly after it was ignored, and it was ignored again the same afternoon.
+When the line moves out of the prompt, the prompt has to be changed to say
+*nothing* rather than left saying the same thing, or the caller hears it twice.
+Tool messages are spoken and the twins share tools verbatim, so each one needs a
+translation in `TOOL_MESSAGES`. Decided 19 Aug.
+
 **A tool exists in three places, and it is not usable until all three have it.**
 The handler (Supabase Edge Function), the route (the n8n Decide node, which
 answers Vapi *before* the writer runs and returns `unknown tool` for a name it
