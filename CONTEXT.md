@@ -134,6 +134,46 @@ managed building stops paying: it goes to a person, and the fee is **not**
 explained in that moment — there it argues for paying for something that does not
 work. Decided 18 Aug.
 
+**Nobody is handed to the office without being offered a ticket first.** Three
+rungs, in order: say the human thing, offer to open a request, and only then give
+the office number — with what it costs, because *"there are a lot of calls at the
+moment"* is true and a written request really is quicker. Going straight to the
+last rung is the failure: two callers on 19 Aug, one with a parcel taken from
+outside their door and one asking for a CCTV review, heard *"I cannot handle
+that"* and were passed on with nothing written down while they were still on the
+line. **Neither was out of scope.** A request is anything the office should have
+in writing — `type: "other"` has existed since migration 014. What still skips
+the ladder: money moving, receipts, disputed amounts, contract terms, legal
+questions, complaints about a member of staff, and anything dangerous. Decided
+19 Aug, and it is the intake half of the debt agent's ladder from 18 Aug.
+
+**Call context is only authoritative about a call we placed.** `ctx.building` and
+`ctx.unit` are facts on an outbound call — the runner attached them and a
+mishearing must not move them. Inbound they are not facts about the caller at
+all: they are whatever started the call. Ticket `255-1056-26` was filed against
+Herzl 14, flat 12, for a caller who said *"Herzo"* and *"I don't know the
+apartment number"*, because the webhook read `ctx.building || args.building` and
+the demo page started **every** agent with a debt campaign's file. The test is
+`dialled(ctx)` — a placed call always carries the resident or the charges, an
+inbound one carries neither — and **not** "is `building` set", because the whole
+point is that it was set and wrong. The caller's own words win on every inbound
+path. Decided 19 Aug.
+
+**The caller's number is taken from the call, never asked for.**
+`call.customer.number` on a real call; the demo sends an invented mobile in
+`caller_phone`, and the real one is read first so a variable can never override a
+call. It lands on `requests.reported_by_phone` on every ticket both agents write.
+On a `needs_review` row, where the audio failed and there may be no address at
+all, it is often the only way back to the person. Decided 19 Aug.
+
+**A ticket can be added to, and never corrected.** `add_request_detail` appends
+one fact at a time; nothing can move a building, an apartment, or a description
+already written. That is what lets the intake agent keep writing the row the
+moment it has a fault and a place — the line dies at three minutes with no
+warning — and ask what the office will actually need *afterwards*, once nothing
+is at risk. A correction after the number is out is still `transfer_to_human`.
+Decided 19 Aug.
+
 **Money is not read out to an unproven caller, and the proof is not a prompt
 rule.** On WhatsApp a balance costs a full name *and* a phone number, both
 typed by the resident, both landing on the same `residents` row — the number

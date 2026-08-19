@@ -463,7 +463,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, six fixed and kept for the record
+### Known defects — six still open, seven fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -499,6 +499,14 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+7. ~~**An inbound ticket carries an address the caller never gave.**~~ **Fixed
+   19 Aug.** `255-1056-26` was filed against Herzl 14, flat 12, for a caller who
+   said *"Herzo"* and did not know their apartment. The agent captured it
+   correctly; the webhook overwrote it, because `ctx.building || args.building`
+   put call context ahead of the caller on **every** path, and the demo page was
+   attaching a debt campaign's file to inbound calls. Now gated on `dialled(ctx)`
+   — see CONTEXT.md — so context counts only on a call we placed. Verified live
+   against the exact shape of the failing call.
 
 ### Five more, from the client's own calls on 12 Aug — four now fixed
 
@@ -660,12 +668,12 @@ Nothing dials: no phone number exists, all 7,391 residents are
    only / a mismatched pair / a correct pair, and a report from a real address,
    a real street at a wrong number, an invented street, and a flat past the end
    of a building.
-2. **Deploy the demo page** (`web/index.html`, build `2026-08-12b`). The
-   deployed page is still `2026-08-12a`. It sends no `gender_forms` and no
-   spelled-out email, while the debt agent's live prompt expects both — so a
-   real web call runs with **no gender instruction at all**, which is worse than
-   before the fix, because the old `{{gender}}` branch is gone too. This blocks
-   re-testing two of the seven voice complaints.
+2. ~~Deploy the demo page.~~ **Done 18 Aug** — build `2026-08-12b` is live, with
+   `gender_forms` and the spelled-out email, which also closed the English debt
+   twin's unresolved `{{gender_forms}}`. **Redeployed 19 Aug**: the page used to
+   start *every* agent with the picked person's full debt file, so the intake
+   agent was answering the phone holding a debtor's building and apartment. It
+   now sends the intake agent one variable — `caller_phone` — and nothing else.
 3. **Attach `get_request_status` and `get_balance` to the intake agent, or cut
    the prompt sections that call them.** The prompt has taught both since the
    Edge Function shipped; the assistant carries three tools and neither is one of
@@ -673,7 +681,9 @@ Nothing dials: no phone number exists, all 7,391 residents are
    still justifies their absence with "this project has no read path", which
    stopped being true in early August. This is the 5 Aug failure shape — the
    caller asks, the agent has nothing to call, and the answer is invented. Both
-   twins, Hebrew and English.
+   twins, Hebrew and English. **The intake agent now carries four tools** —
+   `add_request_detail` was added 19 Aug — so this is the only gap left in that
+   list.
 4. Fix the remaining data defect (the 2022 debt stamped `2026-08`).
 5. Schedule the sync — `oxs_debt_sync.py` nightly, plus a pre-flight debt
    check immediately before any call, so nobody is chased for something they

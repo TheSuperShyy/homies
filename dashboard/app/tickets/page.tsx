@@ -32,7 +32,7 @@ export default async function Tickets({
   const [from, to] = pageRange(page, size);
   let q = serverClient()
     .from('requests')
-    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at',
+    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at,reported_by_phone',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
   const { data, error, count } = await q
@@ -68,7 +68,7 @@ export default async function Tickets({
         {data?.length ? (
           <table>
             <thead><tr>
-              <th>Reference</th><th>What</th><th>Where</th><th>Type</th>
+              <th>Reference</th><th>What</th><th>Where</th><th>Caller</th><th>Type</th>
               <th>Urgency</th><th>Status</th><th>Via</th><th>Opened</th>
             </tr></thead>
             <tbody>
@@ -77,6 +77,11 @@ export default async function Tickets({
                   <td className="mono">{r.reference}</td>
                   <td dir="auto">{r.description}</td>
                   <td dir="auto">{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
+                  {/* The number the call came from, kept since 19 Aug. It is
+                      the only thing on an inbound ticket that cannot be
+                      mis-heard, and on a needs_review row where the audio
+                      failed it is often the only way back to the person. */}
+                  <td className="mono">{r.reported_by_phone ?? <span className="muted">—</span>}</td>
                   <td className="muted">{r.type}</td>
                   <td>{r.urgency}</td>
                   <td>

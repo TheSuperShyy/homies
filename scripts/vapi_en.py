@@ -748,9 +748,26 @@ INTAKE_LINES = [
     # now (`get_request_status`), and a twin still carrying the refusal would be
     # testing a flow that no longer exists.
 
-    ("    זה משהו שנציג צריך לטפל בו. אני מעביר את זה, ומישהו יחזור אליך.",
-     "    That's something a person needs to handle. I'm passing it on and someone\n"
-     "    will get back to you."),
+    # 19 Aug. The single out-of-scope line that used to sit here is gone from
+    # both sides, and what replaced it is the reason: the agent said it to a
+    # caller whose parcel had been taken and to another asking for a CCTV
+    # review, and in both calls it was the whole response. Three rungs now, and
+    # all three are translated together because a twin holding one of them is a
+    # twin testing a flow that does not exist.
+    ("אני מצטער לשמוע.", "I'm sorry to hear that."),
+
+    ("    אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
+     "    I can open a request for this, so the office has it in writing and comes\n"
+     "    back to you. Would you like me to?"),
+
+    # The phone number is a fact and stays exactly as it is. Only the sentence
+    # around it is translated - same rule as every other contact detail in this
+    # table.
+    ("""    אין בעיה. אפשר לפנות למשרד ב־077-6687949. רק שתדע, יש שם הרבה פניות
+    כרגע, אז קריאה רשומה בדרך כלל מהירה יותר.""",
+     """    That's no problem. You can reach the office on 077-6687949. Just so you
+    know, they're taking a lot of calls at the moment, so a written request is
+    usually quicker."""),
 
     # Added 18 Aug. The status vocabulary arrived with `get_request_status` and
     # was never in this table, so the twin has been unbuildable since. The last

@@ -325,6 +325,27 @@ switch (fn.name) {
     result = { ok: true };
     break;
   }
+  case 'add_request_detail': {
+    // 19 Aug. The intake agent writes the ticket the moment it has a fault and
+    // a place, reads the number out, and only THEN asks what the office will
+    // need — what the item was, where it was left, when they noticed. Each
+    // answer comes back through here.
+    //
+    // Refused here as well as in the writer, and that is not belt-and-braces:
+    // this node answers Vapi BEFORE the writer runs, so a refusal that lived
+    // only downstream would arrive after the agent had been told yes. The same
+    // reason open_payment_ticket duplicates its card check above.
+    if (!args.reference) { result = { ok:false, error:'reference is required' }; break; }
+    if (!args.detail)    { result = { ok:false, error:'detail is required' }; break; }
+    // Non-null purely so `_write` is true and the call reaches the writer. The
+    // sheet era is over — both writer nodes POST to the Edge Function and this
+    // name is never read — but `_write` is still what gates the forward.
+    tab = 'requests';
+    row = { at, call_id: ctx.call_id, phone: ctx.phone,
+            reference: String(args.reference), detail: String(args.detail) };
+    result = { ok: true };
+    break;
+  }
   case 'flag_not_handed_over': {
     // Retired 11 Aug and no longer offered to the agent; answered so a stale
     // assistant does not get 'unknown tool' mid-call. The Supabase writer no

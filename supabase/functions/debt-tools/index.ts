@@ -62,6 +62,12 @@ type CallContext = {
   cardLast4: string | null;
   building: string | null;
   unit: string | null;
+  /**
+   * The number the call came from, and the only thing about an inbound caller
+   * we know before they say a word. Nobody asks for it and the agent never says
+   * it aloud: it is on the call, so it goes on the row.
+   */
+  callerPhone: string | null;
   /** Every open charge this call covers. The whitelist. Never empty on a real call. */
   charges: Charge[];
 };
@@ -138,6 +144,12 @@ function context(message: any): CallContext {
     cardLast4: v.card_last4 ? String(v.card_last4) : null,
     building: v.building ?? null,
     unit: v.unit ?? null,
+    // Vapi puts the far end on `customer.number` for a real phone call and
+    // leaves it absent on a web call, which is correct in both cases: a browser
+    // has no number. The demo sends one in variableValues so the path is
+    // testable, and it is read LAST so a real call can never be overridden by a
+    // variable — the one direction of precedence this file got wrong before.
+    callerPhone: phoneOf(call?.customer?.number) ?? phoneOf(v.caller_phone),
     charges,
   };
 }
@@ -218,8 +230,11 @@ async function interactionId(ctx: CallContext): Promise<string | null> {
       channel: wa ? "whatsapp" : "voice",
       direction: wa ? "inbound" : "outbound",
       // The phone is on the call id as `wa:<number>` and nowhere else for chat,
-      // so without this the row cannot be tied back to a person at all.
-      caller_phone: wa ? ctx.callId.slice(3) : null,
+      // so without this the row cannot be tied back to a person at all. On a
+      // voice call it is `customer.number`, which until 19 Aug was read here and
+      // nowhere else — recorded against the call and then dropped when the
+      // ticket was written, which is exactly the number the office needs.
+      caller_phone: wa ? ctx.callId.slice(3) : ctx.callerPhone,
       resident_id: ctx.residentId,
       started_at: new Date().toISOString(),
     })
@@ -466,6 +481,27 @@ async function matchBuilding(saidRaw: unknown): Promise<Match> {
 async function canonicalAddress(said: unknown): Promise<string> {
   const m = await matchBuilding(said);
   return m.status === "found" ? String(m.building.address) : "";
+}
+
+/**
+ * Did we place this call, or did it come to us?
+ *
+ * It decides whether `ctx.building` and `ctx.unit` may be believed, and getting
+ * it wrong is what put somebody else's address on a ticket on 19 Aug. Outbound,
+ * the campaign runner attached the address and the model is not allowed to
+ * overwrite it. Inbound, an address on the call did not come from the caller —
+ * it came from whatever started the call, which on the demo page was a debt
+ * campaign's file for an unrelated person. The caller who says "Herzo" and does
+ * not know their apartment must not end up with a ticket reading Herzl 14,
+ * flat 12.
+ *
+ * A dialled call always carries either the resident we dialled or the charges we
+ * rang about; the runner cannot place one without them. An inbound call carries
+ * neither, however much else is attached to it. So this is the test, rather than
+ * "is `building` set" — the whole point is that `building` was set and wrong.
+ */
+function dialled(ctx: CallContext): boolean {
+  return Boolean(ctx.residentId || ctx.charges.length);
 }
 
 /**
@@ -1172,7 +1208,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // This read `ctx.building ?? ""` until 8 Aug, which is correct outbound and
     // silently wrong inbound: every intake ticket would have carried an empty
     // building while the agent read a reference number back to the caller.
-    const said = ctx.building || args?.building || "";
+    // 19 Aug: `ctx.building` now only counts on a call we placed — see
+    // `dialled`. The comment above was right about the intent and the code did
+    // not enforce it: nothing checked that the context belonged to this caller.
+    const said = (dialled(ctx) ? ctx.building : "") || args?.building || "";
     const type = args?.type ?? "other";
 
     // The address as WE write it, when what was said resolves to a building we
@@ -1202,7 +1241,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // and it is checked against the apartments actually on the call — a flat
     // that is not one of theirs is dropped to null, which files the ticket for a
     // person to read rather than dispatching a technician to a guess.
-    let unit = unitOf(ctx.unit);
+    // 19 Aug, same gate as the building above: an apartment attached to a call
+    // we did not place is not this caller's apartment.
+    let unit = dialled(ctx) ? unitOf(ctx.unit) : null;
     if (!unit) {
       const said = unitOf(args?.unit);
       const known = new Set(ctx.charges.map((c) => c.unit).filter(Boolean));
@@ -1304,6 +1345,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         building,
         unit,
         reported_unit: reportedUnit,
+        reported_by_phone: ctx.callerPhone,
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
       })
@@ -1311,6 +1353,60 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .single();
 
     return error ? { ok: false, error: error.message } : { ok: true, reference: data.reference };
+  },
+
+  /**
+   * Add to a ticket that already exists.
+   *
+   * WHY THIS EXISTS AT ALL, GIVEN open_request TAKES A DESCRIPTION
+   *
+   * The line closes after three minutes with no warning, so the intake prompt
+   * has always said: write the row the moment you have a fault and a place, and
+   * tidy up afterwards. A perfect conversation with no row is a failed call.
+   *
+   * That was fine while every ticket was a fault. It is not fine for the ones
+   * asked for on 19 Aug — a lost parcel, a CCTV review, a neighbour — where the
+   * office cannot act on the first sentence alone and needs what it was, where
+   * it was left, and when it was noticed. Asking that BEFORE writing puts the
+   * whole ticket behind a question, which is the one ordering that loses calls.
+   * So the agent writes, then asks, then adds. Nothing is ever at risk.
+   *
+   * APPENDS, NEVER REPLACES. The caller's first sentence is the one thing on
+   * the row that came out of their mouth unprompted, and an answer to a follow-up
+   * does not supersede it. A tool that could overwrite a description would, on a
+   * mishearing, quietly delete the only account of the fault anybody has.
+   */
+  async add_request_detail(args, ctx) {
+    const serial = serialOf(args?.reference);
+    const detail = String(args?.detail ?? "").trim();
+    if (!serial) return { ok: false, error: "no reference" };
+    if (!detail) return { ok: false, error: "nothing to add" };
+
+    // Same serial-only match as get_request_status, and for the same reason: a
+    // caller says "one thousand and fifty six", not "255-1056-26".
+    const { data: rows } = await db
+      .from("requests")
+      .select("id,reference,description")
+      .or(`reference.like.%-${serial}-%,reference.like.%-${serial}`)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    const row = rows?.[0];
+    if (!row) return { ok: false, error: "not found" };
+
+    // Already there — a repeated tool call on a retried webhook, or an agent
+    // that asked the same question twice. Appending it again gives the office a
+    // ticket that stutters.
+    const existing = String(row.description ?? "");
+    if (existing.includes(detail)) return { ok: true, reference: row.reference };
+
+    const { error } = await db
+      .from("requests")
+      .update({ description: existing ? existing + " | " + detail : detail })
+      .eq("id", row.id);
+
+    return error ? { ok: false, error: error.message }
+                 : { ok: true, reference: row.reference };
   },
 
   /**
@@ -1339,8 +1435,16 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         resident_id: ctx.residentId,
         interaction_id: await interactionId(ctx),
         description,
-        building: ctx.building || args?.building || null,
-        unit: unitOf(ctx.unit || args?.unit),
+        // WHAT THE CALLER SAID WINS. This read the other way round until 19 Aug
+        // — context first, the agent's capture second — and on a web call that
+        // meant the demo page's variables. A caller who said "Herzo" and did not
+        // know their apartment got a ticket reading Herzl 14, flat 12: an
+        // address they never gave, on a row that looks exactly like one they
+        // confirmed. Context is right on an OUTBOUND call, where we dialled a
+        // known person; it is never right about someone ringing in.
+        building: args?.building || (dialled(ctx) ? ctx.building : null) || null,
+        unit: unitOf(args?.unit || (dialled(ctx) ? ctx.unit : null)),
+        reported_by_phone: ctx.callerPhone,
         urgency: "normal",
         status: "needs_review",
         opened_via: channel(ctx),

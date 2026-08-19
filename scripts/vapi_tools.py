@@ -350,6 +350,30 @@ INTAKE_TOOLS = [
         # on silence. The row lands either way.
     ),
     _fn(
+        "add_request_detail",
+        "Call after open_request, to add something the caller told you afterwards. One "
+        "fact per call, in their words. Use it for the answers to your follow-up "
+        "questions — what the item was, where they left it, when they noticed. It adds "
+        "to the ticket and never replaces anything already on it.",
+        {
+            "reference": {
+                "type": "string",
+                "description": "The reference open_request returned.",
+            },
+            "detail": {
+                "type": "string",
+                "description": "The one thing to add, in the caller's own words.",
+            },
+        },
+        ["reference", "detail"],
+        # Async, deliberately. The ticket already exists and already has its
+        # number read out; the agent is enriching a row, not waiting on one, and
+        # a caller who has just answered a question should hear the next one
+        # rather than a pause. A failed append costs a line of detail. A pause
+        # here costs the same three minutes every other async tool exists to
+        # protect.
+    ),
+    _fn(
         "transfer_to_human",
         "Call after telling the caller a representative will get back to them, never "
         "before and never on its own. This hands the call to the office in writing; it "

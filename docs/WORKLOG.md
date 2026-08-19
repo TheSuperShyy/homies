@@ -9,6 +9,136 @@ conversation that produced it.
 
 ---
 
+## 2026-08-19
+
+### The inbound agent stops handing people to the office empty-handed
+
+Two English intake calls, and both failed the same way. Somebody asked for a CCTV
+review; somebody else had a parcel taken from outside their door. Both heard:
+
+> Unfortunately, I cannot handle lost baggage or CCTV reviews. That's something a
+> person needs to handle. I'm passing it to someone who will get back to you.
+
+Reported as *"I want the de-escalation applied to the inbound as well"*, and the
+diagnosis is one line: **the intake prompt's out-of-scope path had exactly one
+rung.** The debt agent got its three-rung ladder on 18 Aug — answer, offer a
+request, only then the office — and this prompt never had it. It said the thing
+it could not do, and then said it was passing them on. Nothing was offered.
+Nothing was written down while the caller was still there.
+
+**Neither request was out of scope.** `type: "other"` has existed since migration
+014 and is what a standing order files under. A missing parcel, a CCTV review, a
+neighbour, a door left open — all of them are things the office should have in
+writing, and the agent declined to do something it could do. The prompt now says
+so first, before the ladder, because the ladder does not help an agent that has
+already decided the request is not a request.
+
+The three rungs, and rung three is the one that had to be honest:
+
+1. *אני מצטער לשמוע.* One sentence. **Never "I cannot handle that"** — a sentence
+   about your own limits is of no use to somebody who has lost something.
+2. *אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?*
+3. The office number, with what it costs: *יש שם הרבה פניות כרגע, אז קריאה
+   רשומה בדרך כלל מהירה יותר.* — asked for in those words.
+
+**What still skips the ladder**: money moving, a receipt, a disputed amount, a
+contract term, a legal question, a complaint about a member of staff, anything
+dangerous. A request is the wrong container for those.
+
+### The number the call came from now reaches the ticket, and it is never asked for
+
+Nobody asks a caller for their phone number and nobody should — it arrives with
+the call. It was being read once, written to `interactions.caller_phone`, and
+then dropped when the ticket was written. `requests.reported_by_phone` has
+existed since 014 and was filled in only by tickets imported from OXS.
+
+So `context()` gained `callerPhone` — `call.customer.number` on a real call,
+`caller_phone` in variableValues for the demo, and **the real one is read first**
+so a variable can never override a call. Both writers put it on the row. The
+Tickets page shows it: on a `needs_review` row where the audio failed, it is
+often the only way back to the person.
+
+### The bug underneath both of those, which was ours and not the model's
+
+Ticket `255-1056-26`, from a call where the caller said *"Herzo"* and *"I don't
+know the apartment number"*, was filed against **Herzl 14, flat 12**. The agent
+did nothing wrong: it sent `building: "Herzo"` and no unit, which is exactly
+right. The webhook overwrote it.
+
+`ctx.building || args.building` — **context first, what the caller said second.**
+That precedence is correct outbound, where the campaign runner attached the
+address and a mishearing must not be able to move it. It is nonsense inbound,
+where anything attached to the call did not come from the caller. On the demo
+page it came from a debt campaign's file for an unrelated person, because
+`web/index.html` started **every** agent with `variablesFor(PEOPLE[chosen])` —
+name, building, apartment, charges — including the agent whose whole job is
+answering a call from someone it knows nothing about.
+
+Fixed on both sides, and the server-side fix is the one that holds:
+
+- **`dialled(ctx)`** — did we place this call? A dialled call always carries the
+  resident or the charges; the runner cannot place one without them. An inbound
+  call carries neither, however much else is attached to it. So the test is not
+  "is `building` set" — the whole point is that `building` was set and wrong.
+  `open_request` and `save_partial_request` now consult context only when it is
+  true.
+- **The demo sends one variable to the intake agent**: `caller_phone`, the demo
+  person's own invented mobile. The intake prompt uses no `{{variables}}` at all,
+  so there was never anything else it could legitimately want.
+
+Verified against the live function with the exact shape of the failing call:
+inbound with demo variables present now files `Herzo` and **no apartment**, with
+the phone on the row; outbound with charges still keeps `Herzl 14 / 12`.
+
+### A ticket can be added to after it is written
+
+Asked for as: the agent should ask what the office will actually need — what the
+item was, where it was left, when it was noticed — *"a summary, basically. It
+depends on a case."*
+
+That collides with a rule this prompt has carried since it was written: **write
+the row the moment you have a fault and a place, and tidy up afterwards**,
+because the line dies at three minutes with no warning and *a perfect
+conversation with no row is a failed call*. Asking first puts the whole ticket
+behind a question.
+
+So the order is: write, read the number out, **then** ask, and add each answer as
+it arrives. That needed a tool that did not exist.
+
+**`add_request_detail`** — reference and one fact, in the caller's words.
+**Appends, never replaces.** The caller's first sentence is the only thing on the
+row that came out of their mouth unprompted; a tool that could overwrite a
+description would, on one mishearing, delete the only account of the fault
+anybody has. Repeats are ignored rather than stuttered onto the row, since a
+retried webhook and an agent asking twice look identical from here.
+
+**"Once the number is out, the request cannot be changed" is now "cannot be
+corrected — only added to."** The distinction is load-bearing: nothing can move a
+building, an apartment or a description already written, so a correction after
+the number is out is still `transfer_to_human`.
+
+### Three hosts had to learn the tool, and the middle one nearly got missed
+
+Every tool call is **two hops** — Vapi → n8n `homies-debt-tools` → the Edge
+Function — and the router switches on tool name. A tool the router does not know
+answers `unknown tool add_request_detail` mid-call, and the agent hears a refusal
+for something it was told to do.
+
+The router is built from `scripts/n8n_deploy.py`, and the live Decide node was
+byte-identical to the repo's, so it was edited there and redeployed rather than
+hand-patched — the same drift lesson as `vapi_export.py` on 18 Aug. The case
+refuses a missing reference or detail **in n8n as well as in the writer**, for the
+reason `open_payment_ticket` already duplicates its card check: this node answers
+Vapi *before* the writer runs, so a refusal that lived only downstream would
+arrive after the agent had been told yes.
+
+Round-tripped through n8n against a real ticket, then the test line removed.
+
+Intake prompt 23,583 → 27,455 chars, English twin 25,682, 4 tools with servers on
+both. Router redeployed and still active. Edge Function v25.
+
+---
+
 ## 2026-08-18
 
 ### It stopped deciding the call was over — and the line it closed on was the worst one yet
