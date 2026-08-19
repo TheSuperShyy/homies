@@ -191,10 +191,24 @@ files plus the public key were repointed, and `.env` swapped.
 | Intake (en) | `8b98016b-310a-4286-bed8-c8077b603773` | `9ed5e788-…` |
 
 Account 5 is still complete and still current — the two are mirrors of each
-other, so going back is the same command in reverse — but it stays overdrawn
-until somebody tops it up. **Call history, transcripts and recordings did not
+other, so going back is the same command in reverse — and **as of 19 Aug
+afternoon it is back in credit**, so the fallback is real again. It was $0.11
+overdrawn that morning; nobody here topped it up, so either the client did or a
+monthly allowance reset. Check with `--balance` before relying on it rather than
+trusting this line. **Call history, transcripts and recordings did not
 move and cannot**; everything before 19 Aug 12:00 lives on account 5, and Vapi
 deletes recordings after 14 days.
+
+**Cartesia has no balance endpoint, and it is in the live Hebrew path.**
+`/usage`, `/balance`, `/account`, `/credits` are all 404 and a successful call
+returns no quota headers — checked 19 Aug. Both keys in `.env`
+(`CARTESIA_API_KEY`, `CARTESIA_MAIN_API_KEY`) are valid and belong to the **same
+org**, so they are two keys on one balance rather than two accounts. **Vapi holds
+this key as a provider credential** ("Cartesia (Hebrew TTS)", added 11 Aug), which
+means Hebrew speech bills to *our* Cartesia org and not through Vapi — a Vapi
+balance in credit says nothing about whether the Hebrew agent can speak. The only
+way to read what is left is the Cartesia dashboard. The English twins use Vapi's
+own Elliot voice and are unaffected.
 
 **Check the balance before a test session, not after.**
 `python scripts/vapi_transfer.py --balance` — exit 0 in credit, exit 1 blocked.
