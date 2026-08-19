@@ -510,7 +510,7 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
-### Known defects — six still open, eleven fixed and kept for the record
+### Known defects — six still open, twelve fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -546,6 +546,12 @@ handset.**
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+12. ~~**The status lookup only matches an exact building name, and demands an
+    apartment for a shared fault.**~~ **Fixed 19 Aug.** `ilike` not `.eq`;
+    apartment optional; optional `type` filter; `ambiguous_building` when the
+    loose match spans more than one. **This surfaced a live data defect** —
+    `Herzl fourteen` and `Herzl 14` are one building stored twice, because the
+    agent writes what the caller said and `verify_address` is still not attached.
 11. ~~**The agent improvises the waiting line, and reads the address back
     twice.**~~ **Fixed 19 Aug.** The waiting line is a request-start message on
     the three sync tools now, not an instruction — the model ignored the

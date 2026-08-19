@@ -143,6 +143,18 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**A lookup takes what a caller says, not what the database stores.** Exact
+matching on anything a person speaks aloud is a lookup that fails silently and
+looks like "no records" — a building matched with `.eq` wanted its punctuation
+and its city. Match loosely, then **guard the looseness**: a filter for what they
+named, and an explicit ambiguous answer when the loose match spans more than one
+record, so the agent asks rather than picks. Guessing which building somebody
+meant sends the answer to the wrong address.
+
+**And do not ask for an apartment for something that is not in one.** A lift, a
+lobby light, a gate, the bin store belong to the building. Requiring the flat
+number made the commonest inbound question unanswerable. Decided 19 Aug.
+
 **A line the model must say every time is not the model's line.** Where the
 wording is fixed and non-negotiable, it goes somewhere the model cannot reach:
 `voice.chunkPlan.formatPlan.replacements` for what must never be said, a tool's

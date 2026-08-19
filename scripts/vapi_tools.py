@@ -433,7 +433,17 @@ INTAKE_TOOLS = [
                 "type": "string",
                 "description": "As the caller said it. Any form. Leave out if they have none.",
             },
+            # The apartment is OPTIONAL here and that is the point: a lift, a
+            # lobby light or a gate is not in a flat. Building alone is a
+            # complete question when the fault is a shared one.
             **LOCATION,
+            "type": {
+                "type": "string",
+                "enum": ["plumbing", "electrical", "lighting", "elevator",
+                         "cleaning", "gardening", "pest_control", "locksmith",
+                         "fire_safety", "maintenance", "other"],
+                "description": "What the caller named, if they named it — 'the elevator' is elevator.",
+            },
         },
         [],
         # Sync. The agent is about to say a status out loud and is forbidden from

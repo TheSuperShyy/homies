@@ -991,19 +991,49 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       rows = data;
     }
 
+    // The building, and the apartment only if there is one.
+    //
+    // BOTH HALVES OF THIS CHANGED ON 19 AUG, AND BOTH WERE WRONG THE SAME WAY:
+    // they assumed the caller would hand over a database value.
+    //
+    // 1. The match was `.eq`, so it wanted the building's name character for
+    //    character — "סוקולוב 86, תל אביב - יפו", punctuation and city included.
+    //    A caller says "Sokolov", or "Herzl", or "building one". Measured: an
+    //    exact name matched, and the same name in lower case, the same name
+    //    without its number, and anything a person would actually say all
+    //    returned nothing. `ilike %…%` is what a caller can reach.
+    //
+    // 2. The apartment was REQUIRED, and for a shared fault that is the wrong
+    //    question. A lift, a lobby light, a gate, a bin store — none of them are
+    //    in a flat, and asking somebody which apartment their elevator is in is
+    //    a question with no answer. The building alone is now a complete query.
     if (!rows?.length) {
       const building = ctx.building || args?.building || "";
       const unit = unitOf(ctx.unit || args?.unit);
-      if (building && unit) {
-        const { data, error } = await db
-          .from("requests")
-          .select(fields)
-          .eq("building", building)
-          .eq("unit", unit)
+      if (building) {
+        let q = db.from("requests").select(fields).ilike("building", `%${building}%`);
+        if (unit) q = q.eq("unit", unit);
+        // The caller almost always names the thing — "the elevator", "the
+        // lighting". Without it, a building with no apartment given returns
+        // every recent request in the building and the agent reads out
+        // somebody else's leak.
+        const type = String(args?.type ?? "").trim();
+        if (type) q = q.eq("type", type);
+        const { data, error } = await q
           .order("created_at", { ascending: false })
-          .limit(3);
+          .limit(unit ? 3 : 8);
         if (error) return { ok: false, error: error.message };
         rows = data;
+
+        // A loose match can span two buildings — "Herzl" is Herzl 14 and
+        // Herzl 22. Reading one building's requests to somebody standing in
+        // the other is worse than asking which they meant, so this says so
+        // rather than guessing. Named for the agent; the resident just gets
+        // asked a question.
+        const names = [...new Set((rows ?? []).map((r) => String(r.building)))];
+        if (names.length > 1) {
+          return { ok: true, found: 0, ambiguous_building: true, buildings: names };
+        }
       }
     }
 

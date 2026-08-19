@@ -11,6 +11,48 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### A lift is not in an apartment, and nobody says a building's name exactly
+
+The status lookup worked, and then it was asked the obvious question — *"any
+status for the elevator at building one?"* — and returned nothing. Measured
+rather than guessed, six ways:
+
+    reference number          found
+    "Herzl 14" + apt 12       found
+    "Herzl 14", no apartment  NOTHING
+    "herzl 14" + apt 12       NOTHING
+    "Herzl" + apt 12          NOTHING
+    "building 1" + apt 12     NOTHING
+
+Two assumptions, both the same shape: that the caller would hand over a database
+value.
+
+**The match was `.eq`**, so it wanted the building's name character for
+character — punctuation, city and all, `סוקולוב 86, תל אביב - יפו`. A caller says
+"Sokolov". Lower case failed. Dropping the number failed. `ilike %…%` now.
+
+**The apartment was required**, and for a shared fault that is a question with no
+answer. A lift, a lobby light, a gate, the bin store — none of them are in a
+flat. The building alone is a complete query now, and the prompt says so: ask for
+the apartment when the thing is behind their own front door, not otherwise.
+
+Two guards came with it, because a loose match on a building is not free. The
+tool takes an optional **type** — "the elevator" is `elevator` — so a
+building-wide question does not read a stranger's leak to somebody asking about
+the lift. And a name matching **more than one building** returns
+`ambiguous_building` with the names rather than picking; the agent reads them
+back and asks which.
+
+After: building alone returns six, lower case works, `Herzl` + `elevator` returns
+the one, and `building 1` still returns nothing — correctly, because no building
+is called that.
+
+**The ambiguity check found a real data problem on its first run.** `Herzl` matched
+two buildings named `Herzl fourteen` and `Herzl 14` — the same building, stored
+twice, because the agent writes down whatever the caller said and nothing
+reconciles it against the portfolio. That is `verify_address`, still not attached,
+and it now has a visible cost rather than a theoretical one.
+
 ### The waiting line stops being the model's to say
 
 *"This will just take a sec"* came back on the status call, hours after being
