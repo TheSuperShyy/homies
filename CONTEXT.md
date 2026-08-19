@@ -143,6 +143,21 @@ on the slower option is said because it is true, once, and the turn ends on a
 question rather than a recommendation. Once they have chosen, that is the answer:
 no second attempt at persuading them. Decided 19 Aug, having been asked for twice.
 
+**A tool exists in three places, and it is not usable until all three have it.**
+The handler (Supabase Edge Function), the route (the n8n Decide node, which
+answers Vapi *before* the writer runs and returns `unknown tool` for a name it
+does not know), and the declaration (`INTAKE_TOOLS` / `DEBT_TOOLS`, which is what
+the assistant actually carries). A prompt section describing the tool is a
+fourth thing and is not one of the three.
+
+**And a prompt that describes a tool the assistant does not carry is worse than
+a missing section.** The model will not say "I cannot" — it reaches for the
+nearest tool it does have. On 19 Aug a resident asked for the status of their
+elevator ticket, the agent had no lookup, and it opened them a second ticket for
+the same elevator and read out its number. The handler had been complete for a
+day and the prompt had described it for a day; the declaration and the route
+were never added. Move all three together, or none. Decided 19 Aug.
+
 **Hebrew is the source, English is derived, and the derivation is not word for
 word.** The prompt is written with every spoken line in Hebrew and pushed to the
 Hebrew assistant; `vapi_en.py` reads *that live assistant* and swaps each Hebrew

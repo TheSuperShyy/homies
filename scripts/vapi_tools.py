@@ -315,15 +315,29 @@ INTAKE_TRANSFER_REASONS = [
     "out_of_scope", "emergency", "caller_request", "repeated_failure", "language",
 ]
 
-# Three tools, all writes.
+# Six tools: four writes and two reads.
 #
-# WHAT IS DELIBERATELY ABSENT: `identify_resident` and `get_request_status`.
-# Both are reads, and this project has no read path — the n8n handler is a stub
-# that returns "lookup not implemented", and the Apps Script one matches on a
-# phone number, which a web call does not have. An agent carrying a lookup tool
-# that cannot look anything up is worse than one carrying none: it offers, the
-# caller accepts, and the answer is invented. So the tools are absent and the
-# prompt no longer offers either. Both come back with the database, not before.
+# THE READS ARRIVED LATE, AND THE GAP WAS VISIBLE FROM THE OUTSIDE.
+# This list said "three tools, all writes" and explained that `get_request_status`
+# was absent because there was no read path — true when it was written. The
+# handler landed in the Edge Function on 18 Aug and the prompt gained a whole
+# "Status of an existing request" section the same day. This list was not
+# touched, and n8n had no route for the name either, so the agent had a section
+# telling it how to answer a question and no way to ask one.
+#
+# What that looks like on a call, 19 Aug: a resident rang to ask where their
+# elevator ticket stood. The agent had nothing to look it up with, so it did the
+# only thing it could — took the building, took the apartment, and opened them a
+# second ticket for the same fault. The caller had to say "I don't want to create
+# a ticket" to a system that had already created one.
+#
+# A prompt that describes a tool the assistant does not carry is worse than a
+# missing section: the model will not say "I cannot", it will find the nearest
+# tool it does have. So the rule is that these three move together or not at all
+# — the handler, the route in n8n, and this list.
+#
+# `identify_resident` is still absent, and still for the original reason: the
+# n8n handler is a stub that returns "lookup not implemented".
 INTAKE_TOOLS = [
     _open_request(location="full"),
     _fn(
@@ -381,6 +395,43 @@ INTAKE_TOOLS = [
         "Close the call after calling it.",
         {"reason": {"type": "string", "enum": INTAKE_TRANSFER_REASONS}},
         ["reason"],
+    ),
+    _fn(
+        "get_request_status",
+        "Call when the caller asks what is happening with a request they already made. "
+        "Never open a new one to answer this. Pass the reference exactly as they said "
+        "it — whole, or just the digits — and the lookup is forgiving. With no "
+        "reference, the building and apartment find their recent requests. What comes "
+        "back is everything you know: it does not say when a technician will come or "
+        "who is handling it.",
+        {
+            "reference": {
+                "type": "string",
+                "description": "As the caller said it. Any form. Leave out if they have none.",
+            },
+            **LOCATION,
+        },
+        [],
+        # Sync. The agent is about to say a status out loud and is forbidden from
+        # stating one it did not just get back, so there is nothing for it to do
+        # while this runs. Same reason open_request waits.
+        wait=True,
+    ),
+    _fn(
+        "get_balance",
+        "Call when the caller asks how much is owed on an apartment, or whether the "
+        "building fee is paid. Building and apartment identify them; a full name works "
+        "if they offer one. Read the amount as words. You can read a balance and you "
+        "cannot touch one — paying, receipts and disputes are a person's job.",
+        {
+            "name": {
+                "type": "string",
+                "description": "Full name, only if the caller offered one.",
+            },
+            **LOCATION,
+        },
+        [],
+        wait=True,
     ),
 ]
 

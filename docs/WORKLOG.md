@@ -11,6 +11,47 @@ conversation that produced it.
 
 ## 2026-08-19
 
+### The agent could not read a status, so it wrote a ticket instead
+
+A resident rang to ask where their elevator ticket stood. The agent took the
+building, took the apartment, read back the fault, opened them a **second ticket
+for the same elevator** and gave them its number. The caller had to say *"I don't
+want to create a ticket, I'm asking for a status update"* to a system that had
+already created one.
+
+The agent was not carrying `get_request_status`. It had a whole prompt section
+telling it how to answer that question and no tool to ask it with, so it reached
+for the nearest tool it did have.
+
+**Three hosts, and only one of them had the tool.** The handler has been complete
+in the Edge Function since 18 Aug — `get_request_status` and `get_balance` both,
+around a hundred lines each. The prompt gained its "Status of an existing
+request" section the same day, with the status vocabulary translated for the
+English twin. Neither `INTAKE_TOOLS` nor the n8n Decide node was touched. So the
+tool existed where it does the work, was described where it is spoken about, and
+was absent from the two places that decide whether it can be called at all.
+
+`vapi_tools.py` even carried a comment explaining the absence — *"this project
+has no read path"* — which was true when written and had been false for a day.
+
+Both declared (sync, because the agent has nothing to say until the answer
+arrives), both routed, both verified through the live webhook: `1065` comes back
+open, the elevator, opened today; building and apartment come back with three
+requests newest first; a real apartment's balance comes back with the resident,
+the total and the months. n8n's Decide node was byte-identical to the repo before
+the push, so nothing hand-edited was overwritten, and the workflow stayed active
+through it.
+
+**The rule this leaves behind:** a prompt that describes a tool the assistant
+does not carry is worse than a missing section, because the model will not say
+"I cannot" — it will find the nearest tool it does have and use that. Handler,
+route and declaration move together or not at all.
+
+Still wrong in that same call and not yet fixed: the waiting line came out as
+*"this will just take a sec"* again despite being pinned this morning, the
+read-back was said twice, and the digit-by-digit apartment question — which is
+meant to be the *second* attempt — was used as the first.
+
 ### The ladder becomes one sentence, because it was never a ladder
 
 The three-rung structure from earlier today was mine, not the ask. It was written

@@ -384,6 +384,26 @@ switch (fn.name) {
     result = { ok: true };
     break;
   }
+  case 'get_request_status':
+  case 'get_balance': {
+    // Reads, and the only two tools here whose answer this node must not
+    // invent. No `tab`, so nothing is written; `needsRealAnswer` below sends
+    // the call to the Edge Function and returns whatever it says.
+    //
+    // 19 Aug. Both handlers have existed in the writer since 18 Aug and neither
+    // had a name here, so the switch fell through to `unknown tool` — except it
+    // never got that far, because the assistant was not carrying the tools
+    // either. A resident asking for the status of their elevator ticket was
+    // given a second ticket for the same fault instead.
+    //
+    // Deliberately no validation. get_request_status takes a reference OR a
+    // building and apartment, get_balance takes a name OR a building and
+    // apartment, and both answer `found: 0` rather than erroring when they have
+    // nothing to go on. A refusal invented here would refuse cases the writer
+    // handles.
+    result = { ok: true };
+    break;
+  }
   case 'identify_resident': {
     // Kept so one webhook serves every tool. The lookup itself is not here yet.
     result = { ok: true, note: 'lookup not implemented on n8n yet' };
@@ -391,12 +411,20 @@ switch (fn.name) {
   }
 }
 
-// open_request is the one tool whose answer cannot be invented here: the agent
-// reads the reference aloud, and if n8n minted one while the sheet minted
-// another they would disagree forever. So that call alone waits for the writer
-// and returns whatever it says. It fires rarely — a maintenance issue raised
-// during a debt call — so paying for it there is cheap.
-const needsRealAnswer = fn.name === 'open_request' && Boolean(args.description);
+// Which calls wait for the real answer instead of being answered from here.
+//
+// open_request, because the agent reads the reference aloud and if n8n minted
+// one while the writer minted another they would disagree forever.
+//
+// And since 19 Aug the two reads, for a stronger version of the same reason:
+// there is no answer to invent. A status or an amount this node made up would be
+// read to a resident as fact. They are also the only tools where the round trip
+// costs nothing in perceived speed — the agent has nothing to say until the
+// answer arrives, so the wait is the work rather than a delay in front of it.
+const READS = ['get_request_status', 'get_balance'];
+const needsRealAnswer =
+  (fn.name === 'open_request' && Boolean(args.description)) ||
+  READS.indexOf(fn.name) >= 0;
 
 // What actually goes to the writer. Almost verbatim — with the location resolved
 // into variableValues first.
