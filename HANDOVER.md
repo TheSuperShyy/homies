@@ -767,9 +767,9 @@ Nothing dials: no phone number exists, all 7,391 residents are
    still justifies their absence with "this project has no read path", which
    stopped being true in early August. This is the 5 Aug failure shape — the
    caller asks, the agent has nothing to call, and the answer is invented. Both
-   twins, Hebrew and English. **The intake agent now carries four tools** —
-   `add_request_detail` was added 19 Aug — so this is the only gap left in that
-   list.
+   twins, Hebrew and English. **The intake agent now carries six tools** —
+   `add_request_detail`, then `get_request_status` and `get_balance`, all
+   19 Aug — so `verify_address` is the only gap left in that list.
 4. Fix the remaining data defect (the 2022 debt stamped `2026-08`).
 5. Schedule the sync — `oxs_debt_sync.py` nightly, plus a pre-flight debt
    check immediately before any call, so nobody is chased for something they
@@ -782,6 +782,6 @@ Nothing dials: no phone number exists, all 7,391 residents are
 
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.
 - ElevenLabs key in Vapi, if that voice is wanted.
-- `scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to
-  `INTAKE_TOOLS` before anyone runs a full inbound sync, or the sync will
-  strip them from the live assistant.
+- ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to
+  `INTAKE_TOOLS`.~~ **Done 19 Aug**, along with the missing n8n routes. Both
+  verified through the live webhook.
