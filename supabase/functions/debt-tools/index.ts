@@ -1732,9 +1732,25 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * so the reason survives even when no rep is free and the transfer fails.
    */
   async transfer_to_human(args, ctx) {
+    // BOTH agents' vocabularies, because both write to this one column.
+    // Kept in step with TRANSFER_REASONS and INTAKE_TRANSFER_REASONS in
+    // scripts/vapi_tools.py, and with the CHECK widened in migration 021.
+    //
+    // Until 20 Aug this list held the debt agent's six and nothing else. The
+    // intake agent has been sending `emergency`, `out_of_scope` and
+    // `repeated_failure` since the day it shipped; every one of them failed the
+    // `includes` test below and was written as `caller_request`. The fallback
+    // was there to stop an unstorable value hitting the CHECK constraint and
+    // throwing — so it turned a loud failure into a quiet lie, which is the
+    // worse of the two. A caller reporting black smoke from a window is on
+    // record as somebody who asked to speak to a person.
+    //
+    // The fallback stays, for a genuinely unknown word. It is no longer load
+    // bearing for values this system sends itself.
     const reasons = [
       "hardship", "dispute", "distress", "language", "not_understood",
       "caller_request", "ownership",
+      "out_of_scope", "emergency", "repeated_failure",
     ];
     const reason = reasons.includes(args?.reason) ? args.reason : "caller_request";
 
@@ -1755,10 +1771,63 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       paused = t.charges.length;
     }
 
+    const iid = await interactionId(ctx);
+
+    // --- The emergency backstop ---------------------------------------------
+    //
+    // A TRANSFER IS A NOTE. IT IS NOT A TICKET.
+    // Nothing searches call_outcomes, no dashboard lists it, and no technician
+    // is dispatched off it. An emergency that produced a transfer and no
+    // request has therefore left no record anybody will ever find.
+    //
+    // On 20 Aug a caller reported what they believed was a fire. The agent
+    // behaved sensibly by its own lights — recognised the emergency, said it
+    // was bringing in a person, transferred — and never called `open_request`.
+    // The `requests` table ended that day empty. The prompt's Emergency section
+    // has been rewritten to say write first, then transfer; this is the half
+    // that does not depend on the model doing as it is told, which is a lesson
+    // this file has now paid for three times.
+    //
+    // ONLY for `emergency`, deliberately. `out_of_scope` and `caller_request`
+    // are cases where minting a ticket is often exactly the wrong move — the
+    // office wanted a note, not a work item. Emergency is the one reason where
+    // a missing record costs more than a spurious one.
+    //
+    // Written as `needs_review`, not `open`: nothing here came from a completed
+    // intake, so a person reads it before it is treated as a well-formed
+    // request. `urgency` is `emergency` so it sorts to the top of whatever they
+    // are looking at.
+    let emergency_reference: string | null = null;
+    if (reason === "emergency" && iid) {
+      const prior = await db.from("requests").select("id")
+        .eq("interaction_id", iid).limit(1);
+      if (!prior.data?.length) {
+        // Same asymmetry as open_request: a building attached to a call counts
+        // only on a call we placed. Inbound, the argument is the only source.
+        const said = (dialled(ctx) ? ctx.building : "") || args?.building || "";
+        const building = (await canonicalAddress(said)) || String(said).trim() || null;
+        const { data: em } = await db.from("requests").insert({
+          resident_id: ctx.residentId,
+          interaction_id: iid,
+          type: null,
+          description: String(args?.description ?? "").trim() ||
+            "Emergency transfer with no request opened. The agent did not " +
+            "record what was reported; the call recording is the only account.",
+          building,
+          unit: null,
+          reported_by_phone: ctx.callerPhone,
+          urgency: "emergency",
+          status: "needs_review",
+          opened_via: channel(ctx),
+        }).select("reference").single();
+        emergency_reference = em?.reference ?? null;
+      }
+    }
+
     await db.from("call_outcomes").insert({
       charge_id: ctx.charges.length === 1 ? ctx.charges[0].charge_id : null,
       resident_id: ctx.residentId,
-      interaction_id: await interactionId(ctx),
+      interaction_id: iid,
       outcome: "transferred",
       transfer_reason: reason,
       posture_reached: args?.posture_reached ?? null,
@@ -1770,7 +1839,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .update({ disposition: `transfer:${reason}` })
       .eq("external_call_id", ctx.callId);
 
-    return { ok: true, reason, charges_paused: paused };
+    // `emergency_reference` is returned so the agent can read it back if it has
+    // not already given one. It is never an error that it exists — the caller
+    // is told about their report either way.
+    return { ok: true, reason, charges_paused: paused, emergency_reference };
   },
 
   /**

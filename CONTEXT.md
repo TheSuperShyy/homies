@@ -25,6 +25,24 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**An emergency must leave a ticket, not just a transfer.** Write first, then
+transfer — in the prompt, and enforced in `transfer_to_human` regardless of what
+the prompt achieved. A transfer is a note in `call_outcomes`; nothing searches
+it, no dashboard lists it, nobody is dispatched off it. On 20 Aug a caller
+reported a possible fire, the agent transferred without opening a request, and
+the day ended with no record of it anywhere a person would look.
+
+**A tool's vocabulary lives in three places and they drift.** The declaration
+(`vapi_tools.py`), the handler allow-list (`debt-tools/index.ts`) and the
+database CHECK have to be changed together. When the intake agent shipped with
+its own transfer reasons, only the first was updated: `emergency`,
+`out_of_scope` and `repeated_failure` were unstorable for as long as the agent
+existed, and the handler quietly rewrote them to `caller_request` rather than
+letting the insert fail. **A fallback that turns an invalid value into a
+plausible one is worse than a crash** — it destroys the evidence that anything
+went wrong. Prefer failing loudly; where a fallback must exist, make sure no
+value the system sends itself can reach it.
+
 **OXS is read-only, forever.** Import from it, never write to it. The API
 exposes write endpoints for service calls; they are forbidden. A change a
 resident asks for becomes staff work, not an API call. If a design needs an

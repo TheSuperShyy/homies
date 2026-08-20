@@ -417,7 +417,33 @@ INTAKE_TOOLS = [
         "before and never on its own. This hands the call to the office in writing; it "
         "does not connect anyone to anyone, so do not say you are putting them through. "
         "Close the call after calling it.",
-        {"reason": {"type": "string", "enum": INTAKE_TRANSFER_REASONS}},
+        {
+            "reason": {"type": "string", "enum": INTAKE_TRANSFER_REASONS},
+            # 20 Aug. These two exist for one case: `reason: emergency` where no
+            # request was opened first. The server writes the ticket the agent
+            # skipped, and without these it has nothing to write into it — a row
+            # saying only "an emergency happened somewhere" is barely better
+            # than the nothing it replaces.
+            #
+            # Optional in the schema and mandatory in the prompt, on purpose. A
+            # required field the model cannot fill is a tool call that never
+            # happens, and a transfer that does not happen is worse than a
+            # transfer with a thin description.
+            "description": {
+                "type": "string",
+                "description": (
+                    "What was reported, in the caller's own words. Required when "
+                    "reason is `emergency`; leave out otherwise."
+                ),
+            },
+            "building": {
+                "type": "string",
+                "description": (
+                    "The building, if one was given. Only read when reason is "
+                    "`emergency` and no request was opened."
+                ),
+            },
+        },
         ["reason"],
     ),
     _fn(

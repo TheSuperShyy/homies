@@ -9,6 +9,104 @@ conversation that produced it.
 
 ---
 
+## 2026-08-20
+
+### A fire was reported and the system recorded nothing
+
+A test call at 08:05: the caller says black smoke is coming out of a window and
+they think there is a fire. The agent handled the conversation well — recognised
+the emergency, said it was marking it urgent and bringing in a person, named 101
+and 102. At the end of the day the `requests` table was empty.
+
+The user's read was that Supabase had come unlinked from the new Vapi account.
+It had not. Three separate faults stacked up, and the endpoint was fine.
+
+**Fault 1 — the prompt made the ticket the droppable half.** The Emergency
+section said "stop the intake, do not finish the script first, set urgency to
+emergency on whatever you write, say you are bringing in a person, and transfer
+immediately", and closed with "a tidy ticket and no human is a failure here,
+however good the ticket is". Every emphasis points at the transfer. "Whatever
+you write" is conditional on there being something written and never says to
+write it. The agent called exactly one tool in the whole call:
+`transfer_to_human`. `open_request` was never invoked, and by the prompt as
+written that was arguably correct.
+
+Rewritten to **write, then transfer, in that order, every time** — `open_request`
+with whatever is already known, no further questions first, then the spoken
+line, then the transfer carrying the same description. It now says plainly why:
+a transfer is a note, nothing searches it, nobody is dispatched off it.
+
+**Fault 2 — the word `emergency` was never storable.** `call_outcomes.
+transfer_reason` has been constrained to the debt agent's six reasons since
+migration `004`. The intake agent shipped later with its own five
+(`INTAKE_TRANSFER_REASONS`), of which `emergency`, `out_of_scope` and
+`repeated_failure` were not among them. The Edge Function's allow-list mirrored
+the constraint and mapped anything outside it to `caller_request` — protecting
+itself from a CHECK violation by turning a rejected insert into a wrong one. So
+the fire is on record as `transfer:caller_request`: a caller who asked to speak
+to someone.
+
+This is the same shape as every other bug in this file: a tool's vocabulary
+living in three places that were allowed to drift. Migration `021` widens the
+CHECK to the union of both agents; the handler's list now matches; the column
+comment names both source constants so the next person sees the coupling.
+
+18 of 24 transfers on record say `caller_request`. An unknown number were
+something else and cannot be recovered — the word was discarded before it was
+written. The transcripts are the only evidence.
+
+**Fault 3 — nothing caught it afterwards.** `salvage()` writes a `needs_review`
+row from the transcript when a call produced no request, but only for calls that
+were *cut off* (`max-duration`, `silence-timed-out`). This call ended normally,
+so it correctly did not fire.
+
+Added an **emergency backstop** in `transfer_to_human`: on `reason: emergency`
+with no request on the interaction, the server opens one itself —
+`urgency: emergency`, `status: needs_review`, description from the new
+`description` argument. Only for `emergency`; for `out_of_scope` and
+`caller_request` a spurious work item is often worse than none. An instruction
+the model can ignore is not a constraint, and this file has now paid for that
+lesson three times.
+
+**The account migration is fine, and I misread it first.** The user asked
+whether Supabase was still linked "to the new account", and while checking I
+listed account 7's assistants, found none of them in `web/index.html`, and
+started writing up a half-finished migration. Wrong way round: HANDOVER already
+records account 6 as live since 19 Aug pm and account 7 as *retired* (it is the
+old account 4). The demo page carries the live public key and the live assistant
+ids; today's call landed on `9cae6bf7`, the live English intake assistant, on the
+live account. Nothing about the accounts is broken.
+
+What made it hard to check is real, though, and already recorded: `.env` can no
+longer tell the accounts apart, because the `repoint()` bug flattened every
+`VAPI_PUBLIC_KEY_ACCOUNT*` to the same value before it was fixed. Identifying
+the live account meant asking the API which one had today's calls on it. The
+lesson is the one already in HANDOVER — read the table there before inferring an
+account from `.env`.
+
+**Also found and not changed:** `vapi_sync.py` resolves the tool host to n8n
+whenever `N8N_BASE_URL` is set, but the live assistants have always pointed
+straight at Supabase. Synced with `N8N_BASE_URL=` cleared so this fix did not
+silently move the intake agent behind n8n. HANDOVER claimed the n8n route was
+live; corrected.
+
+**Testing.** Migration applied (21 of 21). Edge Function deployed, version 33
+ACTIVE. Hebrew intake pushed; English twin rebuilt from the live Hebrew
+assistant, 38 substitutions all matching, no Hebrew remaining. Then three probes
+against the live endpoint: an emergency transfer with no prior request minted
+`255-1068-26` with `urgency: emergency`, `status: needs_review` and the reason
+stored as `emergency`; an emergency transfer *after* an `open_request` minted
+nothing extra; an `out_of_scope` transfer stored `out_of_scope` and minted
+nothing. All probe rows deleted afterwards — `requests` for 20 Aug is empty
+again.
+
+**Not fixed, still true:** a transfer still reaches nobody. It writes a row in
+`call_outcomes` that no dashboard shows. The backstop means an emergency now
+leaves a ticket somebody can find, which is a different thing from somebody
+being told.
+
+---
+
 ## 2026-08-19
 
 ### The Cartesia key moves, and `.env` was the least important place it lived

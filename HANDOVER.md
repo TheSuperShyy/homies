@@ -1,6 +1,6 @@
 # HANDOVER — Homies, everything you need to take over
 
-**Current as of 2026-08-18.** If you have just been told "read the handover",
+**Current as of 2026-08-20.** If you have just been told "read the handover",
 this file plus `CONTEXT.md` is the whole briefing. Read both, then start
 working. Go to `docs/WORKLOG.md` only when you need to know *why* something
 was decided — it is the chronology with full reasoning, newest first.
@@ -37,10 +37,19 @@ a 30-turn memory keyed by phone.
 
 **One writer, reached three ways.** Every write goes through the Supabase Edge
 Function `debt-tools` (13 handlers, `--no-verify-jwt`, authenticated by
-`TOOL_SECRET`). Voice tool calls route via n8n `/webhook/homies-debt-tools`;
-the end-of-call report and the two read-only tools (`get_balance`,
-`get_request_status`) go straight to the Edge Function. Every write opens an
-`interactions` stub first, so nothing is orphaned.
+`TOOL_SECRET`). **Both voice assistants call the Edge Function directly** —
+every tool, reads and writes alike — as does the end-of-call report. Checked on
+the live assistants 20 Aug; the earlier claim that voice tools route via n8n
+`/webhook/homies-debt-tools` was wrong. n8n serves the WhatsApp path only.
+
+That matters when you run `vapi_sync.py`: `tool_server()` prefers n8n whenever
+`N8N_BASE_URL` is set in `.env`, so a plain sync would silently move the voice
+agents behind n8n and put every tool through the Decide node. Until that is a
+decision somebody has made on purpose, sync with it cleared:
+
+    N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply
+
+Every write opens an `interactions` stub first, so nothing is orphaned.
 
 **The store.** Supabase Postgres (Tokyo region), the only store of record.
 Tables: `residents`, `charges`, `interactions`, `requests`, `messages`,
