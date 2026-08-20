@@ -25,6 +25,12 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**On a detail page, the thing you came for goes first and widest.** Reference
+detail goes beside it, not above it, and anything whose length is set by the
+data -- a transcript, a thread -- scrolls in its own pane rather than growing
+the page. The call page broke both rules on 20 Aug and was unusable within
+hours of shipping.
+
 **A rule that says what to say must also say when.** The intake prompt's
 two-way offer was written with great care about its wording and nothing about
 its trigger, so on 20 Aug the model opened a call with it -- apologising to

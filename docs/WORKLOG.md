@@ -11,6 +11,45 @@ conversation that produced it.
 
 ## 2026-08-20
 
+### The call page was one long scroll
+
+Reported straight after the transcript work shipped: the conversation view is
+not friendly, it is a long scroll. Correct, and it was two separate mistakes.
+
+**The page length was set by how talkative the caller was.** Bubbles stacked
+down the document, so a three-minute call was a three-minute page. Now the
+transcript scrolls inside its own pane, capped just under the viewport --
+`min(68vh, 620px)` -- so the end of the pane is visibly the end of a *box*
+rather than the end of the page, which is the cue that tells you where to
+scroll.
+
+**Everything you glance at once sat above the thing you came to read.** Seven
+large metadata cards, then the summary, then the recording, and only then the
+first thing anybody said. Now two columns: conversation wide on the left,
+summary / recording / details / tools stacked on the right. Under 900px it goes
+to one column and the **sidebar leads**, because on a phone the facts and the
+recording are worth more up front than the opening line of a long transcript.
+
+**The speaker labels were noise.** "Michael" and "Caller" printed above all 22
+bubbles is the same two words repeated down the page. Dropped; who-is-which is
+said once in the panel header with two colour dots, the way every chat client
+does it. Left/right alignment carries the rest.
+
+Two smaller things while in there. The tool calls moved into a collapsed
+`<details>` -- it is JSON, it is long, and it is the one section on the page
+that is only read when something is wrong. And the recording panel now says
+Vapi keeps recordings 14 days, because an expired one renders as a working
+player that plays nothing, which reads as a broken page rather than an expired
+file.
+
+`.msg .who` is kept in the stylesheet: the WhatsApp conversation view uses it
+and there the label carries a timestamp and a message type, which is
+information rather than repetition.
+
+**Testing.** `next build` clean, 9 routes. Rendered markup checked on the fire
+call: grid present, scrolling pane present, four panel headers, zero `.who`
+elements, 12 agent bubbles and 10 caller bubbles.
+
 ### The opening turn apologised for nothing and offered a choice already made
 
 From the 08:05 transcript, the first exchange:

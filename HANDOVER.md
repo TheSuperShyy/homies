@@ -79,6 +79,13 @@ the transcript beside it stays good. The search box on `/calls` matches
 transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
+**The call page is two columns** -- conversation left, summary / recording /
+details / tools right -- collapsing to one column under 900px with the sidebar
+first. The transcript scrolls inside its own pane; do not remove that cap
+without replacing it, or the page length goes back to being whatever the call
+length was. Speaker names are deliberately absent from the bubbles and stated
+once in the panel header.
+
 **Summaries start from 20 Aug, not before.** `analysisPlan.summaryPlan` was
 added to the assistants that day; the 163 calls recorded before it have a null
 summary permanently, because a summary is generated at end of call and cannot be

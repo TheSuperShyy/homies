@@ -113,6 +113,55 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); 
 .msg.resident { align-self: flex-start; background: var(--panel); }
 .msg.bot { align-self: flex-end; background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
 .msg .who { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+/* The transcript scrolls inside its own pane instead of growing the page. A
+   three-minute call is ~25 turns, and stacking them down the document meant the
+   page length was set by how talkative the caller was. Capped just under the
+   viewport so the end of the pane is visibly the end of a box, not the end of
+   the page — the cue that tells you to scroll here rather than everywhere. */
+.thread.scroll { max-height: min(68vh, 620px); overflow-y: auto; }
+
+/* The call page: conversation wide on the left, everything you glance at once
+   on the right. The facts used to sit ABOVE the transcript as large cards, so
+   reaching the first thing anybody said meant scrolling past all of them. */
+.callgrid { display: grid; grid-template-columns: minmax(0, 1fr) 302px; gap: 18px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+@media (max-width: 900px) {
+  /* One column, and the sidebar leads: on a phone the facts and the recording
+     are worth more up front than the first line of a two-minute transcript. */
+  .callgrid { grid-template-columns: 1fr; }
+  .side { order: -1; }
+  .thread.scroll { max-height: none; }
+}
+
+/* A quiet header on each panel, so a stack of them reads as sections rather
+   than as one undifferentiated column of boxes. */
+.panelhead {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 14px; border-bottom: 1px solid var(--line);
+  font-size: 12px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+details > summary.panelhead { cursor: pointer; list-style: none; }
+details > summary.panelhead::-webkit-details-marker { display: none; }
+details > summary.panelhead::after { content: '+'; font-size: 14px; }
+details[open] > summary.panelhead::after { content: '\2212'; }
+
+/* Who is which side, said once at the top instead of above every bubble. */
+.legend { display: flex; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; }
+.legend .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--line); }
+.legend .dot + span, .legend .dot { margin-inline-start: 4px; }
+.legend .dot.resident { background: var(--panel); }
+.legend .dot.bot { background: color-mix(in srgb, var(--accent) 45%, var(--panel)); }
+
+/* Key/value rows for reference detail. Deliberately not .card — these are read
+   once, and sizing them like headline numbers is what crowded the page. */
+.rows { padding: 4px 14px 10px; }
+.row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px;
+}
+.rows .row:last-child { border-bottom: 0; }
+.row .mono { text-align: end; word-break: break-word; }
 .transcript {
   white-space: pre-wrap; padding: 16px; font-size: 14px; line-height: 1.6;
   font-family: ui-monospace, monospace;
