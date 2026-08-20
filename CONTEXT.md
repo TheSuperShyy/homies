@@ -25,6 +25,17 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**`hebrew-voice-gender-pronunciation-skill.md` is the source for Hebrew gender
+and pronunciation rules.** Part A (gender) is integrated into both voice
+prompts. Part B (general homographs) is deliberately NOT: it is real Hebrew and
+almost none of it can occur in building management, and prompt length is
+attention. Take from it what the domain can actually hit.
+
+**Search a Hebrew prompt with more than one spelling.** A claim that a rule is
+missing was wrong on 20 Aug because the check used pointed לְךָ and the prompt
+writes *lekha*. Unpointed, pointed, and transliterated are three different
+strings for one word.
+
 **GitHub Actions runs the import; the dashboard watches it.** Decided 20 Aug.
 The dashboard is the control surface and never the engine -- the importers are
 Python, they outlive a serverless timeout, and the dashboard holds only the anon

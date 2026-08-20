@@ -79,6 +79,14 @@ the transcript beside it stays good. The search box on `/calls` matches
 transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
+**Both Hebrew voice agents carry the gender rules**, from
+`hebrew-voice-gender-pronunciation-skill.md`. Intake has had them since it was
+written; the debt agent got the homograph traps (לך, שלך, איתך and four more --
+spelled the same for both genders, said differently) and the neutral-phrasing
+repertoire on 20 Aug. Both sit inside the span `DEBT_BLOCKS`/`INTAKE_BLOCKS`
+replace, so the English twins carry an English grammar note instead and no
+Hebrew table leaks to an English caller.
+
 **The OXS import runs on GitHub Actions and is finally configured.** All six
 repository secrets were set on 20 Aug -- before that the schedule had fired
 twice a day since 18 Aug and failed on its first step every time, so every OXS

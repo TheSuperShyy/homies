@@ -11,6 +11,58 @@ conversation that produced it.
 
 ## 2026-08-20
 
+### The gender skill goes into the debt agent, where half of it was missing
+
+Asked whether both Hebrew agents carry the gender identifier, then pointed at
+`hebrew-voice-gender-pronunciation-skill.md` -- a 30,000-character Hebrew
+document in three parts: gender distinction, homographs and pronunciation, and
+safer word choices.
+
+**I got the first answer wrong and had to correct it.** I reported that the
+intake prompt did not mention the לך trap. It does -- it carries the trap, the
+neutral-phrasing table almost verbatim from the skill's section 4, foreign-word
+transliteration and number gender. My check had searched for the *pointed*
+spelling לְךָ; the prompt writes the transliteration *lekha*. The skill was
+already integrated there and I had missed it by one search term.
+
+**The real gap was the debt agent**, and it was the half a written check cannot
+see. Its GRAMMAR section had the imperatives table -- תני against תן, תשלחי
+against תשלח -- which is the easy half, because those look different on the
+page. It had nothing on the words spelled **identically** for a man and a woman:
+לך, שלך, איתך, בשבילך, אצלך, ממך, עליך. A sentence carrying one of those reads
+as correct, passes any check you can run on the text, and still comes out wrong
+in the ear.
+
+**לך is the one that matters here**, because it is in every second sentence a
+collections call wants to say: אני אשלח לך, חוזר אליך, יש לך תשלום פתוח. The
+instruction is not to pick better -- it is to take the word out and say the
+sentence without it. The result is shorter, which everything else in that prompt
+already asks for.
+
+Added the neutral-phrasing repertoire too. The debt prompt said "keep phrasing
+around until a form lands" and gave nothing to phrase around WITH; the intake
+prompt has had the table since it was written. With one addition of my own:
+**neutral is a bridge, not a destination.** A whole call held at arm's length in
+the plural sounds like a form being read, which is the other way to lose
+somebody.
+
+**Part B was deliberately left out.** The skill's homograph section is general
+Hebrew -- milk against tallow, book against barber, bride against finished. Real
+problems, and almost none of them can occur in a call about a building committee
+payment. Adding twenty irrelevant rows to a 65,000-character prompt costs
+attention and buys nothing.
+
+**No English twin work was needed, which was worth checking rather than
+assuming.** Everything added sits between "Grammar must be perfect" and "stay
+neutral, leave them as written" -- the exact span `DEBT_BLOCKS` replaces
+wholesale with an English grammar note. The patch asserts that before writing,
+because a Hebrew table escaping that span would ship to an English caller.
+
+**Testing.** Hebrew pushed and read back: all five markers present. English twin
+rebuilt -- 60 passages and 4 section blocks -- and checked for the opposite
+condition, that the Hebrew table did NOT leak into it. It did not. Intake
+re-checked and unchanged.
+
 ### The nightly import had never once run
 
 Asked whether the auto import was fixed. It was not, and it had been failing
