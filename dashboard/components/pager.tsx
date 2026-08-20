@@ -86,11 +86,18 @@ export function Pager({
         ))}
       </span>
       <span className="muted mono">page {page} of {pages} · {total} {unit}</span>
+      {/* Buttons, not bare words. At the first or last page they stay in
+          place and go visibly dead rather than disappearing — a control that
+          vanishes moves everything beside it and leaves you unsure whether you
+          reached the end or misclicked. `aria-disabled` on a span says the same
+          thing to a screen reader that the grey says to everyone else. */}
       <span className="nav">
-        {page > 1 ? <a href={href(page - 1, size)}>&larr; {prev}</a>
-                  : <span className="muted">&larr; {prev}</span>}
-        {page < pages ? <a href={href(page + 1, size)}>{next} &rarr;</a>
-                      : <span className="muted">{next} &rarr;</span>}
+        {page > 1
+          ? <a className="btn-nav" href={href(page - 1, size)}>&larr; {prev}</a>
+          : <span className="btn-nav off" aria-disabled="true">&larr; {prev}</span>}
+        {page < pages
+          ? <a className="btn-nav" href={href(page + 1, size)}>{next} &rarr;</a>
+          : <span className="btn-nav off" aria-disabled="true">{next} &rarr;</span>}
       </span>
     </div>
   );

@@ -44,7 +44,7 @@ main { padding: 26px; }
 .tabs a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .pager {
   display: flex; justify-content: space-between; align-items: center;
-  gap: 14px; margin-top: 14px; font-size: 14px; flex-wrap: wrap;
+  gap: 14px; margin: 0 0 12px; font-size: 14px; flex-wrap: wrap;
 }
 .pager a { color: var(--accent); }
 /* Three groups, so the count stays centred whether or not the size picker is
@@ -62,6 +62,23 @@ main { padding: 26px; }
 .pager .per a.on {
   background: var(--accent); border-color: var(--accent); color: #fff;
 }
+/* Newer / Older. Same size and shape as .btn-sm so every clickable thing on a
+   list page is recognisably the same object, but outlined rather than filled:
+   the filled orange is the row action, and two filled colours competing on one
+   screen is how a page stops having a primary action at all. */
+.btn-nav {
+  display: inline-block; padding: 5px 13px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  font-size: 13px; line-height: 1.5; font-weight: 500; white-space: nowrap;
+}
+.pager .nav a.btn-nav { color: var(--ink); }
+.btn-nav:hover { border-color: var(--action); color: var(--action); }
+.btn-nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-nav.off { color: var(--muted); opacity: .5; cursor: default; }
+.btn-nav.off:hover { border-color: var(--line); color: var(--muted); }
+/* The size picker gets a real touch target. 1px of padding was a 14px-tall
+   tap target, which is half what a finger needs. */
+.pager .per a { padding: 4px 10px; }
 h1 { font-size: 19px; margin: 0 0 18px; font-weight: 600; letter-spacing: -0.01em; }
 h2 { font-size: 14px; margin: 26px 0 10px; font-weight: 600; color: var(--muted); }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }

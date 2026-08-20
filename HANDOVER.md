@@ -79,6 +79,9 @@ the transcript beside it stays good. The search box on `/calls` matches
 transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
+**Pagination sits above every table**, not below, on calls, tickets,
+conversations and debts. It hides itself when the whole list fits on one page.
+
 **Every row in `/calls` has a filled orange `View call` button**, including rows with no
 transcript -- the detail page still shows the recording, outcome and tool calls.
 

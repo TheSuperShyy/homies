@@ -92,6 +92,7 @@ async function NoAnswer({ page, size }: { page: number; size: number }) {
 
   return (
     <>
+      <CallPager view="no_answer" page={page} size={size} total={count ?? 0} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
@@ -114,7 +115,6 @@ async function NoAnswer({ page, size }: { page: number; size: number }) {
           </table>
         ) : !error && <div className="empty">Nobody has gone unanswered yet.</div>}
       </div>
-      <CallPager view="no_answer" page={page} size={size} total={count ?? 0} />
     </>
   );
 }
@@ -129,6 +129,7 @@ async function LinksSent({ page, size }: { page: number; size: number }) {
 
   return (
     <>
+      <CallPager view="links" page={page} size={size} total={count ?? 0} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
@@ -152,7 +153,6 @@ async function LinksSent({ page, size }: { page: number; size: number }) {
           </table>
         ) : !error && <div className="empty">No payment links sent yet.</div>}
       </div>
-      <CallPager view="links" page={page} size={size} total={count ?? 0} />
       <p className="muted" style={{ fontSize: 13 }}>
         &ldquo;sent&rdquo; means OXS confirmed the link went out — whether it was <em>paid</em> is
         only visible in OXS, so nothing here counts as money received.
@@ -183,6 +183,7 @@ async function CallList({ view, page, size, search }: {
 
   return (
     <>
+      <CallPager view={view} page={page} size={size} total={count ?? 0} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
@@ -228,7 +229,6 @@ async function CallList({ view, page, size, search }: {
           </div>
         )}
       </div>
-      <CallPager view={view} page={page} size={size} total={count ?? 0} />
     </>
   );
 }

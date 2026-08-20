@@ -14,6 +14,8 @@ export default async function Conversations({
   return (
     <>
       <h1>Conversations</h1>
+      <Pager page={page} size={size} total={count ?? 0} basePath="/conversations"
+             unit="conversations" />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
@@ -46,8 +48,6 @@ export default async function Conversations({
           </table>
         ) : !error && <div className="empty">No conversations yet.</div>}
       </div>
-      <Pager page={page} size={size} total={count ?? 0} basePath="/conversations"
-             unit="conversations" />
     </>
   );
 }

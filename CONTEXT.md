@@ -25,6 +25,14 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**One filled control per screen.** The orange `View call` is the row action;
+everything else that clicks — Newer/Older, tabs, the size pills — is outlined.
+Two filled colours competing means no primary action.
+
+**Disabled controls stay put and go grey.** Never removed: a control that
+vanishes shifts its neighbours and leaves the reader unsure whether they hit
+the end of the list or misclicked.
+
 **A filled button needs two colours, not one.** A shade dark enough to carry
 white text on the light theme is too dim on the dark one. Every filled control
 here defines its background AND its label per theme -- see `--action` /

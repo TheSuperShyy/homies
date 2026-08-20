@@ -63,6 +63,8 @@ export default async function Tickets({
           </a>
         ))}
       </nav>
+      <Pager page={page} size={size} total={count ?? 0} basePath="/tickets"
+             params={{ status }} unit="tickets" />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
@@ -102,8 +104,6 @@ export default async function Tickets({
           </table>
         ) : !error && <div className="empty">No tickets{status ? ` with status ${status}` : ''}.</div>}
       </div>
-      <Pager page={page} size={size} total={count ?? 0} basePath="/tickets"
-             params={{ status }} unit="tickets" />
     </>
   );
 }
