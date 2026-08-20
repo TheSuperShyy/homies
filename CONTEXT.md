@@ -25,6 +25,18 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**A tool that returns success must say what it did NOT do.** `verify_address`
+told the model to call it before `open_request` and never said it opens nothing
+itself, so a successful check read as the job being finished and the model
+answered with an invented reference. Where two tools are a sequence, the first
+one's description carries the handoff.
+
+**Never let the bot's own claim be the only record.** Every path that can tell a
+resident something was written must have something behind it that writes -- the
+emergency backstop in `transfer_to_human`, `rescue_request` for chat. The guard
+that only *suppresses* a false claim leaves the resident with nothing, which is
+quieter than the lie and no better for them.
+
 **On a detail page, the thing you came for goes first and widest.** Reference
 detail goes beside it, not above it, and anything whose length is set by the
 data -- a transcript, a thread -- scrolls in its own pane rather than growing

@@ -1731,6 +1731,117 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * The transfer itself is Vapi's, configured on the assistant. This records why,
    * so the reason survives even when no rep is free and the transfer fails.
    */
+  /**
+   * Write the request the WhatsApp model SAID it opened and did not.
+   *
+   * WHY THIS EXISTS
+   * On 20 Aug the bot was given three messages: a leak in the lobby, "yes please
+   * open a request", and a building and apartment. It called `verify_address`,
+   * got back a real building and a real flat, and then answered:
+   *
+   *     פתחתי קריאה על הנזילה בלובי, מספר 255-1048-26 — זה עובר לצוות התחזוקה
+   *
+   * `open_request` was never called. The reference was invented, digit for
+   * digit, in the shape this system uses. Nothing was written anywhere.
+   *
+   * The reply guard in n8n catches the claim — it looks for a reference-shaped
+   * string with no `open_request` run behind it — and until now it replaced the
+   * message with "I am passing this to the team". That stops the lie and leaves
+   * the resident with nothing: no ticket, and a handover that reaches nobody.
+   *
+   * By that point everything a ticket needs already exists. The address was
+   * verified a moment ago, and the fault is sitting in `messages`, which is
+   * written for every inbound message before the model ever runs. So this
+   * assembles the row from what is on record instead of from what the model
+   * claimed, and gives the resident a reference that is real.
+   *
+   * WHY IT IS `needs_review` AND NOT `open`
+   * A normal ticket carries a `type` and a `fault_location` the model chose. A
+   * rescued one has neither — nobody classified it — so it is marked for a
+   * person rather than dressed up as something an inference produced. Same
+   * reasoning as `salvage()` below, and the same status.
+   *
+   * The description is the resident's own inbound messages, oldest first,
+   * joined. Not a summary: nothing here is smart enough to summarise, and this
+   * runs precisely when the smart thing has failed.
+   */
+  async rescue_request(args, ctx) {
+    const phone = phoneOf(args?.phone) ?? phoneOf(ctx.callerPhone);
+    const rawPhone = String(args?.phone ?? "").trim();
+    if (!phone && !rawPhone) return { ok: false, error: "phone is required" };
+
+    const iid = await interactionId(ctx);
+
+    // Never mint a second one. The guard can fire on consecutive turns of the
+    // same conversation — a model that invents a reference once will usually do
+    // it again on the next message — and a resident describing one leak must
+    // not collect a ticket per message.
+    const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+    let dupe = db.from("requests").select("reference")
+      .gte("created_at", since)
+      .in("status", ["open", "in_progress", "needs_review"])
+      .order("created_at", { ascending: false }).limit(1);
+    dupe = iid ? dupe.eq("interaction_id", iid) : dupe.eq("reported_by_phone", phone);
+    const { data: already } = await dupe;
+    if (already && already.length) {
+      return { ok: true, reference: already[0].reference, duplicate: true };
+    }
+
+    // What they actually said. `messages` is written by "Log inbound" before the
+    // model runs, so it is on record even on the turn the model went wrong.
+    // Both phone spellings are tried: n8n stores what WhatsApp sends (972…),
+    // and everything else in this file works in E.164 (+972…).
+    const spellings = [...new Set([phone, rawPhone].filter(Boolean))];
+    const { data: msgs } = await db.from("messages")
+      .select("body,created_at")
+      .in("phone", spellings)
+      .eq("direction", "inbound")
+      .order("created_at", { ascending: false })
+      .limit(12);
+
+    const said = (msgs ?? [])
+      .map((m: any) => String(m?.body ?? "").trim())
+      .filter(Boolean)
+      .reverse();
+    if (!said.length && !args?.description) {
+      return { ok: false, error: "nothing on record to write" };
+    }
+    const description = String(args?.description ?? said.join(" / ")).slice(0, 4000);
+
+    // The building as WE write it. `args.building` is what verify_address just
+    // returned and is already canonical; the fallback re-derives it from what
+    // was said, which is what happens when the guard fires before any address
+    // was verified.
+    let building = (await canonicalAddress(args?.building)) || "";
+    if (!building) {
+      for (const line of said) {
+        const m = await matchBuilding(line);
+        if (m.status === "ok") { building = (m.building as any)?.address ?? ""; break; }
+      }
+    }
+
+    const { data, error } = await db.from("requests").insert({
+      resident_id: ctx.residentId,
+      interaction_id: iid,
+      // Null, deliberately: nothing classified this. A guessed category on a
+      // rescued row is the same failure that produced it.
+      type: null,
+      description,
+      building: building || null,
+      unit: null,
+      reported_unit: unitOf(args?.unit),
+      reported_by_phone: phone,
+      urgency: urgency(args?.urgency),
+      status: "needs_review",
+      opened_via: channel(ctx),
+      oxs_ref: "partial:model_claimed",
+    }).select("reference").single();
+
+    return error
+      ? { ok: false, error: error.message }
+      : { ok: true, reference: data.reference, rescued: true };
+  },
+
   async transfer_to_human(args, ctx) {
     // BOTH agents' vocabularies, because both write to this one column.
     // Kept in step with TRANSFER_REASONS and INTAKE_TRANSFER_REASONS in

@@ -143,8 +143,13 @@ say anyone is being put through.
   paying; a dedicated line cannot reach Vapi.
 - **Payment link delivery.** `send_payment_link` writes a row and stops. OXS
   exposes no payment-link endpoint, so the link still comes from OXS itself.
-- **Chatwoot in the message path.** It runs and owns the number; it is not
-  wired to the bot.
+- **Chatwoot in the message path.** It is installed and running at
+  `chat.srv1879140.hstgr.cloud` with an admin account, and it is **not** in the
+  message path — Meta still delivers to n8n. Checked 20 Aug. Blocked on a
+  Chatwoot API token in `.env` as `CHATWOOT_API_TOKEN`. Do the cutover while the
+  number is still Meta's test number: repointing the callback has a window where
+  inbound messages are lost rather than queued, and that window is free now and
+  expensive later.
 - **A running scheduler.** `.github/workflows/oxs-sync.yml` exists — residents,
   arrears and requests at midnight and 15:00 Israel time — but `.github/` is
   untracked, so nothing fires until it is committed to `main` and the six

@@ -11,6 +11,82 @@ conversation that produced it.
 
 ## 2026-08-20
 
+### The chat bot invented a reference number and wrote nothing
+
+Asked for a responsive bot, so the bot was measured first rather than improved
+on a hunch. `check_whatsapp.py` failed: three messages -- a leak in the lobby,
+"yes please open a request", a real building and flat -- all answered, and no
+row in `requests` after 45 seconds.
+
+The n8n execution said it plainly. The agent called `verify_address`, got back a
+real building and a real apartment, never called `open_request`, and replied:
+
+    פתחתי קריאה על הנזילה בלובי, מספר 255-1048-26 — זה עובר לצוות התחזוקה
+
+A reference invented digit for digit in the shape this system uses. The phantom
+guard from 19 Aug caught the claim and replaced the message with "I am passing
+this to the team" -- which stops the lie and leaves the resident with nothing: no
+ticket, and a handover that reaches nobody.
+
+**Why it skipped the tool.** `open_request`'s own description already said "you
+must not invent one, and you must not tell the resident a ticket exists before
+this returns", and the model did it anyway. What was missing was on the OTHER
+tool: `verify_address` said "call this BEFORE open_request" and never said that
+it opens nothing itself. On `gemini-2.5-flash` a successful check reads as the
+work being done, and the agent returned a final answer after one tool call.
+
+Fixed in the two places the n8n agents skill puts them. The tool description now
+says verify_address CHECKS an address and OPENS NOTHING, that a successful check
+is half the job, and that the next thing is `open_request` with no reply in
+between. Inter-tool flow belongs in the system prompt, so that got the hard rule
+as well, under "מה אף פעם לא", with the 20 Aug reply quoted as the worked
+example of getting it wrong.
+
+**And a backstop, because a rule the model can ignore is not a constraint.** New
+Edge Function handler `rescue_request`: given the phone, it reads that
+conversation's inbound messages out of `messages` -- written by "Log inbound"
+before the model ever runs -- joins them as the description, takes the building
+from the `verify_address` result n8n already has, and writes the row. Status
+`needs_review` with a null `type`, because nothing classified it and a guessed
+category on a rescued row is the same failure that produced it. Idempotent
+within 30 minutes on the interaction, so a model that invents a number twice in
+one conversation does not mint two tickets.
+
+In n8n the guard's false branch now runs "Open it anyway" before replying,
+instead of going straight to the handover line.
+
+**A thing found while testing that changes the design.** The guard cannot
+actually tell a truthful claim from an invented one: a tool node has no `main`
+output, so `$('open_request').all()` is unreliable and the false branch runs on
+EVERY reply that names a reference -- including the correct ones. Rather than
+fight that, the rescue is idempotent and returns the AUTHORITATIVE reference
+either way, and the reply node now asks a better question: does the model's own
+sentence contain that number? If it does, the model told the truth and its
+wording is kept. If not, we speak the real number. If there is none, we hand
+over. The failure mode is now "we replaced good phrasing with correct phrasing"
+rather than "we told somebody a lie".
+
+**The check was broken too, for the third time in this file's life.** It found
+its row with `description like *בדיקת-מערכת-999*`, assuming the bot copies the
+resident's message verbatim. It does not, and should not -- told
+"יש נזילת מים בלובי, דחוף. בדיקת-מערכת-999" it wrote **"נזילת מים בלובי"** and
+dropped the marker as the noise it is. A perfect row the query could not see.
+A fixture the system under test is right to reject is a broken fixture. It now
+finds its rows through `interactions.external_call_id = wa:<phone>`, with the
+phone minted per run -- exact, and safer than the old DELETE, which matched free
+text and would have removed a real resident's ticket if they ever typed the
+marker.
+
+**Testing.** `rescue_request` exercised directly three ways before wiring:
+writes a real ticket with the whole thread as the description and the verified
+address; returns `duplicate` on a second call in the same conversation; refuses
+without a phone. Probe rows deleted. Workflow read back after saving --
+24 nodes, connections correct, no overlapping positions, still active. Then the
+full end-to-end check: **all checks passed, row in the database after 9 seconds,
+and `status: open`** -- meaning the model called `open_request` itself and the
+backstop was not needed. The check now prints the status so a rescued row can
+never masquerade as the bot working.
+
 ### The call page was one long scroll
 
 Reported straight after the transcript work shipped: the conversation view is

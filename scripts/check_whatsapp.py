@@ -62,7 +62,49 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # building any more, because the building now belongs to Homies and its real
 # requests must never be in range of this file's DELETE.
 MARKER = "בדיקת-מערכת-999"
-BUILDING_MATCH = "requests?description=like.*%D7%91%D7%93%D7%99%D7%A7%D7%AA-%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA-999*"
+
+
+def ours(frm, select=""):
+    """Find this run's rows by the CONVERSATION they belong to.
+
+    Matched on `interaction_id` — every WhatsApp write opens an interaction
+    keyed `wa:<phone>`, and `frm` is minted fresh per run — rather than on the
+    marker appearing in the description.
+
+    THE MARKER STOPPED WORKING, AND THE BOT WAS RIGHT (20 Aug)
+    This used to query `description like *<marker>*`, which assumed the bot
+    copies the resident's message into the description verbatim. It does not,
+    and it should not: the prompt tells it to write THE FAULT in the resident's
+    words, so given "יש נזילת מים בלובי, דחוף. בדיקת-מערכת-999" it wrote
+    "נזילת מים בלובי" and dropped the marker as the noise it is. The row was
+    perfect and the query could not see it, so the check failed and read as a
+    broken bot for the second time in this file's life.
+
+    A fixture the system under test is right to reject is a broken fixture.
+    That is written twice above this line already; this is the third.
+
+    Also safer than what it replaced. The old DELETE matched free text, so a
+    real resident writing the marker string would have had their ticket
+    removed. This can only ever touch rows belonging to a phone number this
+    process invented seconds ago.
+    """
+    ok, rows = sb("interactions?external_call_id=eq.wa:%s&select=id" % frm)
+    if not rows:
+        return []
+    ids = ",".join(r["id"] for r in rows)
+    return ids, "requests?interaction_id=in.(%s)%s" % (ids, select)
+
+
+def our_rows(frm, select):
+    got = ours(frm)
+    if not got:
+        return []
+    return sb(got[1] + select)[1]
+
+
+def our_path(frm):
+    got = ours(frm)
+    return got[1] if got else None
 
 
 def a_real_building():
@@ -216,7 +258,7 @@ def main():
           "200 always — Meta must never be told to retry")
     check("wrong signature answers 200", post_message(frm, "x", bad=True) == 200)
 
-    before = sb(BUILDING_MATCH + "&select=reference")[1]
+    before = our_rows(frm, "&select=reference")
     check("forged messages wrote nothing", len(before) == 0, "%d rows" % len(before))
 
     # --- 4. A real conversation reaches the database ------------------------
@@ -254,7 +296,7 @@ def main():
     while waited < 45:
         time.sleep(3)
         waited += 3
-        rows = sb(BUILDING_MATCH + "&select=reference,opened_via,urgency,unit")[1]
+        rows = our_rows(frm, "&select=reference,opened_via,urgency,unit,status")
         if rows:
             break
     check("row reached Supabase", len(rows) == 1, "after %ds" % waited)
@@ -263,17 +305,27 @@ def main():
               rows[0]["opened_via"])
         check("common-area fault has no unit", rows[0]["unit"] in (None, ""),
               str(rows[0]["unit"]))
+        # `needs_review` means the model never called open_request and the
+        # rescue in transfer_to_human's neighbour wrote the row instead. The
+        # resident still gets a real reference, so this is not a failure — but
+        # it is the difference between the bot working and the net catching it,
+        # and a green check that hides which one happened is worth nothing.
+        print("       status: %s%s" % (
+            rows[0]["status"],
+            "   <- RESCUED, the model did not call open_request"
+            if rows[0]["status"] == "needs_review" else ""))
 
         # --- 5. And a second report of it does not become a second ticket ---
         post_message(frm, "הנזילה עדיין שם. %s" % MARKER)
         time.sleep(12)
-        again = sb(BUILDING_MATCH + "&select=reference")[1]
+        again = our_rows(frm, "&select=reference")
         check("duplicate did not open a second ticket", len(again) == 1,
               "%d rows" % len(again))
 
     # --- Clean up after ourselves -------------------------------------------
-    left = sb(BUILDING_MATCH, "DELETE")[0]
-    print("\ncleanup: deleted %s rows (HTTP %s)" % (MARKER, left))
+    path = our_path(frm)
+    left = sb(path, "DELETE")[0] if path else "nothing to delete"
+    print("\ncleanup: deleted this run's rows (HTTP %s)" % left)
 
     print()
     if FAILED:
