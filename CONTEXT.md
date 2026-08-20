@@ -25,6 +25,16 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**GitHub Actions runs the import; the dashboard watches it.** Decided 20 Aug.
+The dashboard is the control surface and never the engine -- the importers are
+Python, they outlive a serverless timeout, and the dashboard holds only the anon
+key on purpose. Do not move execution into it.
+
+**A green tick that did nothing is worse than a red one.** Half the scheduled
+runs exit in seconds because GitHub cron is UTC and Israel has daylight saving.
+Anything reporting on those runs must say SKIPPED, never success -- reading
+those ticks as imports is why nobody noticed the sync had never worked.
+
 **The debt agent works an objection before handing it over.** Changed 20 Aug
 from the opposite. "I'll pay when the lift is fixed" is a condition, not a
 refusal, and transferring on it turns the commonest objection in the business

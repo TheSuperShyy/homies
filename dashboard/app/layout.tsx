@@ -28,6 +28,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
             <a href="/debts">Debts</a>
             <a href="/conversations">Conversations</a>
             <a href="/calls">Calls</a>
+            <a href="/sync">Import</a>
           </nav>
           {user && (
             <form action={signOut}>

@@ -79,6 +79,15 @@ the transcript beside it stays good. The search box on `/calls` matches
 transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
+**The OXS import runs on GitHub Actions and is finally configured.** All six
+repository secrets were set on 20 Aug -- before that the schedule had fired
+twice a day since 18 Aug and failed on its first step every time, so every OXS
+row in the database arrived from a manual run. Watch it at `/sync` on the
+dashboard. **A run finishing in under a minute imported nothing** -- that is the
+daylight-saving guard, not a success. The Run now button needs
+`GITHUB_DISPATCH_TOKEN` (fine-grained PAT, Actions write) in Vercel; everything
+else on that page works without it.
+
 **The debt agent no longer transfers on "the lift isn't fixed".** It works
 the objection first -- log the fault, say that the committee money funds the
 repair, ask again -- then one smaller ask, then hands over. Changed 20 Aug,
