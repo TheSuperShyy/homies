@@ -97,6 +97,15 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); 
 }
 .status-edit button.pill:hover { color: var(--accent); border-color: var(--accent); }
 .empty { padding: 34px; text-align: center; color: var(--muted); }
+/* The transcript search. Sits under the tabs, wraps on a narrow screen, and the
+   input takes the slack so a long Hebrew phrase stays readable while typing. */
+.search { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; flex-wrap: wrap; }
+.search input {
+  flex: 1 1 260px; min-width: 0; padding: 8px 12px; font-size: 14px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: var(--ink);
+}
+.search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 /* A chat, laid out as one. dir="auto" on each bubble so Hebrew renders
    right-to-left and a reference number stays left-to-right inside it. */
 .thread { display: flex; flex-direction: column; gap: 9px; padding: 18px; }

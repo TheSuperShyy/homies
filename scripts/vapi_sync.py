@@ -147,6 +147,47 @@ BASE = {
     "model": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.3},
     "firstMessageMode": "assistant-speaks-first",
     "artifactPlan": {"recordingEnabled": True},
+    # THE SUMMARY COLUMN WAS EMPTY ON EVERY CALL EVER RECORDED (20 Aug).
+    #
+    # `interactions.summary` has existed since migration 001 and the dashboard
+    # has rendered it in the Calls list since the day that page was written. All
+    # 163 rows were null, because the end-of-call report only ever carries a
+    # summary when an `analysisPlan` asks for one, and there has never been one
+    # here. So the list read "no summary" on every row and the only way to find
+    # out what a call was about was to open it and read the transcript.
+    #
+    # Vapi's stock summary prompt answers in English. That is wrong for this
+    # product twice over: the calls are Hebrew and the people reading the list
+    # are Israeli staff. Asking for the language of the call keeps the Hebrew
+    # agent's summaries Hebrew and the English twin's English, which is also
+    # what makes the twins comparable.
+    #
+    # `{{transcript}}` is Vapi's own variable and is substituted before the
+    # model sees it. It is not an n8n expression and the brace rules that bite
+    # there do not apply.
+    "analysisPlan": {
+        "summaryPlan": {
+            "enabled": True,
+            "timeoutSeconds": 30,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "You summarise one call for a building-management company's "
+                        "staff list, where it is read at a glance beside forty others. "
+                        "Write ONE sentence, at most two, in the SAME LANGUAGE the "
+                        "call was conducted in. Say what the caller wanted and what "
+                        "actually happened to it. If a request was opened, give its "
+                        "reference number. If the call was handed to a person, say so "
+                        "and why. If nothing was resolved, say that plainly rather "
+                        "than describing the conversation. No preamble, no 'the "
+                        "caller called to', no bullet points, no quotation marks."
+                    ),
+                },
+                {"role": "user", "content": "Transcript:\n\n{{transcript}}"},
+            ],
+        },
+    },
     # See the assistant docs for why each of these departs from the default.
     "startSpeakingPlan": {
         # 0.6 -> 0.4, matching the English twin. Then 0.4 -> 0.25 on 7 Aug when

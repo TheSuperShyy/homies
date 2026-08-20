@@ -66,7 +66,23 @@ per resident, every apartment they owe on, composed Hebrew phrases and the
 
 **The dashboard.** Next.js 14 on Vercel at `homies-dashboard.vercel.app`.
 Pages: overview, tickets, debts, conversations, calls, call detail. Anon key,
-no login since 9 Aug, read-only except `requests.status`. Paging is
+no login since 9 Aug, read-only except `requests.status`.
+
+**Where the call recordings and transcripts are.** `/calls` lists every voice
+call; the `transcript` link on a row opens `/calls/<id>`, which carries the
+facts, the summary, an audio player for the recording, the transcript laid out
+as a conversation, and the tool calls the agent actually made. Both come from
+`interactions` -- `transcript`, `audio_url` -- written by the end-of-call
+report. **Vapi deletes its own recordings after 14 days** and nothing copies
+them to our storage yet, so `audio_url` on an older call is a dead link while
+the transcript beside it stays good. The search box on `/calls` matches
+transcript and summary, works in Hebrew, and puts the term in the URL so a
+search can be sent to somebody.
+
+**Summaries start from 20 Aug, not before.** `analysisPlan.summaryPlan` was
+added to the assistants that day; the 163 calls recorded before it have a null
+summary permanently, because a summary is generated at end of call and cannot be
+backfilled. A row reading "no summary" is an old call, not a fault. Paging is
 `dashboard/components/pager.tsx` and lives entirely in the URL: `?page=` plus
 `?per=` at 10, 25 or 50, ten being the default and the fallback for anything
 off that list. Every filter on every list carries the size, and every size

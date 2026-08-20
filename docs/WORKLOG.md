@@ -11,6 +11,69 @@ conversation that produced it.
 
 ## 2026-08-20
 
+### Call transcripts were already stored; nothing made them readable
+
+Asked to store call transcripts so they can be opened and viewed. Checked before
+building: `interactions.transcript` has existed since migration 001, the
+end-of-call report has filled it since 8 Aug, and 128 of 163 rows have one --
+including this morning's fire call. `audio_url` is populated on 133. The
+dashboard has had a Calls list and a per-call page rendering transcript,
+recording and tool calls since the day it was written, and
+`homies-dashboard.vercel.app/calls` answers 200 with no login.
+
+So the storage half was done and the answer to the request is "it already
+exists". Three things made it not actually usable, and those were the work.
+
+**Every summary was null.** All 163 of them. `interactions.summary` has been in
+the schema since 001 and rendered in the Calls list since that page existed, but
+the end-of-call report only carries a summary when an `analysisPlan` asks for
+one, and no assistant has ever had one. So the list said "no summary" on every
+row and the only way to learn what a call was about was to open it and read.
+
+Added `analysisPlan.summaryPlan` to the shared assistant payload in
+`vapi_sync.py`: one sentence, at most two, **in the language the call was
+conducted in** -- Vapi's stock prompt answers in English, which is wrong twice
+over when the calls are Hebrew and the staff reading the list are Israeli. It
+asks for what the caller wanted and what happened to it, the reference number if
+one was opened, and to say plainly when nothing was resolved rather than
+narrating the conversation.
+
+Going forward only. Nothing backfills the 163 existing rows -- the summary is
+generated at end of call and that moment has passed for all of them.
+
+**The transcript rendered as one monospace blob.** Vapi writes one speaker per
+line prefixed `AI:` or `User:` and wraps nothing, so a long answer is a single
+very long line. Technically viewable, unreadable in practice, and Hebrew ran
+left-to-right inside a code font. The detail page now parses it into turns and
+renders them with the chat-bubble styles the WhatsApp conversations page already
+had -- `dir="auto"` per bubble, so Hebrew goes right-to-left and a reference
+number stays left-to-right inside it. A line with no recognised prefix appends
+to the turn above rather than being dropped, which is what happens whenever
+speech contains a newline. If fewer than two turns parse, the raw block is still
+rendered: an unparsed transcript must stay readable, and a page showing nothing
+would look like a call where nothing was said.
+
+**There was no way to search them.** A stored transcript nobody can search is an
+archive, not a record. Added a search box on `/calls` matching `q` against
+transcript and summary, as a GET form so the search lands in the URL and can be
+linked, bookmarked or sent to somebody. It survives a tab switch. PostgREST `or`
+syntax characters are stripped from the term before it reaches the filter, or
+someone searching `255-1013-26, elevator` gets a parse error instead of results.
+Hidden on the No answer and Links sent tabs, which read `call_outcomes` and have
+no transcript to search.
+
+**Testing.** All four assistants confirmed carrying `summaryPlan.enabled` and
+`artifactPlan.recordingEnabled` after the push. Dashboard `next build` clean, 9
+routes. Search exercised against live data with the **anon** key, so it is
+proven to work under the dashboard's own RLS rather than under a service key:
+`smoke` -> 1 call (this morning's), `elevator` -> 12, `מעלית` -> 2,
+`255-1013` -> 0 (reference numbers are spoken as words, not digits, so they are
+not findable this way -- worth knowing before somebody tries).
+
+Two transient Vapi failures during the pushes -- an `IncompleteRead` on a list
+and a 500 on an update -- both fine on retry. Worth remembering before
+diagnosing a real fault.
+
 ### A fire was reported and the system recorded nothing
 
 A test call at 08:05: the caller says black smoke is coming out of a window and

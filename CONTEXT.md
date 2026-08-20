@@ -25,6 +25,13 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**Check what already exists before building it.** Asked on 20 Aug to store call
+transcripts so they could be viewed: they had been stored since migration 001,
+filled since 8 Aug, and rendered on a live dashboard page the whole time. The
+real work was three gaps that made the existing thing unusable -- no summaries,
+an unreadable layout, no search. Reading first turned a rebuild into an
+afternoon.
+
 **An emergency must leave a ticket, not just a transfer.** Write first, then
 transfer — in the prompt, and enforced in `transfer_to_human` regardless of what
 the prompt achieved. A transfer is a note in `call_outcomes`; nothing searches

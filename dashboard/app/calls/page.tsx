@@ -15,22 +15,53 @@ const TABS = [
 // Tabs and pager both go through the shared component now, so the only local
 // concern left is that switching view keeps the rows-per-page and drops the
 // page number: page four of "all calls" is not page four of "no answer".
-function tabHref(view: string, size: number) {
+function tabHref(view: string, size: number, search?: string) {
   const q = new URLSearchParams();
   if (view !== 'all') q.set('view', view);
   const per = perParam(size);
   if (per) q.set('per', per);
+  // A search survives a tab switch. Looking for "elevator" and then narrowing
+  // to inbound is one thought, and losing the word halfway through it is the
+  // kind of small betrayal that stops people using a filter at all.
+  if (search) q.set('q', search);
   const s = q.toString();
   return s ? `/calls?${s}` : '/calls';
 }
 
-function Tabs({ view, size }: { view: string; size: number }) {
+function Tabs({ view, size, search }: { view: string; size: number; search?: string }) {
   return (
     <nav className="tabs">
       {TABS.map(([key, label]) => (
-        <a key={key} href={tabHref(key, size)} className={view === key ? 'on' : ''}>{label}</a>
+        <a key={key} href={tabHref(key, size, search)} className={view === key ? 'on' : ''}>{label}</a>
       ))}
     </nav>
+  );
+}
+
+/**
+ * Search what was said.
+ *
+ * A stored transcript nobody can search is an archive, not a record: the call is
+ * "in there somewhere" and finding the one where a resident mentioned the lift
+ * means opening them one at a time.
+ *
+ * A GET form, so the search lands in the URL — linkable, bookmarkable, sendable
+ * to somebody else, and it survives the back button. `q` is matched against the
+ * transcript AND the summary: the summary is the sentence a person remembers,
+ * the transcript is where the words actually are.
+ */
+function Search({ view, size, search }: { view: string; size: number; search?: string }) {
+  return (
+    <form method="get" action="/calls" className="search">
+      {view !== 'all' && <input type="hidden" name="view" value={view} />}
+      {perParam(size) && <input type="hidden" name="per" value={perParam(size)!} />}
+      <input name="q" defaultValue={search ?? ''} dir="auto"
+             placeholder="Search what was said - Hebrew or English" />
+      <button type="submit">Search</button>
+      {search && (
+        <a href={tabHref(view, size)} className="muted" style={{ fontSize: 13 }}>clear</a>
+      )}
+    </form>
   );
 }
 
@@ -130,8 +161,8 @@ async function LinksSent({ page, size }: { page: number; size: number }) {
   );
 }
 
-async function CallList({ view, page, size }: {
-  view: string; page: number; size: number;
+async function CallList({ view, page, size, search }: {
+  view: string; page: number; size: number; search?: string;
 }) {
   const direction = view === 'inbound' || view === 'outbound' ? view : undefined;
   const [from, to] = pageRange(page, size);
@@ -140,6 +171,14 @@ async function CallList({ view, page, size }: {
     .select('id,external_call_id,direction,caller_phone,summary,transcript,disposition,duration_seconds,latency_ms,started_at', { count: 'exact' })
     .eq('channel', 'voice');
   if (direction) q = q.eq('direction', direction);
+  if (search) {
+    // Strip the characters PostgREST reads as `or` syntax before they reach the
+    // filter. A comma or a bracket typed into the box would otherwise come back
+    // as a parse error instead of results, and somebody searching for
+    // "255-1013-26, elevator" has done nothing wrong.
+    const safe = search.replace(/[,()\\]/g, ' ').trim();
+    if (safe) q = q.or(`transcript.ilike.%${safe}%,summary.ilike.%${safe}%`);
+  }
   const { data, error, count } = await q.order('started_at', { ascending: false }).range(from, to);
 
   return (
@@ -173,9 +212,14 @@ async function CallList({ view, page, size }: {
           </table>
         ) : !error && (
           <div className="empty">
-            {direction ? `No ${direction} calls recorded yet.` : 'No calls recorded yet.'}<br />
+            {search
+              ? <>Nothing said in a call matches &ldquo;{search}&rdquo;.</>
+              : direction ? `No ${direction} calls recorded yet.` : 'No calls recorded yet.'}
+            <br />
             <span style={{ fontSize: 13 }}>
-              End-of-call reports were wired on 8 Aug; rows appear here from the next call placed.
+              {search
+                ? 'Only calls with a transcript can match, and the oldest calls have none.'
+                : 'End-of-call reports were wired on 8 Aug; rows appear here from the next call placed.'}
             </span>
           </div>
         )}
@@ -187,17 +231,23 @@ async function CallList({ view, page, size }: {
 
 export default async function Calls({
   searchParams,
-}: { searchParams?: { view?: string; page?: string; per?: string } }) {
+}: { searchParams?: { view?: string; page?: string; per?: string; q?: string } }) {
   const view = searchParams?.view ?? 'all';
   const page = pageFrom(searchParams);
   const size = sizeFrom(searchParams);
+  const search = searchParams?.q?.trim() || undefined;
+  // The two outcome views read call_outcomes, which carries no transcript, so
+  // the box there would be a search that silently does nothing. Shown only
+  // where it actually searches something.
+  const searchable = view !== 'no_answer' && view !== 'links';
   return (
     <>
       <h1>Calls</h1>
-      <Tabs view={view} size={size} />
+      <Tabs view={view} size={size} search={search} />
+      {searchable && <Search view={view} size={size} search={search} />}
       {view === 'no_answer' ? <NoAnswer page={page} size={size} />
         : view === 'links' ? <LinksSent page={page} size={size} />
-        : <CallList view={view} page={page} size={size} />}
+        : <CallList view={view} page={page} size={size} search={search} />}
     </>
   );
 }
