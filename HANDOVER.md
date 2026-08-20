@@ -572,6 +572,16 @@ handset.**
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
 
+**Finishing a task means updating three files, and a hook says so.**
+`scripts/check_briefing_logged.sh` runs on Stop and refuses to end a turn whose
+change set touches anything substantive without touching **CONTEXT.md and
+HANDOVER.md**. It blocks each change set once, records the fingerprint in
+`.git/briefing-nagged`, and cannot loop. Enforcement is switched on in
+`.claude/settings.local.json` (gitignored — this repo is public and a cloner
+should not inherit a hook); the check itself is committed and runs by hand:
+`bash scripts/check_briefing_logged.sh`. **If it fires and one of the three
+really needs nothing, write the line saying so** rather than bypassing it.
+
 ### Known defects — six still open, sixteen fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —

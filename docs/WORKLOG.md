@@ -95,6 +95,34 @@ are open in their building and never what any of them is**, and **memory is
 within the call only** — no storage, no identity surface, and it works on a web
 call with no number attached.
 
+### The logging rule stops depending on me remembering it
+
+Asked for a third time, and correctly — twice was already twice too many. So it
+is no longer an instruction, it is a gate.
+
+`scripts/check_briefing_logged.sh` runs when a turn finishes. It looks at
+whichever change set is live — uncommitted work if there is any, otherwise the
+last commit — and if that set touches anything substantive without touching
+**CONTEXT.md and HANDOVER.md**, it refuses to let the turn end and says which are
+missing. `.env` and the worklog do not count as substantive: the worklog is the
+one that never gets forgotten, and `.env` is gitignored.
+
+**It cannot loop, and that was the design constraint.** Every block is
+satisfiable in the same turn — edit the two files and either the working tree
+carries them or the follow-up commit does. And each distinct change set is
+blocked exactly **once**: the fingerprint goes in `.git/briefing-nagged`, so a
+turn that only answers a question is never blocked by a commit that was already
+flagged.
+
+The check is committed because it documents the convention; the choice to enforce
+it lives in `.claude/settings.local.json`, which is gitignored — this repository
+is public and a hook that fires on a stranger's machine because they cloned it is
+rude. Anyone can still run `bash scripts/check_briefing_logged.sh` by hand.
+
+Tested all four ways before wiring it: blocks with the briefing files stale,
+stays silent once both are touched, emits valid JSON, and stays silent on a
+second run against the same change set.
+
 ### Reading the call instead of the transcript
 
 "The building lookup is still not working." Vapi records the arguments the agent

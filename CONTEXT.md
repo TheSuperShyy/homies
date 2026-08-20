@@ -195,6 +195,17 @@ who had just declined a transfer. Any rule of that shape needs the case it was
 never meant to cover written into it — a question asked and answered is a
 complete call. Decided 19 Aug.
 
+**Every task is logged in three places, and a hook enforces it rather than
+memory.** `docs/WORKLOG.md` for the chronology, `CONTEXT.md` for any standing
+decision it settles, `HANDOVER.md` for anything a fresh session would act on
+wrongly. Asked for three times; the first two were instructions and both were
+broken, most damagingly on 19 Aug when the live Vapi account changed and both
+briefing files kept naming the retired one. `scripts/check_briefing_logged.sh`
+now blocks the end of a turn whose change set touches something substantive
+without touching CONTEXT.md and HANDOVER.md. **If one of the three genuinely
+needs nothing, open it and say why in a line** rather than skipping it — the
+check is satisfied by an honest note, not only by a change.
+
 **A rule the model follows most of the time is not a guard.** Where the cost of
 disobedience is a resident being told something untrue, the check goes where it
 can read what actually happened — the workflow, the tool output, the execution —

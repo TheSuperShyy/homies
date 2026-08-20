@@ -105,3 +105,7 @@ dashboard/.next/
 # Written by `vercel link` on first deploy. Project and org IDs, not secrets,
 # but they tie this checkout to one Vercel account and do not belong in git.
 dashboard/.vercel/
+
+# Personal Claude Code settings. The check itself is committed in scripts/;
+# only the choice to enforce it is local, so a public clone runs no hooks.
+.claude/settings.local.json
