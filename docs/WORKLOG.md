@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-08-20
 
+### The way into a call was the least visible thing on the page
+
+The Calls list's only clickable element was the word `transcript`, styled as
+plain text because the stylesheet sets `a { color: inherit; text-decoration:
+none }`. So the one action on every row did not look like an action.
+
+Now a bordered `View call` button, and shown on **every** row rather than only
+rows with a transcript: the page also carries the recording, the outcome and the
+tool calls, so a call that produced no words still has something to look at --
+the 6-second Cartesia failure on 19 Aug being exactly the row somebody would
+want to open.
+
 ### The chat bot invented a reference number and wrote nothing
 
 Asked for a responsive bot, so the bot was measured first rather than improved

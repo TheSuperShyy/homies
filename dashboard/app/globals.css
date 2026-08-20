@@ -97,6 +97,16 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); 
 }
 .status-edit button.pill:hover { color: var(--accent); border-color: var(--accent); }
 .empty { padding: 34px; text-align: center; color: var(--muted); }
+/* A row action that reads as one. The bare "transcript" link was the only
+   clickable thing in the table and did not look clickable, so the way into a
+   call was the least visible element on the page. */
+.btn-sm {
+  display: inline-block; padding: 4px 11px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  font-size: 13px; line-height: 1.5; white-space: nowrap;
+}
+.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 /* The transcript search. Sits under the tabs, wraps on a narrow screen, and the
    input takes the slack so a long Hebrew phrase stays readable while typing. */
 .search { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; flex-wrap: wrap; }

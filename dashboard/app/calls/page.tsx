@@ -205,7 +205,11 @@ async function CallList({ view, page, size, search }: {
                   <td className="mono" style={{ color: c.latency_ms > 800 ? 'var(--review)' : undefined }}>
                     {c.latency_ms ? `${c.latency_ms}ms` : '—'}
                   </td>
-                  <td>{c.transcript && <a href={`/calls/${c.id}`}>transcript</a>}</td>
+                  {/* Shown on every row, not only ones with a transcript: the
+                      page also carries the recording, the outcome and the tools
+                      the agent called, so there is something to see even on a
+                      call that produced no words. */}
+                  <td><a className="btn-sm" href={`/calls/${c.id}`}>View call</a></td>
                 </tr>
               ))}
             </tbody>

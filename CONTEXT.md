@@ -25,6 +25,10 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**If a row has an action, it looks like one.** The dashboard's global `a {
+color: inherit; text-decoration: none }` makes every link invisible as a link,
+so anything clickable in a table needs `.btn-sm` or it reads as text.
+
 **A tool that returns success must say what it did NOT do.** `verify_address`
 told the model to call it before `open_request` and never said it opens nothing
 itself, so a successful check read as the job being finished and the model

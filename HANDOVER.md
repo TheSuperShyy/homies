@@ -79,6 +79,9 @@ the transcript beside it stays good. The search box on `/calls` matches
 transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
+**Every row in `/calls` has a `View call` button**, including rows with no
+transcript -- the detail page still shows the recording, outcome and tool calls.
+
 **The call page is two columns** -- conversation left, summary / recording /
 details / tools right -- collapsing to one column under 900px with the sidebar
 first. The transcript scrolls inside its own pane; do not remove that cap
