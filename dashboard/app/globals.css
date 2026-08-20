@@ -4,12 +4,17 @@
   --bg: #f7f7f8; --panel: #fff; --line: #e4e4e7; --ink: #18181b;
   --muted: #71717a; --accent: #1d4ed8;
   --open: #b45309; --progress: #1d4ed8; --done: #15803d; --review: #b91c1c;
+  /* The row action. A deep orange on white so 13px text still clears AA;
+     the dark theme goes brighter and flips the label to near-black, because
+     the same orange that reads well on white is too dim on #101012. */
+  --action: #c2410c; --action-ink: #fff; --action-hover: #9a3412;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #101012; --panel: #18181b; --line: #27272a; --ink: #f4f4f5;
     --muted: #a1a1aa; --accent: #7aa2ff;
     --open: #f0b429; --progress: #7aa2ff; --done: #4ade80; --review: #f87171;
+    --action: #fb923c; --action-ink: #1c1005; --action-hover: #fdba74;
   }
 }
 * { box-sizing: border-box; }
@@ -101,12 +106,14 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); 
    clickable thing in the table and did not look clickable, so the way into a
    call was the least visible element on the page. */
 .btn-sm {
-  display: inline-block; padding: 4px 11px; border-radius: 7px;
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-  font-size: 13px; line-height: 1.5; white-space: nowrap;
+  display: inline-block; padding: 5px 13px; border-radius: 7px;
+  border: 1px solid transparent; background: var(--action); color: var(--action-ink);
+  font-size: 13px; line-height: 1.5; font-weight: 500; white-space: nowrap;
 }
-.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
-.btn-sm:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn-sm:hover { background: var(--action-hover); }
+/* Not the orange: a focus ring the same colour as the thing it surrounds is
+   invisible, which is the whole job of a focus ring. */
+.btn-sm:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* The transcript search. Sits under the tabs, wraps on a narrow screen, and the
    input takes the slack so a long Hebrew phrase stays readable while typing. */
 .search { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; flex-wrap: wrap; }

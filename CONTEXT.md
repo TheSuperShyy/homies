@@ -25,6 +25,11 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**A filled button needs two colours, not one.** A shade dark enough to carry
+white text on the light theme is too dim on the dark one. Every filled control
+here defines its background AND its label per theme -- see `--action` /
+`--action-ink`.
+
 **If a row has an action, it looks like one.** The dashboard's global `a {
 color: inherit; text-decoration: none }` makes every link invisible as a link,
 so anything clickable in a table needs `.btn-sm` or it reads as text.

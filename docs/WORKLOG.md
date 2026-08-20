@@ -13,6 +13,13 @@ conversation that produced it.
 
 ### The way into a call was the least visible thing on the page
 
+Filled orange, on request. Two `--action` tokens rather than one colour: the
+deep orange that clears AA contrast against white (`#c2410c`, ~5.9:1 with white
+text) is too dim on the dark theme's `#101012`, so dark goes brighter
+(`#fb923c`) and flips the label to near-black. The focus ring stays the blue
+accent -- a ring the same colour as the button it surrounds is invisible, which
+is the entire job of a focus ring.
+
 The Calls list's only clickable element was the word `transcript`, styled as
 plain text because the stylesheet sets `a { color: inherit; text-decoration:
 none }`. So the one action on every row did not look like an action.
