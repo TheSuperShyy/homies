@@ -756,6 +756,24 @@ INTAKE_LINES = [
     # twin testing a flow that does not exist.
     ("אני מצטער לשמוע.", "I'm sorry to hear that."),
 
+    # 20 Aug. The opening turn, where the caller asks for a request and says
+    # nothing about what for. Both of these exist because the line above was
+    # said in answer to "I want to open a ticket" — sympathy for a sentence
+    # describing no misfortune — and the two-way offer was made to somebody who
+    # had already chosen.
+    #
+    # The quoted caller line is an EXAMPLE of what a caller says, not something
+    # the agent ever speaks. It is translated anyway: an English twin whose
+    # examples are Hebrew is teaching a register the English caller will never
+    # produce, and the rule the model infers from it would be about the wrong
+    # language. Same reason the prompt's other quoted callers are translated.
+    ("*אני רוצה לפתוח קריאה*", '*"I want to open a request"*'),
+
+    # The whole of the corrected opening. Short on purpose: it is the only
+    # thing said in that turn, and every word added to it is a word spoken
+    # before anybody knows whether the building is on fire.
+    ("בטח. מה קרה?", "Of course. What's happened?"),
+
     # One sentence carrying both ways out, since 19 Aug. The two used to be
     # separate rungs and the caller had to refuse the first before hearing the
     # second, which read as a script advancing rather than as a person saying

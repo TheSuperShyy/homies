@@ -11,6 +11,60 @@ conversation that produced it.
 
 ## 2026-08-20
 
+### The opening turn apologised for nothing and offered a choice already made
+
+From the 08:05 transcript, the first exchange:
+
+    Caller:  I want I want to open a ticket.
+    Michael: I'm sorry to hear that. I can open a ticket for this or pass it to
+             the office, but they're taking a lot of calls at the moment. So
+             that would be a wait. Which would you prefer?
+    Caller:  Want to open a ticket?
+
+The caller's reply is the measurement. They repeated themselves as a question,
+because they had been asked to choose something they had just chosen.
+
+Two things fired that should not have, and both came from the same section --
+"Never hand somebody over without offering them something first". That section
+described *what* to say beautifully and never said *when*, so the model applied
+it to the first sentence of the call.
+
+**The sympathy line has a precondition it never stated.** *אני מצטער לשמוע*
+answers a misfortune. "I want to open a ticket" is not one -- nothing had been
+described yet. Sympathy for a sentence that describes nothing is the clearest
+possible tell that a phrase was reached for rather than meant, which is exactly
+the "not human" complaint from 19 Aug in a new place.
+
+**The two-way offer is for a problem that might not fit in a ticket** -- a lost
+parcel, CCTV, a neighbour. It is the alternative to a transfer. It is not for
+somebody who has asked for a ticket, and it can never be right in the opening
+turn, because until they say what happened there is nothing to weigh.
+
+Both now carry an explicit gate. The offer section opens with when it applies
+and two nevers; the sympathy line says you can only be sorry about something you
+have been told.
+
+**And the path that was missing entirely.** Nothing in the prompt covered a
+caller who asks for a request without saying why -- so the model improvised, and
+then asked which building. New section, "When they ask for a request without
+saying why": one question, *בטח. מה קרה?*, and nothing else in that turn.
+
+Not the building, explicitly. What happened comes before where it happened,
+because it decides whether this is an emergency -- and on this very call the
+building was asked for first and the caller had to volunteer, several turns
+later and unprompted, that there was black smoke coming out of a window.
+
+**The English twin refused to build**, which is the safety property doing its
+job: two new Hebrew passages had no entry in the substitution table. Both added,
+including the quoted caller line -- an English twin whose *examples* are Hebrew
+teaches a register the English caller will never produce.
+
+**Testing.** Hebrew pushed, English rebuilt (40 passages + 2 section blocks, no
+Hebrew remaining) and pushed. Then both live assistants read back from the API
+and checked for five markers each: the new section, the question in its own
+language, the offer gate, the sympathy precondition, and the morning's
+write-then-transfer emergency rule. Ten of ten present.
+
 ### Call transcripts were already stored; nothing made them readable
 
 Asked to store call transcripts so they can be opened and viewed. Checked before

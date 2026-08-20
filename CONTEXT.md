@@ -25,6 +25,15 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**A rule that says what to say must also say when.** The intake prompt's
+two-way offer was written with great care about its wording and nothing about
+its trigger, so on 20 Aug the model opened a call with it -- apologising to
+somebody who had described no misfortune and offering a ticket to somebody who
+had just asked for one. Every section that scripts a sentence needs the
+conditions under which it fires, and at least one explicit *never*. This is the
+sibling of the rule already here: any rule banning a kind of speech gets an
+example of the speech still wanted.
+
 **Check what already exists before building it.** Asked on 20 Aug to store call
 transcripts so they could be viewed: they had been stored since migration 001,
 filled since 8 Aug, and rendered on a live dashboard page the whole time. The

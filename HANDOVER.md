@@ -410,6 +410,14 @@ carries the account-5 ids, so it reaches the rebuilt twin. **`vapi_en.py intake
 --dry` is the health check**; it exits loudly whenever a Hebrew fixed line
 changes, and the fix is always the table, never the check.
 
+**Changed 20 Aug — the opening turn.** A caller who asks for a request without
+saying why now gets one question, *בטח. מה קרה?* / "Of course. What's happened?",
+and nothing else in that turn: not the building, not sympathy, not the choice
+between a request and the office. The two-way offer and the "I'm sorry to hear
+that" line each carry an explicit gate now, because neither had one and both
+fired on the first sentence of a call. Both twins verified live against the API
+after the push.
+
 **Changed 18 Aug — ticket numbers are Homies' format.** New tickets are minted
 `255-NNNN-YY` (migration 020), the shape every call in OXS already carries: their
 code for Homies, our serial, the year in two digits. First one was `255-1047-26`.
