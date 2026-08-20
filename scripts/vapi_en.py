@@ -334,6 +334,14 @@ starts, finish it); between the characters of a reference number."""),
 ]
 
 DEBT_LINES = [
+    # 20 Aug. The four-step answer to "I'm not paying while the lift is
+    # broken", which replaced a section that told the agent to acknowledge
+    # the fault and transfer. Not a word-for-word gloss: the same four moves
+    # said the way an English-speaking collections agent says them, which is
+    # what a twin is for.
+    ('    אני שומע. המעלית בבניין עדיין לא תוקנה — אני רושם את זה עכשיו כדי שהמשרד\n    יטפל. והכסף של הוועד הוא בדיוק מה שמממן את התיקון הזה, אז ה־450 של יולי\n    עוזר להזיז אותו. אפשר לשלוח קישור?',
+     "    I hear you, the lift in your building still isn't fixed. I'm logging\n    that now so the office picks it up. And the committee money is exactly\n    what pays for that repair, so the four hundred and fifty for July\n    actually helps get it moving. Can I send you the link?"),
+
     # Identity. Both twins are Michael since 5 Aug; this strips the Hebrew
     # spellings an English voice cannot say.
     ("You are Michael (מיכאל), the AI voice assistant of Homies (הומיז), a building",

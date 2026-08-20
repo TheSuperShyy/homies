@@ -79,6 +79,11 @@ the transcript beside it stays good. The search box on `/calls` matches
 transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
+**The debt agent no longer transfers on "the lift isn't fixed".** It works
+the objection first -- log the fault, say that the committee money funds the
+repair, ask again -- then one smaller ask, then hands over. Changed 20 Aug,
+both twins live, **not yet heard out loud.**
+
 **Pagination sits above every table**, not below, on calls, tickets,
 conversations and debts. It hides itself when the whole list fits on one page.
 

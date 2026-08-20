@@ -25,6 +25,18 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**The debt agent works an objection before handing it over.** Changed 20 Aug
+from the opposite. "I'll pay when the lift is fixed" is a condition, not a
+refusal, and transferring on it turns the commonest objection in the business
+into an automatic zero. Four moves in one turn -- say it back, open the request,
+say that the committee money is what pays for the repair, ask again -- then one
+smaller ask, then stop. Never argue the fee, never say the two are unrelated.
+
+**Pressing is about specificity, not volume.** Every escalation in that ladder
+gets easier for the resident to say yes to, not harder: full amount, then a
+date or a standing order, then a person. An agent that repeats the same ask
+louder is the one residents complain about.
+
 **One filled control per screen.** The orange `View call` is the row action;
 everything else that clicks — Newer/Older, tabs, the size pills — is outlined.
 Two filled colours competing means no primary action.
