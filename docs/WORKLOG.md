@@ -9,6 +9,615 @@ conversation that produced it.
 
 ---
 
+## 2026-08-23
+
+### The bot was silencing itself on every new conversation
+
+Found in the first minute of the bot evaluation the user asked for, by the
+evaluation itself: the harness's very first greeting got no reply, and the
+execution showed `_handedOver: true` on a brand-new conversation nobody had
+touched.
+
+**Chatwoot assigns every new conversation on a bot-attached inbox to the agent
+bot itself** -- `meta.assignee` is the bot, `assignee_type: "AgentBot"`. The
+takeover gate written on the 21st asked only "is anyone assigned?", and the bot
+counts as anyone. So every conversation created after the bot was linked
+started life handed-over, and the bot never spoke. It had gone unnoticed for
+two days because every test so far ran on conversation 1, which predates the
+linking -- the one conversation in the system the bug could not touch.
+
+Fixed in both places that read the assignee: the WhatsApp workflow's gate and
+the handback workflow's filter now treat only a **User** assignee as a
+takeover (`assignee_type === 'User'`, with "has no outgoing_url" as the
+fallback discriminator -- the bot's assignee object carries its webhook URL, a
+person's never does). Smoke-tested on a bot-assigned conversation: menu in
+3.2s. The handback fix matters as much: without it, the scheduler would have
+"handed back" every bot-owned quiet conversation every 15 minutes, forever.
+
+Also noticed on the way: the agent bot's `outgoing_url` -- including the
+webhook secret in its query string -- is embedded in `meta.assignee` on every
+webhook payload Chatwoot sends. Internal-only today, but it means the secret
+appears anywhere those payloads get logged.
+
+### The evaluation ran, ten judges read it, and the verdict is one sentence
+
+**The bot's manners are good and its refusals hold; its promises are hollow.**
+All 18 scenarios completed (45 turns, replies in 3.8-10.1s). Ten agents -- one
+judge per requested section, a truth-verifier, a completeness critic over the
+other nine -- produced 85 findings: 34 high, 31 medium, 20 low. Published as
+the "Homies Bot Field Test" artifact; transcripts and panel JSON in the session
+scratchpad.
+
+What held: no grovelling under "גנבים", the neighbour's debt refused, a foreign
+ticket ref leaked nothing, both injection attempts bounced, the balance
+question hit an identity gate, Hebrew register genuinely Israeli, menu and
+canned flows exact.
+
+The run's defining facts, each verified against tool calls and the database:
+
+- **open_request was called zero times.** Three residents were told their leak
+  "went to the team"; no ticket existed. The prompt's own banned sentence shape
+  ("אני פותח קריאה על...") appeared verbatim.
+- **Three of four "מעביר לצוות" lines had no transfer_to_human behind them**,
+  including the scenario whose entire point was an explicit request for a
+  human. The only real transfer was the gas emergency.
+- **The model fabricated ticket number 255-1048-26 -- the exact number the
+  prompt's own cautionary tale quotes.** The war story handed the model a
+  realistic number to reuse. The rescue caught it, then delivered the resident
+  NOTHING: reply null after 10.1s, and the rescue's DB row landed only after
+  the scenario's snapshot (exactly one such row existed at cleanup).
+- **Post-tool amnesia**: after verify_address or transfer_to_human ran, the
+  bot asked for the building it had just been given (gas emergency) and for an
+  apartment given two turns earlier (duplicate).
+- **The "עוד משהו?" options list the prompt trusts the workflow to send never
+  fired once** -- the prompt forbids the model to ask, the node never sends, so
+  every conversation ends on a dead line.
+- **Balance is undiscoverable**: dropped from the menu in the Chatwoot move and
+  enumerated nowhere.
+- The gas transfer fired **before any address existed** and nothing attached
+  the address afterwards -- the team gets an emergency with no location.
+
+The critic also corrected the panel: empty `db_requests` is not evidence about
+transfers (they never write that table; the missing tool calls are the
+evidence), and the "truncated tool descriptions" finding was the capture
+script's own 500-char cut, not the live config.
+
+Test data cleaned: 68 messages, 1 request, 2 interactions, the balance fixture
+(resident + charge), and all 18 synthetic Chatwoot contacts. Only the real
+conversation 1 remains.
+
+### The report was rewritten per section, and phantom handovers downgraded
+
+Two revisions on the user's feedback. First, the report page was rebuilt in
+plain language: per section, "what worked / what's broken / the fix" as short
+bullets, with the judges' full prose collapsed underneath.
+
+Second, a call the owner made and the report now carries: **the phantom
+handover is a warning, not a failure.** Reasoning: with Chatwoot in the path,
+every conversation sits in the inbox where staff can read and answer it inside
+WhatsApp's 24-hour service window -- so a missing transfer_to_human record no
+longer strands a resident the way it did when n8n answered Meta directly. The
+warning text keeps the two conditions under which it becomes a real failure
+again: nobody watching the inbox, or the 24-hour window passing. The
+recommendation kept alongside: wire the transfer line to also flag the
+conversation in Chatwoot (assign or label), so promised handovers stand out
+from ordinary chats instead of relying on inbox patrol.
+
+The ranking of worst findings is now: ghost tickets, the silent reply,
+dead-end endings.
+
+### Dead-end endings: the cure was built, nothing ever fed it
+
+The report's finding #3, fixed at the owner's direction. The follow-up lane —
+"Dead end reply?" -> "Options again" -> "Send menu", complete with the menu
+content and the exact Send-menu node that already serves the greeting — had
+**no incoming edge**. An orphan since the cutover rewrite; zero firings in 45
+field-test turns, exactly as the report measured.
+
+Three changes, live: (1) the missing wire — Send now feeds "Dead end
+reply?", so every posted reply reaches the checker; (2) the owner's phrasing —
+the follow-up asks "אפשר לעזור בעוד משהו?" like a person, with the same three
+buttons under it; (3) a handover guard — no follow-up menu when the sent
+reply announces a transfer to a human ("אני מעביר..."), because "anything
+else?" right after "a person is taking over" is wrong tone and its third
+button would invite a second transfer.
+
+The wire alone wasn't enough: the checker's original conditions referenced
+$('Hand over instead') bare, and when that node hadn't run the expression
+threw and the If silently evaluated false — the same never-exercised-
+expression class as the backstop's .all() bug this morning. Both conditions
+were rebuilt on $json.content (Send's own response carries the sent text), no
+cross-node references at all.
+
+Verified live, three ways: a thanks close got the reply and then the
+follow-up question with buttons; an explicit human request got the transfer
+line and stayed quiet; and the classic ticket flow that used to stop cold on
+"רשמתי. זה עובר לצוות" now shows three fixes in one thread — the model's
+invented number was caught, the rescue lane opened a REAL ticket
+(255-1083-26 in the test) and told the resident the real reference (the
+morning's null-text fix at work), and the thread ended with the follow-up
+question instead of a closed line. Test data cleaned (7 conversations,
+23 messages, 3 interactions, 2 call_outcomes, 1 rescue request). Rollbacks:
+wa-before-deadend.json / wa-before-deadend2.json. Report updated; the
+open-list ranking is now: ghost tickets (root), then the smaller items.
+
+### The emergency tone flipped from commanding to calming
+
+The owner read the retest transcripts and corrected the spec: the bot must
+NOT open every danger report by ordering a call to 102. New order, applied to
+the live prompt (the section's third rewrite today, drafted again by a
+three-writer/three-judge panel — the safety-first draft won 2:1, with grafts
+from the losers): (1) confirm first whether it's really serious, with one
+specific answerable question — the resident assesses, the bot never declares
+severity in either direction ("ייתכן שיש סכנת חיים" is quoted in the prompt
+as the banned move); (2) recognize panic from the writing itself (caps, !!!,
+"הצילו") and be the calm one — acknowledge first, short steady sentences, one
+thing per message; (3) the hotlines 100/101/102/103 are advice for serious
+situations, not a command — "אם המצב חמור, 102 הם הכתובת הכי נכונה"; (4) the
+transfer still really happens and "takes a moment"; (5) ask them explicitly
+not to act on their own or take rash steps; (6) stay in the conversation,
+with the hotline availability said once, gently — not as a chorus.
+
+Round-5 live retest, three scenarios: gas in normal register — acknowledge,
+"הריח חזק ומתפשט, או חלש?", precautions and 102-as-advice only after the
+resident confirmed, transfer plus don't-act-alone; a panicking fire report —
+"אני כאן. קיבלתי — שריפה בבניין. / רואים אש או עשן ממש עכשיו?" and the calm
+one-thing rhythm all the way; an injury — "היא בהכרה?" then 101 as advice.
+The backstop earned its keep twice: on two turns the model promised the
+transfer without calling the tool and "Transfer it anyway" made it real.
+Remaining warts, all minor and listed for later: the model leans on the fixed
+transfer line inside emergencies instead of the "takes a moment to the right
+department" phrasing, one "איזה בניין זו", and an occasional two-details
+question. Test data cleaned (3 interactions, 4 call_outcomes, 2 requests, 16
+messages, conversations 30-32 with contacts). Prompt now 30,158 chars.
+Rollback: wa-before-calmtone.json via patch_wa_emergency3.py --restore.
+Report's update note and retest threads replaced with the calming-tone runs.
+
+### The emergency flow stopped being a cutoff, and promises grew a backstop
+
+The owner's spec, applied to the live bot: an emergency should never end at
+"אני מעביר את זה לצוות, נחזור בהקדם." The new protocol, in the prompt's own
+voice: emergency services first if it's serious (100/101/102/103 matched to
+the hazard), say we're not experts, universally-accepted safety steps only
+with a strict no-diagnosis rule in both directions (no "it's probably X", no
+"that's not dangerous", and no "זה דחוף" either — severity is the emergency
+services' call), say the transfer to the right department takes a moment
+(after the tool actually ran), stay in the conversation asking one thing at a
+time, and close by repeating the emergency-services advice. Cheerful words
+banned near emergencies. Drafted by a three-writer panel with three judges
+(the winning draft needed four fixes, including a severity-gate bug where the
+bot would decide how serious it sounded before pointing at 102).
+
+Three live test rounds forced two more rounds of work:
+
+- **Round 1**: gas — textbook. Injury — no example to copy, so it slipped:
+  promised the transfer without calling the tool, said "זה דחוף", masculine
+  "תדאג", three questions in one message. Fix: an injury mini-example in the
+  prompt plus the both-directions severity ban.
+- **Round 2**: injury — textbook. Water-on-electrical-panel — promised a
+  transfer, no tool call. The prompt had now said "tool before text" twice;
+  this class needed structure, not a third sentence. Fix: **the promise
+  backstop** — a new lane after "Reply usable?": if the outgoing text promises
+  a handover and neither transfer_to_human nor open_request ran, the workflow
+  fires the same debt-tools webhook itself and the reply goes out unchanged.
+  Every spoken handover now leaves a transfer record.
+- **Round 3** exposed two real bugs. The backstop double-fired next to a real
+  transfer: `$('tool').all()` reads the main channel and tool nodes emit on
+  ai_tool, so the check always saw "not run" — switched to `isExecuted`, and
+  the older phantom-ticket check in "Reply usable?" carried the same latent
+  flaw (hidden because open_request had never run once) and got the same fix.
+  And the regression leg caught **the silent reply's mechanism on camera**:
+  the ghost claim fell into the rescue lane, a real ticket was created, and
+  "Hand over instead" evaluated its text to null — Chatwoot sent an empty
+  message. The expression is now String()-wrapped with a hard fallback, and
+  "Send" itself substitutes the fixed transfer line for empty content, so a
+  blank message to a resident is impossible from any lane.
+- **Round 4**: human request — tool ran, backstop silent. Water-electric —
+  the model called the tool itself, full protocol. Normal fault — ordinary
+  flow intact (its turn-2 re-asking is the known, deliberately-open amnesia
+  finding, not a regression).
+
+Transfers, it turns out, write three rows each: an `interactions` row
+(`wa:<phone>`, disposition transfer:emergency), a `call_outcomes` row, and a
+`needs_review` row in `requests` — so a backstopped promise is genuinely
+visible to staff, not just logged. All test data deleted afterwards: 8
+interactions, 10 call_outcomes (the double-fires included), 6 requests, 34
+messages, 10 Chatwoot conversations and contacts (phones ...9020[20-29]).
+
+Prompt is now 29,694 chars (was 27,347). Workflow is 30 nodes (was 26; the
+backstop lane has its own sticky note). Rollback snapshots:
+wa-current-emergency.json (pre-everything), wa-before-backstop.json,
+wa-before-fixups.json — each patch script takes --restore. Report updated
+with a "changed after the report" note and three live retest threads; still
+open by design: ghost tickets, dead-end endings, the Chatwoot assign/label
+flag on transfers.
+
+### The full transcripts are now on the report page
+
+The user asked to see the back-and-forth itself, so the report now ends with
+"The conversations, word for word": all 19 test threads as chat bubbles --
+resident right, bot left -- with the tap-menu buttons rendered as pills, a
+small mono line under each reply showing which tool ran and the latency, the
+one empty reply shown as an explicit red "no reply came back" bubble, and a
+one-line note under each thread saying what it proved. Data comes straight
+from `bot-test-transcript.json` (the probe's capture), untouched.
+
+While wiring it in, the header stats were corrected against that same data:
+the page said "18 conversations"; the truth is 19 scenarios, 33 exchanges,
+across 17 WhatsApp threads (three scenarios deliberately reused one number).
+With the transcripts printed in full the count became checkable, so the stat
+now says "19 scenarios" and the subtitle carries the 33.
+
+Same artifact URL, republished.
+
+Eighteen scripted Hebrew conversations against the live pipeline -- webhook to
+agent to Chatwoot to Supabase -- on synthetic +9725099020xx numbers, so no
+real phone receives anything. Observation only: nothing about the bot is
+edited mid-test; every miss becomes a finding. Sections, per the user's list:
+attitude, grammar, reactions, interaction, request handling, boundaries,
+time-to-human, guidance. A synthetic resident with one unpaid 450 charge was
+planted for the balance scenario and is deleted with the rest afterwards.
+
+---
+
+## 2026-08-21
+
+### Chatwoot is half in the path: token, inbox and a verified callback
+
+Asked what setting up Chatwoot needs. It turned out to be less than the feature
+doc assumed -- it has been installed and running since 9 Aug, so the job is the
+cutover, not the install. Confirmed against Meta first: the app subscription
+still names `n8n-zqvb.../webhook/homies-whatsapp`, so nothing had moved.
+
+**Root SSH, by key.** The box only had a password/key prompt for a key we did
+not hold. Generated an ed25519 pair locally, public half pasted through
+hPanel's web console. It failed twice before it worked, and the reason is worth
+keeping: the existing `authorized_keys` had **no trailing newline**, so `>>`
+glued our key onto the end of the previous one and broke both. `wc -l` said 1
+line and 847 bytes, which is the tell. Split with `sed`, backup left at
+`authorized_keys.bak` -- do not delete it until the original key's owner has
+confirmed they can still get in.
+
+All six containers up, none touched: chatwoot rails/sidekiq/redis/postgres,
+n8n, traefik. 5.8G of 7.9G free.
+
+**The install had one user and no inboxes.** SuperAdmin `clixteam579@gmail.com`
+on account 2, named `CLIX` rather than Homies. Zero inboxes -- the WhatsApp
+channel had never been created, which is the real reason the cutover never
+happened.
+
+**Token minted from the Rails console**, not by hand in the UI, so it never
+crossed a chat window. `CHATWOOT_API_TOKEN`, `CHATWOOT_URL` and
+`CHATWOOT_ACCOUNT_ID=2` in `.env`; `/api/v1/profile` answers 200.
+
+First attempt wrote 197 characters of Rails log into `.env` because `tail -c`
+was used to trim the output. `rails runner` prints deprecation warnings and a
+geoip line to stdout, so anything read from it needs a delimiter, not a
+position. Redone with `<<<TOK ... TOK>>>`, which gave the real 24 characters.
+
+**Which WhatsApp token, settled by asking Meta rather than guessing.** Three
+live in `.env` and `debug_token` separates them:
+
+| variable | type | valid | expires |
+|---|---|---|---|
+| `SYSTEM_USER_ACCESS_TOKEN` | SYSTEM_USER | yes | never |
+| `WHATSAPP_ACCESS_TOKEN` | SYSTEM_USER | yes | never |
+| `WHATSAPP_TOKEN` | USER | **no** | expired |
+
+`WHATSAPP_TOKEN` is dead. Nothing checked yet whether the n8n WhatsApp
+credential is holding it -- if it is, the bot is sending on borrowed time.
+
+**Inbox 1 created**, `Channel::Whatsapp`, provider `whatsapp_cloud`, number
+`+15551781261` ("Test Number", quality GREEN). Creating it moves nothing: Meta
+still delivers to n8n, and deleting the inbox undoes it.
+
+**The callback was proved before Meta was told about it.** Chatwoot's endpoint
+is `{FRONTEND_URL}/webhooks/whatsapp/{phone}` with a 32-character verify token
+in `provider_config`, both now in `.env`. Ran Meta's own handshake against it
+by hand:
+
+```
+right token -> 200, echoes the challenge
+wrong token -> 401
+```
+
+So the one step that silently refuses to save in Meta's UI is already known to
+work.
+
+**The admin password was lost, and there was no way to mail a reset.** The one
+account is the user's own address and the password was gone. With SMTP unset
+there is no forgot-password path at all, so the Rails console is not a shortcut
+here -- it is the only door. Reset to a generated 21-character value, stored in
+`.env` as `CHATWOOT_ADMIN_PASSWORD` beside `CHATWOOT_ADMIN_EMAIL`, and verified
+by `POST /auth/sign_in`: 200, SuperAdmin, administrator on account `CLIX`.
+
+Confirmed while in there: `ENABLE_ACCOUNT_SIGNUP=false` really is set on the
+running container, so the public URL offers no registration form. And
+`MAILER_SENDER_EMAIL` and `SMTP_ADDRESS` are not merely blank, they are unset --
+which is what makes the paragraph above true, and what blocks inviting the 19
+staff.
+
+### Replying IS the takeover, and quiet hands it back
+
+Asked "do I just reply?" -- and the honest answer was no, which was wrong of
+the design, not the question. Chatwoot does not assign a conversation to the
+agent who answers it (its `self_assign?` is a notification-suppression check,
+nothing more), so an agent who replied and walked away would still have the
+bot talking over them.
+
+**Two additions closed it:**
+
+**A human reply now claims the conversation.** The webhook makes this safe:
+the bot's own outgoing messages arrive as `sender.type: "agent_bot"`, a
+person's as `"user"`. New branch in the WhatsApp workflow -- `Sort` flags a
+public human reply, "Human replied?" routes it, "Assign to the replier"
+assigns the conversation to that user. Private notes deliberately do not
+claim. Tested live: agent reply via API -> conversation assigned to Assaf
+Clix in under eight seconds.
+
+**A new scheduled workflow, "Homies — Chatwoot handback"** (IVNR5iNn7bQS8JgP,
+every minute, Asia/Jerusalem): open conversations where the bot is off and
+nothing has happened for **15 minutes** are unassigned and stripped of
+`bot-off`. 15 was chosen over the proposed 2 -- `last_activity_at` only moves
+on messages, so a 2-minute limit steals threads from an agent who is typing
+or on the phone. Resolved conversations are never touched: resolved is
+finished, not forgotten.
+
+**The first 22-minute soak caught a bug.** At t+15m the unassign fired and
+the label survived: "Strip the bot-off label" built its URL from
+`$json.conv_id`, but after the Unassign node `$json` is the assignment
+response, so the URL ended in `undefined` and Chatwoot served its 404 page.
+Third instance today of the same class -- an n8n expression reading the wrong
+node's output -- and the fix is the same shape: read the filter node's item
+(`$('Quiet for 15 minutes?').item.json.conv_id`), which the body expression
+had done correctly from the start.
+
+Also learned: **taking over resets the inactivity clock.** Assigning or
+labelling moves `last_activity_at`, so the 15 minutes counts from the
+takeover, not from the resident's last message. Right semantics, free.
+
+The second soak passed clean: reply-claim + label on, fourteen minutes of
+`assignee=Assaf Clix labels=['bot-off']`, and at t+15m both gone in the same
+tick -- `assignee=None labels=[]`. Full cycle proven: human reply claims,
+fifteen quiet minutes hands back, next resident message gets the bot. Chatwoot-side prerequisites unchanged:
+auto-assignment off on inbox 1, `bot-off` label exists, admin credential in
+n8n as "Chatwoot admin (api_access_token)" (`N8N_CHATWOOT_ADMIN_CRED_ID`).
+
+### The bot got a switch a human can see
+
+Asked for "a switch for on and off of the chatbot so a human can turn over" --
+after the third time an empty-looking inbox was read as a broken system. The
+`pending`-status gate shipped this morning was the same capability wired to the
+wrong signal: `pending` is exactly the state Chatwoot's default conversation
+list hides, so every thread the bot was working was invisible by design.
+
+**Now the bot answers by default and three visible acts silence it**, each for
+one conversation only:
+
+| act in the inbox | effect |
+|---|---|
+| assign it to anyone | bot off -- taking a conversation is taking it over |
+| add the `bot-off` label | bot off -- the explicit switch, shows as a chip |
+| resolve it | bot off |
+
+Undo any of them and the bot picks the thread back up. And after every reply
+the bot flips its own conversation to `open` (new node "Show it in Open",
+downstream of Send on purpose -- a thread nobody was answered in must not show
+as handled), so everything is on the default screen with no filter changes.
+
+Two Chatwoot-side changes made first, without which the design fails silently:
+**auto-assignment off** on inbox 1, or Chatwoot assigns an agent on arrival and
+the assignee test kills the bot before it says a word; and the **`bot-off`
+label created** at account level, so the switch is one click rather than typed
+free text.
+
+Tested six states end to end, each payload's conversation object read back from
+Chatwoot rather than hand-written -- a hand-written fixture tests my idea of
+Chatwoot, which is the mistake that produced this morning's outage. Default
+answers; label silences; label removed answers; assigned silences; unassigned
+answers; resolved silences. 6/6, and the "flipped to Open" column confirmed the
+new node fires only when the bot actually replied.
+
+The `pending` filter note written into HANDOVER two hours ago is superseded and
+was rewritten: agents no longer need to touch the filter at all.
+
+### Chatwoot is in the message path, and the cutover had already happened
+
+The bot stopped answering. It was us, in a way none of the planning caught.
+
+**Creating a WhatsApp Cloud inbox in Chatwoot repoints the number.** Chatwoot
+sets a **per-phone-number webhook override** on Meta, and that beats the
+app-level subscription. `GET /{app-id}/subscriptions` still named n8n -- which
+is what was checked, twice, and reported as "nothing has moved" -- while
+`GET /{phone-number-id}?fields=webhook_configuration` told the truth:
+
+```
+phone_number: https://chat.../webhooks/whatsapp/+15551781261   <- wins
+application:  https://n8n-zqvb.../webhook/homies-whatsapp
+```
+
+So the cutover happened silently at inbox creation, hours before the n8n
+changes existed, which is exactly the order the plan says never to do. In
+between, every message reached Chatwoot, was forwarded to n8n, and was thrown
+away by a signature check still looking for Meta's HMAC:
+
+```
+Sort -> {"_reply": "", "_work": false, "_rejected": "unsigned"}
+headers: user-agent: Ruby, x-chatwoot-signature: sha256=...
+```
+
+**Check `webhook_configuration` on the phone number, never the app
+subscription, to learn where a number actually points.**
+
+**Rolled forward rather than back**, on the user's call. And the MCP turned out
+not to be needed: n8n's REST API takes a workflow update, so the four changes
+went in through `PUT /api/v1/workflows/{id}` with the pre-edit JSON saved beside
+the patch script as the rollback (`--restore`).
+
+Three things cost a round trip each:
+
+**The n8n public API accepts only `name`, `nodes`, `connections`, `settings`**
+on a PUT and 400s on anything else -- the GET returns twenty-two keys.
+
+**A URL field needs a leading `=` to be an expression.** Without it the node
+posted to a literal `.../conversations/{{ $('Sort')... }}/messages` and Chatwoot
+answered its 404 page. The body fields already had the `=`; the URL did not,
+because it was assembled in Python and the prefix was lost.
+
+**The webhook node has two outputs**, GET and POST, and POST is index 1. Reading
+`main[0]` of the trigger shows an empty array and looks like a dead execution.
+
+**Chatwoot signs its webhooks after all.** `lib/webhooks/trigger.rb` sends
+`X-Chatwoot-Signature`, HMAC-SHA256 over `${timestamp}.${body}`. It is not
+verified: `require('crypto')` is blocked in the task-runner sandbox and the
+Crypto node cannot prepend a timestamp to the raw bytes. The door is a
+43-character secret on the bot's `outgoing_url`, checked in `Sort`, failing
+closed. Verifying the signature is the obvious hardening later.
+
+**Chatwoot fires five extra events per exchange.** One resident message
+produced `conversation_status_changed`, `conversation_updated`, and both
+`message_created` and `message_updated` for the bot's own reply. Answering that
+last one is an infinite loop, which is why the new `Sort` filters on `event`,
+`message_type` and `private` before it does anything at all.
+
+### Proved end to end, including the thing a webhook could never do
+
+```
+1  in   hello
+2  out  היי, כאן שירות הלקוחות של הומיז. במה אפשר לעזור?
+        [פתיחת קריאת שירות] [מצב קריאה קיימת] [לדבר עם נציג]
+3  in   פתיחת קריאת שירות        <- tapped on a real handset
+4  out  בסדר. מה התקלה?
+```
+
+The tap is the interesting one: Chatwoot discards the button id and forwards
+only the title, so the routing table is now Hebrew strings, and it resolved
+correctly from a real phone rather than a replay.
+
+Supabase logged all four with `phone` in the old bare-digits form -- `Sort`
+strips Chatwoot's leading `+` deliberately, because both writers, every tool
+and 99 existing rows match that shape.
+
+**The per-conversation AI toggle works**, which is the capability the whole
+migration exists for:
+
+| conversation | inbound message | Sort |
+|---|---|---|
+| `open` (a human has it) | יש נזילה בלובי | `_handedOver: true`, silent |
+| `pending` (bot has it) | שלום | `_menu: true`, answered |
+
+One artifact left behind: the run whose `Send menu` 404'd still wrote an
+outbound `messages` row, because `Log reply` sits on a parallel branch rather
+than downstream of the send. Pre-existing, not introduced here, and worth
+fixing -- a logged reply nobody received is a transcript that lies.
+
+### Teams and the agent bot, built ahead of the traffic
+
+Both are inert until Meta repoints, so there was no reason to leave them for
+the risky day.
+
+**Four teams** on account 2, matching the departments in the feature doc:
+Collections (1), Operations (2), Management (3), Service (4), all with
+auto-assign on.
+
+**Agent bot 1, "Homies bot"**, pointed at the existing n8n webhook
+`https://n8n-zqvb.../webhook/homies-whatsapp` -- the same URL Meta uses today,
+which is deliberate: after the cutover the caller changes and the address does
+not. Linked to inbox 1, `AgentBotInbox` confirms `1 | 1 | active`. Its own
+`access_token` is in `.env` as `CHATWOOT_BOT_TOKEN`; that is the credential n8n
+will post replies back with, not the admin token.
+
+One thing to know for the n8n work: a message arriving now would be forwarded
+to n8n and fail there, because n8n still expects Meta's envelope. Nothing
+arrives, because Meta still delivers to n8n directly. The wiring is complete on
+the Chatwoot side and dead on the wire.
+
+### The menu does not survive the move, and Chatwoot's own source says why
+
+Writing the n8n changes meant reading how Chatwoot builds a WhatsApp payload,
+and two things fell out that the feature doc had assumed away.
+
+**Chatwoot builds the interactive payload itself, from its own fields.**
+`base_service.rb` `create_rows` emits `{id, title}` and nothing else, and
+`create_payload` emits `body.text` and nothing else. So the four row
+**descriptions** and the **footer** in today's menu have nowhere to go. The
+list's tap-to-open button is `I18n.t(...list_button_label)` -- account 2's
+locale is `en`, so it would render **"Choose an item"** in English under a
+Hebrew question. The Hebrew locale is no better: `בחר פריט`, masculine
+imperative, straight into the rule that we never gender the listener.
+
+**Anything with 3 or fewer items becomes reply buttons instead**, and buttons
+have no wrapper label at all -- the titles show directly. So the fix is to stop
+at three. `יתרה ותשלומים` is the option that goes. It is also the right one to
+lose: the agent still answers balance questions typed as words, and reading a
+balance out loud is gated on the identity question in PRD 13 that nobody has
+answered.
+
+**Chatwoot throws the tapped button's id away.** `message_content` in
+`incoming_message_service_helpers.rb` reaches for
+`interactive.button_reply.title` and never the id -- with a `TODO` in their
+source admitting it. Today's `Sort` routes on `tapped === 'open'`, so that
+routing has to match the Hebrew **label** instead, which makes those three
+strings load-bearing: reword one in the menu and the flow it starts silently
+stops starting.
+
+Both were found by reading the running container, not by guessing, and both
+would have surfaced as "the menu looks wrong" some minutes after a live
+cutover.
+
+### The n8n changes are written and not applied
+
+`docs/features/12-chatwoot/cutover-n8n.md`. Four changes, ready to paste, with
+the order they have to happen in.
+
+1. **The door.** Meta signs every POST; Chatwoot signs nothing. The HMAC check
+   cannot be kept and must not merely be deleted -- without it the webhook is a
+   public endpoint that files tickets for anyone who finds it, and the phone
+   number in the envelope decides whose ticket. Replaced with a secret in the
+   query string, because an agent bot sends a fixed URL and no custom headers.
+   **Done on the Chatwoot side already**: bot 1's `outgoing_url` now carries
+   `?s=<N8N_WEBHOOK_SECRET>`.
+2. **The parser.** Chatwoot posts every event to the same URL, so the new
+   `Sort` filters on `event`, `message_type` and `private` before doing
+   anything -- answering the bot's own outgoing messages is an infinite loop.
+   And `conversation.status` carries the AI toggle: `pending` means the bot
+   owns the thread, and the instant a human replies Chatwoot flips it to `open`
+   and the bot must fall silent on that conversation and no other. One line,
+   and it is the entire reason for the migration.
+3. **The reply path.** `Send` and `Send menu` post to `graph.facebook.com`. The
+   danger is not that this would fail after the cutover -- it is that it would
+   *work*: the reply reaches the resident and never appears in the conversation
+   staff are watching. Both become one Chatwoot call, authenticated with
+   `CHATWOOT_BOT_TOKEN` rather than the admin token, so replies are attributed
+   to the bot and the inbox can show who said what.
+4. **`scripts/check_whatsapp.py`** gets the new envelope, and is the safety
+   net: it must pass against the new path while the old path is still carrying
+   real messages.
+
+The acceptance test is step 5, not step 4 -- reply as a human in the inbox and
+watch the bot go quiet on that thread alone. That is the capability that could
+not be built on a webhook, and it is the only proof the migration was worth
+doing.
+
+### Stopped short of the cutover, and not for the reason the plan gives
+
+The feature doc frames repointing the callback as risky because inbound
+messages in the switch window are lost rather than queued. On a test number
+with no residents that costs nothing.
+
+The real reason is different: **the minute Meta delivers to Chatwoot, the n8n
+bot stops answering.** Its webhook verifies Meta's HMAC, which Chatwoot does
+not send; its parser reads Meta's envelope, which Chatwoot does not use; and
+both send nodes post to `graph.facebook.com`, so any reply that did get made
+would reach the resident without ever appearing in the conversation the staff
+are watching. Three changes, all inside n8n.
+
+**The n8n MCP is not authorised in this session**, so none of them can be made.
+Repointing now would take WhatsApp down with no way to bring it back before the
+next session. Left where it is.
+
+---
+
 ## 2026-08-20
 
 ### The gender skill goes into the debt agent, where half of it was missing

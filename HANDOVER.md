@@ -1,6 +1,6 @@
 # HANDOVER — Homies, everything you need to take over
 
-**Current as of 2026-08-20.** If you have just been told "read the handover",
+**Current as of 2026-08-23.** If you have just been told "read the handover",
 this file plus `CONTEXT.md` is the whole briefing. Read both, then start
 working. Go to `docs/WORKLOG.md` only when you need to know *why* something
 was decided — it is the chronology with full reasoning, newest first.
@@ -31,9 +31,100 @@ can be dialled), or sends a **WhatsApp message** to one Meta test number.
 inbound + debt, and English twins used for comparison. Hebrew stack is
 ElevenLabs Scribe v2 for speech-to-text and Cartesia Sonic 3 for the voice,
 attached with our own Cartesia key so Vapi bills ₪0 for TTS. WhatsApp messages
-hit **n8n** at `/webhook/homies-whatsapp`, which verifies the Meta signature,
-dedupes on `wamid`, detects language, and runs an AI Agent on OpenRouter with
-a 30-turn memory keyed by phone.
+go **Meta -> Chatwoot -> n8n** since 21 Aug. Chatwoot owns the number and the
+inbox; n8n is its *agent bot*, still at `/webhook/homies-whatsapp`, which checks
+a shared secret in the query string, ignores everything that is not an inbound
+`message_created`, dedupes on Chatwoot's message id, and runs an AI Agent on
+OpenRouter with a 30-turn memory keyed by phone. Replies post back to Chatwoot,
+never to Meta, so the inbox holds both halves of every conversation.
+
+**Chatwoot assigns new conversations to the agent bot itself** (`assignee_type
+"AgentBot"`), and only a **User** assignee counts as a takeover -- both the
+WhatsApp gate and the handback filter check the type since 23 Aug, after the
+bot spent two days silencing itself on every conversation newer than
+conversation 1.
+
+**The WhatsApp bot was field-tested 23 Aug and the findings are unfixed on
+purpose.** 19 live Hebrew scenarios (33 exchanges), 10 judges, 85 findings
+("Homies Bot Field Test" artifact, which now also prints every conversation
+word for word as chat bubbles; verdicts in docs/WORKLOG.md). The short
+version: attitude, refusals and privacy held; the promises were hollow --
+zero open_request calls against three "went to the team" claims, one
+fabricated ticket number (255-1048-26 -- the exact example the prompt's own
+war story quotes), one turn of pure silence, and post-tool amnesia. The
+missing transfer_to_human records behind three of four handover lines are a
+**warning, not a failure -- the owner's call, 23 Aug**: with Chatwoot in the
+path every chat stays answerable in the inbox within WhatsApp's 24-hour
+window; it becomes a real failure again only if nobody watches the inbox or
+the window passes. Worst three by harm: ghost tickets, the silent reply,
+dead-end endings. The owner asked for findings, not fixes: change nothing in
+the prompt or workflow without walking that report first.
+
+**Except the emergency flow — rebuilt later on 23 Aug at the owner's
+request, then re-tuned the same evening from commanding to calming.**
+Emergencies no longer end at the one-line transfer cutoff, and the bot does
+NOT open by ordering a call to emergency services. The prompt's protocol now
+runs: confirm first whether it's really serious (one answerable question —
+the resident assesses; the bot never declares severity in either direction,
+"ייתכן שיש סכנת חיים" is quoted as the banned move); recognize panic from
+the writing (caps, !!!, "הצילו") and be the calm one — acknowledge first,
+short sentences, one thing per message; the hotlines 100/101/102/103 are
+ADVICE for serious situations matched to the hazard ("אם המצב חמור, 102 הם
+הכתובת הכי נכונה"), never a command; "we're not experts"; universally-
+accepted safety precautions only, strictly no diagnosis; transfer to the
+right department "takes a moment" (tool before text); ask them not to act on
+their own or take rash steps; stay in the conversation one question at a
+time, hotline availability said once, gently; cheerful words banned. Two
+structural changes rode along, workflow now 30 nodes: **the promise
+backstop** ("Promised a transfer, made none?" → "Transfer it anyway" →
+"Carry the reply") makes any spoken handover real when the model skipped the
+tool — every transfer writes interactions + call_outcomes + a needs_review
+row in requests, so promises are staff-visible now; and **the silent reply is
+plugged** — its mechanism was "Hand over instead" evaluating its text to
+null (now String()-wrapped with a fallback), plus "Send" substitutes the
+fixed line for empty content, so a blank outgoing message is impossible.
+Also fixed on the way: `$('tool').all()` in main-flow expressions never sees
+ai_tool output — tool-ran checks must use `isExecuted` (the phantom-ticket
+check in "Reply usable?" had this latent bug too; fixed). Verified over four
+live rounds, test data cleaned. Rollback snapshots in the session scratchpad:
+wa-current-emergency.json / wa-before-backstop.json / wa-before-fixups.json,
+each patch script takes --restore.
+
+**Dead-end endings are fixed too (23 Aug, owner's direction).** The
+follow-up lane ("Dead end reply?" → "Options again" → "Send menu") was an
+orphan — no incoming edge since the cutover rewrite — and its checker's
+conditions referenced unexecuted nodes bare, silently evaluating false. Now:
+Send feeds the checker; every reply that ends without a question is followed
+by "אפשר לעזור בעוד משהו?" (owner's phrasing) with the three menu buttons;
+a reply announcing a handover ("אני מעביר...") stays quiet on purpose. Both
+checker conditions read $json.content (Send's own response) — no cross-node
+expression references in If nodes; bare `$('node')` on an unexecuted node
+silently fails the condition. Rollbacks: wa-before-deadend.json /
+wa-before-deadend2.json. Still open by design: ghost tickets at the root
+(the model never calls open_request itself — though the repaired rescue lane
+now opens a real ticket and tells the resident its real number when the
+model fakes a claim), and the Chatwoot assign/label flag on transfers.
+
+**The bot's on/off switch is the natural gesture: replying.** A public human
+reply auto-assigns the conversation to the replier (the workflow does this;
+Chatwoot itself does not), and an assigned conversation is one the bot stays
+out of. The other switches work too: assign by hand, the **`bot-off` label**,
+or **resolve**. The bot's own replies (`sender.type: agent_bot`) and private
+notes never claim. After every bot reply the thread flips to `open`, so
+everything shows on the default screen.
+
+**Quiet hands it back.** "Homies — Chatwoot handback" (IVNR5iNn7bQS8JgP) runs
+every minute: a handed-over conversation silent for **15 minutes** is
+unassigned and stripped of `bot-off`, so the resident's next message gets the
+bot instead of an agent who went home. Taking over resets the clock, and so
+does every reply -- the bot never interrupts mid-conversation. Resolved
+conversations are never handed back.
+
+Held up by: **auto-assignment OFF** on inbox 1 (on, every conversation is
+assigned on arrival and the bot never speaks), the `bot-off` label at account
+level, and two n8n credentials -- bot token for replies, admin token
+("Chatwoot admin", `N8N_CHATWOOT_ADMIN_CRED_ID`) for assignment changes.
+Six-state switch test and reply-claim test passed 21 Aug.
 
 **One writer, reached three ways.** Every write goes through the Supabase Edge
 Function `debt-tools` (13 handlers, `--no-verify-jwt`, authenticated by
@@ -171,13 +262,29 @@ say anyone is being put through.
   paying; a dedicated line cannot reach Vapi.
 - **Payment link delivery.** `send_payment_link` writes a row and stops. OXS
   exposes no payment-link endpoint, so the link still comes from OXS itself.
-- **Chatwoot in the message path.** It is installed and running at
-  `chat.srv1879140.hstgr.cloud` with an admin account, and it is **not** in the
-  message path — Meta still delivers to n8n. Checked 20 Aug. Blocked on a
-  Chatwoot API token in `.env` as `CHATWOOT_API_TOKEN`. Do the cutover while the
-  number is still Meta's test number: repointing the callback has a window where
-  inbound messages are lost rather than queued, and that window is free now and
-  expensive later.
+- **Chatwoot hardening, and the seats.** Chatwoot is live in the path (see
+  above) but three things are unfinished. **SMTP is unset** --
+  `MAILER_SENDER_EMAIL` and `SMTP_ADDRESS` are absent, not blank -- so nobody
+  can be invited and nobody can recover an account; the Rails console is the
+  only door, which means losing root on the VPS means losing Chatwoot. **The 19
+  seats and the routing rules** do not exist: teams 1-4 (Collections,
+  Operations, Management, Service) are created and empty, and nothing routes to
+  them automatically. **The webhook secret is a query-string shared secret**,
+  not a verified signature: Chatwoot does send `X-Chatwoot-Signature`
+  (HMAC-SHA256 over `${timestamp}.${body}`) but n8n cannot check it --
+  `require('crypto')` is blocked in the task-runner sandbox. The account is
+  named `CLIX`, not Homies.
+
+  **The number is Meta's test number and is meant to be replaced.** A swap
+  changes the inbox's `phone_number` and `provider_config` and the callback URL
+  (Chatwoot puts the number *in* the path), and touches n8n not at all -- the
+  cutover removed the last place n8n named the number. **Creating or editing a
+  WhatsApp inbox in Chatwoot repoints the number by itself**, via a
+  per-phone-number `webhook_configuration` override that beats the app-level
+  subscription. Do the n8n side first. Check with
+  `GET /{phone-number-id}?fields=webhook_configuration`, never
+  `GET /{app-id}/subscriptions`, which lies.
+
 - **A running scheduler.** `.github/workflows/oxs-sync.yml` exists — residents,
   arrears and requests at midnight and 15:00 Israel time — but `.github/` is
   untracked, so nothing fires until it is committed to `main` and the six

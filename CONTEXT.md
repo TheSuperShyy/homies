@@ -36,6 +36,43 @@ missing was wrong on 20 Aug because the check used pointed לְךָ and the prom
 writes *lekha*. Unpointed, pointed, and transliterated are three different
 strings for one word.
 
+**Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
+21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
+Meta, which beats the app-level subscription, so the number moves the moment the
+inbox exists -- no separate registration step, no warning. The bot was dead for
+two hours while `GET /{app-id}/subscriptions` still cheerfully named n8n. **To
+learn where a number really points, read
+`GET /{phone-number-id}?fields=webhook_configuration`.** The app subscription is
+not wrong, it is simply outranked.
+
+**n8n changes land BEFORE the Chatwoot inbox is created.** Corrected 21 Aug
+from "before the callback moves", which was the same rule aimed at the wrong
+step.
+The plan's stated risk -- messages lost in the switch window -- is the small
+one, and on a test number it costs nothing. The real one is that the instant
+Meta delivers to Chatwoot the bot goes mute: the webhook verifies an HMAC
+Chatwoot never sends, `Sort` parses an envelope Chatwoot never uses, and both
+send nodes post to `graph.facebook.com`, where a reply reaches the resident but
+never appears in the conversation staff are watching. Rewrite all three, update
+`scripts/check_whatsapp.py`, then repoint. Never the other way round.
+
+**Read a value out of `rails runner` with a delimiter, never a position.**
+It prints a RubyLLM deprecation warning and a geoip line to stdout before your
+output. `tail -c 200` put 197 characters of log into `.env` as an API token on
+21 Aug. Wrap the value in a marker and grep for it.
+
+**n8n does not need the MCP to be edited.** Its REST API takes a workflow
+update: `PUT /api/v1/workflows/{id}` with `N8N_API_KEY`. Two traps -- the PUT
+accepts only `name`, `nodes`, `connections`, `settings` and 400s on the other
+eighteen keys the GET returns; and a URL parameter needs a leading `=` or the
+`{{ }}` in it is sent literally. Always save the pre-edit JSON first; that is
+the rollback.
+
+**Access to the VPS is a key, not a password.** `~/.ssh/homies_vps`, root on
+186.240.147.235. Appending to `authorized_keys` there needs care: the file had
+no trailing newline, so `>>` welded the new key onto the previous one and broke
+both. `printf` a leading newline, or check `wc -l` afterwards.
+
 **GitHub Actions runs the import; the dashboard watches it.** Decided 20 Aug.
 The dashboard is the control surface and never the engine -- the importers are
 Python, they outlive a serverless timeout, and the dashboard holds only the anon
