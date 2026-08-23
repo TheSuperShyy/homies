@@ -1445,20 +1445,50 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // The address as WE write it, when what was said resolves to a building we
     // manage. Added 13 Aug alongside `verify_address`.
     //
-    // Normalising, not refusing. `open_request` is shared with both voice
-    // agents, and only the chat bot has been taught to verify first — making
-    // this reject an unresolvable building would start silently dropping
-    // inbound voice tickets, which is a worse failure than the one it fixes.
-    // The refusal lives where the resident can be asked about it: the bot
-    // calls `verify_address`, hears "we do not manage that street", and says
-    // so. This is the backstop for the ticket that gets filed anyway.
+    // On VOICE this normalises and never refuses: voice agents were never
+    // taught to verify first, and rejecting an unresolvable building would
+    // silently drop inbound voice tickets — a worse failure than the one it
+    // fixes. An unresolved voice building files as said, for a person to read.
     //
-    // Worth it even on its own, because the duplicate guard below matches on
-    // `building` as a string. Two reports of one lobby leak written
-    // `יואב 14` and `רחוב יואב 14 רמת גן` are two buildings to that guard and
-    // one building to everybody else, so the second report mints a second
-    // ticket and dispatches a second van.
-    const building = (await canonicalAddress(said)) || said;
+    // On WHATSAPP this refuses, since 23 Aug. The chat bot was taught a
+    // two-step dance — verify_address, then open_request, then answer — and
+    // the field test showed the model simply does not chain: five live runs,
+    // zero second calls, three invented references read to residents.
+    // Sequencing that must always happen belongs in code, not in a model's
+    // discipline, so the verification now lives HERE: one tool call, nothing
+    // to chain. An address that does not resolve returns the same refusal
+    // vocabulary `verify_address` speaks — the prompt already knows how to
+    // relay every reason — and no ticket is filed, because a ticket against a
+    // building we do not manage is staff time spent on something that does
+    // not exist.
+    //
+    // The canonical form matters even when it changes nothing else, because
+    // the duplicate guard below matches on `building` as a string. Two
+    // reports of one lobby leak written `יואב 14` and `רחוב יואב 14 רמת גן`
+    // are two buildings to that guard and one building to everybody else, so
+    // the second report would mint a second ticket and dispatch a second van.
+    const m = await matchBuilding(said);
+    if (channel(ctx) === "whatsapp" && m.status !== "found") {
+      if (m.status === "street_unknown" || m.status === "empty") {
+        return {
+          ok: true, opened: false, building_found: false,
+          reason: m.status === "empty" ? "need_building" : "street_unknown",
+        };
+      }
+      if (m.status === "need_number" || m.status === "number_off_street") {
+        return {
+          ok: true, opened: false, building_found: false,
+          reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
+          street: m.street.street,
+          numbers_we_manage: m.numbers,
+        };
+      }
+      return {
+        ok: true, opened: false, building_found: false, reason: "ambiguous",
+        candidates: m.candidates.map((b: any) => b.address).slice(0, 5),
+      };
+    }
+    const building = (m.status === "found" ? String(m.building.address) : "") || said;
 
     // ctx first, argument second — outbound the apartment is a fact attached to
     // the call and the model may not overwrite it.
