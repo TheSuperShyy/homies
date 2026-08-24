@@ -1,0 +1,86 @@
+# Maintenance tickets from OXS, every fifteen minutes.
+#
+# WHY THIS IS NOT PART OF `oxs-sync.yml`
+# It used to be its last step, and therefore ran twice a day and only if the
+# arrears sweep in front of it had finished — which is how it went eleven days
+# without running at all: the job kept dying in that sweep and took an
+# eleven-second import down with it. Nothing about a ticket import needs the
+# arrears data, and nothing about a resident asking "what is happening with my
+# leak" waits politely for midnight.
+#
+# It costs three requests: one to OXS, one page-through of `residents` to match
+# on, one bulk upsert. The OXS limit is 60 requests a minute PER KEY, and this
+# uses `OXS_KEY_REQUESTS` while the sweep uses `OXS_KEY_GENERAL`, so the two
+# workflows cannot starve each other however they overlap.
+#
+# NO DAYLIGHT-SAVING GUARD HERE, deliberately. `oxs-sync.yml` needs one because
+# it must land at a particular hour in Jerusalem; an interval does not care what
+# time it is. The two-cron trick would be noise.
+#
+# GITHUB CRON IS BEST-EFFORT. Fifteen minutes is what is asked for, not what is
+# promised — the scheduler has been observed 51 minutes late on this repository.
+# `oxs_last_seen_at` records when a ticket was actually last seen, so the
+# dashboard reports the real freshness rather than the intended one.
+#
+# OXS IS READ-ONLY. One GET, and every write lands in Supabase.
+name: OXS requests
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and report, write nothing"
+        type: boolean
+        default: false
+
+concurrency:
+  group: oxs-requests
+  cancel-in-progress: false   # an 11-second job never needs interrupting
+
+jobs:
+  requests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10       # a normal run is ~15s; this is a hang guard
+
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Write .env from secrets
+        env:
+          OXS_KEY_REQUESTS: ${{ secrets.OXS_KEY_REQUESTS }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # Three values, not six: this importer talks to PostgREST rather than
+          # to Postgres, so it needs no database URL, and it never reads a debt.
+          # Deleted in the always() step below; .gitignore line 2 covers it and
+          # nothing here pushes.
+          for k in OXS_KEY_REQUESTS SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY; do
+            if [ -z "${!k}" ]; then
+              echo "::error::$k is not set as a repository secret."
+              exit 1
+            fi
+            printf '%s=%s\n' "$k" "${!k}" >> .env
+          done
+
+      # No --quiet flag on this one, and it does not need inventing: the script
+      # prints counts, categories and reference numbers, never a resident's name,
+      # phone or balance. Checked before this workflow was written, because the
+      # logs on this repository are public.
+      - name: Import tickets
+        run: |
+          python scripts/oxs_requests_sync.py \
+            ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
+
+      - name: Shred .env
+        if: always()
+        run: rm -f .env

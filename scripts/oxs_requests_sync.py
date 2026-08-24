@@ -31,6 +31,24 @@ the two apart, and the difference matters: under the first reading a call that
 disappears has been resolved, under the second it has not. Until Homies answers,
 a row that stops being returned is left exactly as it is rather than being
 guessed into `resolved`.
+
+Measured 24 Aug and worth the ten seconds it took: 35 calls live against 69
+imported, so 35 of ours had left the feed, three of them within one hour that
+morning. `oxs_last_seen_at` is stamped on every ticket in every run, so "not
+seen since" is now a date rather than an inference, and the day Homies answers
+the question one UPDATE clears the backlog.
+
+WHERE THE PROGRESS ACTUALLY LIVES
+
+`status` is a constant, but `treatmentLog` is not: a list of the dispatcher's
+own notes -- "הועבר לאלון שערים", "בטיפול דוד", "ממתינים לגופים מהקבלן" -- on 13
+of the 35 live calls, with `lastUpdate` carrying a real timestamp on all 35.
+That is the answer to "what is happening with my ticket", and until now none of
+it reached us, so the bot could only ever say "open".
+
+NEWEST FIRST: `lastUpdateNote` equals `treatmentLog[0]` on 13 of 13 and the last
+element only where the list has one. Element 0 is current, the tail is history,
+and the array is stored in their order.
 """
 
 import json
@@ -39,12 +57,16 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OXS = "https://api.oxs.co.il/api/external/v1"
+
+# One stamp for the whole run, set in main(). See its use in build().
+SEEN_AT = None
 
 # Their twelve categories, mapped to the slugs migration 014 constrains `type`
 # to. The Hebrew label is stored beside it verbatim: the slug is for code, the
@@ -195,11 +217,21 @@ def build(call, residents, by_bu):
         "source_platform": ((call.get("platform") or {}).get("label") or "").strip() or None,
         "image_count": len(call.get("images") or []),
         "oxs_created_at": call.get("createdAt"),
+        # Their words, in their order, newest first. See the docstring: this is
+        # the only thing on the record that says a ticket is moving, because
+        # `status` says `open` on every call they have ever served.
+        "oxs_notes": [n for n in (call.get("treatmentLog") or []) if str(n).strip()],
+        "oxs_last_update": call.get("lastUpdate"),
+        # Ours, not theirs. One timestamp for the whole run, so "last seen" sorts
+        # cleanly instead of smearing across the seconds the loop took.
+        "oxs_last_seen_at": SEEN_AT,
     }
 
 
 def main():
+    global SEEN_AT
     apply = "--apply" in sys.argv
+    SEEN_AT = datetime.now(timezone.utc).isoformat()
 
     calls = oxs("/service-calls")
     print("OXS service calls: %d" % len(calls))
@@ -235,8 +267,20 @@ def main():
     unknown = sorted({r["category_he"] for r in rows
                       if r["category_he"] and r["category_he"] not in CATEGORY})
 
+    # WHAT OXS HAS STOPPED SERVING.
+    #
+    # The one number that says something is wrong, and it is not visible from
+    # either side alone: their feed is only ever the open calls, ours is every
+    # call we have ever seen, and the difference is the tickets that left. Not
+    # touched here — see the docstring — but printed every run, because a
+    # backlog that nobody is counting is a backlog nobody notices.
+    gone = known - {r["oxs_ref"] for r in rows}
+
     print("  new: %d   already imported: %d" % (len(new), len(rows) - len(new)))
+    print("  no longer served by OXS: %d of %d we hold "
+          "(may be resolved — status unconfirmed)" % (len(gone), len(known)))
     print("  matched to a resident: %d of %d" % (matched, len(rows)))
+    print("  with a progress note: %d of %d" % (sum(1 for r in rows if r["oxs_notes"]), len(rows)))
     print("  no building address: %d" % sum(1 for r in rows if not r["building"]))
     print("  categories: %s" % dict(cats))
     if unknown:
@@ -262,7 +306,12 @@ def main():
     code, res = sb("requests?on_conflict=reference", "POST", rows,
                    "resolution=merge-duplicates,return=minimal")
     if code >= 300:
-        sys.exit("Supabase %s: %s" % (code, res))
+        # Message only, never the body. PostgREST returns the offending row in
+        # `details` on a constraint failure, and this now runs every fifteen
+        # minutes into a log that anybody can read — one bad row would publish a
+        # resident's name, apartment and the fault they reported.
+        msg = res.get("message", res) if isinstance(res, dict) else res
+        sys.exit("Supabase %s: %s" % (code, str(msg)[:200]))
     print("\nwrote %d rows (HTTP %s)" % (len(rows), code))
 
     code, after = sb("requests?select=reference&opened_via=eq.oxs&limit=2000")

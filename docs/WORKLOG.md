@@ -151,6 +151,68 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### OXS has a status field and it is a constant; the progress is somewhere else
+
+Asked whether OXS carries a status at all, since every imported ticket reads
+open and a twice-daily import means nobody knows when that changes.
+
+**The field exists and never varies.** All 35 service calls the API served that
+afternoon returned `{"label":"פתוחה","status":"open"}`, dating from 10 February
+to that morning -- so it is not "recent calls only", it is genuinely every call
+they serve, always open. Our 69 said open because that is what they were told.
+
+**The movement is in `treatmentLog`,** which we were not importing: the
+dispatcher's own notes, 13 of the 35 filled -- "הועבר לאלון שערים",
+"בטיפול דוד", "כרגע המתג תפוס עם קיסם - ממתינים לדוד לטיפול בתקלה", and one that
+runs to a paragraph about an electrician who has to bring fittings. That is the
+answer to "what is happening with my leak", which is the question
+`get_request_status` exists to answer and had been answering with the word
+"open".
+
+**Newest first, and worth checking rather than assuming.** `lastUpdateNote`
+equals `treatmentLog[0]` on 13 of 13 and the last element only where the list
+has one entry. Element 0 is current; the tail is history. Stored as an array in
+their order, because "fittings ordered" followed by "David handling it" is a
+ticket moving and one string is not.
+
+**Closure is expressed by disappearance.** 34 calls live against 70 we hold, and
+three left the feed inside a single hour that morning. The script has refused
+since 12 Aug to read that as `resolved`, correctly -- the endpoint cannot
+distinguish "only open calls are served" from "nothing is ever closed here". So
+022 adds `oxs_last_seen_at`, stamped on every ticket on every run: the fact is
+now measured and dated, and the day Homies answers, one UPDATE clears the
+backlog instead of an archaeology exercise. It is now question 2 on the client
+list, because it is the cheapest question there and 36 stale tickets ride on it.
+
+**Tickets got their own workflow, every fifteen minutes.** They had been the
+last step of `oxs-sync.yml`, which is how an eleven-second import went eleven
+days without running: the arrears sweep in front of it kept dying and took it
+down too. Nothing about a ticket import needs arrears data, and it costs three
+requests -- one to OXS, one page of residents, one bulk upsert. The two
+workflows cannot starve each other on the rate limit either, because this key is
+`OXS_KEY_REQUESTS` and the sweep's is `OXS_KEY_GENERAL`, and the 60/min is per
+key. No daylight-saving guard: an interval does not care what hour it is.
+
+GitHub's cron is best-effort -- 51 minutes late on this repository, measured --
+so fifteen minutes is the ask, not the promise. `oxs_last_seen_at` is what the
+dashboard reports, so it shows the real freshness rather than the intended one.
+
+**On the dashboard.** The current note sits under the description in the ticket
+list, in Hebrew, with a count of older ones; a ticket that has dropped out of
+OXS says so in the review colour rather than being quietly resolved. The Status
+column stays ours -- it always was, and now it is clear that it says nothing
+about their side.
+
+**One thing tightened on the way.** The Supabase error path printed the whole
+PostgREST body, which carries the offending row in `details`. Harmless twice a
+day into a log nobody opened; not harmless every fifteen minutes into a public
+repository. It prints the message and 200 characters of it now.
+
+**Testing.** Migration applied and read back. Dry run, then applied: 34 calls,
+34 of 34 matched to a resident, 13 notes written, 36 counted as no longer served.
+Read back from Postgres -- 13 tickets carry notes, 34 stamped in this run, 36
+stale. Dashboard typechecks and builds.
+
 ### The sweep can lose a third of the buildings without saying so
 
 Went to check the ₪975,991 the fixed import had just written, by re-running the

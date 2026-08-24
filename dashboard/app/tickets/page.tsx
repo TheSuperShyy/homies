@@ -23,6 +23,30 @@ async function updateStatus(formData: FormData) {
 
 // `searchParams` rather than client-side state: a filtered view should be a URL
 // somebody can send to a colleague.
+/**
+ * Whether OXS is still serving this ticket, and when it stopped.
+ *
+ * OXS never marks a call closed — it stops returning it. Measured 24 Aug: 34
+ * calls live against 70 we hold, three of them leaving the feed within one
+ * hour. Whether leaving means resolved is still an open question with Homies,
+ * so this reports the fact and refuses to draw the conclusion: a ticket that
+ * has dropped out is flagged, not silently resolved.
+ *
+ * The importer runs every fifteen minutes and GitHub's scheduler is
+ * best-effort, so anything seen inside the last 45 minutes counts as current.
+ */
+function InOxs({ seen }: { seen?: string | null }) {
+  if (!seen) return null;
+  const mins = Math.round((Date.now() - Date.parse(seen)) / 60000);
+  if (mins < 45) return <div style={{ fontSize: 11, opacity: 0.65 }}>in OXS now</div>;
+  const gone = mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`;
+  return (
+    <div style={{ fontSize: 11, color: 'var(--review)' }} title={`Last seen in OXS ${seen}`}>
+      gone from OXS {gone}
+    </div>
+  );
+}
+
 export default async function Tickets({
   searchParams,
 }: { searchParams: { status?: string; page?: string; per?: string } }) {
@@ -32,7 +56,7 @@ export default async function Tickets({
   const [from, to] = pageRange(page, size);
   let q = serverClient()
     .from('requests')
-    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at,reported_by_phone',
+    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
   const { data, error, count } = await q
@@ -77,7 +101,24 @@ export default async function Tickets({
               {data.map((r: any) => (
                 <tr key={r.reference}>
                   <td className="mono">{r.reference}</td>
-                  <td dir="auto">{r.description}</td>
+                  <td dir="auto">
+                    {r.description}
+                    {/* WHAT OXS ACTUALLY KNOWS ABOUT THIS TICKET.
+                        Their `status` field reads `open` on every service call
+                        they have ever served, so the Status column opposite is
+                        ours and says nothing about their side. The movement is
+                        here: the dispatcher's own note, newest first, imported
+                        since 24 Aug. Their words, untranslated — this is what a
+                        resident is told when they ring and ask. */}
+                    {r.oxs_notes?.length > 0 && (
+                      <div className="muted" style={{ fontSize: 12, marginTop: 3 }} dir="auto">
+                        ↳ {r.oxs_notes[0]}
+                        {r.oxs_notes.length > 1 && (
+                          <span style={{ opacity: 0.7 }}> · +{r.oxs_notes.length - 1} earlier</span>
+                        )}
+                      </div>
+                    )}
+                  </td>
                   <td dir="auto">{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
                   {/* The number the call came from, kept since 19 Aug. It is
                       the only thing on an inbound ticket that cannot be
@@ -97,7 +138,10 @@ export default async function Tickets({
                     </form>
                   </td>
                   <td className="muted">{r.opened_via}</td>
-                  <td className="muted mono">{r.created_at.slice(0, 16).replace('T', ' ')}</td>
+                  <td className="muted mono">
+                    {r.created_at.slice(0, 16).replace('T', ' ')}
+                    {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} />}
+                  </td>
                 </tr>
               ))}
             </tbody>

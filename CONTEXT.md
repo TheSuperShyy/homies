@@ -110,6 +110,19 @@ killed mid-write (24 Aug). Ask the database. `max(updated_at)` on the table the
 import writes settles in one query what a run list cannot settle at all, which
 is why every count on `/sync` now carries the age of its newest row.
 
+**OXS's ticket `status` is a constant, and the progress is in `treatmentLog`.**
+Every service call they serve reads `פתוחה`, whatever its age — so a ticket
+saying `open` in our database is not evidence of anything. What moves is the
+dispatcher's note list (newest first, element 0 is current) and `lastUpdate`.
+Closure is expressed by the call leaving the feed, never by the field, and
+whether leaving means done is still question 2 on the client list — until it is
+answered, a vanished ticket is flagged and dated, never resolved by us.
+
+**A fast import must not ride on a slow one.** The eleven-second ticket import
+was the last step of the twenty-eight-minute arrears job, so when the sweep in
+front of it died it died too — eleven days of it. Independent data gets an
+independent schedule; shared credentials are not a reason to share a workflow.
+
 **Pace a rate limit per request, never per loop iteration.** `oxs_arrears.py`
 slept twice per building while making three calls, which makes the real request
 rate depend on network latency: safe from a GitHub runner, over the limit from a
