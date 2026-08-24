@@ -1318,12 +1318,32 @@ def workflow(e):
                     # without a model round-trip, and without being told, the
                     # agent introduces itself again on what it reads as message
                     # one.
+                    #
+                    # THIS LINE OUTRANKS THE SYSTEM PROMPT, and that cut both
+                    # ways on 25 Aug. A dashboard edit of 23 Aug had made the
+                    # first-message branch say "name, then a polite offer of
+                    # help, and THEN address the body" -- so a balance question
+                    # got the whole opener pasted above it, and a mid-thread
+                    # "היי" got a full reintroduction, while the system prompt
+                    # said the opposite in both places and lost 11 times out of
+                    # 11 in the probe fan-out. Whatever the first message must
+                    # do, it is said HERE, in one sentence per branch, and the
+                    # prompt agrees with it rather than the other way round.
+                    # Mirrors the live node exactly; see prompt.md.
                     "text": "={{ '[ענה על ההודעה הזאת בעברית, תמיד, גם אם"
                             " ההודעה באנגלית.]'"
                             " + ($json.greeted"
-                            " ? ' [כבר הצגת את עצמך בשיחה הזאת. בלי שלום, בלי היי,"
-                            " ובלי להציג את עצמך שוב.]' : '')"
-                            " + '\\n' + $json.text }}",
+                            " ? ' [אתם כבר באמצע שיחה. לא מציגים את עצמך שוב"
+                            " ולא כותבים \"במה אפשר לעזור\". אם ההודעה היא רק"
+                            " ברכה — ברכה קצרה בחזרה וממשיכים מאיפה שהפסקתם."
+                            " אם יש בה תוכן — בלי פתיח בכלל, ישר לעניין.]'"
+                            " : ' [זו ההודעה הראשונה בשיחה: פתח בשם — היי, כאן"
+                            " מיכאל מהומיז. אם ההודעה היא רק ברכה (גם \"מה נשמע\""
+                            " ו\"מה המצב\" הן ברכה, לא שאלה — לא עונים עליהן ולא"
+                            " מחזירים אותן) — הוסף הצעת עזרה אחת: במה אפשר לעזור?"
+                            " אם יש בהודעה תוכן — בלי \"במה אפשר לעזור\" בכלל:"
+                            " השם, ואז ישר מטפלים במה שנכתב, באותה הודעה.]')"
+                            " + String.fromCharCode(10) + $json.text }}",
                     "options": {"systemMessage": system_prompt()},
                 },
                 # A model error must not take the workflow down. OpenRouter 402s

@@ -901,7 +901,20 @@ really needs nothing, write the line saying so** rather than bypassing it.
    the intro; the model losing which side of the conversation it is on, which
    the WORKLOG has seen before as "does not recognise its own turns". Suspect
    the `Conversation so far` memory shape. Found while fixing the intro, not
-   fixed. Reproduce with a short refusal after the status-menu tap.
+   fixed. Reproduce with a short refusal after the status-menu tap. **Not
+   reproduced on 25 Aug** after the per-message rule was rewritten (`אין לי,
+   לא פתחתי` → `אוקיי. אז אפשר לפתוח קריאה, לבדוק מצב...`); may have been the
+   same cause. Keep open until seen clean on a real handset.
+
+20. **Asked `אתה בוט?`, the bot said `אני לא בוט.`** Live, 25 Aug, fresh
+   number; on an earlier run the same question got `אני נציג שירות`. There is
+   no rule about it in the prompt, so the model improvises, and one of its
+   improvisations is a lie to a resident. **This needs a decision, not a
+   prompt tweak**: whether מיכאל admits to being automated when asked directly.
+   Recommendation: yes, in one line, and carry on -- `אני העוזר האוטומטי של
+   הומיז. במה אפשר לעזור?` -- because the persona is a name and a tone, not a
+   claim to be a person, and the first resident who finds out otherwise tells
+   the whole building. Reproduce: `python scripts/probe_whatsapp.py "אתה בוט?"`.
 
 6. **A common-area ticket keeps an apartment number if the resident offers
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly

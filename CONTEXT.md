@@ -40,6 +40,14 @@ Homies. Hope you are having a great day"* — was answered, not translated:
 no `היי!`, no smiley, no `היום`, and the bot never reports its own mood
 (`הכול טוב, תודה` is banned). Voice and chat now share the name.
 
+**The per-message instruction in the agent node outranks the system prompt.
+First-message rules live there, in one sentence per branch.** Proven 25 Aug:
+the 23 Aug dashboard edit of that line ordered "name, offer of help, then the
+body", and the 32k-character prompt saying the opposite lost 11 of 11 probes.
+Change the line and the prompt together, keep the script's copy identical to
+live, and test with `scripts/probe_whatsapp.py` -- `check_whatsapp.py` was
+green the whole time, because plumbing is not tone.
+
 **The live n8n workflow is ahead of `n8n_whatsapp.py`, and a PUT is a
 replace.** Eight nodes (the Chatwoot handback and the promise backstop) and
 the Chatwoot-shaped Sort parser exist only in production. `--apply` refuses
