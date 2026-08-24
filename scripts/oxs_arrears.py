@@ -203,31 +203,93 @@ def main():
 
     import psycopg
     dsn = E.get("SUPABASE_DB_URL", "").strip()
+    if not dsn:
+        sys.exit("SUPABASE_DB_URL is empty in .env.")
     period = date(YEAR, THIS_MONTH, 1)
+
+    rows = [r for r in behind if r["phone"]]
+    skipped = len(behind) - len(rows)
+
+    # ONE DEBTOR CAN APPEAR TWICE, AND THE TABLE CANNOT HOLD BOTH.
+    #
+    # `charges` is unique on (resident_id, period, unit) and carries no
+    # building, so the same phone owing on flat 3 of two different buildings is
+    # one row whatever we do. Postgres refuses to update the same row twice
+    # inside one statement, so that collision is resolved here instead of
+    # raising mid-import: the larger debt wins and the count is reported.
+    # Nothing is summed — a summed figure pinned to one flat is the specific,
+    # confident and wrong number migration 012 was written to stop.
+    best = {}
+    for r in sorted(rows, key=lambda r: (r["phone"], str(r["unit"] or ""), -r["amount"])):
+        best.setdefault((r["phone"], str(r["unit"] or "")), r)
+    collisions = len(rows) - len(best)
+    rows = list(best.values())
+
+    names = [r["name"] for r in rows]
+    phones = [r["phone"] for r in rows]
+    builds = [r["building"] for r in rows]
+    units = [str(r["unit"] or "") for r in rows]
+    amounts = [r["amount"] for r in rows]
+
+    # ONE STATEMENT PER TABLE, NOT TWO PER APARTMENT.
+    #
+    # The loop this replaces sent two round trips per debtor to a database on
+    # another continent. Measured on 23 Aug in the residents importer, whose
+    # identical loop spent fourteen of its nineteen minutes waiting on the
+    # network — which is most of the reason the job crossed its ceiling and was
+    # killed here, mid-write, twice a day. Same SQL, same conflict handling,
+    # one round trip each.
     with psycopg.connect(dsn, connect_timeout=15) as conn:
         with conn.transaction():
-            written = skipped = 0
-            for r in behind:
-                if not r["phone"]:
-                    skipped += 1
-                    continue
-                conn.execute("""
-                    insert into residents (full_name, phone, building, unit, source,
-                                           handed_over, do_not_call)
-                    values (%s, %s, %s, %s, 'oxs', false, false)
-                    on conflict (phone) do update set
-                      building = excluded.building, unit = excluded.unit
-                """, (r["name"], r["phone"], r["building"], r["unit"]))
-                conn.execute("""
-                    insert into charges (resident_id, period, amount, status)
-                    select id, %s, %s, 'unpaid' from residents where phone = %s
-                    on conflict (resident_id, period) do update set
-                      amount = excluded.amount, status = 'unpaid'
-                """, (period, r["amount"], r["phone"]))
-                written += 1
+            conn.execute("""
+                insert into residents (full_name, phone, building, unit, source,
+                                       handed_over, do_not_call)
+                select distinct on (v.phone)
+                       v.name, v.phone, v.building, v.unit, 'oxs', false, false
+                  from unnest(%s::text[], %s::text[], %s::text[], %s::text[])
+                       as v(name, phone, building, unit)
+                 order by v.phone, v.unit
+                on conflict (phone) do update set
+                  building = excluded.building, unit = excluded.unit
+            """, (names, phones, builds, units))
+
+            # THE CONFLICT TARGET IS (resident_id, period, unit).
+            #
+            # It was (resident_id, period) until 11 Aug, when migration 012 put
+            # the apartment on the charge and dropped that constraint. The
+            # statement was never updated, so every arrears write since has been
+            # a guaranteed 42P10, "no unique or exclusion constraint matching
+            # the ON CONFLICT specification" — which nobody saw, because the job
+            # was being killed in the sweep before it ever reached this line.
+            #
+            # `status` is deliberately absent from the update list. It used to be
+            # forced back to 'unpaid' every twelve hours, which would re-chase
+            # somebody who had paid the moment staff had not yet entered it in
+            # OXS — the one outcome the debt agent is built to avoid. A charge
+            # marked paid, disputed or waived keeps that status; only the amount
+            # is refreshed. `source` is set because it defaults to 'seed', and
+            # 'seed' is what every destructive query in 007 deletes.
+            written = conn.execute("""
+                insert into charges (resident_id, period, amount, status, source, unit)
+                select r.id, %s, v.amount, 'unpaid', 'oxs', v.unit
+                  from unnest(%s::text[], %s::numeric[], %s::text[])
+                       as v(phone, amount, unit)
+                  join residents r on r.phone = v.phone
+                on conflict (resident_id, period, unit) do update set
+                  amount = excluded.amount, source = 'oxs'
+            """, (period, phones, amounts, units)).rowcount
+
+        held = conn.execute("""
+            select count(*) from charges
+             where period = %s and status <> 'unpaid'
+        """, (period,)).fetchone()[0]
         n = conn.execute("select count(*) from charges where status='unpaid'").fetchone()[0]
         owed = conn.execute("select coalesce(sum(amount),0) from charges where status='unpaid'").fetchone()[0]
-    print(f"\nwrote {written} charges ({skipped} skipped, no phone)")
+
+    print(f"\nwrote {written} charges for {period}")
+    print(f"  {skipped} skipped, no phone; {collisions} dropped, "
+          f"same phone and flat number in two buildings")
+    print(f"  {held} charges this period left as they were (paid, disputed or waived)")
     print(f"open balances now: {n} charges, ₪{float(owed):,.0f}")
 
 

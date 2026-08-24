@@ -100,10 +100,33 @@ a reply announcing a handover ("אני מעביר...") stays quiet on purpose. B
 checker conditions read $json.content (Send's own response) — no cross-node
 expression references in If nodes; bare `$('node')` on an unexecuted node
 silently fails the condition. Rollbacks: wa-before-deadend.json /
-wa-before-deadend2.json. Still open by design: ghost tickets at the root
-(the model never calls open_request itself — though the repaired rescue lane
-now opens a real ticket and tells the resident its real number when the
-model fakes a claim), and the Chatwoot assign/label flag on transfers.
+wa-before-deadend2.json.
+
+**The bot is Michael (23 Aug evening, owner's direction).** Every FIRST
+message of a conversation opens with a polite personal hello — «היי, כאן
+מיכאל מהומיז. איך אפשר לעזור היום?» — whatever the resident wrote; there is
+no greeting matcher anymore (the exact-match regex is deleted from Sort).
+Smalltalk gets a human answer. The media fixed line was removed from the
+prompt entirely — the workflow answers real media itself before the model
+runs, and the model is banned from ever claiming it "only reads text" (it
+had said that to plain text on the owner's handset). Greeting memory is
+time-based: greet again after 24 quiet hours; legacy boolean flags count as
+stale, so every pre-existing contact gets the new intro once.
+
+**Ghost tickets are fixed at the root (23 Aug, owner's direction).** The
+model provably never chains verify_address → open_request (one tool call per
+turn is what gemini-2.5-flash does), so the sequencing moved into the edge
+function: on the WhatsApp channel open_request verifies the address itself
+and refuses with verify_address's own reason codes instead of filing —
+voice keeps normalise-never-refuse on purpose (function v37; the gate is
+`channel(ctx)` on the wa: call-id prefix). The bot prompt teaches one call,
+verify_address is demoted to address questions and emergency grounding, and
+the prompt contains no example ticket numbers anymore — the bot had
+fabricated one digit for digit. Verified live: real references in replies
+matching real rows, refusals for unmanaged addresses with the street's real
+numbers offered, no junk rows. Rollback: wa-before-ghost.json
+(patch_wa_ghost.py --restore) + redeploy the previous index.ts. Still open
+by design: the Chatwoot assign/label flag on transfers.
 
 **The bot's on/off switch is the natural gesture: replying.** A public human
 reply auto-assigns the conversation to the replier (the workflow does this;
@@ -178,14 +201,20 @@ repertoire on 20 Aug. Both sit inside the span `DEBT_BLOCKS`/`INTAKE_BLOCKS`
 replace, so the English twins carry an English grammar note instead and no
 Hebrew table leaks to an English caller.
 
-**The OXS import runs on GitHub Actions and is finally configured.** All six
-repository secrets were set on 20 Aug -- before that the schedule had fired
-twice a day since 18 Aug and failed on its first step every time, so every OXS
-row in the database arrived from a manual run. Watch it at `/sync` on the
-dashboard. **A run finishing in under a minute imported nothing** -- that is the
-daylight-saving guard, not a success. The Run now button needs
-`GITHUB_DISPATCH_TOKEN` (fine-grained PAT, Actions write) in Vercel; everything
-else on that page works without it.
+**The OXS import runs on GitHub Actions and has never yet completed a pass.**
+The six repository secrets were set on 20 Aug -- before that every run died on
+its first step. Since then every real run has been killed at the 45-minute
+ceiling partway through arrears, so `residents` is current and **`charges` has
+been frozen at 11 Aug and `requests` at 12 Aug**. Five faults, all fixed on
+24 Aug and none yet exercised: row-at-a-time writes (14m24s of the 18m46s
+residents step), the ceiling itself (now 90; a full pass is ~28 minutes), an
+`ON CONFLICT` target that migration 012 dropped on 11 Aug and which answers
+42P10 every time, `charges.source`/`charges.unit` never being set, and
+block-buffered stdout that made the killed step log nothing at all. Watch it at
+`/sync`. **A run finishing in under a minute imported nothing** -- that is the
+daylight-saving guard, not a success, and the page now says so by name. The Run
+now button needs `GITHUB_DISPATCH_TOKEN` (fine-grained PAT, Actions write) in
+Vercel; everything else on that page works without it.
 
 **The debt agent no longer transfers on "the lift isn't fixed".** It works
 the objection first -- log the fault, say that the committee money funds the
@@ -251,7 +280,7 @@ say anyone is being put through.
 | Off-topic questions | politely declined, never escalated, since 18 Aug |
 | Ticket numbers in Homies' own format | `255-NNNN-YY` since 18 Aug; the old `HM-YYYY-NNNN` still resolves |
 | Dashboard | live; 10/25/50 rows a page, chosen in the URL |
-| OXS → Supabase import | works; twice-daily workflow written, not yet committed |
+| OXS → Supabase import | scripts work by hand; the twice-daily workflow has never completed a pass — fixed 24 Aug, first run still owed |
 
 **Does not exist:**
 
@@ -285,10 +314,12 @@ say anyone is being put through.
   `GET /{phone-number-id}?fields=webhook_configuration`, never
   `GET /{app-id}/subscriptions`, which lies.
 
-- **A running scheduler.** `.github/workflows/oxs-sync.yml` exists — residents,
-  arrears and requests at midnight and 15:00 Israel time — but `.github/` is
-  untracked, so nothing fires until it is committed to `main` and the six
-  repository secrets are set. Every other import is still run by hand.
+- **A completed scheduled import.** `.github/workflows/oxs-sync.yml` is
+  committed, the six secrets are set, and it fires on time — residents, arrears
+  and requests at midnight and 15:00 Israel time. It has still never finished:
+  every real run was killed at its time limit inside the arrears sweep, and the
+  write it was heading for would have raised 42P10 when it got there. Both fixed
+  24 Aug, unrun. Every other import is still done by hand.
 - **A campaign runner.** Nothing has ever iterated the queue. **A runner reads
   `v_debt_call_queue_person`, never `v_debt_call_queue`.** The person view is
   one row per resident and IS the grouping decision, made 11 Aug: one call

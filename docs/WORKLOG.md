@@ -9,6 +9,127 @@ conversation that produced it.
 
 ---
 
+## 2026-08-24
+
+### The nightly import was being killed mid-write, and the write would have failed anyway
+
+Asked to fix the nightly import. Four days after the secrets landed it had
+still never completed a single pass, and the dashboard said it was fine.
+
+**What the run list actually says.** Two runs a day conclude `cancelled` after
+exactly 45m -- the job ceiling -- and two conclude `success` in three to ten
+seconds, which is the daylight-saving twin exiting on purpose. Read casually
+that is two green ticks a day. Read properly it is: nothing has ever finished.
+
+**What the database says, which is the part that settles it.** `residents` was
+current to 23 Aug. The newest row in `charges` was **11 Aug** and in `requests`
+**12 Aug** -- thirteen and twelve days stale, while the three counts on `/sync`
+sat unchanged and unremarked.
+
+**Where the time went.** Step timings from the two cancelled runs: residents
+18m46s, of which the OXS fetch was 4m22s and **the writes were 14m24s** --
+7,523 rows, one `INSERT` round trip each, to a database in another region. Then
+arrears was killed 26 minutes into a sweep that needs 22, with the writes still
+ahead of it. Requests, a ten-second job, never ran at all on either day.
+
+**And it would have failed at the first write.** `oxs_arrears.py` says
+`on conflict (resident_id, period)`. Migration 012 dropped that constraint on
+11 Aug when the apartment moved onto the charge -- the key is
+`(resident_id, period, unit)` now. The shipped statement was run against the
+live database to be sure rather than reasoned about, and it answers **42P10,
+"no unique or exclusion constraint matching the ON CONFLICT specification"**.
+Every arrears write since 11 Aug was guaranteed to fail; the timeout was
+killing the job in the sweep before it could get far enough to prove it. Two
+bugs, one hiding the other, and the newest charge in the database is dated the
+day the constraint changed.
+
+**Two more that the same statement carried.** `charges.source` defaults to
+`'seed'` and nothing set it, so every charge the importer was about to write
+would have claimed to be fictional -- invisible to the dashboard's OXS count
+and inside the blast radius of every purge query 007 wrote to be careful. And
+`charges.unit` was never set either, which quietly re-opens the collapse 012
+exists to prevent: an owner of three flats overwriting themselves twice, the
+₪6,665 that was invisible on 11 Aug.
+
+**Why nobody saw any of it.**
+
+Python block-buffers stdout when it is a pipe, and an Actions log is a pipe. The
+killed step printed **nothing at all** -- twenty-six minutes of progress
+counters died in the buffer with the process. Both cancelled runs show an empty
+step and no clue which building it was on.
+
+The guard asked what time it was in Jerusalem, and GitHub's scheduler is
+best-effort. The afternoon run on 23 Aug started **51 minutes late**, at 15:51
+local -- nine minutes from falling outside its own hour and skipping the day in
+total silence. It now asks which cron fired (`github.event.schedule`) and
+compares that to the current UTC offset, so lateness cannot decide anything.
+
+And `/sync` reported healthy throughout, for two independent reasons. It tells a
+real import from a skip by duration -- but the guard was a step inside the job
+holding the concurrency lock, so a twin queued behind the whole real run before
+exiting in three seconds, and GitHub counts queue time in the only timestamps
+the page can see. A 45-minute run that concluded `success` and imported nothing
+read as a real import. Meanwhile the page looked for `conclusion === 'failure'`,
+and a job killed by its own timeout concludes **`cancelled`**, so the "last run
+failed" banner never fired once.
+
+**The fix, in five places.**
+
+*The writes are one statement per table.* Same SQL, same conflict handling,
+`unnest` of arrays instead of a loop: 7,523 residents in one round trip. The
+correct conflict target, `source = 'oxs'`, and the apartment on every charge.
+
+*A debtor can appear twice and the table cannot hold both* -- the same phone
+owing on flat 3 of two different buildings, since `charges` carries no building.
+Postgres refuses to update one row twice in a statement, so that collision is
+resolved before it raises: the larger debt wins and the count is printed.
+Nothing is summed, because a summed figure pinned to one flat is the specific,
+confident and wrong number 012 was written to stop.
+
+*`status` left out of the update list, which is a change of intent.* It used to
+be forced back to `'unpaid'` every twelve hours. Since OXS is read-only to us, a
+payment taken by the agent is a staff task, and until staff enter it OXS still
+shows the month unpaid -- so the old statement would re-chase somebody who had
+already paid, which is the one outcome the debt agent's whole design exists to
+avoid. Paid, disputed and waived now survive the nightly refresh; only the
+amount is updated, and the count held back is reported.
+
+*The three imports no longer share a fate.* Each carries its own timeout and
+runs unless the job was cancelled outright, so arrears dying no longer takes a
+ten-second requests import with it. A gate at the end names which of the three
+landed and fails the run if any did not. The job ceiling goes 45 → 90 minutes:
+a full pass is ~28, nearly all of it OXS rate limiting, and the old number was
+below the floor.
+
+*`/sync` stops being able to tell that story.* Every terminal conclusion that is
+not `success` counts as a failure. The guard moved into its own job outside the
+concurrency group, so a twin never queues and its duration is honest again. And
+each of the three counts now prints the newest row underneath it, coloured when
+it is more than 26 hours old -- the one line that would have shown this on day
+one, because 178 charges looks identical whether it landed last night or on the
+11th.
+
+**Testing.** Both write paths were run end to end against the live database
+through a connection whose `commit` was replaced with a no-op, then rolled back:
+4 arrears rows in produced 2 charges, 1 skipped for no phone and 1 dropped as a
+same-flat-number collision; the residents batch upsert, the `/debts` charge path
+and the carried-debt re-attach all executed. Counts were 7,532/178 before and
+7,532/178 after. The status decision was proved separately: seed a charge, mark
+it `paid`, run tonight's statement with a larger amount -- amount 500 → 900,
+status still `paid`. The old statement's 42P10 was reproduced and the new one
+confirmed to work on the same connection. The guard was checked against both
+offsets: exactly one cron of each pair is live in summer and in winter, and
+neither answer depends on the clock. YAML parses, dashboard typechecks and
+builds. `requests_reference_key` was checked too, in case the third importer
+carried the same rot -- it does not; that import failed only because it was
+never reached.
+
+**Not verified.** No run has been made since the fix. The write path is proven
+against the live schema but nothing has been committed to the database, so the
+first real arrears import since 11 Aug has still not happened.
+
+---
+
 ## 2026-08-23
 
 ### The bot was silencing itself on every new conversation
@@ -105,6 +226,187 @@ from ordinary chats instead of relying on inbox patrol.
 
 The ranking of worst findings is now: ghost tickets, the silent reply,
 dead-end endings.
+
+### End-to-end flow test: everything passes except ticket lookup
+
+Owner asked for one straight run through the whole flow — greeting, opening a
+ticket, checking a ticket, general questions — observation only, no debugging.
+Seven turns on a synthetic number, read back through the Chatwoot messages API
+rather than the probe (the probe's `newest_outgoing` keeps capturing the
+trailing follow-up menu instead of the reply).
+
+Passed: the greeting («היי! הכל טוב, תודה. כאן מיכאל מהומיז — איך אפשר לעזור?»
+with the three buttons); the ticket flow, which produced a REAL row —
+255-1086-26, plumbing, canonical building, right description; office hours;
+payment methods; the closing thanks.
+
+**Failed: ticket lookup, and it fails by creating a duplicate.** Asked «מה
+המצב עם הקריאה שפתחתי?», the model did the right thing — called
+get_request_status and wrote a status answer quoting the reference. Then the
+phantom-claim net fired: its test is "reply contains a ticket-shaped number
+AND open_request did not run", and a status answer satisfies both. The rescue
+lane opened a junk ticket (255-1087-26, building null, description made of
+concatenated conversation lines, needs_review) and REPLACED the correct status
+answer with "פתחתי קריאה, מספר 255-1087-26. זה עובר לצוות." The guard knows
+only one legitimate source for a reference in a reply; the lookup tool is the
+other one, and it was never taught. Fix is one condition —
+`get_request_status.isExecuted` excuses the claim — held back because the owner
+asked for observation only.
+
+Two smaller observations, left for the owner to rule on: on a content-bearing
+message the model still re-introduces itself and echoes the resident's sentence
+back word for word before reacting (the intro words sit inside its own
+instruction, and flash copies them); and the follow-up menu fires after every
+reply that doesn't end in a question — five times in one seven-turn
+conversation, which reads mechanical after small informational answers.
+
+Test data cleaned and verified: both tickets deleted, 19 messages, the
+conversation and its contact gone.
+
+### The menu rides on Michael's hello
+
+Owner noticed the intro arrives without the three buttons — they used to be
+attached by the deleted greeting matcher. New mechanism, no matcher: the
+model decides what is a greeting (the prompt guarantees «כאן מיכאל מהומיז»
+appears exactly on greeting replies), and the Send node decorates any reply
+carrying that signature with the three menu buttons as one input_select
+message. Smart classification in the model, deterministic decoration in the
+workflow — the same division of labor as the transfer backstop. The
+dead-end checker now skips intro replies so a period-ended hello cannot
+produce a second menu.
+
+Verified live: greeting → intro with the 3 buttons on the same message; a
+tapped button still routes to its canned reply; a "never mind, thanks" close
+still gets the follow-up menu; no double menus. Test data cleaned.
+Rollback: wa-before-introbuttons.json via patch_wa_introbuttons.py --restore.
+
+### The rule became "a greeting gets the name" — and a heredoc broke the bot for four minutes
+
+Owner's handset again: four minutes after their last test, «היי מה המצב?»
+got the greeting back without the name — the 24-hour greeted window counted
+them as mid-conversation. The owner's correction is simpler than any window:
+**a greeting gets a greeting with the name, every time** — first message or
+mid-conversation — worded differently each time; only content messages skip
+the intro ("הפתיח הולך אחרי ברכות, לא אחרי הודעות"). Wrapper and prompt
+rewritten to that rule.
+
+The rewrite carried a trap: pushing the new wrapper through a bash heredoc
+turned the expression's \\n escape into a literal newline inside the JS
+string — a syntax error, so the agent failed before ever calling the model
+and EVERY message got the error-fallback transfer line. Caught in the very
+next live test (three for three fallback lines), diagnosed from the
+execution (no OpenRouter run at all), rebuilt with String.fromCharCode(10)
+so there is no escape sequence left to mangle. The scratchpad's standing
+rule stands: tricky content goes through the Write tool, never heredoc.
+
+Verified live: greeting → name+offer; second greeting → name again, new
+wording («היי! כאן מיכאל מהומיז, מה אפשר לעשות בשבילכם?»); content message →
+no intro, straight to the ticket offer. Test data cleaned. Rollbacks:
+wa-before-nameback.json (pre-rule), fix_wrapper.py holds the good wrapper.
+
+### A second "היי" no longer gets the same sentence back
+
+Owner's handset, minute two of the persona relaunch: after Michael's intro
+they wrote just «היי» — and got «היי. איך אפשר לעזור?», a near-verbatim
+replay of the offer sent sixty seconds earlier. The greeted flag worked (no
+re-introduction); what was missing was any rule for what a SECOND greeting
+gets, and the general never-repeat rule the field test called for.
+
+Added to the prompt: a mid-conversation greeting is answered short and
+forward («כן, אני כאן — מה קרה?», «היי, ספרו לי מה העניין»), never with the
+help offer again — and **no sentence already sent in a conversation is ever
+sent again word for word**; whoever gets the same sentence twice knows for
+certain they are talking to a recording. Verified live on a fresh number:
+intro → varied invitation (+ the dead-end net's buttons, correctly) →
+«כן, אני כאן — מה קרה?». Rollback: wa-before-norepeat.json.
+
+### The bot is Michael now, and every first message gets a hello
+
+Caught by the owner on a real handset: «היי מה המצב?» — plain text, first
+message — got the media-only line («אני קורא כאן רק טקסט»), twice, and no
+greeting. Two roots. The greeting menu fired only on an exact-match regex, a
+script pretending to be a bot; everything else fell to the model, which
+reached for the one fixed line it had. And that media line sat in the prompt
+as ammunition even though the workflow answers real media by itself before
+the model ever runs — the same lesson as the example ticket numbers.
+
+The owner's direction: no greeting matcher at all. Changes, live: the
+greeting-regex branch is deleted from Sort (every first message goes to the
+model); the per-message wrapper now instructs a first message to open with a
+polite personal hello; the bot has a name — **מיכאל (Michael)** — woven
+through the identity section and every example; smalltalk gets a human-answer
+rule («היי! הכל טוב, תודה. כאן מיכאל מהומיז — איך אפשר לעזור?»); and the
+media line was REMOVED from the prompt with an explicit ban — any message
+that reaches the model is text from a person. The workflow still answers
+real media with the canned line; the prompt's fixed-lines section is down to
+one line (the transfer sentence).
+
+Greeting memory became time-based on the way: the old flag was
+greeted-forever, which meant no existing contact — the owner included —
+would ever see the new intro. Now the store keeps last-seen timestamps and
+Michael greets again after 24 quiet hours, like a person; legacy boolean
+flags count as stale, so every existing contact gets the new hello once.
+
+Verified live: «היי מה המצב?» → warm Michael intro, no media line; a fault
+opener → intro plus handling in one message; empty text still gets the
+canned media line; a legacy-flag phone got re-greeted exactly once. Test
+data cleaned. Rollback: wa-before-persona.json via patch_wa_persona.py
+--restore.
+
+### Ghost tickets, fixed at the root: the sequencing moved into the tool
+
+The report's worst finding, closed at the owner's direction. Diagnosis first:
+the tool descriptions already ordered the model, in so many words, to call
+open_request right after verify_address and not answer between the two — and
+across every live run today it never once chained. gemini-2.5-flash reliably
+makes ONE tool call per turn. Sequencing that must always happen cannot live
+in a model's discipline; it moved into code.
+
+The edge function's open_request now verifies the address itself, inside the
+same call, on the WhatsApp channel only (`channel(ctx)`, the wa: prefix):
+an address that does not resolve returns verify_address's own refusal
+vocabulary — street_unknown, number_not_on_street with numbers_we_manage,
+need_number, need_building, ambiguous — and files nothing, because a ticket
+against a building we do not manage is staff time spent on something that
+does not exist. Voice keeps the old normalise-never-refuse behaviour by
+construction: voice agents were never taught to verify, and refusing would
+silently drop their tickets. Deployed as function version 37.
+
+Bot-side, the two-step doctrine is gone: the prompt teaches one call
+(open_request checks by itself), the what-comes-back reason bullets stay
+word for word (same codes, new sender), verify_address is demoted to pure
+address questions and emergency grounding, and both tool descriptions
+rewritten. The prompt also lost every example ticket number — the field test
+proved the bot fabricates them digit for digit, so the format is now taught
+by structure (office code, number, year) with an explicit "no real example
+numbers in this file, on purpose". The phantom-claim regex in "Reply
+usable?" was widened for long references (255-26277-26 shape) on the way.
+
+Verified live, four scenarios: two full ticket flows where the model called
+open_request itself — real references in the replies (255-1084-26,
+255-1085-26) matching real rows with the right category, description,
+canonical building, and unit null for common areas; Herzl 999 refused with
+"ברחוב הרצל אנחנו מנהלים את 112", no row; Sokolov 99 refused with the 86/29
+numbers we do manage, no row. The follow-up menu fired after the ticket
+confirmation — the day's fixes compose. The rescue lane stays as the safety
+net. Test data cleaned (4 conversations, 24 messages, 2 interactions, 2 test
+tickets — verified gone). Rollback: wa-before-ghost.json via
+patch_wa_ghost.py --restore; the function change reverts by redeploying the
+previous index.ts from git.
+
+### Housekeeping commits itself now
+
+The uncommitted-docs backlog is gone and won't rebuild: two days of work
+(CONTEXT, HANDOVER, WORKLOG, the Chatwoot cutover record) were committed and
+pushed, and a new Stop hook runs `scripts/housekeep.py` after every Claude
+Code turn. The script stages ONLY the briefing files and docs/, scans the
+staged diff's added lines for real phone numbers and key-shaped strings
+(this repo is public), and commits + pushes only when clean — a hit unstages
+everything and reports instead. Whitelisted by name: the public office line,
+the synthetic 9725099020xx test phones, OXS ticket references. The scan has
+a self-test; it caught one pattern gap (sk_car_-style keys with inner
+underscores) before going live. Sits alongside the existing briefing-check
+hook in .claude/settings.local.json.
 
 ### Dead-end endings: the cure was built, nothing ever fed it
 

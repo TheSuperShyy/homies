@@ -25,6 +25,26 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**Sequencing that must always happen lives in code, not in the model.**
+Proven three times on 23 Aug: the model (gemini-2.5-flash) makes one tool
+call per turn and never chains, whatever the prompt orders. So open_request
+verifies the address itself server-side (WhatsApp only), a workflow backstop
+makes promised transfers real, and the dead-end follow-up is a wired lane —
+none of these rely on model discipline. Prompts persuade; workflows and
+tools guarantee.
+
+**No realistic example values in prompts the model might echo.** The bot
+read a resident a ticket number fabricated digit-for-digit from the prompt's
+own cautionary example. Formats are taught by structure (office code,
+number, year), never by a plausible concrete instance.
+
+**In n8n If-node expressions, never reference another node bare.**
+`$('Node')` on a node that did not run this execution throws, and the If
+silently evaluates false — no error shown (the dead-end checker sat broken
+this way). And `$('tool').all()` never sees ai_tool output — a did-the-tool-
+run check must use `isExecuted`. Prefer reading `$json` from the actual
+input item wherever possible.
+
 **`hebrew-voice-gender-pronunciation-skill.md` is the source for Hebrew gender
 and pronunciation rules.** Part A (gender) is integrated into both voice
 prompts. Part B (general homographs) is deliberately NOT: it is real Hebrew and
@@ -82,6 +102,21 @@ key on purpose. Do not move execution into it.
 runs exit in seconds because GitHub cron is UTC and Israel has daylight saving.
 Anything reporting on those runs must say SKIPPED, never success -- reading
 those ticks as imports is why nobody noticed the sync had never worked.
+
+**An import is proved by the rows it wrote, not by the runner's verdict.**
+Twice now the runner has been the wrong witness: green ticks on runs that never
+started (20 Aug) and a healthy-looking `/sync` while every real run was being
+killed mid-write (24 Aug). Ask the database. `max(updated_at)` on the table the
+import writes settles in one query what a run list cannot settle at all, which
+is why every count on `/sync` now carries the age of its newest row.
+
+**A migration that changes a constraint owns every statement that names it.**
+Migration 012 moved the apartment onto the charge and dropped
+`(resident_id, period)` on 11 Aug. Two importers still named it in their
+`ON CONFLICT`, so both were a guaranteed 42P10 for thirteen days, unnoticed
+because a different bug was killing them earlier. When a key changes, grep for
+the old one -- and run the changed statement against the real schema, inside a
+transaction you roll back, rather than reasoning about whether it still fits.
 
 **The debt agent works an objection before handing it over.** Changed 20 Aug
 from the opposite. "I'll pay when the lift is fixed" is a condition, not a

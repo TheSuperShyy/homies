@@ -62,26 +62,83 @@ function took(a: string, b: string) {
  *
  * GitHub's cron is UTC and has no daylight saving, so the workflow is scheduled
  * four times a day and exits immediately on the two that are the wrong hour in
- * Jerusalem. Those exit `success` in about seven seconds. Reporting them as
+ * Jerusalem. Those exit `success` in about ten seconds. Reporting them as
  * successful imports would be the most misleading thing this page could do —
  * it would show green all day while nothing had come in since Tuesday.
+ *
+ * WHY THE DURATION IS TRUSTWORTHY AGAIN. It was not, between 20 and 24 Aug.
+ * The guard was a step inside the one job that held the concurrency lock, so a
+ * skipped twin sat in the queue for the whole of the real run before exiting in
+ * three seconds — and GitHub counts queue time in `created_at`..`updated_at`,
+ * which is all this page can see. A 45-minute run that concluded `success` and
+ * imported nothing therefore read as a real import here. The guard now lives in
+ * its own job outside the lock, so a twin never queues and its duration is its
+ * own again.
  */
 function realImport(r: Run) {
   return r.conclusion === 'success'
     && (Date.parse(r.updated_at) - Date.parse(r.created_at)) > 60_000;
 }
 
+/**
+ * Anything that is not a completed success or a deliberate skip.
+ *
+ * `failure` is not the only way this workflow ends badly, and for two days it
+ * was not the way it ended at all: the job kept exceeding its time limit
+ * mid-import, which GitHub concludes as `cancelled`. This page looked only for
+ * `failure`, so the banner below never fired while the import was dying twice a
+ * day. Every other terminal conclusion is treated as a failure on purpose —
+ * an unknown outcome on a job that writes to the database is not good news.
+ */
+function failed(r: Run) {
+  return r.status === 'completed' && r.conclusion !== 'success';
+}
+
+/**
+ * How old the newest row in a table is, coloured when that is too old.
+ *
+ * The import runs twice a day, so 26 hours means at least two runs have come
+ * and gone without touching this table. That is the line the page was missing:
+ * a count of 178 looks identical whether it landed last night or on 11 August.
+ */
+function Freshness({ iso, verb }: { iso?: string | null; verb: string }) {
+  if (!iso) return <div className="muted" style={{ fontSize: 12 }}>never</div>;
+  const old = Date.now() - Date.parse(iso) > 26 * 3600_000;
+  return (
+    <div className="muted" style={{ fontSize: 12, color: old ? 'var(--review)' : undefined }}>
+      {verb} {ago(iso)}
+    </div>
+  );
+}
+
 export default async function Sync() {
   const db = serverClient();
-  const [{ list, error }, residents, charges, requests] = await Promise.all([
-    runs(),
-    db.from('residents').select('id', { count: 'exact', head: true }).eq('source', 'oxs'),
-    db.from('charges').select('id', { count: 'exact', head: true }).eq('source', 'oxs'),
-    db.from('requests').select('id', { count: 'exact', head: true }).eq('opened_via', 'oxs'),
-  ]);
+
+  // A COUNT ON ITS OWN CANNOT GO STALE VISIBLY.
+  //
+  // These three numbers sat unchanged for a fortnight while the page reported
+  // healthy: residents were current, arrears were 13 days old and requests 12,
+  // and nothing on the screen said so. The newest row in each table is the one
+  // fact that would have shown it, so it is now printed under every count.
+  // `charges` and `requests` carry `updated_at`, which a nightly re-import
+  // touches even when the amount has not changed; `residents` has only
+  // `created_at`, so its line says "newest added" and means exactly that.
+  const [{ list, error }, residents, charges, requests, newRes, newChg, newReq] =
+    await Promise.all([
+      runs(),
+      db.from('residents').select('id', { count: 'exact', head: true }).eq('source', 'oxs'),
+      db.from('charges').select('id', { count: 'exact', head: true }).eq('source', 'oxs'),
+      db.from('requests').select('id', { count: 'exact', head: true }).eq('opened_via', 'oxs'),
+      db.from('residents').select('created_at').eq('source', 'oxs')
+        .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      db.from('charges').select('updated_at').eq('source', 'oxs')
+        .order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+      db.from('requests').select('updated_at').eq('opened_via', 'oxs')
+        .order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+    ]);
 
   const lastReal = list.find(realImport);
-  const lastFail = list.find((r) => r.conclusion === 'failure');
+  const lastFail = list.find(failed);
   const running = list.find((r) => r.status !== 'completed');
   const token = Boolean(process.env.GITHUB_DISPATCH_TOKEN);
 
@@ -106,32 +163,49 @@ export default async function Sync() {
         <div className="card">
           <div className="k">Residents from OXS</div>
           <div className="n">{residents.count ?? '—'}</div>
+          <Freshness iso={newRes.data?.created_at} verb="newest added" />
         </div>
         <div className="card">
-          <div className="k">Charges from OXS</div>
+          <div className="k">Arrears from OXS</div>
           <div className="n">{charges.count ?? '—'}</div>
+          <Freshness iso={newChg.data?.updated_at} verb="last refreshed" />
         </div>
         <div className="card">
           <div className="k">Requests from OXS</div>
           <div className="n">{requests.count ?? '—'}</div>
+          <Freshness iso={newReq.data?.updated_at} verb="last refreshed" />
         </div>
       </div>
 
       {!lastReal && !running && (
         <div className="panel" style={{ padding: 14, marginBottom: 18 }}>
-          <strong>Nothing has ever imported on a schedule.</strong>{' '}
+          <strong style={{ color: 'var(--review)' }}>
+            No run in this history imported anything.
+          </strong>{' '}
           <span className="muted">
-            Every row above arrived from a run by hand. The schedule fired twice a
-            day and failed on the first step, because the six credentials it needs
-            were never set on the repository.
-          </span>
+            Every run listed below either skipped as the wrong half of a
+            daylight-saving pair, or started and did not finish. The rows above
+            arrived from earlier runs — check the newest-row lines to see how
+            long ago.
+          </span>{' '}
+          {list[0] && (
+            <a href={list[0].html_url} className="mono" style={{ color: 'var(--accent)' }}>
+              open the last log
+            </a>
+          )}
         </div>
       )}
 
-      {lastFail && lastReal && Date.parse(lastFail.created_at) > Date.parse(lastReal.updated_at) && (
+      {lastFail && (!lastReal || Date.parse(lastFail.created_at) > Date.parse(lastReal.updated_at)) && (
         <div className="panel" style={{ padding: 14, marginBottom: 18 }}>
-          <strong style={{ color: 'var(--review)' }}>The last run failed.</strong>{' '}
-          <span className="muted">Nothing has come in since {ago(lastReal.updated_at)}.</span>{' '}
+          <strong style={{ color: 'var(--review)' }}>
+            The last run ended {lastFail.conclusion}.
+          </strong>{' '}
+          <span className="muted">
+            {lastReal
+              ? `Nothing has come in since ${ago(lastReal.updated_at)}.`
+              : 'Nothing has come in from it.'}
+          </span>{' '}
           <a href={lastFail.html_url} className="mono" style={{ color: 'var(--accent)' }}>see why</a>
         </div>
       )}

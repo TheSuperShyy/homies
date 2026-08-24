@@ -146,6 +146,11 @@ def fetch_all():
             "oxs_ref": rec.get("_id"),
             "address": rec.get("address"),
             "owner": clean_name(owner.get("firstName")),
+            # Since 012 the apartment is part of the charge's identity, so an
+            # owner of three flats owes three rows rather than overwriting
+            # themselves twice. Empty string, never None: the unique constraint
+            # treats NULLs as distinct and would let the duplicate back in.
+            "unit": str((rec.get("apartment") or {}).get("number") or ""),
         })
 
     print(f"\nresidents with a phone: {len(residents)}   "
@@ -172,7 +177,7 @@ def apply(residents, charges):
         # Those are real money owed by real people, so they are carried across
         # the purge and re-attached by name to the resident's real phone.
         carried = conn.execute("""
-            select r.full_name, c.period, c.amount, c.status
+            select r.full_name, c.period, c.amount, c.status, c.unit, c.source
             from charges c join residents r on r.id = c.resident_id
             where r.phone like '+9725000000%'
         """).fetchall()
@@ -184,41 +189,66 @@ def apply(residents, charges):
                 where source = 'seed' or phone like '+9725000000%'
             """).rowcount
 
-            for r in residents:
-                conn.execute("""
-                    insert into residents
-                      (full_name, phone, building, unit, oxs_ref, source,
-                       handed_over, do_not_call)
-                    values (%(full_name)s, %(phone)s, %(building)s, %(unit)s,
-                            %(oxs_ref)s, 'oxs', false, false)
-                    on conflict (phone) do update set
-                      full_name = excluded.full_name,
-                      building  = excluded.building,
-                      unit      = excluded.unit,
-                      oxs_ref   = excluded.oxs_ref,
-                      source    = 'oxs'
-                """, r)
+            # ONE STATEMENT FOR ALL SEVEN THOUSAND, NOT SEVEN THOUSAND
+            # STATEMENTS.
+            #
+            # The loop this replaces was measured on 23 Aug: 4m22s to fetch the
+            # residents from OXS, then 14m24s to write them, because every row
+            # was its own round trip to a database in another region. That is
+            # what pushed the job past its 45-minute ceiling and got it killed
+            # in the step after this one. Identical SQL and identical conflict
+            # handling, arrays instead of a loop, seconds instead of minutes.
+            conn.execute("""
+                insert into residents
+                  (full_name, phone, building, unit, oxs_ref, source,
+                   handed_over, do_not_call)
+                select v.full_name, v.phone, v.building, v.unit, v.oxs_ref,
+                       'oxs', false, false
+                  from unnest(%s::text[], %s::text[], %s::text[], %s::text[],
+                              %s::text[])
+                       as v(full_name, phone, building, unit, oxs_ref)
+                on conflict (phone) do update set
+                  full_name = excluded.full_name,
+                  building  = excluded.building,
+                  unit      = excluded.unit,
+                  oxs_ref   = excluded.oxs_ref,
+                  source    = 'oxs'
+            """, ([r["full_name"] for r in residents],
+                  [r["phone"] for r in residents],
+                  [r["building"] for r in residents],
+                  [r["unit"] for r in residents],
+                  [r["oxs_ref"] for r in residents]))
 
             n_charges = 0
             for c in charges:
                 if not c["phone"]:
                     print(f"  ! debt without phone, skipped: {c['owner']} {c['address']}")
                     continue
+                # (resident_id, period, unit) since 012 dropped the two-column
+                # constraint; `source` because it defaults to 'seed', which is
+                # what 007's purge queries delete. This path is not exercised by
+                # the scheduled run — the workflow passes --skip-charges — but a
+                # statement that can only raise 42P10 is not worth leaving in.
                 conn.execute("""
-                    insert into charges (resident_id, period, amount, status, oxs_ref)
-                    select id, %s, %s, 'unpaid', %s from residents where phone = %s
-                    on conflict (resident_id, period) do update set
-                      amount = excluded.amount, oxs_ref = excluded.oxs_ref
-                """, (period, c["amount"], c["oxs_ref"], c["phone"]))
+                    insert into charges
+                      (resident_id, period, amount, status, oxs_ref, source, unit)
+                    select id, %s, %s, 'unpaid', %s, 'oxs', %s
+                      from residents where phone = %s
+                    on conflict (resident_id, period, unit) do update set
+                      amount = excluded.amount, oxs_ref = excluded.oxs_ref,
+                      source = 'oxs'
+                """, (period, c["amount"], c["oxs_ref"], c["unit"], c["phone"]))
                 n_charges += 1
 
             n_carried, lost = 0, []
-            for name, per, amount, status in carried:
+            for name, per, amount, status, unit, src in carried:
                 n = conn.execute("""
-                    insert into charges (resident_id, period, amount, status)
-                    select id, %s, %s, %s from residents where full_name = %s
-                    on conflict (resident_id, period) do nothing
-                """, (per, amount, status, name)).rowcount
+                    insert into charges
+                      (resident_id, period, amount, status, unit, source)
+                    select id, %s, %s, %s, %s, %s
+                      from residents where full_name = %s
+                    on conflict (resident_id, period, unit) do nothing
+                """, (per, amount, status, unit, src, name)).rowcount
                 if n:
                     n_carried += 1
                 else:

@@ -4,9 +4,15 @@
 # GitHub's cron is UTC only and has no notion of daylight saving. Israel is
 # UTC+3 in summer (IDT) and UTC+2 in winter (IST), so midnight local is 21:00
 # UTC for half the year and 22:00 UTC for the other half. Four triggers fire,
-# and the guard step below lets exactly one of each pair through by asking what
-# time it actually is in Jerusalem. A fixed pair of crons would have been one
-# line shorter and wrong for five months of the year.
+# and the `decide` job below lets exactly one of each pair through.
+#
+# IT ASKS WHICH CRON FIRED, NOT WHAT TIME IT IS.
+# The first version compared the Jerusalem clock to `hour in (0, 15)`. GitHub's
+# scheduler is best-effort and runs late under load: the 23 Aug afternoon run
+# started 51 minutes after its cron, at 15:51 Jerusalem — nine minutes from
+# falling outside its own hour and skipping the day in silence.
+# `github.event.schedule` names the cron that fired, and the UTC offset says
+# which of the pair is the live one right now. Lag becomes irrelevant.
 #
 # WHY --quiet IS ON EVERY COMMAND
 # This repository is PUBLIC, and Actions logs on a public repository are
@@ -21,8 +27,8 @@ name: OXS sync
 
 on:
   schedule:
-    - cron: "0 21 * * *"   # 00:00 Israel, summer (IDT)
-    - cron: "0 22 * * *"   # 00:00 Israel, winter (IST)
+    - cron: "0 21 * * *"   # 00:00 Israel, summer (IDT, UTC+3)
+    - cron: "0 22 * * *"   # 00:00 Israel, winter (IST, UTC+2)
     - cron: "0 12 * * *"   # 15:00 Israel, summer
     - cron: "0 13 * * *"   # 15:00 Israel, winter
   workflow_dispatch:
@@ -32,49 +38,93 @@ on:
         type: boolean
         default: false
 
-concurrency:
-  group: oxs-sync
-  cancel-in-progress: false   # a half-finished import is worse than a late one
-
 jobs:
-  sync:
+  # A separate job, and deliberately outside the concurrency group below.
+  #
+  # When the guard was a step inside the one job, the daylight-saving twin
+  # queued behind the real run for its whole duration and then exited in three
+  # seconds — so GitHub recorded a 45-minute run that concluded `success` and
+  # had imported nothing. Run duration is what the /sync page reads to tell real
+  # imports from skipped ones, and it read those as real. Deciding outside the
+  # group means a twin never waits: it finishes in seconds and says so.
+  decide:
     runs-on: ubuntu-latest
-    timeout-minutes: 45       # a full run is ~10 min; this is a hang guard
-
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.when.outputs.go }}
+      local: ${{ steps.when.outputs.local }}
+      why: ${{ steps.when.outputs.why }}
     steps:
-      - name: Is it actually midnight or 15:00 in Jerusalem?
+      - name: Is this cron the live one for the current Israel offset?
         id: when
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          EVENT: ${{ github.event_name }}
         run: |
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import os
           from datetime import datetime
           from zoneinfo import ZoneInfo
+
           now = datetime.now(ZoneInfo("Asia/Jerusalem"))
-          manual = "${{ github.event_name }}" == "workflow_dispatch"
-          go = manual or now.hour in (0, 15)
+          offset = int(now.utcoffset().total_seconds() // 3600)   # 3 summer, 2 winter
+          fired = (os.environ.get("SCHEDULE") or "").strip()
+          manual = os.environ.get("EVENT") == "workflow_dispatch"
+
+          # The cron pair that is correct at each offset. Nothing here reads the
+          # clock, so a late start cannot turn a live run into a skipped one.
+          live = {3: {"0 21 * * *", "0 12 * * *"},
+                  2: {"0 22 * * *", "0 13 * * *"}}.get(offset, set())
+          go = manual or fired in live
+
+          why = ("started by hand" if manual else
+                 f"cron {fired!r} is the live one at UTC+{offset}" if go else
+                 f"cron {fired!r} is the daylight-saving twin at UTC+{offset}")
           print(f"go={'true' if go else 'false'}")
           print(f"local={now:%Y-%m-%d %H:%M %Z}")
+          print(f"why={why}")
           PY
 
-      - name: Report the skip
-        if: steps.when.outputs.go != 'true'
+      - name: Say which it was
         run: |
-          echo "Jerusalem is ${{ steps.when.outputs.local }} — not a sync hour."
-          echo "This is the daylight-saving twin firing. Nothing to do."
+          echo "Jerusalem: ${{ steps.when.outputs.local }}"
+          echo "${{ steps.when.outputs.why }}"
+          echo "importing: ${{ steps.when.outputs.go }}"
 
+  sync:
+    needs: decide
+    if: needs.decide.outputs.go == 'true'
+    runs-on: ubuntu-latest
+
+    # A full pass is ~28 minutes and almost all of it is OXS rate limiting:
+    # 175 buildings, three GETs each, spaced to stay under 60 requests a minute.
+    # The old ceiling was 45, which the first run that actually wrote crossed —
+    # it was killed mid-arrears twice a day for two days. This is headroom for a
+    # slow OXS, not a target.
+    timeout-minutes: 90
+
+    concurrency:
+      group: oxs-sync
+      cancel-in-progress: false   # a half-finished import is worse than a late one
+
+    env:
+      # Python block-buffers stdout when it is a pipe, which an Actions log is.
+      # Both cancelled runs on 23 Aug showed ZERO output from the step that was
+      # killed — twenty-six minutes of progress lines died in the buffer with
+      # the process. A hang has to be visible while it is hanging.
+      PYTHONUNBUFFERED: "1"
+
+    steps:
       - uses: actions/checkout@v4
-        if: steps.when.outputs.go == 'true'
 
       - uses: actions/setup-python@v5
-        if: steps.when.outputs.go == 'true'
         with:
           python-version: "3.12"
 
       - name: Install psycopg
-        if: steps.when.outputs.go == 'true'
         run: pip install --quiet "psycopg[binary]"
 
       - name: Write .env from secrets
-        if: steps.when.outputs.go == 'true'
         env:
           OXS_KEY_GENERAL: ${{ secrets.OXS_KEY_GENERAL }}
           OXS_KEY_DEBTS: ${{ secrets.OXS_KEY_DEBTS }}
@@ -96,20 +146,32 @@ jobs:
           done
           echo "wrote .env with 6 values"
 
+      # THE THREE IMPORTS NO LONGER SHARE A FATE.
+      #
+      # They used to be a plain sequence, so arrears dying took maintenance
+      # requests — a ten-second job — down with it. Each carries its own timeout
+      # and runs unless the whole job was cancelled, and the gate at the end
+      # fails the run if any of them did not land. Residents first, because the
+      # other two match against the rows it writes.
       - name: Residents
-        if: steps.when.outputs.go == 'true'
+        id: residents
+        timeout-minutes: 20
         run: |
           python scripts/oxs_api_import.py --quiet --skip-charges \
             ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
 
       - name: Arrears
-        if: steps.when.outputs.go == 'true'
+        id: arrears
+        if: ${{ !cancelled() }}
+        timeout-minutes: 45
         run: |
           python scripts/oxs_arrears.py --quiet \
             ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
 
       - name: Maintenance requests
-        if: steps.when.outputs.go == 'true'
+        id: requests
+        if: ${{ !cancelled() }}
+        timeout-minutes: 15
         run: |
           python scripts/oxs_requests_sync.py \
             ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
@@ -117,3 +179,23 @@ jobs:
       - name: Shred .env
         if: always()
         run: rm -f .env
+
+      # Names which of the three landed, and goes red if any did not. Without it
+      # a partial import is a red run with no summary, and finding out which
+      # step died means opening a log that is mostly progress counters.
+      - name: Did all three land?
+        if: always()
+        run: |
+          echo "residents: ${{ steps.residents.outcome }}"
+          echo "arrears:   ${{ steps.arrears.outcome }}"
+          echo "requests:  ${{ steps.requests.outcome }}"
+          fail=0
+          for s in "residents=${{ steps.residents.outcome }}" \
+                   "arrears=${{ steps.arrears.outcome }}" \
+                   "requests=${{ steps.requests.outcome }}"; do
+            case "$s" in
+              *=success) ;;
+              *) echo "::error::${s%%=*} did not complete (${s#*=})"; fail=1 ;;
+            esac
+          done
+          exit $fail
