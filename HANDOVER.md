@@ -201,20 +201,22 @@ repertoire on 20 Aug. Both sit inside the span `DEBT_BLOCKS`/`INTAKE_BLOCKS`
 replace, so the English twins carry an English grammar note instead and no
 Hebrew table leaks to an English caller.
 
-**The OXS import runs on GitHub Actions and has never yet completed a pass.**
-The six repository secrets were set on 20 Aug -- before that every run died on
-its first step. Since then every real run has been killed at the 45-minute
-ceiling partway through arrears, so `residents` is current and **`charges` has
-been frozen at 11 Aug and `requests` at 12 Aug**. Five faults, all fixed on
-24 Aug and none yet exercised: row-at-a-time writes (14m24s of the 18m46s
-residents step), the ceiling itself (now 90; a full pass is ~28 minutes), an
-`ON CONFLICT` target that migration 012 dropped on 11 Aug and which answers
-42P10 every time, `charges.source`/`charges.unit` never being set, and
-block-buffered stdout that made the killed step log nothing at all. Watch it at
-`/sync`. **A run finishing in under a minute imported nothing** -- that is the
-daylight-saving guard, not a success, and the page now says so by name. The Run
-now button needs `GITHUB_DISPATCH_TOKEN` (fine-grained PAT, Actions write) in
-Vercel; everything else on that page works without it.
+**The OXS import completed its first full pass on 24 Aug**, four days after the
+secrets landed and thirteen days after it last wrote a charge. Until then every
+real run was killed at the 45-minute ceiling partway through arrears, and the
+write it was heading for would have raised 42P10 when it got there -- migration
+012 dropped `(resident_id, period)` on 11 Aug and both importers still named it.
+Also fixed that day: row-at-a-time writes (14m24s of the 18m46s residents step,
+now seconds), `charges.source`/`charges.unit` never being set, block-buffered
+stdout that made the killed step log nothing at all, a guard that read the clock
+while the scheduler ran 51 minutes late, and a `/sync` page that counted queue
+time as run time and treated only `failure` as failure. **A full pass is ~28
+minutes**, almost all of it OXS rate limiting; the ceiling is 90. Watch it at
+`/sync`, where every count now carries the age of its newest row. **A run
+finishing in under a minute imported nothing** -- that is the daylight-saving
+guard, not a success, and the page says so by name. The Run now button needs
+`GITHUB_DISPATCH_TOKEN` (fine-grained PAT, Actions write) in Vercel; everything
+else on that page works without it.
 
 **The debt agent no longer transfers on "the lift isn't fixed".** It works
 the objection first -- log the fault, say that the committee money funds the
@@ -280,7 +282,7 @@ say anyone is being put through.
 | Off-topic questions | politely declined, never escalated, since 18 Aug |
 | Ticket numbers in Homies' own format | `255-NNNN-YY` since 18 Aug; the old `HM-YYYY-NNNN` still resolves |
 | Dashboard | live; 10/25/50 rows a page, chosen in the URL |
-| OXS → Supabase import | scripts work by hand; the twice-daily workflow has never completed a pass — fixed 24 Aug, first run still owed |
+| OXS → Supabase import | works; twice daily on GitHub Actions, first complete pass 24 Aug (~28 min), watched at `/sync` |
 
 **Does not exist:**
 
@@ -314,12 +316,12 @@ say anyone is being put through.
   `GET /{phone-number-id}?fields=webhook_configuration`, never
   `GET /{app-id}/subscriptions`, which lies.
 
-- **A completed scheduled import.** `.github/workflows/oxs-sync.yml` is
-  committed, the six secrets are set, and it fires on time — residents, arrears
-  and requests at midnight and 15:00 Israel time. It has still never finished:
-  every real run was killed at its time limit inside the arrears sweep, and the
-  write it was heading for would have raised 42P10 when it got there. Both fixed
-  24 Aug, unrun. Every other import is still done by hand.
+- **A completed run on the schedule itself.** The full pass on 24 Aug was
+  dispatched by hand and finished in 27m41s; the `decide` job that decides
+  whether a cron is the live one or its daylight-saving twin has been exercised
+  only on the manual path, where it always says go. The first scheduled proof is
+  15:00 Israel that day. Every import other than these three is still run by
+  hand.
 - **A campaign runner.** Nothing has ever iterated the queue. **A runner reads
   `v_debt_call_queue_person`, never `v_debt_call_queue`.** The person view is
   one row per resident and IS the grouping decision, made 11 Aug: one call
@@ -768,17 +770,27 @@ handset.**
 
 ## The data, as it stands
 
-- **7,391 residents** — real names, real E.164 mobiles, across 173 active
-  buildings. All carry `handed_over = false`, so **`v_debt_call_queue` is
-  empty and nothing can dial**. A person must flip that flag before any
-  campaign. This is the safety interlock; do not remove it casually.
-- **122 apartments owing ₪101,519.70, held by 120 residents** — one charge per
-  apartment per unpaid month across 2026-01 → 2026-07. July is 108 apartments
-  and 106 people, tapering to 4 owing January. Apartments and residents are
+- **7,532 residents** — real names, real E.164 mobiles, across 174 buildings
+  (175 are active in OXS; one has no resident with a usable phone). All carry
+  `handed_over = false`, so **`v_debt_call_queue` is empty and nothing can
+  dial**. A person must flip that flag before any campaign. This is the safety
+  interlock; do not remove it casually.
+- **586 apartments owing ₪1,022,921, held by 575 residents.** One charge per
+  apartment per period. 534 of those apartments and ₪922,901 arrived in the
+  first complete import on 24 Aug and sit under period 2026-08-01, which is how
+  `oxs_arrears.py` files a whole year's missing months: the amount is the
+  monthly rate times the months not paid, stamped with the month it was
+  computed. The older periods are the earlier hand-run imports — July 108
+  apartments, tapering to 4 owing January. Apartments and residents are
   different numbers and the dashboard counts both.
+- **282 apartments are behind and not chased**, because they have no 2026
+  payment at all and therefore no monthly rate that can be trusted — new,
+  vacant, or never handed over. They are reported by the sweep and deliberately
+  not written.
 - The one legacy row — ₪1,500, a 2022 balance, and the only thing OXS's
   `/debts` endpoint reports for the entire company — was **deleted 17 Aug**.
-  178 charges, ₪100,020 open, all of it 2026 arrears.
+  712 charges now, 9 of them already paid; 69 imported maintenance tickets of
+  103 in total.
 - Zero demo or synthetic rows; both were purged on 10 Aug. Every charge carries
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.

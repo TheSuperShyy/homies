@@ -124,9 +124,32 @@ builds. `requests_reference_key` was checked too, in case the third importer
 carried the same rot -- it does not; that import failed only because it was
 never reached.
 
-**Not verified.** No run has been made since the fix. The write path is proven
-against the live schema but nothing has been committed to the database, so the
-first real arrears import since 11 Aug has still not happened.
+**Then it ran, and finished, for the first time.** Dispatched with `--apply`
+and watched to the end: 27m41s, all three steps green, gate green.
+
+    decide       4s
+    Residents    4m27s   (was 18m46s — the 14m24s of writes is gone)
+    Arrears      22m57s  (the OXS sweep; the writes inside it took 3 seconds)
+    Requests     11s     (had not run at all since 12 Aug)
+
+**576 apartments behind on 2026, ₪975,991.** 534 charges written for
+2026-08-01 -- 41 skipped for having no phone, 1 dropped as a same-flat-number
+collision, which is 576 exactly. `charges` went 178 → 712, every one of them
+`source = 'oxs'` and every one carrying an apartment. **14 owners now hold more
+than one charge in the same period** -- the multi-flat case that has been
+overwriting itself since 11 Aug, landing correctly for the first time. Open
+balances: 703 charges, ₪1,022,921. Requests went 68 → 103, and matched 38 of 38
+service calls to a resident rather than 26 of 27, because it finally ran against
+a resident table imported the same minute.
+
+The 9 charges already marked `paid` all sit in earlier periods, so the status
+rule was not exercised in production -- it stays proven by the rollback test
+only, and the first live test of it will be the first time somebody pays before
+staff enter it in OXS.
+
+**Still owed.** Nobody has looked at `/sync` since it redeployed, and the
+`GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
+Vercel.
 
 ---
 
