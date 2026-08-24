@@ -18,7 +18,8 @@ The monthly figure comes from the apartment's own payment history
 at all this year has no figure to use and is reported separately rather than
 guessed at.
 
-Read-only against OXS. Two GETs per building, spaced for the 60/min limit.
+Read-only against OXS. Three GETs per building, paced inside `get` so the rate
+stays under the 60/min limit whatever the network latency is.
 """
 import argparse
 import json
@@ -26,6 +27,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 from collections import Counter, defaultdict
 from datetime import date
@@ -53,14 +55,43 @@ E = env()
 KG = E["OXS_KEY_GENERAL"]
 
 
-def get(path):
-    req = urllib.request.Request(BASE + path, headers={
-        "x-api-key": KG, "User-Agent": "homies-oxs-arrears/1.0"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        body = json.loads(r.read().decode("utf-8"))
-    if body.get("status") != 1:
-        raise RuntimeError(f"{path}: {body.get('error')}")
-    return body["data"]
+# THE LIMIT IS COUNTED PER REQUEST, SO THE PACING HAS TO BE TOO.
+#
+# This slept 1.05s twice per building while making three GETs, which makes the
+# real request rate a function of how fast the network is. From a GitHub runner
+# each call takes long enough that the sweep sits near 27/min and never notices.
+# Run from a machine close to OXS on 24 Aug it went over 60/min and **37 of 175
+# buildings came back 429** -- every one of them dropped from the arrears list
+# with a printed warning nobody was reading, taking 511 of 576 debtors with
+# them. The sleep now lives in `get`, so the rate is 57/min whatever the
+# latency, and a 429 is retried rather than turned into a missing building.
+PACE = 1.05
+_last = 0.0
+
+
+def get(path, tries=4):
+    global _last
+    for attempt in range(tries):
+        gap = _last + PACE - time.monotonic()
+        if gap > 0:
+            time.sleep(gap)
+        _last = time.monotonic()
+        req = urllib.request.Request(BASE + path, headers={
+            "x-api-key": KG, "User-Agent": "homies-oxs-arrears/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                body = json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or attempt == tries - 1:
+                raise
+            # Retry-After when they send one, otherwise back off 5s, 10s, 20s.
+            back = float(e.headers.get("Retry-After") or 0) or 5 * 2 ** attempt
+            print(f"  · rate limited, waiting {back:.0f}s")
+            time.sleep(back)
+            continue
+        if body.get("status") != 1:
+            raise RuntimeError(f"{path}: {body.get('error')}")
+        return body["data"]
 
 
 def payment_records(blob):
@@ -97,22 +128,27 @@ def sweep():
           f"{DUE[0]}..{YEAR}-{DUE[-1]} ({len(DUE)} months, "
           f"{YEAR}-{THIS_MONTH:02d} excluded as not yet late)\n")
 
-    behind, unknown = [], []
+    behind, unknown, failed = [], [], []
     for i, b in enumerate(buildings, 1):
         addr = f"{b.get('street','').strip()} {b.get('number','').strip()}, {b.get('city','').strip()}"
         try:
             aps = {a["_id"]: str(a.get("number") or "") for a in get(f"/buildings/{b['_id']}/apartments")}
-            time.sleep(1.05)
             recs = payment_records(get(f"/buildings/{b['_id']}/payments?year={YEAR}"))
         except Exception as exc:
             print(f"  ! {addr}: {exc}")
-            time.sleep(1.05)
+            failed.append(addr)
             continue
 
-        # tenant contact, keyed by apartment number
+        # tenant contact, keyed by apartment number.
+        # A failure here is NOT cosmetic and is no longer swallowed: without the
+        # tenants list an apartment keeps its debt but loses its phone, and a row
+        # with no phone is dropped by the writer. A building that 429s here
+        # disappears from the arrears list as surely as one that fails above.
         try:
             tenants = get(f"/buildings/{b['_id']}/tenants")
-        except Exception:
+        except Exception as exc:
+            print(f"  ! {addr} (contacts): {exc}")
+            failed.append(f"{addr} (contacts)")
             tenants = []
         contact = {}
         for t in (tenants.get("results", tenants) if isinstance(tenants, dict) else tenants):
@@ -154,9 +190,9 @@ def sweep():
 
         if i % 20 == 0 or i == len(buildings):
             print(f"  {i}/{len(buildings)} buildings · {len(behind)} behind, "
-                  f"{len(unknown)} with no {YEAR} payment at all")
-        time.sleep(1.05)
-    return behind, unknown
+                  f"{len(unknown)} with no {YEAR} payment at all"
+                  + (f", {len(failed)} unreadable" if failed else ""))
+    return behind, unknown, failed
 
 
 def main():
@@ -171,7 +207,7 @@ def main():
                     help="totals only, no per-apartment lines. Required in CI.")
     a = ap.parse_args()
 
-    behind, unknown = sweep()
+    behind, unknown, failed = sweep()
     behind.sort(key=lambda r: -r["amount"])
     total = sum(r["amount"] for r in behind)
 
@@ -186,6 +222,22 @@ def main():
     print(f"\nNO {YEAR} PAYMENT ON RECORD: {len(unknown)} apartments — "
           f"not chased, no monthly figure to trust (new, vacant, or not handed over)")
 
+    # A PARTIAL SWEEP MUST NOT LOOK LIKE A COMPLETE ONE.
+    #
+    # Whatever it found is still worth writing -- every write here is an upsert
+    # and nothing is deleted, so a short run leaves yesterday's figures standing
+    # rather than erasing them. What it must not do is exit 0, because that is
+    # the signal the workflow gate and `/sync` both read, and "the arrears list"
+    # missing 37 buildings while reporting success is the same lie this whole
+    # import spent a fortnight telling.
+    if failed:
+        print(f"\n{'!'*78}\n{len(failed)} buildings could not be read and are "
+              f"MISSING from the list above:")
+        for f in failed:
+            print(f"  ! {f}")
+        print("This run is incomplete. It will still write what it found, and "
+              f"then exit non-zero.\n{'!'*78}")
+
     # Gitignored either way (`docs/reference/arrears-*.json`), but a scheduled
     # runner has no reader for it, and one fewer copy of a debtor list on a
     # machine we do not own is worth the two lines.
@@ -199,7 +251,7 @@ def main():
 
     if not a.apply:
         print("\nDry run — Supabase untouched. Re-run with --apply.")
-        return
+        sys.exit(1 if failed else 0)
 
     import psycopg
     dsn = E.get("SUPABASE_DB_URL", "").strip()
@@ -291,6 +343,8 @@ def main():
           f"same phone and flat number in two buildings")
     print(f"  {held} charges this period left as they were (paid, disputed or waived)")
     print(f"open balances now: {n} charges, ₪{float(owed):,.0f}")
+    if failed:
+        sys.exit(f"\nIncomplete: {len(failed)} buildings unread, listed above.")
 
 
 if __name__ == "__main__":

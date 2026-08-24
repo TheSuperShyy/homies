@@ -805,7 +805,7 @@ should not inherit a hook); the check itself is committed and runs by hand:
 `bash scripts/check_briefing_logged.sh`. **If it fires and one of the three
 really needs nothing, write the line saying so** rather than bypassing it.
 
-### Known defects — six still open, sixteen fixed and kept for the record
+### Known defects — eight still open, eighteen fixed and kept for the record
 
 1. ~~**The 2022 debt is stamped `2026-08`.**~~ **Fixed 17 Aug.** The row —
    ₪1,500, ארז לויים, הרכסים 17 apt 8, `handed_over=false` — was deleted, and
@@ -851,10 +851,56 @@ really needs nothing, write the line saying so** rather than bypassing it.
    and the node reports "invalid syntax" at run time rather than at deploy; and
    **`isExecuted` is useless on a tool node** — it returned true on a run whose
    execution shows the tool was never called. Use the node's output instead.
+17. **The nightly arrears import writes the UNFILTERED sweep, and the ₪922,901
+   on the dashboard is not a debt figure anybody has stood behind.** Opened
+   24 Aug, the hour the import first completed. `import_arrears.py` — which
+   produced the ₪101,519 figure on 11 Aug — drops two patterns before writing:
+   months forming a **leading run** shared by ≥60% of a building's flagged
+   apartments (the period before Homies managed the building, not debt), and
+   whole buildings where ≥80% miss the same pattern (recording lag, not debt).
+   It reads `docs/reference/arrears-2026.json`, which `oxs_arrears.py` writes
+   **only when `--quiet` is off** — and the workflow passes `--quiet`. So the
+   automated path skips the filter entirely. Raw: 576 apartments, ₪975,991.
+   Filtered, by hand, on 11 Aug: 122 and ₪101,519. **Do not quote the dashboard
+   arrears total to the client until this is settled.** Nothing dials — every
+   resident is `handed_over = false`.
+
+18. **Two importers disagree about what `charges.period` means, and ₪63,614 is
+   counted twice.** `import_arrears.py` writes one row per unpaid month stamped
+   with the month owed; `oxs_arrears.py` writes one cumulative row per apartment
+   stamped with the month it ran. 68 residents hold both — ₪683 for July and
+   ₪683 again inside the August row. Re-running within the same month is safe
+   (it upserts the same period). **1 September is not**: it writes a fresh
+   Jan–Aug row beside the untouched Jan–Jul ones and compounds monthly from
+   there. Decide before then whether the nightly import retires its own earlier
+   rows, or is re-keyed so a year's arrears is one row.
+
 6. **A common-area ticket keeps an apartment number if the resident offers
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly
    never asked, but `check_whatsapp.py` asserts common-area faults carry no
    unit, so the contract and the row disagree and a dispatcher is misled.
+20. ~~**The arrears sweep loses buildings to the rate limit and reports a total
+   anyway.**~~ **Fixed 24 Aug.** It slept 1.05s twice per building while making
+   three GETs, so the request rate depended on latency — ~27/min from a GitHub
+   runner, over 60/min from a machine near OXS, where **37 of 175 buildings
+   answered 429** and were skipped with a printed warning, taking 511 of 576
+   debtors with them. The gate moved inside `get()` and keys on the previous
+   request's start, so the rate is 57/min whatever the link; a 429 is retried
+   three times honouring `Retry-After`; a tenants failure counts as a failure
+   too (it costs the phone, and a row with no phone is dropped by the writer);
+   and an incomplete sweep writes what it found and then **exits non-zero**, so
+   the workflow gate and `/sync` both go red.
+
+19. ~~**The scheduled import had never completed a single pass.**~~ **Fixed
+   24 Aug**, and verified by a 27m41s run that wrote 534 charges. Five faults:
+   the 45-minute job ceiling (a full pass is ~28 min, ceiling now 90), 14m24s of
+   row-at-a-time writes now one statement per table, an `ON CONFLICT
+   (resident_id, period)` that migration 012 dropped on 11 Aug and which
+   answers 42P10 every time, `charges.source`/`charges.unit` never being set,
+   and block-buffered stdout that made the killed step log nothing at all.
+   `charges.status` also stopped being forced back to `'unpaid'` nightly, which
+   would re-chase somebody who paid before staff entered it in OXS.
+
 16. ~~**A caller was told about another resident's request, and the call had no
     memory of itself.**~~ **Fixed 19 Aug.** The category is matched against the
     description as well as the `type`, so a lift enquiry finds the caller's

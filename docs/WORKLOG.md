@@ -151,6 +151,62 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### The sweep can lose a third of the buildings without saying so
+
+Went to check the ₪975,991 the fixed import had just written, by re-running the
+sweep locally with `--quiet` off so the month lists would land in
+`docs/reference/arrears-2026.json`. It came back **65 apartments, ₪74,341** --
+against the same sweep's 576 and ₪975,991 in CI ninety minutes earlier.
+
+**37 of 175 buildings had answered `HTTP 429: Too Many Requests`** and been
+skipped. The CI run had zero. The difference is latency, and the bug is that
+the pacing never accounted for it: the loop slept 1.05s twice per building
+while making three GETs, so the real request rate is a function of how fast the
+network is. From a GitHub runner each payments call takes ten seconds and the
+sweep idles near 27 requests a minute; from a machine close to OXS it goes over
+60 and buildings start dropping out. The dropped ones were not random -- they
+included every large debtor building, so **511 of 576 debtors vanished** and the
+script printed a warning line per building and carried on to announce a total.
+
+The pacing moved into `get()`, which now gates on the previous request's start
+time, so the rate is 57/min whatever the latency and the sleeps cost nothing on
+a slow link. A 429 is retried up to three times, honouring `Retry-After`.
+Measured after: 18 requests in 66 seconds, no 429s.
+
+**And a failed sweep now says so in the only way anything reads.** A tenants
+failure is counted as a failure too -- it does not lose the debt, it loses the
+phone, and a row with no phone is dropped by the writer, so the apartment
+disappears just the same. Whatever the sweep found is still written, because
+every write is an upsert and a short run leaves yesterday's figures standing
+rather than erasing them. What it must not do is exit 0: the workflow gate and
+`/sync` both read that, and an arrears list missing 37 buildings while reporting
+success is the same lie the import spent a fortnight telling.
+
+**Two things about today's ₪922,901 that are not yet decided.**
+
+*The filter stage is not in the automated path.* `import_arrears.py` -- the
+script that produced the ₪101,519 figure on 11 Aug -- drops two patterns before
+writing: months forming a **leading run** shared by 60% or more of a building's
+flagged apartments (that is the period before Homies managed the building, not
+debt), and whole buildings where 80% or more miss the same pattern (recording
+lag, not debt). It reads the JSON `oxs_arrears.py` writes **only when `--quiet`
+is off**, and the workflow passes `--quiet`. So the nightly path skips the
+filter entirely and writes the raw sweep. That is where ₪975,991 against
+₪101,519 comes from, and it is now on the dashboard.
+
+*The two importers disagree about what `period` means.* The old one wrote one
+row per unpaid month, stamped with the month owed. `oxs_arrears.py` writes one
+cumulative row per apartment stamped with the month it ran. **68 residents now
+hold both**, ₪63,614 across 107 charges counted twice -- ₪683 for July and ₪683
+again inside August. Today's 15:00 run cannot make it worse, because it upserts
+the same period. **1 September can**: it will write a fresh Jan-Aug row beside
+the untouched Jan-Jul one, and compound every month after that.
+
+Neither is mine to settle -- the filter thresholds were a judgement made against
+real data on 11 Aug, and retiring 107 charges is money coming off a client-facing
+figure. Both are written up as open defects. A clean sweep is running to
+quantify exactly what each filter removes.
+
 ---
 
 ## 2026-08-23

@@ -110,6 +110,18 @@ killed mid-write (24 Aug). Ask the database. `max(updated_at)` on the table the
 import writes settles in one query what a run list cannot settle at all, which
 is why every count on `/sync` now carries the age of its newest row.
 
+**Pace a rate limit per request, never per loop iteration.** `oxs_arrears.py`
+slept twice per building while making three calls, which makes the real request
+rate depend on network latency: safe from a GitHub runner, over the limit from a
+machine near OXS, where it lost 37 of 175 buildings to 429s on 24 Aug and 511 of
+576 debtors with them. The gate belongs inside the fetch function, keyed on the
+previous request's start time. Retry a 429; never let one become a missing row.
+
+**A partial run must not exit 0.** Everything downstream -- the workflow gate,
+`/sync`, a person glancing at a run list -- reads the exit status and nothing
+else. Write what was found, because an upsert that stops early leaves yesterday
+standing, but say the run was incomplete in the one channel anybody reads.
+
 **A migration that changes a constraint owns every statement that names it.**
 Migration 012 moved the apartment onto the charge and dropped
 `(resident_id, period)` on 11 Aug. Two importers still named it in their
