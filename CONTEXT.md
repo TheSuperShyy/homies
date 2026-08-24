@@ -33,6 +33,21 @@ makes promised transfers real, and the dead-end follow-up is a wired lane —
 none of these rely on model discipline. Prompts persuade; workflows and
 tools guarantee.
 
+**The WhatsApp bot is מיכאל again, and the warmth is the name, not the
+punctuation.** Restored 24 Aug at the builder's request (nameless since 12
+Aug "sounded AI"). The brief's English example — *"Hello! Michael here from
+Homies. Hope you are having a great day"* — was answered, not translated:
+no `היי!`, no smiley, no `היום`, and the bot never reports its own mood
+(`הכול טוב, תודה` is banned). Voice and chat now share the name.
+
+**The live n8n workflow is ahead of `n8n_whatsapp.py`, and a PUT is a
+replace.** Eight nodes (the Chatwoot handback and the promise backstop) and
+the Chatwoot-shaped Sort parser exist only in production. `--apply` refuses
+by name until the script catches up; edit live through the REST API
+surgically, back up first to `docs/handover/`, and bring the change back to
+the repo the same day. The 23 Aug prompt rewrite went three days uncommitted
+and was found only because a greeting change nearly overwrote it.
+
 **No realistic example values in prompts the model might echo.** The bot
 read a resident a ticket number fabricated digit-for-digit from the prompt's
 own cautionary example. Formats are taught by structure (office code,

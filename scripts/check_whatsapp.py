@@ -27,8 +27,6 @@ It writes to the live `requests` table and deletes what it wrote, under a
 building number no real address uses.
 """
 
-import hashlib
-import hmac
 import json
 import os
 import sys
@@ -168,25 +166,55 @@ def sb(path, method="GET", body=None):
 
 
 def envelope(frm, text):
-    return {"object": "whatsapp_business_account", "entry": [{
-        "id": E["WHATSAPP_WABA_ID"].strip(), "changes": [{"field": "messages", "value": {
-            "messaging_product": "whatsapp",
-            "metadata": {"phone_number_id": E["WHATSAPP_PHONE_NUMBER_ID"].strip()},
-            "contacts": [{"profile": {"name": "selfcheck"}, "wa_id": frm}],
-            "messages": [{"from": frm, "id": "wamid.CHK%d" % (time.time() * 1000000),
-                          "timestamp": str(int(time.time())),
-                          "type": "text", "text": {"body": text}}]}}]}]}
+    """Chatwoot's `message_created` event, the way its agent bot posts it.
+
+    This was Meta's envelope until the 21 Aug cutover, and stayed Meta's for
+    three days after: the check went red against a working bot, and on 24 Aug
+    five synthetic messages died at Sort's first filter while their executions
+    read `success`. Change 4 of cutover-n8n.md said this would happen.
+
+    Sort filters on `event`, `message_type` and `private`, refuses a
+    conversation with a human assignee, and reads the phone WITH a leading plus
+    which it strips itself -- so `frm` stays bare here and every Supabase
+    lookup below keeps matching on the bare form.
+
+    The conversation id is invented, so the Send node 404s against Chatwoot at
+    the very end of the run. That is after the tools have fired and the row has
+    been written, which is what this file asserts, and it keeps test replies
+    out of the real inbox.
+    """
+    n = int(time.time() * 1000) % 10**9
+    return {
+        "event": "message_created",
+        "id": n,
+        "content": text,
+        "message_type": "incoming",
+        "private": False,
+        "content_type": "text",
+        "sender": {"id": n % 10**6, "type": "contact", "name": "selfcheck",
+                   "phone_number": "+" + frm},
+        "conversation": {"id": 900000000 + n % 10**7, "status": "pending",
+                         "labels": [],
+                         "meta": {"assignee": None, "assignee_type": None}},
+        "inbox": {"id": 1, "name": "Homies WhatsApp"},
+    }
 
 
 def post_message(frm, text, sign=True, bad=False):
-    """Post at the live callback URL exactly as Meta would."""
+    """Post at the live webhook exactly as Chatwoot's agent bot would.
+
+    `sign` and `bad` keep their names and their meaning -- is the caller who it
+    claims to be -- but the mechanism is the shared secret in the query string
+    now. Chatwoot sends a fixed URL and no custom headers, so there is nowhere
+    else for a door to be; see Change 1 of cutover-n8n.md.
+    """
     raw = json.dumps(envelope(frm, text), ensure_ascii=False,
                      separators=(",", ":")).encode("utf-8")
     headers = {"Content-Type": "application/json"}
-    if sign:
-        mac = hmac.new(E["APP_SECRET"].strip().encode(), raw, hashlib.sha256).hexdigest()
-        headers["X-Hub-Signature-256"] = "sha256=" + ("0" * 64 if bad else mac)
     url = E["N8N_BASE_URL"].strip().rstrip("/") + "/webhook/" + "homies-whatsapp"
+    if sign:
+        secret = "not-the-secret" if bad else E["N8N_WEBHOOK_SECRET"].strip()
+        url += "?s=" + urllib.parse.quote(secret)
     return get(url, headers, raw, "POST")[0]
 
 
@@ -205,7 +233,11 @@ def main():
 
     names = {n["name"]: n for n in full["nodes"]}
     hook = names.get("WhatsApp", {}).get("parameters", {})
-    check("webhook takes GET and POST", hook.get("httpMethod") == ["GET", "POST"])
+    # Meta needed GET for its verification handshake; Chatwoot only POSTs, and
+    # the live node says so as `multipleMethods` rather than a method list.
+    # Either shape is a webhook that will answer Chatwoot.
+    check("webhook takes POST", hook.get("multipleMethods") is True
+          or "POST" in (hook.get("httpMethod") or ["POST"]))
     check("webhook keeps the raw body", hook.get("options", {}).get("rawBody") is True)
 
     # BOTH webhook outputs must be wired. One output looks identical in the
@@ -254,9 +286,9 @@ def main():
     # --- 3. A forged message is refused -------------------------------------
     print("\nsecurity")
     frm = "97250%07d" % (int(time.time()) % 10**7)
-    check("unsigned message answers 200", post_message(frm, "x", sign=False) == 200,
-          "200 always — Meta must never be told to retry")
-    check("wrong signature answers 200", post_message(frm, "x", bad=True) == 200)
+    check("no secret answers 200", post_message(frm, "x", sign=False) == 200,
+          "200 always — a caller who is not Chatwoot learns nothing")
+    check("wrong secret answers 200", post_message(frm, "x", bad=True) == 200)
 
     before = our_rows(frm, "&select=reference")
     check("forged messages wrote nothing", len(before) == 0, "%d rows" % len(before))

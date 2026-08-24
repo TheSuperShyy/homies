@@ -151,6 +151,73 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### The bot is מיכאל again, and the repo was three days behind the bot
+
+Asked for the WhatsApp intro to stop sounding like AI, with an English
+example: *"Hello! Michael here from Homies. Hope you are having a great day,
+how can I help you out?"* Decision taken on the one real fork -- the name
+comes back, in Hebrew. It had been off since 12 Aug and the voice agents never
+lost it.
+
+**The brief was answered, not translated.** Every decoration in that example
+fails in Hebrew and the prompt already said why for two of them: `היי!` reads
+as an over-eager bot; *hope you're having a great day* has no Israeli
+equivalent and `מה שלומך?` has been banned since 8 Aug on those grounds. The
+warmth is carried by the name, which is the one thing a person has and a form
+does not. New opener: `היי, כאן מיכאל מהומיז. במה אפשר לעזור?`
+
+**Then the deploy script's dry run showed 23 nodes and the live workflow had
+30.** Stopped. The prompt in n8n was 30,672 characters against 26,718 in the
+repo -- rewritten in the dashboard on 23 Aug, never committed -- and the eight
+nodes the script does not build are the Chatwoot handback and the promise
+backstop, applied through the REST API on 21-23 Aug. An `--apply` to change
+one sentence would have deleted all of it. The repo's system-prompt section
+was rebased onto the live text first, then the intro was rewritten on top.
+
+**And it was already inconsistent in production.** The 23 Aug prompt had the
+name; the menu line the workflow sends to a bare `היי` did not. So a resident
+got `היי, כאן שירות הלקוחות של הומיז` if they typed hello and `היי, כאן מיכאל
+מהומיז. איך אפשר לעזור היום?` if they typed anything else -- the exact drift
+`check_greeting()` exists to stop, which it could not, because the thing that
+drifted was never run through it.
+
+**Four things fixed in the 23 Aug intro, three tells and one contradiction:**
+`איך אפשר לעזור היום?` (the *today* of a translated call centre); `היי! הכול
+טוב, תודה.` (a rep reporting his own mood -- the most scripted line in the
+file); `היי, עדיין כאן :)` (a smiley, in a prompt whose own rules say "אימוג'ים.
+אף אחד."); and "every greeting gets the name back, always" three paragraphs
+after "introduce yourself once and never again". That last one is now: name
+once, at the start of a conversation; a mid-thread `היי` gets a greeting and
+the thread picked up, never a reintroduction.
+
+**Pushed surgically**, not with the script: backup of the live workflow to
+`docs/handover/n8n-whatsapp-live-24aug-before-intro.json` (shared secret
+redacted), then the system message and the Sort greeting replaced in place.
+30 nodes before, 30 after, backstop intact. The script now refuses `--apply`
+by node name while live carries nodes it does not build.
+
+**`check_whatsapp.py` had been red against a working bot since 21 Aug.** It
+still posted Meta's envelope; the live Sort parses Chatwoot's, and Change 4 of
+the cutover doc -- which said exactly this would happen -- was never applied.
+Five synthetic messages died at Sort's first filter with executions reading
+`success`. Rewritten to Chatwoot's `message_created` shape with the `?s=`
+secret, the GET-and-POST assertion relaxed to what a Chatwoot webhook needs,
+the security labels renamed to what they now test. **All checks passed**: row
+in 6 s, `status: open` (the model called `open_request` itself, no rescue),
+common-area fault with no unit, duplicate did not open a second ticket.
+
+**Verified live from three fresh numbers before the check existed:** `היי` →
+`היי, כאן מיכאל מהומיז. במה אפשר לעזור?`; `בוקר טוב, מה נשמע?` → `בוקר טוב, כאן
+מיכאל מהומיז. במה אפשר לעזור?`; a leak in the first message → the name and the
+offer in one reply. Test rows deleted.
+
+**Found in a real transcript from 14:28 the same day, under the old prompt,
+and not fixed here:** a resident wrote `אין לי לא פתחתי` and the bot answered
+*"אוקיי. אם ארצה לפתוח, אשאל על הפרטים"* -- in the resident's voice, as if it
+were the one deciding whether to open a ticket -- then `חחחחח :)` to a laugh,
+and *"אוקיי, תודה בכל אופן"* to `לא אחי`. The smiley licence is gone with the
+intro rewrite; the voice confusion is a separate defect, logged in HANDOVER.
+
 ### OXS has a status field and it is a constant; the progress is somewhere else
 
 Asked whether OXS carries a status at all, since every imported ticket reads

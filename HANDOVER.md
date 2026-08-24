@@ -756,9 +756,19 @@ handset.**
 
 **Changed 12 Aug, and worth knowing before you read a transcript:**
 
-- **The WhatsApp bot has no name.** It is Homies' support desk, not מיכאל, and
-  it will not invent a name if asked. Self-reference stays masculine — that is
-  Hebrew verb grammar, not a persona. The **voice** agents are still מיכאל.
+- **The WhatsApp bot is מיכאל again, since 24 Aug** — nameless from 12 to 24
+  Aug, and the builder's verdict on that was "sounds AI". Opener:
+  `היי, כאן מיכאל מהומיז. במה אפשר לעזור?`, in both the prompt and the menu the
+  workflow sends to a bare `היי`, and `check_greeting()` asserts they match.
+  No `היי!`, no smiley, no `היום`, never reports its own mood. Voice and chat
+  share the name now.
+- **The live n8n workflow is ahead of `scripts/n8n_whatsapp.py`.** Eight nodes
+  and the Chatwoot-shaped Sort parser exist only in production. **`--apply`
+  now refuses** while that is true; patch live through the REST API, back up
+  to `docs/handover/` first (24 Aug backup is there, secret redacted), and
+  bring the change back to the repo. `check_whatsapp.py` speaks Chatwoot's
+  envelope since 24 Aug and is green; it had been red against a working bot
+  since the 21 Aug cutover.
 - **The bot answers in Hebrew unless English is explicitly requested** (the
   menu row, or the word). Script detection was removed: a Latin-letter
   reference number was flipping Hebrew conversations to English.
@@ -883,6 +893,15 @@ really needs nothing, write the line saying so** rather than bypassing it.
    Jan–Aug row beside the untouched Jan–Jul ones and compounds monthly from
    there. Decide before then whether the nightly import retires its own earlier
    rows, or is re-keyed so a year's arrears is one row.
+
+19. **The WhatsApp bot can answer in the resident's voice.** Real transcript,
+   24 Aug 14:28, under the 23 Aug prompt: to `אין לי לא פתחתי` it wrote
+   *"אוקיי. אם ארצה לפתוח, אשאל על הפרטים"* — first person as the one deciding
+   whether to open a ticket — and to `לא אחי`, *"אוקיי, תודה בכל אופן"*. Not
+   the intro; the model losing which side of the conversation it is on, which
+   the WORKLOG has seen before as "does not recognise its own turns". Suspect
+   the `Conversation so far` memory shape. Found while fixing the intro, not
+   fixed. Reproduce with a short refusal after the status-menu tap.
 
 6. **A common-area ticket keeps an apartment number if the resident offers
    one.** A stuck-lift ticket came out with `unit = 12`. The bot correctly

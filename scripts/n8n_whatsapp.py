@@ -248,7 +248,10 @@ TAP_LINE = {
 MENU = {
     "he": {
         "type": "list",
-        "body": {"text": "היי, כאן שירות הלקוחות של הומיז. במה אפשר לעזור?"},
+        # Must stay character-for-character identical to the opener in
+        # prompt.md — check_greeting() below fails the deploy if they drift, and
+        # they did drift once, on 13 Aug. Name restored 24 Aug.
+        "body": {"text": "היי, כאן מיכאל מהומיז. במה אפשר לעזור?"},
         "footer": {"text": "אפשר גם לבחור מהרשימה"},
         "action": {
             "button": "אפשרויות",
@@ -1889,6 +1892,30 @@ def main():
         return
 
     if existing:
+        # A PUT IS A REPLACE, AND THIS SCRIPT IS BEHIND THE LIVE WORKFLOW.
+        #
+        # Since the Chatwoot cutover on 21 Aug the live workflow has carried
+        # eight nodes this file does not build -- the human handback (Human
+        # replied?, Assign to the replier, Carry the reply, Show it in Open,
+        # Open it anyway) and the promise backstop (Promised a transfer, made
+        # none?, Transfer it anyway, The promise backstop) -- plus a Sort node
+        # that parses Chatwoot's envelope rather than Meta's, all applied
+        # through the REST API and never brought back here. On 24 Aug an
+        # --apply to change one greeting would have deleted all of it, and was
+        # caught only because the dry run prints the node list. So it is
+        # refused here, by name, until either the script catches up or the
+        # caller says --force and means it.
+        live = api("GET", "/api/v1/workflows/%s" % existing["id"])
+        ours = {n["name"] for n in wf["nodes"]}
+        extra = [n["name"] for n in live["nodes"] if n["name"] not in ours]
+        if extra and "--force" not in sys.argv:
+            sys.exit(
+                "\nREFUSING TO PUSH. The live workflow has %d node(s) this script "
+                "does not build, and a PUT would delete them:\n%s\n\n"
+                "Bring the script up to date first, or pass --force to replace "
+                "the live workflow anyway. A backup of the live one as of 24 Aug "
+                "is in docs/handover/n8n-whatsapp-live-24aug-before-intro.json."
+                % (len(extra), "".join("  - %s\n" % n for n in extra)))
         api("PUT", "/api/v1/workflows/%s" % existing["id"], wf)
         wid = existing["id"]
         print("\nupdated %s" % wid)
