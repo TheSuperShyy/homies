@@ -786,21 +786,22 @@ handset.**
   `handed_over = false`, so **`v_debt_call_queue` is empty and nothing can
   dial**. A person must flip that flag before any campaign. This is the safety
   interlock; do not remove it casually.
-- **586 apartments owing ₪1,022,921, held by 575 residents.** One charge per
-  apartment per period. 534 of those apartments and ₪922,901 arrived in the
-  first complete import on 24 Aug and sit under period 2026-08-01, which is how
-  `oxs_arrears.py` files a whole year's missing months: the amount is the
-  monthly rate times the months not paid, stamped with the month it was
-  computed. The older periods are the earlier hand-run imports — July 108
-  apartments, tapering to 4 owing January. Apartments and residents are
-  different numbers and the dashboard counts both.
-- **282 apartments are behind and not chased**, because they have no 2026
+- **65 apartments owing ₪60,175, held by 64 residents — 105 monthly charges,
+  Jan–Jul 2026** (written 25 Aug from that morning's sweep). One row per
+  apartment per unpaid month, `period` = the month owed. The raw sweep said
+  576 apartments and ₪977,850; the correction (22 buildings that joined
+  mid-year lose their leading months, 2 buildings with a recording lag are
+  excluded) brings it to 79 apartments / ₪67,225, and 15 of those have no
+  phone and are not written. **89 charges are marked paid** — 80 of them on
+  25 Aug, months the 11 Aug import listed that OXS now shows a payment for.
+  Apartments and residents are different numbers and the dashboard counts both.
+- **342 apartments are behind and not chased**, because they have no 2026
   payment at all and therefore no monthly rate that can be trusted — new,
   vacant, or never handed over. They are reported by the sweep and deliberately
   not written.
 - The one legacy row — ₪1,500, a 2022 balance, and the only thing OXS's
   `/debts` endpoint reports for the entire company — was **deleted 17 Aug**.
-  712 charges now, 9 of them already paid.
+  194 charges now, 89 of them paid, none dated later than July.
 - **70 imported maintenance tickets of 104**, and the other 34 are ours from
   testing (21 voice, 12 WhatsApp, 1 staff) — the Tickets, Calls and
   Conversations pages all show test traffic mixed with the real import. **No

@@ -151,6 +151,53 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### Verified before the client touches it: both agents, all surfaces
+
+Asked to prove the chatbot and the voice agents are untouched by the day's
+changes before anything outbound proceeds. Six surfaces at once.
+
+**Green without comment.** `check_whatsapp.py` end to end. `check_tools.py`:
+all ten voice-tool cases through n8n → Edge Function, the path Vapi really
+calls. Four Vapi assistants read back: prompts (65k / 62k / 44k / 42k chars),
+voices, transcribers and tool lists all match the repo, `vapi_sync.py` dry
+runs target the right ids. Demo page up, serving the live account-6 ids —
+HANDOVER had said account 5, which was stale, not wrong at the time. Dashboard
+pages all 200. The only n8n errors in the window were the probes' own `Send`
+404s against invented Chatwoot conversation ids.
+
+**Recording-off, checked for consequence rather than assumed.** Migration 006
+makes a recording the proof of a spoken card authorisation and says a ticket
+without one "must not be charged". That flow was reversed on 4 Aug on the
+client's instruction — the resident pays through a link OXS sends — and the
+prompt doc says the recording "stops being the authorisation". So the rule is
+history, the writer stores `audio_url = null` without complaint, and
+transcript-only costs nothing the current design uses.
+
+**The four client flows on WhatsApp, run and judged.** Open a ticket: pass —
+offer, building+apartment together, `open_request` fired, `255-1095-26`
+quoted with what happens next, `תודה` → `בבקשה.`. Talk to a person: pass —
+`transfer_to_human` fired on turn one, the fixed line, `בטח.` Status: the
+substance passes (`get_request_status` fires, state in plain Hebrew, no
+invented dates) but the opener asks two questions 3 of 3 — `איזו קריאה? יש
+מספר סידורי?` — and "מספר סידורי" is nobody's word for a ticket number. One
+paragraph added to the prompt: ask **"מה מספר הקריאה?"** and nothing else, and
+the word is מספר קריאה. Pushed live, systemMessage only, verified byte-equal.
+Balance: the judge failed it twice, and it was the test — "בדיקת מערכת" is not
+a name, so the bot asked for one. With `דוד כהן, 050-1234567` it looks up,
+says no match, asks to check the details, and hands over on insistence; split
+across two turns it does the same. Pass.
+
+**The debt list, written from today's sweep.** Raw 576 apartments / ₪977,850;
+corrected 79 / ₪67,225; 15 without a phone; **wrote 104 monthly charges for
+64 apartments and marked 80 paid** — months the 11 Aug import listed that OXS
+now shows a payment for, on apartments read this run. Table: 105 unpaid
+charges, 65 apartments, 64 residents, **₪60,175**, nothing dated August; 89
+paid. The live Debts page shows the same four numbers.
+
+**What could not be done from here.** A voice conversation needs a
+microphone. Either one web call on the demo page, or Vapi's simulated-caller
+suite (`vapi_eval.py`), which costs money and was not started unasked.
+
 ### Five decisions on outbound, and the debt list put right
 
 Asked what section 5 of the checklist meant, then decided it, in order:

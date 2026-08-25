@@ -55,6 +55,12 @@ Nothing auto-dials. The press is the `handed_over` decision. A PIN is typed
 with it because the page has no login wall. Transcript only -- recording is
 off on every assistant and the deploy scripts keep it off.
 
+**Acceptance is the four client flows, not the plumbing check.** Before the
+client is told to test, run open-ticket, status, balance and human on
+`scripts/probe_whatsapp.py` and read the replies; `check_whatsapp.py` was
+green on 25 Aug while two of those flows were not. Use a name that could be a
+name — "בדיקת מערכת" failed the balance flow and it was the test, not the bot.
+
 **The per-message instruction in the agent node outranks the system prompt.
 First-message rules live there, in one sentence per branch.** Proven 25 Aug:
 the 23 Aug dashboard edit of that line ordered "name, offer of help, then the
