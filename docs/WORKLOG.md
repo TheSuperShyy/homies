@@ -11,6 +11,58 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### The Hebrew debt agent is now instructed in Hebrew
+
+Asked to write the prompts in Hebrew so the agent's Hebrew reads as native
+rather than translated. Measured the cost first and put the choice to the
+owner: the debt prompt was 66,492 characters and **4% Hebrew**, an English
+document quoting Hebrew lines, re-sent every turn (one turn is ~17,500 prompt
+tokens; the 13:19 call reached 119,548 and cost $0.22 for fifty seconds).
+Answer: every Hebrew variant gets a Hebrew prompt. The English twins keep
+English.
+
+**Rewritten, not translated.** Meaning first, then the words Hebrew actually
+uses, per the standing rule. Every fixed line the agent speaks was carried
+through **verbatim** rather than re-rendered, because those are already the
+target output and re-translating them would change what a resident hears.
+
+**Verified before pushing**, by extracting the load-bearing artefacts from both
+versions and comparing sets: 10 of 10 `{{variables}}`, 8 of 8 tool names, 14 of
+14 reason and outcome codes, the office phone, address, email, hours, payment
+day and both SLA figures, and all seven quoted fixed lines present character for
+character. The only Latin text left in the Hebrew is tool names, codes and
+variable names, which is correct.
+
+**It came out shorter**: 66,492 characters to 52,586, a fifth less. Hebrew
+tokenises worse per character, so the net token change is smaller than the 2x
+the character count would have implied in the other direction; the real figure
+lands on the next real call and is worth reading off the cost breakdown.
+
+**Two pieces of machinery had to move.**
+
+`vapi_sync.py` finds the first message under a `### Opening` heading, which is
+now `### הפתיחה`. It accepts either, so the frozen English source still parses
+through the same function.
+
+`vapi_en.py` was the bigger one. It built the English twin by taking the **live
+Hebrew prompt** and substituting 62 passages, refusing to ship if any stopped
+matching. With the Hebrew prompt actually in Hebrew there is nothing left for
+that table to match. The last build it produced is frozen under
+`docs/assistant/en/`, and the twins now read from there while still taking
+voice, tools, model tier, durations and endpointing from the Hebrew twin.
+
+**What that cost, and it was the point of the old design:** nothing fails when
+the twins drift now. A change to the Hebrew prompt does not reach the English
+one and no check will say so. Recorded in CONTEXT rather than left to be
+rediscovered.
+
+**Live and verified:** debt (he) 52,586 chars, 68% Hebrew, 7 tools, first
+message correct; debt (en) unchanged at 63,217 and 0% Hebrew.
+
+**Not done: the intake agent**, still 44,719 characters at 4% Hebrew. Same job,
+next.
+
+
 ### The closing beat asks what is unclear, not what else we can do for them
 
 Off the transcript he had been reading: the line that actually bothered him was

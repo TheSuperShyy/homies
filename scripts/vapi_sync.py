@@ -619,9 +619,9 @@ def extract_headings(text):
     if not sp:
         sys.exit("Could not find the '## System prompt' section")
     body = sp.group(1).strip().strip("-").strip()
-    fm = re.search(r"### Opening\s*\n+> (.+)", body)
+    fm = re.search(r"### (?:Opening|הפתיחה)\s*\n+> (.+)", body)
     if not fm:
-        sys.exit("Could not find the opening line under '### Opening'")
+        sys.exit("Could not find the opening line under '### Opening' / '### הפתיחה'")
     return fm.group(1).strip(), body
 
 

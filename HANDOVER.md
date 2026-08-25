@@ -799,6 +799,14 @@ handset.**
   the dashboard transcript. (An earlier note here blamed an acoustic echo from
   laptop speakers; wrong -- testing was on headphones and by typing, and this
   is normal Vapi behaviour.)
+- **Voice: the Hebrew debt prompt is written in Hebrew (25 Aug).** 52,586
+  chars, 68% Hebrew; the rest is tool names, codes and variables. Source is
+  still `docs/features/10-debt-followup/prompt.md`, and `vapi_sync.py debt
+  --apply` still pushes it. **The English twin no longer derives from it** --
+  `vapi_en.py` reads `docs/assistant/en/debt.en.md`, frozen from the last
+  substitution build. Change one and you must change the other by hand.
+  **Intake (he) is still English prose**, 44,719 chars, and is the remaining
+  half of this job.
 - **Voice: the debt call's closing question changed (25 Aug).** Beat 3 was
   "anything else?", which the model rendered as `יש עוד משהו שתרצה ממני?`. It
   now asks whether anything is unclear or they want to ask something --

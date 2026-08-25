@@ -1063,8 +1063,45 @@ TWINS = {
 }
 
 
+FROZEN = {
+    "Homies — Debt Follow-up (en)": "docs/assistant/en/debt.en.md",
+    "Homies — Inbound Intake (en)": "docs/assistant/en/intake.en.md",
+}
+
+
+def frozen_prompt(twin):
+    """The English prompt read from disk, or None if there is no frozen file.
+
+    THE SUBSTITUTION TABLE STOPPED WORKING ON 25 AUG. It took the live Hebrew
+    prompt -- English prose quoting Hebrew lines -- and swapped 62 passages for
+    English, refusing to ship if any of them stopped matching. The Hebrew
+    prompts were then rewritten in Hebrew at the owner's request, so there is no
+    English prose left to keep and nothing for the table to match.
+
+    The last build it produced is frozen under docs/assistant/en/ and the
+    English twins are maintained from there. Everything else about them still
+    comes from the Hebrew twin -- voice, tools, model tier, durations,
+    endpointing -- so the two still behave the same; only the words are now
+    maintained by hand.
+
+    WHAT WAS LOST, AND IT WAS THE POINT OF THE OLD DESIGN: nothing now fails
+    when the two drift. A change to the Hebrew prompt does not reach the English
+    one, and no check will tell you.
+    """
+    import io, os
+    path = FROZEN.get(twin["name"])
+    if not path or not os.path.exists(path):
+        return None
+    raw = io.open(path, encoding="utf-8").read()
+    m = re.search(r"```\n(.*?)\n```", raw, re.S)
+    return m.group(1) if m else None
+
+
 def englished(prompt, twin):
     """The Hebrew prompt with every language-bound passage swapped for English."""
+    frozen = frozen_prompt(twin)
+    if frozen:
+        return frozen
     out = prompt
 
     blocks = twin["block"] or []

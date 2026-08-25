@@ -359,6 +359,15 @@ change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
+**The Hebrew assistants are instructed in Hebrew; the English twins are not.**
+Decided 25 Aug. Fixed lines the agent speaks are carried through verbatim when
+a prompt is rewritten, never re-translated, because they are already the output.
+And the twins are no longer derived from each other: `vapi_en.py` used to build
+the English one from the live Hebrew and refuse to ship on a mismatch, which is
+what kept them saying the same thing. That guarantee is gone. **Changing one
+prompt now requires changing the other by hand, and nothing will fail if you
+do not.**
+
 **A required beat needs its purpose written down, not just its name.** Beat 3
 of the debt call was mandatory for a week and specified only as "anything
 else?", so the model produced the most literal reading of that phrase and asked
