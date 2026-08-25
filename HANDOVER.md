@@ -787,6 +787,18 @@ handset.**
   `—` and `–` to a comma on the way out, so a canned line or a model slip
   cannot carry one. Reference numbers use ASCII hyphens and are untouched by
   the strip, which was tested rather than assumed.
+- **The three buttons are attached by `Send`, on two signals (25 Aug).** The
+  reply containing `מיכאל מהומיז`, or `Sort` reporting `greeting: true`. Until
+  25 Aug it was the name alone, so a second `היי` inside 24 hours lost the
+  buttons: the bot correctly does not reintroduce itself mid-thread, and the
+  trigger went with the name. The live Chatwoot `Sort` had no greeting test at
+  all between the 21 Aug cutover and now.
+- **`Reply usable?` exempts a one-word reply to a greeting (25 Aug).** Its
+  false branch is the rescue: `rescue_request`, a real ticket, and a handover
+  line. `היי.` is one word and correct, so a resident who said hello twice was
+  given a service call. Empty output and one-word answers to anything else
+  still take the rescue. **Residual, flagged not fixed:** a one-word reply to a
+  non-greeting (`תודה` → one word) still opens a `needs_review` ticket.
 - **A tap is remembered for one message (`tapped_open`, 25 Aug).** Tapping
   `פתיחת קריאת שירות` is an explicit request, but the canned reply never
   reaches the model, so the agent used to offer to open a call the resident had

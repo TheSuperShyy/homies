@@ -359,6 +359,15 @@ change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
+**A guard that fires on a shape will fire on correct output eventually.**
+`Reply usable?` treated any one-word reply as a broken generation, which held
+until the prompt gained a rule asking for exactly a one-word reply to a
+mid-thread greeting. The guard then punished the model for obeying, and its
+false branch opens a real ticket. When a rule is added on one side, the guards
+that encode the old assumption have to be re-read: they do not fail loudly,
+they fire on the wrong thing and look like they are working. Tie a guard to
+what the message asked for, not to the length of the answer. Found 25 Aug.
+
 **And whatever the workflow answers on its own, the model has to be told
 happened.** The second half of the same rule, and the more expensive half. A
 canned line is not just a string that drifts; it is a turn the agent has no

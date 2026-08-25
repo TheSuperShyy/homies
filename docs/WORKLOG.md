@@ -11,6 +11,59 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### Saying hello twice lost the buttons, and opened a service call
+
+Owner, from a handset: say הי and the three options do not come. Reproduced on
+the first try, and the cause was two faults stacked on each other.
+
+**The options were keyed on the bot's name.** Nothing in the live workflow ever
+detected a greeting; the `Send` node attached the three buttons when the
+outgoing text matched `/מיכאל מהומיז/`. That is a proxy for *first message*,
+not for *they said hello*. Write הי a second time inside 24 hours and the
+mid-thread rule correctly suppresses the reintroduction, the name is not in the
+reply, and the buttons vanish with it. The Meta-shaped `Sort` in the repo has
+always had a proper `GREETING` test and gave a greeting the menu every time;
+it was lost in the Chatwoot cutover on 21 Aug and nobody noticed, because the
+name regex covered the common case. The test is ported back, `Sort` now emits
+`greeting`, and `Send` attaches on either signal. Regex re-run in node against
+ten inputs: `היי`, `היי!!`, `hi`, `HELLO`, `בוקר טוב`, `מה נשמע` true;
+`שלום, יש נזילה`, `יש נזילה בלובי`, a row title and a reference false.
+
+**Then the worse one.** The second `היי` was answered `היי.` and the resident
+was told `פתחתי קריאה, מספר 255-1117-26. זה עובר לצוות.` `Reply usable?`
+requires two words, one word is treated as a broken generation, and the false
+branch is the rescue: `rescue_request`, a ticket, and a handover line. The
+comment beside that guard said "a single word is a broken generation whatever
+the word is". It is not: the prompt's own mid-thread rule asks for exactly a
+short greeting back, so the guard was firing on output that was doing what it
+was told. A resident who said nothing but hello got a service call and was told
+it was with the team.
+
+One word now passes when the message being answered was a greeting. Empty still
+fails, and a one-word answer to anything else still fails, so the net that
+catches a genuinely broken generation mid-fault is untouched. Verified by
+running the stored expression in node across the matrix: (`היי.`, greeting)
+passes, (`היי.`, not greeting) fails, empty fails either way, a normal sentence
+passes.
+
+**The rescue itself is well built and stays as it is.** It writes the
+resident's own recent inbound messages as the description, `type: null`,
+`status: needs_review`, `oxs_ref: partial:model_claimed`. So the ticket it
+opened was reviewable rather than junk, which is the only reason this was a
+defect and not an incident.
+
+**Live now:** first `היי` gets the greeting and three buttons, second `היי`
+gets a short greeting and three buttons and no ticket, and a fault typed
+without tapping still gets the offer with no buttons attached. Repo and live
+carry the same guard expression, byte for byte.
+
+**Still open.** A one-word reply to something that is not a greeting still
+triggers the rescue: `תודה` answered with a single word would open a
+needs_review ticket. Rarely reachable, lands in a review queue, and narrowing
+it further means weakening a net that was added after a real failure. Flagged
+rather than changed.
+
+
 ### The menu stays; the tap it starts no longer asks a question it already had
 
 Owner, on the greeting screenshot: keep this, and make the reply the open flow

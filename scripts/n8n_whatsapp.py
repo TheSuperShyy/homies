@@ -1028,9 +1028,13 @@ const tappedOpen = !!lastTap && lastTap.kind === 'open'
   && (Date.now() - lastTap.at) < 30 * 60 * 1000;
 if (lastTap) delete store.tapped[from];
 
+// Always false on this branch -- a bare greeting returned the menu above and
+// never reaches the model here -- but the field has to exist, because the
+// "Reply usable?" guard reads it and an undefined there would make a one-word
+// reply unjudgeable rather than merely wrong.
 return [{ json: { _reply: '', _work: true, _canned: false, _menu: false,
                   to: from, text, tapped, lang, greeted, message_id: id,
-                  tapped_open: tappedOpen,
+                  tapped_open: tappedOpen, greeting: GREETING.test(bare),
                   in_text: inText, msg_type: msgType,
                   followup: __FOLLOWUP_MENU__[lang] } }];
 """
@@ -1703,6 +1707,15 @@ def workflow(e):
             # "אני" is exactly as long as a legitimate Hebrew word, so length
             # cannot tell them apart.
             #
+            # THAT LAST CLAIM WAS FALSE, and cost a resident a service call on
+            # 25 Aug. Write הי twice inside a day and the mid-thread rule is to
+            # answer with a short greeting and nothing else -- "היי." -- one
+            # word, correct, and read here as a broken generation. The rescue
+            # fired, opened a ticket, and told them it was with the team. One
+            # word is only evidence of failure when the message being answered
+            # asked for more than one, so a greeting is exempt. Empty still
+            # fails, and a one-word answer to anything else still fails.
+            #
             # Failing this sends the handover line instead, which is the honest
             # answer: we could not produce one, and a person will follow up.
             node(
@@ -1713,8 +1726,11 @@ def workflow(e):
                                 "typeValidation": "loose"},
                     "conditions": [{
                         "id": "words",
-                        "leftValue": "={{ (($json.output || '').trim()"
-                                     ".split(/\\s+/).filter(Boolean)).length >= 2 }}",
+                        "leftValue": "={{ (() => { const w = String($json.output"
+                                     r" || '').trim().split(/\s+/).filter(Boolean).length;"
+                                     " if (w >= 2) return true;"
+                                     " return w === 1 && $('Sort').first().json.greeting === true;"
+                                     " })() }}",
                         "rightValue": "",
                         "operator": {"type": "boolean", "operation": "true",
                                      "singleValue": True},
