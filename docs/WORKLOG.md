@@ -11,6 +11,43 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### The closing beat asks what is unclear, not what else we can do for them
+
+Off the transcript he had been reading: the line that actually bothered him was
+`יש עוד משהו שתרצה ממני?`, and he wants it closer to *do you have any questions
+or concerns?*
+
+Beat 3 of the debt call has been mandatory since 18 Aug but its wording was
+left open -- "whether there is anything else, in whatever words fit the call"
+-- so the model reached for the most literal reading and produced *is there
+anything else you want from me*. The beat is now specified by what it is for
+rather than by that phrase: whether anything is unclear or there is something
+they want to ask, with `יש שאלות או משהו שלא ברור?` as the model line.
+
+**The difference is not politeness.** *What else do you want from me* invites
+nothing and treats the beat as a formality; *is anything unclear* is the
+sentence a resident who did not follow the amount, or which month it was, or
+what the link actually does, can answer honestly. That is the whole reason the
+beat is not optional. A debt call that ends with an unasked question is the one
+that becomes a complaint later.
+
+`יש שאלות או משהו שלא ברור?` also happens to be ungendered, which costs nothing
+here -- the debt agent gets `{{gender_forms}}` off the queue and can inflect --
+but removes one more place to get it wrong.
+
+**Pushed to both twins.** `vapi_sync.py debt --apply` after a line-by-line diff
+of the live prompt against the doc, which showed the only difference was this
+edit and nothing live-only would be lost. Then the English twin, where the
+substitution table refused the build until both new Hebrew quotes had English
+pairs -- the wanted line and the rejected one it is contrasted with -- which is
+exactly the guard doing its job. He 66,492 chars, en 63,217, no Hebrew left in
+the English.
+
+**Not changed: the intake agent.** It has its own "anything else" beat, but
+there it means *another fault to report*, which is a different and legitimate
+question. Worth a decision separately rather than a silent sweep.
+
+
 ### Confirmed: the cut is in the transcript, not in the speech
 
 The owner pasted the transcript he was reading, which answers the question the

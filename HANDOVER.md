@@ -799,6 +799,12 @@ handset.**
   the dashboard transcript. (An earlier note here blamed an acoustic echo from
   laptop speakers; wrong -- testing was on headphones and by typing, and this
   is normal Vapi behaviour.)
+- **Voice: the debt call's closing question changed (25 Aug).** Beat 3 was
+  "anything else?", which the model rendered as `יש עוד משהו שתרצה ממני?`. It
+  now asks whether anything is unclear or they want to ask something --
+  `יש שאלות או משהו שלא ברור?` / `Any questions, or anything that isn't clear?`
+  Live on both debt twins. The intake agent's own "anything else" beat was left
+  alone: there it means another fault to report.
 - **Voice: the "agent gets cut off" report is a transcript artefact (25 Aug,
   confirmed).** The 13:19 call log holds no record of the assistant's text at
   all -- every "Michael" line in the dashboard is a Deepgram transcript, and

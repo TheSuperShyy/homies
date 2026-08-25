@@ -334,6 +334,14 @@ starts, finish it); between the characters of a reference number."""),
 ]
 
 DEBT_LINES = [
+    # 25 Aug. Beat 3 stopped being "anything else you need from me" and became
+    # an invitation to raise a question, so both quotes in that section need a
+    # twin: the wanted line, and the rejected one it is contrasted with.
+    ("`יש שאלות או משהו שלא ברור?`",
+     "`Any questions, or anything that isn't clear?`"),
+    ("came back off a real call as `יש עוד משהו שתרצה ממני?`, and the difference is",
+     "came back off a real call as `is there anything else you need from me?`, and the difference is"),
+
     # 20 Aug. The four-step answer to "I'm not paying while the lift is
     # broken", which replaced a section that told the agent to acknowledge
     # the fault and transfer. Not a word-for-word gloss: the same four moves

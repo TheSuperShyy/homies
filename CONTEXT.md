@@ -359,6 +359,15 @@ change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
+**A required beat needs its purpose written down, not just its name.** Beat 3
+of the debt call was mandatory for a week and specified only as "anything
+else?", so the model produced the most literal reading of that phrase and asked
+the resident what else they wanted from it. Naming a beat says when to speak;
+only its purpose decides what the sentence is for. The closing question asks
+what is unclear, because the one thing that beat exists to catch is a resident
+who did not follow the amount and would otherwise put the phone down confused.
+Decided 25 Aug.
+
 **A voice transcript is evidence of what a recogniser heard, not of what was
 said.** Bot lines are built by transcribing the assistant's own audio, so
 garbled Hebrew in a transcript says nothing about the model or the voice until
