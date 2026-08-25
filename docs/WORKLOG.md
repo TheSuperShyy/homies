@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### A greeting is answered by the workflow now, so the name is always there
+
+Third time of asking, and the first two answers were wrong. The opener has to
+be `היי, כאן מיכאל מהומיז` **whenever** somebody says hello, not only the first
+time in 24 hours. The screenshot: `היי` at 20:47 answered `היי, מה קרה?`.
+
+**The model could not have done this.** The mid-thread rule tells it, correctly,
+not to reintroduce itself once a conversation is running, and it was obeying.
+Asking it to also always give its name to a greeting is asking the prompt to
+hold both sides of a contradiction, which is how the earlier per-message
+instruction ended up outranking the system prompt in the first place.
+
+So a bare hello no longer reaches the model at all. `Sort` answers it with
+`MENU.content`, the same string as the opener in `prompt.md` that
+`check_greeting()` already pins, and `Send` attaches the three buttons to any
+greeting. Deterministic, one fewer model call, and nothing left to drift. This
+is what the Meta-shaped `Sort` in `scripts/n8n_whatsapp.py` has always done and
+what the Chatwoot cutover dropped on 21 Aug; live has now caught up with it by
+a different route, because the `Send menu` node that the repo design uses is
+Meta-shaped and dead here.
+
+Only a bare greeting. `שלום, יש נזילה` has a fault in it and still goes to the
+model.
+
+**Live:** `היי`, then `היי` again, then `שלום`, all three answered
+`היי, כאן מיכאל מהומיז. במה אפשר לעזור?` with the three buttons, none of them
+touching the model. `יש נזילה בלובי` after them still reaches the model and
+still gets the offer with no buttons attached.
+
+**A consequence worth knowing.** A greeting typed in the middle of a flow now
+restarts the opener rather than continuing. That is the instruction as given,
+and it is the price of the rule being unconditional.
+
+
 ### Saying hello twice lost the buttons, and opened a service call
 
 Owner, from a handset: say הי and the three options do not come. Reproduced on

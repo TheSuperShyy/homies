@@ -359,6 +359,16 @@ change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
+**When two rules for the model contradict each other, one of them belongs in
+code.** The opener must always carry the name; the bot must not reintroduce
+itself mid-thread. Both are right, and no prompt holds both -- whichever is
+written more forcefully wins that turn, which is drift dressed as behaviour.
+A greeting is now answered by the workflow, so the name is a fact rather than
+an instruction, and the mid-thread rule keeps its meaning for everything else.
+The same reasoning already governs sequencing: what must always happen lives in
+code, not in the model. Decided 25 Aug, after three attempts to fix it in the
+prompt.
+
 **A guard that fires on a shape will fire on correct output eventually.**
 `Reply usable?` treated any one-word reply as a broken generation, which held
 until the prompt gained a rule asking for exactly a one-word reply to a

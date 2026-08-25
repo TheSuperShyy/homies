@@ -787,6 +787,13 @@ handset.**
   `—` and `–` to a comma on the way out, so a canned line or a model slip
   cannot carry one. Reference numbers use ASCII hyphens and are untouched by
   the strip, which was tested rather than assumed.
+- **A bare greeting never reaches the model (25 Aug).** `Sort` answers it with
+  `MENU.content` -- `היי, כאן מיכאל מהומיז. במה אפשר לעזור?` -- every time,
+  not once per 24 hours. Asked for three times; the model cannot deliver it
+  because the mid-thread rule forbids reintroducing itself, and both rules
+  cannot be true at once. So the name is now the workflow's job. Only a bare
+  one: `שלום, יש נזילה` still goes to the model. Side effect: a greeting typed
+  mid-flow restarts the opener.
 - **The three buttons are attached by `Send`, on two signals (25 Aug).** The
   reply containing `מיכאל מהומיז`, or `Sort` reporting `greeting: true`. Until
   25 Aug it was the name alone, so a second `היי` inside 24 hours lost the
