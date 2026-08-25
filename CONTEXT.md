@@ -55,6 +55,12 @@ Nothing auto-dials. The press is the `handed_over` decision. A PIN is typed
 with it because the page has no login wall. Transcript only -- recording is
 off on every assistant and the deploy scripts keep it off.
 
+**Targets the owner has set aside, 25 Aug.** Voice latency ~1.2 s is
+accepted; do not spend time chasing the PRD's 0.8 s. Ten simultaneous calls
+is not a target while outbound is a button pressed by a person. A complaint is
+a hand-over to a person, not its own ticket type. Do not reopen these without
+being asked.
+
 **Acceptance is the four client flows, not the plumbing check.** Before the
 client is told to test, run open-ticket, status, balance and human on
 `scripts/probe_whatsapp.py` and read the replies; `check_whatsapp.py` was

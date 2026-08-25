@@ -1196,6 +1196,22 @@ Nothing dials: no phone number exists, all 7,391 residents are
 
 ## Next moves, in order
 
+**The owner's read of the PRD checklist, 25 Aug — what is accepted as-is and
+what is still owed.** WhatsApp bot: done; next is moving it to Homies' own
+number and sending the OXS payment link through WhatsApp (template message).
+Status lookups: done, from our copy of OXS, on both channels. Complaints:
+today a complaint becomes a hand-over to a person (transfer_to_human), not a
+ticket with a category — the owner considers the ticket summary enough for a
+human to read; the PRD's separate complaint ticket is not being built. Voice
+latency: **~1.2 s accepted**; the PRD's 0.8 s is not a target. Ten concurrent
+calls: **not a target** while outbound is a manual button; note inbound would
+still need it once a number exists. Chatwoot: **two inboxes** planned — one
+for resident ticketing, one for staff tasks on ticket resolution; needs
+Homies' seats. CRM: no RTL, no login, no daily metrics — acknowledged, still
+owed. Monday: **confirmed in the main PRD** (§0 change 5, §5, §6, §10, §11
+`staff_tasks`, phase 5, open items 7 and 9) — tasks push to Monday one-way;
+still needs their token and board. Outbound: not functional until the number.
+
 **Decided 25 Aug, and the order it happens in.** Outbound is a **Call button
 per resident on `/debts`** — a person presses, the agent rings that one
 resident, nothing auto-dials (feature 15, built). **Transcript only**: recording

@@ -151,6 +151,17 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### The owner walked the checklist
+
+Went through the PRD checklist item by item and set the targets: latency
+~1.2 s is fine, ten concurrent calls is not needed with a manual trigger,
+complaints stay a hand-over rather than a ticket type, Chatwoot gets two
+inboxes (resident ticketing, staff task resolution), the CRM's RTL / login /
+metrics are acknowledged as owed, and Monday was checked against the main
+PRD — it is there in six places, one-way push, waiting on a token and a
+board. Next on WhatsApp: Homies' own number, then the payment link as a
+template message. Recorded in HANDOVER and CONTEXT.
+
 ### Verified before the client touches it: both agents, all surfaces
 
 Asked to prove the chatbot and the voice agents are untouched by the day's
