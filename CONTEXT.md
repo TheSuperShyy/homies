@@ -46,7 +46,8 @@ current-month unpaid OXS row is deleted on every run as the one shape that
 can only be wrong (023, 25 Aug). The 11 Aug correction -- onboarding runs
 dropped, lagging buildings excluded -- is applied on every path, and a charge
 is marked paid only when OXS shows a payment for that month on an apartment
-read that run.
+read that run. Amounts are stored as OXS gives them (agorot and all) and
+**shown in whole shekels** -- ₪105,760.7 on a card reads as a typo.
 
 **Outbound is a button, not a runner.** Decided 25 Aug: a person presses Call
 next to one resident on the Debts page; the agent rings that resident, once.

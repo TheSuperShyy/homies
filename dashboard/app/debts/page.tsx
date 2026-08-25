@@ -36,7 +36,9 @@ type Charge = {
 };
 
 const month = (p: string) => p.slice(0, 7);
-const shekels = (n: number) => '₪' + n.toLocaleString('en-US');
+// Whole shekels. Monthly rates from OXS carry agorot (683.4), and a total of
+// ₪105,760.7 on a card reads as a typo, not as precision anybody wanted.
+const shekels = (n: number) => '₪' + Math.round(n).toLocaleString('en-US');
 const WELL_FORMED = /^\d{4}-\d{2}$/;
 
 export default async function Debts({
