@@ -359,6 +359,14 @@ change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
+**A transcript is evidence of what a microphone heard, not of what was said.**
+Voice bot lines are built from transcription, so on a speakers-on web test they
+record the agent's own audio bouncing back, mis-hearings and all. Two days were
+spent treating garbled Hebrew in a transcript as a model or TTS fault before
+the call log showed the same line intact in `Voice cached`. Before drawing any
+conclusion about what a voice agent said, check it against the log, and test on
+headphones or a real line. Found 25 Aug.
+
 **When two rules for the model contradict each other, one of them belongs in
 code.** The opener must always carry the name; the bot must not reintroduce
 itself mid-thread. Both are right, and no prompt holds both -- whichever is

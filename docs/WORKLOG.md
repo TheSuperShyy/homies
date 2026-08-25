@@ -11,6 +11,58 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### The voice agent cuts itself off because it is listening to itself
+
+Asked why the voice agent gets cut while talking. Read the three calls from
+12:43-12:53 today, all `webCall`, and the cause is in the Deepgram stream
+rather than in any prompt or speaking plan.
+
+**Every final transcript on the microphone channel is the bot's own line.** Ten
+of them in the 12:53 call, word for word against what Cartesia had just
+spoken: `שלום, מדבר מיכאל מחבר`, `אני מתקשר בקשר לוועד הבית על דירה 12`,
+`יש עוד משהו שתרצה?`, `עדיין על הקו`. Not one word of caller speech was
+transcribed in that call at all. What the caller actually said arrived by a
+different route entirely, as `Live call control add-message` events, which is
+how the demo page injects typed text. Speakers into microphone, and the agent
+hears itself as the person it is talking to.
+
+**That is the cut, and the log names it.** Every time speech is detected the
+pipeline logs `User started speaking` → `New turn started` → `Pipeline cleared`
+→ `LLM stream clearing`. The in-flight answer is thrown away and a new turn
+begins. With the echo, the thing triggering it is the agent's own voice about a
+second after it starts talking. `stopSpeakingPlan` is `numWords: 2`,
+`voiceSeconds: 0.3`, so two transcribed words stop it, and its own greeting
+supplies them.
+
+**And it explains the garbled Hebrew nobody could place.** `תם יוף ובפקל של
+מיוף` in the 12:43 call is not the model writing nonsense and not what the
+caller heard. It is Deepgram mis-hearing the agent's own audio coming back
+through the speakers, and it lands in `artifact.messages` as if it were the
+bot's text, because those bot lines are built from the transcription rather
+than from what was sent to the voice. Same reason the first message is recorded
+without its `אה,` and without punctuation while `Voice cached` shows the real
+line in full.
+
+**So the transcripts have been lying about the bot all week.** Anything read
+out of `artifact.messages` for a bot turn is what a microphone in the room
+heard, not what was said. `Voice cached` in the call log is the honest record.
+
+**What this does and does not mean.** On a real phone line there is no acoustic
+path from earpiece to mouthpiece and carrier echo cancellation handles the
+rest, so this specific failure should not survive the move to a real number.
+It is a property of testing in a browser with speakers on. Headphones settle it
+in one call.
+
+**Two settings worth revisiting anyway**, neither changed yet because they are
+the client demo's configuration: `stopSpeakingPlan` at `numWords: 2` /
+`voiceSeconds: 0.3` is an eager barge-in that will also fire on a noisy stairwell
+or a television, and `startSpeakingPlan.smartEndpointingPlan` is set to
+`provider: vapi` on Hebrew audio, which is worth confirming is supported for
+Hebrew rather than assumed.
+
+**Not changed, not deployed.** This entry is a diagnosis.
+
+
 ### A greeting is answered by the workflow now, so the name is always there
 
 Third time of asking, and the first two answers were wrong. The opener has to

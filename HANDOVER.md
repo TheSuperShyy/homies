@@ -787,6 +787,18 @@ handset.**
   `—` and `–` to a comma on the way out, so a canned line or a model slip
   cannot carry one. Reference numbers use ASCII hyphens and are untouched by
   the strip, which was tested rather than assumed.
+- **Voice: a bot line in `artifact.messages` is a TRANSCRIPTION, not what was
+  said (25 Aug).** Web-call testing with speakers on puts the agent's own audio
+  back into the microphone, so Deepgram transcribes it and it is stored as the
+  bot's text. In the 12:53 call all ten microphone transcripts were the bot's
+  own lines and no caller speech was transcribed at all. Consequences: the
+  agent cuts itself off (`User started speaking` → `Pipeline cleared` → the
+  in-flight answer is discarded, and `stopSpeakingPlan.numWords` is 2, which
+  its own greeting reaches in about a second), and garbled Hebrew such as
+  `תם יוף ובפקל של מיוף` is Deepgram mishearing the agent, not the model. **Use
+  headphones for web tests.** The honest record of what was spoken is
+  `Voice cached` in the call log, not the transcript. Should not survive the
+  move to a real phone number; unverified until there is one.
 - **A bare greeting never reaches the model (25 Aug).** `Sort` answers it with
   `MENU.content` -- `היי, כאן מיכאל מהומיז. במה אפשר לעזור?` -- every time,
   not once per 24 hours. Asked for three times; the model cannot deliver it
