@@ -11,6 +11,50 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### Confirmed: the cut is in the transcript, not in the speech
+
+The owner pasted the transcript he was reading, which answers the question the
+previous entry had to leave open: the cut is **seen**, not heard.
+
+The 13:19 call settles it. Its log contains **no record of the assistant's text
+at all** -- 9 final and 21 partial Deepgram transcripts, and nothing else
+carrying Hebrew. Every line labelled "Michael" in that view is recogniser
+output. Watch one assemble:
+
+    0.00s  partial  שלום,
+    0.88s  partial  שלום, מדבר מיכאל מחבר
+    1.94s  partial  שלום, מדבר מיכאל מחברת הומיס שמנהלת
+    2.71s  FINAL    שלום מדבר מיכאל מחברת הומיז שמנהלת את הבניין
+
+`הומיס` corrected to `הומיז` between two frames. An agent does not mispronounce
+its own company and then fix it; a recogniser does exactly that.
+
+**The rest of the paste is the same thing.** `חכה 2º` is `חכה שנייה` with
+Deepgram's number formatter turning *shniya* into an ordinal. `דירה 12 12` is
+one utterance recognised twice across a segment boundary. `450 שקלים` is the
+model's `ארבע מאות וחמישים שקלים`, in words, normalised to digits.
+
+**And the two visible cuts, against the model's own tokens from the 12:53 call:**
+
+| | |
+|---|---|
+| model emitted | `אז רוצה שאני אשלח לך, אה, לינק לתשלום ותסגור את זה?` |
+| transcript shows | `אז רוצה שאני אשלח לינק לתשלום ות` |
+| model emitted | `מעולה, הלינק בדרך עכשיו ותוכל לסגור את זה מתי שבא לך.` |
+| transcript shows | `...ותוכל לסגור את זה מתי שבא` |
+
+Both complete going in. The transcript segment is closed mid-word when the
+pipeline clears, and the pipeline clears the moment the caller speaks or types
+-- ten `Pipeline cleared` events in a fifty-second call.
+
+**What is not proven:** that the audio matched the text. Nothing here can show
+that while recording is off, and the one unexplained anomaly from the earlier
+entry -- two seconds of audio past the end of the model's text in the 12:43:06
+call -- still needs a recorded call to settle. Offered, not enabled: recording
+is off by client instruction (transcript only), so turning it on even once is
+the owner's call.
+
+
 ### Correction: it is not an echo, and the transcript is still not the agent
 
 The entry below blamed an acoustic echo, speakers into microphone. **Wrong.**

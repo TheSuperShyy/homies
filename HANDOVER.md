@@ -799,6 +799,15 @@ handset.**
   the dashboard transcript. (An earlier note here blamed an acoustic echo from
   laptop speakers; wrong -- testing was on headphones and by typing, and this
   is normal Vapi behaviour.)
+- **Voice: the "agent gets cut off" report is a transcript artefact (25 Aug,
+  confirmed).** The 13:19 call log holds no record of the assistant's text at
+  all -- every "Michael" line in the dashboard is a Deepgram transcript, and
+  segments close mid-word when the pipeline clears, which happens whenever the
+  caller speaks or types. Tells to recognise it by: `הומיס` corrected to
+  `הומיז` between frames, `חכה 2º` for `חכה שנייה`, `דירה 12 12` doubled at a
+  segment boundary. **Unproven:** that the audio matched the text; recording is
+  off, so nobody has ground truth. Offer a single recorded call before
+  promising the client the audio is clean.
 - **Voice: no call in the account shows the agent cut mid-sentence (25 Aug).**
   Across all six real calls every `Pipeline cleared` follows a
   `Bot stopped speaking`, never interrupts one; delivery runs ~14 chars/sec,
