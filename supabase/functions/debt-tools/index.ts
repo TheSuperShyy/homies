@@ -149,7 +149,15 @@ function context(message: any): CallContext {
     // has no number. The demo sends one in variableValues so the path is
     // testable, and it is read LAST so a real call can never be overridden by a
     // variable — the one direction of precedence this file got wrong before.
-    callerPhone: phoneOf(call?.customer?.number) ?? phoneOf(v.caller_phone),
+    // `v.phone` last, and it is what CHAT sends. The WhatsApp tool body puts
+    // the sender's number there (n8n_whatsapp.py TOOL_BODY) and the call id is
+    // `wa:<number>`, so the number was always present — but nothing read it
+    // here, and `reported_by_phone` on a ticket is `ctx.callerPhone`. Result:
+    // every ticket ever opened on WhatsApp stored a null phone while the
+    // interaction beside it stored the right one, and the dashboard's Caller
+    // column was empty on the whole channel. Found 25 Aug, the hour complaints
+    // became tickets — a complaint nobody can ring back is half a complaint.
+    callerPhone: phoneOf(call?.customer?.number) ?? phoneOf(v.caller_phone) ?? phoneOf(v.phone),
     charges,
   };
 }
@@ -405,6 +413,9 @@ const TYPE_WORDS: Record<string, string[]> = {
   locksmith: ["lock", "key", "door", "מנעול", "מפתח", "דלת"],
   fire_safety: ["fire", "smoke", "extinguisher", "אש", "עשן", "מטפה"],
   maintenance: ["maintenance", "תחזוקה"],
+  // Ours, not OXS's (migration 025, 25 Aug): a complaint is a ticket on both
+  // channels. The words are what a caller says when asking about one.
+  complaint: ["complaint", "noise", "neighbour", "neighbor", "תלונה", "רעש", "שכן", "שכנים"],
 };
 
 /** Does this row look like the thing the caller named? */
@@ -1560,6 +1571,22 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     //
     // 30 minutes, not 24 hours, because "the leak is back" the next morning is
     // a new fact and deserves its own row.
+    // A COMPLAINT IS NEVER A DUPLICATE, and this guard would eat it.
+    //
+    // Everything above is reasoning about a FAULT: one leak, one van, and a
+    // second report of it is the same physical thing. A complaint is not a
+    // thing in a building, it is a person's account of one — so two complaints
+    // from one building inside half an hour are two people, not one event, and
+    // "place plus type" collides on every single one of them (they share a
+    // type by definition and a common-area complaint has no unit either).
+    //
+    // Caught within the hour of complaints becoming a ticket type on 25 Aug:
+    // a cleaning complaint and a noise complaint, same building, minutes
+    // apart. The second was swallowed into the first and its author was read
+    // back a reference to somebody else's complaint, with their own never
+    // written down. There is no cost on the other side to weigh against that
+    // — nobody is dispatched twice for a complaint.
+    if (type !== "complaint") {
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     let dupeQuery = db
       .from("requests")
@@ -1578,6 +1605,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const { data: existing } = await dupeQuery;
     if (existing && existing.length) {
       return { ok: true, reference: existing[0].reference, duplicate: true };
+    }
     }
 
     // Who this is, when the call did not already say. Outbound we dialled them

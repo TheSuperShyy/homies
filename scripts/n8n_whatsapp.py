@@ -720,7 +720,7 @@ TOOLS = [
                 "type": {"type": "string",
                          "enum": ["plumbing", "electrical", "lighting", "elevator",
                                   "cleaning", "gardening", "pest_control", "locksmith",
-                                  "fire_safety", "maintenance", "other"],
+                                  "fire_safety", "maintenance", "other", "complaint"],
                          "description": "What they named, if they named it — "
                                         "'the elevator' is elevator."},
             },
@@ -1473,7 +1473,7 @@ def workflow(e):
                                             "light, a gate — anything not inside a flat."),
                             from_ai("type", "One of plumbing/electrical/lighting/elevator/"
                                             "cleaning/gardening/pest_control/locksmith/"
-                                            "fire_safety/maintenance/other, if they named "
+                                            "fire_safety/maintenance/other/complaint, if they named "
                                             "the thing. Empty otherwise."),
                         )),
                     "options": {"timeout": 25000},

@@ -915,6 +915,14 @@ really needs nothing, write the line saying so** rather than bypassing it.
    לא פתחתי` → `אוקיי. אז אפשר לפתוח קריאה, לבדוק מצב...`); may have been the
    same cause. Keep open until seen clean on a real handset.
 
+21. **The model is inconsistent about complaint vs the service type.** "The
+   cleaner has not come for two weeks and the lobby is dirty" filed as
+   `complaint` on one run and `cleaning` on the next, same words. Both are
+   defensible — the second even routes to the cleaning team — but it means
+   "every complaint has `type = complaint`" is not a promise anyone can rely
+   on for a report. Decide whether service-not-delivered is a complaint or a
+   task, then say so in one line in both prompts.
+
 20. **Asked `אתה בוט?`, the bot said `אני לא בוט.`** Live, 25 Aug, fresh
    number; on an earlier run the same question got `אני נציג שירות`. There is
    no rule about it in the prompt, so the model improvises, and one of its
@@ -1200,9 +1208,9 @@ Nothing dials: no phone number exists, all 7,391 residents are
 what is still owed.** WhatsApp bot: done; next is moving it to Homies' own
 number and sending the OXS payment link through WhatsApp (template message).
 Status lookups: done, from our copy of OXS, on both channels. Complaints:
-today a complaint becomes a hand-over to a person (transfer_to_human), not a
-ticket with a category — the owner considers the ticket summary enough for a
-human to read; the PRD's separate complaint ticket is not being built. Voice
+**a ticket, `type: complaint`, on voice and WhatsApp** (corrected by the owner
+the same hour; migration 025) — opened like any request, read by staff in the
+dashboard and the inbox, never written to OXS for now. Voice
 latency: **~1.2 s accepted**; the PRD's 0.8 s is not a target. Ten concurrent
 calls: **not a target** while outbound is a manual button; note inbound would
 still need it once a number exists. Chatwoot: **two inboxes** planned — one

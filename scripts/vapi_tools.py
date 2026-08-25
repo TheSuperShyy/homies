@@ -166,7 +166,7 @@ def _open_request(location):
             "type": "string",
             "enum": ["plumbing", "electrical", "lighting", "elevator",
                      "cleaning", "gardening", "pest_control", "locksmith",
-                     "fire_safety", "maintenance", "other"],
+                     "fire_safety", "maintenance", "other", "complaint"],
         },
         "urgency": {
             "type": "string",
@@ -467,7 +467,7 @@ INTAKE_TOOLS = [
                 "type": "string",
                 "enum": ["plumbing", "electrical", "lighting", "elevator",
                          "cleaning", "gardening", "pest_control", "locksmith",
-                         "fire_safety", "maintenance", "other"],
+                         "fire_safety", "maintenance", "other", "complaint"],
                 "description": "What the caller named, if they named it — 'the elevator' is elevator.",
             },
         },

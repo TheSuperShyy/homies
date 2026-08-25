@@ -50,14 +50,21 @@ phrases = [a for a in sys.argv[1:] if a.strip()]
 if not phrases:
     sys.exit(__doc__)
 
-# 5990xxxxxx is not a live Israeli mobile range; still unique per run.
+# THE SHAPE HAS TO BE A REAL ONE, and for a fortnight it was not.
+#
+# `+9725990XXXXXX` gives a ten-digit national number; Israeli mobiles are nine,
+# so the Edge Function's `phoneOf` returned null on every probe message and
+# anything keyed on the sender's number silently did nothing. On 25 Aug that
+# made a fixed `reported_by_phone` look unfixed. `599` is not an allocated
+# mobile prefix, so these still cannot reach a real handset — 59 9 + six digits
+# is nine, which parses.
 seed = int(time.time() * 1000) % 10**7
 phones, cur = [], None
 for i, p in enumerate(phrases):
     if p.startswith(">>") and cur:
         phones.append(cur)
     else:
-        cur = "+9725990%06d" % ((seed + i * 7919) % 10**6)
+        cur = "+972599%06d" % ((seed + i * 7919) % 10**6)
         phones.append(cur)
 texts = [p[2:] if p.startswith(">>") else p for p in phrases]
 
@@ -147,7 +154,12 @@ for table, col, vals in (("messages", "phone", bare + plus),
                          ("requests", "reported_by_phone", bare + plus),
                          ("interactions", "external_call_id", ["wa:" + b for b in bare])):
     try:
-        q = "%s?%s=in.(%s)" % (table, col, ",".join(vals))
+        # THE PLUS HAS TO BE ENCODED. In a URL query string `+` decodes as a
+        # space, so `in.(+972599572372)` asks PostgREST for a number that
+        # begins with a space and matches nothing — which is why this printed
+        # "cleanup requests 0" while leaving real rows behind for a fortnight.
+        q = "%s?%s=in.(%s)" % (table, col,
+                               ",".join(urllib.parse.quote(v, safe="") for v in vals))
         req = urllib.request.Request(base + q, headers=h, method="DELETE")
         n = len(json.loads(urllib.request.urlopen(req, timeout=30).read() or b"[]"))
         print("cleanup %-13s %d" % (table, n))

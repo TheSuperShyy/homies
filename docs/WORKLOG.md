@@ -151,6 +151,54 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### A complaint is a ticket now, and two things it uncovered
+
+Owner, correcting the morning's note: a complaint should **open a ticket** on
+both channels, not hand over to a person. Nothing is written to OXS — the
+foundation first, their API stays read-only.
+
+Migration 025 adds `complaint` to the type constraint, the enum went into both
+channels' tool schemas, and the two prompts gained a paragraph each: on
+WhatsApp a complaint is offered and opened like a leak (hand over only for
+anger, danger, or an explicit ask), on voice it is named as its own type
+beside "a leak is plumbing". Pushed to all four assistants; the English twins
+were rebuilt from the Hebrew so they did not drift. `check_tools.py` gained a
+complaint case, because the type is constrained in Postgres and a drift
+between the enum and the constraint would surface as a resident being told
+their complaint was filed when the database refused it.
+
+**It immediately broke the duplicate guard, and that was worth finding.** The
+guard merges tickets sharing building + type + unit inside 30 minutes — right
+for a fault (one leak, one van) and wrong for a complaint, which shares a type
+by definition and has no unit when it is about a common area. Two complaints
+minutes apart, same building: the second was swallowed, its author read back a
+reference to somebody else's complaint, and their own words never written
+down. Complaints now skip the guard. Verified properly on the second attempt —
+the first test used different units, which the guard would not have merged
+anyway, so it proved nothing: two complaints with identical (type, building,
+unit) 32 seconds apart, both written, distinct references.
+
+**And every WhatsApp ticket ever opened had no caller phone.** `reported_by_phone`
+reads `ctx.callerPhone`, which is built from `customer.number` or
+`caller_phone` — and the chat tool body sends the sender as `phone`. The
+number was always there (the interaction row beside it stores it, recovered
+from the `wa:` call id) and nothing read it, so the dashboard's Caller column
+was empty for the whole channel. One `?? phoneOf(v.phone)` fixes it. A
+complaint nobody can ring back is half a complaint, which is how this
+surfaced.
+
+**Two faults in the probe, found while proving the above.** It invented
+`+9725990XXXXXX` — a ten-digit national number where Israeli mobiles are nine
+— so `phoneOf` rejected every probe sender and the phone fix looked unfixed.
+And its cleanup passed `+972…` unencoded into a PostgREST `in.()`, where `+`
+decodes as a space, so it had been reporting "cleanup requests 0" while
+leaving real rows behind. Both fixed; twelve leftover test tickets deleted by
+hand.
+
+**Not mine, left alone:** `255-1103-26` … `255-1105-26`, voice, all three
+within 0.4s from the demo resident `+972521234568`. Test data in a live table,
+but this session did not create them.
+
 ### The owner walked the checklist
 
 Went through the PRD checklist item by item and set the targets: latency

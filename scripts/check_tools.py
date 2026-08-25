@@ -65,6 +65,12 @@ CASES = [
     ("request_standing_order", {}, None),
     ("log_disputed_payment", {}, None),
     ("open_request", {"description": "leak in the lobby", "type": "plumbing"}, "reference"),
+    # A complaint is a ticket, on voice as well as chat (25 Aug, migration 025).
+    # Here because the type is constrained in Postgres: if the constraint and
+    # the tool enums ever fall out of step, this fails rather than the resident
+    # being told a complaint was filed that the database refused.
+    ("open_request", {"description": "the guard is rude to residents",
+                      "type": "complaint"}, "reference"),
     ("transfer_to_human", {"reason": "hardship", "posture_reached": "hot"}, None),
     ("open_payment_ticket", {"authorization_captured": True}, None),
     # A second ticket for the same call. On n8n this is no longer refused — the
