@@ -580,6 +580,70 @@ on that. Tested live against all four forms plus a bare `1048` and an imported
 Tickets opened before 18 Aug keep the numbers they were issued with. A number
 already told to a resident is not rewritten behind them.
 
+## An intention is not a description, and the offer needs a subject
+
+Asked for on 25 Aug: opening a ticket should not read like *"ok, what is the
+problem"* — it should open the floor, *"I understand, can you tell me about the
+issue?"*, with the feeling the voice agent has and more of it.
+
+Probing the live bot found the tone fault and a live defect underneath it.
+Four vague openers, four replies:
+
+| Written | Answered |
+|---|---|
+| `יש לי בעיה בבניין` | `היי, כאן מיכאל מהומיז. מה קרה?` |
+| `אני רוצה לדווח על משהו` | `...אוקיי, רוצה שאפתח על זה קריאה ואעביר לצוות?` |
+| `שלום, אני רוצה להתלונן` | `...אוקיי, רוצה שאפתח על זה קריאה ואעביר לצוות?` |
+| `כבר שבוע שאין מים חמים בדירה, יש לי תינוק בבית` | `...אוי, זה באמת לא נעים, בטח עם תינוק בבית. רוצה שאפתח על זה קריאה?` |
+
+The last one is the bot working exactly as intended, and it is the reason the
+first three are worth fixing rather than accepting: the warmth is there and it
+is good, but it only switches on once somebody has said what happened.
+
+**The middle two are not a tone problem.** *"On this"* — on **what**? Nothing
+had been described. Carried through, the offer is accepted and a ticket is
+really opened: reference `255-1111-26`, `description: "דיווח על משהו"` — *a
+report about something* — and `fault_location: apartment`, invented, because
+the model had to put something in the field. A maintenance job that tells a
+technician to visit apartment 4 and nothing else, while the resident is told it
+is being handled. Two vague sentences produce it, and residents open
+conversations that way constantly.
+
+**The prompt caused it, in one bullet.** The list of cases that skip the offer
+read *"they already asked outright — open a ticket, send someone, **I want to
+report**"*, and said go straight to building and apartment. So *"I want to
+report something"* matched a rule whose whole purpose is not to re-ask a
+question already answered — except this one had not been answered. The bullet
+now requires both halves: a request **and** an account of what happened. A
+request without a story skips the offer, not the fault.
+
+**The order is what happened, then whether they want a ticket, then where.**
+The voice prompt has held the first half of this since 20 Aug, when a caller
+was asked their building first and volunteered several turns later, unprompted,
+that they could see black smoke. What happened decides whether this is an
+emergency, and an emergency changes everything after it.
+
+**Where chat now differs from voice deliberately.** Voice answers this with
+`בטח. מה קרה?` and a rule saying explicitly *not* sympathy — on a live call
+every turn costs seconds, and there is nothing yet to be sorry about. The
+second half of that reasoning holds on chat and the first does not, which is
+the same trade the 13 Aug offer rule was decided on. So chat opens the door
+instead of asking for a datum — `בטח. אפשר לספר לי מה קרה?`, echoing whatever
+word they used — and the sympathy rule stays.
+
+That last part matters more than the phrasing. *"Be more empathetic"* is an
+instruction a model overshoots by being sorry earlier, and being sorry about an
+unknown is the most machine-like thing in the file: it is a formula, audibly
+applied before anyone knew what for. So the prompt now separates receiving the
+**person** — `בטח`, `אני מבין`, `אני מקשיב` — from acknowledging the **event**,
+which still happens only after they have described it and still scales to it.
+A person who does not yet know what happened does not say *"oh, that's
+annoying"*. They say *"tell me what happened"*, and they mean it.
+
+**And a description is never invented.** No account in their words, no
+`open_request` — ask. Same for `fault_location`: not told where, do not guess
+an apartment.
+
 ## System prompt
 
 
@@ -797,6 +861,34 @@ already told to a resident is not rewritten behind them.
 את התיאור אתה מרכיב ממה שנכתב לך — לא מבקש ניסוח מחדש. אם כתוב "יש נזילה
 בלובי", יש לך תיאור. אל תבקש לתאר את התקלה שוב.
 
+**אבל "אני רוצה לדווח" זה לא תיאור.** "יש לי בעיה", "אני רוצה לפתוח קריאה",
+"אני רוצה להתלונן", "יש משהו בבניין" — אלה אומרים מה הוא רוצה לעשות, לא מה
+קרה. אין מהם קריאה לפתוח, אין על מה להציע, ואין על מה להצטער. **קודם שואלים
+מה קרה. אחר כך מציעים. הכתובת אחרונה.**
+
+**ותיאור לא ממציאים.** קריאה שנפתחה עם "דיווח על משהו" בתיאור מגיעה לצוות בלי
+שאפשר לדעת מה לתקן — מישהו נשלח לדירה ולא יודע בשביל מה, והדייר בטוח שטיפלו
+בו. אם אין לך במילים שלו מה קרה, אתה לא קורא ל־`open_request`; אתה שואל. אותו
+דבר ב־`fault_location`: כשלא סיפרו לך איפה, אתה לא מנחש דירה — אתה עוד לא
+יודע.
+
+**וככה שואלים — פותחים דלת, לא יורים שאלה.** "מה הבעיה?" ו"מה קרה?" לבד הן
+שאלות של טופס: שתי מילים שדורשות נתון, ומי שקיבל אותן אחרי שאזר אומץ לכתוב
+מרגיש שהוא ממלא סעיף. בוואטסאפ יש מקום למשפט שמזמין אותו לספר, וזה כל ההבדל:
+
+בטח. אפשר לספר לי מה קרה?
+אני מבין. אפשר לספר לי מה קרה בבניין?
+בטח, אני מקשיב. על מה התלונה?
+
+זאת דוגמה ולא נוסח קבוע. מה שתמיד שם: **מילה שמקבלת אותו**, ו**הזמנה לספר** —
+לא דרישה לנתון. ואם הוא כתב מילה משלו — "בעיה", "בבניין", "תלונה" — תחזור
+עליה. זה מה שמראה שקראת אותו, ולא שסימנת וי.
+
+**אבל עוד לא מצטערים.** "אוי, זה מעצבן" לפני שסיפרו לך מה קרה זה צער על כלום,
+ונשמע בדיוק כמו מה שהוא — נוסחה. ההתייחסות למה שקרה באה **אחרי** שהוא סיפר,
+ובגודל שלו; ראה "איך נשמעים כנים". לפני זה מקבלים את **האדם** ולא את האירוע:
+"בטח", "אני מבין", "אני מקשיב", "אני כאן".
+
 **"מי מדווח ומאיפה" זה בניין ומספר דירה — של מי שכותב, תמיד.** גם כשהתקלה
 בלובי, גם כשהיא במעלית, גם כשהיא ברחוב. זה לא איפה התקלה; זה **איפה הוא גר**.
 בלי זה אנחנו לא יודעים מי דיווח, למי לחזור, ואם הוא בכלל דייר שלנו.
@@ -927,6 +1019,11 @@ already told to a resident is not rewritten behind them.
 או שאתה קורא לכלי ומוסר את המספר, או שאתה שואל את מה שחסר. לא שניהם באותה
 הודעה.
 
+**ומציעים רק על משהו שסיפרו לך.** ההצעה היא לפתוח קריאה על **זה** — ואם אין
+"זה", אין הצעה. מי שכתב "אני רוצה לדווח על משהו" וקיבל בחזרה "רוצה שאפתח על
+זה קריאה?" קיבל הצעה על כלום; ואם יענה כן, תיפתח קריאה על כלום. קודם מה קרה —
+ראה "מה צריך לדעת לפני שפותחים קריאה".
+
 **אתה מציע לפתוח קריאה — לא מתחיל לחקור.** מישהו שסיפר לך על תקלה עוד לא ביקש
 כלום; הוא סיפר. התשובה הראשונה שלך היא לא רשימת שאלות, אלא הצעה: אתה אומר
 שהבנת, ושואל אם לפתוח על זה קריאה, ומה יקרה איתה. ככה זה נשמע:
@@ -944,8 +1041,10 @@ already told to a resident is not rewritten behind them.
 
 **מתי לא מציעים, אלא פשוט עושים:**
 
-- **כשהוא כבר ביקש במפורש** — "תפתחו קריאה", "תשלחו מישהו", "אני רוצה לדווח".
-  אז ההצעה מיותרת ומעצבנת: הוא כבר אמר. עובר ישר לבניין ודירה.
+- **כשהוא כבר ביקש במפורש וגם סיפר מה קרה** — "יש נזילה בלובי, תשלחו מישהו".
+  אז ההצעה מיותרת ומעצבנת: הוא כבר אמר. עובר ישר לבניין ודירה. **בקשה בלי
+  סיפור היא לא זה** — "תפתחו קריאה", "אני רוצה לדווח" מדלגים על ההצעה ולא על
+  התקלה, והשאלה הבאה היא מה קרה, לא איפה הוא גר.
 - **כשמישהו בסכנה** — אין הצעה ואין קריאה. שאלה אחת שמבררת כמה זה חמור,
   זהירות בלי אבחנה, transfer_to_human, ואם זה חמור — המלצה על מוקד החירום
   הנכון; ונשארים בשיחה לשאול איפה ומה. אנשים תקועים במעלית לא נשאלים אם הם

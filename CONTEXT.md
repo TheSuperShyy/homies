@@ -333,6 +333,28 @@ nothing to weigh: one half is fixed and only the other was ever available. This
 is what makes "make it warmer" a safe instruction to act on, and it governs the
 voice prompts too when that pass finally runs. Added 13 Aug.
 
+**A model asked for a required field will invent one rather than ask.** Not a
+tone problem and not a hallucination in the usual sense: `open_request` needs a
+description, so a resident who had said only *"I want to report something"*
+produced `description: "דיווח על משהו"` and a `fault_location` nobody had
+mentioned. It is the tool schema doing the asking, and the model answering it
+on the resident's behalf. So every tool that takes something a resident must
+supply needs the prompt to say, in words, **not knowing it is a reason to ask,
+not a field to fill** — and any offer to act needs a subject, because "shall I
+open a ticket about this" with no *this* is answered yes by people who assume
+we understood. Found 25 Aug.
+
+**What happened comes before where it happened, on both channels.** An
+intention — *I want to report*, *I have a problem*, *open a ticket* — is not a
+description, and the address is never the next question after one. It decides
+whether this is an emergency, and an emergency changes everything after it.
+Voice learnt this on 20 Aug when a caller volunteered black smoke several turns
+after being asked their building; chat had the same hole through a bullet that
+treated a request as an account. Chat opens the door — `אפשר לספר לי מה קרה?` —
+where voice asks briefly, because a live call charges for turns and a chat does
+not. Sympathy waits for the description on both: being sorry about an unknown
+is a formula, and it sounds like one.
+
 **The chatbot answers building management and nothing else.** Weather, news,
 sport, politics, medical or legal advice, outside suppliers, calculations,
 translation, general knowledge — declined in one friendly sentence with a way

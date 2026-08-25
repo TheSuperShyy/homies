@@ -748,7 +748,18 @@ model and is answered by the workflow. They drifted on 13 Aug and a real handset
 found it. `check_greeting()` now fails the deploy if they stop matching. Any
 reply carrying the `אפשרויות` list button came from the workflow, not the model.
 The bot then **offers** to open a ticket before asking anything, and asks for the building
-and apartment only after the yes. Warmth is now explicitly confined to the
+and apartment only after the yes.
+
+**The order is fixed and it is what → whether → where (25 Aug).** An intention
+is not a description: `אני רוצה לדווח`, `יש לי בעיה`, `אני רוצה להתלונן` say
+what somebody wants done and nothing about what happened, so there is nothing
+to offer on and nothing to open. The bot asks first, and asks by opening a door
+rather than demanding a datum — `בטח. אפשר לספר לי מה קרה?`, echoing whatever
+word they used, never a bare `מה הבעיה?`. Sympathy still waits for the
+description (being sorry about an unknown is the most machine-like line
+available); before it, the bot receives the person — `בטח`, `אני מבין`,
+`אני מקשיב`. A description is never invented and neither is `fault_location`.
+Voice keeps its own shorter form of the same order and was not touched. Warmth is now explicitly confined to the
 sentence and never the fact — see the rule in `CONTEXT.md` — so refusals, the
 reference-number handover and a failed identity check are all phrased like a
 person while the checks behind them are unchanged. Ungendered second person
@@ -763,6 +774,12 @@ handset.**
   workflow sends to a bare `היי`, and `check_greeting()` asserts they match.
   No `היי!`, no smiley, no `היום`, never reports its own mood. Voice and chat
   share the name now.
+- **Tickets about nothing were possible until 25 Aug.** `אני רוצה לדווח על
+  משהו` → `רוצה שאפתח על זה קריאה?` → yes → address wrote a real ticket with
+  `description: "דיווח על משהו"` and an invented `fault_location: apartment`.
+  Cause was one prompt bullet listing `אני רוצה לדווח` among "they already
+  asked outright, go straight to building and apartment". Fixed, live, and
+  re-probed; the bullet now needs a request **and** an account.
 - **The live n8n workflow is ahead of `scripts/n8n_whatsapp.py`.** Eight nodes
   and the Chatwoot-shaped Sort parser exist only in production. **`--apply`
   now refuses** while that is true; patch live through the REST API, back up

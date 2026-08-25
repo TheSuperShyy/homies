@@ -11,6 +11,71 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### Opening a ticket asked for a datum, and opened tickets about nothing
+
+Owner: creating a ticket should not read like *"ok, what is the problem"* — it
+should open the floor, *"I understand, can you tell me about the issue?"*, with
+the voice agent's empathy and more of it.
+
+Probed the live bot with four vague openers before changing anything. `יש לי
+בעיה בבניין` was answered `מה קרה?` — the two-word form he was describing. But
+`אני רוצה לדווח על משהו` and `אני רוצה להתלונן` were answered
+`רוצה שאפתח על זה קריאה?` — **on what?** Nothing had been described. Carried
+through, that offer is accepted and a real ticket is written: `255-1112-26`'s
+predecessor came back with `description: "דיווח על משהו"` — *a report about
+something* — and `fault_location: apartment`, invented, because the field had
+to hold something. A maintenance job telling somebody to visit apartment 4 and
+nothing else, while the resident is told it is handled.
+
+**The prompt caused it, in one bullet.** The cases that skip the offer read
+*"they already asked outright — open a ticket, send someone, **I want to
+report**"*, and sent the bot straight to building and apartment. So *"I want to
+report something"* matched a rule whose entire purpose is not to re-ask an
+answered question — except this one had not been answered. The bullet now needs
+both halves, a request **and** an account; a request without a story skips the
+offer, not the fault.
+
+**What changed in the prompt.** An intention is not a description; a
+description is never invented and neither is `fault_location`; the offer needs
+a subject; and the question that gathers it opens a door instead of demanding
+a datum — `בטח. אפשר לספר לי מה קרה?`, echoing whatever word they used.
+
+**And a guard against overshooting the ask.** *Be more empathetic* is answered
+by a model being sorry earlier, and sympathy for an unknown is the most
+machine-like thing available — a formula, audibly applied before anyone knew
+what for. So receiving the **person** (`בטח`, `אני מבין`, `אני מקשיב`) is
+separated from acknowledging the **event**, which still happens only after it
+is described and still scales to it.
+
+**Where chat now differs from voice on purpose.** Voice answers this with
+`בטח. מה קרה?` under a rule that says explicitly *not* sympathy — on a live
+call each turn costs seconds and nothing has been described yet. The second
+half holds on chat and the first does not, the same trade the 13 Aug offer rule
+was decided on. Voice was left untouched; it already asks what happened before
+where, since the 20 Aug call where the building was asked first and the caller
+volunteered black smoke several turns later.
+
+**Verified live.** Same four openers after the push: `אני מבין. אפשר לספר לי מה
+קרה בבניין?`, `בטח, אפשר לספר לי מה קרה?`, `בטח, אני מקשיב. על מה התלונה?`, and
+the hot-water-with-a-baby message — which was already right — unchanged, still
+offering at once. Then end to end: vague opener → `יש נזילה מהתקרה בחניון כבר
+יומיים` → yes → address → `255-1112-26` with
+`description: "נזילה מהתקרה בחניון"`, `fault_location: common`, `urgency: high`.
+And `תפתחו קריאה בבקשה` now returns `אפשר לספר לי מה קרה?` rather than the
+address. Regression: described faults still get the offer with no extra
+question, status still asks one question, the balance gate is unmoved,
+`check_whatsapp.py` all green.
+
+Pushed by read-modify-write on the agent node alone — `--apply` is still
+refused, and would still delete the eight Chatwoot nodes. 30 nodes before and
+after, active, systemMessage byte-equal to `prompt.md`.
+
+**Still open.** The acknowledgement scales less finely than it reads: a lobby
+leak and *"the neighbour is loud until 3am every night, I can't sleep"* both
+drew `אוי, זה מעצבן`. Not wrong, and the size rule is in the prompt; where the
+top of that range should sit is a taste call for the owner.
+
+
 ### The nightly import was being killed mid-write, and the write would have failed anyway
 
 Asked to fix the nightly import. Four days after the secrets landed it had
@@ -195,9 +260,12 @@ decodes as a space, so it had been reporting "cleanup requests 0" while
 leaving real rows behind. Both fixed; twelve leftover test tickets deleted by
 hand.
 
-**Not mine, left alone:** `255-1103-26` … `255-1105-26`, voice, all three
-within 0.4s from the demo resident `+972521234568`. Test data in a live table,
-but this session did not create them.
+**Not mine:** `255-1103-26` … `255-1105-26`, voice, all three within 0.4s from
+the demo resident `+972521234568`. Test data in a live table, but this session
+did not create them. `1103` and `1104` were left; **`1105` was not** — the last
+cleanup filtered on `type in ('plumbing','complaint') and opened_via='voice'`,
+which caught it alongside the two it was aimed at, after I had said I would
+leave it alone.
 
 ### The owner walked the checklist
 
