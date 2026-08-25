@@ -965,6 +965,12 @@ if (!text.trim()) {
 // re-greeting on a real handset. 'human' and 'balance' fall through to the
 // agent: 'human' becomes transfer_to_human, 'balance' becomes get_balance.
 if (tapped === 'open' || tapped === 'status') {
+  // REMEMBER IT. The canned line never reaches the model, so on the next
+  // message the agent sees a fault description arriving out of nowhere and
+  // offers to open a call the resident already asked for by tapping. Seen live
+  // on 25 Aug, and it is the re-ask the prompt exists to prevent.
+  store.tapped = store.tapped || {};
+  store.tapped[from] = { kind: tapped, at: Date.now() };
   return [{ json: {
     _reply: '', _work: false, _canned: true, _menu: false,
     to: from, lang, text: __TAP_LINE__[tapped][lang],
@@ -1009,8 +1015,22 @@ if (!tapped && GREETING.test(bare)) {
 // because a menu is JSON full of `}}` and an n8n {{ expression }} is cut at
 // the first `}}` it meets — embedding it in a Set node fails as "invalid
 // syntax" with the cause invisible.
+// Spent on the first message after the tap and then forgotten: it says what
+// the resident just did, not a standing state. Half an hour, because somebody
+// who taps and answers tomorrow is starting again. Stale entries are swept so
+// the map cannot grow without limit.
+store.tapped = store.tapped || {};
+for (const k in store.tapped) {
+  if (Date.now() - (store.tapped[k].at || 0) > 60 * 60 * 1000) delete store.tapped[k];
+}
+const lastTap = store.tapped[from];
+const tappedOpen = !!lastTap && lastTap.kind === 'open'
+  && (Date.now() - lastTap.at) < 30 * 60 * 1000;
+if (lastTap) delete store.tapped[from];
+
 return [{ json: { _reply: '', _work: true, _canned: false, _menu: false,
                   to: from, text, tapped, lang, greeted, message_id: id,
+                  tapped_open: tappedOpen,
                   in_text: inText, msg_type: msgType,
                   followup: __FOLLOWUP_MENU__[lang] } }];
 """
@@ -1365,6 +1385,14 @@ def workflow(e):
                             " מחזירים אותן), הוסף הצעת עזרה אחת: במה אפשר לעזור?"
                             " אם יש בהודעה תוכן, בלי \"במה אפשר לעזור\" בכלל:"
                             " השם, ואז ישר מטפלים במה שנכתב, באותה הודעה.]')"
+                            # A tap on "פתיחת קריאת שירות" IS the request, so
+                            # the offer would re-ask an answered question. The
+                            # model cannot know the tap happened -- the line it
+                            # was answered with was canned -- so Sort tells it.
+                            " + ($json.tapped_open ? ' [הדייר כבר ביקש לפתוח"
+                            " קריאה, וכבר אמרנו לו לספר מה קרה. אל תציע לפתוח"
+                            " קריאה, הוא כבר ביקש. אחרי שסיפר, שאל באיזה בניין"
+                            " ואיזו דירה גרים.]' : '')"
                             " + String.fromCharCode(10) + $json.text }}",
                     "options": {"systemMessage": system_prompt()},
                 },

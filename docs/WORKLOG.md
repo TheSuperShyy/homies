@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### The menu stays; the tap it starts no longer asks a question it already had
+
+Owner, on the greeting screenshot: keep this, and make the reply the open flow
+gives a human one. The menu is untouched. Walking the whole path on the live
+bot rather than only the line that was asked about turned up the rest of it.
+
+Tap `פתיחת קריאת שירות`, describe a leak, and the bot answered
+`רוצה שאפתח על זה קריאה ואעביר למשרד?` The resident had asked for a service
+call by tapping the row that says so. **The model never knew.** Canned lines
+are sent by the workflow without a round trip, so from the agent's side a fault
+description arrived out of nowhere and the offer rule fired correctly on wrong
+information. Five messages to open a ticket, one of them asking something the
+first tap had answered.
+
+`greeted` already solves this shape of problem for the introduction, so the fix
+is the same shape: `store.tapped` records which row was tapped, the next
+message carries `tapped_open`, and the per-message instruction tells the agent
+not to offer and to ask the building and apartment once the fault is described.
+Spent on that one message and then deleted, with an hourly sweep, because it
+describes what somebody just did rather than a state they are in. Half an hour,
+after which a tap is history.
+
+**Live, the whole path:** `היי` gets the menu, the tap gets
+`בטח. אפשר לספר לי מה קרה?`, the leak gets
+`אוי, זה מעצבן. באיזה בניין ואיזו דירה גרים?`, and the address gets the
+reference. Four messages, no re-ask, the acknowledgement still there. Typing a
+fault without tapping still gets the offer, which is the case the flag must not
+leak into, and the status tap still answers one question and then the status.
+
+Brought back to `scripts/n8n_whatsapp.py` as well as the live workflow, which
+is one less thing diverged.
+
+
 ### The em dash, and the line a resident actually read was never the model's
 
 Screenshot from a real handset. A tap on `מצב קריאה קיימת` was answered

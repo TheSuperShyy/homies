@@ -787,6 +787,13 @@ handset.**
   `—` and `–` to a comma on the way out, so a canned line or a model slip
   cannot carry one. Reference numbers use ASCII hyphens and are untouched by
   the strip, which was tested rather than assumed.
+- **A tap is remembered for one message (`tapped_open`, 25 Aug).** Tapping
+  `פתיחת קריאת שירות` is an explicit request, but the canned reply never
+  reaches the model, so the agent used to offer to open a call the resident had
+  already asked for. `Sort` now records the tap in workflow static data and the
+  next message carries a flag that tells the agent to skip the offer and ask
+  the building and apartment. Deleted after that one message; typing a fault
+  without tapping still gets the offer.
 - **The canned tap lines are not the model, and they can contradict the
   prompt.** `TAP_LINE` in `scripts/n8n_whatsapp.py` answers a tap on the menu
   with no model round trip. The `status` line spent a day asking three things
