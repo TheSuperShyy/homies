@@ -128,7 +128,13 @@ def sweep():
           f"{DUE[0]}..{YEAR}-{DUE[-1]} ({len(DUE)} months, "
           f"{YEAR}-{THIS_MONTH:02d} excluded as not yet late)\n")
 
-    behind, unknown, failed = [], [], []
+    # `seen` is every apartment with a phone in a building that was read, with
+    # the months it is missing -- INCLUDING apartments missing nothing. The
+    # writer needs it to mark a charge paid: a month that was open in our table
+    # and is no longer missing in OXS has a payment recorded against it. Only
+    # a read apartment can say that, which is why a failed building never
+    # marks anything paid.
+    behind, unknown, failed, seen = [], [], [], []
     for i, b in enumerate(buildings, 1):
         addr = f"{b.get('street','').strip()} {b.get('number','').strip()}, {b.get('city','').strip()}"
         try:
@@ -175,9 +181,11 @@ def sweep():
 
         for ap_id, num in aps.items():
             missing = [m for m in DUE if m not in paid.get(ap_id, set())]
+            name, phone = contact.get(num, (payer.get(ap_id, ""), None))
+            if phone:
+                seen.append({"phone": phone, "unit": num, "missing": missing})
             if not missing:
                 continue
-            name, phone = contact.get(num, (payer.get(ap_id, ""), None))
             row = {"building": addr, "unit": num, "months": missing,
                    "name": name or payer.get(ap_id, "") or "דייר", "phone": phone}
             if rate[ap_id]:
@@ -192,7 +200,63 @@ def sweep():
             print(f"  {i}/{len(buildings)} buildings · {len(behind)} behind, "
                   f"{len(unknown)} with no {YEAR} payment at all"
                   + (f", {len(failed)} unreadable" if failed else ""))
-    return behind, unknown, failed
+    return behind, unknown, failed, seen
+
+
+def is_leading_run(months):
+    """('01','02','03') -> True. ('07',) -> False. ('01','03') -> False."""
+    want = [f"{i:02d}" for i in range(1, len(months) + 1)]
+    return list(months) == want
+
+
+def correct(behind):
+    """The raw sweep, minus what is not debt.
+
+    Written for import_arrears.py on 11 Aug and applied by hand ever since;
+    the nightly path skipped it, which is how ₪922,901 reached a client-facing
+    page on 24 Aug against ₪101,519 for the same data cleaned. Since 25 Aug
+    there is one copy, here, and both importers call it.
+
+    Two patterns, both judged per building:
+
+      * ONBOARDING. Most flagged apartments miss the same *leading* run of
+        months -- 01, or 01-02, or 01-05. A whole building does not go unpaid
+        from January and then resume together; Homies taking the building on
+        in May happens constantly. Those months are dropped, the rest kept.
+      * RECORDING LAG. Most flagged apartments miss the same *recent* pattern.
+        That is the office being behind on entering payments, not sixty
+        residents defaulting in the same month. The building is excluded.
+
+    Returns (rows, onboarded, lagging, dropped_lag, dropped_whole). Rows carry
+    `months` filtered and `amount` recomputed.
+    """
+    by_b = defaultdict(list)
+    for r in behind:
+        by_b[r["building"]].append(r)
+
+    onboarded, lagging = {}, set()
+    for b, rs in by_b.items():
+        if len(rs) < 4:
+            continue
+        common, n = Counter(tuple(r["months"]) for r in rs).most_common(1)[0]
+        share = n / len(rs)
+        if is_leading_run(common) and share >= 0.6:
+            onboarded[b] = set(common)          # months before Homies managed it
+        elif share >= 0.8:
+            lagging.add(b)                       # recording lag, not debt
+
+    rows, dropped_lag, dropped_whole = [], 0, 0
+    for r in behind:
+        if r["building"] in lagging:
+            dropped_lag += 1
+            continue
+        skip = onboarded.get(r["building"], set())
+        months = [m for m in r["months"] if m not in skip]
+        if not months:
+            dropped_whole += 1
+            continue
+        rows.append({**r, "months": months, "amount": r["monthly"] * len(months)})
+    return rows, onboarded, lagging, dropped_lag, dropped_whole
 
 
 def main():
@@ -205,19 +269,44 @@ def main():
     # document the repo rules forbid committing. The workflow always passes it.
     ap.add_argument("--quiet", action="store_true",
                     help="totals only, no per-apartment lines. Required in CI.")
+    # The sweep is 22 minutes of OXS rate limiting. A dry run writes everything
+    # it learned to docs/reference/arrears-YEAR.json; --from-json replays that
+    # file into the write path, so the write can be tested, re-run or repaired
+    # without another sweep. Not for CI, which always sweeps.
+    ap.add_argument("--from-json", action="store_true",
+                    help="skip the sweep, load the last dry run's JSON")
     a = ap.parse_args()
 
-    behind, unknown, failed = sweep()
+    out = os.path.join(ROOT, "docs", "reference", f"arrears-{YEAR}.json")
+    if a.from_json:
+        blob = json.load(open(out, encoding="utf-8"))
+        if "seen" not in blob:
+            sys.exit(f"{out} predates the 25 Aug format (no 'seen'); run a sweep first.")
+        behind, unknown, failed, seen = blob["behind"], blob["unknown"], blob.get("failed", []), blob["seen"]
+        print(f"loaded {out}: {len(behind)} behind, {len(unknown)} unknown, "
+              f"{len(seen)} apartments seen, {len(failed)} failed")
+    else:
+        behind, unknown, failed, seen = sweep()
     behind.sort(key=lambda r: -r["amount"])
     total = sum(r["amount"] for r in behind)
 
-    print(f"\n{'='*78}\nBEHIND ON {YEAR}: {len(behind)} apartments, ₪{total:,.0f}\n")
-    for r in ([] if a.quiet else behind[:40]):
+    print(f"\n{'='*78}\nRAW SWEEP, BEHIND ON {YEAR}: {len(behind)} apartments, ₪{total:,.0f}")
+
+    rows, onboarded, lagging, dropped_lag, dropped_whole = correct(behind)
+    rows.sort(key=lambda r: -r["amount"])
+    charges = sum(len(r["months"]) for r in rows)
+    corrected = sum(r["amount"] for r in rows)
+    print(f"  {len(onboarded)} buildings started mid-year — their leading months dropped")
+    print(f"  {len(lagging)} buildings show a recording lag — excluded entirely ({dropped_lag} apartments)")
+    print(f"  {dropped_whole} apartments had nothing left after the correction")
+    print(f"\nARREARS AFTER CORRECTION: {len(rows)} apartments, {charges} monthly charges, "
+          f"₪{corrected:,.0f}\n")
+    for r in ([] if a.quiet else rows[:40]):
         print(f"  {r['name'][:22]:<22} {r['amount']:>8,.0f}  "
               f"{len(r['months'])}m ({','.join(r['months'])})  "
               f"{r['building'][:26]:<26} apt {r['unit']:<4} {r['phone'] or 'NO PHONE'}")
-    if len(behind) > 40:
-        print(f"  ... and {len(behind)-40} more")
+    if len(rows) > 40 and not a.quiet:
+        print(f"  ... and {len(rows)-40} more")
 
     print(f"\nNO {YEAR} PAYMENT ON RECORD: {len(unknown)} apartments — "
           f"not chased, no monthly figure to trust (new, vacant, or not handed over)")
@@ -243,9 +332,8 @@ def main():
     # machine we do not own is worth the two lines.
     if a.quiet:
         print("\nfull list not written (--quiet)")
-    else:
-        out = os.path.join(ROOT, "docs", "reference", f"arrears-{YEAR}.json")
-        json.dump({"behind": behind, "unknown": unknown},
+    elif not a.from_json:
+        json.dump({"behind": behind, "unknown": unknown, "failed": failed, "seen": seen},
                   open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         print(f"\nfull list written to {out}")
 
@@ -257,10 +345,9 @@ def main():
     dsn = E.get("SUPABASE_DB_URL", "").strip()
     if not dsn:
         sys.exit("SUPABASE_DB_URL is empty in .env.")
-    period = date(YEAR, THIS_MONTH, 1)
 
-    rows = [r for r in behind if r["phone"]]
-    skipped = len(behind) - len(rows)
+    rows = [r for r in rows if r["phone"]]
+    skipped = sum(1 for r in correct(behind)[0] if not r["phone"])
 
     # ONE DEBTOR CAN APPEAR TWICE, AND THE TABLE CANNOT HOLD BOTH.
     #
@@ -277,11 +364,22 @@ def main():
     collisions = len(rows) - len(best)
     rows = list(best.values())
 
+    # ONE ROW PER UNPAID MONTH. `period` is the month itself and `amount` is the
+    # monthly rate -- what the dashboard's "months owed" counts and what the
+    # debt agent names on the phone. The cumulative alternative (one row per
+    # apartment stamped with the month it ran) was written exactly once, on
+    # 24 Aug, and migration 023 removed it; the guard further down makes sure
+    # it cannot come back.
+    ph, un, per, am = [], [], [], []
+    for r in rows:
+        for m in r["months"]:
+            ph.append(r["phone"]); un.append(str(r["unit"] or ""))
+            per.append(date(YEAR, int(m), 1)); am.append(r["monthly"])
+
     names = [r["name"] for r in rows]
     phones = [r["phone"] for r in rows]
     builds = [r["building"] for r in rows]
     units = [str(r["unit"] or "") for r in rows]
-    amounts = [r["amount"] for r in rows]
 
     # ONE STATEMENT PER TABLE, NOT TWO PER APARTMENT.
     #
@@ -291,6 +389,7 @@ def main():
     # network — which is most of the reason the job crossed its ceiling and was
     # killed here, mid-write, twice a day. Same SQL, same conflict handling,
     # one round trip each.
+    this_month = date(YEAR, THIS_MONTH, 1)
     with psycopg.connect(dsn, connect_timeout=15) as conn:
         with conn.transaction():
             conn.execute("""
@@ -309,10 +408,9 @@ def main():
             #
             # It was (resident_id, period) until 11 Aug, when migration 012 put
             # the apartment on the charge and dropped that constraint. The
-            # statement was never updated, so every arrears write since has been
-            # a guaranteed 42P10, "no unique or exclusion constraint matching
-            # the ON CONFLICT specification" — which nobody saw, because the job
-            # was being killed in the sweep before it ever reached this line.
+            # statement was never updated, so every arrears write until 24 Aug
+            # was a guaranteed 42P10 that nobody saw, because the job was being
+            # killed in the sweep before it ever reached this line.
             #
             # `status` is deliberately absent from the update list. It used to be
             # forced back to 'unpaid' every twelve hours, which would re-chase
@@ -323,26 +421,71 @@ def main():
             # 'seed' is what every destructive query in 007 deletes.
             written = conn.execute("""
                 insert into charges (resident_id, period, amount, status, source, unit)
-                select r.id, %s, v.amount, 'unpaid', 'oxs', v.unit
-                  from unnest(%s::text[], %s::numeric[], %s::text[])
-                       as v(phone, amount, unit)
+                select r.id, v.period, v.amount, 'unpaid', 'oxs', v.unit
+                  from unnest(%s::text[], %s::text[], %s::date[], %s::numeric[])
+                       as v(phone, unit, period, amount)
                   join residents r on r.phone = v.phone
                 on conflict (resident_id, period, unit) do update set
                   amount = excluded.amount, source = 'oxs'
-            """, (period, phones, amounts, units)).rowcount
+            """, (ph, un, per, am)).rowcount
+
+            # THE SWEEP NEVER WRITES THE CURRENT MONTH, so an unpaid OXS charge
+            # stamped with it can only be the cumulative shape of 24 Aug --
+            # written again by an old copy of this script, or by a run that
+            # started before the fix. Removed on every run, so the double count
+            # cannot return.
+            stale = conn.execute("""
+                delete from charges
+                 where source = 'oxs' and status = 'unpaid' and period = %s
+            """, (this_month,)).rowcount
+
+            # PAID, ON POSITIVE EVIDENCE ONLY.
+            #
+            # A charge open in our table whose month OXS no longer lists as
+            # missing -- for an apartment this very run read -- has a payment
+            # recorded against it. Not "absent from the arrears list": a
+            # building that failed, a phone that changed, or a filter that
+            # dropped it are all absences, and none of them is a payment. The
+            # raw `missing`, before correction, so onboarding months and
+            # lagging buildings are never called paid by the correction either.
+            seen_map = {(x["phone"], str(x["unit"] or "")): set(x["missing"]) for x in seen}
+            open_rows = conn.execute("""
+                select r.phone, c.unit, c.period
+                  from charges c join residents r on r.id = c.resident_id
+                 where c.status = 'unpaid' and c.source = 'oxs'
+                   and c.period >= %s and c.period < %s
+            """, (date(YEAR, 1, 1), this_month)).fetchall()
+            pp, pu, pd = [], [], []
+            for phone, unit, period in open_rows:
+                key = (phone, str(unit or ""))
+                if key in seen_map and f"{period.month:02d}" not in seen_map[key]:
+                    pp.append(phone); pu.append(str(unit or "")); pd.append(period)
+            paid = 0
+            if pp:
+                paid = conn.execute("""
+                    update charges c set status = 'paid'
+                      from residents r, unnest(%s::text[], %s::text[], %s::date[])
+                           as v(phone, unit, period)
+                     where c.resident_id = r.id and r.phone = v.phone
+                       and c.unit = v.unit and c.period = v.period
+                       and c.status = 'unpaid' and c.source = 'oxs'
+                """, (pp, pu, pd)).rowcount
 
         held = conn.execute("""
             select count(*) from charges
-             where period = %s and status <> 'unpaid'
-        """, (period,)).fetchone()[0]
+             where source = 'oxs' and status in ('disputed', 'waived', 'pending_charge')
+        """).fetchone()[0]
         n = conn.execute("select count(*) from charges where status='unpaid'").fetchone()[0]
         owed = conn.execute("select coalesce(sum(amount),0) from charges where status='unpaid'").fetchone()[0]
+        people = conn.execute("select count(distinct resident_id) from charges where status='unpaid'").fetchone()[0]
 
-    print(f"\nwrote {written} charges for {period}")
-    print(f"  {skipped} skipped, no phone; {collisions} dropped, "
+    print(f"\nwrote {written} monthly charges for {len(rows)} apartments")
+    print(f"  {skipped} apartments skipped, no phone; {collisions} dropped, "
           f"same phone and flat number in two buildings")
-    print(f"  {held} charges this period left as they were (paid, disputed or waived)")
-    print(f"open balances now: {n} charges, ₪{float(owed):,.0f}")
+    print(f"  {paid} charges marked paid — OXS now shows a payment for that month")
+    print(f"  {stale} stale current-month rows removed")
+    print(f"  {held} charges held as disputed, waived or pending — left as they were")
+    print(f"open balances now: {people} residents, {n} charges, ₪{float(owed):,.0f}")
     if failed:
         sys.exit(f"\nIncomplete: {len(failed)} buildings unread, listed above.")
 

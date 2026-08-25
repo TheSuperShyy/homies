@@ -146,7 +146,11 @@ BASE = {
         {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}),
     "model": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.3},
     "firstMessageMode": "assistant-speaks-first",
-    "artifactPlan": {"recordingEnabled": True},
+    # TRANSCRIPT ONLY, NO AUDIO. Decided 25 Aug: nothing is recorded, the
+    # transcript is kept. Switched off live the same day on all four assistants;
+    # this line is what stops the next push switching it back on.
+    "artifactPlan": {"recordingEnabled": False, "videoRecordingEnabled": False,
+                     "transcriptPlan": {"enabled": True}},
     # THE SUMMARY COLUMN WAS EMPTY ON EVERY CALL EVER RECORDED (20 Aug).
     #
     # `interactions.summary` has existed since migration 001 and the dashboard

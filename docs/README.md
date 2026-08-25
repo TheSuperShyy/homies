@@ -119,7 +119,11 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | # | Feature | Est. | State |
 |---|---|---|---|
 | 10 | [Outbound debt follow-up](features/10-debt-followup/feature.md) | 4d | prompt drafted |
-| 11 | [WhatsApp bot](features/11-whatsapp-bot/feature.md) | 3d | built, not deployed |
+| 11 | [WhatsApp bot](features/11-whatsapp-bot/feature.md) | 3d | live on the Meta test number, through Chatwoot |
+| 12 | [Chatwoot inbox](features/12-chatwoot/feature.md) | 2d | live in the message path since 21 Aug |
+| 13 | [Dashboard](features/13-dashboard/feature.md) | 3d | live on Vercel |
+| 14 | [One call per resident](features/14-one-call-per-resident/feature.md) | 1d | view + demo, no runner by decision |
+| 15 | [Call button](features/15-call-button/feature.md) | 1d | built 25 Aug; waits for the Israeli number and a PIN in Vercel |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and

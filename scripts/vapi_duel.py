@@ -246,7 +246,11 @@ def resident_body(scenario=None):
         "maxDurationSeconds": 300,
         "silenceTimeoutSeconds": 30,
         "endCallFunctionEnabled": True,
-        "artifactPlan": {"recordingEnabled": True},
+        # TRANSCRIPT ONLY, NO AUDIO. Decided 25 Aug: nothing is recorded, the
+        # transcript is kept. Switched off live the same day on all four assistants;
+        # this line is what stops the next push switching it back on.
+        "artifactPlan": {"recordingEnabled": False, "videoRecordingEnabled": False,
+                         "transcriptPlan": {"enabled": True}},
     }
 
 

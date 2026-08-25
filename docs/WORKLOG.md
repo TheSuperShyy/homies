@@ -151,6 +151,56 @@ staff enter it in OXS.
 `GITHUB_DISPATCH_TOKEN` that would let the Run now button work is still not in
 Vercel.
 
+### Five decisions on outbound, and the debt list put right
+
+Asked what section 5 of the checklist meant, then decided it, in order:
+fix the list; a Call button on the Debts page, pressed by a person, never an
+auto-dialer; transcript only, no recording; the no-repeat / do-not-call /
+calling-hours rules later; order the Israeli number. Built the first three.
+
+**Recording off, transcripts kept.** `artifactPlan.recordingEnabled` was true
+on all four assistants; now false, video off, `transcriptPlan.enabled` true,
+read back. Two deploy scripts (`vapi_sync.py`, `vapi_duel.py`) would have
+switched it back on at the next push; both changed. The call page's dead
+player note now says audio exists only for calls before 25 Aug.
+
+**The debt list.** Migration 023 deleted the cumulative rows -- 540 of them
+by then, ₪934,061, the 15:00 run having added six -- pinned by period,
+source, status and a 24 Aug `created_at`. The table went back to 169 per-month
+charges, 121 apartments, ₪100,020. Then `oxs_arrears.py` was rewritten from
+`sweep()` down: the 11 Aug correction (onboarding runs dropped, lagging
+buildings excluded) now lives in it as `correct()` and `import_arrears.py`
+imports it, so there is one copy; `--apply` writes one row per unpaid month
+with `period` = the month; a guard deletes any current-month unpaid OXS row on
+every run, since the sweep never writes one and only the old shape could; and
+a charge is marked **paid on positive evidence only** -- the apartment was
+read this run and OXS no longer lists that month as missing. Not "absent from
+the list": a failed building, a changed phone and a filter are all absences
+and none is a payment. `--from-json` replays the last dry run's file, which
+now also carries `seen`, so the write path can be tested without a 22-minute
+sweep. Replayed on yesterday's sweep the correction gives **81 apartments, 124
+monthly charges, ₪68,365** against ₪979,974 raw.
+
+**The Call button.** Migration 024 adds `press_call(phone)`, SECURITY
+DEFINER: flips `handed_over` for that one resident and returns their
+`v_debt_call_queue_person` row, or NULL when not eligible -- the only write
+the anon key gains on `residents`, because the dashboard has had no login
+wall since 9 Aug. `dashboard/lib/call.ts` holds the three gates -- a PIN
+typed next to the button (`CALL_PIN`, without which the column is not
+rendered), the function, and `VAPI_PHONE_NUMBER_ID` (without which the row
+reads "no number yet") -- and places the call through Vapi's `POST /call`
+with the same `variableValues` the browser demo composes, callback number
+now Homies' real office line from the FAQ. The Debts page gained the column,
+the form and a one-line result from the URL. Probed: an unknown phone returns
+NULL and flips nothing; anon can execute; `tsc` and the build pass. The PIN
+was the builder's call, not the owner's, and is written up as such in
+`docs/features/15-call-button/context.md`.
+
+**Timing.** 023 ran at 05:40 UTC. The scheduled sync at 12:00 UTC would
+re-write the cumulative rows unless the importer fix is pushed first; the
+guard makes even that self-healing on the following run, but the push goes
+out before noon regardless.
+
 ### Tested until it passed: the line that outranked the prompt
 
 Asked to test and make sure it passes. Two layers: the deterministic checks,

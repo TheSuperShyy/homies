@@ -40,6 +40,20 @@ Homies. Hope you are having a great day"* — was answered, not translated:
 no `היי!`, no smiley, no `היום`, and the bot never reports its own mood
 (`הכול טוב, תודה` is banned). Voice and chat now share the name.
 
+**`charges.period` is the month owed, one row per unpaid month.** Never a
+cumulative "as of" stamp: the sweep never writes the current month, and a
+current-month unpaid OXS row is deleted on every run as the one shape that
+can only be wrong (023, 25 Aug). The 11 Aug correction -- onboarding runs
+dropped, lagging buildings excluded -- is applied on every path, and a charge
+is marked paid only when OXS shows a payment for that month on an apartment
+read that run.
+
+**Outbound is a button, not a runner.** Decided 25 Aug: a person presses Call
+next to one resident on the Debts page; the agent rings that resident, once.
+Nothing auto-dials. The press is the `handed_over` decision. A PIN is typed
+with it because the page has no login wall. Transcript only -- recording is
+off on every assistant and the deploy scripts keep it off.
+
 **The per-message instruction in the agent node outranks the system prompt.
 First-message rules live there, in one sentence per branch.** Proven 25 Aug:
 the 23 Aug dashboard edit of that line ordered "name, offer of help, then the

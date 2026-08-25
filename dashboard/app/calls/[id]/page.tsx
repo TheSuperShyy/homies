@@ -109,11 +109,13 @@ export default async function Call({ params }: { params: { id: string } }) {
               <div className="panelhead"><span>Recording</span></div>
               <div style={{ padding: 12 }}>
                 <audio controls src={c.audio_url} style={{ width: '100%' }} />
-                {/* Vapi deletes its own recordings after 14 days and nothing
-                    copies them out yet, so an old call's player is a dead
-                    control that looks like a broken page. Say which it is. */}
+                {/* Recording was switched off on 25 Aug — transcript only,
+                    the owner's decision — so only calls before that date have
+                    audio, and Vapi deletes even those after 14 days. A dead
+                    player looks like a broken page; say which it is. */}
                 <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-                  Vapi keeps recordings 14 days. Older calls play nothing.
+                  Audio exists only for calls before 25 Aug 2026 (recording is off since;
+                  transcripts are kept). Vapi deletes recordings after 14 days.
                 </div>
               </div>
             </div>

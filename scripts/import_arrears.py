@@ -46,6 +46,7 @@ from datetime import date
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 YEAR = 2026
 
 
@@ -59,10 +60,10 @@ def env():
     return d
 
 
-def is_leading_run(months):
-    """('01','02','03') -> True. ('07',) -> False. ('01','03') -> False."""
-    want = [f"{i:02d}" for i in range(1, len(months) + 1)]
-    return list(months) == want
+# THE CORRECTION LIVES IN oxs_arrears.py SINCE 25 AUG, and this file calls it.
+# It was written here on 11 Aug and the nightly importer never applied it,
+# which is how the raw ₪922,901 reached a client-facing page. One copy.
+from oxs_arrears import correct  # noqa: E402
 
 
 def main():
@@ -73,37 +74,7 @@ def main():
     src = os.path.join(ROOT, "docs", "reference", f"arrears-{YEAR}.json")
     behind = json.load(open(src, encoding="utf-8"))["behind"]
 
-    by_b = defaultdict(list)
-    for r in behind:
-        by_b[r["building"]].append(r)
-
-    # A leading run shared by most of a building is onboarding, and the bar for
-    # believing that is lower than for other patterns: a whole building going
-    # unpaid from January onwards and then resuming together does not happen,
-    # whereas Homies taking the building on in May happens constantly.
-    onboarded, lagging = {}, set()
-    for b, rs in by_b.items():
-        common, n = Counter(tuple(r["months"]) for r in rs).most_common(1)[0]
-        if len(rs) < 4:
-            continue
-        share = n / len(rs)
-        if is_leading_run(common) and share >= 0.6:
-            onboarded[b] = set(common)          # months before Homies managed it
-        elif share >= 0.8:
-            lagging.add(b)                       # recording lag, not debt
-
-    rows, dropped_lag, dropped_whole = [], 0, 0
-    for r in behind:
-        if r["building"] in lagging:
-            dropped_lag += 1
-            continue
-        skip = onboarded.get(r["building"], set())
-        months = [m for m in r["months"] if m not in skip]
-        if not months:
-            dropped_whole += 1
-            continue
-        rows.append({**r, "months": months,
-                     "amount": r["monthly"] * len(months)})
+    rows, onboarded, lagging, dropped_lag, dropped_whole = correct(behind)
 
     charges = sum(len(r["months"]) for r in rows)
     total = sum(r["amount"] for r in rows)

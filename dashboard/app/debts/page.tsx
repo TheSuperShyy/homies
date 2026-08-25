@@ -1,5 +1,22 @@
+import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageSlice, perParam, sizeFrom } from '@/components/pager';
+import { callButtonEnabled, callResident, phoneNumberConnected } from '@/lib/call';
+
+// The Call button. A person chose this resident and pressed; the agent rings
+// them, once, now. Everything that decides whether that may happen lives in
+// lib/call.ts and migration 024 — this action only carries the form to it and
+// comes back to the same page with the answer in the URL, so there is no
+// client JS and a refresh cannot press the button again.
+async function placeCall(formData: FormData) {
+  'use server';
+  const phone = String(formData.get('phone') ?? '');
+  const pin = String(formData.get('pin') ?? '');
+  const back = String(formData.get('back') ?? '/debts');
+  const result = await callResident(phone, pin);
+  const q = new URLSearchParams({ called: phone, result });
+  redirect(`${back}${back.includes('?') ? '&' : '?'}${q}`);
+}
 
 // One row per apartment, not per charge and not per person. A resident owing
 // three months is one decision, so months collapse; but an owner with two flats
@@ -24,9 +41,16 @@ const WELL_FORMED = /^\d{4}-\d{2}$/;
 
 export default async function Debts({
   searchParams,
-}: { searchParams?: { page?: string; month?: string; by?: string; per?: string } }) {
+}: { searchParams?: { page?: string; month?: string; by?: string; per?: string;
+                      called?: string; result?: string } }) {
   const page = pageFrom(searchParams);
   const size = sizeFrom(searchParams);
+  // Calling exists only when a PIN is configured (lib/call.ts explains why),
+  // and a number only when the Israeli line is connected. Both are facts about
+  // Vercel's env, read once per render.
+  const canCall = callButtonEnabled();
+  const hasNumber = phoneNumberConnected();
+  const outcome = searchParams?.result ?? '';
   const { data, error } = await serverClient()
     .from('charges')
     .select('period,amount,status,unit,residents(full_name,building,phone)')
@@ -184,6 +208,19 @@ export default async function Debts({
         ))}
       </nav>
 
+      {/* What happened to the last press, from the URL the action came back
+          with. ok: the call id Vapi returned; err: a sentence a person can act
+          on. Shown once — it is part of the URL, so a bookmark carries it,
+          which is preferable to a toast nobody was looking at. */}
+      {outcome && (
+        <div className="panel" style={{ padding: '10px 14px', marginBottom: 14,
+                                        borderColor: outcome.startsWith('ok:') ? 'var(--ok, #2a7)' : 'var(--review)' }}>
+          {outcome.startsWith('ok:')
+            ? <>Calling <span className="mono">{searchParams?.called}</span> now — call <span className="mono">{outcome.slice(3) || '(no id)'}</span>. It will appear under Calls when it ends.</>
+            : <>Did not call <span className="mono">{searchParams?.called}</span>: {outcome.replace(/^err:/, '')}</>}
+        </div>
+      )}
+
       <div className="cards">
         {cards.map(([k, n]) => (
           <div className="card" key={k}>
@@ -207,6 +244,7 @@ export default async function Debts({
               {selected === 'all' && <th>Months owed</th>}
               <th>In review</th>
               <th>{selected === 'all' ? 'Owed' : `Owed (${selected})`}</th>
+              {canCall && <th>Call</th>}
             </tr></thead>
             <tbody>
               {visible.map((r) => {
@@ -239,6 +277,31 @@ export default async function Debts({
                     <td className="muted mono">{[...r.months].sort().join(', ') || '—'}</td>}
                   <td className="muted">{r.inReview.join(', ') || '—'}</td>
                   <td className="mono">{r.owed ? shekels(r.owed) : '—'}</td>
+                  {/* One press, one call, this resident. The PIN is typed
+                      every time on purpose: this page has no login, and the
+                      cost of a mistaken press is a resident's phone ringing
+                      about money. In owner view the row already is the whole
+                      call; in apartment view it is too — the agent gets every
+                      flat the owner owes on, so pressing on either row of a
+                      two-flat owner places the same call. */}
+                  {canCall && (
+                    <td>
+                      {hasNumber && r.owed > 0 ? (
+                        <form action={placeCall} className="status-edit">
+                          <input type="hidden" name="phone" value={r.phone} />
+                          <input type="hidden" name="back" value={link(selected, byOwnerView)} />
+                          <input type="password" name="pin" placeholder="PIN" required
+                                 inputMode="numeric" autoComplete="off"
+                                 style={{ width: 56 }} />
+                          <button type="submit" className="pill">call</button>
+                        </form>
+                      ) : (
+                        <span className="muted" style={{ fontSize: 12 }}>
+                          {r.owed > 0 ? 'no number yet' : '—'}
+                        </span>
+                      )}
+                    </td>
+                  )}
                 </tr>
                 );
               })}

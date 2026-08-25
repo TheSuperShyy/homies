@@ -870,8 +870,11 @@ really needs nothing, write the line saying so** rather than bypassing it.
    and the node reports "invalid syntax" at run time rather than at deploy; and
    **`isExecuted` is useless on a tool node** — it returned true on a run whose
    execution shows the tool was never called. Use the node's output instead.
-17. **The nightly arrears import writes the UNFILTERED sweep, and the ₪922,901
-   on the dashboard is not a debt figure anybody has stood behind.** Opened
+17. **CLOSED 25 Aug.** The correction now lives in `oxs_arrears.py` as
+   `correct()`, applied on every path (`import_arrears.py` imports it), and the
+   nightly write is per-month. Kept for the history. ~~The nightly arrears
+   import writes the UNFILTERED sweep, and the ₪922,901 on the dashboard is not
+   a debt figure anybody has stood behind.~~ Opened
    24 Aug, the hour the import first completed. `import_arrears.py` — which
    produced the ₪101,519 figure on 11 Aug — drops two patterns before writing:
    months forming a **leading run** shared by ≥60% of a building's flagged
@@ -884,8 +887,12 @@ really needs nothing, write the line saying so** rather than bypassing it.
    arrears total to the client until this is settled.** Nothing dials — every
    resident is `handed_over = false`.
 
-18. **Two importers disagree about what `charges.period` means, and ₪63,614 is
-   counted twice.** `import_arrears.py` writes one row per unpaid month stamped
+18. **CLOSED 25 Aug.** Migration 023 deleted the 540 cumulative rows
+   (₪934,061); `period` is the month owed everywhere; a current-month unpaid
+   OXS row is deleted on every run as the one shape that can only be wrong; and
+   a charge is marked paid only on positive evidence from OXS. ~~Two importers
+   disagree about what `charges.period` means, and ₪63,614 is counted
+   twice.~~ `import_arrears.py` writes one row per unpaid month stamped
    with the month owed; `oxs_arrears.py` writes one cumulative row per apartment
    stamped with the month it ran. 68 residents hold both — ₪683 for July and
    ₪683 again inside the August row. Re-running within the same month is safe
@@ -1119,7 +1126,8 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 | Cartesia | `CARTESIA_API_KEY` (attached inside Vapi as a credential) |
 | OpenRouter | `OPENROUTER_API_KEY` — **key 2 since 12 Aug**, uncapped, on the $19.80 account. `_CAPPED15` is the 12-Aug key (same account, $15 cap); `_EMPTY` is a different, unfunded account. n8n credential `92ZNHDhByavmNP5T` (`N8N_OPENROUTER_CRED_ID`) — the API cannot PATCH a credential, so a key change means a **new credential and a re-push**, and every superseded one is left in place |
 | Meta/WhatsApp | `APP_ID`, `APP_SECRET`, `WHATSAPP_TOKEN`, `WHATSAPP_WABA_ID`, `WHATSAPP_PHONE_NUMBER_ID` |
-| Vercel | `VERCEL_TOKEN` |
+| Vercel | `VERCEL_TOKEN` — **the one in .env answers "invalidToken" (checked 24 Aug)**; deploys still go out on push |
+| Dashboard, in Vercel's env (none set yet) | `CALL_PIN` (no PIN, no Call column), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID` (no number, no call), `VAPI_DEBT_ASSISTANT_ID` (defaults to Debt he), `HOMIES_CALLBACK_NUMBER` / `HOMIES_VERIFICATION_EMAIL_SAY` / `HOMIES_ALT_PAYMENT` (defaults in `dashboard/lib/call.ts`), `GITHUB_DISPATCH_TOKEN` (Run now on `/sync`) |
 | Internal | `TOOL_SECRET` (Vapi → n8n → Edge Function) |
 
 Empty and expected to stay empty: Twilio, Telnyx (no phone numbers yet).
@@ -1185,6 +1193,18 @@ Nothing dials: no phone number exists, all 7,391 residents are
 `handed_over = false`, and both queue views return 0 rows.
 
 ## Next moves, in order
+
+**Decided 25 Aug, and the order it happens in.** Outbound is a **Call button
+per resident on `/debts`** — a person presses, the agent rings that one
+resident, nothing auto-dials (feature 15, built). **Transcript only**: recording
+is off on all four assistants and the deploy scripts keep it off. The
+no-repeat / do-not-call / calling-hours rules are a later follow-up. To make
+the button live: (1) the owner orders the Israeli number from Omnitelecom —
+the list is in memory and in `docs/`; (2) create the BYO SIP credential and
+phone number in Vapi, copy its id; (3) set `CALL_PIN`, `VAPI_PRIVATE_KEY` and
+`VAPI_PHONE_NUMBER_ID` in Vercel. Until (3) the column reads "no number yet".
+The first real press is also the first real test of the end-of-call writer on
+a phone call: check that `attempts` moves and the call lands under Calls.
 
 0. **Place one web call in each language, on the new account.** Nothing has been
    called since the promotion — the assistants are verified identical and the
