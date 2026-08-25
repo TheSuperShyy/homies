@@ -585,8 +585,9 @@ English twins.
 intake twin is current.** The Hebrew intake prompt was pushed prompt-only (23,583
 chars, three tools verified intact) and the English twin rebuilt from it
 (`vapi_en.py intake --update`). Testable now on
-homies-voice-demo.vercel.app — the deployed page is build `2026-08-12a` but
-carries the account-5 ids, so it reaches the rebuilt twin. **`vapi_en.py intake
+homies-voice-demo.vercel.app — the deployed page carries the **live account-6
+ids** (all four, verified against the served HTML on 25 Aug), so a web call
+there reaches the assistants the repo syncs. **`vapi_en.py intake
 --dry` is the health check**; it exits loudly whenever a Hebrew fixed line
 changes, and the fix is always the table, never the check.
 

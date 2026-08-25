@@ -164,6 +164,19 @@ read back. Two deploy scripts (`vapi_sync.py`, `vapi_duel.py`) would have
 switched it back on at the next push; both changed. The call page's dead
 player note now says audio exists only for calls before 25 Aug.
 
+Checked before calling this free of consequence: migration 006 says a payment
+ticket with `authorization_captured` and no `audio_url` "must not be charged"
+-- the recording was the proof of a spoken yes to a card charge. That flow was
+reversed on **4 Aug on the client's instruction**: the resident pays through a
+link OXS sends, and the prompt doc says in so many words that the recording
+"stops being the authorisation for a payment". So the 006 rule is history, the
+end-of-call writer stores `audio_url = null` without complaint (verified in
+`debt-tools/index.ts:2134`), and transcript-only costs nothing the current
+design uses. Verified the rest of the voice path the same hour: all ten tool
+cases green through n8n → Edge Function, four assistants with prompts, voices,
+transcribers and tool lists matching the repo, demo page serving the live
+account-6 ids.
+
 **The debt list.** Migration 023 deleted the cumulative rows -- 540 of them
 by then, ₪934,061, the 15:00 run having added six -- pinned by period,
 source, status and a 24 Aug `created_at`. The table went back to 169 per-month
