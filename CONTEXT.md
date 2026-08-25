@@ -359,6 +359,18 @@ change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
+**And whatever the workflow answers on its own, the model has to be told
+happened.** The second half of the same rule, and the more expensive half. A
+canned line is not just a string that drifts; it is a turn the agent has no
+record of, so the next message reaches it stripped of what the resident had
+already said. That is how a tap on *open a service call*, followed by a
+description of a leak, was answered with an offer to open a service call: the
+offer rule fired correctly on information that was missing a turn. Anything the
+workflow handles without a round trip -- a tap, a menu, a canned first question
+-- must hand its fact forward, the way `greeted` and now `tapped_open` do.
+State that lives outside the conversation is invisible to the model unless
+something puts it back in. Found 25 Aug.
+
 **What happened comes before where it happened, on both channels.** An
 intention — *I want to report*, *I have a problem*, *open a ticket* — is not a
 description, and the address is never the next question after one. It decides
