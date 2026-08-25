@@ -209,12 +209,26 @@ TAP_LINE = {
     # apartment together, so asking for the building here would split that pair
     # across two messages and leave the apartment dangling on its own.
     "open": {
-        "he": "בסדר. מה התקלה?",
+        "he": "בטח. אפשר לספר לי מה קרה?",
     },
     "status": {
-        "he": "מה מספר הקריאה? אפשר גם רק את הספרות האחרונות — ואם אין מספר, בניין ודירה.",
+        "he": "בטח. מה מספר הקריאה?",
     },
 }
+
+# BOTH LINES WERE REWRITTEN ON 25 AUG, off a screenshot from a real handset.
+#
+# `status` read "מה מספר הקריאה? אפשר גם רק את הספרות האחרונות — ואם אין מספר,
+# בניין ודירה." Three options in one breath, and the prompt has forbidden
+# exactly that since 24 Aug: the status opener is one question, and a resident
+# with no number will say so. Worse, it is where the owner first saw the em
+# dash, and it was never the model writing it -- this line is canned, so no
+# amount of prompt work could have reached it.
+#
+# `open` read "בסדר. מה התקלה?" -- the flat "what is the problem" the 25 Aug
+# prompt pass replaced everywhere else. A tap is still an explicit request, so
+# the offer is still skipped; only the wording changed, to the same open
+# invitation the prompt now uses.
 
 # The menu, sent ONLY when someone opens with a bare greeting.
 #
@@ -1330,18 +1344,26 @@ def workflow(e):
                     # do, it is said HERE, in one sentence per branch, and the
                     # prompt agrees with it rather than the other way round.
                     # Mirrors the live node exactly; see prompt.md.
+                    #
+                    # NO DASH IN HERE EITHER (25 Aug). This string is
+                    # appended to EVERY resident message, so six em
+                    # dashes sat beside every turn the model ever saw
+                    # -- a stronger example than any rule in the system
+                    # prompt, and the reason the prompt cleanup alone
+                    # would not have held. Colons and full stops carry
+                    # the same meaning; the branches are unchanged.
                     "text": "={{ '[ענה על ההודעה הזאת בעברית, תמיד, גם אם"
                             " ההודעה באנגלית.]'"
                             " + ($json.greeted"
                             " ? ' [אתם כבר באמצע שיחה. לא מציגים את עצמך שוב"
                             " ולא כותבים \"במה אפשר לעזור\". אם ההודעה היא רק"
-                            " ברכה — ברכה קצרה בחזרה וממשיכים מאיפה שהפסקתם."
-                            " אם יש בה תוכן — בלי פתיח בכלל, ישר לעניין.]'"
-                            " : ' [זו ההודעה הראשונה בשיחה: פתח בשם — היי, כאן"
+                            " ברכה: ברכה קצרה בחזרה וממשיכים מאיפה שהפסקתם."
+                            " אם יש בה תוכן: בלי פתיח בכלל, ישר לעניין.]'"
+                            " : ' [זו ההודעה הראשונה בשיחה. פתח בשם: היי, כאן"
                             " מיכאל מהומיז. אם ההודעה היא רק ברכה (גם \"מה נשמע\""
-                            " ו\"מה המצב\" הן ברכה, לא שאלה — לא עונים עליהן ולא"
-                            " מחזירים אותן) — הוסף הצעת עזרה אחת: במה אפשר לעזור?"
-                            " אם יש בהודעה תוכן — בלי \"במה אפשר לעזור\" בכלל:"
+                            " ו\"מה המצב\" הן ברכה, לא שאלה. לא עונים עליהן ולא"
+                            " מחזירים אותן), הוסף הצעת עזרה אחת: במה אפשר לעזור?"
+                            " אם יש בהודעה תוכן, בלי \"במה אפשר לעזור\" בכלל:"
                             " השם, ואז ישר מטפלים במה שנכתב, באותה הודעה.]')"
                             " + String.fromCharCode(10) + $json.text }}",
                     "options": {"systemMessage": system_prompt()},
@@ -1593,9 +1615,22 @@ def workflow(e):
                     "authentication": "genericCredentialType",
                     "genericAuthType": "httpHeaderAuth",
                     "sendBody": True, "specifyBody": "json",
+                    # NO DASH LEAVES THIS WORKFLOW, whoever wrote the sentence.
+                    #
+                    # The prompt forbids "—" and 220 instances of it were taken
+                    # out of the prompt on 25 Aug, because a rule that argues
+                    # with its own examples loses. That makes the model unlikely
+                    # to type one; this makes it impossible. Every outgoing
+                    # message passes through here, canned lines and model
+                    # replies alike, so one expression covers all of them. A
+                    # comma is the substitution because that is what the dash
+                    # was standing in for in every line we had.
                     "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp',"
                                 " to: $('Sort').item.json.to, type: 'text',"
-                                " text: { body: $json.output || $json.text } }) }}",
+                                " text: { body: String($json.output || $json.text || '')"
+                                r".replace(/\s*[—–]\s*/g, ', ')"
+                                r".replace(/,\s*,/g, ',').replace(/\s+,/g, ',')"
+                                r".replace(/,\s*\./g, '.') } }) }}",
                     "options": {"timeout": 20000},
                 },
                 credentials=({"httpHeaderAuth": {"id": send_cred, "name": SEND_CRED}}

@@ -344,6 +344,21 @@ not a field to fill** — and any offer to act needs a subject, because "shall I
 open a ticket about this" with no *this* is answered yes by people who assume
 we understood. Found 25 Aug.
 
+**A prompt teaches by example before it teaches by rule, and the nearest text
+teaches loudest.** "Never write X" loses to two hundred lines of X, so a ban on
+a habit is only real once the file stops demonstrating it. And the per-message
+instruction appended to every resident message outranks the system prompt on
+register exactly as it did on content in Aug: it sits closer to the words being
+answered. When output has a tic, look there first, then at the examples, then at
+the rules. Found 25 Aug, over the em dash.
+
+**A canned line cannot be fixed by editing the prompt.** Menu taps are answered
+by the workflow with no model round trip, so those strings drift out of step
+with the prompt silently and survive every prompt pass. A reply that will not
+change is the signal. Where a fixed string and the prompt say the same thing,
+they are two copies and both get edited, which `check_greeting()` already
+enforces for the opener and nothing enforces for the rest.
+
 **What happened comes before where it happened, on both channels.** An
 intention — *I want to report*, *I have a problem*, *open a ticket* — is not a
 description, and the address is never the next question after one. It decides

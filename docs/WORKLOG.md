@@ -11,6 +11,58 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### The em dash, and the line a resident actually read was never the model's
+
+Screenshot from a real handset. A tap on `מצב קריאה קיימת` was answered
+`מה מספר הקריאה? אפשר גם רק את הספרות האחרונות — ואם אין מספר, בניין ודירה.`
+Owner: the intro is fine, that reply is AI, strictly no em dashes, and every
+reply should sound humane and polite rather than machine-made.
+
+**That line was never the model's.** It is canned, hardcoded in `TAP_LINE`, sent
+by the workflow without a model round trip. So no amount of prompt work would
+ever have reached it, and it had been contradicting the prompt since 24 Aug,
+which requires the status opener to be one question and nothing else. It asked
+three things in one breath. Rewritten to `בטח. מה מספר הקריאה?`. Its sibling
+went the same way: `בסדר. מה התקלה?` is the flat "what is the problem" the
+25 Aug pass had replaced everywhere except here, and is now
+`בטח. אפשר לספר לי מה קרה?`. A tap is still an explicit request, so the offer
+is still skipped; only the wording moved.
+
+**Then the dash, which was in the prompt 220 times.** A rule saying "never
+write X" loses to two hundred lines writing X, so the rule went in and the
+examples went out together. Three of them were utterances the bot would copy
+verbatim and got full stops by hand, because a comma there is limp:
+`מספר 255-1030-26. זה עובר לצוות התחזוקה.` The prose took a colon where the
+dash was defining something and a comma where it was an aside, and fifteen
+lines were rewritten afterwards where the comma had flattened a sentence that
+wanted a full stop. The two dashes left in the prompt are the rule quoting the
+character it forbids, and the rule says so rather than claiming a clean file.
+
+**The strongest teacher was somewhere else entirely.** The per-message
+instruction appended to every resident message carried six em dashes, so the
+model saw them beside every turn it ever answered, closer to the message than
+the system prompt. This is the same string that outranked the system prompt on
+23 Aug over the greeting; it outranks it on register too. Rewritten with colons
+and full stops, branches untouched, and both greeting branches re-verified
+afterwards.
+
+**And a net under all of it.** Every outgoing message, canned or model-written,
+passes through one node, so its expression now strips `—` and `–` to a
+comma before sending. Tested by running the stored expression in node against a
+line containing both: they become commas, and the hyphens inside
+`255-1114-26` are untouched, which is the thing that had to keep working.
+
+**Verified live.** Both taps read right. `יש נזילה בלובי` still gets the name
+and the offer with no `במה אפשר לעזור`; `בוקר טוב, מה נשמע?` still gets the
+name and the offer; mid-thread still gets no reintroduction; the status opener
+is one question; and the ticket confirmation now writes
+`מספר 255-1114-26. זה עובר לצוות התחזוקה.` No dash in any reply. 30 nodes
+before and after, active throughout.
+
+**Not touched: the voice agents.** A dash is punctuation and nothing speaks it,
+so the instruction does not apply there.
+
+
 ### Opening a ticket asked for a datum, and opened tickets about nothing
 
 Owner: creating a ticket should not read like *"ok, what is the problem"* — it

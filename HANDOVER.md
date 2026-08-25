@@ -780,6 +780,19 @@ handset.**
   Cause was one prompt bullet listing `אני רוצה לדווח` among "they already
   asked outright, go straight to building and apartment". Fixed, live, and
   re-probed; the bullet now needs a request **and** an account.
+- **No em dash reaches a resident, and it is enforced in three places
+  (25 Aug).** The prompt forbids it and no longer contains one outside the rule
+  that names it; the per-message instruction, which the model sees beside every
+  turn, was rewritten to colons and full stops; and the `Send` node strips
+  `—` and `–` to a comma on the way out, so a canned line or a model slip
+  cannot carry one. Reference numbers use ASCII hyphens and are untouched by
+  the strip, which was tested rather than assumed.
+- **The canned tap lines are not the model, and they can contradict the
+  prompt.** `TAP_LINE` in `scripts/n8n_whatsapp.py` answers a tap on the menu
+  with no model round trip. The `status` line spent a day asking three things
+  at once while the prompt required one question, and it is where the owner
+  first saw the dash. If a reply looks wrong and prompt changes do not move it,
+  check whether it is canned before rewriting the prompt again.
 - **The live n8n workflow is ahead of `scripts/n8n_whatsapp.py`.** Eight nodes
   and the Chatwoot-shaped Sort parser exist only in production. **`--apply`
   now refuses** while that is true; patch live through the REST API, back up
