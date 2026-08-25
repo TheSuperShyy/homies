@@ -788,17 +788,23 @@ handset.**
   cannot carry one. Reference numbers use ASCII hyphens and are untouched by
   the strip, which was tested rather than assumed.
 - **Voice: a bot line in `artifact.messages` is a TRANSCRIPTION, not what was
-  said (25 Aug).** Web-call testing with speakers on puts the agent's own audio
-  back into the microphone, so Deepgram transcribes it and it is stored as the
-  bot's text. In the 12:53 call all ten microphone transcripts were the bot's
-  own lines and no caller speech was transcribed at all. Consequences: the
-  agent cuts itself off (`User started speaking` → `Pipeline cleared` → the
-  in-flight answer is discarded, and `stopSpeakingPlan.numWords` is 2, which
-  its own greeting reaches in about a second), and garbled Hebrew such as
-  `תם יוף ובפקל של מיוף` is Deepgram mishearing the agent, not the model. **Use
-  headphones for web tests.** The honest record of what was spoken is
-  `Voice cached` in the call log, not the transcript. Should not survive the
-  move to a real phone number; unverified until there is one.
+  said (25 Aug).** Vapi transcribes the assistant's own audio to build the
+  transcript, so the stored bot text is a recognition of Hebrew speech and
+  drops or mangles words. Proof: the model emitted `דירה שתים עשרה` and
+  `ארבע מאות וחמישים שקלים`; the transcript stores `דירה 12` and `450` -- only
+  a recogniser turns words into digits. So `מחבר` for `מחברת הומיז`, and
+  `תם יוף ובפקל של מיוף`, are recogniser output, **not** the model, and not
+  necessarily what a caller heard. The honest record is `Voice cached` and the
+  `Model output` events in the call log. Do not diagnose voice behaviour from
+  the dashboard transcript. (An earlier note here blamed an acoustic echo from
+  laptop speakers; wrong -- testing was on headphones and by typing, and this
+  is normal Vapi behaviour.)
+- **Voice: no call in the account shows the agent cut mid-sentence (25 Aug).**
+  Across all six real calls every `Pipeline cleared` follows a
+  `Bot stopped speaking`, never interrupts one; delivery runs ~14 chars/sec,
+  ordinary for Hebrew. **Unexplained:** in the 12:43:06 call the audio runs ~2s
+  past the end of the model's text. Recording is off, so it cannot be settled
+  without one recorded call.
 - **A bare greeting never reaches the model (25 Aug).** `Sort` answers it with
   `MENU.content` -- `היי, כאן מיכאל מהומיז. במה אפשר לעזור?` -- every time,
   not once per 24 hours. Asked for three times; the model cannot deliver it

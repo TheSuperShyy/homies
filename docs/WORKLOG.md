@@ -11,6 +11,50 @@ conversation that produced it.
 
 ## 2026-08-24
 
+### Correction: it is not an echo, and the transcript is still not the agent
+
+The entry below blamed an acoustic echo, speakers into microphone. **Wrong.**
+The owner was on headphones and typing, so there was no acoustic path at all,
+and the diagnosis was written up and committed before that was asked.
+
+What actually produces those bot-voiced Deepgram transcripts is Vapi
+transcribing the assistant's own audio track to build the transcript. Normal
+behaviour, nothing to fix in a room.
+
+**The finding underneath survives, and it is the useful half.** A bot line in
+`artifact.messages` is a recognition of the agent's audio, not the text sent to
+the voice. From one turn of the 12:53 call:
+
+| | |
+|---|---|
+| model emitted | `אה, אני מתקשר בקשר לוועד הבית על דירה שתים עשרה, של חודש יולי, ארבע מאות וחמישים שקלים.` |
+| stored as the bot's words | `אני מתקשר בקשר לוועד הבית על דירה 12` |
+
+The `אה,` is gone, the punctuation is gone, and the model wrote the numbers as
+**words** while the stored line has **digits**. Only a speech recogniser turns
+`שתים עשרה` into `12`. So `מחבר` in place of `מחברת הומיז`, and the notorious
+`תם יוף ובפקל של מיוף`, are what a recogniser made of the agent's Hebrew. The
+line sent to the voice was whole.
+
+**And no call in the account shows the agent cut mid-sentence.** Speech spans
+against pipeline events across all six real calls: every `Pipeline cleared`
+lands *after* a `Bot stopped speaking`, never during. The 10:03 call, the only
+one where the caller actually spoke aloud, has two unbroken ten-second
+stretches. Delivery works out at roughly 14 characters per second, ordinary for
+Hebrew, so nothing is being dropped in bulk either.
+
+**One real anomaly is left**, in the 12:43:06 call: the model's text ends at
+`ארבע מאות וחמישים שקלים.` and the audio carries on about two more seconds,
+transcribed `תם יוף` then `ובפקל של`. Audio with no text behind it. Either
+Cartesia generated a tail it was not given, or the recogniser invented one, and
+with recording off there is no way to tell from here.
+
+**Open with the owner:** whether the cut is *heard* or *seen*. If what looks
+cut is the transcript in the dashboard, this entry is the whole answer and the
+audio is fine. If it is audible, the next step is one call with recording
+switched on, which is the only thing that settles the anomaly above.
+
+
 ### The voice agent cuts itself off because it is listening to itself
 
 Asked why the voice agent gets cut while talking. Read the three calls from
