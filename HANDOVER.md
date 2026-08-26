@@ -818,8 +818,16 @@ handset.**
   הקריאה?`, and a resident who answers "which number?" is now told what it is
   and offered building-and-apartment instead. Three copies edited together:
   `TAP_LINE`, the live `Sort` node's `TAPPED`, and the prompt's status section.
-  Live prompt is 35,985 chars. **Not re-tested through the bot.** The other
-  button, `בטח. אפשר לספר לי מה קרה?`, has the same clipped shape and was left.
+  The other button, `בטח. אפשר לספר לי מה קרה?`, has the same clipped shape and
+  was left.
+- **WhatsApp: "אין לי" no longer resets the conversation (26 Aug).** A resident
+  who tapped the status button, was asked for a number and answered `אין לי` got
+  `אני מבין. על מה אפשר לעזור?` back (execution 9798). They had answered; the
+  bot started over. The prompt already routed a numberless resident to building
+  and apartment but never said that `אין לי` IS that case. Now it does:
+  `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
+  an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
+  not Hebrew. Live prompt 36,750 chars. **Not tested through the bot.**
 - **Voice: the Hebrew intake prompt was tested and had three Hebrew errors the
   English one did not (26 Aug).** `scripts/prompt_probe.py` puts fixed resident
   turns to the live assistant and prints what it writes; `--ref <commit>` runs

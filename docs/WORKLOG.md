@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### "אין לי" was answered by starting the conversation again
+
+Reported as sounding robotic: `אני מבין. על מה אפשר לעזור?` Pulled the actual turn
+out of execution 9798 rather than guessing at it, and the reply is worse than
+its tone. The resident had tapped the status button, been asked for a reference
+number, and answered **אין לי**. They had just answered the question. The bot
+threw the thread away and asked what they wanted.
+
+**So the fix is not a warmer "how can I help".** It is not asking that at all.
+The prompt already said that a resident without a number is asked for building
+and apartment; it did not say that "אין לי" IS that case, so the model treated a
+non-answer-shaped answer as the end of the road. Now named, with the line:
+`אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?`
+
+**And the open question is named as the fault it is.** An open question after
+somebody has answered is not politeness, it is losing the thread, and it tells
+them nobody read what they wrote. `במה אפשר לעזור?` was already restricted to
+the first message; the ban now also names this exact turn, because a general
+rule three hundred lines away did not reach it.
+
+**`על מה אפשר לעזור?` is also not Hebrew** -- you help **ב**something, not
+**על** something. Same class as `מתי זה ייקח` on the voice side earlier today:
+a fixed line arriving with one word swapped and the rest left behind.
+
+**What was NOT done, and it was asked for.** The owner's wording included
+*"do you want me to open a ticket for something?"*. Not put at this turn: they
+are mid-lookup, so offering a ticket there repeats the same reset in a friendlier
+voice, and an offer with no subject is the junk-ticket path closed on 25 Aug.
+Raised in the reply rather than quietly dropped; it belongs to a genuinely blank
+opening, which is a different slot.
+
+Live prompt 35,985 -> 36,750 chars. Not tested through the bot.
+
 ### The second menu button answers warmly, and explains what a reference number is
 
 Read off the live reply to the "מצב קריאה קיימת" button: `בטח. מה מספר הקריאה?`
