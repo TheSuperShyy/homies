@@ -261,6 +261,37 @@ PRONUNCIATION = [
     ("ועד בית", "ועד הבית"),
 ]
 
+# ---------------------------------------------------------------------------
+# Tail padding. The same mechanism, used to add silence rather than words.
+# ---------------------------------------------------------------------------
+#
+# THE LAST WORD OF A REPLY WAS BEING CLIPPED, reported by ear on 26 Aug from the
+# dashboard widget, and measured rather than argued: Cartesia sonic-3 ends its
+# audio 43-135ms after the last phoneme, at full speaking amplitude, where a
+# comfortably engineered voice leaves 300-500ms of quiet tail. Whoever tears the
+# stream down — Vapi's turn handling, the widget's audio buffer — lands inside
+# the final syllable, because the voice leaves it no margin. Neither side is
+# broken alone: a padded voice survives an abrupt teardown, and a graceful
+# teardown survives an unpadded voice. This buys the margin on the side we
+# control.
+#
+# Cartesia honours an SSML-style break tag as real silence, measured the same
+# way: the bare final chunk carried 135ms of tail, the same chunk with
+# `<break time="400ms"/>` carried 472ms, and the tag itself is never spoken.
+# So every chunk that ends a sentence gets a 300ms pause appended AFTER its
+# final punctuation. Between sentences inside one turn this reads as a beat —
+# the pause the voice-DNA files prize — and at the end of the turn it is the
+# margin that keeps the teardown out of the last word.
+#
+# These rules run LAST. Everything above deletes or rewrites words, and a rule
+# that ran after this one could eat the tag it just appended.
+PAD = ' <break time="300ms"/>'
+PAD_RULES = [
+    {"type": "regex", "regex": r"\.\s*$", "value": "." + PAD},
+    {"type": "regex", "regex": r"\?\s*$", "value": "?" + PAD},
+    {"type": "regex", "regex": r"!\s*$", "value": "!" + PAD},
+]
+
 
 def spoken_patterns():
     """SPOKEN as bounded regexes, for the filter and the checker alike."""
@@ -281,6 +312,8 @@ def replacements():
     # way round that cannot happen.
     out += [{"type": "exact", "key": k, "value": v, "replaceAllEnabled": True}
             for k, v in PRONUNCIATION]
+    # Tail padding last — see PAD_RULES above. After this point nothing may run.
+    out += PAD_RULES
     return out
 
 
@@ -411,6 +444,12 @@ def safe_sentence_failures():
         # deliberate pronunciation rewrites are told apart from holes.
         sentence, want = entry if isinstance(entry, tuple) else (entry, entry)
         after = filtered(sentence)
+        # The tail pad is deliberate and lands on every sentence that ends in
+        # punctuation, so it is stripped before comparing — this check is for
+        # HOLES, words the filter ate, and a uniform appended pause is not one.
+        # Strip exactly one, from the end: a pad anywhere else IS damage.
+        if after.endswith(PAD):
+            after = after[:-len(PAD)]
         if after != want:
             out.append((sentence, after))
     return out

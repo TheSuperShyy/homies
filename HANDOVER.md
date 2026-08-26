@@ -828,6 +828,17 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **Voice: every sentence now ends in a 300ms unspoken pause, on both Hebrew
+  agents and their fallbacks (26 Aug evening, NOT yet heard).** Fix for the
+  clipped-last-word report: Cartesia sonic-3 leaves 43-135ms of tail (measured
+  from its own WAV output), so `voice_guard.py` PAD_RULES append
+  `<break time="300ms"/>` after sentence-final punctuation, last in the shared
+  formatPlan. The safe-sentence gate knows to strip the pad; both assistants
+  read back 3 pad rules live. **If the clip survives, raise the constant in
+  PAD (one string) before suspecting the widget's player.** The two isolation
+  WAVs are in the session scratchpad; the owner has copies to judge whether
+  Cartesia's own rendering also swallows the syllable — if it does, the fix is
+  a different voice, not more padding.
 - **Voice: the debt agent runs gpt-4.1 since 26 Aug ~18:52, owner's choice, NOT
   yet heard.** The "cut off / losing connection" report was measured as model
   latency, not network: gpt-5.2 (reasoning) spent ~3.9s of a ~5.3s turn

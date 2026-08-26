@@ -463,6 +463,19 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**When the log runs out, take the sentence out of the call.** The clipped-last-
+word report had nothing left in the call log — no interruption, no error, no
+recording — and was settled by synthesizing the exact sentence through Cartesia
+directly and measuring the waveform: speech ends 43-135ms before the audio
+does, at full amplitude. **Cartesia sonic-3 pads no tail**, so any consumer
+that tears the stream down early lands inside the last word; the margin is
+bought in `voice_guard.py`'s PAD_RULES, which append an unspoken
+`<break time="300ms"/>` after sentence-final punctuation. Two standing facts:
+a complaint about a *sound* can often be reproduced outside the call for the
+cost of one TTS request, and the break tag is the one way this stack can add
+silence — Vapi has no tail-padding knob and formatPlan replacements are the
+only hook that touches every chunk of every utterance.
+
 **A voice call reported as "cut off" or "disconnected" is a latency report
 until the log says otherwise.** Both calls behind the 26 Aug report ended
 `customer-ended-call` into silence — no drop, no error; the resident hung up on

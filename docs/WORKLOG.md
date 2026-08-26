@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### The last word was falling into a 43-millisecond tail, and every sentence now ends in bought silence
+
+The report survived the model swap, refined by one question: the **last word of
+replies is clipped mid-call**, on the dashboard widget. The call logs had
+nothing left to give — no interruption (`numUserInterrupted: 0`), no error, and
+no recordings exist to inspect (off by design) — so the sentence itself was
+taken out of the call stack: the exact final line of the 18:56 call, rendered
+through Cartesia directly with `cartesia_tts.py`'s request shape, WAV instead
+of mp3, and the waveform measured in Python.
+
+**The voice leaves the last word no margin.** Speech ends 43ms before the file
+does on the full sentence, 90-135ms on the final chunk, still at full speaking
+amplitude — where a comfortably engineered voice trails 300-500ms of silence.
+Whoever tears the stream down (Vapi's turn handling, the widget's buffer) lands
+inside the final syllable. Neither side is broken alone; the voice hands the
+teardown zero margin. Both WAVs were sent to the owner so their ear can settle
+whether the rendering itself also swallows the syllable.
+
+**The fix buys margin on the side we control.** Measured first: Cartesia
+honours an SSML-style `<break time="400ms"/>` as real, unspoken silence — tail
+went 135ms → 472ms. So `voice_guard.py` grew a third section beside deletion
+and pronunciation: **tail padding**. Three regex rules append
+`<break time="300ms"/>` after sentence-final `.`/`?`/`!`, appended LAST in
+`replacements()` so nothing can eat the tag. Between sentences in one turn it
+reads as a beat; at the end of the turn it is the margin. The safe-sentence
+gate strips exactly one trailing pad before comparing — the check hunts holes,
+and a uniform appended pause is not one; 22 sentences, 0 damaged.
+
+**Live on both Hebrew agents and their fallbacks** (the guard is one shared
+`formatPlan`): debt and intake each read back 3 pad rules, main voice and
+fallback alike. **Not yet heard** — the owner should retest on the widget; if
+the clip survives 300ms of margin, the tag duration is one constant, and the
+next suspect is the widget's own player rather than the margin.
+
 ### "Being cut off" was five seconds of thinking, and the debt agent now runs gpt-4.1
 
 Reported: the voice agent "is being cut off for some reason, like being
