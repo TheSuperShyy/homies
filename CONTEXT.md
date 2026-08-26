@@ -444,6 +444,16 @@ read; guessing at the missing half is what produces a fix aimed at the wrong
 thing. Same shape as the acoustic-echo diagnosis above, and the third time this
 week that reading the evidence changed what the fix was.
 
+**Fixing a defect by writing the sentence is how a prompt becomes a
+player-piano, and it happened again on 26 Aug.** Three real faults were each
+fixed with an exact Hebrew line, taking the WhatsApp system prompt from zero
+verbatim lines to four in one afternoon. The owner caught it: *"I want the bot
+to be open and not follow the script strictly."* **Count the verbatim lines
+after a prompt session** -- it is one grep, and it is the only cheap signal that
+this drift has happened. Keep the distinctions, which are substance, and delete
+the wording. The single legitimate literal is a menu tap, because the workflow
+answers it with no model call and there is nothing there to phrase.
+
 **Do not promise routing that does not exist.** A resident is told their ticket
 goes "לצות", never to a named department. The four Chatwoot teams exist and are
 empty, and nothing routes to them automatically, so a sentence naming a

@@ -834,8 +834,16 @@ handset.**
   `אה, אין בעיה. אפשר לספר לי מה קרה? אני אפתח על זה קריאה ואעביר לצוות.`
   Ambiguous, ask the building; its answer settles it. **The bot says "לצוות" and
   never names a department** -- routing to the four Chatwoot teams does not
-  exist, so naming one would promise a system we have not built. Live prompt
-  37,817 chars. **Not tested through the bot.**
+  exist, so naming one would promise a system we have not built.
+- **WhatsApp: the prompt holds no verbatim lines again (26 Aug).** The three
+  fixes above were each written as an exact Hebrew sentence, taking the system
+  prompt from 0 scripted lines to 4 in an afternoon; the owner asked for the bot
+  to be open rather than scripted, which is rule 1 of the file's own editing
+  rules. Rewritten as intent, distinctions kept, **back to 0**. Check with a
+  grep for four-space-indented Hebrew inside the `## System prompt` section
+  after any prompt session. The menu tap stays literal because the workflow
+  answers it with no model call. Live prompt 37,856 chars. **Not tested through
+  the bot.**
 - **Voice: the Hebrew intake prompt was tested and had three Hebrew errors the
   English one did not (26 Aug).** `scripts/prompt_probe.py` puts fixed resident
   turns to the live assistant and prints what it writes; `--ref <commit>` runs

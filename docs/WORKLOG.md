@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The three sentences added today were scripts, and are now intent
+
+*"I want the bot to be open and not follow the script strictly."* Which is rule
+1 of this prompt's own editing rules, reasserted against what today's work had
+been doing to it.
+
+**Measured rather than assumed.** Before today's commits the system prompt held
+**zero** verbatim Hebrew lines handed to the model. Three commits later it held
+four, all mine: the reference-number explanation, the building-and-apartment
+question, and the open-the-door offer. Each was added for a real defect and each
+was written as an exact sentence, which is the failure rule 1 names -- on 7 Aug
+the debt agent's verbatim count went 5 to 23 and it became a player-piano.
+
+**Every one is now a description of what the message has to carry.** The
+distinctions stay, because they are substance and rule 3 protects them: which of
+the two meanings of "אין לי" is in front of you, that the building question is
+asked alone, that the offer and the invitation travel together, that an open
+question after an answer loses the thread. What went is the wording. Back to
+**0 verbatim lines**.
+
+**The one that cannot be opened, and why it is not an exception.** The menu tap
+is answered by the workflow with no model call at all, so its reply is a literal
+string by construction, not by choice -- rule 2's "the platform speaks it
+literally". The prompt no longer quotes it as the required form; it says the
+button is one instance of what the sentence does, so nothing is being copied
+from it.
+
+**If the taps should be open too, that is a real option with a real cost:** send
+the tap through the model like any other message instead of answering it from
+the workflow. It buys a phrasing that fits what the resident actually pressed
+and varies; it costs a model round trip on every tap, and it gives up the
+guarantee that the reply to a button is exactly what we intend. Not done, not
+asked for, recorded so the choice is visible.
+
+Live prompt 37,817 -> 37,856 chars. Not tested through the bot.
+
 ### "אין לי" splits in two, and only one half is a lookup
 
 The owner's own words for what a representative would say: *"would you like to
