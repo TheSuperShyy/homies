@@ -828,8 +828,47 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
-- **WhatsApp: the two `אין לי` prompt fixes below never ran, and there is a
-  patch waiting to be pushed (26 Aug).** Retested at 16:26 and 16:36 and the
+- **WhatsApp: shipped, probed, and the prompt now treats gender as a question
+  about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
+  live and verified; the entry below it is history, not a pending item. Since
+  then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **`Spell female male prompt.pdf` at the repo root is a VOICE spec** (nikkud
+    for TTS, `agent_gender`/`customer_gender`, ends at Text To Speech). Only a
+    subset applies to a keyboard. **The voice agents were not touched** — the
+    pointed half is theirs and is an unstarted pass.
+  - **The ban on `לך`/`שלך` is reversed** and this is deliberate, not a
+    regression: unpointed they are one spelling and mark nothing to a reader.
+    Allowed now: `לך`, `שלך`, `אותך`, `איתך`, `ממך`, `בשבילך`, `אצלך`, and the
+    ־ת past. Still avoided: `אתה`/`את`, present, future, imperative,
+    `אליך`/`אלייך`, `עליך`/`עלייך`. **Do not "fix" this back** — the reasoning
+    is in `CONTEXT.md`.
+  - **The bot follows a gender the resident wrote** (`אני גרה`) for the rest of
+    the conversation. A name is still worth nothing.
+  - **`באפשרותך`, `ברצונך`, `הנך`, `הינך`, `עבורך`, `לרשותך`, `להלן` are
+    forbidden**, and `תוכל` was removed from the list of words the prompt
+    recommends.
+  - **The `אין לי` branch is decided by what the resident negated**: the ticket
+    (`קריאה`, `פתחתי`, `דיווחתי`) means open the door and say the answer becomes
+    a ticket for the team; only the number (`זוכר`, `שמרתי`) means ask building
+    and apartment, and **ask**, not observe that it is possible.
+  - **The Send node now strips any `[...]` span** as well as the dash. A probe
+    caught the model emitting its own English reasoning, bracketed like the
+    per-turn instructions, on its way to a resident. Intermittent; two clean
+    reruns. If a legitimate bracket is ever needed in a reply, this is why it
+    vanishes.
+  - **Probing is `scripts/probe_whatsapp.py "מצב קריאה קיימת" ">>אין לי"`** and
+    it costs one real model call per phrase. The model is
+    `google/gemini-2.5-flash`, so a branch that is right three times can still
+    be wrong the fourth; judge a prompt change on several runs, not one.
+  - **The live workflow still cannot be deployed by `scripts/n8n_whatsapp.py`**
+    (it refuses, correctly — eight nodes it does not build). The prompt is
+    pushed on its own by a scratchpad script that reuses that file's
+    `system_prompt()`, so `check_greeting()` still gates it. **That script dies
+    with the session; the next person needs to write it again or teach
+    `n8n_whatsapp.py` a prompt-only mode.** The Sort, agent and Send edits are
+    mirrored in `n8n_whatsapp.py` but have only ever reached n8n by hand.
+- **WhatsApp: the two `אין לי` prompt fixes below never ran, and there was a
+  patch waiting to be pushed (26 Aug, now shipped — see above).** Retested at 16:26 and 16:36 and the
   reply was unchanged. The prompt was not the problem: the live system message
   is 37,856 chars and byte-identical to `prompt.md`. **Execution 9939** shows
   the agent's whole input was `אין לי`, and the memory for that phone held

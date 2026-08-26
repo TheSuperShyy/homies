@@ -11,6 +11,98 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### Shipped, and the owner's Hebrew spelling file settled an old rule the wrong way round
+
+**The `last_bot` fix is live and verified.** Approved and pushed; all four
+assertions came back true and the workflow stayed active. Probed rather than
+assumed: tap `מצב קריאה קיימת`, then
+
+| answered | reply |
+|---|---|
+| `אין לי` | `אוקיי, אין בעיה. אם אין מספר קריאה אפשר לבדוק לפי בניין ודירה. באיזה בניין ואיזו דירה גרים?` |
+| `לא זוכר את המספר` | `אין בעיה, אפשר לבדוק גם לפי בניין ודירה. באיזה בניין ואיזו דירה גרים?` |
+| `לא פתחתי קריאה` | `אני מבין. אפשר לספר לי מה קרה, ואז אפתח על זה קריאה ואעביר לצוות.` |
+
+The reset is gone. Verification then found the next thing, which is the pattern
+of the whole day: **the first probe of `אין לי קריאה` still sent a resident with
+no ticket to look up a ticket**, and the first probe of `אין לי` answered
+`אפשר לבדוק גם לפי בניין ומספר דירה.` without asking anything, which hands the
+turn back to somebody who has nothing to say. Both were prompt faults the
+plumbing had been hiding.
+
+**Three prompt edits, in the order they were found.** The branch test now leads
+with what is actually being decided (is there a ticket at all, not does he have
+the number) and names the discriminator: **what did he negate** — the ticket
+(`קריאה`, `פתחתי`, `דיווחתי`, `פניתי`) or only his hold on the number (`זוכר`,
+`שמרתי`, `מוצא`). The no-ticket branch says both halves go in one message and
+why a bare invitation fails there: he has just been told there is nothing to
+look up, so an invitation with no promise means telling a stranger about a leak
+and not knowing whether anything happened. And the lookup branch has to **ask**,
+not observe that asking is possible.
+
+#### `Spell female male prompt.pdf`
+
+Supplied by the owner as "the proper correct spelling for words". 31 pages,
+Hebrew, and it is a **voice** specification: it ends "ורק אז לשלוח את הטקסט ל
+Text To Speech" and says outright that the nikkud exists to make a TTS engine
+pronounce correctly. Most of it therefore cannot go anywhere near WhatsApp.
+What it did do is settle a rule the chatbot has had backwards since 12 Aug.
+
+**Page 28, `מילים דו משמעיות שחובה לנקד`**, lists `לְךָ`/`לָךְ`,
+`שֶׁלְּךָ`/`שֶׁלָּךְ`, `אִתְּךָ`/`אִתָּךְ`, `אוֹתְךָ`/`אוֹתָךְ` — words that
+need pointing *because unpointed they are identical*. The prompt saw the same
+fact and drew the opposite conclusion: "המילה שתפיל אותך היא לך [...] פשוט
+תוריד את המילה". **Right for speech, backwards for text.** In writing `לך` marks
+nothing; the reader supplies their own gender. That rule has been stripping the
+warmest word out of every sentence to prevent a marking nobody could see, and
+`בטח, אשמח לבדוק בשבילך` — the line the owner asked for on 26 Aug and the
+warmest in the bot — has been quietly breaking it since it was written.
+
+So the rule is now split by **what a reader can actually see**:
+
+- **Allowed**, because unpointed they are one spelling: `לך`, `שלך`, `אותך`,
+  `איתך`, `ממך`, `בשבילך`, `אצלך`, and the past tense in ־ת (`אמרת`, `שלחת`,
+  `קיבלת`, `בדקת`, `דיברת`, `הגעת`, `רצית`).
+- **Still avoided**, because they are written apart: `אתה`/`את`; present
+  (`גר`/`גרה`, `יכול`/`יכולה`, `צריך`/`צריכה`); future (`תוכל`/`תוכלי`);
+  every imperative; and `אליך`/`אלייך`, `עליך`/`עלייך`.
+- **And if the resident marked it themselves** — wrote `אני גרה`, `אני צריכה` —
+  the bot follows them for the rest of the conversation. That is the file's own
+  `customer_gender` rule and it is not a guess: it is what they typed. A name
+  still is a guess and still counts for nothing.
+- **No nikkud, ever.** The two pointed words in the file are named as examples
+  in the rule itself, the same accounting the em dash rule already carries.
+
+**Also taken: the clerical `־ך` family.** `באפשרותך` reached a probe reply
+within minutes of the gender change, and it is on the file's forbidden list.
+Added with `ברצונך`, `האם ברצונך`, `הנך`, `הינך`, `עבורך`, `לרשותך`, `להלן`,
+`ככל שתחפוץ`. And `תוכל` was quietly removed from the prompt's own list of words
+Israelis *do* type, where it had been sitting as a recommendation while the
+paragraph above forbade gendered futures; `אפשר` replaces it.
+
+**Not taken:** all the nikkud, the TTS ordering, `agent_gender` (the bot is
+מיכאל and already speaks in the masculine), the sales lines, and the street
+slang. **The voice agents were not touched** — the pointed half of this document
+is written for them and belongs to a separate pass.
+
+#### A reasoning leak, caught by probing
+
+One probe came back `אוקיי, תודה. [The user said they live in building 12,
+apartment 4. The previous turn was about a leak in the lobby...]` — the model's
+own English deliberation, formatted like an instruction and addressed to a
+resident. Every instruction it reads arrives in square brackets, and as of today
+there is one more of them. Two further runs of the same turn were clean, so it
+is intermittent and cannot be tested away. **The Send node now strips any
+bracketed span**, next to the dash strip and for the same reason: every outgoing
+message passes through there, canned and model alike, and a service agent never
+types a bracket.
+
+**Live: prompt 37,856 → 39,968 chars, pushed four times and re-probed after each
+one.** The model is `google/gemini-2.5-flash`, so branch behaviour is
+probabilistic rather than fixed — `לא פתחתי קריאה` went to the wrong branch on
+one run before the discriminator was added and has been right 3/3 since. Final
+sweep of six probes across all four answers: all six correct.
+
 ### The prompt fix was live all afternoon and the model never got to use it
 
 Retested from a handset at 16:26 and again at 16:36: tap `מצב קריאה קיימת`,

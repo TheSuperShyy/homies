@@ -1726,12 +1726,27 @@ def workflow(e):
                     # replies alike, so one expression covers all of them. A
                     # comma is the substitution because that is what the dash
                     # was standing in for in every line we had.
+                    # AND NEITHER DOES A BRACKET.
+                    #
+                    # Every instruction the model reads on a turn arrives inside
+                    # square brackets: the language line, the mid-conversation
+                    # line, the tap line, and since 26 Aug the last_bot line. On
+                    # 26 Aug a probe came back
+                    # "אוקיי, תודה. [The user said they live in building 12...]"
+                    # -- the model's own reasoning, in English, formatted like
+                    # the instructions beside it, addressed to nobody and about
+                    # to be sent to a resident. Intermittent, so it cannot be
+                    # tested away; two more runs of the same turn were clean.
+                    # A bracketed span is never something a service agent types,
+                    # so it comes off here for the same reason the dash does.
                     "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp',"
                                 " to: $('Sort').item.json.to, type: 'text',"
                                 " text: { body: String($json.output || $json.text || '')"
+                                r".replace(/\[[^\]]*\]/g, ' ')"
                                 r".replace(/\s*[—–]\s*/g, ', ')"
                                 r".replace(/,\s*,/g, ',').replace(/\s+,/g, ',')"
-                                r".replace(/,\s*\./g, '.') } }) }}",
+                                r".replace(/,\s*\./g, '.')"
+                                r".replace(/\s{2,}/g, ' ').trim() } }) }}",
                     "options": {"timeout": 20000},
                 },
                 credentials=({"httpHeaderAuth": {"id": send_cred, "name": SEND_CRED}}

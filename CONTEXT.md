@@ -463,6 +463,36 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A rule written for speech can be exactly wrong in writing, and the chatbot
+carried one for a fortnight.** Hebrew marks the addressee's gender in `לְךָ`
+against `לָךְ`, `שֶׁלְּךָ` against `שֶׁלָּךְ` — audibly. Unpointed, they are one
+spelling, and a reader supplies their own gender. The WhatsApp prompt banned
+them anyway, correctly observing that the letters are identical and drawing the
+opposite conclusion, which cost the warmest word in the language on every turn.
+**The test is not "is this word gendered", it is "can the person on the other
+end see the gender in it"**, and for a text bot that means: pronouns, present,
+future and imperative are visible; object and possessive suffixes and the ־ת
+past are not. The owner's own voice spec is what settled it, by listing exactly
+those words as the ones that *must* be pointed. **Before importing a voice rule
+into the chatbot or a chat rule into the voice agents, ask which medium the rule
+is about.** Most of a TTS document is inapplicable to a keyboard, and the parts
+that transfer often transfer inverted.
+
+**And gender the bot was told is not gender the bot guessed.** A resident who
+writes `אני גרה` has handed over the fact; the bot follows it for the rest of
+the conversation. A name in WhatsApp is still a guess and still counts for
+nothing. The distinction is the whole of the policy: never infer, always use
+what was actually written.
+
+**Every instruction the model reads is in brackets, so a bracket in its output
+is its own thinking.** A probe on 26 Aug returned an English deliberation
+formatted like the per-turn instructions beside it, addressed to a resident.
+Intermittent, so no test will hold it down. **It is stripped at the Send node,
+which is the only place every outgoing message passes** — canned lines and model
+replies alike — and the same place the em dash is stripped, for the same reason.
+When the fix belongs to "nothing may ever leave carrying X", it belongs there and
+not in the prompt.
+
 **A retest of an unshipped fix is not evidence, and it looks exactly like one.**
 The same `אין לי` was reported three times on 26 Aug, at 16:26, 16:36 and 16:50,
 against a workflow that had not changed since 15:34. Only the first carried
