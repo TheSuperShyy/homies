@@ -44,6 +44,12 @@ Authentication → Add user, by design.
 
 Deploys on push (git-linked Vercel project).
 
+**A second account followed for the Homies side**: office@homies-management.co.il
+— the office address the bot itself hands out, so it is the natural shared
+login for the client's staff. Created the same way, verified signing in and
+reading. Both passwords were handed to the owner in chat; neither is written
+anywhere in the repo.
+
 ### The voice agents now point the words the writing hides
 
 Asked why the female/male file had not reached the voice agents, then told to

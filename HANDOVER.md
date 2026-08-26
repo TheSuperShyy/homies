@@ -836,7 +836,10 @@ handset.**
   clixteam579@gmail.com** (password given to the owner in chat, 26 Aug); more
   are made in Supabase dashboard → Authentication → Add user — there is no
   sign-up form on purpose. Demo mode is OVER: anyone showing the dashboard
-  now needs those credentials. If a demo without login is ever wanted again,
+  now needs those credentials. **A second account exists for the Homies side:
+  office@homies-management.co.il** (created 26 Aug night, password handed to
+  the owner in chat, verified signing in). If a demo without login is ever
+  wanted again,
   that is 010's pattern; do not just delete the middleware redirect — RLS is
   the boundary and the pages would show empty tables, not data. NOTE: the
   Supabase secret key refuses requests carrying a browser User-Agent
