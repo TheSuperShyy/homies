@@ -828,6 +828,19 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **Dashboard: the login is ENFORCED as of 26 Aug night.** Migration 026
+  dropped every anon grant (the ten anon_read policies, the status dropdown's
+  anon write, press_call's anon execute) and moved the status write to
+  authenticated; the middleware redirect is back. Verified: anon key reads 0
+  rows; the staff account signs in and reads. **One account exists:
+  clixteam579@gmail.com** (password given to the owner in chat, 26 Aug); more
+  are made in Supabase dashboard → Authentication → Add user — there is no
+  sign-up form on purpose. Demo mode is OVER: anyone showing the dashboard
+  now needs those credentials. If a demo without login is ever wanted again,
+  that is 010's pattern; do not just delete the middleware redirect — RLS is
+  the boundary and the pages would show empty tables, not data. NOTE: the
+  Supabase secret key refuses requests carrying a browser User-Agent
+  ("Forbidden use of secret API key in browser") — send no UA from scripts.
 - **Voice: both Hebrew prompts now instruct POINTED address words at a known
   gender (26 Aug night, owner's explicit ask, NOT yet heard in a call).**
   Debt 53,635 chars / intake 35,622, live and verified. The rule: gender

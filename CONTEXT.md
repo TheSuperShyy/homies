@@ -463,6 +463,15 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A re-lock is only as complete as the list of what was opened.** Demo mode
+opened three things (read policies, one column write, one RPC execute), and
+only the first was written down in the migration that promised the re-lock.
+When opening access "temporarily", every grant goes in the same file as the
+plan to close it — later grants to the same role belong beside it, not in
+their own migrations, or the re-lock closes one door of three. And the
+reverse of dropping an anon write is CREATING the authenticated write, or the
+feature the write served breaks silently for exactly the people who log in.
+
 **A pronunciation instruction is testable before it ships, and the test is one
 TTS request.** Whether Cartesia obeys nikkud was measured, not assumed: the
 same sentence pointed masculine and feminine renders as different audio

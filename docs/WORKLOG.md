@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### The dashboard login went from existing to enforced
+
+Asked for "a login" — and the whole apparatus already existed: Supabase Auth,
+the login page (built with real labels, sign-in only, accounts admin-created by
+design), the session middleware, and 009's authenticated read policies. What
+was missing was enforcement: demo mode (9 Aug) removed the redirect and opened
+the tables to anon, and 010's header promised the re-lock as "a deletion, not
+a rebuild". This is that deletion, plus the half nobody wrote down:
+
+**Three anon grants existed, not one.** `anon_read` on ten tables (010), the
+status dropdown's `anon_update_status` + column grant (011), and `press_call`
+execute (024, granted to anon AND authenticated). Migration
+`026_relock_dashboard.sql` closes all three — and **re-creates the status
+write for authenticated**, because dropping anon's without adding
+authenticated's would silently break the tickets page for signed-in staff.
+`press_call` already had its authenticated grant. buildings/apartments (019)
+never opened.
+
+**Middleware redirect restored**: no session → `/login` (and signed-in visits
+to `/login` bounce home). The comment keeps the 9 Aug history and the real
+boundary: RLS, not the redirect.
+
+**Verified, each claim by its own probe**: migration applied ("RLS: every
+table guarded"); anon key reads 0 rows from requests/residents/messages; the
+staff account signs in via the password grant and reads 3 rows as
+authenticated; `tsc` clean. Account: clixteam579@gmail.com, password handed to
+the owner in chat, created server-side (the secret key refuses a browser
+user-agent — worth knowing: the "Forbidden use of secret API key in browser"
+error keys off the User-Agent header). Further accounts: Supabase dashboard →
+Authentication → Add user, by design.
+
+Deploys on push (git-linked Vercel project).
+
 ### The voice agents now point the words the writing hides
 
 Asked why the female/male file had not reached the voice agents, then told to
