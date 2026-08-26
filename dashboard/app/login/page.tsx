@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { COOKIE, getLocale, translator, type Locale } from '@/lib/i18n';
 import { LoginForm } from '@/components/login-form';
-import { IconBuilding, IconLanguage } from '@/components/icons';
+import { IconLanguage } from '@/components/icons';
 
 // Sign-in only. There is no sign-up form on purpose: accounts are created by an
 // admin in the Supabase dashboard, the same reasoning as ENABLE_ACCOUNT_SIGNUP
@@ -39,12 +39,12 @@ export default function Login() {
       submit: t('login.submit'),
       working: t('login.working'),
     }}>
+      {/* The company's real logo, supplied 26 Aug. It carries the name and the
+          Hebrew subtitle itself, so no text beside it — the alt is for screen
+          readers and for the broken-image case. White plate because the mark
+          was drawn on white and the login page is dark. */}
       <div className="authbrand">
-        <span className="mark"><IconBuilding /></span>
-        <div>
-          <b>{t('app.name')}</b>
-          <small>{t('app.subtitle')}</small>
-        </div>
+        <img src="/homies-logo.png" alt={`${t('app.name')} — ${t('app.subtitle')}`} />
       </div>
       <form action={setLocale} className="authlang">
         <input type="hidden" name="to" value={other} />
