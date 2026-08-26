@@ -828,6 +828,11 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **Dashboard: /login renders WITHOUT the app shell** (26 Aug night, after a
+  screenshot showed the sidebar wrapped around the sign-in card). The branch
+  is a path test in `app/layout.tsx`; the login page carries its own brand and
+  language switch. If a new public page is ever added, it needs the same
+  treatment — the layout's shell assumes a signed-in reader.
 - **VERCEL_TOKEN in `.env` is dead — 403 on every API call (26 Aug night).**
   Deploys are unaffected (the project is git-linked; push to main builds), and
   the login wall was verified by probing https://homies-dashboard.vercel.app

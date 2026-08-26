@@ -16,7 +16,12 @@ export type LoginLabels = {
   title: string; email: string; password: string; submit: string; working: string;
 };
 
-export function LoginForm({ labels }: { labels: LoginLabels }) {
+// `children` render above the form, inside the centered column — the brand
+// and the language switch. They come from the server page because they need
+// the cookie locale and a server action, and this file is the one client
+// component; passing them as RSC children keeps it that way.
+export function LoginForm({ labels, children }:
+    { labels: LoginLabels; children?: React.ReactNode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -34,6 +39,8 @@ export function LoginForm({ labels }: { labels: LoginLabels }) {
 
   return (
     <div className="authwrap">
+      <div className="authbox">
+      {children}
       <form className="auth" onSubmit={submit}>
         <h1>{labels.title}</h1>
         {/* role="alert" so a screen reader is told the sign-in failed. Without
@@ -52,6 +59,7 @@ export function LoginForm({ labels }: { labels: LoginLabels }) {
           {busy ? labels.working : labels.submit}
         </button>
       </form>
+      </div>
     </div>
   );
 }

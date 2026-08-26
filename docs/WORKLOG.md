@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### The login page stops wearing the app around itself
+
+Reported from a screenshot minutes after the wall went up: /login rendered
+inside the full app shell — sidebar, six nav links, language toggle — the
+signed-in furniture wrapped around the box that says you are not signed in.
+Leftover from demo mode: the root layout carried a comment saying the nav
+shows for everyone "because there is no login to gate it behind", which
+stopped being true the moment the middleware redirect returned.
+
+The layout now renders `/login` bare (one path test — the middleware
+guarantees it is the only page a logged-out visitor reaches), and the page
+became a real login screen: brand mark and name above the card, the form, and
+a language switch below it. The switch is duplicated as the page's own server
+action (a layout's inline action cannot be imported), and always returns to
+/login. The brand and switch travel into the client form as RSC children so
+login-form.tsx stays the dashboard's only client component. `tsc` and
+`next build` clean; deploys on push.
+
 ### The dashboard login went from existing to enforced
 
 Asked for "a login" — and the whole apparatus already existed: Supabase Auth,

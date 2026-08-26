@@ -61,13 +61,28 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const here = (href: string) =>
     href === '/' ? path === '/' : path.startsWith(href);
 
+  // The login page stands alone. Rendering the sidebar around a sign-in form
+  // shows a logged-out visitor the app's entire menu — six links they cannot
+  // use, wrapped around the box that says they cannot use them. Reported from
+  // a screenshot on 26 Aug, the day the wall went up: the shell below is the
+  // signed-in furniture, and /login is by definition the one page whose reader
+  // is not signed in. The middleware guarantees this is also the ONLY page a
+  // logged-out visitor reaches, so one path test covers every case.
+  if (path === '/login') {
+    return (
+      <html lang={locale} dir={dir(locale)} className={hebrew.variable}>
+        <body>
+          {children}
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang={locale} dir={dir(locale)} className={hebrew.variable}>
       <body>
         <div className="shell">
-          {/* Demo mode: the nav shows for everyone — there is no login to gate
-              it behind. The sign-out button only appears when a session
-              exists. */}
+          {/* The sign-out button only appears when a session exists. */}
           <nav className="rail" aria-label={t('nav.menu')}>
             <a className="brand" href="/">
               <span className="mark"><IconBuilding /></span>
