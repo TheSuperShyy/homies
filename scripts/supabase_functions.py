@@ -125,9 +125,17 @@ def main():
         set_env("TOOL_SECRET", tool_secret)
         print("\nwrote TOOL_SECRET to .env")
 
-    code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref,
-                     [{"name": "TOOL_SECRET", "value": tool_secret}])
-    print("secret push    HTTP %s" % code)
+    # OXS_KEY_REQUESTS rides along since 26 Aug: open_request mirrors tickets
+    # into OXS (see oxsMirror in index.ts) and reads the key from the function
+    # environment. Absent from .env, the mirror is simply off — the function
+    # skips it — so this is not a fail-closed value like TOOL_SECRET.
+    to_push = [{"name": "TOOL_SECRET", "value": tool_secret}]
+    oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
+    if oxs_key:
+        to_push.append({"name": "OXS_KEY_REQUESTS", "value": oxs_key})
+    code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref, to_push)
+    print("secret push    HTTP %s  (%d secrets%s)" %
+          (code, len(to_push), "" if oxs_key else " — OXS_KEY_REQUESTS missing, mirror will be off"))
     if code >= 300:
         print(out)
         sys.exit(1)

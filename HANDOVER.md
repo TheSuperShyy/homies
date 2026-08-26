@@ -828,6 +828,19 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **Tickets mirror into OXS since 26 Aug night (Edge Function v43, verified on
+  production and cleaned up).** `open_request` POSTs to OXS
+  `/service-calls` when the building resolves; the created `_id` is stamped
+  into `requests.oxs_ref`; the description carries our reference. Best-effort
+  — OXS down costs only the mirror. **The write key is `OXS_KEY_REQUESTS`**
+  (service_calls module; the ONLY module OXS allows write keys for — general
+  and finance are read-only at key creation, whatever anyone remembers).
+  Pushed to the function's secrets by `supabase_functions.py`.
+  **`oxs_requests_sync.py` now skips feed items whose `_id` a non-imported
+  row holds** — remove that skip and every bot ticket duplicates on the next
+  sync. The old "OXS is read-only" rule still governs everything except this
+  one endpoint. The memory file `homies-oxs-read-only` is now stale on this
+  point.
 - **Dashboard: /login renders WITHOUT the app shell** (26 Aug night, after a
   screenshot showed the sidebar wrapped around the sign-in card). The branch
   is a path test in `app/layout.tsx`; the login page carries its own brand

@@ -17,11 +17,22 @@ never duplicated.
 
 WHAT THIS IS NOT
 
-It is not two-way. **Nothing here writes to OXS**, and nothing can: their
-external API is twelve GET endpoints with no POST, PUT, PATCH or DELETE
-anywhere in it. A ticket imported here cannot be closed from our side, which is
-why imported rows are marked `opened_via = 'oxs'` — a staff member has to be
-able to see at a glance which system owns the row in front of them.
+It is not two-way. **Nothing here writes to OXS.** (The claim this docstring
+used to make — that nothing *could* — stopped being true with External API v1,
+which has POST/PUT/DELETE for service calls, and since 26 Aug `open_request`
+in the Edge Function mirrors new tickets INTO OXS. This script remains the
+import half only.) A ticket imported here cannot be closed from our side,
+which is why imported rows are marked `opened_via = 'oxs'` — a staff member
+has to be able to see at a glance which system owns the row in front of them.
+
+AND THE MIRROR MAKES ONE SKIP NECESSARY. A ticket our bot opened now exists in
+OXS too, created by our key, and OXS serves it back in the same feed as
+everything else. Its `_id` was written to `requests.oxs_ref` by the mirror at
+creation time, so any feed row whose `_id` is already held by a NON-imported
+request is our own ticket coming back — importing it would mint a second row
+for one fault (the upsert keys on `reference`, and their taskNumber is not our
+reference). Those rows are skipped, not merged: the our-side row is the
+resident's record and OXS's copy is downstream of it.
 
 STATUS, AND WHAT WE DO NOT KNOW
 
@@ -255,6 +266,19 @@ def main():
     print("residents on file: %d" % len(residents))
 
     rows = [build(c, residents, by_bu) for c in calls]
+
+    # Our own tickets, coming back. The mirror in the Edge Function stamps the
+    # created OXS _id into oxs_ref on the bot's row, so a feed item whose _id a
+    # non-imported row already holds is not news — it is our ticket reflected.
+    # Skipped BEFORE any counting: to every number below, it does not exist.
+    # See "AND THE MIRROR MAKES ONE SKIP NECESSARY" in the docstring.
+    code, ours = sb("requests?select=oxs_ref&oxs_ref=not.is.null"
+                    "&opened_via=neq.oxs&limit=2000")
+    mirrored = {r["oxs_ref"] for r in ours} if code == 200 else set()
+    skipped = [r for r in rows if r["oxs_ref"] in mirrored]
+    rows = [r for r in rows if r["oxs_ref"] not in mirrored]
+    if skipped:
+        print("ours, reflected back by OXS and skipped: %d" % len(skipped))
 
     # What is already here, so the print says new or updated rather than "33".
     code, have = sb("requests?select=oxs_ref&opened_via=eq.oxs&limit=2000")

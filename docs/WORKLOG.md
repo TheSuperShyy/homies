@@ -11,6 +11,48 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### Tickets now land inside Homies: open_request writes to OXS
+
+Asked whether our API key can add tickets in Homies. Checked the spec rather
+than the memory that says OXS is read-only: **External API v1 has
+POST/PUT/DELETE for service calls** — the read-only rule was our policy (and
+an accurate description of the API as it once was; `oxs_requests_sync.py`'s
+docstring still claimed "twelve GET endpoints with no POST", now corrected).
+Write scope exists ONLY for the service_calls module; general and finance
+keys cannot even be created with it, so the owner's "the general key has full
+control I think" was the right fact on the wrong key.
+
+**Proved before building, on the live API**: a scope probe (PUT on a
+nonexistent task — a read key 403s "read-only" before validating; ours
+proceeded to body validation) and then a full create-read-delete round trip
+(`255-26844-26`, deleted, confirmed gone). POST returns `data._id` and
+`data.taskNumber`; created records carry no user, only `createdByApiKeyId`;
+`availableToTenants` defaults false.
+
+**The build, three pieces:**
+
+- **`oxsMirror()` in the Edge Function**, called from `open_request` after our
+  row is written, only when the building resolved (`m.building.id` IS the OXS
+  `_id` — the mirror table kept it from day one). Best-effort by design: the
+  resident already has the reference, so OXS failing costs only the mirror,
+  logged and swallowed. The description carries fault + flat + our reference.
+  The created `_id` is stamped into `requests.oxs_ref`.
+- **`supabase_functions.py` pushes `OXS_KEY_REQUESTS`** as a function secret
+  beside TOOL_SECRET (absent key = mirror off, not fail-closed).
+- **`oxs_requests_sync.py` skips its own reflection**: a feed `_id` already
+  held by a NON-imported row is our ticket coming back, and importing it would
+  mint a duplicate (the upsert keys on `reference`, and their taskNumber is
+  not our reference). Skipped before any counting.
+
+**Verified end to end on production**: webhook → reference `255-1123-26`, row
+stamped `oxs_ref`, the call visible in OXS as `255-26845-26` with our
+reference in its description, both sides deleted, and the importer dry-runs
+clean (21 calls, 0 new, skip logic quiet). Function version 43.
+
+Voice rides the same path free: an unresolved voice building files ours-only,
+exactly as before. Not wired: `apartmentId` (the description carries the flat;
+the apartments mirror has the ids if it is ever wanted).
+
 ### The login page stops wearing the app around itself
 
 Reported from a screenshot minutes after the wall went up: /login rendered

@@ -569,6 +569,63 @@ async function matchBuilding(saidRaw: unknown): Promise<Match> {
   return { status: "found", building: exact[0] };
 }
 
+/**
+ * Mirror a just-opened ticket into OXS, where Homies' staff actually work.
+ *
+ * Decided 26 Aug, reversing the read-only rule on this ONE endpoint: the
+ * External API v1 grew POST/PUT/DELETE for service_calls (and only for
+ * service_calls — finance and general keys cannot even be created with write
+ * scope), the owner asked for tickets to land in Homies, and a live
+ * create-read-delete round trip was run against the real API before this was
+ * written. The rest of OXS stays read-only, forever.
+ *
+ * Best-effort BY DESIGN. The resident has already been promised the reference
+ * by the time this runs, so an OXS outage must not unwrite that promise: any
+ * failure here is logged and swallowed, and the ticket lives on in our table
+ * exactly as before. The one thing a failure costs is staff seeing the ticket
+ * only on the dashboard rather than in OXS.
+ *
+ * The created call's `_id` is written back to `requests.oxs_ref` — the same
+ * column the importer keys on — which is how `oxs_requests_sync.py` recognises
+ * this call as ours when it comes back in the feed, instead of minting a
+ * duplicate row. The sync skips any oxs_ref held by a row it does not own.
+ *
+ * Created records carry no OXS user (the spec attributes them to the API key),
+ * and `availableToTenants` defaults to false — the resident's own record is
+ * OUR ticket; the OXS row is for staff.
+ */
+async function oxsMirror(
+  buildingOxsId: string, description: string, unit: string | null,
+  reference: string, rowId: string,
+) {
+  const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
+  if (!key) return; // not configured: the mirror is off, the ticket is fine
+  try {
+    const r = await fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
+      method: "POST",
+      headers: { "x-api-key": key, "content-type": "application/json" },
+      body: JSON.stringify({
+        buildingId: buildingOxsId,
+        // Staff-facing, so it carries what a dispatcher needs at a glance:
+        // the fault, the flat when the fault is in one, and our reference so
+        // the two systems can be joined by a human as well as by oxs_ref.
+        description: description
+          + (unit ? ` (דירה ${unit})` : "")
+          + ` [בוט, סימוכין ${reference}]`,
+      }),
+    });
+    const d = await r.json().catch(() => null);
+    const oxsId = d?.data?._id;
+    if (d?.status === 1 && oxsId) {
+      await db.from("requests").update({ oxs_ref: String(oxsId) }).eq("id", rowId);
+    } else {
+      console.error("oxs mirror refused", r.status, JSON.stringify(d).slice(0, 200));
+    }
+  } catch (err) {
+    console.error("oxs mirror failed", String(err).slice(0, 200));
+  }
+}
+
 /** The address as we write it, or "" when what was said resolves to nothing. */
 async function canonicalAddress(said: unknown): Promise<string> {
   const m = await matchBuilding(said);
@@ -1635,10 +1692,21 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
       })
-      .select("reference")
+      .select("id,reference")
       .single();
 
-    return error ? { ok: false, error: error.message } : { ok: true, reference: data.reference };
+    if (error) return { ok: false, error: error.message };
+
+    // Into OXS as well, when the building resolved — an unresolved voice
+    // building has no OXS id to file against and stays ours-only, for a
+    // person to read. Awaited so the Deno runtime cannot cancel it at
+    // response time; failures inside are logged and swallowed.
+    if (m.status === "found") {
+      await oxsMirror(String(m.building.id), String(args.description), unit,
+                      data.reference, data.id);
+    }
+
+    return { ok: true, reference: data.reference };
   },
 
   /**
