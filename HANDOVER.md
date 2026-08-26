@@ -832,6 +832,10 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **Both tap lines are warm now.** The open button says `בטח, אשמח לעזור.
+    אפשר לספר לי מה קרה?` since the evening of 26 Aug (same three-copy change
+    as the status button: `TAP_LINE`, live `TAPPED`, prompt). Probed: the turn
+    after the tap still routes without a re-offer.
   - **The balance opener was the last flow still ending in a full stop** —
     3/3 systematic, `אז צריך שם מלא ומספר טלפון.` with the menu appended as a
     second message. Fixed 26 Aug (the balance section now says "ואז שואל" means

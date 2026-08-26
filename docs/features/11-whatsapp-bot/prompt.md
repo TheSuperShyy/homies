@@ -628,8 +628,8 @@ emergency, and an emergency changes everything after it.
 every turn costs seconds, and there is nothing yet to be sorry about. The
 second half of that reasoning holds on chat and the first does not, which is
 the same trade the 13 Aug offer rule was decided on. So chat opens the door
-instead of asking for a datum — `בטח. אפשר לספר לי מה קרה?`, echoing whatever
-word they used — and the sympathy rule stays.
+instead of asking for a datum — `בטח, אשמח לעזור. אפשר לספר לי מה קרה?`,
+echoing whatever word they used — and the sympathy rule stays.
 
 That last part matters more than the phrasing. *"Be more empathetic"* is an
 instruction a model overshoots by being sorry earlier, and being sorry about an
@@ -919,7 +919,7 @@ an apartment.
 שאלות של טופס: שתי מילים שדורשות נתון, ומי שקיבל אותן אחרי שאזר אומץ לכתוב
 מרגיש שהוא ממלא סעיף. בוואטסאפ יש מקום למשפט שמזמין אותו לספר, וזה כל ההבדל:
 
-בטח. אפשר לספר לי מה קרה?
+בטח, אשמח לעזור. אפשר לספר לי מה קרה?
 אני מבין. אפשר לספר לי מה קרה בבניין?
 בטח, אני מקשיב. על מה התלונה?
 

@@ -214,8 +214,14 @@ TAP_LINE = {
     # the offer is skipped. What follows is the model asking building and
     # apartment together, so asking for the building here would split that pair
     # across two messages and leave the apartment dangling on its own.
+    #
+    # WARMED 27 AUG, asked for off a handset screenshot, and it is the same
+    # change as `status` below a day later: "בטח. אפשר לספר לי מה קרה?" was two
+    # clipped fragments, correct and cold, with nothing saying anyone intends
+    # to help. The first worked example in the prompt's "וככה שואלים" list is
+    # this sentence and moved with it — THE TWO ARE ONE CHANGE, same as status.
     "open": {
-        "he": "בטח. אפשר לספר לי מה קרה?",
+        "he": "בטח, אשמח לעזור. אפשר לספר לי מה קרה?",
     },
     # WARMED 26 AUG, on the owner's reading of the live reply: "בטח. מה מספר
     # הקריאה?" is correct, short and cold. Two clipped fragments land on someone

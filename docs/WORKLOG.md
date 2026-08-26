@@ -9,6 +9,30 @@ conversation that produced it.
 
 ---
 
+## 2026-08-26 (evening)
+
+### The first menu button gets the same warmth the second one got this morning
+
+Asked for off a handset screenshot: `בטח. אפשר לספר לי מה קרה?` on the
+open-ticket tap, "make it like the one we did for the ticket status checker".
+Same diagnosis as the morning's status line: correct, short and cold,
+two clipped fragments with nothing saying anyone intends to help. Now
+`בטח, אשמח לעזור. אפשר לספר לי מה קרה?` — receive the person, then open the
+door.
+
+**Three copies moved together**, same as the status change: `TAP_LINE["open"]`
+in `n8n_whatsapp.py`, the live Sort node's `TAPPED`, and the prompt — both the
+English commentary that quotes the line and the first worked example in the
+"וככה שואלים" list, which is this sentence. Live prompt 41,454 → 41,466 chars.
+
+**Probed**: the tap answers with the new line, and the turn after it still knows
+the tap happened — `אין מים חמים בדירה` got `אני מבין. ובאיזה בניין ואיזו דירה
+גרים?`, no re-offer, no reset. Both `TAP_LINE` entries are now warm, so the
+"the other button has the same clipped shape and was left" note has retired.
+
+CONTEXT.md needs nothing from this: it is the existing offer-before-question
+rule applied to the second of the two lines it was written against.
+
 ## 2026-08-26
 
 ### Chatbot sweep: the plumbing is green, and the balance opener was the one flow still ending in a full stop
