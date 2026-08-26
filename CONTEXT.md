@@ -433,6 +433,23 @@ fact one question would have surfaced, and which made the whole explanation
 impossible. A symptom reported from a demo surface can be an artefact of that
 surface.
 
+**A line reported as robotic is not always a tone defect. Pull the turn before
+rewriting the sentence.** `אני מבין. על מה אפשר לעזור?` was reported that way on
+26 Aug. Execution 9798 showed the resident had tapped the status button, been
+asked for a reference number, and answered `אין לי` -- so the reply was not a
+stiff sentence, it was the bot discarding the thread and starting over. Warming
+the wording would have shipped the same failure in a friendlier voice. The
+executions carry the resident's own message beside the reply and cost nothing to
+read; guessing at the missing half is what produces a fix aimed at the wrong
+thing. Same shape as the acoustic-echo diagnosis above, and the third time this
+week that reading the evidence changed what the fix was.
+
+**A general rule three hundred lines away does not reach the turn it governs.**
+`במה אפשר לעזור?` had been restricted to the first message since 12 Aug, and the
+model still produced it on message four. Naming the exact turn is what fixed it.
+Distance in a prompt is real: a rule the model has to go and find is a rule it
+finds sometimes.
+
 **When two rules for the model contradict each other, one of them belongs in
 code.** The opener must always carry the name; the bot must not reintroduce
 itself mid-thread. Both are right, and no prompt holds both -- whichever is
