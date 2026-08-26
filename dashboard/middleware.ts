@@ -59,5 +59,14 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // Static files are excluded from the wall by extension, not by name. The
+  // night the redirect came back it caught /homies-logo.png too, and the login
+  // page rendered a broken image of its own brand: the request for the logo
+  // was 307'd to the page that was asking for it. Files under public/ are
+  // exactly the assets pages need BEFORE a session exists; there is nothing
+  // secret in an image the login page itself displays, and anything secret
+  // does not belong in public/ anyway.
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)',
+  ],
 };

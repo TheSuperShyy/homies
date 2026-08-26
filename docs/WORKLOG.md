@@ -28,7 +28,16 @@ owner dropped `Homies-Logo.png` at the repo root mid-work — roof, ladder,
 Hebrew subtitle — and it replaced the generic icon: copied to
 `dashboard/public/` (the repo root is outside Vercel's rootDirectory and never
 deploys), on a white plate because the mark was drawn on white and the page is
-dark. The sidebar keeps the small icon; the wordmark is illegible at 30px. The switch is duplicated as the page's own server
+dark. The sidebar keeps the small icon; the wordmark is illegible at 30px.
+
+**And the wall promptly ate the logo.** The deployed page showed a broken
+image with the alt text: the middleware matcher excluded only Next's own
+internals, so the request for `/homies-logo.png` had no session and was 307'd
+to `/login` — the page that was asking for it. Confirmed by probing the URL
+(307, Location `/login`), fixed by excluding image extensions from the
+matcher: files under `public/` are exactly the assets a page needs before a
+session exists, and anything secret does not belong there anyway. Verified
+200 after deploy. The switch is duplicated as the page's own server
 action (a layout's inline action cannot be imported), and always returns to
 /login. The brand and switch travel into the client form as RSC children so
 login-form.tsx stays the dashboard's only client component. `tsc` and
