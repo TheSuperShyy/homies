@@ -831,9 +831,14 @@ handset.**
 - **Dashboard: /login renders WITHOUT the app shell** (26 Aug night, after a
   screenshot showed the sidebar wrapped around the sign-in card). The branch
   is a path test in `app/layout.tsx`; the login page carries its own brand
-  (the real logo, `dashboard/public/homies-logo.png`, white plate) and
-  language switch. If a new public page is ever added, it needs the same
-  treatment — the layout's shell assumes a signed-in reader.
+  (the real logo, `dashboard/public/homies-logo.png`, tight-cropped, on a
+  styled white plate with the roof-orange under-edge) and language switch. If
+  a new public page is ever added, it needs the same treatment — the layout's
+  shell assumes a signed-in reader. **The favicon is the roof mark**
+  (`dashboard/app/icon.png` 512 transparent + `apple-icon.png` 180 white,
+  auto-served by Next); the source of all three images is `Homies-Logo.png`
+  at the repo root — regenerate crops from there, never edit the derived
+  files.
 - **Dashboard: image extensions are EXCLUDED from the middleware matcher, on
   purpose (26 Aug night).** The wall 307'd `/homies-logo.png` to `/login` and
   the login page showed a broken image of its own brand. The matcher now skips

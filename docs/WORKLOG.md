@@ -30,6 +30,18 @@ Hebrew subtitle — and it replaced the generic icon: copied to
 deploys), on a white plate because the mark was drawn on white and the page is
 dark. The sidebar keeps the small icon; the wordmark is illegible at 30px.
 
+**The logo then became the favicon, and the plate became a lockup.** Asked for
+both. The roof mark — the distinctive half of the logo, and the only half that
+survives 16px — was cut out of the PNG with PIL (letter-tops and an edge-noise
+sliver caught by the first crop, recut y 62–179), white made transparent, and
+written to `dashboard/app/icon.png` (512) and `apple-icon.png` (180, white,
+iOS rounds it itself); Next serves both and injects the tags, and the matcher's
+new image exclusion means the wall does not eat these too. The login PNG was
+tight-cropped (the shipped file carried fat white margins — that emptiness was
+most of the "basic square" look), shown larger, and the plate restyled: 20px
+radius, even padding, a soft drop, and the roof's own orange as a 3px inset
+under-edge grounding the card. Both crops verified by eye before shipping.
+
 **And the wall promptly ate the logo.** The deployed page showed a broken
 image with the alt text: the middleware matcher excluded only Next's own
 internals, so the request for `/homies-logo.png` had no session and was 307'd
