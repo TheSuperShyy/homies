@@ -832,6 +832,12 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **The balance opener was the last flow still ending in a full stop** —
+    3/3 systematic, `אז צריך שם מלא ומספר טלפון.` with the menu appended as a
+    second message. Fixed 26 Aug (the balance section now says "ואז שואל" means
+    a question mark, why in the first half, what in the second); 5/5 probes end
+    in the question since. Live prompt 41,454 chars. `check_whatsapp.py` all
+    green the same day.
   - **Every reply ends with a question, and this is a standing rule the owner
     asked to be kept.** Open wherever open fits; closed only when what remains
     really is yes or no. Full stops only where the conversation ends: status

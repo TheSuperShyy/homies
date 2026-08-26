@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### Chatbot sweep: the plumbing is green, and the balance opener was the one flow still ending in a full stop
+
+Told "chatbot first" after the read-only voice check, so the voice pass stays
+parked and the chatbot got a full verification sweep instead.
+
+**`check_whatsapp.py`: all checks passed.** Callback registered, token valid,
+WABA subscribed, forged messages write nothing, and the end-to-end run wrote one
+ticket to Supabase (channel `whatsapp`, common-area fault with no unit, 6s), and
+the duplicate did not open a second one.
+
+**Probe sweep across the five flows.** Fault report (offer before address, per
+the 25 Aug order), human transfer (handover phrase, no menu appended), courtesy
+first message, and address rejection for an unmanaged building all behaved. **The
+miss was the balance opener, and it was systematic, not a rate: 3/3 it stated
+the requirement instead of asking** — `יתרה זה מידע אישי, אז צריך שם מלא ומספר
+טלפון.` — a full stop, so `Dead end reply?` appended the menu and the reply
+arrived as two messages. The exact fault the ends-with-a-question rule was
+written against, in the one flow whose opening the model composes from an
+explain-then-ask instruction: it explained, and stated, and never asked.
+
+**Fix: "ואז שואל" now means a question mark**, with the split named — the first
+half says why (`אני מוודא מי שואל`), the second half asks what (`מה השם המלא
+ומספר הטלפון?`), and each detail appears once. Pushed twice (41,097 → 41,454
+chars, live and byte-identical). Re-probed: 5/5 end in the question; the
+noun-doubling ("צריך שם ומספר. מה השם והמספר?") persists on some runs and is
+cosmetic — flash gives rates, not guarantees, and the menu no longer fires.
+
+One deviation seen once and left alone: a stairwell fault went straight to
+building-and-apartment without the offer, 1/2 runs. Known what→whether→where
+territory, not chased on a single occurrence.
+
 ### The second message was not a bug, it was the reply not asking anything
 
 Reported off a handset: the no-ticket answer arrived, and under it a second
