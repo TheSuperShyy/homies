@@ -194,10 +194,16 @@ MEDIA_LINE = {
 # Balance is the one flow whose first question is fixed and still is NOT canned,
 # which is worth the sentence. A canned line never reaches the model, so the
 # agent has no record of having asked it — and the answer to *this* question is
-# a name and a number, which on their own could belong to any flow. 'open' and
-# 'status' get away with it because their answers say what they are: a fault
-# description or a reference number. So the model asks this one itself, and
-# remembers it.
+# a name and a number, which on their own could belong to any flow. So the model
+# asks this one itself, and remembers it.
+#
+# THIS COMMENT USED TO GO ON to say 'open' and 'status' get away with it because
+# their answers say what they are, a fault description or a reference number.
+# Wrong, and it cost 26 Aug: a resident asked for a reference number answered
+# "אין לי", which says what it is not. The reasoning held for the answers that
+# were imagined and not for the one that arrived. `said()` in the Sort node now
+# carries every canned line forward regardless, so the argument no longer has to
+# be right — which is the point of not making it.
 #
 # Same grammar rule as every other fixed line: nothing addresses the resident
 # in a gendered form.
@@ -954,6 +960,29 @@ store.greeted = store.greeted || {};
 const greeted = store.greeted[from] === true;
 store.greeted[from] = true;
 
+// --- And WHAT it said, not just that it spoke -------------------------------
+// `greeted` above is a flag, and a flag only fixes the case it was written for.
+// The same hole was patched again on 25 Aug with `tapped_open`, and found a
+// THIRD time on 26 Aug: a resident tapped "מצב קריאה קיימת", was asked for a
+// reference number by the canned line below, answered "אין לי", and got
+// "אני מבין. על מה אפשר לעזור?" back. The model had no question in front of
+// it, so an answer read as an opening, and it opened. TAP_LINE's own comment
+// argued this could not happen -- that a reference number says what it is --
+// and it is right about the number and wrong about "I don't have one".
+//
+// So carry the SENTENCE. Every canned line leaves this node through said(),
+// which means a line added later is covered by having been said, with nobody
+// remembering to add a flag for it.
+//
+// Half an hour, and spent on the next message: it describes the turn the
+// resident is answering, not a standing state. After that the agent's own
+// memory holds the thread, because from there on the bot's turns are its own.
+store.lastBot = store.lastBot || {};
+for (const k in store.lastBot) {
+  if (Date.now() - (store.lastBot[k].at || 0) > 60 * 60 * 1000) delete store.lastBot[k];
+}
+const said = (t) => { store.lastBot[from] = { text: t, at: Date.now() }; return t; };
+
 // Media, location, stickers and reactions get the did-not-understand line
 // without touching the model. A voice note is the interesting case and is
 // deliberately out of this slice.
@@ -962,7 +991,7 @@ if (!text.trim()) {
   // the agent feeds and that node reads them at the top level.
   return [{ json: {
     _reply: '', _work: false, _canned: true, _menu: false,
-    to: from, lang, text: __MEDIA_LINE__[lang],
+    to: from, lang, text: said(__MEDIA_LINE__[lang]),
     in_text: inText, msg_type: msgType, message_id: id,
   } }];
 }
@@ -981,7 +1010,7 @@ if (tapped === 'open' || tapped === 'status') {
   store.tapped[from] = { kind: tapped, at: Date.now() };
   return [{ json: {
     _reply: '', _work: false, _canned: true, _menu: false,
-    to: from, lang, text: __TAP_LINE__[tapped][lang],
+    to: from, lang, text: said(__TAP_LINE__[tapped][lang]),
     in_text: inText, msg_type: msgType, message_id: id,
   } }];
 }
@@ -1006,6 +1035,9 @@ const GREETING = new RegExp(
   'shalom|ahlan)$', 'u');
 
 if (!tapped && GREETING.test(bare)) {
+  // The menu body is what the resident reads, so that is what is remembered.
+  // The Send menu node puts it on the wire; this node is where it is chosen.
+  said(__MENU__[lang].body.text);
   return [{ json: {
     _reply: '', _work: false, _canned: false, _menu: true,
     to: from, text, lang, message_id: id,
@@ -1036,6 +1068,12 @@ const tappedOpen = !!lastTap && lastTap.kind === 'open'
   && (Date.now() - lastTap.at) < 30 * 60 * 1000;
 if (lastTap) delete store.tapped[from];
 
+// The line the resident is answering, when the workflow is what said it.
+// Same half hour as the tap, and spent the same way.
+const prevBot = store.lastBot[from];
+const lastBot = prevBot && (Date.now() - prevBot.at) < 30 * 60 * 1000 ? prevBot.text : '';
+delete store.lastBot[from];
+
 // Always false on this branch -- a bare greeting returned the menu above and
 // never reaches the model here -- but the field has to exist, because the
 // "Reply usable?" guard reads it and an undefined there would make a one-word
@@ -1043,6 +1081,7 @@ if (lastTap) delete store.tapped[from];
 return [{ json: { _reply: '', _work: true, _canned: false, _menu: false,
                   to: from, text, tapped, lang, greeted, message_id: id,
                   tapped_open: tappedOpen, greeting: GREETING.test(bare),
+                  last_bot: lastBot,
                   in_text: inText, msg_type: msgType,
                   followup: __FOLLOWUP_MENU__[lang] } }];
 """
@@ -1405,6 +1444,17 @@ def workflow(e):
                             " קריאה, וכבר אמרנו לו לספר מה קרה. אל תציע לפתוח"
                             " קריאה, הוא כבר ביקש. אחרי שסיפר, שאל באיזה בניין"
                             " ואיזו דירה גרים.]' : '')"
+                            # The turn the resident is answering, when the
+                            # workflow said it rather than the model. Stated as
+                            # a fact and nothing more: what the sentence means
+                            # and what to do about it is the prompt's job, and
+                            # the prompt already has a section on every one of
+                            # these lines. An instruction here would be a second
+                            # prompt nobody reads beside the first.
+                            " + ($json.last_bot ? ' [ההודעה הזאת היא תשובה. מה"
+                            " שנכתב לדייר לפני כן נשלח על ידי המערכת ולא על ידך,"
+                            " ולכן אין לו זכר בזיכרון שלך: ' + $json.last_bot"
+                            " + ']' : '')"
                             " + String.fromCharCode(10) + $json.text }}",
                     "options": {"systemMessage": system_prompt()},
                 },
@@ -1434,8 +1484,19 @@ def workflow(e):
                 id="memory", name="Conversation so far",
                 type="@n8n/n8n-nodes-langchain.memoryBufferWindow",
                 typeVersion=1.3, position=[1200, 420],
+                # THE `-2` IS A MEMORY EPOCH, and it is deliberate. Simple
+                # Memory lives in the n8n process, not in a table, so there is
+                # no way to delete one poisoned conversation: a workflow save
+                # does not clear it and neither does a reactivate. On 26 Aug one
+                # test handset had four identical
+                # "אין לי" → "אני מבין. על מה אפשר לעזור?" pairs sitting in its
+                # window, which is a three-shot demonstration of the exact fault
+                # being fixed, and it would have argued with the fix. Bumping
+                # the suffix abandons every old buffer at once. Bump it again
+                # the next time a bad turn has to be forgotten; the cost is that
+                # everyone mid-conversation starts fresh, which is cheap.
                 parameters={"sessionIdType": "customKey",
-                            "sessionKey": "={{ $json.to }}",
+                            "sessionKey": "={{ $json.to }}-2",
                             "contextWindowLength": 30},
                 # 12 until 8 Aug. Raised because the language choice now lives
                 # HERE and nowhere else: a resident who asks for English is

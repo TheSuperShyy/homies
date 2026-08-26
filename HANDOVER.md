@@ -849,6 +849,14 @@ handset.**
   every command that would push it, and the script's own dry run, were refused
   by the permission classifier. The patcher and a pre-change backup of the live
   workflow are in this session's scratchpad. **Nothing pushed, nothing tested.**
+  **The live workflow has not changed since 15:34** (`updatedAt`
+  `2026-08-26T07:34:49Z`), so the 16:26, 16:36 and 16:50 reports are three runs
+  of one build and only the first is evidence. Check that field before reading
+  the next screenshot. To ship it, run the scratchpad patcher — it PUTs Sort,
+  the agent template and the memory key in one call and prints four assertions
+  back; there is a pre-change copy of the live workflow beside it. Then probe
+  with `scripts/probe_whatsapp.py "מצב קריאה קיימת" ">>אין לי"` before a real
+  handset touches it.
 - **WhatsApp: "אין לי" now splits in two (26 Aug).** "לא זוכר / לא שמרתי" keeps
   the lookup and asks building and apartment. "אין לי קריאה / לא פתחתי" has
   nothing to look up and gets the door opened instead:

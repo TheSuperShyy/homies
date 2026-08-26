@@ -463,6 +463,15 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A retest of an unshipped fix is not evidence, and it looks exactly like one.**
+The same `אין לי` was reported three times on 26 Aug, at 16:26, 16:36 and 16:50,
+against a workflow that had not changed since 15:34. Only the first carried
+information. **Before reading a retest, establish that the thing under test is
+the thing that was changed** — for this bot that is one API read of the live
+workflow, and it is the same discipline as pulling the execution before
+rewriting a line. Say which build a screenshot is of, unasked, because the
+person holding the handset cannot see the difference.
+
 **State it as a fact and stop.** The per-message clause says only that this
 message is an answer and quotes what was written; it does not say what to do
 about it. What each of those lines means is already a section of the prompt, and

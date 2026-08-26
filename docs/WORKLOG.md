@@ -72,6 +72,23 @@ against the live Sort, but every command that would run it was refused by the
 permission classifier, as was the script's own dry run. **Nothing has been
 pushed to n8n and nothing has been tested.** Waiting on the owner.
 
+**Retested at 16:50 anyway, and it was identical.** It had to be: the live
+workflow has not changed since 15:34, so 16:26, 16:36 and 16:50 are three runs
+of the same code and the second and third carried no information. Saying so
+plainly is the whole of it — a screenshot of an unshipped fix looks exactly like
+a screenshot of a failed one, and the only thing that tells them apart is
+knowing whether the push happened.
+
+**The briefing files were committed out from under this entry.** A housekeeping
+automation took CONTEXT.md, HANDOVER.md and this file at 16:46 as
+`33cd0df "Housekeeping: briefing files and docs kept current (auto)"` and pushed
+it, which left the code change alone in the working tree and tripped
+`check_briefing_logged.sh` — correctly, by its own rule, since the change set it
+could see was code with no briefing in it. Nothing was lost and the auto commit
+was left alone (it is on origin). Worth knowing before someone reads that hook
+firing as a missed log: **the guard tests the change set, and an automation that
+commits half of one will fire it.**
+
 ### The dashboard was redesigned, and it speaks two languages now
 
 Asked to make the dashboard look good, with the ui-ux-pro-max skill. Its design
