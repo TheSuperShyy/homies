@@ -463,6 +463,15 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**An exception written far from the rule it overrides does not exist.** Proven
+twice on 26 Aug: the `אין לי` fix, and then the transfer-context flow, where
+"what arrives after a handover is context, not a request" sat in the transfer
+section while the complaint rule 300 lines away kept opening tickets from it.
+The model obeys the rule at the point of firing, so **the exception is written
+inside the rule it excepts** — in both places if two rules fire — with a
+cross-reference back to the full story. A precedence claim ("this beats every
+other flow") helps but does not substitute.
+
 **When the log runs out, take the sentence out of the call.** The clipped-last-
 word report had nothing left in the call log — no interruption, no error, no
 recording — and was settled by synthesizing the exact sentence through Cartesia

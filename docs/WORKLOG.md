@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### "לדבר עם נציג" answered with a closed door, and now it gathers context on the way to the team
+
+Off a handset: the third menu button got `אני מעביר את זה לצוות, נחזור בהקדם.`
+and the owner asked for the representative's shape instead: got it + I'm
+connecting you + what's it about, so there's context to start with. Execution
+10409 showed a second fault underneath: the model wrote the handover line
+**without calling `transfer_to_human`** — the "Promised a transfer, made none?"
+backstop caught it and made the transfer anyway, which is what it is for.
+
+The line the model produced was the prompt's own **one verbatim line**, doing
+exactly what it was told. The fix splits by what is known: **topic known** →
+the fixed line stays; **bare request** (the tap, or "רוצה נציג" alone) → the
+model composes: confirm, handing to the team (**"לצוות", never a department** —
+the routing that word promises does not exist, decided 26 Aug morning), and ask
+what it is about, with the reason in half a sentence. The answer to that
+question is **context for the team, and it beats every flow in the file**: no
+ticket offer, no complaint ticket, no building-and-apartment; one line without
+a question mark closes it.
+
+**Three probe rounds to get there, each miss written back where it fired:**
+
+1. Model glued the fixed line + `על מה אפשר לעזור?` (the phrase the file names
+   as not Hebrew). → the bare case now excludes the fixed line entirely, and
+   the question is named as *about the subject*, not an offer of help — he
+   asked for a person, so offering yourself answers the wrong request.
+2. The context answer restarted the complaint flow. The exception lived 300
+   lines from the rule that fired — the same lesson as the `אין לי` fix — so it
+   is now written **inside** the complaint rule and the open-ticket section.
+3. The context answer got the transfer re-announced and the question re-asked.
+   → after the answer: one sentence, no question mark, never announce the
+   transfer twice, never re-ask the answered.
+
+Final probes 2/2 correct on both turns. Live prompt 42,327 → 43,473 chars.
+Known rate-level slip left open: the model writes `אליך` in this flow (a
+written gender mark, against the standing rule); noted, not chased tonight.
+
+Emergency stays senior: `הצפה במחסן` after a transfer got the emergency
+protocol including the building question — that is the designed precedence,
+not a fault.
+
 ### The last word was falling into a 43-millisecond tail, and every sentence now ends in bought silence
 
 The report survived the model swap, refined by one question: the **last word of

@@ -853,6 +853,16 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **The "לדבר עם נציג" flow gathers context now (26 Aug evening, probed
+    2/2).** A bare request for a human gets: confirm + handing to the team +
+    "on what subject, so whoever returns arrives with context" — then the
+    answer gets a one-line no-question closer and NOTHING else (no ticket
+    offer, no re-ask; the exception is written inside the complaint and
+    open-ticket rules, not only in the transfer section). The fixed line
+    `אני מעביר את זה לצוות, נחזור בהקדם.` survives only for a transfer whose
+    topic is already known. The team reads the context in the Chatwoot thread —
+    `transfer_to_human` does not assign the conversation, so the bot stays on
+    until a human replies. Known open rate-slip: the model writes `אליך` here.
   - **Both tap lines are warm now.** The open button says `בטח, אשמח לעזור.
     אפשר לספר לי מה קרה?` since the evening of 26 Aug (same three-copy change
     as the status button: `TAP_LINE`, live `TAPPED`, prompt). Probed: the turn
