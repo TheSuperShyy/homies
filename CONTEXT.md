@@ -665,6 +665,17 @@ this drift has happened. Keep the distinctions, which are substance, and delete
 the wording. The single legitimate literal is a menu tap, because the workflow
 answers it with no model call and there is nothing there to phrase.
 
+**A worked example that matches the input verbatim beats every instruction
+around it.** The tap "לדבר עם נציג" was answered with the greeting glued to
+the fixed transfer line — the exact shape of a first-message example in the
+prompt that listed "רוצה נציג", against a mid-thread note in the same message
+and a transfer rule 600 lines down that forbade both halves. The model did not
+misread the rules; it found a closer match. So examples are held to every rule
+in the file, including the rules of other sections: an example that a section
+elsewhere would reject is a defect *now*, not when it fires. Same family as
+"the exception lives inside the rule it overrides", one step earlier — the
+example IS the rule the model reads first.
+
 **Do not promise routing that does not exist.** A resident is told their ticket
 goes "לצות", never to a named department. The four Chatwoot teams exist and are
 empty, and nothing routes to them automatically, so a sentence naming a

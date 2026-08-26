@@ -1084,12 +1084,17 @@ handset.**
   cannot be true at once. So the name is now the workflow's job. Only a bare
   one: `שלום, יש נזילה` still goes to the model. Side effect: a greeting typed
   mid-flow restarts the opener.
-- **The three buttons are attached by `Send`, on two signals (25 Aug).** The
-  reply containing `מיכאל מהומיז`, or `Sort` reporting `greeting: true`. Until
-  25 Aug it was the name alone, so a second `היי` inside 24 hours lost the
-  buttons: the bot correctly does not reintroduce itself mid-thread, and the
-  trigger went with the name. The live Chatwoot `Sort` had no greeting test at
-  all between the 21 Aug cutover and now.
+- **The three buttons are attached by `Send`, on two signals (25 Aug, narrowed
+  26 Aug).** `Sort` reporting `greeting: true`, or the reply containing
+  `מיכאל מהומיז` **on a handset `Sort` has not greeted in 24 hours**
+  (`greeted !== true`). Until 25 Aug it was the name alone, so a second `היי`
+  inside 24 hours lost the buttons. On 26 Aug the name-alone half misfired the
+  other way: the model re-introduced itself mid-thread on a "לדבר עם נציג" tap
+  (a prompt example matched the input verbatim and beat the mid-thread note —
+  fixed in prompt.md the same night) and a resident asking for a person got the
+  menu glued to the transfer reply. The `greeted` guard makes mid-thread menu
+  attachment impossible whatever the model writes. The live Chatwoot `Sort`
+  had no greeting test at all between the 21 Aug cutover and 25 Aug.
 - **`Reply usable?` exempts a one-word reply to a greeting (25 Aug).** Its
   false branch is the rescue: `rescue_request`, a real ticket, and a handover
   line. `היי.` is one word and correct, so a resident who said hello twice was

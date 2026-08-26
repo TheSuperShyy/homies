@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### The menu buttons rode a transfer reply, because the name was the trigger
+
+- Tap "לדבר עם נציג" from a fresh handset: the reply came back as
+  `היי, כאן מיכאל מהומיז. אני מעביר את זה לצוות, ייקח רגע. על מה אפשר לעזור?`
+  **with the three menu buttons attached** — a resident who asked for a person
+  was offered the opening menu again.
+- Execution 10593 shows `Sort` did its job: `greeted: true`, `last_bot`
+  carrying the menu greeting, the mid-thread note in the composed message. The
+  model re-introduced itself anyway.
+- Why: the first-message section of prompt.md listed "רוצה נציג" among its
+  examples and answered it with the greeting plus the fixed transfer line —
+  contradicting the transfer section, which denies a bare request the fixed
+  line and demands the on-topic question. The input matched the example
+  verbatim, and the example beat both the note and the rule 300 lines away.
+- Why buttons: `Send` attaches the three options when the reply contains
+  `מיכאל מהומיז` — the name as a proxy for "this is the opener". The model's
+  misplaced greeting tripped it.
+- Fixed both layers, live: `Send` now attaches on `greeting: true`, or on the
+  name only when `Sort` says the handset was NOT already greeted
+  (`greeted !== true`) — a mid-thread reply can never carry the menu again,
+  whatever the model writes. And the prompt example for "רוצה נציג" now obeys
+  the transfer rule (confirm, hand over, ask what it's about) with the
+  mid-thread no-name exception written inside it. Pushed to the live agent
+  node (43,868 chars); probed the exact failing turn three times — no
+  re-introduction, topic question, one question mark, all three runs.
+
 ### The mirror was switched off within the hour, and the fault was the consent, not the code
 
 *"that was risky i told you not to do any shit to oxs."* Correct, and worth
