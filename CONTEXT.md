@@ -463,6 +463,17 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A voice call reported as "cut off" or "disconnected" is a latency report
+until the log says otherwise.** Both calls behind the 26 Aug report ended
+`customer-ended-call` into silence — no drop, no error; the resident hung up on
+a line that was thinking. The check costs one command, `vapi_latency.py`, and
+the number that matters is its caller-felt turn latency (endpointing included),
+not the dashboard's panel. **A reasoning model does not belong on the speaking
+end of a phone call**: gpt-5.2 spent ~4s of every ~5s turn thinking, and that
+latency is variable, so the same agent passes one day's listening test and
+fails the next. `customer-ended-call` in aggregate is itself a symptom — it is
+what silence produces, because the caller is always the one to give up first.
+
 **A canned line is not exempt from the prompt's style rules, and both tap lines
 now follow them.** The two fixed replies in the Sort node were written before
 the warmth rules and kept their clipped shape after the model's lines lost it —

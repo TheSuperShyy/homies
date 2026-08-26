@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### "Being cut off" was five seconds of thinking, and the debt agent now runs gpt-4.1
+
+Reported: the voice agent "is being cut off for some reason, like being
+disconnected or losing connection". Read the calls before explaining — the two
+reported calls (10:41 and 10:42 UTC, web calls to the debt agent) show **no
+drop, no error, no network event**. Both ended `customer-ended-call` into
+silence: one 15s after the amount line with no next turn arriving, one 8s after
+`log_call_outcome` returned Success with the goodbye still being generated.
+
+**The wait was the model.** Vapi's per-turn metrics: model 3,878ms of a 5,308ms
+turn (voice 853ms, transcriber 238ms, endpointing 301ms). `vapi_latency.py` put
+the two calls at **5,390ms and 5,850ms median** caller-felt latency against the
+PRD's <800ms. gpt-5.2 is a reasoning model; it thinks ~4s before every sentence
+and again after every tool call. Five seconds of dead air on a phone reads as a
+dead line, so the resident hangs up, which is also why every one of these calls
+files under `customer-ended-call`. Reasoning latency is variable — the same
+agent measured 1.3–2.1s median on its better calls — which is why 25 Aug
+sounded clean and today sounded broken.
+
+**Owner chose gpt-4.1** over dialling 5.2's reasoning effort down (offered
+both, plus tool-call filler lines; the untried effort knob is the first thing
+to reach for if the Hebrew or the negotiation worsens). One line in
+`vapi_sync.py`, history kept in the comment above it; `--apply` pushed it and
+the API reads back `openai gpt-4.1`, prompt 52,586 chars and all seven tools
+untouched. **Not yet heard** — no call has been placed against 4.1.
+
+The English twin still runs gpt-5.4 (`vapi_en.py` copies the prompt, not the
+model block) and the intake agents are untouched.
+
 ### The first menu button gets the same warmth the second one got this morning
 
 Asked for off a handset screenshot: `בטח. אפשר לספר לי מה קרה?` on the

@@ -555,7 +555,23 @@ TARGETS = {
             # swapped the transcriber; captured here so a sync does not revert
             # it. Note the English twin still runs gpt-5.4 — vapi_en.py copies
             # the prompt, not this block.
-            "model": {"provider": "openai", "model": "gpt-5.2"},
+            #
+            # 5.2 -> 4.1 ON 26 AUG, AND THE REASON IS SECONDS, NOT SHEKELS.
+            # The owner reported the agent "being cut off, like losing
+            # connection". The call logs said otherwise: no drop, no error —
+            # both calls ended customer-ended-call into SILENCE, because
+            # gpt-5.2 is a reasoning model and Vapi's own per-turn metrics put
+            # its share of the wait at ~3.9s of a 5.3s turn (voice 0.9s,
+            # transcriber 0.2s, endpointing 0.3s). vapi_latency.py measured the
+            # two reported calls at 5,390ms and 5,850ms median caller-felt
+            # latency against the PRD's <800ms; five seconds of dead air on a
+            # phone reads as a dead line, and the resident hangs up. The same
+            # agent measured 1.3-2.1s median on its better calls — reasoning
+            # latency is variable, which is why 25 Aug sounded clean and 26 Aug
+            # sounded broken. Chosen by the owner over dialling gpt-5.2's
+            # reasoning effort down. If the Hebrew or the negotiation audibly
+            # worsens, that untried option is the first thing to reach for.
+            "model": {"provider": "openai", "model": "gpt-4.1"},
         },
         # "Echo Stone" — this agent takes a cloned voice when one exists. See
         # cloned_voice() below. The debt agent and not the inbound one because

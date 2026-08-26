@@ -828,6 +828,16 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **Voice: the debt agent runs gpt-4.1 since 26 Aug ~18:52, owner's choice, NOT
+  yet heard.** The "cut off / losing connection" report was measured as model
+  latency, not network: gpt-5.2 (reasoning) spent ~3.9s of a ~5.3s turn
+  thinking; `vapi_latency.py` put the two reported calls at 5,390/5,850ms
+  median caller wait vs the PRD's <800ms. Swapped via one line in
+  `vapi_sync.py` + `--apply`; prompt, voice, transcriber, tools unchanged.
+  **First 4.1 call should be listened to for Hebrew and negotiation quality**;
+  if worse, the untried cheaper move is keeping 5.2 with reasoning effort
+  turned down (option offered, not taken). The English twin still runs gpt-5.4;
+  intake (he) still gpt-4.1-mini and still unheard since its Hebrew rewrite.
 - **WhatsApp: shipped, probed, and the prompt now treats gender as a question
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
