@@ -125,17 +125,30 @@ def main():
         set_env("TOOL_SECRET", tool_secret)
         print("\nwrote TOOL_SECRET to .env")
 
-    # OXS_KEY_REQUESTS rides along since 26 Aug: open_request mirrors tickets
-    # into OXS (see oxsMirror in index.ts) and reads the key from the function
-    # environment. Absent from .env, the mirror is simply off — the function
-    # skips it — so this is not a fail-closed value like TOOL_SECRET.
+    # THE OXS MIRROR IS OFF BY DEFAULT, AND ONLY A FLAG TURNS IT ON.
+    #
+    # open_request can mirror tickets into OXS (oxsMirror in index.ts), gated
+    # on OXS_KEY_REQUESTS being present in the FUNCTION's environment. On
+    # 26 Aug the owner had that mirror switched off after it went live on a
+    # consent that was not really given — "OXS is read-only" is the standing
+    # rule, and reversing it is an explicit decision, not a deploy side effect.
+    #
+    # So a plain --apply DELETES the function-side key (a stale one must not
+    # linger and quietly keep writing), and only `--oxs-mirror` pushes it. The
+    # .env copy is untouched either way — the read-side importers use it.
     to_push = [{"name": "TOOL_SECRET", "value": tool_secret}]
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
-    if oxs_key:
+    mirror = "--oxs-mirror" in sys.argv
+    if mirror and oxs_key:
         to_push.append({"name": "OXS_KEY_REQUESTS", "value": oxs_key})
     code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref, to_push)
-    print("secret push    HTTP %s  (%d secrets%s)" %
-          (code, len(to_push), "" if oxs_key else " — OXS_KEY_REQUESTS missing, mirror will be off"))
+    print("secret push    HTTP %s  (%d secrets)" % (code, len(to_push)))
+    if not mirror:
+        code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref,
+                         ["OXS_KEY_REQUESTS"])
+        print("oxs mirror     OFF — function-side key deleted (HTTP %s)" % code)
+    else:
+        print("oxs mirror     ON — pushed by explicit --oxs-mirror")
     if code >= 300:
         print(out)
         sys.exit(1)

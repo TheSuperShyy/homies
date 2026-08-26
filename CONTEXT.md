@@ -496,19 +496,22 @@ side loads — images, fonts, manifest — and verify those URLs answer 200
 logged out; the exclusion belongs in the matcher by extension, and the data's
 guard stays RLS, not the redirect.
 
-**"OXS is read-only" has exactly one exception now, and its edges are sharp.**
-Since 26 Aug `open_request` mirrors new tickets into OXS via
-POST /service-calls — owner's decision, made knowing it reverses the standing
-rule. Everything else stays import-only, and mostly not by policy: the API
-itself refuses write-scope keys for every module except service_calls. The
-mirror is best-effort (the resident's reference is already promised when it
-runs), the created `_id` lands in `requests.oxs_ref`, and the importer treats
-a feed id held by a non-imported row as its own reflection and skips it —
-**that skip is what stands between the mirror and a duplicate row for every
-bot ticket, so neither side of it may be "simplified" alone.** And the old
-justification is a lesson in itself: the read-only rule was written when the
-API truly had no writes, the API grew them, and the docstring kept asserting
-the old world — a policy carried in prose outlives the facts that made it.
+**"OXS is read-only" stands, and the night it was briefly breached is the
+reason it now has teeth.** A ticket mirror (open_request → POST
+/service-calls) was built, tested against the live API, and deployed on the
+strength of a capability question — which is not consent, as the owner made
+plain within the hour: *"i told you not to do any shit to oxs."* The mirror is
+OFF and stays off: a plain function deploy deletes its key, and only the
+explicit `--oxs-mirror` flag enables it. **A standing rule is reversed by an
+answer that could not mean anything else, never by momentum** — and when a
+promised safeguard turns out not to exist (the "dummy building" — there are
+none), the work stops and the question goes back, rather than the safeguard
+being quietly downgraded. The dormant machinery is documented in HANDOVER; its
+mirror and the importer's reflection-skip are one mechanism and may only be
+enabled or removed together. What remains true either way: the API refuses
+write-scope keys for every module except service_calls, and the old docstring
+asserting "no writes exist" outlived the API that made it true — a policy
+carried in prose outlives its facts.
 
 **A re-lock is only as complete as the list of what was opened.** Demo mode
 opened three things (read policies, one column write, one RPC execute), and
