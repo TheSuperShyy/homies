@@ -463,6 +463,21 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**One question mark per message is a ceiling and a floor.** The rule had been
+read as a ceiling only, so replies drifted into statements: `אפשר לספר לי מה
+קרה ואפתח על זה קריאה.` is correct in content and hands the resident a
+description of what the bot is willing to do rather than a request to act, and
+the turn stays stuck. **Every message the conversation continues after ends with
+a question**, open wherever open fits and closed only when what remains really
+is yes or no. Full stops belong to the messages that end things: a status
+delivered, a reference number, a transfer that has happened.
+
+**And on WhatsApp this is not only a matter of tone.** `Dead end reply?` appends
+the three-button menu to any reply with no `?` in it, so a reply that does not
+ask a question arrives as **two** messages. A doubled reply reported from a
+handset is the backstop firing, not a duplicate send, and the fix is the missing
+question rather than anything in the send path.
+
 **A rule written for speech can be exactly wrong in writing, and the chatbot
 carried one for a fortnight.** Hebrew marks the addressee's gender in `לְךָ`
 against `לָךְ`, `שֶׁלְּךָ` against `שֶׁלָּךְ` — audibly. Unpointed, they are one

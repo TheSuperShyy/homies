@@ -832,6 +832,13 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **Every reply ends with a question, and this is a standing rule the owner
+    asked to be kept.** Open wherever open fits; closed only when what remains
+    really is yes or no. Full stops only where the conversation ends: status
+    delivered, reference number given, transfer done. **A reply with no `?` is
+    sent as TWO messages** — `Dead end reply?` appends the button menu to it —
+    so a doubled reply on a handset is that backstop firing, not a duplicate
+    send. Probed 6 times, 5 ended in a question; flash, so it is a rate.
   - **`Spell female male prompt.pdf` at the repo root is a VOICE spec** (nikkud
     for TTS, `agent_gender`/`customer_gender`, ends at Text To Speech). Only a
     subset applies to a keyboard. **The voice agents were not touched** — the

@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The second message was not a bug, it was the reply not asking anything
+
+Reported off a handset: the no-ticket answer arrived, and under it a second
+message, `אפשר לעזור בעוד משהו?` with the three buttons. **`Dead end reply?`
+appends the menu to any reply containing no `?` and no handover phrase.** The
+reply was `אוקיי, אני מבין. אפשר לספר לי מה קרה ואפתח קריאה, ואעביר לצוות
+לטיפול.` — correct in content and ending in a full stop, so the workflow read it
+as leaving the resident stuck and offered them a way out. The backstop was doing
+its job. **A reply that does not ask a question literally arrives as two
+messages**, which is worth knowing before anyone goes looking for a duplicate
+send.
+
+**So the fix is the same fix as the content one.** Asked for as a standing rule
+rather than a one-off: every reply ends with a question that hands the turn
+back, and an open one wherever open fits. The prompt already said "one question
+mark per message" and treated that as a ceiling; **one is now also the floor**.
+A full stop is allowed only in the messages the conversation ends with: a status
+delivered, a reference number given, a transfer that has happened.
+
+**Named the trap in the same breath**, because "always end with a question" read
+literally produces `רוצה שאפתח קריאה?` everywhere. The question that hands the
+turn back is normally open — `מה קרה?`, `באיזה בניין ואיזו דירה גרים?` — and
+closed only when what remains really is yes or no. The rule is that the message
+ends with a request of them, not that it ends in a choice between two things.
+
+The no-ticket branch carries it explicitly, with the diagnosis attached: the
+fault in that line was never the content, it was the full stop, which turned a
+request into a description of what the bot is prepared to do.
+
+**Probed 6 times across three phrasings after the push: 5 ended in a question,**
+the one miss on the first run of `אין לי קריאה`, then 3/3 on the same phrase
+after. `google/gemini-2.5-flash`, so this is a rate and not a guarantee; the
+menu backstop still catches the misses, which is what it is for. Live prompt
+39,968 → 41,097 chars. Saved to memory as a standing preference.
+
 ### Shipped, and the owner's Hebrew spelling file settled an old rule the wrong way round
 
 **The `last_bot` fix is live and verified.** Approved and pushed; all four
