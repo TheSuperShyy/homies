@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### The voice agents now point the words the writing hides
+
+Asked why the female/male file had not reached the voice agents, then told to
+apply it: *"the way we read the words in Hebrew is different from the way we
+speak it"* — which is precisely the half both Hebrew prompts were missing.
+They already carried most of the PDF's system from earlier work: gender as
+state, speech beats name, unisex names decide nothing, the neutral bridge, the
+imperative/future table, and even the pointed forms of לך/שלך/איתך — **but
+only as documentation.** The standing instruction for those words was
+drop-the-word (right when gender is undecided) and nothing else, so with a
+known-gender caller the model still wrote `לך` unpointed and the engine
+guessed the reading.
+
+**Measured before shipping**: the same sentence pointed both ways through the
+live voice (sonic-3, Eyal) produces genuinely different audio — 3.53s vs
+2.41s, first-second correlation −0.04, where 1.0 would mean nikkud ignored.
+Both WAVs sent to the owner, whose ear confirms the pronunciations; the
+mechanism is confirmed by the measurement.
+
+**What was added, in both Hebrew prompts** (debt after its invisible-words
+table, intake after its "לך" paragraph):
+
+- **Decided gender → the dropped words come back, pointed**: אני שולח לָךְ,
+  יש לְךָ תשלום פתוח. The nikkud is for the engine, not the ear.
+- **Past tense in direct address points too** — שילמת/קיבלת/אמרת are written
+  identically and spoken תָּ/תְּ; the debt prompt got the table, intake the
+  rule with two examples.
+- **Point only where it saves the pronunciation** — not a prayer book; a word
+  that reads correctly unpointed stays unpointed. Always pointed: the address
+  words at a known gender, and the pairs writing cannot separate — אֶת/אַתְּ,
+  עִם/עַם, שָׁם/שֵׁם.
+
+Live: debt 52,586 → 53,635 chars (157 nikkud marks), intake 34,877 → 35,622
+(57 marks), both verified by reading the assistants back. **Not yet heard in a
+call.** NOT taken from the PDF: agent_gender (מיכאל is fixed masculine),
+the sales scripts, street slang — and the register lists were already covered.
+**The frozen English twins are now behind the Hebrew** on both agents —
+`vapi_en.py --dry` will show the drift; updating them is by hand and still
+owed.
+
 ### "לדבר עם נציג" answered with a closed door, and now it gathers context on the way to the team
 
 Off a handset: the third menu button got `אני מעביר את זה לצוות, נחזור בהקדם.`

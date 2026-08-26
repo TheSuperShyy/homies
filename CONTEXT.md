@@ -463,6 +463,16 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A pronunciation instruction is testable before it ships, and the test is one
+TTS request.** Whether Cartesia obeys nikkud was measured, not assumed: the
+same sentence pointed masculine and feminine renders as different audio
+(uncorrelated waveforms), so a prompt telling the model to point לָךְ is a real
+lever and not a hope. The complement of the chat-side rule: **in writing,
+unpointed לך marks nothing; in speech the engine must pick one — so chat drops
+the mark and voice adds it.** The two rules come from the same fact about
+Hebrew and go in opposite directions; carrying either one into the other
+medium breaks it.
+
 **An exception written far from the rule it overrides does not exist.** Proven
 twice on 26 Aug: the `אין לי` fix, and then the transfer-context flow, where
 "what arrives after a handover is context, not a request" sat in the transfer

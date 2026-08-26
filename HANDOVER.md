@@ -828,6 +828,18 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **Voice: both Hebrew prompts now instruct POINTED address words at a known
+  gender (26 Aug night, owner's explicit ask, NOT yet heard in a call).**
+  Debt 53,635 chars / intake 35,622, live and verified. The rule: gender
+  undecided → drop the ambiguous word (unchanged); gender decided → write it
+  pointed (לָךְ / לְךָ, and תָּ/תְּ past in direct address); point only what
+  saves a pronunciation, plus אֶת/אַתְּ, עִם/עַם, שָׁם/שֵׁם. Cartesia sonic-3
+  honours nikkud — measured, two pointings of one sentence give uncorrelated
+  audio; confirmation WAVs are with the owner. **Both frozen English twins are
+  now officially behind their Hebrew sources** (`vapi_en.py <twin> --dry` shows
+  it); updating them is by hand and still owed. Source of the requirement:
+  `Spell female male prompt.pdf` at the repo root — its agent_gender, sales
+  and slang sections were deliberately not taken.
 - **Voice: every sentence now ends in a 300ms unspoken pause, on both Hebrew
   agents and their fallbacks (26 Aug evening, NOT yet heard).** Fix for the
   clipped-last-word report: Cartesia sonic-3 leaves 43-135ms of tail (measured
