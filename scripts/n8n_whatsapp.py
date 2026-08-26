@@ -211,8 +211,16 @@ TAP_LINE = {
     "open": {
         "he": "בטח. אפשר לספר לי מה קרה?",
     },
+    # WARMED 26 AUG, on the owner's reading of the live reply: "בטח. מה מספר
+    # הקריאה?" is correct, short and cold. Two clipped fragments land on someone
+    # who has just asked for help without one word saying anybody is going to
+    # help them. The first half of the sentence is what makes it service rather
+    # than a form, and it is not redundant just because helping is obvious.
+    # The same sentence is in the prompt, under "מצב של קריאה קיימת", because
+    # the model produces it on the typed path and this canned copy produces it
+    # on the tap path. THE TWO ARE ONE CHANGE.
     "status": {
-        "he": "בטח. מה מספר הקריאה?",
+        "he": "בטח, אשמח לבדוק בשבילך. יש לך את מספר הקריאה?",
     },
 }
 

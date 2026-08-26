@@ -357,7 +357,21 @@ by the workflow with no model round trip, so those strings drift out of step
 with the prompt silently and survive every prompt pass. A reply that will not
 change is the signal. Where a fixed string and the prompt say the same thing,
 they are two copies and both get edited, which `check_greeting()` already
-enforces for the opener and nothing enforces for the rest.
+enforces for the opener and nothing enforces for the rest. **Three copies for
+the status button, done by hand on 26 Aug:** `TAP_LINE` in
+`scripts/n8n_whatsapp.py`, the `TAPPED` map inside the live `Sort` node, and
+the sentence quoted in the prompt's own status section. Push those by patching
+the live nodes in place; `--apply` overwrites a workflow that is ahead of the
+repo script.
+
+**Correct, short and cold is still a defect.** The status button used to answer
+`בטח. מה מספר הקריאה?` -- accurate, two clipped fragments, and no word in it
+saying anybody is going to help. The owner read it as rude. A request for
+information lands on somebody who has just asked for help, so the sentence
+offers before it asks. And **a resident who replies "which number?" is not being
+difficult**: most call once a year and do not know a reference number exists.
+Say what it is and where they saw it, and give the other route in the same
+breath.
 
 **The Hebrew assistants are instructed in Hebrew; the English twins are not.**
 Decided 25 Aug, and true of both Hebrew agents since 26 Aug -- debt from

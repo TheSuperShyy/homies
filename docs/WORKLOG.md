@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The second menu button answers warmly, and explains what a reference number is
+
+Read off the live reply to the "מצב קריאה קיימת" button: `בטח. מה מספר הקריאה?`
+"is rude and ai". It is correct, short and cold: two clipped fragments landing
+on somebody who has just asked for help, without one word saying anybody is
+going to help them. Now `בטח, אשמח לבדוק בשבילך. יש לך את מספר הקריאה?`
+The first half is what makes it service rather than a form, and it is not
+redundant because helping is obvious.
+
+**And the follow-up the owner asked for: somebody who answers "which number?"
+does not know such a thing exists.** Most residents call once a year. The bot
+now says what it is and where they saw it, and offers the other way in the same
+breath: `אה, זה המספר שקיבלת מאיתנו כשנפתחה הקריאה. אם הוא לא ביד, אפשר גם לפי הבניין והדירה.`
+
+**Why that does not break the one-question rule** three paragraphs above it. That
+rule bans offering both routes in the FIRST ask, when it is still unknown whether
+they have a number, because two question marks in one message is confusing. Here
+they have already said they have none, which is what turns the second route from
+a question into an answer. The prompt says so in as many words, or the next
+person to read it removes one of the two.
+
+**Three copies, edited together, because that is the standing trap here.** The
+tap reply is answered by the workflow with no model round trip, so the prompt
+cannot reach it: `scripts/n8n_whatsapp.py` `TAP_LINE`, the live `Sort` node's
+`TAPPED` map, and the prompt's own "מצב של קריאה קיימת" section, which is what
+produces the same sentence on the typed path. Pushed by patching the two live
+nodes in place rather than `--apply`, which would overwrite a workflow that is
+ahead of the repo script.
+
+**Not re-tested.** The probe run was stopped before it sent anything, and
+nothing has been put through the live bot since.
+
+**Not changed: the first button.** `בטח. אפשר לספר לי מה קרה?` has the same
+clipped shape and was not raised.
+
 ### The Hebrew prompt was tested, and it had made the Hebrew worse
 
 Asked for a test that would give a basis for whether the agent sounds like a

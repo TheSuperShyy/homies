@@ -813,6 +813,13 @@ handset.**
   a person; **the intake agent has not been called since its rewrite**.
   `vapi_en.py <twin> --dry` now prints a parity report against the Hebrew twin
   and refuses to write a drifted one; both pairs pass.
+- **WhatsApp: the status button answers warmly and explains itself (26 Aug).**
+  `בטח, אשמח לבדוק בשבילך. יש לך את מספר הקריאה?` replaces `בטח. מה מספר
+  הקריאה?`, and a resident who answers "which number?" is now told what it is
+  and offered building-and-apartment instead. Three copies edited together:
+  `TAP_LINE`, the live `Sort` node's `TAPPED`, and the prompt's status section.
+  Live prompt is 35,985 chars. **Not re-tested through the bot.** The other
+  button, `בטח. אפשר לספר לי מה קרה?`, has the same clipped shape and was left.
 - **Voice: the Hebrew intake prompt was tested and had three Hebrew errors the
   English one did not (26 Aug).** `scripts/prompt_probe.py` puts fixed resident
   turns to the live assistant and prints what it writes; `--ref <commit>` runs
