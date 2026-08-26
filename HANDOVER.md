@@ -812,7 +812,16 @@ handset.**
   heard by the owner and reported clean -- no cut-off, and it holds a turn like
   a person; **the intake agent has not been called since its rewrite**.
   `vapi_en.py <twin> --dry` now prints a parity report against the Hebrew twin
-  and refuses to write a drifted one; both pairs pass. What the change can and cannot do: the fixed lines the
+  and refuses to write a drifted one; both pairs pass.
+- **Voice: the Hebrew intake prompt was tested and had three Hebrew errors the
+  English one did not (26 Aug).** `scripts/prompt_probe.py` puts fixed resident
+  turns to the live assistant and prints what it writes; `--ref <commit>` runs
+  the same turns against an older prompt, which is how a before/after pair is
+  made. It tests WORDS, never audio. The three — `מה היה בנזילה?`,
+  `מתי זה ייקח`, `בוא נראה` — were all the model lifting fragments of its own
+  Hebrew instructions into its speech, which an English prompt cannot do.
+  Fixed and re-tested at 0/8; live prompt is now 34,877 chars. **Open, 1/8:**
+  one run said the closing line mid-call, which on a real call hangs up. What the change can and cannot do: the fixed lines the
   agents speak were always Hebrew and are carried through verbatim, so nothing
   about those changed; what should read less translated is every sentence the
   model composes between them.

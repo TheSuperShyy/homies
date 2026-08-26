@@ -378,6 +378,19 @@ Hebrew gender tables have no English counterpart and their absence is correct.
 **It is weaker than the table it replaces** -- that could not ship a twin
 missing a sentence; this notices a missing section, rule, code or fact.
 
+**A same-language prompt bleeds into speech, and that is the cost of writing
+the prompt in Hebrew.** Measured 26 Aug with `prompt_probe.py`: the Hebrew
+intake prompt made the agent say `מה היה בנזילה?` (the missing-parcel example
+applied to a leak) 4/4, `מתי זה ייקח` (question word swapped, verb left behind)
+4/4, and `בוא נראה` 2/4 — a form that appears in the prompt ONLY in the column
+of things it must never say. The English prompt produced none of the three.
+When the instruction is in English, the change of language is itself the
+boundary between what to think and what to say; in Hebrew there is no boundary,
+so **every example, every forbidden form and every fixed line is also a
+candidate sentence.** Write them so they cannot be lifted: name the forbidden
+column as forbidden, bind an example to its case, and say which words move
+together. All three went to 0/8 that way.
+
 **The English agents cannot have the problem the Hebrew ones had.** Their
 prompts were written in English and their output is English, so nothing is
 rendered between instruction and speech. An English prompt driving a Hebrew

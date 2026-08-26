@@ -11,6 +11,71 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The Hebrew prompt was tested, and it had made the Hebrew worse
+
+Asked for a test that would give a basis for whether the agent sounds like a
+person speaking Hebrew or like an English script being rendered into it.
+
+**`scripts/prompt_probe.py`** is the instrument. Fixed resident turns, so both
+halves of a pair hear the same sentences in the same order and any difference in
+the reply is the prompt; the prompt read off the LIVE assistant by default, or
+out of the repo at a commit with `--ref`, which is what produces the pair. It
+answers a question about WORDS. It says nothing about how the agent sounds --
+pronunciation, pace and turn-taking live in TTS and endpointing, and a call is
+still the only evidence about those.
+
+**Two harness faults were found and fixed before any result was believed.**
+The first version attached no tools, so the agent invented a lookup result it
+had never queried -- a fault of the harness that would have been reported as a
+fault of the agent. The second read placeholders aloud on the debt target,
+because the variable list was written from memory: it carried two names the
+prompt does not use and missed three it does. Unresolved placeholders are now
+fatal rather than a warning, and the `--ref` half takes that commit's own
+opening line, without which the two halves did not start the same conversation.
+
+**THE RESULT WAS THE OPPOSITE OF THE HYPOTHESIS.** Four runs per condition on
+the leak scenario, same model, same turns:
+
+| in the agent's Hebrew | English prompt | Hebrew prompt |
+|---|---|---|
+| `מה היה בנזילה?` -- "what was in the leak", not a sentence | 0/4 | **4/4** |
+| `מתי זה ייקח` -- question word and verb disagree | 0/4 | **4/4** |
+| `בוא נראה` -- masculine, to a caller of unknown gender | 0/4 | **2/4** |
+
+The English-prompt version's Hebrew was already idiomatic: correct number
+gender, natural connectives, ordinary spoken word order. The Hebrew-prompt
+version introduced three errors it did not have.
+
+**The mechanism is bleed, and it is specific to a same-language prompt.** All
+three failures are the model lifting a fragment of its own instructions into
+its speech: `מה היה בתיק?` is the missing-parcel example applied to a leak;
+`מתי זה ייקח` is the fixed line with its question word swapped and its verb
+left behind; `בוא נראה` appears in the prompt ONLY in the left-hand column of
+the neutral-phrasing table, which is the column of forms it must never say.
+When the instruction is in English, the change of language is itself the
+boundary between what to think and what to say. In Hebrew that boundary is
+gone.
+
+**Three fixes, each aimed at one of them:** the left column is named as
+forbidden rather than as a list to choose from; the question word and the verb
+are stated to move together, with `מתי זה ייקח` named as not Hebrew; and the
+follow-up examples are bound to the case beside them, with the leak's own
+questions written out. Pushed, and re-tested over **eight** runs: 0/8 on all
+three.
+
+**One new symptom, 1/8, recorded rather than explained.** One run said the
+closing line in the middle of the call and then carried on. On a real call that
+phrase is the only thing that ends one, so it would have hung up on a resident
+mid-question. It did not recur in the other seven and it is not attributable to
+the fix; it is a watch item.
+
+**What this does and does not settle.** It does not support the reading that an
+English prompt is why the Hebrew sounded translated -- on this evidence the
+English-prompt Hebrew was clean, and writing the prompt in Hebrew is what
+introduced the errors. It says nothing about audio, so the owner's report that
+the outbound now sounds better on a real call is untouched by it. One model,
+temperature 0.3, one scenario deeply and three shallowly.
+
 ### The English twins are checked against the Hebrew again
 
 Told that the English twin should not have been left untouched, and that an
