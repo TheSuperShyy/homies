@@ -463,6 +463,17 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A login wall must be tested from its own public page's point of view, not
+only the pages it guards.** The wall that correctly bounced every dashboard
+page also bounced the login page's own logo — a subresource request carries no
+special status, so /homies-logo.png was 307'd to the page displaying it and
+rendered as a broken image. The probe that proved the wall up ("/ redirects,
+/login answers 200") could not catch it, because it fetched pages and not
+their assets. When adding any blanket intercept, enumerate what the PUBLIC
+side loads — images, fonts, manifest — and verify those URLs answer 200
+logged out; the exclusion belongs in the matcher by extension, and the data's
+guard stays RLS, not the redirect.
+
 **A re-lock is only as complete as the list of what was opened.** Demo mode
 opened three things (read policies, one column write, one RPC execute), and
 only the first was written down in the migration that promised the re-lock.

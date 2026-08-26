@@ -830,9 +830,17 @@ handset.**
   not Hebrew.
 - **Dashboard: /login renders WITHOUT the app shell** (26 Aug night, after a
   screenshot showed the sidebar wrapped around the sign-in card). The branch
-  is a path test in `app/layout.tsx`; the login page carries its own brand and
+  is a path test in `app/layout.tsx`; the login page carries its own brand
+  (the real logo, `dashboard/public/homies-logo.png`, white plate) and
   language switch. If a new public page is ever added, it needs the same
   treatment — the layout's shell assumes a signed-in reader.
+- **Dashboard: image extensions are EXCLUDED from the middleware matcher, on
+  purpose (26 Aug night).** The wall 307'd `/homies-logo.png` to `/login` and
+  the login page showed a broken image of its own brand. The matcher now skips
+  `png|jpg|jpeg|svg|webp|ico` — do not "harden" that exclusion away: public/
+  assets are what pages need before a session exists, RLS guards the data, and
+  anything secret does not belong in public/. Verified: logo 200, /tickets
+  still 307.
 - **VERCEL_TOKEN in `.env` is dead — 403 on every API call (26 Aug night).**
   Deploys are unaffected (the project is git-linked; push to main builds), and
   the login wall was verified by probing https://homies-dashboard.vercel.app
