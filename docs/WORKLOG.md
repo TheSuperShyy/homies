@@ -44,6 +44,13 @@ Authentication → Add user, by design.
 
 Deploys on push (git-linked Vercel project).
 
+**The wall was verified on the deployed site itself**: `/`, `/tickets` and
+`/debts` all 307 to `/login`, `/login` answers 200. It had to be verified by
+probing the URL directly because **the VERCEL_TOKEN in `.env` now 403s on
+every API call** — the deploy still happened (git-linked, builds on push), but
+the API-side confirmation script died on the dead token, not on the deploy.
+Token needs rotating; flagged in HANDOVER.
+
 **A second account followed for the Homies side**: office@homies-management.co.il
 — the office address the bot itself hands out, so it is the natural shared
 login for the client's staff. Created the same way, verified signing in and

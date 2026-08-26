@@ -828,6 +828,13 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **VERCEL_TOKEN in `.env` is dead — 403 on every API call (26 Aug night).**
+  Deploys are unaffected (the project is git-linked; push to main builds), and
+  the login wall was verified by probing https://homies-dashboard.vercel.app
+  directly: every page 307s to /login, /login answers 200. Rotate the token
+  before the next scripted `vercel_deploy.py` run; until then do not trust any
+  script that polls the Vercel API — it fails with 403, not with a clear
+  "token expired".
 - **Dashboard: the login is ENFORCED as of 26 Aug night.** Migration 026
   dropped every anon grant (the ten anon_read policies, the status dropdown's
   anon write, press_call's anon execute) and moved the status write to
