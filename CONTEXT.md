@@ -475,6 +475,16 @@ noise), and **look at every generated image before shipping it** — the first
 roof crop carried the letter-tops of the wordmark and an edge sliver, and no
 build, type-check or probe can see inside a PNG.
 
+**And the dashboard has two themes, so an asset that carries its own colors is
+two assets.** `prefers-color-scheme` splits every ground in this app; a logo
+whose wordmark is dark needs a dark-theme variant with that wordmark
+recolored, served by `<picture>`, or it vanishes for half the audience — the
+first dark attempt shipped navy-on-navy and only a preview caught it. **The
+preview that counts is composited on each theme's own ground color**, not on
+a checkerboard: transparency being correct says nothing about legibility.
+Same rule as the token contrast checks — measured against both themes, every
+time, because an eye on one theme cannot clear the other.
+
 **A login wall must be tested from its own public page's point of view, not
 only the pages it guards.** The wall that correctly bounced every dashboard
 page also bounced the login page's own logo — a subresource request carries no
