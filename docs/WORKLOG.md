@@ -11,6 +11,52 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The English twins are checked against the Hebrew again
+
+Told that the English twin should not have been left untouched, and that an
+English prompt rendered into Hebrew is the root of the grammar and naturalness
+faults. The second half is right and is why both Hebrew prompts were rewritten.
+**The first half does not carry over to the English agents, and it is worth
+being exact about why:** their prompts were written in English in the first
+place and their output is English, so there is no rendering step between
+instruction and speech for anything to be lost in. Rewriting their prose would
+not make their English more natural, because it was never a translation.
+
+**What was really wrong is what the owner spotted.** Freezing the English
+prompts on 25 Aug removed the one thing that kept the twins saying the same
+thing: the substitution table refused to ship when a passage stopped matching.
+Nothing replaced it, so a change to a Hebrew prompt would silently never reach
+its twin.
+
+**`parity()` in `vapi_en.py` is the replacement**, and it runs on `--dry`,
+`--create` and `--update`, refusing to write a drifted twin unless `--force`
+says the difference is deliberate. It compares what cannot legitimately differ
+between two versions of one document: heading count and level order, the set of
+snake_case identifiers (tool names, reasons, statuses, types), the facts that
+are not translated (the office number, 101 and 102, both reference formats),
+and bullet and numbered-step counts.
+
+**It deliberately does not fail on tables.** Three of the four in the debt
+prompt and the only one in the intake prompt teach Hebrew gender — masculine
+against feminine forms, and the neutral phrasings that avoid guessing a
+caller's. None has an English counterpart, and an English twin carrying them
+would be wrong rather than complete. Counts are reported, never failed on. That
+is also the answer to the 39-vs-9 and 11-vs-0 table gaps: they are correct.
+
+**It is weaker than what it replaces, and that is recorded rather than hidden.**
+The table could not ship a twin that had lost a sentence. This notices a lost
+section, rule, code or fact.
+
+**Proved by breaking it**, because a check that has only ever passed is a check
+that agrees with itself. Removing one heading, one tool name and the office
+phone number from the English intake prompt each failed the run; the unmodified
+pair passes.
+
+**Both pairs pass as they stand:** intake 29/29 headings, 15/15 codes, 7/7
+facts; debt 1/1 headings, 21/21 codes, 2/2 facts. So the English twins were not
+behind — nothing was keeping them from falling behind, which is the thing now
+fixed.
+
 ### The inbound agent is now instructed in Hebrew too
 
 Asked whether the inbound prompt was already Hebrew, with the reading that an

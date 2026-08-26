@@ -369,9 +369,20 @@ spoken fixed lines were always Hebrew, so rewriting the instruction cannot
 alter them; what it moves is every sentence the model composes for itself.
 And the twins are no longer derived from each other: `vapi_en.py` used to build
 the English one from the live Hebrew and refuse to ship on a mismatch, which is
-what kept them saying the same thing. That guarantee is gone. **Changing one
-prompt now requires changing the other by hand, and nothing will fail if you
-do not.**
+what kept them saying the same thing. **Changing one prompt now requires
+changing the other by hand** -- but since 26 Aug something does fail if you do
+not. `parity()` runs on every `vapi_en.py` path and refuses to write a twin that
+has drifted, comparing heading count and level order, snake_case identifiers,
+untranslated facts, and bullet and step counts. It does not fail on tables: the
+Hebrew gender tables have no English counterpart and their absence is correct.
+**It is weaker than the table it replaces** -- that could not ship a twin
+missing a sentence; this notices a missing section, rule, code or fact.
+
+**The English agents cannot have the problem the Hebrew ones had.** Their
+prompts were written in English and their output is English, so nothing is
+rendered between instruction and speech. An English prompt driving a Hebrew
+agent is the failure mode; an English prompt driving an English agent is not,
+and rewriting their prose would improve nothing.
 
 **A required beat needs its purpose written down, not just its name.** Beat 3
 of the debt call was mandatory for a week and specified only as "anything

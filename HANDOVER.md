@@ -808,8 +808,11 @@ handset.**
   **Intake (he) followed on 26 Aug** -- 33,948 chars, 70% Hebrew, source
   `docs/assistant/demo-inbound.md`, pushed with `vapi_sync.py inbound --apply`,
   and its English twin frozen at `docs/assistant/en/intake.en.md` the same way.
-  Both Hebrew agents are now instructed in Hebrew and **neither has been heard
-  on a call since**. What the change can and cannot do: the fixed lines the
+  Both Hebrew agents are now instructed in Hebrew. The debt agent has since been
+  heard by the owner and reported clean -- no cut-off, and it holds a turn like
+  a person; **the intake agent has not been called since its rewrite**.
+  `vapi_en.py <twin> --dry` now prints a parity report against the Hebrew twin
+  and refuses to write a drifted one; both pairs pass. What the change can and cannot do: the fixed lines the
   agents speak were always Hebrew and are carried through verbatim, so nothing
   about those changed; what should read less translated is every sentence the
   model composes between them.

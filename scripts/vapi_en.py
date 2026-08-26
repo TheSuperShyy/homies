@@ -1084,9 +1084,12 @@ def frozen_prompt(twin):
     endpointing -- so the two still behave the same; only the words are now
     maintained by hand.
 
-    WHAT WAS LOST, AND IT WAS THE POINT OF THE OLD DESIGN: nothing now fails
-    when the two drift. A change to the Hebrew prompt does not reach the English
-    one, and no check will tell you.
+    WHAT WAS LOST, AND IT WAS THE POINT OF THE OLD DESIGN: nothing failed when
+    the two drifted. A change to the Hebrew prompt did not reach the English
+    one, and no check said so. `parity()` below is the replacement, and it
+    checks a weaker thing than the table did — the table could not ship a twin
+    that had lost a sentence, and parity() only notices when a twin loses a
+    section, a rule, a code or a fact.
     """
     import io, os
     path = FROZEN.get(twin["name"])
@@ -1095,6 +1098,93 @@ def frozen_prompt(twin):
     raw = io.open(path, encoding="utf-8").read()
     m = re.search(r"```\n(.*?)\n```", raw, re.S)
     return m.group(1) if m else None
+
+
+
+# Facts that must read the same in both languages. A phone number, an emergency
+# service and a reference format are not translated, so if one twin has a
+# different set the difference is a loss, never a rendering.
+PARITY_FACTS = r"077-6687949|\b101\b|\b102\b|255-\d{4}-\d{2}|HM-\d{4}-\d{4}"
+
+# Identifiers the model is told to call or to choose from: tool names, reason
+# codes, statuses, types. They are the same string in both prompts by
+# definition — a twin missing one is a twin that cannot do the thing.
+PARITY_CODES = r"\b(?:[a-z]+_){1,3}[a-z]+\b"
+
+
+def parity(hebrew, english):
+    """What survives translation, compared. Returns [(label, ok, detail)].
+
+    WHY THIS IS NOT THE OLD CHECK. Until 25 Aug the English twin was BUILT from
+    the Hebrew by substituting 62 passages, and the build refused to ship if any
+    of them stopped matching. That is a much stronger guarantee than this: it
+    could not produce a twin that had lost a sentence, because every sentence
+    was accounted for. Rewriting the prompts in Hebrew ended it — there is
+    nothing left for an English substitution table to match — and this is what
+    can still be checked once the two documents are written independently.
+
+    It compares only what cannot legitimately differ:
+
+      headings   the two documents are the same document in two languages, so a
+                 section present in one and absent from the other is a loss
+      codes      tool names, reasons, statuses, types — identical strings
+      facts      the office number, 101/102, both reference formats
+      structure  bullet and numbered-list counts, which track rules and steps
+
+    IT DELIBERATELY DOES NOT COMPARE TABLES. Three of the four tables in the
+    debt prompt and the only one in the intake prompt teach Hebrew gender:
+    masculine against feminine forms, and the neutral phrasings that avoid
+    guessing a caller's gender. None of them has an English counterpart, and an
+    English twin carrying them would be wrong rather than complete. Table counts
+    are reported, never failed on.
+    """
+    def heads(t):
+        return [len(h) for h in re.findall(r"(?m)^(#+) ", t)]
+
+    def counts(t, rx):
+        return len(re.findall(rx, t))
+
+    out = []
+    hh, eh = heads(hebrew), heads(english)
+    out.append(("headings", hh == eh,
+                "%d vs %d" % (len(hh), len(eh)) if hh != eh
+                else "%d, same levels in the same order" % len(hh)))
+
+    for label, rx in (("codes", PARITY_CODES), ("facts", PARITY_FACTS)):
+        a, b = set(re.findall(rx, hebrew)), set(re.findall(rx, english))
+        detail = "%d, identical" % len(a)
+        if a != b:
+            bits = []
+            if a - b:
+                bits.append("missing from English: " + ", ".join(sorted(a - b)))
+            if b - a:
+                bits.append("only in English: " + ", ".join(sorted(b - a)))
+            detail = "; ".join(bits)
+        out.append((label, a == b, detail))
+
+    for label, rx in (("bullets", r"(?m)^- "), ("numbered steps", r"(?m)^\d+\. ")):
+        a, b = counts(hebrew, rx), counts(english, rx)
+        out.append((label, a == b, "%d vs %d" % (a, b) if a != b else str(a)))
+
+    a, b = counts(hebrew, r"(?m)^\|"), counts(english, r"(?m)^\|")
+    out.append(("table rows (not failed on)", True,
+                "%d vs %d — the difference is the Hebrew gender tables" % (a, b)))
+    return out
+
+
+def print_parity(rows):
+    """Prints the report and returns True if everything that matters passed."""
+    print("\nparity with the Hebrew twin")
+    ok = True
+    for label, good, detail in rows:
+        print("  %-26s %-4s %s" % (label, "ok" if good else "FAIL", detail))
+        ok = ok and good
+    if not ok:
+        print("\nThe twins have drifted. Whichever document lost the "
+              "section, the code or the fact is the one to fix. This check "
+              "cannot tell you which, only that they no longer say the "
+              "same thing.")
+    return ok
 
 
 def englished(prompt, twin):
@@ -1235,6 +1325,18 @@ def main():
     source = api("GET", "/assistant/" + twin["source"])
     body = build(source, twin)
 
+    # THE TWINS ARE CHECKED AGAINST EACH OTHER BEFORE ANYTHING IS WRITTEN.
+    # Freezing the English prompts on 25 Aug removed the guarantee that a change
+    # to one reached the other, and left nothing that would say so. This is the
+    # replacement, and it runs on every path including --update, so an English
+    # twin that has lost a section cannot be pushed without the failure being on
+    # screen first.
+    rows = parity(
+        "".join(m.get("content", "") for m in source["model"]["messages"]
+                if m.get("role") == "system"),
+        body["model"]["messages"][0]["content"],
+    )
+
     if args[1] == "--dry":
         prompt = body["model"]["messages"][0]["content"]
         print("name:        ", body["name"])
@@ -1266,8 +1368,13 @@ def main():
             print("\nsubstitutions applied: %d passages%s" % (
                 len(twin["lines"]),
                 " + %d section blocks" % len(twin["block"]) if twin["block"] else ""))
+        print_parity(rows)
         print("\nNothing was created. Re-run with --create.")
         return
+
+    if not print_parity(rows) and "--force" not in args:
+        sys.exit("\nRefusing to write a twin that has drifted. Fix the gap, "
+                 "or re-run with --force if the difference is deliberate.")
 
     if args[1] == "--create":
         made = api("POST", "/assistant", body)
