@@ -1,15 +1,17 @@
 import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
+import { getLocale, translator, when, type Locale, type T } from '@/lib/i18n';
+import { IconInbox, IconSearch, IconOpenLink } from '@/components/icons';
 
 // One page, four views, state in the URL. The two extra views answer the two
 // questions ops actually asks after an outbound day: who never picked up, and
 // who was sent a link.
 const TABS = [
-  ['all', 'All calls'],
-  ['inbound', 'Inbound'],
-  ['outbound', 'Outbound'],
-  ['no_answer', 'No answer'],
-  ['links', 'Links sent'],
+  ['all', 'calls.all'],
+  ['inbound', 'calls.inbound'],
+  ['outbound', 'calls.outbound'],
+  ['no_answer', 'calls.noAnswer'],
+  ['links', 'calls.links'],
 ] as const;
 
 // Tabs and pager both go through the shared component now, so the only local
@@ -28,11 +30,14 @@ function tabHref(view: string, size: number, search?: string) {
   return s ? `/calls?${s}` : '/calls';
 }
 
-function Tabs({ view, size, search }: { view: string; size: number; search?: string }) {
+function Tabs({ view, size, search, t }: {
+  view: string; size: number; search?: string; t: T;
+}) {
   return (
-    <nav className="tabs">
-      {TABS.map(([key, label]) => (
-        <a key={key} href={tabHref(key, size, search)} className={view === key ? 'on' : ''}>{label}</a>
+    <nav className="seg" aria-label={t('calls.title')}>
+      {TABS.map(([key, key2]) => (
+        <a key={key} href={tabHref(key, size, search)}
+           aria-current={view === key ? 'true' : undefined}>{t(key2)}</a>
       ))}
     </nav>
   );
@@ -50,16 +55,20 @@ function Tabs({ view, size, search }: { view: string; size: number; search?: str
  * transcript AND the summary: the summary is the sentence a person remembers,
  * the transcript is where the words actually are.
  */
-function Search({ view, size, search }: { view: string; size: number; search?: string }) {
+function Search({ view, size, search, t }: {
+  view: string; size: number; search?: string; t: T;
+}) {
   return (
     <form method="get" action="/calls" className="search">
       {view !== 'all' && <input type="hidden" name="view" value={view} />}
       {perParam(size) && <input type="hidden" name="per" value={perParam(size)!} />}
       <input name="q" defaultValue={search ?? ''} dir="auto"
-             placeholder="Search what was said - Hebrew or English" />
-      <button type="submit">Search</button>
+             aria-label={t('calls.search')} placeholder={t('calls.search')} />
+      <button type="submit"><IconSearch /> {t('calls.searchBtn')}</button>
       {search && (
-        <a href={tabHref(view, size)} className="muted" style={{ fontSize: 13 }}>clear</a>
+        <a href={tabHref(view, size)} className="muted" style={{ fontSize: 13 }}>
+          {t('calls.clear')}
+        </a>
       )}
     </form>
   );
@@ -67,21 +76,19 @@ function Search({ view, size, search }: { view: string; size: number; search?: s
 
 // Newer/Older rather than Previous/Next: every view here is ordered newest
 // first, and "previous" is ambiguous about which way that runs.
-function CallPager({ view, page, size, total }: {
-  view: string; page: number; size: number; total: number;
+function CallPager({ view, page, size, total, t }: {
+  view: string; page: number; size: number; total: number; t: T;
 }) {
   return (
     <Pager basePath="/calls" page={page} size={size} total={total}
            params={{ view: view === 'all' ? undefined : view }}
-           prev="Newer" next="Older" unit="rows" />
+           prev={t('calls.newer')} next={t('calls.older')} unit={t('calls.unit')} t={t} />
   );
 }
 
-function when(ts?: string | null) {
-  return ts ? ts.slice(0, 16).replace('T', ' ') : '—';
-}
-
-async function NoAnswer({ page, size }: { page: number; size: number }) {
+async function NoAnswer({ page, size, t, locale }: {
+  page: number; size: number; t: T; locale: Locale;
+}) {
   const [from, to] = pageRange(page, size);
   const { data, error, count } = await serverClient()
     .from('call_outcomes')
@@ -92,34 +99,44 @@ async function NoAnswer({ page, size }: { page: number; size: number }) {
 
   return (
     <>
-      <CallPager view="no_answer" page={page} size={size} total={count ?? 0} />
+      <CallPager view="no_answer" page={page} size={size} total={count ?? 0} t={t} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>When</th><th>Resident</th><th>Phone</th><th>Building</th><th>Unit</th><th>Attempt</th>
+              <th>{t('col.when')}</th><th>{t('col.resident')}</th><th>{t('col.phone')}</th>
+              <th>{t('col.building')}</th><th>{t('col.unit')}</th><th>{t('col.attempt')}</th>
             </tr></thead>
             <tbody>
               {data.map((r: any) => (
                 <tr key={r.id}>
-                  <td className="muted mono">{when(r.created_at)}</td>
-                  <td dir="auto">{r.residents?.full_name ?? <span className="muted">unknown</span>}</td>
+                  <td className="muted mono">{when(r.created_at, locale)}</td>
+                  <td dir="auto">{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
                   <td className="mono">{r.residents?.phone ?? '—'}</td>
                   <td dir="auto">{r.residents?.building ?? '—'}</td>
                   <td className="mono">{r.residents?.unit ?? '—'}</td>
-                  <td className="mono">{r.attempt ?? '—'}</td>
+                  <td className="mono num">{r.attempt ?? '—'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        ) : !error && <div className="empty">Nobody has gone unanswered yet.</div>}
+          </div>
+        ) : !error && (
+          <div className="empty">
+            <IconInbox />
+            <div>{t('calls.emptyNoAnswer')}</div>
+          </div>
+        )}
       </div>
     </>
   );
 }
 
-async function LinksSent({ page, size }: { page: number; size: number }) {
+async function LinksSent({ page, size, t, locale }: {
+  page: number; size: number; t: T; locale: Locale;
+}) {
   const [from, to] = pageRange(page, size);
   const { data, error, count } = await serverClient()
     .from('payment_links')
@@ -129,40 +146,48 @@ async function LinksSent({ page, size }: { page: number; size: number }) {
 
   return (
     <>
-      <CallPager view="links" page={page} size={size} total={count ?? 0} />
+      <CallPager view="links" page={page} size={size} total={count ?? 0} t={t} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>When</th><th>Resident</th><th>Phone</th><th>Building</th><th>Amount</th><th>Period</th><th>Status</th>
+              <th>{t('col.when')}</th><th>{t('col.resident')}</th><th>{t('col.phone')}</th>
+              <th>{t('col.building')}</th><th>{t('col.amount')}</th>
+              <th>{t('col.period')}</th><th>{t('col.status')}</th>
             </tr></thead>
             <tbody>
               {data.map((r: any) => (
                 <tr key={r.id}>
-                  <td className="muted mono">{when(r.created_at)}</td>
-                  <td dir="auto">{r.residents?.full_name ?? <span className="muted">unknown</span>}</td>
+                  <td className="muted mono">{when(r.created_at, locale)}</td>
+                  <td dir="auto">{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
                   <td className="mono">{r.residents?.phone ?? '—'}</td>
                   <td dir="auto">{r.residents?.building ?? '—'}</td>
-                  <td className="mono">₪{Number(r.amount).toLocaleString()}</td>
+                  <td className="mono num">₪{Number(r.amount).toLocaleString()}</td>
                   <td className="mono">{r.period?.slice(0, 7) ?? '—'}</td>
                   <td><span className={`pill ${r.status === 'sent' ? 'resolved' : r.status === 'failed' ? 'needs_review' : 'open'}`}>{r.status}</span></td>
                 </tr>
               ))}
             </tbody>
           </table>
-        ) : !error && <div className="empty">No payment links sent yet.</div>}
+          </div>
+        ) : !error && (
+          <div className="empty">
+            <IconInbox />
+            <div>{t('calls.emptyLinks')}</div>
+          </div>
+        )}
       </div>
-      <p className="muted" style={{ fontSize: 13 }}>
-        &ldquo;sent&rdquo; means OXS confirmed the link went out — whether it was <em>paid</em> is
-        only visible in OXS, so nothing here counts as money received.
+      <p className="muted" style={{ fontSize: 13, marginBlockStart: 10 }}>
+        {t('calls.linksNote')}
       </p>
     </>
   );
 }
 
-async function CallList({ view, page, size, search }: {
-  view: string; page: number; size: number; search?: string;
+async function CallList({ view, page, size, search, t, locale }: {
+  view: string; page: number; size: number; search?: string; t: T; locale: Locale;
 }) {
   const direction = view === 'inbound' || view === 'outbound' ? view : undefined;
   const [from, to] = pageRange(page, size);
@@ -183,49 +208,54 @@ async function CallList({ view, page, size, search }: {
 
   return (
     <>
-      <CallPager view={view} page={page} size={size} total={count ?? 0} />
+      <CallPager view={view} page={page} size={size} total={count ?? 0} t={t} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>When</th><th>Direction</th><th>Number</th><th>Summary</th>
-              <th>Outcome</th><th>Length</th><th>Latency</th><th></th>
+              <th>{t('col.when')}</th><th>{t('col.direction')}</th><th>{t('col.number')}</th>
+              <th>{t('col.summary')}</th><th>{t('col.outcome')}</th>
+              <th>{t('col.length')}</th><th>{t('col.latency')}</th><th></th>
             </tr></thead>
             <tbody>
               {data.map((c: any) => (
                 <tr key={c.id}>
-                  <td className="muted mono">{when(c.started_at)}</td>
+                  <td className="muted mono">{when(c.started_at, locale)}</td>
                   <td>{c.direction}</td>
                   <td className="mono">{c.caller_phone ?? '—'}</td>
-                  <td dir="auto">{c.summary ?? <span className="muted">no summary</span>}</td>
+                  <td dir="auto">{c.summary ?? <span className="muted">{t('calls.noSummary')}</span>}</td>
                   <td className="muted">{c.disposition ?? '—'}</td>
-                  <td className="mono">{c.duration_seconds ? `${c.duration_seconds}s` : '—'}</td>
+                  <td className="mono num">{c.duration_seconds ? `${c.duration_seconds}s` : '—'}</td>
                   {/* The <800ms target from the plan, visible per call rather
                       than as an average that hides the bad ones. */}
-                  <td className="mono" style={{ color: c.latency_ms > 800 ? 'var(--review)' : undefined }}>
+                  <td className="mono num" style={{ color: c.latency_ms > 800 ? 'var(--review)' : undefined }}>
                     {c.latency_ms ? `${c.latency_ms}ms` : '—'}
                   </td>
                   {/* Shown on every row, not only ones with a transcript: the
                       page also carries the recording, the outcome and the tools
                       the agent called, so there is something to see even on a
                       call that produced no words. */}
-                  <td><a className="btn-sm" href={`/calls/${c.id}`}>View call</a></td>
+                  <td><a className="btn-sm" href={`/calls/${c.id}`}>
+                    <IconOpenLink />{t('calls.view')}
+                  </a></td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         ) : !error && (
           <div className="empty">
-            {search
-              ? <>Nothing said in a call matches &ldquo;{search}&rdquo;.</>
-              : direction ? `No ${direction} calls recorded yet.` : 'No calls recorded yet.'}
-            <br />
-            <span style={{ fontSize: 13 }}>
-              {search
-                ? 'Only calls with a transcript can match, and the oldest calls have none.'
-                : 'End-of-call reports were wired on 8 Aug; rows appear here from the next call placed.'}
-            </span>
+            <IconInbox />
+            <div>{search
+              ? t('calls.emptySearch', { q: search })
+              : direction
+                ? t('calls.emptyDirection', { direction: t(`calls.${direction}` as any) })
+                : t('calls.emptyNone')}</div>
+            <div style={{ fontSize: 13, marginBlockStart: 4 }}>
+              {search ? t('calls.emptySearchHint') : t('calls.emptyHint')}
+            </div>
           </div>
         )}
       </div>
@@ -237,6 +267,8 @@ export default async function Calls({
   searchParams,
 }: { searchParams?: { view?: string; page?: string; per?: string; q?: string } }) {
   const view = searchParams?.view ?? 'all';
+  const locale = getLocale();
+  const t = translator(locale);
   const page = pageFrom(searchParams);
   const size = sizeFrom(searchParams);
   const search = searchParams?.q?.trim() || undefined;
@@ -246,12 +278,12 @@ export default async function Calls({
   const searchable = view !== 'no_answer' && view !== 'links';
   return (
     <>
-      <h1>Calls</h1>
-      <Tabs view={view} size={size} search={search} />
-      {searchable && <Search view={view} size={size} search={search} />}
-      {view === 'no_answer' ? <NoAnswer page={page} size={size} />
-        : view === 'links' ? <LinksSent page={page} size={size} />
-        : <CallList view={view} page={page} size={size} search={search} />}
+      <div className="pagehead"><h1>{t('calls.title')}</h1></div>
+      <Tabs view={view} size={size} search={search} t={t} />
+      {searchable && <Search view={view} size={size} search={search} t={t} />}
+      {view === 'no_answer' ? <NoAnswer page={page} size={size} t={t} locale={locale} />
+        : view === 'links' ? <LinksSent page={page} size={size} t={t} locale={locale} />
+        : <CallList view={view} page={page} size={size} search={search} t={t} locale={locale} />}
     </>
   );
 }

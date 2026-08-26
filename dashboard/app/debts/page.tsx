@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageSlice, perParam, sizeFrom } from '@/components/pager';
 import { callButtonEnabled, callResident, phoneNumberConnected } from '@/lib/call';
+import { getLocale, translator } from '@/lib/i18n';
+import { IconInbox, IconCheck, IconAlert, IconPhoneOut } from '@/components/icons';
 
 // The Call button. A person chose this resident and pressed; the agent rings
 // them, once, now. Everything that decides whether that may happen lives in
@@ -40,11 +42,14 @@ const month = (p: string) => p.slice(0, 7);
 // ₪105,760.7 on a card reads as a typo, not as precision anybody wanted.
 const shekels = (n: number) => '₪' + Math.round(n).toLocaleString('en-US');
 const WELL_FORMED = /^\d{4}-\d{2}$/;
+const REVIEW = { disputed: 'debts.disputed', pending: 'debts.pending' } as const;
 
 export default async function Debts({
   searchParams,
 }: { searchParams?: { page?: string; month?: string; by?: string; per?: string;
                       called?: string; result?: string } }) {
+  const locale = getLocale();
+  const t = translator(locale);
   const page = pageFrom(searchParams);
   const size = sizeFrom(searchParams);
   // Calling exists only when a PIN is configured (lib/call.ts explains why),
@@ -115,7 +120,8 @@ export default async function Debts({
       row.owed += Number(c.amount);
       row.months.push(month(c.period));
     } else {
-      row.inReview.push(`${month(c.period)} (${c.status === 'disputed' ? 'disputed' : 'pending'})`);
+      row.inReview.push(
+        `${month(c.period)} (${t(REVIEW[c.status === 'disputed' ? 'disputed' : 'pending'])})`);
     }
     byApartment.set(key, row);
   }
@@ -168,10 +174,10 @@ export default async function Debts({
   // same number: 108 flats owe for July, held by 106 owners.
   const owing = apartments.filter((r) => r.owed > 0);
   const cards = [
-    [selected === 'all' ? 'Total open' : `Open in ${selected}`, shekels(total)],
-    ['Apartments owing', owing.length],
-    ['Residents owing', new Set(owing.map((r) => r.phone)).size],
-    ['In review', apartments.reduce((s, r) => s + r.inReview.length, 0)],
+    ['is-money', selected === 'all' ? t('debts.totalOpen') : t('debts.openIn', { month: selected }), shekels(total)],
+    ['is-open',  t('debts.apartments'), owing.length],
+    ['is-open',  t('debts.residents'),  new Set(owing.map((r) => r.phone)).size],
+    ['',         t('debts.inReview'),   apartments.reduce((acc, r) => acc + r.inReview.length, 0)],
   ] as const;
 
   const tabs = ['all', ...months];
@@ -189,64 +195,70 @@ export default async function Debts({
 
   return (
     <>
-      <h1>Open balances</h1>
-      <nav style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap',
-                    alignItems: 'center' }}>
-        {tabs.map((t) => (
-          <a key={t} href={link(t, byOwnerView)}
-             className="pill" style={{ opacity: selected === t ? 1 : 0.55 }}>
-            {t}
-          </a>
-        ))}
-        <span style={{ flex: 1 }} />
-        {/* The month survives the toggle and the toggle survives the month —
+      <div className="pagehead"><h1>{t('debts.title')}</h1></div>
+      <div className="filters">
+        <nav className="seg" aria-label={t('col.period')}>
+          {tabs.map((m) => (
+            <a key={m} href={link(m, byOwnerView)}
+               aria-current={selected === m ? 'true' : undefined}>
+              {m === 'all' ? t('status.all') : m}
+            </a>
+          ))}
+        </nav>
+        {/* The month survives the toggle and the toggle survives the month:
             either one resetting the other would make the pair unusable. */}
-        {[['apartment', 'by apartment'], ['owner', 'by owner']].map(([v, label]) => (
-          <a key={v} href={link(selected, v === 'owner')}
-             className="pill"
-             style={{ opacity: byOwnerView === (v === 'owner') ? 1 : 0.55 }}>
-            {label}
-          </a>
-        ))}
-      </nav>
+        <nav className="seg" aria-label={t('debts.byApartment')}>
+          {([['apartment', t('debts.byApartment')], ['owner', t('debts.byOwner')]] as const)
+            .map(([v, lab]) => (
+              <a key={v} href={link(selected, v === 'owner')}
+                 aria-current={byOwnerView === (v === 'owner') ? 'true' : undefined}>
+                {lab}
+              </a>
+            ))}
+        </nav>
+      </div>
 
       {/* What happened to the last press, from the URL the action came back
           with. ok: the call id Vapi returned; err: a sentence a person can act
           on. Shown once — it is part of the URL, so a bookmark carries it,
           which is preferable to a toast nobody was looking at. */}
       {outcome && (
-        <div className="panel" style={{ padding: '10px 14px', marginBottom: 14,
-                                        borderColor: outcome.startsWith('ok:') ? 'var(--ok, #2a7)' : 'var(--review)' }}>
-          {outcome.startsWith('ok:')
-            ? <>Calling <span className="mono">{searchParams?.called}</span> now — call <span className="mono">{outcome.slice(3) || '(no id)'}</span>. It will appear under Calls when it ends.</>
-            : <>Did not call <span className="mono">{searchParams?.called}</span>: {outcome.replace(/^err:/, '')}</>}
+        <div className={`notice ${outcome.startsWith('ok:') ? 'ok' : 'bad'}`} role="status">
+          {outcome.startsWith('ok:') ? <IconCheck /> : <IconAlert />}
+          <span>
+            {outcome.startsWith('ok:')
+              ? t('debts.calling', { phone: searchParams?.called ?? '', id: outcome.slice(3) || '—' })
+              : t('debts.notCalled', { phone: searchParams?.called ?? '', why: outcome.replace(/^err:/, '') })}
+          </span>
         </div>
       )}
 
       <div className="cards">
-        {cards.map(([k, n]) => (
-          <div className="card" key={k}>
-            <div className="n">{n}</div>
+        {cards.map(([tone, k, v]) => (
+          <div className={`card ${tone}`} key={k}>
+            <div className="n">{v}</div>
             <div className="k">{k}</div>
           </div>
         ))}
       </div>
 
-      <h2>{byOwnerView ? 'By resident, largest first' : 'By apartment, largest first'}</h2>
+      <h2>{byOwnerView ? t('debts.headOwner') : t('debts.headApartment')}</h2>
       <Pager page={page} size={size} total={rows.length} basePath="/debts"
              params={{ month: selected, by: byOwnerView ? 'owner' : undefined }}
-             unit={byOwnerView ? 'residents' : 'apartments'} />
+             unit={byOwnerView ? t('debts.unitRes') : t('debts.unitAp')} t={t} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {rows.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>Resident</th><th>Building</th>
-              <th>{byOwnerView ? 'Apartments' : 'Apartment'}</th><th>Phone</th>
-              {selected === 'all' && <th>Months owed</th>}
-              <th>In review</th>
-              <th>{selected === 'all' ? 'Owed' : `Owed (${selected})`}</th>
-              {canCall && <th>Call</th>}
+              <th>{t('col.resident')}</th><th>{t('col.building')}</th>
+              <th>{byOwnerView ? t('debts.colApartments') : t('debts.colApartment')}</th>
+              <th>{t('col.phone')}</th>
+              {selected === 'all' && <th>{t('debts.monthsOwed')}</th>}
+              <th>{t('debts.inReview')}</th>
+              <th>{selected === 'all' ? t('debts.owed') : t('debts.owedIn', { month: selected })}</th>
+              {canCall && <th>{t('debts.call')}</th>}
             </tr></thead>
             <tbody>
               {visible.map((r) => {
@@ -264,8 +276,8 @@ export default async function Debts({
                       ? ((r as any).units.join(', ') || '—')
                       : (r.unit || '—')}
                     {!byOwnerView && others.length > 0 && (
-                      <span className="muted" style={{ fontSize: 12, marginInlineStart: 6 }}>
-                        · also apt {others.join(', ')} · {shekels(owner!.total)} total
+                      <span className="sub">
+                        {t('debts.alsoApt', { units: others.join(', '), total: shekels(owner!.total) })}
                       </span>
                     )}
                   </td>
@@ -278,7 +290,7 @@ export default async function Debts({
                   {selected === 'all' &&
                     <td className="muted mono">{[...r.months].sort().join(', ') || '—'}</td>}
                   <td className="muted">{r.inReview.join(', ') || '—'}</td>
-                  <td className="mono">{r.owed ? shekels(r.owed) : '—'}</td>
+                  <td className="mono num">{r.owed ? shekels(r.owed) : '—'}</td>
                   {/* One press, one call, this resident. The PIN is typed
                       every time on purpose: this page has no login, and the
                       cost of a mistaken press is a resident's phone ringing
@@ -292,14 +304,16 @@ export default async function Debts({
                         <form action={placeCall} className="status-edit">
                           <input type="hidden" name="phone" value={r.phone} />
                           <input type="hidden" name="back" value={link(selected, byOwnerView)} />
-                          <input type="password" name="pin" placeholder="PIN" required
+                          <input type="password" name="pin" placeholder={t('debts.pin')} required
                                  inputMode="numeric" autoComplete="off"
-                                 style={{ width: 56 }} />
-                          <button type="submit" className="pill">call</button>
+                                 aria-label={t('debts.pin')} />
+                          <button type="submit" className="btn-sm">
+                            <IconPhoneOut />{t('debts.callBtn')}
+                          </button>
                         </form>
                       ) : (
                         <span className="muted" style={{ fontSize: 12 }}>
-                          {r.owed > 0 ? 'no number yet' : '—'}
+                          {r.owed > 0 ? t('debts.noNumber') : '—'}
                         </span>
                       )}
                     </td>
@@ -309,9 +323,13 @@ export default async function Debts({
               })}
             </tbody>
           </table>
+          </div>
         ) : !error && (
           <div className="empty">
-            {selected === 'all' ? 'Nobody owes anything.' : `Nobody owes for ${selected}.`}
+            <IconInbox />
+            <div>{selected === 'all'
+              ? t('debts.emptyAll')
+              : t('debts.emptyMonth', { month: selected })}</div>
           </div>
         )}
       </div>

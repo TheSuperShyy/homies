@@ -1,162 +1,526 @@
 /* One stylesheet, no framework. The dashboard is tables and text; a build-time
-   CSS toolchain would be more moving parts than the whole app. */
+   CSS toolchain would be more moving parts than the whole app.
+
+   EVERYTHING HERE IS WRITTEN IN LOGICAL PROPERTIES — inline-start, not left.
+   The interface runs right-to-left in Hebrew and left-to-right in English off
+   one `dir` attribute, and a single hardcoded `left` is a corner that silently
+   stays on the wrong side in one of the two languages. */
+
+/* ---------------------------------------------------------------- tokens -- */
+/* Semantic names, never raw hex at the call site. The status colours carry
+   meaning, so they are defined once here and every pill, stripe and dot reads
+   from the same six. */
 :root {
-  --bg: #f7f7f8; --panel: #fff; --line: #e4e4e7; --ink: #18181b;
-  --muted: #71717a; --accent: #1d4ed8;
-  --open: #b45309; --progress: #1d4ed8; --done: #15803d; --review: #b91c1c;
-  /* The row action. A deep orange on white so 13px text still clears AA;
-     the dark theme goes brighter and flips the label to near-black, because
-     the same orange that reads well on white is too dim on #101012. */
-  --action: #c2410c; --action-ink: #fff; --action-hover: #9a3412;
+  color-scheme: light dark;
+
+  --bg:        #F1F5F9;
+  --panel:     #FFFFFF;
+  --panel-2:   #F8FAFC;
+  --line:      #E2E8F0;
+  --line-soft: #EFF3F8;
+  --ink:       #0F172A;
+  --ink-2:     #334155;
+  /* slate-500 (#64748B) was the obvious pick and it misses AA: 4.34:1 against
+     the page ground, where most muted text on this dashboard actually sits.
+     One step darker clears 4.5 and still reads as a second tier against
+     --ink-2, which is the job it does. */
+  --muted:     #5B6B80;
+
+  --accent:      #1E40AF;
+  --accent-ink:  #FFFFFF;
+  --accent-soft: #E8EEFB;
+  --accent-line: #C7D7F5;
+
+  /* The row action. Amber against the blue so the one thing you press is never
+     the same colour as the thing you read. */
+  --action:       #B45309;
+  --action-ink:   #FFFFFF;
+  --action-hover: #92400E;
+
+  --open:     #B45309;  --open-bg:     #FEF3C7;
+  --progress: #1D4ED8;  --progress-bg: #DBEAFE;
+  --done:     #15803D;  --done-bg:     #DCFCE7;
+  --review:   #B91C1C;  --review-bg:   #FEE2E2;
+  --idle:     #5B6B80;  --idle-bg:     #F1F5F9;
+
+  --radius:    10px;
+  --radius-sm: 7px;
+  --shadow:    0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .04);
+  --shadow-md: 0 1px 2px rgba(15, 23, 42, .05), 0 12px 28px -20px rgba(15, 23, 42, .5);
+  --sidebar:   244px;
+
+  --ease: cubic-bezier(.2, .7, .3, 1);
 }
+
+/* Dark is designed, not inverted: the surfaces lift toward blue rather than
+   toward grey, and every status colour is re-picked because the light-mode
+   amber and green both fall under 4.5:1 on a dark panel. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101012; --panel: #18181b; --line: #27272a; --ink: #f4f4f5;
-    --muted: #a1a1aa; --accent: #7aa2ff;
-    --open: #f0b429; --progress: #7aa2ff; --done: #4ade80; --review: #f87171;
-    --action: #fb923c; --action-ink: #1c1005; --action-hover: #fdba74;
+    --bg:        #0B0F17;
+    --panel:     #141A23;
+    --panel-2:   #19212C;
+    --line:      #253040;
+    --line-soft: #1C242F;
+    --ink:       #E8EDF5;
+    --ink-2:     #C2CCDA;
+    --muted:     #94A3B8;
+
+    --accent:      #7CA0F0;
+    --accent-ink:  #0B0F17;
+    --accent-soft: #1B2740;
+    --accent-line: #2F4675;
+
+    --action:       #FB923C;
+    --action-ink:   #1A1005;
+    --action-hover: #FDBA74;
+
+    --open:     #F5B841;  --open-bg:     #3A2C10;
+    --progress: #7CA0F0;  --progress-bg: #1B2740;
+    --done:     #52C98B;  --done-bg:     #123324;
+    --review:   #F87171;  --review-bg:   #3B1A1A;
+    --idle:     #94A3B8;  --idle-bg:     #1C242F;
+
+    --shadow:    0 1px 2px rgba(0, 0, 0, .5);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 28px -20px rgba(0, 0, 0, 1);
   }
 }
+
 * { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
 body {
-  margin: 0; background: var(--bg); color: var(--ink);
-  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-hebrew), ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
+
 a { color: inherit; text-decoration: none; }
-header.top {
-  display: flex; gap: 22px; align-items: baseline;
-  padding: 14px 26px; background: var(--panel); border-bottom: 1px solid var(--line);
+
+/* One focus ring, defined once, visible on both grounds. Removing these is the
+   single most common way a dashboard becomes unusable by keyboard. */
+:where(a, button, select, input, summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
-header.top strong { font-size: 15px; letter-spacing: -0.01em; }
-header.top nav { display: flex; gap: 18px; }
-header.top nav a { color: var(--muted); font-size: 14px; }
-header.top nav a:hover, header.top nav a.on { color: var(--ink); }
-header.top form { margin-inline-start: auto; }
-main { padding: 26px; }
-/* View switcher on the calls page. Links, not buttons — the state lives in the
-   URL so a view can be bookmarked and shared. */
-.tabs { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
-.tabs a {
-  padding: 6px 14px; font-size: 13px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
-.tabs a:hover { color: var(--ink); }
-.tabs a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ------------------------------------------------------------- app shell -- */
+/* Sidebar on a desk, top bar on a phone. An operations dashboard is used at a
+   desk nearly all of the time, and a persistent rail means the six views are
+   one click apart from anywhere instead of hidden behind a menu. */
+.shell { display: grid; grid-template-columns: 1fr; min-height: 100dvh; }
+
+@media (min-width: 1024px) {
+  .shell { grid-template-columns: var(--sidebar) minmax(0, 1fr); }
+}
+
+.rail {
+  background: var(--panel);
+  border-block-end: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+}
+
+@media (min-width: 1024px) {
+  .rail {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 20px 14px;
+    border-block-end: 0;
+    border-inline-end: 1px solid var(--line);
+    height: 100dvh;
+  }
+}
+
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  padding-inline: 6px; margin-block-end: 0;
+  white-space: nowrap;
+}
+@media (min-width: 1024px) { .brand { margin-block-end: 22px; } }
+
+.brand .mark {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 8px;
+  background: var(--accent); color: var(--accent-ink);
+  display: grid; place-items: center;
+}
+.brand .mark svg { width: 17px; height: 17px; }
+.brand b { font-size: 15px; font-weight: 600; letter-spacing: -.01em; display: block; }
+.brand small { font-size: 11.5px; color: var(--muted); display: none; }
+@media (min-width: 1024px) { .brand small { display: block; } }
+
+/* The six views. Icon plus label always — an icon-only rail saves 90px and
+   costs everybody who has not memorised which glyph is which. */
+.navlist {
+  display: flex; gap: 4px; overflow-x: auto; flex: 1 1 auto;
+  scrollbar-width: none;
+}
+.navlist::-webkit-scrollbar { display: none; }
+@media (min-width: 1024px) {
+  .navlist { flex-direction: column; gap: 2px; overflow: visible; flex: 0 0 auto; }
+}
+
+.navlist a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 500; color: var(--muted);
+  white-space: nowrap;
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+.navlist a svg { width: 17px; height: 17px; flex: none; }
+.navlist a:hover { background: var(--panel-2); color: var(--ink); }
+
+/* Current location, said two ways: colour and a filled ground. Colour alone
+   fails for anybody who cannot separate the two blues. */
+.navlist a[aria-current="page"] {
+  background: var(--accent-soft); color: var(--accent); font-weight: 600;
+}
+
+.railfoot {
+  display: flex; align-items: center; gap: 8px;
+  margin-inline-start: auto;
+}
+@media (min-width: 1024px) {
+  .railfoot {
+    margin-inline-start: 0; margin-block-start: auto;
+    padding-block-start: 14px; border-block-start: 1px solid var(--line);
+    flex-direction: column; align-items: stretch;
+  }
+}
+
+/* The language switch. A form, not a link: it writes a cookie, and a GET link
+   that changes server state is a link a crawler or a prefetch can pull. */
+.langswitch button {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 8px 12px;
+  font-size: 13px; font-weight: 500;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: var(--ink-2); cursor: pointer;
+  transition: border-color .16s var(--ease), color .16s var(--ease);
+}
+.langswitch button:hover { border-color: var(--accent); color: var(--accent); }
+.langswitch svg { width: 15px; height: 15px; flex: none; }
+
+main { padding: 22px; min-width: 0; }
+@media (min-width: 768px) { main { padding: 30px 34px; } }
+.page { max-width: 1400px; margin-inline: auto; }
+
+/* ------------------------------------------------------------- headings -- */
+h1 {
+  font-size: 24px; font-weight: 600; letter-spacing: -.02em;
+  margin: 0 0 4px; text-wrap: balance;
+}
+.pagehead { margin-block-end: 22px; }
+.pagehead p { margin: 0; color: var(--muted); font-size: 14px; }
+
+h2 {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .07em;
+  margin: 30px 0 11px;
+}
+
+/* ---------------------------------------------------------- stat tiles --- */
+/* The numbers a manager reads in two seconds. A tinted stripe on the inline
+   start carries the semantic — urgent is not just a bigger number, it is a
+   different kind of number — and it is the same six colours as the pills, so
+   the card and the rows underneath agree. */
+.cards {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+}
+.card {
+  position: relative; overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 15px 17px;
+  box-shadow: var(--shadow);
+}
+.card::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  width: 3px; background: var(--idle);
+}
+.card.is-open::before     { background: var(--open); }
+.card.is-urgent::before   { background: var(--review); }
+.card.is-progress::before { background: var(--progress); }
+.card.is-done::before     { background: var(--done); }
+.card.is-money::before    { background: var(--accent); }
+
+.card .n {
+  font-size: 27px; font-weight: 650; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums; line-height: 1.15;
+}
+.card .k {
+  font-size: 12px; color: var(--muted); margin-block-start: 3px;
+  letter-spacing: .01em;
+}
+
+/* ---------------------------------------------------------------- panel -- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+/* The scroll lives on an inner wrapper so the panel keeps its rounded corners
+   and its shadow while a wide table slides underneath them. */
+.panel > .scrollx { overflow-x: auto; }
+
+.panelhead {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 15px; border-block-end: 1px solid var(--line);
+  background: var(--panel-2);
+  font-size: 11.5px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+}
+details > summary.panelhead { cursor: pointer; list-style: none; }
+details > summary.panelhead::-webkit-details-marker { display: none; }
+details > summary.panelhead::after { content: '+'; font-size: 14px; }
+details[open] > summary.panelhead::after { content: '\2212'; }
+
+/* ---------------------------------------------------------------- table -- */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+/* Sticky header. A hundred rows of arrears is a scroll where the column you
+   are reading stops having a name halfway down. */
+thead th {
+  position: sticky; inset-block-start: 0; z-index: 2;
+  text-align: start; font-weight: 600; font-size: 11.5px; color: var(--muted);
+  background: var(--panel-2);
+  padding: 11px 15px;
+  border-block-end: 1px solid var(--line);
+  text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+}
+
+td {
+  padding: 12px 15px;
+  border-block-end: 1px solid var(--line-soft);
+  vertical-align: top;
+  color: var(--ink-2);
+}
+td:first-child { color: var(--ink); }
+tbody tr:last-child td { border-block-end: 0; }
+tbody tr { transition: background .14s var(--ease); }
+tbody tr:hover { background: var(--panel-2); }
+/* Keyboard parity: tabbing into a row's control should light the row the same
+   way a mouse does, or the two ways of using the page look like two pages. */
+tbody tr:focus-within { background: var(--accent-soft); }
+
+.mono {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+}
+.num { font-variant-numeric: tabular-nums; text-align: end; white-space: nowrap; }
+.muted { color: var(--muted); }
+.sub { display: block; font-size: 12px; color: var(--muted); margin-block-start: 3px; }
+
+/* ----------------------------------------------------------------- pill -- */
+/* A dot and a word, never a colour on its own. The dot is what survives a
+   greyscale print and a red-green colour deficiency; the tint is what makes a
+   column of statuses scannable at a glance. */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+  background: var(--idle-bg); color: var(--idle);
+  border: 1px solid transparent;
+}
+.pill::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; flex: none;
+}
+.pill.open         { background: var(--open-bg);     color: var(--open); }
+.pill.in_progress  { background: var(--progress-bg); color: var(--progress); }
+.pill.resolved     { background: var(--done-bg);     color: var(--done); }
+.pill.needs_review { background: var(--review-bg);   color: var(--review); }
+.pill.cancelled    { background: var(--idle-bg);     color: var(--idle); }
+
+/* Urgency reads as a rank, so it gets weight rather than a second colour
+   system competing with status in the next column. */
+.urg { font-size: 13px; font-weight: 500; color: var(--muted); }
+.urg.high, .urg.emergency { color: var(--review); font-weight: 600; }
+
+/* ------------------------------------------------------------- filters --- */
+/* Segmented control. One row of choices that are mutually exclusive, so they
+   share a track and the chosen one is filled rather than merely brighter —
+   opacity .55 against 1 was the old signal and it read as "loading". */
+.seg {
+  display: inline-flex; flex-wrap: wrap; gap: 3px;
+  padding: 3px; margin: 0 0 16px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.seg a {
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+.seg a:hover { color: var(--ink); background: var(--panel-2); }
+.seg a[aria-current] { background: var(--accent); color: var(--accent-ink); }
+
+.filters {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  align-items: center; justify-content: space-between;
+}
+
+/* ---------------------------------------------------------------- pager -- */
 .pager {
   display: flex; justify-content: space-between; align-items: center;
   gap: 14px; margin: 0 0 12px; font-size: 14px; flex-wrap: wrap;
 }
-.pager a { color: var(--accent); }
 /* Three groups, so the count stays centred whether or not the size picker is
-   showing. `nav` keeps Previous and Next together at the right rather than
-   pushed to opposite ends by the space-between. */
-.pager .per, .pager .nav { display: flex; align-items: center; gap: 8px; }
-.pager .per { font-size: 12px; }
+   showing. */
+.pager .per, .pager .nav { display: flex; align-items: center; gap: 6px; }
+.pager .per { font-size: 12px; color: var(--muted); }
 /* Links, not a <select>: every other control on this dashboard is a URL, and a
    dropdown would need client JS to navigate. */
 .pager .per a {
-  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line);
+  padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
   color: var(--muted); font-variant-numeric: tabular-nums;
 }
 .pager .per a:hover { color: var(--ink); border-color: var(--muted); }
-.pager .per a.on {
-  background: var(--accent); border-color: var(--accent); color: #fff;
-}
+.pager .per a.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
 /* Newer / Older. Same size and shape as .btn-sm so every clickable thing on a
    list page is recognisably the same object, but outlined rather than filled:
-   the filled orange is the row action, and two filled colours competing on one
+   the filled amber is the row action, and two filled colours competing on one
    screen is how a page stops having a primary action at all. */
 .btn-nav {
-  display: inline-block; padding: 5px 13px; border-radius: 7px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: var(--radius-sm);
   border: 1px solid var(--line); background: var(--panel); color: var(--ink);
   font-size: 13px; line-height: 1.5; font-weight: 500; white-space: nowrap;
+  transition: border-color .16s var(--ease), color .16s var(--ease);
 }
-.pager .nav a.btn-nav { color: var(--ink); }
 .btn-nav:hover { border-color: var(--action); color: var(--action); }
-.btn-nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .btn-nav.off { color: var(--muted); opacity: .5; cursor: default; }
 .btn-nav.off:hover { border-color: var(--line); color: var(--muted); }
-/* The size picker gets a real touch target. 1px of padding was a 14px-tall
-   tap target, which is half what a finger needs. */
-.pager .per a { padding: 4px 10px; }
-h1 { font-size: 19px; margin: 0 0 18px; font-weight: 600; letter-spacing: -0.01em; }
-h2 { font-size: 14px; margin: 26px 0 10px; font-weight: 600; color: var(--muted); }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.card {
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: 10px; padding: 14px 16px;
-}
-.card .n { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.card .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-.panel {
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: 10px; overflow-x: auto;
-}
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th {
-  text-align: start; font-weight: 500; font-size: 12px; color: var(--muted);
-  padding: 10px 14px; border-bottom: 1px solid var(--line);
-  text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
-}
-td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-tr:last-child td { border-bottom: 0; }
-tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
-.mono { font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace; font-size: 13px; }
-.muted { color: var(--muted); }
-.pill {
-  display: inline-block; padding: 2px 9px; border-radius: 999px;
-  font-size: 12px; border: 1px solid currentColor; white-space: nowrap;
-}
-.open { color: var(--open); } .in_progress { color: var(--progress); }
-.resolved { color: var(--done); } .needs_review { color: var(--review); }
-.cancelled { color: var(--muted); }
-/* The status cell's editor: the select wears the same pill as the old static
-   badge, the save button sits beside it and stays out of the way. */
-.status-edit { display: flex; gap: 6px; align-items: center; }
-.status-edit select.pill { background: transparent; cursor: pointer; }
-.status-edit button.pill {
-  background: transparent; cursor: pointer; color: var(--muted);
-}
-.status-edit button.pill:hover { color: var(--accent); border-color: var(--accent); }
-.empty { padding: 34px; text-align: center; color: var(--muted); }
+/* The arrow points the way the language reads. One rule, both directions. */
+.btn-nav .arr { display: inline-block; }
+[dir="rtl"] .btn-nav .arr { transform: scaleX(-1); }
+
+/* --------------------------------------------------------------- action -- */
 /* A row action that reads as one. The bare "transcript" link was the only
    clickable thing in the table and did not look clickable, so the way into a
    call was the least visible element on the page. */
 .btn-sm {
-  display: inline-block; padding: 5px 13px; border-radius: 7px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: var(--radius-sm);
   border: 1px solid transparent; background: var(--action); color: var(--action-ink);
   font-size: 13px; line-height: 1.5; font-weight: 500; white-space: nowrap;
+  cursor: pointer;
+  transition: background .16s var(--ease);
 }
 .btn-sm:hover { background: var(--action-hover); }
-/* Not the orange: a focus ring the same colour as the thing it surrounds is
-   invisible, which is the whole job of a focus ring. */
-.btn-sm:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* The transcript search. Sits under the tabs, wraps on a narrow screen, and the
-   input takes the slack so a long Hebrew phrase stays readable while typing. */
-.search { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; flex-wrap: wrap; }
-.search input {
-  flex: 1 1 260px; min-width: 0; padding: 8px 12px; font-size: 14px;
-  border: 1px solid var(--line); border-radius: 8px;
+.btn-sm svg { width: 14px; height: 14px; }
+
+button {
+  padding: 9px 15px; font-size: 14px; border-radius: var(--radius-sm); cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  font-family: inherit;
+  transition: border-color .16s var(--ease), background .16s var(--ease);
+}
+button:hover { border-color: var(--muted); }
+button.primary {
+  background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
+  width: 100%; font-weight: 600;
+}
+button.primary:hover { filter: brightness(1.08); }
+button[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* The status cell's editor: the select wears the pill, the save button sits
+   beside it and stays out of the way until the row is touched. */
+.status-edit { display: flex; gap: 6px; align-items: center; }
+.status-edit select {
+  font: inherit; font-size: 12px; font-weight: 500;
+  padding: 3px 9px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink-2);
+}
+.status-edit button {
+  padding: 3px 10px; font-size: 12px; border-radius: 999px;
+  color: var(--muted); background: transparent;
+}
+.status-edit button:hover { color: var(--accent); border-color: var(--accent); }
+.status-edit input {
+  font: inherit; font-size: 13px; padding: 4px 8px; width: 62px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
   background: var(--panel); color: var(--ink);
 }
-.search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* -------------------------------------------------------------- notices -- */
+.notice {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 15px; margin-block-end: 16px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--panel); font-size: 14px;
+  box-shadow: var(--shadow);
+}
+.notice svg { width: 17px; height: 17px; flex: none; margin-block-start: 2px; }
+.notice.ok   { border-color: var(--done);   color: var(--ink); }
+.notice.ok svg   { color: var(--done); }
+.notice.bad  { border-color: var(--review); color: var(--ink); }
+.notice.bad svg  { color: var(--review); }
+.notice.info svg { color: var(--muted); }
+
+/* Empty is a state with something to say, not a blank box. */
+.empty {
+  padding: 46px 24px; text-align: center; color: var(--muted); font-size: 14px;
+}
+.empty svg { width: 26px; height: 26px; opacity: .5; margin-block-end: 10px; }
+
+/* --------------------------------------------------------------- search -- */
+.search { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; flex-wrap: wrap; }
+.search input {
+  flex: 1 1 280px; min-width: 0; padding: 9px 13px;
+  /* 16px, not 14: anything smaller makes iOS zoom the page on focus. */
+  font-size: 16px; font-family: inherit;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--panel); color: var(--ink);
+}
+.search input::placeholder { color: var(--muted); }
+
+/* --------------------------------------------------------------- thread -- */
 /* A chat, laid out as one. dir="auto" on each bubble so Hebrew renders
    right-to-left and a reference number stays left-to-right inside it. */
 .thread { display: flex; flex-direction: column; gap: 9px; padding: 18px; }
-.msg { max-width: 68%; padding: 9px 13px; border-radius: 13px; border: 1px solid var(--line); }
-.msg.resident { align-self: flex-start; background: var(--panel); }
-.msg.bot { align-self: flex-end; background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
-.msg .who { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
-/* The transcript scrolls inside its own pane instead of growing the page. A
-   three-minute call is ~25 turns, and stacking them down the document meant the
-   page length was set by how talkative the caller was. Capped just under the
-   viewport so the end of the pane is visibly the end of a box, not the end of
-   the page — the cue that tells you to scroll here rather than everywhere. */
+.msg {
+  max-width: 68%; padding: 9px 13px; border-radius: 13px;
+  border: 1px solid var(--line); font-size: 14px;
+}
+.msg.resident { align-self: flex-start; background: var(--panel-2); }
+.msg.bot { align-self: flex-end; background: var(--accent-soft); border-color: var(--accent-line); }
+.msg .who { font-size: 11px; color: var(--muted); margin-block-end: 3px; }
+/* The transcript scrolls inside its own pane instead of growing the page.
+   Capped just under the viewport so the end of the pane is visibly the end of a
+   box, not the end of the page. */
 .thread.scroll { max-height: min(68vh, 620px); overflow-y: auto; }
 
-/* The call page: conversation wide on the left, everything you glance at once
-   on the right. The facts used to sit ABOVE the transcript as large cards, so
-   reaching the first thing anybody said meant scrolling past all of them. */
+/* The call page: conversation wide on the reading side, everything you glance
+   at once beside it. */
 .callgrid { display: grid; grid-template-columns: minmax(0, 1fr) 302px; gap: 18px; align-items: start; }
 .side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 @media (max-width: 900px) {
@@ -167,48 +531,49 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); 
   .thread.scroll { max-height: none; }
 }
 
-/* A quiet header on each panel, so a stack of them reads as sections rather
-   than as one undifferentiated column of boxes. */
-.panelhead {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 9px 14px; border-bottom: 1px solid var(--line);
-  font-size: 12px; color: var(--muted);
-  text-transform: uppercase; letter-spacing: .04em;
-}
-details > summary.panelhead { cursor: pointer; list-style: none; }
-details > summary.panelhead::-webkit-details-marker { display: none; }
-details > summary.panelhead::after { content: '+'; font-size: 14px; }
-details[open] > summary.panelhead::after { content: '\2212'; }
-
 /* Who is which side, said once at the top instead of above every bubble. */
-.legend { display: flex; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; }
+.legend { display: flex; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; font-weight: 500; }
 .legend .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--line); }
 .legend .dot + span, .legend .dot { margin-inline-start: 4px; }
-.legend .dot.resident { background: var(--panel); }
-.legend .dot.bot { background: color-mix(in srgb, var(--accent) 45%, var(--panel)); }
+.legend .dot.resident { background: var(--panel-2); }
+.legend .dot.bot { background: var(--accent); }
 
 /* Key/value rows for reference detail. Deliberately not .card — these are read
    once, and sizing them like headline numbers is what crowded the page. */
-.rows { padding: 4px 14px 10px; }
+.rows { padding: 4px 15px 10px; }
 .row {
   display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-  padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px;
+  padding: 8px 0; border-block-end: 1px solid var(--line-soft); font-size: 13px;
 }
-.rows .row:last-child { border-bottom: 0; }
+.rows .row:last-child { border-block-end: 0; }
+.row > :first-child { color: var(--muted); }
 .row .mono { text-align: end; word-break: break-word; }
+
 .transcript {
   white-space: pre-wrap; padding: 16px; font-size: 14px; line-height: 1.6;
   font-family: ui-monospace, monospace;
 }
-form.auth { max-width: 320px; margin: 90px auto; }
+
+/* ---------------------------------------------------------------- login -- */
+.authwrap { display: grid; place-items: center; min-height: 100dvh; padding: 24px; }
+form.auth {
+  width: 100%; max-width: 340px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px;
+  box-shadow: var(--shadow-md);
+}
+form.auth h1 { font-size: 20px; margin-block-end: 18px; }
+form.auth label {
+  display: block; font-size: 12.5px; font-weight: 500;
+  color: var(--muted); margin-block-end: 5px;
+}
 form.auth input {
-  width: 100%; padding: 10px 12px; margin-bottom: 10px; font-size: 15px;
-  border: 1px solid var(--line); border-radius: 8px;
+  width: 100%; padding: 10px 12px; margin-block-end: 14px; font-size: 16px;
+  font-family: inherit;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
   background: var(--panel); color: var(--ink);
 }
-button {
-  padding: 9px 15px; font-size: 14px; border-radius: 8px; cursor: pointer;
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+.err {
+  color: var(--review); font-size: 13px; margin-block-end: 12px;
+  background: var(--review-bg); padding: 9px 12px; border-radius: var(--radius-sm);
 }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; width: 100%; }
-.err { color: var(--review); font-size: 13px; margin-bottom: 10px; }

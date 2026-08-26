@@ -1,4 +1,6 @@
 import { serverClient } from '@/lib/supabase-server';
+import { getLocale, translator, type T } from '@/lib/i18n';
+import { IconAlert, IconInbox, IconOpenLink } from '@/components/icons';
 
 // Where the importer runs. Chosen 20 Aug over a VPS cron and over porting the
 // three Python importers into an Edge Function: the workflow already exists,
@@ -101,18 +103,21 @@ function failed(r: Run) {
  * and gone without touching this table. That is the line the page was missing:
  * a count of 178 looks identical whether it landed last night or on 11 August.
  */
-function Freshness({ iso, verb }: { iso?: string | null; verb: string }) {
-  if (!iso) return <div className="muted" style={{ fontSize: 12 }}>never</div>;
+function Freshness({ iso, line, t }: {
+  iso?: string | null; line: 'sync.newestAdded' | 'sync.refreshed'; t: T;
+}) {
+  if (!iso) return <span className="sub">{t('sync.never')}</span>;
   const old = Date.now() - Date.parse(iso) > 26 * 3600_000;
   return (
-    <div className="muted" style={{ fontSize: 12, color: old ? 'var(--review)' : undefined }}>
-      {verb} {ago(iso)}
-    </div>
+    <span className="sub" style={{ color: old ? 'var(--review)' : undefined }}>
+      {t(line, { ago: ago(iso) })}
+    </span>
   );
 }
 
 export default async function Sync() {
   const db = serverClient();
+  const t = translator(getLocale());
 
   // A COUNT ON ITS OWN CANNOT GO STALE VISIBLY.
   //
@@ -144,105 +149,99 @@ export default async function Sync() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 4 }}>Import from OXS</h1>
-      <p className="muted" style={{ margin: '0 0 18px', fontSize: 13 }}>
-        Residents, arrears and maintenance requests, twice a day at midnight and
-        3pm Israel time. OXS is read-only: nothing here ever writes back to it.
-      </p>
+      <div className="pagehead">
+        <h1>{t('sync.title')}</h1>
+        <p>{t('sync.blurb')}</p>
+      </div>
 
       <div className="cards" style={{ marginBottom: 18 }}>
-        <div className="card">
-          <div className="k">Last real import</div>
+        <div className={`card ${running ? 'is-progress' : lastReal ? 'is-done' : 'is-urgent'}`}>
           <div className="n" style={{ fontSize: 17 }}>
-            {running ? 'running now' : lastReal ? ago(lastReal.updated_at) : 'never'}
+            {running ? t('sync.runningNow') : lastReal ? ago(lastReal.updated_at) : t('sync.never')}
           </div>
+          <div className="k">{t('sync.lastReal')}</div>
           {!running && lastReal && (
-            <div className="muted" style={{ fontSize: 12 }}>took {took(lastReal.created_at, lastReal.updated_at)}</div>
+            <span className="sub">{t('sync.tookLabel', { d: took(lastReal.created_at, lastReal.updated_at) })}</span>
           )}
         </div>
         <div className="card">
-          <div className="k">Residents from OXS</div>
           <div className="n">{residents.count ?? '—'}</div>
-          <Freshness iso={newRes.data?.created_at} verb="newest added" />
+          <div className="k">{t('sync.residents')}</div>
+          <Freshness iso={newRes.data?.created_at} line="sync.newestAdded" t={t} />
         </div>
         <div className="card">
-          <div className="k">Arrears from OXS</div>
           <div className="n">{charges.count ?? '—'}</div>
-          <Freshness iso={newChg.data?.updated_at} verb="last refreshed" />
+          <div className="k">{t('sync.arrears')}</div>
+          <Freshness iso={newChg.data?.updated_at} line="sync.refreshed" t={t} />
         </div>
         <div className="card">
-          <div className="k">Requests from OXS</div>
           <div className="n">{requests.count ?? '—'}</div>
-          <Freshness iso={newReq.data?.updated_at} verb="last refreshed" />
+          <div className="k">{t('sync.requests')}</div>
+          <Freshness iso={newReq.data?.updated_at} line="sync.refreshed" t={t} />
         </div>
       </div>
 
       {!lastReal && !running && (
-        <div className="panel" style={{ padding: 14, marginBottom: 18 }}>
-          <strong style={{ color: 'var(--review)' }}>
-            No run in this history imported anything.
-          </strong>{' '}
-          <span className="muted">
-            Every run listed below either skipped as the wrong half of a
-            daylight-saving pair, or started and did not finish. The rows above
-            arrived from earlier runs — check the newest-row lines to see how
-            long ago.
-          </span>{' '}
-          {list[0] && (
-            <a href={list[0].html_url} className="mono" style={{ color: 'var(--accent)' }}>
-              open the last log
-            </a>
-          )}
+        <div className="notice bad">
+          <IconAlert />
+          <span>
+            <strong>{t('sync.noneImported')}</strong>{' '}
+            <span className="muted">{t('sync.noneWhy')}</span>{' '}
+            {list[0] && (
+              <a href={list[0].html_url} style={{ color: 'var(--accent)' }}>
+                {t('sync.openLast')}
+              </a>
+            )}
+          </span>
         </div>
       )}
 
       {lastFail && (!lastReal || Date.parse(lastFail.created_at) > Date.parse(lastReal.updated_at)) && (
-        <div className="panel" style={{ padding: 14, marginBottom: 18 }}>
-          <strong style={{ color: 'var(--review)' }}>
-            The last run ended {lastFail.conclusion}.
-          </strong>{' '}
-          <span className="muted">
-            {lastReal
-              ? `Nothing has come in since ${ago(lastReal.updated_at)}.`
-              : 'Nothing has come in from it.'}
-          </span>{' '}
-          <a href={lastFail.html_url} className="mono" style={{ color: 'var(--accent)' }}>see why</a>
+        <div className="notice bad">
+          <IconAlert />
+          <span>
+            <strong>{t('sync.lastEnded', { how: lastFail.conclusion ?? '—' })}</strong>{' '}
+            <span className="muted">
+              {lastReal
+                ? t('sync.nothingSince', { ago: ago(lastReal.updated_at) })
+                : t('sync.nothingFrom')}
+            </span>{' '}
+            <a href={lastFail.html_url} style={{ color: 'var(--accent)' }}>{t('sync.seeWhy')}</a>
+          </span>
         </div>
       )}
 
-      <h2>Run it now</h2>
+      <h2>{t('sync.runNow')}</h2>
       <div className="panel" style={{ padding: 14, marginBottom: 18 }}>
         {token ? (
           // A GET form, so no client JavaScript ships for one button. The route
           // handler dispatches and redirects straight back here.
           <form method="post" action="/sync/run" className="search" style={{ margin: 0 }}>
             <button className="btn-sm" type="submit" disabled={Boolean(running)}>
-              {running ? 'A run is already going' : 'Run import now'}
+              {running ? t('sync.running') : t('sync.runBtn')}
             </button>
             <label className="muted" style={{ fontSize: 13, display: 'flex', gap: 6, alignItems: 'center' }}>
               <input type="checkbox" name="dry_run" value="true" defaultChecked />
-              Dry run — fetch and report, write nothing
+              {t('sync.dryRun')}
             </label>
           </form>
         ) : (
           <div className="muted" style={{ fontSize: 13 }}>
-            <strong style={{ color: 'var(--ink)' }}>Button not wired yet.</strong> Triggering a
-            run needs a GitHub token with permission to start workflows, held by
-            this app rather than by a person. Add a fine-grained token scoped to
-            this repository with <span className="mono">Actions: read and write</span>,
-            as <span className="mono">GITHUB_DISPATCH_TOKEN</span> in the Vercel
-            project. Everything above works without it.
+            <strong style={{ color: 'var(--ink)' }}>{t('sync.notWiredT')}</strong>{' '}
+            {t('sync.notWired')}
           </div>
         )}
       </div>
 
-      <h2>Recent runs</h2>
+      <h2>{t('sync.recent')}</h2>
       <div className="panel">
         {error && <div className="empty">{error}</div>}
         {list.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>When</th><th>Started by</th><th>Result</th><th>Took</th><th></th>
+              <th>{t('col.when')}</th><th>{t('sync.startedBy')}</th>
+              <th>{t('sync.result')}</th><th>{t('sync.took')}</th><th></th>
             </tr></thead>
             <tbody>
               {list.map((r) => {
@@ -250,33 +249,36 @@ export default async function Sync() {
                 return (
                   <tr key={r.id}>
                     <td className="muted mono">{ago(r.created_at)}</td>
-                    <td className="muted">{r.event === 'schedule' ? 'schedule' : 'by hand'}</td>
+                    <td className="muted">{r.event === 'schedule' ? t('sync.bySchedule') : t('sync.byHand')}</td>
                     <td>
                       {r.status !== 'completed'
-                        ? <span className="pill in_progress">running</span>
+                        ? <span className="pill in_progress">{t('sync.stateRunning')}</span>
                         : skipped
                           // Named for what it is. "success" on a run that did
                           // nothing is how a dashboard lies without a bug.
-                          ? <span className="pill cancelled">skipped — wrong hour</span>
+                          ? <span className="pill cancelled">{t('sync.stateSkipped')}</span>
                           : r.conclusion === 'success'
-                            ? <span className="pill resolved">imported</span>
+                            ? <span className="pill resolved">{t('sync.stateDone')}</span>
                             : <span className="pill needs_review">{r.conclusion}</span>}
                     </td>
-                    <td className="mono">{r.status === 'completed' ? took(r.created_at, r.updated_at) : '—'}</td>
-                    <td><a className="btn-sm" href={r.html_url}>Open log</a></td>
+                    <td className="mono num">{r.status === 'completed' ? took(r.created_at, r.updated_at) : '—'}</td>
+                    <td><a className="btn-sm" href={r.html_url}><IconOpenLink />{t('sync.openLog')}</a></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        ) : !error && <div className="empty">No runs recorded yet.</div>}
+          </div>
+        ) : !error && (
+          <div className="empty">
+            <IconInbox />
+            <div>{t('sync.empty')}</div>
+          </div>
+        )}
       </div>
 
-      <p className="muted" style={{ fontSize: 13, marginTop: 14 }}>
-        Four scheduled runs a day, of which two are always skipped: GitHub&rsquo;s
-        cron is UTC and has no daylight saving, so both possible Israel offsets
-        are scheduled and the wrong one exits in seconds. A skipped run is not a
-        failure.
+      <p className="muted" style={{ fontSize: 13, marginBlockStart: 14 }}>
+        {t('sync.footnote')}
       </p>
     </>
   );

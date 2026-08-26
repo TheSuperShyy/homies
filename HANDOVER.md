@@ -835,6 +835,20 @@ handset.**
   Ambiguous, ask the building; its answer settles it. **The bot says "לצוות" and
   never names a department** -- routing to the four Chatwoot teams does not
   exist, so naming one would promise a system we have not built.
+- **Dashboard: redesigned and bilingual (26 Aug).** Hebrew by default with an
+  English switch in the sidebar, `dir` and `lang` following it. Sidebar nav at
+  >=1024px, SVG icon set, status pills with a dot as well as a colour, semantic
+  stripes on the stat tiles, sticky table headers, Noto Sans Hebrew via
+  `next/font`. **Every user-facing string lives in `dashboard/lib/i18n.ts`**
+  (185 entries); a string written into a page shows untranslated in the other
+  language and nothing fails. The middleware now sets `x-pathname` on the
+  request headers because a server layout cannot otherwise know which page it
+  is rendering. `tsc` and `next build` clean; all pages 200 in both languages.
+  **Never seen in a browser** -- no screenshots, so 375px and the dark theme are
+  measured and reasoned about, not looked at. **This closes two of the three
+  CRM gaps the owner listed on 25 Aug** (Hebrew RTL, and the login page now has
+  real labels); **daily metrics and department scoping are still owed**, and the
+  login page still is not enforced.
 - **WhatsApp: the prompt holds no verbatim lines again (26 Aug).** The three
   fixes above were each written as an exact Hebrew sentence, taking the system
   prompt from 0 scripted lines to 4 in an afternoon; the owner asked for the bot

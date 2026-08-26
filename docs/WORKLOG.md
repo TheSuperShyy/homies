@@ -11,6 +11,76 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The dashboard was redesigned, and it speaks two languages now
+
+Asked to make the dashboard look good, with the ui-ux-pro-max skill. Its design
+system landed on **Data-Dense Dashboard** — blue primary, amber accent, Noto
+Sans Hebrew — which matched what the pages already were, so the work was
+elevation rather than a new direction.
+
+**The question that changed the job.** The chrome was English while every value
+in it was Hebrew, and the readers are Hebrew-speaking staff. Asked; the answer
+was a switch, both languages. So this is a redesign and a localisation in one
+pass, which is also the cheaper order: doing the layout in English first and
+flipping it later means doing the RTL work twice.
+
+**`lib/i18n.ts`** holds 185 entries as flat keys with `{name}` interpolation.
+The locale is a **cookie**, not a URL parameter, and that is the one piece of
+state on this dashboard that is deliberately not in the URL: everything else is
+a view somebody should be able to send a colleague, and language belongs to the
+reader. Sending a filtered ticket list should not also change the recipient's
+interface language.
+
+**What actually changed visually.**
+
+- **A sidebar at 1024px and up**, top bar below it. Six views one click from
+  anywhere, each with an icon AND a label; the current one is marked by ground
+  and weight as well as colour.
+- **Eighteen SVG icons**, drawn in `components/icons.tsx` at one set's
+  proportions rather than pulled in as a dependency for eighteen paths.
+- **Status pills carry a dot and a word**, not a colour. Colour alone fails on a
+  greyscale print and for red-green deficiency, and it was the old design's only
+  signal.
+- **Stat tiles carry a semantic stripe** in the same six colours as the pills,
+  so urgent-and-open is the only red thing on the overview and is findable.
+- **Sticky table headers.** A hundred rows of arrears was a scroll where the
+  column you were reading stopped having a name.
+- **Segmented filters** replace the opacity-.55 pills, which read as "loading"
+  rather than "not selected".
+- **Noto Sans Hebrew** via `next/font`, self-hosted. The old stack was
+  `system-ui`, which on Windows renders Hebrew in a fallback face with a
+  different weight and x-height from the Latin beside it — the reason mixed rows
+  looked pasted together.
+- **Empty states have an icon and a sentence**; `prefers-reduced-motion` is
+  honoured; focus rings are defined once and never removed.
+
+**Two contrast failures found by measuring rather than by eye.** slate-500 as
+`--muted` is 4.34:1 on the page ground, under AA, and the same colour was the
+cancelled pill. One step darker clears 4.5 and still reads as a second tier
+against `--ink-2`. Every other pair was checked the same way: 30 pairs across
+both themes, all passing.
+
+**The pathname had to come from middleware.** A server layout in the App Router
+cannot ask which page it is rendering. `x-invoke-path` is a Next internal that
+is absent in 14.2 and `referer` is the page you came FROM, so a nav built on it
+highlights the item you just left. The middleware now sets `x-pathname` on the
+request headers.
+
+**The login page had to split in two.** It is the only client component here,
+and `cookies()` is server-only, so its labels arrive as props from a server
+wrapper. The alternative was shipping the dictionary to the browser or guessing
+from `navigator.language`, which would put the login page in a different
+language from every page behind it.
+
+**Verified**: `tsc --noEmit` clean, `next build` clean, and all seven pages plus
+both detail pages served 200 in both languages against the real database.
+Hebrew renders `lang="he" dir="rtl"`, English `lang="en" dir="ltr"`.
+
+**Not done:** no screenshots were taken, so this is verified as "renders and
+compiles", not "looks right" — the layout at 375px and the dark theme have been
+reasoned about and measured but not seen. Worth a look before it goes to the
+client.
+
 ### The three sentences added today were scripts, and are now intent
 
 *"I want the bot to be open and not follow the script strictly."* Which is rule

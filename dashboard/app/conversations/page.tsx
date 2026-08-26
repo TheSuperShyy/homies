@@ -1,9 +1,13 @@
 import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, sizeFrom } from '@/components/pager';
+import { getLocale, translator, when } from '@/lib/i18n';
+import { IconInbox } from '@/components/icons';
 
 export default async function Conversations({
   searchParams,
 }: { searchParams?: { page?: string; per?: string } }) {
+  const locale = getLocale();
+  const t = translator(locale);
   const page = pageFrom(searchParams);
   const size = sizeFrom(searchParams);
   const [from, to] = pageRange(page, size);
@@ -13,16 +17,17 @@ export default async function Conversations({
 
   return (
     <>
-      <h1>Conversations</h1>
+      <div className="pagehead"><h1>{t('convos.title')}</h1></div>
       <Pager page={page} size={size} total={count ?? 0} basePath="/conversations"
-             unit="conversations" />
+             unit={t('convos.unit')} t={t} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>Who</th><th>Last message</th><th>Messages</th>
-              <th>Lang</th><th>Human</th><th>Last activity</th>
+              <th>{t('convos.who')}</th><th>{t('convos.last')}</th><th>{t('convos.count')}</th>
+              <th>{t('convos.lang')}</th><th>{t('convos.human')}</th><th>{t('convos.activity')}</th>
             </tr></thead>
             <tbody>
               {data.map((c: any) => (
@@ -34,19 +39,27 @@ export default async function Conversations({
                           a blank: it means somebody outside the imported list
                           is writing in. */}
                       {c.full_name ?? <span className="mono">{c.phone}</span>}
-                      {c.building && <div className="muted" dir="auto">{c.building}{c.unit ? ` · ${c.unit}` : ''}</div>}
+                      {c.building && <span className="sub" dir="auto">{c.building}{c.unit ? ` · ${c.unit}` : ''}</span>}
                     </a>
                   </td>
                   <td dir="auto">{c.last_message}</td>
                   <td className="mono">{c.message_count}<span className="muted"> / {c.from_resident} in</span></td>
                   <td className="muted">{c.lang ?? '—'}</td>
-                  <td>{c.touched_by_human ? 'yes' : <span className="muted">bot only</span>}</td>
-                  <td className="muted mono">{c.last_message_at?.slice(0, 16).replace('T', ' ')}</td>
+                  <td>{c.touched_by_human
+                    ? <span className="pill in_progress">{t('convos.yes')}</span>
+                    : <span className="muted">{t('convos.botOnly')}</span>}</td>
+                  <td className="muted mono">{when(c.last_message_at, locale)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        ) : !error && <div className="empty">No conversations yet.</div>}
+          </div>
+        ) : !error && (
+          <div className="empty">
+            <IconInbox />
+            <div>{t('convos.empty')}</div>
+          </div>
+        )}
       </div>
     </>
   );

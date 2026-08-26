@@ -444,6 +444,24 @@ read; guessing at the missing half is what produces a fix aimed at the wrong
 thing. Same shape as the acoustic-echo diagnosis above, and the third time this
 week that reading the evidence changed what the fix was.
 
+**The dashboard is bilingual, and the language is the one piece of state that
+is NOT in the URL.** Cookie `homies_lang`, Hebrew by default because the staff
+are Hebrew speakers; `lib/i18n.ts` is the only place a user-facing string is
+written. Everything else on the dashboard puts its state in the URL so a view
+can be sent to a colleague, and language is the exception precisely because of
+that: sending somebody a filtered list should not change their interface
+language. **Add a string to the dictionary, never to a page** -- a hardcoded
+one appears in the other language untranslated and nothing fails.
+
+**Logical properties only, in every stylesheet rule.** `inline-start`, not
+`left`. One hardcoded side is a corner that silently stays wrong in one of the
+two languages, and it will be found by a Hebrew reader rather than by a test.
+
+**Measure contrast, do not judge it.** Two pairs in the redesign missed AA by
+0.16 and both looked fine: slate-500 muted text is 4.34:1 on the page ground.
+The check is twenty lines of Python over the token list and it runs against both
+themes; an eye cannot do it and a dark theme cannot be inferred from a light one.
+
 **Fixing a defect by writing the sentence is how a prompt becomes a
 player-piano, and it happened again on 26 Aug.** Three real faults were each
 fixed with an exact Hebrew line, taking the WhatsApp system prompt from zero

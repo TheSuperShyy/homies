@@ -1,4 +1,5 @@
 import { serverClient } from '@/lib/supabase-server';
+import { getLocale, translator } from '@/lib/i18n';
 
 /**
  * Split a Vapi transcript into turns.
@@ -34,6 +35,7 @@ function secs(n?: number | null) {
 }
 
 export default async function Call({ params }: { params: { id: string } }) {
+  const t = translator(getLocale());
   const { data: c, error } = await serverClient()
     .from('interactions').select('*').eq('id', params.id).maybeSingle();
 
@@ -47,19 +49,23 @@ export default async function Call({ params }: { params: { id: string } }) {
   const facts: [string, any][] = [
     ['When', c.started_at?.replace('T', ' ').slice(0, 16)],
     ['Direction', c.direction],
-    ['Number', c.caller_phone],
-    ['Length', secs(c.duration_seconds)],
-    ['Turns', spoken.length || null],
-    ['Latency', c.latency_ms ? `${c.latency_ms}ms` : null],
-    ['Outcome', c.disposition],
+    [t('col.number'), c.caller_phone],
+    [t('col.length'), secs(c.duration_seconds)],
+    [t('call.turns'), spoken.length || null],
+    [t('col.latency'), c.latency_ms ? `${c.latency_ms}ms` : null],
+    [t('col.outcome'), c.disposition],
   ];
 
   return (
     <>
-      <h1 style={{ marginBottom: 4 }}>Call</h1>
-      <p style={{ margin: '0 0 16px' }}>
-        <a href="/calls" className="muted" style={{ fontSize: 13 }}>&larr; All calls</a>
-      </p>
+      <div className="pagehead">
+        <h1>{t('call.title')}</h1>
+        <p>
+          <a href="/calls" className="muted">
+            <span className="arr">&larr;</span> {t('call.back')}
+          </a>
+        </p>
+      </div>
 
       {/* Conversation first and widest; everything else beside it. Stacks to one
           column under 900px, and the sidebar goes first there so a phone still
@@ -68,7 +74,7 @@ export default async function Call({ params }: { params: { id: string } }) {
         <div>
           <div className="panel">
             <div className="panelhead">
-              <span>Conversation</span>
+              <span>{t('call.conversation')}</span>
               {/* Said once, because the alternative was printing "Michael" and
                   "Caller" above all 22 bubbles — the same two words repeated
                   down the page, which is noise, not information. */}
@@ -90,7 +96,7 @@ export default async function Call({ params }: { params: { id: string } }) {
               </div>
             ) : (
               <div className="transcript" dir="auto">
-                {c.transcript ?? <span className="muted">No transcript on this call.</span>}
+                {c.transcript ?? <span className="muted">{t('call.noTranscript')}</span>}
               </div>
             )}
           </div>
@@ -99,14 +105,14 @@ export default async function Call({ params }: { params: { id: string } }) {
         <aside className="side">
           {c.summary && (
             <div className="panel">
-              <div className="panelhead"><span>Summary</span></div>
+              <div className="panelhead"><span>{t('call.summary')}</span></div>
               <div style={{ padding: '12px 14px', fontSize: 14 }} dir="auto">{c.summary}</div>
             </div>
           )}
 
           {c.audio_url && (
             <div className="panel">
-              <div className="panelhead"><span>Recording</span></div>
+              <div className="panelhead"><span>{t('call.recording')}</span></div>
               <div style={{ padding: 12 }}>
                 <audio controls src={c.audio_url} style={{ width: '100%' }} />
                 {/* Recording was switched off on 25 Aug — transcript only,
@@ -122,7 +128,7 @@ export default async function Call({ params }: { params: { id: string } }) {
           )}
 
           <div className="panel">
-            <div className="panelhead"><span>Details</span></div>
+            <div className="panelhead"><span>{t('call.details')}</span></div>
             <div className="rows">
               {facts.filter(([, v]) => v).map(([k, v]) => (
                 <div className="row" key={k}>
@@ -140,7 +146,7 @@ export default async function Call({ params }: { params: { id: string } }) {
           {Array.isArray(c.tool_calls) && c.tool_calls.length > 0 && (
             <details className="panel">
               <summary className="panelhead">
-                <span>Tools called</span><span className="mono">{c.tool_calls.length}</span>
+                <span>{t('call.tools')}</span><span className="mono">{c.tool_calls.length}</span>
               </summary>
               <div className="transcript" style={{ fontSize: 12 }}>
                 {JSON.stringify(c.tool_calls, null, 2)}

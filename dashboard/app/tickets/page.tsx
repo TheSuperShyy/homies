@@ -1,6 +1,8 @@
 import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
+import { getLocale, label, translator, when, type T } from '@/lib/i18n';
+import { IconInbox } from '@/components/icons';
 
 // The four values the check constraint on requests.status accepts. The list is
 // duplicated from the schema on purpose: the server action validates against
@@ -35,15 +37,16 @@ async function updateStatus(formData: FormData) {
  * The importer runs every fifteen minutes and GitHub's scheduler is
  * best-effort, so anything seen inside the last 45 minutes counts as current.
  */
-function InOxs({ seen }: { seen?: string | null }) {
+function InOxs({ seen, t }: { seen?: string | null; t: T }) {
   if (!seen) return null;
   const mins = Math.round((Date.now() - Date.parse(seen)) / 60000);
-  if (mins < 45) return <div style={{ fontSize: 11, opacity: 0.65 }}>in OXS now</div>;
+  if (mins < 45) return <span className="sub">{t('tickets.inOxs')}</span>;
   const gone = mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`;
   return (
-    <div style={{ fontSize: 11, color: 'var(--review)' }} title={`Last seen in OXS ${seen}`}>
-      gone from OXS {gone}
-    </div>
+    <span className="sub" style={{ color: 'var(--review)' }}
+          title={t('tickets.lastSeen', { when: seen })}>
+      {t('tickets.goneOxs', { ago: gone })}
+    </span>
   );
 }
 
@@ -51,6 +54,8 @@ export default async function Tickets({
   searchParams,
 }: { searchParams: { status?: string; page?: string; per?: string } }) {
   const status = searchParams.status;
+  const locale = getLocale();
+  const t = translator(locale);
   const page = pageFrom(searchParams);
   const size = sizeFrom(searchParams);
   const [from, to] = pageRange(page, size);
@@ -68,34 +73,39 @@ export default async function Tickets({
   // The chosen size survives a change of tab. Picking 50 and then filtering to
   // "open" should not quietly hand back ten rows.
   const per = perParam(size);
-  const tabHref = (t: string) => {
+  // `tab`, not `t`: the translator is called `t` and a parameter shadowing it
+  // here compiles and then renders every label as a status code.
+  const tabHref = (tab: string) => {
     const q = new URLSearchParams();
-    if (t) q.set('status', t);
+    if (tab) q.set('status', tab);
     if (per) q.set('per', per);
-    const s = q.toString();
-    return s ? `/tickets?${s}` : '/tickets';
+    const qs = q.toString();
+    return qs ? `/tickets?${qs}` : '/tickets';
   };
 
   return (
     <>
-      <h1>Tickets</h1>
-      <nav style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-        {tabs.map((t) => (
-          <a key={t || 'all'} href={tabHref(t)}
-             className="pill" style={{ opacity: (status ?? '') === t ? 1 : 0.55 }}>
-            {t || 'all'}
+      <div className="pagehead"><h1>{t('tickets.title')}</h1></div>
+      <nav className="seg" aria-label={t('col.status')}>
+        {tabs.map((s) => (
+          <a key={s || 'all'} href={tabHref(s)}
+             aria-current={(status ?? '') === s ? 'true' : undefined}>
+            {s ? label(t, 'status', s) : t('status.all')}
           </a>
         ))}
       </nav>
       <Pager page={page} size={size} total={count ?? 0} basePath="/tickets"
-             params={{ status }} unit="tickets" />
+             params={{ status }} unit={t('tickets.unit')} t={t} />
       <div className="panel">
         {error && <div className="empty">{error.message}</div>}
         {data?.length ? (
+          <div className="scrollx">
           <table>
             <thead><tr>
-              <th>Reference</th><th>What</th><th>Where</th><th>Caller</th><th>Type</th>
-              <th>Urgency</th><th>Status</th><th>Via</th><th>Opened</th>
+              <th>{t('col.reference')}</th><th>{t('col.what')}</th><th>{t('col.where')}</th>
+              <th>{t('col.caller')}</th><th>{t('col.type')}</th>
+              <th>{t('col.urgency')}</th><th>{t('col.status')}</th>
+              <th>{t('col.via')}</th><th>{t('col.opened')}</th>
             </tr></thead>
             <tbody>
               {data.map((r: any) => (
@@ -111,12 +121,14 @@ export default async function Tickets({
                         since 24 Aug. Their words, untranslated — this is what a
                         resident is told when they ring and ask. */}
                     {r.oxs_notes?.length > 0 && (
-                      <div className="muted" style={{ fontSize: 12, marginTop: 3 }} dir="auto">
+                      <span className="sub" dir="auto">
                         ↳ {r.oxs_notes[0]}
                         {r.oxs_notes.length > 1 && (
-                          <span style={{ opacity: 0.7 }}> · +{r.oxs_notes.length - 1} earlier</span>
+                          <span style={{ opacity: 0.7 }}>
+                            {' · '}{t('tickets.earlier', { n: r.oxs_notes.length - 1 })}
+                          </span>
                         )}
-                      </div>
+                      </span>
                     )}
                   </td>
                   <td dir="auto">{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
@@ -126,27 +138,36 @@ export default async function Tickets({
                       failed it is often the only way back to the person. */}
                   <td className="mono">{r.reported_by_phone ?? <span className="muted">—</span>}</td>
                   <td className="muted">{r.type}</td>
-                  <td>{r.urgency}</td>
+                  <td><span className={`urg ${r.urgency}`}>{label(t, 'urgency', r.urgency)}</span></td>
                   <td>
                     <form action={updateStatus} className="status-edit">
                       <input type="hidden" name="reference" value={r.reference} />
-                      <select name="status" defaultValue={r.status}
-                              className={`pill ${r.status}`}>
-                        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      <select name="status" defaultValue={r.status} aria-label={t('col.status')}>
+                        {STATUSES.map((s) => (
+                          <option key={s} value={s}>{label(t, 'status', s)}</option>
+                        ))}
                       </select>
-                      <button type="submit" className="pill">save</button>
+                      <button type="submit">{t('tickets.save')}</button>
                     </form>
                   </td>
                   <td className="muted">{r.opened_via}</td>
                   <td className="muted mono">
-                    {r.created_at.slice(0, 16).replace('T', ' ')}
-                    {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} />}
+                    {when(r.created_at, locale)}
+                    {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} t={t} />}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        ) : !error && <div className="empty">No tickets{status ? ` with status ${status}` : ''}.</div>}
+          </div>
+        ) : !error && (
+          <div className="empty">
+            <IconInbox />
+            <div>{status
+              ? t('tickets.emptyStatus', { status: label(t, 'status', status) })
+              : t('tickets.empty')}</div>
+          </div>
+        )}
       </div>
     </>
   );
