@@ -23,7 +23,12 @@ stopped being true the moment the middleware redirect returned.
 The layout now renders `/login` bare (one path test — the middleware
 guarantees it is the only page a logged-out visitor reaches), and the page
 became a real login screen: brand mark and name above the card, the form, and
-a language switch below it. The switch is duplicated as the page's own server
+a language switch below it. **The brand then became the real thing**: the
+owner dropped `Homies-Logo.png` at the repo root mid-work — roof, ladder,
+Hebrew subtitle — and it replaced the generic icon: copied to
+`dashboard/public/` (the repo root is outside Vercel's rootDirectory and never
+deploys), on a white plate because the mark was drawn on white and the page is
+dark. The sidebar keeps the small icon; the wordmark is illegible at 30px. The switch is duplicated as the page's own server
 action (a layout's inline action cannot be imported), and always returns to
 /login. The brand and switch travel into the client form as RSC children so
 login-form.tsx stays the dashboard's only client component. `tsc` and
