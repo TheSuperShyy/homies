@@ -11,6 +11,67 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### The prompt fix was live all afternoon and the model never got to use it
+
+Retested from a handset at 16:26 and again at 16:36: tap `מצב קריאה קיימת`,
+answer `אין לי`, get `אני מבין. על מה אפשר לעזור?` "its still the same".
+
+**Checked the deploy before touching the prompt again.** The live system message
+is 37,856 chars and byte-identical to the `## System prompt` section of
+`docs/features/11-whatsapp-bot/prompt.md`. Nothing about this afternoon's work
+failed to ship. So the fault was not in what the model was told.
+
+**Execution 9939 says what it was.** The agent's entire input was
+`[ענה על ההודעה הזאת בעברית...] [אתם כבר באמצע שיחה...]` + `אין לי`, and the
+memory node's `chatHistory` for that phone held three pairs, all of them
+`אין לי` → `אני מבין. על מה אפשר לעזור?`. No greeting in it, no status question
+in it. The turn before was execution 9932, a canned reply with `_work: false` —
+the Sort node answered the button tap itself and the agent node did not run.
+**A canned line never reaches the agent, so it is never written to the agent's
+memory.** From the model's seat, somebody wrote "I don't have" into an empty
+room. Every branch of the new `אין לי` section is conditioned on being in the
+status flow, and the model had no way to know it was.
+
+**Third time, same hole.** 12 Aug it introduced itself twice; patched with a
+`greeted` flag. 25 Aug it re-asked somebody who had tapped "open a ticket";
+patched with a `tapped_open` flag. 26 Aug this. `TAP_KIND` in the live Sort has
+stored `status` since the tap line was added and nothing has ever read it —
+`tappedOpen` tests `kind === 'open'` and there is no second clause. Four lines
+leave that node and two of them tell the model nothing:
+
+| The workflow says | The model knows |
+|---|---|
+| `היי, כאן מיכאל מהומיז. במה אפשר לעזור?` | `greeted` |
+| `בטח. אפשר לספר לי מה קרה?` | `tapped_open` |
+| `בטח, אשמח לבדוק בשבילך. יש לך את מספר הקריאה?` | nothing |
+| `אני קורא כאן רק טקסט. אפשר לכתוב לי מה קרה?` | nothing |
+
+**So the fix carries the sentence, not a fourth flag.** `said()` wraps every
+canned line at the one point they leave the Sort node, storing it against the
+phone for half an hour; the next model turn gets it as `last_bot` and the agent
+template states it as a fact — this message is an answer, and here is what was
+written to them by the system rather than by you. What that answer *means* stays
+in the prompt, which already has a section on each of these lines. A line added
+next month is covered by having been said, with nobody remembering a flag.
+
+**A comment in `TAP_LINE` had argued this could not happen** — that 'open' and
+'status' get away with being canned "because their answers say what they are: a
+fault description or a reference number". True of every answer that was
+imagined, false of the one that arrived. Corrected in place rather than deleted.
+
+**The memory needed an epoch, not a fix.** That handset's window held four
+identical wrong pairs by the end of testing, which is a three-shot demonstration
+of the exact fault arguing with the prompt that forbids it. Simple Memory lives
+in the n8n process and there is no way to delete one conversation: a save does
+not clear it and neither does a reactivate. `sessionKey` is now
+`={{ $json.to }}-2`. Bump it again the next time a bad turn has to be forgotten.
+
+**Written, not shipped.** `scripts/n8n_whatsapp.py` carries the change; the live
+Chatwoot workflow does not. The patcher is written and its anchors verified
+against the live Sort, but every command that would run it was refused by the
+permission classifier, as was the script's own dry run. **Nothing has been
+pushed to n8n and nothing has been tested.** Waiting on the owner.
+
 ### The dashboard was redesigned, and it speaks two languages now
 
 Asked to make the dashboard look good, with the ui-ux-pro-max skill. Its design

@@ -828,6 +828,27 @@ handset.**
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
   not Hebrew.
+- **WhatsApp: the two `אין לי` prompt fixes below never ran, and there is a
+  patch waiting to be pushed (26 Aug).** Retested at 16:26 and 16:36 and the
+  reply was unchanged. The prompt was not the problem: the live system message
+  is 37,856 chars and byte-identical to `prompt.md`. **Execution 9939** shows
+  the agent's whole input was `אין לי`, and the memory for that phone held
+  nothing but `אין לי` → `אני מבין. על מה אפשר לעזור?`, three times. The turn
+  before it, execution 9932, was a canned reply with `_work: false`: the Sort
+  node answered the button tap and the agent never ran. **A canned line never
+  reaches the agent and is never written to its memory**, so no rule about the
+  status flow could apply — the model did not know it was in one. Third time
+  for this hole (`greeted` 12 Aug, `tapped_open` 25 Aug), and `TAP_KIND` has
+  stored `status` all along with nothing reading it. Fixed by carrying the
+  sentence instead of a fourth flag: `said()` records every canned line as it
+  leaves Sort, the next turn gets it as `last_bot`, and the agent template
+  states it as a fact and leaves the meaning to the prompt. Memory `sessionKey`
+  bumped to `={{ $json.to }}-2` because Simple Memory cannot be cleared per
+  conversation and that handset's window is four demonstrations of the fault.
+  **`scripts/n8n_whatsapp.py` has the change; the live workflow does not** —
+  every command that would push it, and the script's own dry run, were refused
+  by the permission classifier. The patcher and a pre-change backup of the live
+  workflow are in this session's scratchpad. **Nothing pushed, nothing tested.**
 - **WhatsApp: "אין לי" now splits in two (26 Aug).** "לא זוכר / לא שמרתי" keeps
   the lookup and asks building and apartment. "אין לי קריאה / לא פתחתי" has
   nothing to look up and gets the door opened instead:

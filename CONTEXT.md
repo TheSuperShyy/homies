@@ -444,6 +444,32 @@ read; guessing at the missing half is what produces a fix aimed at the wrong
 thing. Same shape as the acoustic-echo diagnosis above, and the third time this
 week that reading the evidence changed what the fix was.
 
+**And when a prompt fix does not take, check that the model was in the
+conversation at all before rewriting it again.** The same `אין לי` came back
+unchanged after the prompt was fixed and deployed. The prompt was fine — live
+and byte-identical to the repo. **The Sort node answers four things itself: the
+menu, both tap lines and the attachment line. None of them run the agent, so
+none of them are in the agent's memory**, and the model met `אין לי` as the
+first thing anyone had ever said to it. No prompt rule can survive that, because
+every rule about a flow is conditioned on being in the flow.
+
+**A flag fixes the case it was written for; the sentence fixes the class.** This
+hole has been patched three times, twice with a boolean — `greeted` on 12 Aug,
+`tapped_open` on 25 Aug — and each patch left the next canned line uncovered,
+including one whose kind the code was already storing and never read. What the
+model needs is not a fact about the flow, it is **the turn the resident is
+answering**, so `said()` now carries the line itself out of the one place all
+four leave the node. **The rule for anything added there later: a line the
+workflow speaks is a line the model must be handed**, and the way to make that
+survive a forgetful afternoon is a single choke point rather than a convention.
+
+**State it as a fact and stop.** The per-message clause says only that this
+message is an answer and quotes what was written; it does not say what to do
+about it. What each of those lines means is already a section of the prompt, and
+an instruction beside the turn would be a second prompt competing with the
+first — the player-piano failure one paragraph down, arriving through the side
+door.
+
 **The dashboard is bilingual, and the language is the one piece of state that
 is NOT in the URL.** Cookie `homies_lang`, Hebrew by default because the staff
 are Hebrew speakers; `lib/i18n.ts` is the only place a user-facing string is
