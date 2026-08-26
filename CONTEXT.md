@@ -663,7 +663,11 @@ to be open and not follow the script strictly."* **Count the verbatim lines
 after a prompt session** -- it is one grep, and it is the only cheap signal that
 this drift has happened. Keep the distinctions, which are substance, and delete
 the wording. The single legitimate literal is a menu tap, because the workflow
-answers it with no model call and there is nothing there to phrase.
+answers it with no model call and there is nothing there to phrase. As of late
+26 Aug all three taps are answered that way: "לדבר עם נציג" was the model's,
+and after the third prompt round failed on the same turn in one evening, the
+turn moved into the workflow instead of getting a fourth rule — a routing turn
+the model keeps fumbling is evidence the turn was never the model's to phrase.
 
 **A worked example that matches the input verbatim beats every instruction
 around it.** The tap "לדבר עם נציג" was answered with the greeting glued to

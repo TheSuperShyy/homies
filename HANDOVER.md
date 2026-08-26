@@ -923,16 +923,25 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
-  - **The "לדבר עם נציג" flow gathers context now (26 Aug evening, probed
-    2/2).** A bare request for a human gets: confirm + handing to the team +
-    "on what subject, so whoever returns arrives with context" — then the
-    answer gets a one-line no-question closer and NOTHING else (no ticket
-    offer, no re-ask; the exception is written inside the complaint and
-    open-ticket rules, not only in the transfer section). The fixed line
-    `אני מעביר את זה לצוות, נחזור בהקדם.` survives only for a transfer whose
-    topic is already known. The team reads the context in the Chatwoot thread —
+  - **The "לדבר עם נציג" TAP is canned since late 26 Aug — the model no
+    longer sees it.** Three prompt rounds could not hold gemini-2.5-flash on
+    this turn (a re-greeting with the menu glued on, then the bare fixed line
+    with no question — execs 10593, 10655), so the tap joined the other two in
+    the live `Sort`'s `TAPPED` with the owner's wording: `קיבלתי, אני מעביר
+    אותך לצוות. כדי שמי שחוזר יגיע כבר עם ההקשר, אפשר לכתוב בכמה מילים על מה
+    הפנייה?`. A `Human tap?` → `Transfer the tap` branch off the canned path
+    fires the real transfer (same debt-tools webhook as the promise backstop,
+    reason caller_request) so the line never promises what didn't happen.
+    The resident's answer reaches the model flagged `tapped_human` (one-line
+    no-question closer, context for the team, nothing else); `Dead end reply?`
+    skips replies naming הצוות so that closer doesn't get the menu. Verified
+    by replaying the real tap webhook: exec 10672, plain text, transfer
+    `{"ok":true}`. A TYPED bare "רוצה נציג" still goes to the model and the
+    transfer-section rule (confirm + handover + on-what-subject) still governs
+    it. The team reads the context in the Chatwoot thread —
     `transfer_to_human` does not assign the conversation, so the bot stays on
-    until a human replies. Known open rate-slip: the model writes `אליך` here.
+    until a human replies. Known open rate-slip: the model writes `אליך` in
+    the closer.
   - **Both tap lines are warm now.** The open button says `בטח, אשמח לעזור.
     אפשר לספר לי מה קרה?` since the evening of 26 Aug (same three-copy change
     as the status button: `TAP_LINE`, live `TAPPED`, prompt). Probed: the turn

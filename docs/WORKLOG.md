@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-08-26 (evening)
 
+### The נציג tap is canned now, because the model fumbled it twice in one evening
+
+- Second test of the "לדבר עם נציג" tap (22:51, exec 10655): no buttons this
+  time — that fix held — but the model answered with the bare fixed line,
+  `אני מעביר את זה לצוות, נחזור בהקדם.`, no question, dead end. The prompt's
+  bare-request rule (ask what it's about), its own new worked example, and the
+  mid-thread note all said otherwise; gemini-2.5-flash picked the fixed line
+  anyway. Third prompt round on the same turn — the owner: *"i told you
+  multiple times i want it to be human and open ended always."*
+- So the turn left the model. A tap is routing, and CONTEXT already held the
+  rule: the one legitimate verbatim line is a menu tap, because the workflow
+  answers it with no model call. "לדבר עם נציג" now joins the other two taps
+  in Sort's TAPPED, with the owner's wording: `קיבלתי, אני מעביר אותך לצוות.
+  כדי שמי שחוזר יגיע כבר עם ההקשר, אפשר לכתוב בכמה מילים על מה הפנייה?`
+- The transfer stays real: new `Human tap?` → `Transfer the tap` branch off
+  the canned path fires the same debt-tools webhook the promise backstop uses
+  (reason caller_request), so the canned answer never promises a transfer that
+  didn't happen.
+- The resident's ANSWER still goes to the model, flagged `tapped_human` with a
+  composed note (context for the team, one sentence, no question mark, no
+  ticket) — same mechanism as `tapped_open`. `Dead end reply?` now also skips
+  replies naming הצוות, so the closer doesn't get the menu appended.
+- prompt.md: the transfer section now says the tap never reaches the model;
+  the first-message note trimmed to match. Pushed live (43,930 chars).
+- Verified end-to-end by replaying the real tap webhook (exec 10672): canned
+  line sent as plain text, no buttons, transfer fired `{"ok":true}`, no menu
+  appended. Follow-up turn probed 6/6: one sentence, no question mark. Two
+  known blemishes logged, not chased: a rare stray name prefix (1/6, harmless
+  since buttons now need `greeted !== true`), and the standing אליך/אלייך
+  written-gender slip in the closer.
+
 ### The menu buttons rode a transfer reply, because the name was the trigger
 
 - Tap "לדבר עם נציג" from a fresh handset: the reply came back as
