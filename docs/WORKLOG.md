@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-26
 
+### "אין לי" splits in two, and only one half is a lookup
+
+The owner's own words for what a representative would say: *"would you like to
+elaborate the concerns you have so that we can create a ticket for you and pass
+it on the department"*. Which is right, and it is a different case from the one
+fixed an hour earlier.
+
+**Two meanings behind the same two words.** "לא זוכר", "לא שמרתי" means the
+ticket exists and the number is mislaid: building and apartment find it.
+"אין לי קריאה", "לא פתחתי" means there is nothing to look for, and asking
+that resident for a building sends them hunting for something both parties know
+does not exist. That one gets the door opened instead:
+`אה, אין בעיה. אפשר לספר לי מה קרה? אני אפתח על זה קריאה ואעביר לצות.`
+Ambiguous between the two, the building question is cheaper and its answer
+settles it: found, give the status; nothing found, offer to open.
+
+**Which reverses the reservation stated in the previous turn, and the reason it
+is now correct is written into the prompt rather than left as a reversal.** The
+25 Aug rule bans offering a ticket to somebody who has described nothing,
+because the ticket then opens empty. This offer arrives **with** the question,
+not instead of it, and the ticket is still opened only after they have told you
+something. Naming what happens to their answer is also what makes it sound like
+a person rather than a form: they hear what they have to give and what they get
+back.
+
+**One word of the owner's wording was not used.** "The department" promises
+automatic routing to a department, which does not exist here: the four Chatwoot
+teams are empty and nothing routes to them. The prompt says "לצות", which is
+true, and is already the wording everywhere else in the file. Recorded here so
+the next person does not read it as a translation slip and helpfully "fix" it.
+
+Live prompt 36,750 -> 37,817 chars. Not tested through the bot.
+
 ### "אין לי" was answered by starting the conversation again
 
 Reported as sounding robotic: `אני מבין. על מה אפשר לעזור?` Pulled the actual turn

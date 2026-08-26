@@ -444,6 +444,19 @@ read; guessing at the missing half is what produces a fix aimed at the wrong
 thing. Same shape as the acoustic-echo diagnosis above, and the third time this
 week that reading the evidence changed what the fix was.
 
+**Do not promise routing that does not exist.** A resident is told their ticket
+goes "לצות", never to a named department. The four Chatwoot teams exist and are
+empty, and nothing routes to them automatically, so a sentence naming a
+department describes a system we have not built. Revisit when routing is real,
+not before.
+
+**An offer that arrives WITH the question is not the offer the 25 Aug rule
+bans.** That rule stops a ticket being offered to somebody who has described
+nothing, because the ticket then opens empty. Asking what happened and saying in
+the same breath what will be done with the answer is the opposite: the ticket
+still opens only after they have told you something, and naming the outcome is
+what makes the sentence sound like a person rather than a form.
+
 **A general rule three hundred lines away does not reach the turn it governs.**
 `במה אפשר לעזור?` had been restricted to the first message since 12 Aug, and the
 model still produced it on message four. Naming the exact turn is what fixed it.

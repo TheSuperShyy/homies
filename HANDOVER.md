@@ -827,7 +827,15 @@ handset.**
   and apartment but never said that `אין לי` IS that case. Now it does:
   `אין בעיה, נמצא את זה גם ככה. באיזה בניין ואיזו דירה?` An open question after
   an answer is named as losing the thread, and `על מה אפשר לעזור?` is named as
-  not Hebrew. Live prompt 36,750 chars. **Not tested through the bot.**
+  not Hebrew.
+- **WhatsApp: "אין לי" now splits in two (26 Aug).** "לא זוכר / לא שמרתי" keeps
+  the lookup and asks building and apartment. "אין לי קריאה / לא פתחתי" has
+  nothing to look up and gets the door opened instead:
+  `אה, אין בעיה. אפשר לספר לי מה קרה? אני אפתח על זה קריאה ואעביר לצוות.`
+  Ambiguous, ask the building; its answer settles it. **The bot says "לצוות" and
+  never names a department** -- routing to the four Chatwoot teams does not
+  exist, so naming one would promise a system we have not built. Live prompt
+  37,817 chars. **Not tested through the bot.**
 - **Voice: the Hebrew intake prompt was tested and had three Hebrew errors the
   English one did not (26 Aug).** `scripts/prompt_probe.py` puts fixed resident
   turns to the live assistant and prints what it writes; `--ref <commit>` runs
