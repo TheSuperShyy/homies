@@ -805,8 +805,14 @@ handset.**
   --apply` still pushes it. **The English twin no longer derives from it** --
   `vapi_en.py` reads `docs/assistant/en/debt.en.md`, frozen from the last
   substitution build. Change one and you must change the other by hand.
-  **Intake (he) is still English prose**, 44,719 chars, and is the remaining
-  half of this job.
+  **Intake (he) followed on 26 Aug** -- 33,948 chars, 70% Hebrew, source
+  `docs/assistant/demo-inbound.md`, pushed with `vapi_sync.py inbound --apply`,
+  and its English twin frozen at `docs/assistant/en/intake.en.md` the same way.
+  Both Hebrew agents are now instructed in Hebrew and **neither has been heard
+  on a call since**. What the change can and cannot do: the fixed lines the
+  agents speak were always Hebrew and are carried through verbatim, so nothing
+  about those changed; what should read less translated is every sentence the
+  model composes between them.
 - **Voice: the debt call's closing question changed (25 Aug).** Beat 3 was
   "anything else?", which the model rendered as `יש עוד משהו שתרצה ממני?`. It
   now asks whether anything is unclear or they want to ask something --

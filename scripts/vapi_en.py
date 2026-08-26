@@ -1253,9 +1253,19 @@ def main():
             sp["transcriptionEndpointingPlan"]["onNumberSeconds"], st["backoffSeconds"]))
         print("prompt:       %d chars, no Hebrew remaining" % len(prompt))
         print("firstMessage:", body["firstMessage"])
-        print("\nsubstitutions applied: %d passages%s" % (
-            len(twin["lines"]),
-            " + %d section blocks" % len(twin["block"]) if twin["block"] else ""))
+        # WHAT THIS LINE USED TO SAY WAS FALSE ONCE THE FROZEN FILES ARRIVED.
+        # It printed the SIZE OF THE TABLE, not what was applied — so after the
+        # Hebrew prompts were rewritten in Hebrew and englished() started
+        # short-circuiting to the frozen file, it went on reporting "40 passages
+        # + 2 section blocks" for a build that substituted nothing at all. A
+        # report that describes work the run did not do is worse than no report.
+        if FROZEN.get(twin["name"]) and frozen_prompt(twin):
+            print("\nsource of English: %s (frozen — no substitution ran)"
+                  % FROZEN[twin["name"]])
+        else:
+            print("\nsubstitutions applied: %d passages%s" % (
+                len(twin["lines"]),
+                " + %d section blocks" % len(twin["block"]) if twin["block"] else ""))
         print("\nNothing was created. Re-run with --create.")
         return
 

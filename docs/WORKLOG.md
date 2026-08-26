@@ -9,6 +9,58 @@ conversation that produced it.
 
 ---
 
+## 2026-08-26
+
+### The inbound agent is now instructed in Hebrew too
+
+Asked whether the inbound prompt was already Hebrew, with the reading that an
+English prompt is part of why the agent sounds robotic in Hebrew. It was not:
+44,719 characters at **4% Hebrew**, an English document quoting the twenty-odd
+Hebrew lines it actually speaks. That completes the owner's instruction of
+25 Aug — every Hebrew variant gets a Hebrew prompt — and leaves the two English
+twins on English.
+
+**Is the reading right?** Partly, and it is worth being exact about which part.
+The lines the agent *speaks* verbatim were already Hebrew in both versions, so
+those cannot have changed. What changes is everything the model composes for
+itself: register, connective words, how a question is put. An instruction
+written in English is reasoned about in English and then rendered, and the
+rendering is where translated-sounding Hebrew comes from. So this should help
+the sentences between the fixed lines, and it cannot help the fixed lines,
+because they were never the problem.
+
+**Rewritten, not translated**, per the standing rule, and every fixed spoken
+line carried through **verbatim** — those are already the target output.
+
+**Verified before pushing**, the same way the debt prompt was: 6 of 6 tool
+names, 5 of 5 reason codes, 15 of 15 status and type codes, 11 of 11 facts and
+numbers (the office phone, both reference formats, `101`/`102`, the two spoken
+digit strings), and 31 of 31 fixed Hebrew lines present character for
+character. All 29 headings kept. The only Latin left is machinery — tool names,
+codes, `type`, `reason`, `urgency` — which is correct.
+
+**44,719 characters to 33,948, a quarter shorter.** The prompt is re-sent every
+turn, so this is money as well as register; as with the debt agent, Hebrew
+tokenises worse per character, so the real figure lands on the next call's cost
+breakdown, not on the character count.
+
+**A false line in `vapi_en.py`'s output, fixed in passing.** Its dry run
+printed *"substitutions applied: 40 passages + 2 section blocks"* — the size of
+the substitution table, not what the run did. Since the frozen English files
+arrived on 25 Aug, `englished()` short-circuits and substitutes nothing, so
+that line had been reporting work that did not happen. It now names the frozen
+file instead.
+
+**Live and verified:** intake (he) 33,948 chars, 70% Hebrew, 6 tools, first
+message unchanged; intake (en) untouched at 43,103 and 0% Hebrew; debt (he)
+unchanged at 52,586.
+
+**Not verified by ear.** No call has been placed on the new prompt. If the
+Hebrew instruction changes how it sounds, that is the thing to listen for, and
+it is the same thing still outstanding for the debt agent.
+
+---
+
 ## 2026-08-24
 
 ### The Hebrew debt agent is now instructed in Hebrew
@@ -59,8 +111,8 @@ rediscovered.
 **Live and verified:** debt (he) 52,586 chars, 68% Hebrew, 7 tools, first
 message correct; debt (en) unchanged at 63,217 and 0% Hebrew.
 
-**Not done: the intake agent**, still 44,719 characters at 4% Hebrew. Same job,
-next.
+**Not done at the time: the intake agent**, still 44,719 characters at 4%
+Hebrew. Done the next day — see 2026-08-26.
 
 
 ### The closing beat asks what is unclear, not what else we can do for them

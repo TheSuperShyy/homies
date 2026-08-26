@@ -360,8 +360,13 @@ they are two copies and both get edited, which `check_greeting()` already
 enforces for the opener and nothing enforces for the rest.
 
 **The Hebrew assistants are instructed in Hebrew; the English twins are not.**
-Decided 25 Aug. Fixed lines the agent speaks are carried through verbatim when
-a prompt is rewritten, never re-translated, because they are already the output.
+Decided 25 Aug, and true of both Hebrew agents since 26 Aug -- debt from
+`docs/features/10-debt-followup/prompt.md`, intake from
+`docs/assistant/demo-inbound.md`. Fixed lines the agent speaks are carried
+through verbatim when a prompt is rewritten, never re-translated, because they
+are already the output. **Which also bounds what the change can do:** the
+spoken fixed lines were always Hebrew, so rewriting the instruction cannot
+alter them; what it moves is every sentence the model composes for itself.
 And the twins are no longer derived from each other: `vapi_en.py` used to build
 the English one from the live Hebrew and refuse to ship on a mismatch, which is
 what kept them saying the same thing. That guarantee is gone. **Changing one
@@ -770,11 +775,16 @@ section governs, and the short version is:
    not find the rule", and that gets likelier as the file grows. Every turn
    re-sends the whole prompt, so length is also money.
 
-**Pushing a prompt: never run `vapi_sync.py` blind.** The live assistants
-carry tools the script does not know about (`get_request_status`,
-`get_balance` are missing from `INTAKE_TOOLS`), and a sync would strip them.
-Push prompt-only: GET the assistant, swap `model.messages[system].content`,
-PATCH the **whole** `model` object back. Verify tools survived.
+**Pushing a prompt: check what a sync would strip before running it.** This
+used to say never run `vapi_sync.py` blind, because the live assistants carried
+tools the script did not know about. `INTAKE_TOOLS` gained
+`get_request_status` and `get_balance` on 19 Aug, and the 26 Aug Hebrew push
+went through `vapi_sync.py inbound --apply` with all six tools intact and
+verified afterwards. The rule behind it stands: read the dry run's tool list
+against the live assistant's before applying, and if the script knows fewer,
+push prompt-only instead: GET the assistant, swap
+`model.messages[system].content`, PATCH the **whole** `model` object back.
+Either way, verify the tools survived.
 
 **And never build `model.tools` from `vapi_tools.py` either.** Found 18 Aug: every
 live tool carries a `server` block — the webhook URL and the shared secret — that
