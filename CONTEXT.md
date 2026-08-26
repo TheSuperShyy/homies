@@ -463,6 +463,18 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**Brand assets are derived, and the derivation is the record.** Everything the
+dashboard shows of the logo — the login lockup, `app/icon.png`, the apple
+icon — is cut by script from `Homies-Logo.png` at the repo root, which is the
+one file the owner supplies. Regenerate from source on any change; never
+retouch a derived file, or the next regeneration silently undoes the edit.
+Two judgements that took a wrong crop each to learn: **pick the crop that
+survives the size** (the roof mark is the favicon because it is the only part
+of the logo legible at 16px — a shrunk wordmark is not a smaller logo, it is
+noise), and **look at every generated image before shipping it** — the first
+roof crop carried the letter-tops of the wordmark and an edge sliver, and no
+build, type-check or probe can see inside a PNG.
+
 **A login wall must be tested from its own public page's point of view, not
 only the pages it guards.** The wall that correctly bounced every dashboard
 page also bounced the login page's own logo — a subresource request carries no
