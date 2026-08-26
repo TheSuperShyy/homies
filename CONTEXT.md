@@ -463,6 +463,17 @@ four leave the node. **The rule for anything added there later: a line the
 workflow speaks is a line the model must be handed**, and the way to make that
 survive a forgetful afternoon is a single choke point rather than a convention.
 
+**A canned line is not exempt from the prompt's style rules, and both tap lines
+now follow them.** The two fixed replies in the Sort node were written before
+the warmth rules and kept their clipped shape after the model's lines lost it —
+the status line until the morning of 26 Aug, the open line until that evening,
+each corrected only when the owner read it off a handset. The shape every fixed
+line takes: **receive the person, then ask** — `בטח, אשמח לעזור. אפשר לספר לי
+מה קרה?` — because the first half is what makes it service rather than a form.
+A new canned line gets this shape on the day it is written, not after its own
+screenshot; and it is always a three-copy change (`TAP_LINE`, the live `TAPPED`,
+the prompt's worked example), moved together or not at all.
+
 **One question mark per message is a ceiling and a floor.** The rule had been
 read as a ceiling only, so replies drifted into statements: `אפשר לספר לי מה
 קרה ואפתח על זה קריאה.` is correct in content and hands the resident a
