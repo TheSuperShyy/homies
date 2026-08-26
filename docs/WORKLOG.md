@@ -30,6 +30,21 @@ Hebrew subtitle — and it replaced the generic icon: copied to
 deploys), on a white plate because the mark was drawn on white and the page is
 dark. The sidebar keeps the small icon; the wordmark is illegible at 30px.
 
+**The plate then went entirely — "its just a white square".** The styled card
+was still a white box on a dark page, because the source wordmark is near-black
+and needed the white behind it. The real fix is the designer's one: **a
+per-theme variant**. Both are derived from the source by un-blending the white
+background to true transparency (alpha = 255 − min channel, colors
+un-composited); the dark file additionally recolors the achromatic pixels to
+white — the wordmark turned out to be dark NAVY, so the recolor keys on
+luminance plus R−B (brown roof side has R far above B and is kept), and the
+first attempt shipped dark-on-dark before the preview caught it. The source
+also hides a faint frame line inside its outer 8px, excluded from the crop. A
+`<picture>` serves the dark file under `prefers-color-scheme: dark` and the
+transparent-original otherwise; the CSS plate is gone, replaced by a faint
+drop-shadow. Both variants previewed composited on their own theme grounds
+before shipping.
+
 **The logo then became the favicon, and the plate became a lockup.** Asked for
 both. The roof mark — the distinctive half of the logo, and the only half that
 survives 16px — was cut out of the PNG with PIL (letter-tops and an edge-noise

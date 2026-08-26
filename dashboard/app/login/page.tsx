@@ -41,10 +41,17 @@ export default function Login() {
     }}>
       {/* The company's real logo, supplied 26 Aug. It carries the name and the
           Hebrew subtitle itself, so no text beside it — the alt is for screen
-          readers and for the broken-image case. White plate because the mark
-          was drawn on white and the login page is dark. */}
+          readers and for the broken-image case. No plate: the white box around
+          the mark was the first attempt and read as a white square, so the
+          logo floats on the page instead, in a per-theme variant — the source
+          wordmark is near-black and would vanish on the dark ground, so the
+          dark file has it recolored white. Both derive from Homies-Logo.png
+          at the repo root. */}
       <div className="authbrand">
-        <img src="/homies-logo.png" alt={`${t('app.name')} — ${t('app.subtitle')}`} />
+        <picture>
+          <source srcSet="/homies-logo-dark.png" media="(prefers-color-scheme: dark)" />
+          <img src="/homies-logo.png" alt={`${t('app.name')} — ${t('app.subtitle')}`} />
+        </picture>
       </div>
       <form action={setLocale} className="authlang">
         <input type="hidden" name="to" value={other} />
