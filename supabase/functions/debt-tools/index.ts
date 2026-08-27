@@ -1647,7 +1647,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     let dupeQuery = db
       .from("requests")
-      .select("reference")
+      .select("id,reference,description")
       .eq("building", building)
       .eq("type", type)
       .gte("created_at", since)
@@ -1661,7 +1661,22 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
     const { data: existing } = await dupeQuery;
     if (existing && existing.length) {
-      return { ok: true, reference: existing[0].reference, duplicate: true };
+      // A second report of one fault inside the window often carries NEW
+      // FACTS. 27 Aug, live: "תקלה במעלית" came back twenty minutes later as
+      // "נתקעת בין קומות, כבר חודשיים, ביקשתי כמה פעמים" — and the guard
+      // handed back the old reference and dropped all of it, leaving the
+      // ticket as thin as its first phrasing. Same convention as
+      // add_request_detail: append with " | ", never replace, and skip when
+      // the second report carries the same words (a retried webhook does).
+      const dupeRow = existing[0];
+      const fresh = String(args.description).trim();
+      const held = String(dupeRow.description ?? "");
+      if (fresh && !held.includes(fresh)) {
+        await db.from("requests")
+          .update({ description: held ? held + " | " + fresh : fresh })
+          .eq("id", dupeRow.id);
+      }
+      return { ok: true, reference: dupeRow.reference, duplicate: true };
     }
     }
 

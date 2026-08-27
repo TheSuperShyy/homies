@@ -146,7 +146,14 @@ def main():
     if not mirror:
         code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref,
                          ["OXS_KEY_REQUESTS"])
-        print("oxs mirror     OFF — function-side key deleted (HTTP %s)" % code)
+        # 404 means the key is already gone, which IS the off state this
+        # branch exists to enforce — found 27 Aug when the second plain
+        # --apply after the shutdown aborted here and never deployed.
+        if code == 404:
+            print("oxs mirror     OFF — key already absent (HTTP 404)")
+            code = 200
+        else:
+            print("oxs mirror     OFF — function-side key deleted (HTTP %s)" % code)
     else:
         print("oxs mirror     ON — pushed by explicit --oxs-mirror")
     if code >= 300:

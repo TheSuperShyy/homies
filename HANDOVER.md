@@ -958,6 +958,11 @@ handset.**
     a question mark, why in the first half, what in the second); 5/5 probes end
     in the question since. Live prompt 41,454 chars. `check_whatsapp.py` all
     green the same day.
+  - **A duplicate report's new facts land on the existing ticket (27 Aug,
+    debt-tools v50).** open_request's 30-minute duplicate guard no longer
+    discards the second description: it appends with " | " unless the words
+    are already there. Plain `supabase_functions.py --apply` no longer aborts
+    when the OXS key is already absent (404 = off, the state it enforces).
   - **A thing's name is not a fault description (27 Aug).** "תקנו את המעלית"
     no longer counts as a description: the bot asks what is happening with the
     thing before the address and before any open_request, and builds the

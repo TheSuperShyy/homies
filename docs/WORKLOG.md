@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### A duplicate report with new facts now feeds the ticket it duplicates
+
+- Replayed the full elevator conversation through the live bot to verify the
+  intake fix with real tools. The words were right; the ROW was not: the
+  30-minute duplicate guard matched (the "morning" ticket was Philippine-time
+  morning, twenty minutes earlier in UTC), returned the old reference, and
+  threw the richer second description on the floor. The guard was designed for
+  one-leak-two-reports; nobody designed where the second report's new facts go.
+- `open_request`'s duplicate path now appends the fresh description to the
+  existing row (" | " separator, `add_request_detail`'s convention), skipping
+  when the words are identical so retried webhooks don't stutter the ticket.
+  Deployed debt-tools v50, verified with a two-report test (row read both
+  phrasings joined), test row deleted.
+- Found and fixed on the way: the second plain `--apply` after the OXS
+  shutdown aborted on deleting the already-deleted key (HTTP 404) and NEVER
+  DEPLOYED — my own enforcement edit. 404 now counts as the off state it
+  enforces.
+- Backfilled 255-1125-26 with the context the resident actually gave.
+
 ### A ticket that says "תקלה במעלית" is a ticket with nothing in it
 
 - Live 15:45, ticket 255-1125-26: the resident said the elevator had been
