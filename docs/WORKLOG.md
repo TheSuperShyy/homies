@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### The phantom guard read a quotation as a claim, and buried a correct answer
+
+- Owner's status test: "האם המעלית תוקנה?" → the model found the building's
+  open OXS ticket and wrote the right answer — "יש קריאה פתוחה, מספר
+  255-26840-26, בטיפול" — and the resident never saw it. The phantom guard's
+  claims regex matches any reference shape (widened to \d{3,6} for OXS
+  serials), every status reply quotes a reference, open_request had not run,
+  so the guard killed the good reply and the rescue net opened 255-1130-26
+  with the transcript as its description. Two of the purged 24 Aug rows were
+  this same bug, unnoticed.
+- Guard fixed, live and mirrored in the script: a claim is OPENING language —
+  the "פתחתי קריאה" phrases, or first-person פתחתי/פתחנו alongside a
+  reference. "נפתחה ב־26.8" in a status reply matches neither. Junk row
+  removed by migration 028.
+- Two more defects surfaced by the same test, both in get_request_status:
+  the by-building search was a contiguous ilike, so "אבטליון 4 הרצליה"
+  (no comma) missed the row written "אבטליון 4, הרצליה" — it now
+  canonicalizes through matchBuilding first, raw text as fallback. And an
+  unresolvable building (Latin spelling) returned found:0, which the model
+  read out as "אין קריאות פתוחות" — a false statement; the answer now
+  carries building_unrecognized so the agent can say it did not recognize
+  the address. debt-tools v52, both probed directly: comma-less finds the
+  ticket, Latin gets the flag.
+
 ### The bot pauses like a person now, and the test tickets are gone
 
 - Owner asked for a 1.5-3s random delay on replies and a purge of all fake

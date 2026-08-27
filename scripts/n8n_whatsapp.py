@@ -1868,8 +1868,21 @@ def workflow(e):
                             #    they are meant to be.
                             r"={{ (() => {"
                             r" const t = String($json.output || '');"
-                            r" const claims = /\b\d{3}-\d{4}-\d{2}\b|\bHM-\d{4}-\d{3,6}\b"
-                            "|\u05e4\u05ea\u05d7\u05ea\u05d9 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e4\u05ea\u05d7\u05e0\u05d5 \u05e7\u05e8\u05d9\u05d0\u05d4/.test(t);"
+                            # A REFERENCE ALONE IS NOT A CLAIM \u2014 learned live
+                            # on 27 Aug. Every status reply quotes a reference
+                            # (including OXS's five-digit serials, hence
+                            # \d{3,6}), so testing for the number alone made
+                            # the guard kill correct status answers and let
+                            # the rescue mint junk tickets whose description
+                            # is the transcript (255-1130-26, plus two purged
+                            # rows from 24 Aug). A claim is the OPENING
+                            # language: the exact "X \u05e7\u05e8\u05d9\u05d0\u05d4" phrases, or a
+                            # first-person \u05e4\u05ea\u05d7\u05ea\u05d9/\u05e4\u05ea\u05d7\u05e0\u05d5 anywhere near a
+                            # reference. "\u05e0\u05e4\u05ea\u05d7\u05d4 \u05d1\u05be26.8" in a status reply
+                            # matches neither.
+                            " const claims = /\u05e4\u05ea\u05d7\u05ea\u05d9 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e4\u05ea\u05d7\u05e0\u05d5 \u05e7\u05e8\u05d9\u05d0\u05d4/.test(t)"
+                            r" || ((/\b\d{3}-\d{3,6}-\d{2}\b|\bHM-\d{4}-\d{3,6}\b/.test(t))"
+                            " && /\u05e4\u05ea\u05d7\u05ea\u05d9|\u05e4\u05ea\u05d7\u05e0\u05d5/.test(t));"
                             " if (!claims) return true;"
                             # `isExecuted` is useless on a tool node: it reported
                             # true on the 19 Aug run where the execution shows

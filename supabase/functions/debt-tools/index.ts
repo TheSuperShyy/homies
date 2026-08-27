@@ -1237,7 +1237,22 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       }
 
       if (building) {
-        let q = db.from("requests").select(fields).ilike("building", `%${building}%`);
+        // Canonicalize the way open_request does before matching. The rows
+        // carry OUR form of the address — "אבטליון 4, הרצליה", comma included
+        // — and a caller types "אבטליון 4 הרצליה", which a contiguous ilike
+        // does not find (missed live 27 Aug: the building's open elevator
+        // ticket, invisible over one comma). matchBuilding parses street and
+        // number; when it resolves, its canonical address IS the string on
+        // the rows. When it does not (a Latin spelling, an unmanaged street),
+        // the raw text keeps its ilike chance, and the answer carries
+        // building_unrecognized so the agent can say "לא זיהיתי את הכתובת"
+        // instead of the false "אין קריאות פתוחות".
+        const mb = await matchBuilding(building);
+        const needle = mb.status === "found" ? String(mb.building.address) : building;
+        // var, deliberately: the final return sits outside this block and
+        // needs to see it. False when the address resolved or was never given.
+        var buildingUnrecognized = mb.status !== "found";
+        let q = db.from("requests").select(fields).ilike("building", `%${needle}%`);
         if (unit) q = q.eq("unit", unit);
         // The caller almost always names the thing — "the elevator", "the
         // lighting". Without it, a building with no apartment given returns
@@ -1301,6 +1316,13 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // Somebody who names a street is not thereby entitled to their
       // neighbours' business.
       other_open: othersInBuilding,
+      // "No open requests" and "I did not recognize that address" are
+      // different answers, and only the caller's building being resolvable
+      // separates them. Set only when a building was given, did not resolve
+      // (Latin spelling, unmanaged street), and nothing matched anyway.
+      building_unrecognized:
+        (typeof buildingUnrecognized !== "undefined" && buildingUnrecognized &&
+         !(rows?.length)) || undefined,
       // The caller gave a building and named no fault, so nothing here can be
       // attributed to them. Descriptions are withheld and the agent asks what
       // it was about rather than reading the list.

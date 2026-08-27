@@ -958,6 +958,17 @@ handset.**
     a question mark, why in the first half, what in the second); 5/5 probes end
     in the question since. Live prompt 41,454 chars. `check_whatsapp.py` all
     green the same day.
+  - **The phantom guard keys on opening LANGUAGE, not reference shape (27
+    Aug).** A reply quoting a reference (every status answer does) is no
+    longer a "claim"; only פתחתי/נפתחה/פתחנו קריאה phrasing, or
+    פתחתי/פתחנו beside a reference, triggers the open_request check. Before
+    this, correct status replies were being replaced by rescue tickets whose
+    description is the transcript (255-1130-26, purged by migration 028).
+  - **get_request_status canonicalizes the building via matchBuilding (27
+    Aug, debt-tools v52)** — "אבטליון 4 הרצליה" without the comma now finds
+    the row — and returns `building_unrecognized: true` when the address
+    resolves to nothing, so the agent says "לא זיהיתי את הכתובת" instead of
+    the false "אין קריאות פתוחות".
   - **Replies pause like typing (27 Aug).** Wait nodes "Type for a moment" /
     "(menu)" hold canned lines and menus 0.5-1.7s before sending (felt ~2-3s
     with run overhead, measured); agent replies get zero added. Amounts are

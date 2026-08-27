@@ -1107,6 +1107,16 @@ call goes nowhere, and the resident is told a request was opened. To change a to
 description, edit the **fetched** object in place and PATCH the whole `model`.
 Check `sum(1 for t in tools if t["server"]["url"])` before and after.
 
+**A guard must key on the claim, not the artifact.** The phantom-ticket
+guard fired on the SHAPE of a reference, and every honest status reply quotes
+one — so the guard replaced correct answers with rescue tickets for three
+days before anyone saw it. The claim it exists to catch is "I opened a
+ticket"; the artifact is the number. Any backstop written against a pattern
+that legitimate output also produces will eat legitimate output, and it will
+do it silently, because the backstop's own success looks like the system
+working. Key the trigger on the act being claimed, and keep a probe in the
+suite that runs the GOOD case through the guard.
+
 **A duplicate is a merge, not a discard.** The 30-minute ticket guard was
 designed so one leak gets one van, and for months its answer to a second
 report was to hand back the old reference and drop everything else in the
