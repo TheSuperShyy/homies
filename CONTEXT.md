@@ -1148,6 +1148,16 @@ rather than proceeding.
 **Before deleting or overwriting real data, look at what is there.** Carry
 what matters across a purge rather than assuming it can be rebuilt.
 
+**Destructive database changes go through the migration ledger, not raw
+REST.** Migration 027 (the 27 Aug test-ticket purge) set the pattern: survey
+row-by-row first, write the delete as a numbered migration whose comment says
+what the populations were and why one goes, apply via `supabase_migrate.py`.
+The repo then carries a permanent, reviewable record of every destructive op
+— which is also what makes such an op approvable at all. Same date, same
+principle: `requests` is real-data-only now (`opened_via <> 'oxs'` means a
+real resident or a new test), and test rows are cleaned up when a test round
+ends rather than left to fossilize.
+
 **Use the n8n skills before building any workflow**; never work from recall.
 Workflows must be readable — no overlapping nodes, real names, sticky notes,
 enforced by `scripts/n8n_layout.py`.
