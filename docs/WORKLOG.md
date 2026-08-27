@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### Consecutive taps never repeat a phrasing
+
+- Live rotation test (14 replayed taps; the burst flooded the owner's chat —
+  their call: useful but too risky to repeat at that volume): status drew all
+  three variants 2-2-2, but open and human drew the SAME variant three taps
+  running — pure random repeats, and repeats read as one script.
+- The picker now remembers the last variant per handset+button and steps past
+  it: consecutive taps always differ, distribution stays even (simulated 10k
+  draws: zero consecutive repeats, ~3.3k each). Verified in code, not by
+  another chat flood.
+
 ### Epoch -4, and the full status chain proven on the live pipe
 
 - Memory wiped again (epoch `-3` → `-4`, live and in the script) so the

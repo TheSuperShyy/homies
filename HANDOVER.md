@@ -923,6 +923,11 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **Consecutive taps never repeat a phrasing (27 Aug, later).** The picker
+    keeps the last variant per handset+button in workflow static data
+    (store.lastVar) and steps past a repeat draw. Bulk replay tests flood the
+    owner's real chat — keep future variant tests to code-level checks or a
+    handful of taps.
   - **Every tap answers with one of THREE random phrasings since 27 Aug**
     (owner's ask — an identical line every time reads as a machine). All nine
     variants live in the live `Sort`'s `TAPPED`, all end with the question;
