@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### The variants were made polite, after one read as curt
+
+- Owner saw "בטח, אני מקשיב. מה קרה?" on a real tap and asked for polite and
+  professional. That variant was the two-word form-question the prompt itself
+  warns against — my mistake to ship it. All curt variants replaced with full
+  courteous sentences; the nine still rotate at random, keep their shapes,
+  and end with the question.
+
 ### Each tap now has three phrasings, drawn at random
 
 - Owner: one identical reply per button reads as a machine; asked for at
