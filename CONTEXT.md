@@ -324,6 +324,15 @@ confidence floor, unmatched beats guessed, because a ticket on a confidently
 wrong building reads correct and sends a van to the wrong street. Added
 13 Aug.
 
+**Warm is not casual: the register is polite and professional, and slang is
+banned (27 Aug, owner).** The "sound human" work had put "מבאס" into the
+prompt's approved empathy words, and the owner rejected it the first time a
+resident-facing turn used that register ("make the response polite and
+professional"). Empathy stays — "זה באמת מתסכל", "מצטער לשמוע" — but the bot
+sounds like someone at an office desk, not a friend on the couch, even when
+the resident is angry or slangy themselves. This bounds every future "make it
+human" pass, chat and voice both.
+
 **Warmth lives in the sentence, never in the fact.** The details pass through
 verbatim — building, apartment, reference number, amount, months, status — and
 every sentence around them is the model's to write like a person. A warm

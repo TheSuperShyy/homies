@@ -965,6 +965,16 @@ handset.**
     sent as TWO messages** — `Dead end reply?` appends the button menu to it —
     so a doubled reply on a handset is that backstop firing, not a duplicate
     send. Probed 6 times, 5 ended in a question; flash, so it is a rate.
+    **Narrowed 27 Aug: `Dead end reply?` now has THREE conditions.** A reply
+    that asks for something without a question mark (contains
+    באיזה/איזו/איזה/איפה/מתי/"צריך לדעת"/"אפשר ל") is mid-flow and gets NO
+    menu — live 15:24 an address request phrased as a statement got the menu
+    glued on mid-complaint. It also skips replies naming הצוות (the
+    transfer-context closer). The `tapped_open` note now demands a short
+    respectful reaction to the thing itself, acknowledgment of a repeat
+    complaint, no slang, and ending on the question mark — written WITHOUT
+    naming any phrase to avoid, because the first draft named "אני מבין" and
+    thereby planted it.
   - **`Spell female male prompt.pdf` at the repo root is a VOICE spec** (nikkud
     for TTS, `agent_gender`/`customer_gender`, ends at Text To Speech). Only a
     subset applies to a keyboard. **The voice agents were not touched** — the
