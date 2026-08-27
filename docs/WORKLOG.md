@@ -9,6 +9,24 @@ conversation that produced it.
 
 ---
 
+## 2026-08-27
+
+### Each tap now has three phrasings, drawn at random
+
+- Owner: one identical reply per button reads as a machine; asked for at
+  least three rephrasings each. Live `Sort`'s `TAPPED` now maps each button
+  to three variants and picks with `Math.random()`. The variants rephrase,
+  never redirect: open still invites the story, status still names מספר
+  הקריאה (the אין לי branch keys on it), human still confirms + announces the
+  transfer (wording the Dead-end and backstop regexes recognise) + asks the
+  topic, and all nine end with the question. `said()` stores whichever was
+  picked, so `last_bot` stays truthful.
+- Verified live by replaying the tap webhook (exec 11668): variant two came
+  out, transfer fired, plain text, no buttons. The prompt needed nothing —
+  it already calls the tap lines "דוגמה ולא נוסח קבוע". The Meta-shaped
+  `scripts/n8n_whatsapp.py` still carries single-string `TAP_LINE`s; known
+  drift, live is the truth.
+
 ## 2026-08-26 (evening)
 
 ### The נציג tap is canned now, because the model fumbled it twice in one evening

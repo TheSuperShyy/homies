@@ -923,6 +923,12 @@ handset.**
   about what a reader can SEE (26 Aug, latest).** The `last_bot` fix below is
   live and verified; the entry below it is history, not a pending item. Since
   then, four more prompt pushes, **live prompt 39,968 chars**, all probed:
+  - **Every tap answers with one of THREE random phrasings since 27 Aug**
+    (owner's ask — an identical line every time reads as a machine). All nine
+    variants live in the live `Sort`'s `TAPPED`, all end with the question;
+    variants rephrase, never redirect (status always names מספר הקריאה, human
+    always confirms + announces + asks the topic). `said()` carries the picked
+    sentence into `last_bot`.
   - **The "לדבר עם נציג" TAP is canned since late 26 Aug — the model no
     longer sees it.** Three prompt rounds could not hold gemini-2.5-flash on
     this turn (a re-greeting with the menu glued on, then the bare fixed line
