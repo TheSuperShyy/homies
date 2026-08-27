@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### Status answers open with the checking, not the datum
+
+- Owner: the status reply reads like a printout; wanted "I checked it, and
+  according to the system the issue regarding [topic] is ..." in several
+  rotating phrasings. New rule in the status section, planted beside the
+  tell-don't-read rule (whose own example now carries the framing): the
+  answer opens with בדקתי / עשיתי בדיקה, names the system, the topic in the
+  resident's words, status in human Hebrew — and the not-found case uses the
+  same order before the offer. Three example variants, marked as examples.
+- Pushed live (45,570 chars). Probed with a real tool-result in context:
+  3/3 open with the checked-framing, wording varies.
+
 ### The phantom guard read a quotation as a claim, and buried a correct answer
 
 - Owner's status test: "האם המעלית תוקנה?" → the model found the building's

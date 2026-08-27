@@ -958,6 +958,10 @@ handset.**
     a question mark, why in the first half, what in the second); 5/5 probes end
     in the question since. Live prompt 41,454 chars. `check_whatsapp.py` all
     green the same day.
+  - **Status answers open with the checking (27 Aug).** "בדקתי במערכת: הקריאה
+    על המעלית פתוחה ובטיפול" — checked-first, topic in the resident's words,
+    status in human Hebrew, same order for not-found. Owner's framing ask;
+    examples live in the status section of prompt.md.
   - **The phantom guard keys on opening LANGUAGE, not reference shape (27
     Aug).** A reply quoting a reference (every status answer does) is no
     longer a "claim"; only פתחתי/נפתחה/פתחנו קריאה phrasing, or
