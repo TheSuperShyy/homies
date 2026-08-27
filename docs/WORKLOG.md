@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### The menu landed mid-complaint, and the empathy was slang
+
+- Live 15:24: an angry "ביקשתי את זה כבר מספר פעמים" was answered with an
+  address request phrased without a question mark, so the Dead-end guard read
+  it as nowhere-to-go and glued "אפשר לעזור בעוד משהו?" plus the menu onto a
+  resident mid-complaint. Owner: "not good."
+- Deterministic fix: `Dead end reply?` gained a third condition — a reply that
+  asks for something without a question mark (באיזה/איזו/איפה/מתי/צריך
+  לדעת/אפשר ל...) is mid-flow, never a dead end. Holds whatever the model
+  writes.
+- The `tapped_open` note now demands a short, respectful reaction to the thing
+  that happened (in its own words, no generic filler, no slang), one-sentence
+  acknowledgment when the resident says they already asked before, and the
+  message ending on its question mark. First draft named "אני מבין" as the
+  phrase to avoid and thereby planted it — rewritten without naming any
+  phrase.
+- prompt.md: the empathy word list lost its slang ("מבאס" was listed as
+  approved; the owner's standing direction is polite and professional) —
+  replaced with "זה באמת מתסכל", "מצטער לשמוע", plus an explicit no-slang
+  clause. Pushed live (43,995 chars). Probes 6/6: ends with the question, no
+  slang, the repeat-complaint turn acknowledges the frustration.
+
 ### The variants were made polite, after one read as curt
 
 - Owner saw "בטח, אני מקשיב. מה קרה?" on a real tap and asked for polite and
