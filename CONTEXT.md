@@ -1107,6 +1107,22 @@ call goes nowhere, and the resident is told a request was opened. To change a to
 description, edit the **fetched** object in place and PATCH the whole `model`.
 Check `sum(1 for t in tools if t["server"]["url"])` before and after.
 
+**A duplicate is a merge, not a discard.** The 30-minute ticket guard was
+designed so one leak gets one van, and for months its answer to a second
+report was to hand back the old reference and drop everything else in the
+message. That is half a design: deciding two reports are one event without
+deciding where the second report's NEW FACTS go. A resident who elaborated
+twenty minutes later left no trace (27 Aug, the elevator ticket), so now the
+duplicate path appends what is new and skips what is already held. The rule
+generalizes: any dedup that survives a row must route the loser's information
+into the winner, or the system trains people that elaborating is pointless.
+
+**Enforcement must count already-enforced as success.** The plain-deploy step
+that deletes the OXS key aborted on 404 once the key was already gone — and
+took the entire function deploy down with it, silently, from the second run
+onward. A guard that fails when the state it wants already holds is a guard
+that breaks the pipeline it protects. Idempotence first, then loudness.
+
 **Distilling a new "skill" document into a prompt means rejecting most of
 it.** Anything conflicting with an earned rule loses: latency-masking fillers
 lose to the silent-tool rule, de-escalation-to-keep-working loses to
