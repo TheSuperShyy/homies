@@ -1058,7 +1058,7 @@ handset.**
   sentence instead of a fourth flag: `said()` records every canned line as it
   leaves Sort, the next turn gets it as `last_bot`, and the agent template
   states it as a fact and leaves the meaning to the prompt. Memory `sessionKey`
-  bumped to `={{ $json.to }}-3` because Simple Memory cannot be cleared per
+  bumped to `={{ $json.to }}-4` because Simple Memory cannot be cleared per
   conversation and that handset's window is four demonstrations of the fault.
   **`scripts/n8n_whatsapp.py` has the change; the live workflow does not** —
   every command that would push it, and the script's own dry run, were refused

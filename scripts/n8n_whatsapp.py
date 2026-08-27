@@ -1506,7 +1506,7 @@ def workflow(e):
                 # turns (skipping the new ask-what-happened rule) and imported
                 # one building's fault details into another building's ticket.
                 parameters={"sessionIdType": "customKey",
-                            "sessionKey": "={{ $json.to }}-3",
+                            "sessionKey": "={{ $json.to }}-4",
                             "contextWindowLength": 30},
                 # 12 until 8 Aug. Raised because the language choice now lives
                 # HERE and nowhere else: a resident who asks for English is

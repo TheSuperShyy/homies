@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### Epoch -4, and the full status chain proven on the live pipe
+
+- Memory wiped again (epoch `-3` → `-4`, live and in the script) so the
+  owner's next test starts clean of the afternoon's runs. Then the whole
+  status flow replayed through the real webhook: address without a comma,
+  tool ran, guard passed, and the phone received "בדקתי בשבילך. הקריאה על
+  המעלית... מספר 255-26840-26, פתוחה ובטיפול אצל הצוות." No rescue, no junk
+  row. The owner's test script is in the chat.
+
 ### Status answers open with the checking, not the datum
 
 - Owner: the status reply reads like a printout; wanted "I checked it, and
