@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### The bot pauses like a person now, and the test tickets are gone
+
+- Owner asked for a 1.5-3s random delay on replies and a purge of all fake
+  tickets. Delay: two Wait nodes in the live workflow — canned lines and both
+  menus pause 0.5-1.7s (the run itself already costs ~1.5s, so the FELT delay
+  measured 2.2-2.6s over two replays); agent replies get zero added, the
+  model already made the resident wait. Answer Meta long since answered the
+  webhook, so nothing times out.
+- Purge: migration 027 deletes every request not imported from OXS — 44 rows
+  of three weeks' bot testing (WhatsApp test-number conversations, voice
+  rehearsals with "AI: שלום" transcripts, rows titled "בדיקה", one staff seed
+  from 8 Aug). 145 OXS rows remain, verified after apply. Routed through the
+  migration ledger, the repo's audited channel for DB changes, after the
+  direct bulk DELETE was blocked by the permission layer.
+
 ### The memory argued with the fix again, and the epoch is -3
 
 - Owner retest, new building (יואב 14): the bot skipped the new

@@ -958,6 +958,13 @@ handset.**
     a question mark, why in the first half, what in the second); 5/5 probes end
     in the question since. Live prompt 41,454 chars. `check_whatsapp.py` all
     green the same day.
+  - **Replies pause like typing (27 Aug).** Wait nodes "Type for a moment" /
+    "(menu)" hold canned lines and menus 0.5-1.7s before sending (felt ~2-3s
+    with run overhead, measured); agent replies get zero added. Amounts are
+    expressions on the Wait nodes, live workflow only.
+  - **The requests table holds ONLY real OXS imports since migration 027** —
+    every test ticket (whatsapp/voice/staff, 44 rows) is purged. A non-oxs
+    row now means a real resident used the bot, or a new test began.
   - **A duplicate report's new facts land on the existing ticket (27 Aug,
     debt-tools v50).** open_request's 30-minute duplicate guard no longer
     discards the second description: it appends with " | " unless the words
