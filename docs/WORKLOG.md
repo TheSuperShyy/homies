@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### A ticket that says "תקלה במעלית" is a ticket with nothing in it
+
+- Live 15:45, ticket 255-1125-26: the resident said the elevator had been
+  broken two months and reported several times, and the ticket that reached
+  the dashboard said "תקלה במעלית" and nothing else. The bot never asked what
+  the elevator actually does, because the prompt's own rule said a sentence
+  like "תקנו את המעלית" already counts as a description.
+- Three prompt rules added/changed, pushed live (44,967 chars):
+  1. **A thing's name is not a fault description.** With only the name, the
+     next question is what is happening with it, not the address, and not an
+     offer to open a ticket there is nothing to write in. Saying what you'll
+     do with the answer rides in the same breath.
+  2. **The description is built from everything told along the way** —
+     duration, prior unhandled reports, severity — not just the last message.
+  3. **A curse is not the word you echo back** ("המעלית הארורה" comes back as
+     "המעלית") — the repeat-their-word rule gained its exception after a probe
+     opened with "קיבלתי, מעלית ארורה".
+- Probed: 4/4 ask what's wrong with the elevator first; 3/3 confirmations
+  carry "נתקעת בין קומות, כבר חודשיים" into what gets opened.
+
 ### The menu landed mid-complaint, and the empathy was slang
 
 - Live 15:24: an angry "ביקשתי את זה כבר מספר פעמים" was answered with an

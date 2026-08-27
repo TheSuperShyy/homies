@@ -958,6 +958,12 @@ handset.**
     a question mark, why in the first half, what in the second); 5/5 probes end
     in the question since. Live prompt 41,454 chars. `check_whatsapp.py` all
     green the same day.
+  - **A thing's name is not a fault description (27 Aug).** "תקנו את המעלית"
+    no longer counts as a description: the bot asks what is happening with the
+    thing before the address and before any open_request, and builds the
+    description from everything told along the way (duration, prior reports).
+    Curses are never echoed back. Ticket 255-1125-26 ("תקלה במעלית", no
+    context) is the failure that forced it.
   - **Every reply ends with a question, and this is a standing rule the owner
     asked to be kept.** Open wherever open fits; closed only when what remains
     really is yes or no. Full stops only where the conversation ends: status
