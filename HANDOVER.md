@@ -928,12 +928,13 @@ handset.**
     (store.lastVar) and steps past a repeat draw. Bulk replay tests flood the
     owner's real chat — keep future variant tests to code-level checks or a
     handful of taps.
-  - **Every tap answers with one of THREE random phrasings since 27 Aug**
-    (owner's ask — an identical line every time reads as a machine). All nine
-    variants live in the live `Sort`'s `TAPPED`, all end with the question;
-    variants rephrase, never redirect (status always names מספר הקריאה, human
-    always confirms + announces + asks the topic). `said()` carries the picked
-    sentence into `last_bot`.
+  - **Every tap answers with one of THREE random phrasings since 27 Aug**,
+    and since the evening they are DIRECT — no courtesy opener ("בטח, אשמח
+    לעזור"), because the menu greeting already said hello; a tap answers with
+    the substance. All nine live in the live `Sort`'s `TAPPED`, all end with
+    the question; variants rephrase, never redirect (status always names מספר
+    הקריאה, human always announces the transfer + asks the topic). `said()`
+    carries the picked sentence into `last_bot`.
   - **The "לדבר עם נציג" TAP is canned since late 26 Aug — the model no
     longer sees it.** Three prompt rounds could not hold gemini-2.5-flash on
     this turn (a re-greeting with the menu glued on, then the bare fixed line

@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### The taps dropped the courtesy opener
+
+- Owner: "sure, I'd be happy to help" after the menu greeting is a second
+  hello — the greeting already happened, so a tap should answer instantly
+  with the substance ("share the details of what's bothering you so I can
+  help"). All nine variants rewritten direct: open invites the details and
+  says a ticket comes of them, status goes straight to checking, human goes
+  straight to the transfer and the context question. Same rules underneath
+  (question last, מספר הקריאה named, transfer language present, no name, no
+  repeat), verified by the gate check; the no-repeat picker untouched.
+
 ### Consecutive taps never repeat a phrasing
 
 - Live rotation test (14 replayed taps; the burst flooded the owner's chat —
