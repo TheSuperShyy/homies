@@ -1501,8 +1501,12 @@ def workflow(e):
                 # the suffix abandons every old buffer at once. Bump it again
                 # the next time a bad turn has to be forgotten; the cost is that
                 # everyone mid-conversation starts fresh, which is cheap.
+                # Bumped to -3 on 27 Aug: the test handset's buffer held a full
+                # day of elevator test runs, so the model imitated its own old
+                # turns (skipping the new ask-what-happened rule) and imported
+                # one building's fault details into another building's ticket.
                 parameters={"sessionIdType": "customKey",
-                            "sessionKey": "={{ $json.to }}-2",
+                            "sessionKey": "={{ $json.to }}-3",
                             "contextWindowLength": 30},
                 # 12 until 8 Aug. Raised because the language choice now lives
                 # HERE and nowhere else: a resident who asks for English is

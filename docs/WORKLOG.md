@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-08-27
 
+### The memory argued with the fix again, and the epoch is -3
+
+- Owner retest, new building (יואב 14): the bot skipped the new
+  ask-what-happened rule and jumped to the address — and the ticket, though
+  rich, carried "נתקעת בין קומות, כבר חודשיים" imported from the PREVIOUS
+  test conversation about בצלאל 1. The live prompt was right; the memory
+  buffer held a full day of test runs and the model imitated its own old
+  turns and borrowed their facts across buildings.
+- Same remedy as 26 Aug: memory epoch bumped, sessionKey `-2` → `-3`, live
+  and mirrored in the script. Fresh-memory replay: "אפשר לספר לי מה קרה עם
+  המעלית?" — the what-question comes first again.
+
 ### A duplicate report with new facts now feeds the ticket it duplicates
 
 - Replayed the full elevator conversation through the live bot to verify the
