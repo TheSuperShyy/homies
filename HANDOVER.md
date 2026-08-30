@@ -1956,6 +1956,34 @@ Nothing dials: no phone number exists, all 7,391 residents are
 
 ## Next moves, in order
 
+**THE PROMPT IS PATCHED BUT NOT RE-VERIFIED, AND NOT APPLIED.** State as of
+30 Aug, in order of what would bite first:
+
+1. **Nothing is live on Vapi.** `03c9074`, the regression patches, and
+   `8793c9f` are all committed and unpushed. A caller right now gets the
+   36,668-char prompt and still breaks on the office number.
+   `python scripts/vapi_sync.py inbound --apply` covers all of it. Read the dry
+   run's tool list first — it must show six.
+2. **The three regression patches have not been probed.** They were written
+   against failures the probe found and are unverified against it. Re-running
+   `leak`, `vague` and `parcel` on `--ref HEAD` costs about $0.08 and needs the
+   owner's word. **Do this before the push**, because two of the three
+   regressions were things the author was confident about and wrong about.
+3. **`prompt_probe.py` bare reads the LIVE assistant, not the repo.** While
+   nothing is applied, that is the *old* prompt. Use `--ref HEAD` for the new
+   one and `--ref 8793c9f` for the old. Getting this wrong scores the same
+   prompt twice and reads as "no change".
+4. Skip the `late` scenario on inbound — it is a debt call and only adds noise
+   and cost.
+
+**What the probe established about the refactor**, so nobody re-litigates it:
+the example-contamination failure (`מה היה בתיק?` on a parcel) is fixed, the
+re-asking of already-given facts is fixed, the ungrammatical `מתי זה ייקח` is
+gone, and per-call token cost halved. Against that, the reference number and the
+address confirmation both regressed and were patched. The fence is 19,978 chars,
+down from 36,668.
+
+
 **TWO THINGS ARE COMMITTED AND NOT LIVE, AND A CALLER TODAY GETS NEITHER.**
 `8793c9f` (the office number written as speech, which fixed the 30 Aug
 digit-stutter) and the 30 Aug prompt refactor are both in the repo and neither

@@ -1345,6 +1345,31 @@ afterwards, never as a side effect.
 
 ## The voice prompts
 
+**Probe a large prompt change before pushing it. Decided 30 Aug, after it paid
+for itself the first time it was used.** `scripts/prompt_probe.py` costs cents —
+about $0.22 for a three-scenario before/after pair — and caught three
+regressions in the refactor that all three static checks passed clean. Static
+checks prove the prompt still extracts, still contains its facts and still
+survives the voice filter. **None of them can tell you the agent stopped
+confirming the address.** Money-spending still needs the owner's word each time;
+the recommendation is to ask for it on anything over about 20% of the prompt.
+
+**A rule stated as an abstraction fails where a wrong-answer-beside-the-right-one
+succeeds.** Both regressions I was most confident about were abstractions I had
+written to replace a concrete pairing. *"The tool returns a number in three
+parts, say the middle"* produced an agent that read all three; the old
+`כן: … / לא: …` pair did not. This does not contradict the rule above it —
+worked *examples of a question* leak into unrelated questions and must go; a
+worked example of a **format** is the only thing that reliably pins a format.
+The distinction is whether the example is something to imitate or something to
+match.
+
+**And "write it and move on" is heard as permission to skip.** Any instruction
+to be faster needs the thing it must not drop named in the same breath, or the
+model drops the most skippable-looking step — which was the address
+confirmation, the one turn standing between a technician and a stranger's door.
+
+
 **A prompt is not its own changelog. Decided 30 Aug, and it is rule 5 with
 teeth.** The inbound prompt had grown twenty-five paragraphs that state a rule
 and then narrate the call that produced it. That reads as institutional memory

@@ -11,6 +11,73 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The probe was run, and it caught three regressions I had put in myself
+
+**Twenty-two cents, and the best money spent today.** `prompt_probe.py` replays
+scripted callers against the prompt through OpenRouter on the same
+`gpt-4.1-mini` the assistant runs, with the live tools and fixed tool results, so
+the only variable between two runs is the wording. Three scenarios — `leak`,
+`vague`, `parcel` — against `--ref 8793c9f` and `--ref HEAD`. The `late`
+scenario was skipped deliberately: it is a debt call and would only have been
+noise against an inbound prompt.
+
+Note for the next person: **the bare command reads the LIVE assistant**, which
+is still the old prompt while nothing is applied. The after half needs
+`--ref HEAD`.
+
+**Three regressions, all mine, all from the refactor.**
+
+1. **It read the whole reference number out**, all three parts, in every
+   scenario — *"שתיים חמש חמש, אחת אפס ארבע שתיים, שתיים שש"* where the old
+   prompt correctly said *"אחת אפס ארבע שתיים"*. The old text put the literal
+   returned value next to the spoken answer; I replaced it with "a number in
+   three parts, say the middle" to keep numerals out of the prompt, and the
+   abstraction did not land. **Fixed by putting a wrong answer beside the right
+   one** — that pairing, not the prose, was what carried the rule.
+2. **The read-back before the write vanished entirely.** No confirmation turn in
+   any of the three. *"If they gave you everything, write it and move on"* was
+   read as leave to skip the one turn the old prompt called the whole ceremony
+   of the call. Fixed by saying outright that hurrying is not skipping.
+3. **It ran `get_request_status` against a request it had opened seconds
+   earlier**, then volunteered *"יש עוד שתי פניות פתוחות"* to a caller who had
+   asked when a technician was coming. The count rule was honoured; nobody had
+   asked for a count.
+
+**Three improvements confirmed, and they are the ones the refactor was for.**
+
+- **The worked-example contamination is gone.** On a caller saying *"חבילה"*,
+  the old prompt asked *"מה היה בתיק?"* — reaching for the nearest-shaped
+  example rather than the fault in front of it, the 26 Aug failure class. The
+  new one does not.
+- **It stopped re-asking what it had been told.** The old prompt asked *"באיזו
+  שעה השארת את החבילה בחוץ?"* two turns after the caller said *"בבוקר, בערך
+  בשמונה"*.
+- **`מתי זה ייקח` is gone** — ungrammatical Hebrew the old prompt spent a whole
+  paragraph forbidding and produced anyway.
+
+**And the old prompt broke its own rules in front of the probe**, which is the
+argument for the cut stated better than I stated it. In these three runs it
+asked *"משהו נוסף שחשוב שהמשרד ידע?"* — the exact yes/no question its own text
+calls forbidden; said *"רגע, אני רושם"* while a tool was running, which it
+forbids; and crammed the reference number and a question into one turn, which it
+forbids. At 36,668 characters the model could not find its own rules.
+
+**Cost per scenario halved**, $0.045 to $0.028. The prompt is re-sent every turn
+on a real call too, so the same ratio lands on the Vapi bill.
+
+**The three patches landed under `209de11`, an automated housekeeping
+commit, not under a written one.** Its message reads "Housekeeping: briefing
+files and docs kept current (auto)" and says nothing about what changed, which
+is why this entry exists: `209de11` is the reference-number fix, the read-back
+fix and the status-check fix. Nothing is wrong with the code; the chronology
+would simply have been unreadable without this line.
+
+**Three patches applied; fence is 19,978 chars.** `facts_check` clean, guard 0
+failures across 25 fixtures. **The patches are NOT re-probed** — re-running the
+three scenarios costs about $0.08 and needs the owner's word, like every spend
+here.
+
+
 ### The inbound prompt stopped being a script, and learned what the chatbot knows
 
 **Asked for: an autonomous, intent-driven agent instead of a rigid one, keeping
