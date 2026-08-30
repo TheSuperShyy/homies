@@ -886,6 +886,23 @@ handset.**
   the boundary and the pages would show empty tables, not data. NOTE: the
   Supabase secret key refuses requests carrying a browser User-Agent
   ("Forbidden use of secret API key in browser") — send no UA from scripts.
+- **Money and keys, measured 28 Aug.** OpenRouter (the WhatsApp bot's brain)
+  reads **$29.13 left of $115** — `GET https://openrouter.ai/api/v1/credits`
+  with the `OPENROUTER_API_KEY`, the one balance in this project an API will
+  tell you. **Cartesia has no balance or usage endpoint** (404 on both keys):
+  dashboard only. **Vapi exposes no credit to the private key** either
+  (`/subscription` 404, `/org` 401 — that one wants the public key).
+- **Vapi's API 403s on Python's default User-Agent** (`error code: 1010`,
+  Cloudflare, not auth). Send `User-Agent: curl/8.5.0` and the same key works
+  — this is why `vapi_export.py` succeeds where a hand-rolled urllib call
+  "fails". Do not report the Vapi key as dead without retrying with that
+  header.
+- **Voice stack, confirmed live 28 Aug:** both Hebrew assistants speak
+  through **Cartesia `sonic-3`, stock voice `a976c076-3e31-4bf2-a178-8c3ce3d52b2a`**,
+  credential held Vapi-side as "Cartesia (Hebrew TTS)"; both English twins are
+  on Vapi's built-in Elliot. `CARTESIA_VOICE_ID` is still EMPTY — there is no
+  clone, and `CARTESIA_API_KEY` is still the value exposed in chat on 7 Aug,
+  still unrotated.
 - **Voice: both Hebrew prompts now instruct POINTED address words at a known
   gender (26 Aug night, owner's explicit ask, NOT yet heard in a call).**
   Debt 53,635 chars / intake 35,622, live and verified. The rule: gender

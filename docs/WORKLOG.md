@@ -9,6 +9,27 @@ conversation that produced it.
 
 ---
 
+## 2026-08-28
+
+### The dashboard is up locally, and the voice/credit questions were answered from the APIs
+
+- Started the dashboard dev server for the redesign: `npm run dev` in
+  `dashboard/`, live on http://localhost:3000, login wall verified (`/` 307s
+  to `/login`, which serves 200). Pages available to redesign: tickets,
+  conversations, calls, debts, sync, login. No design work yet — asked the
+  owner who it is for and what bothers them before touching anything.
+- Voice stack question answered from the live account rather than memory
+  (`vapi_export.py`): Hebrew debt + intake both on Cartesia `sonic-3` with the
+  stock Hebrew voice and the 300ms pad plan; English twins on Vapi Elliot;
+  `CARTESIA_VOICE_ID` empty, so no clone exists, and the 7 Aug exposed
+  Cartesia key is still unrotated.
+- Credit question: **OpenRouter $29.13 of $115 left**. Cartesia and Vapi
+  publish no balance to these keys (404/401) — dashboard only. Recorded in
+  HANDOVER so nobody re-probes to learn the same thing.
+- Found on the way: Vapi 403s Python's default User-Agent (Cloudflare 1010),
+  which reads like a revoked key. `curl/8.5.0` clears it; CONTEXT now carries
+  the general rule, since Supabase's Management API has the same trap.
+
 ## 2026-08-27
 
 ### The taps dropped the courtesy opener

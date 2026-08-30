@@ -1219,6 +1219,14 @@ why and rejected alternatives).
 | `vapi_transfer.py` | `--balance` first. Then `--apply` to move, `--mirror` to keep a spare in step, `--promote` to make that spare live |
 | `n8n_deploy.py`, `n8n_layout.py` | Workflow deploy and layout enforcement |
 
+**Send a plain non-browser User-Agent to every provider API, or set none.**
+Two providers now refuse Python's default: the Supabase Management API
+("Forbidden use of secret API key in browser") and Vapi, which answers 403
+`error code: 1010` — a Cloudflare browser-signature block, not an auth
+failure, and it reads exactly like a dead key. `User-Agent: curl/8.5.0`
+clears both. Before concluding a key is revoked, retry with that header; a
+wrongly reported dead key sends somebody rotating credentials that work.
+
 Long sweeps: run with `python -u` so progress is visible, and in the
 background. OXS rate limits are **60 requests/minute per key**, and a
 per-building payments call can return ~10,000 records — a full sweep is half
