@@ -30,7 +30,7 @@ import { serverClient } from '@/lib/supabase-server';
 // two hundred lines apart does not carry the branch through the sentence.
 
 const VAPI = 'https://api.vapi.ai';
-const DEBT_HE = '8f927b15-a02f-436d-a87d-acf23abecb9b'; // Homies — Debt Follow-up (he), account 6
+const DEBT_HE = '93c7f5e5-4024-49a3-9ab6-141f2b423649'; // Homies — Debt Follow-up (he), the August account
 
 // The office number and email are Homies' own, from docs/reference/homies-faq.txt;
 // the bank-transfer line is still the demo's until Homies confirms one. Overridable without a deploy.

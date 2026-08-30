@@ -1310,6 +1310,33 @@ alone under standing instruction, and open.
 
 ---
 
+## Moving Vapi accounts
+
+`docs/handover/new-vapi.md` is the procedure and `scripts/vapi_transfer.py` runs
+most of it. Two rules survive every move:
+
+**The script's file list is always one move behind the repo.** `ID_FILES` is a
+hand-maintained list, and a file that hardcodes an assistant id but is missing
+from it keeps pointing at the old account while the run reports success. The
+30 Aug move found three such files after the fact. So the last step is never the
+script: **grep the outgoing ids across the repo yourself**, and add whatever you
+find to `ID_FILES` before you forget. A wrong assistant id does not error — it
+starts a call with the wrong agent, on an account nobody is watching.
+
+**Environment variables in a hosting dashboard do not travel and this repo
+cannot see them.** Vercel holds its own `VAPI_PRIVATE_KEY` and
+`VAPI_DEBT_ASSISTANT_ID` for the dashboard's Call button; a move that changes
+`.env` and the code leaves both untouched. Worse, an env var *wins* over the
+constant beside it, so a stale hardcoded fallback stays invisible until the day
+somebody unsets the variable.
+
+**A copy is not a rebuild, and the difference is the point.**
+`vapi_transfer.py` reproduces what **is** live; `vapi_sync.py` pushes what the
+repo says should be live. Those differ whenever a prompt has been edited without
+a push — both Hebrew prompts were a few hundred chars behind on 30 Aug — and a
+migration is the wrong moment to discover it. Copy to move, sync deliberately
+afterwards, never as a side effect.
+
 ## The voice prompts
 
 `docs/features/10-debt-followup/prompt.md` and `docs/assistant/demo-inbound.md`

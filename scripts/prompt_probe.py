@@ -51,7 +51,7 @@ MODEL = "openai/gpt-4.1-mini"          # what both assistants run on Vapi
 
 TARGETS = {
     "inbound": {
-        "assistant": "12a4c01d-85ac-4955-a195-ed4c42b09927",
+        "assistant": "7752c6bb-89e9-49f3-aaf4-154ecc65cdff",
         "doc": "docs/assistant/demo-inbound.md",
         "extract": r"## System prompt\s*\n+````\s*\n(.*?)\n````",
         # A COPY of the '## First message' block in the doc above, and the only
@@ -62,7 +62,7 @@ TARGETS = {
         "vars": {},
     },
     "debt": {
-        "assistant": "8f927b15-a02f-436d-a87d-acf23abecb9b",
+        "assistant": "93c7f5e5-4024-49a3-9ab6-141f2b423649",
         "doc": "docs/features/10-debt-followup/prompt.md",
         "extract": r"\n## System prompt\s*\n(.*?)(?=\n## )",
         "first": None,

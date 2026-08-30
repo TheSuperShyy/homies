@@ -9,7 +9,8 @@ Read this once before starting. The rebuild is about twenty minutes. **Two steps
 fail if you have not done the work below first (step 0 and step 5), and one step
 fails silently (step 2).**
 
-Last verified against the live account on **7 Aug 2026**.
+Last verified against the live account on **30 Aug 2026** — see the 30 Aug
+section at the bottom, which is also where the current ids are.
 
 ## Before you start: two blockers
 
@@ -424,3 +425,71 @@ account 4 — and every assistant has its `server` headers.
 **Do not run `vapi_export.py` while `VAPI_PRIVATE_KEY` is overridden to account
 5** — it writes to the fixed path and would overwrite the record of the live
 account with the standby's.
+
+## 30 Aug: the August account, and three files the script had never looked at
+
+The client's keys were already in `.env` as `VAPI_AUGUST_API_PRIVATE_KEY` /
+`VAPI_AUGUST_API_PUBLIC_KEY`, so `--to` had a variable to name and no key ever
+reached a command line. `vapi_transfer.py` did steps 2, 3, 5 and 6 in one run:
+the Cartesia credential created from `CARTESIA_API_KEY`, all four assistants
+copied verbatim, 17 ids rewritten across 10 files.
+
+| | The outgoing account | The August account (current) |
+|---|---|---|
+| Debt (he) | `8f927b15` | `93c7f5e5-4024-49a3-9ab6-141f2b423649` |
+| Debt (en) | `cc8e43b4` | `72de8d5c-12c7-4e6c-a2db-27b16d41066a` |
+| Intake (he) | `12a4c01d` | `7752c6bb-89e9-49f3-aaf4-154ecc65cdff` |
+| Intake (en) | `9cae6bf7` | `713874a1-5e3c-4c47-b0e8-7e4e75c1e83b` |
+| Public key | `083a46ec` | `36afb64b…` (in `.env`, and in `web/index.html`) |
+| Cartesia credential | `6b3954f6` | `448aa856-75ef-4209-9f0c-b795be6529dc` |
+| Org | `4cedeed3` | `c9c2b782-6419-4d2f-ad74-cc72ba4ff65c` |
+| Phone number | none | none |
+
+The outgoing pair was already archived as `VAPI_PRIVATE_KEY_ACCOUNT6` /
+`VAPI_PUBLIC_KEY_ACCOUNT6` before the promotion, and the promotion script
+refuses to run if it is not — losing the old key loses the old account's call
+history, which is the only thing on it that cannot be rebuilt.
+
+**The public key was readable this time, and the manual step was not manual.**
+`GET /org` is still 401 to a private key — that has not changed — but the client
+supplied the public key alongside the private one, so it went into `.env` and
+into `web/index.html` from there. Nothing had to be copied out of the dashboard.
+
+**Three files hardcoded an id and were not in `ID_FILES`.** The script reported
+"17 in total" and was right about its own list; a grep for the outgoing ids
+afterwards found four more:
+
+| File | Why it mattered |
+|---|---|
+| `dashboard/lib/call.ts` | the **Call button's** debt agent — the only id on this list a user can fire by hand |
+| `scripts/prompt_probe.py` | both probe targets, so a probe would have scored the old account |
+| `.env.example` | `VAPI_DEBT_ASSISTANT_ID`, the template every future deploy copies |
+
+All four are fixed and all three files are now in `ID_FILES`, so the count is 21
+from here on. **The lesson is the grep, not the list**: run it after the script,
+against the ids you just left, every time. The list will always be one move
+behind the repo.
+
+`dashboard/lib/call.ts` is worse than the others because `VAPI_DEBT_ASSISTANT_ID`
+on Vercel wins over the constant, so a stale constant is invisible until the day
+somebody unsets the variable — and then the button silently calls an assistant on
+an account nobody is watching. **Vercel's own `VAPI_PRIVATE_KEY` and
+`VAPI_DEBT_ASSISTANT_ID` are not in this repo and do not travel.** Update them in
+the Vercel dashboard or the Call button keeps billing the old account.
+
+Verified after, against the promoted key: four assistants with the right names,
+prompts byte-identical to the outgoing account at 53,635 / 35,622 / 63,217 /
+43,103 chars, tool counts 7 / 6 / 7 / 6, `cartesia a976c076…` on both Hebrew
+assistants (not Elliot), and every assistant's `server` block carrying its
+`x-homies-secret` with the live value. `vapi_sync.py` resolved both Hebrew ids by
+name without being told them, which is the other half of proving the key swap.
+
+**Not verified: nobody has placed a call.** Blocker 1 still has no symptom but
+the sound of it.
+
+**Both Hebrew prompts are behind the repo, and were before the move.** The dry
+runs read 54,119 chars against 53,635 live on debt, and 36,668 against 35,622 on
+intake. That is drift the copy carried over faithfully — a copy reproduces what
+*is* live, not what the repo says should be. Re-pushing is `vapi_sync.py debt
+--apply` and `inbound --apply`, and it is a decision about the prompt, not a step
+in the move, so it was left for whoever owns the prompt to make.

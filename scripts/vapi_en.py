@@ -1043,7 +1043,7 @@ be resolved. Anything else?* Both sentences were true."""),
 
 TWINS = {
     "debt": {
-        "source": "8f927b15-a02f-436d-a87d-acf23abecb9b",   # Debt Follow-up (he)
+        "source": "93c7f5e5-4024-49a3-9ab6-141f2b423649",   # Debt Follow-up (he)
         "name": "Homies — Debt Follow-up (en)",
         "stack": DEBT_STACK,
         "lines": DEBT_LINES,
@@ -1055,7 +1055,7 @@ TWINS = {
         ),
     },
     "intake": {
-        "source": "12a4c01d-85ac-4955-a195-ed4c42b09927",   # Inbound Intake (he)
+        "source": "7752c6bb-89e9-49f3-aaf4-154ecc65cdff",   # Inbound Intake (he)
         "name": "Homies — Inbound Intake (en)",
         "stack": INTAKE_STACK,
         "lines": INTAKE_LINES,

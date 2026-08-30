@@ -36,7 +36,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-MICHAL_ASSISTANT = "8f927b15-a02f-436d-a87d-acf23abecb9b"
+MICHAL_ASSISTANT = "93c7f5e5-4024-49a3-9ab6-141f2b423649"
 # Empty since the 5 Aug account migration — a number does not come across with a
 # rebuild, and the new account has none. The resident's own line below is created
 # by this script when missing, so only Michal's side needs filling in by hand.

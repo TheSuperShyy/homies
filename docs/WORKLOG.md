@@ -9,6 +9,83 @@ conversation that produced it.
 
 ---
 
+## 2026-08-30
+
+### Vapi moved to the August account, and the id list was one move behind the repo
+
+- The client's August keys were already in `.env` as
+  `VAPI_AUGUST_API_PRIVATE_KEY` / `VAPI_AUGUST_API_PUBLIC_KEY`, so
+  `vapi_transfer.py --to VAPI_AUGUST_API_PRIVATE_KEY --apply` had a variable to
+  name and no key touched a command line. It created the Cartesia credential,
+  copied all four assistants verbatim and rewrote 17 ids across 10 files. New
+  ids, the org, and the full account of the move are in
+  `docs/handover/new-vapi.md` under **30 Aug**.
+- The outgoing export was archived to `vapi-export-account6-30aug.json`
+  **before** anything was created, and `vapi-export.json` re-run afterwards so
+  it describes the account that is actually live. Both `--check` clean.
+- `.env` promoted: the outgoing pair was already archived as `_ACCOUNT6`, and
+  the promotion script refuses to run unless it is — losing the old private key
+  loses that account's call history, which is the one thing on it that cannot
+  be rebuilt. Backup at `.env.bak-promote`.
+- **The public key did not need the dashboard this time.** `GET /org` is still
+  401 to a private key, but the client supplied the public key with the private
+  one, so `web/index.html` took it from `.env`. `BUILD` bumped to `2026-08-30a`
+  in the same edit, which is the only way to tell from a browser whether the
+  page in front of you is the one you just changed.
+- **Three files hardcoded an id and were not in `ID_FILES`.** The script
+  reported 17 and was right about its own list; a grep for the outgoing ids
+  afterwards found four more: `dashboard/lib/call.ts` (the Call button's debt
+  agent), `scripts/prompt_probe.py` (both probe targets), and `.env.example`.
+  All fixed, all three added to `ID_FILES`, so the count is 21 from here on.
+  The one that mattered is the dashboard: `VAPI_DEBT_ASSISTANT_ID` on Vercel
+  wins over the constant, so a stale constant there is invisible until the day
+  somebody unsets the variable.
+- Verified against the promoted key: four assistants with the right names,
+  prompts byte-identical to the outgoing account at 53,635 / 35,622 / 63,217 /
+  43,103 chars, tools 7 / 6 / 7 / 6, `cartesia a976c076…` on both Hebrew
+  assistants rather than Elliot, and every assistant's `server` block still
+  carrying `x-homies-secret` with the live value. `vapi_sync.py` resolved both
+  Hebrew ids by name without being told them, which is the other half of
+  proving the key swap.
+- **Left for the client, and said rather than done:** Vercel's own
+  `VAPI_PRIVATE_KEY` and `VAPI_DEBT_ASSISTANT_ID` are not in this repo and do
+  not travel; `web/` is its own repository and was not pushed; and nobody has
+  placed a call on the new account, so the Hebrew voice is verified by its id
+  and not by ear.
+- **Both Hebrew prompts are behind the repo, and were before the move** — the
+  dry runs read 54,119 against 53,635 live on debt and 36,668 against 35,622 on
+  intake. A copy reproduces what *is* live, not what the repo says should be.
+  Re-pushing is a decision about the prompt, not a step in the move, so it was
+  left alone.
+
+### Ten inbound voice scenarios, run against the live assistant
+
+- Built a harness that loads the live inbound assistant's own prompt, model,
+  temperature and tools from Vapi, plays an adaptive Hebrew caller against it,
+  and executes every tool call for real against the production webhook.
+  Transcripts in the session scratchpad; ten scenarios, from a flat leak to a
+  gas emergency to a caller who only wants a human.
+- **The gas emergency never wrote a ticket.** The prompt says write, then
+  transfer; the model transferred and did not write. The row that exists at all
+  exists because the Edge Function has an emergency backstop, so it landed as
+  `needs_review` with no type. The agent also answered the gas report with only
+  its closing sentence, four times over.
+- **It addressed a self-declared male caller in the feminine, twice** —
+  `אֵלַיִךְ`, which is the pointed form the prompt's own worked example uses. A
+  fixed example in a prompt is a phrase the model will say back, gender and all.
+- **It opened a real ticket for an address Homies does not manage.** Voice files
+  as-said by design where WhatsApp refuses; that difference is now on the record
+  rather than in one person's head.
+- **A transfer leaves a note, not a ticket.** The angry caller's complaint
+  produced a `call_outcomes` row and nothing on any dashboard.
+- Ten judges over the transcripts produced 79 findings; an adversarial pass
+  refuted 46 and let 31 stand, which is roughly the two-thirds rejection rate
+  this harness has shown before. One of my own suspicions was among the
+  refuted: the "there are a lot of requests right now" line is not an
+  invention, it is scripted in the prompt.
+
+---
+
 ## 2026-08-28
 
 ### The local dashboard was brought up for the redesign, and one config change was left uncommitted

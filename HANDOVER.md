@@ -470,13 +470,27 @@ find. **Account 4 is now the live one.** Its four assistants had been mirrored a
 hour earlier and were byte-identical, so nothing was copied: 19 ids across 11
 files plus the public key were repointed, and `.env` swapped.
 
-| | now live | retired |
+**Superseded 30 Aug — the August account is live.** The table below is kept
+because the ids in its *retired* column are what you grep for when something
+still misbehaves. Current ids, and the full account of the move, are in
+`docs/handover/new-vapi.md` under **30 Aug**.
+
+| | now live (30 Aug) | retired |
 |---|---|---|
-| Keys | `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` (account 6, live 19 Aug pm) | `VAPI_*_KEY_ACCOUNT7` (the old account 4), `_ACCOUNT5` |
-| Debt (he) | `8f927b15-a02f-436d-a87d-acf23abecb9b` | `9e2034d1-…`, `489aa39c-…` |
-| Debt (en) | `cc8e43b4-be81-46c4-9772-893ee2a0c98a` | `41d370b2-…`, `3b0e384d-…` |
-| Intake (he) | `12a4c01d-85ac-4955-a195-ed4c42b09927` | `f482abc1-…`, `7813da25-…` |
-| Intake (en) | `9cae6bf7-0ac6-45eb-ad66-dcca018cb710` | `8b98016b-…`, `9ed5e788-…` |
+| Keys | `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` (the August account, live 30 Aug) | `VAPI_*_KEY_ACCOUNT6` (live 19–30 Aug), `_ACCOUNT7` (the old account 4), `_ACCOUNT5` |
+| Debt (he) | `93c7f5e5-4024-49a3-9ab6-141f2b423649` | `8f927b15-…`, `9e2034d1-…`, `489aa39c-…` |
+| Debt (en) | `72de8d5c-12c7-4e6c-a2db-27b16d41066a` | `cc8e43b4-…`, `41d370b2-…`, `3b0e384d-…` |
+| Intake (he) | `7752c6bb-89e9-49f3-aaf4-154ecc65cdff` | `12a4c01d-…`, `f482abc1-…`, `7813da25-…` |
+| Intake (en) | `713874a1-5e3c-4c47-b0e8-7e4e75c1e83b` | `9cae6bf7-…`, `8b98016b-…`, `9ed5e788-…` |
+| Cartesia credential | `448aa856-75ef-4209-9f0c-b795be6529dc` | `6b3954f6-…`, `52e0bca2-…` |
+| Org | `c9c2b782-6419-4d2f-ad74-cc72ba4ff65c` | `4cedeed3-…` |
+
+**Two things on the August account are still open and are not this repo's to
+close.** Vercel holds its own `VAPI_PRIVATE_KEY` and `VAPI_DEBT_ASSISTANT_ID`
+for the dashboard's Call button — until those are changed in the Vercel
+dashboard, the button bills the old account. And nobody has placed a call on the
+August account in either language, so the Cartesia voice is verified by its id
+and not yet by ear.
 
 Account 5's balance is **unknown**, and the earlier claim here that it was back
 in credit was wrong. `VAPI_PUBLIC_KEY_ACCOUNT5` in `.env` does not hold account

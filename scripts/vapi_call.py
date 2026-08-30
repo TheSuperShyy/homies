@@ -26,7 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
 
-ASSISTANT_ID = "8f927b15-a02f-436d-a87d-acf23abecb9b"   # Homies — Debt Follow-up (he)
+ASSISTANT_ID = "93c7f5e5-4024-49a3-9ab6-141f2b423649"   # Homies — Debt Follow-up (he)
 # Empty since the 5 Aug account migration. A phone number does not come across
 # with a rebuild — the free US number (+16576083115) stayed on the old account,
 # and the new one has none. Buy or import one, then put its id here.

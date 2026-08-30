@@ -98,6 +98,12 @@ ID_FILES = [
     "scripts/vapi_duel.py",
     "scripts/vapi_eval.py",
     "scripts/vapi_mock.py",
+    "scripts/prompt_probe.py",
+    # The dashboard's Call button. It is the only id here that a *user* can fire
+    # by hand, and it was missed by the 30 Aug move: the env var wins on Vercel,
+    # so a stale constant here is invisible until the day the var is unset.
+    "dashboard/lib/call.ts",
+    ".env.example",
     "docs/assistant/debt-followup.md",
     "docs/assistant/demo-inbound.md",
     "docs/assistant/inbound-test-script.md",

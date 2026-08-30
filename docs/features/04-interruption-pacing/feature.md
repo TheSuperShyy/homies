@@ -39,7 +39,7 @@ a promise — Hebrew STT carries a real tax.
 None. This feature is Vapi assistant configuration plus prompt work; it exposes
 no tool.
 
-Assistant `12a4c01d-85ac-4955-a195-ed4c42b09927`, Azure `he-IL` STT, voice
+Assistant `7752c6bb-89e9-49f3-aaf4-154ecc65cdff`, Azure `he-IL` STT, voice
 `he-IL-HilaNeural`. Live as of 3 Aug 2026; config and the reasoning behind each
 turn-taking number are in [demo-inbound.md](../../assistant/demo-inbound.md).
 
