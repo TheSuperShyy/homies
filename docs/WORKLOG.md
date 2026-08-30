@@ -36,6 +36,50 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The agent read numbers one digit at a time, and the prompt was telling it to
+
+- **Reported as a bug: "it says 1 2 3 4 5 6, very slowly and bugging".** It is
+  not a Vapi fault and it is not the model drifting — both prompts instruct it.
+  `demo-inbound.md`: *מספר פנייה, מספר טלפון או מספר דירה הם ספרות,
+  אחת-אחת, עם פסיק בין כל אחת*, with the worked example
+  `מספר הקריאה שלך: 1, 0, 0, 1.` The debt prompt is worse — a comma after
+  every digit **and** a full stop between the groups:
+  *אחת, שתיים, שלוש, ארבע. חמש, שש, שבע, שמונה*.
+- **Punctuation is not notation, it is performed.** The voice pauses at every
+  comma and drops to a falling ending at every full stop, so eight digits
+  written that way are eight separate utterances. `voice_guard.py` has carried
+  the same lesson since 4 Aug for prose — a call came back as
+  *"לפי מה שרשום אצלנו הוא עדיין לא הוסדר. שקלים. מצויין."* — and nobody
+  applied it to the digit rules, which were written to make a reference
+  catchable and never re-read as a prosody instruction.
+- **Fixed in the prompts, all four.** Digits now run together: no punctuation
+  inside a group, one comma between groups, never a full stop. `1, 0, 0, 1`
+  became `אחת אפס אפס אחת` and the colon before it went too, being another
+  boundary. Account `12345678` is now *אחת שתיים שלוש ארבע, חמש שש שבע שמונה*.
+  Each prompt also says *why*, so the next editor does not put the commas back
+  to make it clearer.
+- **One outright defect went with it: the apartment number.** The intake prompt
+  listed מספר דירה among the things read digit by digit, so flat 12 was
+  *אחת, שתיים*. It is a quantity, not an identifier: דירה שתים עשרה.
+- **What was NOT changed, and this is the interesting half.**
+  `formatPlan.numberToDigitsCutoff` is unset on all four assistants, so they run
+  Vapi's default of 2025 — and Vapi's own schema says a number above the cutoff
+  is converted to individual digits before the voice sees it. Raising it is the
+  obvious move and it was rejected: the conversion to words is **English**, and
+  "twelve hundred" inside a Hebrew sentence is worse than `1 2 0 0`, which
+  Cartesia at least reads with Hebrew digit names. The low cutoff is the safer
+  failure here. Written into `voice_guard.py` beside the field so the next
+  person does not spend the afternoon finding it.
+- **Evidence came from real calls, not from reading.** Today's 09:11 and 09:16
+  calls have the agent reading the office number as `077. 6 8 7, 7,` followed by
+  a run of thirteen 7s. Note for whoever reads those next: Vapi's `messages[]`
+  for `role: bot` is speech-to-text of our own agent, not the model's text — it
+  normalises Hebrew number words back into numerals, so it cannot settle how
+  something was written, only how it came out.
+- **Verified:** guard self-check 0 safe-sentence failures, both extractors fine
+  (35,915 and 53,966 chars), both English twins pass parity, everything
+  compiles. **Not applied** — the live assistants still read digits apart.
+
 ### Both voice agents introduce themselves the client's way now
 
 - **The line he gave: `שלום מדברת מיכאל מהצוות של הומיז`, and it is written

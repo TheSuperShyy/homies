@@ -203,7 +203,7 @@ SAFE_SENTENCES = [
      "תודה שהתקשרת לחברת הומיז, יום טוב, ולהתראות."),
     "אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
     "אפשר לפנות למשרד ב־077-6687949.",
-    "מספר הקריאה שלך: 1, 0, 0, 1.",
+    "מספר הקריאה שלך אחת אפס אפס אחת.",
 ]
 
 # The 5 Aug shape: a note parameter announced by its own field name. "Please
@@ -315,6 +315,25 @@ def replacements():
     # Tail padding last — see PAD_RULES above. After this point nothing may run.
     out += PAD_RULES
     return out
+
+
+# NOT SET, AND THAT IS THE DECISION: formatPlan.numberToDigitsCutoff.
+#
+# Vapi's default is 2025, and its own schema spells out what that means: a
+# number ABOVE the cutoff is converted to individual digits before the voice
+# sees it, so "12345" is sent as "1 2 3 4 5" while "1200" is sent as words.
+# Every assistant here has left it unset, so every assistant is running 2025.
+#
+# The obvious move on 30 Aug, chasing "it reads numbers one by one", was to
+# raise it. It was not made, for a reason worth keeping: the conversion to
+# WORDS is English. In a Hebrew sentence "twelve hundred" is worse than
+# "1 2 0 0", which Cartesia at least reads with Hebrew digit names. So the low
+# cutoff is the safer failure for a Hebrew agent, and the real fix is that the
+# model should never hand the formatter a bare numeral in the first place —
+# amounts are written as Hebrew words by the prompt, and identifiers as Hebrew
+# digit words. Both prompts say so.
+#
+# Raise it only with a recorded Hebrew call as evidence, never on reasoning.
 
 
 def voice_with_guard(voice, chunk=None):

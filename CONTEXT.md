@@ -530,6 +530,22 @@ the sentence quoted in the prompt's own status section. Push those by patching
 the live nodes in place; `--apply` overwrites a workflow that is ahead of the
 repo script.
 
+**Punctuation in a voice prompt is performed, not read.** Every comma is a
+pause the voice takes and every full stop is a falling ending, so what looks
+like a formatting choice in the text is a timing instruction in the audio. This
+has now bitten twice: prose in Aug (a sentence synthesised in pieces, each with
+its own ending) and digits on 30 Aug (`1, 0, 0, 1` heard as four separate
+words with gaps, reported as "very slowly and bugging"). **Write the punctuation
+you want to hear.** Digits run together inside a group, one comma between
+groups, never a full stop inside a number. A rule that says "say it clearly"
+and a rule that says "put a comma after each digit" are not the same rule, and
+the second one is the only one the voice can obey.
+
+**A number that is a quantity is a word; a number that is an identifier is
+digits.** Apartment 12 is דירה שתים עשרה and 450 is ארבע מאות וחמישים
+שקלים; a reference or a phone number is digits. The intake prompt had the
+apartment on the wrong side of that line until 30 Aug.
+
 **The same is true of the voice agents' opening, in five places, and only
 grep keeps them together.** The spoken first line is a fixed string Vapi plays
 before the model is invoked, so no prompt rule reaches it. Changing it on 30 Aug

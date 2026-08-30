@@ -278,6 +278,19 @@ say anyone is being put through.
 
 ---
 
+**Numbers are read one digit at a time on the live agents, and the fix is in
+the repo but not applied.** Reported 30 Aug as "1 2 3 4 5 6, very slowly and
+bugging". Both prompts told it to — a comma after every digit, which the voice
+performs as a pause. Rewritten so digits run together in groups; the apartment
+number, which was being spelled out as אחת שתיים, is a word again. Goes live
+with the same two `--apply` commands below.
+
+**Do not "fix" this by raising `formatPlan.numberToDigitsCutoff`.** It is unset
+on all four assistants, so they run Vapi's default of 2025, and yes that means
+Vapi splits any bare number above 2025 into digits itself. Raising it makes
+Vapi speak the number as **English words** inside a Hebrew sentence, which is
+worse. The reasoning is written beside the field in `scripts/voice_guard.py`.
+
 **The repo is one line ahead of live Vapi, and nothing has been applied.**
 All four assistants introduce themselves the client's way as of 30 Aug —
 Hebrew `שלום, מדבר מיכאל מהצוות של הומיז`, English "this is Michael from
