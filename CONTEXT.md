@@ -1372,6 +1372,29 @@ whatever wrapper the sender's phone chose.
 Once a recording is in a repo's history, removing it is a rewrite rather than a
 delete. That asymmetry is the whole reason these rules are strict.
 
+## A measurement you wrote yourself is a hypothesis, not evidence
+
+Chasing the clone's intonation, I wrote a pitch tracker and it reported a p10-p90
+spread of 177 Hz around a 126 Hz median, which would mean Ido swings across an
+octave and a half while speaking. That is a striking number and it was my bug.
+The upper hump sat against the tracker's own 320 Hz ceiling, which is what a
+railing autocorrelation looks like, and the test that settled it was contiguity:
+a person who raises their voice does it for a whole word, so real high pitch
+arrives in runs of 20+ frames. **99% of mine were 1 to 19 frame flickers** —
+octave errors, not speech.
+
+The rule: before believing a number your own code produced, find the check that
+would expose it as an artefact and run that. A histogram that looks bimodal, a
+distribution pressed against a search boundary, an effect that appears in every
+sample equally — each has a cheap test. Skipping it turns a bug into a finding
+and sends the next hour somewhere useless.
+
+**And know when measurement is spent.** Three theories for that intonation fault,
+three refuted, and the client heard the problem in seconds each time. Duration
+tells you a clip came out short, never that a word was clipped or that a
+contour is unsettling. When the instrument cannot see the fault, stop building
+instruments and ship the comparison to the person who can hear it.
+
 ## Cut a cloning clip on pauses, never on round numbers
 
 The first clone of Ido truncated words, and the client heard it immediately. The

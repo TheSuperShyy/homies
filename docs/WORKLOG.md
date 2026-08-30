@@ -212,6 +212,35 @@ builds with six tools attached.
 heard either this or the office-number fix.
 
 
+### The intonation is still wrong, three theories died, and one of them was my own bug
+
+- Client rejected v2 as well: "sudden high tone and low tone, unsettling". Not
+  truncation this time, contour.
+- **Theory one, the join.** v2 was two stretches from different points in the
+  recording, so I expected two registers. Measured their median pitch: 130.1 Hz
+  and 127.0 Hz, 3.1 Hz apart. Refuted.
+- **Theory two, an expressive source.** My tracker put the p10-p90 spread at
+  177 Hz around a 126 Hz median, which would mean he swings an octave and a half
+  while talking. **That was my own bug.** The upper hump sat against the
+  tracker's 320 Hz ceiling, which is what a railing autocorrelation looks like.
+  The contiguity test settled it: real raised speech comes in runs of 20+ frames,
+  and 99% of mine were 1 to 19 frame flickers. Octave errors, not a voice.
+- **Theory three, from earlier today, was that short lines inflate.** Also wrong.
+  Three for three, and the client heard the fault in seconds every time.
+- **The lever nobody had pulled: the model.** Probed six Cartesia model ids and
+  **only two speak Hebrew at all, `sonic-3` and `sonic-preview`.** Everything to
+  date has been sonic-3, which is the default in `.env` and in `cartesia_tts.py`.
+  sonic-3 rushes: the ticket line comes out 3.94s against Eyal's 5.67s, where
+  sonic-preview gives 5.49s. Prosody belongs to the model, so this was worth more
+  than another clip.
+- Rebuilt `voice/ido-vs-eyal.html` as four columns: Eyal, Ido on sonic-3, Ido on
+  sonic-preview, Ido on sonic-3 at slow speed.
+- **Stopped building instruments.** Duration says a clip is short; it cannot say
+  a word was clipped or a contour is unsettling. If none of the four pass, the
+  input is the problem rather than the settings: instant cloning takes ten
+  seconds, professional cloning wants thirty minutes, and `ido-voice.mp4` is
+  three minutes forty.
+
 ### The first clone truncated words, and the clip was the reason
 
 - Client listened and rejected v1: words cut off, not finishing. Correct, and

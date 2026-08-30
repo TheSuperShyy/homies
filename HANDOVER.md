@@ -2132,10 +2132,21 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   and so began and ended mid-word, and an instant clone reproduces its clip's
   edges. New clips must start and end inside a pause. See CONTEXT, "Cut a
   cloning clip on pauses, never on round numbers".
-- **Listen before wiring anything in: `voice/ido-vs-eyal.html`**, three columns
-  per line, Eyal against v1 against v2. Against Eyal, v1 averaged 0.93x and v2
-  averages 1.09x, and the ticket-number line went 0.87x to exactly 1.00x. **The
-  greeting is still 0.71x on v2**, which is where to listen hardest.
+- **The clone's intonation is still rejected, and the model is the live lead.**
+  The client called it "sudden high tone and low tone, unsettling", on both v1
+  and v2. **Only two Cartesia models speak Hebrew: `sonic-3` and
+  `sonic-preview`**, and everything before 30 Aug used sonic-3, which is also
+  `CARTESIA_MODEL` in `.env` and `MODEL` in `scripts/cartesia_tts.py`.
+  sonic-3 rushes: the ticket line renders 3.94s against Eyal's 5.67s, where
+  sonic-preview gives 5.49s. Prosody is a model property, so try preview before
+  cutting any more clips.
+- **Listen: `voice/ido-vs-eyal.html`**, four columns, Eyal / Ido on sonic-3 /
+  Ido on sonic-preview / Ido on sonic-3 at slow speed.
+- **If none of them pass, the honest read is that the source is too short.**
+  Instant cloning takes 10 seconds and that is what we have used. Professional
+  cloning wants 30 minutes; `ido-voice.mp4` is 3m40. Getting more audio from Ido
+  is the only route that changes the input rather than the settings, and Eyal
+  remains wired in and working meanwhile.
 - Earlier note here said Eyal's timing is flat. It is not: the same greeting
   measured 4.49s and 5.51s on two runs. Stock voices vary too.
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.
