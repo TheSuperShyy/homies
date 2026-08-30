@@ -43,6 +43,14 @@ portfolio and say nothing about buildings. Ornament either says whose product
 this is or it says nothing, so it gets replaced rather than inherited. Nothing
 else in the system does.
 
+**When the same one-off rule has been written five times, the sixth case is
+already broken.** Five components each carried their own `svg { width: … }`
+because an SVG with a viewBox and no width renders at 300x150; the bare `button`
+element had no such rule, so the one button in the app without a component class
+rendered a 300px magnifier from the day it was written. A repeated workaround is
+a missing default, and the cost of not noticing is paid by whatever comes next
+and does not have a class. Put it on the element.
+
 **A small screen sometimes needs a different component, not the same one
 rearranged.** The sidebar was made responsive the usual way — same markup, a
 media query, a column becomes a row — and it passed every check I ran: it fit,

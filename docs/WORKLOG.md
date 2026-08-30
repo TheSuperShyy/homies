@@ -36,6 +36,30 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The call search button was a 300px magnifier, and the reason was a missing default
+
+- **Reported from the desk: the search button on /calls was enormous and had no
+  label.** An `<svg>` with a viewBox and no width or height does not size itself
+  from that viewBox — it falls back to the replaced-element default of 300x150
+  and takes its container with it. The icon was 300 points wide inside a pill,
+  which pushed the word "Search" out of the button entirely.
+- **The interesting part is why only that one button.** Five components carry
+  icons and every one of them had its own rule for this — `.navlist a svg`,
+  `.btn-sm svg`, `.choice button svg`, `button.danger svg`, `.langswitch svg` —
+  and the bare `button` element had none. So the single button in the app with
+  an icon and no class of its own was the only thing that could break, and it
+  did, from the day it was written.
+- **Fixed on the element, not on the instance.** `button svg { width: 15px;
+  height: 15px; flex: none }` plus `display: inline-flex; gap: 8px` on the base
+  button, which is what the five class rules were each re-deriving. They still
+  win on specificity where they want a different size.
+- Same failure mode as `.heromotif` on 30 Aug, which is the second time this
+  exact default has cost an afternoon.
+- Verified by rendering every button variant in the app on one page — search,
+  plain, `.btn-sm`, choice pills, `.go`, `.danger`, the status editor, the
+  full-width primary and the sidebar footer — so the base rule was judged
+  against all of them and not only the broken one. Build clean.
+
 ### The phone gets a real navigation bar, because the folded sidebar was not one
 
 - **The owner sent a photograph of their phone: the top bar read "Tickets,

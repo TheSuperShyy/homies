@@ -1180,6 +1180,9 @@ handset.**
   so.** Below 720px the tables become stacked cards and that attribute is the
   only thing naming each line. Set it from the same `t('col.x')` call as the
   matching `<th>`; a new column without one renders as a value with no label.
+- **`button svg` has a 15px default now.** An SVG with a viewBox and no width
+  is 300x150, not viewBox-sized. Do not add another per-component rule for it
+  unless that component genuinely wants a different size.
 - **The phone has two bars and no sidebar.** `.mtop` (brand + Import + Settings)
   at the top, `.tabbar` (Overview, Tickets, Debts, Chats, Calls) fixed at the
   bottom; `.rail` is `display: none` below 1024px. Do not fold the sidebar back

@@ -804,6 +804,10 @@ td .mono, td.mono, .row .mono { white-space: nowrap; }
 
 /* Button, secondary variant at md: height 38, padding 0 20, pill, 13px. */
 button {
+  /* Laid out as icon-then-label rather than left to the default inline flow.
+     Most buttons here are text only and do not care; the ones that are not
+     were each solving this again in their own rule. */
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   height: var(--control-md); padding-inline: 20px;
   font-size: var(--text-md); font-weight: var(--weight-medium);
   border-radius: var(--radius-pill); cursor: pointer;
@@ -811,6 +815,17 @@ button {
   font-family: inherit;
   transition: background var(--transition-fast);
 }
+/* AND A SIZE FOR THE ICON, which is the whole reason this is here.
+   An `<svg>` with a viewBox and no width or height does NOT size itself from
+   that viewBox — it falls back to the replaced-element default of 300x150 and
+   takes the button with it. Every component that carries an icon had its own
+   rule for this (`.navlist a svg`, `.btn-sm svg`, `.choice button svg`,
+   `button.danger svg`) and a PLAIN button had none, so the one bare button in
+   the app with an icon in it — the call search — rendered as a giant magnifier
+   that pushed its own label out of the way. This is the default those other
+   rules were all working around; they still win on specificity where they want
+   a different size. Same failure mode as the hero motif in `.heromotif`. */
+button svg { width: 15px; height: 15px; flex: none; }
 button:hover { background: var(--surface-3); }
 /* Button, primary variant. */
 button.primary {
