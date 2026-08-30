@@ -36,6 +36,62 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The nine local commits went live, and the dead bell was replaced by a real settings page
+
+- **Pushed.** `c529877..f955ca1` — nine commits, 47 files. The push had been
+  refused twice by the permission classifier before the owner confirmed it; the
+  pre-push scan (credentials, resident phone numbers, `.env`, build output) came
+  back clean both times and was not re-run for the third attempt because nothing
+  had changed in between. Vercel is git-linked, so the deploy followed on its
+  own — the dead `VERCEL_TOKEN` never enters into it.
+
+- **The notification bell is gone rather than dimmed.** It was drawn disabled
+  and labelled "soon", which was honest when the shell was new and is furniture
+  now: nothing in this app raises a notification, there is no store to hold one,
+  and a control that is permanently off teaches the reader to stop looking at
+  that corner. `IconBell` and the `chrome.notifications` string went with it.
+  The day something has to be announced, it comes back.
+
+- **The gear beside it became a real destination, `/settings`.** Also reachable
+  from the sidebar's System group and by clicking your own name in the topbar —
+  the corner is where half of all readers look for their account before they
+  find a gear.
+
+- **What the page actually does**, all of it real, none of it a placeholder:
+  the signed-in account with its email, last sign-in and opening date; a
+  password change; the theme and language choices; sign out.
+
+- **The password change verifies the current password first, which Supabase
+  does not require.** `updateUser({ password })` rewrites the password of
+  whoever holds the session cookie, so an unlocked laptop on an office desk is
+  enough to lock the owner out of their own dashboard. One extra
+  `signInWithPassword` closes that. A 400 from it is reported as "wrong
+  password"; anything else — a 429 from the rate limiter, a 5xx — is reported
+  as a failure, because telling someone their correct password is wrong sends
+  them round in circles.
+
+- **No client JavaScript on the page: 167 B.** Every control is a form posting
+  to a server action that writes and redirects back, and the outcome comes back
+  in the query string — the same shape the language switch already used, and
+  the convention this dashboard follows everywhere else.
+
+- **What is deliberately absent, and said out loud on the page:** no display
+  name, no avatar upload, no notification preferences, no team management, no
+  roles. There is no profile table, no notification store, and one policy —
+  `staff_read` — that grants every signed-in account the same read of every
+  table. A settings page whose switches do nothing is worse than a short one.
+
+- **Two layout bugs found by rendering it rather than by reading it.** The
+  success banner ran to the full 1400px page width while every panel under it
+  stopped at 640, which read as two pages stacked; the cap moved from the panels
+  to the page. And the sign-out arrow points out of a door, so it meant its own
+  opposite in Hebrew — `.flipx`, the same treatment the pager arrows already
+  had, applied here and in the sidebar where it had been wrong all along.
+  Checked in both themes and both directions against the real built stylesheet.
+
+- `tsc` clean, build clean, contrast check 0 failing. Built with
+  `NEXT_DIST_DIR=.next-verify` so the owner's dev server kept its own `.next`.
+
 ### The Stovest design system is vendored, the shell is rebuilt on it, and the dashboard now shows a skeleton instead of a frozen window
 
 - **Confirmed the WhatsApp bot changes are live in n8n before touching anything

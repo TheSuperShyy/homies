@@ -344,7 +344,13 @@ a { color: inherit; text-decoration: none; }
   display: inline-flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: var(--weight-semibold); text-transform: uppercase;
 }
-.who-block { display: flex; align-items: center; gap: 10px; padding-inline-start: 6px; }
+.who-block {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 10px 4px 6px; border-radius: var(--radius-pill);
+  transition: background var(--transition-fast);
+}
+[dir="rtl"] .who-block { padding: 4px 6px 4px 10px; }
+.who-block:hover { background: var(--surface-3); }
 .who-block b { display: block; font-size: var(--text-sm); font-weight: var(--weight-medium); line-height: 1.3; }
 .who-block small { display: block; font-size: var(--text-xs); color: var(--text-3); }
 
@@ -1077,3 +1083,89 @@ form.auth input {
   color: var(--st-review); font-size: var(--text-md); margin-block-end: 12px;
   background: var(--st-review-bg); padding: 10px 14px; border-radius: var(--radius-md);
 }
+
+/* ------------------------------------------------------------- settings -- */
+/* Label on one side, value or control on the other, hairline between. The whole
+   page is one column capped at reading width rather than the 1400px the tables
+   use — a settings row 1300px wide puts a metre of nothing between the word
+   "Theme" and the button that changes it. The cap is on the PAGE and not on the
+   panels: put it on the panels alone and the success banner above them runs to
+   the full width while everything it refers to stops at 640, which reads as two
+   pages stacked. */
+.setpage { max-width: 640px; }
+.setcol { display: grid; gap: 4px; }
+
+.setrow {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 14px 20px;
+  border-block-start: 1px solid var(--border-1);
+  font-size: var(--text-md);
+}
+.setrow:first-child { border-block-start: 0; }
+.setrow .lbl { color: var(--text-2); }
+.setrow .val { color: var(--text-1); text-align: end; overflow-wrap: anywhere; }
+/* The email is the one value long enough to need the whole row on a phone. */
+@media (max-width: 520px) {
+  .setrow { flex-direction: column; align-items: stretch; gap: 8px; }
+  .setrow .val { text-align: start; }
+}
+
+/* The identity block at the top of the account panel: the topbar's avatar, one
+   size up, on the panel's own ground. */
+.setwho {
+  display: flex; align-items: center; gap: 12px; padding: 18px 20px;
+}
+.setwho .avatar { width: 44px; height: 44px; font-size: 15px; }
+.setwho b { display: block; font-size: var(--text-base); font-weight: var(--weight-semibold); }
+.setwho small { display: block; font-size: var(--text-xs); color: var(--text-3); margin-block-start: 2px; }
+
+/* A closing sentence inside the panel, under the hairline — for the things that
+   are true about the whole section rather than about one row. */
+.setnote {
+  margin: 0; padding: 14px 20px;
+  border-block-start: 1px solid var(--border-1);
+  font-size: var(--text-sm); color: var(--text-3); line-height: 1.55;
+}
+
+/* Two or three pill buttons where only one is on. `aria-pressed` carries both
+   the state and the styling, so there is no second class to keep in step with
+   it — and a screen reader is told which one is current without being told
+   twice. */
+.choice { display: flex; gap: 8px; flex-wrap: wrap; }
+.choice button {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: var(--control-sm); padding-inline: 16px; font-size: var(--text-sm);
+}
+.choice button svg { width: 14px; height: 14px; }
+.choice button[aria-pressed="true"] {
+  background: var(--accent-fill); border-color: var(--accent-fill); color: var(--accent-fg);
+}
+.choice button[aria-pressed="true"]:hover { background: var(--accent-hover); }
+
+/* The password form. Same field geometry as the login card, which is the only
+   other place on this dashboard anybody types a password. */
+.setform { padding: 20px; display: grid; gap: 0; max-width: 340px; }
+.setform label {
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--text-2); margin-block-end: 6px;
+}
+.setform input {
+  height: var(--control-lg); padding-inline: 16px; margin-block-end: 14px;
+  /* 16px, not the system's 13: iOS zooms the page on focus for anything under
+     16, and a password field is a bad place to lose your bearings. */
+  font-size: 16px; font-family: inherit;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
+}
+.setform .hint {
+  margin: 0 0 14px; font-size: var(--text-sm); color: var(--text-3);
+}
+
+/* Sign out is not destructive — nothing is lost — but it is the one control on
+   this page that ends the session, so it does not wear the same quiet grey as
+   the two that change a colour. */
+button.danger { color: var(--st-review); border-color: var(--st-review); background: transparent; }
+button.danger:hover { background: var(--st-review-bg); }
+button.danger { display: inline-flex; align-items: center; gap: 8px; }
+button.danger svg { width: 15px; height: 15px; }
+[dir="rtl"] .flipx { transform: scaleX(-1); }

@@ -1176,6 +1176,18 @@ handset.**
   because the rings came from a stock-portfolio recreation and meant nothing on
   a maintenance dashboard. It is the only deliberate departure from the
   reference in the restyle — do not "restore" it.
+- **`main` is pushed and level with `origin/main` as of 30 Aug.** The redesign,
+  the charts, the logo and the settings page are all live on Vercel.
+- **`/settings` is the account page, and it is the only page in the app that
+  writes to anything.** Password change, theme, language, sign out. It verifies
+  the current password before changing it — Supabase does not require that, and
+  without it the session cookie alone is enough to lock the owner out.
+- **There is no role model and the settings page says so.** One policy,
+  `staff_read`, grants every signed-in account the same read of every table.
+  Do not add a "Role: Admin" row until there is a column behind it.
+- **The notification bell was removed on 30 Aug, deliberately.** Nothing raises
+  a notification and there is no store for one. Do not re-add it as a dim
+  placeholder; add it when there is something to announce.
 - **Four logo files, and which one to use is decided on the server.**
   `public/homies-logo{,-dark}.png` are the full lockup (login page);
   `public/homies-mark{,-dark}.png` are the roof mark alone (sidebar), cut from

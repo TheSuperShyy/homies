@@ -107,6 +107,34 @@ export function SegSkeleton({ n = 4 }: { n?: number }) {
   );
 }
 
+/**
+ * A panel of label/value rows — the settings page's shape, not a table's.
+ *
+ * Built out of the real `.setrow`, so the grey lines sit at the same height and
+ * the same insets as the text that replaces them.
+ */
+export function RowsSkeleton({ rows = 3, head = false }: { rows?: number; head?: boolean }) {
+  return (
+    <div className="panel" aria-hidden="true">
+      {head && (
+        <div className="setwho">
+          <span className="sk" style={{ height: 44, width: 44, borderRadius: '50%' }} />
+          <span style={{ display: 'grid', gap: 7 }}>
+            <span className="sk sk-line" style={{ width: 120 }} />
+            <span className="sk sk-line" style={{ width: 70, height: 9 }} />
+          </span>
+        </div>
+      )}
+      {Array.from({ length: rows }, (_, r) => (
+        <div key={r} className="setrow">
+          <span className="sk sk-line" style={{ width: 96 }} />
+          <span className="sk sk-line" style={{ width: r % 2 ? 128 : 168 }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** A page title, so the heading does not pop in after everything else. */
 export function HeadSkeleton() {
   return (

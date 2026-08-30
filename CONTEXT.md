@@ -43,6 +43,13 @@ portfolio and say nothing about buildings. Ornament either says whose product
 this is or it says nothing, so it gets replaced rather than inherited. Nothing
 else in the system does.
 
+**A control that does nothing is worse than no control.** Placeholders earn
+their place only while they are honest about being one and only while something
+is coming. The notification bell sat disabled and labelled "soon" for four days
+with nothing behind it and nothing planned, which stopped being honesty and
+became furniture. Draw the empty seat when the meal is ordered; otherwise leave
+the chair out.
+
 **When something is missing from the page, probe the DOM before theorising.**
 Twice in one day an element that was simply absent had a cause no amount of
 reading the source would have found — a stylesheet 404, and a flex item with a

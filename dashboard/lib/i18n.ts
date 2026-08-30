@@ -77,6 +77,7 @@ const S = {
   'nav.conversations': { he: 'שיחות ווטסאפ',     en: 'Conversations' },
   'nav.calls':         { he: 'שיחות טלפון',      en: 'Calls' },
   'nav.sync':          { he: 'ייבוא',            en: 'Import' },
+  'nav.settings':      { he: 'הגדרות',           en: 'Settings' },
   'nav.signOut':       { he: 'יציאה',            en: 'Sign out' },
   'nav.menu':          { he: 'תפריט',            en: 'Menu' },
   'lang.switch':       { he: 'English',          en: 'עברית' },
@@ -95,9 +96,9 @@ const S = {
   'chrome.greetingSub':{ he: 'זה מה שקורה היום בבניינים', en: "Here's what is happening across the buildings" },
   'chrome.search':     { he: 'חיפוש בכל המערכת', en: 'Search everything' },
   'chrome.soon':       { he: 'בקרוב',           en: 'Soon' },
-  'chrome.notifications': { he: 'התראות',       en: 'Notifications' },
   'chrome.settings':   { he: 'הגדרות',          en: 'Settings' },
   'chrome.staff':      { he: 'צוות',            en: 'Staff' },
+  'theme.dark':        { he: 'כהה',             en: 'Dark' },
   'theme.light':       { he: 'בהיר',            en: 'Light' },
   'theme.switchLabel': { he: 'מעבר לתצוגה בהירה או כהה', en: 'Switch between light and dark' },
   'load.loading':      { he: 'טוען…',           en: 'Loading…' },
@@ -331,6 +332,51 @@ const S = {
   'login.password': { he: 'סיסמה',       en: 'Password' },
   'login.submit':   { he: 'כניסה',       en: 'Sign in' },
   'login.working':  { he: 'רגע…',        en: 'Signing in…' },
+
+  // --- settings -----------------------------------------------------------
+  'settings.title':     { he: 'הגדרות',            en: 'Settings' },
+  'settings.blurb':     { he: 'הפרטים שלך, והדרך שבה המערכת נראית לך.',
+                          en: 'Your account, and how this dashboard looks to you.' },
+
+  'settings.account':   { he: 'החשבון שלי',        en: 'Account' },
+  'settings.email':     { he: 'אימייל',            en: 'Email address' },
+  // Said plainly because it is true and because the alternative is a "Role:
+  // Admin" line that means nothing. There is one policy, `staff_read`, and it
+  // grants every signed-in account the same read of every table.
+  'settings.accessAll': { he: 'לכל מי שמחובר יש בדיוק אותה גישה — צפייה בכל הבניינים. אין עדיין הפרדה לפי תפקיד.',
+                          en: 'Everyone signed in has the same access: read everything, across every building. There are no roles yet.' },
+  'settings.lastSignIn':{ he: 'כניסה אחרונה',      en: 'Last signed in' },
+  'settings.created':   { he: 'החשבון נפתח',       en: 'Account opened' },
+  'settings.whoAdds':   { he: 'חשבונות נפתחים ידנית על ידי מנהל המערכת. אין הרשמה עצמית לדשבורד.',
+                          en: 'Accounts are opened by hand by an administrator. Nobody can sign themselves up.' },
+
+  'settings.password':  { he: 'שינוי סיסמה',       en: 'Password' },
+  'settings.currentPw': { he: 'הסיסמה הנוכחית',    en: 'Current password' },
+  'settings.newPw':     { he: 'סיסמה חדשה',        en: 'New password' },
+  'settings.againPw':   { he: 'הסיסמה החדשה שוב',  en: 'New password again' },
+  'settings.pwRule':    { he: 'לפחות 8 תווים.',    en: 'At least 8 characters.' },
+  'settings.pwSave':    { he: 'עדכון הסיסמה',      en: 'Update password' },
+  'settings.pwSaved':   { he: 'הסיסמה עודכנה.',    en: 'Password updated.' },
+  'settings.errWrong':  { he: 'הסיסמה הנוכחית לא נכונה.',
+                          en: 'That is not the current password.' },
+  'settings.errMismatch':{ he: 'שתי הסיסמאות החדשות לא זהות.',
+                          en: 'The two new passwords are not the same.' },
+  'settings.errShort':  { he: 'הסיסמה החדשה קצרה מ־8 תווים.',
+                          en: 'The new password is shorter than 8 characters.' },
+  'settings.errSame':   { he: 'הסיסמה החדשה זהה לנוכחית.',
+                          en: 'The new password is the same as the current one.' },
+  'settings.errFailed': { he: 'העדכון לא עבר. נסו שוב בעוד רגע.',
+                          en: 'The update did not go through. Try again in a moment.' },
+
+  'settings.appearance':{ he: 'תצוגה',             en: 'Appearance' },
+  'settings.theme':     { he: 'ערכת צבעים',        en: 'Theme' },
+  'settings.language':  { he: 'שפה',               en: 'Language' },
+  'settings.remembered':{ he: 'הבחירה נשמרת בדפדפן הזה בלבד.',
+                          en: 'Remembered in this browser only.' },
+
+  'settings.session':   { he: 'החיבור',            en: 'Session' },
+  'settings.signOutNote':{ he: 'יציאה מהחשבון בדפדפן הזה. לא משפיע על מכשירים אחרים.',
+                          en: 'Signs you out in this browser. Other devices stay signed in.' },
 
   // --- generic ------------------------------------------------------------
   'generic.none':   { he: '—', en: '—' },

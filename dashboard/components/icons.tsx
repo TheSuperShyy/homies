@@ -143,15 +143,8 @@ export const IconOpenLink = (p: P) => (
 /* --- topbar chrome ------------------------------------------------------- */
 /* The design system's own answer to icons is "Lucide, via CDN". A CDN script
    tag is a third-party request on every page load and a runtime dependency for
-   four shapes, so these follow the rule the rest of this file already follows:
+   three shapes, so these follow the rule the rest of this file already follows:
    Lucide's geometry, drawn here. */
-
-export const IconBell = (p: P) => (
-  <svg {...base} {...p}>
-    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-    <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-  </svg>
-);
 
 export const IconSettings = (p: P) => (
   <svg {...base} {...p}>
@@ -174,7 +167,7 @@ export const IconMoon = (p: P) => (
   </svg>
 );
 
-/** Named for the six views, so the rail reads as a list of destinations. */
+/** Named for the seven views, so the rail reads as a list of destinations. */
 export const NAV_ICON = {
   overview: IconOverview,
   tickets: IconTicket,
@@ -182,4 +175,5 @@ export const NAV_ICON = {
   conversations: IconChat,
   calls: IconPhone,
   sync: IconImport,
+  settings: IconSettings,
 } as const;

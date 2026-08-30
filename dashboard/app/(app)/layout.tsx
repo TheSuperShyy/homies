@@ -5,7 +5,7 @@ import { serverClient } from '@/lib/supabase-server';
 import { COOKIE, THEME_COOKIE, getLocale, getTheme, translator, type Locale } from '@/lib/i18n';
 import { BackField, RailNav, type NavGroup } from '@/components/nav';
 import {
-  NAV_ICON, IconBell, IconLanguage, IconMoon, IconSearch,
+  NAV_ICON, IconLanguage, IconMoon, IconSearch,
   IconSettings, IconSignOut, IconSun,
 } from '@/components/icons';
 
@@ -51,8 +51,9 @@ async function setTheme(formData: FormData) {
 }
 
 // Grouped, the way the design system's sidebar is: the things you look at, then
-// the thing you operate. One group of five and one of one is not much of a
-// division, but it is a true one — Import is the only page that writes.
+// the things you operate. The division is a true one — the second group is the
+// only place in the app where pressing something changes state rather than
+// filtering a view.
 const NAV = [
   ['nav.group.main', [
     ['overview', '/'],
@@ -63,6 +64,7 @@ const NAV = [
   ]],
   ['nav.group.support', [
     ['sync', '/sync'],
+    ['settings', '/settings'],
   ]],
 ] as const;
 
@@ -144,7 +146,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   accessible name has to come from somewhere else or the button
                   becomes an unnamed icon on a phone. */}
               <button type="submit" aria-label={t('nav.signOut')}>
-                <IconSignOut />
+                <IconSignOut className="flipx" />
                 <span>{t('nav.signOut')}</span>
               </button>
             </form>
@@ -185,21 +187,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </button>
             </form>
 
-            {/* Both placeholders. There is no notification store and no settings
-                page; drawing them live and dead is the honest state of the
-                shell, and removing them would mean redrawing this bar the day
-                either one exists. */}
-            <span className="iconbtn" aria-disabled="true"
-                  title={`${t('chrome.notifications')} — ${t('chrome.soon')}`}>
-              <IconBell />
-            </span>
-            <span className="iconbtn" aria-disabled="true"
-                  title={`${t('chrome.settings')} — ${t('chrome.soon')}`}>
+            {/* The gear is a real destination now. The bell that used to sit
+                beside it is gone rather than left dim: nothing in this app
+                raises a notification, there is no store to put one in, and a
+                permanently disabled control is furniture the reader has to
+                learn to ignore. It comes back the day something has to be
+                announced, and not before. */}
+            <Link className="iconbtn" href="/settings"
+                  aria-label={t('chrome.settings')} title={t('chrome.settings')}>
               <IconSettings />
-            </span>
+            </Link>
 
             {email && (
-              <div className="who-block">
+              // A link, because the name in the corner is where half of all
+              // readers look for their own account before they find the gear.
+              <Link className="who-block" href="/settings">
                 {/* The reference uses photographic avatars. There are no
                     photographs of Homies staff and there is no field to put one
                     in, so this is the system's own initials fallback, which is a
@@ -209,7 +211,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <b dir="auto">{name}</b>
                   <small>{email}</small>
                 </span>
-              </div>
+              </Link>
             )}
           </div>
         </header>
