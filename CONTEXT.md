@@ -1343,6 +1343,55 @@ a push — both Hebrew prompts were a few hundred chars behind on 30 Aug — and
 migration is the wrong moment to discover it. Copy to move, sync deliberately
 afterwards, never as a side effect.
 
+## Somebody else's voice
+
+`ido-voice.mp4` is a real person speaking for three and a half minutes, and the
+clone built from it will answer residents under a different name. Three
+decisions stand around that, and none of them is about audio quality.
+
+**Consent gets written into the repo, not remembered.** Ido agreed on 30 Aug and
+that sentence is in `voice/README.md`. Permission for something like this
+otherwise lives in one person's head and leaves when they do, and the next person
+to find a stranger's voice in a repository should find the answer beside it
+rather than have to go asking. The clone is named **Echo Stone** on Cartesia
+rather than "Ido", and `access[type]` is set to `private` explicitly: a codename
+on a vendor account costs nothing and is one fewer place his name sits.
+
+**Recordings are ignored by extension, including containers — never by
+filename.** This was learned twice. On 5 Aug `New Recording 154.m4a (1).mp4`
+turned up untracked and unignored and missed a commit by minutes; the fix written
+that day added `New Recording*` and `*.m4a*`, patterns that match *that file*.
+The same day `ido-voice.mp4` arrived, matched neither, and sat one `git add -A`
+from GitHub for 25 days until a `git status` run for an unrelated reason caught
+it. The comment above those patterns even said "the extension alone does not
+catch it" and then omitted the extension. **A rule written against the last
+accident catches the last accident.** `.gitignore` now covers the audio
+extensions plus `*.mp4 *.m4v *.mov`, because a voice recording arrives in
+whatever wrapper the sender's phone chose.
+
+Once a recording is in a repo's history, removing it is a rewrite rather than a
+delete. That asymmetry is the whole reason these rules are strict.
+
+## Ask the API and read the price list
+
+A vendor's feature documentation is not a statement about your account. Cloning
+sat unbuilt for three weeks on a $49/month figure that came from third-party
+write-ups, next to a note reasoning from Cartesia's docs that it might be free —
+two guesses in opposite directions, neither checked against anything.
+
+`/voices/clone` answers the question in one request: `402
+plan_upgrade_required`, on 7 Aug and again on 30 Aug. The seller's own price page
+answers the rest: instant cloning is the **$5/month Pro** tier, and the $49
+Startup tier buys *professional* cloning, a different feature needing thirty
+minutes of audio. **A $49 line item gets deferred; a $5 one does not**, so the
+wrong number did not just sit there being wrong, it decided something.
+
+The general form: when a capability might be plan-gated, spend the one request
+that returns the real error, and read the price list rather than a feature page.
+The same rule caught the opposite error on 30 Aug, when "Cartesia publishes no
+balance" turned out to be false — a synthesis call answers "is there credit"
+even though nothing answers "how much".
+
 ## The voice prompts
 
 **Verify a push by reading the assistant back, never by trusting the write.**

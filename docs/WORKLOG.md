@@ -212,6 +212,50 @@ builds with six tools attached.
 heard either this or the office-number fix.
 
 
+### Ido's voice is still not cloned, and the blocker turned out to cost five dollars
+
+- Ido confirmed he is happy for his voice to be cloned for the agent. That is
+  now written into `voice/README.md` rather than living in one conversation,
+  because consent is exactly the kind of fact that leaves with the person who
+  remembers it.
+- Ran the existing `scripts/voice_clone.py --go`. It returned **402
+  `plan_upgrade_required`**, byte-for-byte what it returned on 7 Aug. Stopped
+  there: did not retry, and did not try the other two Cartesia keys in `.env`
+  hoping one sat on a different plan.
+- **The number in the repo was wrong, and it cost three weeks.** Both this
+  script and `cartesia_tts.py` implied cloning needed a $49/month tier, and
+  reasoned from Cartesia's feature docs that it might be free. Read the actual
+  price list: Free has no cloning, **Pro at $5/month has instant cloning**,
+  Startup at $49 buys *professional* cloning, a different feature needing thirty
+  minutes of audio. A $49 line item gets deferred; a $5 one does not. Ask the
+  API and read the seller's price list, rather than inferring a gate from a
+  feature page.
+- Cut two more candidates, d (62-72s) and e (100-110s), from the two longest
+  silence-free runs the 5 Aug pass never sampled. Both came out 2-4 dB quieter
+  than a/b/c, so a stays the default.
+- **Checked the clipping question one window at a time and it is a non-issue.**
+  The whole recording peaks at 0.0 dB, which would be baked into a clone
+  permanently, but each ten-second candidate peaks at -0.9 to -2.2 dB: the
+  full-scale sample lives outside all five. Measuring the file would have
+  rejected clips that are fine.
+- Added `--voice <id>` to `cartesia_tts.py`, which previously had no way to name
+  a voice, and proved it by rendering the whole script through Eyal. The id goes
+  in the filename so a second voice cannot overwrite the first, which is the
+  entire point: two voices, identical words, side by side. So
+  `voice/samples/c*-a976c076.mp3` is now the "before" column, waiting for a
+  clone to fill the "after".
+- **No assistant was touched.** `vapi_sync.py inbound` still reports
+  `cartesia a976c076`, and nothing was wired anywhere.
+- **And the recording itself was one `git add -A` from GitHub.** A `git status`
+  run to check nothing had been staged showed `?? ido-voice.mp4` — untracked and
+  **not ignored**, 3m40s of a real person, sitting like that since 5 Aug.
+  `.gitignore` already carries a long comment about this exact near-miss from
+  that same day, but the fix chosen then matched the *filename*
+  (`New Recording*`, `*.m4a*`) rather than the extension, and `ido-voice.mp4`
+  matches neither. Added `*.mp4`, `*.m4v`, `*.mov`. **A rule written against the
+  last accident catches the last accident**: the comment even said "the
+  extension alone does not catch it" and then omitted the extension.
+
 ### Vapi moved to the August account, and the id list was one move behind the repo
 
 - The client's August keys were already in `.env` as

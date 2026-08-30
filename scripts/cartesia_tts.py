@@ -8,9 +8,14 @@ would land in shell history, which is the one place a key is hardest to remove.
 
 WHY THIS EXISTS SEPARATELY FROM voice_clone.py
 Cloning returned 402 `plan_upgrade_required` on 7 Aug: Instant Voice Cloning is
-Pro-tier, and the free tier does not include it. That killed the "your own voice"
-route for now but not the provider — Cartesia carries FOUR NATIVE HEBREW VOICES
-(`language: he`), and those are free-tier TTS.
+Pro-tier, and the free tier does not include it. **Re-tested 30 Aug: byte-for-byte
+the same 402.** That killed the "your own voice" route for now but not the
+provider — Cartesia carries native Hebrew voices (`language: he`), and those are
+free-tier TTS.
+
+The count in this paragraph used to say four. A full walk of the account on
+30 Aug found 934 voices, about thirty of them `he`, so the library grew and the
+number here was three weeks stale. `--list` is the answer, not this comment.
 
 That matters because it is the first option that is native Hebrew *and* modern.
 Azure's he-IL voices are accurate and flat; vapi/Elliot is expressive with an
@@ -40,8 +45,9 @@ API = "https://api.cartesia.ai"
 VERSION = "2026-03-01"
 MODEL = os.environ.get("CARTESIA_MODEL", "sonic-3")
 
-# The four `language: he` voices on the account. Native Hebrew, not an English
-# model reading Hebrew — which is the entire distinction this file exists to test.
+# Three of the `language: he` voices on the account, the ones these scripts use.
+# Native Hebrew, not an English model reading Hebrew — which is the entire
+# distinction this file exists to test. There are about thirty; run `--list`.
 NOAM = "3e32f3c5-9ac0-4192-9994-87fdb277120f"      # masculine, "Broadcaster"
 YARDEN = "ff857c8e-e7f9-4afd-af42-dce9f3c5ab02"    # feminine, "Trusted Advisor"
 AYALA = "ebc02c0d-61fd-48f2-a6c9-0d6683b7d466"     # feminine, "Expert Narrator"
@@ -120,6 +126,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", action="store_true", help="Hebrew voices on the account")
     ap.add_argument("--script", choices=sorted(SCRIPTS), help="render a named script")
+    # Render a script through ONE voice instead of the per-line voices, which is
+    # how a cloned voice gets judged against a stock one on identical words. The
+    # id goes in the filename because the whole point is hearing two of these
+    # side by side, and a second run must not overwrite the first.
+    ap.add_argument("--voice", metavar="ID",
+                    help="override every voice in the script with this id")
     a = ap.parse_args()
     key = load_key()
 
@@ -138,6 +150,9 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     print("model %s\n" % MODEL)
     for name, vid, text, emo in SCRIPTS[a.script]:
+        if a.voice:
+            vid = a.voice
+            name = "%s-%s" % (name, a.voice[:8])
         audio = synth(key, vid, text, emo)
         p = os.path.join(OUT, name + ".mp3")
         open(p, "wb").write(audio)

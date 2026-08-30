@@ -2105,6 +2105,17 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 
 ## Pending on other people
 
+- **Cartesia Pro, $5/month, to unblock Ido's voice clone.** This is the whole
+  blocker and it is one click at play.cartesia.ai/subscription. Everything else
+  is built and waiting: the clips are cut, `scripts/voice_clone.py --go` is one
+  command, `cartesia_tts.py --voice <id>` renders the result, and Eyal saying the
+  same lines is already in `voice/samples/`. `/voices/clone` returns
+  `402 plan_upgrade_required` on Free — confirmed 7 Aug and again 30 Aug.
+  Ido has agreed to the clone (30 Aug); see `voice/README.md`.
+  **Do not price this at $49.** That is the Startup tier and it buys
+  *professional* cloning, a different feature. Instant cloning is Pro at $5, and
+  the wrong figure sat in two scripts for three weeks while the voice went
+  unbuilt.
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.
 - ElevenLabs key in Vapi, if that voice is wanted.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to

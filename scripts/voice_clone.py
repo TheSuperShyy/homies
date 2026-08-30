@@ -22,13 +22,30 @@ cloning is plan-gated too. Cartesia also keeps `chunkPlan`, which is where the
 output guard lives; a provider without it would silently drop the filter that
 stops the model reading its own tool calls aloud.
 
-WHAT THIS COSTS, AND A CORRECTION
-Third-party pricing write-ups say cloning needs the Pro tier at about $49/month.
-Cartesia's own documentation says training instant clones is "fast and free" and
-puts the paid tier on PRO voice cloning — a different feature that needs at least
-30 minutes of audio and up to 3 hours of training. The primary source wins here,
-so a free account is worth trying first; a 402 or 403 from --go is what proves
-otherwise, and costs nothing to find out.
+WHAT THIS COSTS. BOTH EARLIER ANSWERS HERE WERE WRONG.
+This paragraph used to reason from documentation and get it backwards in two
+directions at once. It said third-party write-ups put cloning on a "$49/month Pro
+tier", and that Cartesia's own docs called instant cloning "fast and free", and
+it sided with the docs. Neither held.
+
+Run against the API, twice — 7 Aug and again 30 Aug — /voices/clone returns:
+
+    402 plan_upgrade_required
+    "This feature is not available on the free tier"
+
+And the pricing page, read 30 Aug, explains the shape the docs obscured. There
+are two cloning features on four tiers, and the $49 belongs to the other one:
+
+    Free      $0     no cloning at all
+    Pro       $5     INSTANT cloning — this script          <- what we need
+    Startup   $49    adds PROFESSIONAL cloning (30+ min of audio)
+    Scale     $299
+
+So the blocker is real and the fix is **$5 a month**, not the $49 this file
+implied for three weeks. That mattered: a $49 line item gets deferred and a $5
+one does not, and the voice sat unbuilt partly because of a number nobody
+re-checked. **Ask the API and read the seller's own price list; do not infer a
+plan gate from a feature doc.**
 
 TEN SECONDS VERSUS THE WHOLE RECORDING
 Asked for, and it is not available: the source recording is 3m40s, which is 22x
@@ -75,6 +92,17 @@ VERSION = "2026-03-01"
 #     clone-candidate-a.wav   162-172s   loudest and steady      <- default
 #     clone-candidate-b.wav   150-160s   steadiest of the three
 #     clone-candidate-c.wav   31-41s     early, different content
+#     clone-candidate-d.wav   62-72s     cut 30 Aug, quietest
+#     clone-candidate-e.wav   100-110s   cut 30 Aug
+#
+# d and e were added on 30 Aug from the two longest silence-free runs the first
+# pass never sampled (30-85s and 93-131s). They came out 2-4 dB quieter in the
+# mean than a/b/c, so they are alternates rather than contenders.
+#
+# **None of the five clips.** The whole recording peaks at 0.0 dB, which would be
+# baked into a clone permanently, but measured one window at a time the peaks are
+# -0.9 to -2.2 dB: the full-scale sample lives outside every candidate. Measure
+# the window, never the file.
 #
 # Those are objective criteria, and objective criteria cannot hear. Listen to all
 # three and pass --clip to pick a different one; the best clone comes from the
@@ -82,6 +110,12 @@ VERSION = "2026-03-01"
 CLIP = os.path.join(ROOT, "voice", "clone-candidate-a.wav")
 MAX_SECONDS = 10.0
 NAME = "Echo Stone"
+# The subject is Ido, whose recording is `ido-voice.mp4` in the repo root, and who
+# agreed to this on 30 Aug. The name below is deliberately not his: it is a label
+# on a third-party vendor account, and a codename there costs nothing while a real
+# person's name is one more place his identity sits. `access[type]: private` below
+# is the other half of the same decision.
+#
 # ISO 639-1. `he` because the assistant speaks Hebrew and nothing else — see
 # the Language section of docs/features/10-debt-followup/prompt.md.
 #

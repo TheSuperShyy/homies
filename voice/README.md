@@ -4,6 +4,24 @@ The `.html` files here are committed. **The audio they play is not**, and that i
 deliberate rather than an oversight. Open any of them after cloning and every
 player will be empty until you regenerate the samples.
 
+## Whose voice this is, and that he said yes
+
+`ido-voice.mp4` in the repo root is **Ido**, 3m40s of him speaking. Every
+`clone-candidate-*.wav` here is a ten-second window cut from it, and
+`echo-stone-sample.wav` is the whole thing as WAV.
+
+**Ido agreed to his voice being cloned for the Homies agent, confirmed 30 Aug
+2026.** That sentence is in this file because consent for something like this is
+the kind of fact that lives in one person's memory and then leaves with them, and
+because the next person to find a stranger's voice in a repository deserves to
+find the answer beside it rather than have to go asking.
+
+The clone is named **Echo Stone** on Cartesia, not "Ido". A codename on a vendor
+account costs nothing, and it is one fewer place his name sits. `access[type]`
+is set to `private` explicitly in `scripts/voice_clone.py` for the same reason.
+
+`clix-clone-*.wav` are a different person and a different project.
+
 ## Why the audio is gitignored
 
 Two different reasons, and both matter:
@@ -43,6 +61,22 @@ prints all 29 voices with their ids if they need rebuilding.
 | `hebrew-audition.html` | Eleven masculine Hebrew voices — **Eyal was chosen** |
 | `hebrew-audition-women.html` | Eighteen feminine voices, from before both agents went male |
 | `listen.html` | The original clone-candidate picker |
+
+## The clone does not exist yet, and the reason is five dollars
+
+`scripts/voice_clone.py` is finished and its clips are cut, but Cartesia's
+`/voices/clone` answers `402 plan_upgrade_required` on the free tier. Tried
+7 Aug, tried again 30 Aug, same response both times.
+
+Instant voice cloning starts on Cartesia's **Pro tier, $5/month**. This file and
+`voice_clone.py` both used to imply $49, which is the *Startup* tier and buys
+*professional* cloning, a different feature needing thirty minutes of audio. The
+voice sat unbuilt for three weeks partly because of that wrong number.
+
+Upgrade at play.cartesia.ai/subscription, then `python scripts/voice_clone.py
+--go`. Everything downstream is ready: `cartesia_tts.py --voice <id>` renders any
+voice through the existing scripts, and `voice/samples/c*-a976c076.mp3` is
+already Eyal saying those lines, so the comparison only needs the second column.
 
 ## The thing this directory exists to have proved
 

@@ -85,6 +85,19 @@ Lotosclean-*
 # so the extension alone does not catch it.
 New Recording*
 *.m4a*
+# ...but matching the FILENAME instead of the extension is what failed. The two
+# lines above were the 5 Aug fix, and on that same day `ido-voice.mp4` was put in
+# the repo root, where neither pattern touches it: it does not start with "New
+# Recording" and it has no `.m4a` in it. It then sat untracked and unignored for
+# 25 days — 3m40s of a real person speaking, one `git add -A` from being
+# permanent. Found 30 Aug, by a `git status` run for a different reason.
+#
+# So: container extensions too, because a voice recording arrives in whatever
+# wrapper the sender's phone chose, and the next one will have a name nobody
+# predicted either.
+*.mp4
+*.m4v
+*.mov
 
 # Scratch
 tmp/
