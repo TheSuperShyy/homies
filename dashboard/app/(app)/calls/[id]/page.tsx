@@ -1,5 +1,6 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, translator } from '@/lib/i18n';
+import Link from 'next/link';
 
 /**
  * Split a Vapi transcript into turns.
@@ -61,9 +62,9 @@ export default async function Call({ params }: { params: { id: string } }) {
       <div className="pagehead">
         <h1>{t('call.title')}</h1>
         <p>
-          <a href="/calls" className="muted">
+          <Link href="/calls" className="muted">
             <span className="arr">&larr;</span> {t('call.back')}
-          </a>
+          </Link>
         </p>
       </div>
 

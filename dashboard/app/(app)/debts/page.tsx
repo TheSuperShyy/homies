@@ -4,6 +4,7 @@ import { Pager, pageFrom, pageSlice, perParam, sizeFrom } from '@/components/pag
 import { callButtonEnabled, callResident, phoneNumberConnected } from '@/lib/call';
 import { getLocale, translator } from '@/lib/i18n';
 import { IconInbox, IconCheck, IconAlert, IconPhoneOut } from '@/components/icons';
+import Link from 'next/link';
 
 // The Call button. A person chose this resident and pressed; the agent rings
 // them, once, now. Everything that decides whether that may happen lives in
@@ -199,10 +200,10 @@ export default async function Debts({
       <div className="filters">
         <nav className="seg" aria-label={t('col.period')}>
           {tabs.map((m) => (
-            <a key={m} href={link(m, byOwnerView)}
+            <Link key={m} href={link(m, byOwnerView)}
                aria-current={selected === m ? 'true' : undefined}>
               {m === 'all' ? t('status.all') : m}
-            </a>
+            </Link>
           ))}
         </nav>
         {/* The month survives the toggle and the toggle survives the month:
@@ -210,10 +211,10 @@ export default async function Debts({
         <nav className="seg" aria-label={t('debts.byApartment')}>
           {([['apartment', t('debts.byApartment')], ['owner', t('debts.byOwner')]] as const)
             .map(([v, lab]) => (
-              <a key={v} href={link(selected, v === 'owner')}
+              <Link key={v} href={link(selected, v === 'owner')}
                  aria-current={byOwnerView === (v === 'owner') ? 'true' : undefined}>
                 {lab}
-              </a>
+              </Link>
             ))}
         </nav>
       </div>

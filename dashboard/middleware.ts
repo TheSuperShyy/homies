@@ -10,14 +10,18 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  // THE LAYOUT NEEDS TO KNOW WHICH PAGE IT IS RENDERING, and a server layout in
-  // the App Router has no way to ask. `x-invoke-path` is a Next internal that
-  // is not there in 14.2, and `referer` is the page you came FROM, so a nav
-  // built on it highlights the item you just left. Setting it on the REQUEST
-  // headers here is the supported route: it reaches the server component and
-  // never goes back to the browser.
+  // Request headers the server components read. Setting them HERE, on the
+  // request rather than the response, is the supported way to hand a server
+  // component something the request knows and the component cannot ask for —
+  // it reaches the component and never goes back to the browser.
+  //
+  // There used to be an `x-pathname` here too, so the sidebar could tell which
+  // page was current. It is gone: once navigation became client-side the
+  // layout stopped re-rendering between routes, and a path baked in on the
+  // server went stale on the first click. `usePathname()` in
+  // `components/nav.tsx` reads it from the router instead, which is the thing
+  // that actually changes. Do not bring it back for that job.
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-pathname', request.nextUrl.pathname);
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
 
@@ -46,8 +50,8 @@ export async function middleware(request: NextRequest) {
   // button; calling `auth.getUser()` there is a second full round trip to the
   // auth server for a question this request has already answered, and it blocks
   // the shell from streaming while it waits. The header is set on the REQUEST,
-  // exactly like `x-pathname` above, so it reaches the server component and
-  // never goes back to the browser.
+  // rather than on the response, so it reaches the server component and never
+  // goes back to the browser.
   if (user?.email) requestHeaders.set('x-user-email', user.email);
 
   // The login wall, restored 26 Aug 2026 on the owner's ask. Demo mode

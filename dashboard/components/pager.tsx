@@ -1,4 +1,5 @@
 import type { T } from '@/lib/i18n';
+import Link from 'next/link';
 
 // The pager, and the page size, for every list on the dashboard.
 //
@@ -89,8 +90,8 @@ export function Pager({
       <span className="per">
         <span className="muted">{t('pager.rows')}</span>
         {PAGE_SIZES.map((n) => (
-          <a key={n} href={href(1, n)} className={n === size ? 'on' : ''}
-             aria-current={n === size ? 'true' : undefined}>{n}</a>
+          <Link key={n} href={href(1, n)} className={n === size ? 'on' : ''}
+             aria-current={n === size ? 'true' : undefined}>{n}</Link>
         ))}
       </span>
       <span className="muted mono">
@@ -105,10 +106,10 @@ export function Pager({
         {/* The arrow is a span so RTL can mirror it without mirroring the
             words beside it — see .btn-nav .arr. */}
         {page > 1
-          ? <a className="btn-nav" href={href(page - 1, size)}><span className="arr">&larr;</span> {prevLabel}</a>
+          ? <Link className="btn-nav" href={href(page - 1, size)}><span className="arr">&larr;</span> {prevLabel}</Link>
           : <span className="btn-nav off" aria-disabled="true"><span className="arr">&larr;</span> {prevLabel}</span>}
         {page < pages
-          ? <a className="btn-nav" href={href(page + 1, size)}>{nextLabel} <span className="arr">&rarr;</span></a>
+          ? <Link className="btn-nav" href={href(page + 1, size)}>{nextLabel} <span className="arr">&rarr;</span></Link>
           : <span className="btn-nav off" aria-disabled="true">{nextLabel} <span className="arr">&rarr;</span></span>}
       </span>
     </div>

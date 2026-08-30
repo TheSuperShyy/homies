@@ -1,6 +1,7 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, label, translator, when } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
+import Link from 'next/link';
 
 export default async function Overview() {
   const db = serverClient();
@@ -59,7 +60,7 @@ export default async function Overview() {
       <div className="panel" style={{ marginBlockStart: 20 }}>
         <div className="panelhead">
           <span>{t('overview.last7')}</span>
-          <a className="btn-nav" href="/tickets">{t('overview.seeAll')}</a>
+          <Link className="btn-nav" href="/tickets">{t('overview.seeAll')}</Link>
         </div>
         {recent.data?.length ? (
           <div className="scrollx">

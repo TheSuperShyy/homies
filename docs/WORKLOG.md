@@ -61,6 +61,40 @@ conversation that produced it.
 - Baseline for comparison after deploy: live `/login` TTFB today, before any of
   this ships, was 1.78s cold and ~0.43s warm.
 
+### Navigation is client-side now, and two things had to move to make it honest
+
+- The nav, the filters, the pager and every row link were plain `<a href>`, so
+  every click was a full document load — the Chrome tab spun on the way from
+  tickets to debts, and the skeletons added earlier never got a chance to show,
+  because a full load throws the whole page away first. All of them are
+  `next/link` now. The only `<a>` left in the app are the three that point at
+  GitHub from the import page, which are meant to leave.
+- **The sidebar highlight had to move to the client.** A layout shared by two
+  routes is not re-rendered when you move between them — the App Router keeps
+  it mounted and swaps only the page. The old highlight was computed on the
+  server from an `x-pathname` request header, so it would have frozen on
+  whichever page you first landed on and the nav would have lied about where
+  you are. `components/nav.tsx` reads `usePathname()` instead. Same for the
+  `back` field on the language and theme switches, which would otherwise have
+  sent you back to wherever you entered the app.
+- **The login page moved out of the shell structurally.** Same cause: the root
+  layout decided whether to draw the sidebar by testing the path, and that test
+  goes stale the moment the layout stops re-rendering — a sign-out would have
+  landed on the login form with the whole signed-in menu still around it, which
+  is the bug reported on 26 Aug. The dashboard routes now live in an `(app)`
+  route group with the shell in `app/(app)/layout.tsx`; `/login` sits outside
+  it, so it cannot have the shell. Parentheses keep the group out of the URL —
+  `/tickets` is still `/tickets`, verified.
+- `x-pathname` is gone from the middleware, because nothing reads it any more.
+  The comment says why, so it does not come back for that job.
+- Verified: `/tickets`, `/debts` and `/sync/run` all still 307 to `/login`;
+  `/login` renders `authwrap` and no `shell`, `rail` or `topbar`; a request
+  carrying `RSC: 1` comes back as `text/x-component`, 3.9kB against 7.6kB for
+  the document, which is the mechanism that replaces the page load. `tsc` and
+  `next build` clean. **Not verified end to end:** clicking from tickets to
+  debts as a signed-in user, because there is no test account in the repo and
+  the pages are behind the login wall.
+
 ### Two things measured that contradicted what the screenshots suggested
 
 - **The "blank page at 390px" was a headless artefact, not a bug.** Chrome

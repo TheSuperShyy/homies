@@ -1161,6 +1161,20 @@ handset.**
   middleware now sets `x-user-email` on the request headers alongside
   `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
   layout or page**; the middleware is the only place that should call it.
+- **Navigation is client-side. Use `next/link`, never a bare `<a>`, for
+  anything inside the app.** A plain anchor reloads the document, which throws
+  away the shell and the skeleton and spins the browser tab. The only `<a>`
+  that belong are the ones leaving for GitHub on the import page.
+- **The routes live in an `app/(app)/` route group and the shell is that
+  group's layout.** The parentheses are invisible in URLs. `/login` is outside
+  the group, which is what guarantees it never renders the sidebar — it used to
+  be a path test in the root layout, and a path test goes stale as soon as the
+  layout stops re-rendering between routes.
+- **Anything in the shell that depends on WHICH page is showing must read
+  `usePathname()`**, not a request header. A shared layout is not re-rendered
+  when the page under it changes, so a server-computed path freezes on first
+  load. This is why `components/nav.tsx` is the one client component in the
+  shell, and why `x-pathname` was removed from the middleware.
 - **Every route has a `loading.tsx`** backed by `components/skeleton.tsx`,
   sized to the real column counts and row heights so nothing shifts when the
   data lands. If you add a page, add its skeleton with the right `cols`, or the

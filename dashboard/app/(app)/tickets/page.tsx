@@ -3,6 +3,7 @@ import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
 import { getLocale, label, translator, when, type T } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
+import Link from 'next/link';
 
 // The four values the check constraint on requests.status accepts. The list is
 // duplicated from the schema on purpose: the server action validates against
@@ -88,10 +89,10 @@ export default async function Tickets({
       <div className="pagehead"><h1>{t('tickets.title')}</h1></div>
       <nav className="seg" aria-label={t('col.status')}>
         {tabs.map((s) => (
-          <a key={s || 'all'} href={tabHref(s)}
+          <Link key={s || 'all'} href={tabHref(s)}
              aria-current={(status ?? '') === s ? 'true' : undefined}>
             {s ? label(t, 'status', s) : t('status.all')}
-          </a>
+          </Link>
         ))}
       </nav>
       <Pager page={page} size={size} total={count ?? 0} basePath="/tickets"

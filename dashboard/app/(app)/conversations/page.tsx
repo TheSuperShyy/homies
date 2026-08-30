@@ -2,6 +2,7 @@ import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, sizeFrom } from '@/components/pager';
 import { getLocale, translator, when } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
+import Link from 'next/link';
 
 export default async function Conversations({
   searchParams,
@@ -33,14 +34,14 @@ export default async function Conversations({
               {data.map((c: any) => (
                 <tr key={c.phone}>
                   <td>
-                    <a href={`/conversations/${encodeURIComponent(c.phone)}`}>
+                    <Link href={`/conversations/${encodeURIComponent(c.phone)}`}>
                       {/* A name when the phone matches a resident, the number
                           when it does not. An unmatched number is a signal, not
                           a blank: it means somebody outside the imported list
                           is writing in. */}
                       {c.full_name ?? <span className="mono">{c.phone}</span>}
                       {c.building && <span className="sub" dir="auto">{c.building}{c.unit ? ` · ${c.unit}` : ''}</span>}
-                    </a>
+                    </Link>
                   </td>
                   <td dir="auto">{c.last_message}</td>
                   <td className="mono">{c.message_count}<span className="muted"> / {c.from_resident} in</span></td>

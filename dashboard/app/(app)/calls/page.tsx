@@ -2,6 +2,7 @@ import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
 import { getLocale, translator, when, type Locale, type T } from '@/lib/i18n';
 import { IconInbox, IconSearch, IconOpenLink } from '@/components/icons';
+import Link from 'next/link';
 
 // One page, four views, state in the URL. The two extra views answer the two
 // questions ops actually asks after an outbound day: who never picked up, and
@@ -36,8 +37,8 @@ function Tabs({ view, size, search, t }: {
   return (
     <nav className="seg" aria-label={t('calls.title')}>
       {TABS.map(([key, key2]) => (
-        <a key={key} href={tabHref(key, size, search)}
-           aria-current={view === key ? 'true' : undefined}>{t(key2)}</a>
+        <Link key={key} href={tabHref(key, size, search)}
+           aria-current={view === key ? 'true' : undefined}>{t(key2)}</Link>
       ))}
     </nav>
   );
@@ -66,9 +67,9 @@ function Search({ view, size, search, t }: {
              aria-label={t('calls.search')} placeholder={t('calls.search')} />
       <button type="submit"><IconSearch /> {t('calls.searchBtn')}</button>
       {search && (
-        <a href={tabHref(view, size)} className="muted" style={{ fontSize: 13 }}>
+        <Link href={tabHref(view, size)} className="muted" style={{ fontSize: 13 }}>
           {t('calls.clear')}
-        </a>
+        </Link>
       )}
     </form>
   );
@@ -237,9 +238,9 @@ async function CallList({ view, page, size, search, t, locale }: {
                       page also carries the recording, the outcome and the tools
                       the agent called, so there is something to see even on a
                       call that produced no words. */}
-                  <td><a className="btn-sm" href={`/calls/${c.id}`}>
+                  <td><Link className="btn-sm" href={`/calls/${c.id}`}>
                     <IconOpenLink />{t('calls.view')}
-                  </a></td>
+                  </Link></td>
                 </tr>
               ))}
             </tbody>
