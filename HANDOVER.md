@@ -178,6 +178,16 @@ per resident, every apartment they owe on, composed Hebrew phrases and the
 `charges` whitelist; built on the charge view so the predicate exists once),
 `v_conversations`, `v_pending_payment_tickets`.
 
+**Never `npx next build` against a running dev server.** `next.config.mjs`
+reads `NEXT_DIST_DIR`; a verification build is
+`NEXT_DIST_DIR=.next-verify npx next build`. Sharing `.next` with `next dev`
+serves a page with no CSS and no error in any log. Related: a corrupted
+`.next` cache crashed the dev server on 28 Aug (`ENOENT` on
+`webpack/server-development/*.pack.gz`, root then 404ing) — the fix is to stop
+the process, delete `.next`, and start again. And a backgrounded `npm run dev`
+in this harness reports `exited with code 127` while the server keeps
+serving: check `netstat` and an actual HTTP probe before believing it died.
+
 **The dashboard.** Next.js 14 on Vercel at `homies-dashboard.vercel.app`.
 Pages: overview, tickets, debts, conversations, calls, call detail. Anon key,
 no login since 9 Aug, read-only except `requests.status`.

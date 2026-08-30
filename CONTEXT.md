@@ -64,6 +64,16 @@ showing reads `usePathname()` on the client. A path computed on the server
 freezes on first load and the interface starts lying — that is what
 `x-pathname` was doing, and it is why it was removed.
 
+**A verification build never shares a directory with a running dev server.**
+Both `next dev` and `next build` write `.next`, so building while the server
+runs rewrites the tree underneath it: the server keeps serving the manifest it
+booted with, the hashed chunks it names are gone, and the browser 404s on its
+own stylesheet. The page then renders with no CSS, which does not look like a
+missing stylesheet, it looks like the app exploded, and nothing errors
+anywhere. `next.config.mjs` therefore honours `NEXT_DIST_DIR`; verification
+builds run as `NEXT_DIST_DIR=.next-verify npx next build`. Dev and the real
+deploy keep `.next`.
+
 **Colour is measured, never eyeballed.** `python scripts/contrast_check.py`
 after any token change. The supplied system shipped four pairs under WCAG AA
 and its own readme says the colours were taken off screenshots, which is

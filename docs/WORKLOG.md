@@ -9,6 +9,31 @@ conversation that produced it.
 
 ---
 
+## 2026-08-28
+
+### The local dashboard was brought up for the redesign, and one config change was left uncommitted
+
+- Started `npm run dev` in `dashboard/` for the redesign session. It crashed on
+  a corrupted build cache (`ENOENT` on `.next/cache/webpack/server-development/
+  *.pack.gz`, after which `/` served 404 while `/login` still answered 200).
+  Stopped the process, deleted `.next`, restarted: root 307s to `/login`,
+  `/login` and `/tickets` behave. Note for the harness: the backgrounded run
+  reports `exited with code 127` while node keeps serving, so the failure
+  notice is not evidence the server is down.
+- `dashboard/next.config.mjs` was sitting modified in the working tree, not
+  authored in this session: it makes `distDir` configurable via
+  `NEXT_DIST_DIR` so a verification build cannot rewrite `.next` under a
+  running dev server. Committed as found, with the rule lifted into CONTEXT
+  and the operational half into HANDOVER, because that failure renders a page
+  with no CSS and no error in any log.
+- Answered two account questions from the APIs rather than memory. Voice: both
+  Hebrew assistants on Cartesia `sonic-3` with the stock voice, English twins
+  on Vapi Elliot, `CARTESIA_VOICE_ID` still empty. Credit: OpenRouter reports
+  **$29.13 of $115 left**; Cartesia publishes no figure, but a two-word
+  `/tts/bytes` call answers the real question (200 = can pay, 402 = cannot)
+  and all three keys returned 200, including `CARTESIA_API_KEY_ACCOUNT1`,
+  which this repo calls retired and which is therefore still billable.
+
 ## 2026-08-30
 
 ### The Stovest design system is vendored, the shell is rebuilt on it, and the dashboard now shows a skeleton instead of a frozen window

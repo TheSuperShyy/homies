@@ -1,0 +1,4 @@
+
+# Verification builds. See the note in next.config.mjs: a build that shares
+# .next with a running dev server pulls the stylesheet out from under it.
+.next-verify/
