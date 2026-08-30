@@ -212,6 +212,36 @@ builds with six tools attached.
 heard either this or the office-number fix.
 
 
+### The first clone truncated words, and the clip was the reason
+
+- Client listened and rejected v1: words cut off, not finishing. Correct, and
+  none of my measurements had caught it.
+- **Found the cause in the training clip, not the model.** `clone-candidate-a.wav`
+  was cut 162-172s, chosen on 5 Aug for being the loudest steady ten seconds.
+  Checked its edges: it opens with a 0.15s fragment of a syllable and runs off
+  the end mid-phrase. An instant clone reproduces the clip it is given, edges
+  included, so it was trained on clipped speech and produced clipped speech.
+- **Changed the selection rule from level-first to boundary-first.** Mapped all
+  55 pauses in the recording and kept only windows that start *and* end inside
+  one. Three survived, all 4.4-5.5s with no internal gap at all.
+- Joined two of them into `clone-candidate-i.wav`, 9.38s. First attempt at the
+  join trimmed the tail to hit 9.9s and **that trim cut into speech**, putting
+  the original fault straight back; rebuilt without trimming, which is why the
+  clip is 9.38s and not 10.
+- Cloned v2 from it: `493006a2-0b42-46cf-a094-5cbde1ece032`.
+- Measured all three on five real agent lines. Against Eyal, v1 averages 0.93x
+  and v2 averages 1.09x; the ticket-number line went 0.87x to exactly 1.00x.
+  **The greeting is still 0.71x on v2**, so this is not declared fixed.
+- Pointed `CARTESIA_VOICE_ID` at v2. Leaving a known-bad id in `.env` is the
+  trap, not the fix. Neither clone is wired into any agent.
+- Rebuilt `voice/ido-vs-eyal.html` as three columns, Eyal against v1 against v2,
+  same words in each.
+- **Two things I had said that were wrong.** Duration would never have caught
+  this: it says a clip came out short, not that a word was clipped, and the
+  client heard in seconds what the numbers had not flagged. And I called Eyal's
+  timing flat, which it is not, the same greeting measured 4.49s and 5.51s on
+  two runs.
+
 ### The voice is cloned, on the client's account, because ours never could
 
 - Asked whether we were using Yariv's Cartesia key. We were not, and the answer

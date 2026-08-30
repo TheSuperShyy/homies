@@ -2118,11 +2118,26 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   edit and it makes the clone work — **and it moves every Hebrew utterance from
   both agents onto the client's bill, not just the cloned one.** Do not do this
   as a side effect of wiring up a voice.
-- **Listen before wiring it in: `voice/ido-vs-eyal.html`.** The clone's timing is
-  not steady. One render of a fixed line came out 14.11s and five repeats came
-  out 3.0–5.9s, against Eyal's flat 2.87s. The 14s outlier has not recurred and
-  the real Homies greeting measures 4.36s against Eyal's 4.49s, so this is a risk
-  to judge by ear rather than a defect to fix.
+- **Two clones exist and the first one is bad. Do not use `61e911a7`.**
+
+  | | id | from | verdict |
+  |---|---|---|---|
+  | v1 | `61e911a7-5409-413f-8483-bb68cf477441` | `clone-candidate-a.wav`, cut 162-172s | **rejected by the client, truncates words** |
+  | v2 | `493006a2-0b42-46cf-a094-5cbde1ece032` | `clone-candidate-i.wav`, two pause-bounded stretches joined | awaiting a listen |
+
+  `CARTESIA_VOICE_ID` in `.env` points at **v2**, because leaving a known-bad id
+  in place is the trap, not the fix. Neither is wired into any agent.
+  The loser gets deleted from the client's account once someone has listened.
+- **Why v1 failed, so it is not repeated:** the clip was cut at round timestamps
+  and so began and ended mid-word, and an instant clone reproduces its clip's
+  edges. New clips must start and end inside a pause. See CONTEXT, "Cut a
+  cloning clip on pauses, never on round numbers".
+- **Listen before wiring anything in: `voice/ido-vs-eyal.html`**, three columns
+  per line, Eyal against v1 against v2. Against Eyal, v1 averaged 0.93x and v2
+  averages 1.09x, and the ticket-number line went 0.87x to exactly 1.00x. **The
+  greeting is still 0.71x on v2**, which is where to listen hardest.
+- Earlier note here said Eyal's timing is flat. It is not: the same greeting
+  measured 4.49s and 5.51s on two runs. Stock voices vary too.
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.
 - ElevenLabs key in Vapi, if that voice is wanted.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to

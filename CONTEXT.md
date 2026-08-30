@@ -1372,6 +1372,29 @@ whatever wrapper the sender's phone chose.
 Once a recording is in a repo's history, removing it is a rewrite rather than a
 delete. That asymmetry is the whole reason these rules are strict.
 
+## Cut a cloning clip on pauses, never on round numbers
+
+The first clone of Ido truncated words, and the client heard it immediately. The
+cause was not the model. `clone-candidate-a.wav` was cut 162s to 172s because
+those were the loudest ten seconds, and a window chosen that way opens and closes
+wherever it happens to land: that one opens on a 0.15-second fragment of a
+syllable and runs off the end mid-phrase. **An instant clone learns the clip it
+is given, including how the clip begins and ends.** Feed it clipped speech and it
+produces clipped speech.
+
+So the selection rule is a boundary rule first and a level rule second: map every
+pause in the recording, keep only windows that **start and end inside a pause**,
+and score those on level. On this recording, 55 pauses left exactly three usable
+windows. Where one window is too short, join two pause-bounded ones rather than
+extending a single one to a target length; the seam is silence to silence, which
+is a breath, while a trim to fit puts the mid-word cut straight back.
+
+**And do not judge the result by duration.** Duration told us v1 came out short,
+which is a hint, and it cannot tell a clipped word from a brisk one. The client
+heard the fault in seconds and no measurement here had flagged it. Ship a
+listening page and ask a person; the numbers are for narrowing down which clip to
+try next, not for deciding.
+
 ## Whoever owns the key owns the voice
 
 Ido's clone (`61e911a7-…`, "Echo Stone") was made on **the client's own Cartesia

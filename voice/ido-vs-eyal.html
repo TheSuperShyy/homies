@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ido's clone against Eyal</title>
+<title>Ido's clone, second attempt</title>
 <style>
   :root {
     --bg: #faf9f7; --fg: #171614; --dim: #6b6862;
@@ -53,131 +53,86 @@
   li { margin-bottom: .4rem; }
 </style>
 <style>
-  .two { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-  @media (max-width:34rem) { .two { grid-template-columns:1fr; } }
-  .who { font-size:.8rem; color:var(--dim); margin-bottom:.3rem; }
+  .three { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  @media (max-width:46rem) { .three { grid-template-columns:1fr; } }
+  .who { font-size:.78rem; color:var(--dim); margin-bottom:.3rem; }
   .who .d { font-variant-numeric:tabular-nums; opacity:.7; }
   .lbl { font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
   .lbl .note { text-transform:none; letter-spacing:0; color:var(--dim); font-weight:400; }
   .he { font-size:1.05rem; margin:.2rem 0 .9rem; }
   audio { width:100%; }
-  .many { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.8rem; }
   .warn { border-left:3px solid var(--accent); padding-left:1rem; margin:2rem 0; color:var(--dim); }
 </style>
 </head>
 <body>
 <main>
-  <h1>Ido's clone against Eyal</h1>
-  <p class="sub">Same words, two voices. Eyal is the stock Hebrew voice the agents
-  use today; Ido is the clone made on 30 Aug from ten seconds of
-  <code>ido-voice.mp4</code>. Nothing is wired into any agent yet, and this page
-  is the decision.</p>
-
-  <h2>The lines that decide it</h2>
-
-  <div class="card">
-    <div class="lbl">greet-homies <span class="note">The real opening line. The one that matters most.</span></div>
-    <p class="he" dir="rtl">שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?</p>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">4.49s</span></div><audio controls preload="none" src="samples/probe/greet-homies-eyal.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">4.36s</span></div><audio controls preload="none" src="samples/probe/greet-homies-ido.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">short-ok <span class="note">Two words. Half the agent's turns start like this.</span></div>
-    <p class="he" dir="rtl">בסדר גמור.</p>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">0.97s</span></div><audio controls preload="none" src="samples/probe/short-ok-eyal.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">1.02s</span></div><audio controls preload="none" src="samples/probe/short-ok-ido.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">short-num <span class="note">Digits as words. The one line a caller writes down.</span></div>
-    <p class="he" dir="rtl">מספר הקריאה שלך אחת אפס אפס אחת.</p>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">2.46s</span></div><audio controls preload="none" src="samples/probe/short-num-eyal.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">2.22s</span></div><audio controls preload="none" src="samples/probe/short-num-ido.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">medium <span class="note">A full sentence, the length of a normal reply.</span></div>
-    <p class="he" dir="rtl">רשמתי את הפנייה, נזילה מהתקרה באמבטיה, והיא עוברת לצוות התחזוקה.</p>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">4.36s</span></div><audio controls preload="none" src="samples/probe/medium-eyal.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">4.18s</span></div><audio controls preload="none" src="samples/probe/medium-ido.mp3"></audio></div>
-    </div>
-  </div>
-
-  <h2>The old comparison script</h2>
-  <p class="sub">Written for CLIX rather than Homies, so the words are wrong, but
-  both voices say the identical text and that is what makes it useful.</p>
-
-  <div class="card">
-    <div class="lbl">c1-debt-none <span class="note">the debt line, no hesitation</span></div>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">6.64s</span></div><audio controls preload="none" src="samples/c1-debt-none-a976c076.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">6.40s</span></div><audio controls preload="none" src="samples/c1-debt-none-61e911a7.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">c2-debt-eh <span class="note">with אה</span></div>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">10.53s</span></div><audio controls preload="none" src="samples/c2-debt-eh-a976c076.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">9.38s</span></div><audio controls preload="none" src="samples/c2-debt-eh-61e911a7.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">c3-debt-ellipsis <span class="note">with a silent pause</span></div>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">7.89s</span></div><audio controls preload="none" src="samples/c3-debt-ellipsis-a976c076.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">6.71s</span></div><audio controls preload="none" src="samples/c3-debt-ellipsis-61e911a7.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">c4-debt-mixed <span class="note">both</span></div>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">9.87s</span></div><audio controls preload="none" src="samples/c4-debt-mixed-a976c076.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">7.78s</span></div><audio controls preload="none" src="samples/c4-debt-mixed-61e911a7.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">c5-debt-warm <span class="note">both, warmth turned up</span></div>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">8.80s</span></div><audio controls preload="none" src="samples/c5-debt-warm-a976c076.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">7.18s</span></div><audio controls preload="none" src="samples/c5-debt-warm-61e911a7.mp3"></audio></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="lbl">c6-debt-curious <span class="note">both, curiosity turned up</span></div>
-    <div class="two">
-      <div><div class="who">Eyal <span class="d">8.86s</span></div><audio controls preload="none" src="samples/c6-debt-curious-a976c076.mp3"></audio></div>
-      <div><div class="who">Ido <span class="d">7.24s</span></div><audio controls preload="none" src="samples/c6-debt-curious-61e911a7.mp3"></audio></div>
-    </div>
-  </div>
+  <h1>Ido's clone, second attempt</h1>
+  <p class="sub">You heard v1 cutting words off. This page has v2 beside it and
+  beside the stock voice, same words in every column.</p>
 
   <div class="warn">
-    <p><strong>One thing to listen for.</strong> The clone's timing is not steady.
-    The line below was rendered six times without changing a character: the first
-    came out <strong>14.11 seconds</strong>, the rest between 3.0 and 5.9. Eyal
-    says it in a flat 2.87 every time. The 14-second one has not come back, but
-    the spread is real, and on a phone call an opening that sometimes takes twice
-    as long is something a caller notices.</p>
-  </div>
-  <div class="card">
-    <div class="lbl">the same line, five more times</div>
-    <p class="he" dir="rtl">שלום, מדבר אסף מקליקס. איך אפשר לעזור?</p>
-    <div class="many">
-    <div><div class="who">run 1 <span class="d">5.88s</span></div><audio controls preload="none" src="samples/probe/clixgreet-0.mp3"></audio></div>
-    <div><div class="who">run 2 <span class="d">3.37s</span></div><audio controls preload="none" src="samples/probe/clixgreet-1.mp3"></audio></div>
-    <div><div class="who">run 3 <span class="d">3.00s</span></div><audio controls preload="none" src="samples/probe/clixgreet-2.mp3"></audio></div>
-    <div><div class="who">run 4 <span class="d">3.84s</span></div><audio controls preload="none" src="samples/probe/clixgreet-3.mp3"></audio></div>
-    <div><div class="who">run 5 <span class="d">3.47s</span></div><audio controls preload="none" src="samples/probe/clixgreet-4.mp3"></audio></div></div>
+    <p><strong>What was wrong with v1.</strong> It was cloned from ten seconds cut
+    at round timestamps, 162s to 172s. That window opens on a 0.15-second fragment
+    of a syllable and runs off the end mid-phrase, so the clip itself is clipped
+    speech and the clone learned it faithfully.</p>
+    <p><strong>What v2 is cloned from.</strong> Two stretches that begin and end in
+    an actual pause, 10.7-15.2s and 30.2-34.7s, joined into 9.4 seconds. No cut
+    lands inside a word anywhere in it.</p>
+    <p><strong>What the numbers say, and what they do not.</strong> Against Eyal,
+    v1 averaged 0.93x and v2 averages 1.09x, and the ticket-number line went from
+    0.87x to exactly 1.00x. But the greeting is still 0.71x, and duration only
+    tells you something is short, never whether a word was clipped. Your ear
+    decides this one.</p>
   </div>
 
-  <p class="sub" style="margin-top:2.5rem">The clone lives on the client's own
-  Cartesia account and can only be played with that account's key. Vapi still
-  holds ours, so no agent can reach this voice until someone decides to move the
-  credential, which also moves all Hebrew speech onto the client's bill.</p>
+
+  <div class="card">
+    <div class="lbl">greet <span class="note">The opening line. Still the shortest against Eyal, so listen here first.</span></div>
+    <p class="he" dir="rtl">שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?</p>
+    <div class="three">
+      <div><div class="who">Eyal, stock <span class="d">5.51s</span></div><audio controls preload="none" src="samples/v2/greet-eyal.mp3"></audio></div>
+      <div><div class="who">v1, cut mid-word <span class="d">3.24s</span></div><audio controls preload="none" src="samples/v2/greet-v1.mp3"></audio></div>
+      <div><div class="who">v2, clean clip <span class="d">3.89s</span></div><audio controls preload="none" src="samples/v2/greet-v2.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">ok <span class="note">Two words.</span></div>
+    <p class="he" dir="rtl">בסדר גמור.</p>
+    <div class="three">
+      <div><div class="who">Eyal, stock <span class="d">0.97s</span></div><audio controls preload="none" src="samples/v2/ok-eyal.mp3"></audio></div>
+      <div><div class="who">v1, cut mid-word <span class="d">1.02s</span></div><audio controls preload="none" src="samples/v2/ok-v1.mp3"></audio></div>
+      <div><div class="who">v2, clean clip <span class="d">1.62s</span></div><audio controls preload="none" src="samples/v2/ok-v2.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">num <span class="note">The line a caller writes down. v1 was short here; v2 matches Eyal exactly.</span></div>
+    <p class="he" dir="rtl">מספר הקריאה שלך אחת אפס אפס אחת.</p>
+    <div class="three">
+      <div><div class="who">Eyal, stock <span class="d">2.35s</span></div><audio controls preload="none" src="samples/v2/num-eyal.mp3"></audio></div>
+      <div><div class="who">v1, cut mid-word <span class="d">2.04s</span></div><audio controls preload="none" src="samples/v2/num-v1.mp3"></audio></div>
+      <div><div class="who">v2, clean clip <span class="d">2.35s</span></div><audio controls preload="none" src="samples/v2/num-v2.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">ticket <span class="note">A full reply.</span></div>
+    <p class="he" dir="rtl">רשמתי את הפנייה, נזילה מהתקרה באמבטיה, והיא עוברת לצוות התחזוקה.</p>
+    <div class="three">
+      <div><div class="who">Eyal, stock <span class="d">3.79s</span></div><audio controls preload="none" src="samples/v2/ticket-eyal.mp3"></audio></div>
+      <div><div class="who">v1, cut mid-word <span class="d">4.49s</span></div><audio controls preload="none" src="samples/v2/ticket-v1.mp3"></audio></div>
+      <div><div class="who">v2, clean clip <span class="d">3.94s</span></div><audio controls preload="none" src="samples/v2/ticket-v2.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">close <span class="note">The closing line. If this truncates, the call never hangs up.</span></div>
+    <p class="he" dir="rtl">תודה שהתקשרת להומיז, יום טוב, ולהתראות.</p>
+    <div class="three">
+      <div><div class="who">Eyal, stock <span class="d">2.93s</span></div><audio controls preload="none" src="samples/v2/close-eyal.mp3"></audio></div>
+      <div><div class="who">v1, cut mid-word <span class="d">2.82s</span></div><audio controls preload="none" src="samples/v2/close-v1.mp3"></audio></div>
+      <div><div class="who">v2, clean clip <span class="d">3.06s</span></div><audio controls preload="none" src="samples/v2/close-v2.mp3"></audio></div>
+    </div>
+  </div>
+  <p class="sub" style="margin-top:2.5rem">Both clones sit on the client's Cartesia
+  account. Nothing is wired into any agent, and whichever one loses gets deleted.</p>
 </main>
 </body>
 </html>
