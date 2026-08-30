@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { COOKIE, getLocale, translator, type Locale } from '@/lib/i18n';
+import { COOKIE, getLocale, getTheme, translator, type Locale } from '@/lib/i18n';
 import { LoginForm } from '@/components/login-form';
 import { IconLanguage } from '@/components/icons';
 
@@ -29,6 +29,7 @@ async function setLocale(formData: FormData) {
 
 export default function Login() {
   const locale = getLocale();
+  const theme = getTheme();
   const t = translator(locale);
   const other: Locale = locale === 'he' ? 'en' : 'he';
   return (
@@ -48,10 +49,14 @@ export default function Login() {
           dark file has it recolored white. Both derive from Homies-Logo.png
           at the repo root. */}
       <div className="authbrand">
-        <picture>
-          <source srcSet="/homies-logo-dark.png" media="(prefers-color-scheme: dark)" />
-          <img src="/homies-logo.png" alt={`${t('app.name')} — ${t('app.subtitle')}`} />
-        </picture>
+        {/* Server-picked, not `<picture media="(prefers-color-scheme: dark)">`.
+            That media query was correct while the theme followed the operating
+            system; since the theme became a cookie and a switch in the topbar
+            it has been answering the wrong question, and a reader on a light OS
+            who chose the dark theme got the near-black wordmark on a near-black
+            page. The theme is known here. */}
+        <img src={theme === 'light' ? '/homies-logo.png' : '/homies-logo-dark.png'}
+             alt={`${t('app.name')} — ${t('app.subtitle')}`} />
       </div>
       <form action={setLocale} className="authlang">
         <input type="hidden" name="to" value={other} />

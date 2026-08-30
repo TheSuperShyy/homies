@@ -86,6 +86,36 @@ conversation that produced it.
 - Baseline for comparison after deploy: live `/login` TTFB today, before any of
   this ships, was 1.78s cold and ~0.43s warm.
 
+### The real logo is in the sidebar, and looking for it found two other bugs
+
+- The sidebar's brand was a generic building glyph on a blue tile. It is the
+  actual Homies roof mark now, cut out of the two existing logo files at the
+  exact row the "HOMIES" wordmark starts (y=129 — rows 127-128 are only the
+  ladder foot, so this is the measured gap, not a guess). Saved as
+  `public/homies-mark.png` and `homies-mark-dark.png`.
+- **Two files, because the logo has a black ladder and figure** that disappear
+  on a near-black sidebar; the dark source draws both in white. Composited each
+  variant onto its real ground and looked at it before wiring anything.
+- **The variant is picked on the SERVER**, from the theme cookie the layout has
+  already read. Which turned up a live bug: the login page was choosing with
+  `<picture media="(prefers-color-scheme: dark)">`, correct while the theme
+  followed the operating system and wrong since it became a switch in the
+  topbar — a reader on a light OS who chose the dark theme got the near-black
+  wordmark on a near-black page. Fixed the same way. Verified by requesting
+  /login with each cookie value and checking which file came back.
+- **The rail was crushing its own contents on a short window.** Found by
+  probing the DOM when the brand vanished from a 300px-tall screenshot: the
+  image had loaded fine at 51x24, but `.brand` had computed height ZERO and its
+  own `overflow: hidden` clipped everything away — no error, nothing in the DOM
+  to explain it. Cause: `.rail` is a column flex container pinned to `100dvh`,
+  so under about 620px of viewport flex took the space out of its items instead
+  of scrolling. `.rail > * { flex: none }`. It bit the logo first because the
+  logo was the newest thing there, but it would have eaten the brand on any
+  laptop with enough toolbars.
+- Verified at 1440x760 in both themes and both directions, and at 1440x300 —
+  the case that was broken. Build and `tsc` clean, run with
+  `NEXT_DIST_DIR=.next-verify` so the owner's dev server kept working.
+
 ### The page that "looked like that" was a 404 on its own stylesheet, and I caused it
 
 - Reported as a giant purple rounded square filling the browser. That is what

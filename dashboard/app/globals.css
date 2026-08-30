@@ -159,6 +159,15 @@ a { color: inherit; text-decoration: none; }
     overflow-y: auto;
     scrollbar-width: thin;
   }
+  /* NOTHING IN THE RAIL SHRINKS. It is a column flex container pinned to the
+     viewport height, so on a short window — a laptop with three toolbars, or
+     any window under about 620px — flex would take the space out of its items
+     rather than scroll. The brand went first, crushed to height 0 and then
+     clipped away entirely by its own `overflow: hidden`: the logo and the
+     wordmark simply were not on the page, with no error and nothing in the
+     DOM to suggest why. The rail already scrolls; this makes it actually do
+     that instead. */
+  .rail > * { flex: none; }
 }
 
 /* The wordmark. The system has no logo asset and says so — its own answer is
@@ -175,13 +184,16 @@ a { color: inherit; text-decoration: none; }
 }
 @media (min-width: 1024px) { .brand { margin-block-end: 4px; } }
 
+/* The mark is an image now, and it is wider than it is tall — 275x129 in the
+   source, so a fixed height and `width: auto` keeps it from being squashed.
+   No plate behind it: the same square white box was tried on the login page in
+   August and read as a white square rather than as a logo, and the reasoning
+   has not changed. It floats on the sidebar ground, which both variants are
+   drawn for. */
 .brand .mark {
-  width: 32px; height: 32px; flex: none;
-  border-radius: var(--radius-sm);
-  background: var(--accent-fill); color: var(--accent-fg);
-  display: grid; place-items: center;
+  height: 24px; width: auto; flex: none;
+  display: block;
 }
-.brand .mark svg { width: 17px; height: 17px; }
 .brand b {
   font-size: var(--text-lg); font-weight: var(--weight-semibold);
   letter-spacing: -.01em; display: block; line-height: 1.2;

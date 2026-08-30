@@ -35,6 +35,13 @@ heights, radii, paddings -- are copied from the system's components, not
 re-invented; where a number is copied the CSS comment names the component it
 came from.
 
+**When something is missing from the page, probe the DOM before theorising.**
+Twice in one day an element that was simply absent had a cause no amount of
+reading the source would have found — a stylesheet 404, and a flex item with a
+computed height of zero. A ten-line script that prints `getBoundingClientRect`
+and `naturalWidth` into a fixed overlay settles it in one screenshot, and every
+guess made before running it was wrong.
+
 **Do not disturb the owner's running dev server.** Verification builds go to
 their own `distDir` (`NEXT_DIST_DIR=.next-verify npx next build`), and the
 owner's processes are not killed or their `.next` deleted without saying so

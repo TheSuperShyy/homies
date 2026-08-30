@@ -5,7 +5,7 @@ import { serverClient } from '@/lib/supabase-server';
 import { COOKIE, THEME_COOKIE, getLocale, getTheme, translator, type Locale } from '@/lib/i18n';
 import { BackField, RailNav, type NavGroup } from '@/components/nav';
 import {
-  NAV_ICON, IconBell, IconBuilding, IconLanguage, IconMoon, IconSearch,
+  NAV_ICON, IconBell, IconLanguage, IconMoon, IconSearch,
   IconSettings, IconSignOut, IconSun,
 } from '@/components/icons';
 
@@ -98,7 +98,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="shell">
       <nav className="rail" aria-label={t('nav.menu')}>
         <Link className="brand" href="/">
-          <span className="mark"><IconBuilding /></span>
+          {/* The real mark, not the generic building glyph that stood in for
+              it. Two files rather than one because the logo carries a black
+              ladder and figure that disappear on a near-black sidebar; the
+              dark variant draws both in white.
+
+              THE VARIANT IS PICKED HERE, ON THE SERVER, because the theme is a
+              cookie this layout has already read. The login page used to do
+              this with `<picture media="(prefers-color-scheme: dark)">`, which
+              was right while the theme followed the operating system and wrong
+              the moment it became a switch in the topbar — a reader on a light
+              OS who chose the dark theme got the black-figure logo on a black
+              ground. Same asset, same bug, fixed the same way. */}
+          <img className="mark" alt=""
+               src={theme === 'light' ? '/homies-mark.png' : '/homies-mark-dark.png'} />
           <span>
             <b>{t('app.name')}</b>
             <small>{t('app.subtitle')}</small>

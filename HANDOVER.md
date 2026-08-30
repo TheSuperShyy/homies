@@ -1171,6 +1171,18 @@ handset.**
   middleware now sets `x-user-email` on the request headers alongside
   `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
   layout or page**; the middleware is the only place that should call it.
+- **Four logo files, and which one to use is decided on the server.**
+  `public/homies-logo{,-dark}.png` are the full lockup (login page);
+  `public/homies-mark{,-dark}.png` are the roof mark alone (sidebar), cut from
+  the same sources. The `-dark` variants draw the ladder and figure in WHITE
+  and are for dark grounds. **Do not pick between them with
+  `prefers-color-scheme`** — the theme is a cookie and a switch in the topbar,
+  so a media query answers the wrong question; read `getTheme()` and set the
+  `src`. That bug shipped once already on the login page.
+- **`.rail > * { flex: none }` is load-bearing.** The sidebar is a column flex
+  container at `100dvh`; without it, a viewport under ~620px tall makes flex
+  shrink the items instead of scrolling, and the brand collapses to height 0
+  and is clipped away by its own `overflow: hidden` — invisible, with no error.
 - **NEVER run `next build` while a dev server is up on the same directory.**
   Both write to `.next`; the build rewrites it under the running server, whose
   manifest then points at chunks that no longer exist, and the browser 404s on
