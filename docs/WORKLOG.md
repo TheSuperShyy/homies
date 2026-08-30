@@ -86,6 +86,33 @@ conversation that produced it.
 - Baseline for comparison after deploy: live `/login` TTFB today, before any of
   this ships, was 1.78s cold and ~0.43s warm.
 
+### The hero card's ornament is rooftops now, not a stock dashboard's rings
+
+- The concentric rings on the open-tickets card were the design system's, and
+  the design system is a recreation of a STOCK PORTFOLIO dashboard — a ring
+  reads there as a dial or a market. On a card counting maintenance tickets for
+  a building-management company it meant nothing. Replaced with a row of
+  rooftops: pitched and flat roofs, lit windows, a street line, echoing the
+  roof in the Homies mark now in the sidebar.
+- Same treatment as the thing it replaces, so it stays ornament: `--text-1` at
+  10-16% opacity, clipped into the corner, behind the number and never beside
+  it. Inline SVG rather than a background image, which means one `currentColor`
+  covers both themes with no second asset and no media query.
+- Mirrored by logical inset plus `scaleX(-1)` in Hebrew, so the tallest
+  building stays at the outer edge in both directions.
+- Two things that had to be right and were not at first: an `<svg>` with a
+  viewBox and no width does NOT size itself from that viewBox the way an
+  `<img>` would — it falls back to 300px regardless of the height beside it, so
+  the box is set with `aspect-ratio`. And an absolutely positioned sibling
+  paints above every static one wherever it sits in the DOM, so the label and
+  the number needed `position: relative` or the rooftops were drawn over the
+  number rather than behind it.
+- This is the one deliberate departure from the reference in the whole restyle.
+  Recorded as such in CONTEXT: ornament either says whose product it is or it
+  says nothing.
+- Looked at in all three variants — dark RTL, dark LTR, light RTL. Build, `tsc`
+  and contrast clean.
+
 ### The real logo is in the sidebar, and looking for it found two other bugs
 
 - The sidebar's brand was a generic building glyph on a blue tile. It is the

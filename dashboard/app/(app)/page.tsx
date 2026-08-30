@@ -1,6 +1,7 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, label, translator, when } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
+import { HeroMotif } from '@/components/motif';
 import {
   Donut, Legend, MetricCard, bucketSeries, grainFor, labeller, type Slice,
 } from '@/components/charts';
@@ -132,7 +133,7 @@ export default async function Overview({
   // the only red thing on the page, which is what makes it findable.
   //
   // THE FIRST ONE IS THE HERO, in the design system's sense: double width,
-  // accent ground, the ring motif, and the number at 34px instead of 26. The
+  // accent ground, the rooftop motif, and the number at 34px instead of 26. The
   // reference gives that treatment to the portfolio total, because a dashboard
   // that treats all its numbers alike has not said which one you came for.
   // Here it is open tickets — the count that decides whether anybody needs to
@@ -154,6 +155,7 @@ export default async function Overview({
       <div className="cards">
         {cards.map(([tone, k, n]) => (
           <div className={`card ${tone}`} key={k}>
+            {tone.includes('hero') && <HeroMotif />}
             <div className="k">{k}</div>
             <div className="n">{n}</div>
           </div>

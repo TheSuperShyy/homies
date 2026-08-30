@@ -1171,6 +1171,11 @@ handset.**
   middleware now sets `x-user-email` on the request headers alongside
   `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
   layout or page**; the middleware is the only place that should call it.
+- **The hero card's ornament is ours, not the design system's.** The system
+  ships concentric rings; `components/motif.tsx` draws rooftops instead,
+  because the rings came from a stock-portfolio recreation and meant nothing on
+  a maintenance dashboard. It is the only deliberate departure from the
+  reference in the restyle — do not "restore" it.
 - **Four logo files, and which one to use is decided on the server.**
   `public/homies-logo{,-dark}.png` are the full lockup (login page);
   `public/homies-mark{,-dark}.png` are the roof mark alone (sidebar), cut from

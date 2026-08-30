@@ -35,6 +35,14 @@ heights, radii, paddings -- are copied from the system's components, not
 re-invented; where a number is copied the CSS comment names the component it
 came from.
 
+**Ornament is the one place the supplied design system gets overruled.** Its
+values — colour, type, radii, control heights — are copied exactly. Its
+decoration is not, where the decoration carries a meaning borrowed from the
+dashboard it was recreated from: the hero's concentric rings belong to a stock
+portfolio and say nothing about buildings. Ornament either says whose product
+this is or it says nothing, so it gets replaced rather than inherited. Nothing
+else in the system does.
+
 **When something is missing from the page, probe the DOM before theorising.**
 Twice in one day an element that was simply absent had a cause no amount of
 reading the source would have found — a stylesheet 404, and a flex item with a

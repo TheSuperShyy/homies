@@ -450,17 +450,15 @@ h2 {
 }
 .card .k { font-size: var(--text-sm); color: var(--text-2); }
 
-/* StatCard hero: accent-soft ground, no border, radius-lg, padding 24, and the
-   concentric-ring motif clipped into the corner. The rings are the one piece of
-   ornament the system ships, and they are what makes the headline number read
-   as the headline.
+/* StatCard hero: accent-soft ground, no border, radius-lg, padding 24, and an
+   ornament in the corner — which is what makes the headline number read as the
+   headline rather than as the first of five equal ones.
 
-   Drawn as a repeating gradient rather than the reference's eight SVG circles —
-   no DOM, no request — but a repeating gradient repeats forever, and the first
-   attempt banded the whole card like a sonar screen. The mask is what makes it
-   the reference's motif instead: the rings exist only within ~210px of their
-   centre and fade out before they reach the number, exactly as eight circles
-   with a largest radius of 186 would. `-webkit-mask` alongside for Safari. */
+   The ornament is NOT the system's. Its hero carries concentric rings, which
+   are right on the stock dashboard they came from and mean nothing on a card
+   counting maintenance tickets. `components/motif.tsx` draws rooftops instead.
+   That is the one place this restyle departed from the reference on purpose:
+   ornament either says whose product this is or it says nothing. */
 .card.hero {
   grid-column: span 2;
   background: var(--accent-soft);
@@ -468,28 +466,27 @@ h2 {
   border-radius: var(--radius-lg);
   padding: 22px 24px;
 }
-.card.hero::after {
-  content: ""; position: absolute; pointer-events: none;
-  /* A ring disc parked over the corner, rather than a gradient positioned with
-     `calc(100% - 58px)`. The calc version put the rings on the wrong corner in
-     one of the two directions and was awkward to reason about; an element with
-     a real size and `inset-inline-end` mirrors itself, which is the whole point
-     of logical properties. Sized so the largest visible ring is ~186px across,
-     which is what the reference's eight SVG circles come to. */
-  inset-block-start: -104px;
-  inset-inline-end: -58px;
-  width: 300px; height: 300px; border-radius: 50%;
-  background: repeating-radial-gradient(circle at center,
-    rgba(255, 255, 255, .05) 0 13px, transparent 13px 26px);
-  /* Fades the outermost rings out instead of cutting them off at a hard edge —
-     without this the disc reads as a circle with a pattern in it. */
-  -webkit-mask-image: radial-gradient(circle at center, #000 0 48%, transparent 92%);
-  mask-image: radial-gradient(circle at center, #000 0 48%, transparent 92%);
+/* The rooftops. Positioned by logical inset so the row hugs the corner the
+   eye reaches LAST in either direction — behind the number, never beside it —
+   and mirrored in Hebrew so the tallest building stays at the outer edge. */
+.heromotif {
+  position: absolute; inset-block-end: 0; inset-inline-end: 0;
+  /* `aspect-ratio`, not `width: auto`. An `<svg>` with a viewBox and no width
+     does not size itself from that viewBox the way an `<img>` would — it falls
+     back to the replaced-element default and comes out 300px wide regardless
+     of the height beside it. */
+  height: 100%; aspect-ratio: 220 / 120; max-width: 64%;
+  color: var(--text-1);
+  pointer-events: none;
 }
-[data-theme="light"] .card.hero::after {
-  background: repeating-radial-gradient(circle at center,
-    rgba(0, 0, 0, .05) 0 13px, transparent 13px 26px);
-}
+[dir="rtl"] .heromotif { transform: scaleX(-1); }
+
+/* The label and the number have to join the positioned layer to stay in front
+   of it. An absolutely positioned sibling paints above every static one no
+   matter where it sits in the DOM, so without this the rooftops are drawn over
+   the number rather than behind it. */
+.card.hero .k, .card.hero .n { position: relative; }
+
 .card.hero::before { display: none; }
 .card.hero .n { font-size: var(--text-3xl); margin-block-start: 10px; }
 .card.hero .k { font-size: var(--text-md); }
