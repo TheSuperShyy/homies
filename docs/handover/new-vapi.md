@@ -470,12 +470,25 @@ from here on. **The lesson is the grep, not the list**: run it after the script,
 against the ids you just left, every time. The list will always be one move
 behind the repo.
 
-`dashboard/lib/call.ts` is worse than the others because `VAPI_DEBT_ASSISTANT_ID`
-on Vercel wins over the constant, so a stale constant is invisible until the day
-somebody unsets the variable — and then the button silently calls an assistant on
-an account nobody is watching. **Vercel's own `VAPI_PRIVATE_KEY` and
-`VAPI_DEBT_ASSISTANT_ID` are not in this repo and do not travel.** Update them in
-the Vercel dashboard or the Call button keeps billing the old account.
+`dashboard/lib/call.ts` is the subtle one: `VAPI_DEBT_ASSISTANT_ID` on Vercel
+wins over the constant, so a stale constant says nothing until the day somebody
+sets neither — and then the button calls an assistant on an account nobody is
+watching.
+
+**Checked rather than assumed, the same day:** `homies-dashboard` on Vercel holds
+no Vapi variables at all and `hiddenProductionEnvCount` is 0, so the Call button
+is switched off in production — `callingEnabled()` needs `CALL_PIN`, which is
+not set. Nothing had to be changed there, and the warning that used to stand here
+(*"update them or the button keeps billing the old account"*) was wrong. Read the
+host with `VERCEL_API` before writing that sentence about any future move.
+`VERCEL_TOKEN` in `.env` is dead — 403 `invalidToken` — and `VERCEL_API` is the
+one that authenticates.
+
+**The demo page deploys itself.** `web/` is `TheSuperShyy/homies-voice-demo`,
+auto-deploying to `homies-voice-demo.vercel.app` on push to `main`. Verified
+after the 30 Aug push: the served page carries public key `36afb64b` and all four
+new ids, and greps clean for every id of the account it left. The dashboard is a
+separate project at `homies-dashboard.vercel.app`.
 
 Verified after, against the promoted key: four assistants with the right names,
 prompts byte-identical to the outgoing account at 53,635 / 35,622 / 63,217 /

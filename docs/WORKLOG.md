@@ -58,6 +58,34 @@ conversation that produced it.
   Re-pushing is a decision about the prompt, not a step in the move, so it was
   left alone.
 
+### The demo site is on the new account, and the Vercel warning was wrong
+
+- Pushed `web/` to `TheSuperShyy/homies-voice-demo`, which auto-deploys.
+  `homies-voice-demo.vercel.app` now serves public key `36afb64b` and all four
+  August ids, and greps clean for every id of the account it left.
+- **The old account is $0.07 overdrawn.** Probing `/call/web` with each public
+  key and a deliberately fake assistant id — so nothing is created either way —
+  the new key fails only on the fake id, and the old one fails with `Your Wallet
+  Balance is -0.07`. Vapi refuses a web call *before* it creates one, so every
+  Start call on the live page had been failing with no call record on either
+  side to find. This is the second time an account has gone under: account 5
+  did the same on 19 Aug at $0.11.
+- **Corrected my own warning from earlier today.** I had said the dashboard's
+  Call button would keep billing the old account until Vercel's env vars were
+  changed. Read rather than assumed: `homies-dashboard` holds **no** Vapi
+  variables and `hiddenProductionEnvCount` is 0, so `callingEnabled()` is false
+  and the column does not render. Nothing needed changing, and outbound cannot
+  run from there until there is a phone number regardless. The constant in
+  `dashboard/lib/call.ts` was still worth fixing: it is the fallback that takes
+  over the day the variable is set and wrong.
+- **`VERCEL_TOKEN` in `.env` is dead** — 403 `invalidToken`. `VERCEL_API` beside
+  it authenticates as `thesupershyy`. Both docs now say so, because trying the
+  obvious-looking one first costs a debugging detour.
+- The `start-method-error` on the browser console was the microphone, not the
+  migration: the page was open as a local file, and Chrome refuses `getUserMedia`
+  to `file://`. Served it on `localhost:8000`, which is what `web/README.md`
+  says to do.
+
 ### Ten inbound voice scenarios, run against the live assistant
 
 - Built a harness that loads the live inbound assistant's own prompt, model,

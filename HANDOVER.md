@@ -485,12 +485,33 @@ still misbehaves. Current ids, and the full account of the move, are in
 | Cartesia credential | `448aa856-75ef-4209-9f0c-b795be6529dc` | `6b3954f6-…`, `52e0bca2-…` |
 | Org | `c9c2b782-6419-4d2f-ad74-cc72ba4ff65c` | `4cedeed3-…` |
 
-**Two things on the August account are still open and are not this repo's to
-close.** Vercel holds its own `VAPI_PRIVATE_KEY` and `VAPI_DEBT_ASSISTANT_ID`
-for the dashboard's Call button — until those are changed in the Vercel
-dashboard, the button bills the old account. And nobody has placed a call on the
-August account in either language, so the Cartesia voice is verified by its id
-and not yet by ear.
+**The demo is deployed and the dashboard has nothing to deploy.** Both Vercel
+projects were read on 30 Aug with `VERCEL_API`:
+
+| Project | Domain | Vapi vars |
+|---|---|---|
+| `homies-voice-demo` | `homies-voice-demo.vercel.app` | none — the keys are in the page |
+| `homies-dashboard` | `homies-dashboard.vercel.app` | **none**, and `hiddenProductionEnvCount` is 0 |
+
+`homies-voice-demo` auto-deploys from `TheSuperShyy/homies-voice-demo` and is
+serving the August account: public key `36afb64b`, all four new ids, no trace of
+the old ones.
+
+**Correction to what this file said earlier: the dashboard's Call button was
+never going to bill the old account, because it is switched off in production.**
+`callingEnabled()` needs `CALL_PIN` and the call itself needs `VAPI_PRIVATE_KEY`
+and `VAPI_PHONE_NUMBER_ID`; the project holds none of the three, so the column
+does not render. Outbound cannot work from Vercel until there is a phone number
+anyway ([[homies-no-phone-numbers]]). The constant in `dashboard/lib/call.ts`
+was still worth fixing — it is the fallback that takes over the day
+`VAPI_DEBT_ASSISTANT_ID` is set and is wrong.
+
+**Still open: nobody has placed a call** on the August account in either
+language, so the Cartesia voice is verified by its id and not yet by ear.
+
+**Two Vercel tokens are in `.env` and only one works.** `VERCEL_TOKEN` returns
+403 `invalidToken`; `VERCEL_API` authenticates as `thesupershyy`. Use
+`VERCEL_API`, and treat `VERCEL_TOKEN` as dead rather than as a second try.
 
 Account 5's balance is **unknown**, and the earlier claim here that it was back
 in credit was wrong. `VAPI_PUBLIC_KEY_ACCOUNT5` in `.env` does not hold account

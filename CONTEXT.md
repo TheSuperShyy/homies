@@ -1323,12 +1323,18 @@ script: **grep the outgoing ids across the repo yourself**, and add whatever you
 find to `ID_FILES` before you forget. A wrong assistant id does not error — it
 starts a call with the wrong agent, on an account nobody is watching.
 
-**Environment variables in a hosting dashboard do not travel and this repo
-cannot see them.** Vercel holds its own `VAPI_PRIVATE_KEY` and
-`VAPI_DEBT_ASSISTANT_ID` for the dashboard's Call button; a move that changes
-`.env` and the code leaves both untouched. Worse, an env var *wins* over the
-constant beside it, so a stale hardcoded fallback stays invisible until the day
-somebody unsets the variable.
+**Environment variables in a hosting dashboard do not travel, and guessing at
+them is not the same as reading them.** A move that changes `.env` and the code
+leaves a host's own variables untouched, and an env var *wins* over the constant
+beside it, so a stale hardcoded fallback stays invisible until the day somebody
+unsets the variable — which is why `dashboard/lib/call.ts` is worth keeping
+right even when nothing reads it.
+
+But read the host before warning about it. On 30 Aug this warning was issued
+about the dashboard's Call button and was wrong: `VERCEL_API` in `.env` lists
+both projects, and `homies-dashboard` holds no Vapi variables at all — no
+`CALL_PIN`, so the button does not even render. `VERCEL_TOKEN` beside it is dead
+(403 `invalidToken`); `VERCEL_API` is the working one.
 
 **A copy is not a rebuild, and the difference is the point.**
 `vapi_transfer.py` reproduces what **is** live; `vapi_sync.py` pushes what the
