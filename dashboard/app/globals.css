@@ -1,89 +1,69 @@
 /* One stylesheet, no framework. The dashboard is tables and text; a build-time
    CSS toolchain would be more moving parts than the whole app.
 
+   THE LOOK COMES FROM THE STOVEST DESIGN SYSTEM, vendored under
+   `dashboard/design-system/`. Nothing below invents a colour, a radius, a
+   control height or a font size — every value is either a token from that
+   system or a number copied out of one of its components (Button, Input,
+   Card, StatCard, DataTable, Tabs, SidebarItem). Where a number is copied
+   rather than tokenised the comment says which component it came from, so the
+   next person can check it against the source instead of guessing.
+
    EVERYTHING HERE IS WRITTEN IN LOGICAL PROPERTIES — inline-start, not left.
    The interface runs right-to-left in Hebrew and left-to-right in English off
    one `dir` attribute, and a single hardcoded `left` is a corner that silently
-   stays on the wrong side in one of the two languages. */
+   stays on the wrong side in one of the two languages. The design system is
+   authored left-to-right throughout, so every value taken from it has been
+   translated on the way in: `borderRight` on the sidebar becomes
+   `border-inline-end`, `translateX` on the switch knob flips with direction. */
 
-/* ---------------------------------------------------------------- tokens -- */
-/* Semantic names, never raw hex at the call site. The status colours carry
-   meaning, so they are defined once here and every pill, stripe and dot reads
-   from the same six. */
+@import '../design-system/styles.css';
+
+/* ---------------------------------------------------------------- bridge -- */
+/* The app's own semantic names, pointed at the design system's tokens.
+   This layer exists so the ~90 selectors below did not all have to be rewritten
+   in one commit, and so a future token change lands in one place. Read it as
+   the dictionary between the two vocabularies.
+
+   It is declared ONCE, not per theme: every value on the right is a `var()`,
+   which resolves at the point of use, so when `[data-theme="light"]`
+   redefines `--surface-1` the bridge follows without a second block. A
+   hardcoded hex anywhere in here would silently pin one theme's colour into
+   both, which is the classic way a themed stylesheet breaks. */
 :root {
-  color-scheme: light dark;
+  --bg:        var(--bg-0);
+  --panel:     var(--surface-1);
+  --panel-2:   var(--surface-2);
+  --panel-3:   var(--surface-3);
+  --line:      var(--border-1);
+  --line-2:    var(--border-2);
+  --ink:       var(--text-1);
+  --ink-2:     var(--text-2);
+  /* Two muted tiers, not one. `--muted` is body-sized secondary text — a table
+     cell, a caption — and takes the system's `--text-2`. `--faint` is the
+     uppercase micro-label tier ("MAIN MENU") and takes `--text-3`. Collapsing
+     them into one value is what makes a dashboard read as flat. */
+  --muted:     var(--text-2);
+  --faint:     var(--text-3);
 
-  --bg:        #F1F5F9;
-  --panel:     #FFFFFF;
-  --panel-2:   #F8FAFC;
-  --line:      #E2E8F0;
-  --line-soft: #EFF3F8;
-  --ink:       #0F172A;
-  --ink-2:     #334155;
-  /* slate-500 (#64748B) was the obvious pick and it misses AA: 4.34:1 against
-     the page ground, where most muted text on this dashboard actually sits.
-     One step darker clears 4.5 and still reads as a second tier against
-     --ink-2, which is the job it does. */
-  --muted:     #5B6B80;
+  --accent-ink:  var(--accent-fg);
+  --accent-line: var(--border-2);
 
-  --accent:      #1E40AF;
-  --accent-ink:  #FFFFFF;
-  --accent-soft: #E8EEFB;
-  --accent-line: #C7D7F5;
+  --open:     var(--st-open);      --open-bg:     var(--st-open-bg);
+  --progress: var(--st-progress);  --progress-bg: var(--st-progress-bg);
+  --done:     var(--st-done);      --done-bg:     var(--st-done-bg);
+  --review:   var(--st-review);    --review-bg:   var(--st-review-bg);
+  --idle:     var(--st-idle);      --idle-bg:     var(--st-idle-bg);
 
-  /* The row action. Amber against the blue so the one thing you press is never
-     the same colour as the thing you read. */
-  --action:       #B45309;
-  --action-ink:   #FFFFFF;
-  --action-hover: #92400E;
+  --action-ink: var(--action-fg);
 
-  --open:     #B45309;  --open-bg:     #FEF3C7;
-  --progress: #1D4ED8;  --progress-bg: #DBEAFE;
-  --done:     #15803D;  --done-bg:     #DCFCE7;
-  --review:   #B91C1C;  --review-bg:   #FEE2E2;
-  --idle:     #5B6B80;  --idle-bg:     #F1F5F9;
-
-  --radius:    10px;
-  --radius-sm: 7px;
-  --shadow:    0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .04);
-  --shadow-md: 0 1px 2px rgba(15, 23, 42, .05), 0 12px 28px -20px rgba(15, 23, 42, .5);
-  --sidebar:   244px;
+  --radius:    var(--radius-lg);   /* 20px — cards and panels */
+  --radius-sm: var(--radius-md);   /* 14px — nested tiles, square inputs */
+  --shadow:    var(--shadow-card); /* none on dark, hairline on light */
+  --shadow-md: var(--shadow-pop);
+  --sidebar:   var(--sidebar-w);   /* 232px */
 
   --ease: cubic-bezier(.2, .7, .3, 1);
-}
-
-/* Dark is designed, not inverted: the surfaces lift toward blue rather than
-   toward grey, and every status colour is re-picked because the light-mode
-   amber and green both fall under 4.5:1 on a dark panel. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:        #0B0F17;
-    --panel:     #141A23;
-    --panel-2:   #19212C;
-    --line:      #253040;
-    --line-soft: #1C242F;
-    --ink:       #E8EDF5;
-    --ink-2:     #C2CCDA;
-    --muted:     #94A3B8;
-
-    --accent:      #7CA0F0;
-    --accent-ink:  #0B0F17;
-    --accent-soft: #1B2740;
-    --accent-line: #2F4675;
-
-    --action:       #FB923C;
-    --action-ink:   #1A1005;
-    --action-hover: #FDBA74;
-
-    --open:     #F5B841;  --open-bg:     #3A2C10;
-    --progress: #7CA0F0;  --progress-bg: #1B2740;
-    --done:     #52C98B;  --done-bg:     #123324;
-    --review:   #F87171;  --review-bg:   #3B1A1A;
-    --idle:     #94A3B8;  --idle-bg:     #1C242F;
-
-    --shadow:    0 1px 2px rgba(0, 0, 0, .5);
-    --shadow-md: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 28px -20px rgba(0, 0, 0, 1);
-  }
 }
 
 * { box-sizing: border-box; }
@@ -92,28 +72,35 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-hebrew), ui-sans-serif, system-ui, -apple-system,
-               "Segoe UI", sans-serif;
-  font-size: 16px;
-  line-height: 1.55;
+  background: var(--bg-0);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  /* The system's default UI size is 13px and the whole scale is built on it.
+     Setting the root to 16px and then overriding every element back down was
+     the old arrangement, and it meant anything without an explicit size came
+     out a third too large. */
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
 }
 
 a { color: inherit; text-decoration: none; }
 
 /* One focus ring, defined once, visible on both grounds. Removing these is the
-   single most common way a dashboard becomes unusable by keyboard. */
+   single most common way a dashboard becomes unusable by keyboard. The system
+   ships `--focus-ring` as a soft accent halo; on a near-black canvas a halo
+   alone is not enough to find, so the outline stays and the halo is added. */
 :where(a, button, select, input, summary):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--focus-ring);
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
@@ -122,23 +109,42 @@ a { color: inherit; text-decoration: none; }
 /* ------------------------------------------------------------- app shell -- */
 /* Sidebar on a desk, top bar on a phone. An operations dashboard is used at a
    desk nearly all of the time, and a persistent rail means the six views are
-   one click apart from anywhere instead of hidden behind a menu. */
-.shell { display: grid; grid-template-columns: 1fr; min-height: 100dvh; }
+   one click apart from anywhere instead of hidden behind a menu.
+
+   The reference fixes the sidebar at 232px and never collapses it, because it
+   was drawn at 1440px and nothing else. This app is opened on a phone, so the
+   rail below 1024px becomes the horizontal bar it already was. */
+/* `minmax(0, 1fr)`, NOT `1fr`. A bare `1fr` track is `minmax(auto, 1fr)`, and
+   `auto` as a minimum means min-content — so the track can be pushed wider than
+   the viewport by the widest unbreakable thing inside it, which here is the
+   rail's row of `white-space: nowrap` nav labels. Nothing observed is currently
+   overflowing; this is the guard, and it costs nothing. Worth knowing why it
+   matters here specifically: this interface reads right-to-left, and a
+   right-to-left document that overflows horizontally opens scrolled to the far
+   edge, so the failure does not look like a scrollbar — it looks like a blank
+   screen with the whole dashboard off to one side. */
+.shell { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100dvh; }
 
 @media (min-width: 1024px) {
   .shell { grid-template-columns: var(--sidebar) minmax(0, 1fr); }
 }
 
 .rail {
-  background: var(--panel);
-  border-block-end: 1px solid var(--line);
+  /* The other half of the guard above. A grid ITEM also defaults to a min-width
+     of auto, so a clamped track on its own is not enough — the rail would still
+     refuse to shrink below the width of its own nowrap contents and push the
+     scrollable area out from the inside. Both are needed or neither does
+     anything. */
+  min-width: 0;
+  background: var(--bg-sidebar);
+  border-block-end: 1px solid var(--border-1);
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
   position: sticky;
   inset-block-start: 0;
-  z-index: 20;
+  z-index: 30;
 }
 
 @media (min-width: 1024px) {
@@ -146,30 +152,72 @@ a { color: inherit; text-decoration: none; }
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: 20px 14px;
+    padding: 22px 16px;
     border-block-end: 0;
-    border-inline-end: 1px solid var(--line);
+    border-inline-end: 1px solid var(--border-1);
     height: 100dvh;
+    overflow-y: auto;
+    scrollbar-width: thin;
   }
 }
 
+/* The wordmark. The system has no logo asset and says so — its own answer is
+   plain type with the second half in the accent. Ours has a real mark, so the
+   mark keeps its tile and the type follows the system's rule. */
 .brand {
   display: flex; align-items: center; gap: 10px;
-  padding-inline: 6px; margin-block-end: 0;
+  padding-inline: 8px; margin-block-end: 0;
   white-space: nowrap;
+  /* The one thing in the rail that may be clipped rather than scrolled. On a
+     narrow phone the wordmark gives up its tail before the navigation gives up
+     a destination. */
+  min-width: 0; overflow: hidden;
 }
-@media (min-width: 1024px) { .brand { margin-block-end: 22px; } }
+@media (min-width: 1024px) { .brand { margin-block-end: 4px; } }
 
 .brand .mark {
-  width: 30px; height: 30px; flex: none;
-  border-radius: 8px;
-  background: var(--accent); color: var(--accent-ink);
+  width: 32px; height: 32px; flex: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent-fill); color: var(--accent-fg);
   display: grid; place-items: center;
 }
 .brand .mark svg { width: 17px; height: 17px; }
-.brand b { font-size: 15px; font-weight: 600; letter-spacing: -.01em; display: block; }
-.brand small { font-size: 11.5px; color: var(--muted); display: none; }
+.brand b {
+  font-size: var(--text-lg); font-weight: var(--weight-semibold);
+  letter-spacing: -.01em; display: block; line-height: 1.2;
+}
+.brand small { font-size: var(--text-xs); color: var(--text-3); display: none; }
 @media (min-width: 1024px) { .brand small { display: block; } }
+
+/* The greeting block, straight out of the reference sidebar: name at 20/600,
+   one muted line under it. Desk only — on a phone the rail is 44px tall and
+   there is nowhere to put it. */
+.railgreet { display: none; }
+@media (min-width: 1024px) {
+  .railgreet { display: block; padding: 22px 14px 6px; }
+  .railgreet b { display: block; font-size: var(--text-xl); font-weight: var(--weight-semibold); }
+  .railgreet small { display: block; font-size: var(--text-xs); color: var(--text-3); margin-block-start: 4px; }
+}
+
+/* The content column: topbar pinned above, page scrolling under it. */
+.col { display: flex; flex-direction: column; min-width: 0; }
+
+/* A nav group is a label plus its links. Below 1024px the label is hidden and
+   the wrapper dissolves, so the two groups' links flow into the one horizontal
+   bar the rail becomes rather than sitting in two separate boxes. */
+.navgroupwrap { display: contents; }
+@media (min-width: 1024px) { .navgroupwrap { display: block; } }
+
+/* SidebarSection: 11px uppercase, 0.06em tracking, 18/14/8 padding. */
+.navgroup {
+  display: none;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-3);
+  padding: 18px 14px 8px;
+}
+@media (min-width: 1024px) { .navgroup { display: block; } }
 
 /* The six views. Icon plus label always — an icon-only rail saves 90px and
    costs everybody who has not memorised which glyph is which. */
@@ -182,21 +230,27 @@ a { color: inherit; text-decoration: none; }
   .navlist { flex-direction: column; gap: 2px; overflow: visible; flex: 0 0 auto; }
 }
 
+/* SidebarItem: height 40, padding 0 14, radius 10, gap 12, 13px. */
 .navlist a {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px; border-radius: 8px;
-  font-size: 14px; font-weight: 500; color: var(--muted);
+  display: flex; align-items: center; gap: 12px;
+  height: var(--control-md); padding-inline: 14px;
+  border-radius: 10px;
+  font-size: var(--text-md); font-weight: var(--weight-regular);
+  color: var(--text-2);
   white-space: nowrap;
-  transition: background .16s var(--ease), color .16s var(--ease);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
-.navlist a svg { width: 17px; height: 17px; flex: none; }
-.navlist a:hover { background: var(--panel-2); color: var(--ink); }
+.navlist a svg { width: 18px; height: 18px; flex: none; }
+.navlist a:hover { background: var(--surface-2); color: var(--text-1); }
 
-/* Current location, said two ways: colour and a filled ground. Colour alone
-   fails for anybody who cannot separate the two blues. */
+/* Current location, said two ways: a filled ground and a weight change. The
+   fill is `--accent-fill`, not `--accent`: white on the reference blue is
+   3.81:1 and this label is 13px. See design-system/tokens/app.css. */
 .navlist a[aria-current="page"] {
-  background: var(--accent-soft); color: var(--accent); font-weight: 600;
+  background: var(--accent-fill); color: var(--accent-fg);
+  font-weight: var(--weight-medium);
 }
+.navlist a[aria-current="page"]:hover { background: var(--accent-hover); }
 
 .railfoot {
   display: flex; align-items: center; gap: 8px;
@@ -205,182 +259,357 @@ a { color: inherit; text-decoration: none; }
 @media (min-width: 1024px) {
   .railfoot {
     margin-inline-start: 0; margin-block-start: auto;
-    padding-block-start: 14px; border-block-start: 1px solid var(--line);
-    flex-direction: column; align-items: stretch;
+    padding-block-start: 16px;
+    flex-direction: column; align-items: stretch; gap: 6px;
   }
 }
 
-/* The language switch. A form, not a link: it writes a cookie, and a GET link
-   that changes server state is a link a crawler or a prefetch can pull. */
-.langswitch button {
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-  width: 100%; padding: 8px 12px;
-  font-size: 13px; font-weight: 500;
-  border: 1px solid var(--line); border-radius: 8px;
-  background: var(--panel); color: var(--ink-2); cursor: pointer;
-  transition: border-color .16s var(--ease), color .16s var(--ease);
+/* --------------------------------------------------------------- topbar -- */
+/* The reference's second piece of chrome: page controls at the reading edge, a
+   centred search pill, and the account at the far edge. 68px, the system's
+   `--topbar-h`, on the sidebar's own ground so the two read as one frame. */
+.topbar {
+  display: none;
 }
-.langswitch button:hover { border-color: var(--accent); color: var(--accent); }
+@media (min-width: 1024px) {
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    height: var(--topbar-h); padding-inline: 24px;
+    background: var(--bg-sidebar);
+    border-block-end: 1px solid var(--border-1);
+    position: sticky; inset-block-start: 0; z-index: 20;
+  }
+}
+.topbar .mid { flex: 1; display: flex; justify-content: center; min-width: 0; }
+.topbar .right { display: flex; align-items: center; gap: 10px; }
+
+/* Input: height 38, padding 0 16, gap 10, pill, 13px, min-width 220. */
+.searchpill {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: var(--control-md); padding-inline: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--input-bg); border: 1px solid var(--pill-border);
+  color: var(--text-3);
+  width: min(360px, 100%);
+}
+.searchpill svg { width: 15px; height: 15px; flex: none; }
+.searchpill input {
+  flex: 1; min-width: 0; background: transparent; border: 0; outline: none;
+  color: var(--text-1); font-family: inherit; font-size: var(--text-md);
+}
+.searchpill input::placeholder { color: var(--text-3); }
+/* PLACEHOLDER. Nothing in this app searches across ticket, debt, conversation
+   and call in one query, and inventing one here would mean new data logic,
+   which this pass is not allowed to touch. So the control is drawn to the
+   system's exact Input spec, disabled, and says so — an honest empty seat
+   rather than a box that eats what you type. */
+.searchpill.is-placeholder { opacity: .72; cursor: not-allowed; }
+.searchpill.is-placeholder input { cursor: not-allowed; }
+.searchpill .soon {
+  font-size: var(--text-xs); color: var(--text-3); flex: none;
+  border: 1px solid var(--border-2); border-radius: var(--radius-pill);
+  padding: 1px 8px;
+}
+
+/* IconButton, outline variant: 38px circle, pill ground, pill border. */
+.iconbtn {
+  width: var(--control-md); height: var(--control-md); flex: none;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--pill-bg); color: var(--text-1);
+  border: 1px solid var(--pill-border);
+  cursor: pointer; padding: 0;
+  transition: background var(--transition-fast);
+}
+.iconbtn:hover { background: var(--surface-3); }
+.iconbtn svg { width: 17px; height: 17px; }
+.iconbtn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+
+/* Avatar, initials variant: circle, surface-3 ground, 0.36em initials. */
+.avatar {
+  width: 36px; height: 36px; flex: none; border-radius: 50%;
+  background: var(--surface-3); color: var(--text-2);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: var(--weight-semibold); text-transform: uppercase;
+}
+.who-block { display: flex; align-items: center; gap: 10px; padding-inline-start: 6px; }
+.who-block b { display: block; font-size: var(--text-sm); font-weight: var(--weight-medium); line-height: 1.3; }
+.who-block small { display: block; font-size: var(--text-xs); color: var(--text-3); }
+
+/* Switch: 40x22 track, 16px knob, 18px travel — flipped for RTL. */
+.themeswitch { display: flex; align-items: center; gap: 8px; }
+.themeswitch .lbl { font-size: var(--text-xs); color: var(--text-3); }
+.themeswitch button {
+  width: 40px; height: 22px; flex: none; padding: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3); border: 1px solid var(--border-2);
+  display: inline-flex; cursor: pointer;
+  transition: background var(--transition-med);
+}
+.themeswitch button .knob {
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  transition: transform var(--transition-med);
+}
+.themeswitch button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent-fill); }
+.themeswitch button[aria-pressed="true"] .knob { transform: translateX(18px); }
+[dir="rtl"] .themeswitch button[aria-pressed="true"] .knob { transform: translateX(-18px); }
+
+/* The language switch. A form, not a link: it writes a cookie, and a GET link
+   that changes server state is a link a crawler or a prefetch can pull.
+   Button, secondary variant: control-md, pill, 13px. */
+.langswitch button {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; height: var(--control-md); padding-inline: 16px;
+  font-size: var(--text-md); font-weight: var(--weight-medium); font-family: inherit;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--pill-bg); color: var(--text-1); cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.langswitch button:hover { background: var(--surface-3); }
 .langswitch svg { width: 15px; height: 15px; flex: none; }
+/* On a phone the rail is a single 44px row and the two footer buttons were
+   about 230px of it — more than half the screen for two things nobody presses
+   often. Below the sidebar breakpoint they lose their labels and become the
+   system's IconButton instead. Both carry an aria-label in the markup, so the
+   text is still there for anyone who needs it read out. */
+@media (max-width: 1023px) {
+  .langswitch button { width: var(--control-md); padding-inline: 0; }
+  .langswitch button span { display: none; }
+}
 
 main { padding: 22px; min-width: 0; }
-@media (min-width: 768px) { main { padding: 30px 34px; } }
+@media (min-width: 768px) { main { padding: 24px; } }
 .page { max-width: 1400px; margin-inline: auto; }
 
 /* ------------------------------------------------------------- headings -- */
 h1 {
-  font-size: 24px; font-weight: 600; letter-spacing: -.02em;
+  font-size: var(--text-xl); font-weight: var(--weight-semibold);
+  letter-spacing: -.01em;
   margin: 0 0 4px; text-wrap: balance;
 }
-.pagehead { margin-block-end: 22px; }
-.pagehead p { margin: 0; color: var(--muted); font-size: 14px; }
+.pagehead { margin-block-end: 20px; }
+.pagehead p { margin: 0; color: var(--text-3); font-size: var(--text-sm); }
 
+/* The system's micro-label: 11px uppercase, 0.06em, muted. */
 h2 {
-  font-size: 12px; font-weight: 600; color: var(--muted);
-  text-transform: uppercase; letter-spacing: .07em;
-  margin: 30px 0 11px;
+  font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--text-3);
+  text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  margin: 28px 0 12px;
 }
 
 /* ---------------------------------------------------------- stat tiles --- */
-/* The numbers a manager reads in two seconds. A tinted stripe on the inline
-   start carries the semantic — urgent is not just a bigger number, it is a
-   different kind of number — and it is the same six colours as the pills, so
-   the card and the rows underneath agree. */
+/* StatCard: surface-2 ground, border-1 outline, radius-md, padding 14, label
+   12/text-2, value 15/600.
+
+   ONE DEPARTURE, AND IT IS INFORMATION RATHER THAN DECORATION: the tile keeps
+   its tinted stripe on the inline start. The reference's tiles are all the
+   same kind of thing (a stock), so nothing distinguishes one from another. Ours
+   are five different kinds of thing, and "urgent" is not merely a bigger
+   number — it is a different sort of number, the only one on the page that
+   means somebody should get up. The stripe is the six status colours the pills
+   already use, so a card and the rows below it say the same word in the same
+   colour. Removing it would leave five identical grey boxes. */
 .cards {
   display: grid; gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
 }
 .card {
   position: relative; overflow: hidden;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 15px 17px;
-  box-shadow: var(--shadow);
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
 }
 .card::before {
   content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
-  width: 3px; background: var(--idle);
+  width: 3px; background: var(--st-idle);
 }
-.card.is-open::before     { background: var(--open); }
-.card.is-urgent::before   { background: var(--review); }
-.card.is-progress::before { background: var(--progress); }
-.card.is-done::before     { background: var(--done); }
+.card.is-open::before     { background: var(--st-open); }
+.card.is-urgent::before   { background: var(--st-review); }
+.card.is-progress::before { background: var(--st-progress); }
+.card.is-done::before     { background: var(--st-done); }
 .card.is-money::before    { background: var(--accent); }
 
 .card .n {
-  font-size: 27px; font-weight: 650; letter-spacing: -.02em;
-  font-variant-numeric: tabular-nums; line-height: 1.15;
+  font-size: var(--text-2xl); font-weight: var(--weight-semibold);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums; line-height: var(--leading-tight);
+  margin-block-start: 8px;
 }
-.card .k {
-  font-size: 12px; color: var(--muted); margin-block-start: 3px;
-  letter-spacing: .01em;
+.card .k { font-size: var(--text-sm); color: var(--text-2); }
+
+/* StatCard hero: accent-soft ground, no border, radius-lg, padding 24, and the
+   concentric-ring motif clipped into the corner. The rings are the one piece of
+   ornament the system ships, and they are what makes the headline number read
+   as the headline.
+
+   Drawn as a repeating gradient rather than the reference's eight SVG circles —
+   no DOM, no request — but a repeating gradient repeats forever, and the first
+   attempt banded the whole card like a sonar screen. The mask is what makes it
+   the reference's motif instead: the rings exist only within ~210px of their
+   centre and fade out before they reach the number, exactly as eight circles
+   with a largest radius of 186 would. `-webkit-mask` alongside for Safari. */
+.card.hero {
+  grid-column: span 2;
+  background: var(--accent-soft);
+  border-color: transparent;
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
 }
+.card.hero::after {
+  content: ""; position: absolute; pointer-events: none;
+  /* A ring disc parked over the corner, rather than a gradient positioned with
+     `calc(100% - 58px)`. The calc version put the rings on the wrong corner in
+     one of the two directions and was awkward to reason about; an element with
+     a real size and `inset-inline-end` mirrors itself, which is the whole point
+     of logical properties. Sized so the largest visible ring is ~186px across,
+     which is what the reference's eight SVG circles come to. */
+  inset-block-start: -104px;
+  inset-inline-end: -58px;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: repeating-radial-gradient(circle at center,
+    rgba(255, 255, 255, .05) 0 13px, transparent 13px 26px);
+  /* Fades the outermost rings out instead of cutting them off at a hard edge —
+     without this the disc reads as a circle with a pattern in it. */
+  -webkit-mask-image: radial-gradient(circle at center, #000 0 48%, transparent 92%);
+  mask-image: radial-gradient(circle at center, #000 0 48%, transparent 92%);
+}
+[data-theme="light"] .card.hero::after {
+  background: repeating-radial-gradient(circle at center,
+    rgba(0, 0, 0, .05) 0 13px, transparent 13px 26px);
+}
+.card.hero::before { display: none; }
+.card.hero .n { font-size: var(--text-3xl); margin-block-start: 10px; }
+.card.hero .k { font-size: var(--text-md); }
+@media (max-width: 640px) { .card.hero { grid-column: span 1; } }
 
 /* ---------------------------------------------------------------- panel -- */
+/* Card: surface-1, border-1, radius-lg, shadow-card (none on dark), padding 20.
+   The panel's padding is zero because a table is flush to its own edges; the
+   20 lives on the title row and the cells instead. */
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 /* The scroll lives on an inner wrapper so the panel keeps its rounded corners
-   and its shadow while a wide table slides underneath them. */
+   while a wide table slides underneath them. */
 .panel > .scrollx { overflow-x: auto; }
 
+/* Card title row: 14/600, action at the far edge, 16px below it. No tinted
+   ground — the reference has none, and the hairline is enough to separate a
+   title from the header row of the table under it. */
 .panelhead {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 10px 15px; border-block-end: 1px solid var(--line);
-  background: var(--panel-2);
-  font-size: 11.5px; color: var(--muted);
-  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  padding: 16px 20px;
+  border-block-end: 1px solid var(--border-1);
+  font-size: var(--text-base); font-weight: var(--weight-semibold);
+  color: var(--text-1);
 }
 details > summary.panelhead { cursor: pointer; list-style: none; }
 details > summary.panelhead::-webkit-details-marker { display: none; }
-details > summary.panelhead::after { content: '+'; font-size: 14px; }
+details > summary.panelhead::after { content: '+'; font-size: 15px; color: var(--text-3); }
 details[open] > summary.panelhead::after { content: '\2212'; }
 
 /* ---------------------------------------------------------------- table -- */
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+/* DataTable: 13px, th 12/500 text-2, th padding 10/12, td padding 12,
+   border-1 between rows and none after the last. Padding is opened to 20 at
+   the inline edges so the first column lines up with the card title above it,
+   which the reference does by putting its table inside a 20px-padded card. */
+table { width: 100%; border-collapse: collapse; font-size: var(--text-md); }
 
 /* Sticky header. A hundred rows of arrears is a scroll where the column you
-   are reading stops having a name halfway down. */
+   are reading stops having a name halfway down. It needs an opaque ground of
+   its own or the rows show through it. */
 thead th {
   position: sticky; inset-block-start: 0; z-index: 2;
-  text-align: start; font-weight: 600; font-size: 11.5px; color: var(--muted);
-  background: var(--panel-2);
-  padding: 11px 15px;
-  border-block-end: 1px solid var(--line);
-  text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+  text-align: start;
+  font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--text-2);
+  background: var(--surface-1);
+  padding: 12px 20px;
+  border-block-end: 1px solid var(--border-1);
+  white-space: nowrap;
 }
 
 td {
-  padding: 12px 15px;
-  border-block-end: 1px solid var(--line-soft);
+  padding: 14px 20px;
+  border-block-end: 1px solid var(--border-1);
   vertical-align: top;
-  color: var(--ink-2);
+  color: var(--text-1);
 }
-td:first-child { color: var(--ink); }
+td.muted, td .muted { color: var(--text-2); }
 tbody tr:last-child td { border-block-end: 0; }
-tbody tr { transition: background .14s var(--ease); }
-tbody tr:hover { background: var(--panel-2); }
+tbody tr { transition: background var(--transition-fast); }
+tbody tr:hover { background: var(--surface-2); }
 /* Keyboard parity: tabbing into a row's control should light the row the same
    way a mouse does, or the two ways of using the page look like two pages. */
-tbody tr:focus-within { background: var(--accent-soft); }
+tbody tr:focus-within { background: var(--surface-2); }
 
 .mono {
   font-variant-numeric: tabular-nums;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
+/* A reference number and a timestamp are single tokens, not prose. In a narrow
+   column the browser will happily break "255-1042-26" after a hyphen and print
+   it on two lines, which turns the one field a reader copies into something
+   they have to reassemble. The table already scrolls inside its own pane, so
+   refusing the break costs nothing. */
+td .mono, td.mono, .row .mono { white-space: nowrap; }
 .num { font-variant-numeric: tabular-nums; text-align: end; white-space: nowrap; }
-.muted { color: var(--muted); }
-.sub { display: block; font-size: 12px; color: var(--muted); margin-block-start: 3px; }
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.sub { display: block; font-size: var(--text-sm); color: var(--text-3); margin-block-start: 3px; }
 
 /* ----------------------------------------------------------------- pill -- */
-/* A dot and a word, never a colour on its own. The dot is what survives a
-   greyscale print and a red-green colour deficiency; the tint is what makes a
-   column of statuses scannable at a glance. */
+/* Badge: 3px 10px, pill, 11px/500. A dot and a word, never a colour on its
+   own — the dot is what survives a greyscale print and a red-green colour
+   deficiency; the tint is what makes a column of statuses scannable. */
 .pill {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: 999px;
-  font-size: 12px; font-weight: 500; white-space: nowrap;
-  background: var(--idle-bg); color: var(--idle);
+  padding: 3px 10px; border-radius: var(--radius-pill);
+  font-size: var(--text-xs); font-weight: var(--weight-medium); white-space: nowrap;
+  background: var(--st-idle-bg); color: var(--st-idle);
   border: 1px solid transparent;
 }
 .pill::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%;
   background: currentColor; flex: none;
 }
-.pill.open         { background: var(--open-bg);     color: var(--open); }
-.pill.in_progress  { background: var(--progress-bg); color: var(--progress); }
-.pill.resolved     { background: var(--done-bg);     color: var(--done); }
-.pill.needs_review { background: var(--review-bg);   color: var(--review); }
-.pill.cancelled    { background: var(--idle-bg);     color: var(--idle); }
+.pill.open         { background: var(--st-open-bg);     color: var(--st-open); }
+.pill.in_progress  { background: var(--st-progress-bg); color: var(--st-progress); }
+.pill.resolved     { background: var(--st-done-bg);     color: var(--st-done); }
+.pill.needs_review { background: var(--st-review-bg);   color: var(--st-review); }
+.pill.cancelled    { background: var(--st-idle-bg);     color: var(--st-idle); }
 
 /* Urgency reads as a rank, so it gets weight rather than a second colour
    system competing with status in the next column. */
-.urg { font-size: 13px; font-weight: 500; color: var(--muted); }
-.urg.high, .urg.emergency { color: var(--review); font-weight: 600; }
+.urg { font-size: var(--text-md); font-weight: var(--weight-regular); color: var(--text-2); }
+.urg.high, .urg.emergency { color: var(--st-review); font-weight: var(--weight-medium); }
 
 /* ------------------------------------------------------------- filters --- */
-/* Segmented control. One row of choices that are mutually exclusive, so they
-   share a track and the chosen one is filled rather than merely brighter —
-   opacity .55 against 1 was the old signal and it read as "loading". */
+/* Tabs: separate pills with an 8px gap — NOT a shared track. The reference has
+   no segmented control; its filters are individual pills at control-sm with
+   the selected one filled. Copied exactly. */
 .seg {
-  display: inline-flex; flex-wrap: wrap; gap: 3px;
-  padding: 3px; margin: 0 0 16px;
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: 999px;
+  display: inline-flex; flex-wrap: wrap; gap: 8px;
+  margin: 0 0 16px;
 }
 .seg a {
-  padding: 6px 14px; border-radius: 999px;
-  font-size: 13px; font-weight: 500; color: var(--muted);
-  transition: background .16s var(--ease), color .16s var(--ease);
+  display: inline-flex; align-items: center;
+  height: var(--control-sm); padding-inline: 16px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--text-2);
+  background: var(--pill-bg); border: 1px solid var(--pill-border);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
-.seg a:hover { color: var(--ink); background: var(--panel-2); }
-.seg a[aria-current] { background: var(--accent); color: var(--accent-ink); }
+.seg a:hover { background: var(--surface-3); color: var(--text-1); }
+.seg a[aria-current] {
+  background: var(--accent-fill); border-color: var(--accent-fill); color: var(--accent-fg);
+}
 
 .filters {
   display: flex; flex-wrap: wrap; gap: 10px;
@@ -390,35 +619,41 @@ tbody tr:focus-within { background: var(--accent-soft); }
 /* ---------------------------------------------------------------- pager -- */
 .pager {
   display: flex; justify-content: space-between; align-items: center;
-  gap: 14px; margin: 0 0 12px; font-size: 14px; flex-wrap: wrap;
+  gap: 14px; margin: 0 0 12px; font-size: var(--text-md); flex-wrap: wrap;
 }
 /* Three groups, so the count stays centred whether or not the size picker is
    showing. */
-.pager .per, .pager .nav { display: flex; align-items: center; gap: 6px; }
-.pager .per { font-size: 12px; color: var(--muted); }
+.pager .per, .pager .nav { display: flex; align-items: center; gap: 8px; }
+.pager .per { font-size: var(--text-sm); color: var(--text-3); }
 /* Links, not a <select>: every other control on this dashboard is a URL, and a
    dropdown would need client JS to navigate. */
 .pager .per a {
-  padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
-  color: var(--muted); font-variant-numeric: tabular-nums;
+  display: inline-flex; align-items: center;
+  height: var(--control-sm); padding-inline: 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--pill-border); background: var(--pill-bg);
+  color: var(--text-2); font-variant-numeric: tabular-nums;
 }
-.pager .per a:hover { color: var(--ink); border-color: var(--muted); }
-.pager .per a.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.pager .per a:hover { background: var(--surface-3); color: var(--text-1); }
+.pager .per a.on {
+  background: var(--accent-fill); border-color: var(--accent-fill); color: var(--accent-fg);
+}
 
-/* Newer / Older. Same size and shape as .btn-sm so every clickable thing on a
-   list page is recognisably the same object, but outlined rather than filled:
-   the filled amber is the row action, and two filled colours competing on one
-   screen is how a page stops having a primary action at all. */
+/* Newer / Older. Button, secondary variant at sm: height 30, padding 0 14,
+   pill, 12px. Outlined rather than filled — the filled amber is the row
+   action, and two filled colours competing on one screen is how a page stops
+   having a primary action at all. */
 .btn-nav {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 13px; border-radius: var(--radius-sm);
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-  font-size: 13px; line-height: 1.5; font-weight: 500; white-space: nowrap;
-  transition: border-color .16s var(--ease), color .16s var(--ease);
+  display: inline-flex; align-items: center; gap: 8px;
+  height: var(--control-sm); padding-inline: 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--text-1);
+  font-size: var(--text-sm); font-weight: var(--weight-medium); white-space: nowrap;
+  transition: background var(--transition-fast);
 }
-.btn-nav:hover { border-color: var(--action); color: var(--action); }
-.btn-nav.off { color: var(--muted); opacity: .5; cursor: default; }
-.btn-nav.off:hover { border-color: var(--line); color: var(--muted); }
+.btn-nav:hover { background: var(--surface-3); }
+.btn-nav.off { color: var(--text-3); opacity: .45; cursor: default; }
+.btn-nav.off:hover { background: var(--pill-bg); }
 /* The arrow points the way the language reads. One rule, both directions. */
 .btn-nav .arr { display: inline-block; }
 [dir="rtl"] .btn-nav .arr { transform: scaleX(-1); }
@@ -426,94 +661,109 @@ tbody tr:focus-within { background: var(--accent-soft); }
 /* --------------------------------------------------------------- action -- */
 /* A row action that reads as one. The bare "transcript" link was the only
    clickable thing in the table and did not look clickable, so the way into a
-   call was the least visible element on the page. */
+   call was the least visible element on the page. Button geometry at sm, in
+   the app's own action colour rather than the accent. */
 .btn-sm {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 13px; border-radius: var(--radius-sm);
-  border: 1px solid transparent; background: var(--action); color: var(--action-ink);
-  font-size: 13px; line-height: 1.5; font-weight: 500; white-space: nowrap;
-  cursor: pointer;
-  transition: background .16s var(--ease);
+  display: inline-flex; align-items: center; gap: 8px;
+  height: var(--control-sm); padding-inline: 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent; background: var(--action); color: var(--action-fg);
+  font-size: var(--text-sm); font-weight: var(--weight-medium); white-space: nowrap;
+  cursor: pointer; font-family: inherit;
+  transition: background var(--transition-fast);
 }
 .btn-sm:hover { background: var(--action-hover); }
 .btn-sm svg { width: 14px; height: 14px; }
 
+/* Button, secondary variant at md: height 38, padding 0 20, pill, 13px. */
 button {
-  padding: 9px 15px; font-size: 14px; border-radius: var(--radius-sm); cursor: pointer;
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  height: var(--control-md); padding-inline: 20px;
+  font-size: var(--text-md); font-weight: var(--weight-medium);
+  border-radius: var(--radius-pill); cursor: pointer;
+  border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--text-1);
   font-family: inherit;
-  transition: border-color .16s var(--ease), background .16s var(--ease);
+  transition: background var(--transition-fast);
 }
-button:hover { border-color: var(--muted); }
+button:hover { background: var(--surface-3); }
+/* Button, primary variant. */
 button.primary {
-  background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
-  width: 100%; font-weight: 600;
+  background: var(--accent-fill); border-color: transparent; color: var(--accent-fg);
+  width: 100%; font-weight: var(--weight-medium);
 }
-button.primary:hover { filter: brightness(1.08); }
+button.primary:hover { background: var(--accent-hover); }
 button[disabled] { opacity: .45; cursor: not-allowed; }
+button[disabled]:hover { background: var(--pill-bg); }
 
 /* The status cell's editor: the select wears the pill, the save button sits
    beside it and stays out of the way until the row is touched. */
 .status-edit { display: flex; gap: 6px; align-items: center; }
 .status-edit select {
-  font: inherit; font-size: 12px; font-weight: 500;
-  padding: 3px 9px; border-radius: 999px; cursor: pointer;
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink-2);
+  font: inherit; font-size: var(--text-xs); font-weight: var(--weight-medium);
+  height: var(--control-sm); padding-inline: 12px;
+  border-radius: var(--radius-pill); cursor: pointer;
+  border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--text-2);
 }
 .status-edit button {
-  padding: 3px 10px; font-size: 12px; border-radius: 999px;
-  color: var(--muted); background: transparent;
+  height: var(--control-sm); padding-inline: 12px; font-size: var(--text-xs);
+  color: var(--text-2); background: transparent; border-color: transparent;
 }
-.status-edit button:hover { color: var(--accent); border-color: var(--accent); }
+.status-edit button:hover { background: var(--surface-2); color: var(--text-1); }
 .status-edit input {
-  font: inherit; font-size: 13px; padding: 4px 8px; width: 62px;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  background: var(--panel); color: var(--ink);
+  font: inherit; font-size: var(--text-md); width: 68px;
+  height: var(--control-sm); padding-inline: 12px;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
 }
 
 /* -------------------------------------------------------------- notices -- */
 .notice {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 12px 15px; margin-block-end: 16px;
-  border: 1px solid var(--line); border-radius: var(--radius);
-  background: var(--panel); font-size: 14px;
-  box-shadow: var(--shadow);
+  padding: 14px 18px; margin-block-end: 16px;
+  border: 1px solid var(--border-1); border-radius: var(--radius-lg);
+  background: var(--surface-1); font-size: var(--text-md);
+  box-shadow: var(--shadow-card);
 }
-.notice svg { width: 17px; height: 17px; flex: none; margin-block-start: 2px; }
-.notice.ok   { border-color: var(--done);   color: var(--ink); }
-.notice.ok svg   { color: var(--done); }
-.notice.bad  { border-color: var(--review); color: var(--ink); }
-.notice.bad svg  { color: var(--review); }
-.notice.info svg { color: var(--muted); }
+.notice svg { width: 17px; height: 17px; flex: none; margin-block-start: 1px; }
+.notice.ok  { border-color: var(--st-done); }
+.notice.ok svg { color: var(--st-done); }
+.notice.bad { border-color: var(--st-review); }
+.notice.bad svg { color: var(--st-review); }
+.notice.info svg { color: var(--text-3); }
 
 /* Empty is a state with something to say, not a blank box. */
 .empty {
-  padding: 46px 24px; text-align: center; color: var(--muted); font-size: 14px;
+  padding: 46px 24px; text-align: center; color: var(--text-3); font-size: var(--text-md);
 }
-.empty svg { width: 26px; height: 26px; opacity: .5; margin-block-end: 10px; }
+.empty svg { width: 26px; height: 26px; opacity: .55; margin-block-end: 10px; }
 
 /* --------------------------------------------------------------- search -- */
+/* Input: pill, control-md, 0 16 padding, icon in text-3. */
 .search { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; flex-wrap: wrap; }
 .search input {
-  flex: 1 1 280px; min-width: 0; padding: 9px 13px;
-  /* 16px, not 14: anything smaller makes iOS zoom the page on focus. */
+  flex: 1 1 280px; min-width: 0;
+  height: var(--control-md); padding-inline: 16px;
+  /* The system says 13px. iOS zooms the page on focus for anything under 16,
+     so the phone gets 16 and the desk gets the system's number. A design
+     system authored at 1440px has no opinion about this, and the zoom is a
+     usability bug rather than a taste question. */
   font-size: 16px; font-family: inherit;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  background: var(--panel); color: var(--ink);
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
 }
-.search input::placeholder { color: var(--muted); }
+@media (min-width: 768px) { .search input { font-size: var(--text-md); } }
+.search input::placeholder { color: var(--text-3); }
 
 /* --------------------------------------------------------------- thread -- */
 /* A chat, laid out as one. dir="auto" on each bubble so Hebrew renders
    right-to-left and a reference number stays left-to-right inside it. */
-.thread { display: flex; flex-direction: column; gap: 9px; padding: 18px; }
+.thread { display: flex; flex-direction: column; gap: 10px; padding: 20px; }
 .msg {
-  max-width: 68%; padding: 9px 13px; border-radius: 13px;
-  border: 1px solid var(--line); font-size: 14px;
+  max-width: 68%; padding: 10px 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-1); font-size: var(--text-md);
 }
-.msg.resident { align-self: flex-start; background: var(--panel-2); }
-.msg.bot { align-self: flex-end; background: var(--accent-soft); border-color: var(--accent-line); }
-.msg .who { font-size: 11px; color: var(--muted); margin-block-end: 3px; }
+.msg.resident { align-self: flex-start; background: var(--surface-2); }
+.msg.bot { align-self: flex-end; background: var(--accent-soft); border-color: var(--border-2); }
+.msg .who { font-size: var(--text-xs); color: var(--text-3); margin-block-end: 3px; }
 /* The transcript scrolls inside its own pane instead of growing the page.
    Capped just under the viewport so the end of the pane is visibly the end of a
    box, not the end of the page. */
@@ -521,8 +771,8 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
 
 /* The call page: conversation wide on the reading side, everything you glance
    at once beside it. */
-.callgrid { display: grid; grid-template-columns: minmax(0, 1fr) 302px; gap: 18px; align-items: start; }
-.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.callgrid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 @media (max-width: 900px) {
   /* One column, and the sidebar leads: on a phone the facts and the recording
      are worth more up front than the first line of a two-minute transcript. */
@@ -532,26 +782,74 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
 }
 
 /* Who is which side, said once at the top instead of above every bubble. */
-.legend { display: flex; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; font-weight: 500; }
-.legend .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--line); }
+.legend {
+  display: flex; align-items: center; gap: 6px;
+  text-transform: none; letter-spacing: 0;
+  font-size: var(--text-sm); font-weight: var(--weight-regular); color: var(--text-2);
+}
+.legend .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--border-2); }
 .legend .dot + span, .legend .dot { margin-inline-start: 4px; }
-.legend .dot.resident { background: var(--panel-2); }
+.legend .dot.resident { background: var(--surface-2); }
 .legend .dot.bot { background: var(--accent); }
 
 /* Key/value rows for reference detail. Deliberately not .card — these are read
    once, and sizing them like headline numbers is what crowded the page. */
-.rows { padding: 4px 15px 10px; }
+.rows { padding: 6px 20px 12px; }
 .row {
   display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-  padding: 8px 0; border-block-end: 1px solid var(--line-soft); font-size: 13px;
+  padding: 9px 0; border-block-end: 1px solid var(--border-1); font-size: var(--text-md);
 }
 .rows .row:last-child { border-block-end: 0; }
-.row > :first-child { color: var(--muted); }
+.row > :first-child { color: var(--text-2); }
 .row .mono { text-align: end; word-break: break-word; }
 
 .transcript {
-  white-space: pre-wrap; padding: 16px; font-size: 14px; line-height: 1.6;
+  white-space: pre-wrap; padding: 20px; font-size: var(--text-md); line-height: 1.6;
   font-family: ui-monospace, monospace;
+}
+
+/* ------------------------------------------------------------ skeletons -- */
+/* What the reader looks at while the database answers.
+
+   THE POINT IS THE SHAPE, NOT THE SPINNER. A skeleton row is built to the same
+   height and the same column widths as the row that replaces it, so the page
+   does not jump when the data lands — a spinner that is then replaced by a
+   table is two layouts, and the second one arrives under the reader's cursor.
+   Every block below is sized off the real rule above it. */
+@keyframes sk-shimmer { to { background-position-x: -200%; } }
+
+.sk {
+  display: block;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg,
+    var(--skeleton-1) 0%, var(--skeleton-2) 50%, var(--skeleton-1) 100%)
+    0 0 / 200% 100%;
+  animation: sk-shimmer 1.4s linear infinite;
+}
+/* The gradient sweeps one way in English and the other in Hebrew, so the
+   motion always runs with the text rather than against it. */
+[dir="rtl"] .sk { animation-direction: reverse; }
+
+/* Fixed widths on a skeleton would make every row identical, which reads as a
+   pattern rather than as text. Four widths, cycled. */
+.sk-line { height: 11px; }
+.sk-tr td > .sk-line:only-child { width: 72%; }
+.sk-tr:nth-child(2n) td > .sk-line:only-child { width: 58%; }
+.sk-tr:nth-child(3n) td > .sk-line:only-child { width: 84%; }
+.sk-tr:nth-child(4n) td > .sk-line:only-child { width: 46%; }
+
+/* A skeleton pill and a skeleton stat, at the exact size of the real ones. */
+.sk-pill { height: 21px; width: 84px; }
+.sk-card .k { height: 11px; width: 62%; }
+.sk-card .n { height: 27px; width: 46%; margin-block-start: 12px; border-radius: 8px; }
+.sk-card.hero .n { height: 38px; }
+
+/* The skeleton is decoration for a sighted reader mid-wait; a screen reader is
+   told the page is loading, once, by a live region that is off-screen rather
+   than hidden — `display: none` is not announced at all. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
 /* ---------------------------------------------------------------- login -- */
@@ -559,42 +857,43 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
 /* Brand above the card, language switch below it. The DOM order is children
    first (server-rendered brand + switch) then the form, so flex `order` puts
    the switch under the card without splitting the children slot in two. */
-.authbox { display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; max-width: 340px; }
+.authbox { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; max-width: 340px; }
 .authbox form.auth { order: 1; }
 /* No plate. The white box around the mark read as a white square, so the logo
    floats on the page in a per-theme transparent variant (the <picture> in
    login/page.tsx picks it). The drop-shadow is faint depth, not a border. */
 .authbrand img {
   display: block; width: 200px; height: auto;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .25));
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .35));
 }
 .authlang { order: 2; }
 .authlang button {
-  display: inline-flex; align-items: center; gap: 7px;
-  font-size: 12.5px; font-family: inherit; color: var(--muted);
-  background: none; border: 1px solid var(--line); border-radius: var(--radius-sm);
-  padding: 7px 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  height: var(--control-sm); padding-inline: 14px;
+  font-size: var(--text-sm); font-family: inherit; color: var(--text-2);
+  background: var(--pill-bg); border: 1px solid var(--pill-border);
+  border-radius: var(--radius-pill); cursor: pointer;
 }
-.authlang button:hover { border-color: var(--accent); color: var(--accent); }
+.authlang button:hover { background: var(--surface-3); color: var(--text-1); }
 .authlang svg { width: 15px; height: 15px; flex: none; }
 form.auth {
   width: 100%; max-width: 340px;
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 28px;
-  box-shadow: var(--shadow-md);
+  background: var(--surface-1); border: 1px solid var(--border-1);
+  border-radius: var(--radius-xl); padding: 28px;
+  box-shadow: var(--shadow-card);
 }
-form.auth h1 { font-size: 20px; margin-block-end: 18px; }
+form.auth h1 { font-size: var(--text-xl); margin-block-end: 20px; }
 form.auth label {
-  display: block; font-size: 12.5px; font-weight: 500;
-  color: var(--muted); margin-block-end: 5px;
+  display: block; font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--text-2); margin-block-end: 6px;
 }
 form.auth input {
-  width: 100%; padding: 10px 12px; margin-block-end: 14px; font-size: 16px;
-  font-family: inherit;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  background: var(--panel); color: var(--ink);
+  width: 100%; height: var(--control-lg); padding-inline: 16px; margin-block-end: 14px;
+  font-size: 16px; font-family: inherit;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
 }
 .err {
-  color: var(--review); font-size: 13px; margin-block-end: 12px;
-  background: var(--review-bg); padding: 9px 12px; border-radius: var(--radius-sm);
+  color: var(--st-review); font-size: var(--text-md); margin-block-end: 12px;
+  background: var(--st-review-bg); padding: 10px 14px; border-radius: var(--radius-md);
 }

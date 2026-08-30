@@ -29,6 +29,25 @@ export function getLocale(): Locale {
 
 export const dir = (l: Locale) => (l === 'he' ? 'rtl' : 'ltr');
 
+/**
+ * Theme, read the same way language is: a cookie, on the server, before a byte
+ * of HTML is written.
+ *
+ * The design system's default is dark and this follows it, so `undefined` means
+ * dark. Doing it server-side rather than with a script in the head is what
+ * stops the flash — there is no moment where the page is one theme and then
+ * becomes the other, because the `data-theme` attribute is already in the
+ * markup that arrives. The cost is that the choice cannot follow the operating
+ * system automatically; the system's own contract is an explicit dark default
+ * plus a switch, so that is what this is.
+ */
+export type Theme = 'dark' | 'light';
+export const THEME_COOKIE = 'homies_theme';
+
+export function getTheme(): Theme {
+  return cookies().get(THEME_COOKIE)?.value === 'light' ? 'light' : 'dark';
+}
+
 /** Locale-aware dates. Hebrew staff read day-first; the ISO slice did not. */
 export function when(iso: string | null | undefined, l: Locale) {
   if (!iso) return '—';
@@ -62,6 +81,27 @@ const S = {
   'nav.menu':          { he: 'תפריט',            en: 'Menu' },
   'lang.switch':       { he: 'English',          en: 'עברית' },
   'lang.switchLabel':  { he: 'Switch to English', en: 'החלף לעברית' },
+
+  // --- topbar and rail chrome ---------------------------------------------
+  // The design system groups its sidebar under uppercase micro-labels. Hebrew
+  // has no case, so "MAIN MENU" cannot be shouted the way English can — the
+  // uppercase transform simply does nothing to Hebrew letters. The label still
+  // earns its place as a grouping line at the same size and tracking; it just
+  // reads as small muted text rather than as small muted capitals, which is
+  // what Hebrew typography does in that position anyway.
+  'nav.group.main':    { he: 'תפריט ראשי',      en: 'Main menu' },
+  'nav.group.support': { he: 'מערכת',           en: 'System' },
+  'chrome.greeting':   { he: 'שלום',            en: 'Welcome' },
+  'chrome.greetingSub':{ he: 'זה מה שקורה היום בבניינים', en: "Here's what is happening across the buildings" },
+  'chrome.search':     { he: 'חיפוש בכל המערכת', en: 'Search everything' },
+  'chrome.soon':       { he: 'בקרוב',           en: 'Soon' },
+  'chrome.notifications': { he: 'התראות',       en: 'Notifications' },
+  'chrome.settings':   { he: 'הגדרות',          en: 'Settings' },
+  'chrome.staff':      { he: 'צוות',            en: 'Staff' },
+  'theme.light':       { he: 'בהיר',            en: 'Light' },
+  'theme.switchLabel': { he: 'מעבר לתצוגה בהירה או כהה', en: 'Switch between light and dark' },
+  'load.loading':      { he: 'טוען…',           en: 'Loading…' },
+  'overview.seeAll':   { he: 'לכל הקריאות',     en: 'See all' },
 
   // --- shared column headings --------------------------------------------
   'col.reference':  { he: 'מספר קריאה', en: 'Reference' },

@@ -1,0 +1,23 @@
+/* Poppins — the design system's substitute for the geometric sans in the
+   Stovest reference. Two changes from `Re-Design/tokens/fonts.css`, both
+   forced by this app rather than by taste:
+
+   1. NO `@import url(fonts.googleapis.com)`. That is a render-blocking request
+      to a third party on every cold load, and it is one of the things that
+      made this dashboard slow. Both families are loaded through `next/font`
+      in `app/layout.tsx` instead, which self-hosts the woff2 from our own
+      origin and inlines the @font-face rules — no third-party DNS, no
+      connection, no flash of the fallback face.
+
+   2. POPPINS HAS NO HEBREW. Not one glyph. Half of this interface is Hebrew,
+      so the stack is Poppins first for Latin and digits, Noto Sans Hebrew
+      immediately behind it for the Hebrew. The browser resolves the stack per
+      glyph, so a mixed row — a reference number beside a resident's name —
+      takes Poppins for the number and Noto for the name, which is exactly
+      what is wanted. Both are geometric humanist faces at similar x-heights,
+      so the seam does not show. */
+
+:root {
+  --font-ui: var(--font-poppins), var(--font-hebrew), 'Segoe UI', system-ui, sans-serif;
+  --font-numeric: var(--font-poppins), system-ui, sans-serif;
+}

@@ -1,0 +1,20 @@
+:root {
+  /* scale */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;   /* default UI size */
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;   /* card values, welcome */
+  --text-2xl: 26px;
+  --text-3xl: 34px;  /* hero numbers e.g. $12,304.11 */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.15;
+  --leading-normal: 1.5;
+  --tracking-wide: 0.06em; /* uppercase micro-labels: MAIN MENU */
+}

@@ -1118,11 +1118,62 @@ handset.**
   language and nothing fails. The middleware now sets `x-pathname` on the
   request headers because a server layout cannot otherwise know which page it
   is rendering. `tsc` and `next build` clean; all pages 200 in both languages.
-  **Never seen in a browser** -- no screenshots, so 375px and the dark theme are
-  measured and reasoned about, not looked at. **This closes two of the three
+  **Superseded by the 30 Aug pass below**, and the "never seen in a browser"
+  note with it -- it has now been looked at. **This closes two of the three
   CRM gaps the owner listed on 25 Aug** (Hebrew RTL, and the login page now has
   real labels); **daily metrics and department scoping are still owed**, and the
   login page still is not enforced.
+- **Dashboard: rebuilt on the Stovest design system (30 Aug).** The system the
+  owner supplied lives in `Re-Design/` and is vendored under
+  `dashboard/design-system/`. The four token files there are BYTE-IDENTICAL to
+  the delivered ones on purpose -- every deviation is in one extension file,
+  `tokens/app.css`, each with the measurement that forced it. **Do not edit
+  `tokens/colors.css` and friends;** put the change in `app.css` so the diff
+  against the source stays empty.
+  - **Dark is the default and light is `data-theme="light"`**, which is the
+    system's contract, not a preference. It is read from the `homies_theme`
+    cookie on the SERVER, so the attribute is in the first byte of HTML and
+    there is no flash. The switch is in the topbar, a server action like the
+    language one.
+  - **Four of the system's own colour pairs miss WCAG AA** -- its readme admits
+    the colours were eyeballed from screenshots. White on `--accent` is 3.81:1
+    behind a 13px nav label, so `--accent-fill` exists as a darker step of the
+    same hue for anywhere the accent carries text; `--text-2` and `--text-3`
+    were both raised. `python scripts/contrast_check.py` measures all 34 pairs
+    the interface renders, composites translucent pill grounds the way CSS
+    does, and exits 1 on a failure. **Run it after any token change.**
+  - **Fonts: Poppins plus Noto Sans Hebrew, both through `next/font`.** Poppins
+    is the system's face and has NO Hebrew -- not one glyph -- so Noto sits
+    behind it and the browser resolves per glyph. The system's own
+    `@import url(fonts.googleapis.com)` is deliberately not used: it is a
+    render-blocking third-party request on every cold load.
+  - **Three placeholders, drawn and labelled as such:** the topbar search, the
+    notifications bell and the settings gear. Nothing in this app searches
+    across four tables in one query and building it would be new data logic.
+  - **Only the overview has had its own layout pass.** Tickets, debts,
+    conversations, calls, sync, the two detail pages and login inherit the new
+    shell and tokens but still need their own pass. Waiting on the owner's
+    review of the overview.
+- **The dashboard was slow because it asked the auth server twice.** The root
+  layout called `auth.getUser()` -- a full network round trip, ~0.29s measured
+  -- for a question the middleware had answered a millisecond earlier for the
+  same request, and it blocked the shell from streaming while it waited. The
+  middleware now sets `x-user-email` on the request headers alongside
+  `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
+  layout or page**; the middleware is the only place that should call it.
+- **Every route has a `loading.tsx`** backed by `components/skeleton.tsx`,
+  sized to the real column counts and row heights so nothing shifts when the
+  data lands. If you add a page, add its skeleton with the right `cols`, or the
+  layout will jump.
+- **Seen in a browser, finally.** Headless Chrome at 1440 and at a true 390
+  viewport, dark and light, right-to-left and left-to-right. Two things the
+  screenshots caught that reading the CSS did not: the hero ring motif was on
+  the wrong corner in LTR (now a sized disc on `inset-inline-end`, which
+  mirrors itself), and reference numbers were breaking across two lines in a
+  narrow column. **Chrome headless clamps its window to ~500px** -- a
+  screenshot requested at 390 is a 500px layout cropped to 390, which in a
+  right-to-left page looks like a blank screen. Render inside a 390px iframe
+  instead.
 - **WhatsApp: the prompt holds no verbatim lines again (26 Aug).** The three
   fixes above were each written as an exact Hebrew sentence, taking the system
   prompt from 0 scripted lines to 4 in an afternoon; the owner asked for the bot

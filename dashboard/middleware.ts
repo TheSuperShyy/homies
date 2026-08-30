@@ -41,6 +41,15 @@ export async function middleware(request: NextRequest) {
   // getUser() asks the auth server whether the token is real.
   const { data: { user } } = await supabase.auth.getUser();
 
+  // AND HAND THE ANSWER DOWN, so the layout does not ask again. The root layout
+  // needs to know who is signed in to render the account block and the sign-out
+  // button; calling `auth.getUser()` there is a second full round trip to the
+  // auth server for a question this request has already answered, and it blocks
+  // the shell from streaming while it waits. The header is set on the REQUEST,
+  // exactly like `x-pathname` above, so it reaches the server component and
+  // never goes back to the browser.
+  if (user?.email) requestHeaders.set('x-user-email', user.email);
+
   // The login wall, restored 26 Aug 2026 on the owner's ask. Demo mode
   // (9 Aug) had removed this redirect and opened the tables to anon; migration
   // 026 closed the tables again, so this redirect is back to being what it

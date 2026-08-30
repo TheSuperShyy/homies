@@ -1,0 +1,90 @@
+/* ------------------------------------------------- Homies extension layer --
+   The Stovest system ships one accent plus positive/negative, because a stock
+   dashboard only ever says "up" or "down". This app says six different things
+   about a ticket, and a two-colour vocabulary cannot carry them.
+
+   So this file EXTENDS the system rather than editing it: nothing above is
+   overwritten, and every value below is picked to sit on the system's own
+   surfaces at 4.5:1 or better. Contrast is measured, not eyeballed — see
+   `scripts/contrast_check.py`, which fails the build's design pass if any pair
+   here drops below AA.
+
+   Status colour is deliberately NOT the accent. The accent marks where you
+   are (active nav, selected pill); status marks what is true about a row. If
+   those were the same hue, an in-progress ticket would read as a selected
+   one. */
+
+:root {
+  /* ticket status — text on its own soft ground */
+  --st-open:      #F5B841;  --st-open-bg:      rgba(245, 184,  65, 0.13);
+  --st-progress:  #5B9BFB;  --st-progress-bg:  rgba( 91, 155, 251, 0.14);
+  --st-done:      #35CE84;  --st-done-bg:      rgba( 53, 206, 132, 0.13);
+  --st-review:    #FF6B6B;  --st-review-bg:    rgba(255, 107, 107, 0.13);
+  --st-idle:      #9CA1AB;  --st-idle-bg:      rgba(156, 161, 171, 0.12);
+
+  /* The row action. Amber against the blue accent so the one control you press
+     is never the same colour as the thing you are reading. Carried over from
+     the previous design, re-picked for these surfaces. */
+  --action:       #F0913E;
+  --action-fg:    #1A1005;
+  --action-hover: #F7A85C;
+
+  /* Skeletons shimmer between these two. Both are real surfaces from the
+     system, so a loading row occupies exactly the space its real row will. */
+  --skeleton-1: var(--surface-2);
+  --skeleton-2: var(--surface-3);
+
+  /* ---- corrections to the shipped Stovest tokens ------------------------
+     The system's readme says its colours were "eyeballed from screenshots,
+     not sampled". Measured against WCAG they miss AA in four places, so the
+     four are corrected here rather than in `tokens/colors.css` — that file is
+     kept byte-identical to the delivered `Re-Design/tokens/colors.css`, so
+     every deviation from the design system is in this one block, with the
+     number that forced it. `scripts/contrast_check.py` re-measures all of it.
+
+     1. WHITE ON THE ACCENT IS 3.81:1. The reference fills the active nav item
+        and the selected filter pill with `--accent` and puts white on top;
+        at 13px that needs 4.5. `--accent` itself is untouched, because it is
+        correct as a line, a chart stroke and a border — it is only the FILLED
+        variant that carries text, so that gets its own token, one step down
+        the same hue at 4.56:1. Side by side the two blues are indistinguish-
+        able; the text on them is not. */
+  --accent-fill: #2472E4;
+
+  /*  2. --text-3 IS 3.46:1 ON THE SIDEBAR. That is the colour of every
+        uppercase micro-label ("MAIN MENU"), and an 11px letter-spaced cap is
+        small text by WCAG, not large — 4.5 applies, not 3.0. Raised until it
+        clears 4.5 on all three grounds it lands on (page 4.93, sidebar 5.22,
+        card 5.01). */
+  --text-3: #7E848D;
+}
+
+[data-theme="light"] {
+  --st-open:      #A25A06;  --st-open-bg:      rgba(162,  90,   6, 0.10);
+  --st-progress:  #1D4ED8;  --st-progress-bg:  rgba( 29,  78, 216, 0.09);
+  --st-done:      #18794E;  --st-done-bg:      rgba( 24, 121,  78, 0.10);
+  --st-review:    #B4231D;  --st-review-bg:    rgba(180,  35,  29, 0.09);
+  --st-idle:      #6E726E;  --st-idle-bg:      rgba(110, 114, 110, 0.10);
+
+  --action:       #9A4C05;
+  --action-fg:    #FFFFFF;
+  --action-hover: #7C3D04;
+
+  --skeleton-1: #EDECE9;
+  --skeleton-2: #E0DFDB;
+
+  /*  3. --text-2 IS 3.85:1 ON THE LIGHT CANVAS and --text-3 is 2.74:1 on a
+        white card. Same reasoning as above, and both tiers move together so
+        the hierarchy between them survives the fix: text-2 lands at 6.26 on
+        the canvas, text-3 at 4.59, still visibly two steps apart. */
+  --text-2: #4E524D;
+  --text-3: #63665F;
+
+  /*  4. The cancelled pill was mine and it was 4.32:1. */
+  --st-idle:      #5D615D;  --st-idle-bg:      rgba(93, 97, 93, 0.10);
+
+  /*  Light mode's accent is already near-black, so nothing needs a separate
+      filled variant — but the token has to exist in both themes or a fill
+      styled with it goes transparent here. */
+  --accent-fill: var(--accent);
+}

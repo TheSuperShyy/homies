@@ -25,6 +25,29 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**The dashboard's look comes from the supplied design system, not from taste.**
+`Re-Design/` is the delivered source and `dashboard/design-system/` is the
+vendored copy. Its token files stay byte-identical to the source; corrections
+go in `tokens/app.css` with the measurement that forced them, so the diff
+against the source stays empty and every deviation is visible in one file.
+Dark is the default, light is `data-theme="light"`. Component values -- control
+heights, radii, paddings -- are copied from the system's components, not
+re-invented; where a number is copied the CSS comment names the component it
+came from.
+
+**Colour is measured, never eyeballed.** `python scripts/contrast_check.py`
+after any token change. The supplied system shipped four pairs under WCAG AA
+and its own readme says the colours were taken off screenshots, which is
+exactly why this is a script and not a judgement.
+
+**A design change is not done until it has been looked at.** Build passing and
+tokens measured are necessary and not sufficient — render it in a headless
+browser at desktop and phone width, in both themes and both directions, and
+look. Two defects in the 30 Aug pass were invisible in the source and obvious
+in the image. Note that Chrome headless clamps its window to ~500px, so a
+"390px" screenshot is really a 500px layout cropped; render inside a 390px
+iframe to see a phone.
+
 **Sequencing that must always happen lives in code, not in the model.**
 Proven three times on 23 Aug: the model (gemini-2.5-flash) makes one tool
 call per turn and never chains, whatever the prompt orders. So open_request

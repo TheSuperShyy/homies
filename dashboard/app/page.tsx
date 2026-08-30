@@ -22,12 +22,19 @@ export default async function Overview() {
   // beat a dashboard that takes a second to render and a minute to interpret.
   // The tone on each one is the semantic, not decoration: urgent-and-open is
   // the only red thing on the page, which is what makes it findable.
+  //
+  // THE FIRST ONE IS THE HERO, in the design system's sense: double width,
+  // accent ground, the ring motif, and the number at 34px instead of 26. The
+  // reference gives that treatment to the portfolio total, because a dashboard
+  // that treats all its numbers alike has not said which one you came for.
+  // Here it is open tickets — the count that decides whether anybody needs to
+  // do anything today.
   const cards = [
-    ['is-open',     t('overview.openTickets'), open.count ?? 0],
-    ['is-urgent',   t('overview.urgent'),      urgent.count ?? 0],
-    ['',            t('overview.allTickets'),  tickets.count ?? 0],
-    ['is-progress', t('overview.convos'),      convos.data?.length ?? 0],
-    ['',            t('overview.calls'),       calls.count ?? 0],
+    ['hero is-open', t('overview.openTickets'), open.count ?? 0],
+    ['is-urgent',    t('overview.urgent'),      urgent.count ?? 0],
+    ['',             t('overview.allTickets'),  tickets.count ?? 0],
+    ['is-progress',  t('overview.convos'),      convos.data?.length ?? 0],
+    ['',             t('overview.calls'),       calls.count ?? 0],
   ] as const;
 
   return (
@@ -39,14 +46,21 @@ export default async function Overview() {
       <div className="cards">
         {cards.map(([tone, k, n]) => (
           <div className={`card ${tone}`} key={k}>
-            <div className="n">{n}</div>
             <div className="k">{k}</div>
+            <div className="n">{n}</div>
           </div>
         ))}
       </div>
 
-      <h2>{t('overview.last7')}</h2>
-      <div className="panel">
+      {/* Card, with its title inside its own border rather than floating above
+          it. The system has no free-standing section heading — a titled card is
+          how it labels a block, and it keeps the label and the thing it labels
+          inside one outline. */}
+      <div className="panel" style={{ marginBlockStart: 20 }}>
+        <div className="panelhead">
+          <span>{t('overview.last7')}</span>
+          <a className="btn-nav" href="/tickets">{t('overview.seeAll')}</a>
+        </div>
         {recent.data?.length ? (
           <div className="scrollx">
             <table>

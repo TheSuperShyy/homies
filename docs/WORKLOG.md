@@ -9,6 +9,85 @@ conversation that produced it.
 
 ---
 
+## 2026-08-30
+
+### The Stovest design system is vendored, the shell is rebuilt on it, and the dashboard now shows a skeleton instead of a frozen window
+
+- **Confirmed the WhatsApp bot changes are live in n8n before touching anything
+  else.** Fetched workflow `u2JjrbcNPYyyh3yl` over the REST API rather than
+  trusting the repo: the `Answer the resident` systemMessage is 37,856 chars
+  with the same SHA-1 as `prompt.md` builds locally, and both canned tap lines
+  are present in the live `Sort` node. The status sentence is deliberately no
+  longer duplicated verbatim in the prompt — the 29 Aug de-scripting removed
+  it, so the tap path says the exact sentence and the typed path says the same
+  offer in the model's own words. Not drift.
+- **Vendored the uploaded design system** (`Re-Design/`) into
+  `dashboard/design-system/`. The four token files are byte-identical to the
+  delivered ones and stay that way; every deviation lives in one extension
+  file, `tokens/app.css`, with the number that forced it.
+- **Four of the system's colour pairs miss WCAG AA and are corrected there.**
+  Its readme says the colours were "eyeballed from screenshots, not sampled",
+  and measurement agrees: white on `--accent` is 3.81:1 behind 13px nav
+  labels, `--text-3` is 3.46:1 on the sidebar and 2.74:1 on a light card, and
+  `--text-2` is 3.85:1 on the light canvas. Added `--accent-fill` (a darker
+  step of the same hue, used only where the accent carries text) and raised
+  the two muted tiers. `scripts/contrast_check.py` measures all 34 pairs the
+  interface actually renders, compositing translucent pill grounds the way CSS
+  does. 0 failing.
+- **Rewrote `globals.css` on the system's tokens and components.** Bridge layer
+  maps the app's old semantic names onto the system's, declared once with
+  `var()` so both themes follow. Dark is now the default and light is
+  `data-theme="light"`, per the system's contract — read from a cookie on the
+  server, so the attribute is in the first byte of HTML and there is no flash.
+- **New chrome:** 232px grouped sidebar, 68px topbar with a centred search
+  pill, theme switch, notification and settings buttons, and the account
+  block. The search, the bell and the gear are PLACEHOLDERS and are drawn and
+  labelled as such — nothing in this app searches across four tables in one
+  query, and building that would be new data logic.
+- **Two real speed fixes, not just a loading animation.**
+  1. The root layout was calling `auth.getUser()` — a full network round trip,
+     measured at ~0.29s from here — for a question the middleware had answered
+     one millisecond earlier for the same request. The middleware now passes
+     the email down as a request header. One round trip removed from every
+     page render, and it was the one blocking the shell from streaming.
+  2. `loading.tsx` for all eight routes plus a `components/skeleton.tsx` built
+     to the real column counts and row heights, so the shell paints instantly
+     and the content lands where the grey was instead of replacing a spinner
+     with a different layout.
+- **Restyled the overview as the review screen**, per the owner's "one screen
+  before the rest": hero stat card with the system's ring motif, four tiles,
+  and the recent table inside a titled card. The other five pages inherit the
+  new shell and tokens but have not had their own layout pass yet.
+- Baseline for comparison after deploy: live `/login` TTFB today, before any of
+  this ships, was 1.78s cold and ~0.43s warm.
+
+### Two things measured that contradicted what the screenshots suggested
+
+- **The "blank page at 390px" was a headless artefact, not a bug.** Chrome
+  clamps its window to ~500px, laid the page out at 500 and cropped the image
+  to 390 — and because the interface is right-to-left, the crop showed the
+  empty left side. Proved it with a geometry probe (`clientWidth=500`,
+  `scrollWidth=500`, nothing overflowing) and then rendered a true 390px
+  viewport inside an iframe, where the layout is correct. The two guards added
+  while chasing it (`minmax(0, 1fr)` on the shell track, `min-width: 0` on the
+  rail) are correct and kept, but the comments claiming they fixed an observed
+  break were rewritten — they guard against it, they did not cure it.
+- **The hero ring motif was on the wrong corner in left-to-right.** Found by
+  looking, not by reading the CSS. Replaced `calc(100% - 58px)` positioning
+  with a sized disc on `inset-inline-end`, which mirrors itself.
+
+### Open
+
+- Five pages still to restyle: tickets, debts, conversations, calls, sync,
+  plus the two detail pages and login. Waiting on the owner's review of the
+  overview.
+- Nothing has been deployed. The build is green and the design was checked in
+  a headless browser at 1440 and at a true 390, in both themes and both
+  directions, but the real app has still never been opened in a real browser.
+- `VERCEL_TOKEN` in `.env` is still invalid (403 `invalidToken: true`).
+
+---
+
 ## 2026-08-28
 
 ### The dashboard is up locally, and the voice/credit questions were answered from the APIs
