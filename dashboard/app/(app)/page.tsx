@@ -1,6 +1,7 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, label, translator, when } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
+import { Donut, DailyBars, Legend, byDay, type Slice } from '@/components/charts';
 import Link from 'next/link';
 
 export default async function Overview() {
@@ -9,7 +10,13 @@ export default async function Overview() {
   const t = translator(locale);
   const since = new Date(Date.now() - 7 * 864e5).toISOString();
 
-  const [tickets, open, urgent, convos, calls, recent] = await Promise.all([
+  // The charts' window. Seven days, the same seven the table under them
+  // covers — two windows on one page means every number has to be read twice
+  // before it can be compared with the one beside it.
+  const week = new Date(Date.now() - 7 * 864e5).toISOString();
+
+  const [tickets, open, urgent, convos, calls, recent,
+         weekTickets, weekCalls, weekLinks] = await Promise.all([
     db.from('requests').select('*', { count: 'exact', head: true }),
     db.from('requests').select('*', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
     db.from('requests').select('*', { count: 'exact', head: true }).in('urgency', ['high', 'emergency']).in('status', ['open', 'in_progress']),
@@ -17,7 +24,30 @@ export default async function Overview() {
     db.from('interactions').select('*', { count: 'exact', head: true }).eq('channel', 'voice'),
     db.from('requests').select('reference,description,building,unit,urgency,status,opened_via,created_at')
       .gte('created_at', since).order('created_at', { ascending: false }).limit(8),
+
+    // Three counts for the ring, and the ticket rows again — dated only —
+    // because the ring needs the total and the columns need them bucketed by
+    // day, and one trip is cheaper than two. `payment_links` is filtered to
+    // `sent`: a row is written when the agent RAISES a link, and raising one is
+    // not sending it.
+    db.from('requests').select('created_at').gte('created_at', week),
+    db.from('interactions').select('created_at').eq('channel', 'voice').gte('created_at', week),
+    db.from('payment_links').select('created_at').eq('status', 'sent').gte('created_at', week),
   ]);
+
+  const slices: Slice[] = [
+    { key: 'tickets', label: t('chart.tickets'), value: weekTickets.data?.length ?? 0, token: '--cat-1' },
+    { key: 'calls',   label: t('chart.calls'),   value: weekCalls.data?.length ?? 0,   token: '--cat-2' },
+    { key: 'links',   label: t('chart.links'),   value: weekLinks.data?.length ?? 0,   token: '--cat-3' },
+  ];
+  const activity = slices.reduce((n, s) => n + s.value, 0);
+
+  // Weekday initials in the reader's own language, from the same Intl the
+  // dates in the table use. Hardcoding "Mon Tue Wed" would be English furniture
+  // on a Hebrew page.
+  const weekday = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB',
+    { timeZone: 'Asia/Jerusalem', weekday: 'short' });
+  const days = byDay(weekTickets.data, 7, (d) => weekday.format(d));
 
   // Counts, not a chart library. Five numbers a manager can read in two seconds
   // beat a dashboard that takes a second to render and a minute to interpret.
@@ -51,6 +81,28 @@ export default async function Overview() {
             <div className="n">{n}</div>
           </div>
         ))}
+      </div>
+
+      <div className="panel" style={{ marginBlockStart: 20 }}>
+        <div className="panelhead">
+          <span>{t('chart.activity')}</span>
+          <span className="faint">{t('overview.last7')}</span>
+        </div>
+        <div className="chartcard">
+          <div className="donutwrap">
+            <Donut slices={slices} total={activity} totalLabel={t('chart.events')} />
+            <Legend slices={slices} total={activity} emptyNote={t('chart.nothingYet')} />
+          </div>
+          <div>
+            <h3 className="charttitle">{t('chart.perDay')}</h3>
+            <DailyBars days={days} emptyLabel={t('chart.noActivity')} />
+          </div>
+          {/* A zero segment with nothing said about it reads as a broken chart
+              rather than as a feature that is not finished. */}
+          {slices[2].value === 0 && (
+            <p className="chartnote">{t('chart.linksNote')}</p>
+          )}
+        </div>
       </div>
 
       {/* Card, with its title inside its own border rather than floating above

@@ -29,6 +29,32 @@
   --action-fg:    #1A1005;
   --action-hover: #F7A85C;
 
+  /* ---- categorical series -----------------------------------------------
+     The Stovest system has no categorical palette — its only chart is a
+     single accent-coloured area, because a stock dashboard plots one line.
+     Three series need three identities, so these are slots 1-3 of the
+     documented default categorical order (blue, orange, aqua), stepped for
+     each surface.
+
+     NOT eyeballed and not invented. Both trios were run through the
+     validator: lightness band, chroma floor, colour-vision separation,
+     normal-vision separation and contrast against the actual chart surface.
+     Worst adjacent pair is deutan dE 9.2 light / 9.4 dark against a target of
+     8, and normal-vision 27.6 / 26.5 against a floor of 15.
+
+     One caveat carried deliberately: in LIGHT mode the aqua sits at 2.82:1
+     against a white card, under the 3:1 mark. The validator calls that a WARN
+     rather than a fail and requires relief — visible labels or a table view.
+     Every segment here is direct-labelled with its own number and repeated in
+     a legend, which is that relief. Do not use these fills without labels. */
+  --cat-1: #3987e5;   /* tickets */
+  --cat-2: #d95926;   /* voice calls */
+  --cat-3: #199e70;   /* payment links */
+
+  /* Recessive chrome. One shade off the surface, never a dashed rule. */
+  --chart-axis: var(--border-2);
+  --chart-zero: var(--border-1);
+
   /* Skeletons shimmer between these two. Both are real surfaces from the
      system, so a loading row occupies exactly the space its real row will. */
   --skeleton-1: var(--surface-2);
@@ -69,6 +95,10 @@
   --action:       #9A4C05;
   --action-fg:    #FFFFFF;
   --action-hover: #7C3D04;
+
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
 
   --skeleton-1: #EDECE9;
   --skeleton-2: #E0DFDB;

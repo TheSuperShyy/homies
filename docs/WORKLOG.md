@@ -61,6 +61,49 @@ conversation that produced it.
 - Baseline for comparison after deploy: live `/login` TTFB today, before any of
   this ships, was 1.78s cold and ~0.43s warm.
 
+### The overview has charts, and one of the three numbers turned out to be zero
+
+- Asked for a pie of three things: daily tickets opened, calls made by the voice
+  agent, payment links sent. **Checked all three against the live database
+  before drawing anything**, which changed the answer.
+  - Tickets: real, 171 in the last seven days, 54 down to 2 across the week.
+    Note 170 of the 171 arrived `opened_via: oxs` — these are imported, not
+    opened by our bot. The chart says "tickets opened", which is true either way.
+  - Voice calls: real, 38 in the window, every one `direction: outbound`. None
+    since 27 Aug.
+  - **Payment links: the table is empty. Zero rows, ever.** `send_payment_link`
+    writes a `payment_links` row and stops; nothing delivers it, and OXS exposes
+    no payment-link endpoint. So the third slice is 0, shown as 0, with one line
+    under the chart saying why — a zero segment with no explanation reads as a
+    broken chart rather than as a feature that is not wired up.
+- **A pie cannot show a daily number**, so there are two charts rather than one.
+  The donut is the three-way mix for the week, which is a real part-to-whole
+  with three well-separated segments; the daily figure the owner actually asked
+  about is a column chart, because "daily" is change over time and a ring
+  answers "which day was busiest" while refusing to answer "is this getting
+  better".
+- **The colours were computed, not chosen.** The Stovest system ships no
+  categorical palette — its only chart is a single accent-coloured area — so the
+  three series take slots 1-3 of the documented default order and were run
+  through the validator against the real card surface in both themes: worst
+  adjacent colour-vision separation 9.2 light / 9.4 dark against a target of 8,
+  normal-vision 27.6 / 26.5 against a floor of 15. One WARN carried knowingly:
+  in light mode the aqua is 2.82:1 on a white card, under 3:1, which obliges
+  visible labels — every segment is direct-labelled and repeated in the legend
+  with its value.
+- **No chart library.** Both shapes are arithmetic and a `stroke-dasharray`.
+  The overview route is still 189 B of client JavaScript; recharts would have
+  been 40-90kB on the page a manager opens most.
+- Three defects found by rendering it rather than by reading it: the columns
+  were full-width saturated blocks (capped at 30px), the baseline was chopped
+  into seven dashes by the grid gap (one rule on the container now), and
+  **`byDay` was bucketing on UTC dates while labelling in Jerusalem time** — a
+  call logged at 01:00 local would have landed on the previous column, with the
+  label above it disagreeing. Both sides use `Asia/Jerusalem` now.
+- Verified: RLS `staff_read` covers `payment_links` and `interactions`, so the
+  charts will start showing links the day anything writes one. Build and `tsc`
+  clean, contrast 0 failing, rendered in both themes and both directions.
+
 ### Navigation is client-side now, and two things had to move to make it honest
 
 - The nav, the filters, the pager and every row link were plain `<a href>`, so

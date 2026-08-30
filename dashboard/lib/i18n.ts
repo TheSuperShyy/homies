@@ -103,6 +103,20 @@ const S = {
   'load.loading':      { he: 'טוען…',           en: 'Loading…' },
   'overview.seeAll':   { he: 'לכל הקריאות',     en: 'See all' },
 
+  // --- overview charts ----------------------------------------------------
+  'chart.activity':    { he: 'פעילות השבוע',      en: 'This week' },
+  'chart.tickets':     { he: 'קריאות שנפתחו',     en: 'Tickets opened' },
+  'chart.calls':       { he: 'שיחות של הסוכן',    en: 'Agent calls' },
+  'chart.links':       { he: 'לינקים לתשלום',     en: 'Payment links' },
+  'chart.events':      { he: 'פעולות',            en: 'events' },
+  'chart.perDay':      { he: 'קריאות שנפתחו, לפי יום', en: 'Tickets opened, by day' },
+  'chart.nothingYet':  { he: 'טרם נשלח',          en: 'none yet' },
+  'chart.noActivity':  { he: 'לא נרשמה פעילות בשבוע האחרון.', en: 'No activity in the last seven days.' },
+  // Said once, under the chart, because a zero segment with no explanation
+  // reads as a broken chart rather than as a feature that is not wired up.
+  'chart.linksNote':   { he: 'הסוכן יודע ליצור לינק לתשלום, אבל עדיין אין מי שישלח אותו — לכן המספר אפס.',
+                         en: 'The agent can raise a payment link, but nothing delivers it yet — which is why that number is zero.' },
+
   // --- shared column headings --------------------------------------------
   'col.reference':  { he: 'מספר קריאה', en: 'Reference' },
   'col.what':       { he: 'מה',          en: 'What' },

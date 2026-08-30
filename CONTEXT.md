@@ -35,6 +35,15 @@ heights, radii, paddings -- are copied from the system's components, not
 re-invented; where a number is copied the CSS comment names the component it
 came from.
 
+**A chart's numbers are checked against the database before it is drawn, and
+its colours are computed rather than chosen.** Both rules were earned on the
+same afternoon: one of the three metrics asked for had never had a row in its
+table, and the design system turned out to ship no categorical palette at all.
+So — query the table first and say plainly when the answer is zero rather than
+quietly dropping the series; and run any categorical palette through the
+validator against the real surface in both themes before it ships. A chart is
+the one part of a dashboard that can be confidently, legibly wrong.
+
 **Navigation in the dashboard is client-side, and the shell is a route group.**
 Use `next/link` for anything inside the app; a bare `<a>` reloads the document,
 throws away the shell and the skeleton, and spins the browser tab. The routes

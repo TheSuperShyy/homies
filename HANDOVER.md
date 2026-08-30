@@ -1161,6 +1161,28 @@ handset.**
   middleware now sets `x-user-email` on the request headers alongside
   `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
   layout or page**; the middleware is the only place that should call it.
+- **The overview's charts read three tables, and one of them is empty.**
+  `requests` and `interactions` (channel `voice`) have real data;
+  **`payment_links` has never had a single row.** `send_payment_link` writes one
+  and stops — nothing delivers it, and OXS exposes no payment-link endpoint — so
+  the third segment is a true zero, not a bug, and a line under the chart says
+  so. It will start plotting itself the day delivery exists; RLS `staff_read`
+  already covers the table. **Do not "fix" that zero by removing the series.**
+- **Chart colour is validated, not picked.** `--cat-1..3` in
+  `design-system/tokens/app.css` are slots 1-3 of the documented categorical
+  order, checked against the real card surface in both themes. In LIGHT mode the
+  aqua is 2.82:1 on white — a WARN, legal only with visible labels, which is why
+  every segment is direct-labelled and repeated in the legend with its value.
+  **Never use those fills without labels, and never add a fourth series without
+  re-running the validator.**
+- **No chart library, and the overview is still 189 B of client JS.** Both
+  charts are inline SVG/CSS in `components/charts.tsx`. Hover is `<title>`
+  rather than a floating tooltip, deliberately — a cursor-following tooltip
+  needs a client component, and every value is printed anyway.
+- **Anything bucketed by day must use `Asia/Jerusalem`, not `slice(0, 10)`.**
+  Supabase returns UTC; Israel is 2-3 hours ahead, so slicing the ISO string
+  files everything logged before 03:00 local under the previous day. `byDay`
+  gets this right — copy it rather than re-deriving it.
 - **Navigation is client-side. Use `next/link`, never a bare `<a>`, for
   anything inside the app.** A plain anchor reloads the document, which throws
   away the shell and the skeleton and spins the browser tab. The only `<a>`

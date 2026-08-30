@@ -808,6 +808,106 @@ button[disabled]:hover { background: var(--pill-bg); }
   font-family: ui-monospace, monospace;
 }
 
+/* --------------------------------------------------------------- charts -- */
+/* Two charts, one card. The ring answers "what did the system do this week",
+   the columns answer "is that going up or down" — a ring cannot answer the
+   second, which is why both are here rather than one of them.
+
+   Everything below is recessive by design: hairline rules one shade off the
+   surface, no dashed grid (dashing reads as a threshold when it is only a
+   grid), thin marks, and the saturated fills kept small. */
+.chartcard {
+  display: grid; gap: 24px; padding: 20px;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .chartcard { grid-template-columns: minmax(0, 1fr); }
+}
+
+.donutwrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.donut { display: block; flex: none; }
+/* The value in the hole. Tabular figures so it does not jiggle between
+   renders, and the ink is a text token — never a series colour. */
+.donut-n {
+  fill: var(--text-1); font-size: 26px; font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums; letter-spacing: -.01em;
+}
+.donut-k { fill: var(--text-3); font-size: 11px; }
+
+.legendlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; min-width: 168px; }
+.legendlist li {
+  display: grid; grid-template-columns: 10px minmax(0, 1fr) auto auto;
+  align-items: center; gap: 10px; font-size: var(--text-md);
+}
+.legendlist .sw { width: 10px; height: 10px; border-radius: 3px; }
+.legendlist .lab { color: var(--text-2); }
+.legendlist .val {
+  color: var(--text-1); font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+.legendlist .pct {
+  color: var(--text-3); font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums; min-width: 44px; text-align: end;
+}
+
+/* Columns. `align-items: end` on the track and a percentage height on the fill
+   is the whole chart — no scale maths in the markup, and it reflows with the
+   card instead of scrolling like an SVG of fixed width would. */
+.bars {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  gap: 10px; align-items: end; min-height: 150px;
+  position: relative;
+}
+/* THE BASELINE IS ONE RULE, drawn across the whole plot rather than under each
+   column. It used to be a border on each bar's own track, which the 10px grid
+   gap chopped into seven dashes — and a dashed rule reads as a threshold or a
+   projection when it is only an axis. Sitting 18px up, which is exactly the
+   height of the label row below it. */
+.bars::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-end: 18px;
+  height: 1px; background: var(--chart-zero); pointer-events: none;
+}
+.bar { display: grid; grid-template-rows: 16px 1fr 18px; min-width: 0; height: 150px; }
+.barval {
+  font-size: var(--text-xs); color: var(--text-2); text-align: center;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.barwrap { display: flex; align-items: flex-end; justify-content: center; min-height: 0; }
+.barfill {
+  /* CAPPED, not full-width. A column that fills its whole grid track is a
+     saturated block the width of a finger, and seven of them read as a wall
+     rather than as data — the loudest thing on a page whose actual headline is
+     the number in the ring. Thin marks are the rule; the track keeps the
+     spacing, the mark stays narrow. */
+  width: min(100%, 30px); background: var(--cat-1);
+  /* Rounded at the data end only, anchored square to the baseline — a bar
+     rounded at the bottom floats off its own axis. */
+  border-start-start-radius: 4px; border-start-end-radius: 4px;
+  min-height: 2px;
+  transition: filter var(--transition-fast);
+}
+.barfill:hover { filter: brightness(1.15); }
+.barlab {
+  font-size: var(--text-xs); color: var(--text-3); text-align: center;
+  padding-block-start: 5px; line-height: 1; white-space: nowrap;
+}
+
+.charttitle {
+  margin: 0 0 12px; font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--text-2);
+}
+
+.chartnote {
+  grid-column: 1 / -1;
+  font-size: var(--text-sm); color: var(--text-3);
+  padding-block-start: 4px;
+}
+.chart-empty {
+  min-height: 150px; display: grid; place-items: center;
+  color: var(--text-3); font-size: var(--text-md);
+}
+
 /* ------------------------------------------------------------ skeletons -- */
 /* What the reader looks at while the database answers.
 
