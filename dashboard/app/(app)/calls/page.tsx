@@ -113,12 +113,12 @@ async function NoAnswer({ page, size, t, locale }: {
             <tbody>
               {data.map((r: any) => (
                 <tr key={r.id}>
-                  <td className="muted mono">{when(r.created_at, locale)}</td>
-                  <td dir="auto">{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
-                  <td className="mono">{r.residents?.phone ?? '—'}</td>
-                  <td dir="auto">{r.residents?.building ?? '—'}</td>
-                  <td className="mono">{r.residents?.unit ?? '—'}</td>
-                  <td className="mono num">{r.attempt ?? '—'}</td>
+                  <td className="muted mono" data-label={t('col.when')}>{when(r.created_at, locale)}</td>
+                  <td dir="auto" data-label={t('col.resident')}>{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
+                  <td className="mono" data-label={t('col.phone')}>{r.residents?.phone ?? '—'}</td>
+                  <td dir="auto" data-label={t('col.building')}>{r.residents?.building ?? '—'}</td>
+                  <td className="mono" data-label={t('col.unit')}>{r.residents?.unit ?? '—'}</td>
+                  <td className="mono num" data-label={t('col.attempt')}>{r.attempt ?? '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -161,13 +161,13 @@ async function LinksSent({ page, size, t, locale }: {
             <tbody>
               {data.map((r: any) => (
                 <tr key={r.id}>
-                  <td className="muted mono">{when(r.created_at, locale)}</td>
-                  <td dir="auto">{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
-                  <td className="mono">{r.residents?.phone ?? '—'}</td>
-                  <td dir="auto">{r.residents?.building ?? '—'}</td>
-                  <td className="mono num">₪{Number(r.amount).toLocaleString()}</td>
-                  <td className="mono">{r.period?.slice(0, 7) ?? '—'}</td>
-                  <td><span className={`pill ${r.status === 'sent' ? 'resolved' : r.status === 'failed' ? 'needs_review' : 'open'}`}>{r.status}</span></td>
+                  <td className="muted mono" data-label={t('col.when')}>{when(r.created_at, locale)}</td>
+                  <td dir="auto" data-label={t('col.resident')}>{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
+                  <td className="mono" data-label={t('col.phone')}>{r.residents?.phone ?? '—'}</td>
+                  <td dir="auto" data-label={t('col.building')}>{r.residents?.building ?? '—'}</td>
+                  <td className="mono num" data-label={t('col.amount')}>₪{Number(r.amount).toLocaleString()}</td>
+                  <td className="mono" data-label={t('col.period')}>{r.period?.slice(0, 7) ?? '—'}</td>
+                  <td data-label={t('col.status')}><span className={`pill ${r.status === 'sent' ? 'resolved' : r.status === 'failed' ? 'needs_review' : 'open'}`}>{r.status}</span></td>
                 </tr>
               ))}
             </tbody>
@@ -223,22 +223,23 @@ async function CallList({ view, page, size, search, t, locale }: {
             <tbody>
               {data.map((c: any) => (
                 <tr key={c.id}>
-                  <td className="muted mono">{when(c.started_at, locale)}</td>
-                  <td>{c.direction}</td>
-                  <td className="mono">{c.caller_phone ?? '—'}</td>
-                  <td dir="auto">{c.summary ?? <span className="muted">{t('calls.noSummary')}</span>}</td>
-                  <td className="muted">{c.disposition ?? '—'}</td>
-                  <td className="mono num">{c.duration_seconds ? `${c.duration_seconds}s` : '—'}</td>
+                  <td className="muted mono" data-label={t('col.when')}>{when(c.started_at, locale)}</td>
+                  <td data-label={t('col.direction')}>{c.direction}</td>
+                  <td className="mono" data-label={t('col.number')}>{c.caller_phone ?? '—'}</td>
+                  <td dir="auto" data-label={t('col.summary')}>{c.summary ?? <span className="muted">{t('calls.noSummary')}</span>}</td>
+                  <td className="muted" data-label={t('col.outcome')}>{c.disposition ?? '—'}</td>
+                  <td className="mono num" data-label={t('col.length')}>{c.duration_seconds ? `${c.duration_seconds}s` : '—'}</td>
                   {/* The <800ms target from the plan, visible per call rather
                       than as an average that hides the bad ones. */}
-                  <td className="mono num" style={{ color: c.latency_ms > 800 ? 'var(--review)' : undefined }}>
+                  <td className="mono num" data-label={t('col.latency')}
+                      style={{ color: c.latency_ms > 800 ? 'var(--review)' : undefined }}>
                     {c.latency_ms ? `${c.latency_ms}ms` : '—'}
                   </td>
                   {/* Shown on every row, not only ones with a transcript: the
                       page also carries the recording, the outcome and the tools
                       the agent called, so there is something to see even on a
                       call that produced no words. */}
-                  <td><Link className="btn-sm" href={`/calls/${c.id}`}>
+                  <td data-label=""><Link className="btn-sm" href={`/calls/${c.id}`}>
                     <IconOpenLink />{t('calls.view')}
                   </Link></td>
                 </tr>

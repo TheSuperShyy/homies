@@ -111,8 +111,8 @@ export default async function Tickets({
             <tbody>
               {data.map((r: any) => (
                 <tr key={r.reference}>
-                  <td className="mono">{r.reference}</td>
-                  <td dir="auto">
+                  <td className="mono" data-label={t('col.reference')}>{r.reference}</td>
+                  <td dir="auto" data-label={t('col.what')}>
                     {r.description}
                     {/* WHAT OXS ACTUALLY KNOWS ABOUT THIS TICKET.
                         Their `status` field reads `open` on every service call
@@ -132,15 +132,15 @@ export default async function Tickets({
                       </span>
                     )}
                   </td>
-                  <td dir="auto">{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
+                  <td dir="auto" data-label={t('col.where')}>{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
                   {/* The number the call came from, kept since 19 Aug. It is
                       the only thing on an inbound ticket that cannot be
                       mis-heard, and on a needs_review row where the audio
                       failed it is often the only way back to the person. */}
-                  <td className="mono">{r.reported_by_phone ?? <span className="muted">—</span>}</td>
-                  <td className="muted">{r.type}</td>
-                  <td><span className={`urg ${r.urgency}`}>{label(t, 'urgency', r.urgency)}</span></td>
-                  <td>
+                  <td className="mono" data-label={t('col.caller')}>{r.reported_by_phone ?? <span className="muted">—</span>}</td>
+                  <td className="muted" data-label={t('col.type')}>{r.type}</td>
+                  <td data-label={t('col.urgency')}><span className={`urg ${r.urgency}`}>{label(t, 'urgency', r.urgency)}</span></td>
+                  <td data-label={t('col.status')}>
                     <form action={updateStatus} className="status-edit">
                       <input type="hidden" name="reference" value={r.reference} />
                       <select name="status" defaultValue={r.status} aria-label={t('col.status')}>
@@ -151,8 +151,8 @@ export default async function Tickets({
                       <button type="submit">{t('tickets.save')}</button>
                     </form>
                   </td>
-                  <td className="muted">{r.opened_via}</td>
-                  <td className="muted mono">
+                  <td className="muted" data-label={t('col.via')}>{r.opened_via}</td>
+                  <td className="muted mono" data-label={t('col.opened')}>
                     {when(r.created_at, locale)}
                     {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} t={t} />}
                   </td>

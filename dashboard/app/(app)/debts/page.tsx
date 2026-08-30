@@ -267,12 +267,13 @@ export default async function Debts({
                 const others = (owner?.units ?? []).filter((u) => u !== r.unit);
                 return (
                 <tr key={byOwnerView ? r.phone : `${r.phone} ${r.unit}`}>
-                  <td dir="auto">{r.name}</td>
-                  <td dir="auto">{r.building}</td>
+                  <td dir="auto" data-label={t('col.resident')}>{r.name}</td>
+                  <td dir="auto" data-label={t('col.building')}>{r.building}</td>
                   {/* From the charge, not the resident. In apartment view an
                       owner of two flats has two rows, and the marker is what
                       stops them reading as two unrelated people a page apart. */}
-                  <td dir="auto" className="mono">
+                  <td dir="auto" className="mono"
+                      data-label={byOwnerView ? t('debts.colApartments') : t('debts.colApartment')}>
                     {byOwnerView
                       ? ((r as any).units.join(', ') || '—')
                       : (r.unit || '—')}
@@ -282,16 +283,17 @@ export default async function Debts({
                       </span>
                     )}
                   </td>
-                  <td className="mono">{r.phone}</td>
+                  <td className="mono" data-label={t('col.phone')}>{r.phone}</td>
                   {/* Dropped under a month filter: it would be the selected
                       month repeated on every row. */}
                   {/* Sorted here rather than relied on: in owner view the
                       months arrive merged from flats ordered by amount, so
                       the query's period ordering no longer holds. */}
                   {selected === 'all' &&
-                    <td className="muted mono">{[...r.months].sort().join(', ') || '—'}</td>}
-                  <td className="muted">{r.inReview.join(', ') || '—'}</td>
-                  <td className="mono num">{r.owed ? shekels(r.owed) : '—'}</td>
+                    <td className="muted mono" data-label={t('debts.monthsOwed')}>{[...r.months].sort().join(', ') || '—'}</td>}
+                  <td className="muted" data-label={t('debts.inReview')}>{r.inReview.join(', ') || '—'}</td>
+                  <td className="mono num"
+                      data-label={selected === 'all' ? t('debts.owed') : t('debts.owedIn', { month: selected })}>{r.owed ? shekels(r.owed) : '—'}</td>
                   {/* One press, one call, this resident. The PIN is typed
                       every time on purpose: this page has no login, and the
                       cost of a mistaken press is a resident's phone ringing
@@ -300,7 +302,7 @@ export default async function Debts({
                       flat the owner owes on, so pressing on either row of a
                       two-flat owner places the same call. */}
                   {canCall && (
-                    <td>
+                    <td data-label={t('debts.call')}>
                       {hasNumber && r.owed > 0 ? (
                         <form action={placeCall} className="status-edit">
                           <input type="hidden" name="phone" value={r.phone} />

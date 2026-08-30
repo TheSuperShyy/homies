@@ -1176,6 +1176,18 @@ handset.**
   because the rings came from a stock-portfolio recreation and meant nothing on
   a maintenance dashboard. It is the only deliberate departure from the
   reference in the restyle — do not "restore" it.
+- **Every `<td>` in every table carries a `data-label`, and it must keep doing
+  so.** Below 720px the tables become stacked cards and that attribute is the
+  only thing naming each line. Set it from the same `t('col.x')` call as the
+  matching `<th>`; a new column without one renders as a value with no label.
+- **On a phone the rail is navigation only.** The language switch and sign out
+  are not there — both are on /settings, which is in the nav. Do not put them
+  back in the bar; there is no room for seven destinations and two buttons.
+- **Mobile is verified inside an iframe, never by resizing the window.**
+  Headless Chrome clamps its window to about 489px, hands you 489 while you
+  asked for 390, and crops the screenshot — which reads exactly like a layout
+  bug. `scratchpad/mk_mobile.py` builds the iframe harness and `probe.js`
+  reports real overflow from the layout engine.
 - **The display name and profile photo live in `auth.users.raw_user_meta_data`
   (`display_name`, `avatar_url`, `avatar_path`), NOT in a profiles table.** The
   middleware reads them off the `getUser()` call it already makes and passes

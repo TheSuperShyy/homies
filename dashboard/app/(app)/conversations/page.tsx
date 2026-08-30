@@ -33,7 +33,7 @@ export default async function Conversations({
             <tbody>
               {data.map((c: any) => (
                 <tr key={c.phone}>
-                  <td>
+                  <td data-label={t('convos.who')}>
                     <Link href={`/conversations/${encodeURIComponent(c.phone)}`}>
                       {/* A name when the phone matches a resident, the number
                           when it does not. An unmatched number is a signal, not
@@ -43,13 +43,13 @@ export default async function Conversations({
                       {c.building && <span className="sub" dir="auto">{c.building}{c.unit ? ` · ${c.unit}` : ''}</span>}
                     </Link>
                   </td>
-                  <td dir="auto">{c.last_message}</td>
-                  <td className="mono">{c.message_count}<span className="muted"> / {c.from_resident} in</span></td>
-                  <td className="muted">{c.lang ?? '—'}</td>
-                  <td>{c.touched_by_human
+                  <td dir="auto" data-label={t('convos.last')}>{c.last_message}</td>
+                  <td className="mono" data-label={t('convos.count')}>{c.message_count}<span className="muted"> / {c.from_resident} in</span></td>
+                  <td className="muted" data-label={t('convos.lang')}>{c.lang ?? '—'}</td>
+                  <td data-label={t('convos.human')}>{c.touched_by_human
                     ? <span className="pill in_progress">{t('convos.yes')}</span>
                     : <span className="muted">{t('convos.botOnly')}</span>}</td>
-                  <td className="muted mono">{when(c.last_message_at, locale)}</td>
+                  <td className="muted mono" data-label={t('convos.activity')}>{when(c.last_message_at, locale)}</td>
                 </tr>
               ))}
             </tbody>

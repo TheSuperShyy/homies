@@ -123,7 +123,20 @@ a { color: inherit; text-decoration: none; }
    right-to-left document that overflows horizontally opens scrolled to the far
    edge, so the failure does not look like a scrollbar — it looks like a blank
    screen with the whole dashboard off to one side. */
-.shell { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100dvh; }
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* AND EXPLICIT ROWS, which is not a tidy-up. Below the sidebar breakpoint the
+     rail and the content column are two grid ROWS, both `auto`, inside a
+     container with `min-height: 100dvh`. Auto rows in a container taller than
+     its content share out the slack equally, so on any page shorter than the
+     viewport — a conversation with four messages, an empty ticket list — the
+     navigation bar grew to a third of the phone screen with its contents
+     floating in the middle of it. Naming the rows hands every spare pixel to
+     the content, which is the one that can use it. */
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 100dvh;
+}
 
 @media (min-width: 1024px) {
   .shell { grid-template-columns: var(--sidebar) minmax(0, 1fr); }
@@ -396,13 +409,41 @@ a { color: inherit; text-decoration: none; }
    often. Below the sidebar breakpoint they lose their labels and become the
    system's IconButton instead. Both carry an aria-label in the markup, so the
    text is still there for anyone who needs it read out. */
+/* AND ON A PHONE IT IS NOT THERE AT ALL. The two buttons became two unlabelled
+   circles pinned to the end of a 390px bar, holding about 90px hostage — a
+   quarter of the row — so that the seven destinations had to scroll inside what
+   was left, and the first thing a reader saw was two icons with no words. Both
+   of them, language and sign out, now live on /settings, which IS one of those
+   seven destinations. So the bar is navigation and nothing else, and the two
+   controls are one tap away with their names attached. */
 @media (max-width: 1023px) {
-  .langswitch button { width: var(--control-md); padding-inline: 0; }
-  .langswitch button span { display: none; }
+  .railfoot { display: none; }
 }
 
 main { padding: 22px; min-width: 0; }
 @media (min-width: 768px) { main { padding: 24px; } }
+/* A phone has 390 points across and 22 of them on each side is 11% of the
+   screen spent on margin. Sixteen still separates the panels from the edge and
+   gives every table cell back 12 points. */
+@media (max-width: 520px) { main { padding: 16px; } }
+
+/* THE WHOLE INTERFACE ON A TOUCHSCREEN. `pointer: coarse` is the finger, not
+   the screen size: a tablet with a mouse keeps the tighter geometry and a small
+   phone gets the bigger targets, which is the distinction that actually
+   matters. 44 is Apple's number and Material's is 48; the controls here already
+   carry padding beyond their painted edge, so 44 on the box is the honest
+   minimum rather than a rounded-up guess. */
+@media (pointer: coarse) {
+  .navlist a, .seg a, .btn-nav, .btn-sm, .pager .per a,
+  button, .choice button, .rangeform button { min-height: 44px; }
+  /* Except the theme switch, which is a 40x22 track with a knob that travels a
+     measured 18px. Growing the box does not grow the knob, so it would become a
+     tall pill with a small dot floating in it — a bigger target for a control
+     that is already only on the desk-width topbar. */
+  .themeswitch button { min-height: 0; }
+  .iconbtn { width: 44px; height: 44px; }
+  .status-edit select, .status-edit button, .status-edit input { min-height: 40px; }
+}
 .page { max-width: 1400px; margin-inline: auto; }
 
 /* ------------------------------------------------------------- headings -- */
@@ -436,6 +477,17 @@ h2 {
 .cards {
   display: grid; gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+}
+/* 176 was measured on a desk, where it is the width at which a label like
+   "Resolved this week" stops wrapping. On a 390px phone it is 34 points too
+   wide for two columns, so all five tiles went single file and the page opened
+   with a screen and a half of headline numbers before anything else. 150 fits
+   two, and the label wraps to a second line rather than the tile taking a whole
+   row to itself. */
+@media (max-width: 520px) {
+  .cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .card { padding: 12px 14px; }
+  .card.hero { grid-column: span 2; padding: 18px; }
 }
 .card {
   position: relative; overflow: hidden;
@@ -502,7 +554,9 @@ h2 {
 .card.hero::before { display: none; }
 .card.hero .n { font-size: var(--text-3xl); margin-block-start: 10px; }
 .card.hero .k { font-size: var(--text-md); }
-@media (max-width: 640px) { .card.hero { grid-column: span 1; } }
+/* Between 520 and 640 the grid really is one column wide, so a two-column
+   span would be an overflow rather than a wide card. */
+@media (max-width: 640px) and (min-width: 521px) { .card.hero { grid-column: span 1; } }
 
 /* ---------------------------------------------------------------- panel -- */
 /* Card: surface-1, border-1, radius-lg, shadow-card (none on dark), padding 20.
@@ -784,6 +838,12 @@ button[disabled]:hover { background: var(--pill-bg); }
 }
 .msg.resident { align-self: flex-start; background: var(--surface-2); }
 .msg.bot { align-self: flex-end; background: var(--accent-soft); border-color: var(--border-2); }
+/* 68% of 1000px is a comfortable line; 68% of 358px is five words. The gutter
+   that tells the two speakers apart only has to be wide enough to see. */
+@media (max-width: 640px) {
+  .msg { max-width: 88%; }
+  .thread { padding: 14px; gap: 8px; }
+}
 .msg .who { font-size: var(--text-xs); color: var(--text-3); margin-block-end: 3px; }
 /* The transcript scrolls inside its own pane instead of growing the page.
    Capped just under the viewport so the end of the pane is visibly the end of a
@@ -1223,4 +1283,83 @@ button.danger svg { width: 15px; height: 15px; }
    buttons wrapping one per line, which looks like three separate controls. */
 @media (max-width: 460px) {
   .avatarpick { flex-direction: column; align-items: flex-start; }
+}
+
+/* ------------------------------------------------- tables on a phone ------ */
+/* NINE COLUMNS DO NOT FIT ON 390 POINTS, AND SCROLLING THEM SIDEWAYS IS NOT AN
+   ANSWER. The horizontal pane is right on a laptop, where the overflow is a
+   column or two and the reader can see most of the row. On a phone it hid six
+   of the nine, put the description in a 60px column where it wrapped one word
+   per line, and left "Status" — the field this page exists to change —
+   permanently off screen with nothing to say it was there.
+ *
+ * So below 720px each row becomes a card and each cell a labelled line. The
+ * labels come from `data-label` on the cell, set from the SAME translator call
+ * as the `<th>` above it, so a column that is renamed or conditionally dropped
+ * cannot leave a stale label behind — which is what `nth-child` selectors would
+ * have done to the debts table, where two columns come and go with the filter.
+ *
+ * The first cell is the row's identity in every one of these tables — a
+ * reference, a resident, a timestamp — so it is the card's heading and keeps
+ * its own label to itself. */
+@media (max-width: 720px) {
+  /* The pane stops being one, or the cards inherit a scrollbar they cannot fill. */
+  .panel > .scrollx { overflow-x: visible; }
+
+  .panel table, .panel tbody, .panel tr, .panel td { display: block; }
+  .panel thead { display: none; }
+
+  .panel tbody tr {
+    padding: 14px 16px;
+    border-block-end: 1px solid var(--border-1);
+  }
+  .panel tbody tr:last-child { border-block-end: 0; }
+
+  /* THE LABEL FLOATS RATHER THAN TAKING A GRID COLUMN. Two columns was the
+     first attempt and it broke on the cells that carry more than one thing —
+     a ticket description with the dispatcher's note under it, an apartment with
+     its "also owns" line. Every child of a grid container becomes an item, so
+     the second line was placed in the label's column, under the word "What",
+     rather than under the description it belongs to. A float takes the label
+     out of flow and every one of the cell's children — however many, whatever
+     they are — wraps beside it. `flow-root` gives each cell its own block
+     formatting context so one cell's float cannot reach into the next. */
+  .panel tbody td {
+    display: flow-root;
+    /* The inset holds the value column open, and the label is pulled back into
+       it by the same amount. A bare float would let only the FIRST line of a
+       long value sit beside the label and every line after it slide back under
+       it, so a two-line description came out ragged against a column of
+       one-line ones. */
+    padding: 5px 0; padding-inline-start: 100px; border: 0;
+  }
+  .panel tbody td::before {
+    content: attr(data-label);
+    float: left; width: 88px; margin-inline-start: -100px;
+    color: var(--text-3); font-size: var(--text-sm);
+  }
+  [dir="rtl"] .panel tbody td::before { float: right; }
+  /* A number is right-aligned in a column because its neighbours above and
+     below are; standing alone in a card it has nothing to line up with. */
+  .panel tbody td.num, .panel tbody td .num { text-align: start; }
+
+  .panel tbody td:first-child {
+    display: block; padding-block: 0 8px; padding-inline-start: 0;
+    font-size: var(--text-base); font-weight: var(--weight-semibold);
+  }
+  .panel tbody td:first-child::before { content: none; }
+
+  /* An empty cell would otherwise print its label with nothing after it. */
+  .panel tbody td:empty { display: none; }
+
+  /* A cell with nothing to label — the row's action button, or a skeleton bar —
+     takes the whole width rather than reserving 96 points for a blank. */
+  .panel tbody td:not([data-label])::before,
+  .panel tbody td[data-label=""]::before { content: none; }
+  .panel tbody td:not([data-label]),
+  .panel tbody td[data-label=""] { padding-block: 8px 0; padding-inline-start: 0; }
+
+  /* The header row of a panel that also carries a table needs the same inset
+     as the cards under it. */
+  thead th { padding-inline: 16px; }
 }

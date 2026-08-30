@@ -248,9 +248,9 @@ export default async function Sync() {
                 const skipped = r.conclusion === 'success' && !realImport(r);
                 return (
                   <tr key={r.id}>
-                    <td className="muted mono">{ago(r.created_at)}</td>
-                    <td className="muted">{r.event === 'schedule' ? t('sync.bySchedule') : t('sync.byHand')}</td>
-                    <td>
+                    <td className="muted mono" data-label={t('col.when')}>{ago(r.created_at)}</td>
+                    <td className="muted" data-label={t('sync.startedBy')}>{r.event === 'schedule' ? t('sync.bySchedule') : t('sync.byHand')}</td>
+                    <td data-label={t('sync.result')}>
                       {r.status !== 'completed'
                         ? <span className="pill in_progress">{t('sync.stateRunning')}</span>
                         : skipped
@@ -261,8 +261,8 @@ export default async function Sync() {
                             ? <span className="pill resolved">{t('sync.stateDone')}</span>
                             : <span className="pill needs_review">{r.conclusion}</span>}
                     </td>
-                    <td className="mono num">{r.status === 'completed' ? took(r.created_at, r.updated_at) : '—'}</td>
-                    <td><a className="btn-sm" href={r.html_url}><IconOpenLink />{t('sync.openLog')}</a></td>
+                    <td className="mono num" data-label={t('sync.took')}>{r.status === 'completed' ? took(r.created_at, r.updated_at) : '—'}</td>
+                    <td data-label=""><a className="btn-sm" href={r.html_url}><IconOpenLink />{t('sync.openLog')}</a></td>
                   </tr>
                 );
               })}

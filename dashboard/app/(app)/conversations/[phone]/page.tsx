@@ -64,10 +64,10 @@ export default async function Thread({ params }: { params: { phone: string } }) 
               <tbody>
                 {tickets.map((t: any) => (
                   <tr key={t.reference}>
-                    <td className="mono">{t.reference}</td>
-                    <td dir="auto">{t.description}</td>
-                    <td><span className={`pill ${t.status}`}>{label(tr, 'status', t.status)}</span></td>
-                    <td className="muted mono">{when(t.created_at, locale)}</td>
+                    <td className="mono" data-label={tr('col.reference')}>{t.reference}</td>
+                    <td dir="auto" data-label={tr('col.what')}>{t.description}</td>
+                    <td data-label={tr('col.status')}><span className={`pill ${t.status}`}>{label(tr, 'status', t.status)}</span></td>
+                    <td className="muted mono" data-label={tr('col.opened')}>{when(t.created_at, locale)}</td>
                   </tr>
                 ))}
               </tbody>

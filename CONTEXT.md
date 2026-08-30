@@ -43,6 +43,13 @@ portfolio and say nothing about buildings. Ornament either says whose product
 this is or it says nothing, so it gets replaced rather than inherited. Nothing
 else in the system does.
 
+**A breakpoint value measured on one screen is a guess on every other one.**
+Three of the mobile defects were numbers that were correct where they were
+chosen and wrong 600px away: a 176px tile minimum picked so a label would not
+wrap, a 68% bubble width that is a comfortable line at 1000px and five words at
+358, a 22px page padding that is 4% of a laptop and 11% of a phone. When a
+number is set to make one thing fit, write down which width it was fitted at.
+
 **A new field does not automatically want a new table.** Ask what reads it and
 how often first. Two fields that the shell renders on every single page went
 into auth metadata rather than a `profiles` table, because the request already

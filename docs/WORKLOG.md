@@ -36,6 +36,58 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The dashboard works on a phone, and getting there found a bug that had been there all along
+
+- **The navigation bar was taking a third of the screen.** Below the sidebar
+  breakpoint `.shell` becomes two grid ROWS, both `auto`, inside a container
+  with `min-height: 100dvh` — and auto rows in a container taller than their
+  content share out the slack equally. So on any page shorter than the viewport
+  (a four-message conversation, an empty ticket list) the rail grew to about
+  330px with its contents floating in the middle. `grid-template-rows: auto
+  minmax(0, 1fr)`. This was live, on every phone, since the shell was built.
+- **Nine-column tables became labelled cards below 720px.** The horizontal
+  scroll pane is right on a laptop, where the overflow is a column or two. On a
+  390px phone it hid six of the nine columns, wrapped the description one word
+  per line in a 60px column, and left Status — the field the tickets page exists
+  to change — permanently off screen with nothing to say it was there. Each row
+  is now a card and each cell a labelled line.
+- **The labels come from `data-label` on the cell, set from the SAME translator
+  call as the `<th>` above it.** Not `nth-child`, which is the usual way this is
+  done and would have gone stale on the debts table the moment its two
+  conditional columns appear or disappear with the filter.
+- **The label floats; it does not take a grid column.** Two columns was the
+  first attempt and broke on every cell carrying more than one thing — a ticket
+  description with the dispatcher's note under it, an apartment with its "also
+  owns" line. Every child of a grid container is an item, so the second line
+  landed in the label's column, under the word "What". A float lets any number
+  of children wrap beside it, and `flow-root` keeps one cell's float out of the
+  next. The cell then carries a matching inline-start inset with the label
+  pulled back into it, so the second line of a long value stays aligned with the
+  first instead of sliding back under the label.
+- **The two footer buttons are gone from the phone rail.** Language and sign out
+  were two unlabelled circles pinned to the end of a 390px bar, holding about a
+  quarter of the row so that seven destinations had to scroll inside what was
+  left. Both now live on /settings, which is itself one of those destinations,
+  with their names attached. **Sign out on a phone is therefore one tap further
+  away than it was** — deliberate, and worth knowing.
+- **Five stat tiles go two abreast.** 176px was measured on a desk, where it is
+  the width at which "Resolved this week" stops wrapping; on a 390px phone it is
+  34 points too wide for two columns, so all five went single file and the page
+  opened with a screen and a half of headline numbers. 150 fits two.
+- Also: 16px page padding under 520 (22 was 11% of the screen), 44px touch
+  targets under `pointer: coarse` — the finger, not the screen size, so a tablet
+  with a mouse keeps the tighter geometry — with the theme switch excluded
+  because growing its 40x22 track does not grow the knob inside it, and message
+  bubbles at 88% instead of 68% (68% of 358px is five words).
+- **Everything above was measured, not eyeballed.** The pages are rendered
+  inside an iframe because headless Chrome will not open a window under about
+  489px and silently gives you 489 with the picture cropped — which is what made
+  the RTL table look like it was overflowing when a DOM probe showed
+  `scrollWidth == clientWidth == 390` in both directions. Two of the four things
+  I first "saw" in a screenshot were the harness, not the app.
+- `tsc` clean, build clean, contrast 0 failing. Checked at 390px in both
+  directions on overview, tickets, a conversation thread and settings.
+
 ### Staff can set their own name and photo, and neither of them got a table
 
 - **Both live in `auth.users.raw_user_meta_data`, not in a `profiles` table.**
