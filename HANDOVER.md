@@ -1956,6 +1956,59 @@ Nothing dials: no phone number exists, all 7,391 residents are
 
 ## Next moves, in order
 
+**TWO THINGS ARE COMMITTED AND NOT LIVE, AND A CALLER TODAY GETS NEITHER.**
+`8793c9f` (the office number written as speech, which fixed the 30 Aug
+digit-stutter) and the 30 Aug prompt refactor are both in the repo and neither
+has been pushed to Vapi. One command covers both:
+
+    python scripts/vapi_sync.py inbound --apply
+
+Until that runs, the inbound assistant is still serving the 36,668-character
+prompt with `077-6687949` in it, and still breaks on any call that asks for the
+office number. **Read the dry run's tool list before applying** — it must show
+six.
+
+**The inbound prompt was cut 49% on 30 Aug and it is a real behavioural
+change.** The fence is 18,824 characters, down from 36,668. Reverting is one
+`git revert` plus one `--apply`. Two behaviours to watch on the first calls
+after the push, because their explanatory stories were moved out of the prompt
+and the bare rules may not carry the same weight: **opening a second request for
+a fault that already has one**, and **the count-not-contents line on other
+residents' requests**. The `parcel` scenario in `prompt_probe.py` exercises the
+first.
+
+**`prompt_probe.py` is the measurement and it has not been run.** It costs
+money — OpenRouter, the same key the WhatsApp bot runs on, roughly six model
+calls per scenario carrying the whole prompt each time — so it needs the owner's
+word each time, like every spend here:
+
+    python scripts/prompt_probe.py inbound --ref 8793c9f    # before
+    python scripts/prompt_probe.py inbound                  # after
+
+Same tools and same fixed tool results on both halves, so the only variable is
+the wording. Worth running **before** the live push, not after.
+
+**`docs/knowledge/homies.md` is new and is the master for the thirteen facts
+both channels state.** Change a fact there, then in both prompts, then run
+`python scripts/facts_check.py`. It exits non-zero and names what drifted. The
+WhatsApp prompt was deliberately not edited — doing so means a redeploy through
+shared production n8n.
+
+**Three rows of `demo-inbound.md`'s configuration table were wrong and are now
+right.** If you read that file before 30 Aug, re-read it: the transcriber is
+`deepgram nova-3` and has been since 12 Aug (the table said `11labs` for
+eighteen days); `recordingEnabled` is **false** by client instruction (the table
+said true); and `INTAKE_TOOLS` has **six** tools, not three. The recording one
+matters most — there is no audio for any call, which is why the 30 Aug stutter
+could not be settled as voice-looping versus transcriber-looping.
+
+**Still open, unchanged:** `{{callback_number}}` is a numeral and will break the
+debt agent's voicemail line the same way the office number broke inbound. It
+comes from `dashboard/lib/call.ts` and four scripts. Not urgent — there is no
+phone number on the account, so no voicemail is reachable — and the fix is the
+same one: store it spoken.
+
+
 **The owner's read of the PRD checklist, 25 Aug — what is accepted as-is and
 what is still owed.** WhatsApp bot: done; next is moving it to Homies' own
 number and sending the OXS payment link through WhatsApp (template message).

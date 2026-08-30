@@ -11,6 +11,116 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The inbound prompt stopped being a script, and learned what the chatbot knows
+
+**Asked for: an autonomous, intent-driven agent instead of a rigid one, keeping
+the spoken fillers.** The prompt was 36,668 characters and roughly a third of it
+was its own changelog — twenty-five paragraphs that state a rule and then narrate
+the call that produced it. A model reading a record of past mistakes writes in
+the shape of the record, which is the form-filling behaviour that was complained
+about. **The fence is now 18,824 characters, a 49% cut.**
+
+`vapi_sync.py` ships only the four-backtick fence, so the narratives were moved
+below it under `## What the prompt used to say, and why` rather than deleted.
+They are the most valuable prose in the file and they were teaching the wrong
+thing; both can be true. The prior prompt is `git show
+8793c9f:docs/assistant/demo-inbound.md`.
+
+**What changed in behaviour.** The fixed ladder is gone — a caller who says
+*"נזילה מהתקרה באמבטיה, הרצל 14 דירה 12, כבר יומיים"* is no longer asked which
+building, because everything needed is already in hand. Two orderings survive
+because they are load-bearing rather than stylistic: read back before you write
+and read the number after, and on an emergency write before you transfer. About
+twenty recited sentences drop to three, each kept for a mechanical reason — the
+closing line matches `endCallPhrases`, the emergency-services numbers, and the
+tool waiting lines which live in config anyway.
+
+**The worked examples went out on purpose.** The 26 Aug *"מה היה בנזילה?"* came
+from reaching for the nearest-shaped example rather than deriving a question
+from the fault in front of it. Removing the examples removes the failure at
+source instead of adding a rule against it.
+
+### The voice agent had none of the facts the WhatsApp bot has had since 16 Aug
+
+This is why the same question got a good answer in WhatsApp and a collapse on
+the phone, and it was not visible until the two were put side by side.
+`docs/features/11-whatsapp-bot/prompt.md` §`מידע על הומיז` holds thirteen facts —
+hours, contacts, what the ועד fee covers, payment, response times, the
+common-versus-private property line. The voice prompt held none of them. It had
+the office phone number only, and only since `8793c9f` this morning.
+
+**`docs/knowledge/homies.md` is now the master** and `scripts/facts_check.py`
+fails when the two prompts drift. Seven of the thirteen carry two renderings
+because the channels do not want the same characters: `077-6687949` is right in
+a chat window a resident copies from and is the exact input that broke the voice
+this morning. The WhatsApp prompt was not touched — editing it means redeploying
+through shared production n8n, for nothing this pass needs.
+
+**One rule had to bend.** Absolute rules 1 and 2 forbade saying when anything
+would happen, which was too wide: the WhatsApp side already draws the line
+correctly, and the prompt now carries it. *"תקלות חירום עד ארבע שעות, השאר עד
+שלושה ימי עסקים"* is policy and may be said; *"יטפלו בזה עד מחר"* is a promise
+somebody else must keep and stays forbidden. Same for the fee, hours and payment
+methods, all previously deflected or transferred.
+
+**The office email is the one fact it holds and cannot deliver.** A Hebrew voice
+mangles Latin characters and nobody can reconstruct a mangled address from
+context. The agent gives the phone number and says the office can send the
+email. Recorded as a limitation, not solved — it goes away with an
+SMS-after-call tool that does not exist.
+
+### Vapi's knowledge base was considered properly, and not used
+
+Asked directly whether Vapi has a built-in one. It does, and the schema at
+`https://api.vapi.ai/api-json` has three flavours: hosted v2 (`POST /file` →
+`POST /v2/knowledge-base`, which generates a `KnowledgeBaseTool` by itself),
+custom (`provider: custom-knowledge-base` plus a server URL), and the legacy
+`model.knowledgeBase`.
+
+Not used for thirteen facts, and the reasons are about this build rather than
+the feature: it is a tool call and therefore a round trip; Hebrew retrieval is
+unmeasured and a miss fails quietly as *"אין לי את הפרט הזה"* about a fact we
+hold; a Vapi-hosted base serves the voice agent only, so channel drift survives;
+and retrieval returns values while the four rules governing them stay in the
+prompt regardless. **The trigger for revisiting is a corpus, not a preference** —
+contracts, house rules, per-building documents.
+
+### Three rows of the configuration table had been wrong for weeks
+
+All three found by running the dry run and reading it against the code, which is
+the check that table has never had.
+
+- **Transcriber said `11labs`/`scribe_v2_realtime`. It has been `deepgram`
+  `nova-3` since 12 Aug**, reversed by the client in the dashboard on latency —
+  700ms against 300ms — and documented in `vapi_sync.py` all along. Eighteen
+  days stale. The 1,901ms transcription figure quoted from this table today was
+  therefore also wrong.
+- **`artifactPlan.recordingEnabled` said `true`. The code says `False`**, off by
+  client instruction. Not a detail: it is exactly why this morning's stutter
+  could not be settled as voice-looping versus transcriber-looping.
+- **The Tools section said "three"** and listed four. `INTAKE_TOOLS` has had
+  **six** since 18 Aug, when `get_request_status` and `get_balance` landed. The
+  now-false "two tools that are missing" section is replaced by the one that is
+  still missing, `identify_resident`, and by the record of what the gap cost on
+  19 Aug.
+- `## Open` claimed the feature files carried masculine lines "against a female
+  voice" and had been corrected to feminine here. The voice became male on
+  7 Aug; the feature files were right and this file was not.
+
+### Verified
+
+`facts_check.py` clean, 13 facts both channels. `voice_guard` 0 failures across
+25 fixtures, three of them new — the response-time answer, the missing-detail
+answer and the office-hours answer, because these are the first spoken lines in
+this system that assert something about the company, and a filter eating half of
+one would be heard as a wrong answer rather than a glitch. Fence extracts at
+18,824 chars under `vapi_sync.py`'s own regex. Every script compiles. Dry run
+builds with six tools attached.
+
+**Not applied to Vapi.** `8793c9f` is still unpushed too, so no caller has yet
+heard either this or the office-number fix.
+
+
 ### Vapi moved to the August account, and the id list was one move behind the repo
 
 - The client's August keys were already in `.env` as

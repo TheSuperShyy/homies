@@ -1345,6 +1345,62 @@ afterwards, never as a side effect.
 
 ## The voice prompts
 
+**A prompt is not its own changelog. Decided 30 Aug, and it is rule 5 with
+teeth.** The inbound prompt had grown twenty-five paragraphs that state a rule
+and then narrate the call that produced it. That reads as institutional memory
+and behaves as a script: a model given a record of past mistakes writes
+carefully, in the shape of the record. `vapi_sync.py` ships only the
+four-backtick fence, so the narratives moved *below* it and lost nothing. **When
+a rule needs its story to be followed, write the rule better — do not put the
+story back.**
+
+**Worked examples are a liability in a prompt that must generalise.** The prompt
+listed *"מה היה בתיק?"* as a follow-up example and the agent asked *"מה היה
+בנזילה?"* — not Hebrew, and four times out of four on 26 Aug. It was reaching
+for the nearest-shaped sentence rather than deriving a question from the fault
+in front of it. Name the *kind* of thing to ask and let it compose.
+
+**A line stays verbatim only when something mechanical depends on the exact
+characters.** In the inbound prompt that is three: the closing sentence, because
+`endCallPhrases` matches on it and `endCallFunctionEnabled` is false, so the
+words *are* the hang-up; the emergency-services numbers; and the tool waiting
+lines, which live in config rather than in the model. Everything else is content
+the agent phrases itself.
+
+### The facts about Homies live in one file
+
+`docs/knowledge/homies.md` is the master for the thirteen facts both channels
+state — hours, contacts, what the ועד fee covers, payment, response times, the
+common-versus-private property line. **Edit there first, then the two prompts,
+then run `python scripts/facts_check.py`,** which fails when they drift.
+
+The copies are deliberate and cannot be collapsed: the WhatsApp bot ships
+through n8n and the voice agent through `vapi_sync.py`, and they do not want the
+same characters. `077-6687949` is correct in a chat window a resident copies
+from and is the exact input that broke the voice on 30 Aug. Seven of the
+thirteen therefore carry a written and a spoken rendering; six are ordinary
+Hebrew and carry one.
+
+**Policy may be stated; a promise may not.** This is the line that lets the
+agent answer at all. *"תקלות חירום עד ארבע שעות, השאר עד שלושה ימי עסקים"* is
+the standard and is sayable. *"יטפלו בזה עד מחר"* is a commitment somebody else
+has to keep, and a question about a specific request is answered from
+`get_request_status` and nowhere else.
+
+**Vapi's built-in knowledge base is not used, and the trigger for changing that
+is a corpus rather than a preference.** It exists — hosted v2, custom, and the
+legacy model field — and for thirteen facts it buys nothing: it is a round trip,
+Hebrew retrieval is unmeasured and fails quietly as *"אין לי את הפרט הזה"* about
+a fact we hold, a Vapi-hosted base cannot serve the WhatsApp bot, and the four
+rules governing the facts stay in the prompt regardless. Revisit when there are
+contracts, house rules or per-building documents.
+
+**The configuration table in `demo-inbound.md` is a reading of the code and goes
+stale silently.** Three rows were wrong on 30 Aug — the transcriber by eighteen
+days, the recording flag, and the tool count. A document cannot fail a test.
+Read the dry run against the code, not against the table.
+
+
 `docs/features/10-debt-followup/prompt.md` and `docs/assistant/demo-inbound.md`
 are the source of truth. The prompt file's own "rules for editing this file"
 section governs, and the short version is:

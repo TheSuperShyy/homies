@@ -206,6 +206,15 @@ SAFE_SENTENCES = [
     # Vapi's formatter had cut it into single digits, and the call broke.
     "המספר של המשרד הוא אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע.",
     "מספר הקריאה שלך אחת אפס אפס אחת.",
+    # 30 Aug, second pass. The agent now states facts about Homies rather
+    # than deflecting them, so the answers themselves are fixtures: they are
+    # the first spoken lines in this system that assert something about the
+    # company, and a filter that ate half of one would be heard as a wrong
+    # answer rather than as a glitch. The office line carries הומיז, which is
+    # where the pronunciation substitutions run.
+    "תקלות חירום עד ארבע שעות, השאר עד שלושה ימי עסקים.",
+    "אין לי את הפרט הזה. אפשר לפנות למשרד בטלפון אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע.",
+    "המשרד של הומיז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
 ]
 
 # The 5 Aug shape: a note parameter announced by its own field name. "Please
