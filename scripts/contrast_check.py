@@ -93,6 +93,9 @@ PAIRS = [
     ("urgent text on card", "--st-review", ["--surface-1"],                   AA_BODY),
     ("hero label",              "--text-2", ["--surface-2", "--accent-soft"], AA_BODY),
     ("hero number",             "--text-1", ["--surface-2", "--accent-soft"], AA_BODY),
+    # The phone tab bar: 11px labels, so body contrast and not large.
+    ("tab label",       "--text-3",  ["--bg-sidebar"],                    AA_BODY),
+    ("current tab",     "--accent",  ["--bg-sidebar"],                    AA_BODY),
     ("card border on page", "--border-1", ["--bg-0"],                         1.0),
 ]
 

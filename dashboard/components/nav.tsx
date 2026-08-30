@@ -51,6 +51,43 @@ export function RailNav({ groups }: { groups: NavGroup[] }) {
 }
 
 /**
+ * The phone's navigation: five destinations across the bottom of the screen.
+ *
+ * WHAT IT REPLACED. The rail used to become a horizontal strip at the top on a
+ * phone, and seven destinations do not fit across 390 points, so it scrolled —
+ * which meant the bar opened showing "Debts", "Co" and "Impor", three of the
+ * seven and two of them cut off mid-word. A reader has no way to know a strip
+ * scrolls sideways until they try it, and a truncated word does not read as
+ * "there is more here", it reads as broken.
+ *
+ * Five, not seven, because five is what fits at a legible size — and because
+ * the split is a real one rather than an arbitrary cut. These five are the
+ * views; Import and Settings are the two things you operate, and they sit in
+ * the small bar at the top instead. Nothing is behind a "More" menu.
+ *
+ * At the bottom because that is where the thumb is, and because a phone browser
+ * puts its own chrome down there too — the safe-area inset in the stylesheet is
+ * what keeps this clear of the home indicator.
+ */
+export function TabBar({ items, label }: { items: NavItem[]; label: string }) {
+  const path = usePathname();
+  const here = (href: string) =>
+    href === '/' ? path === '/' : path.startsWith(href);
+
+  return (
+    <nav className="tabbar" aria-label={label}>
+      {items.map((it) => (
+        <Link key={it.href} href={it.href}
+              aria-current={here(it.href) ? 'page' : undefined}>
+          {it.icon}
+          <span>{it.label}</span>
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+/**
  * The hidden `back` field on the language and theme switches.
  *
  * Both are server actions that write a cookie and redirect, and both must come

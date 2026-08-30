@@ -80,6 +80,16 @@ const S = {
   'nav.settings':      { he: 'הגדרות',           en: 'Settings' },
   'nav.signOut':       { he: 'יציאה',            en: 'Sign out' },
   'nav.menu':          { he: 'תפריט',            en: 'Menu' },
+  'nav.tabs':          { he: 'ניווט ראשי',       en: 'Main navigation' },
+  // The sidebar has 200px for a label and the tab bar has 78. "Conversations"
+  // and "שיחות ווטסאפ" both run off the end of a tab, and a truncated label is
+  // worse than a short one — it looks like a broken layout rather than a name.
+  // These are the names the same destinations go by when there is no room.
+  'tab.overview':      { he: 'סקירה',            en: 'Overview' },
+  'tab.tickets':       { he: 'קריאות',           en: 'Tickets' },
+  'tab.debts':         { he: 'חובות',            en: 'Debts' },
+  'tab.conversations': { he: 'ווטסאפ',           en: 'Chats' },
+  'tab.calls':         { he: 'טלפון',            en: 'Calls' },
   'lang.switch':       { he: 'English',          en: 'עברית' },
   'lang.switchLabel':  { he: 'Switch to English', en: 'החלף לעברית' },
 

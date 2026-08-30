@@ -1180,9 +1180,18 @@ handset.**
   so.** Below 720px the tables become stacked cards and that attribute is the
   only thing naming each line. Set it from the same `t('col.x')` call as the
   matching `<th>`; a new column without one renders as a value with no label.
-- **On a phone the rail is navigation only.** The language switch and sign out
-  are not there — both are on /settings, which is in the nav. Do not put them
-  back in the bar; there is no room for seven destinations and two buttons.
+- **The phone has two bars and no sidebar.** `.mtop` (brand + Import + Settings)
+  at the top, `.tabbar` (Overview, Tickets, Debts, Chats, Calls) fixed at the
+  bottom; `.rail` is `display: none` below 1024px. Do not fold the sidebar back
+  into a horizontal strip — seven labels across 390 points is what produced
+  "Co" and "Impor" on the owner's phone.
+- **A new destination does not automatically get a tab.** Five is what fits at a
+  legible size. A sixth view goes in the top bar beside Import and Settings, or
+  it displaces one.
+- **Tab labels come from `tab.*`, not `nav.*`.** A tab is 78px wide and the
+  sidebar names do not fit in it.
+- **Language and sign out are not in any phone bar** — both are on /settings,
+  which is one tap from the top bar.
 - **Mobile is verified inside an iframe, never by resizing the window.**
   Headless Chrome clamps its window to about 489px, hands you 489 while you
   asked for 390, and crops the screenshot — which reads exactly like a layout

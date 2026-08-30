@@ -3,9 +3,9 @@ import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
 import { COOKIE, THEME_COOKIE, getLocale, getTheme, translator, type Locale } from '@/lib/i18n';
-import { BackField, RailNav, type NavGroup } from '@/components/nav';
+import { BackField, RailNav, TabBar, type NavGroup, type NavItem } from '@/components/nav';
 import {
-  NAV_ICON, IconLanguage, IconMoon, IconSearch,
+  NAV_ICON, IconImport, IconLanguage, IconMoon, IconSearch,
   IconSettings, IconSignOut, IconSun,
 } from '@/components/icons';
 
@@ -108,6 +108,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }),
   }));
 
+  // The same five destinations as the sidebar's first group, under the names
+  // they go by when a label has 78px rather than 200 — see `tab.*` in i18n.
+  const tabs: NavItem[] = NAV[0][1].map(([key, href]) => {
+    const Icon = NAV_ICON[key];
+    return { href, label: t(`tab.${key}` as any), icon: <Icon /> };
+  });
+
   return (
     <div className="shell">
       <nav className="rail" aria-label={t('nav.menu')}>
@@ -165,6 +172,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </nav>
+
+      {/* THE PHONE'S TOP BAR. Brand on one side, the two things you operate on
+          the other — Import and Settings — which are exactly the two the tab
+          bar below does not carry. Desk-width readers never see this; they have
+          the sidebar, which has all seven. */}
+      <header className="mtop">
+        <Link className="brand" href="/">
+          <img className="mark" alt=""
+               src={theme === 'light' ? '/homies-mark.png' : '/homies-mark-dark.png'} />
+          <span><b>{t('app.name')}</b></span>
+        </Link>
+        <div className="mtop-acts">
+          <Link className="iconbtn" href="/sync"
+                aria-label={t('nav.sync')} title={t('nav.sync')}>
+            <IconImport />
+          </Link>
+          <Link className="iconbtn" href="/settings"
+                aria-label={t('nav.settings')} title={t('nav.settings')}>
+            <IconSettings />
+          </Link>
+        </div>
+      </header>
 
       <div className="col">
         {/* The topbar is desk-only, by CSS. On a phone the rail already occupies
@@ -235,6 +264,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="page">{children}</div>
         </main>
       </div>
+
+      <TabBar items={tabs} label={t('nav.tabs')} />
     </div>
   );
 }

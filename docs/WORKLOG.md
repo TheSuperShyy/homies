@@ -36,6 +36,41 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The phone gets a real navigation bar, because the folded sidebar was not one
+
+- **The owner sent a photograph of their phone: the top bar read "Tickets,
+  Debts, Co, Impor".** Three destinations of seven, two of them cut off
+  mid-word. The sidebar folded into a horizontal strip below 1024px and seven
+  labels do not fit across 390 points, so it scrolled — and nobody can tell that
+  a strip scrolls sideways until they try it. A truncated word does not read as
+  "there is more here". It reads as broken, and it was.
+- **Five destinations across the bottom, two in a small bar at the top.** The
+  split is the same one the sidebar already makes: the five you LOOK AT
+  (Overview, Tickets, Debts, Chats, Calls) are tabs at the thumb; the two you
+  OPERATE (Import, Settings) are icon buttons beside the brand at the top.
+  Nothing is behind a "More" menu, nothing scrolls, nothing is truncated.
+- **The tabs use their own shorter names.** A sidebar label has 200px and a tab
+  has 78. "Conversations" and "שיחות ווטסאפ" both run off the end, so there is a
+  `tab.*` set — "Chats", "ווטסאפ" — beside the `nav.*` one. A short name is
+  better than a clipped one.
+- **The same grid trap caught the new top bar on the way in.** `.shell` had one
+  explicit `1fr` row and picked up an implicit `auto` one, which put the BAR in
+  the flexible track and the content in the rigid one — the bar would have grown
+  to fill a short page, exactly as the old rail did. `auto minmax(0, 1fr)` on
+  the phone, one row at desk width where `.mtop` is not rendered at all.
+- **`env(safe-area-inset-bottom)` on the tab bar and matching bottom padding on
+  `main`.** A fixed bar with a guessed 34px is wrong on every phone that does
+  not have a home indicator; the inset resolves to zero there and the bar is
+  exactly as tall as its contents.
+- **The current tab is said in hue AND weight** — semibold plus a heavier icon
+  stroke — because at 11px the active blue and the inactive grey measure 5.17
+  and 5.22 against the sidebar ground, which is to say colour alone would be
+  carrying it. Both are in `scripts/contrast_check.py` now.
+- The sidebar is desk-only from here: `.rail` is `display: none` below 1024 and
+  all of its old phone-row styling is gone rather than left behind unused.
+- Checked at 390x844 in both directions and both themes. `tsc` clean, build
+  clean, contrast 0 failing across 40 pairs.
+
 ### The dashboard works on a phone, and getting there found a bug that had been there all along
 
 - **The navigation bar was taking a third of the screen.** Below the sidebar
