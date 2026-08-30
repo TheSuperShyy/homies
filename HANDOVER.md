@@ -1176,6 +1176,22 @@ handset.**
   because the rings came from a stock-portfolio recreation and meant nothing on
   a maintenance dashboard. It is the only deliberate departure from the
   reference in the restyle — do not "restore" it.
+- **The display name and profile photo live in `auth.users.raw_user_meta_data`
+  (`display_name`, `avatar_url`, `avatar_path`), NOT in a profiles table.** The
+  middleware reads them off the `getUser()` call it already makes and passes
+  them to the shell as `x-user-name` (percent-encoded — headers are latin-1 and
+  Hebrew is not) and `x-user-avatar`. Do not add a profiles table for these: it
+  puts a second database round trip in front of every page render.
+- **Nothing that grants access may ever go in user metadata.** The account can
+  write its own metadata through the auth API. A role belongs in a table with
+  its own policies, read by RLS from there.
+- **Migration 029 created the `avatars` storage bucket** — public, 256 KB,
+  webp/jpeg/png, write/replace/delete restricted to a folder named for the
+  owner's user id. The path scheme `<uid>/<timestamp>.<ext>` is load-bearing:
+  the policies compare `storage.foldername(name)[1]` against `auth.uid()`.
+- **The photo is resized to a 256px square in the browser before upload**
+  (`components/avatar-picker.tsx`). It is the only client component outside the
+  login form.
 - **`main` is pushed and level with `origin/main` as of 30 Aug.** The redesign,
   the charts, the logo and the settings page are all live on Vercel.
 - **`/settings` is the account page, and it is the only page in the app that

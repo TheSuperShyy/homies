@@ -54,6 +54,21 @@ export async function middleware(request: NextRequest) {
   // goes back to the browser.
   if (user?.email) requestHeaders.set('x-user-email', user.email);
 
+  // The display name and the photo travel the same way, for the same reason.
+  // Both live in the auth user's metadata rather than in a profiles table
+  // precisely so that they arrive with the call above and cost nothing extra —
+  // see supabase/029_staff_avatars.sql for the argument.
+  //
+  // THE NAME IS PERCENT-ENCODED. Header values are latin-1; a Hebrew name put
+  // in raw throws on `set()` and takes the whole request down with it, which is
+  // a spectacular way for a cosmetic field to break a dashboard. The layout
+  // decodes it.
+  const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+  const shown = typeof meta.display_name === 'string' ? meta.display_name.trim() : '';
+  if (shown) requestHeaders.set('x-user-name', encodeURIComponent(shown));
+  const photo = typeof meta.avatar_url === 'string' ? meta.avatar_url : '';
+  if (photo) requestHeaders.set('x-user-avatar', photo);
+
   // The login wall, restored 26 Aug 2026 on the owner's ask. Demo mode
   // (9 Aug) had removed this redirect and opened the tables to anon; migration
   // 026 closed the tables again, so this redirect is back to being what it

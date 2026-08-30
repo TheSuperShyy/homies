@@ -43,6 +43,13 @@ portfolio and say nothing about buildings. Ornament either says whose product
 this is or it says nothing, so it gets replaced rather than inherited. Nothing
 else in the system does.
 
+**A new field does not automatically want a new table.** Ask what reads it and
+how often first. Two fields that the shell renders on every single page went
+into auth metadata rather than a `profiles` table, because the request already
+carries that metadata and a table would have cost a database round trip per page
+render. The rule is not "avoid tables" — it is that storage follows the read
+path, and the read path here was already decided.
+
 **A control that does nothing is worse than no control.** Placeholders earn
 their place only while they are honest about being one and only while something
 is coming. The notification bell sat disabled and labelled "soon" for four days

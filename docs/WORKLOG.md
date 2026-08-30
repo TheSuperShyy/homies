@@ -36,6 +36,57 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### Staff can set their own name and photo, and neither of them got a table
+
+- **Both live in `auth.users.raw_user_meta_data`, not in a `profiles` table.**
+  The obvious design is a table keyed on `auth.users(id)`, and it is the wrong
+  one here: the shell renders the reader's name and picture in the sidebar and
+  the topbar on EVERY page, and the reason that shell streams quickly is that it
+  does not ask the database who is signed in — the middleware already calls
+  `getUser()` to decide whether to let the request through, and hands the answer
+  down as a request header. A profiles table would put a second round trip back
+  in front of every page render, which is exactly the cost removed two days ago.
+  Metadata arrives with that call for free.
+- **The trade-off, stated rather than discovered later:** user metadata is
+  writable by the account it belongs to, through the auth API, without going
+  through our page. That is correct for a name and a picture — they are theirs
+  to choose — and it would be COMPLETELY WRONG for anything granting access. If
+  roles ever arrive they do not go here; they go in a table with its own
+  policies, and RLS reads them from there, never from the JWT.
+- **Migration 029 is therefore only a bucket.** `avatars`, public, 256 KB
+  ceiling, webp/jpeg/png only, with four policies: anyone may read, and an
+  account may write, replace and delete only inside a folder named for its own
+  user id. Public rather than signed-URL because the alternative mints a URL per
+  render that expires and cannot be cached, for a handful of staff headshots
+  that are not resident data.
+- **The limits are on the bucket, not only in the code.** A signed-in account
+  can call the storage API directly and skip the upload action entirely, so the
+  numbers in `actions.ts` exist to fail politely; the bucket's own limits are
+  what actually holds.
+- **The photo is resized in the browser, which is the second client component
+  in this app.** There is no image library on the server and adding one means a
+  native dependency in the build; without resizing, what gets stored is whatever
+  came off somebody's phone, and that file is then fetched behind the topbar of
+  every page they open. A canvas centre-crops to a square and draws at 256px —
+  about 20 KB — before it leaves the machine. `toDataURL` does not throw on a
+  format it cannot encode, it silently returns a PNG, so the webp prefix is
+  checked rather than assumed and JPEG is the fallback.
+- **The name is percent-encoded into the request header.** Header values are
+  latin-1; a Hebrew display name set raw throws inside the middleware and takes
+  the whole request down, which would be a spectacular way for a cosmetic field
+  to break the dashboard. The layout decodes it.
+- **The email-derived name is now the fallback rather than the value.** It was
+  always a guess — nobody is called "clixteam579" — and there is somewhere to
+  say so properly. The placeholder in the field shows what will be used if it is
+  left empty.
+- Verified: migration applied and the bucket confirmed live over HTTP (a missing
+  object answers `NoSuchKey`, a missing bucket answers `NoSuchBucket` — the
+  former, so the bucket is there and public). `storage.foldername()` returns the
+  uuid as segment 1, which is what the write policies compare against. Rendered
+  in both themes and both directions. `tsc` clean, build clean, contrast 0
+  failing. **Not yet exercised signed in** — there is still no test account, so
+  the upload round trip itself is unproven.
+
 ### The nine local commits went live, and the dead bell was replaced by a real settings page
 
 - **Pushed.** `c529877..f955ca1` — nine commits, 47 files. The push had been

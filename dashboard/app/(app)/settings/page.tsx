@@ -1,26 +1,26 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
-import {
-  COOKIE, THEME_COOKIE, getLocale, getTheme, translator, type Key, type Locale,
-} from '@/lib/i18n';
+import { getLocale, getTheme, translator, type Key, type Locale } from '@/lib/i18n';
 import { IconAlert, IconCheck, IconMoon, IconSignOut, IconSun } from '@/components/icons';
+import { AvatarPicker } from '@/components/avatar-picker';
+import {
+  changePassword, removeAvatar, saveAvatar, saveName, setLocale, setTheme, signOut,
+} from './actions';
 
 /**
- * The account page: who you are signed in as, your password, and the two
- * choices this dashboard remembers about you.
+ * The account page: who you are signed in as, how you appear to the rest of the
+ * interface, your password, and the two choices this dashboard remembers.
  *
- * WHAT IS DELIBERATELY NOT HERE. No display name, no avatar upload, no
- * notification preferences, no team management. There is no profile table to
- * hold a name, no store to raise a notification from, and no role column to
- * manage — every signed-in account reads every table through one policy called
- * `staff_read`. A settings page whose controls do nothing is worse than a short
- * one, so this is the short one, and it says out loud what it does not do.
+ * WHAT IS DELIBERATELY NOT HERE. No notification preferences and no roles.
+ * There is no store to raise a notification from, and one policy — `staff_read`
+ * — grants every signed-in account the same read of every table. A settings
+ * page whose switches do nothing is worse than a short one, so this is the
+ * short one, and it says out loud what it does not do.
  *
- * NO CLIENT JAVASCRIPT. Every control is a form posting to a server action that
- * writes and redirects back here, the same shape the language switch in the
- * shell already uses. Feedback comes back in the query string, because that is
- * where this dashboard puts state everywhere else.
+ * ALMOST NO CLIENT JAVASCRIPT. Every control here is a form posting to a server
+ * action that writes and redirects back, and the outcome comes back in the
+ * query string — the shape this dashboard uses everywhere else. The one
+ * exception is the photo, which has to be resized in the browser; see
+ * `components/avatar-picker.tsx` for why.
  */
 
 /** Dates here carry a year — "signed in 04/09" is ambiguous on an old account. */
@@ -35,77 +35,21 @@ function fullDate(iso: string | null | undefined, l: Locale) {
   }).format(d);
 }
 
-async function signOut() {
-  'use server';
-  await serverClient().auth.signOut();
-  redirect('/login');
-}
-
-// The shell defines its own copies of these two. A server action declared in a
-// layout cannot be imported by a page, so they are duplicated rather than
-// shared — the same reason the login page carries its own setLocale. Both
-// always come back here, so neither needs the shell's hidden `back` field.
-async function setLocale(formData: FormData) {
-  'use server';
-  const next = String(formData.get('to') ?? 'he') === 'en' ? 'en' : 'he';
-  cookies().set(COOKIE, next, { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' });
-  redirect('/settings');
-}
-
-async function setTheme(formData: FormData) {
-  'use server';
-  const next = String(formData.get('to') ?? 'dark') === 'light' ? 'light' : 'dark';
-  cookies().set(THEME_COOKIE, next, { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' });
-  redirect('/settings');
-}
-
-/**
- * Change the signed-in account's password.
- *
- * THE CURRENT PASSWORD IS CHECKED EVEN THOUGH SUPABASE DOES NOT REQUIRE IT.
- * `updateUser({ password })` will happily rewrite the password of whoever holds
- * the session cookie, which means an unlocked laptop on a desk in the office is
- * enough to lock the owner out of their own dashboard. Signing in again with
- * the password typed in the first box costs one round trip and closes that.
- *
- * Nothing is caught here: `redirect()` works by throwing, so a try/catch around
- * any of this would swallow the redirect and render a blank action.
- */
-async function changePassword(formData: FormData) {
-  'use server';
-  const current = String(formData.get('current') ?? '');
-  const next = String(formData.get('next') ?? '');
-  const again = String(formData.get('again') ?? '');
-
-  // Cheap checks first, so a typo in the confirmation never reaches the auth
-  // server and never counts against its rate limit.
-  if (next !== again) redirect('/settings?e=mismatch');
-  if (next.length < 8) redirect('/settings?e=short');
-  if (next === current) redirect('/settings?e=same');
-
-  const db = serverClient();
-  const { data: { user } } = await db.auth.getUser();
-  if (!user?.email) redirect('/login');
-
-  const { error: wrong } = await db.auth.signInWithPassword({
-    email: user.email, password: current,
-  });
-  // 400 is "those credentials are not right". Anything else — 429 from the rate
-  // limiter, a 5xx — is not the reader's mistake and must not be reported as
-  // one, or they sit there retyping a password that was correct all along.
-  if (wrong) redirect(wrong.status === 400 ? '/settings?e=wrong' : '/settings?e=failed');
-
-  const { error } = await db.auth.updateUser({ password: next });
-  if (error) redirect('/settings?e=failed');
-  redirect('/settings?ok=1');
-}
-
 const ERRORS: Record<string, Key> = {
   wrong: 'settings.errWrong',
   mismatch: 'settings.errMismatch',
   short: 'settings.errShort',
   same: 'settings.errSame',
   failed: 'settings.errFailed',
+  image: 'settings.errImage',
+  big: 'settings.errBig',
+  upload: 'settings.errUpload',
+};
+
+const DONE: Record<string, Key> = {
+  password: 'settings.pwSaved',
+  name: 'settings.nameSaved',
+  photo: 'settings.photoSaved',
 };
 
 export default async function Settings({ searchParams }: {
@@ -115,16 +59,19 @@ export default async function Settings({ searchParams }: {
   const theme = getTheme();
   const t = translator(locale);
 
-  // The shell gets the email from a header the middleware set, precisely to
-  // avoid this call. This page asks properly because it needs the two
+  // The shell gets its copy of all this from headers the middleware set,
+  // precisely to avoid asking. This page asks properly because it needs the two
   // timestamps as well, and one round trip on one page is the honest cost of
   // showing when the account was opened.
   const { data: { user } } = await serverClient().auth.getUser();
+  const meta = (user?.user_metadata ?? {}) as { display_name?: string; avatar_url?: string };
   const email = user?.email ?? '';
-  const name = email ? email.split('@')[0].replace(/[._-]+/g, ' ') : '';
-  const initials = (name || 'H').trim().slice(0, 2);
+  const chosen = (meta.display_name ?? '').trim();
+  const fallback = email ? email.split('@')[0].replace(/[._-]+/g, ' ') : '';
+  const initials = (chosen || fallback || 'H').trim().slice(0, 2);
 
   const err = searchParams?.e ? ERRORS[searchParams.e] : undefined;
+  const done = searchParams?.ok ? DONE[searchParams.ok] : undefined;
 
   return (
     // One column for the whole page, heading and banner included — see .setpage.
@@ -137,9 +84,9 @@ export default async function Settings({ searchParams }: {
       {/* role="status" and role="alert": the outcome of pressing a button has to
           reach a screen reader, and after a redirect there is nothing else on
           the page to say whether it worked. */}
-      {searchParams?.ok && (
+      {done && (
         <div className="notice ok" role="status">
-          <IconCheck /><span>{t('settings.pwSaved')}</span>
+          <IconCheck /><span>{t(done)}</span>
         </div>
       )}
       {err && (
@@ -150,15 +97,45 @@ export default async function Settings({ searchParams }: {
 
       <div className="setcol">
         <section>
+          <h2>{t('settings.profile')}</h2>
+          <div className="panel">
+            <AvatarPicker
+              current={meta.avatar_url ?? ''}
+              initials={initials}
+              save={saveAvatar}
+              remove={removeAvatar}
+              labels={{
+                choose: t('settings.photoChoose'),
+                change: t('settings.photoChange'),
+                remove: t('settings.photoRemove'),
+                save: t('settings.photoSave'),
+                saving: t('settings.photoSaving'),
+                hint: t('settings.photoHint'),
+                errType: t('settings.errImage'),
+                errBig: t('settings.errBig'),
+                errRead: t('settings.errRead'),
+              }}
+            />
+
+            <form className="setinline" action={saveName}>
+              <label htmlFor="name">{t('settings.name')}</label>
+              <div className="row">
+                {/* `dir="auto"` so a Hebrew name is not laid out left-to-right
+                    inside an interface the reader has set to English, and vice
+                    versa. The field belongs to whatever is typed in it. */}
+                <input id="name" name="name" type="text" dir="auto" maxLength={60}
+                       defaultValue={chosen} placeholder={fallback}
+                       aria-describedby="namehint" />
+                <button type="submit">{t('settings.nameSave')}</button>
+              </div>
+              <p className="hint" id="namehint">{t('settings.nameHint')}</p>
+            </form>
+          </div>
+        </section>
+
+        <section>
           <h2>{t('settings.account')}</h2>
           <div className="panel">
-            <div className="setwho">
-              <span className="avatar" aria-hidden="true">{initials}</span>
-              <span>
-                <b dir="auto">{name}</b>
-                <small>{t('chrome.staff')}</small>
-              </span>
-            </div>
             <div className="setrow">
               <span className="lbl">{t('settings.email')}</span>
               <span className="val mono">{email || '—'}</span>

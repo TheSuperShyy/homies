@@ -343,7 +343,13 @@ a { color: inherit; text-decoration: none; }
   background: var(--surface-3); color: var(--text-2);
   display: inline-flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: var(--weight-semibold); text-transform: uppercase;
+  overflow: hidden;
 }
+/* A photo fills the circle rather than fitting inside it. `cover` and not
+   `contain`: the image is already a centre-cropped square by the time it is
+   stored, so there is nothing to letterbox, and `contain` would only show as
+   two grey slivers the day something else puts a non-square image here. */
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .who-block {
   display: flex; align-items: center; gap: 10px;
   padding: 4px 10px 4px 6px; border-radius: var(--radius-pill);
@@ -1169,3 +1175,52 @@ button.danger:hover { background: var(--st-review-bg); }
 button.danger { display: inline-flex; align-items: center; gap: 8px; }
 button.danger svg { width: 15px; height: 15px; }
 [dir="rtl"] .flipx { transform: scaleX(-1); }
+
+/* --------------------------------------------------------------- profile -- */
+/* The photo control. The circle is the same component as the topbar's, four
+   times the size, so what you are looking at while you choose is what everyone
+   else will see. */
+.avatar.xl { width: 72px; height: 72px; font-size: 24px; }
+
+.avatarpick { display: flex; align-items: center; gap: 16px; padding: 20px; }
+.avatarpick-side { min-width: 0; display: grid; gap: 10px; }
+.avatarpick .hint { margin: 0; font-size: var(--text-sm); color: var(--text-3); line-height: 1.5; }
+/* The same line carries the standing hint and the reason the last attempt
+   failed, so it needs to look different in the second case or the change goes
+   unnoticed. */
+.hint.bad { color: var(--st-review); }
+
+/* The one affirmative button among the pills — it commits an upload, where the
+   others beside it only open a file dialog or throw the choice away. */
+.choice button.go {
+  background: var(--accent-fill); border-color: var(--accent-fill); color: var(--accent-fg);
+}
+.choice button.go:hover { background: var(--accent-hover); }
+
+/* A labelled field and its save button on one line, under a hairline. Used for
+   the display name, which is the only free-text setting on the page. */
+.setinline {
+  border-block-start: 1px solid var(--border-1);
+  padding: 18px 20px 20px;
+  display: grid; gap: 6px;
+}
+.setinline > label {
+  font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--text-2);
+}
+.setinline .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.setinline input {
+  flex: 1 1 200px; min-width: 0;
+  height: var(--control-md); padding-inline: 16px;
+  /* 16px rather than the system's 13, so iOS does not zoom the page on focus. */
+  font-size: 16px; font-family: inherit;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
+}
+.setinline input::placeholder { color: var(--text-3); }
+.setinline .hint { margin: 4px 0 0; font-size: var(--text-sm); color: var(--text-3); line-height: 1.5; }
+
+/* On a phone the circle and its buttons do not fit side by side without the
+   buttons wrapping one per line, which looks like three separate controls. */
+@media (max-width: 460px) {
+  .avatarpick { flex-direction: column; align-items: flex-start; }
+}

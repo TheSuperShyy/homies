@@ -82,8 +82,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // the entire shell: nothing could stream to the browser, not even the
   // sidebar, until it came back. The middleware now passes what it learned
   // down as a request header, so this is free.
-  const email = headers().get('x-user-email') || '';
-  const name = email ? email.split('@')[0].replace(/[._-]+/g, ' ') : '';
+  //
+  // The chosen name and photo ride along on the same request for the same
+  // reason; both are metadata on the auth user, so the call the middleware
+  // already made carries them. The name is percent-encoded there because
+  // headers are latin-1 and Hebrew is not.
+  const h = headers();
+  const email = h.get('x-user-email') || '';
+  const encoded = h.get('x-user-name');
+  const chosen = encoded ? decodeURIComponent(encoded) : '';
+  const photo = h.get('x-user-avatar') || '';
+  // The email-derived name is the fallback, not the value. It was always a
+  // guess — "clixteam579" is not what anybody is called — and now there is
+  // somewhere to say so properly.
+  const name = chosen || (email ? email.split('@')[0].replace(/[._-]+/g, ' ') : '');
   const initials = (name || 'H').trim().slice(0, 2);
 
   // The icons are rendered here and handed to the client nav as elements, so
@@ -202,11 +214,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               // A link, because the name in the corner is where half of all
               // readers look for their own account before they find the gear.
               <Link className="who-block" href="/settings">
-                {/* The reference uses photographic avatars. There are no
-                    photographs of Homies staff and there is no field to put one
-                    in, so this is the system's own initials fallback, which is a
-                    real component and not a stand-in. */}
-                <span className="avatar" aria-hidden="true">{initials}</span>
+                {/* The reference uses photographic avatars, and since 30 Aug
+                    there is somewhere to put one — /settings. Initials are the
+                    fallback for an account that has not set one, which is the
+                    system's own variant and a real component rather than a
+                    stand-in. */}
+                <span className="avatar" aria-hidden="true">
+                  {photo ? <img src={photo} alt="" /> : initials}
+                </span>
                 <span>
                   <b dir="auto">{name}</b>
                   <small>{email}</small>
