@@ -184,6 +184,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <span><b>{t('app.name')}</b></span>
         </Link>
         <div className="mtop-acts">
+          {/* The topbar and its search pill are desk-only, so without this the
+              phone has no way to reach the one box that searches everything. */}
+          <Link className="iconbtn" href="/search"
+                aria-label={t('search.title')} title={t('search.title')}>
+            <IconSearch />
+          </Link>
           <Link className="iconbtn" href="/sync"
                 aria-label={t('nav.sync')} title={t('nav.sync')}>
             <IconImport />
@@ -201,18 +207,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             of the viewport before any content. */}
         <header className="topbar">
           <div className="mid">
-            {/* PLACEHOLDER, AND LABELLED AS ONE. The reference's centre is a
-                search pill, and nothing in this app searches tickets, debts,
-                conversations and calls in one query — building that means new
-                data logic, which this pass does not touch. So it is drawn to the
-                system's exact Input spec, disabled, and says "soon" rather than
-                quietly swallowing what you type. */}
-            <div className="searchpill is-placeholder">
+            {/* It works now. It was a disabled pill labelled "Soon" from the
+                day the shell was rebuilt, which was honest and stayed empty —
+                the same thing the notification bell was doing before it was
+                taken out. A GET form, so the query lands in the URL and a
+                search is a link you can send somebody. */}
+            <form className="searchpill" method="get" action="/search">
               <IconSearch />
-              <input type="search" disabled aria-disabled="true"
-                     placeholder={t('chrome.search')} />
-              <span className="soon">{t('chrome.soon')}</span>
-            </div>
+              <input type="search" name="q" autoComplete="off"
+                     aria-label={t('chrome.search')} placeholder={t('chrome.search')} />
+            </form>
           </div>
 
           <div className="right">

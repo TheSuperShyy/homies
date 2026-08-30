@@ -36,6 +36,47 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The header search does something now
+
+- **It had been a disabled pill labelled "Soon" since the shell was rebuilt** —
+  drawn to the design system's Input spec, honest about being empty, and still
+  empty. Same shape as the notification bell before it was removed. The owner
+  asked for it to work rather than go.
+- **One box, four tables.** A ticket by reference, description, building,
+  apartment, reporter name or phone; a resident by name, phone, building or
+  apartment; the words inside a WhatsApp message; and what a call was about,
+  transcript included. Those four are what somebody knows when they pick up the
+  phone and do not know where to look — a name, a number, half a sentence.
+  Everything else here is reachable by filtering a list you already chose.
+- **The `or=()` filter had to be sanitised, and this is the part worth
+  remembering.** PostgREST's `or` is a comma-separated list wrapped in
+  parentheses, so a comma or a bracket in what somebody types does not fail
+  loudly — it reinterprets the rest of the query as more filter clauses. `%` and
+  `_` are `ilike`'s own wildcards on top of that. All of them become whitespace:
+  this is a search box, and a reader typing a comma means "and also".
+- **Two-character floor.** One character matches most of the database and
+  teaches the reader nothing.
+- **Every count is stated and every truncation is admitted.** A panel that
+  quietly stops at eight is a panel that says there are eight, and somebody acts
+  on "there are only two of these" being wrong. Each section prints its total
+  and a line saying how many are shown; the calls line is a link, because the
+  calls page has its own text filter and can take the query onward. The others
+  say the number and stop, which is honest about what exists.
+- **Resident rows link to `/conversations/<phone>`.** There is no resident page
+  and that is the nearest thing to one — it carries their details in a side
+  panel and their recent tickets under the thread, and it handles having no
+  messages.
+- **The phone gets a search icon in its top bar**, because the topbar and its
+  pill are desk-only and without it there would be no way in.
+- **Verified against the live database, not just the type checker.** The four
+  filter strings were fired at the real PostgREST with the service key: `05`
+  returns 17 / 661 / 2 / 18, a Hebrew surname returns 8 / 271 / 1 / 0, `255-`
+  returns 211 / 0 / 19 / 0, and `a,b)c` cleans to `a b c` and returns nothing
+  rather than erroring. All 200 or 206 — no parse failures.
+- 189 B on the route: no client JavaScript, the query in the URL, so a search is
+  a link you can send a colleague. `chrome.soon` is deleted — nothing in the
+  interface says "soon" any more.
+
 ### The call search button was a 300px magnifier, and the reason was a missing default
 
 - **Reported from the desk: the search button on /calls was enormous and had no

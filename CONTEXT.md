@@ -43,6 +43,19 @@ portfolio and say nothing about buildings. Ornament either says whose product
 this is or it says nothing, so it gets replaced rather than inherited. Nothing
 else in the system does.
 
+**PostgREST's `or=()` is a parser, so user text never goes into it raw.** The
+filter is a comma-separated list inside parentheses: a comma or a bracket in a
+typed phrase does not error, it silently reinterprets the rest of the query as
+more clauses, and `%` and `_` are `ilike` wildcards on top of that. Strip them to
+whitespace before building the string. The same care applies to any filter built
+by concatenating user input — the failure mode is a query that succeeds and
+returns the wrong rows, which no test catches unless somebody types a comma.
+
+**A list that truncates has to say so.** Every capped result set prints its real
+total and how many are shown. A panel that quietly stops at eight is a panel
+that says there are eight, and the cost is somebody acting on "there are only
+two of these" when there are forty.
+
 **When the same one-off rule has been written five times, the sixth case is
 already broken.** Five components each carried their own `svg { width: … }`
 because an SVG with a viewBox and no width renders at 300x150; the bare `button`

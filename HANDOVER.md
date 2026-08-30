@@ -1180,6 +1180,13 @@ handset.**
   so.** Below 720px the tables become stacked cards and that attribute is the
   only thing naming each line. Set it from the same `t('col.x')` call as the
   matching `<th>`; a new column without one renders as a value with no label.
+- **`/search` is live and the header pill posts to it.** It covers `requests`,
+  `residents`, `messages` and `interactions` (voice only), eight rows each,
+  newest first, with a two-character floor. Nothing in the interface says
+  "soon" any more; `chrome.soon` is deleted.
+- **`term()` in `app/(app)/search/page.tsx` strips `, ( ) " ' \ % _ *` before
+  the phrase reaches PostgREST's `or=()`.** Do not remove it and do not build
+  another `or` filter from user input without it.
 - **`button svg` has a 15px default now.** An SVG with a viewBox and no width
   is 300x150, not viewBox-sized. Do not add another per-component rule for it
   unless that component genuinely wants a different size.

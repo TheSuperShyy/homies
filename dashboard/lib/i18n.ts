@@ -105,7 +105,6 @@ const S = {
   'chrome.greeting':   { he: 'שלום',            en: 'Welcome' },
   'chrome.greetingSub':{ he: 'זה מה שקורה היום בבניינים', en: "Here's what is happening across the buildings" },
   'chrome.search':     { he: 'חיפוש בכל המערכת', en: 'Search everything' },
-  'chrome.soon':       { he: 'בקרוב',           en: 'Soon' },
   'chrome.settings':   { he: 'הגדרות',          en: 'Settings' },
   'chrome.staff':      { he: 'צוות',            en: 'Staff' },
   'theme.dark':        { he: 'כהה',             en: 'Dark' },
@@ -342,6 +341,31 @@ const S = {
   'login.password': { he: 'סיסמה',       en: 'Password' },
   'login.submit':   { he: 'כניסה',       en: 'Sign in' },
   'login.working':  { he: 'רגע…',        en: 'Signing in…' },
+
+  // --- search -------------------------------------------------------------
+  'search.title':    { he: 'חיפוש',              en: 'Search' },
+  'search.blurb':    { he: 'קריאות, דיירים, הודעות ושיחות — בחיפוש אחד.',
+                       en: 'Tickets, residents, messages and calls, in one search.' },
+  'search.go':       { he: 'חפש',                en: 'Search' },
+  'search.prompt':   { he: 'מה מחפשים?',          en: 'What are you looking for?' },
+  'search.promptHint':{ he: 'שם של דייר, מספר טלפון, מספר קריאה, או משפט שנאמר בוואטסאפ או בשיחה.',
+                       en: 'A resident, a phone number, a ticket reference, or something that was said in a message or a call.' },
+  'search.short':    { he: 'עוד תו אחד לפחות — אות בודדת מחזירה כמעט הכל.',
+                       en: 'One more character — a single letter matches almost everything.' },
+  'search.none':     { he: 'לא נמצא כלום עבור “{q}”.', en: 'Nothing found for “{q}”.' },
+  'search.noneHint': { he: 'שווה לנסות רק את שם המשפחה, או את ארבע הספרות האחרונות של הטלפון.',
+                       en: 'Try just the surname, or the last four digits of the phone number.' },
+  'search.tickets':  { he: 'קריאות',             en: 'Tickets' },
+  'search.residents':{ he: 'דיירים',             en: 'Residents' },
+  'search.messages': { he: 'הודעות ווטסאפ',      en: 'WhatsApp messages' },
+  'search.calls':    { he: 'שיחות טלפון',        en: 'Calls' },
+  'search.said':     { he: 'מה נכתב',            en: 'Message' },
+  'search.openResident': { he: 'לדייר',          en: 'Open' },
+  'search.openThread':   { he: 'לשיחה',          en: 'Thread' },
+  // Said rather than left implied: a list that stops at eight looks like a list
+  // of eight, and somebody acts on "there are only two of these" being wrong.
+  'search.showing':  { he: 'מוצגות {shown} מתוך {total} — הישנות יותר לא כאן.',
+                       en: 'Showing {shown} of {total} — the older ones are not here.' },
 
   // --- settings -----------------------------------------------------------
   'settings.title':     { he: 'הגדרות',            en: 'Settings' },
