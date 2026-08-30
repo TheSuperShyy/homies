@@ -82,15 +82,21 @@ SCRIPTS = {
 }
 
 
-def load_key():
+def load_key(var="CARTESIA_API_KEY"):
+    """The VARIABLE name is the argument, never the key. See voice_clone.py.
+
+    A cloned voice is private to the account that created it, so playing one back
+    needs that account's key — which is not necessarily the one the rest of this
+    project uses.
+    """
     if not os.path.exists(ENV):
         sys.exit(".env not found.")
     for line in open(ENV, encoding="utf-8"):
-        if line.startswith("CARTESIA_API_KEY="):
+        if line.startswith(var + "="):
             k = line.split("=", 1)[1].strip()
             if k:
                 return k
-    sys.exit("CARTESIA_API_KEY is empty in .env")
+    sys.exit("%s is empty or missing in .env" % var)
 
 
 def call(path, key, body=None, method="GET"):
@@ -132,8 +138,10 @@ def main():
     # side by side, and a second run must not overwrite the first.
     ap.add_argument("--voice", metavar="ID",
                     help="override every voice in the script with this id")
+    ap.add_argument("--key", metavar="VAR", default="CARTESIA_API_KEY",
+                    help="read the key from this .env variable (not the key itself)")
     a = ap.parse_args()
-    key = load_key()
+    key = load_key(a.key)
 
     if a.list:
         d = json.loads(call("/voices/?limit=100", key))

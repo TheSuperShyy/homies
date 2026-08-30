@@ -1372,6 +1372,29 @@ whatever wrapper the sender's phone chose.
 Once a recording is in a repo's history, removing it is a rewrite rather than a
 delete. That asymmetry is the whole reason these rules are strict.
 
+## Whoever owns the key owns the voice
+
+Ido's clone (`61e911a7-…`, "Echo Stone") was made on **the client's own Cartesia
+account**, because ours cannot clone and theirs can. Three consequences, and they
+are the kind that are obvious in hindsight and expensive in advance:
+
+**A cloned voice is private to the account that created it.** It cannot be listed,
+played or synthesised with any other key, which is why `voice_clone.py` and
+`cartesia_tts.py` both take `--key VAR` now. `--key` names the **variable**, never
+the key, the same convention as `vapi_transfer.py --to`.
+
+**Vapi needs its own copy of that key, so the clone is unreachable until someone
+moves the credential.** Vapi synthesises server-side and currently holds *our*
+key. Pointing it at the client's key would make the clone work and would also move
+**every** Hebrew utterance, both agents, onto the client's bill — not just the
+cloned one. That is a commercial decision, not a configuration step, and it has
+not been made.
+
+**Ask before touching a client's account, every time.** Homies approved this clone
+explicitly on 30 Aug. The rule that a capability question is not consent is why
+the finding "their key can clone" and the act of cloning on it were two separate
+turns.
+
 ## Ask the API and read the price list
 
 A vendor's feature documentation is not a statement about your account. Cloning
@@ -1385,6 +1408,14 @@ answers the rest: instant cloning is the **$5/month Pro** tier, and the $49
 Startup tier buys *professional* cloning, a different feature needing thirty
 minutes of audio. **A $49 line item gets deferred; a $5 one does not**, so the
 wrong number did not just sit there being wrong, it decided something.
+
+**And there is a way to ask that creates nothing.** Send the request deliberately
+malformed — a clone with no file attached. A plan-gated account rejects it at the
+gate (`402 plan_upgrade_required`); an entitled one gets far enough to complain
+about the missing file (`400 No file was provided`). That one distinction is what
+found the client's account could clone when ours could not, and it cost nothing
+and left no trace. Prefer it to "try it and see", which on a write endpoint means
+creating something on somebody's account to find out whether you could.
 
 The general form: when a capability might be plan-gated, spend the one request
 that returns the real error, and read the price list rather than a feature page.

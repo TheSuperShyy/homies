@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ido's clone against Eyal</title>
+<style>
+  :root {
+    --bg: #faf9f7; --fg: #171614; --dim: #6b6862;
+    --line: #e2dfd9; --card: #ffffff; --accent: #7a4b2a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a; }
+  }
+  :root[data-theme="light"] {
+    --bg:#faf9f7; --fg:#171614; --dim:#6b6862; --line:#e2dfd9; --card:#fff; --accent:#7a4b2a;
+  }
+  :root[data-theme="dark"] {
+    --bg:#131211; --fg:#eceae6; --dim:#948f87; --line:#2b2926; --card:#1c1a18; --accent:#d59a6a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 3rem 1.5rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 46rem; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 .35rem; letter-spacing: -.01em; text-wrap: balance; }
+  .sub { color: var(--dim); margin: 0 0 2.5rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 1.15rem 1.25rem; margin-bottom: 1rem;
+  }
+  .card.pick { border-color: var(--accent); }
+  .head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; margin-bottom: .1rem; }
+  .name { font-weight: 650; }
+  .tag {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 99px; padding: .1rem .5rem;
+  }
+  .meta { color: var(--dim); font-size: .875rem; margin: 0 0 .8rem; }
+  .meta b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+  audio { width: 100%; margin-top: .2rem; }
+  .note { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.5rem; color: var(--dim); font-size: .925rem; }
+  .note b { color: var(--fg); }
+  code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .85em;
+    background: color-mix(in srgb, var(--fg) 7%, transparent);
+    padding: .12em .4em; border-radius: 4px;
+  }
+  ul { padding-left: 1.1rem; }
+  li { margin-bottom: .4rem; }
+</style>
+<style>
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media (max-width:34rem) { .two { grid-template-columns:1fr; } }
+  .who { font-size:.8rem; color:var(--dim); margin-bottom:.3rem; }
+  .who .d { font-variant-numeric:tabular-nums; opacity:.7; }
+  .lbl { font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+  .lbl .note { text-transform:none; letter-spacing:0; color:var(--dim); font-weight:400; }
+  .he { font-size:1.05rem; margin:.2rem 0 .9rem; }
+  audio { width:100%; }
+  .many { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.8rem; }
+  .warn { border-left:3px solid var(--accent); padding-left:1rem; margin:2rem 0; color:var(--dim); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ido's clone against Eyal</h1>
+  <p class="sub">Same words, two voices. Eyal is the stock Hebrew voice the agents
+  use today; Ido is the clone made on 30 Aug from ten seconds of
+  <code>ido-voice.mp4</code>. Nothing is wired into any agent yet, and this page
+  is the decision.</p>
+
+  <h2>The lines that decide it</h2>
+
+  <div class="card">
+    <div class="lbl">greet-homies <span class="note">The real opening line. The one that matters most.</span></div>
+    <p class="he" dir="rtl">שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?</p>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">4.49s</span></div><audio controls preload="none" src="samples/probe/greet-homies-eyal.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">4.36s</span></div><audio controls preload="none" src="samples/probe/greet-homies-ido.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">short-ok <span class="note">Two words. Half the agent's turns start like this.</span></div>
+    <p class="he" dir="rtl">בסדר גמור.</p>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">0.97s</span></div><audio controls preload="none" src="samples/probe/short-ok-eyal.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">1.02s</span></div><audio controls preload="none" src="samples/probe/short-ok-ido.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">short-num <span class="note">Digits as words. The one line a caller writes down.</span></div>
+    <p class="he" dir="rtl">מספר הקריאה שלך אחת אפס אפס אחת.</p>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">2.46s</span></div><audio controls preload="none" src="samples/probe/short-num-eyal.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">2.22s</span></div><audio controls preload="none" src="samples/probe/short-num-ido.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">medium <span class="note">A full sentence, the length of a normal reply.</span></div>
+    <p class="he" dir="rtl">רשמתי את הפנייה, נזילה מהתקרה באמבטיה, והיא עוברת לצוות התחזוקה.</p>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">4.36s</span></div><audio controls preload="none" src="samples/probe/medium-eyal.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">4.18s</span></div><audio controls preload="none" src="samples/probe/medium-ido.mp3"></audio></div>
+    </div>
+  </div>
+
+  <h2>The old comparison script</h2>
+  <p class="sub">Written for CLIX rather than Homies, so the words are wrong, but
+  both voices say the identical text and that is what makes it useful.</p>
+
+  <div class="card">
+    <div class="lbl">c1-debt-none <span class="note">the debt line, no hesitation</span></div>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">6.64s</span></div><audio controls preload="none" src="samples/c1-debt-none-a976c076.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">6.40s</span></div><audio controls preload="none" src="samples/c1-debt-none-61e911a7.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">c2-debt-eh <span class="note">with אה</span></div>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">10.53s</span></div><audio controls preload="none" src="samples/c2-debt-eh-a976c076.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">9.38s</span></div><audio controls preload="none" src="samples/c2-debt-eh-61e911a7.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">c3-debt-ellipsis <span class="note">with a silent pause</span></div>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">7.89s</span></div><audio controls preload="none" src="samples/c3-debt-ellipsis-a976c076.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">6.71s</span></div><audio controls preload="none" src="samples/c3-debt-ellipsis-61e911a7.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">c4-debt-mixed <span class="note">both</span></div>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">9.87s</span></div><audio controls preload="none" src="samples/c4-debt-mixed-a976c076.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">7.78s</span></div><audio controls preload="none" src="samples/c4-debt-mixed-61e911a7.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">c5-debt-warm <span class="note">both, warmth turned up</span></div>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">8.80s</span></div><audio controls preload="none" src="samples/c5-debt-warm-a976c076.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">7.18s</span></div><audio controls preload="none" src="samples/c5-debt-warm-61e911a7.mp3"></audio></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">c6-debt-curious <span class="note">both, curiosity turned up</span></div>
+    <div class="two">
+      <div><div class="who">Eyal <span class="d">8.86s</span></div><audio controls preload="none" src="samples/c6-debt-curious-a976c076.mp3"></audio></div>
+      <div><div class="who">Ido <span class="d">7.24s</span></div><audio controls preload="none" src="samples/c6-debt-curious-61e911a7.mp3"></audio></div>
+    </div>
+  </div>
+
+  <div class="warn">
+    <p><strong>One thing to listen for.</strong> The clone's timing is not steady.
+    The line below was rendered six times without changing a character: the first
+    came out <strong>14.11 seconds</strong>, the rest between 3.0 and 5.9. Eyal
+    says it in a flat 2.87 every time. The 14-second one has not come back, but
+    the spread is real, and on a phone call an opening that sometimes takes twice
+    as long is something a caller notices.</p>
+  </div>
+  <div class="card">
+    <div class="lbl">the same line, five more times</div>
+    <p class="he" dir="rtl">שלום, מדבר אסף מקליקס. איך אפשר לעזור?</p>
+    <div class="many">
+    <div><div class="who">run 1 <span class="d">5.88s</span></div><audio controls preload="none" src="samples/probe/clixgreet-0.mp3"></audio></div>
+    <div><div class="who">run 2 <span class="d">3.37s</span></div><audio controls preload="none" src="samples/probe/clixgreet-1.mp3"></audio></div>
+    <div><div class="who">run 3 <span class="d">3.00s</span></div><audio controls preload="none" src="samples/probe/clixgreet-2.mp3"></audio></div>
+    <div><div class="who">run 4 <span class="d">3.84s</span></div><audio controls preload="none" src="samples/probe/clixgreet-3.mp3"></audio></div>
+    <div><div class="who">run 5 <span class="d">3.47s</span></div><audio controls preload="none" src="samples/probe/clixgreet-4.mp3"></audio></div></div>
+  </div>
+
+  <p class="sub" style="margin-top:2.5rem">The clone lives on the client's own
+  Cartesia account and can only be played with that account's key. Vapi still
+  holds ours, so no agent can reach this voice until someone decides to move the
+  credential, which also moves all Hebrew speech onto the client's bill.</p>
+</main>
+</body>
+</html>

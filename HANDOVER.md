@@ -2105,17 +2105,24 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 
 ## Pending on other people
 
-- **Cartesia Pro, $5/month, to unblock Ido's voice clone.** This is the whole
-  blocker and it is one click at play.cartesia.ai/subscription. Everything else
-  is built and waiting: the clips are cut, `scripts/voice_clone.py --go` is one
-  command, `cartesia_tts.py --voice <id>` renders the result, and Eyal saying the
-  same lines is already in `voice/samples/`. `/voices/clone` returns
-  `402 plan_upgrade_required` on Free — confirmed 7 Aug and again 30 Aug.
-  Ido has agreed to the clone (30 Aug); see `voice/README.md`.
-  **Do not price this at $49.** That is the Startup tier and it buys
-  *professional* cloning, a different feature. Instant cloning is Pro at $5, and
-  the wrong figure sat in two scripts for three weeks while the voice went
-  unbuilt.
+- ~~Cartesia Pro, $5/month, to unblock Ido's voice clone.~~ **Not needed —
+  done 30 Aug on the client's account instead.** The clone is
+  `61e911a7-5409-413f-8483-bb68cf477441` ("Echo Stone"), made from
+  `voice/clone-candidate-a.wav`, and it lives on the account behind
+  `CARTESIA_YARIV_API_KEY`, which is the only one of our three keys on a paid
+  tier. Ours still answers `402` and always did. Homies approved this on 30 Aug.
+- **A decision nobody has made: whose account pays for Hebrew speech.** The clone
+  is unreachable from Vapi as things stand, because Vapi's provider credential
+  (`448aa856`) holds **our** Cartesia key and a cloned voice is private to the
+  account that made it. Repointing that credential at the client's key is one
+  edit and it makes the clone work — **and it moves every Hebrew utterance from
+  both agents onto the client's bill, not just the cloned one.** Do not do this
+  as a side effect of wiring up a voice.
+- **Listen before wiring it in: `voice/ido-vs-eyal.html`.** The clone's timing is
+  not steady. One render of a fixed line came out 14.11s and five repeats came
+  out 3.0–5.9s, against Eyal's flat 2.87s. The 14s outlier has not recurred and
+  the real Homies greeting measures 4.36s against Eyal's 4.49s, so this is a risk
+  to judge by ear rather than a defect to fix.
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.
 - ElevenLabs key in Vapi, if that voice is wanted.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to

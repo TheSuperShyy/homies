@@ -212,6 +212,46 @@ builds with six tools attached.
 heard either this or the office-number fix.
 
 
+### The voice is cloned, on the client's account, because ours never could
+
+- Asked whether we were using Yariv's Cartesia key. We were not, and the answer
+  turned the day around. `.env` held three distinct Cartesia keys; the live one
+  is `CARTESIA_API_KEY`, and Yariv's was byte-identical to a key filed as
+  `CARTESIA_MAIN_API_KEY_ACCOUNT1`. **`_ACCOUNTn` means retired in this file**,
+  so the one account that could do the thing we wanted had been sitting there
+  labelled dead for eleven days.
+- **Probed all three for the cloning entitlement without creating anything.**
+  Sent `/voices/clone` a request with no file attached: a plan-gated account
+  rejects it at the gate with `402 plan_upgrade_required`, an entitled one gets
+  as far as `400 No file was provided`. Ours and ACCOUNT1 hit the gate. Yariv's
+  did not. That distinction cost three requests and no state.
+- Reported the finding and stopped, per the standing rule that a capability
+  question is not consent. Cloned only after Homies approved it.
+- **The clone exists: `61e911a7-5409-413f-8483-bb68cf477441`, "Echo Stone"**,
+  from `clone-candidate-a.wav`, on the client's account, `access[type]: private`.
+- Added `--key VAR` to `voice_clone.py` and `cartesia_tts.py`. A cloned voice is
+  private to the account that made it, so the key that created it is also the
+  only key that can play it back, and the variable name goes on the command line
+  rather than the key.
+- Cleaned up `.env`: stored the voice id, deleted the duplicate that made the
+  client's key look retired, and wrote above it what that account is and what
+  moving Vapi's credential to it would cost.
+- **Measured the clone rather than guessing at it**, since I cannot hear. On the
+  real Homies greeting it runs 4.36s against Eyal's 4.49s, and a two-word line
+  1.02s against 0.97s, so it is not slower in general. But one render of a fixed
+  line came out **14.11s** where Eyal takes 2.87s. Chased it: only 2.5s of that
+  was silence, so it was speaking, not padding; five repeats came back 3.0-5.9s
+  and it has not recurred. **My first theory, that short lines inflate, was
+  wrong** and the length probe killed it. What is left is real variance, 3.0 to
+  5.9 seconds on identical text, against a stock voice that is flat every time.
+- Built `voice/ido-vs-eyal.html`, the two voices on identical words plus the
+  variance demonstrated, because timing is all I can measure and the rest has to
+  be judged by ear.
+- **No agent was touched, and one decision is deliberately left open:** Vapi
+  holds our key, so nothing can reach this voice until the credential is moved,
+  and moving it puts all Hebrew speech on the client's bill rather than only the
+  cloned voice.
+
 ### Ido's voice is still not cloned, and the blocker turned out to cost five dollars
 
 - Ido confirmed he is happy for his voice to be cloned for the agent. That is

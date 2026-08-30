@@ -4,8 +4,22 @@
     python scripts/voice_clone.py --go           create the clone
     python scripts/voice_clone.py --list         voices already on the account
 
-Reads CARTESIA_API_KEY from .env. Never takes a key on the command line — it
-would land in shell history, which is the one place a key is hardest to remove.
+    --key VAR    read the key from a different .env variable
+
+Reads CARTESIA_API_KEY from .env by default. `--key` names the VARIABLE, never
+the key: a key on a command line lands in shell history, which is the one place
+it is hardest to remove. Same convention as `vapi_transfer.py --to`.
+
+WHICH ACCOUNT CAN ACTUALLY CLONE
+Ours cannot. `CARTESIA_YARIV_API_KEY` can — the client's own account carries a
+paid tier, found 30 Aug by sending a clone request with no file attached: a
+plan-gated account answers 402 at the gate, an entitled one answers 400 about
+the missing file. That probe creates nothing and is the cheap way to ask.
+
+    python scripts/voice_clone.py --go --key CARTESIA_YARIV_API_KEY
+
+A voice is private to the account that made it, so anything that plays it back
+needs the same key — `cartesia_tts.py --key` exists for that reason.
 
 WHY CARTESIA AND NOT ELEVENLABS
 A clone cannot run on `provider: vapi`. VapiVoice.voiceId is a closed enum of
@@ -129,7 +143,7 @@ LANGUAGE = os.environ.get("CARTESIA_CLONE_LANGUAGE", "he")
 FORMATS = {".flac", ".mp3", ".mpeg", ".mpga", ".oga", ".ogg", ".wav", ".webm"}
 
 
-def load_env():
+def load_env(var="CARTESIA_API_KEY"):
     if not os.path.exists(ENV):
         sys.exit(".env not found. Copy .env.example to .env and fill in CARTESIA_API_KEY.")
     for line in open(ENV, encoding="utf-8"):
@@ -137,7 +151,9 @@ def load_env():
         if line and not line.startswith("#") and "=" in line:
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
-    key = os.environ.get("CARTESIA_API_KEY", "").strip()
+    key = os.environ.get(var, "").strip()
+    if not key and var != "CARTESIA_API_KEY":
+        sys.exit("%s is empty or missing in .env" % var)
     if not key:
         sys.exit(
             "CARTESIA_API_KEY is empty in .env\n"
@@ -219,7 +235,8 @@ def main():
         sys.exit(__doc__)
     if "--clip" in args:
         globals()["CLIP"] = os.path.abspath(args[args.index("--clip") + 1])
-    key = load_env()
+    keyvar = args[args.index("--key") + 1] if "--key" in args else "CARTESIA_API_KEY"
+    key = load_env(keyvar)
 
     if args[0] == "--list":
         voices = call(key, "GET", "/voices/")
@@ -254,6 +271,7 @@ def main():
     print("language  : %s   (the language spoken in the clip)" % LANGUAGE)
     print("endpoint  : POST %s/voices/clone" % API)
     print("version   : %s" % VERSION)
+    print("key       : %s   (the .env variable, and so which account owns the voice)" % keyvar)
 
     if args[0] == "--dry":
         print("\nDry run. Nothing was uploaded. Re-run with --go.")
