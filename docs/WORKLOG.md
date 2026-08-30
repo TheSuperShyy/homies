@@ -86,6 +86,28 @@ conversation that produced it.
 - Baseline for comparison after deploy: live `/login` TTFB today, before any of
   this ships, was 1.78s cold and ~0.43s warm.
 
+### The page that "looked like that" was a 404 on its own stylesheet, and I caused it
+
+- Reported as a giant purple rounded square filling the browser. That is what
+  this app looks like with NO CSS at all: every inline SVG loses the width the
+  stylesheet gives it and fills the viewport, and the nav icons sit inside
+  `<a>` elements, so they take Chrome's default visited-link purple. Nothing
+  had errored — the server was healthy and every route returned 200.
+- **The cause was mine.** `next dev` and `next build` both write to `.next`.
+  I ran verification builds several times while the owner's dev server was up;
+  each build rewrote the directory underneath it, the running server kept
+  serving the manifest it booted with, and the hashed chunks that manifest
+  pointed at were gone. Proved rather than guessed: the page linked
+  `/_next/static/css/app/layout.css` and the server returned **404** for it.
+  This is also the most likely explanation for the earlier "fix it its broken".
+- **Fixed so it cannot happen again.** `next.config.mjs` now takes `distDir`
+  from `NEXT_DIST_DIR`, so a verification build goes somewhere else:
+  `NEXT_DIST_DIR=.next-verify npx next build`. Demonstrated — ran a full build
+  with the dev server up and re-checked the stylesheet: still 200, still 83kB.
+  `.next-verify/` is gitignored. Dev and the Vercel deploy both keep `.next`.
+- Recovery for a server already in this state: stop it, delete `.next`, start
+  it again. A hard reload alone is not enough — the chunk really is missing.
+
 ### Each metric got its own chart, and the whole panel got a calendar
 
 - Three metrics, three charts, one filter. **Small multiples**: each metric has

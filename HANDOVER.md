@@ -1171,6 +1171,16 @@ handset.**
   middleware now sets `x-user-email` on the request headers alongside
   `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
   layout or page**; the middleware is the only place that should call it.
+- **NEVER run `next build` while a dev server is up on the same directory.**
+  Both write to `.next`; the build rewrites it under the running server, whose
+  manifest then points at chunks that no longer exist, and the browser 404s on
+  its own stylesheet. The page renders with no CSS, which does not look like a
+  missing stylesheet — it looks like the app exploded (inline SVGs fill the
+  viewport in visited-link purple) and nothing appears in any log, because
+  nothing errored. Use `NEXT_DIST_DIR=.next-verify npx next build`;
+  `next.config.mjs` reads that env var for exactly this. If a server is already
+  in that state: stop it, delete `.next`, restart. A hard reload will not fix
+  it.
 - **The overview's date filter is `?from=&to=` in the URL**, defaulting to the
   last seven days, and it scopes every chart on the panel. Presets are plain
   links; the custom range is the one client component

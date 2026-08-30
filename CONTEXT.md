@@ -35,6 +35,14 @@ heights, radii, paddings -- are copied from the system's components, not
 re-invented; where a number is copied the CSS comment names the component it
 came from.
 
+**Do not disturb the owner's running dev server.** Verification builds go to
+their own `distDir` (`NEXT_DIST_DIR=.next-verify npx next build`), and the
+owner's processes are not killed or their `.next` deleted without saying so
+first — a build sharing `.next` with a live dev server pulls the stylesheet out
+from under it and the app appears to explode with nothing in any log. The wider
+rule: when checking your own work costs the user their working copy, isolate
+the check.
+
 **Filters scope the whole panel, live in the URL, and put presets before a
 calendar.** One row above the charts, never a picker per chart — three ranges
 on one screen produce three numbers nobody can compare, and the first question
