@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### Pushed to Vapi
+
+`python scripts/vapi_sync.py inbound --apply`. Live prompt went 35,622 → 19,978
+chars on `7752c6bb-89e9-49f3-aaf4-154ecc65cdff`.
+
+Verified by reading the assistant back off the API rather than trusting the
+write: prompt identical to the repo, six tools, 27 guard replacements, first
+message unchanged, `recordingEnabled` false, transcriber `deepgram nova-3`. The
+numeral `077-6687949` is gone from the live prompt and the Hebrew-words form is
+in it, which is the 30 Aug stutter closed on a real assistant rather than in a
+commit.
+
+**One check in my own verification script read False and was wrong.** It looked
+for `לעולם אל תגיד את הקידומת` as a contiguous string; the prompt wraps between
+`אל` and `תגיד`, so the guard was present all along. Re-checked with whitespace
+normalised. Worth remembering when grepping wrapped Hebrew prose — the same
+mistake in the other direction would have reported a missing rule as present.
+
+**The three regression patches went live without being probed.** Asked for and
+declined, deliberately: the office-number bug was live and breaking calls, and
+an unverified fix without that bug beats a verified prompt with it. The first
+real calls are now the test. See HANDOVER for what to watch.
+
+
 ### The probe was run, and it caught three regressions I had put in myself
 
 **Twenty-two cents, and the best money spent today.** `prompt_probe.py` replays

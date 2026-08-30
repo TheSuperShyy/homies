@@ -1956,19 +1956,21 @@ Nothing dials: no phone number exists, all 7,391 residents are
 
 ## Next moves, in order
 
-**THE PROMPT IS PATCHED BUT NOT RE-VERIFIED, AND NOT APPLIED.** State as of
-30 Aug, in order of what would bite first:
+**THE REFACTORED PROMPT IS LIVE AS OF 30 AUG, AND THE PATCHES IN IT WERE
+NEVER PROBED.** State as of the push, in order of what would bite first:
 
-1. **Nothing is live on Vapi.** `03c9074`, the regression patches, and
-   `8793c9f` are all committed and unpushed. A caller right now gets the
-   36,668-char prompt and still breaks on the office number.
-   `python scripts/vapi_sync.py inbound --apply` covers all of it. Read the dry
-   run's tool list first — it must show six.
-2. **The three regression patches have not been probed.** They were written
-   against failures the probe found and are unverified against it. Re-running
-   `leak`, `vague` and `parcel` on `--ref HEAD` costs about $0.08 and needs the
-   owner's word. **Do this before the push**, because two of the three
-   regressions were things the author was confident about and wrong about.
+1. **Live on assistant `7752c6bb-89e9-49f3-aaf4-154ecc65cdff`**, 19,978 chars,
+   down from 35,622. Verified against the Vapi API after the write, not assumed:
+   prompt matches the repo byte for byte, six tools attached, 27 guard
+   replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
+   also finally ships `8793c9f`, so the office-number stutter is gone from live.
+2. **The three regression patches went live unprobed.** They were written
+   against failures `prompt_probe.py` found and were never re-tested — the owner
+   chose to push rather than spend the $0.08, with the office-number bug live
+   and breaking calls as the reason. **So the first real calls are the test.**
+   Watch for: the reference number read in full (all three parts instead of the
+   middle), and the address read-back before the write going missing. Both
+   regressed once already. Rollback is `git revert` plus one `--apply`.
 3. **`prompt_probe.py` bare reads the LIVE assistant, not the repo.** While
    nothing is applied, that is the *old* prompt. Use `--ref HEAD` for the new
    one and `--ref 8793c9f` for the old. Getting this wrong scores the same

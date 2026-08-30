@@ -1345,6 +1345,21 @@ afterwards, never as a side effect.
 
 ## The voice prompts
 
+**Verify a push by reading the assistant back, never by trusting the write.**
+`vapi_sync.py --apply` printing OK means the PATCH returned 200, not that the
+assistant carries what you meant. GET it afterwards and compare the system
+prompt against the repo, count the tools, and check the guard replacement count
+— the 3 Aug Model Presets incident and the 12 Aug dashboard reversal both
+changed live assistants behind the repo's back, and neither showed up in a
+push's own output.
+
+**And normalise whitespace when grepping Hebrew prose for a rule.** These
+prompts are hard-wrapped at 80 columns, so a phrase that reads as one string on
+the page is split by a newline in the file. A contiguous-string check reported a
+live rule as missing on 30 Aug. The same error in the other direction would
+report a missing rule as present, which is the dangerous half.
+
+
 **Probe a large prompt change before pushing it. Decided 30 Aug, after it paid
 for itself the first time it was used.** `scripts/prompt_probe.py` costs cents —
 about $0.22 for a three-scenario before/after pair — and caught three
