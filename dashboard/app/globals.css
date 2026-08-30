@@ -373,7 +373,14 @@ a { color: inherit; text-decoration: none; }
   width: 40px; height: 22px; flex: none; padding: 2px;
   border-radius: var(--radius-pill);
   background: var(--surface-3); border: 1px solid var(--border-2);
-  display: inline-flex; cursor: pointer;
+  /* `flex-start` SPELLED OUT, because the knob's whole design is that it starts
+     at one end and is moved 18px by a transform. The base `button` rule centres
+     its contents — right for a button with a label in it, and it silently made
+     this one sit 12px in when it should sit at 2, then travel to 30 and hang 6px
+     past the end of its own track. A switch whose knob is neither at one end
+     nor the other reads as half-on. */
+  display: inline-flex; justify-content: flex-start; align-items: center;
+  cursor: pointer;
   transition: background var(--transition-med);
 }
 .themeswitch button .knob {

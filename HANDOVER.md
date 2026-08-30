@@ -1187,6 +1187,11 @@ handset.**
 - **`term()` in `app/(app)/search/page.tsx` strips `, ( ) " ' \ % _ *` before
   the phrase reaches PostgREST's `or=()`.** Do not remove it and do not build
   another `or` filter from user input without it.
+- **Every icon in `components/icons.tsx` now carries `width="16" height="16"`
+  as an attribute.** That is the default for an icon nobody has styled — an
+  unsized `<svg>` is 300x150 in normal flow and 0x0 inside a shrinkable flex
+  item, and both have shipped. CSS still beats presentation attributes, so every
+  per-component `svg` rule keeps working. Do not remove it.
 - **`button svg` has a 15px default now.** An SVG with a viewBox and no width
   is 300x150, not viewBox-sized. Do not add another per-component rule for it
   unless that component genuinely wants a different size.

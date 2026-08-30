@@ -56,6 +56,19 @@ total and how many are shown. A panel that quietly stops at eight is a panel
 that says there are eight, and the cost is somebody acting on "there are only
 two of these" when there are forty.
 
+**Adding a property to a base rule changes every component that did not opt
+out.** `justify-content: center` went onto the base `button` to fix an icon
+button, and silently moved the theme switch's knob to the middle of its track —
+a component that sets `display: inline-flex` but never had an opinion about
+justification, because it did not need one until the base grew one. Before
+widening a shared rule, list what already matches it; the ones that will change
+are the ones that were relying on the default you are replacing.
+
+**"I checked every variant" is a claim to verify, not to make.** The same
+commit rendered nine button variants on one page and called it every button in
+the app. The tenth was the theme switch, and the tenth was the one that broke.
+Enumerate from the stylesheet or the markup, not from memory.
+
 **When the same one-off rule has been written five times, the sixth case is
 already broken.** Five components each carried their own `svg { width: … }`
 because an SVG with a viewBox and no width renders at 300x150; the bare `button`

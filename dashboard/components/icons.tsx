@@ -15,6 +15,19 @@ type P = { className?: string };
 
 const base = {
   viewBox: '0 0 24 24',
+  /* A SIZE, ON EVERY ICON, AS AN ATTRIBUTE.
+     An <svg> with a viewBox and no width or height does not size itself from
+     that viewBox — depending on where it sits it comes out 300x150 or, inside
+     a flex item that shrinks, nothing at all. Both have happened here: the
+     call search button rendered a 300px magnifier, and the sun/moon beside the
+     theme switch measured 0x0 and had been invisible since the shell was
+     built. Every component that draws an icon was carrying its own rule for
+     this, which meant the default was "broken" and the fix was opt-in.
+     Presentation attributes lose to any CSS rule, so all sixteen of those
+     component rules still win wherever they want a different size. This only
+     decides what an icon does when nobody has said. */
+  width: 16,
+  height: 16,
   fill: 'none',
   stroke: 'currentColor',
   strokeWidth: 1.75,

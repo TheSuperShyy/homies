@@ -36,6 +36,35 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The theme switch's knob was in the wrong place, and I put it there
+
+- **A regression from two commits earlier, mine.** Fixing the giant search
+  magnifier meant adding `display: inline-flex; justify-content: center` to the
+  base `button` rule. `.themeswitch button` sets `display: inline-flex` and does
+  NOT set `justify-content`, so it inherited `center` — and this control's whole
+  design is a knob that starts at one end and is moved 18px by a transform.
+  Measured: the knob sat at 12px inside a 40px track when it should sit at 3,
+  and travelled to 30, where 30 + 16 hangs 6px past the end of its own track.
+  A switch whose knob is at neither end reads as half-on.
+- **My verification missed it, and the reason is worth writing down.** The
+  commit that caused it rendered "every button variant in the app on one page"
+  — search, plain, `.btn-sm`, choice pills, `.go`, `.danger`, the status editor,
+  the full-width primary, the sidebar footer. Not the theme switch. Nine out of
+  ten is not a set, and the one left out is the one that broke.
+- **The sun/moon beside it measured 0x0 and had been invisible since the shell
+  was built.** Not 300x150 as the search button was — inside a flex item that
+  can shrink, an unsized `<svg>` collapses to nothing instead. Same root cause,
+  opposite symptom, which is why nobody spotted it: there was no giant icon to
+  notice, just a control with no label.
+- **Fixed on the icon set rather than with a seventeenth per-component rule.**
+  `components/icons.tsx` now emits `width="16" height="16"` on every icon as
+  ATTRIBUTES. Presentation attributes lose to any CSS rule, so all sixteen
+  existing component rules still win where they want a different size; this only
+  decides what an icon does when nobody has said. The default was "broken" and
+  the fix was opt-in; now it is the other way round.
+- Verified by measurement, not by looking: knob at 3 off and 21 on in LTR, 21
+  and 3 in RTL, icon 16x16 in both. Build clean.
+
 ### The header search does something now
 
 - **It had been a disabled pill labelled "Soon" since the shell was rebuilt** —
