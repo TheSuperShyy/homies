@@ -35,6 +35,17 @@ heights, radii, paddings -- are copied from the system's components, not
 re-invented; where a number is copied the CSS comment names the component it
 came from.
 
+**Navigation in the dashboard is client-side, and the shell is a route group.**
+Use `next/link` for anything inside the app; a bare `<a>` reloads the document,
+throws away the shell and the skeleton, and spins the browser tab. The routes
+live in `app/(app)/` with the shell as that group's layout, so `/login` cannot
+render the sidebar by structure rather than by a condition. The rule that
+follows from both: **a layout shared by two routes is not re-rendered when you
+move between them**, so anything in the shell that depends on which page is
+showing reads `usePathname()` on the client. A path computed on the server
+freezes on first load and the interface starts lying — that is what
+`x-pathname` was doing, and it is why it was removed.
+
 **Colour is measured, never eyeballed.** `python scripts/contrast_check.py`
 after any token change. The supplied system shipped four pairs under WCAG AA
 and its own readme says the colours were taken off screenshots, which is
