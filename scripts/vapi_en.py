@@ -406,10 +406,14 @@ DEBT_LINES = [
     # "Laumiz" — as did our own transcriber, on five separate calls. The English
     # side never had the fault (Latin text, English voice) and is unchanged.
     # 30 Aug: the whole clause went. The client's wording is
-    # מהצוות של הומיז, so the English twin is "from the Homies team"
-    # and loses "the building management company" with it. Both halves of
-    # this pair must move together or the substitution stops matching and
-    # this script refuses to write the twin — which is what it is for.
+    # מהצוות של הומיז, so the English half is "from the Homies team".
+    #
+    # THIS TABLE IS DEAD CODE AND WAS EDITED ON A WRONG BELIEF. englished()
+    # short-circuits to the frozen file above, so no substitution has run
+    # since 25 Aug and nothing here refuses anything. It was updated on
+    # 30 Aug in the belief that it still guarded the twin. Left in step
+    # rather than reverted, because a stale table is a worse trap than a
+    # current one — but do not treat editing it as required work.
     ("> שלום, מדבר מיכאל מהצוות של הומיז. אני מדבר עם {{first_name}}?",
      "> Hello, this is Michael from the Homies team. "
      "Am I speaking with {{first_name}}?"),

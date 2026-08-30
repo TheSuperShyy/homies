@@ -530,6 +530,16 @@ the sentence quoted in the prompt's own status section. Push those by patching
 the live nodes in place; `--apply` overwrites a workflow that is ahead of the
 repo script.
 
+**Hebrew is the product; the English twins are not.** Owner's direction,
+30 Aug: work the Hebrew and leave English alone — the two operate differently,
+so a change reasoned out for Hebrew prosody or Hebrew grammar does not become
+an English change by translation. This overrides the older instinct to keep the
+pair in step sentence for sentence. The twins are frozen comparison instruments
+that nobody outside this project hears; `parity()` still runs on them and still
+passes structurally, which is all it was ever asked to do. Related:
+[[hebrew-is-not-a-translation]] — carry the meaning, then pick the words that
+language really uses.
+
 **Punctuation in a voice prompt is performed, not read.** Every comma is a
 pause the voice takes and every full stop is a falling ending, so what looks
 like a formatting choice in the text is a timing instruction in the audio. This
@@ -546,17 +556,20 @@ digits.** Apartment 12 is דירה שתים עשרה and 450 is ארבע מאו�
 שקלים; a reference or a phone number is digits. The intake prompt had the
 apartment on the wrong side of that line until 30 Aug.
 
-**The same is true of the voice agents' opening, in five places, and only
-grep keeps them together.** The spoken first line is a fixed string Vapi plays
-before the model is invoked, so no prompt rule reaches it. Changing it on 30 Aug
-meant touching: the `## First message` fence in `docs/assistant/demo-inbound.md`;
-the `### הפתיחה` blockquote in `docs/features/10-debt-followup/prompt.md`; the
-Hebrew half of the substitution pair in `scripts/vapi_en.py`, which hard-exits
-when it stops matching the live prompt — the one copy that defends itself; the
-hardcoded `first_message` for each English twin in the same file; and the
+**The same is true of the voice agents' opening, and only grep keeps the
+copies together.** The spoken first line is a fixed string Vapi plays before the
+model is invoked, so no prompt rule reaches it. On the Hebrew side there are
+three: the `## First message` fence in `docs/assistant/demo-inbound.md`, the
+`### הפתיחה` blockquote in `docs/features/10-debt-followup/prompt.md`, and the
 `"first"` string in `scripts/prompt_probe.py`, which opens every probe run and,
-left stale, scores a conversation the agent no longer has. Two of those five
-are silent when wrong. Grep the old line before declaring the change done.
+left stale, scores a conversation the agent no longer has. All three are silent
+when wrong. Grep the old line before declaring the change done.
+
+**Nothing on the English side forces a touch, and believing otherwise cost an
+edit on 30 Aug.** `vapi_en.py` carries a substitution table that used to refuse
+to ship a twin whose Hebrew had moved. `englished()` has short-circuited to the
+frozen files under `docs/assistant/en/` since 25 Aug, so that table has not run
+since and guards nothing.
 
 **The voice's gender and the prompt's gender are one change, and it has now
 been argued in both directions.** Hebrew marks the speaker's gender on the
