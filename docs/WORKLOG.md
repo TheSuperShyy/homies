@@ -36,6 +36,30 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### Told to work the Hebrew and leave the English twins alone
+
+- **Owner's direction: "focus in the hebrew not in english since they operate
+  in different way".** Said after two changes in a row -- the opening line, then
+  the digit-reading rules -- were carried into `docs/assistant/en/*.md` as a
+  matter of course. Recorded in CONTEXT.md and in memory; it overrides the older
+  instinct to keep the pair in step sentence for sentence.
+- **A correction goes with it, and it is the reason the mirroring felt
+  obligatory.** Two commits earlier I wrote that `vapi_en.py`'s substitution
+  table "hard-exits when it stops matching the live prompt -- the one copy that
+  defends itself". True until 25 Aug. `englished()` now returns the frozen file
+  before the table is reached, so it has not run since and refuses nothing. Both
+  edits to it were made on a belief about code that does not execute.
+- **So the instruction costs nothing to follow.** A Hebrew prompt change is
+  three files: the two prompt docs and the `"first"` string in
+  `prompt_probe.py`. `parity()` still runs on the twins and still passes, because
+  it checks structure rather than wording -- which is exactly why the two can
+  drift in words with nothing saying so.
+- **The English edits already made were left, not reverted.** A half-stale table
+  is a worse trap than a current one. The comment beside them now says they were
+  not required work, so nobody reads them as precedent.
+- **Also corrected: CONTEXT.md counted five copies of the opening.** The Hebrew
+  side has three, and all three are silent when wrong.
+
 ### The agent read numbers one digit at a time, and the prompt was telling it to
 
 - **Reported as a bug: "it says 1 2 3 4 5 6, very slowly and bugging".** It is

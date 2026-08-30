@@ -278,6 +278,11 @@ say anyone is being put through.
 
 ---
 
+**A prompt change is three files, all Hebrew.** `docs/assistant/demo-inbound.md`
+(inbound), `docs/features/10-debt-followup/prompt.md` (debt), and the `"first"`
+string in `scripts/prompt_probe.py`, which opens every probe run and is silent
+when stale. Nothing under `docs/assistant/en/` is part of the job.
+
 **Numbers are read one digit at a time on the live agents, and the fix is in
 the repo but not applied.** Reported 30 Aug as "1 2 3 4 5 6, very slowly and
 bugging". Both prompts told it to — a comma after every digit, which the voice
@@ -850,7 +855,15 @@ handset.**
   still `docs/features/10-debt-followup/prompt.md`, and `vapi_sync.py debt
   --apply` still pushes it. **The English twin no longer derives from it** --
   `vapi_en.py` reads `docs/assistant/en/debt.en.md`, frozen from the last
-  substitution build. Change one and you must change the other by hand.
+  substitution build. **Do not keep them in step.** Owner's direction,
+  30 Aug: work the Hebrew, leave the English alone -- the two operate
+  differently, so a change reasoned out for Hebrew is not an English
+  change waiting to be translated. Nothing forces it either: `englished()`
+  short-circuits to the frozen file, so the substitution table in
+  `vapi_en.py` has not run since 25 Aug and refuses nothing, whatever its
+  comments claim. `parity()` checks structure, not wording, and keeps
+  passing while the two drift in words. Updating a twin is its own
+  request.
   **Intake (he) followed on 26 Aug** -- 33,948 chars, 70% Hebrew, source
   `docs/assistant/demo-inbound.md`, pushed with `vapi_sync.py inbound --apply`,
   and its English twin frozen at `docs/assistant/en/intake.en.md` the same way.
