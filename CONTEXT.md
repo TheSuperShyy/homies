@@ -43,6 +43,23 @@ portfolio and say nothing about buildings. Ornament either says whose product
 this is or it says nothing, so it gets replaced rather than inherited. Nothing
 else in the system does.
 
+**A small screen sometimes needs a different component, not the same one
+rearranged.** The sidebar was made responsive the usual way — same markup, a
+media query, a column becomes a row — and it passed every check I ran: it fit,
+it did not overflow, nothing was clipped by the layout engine. It was still
+unusable, because seven labels in a 390px row means a horizontal scroller, and a
+scroller nobody can see is a bar showing three destinations with two cut off
+mid-word. The owner found it in a photograph of their own phone. Reflowing a
+desktop component is the cheap answer and it is right most of the time; when the
+content does not fit at all, the honest answer is a second component that does.
+
+**Rendering it is not the same as using it.** The harness renders the markup as
+written, so it answers "does this lay out" and never "can somebody work this".
+Everything it can prove — no overflow, nothing clipped, contrast, both
+directions — was green on a navigation bar that did not work. Ask what a reader
+has to already know to operate what is on the screen; here it was "this strip
+scrolls sideways", which nothing said.
+
 **A breakpoint value measured on one screen is a guess on every other one.**
 Three of the mobile defects were numbers that were correct where they were
 chosen and wrong 600px away: a 176px tile minimum picked so a label would not
