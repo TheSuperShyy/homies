@@ -405,9 +405,14 @@ DEBT_LINES = [
     # name, the voice read the pair as one unfamiliar word, and the client heard
     # "Laumiz" — as did our own transcriber, on five separate calls. The English
     # side never had the fault (Latin text, English voice) and is unchanged.
-    ("> שלום, אה, מדבר מיכאל מחברת הומיז, שמנהלת את הבניין. אני מדבר עם {{first_name}}?",
-     "> Hello, uh, this is Michael from Homies, the building management "
-     "company. Am I speaking with {{first_name}}?"),
+    # 30 Aug: the whole clause went. The client's wording is
+    # מהצוות של הומיז, so the English twin is "from the Homies team"
+    # and loses "the building management company" with it. Both halves of
+    # this pair must move together or the substitution stops matching and
+    # this script refuses to write the twin — which is what it is for.
+    ("> שלום, מדבר מיכאל מהצוות של הומיז. אני מדבר עם {{first_name}}?",
+     "> Hello, this is Michael from the Homies team. "
+     "Am I speaking with {{first_name}}?"),
 
     ("> סליחה על ההפרעה, אני לא יכול למסור פרטים למי שאינו בעל החשבון. אפשר לבקש ש{{first_name}} יחזור אלינו?",
      "> Sorry to disturb you. I can't share details with anyone who is not the "
@@ -1039,8 +1044,9 @@ TWINS = {
         "stack": DEBT_STACK,
         "lines": DEBT_LINES,
         "block": DEBT_BLOCKS,
+        # Tracks the Hebrew opening, reworded by the client on 30 Aug.
         "first_message": (
-            "Hello, this is Michael from Homies, the building management company. "
+            "Hello, this is Michael from the Homies team. "
             "Am I speaking with {{first_name}}?"
         ),
     },
@@ -1058,7 +1064,10 @@ TWINS = {
         # Shortened 5 Aug from "Hello, you've reached Homies building management.
         # This is Michael. How can I help?" — 6.4 seconds of TTS, and the caller
         # started speaking 0.5s in on the first real call and was talked over.
-        "first_message": "Homies Building Management, Michael speaking. How can I help?",
+        # Tracks the Hebrew opening, which the client reworded on 30 Aug.
+        # The twins exist to be compared with their Hebrew siblings; an
+        # opening that has stopped tracking compares the wrong conversation.
+        "first_message": "Hello, this is Michael from the Homies team. How can I help?",
     },
 }
 

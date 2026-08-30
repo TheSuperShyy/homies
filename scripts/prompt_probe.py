@@ -54,7 +54,11 @@ TARGETS = {
         "assistant": "12a4c01d-85ac-4955-a195-ed4c42b09927",
         "doc": "docs/assistant/demo-inbound.md",
         "extract": r"## System prompt\s*\n+````\s*\n(.*?)\n````",
-        "first": "הומיז, חברת הניהול. אה, מדבר מיכאל, איך אפשר לעזור?",
+        # A COPY of the '## First message' block in the doc above, and the only
+        # copy that is not kept in step automatically. Change one, change both
+        # — a probe that opens with a line the agent no longer says is scoring
+        # the wrong conversation.
+        "first": "שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?",
         "vars": {},
     },
     "debt": {

@@ -190,8 +190,28 @@ carries here unchanged:
 ## First message
 
 ```
-הומיז, חברת הניהול. אה, מדבר מיכאל, איך אפשר לעזור?
+שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?
 ```
+
+**The wording is the client's, 30 Aug.** `הומיז, חברת הניהול. אה, מדבר מיכאל`
+→ `שלום, מדבר מיכאל מהצוות של הומיז`. The person now comes before the
+company, which is how anybody answering a phone introduces themselves.
+Two characters shorter, so the three seconds below still stand.
+
+**It was written `מדברת` and is `מדבר` here, and that is not a liberty.**
+`מיכאל` is a man's name and the voice is Elliot; Hebrew marks the speaker's
+gender on the verb, so the feminine form is a grammatical error in the
+agent's very first sentence. The gender of the prompt and the gender of the
+voice are one change — see the note on `voice` in `scripts/vapi_sync.py`,
+which has now been argued in both directions.
+
+**מהצוות של הומיז clears the 12 Aug pronunciation fault by luck, not by
+design.** That fault was מ+הומיז glued into one unfamiliar word, which the
+voice — and our own transcriber — read as *Laumiz* on five calls. Here the
+one-letter preposition attaches to הצוות, an ordinary word, and the company
+name stands alone after של. The `voice_guard.py` substitution is still
+there and still needed, because the model composes the rest of its
+sentences and will write מהומיז again — that is correct Hebrew.
 
 **Six seconds until 5 Aug**, and the first call showed why that is too long: the
 caller began speaking half a second in, twice, and got talked over both times.

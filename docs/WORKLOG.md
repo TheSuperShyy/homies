@@ -36,6 +36,47 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### Both voice agents introduce themselves the client's way now
+
+- **The line he gave: `שלום מדברת מיכאל מהצוות של הומיז`, and it is written
+  in two genders at once.** `מדברת` is feminine, `מיכאל` is a man's name, and the
+  same message called the agent "he". The live voice on both assistants is
+  Cartesia `a976c076` — "Eyal — Grounded Guide", male, chosen by ear on 12 Aug
+  — and the whole prompt was flipped to masculine on 7 Aug when the client asked
+  for a male voice. So it went in as `מדבר`. Asked rather than assumed: a female
+  agent is a different job — the voice, the name back to מיכל, and every verb.
+- **Both agents, because he asked for both.** Inbound is now
+  `שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?` (was
+  `הומיז, חברת הניהול. אה, מדבר מיכאל, איך אפשר לעזור?`), two characters
+  shorter, so the three-second budget that opening lives under still holds.
+  Debt follow-up is the same sentence ending in `אני מדבר עם {{first_name}}?`
+  — that question is not furniture, nothing about the arrears may be said until
+  it is answered.
+- **The debt line gave something up: `שמנהלת את הבניין`.** On a cold outbound
+  call about money to a line with no caller ID, that clause answered *why do you
+  have my number?* The client's wording drops it and the name is now expected to
+  carry it. Written into the prompt doc as a deliberate trade with the way back
+  spelled out, because the symptom — hang-ups in the first two turns, or
+  `מי זה?` — will not obviously point here a month from now.
+- **The 12 Aug pronunciation fault does not recur, and only by luck.** That one
+  was מ+הומיז glued into a single unfamiliar word, which the voice and our own
+  transcriber both read as *Laumiz* on five calls. In `מהצוות של הומיז` the
+  preposition attaches to הצוות, an ordinary word, and the company name stands
+  alone after של. The `voice_guard.py` substitution stays — the model composes
+  the rest of its sentences and will write מהומיז again, because that is
+  correct Hebrew.
+- **Three copies of that line existed and grep found all of them.**
+  `scripts/vapi_en.py` holds it as one half of a substitution pair and
+  hard-exits if the Hebrew no longer matches the live prompt — the English twin
+  became "from the Homies team" in the same edit. `scripts/prompt_probe.py`
+  hardcodes the inbound opening as the agent's first turn; left stale it would
+  have scored a conversation that never happens. It now carries a comment saying
+  it is a manual copy, which is the honest fix short of deriving it.
+- **Not pushed to Vapi.** Both dry runs are clean — inbound 35,622 chars,
+  debt 53,617, first messages extracting correctly — and `--apply` is the
+  client's call, per the standing rule that every external system needs its own
+  explicit go.
+
 ### The theme switch's knob was in the wrong place, and I put it there
 
 - **A regression from two commits earlier, mine.** Fixing the giant search

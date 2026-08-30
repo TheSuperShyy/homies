@@ -278,6 +278,29 @@ say anyone is being put through.
 
 ---
 
+**The repo is one line ahead of live Vapi, and nothing has been applied.**
+All four assistants introduce themselves the client's way as of 30 Aug —
+Hebrew `שלום, מדבר מיכאל מהצוות של הומיז`, English "this is Michael from
+the Homies team" — **in the files only**. The live assistants still say the old
+line. Both dry runs are clean (inbound 35,622 chars, debt 53,617, first messages
+extracting, both English twins passing parity). To push:
+
+    python scripts/vapi_sync.py inbound --apply
+    python scripts/vapi_sync.py debt --apply
+
+Read the `vapi_sync.py` warnings in `CONTEXT.md` before running either —
+`tool_server()` prefers n8n whenever `N8N_BASE_URL` is set. The English twins go
+with `vapi_en.py <twin> --update <id>`; they are comparison instruments and
+nobody outside this project hears them.
+
+**The debt opening lost `שמנהלת את הבניין` with the rewording** — the clause
+that told a cold-called resident why we have their number. Deliberate, the
+client's phrasing. If attempts start ending in `מי זה?` or hang-ups inside two
+turns, look here first; `docs/features/10-debt-followup/prompt.md` carries the
+way back.
+
+---
+
 ## What works, and what does not exist
 
 | Works today | |

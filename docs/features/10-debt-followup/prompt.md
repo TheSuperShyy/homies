@@ -62,6 +62,29 @@ weight. It is the turn where a resident denies owing anything at all, and the
 difference between *"shall I pass this to the team"* and *"I'm putting you
 through"* is a promise the system cannot keep.
 
+### The opening changed on 30 Aug, and it gave something up
+
+`שלום, אה, מדבר מיכאל מחברת הומיז, שמנהלת את הבניין`
+→ `שלום, מדבר מיכאל מהצוות של הומיז`, the client's wording, so both
+agents introduce themselves the same way.
+
+**What went with it: שמנהלת את הבניין.** This is a cold outbound call about
+money, to someone with no caller ID, and that clause was the answer to the
+question every such call raises — *why do you have my number?* It is gone,
+which is a deliberate trade and not an oversight: the name Homies is
+expected to carry it. If attempts start ending in *מי זה?* or hang-ups in the
+first two turns, this line is the first place to look, and
+`מהצוות של הומיז, שמנהלת את הבניין` is the way back without losing the
+client's phrasing.
+
+**The name check survived unchanged.** `אני מדבר עם {{first_name}}?` is not
+conversational furniture — nothing about the debt may be said until it is
+answered, and the not-the-account-holder line below depends on it.
+
+**The `אה` went too**, because the client wrote the line without one. The
+disfluencies elsewhere in this prompt are untouched; only the fixed opening
+is theirs to word.
+
 ## Variables the call must be started with
 
 | Variable | Source | Notes |
@@ -513,7 +536,7 @@ back.
 
 ### הפתיחה
 
-> שלום, אה, מדבר מיכאל מחברת הומיז, שמנהלת את הבניין. אני מדבר עם {{first_name}}?
+> שלום, מדבר מיכאל מהצוות של הומיז. אני מדבר עם {{first_name}}?
 
 **השורה הזאת כבר נאמרה. אתה לא אמרת אותה ואתה לא הולך להגיד אותה.** היא יוצאת
 אוטומטית ברגע שהשיחה מתחברת, לפני שאתה מפיק משהו. היא כתובה כאן כדי שתדע מה

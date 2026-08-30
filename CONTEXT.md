@@ -530,6 +530,26 @@ the sentence quoted in the prompt's own status section. Push those by patching
 the live nodes in place; `--apply` overwrites a workflow that is ahead of the
 repo script.
 
+**The same is true of the voice agents' opening, in five places, and only
+grep keeps them together.** The spoken first line is a fixed string Vapi plays
+before the model is invoked, so no prompt rule reaches it. Changing it on 30 Aug
+meant touching: the `## First message` fence in `docs/assistant/demo-inbound.md`;
+the `### הפתיחה` blockquote in `docs/features/10-debt-followup/prompt.md`; the
+Hebrew half of the substitution pair in `scripts/vapi_en.py`, which hard-exits
+when it stops matching the live prompt — the one copy that defends itself; the
+hardcoded `first_message` for each English twin in the same file; and the
+`"first"` string in `scripts/prompt_probe.py`, which opens every probe run and,
+left stale, scores a conversation the agent no longer has. Two of those five
+are silent when wrong. Grep the old line before declaring the change done.
+
+**The voice's gender and the prompt's gender are one change, and it has now
+been argued in both directions.** Hebrew marks the speaker's gender on the
+verb, so a male voice reading `מדברת` is a grammatical error in every sentence
+the agent has, not a stylistic mismatch. Feminine until 7 Aug (voice Leah,
+מיכל), masculine since (Cartesia "Eyal", מיכאל) at the client's request. A line
+arriving in the wrong gender is a slip to raise, not a decision to infer — the
+cost of guessing wrong is nine passages and a voice swap.
+
 **Correct, short and cold is still a defect.** The status button used to answer
 `בטח. מה מספר הקריאה?` -- accurate, two clipped fragments, and no word in it
 saying anybody is going to help. The owner read it as rude. A request for
