@@ -1,0 +1,48 @@
+<!-- @dsCard group="Components" viewport="700x320" subtitle="Buttons, inputs, toggles, badges, avatar" name="Core" -->
+<!DOCTYPE html><html><head>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../demo-loader.js"></script>
+<style>body{margin:0;background:var(--bg-0);font-family:var(--font-ui)}</style>
+</head><body><div id="root"><div style="height:100vh;background:var(--bg-0)"></div></div>
+<script type="text/babel-demo">
+(async () => {
+const { Button, IconButton, Input, Select, Checkbox, Switch, Badge, Delta, Avatar } = await window.loadDS("../../components/", window.DS_ALL);
+const Search = <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>;
+const Bell = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>;
+function Demo(){
+  const [on, setOn] = React.useState(true);
+  const [ck, setCk] = React.useState(true);
+  return (
+    <div style={{padding:20, display:"flex", flexDirection:"column", gap:16}}>
+      <div style={{display:"flex", gap:10, alignItems:"center"}}>
+        <Button>Upgrade</Button>
+        <Button variant="secondary">See all</Button>
+        <Button variant="secondary" size="sm">Most Viewed</Button>
+        <Button variant="ghost">Cancel</Button>
+        <Button disabled>Disabled</Button>
+        <IconButton label="Notifications">{Bell}</IconButton>
+        <IconButton variant="solid" size={30} label="Expand"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg></IconButton>
+      </div>
+      <div style={{display:"flex", gap:10, alignItems:"center"}}>
+        <Input icon={Search} placeholder="Ask stocks ai anything" style={{width:280}} />
+        <Select options={["6M","1Y","All"]} defaultValue="6M" />
+      </div>
+      <div style={{display:"flex", gap:16, alignItems:"center"}}>
+        <Checkbox checked={ck} onChange={setCk} label="Include watchlist" />
+        <Switch checked={on} onChange={setOn} />
+        <Badge tone="positive">Paid</Badge>
+        <Badge tone="accent">6M</Badge>
+        <Badge>Units 104</Badge>
+        <Delta value="+3.68 ($ 5.32)" />
+        <Delta value="-3.4%" />
+        <Avatar name="Naya Rachel" size={36} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+})();
+</script></body></html>

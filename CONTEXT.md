@@ -1219,6 +1219,14 @@ why and rejected alternatives).
 | `vapi_transfer.py` | `--balance` first. Then `--apply` to move, `--mirror` to keep a spare in step, `--promote` to make that spare live |
 | `n8n_deploy.py`, `n8n_layout.py` | Workflow deploy and layout enforcement |
 
+**When a provider hides the metric, probe the capability.** Cartesia
+publishes no balance anywhere an API key can reach, and "dashboard only" was
+the wrong answer to "is there credit left" — the cheapest real call answers
+it: a two-word synthesis returns 200 while the account can pay and 402 when
+it cannot, which is how the credit outage was diagnosed in the first place.
+Prefer the smallest genuine operation over a status page; it tests the thing
+that will actually run.
+
 **Send a plain non-browser User-Agent to every provider API, or set none.**
 Two providers now refuse Python's default: the Supabase Management API
 ("Forbidden use of secret API key in browser") and Vapi, which answers 403

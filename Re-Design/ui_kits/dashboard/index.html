@@ -1,0 +1,201 @@
+<!-- @dsCard group="Dashboard" viewport="1440x900" subtitle="Stovest dashboard — dark default, light toggle" name="Dashboard" -->
+<!-- @startingPoint section="Screens" subtitle="Full dashboard shell — sidebar, topbar, cards" viewport="1440x900" -->
+<!DOCTYPE html><html><head>
+<meta charset="utf-8"><title>Stovest — Dashboard</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../demo-loader.js"></script>
+<style>body{margin:0;background:var(--bg-0);font-family:var(--font-ui)} *{box-sizing:border-box}</style>
+</head><body><div id="root"><div style="height:100vh;background:var(--bg-0)"></div></div>
+<script type="text/babel-demo">
+(async () => {
+const { Button, IconButton, Input, Badge, Delta, Avatar, Card, StatCard, DataTable, Tabs, SidebarItem, SidebarSection, Switch } = await window.loadDS("../../components/", window.DS_ALL);
+
+const I = (d, s=16) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{d}</svg>;
+const ic = {
+  home: I(<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>),
+  briefcase: I(<><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></>),
+  chart: I(<><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></>),
+  store: I(<><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></>),
+  users: I(<><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16.5 11.5A3.5 3.5 0 1 0 15 5"/><path d="M18 14.6c2.1.6 3.5 2.2 3.5 4.4"/></>),
+  help: I(<><circle cx="12" cy="12" r="9"/><path d="M9.3 9a2.8 2.8 0 0 1 5.4.9c0 1.8-2.7 2.4-2.7 3.9"/><circle cx="12" cy="17.2" r=".4"/></>),
+  search: I(<><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></>, 15),
+  bell: I(<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></>),
+  gear: I(<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></>),
+  chev: I(<path d="m6 9 6 6 6-6"/>, 12),
+};
+
+const Rings = (
+  <svg aria-hidden="true" viewBox="0 0 320 190" preserveAspectRatio="xMidYMid slice" style={{position:"absolute", inset:0, width:"100%", height:"100%", pointerEvents:"none"}}>
+    {[0,1,2,3,4,5,6,7].map(i=><circle key={i} cx="265" cy="30" r={18+i*24} fill="none" stroke="var(--text-1)" strokeOpacity={0.05-i*0.004} strokeWidth="13"/>)}
+  </svg>
+);
+const pts = [78,72,74,68,71,64,60,66,58,62,55,59,52,57,50,54,47,52,44,49,46,51,48,55,53,58,56,61,59,63];
+function AreaChart(){
+  const w = 900, h = 210;
+  const step = w / (pts.length - 1);
+  const line = pts.map((p,i)=>`${i?"L":"M"}${(i*step).toFixed(1)} ${(p*h/100).toFixed(1)}`).join(" ");
+  const hi = 14; // hover index
+  const months = ["1st Jan","15th Jan","1st Feb","15th Feb","1st Mar","15th Mar","1st Apr","15th Apr","1st May","15th May","1st Jun","15th Jun","1st Jul","15th Jul"];
+  return (
+    <div>
+      <div style={{position:"relative"}}>
+        <div style={{position:"absolute", left:`${hi/(pts.length-1)*100}%`, top:14, transform:"translate(-50%, 0)",
+          background:"var(--surface-3)", border:"1px solid var(--border-2)", borderRadius:12, padding:"8px 12px",
+          boxShadow:"var(--shadow-pop)", whiteSpace:"nowrap"}}>
+          <div style={{fontSize:10, color:"var(--text-3)"}}>1st Mar 2024</div>
+          <div style={{display:"flex", gap:8, alignItems:"center", marginTop:2}}>
+            <span style={{fontSize:13, fontWeight:600, color:"var(--text-1)"}}>$ 16,500</span>
+            <Badge tone="accent">+2.4%</Badge>
+          </div>
+        </div>
+        <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:"block"}}>
+          <defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="var(--chart-line)" stopOpacity="0.32"/>
+            <stop offset="1" stopColor="var(--chart-line)" stopOpacity="0.02"/>
+          </linearGradient></defs>
+          {[0.25,0.5,0.75].map(f=><line key={f} x1="0" x2={w} y1={h*f} y2={h*f} stroke="var(--chart-grid)"/>)}
+          <path d={`${line} L${w} ${h} L0 ${h} Z`} fill="url(#fill)"/>
+          <path d={line} fill="none" stroke="var(--chart-line)" strokeWidth="2.5" vectorEffect="non-scaling-stroke"/>
+          <line x1={hi*step} x2={hi*step} y1={pts[hi]*h/100} y2={h} stroke="var(--chart-line)" strokeDasharray="4 4" vectorEffect="non-scaling-stroke"/>
+          <circle cx={hi*step} cy={pts[hi]*h/100} r="5" fill="var(--chart-line)" stroke="var(--surface-1)" strokeWidth="2"/>
+        </svg>
+      </div>
+      <div style={{display:"flex", justifyContent:"space-between", marginTop:10}}>
+        {months.map(m=><span key={m} style={{fontSize:10, color:"var(--text-3)"}}>{m}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function Spark({ up }){
+  const d = up ? "M0 18 L8 14 L16 16 L24 9 L32 11 L40 3" : "M0 5 L8 10 L16 7 L24 14 L32 12 L40 18";
+  return <svg width="44" height="22" viewBox="0 0 40 22"><path d={d} fill="none" stroke={up?"var(--positive)":"var(--negative)"} strokeWidth="1.6"/></svg>;
+}
+
+const tickers = [
+  { t:"AAPL", units:"Units 104", v:"$ 1,721.3", d:"+1.3%" },
+  { t:"TSLA", units:"Units 124", v:"$ 1,521.3", d:"-1.3%" },
+  { t:"MSFT", units:"Units 10", v:"$ 1,721.3", d:"+1.3%" },
+  { t:"GOOG", units:"Units 50", v:"$ 1,721.3", d:"+2.1%" },
+  { t:"NVDA", units:"Units 104", v:"$ 1,721.3", d:"-0.8%" },
+];
+const overview = [
+  { stock:"TSLA", price:"$ 26,000.21", change:"+3.4%", cap:"$ 564.06 B", vol:"$ 379 B", up:true },
+  { stock:"AAPL", price:"$ 32,000.21", change:"-3.4%", cap:"$ 564.06 B", vol:"$ 379 B", up:false },
+  { stock:"NVDA", price:"$ 18,410.02", change:"+1.9%", cap:"$ 442.11 B", vol:"$ 214 B", up:true },
+];
+const watchlist = [
+  { n:"Spotify", s:"NYSE SPOT", v:"$ 2,30.5", d:"+2.45" },
+  { n:"Amazon", s:"NYSE AMZN", v:"$ 2,38.5", d:"+2.35" },
+  { n:"Airbnb", s:"NASDAQ ABNB", v:"$ 1,42.8", d:"-1.12" },
+];
+
+function App(){
+  const [theme, setTheme] = React.useState("dark");
+  const [nav, setNav] = React.useState("Dashboard");
+  const [range, setRange] = React.useState("6M");
+  const [filter, setFilter] = React.useState("All");
+  const [wl, setWl] = React.useState("Most Viewed");
+  return (
+    <div data-theme={theme === "light" ? "light" : undefined}
+      style={{display:"grid", gridTemplateColumns:"var(--sidebar-w) 1fr", minHeight:"100vh", background:"var(--bg-0)", transition:"background var(--transition-med)"}}>
+      {/* sidebar */}
+      <aside data-screen-label="Sidebar" style={{background:"var(--bg-sidebar)", borderRight:"1px solid var(--border-1)", padding:"22px 16px", display:"flex", flexDirection:"column", gap:4}}>
+        <div style={{fontSize:18, fontWeight:600, color:"var(--text-1)", padding:"0 14px"}}>Sto<span style={{color:"var(--accent)"}}>vest</span></div>
+        <div style={{padding:"22px 14px 6px"}}>
+          <div style={{fontSize:20, fontWeight:600, color:"var(--text-1)"}}>Welcome, Naya</div>
+          <div style={{fontSize:11, color:"var(--text-3)", marginTop:4}}>Here's your stock portfolio overview</div>
+        </div>
+        <SidebarSection label="Main Menu" />
+        {[["Dashboard","home"],["Portfolio","briefcase"],["Analysis","chart"],["Market","store"]].map(([l,i])=>
+          <SidebarItem key={l} icon={ic[i]} label={l} active={nav===l} onClick={()=>setNav(l)} />)}
+        <SidebarSection label="Support" />
+        {[["Community","users"],["Help & Support","help"]].map(([l,i])=>
+          <SidebarItem key={l} icon={ic[i]} label={l} active={nav===l} onClick={()=>setNav(l)} />)}
+      </aside>
+      <div style={{display:"flex", flexDirection:"column", minWidth:0}}>
+        {/* topbar */}
+        <header data-screen-label="Topbar" style={{height:"var(--topbar-h)", display:"flex", alignItems:"center", gap:12, padding:"0 24px", background:"var(--bg-sidebar)", borderBottom:"1px solid var(--border-1)"}}>
+          <div style={{display:"flex", gap:8}}>
+            {["Market","Wallets","Tools"].map(m=><Button key={m} variant="secondary" size="sm">{m}</Button>)}
+          </div>
+          <div style={{flex:1, display:"flex", justifyContent:"center"}}>
+            <Input icon={ic.search} placeholder="Ask stocks ai anything" style={{width:360}} />
+          </div>
+          <div style={{display:"flex", alignItems:"center", gap:10}}>
+            <span style={{fontSize:11, color:"var(--text-3)"}}>Light</span>
+            <Switch checked={theme==="light"} onChange={(v)=>setTheme(v?"light":"dark")} />
+            <IconButton label="Notifications">{ic.bell}</IconButton>
+            <IconButton label="Settings">{ic.gear}</IconButton>
+            <div style={{display:"flex", alignItems:"center", gap:10, paddingLeft:6}}>
+              <Avatar name="Naya Rachel" size={36} />
+              <div>
+                <div style={{fontSize:12, fontWeight:500, color:"var(--text-1)"}}>Naya Rachel</div>
+                <div style={{fontSize:10, color:"var(--text-3)"}}>rachel@gmail.com</div>
+              </div>
+            </div>
+          </div>
+        </header>
+        {/* content */}
+        <main data-screen-label="Dashboard" style={{padding:24, display:"flex", flexDirection:"column", gap:20}}>
+          <div style={{display:"grid", gridTemplateColumns:"320px 1fr", gap:20}}>
+            <Card title="Total Holding" action={<div style={{display:"flex", gap:6}}><Button variant="secondary" size="sm">6M {ic.chev}</Button></div>} style={{position:"relative", overflow:"hidden"}}>
+              {Rings}
+              <div style={{fontSize:"var(--text-3xl)", fontWeight:600, color:"var(--text-1)", letterSpacing:"-0.01em", margin:"6px 0 10px"}}>$ 12,304.11</div>
+              <div style={{display:"flex", alignItems:"center", gap:8}}>
+                <span style={{fontSize:12, color:"var(--text-2)"}}>Return</span>
+                <Delta value="+3.68 ($ 5.32)" />
+              </div>
+            </Card>
+            <Card title="My Portfolio" action={<Button variant="secondary" size="sm">See all</Button>}>
+              <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:12}}>
+                {tickers.map(t=><StatCard key={t.t} label={t.t} value={t.v} delta={t.d} sub={t.units} />)}
+              </div>
+            </Card>
+          </div>
+          <Card title="Portfolio Performance" action={<Tabs items={["1D","1W","1M","6M","1Y"]} value={range} onChange={setRange} />}>
+            <div style={{marginTop:28}}><AreaChart /></div>
+          </Card>
+          <div style={{display:"grid", gridTemplateColumns:"1fr 340px", gap:20}}>
+            <Card title="Portfolio Overview" action={<Tabs items={["All","Gainers","Losers"]} value={filter} onChange={setFilter} />}>
+              <DataTable
+                columns={[
+                  { key:"stock", label:"Stock" },
+                  { key:"price", label:"Last Price" },
+                  { key:"change", label:"Change %", render:r=><Delta value={r.change} /> },
+                  { key:"cap", label:"Market Cap" },
+                  { key:"vol", label:"Volume" },
+                  { key:"spark", label:"Last 7 days", align:"right", render:r=><Spark up={r.up} /> },
+                ]}
+                rows={filter==="Gainers"?overview.filter(r=>r.up):filter==="Losers"?overview.filter(r=>!r.up):overview} />
+            </Card>
+            <Card title="Watchlist" action={null}>
+              <Tabs items={["Most Viewed","Gainers","Losers"]} value={wl} onChange={setWl} style={{marginBottom:16}} />
+              <div style={{display:"flex", flexDirection:"column"}}>
+                {watchlist.map((w,i)=>(
+                  <div key={w.n} style={{display:"flex", alignItems:"center", gap:12, padding:"12px 0", borderBottom:i<watchlist.length-1?"1px solid var(--border-1)":"none"}}>
+                    <Avatar name={w.n} size={34} />
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13, fontWeight:500, color:"var(--text-1)"}}>{w.n}</div>
+                      <div style={{fontSize:11, color:"var(--text-3)"}}>{w.s}</div>
+                    </div>
+                    <div style={{textAlign:"right"}}>
+                      <div style={{fontSize:13, fontWeight:500, color:"var(--text-1)"}}>{w.v}</div>
+                      <Delta value={w.d} showArrow={false} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+})();
+</script></body></html>

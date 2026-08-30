@@ -1,0 +1,14 @@
+<!-- @dsCard group="Spacing" viewport="700x150" subtitle="Borders on dark, soft shadows on light" name="Depth" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;display:flex;font-family:var(--font-ui)}
+.half{flex:1;height:150px;padding:16px;box-sizing:border-box;display:flex;gap:12px;align-items:center}
+.c{flex:1;height:100px;border-radius:16px;display:flex;align-items:flex-end;padding:10px;font-size:11px;box-sizing:border-box}</style></head><body>
+<div class="half" style="background:var(--bg-0)">
+  <div class="c" style="background:var(--surface-1);border:1px solid var(--border-1);color:var(--text-2)">card · border only</div>
+  <div class="c" style="background:var(--surface-3);box-shadow:var(--shadow-pop);color:var(--text-2)">popover · --shadow-pop</div>
+</div>
+<div class="half" data-theme="light" style="background:var(--bg-0)">
+  <div class="c" style="background:var(--surface-1);border:1px solid var(--border-1);box-shadow:var(--shadow-card);color:var(--text-2)">card · soft shadow</div>
+  <div class="c" style="background:var(--surface-1);box-shadow:var(--shadow-pop);color:var(--text-2)">popover</div>
+</div>
+</body></html>

@@ -1,0 +1,17 @@
+<!-- @dsCard group="Colors" viewport="700x150" subtitle="Accent per theme — blue on dark, near-black on light" name="Accent" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;font-family:var(--font-ui);display:flex;padding:0}
+.half{flex:1;display:flex;gap:10px;padding:16px;align-items:center}
+.chip{height:38px;padding:0 18px;border-radius:999px;display:inline-flex;align-items:center;font-size:13px;font-weight:500}
+.dot{width:34px;height:34px;border-radius:50%}</style></head><body>
+<div class="half" style="background:var(--bg-0);height:150px;box-sizing:border-box">
+  <span class="chip" style="background:var(--accent);color:var(--accent-fg)">--accent</span>
+  <span class="chip" style="background:var(--accent-hover);color:#fff">hover</span>
+  <span class="chip" style="background:var(--accent-soft);color:var(--accent)">soft</span>
+</div>
+<div class="half" data-theme="light" style="background:var(--bg-0);height:150px;box-sizing:border-box">
+  <span class="chip" style="background:var(--accent);color:var(--accent-fg)">--accent</span>
+  <span class="chip" style="background:var(--accent-hover);color:#fff">hover</span>
+  <span class="chip" style="background:var(--accent-soft);color:var(--accent)">soft</span>
+</div>
+</body></html>

@@ -26,6 +26,14 @@ conversation that produced it.
 - Credit question: **OpenRouter $29.13 of $115 left**. Cartesia and Vapi
   publish no balance to these keys (404/401) — dashboard only. Recorded in
   HANDOVER so nobody re-probes to learn the same thing.
+- Owner pushed back on "Cartesia balance: dashboard only" — we have had full
+  access and checked it before. Correct: the 8 Aug outage was diagnosed by a
+  402 on synthesis, so the capability is the probe. Two-word `/tts/bytes`
+  calls on all three keys returned **200 with audio** — credit present on the
+  live key, the main key, **and on `CARTESIA_API_KEY_ACCOUNT1`, which this
+  repo describes as retired**. It is live and billable; flagged in HANDOVER.
+  No number is available anywhere an API key can reach (`/api-keys` needs a
+  dashboard session). Cost of the check: three clips of one Hebrew word.
 - Found on the way: Vapi 403s Python's default User-Agent (Cloudflare 1010),
   which reads like a revoked key. `curl/8.5.0` clears it; CONTEXT now carries
   the general rule, since Supabase's Management API has the same trap.

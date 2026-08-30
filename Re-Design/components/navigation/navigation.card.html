@@ -1,0 +1,35 @@
+<!-- @dsCard group="Components" viewport="700x260" subtitle="Pill tabs + sidebar navigation" name="Navigation" -->
+<!DOCTYPE html><html><head>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../demo-loader.js"></script>
+<style>body{margin:0;background:var(--bg-0);font-family:var(--font-ui)}</style>
+</head><body><div id="root"><div style="height:100vh;background:var(--bg-0)"></div></div>
+<script type="text/babel-demo">
+(async () => {
+const { Tabs, SidebarItem, SidebarSection } = await window.loadDS("../../components/", window.DS_ALL);
+const Home = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>;
+const Chart = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>;
+function Demo(){
+  const [tab, setTab] = React.useState("6M");
+  const [tab2, setTab2] = React.useState("All");
+  return (
+    <div style={{padding:20, display:"grid", gridTemplateColumns:"200px 1fr", gap:24}}>
+      <div>
+        <SidebarSection label="Main Menu" />
+        <SidebarItem icon={Home} label="Dashboard" active />
+        <SidebarItem icon={Chart} label="Analysis" />
+        <SidebarItem icon={Chart} label="Market" />
+      </div>
+      <div style={{display:"flex", flexDirection:"column", gap:14, paddingTop:12}}>
+        <Tabs items={["1D","1W","1M","6M","1Y"]} value={tab} onChange={setTab} />
+        <Tabs items={["All","Gainers","Losers"]} value={tab2} onChange={setTab2} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+})();
+</script></body></html>

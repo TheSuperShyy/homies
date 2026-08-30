@@ -889,9 +889,16 @@ handset.**
 - **Money and keys, measured 28 Aug.** OpenRouter (the WhatsApp bot's brain)
   reads **$29.13 left of $115** — `GET https://openrouter.ai/api/v1/credits`
   with the `OPENROUTER_API_KEY`, the one balance in this project an API will
-  tell you. **Cartesia has no balance or usage endpoint** (404 on both keys):
-  dashboard only. **Vapi exposes no credit to the private key** either
-  (`/subscription` 404, `/org` 401 — that one wants the public key).
+  tell you as a NUMBER. **Cartesia publishes no balance** (no usage endpoint;
+  `/api-keys` wants a dashboard session, not a key) — but the question that
+  matters is answerable: **a two-word `/tts/bytes` synthesis returns 200 when
+  the account can pay and 402 when it cannot**, which is exactly how the
+  8 Aug demo outage was diagnosed. Checked 28 Aug: `CARTESIA_API_KEY`,
+  `CARTESIA_MAIN_API_KEY` **and the supposedly retired `..._ACCOUNT1` all
+  returned 200** — so all three keys are live and billable, and ACCOUNT1 is
+  not as dead as this file said; treat it as a live key until somebody
+  revokes it in the dashboard. **Vapi exposes no credit to the private key**
+  either (`/subscription` 404, `/org` 401 — that one wants the public key).
 - **Vapi's API 403s on Python's default User-Agent** (`error code: 1010`,
   Cloudflare, not auth). Send `User-Agent: curl/8.5.0` and the same key works
   — this is why `vapi_export.py` succeeds where a hand-rolled urllib call

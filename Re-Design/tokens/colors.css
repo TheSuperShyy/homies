@@ -1,0 +1,82 @@
+/* Dark is the default theme (layout + design source of truth: Stovest dashboard).
+   Light theme scope: [data-theme="light"] — palette from the Skillset reference. */
+
+:root {
+  /* base — dark */
+  --bg-0: #060709;            /* app background */
+  --bg-sidebar: #0A0B0E;      /* sidebar / topbar chrome */
+  --surface-1: #101114;       /* card */
+  --surface-2: #16181D;       /* nested tile, pill button */
+  --surface-3: #1D2026;       /* hover / raised */
+  --border-1: #1E2127;        /* card outline */
+  --border-2: #2A2E36;        /* control outline, stronger */
+
+  --text-1: #FFFFFF;
+  --text-2: #9CA1AB;
+  --text-3: #62676F;
+  --text-inverse: #0B0C0E;
+
+  /* accent */
+  --accent: #2D7FF9;
+  --accent-hover: #4A90FA;
+  --accent-soft: rgba(45, 127, 249, 0.14);
+  --accent-fg: #FFFFFF;
+
+  /* semantic */
+  --positive: #22C55E;
+  --positive-soft: rgba(34, 197, 94, 0.12);
+  --negative: #EF4444;
+  --negative-soft: rgba(239, 68, 68, 0.12);
+
+  /* charts */
+  --chart-line: #2D7FF9;
+  --chart-fill-top: rgba(45, 127, 249, 0.35);
+  --chart-fill-bottom: rgba(45, 127, 249, 0.02);
+  --chart-grid: rgba(255, 255, 255, 0.05);
+
+  /* semantic aliases */
+  --pill-bg: var(--surface-2);
+  --pill-border: var(--border-2);
+  --input-bg: var(--surface-2);
+  --scrim: rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg-0: #E5E4E1;
+  --bg-sidebar: #FFFFFF;
+  --surface-1: #FFFFFF;
+  --surface-2: #F3F3F1;
+  --surface-3: #EAEAE7;
+  --border-1: #E4E3DF;
+  --border-2: #D4D3CF;
+
+  --text-1: #191B18;
+  --text-2: #6E726E;
+  --text-3: #9A9D9A;
+  --text-inverse: #FFFFFF;
+
+  /* Skillset palette: near-black primary, warm grays */
+  --accent: #22251F;
+  --accent-hover: #35382F;
+  --accent-soft: rgba(34, 37, 31, 0.08);
+  --accent-fg: #FFFFFF;
+
+  --positive: #2E9E57;
+  --positive-soft: rgba(46, 158, 87, 0.12);
+  --negative: #D0453F;
+  --negative-soft: rgba(208, 69, 63, 0.10);
+
+  --chart-line: #22251F;
+  --chart-fill-top: rgba(34, 37, 31, 0.22);
+  --chart-fill-bottom: rgba(34, 37, 31, 0.02);
+  --chart-grid: rgba(0, 0, 0, 0.06);
+
+  --pill-bg: #FFFFFF;
+  --pill-border: #D4D3CF;
+  --input-bg: #FFFFFF;
+  --scrim: rgba(25, 27, 24, 0.4);
+
+  color-scheme: light;
+}
