@@ -57,7 +57,10 @@ VARIABLES = {
     "month": "אוגוסט",            # "this month" — today is 3 Aug 2026
     "amount": "500",
     "card_last4": "0715",         # supplied as 715, padded: the field is four digits
-    "callback_number": "03-1234567",
+    # THE REAL OFFICE LINE, since 30 Aug. It was 03-1234567 — a placeholder,
+    # in the one script here that dials for real. --go with that in place
+    # tells a resident to call a number that is not Homies.
+    "callback_number": os.environ.get("HOMIES_CALLBACK_NUMBER", "077-6687949"),
     "verification_email": "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל",
     "attempt": "1",
 }

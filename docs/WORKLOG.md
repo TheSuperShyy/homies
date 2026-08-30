@@ -36,6 +36,30 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### The office line, confirmed by the owner, and two things it turned up
+
+- **077-6687949 is the office number.** Already correct everywhere the live
+  path uses it: `dashboard/lib/call.ts` (the Call button, overridable with
+  `HOMIES_CALLBACK_NUMBER`), both Hebrew prompts, the WhatsApp prompt, the FAQ,
+  `voice_guard.py`'s safe-sentence list and `prompt_probe.py`. Nothing to change
+  there.
+- **Four scripts were handing the agent `03-1234567`**, a placeholder, and one
+  of them is `vapi_call.py`, which places a real outbound call with `--go`. That
+  combination tells a resident to ring a number that is not Homies. All four
+  now read `HOMIES_CALLBACK_NUMBER` with the real line as the fallback, the same
+  variable the dashboard already uses, so `.env` is the one place to change it.
+  The other three (`vapi_duel.py`, `vapi_eval.py`, `vapi_mock.py`) are
+  simulations where it was harmless but meant the agent was never rehearsed on
+  the digits it actually has to say -- 077-6687949 is ten digits and the
+  placeholder was nine, which is a different grouping under yesterday's
+  digit rule.
+- **`scripts/vapi_mock.py` has not compiled since 18 Aug.** Two lines of a
+  comment block lost their `#` in `faaef6f` and the file has been a
+  `SyntaxError` ever since. Two commits touched it in the twelve days after
+  without noticing, because nothing in this repo compiles the scripts and nobody
+  ran that one. Found only because a patch to it failed. Restored; `py_compile`
+  now passes on every file in `scripts/`.
+
 ### Told to work the Hebrew and leave the English twins alone
 
 - **Owner's direction: "focus in the hebrew not in english since they operate

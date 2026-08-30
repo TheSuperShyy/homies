@@ -72,7 +72,7 @@ VARIABLES = {
     "unit": "123",
     "month": "אוגוסט",
     "amount": "500",
-    "callback_number": "03-1234567",
+    "callback_number": os.environ.get("HOMIES_CALLBACK_NUMBER", "077-6687949"),
     "verification_email": "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל",
     "attempt": "1",
 }

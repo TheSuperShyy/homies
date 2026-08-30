@@ -40,10 +40,12 @@ SOURCE = "8f927b15-a02f-436d-a87d-acf23abecb9b"   # Homies — Debt Follow-up (h
 PREFIX = "Homies — Debt TEST: "
 
 # Org-level constants. Not per-resident, so they are not in the seed.
-CALLBACK_NUMBER = "03-1234567"
+# The office line. Same value and same override as the dashboard's Call
+# button (dashboard/lib/call.ts), so .env is the one place to change it.
+CALLBACK_NUMBER = os.environ.get("HOMIES_CALLBACK_NUMBER", "077-6687949")
 # Spoken, not written. See web/index.html for why this is a sentence rather
-than an address: a Hebrew voice given Latin text sounds it out, and guesses
-differently every reading.
+# than an address: a Hebrew voice given Latin text sounds it out, and guesses
+# differently every reading.
 VERIFICATION_EMAIL = "אופיס, שטרודל, הומיז, נקודה, סי, או, נקודה, איי, אל"
 
 # The three finished forms {{gender_forms}} can take. Kept in step with the copy

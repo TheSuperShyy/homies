@@ -530,6 +530,20 @@ the sentence quoted in the prompt's own status section. Push those by patching
 the live nodes in place; `--apply` overwrites a workflow that is ahead of the
 repo script.
 
+**Nothing compiles the scripts, so run `python -m py_compile scripts/*.py`
+before committing one.** `vapi_mock.py` was a `SyntaxError` for twelve days
+from 18 Aug -- two comment lines lost their `#` -- and two later commits touched
+the file without noticing. There is no test suite here and no CI step that would
+have caught it; the only reason it surfaced is that a patch to the file failed.
+A script in this repo is usually run by hand, months apart, which is exactly the
+condition under which a broken one stays broken.
+
+**One real value, one env var, everywhere.** The office line is 077-6687949 and
+it is read from `HOMIES_CALLBACK_NUMBER` with that as the fallback -- in
+`dashboard/lib/call.ts` and now in the four Python scripts that used to hardcode
+`03-1234567`. A placeholder is safe in a simulation and dangerous in
+`vapi_call.py`, which dials for real, and the two look identical in a diff.
+
 **Hebrew is the product; the English twins are not.** Owner's direction,
 30 Aug: work the Hebrew and leave English alone — the two operate differently,
 so a change reasoned out for Hebrew prosody or Hebrew grammar does not become

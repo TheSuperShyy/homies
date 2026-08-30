@@ -278,6 +278,17 @@ say anyone is being put through.
 
 ---
 
+**The office line is 077-6687949**, confirmed by the owner 30 Aug. Read from
+`HOMIES_CALLBACK_NUMBER` where it is used, with that as the fallback, so it is
+set in one place. It was already right in the live path; four scripts carried
+`03-1234567` and were fixed, including `vapi_call.py`, which dials for real with
+`--go`.
+
+**`scripts/vapi_mock.py` did not compile between 18 and 30 Aug** and anyone who
+tried to run it in that window got a `SyntaxError`, not a result. Fixed. Nothing
+here compiles the scripts, so run `python -m py_compile scripts/*.py` before
+committing one -- see CONTEXT.md.
+
 **A prompt change is three files, all Hebrew.** `docs/assistant/demo-inbound.md`
 (inbound), `docs/features/10-debt-followup/prompt.md` (debt), and the `"first"`
 string in `scripts/prompt_probe.py`, which opens every probe run and is silent
