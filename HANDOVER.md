@@ -278,6 +278,21 @@ say anyone is being put through.
 
 ---
 
+**DEFECT CLOSED 30 Aug: the inbound agent broke when asked for the office
+number.** Call `01a05232` produced `ב0.7`, `7`, then `6.` thirty-eight times.
+The prompt held the number as the numeral `077-6687949`; Vapi's formatter cut it
+into single digits (`numberToDigitsCutoff` default 2025, nothing sets it) and
+`voice_guard.py`'s tail pad added 300ms after each. Both Hebrew prompts now
+carry the number in words. **Do not put a numeral phone number back into a voice
+prompt.**
+
+**DEFECT OPEN: `{{callback_number}}` is still a numeral** and will break the
+same way in the debt agent's voicemail line. The value comes from
+`dashboard/lib/call.ts` and four scripts under `scripts/`. Not urgent — there is
+no phone number on the account, so no voicemail is reachable — but the fix is
+the same: store it spoken, as `vapi_mock.py` already does for the verification
+email.
+
 **The office line is 077-6687949**, confirmed by the owner 30 Aug. Read from
 `HOMIES_CALLBACK_NUMBER` where it is used, with that as the fallback, so it is
 set in one place. It was already right in the live path; four scripts carried

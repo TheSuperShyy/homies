@@ -36,6 +36,46 @@ conversation that produced it.
 
 ## 2026-08-30
 
+### Why the agent got stuck on the office number, and the answer it gives now
+
+- **The call is on record and the chain is complete.** Call `01a05232`, 10:24.
+  Asked for the office number, the agent produced
+  `אפשר לפנות למשרד ב0.7`, then `7`, then `6.` thirty-eight times.
+  The resident hung up.
+- **The cause is one line of the prompt, not the model.** The FAQ answer was
+  written `אין בעיה. אפשר לפנות למשרד ב־077-6687949.` — a **numeral**. The
+  model copies a fixed fact verbatim, as it is told to, so a numeral is what
+  reached Vapi. Vapi then split it: `numberToDigitsCutoff` is unset, its default
+  is 2025, and 6687949 is above it. The full stops in `0.7` are Vapi's, not ours.
+- **And our own guard doubled it.** `PAD_RULES` appends `<break time="300ms"/>`
+  to any chunk ending in a full stop — written on 26 Aug because Cartesia leaves
+  43-135ms of tail and the teardown lands inside the last word. Applied to a
+  number Vapi has just cut into `0. 7. 7. 6. 6. ...` it puts 300ms of silence
+  after **every digit**. Ten digits, three seconds of monotone. Whether the
+  thirty-eight sixes were the voice looping or nova-3 looping on flat repetitive
+  audio cannot be settled: recording is off by client instruction, so there is
+  no audio, and both are known failure modes on exactly this input.
+- **Fixed by removing the numeral, not by tuning the formatter.** The number is
+  now written the way it must be said —
+  *אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע* — three groups, one
+  comma between them, no digits and no hyphen. Nothing is left for the formatter
+  to convert, and each of the three chunks gets one pad, which is what the pad
+  is for. Same in the debt prompt's office block, and the rule generalised
+  beside the digit rules: **a phone number is written in words, never in digits,
+  never with a hyphen.** `vapi_mock.py` has used exactly this principle for the
+  verification email since long before — *spoken, not written* — and nobody had
+  carried it to the phone number.
+- **The answer around it changed too, which was the actual request.** It used to
+  be a dismissal: give the number, `transfer_to_human`, close. It now gives the
+  number **and** offers to put them through, with the honest caveat that there
+  is a queue, and ends on a question. Written as content rather than a script —
+  the three things that must be said, in the agent's own words — because the
+  owner asked for the WhatsApp bot's substance without its rigidity.
+- **Still open:** `{{callback_number}}` is a numeral, so the debt agent's
+  voicemail line will break the same way. Not fixed here — it is a value passed
+  from `dashboard/lib/call.ts` and four scripts, and there is no phone number on
+  the account so no voicemail is reachable.
+
 ### The office line, confirmed by the owner, and two things it turned up
 
 - **077-6687949 is the office number.** Already correct everywhere the live

@@ -554,6 +554,24 @@ passes structurally, which is all it was ever asked to do. Related:
 [[hebrew-is-not-a-translation]] — carry the meaning, then pick the words that
 language really uses.
 
+**A fact the agent reads aloud is stored in its spoken form, not its written
+one.** A phone number goes in the prompt as `אפס שבע שבע, שש שש שמונה, ...`,
+never as `077-6687949`; an email as `אופיס, שטרודל, ...`, never as an address.
+The model is told to hand these over verbatim, so whatever form the prompt uses
+is the form that reaches the voice — and a numeral does not reach it intact.
+Vapi's formatter cuts any number above `numberToDigitsCutoff` (default 2025)
+into single digits separated by full stops before the voice sees it, and our own
+tail pad then adds 300ms after each one. That is what broke the office number on
+30 Aug. `vapi_mock.py` had used the spoken form for the verification email since
+long before, with the reason written next to it; nobody had carried it across.
+
+**The pad is not the bug, but it doubles one.** `PAD_RULES` in `voice_guard.py`
+appends 300ms to every chunk ending in a full stop, and it earns its place —
+Cartesia leaves 43-135ms of tail and the teardown lands inside the last word
+without it. It also amplifies anything that produces many small
+sentence-ending chunks. When a turn sounds slow, find what is generating the
+full stops before touching the pad.
+
 **Punctuation in a voice prompt is performed, not read.** Every comma is a
 pause the voice takes and every full stop is a falling ending, so what looks
 like a formatting choice in the text is a timing instruction in the audio. This
