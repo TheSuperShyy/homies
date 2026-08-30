@@ -113,57 +113,124 @@ export function Legend({ slices, total, emptyNote }: {
 export type Day = { date: string; label: string; value: number };
 
 /**
- * Tickets opened per day.
+ * One metric's own card: its number, how it moved, and its shape over the
+ * chosen window.
  *
- * "Daily" is change over time, and a ring cannot show change over time — a pie
- * of seven days would answer "which day was busiest" and refuse to answer
- * "is this getting better", which is the question a daily number is asked. So
- * the same period gets a column chart as well as a segment of the donut.
+ * "Each with its own metrics" is small multiples — three charts on the same
+ * time axis, each with its OWN vertical scale. That is not a dual axis, which
+ * is the thing never to build: a dual axis puts two scales behind one set of
+ * marks and invents a correlation. Here each chart owns its frame, and the
+ * reader compares shapes rather than heights. It also means 171 tickets and 0
+ * payment links can sit side by side without the second one being an invisible
+ * line along the floor.
  *
- * One series, so one hue and no legend: the title names it. Only the largest
- * day is labelled directly — a number over every column is the noise this is
- * meant to replace, and the rest are one hover away.
+ * THE DELTA IS DELIBERATELY NOT GREEN OR RED. The design system colours its
+ * deltas as gains and losses, which is right for a stock and wrong for this:
+ * more tickets opened is not good news and fewer is not bad news, and painting
+ * it green would be the dashboard making a judgement it has no basis for. It
+ * stays in muted ink with an arrow, which states the direction and leaves the
+ * meaning to the person reading it.
  */
-export function DailyBars({ days, emptyLabel }: { days: Day[]; emptyLabel: string }) {
+export function MetricCard({
+  label, value, token, days, previous, prevLabel, emptyLabel, note,
+}: {
+  label: string; value: number; token: string; days: Day[];
+  previous: number; prevLabel: string; emptyLabel: string; note?: string;
+}) {
+  // No previous period means no percentage — dividing by zero is not "up
+  // 100%", it is "there is nothing to compare this with". The row still
+  // occupies its height so the three cards stay aligned; it just says nothing,
+  // which is the honest thing for it to say.
+  const delta = previous > 0
+    ? Math.round(((value - previous) / previous) * 100)
+    : null;
+  return (
+    <div className="metric">
+      <div className="metric-head">
+        <span className="sw" style={{ background: `var(${token})` }} aria-hidden="true" />
+        <span className="metric-k">{label}</span>
+      </div>
+      <div className="metric-n">{value}</div>
+      <div className="metric-d">
+        {delta !== null && (
+          <span className="faint">
+            <span aria-hidden="true">{delta > 0 ? '↑' : delta < 0 ? '↓' : '→'}</span>{' '}
+            {Math.abs(delta)}% {prevLabel}
+          </span>
+        )}
+      </div>
+      <Bars days={days} token={token} emptyLabel={emptyLabel} />
+      {note && <p className="metric-note">{note}</p>}
+    </div>
+  );
+}
+
+/**
+ * The columns.
+ *
+ * One series, one hue — the hue belongs to the metric, not to its rank, so
+ * tickets stay blue whether they are the biggest number on the page or the
+ * smallest. Only the largest column is labelled: a number over every column is
+ * the noise a chart exists to replace, and the rest carry a `<title>`.
+ */
+export function Bars({
+  days, token, emptyLabel,
+}: { days: Day[]; token: string; emptyLabel: string }) {
   const max = Math.max(...days.map((d) => d.value), 1);
   const peak = days.reduce((a, b) => (b.value > a.value ? b : a), days[0]);
-  if (!days.some((d) => d.value > 0)) {
+  if (!days.length || !days.some((d) => d.value > 0)) {
     return <div className="chart-empty">{emptyLabel}</div>;
   }
+  // Thin the axis labels rather than letting them collide. Every column keeps
+  // its `<title>` and its place in the aria-label, so nothing is lost — the
+  // axis just stops trying to name all fourteen of them in 240px.
+  const every = Math.ceil(days.length / 7);
   return (
     <div className="bars" role="img"
          aria-label={days.map((d) => `${d.label}: ${d.value}`).join(', ')}>
-      {days.map((d) => (
+      {days.map((d, i) => (
         <div className="bar" key={d.date}>
           <div className="barval">
-            {/* Selective direct labels: the peak only. */}
             {d.date === peak.date && d.value > 0 ? d.value : ' '}
           </div>
           <div className="barwrap">
             <div className="barfill"
-                 style={{ height: `${Math.max((d.value / max) * 100, d.value > 0 ? 3 : 0)}%` }}
+                 style={{
+                   background: `var(${token})`,
+                   height: `${Math.max((d.value / max) * 100, d.value > 0 ? 3 : 0)}%`,
+                 }}
                  title={`${d.label}: ${d.value}`} />
           </div>
-          <div className="barlab">{d.label}</div>
+          <div className="barlab">
+            {i % every === 0 || i === days.length - 1 ? d.label : ' '}
+          </div>
         </div>
       ))}
     </div>
   );
 }
 
+/* ------------------------------------------------------------- buckets --- */
+
 /**
- * Buckets rows into calendar days.
+ * Rows -> columns, over an arbitrary window.
  *
- * IN JERUSALEM TIME, NOT UTC, and that is the whole reason this is a function
- * rather than a `slice(0, 10)`. Supabase returns `created_at` as UTC, Israel
- * runs two or three hours ahead of it, and slicing the ISO string files
- * anything logged between midnight and 03:00 local under the previous day —
- * so an early-morning emergency call would appear on the wrong column, and the
- * column labels, which ARE formatted in Jerusalem time, would disagree with
- * the bars above them. Both sides use the same zone now.
+ * TWO THINGS THIS GETS RIGHT AND A `slice(0, 10)` DOES NOT.
  *
- * A day with no rows stays in the list as a zero, so an empty Tuesday is a gap
- * you can see rather than a column that quietly is not there.
+ * 1. THE ZONE. Supabase returns `created_at` in UTC and Israel runs two or
+ *    three hours ahead, so slicing the ISO string files anything logged between
+ *    midnight and 03:00 local under the previous day — an early-morning
+ *    emergency call lands on the wrong column, and the labels, which ARE
+ *    formatted in Jerusalem time, then disagree with the bars above them.
+ *
+ * 2. THE BUCKET SIZE. Once the reader can pick their own range, "one column per
+ *    day" stops working: ninety days is ninety slivers two pixels wide with
+ *    unreadable labels underneath. So the window picks the bucket — days up to
+ *    about a month, then weeks, then months — and the chart never draws more
+ *    than ~31 columns whatever range is asked for.
+ *
+ * Empty buckets are kept as zeroes. A week with nothing in it is a fact worth
+ * seeing, and dropping it would silently compress the time axis.
  */
 const TZ = 'Asia/Jerusalem';
 // en-CA because it is the locale whose short date IS `YYYY-MM-DD`, which makes
@@ -172,21 +239,80 @@ const KEY = new Intl.DateTimeFormat('en-CA', {
   timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
 });
 
-export function byDay(
+export type Grain = 'day' | 'week' | 'month';
+
+/**
+ * The thresholds are set by the WIDTH OF A CARD, not by what looks reasonable
+ * on a full-width chart. Each metric now lives in its own ~240px column, and
+ * thirty daily columns in 240px is thirty five-pixel slivers with unreadable
+ * labels underneath — so a month rolls up to weeks and a quarter still does,
+ * and only a range longer than about fourteen weeks goes to months. The rule
+ * of thumb: never more than ~14 columns in a card this size.
+ */
+export function grainFor(spanDays: number): Grain {
+  if (spanDays <= 14) return 'day';
+  if (spanDays <= 98) return 'week';
+  return 'month';
+}
+
+/** The key a date falls under, for the chosen grain. Weeks start on Sunday,
+ *  which is the Israeli working week — a Monday-start grid would split every
+ *  week the office actually works. */
+function bucketKey(d: Date, grain: Grain): string {
+  const iso = KEY.format(d);              // YYYY-MM-DD in Jerusalem
+  if (grain === 'day') return iso;
+  if (grain === 'month') return iso.slice(0, 7) + '-01';
+  const [y, m, day] = iso.split('-').map(Number);
+  const at = new Date(Date.UTC(y, m - 1, day));
+  at.setUTCDate(at.getUTCDate() - at.getUTCDay());   // back to Sunday
+  return at.toISOString().slice(0, 10);
+}
+
+function step(d: Date, grain: Grain) {
+  const n = new Date(d);
+  if (grain === 'day') n.setUTCDate(n.getUTCDate() + 1);
+  else if (grain === 'week') n.setUTCDate(n.getUTCDate() + 7);
+  else n.setUTCMonth(n.getUTCMonth() + 1);
+  return n;
+}
+
+export function bucketSeries(
   rows: { created_at: string }[] | null | undefined,
-  days: number,
-  fmt: (d: Date) => string,
+  from: string,
+  to: string,
+  grain: Grain,
+  label: (isoKey: string, grain: Grain) => string,
 ): Day[] {
   const out: Day[] = [];
-  const now = new Date();
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * 864e5);
-    out.push({ date: KEY.format(d), label: fmt(d), value: 0 });
+  const end = new Date(to + 'T00:00:00Z');
+  let cur = new Date(bucketKey(new Date(from + 'T12:00:00Z'), grain) + 'T00:00:00Z');
+  // The 400 cap is a guard, not a limit: `grainFor` already keeps this under
+  // ~31, and an unbounded while-loop over user-supplied dates is how a bad URL
+  // becomes a hung request.
+  for (let i = 0; cur <= end && i < 400; i++) {
+    const key = cur.toISOString().slice(0, 10);
+    out.push({ date: key, label: label(key, grain), value: 0 });
+    cur = step(cur, grain);
   }
   const index = new Map(out.map((d) => [d.date, d]));
   for (const r of rows ?? []) {
-    const hit = index.get(KEY.format(new Date(r.created_at)));
+    const hit = index.get(bucketKey(new Date(r.created_at), grain));
     if (hit) hit.value += 1;
   }
   return out;
+}
+
+/** Column labels in the reader's language, sized to the grain: weekday
+ *  initials for a short window, day/month once there are too many for that. */
+export function labeller(locale: 'he' | 'en', spanDays: number) {
+  const l = locale === 'he' ? 'he-IL' : 'en-GB';
+  const wd = new Intl.DateTimeFormat(l, { timeZone: 'UTC', weekday: 'short' });
+  const dm = new Intl.DateTimeFormat(l, { timeZone: 'UTC', day: 'numeric', month: 'short' });
+  const mo = new Intl.DateTimeFormat(l, { timeZone: 'UTC', month: 'short' });
+  return (key: string, grain: Grain) => {
+    const d = new Date(key + 'T00:00:00Z');
+    if (grain === 'month') return mo.format(d);
+    if (grain === 'week') return dm.format(d);
+    return spanDays <= 10 ? wd.format(d) : dm.format(d);
+  };
 }

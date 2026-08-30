@@ -808,6 +808,38 @@ button[disabled]:hover { background: var(--pill-bg); }
   font-family: ui-monospace, monospace;
 }
 
+/* ---------------------------------------------------------- date range -- */
+/* One row, above the charts it scopes, presets before the calendar. The
+   calendar is `<input type="date">` — the browser's own picker, which is a
+   real month grid, keyboard-operable and already translated into the reader's
+   language, for none of the 30-50kB a React date picker would add to a page
+   that otherwise ships 189 bytes. */
+.rangewrap { padding: 16px 20px; border-block-end: 1px solid var(--border-1); }
+.rangebar {
+  display: flex; align-items: center; gap: 16px 20px; flex-wrap: wrap;
+}
+.rangebar .seg { margin: 0; }
+.rangeform { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rangeform label { display: flex; align-items: center; gap: 8px; }
+.rangeform label > span { font-size: var(--text-sm); color: var(--text-3); }
+.rangeform input[type="date"] {
+  font: inherit; font-size: var(--text-sm);
+  height: var(--control-sm); padding-inline: 14px;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+/* The picker's own calendar glyph is drawn near-black by the browser and
+   vanishes on a dark control. Inverting it is the only way to recolour a
+   shadow-DOM part that exposes nothing else. */
+.rangeform input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(.55); cursor: pointer;
+}
+[data-theme="light"] .rangeform input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none; opacity: .55;
+}
+.rangeform button { height: var(--control-sm); }
+
 /* --------------------------------------------------------------- charts -- */
 /* Two charts, one card. The ring answers "what did the system do this week",
    the columns answer "is that going up or down" — a ring cannot answer the
@@ -817,13 +849,52 @@ button[disabled]:hover { background: var(--pill-bg); }
    surface, no dashed grid (dashing reads as a threshold when it is only a
    grid), thin marks, and the saturated fills kept small. */
 .chartcard {
-  display: grid; gap: 24px; padding: 20px;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-  align-items: center;
+  display: grid; gap: 20px; padding: 20px;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  align-items: start;
 }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .chartcard { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The mix, and then each metric on its own. The ring answers "what share",
+   the three cards answer "how many, and which way is it going" — the same
+   three numbers doing two different jobs, which is why both earn their place
+   rather than one repeating the other. */
+.mixtile {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  padding: 16px; border: 1px solid var(--border-1); border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.mixtile .legendlist { width: 100%; }
+
+.metrics {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.metric {
+  display: flex; flex-direction: column;
+  padding: 16px; border: 1px solid var(--border-1); border-radius: var(--radius-md);
+  background: var(--surface-2); min-width: 0;
+}
+.metric-head { display: flex; align-items: center; gap: 8px; }
+.metric-head .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.metric-k { font-size: var(--text-sm); color: var(--text-2); }
+.metric-n {
+  font-size: var(--text-2xl); font-weight: var(--weight-semibold);
+  letter-spacing: -.01em; font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight); margin-block-start: 8px;
+}
+/* The direction, in muted ink — never the gain/loss green and red the design
+   system uses for a stock. More tickets opened is not good news and fewer is
+   not bad news, and colouring it would be the dashboard passing a judgement it
+   has no basis for. */
+.metric-d { font-size: var(--text-xs); min-height: 16px; margin-block-end: 12px; }
+.metric-note {
+  margin: 12px 0 0; font-size: var(--text-xs); color: var(--text-3); line-height: 1.45;
+}
+.metric .bars, .metric .chart-empty { min-height: 104px; }
+.metric .bar { height: 104px; }
 
 .donutwrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 .donut { display: block; flex: none; }

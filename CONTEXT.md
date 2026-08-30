@@ -35,6 +35,15 @@ heights, radii, paddings -- are copied from the system's components, not
 re-invented; where a number is copied the CSS comment names the component it
 came from.
 
+**Filters scope the whole panel, live in the URL, and put presets before a
+calendar.** One row above the charts, never a picker per chart — three ranges
+on one screen produce three numbers nobody can compare, and the first question
+asked of a dashboard is whether one thing moved while another did. The range
+belongs in the URL for the same reason every other filter here does: a view
+should be a link you can send a colleague. And a percentage against a zero
+baseline is not shown at all; dividing by zero is "nothing to compare with",
+not "up 100%".
+
 **A chart's numbers are checked against the database before it is drawn, and
 its colours are computed rather than chosen.** Both rules were earned on the
 same afternoon: one of the three metrics asked for had never had a row in its

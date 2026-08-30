@@ -1161,6 +1161,21 @@ handset.**
   middleware now sets `x-user-email` on the request headers alongside
   `x-pathname` and the layout reads that. **Do not reintroduce `getUser()` in a
   layout or page**; the middleware is the only place that should call it.
+- **The overview's date filter is `?from=&to=` in the URL**, defaulting to the
+  last seven days, and it scopes every chart on the panel. Presets are plain
+  links; the custom range is the one client component
+  (`components/date-range.tsx`, `<input type="date">` — the browser's own
+  picker). Both dates are validated in the page: reversed pairs are swapped, a
+  future `to` is clamped, and a span over 366 days is cut back, because those
+  queries pull rows rather than counts.
+- **Bucket size is chosen by span, and the thresholds are set by CARD width.**
+  <=14 days daily, <=98 weekly, beyond that monthly — never more than 14 columns
+  in a ~240px card. If you widen those cards, `grainFor` in
+  `components/charts.tsx` is the one place to change.
+- **A `to` date is inclusive, so the query bound is the start of the NEXT day
+  and exclusive.** Using `lte` on the date drops everything logged after
+  midnight on the last day of the range. Same reasoning as the Jerusalem
+  bucketing note below — both bit once already.
 - **The overview's charts read three tables, and one of them is empty.**
   `requests` and `interactions` (channel `voice`) have real data;
   **`payment_links` has never had a single row.** `send_payment_link` writes one

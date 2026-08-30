@@ -1,22 +1,63 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, label, translator, when } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
-import { Donut, DailyBars, Legend, byDay, type Slice } from '@/components/charts';
+import {
+  Donut, Legend, MetricCard, bucketSeries, grainFor, labeller, type Slice,
+} from '@/components/charts';
+import { DateRange } from '@/components/date-range';
 import Link from 'next/link';
 
-export default async function Overview() {
+/** A calendar day in Jerusalem, as `YYYY-MM-DD`. Every date on this page is
+ *  computed in the office's own zone — the alternative is a "today" that turns
+ *  over at 2am local and a "last 7 days" that is sometimes six. */
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const JDAY = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit',
+});
+const jday = (d: Date) => JDAY.format(d);
+const shift = (iso: string, days: number) =>
+  jday(new Date(new Date(iso + 'T12:00:00Z').getTime() + days * 864e5));
+const spanOf = (from: string, to: string) =>
+  Math.round((Date.parse(to + 'T12:00:00Z') - Date.parse(from + 'T12:00:00Z')) / 864e5) + 1;
+
+export default async function Overview({
+  searchParams,
+}: { searchParams?: { from?: string; to?: string } }) {
   const db = serverClient();
   const locale = getLocale();
   const t = translator(locale);
   const since = new Date(Date.now() - 7 * 864e5).toISOString();
 
-  // The charts' window. Seven days, the same seven the table under them
-  // covers — two windows on one page means every number has to be read twice
-  // before it can be compared with the one beside it.
-  const week = new Date(Date.now() - 7 * 864e5).toISOString();
+  // ---- the window -------------------------------------------------------
+  // Whatever the reader picked, or the last seven days. VALIDATED, not
+  // trusted: both dates arrive from the URL, and a malformed or reversed pair
+  // should give the default view rather than an empty chart or a hung request.
+  const today = jday(new Date());
+  const ok = (v?: string) => (DATE_RE.test(v ?? '') ? v! : undefined);
+  let to = ok(searchParams?.to) ?? today;
+  let from = ok(searchParams?.from) ?? shift(to, -6);
+  if (from > to) [from, to] = [to, from];
+  if (to > today) to = today;
+  // A year is the cap. Not a policy, a guard: the three queries below pull
+  // rows rather than counts, and an unbounded range is a request to send the
+  // whole table to the browser.
+  if (spanOf(from, to) > 366) from = shift(to, -365);
+
+  const span = spanOf(from, to);
+  const grain = grainFor(span);
+  // Bounds for the query. `to` is a whole day, so the upper bound is the START
+  // of the next day and exclusive — `lte` on a date silently drops everything
+  // logged after midnight on the last day of the range, which is the last day
+  // anybody actually looks at.
+  const gte = from + 'T00:00:00+03:00';
+  const lt = shift(to, 1) + 'T00:00:00+03:00';
+  // The same length again, immediately before it, so each metric can say which
+  // way it moved.
+  const prevFrom = shift(from, -span) + 'T00:00:00+03:00';
 
   const [tickets, open, urgent, convos, calls, recent,
-         weekTickets, weekCalls, weekLinks] = await Promise.all([
+         winTickets, winCalls, winLinks,
+         prevTickets, prevCalls, prevLinks] = await Promise.all([
     db.from('requests').select('*', { count: 'exact', head: true }),
     db.from('requests').select('*', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
     db.from('requests').select('*', { count: 'exact', head: true }).in('urgency', ['high', 'emergency']).in('status', ['open', 'in_progress']),
@@ -30,24 +71,60 @@ export default async function Overview() {
     // day, and one trip is cheaper than two. `payment_links` is filtered to
     // `sent`: a row is written when the agent RAISES a link, and raising one is
     // not sending it.
-    db.from('requests').select('created_at').gte('created_at', week),
-    db.from('interactions').select('created_at').eq('channel', 'voice').gte('created_at', week),
-    db.from('payment_links').select('created_at').eq('status', 'sent').gte('created_at', week),
+    db.from('requests').select('created_at').gte('created_at', gte).lt('created_at', lt),
+    db.from('interactions').select('created_at').eq('channel', 'voice')
+      .gte('created_at', gte).lt('created_at', lt),
+    db.from('payment_links').select('created_at').eq('status', 'sent')
+      .gte('created_at', gte).lt('created_at', lt),
+
+    // The period before, for the deltas. Counts only — nothing plots these, so
+    // pulling the rows would be three round trips of data nobody reads.
+    db.from('requests').select('*', { count: 'exact', head: true })
+      .gte('created_at', prevFrom).lt('created_at', gte),
+    db.from('interactions').select('*', { count: 'exact', head: true }).eq('channel', 'voice')
+      .gte('created_at', prevFrom).lt('created_at', gte),
+    db.from('payment_links').select('*', { count: 'exact', head: true }).eq('status', 'sent')
+      .gte('created_at', prevFrom).lt('created_at', gte),
   ]);
 
-  const slices: Slice[] = [
-    { key: 'tickets', label: t('chart.tickets'), value: weekTickets.data?.length ?? 0, token: '--cat-1' },
-    { key: 'calls',   label: t('chart.calls'),   value: weekCalls.data?.length ?? 0,   token: '--cat-2' },
-    { key: 'links',   label: t('chart.links'),   value: weekLinks.data?.length ?? 0,   token: '--cat-3' },
-  ];
+  // COLOUR FOLLOWS THE ENTITY, NEVER ITS RANK. Tickets are slot 1 whether they
+  // are the biggest number on the page or the smallest, so a reader who
+  // learned "orange is calls" is never re-taught by changing the date range.
+  const lab = labeller(locale, span);
+  const metrics = [
+    { key: 'tickets', token: '--cat-1', label: t('chart.tickets'),
+      rows: winTickets.data, prev: prevTickets.count ?? 0,
+      note: undefined as string | undefined },
+    { key: 'calls', token: '--cat-2', label: t('chart.calls'),
+      rows: winCalls.data, prev: prevCalls.count ?? 0,
+      note: undefined as string | undefined },
+    { key: 'links', token: '--cat-3', label: t('chart.links'),
+      rows: winLinks.data, prev: prevLinks.count ?? 0,
+      note: (winLinks.data?.length ?? 0) === 0 ? t('chart.linksNote') : undefined },
+  ].map((m) => ({
+    ...m,
+    value: m.rows?.length ?? 0,
+    series: bucketSeries(m.rows, from, to, grain, lab),
+  }));
+
+  const slices: Slice[] = metrics.map((m) => ({
+    key: m.key, label: m.label, value: m.value, token: m.token,
+  }));
   const activity = slices.reduce((n, s) => n + s.value, 0);
 
-  // Weekday initials in the reader's own language, from the same Intl the
-  // dates in the table use. Hardcoding "Mon Tue Wed" would be English furniture
-  // on a Hebrew page.
-  const weekday = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB',
-    { timeZone: 'Asia/Jerusalem', weekday: 'short' });
-  const days = byDay(weekTickets.data, 7, (d) => weekday.format(d));
+  // Presets first — nobody fights a calendar grid for "last 30 days".
+  const presets = [7, 30, 90].map((d) => ({
+    days: d,
+    label: t(('range.d' + d) as any),
+    href: '/?from=' + shift(today, -(d - 1)) + '&to=' + today,
+    on: to === today && span === d,
+  }));
+
+  const shown = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB',
+    { timeZone: 'UTC', day: 'numeric', month: 'short' });
+  const windowLabel =
+    shown.format(new Date(from + 'T00:00:00Z')) + ' \u2013 ' +
+    shown.format(new Date(to + 'T00:00:00Z'));
 
   // Counts, not a chart library. Five numbers a manager can read in two seconds
   // beat a dashboard that takes a second to render and a minute to interpret.
@@ -83,25 +160,52 @@ export default async function Overview() {
         ))}
       </div>
 
+      {/* ONE filter row, above everything it scopes. Not one picker per chart:
+          three ranges on one screen means three numbers that cannot be
+          compared with each other, and the first question anybody asks of a
+          dashboard is whether calls went up while tickets went down. */}
       <div className="panel" style={{ marginBlockStart: 20 }}>
         <div className="panelhead">
           <span>{t('chart.activity')}</span>
-          <span className="faint">{t('overview.last7')}</span>
+          <span className="faint">{windowLabel}</span>
         </div>
+
+        <div className="rangewrap">
+          <DateRange
+            from={from} to={to} today={today} presets={presets}
+            labels={{
+              from: t('range.from'), to: t('range.to'),
+              apply: t('range.apply'), custom: t('range.custom'),
+            }}
+          />
+        </div>
+
         <div className="chartcard">
-          <div className="donutwrap">
-            <Donut slices={slices} total={activity} totalLabel={t('chart.events')} />
+          <div className="mixtile">
+            <Donut slices={slices} total={activity} totalLabel={t('chart.events')} size={132} />
             <Legend slices={slices} total={activity} emptyNote={t('chart.nothingYet')} />
           </div>
-          <div>
-            <h3 className="charttitle">{t('chart.perDay')}</h3>
-            <DailyBars days={days} emptyLabel={t('chart.noActivity')} />
+
+          {/* SMALL MULTIPLES: each metric its own frame and its own vertical
+              scale. That is not a dual axis — the thing never to build — it is
+              three charts side by side, so 171 tickets and 0 payment links can
+              both be read instead of the second one being an invisible line
+              along the floor of the first one's scale. */}
+          <div className="metrics">
+            {metrics.map((m) => (
+              <MetricCard
+                key={m.key}
+                label={m.label}
+                value={m.value}
+                token={m.token}
+                days={m.series}
+                previous={m.prev}
+                prevLabel={t('chart.vsPrev')}
+                emptyLabel={t('chart.noneInRange')}
+                note={m.note}
+              />
+            ))}
           </div>
-          {/* A zero segment with nothing said about it reads as a broken chart
-              rather than as a feature that is not finished. */}
-          {slices[2].value === 0 && (
-            <p className="chartnote">{t('chart.linksNote')}</p>
-          )}
         </div>
       </div>
 

@@ -61,6 +61,50 @@ conversation that produced it.
 - Baseline for comparison after deploy: live `/login` TTFB today, before any of
   this ships, was 1.78s cold and ~0.43s warm.
 
+### Each metric got its own chart, and the whole panel got a calendar
+
+- Three metrics, three charts, one filter. **Small multiples**: each metric has
+  its own frame and its own vertical scale, which is what lets 171 tickets and
+  0 payment links sit side by side — on a shared scale the second one is an
+  invisible line along the floor. That is not a dual axis, which is the thing
+  never to build; a dual axis puts two scales behind ONE set of marks and
+  invents a correlation.
+- **One filter row, above everything it scopes, never one picker per chart.**
+  Three ranges on one screen means three numbers that cannot be compared with
+  each other, and the first question anybody asks a dashboard is whether calls
+  went up while tickets went down.
+- **Presets before the calendar** — 7 / 30 / 90 days, because nobody wants to
+  fight a month grid for "last 30 days". The calendar itself is
+  `<input type="date">`: the browser's own picker, a real month grid, keyboard
+  operable and already translated, for none of the 30-50kB a React date picker
+  costs. The overview went from 189 B to **726 B** of client JavaScript.
+- The range lives in the URL (`?from=&to=`), like every other filter here, so a
+  window is a link you can send a colleague. Both dates are validated rather
+  than trusted: a malformed pair falls back to the default, a reversed pair is
+  swapped, a future `to` is clamped to today, and anything over a year is cut
+  back — those three queries pull rows, not counts, so an unbounded range is a
+  request to send the whole table.
+- **The bucket size follows the window, and the window follows the card.** Up
+  to 14 days it is one column per day; to 98 days, per week; beyond that, per
+  month. The thresholds are set by the width of a metric CARD (~240px), not by
+  what a full-width chart could take — thirty daily columns in 240px is thirty
+  five-pixel slivers. Proved rather than assumed: every range from 1 to 366
+  days produces at most 14 columns. Axis labels thin out above seven columns;
+  every column keeps its hover title and its place in the aria-label.
+- **Everything is computed in Jerusalem time** — the day keys, the query
+  bounds, the presets and "today". A `to` date is inclusive, so the query's
+  upper bound is the START of the next day and exclusive: `lte` on a date
+  silently drops everything logged after midnight on the last day of the range,
+  which is the day people actually look at.
+- **The delta is deliberately not green or red.** The design system colours
+  deltas as gains and losses, which is right for a stock and wrong here — more
+  tickets opened is not good news and fewer is not bad news, and colouring it
+  would be the dashboard passing a judgement it has no basis for. Muted ink and
+  an arrow. And when the previous period is zero there is no percentage at all:
+  dividing by zero is not "up 100%", it is "nothing to compare with".
+- Rendered and looked at in both themes at the 7-day and the 90-day extreme.
+  Build, `tsc` and contrast all clean.
+
 ### The overview has charts, and one of the three numbers turned out to be zero
 
 - Asked for a pie of three things: daily tickets opened, calls made by the voice
