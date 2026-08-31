@@ -11,6 +11,70 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### A typing harness for the inbound agent, and the first probe of the 30 Aug cut
+
+`scripts/prompt_chat.py`. You type English, it puts spoken Hebrew to the live
+assistant, and it prints the reply in Hebrew and English. Built because the
+person judging this agent does not read Hebrew, so "is he a friendly voice to
+reach" was a question with no instrument behind it. `prompt_probe.py` replays
+three fixed Hebrew scenarios; this one is driven by hand.
+
+It imports the probe's engine rather than copying it — `live_prompt`, `ask`,
+`TOOL_RESULTS`, and crucially `TARGETS["inbound"]["first"]`, which is already a
+hand-synced copy of the doc's opening line. A third copy was the thing to avoid.
+`turn()` is the one deliberate near-duplicate: the probe returns tool NAMES, and
+the arguments are the whole point here — a ticket opened against the wrong
+apartment cannot be seen in `[tools] : open_request`.
+
+Tools are mocked, Vapi is only read. Nothing reached Supabase or OXS.
+
+**The translator embellished, and it was caught by its own echo line.** Typing
+`Herzl 14` produced *"the building on Herzl Street 14, there is a problem that
+needs handling"* — a complaint the caller never made, and the agent answered it.
+`TO_HE` now carries an explicit add-nothing rule. This is why the Hebrew is
+printed before it is sent: with a translation step there are two things that can
+be wrong with a bad answer, and they have to be separable.
+
+The back-translation is told to preserve register. A translator left alone turns
+anything into courteous English, and courtesy invented in translation would be
+credited to the agent by the one person who cannot check.
+
+### The 30 Aug regression patches were wrong, and three of them are live
+
+The patches shipped without a probe; this was the first look. Two runs, both
+reproducing, all inside the reference-number block — the one line of a call the
+caller writes down:
+
+1. **He reads the prefix.** The prompt gives `255, 1042, 26` as its own example
+   of what never to say. He says `255, 1042`. In the second run: `255042` — the
+   `1` gone. That is a number that does not exist, read to a caller as theirs.
+2. **He glues a question to the number.** *"The number goes out alone in its own
+   turn"* — he appends "anything else?" every time.
+3. **The read-back vanishes.** One run went apartment number → `open_request`
+   with no sentence back first.
+
+Separately, from the openness run:
+
+4. **Hand-offs go out empty.** "Can I talk to a real person" after a full noise
+   complaint called `transfer_to_human` with `building: ""`, `description: ""`.
+   The office gets a note carrying nothing.
+5. **He invents.** *"There are a lot of requests there right now, so it will take
+   time"* — nothing tells him that, and it is a timing promise he is explicitly
+   forbidden to make. He also asserted noise complaints are handled by the
+   office; that is not in the knowledge block either, and the block's own rule
+   for doubt is say we will check, and transfer.
+
+Hours and gardening he got right, and correctly answered only what was asked
+rather than reading the fee list.
+
+**On openness, the evidence is narrower than expected.** He is not cold — he
+opened with warmth on a small-talk turn and said "sorry to hear that" to the
+noise complaint. What he does is funnel: four consecutive turns ended by
+offering to open a ticket. That, not curtness, is what reads as closed.
+
+Nothing about the prompt was changed. `docs/assistant/openness-test-lines.md`
+carries the lines to type; transcripts land in `docs/assistant/transcripts/`.
+
 ### Three feature branches, one per agent
 
 `feature/chatbot`, `feature/voice-inbound`, `feature/voice-outbound`, all cut

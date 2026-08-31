@@ -1989,13 +1989,25 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
-2. **The three regression patches went live unprobed.** They were written
-   against failures `prompt_probe.py` found and were never re-tested — the owner
-   chose to push rather than spend the $0.08, with the office-number bug live
-   and breaking calls as the reason. **So the first real calls are the test.**
-   Watch for: the reference number read in full (all three parts instead of the
-   middle), and the address read-back before the write going missing. Both
-   regressed once already. Rollback is `git revert` plus one `--apply`.
+2. **The three regression patches were wrong, and it is now measured.** They
+   went live unprobed — the owner chose to push rather than spend the $0.08,
+   with the office-number bug live and breaking calls as the reason — and the
+   two failures this entry told you to watch for are **both confirmed live**,
+   probed 31 Aug with `scripts/prompt_chat.py` over two runs:
+   - **The reference number is read with its prefix**, which the prompt gives as
+     its own example of what never to say. Worse, one run produced `255042`:
+     the `1` of `1042` dropped. That is a non-existent number read to a caller
+     as theirs, on the one line of a call that must be copied exactly.
+   - **A question is glued to the number** — "anything else?" — against
+     *"the number goes out alone in its own turn"*.
+   - **The read-back before the write vanished** in one of the two runs.
+
+   Two more, from the same session and not previously predicted: hand-offs go
+   out with `building: ""` and `description: ""`, discarding everything the
+   caller just said; and the agent invents — it claimed the office was busy and
+   that noise complaints are handled, neither of which is in the knowledge
+   block. Rollback is `git revert` plus one `--apply`. **Nothing has been
+   changed in response to any of this yet.**
 3. **`prompt_probe.py` bare reads the LIVE assistant, not the repo.** While
    nothing is applied, that is the *old* prompt. Use `--ref HEAD` for the new
    one and `--ref 8793c9f` for the old. Getting this wrong scores the same
@@ -2042,6 +2054,23 @@ word each time, like every spend here:
 
 Same tools and same fixed tool results on both halves, so the only variable is
 the wording. Worth running **before** the live push, not after.
+
+**`scripts/prompt_chat.py` is the same engine, driven by hand, and it is the one
+to reach for if you do not read Hebrew.** You type English, it puts spoken
+Hebrew to the agent and prints the reply in both languages, with tool
+*arguments* shown — which is how the empty hand-off and the mangled reference
+number were found, neither of which `prompt_probe.py` can display. Tools are
+mocked; Vapi is only read; nothing reaches Supabase or OXS.
+
+    python scripts/prompt_chat.py inbound
+
+Lines to type are in `docs/assistant/openness-test-lines.md`, grouped by what
+each group probes and annotated with what a good answer looks like. Transcripts
+are written to `docs/assistant/transcripts/` on exit, in both languages, so a
+run can be handed to a fresh session and read cold. **Read the `sent [he]` echo
+line every turn** — with a translation step in the path there are two things
+that can be wrong with a bad answer, and a turn whose Hebrew was wrong tested
+the translator, not the agent. That failure has already happened once.
 
 **`docs/knowledge/homies.md` is new and is the master for the thirteen facts
 both channels state.** Change a fact there, then in both prompts, then run

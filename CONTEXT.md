@@ -1495,6 +1495,25 @@ survives the voice filter. **None of them can tell you the agent stopped
 confirming the address.** Money-spending still needs the owner's word each time;
 the recommendation is to ask for it on anything over about 20% of the prompt.
 
+**And a probe is only as good as what it prints. Learned 31 Aug.** The 30 Aug
+patches for those three regressions shipped unprobed, and all three were still
+broken; the first run of `scripts/prompt_chat.py` found them in four turns for
+three cents. Two of the five failures that session — a hand-off carrying an
+empty `description`, and `open_request` arguments — are invisible to
+`prompt_probe.py`, which prints tool *names* and not their arguments. A ticket
+opened against the wrong apartment is the worst outcome in this system and it
+lives entirely in a field the older instrument does not show. That is why
+`prompt_chat.py` duplicates `turn()` instead of calling it.
+
+**The translation step in `prompt_chat.py` is a second thing that can be
+wrong, and it is kept visible for that reason.** Typing `Herzl 14` once produced
+Hebrew meaning *"the building on Herzl Street 14, there is a problem that needs
+handling"*, and the agent answered a complaint the caller never made. The Hebrew
+is printed before it is sent so the two can be told apart. Its back-translation
+is likewise instructed to preserve register: a translator left alone renders
+anything as courteous English, and courtesy invented in translation gets
+credited to the agent by the one reader who cannot check.
+
 **A rule stated as an abstraction fails where a wrong-answer-beside-the-right-one
 succeeds.** Both regressions I was most confident about were abstractions I had
 written to replace a concrete pairing. *"The tool returns a number in three
