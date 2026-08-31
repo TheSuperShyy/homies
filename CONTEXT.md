@@ -322,13 +322,30 @@ killed mid-write (24 Aug). Ask the database. `max(updated_at)` on the table the
 import writes settles in one query what a run list cannot settle at all, which
 is why every count on `/sync` now carries the age of its newest row.
 
-**OXS's ticket `status` is a constant, and the progress is in `treatmentLog`.**
-Every service call they serve reads `פתוחה`, whatever its age — so a ticket
-saying `open` in our database is not evidence of anything. What moves is the
-dispatcher's note list (newest first, element 0 is current) and `lastUpdate`.
-Closure is expressed by the call leaving the feed, never by the field, and
-whether leaving means done is still question 2 on the client list — until it is
-answered, a vanished ticket is flagged and dated, never resolved by us.
+**Read the vendor's spec before calling a question unanswerable.** For three
+weeks this file said OXS's ticket `status` was a constant and that closure could
+only be inferred from a call leaving the feed — with whether leaving meant done
+sitting as question 2 on the client list, and 36 tickets flagged and waiting on
+it. `GET /service-calls` takes a `status` parameter that "defaults to open",
+documented on page 6 of `OXS_External_API_v1.pdf`, and we had never sent it.
+Every call reading `פתוחה` was our own filter reflected back. Measured 31 Aug:
+`status=open` 42, `status=close` 26,903. **The constant was ours, not theirs.**
+The general rule is the one that cost the three weeks: a field that never varies
+is a claim about the query as much as about the data, and the cheapest test is
+the parameter table, not the client's inbox.
+
+**A ticket that leaves the OXS feed has been closed**, and the sync now asks
+rather than guesses — each departure is fetched back by `taskNumber` and carries
+a real status, a `doneDate` and a `closedBy`. What still holds from before: the
+dispatcher's `treatmentLog` (newest first, element 0 is current) is where a
+ticket's *progress* lives, because the feed's own status really is `open` on
+everything in it — that part was never wrong, it just was not the whole story.
+
+**Their vocabulary is `close`, not `closed`, and their paginated body is
+`data: {finalList, totalCount, totalPages}`, not the `{data, total, pages}` the
+PDF's example shows.** Both were found by probing and both are places where
+trusting the document would have failed silently — a wrong status value returns
+zero rows and no error, and the wrong envelope key returns one bogus row.
 
 **A fast import must not ride on a slow one.** The eleven-second ticket import
 was the last step of the twenty-eight-minute arrears job, so when the sweep in

@@ -209,11 +209,40 @@ nothing about, and this system holds tickets our agent cannot see — so a
 resident who asks "what is happening with my request" gets the wrong answer
 depending on which door they came through.
 
-Two things to establish with the client before using it:
+**— ANSWERED 31 Aug, by the parameter table rather than the client —**
 
-1. **Does `/service-calls` only return open ones, or does nothing ever close?**
-   Every record is `פתוחה` and one is six months old. Those are very different
-   facts and the API cannot tell them apart.
+`GET /service-calls` takes a **`status`** query parameter which, per
+`OXS_External_API_v1.pdf` p.6, **defaults to `open`**. This document's own probe
+never sent it, and neither did `oxs_requests_sync.py`. So "33 records, status
+פתוחה on all 33" above is a description of the default filter, not of Homies.
+
+Re-probed 31 Aug with `scripts/oxs_status_probe.py`:
+
+| Query | Records |
+|---|---|
+| bare (no params) | 42 |
+| `?status=open` | 42 — identical, confirming the default |
+| `?status=close` | **26,903**, across 1,346 pages |
+
+**The value is `close`, not `closed`.** `closed`, `done`, `cancelled`,
+`inProgress` and `all` each return zero rows with HTTP 200 and no error.
+
+**Pagination differs from the spec.** The PDF shows `{"status":1,"data":[],
+"total":137,"pages":3}`. What actually comes back when `page` is sent is
+`data: {finalList, totalCount, totalPages}` — 20 per page. The unpaginated call
+returns the complete open set.
+
+`GET /service-calls/:taskNumber?buildingId=` works and is how a departed ticket
+is resolved one at a time; `buildingId` is required and comes from
+`buildings.id`, which is the OXS `_id`. On a closed call it carries `doneDate`
+and `closedBy {_id, firstName}`, both null on everything in the open feed.
+**Neither is imported** — they would need a migration, and `status` plus
+`lastUpdate` already carry the decision.
+
+Still worth establishing with the client:
+
+1. ~~**Does `/service-calls` only return open ones, or does nothing ever
+   close?**~~ Answered above: it returns open ones only.
 2. **`reportedBy.phone` matches our `residents.phone`**, which makes ticket
    history joinable to the debt queue without any new identifier.
 
@@ -237,9 +266,12 @@ categories they actually use. Ours was invented. Theirs should win.
 
 ## Standing constraints
 
-- **OXS is read-only, forever.** These are GET endpoints and there are no others
-  as far as this system is concerned. A change a resident asks for becomes staff
-  work, not an API call.
+- **OXS is read-only BY POLICY, not by the API.** This line used to say
+  "forever", and that stopped being true with External API v1: a `service_calls`
+  key at `accessLevel: full` has POST, PUT and DELETE, and since 26 Aug
+  `open_request` in the Edge Function does POST new tickets in. Everything else
+  stays read-only because we chose that, and the ticket mirror is switched off
+  at the owner's instruction — not because the endpoints are missing.
 - **60 requests/minute and 1,000/hour, per key**, not shared. A full resident
   sweep is 193 building calls and takes about four minutes at a 1.05s pace.
 - **No webhooks.** Everything here is polled, so freshness is whatever the last
