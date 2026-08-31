@@ -801,6 +801,51 @@ against a message that allows one.
   does not verify Meta's signature. Found while diffing the 35 live nodes against
   the 21 built. Not touched; it needs its own decision.
 
+### The care work broke the emergency write, and it took five goes to see why
+
+A live call reported a gas leak. The agent named the wrong emergency numbers —
+"מד״א 100" and "כבאות 1002" — said the line twice, and hung up. The hang-up was
+the old rule *close the moment there is a result*, where a transfer counts as a
+result; the closing phrase is itself the Vapi end-call trigger.
+
+**Probing the new prompt on the same call found something worse: it wrote
+nothing.** Three turns, no `open_request`, and the agent saying *"I am opening
+an urgent case"* while opening nothing. Against the prompt before this session's
+work it wrote on turn two. So that was mine, and it broke the single most
+evidenced rule in the file — the 20 Aug black-smoke call that ended with correct
+words, a transfer, and no row anywhere.
+
+Five causes, found one at a time, and **four of the five were the same mistake**:
+
+1. The care section said the first sentence is about them *"and only then the
+   request"*, which reads as though writing waits its turn. Only the questions
+   wait.
+2. The emergency section stated write-first in prose while its worked example
+   showed a sentence. The example won.
+3. The worked example I then added omitted the emergency number, so that got
+   copied instead.
+4. The one-or-two-sentence cap was evicting the safety line from a turn that now
+   also carried the welfare question — my addition displaced it.
+5. **Three worked examples had accumulated in one section** and the model was
+   producing the nearest two joined together. Collapsed to a single complete
+   example; the section came out shorter than before the fix.
+
+Then the last one, which was not about placement at all: **a hedged emergency
+was not being read as one.** *"I think there is a gas leak"* wrote nothing while
+*"I am stuck in the lift"* was handled perfectly, every time. The trigger list
+was being read as a list of confirmed facts. `ספק הוא חירום` now says so, with
+the hedged phrasing as the example. Three consecutive runs wrote after it, where
+two of four had before.
+
+**The standing rule out of this: do not add a worked example to a section that
+already has one. Change the one that is there.** Adding is how a section ends up
+teaching three different turns and the model picking whichever sat nearest.
+
+Verified at the end: a gas leak gets the write, the transfer, מד״א מאה ואחת and
+כבאות מאה ושתיים, the welfare question, and no hang-up; a lobby light gets none
+of it. Fence 22,950 chars. **Still not pushed.**
+
+
 ### Michael answers the person before he answers the ticket
 
 A real call: "I'm stuck in the elevator" got `הבנתי. באיזה בניין ואיזו דירה.` — no

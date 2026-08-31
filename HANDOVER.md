@@ -2128,7 +2128,7 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
 **THE INBOUND PROMPT CHANGED ON 31 AUG AND IS NOT PUSHED.** Fence 19,978 →
-22,556 chars, committed, dry run clean, six tools, `facts_check` clean. Michael
+22,950 chars, committed, dry run clean, six tools, `facts_check` clean. Michael
 now reacts to the caller before the ticket, asks after anyone locked in or hurt
 (gender-neutral `הכל בסדר שם?`, never `אתה בסדר?`), and does not close until the
 caller says they are done. Probed through `prompt_chat.py` across four runs.
@@ -2142,7 +2142,14 @@ that.**
    hangs up mid-word on the second it expires and the model is never told it is
    coming. Either raise the cap or accept that satisfied-but-slow callers are cut
    off. `save_partial_request` is the only net under it.
-2. **The reference number is still wrong.** Read with its `255` prefix, and it
+2. **Emergencies were broken by this work and are fixed — but they are the part
+   to re-probe first after any further edit.** The care rules stopped
+   `open_request` firing on a gas leak entirely, and it took five passes to
+   restore. A gas leak must produce: the write with `building: "לא ידוע"` at
+   emergency urgency, `transfer_to_human`, מד״א מאה ואחת and כבאות מאה ושתיים
+   spoken as words, the welfare question, and no hang-up. **A hedged report
+   ("I think there is...") is the case that breaks first.**
+3. **The reference number is still wrong.** Read with its `255` prefix, and it
    still drops the `1` of `1042` — `255042`, a number that does not exist.
    Untouched by this work and still the most serious defect on this agent.
 

@@ -1810,6 +1810,21 @@ live rule as missing on 30 Aug. The same error in the other direction would
 report a missing rule as present, which is the dangerous half.
 
 
+**Never add a worked example to a section that already has one — change the one
+that is there. Learned 31 Aug, the hard way.** Four separate failures in one
+session came from examples competing: an emergency section ended up carrying
+three, and the model produced the nearest two spliced together, dropping the
+emergency phone number that lived only in the furthest. Each attempted fix added
+another example and made it worse. Collapsing them to one complete example fixed
+it and left the section shorter than before. **Count the examples in a section
+before writing a rule for it.**
+
+**And a hedge defeats a trigger list.** *"I think there is a gas leak"* produced
+no written request while *"I am stuck in the lift"* was handled perfectly, from
+the same list, in the same run. A list of emergencies reads as a list of
+confirmed facts unless it says otherwise. Any classifier written as a list of
+nouns needs a line saying that a suspicion counts.
+
 **A rule lands where the example lands. Learned 31 Aug.** An anti-parroting rule
 written as a paragraph after the politeness list changed the output by nothing at
 all — the echo came back word for word. Moved directly under the worked example
