@@ -34,20 +34,46 @@ for one fault (the upsert keys on `reference`, and their taskNumber is not our
 reference). Those rows are skipped, not merged: the our-side row is the
 resident's record and OXS's copy is downstream of it.
 
-STATUS, AND WHAT WE DO NOT KNOW
+STATUS, AND HOW THE QUESTION WAS SETTLED
 
-Every call OXS returns reads `פתוחה`. That is either because the endpoint only
-serves open calls, or because nothing is ever closed there. The API cannot tell
-the two apart, and the difference matters: under the first reading a call that
-disappears has been resolved, under the second it has not. Until Homies answers,
-a row that stops being returned is left exactly as it is rather than being
-guessed into `resolved`.
+This docstring said for three weeks that the API could not tell two readings
+apart -- "the endpoint only serves open calls" versus "nothing is ever closed
+there" -- and 36 of our tickets sat flagged `gone from OXS` on the dashboard,
+unresolved, on that basis. It was waiting on an answer from Homies.
 
-Measured 24 Aug and worth the ten seconds it took: 35 calls live against 69
-imported, so 35 of ours had left the feed, three of them within one hour that
-morning. `oxs_last_seen_at` is stamped on every ticket in every run, so "not
-seen since" is now a date rather than an inference, and the day Homies answers
-the question one UPDATE clears the backlog.
+The answer was in OXS's own spec the whole time. `GET /service-calls` takes a
+`status` parameter and, in their words (`OXS_External_API_v1.pdf` p.6), it
+"defaults to open". We had never sent it -- this script called the endpoint
+bare. Every record reading `פתוחה` was the documented default filter doing
+exactly what it says on the tin, and none of it was evidence about how Homies
+works.
+
+Probed live on 31 Aug, `scripts/oxs_status_probe.py`:
+
+    (bare)          42 calls     identical to status=open, which is the default
+    status=open     42 calls
+    status=close    26,903 calls across 1,346 pages
+
+OXS closes calls constantly. The feed is the open ones. **A ticket that leaves
+it has been closed**, and the eight oldest departures, fetched back by
+taskNumber, each returned `status.status = "close"` carrying a `doneDate` and a
+`closedBy` naming the staff member who closed it.
+
+TWO THINGS THE SPEC GETS WRONG. Both measured, not read:
+
+  * The status value is `close`, not `closed`. Sending `closed` returns zero
+    rows and no error, which is exactly how a wrong guess here stays invisible.
+  * A paginated response is not `{data: [], total, pages}` as the PDF's example
+    shows. Passing `page` changes the shape of `data` from an array into
+    `{finalList, totalCount, totalPages}`, twenty per page. The unpaginated call
+    returns the whole open set (42 of 42), so this script has never truncated —
+    but it would have, silently, the moment the open list outgrew one response.
+
+WHY WE DO NOT IMPORT THE CLOSED FEED. 26,903 calls is Homies' entire history and
+almost none of it is ours. Only the tickets we already hold matter, so a
+departure is resolved by fetching that one call back by `taskNumber` — bounded,
+because a ticket is looked up once and then carries a closed status that takes
+it out of the set.
 
 WHERE THE PROGRESS ACTUALLY LIVES
 
@@ -67,6 +93,7 @@ import os
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
@@ -78,6 +105,10 @@ OXS = "https://api.oxs.co.il/api/external/v1"
 
 # One stamp for the whole run, set in main(). See its use in build().
 SEEN_AT = None
+
+# 60 requests a minute per key. The departed-ticket lookups are the only loop
+# here that can approach it; this is the pace oxs_buildings_sync.py already uses.
+PACE = 1.05
 
 # Their twelve categories, mapped to the slugs migration 014 constrains `type`
 # to. The Hebrew label is stored beside it verbatim: the slug is for code, the
@@ -97,14 +128,21 @@ CATEGORY = {
     "אחר": "other",
 }
 
-# Their status vocabulary against ours. Only one value has ever been observed;
-# the rest are here so an unknown one is loud rather than silently dropped.
+# Their status vocabulary against ours.
+#
+# TWO values have been observed, 31 Aug: `open` in the feed and `close` on every
+# call fetched back after it left. `close` is the one that matters and it was
+# missing here until then — this table was written from the spec, which spells
+# it `closed`, and `STATUS.get("close", "open")` would have quietly filed every
+# closed ticket as open. The rest are kept so an unknown value is loud rather
+# than silently dropped; see `unmapped` in main(), which now exits non-zero.
 STATUS = {
     "open": "open",
+    "close": "resolved",      # observed, and the only closed form OXS returns
+    "closed": "resolved",     # spec spelling, never seen
     "inProgress": "in_progress",
     "in_progress": "in_progress",
     "done": "resolved",
-    "closed": "resolved",
     "cancelled": "cancelled",
     "canceled": "cancelled",
 }
@@ -136,17 +174,29 @@ def http(url, headers, data=None, method="GET"):
         return e.code, body
 
 
-def oxs(path):
+def oxs(path, fatal=True, **params):
     # Vapi, Supabase's management API and this one all 403 or block Python's
     # default User-Agent at some point. Setting it once here costs nothing.
-    code, payload = http(OXS + path, {"x-api-key": E["OXS_KEY_REQUESTS"].strip(),
-                                      "User-Agent": "curl/8.0",
-                                      "Accept": "application/json"})
+    url = OXS + path
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    code, payload = http(url, {"x-api-key": E["OXS_KEY_REQUESTS"].strip(),
+                               "User-Agent": "curl/8.0",
+                               "Accept": "application/json"})
     if code != 200:
+        if not fatal:
+            return []
         sys.exit("OXS %s -> HTTP %s" % (path, code))
     d = payload.get("data", payload) if isinstance(payload, dict) else payload
     if isinstance(d, dict):
-        d = d.get("results", d)
+        # `finalList` is the real key and it is not what the spec says. The PDF
+        # documents a paginated body as `{data: [], total, pages}`; what OXS
+        # actually returns when `page` is sent is
+        # `data: {finalList, totalCount, totalPages}`. The old code looked for
+        # `results`, found nothing, and fell through to `[d]` — one bogus row
+        # made of the envelope itself. It never fired only because nothing here
+        # has ever sent `page`.
+        d = d.get("finalList", d.get("results", d))
     return d if isinstance(d, list) else [d]
 
 
@@ -239,6 +289,73 @@ def build(call, residents, by_bu):
     }
 
 
+def departed_rows(gone):
+    """What OXS says about the tickets that have left its open feed.
+
+    One `GET /service-calls/:taskNumber?buildingId=` each. `buildingId` is
+    required by the endpoint and is not on the ticket, so it comes from
+    `buildings.id` — which IS the OXS `_id` (migration 016) — joined on the
+    address string both tables are built from.
+
+    BOUNDED ON PURPOSE. Only rows still `open` or `in_progress` on our side are
+    looked up. A departed ticket therefore costs one request exactly once and
+    then carries a closed status that takes it out of this set; without that
+    filter every closed ticket we have ever imported would be re-fetched every
+    fifteen minutes, for ever, to be told the same thing.
+
+    `oxs_last_seen_at` is deliberately NOT in the returned rows. It means "the
+    last run that saw this ticket in the open feed" and that is still true of
+    the value already stored — this call did not see it there, it went and asked
+    after it. Overwriting it would make a resolved ticket look freshly live.
+    """
+    if not gone:
+        return [], []
+
+    code, mine = sb("requests?select=reference,building,oxs_ref"
+                    "&opened_via=eq.oxs&status=in.(open,in_progress)&limit=2000")
+    if code != 200 or not isinstance(mine, list):
+        print("  could not read our own open rows (HTTP %s); resolution skipped" % code)
+        return [], []
+    pending = [r for r in mine if r.get("oxs_ref") in gone]
+    if not pending:
+        return [], []
+
+    code, blds = sb("buildings?select=id,address&limit=500")
+    by_addr = ({b["address"]: b["id"] for b in blds}
+               if code == 200 and isinstance(blds, list) else {})
+
+    print("  asking OXS about %d departed ticket(s), about %.0fs at %.2fs apart"
+          % (len(pending), len(pending) * PACE, PACE))
+
+    rows, unmapped, missing_bld = [], [], 0
+    for r in pending:
+        bid = by_addr.get(r.get("building"))
+        if not bid:
+            missing_bld += 1
+            continue
+        time.sleep(PACE)
+        got = oxs("/service-calls/%s" % urllib.parse.quote(str(r["reference"])),
+                  fatal=False, buildingId=bid)
+        call = (got[0] if got else {}) or {}
+        raw = ((call.get("status") or {}).get("status") or "").strip()
+        if not raw:
+            continue
+        if raw not in STATUS:
+            unmapped.append(raw)
+            continue
+        rows.append({
+            "reference": r["reference"],
+            "status": STATUS[raw],
+            # Their closing notes are worth as much as their progress notes, and
+            # a ticket often gains its most useful one on the way out.
+            "oxs_notes": [n for n in (call.get("treatmentLog") or []) if str(n).strip()],
+            "oxs_last_update": call.get("lastUpdate"),
+        })
+    if missing_bld:
+        print("  no building id for %d of them — left alone" % missing_bld)
+    return rows, unmapped
+
+
 def main():
     global SEEN_AT
     apply = "--apply" in sys.argv
@@ -291,18 +408,28 @@ def main():
     unknown = sorted({r["category_he"] for r in rows
                       if r["category_he"] and r["category_he"] not in CATEGORY})
 
-    # WHAT OXS HAS STOPPED SERVING.
+    # WHAT OXS HAS STOPPED SERVING, AND WHAT BECAME OF IT.
     #
-    # The one number that says something is wrong, and it is not visible from
-    # either side alone: their feed is only ever the open calls, ours is every
-    # call we have ever seen, and the difference is the tickets that left. Not
-    # touched here — see the docstring — but printed every run, because a
-    # backlog that nobody is counting is a backlog nobody notices.
+    # Their feed is only ever the open calls; ours is every call we have ever
+    # seen. The difference is the tickets that left, and until 31 Aug this
+    # script could only count them and say "status unconfirmed". It can now ask:
+    # each one is fetched back by taskNumber and comes home with a real status.
+    # See "STATUS, AND HOW THE QUESTION WAS SETTLED" in the docstring.
     gone = known - {r["oxs_ref"] for r in rows}
 
     print("  new: %d   already imported: %d" % (len(new), len(rows) - len(new)))
-    print("  no longer served by OXS: %d of %d we hold "
-          "(may be resolved — status unconfirmed)" % (len(gone), len(known)))
+    print("  no longer in the OXS open feed: %d of %d we hold" % (len(gone), len(known)))
+
+    closed, unmapped_status = departed_rows(gone)
+    if closed:
+        print("  OXS says they are: %s"
+              % dict(Counter(r["status"] for r in closed)))
+    if unmapped_status:
+        # Loud, and fatal. The whole point of this change is that we now trust
+        # their status enough to write it; a value the table does not know is
+        # the one case where trusting it would be wrong.
+        sys.exit("UNMAPPED OXS STATUS -> refusing to write: %s"
+                 % sorted(set(unmapped_status)))
     print("  matched to a resident: %d of %d" % (matched, len(rows)))
     print("  with a progress note: %d of %d" % (sum(1 for r in rows if r["oxs_notes"]), len(rows)))
     print("  no building address: %d" % sum(1 for r in rows if not r["building"]))
@@ -337,6 +464,20 @@ def main():
         msg = res.get("message", res) if isinstance(res, dict) else res
         sys.exit("Supabase %s: %s" % (code, str(msg)[:200]))
     print("\nwrote %d rows (HTTP %s)" % (len(rows), code))
+
+    # The departed ones, as a SECOND write and not merged into the one above.
+    #
+    # Two reasons. PostgREST needs every object in one payload to carry the same
+    # keys, and these deliberately omit `oxs_last_seen_at` (see departed_rows).
+    # And a run that resolves half the ticket table should say so on its own
+    # line rather than inside a total.
+    if closed:
+        code, res = sb("requests?on_conflict=reference", "POST", closed,
+                       "resolution=merge-duplicates,return=minimal")
+        if code >= 300:
+            msg = res.get("message", res) if isinstance(res, dict) else res
+            sys.exit("Supabase %s writing resolved tickets: %s" % (code, str(msg)[:200]))
+        print("resolved %d departed ticket(s) from OXS (HTTP %s)" % (len(closed), code))
 
     code, after = sb("requests?select=reference&opened_via=eq.oxs&limit=2000")
     print("imported tickets now in the database: %d" % len(after))

@@ -1587,8 +1587,11 @@ handset.**
 - Tickets refresh **every 15 minutes** on their own workflow since 24 Aug
   (`oxs-requests.yml`), not twice a day. Each carries `oxs_notes` — the OXS
   dispatcher's own progress notes, newest first — and `oxs_last_seen_at`.
-  **36 of the 70 have left the OXS feed** and are flagged on the dashboard as
-  gone, not resolved; see client question 2.
+  **36 of the 70 have left the OXS feed**, which as of 31 Aug is known to mean
+  CLOSED (client question 2, answered). They still read `open` in the database
+  and on the dashboard — the sync change that resolves them is written but has
+  not been applied. Until it runs, the tickets page overstates the open count by
+  roughly half.
 - Zero demo or synthetic rows; both were purged on 10 Aug. Every charge carries
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
@@ -1930,16 +1933,16 @@ exists. Never print a value, never commit one, never paste one into chat.
    finance module tracks only legacy carried debt, or Homies records arrears
    somewhere the API does not aggregate. Until answered, the computed arrears
    list is ours, not OXS-blessed.
-2. **When a service call stops appearing in OXS, has it been done?** The single
-   most valuable question on this list, and the cheapest to answer. Their
-   `status` field reads `פתוחה` on every call they serve — verified 24 Aug
-   across all 35 live, dating back to 10 February — so closure is expressed only
-   by the call leaving the feed. 34 were live against 70 we hold; three left
-   within one hour that morning. If leaving means done, one UPDATE resolves 36
-   stale tickets and the bot stops telling residents that a finished job is
-   still open. If it does not, we have a real backlog nobody is counting.
-   `requests.oxs_last_seen_at` has been stamped on every run since 24 Aug, so
-   whichever the answer is, the data to act on it already exists.
+2. ~~**When a service call stops appearing in OXS, has it been done?**~~
+   **ANSWERED 31 Aug — yes — and not by the client.** `GET /service-calls` takes
+   a `status` parameter that "defaults to open" (`OXS_External_API_v1.pdf` p.6);
+   `oxs_requests_sync.py` had never sent it, so `פתוחה` on every record was our
+   own filter reflected back, not a fact about Homies. Probed live:
+   `status=open` 42 calls, `status=close` **26,903** across 1,346 pages. Eight
+   departed tickets fetched back by `taskNumber` each returned
+   `status.status = "close"` with a `doneDate` and a `closedBy` naming the staff
+   member. **A ticket that leaves the feed has been closed.** The sync now asks
+   per departure instead of guessing — see the WORKLOG entry for 31 Aug.
 3. **Payment proof by WhatsApp or email?** The dispute path sends residents to
    `{{verification_email}}`; Israelis default to WhatsApp screenshots. An
    office-intake decision, not a prompt change.

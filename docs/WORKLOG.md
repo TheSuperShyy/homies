@@ -11,6 +11,71 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The unanswerable question was answered by reading the vendor's own PDF
+
+**A dashboard question — "why does it say gone from OXS?" — turned into the
+answer to open client question 2**, which has been the most valuable item on
+that list since 24 Aug.
+
+The chain: `oxs_requests_sync.py` has said since 12 Aug that the API cannot
+distinguish "the endpoint only serves open calls" from "nothing is ever closed
+there", and 36 of 70 imported tickets have sat flagged `gone from OXS`,
+deliberately unresolved, waiting on Homies to say which it was.
+
+**It is in `OXS_External_API_v1.pdf`, page 6.** `GET /service-calls` takes a
+`status` parameter and it "defaults to open". The script called the endpoint
+bare — `oxs("/service-calls")`, no parameters, every run since it was written.
+Every record reading `פתוחה` was the documented default filter doing exactly
+what it says. The constant was ours, not theirs.
+
+**Probed live before changing anything** (`scripts/oxs_status_probe.py`, new,
+GET only, writes nothing):
+
+    (bare)          42 calls      identical to status=open — the default confirmed
+    status=open     42 calls
+    status=close    26,903 calls across 1,346 pages
+
+And the decisive half, eight of the oldest departed tickets fetched back by
+`GET /service-calls/:taskNumber?buildingId=`:
+
+    255-26757-26  ours=open  oxs=close  doneDate=2026-08-24  closedBy=גל
+    255-26758-26  ours=open  oxs=close  doneDate=2026-08-24  closedBy=יריב
+    255-26702-26  ours=open  oxs=close  doneDate=2026-08-24  closedBy=אלון
+    255-26698-26  ours=open  oxs=close  doneDate=2026-08-24  closedBy=בן
+    (four more, identical shape)
+
+**OXS closes calls constantly — 26,903 of them — and the feed is the open ones.
+A ticket that leaves it has been closed.** Client question 2 is answered without
+asking the client, and the 36 are resolved tickets we have been showing as open.
+
+**Two things the spec gets wrong**, both measured rather than read:
+
+- The status value is **`close`**, not `closed`. `closed` returns zero rows and
+  no error. The `STATUS` map in the sync was written from the spec and had
+  `closed` but not `close`, so `STATUS.get("close", "open")` would have filed
+  every closed ticket as open — a wrong guess that stays invisible.
+- A paginated body is **not** `{data: [], total, pages}` as the PDF's example
+  shows. Sending `page` changes `data` from an array into
+  `{finalList, totalCount, totalPages}`, twenty per page. The sync's `oxs()`
+  helper looks for `results`, so had it ever paginated it would have returned
+  one bogus row made of the envelope. It never has — the unpaginated call
+  returns the whole open set, 42 of 42 — but it would have the moment the open
+  list outgrew one response.
+
+**What changed in `oxs_requests_sync.py`:** `close` added to `STATUS`; `oxs()`
+takes query parameters and understands `finalList`; a new `departed_rows()`
+fetches each ticket that left the feed by `taskNumber` and reads its real
+status; an unmapped status now exits non-zero instead of defaulting to `open`.
+The departed lookups are bounded — only rows still open on our side are checked,
+so a ticket costs one request once and then carries a status that removes it
+from the set. `oxs_last_seen_at` is deliberately not written by that path: it
+means "last seen in the open feed" and that is still true of the stored value.
+
+**Not yet run.** The dry run was blocked by the sandbox classifier, so no row
+has been rewritten and the 36 still read `open` in the database and on the
+dashboard. The code is written and compiles; the apply is the next step and
+needs the owner, since it changes the status of roughly half the ticket table.
+
 ### A typing harness for the inbound agent, and the first probe of the 30 Aug cut
 
 `scripts/prompt_chat.py`. You type English, it puts spoken Hebrew to the live
