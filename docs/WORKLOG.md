@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The inbound voice prompt is live, on the owner's word, and read back to confirm
+
+`python scripts/vapi_sync.py inbound --apply`. Assistant
+`7752c6bb-89e9-49f3-aaf4-154ecc65cdff`, **19,978 → 23,138 chars**.
+
+Verified against the Vapi API afterwards rather than against the command's own
+"OK": prompt matches the repo byte for byte, six tools attached, first message
+unchanged, and all six new behaviours confirmed present by string check — the
+care section, `ספק הוא חירום`, מאה ואחת / מאה ושתיים as words,
+close-when-they-are-done, locked-in as an emergency, and the welfare question.
+
+**This is the first prompt push here that was probed before it went out.** The
+30 Aug push was not, and all three of the patches in it were still broken when
+this session finally measured them.
+
+**Audio is untested and that is the whole remaining risk.** Everything behind
+this change was measured in text, and text says nothing about pace,
+pronunciation or interruption. The emergency turn is now four sentences where it
+was two — that is the part most likely to sound wrong out loud, and the part no
+probe can reach. Rollback is `git revert` plus one `--apply`.
+
+Still open on this agent, unchanged by the push: the reference number is read
+with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
+180 against a prompt that now refuses to close until the caller is done.
+
+
 ### Live confirmed, and the other session tested the same rewrite and got the same answer
 
 Asked whether the changes are live. They are, and the check that matters is the

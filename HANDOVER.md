@@ -2148,7 +2148,12 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
-**THE INBOUND PROMPT CHANGED ON 31 AUG AND IS NOT PUSHED.** Fence 19,978 →
+**THE INBOUND PROMPT IS LIVE AS OF 31 AUG — PUSHED, AND READ BACK TO VERIFY.**
+Byte-for-byte match with the repo, six tools, first message unchanged, all six
+new behaviours confirmed present against the API. The first push in this repo
+that was probed beforehand. **Audio is still untested:** the emergency turn is
+four sentences now where it was two, and only a call can tell you how that
+sounds. Rollback is `git revert` plus one `--apply`. The old note follows.** Fence 19,978 →
 22,950 chars, committed, dry run clean, six tools, `facts_check` clean. Michael
 now reacts to the caller before the ticket, asks after anyone locked in or hurt
 (gender-neutral `הכל בסדר שם?`, never `אתה בסדר?`), and does not close until the
