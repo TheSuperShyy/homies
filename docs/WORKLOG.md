@@ -37,6 +37,77 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### A candidate WhatsApp prompt can be run without installing it, and the first thing it found was ours
+
+`scripts/wa_prompt_chat.py`. Talks to OpenRouter directly with the live model,
+temperature, max_tokens and the five real tool schemas, so the **wording is the
+only variable**. Nothing is pushed, nothing is written, no resident is involved.
+The voice side has had this since `39e6fb9`; WhatsApp never did, which is why a
+single afternoon of prompt work cost thirteen pushes to the live active
+workflow.
+
+Three deliberate choices. **Tool calls are stubbed but their arguments are
+printed**, because a ticket opened against the wrong apartment is the worst
+outcome here and `[tools] open_request` alone cannot show it. **`--runs`
+defaults to 3**, because the lesson that cost most was that one send measures
+the best case and the resident meets the floor. **`--vs` runs two prompts on the
+same arc**, which is the only way to settle a rewrite argument.
+
+**It reads the tap lines from the live Sort node, not from
+`n8n_whatsapp.TAP_LINE`** — that constant is dead. It still holds
+`בטח, אשמח לעזור. אפשר לספר לי מה קרה?`, the single opener the owner removed on
+27 Aug, while live carries a rotation of three variants per tap keyed by the
+Hebrew button label. **And that dead constant contains `אשמח לעזור`, which this
+prompt bans outright**, so anyone regenerating the workflow from the script
+would ship a banned phrase as a canned line.
+
+### The head-to-head, and it went both ways
+
+The candidate rewrite, patched with the five backend fixes agreed beforehand,
+against the live prompt. Two runs each, stuck-in-lift and gas.
+
+**Stuck in a lift — the candidate lost badly, and exactly as the voice session
+predicted.** It **re-greeted mid-conversation** (`היי, כאן מיכאל מהומיז. במה
+אפשר לעזור?` in reply to `im stuck!!!`), **never called `transfer_to_human`**
+despite its own rule saying to call it immediately, **gendered the resident
+repeatedly** (`אתה לכוד`, `אתה נמצא`) despite its own neutral-language rule, and
+**asked a trapped person for the building anyway** — the "location trap" its own
+patch was written to prevent. The live prompt transferred on turn two in both
+runs, asked one question, and answered the fear on turn three without re-asking.
+
+**Gas — the candidate won a point and lost the important one.** It called
+`transfer_to_human` on turn one in both runs, which the live prompt did **not**
+do. But it gave **no safety advice at all**: no flames, no light switches, wait
+outside — absent from both runs, and for a gas leak that is the most valuable
+thing anyone can say. One run answered a reported gas leak with
+`נציג יחזור אליכם בהקדם. אנא הישארו בטוחים.` — including `אנא`, banned
+translation-Hebrew.
+
+**Verdict: the live prompt stays.** The candidate's structure is not the
+problem — its own patched rules were ignored by the model in the cases that
+matter, which is the same finding as the voice session's, reached independently.
+
+### The defect this found in OUR prompt, and it is the serious one
+
+**On the gas arc the live prompt announced a transfer it never made.** It wrote
+`אני מעביר את זה לצוות עכשיו` with no `transfer_to_human` call in the visible
+runs. Live, the `Promised a transfer, made none?` node catches this and performs
+the transfer anyway — which means **that guard has been silently carrying the
+gas path**, and nobody knew, because a live probe cannot show you which tools
+were called. If that node's matcher ever misses a phrasing, a reported gas leak
+goes nowhere.
+
+This is the argument for the runner in one line: two days of live probing could
+not see it, and the first head-to-head did.
+
+### Still open
+
+- **The gas path announces a transfer without calling the tool.** Prompt-level
+  fix needed; do not leave it to the guard node.
+- The severity rule is still over-tight and still leaks (`ריח גז זה מסוכן`
+  appeared again in run 1). Narrow it to the clinical verdict.
+- Both prompts re-ask the building on turn two of the gas arc.
+
 ### The gas, fire and injury arcs finally got read, and one of them broke the safety rule
 
 The owner said to work against live rather than build tooling first, so the

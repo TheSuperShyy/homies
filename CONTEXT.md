@@ -553,6 +553,14 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**A live probe cannot show you which tools were called, and that hid a real
+defect for two days.** `probe_whatsapp.py` reads replies off the executions; it
+says nothing about whether `transfer_to_human` actually fired. The first
+offline run found the gas path announcing a transfer it never made, with the
+`Promised a transfer, made none?` node silently covering for it. **When a guard
+node exists, assume it is load-bearing until proven otherwise** — its whole job
+is to make a failure invisible.
+
 **A list of banned phrasings teaches the phrasings, not the boundary.** The
 emergency block forbade three ways of rating severity; the model avoided all
 three and wrote a fourth. Bans that enumerate need a **test** the model can

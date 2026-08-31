@@ -191,13 +191,28 @@ its stated time.
   written into the file as a forbidden example. **Narrow it to the clinical
   verdict** (life-threatening / all-clear / named cause) and delete the
   written-out phrases. Do not enforce it a fourth time.
-- **There is no way to test a WhatsApp prompt without pushing it to live.**
-  `prompt_chat.py --file` (commit `39e6fb9`) does exactly this for the **voice**
-  agents and does not cover WhatsApp. Every WhatsApp prompt experiment is a real
-  push to the live active workflow plus real model calls on the production key —
-  thirteen of them on 31 Aug. Safe only because `n8n_whatsapp_patch.py` is
-  idempotent and a pre-change backup exists. **Building the WhatsApp equivalent
-  is the highest-value tooling job open.**
+- **`scripts/wa_prompt_chat.py` runs a candidate WhatsApp prompt without
+  installing it** — live model, temperature and the five real tool schemas,
+  straight to OpenRouter. Tool calls are stubbed and their **arguments printed**,
+  which live probing cannot show. `--vs` for head-to-head, `--runs` defaults to
+  3, `--tap` seeds a menu tap. **Iterate here, then confirm once with
+  `probe_whatsapp.py`** — this does not exercise the Sort short-circuits, the
+  memory template, or the three output guards.
+- **OPEN DEFECT, and this one is safety-relevant: the gas path announces a
+  transfer without calling `transfer_to_human`.** Found 31 Aug on the first
+  offline run. Live, `Promised a transfer, made none?` performs it anyway, so
+  **that guard node has been carrying the gas path unnoticed**. Fix the prompt;
+  do not rely on the net.
+- **`n8n_whatsapp.TAP_LINE` is dead and wrong.** It holds the single
+  `בטח, אשמח לעזור...` opener the owner removed 27 Aug; live carries three
+  variants per tap in the Sort node's `TAPPED`, keyed by Hebrew button label.
+  The stale constant also contains `אשמח לעזור`, which the prompt bans — so
+  regenerating the workflow from the script would ship a banned canned line.
+- **The candidate rewrite lost the head-to-head and is not coming back.** Two
+  runs each on stuck-in-lift and gas: it re-greeted mid-conversation, never
+  transferred on the lift, gendered the resident, asked a trapped person for
+  their building, and gave no gas safety advice at all. Its own patched rules
+  were ignored by the model. Same conclusion the voice session reached.
 - **A trapped resident must be transferred before being asked anything.**
   `transfer_to_human` takes only a `reason` enum — no address, no flat, no
   description — so there is nothing to collect first. On 31 Aug a lift arc ran
