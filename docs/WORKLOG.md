@@ -387,6 +387,33 @@ Four consecutive turns ended by offering to open a ticket.
   on `a976c076…` (Eyal). Nothing was wired in.
 - `docs/WORKLOG.md` had run `08-30 / 08-28 / 08-30 / 08-28`; reordered newest-first.
 
+### The bot stopped saying "tell me whatever you're comfortable with"
+
+- A later session on 31 Aug rewrote the hesitation section of
+  `docs/features/11-whatsapp-bot/prompt.md` and pushed it. **Live and repo both
+  read 51,455 chars at 07:09Z**, so it is on the running bot, not just on disk.
+- What changed: when a resident hesitates to report something, the bot now
+  **narrows the question instead of widening it**. "אפשר לספר כמה שנוח" is named
+  in the prompt as handing the work back to someone who has just said they find
+  it hard to start.
+- Refined again minutes later, and the refinement is the better half: **answer
+  the worry he actually voiced, not all three.** Someone worried about falling
+  out with a neighbour who gets back "even small things matter" has been answered
+  for a concern he never had, and it reads exactly like not being listened to.
+  Three worked examples now sit in the prompt, one per worry — too small, the
+  neighbour, embarrassment/who reads this — each pairing a one-sentence cost
+  reduction with a two-word question. **And if it is unclear which worry it is,
+  ask the narrow question alone rather than guess: guessing the wrong worry is
+  worse than not guessing.**
+- Generalised in the prompt beyond hesitation: **whenever he is stuck, shrink the
+  question.** "מה קרה?" and "מה שבא לך" are questions for someone who already
+  knows what to say. The example given is deliberately marked as an example and
+  not fixed wording — a fixed phrase in a prompt is one the model repeats
+  verbatim, which the same prompt forbids elsewhere.
+- Not mine and not verified by me beyond the character count matching. It was
+  committed by the housekeeping hook with no briefing entry, which is why it is
+  written up here after the fact rather than at the time.
+
 ### Ido's voice went live on both Hebrew agents, on a model nobody had tried
 
 - **Live at 06:54Z**, read back from the Vapi API: Debt (he) `93c7f5e5` and

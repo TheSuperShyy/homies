@@ -1639,6 +1639,42 @@ taken as a step inside a voice change.
 authenticates through it, and say who pays afterwards.** Then check the rollback
 is one command before you make the change, not after.
 
+## When someone is stuck, narrow the question rather than widen it
+
+Added to the WhatsApp prompt on 31 Aug and live the same day. A resident who says
+"I'm not sure it's worth bothering you" has already told you the hard part is
+starting. Answering that with "share whatever you're comfortable with" sounds
+generous and is the opposite: it is an open question handed to the one person who
+has just said open questions are what they cannot answer. "אין בעיה" is in the
+same family — it reassures nothing and moves nothing.
+
+What works is three moves in one message: **the worry he actually voiced is
+heard**, **its cost is lowered** in one sentence, and then **one question
+answerable in two words** — in the flat or the common area, did it break or is it
+just bothering you, was it today. Two words is enough to work from, and asking
+for them is the agent taking the step instead of waiting.
+
+**Answer the worry he said, not the set of worries people have.** There are three
+common ones — it is too small to bother anyone, it involves a neighbour, it is
+embarrassing and who will read it — and they need different sentences. Reassuring
+someone worried about a neighbour that "even small things matter" answers a
+concern he never raised, and reads precisely like not having been read. **If it
+is unclear which one it is, ask the narrow question on its own: guessing the
+wrong worry is worse than not guessing.**
+
+The door-left-open line ("if you feel like sharing later, I'm here") is correct
+*after* those, never instead of them. On its own it closes the conversation while
+sounding like it is keeping it open, and someone who already hesitated does not
+come back.
+
+**And the worked example in the prompt is marked as an example on purpose.** A
+fixed phrase is one the model will say back word for word, which the same prompt
+forbids elsewhere — the rule that a sentence already sent is never sent again
+exists because repetition is how a person works out they are talking to a
+recording. This is the same trap that put a feminine-inflected `אֵלַיִךְ` in front
+of a male caller on the voice agent: the model reproduced the prompt's own worked
+example, gender and all.
+
 ## The voice prompts
 
 **Verify a push by reading the assistant back, never by trusting the write.**

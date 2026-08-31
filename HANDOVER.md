@@ -140,10 +140,13 @@ the end of the session, not off this repo:
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
 | OpenRouter temperature | **0.3** | 0.3 |
-| agent prompt | **47,219 chars** | 47,219 |
+| agent prompt | **51,455 chars** | 51,455 |
 
-Live `updatedAt` is `2026-08-31T06:08:45Z`, workflow `u2JjrbcNPYyyh3yl`, still
-active. Repo and live agree on all four.
+Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
+at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
+follow-up patch, 47,219 after it, then 51,455 when a later session added the
+narrow-question rule below and pushed it. Treat any number in this table as of
+its stated time.
 
 - **The bot now closes its own conversations.** No options list after a completed
   flow; the prompt paragraph that used to forbid the model saying "עוד משהו?"
