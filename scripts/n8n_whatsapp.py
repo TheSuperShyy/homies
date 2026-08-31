@@ -670,11 +670,17 @@ TOOLS = [
     {
         "name": "open_request",
         "description": (
-            "Open a maintenance or service ticket for this resident. Call this "
-            "once you know what the problem is and you have run verify_address "
-            "on the building and apartment they live in. Returns the real "
-            "reference number — you must not invent one, and you must not tell "
-            "the resident a ticket exists before this returns."
+            "Open a maintenance or service ticket. Call it as soon as you "
+            "know WHAT is wrong and WHERE — it verifies the address itself, "
+            "inside the same call: a building Homies does not manage opens "
+            "nothing, and the response says why (building_found false, with "
+            "reason street_unknown / number_not_on_street plus "
+            "numbers_we_manage / need_number / need_building / ambiguous plus "
+            "candidates) so you can tell the resident and ask again. You do "
+            "NOT need verify_address before this — there is no step before "
+            "this. When it opens, the response carries the real reference "
+            "number, the only source of one: never invent a number, and never "
+            "say a ticket exists before this returns a reference."
         ),
         "input_schema": {
             "type": "object",
@@ -693,7 +699,7 @@ TOOLS = [
                     "enum": ["plumbing", "electrical", "lighting", "elevator",
                              "cleaning", "gardening", "pest_control",
                              "locksmith", "fire_safety", "maintenance",
-                             "other"],
+                             "other", "complaint"],
                 },
                 "building": {"type": "string", "description": "Street and number."},
                 # Two apartment fields, because there are two facts and they are
@@ -712,8 +718,7 @@ TOOLS = [
                     "type": "string",
                     "description": "The apartment the person reporting LIVES in. "
                                    "Send this every time, including for a fault "
-                                   "in the lobby or the lift. Verify it with "
-                                   "verify_address first.",
+                                   "in the lobby or the lift.",
                 },
                 "fault_location": {
                     "type": "string",
@@ -723,9 +728,6 @@ TOOLS = [
                                    "'common' for a lift, lobby, stairwell, "
                                    "roof, car park, gate or yard.",
                 },
-                "unit": {"type": "string",
-                         "description": "Leave empty. The server fills this from "
-                                        "reporter_unit and fault_location."},
                 "urgency": {
                     "type": "string",
                     # These four are a check constraint on requests.urgency, not
@@ -745,16 +747,16 @@ TOOLS = [
         "name": "verify_address",
         "description": (
             "Check a building — and an apartment, if there is one — against the "
-            "list of buildings Homies actually manages. Call this BEFORE "
-            "open_request, every time, as soon as the resident names where they "
-            "are. Pass `building` exactly as they wrote it; the whole sentence "
-            "is fine. Pass `unit` only for a fault inside a flat; leave it out "
-            "for a lift, lobby, stairwell or anything else in the common areas. "
-            "Returns building_found, and when the building is real: the "
-            "canonical address to file the call against, how many apartments it "
-            "has, and unit_found. When it is not real it says why — an unknown "
-            "street, or a street we manage at other numbers, and it lists those "
-            "numbers so you can offer them."
+            "list of buildings Homies actually manages, WITHOUT opening "
+            "anything. Use it only when the address itself is the question: a "
+            "resident asking whether we manage their building, or grounding a "
+            "location during an emergency. It is NOT a step before "
+            "open_request — open_request verifies on its own; for tickets call "
+            "open_request directly. Pass building exactly as they wrote it; "
+            "the whole sentence is fine. Pass unit only for a fault inside a "
+            "flat. Returns building_found, the canonical address when the "
+            "building is real, and when it is not — why, with the numbers we "
+            "do manage on that street so you can offer them."
         ),
         "input_schema": {
             "type": "object",
@@ -1578,7 +1580,7 @@ def workflow(e):
                         " fault_location: %s, urgency: %s" % (
                             from_ai("description", tool("open_request")["input_schema"]["properties"]["description"]["description"]),
                             from_ai("type", "One of " + "/".join(tool("open_request")["input_schema"]["properties"]["type"]["enum"])),
-                            from_ai("building", "Street and number, as verify_address returned it."),
+                            from_ai("building", "Street and number, as the resident wrote it. The whole sentence is fine; this tool checks it."),
                             # `unit` is deliberately NOT offered to the model.
                             # The server derives it from these two, so there is
                             # no way for the model to pin a lobby leak to a flat

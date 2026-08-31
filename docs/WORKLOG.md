@@ -72,6 +72,92 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### Three prompts, five arcs, and the 66k file lost the most common one
+
+The owner asked for the opposite of what this file has become: *"i want the llm
+to be smart and not limited to any constraint, how you talk to me, very open and
+not guided by any path, ladders and rules."* The "ladders" are the three
+`מדרגות` concern rungs at prompt.md:1375, so this is a reaction to a specific
+thing I built. Rather than argue it, it got measured, which is what
+`wa_prompt_chat.py` exists for.
+
+**A** the live prompt (66,826 chars), **B** the state machine the owner pasted
+(4,071, written out in Hebrew with the three rules that contradict live
+corrected), **C** genuinely open (1,564: identity, the tools, and only the six
+constraints that produce a *wrong outcome* rather than an ugly one). Five arcs,
+three runs each.
+
+| arc | A - 66,826 | B - 4,071 | C - 1,564 |
+| --- | --- | --- | --- |
+| trapped in lift | transfers 2/3, never genders, one question | transfers 3/3 (one announced first), **genders 3/3**, re-greets, invents "our emergency hotline" | **transfers 0/3**, `את/ה` slash-forms, recites all four emergency numbers on turn 1 |
+| gas | **safety advice 3/3**, transfers 3/3, `ריח חזק זה מסוכן` 2/3 | transfers 3/3 on turn 1, **safety advice 0/3**, narrates the tool | safety advice 3/3, **transfers 0/3**, announces a ticket it never opens, `בנוסף` |
+| hesitant | **narrow binary question 3/3**, never genders | no closing question 2/3, genders | recites emergency numbers at someone who said they are unsure, transfers unasked |
+| **ordinary fault** | **correct 1/3** | **correct 3/3** | correct 0/3 |
+| balance | correct 3/3 | correct 3/3 | correct 3/3 |
+
+**The ordinary fault row is the finding.** A burnt light in a corridor is the
+most common thing this bot will ever be told, and the live prompt got it right
+once in three. Run 2 answered `הרצל 14 דירה 3` with
+`מעולה. באיזה בניין ואיזו דירה גרים?` - asking for what it had just been
+given. **Run 3 wrote `אוקיי, רשמתי. אני פותח קריאה.` and called nothing**:
+no ticket, no reference, and a resident who now believes one exists.
+prompt.md:1345 forbids exactly that sentence. The state machine, a sixteenth of
+the size, opened it correctly three times out of three with every field right.
+
+**Where A wins, it wins by reciting.** On the lift, gas and hesitancy arcs its
+output was near-identical across all three runs - the emergency block's two-turn
+example came back almost verbatim every time. That is why those arcs pass: the
+file has a worked example for them. It has no worked example for a burnt bulb,
+and that is the row it loses. **The prompt is not a set of instructions any
+more, it is a lookup table, and it is excellent exactly where it has an entry.**
+
+**Balance was a three-way tie**, which says the ~45 lines under
+`### יתרה וחוב` buy nothing the tool description was not already buying on
+its own.
+
+**And C's failure is worth keeping.** Told not to gender the resident and given
+no guidance on how, it invented `את/ה`, `זקוק/ה`, `צא/צאי` - grammatically
+correct, and the register of a government form. The rule was right and useless
+without the craft. That is the honest case for *some* of the file.
+
+### The seam the state machine exposed, which was real
+
+It asserted `verify_address` must run before `open_request`. Wrong: the backend
+runs `matchBuilding` inside `open_request` (`debt-tools/index.ts:1562`) and
+refuses with `opened: false`. Live's own tool descriptions say so outright -
+*"You do NOT need verify_address before this - there is no step before this"* -
+and so does prompt.md:1212. **But two of `open_request`'s `$fromAI` parameter
+docs still order the pre-step**, and the model reads those every request:
+`building` said *"as verify_address returned it"* and `reporter_unit` said
+*"Verify it with verify_address first"*. One tool arguing with itself.
+
+`scripts/n8n_whatsapp_toolfix.py` removes both. **Dry-run only - the write to
+the live active workflow was blocked by the permission classifier and was not
+worked around.**
+
+### And the harness was not faithful, which mattered more than it looks
+
+`wa_prompt_chat.py` built its tool schemas from `n8n_whatsapp.TOOLS`, and that
+had drifted from live: `open_request` and `verify_address` descriptions stale
+(one still carrying "Call this BEFORE open_request, every time"), the `type`
+enum missing `complaint`, and a `unit` property live never offers. **A short
+prompt leans on tool descriptions far harder than a long one**, so testing an
+open prompt against stale tool text would have measured the wrong thing
+entirely. It now reads descriptions and `$fromAI` docs from the live workflow,
+the same way `live_tap_lines()` already reads `TAPPED` from the live `Sort`
+node, and prints a drift warning when the script disagrees. The script was
+brought back in step in the same pass.
+
+### Two guard-node findings, neither fixed
+
+- **`Promised a transfer, made none?` only matches the present tense.** Its
+  regex is `אני מעביר|מעביר את זה|מעביר אתכם|מעביר אותך|עובר לצוות`.
+  The model demonstrably also writes `העברתי את זה לצוות` and
+  `העברתי את השיחה`, which **fall straight through**. It caught A's gas
+  run-1 phrasing; it would not have caught B's.
+- **Nothing guards a promised-but-unopened ticket.** A's fault run 3 is exactly
+  that failure and there is no net under it.
+
 ### A candidate WhatsApp prompt can be run without installing it, and the first thing it found was ours
 
 `scripts/wa_prompt_chat.py`. Talks to OpenRouter directly with the live model,

@@ -94,18 +94,115 @@ def repo_prompt(ref=None):
     return m.group(1).strip()
 
 
-def openai_tools():
-    """The live tool registry, in the shape OpenRouter's chat API wants.
+WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
+_WF = None
 
-    Converted rather than duplicated: a second copy of five schemas is a second
-    thing to keep in step, and the whole point of this runner is that the tools
-    are NOT the variable under test.
+
+def live_workflow():
+    """The live WhatsApp workflow, fetched once."""
+    global _WF
+    if _WF is None:
+        _WF = W.api("GET", "/api/v1/workflows/" + WORKFLOW_ID)
+    return _WF
+
+
+def _literals(chunk):
+    """Every quoted string in one $fromAI argument list, in order.
+
+    Quote-aware rather than a regex, because the descriptions themselves
+    contain quotes: fault_location's says "'apartment' for a leak in their
+    kitchen". A naive split on quotes truncates it there.
     """
-    return [{"type": "function",
-             "function": {"name": t["name"],
-                          "description": t["description"],
-                          "parameters": t["input_schema"]}}
-            for t in W.TOOLS]
+    out, i, n = [], 0, len(chunk)
+    while i < n:
+        if chunk[i] in "\"'":
+            q, j = chunk[i], i + 1
+            while j < n and chunk[j] != q:
+                j += 2 if chunk[j] == "\\" else 1
+            out.append(chunk[i + 1:j])
+            i = j + 1
+        else:
+            i += 1
+    return out
+
+
+def from_ai(js):
+    """(name, description) for every $fromAI(...) in a tool node's jsonBody.
+
+    This IS the parameter schema live sends. n8n's httpRequestTool has no
+    separate schema field: the model's arguments are whatever $fromAI asks
+    for, inside the JS that builds the request body.
+    """
+    out, tag, k = [], "$fromAI(", js.find("$fromAI(")
+    while k != -1:
+        i, depth, q = k + len(tag), 1, None
+        while i < len(js) and depth:
+            c = js[i]
+            if q:
+                if c == "\\":
+                    i += 1
+                elif c == q:
+                    q = None
+            elif c in "\"'":
+                q = c
+            elif c == "(":
+                depth += 1
+            elif c == ")":
+                depth -= 1
+            i += 1
+        lit = _literals(js[k + len(tag):i - 1])
+        if len(lit) >= 2:
+            out.append((lit[0], lit[1]))
+        k = js.find(tag, i)
+    return out
+
+
+def live_tools():
+    """The five tools exactly as the live agent node presents them.
+
+    Not built from `n8n_whatsapp.TOOLS`, which has drifted: on 31 Aug two of
+    its five descriptions were stale, including a `verify_address` that still
+    said "Call this BEFORE open_request, every time" — an instruction live
+    stopped sending. Every field live declares is a plain string with the
+    permitted values written into its description, and none are marked
+    required; the script's copy declares real enums and a required field, which
+    is a different thing to hand a model.
+
+    **This matters most when the prompt is short.** Strip the system prompt
+    down and the tool descriptions become most of what the model has to go on,
+    so a runner that sends the wrong ones measures the wrong prompt.
+    """
+    out = []
+    for n in live_workflow()["nodes"]:
+        if "tool" not in n.get("type", "").lower():
+            continue
+        p = n.get("parameters") or {}
+        props = {name: {"type": "string", "description": doc}
+                 for name, doc in from_ai(p.get("jsonBody") or "")}
+        out.append({"type": "function",
+                    "function": {"name": n["name"],
+                                 "description": p.get("toolDescription") or "",
+                                 "parameters": {"type": "object",
+                                                "properties": props,
+                                                "required": []}}})
+    if not out:
+        sys.exit("No tool nodes found in the live workflow.")
+    return out
+
+
+def report_drift(tools):
+    """Say so when the script disagrees with live, rather than picking silently.
+
+    The runner uses live either way. This exists so the drift gets fixed
+    instead of quietly widening — it is how the stale descriptions surfaced.
+    """
+    script = {t["name"]: t["description"].strip() for t in getattr(W, "TOOLS", [])}
+    stale = [t["function"]["name"] for t in tools
+             if t["function"]["name"] in script
+             and script[t["function"]["name"]] != t["function"]["description"].strip()]
+    if stale:
+        print("drift      : n8n_whatsapp.TOOLS is stale for %s "
+              "(live is being used)" % ", ".join(stale))
 
 
 def ask(messages, key, tools):
@@ -162,8 +259,8 @@ def live_tap_lines():
     conversation that does not happen — and that stale constant also contains a
     phrase this prompt bans outright, which is its own bug (see HANDOVER).
     """
-    wf = W.api("GET", "/api/v1/workflows/u2JjrbcNPYyyh3yl")
-    code = [n for n in wf["nodes"] if n["name"] == "Sort"][0]["parameters"]["jsCode"]
+    code = [n for n in live_workflow()["nodes"]
+            if n["name"] == "Sort"][0]["parameters"]["jsCode"]
     block = re.search(r"TAPPED\s*=\s*\{(.*?)\n\};", code, re.S)
     if not block:
         sys.exit("Could not read TAPPED out of the live Sort node.")
@@ -218,9 +315,10 @@ def main():
                          "of the repo's")
     ap.add_argument("--ref", default=None,
                     help="the prompt as the repo had it at this git ref")
-    ap.add_argument("--vs", default=None,
+    ap.add_argument("--vs", action="append", default=None, metavar="FILE",
                     help="head-to-head: run the same arc against this "
-                         "candidate file AND the repo prompt")
+                         "candidate AND the repo prompt. Repeatable, so three "
+                         "or more prompts can be compared in one pass")
     ap.add_argument("--tap", choices=["open", "status"], default=None,
                     help="start the arc from a menu tap, as the screenshots do")
     ap.add_argument("--runs", type=int, default=3,
@@ -232,7 +330,7 @@ def main():
     key = (e.get("OPENROUTER_API_KEY") or "").strip()
     if not key:
         sys.exit("OPENROUTER_API_KEY missing from .env")
-    tools = openai_tools()
+    tools = live_tools()
 
     if args.file:
         current = io.open(args.file, encoding="utf-8").read().strip()
@@ -241,16 +339,18 @@ def main():
         current = repo_prompt(args.ref)
         label = "repo" + (" at " + args.ref if args.ref else "")
 
-    contenders = [(label, current)]
-    if args.vs:
-        contenders.append((args.vs,
-                           io.open(args.vs, encoding="utf-8").read().strip()))
-        contenders.reverse()  # candidate first, incumbent second
+    # Candidates first, incumbent last, so the run to compare against is the
+    # one still on screen when the output stops scrolling.
+    contenders = [(v, io.open(v, encoding="utf-8").read().strip())
+                  for v in (args.vs or [])]
+    contenders.append((label, current))
 
     print("model      : %s   temp %s   max_tokens %s"
           % (W.MODEL, W.TEMPERATURE, W.MAX_TOKENS))
-    print("tools      : %s (stubbed — nothing is written anywhere)"
-          % ", ".join(t["name"] for t in W.TOOLS))
+    print("tools      : %s (live definitions, stubbed results — nothing is "
+          "written anywhere)"
+          % ", ".join(t["function"]["name"] for t in tools))
+    report_drift(tools)
     print("runs       : %d per prompt" % args.runs)
     taplines = live_tap_lines() if args.tap else None
     if args.tap:

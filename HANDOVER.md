@@ -180,6 +180,36 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **The prompt loses the most common arc, and this is the open question.**
+  Measured 31 Aug: an ordinary burnt corridor bulb came out correct **1 run in
+  3** on the live prompt — once re-asking the address just given, once writing
+  `אוקיי, רשמתי. אני פותח קריאה.` and calling **nothing**, leaving the
+  resident believing a ticket exists. A 4,071-char state machine got it right
+  3/3. The emergency and hesitancy arcs pass because the file has worked
+  examples for them and the model recites them near-verbatim; the ordinary path
+  has none. **Do not read this as "delete the file"** — the 1,564-char open
+  variant invented `את/ה` slash-forms and failed every arc but balance.
+- **`scripts/n8n_whatsapp_toolfix.py` is written and NOT applied.** It removes
+  the two `$fromAI` docs on `open_request` that still order a `verify_address`
+  pre-step, contradicting the tool's own description, the system prompt and the
+  backend (`debt-tools/index.ts:1562` verifies inside the open call). The live
+  write was blocked by the permission classifier — it needs the owner to run it
+  with `--apply`.
+- **`wa_prompt_chat.py` now reads tool definitions from LIVE**, not from
+  `n8n_whatsapp.TOOLS`, and warns when the two disagree. It was sending stale
+  tool text until 31 Aug, which matters most when testing short prompts.
+- **`n8n_whatsapp.py` is behind live in more places than the tools were.**
+  `TAP_LINE` is not dead code as previously recorded — it is interpolated into
+  the `Sort` node as `__TAP_LINE__`, so a full deploy from this script would
+  **overwrite live's three-variant `TAPPED` rotation with the single
+  `בטח, אשמח לעזור...` line the owner removed on 27 Aug**, which the prompt
+  also bans. The `Sort` template itself is structurally older than live's.
+  Treat a full deploy as unsafe until this is reconciled.
+- **Two gaps in the output guards, neither fixed.**
+  `Promised a transfer, made none?` matches only present-tense forms
+  (`אני מעביר|מעביר את זה|מעביר אתכם|מעביר אותך|עובר לצוות`) and
+  misses `העברתי`, which the model does produce. And **nothing at all guards a
+  promised-but-unopened ticket**, which is the fault arc's run-3 failure.
 - **Probing emergencies does not page anybody, so test them.** `transfer_to_human`
   posts to the tools router (respond, optional sheet write) and replies go to
   Chatwoot against an invented conversation id, which 404s. Verified 31 Aug.

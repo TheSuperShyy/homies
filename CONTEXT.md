@@ -553,6 +553,26 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**Prompt size is a measurable quantity, and on 31 Aug it got measured.** The
+live 66,826-char prompt, a 4,071-char state machine and a 1,564-char open one,
+five arcs, three runs each. **The long one wins every arc it has a worked
+example for and loses the one it does not** — it handled a burnt corridor bulb
+correctly once in three tries, once re-asking an address it had just been given
+and once announcing a ticket it never opened, while a prompt a sixteenth of its
+size got it right three times out of three. **The file has stopped being a set
+of instructions and become a lookup table.** That is not an argument for
+deleting it — the open prompt, told not to gender the resident and given no
+craft to do it with, invented `את/ה` slash-forms and sounded like a government
+form. It is an argument for knowing which rows exist.
+
+**A short prompt leans on tool descriptions far harder than a long one.** With
+the rules gone, the tool text is most of what the model has. So a harness that
+sends stale tool definitions measures the wrong prompt — and `wa_prompt_chat.py`
+was doing exactly that until it was pointed at live. **Anything that reads the
+bot's configuration should read it from live, not from the script that built
+it**, because the script is behind in at least three places and nobody notices
+until something is measured against it.
+
 **A live probe cannot show you which tools were called, and that hid a real
 defect for two days.** `probe_whatsapp.py` reads replies off the executions; it
 says nothing about whether `transfer_to_human` actually fired. The first
