@@ -11,6 +11,83 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Somebody was trapped in a lift for three turns and nobody was ever called
+
+An outside review of the prompt arrived claiming four contradictions. Checking
+them against the file found three of the four wrong on the mechanism — but
+reading the **multi-turn** arc they were about found something none of them
+named, and much worse than any of them:
+
+    im stuck!!!              → אני שומע אותך... איפה נתקעתם בדיוק?
+    in the elevator          → אני איתך, ומעלית זה מצב מלחיץ. באיזה בניין המעלית?
+    yes im alone and scared  → ...אפשר לספר לי באיזה בניין אתם נמצאים?
+
+**Three turns, a resident trapped and frightened, no `transfer_to_human`, and
+the same question asked twice.** Stuck in a lift is the case the emergency block
+names explicitly, and it never ran.
+
+**This was mine, from ninety minutes earlier.** The "already said where → ask
+which building" rule is right for somebody locked out of their flat, and on the
+danger path it *replaced* the protocol instead of feeding it. The address
+question had become the most available next move in the file, and it beat a
+block that never says the word "building".
+
+**Three pushes, and the first two failed in the way this file always fails:**
+
+1. Wrote the prose fix — "trapped → transfer first". It kept asking for the
+   building, because **the examples one line below still showed a lift being
+   answered with `באיזה בניין המעלית?`**. I have now written a rule against my
+   own examples three times in one day and lost three times.
+2. Deleted the trapped examples. The transfer started firing — and lift
+   recognition broke, because with no example of a named lift handled
+   correctly it fell back to the generic ask-where example and asked somebody
+   who wrote "stuck in the lift" whether they were in the lift. It also
+   produced `הצוות כבר יודע` before any tool call: a promise of help that had
+   not been arranged, told to the one person most dependent on it.
+3. **The actual fix was the first two-turn example in this file.** Every worked
+   example here is a single message — which is exactly why single-turn
+   behaviour is good and the arcs are not. **Nothing in the file had ever
+   demonstrated what the second message looks like when the resident does not
+   answer the question.** The emergency block now carries a full exchange whose
+   second turn answers the fear and pointedly does *not* re-ask the building.
+
+**Verified, both arcs:**
+
+    תקוע במעלית!!  → קיבלתי, תקועים במעלית. מעביר את זה לצוות עכשיו, וזה ייקח
+                     רגע. בינתיים בלי לנסות לפתוח בכוח. באיזה בניין?
+    אני לבד ומפחד  → אני איתך, ואני לא נעלם מהשיחה. הצוות כבר מטפל בזה. אם זה
+                     מרגיש חמור, 102 שם בכל רגע.
+
+The English arc behaves identically. Ordinary paths unchanged: a dead bulb still
+gets the offer, locked-out still gets building and flat. `check_whatsapp.py` all
+green including a real ticket end to end. Live and repo identical at 65,014
+chars.
+
+**On the four claimed contradictions, for the record**, because the same
+arguments will come back:
+
+- **"One question mark caps empathy."** No. The cap is on question *marks*;
+  concern goes in a declarative sentence before it, which is what the bot
+  actually does. Raising the cap would have produced two questions and still no
+  transfer.
+- **"Offer-first fights assess-severity."** Already resolved in the file —
+  danger takes no offer and no ticket — and the probe confirms it: locked out
+  gets the ticket path, a lift does not.
+- **"It must collect data before calling the tool."** False. `transfer_to_human`
+  takes a `reason` enum and nothing else. There was never anything to collect.
+- **"Non-gendering forces robotic Hebrew."** Overstated. `אני שומע אותך, וזה
+  באמת מלחיץ` is warm, natural and genderless. **The proposed remedy — default
+  masculine during emergencies — is rejected**: it misgenders about half of
+  residents at the moment they are most distressed, for a cosmetic gain.
+
+### Still open
+
+- `אני כאן. קיבלתי, תקועים במעלית` still stacks acknowledgements and echoes the
+  state as a log entry, both already ruled against. Not chased: every attempt to
+  fix recitation today produced a worse bug than the recitation.
+- The em dash appears nine times in the system prompt while the rule banning it
+  claims two.
+
 ### A rules inventory for the owner, and nothing in the system changed
 
 Two questions, both answered in the terminal, no edit to the prompt, the

@@ -140,7 +140,7 @@ the end of the session, not off this repo:
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
 | OpenRouter temperature | **0.6** | 0.6 |
-| agent prompt | **63,250 chars** | 63,250 |
+| agent prompt | **65,014 chars** | 65,014 |
 
 Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
 at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
@@ -180,6 +180,20 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **A trapped resident must be transferred before being asked anything.**
+  `transfer_to_human` takes only a `reason` enum — no address, no flat, no
+  description — so there is nothing to collect first. On 31 Aug a lift arc ran
+  three turns with no transfer because the concern rung's "ask which building"
+  out-competed the emergency block. **Do not put a next-question instruction
+  inside a tone rule.**
+- **The emergency block holds the file's only two-turn example, and it is
+  load-bearing.** Its second turn deliberately does NOT re-ask the unanswered
+  question. Everything else here is single-turn, which is why arcs were the
+  weak spot; if you add examples elsewhere, add arcs.
+- **Default-masculine Hebrew for emergencies was proposed and rejected**
+  (31 Aug, outside review). It misgenders about half of residents at the worst
+  possible moment. Unpointed forms — `איתך`, `שמעת`, `שלך` — already give warm
+  genderless Hebrew; `אני שומע אותך, וזה באמת מלחיץ` is the proof.
 - **There is no intent classifier and no keyword routing — do not go looking
   for one.** Word-matching exists only in `Sort` (greeting regex, both tap
   lines, the attachment line); everything else is the model reading the prompt.

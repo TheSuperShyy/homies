@@ -553,6 +553,21 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**Every worked example in this prompt was a single message, and the failures
+are multi-turn.** That asymmetry explains a week of results: first replies read
+well and second replies repeat the question, forget the transfer, or answer a
+frightened person with a form. A resident trapped in a lift went three turns
+with no `transfer_to_human` while every single-turn probe of the same words
+passed. **The fix was the file's first two-turn example** — specifically one
+where the resident does *not* answer the question, which nothing here had ever
+shown. Probe arcs, not messages.
+
+**And a tone rule must never decide whether somebody gets a human.** The
+concern rungs are about how warm the sentence is; when one of them also said
+what to ask next, it silently pre-empted the emergency protocol, because the
+protocol never mentions the words that rung used. Keep the decision and the
+register in separate blocks, and have the register hand off explicitly.
+
 **One send per case measures the best case and nothing else.** The owner
 caught a cold reply ten minutes after a push whose three verification probes
 had all passed. Model output at temperature 0.6 has a spread, the resident
