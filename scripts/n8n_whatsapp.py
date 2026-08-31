@@ -242,6 +242,11 @@ MEDIA_LINE = {
 #
 # Same grammar rule as every other fixed line: nothing addresses the resident
 # in a gendered form.
+# DEAD SINCE 31 AUG, AND KEPT ONLY AS A RECORD. The owner asked for nothing
+# templated, so the 'open' and 'status' taps stopped being answered by the
+# workflow and now reach the model like any other message. Nothing reads this
+# any more — the SORT template's tap branch went with it. Do not wire it back
+# in without saying so: these sentences are the ones the owner pointed at.
 TAP_LINE = {
     # The fault only, and not the building with it. Tapping this row IS the
     # explicit request, so the offer the prompt now opens with ("shall I open a
@@ -813,11 +818,29 @@ TOOLS = [
     {
         "name": "transfer_to_human",
         "description": (
-            "Hand this conversation to a person. Call this whenever money, debt, "
-            "payment details or receipts come up; when the resident asks for a "
-            "person or is angry; when anything sounds like a safety risk; and "
-            "whenever you are simply not sure. Being unsure is a good enough "
-            "reason on its own."
+            # Widened 31 Aug, when the prompt's emergency protocol was deleted
+            # with the rest of the scripting. Measured before the change: zero
+            # transfers in six runs for somebody shut in a lift or reporting
+            # gas. The owner's call was to put it here rather than back in the
+            # prompt, which is also the safer home for it — tool descriptions
+            # are English and the bot writes Hebrew, so there is no sentence in
+            # here for it to recite.
+            "Hand this conversation to a person. CALL THIS BEFORE YOU WRITE "
+            "YOUR REPLY, never after: the reply may then say help is on the "
+            "way, and a reply that says so without this call is a lie told to "
+            "somebody who may be in danger.\n"
+            "Call it whenever money, debt, payment details or receipts come "
+            "up; when the resident asks for a person, or is angry; and "
+            "whenever you are simply not sure — being unsure is reason enough "
+            "on its own.\n"
+            "And call it for a PERSON in a bad state, as opposed to a thing "
+            "that broke: somebody shut in a lift, on a roof, in a stairwell "
+            "or a car park; somebody hurt, alone, frightened or panicking; "
+            "anybody reporting gas, fire, flooding, or water near "
+            "electricity. A burst pipe is a ticket. A person who cannot get "
+            "out is this, and it happens first — before you ask where they "
+            "live, before anything else. If a message contains both, this one "
+            "wins."
         ),
         "input_schema": {
             "type": "object",
@@ -1056,19 +1079,11 @@ if (!text.trim()) {
 // already said what the resident wants, and a model round-trip here produced a
 // re-greeting on a real handset. 'human' and 'balance' fall through to the
 // agent: 'human' becomes transfer_to_human, 'balance' becomes get_balance.
-if (tapped === 'open' || tapped === 'status') {
-  // REMEMBER IT. The canned line never reaches the model, so on the next
-  // message the agent sees a fault description arriving out of nowhere and
-  // offers to open a call the resident already asked for by tapping. Seen live
-  // on 25 Aug, and it is the re-ask the prompt exists to prevent.
-  store.tapped = store.tapped || {};
-  store.tapped[from] = { kind: tapped, at: Date.now() };
-  return [{ json: {
-    _reply: '', _work: false, _canned: true, _menu: false,
-    to: from, lang, text: said(__TAP_LINE__[tapped][lang]),
-    in_text: inText, msg_type: msgType, message_id: id,
-  } }];
-}
+// The 'open' and 'status' taps were answered here with a canned line until
+// 31 Aug, when the owner asked for nothing templated. They fall through to the
+// model now, which answers the tap in its own words. The tap is then in the
+// conversation memory, so store.tapped is no longer needed to stop the 25 Aug
+// re-ask: the model can see for itself that a ticket was already asked for.
 
 // --- A greeting, and nothing else ------------------------------------------
 // This is the only case that gets the menu. Someone who opens with "שלום" has

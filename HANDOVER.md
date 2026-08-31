@@ -180,6 +180,38 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **The bot is deliberately unconstrained as of 31 Aug. Do not add a rule back
+  without asking.** The system prompt is **3,177 characters** (was 66,826) and
+  holds two restrictions — nothing outside Homies, nothing about another
+  resident — plus facts it cannot invent, one line on not gendering the
+  resident, and the greeting sentence `check_greeting()` requires. Every worked
+  example, register rule, concern rung and protocol is gone, on the owner's
+  explicit and repeated instruction.
+- **Behaviour goes in the tool descriptions now, not the prompt.** They are
+  English and the bot writes Hebrew, so there is nothing in them to recite.
+  Deleting the emergency protocol took transfers to **0 in 6 runs** for
+  somebody shut in a lift; widening `transfer_to_human`'s description (281 →
+  856 chars) took it to **4 in 3 runs on each arc** without causing
+  over-transferring on ordinary faults.
+- **THE PROMPT IS NOT THE ONLY PROMPT — read all three before judging what the
+  bot says.** (1) `prompt.md`. (2) The `Answer the resident` node's own `text`
+  template, which injects instructions on every message; it held 1,473
+  characters including the building-and-apartment script until 31 Aug and is
+  now 406, facts only. (3) The `Sort` node, which answers greetings and the
+  `לדבר עם נציג` tap with canned Hebrew the model never sees.
+- **`לדבר עם נציג` is the one canned tap left, on purpose.** `Human tap?` →
+  `Transfer the tap` hangs off the *canned* branch of `Canned reply?`; sending
+  that tap to the model instead would stop the transfer firing. Rewiring it is
+  a separate job.
+- **The register regressed and nobody has fixed it.** Not templated any more —
+  twelve replies over three replays of the same arc, no two alike — but the
+  bot now writes numbered forms on a menu tap, slash-forms like `פרט/י`,
+  `אנא`, `ברצונך` and four-line messages. This is the known cost of the
+  change, not a regression to fix quietly.
+- **`scripts/n8n_whatsapp_open.py`** applied the workflow half of this and is
+  idempotent. `TAP_LINE` in `n8n_whatsapp.py` is now genuinely dead and marked
+  as such; the SORT template's tap branch was removed with it, so a deploy no
+  longer re-adds the canned lines.
 - **`open_request` was contradicting itself and it cost most of the ordinary
   path. Fixed and applied 31 Aug.** Its description says there is no step
   before it; two of its own `$fromAI` parameter docs said to run

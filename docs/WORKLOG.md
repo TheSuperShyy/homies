@@ -72,6 +72,94 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### The prompt is 3,177 characters and the scripts are gone, including the ones that were never in it
+
+The owner, twice, the second time flatly: nothing templated, the bot free, only
+two restrictions — nothing outside Homies, nothing about another resident.
+
+**He was right and it was provable.** Every bot line in the 21:24–21:42
+conversation was a sentence out of `prompt.md`: prompt.md:1078, then
+prompt.md:1449 and prompt.md:1112 word for word. Each sat under a line reading
+`אלה דוגמאות ולא נוסח קבוע`. Two consecutive turns that meant different things —
+*I don't know* and *I don't want to* — got the same reply differing by one
+comma, because the rule banned repeating a sentence **word for word** and a
+comma clears that bar. **Saying "not a fixed formula" beside a complete sentence
+does not stop the sentence being sent.**
+
+**And prompt.md was never the only prompt.** Two other places held canned
+Hebrew and both reached residents:
+
+- **The agent node's own message template**, 1,473 characters injected on every
+  message. Greeting choreography, and for a tap on "open a ticket" the entire
+  offer script down to
+  `ובאותה הודעה שאלת הבניין והדירה, והיא נגמרת בסימן השאלה שלה`. That is the
+  building-and-apartment question, and it was never in `prompt.md`. **Stripping
+  the prompt would have left it running.**
+- **The `Sort` node's canned tap replies**, three fixed variants per menu row,
+  sent without the model seeing the tap. The 21:25 message in the screenshot was
+  one of these.
+
+### What was done
+
+| | before | after |
+| --- | --- | --- |
+| system prompt | 66,826 | **3,177** |
+| agent node injected prompt | 1,473 | **406** |
+| canned tap replies | 9 | **3** (the נציג row only) |
+
+Gone from the prompt: the register table and its ✓/✗ columns, every
+banned-phrase list, the three concern rungs, the invitation and hesitancy fork,
+the offer choreography, the four-part closing message, the entire emergency
+protocol, the status/balance/address sections, and **every worked example**.
+
+Kept: the two restrictions; the facts it cannot invent (office details, what the
+fee covers, payment, response times, responsibility, the national emergency
+numbers as data); one line saying not to gender the resident; one clause saying
+Michael is a man, added after a run came back `אני מבינה`; two channel facts
+(WhatsApp renders no markdown; a message can arrive after you have written).
+And the greeting sentence, verbatim only because `check_greeting()` blocks the
+deploy when it and the menu body drift.
+
+**`לדבר עם נציג` stays canned and this is deliberate.** `Human tap?` →
+`Transfer the tap` hangs off the *canned* branch of `Canned reply?`. Route that
+tap to the model and the transfer silently stops firing. That button is routing,
+not conversation; moving it is a rewiring job of its own.
+
+### The measurement, and the one thing that had to move to the tools
+
+Templating: **fixed.** The screenshot replayed three times gave twelve replies
+and no two alike. Live probe, five messages, five different answers.
+
+The floor, measured before anything was added back, 3 runs per arc:
+
+| arc | prompt stripped | after the tool change |
+| --- | --- | --- |
+| trapped in a lift | **0 transfers** | **4** |
+| gas | **0 transfers** | **4** |
+| ordinary fault | 3/3 opened | 3/3 opened |
+| balance | 3/3 | — |
+
+Zero out of six, for somebody shut in a lift saying they are alone and
+frightened. It asked for the street name three turns running.
+
+**The fix went into `transfer_to_human`'s description, not back into the
+prompt** — the owner's call, and the better home for it anyway: **tool
+descriptions are English and the bot writes Hebrew, so there is no sentence in
+them for it to recite.** 281 characters to 856, saying to call it before writing
+the reply, and that it is for a **person** in a bad state as opposed to a thing
+that broke. It did not cause over-transferring: ordinary faults still open
+tickets 3/3.
+
+### What it sounds like now, honestly
+
+Not templated, and not good. The tap produces a numbered form
+(`1. מה הבעיה? 2. באיזה בניין...`). Slash-forms are back — `פרט/י` — which is
+what happens when a prompt says not to gender the resident without saying how.
+`אנא`, `ברצונך`, bulleted lists, four-line messages. **The register regressed
+about as far as the repetition improved.** That is the trade the owner asked
+for, it is recorded here rather than quietly hedged, and anything added back is
+a decision a person makes.
+
 ### The tool was arguing with itself, and that was most of what I blamed on prompt size
 
 The owner ran `n8n_whatsapp_toolfix.py --apply`. Both strings gone from live,

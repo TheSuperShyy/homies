@@ -281,7 +281,15 @@ def run_arc(prompt, phrases, key, tools, tap=None, taplines=None):
     # the conversation the model then sees. Seeding it reproduces the arc the
     # owner's screenshots start from.
     if tap:
-        line = (taplines or {}).get(TAP_LABEL[tap], ["(tap line unavailable)"])[0]
+        rows = (taplines or {}).get(TAP_LABEL[tap])
+        if not rows:
+            # Since 31 Aug only the נציג row is answered by the workflow; the
+            # others reach the model. Seeding a line live no longer sends would
+            # test a conversation that does not happen.
+            sys.exit("The %r tap is no longer canned in the live Sort node — it "
+                     "goes to the model now. Send %r as the first phrase "
+                     "instead of using --tap." % (tap, TAP_LABEL[tap]))
+        line = rows[0]
         messages.append({"role": "assistant", "content": line})
         rows.append(("bot", line, []))
     for p in phrases:
@@ -354,6 +362,14 @@ def main():
     print("runs       : %d per prompt" % args.runs)
     taplines = live_tap_lines() if args.tap else None
     if args.tap:
+        if not (taplines or {}).get(TAP_LABEL[args.tap]):
+            # Since 31 Aug only the נציג row is answered by the workflow; the
+            # others reach the model. Seeding a line live no longer sends would
+            # test a conversation that does not happen.
+            sys.exit("The %r tap is no longer canned in the live Sort node — it "
+                     "reaches the model now. Send %r as the first phrase "
+                     "instead of using --tap."
+                     % (args.tap, TAP_LABEL[args.tap]))
         print("opening    : menu tap '%s' -> %s"
               % (args.tap, taplines[TAP_LABEL[args.tap]][0]))
     print()

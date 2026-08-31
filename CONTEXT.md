@@ -553,6 +553,29 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**An example in a prompt is a template, whatever the sentence next to it
+says.** This file told the model `אלה דוגמאות ולא נוסח קבוע` three separate
+times and the examples came back to residents word for word anyway. A rule
+banning repetition **word for word** was satisfied by moving a comma. There is
+no wording that makes a complete, sendable sentence safe to show a model: if
+it is in the prompt it will be sent, so the only way to stop the reciting is
+to leave nothing to recite.
+
+**Behaviour belongs in the tool descriptions, not the prompt, and the reason is
+mechanical.** Tool descriptions are English; the bot answers in Hebrew. There
+is nothing in them it can copy into a reply. When the emergency protocol was
+deleted the bot stopped transferring anybody — zero in six runs for somebody
+shut in a lift — and moving the same requirement into `transfer_to_human`'s
+description fixed it without putting a single Hebrew sentence back in front of
+the model.
+
+**The prompt was never the only prompt.** The agent node injects its own
+instructions on every message — 1,473 characters of them until 31 Aug,
+including the whole offer script — and the `Sort` node answers greetings, menu
+taps and media with canned Hebrew the model never sees. **Anyone auditing what
+the bot says has to read all three**, and reading `prompt.md` alone will
+mislead them.
+
 **When a model behaves erratically on one path, check whether its tool
 definitions contradict themselves before blaming the prompt.** On 31 Aug the
 live prompt opened an ordinary ticket correctly **1 time in 3**, and the two
