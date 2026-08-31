@@ -68,35 +68,28 @@ def strip_connections(conns, dropped):
 
     n8n's shape is {source: {type: [[{node, type, index}, ...], ...]}}, so a
     node is deleted in two places and forgetting the second leaves a connection
-    pointing at a node that is not there -- which the editor renders as a broken
+    pointing at a node that is not there -- which the editor draws as a broken
     arrow and the runtime ignores silently.
     """
     out = {}
     for src, types in conns.items():
         if src in dropped:
             continue
-        new_types = {}
-        for kind, branches in types.items():
-            new_types[kind] = [
-                [t for t in branch if t.get("node") not in dropped]
-                for branch in branches
-            ]
-        out[src] = new_types
+        out[src] = {
+            kind: [[t for t in branch if t.get("node") not in dropped]
+                   for branch in branches]
+            for kind, branches in types.items()
+        }
     return out
 
 
 def layout_complaints(nodes):
-    """The lines n8n_layout.check() would raise, as a set, or empty."""
+    """The lines n8n_layout.check() would raise, as a set. Empty if it passes."""
     try:
         W.check(nodes)
     except W.LayoutError as exc:
-        return {l.strip() for l in str(exc).splitlines()[1:] if l.strip()}
+        return {line.strip() for line in str(exc).splitlines()[1:] if line.strip()}
     return set()
-
-
-def new_layout_complaints(before, after):
-    """Only what the patch itself introduced."""
-    return sorted(layout_complaints(after) - layout_complaints(before))
 
 
 def main():
@@ -104,12 +97,76 @@ def main():
 
     found = W.find()
     if not found:
-        sys.exit("\nREFUSING TO PATCH. This would introduce placement "
-                 "problems that are not already there:\n    %s"
-                 % "\n    ".join(worse))
+        sys.exit("No workflow named %r on the instance." % W.WF_NAME)
+    live = W.api("GET", "/api/v1/workflows/%s" % found["id"])
+
+    nodes = live["nodes"]
+    conns = live["connections"]
+    changes = []
+
+    # 1. the follow-up menu
+    present = [n["name"] for n in nodes if n["name"] in DROP]
+    if present:
+        changes.append("remove nodes: %s" % ", ".join(present))
+    kept = [n for n in nodes if n["name"] not in DROP]
+
+    before = json.dumps(conns, sort_keys=True, ensure_ascii=False)
+    conns = strip_connections(conns, set(DROP))
+    if json.dumps(conns, sort_keys=True, ensure_ascii=False) != before:
+        changes.append("rewire: drop every connection touching those nodes")
+
+    # 2. the prompt
+    prompt = W.system_prompt()
+    W.check_greeting(prompt)
+    agent = next((n for n in kept if n["type"].endswith("langchain.agent")), None)
+    if agent is None:
+        sys.exit("No agent node on the live workflow -- refusing to guess.")
+    old_prompt = agent["parameters"].get("options", {}).get("systemMessage", "")
+    if old_prompt != prompt:
+        changes.append("prompt: %d chars -> %d" % (len(old_prompt), len(prompt)))
+        agent["parameters"].setdefault("options", {})["systemMessage"] = prompt
+
+    # 3. the temperature
+    model = next((n for n in kept if n["type"].endswith("lmChatOpenRouter")), None)
+    if model is None:
+        sys.exit("No OpenRouter node on the live workflow -- refusing to guess.")
+    opts = model["parameters"].setdefault("options", {})
+    if opts.get("temperature") != W.TEMPERATURE:
+        changes.append("temperature: %s -> %s"
+                       % (opts.get("temperature", "unset"), W.TEMPERATURE))
+        opts["temperature"] = W.TEMPERATURE
+
+    print("workflow : %s  (%s, active=%s)"
+          % (W.WF_NAME, live["id"], live.get("active")))
+    print("nodes    : %d live -> %d after" % (len(nodes), len(kept)))
+    if not changes:
+        print("")
+        print("Nothing to do. Live already matches.")
+        return
+    print("")
+    print("changes:")
+    for c in changes:
+        print("  - %s" % c)
+
+    # PLACEMENT IS CHECKED RELATIVELY, NOT ABSOLUTELY, and that is deliberate.
+    #
+    # n8n_layout.check() raises on the live workflow as it stands: seven pairs of
+    # overlapping nodes, and every node off the grid, all of it from the hand
+    # edits that put those fourteen nodes there in the first place. That is a
+    # real complaint and somebody should answer it, but it is not this patch's to
+    # answer -- failing here would mean no surgical edit can ever be made to this
+    # workflow until an unrelated tidy-up happens first.
+    #
+    # So the bar is: do not make it worse. Any complaint the patched workflow
+    # raises that the live one did not is one this patch caused, and that fails.
+    worse = sorted(layout_complaints(kept) - layout_complaints(nodes))
+    if worse:
+        sys.exit("REFUSING TO PATCH. This would introduce placement problems "
+                 "that are not already there:\n    " + "\n    ".join(worse))
 
     if not apply:
-        print("\nDry run. Re-run with --apply to write it.")
+        print("")
+        print("Dry run. Re-run with --apply to write it.")
         return
 
     # PUT takes only these four keys; sending id/active/tags back is a 400.
@@ -119,7 +176,8 @@ def main():
         "connections": conns,
         "settings": live.get("settings", {}),
     })
-    print("\nwritten. Re-run without --apply to confirm it reports nothing to do.")
+    print("")
+    print("written. Re-run without --apply to confirm it reports nothing to do.")
 
 
 if __name__ == "__main__":
