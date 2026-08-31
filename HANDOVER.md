@@ -140,7 +140,7 @@ the end of the session, not off this repo:
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
 | OpenRouter temperature | **0.6** | 0.6 |
-| agent prompt | **59,229 chars** | 59,229 |
+| agent prompt | **61,389 chars** | 61,389 |
 
 Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
 at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
@@ -180,6 +180,16 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **The urgent-and-thin message has its own case inside rung three.**
+  `im stuck!!!!`, `הצילו`, `תעזרו לי` — do not ask them to describe anything,
+  treat the exclamation marks as content, and ask **where they are now**, not
+  where they live. That last distinction is the whole fix; the address question
+  is for opening a ticket, and it comes after a yes on every other path.
+- **Ordinary faults still offer before asking the address, including the
+  smallest ones.** Rung one's "straight to the point" means straight to the
+  *offer*. This regressed once on 31 Aug when the where-are-you-now rule made
+  the address question too salient file-wide; if a bulb report starts asking
+  for a flat number again, that is the interaction to look at.
 - **Concern has three rungs, and the third one is load-bearing.** Small fault
   → brisk. Big fault, but to a thing → one real sentence. **Happened to the
   person** (trapped, no water, cold, locked out, with a baby) → concern first,

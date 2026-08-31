@@ -553,6 +553,19 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**Every path in the WhatsApp prompt assumes the resident describes the
+problem, and somebody in trouble cannot.** `im stuck!!!!` has no fault, no
+place and no detail, so every rule keyed on what they said had nothing to work
+with and produced the shortest sentence available. **A message can be urgent
+and thin at the same time, and thin is not the same as uncooperative**: the
+exclamation marks are the content. Asking such a person to describe what
+happened is the worst available reply.
+
+**And `where do you live` is a records question while `where are you now` is a
+rescue question.** They sound alike and read completely differently: one says a
+file is being opened, the other says somebody is coming. The prompt only had
+the first, which is why every trapped resident got asked for their flat number.
+
 **A prompt full of rules that cap a behaviour has no way to ask for more of
 it.** Every warmth rule in the WhatsApp prompt was a ceiling — one containment
 word per conversation, none is fine, not sorry yet, don't be shocked by a dead
@@ -586,6 +599,12 @@ losing, look for the block that is beating it before writing it a third time.
 distance.** `אין בעיה` is blessed twice as ordinary spoken Hebrew; banning it
 inside one branch did nothing. Scoping it where it is approved — it answers a
 fact received, not a person who has just said something is hard — is what held.
+
+**A ✓ example silently repeals a ✗ list.** The invitation block's first worked
+example opened `בטח, אשמח לעזור` while `אשמח לעזור` sat on this file's own
+list of things only a bot writes — and examples outrank rules at any distance,
+so the ban lost on the most-travelled path in the file. When a ban keeps
+leaking, grep the approved examples for it before writing the rule again.
 
 **A contrast pair is not a sendable phrase; a written-out phrase is.** The
 do-not-say rule has an exploitable middle: `"תוכל" מול "תוכלי"` never leaks,

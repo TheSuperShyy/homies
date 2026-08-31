@@ -11,6 +11,88 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The file assumed the resident would describe the problem. Some cannot.
+
+`im stuck!!!!` came back with `אני כאן. איפה בדיוק?` — the fifth cold reply in a
+day, and this one landed an hour after the concern rungs went live. Probing it
+found three separate answers to the same message, all wrong:
+
+    אפשר לספר לי מה קרה?          asking somebody shouting for help to write it out
+    איפה בדיוק גרים ובאיזה בניין?  the records question, to somebody trapped
+    נשמע שמשהו רע קרה              a guess, delivered as an observation
+
+**And rung three did fire.** `להיות תקוע זה מצב מלחיץ` is its wording. It
+reached the right rung and then lost the question half to the address rule, so
+the diagnosis was not "concern is too low" a second time.
+
+**The hole is that yesterday's naming rule has no input here.** "The concern
+sentence must contain what happened to them" was the fix for recitation, and it
+works — but `im stuck!!!!` names almost nothing, so the rule had nothing to put
+in the sentence and collapsed to the shortest one available. **Every path in this
+file downstream of the greeting is built on "tell me what happened".** There was
+no path at all for somebody in trouble *right now* who cannot type a
+description. Four exclamation marks and one word is a person asking you to take
+over, not to interview them.
+
+So: a fourth case inside rung three, for the **urgent and thin** message. Do not
+ask them to describe anything — they already said the important part. The
+exclamation marks are content, not noise. One question only.
+
+**And the distinction that actually fixes it: `where do you live` is a records
+question, `where are you now` is a rescue question.** The file only had the
+first. You send somebody to where the resident *is*, not to the flat registered
+in their name — and the two sound almost identical while reading completely
+differently on the other end. Being asked which flat you live in while trapped
+tells you a file is being opened; being asked where you are tells you somebody is
+on the way. The address rule got this exception at **its own site**, because the
+version written only at the rung's site had already lost to it once.
+
+**Two faults found by probing the fix, one of them a regression I caused:**
+
+1. **It echoed the plea.** `הצילו` → `קיבלתי, הצילו`, which reads as filing
+   "help!" as the name of the fault. The echo rule already exempts curses; it now
+   exempts pleas, for the same reason. **You echo what happened, never what they
+   are asking you for.**
+2. **The smallest faults stopped offering.** `נורה שרופה במסדרון` went straight
+   to `באיזה בניין ואיזו דירה גרים?`, three sends out of three, where the same
+   phrase had offered the ticket correctly in three earlier probes today. A noisy
+   air conditioner and a garage door still offered, so it was specific to rung
+   one — whose wording is mine: `"אוקיי" ומיד לעניין`, and "straight to the
+   point" reads as "skip the offer, collect the address". The where-are-you
+   rewrite had also made the address question far more salient file-wide, which
+   is what tipped the smallest case over. Both scoped: "straight to the point"
+   means straight to the **offer**, and the where-are-you exception applies only
+   when the resident themselves is in trouble.
+
+**And a contradiction found on the way: the invitation block's first worked
+example opened `בטח, אשמח לעזור`, while `אשמח לעזור` is on this file's own list
+of things only a bot writes.** An example outranks a rule at any distance, so the
+ban had been losing to it on the most common path in the file. Removed. Worth a
+sweep: this is unlikely to be the only ✓ example contradicting a ✗ list.
+
+**Verified after the last push:**
+
+    im stuck!!!!             → אני איתך עכשיו. איפה נמצאים ברגע זה, במעלית,
+                               בחניון, במקום אחר?
+    הצילו                    → אני קורא, ואני לא הולך לשום מקום. איפה זה קורה
+                               עכשיו?
+    תקוע!!! תעזרו לי         → קיבלתי, ואני איתך עכשיו. איפה נמצאים ברגע זה...
+    נורה שרופה במסדרון       → אני מבין שיש נורה שרופה במסדרון. לפתוח על זה
+                               קריאה לצוות?
+
+`check_whatsapp.py` all green including a real ticket end to end. Patch
+idempotent, live and repo identical at 61,389 chars.
+
+### Still open
+
+- **Nobody has read a full emergency to the end.** Every probe here stops at the
+  bot's first reply. The transfer, the safety advice and staying in the chat are
+  all unverified against a real multi-turn panic.
+- The em dash appears nine times in the system prompt while the rule banning it
+  claims two.
+- Emergency turn one still announces a transfer before calling the tool.
+- The three-turn probe still re-greets after a menu tap.
+
 ### Every rule about warmth in this file was a ceiling, and none was a floor
 
 The owner sent a fourth chat, 17:06, and asked for the bot to be "exaggerated,
