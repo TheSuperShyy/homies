@@ -43,6 +43,63 @@ which shipped unprobed and were all still wrong:
 On the original question, whether he is too closed: he is not cold, he funnels.
 Four consecutive turns ended by offering to open a ticket.
 
+### Ido's clone, third attempt — and the blocker was two numbers I wrote myself
+
+- **The owner asked why a three-minute recording was being used ten seconds at a
+  time.** It should not have been. `scripts/voice_clone.py` had enforced
+  `MAX_SECONDS = 10.0` since 5 Aug and its docstring called the 220s source "22x
+  over instant cloning's 10-second limit". **There is no such limit.** Cartesia's
+  guide says a clone can be made "with as little as 10 seconds of audio" — a
+  floor, written into this repo as a ceiling — and they accept up to 60.
+- **`sonic-3.6` had never been tried and appears in no file in this repo before
+  today.** It is Cartesia's current GA model and it speaks Hebrew. The 30 Aug
+  probe that concluded "only sonic-3 and sonic-preview accept Hebrew" guessed six
+  model ids and that was not one of them, so the finding described the guess list
+  rather than Cartesia. Verified today on all three of the agent's real lines.
+- **The two mistakes covered for each other**, which is why neither surfaced:
+  *"Only Sonic 3.6 uses reference audio beyond 10 seconds, so a longer clip won't
+  improve results on older models."* Fixing either alone would have looked like a
+  dead end. The listening page now carries the control (55s on `sonic-3`) beside
+  the candidate (55s on `sonic-3.6`), so it answers *which* change helped.
+- `clone-candidate-long.wav`, 55.470s, cut 29.95→85.42s pause-edge to pause-edge:
+  86ms of room before the first onset, 99ms after the last, peak −0.9 dB measured
+  **on the window** so no clipping is baked in. Cloned as `Echo Stone Long`,
+  `ba765d50-19c6-4b3e-bc15-9de3b45f82f7`, on the client's Cartesia account.
+- The API accepted 55.5s without complaint, which is the direct proof that the
+  ten-second ceiling never existed.
+- **v2 was 9.4s — below Cartesia's own stated floor.** The script only ever
+  guarded the ceiling it had invented; it now guards both (`MIN_SECONDS = 10.0`).
+- `scripts/ido_compare.py` is new: nine renders, two variables crossed. The 30 Aug
+  comparison was made by hand and could not be reproduced, which is a problem when
+  `voice/samples/` is gitignored on purpose.
+
+### A landmine in `.env` that would have put a rejected voice on production
+
+- `vapi_sync.py`'s `cloned_voice()` **prefers** `CARTESIA_VOICE_ID` over Eyal. It
+  had been set on 30 Aug to the v2 clone, so `vapi_sync.py debt --apply` would
+  have silently put a twice-rejected voice on the production debt agent — and
+  then failed twice over, because the clones live on the client's Cartesia
+  account while Vapi's credential `448aa856` holds our key. Vapi would have
+  fallen through to Elliot: a Hebrew agent with an American accent, logging
+  nothing and erroring nothing. Commented out, with the reasoning beside it.
+- **A dry run reports what the repo would push, not what is live.** `vapi_sync.py
+  debt` printed the clone id while the live assistant was on Eyal all along. Both
+  Hebrew assistants were then checked against the Vapi API directly and both are
+  on `a976c076…` (Eyal). Nothing was wired in.
+- `docs/WORKLOG.md` had run `08-30 / 08-28 / 08-30 / 08-28`; reordered newest-first.
+
+### Still open
+
+- **The listening page needs an ear, not another measurement.** Every fault in
+  this voice so far was found by the owner in seconds and by my instruments
+  never — three refuted theories on 30 Aug, one of which was my own pitch tracker
+  making octave errors. The durations on the page are duration only.
+- If none of the five pass, instant cloning is not the route: professional cloning
+  wants thirty minutes and `ido-voice.mp4` is three minutes forty. That means more
+  audio from Ido, or keeping Eyal.
+- The two rejected clones are still on the client's Cartesia account. Deleting
+  them is a write to a client system and has not been asked for.
+
 ---
 
 ## 2026-08-30

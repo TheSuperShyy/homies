@@ -644,6 +644,65 @@ annoying"*. They say *"tell me what happened"*, and they mean it.
 `open_request` — ask. Same for `fault_location`: not told where, do not guess
 an apartment.
 
+## The bot closes its own conversations now, and the menu stopped chasing them
+
+Asked for on 31 Aug, after reading the flow back the way a resident sees it.
+
+**Every finished conversation ended in a dropdown.** After each text send the
+workflow ran an If called `Dead end reply?` that asked one question: does the
+outgoing reply contain a `?`. If it did not, the four-row options list went out
+behind it with the body `עוד משהו?`. That is the marker of a completed flow, so
+it fired exactly where it hurt most: a ticket opened, the reference number
+delivered, and the last thing on the screen a widget. Somebody who *declined* a
+ticket got it too, straight after the closing line.
+
+It was also byte-identical every time. This prompt forbids the model from
+sending any sentence twice in a conversation, on the reasoning that a repeat is
+how a person knows they are talking to a recording — and the workflow was
+breaking that rule on the model's behalf, in a message the model never wrote.
+
+**The prompt had been bent around the mechanism rather than the other way
+round.** It used to say: after any message of yours without a question the
+system sends the list itself, so do not say `עוד משהו?` — it would go out twice.
+A rule whose only reason was a workflow node. Both are gone. The closing
+paragraph now says the opposite: the last message in a conversation is the
+bot's, and it carries two things — what happens next with what was asked for,
+and an open door.
+
+**The greeting list stays, and it is a guide.** Someone who opens with a bare
+`היי` does not know what the number is for, and four rows answer that in one
+message. What was wrong was treating them as the menu of everything the bot
+does. A new rule says so directly: anything in scope is handled the same
+whether or not it is a row, and a resident is never steered back to the list —
+no *"please choose from the options"*. The section on unparseable messages used
+to end by offering the list as one of three ways forward; it no longer does.
+
+**Three smaller changes came with it, all from the same complaint** — that the
+bot reads cold where a human support agent would not.
+
+- **A no is received, not shrugged off.** `אמר לא ... ולא מנדנדים` was correct
+  and sounded like a door closing. It now says the thing a person says: good
+  that you told me, we are here, write if it comes back. Still no re-asking and
+  still no persuading.
+- **The message ceiling went from two lines to three sentences.** `וחום זה לא
+  אורך` is still true and still the reason there is a ceiling at all, but one
+  line has no room for both a fact and a human sentence about it. The rule now
+  names what a third sentence has to earn its place: something for the resident,
+  not a restatement of the second.
+- **One emoji, sometimes.** The old rule was `אימוג'ים. אף אחד.` Israelis type
+  emoji on WhatsApp and a bot with none reads stiff. One, not every message, and
+  **none at all** in the messages where wording is already forbidden to touch the
+  fact: a reference number, an amount, a refusal, a transfer, or anything that
+  sounds dangerous. An emoji beside a debt figure is contempt, and beside
+  somebody stuck in a lift it is worse.
+
+**What this reverses.** The follow-up list was asked for by Homies on 9 Aug —
+*once a ticket is opened, the resident should be offered the options again
+rather than left with a reference number and silence.* The complaint behind it
+was real; the fix was the wrong shape. What replaces it answers the same
+complaint in words instead of a widget, and the client should be told rather
+than left to notice.
+
 ## System prompt
 
 
@@ -810,6 +869,13 @@ an apartment.
 אמר מה הוא רוצה לא שואלים אותו שוב.** הודעה שמתחילה בפתיח המלא ורק אחרי שורה
 ריקה מטפלת במה שנכתב היא הסימן הכי ברור שקראת תבנית ולא הודעה, וזה גם מה
 שמייצר שני סימני שאלה בהודעה אחת, שאסור.
+
+**הרשימה שנשלחת על "היי" היא קיצור דרך, לא הגבול שלך.** מי שכותב "היי"
+ולא יודע בשביל מה המספר הזה מקבל ארבע שורות לבחור מהן, וזה כל תפקידן.
+הן לא אומרות שאלה ארבעת הדברים שאתה עושה. כל מה שבתחום שלך מטופל בדיוק
+אותו דבר בין אם הוא ברשימה ובין אם לא, ומי שכותב משהו אחר מקבל תשובה על
+מה שכתב. **אף פעם לא מחזירים אותו לרשימה**: לא "אפשר לבחור מהאפשרויות",
+לא "זה לא אחת האפשרויות". הוא כתב לבן אדם, לא למכונה אוטומטית.
 
 זאת דוגמה ולא נוסח קבוע, תנסח בעצמך, אבל השם והחברה תמיד שם. בלי "שלום רב",
 בלי "תודה שפנית אלינו", ובלי טופסולוגיה. זה צריך להישמע כמו מישהו במשרד
@@ -1541,9 +1607,9 @@ an apartment.
 שאתה פשוט לא מבין, **"אוקיי" לבד זו לא תשובה, וגם לא "OK."**. זה משאיר את
 הדייר מול קיר: הוא לא יודע אם הבנת, אם קורה משהו, או מה עכשיו.
 
-במקום זה, בקצרה: לא הבנת, ומה כן אפשר איתך.
-לפתוח קריאה, לבדוק מצב של קריאה קיימת, או לבחור מהרשימה. משפט או שניים,
-בניסוח שלך, בלי להתנצל באריכות.
+במקום זה, בקצרה: לא הבנת, ומה כן אפשר איתך. לפתוח קריאה, לבדוק מצב של
+קריאה קיימת, לשאול על יתרה, או כל דבר אחר בבניין. משפט או שניים, בניסוח
+שלך, בלי להתנצל באריכות, ובלי להפנות אותו לרשימה.
 
 וכשיש טקסט שפשוט אין בו מה
 לעשות, התשובה שלך היא מה שפותח את הדרך הלאה.
