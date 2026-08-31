@@ -37,6 +37,62 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### The gas, fire and injury arcs finally got read, and one of them broke the safety rule
+
+The owner said to work against live rather than build tooling first, so the
+three emergency arcs that had been flagged untested for two days were probed.
+Checked first that this is safe to do: `transfer_to_human` posts to the tools
+router (`Webhook → Decide → Respond`, with an optional sheet write) and the reply
+goes to Chatwoot against an invented conversation id, which 404s. **No human is
+paged by a probe.** That is worth knowing before anyone hesitates to test these
+again.
+
+**Injury and fire were sound. Gas broke the one rule this file treats as
+non-negotiable:**
+
+    יש ריח גז חזק בחדר מדרגות → ריח גז חזק זה מסוכן. בלי שום להבה...
+
+**The bot rated the severity**, which step 1 forbids in both directions —
+the resident and the emergency services decide how bad it is, never us. The rule
+was there and it named three phrasings: `ייתכן שיש סכנת חיים`, `זה דחוף`,
+`זה לא מסוכן`. **The model avoided all three and produced a fourth.** A list of
+phrasings teaches the phrasings; what it needed was the test, which it now has:
+if your sentence rates how bad the situation is, it is out, in either direction.
+
+Turn two also re-asked the building it had asked on turn one, and repeated the
+102 line the same block says to give once and not as a refrain. Both now written
+as rules at step 7, because the two-turn example added earlier is about a lift
+and the gas path did not generalise from it.
+
+**Then I put two of my own rules in each other's way.** The severity test says
+do not rate how bad it is; the concern rungs require saying something real about
+how bad it is. As written they could not both be obeyed. The line that resolves
+it: **you may name what they are feeling, you may not rate the danger.** "This
+sounds frightening" is about them and is always true; "this is dangerous" is a
+verdict on the hazard. Also fixed at the same time: the injury reply asked two
+questions in one message — `איך היא מרגישה עכשיו? האם היא בהכרה?` — which the
+one-question rule forbids everywhere, and which matters most here, because a
+frightened person answers one of two questions and you do not know which.
+
+**Where it actually stands, and this is the honest part.** The one-question fix
+holds — all four arcs now carry a single question mark. **The severity rewrite
+only half-holds**: `זה מצב מדאיג` and `זה נשמע ממש לא טוב` still come back, and
+`זה מצב מדאיג` is a phrase I wrote into the file **as a forbidden example**
+twenty minutes earlier. That is the third time today that writing out a banned
+phrase caused it to be sent, against a rule recorded this morning.
+
+**And on reflection the rule is wrong, not just leaky.** What the file needs to
+prevent is a clinical verdict — declaring something life-threatening, or giving
+an all-clear, or naming a cause. `זה מצב מדאיג` said to somebody whose mother
+has fallen is neither; it is ordinary Israeli warmth. **The next step is to
+narrow that rule back rather than to enforce it a fourth time**, and to delete
+the written-out phrases so they stop being recited. Stopped before doing it so
+the decision is visible rather than buried in a push.
+
+Live and repo identical at 66,826 chars. The prompt edits were swept into
+`87860fb` by the auto-housekeeping hook without these files; that is why this
+entry is arriving separately.
+
 ### Live confirmed, and the other session tested the same rewrite and got the same answer
 
 Asked whether the changes are live. They are, and the check that matters is the

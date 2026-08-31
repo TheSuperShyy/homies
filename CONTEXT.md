@@ -553,6 +553,22 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**A list of banned phrasings teaches the phrasings, not the boundary.** The
+emergency block forbade three ways of rating severity; the model avoided all
+three and wrote a fourth. Bans that enumerate need a **test** the model can
+apply to a sentence it has not seen — here, "if your sentence rates how bad the
+situation is, it is out". This is the same failure as the ✓/✗ lists, one level
+up: enumeration cannot cover a space, and the file keeps trying.
+
+**Naming what they feel is not rating the danger, and a prompt that forbids
+both forbids warmth.** Written carelessly, a severity ban and the concern rungs
+cancel each other out. "This sounds frightening" is about the person and is
+always true. "This is dangerous" is a verdict on the hazard, which belongs to
+the resident and the emergency services. **Only the clinical verdict is worth
+banning** — life-threatening, all-clear, or a named cause. Banning ordinary
+concern was an over-tightening, and it is recorded here because it looked
+principled while being wrong.
+
 **The proposed prompt rewrite failed twice, by two methods, on two agents.**
 It arrived with a diagnosis of constraint overload and model paralysis. This
 session probed the WhatsApp bot live and found the four claimed contradictions

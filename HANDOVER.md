@@ -180,6 +180,17 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **Probing emergencies does not page anybody, so test them.** `transfer_to_human`
+  posts to the tools router (respond, optional sheet write) and replies go to
+  Chatwoot against an invented conversation id, which 404s. Verified 31 Aug.
+  The gas, fire and injury arcs were left untested for two days on a fear that
+  turned out to be unfounded.
+- **OPEN DEFECT: the emergency severity rule is over-tight and leaks.** It now
+  bans any sentence rating how bad a situation is, which also bans ordinary
+  concern like `זה מצב מדאיג` — and that phrase comes back anyway, because it is
+  written into the file as a forbidden example. **Narrow it to the clinical
+  verdict** (life-threatening / all-clear / named cause) and delete the
+  written-out phrases. Do not enforce it a fourth time.
 - **There is no way to test a WhatsApp prompt without pushing it to live.**
   `prompt_chat.py --file` (commit `39e6fb9`) does exactly this for the **voice**
   agents and does not cover WhatsApp. Every WhatsApp prompt experiment is a real
