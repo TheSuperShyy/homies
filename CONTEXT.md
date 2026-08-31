@@ -1858,6 +1858,21 @@ live rule as missing on 30 Aug. The same error in the other direction would
 report a missing rule as present, which is the dangerous half.
 
 
+**A whole-object `--apply` pushes everything the tool believes, not the change
+you made. Learned 31 Aug by breaking it.** Pushing the inbound prompt with
+`vapi_sync.py --apply` silently reverted Ido's cloned voice to the Eyal id
+hardcoded in that script, an hour after another session had put the clone live.
+The prompt half was verified and correct; nothing checked the fields that were
+not meant to change. **With two sessions on one account, every whole-object
+write is a clobber risk** — prefer a surgical patcher that touches one field and
+reads back (`vapi_set_voice.py`, `n8n_whatsapp_patch.py`), and after any
+whole-object write verify the fields you did NOT intend to touch.
+
+**And do not trust a tool's own label for a fact it is asserting.** The dry run
+printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
+word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
+nothing.
+
 **Measure a proposed prompt, do not argue with it. Decided 31 Aug.** A rewrite
 arrived with a confident diagnosis — constraint overload, the model freezing —
 and `prompt_chat.py --file` settled it in ten minutes and about thirty cents: it

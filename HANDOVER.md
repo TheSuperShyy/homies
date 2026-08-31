@@ -2174,6 +2174,15 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
+**DO NOT RUN `vapi_sync.py inbound --apply` TO CHANGE A PROMPT.** It writes the
+whole assistant and hardcodes `cartesia_voice = a976c076` (Eyal), so it reverts
+Ido's clone `ba765d50` every time. It did exactly that on 31 Aug, an hour after
+the clone went live, and the owner found it on a call. Use
+`scripts/vapi_set_voice.py` for voice and verify BOTH fields after any write:
+voice must read `ba765d50-19c6-4b3e-bc15-9de3b45f82f7`, sonic-3.5, Elliot
+fallback. Its dry-run label `(cloned)` next to `a976c076` is false — that id is
+stock Eyal.
+
 **THE INBOUND PROMPT IS LIVE AS OF 31 AUG — PUSHED, AND READ BACK TO VERIFY.**
 Byte-for-byte match with the repo, six tools, first message unchanged, all six
 new behaviours confirmed present against the API. The first push in this repo

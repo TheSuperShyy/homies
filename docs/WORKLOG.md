@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Pushing the prompt reverted Ido's voice, and the warning was already written
+
+`vapi_sync.py inbound --apply` writes the WHOLE assistant, not the prompt. It
+carries `cartesia_voice = a976c076` (Eyal) hardcoded and never consults
+`CARTESIA_VOICE_ID`, so the prompt push at 19:0x silently reset the inbound
+assistant from Ido's clone `ba765d50` (Echo Stone Long), live since 06:54Z, back
+to Eyal. The owner noticed on a call. Debt was untouched, the push being inbound
+only.
+
+**The warning was in this file before I ran it**, in the entry directly below:
+*"`vapi_sync.py --apply` was the obvious tool and was the wrong one... It also
+hardcodes Eyal for inbound"*, which is why `scripts/vapi_set_voice.py` exists. I
+read the dry run, saw `voice: cartesia a976c076… (cloned)`, and took the label
+for the fact. **The label is wrong: `a976c076` is stock Eyal, not a clone.**
+
+Restored with `vapi_set_voice.py --apply` — PATCHes `voice` alone, refuses an id
+no key in `.env` can see, reads back after. Both fields verified together
+afterwards, which is the check that was missing: voice `ba765d50` sonic-3.5
+Elliot fallback, prompt 23,138 matching the repo, six tools.
+
+**Two things to fix, neither done:**
+
+1. **`vapi_sync.py` should not be able to do this.** It should read the live
+   voice and preserve it unless explicitly told otherwise. Left alone because
+   the other session is working in that file right now.
+2. **The `(cloned)` label in its dry run is false** and is what I trusted.
+
+The wider lesson, and it is not about voices: **`--apply` on a whole-object
+writer is not "push the change I made", it is "push everything this tool
+believes", including fields it has held stale since August and fields another
+session changed an hour ago.** Two sessions on one account makes every
+whole-object write a clobber risk. Verify every field you did not intend to
+change, not just the one you did.
+
+
 ### The inbound voice prompt is live, on the owner's word, and read back to confirm
 
 `python scripts/vapi_sync.py inbound --apply`. Assistant
