@@ -553,6 +553,15 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**The proposed prompt rewrite failed twice, by two methods, on two agents.**
+It arrived with a diagnosis of constraint overload and model paralysis. This
+session probed the WhatsApp bot live and found the four claimed contradictions
+wrong on the mechanism; the voice session drove the candidate text itself with
+`prompt_chat.py --file` and watched it reproduce the original complaint almost
+word for word, asking a trapped caller which apartment they live in. **Treat it
+as settled** unless new evidence arrives — and note what settled it was running
+the text, not arguing about it.
+
 **Every worked example in this prompt was a single message, and the failures
 are multi-turn.** That asymmetry explains a week of results: first replies read
 well and second replies repeat the question, forget the transfer, or answer a

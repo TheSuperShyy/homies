@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Live confirmed, and the other session tested the same rewrite and got the same answer
+
+Asked whether the changes are live. They are, and the check that matters is the
+node-by-node one rather than the last write: `n8n_whatsapp_patch.py` with no flag
+reports "Nothing to do", the workflow is active, and the live system message is
+byte-identical to the repo at **65,014 chars**, temperature 0.6, with the
+two-turn lift example present.
+
+**And the concurrent voice session tested the same proposed rewrite, from the
+other direction, and it failed there too.** Commit `39e6fb9` built
+`prompt_chat.py --file` to drive a candidate prompt that is installed nowhere,
+and put the rewrite — the one that arrived with the constraint-overload and
+model-paralysis diagnosis — through the emergency cases. **It failed both, and
+the stuck-in-lift answer reproduced the original complaint almost word for word,
+including asking a trapped person which apartment they live in.** That is the
+same conclusion this session reached by probing live, arrived at independently
+with a different method on a different agent. Two failures, two methods: the
+proposal is settled unless new evidence arrives.
+
+**The tooling gap that matters more than either.** `prompt_chat.py --file` is
+for the **voice** agents only. The WhatsApp bot has no equivalent: every prompt
+experiment today went to live production, thirteen pushes, each one a real model
+call on the production key against a real workflow serving real residents. It
+worked because the patcher is idempotent and reversible, but it is the wrong
+shape. **The voice side can now try a prompt without installing it and WhatsApp
+cannot**, and closing that gap would have saved most of today.
+
+Nothing else changed: no prompt edit, no workflow edit, no live write.
+
 ### Somebody was trapped in a lift for three turns and nobody was ever called
 
 An outside review of the prompt arrived claiming four contradictions. Checking

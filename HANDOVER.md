@@ -180,6 +180,13 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **There is no way to test a WhatsApp prompt without pushing it to live.**
+  `prompt_chat.py --file` (commit `39e6fb9`) does exactly this for the **voice**
+  agents and does not cover WhatsApp. Every WhatsApp prompt experiment is a real
+  push to the live active workflow plus real model calls on the production key —
+  thirteen of them on 31 Aug. Safe only because `n8n_whatsapp_patch.py` is
+  idempotent and a pre-change backup exists. **Building the WhatsApp equivalent
+  is the highest-value tooling job open.**
 - **A trapped resident must be transferred before being asked anything.**
   `transfer_to_human` takes only a `reason` enum — no address, no flat, no
   description — so there is nothing to collect first. On 31 Aug a lift arc ran
