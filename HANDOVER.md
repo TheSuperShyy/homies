@@ -180,6 +180,12 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **There is no intent classifier and no keyword routing — do not go looking
+  for one.** Word-matching exists only in `Sort` (greeting regex, both tap
+  lines, the attachment line); everything else is the model reading the prompt.
+  Three If nodes check the model's *output* and perform what it claimed but did
+  not do. Asked by the owner on 31 Aug; a fresh session debugging a behaviour
+  will otherwise waste an hour looking for the branch that decided it.
 - **Send a panic message at least three times before believing it is fixed.**
   `probe_whatsapp.py` repeats a phrase by passing it twice; `>>` continues the
   same number. One send passes on the best draw and tells you nothing about the

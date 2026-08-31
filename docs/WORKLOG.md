@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### A rules inventory for the owner, and nothing in the system changed
+
+Two questions, both answered in the terminal, no edit to the prompt, the
+workflow or live. Logged because the answers are the kind a fresh session will
+be asked again.
+
+**Is the bot matching words or situations?** Both, at different layers, and the
+split is worth stating plainly because it explains why every fix this week had
+to be a prompt fix. **Only the Sort node matches words**, and it answers four
+things itself — the menu on an exact-match greeting regex of about twenty-two
+words, both tap lines, and the attachment line — none of which run the agent.
+**Everything else is the model's judgement against prose.** There is no intent
+classifier, no keyword table, no routing on what the resident said. Three If
+nodes check the model's *output* afterwards and perform what it claimed but did
+not do. **A fresh session should not go looking for a router: there isn't one**,
+and that is why a rule in this file only lands when it beats the other prose
+around it.
+
+**A plain-English inventory of the prompt's rules**, thirteen sections, roughly
+a hundred and fifty bolded rules. Produced by reading the headings and rule
+leads back out of the file rather than from memory. Nothing was found wrong
+while doing it.
+
 ### One probe per case is not a test, and the owner is the one who noticed
 
 The owner tested `im stuck!!!` at 18:07, **ten minutes after** the previous push,

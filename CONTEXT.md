@@ -827,7 +827,11 @@ conversation at all before rewriting it again.** The same `אין לי` came bac
 unchanged after the prompt was fixed and deployed. The prompt was fine — live
 and byte-identical to the repo. **The Sort node answers four things itself: the
 menu, both tap lines and the attachment line. None of them run the agent, so
-none of them are in the agent's memory**, and the model met `אין לי` as the
+none of them are in the agent's memory** — and that list is the *entire* extent
+of word-matching in this system. There is no intent classifier and no keyword
+routing on anything a resident says; every other decision is the model weighing
+prose against prose, which is why a behaviour only changes when its rule beats
+the text around it rather than merely existing, and the model met `אין לי` as the
 first thing anyone had ever said to it. No prompt rule can survive that, because
 every rule about a flow is conditioned on being in the flow.
 
