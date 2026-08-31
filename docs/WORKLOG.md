@@ -9,6 +9,35 @@ conversation that produced it.
 
 ---
 
+## 2026-08-31
+
+### Three feature branches, one per agent
+
+`feature/chatbot`, `feature/voice-inbound`, `feature/voice-outbound`, all cut
+from `main` at `1eafae8` and pushed with `-u`, so each tracks its own remote.
+Until now the three deliverables shared one line of commits and there was no way
+to move on one without moving on all three.
+
+Made with `git branch` rather than `switch -c` so the working copy never left
+`main`, and the checkout stays there: one folder, `git switch` between branches,
+no worktrees. Chatbot is still the priority, so the two voice branches sit at
+`main` as markers rather than as work in progress.
+
+**`main` is 6 commits ahead of `origin/main`.** Those six went to GitHub as part
+of the branch push — they now exist on origin under three branch names but not
+on `origin/main`, which still sits at the older commit. Pushing `main` is a
+separate call nobody has made yet.
+
+**`docs/WORKLOG.md` will conflict on every merge back.** It is ~13,900 lines and
+every session appends near the top, so three branches appending in parallel
+collide at the same point. Mechanical to resolve, but it happens every time. The
+one-line fix, offered and not yet taken: `docs/WORKLOG.md merge=union` in a root
+`.gitattributes`, which keeps both sides' lines instead of raising a conflict.
+`HANDOVER.md` and `CONTEXT.md` are edited in place rather than appended, so they
+merge normally.
+
+---
+
 ## 2026-08-30
 
 ### Pushed to Vapi

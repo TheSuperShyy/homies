@@ -21,6 +21,31 @@ The user is the builder; Homies is the client.
 
 ---
 
+## Where the work lives — four branches
+
+As of 31 Aug the repo has one branch per deliverable, all created from `main`
+at `1eafae8` and all tracking a remote of the same name:
+
+| Branch | What belongs on it |
+| --- | --- |
+| `main` | Integration line. Everything merges back here. |
+| `feature/chatbot` | The WhatsApp bot — n8n workflows, `scripts/n8n_*.py`, `scripts/*whatsapp*.py`, the Hebrew prompt work behind it. |
+| `feature/voice-inbound` | The inbound intake assistant — Vapi assistant config, `scripts/vapi_*.py`, `voice/`. |
+| `feature/voice-outbound` | Outbound debt collection — the per-resident Call button path, OXS debt sync. |
+
+One checkout at `Desktop/Homie`, `git switch` between them, no worktrees. The
+two voice branches still sit at `main`; the chatbot is the priority and nothing
+has diverged yet.
+
+`main` is 6 commits ahead of `origin/main` — those commits reached GitHub under
+the three feature branch names, but `origin/main` has not been updated.
+
+`docs/WORKLOG.md` conflicts on every merge back, because every session appends
+near the top of a ~13,900-line file. A root `.gitattributes` with
+`docs/WORKLOG.md merge=union` removes it; it has been offered and not yet taken.
+
+---
+
 ## The system, one page
 
 **Two front doors, and no third.** A resident either opens `web/index.html`
