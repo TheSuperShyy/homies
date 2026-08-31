@@ -878,6 +878,39 @@ against a message that allows one.
   does not verify Meta's signature. Found while diffing the 35 live nodes against
   the 21 built. Not touched; it needs its own decision.
 
+### A proposed rewrite was measured instead of argued about, and it lost
+
+The owner brought a refactored prompt with a critique: constraint overload,
+too many absolute negatives, contradictory logic, the model "freezing" as a
+result. `--file` added to `prompt_chat.py` so a candidate that is neither in the
+repo nor on the assistant can be put through the same turns, with the live tools
+and first message, leaving only the wording as a variable.
+
+6,544 chars against 23,138. Same turns, both prompts:
+
+| case | candidate | current |
+|---|---|---|
+| hedged gas leak | no ticket, asks location | writes turn 1, transfers, 101/102 |
+| stuck in lift | no ticket, asks for the apartment | writes turn 1, asks if hurt |
+| ordinary leak | still confirming on turn 2 | written, number read |
+
+The lift answer reproduced the original complaint almost word for word, down to
+asking a trapped person which apartment they are in.
+
+**And it refutes the diagnosis rather than the wording.** The candidate's
+emergency section says `הפעל כלים מיד` in clearer prose than the original
+carries, unencumbered by any of the surrounding constraints, and still did not
+fire. What makes ours fire is the worked example plus `ספק הוא חירום`. Removing
+constraints did not free the model to act; it removed the scaffolding that made
+it act. Worth holding on to the next time a prompt looks too long: **length was
+not the variable, and neither was negativity.**
+
+Three things from the critique are right and worth porting: the sentence cap
+genuinely was evicting the safety line (found independently and already fixed),
+the transfer wording `העברתי את הפרטים למשרד, נציג יחזור אליכם בהקדם` is cleaner
+than ours, and its section structure reads better. Not ported yet.
+
+
 ### The care work broke the emergency write, and it took five goes to see why
 
 A live call reported a gas leak. The agent named the wrong emergency numbers —

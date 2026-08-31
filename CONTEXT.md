@@ -1825,6 +1825,20 @@ live rule as missing on 30 Aug. The same error in the other direction would
 report a missing rule as present, which is the dangerous half.
 
 
+**Measure a proposed prompt, do not argue with it. Decided 31 Aug.** A rewrite
+arrived with a confident diagnosis — constraint overload, the model freezing —
+and `prompt_chat.py --file` settled it in ten minutes and about thirty cents: it
+failed both emergency cases, one of them reproducing the exact complaint that
+started the work. **The claim was plausible and the evidence was cheap**, which
+is the whole argument for owning an instrument.
+
+What it showed is worth more than the verdict. The candidate stated the
+tool-first rule in *clearer* prose than ours, with none of the surrounding
+constraints, and still did not fire. **Prompt length and negative phrasing were
+not the variable.** The behaviour comes from the worked example and from saying
+that a hedged report counts; strip those and a shorter, friendlier, better-organised
+prompt does the wrong thing on a gas leak.
+
 **Never add a worked example to a section that already has one — change the one
 that is there. Learned 31 Aug, the hard way.** Four separate failures in one
 session came from examples competing: an emergency section ended up carrying

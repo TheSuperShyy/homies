@@ -222,6 +222,12 @@ def main():
     ap.add_argument("target", choices=sorted(pp.TARGETS))
     ap.add_argument("--ref", default=None,
                     help="read the prompt from the repo at this commit instead of live")
+    # A candidate prompt that is not in the repo and not on the assistant — for
+    # putting a proposed rewrite through the same turns as the real one before
+    # anyone argues about it. Tools and the first message still come from live,
+    # so the only variable is the wording.
+    ap.add_argument("--file", default=None,
+                    help="read the prompt from a plain text file instead")
     args = ap.parse_args()
 
     key = pp.E.get("OPENROUTER_API_KEY", "").strip()
@@ -229,8 +235,13 @@ def main():
         sys.exit("OPENROUTER_API_KEY missing from .env")
 
     target = pp.TARGETS[args.target]
-    prompt, first, tools = (pp.repo_prompt(target, args.ref) if args.ref
-                            else pp.live_prompt(target))
+    if args.file:
+        _, first, tools = pp.live_prompt(target)
+        prompt = io.open(args.file, encoding="utf-8").read()
+    elif args.ref:
+        prompt, first, tools = pp.repo_prompt(target, args.ref)
+    else:
+        prompt, first, tools = pp.live_prompt(target)
     prompt = pp.resolve(prompt, target["vars"])
     first = pp.resolve(first, target["vars"])
     left = [v for v in re.findall(r"\{\{[^}]+\}\}", prompt + first) if v != "{{...}}"]
