@@ -553,6 +553,25 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**One send per case measures the best case and nothing else.** The owner
+caught a cold reply ten minutes after a push whose three verification probes
+had all passed. Model output at temperature 0.6 has a spread, the resident
+meets a random draw from it, and **what matters is the floor**. A behaviour
+change is not verified until the same message has been sent at least three
+times.
+
+**An example that contradicts the rule beside it is the one that wins.**
+Twice in one day: a generic concern line among four specific ones, and a
+question that dropped the resident's word while the rule above it required
+carrying it. Both were recited three runs of three. **Every example in a block
+must demonstrate the rule**; an exception cannot sit loose among them, it has
+to be labelled as the exception.
+
+**And examples must show the language crossing.** Residents write English and
+are answered in Hebrew by design, so a block whose example headers are all
+Hebrew silently excludes every English message — `im stuck!!!` matched nothing
+and fell through to the file's defaults.
+
 **Every path in the WhatsApp prompt assumes the resident describes the
 problem, and somebody in trouble cannot.** `im stuck!!!!` has no fault, no
 place and no detail, so every rule keyed on what they said had nothing to work

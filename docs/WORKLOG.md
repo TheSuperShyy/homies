@@ -11,6 +11,81 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### One probe per case is not a test, and the owner is the one who noticed
+
+The owner tested `im stuck!!!` at 18:07, **ten minutes after** the previous push,
+and got `אני כאן. איפה בדיוק?`. Three probes of the same flow, run immediately
+after, all passed. **So the best case passed and the floor did not**, and every
+verification in this file up to now has been one send per case — which measures
+the best case and nothing else. The instruction that came with the complaint was
+"test it yourself, multiple times", and it is the correct one: from here a panic
+case is sent at least three times before it is called fixed.
+
+**The register target, in the owner's words:** *"I hear you, can you tell me
+where you are stuck?"* — not a sentence to install, a level to reach. Read
+against it, even the *passing* probes were wrong in three ways:
+
+    אני כאן. קיבלתי, ואני איתך עכשיו.   three acknowledgements stacked, a bot stammering
+    אני כאן. קיבלתי, תקועים.            their word filed back as a log entry
+    אני קורא, ואני לא הולך לשום מקום.   theatrical, and my own example being recited
+
+**And every one of them asked "where are you", dropping the word the resident
+used.** That is the whole content of the owner's reference sentence, and it has
+nothing to do with warmth vocabulary: *"where are you stuck"* proves the message
+was read, *"where are you"* is a question you could ask a courier. **Their word
+goes in the question, not in a dry acknowledgement.**
+
+**Then three rounds, each one a probe finding, and all three were mine:**
+
+1. **It recited the one example that contradicted the rule above it**, three runs
+   of three — the only one of four that did not carry the resident's word. Same
+   shape as `אוי, זה ממש לא נעים` this morning. **An example that breaks the
+   neighbouring rule is not a weak example, it is the one that wins.** Every
+   example in a block has to demonstrate the rule, with no exceptions sitting
+   loose beside them.
+2. **Every example header was Hebrew while the resident wrote English.**
+   `im stuck!!!` matched none of them, which is why it reached past the first
+   example entirely. Residents write English and are answered in Hebrew **by
+   design**, so the examples have to show that crossing or the English messages
+   match nothing. Two headers are now English.
+3. **Then the opposite over-correction: it asked people who had already
+   answered.** `help im stuck in the parking` came back with *"where are you
+   stuck, the car park, the lift, somewhere else?"* — offering options to
+   somebody who had picked one. Re-asking what they just said is louder than a
+   flat reply, because it proves the message was not read. The rule now forks:
+   no place given, ask where they are stuck; place given, that half is answered
+   and the question moves to the only thing still missing, **which building**.
+
+**Verified across fourteen sends of the panic path**, six inputs, Hebrew and
+English, fresh numbers and after a menu tap:
+
+    im stuck!!!                    → אני שומע אותך, וזה באמת מלחיץ. איפה
+                                     נתקעתם, במעלית, בחניון, במקום אחר?
+    תקוע במעלית!!                  → אני איתך, ומעלית זה מצב מלחיץ. באיזה
+                                     בניין המעלית?
+    help im stuck in the parking   → אני איתך, ואני כבר על זה. באיזה בניין
+                                     החניון?
+    תעזרו לי אני תקוע בגג          → אני שומע אותך, וזה מצב נורא. באיזה בניין
+                                     הגג שאתם עליו?
+    הצילו                          → אני שומע אותך, וזה באמת מלחיץ. איפה
+                                     נתקעתם בדיוק?
+
+No regression on the ordinary path — a dead bulb still gets the offer, a flood
+still gets its own sentence. `check_whatsapp.py` all green including a real
+ticket end to end. Live and repo identical at 63,250 chars.
+
+### Still open
+
+- `אני שומע אותך, וזה באמת מלחיץ` now opens most panic replies. Convergence one
+  level down, the same trade accepted this morning: the substantive half varies
+  and the reciting half is a good sentence. **Do not chase it** — every attempt
+  to fix recitation today created a worse bug than the recitation.
+- Nobody has read a full emergency to the end. Every probe stops at the first
+  reply; the transfer, the safety advice and staying in the chat are unverified
+  against a real multi-turn panic. This is now the largest untested path.
+- The em dash appears nine times in the system prompt while the rule banning it
+  claims two. Likely more ✓ examples contradict ✗ lists; worth one sweep.
+
 ### The file assumed the resident would describe the problem. Some cannot.
 
 `im stuck!!!!` came back with `אני כאן. איפה בדיוק?` — the fifth cold reply in a

@@ -140,7 +140,7 @@ the end of the session, not off this repo:
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
 | OpenRouter temperature | **0.6** | 0.6 |
-| agent prompt | **61,389 chars** | 61,389 |
+| agent prompt | **63,250 chars** | 63,250 |
 
 Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
 at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
@@ -180,6 +180,15 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **Send a panic message at least three times before believing it is fixed.**
+  `probe_whatsapp.py` repeats a phrase by passing it twice; `>>` continues the
+  same number. One send passes on the best draw and tells you nothing about the
+  floor, which is what the resident actually meets.
+- **The resident's own word goes into the question**: `איפה נתקעתם` not `איפה
+  אתם`. That single change is what moved this path from correct to warm, and it
+  is the owner's own reference — *"can you tell me where you are stuck?"*
+  **But if they already said where, do not ask again** — acknowledge the place
+  and ask which building, the only thing still missing.
 - **The urgent-and-thin message has its own case inside rung three.**
   `im stuck!!!!`, `הצילו`, `תעזרו לי` — do not ask them to describe anything,
   treat the exclamation marks as content, and ask **where they are now**, not
