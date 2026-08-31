@@ -140,7 +140,7 @@ the end of the session, not off this repo:
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
 | OpenRouter temperature | **0.6** | 0.6 |
-| agent prompt | **55,238 chars** | 55,238 |
+| agent prompt | **54,059 chars** | 54,059 |
 
 Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
 at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
@@ -171,11 +171,18 @@ its stated time.
   `MENU["he"]["body"]` and never calls the model. Change one without the other
   and residents get two different greetings depending which door they came in;
   the deploy fails rather than letting that ship.
-- **The hesitancy, offer and closing branches no longer contain sendable Hebrew**
-  — they carry what the message must convey instead. That is deliberate and it
-  is load-bearing; re-adding a worked example there brings the reciting back.
-  The off-topic branch is the opposite and **keeps** its example. See CONTEXT,
-  "strip examples only where the reply has to be tailored".
+- **How the bot asks "what happened" is decided in ONE block** (`וככה שואלים`)
+  and it forks there: path A, the default, is the open invitation; path B, for
+  somebody who has already said it is hard, is a narrow binary question. **Do
+  not add a second block for the hesitant case** — there was one, it lost to
+  the general rule three times, and deleting it is what fixed the behaviour.
+- **The hesitancy fork carries worked examples on purpose.** An ingredients
+  table was tried there and passed only as a first message; three turns deep it
+  dissolved and the bot went passive again. The offer and closing branches keep
+  ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **No do-not-say sentence is written anywhere in this prompt**, including as a
+  ✗ example. `אפשר לספר כמה שנוח` was sent to a real resident while existing in
+  the file only on the do-not-say list. Describe the failure, never write it.
 - **This reversed the 23 Aug lane repair, which was the owner's own direction.**
   If the intent was only to stop the menu firing after *ticket* replies and not
   after every reply, that is a narrower change and this went further.

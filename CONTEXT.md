@@ -553,7 +553,28 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
-**But strip examples only where the reply has to be tailored to the person.**
+**One block owns one decision, and a local exception cannot outvote a general
+rule that is stated three times with examples.** On 31 Aug a hesitant resident
+got a reply assembled entirely from approved text — the openers list, the
+register table's good column, and the headline invitation example — while the
+exception telling the bot to do the opposite sat once, fifty lines away, in
+another section. Two rounds of adding rules changed nothing. The fix was to
+move the exception **into** the block that owns the decision and delete the
+rival, so there is one place to read and nothing to outvote. When a rule keeps
+losing, look for the block that is beating it before writing it a third time.
+
+**And a word approved in the general register cannot be un-approved from a
+distance.** `אין בעיה` is blessed twice as ordinary spoken Hebrew; banning it
+inside one branch did nothing. Scoping it where it is approved — it answers a
+fact received, not a person who has just said something is hard — is what held.
+
+**But strip examples only where the reply has to be tailored to the person,
+and only where a single message is the whole conversation.** Ingredients — a
+table of what to convey instead of a sentence — held for a first message and
+dissolved three turns deep, where the model reverted to its defaults. Worked
+examples survive context; tables do not. Where the two conflict, the reciting
+is the smaller defect: similar reassurance to two residents beats a brush-off
+to one.
 This is the distinction, and getting it backwards makes things worse. Where two
 residents would notice they got identical words — a hesitation whose *worry*
 differs, an acknowledgement of what someone just told you — a fixed sentence is

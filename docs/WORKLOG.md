@@ -123,6 +123,75 @@ read the right word and only the slug is coarse. Fixing it properly is a
 migration, which was outside what was approved here.
 
 
+### The passive reply was assembled out of text the file approves
+
+The owner sent a third chat at 16:13, after the morning's push, still cold:
+`אני מבין. אין בעיה, אפשר לספר כמה שנוח.` Two rounds of fixes had not moved it.
+
+**The reply was not the model ignoring a rule. It was the model obeying three
+other ones.** Every phrase in it is blessed somewhere in this file: `אני מבין`
+in the approved-openers list, `אין בעיה` in the register table's *good* column
+**and** again as an approved mid-conversation reply, and `אפשר לספר...` as the
+headline worked example for inviting somebody to talk. The hesitancy block was a
+single local ✗ list fifty lines away arguing against all of it, and it lost on
+every axis that decides things in this file: count, proximity to the normal path,
+and concreteness.
+
+**And `אפשר לספר כמה שנוח` existed in the file ONLY as my own ✗ line.** The model
+read it off the do-not-say list and sent it — the exact failure written into
+CONTEXT.md that morning, and then left in place by me anyway.
+
+**Root cause: two blocks answered "how do I ask what happened."** The general one
+said *invite them openly*, three times, with examples. The exception said
+*narrow it*, once, in a different section. A fourth rule would have lost too.
+
+**The fix was structural.** The fork now lives inside the block that owns the
+decision (`וככה שואלים`): path A, the default, is the open invitation with its
+examples untouched; path B, for somebody who has already said it is hard, is the
+narrow binary question. The rival block is deleted rather than duplicated — two
+copies is how this started. `אין בעיה` was scoped **at the site of its approval**
+rather than banned from a distance: it answers a fact received, not a person who
+just said they are unsure. And no do-not-say sentence is written anywhere in the
+file now; the failure shapes are described instead.
+
+**I made it worse before I made it better, and the reason is worth keeping.**
+The first merge carried the ingredients table into the block and dropped both
+cases in prominence: turn 2 lost the capability answer entirely and returned a
+bare `במה אפשר לעזור?`, and turn 3 went passive again with a masculine `תרצה`.
+Restoring **worked examples** inside the merged fork fixed both immediately.
+
+**So ingredients do not survive multi-turn context, and that is the correction to
+this morning's entry.** The ingredients version passed only ever as a *first*
+message, which is the only way it was tested; the owner's real conversation is
+three turns deep, and at that depth a table of things-to-convey dilutes where a
+sentence does not. The recitation cost comes back with the examples and is
+accepted: two hesitant residents getting similar reassurance is a far smaller
+defect than one hesitant resident getting brushed off.
+
+**Verified on the owner's exact conversation**, three turns from one number,
+including the typo `באלי` which had never been tested:
+
+    פתיחת קריאת שירות        → אפשר לספר לי מה קרה, ואני אפתח על זה קריאה לצוות?
+    וואלה אני יודע מה...     → אני יכול לפתוח קריאה על תקלה בבניין או בדירה,
+                               לבדוק מה קורה עם קריאה שכבר פתוחה, ולהגיד מה
+                               היתרה. על מה מדובר?
+    לא יודע אם באלי לשתף     → אני מבין, ואין לחץ. זה משהו שהתקלקל, או משהו
+                               שמפריע?
+
+No regression on the ordinary paths: a leak still gets the open offer, a named
+neighbour worry gets its matched reassurance and a narrow question, off-topic
+keeps its character. `check_whatsapp.py` all green including a real ticket end to
+end. Live and repo identical at 54,059 chars.
+
+### Still open
+
+- The **three-turn probe re-greets after a menu tap** (`היי, כאן מיכאל מהומיז`
+  on turn 2). The `greeted` flag is set before every canned return, so this
+  should not happen; it does not appear in the owner's real chats, so it may be
+  a probe artifact. Not chased.
+- Emergency turn one still announces the transfer before calling the tool.
+- The complaint path asks two questions in one message and can end a turn flat.
+
 ### The greeting is the only script, and the fix is not the one I expected
 
 Asked for after the bot was caught reciting: keep the `מיכאל` opener fixed, and
