@@ -71,10 +71,56 @@ so a ticket costs one request once and then carries a status that removes it
 from the set. `oxs_last_seen_at` is deliberately not written by that path: it
 means "last seen in the open feed" and that is still true of the stored value.
 
-**Not yet run.** The dry run was blocked by the sandbox classifier, so no row
-has been rewritten and the 36 still read `open` in the database and on the
-dashboard. The code is written and compiles; the apply is the next step and
-needs the owner, since it changes the status of roughly half the ticket table.
+**APPLIED, and the backlog was six times bigger than anyone thought.** HANDOVER
+said 70 imported tickets; the real figure is 254, because the sync has run every
+fifteen minutes since that number was written on 24 Aug. So the stale backlog
+was not 36 tickets, it was **216**.
+
+    OXS open feed                     38
+    we hold                          254
+    departed and resolved            216   (zero unmapped statuses across 216 lookups)
+    still open our side               38
+
+**The invariant lands exactly**: 38 open OXS tickets in our database against 38
+open calls in their feed. Verified by querying the table rather than trusting
+the run's own output, and three resolved rows were spot-checked back against
+OXS — `255-26797-26` closed 25 Aug by אלון, `255-26930-26` and `255-26929-26`
+both closed 30 Aug by דוד and יריב. The dashboard had been showing 216
+finished jobs as open, and the bot had been telling residents so.
+
+**The first apply half-failed, and the reason is worth keeping.** The 38 open
+rows wrote; the 216 resolutions were rejected:
+
+    new row for relation "requests" violates check constraint
+    "requests_complete_unless_review"
+
+The payload carried four columns — reference, status, notes, lastUpdate — on the
+reasoning that every one of those rows already exists, so
+`on_conflict=reference` with merge-duplicates must resolve to an UPDATE.
+**Postgres evaluates CHECK constraints against the tuple the INSERT proposes,
+before ON CONFLICT diverts it**, and that tuple has `type`, `description` and
+`building` null with status `resolved`, which migration 003 forbids. Sending the
+whole row would have satisfied the constraint and would also have been wrong: an
+upsert that *can* insert is one that can mint a half-built ticket under a
+mistyped reference. Changed to a PATCH per row — UPDATE cannot create anything,
+which is the right guarantee for "this ticket exists and has been closed".
+
+**Dashboard, same pass.** "gone from OXS" was answering a question that no
+longer exists, and 216 amber flags saying nothing is how a warning stops being
+read. The badge now fires only on a ticket still open OUR side that OXS is not
+serving — an importer that could not reconcile that row, which is a real
+anomaly — and resolved rows carry none, because the Status column says it.
+`tickets.goneOxs` became `tickets.notInOxs` in both languages. Separately, the
+OXS note history now opens: `+2 earlier` was plain text with no way to read
+them, and is now a `<details>` disclosure, no client JS, so `nav.tsx` stays the
+only component that crosses into the browser.
+
+**One thing found and deliberately not fixed: `בינוי` is a twelfth OXS category**
+and files as `other`. Migration 014's own comment says "twelve their dispatchers
+actually use" but its check constraint lists eleven slugs, so the twelfth was
+missed when it was written. `category_he` still stores `בינוי` verbatim, so staff
+read the right word and only the slug is coarse. Fixing it properly is a
+migration, which was outside what was approved here.
 
 
 ### The bot stopped waiting and started helping, and it took four attempts

@@ -347,6 +347,16 @@ PDF's example shows.** Both were found by probing and both are places where
 trusting the document would have failed silently — a wrong status value returns
 zero rows and no error, and the wrong envelope key returns one bogus row.
 
+**An upsert is not a safe way to update rows that already exist.** PostgREST's
+`on_conflict=...` with merge-duplicates reads like "UPDATE if present", and it
+is not: Postgres evaluates CHECK constraints against the tuple the INSERT
+proposes, *before* ON CONFLICT diverts it. A four-column payload aimed at 216
+existing tickets was rejected by `requests_complete_unless_review` because the
+proposed insert had `type`, `description` and `building` null. Sending the whole
+row silences it and buys a worse problem — an upsert that can insert can mint a
+half-built row under a mistyped key. **When the row must already exist, PATCH.**
+UPDATE cannot create anything, and that is the guarantee you actually want.
+
 **A fast import must not ride on a slow one.** The eleven-second ticket import
 was the last step of the twenty-eight-minute arrears job, so when the sweep in
 front of it died it died too — eleven days of it. Independent data gets an
