@@ -77,6 +77,115 @@ dashboard. The code is written and compiles; the apply is the next step and
 needs the owner, since it changes the status of roughly half the ticket table.
 
 
+### A lint pass and a flow test, and the flow test found the worse things
+
+`ruff` is not installed in this project and there is no lint config; installed
+it ad hoc (0.16.5). **33 findings on the strict default rules, 751 on the wider
+set**, and almost all of the 751 are this codebase's deliberate style —
+`%`-formatting is 551 of them on its own. Nothing failed to compile.
+
+A four-lens audit over the scripts (Python static, the JavaScript embedded in
+Python strings, today's diff, prompt-file integrity), each finding then handed
+to an adversarial verifier told to refute it: **17 non-style findings raised, 11
+survived, 6 refuted.** The refuted six are recorded because they are the ones a
+future reader will re-raise — an "unchecked crypto credential" that is in fact
+guarded, an "empty message body" that the live workflow already backstops, and
+an em-dash count that is correct once you extract the region the way
+`system_prompt()` does.
+
+**Three defects were fixed, all verified against live before touching anything.**
+
+- **I had told the model the greeting list has four rows. It has three.** The
+  paragraph added earlier today said `מקבל ארבע שורות` and named four things.
+  The live Sort node — the Chatwoot one, which this repo does not have in source
+  — carries `MENU` with exactly three items: open, status, human. Its own comment
+  says why: *"Three items, so Chatwoot renders reply buttons rather than a list.
+  Four or more silently becomes a list whose wrapper button reads 'Choose an
+  item' in English."* **יתרה is not a row**, and the prompt now says so, because
+  a model that assumes a resident saw a balance button will answer about a screen
+  the resident never had.
+- **The emergency protocol promised a department that does not exist.** Step 5
+  and the gas worked example both said `למחלקה המתאימה`, while line 1359 of the
+  same file forbids exactly that: *ניתוב אוטומטי למחלקות עוד לא קיים אצלנו,
+  ומשפט שמבטיח אותו מבטיח דבר שלא קורה.* `transfer_to_human` posts one
+  undifferentiated handover. Both now say `לצוות`.
+- **Today's three-sentence ceiling collided with the emergency block**, where
+  three separate safety instructions legitimately need the room. Rather than
+  leave two rules disagreeing, the emergency section is now the one stated
+  exception — short sentences, one idea each, one question, no emoji, no ceiling.
+
+**What the flow test found that no linter would.**
+
+Fourteen probe conversations against the live bot. The ticket, balance-gate,
+out-of-scope, greeting and decline paths are all correct. Two were not:
+
+- **`transfer_to_human` was never called on any of five emergency probes.** Lift,
+  fire, lift-with-a-child — all got a severity question, none got the tool, and
+  one said `אני מעביר את זה לצוות` *without* calling it. The tool is attached and
+  reachable; the rule is written and explicit (step 5: the tool is called before
+  the sentence that announces it). The model was simply not obeying it. After the
+  `מחלקה` fix a gas probe called `transfer_to_human` on turn 2 — but turn 1 still
+  announced the transfer without calling it first. **The live
+  `Promised a transfer, made none?` backstop is what is holding that line**, not
+  the prompt, which is worth knowing before anyone removes the backstop.
+- **The complaint path breaks the one-question rule and then strands the turn.**
+  `אני רוצה להתלונן על השכן` got `אפשר לספר לי מה קרה ובאיזה בניין ודירה גרים?`
+  — two questions in one message, which the file forbids everywhere except the
+  two named pairs — and the next message ended on a full stop with nothing to
+  answer. Before today the options list would have followed and papered over it.
+  It no longer does. **Removing the menu removed a safety net that was hiding a
+  prompt bug**; the bug was always there. Not yet fixed.
+
+**And the owner sent a real chat that was worth more than all fourteen probes.**
+A resident tapped `פתיחת קריאת שירות`, said he did not know what he could ask
+for, then that he was not sure he wanted to share. He got `אני מבין` twice,
+verbatim, in consecutive messages, and `אם תרצה לשתף בהמשך, אני כאן` — which is
+a masculine second person, in the one rule this prompt takes most seriously.
+Three fixes: `תרצה/תרצי` named explicitly in the forbidden list (it was covered
+by the class and missed anyway), a once-per-conversation cap written **into the
+approved-openers list itself** rather than as a distant rule, and two new cases —
+someone who does not know what to ask gets told what is possible, and someone
+hesitating gets the worry named (nothing is too small, it stays between him and
+the team) before the door is held open. Replayed after: both land.
+
+**The lesson from this morning held twice more.** The first attempt at the
+acknowledgement cap and at the what-can-I-ask case both failed, and both failed
+the same way: the rule was written some distance from the example list the model
+actually reads. Moving the constraint into the example fixed both. **In this file
+an example outranks a rule at any distance** — that is now three for three.
+
+### Still open from the audit
+
+- **`check_tools.py:126` is dead code and its test asserts nothing.**
+  `if expect == "!duplicate":` matches a sentinel no case carries any more, so
+  the duplicate-ticket case opens on a fresh call id and is a second first
+  ticket. It passes unconditionally. The verifier also found the naive fix breaks
+  the run — on Apps Script the scoring is inverted — so this needs a real look,
+  not a one-liner.
+- **The OpenRouter credential the workflow uses is unchecked.** `need()` hard
+  blocks on `OPENROUTER_API_KEY`, which the built workflow never carries; the
+  model node authenticates with `N8N_OPENROUTER_CRED_ID`, which falls back to
+  `""` silently. Rotate the key and the deploy reports success with no working
+  model credential.
+- **`check_tools.py:184` prints "0 checked, 0 failed" and exits 0 when the n8n
+  API call fails**, then prints "Safe to attach".
+- **`check_whatsapp.py:89` unpacks an HTTP status into a variable named `ok`**
+  and discards it, so an expired Supabase key surfaces as a TypeError inside the
+  checker rather than as a 401.
+- **`probe_whatsapp.py:113` silently drops any execution whose Sort node
+  errored**, so a crashed Sort reads as "no messages reached the bot".
+- **The `Reply usable?` one-word exemption can never fire** — it reads
+  `Sort.greeting`, which the branch that reaches the agent sets to false
+  unconditionally. The 25 Aug fix has been inert since it was written.
+- **`APP_SECRET` is interpolated verbatim into the Sort Code node**, and two
+  comments in the file claim it is not. It would land in plaintext in the next
+  handover JSON export.
+- **`prompt.md:864`, the first-message balance example, ends on a full stop** and
+  demonstrates the shape a later rule calls wrong.
+- The complaint path above.
+
+None of these were touched. They are reported, not fixed.
+
 ### Three feature branches, one per agent
 
 `feature/chatbot`, `feature/voice-inbound`, `feature/voice-outbound`, cut from
