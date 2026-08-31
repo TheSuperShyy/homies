@@ -553,17 +553,27 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
-**Prompt size is a measurable quantity, and on 31 Aug it got measured.** The
-live 66,826-char prompt, a 4,071-char state machine and a 1,564-char open one,
-five arcs, three runs each. **The long one wins every arc it has a worked
-example for and loses the one it does not** — it handled a burnt corridor bulb
-correctly once in three tries, once re-asking an address it had just been given
-and once announcing a ticket it never opened, while a prompt a sixteenth of its
-size got it right three times out of three. **The file has stopped being a set
-of instructions and become a lookup table.** That is not an argument for
-deleting it — the open prompt, told not to gender the resident and given no
-craft to do it with, invented `את/ה` slash-forms and sounded like a government
-form. It is an argument for knowing which rows exist.
+**When a model behaves erratically on one path, check whether its tool
+definitions contradict themselves before blaming the prompt.** On 31 Aug the
+live prompt opened an ordinary ticket correctly **1 time in 3**, and the two
+failure modes were stalling: re-asking an address just given, or writing
+`אני פותח קריאה` and calling nothing. It read as prompt bloat. It was
+`open_request` arguing with itself — its description said there is no step
+before it, two of its own `$fromAI` parameter docs said to verify the address
+first. Deleting those two strings took it to **8 in 9**. **A model given an
+instruction it cannot satisfy does not error, it stalls**, and a stall looks
+exactly like a badly written prompt.
+
+**Prompt size is still measurable, and the measurement is worth redoing.** The
+same run showed the live prompt reciting its worked examples near-verbatim
+across three runs of the lift, gas and hesitancy arcs — it is a lookup table on
+the paths it has entries for. And the balance section, ~45 lines, tied exactly
+with a one-line rule and with nothing at all, because `get_balance`'s own
+description already carries the identity check. But the headline finding of
+that comparison was contaminated by the tool bug and should not be quoted.
+**What did hold: constraints without craft are useless** — told not to gender
+the resident and given no idea how, the 1,564-char prompt invented `את/ה`
+slash-forms and sounded like a government form.
 
 **A short prompt leans on tool descriptions far harder than a long one.** With
 the rules gone, the tool text is most of what the model has. So a harness that

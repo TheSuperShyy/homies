@@ -72,6 +72,50 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### The tool was arguing with itself, and that was most of what I blamed on prompt size
+
+The owner ran `n8n_whatsapp_toolfix.py --apply`. Both strings gone from live,
+re-run reports nothing to do, 33 nodes, still active.
+
+**Then the arc that was failing was re-run, and the result corrects the entry
+below this one.** Ordinary burnt bulb, same two turns:
+
+| | before the fix | after |
+| --- | --- | --- |
+| opens correctly | **1 / 3** | **8 / 9** |
+
+Six consecutive clean runs, every field right: `fault_location: common`,
+`reporter_unit: 3`, `type: lighting`, `urgency: normal`, the description in the
+resident's own words, the reference verbatim.
+
+**So the failure was mostly the contradiction, not the size of the prompt.**
+`open_request`'s description said there is no step before it; two of its own
+`$fromAI` parameter docs said to verify first. Given an instruction it could not
+satisfy, the model stalled — re-asking an address it had just been given, or
+writing `אני פותח קריאה` and calling nothing. Both failure modes disappeared
+when the contradiction did. And it explains the state machine's 3/3 on the same
+arc: it says outright that `open_request` verifies on its own, which overrode
+the parameter docs.
+
+**What survives from the earlier entry:** the live prompt does recite its worked
+examples near-verbatim on the lift, gas and hesitancy arcs, and the balance
+section is still a three-way tie against a one-line rule. What does *not*
+survive is the headline. "The 66k prompt loses the most common arc" was
+measured through a broken tool definition, and it was not a fair reading.
+
+**Confirmed live**, because the offline runner cannot catch a broken n8n
+expression — it reads the definitions but never executes them:
+
+    נורה שרופה במסדרון → היי, כאן מיכאל מהומיז. ... לפתוח על זה קריאה?
+    הרצל 14 דירה 3     → [open_request] אני רואה שכתבת הרצל 14.
+                          ברחוב הרצל אנחנו מנהלים את 112.
+                          אפשר לבדוק שוב את מספר הבניין?
+
+One tool call, no `verify_address` step, and it landed on the real
+`number_not_on_street` branch — which the offline stub never exercises, because
+it always returns a reference. Offers the number we do manage, does not blame
+the resident, ends with a question. prompt.md:1229 as written.
+
 ### Three prompts, five arcs, and the 66k file lost the most common one
 
 The owner asked for the opposite of what this file has become: *"i want the llm

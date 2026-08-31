@@ -180,21 +180,23 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
-- **The prompt loses the most common arc, and this is the open question.**
-  Measured 31 Aug: an ordinary burnt corridor bulb came out correct **1 run in
-  3** on the live prompt — once re-asking the address just given, once writing
-  `אוקיי, רשמתי. אני פותח קריאה.` and calling **nothing**, leaving the
-  resident believing a ticket exists. A 4,071-char state machine got it right
-  3/3. The emergency and hesitancy arcs pass because the file has worked
-  examples for them and the model recites them near-verbatim; the ordinary path
-  has none. **Do not read this as "delete the file"** — the 1,564-char open
-  variant invented `את/ה` slash-forms and failed every arc but balance.
-- **`scripts/n8n_whatsapp_toolfix.py` is written and NOT applied.** It removes
-  the two `$fromAI` docs on `open_request` that still order a `verify_address`
-  pre-step, contradicting the tool's own description, the system prompt and the
-  backend (`debt-tools/index.ts:1562` verifies inside the open call). The live
-  write was blocked by the permission classifier — it needs the owner to run it
-  with `--apply`.
+- **`open_request` was contradicting itself and it cost most of the ordinary
+  path. Fixed and applied 31 Aug.** Its description says there is no step
+  before it; two of its own `$fromAI` parameter docs said to run
+  `verify_address` first. The model stalled rather than choosing — re-asking
+  an address just given, or writing `אני פותח קריאה` and calling nothing.
+  Opening an ordinary ticket went from **1/3 to 8/9** when those two strings
+  were deleted (`scripts/n8n_whatsapp_toolfix.py`, now idempotent and clean).
+  **The lesson is the general one: check the tool definitions for
+  self-contradiction before rewriting a prompt.**
+- **The three-way prompt comparison of 31 Aug is contaminated — do not quote
+  its headline.** It ran through the broken tool definition, so the
+  "66k prompt loses the ordinary arc" result was mostly that bug. What still
+  holds: the live prompt recites its worked examples near-verbatim on the lift,
+  gas and hesitancy arcs; the balance section ties with a one-line rule; and a
+  1,564-char open prompt invented `את/ה` slash-forms because it was told not
+  to gender the resident without being told how. **Worth re-running now that
+  the tools are honest.**
 - **`wa_prompt_chat.py` now reads tool definitions from LIVE**, not from
   `n8n_whatsapp.TOOLS`, and warns when the two disagree. It was sending stale
   tool text until 31 Aug, which matters most when testing short prompts.
