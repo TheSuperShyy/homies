@@ -553,6 +553,25 @@ negative as a described shape rather than a sentence. If a phrasing must not
 reach a resident, the only reliable move is that no version of it appears in
 the file.
 
+**A prompt full of rules that cap a behaviour has no way to ask for more of
+it.** Every warmth rule in the WhatsApp prompt was a ceiling — one containment
+word per conversation, none is fine, not sorry yet, don't be shocked by a dead
+bulb — all correct, all written against a bot that over-apologised, and
+together they meant a resident who wrote that they were trapped got the cheapest
+word in the language. **When a dial only turns one way, the answer is a floor
+that scales, not another cap.** The scale now has a rung for when it happened
+to the *person* rather than to a thing of theirs, and it is the rung the other
+rules defer to.
+
+**And raising helpfulness produces fabrication as a side effect, reliably.**
+Told to care about the person and given a step reading "basic agreed
+precautions", the bot invented a distress button and a guard post for a
+resident stuck in a car park. Nothing in the file was false; the gap was
+filled with something plausible. **Any instruction that widens what the bot
+may offer needs a matching sentence about what it does not know** — here, that
+it knows nothing about the physical building, and that caution is about the
+resident's body, never about equipment.
+
 **One block owns one decision, and a local exception cannot outvote a general
 rule that is stated three times with examples.** On 31 Aug a hesitant resident
 got a reply assembled entirely from approved text — the openers list, the
@@ -567,6 +586,12 @@ losing, look for the block that is beating it before writing it a third time.
 distance.** `אין בעיה` is blessed twice as ordinary spoken Hebrew; banning it
 inside one branch did nothing. Scoping it where it is approved — it answers a
 fact received, not a person who has just said something is hard — is what held.
+
+**A contrast pair is not a sendable phrase; a written-out phrase is.** The
+do-not-say rule has an exploitable middle: `"תוכל" מול "תוכלי"` never leaks,
+because neither half is a message, while `תוכל לכתוב` sitting in the prose as
+an example of the leak was sent to a resident verbatim. Teach the shape with
+pairs or with a test the model can apply; never with the finished phrase.
 
 **But strip examples only where the reply has to be tailored to the person,
 and only where a single message is the whole conversation.** Ingredients — a

@@ -140,7 +140,7 @@ the end of the session, not off this repo:
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
 | OpenRouter temperature | **0.6** | 0.6 |
-| agent prompt | **54,059 chars** | 54,059 |
+| agent prompt | **59,229 chars** | 59,229 |
 
 Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
 at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
@@ -180,6 +180,20 @@ its stated time.
   table was tried there and passed only as a first message; three turns deep it
   dissolved and the bot went passive again. The offer and closing branches keep
   ingredients, the off-topic branch keeps its example. See CONTEXT.
+- **Concern has three rungs, and the third one is load-bearing.** Small fault
+  → brisk. Big fault, but to a thing → one real sentence. **Happened to the
+  person** (trapped, no water, cold, locked out, with a baby) → concern first,
+  sized honestly, and **the next question is about them, not the fault**. The
+  small containment words (`נשמע לא נעים`, `אני מבין`) are barred on the third
+  rung: they are what dragged "somebody is trapped" back down to "not
+  pleasant". Do not re-cap this without reading CONTEXT, "a prompt full of
+  rules that cap a behaviour" — four owner complaints in one day came from it.
+- **The emergency trigger is a principle, not a list.** Person in a bad state,
+  not thing that broke. It was a closed list of five and a roof was not on it.
+  Adding a sixth item is the wrong fix; the test is what carries it.
+- **The bot must never invent the building.** No distress button, guard post,
+  emergency key, main stopcock. It invented one on 31 Aug for somebody stuck in
+  a car park. Permitted caution is about the resident's body only.
 - **No do-not-say sentence is written anywhere in this prompt**, including as a
   ✗ example. `אפשר לספר כמה שנוח` was sent to a real resident while existing in
   the file only on the do-not-say list. Describe the failure, never write it.

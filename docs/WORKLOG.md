@@ -11,6 +11,108 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Every rule about warmth in this file was a ceiling, and none was a floor
+
+The owner sent a fourth chat, 17:06, and asked for the bot to be "exaggerated,
+empath and concern". A resident wrote `im stuck on the roof` and got back
+`אני מבין. איך זה קרה?`
+
+**This is not the passivity bug fixed an hour earlier.** That one was about a
+hesitant resident and it is fixed; the 16:49 turn in the same screenshot now
+answers correctly. This is a **severity** bug, and it had two independent causes.
+
+**One: the emergency trigger was a closed list of five.** Gas, fire, water on
+electricity, somebody injured, stuck in a lift. A roof is not on it. A list of
+five concrete items teaches a model that item six is ordinary, and this list
+already contained *stuck in a lift*, which makes leaving out a roof read as
+deliberate rather than accidental. It is now a **principle with examples**: if
+the message is about a **person** in a bad state rather than a **thing** that
+broke, it belongs here, whatever words it uses. Stated explicitly because a roof
+appears elsewhere in this file on the list of common property.
+
+**Two, and this is the one worth keeping: every warmth rule here is a cap.**
+Read them together and the design is a rationing scheme — one containment word
+per conversation, none at all is fine, don't be sorry before they've told you,
+somebody sorry in every message sounds fake, don't be shocked by a dead bulb.
+Every one of them is correct, all were written against a bot that over-
+apologised, and **not one of them ever says turn it up.** The single scaling
+rule that did exist topped out at `"אוי, זה מעצבן"` for a flooded flat — so a
+person trapped somewhere fell off the top of the ladder and landed on the
+cheapest word in the language.
+
+**The fix is a third rung**, in the block that already owns how big the
+acknowledgement is: when it happened **to the person** rather than to a thing of
+theirs — trapped, no water, cold, locked out, with a baby or an elderly
+relative, frightened — concern comes **first**, it is a real sentence and not a
+word, and **the next question is about them, not about the fault.** "How did
+that happen" to somebody stuck is an inquiry, and they are not asking for an
+inquiry.
+
+**Four pushes, because each probe found the next thing, and three of the four
+faults were caused by the fix itself:**
+
+1. **My own example became the most available sentence in the file.** `אוי, זה
+   ממש לא נעים` came back for a roof, an underground car park and a flooded
+   living room. It was example #1 — the model takes #1, recorded here on 31 Aug
+   — and the only one of the four naming nothing. The other three name the
+   thing (`יום שלם בלי מים`, `עם תינוק בבית`) and none of them recited. **So the
+   rule is not "care more", it is "the sentence must contain what happened to
+   them"**: a sentence that fits any complaint is a formula, and a formula is
+   the only kind of sentence a model can recite.
+2. **It invented the building.** `אפשר לנסות את לחצן המצוקה שנמצא בעמדת השומר
+   או ליד השער` — there is no such button and there may be no guard post.
+   Telling somebody trapped to go and look for hardware that does not exist
+   costs them the minutes that matter. This is the failure mode that turning up
+   helpfulness produces on its own: asked to care about the person, given a
+   step that says "basic agreed precautions", the model fills the gap with a
+   plausible physical fact. The file banned diagnosis; it never banned inventing
+   the building. Now it does, and the permitted caution is **about their body**
+   (don't climb, don't jump, don't force it, stay somewhere safe) and never
+   about equipment.
+3. **It gendered a resident** — `תוכל לכתוב לי באיזה בניין` — and the file
+   supplied the string: `תוכל לכתוב` sat in the prose as its own example of the
+   leak. Same shape as `אפשר לספר כמה שנוח` yesterday. The contrast **pairs**
+   (`"תוכל" מול "תוכלי"`) are safe, because a pair is not a sendable phrase; a
+   whole gendered phrase written out is not. Replaced with the test — does the
+   verb change for a woman — plus a note that improvising is when it breaks, and
+   an emergency is exactly when it improvises.
+4. **A message carrying both a person and a fault let the fault win.** `אני
+   תקוע בחניון, השער לא נפתח` got rung two's size and rung two's question. The
+   gate is the cause, not the subject. Now: when one message has both, the
+   person decides, including when the fault is written last and sounds like the
+   point.
+
+**Verified, four rungs, after the last push:**
+
+    im stuck on the roof            → להיות תקוע על הגג זה מצב נורא, ואני כאן.
+                                      יש שם מקום בטוח, או שצריך שמישהו יגיע מיד?
+    אני תקוע בחניון, השער לא נפתח   → להיות תקוע בחניון זה מצב לא נעים בכלל.
+                                      קודם כל, אפשר לספר לי מה המצב שם? יש דרך
+                                      לצאת רגלית?
+    אין לי מים בדירה כבר יום שלם    → יום שלם בלי מים זה בלתי אפשרי, ואני מצטער
+                                      שזה נמשך ככה. זה בכל הדירה, או רק במטבח?
+    נורה שרופה במסדרון בקומה 3      → אוקיי, נורה שרופה במסדרון בקומה 3. לפתוח
+                                      על זה קריאה לטיפול?
+
+No invented equipment, no gendered form, no recitation across cases, and the
+dead bulb stayed brisk — the regression that matters, because over-reacting to a
+bulb costs exactly as much credibility as under-reacting to a flood.
+`check_whatsapp.py` all green including a real ticket end to end and a duplicate
+suppressed. Patch idempotent, live and repo identical at 59,229 chars.
+
+### Still open
+
+- **The em dash appears nine times in the system prompt**, and the rule banning
+  it claims "the two times this character appears here are these lines". By this
+  file's own logic — a character present is a character available — that rule is
+  undermined by seven counter-examples. Not reported by anyone, so not chased
+  today, but it is the same defect class as items 1 and 3 above.
+- The car park still says `לא נעים בכלל` where the roof says `נורא`. Under-sized
+  by one notch on the ambiguous case only; the question half is right.
+- Emergency turn one still announces a transfer before calling the tool; the
+  `Promised a transfer, made none?` node catches it.
+- The three-turn probe still re-greets after a menu tap.
+
 ### The unanswerable question was answered by reading the vendor's own PDF
 
 **A dashboard question — "why does it say gone from OXS?" — turned into the
