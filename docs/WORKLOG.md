@@ -88,6 +88,37 @@ Four consecutive turns ended by offering to open a ticket.
   on `a976c076…` (Eyal). Nothing was wired in.
 - `docs/WORKLOG.md` had run `08-30 / 08-28 / 08-30 / 08-28`; reordered newest-first.
 
+### The follow-up menu, prepared and NOT applied — repo and live now disagree
+
+- **Nothing was pushed to n8n. The live WhatsApp bot is unchanged.** Verified by
+  a dry run against the live workflow at the end of the session: 35 nodes,
+  `Dead end reply?` and `Options again` both still present, temperature still
+  unset, prompt still 45,570 chars against the repo's 47,219.
+- What was prepared: `scripts/n8n_whatsapp_patch.py` (new) removes the two
+  follow-up nodes and their connections, pushes the repo's prompt, and sets
+  `options.temperature = 0.3` on the OpenRouter node. `scripts/n8n_whatsapp.py`
+  was edited to match — `FOLLOWUP_BODY` / `FOLLOWUP_MENU` deleted, `TEMPERATURE`
+  added — and `docs/handover/n8n-whatsapp-live-31aug-before-followup-removal.json`
+  is the 35-node before-snapshot.
+- **The reason it never ran: the patch script did not parse.** A `sys.exit()`
+  string had its escapes mangled when the file was written, so line 168 was an
+  unterminated literal. Repaired and dry-run today; it now reports the four
+  changes cleanly and is idempotent.
+- **Why a patch script and not `n8n_whatsapp.py --apply`:** that script builds 21
+  nodes and pushes with a PUT, which is a replace, and the live workflow has
+  carried 35 since the Chatwoot cutover. Its own guard refuses rather than delete
+  fourteen live nodes. The guard is right; the long-term fix is bringing the
+  builder up to date, which this was not.
+- **Temperature had never been sent at all** — the node carried only `maxTokens`,
+  so the bot ran at Google's default of 1.0. Set to 0.3, the value the rest of
+  the project uses. This is the likeliest cause of the Hebrew-spelling feedback
+  addressed, **not** a reproduced fault fixed: no examples came with the
+  feedback. The same omission was found on the voice agent on 26 Aug.
+- **This reverses an owner decision and should be confirmed before it is pushed.**
+  The follow-up lane was repaired on 23 Aug *at the owner's direction* — "every
+  reply that ends without a question is followed by 'אפשר לעזור בעוד משהו?'".
+  Removing it is the opposite instruction, and it is a change residents see.
+
 ### Still open
 
 - **The listening page needs an ear, not another measurement.** Every fault in

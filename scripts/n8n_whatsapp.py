@@ -145,6 +145,29 @@ EFFORT = "low (no longer sent — the OpenRouter node has no reasoning parameter
 # WhatsApp-length answer — a reply that thought first would truncate mid-sentence.
 MAX_TOKENS = 4096
 
+# NO TEMPERATURE WAS SENT AT ALL UNTIL 31 AUG, and that is worth a paragraph
+# because the same omission has already cost this project once.
+#
+# The node only ever carried maxTokens, so the model ran at whatever OpenRouter
+# and Google default to — for Gemini that is 1.0, which is high for a service
+# desk. On 26 Aug the voice agent was found in exactly this state ("the live
+# model object had no temperature at all — the design value 0.3 was lost when
+# the assistant was rebuilt"), on a call that produced real Hebrew typos in the
+# bot's own logged output. That one turned out to have a second cause as well,
+# but the missing temperature was real and was fixed with 0.3.
+#
+# Set here after feedback that the bot misspells simple Hebrew words. No
+# examples came with the feedback, so this is the likeliest cause addressed
+# rather than a reproduced fault fixed — read the probe output before believing
+# it worked. 0.3 is the value the rest of the project already uses.
+#
+# If it does not hold, the next suspect is the model, not the prompt: this bot
+# runs google/gemini-2.5-flash, chosen on 8 Aug for cost, and the comment above
+# MODEL says its Hebrew was never signed off by a native speaker. A spelling
+# rule in the prompt is NOT the next thing to try — twice recorded here that a
+# prompt hint does not change what a model emits at token level.
+TEMPERATURE = 0.3
+
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
 # on a schedule; pinning means the bot breaks on a date we can look up rather
 # than on a morning we cannot explain.
@@ -304,17 +327,29 @@ MENU = {
 }
 
 
-# The menu again, after a flow completes. Asked for 9 Aug: once a ticket is
-# opened, the resident should be offered the options again rather than left
-# with a reference number and silence. The body changes — "עוד משהו?" is a
-# follow-up, the greeting body would read like amnesia — and the rows stay
-# identical. Sent by the workflow, not the model: the trigger is a reference
-# number in the outgoing reply, which is exactly the marker of a completed
-# flow (open or status — both end with a reference, both deserve the offer).
-FOLLOWUP_BODY = {"he": "עוד משהו?"}
-FOLLOWUP_MENU = {
-    lang: dict(MENU[lang], body={"text": FOLLOWUP_BODY[lang]}) for lang in MENU
-}
+# THE FOLLOW-UP MENU IS GONE, AND THAT IS THE POINT OF THIS COMMENT.
+#
+# Until 31 Aug the options list was sent a second time after every completed
+# flow — body "עוד משהו?", same four rows — fired by an If that asked
+# whether the outgoing reply contained a question mark. Asked for on 9 Aug, on
+# the reasoning that a resident should not be left with a reference number and
+# silence.
+#
+# What it actually did was end every conversation with a dropdown. A ticket
+# opened, the reply carried a reference and no question mark, and the last thing
+# the resident saw was a widget. Someone who declined a ticket got the same
+# widget after the closing line. It was also byte-identical every time, which is
+# the one thing the prompt forbids the model from doing — the rule that a
+# sentence already sent is never sent again exists because a repeat is how you
+# know you are talking to a recording, and the workflow was breaking it on the
+# model's behalf.
+#
+# The prompt had been bent around it, too: it used to tell the model NOT to say
+# "עוד משהו?" itself, because the workflow would. That paragraph is now
+# inverted — the bot closes its own conversations, warmly and in its own words.
+#
+# The GREETING menu stays. It is a guide for someone who opens with a bare
+# "היי" and does not know what the number is for, and it is sent once.
 
 
 def env():
@@ -1056,11 +1091,6 @@ if (!tapped && GREETING.test(bare)) {
 // reads the title like any other message — but so an execution can be read back
 // later and tell a tap from someone typing the same words.
 //
-// `followup` is the options list again, body "עוד משהו?", sent by the tail of
-// the workflow when the reply carries a reference number. Built HERE, in code,
-// because a menu is JSON full of `}}` and an n8n {{ expression }} is cut at
-// the first `}}` it meets — embedding it in a Set node fails as "invalid
-// syntax" with the cause invisible.
 // Spent on the first message after the tap and then forgotten: it says what
 // the resident just did, not a standing state. Half an hour, because somebody
 // who taps and answers tomorrow is starting again. Stale entries are swept so
@@ -1088,8 +1118,7 @@ return [{ json: { _reply: '', _work: true, _canned: false, _menu: false,
                   to: from, text, tapped, lang, greeted, message_id: id,
                   tapped_open: tappedOpen, greeting: GREETING.test(bare),
                   last_bot: lastBot,
-                  in_text: inText, msg_type: msgType,
-                  followup: __FOLLOWUP_MENU__[lang] } }];
+                  in_text: inText, msg_type: msgType } }];
 """
 
 
@@ -1216,8 +1245,7 @@ def workflow(e):
                 parameters={"jsCode": js(SORT, VERIFY_TOKEN=verify,
                                          APP_SECRET=app_secret,
                                          MEDIA_LINE=MEDIA_LINE, MENU=MENU,
-                                         TAP_LINE=TAP_LINE,
-                                         FOLLOWUP_MENU=FOLLOWUP_MENU)},
+                                         TAP_LINE=TAP_LINE)},
             ),
             node(
                 id="respond", name="Answer Meta",
@@ -1477,7 +1505,8 @@ def workflow(e):
             node(
                 id="model", name="OpenRouter", type="@n8n/n8n-nodes-langchain.lmChatOpenRouter",
                 typeVersion=1, position=[960, 420],
-                parameters={"model": MODEL, "options": {"maxTokens": MAX_TOKENS}},
+                parameters={"model": MODEL, "options": {"maxTokens": MAX_TOKENS,
+                                                        "temperature": TEMPERATURE}},
                 credentials={"openRouterApi": {"id": e.get("N8N_OPENROUTER_CRED_ID", "").strip(),
                                                "name": "Homies OpenRouter"}},
                 retryOnFail=True, maxTries=3, waitBetweenTries=5000,
@@ -1903,51 +1932,6 @@ def workflow(e):
                     "combinator": "and",
                 }},
             ),
-            node(
-                id="hasref", name="Dead end reply?", type="n8n-nodes-base.if",
-                typeVersion=2, position=[1680, 60],
-                parameters={"conditions": {
-                    "options": {"caseSensitive": True, "leftValue": "",
-                                "typeValidation": "loose"},
-                    "conditions": [{
-                        "id": "sent",
-                        "leftValue": "={{ $('Hand over instead').isExecuted"
-                                     " ? ($('Hand over instead').first().json.text || '')"
-                                     " : ($('Answer the resident').isExecuted"
-                                     " ? ($('Answer the resident').first().json.output || '')"
-                                     " : '') }}",
-                        "rightValue": "",
-                        "operator": {"type": "string", "operation": "notEmpty",
-                                     "singleValue": True},
-                    }, {
-                        "id": "noq",
-                        "leftValue": "={{ $('Hand over instead').isExecuted"
-                                     " ? ($('Hand over instead').first().json.text || '')"
-                                     " : ($('Answer the resident').isExecuted"
-                                     " ? ($('Answer the resident').first().json.output || '')"
-                                     " : '') }}",
-                        "rightValue": "?",
-                        "operator": {"type": "string", "operation": "notContains"},
-                    }],
-                    "combinator": "and",
-                }},
-            ),
-            # Rebuilds the flat to/menu shape the Send menu node reads, so the
-            # follow-up rides the same node as the greeting menu. The body
-            # differs — "עוד משהו?" — the rows are identical on purpose. The
-            # menu itself comes from Sort, which built it in code: a menu is
-            # JSON full of `}}`, and an n8n expression is cut at the first
-            # `}}` it meets, so it cannot be inlined here.
-            node(
-                id="followup", name="Options again", type="n8n-nodes-base.set",
-                typeVersion=3.4, position=[1920, 60],
-                parameters={"assignments": {"assignments": [
-                    {"id": "to", "name": "to", "type": "string",
-                     "value": "={{ $('Sort').first().json.to }}"},
-                    {"id": "menu", "name": "menu", "type": "object",
-                     "value": "={{ $('Sort').first().json.followup }}"},
-                ]}, "options": {}},
-            ),
         ],
         "connections": {
             # TWO OUTPUTS, NOT ONE. `multipleMethods` gives the webhook node one
@@ -2014,16 +1998,11 @@ def workflow(e):
             "Hand over instead": {"main": [[
                 {"node": "Send", "type": "main", "index": 0},
                 {"node": "Log reply", "type": "main", "index": 0}]]},
-            # After every text send, ask whether the reply was a dead end. A
-            # reply that asked a question continues the conversation and the
-            # If answers no; anything else gets the options list after it.
-            "Send": {"main": [[
-                {"node": "Dead end reply?", "type": "main", "index": 0}]]},
-            "Dead end reply?": {"main": [[
-                {"node": "Options again", "type": "main", "index": 0}]]},
-            "Options again": {"main": [[
-                {"node": "Send menu", "type": "main", "index": 0},
-                {"node": "Log reply", "type": "main", "index": 0}]]},
+            # `Send` is a leaf. It used to feed "Dead end reply?", which asked
+            # whether the outgoing reply contained a question mark and sent the
+            # options list after every reply that did not — so a ticket number
+            # was always followed by a dropdown. Removed 31 Aug; the bot closes
+            # its own conversations now. See the FOLLOW-UP MENU note at the top.
             # Sub-nodes connect UP into the agent on their own connection types,
             # and the direction is the part that catches people out: the model,
             # the memory and each tool are the SOURCE, the agent is the target.
@@ -2074,8 +2053,9 @@ def main():
     print("workflow : %s" % WF_NAME)
     print("nodes    : %s" % ", ".join(n["name"] for n in wf["nodes"]))
     print("callback : %s/webhook/%s" % (base, WEBHOOK_PATH))
-    print("model    : %s via OpenRouter  effort=%s  max_tokens=%d"
-          % (MODEL, EFFORT, MAX_TOKENS))
+    # temperature is printed because the last time it went missing nobody saw.
+    print("model    : %s via OpenRouter  effort=%s  max_tokens=%d  temp=%s"
+          % (MODEL, EFFORT, MAX_TOKENS, TEMPERATURE))
     print("tools    : %s" % ", ".join(t["name"] for t in TOOLS))
     token_report(e)
     print("signature: %s" % ("ON — X-Hub-Signature-256 checked against APP_SECRET"

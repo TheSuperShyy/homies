@@ -1522,6 +1522,43 @@ while logging nothing. The variable's own docstring had said the safe state is
 --apply stays safe to run". **Do not pre-load a variable that overrides
 production; leave it unset until the thing it names has been accepted.**
 
+## The WhatsApp builder can no longer push, and that is the safe answer
+
+`scripts/n8n_whatsapp.py` builds the workflow and ships it with a PUT, and a PUT
+is a replace. Since the Chatwoot cutover on 21 Aug the live workflow has carried
+nodes that script does not build — the human handback, the promise backstop, the
+tap transfer, the two typing-indicator Waits — all applied through the REST API
+and never brought back into the builder. On 31 Aug that was **35 live against 21
+built**, and the script's own guard refuses the push rather than silently delete
+fourteen nodes that are serving residents.
+
+**The guard is not a bug to work around.** The correct long-term fix is bringing
+the builder back up to date so it is the source of truth again. Until then,
+changes to the live bot are surgical: read the live workflow, change only the
+named things, leave every other byte as found, write it back. That is what
+`scripts/n8n_whatsapp_patch.py` is, and it is idempotent on purpose — the thing
+it edits is live, so the obvious way to check whether it worked is to run it
+again.
+
+**A consequence worth stating plainly: the repo is not the bot.** After a
+surgical patch, `n8n_whatsapp.py` describes something that is not live and the
+live workflow contains things no file describes. Anything asserting "the bot
+does X" has to be read off the live workflow, not off the repo.
+
+## A script that was written is not a change that was made
+
+On 31 Aug a patch script, a matching set of repo edits and a before-snapshot were
+all produced for the WhatsApp bot, and none of it reached n8n — the script had an
+unterminated string literal and had never been run. Everything on disk looked
+like completed work. The live workflow was untouched.
+
+Two habits follow. **Run the dry path before writing the summary**, because a
+dry run is the cheapest possible proof that the code at least executes. And
+**when reporting, say which side was checked**: "the repo now says X" and "the
+live workflow now says X" are different claims, and only the second one is about
+production. Related: [[A dry run tells you what the repo wants, not what is
+live]], which is the same confusion pointing the other way.
+
 ## The voice prompts
 
 **Verify a push by reading the assistant back, never by trusting the write.**

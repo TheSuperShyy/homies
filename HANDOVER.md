@@ -90,6 +90,30 @@ live rounds, test data cleaned. Rollback snapshots in the session scratchpad:
 wa-current-emergency.json / wa-before-backstop.json / wa-before-fixups.json,
 each patch script takes --restore.
 
+**UNAPPLIED, 31 Aug: a change to the follow-up menu is prepared and has NOT
+been pushed. The repo and the live bot now disagree.** Read this before touching
+either. Verified by dry run at the end of that session:
+
+| | live n8n | this repo |
+|---|---|---|
+| nodes | **35** | 33 after the patch |
+| `Dead end reply?` / `Options again` | **both present** | deleted |
+| OpenRouter temperature | **unset — running at Google's 1.0 default** | 0.3 |
+| agent prompt | **45,570 chars** | 47,219 |
+
+- Apply with `python scripts/n8n_whatsapp_patch.py --apply` (run it with no flag
+  first — it prints the diff and changes nothing; it is idempotent).
+- **It never ran because it did not parse** — an unterminated string literal at
+  line 168, since repaired. Nothing was ever sent to n8n.
+- `docs/handover/n8n-whatsapp-live-31aug-before-followup-removal.json` is the
+  35-node before-snapshot.
+- **Do not push it without asking.** It reverses the 23 Aug decision immediately
+  below, which was the owner's own direction, and residents see the difference.
+  The temperature half is uncontroversial; the menu removal is not.
+- **`n8n_whatsapp.py --apply` is not the way to ship this.** It builds 21 nodes
+  and PUTs, which is a replace; its guard refuses rather than delete the fourteen
+  live nodes added since the Chatwoot cutover. That guard is correct.
+
 **Dead-end endings are fixed too (23 Aug, owner's direction).** The
 follow-up lane ("Dead end reply?" → "Options again" → "Send menu") was an
 orphan — no incoming edge since the cutover rewrite — and its checker's
