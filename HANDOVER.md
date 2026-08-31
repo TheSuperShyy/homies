@@ -213,6 +213,16 @@ its stated time.
   `אני אעדכן אותך כשהטיפול יתקדם` after opening a ticket. There is no
   proactive update path — nothing sends that message. Either build it or tell
   the bot it cannot say it; do not leave it as it is.
+- **Register items the owner has raised, in order, and where they stand.**
+  Parentheses: **fixed** 31 Aug, a channel fact, gone 9/9. Length and the
+  four-point form: **fixed**. `נציג אנושי`: **fixed** in
+  `transfer_to_human`. **Still open and deliberately untouched**: `אנא` in
+  most replies, `ברצונך`, and `במה אפשר לעזור?` straight after a tap
+  that already said what they want. Each is one clause in the channel-facts
+  line; none has been added without being asked for.
+- **Two inventions seen in emergency replies, neither guarded:**
+  `צוות החירום שלנו` (there is no such team) and `הם בדרך לעזור לך`
+  (nobody was dispatched). Same family as the proactive-update promise below.
 - **The register regressed and nobody has fixed it.** Not templated any more —
   twelve replies over three replays of the same arc, no two alike — but the
   bot now writes numbered forms on a menu tap, slash-forms like `פרט/י`,

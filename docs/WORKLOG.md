@@ -72,6 +72,33 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### Parentheses were giving it away
+
+The owner, off a handset screenshot: *"having it create characters like the
+parenthesis its giving me the bot vibes."* The reply had
+`(למשל, לכוד במעלית)` in it, and earlier probes had
+`(רחוב ומספר)` and an invented sample address in brackets.
+
+He is right and it is the same class as the markdown fact already in the file:
+a parenthesis is a **writing** convention, and nobody types one into WhatsApp.
+An aside squeezed into brackets is the single clearest tell that a machine wrote
+the sentence, because a person would either say the thing or leave it out.
+
+One clause, in the channel facts beside the markdown and length ones, phrased as
+what people do rather than as a ban with an example in it. Prompt 3,442 to
+3,536.
+
+**Gone in 9 replies out of 9** offline across three runs of tap ->
+`im stuck` -> `in the elevator`, with `transfer_to_human` still firing on every
+run. Confirmed live.
+
+**Noticed while counting and NOT fixed, because it was not what was asked:**
+`אנא` is now in most replies, six of those nine and again on the live probe.
+It is the same complaint as the parentheses — a letter-writing word nobody types
+in a chat — and it is one clause away in the same place. Also seen once:
+`צוות החירום שלנו`, which does not exist, and `הם בדרך לעזור לך`,
+which promises something nobody dispatched.
+
 ### Two corrections from the owner, and only one of them landed where I put it
 
 **"its not human representative its Department representatives."** The bot was
