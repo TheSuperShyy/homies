@@ -2102,6 +2102,25 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
+**THE INBOUND PROMPT CHANGED ON 31 AUG AND IS NOT PUSHED.** Fence 19,978 →
+22,556 chars, committed, dry run clean, six tools, `facts_check` clean. Michael
+now reacts to the caller before the ticket, asks after anyone locked in or hurt
+(gender-neutral `הכל בסדר שם?`, never `אתה בסדר?`), and does not close until the
+caller says they are done. Probed through `prompt_chat.py` across four runs.
+`python scripts/vapi_sync.py inbound --apply` puts it live; **nobody has run
+that.**
+
+**Two things collide with it, and both need a decision rather than a guess:**
+
+1. **`maxDurationSeconds` is 180**, asked for directly on 5 Aug. "Do not close
+   until the caller is done" and a hard three-minute cut are in tension — Vapi
+   hangs up mid-word on the second it expires and the model is never told it is
+   coming. Either raise the cap or accept that satisfied-but-slow callers are cut
+   off. `save_partial_request` is the only net under it.
+2. **The reference number is still wrong.** Read with its `255` prefix, and it
+   still drops the `1` of `1042` — `255042`, a number that does not exist.
+   Untouched by this work and still the most serious defect on this agent.
+
 **`scripts/check_briefing_logged.sh` changed on 31 Aug and is now quieter on
 purpose.** It still blocks a turn that leaves CONTEXT.md and HANDOVER.md stale,
 but it no longer fires when the last commit already carries both, and it will

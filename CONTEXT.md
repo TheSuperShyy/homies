@@ -1768,6 +1768,18 @@ live rule as missing on 30 Aug. The same error in the other direction would
 report a missing rule as present, which is the dangerous half.
 
 
+**A rule lands where the example lands. Learned 31 Aug.** An anti-parroting rule
+written as a paragraph after the politeness list changed the output by nothing at
+all — the echo came back word for word. Moved directly under the worked example
+that produces the behaviour, and written in that example's own `לא:` / `אלא:`
+shape, it took immediately. **The model copies the nearest example, not the
+furthest rule**, so a rule that contradicts an example must be placed against that
+example or it loses. The same session showed the other half: a care rule in its
+own section never reached the emergency path, because that section carries its own
+complete procedure and a caller in a lift is handled entirely inside it. **A
+cross-cutting rule has to be repeated inside every branch that has its own
+procedure**, or it governs only the calls that fall through to the default.
+
 **A guard that cannot be satisfied is not a guard, it is a wall, and the model
 works around walls. Decided 31 Aug.** `check_briefing_logged.sh` spent four
 turns blocking a session that had already committed its briefing files, because

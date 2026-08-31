@@ -621,6 +621,60 @@ against a message that allows one.
   does not verify Meta's signature. Found while diffing the 35 live nodes against
   the 21 built. Not touched; it needs its own decision.
 
+### Michael answers the person before he answers the ticket
+
+A real call: "I'm stuck in the elevator" got `הבנתי. באיזה בניין ואיזו דירה.` — no
+reaction, and an apartment number demanded from someone shut in a lift. The
+owner's verdict: it is not even human, it does not care.
+
+**He was obeying the prompt exactly, which was the problem.** Acknowledgement was
+capped at two words with a sentence explicitly forbidden, and the worked example
+under that cap is the shape of the reply the caller got. The only human sentence
+in the file, `אני מצטער לשמוע`, was gated inside the branch for parcels and
+neighbours, so a leak or a trapped person could never reach it. No rule for fear
+or distress existed at all — only anger, which forbids sympathy. Nothing anywhere
+asked whether the caller was alright.
+
+The archive argued for the change rather than against it: the two-word rule was
+added on 19 Aug to fix *coldness*, and its own rationale ends **`קיצור הוא
+הכלל; שתיקה היא לא`**. Two words was meant as a floor and had become a ceiling.
+
+New section `## מי שמדבר איתך`; a person locked in added to the emergency list;
+closing now waits for the caller rather than the row; two turns in a row may no
+longer both end in an offer; `רשמתי` out of the filler list. Fence 19,978 →
+22,556 chars. **Not pushed to Vapi.**
+
+**Three fixes were wrong the first time and the harness caught all three.**
+
+1. The care rule never reached the emergency path. An emergency writes and
+   transfers under "do not ask another question before you have written", so the
+   lift call produced a fast correct urgent ticket and not one word about the
+   person inside it. The welfare question now sits **inside** the emergency
+   section, after the write, where it costs nothing.
+2. Removing the ban on repeating the caller back was too broad — he began
+   echoing whole sentences. Narrowed.
+3. **And stating that narrower rule after the politeness list changed nothing:
+   the echo came back word for word.** It only took effect once moved directly
+   under the worked example that produces the behaviour, written in the same
+   shape as that example. Placement beat wording.
+
+Two more found in the same runs and fixed at source: the hand-off said
+*ומעביר לנציג עכשיו*, the live transfer the prompt bans, and **מד״א 101 was
+read aloud as מאה** — 100, an emergency number said wrong — because 101 and 102
+were written as numerals. Hebrew words now, like the office number.
+
+**A correction to this session's own earlier claim.** I twice called *יש שם המון
+פניות כרגע* an invention. It was not — it was the worked example in
+`## אם זה אולי לא נכנס לפנייה`, which also phrased the hand-off as transferring
+the call. The agent was quoting us. Both fixed.
+
+**Still open, and neither is new:** the reference number is still read with its
+`255` prefix and still drops the `1` of `1042`, and a question is still glued to
+it. And **`maxDurationSeconds` is 180** — asked for directly on 5 Aug — which now
+argues with "do not close until the caller is done": Vapi hangs up mid-word on
+the second it expires.
+
+
 ### The briefing guard fired four times at a session that had complied
 
 `scripts/check_briefing_logged.sh` blocks a turn while CONTEXT.md and
