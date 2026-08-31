@@ -90,29 +90,48 @@ live rounds, test data cleaned. Rollback snapshots in the session scratchpad:
 wa-current-emergency.json / wa-before-backstop.json / wa-before-fixups.json,
 each patch script takes --restore.
 
-**UNAPPLIED, 31 Aug: a change to the follow-up menu is prepared and has NOT
-been pushed. The repo and the live bot now disagree.** Read this before touching
-either. Verified by dry run at the end of that session:
+**LIVE, 31 Aug: the follow-up menu is GONE from the running bot.** This
+supersedes the 23 Aug paragraph immediately below — read this first, because that
+one now describes behaviour the bot no longer has. Read off the live workflow at
+the end of the session, not off this repo:
 
-| | live n8n | this repo |
+| | live n8n | repo |
 |---|---|---|
-| nodes | **35** | 33 after the patch |
-| `Dead end reply?` / `Options again` | **both present** | deleted |
-| OpenRouter temperature | **unset — running at Google's 1.0 default** | 0.3 |
-| agent prompt | **45,570 chars** | 47,219 |
+| nodes | **33** | 33 |
+| `Dead end reply?` / `Options again` | **gone** | deleted |
+| OpenRouter temperature | **0.3** | 0.3 |
+| agent prompt | **47,219 chars** | 47,219 |
 
-- Apply with `python scripts/n8n_whatsapp_patch.py --apply` (run it with no flag
-  first — it prints the diff and changes nothing; it is idempotent).
-- **It never ran because it did not parse** — an unterminated string literal at
-  line 168, since repaired. Nothing was ever sent to n8n.
-- `docs/handover/n8n-whatsapp-live-31aug-before-followup-removal.json` is the
-  35-node before-snapshot.
-- **Do not push it without asking.** It reverses the 23 Aug decision immediately
-  below, which was the owner's own direction, and residents see the difference.
-  The temperature half is uncontroversial; the menu removal is not.
-- **`n8n_whatsapp.py --apply` is not the way to ship this.** It builds 21 nodes
-  and PUTs, which is a replace; its guard refuses rather than delete the fourteen
-  live nodes added since the Chatwoot cutover. That guard is correct.
+Live `updatedAt` is `2026-08-31T06:08:45Z`, workflow `u2JjrbcNPYyyh3yl`, still
+active. Repo and live agree on all four.
+
+- **The bot now closes its own conversations.** No options list after a completed
+  flow; the prompt paragraph that used to forbid the model saying "עוד משהו?"
+  is inverted, because the workflow is no longer saying it on the model's behalf.
+  The GREETING menu stays and is still sent once.
+- **The temperature had never been sent at all** — the node carried only
+  `maxTokens`, so the bot ran at Google's 1.0 default from the start. Now 0.3.
+  This was the likeliest cause of the Hebrew-spelling feedback *addressed*, not a
+  reproduced fault fixed: no examples came with the feedback. **Read real replies
+  before believing it worked**, and if it did not hold, the next suspect is the
+  model (`google/gemini-2.5-flash`, chosen 8 Aug for cost, its Hebrew never
+  signed off by a native speaker) — **not** a spelling rule in the prompt, which
+  is recorded twice here as something that does not change token-level output.
+- **This reversed the 23 Aug lane repair, which was the owner's own direction.**
+  If the intent was only to stop the menu firing after *ticket* replies and not
+  after every reply, that is a narrower change and this went further.
+- Before-snapshot: `docs/handover/n8n-whatsapp-live-31aug-before-followup-removal.json`
+  (35 nodes). `python scripts/n8n_whatsapp_patch.py` with no flag re-checks live
+  and is idempotent; it currently prints "Nothing to do."
+- **`n8n_whatsapp.py --apply` is still not the way to ship to this workflow.** It
+  builds 21 nodes and PUTs, which is a replace; its guard refuses rather than
+  delete the nodes added by hand since the Chatwoot cutover. That guard is right.
+
+**A caution about this section's own history.** Earlier the same day this block
+asserted the change was *unapplied*, from a dry run taken minutes before, and it
+was already wrong by the time it was committed. The live workflow moved during
+the session. **Re-read live immediately before writing a claim about it**, and
+treat any node count in this file as of its stated timestamp, not as current.
 
 **Dead-end endings are fixed too (23 Aug, owner's direction).** The
 follow-up lane ("Dead end reply?" → "Options again" → "Send menu") was an
@@ -1988,6 +2007,16 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
+**`scripts/check_briefing_logged.sh` changed on 31 Aug and is now quieter on
+purpose.** It still blocks a turn that leaves CONTEXT.md and HANDOVER.md stale,
+but it no longer fires when the last commit already carries both, and it will
+not fire twice inside ten minutes. Before that it blocked four turns running at
+a session that had complied, because a second session was editing the same
+checkout and changing the fingerprint every turn. **If you are working in this
+repo alongside another session, expect uncommitted files that are not yours —
+commit by name, never `git add -A`.** Run it by hand any time with
+`bash scripts/check_briefing_logged.sh`; silence means it is satisfied.
+
 **THEY WERE PROBED ON 31 AUG AND ALL THREE ARE STILL BROKEN.** Item 2 below is
 kept as written for the history; this is the result. Two runs of
 `scripts/prompt_chat.py`, both reproducing, on assistant

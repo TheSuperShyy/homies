@@ -1545,19 +1545,38 @@ surgical patch, `n8n_whatsapp.py` describes something that is not live and the
 live workflow contains things no file describes. Anything asserting "the bot
 does X" has to be read off the live workflow, not off the repo.
 
-## A script that was written is not a change that was made
+## State moves while you are describing it — re-read live before you assert
 
-On 31 Aug a patch script, a matching set of repo edits and a before-snapshot were
-all produced for the WhatsApp bot, and none of it reached n8n — the script had an
-unterminated string literal and had never been run. Everything on disk looked
-like completed work. The live workflow was untouched.
+On 31 Aug the WhatsApp bot's status was written into the briefing files twice and
+was wrong both times, from evidence that was minutes old.
 
-Two habits follow. **Run the dry path before writing the summary**, because a
-dry run is the cheapest possible proof that the code at least executes. And
-**when reporting, say which side was checked**: "the repo now says X" and "the
-live workflow now says X" are different claims, and only the second one is about
-production. Related: [[A dry run tells you what the repo wants, not what is
-live]], which is the same confusion pointing the other way.
+A dry run showed 35 live nodes and the follow-up menu still present, so HANDOVER
+got a table headed **UNAPPLIED**. That table was already false when it was
+committed: the live workflow had moved to 33 nodes, prompt 47,219, temperature
+0.3. Nobody in this session ran `--apply`. Separately, the patch script itself
+was being rewritten on disk while the session ran — a 126-line copy that parses
+but has an empty `main()` got committed in `a5c4983`, in place of the 184-line
+copy that had dry-run correctly minutes earlier.
+
+**So a repository under a live session is not a still photograph, and neither is
+the production system it talks to.** Three rules follow:
+
+1. **Re-read the live system immediately before writing a claim about it**, not
+   at the start of the work. A node count, a prompt length or an "unapplied" is
+   a reading, not a fact, and it decays.
+2. **Stamp readings with their timestamp** and never carry one forward. Every
+   table in HANDOVER describing live state should say when it was read.
+3. **Verify what you committed, not what you edited.** `git show <sha>:<path>`
+   costs one command. A file that parses is not a file that works, and "I
+   repaired it" is a claim about a version that may no longer be the one on disk.
+
+**And do not explain away an anomaly with the nearest available theory.** The
+mangled string literal in that script was blamed on my own heredoc escaping,
+because I had genuinely hit that bug twice the same hour. The likelier cause was
+that something else was writing the file. A familiar explanation that fits is not
+the same as the right one — the same error as the octave-error pitch tracker,
+one day apart. Related: [[A measurement you wrote yourself is a hypothesis, not
+evidence]] and [[A dry run tells you what the repo wants, not what is live]].
 
 ## The voice prompts
 
@@ -1575,6 +1594,22 @@ the page is split by a newline in the file. A contiguous-string check reported a
 live rule as missing on 30 Aug. The same error in the other direction would
 report a missing rule as present, which is the dangerous half.
 
+
+**A guard that cannot be satisfied is not a guard, it is a wall, and the model
+works around walls. Decided 31 Aug.** `check_briefing_logged.sh` spent four
+turns blocking a session that had already committed its briefing files, because
+it reads the uncommitted set and committing is what empties it — and the only
+uncommitted work belonged to a second session sharing the checkout, so the sole
+way to clear the block was to commit somebody else's unfinished work. The cost
+of a guard being too lax is one late reminder. The cost of it being
+unsatisfiable is that the next session learns to route around it, and then it
+protects nothing. **Every blocking check needs an escape that a compliant
+session can actually reach**, and "the last commit already did it" is usually
+that escape.
+
+**And a check that assumes it is the only writer will eventually be wrong.**
+Two sessions in one checkout is now normal here, so anything fingerprinting the
+working tree is fingerprinting other people's typing too.
 
 **Probe a large prompt change before pushing it. Decided 30 Aug, after it paid
 for itself the first time it was used.** `scripts/prompt_probe.py` costs cents —

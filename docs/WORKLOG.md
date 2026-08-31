@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The briefing guard fired four times at a session that had complied
+
+`scripts/check_briefing_logged.sh` blocks a turn while CONTEXT.md and
+HANDOVER.md are stale. Its "WHY IT CANNOT LOOP" note rested on one nag per
+distinct change set, fingerprinted in `.git/briefing-nagged`. That holds only
+while the working tree moves when this session moves it. Two sessions shared
+this checkout on 31 Aug — one on the chatbot and the Ido voice clone, one on
+the inbound harness — and the other one added or committed a file between every
+turn. Every fingerprint was therefore new, and the block landed four times
+running on a session whose own work was already committed and logged. The file
+count in the message went 3 → 5 → 7 → 7 as somebody else typed.
+
+It was also unsatisfiable, which is the worse half. It reads the *uncommitted*
+set when one exists, and the only uncommitted work was the other session's, so
+the sole way to clear it was to commit somebody else's half-finished work.
+
+Two escapes added, and neither touches the 19 Aug failure the guard was built
+for — four worklog-only commits that left both briefing files naming a retired
+Vapi account:
+
+- **Both briefing files in the LAST COMMIT counts as logged.** Committing them
+  is precisely what removes them from the uncommitted set the check reads, so
+  without this the guard punished the fix it had just demanded.
+- **Ten-minute cooldown**, whatever the change set. A set that keeps changing
+  underneath you is not evidence that you failed to log anything.
+
+Five cases tested in a throwaway repo, then deleted: the 19 Aug shape still
+blocks; an identical set does not nag twice; a set that grows underneath stays
+quiet; a session that has just committed its briefing files passes; and once the
+cooldown expires an unlogged session is nagged again. The marker had 29
+fingerprints in it, so this had been firing for a while.
+
+
 ### A typing harness for the inbound agent (script here, full record on `main`)
 
 `scripts/prompt_chat.py`, committed on this branch in `531153d`. You type
@@ -88,12 +121,13 @@ Four consecutive turns ended by offering to open a ticket.
   on `a976c076…` (Eyal). Nothing was wired in.
 - `docs/WORKLOG.md` had run `08-30 / 08-28 / 08-30 / 08-28`; reordered newest-first.
 
-### The follow-up menu, prepared and NOT applied — repo and live now disagree
+### The follow-up menu is gone from the live bot, and I got its status wrong twice
 
-- **Nothing was pushed to n8n. The live WhatsApp bot is unchanged.** Verified by
-  a dry run against the live workflow at the end of the session: 35 nodes,
-  `Dead end reply?` and `Options again` both still present, temperature still
-  unset, prompt still 45,570 chars against the repo's 47,219.
+- **Mid-session reading, kept because the sequence is the point:** a dry run
+  against live showed 35 nodes, `Dead end reply?` and `Options again` both still
+  present, temperature unset, prompt 45,570 against the repo's 47,219 — so the
+  change looked prepared and unpushed. By the end of the session that was false;
+  see the correction below.
 - What was prepared: `scripts/n8n_whatsapp_patch.py` (new) removes the two
   follow-up nodes and their connections, pushes the repo's prompt, and sets
   `options.temperature = 0.3` on the OpenRouter node. `scripts/n8n_whatsapp.py`
@@ -114,6 +148,21 @@ Four consecutive turns ended by offering to open a ticket.
   the project uses. This is the likeliest cause of the Hebrew-spelling feedback
   addressed, **not** a reproduced fault fixed: no examples came with the
   feedback. The same omission was found on the voice agent on 26 Aug.
+- **CORRECTION, end of session: it is applied and live.** Read directly off n8n:
+  33 nodes, `Dead end reply?` and `Options again` both gone, prompt 47,219 chars,
+  temperature 0.3, `updatedAt 2026-08-31T06:08:45Z`, workflow still active. Repo
+  and live agree on all four. I did not run `--apply`; the workflow moved during
+  the session and my earlier "unapplied" table was already stale when committed.
+- **I also committed a gutted copy of the patch script.** `a5c4983` carries a
+  126-line version that parses but has no `main()` body — it would connect and do
+  nothing. The 184-line working copy is the real one and is what dry-ran
+  correctly. The file was being written by something other than me during the
+  session, which is also the likeliest explanation for the mangled string literal
+  blamed earlier on my own escaping.
+- **What this means for the record:** two claims about production went into the
+  briefing files from evidence that was minutes old and already false. The fix is
+  in CONTEXT — re-read live immediately before asserting anything about it, and
+  never carry a node count forward without its timestamp.
 - **This reverses an owner decision and should be confirmed before it is pushed.**
   The follow-up lane was repaired on 23 Aug *at the owner's direction* — "every
   reply that ends without a question is followed by 'אפשר לעזור בעוד משהו?'".
