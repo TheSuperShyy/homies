@@ -465,19 +465,38 @@ def main():
         sys.exit("Supabase %s: %s" % (code, str(msg)[:200]))
     print("\nwrote %d rows (HTTP %s)" % (len(rows), code))
 
-    # The departed ones, as a SECOND write and not merged into the one above.
+    # The departed ones: PATCH each, never an upsert.
     #
-    # Two reasons. PostgREST needs every object in one payload to carry the same
-    # keys, and these deliberately omit `oxs_last_seen_at` (see departed_rows).
-    # And a run that resolves half the ticket table should say so on its own
-    # line rather than inside a total.
+    # An upsert here fails, and the failure is worth recording because the
+    # reasoning that produced it looked sound. These rows all exist, so
+    # `on_conflict=reference` with merge-duplicates "obviously" resolves to an
+    # UPDATE — but Postgres evaluates CHECK constraints against the tuple the
+    # INSERT proposes, before ON CONFLICT diverts it. The payload carries four
+    # columns, so that tuple has `type`, `description` and `building` NULL with
+    # status `resolved`, and `requests_complete_unless_review` (migration 003)
+    # rejects the batch:
+    #
+    #     new row for relation "requests" violates check constraint
+    #     "requests_complete_unless_review"
+    #
+    # Sending the whole row instead would satisfy it and would also be wrong:
+    # an upsert that can INSERT is an upsert that can mint a half-built ticket
+    # for a reference we mis-typed. UPDATE cannot create anything, which is the
+    # correct guarantee for "this ticket already exists and has been closed".
+    # One request each; the reference carries a plain unique constraint.
     if closed:
-        code, res = sb("requests?on_conflict=reference", "POST", closed,
-                       "resolution=merge-duplicates,return=minimal")
-        if code >= 300:
-            msg = res.get("message", res) if isinstance(res, dict) else res
-            sys.exit("Supabase %s writing resolved tickets: %s" % (code, str(msg)[:200]))
-        print("resolved %d departed ticket(s) from OXS (HTTP %s)" % (len(closed), code))
+        for r in closed:
+            ref = urllib.parse.quote(str(r["reference"]), safe="")
+            body = {k: v for k, v in r.items() if k != "reference"}
+            code, res = sb("requests?reference=eq.%s" % ref, "PATCH", body,
+                           "return=minimal")
+            if code >= 300:
+                # Reference only, never the body: this runs every fifteen
+                # minutes into a log anybody can read.
+                msg = res.get("message", res) if isinstance(res, dict) else res
+                sys.exit("Supabase %s resolving %s: %s"
+                         % (code, r["reference"], str(msg)[:200]))
+        print("resolved %d departed ticket(s) from OXS" % len(closed))
 
     code, after = sb("requests?select=reference&opened_via=eq.oxs&limit=2000")
     print("imported tickets now in the database: %d" % len(after))

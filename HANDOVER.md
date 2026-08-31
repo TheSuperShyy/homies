@@ -1587,11 +1587,14 @@ handset.**
 - Tickets refresh **every 15 minutes** on their own workflow since 24 Aug
   (`oxs-requests.yml`), not twice a day. Each carries `oxs_notes` — the OXS
   dispatcher's own progress notes, newest first — and `oxs_last_seen_at`.
-  **36 of the 70 have left the OXS feed**, which as of 31 Aug is known to mean
-  CLOSED (client question 2, answered). They still read `open` in the database
-  and on the dashboard — the sync change that resolves them is written but has
-  not been applied. Until it runs, the tickets page overstates the open count by
-  roughly half.
+  **254 imported tickets as of 31 Aug, of which 216 are resolved and 38 open.**
+  The 70 this file used to claim was the 24 Aug figure and the importer has run
+  every fifteen minutes since. A ticket leaving the OXS feed means CLOSED
+  (client question 2, answered 31 Aug), and the sync now fetches each departure
+  back by `taskNumber` and writes their real status — 216 of them in the first
+  run. **The open count now matches OXS exactly: 38 ours, 38 theirs.** Before
+  this, every one of those 216 finished jobs read `open` on the dashboard and to
+  the bot.
 - Zero demo or synthetic rows; both were purged on 10 Aug. Every charge carries
   `source = 'oxs'` — until 11 Aug they all said `'seed'`, which is the flag
   every destructive query filters on.
@@ -1926,6 +1929,15 @@ Missing if wanted: `ELEVENLABS_API_KEY` — the custom voice
 exists. Never print a value, never commit one, never paste one into chat.
 
 ---
+
+**A twelfth OXS category exists and files as `other`.** `בינוי` (construction)
+appears on live service calls. Migration 014's comment says "twelve their
+dispatchers actually use", but its `requests_type_check` lists eleven slugs and
+`CATEGORY` in `oxs_requests_sync.py` matches it, so the twelfth falls through to
+`other`. Not urgent — `category_he` stores `בינוי` verbatim, so staff and the
+dashboard show the right word and only the slug is coarse. Fixing it is a
+migration plus one line in the map; the sync prints
+`UNMAPPED CATEGORIES -> filed as other` on every run until then.
 
 ## Open questions for the client
 
