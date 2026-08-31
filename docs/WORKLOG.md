@@ -11,6 +11,97 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Three feature branches, one per agent
+
+`feature/chatbot`, `feature/voice-inbound`, `feature/voice-outbound`, cut from
+`main` at `1eafae8` and pushed with `-u`. Until now the three deliverables
+shared one line of commits and there was no way to move on one without moving on
+all three. Made with `git branch` rather than `switch -c` so the working copy
+never left `main`; one checkout, `git switch` between them, no worktrees. The
+two voice branches sit at `main` as markers — chatbot is the priority.
+
+`main` was 6 commits ahead of `origin/main` at the time. Those six reached
+GitHub inside the feature-branch push, so they exist on origin under three
+branch names but not on `origin/main`.
+
+### The prompt learned to close its own conversations, and an example beat a rule
+
+Companion to "The follow-up menu is gone from the live bot" below — that entry
+covers the workflow half. This is the prompt half, done in a separate session
+that did not know the first was running. **Both sessions edited the same files
+at the same time**, which is the likeliest explanation for the mangled string
+literal in `n8n_whatsapp_patch.py` that the other entry blames on its own
+escaping, and for the gutted 126-line copy committed in `a5c4983`. Nothing was
+lost; live and repo agree. But two agents on one worktree is how it nearly was.
+
+**With the menu gone, the prompt still had to be told to close a conversation**,
+because it had been bent around the mechanism rather than the other way round:
+it said *do not ask "עוד משהו?" yourself, the system will*. That paragraph is
+inverted. Four other changes went in with it, all from one complaint — that the
+bot reads cold where a human support agent would not:
+
+- **The list is a guide, not a boundary.** A new rule says the four rows are a
+  shortcut for someone who does not know what the number is for. Anything in
+  scope is handled whether or not it is a row, and nobody is ever steered back
+  to it — `"אפשר לבחור מהאפשרויות"` is now forbidden. The unparseable-message
+  section used to offer the list as one of three ways forward; it no longer does.
+- **A no is received, not shrugged off.** `אמר לא ... ולא מנדנדים` was correct
+  and sounded like a door closing. It now says what a person says: good that you
+  told me, we are here, write if it comes back. Still no re-asking, no
+  persuading.
+- **The ceiling went from two lines to three sentences.** One line has no room
+  for both a fact and a human sentence about it. The rule names what a third
+  sentence must earn: something for the resident, not a restatement of the second.
+- **One emoji, sometimes.** Was `אימוג'ים. אף אחד.` Israelis type emoji on
+  WhatsApp and a bot with none reads stiff. One, not every message, and **none at
+  all** where wording is already forbidden to touch the fact: a reference number,
+  an amount, a refusal, a transfer, anything dangerous.
+
+**THE FIRST ATTEMPT AT THE CLOSING RULE DID NOT LAND, AND THE REASON IS THIS
+FILE'S OWN EDITING RULE 1.** The new rule went in three paragraphs below the
+worked example, and the probe came back with the old shape carrying a fresh
+number: `פתחתי קריאה על הנזילה בלובי, מספר 255-1144-26. זה עובר לצוות התחזוקה.`
+A model handed a script replays the script, and a rule several paragraphs away
+loses to a sentence it can copy. Fixed by rewriting **the example itself** into
+four items — what it is about, the number, where it went, and an open door — and
+saying the first three are facts while the fourth is his to phrase differently
+every time. Second probe:
+
+    רשמתי. הקריאה על הנזילה בלובי נפתחה, מספר 255-1145-26, והיא עוברת לצוות.
+    אם משהו משתנה אפשר לכתוב לי.
+
+Worth remembering rather than re-learning: **in this file an example outranks a
+rule, at any distance.** If the behaviour is meant to change, the example is what
+has to change.
+
+**Checks.** `check_whatsapp.py` all green, including a real ticket opened end to
+end and a duplicate suppressed. `probe_whatsapp.py` over six replies: no options
+list after anything, the closing message carries the open door, the decline lands
+soft, and a bare `היי` still returns the greeting list from the workflow branch.
+No Hebrew typos in those six — which is not proof, six is a small sample, and the
+spelling feedback came with no examples to reproduce.
+
+The emoji rule was **not** exercised: every message in the probe was an opener, a
+reference number or a refusal, all of which correctly forbid one. It is untested
+against a message that allows one.
+
+### Two things the follow-up removal is owed
+
+- **It reverses an owner decision, and it is already live.** The follow-up lane
+  was repaired on 23 Aug *at the owner's direction* — every reply ending without
+  a question is followed by `אפשר לעזור בעוד משהו?` — and the same list was asked
+  for by Homies on 9 Aug. The entry below flagged that it should be confirmed
+  before being pushed. It was pushed anyway, in a parallel session where the
+  builder asked for exactly this removal and approved it knowing the 9 Aug
+  request. The 23 Aug direction was not in front of either of us at the time.
+  **Homies still has to be told**, and the answer to their original complaint is
+  now given in words instead of a widget.
+- **`Sign the raw body` is in the script and not on live.** The deploy summary
+  prints `signature: ON — X-Hub-Signature-256 checked against APP_SECRET`, which
+  describes what the builder would produce, not what is running: the live webhook
+  does not verify Meta's signature. Found while diffing the 35 live nodes against
+  the 21 built. Not touched; it needs its own decision.
+
 ### The briefing guard fired four times at a session that had complied
 
 `scripts/check_briefing_logged.sh` blocks a turn while CONTEXT.md and
@@ -181,6 +272,7 @@ Four consecutive turns ended by offering to open a ticket.
   them is a write to a client system and has not been asked for.
 
 ---
+
 
 ## 2026-08-30
 

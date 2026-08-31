@@ -21,6 +21,46 @@ The user is the builder; Homies is the client.
 
 ---
 
+## Where the work lives — four branches
+
+As of 31 Aug the repo has one branch per deliverable, all cut from `main` at
+`1eafae8` and all tracking a remote of the same name:
+
+| Branch | What belongs on it |
+| --- | --- |
+| `main` | Integration line. Everything merges back here. |
+| `feature/chatbot` | The WhatsApp bot — n8n workflows, `scripts/n8n_*.py`, `scripts/*whatsapp*.py`, the Hebrew prompt behind it. |
+| `feature/voice-inbound` | The inbound intake assistant — Vapi config, `scripts/vapi_*.py`, `voice/`. |
+| `feature/voice-outbound` | Outbound debt collection — the per-resident Call button path, OXS debt sync. |
+
+One checkout at `Desktop/Homie`, `git switch` between them, no worktrees. The
+two voice branches still sit at `main`; the chatbot is the priority.
+
+`docs/WORKLOG.md` will conflict on every merge back, because every session
+appends near the top of a ~14,000-line file. A root `.gitattributes` with
+`docs/WORKLOG.md merge=union` removes it. Offered, not yet taken.
+
+**Two agents worked this repo at the same time on 31 Aug**, in one worktree, and
+neither knew about the other. Nothing was lost, but a script was committed in a
+gutted state (`a5c4983`) and a string literal was mangled mid-write. If a second
+session is going to run, give it its own worktree.
+
+---
+
+## The live webhook does not check Meta's signature
+
+`Sign the raw body` is a node `n8n_whatsapp.py` builds and the live workflow does
+not have. So the deploy summary's `signature: ON — X-Hub-Signature-256 checked
+against APP_SECRET` describes what the builder would produce, not what is
+running: anyone who learns the callback URL can post a message envelope at it.
+
+Found on 31 Aug while diffing the 35 live nodes against the 21 built, and left
+alone — it needs its own decision rather than being folded into an unrelated
+change. Note that `check_whatsapp.py` passes its security checks regardless:
+they prove a forged *Chatwoot* call writes nothing, which is a different door.
+
+---
+
 ## The system, one page
 
 **Two front doors, and no third.** A resident either opens `web/index.html`
