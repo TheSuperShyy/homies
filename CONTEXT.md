@@ -1492,7 +1492,10 @@ about $0.22 for a three-scenario before/after pair — and caught three
 regressions in the refactor that all three static checks passed clean. Static
 checks prove the prompt still extracts, still contains its facts and still
 survives the voice filter. **None of them can tell you the agent stopped
-confirming the address.** Money-spending still needs the owner's word each time;
+confirming the address.** **And a probe is only as good as what it prints:
+`prompt_probe.py` shows tool NAMES, so a hand-off that goes out with an empty
+`description` is invisible to it. `scripts/prompt_chat.py` prints the arguments,
+and found exactly that on 31 Aug.** Money-spending still needs the owner's word each time;
 the recommendation is to ask for it on anything over about 20% of the prompt.
 
 **A rule stated as an abstraction fails where a wrong-answer-beside-the-right-one

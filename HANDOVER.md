@@ -1964,6 +1964,32 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
+**THEY WERE PROBED ON 31 AUG AND ALL THREE ARE STILL BROKEN.** Item 2 below is
+kept as written for the history; this is the result. Two runs of
+`scripts/prompt_chat.py`, both reproducing, on assistant
+`7752c6bb-89e9-49f3-aaf4-154ecc65cdff`:
+
+- **The reference number is read with its `255` prefix**, which the prompt gives
+  as its own example of what never to say. One run produced `255042` — the `1`
+  of `1042` gone. A number that does not exist, read to a caller as theirs, on
+  the one line of a call that must be copied exactly.
+- **A question is glued to the number** ("anything else?"), against *"the number
+  goes out alone in its own turn"*.
+- **The read-back before the write vanished** in one of the two runs.
+
+Two more from the same session, not previously predicted: `transfer_to_human`
+fires with `building: ""` and `description: ""`, so the office gets a hand-off
+note carrying nothing of what the caller said; and the agent invents — it
+claimed the office was busy, and that noise complaints are handled, neither of
+which is in the knowledge block. **Nothing has been changed in response yet.**
+Rollback is `git revert` plus one `--apply`.
+
+The instrument is `python scripts/prompt_chat.py inbound` (committed here in
+`531153d`); it prints tool *arguments*, which is why the empty hand-off was
+visible at all — `prompt_probe.py` shows names only. Lines to type and the
+transcripts are on `main` in `f4b2de6`.
+
+
 2. **The three regression patches went live unprobed.** They were written
    against failures `prompt_probe.py` found and were never re-tested — the owner
    chose to push rather than spend the $0.08, with the office-number bug live
