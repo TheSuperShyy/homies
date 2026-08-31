@@ -561,6 +561,17 @@ no wording that makes a complete, sendable sentence safe to show a model: if
 it is in the prompt it will be sent, so the only way to stop the reciting is
 to leave nothing to recite.
 
+**Where a fact goes decides whether it works.** The owner's correction that
+handovers go to *department representatives* was written into the prompt's
+facts list and changed nothing; moved verbatim into `transfer_to_human`'s
+description it took on the first probe. A reference bullet at the bottom of a
+prompt is background the model reads once; a tool description is read at the
+moment it decides to act. **Ask which moment the model needs the fact, and put
+it there.** Same for length: a channel fact about WhatsApp did nothing, a line
+in `open_request` fixed mid-conversation replies but not the opening one, and
+only extending the tap fact — *the tap already tells you what they want, so
+what is missing is what happened* — removed the four-point form.
+
 **Behaviour belongs in the tool descriptions, not the prompt, and the reason is
 mechanical.** Tool descriptions are English; the bot answers in Hebrew. There
 is nothing in them it can copy into a reply. When the emergency protocol was

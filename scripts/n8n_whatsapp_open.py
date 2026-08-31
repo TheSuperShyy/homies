@@ -107,7 +107,11 @@ TRANSFER_NEW = (
     "fire, flooding, or water near electricity. A burst pipe is a ticket. A "
     "person who cannot get out is this, and it happens first — before you ask "
     "where they live, before anything else. If a message contains both, this "
-    "one wins."
+    "one wins.\n"
+    "Whoever picks it up is one of Homies' department representatives. In "
+    "Hebrew that is נציג מחלקה, or simply הצוות — use one of those when you "
+    "tell the resident where their message went. Routing to a particular "
+    "department does not exist yet, so never say which department it went to."
 )
 
 
@@ -149,6 +153,19 @@ def main():
                        "(a person in a bad state, and call it first)"
                        % (before, len(TRANSFER_NEW)))
         tool["parameters"]["toolDescription"] = TRANSFER_NEW
+
+    # 4. open_request, from the script rather than a copy kept here. With the
+    #    prompt stripped, the tool descriptions are most of what the model has,
+    #    so they are worth keeping in one place -- and n8n_whatsapp.py is that
+    #    place again now that the two have been reconciled.
+    op = by["open_request"]
+    want = W.tool("open_request")["description"]
+    if op["parameters"].get("toolDescription") != want:
+        before = len(op["parameters"].get("toolDescription") or "")
+        changes.append("open_request: description %d -> %d chars "
+                       "(gather details in a sentence, not as a form)"
+                       % (before, len(want)))
+        op["parameters"]["toolDescription"] = want
 
     print("workflow : %s  (%s, active=%s)"
           % (live["name"], live["id"], live.get("active")))

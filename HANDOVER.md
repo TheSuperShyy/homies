@@ -203,6 +203,16 @@ its stated time.
   `Transfer the tap` hangs off the *canned* branch of `Canned reply?`; sending
   that tap to the model instead would stop the transfer firing. Rewiring it is
   a separate job.
+- **Handovers go to *department representatives*, and that fact lives in
+  `transfer_to_human`'s description, not the prompt** — put in the prompt's
+  facts list first, where it had no effect at all. The Hebrew term is spelled
+  out there (`נציג מחלקה`, or `הצוות`) because the tool text is English.
+  **Naming a specific department is still out**: routing to the four Chatwoot
+  teams does not exist.
+- **A promise nobody has decided about:** the bot wrote
+  `אני אעדכן אותך כשהטיפול יתקדם` after opening a ticket. There is no
+  proactive update path — nothing sends that message. Either build it or tell
+  the bot it cannot say it; do not leave it as it is.
 - **The register regressed and nobody has fixed it.** Not templated any more —
   twelve replies over three replays of the same arc, no two alike — but the
   bot now writes numbered forms on a menu tap, slash-forms like `פרט/י`,

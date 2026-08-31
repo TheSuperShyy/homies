@@ -72,6 +72,54 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### Two corrections from the owner, and only one of them landed where I put it
+
+**"its not human representative its Department representatives."** The bot was
+saying `נציג אנושי`, which is a translation of "human agent" and not what
+Homies call their people. Put the correction in the prompt's facts list first,
+as a bullet under what it knows about the company — **and it did nothing**. The
+next probe said `נציג אנושי` again.
+
+Moved it into `transfer_to_human`'s description instead and it took on the
+first try: `בטח, אני מעביר את הפנייה שלך למחלקה הרלוונטית שלנו. נציג יחזור
+אליך בהקדם.` **The lesson is about placement, not wording.** A bullet in a
+reference list at the bottom of the prompt is read as background; a tool
+description is read at the moment the model decides to act. Same sentence, two
+places, one of them works.
+
+The Hebrew term is given explicitly in the tool description (`נציג מחלקה`,
+or `הצוות`) because the tool text is English and the model has to produce
+Hebrew — the one place a fixed term belongs. **Naming which department is still
+out**: routing to the four Chatwoot teams does not exist, and CONTEXT.md has
+said since August that naming one describes a system we have not built.
+
+**"its a bit too long."** Three attempts, and only the third worked:
+
+1. A channel fact in the prompt — WhatsApp messages are short because people
+   read them on a phone mid-something. **No effect.**
+2. A line in `open_request`'s description about gathering details in a sentence
+   rather than as a form. **Fixed the middle of the conversation** — `הבנתי,
+   נזילה בלובי. באיזה בניין מדובר, ובאיזו דירה אתה גר?` — **and not the tap**,
+   because on the tap the model has not reached for the tool yet.
+3. Extending the tap fact already in the prompt: the tap tells you what they
+   want, so **the only thing missing at that point is what happened**, and the
+   rest is asked when you get to it. **That killed the four-point form**, 3 runs
+   out of 3 offline, confirmed live.
+
+Prompt 3,177 → 3,442 chars. All three additions are facts — who receives a
+transfer, what a tap already tells you, what the channel is like — not style
+rules, which is the line the owner drew.
+
+**End to end live**, tap → `יש נזילה בלובי` → `הרצל 112 דירה 3` → a real ticket
+with the reference quoted back verbatim.
+
+**Still off, and not fixed because the owner asked for no style rules:** `אנא`
+and `ברצונך` keep appearing, it still says `במה אפשר לעזור?` straight after a
+tap that already said what they want, and it invented a sample address in a
+parenthesis. One worth a decision rather than a rule: it wrote
+`אני אעדכן אותך כשהטיפול יתקדם` — **a promise of proactive updates the system
+cannot send.**
+
 ### The prompt is 3,177 characters and the scripts are gone, including the ones that were never in it
 
 The owner, twice, the second time flatly: nothing templated, the bot free, only

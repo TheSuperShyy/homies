@@ -686,6 +686,14 @@ TOOLS = [
             "this. When it opens, the response carries the real reference "
             "number, the only source of one: never invent a number, and never "
             "say a ticket exists before this returns a reference."
+            # Added 31 Aug: with the prompt stripped, the model answered a
+            # menu tap with a four-point numbered form. This is the lever
+            # that works -- a tool description, in English, with no Hebrew
+            # sentence in it to recite.
+            " Collect what is missing the way a person would, in a "
+            "sentence, taking the most useful thing first — not as a "
+            "numbered list of requirements. A resident who is handed a "
+            "four-point form usually answers none of it."
         ),
         "input_schema": {
             "type": "object",
@@ -840,7 +848,18 @@ TOOLS = [
             "electricity. A burst pipe is a ticket. A person who cannot get "
             "out is this, and it happens first — before you ask where they "
             "live, before anything else. If a message contains both, this one "
-            "wins."
+            "wins.\n"
+            # The owner's correction, 31 Aug: they are department
+            # representatives, not "a human representative". Put here rather
+            # than in the prompt because a bullet in the prompt's facts list
+            # did not displace the model's default — the tool description is
+            # what it reads at the moment it decides to hand over. The Hebrew
+            # term is given because that is the word it has to produce.
+            "Whoever picks it up is one of Homies' department "
+            "representatives. In Hebrew that is נציג מחלקה, or simply הצוות — "
+            "use one of those when you tell the resident where their message "
+            "went. Routing to a particular department does not exist yet, so "
+            "never say which department it went to."
         ),
         "input_schema": {
             "type": "object",
