@@ -545,6 +545,26 @@ register exactly as it did on content in Aug: it sits closer to the words being
 answered. When output has a tic, look there first, then at the examples, then at
 the rules. Found 25 Aug, over the em dash.
 
+**And the corollary, which cost six pushes on 31 Aug: a sentence present in a
+prompt is a sentence the model will send.** Marking it wrong does not disarm
+it — `זה לא משהו שאני יכול לעזור בו` came back verbatim one push after it was
+written into the file as a ✗ example of what not to say. Nor does writing the
+negative as a described shape rather than a sentence. If a phrasing must not
+reach a resident, the only reliable move is that no version of it appears in
+the file.
+
+**But strip examples only where the reply has to be tailored to the person.**
+This is the distinction, and getting it backwards makes things worse. Where two
+residents would notice they got identical words — a hesitation whose *worry*
+differs, an acknowledgement of what someone just told you — a fixed sentence is
+actively wrong, and the fix is to replace the example with what the message must
+**convey**: a table of content per case, and question *directions* rather than
+question texts. Where the reply is generic by nature — declining an off-topic
+question, which nobody receives twice — the single example is the only thing
+carrying the register, and removing it leaves the model's own default, which is
+corporate mush. Three pushes made that branch worse before it was put back.
+**Recitation is a defect only where somebody would notice the repeat.**
+
 **A canned line cannot be fixed by editing the prompt.** Menu taps are answered
 by the workflow with no model round trip, so those strings drift out of step
 with the prompt silently and survive every prompt pass. A reply that will not

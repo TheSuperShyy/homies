@@ -166,7 +166,19 @@ MAX_TOKENS = 4096
 # MODEL says its Hebrew was never signed off by a native speaker. A spelling
 # rule in the prompt is NOT the next thing to try — twice recorded here that a
 # prompt hint does not change what a model emits at token level.
-TEMPERATURE = 0.3
+# RAISED 0.3 -> 0.6 on 31 Aug, deliberately reversing the same day's change.
+#
+# 0.3 was set that morning against a Hebrew-spelling complaint. It is also
+# what makes the model reach for the nearest finished sentence in the prompt
+# every time: three different hesitations came back with the SAME Hebrew
+# sentence, word for word. The prompt now offers ✓/✗ pairs with two and three
+# variants each, and variants cannot vary at 0.3.
+#
+# The evidence for 0.3 was always thin: the spelling complaint arrived with no
+# examples, was never reproduced, and six probe replies at 0.3 had no typos --
+# which is what 0.6 would also produce. If Hebrew degrades, step to 0.45 and
+# re-probe; that is one constant and one push.
+TEMPERATURE = 0.6
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
 # on a schedule; pinning means the bot breaks on a date we can look up rather

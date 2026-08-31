@@ -139,8 +139,8 @@ the end of the session, not off this repo:
 |---|---|---|
 | nodes | **33** | 33 |
 | `Dead end reply?` / `Options again` | **gone** | deleted |
-| OpenRouter temperature | **0.3** | 0.3 |
-| agent prompt | **51,455 chars** | 51,455 |
+| OpenRouter temperature | **0.6** | 0.6 |
+| agent prompt | **55,238 chars** | 55,238 |
 
 Workflow `u2JjrbcNPYyyh3yl`, still active. Repo and live agree on all four, read
 at 07:09Z. **The prompt figure moved twice on 31 Aug** — 45,570 before the
@@ -152,14 +152,30 @@ its stated time.
   flow; the prompt paragraph that used to forbid the model saying "עוד משהו?"
   is inverted, because the workflow is no longer saying it on the model's behalf.
   The GREETING menu stays and is still sent once.
-- **The temperature had never been sent at all** — the node carried only
-  `maxTokens`, so the bot ran at Google's 1.0 default from the start. Now 0.3.
-  This was the likeliest cause of the Hebrew-spelling feedback *addressed*, not a
-  reproduced fault fixed: no examples came with the feedback. **Read real replies
-  before believing it worked**, and if it did not hold, the next suspect is the
-  model (`google/gemini-2.5-flash`, chosen 8 Aug for cost, its Hebrew never
-  signed off by a native speaker) — **not** a spelling rule in the prompt, which
-  is recorded twice here as something that does not change token-level output.
+- **Temperature: never sent at all until 31 Aug, then 0.3, now 0.6.** The node
+  carried only `maxTokens`, so the bot ran at Google's 1.0 default from the
+  start. 0.3 was set that morning against the Hebrew-spelling feedback — which
+  arrived with **no examples and was never reproduced**, so it addressed the
+  likeliest cause rather than fixing a known fault. It was raised to 0.6 the
+  same day because 0.3 is deterministic, and deterministic is precisely why the
+  model recited the nearest sentence in the prompt: three different residents
+  got the same Hebrew word for word. No Hebrew degradation observed at 0.6.
+  **If spelling complaints return, step to 0.45 and re-probe — one constant, one
+  push.** The next suspect after that is the model (`google/gemini-2.5-flash`,
+  chosen 8 Aug for cost, its Hebrew never signed off by a native speaker) —
+  **not** a spelling rule in the prompt, recorded twice here as something that
+  does not change token-level output.
+- **Two lines in the prompt are verbatim, not one.** The file said one for
+  weeks. The transfer line it names, **and the greeting** — pinned in code by
+  `check_greeting()`, because the workflow answers a bare `היי` with
+  `MENU["he"]["body"]` and never calls the model. Change one without the other
+  and residents get two different greetings depending which door they came in;
+  the deploy fails rather than letting that ship.
+- **The hesitancy, offer and closing branches no longer contain sendable Hebrew**
+  — they carry what the message must convey instead. That is deliberate and it
+  is load-bearing; re-adding a worked example there brings the reciting back.
+  The off-topic branch is the opposite and **keeps** its example. See CONTEXT,
+  "strip examples only where the reply has to be tailored".
 - **This reversed the 23 Aug lane repair, which was the owner's own direction.**
   If the intent was only to stop the menu firing after *ticket* replies and not
   after every reply, that is a narrower change and this went further.
