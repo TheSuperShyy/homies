@@ -77,6 +77,55 @@ dashboard. The code is written and compiles; the apply is the next step and
 needs the owner, since it changes the status of roughly half the ticket table.
 
 
+### The bot stopped waiting and started helping, and it took four attempts
+
+Second screenshot from the owner. The bot had improved — it answered
+"what can I even ask for" with a real list — but the last line was
+`אני מבין. אין בעיה, אפשר לספר כמה שנוח.` and the note was that it
+"disregards how the customer feels" and should take initiative like a good
+service rep would.
+
+**The rule's own last clause was the bug.** It ended `ורק אז, בלי ללחוץ,
+שאפשר לספר כמה שבא לו` — I had written the passive ending myself. An open
+invitation is the hardest thing to answer when you are already unsure: someone
+who does not know where to start needs a **start**, not permission. Replaced
+with the opposite instinct, now the general rule for anyone who stalls:
+**כשהוא נתקע, אתה מצמצם את השאלה ולא מרחיב אותה** — a narrow question costs
+two words to answer, and from two words there is something to work with.
+`אפשר לספר כמה שנוח` and `אין בעיה` are both named as what they are: handing
+the work back.
+
+**Then the example became a script, which is this file's oldest trap.** One
+worked example produced the SAME sentence word for word against three different
+hesitations — including telling somebody who did not want trouble with a
+neighbour that "small things are exactly what we're here for", an answer to a
+worry he never had. Fixed with **three** examples, one per worry (too small /
+neighbour trouble / who reads this), each with its own narrow closing question,
+so the model has to choose rather than replay.
+
+**Then it guessed.** `לא יודע אם בא לי לשתף` names no worry at all, and the
+model answered it with the neighbour reassurance. The instruction not to guess
+was prose sitting beside three cases that were examples, so it lost. A fourth
+example was added for the unnamed case — acknowledge, no guess, straight to the
+narrow question — and it is written as **the default rather than the edge
+case**, because most people who hesitate do not say why.
+
+Verified after each push. Named worry gets its matched reassurance; unnamed gets
+`אני מבין, ואין לחץ. זה משהו שהתקלקל, או משהו שמפריע?` and no invented fear.
+
+**FOUR TIMES IN ONE DAY an example has beaten a rule in this file**, and every
+one of the four was me writing a rule and expecting it to win. The pattern is
+now beyond doubt: a behaviour change here is an **example** change. Prose next
+to an example is decoration. If two examples disagree, the nearer one wins; if a
+rule and an example disagree, the example wins regardless of distance.
+
+**A residual worth watching:** the four hesitancy replies still come back close
+to verbatim from their examples. Matching the right one to the right worry is
+the part that mattered and it works, but every resident with the same worry gets
+the same sentence. The file says `תנסח בעצמך` and the model does not. If that
+starts reading canned, the answer is more examples per branch, not another
+instruction to vary.
+
 ### A lint pass and a flow test, and the flow test found the worse things
 
 `ruff` is not installed in this project and there is no lint config; installed
