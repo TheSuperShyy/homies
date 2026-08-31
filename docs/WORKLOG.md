@@ -387,6 +387,41 @@ Four consecutive turns ended by offering to open a ticket.
   on `a976c076…` (Eyal). Nothing was wired in.
 - `docs/WORKLOG.md` had run `08-30 / 08-28 / 08-30 / 08-28`; reordered newest-first.
 
+### Ido's voice went live on both Hebrew agents, on a model nobody had tried
+
+- **Live at 06:54Z**, read back from the Vapi API: Debt (he) `93c7f5e5` and
+  Intake (he) `7752c6bb` both on `ba765d50` (Echo Stone Long), `sonic-3.5`,
+  Elliot fallback. English twins untouched.
+- **The Cartesia bill moved to the client**, on Homies' explicit decision after
+  being shown the alternative ($5/month Pro on our account and re-clone there).
+  Credential `448aa856` repointed at 06:47:43Z. It is the whole Cartesia bill,
+  not the cloned voice alone — the English agents use no Cartesia at all.
+- **`sonic-3.6` turned out to be unusable in production, and that was found by
+  the write failing.** Vapi refuses it for Hebrew: only sonic-3.5, sonic-3 and
+  dated variants are allowed. Since 3.6 is the only model that reads a reference
+  clip past ten seconds, the 55-second clone's entire advantage is unavailable
+  on a live agent. The PATCH was rejected cleanly and both assistants were left
+  untouched, which is the good version of this failure.
+- **`sonic-3.5` had never been rendered here either** — the 30 Aug probe missed
+  it exactly as it missed 3.6. It does not rush the way sonic-3 does: ticket line
+  5.33s against Eyal's 5.67s, where sonic-3 gives 3.94s. Rendered on both clones
+  and added to the listening page, which is now seven rows per line.
+- **What is live is not the row that was picked.** The candidate was 55s +
+  sonic-3.6; production runs 55s + sonic-3.5. Said rather than glossed.
+- **`vapi_sync.py --apply` was the obvious tool and was the wrong one.** On debt
+  it would have pushed a prompt 484 chars ahead of live; on inbound it builds
+  from a *demo* source at 19,978 chars against ~35,600 live and would have
+  replaced the production prompt. It also hardcodes Eyal for inbound. Wrote
+  `scripts/vapi_set_voice.py` instead: PATCHes the `voice` field only, dry by
+  default, refuses a voice no key in `.env` can resolve, and reads back after.
+- `scripts/vapi_cartesia_key.py` is new and is also the rollback — `--to
+  CARTESIA_API_KEY --apply` puts the billing back. It refuses to point the
+  credential at an account that cannot see `CARTESIA_VOICE_ID`, because that
+  failure is silent: Vapi falls through to Elliot and the Hebrew agent answers
+  in an American accent, logging nothing.
+- **Still not heard on a call.** Every claim above is a field read back. One
+  Hebrew web call from `web/` on localhost closes it.
+
 ### The follow-up menu is gone from the live bot, and I got its status wrong twice
 
 - **Mid-session reading, kept because the sequence is the point:** a dry run

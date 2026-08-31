@@ -2240,58 +2240,65 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   edit and it makes the clone work — **and it moves every Hebrew utterance from
   both agents onto the client's bill, not just the cloned one.** Do not do this
   as a side effect of wiring up a voice.
-- **Three clones exist and two are rejected.**
+- **LIVE 31 Aug 06:54Z: Ido's voice is on BOTH Hebrew agents.** Read back from
+  the Vapi API, not from a dry run:
 
-  | | id | clip | model | verdict |
-  |---|---|---|---|---|
-  | v1 | `61e911a7-…` | `clone-candidate-a.wav`, cut 162-172s | `sonic-3` | **rejected — truncates words** |
-  | v2 | `493006a2-…` | `clone-candidate-i.wav`, 9.4s joined | `sonic-3` | **rejected — unsettling intonation** |
-  | long | `ba765d50-19c6-4b3e-bc15-9de3b45f82f7` | `clone-candidate-long.wav`, 55.5s | `sonic-3.6` | awaiting a listen |
+  | assistant | voice | model | fallback |
+  |---|---|---|---|
+  | Debt (he) `93c7f5e5` | `ba765d50` Echo Stone Long | `sonic-3.5` | Elliot |
+  | Intake (he) `7752c6bb` | `ba765d50` Echo Stone Long | `sonic-3.5` | Elliot |
 
-  None is wired into any agent; both Hebrew assistants are on Eyal
-  (`a976c076…`), checked against the Vapi API on 31 Aug rather than via a dry run.
-  The losers get deleted from the client's account once someone has listened —
-  that is a write to a client system, so ask first.
-- **`CARTESIA_VOICE_ID` is commented out in `.env` on purpose, and that is the
-  safe state.** `vapi_sync.py`'s `cloned_voice()` **prefers** it over Eyal, so
-  while it is set, `vapi_sync.py debt --apply` silently puts that id on the
-  production debt agent. From 30 to 31 Aug it held a twice-rejected clone. It
-  would also have failed silently: the clones are on the client's Cartesia
-  account while Vapi's credential `448aa856` holds our key, so Vapi falls through
-  to Elliot and the Hebrew agent speaks with an American accent, logging nothing.
-  Uncomment only when a voice is accepted **by ear** and the credential points at
-  the account that owns it.
-- **Why v1 failed, so it is not repeated:** the clip was cut at round timestamps
-  and began and ended mid-word, and an instant clone reproduces its clip's edges.
-  Clips are cut pause-edge to pause-edge now. See CONTEXT, "Cut a cloning clip on
-  pauses, never on round numbers".
-- **Why v2 failed — two numbers in this repo that were wrong, found 31 Aug.**
-  1. **Ten seconds is Cartesia's minimum, not its maximum.** Their guide says "as
-     little as 10 seconds"; `voice_clone.py` had enforced it as a ceiling since
-     5 Aug. They accept **up to 60**. v2's clip was 9.4s — below their floor.
-     `MAX_SECONDS` is now 60.0 and `MIN_SECONDS = 10.0` guards the other end.
-  2. **`sonic-3.6` had never been tried** and was in no file here. It is
-     Cartesia's current GA model, it speaks Hebrew, and it is the **only** model
-     that reads reference audio past 10 seconds. The 30 Aug probe concluding
-     "only sonic-3 and sonic-preview do Hebrew" guessed six ids and missed it.
+  The English twins are untouched (`provider: vapi`, Elliot) and use no Cartesia.
+- **The Cartesia bill moved to the client.** Credential `448aa856`
+  ("Cartesia (Hebrew TTS)") was repointed to `CARTESIA_YARIV_API_KEY` at
+  06:47:43Z, on Homies' explicit decision, because a cloned voice is private to
+  the account that made it and ours answers `402 plan_upgrade_required`. **That
+  credential is the whole Cartesia bill, not just the cloned voice** — every
+  Hebrew utterance from both agents now bills to the client's account.
+  Rollback: `python scripts/vapi_cartesia_key.py --to CARTESIA_API_KEY --apply`.
+- **NOT YET HEARD ON A CALL, and the failure here is silent.** Everything above is
+  verified by reading fields back. If Vapi's stored key were somehow not the
+  client's, Vapi could not resolve the voice, would fall through `fallbackPlan`
+  to Elliot, and the Hebrew agent would answer in an American accent — no error,
+  no log line. **One Hebrew web call closes this**; serve `web/` on localhost
+  (Chrome refuses the microphone to `file://`) and press Start.
+- **`sonic-3.6` cannot be used on a live agent, and that is a Vapi limit.** A
+  PATCH is refused: *"voice.model must be one of the following values for he
+  language: sonic-3.5, sonic-3.5-2026-05-04, sonic-3, sonic-3-2026-01-12,
+  sonic-3-2025-10-27."* sonic-3.6 is the only model that reads a reference clip
+  past 10 seconds, so **the 55-second clone's whole advantage is unavailable in
+  production**. `sonic-3.5` was chosen as the nearest runnable model; it was
+  never tested before today and it does not rush the way `sonic-3` does (ticket
+  line 5.33s against Eyal's 5.67s, where sonic-3 gives 3.94s).
+- **What is live is NOT the render that was picked.** The candidate on the
+  listening page was 55s + sonic-3.6. What went on the agents is 55s +
+  sonic-3.5. Judge it from the row marked *the candidate* in
+  `voice/ido-vs-eyal.html`, which is now that combination.
+- **Three clones exist, all on the client's Cartesia account.**
 
-  The two covered for each other: a longer clip on `sonic-3` changes nothing
-  audible, so fixing either alone looks like a dead end. `CARTESIA_MODEL` is now
-  `sonic-3.6`, and all three places that name a model read that variable with a
-  matching fallback: `.env`, `scripts/cartesia_tts.py` and `scripts/vapi_sync.py`.
-  The fallbacks are what a fresh clone with a thin `.env` would send to a live
-  agent, so they were changed too rather than left at `sonic-3`.
-- **Listen: `voice/ido-vs-eyal.html`** — five rows per line: Eyal, both rejected
-  clones, the control (55s on `sonic-3`, expected no better), and the candidate
-  (55s on `sonic-3.6`). Regenerate the audio with `python scripts/ido_compare.py`.
-- **If none of them pass, the source is too short and no dial fixes it.**
-  Professional cloning wants 30 minutes; `ido-voice.mp4` is 3m40. More audio from
-  Ido is the only route that changes the input rather than the settings, and Eyal
-  remains wired in and working meanwhile.
-- **Three theories about the intonation were tested on 30 Aug and all three were
-  wrong**, one because my own pitch tracker was making octave errors. Every fault
-  in this voice has been found by the client in seconds and by measurement never.
-  Build the listening page; do not build another measurement.
+  | | id | clip | verdict |
+  |---|---|---|---|
+  | v1 | `61e911a7-…` | 10s, round cut | rejected — truncates words |
+  | v2 | `493006a2-…` | 9.4s | rejected — unsettling intonation |
+  | long | `ba765d50-19c6-4b3e-bc15-9de3b45f82f7` | 55.5s | **live** |
+
+  Deleting the two rejected ones is a write to a client system; ask first.
+- **`vapi_sync.py <agent> --apply` MUST NOT be used to change these voices**, and
+  `scripts/vapi_set_voice.py` exists because of it. `vapi_sync` is all-or-nothing:
+  on `debt` it would also push a prompt 484 chars ahead of live, and on `inbound`
+  it builds from `docs/assistant/demo-inbound.md` at **19,978 chars against
+  ~35,600 live** — it would replace the production prompt with a demo one. It also
+  hardcodes Eyal for inbound and never reads `CARTESIA_VOICE_ID`. Use
+  `vapi_set_voice.py` (voice field only, dry by default, reads back).
+- **Rollback to Eyal is one command:**
+  `python scripts/vapi_set_voice.py --voice a976c076-3e31-4bf2-a178-8c3ce3d52b2a --apply`
+  and, if the billing should go back too, the `vapi_cartesia_key.py` line above.
+- **Why v1 and v2 failed, so it is not repeated.** v1: the clip was cut at round
+  timestamps and began mid-word; an instant clone reproduces its clip's edges.
+  v2: two numbers in this repo were wrong — ten seconds is Cartesia's **minimum**
+  (they accept 60, and v2's clip was 9.4s, under their floor), and `sonic-3.6`
+  had never been tried because a probe guessed six model ids and missed it. The
+  two covered for each other, since a longer clip changes nothing on older models.
 - Earlier note here said Eyal's timing is flat. It is not: the same greeting
   measured 4.49s and 5.51s on two runs. Stock voices vary too.
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.

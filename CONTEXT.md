@@ -1595,6 +1595,50 @@ the same as the right one — the same error as the octave-error pitch tracker,
 one day apart. Related: [[A measurement you wrote yourself is a hypothesis, not
 evidence]] and [[A dry run tells you what the repo wants, not what is live]].
 
+## The platform's allow-list is narrower than the vendor's catalogue
+
+Cartesia offers `sonic-3.6`. Vapi will not run it. A PATCH setting it on a Hebrew
+assistant is refused: *"voice.model must be one of the following values for he
+language: sonic-3.5, sonic-3.5-2026-05-04, sonic-3, sonic-3-2026-01-12,
+sonic-3-2025-10-27."*
+
+This mattered more than a version number usually does. `sonic-3.6` is the only
+Cartesia model that reads a reference clip past ten seconds, so the whole point
+of cutting a 55-second clone — the fix for two rejected voices — **cannot be used
+on a live agent at all**. The repo had been tuned end to end for a model the
+runtime does not accept, and nothing said so until the write was attempted.
+
+**So when a vendor capability has to travel through a platform, ask the platform
+what it accepts before building on the vendor's answer.** The vendor's docs
+describe the vendor. And note what saved this: the PATCH was refused cleanly, so
+both assistants were left untouched. A silent partial apply here would have left
+one agent on a new voice and one on the old with no error to read.
+
+**The consolation was also something never tried.** `sonic-3.5` is on the
+allow-list and had been rendered nowhere in this repo, because the model probe
+that missed 3.6 missed it too. It does not rush the way `sonic-3` does. A probe
+over a list you invented measures your list — recorded twice now, one day apart.
+
+## A provider credential is a billing decision wearing a config field's clothes
+
+Vapi synthesises server-side, so it holds its own copy of a Cartesia key. There is
+one, `Cartesia (Hebrew TTS)` (`448aa856`), and **both** Hebrew assistants use it
+while the English twins use `provider: vapi` and touch Cartesia not at all. So
+that credential is not "the Hebrew voice's key". It is the entire Cartesia bill.
+
+Repointing it to the client's account on 31 Aug was the only way to put Ido's
+voice on an agent — a cloned voice is private to the account that created it, and
+ours answers `402 plan_upgrade_required`. But it moved every Hebrew utterance
+both agents will ever speak onto the client's bill, not just the cloned one, and
+the client had approved their key for *cloning*, not for carrying production
+traffic. That is a decision for the owner, and it was put to them with the
+alternative priced ($5/month Pro on our account, then re-clone there) rather than
+taken as a step inside a voice change.
+
+**The general form: before editing a shared credential, work out everything that
+authenticates through it, and say who pays afterwards.** Then check the rollback
+is one command before you make the change, not after.
+
 ## The voice prompts
 
 **Verify a push by reading the assistant back, never by trusting the write.**

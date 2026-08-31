@@ -66,10 +66,19 @@ LINES = [
 
 # tag -> (voice id, model). The tag is the filename suffix and the column name on
 # the listening page; keep the two in step.
+# VAPI DOES NOT ACCEPT EVERY MODEL CARTESIA OFFERS, and that is the constraint
+# that decides this. A PATCH with sonic-3.6 is refused: "voice.model must be one
+# of the following values for he language: sonic-3.5, sonic-3.5-2026-05-04,
+# sonic-3, sonic-3-2026-01-12, sonic-3-2025-10-27". So sonic-3.6 -- the only
+# model that reads a reference clip past 10 seconds -- cannot be used on a live
+# agent at all today, and sonic-3.5 is the best available substitute. Render it
+# and listen, because Cartesia's own line implies the 55s clip buys nothing here.
 VARIANTS = [
     ("v2-s36",      V2,   "sonic-3.6"),
     ("long-sonic3", LONG, "sonic-3"),
     ("long-s36",    LONG, "sonic-3.6"),
+    ("long-s35",    LONG, "sonic-3.5"),      # what Vapi would actually run
+    ("v2-s35",      V2,   "sonic-3.5"),      # control: does the long clip help here at all?
 ]
 
 

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ido's clone, five ways</title>
+<title>Ido's clone, seven ways</title>
 <style>
   :root {
     --bg: #faf9f7; --fg: #171614; --dim: #6b6862;
@@ -63,7 +63,7 @@
                 color:var(--dim); font-size:.925rem }
   .note-block b { color:var(--fg) }
 </style></head><body><main>
- <h1>Ido's clone, five ways</h1>
+ <h1>Ido's clone, seven ways</h1>
  <p class="sub">You asked why a three-minute recording was being used ten seconds
  at a time. It should not have been. Two things I had written down as facts were
  wrong, and this page is the experiment they were hiding.</p>
@@ -84,6 +84,22 @@
   to sound no better than row two.</p>
  </div>
 
+ <div class="warn">
+  <p><b>Vapi will not run sonic-3.6, so the best-sounding row is not the one that
+  can go live.</b> A live agent's voice is set through Vapi, and it refuses that
+  model outright for Hebrew: <i>"voice.model must be one of the following values
+  for he language: sonic-3.5, sonic-3.5-2026-05-04, sonic-3, sonic-3-2026-01-12,
+  sonic-3-2025-10-27."</i> Found on 31 Aug when the change was attempted — the
+  write was refused and both agents were left untouched.</p>
+  <p><b>So the shortlist is sonic-3.5</b>, which nothing here had tried either. On
+  the ticket line it takes 5.33s against Eyal's 5.67s, where sonic-3 rushes it in
+  3.94s. The row marked <i>the candidate</i> is the one that would be installed.</p>
+  <p>Note the control beneath it. Cartesia say only 3.6 reads a clip past ten
+  seconds, so on 3.5 the 55-second clone and the old 9.4-second one should sound
+  much alike — 5.33s against 5.49s. If they do, the long clip buys nothing on a
+  model Vapi allows, and the choice is between Ido as 3.5 renders him, and Eyal.</p>
+ </div>
+
  <div class="card">
    <div class="lbl">greet <span class="note">The opening line.</span></div>
    <p class="he" dir="rtl">שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?</p>
@@ -91,7 +107,9 @@
    <div class="row"><div class="who">Ido · 9.4s · sonic-3 <span class="d">3.00s</span><span class="sm">what you rejected</span></div><audio controls preload="none" src="samples/final/greet-v2-sonic3.mp3"></audio></div>
    <div class="row"><div class="who">Ido · 9.4s · sonic-3.6 <span class="d">3.97s</span><span class="sm">new model, same short clip</span></div><audio controls preload="none" src="samples/final/greet-v2-s36.mp3"></audio></div>
    <div class="row"><div class="who">Ido · 55s · sonic-3 <span class="d">5.62s</span><span class="sm">the control — old model ignores the extra audio</span></div><audio controls preload="none" src="samples/final/greet-long-sonic3.mp3"></audio></div>
-   <div class="row cand"><div class="who">Ido · 55s · sonic-3.6 <span class="d">3.87s</span><span class="sm">both fixes together — the candidate</span></div><audio controls preload="none" src="samples/final/greet-long-s36.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 55s · sonic-3.6 <span class="d">3.87s</span><span class="sm">best sounding, but <b>Vapi refuses this model</b></span></div><audio controls preload="none" src="samples/final/greet-long-s36.mp3"></audio></div>
+   <div class="row cand"><div class="who">Ido · 55s · sonic-3.5 <span class="d">4.28s</span><span class="sm">the candidate — what a live agent would actually run</span></div><audio controls preload="none" src="samples/final/greet-long-s35.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3.5 <span class="d">4.13s</span><span class="sm">control — does the long clip help on 3.5 at all?</span></div><audio controls preload="none" src="samples/final/greet-v2-s35.mp3"></audio></div>
  </div>
 
  <div class="card">
@@ -101,7 +119,9 @@
    <div class="row"><div class="who">Ido · 9.4s · sonic-3 <span class="d">3.94s</span><span class="sm">what you rejected — rushes this by 30%</span></div><audio controls preload="none" src="samples/final/ticket-v2-sonic3.mp3"></audio></div>
    <div class="row"><div class="who">Ido · 9.4s · sonic-3.6 <span class="d">5.56s</span><span class="sm">new model, same short clip</span></div><audio controls preload="none" src="samples/final/ticket-v2-s36.mp3"></audio></div>
    <div class="row"><div class="who">Ido · 55s · sonic-3 <span class="d">4.62s</span><span class="sm">the control — old model ignores the extra audio</span></div><audio controls preload="none" src="samples/final/ticket-long-sonic3.mp3"></audio></div>
-   <div class="row cand"><div class="who">Ido · 55s · sonic-3.6 <span class="d">4.91s</span><span class="sm">both fixes together — the candidate</span></div><audio controls preload="none" src="samples/final/ticket-long-s36.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 55s · sonic-3.6 <span class="d">4.99s</span><span class="sm">best sounding, but <b>Vapi refuses this model</b></span></div><audio controls preload="none" src="samples/final/ticket-long-s36.mp3"></audio></div>
+   <div class="row cand"><div class="who">Ido · 55s · sonic-3.5 <span class="d">5.33s</span><span class="sm">the candidate — what a live agent would actually run</span></div><audio controls preload="none" src="samples/final/ticket-long-s35.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3.5 <span class="d">5.49s</span><span class="sm">control — does the long clip help on 3.5 at all?</span></div><audio controls preload="none" src="samples/final/ticket-v2-s35.mp3"></audio></div>
  </div>
 
  <div class="card">
@@ -111,7 +131,9 @@
    <div class="row"><div class="who">Ido · 9.4s · sonic-3 <span class="d">3.29s</span><span class="sm">what you rejected</span></div><audio controls preload="none" src="samples/final/close-v2-sonic3.mp3"></audio></div>
    <div class="row"><div class="who">Ido · 9.4s · sonic-3.6 <span class="d">3.55s</span><span class="sm">new model, same short clip</span></div><audio controls preload="none" src="samples/final/close-v2-s36.mp3"></audio></div>
    <div class="row"><div class="who">Ido · 55s · sonic-3 <span class="d">2.93s</span><span class="sm">the control — old model ignores the extra audio</span></div><audio controls preload="none" src="samples/final/close-long-sonic3.mp3"></audio></div>
-   <div class="row cand"><div class="who">Ido · 55s · sonic-3.6 <span class="d">3.16s</span><span class="sm">both fixes together — the candidate</span></div><audio controls preload="none" src="samples/final/close-long-s36.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 55s · sonic-3.6 <span class="d">3.47s</span><span class="sm">best sounding, but <b>Vapi refuses this model</b></span></div><audio controls preload="none" src="samples/final/close-long-s36.mp3"></audio></div>
+   <div class="row cand"><div class="who">Ido · 55s · sonic-3.5 <span class="d">3.24s</span><span class="sm">the candidate — what a live agent would actually run</span></div><audio controls preload="none" src="samples/final/close-long-s35.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3.5 <span class="d">3.24s</span><span class="sm">control — does the long clip help on 3.5 at all?</span></div><audio controls preload="none" src="samples/final/close-v2-s35.mp3"></audio></div>
  </div>
 
  <div class="note-block">

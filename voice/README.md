@@ -103,21 +103,30 @@ looks like a dead end. `ido-vs-eyal.html` therefore carries the control — the
 The owner found all of this by asking why a three-minute recording was being used
 ten seconds at a time. No measurement in this repo had thought to ask.
 
-### Nothing is wired to any agent, and `CARTESIA_VOICE_ID` is commented out
+### LIVE since 31 Aug: `ba765d50` on both Hebrew agents
 
-Both Hebrew assistants still speak with Eyal (`a976c076…`), verified against the
-live Vapi API rather than a dry run — the distinction matters, because a dry run
-reports what the repo *would* push.
+Debt (he) `93c7f5e5` and Intake (he) `7752c6bb` both run `ba765d50`
+(Echo Stone Long) on **`sonic-3.5`**, with an Elliot fallback. Read back from the
+Vapi API at 06:54Z, not from a dry run.
 
-`vapi_sync.py`'s `cloned_voice()` **prefers** `CARTESIA_VOICE_ID` over Eyal, so
-while that variable is set, `vapi_sync.py debt --apply` silently puts whatever id
-is in it onto the production debt agent. From 30 to 31 Aug that was a twice-
-rejected clone, and it would have failed twice over: the clones are on the
-client's account while Vapi's credential `448aa856` holds our key, so Vapi would
-have fallen through to Elliot — a Hebrew agent with an American accent, which
-logs nothing. The variable is commented out in `.env` with that reasoning beside
-it. Uncomment it only when a voice has been accepted *by ear* and the Vapi
-credential points at the account that owns it.
+**It runs 3.5 and not 3.6, and that is a Vapi limit rather than a choice.** Vapi
+refuses `sonic-3.6` for Hebrew outright, and 3.6 is the only model that reads a
+reference clip past ten seconds — so the 55-second clone's advantage is real in
+`ido_compare.py` and unavailable in production. What is live is *not* the row
+that was picked on the listening page.
+
+**The Cartesia credential now holds the client's key** (`448aa856`, repointed
+06:47:43Z), because a cloned voice is private to the account that made it. That
+credential is the whole Cartesia bill for both Hebrew agents, not just the clone.
+
+**Not yet heard on a call.** If Vapi could not resolve the voice it would fall
+through to Elliot and answer in an American accent, logging nothing — so one
+Hebrew web call is the only real proof. Rollback to Eyal:
+
+```bash
+python scripts/vapi_set_voice.py --voice a976c076-3e31-4bf2-a178-8c3ce3d52b2a --apply
+python scripts/vapi_cartesia_key.py --to CARTESIA_API_KEY --apply   # billing too
+```
 
 ### Regenerating the comparison
 
