@@ -72,6 +72,53 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### A policy beat a rule, and one default beat a menu of options
+
+The owner: *"its still talking like i can transfer you to a human. i dont want
+it to be a strict rule but a policy instead — remember how hard we refactored
+the over engineered chatbot earlier."*
+
+**Why the earlier fix only half worked.** The department-representatives
+correction went into `transfer_to_human`'s description, and that fixed what the
+bot says **when it hands over**. It kept saying "a human" when it **offers** to
+hand over, because at that moment it has not reached for the tool and the tool
+text is not what it is reading. Third time today the same lesson: **ask which
+moment the model needs the fact, and put it there.**
+
+So it moved into the prompt, next to the identity, and as a policy rather than a
+ban:
+
+> אתה ונציגי המחלקות של הומיז הם אותו שירות, לא שתי דרגות שלו.
+
+Stated that way it covers what a ban would miss — offering a handover, calling
+itself a machine, promising "a real person" — without listing any of them.
+
+### The slashes were my own fault, again
+
+The same runs came back full of `מבין/ה`, `תרצה/י`, `את/ה` — it was even
+slashing **its own** gender, which the prompt states outright. Cause: the
+gendering line said *do not solve this with a slash mid-word*. **Naming the
+failure taught the failure**, for the fifth time in this file's history and the
+first since it was stripped. The clause was written this morning and the rule
+against writing such clauses is in CONTEXT.md above it.
+
+Removing the mention was not enough on its own. Replacing it with a **menu** of
+neutral options — plural, infinitive, or a sentence about what happened — gave
+1 clean run in 3. Replacing the menu with **one default** gave 4 in 4:
+
+> לכן אתה פונה אליו בלשון רבים, תמיד.
+
+**Offering a model three ways to satisfy a constraint is weaker than giving it
+one**, because each option is a decision to get wrong per sentence. The
+single default also shortened that passage.
+
+4/4 offline clean of slashes, parentheses and "human"; confirmed live. Prompt
+3,536 to 3,736 — the handover policy added, the gendering passage shrank.
+
+**Still there and still not chased:** `אנא` in some replies, `שלום לכם`
+where `היי` belongs, and twice a message that ended on a colon promising a
+list that never came.
+
 ### Parentheses were giving it away
 
 The owner, off a handset screenshot: *"having it create characters like the

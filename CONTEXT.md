@@ -561,6 +561,10 @@ no wording that makes a complete, sendable sentence safe to show a model: if
 it is in the prompt it will be sent, so the only way to stop the reciting is
 to leave nothing to recite.
 
+**One default beats a menu of options.** Told the neutral forms available in Hebrew — plural, infinitive, or rephrasing around the event — the model got it right once in three. Told simply to address the resident in the plural, always, it got it right four times in four. **Every option is a decision to get wrong once per sentence**, and a prompt that offers choices is asking for that decision every time. Pick the default and say only that.
+
+**Naming a failure mode teaches it, and this survives the rewrite.** The stripped prompt's one gendering line said not to solve the problem with a slash mid-word; the replies came back full of slashes, including on the bot's own verbs. Removing the mention was necessary and not sufficient — the positive default was what fixed it.
+
 **Where a fact goes decides whether it works.** The owner's correction that
 handovers go to *department representatives* was written into the prompt's
 facts list and changed nothing; moved verbatim into `transfer_to_human`'s
