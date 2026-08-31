@@ -62,11 +62,21 @@ re-checked. **Ask the API and read the seller's own price list; do not infer a
 plan gate from a feature doc.**
 
 TEN SECONDS VERSUS THE WHOLE RECORDING
-Asked for, and it is not available: the source recording is 3m40s, which is 22x
-over instant cloning's 10-second limit and 8x under Pro cloning's 30-minute
-minimum. It falls in the gap between the two modes. Sending the whole file to the
-instant endpoint does not use the whole file — it lets the API choose which ten
-seconds to keep instead of choosing them deliberately. Hence the candidates below.
+This section said for three weeks that 220s was "22x over instant cloning's
+10-second limit". **There is no 10-second limit.** Cartesia's own guide says a
+clone can be made "with as little as 10 seconds of audio" — a floor, which this
+file had written down as a ceiling. Their guide offers up to 60 seconds, and is
+explicit about who can use it: "Only Sonic 3.6 uses reference audio beyond 10
+seconds, so a longer clip won't improve results on older models."
+
+That second sentence is why nobody noticed. Feeding 40 extra seconds to `sonic-3`
+would have changed nothing audible, so the wrong constant and the wrong model
+would have covered for each other. The owner found it on 31 Aug by asking the
+obvious question — why is a three-minute recording being used ten seconds at a
+time — which no measurement in this repo had thought to ask.
+
+**Read the vendor's number and check which direction it points.** A minimum and a
+maximum look identical in a sentence and are opposites in a constant.
 """
 
 import json
@@ -89,40 +99,60 @@ API = "https://api.cartesia.ai"
 # number to bump when something breaks.
 VERSION = "2026-03-01"
 
-# TEN SECONDS IS THE LIMIT, AND IT DECIDES THE WHOLE RESULT.
+# TEN SECONDS IS THE FLOOR. SIXTY IS THE CEILING. THE MODEL DECIDES WHICH MATTERS.
 #
-# Cartesia's instant cloning takes a clip of "up to 10 seconds". The source
-# recording is 220 seconds, so handing it the whole thing means the clone is
-# built from whichever ten seconds the API happens to keep — which could be the
-# throat-clear at the start. The voice is then judged on a slice nobody chose.
+# Cartesia asks for "as little as 10 seconds" and accepts up to 60. Until 31 Aug
+# this file read that minimum as a maximum and cut every candidate to exactly ten
+# seconds, throwing away 210 seconds of a 220-second recording.
 #
-# So the ten seconds are chosen deliberately. Their docs are specific about what
-# ruins a clone: "pauses in the recording will be mimicked by the cloned voice",
-# and background noise and clipping are baked in permanently. The candidates
-# below were cut from the longest silence-free stretches of the recording and
-# scored on mean level, steadiness of level, and the absence of any near-silent
-# second inside the window:
+# The catch is that the extra audio is only read by one model: "Only Sonic 3.6
+# uses reference audio beyond 10 seconds, so a longer clip won't improve results
+# on older models." Everything cloned here before 31 Aug was `sonic-3` on ~10s —
+# the oldest model on the least audio — and was rejected twice by ear, first for
+# cutting words off and then for an unsettling up-down intonation.
 #
-#     clone-candidate-a.wav   162-172s   loudest and steady      <- default
-#     clone-candidate-b.wav   150-160s   steadiest of the three
-#     clone-candidate-c.wav   31-41s     early, different content
-#     clone-candidate-d.wav   62-72s     cut 30 Aug, quietest
-#     clone-candidate-e.wav   100-110s   cut 30 Aug
+# Whatever the length, three things from their guide are baked into a clone
+# permanently and cannot be undone afterwards:
 #
-# d and e were added on 30 Aug from the two longest silence-free runs the first
-# pass never sampled (30-85s and 93-131s). They came out 2-4 dB quieter in the
-# mean than a/b/c, so they are alternates rather than contenders.
+#   - "pauses in the recording will be mimicked by the cloned voice"
+#   - background noise
+#   - clipping
 #
-# **None of the five clips.** The whole recording peaks at 0.0 dB, which would be
-# baked into a clone permanently, but measured one window at a time the peaks are
-# -0.9 to -2.2 dB: the full-scale sample lives outside every candidate. Measure
-# the window, never the file.
+# So a clip is cut from pause edge to pause edge, never at round timestamps. That
+# is not a stylistic preference: `clone-candidate-a.wav` was cut at 162.0s, opened
+# on a 0.146s fragment of a syllable, and the clone learned to swallow the start
+# of words. Internal sentence pauses of ~0.3s are ordinary speech and are wanted
+# in a long clip; it is the edges that have to land in silence.
 #
-# Those are objective criteria, and objective criteria cannot hear. Listen to all
-# three and pass --clip to pick a different one; the best clone comes from the
-# one that sounds most like ordinary speaking, not the one with the best numbers.
-CLIP = os.path.join(ROOT, "voice", "clone-candidate-a.wav")
-MAX_SECONDS = 10.0
+#     clone-candidate-a.wav      162-172s     round cut — PRODUCED THE v1 FAULT
+#     clone-candidate-b.wav      150-160s     round cut
+#     clone-candidate-c.wav       31-41s      round cut
+#     clone-candidate-d.wav       62-72s      round cut, 30 Aug
+#     clone-candidate-e.wav      100-110s     round cut, 30 Aug
+#     clone-candidate-f/g/h.wav  various      pause-bounded, 30 Aug
+#     clone-candidate-i.wav      f+g joined   9.379s  -> the v2 clone
+#     clone-candidate-long.wav   29.95-85.42s 55.470s -> 31 Aug, for Sonic 3.6   <- default
+#
+# `long` is the 30-85s run taken whole rather than sampled: speech runs from
+# 30.036s to 85.321s with only ordinary 0.25-0.35s sentence pauses inside it, and
+# the cut sits 86ms before the first onset and 99ms after the last, so the edges
+# are silent without being padded.
+#
+# MEASURE THE WINDOW, NEVER THE FILE. The whole recording peaks at 0.0 dB, which
+# would bake clipping into a clone forever, but no candidate contains that sample:
+# they measure -0.9 to -2.2 dB, and `long` measures -0.9 dB across all 55 seconds.
+# The full-scale peak lives outside every window that has been used.
+#
+# And none of these numbers can hear. Every fault in this voice so far was found
+# by a person in seconds and by the measurements never. Pass --clip to try another
+# and listen; the best clone comes from the clip that sounds most like ordinary
+# speaking, not the one with the best figures.
+CLIP = os.path.join(ROOT, "voice", "clone-candidate-long.wav")
+# 60.0, not 10.0 — see above. The guard stays because the API's behaviour past its
+# own maximum is undocumented, and a clone silently built from an arbitrary slice
+# of an oversized file is exactly the failure this script exists to prevent.
+MAX_SECONDS = 60.0
+MIN_SECONDS = 10.0
 NAME = "Echo Stone"
 # The subject is Ido, whose recording is `ido-voice.mp4` in the repo root, and who
 # agreed to this on 30 Aug. The name below is deliberately not his: it is a label
@@ -235,6 +265,11 @@ def main():
         sys.exit(__doc__)
     if "--clip" in args:
         globals()["CLIP"] = os.path.abspath(args[args.index("--clip") + 1])
+    if "--name" in args:
+        # Three clones now live on the client's account and are told apart by this
+        # string alone. A name is not cosmetic when someone else owns the account
+        # and has to recognise what is sitting on it.
+        globals()["NAME"] = args[args.index("--name") + 1]
     keyvar = args[args.index("--key") + 1] if "--key" in args else "CARTESIA_API_KEY"
     key = load_env(keyvar)
 
@@ -257,12 +292,20 @@ def main():
     secs = duration(CLIP)
     if secs is not None and secs > MAX_SECONDS + 0.05:
         sys.exit(
-            "Clip is %.1fs. Cartesia's instant cloning takes up to %.0f seconds.\n"
-            "Sending a longer file means the clone is built from whichever ten "
-            "seconds the API keeps,\nwhich is not a choice anyone made. Use one of "
-            "the prepared candidates:\n"
-            "  python scripts/voice_clone.py --go --clip voice/clone-candidate-b.wav"
+            "Clip is %.1fs. Cartesia accepts up to %.0f seconds.\n"
+            "Sending a longer file does not use the longer file: the clone is built "
+            "from whichever\nslice the API keeps, which is nobody's choice. Cut a "
+            "window instead:\n"
+            "  python scripts/voice_clone.py --go --clip voice/clone-candidate-long.wav"
             % (secs, MAX_SECONDS))
+    if secs is not None and secs < MIN_SECONDS - 0.05:
+        # Added 31 Aug. Until then this script guarded only the ceiling it had
+        # invented and left the real floor unguarded, so a too-short clip would
+        # have been found out by ear rather than here.
+        sys.exit(
+            "Clip is %.1fs. Cartesia asks for at least %.0f seconds; a shorter clip "
+            "makes a thinner\nclone. Cut a longer window from the source recording."
+            % (secs, MIN_SECONDS))
 
     size = os.path.getsize(CLIP)
     print("clip      : %s (%.1f MB, %.1fs)" % (os.path.relpath(CLIP, ROOT), size / 1e6,

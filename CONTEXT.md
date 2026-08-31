@@ -1469,6 +1469,59 @@ The same rule caught the opposite error on 30 Aug, when "Cartesia publishes no
 balance" turned out to be false — a synthesis call answers "is there credit"
 even though nothing answers "how much".
 
+## A minimum and a maximum look identical in a sentence
+
+Cartesia's guide says a voice clone can be made "with as little as 10 seconds of
+audio". On 5 Aug that became `MAX_SECONDS = 10.0` in `scripts/voice_clone.py`,
+and a docstring calling the 220-second source recording "22x over instant
+cloning's 10-second limit". It is a **floor**. They accept up to sixty seconds.
+For three weeks every clip was cut to exactly ten seconds and 210 seconds of a
+220-second recording were thrown away on each attempt.
+
+Nothing caught it because nothing could. The number was in our own repository, in
+a comment block explaining at length why it mattered, and every later reader
+(me included) treated it as settled fact and reasoned forward from it. **A
+constant you wrote yourself reads like evidence and is only ever a claim.** The
+owner found it by asking why a three-minute recording was being used ten seconds
+at a time — a question about the shape of the thing, which no measurement in the
+repo was capable of asking.
+
+**It had an accomplice.** `sonic-3.6` — Cartesia's current model, which speaks
+Hebrew — appeared in no file here before 31 Aug, because a 30 Aug probe guessed
+six model ids and missed it, then reported "only sonic-3 and sonic-preview accept
+Hebrew". That conclusion was about the guess list, not about Cartesia. **A probe
+over a list you invented measures your list.** And the two errors protected each
+other, because "only Sonic 3.6 uses reference audio beyond 10 seconds": a longer
+clip on the old model changes nothing audible, so testing either fix alone would
+have looked like a dead end and confirmed both mistakes.
+
+So: when a number decides an approach, re-read it at the source before building
+the third attempt on it, and when a probe comes back negative, ask whether it
+tested the world or your own list. Related: [[Ask the API and read the price
+list]] and [[A measurement you wrote yourself is a hypothesis, not evidence]].
+
+## A dry run tells you what the repo wants, not what is live
+
+`python scripts/vapi_sync.py debt` printed a cloned voice id on 31 Aug while the
+live debt assistant was on Eyal and had been all along. Both statements were
+true: the dry run reports what `--apply` *would* push. Reading it as the live
+state is how you verify a claim about production against a file on disk.
+
+Verify "nothing was changed" against the provider's API. `GET /assistant/<id>`
+and read `voice.voiceId`. It is one request and it is the only thing that
+actually answers the question.
+
+**The same read found a live hazard.** `vapi_sync.py`'s `cloned_voice()` prefers
+`CARTESIA_VOICE_ID` over the stock voice, so setting that variable "ready for
+later" armed `--apply` to put a twice-rejected clone onto the production debt
+agent — and it would have failed silently rather than loudly, because the clone
+is on the client's Cartesia account while Vapi's credential holds our key, so
+Vapi falls through to Elliot and a Hebrew agent speaks with an American accent
+while logging nothing. The variable's own docstring had said the safe state is
+*unset*: "with the variable absent this function changes nothing at all, so
+--apply stays safe to run". **Do not pre-load a variable that overrides
+production; leave it unset until the thing it names has been accepted.**
+
 ## The voice prompts
 
 **Verify a push by reading the assistant back, never by trusting the write.**

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ido's clone, four ways</title>
+<title>Ido's clone, five ways</title>
 <style>
   :root {
     --bg: #faf9f7; --fg: #171614; --dim: #6b6862;
@@ -24,88 +24,128 @@
   }
   main { max-width: 46rem; margin: 0 auto; }
   h1 { font-size: 1.5rem; margin: 0 0 .35rem; letter-spacing: -.01em; text-wrap: balance; }
-  .sub { color: var(--dim); margin: 0 0 2.5rem; }
+  .sub { color: var(--dim); margin: 0 0 2rem; }
   .card {
     background: var(--card); border: 1px solid var(--line);
     border-radius: 10px; padding: 1.15rem 1.25rem; margin-bottom: 1rem;
   }
-  .card.pick { border-color: var(--accent); }
-  .head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; margin-bottom: .1rem; }
-  .name { font-weight: 650; }
-  .tag {
-    font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
-    color: var(--accent); border: 1px solid var(--accent);
-    border-radius: 99px; padding: .1rem .5rem;
-  }
-  .meta { color: var(--dim); font-size: .875rem; margin: 0 0 .8rem; }
-  .meta b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
-  audio { width: 100%; margin-top: .2rem; }
-  .note { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.5rem; color: var(--dim); font-size: .925rem; }
-  .note b { color: var(--fg); }
+  .lbl { font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem }
+  .lbl .note { text-transform:none; letter-spacing:0; color:var(--dim); font-weight:400 }
+  .he { font-size:1.05rem; margin:.2rem 0 1rem }
+  audio { width:100%; margin-top:.25rem }
   code {
     font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .85em;
     background: color-mix(in srgb, var(--fg) 7%, transparent);
     padding: .12em .4em; border-radius: 4px;
   }
-  ul { padding-left: 1.1rem; }
-  li { margin-bottom: .4rem; }
-</style>
-<style>
- .four{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem}
- @media(max-width:56rem){.four{grid-template-columns:1fr 1fr}}
- @media(max-width:30rem){.four{grid-template-columns:1fr}}
- .who{font-size:.75rem;color:var(--dim);margin-bottom:.3rem}
- .who .d{font-variant-numeric:tabular-nums;opacity:.7}
- .lbl{font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
- .lbl .note{text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400}
- .he{font-size:1.05rem;margin:.2rem 0 .9rem}
- audio{width:100%}
- .warn{border-left:3px solid var(--accent);padding-left:1rem;margin:2rem 0;color:var(--dim)}
+  ul { padding-left: 1.1rem; } li { margin-bottom: .4rem; }
+
+  /* One row per candidate rather than narrow columns: five audio players side by
+     side are too cramped to scrub, and A/B listening is easier down a column. */
+  .row { display:grid; grid-template-columns: 13rem 1fr; gap:.2rem 1rem; align-items:center;
+         padding:.45rem 0; border-top:1px solid var(--line) }
+  .row:first-of-type { border-top:0 }
+  .row .who { font-size:.82rem }
+  .row .who .d { color:var(--dim); font-variant-numeric:tabular-nums; margin-left:.4rem }
+  .row .who .sm { display:block; color:var(--dim); font-size:.72rem }
+  .row.ref .who { color:var(--accent) }
+  .row.cand { background: color-mix(in srgb, var(--accent) 6%, transparent);
+              margin:0 -.5rem; padding-left:.5rem; padding-right:.5rem; border-radius:6px }
+  @media(max-width:34rem){ .row{grid-template-columns:1fr} }
+
+  .warn { border-left:3px solid var(--accent); padding-left:1rem; margin:2rem 0; color:var(--dim) }
+  .warn b, .warn strong { color:var(--fg) }
+  table { border-collapse:collapse; width:100%; font-size:.9rem; margin:.6rem 0 0 }
+  th,td { text-align:left; padding:.35rem .6rem; border-bottom:1px solid var(--line) }
+  th { font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--dim) }
+  td.n { font-variant-numeric:tabular-nums }
+  .note-block { border-top:1px solid var(--line); margin-top:2.5rem; padding-top:1.5rem;
+                color:var(--dim); font-size:.925rem }
+  .note-block b { color:var(--fg) }
 </style></head><body><main>
- <h1>Ido's clone, four ways</h1>
- <p class="sub">You said the intonation jumps between high and low and it is
- unsettling. Same voice in the middle two columns, different model. Stock Eyal on
- the left as the reference.</p>
+ <h1>Ido's clone, five ways</h1>
+ <p class="sub">You asked why a three-minute recording was being used ten seconds
+ at a time. It should not have been. Two things I had written down as facts were
+ wrong, and this page is the experiment they were hiding.</p>
+
  <div class="warn">
-  <p><strong>Only two Cartesia models speak Hebrew at all</strong>, sonic-3 and
-  sonic-preview, and everything you have heard so far was sonic-3. Prosody is a
-  property of the model, so this is the one lever that was never pulled.</p>
-  <p><strong>Where I got to by measuring: nowhere.</strong> Three theories, three
-  wrong. Not short lines, not the joined clip, and not the recording being
-  expressive, which turned out to be my own pitch tracker making octave errors.
-  Ninety nine percent of the "high pitch" I measured was one to nineteen frame
-  flicker. The numbers under each player are duration only.</p>
+  <p><b>Ten seconds is Cartesia's minimum, not its maximum.</b> Their guide says a
+  clone can be made "with as little as 10 seconds of audio" — a floor, which this
+  repo had recorded as a ceiling since 5 August. They accept up to 60 seconds.
+  Every clip cut so far threw away 210 seconds of a 220-second recording.</p>
+  <p><b>And the current model was never tried.</b> <code>sonic-3.6</code> speaks
+  Hebrew and appeared in no file in this repo; the probe that concluded "only
+  sonic-3 and sonic-preview do Hebrew" simply never guessed its name.</p>
+  <p><b>The two mistakes covered for each other.</b> Cartesia: "Only Sonic 3.6
+  uses reference audio beyond 10 seconds, so a longer clip won't improve results
+  on older models." A longer clip on <code>sonic-3</code> would have changed
+  nothing audible — so testing either fix alone would have looked like a dead end.
+  That is why row four is on this page: it is the control, and it is <i>expected</i>
+  to sound no better than row two.</p>
  </div>
 
-  <div class="card">
-    <div class="lbl">greet <span class="note">The opening line.</span></div>
-    <p class="he" dir="rtl">שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?</p>
-    <div class="four">
-      <div><div class="who">Eyal, stock <span class="d">2.95s</span></div><audio controls preload="none" src="samples/final/greet-eyal.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-3 <span class="d">3.00s</span></div><audio controls preload="none" src="samples/final/greet-v2-sonic3.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-preview <span class="d">3.97s</span></div><audio controls preload="none" src="samples/final/greet-v2-preview.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-3 slow <span class="d">3.34s</span></div><audio controls preload="none" src="samples/final/greet-v2-slow.mp3"></audio></div></div>
-  </div>
-  <div class="card">
-    <div class="lbl">ticket <span class="note">The clearest one. sonic-3 rushes this by 30%; preview lands next to Eyal.</span></div>
-    <p class="he" dir="rtl">רשמתי את הפנייה, נזילה מהתקרה באמבטיה, והיא עוברת לצוות התחזוקה.</p>
-    <div class="four">
-      <div><div class="who">Eyal, stock <span class="d">5.67s</span></div><audio controls preload="none" src="samples/final/ticket-eyal.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-3 <span class="d">3.94s</span></div><audio controls preload="none" src="samples/final/ticket-v2-sonic3.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-preview <span class="d">5.49s</span></div><audio controls preload="none" src="samples/final/ticket-v2-preview.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-3 slow <span class="d">4.44s</span></div><audio controls preload="none" src="samples/final/ticket-v2-slow.mp3"></audio></div></div>
-  </div>
-  <div class="card">
-    <div class="lbl">close <span class="note">The closing line. Saying it is the only thing that ends a call.</span></div>
-    <p class="he" dir="rtl">תודה שהתקשרת להומיז, יום טוב, ולהתראות.</p>
-    <div class="four">
-      <div><div class="who">Eyal, stock <span class="d">3.11s</span></div><audio controls preload="none" src="samples/final/close-eyal.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-3 <span class="d">3.29s</span></div><audio controls preload="none" src="samples/final/close-v2-sonic3.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-preview <span class="d">3.97s</span></div><audio controls preload="none" src="samples/final/close-v2-preview.mp3"></audio></div>
-      <div><div class="who">Ido, sonic-3 slow <span class="d">2.32s</span></div><audio controls preload="none" src="samples/final/close-v2-slow.mp3"></audio></div></div>
-  </div>
- <p class="sub" style="margin-top:2.5rem">If none of these sound right, the honest
- read is that ten seconds is not enough audio for this voice. Cartesia's
- professional cloning wants thirty minutes and we have three minutes forty.
- Eyal stays available and nothing is wired to any agent.</p>
+ <div class="card">
+   <div class="lbl">greet <span class="note">The opening line.</span></div>
+   <p class="he" dir="rtl">שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?</p>
+   <div class="row ref"><div class="who">Eyal, stock <span class="d">2.95s</span><span class="sm">the reference — what is live today</span></div><audio controls preload="none" src="samples/final/greet-eyal.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3 <span class="d">3.00s</span><span class="sm">what you rejected</span></div><audio controls preload="none" src="samples/final/greet-v2-sonic3.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3.6 <span class="d">3.97s</span><span class="sm">new model, same short clip</span></div><audio controls preload="none" src="samples/final/greet-v2-s36.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 55s · sonic-3 <span class="d">5.62s</span><span class="sm">the control — old model ignores the extra audio</span></div><audio controls preload="none" src="samples/final/greet-long-sonic3.mp3"></audio></div>
+   <div class="row cand"><div class="who">Ido · 55s · sonic-3.6 <span class="d">3.87s</span><span class="sm">both fixes together — the candidate</span></div><audio controls preload="none" src="samples/final/greet-long-s36.mp3"></audio></div>
+ </div>
+
+ <div class="card">
+   <div class="lbl">ticket <span class="note">The most revealing line — long enough for a contour to go wrong.</span></div>
+   <p class="he" dir="rtl">רשמתי את הפנייה, נזילה מהתקרה באמבטיה, והיא עוברת לצוות התחזוקה.</p>
+   <div class="row ref"><div class="who">Eyal, stock <span class="d">5.67s</span><span class="sm">the reference — what is live today</span></div><audio controls preload="none" src="samples/final/ticket-eyal.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3 <span class="d">3.94s</span><span class="sm">what you rejected — rushes this by 30%</span></div><audio controls preload="none" src="samples/final/ticket-v2-sonic3.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3.6 <span class="d">5.56s</span><span class="sm">new model, same short clip</span></div><audio controls preload="none" src="samples/final/ticket-v2-s36.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 55s · sonic-3 <span class="d">4.62s</span><span class="sm">the control — old model ignores the extra audio</span></div><audio controls preload="none" src="samples/final/ticket-long-sonic3.mp3"></audio></div>
+   <div class="row cand"><div class="who">Ido · 55s · sonic-3.6 <span class="d">4.91s</span><span class="sm">both fixes together — the candidate</span></div><audio controls preload="none" src="samples/final/ticket-long-s36.mp3"></audio></div>
+ </div>
+
+ <div class="card">
+   <div class="lbl">close <span class="note">Saying this line is the only thing that ends a call.</span></div>
+   <p class="he" dir="rtl">תודה שהתקשרת להומיז, יום טוב, ולהתראות.</p>
+   <div class="row ref"><div class="who">Eyal, stock <span class="d">3.11s</span><span class="sm">the reference — what is live today</span></div><audio controls preload="none" src="samples/final/close-eyal.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3 <span class="d">3.29s</span><span class="sm">what you rejected</span></div><audio controls preload="none" src="samples/final/close-v2-sonic3.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 9.4s · sonic-3.6 <span class="d">3.55s</span><span class="sm">new model, same short clip</span></div><audio controls preload="none" src="samples/final/close-v2-s36.mp3"></audio></div>
+   <div class="row"><div class="who">Ido · 55s · sonic-3 <span class="d">2.93s</span><span class="sm">the control — old model ignores the extra audio</span></div><audio controls preload="none" src="samples/final/close-long-sonic3.mp3"></audio></div>
+   <div class="row cand"><div class="who">Ido · 55s · sonic-3.6 <span class="d">3.16s</span><span class="sm">both fixes together — the candidate</span></div><audio controls preload="none" src="samples/final/close-long-s36.mp3"></audio></div>
+ </div>
+
+ <div class="note-block">
+  <p><b>What changed since the version you heard.</b></p>
+  <table>
+    <tr><th>&nbsp;</th><th>clip</th><th>model</th><th>status</th></tr>
+    <tr><td>v1</td><td class="n">10s, cut at round times</td><td>sonic-3</td><td>rejected — cut words off</td></tr>
+    <tr><td>v2</td><td class="n">9.4s</td><td>sonic-3</td><td>rejected — unsettling intonation</td></tr>
+    <tr><td>long</td><td class="n">55.5s</td><td>sonic-3.6</td><td>this page</td></tr>
+  </table>
+  <p style="margin-top:1rem">The 55-second clip runs from 29.95s to 85.42s of the
+  recording, cut from one pause edge to the next so no word is clipped at either
+  end — the fault that produced v1. It peaks at &minus;0.9&nbsp;dB, so no clipping
+  is baked in. The v2 clip was <b>9.4 seconds, below Cartesia's own 10-second
+  floor</b>; the script now refuses anything shorter.</p>
+
+  <p><b>What I got wrong, in order.</b> Three theories about the intonation, all
+  refuted: not short lines, not the joined clip, and not the recording being
+  expressive — that last was my own pitch tracker making octave errors, with 99%
+  of the "high pitch" turning out to be one-to-nineteen-frame flicker. Then the
+  two constants above, which no amount of measuring would have caught because I
+  had written them myself and never re-read the source. <b>The numbers on this
+  page are duration only.</b> Duration can show a line is rushed. It cannot hear a
+  clipped word or an unsettling contour, and every fault in this voice so far was
+  found by you in seconds and by my measurements never.</p>
+
+  <p><b>Nothing is wired to any agent.</b> Both Hebrew assistants still use Eyal.
+  The clones are private voices on the client's Cartesia account. Regenerate this
+  audio with <code>python scripts/ido_compare.py</code>.</p>
+
+  <p>If none of the five sound right, the honest read is that instant cloning is
+  not going to get there and the input needs to change: Cartesia's professional
+  cloning wants thirty minutes of audio and we have three minutes forty. That
+  means asking Ido to record again, or keeping Eyal — who is live, working, and
+  was chosen out of eleven at an audition.</p>
+ </div>
 </main></body></html>

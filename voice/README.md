@@ -61,22 +61,72 @@ prints all 29 voices with their ids if they need rebuilding.
 | `hebrew-audition.html` | Eleven masculine Hebrew voices — **Eyal was chosen** |
 | `hebrew-audition-women.html` | Eighteen feminine voices, from before both agents went male |
 | `listen.html` | The original clone-candidate picker |
+| `ido-vs-eyal.html` | **The live question**: does any Ido clone beat Eyal? Five rows per line — Eyal, both rejected clones, the control, the candidate |
 
-## The clone does not exist yet, and the reason is five dollars
+## Three clones exist, two are rejected, and the reason was two of my own numbers
 
-`scripts/voice_clone.py` is finished and its clips are cut, but Cartesia's
-`/voices/clone` answers `402 plan_upgrade_required` on the free tier. Tried
-7 Aug, tried again 30 Aug, same response both times.
+The clone lives on **the client's Cartesia account** (`CARTESIA_YARIV_API_KEY`),
+approved by Yariv on 30 Aug, because ours has never had the cloning entitlement:
+`/voices/clone` answers `402 plan_upgrade_required` on it. A cloned voice is
+private to the account that made it, so the client's key is also the only key
+that can play these back.
 
-Instant voice cloning starts on Cartesia's **Pro tier, $5/month**. This file and
-`voice_clone.py` both used to imply $49, which is the *Startup* tier and buys
-*professional* cloning, a different feature needing thirty minutes of audio. The
-voice sat unbuilt for three weeks partly because of that wrong number.
+| | clip | model | verdict |
+|---|---|---|---|
+| `61e911a7…` v1 | 10s, cut at round timestamps | `sonic-3` | rejected — cut words off |
+| `493006a2…` v2 | 9.4s, pause-bounded | `sonic-3` | rejected — "sudden high tone and low tone, unsettling" |
+| `ba765d50…` long | 55.5s, pause-bounded | `sonic-3.6` | cut 31 Aug, awaiting a listen |
 
-Upgrade at play.cartesia.ai/subscription, then `python scripts/voice_clone.py
---go`. Everything downstream is ready: `cartesia_tts.py --voice <id>` renders any
-voice through the existing scripts, and `voice/samples/c*-a976c076.mp3` is
-already Eyal saying those lines, so the comparison only needs the second column.
+**v1's fault was mine.** `clone-candidate-a.wav` was cut at 162.0s and opened on
+a 0.146s fragment of a syllable, so the clone learned to swallow the starts of
+words. Clips are cut pause-edge to pause-edge now, at any length.
+
+**v2's fault was two numbers I had written down myself and never re-read.**
+
+1. **Ten seconds is Cartesia's minimum, not its maximum.** Their guide says a
+   clone can be made "with as little as 10 seconds of audio". This repo recorded
+   that as a ceiling on 5 Aug and spent three weeks choosing which ten seconds of
+   a 220-second recording to keep. They accept up to 60. The v2 clip was 9.4s —
+   *below* their floor, which nothing here was checking either.
+2. **`sonic-3.6` was never tried.** It is Cartesia's current model, it speaks
+   Hebrew, and before 31 Aug it appeared in no file in this repo. A probe on
+   30 Aug concluded "only sonic-3 and sonic-preview do Hebrew"; it guessed six
+   model ids and that was not one of them, so the finding described the guess
+   list, not Cartesia.
+
+Those two mistakes protected each other: *"Only Sonic 3.6 uses reference audio
+beyond 10 seconds, so a longer clip won't improve results on older models."* A
+longer clip on `sonic-3` changes nothing audible, so fixing either one alone
+looks like a dead end. `ido-vs-eyal.html` therefore carries the control — the
+55s clip on `sonic-3` — beside the candidate.
+
+The owner found all of this by asking why a three-minute recording was being used
+ten seconds at a time. No measurement in this repo had thought to ask.
+
+### Nothing is wired to any agent, and `CARTESIA_VOICE_ID` is commented out
+
+Both Hebrew assistants still speak with Eyal (`a976c076…`), verified against the
+live Vapi API rather than a dry run — the distinction matters, because a dry run
+reports what the repo *would* push.
+
+`vapi_sync.py`'s `cloned_voice()` **prefers** `CARTESIA_VOICE_ID` over Eyal, so
+while that variable is set, `vapi_sync.py debt --apply` silently puts whatever id
+is in it onto the production debt agent. From 30 to 31 Aug that was a twice-
+rejected clone, and it would have failed twice over: the clones are on the
+client's account while Vapi's credential `448aa856` holds our key, so Vapi would
+have fallen through to Elliot — a Hebrew agent with an American accent, which
+logs nothing. The variable is commented out in `.env` with that reasoning beside
+it. Uncomment it only when a voice has been accepted *by ear* and the Vapi
+credential points at the account that owns it.
+
+### Regenerating the comparison
+
+```bash
+python scripts/ido_compare.py     # 9 renders, needs CARTESIA_YARIV_API_KEY
+```
+
+Eyal's three files are not re-rendered; delete `samples/final/*-eyal.mp3` if they
+ever need rebuilding.
 
 ## The thing this directory exists to have proved
 

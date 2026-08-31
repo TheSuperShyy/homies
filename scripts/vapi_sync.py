@@ -881,9 +881,13 @@ def cartesia_voice(vid, fallback):
         "experimentalControls": {
             "emotion": [os.environ.get("CARTESIA_EMOTION", "positivity:low").strip()],
         },
-        # sonic-3 by default. Overridable because the model list moves faster
-        # than this file does, and because the right one is decided by ear.
-        "model": os.environ.get("CARTESIA_MODEL", "sonic-3").strip(),
+        # sonic-3.6 by default since 31 Aug, and the default matters: this is
+        # what a fresh clone of the repo sends to a live agent when .env is thin.
+        # sonic-3.6 is Cartesia's current model and the only one that reads a
+        # reference clip past 10 seconds, which is what every cloned voice here
+        # now depends on. Still overridable: the model list moves faster than
+        # this file does, and the right one is decided by ear.
+        "model": os.environ.get("CARTESIA_MODEL", "sonic-3.6").strip(),
         # The same thing `language: he` does on the Vapi voices: without it a
         # multilingual voice reads Hebrew text as though it were English.
         "language": "he",

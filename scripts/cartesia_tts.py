@@ -43,7 +43,14 @@ OUT = os.path.join(ROOT, "voice", "samples")
 
 API = "https://api.cartesia.ai"
 VERSION = "2026-03-01"
-MODEL = os.environ.get("CARTESIA_MODEL", "sonic-3")
+# sonic-3.6 since 31 Aug, not sonic-3. Two reasons, and the second is the one that
+# cost time: it is Cartesia's current GA model, and it is the ONLY model that reads
+# reference audio past 10 seconds ("a longer clip won't improve results on older
+# models"). A 30 Aug probe here concluded that only sonic-3 and sonic-preview speak
+# Hebrew; that probe guessed six model ids and sonic-3.6 was not among them, so the
+# conclusion was about the guess list rather than about Cartesia. sonic-3.6 renders
+# Hebrew fine — verified 31 Aug on all three of the agent's real lines.
+MODEL = os.environ.get("CARTESIA_MODEL", "sonic-3.6")
 
 # Three of the `language: he` voices on the account, the ones these scripts use.
 # Native Hebrew, not an English model reading Hebrew — which is the entire

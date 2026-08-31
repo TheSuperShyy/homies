@@ -2144,35 +2144,58 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   edit and it makes the clone work — **and it moves every Hebrew utterance from
   both agents onto the client's bill, not just the cloned one.** Do not do this
   as a side effect of wiring up a voice.
-- **Two clones exist and the first one is bad. Do not use `61e911a7`.**
+- **Three clones exist and two are rejected.**
 
-  | | id | from | verdict |
-  |---|---|---|---|
-  | v1 | `61e911a7-5409-413f-8483-bb68cf477441` | `clone-candidate-a.wav`, cut 162-172s | **rejected by the client, truncates words** |
-  | v2 | `493006a2-0b42-46cf-a094-5cbde1ece032` | `clone-candidate-i.wav`, two pause-bounded stretches joined | awaiting a listen |
+  | | id | clip | model | verdict |
+  |---|---|---|---|---|
+  | v1 | `61e911a7-…` | `clone-candidate-a.wav`, cut 162-172s | `sonic-3` | **rejected — truncates words** |
+  | v2 | `493006a2-…` | `clone-candidate-i.wav`, 9.4s joined | `sonic-3` | **rejected — unsettling intonation** |
+  | long | `ba765d50-19c6-4b3e-bc15-9de3b45f82f7` | `clone-candidate-long.wav`, 55.5s | `sonic-3.6` | awaiting a listen |
 
-  `CARTESIA_VOICE_ID` in `.env` points at **v2**, because leaving a known-bad id
-  in place is the trap, not the fix. Neither is wired into any agent.
-  The loser gets deleted from the client's account once someone has listened.
+  None is wired into any agent; both Hebrew assistants are on Eyal
+  (`a976c076…`), checked against the Vapi API on 31 Aug rather than via a dry run.
+  The losers get deleted from the client's account once someone has listened —
+  that is a write to a client system, so ask first.
+- **`CARTESIA_VOICE_ID` is commented out in `.env` on purpose, and that is the
+  safe state.** `vapi_sync.py`'s `cloned_voice()` **prefers** it over Eyal, so
+  while it is set, `vapi_sync.py debt --apply` silently puts that id on the
+  production debt agent. From 30 to 31 Aug it held a twice-rejected clone. It
+  would also have failed silently: the clones are on the client's Cartesia
+  account while Vapi's credential `448aa856` holds our key, so Vapi falls through
+  to Elliot and the Hebrew agent speaks with an American accent, logging nothing.
+  Uncomment only when a voice is accepted **by ear** and the credential points at
+  the account that owns it.
 - **Why v1 failed, so it is not repeated:** the clip was cut at round timestamps
-  and so began and ended mid-word, and an instant clone reproduces its clip's
-  edges. New clips must start and end inside a pause. See CONTEXT, "Cut a
-  cloning clip on pauses, never on round numbers".
-- **The clone's intonation is still rejected, and the model is the live lead.**
-  The client called it "sudden high tone and low tone, unsettling", on both v1
-  and v2. **Only two Cartesia models speak Hebrew: `sonic-3` and
-  `sonic-preview`**, and everything before 30 Aug used sonic-3, which is also
-  `CARTESIA_MODEL` in `.env` and `MODEL` in `scripts/cartesia_tts.py`.
-  sonic-3 rushes: the ticket line renders 3.94s against Eyal's 5.67s, where
-  sonic-preview gives 5.49s. Prosody is a model property, so try preview before
-  cutting any more clips.
-- **Listen: `voice/ido-vs-eyal.html`**, four columns, Eyal / Ido on sonic-3 /
-  Ido on sonic-preview / Ido on sonic-3 at slow speed.
-- **If none of them pass, the honest read is that the source is too short.**
-  Instant cloning takes 10 seconds and that is what we have used. Professional
-  cloning wants 30 minutes; `ido-voice.mp4` is 3m40. Getting more audio from Ido
-  is the only route that changes the input rather than the settings, and Eyal
+  and began and ended mid-word, and an instant clone reproduces its clip's edges.
+  Clips are cut pause-edge to pause-edge now. See CONTEXT, "Cut a cloning clip on
+  pauses, never on round numbers".
+- **Why v2 failed — two numbers in this repo that were wrong, found 31 Aug.**
+  1. **Ten seconds is Cartesia's minimum, not its maximum.** Their guide says "as
+     little as 10 seconds"; `voice_clone.py` had enforced it as a ceiling since
+     5 Aug. They accept **up to 60**. v2's clip was 9.4s — below their floor.
+     `MAX_SECONDS` is now 60.0 and `MIN_SECONDS = 10.0` guards the other end.
+  2. **`sonic-3.6` had never been tried** and was in no file here. It is
+     Cartesia's current GA model, it speaks Hebrew, and it is the **only** model
+     that reads reference audio past 10 seconds. The 30 Aug probe concluding
+     "only sonic-3 and sonic-preview do Hebrew" guessed six ids and missed it.
+
+  The two covered for each other: a longer clip on `sonic-3` changes nothing
+  audible, so fixing either alone looks like a dead end. `CARTESIA_MODEL` is now
+  `sonic-3.6`, and all three places that name a model read that variable with a
+  matching fallback: `.env`, `scripts/cartesia_tts.py` and `scripts/vapi_sync.py`.
+  The fallbacks are what a fresh clone with a thin `.env` would send to a live
+  agent, so they were changed too rather than left at `sonic-3`.
+- **Listen: `voice/ido-vs-eyal.html`** — five rows per line: Eyal, both rejected
+  clones, the control (55s on `sonic-3`, expected no better), and the candidate
+  (55s on `sonic-3.6`). Regenerate the audio with `python scripts/ido_compare.py`.
+- **If none of them pass, the source is too short and no dial fixes it.**
+  Professional cloning wants 30 minutes; `ido-voice.mp4` is 3m40. More audio from
+  Ido is the only route that changes the input rather than the settings, and Eyal
   remains wired in and working meanwhile.
+- **Three theories about the intonation were tested on 30 Aug and all three were
+  wrong**, one because my own pitch tracker was making octave errors. Every fault
+  in this voice has been found by the client in seconds and by measurement never.
+  Build the listening page; do not build another measurement.
 - Earlier note here said Eyal's timing is flat. It is not: the same greeting
   measured 4.49s and 5.51s on two runs. Stock voices vary too.
 - `OXS_KEY_REQUESTS` to be re-issued Read-Only on the OXS side.
