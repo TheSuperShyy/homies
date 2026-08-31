@@ -123,6 +123,84 @@ read the right word and only the slug is coarse. Fixing it properly is a
 migration, which was outside what was approved here.
 
 
+### The greeting is the only script, and the fix is not the one I expected
+
+Asked for after the bot was caught reciting: keep the `מיכאל` opener fixed, and
+after it stop leaning on sentences. Six pushes and about thirty probe replies to
+get there, and the useful part is what did **not** work.
+
+**The file claimed one line was verbatim. Two are.** The transfer line it names,
+and the greeting — pinned in code by `check_greeting()`, because the workflow
+sends `MENU["he"]["body"]` for a bare `היי` without ever calling the model, so if
+the two drift a resident gets a different greeting depending which door they came
+in. Both stay; the file now says so. The transfer line stays on editing-rule 2
+grounds (it is a promise the company keeps), and that is flagged rather than
+assumed.
+
+**Temperature 0.3 → 0.6**, deliberately reversing this morning. 0.3 was set
+against the spelling complaint, and deterministic sampling is exactly why the
+model reached for the nearest finished sentence every time. Variants cannot vary
+at 0.3. No Hebrew degradation across the probes since. Revert path is one
+constant.
+
+**What failed, in order, because each failure was informative:**
+
+1. **Two or three ✓ variants per branch.** The model took **variant number one,
+   every time.** Three different hesitations each got their branch's first
+   listed sentence, and two identical inputs came back near-identical. A list of
+   finished sentences is still a list to copy; offering three only moves the
+   copying to the first.
+2. **✗ lines are copied too.** This was the real surprise, and it kills the
+   assumption the whole approach rested on. `זה לא משהו שאני יכול לעזור בו`
+   came back verbatim one push after being written into the file as ✗. Marking a
+   sentence wrong does not disarm it — **a sentence present in the prompt is a
+   sentence available to send.**
+3. **Writing the ✗ as a described shape instead of a sentence** did not help
+   either: all three off-topic probes still produced the shape, twice ending in
+   `אשמח לעזור`, which this file bans outright.
+
+**What worked: replacing the ✓ side with ingredients.** For hesitancy the
+finished sentences are gone, replaced by a table of what the reassurance must
+*convey* per worry, plus question *directions* rather than question texts. Result:
+two identical inputs now come back differently worded, each worry gets its own
+matched reassurance, nothing is lifted from the file, and the unnamed case still
+refuses to guess a worry nobody voiced.
+
+**And the distinction I got wrong first, which is the thing to remember.**
+Stripping examples helps where **the reply must be tailored to the person** —
+hesitancy, where the worry differs and a fixed sentence is actively wrong. It
+*hurts* where the reply is **generic by nature**. Off-topic deflection is the
+same message to everybody and nobody receives two, and its single example was not
+a crutch, it was the only thing carrying the register; without it the model's own
+default for "decline politely" is corporate mush. Three pushes made that branch
+worse before it was put back. **Recitation is only a defect where two residents
+would notice they got the same words.**
+
+Kept from those three pushes: the ✗ for `אשמח לעזור`, which that branch broke
+repeatedly, and the requirement to end on a question.
+
+The offer and the closing-message branches also moved to ingredients. The offer
+still converges on one phrasing for identical input, which is a much weaker
+failure — it is the model's own sentence, not one lifted from the file.
+
+**Checks.** `check_whatsapp.py` all green including a real ticket end to end and
+a duplicate suppressed. `check_greeting()` passes. Patch idempotent, live and repo
+identical at 55,238 chars.
+
+### Still open
+
+- The **hesitancy closing question** converges on "התקלקל או מפריע" more often
+  than not. Smaller than the original defect — the substantive half varies — but
+  it is the same pattern one level down.
+- The emergency path still announces a transfer before calling the tool on turn
+  one; the `Promised a transfer, made none?` node catches it.
+- The complaint path asks two questions in one message and can end a turn flat.
+- Push 2 of the example rewrite is untouched: the opener branches, the invitation
+  to describe a fault, "I don't have that", the status answer, and the gas
+  emergency example. Apply the tailored/generic test to each before rewriting —
+  most of them are generic, and on the evidence here that means leaving them
+  alone.
+
 ### The bot stopped waiting and started helping, and it took four attempts
 
 Second screenshot from the owner. The bot had improved — it answered
