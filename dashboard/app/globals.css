@@ -652,6 +652,13 @@ details[open] > summary.panelhead::after { content: '\2212'; }
 }
 .notes > ol > li { margin-block-start: 2px; }
 
+/* Search's debt column: one chip per month owed. Wraps rather than widening
+   the table, which on a phone is the difference between a readable row and a
+   horizontal scroll for every result. */
+.months { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.months > span { white-space: nowrap; font-size: var(--text-sm); }
+
+
 /* ---------------------------------------------------------------- table -- */
 /* DataTable: 13px, th 12/500 text-2, th padding 10/12, td padding 12,
    border-1 between rows and none after the last. Padding is opened to 20 at
