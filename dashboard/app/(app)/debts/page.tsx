@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
-import { month, shekels } from '@/lib/money';
+import { month, OUTSTANDING, shekels } from '@/lib/money';
 import { Pager, pageFrom, pageSlice, perParam, sizeFrom } from '@/components/pager';
 import { callButtonEnabled, callResident, phoneNumberConnected } from '@/lib/call';
 import { getLocale, translator } from '@/lib/i18n';
@@ -59,7 +59,7 @@ export default async function Debts({
   const { data, error } = await serverClient()
     .from('charges')
     .select('period,amount,status,unit,residents(full_name,building,phone)')
-    .in('status', ['unpaid', 'disputed', 'pending_charge'])
+    .in('status', [...OUTSTANDING])
     .order('period', { ascending: true });
 
   const charges = (data ?? []) as unknown as Charge[];

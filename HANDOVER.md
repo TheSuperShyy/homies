@@ -1938,10 +1938,11 @@ exists. Never print a value, never commit one, never paste one into chat.
 building or apartment matches, and each resident who owes is listed with every
 unpaid month and its own amount — the rates are not equal month to month, and
 this is the only place on the dashboard that shows the per-month breakdown.
-Biggest debt first, capped at 8 with the usual "showing N of M" line. **It reads
-the same three statuses `/debts` does** — `unpaid`, `disputed`,
-`pending_charge` — with the last two listed under a review label and NOT added
-to the total, so the two pages cannot report different money for one resident.
+Biggest debt first, capped at 8 with the usual "showing N of M" line. **Which statuses count as a debt is
+`OUTSTANDING` in `dashboard/lib/money.ts`** — `unpaid`, `disputed`,
+`pending_charge` — imported by BOTH `/debts` and `/search`, so change it in one
+place and never at a call site. The last two are listed under a review label and
+NOT added to the total; `paid` and `waived` never appear.
 `paid` and `waived` never appear. Only `unpaid` and `paid` exist in the data
 today (618 and 100 rows). `shekels` and `month` moved to `dashboard/lib/money.ts`
 and both pages import them — two copies of the rounding rule would mean two

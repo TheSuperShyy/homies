@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, label, translator, when, type Locale, type T } from '@/lib/i18n';
 import { IconInbox, IconOpenLink, IconSearch } from '@/components/icons';
-import { month, shekels } from '@/lib/money';
+import { month, OUTSTANDING, shekels } from '@/lib/money';
 
 /**
  * One box for the whole dashboard.
@@ -142,19 +142,12 @@ export default async function Search({ searchParams }: {
         // ninth alphabetically, owed ₪14,976. A section that answers "does this
         // person owe" must not depend on where their surname sorts.
         //
-        // THE SAME THREE STATUSES THE DEBTS PAGE USES, and for the same
-        // reason. `unpaid` is the money owed; `disputed` and `pending_charge`
-        // are still outstanding but are waiting on a person, so they are listed
-        // and NOT added to the total — exactly as /debts does it. `paid` and
-        // `waived` are not debts and never appear.
-        //
-        // Filtering to `unpaid` alone was the first version. No row in the
-        // table carries the other two today, so nothing would have looked
-        // wrong — and the day one did, /debts and /search would have quietly
-        // reported different money for the same resident.
+        // OUTSTANDING is shared with /debts so the two pages cannot answer
+        // "what does this person owe" differently. `disputed` and
+        // `pending_charge` are listed and never totalled; see lib/money.ts.
         db.from('charges')
           .select('period,amount,unit,status,residents!inner(id,full_name,building,unit)')
-          .in('status', ['unpaid', 'disputed', 'pending_charge'])
+          .in('status', [...OUTSTANDING])
           .or([
             `full_name.ilike.${like}`, `phone.ilike.${like}`,
             `building.ilike.${like}`, `unit.ilike.${like}`,
