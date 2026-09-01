@@ -166,6 +166,23 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### The owner redefined the report, with a screenshot
+
+Asked for the 1 Sep whole-system report three times, each answer narrower:
+flat bullets, then simple words, then a screenshot of the wanted style with
+the rules in his words: bullets start with build/created/edited/fixed/debug/
+pushed/tested, human words, "response and feedback" in the bullet (the
+result, not just the act), and the POV is his. This supersedes the old
+one-clause-no-explanation rule from 13 Aug. Canonical spec lives in Claude
+memory (`homies-daily-report-format`), not in the repo; recorded here because
+the old rule was also exercised from here. No repo files changed for this.
+
+The stop hook then flagged `docs/assistant/**` changes as left behind: those
+were the parallel voice session's in-flight files, auto-committed by its
+housekeeping as `a9ea576` minutes later. The shared-checkout false positive
+is the exact case the 31 Aug note in `scripts/check_briefing_logged.sh`
+records.
+
 ### "I hear you and i understand" — the stamp had one shape, and then a second
 
 The owner, clarifying what "not templated" meant to him: *"i was more focused
