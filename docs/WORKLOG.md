@@ -1262,6 +1262,29 @@ OXS note history now opens: `+2 earlier` was plain text with no way to read
 them, and is now a `<details>` disclosure, no client JS, so `nav.tsx` stays the
 only component that crosses into the browser.
 
+### The badge I shipped this morning lit all 54 open tickets and meant nothing
+
+Reported from the dashboard: `not in OXS for 1h, still open`, on row after row.
+Measured before touching it — 54 of 54 open tickets firing, **0 of 54 actually
+missing from OXS**. All 54 carried the identical `oxs_last_seen_at`, so the last
+run had seen every one of them.
+
+The badge measured wall-clock staleness, which is a fact about the importer and
+not about the ticket. Once the last run passes 45 minutes old — with ~5 runs a
+day, most of the day — every open ticket lights up together. The first version
+of this plan said importer lag "belongs on /sync, not on every row"; the
+implementation then did the opposite, and the earlier note about 216 amber flags
+being how a warning stops being read applied to my own replacement.
+
+**Fixed by changing what it compares against.** Every ticket in the feed is
+stamped with one timestamp per run, so the newest stamp in the table IS the last
+run. A ticket older than that was looked for and not found; equal to it means
+present. No clock, no 45-minute constant, and nothing renders in the ordinary
+case — a row saying "still fine" is the same mistake in a friendlier colour.
+`tickets.inOxs` is deleted, `tickets.notInOxs` loses its `{ago}`. One extra
+unfiltered query for the newest stamp, so a status tab or a page of results
+cannot change what "the last run" was. Now fires on 0 of 54, matching reality.
+
 ### /sync stops reporting the scheduler and starts reporting the import
 
 Half of "Recent runs" was `skipped — wrong hour`. Those are real and they are

@@ -190,11 +190,13 @@ const S = {
   'tickets.empty':      { he: 'אין קריאות.', en: 'No tickets.' },
   'tickets.emptyStatus':{ he: 'אין קריאות בסטטוס {status}.', en: 'No tickets with status {status}.' },
   'tickets.unit':       { he: 'קריאות',   en: 'tickets' },
-  'tickets.inOxs':      { he: 'נמצאת ב-OXS עכשיו', en: 'in OXS now' },
   // Not "gone" any more — a departure is a closure and the sync writes it as
   // one. This fires only on a ticket still open our side that OXS is not
   // serving, which means the importer could not reconcile that row.
-  'tickets.notInOxs':   { he: 'לא ב-OXS מזה {ago}, ועדיין פתוחה', en: 'not in OXS for {ago}, still open' },
+  // Fires only when the LAST IMPORT looked and did not find it — not on a
+  // clock. No {ago}: the age belongs to the importer, not to the ticket,
+  // and /sync is where importer lag is reported.
+  'tickets.notInOxs':   { he: 'לא נמצאה ב-OXS בייבוא האחרון', en: 'not found in OXS at the last import' },
   'tickets.lastSeen':   { he: 'נראתה לאחרונה ב-OXS ב-{when}', en: 'Last seen in OXS {when}' },
   'tickets.earlier':    { he: '+{n} קודמות', en: '+{n} earlier' },
 

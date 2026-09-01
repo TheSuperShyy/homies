@@ -27,38 +27,38 @@ async function updateStatus(formData: FormData) {
 // `searchParams` rather than client-side state: a filtered view should be a URL
 // somebody can send to a colleague.
 /**
- * Whether this ticket's OXS record and ours still disagree.
+ * A ticket the last import looked for in OXS and did not find.
  *
- * Until 31 Aug this said "gone from OXS", because a ticket leaving the feed was
- * the only thing we could see and whether leaving meant resolved was an open
- * question with the client. It is not any more. `GET /service-calls` takes a
- * `status` parameter that defaults to open, `oxs_requests_sync.py` had never
- * sent it, and every record reading `open` was our own filter reflected back.
- * A departure means closed, the sync now fetches each one back by taskNumber
- * and writes the real status, and the Status column opposite therefore answers
- * the question this badge used to ask. 216 of 254 turned out resolved.
+ * TWO WRONG VERSIONS OF THIS BADGE SHIPPED BEFORE THIS ONE, and the second is
+ * the instructive one.
  *
- * WHAT IS LEFT IS THE ANOMALY, which is worth more than the old badge was. A
- * ticket still open on OUR side that OXS is not serving is one the importer
- * could not reconcile — no building id for the by-taskNumber lookup, or a fetch
- * that errored — and it should be visible. A resolved ticket needs no badge at
- * all: its status says it, and 216 amber flags saying nothing is how a warning
- * stops being read.
+ * It said "gone from OXS" whenever a ticket had not been seen for 45 minutes.
+ * That reads as a fact about the ticket and is a fact about the IMPORTER: if
+ * the job has not run, every open ticket is 45 minutes stale at once, and none
+ * of them has gone anywhere. `oxs-requests.yml` asks for a run every fifteen
+ * minutes and GitHub delivers about five a day, so the badge was lit on all 54
+ * open tickets for most of the day while exactly 0 were missing. A warning that
+ * is always on is not a warning.
  *
- * 45 minutes: the importer runs every fifteen and GitHub's scheduler is
- * best-effort, so three missed ticks is the slack before anything is called odd.
+ * The comparison that means something is against the last run rather than
+ * against the clock. Every ticket in the feed gets stamped with one timestamp
+ * per run, so the newest stamp in the table IS when the importer last looked.
+ * A ticket older than that was looked for and not found; a ticket equal to it
+ * was there. Importer lag is then a separate fact with one value for the whole
+ * system, and it belongs on /sync, which already reports it.
+ *
+ * Nothing renders in the ordinary case, deliberately. A row per ticket saying
+ * "still fine" is the same mistake in a friendlier colour.
  */
-function InOxs({ seen, status, t }:
-               { seen?: string | null; status?: string; t: T }) {
+function InOxs({ seen, status, lastRun, t }:
+               { seen?: string | null; status?: string; lastRun?: string | null; t: T }) {
   const live = status === 'open' || status === 'in_progress';
-  if (!seen || !live) return null;
-  const mins = Math.round((Date.now() - Date.parse(seen)) / 60000);
-  if (mins < 45) return <span className="sub">{t('tickets.inOxs')}</span>;
-  const ago = mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`;
+  if (!live || !seen || !lastRun) return null;
+  if (Date.parse(seen) >= Date.parse(lastRun)) return null;
   return (
     <span className="sub" style={{ color: 'var(--review)' }}
           title={t('tickets.lastSeen', { when: seen })}>
-      {t('tickets.notInOxs', { ago })}
+      {t('tickets.notInOxs')}
     </span>
   );
 }
@@ -77,9 +77,18 @@ export default async function Tickets({
     .select('reference,description,building,unit,type,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
-  const { data, error, count } = await q
-    .order('created_at', { ascending: false })
-    .range(from, to);
+  // One extra query, and it is what makes the badge above mean anything: the
+  // newest stamp across every imported ticket is the moment the importer last
+  // looked at OXS. Read unfiltered on purpose — a status tab or a page of
+  // results must not change what "the last run" was.
+  const [{ data, error, count }, newest] = await Promise.all([
+    q.order('created_at', { ascending: false }).range(from, to),
+    serverClient().from('requests').select('oxs_last_seen_at')
+      .eq('opened_via', 'oxs')
+      .order('oxs_last_seen_at', { ascending: false })
+      .limit(1).maybeSingle(),
+  ]);
+  const lastRun = newest.data?.oxs_last_seen_at ?? null;
 
   const tabs = ['', ...STATUSES];
 
@@ -184,7 +193,7 @@ export default async function Tickets({
                   <td className="muted" data-label={t('col.via')}>{r.opened_via}</td>
                   <td className="muted mono" data-label={t('col.opened')}>
                     {when(r.created_at, locale)}
-                    {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} status={r.status} t={t} />}
+                    {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} status={r.status} lastRun={lastRun} t={t} />}
                   </td>
                 </tr>
               ))}
