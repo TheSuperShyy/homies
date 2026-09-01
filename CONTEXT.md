@@ -347,6 +347,16 @@ PDF's example shows.** Both were found by probing and both are places where
 trusting the document would have failed silently — a wrong status value returns
 zero rows and no error, and the wrong envelope key returns one bogus row.
 
+**A status list may hide rows; the state it derives may not.** Half of `/sync`
+was `skipped — wrong hour` — real runs, permanent by design, and pure noise to
+anyone looking for the last real import. Filtering them out is right, and the
+way to do it safely is fixed: the table reads the filtered list, everything that
+decides a banner reads the UNFILTERED one, and the filter is written so it can
+never match a failure (here it requires conclusion `success`). Plus the count of
+what was dropped, per the truncation rule above. Get this backwards — derive
+"nothing has failed" from a list you filtered — and the page reports health by
+hiding the evidence.
+
 **A scheduled workflow runs from the DEFAULT branch, so a fix on a feature
 branch is not running.** Two commits' worth of importer fix sat on
 `feature/chatbot` while every scheduled run kept executing `main`'s old copy,
