@@ -124,6 +124,46 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### "I hear you and i understand" — the stamp had one shape, and then a second
+
+The owner, clarifying what "not templated" meant to him: *"i was more focused
+in the robotic repetition like i hear you and i understand."*
+
+**Measured before touching anything** (last 18 live model replies): the
+scripted empathy register — `אני שומע אותך`, `מצטער לשמוע`, `כאן בשבילך` —
+was already at zero; the 31 Aug strip took its example blocks with it. What
+survived was one structure, three times out of three at the same spot: the
+bot re-asking after resistance opens by agreeing to soften the demand
+(`אני מבין ששלחתם כבר את הכתובת, אבל…`). Plus the short beat drifting empty
+(`נשמע שמדובר במשהו שדורש טיפול`, which names nothing). A sweep of every
+live node text found no feeder — this is the model's own habit under
+friction, so the fix is one prompt paragraph, quoting no phrase.
+
+**The first version taught a fifth shape of the old lesson.** v1 banned the
+comprehension announcement *that carries nothing of the thing itself*; the
+very first probe answered a leak report with
+`אני מבין שיש לכם נזילה מתחת לכיור במטבח` — the resident's words played back
+behind the same verb, carrying the thing, slipping the ban. A rule against
+the empty version invites the padded version. v2 (same evening): understanding
+shows in what you DO with what they told you; a sentence that only announces
+you understood — even when it repeats what the resident just wrote — gives
+them nothing; react to the thing or continue from it. Re-asks keep the second
+rule: no agree-to-soften opener — say briefly why it is still missing, or ask
+differently. Epochs 10 and 11, both forced by the guard.
+
+**Verified on the exact bait that produced all three stamps** (fault →
+building only → `כבר נתתי לכם את הכתובת`):
+`צודקים, קיבלתי את הכתובת של הבניין. כדי לפתוח קריאת שירות על נזילה בתוך
+הדירה, אני צריך גם את מספר הדירה.` — concedes their actual point,
+distinguishes building from flat, no comprehension verb anywhere. The beat
+survived as a reaction: `נזילה מתחת לכיור זה בהחלט לא נעים.` Zero `אני מבין`
+in the post-v2 sample; all nine patchers idempotent after.
+
+**Data point for the open first-contact echo:** a contentless fault
+(`יש בעיה בבניין`) got the verbatim intro alone, twice (v1 and v2 probes).
+Tolerable here — the system's question was the right question and the menu
+rode along — but it is the same echo, and the tally keeps growing.
+
 ### "But make sure its not templated" — measured, and it is not
 
 The owner's one condition on the closing acts, checked the honest way: more
