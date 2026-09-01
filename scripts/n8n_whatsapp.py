@@ -877,10 +877,44 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
+                # `distress` REMOVED 1 Sep, and it is the whole reason an
+                # emergency left no record.
+                #
+                # A resident reported somebody fallen on the stairs and wrote
+                # "send help". The model handed over with reason `distress`,
+                # which is the honest English word for it and a perfectly valid
+                # value — the Edge Function stores it without complaint. But the
+                # emergency backstop in debt-tools, the thing that writes a
+                # `needs_review` ticket when a handover happens and no request
+                # was opened, is scoped to `reason === "emergency"` alone. So
+                # the one transfer reason that best describes a person in
+                # trouble was also the one that routed them around the net
+                # built for them. `requests` ended the conversation empty.
+                #
+                # Not widened at the Edge Function instead, deliberately: the
+                # voice debt agent sends `distress` for someone upset about
+                # money, and minting an emergency ticket for every distressed
+                # debtor would be worse than the bug. This tool is the WhatsApp
+                # bot's alone, and on WhatsApp a person in distress IS the
+                # emergency case, so the fix is to stop offering the word here.
+                # scripts/vapi_tools.py is untouched.
                 "reason": {
                     "type": "string",
                     "enum": ["out_of_scope", "emergency", "caller_request",
-                             "distress", "not_understood"],
+                             "not_understood"],
+                },
+                # ADDED 1 Sep, so the backstop's row is readable. It writes
+                # `args.description` and falls back to a sentence saying the
+                # call recording is the only account — which on WhatsApp is
+                # false twice over: there is no call and there is no recording.
+                # The transcript exists, but nobody reading a `needs_review`
+                # queue knows to go and find it.
+                "description": {
+                    "type": "string",
+                    "description": "What was reported, in Hebrew, in the "
+                                   "resident's own words. Send it every time: "
+                                   "on an emergency this is the only account "
+                                   "of what happened that reaches the team.",
                 },
             },
             "required": ["reason"],
@@ -1655,9 +1689,18 @@ def workflow(e):
                     "sendBody": True, "specifyBody": "json",
                     "jsonBody": TOOL_BODY % (
                         "transfer_to_human",
-                        "reason: %s" % from_ai(
-                            "reason", "One of " + "/".join(
-                                tool("transfer_to_human")["input_schema"]["properties"]["reason"]["enum"])),
+                        ", ".join((
+                            "reason: %s" % from_ai(
+                                "reason", "Use emergency for a person in a bad "
+                                "state — hurt, trapped, frightened, or "
+                                "reporting gas, fire or flooding. One of "
+                                + "/".join(tool("transfer_to_human")
+                                           ["input_schema"]["properties"]["reason"]["enum"])),
+                            "description: %s" % from_ai(
+                                "description",
+                                tool("transfer_to_human")["input_schema"]
+                                ["properties"]["description"]["description"]),
+                        )),
                     ),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
