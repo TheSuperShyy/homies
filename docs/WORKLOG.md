@@ -71,6 +71,63 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### "wassap" never met the menu, and the schema turned out to be a prompt too
+
+The owner's 20:21 transcript: three English greetings clarified at, in the
+singular, three times; `hi is this homies support?` answered with the verbatim
+intro and no menu; then a balance request interrogated across three rounds —
+`עבור דירה מסוימת, או באופן כללי?` — and capped with the facade-breaking
+`המערכת דורשת שאציין… ולכן אני חייב לשאול`. His verdict: *"it did not even
+trigger the menu also it sound robotic."* The one good part: once the tool
+finally ran, the balance answer itself was exact.
+
+Four causes, four fixes, one new patcher (`scripts/n8n_whatsapp_greet.py`):
+
+**1. The GREETING list held textbook English and no slang.** `wassup`,
+`whats up`, `whatsup`, `wassap`, `wazzup`, `sup`, `hi there`, `hey there`,
+`hello there`, `howdy` joined the alternation, anchored as before, so a
+greeting with content still reaches the model. Verified: `wassup` and
+`whats up` now return the menu from the workflow, no model call — which also
+retires most of the singular-clarify register problem, since those messages
+no longer reach the model at all.
+
+**2. A verbatim intro echo now carries the menu.** `Send` attached the menu
+only on `greeted !== true`, and the owner's handset has been greeted-true
+since August (`store.greeted` means *has ever messaged*, not *was ever
+greeted*). New clause: a reply containing the canonical sentence verbatim IS
+the intro, menu attached regardless. The ownership clause (epoch 7) makes
+echoes rarer; this makes a surviving one indistinguishable from the intended
+thing. Verified by replicating Send's scrub-and-test on the echoed reply —
+the probe conversation 404s at Send before the body is recorded, so the
+condition was proven in isolation and the clause read back from live.
+
+**3. The interrogation came from the tool schema, before any tool ran.**
+`get_balance`'s live jsonBody: `unit: $fromAI('unit', "Apartment number, only
+if they asked about one specific apartment. Empty otherwise.")` — an OPTIONAL
+parameter documented as a condition, which the model resolved by asking the
+resident, three times, then inventing a system that required it. **The schema
+is a prompt too: an optional field must say what to do in the normal case, or
+the model asks the resident to fill it.** The doc now opens with "Almost
+always empty: the lookup finds the resident's own apartment by itself" and
+bans the question outright; the description (source of truth in
+`n8n_whatsapp.py`, synced by the patcher) says the same and adds "ask in your
+own words" — the old ask leaked tool-doc register into the reply
+(`כפי שהזנתם אותם בשיחה זו`). Verified live: the arc that took six turns and
+three apartment questions now takes two — identity asked plainly, then
+`דניאלה, היתרה לתשלום שלכם היא 14,976 ש"ח עבור החודשים יוני, יולי ואוגוסט`.
+
+**4. Tool text joined the memory epoch.** This incident is buffer poisoning
+the epoch check did not cover: the owner's thread holds three worked examples
+of the interrogation. `EPOCH_COVERS` gained `"tools"` — a hash over the five
+descriptions via `tools_text()` — asserted by `n8n_whatsapp_open.py` and the
+new patcher; epoch 7 → 8. Recorded limit: parameter docs living only in live
+jsonBodies are not hashed; when one changes, bump by hand.
+
+**Left open, said plainly:** the singular `כתבת` on casual English input broke
+a prompt rule that already exists; no third prompt pass — the regex change
+removed most of its trigger, measured next time it shows. `fgsfds` now gets a
+short plural clarify with no guess and no tool call.
+
 ### "Its a dumb bot": nine digits, nine essays, one real handover — and what professional turned out to mean
 
 The owner typed `hello` and then the digits 1 through 9 at the bot, fast, and

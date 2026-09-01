@@ -203,7 +203,9 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 7
+MEMORY_EPOCH = 8
+# 7 -> 8: the owner's thread holds three worked examples of the get_balance
+# apartment interrogation, which the schema fix below this epoch removes.
 # 6 -> 7, same evening: the quoted opener grew its ownership clause after
 # being pasted whole into four replies. Buffers under 6 hold those echoes.
 # 5 -> 6, 1 Sep evening: the never-guess / never-volunteer prompt lines went
@@ -223,6 +225,13 @@ MEMORY_TURNS = 12
 EPOCH_COVERS = {
     "prompt": "69102d8c6278",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "6e19bca8b5ab",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
+    # tool-text change poisons buffers exactly the way a prompt change does
+    # -- the interrogation above is three examples deep in one thread --
+    # and nothing covered it. Parameter docs in the live jsonBody are NOT
+    # hashed; when one changes, bump by hand. Recorded limit, not an
+    # oversight.
+    "tools": "ea739e751a67",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -679,11 +688,16 @@ NOT_COVERED = "\n".join([
 ])
 
 
+def tools_text():
+    """The five descriptions, canonical order, for the epoch hash."""
+    return "\n---\n".join(t["name"] + ": " + t["description"] for t in TOOLS)
+
+
 def epoch_hash(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
 
 
-def check_memory_epoch(prompt=None, inject=None):
+def check_memory_epoch(prompt=None, inject=None, tools=None):
     """Refuse to deploy new behaviour on top of buffers that teach the old.
 
     The agent's memory is a second source of instructions and it outranks the
@@ -708,7 +722,7 @@ def check_memory_epoch(prompt=None, inject=None):
     Each caller checks the field it owns, which is also what keeps
     n8n_whatsapp.py from importing the patchers that import it.
     """
-    for name, text in (("prompt", prompt), ("inject", inject)):
+    for name, text in (("prompt", prompt), ("inject", inject), ("tools", tools)):
         if text is None:
             continue
         got = epoch_hash(text)
@@ -1068,8 +1082,17 @@ TOOLS = [
             "AND their phone number, both typed by them in this conversation. "
             "Do not call it without both, do not use the number they are "
             "messaging from, and never fill either from a guess. If they have "
-            "not given both yet, ask — one message, both facts. Returns the "
-            "resident's name, apartment, total owed and the unpaid months, or "
+            "not given both yet, ask — one message, both facts, in your own words. "
+            # 1 Sep evening: an optional `unit` parameter documented as a
+            # condition ("only if they asked about one specific apartment")
+            # became a three-round interrogation — "עבור דירה מסוימת, או
+            # באופן כללי?" — capped with "המערכת דורשת שאציין". No tool had
+            # run; the question came from the schema. The schema is a prompt
+            # too, and an optional field must say what to do in the normal
+            # case, not name the rare one and leave the rest open.
+            "The lookup finds the resident's own apartment by itself: never "
+            "ask which apartment or whether they mean a specific one. Returns "
+            "the resident's name, apartment, total owed and the unpaid months, or "
             "`identity_failed` when the name and the number do not belong to "
             "the same resident. Read-only — it cannot take a payment; anyone "
             "who wants to actually pay, needs a receipt or disputes an amount "

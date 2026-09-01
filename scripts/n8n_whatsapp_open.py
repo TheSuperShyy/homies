@@ -135,6 +135,11 @@ def main():
         if need not in by:
             sys.exit("No %r node on the live workflow -- refusing to guess." % need)
 
+    # This file syncs three of the five tool descriptions, so it asserts the
+    # tools epoch: a description change poisons buffers the way a prompt change
+    # does, and on 1 Sep the get_balance interrogation proved it.
+    W.check_memory_epoch(tools=W.tools_text())
+
     changes = []
 
     # 1. Sort
