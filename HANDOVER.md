@@ -2341,6 +2341,15 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
 API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
 English callers `אני לא מבין עברית`.
 
+**INBOUND IS LIVE AT 30,174 CHARS (1 Sep), voice `ba765d50`, verified together.**
+The agent now handles rather than routes: **`transfer_to_human` is for a caller
+who asks for a person, or an emergency, and nothing else.** Money, contracts and
+staff complaints open a tracked request instead. If you change this prompt,
+re-check in this order — asked-for-a-person still transfers every time, an
+ordinary leak opens a request and does NOT transfer, a disputed bill opens a
+request rather than reading a balance, and a single `סליחה?` does not end the
+call. Each of those broke at some point today.
+
 **Evidence for every behaviour claim about the inbound agent is in
 `docs/assistant/transcripts/`**, Hebrew and English side by side, committed with
 the change it justifies. Read those before re-testing something by hand.

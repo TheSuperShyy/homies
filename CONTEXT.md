@@ -2043,6 +2043,19 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**The agent's job is to handle the call, not to route it. Decided 1 Sep.** What
+it is not authorised to *decide* it is still authorised to *write*, so a
+disputed amount, a contract question or a complaint about staff becomes a
+tracked request rather than a hand-off note — which is better for the office by
+the file's own argument, since nothing searches a note and nobody is dispatched
+from one. **A transfer is for two things: they asked for a person, or it is an
+emergency.** Everything else is a row.
+
+**And a moment's confusion is not a failed call.** One unclear turn used to end
+calls; someone who has been talking to you has not become a foreign-language
+speaker. **Any rule that fires on a single bad turn will fire on an ordinary
+one** — real phone calls are full of "sorry?".
+
 **Probe transcripts get committed, not summarised. 1 Sep.** A claim about how an
 agent behaves is worth what its evidence is worth, and prose in a worklog cannot
 be re-read for something it did not think to mention. `prompt_chat.py` writes

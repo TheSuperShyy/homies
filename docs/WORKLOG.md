@@ -11,6 +11,48 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Handle it. Transfer when they ask, or when it is an emergency
+
+A real call ended after one *"sorry?"*. The agent had already understood the
+caller's English and answered it — **that part worked** — then treated a single
+unclear turn as a foreign language and closed the call. **Five separate routes
+led to a hand-off; the owner wants two.**
+
+**The policy the file never stated: the job is to handle it, not to route it.**
+Almost everything now ends in a request the agent opens. What it is not
+authorised to *decide* it is still authorised to *write* — money moving, a
+disputed amount, a contract clause, a complaint about an employee are all a
+tracked row now instead of a hand-off note. The file already argued a row beats
+a note: nothing searches a note and nobody is dispatched from one. **The caller
+leaves with a reference number instead of a promise.**
+
+**One unclear turn is no longer a failure and never a reason to end a call.**
+Someone who has been talking to you did not suddenly become a foreign-language
+speaker. Ask again, differently, keep going; give up only after really trying,
+and even then keep the partial rather than the hand-off.
+
+**Two regressions from this, both caught before pushing.** Reading someone their
+balance is not an answer to a claim that the balance is *wrong* — a disputed bill
+was getting `get_balance` and a goodbye, with the dispute unrecorded. And making
+transfer a last resort made it hesitant on the one case that must always work:
+asked for a person, it replied *"do you want me to do that?"* — asking them
+something they had just said. **They asked, they get it, no confirming
+question.**
+
+Also fixed: **TTS read `עברי` as `הבריא`** on a real call — "healthy" instead of
+"Hebrew". Ordinary wording now, and a reminder that an unusual word is a
+pronunciation risk that no text probe can see.
+
+Verified before the push: asked for a person transfers three of three; an
+ordinary leak opens a request and nothing else; a disputed bill opens a request;
+`סליחה?` keeps the call alive. Live at 30,174, voice restored after the push as
+always.
+
+**Note on the history:** the auto-housekeeping commit `5b05c58` swept this file
+up before the session's own commit ran, so the change is in git without the
+message written for it. That message is this entry.
+
+
 ### Hebrew stays the line's language, and English stops being a rejection
 
 The owner's intent was never a language hand-off: understand English and Hebrew,
