@@ -213,6 +213,7 @@ its stated time.
   `אני אעדכן אותך כשהטיפול יתקדם` after opening a ticket. There is no
   proactive update path — nothing sends that message. Either build it or tell
   the bot it cannot say it; do not leave it as it is.
+- **Repetition across turns is improved, not solved.** The handover sentence no longer appears in every message and the later messages lead with content, but `אני מבין` still opens the first two, and `transfer_to_human` is still called two or three times in a long emergency instead of once. **Do not chase this with more clauses** — the attempt that targeted the opener directly made it worse and was reverted.
 - **Address the resident in the PLURAL. That one line is doing a lot of work.** It replaced roughly forty lines of gendering craft in the old prompt and is the only thing standing between the bot and `את/ה` slash-forms. Do not soften it into a list of options: as a menu of neutral forms it scored 1/3, as a single default 4/4.
 - **Register items the owner has raised, in order, and where they stand.**
   Parentheses: **fixed** 31 Aug, a channel fact, gone 9/9. Length and the

@@ -72,6 +72,51 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### The bot said the same thing four times, and one of my three fixes had to be rolled back
+
+The owner, on a gas-then-fire conversation: *"its working real nice since its
+open but i still can see a duplicate words that does not sound human at all —
+how can we fix this at the same time does not return back to the old shtty one
+that overengineered the system... prompt paralysis."*
+
+He is right. Four messages, and
+`אני מעביר את הפנייה הזו מיד לצוות שלנו שיטפל בזה` appeared word for word in
+**all four**. `אני מבין ש` opened three of them, and the 102 line came three
+times. Reproduced offline: `transfer_to_human` was being called **on every
+turn**, and one run even wrote that it was transferring them `שוב` — again.
+
+**Fix 1, in the prompt, and it worked.** There was already a line saying the same
+resident should not get the same sentence twice. It was too weak and it was
+about *sentences*, while the failure was repeated *content* in fresh wording. It
+was sharpened rather than added to:
+
+> ואתה כותב למישהו שקרא את ההודעה הקודמת שלך: מה שכבר אמרת נשאר
+> נכון בלי שתחזור עליו, וכל הודעה שלך מוסיפה משהו שלא היה בקודמת.
+
+**Fix 2, in the tool, and it was my own contradiction.** `transfer_to_human`
+said *CALL THIS BEFORE YOU WRITE YOUR REPLY, never after*, which the model read
+as **every** reply. Rewritten to scope it to the sentence that makes the
+promise, and to say a conversation is handed over once. Same class of bug as
+`open_request` arguing with itself about `verify_address` on 31 Aug, and mine
+both times.
+
+**Fix 3 was wrong and was rolled back.** A clause saying an opening that only
+says you understood is not information. It made things **worse**: the model
+switched from `אני מבין` to `אנחנו מבינים`, messages got longer, and
+markdown bold reappeared. **It never reached live** — it was measured offline
+first, and reverted. Prompt went 3,864 to 3,984 and back to 3,864.
+
+**Where it landed.** The third message of the arc now opens with the answer
+itself in 3 runs of 3 — `בשום אופן לא! מים וחשמל הם שילוב מסוכן מאוד.` —
+with no run-up and no repeated handover line. Confirmed live. **Still there:**
+`אני מבין` opens the first two messages, and the tool is still called two or
+three times in some runs rather than once.
+
+**The rule this pass earned:** three attempts, one reverted, and the prompt is
+the same size it started. **When a fix makes the output worse, roll it back
+instead of adding a fourth** — that is the difference between tuning and the
+paralysis the owner is describing.
+
 ### A policy beat a rule, and one default beat a menu of options
 
 The owner: *"its still talking like i can transfer you to a human. i dont want

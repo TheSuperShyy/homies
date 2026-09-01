@@ -90,31 +90,6 @@ AGENT_NEW = (
     "+ String.fromCharCode(10) + $json.text }}"
 )
 
-# --------------------------------------------------------------------------
-# 3. transfer_to_human: a specification, not a script.
-# --------------------------------------------------------------------------
-TRANSFER_NEW = (
-    "Hand this conversation to a person. CALL THIS BEFORE YOU WRITE YOUR "
-    "REPLY, never after: the reply may then say help is on the way, and a "
-    "reply that says so without this call is a lie told to somebody who may "
-    "be in danger.\n"
-    "Call it whenever money, debt, payment details or receipts come up; when "
-    "the resident asks for a person, or is angry; and whenever you are simply "
-    "not sure — being unsure is reason enough on its own.\n"
-    "And call it for a PERSON in a bad state, as opposed to a thing that "
-    "broke: somebody shut in a lift, on a roof, in a stairwell or a car park; "
-    "somebody hurt, alone, frightened or panicking; anybody reporting gas, "
-    "fire, flooding, or water near electricity. A burst pipe is a ticket. A "
-    "person who cannot get out is this, and it happens first — before you ask "
-    "where they live, before anything else. If a message contains both, this "
-    "one wins.\n"
-    "Whoever picks it up is one of Homies' department representatives. In "
-    "Hebrew that is נציג מחלקה, or simply הצוות — use one of those when you "
-    "tell the resident where their message went. Routing to a particular "
-    "department does not exist yet, so never say which department it went to."
-)
-
-
 def main():
     apply = "--apply" in sys.argv
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
@@ -145,27 +120,22 @@ def main():
                        % (before, len(AGENT_NEW)))
         agent["parameters"]["text"] = AGENT_NEW
 
-    # 3. transfer_to_human
-    tool = by["transfer_to_human"]
-    if tool["parameters"].get("toolDescription") != TRANSFER_NEW:
-        before = len(tool["parameters"].get("toolDescription") or "")
-        changes.append("transfer_to_human: description %d -> %d chars "
-                       "(a person in a bad state, and call it first)"
-                       % (before, len(TRANSFER_NEW)))
-        tool["parameters"]["toolDescription"] = TRANSFER_NEW
-
-    # 4. open_request, from the script rather than a copy kept here. With the
-    #    prompt stripped, the tool descriptions are most of what the model has,
-    #    so they are worth keeping in one place -- and n8n_whatsapp.py is that
-    #    place again now that the two have been reconciled.
-    op = by["open_request"]
-    want = W.tool("open_request")["description"]
-    if op["parameters"].get("toolDescription") != want:
-        before = len(op["parameters"].get("toolDescription") or "")
-        changes.append("open_request: description %d -> %d chars "
-                       "(gather details in a sentence, not as a form)"
-                       % (before, len(want)))
-        op["parameters"]["toolDescription"] = want
+    # 3 & 4. The two tool descriptions that carry behaviour, taken from the
+    #        script rather than copied here. With the prompt stripped these are
+    #        most of what the model has to go on, so they are worth keeping in
+    #        one place -- and n8n_whatsapp.py is that place again now that the
+    #        two have been reconciled.
+    for name, why in (("transfer_to_human",
+                       "a person in a bad state, call it first, and only once"),
+                      ("open_request",
+                       "gather details in a sentence, not as a form")):
+        node = by[name]
+        want = W.tool(name)["description"]
+        if node["parameters"].get("toolDescription") != want:
+            before = len(node["parameters"].get("toolDescription") or "")
+            changes.append("%s: description %d -> %d chars (%s)"
+                           % (name, before, len(want), why))
+            node["parameters"]["toolDescription"] = want
 
     print("workflow : %s  (%s, active=%s)"
           % (live["name"], live["id"], live.get("active")))

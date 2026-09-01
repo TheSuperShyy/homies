@@ -833,10 +833,18 @@ TOOLS = [
             # prompt, which is also the safer home for it — tool descriptions
             # are English and the bot writes Hebrew, so there is no sentence in
             # here for it to recite.
-            "Hand this conversation to a person. CALL THIS BEFORE YOU WRITE "
-            "YOUR REPLY, never after: the reply may then say help is on the "
-            "way, and a reply that says so without this call is a lie told to "
-            "somebody who may be in danger.\n"
+            "Hand this conversation to a person. CALL THIS BEFORE the reply "
+            "that tells them their message is going to somebody — that "
+            "sentence must never be written without this call behind it, "
+            "because it is a promise made to somebody who may be in danger.\n"
+            # Rewritten 1 Sep. The old wording said "before your reply, never
+            # after", which the model read as "on every reply", so a four-turn
+            # fire conversation called it four times and announced the same
+            # handover four times, once saying it was transferring them again.
+            "You only hand a conversation over once. After that call the "
+            "handover exists and stays true: do not call this again in the "
+            "same conversation, and do not tell them a second time. Later "
+            "messages are for what is actually new.\n"
             "Call it whenever money, debt, payment details or receipts come "
             "up; when the resident asks for a person, or is angry; and "
             "whenever you are simply not sure — being unsure is reason enough "
@@ -859,7 +867,12 @@ TOOLS = [
             "representatives. In Hebrew that is נציג מחלקה, or simply הצוות — "
             "use one of those when you tell the resident where their message "
             "went. Routing to a particular department does not exist yet, so "
-            "never say which department it went to."
+            "never say which department it went to.\n"
+            # Added 1 Sep: on a four-turn gas-then-fire conversation this was
+            # called on every turn, and the bot announced the same handover
+            # four times -- once even saying it was transferring them "again".
+            "Call it again only if something genuinely new appears that the "
+            "first handover did not cover."
         ),
         "input_schema": {
             "type": "object",

@@ -561,6 +561,8 @@ no wording that makes a complete, sendable sentence safe to show a model: if
 it is in the prompt it will be sent, so the only way to stop the reciting is
 to leave nothing to recite.
 
+**A fix that makes the output worse gets rolled back, not supplemented.** On 1 Sep three changes were made to stop the bot repeating itself; the third made messages longer, switched the tic from singular to plural and brought markdown back. It was measured offline, reverted, and never reached live, and the prompt finished the pass the same size it started. **Adding a fourth clause to correct the third is how the 66k version happened.**
+
 **One default beats a menu of options.** Told the neutral forms available in Hebrew — plural, infinitive, or rephrasing around the event — the model got it right once in three. Told simply to address the resident in the plural, always, it got it right four times in four. **Every option is a decision to get wrong once per sentence**, and a prompt that offers choices is asking for that decision every time. Pick the default and say only that.
 
 **Naming a failure mode teaches it, and this survives the rewrite.** The stripped prompt's one gendering line said not to solve the problem with a slash mid-word; the replies came back full of slashes, including on the bot's own verbs. Removing the mention was necessary and not sufficient — the positive default was what fixed it.
