@@ -132,6 +132,17 @@ span more than one flat, which is what migration 012 exists for.
 pending_charge, and a total quietly including a waived month gets somebody
 chased for money they do not owe.
 
+**Asked afterwards whether it shows only active debt — yes, and checking that
+found a second thing.** The statuses in the table today are only `unpaid` (618
+rows, ₪310,081) and `paid` (100, ₪63,295), so `unpaid` alone looked complete.
+But `/debts` reads `.in('status', ['unpaid','disputed','pending_charge'])` and
+treats all three as outstanding, listing the last two with a review label
+instead of adding them to the total. Search now does exactly the same. No row
+carries those statuses today so nothing on screen changed — and the day one
+does, the two pages would have reported different money for the same resident.
+A resident with only review months appears with `—` for the total rather than
+being dropped.
+
 **The first version was wrong and testing caught it.** It took the ids from the
 residents panel so the two sections could not disagree — but that panel is
 capped at 8 and ordered by name, so searching `גולן` listed eight Golans who
