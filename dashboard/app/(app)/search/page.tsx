@@ -142,13 +142,19 @@ export default async function Search({ searchParams }: {
         // ninth alphabetically, owed ₪14,976. A section that answers "does this
         // person owe" must not depend on where their surname sorts.
         //
-        // Unpaid only. `status` also carries paid, disputed, waived and
-        // pending_charge, and only one of those is a debt — a total quietly
-        // including a waived month gets somebody chased for money they do not
-        // owe.
+        // THE SAME THREE STATUSES THE DEBTS PAGE USES, and for the same
+        // reason. `unpaid` is the money owed; `disputed` and `pending_charge`
+        // are still outstanding but are waiting on a person, so they are listed
+        // and NOT added to the total — exactly as /debts does it. `paid` and
+        // `waived` are not debts and never appear.
+        //
+        // Filtering to `unpaid` alone was the first version. No row in the
+        // table carries the other two today, so nothing would have looked
+        // wrong — and the day one did, /debts and /search would have quietly
+        // reported different money for the same resident.
         db.from('charges')
-          .select('period,amount,unit,residents!inner(id,full_name,building,unit)')
-          .eq('status', 'unpaid')
+          .select('period,amount,unit,status,residents!inner(id,full_name,building,unit)')
+          .in('status', ['unpaid', 'disputed', 'pending_charge'])
           .or([
             `full_name.ilike.${like}`, `phone.ilike.${like}`,
             `building.ilike.${like}`, `unit.ilike.${like}`,
@@ -167,6 +173,7 @@ export default async function Search({ searchParams }: {
   type Owed = {
     id: string; name: string | null; building: string | null;
     months: { period: string; amount: number; unit: string | null }[];
+    inReview: string[];
     total: number;
   };
   const byResident = new Map<string, Owed>();
@@ -175,11 +182,17 @@ export default async function Search({ searchParams }: {
     if (!p) continue;
     let g = byResident.get(p.id);
     if (!g) {
-      g = { id: p.id, name: p.full_name, building: p.building, months: [], total: 0 };
+      g = { id: p.id, name: p.full_name, building: p.building, months: [], inReview: [], total: 0 };
       byResident.set(p.id, g);
     }
-    g.months.push({ period: c.period, amount: Number(c.amount), unit: c.unit || p.unit || null });
-    g.total += Number(c.amount);
+    if (c.status === 'unpaid') {
+      g.months.push({ period: c.period, amount: Number(c.amount), unit: c.unit || p.unit || null });
+      g.total += Number(c.amount);
+    } else {
+      // Listed, never totalled. A disputed month added to "owed" is a number
+      // somebody would act on before the dispute is settled.
+      g.inReview.push(`${month(c.period)} (${t(c.status === 'disputed' ? 'debts.disputed' : 'debts.pending')})`);
+    }
   }
   const owingAll = [...byResident.values()].sort((a, b) => b.total - a.total);
   const owing = owingAll.slice(0, LIMIT);
@@ -285,9 +298,14 @@ export default async function Search({ searchParams }: {
                               )}
                             </span>
                           ))}
+                          {r.inReview.map((m) => (
+                            <span key={m} className="mono" style={{ color: 'var(--review)' }}>{m}</span>
+                          ))}
                         </div>
                       </td>
-                      <td className="mono num" data-label={t('debts.owed')}>{shekels(r.total)}</td>
+                      <td className="mono num" data-label={t('debts.owed')}>
+                        {r.total ? shekels(r.total) : '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
