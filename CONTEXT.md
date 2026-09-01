@@ -598,6 +598,10 @@ no wording that makes a complete, sendable sentence safe to show a model: if
 it is in the prompt it will be sent, so the only way to stop the reciting is
 to leave nothing to recite.
 
+**The intro and its menu are the only fixed text in the system.** Everything else a resident reads is written by the model, including the answer to a menu tap, the answer to a photo with no caption, and the rescue when a guard throws a reply away. Stated by the owner three times; the last four canned sentences went on 1 Sep. **Adding a stock line back — even as a fallback, even on a path that never runs — is reintroducing the thing.**
+
+**On this n8n, `executionOrder: v1` schedules a node's branches by their POSITION on the canvas, not by the connections array.** A branch placed lower runs later, and an earlier branch that throws ends the run before it. So the canvas is not a diagram of the flow, it IS the flow's order: **anything that must happen — a handover, a write — belongs physically above anything that can fail.** Cost two probes and a wrong diagnosis to find.
+
 **A prohibition that quotes the phrase it forbids supplies the phrase.** The bullet saying `אין צוות שנמצא בדרך` used `בדרך` twice and the bot answered `עזרה בדרך`. Second time this exact mechanism has cost a day — the gendering line that named `את/ה` made slash-forms explode. **State the positive fact, put it where behaviour lives rather than in the lookup list, and let the absence do the work.** What replaced it is one frame, `אתה מדווח מה כבר נעשה, לא מה עומד לקרות`, which covers a whole family of invented promises without naming a single one of them.
 
 **A tool description is read at the moment that tool is chosen, and nowhere else.** Telling `transfer_to_human` to go back and open a ticket afterwards did nothing, because the address arrives two turns later and by then the model is not reading that text. Moved into `open_request` it worked immediately. **An instruction about what to do LATER belongs on the tool that acts later, or in the prompt — never on the tool being called now.**

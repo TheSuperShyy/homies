@@ -114,22 +114,18 @@ SECOND_OLD = (r" || ((/\b\d{3}-\d{3,6}-\d{2}\b|\bHM-\d{4}-\d{3,6}\b/.test(t))"
               " && /פתחתי|פתחנו/.test(t))")
 
 # --------------------------------------------------------------------------
-# 2. The agent node's injected prompt, reduced to what the model cannot know.
+# 2. The agent node's injected prompt.
 #
-# `last_bot` is the one that genuinely matters: the workflow sometimes speaks
-# for the bot, and those lines are not in its memory, so without this it
-# answers a question it cannot see.
-# --------------------------------------------------------------------------
-AGENT_NEW = (
-    "={{ ($json.greeted ? '[אתם כבר באמצע שיחה.]' "
-    ": '[זו ההודעה הראשונה בשיחה.]') "
-    "+ ($json.tapped_human ? ' [המערכת כבר הודיעה לדייר שהיא מעבירה לצוות "
-    "ושאלה על מה הפנייה. ההודעה הזאת היא התשובה שלו, והיא נועדה לצוות "
-    "שיחזור אליו.]' : '') "
-    "+ ($json.last_bot ? ' [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא "
-    "אתה, ולכן אין לו זכר בזיכרון שלך: ' + $json.last_bot + ']' : '') "
-    "+ String.fromCharCode(10) + $json.text }}"
-)
+# THIS FILE NO LONGER OWNS IT. It reduced the template from 1,473 characters to
+# 406 on 31 Aug, and that is the change recorded here; on 1 Sep
+# `n8n_whatsapp_untemplate.py` grew it again to carry `tap_now` and
+# `attachment`, because the canned tap reply and the canned attachment reply
+# both became the model's job and it has to be told which is which.
+#
+# Keeping a second copy here meant this script silently REVERTED that one the
+# next time it ran -- caught on the same day, by running both. One field, one
+# owner: the same rule that settled the tool descriptions on 31 Aug.
+AGENT_NEW = None
 
 def main():
     apply = "--apply" in sys.argv
@@ -176,14 +172,9 @@ def main():
                     break
             c["leftValue"] = lv
 
-    # 2. Agent template
-    agent = by["Answer the resident"]
-    if agent["parameters"].get("text") != AGENT_NEW:
-        before = len(agent["parameters"].get("text") or "")
-        changes.append("Answer the resident: injected prompt %d -> %d chars "
-                       "(drops the greeting and offer choreography)"
-                       % (before, len(AGENT_NEW)))
-        agent["parameters"]["text"] = AGENT_NEW
+    # 2. Agent template -- owned by n8n_whatsapp_untemplate.py since 1 Sep.
+    #    See the note on AGENT_NEW above: writing it from here as well reverted
+    #    that script's version every time this one ran.
 
     # 3 & 4. The two tool descriptions that carry behaviour, taken from the
     #        script rather than copied here. With the prompt stripped these are

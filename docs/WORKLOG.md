@@ -228,6 +228,77 @@ owner warned about. The remaining levers are a guard on the claim — which can
 only replace the reply with a canned line, and canned is the thing being removed
 — or accepting it. **The owner's call, not mine.**
 
+### Five fixed sentences, four of them gone, and the canvas turned out to be the execution order
+
+The owner, for the third time: *"i told you multiple times i dont want a
+templated message, only the intro one which is the menu."*
+
+**The model's replies were already free, and it was worth measuring rather than
+asserting.** 20 live replies on 1 Sep, **zero exact repeats**. The single word
+`elevator` came back four different ways, from a four-line message to
+`באיזה בניין אתם נמצאים? אנא ציינו רחוב ומספר.` It was the WORKFLOW that still
+spoke in fixed sentences, in five places — one of them found only while removing
+the others:
+
+| fixed text | when | now |
+| --- | --- | --- |
+| `היי, כאן מיכאל מהומיז. במה אפשר לעזור?` + three menu rows | bare greeting | **kept — the owner's one exception** |
+| three variants of `אני מעביר אותך לצוות…` | tap on `לדבר עם נציג` | the model writes it |
+| `אני קורא כאן רק טקסט…` | photo with no caption | the model writes it |
+| `פתחתי קריאה, מספר X…` / `אני מעביר את זה לצוות, נחזור בהקדם.` | a guard threw the reply away | `Say it again` writes it |
+| the same sentence again, hard-coded **inside `Send`** as `.trim() \|\| '…'` | any empty reply | removed; nothing is sent |
+
+**The trap, and it is why the tap survived the 31 Aug cut.**
+`Human tap? -> Transfer the tap` hung off the CANNED branch. Send the tap to the
+model and that branch stops running for it, so a resident who asks for a person
+silently never reaches one. `Human tap?` was moved onto `Sort` itself, where it
+sees every message and tests only `$json.tap === 'human'`.
+
+**And that was still not enough, which is the real lesson of the day.** With the
+rewiring done and correct, two live probes came back
+`Human tap? = False` — the node had not run at all. The workflow's
+`executionOrder` is **`v1`, which walks a node's branches by their POSITION on
+the canvas**, not by the order of the connections array. `Human tap?` sat at
+y=336, below `Is there a message?` at y=-16, so the reply branch ran first,
+`Send` failed on a conversation Chatwoot could not find, the run ended there,
+and the tap never transferred. Moving the node into the band between
+`Answer Meta` and `Is there a message?` fixed it on the next probe.
+
+**The canvas is not documentation. It is the schedule.** A handover a resident
+asked for must not sit downstream of a delivery that can throw, and it was
+sitting there under the old wiring too — invisible, because real conversations
+do not 404.
+
+**Verified before touching anything.** `Sort` is 16KB of JavaScript this repo has
+no copy of, so the patched node was run in node.js against seven fake envelopes
+first: the greeting still canned; the tap `_work: true, tap: 'human',
+tap_now: true`; **the next message still `tapped_human: true`** — the flag is
+written on the tap and consumed one message later, and letting the tap fall
+through to the same return would have spent it in its own run; the attachment
+`_work: true, attachment: true`; `שלום, יש נזילה` still not a greeting.
+
+**Live, after.** Tap: answered by the model in its own words, `Human tap? = True`,
+`Transfer the tap = True`, and no second handover on the following message.
+Greeting: the intro and all three menu rows, byte for byte. Ordinary leak:
+one ticket, `255-1183-26`, address asked in a single sentence.
+
+**Two things that went wrong on the way, both caught by something other than
+me.** n8n rejected the first PUT — `Answer the resident`'s **error output** also
+fed `Hand over instead`, which I had not looked for; the reroute now walks the
+graph instead of naming the edges I remembered. And `scripts/n8n_layout.py`
+refused the new nodes' placement, twice, until they sat clear of
+`Open it anyway` and `Conversation so far`.
+
+**Wired but not exercised, and said plainly:** the rescue path needs the model to
+produce an unusable reply, which cannot be forced on demand. `Say it again` is
+in place and read back. If it fails at runtime nothing is sent — which is the
+designed fallback anyway, so the downside is bounded. It fired 0 times in the 60
+executions before this change.
+
+**And one more field with two owners.** `n8n_whatsapp_open.py` still held its own copy of the agent template, so running it after this work silently reverted the new one — caught by running all six patch scripts at the end, which is why that check exists. It no longer writes that field: one field, one owner, the same rule that settled the tool descriptions on 31 Aug.
+
+Three node overlaps remain on the canvas and all three predate this work.
+
 ### Pushing the prompt reverted Ido's voice, and the warning was already written
 
 `vapi_sync.py inbound --apply` writes the WHOLE assistant, not the prompt. It
