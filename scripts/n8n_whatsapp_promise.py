@@ -76,6 +76,22 @@ CONDITION = (
     # resident who only asked how their request was getting on.
     r" const said = /(אני |אנחנו )?(מעביר|מעבירה|מעבירים|העברתי|העברנו)/.test(t);"
     r" if (!said) return false;"
+    # A tap on "לדבר עם נציג" has ALREADY been transferred, by Human tap? ->
+    # Transfer the tap, before the model ever wrote a word. So the claim is
+    # true, and firing here sent a second handover for one tap: seen live on
+    # 1 Sep in execution 20722, where Transfer the tap and Transfer it anyway
+    # both ran. The guard could not have known before yesterday, because until
+    # the tap started reaching the model it never produced a reply for this
+    # node to read.
+    #
+    # Asking Sort rather than asking whether Transfer the tap executed, on
+    # purpose: an n8n tool/branch node reports `isExecuted` true when it was
+    # merely reachable, which is what made this guard dead for a day. Sort runs
+    # on every path, so `.first()` here is a read that cannot throw for the
+    # reason `$('open_request').all()` did. The try/catch still falls through to
+    # the old behaviour rather than silently disabling the backstop.
+    r" try { if ($('Sort').first().json.tap === 'human') return false;"
+    r" } catch (e) { }"
     # A verb on its own is not a promise — `מעביר` turns up in plenty of
     # sentences that are not about handing this conversation to anybody.
     r" if (!/(לצוות|לנציג|לטיפול|לעמית)/.test(t)) return false;"

@@ -199,10 +199,9 @@ its stated time.
   characters including the building-and-apartment script until 31 Aug and is
   now 406, facts only. (3) The `Sort` node, which answers greetings and the
   `לדבר עם נציג` tap with canned Hebrew the model never sees.
-- **`לדבר עם נציג` is the one canned tap left, on purpose.** `Human tap?` →
-  `Transfer the tap` hangs off the *canned* branch of `Canned reply?`; sending
-  that tap to the model instead would stop the transfer firing. Rewiring it is
-  a separate job.
+- ~~**`לדבר עם נציג` is the one canned tap left.**~~ **No longer true, 1 Sep.**
+  All three taps reach the model; `Human tap?` was moved off the canned branch
+  onto `Sort`. See the entries below, which supersede this.
 - **Handovers go to *department representatives*, and that fact lives in
   `transfer_to_human`'s description, not the prompt** — put in the prompt's
   facts list first, where it had no effect at all. The Hebrew term is spelled
@@ -215,8 +214,11 @@ its stated time.
   the bot it cannot say it; do not leave it as it is.
 - **`Human tap?` hangs off `Sort` and sits ABOVE the reply branch, and both halves matter.** Off `Sort` because the tap no longer takes the canned branch; above, because executionOrder v1 goes by canvas position and a failed `Send` further down ends the run first. Move it back down and requests for a person stop transferring, silently, exactly as they did in two probes on 1 Sep.
 - **`tap_now` vs `tapped_human`.** `tap_now` says this message IS the tap; `tapped_human` says the next one answers it. The flag is written on the tap and consumed one message later, so the consume is skipped on the tap's own run — remove that guard and the model forgets the tap ever happened.
-- **`Say it again` replaces `Hand over instead`, and there is no third fallback.** If the retry is also unusable, nothing is sent; `Open it anyway` has already written a real ticket, so the report is not lost. The path is wired and read back but has never actually run.
+- **`Say it again` replaces `Hand over instead`, and there is no third fallback.** If the retry is also unusable, nothing is sent; `Open it anyway` has already written a real ticket, so the report is not lost. **It has now run live** (execution 20768, 1 Sep): the model invented `HM-20240704-12345` and called no tool, the guard rejected it, `Open it anyway` minted `255-1184-26`, and `Say it again` wrote it up with the real number. The whole chain works. Its own short prompt does NOT receive `greeted`, so a rescue message can still reintroduce Michael.
 - **`Sort` still builds a `followup` object that nothing reads** — dead since the follow-up menu came out on 31 Aug. Left alone; it cannot reach anybody.
+- **Everything in `Answer the resident`'s injected context is a FACT about the turn. Do not put an instruction back in it.** One added on 1 Sep told the model to report the handover in its own wording, and three different taps came back with identical opening sentences. The handover clause is gated on `tap === 'human'`, the same field `Human tap?` routes on; it was gated on `tap_now` for a day, which is true for ALL THREE rows, and the bot announced a handover on two taps that never had one.
+- **`Promised a transfer, made none?` stands down when `tap === 'human'`, and that clause is load-bearing.** `Transfer the tap` has already fired by then, so without it a single tap sent TWO handovers (execution 20722, both nodes in the run). It asks `Sort` rather than asking whether `Transfer the tap` executed, because `isExecuted` on an n8n node is spuriously true, the bug that left this guard dead for a day. `Sort` runs on every path, so `.first()` cannot throw the way `$('open_request').all()` did.
+- **The נציג tap reply ends on a full stop and asks nothing, and one attempt to fix it was rolled back.** Adding the fact `הנציג עוד לא יודע על מה הפנייה` made the model reopen with `היי` AND call `transfer_to_human` on top of the workflow's transfer. A bare `היי,`/`שלום לכם,` still opens 3 of 5 נציג taps against 1 of 7 of the other rows; the name itself appears in none of 12. Open, measured, and deliberately not chased further.
 - **`Promised a transfer, made none?` is LIVE now and decides on the reply alone.** Do not put `isExecuted` or `.all()` back — one never fires, the other always does. It matches first-person verbs only: the passive `הועברה לטיפול` belongs to status answers, and matching it hands over residents who only asked about their ticket.
 - **The rescued handover uses `reason: 'caller_request'`, and that is a known gap, not an oversight.** Deriving it from the reply so an emergency reaches the ticket backstop wrote TWO tickets for one call — the model's own transfer and the rescue race each other through the backstop's `interaction_id` check. Fixing it needs a partial unique index on `interaction_id where oxs_ref = 'partial:emergency_transfer'` and the conflict swallowed. Until then an emergency the model never transferred at all still leaves no ticket.
 - **The prompt no longer contains the word `בדרך`, deliberately.** It says `אתה מדווח מה כבר נעשה, לא מה עומד לקרות` instead. Writing the forbidden phrase back in, in any form, is what caused the failure it is there to prevent.

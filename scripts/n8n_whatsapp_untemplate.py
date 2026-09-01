@@ -185,16 +185,71 @@ RETURN_NEW = """  greeting: isGreeting, last_bot: lastBot,
   in_text: inText, msg_type: attachment ? 'attachment' : 'text',"""
 
 # --------------------------------------------------------------------------
-# 5. The agent template. Kept in step with n8n_whatsapp_open.py, which is where
-#    it is defined; this file only pushes it.
+# 5. The agent template, which this file owns: n8n_whatsapp_open.py set its own
+#    copy to None on 1 Sep after the two silently reverted each other.
+#
+# EVERY CLAUSE HERE IS A FACT ABOUT THE TURN. NONE OF THEM SAYS WHAT TO WRITE.
+# That is not a style preference, it is the rule the node was built on -- see
+# n8n_whatsapp.py around the last_bot branch: "Stated as a fact and nothing
+# more: what the sentence means and what to do about it is the prompt's job...
+# an instruction here would be a second prompt nobody reads beside the first."
+#
+# I broke it on 1 Sep and the owner caught it the same evening. The tap clause
+# read "the request has already been passed to a rep by the system, so don't ask
+# whether to transfer, tell them in your own wording what happened, and ask what
+# the request is about" -- and two separate things went wrong with that:
+#
+# 1. IT FIRED ON ALL THREE MENU ROWS. `tap_now` is true for any tap, but only
+#    "לדבר עם נציג" actually transfers. Executions 20664 (status) and 20680
+#    (open) announced a handover that never happened; `Transfer the tap` appears
+#    in the node list of 20671 alone. The claim is now gated on the SAME field
+#    the routing reads, `tap === 'human'`, so the two cannot disagree.
+# 2. IT PRESCRIBED A SHAPE, so the model produced that shape. Three different
+#    taps came back with the same two opening sentences and the same
+#    state-then-ask paragraph split. The owner read it as a template, correctly:
+#    it was one, just written as an instruction instead of a string.
+#
+# The greeted branch is the opposite mistake, and older. It used to end
+# "לא מציגים את עצמך שוב ולא כותבים במה אפשר לעזור"; the 31 Aug reduction from
+# 1,473 chars to 406 kept the fact and dropped the clause, so all three taps
+# reopened with the name over a menu that had just introduced him. The original
+# is still in n8n_whatsapp.py if the wording is ever wanted back in full.
+#
+# The `false` branch stays bare on purpose. The old one said
+# "פתח בשם: היי, כאן מיכאל מהומיז", and handing the model the greeting verbatim
+# is the recitation failure this file records twice already. It introduces
+# itself unprompted, which is the behaviour being kept.
+#
+# NO EM DASH. This string is appended to every resident message, so a dash here
+# is a writing sample beside every turn the model ever sees; the 1 Sep tap
+# clause had one. Same finding as 25 Aug, recorded in n8n_whatsapp.py.
 # --------------------------------------------------------------------------
 AGENT_NEW = (
-    "={{ ($json.greeted ? '[אתם כבר באמצע שיחה.]' "
-    ": '[זו ההודעה הראשונה בשיחה.]') "
-    "+ ($json.tap_now ? ' [ההודעה הזאת היא לחיצה על כפתור, לא משהו שהדייר "
-    "הקליד. הפנייה כבר הועברה לנציג על ידי המערכת, אז אל תשאל אם להעביר — "
-    "תגיד לו בניסוח שלך מה קרה, ותשאל על מה הפנייה כדי שמי שחוזר אליו יגיע "
-    "עם ההקשר.]' : '') "
+    # The prohibition alone held for the self-introduction and lost the coin
+    # toss on the greeting: "שלום לכם," opened 2 of 4 tap replies on 1 Sep
+    # while not one of them repeated the name. So the REASON is stated first
+    # and the prohibition points back at it, which is the shape everything
+    # else in this template already has. No quoted opener: naming the phrase
+    # is how yesterday supplied it.
+    "={{ ($json.greeted ? '[אתם כבר באמצע שיחה, וכבר בירכת את הדייר "
+    "והצגת את עצמך. לא עושים את זה שוב.]' : '[זו ההודעה הראשונה בשיחה.]') "
+    "+ ($json.tap_now ? ' [ההודעה הזאת היא לחיצה על כפתור ברשימה, לא משהו "
+    "שהדייר הקליד.]' : '') "
+    # TRIED AND ROLLED BACK, 1 Sep evening. This clause closes with a full stop
+    # and asks nothing, so the resident has nothing to answer and the rep calls
+    # back knowing only that somebody wanted a person. The obvious repair was to
+    # name the gap as one more fact: "הנציג עוד לא יודע על מה הפנייה". It
+    # measured worse on two counts in a single probe. The reply reopened with
+    # "היי" over a menu that had just said the name, and the model called
+    # `transfer_to_human` ITSELF on top of the transfer the workflow had already
+    # made, apparently reading "the rep does not know yet" as "not properly
+    # handed over". Worse output gets rolled back, not supplemented.
+    #
+    # The missing question is left standing and written down instead. It is a
+    # dead end, not a lie, and the resident can still write; a second handover
+    # is a duplicate write, which this workflow has paid for twice already.
+    "+ ($json.tap === 'human' ? ' [הפנייה כבר הועברה לנציג של הומיז על ידי "
+    "המערכת, ומה שהדייר יכתוב עכשיו יגיע לנציג הזה.]' : '') "
     "+ ($json.tapped_human && !$json.tap_now ? ' [ההודעה הזאת היא התשובה של "
     "הדייר על מה הפנייה, אחרי שהיא כבר הועברה לנציג. היא נועדה לצוות שיחזור "
     "אליו.]' : '') "
@@ -244,8 +299,9 @@ def main():
 
     agent = by["Answer the resident"]
     if agent["parameters"].get("text") != AGENT_NEW:
-        changes.append("Answer the resident: tell the model when a message IS "
-                       "the tap, when it answers one, and when a file arrived")
+        changes.append("Answer the resident: facts only in the injected context "
+                       "(the handover claim now gated on tap === 'human', and "
+                       "'do not introduce yourself again' restored)")
         agent["parameters"]["text"] = AGENT_NEW
 
     # --- The rewiring -------------------------------------------------------

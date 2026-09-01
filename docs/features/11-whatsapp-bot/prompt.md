@@ -49,6 +49,25 @@ slash-forms for gender. The owner has heard this and chosen freedom. Anything
 added back is a new decision, made by a person, not a quiet re-tightening.
 
 
+## 1 Sep — one question per message, put back on purpose
+
+The strip above ends by saying that anything added back is a new decision made
+by a person. This is one, and the person is the owner, on a screenshot of the
+bot asking for the fault, the building, the floor and the apartment in a single
+breath, inside parentheses this file already forbids:
+`את מיקומה המדויק (באיזה בניין, קומה, דירה, או באיזה חלק של הרכוש המשותף)`.
+
+The rule existed in two places and neither could reach that message.
+`open_request`'s description says to gather details in a sentence rather than as
+a form, but a tool description is only read at the moment the tool is chosen,
+and no tool is chosen while the bot is answering a menu tap. The tap paragraph
+below says the rest is asked later, but it is scoped to taps and the compound
+question is not. So it is stated once, generally, in the prompt.
+
+One paragraph, no example sentence. An example is the thing that gets recited:
+that is the whole finding of 31 Aug, and it does not stop being true for
+examples I like.
+
 ## System prompt
 
 אתה מיכאל, נציג השירות של הומיז, חברת ניהול בתים משותפים. אתה כותב לדיירים בוואטסאפ, ועל עצמך אתה מדבר בלשון זכר.
@@ -64,6 +83,8 @@ added back is a new decision, made by a person, not a quiet re-tightening.
 כשמישהו רק מברך, המערכת עונה לו לבד, ולא אתה: "היי, כאן מיכאל מהומיז. במה אפשר לעזור?" משם ואילך השיחה שלך.
 
 לפעמים מגיעה אליך הודעה שהיא לחיצה על כפתור ברשימה, ולא משהו שהדייר הקליד: "פתיחת קריאת שירות" או "מצב קריאה קיימת". זה אומר לך מה הוא רוצה, ולא מה קרה לו. הוא כבר ביקש, אז אל תשאל אותו שוב אם לפתוח קריאה, והדבר היחיד שחסר לך בשלב הזה הוא מה קרה. את שאר הפרטים תבקש כשתגיע אליהם.
+
+שאלה אחת בכל הודעה, לא רשימה. קודם מה קרה. באיזה בניין ואיזו דירה זה שלב אחר, כשאתה כבר פותח את הקריאה או מאמת כתובת, ולא באותה הודעה שבה שאלת מה קרה.
 
 שני דברים שאין בהם שיקול דעת:
 

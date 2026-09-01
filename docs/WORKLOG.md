@@ -11,6 +11,74 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The note was lying on two rows out of three, and it was mine
+
+The owner, on a screenshot of three menu taps in a row: *"the response is bad i
+dont want this type of response its bot not even human also we have the intro
+for michael on the menu buttons and having a greeting again is weird."* All
+three replies opened with the same two sentences:
+
+```
+מצב קריאה קיימת    → היי, מיכאל מהומיז כאן. הפנייה שלכם כבר הועברה לטיפול הצוות…
+לדבר עם נציג       → היי, מיכאל מהומיז כאן. הפנייה שלכם כבר הועברה לטיפול הצוות…
+פתיחת קריאת שירות  → היי, מיכאל מהומיז כאן. הפנייה שלכם כבר הועברה לטיפול הצוות…
+```
+
+**That is not the model repeating itself. It is reciting the note I added the
+day before, and on two of the three it is false.** `Sort` sets `tap_now: true`
+for every menu row, but the note keyed on it said *the request has already been
+passed to a rep by the system, so tell them in your own wording what happened
+and ask what it is about.* `Transfer the tap` appears in the node list of
+`20671` alone; `20664` (status) and `20680` (open) announced a handover nothing
+had made. And because the note prescribed a shape, three different taps came
+back in the same shape. **A template written as an instruction is still a
+template**, which is exactly what the owner had been objecting to for three
+days, and I had moved it rather than removed it.
+
+Two other things came out of the same line. The greeted branch had read
+`לא מציגים את עצמך שוב ולא כותבים "במה אפשר לעזור"` until the 31 Aug reduction
+from 1,473 chars to 406 kept the fact and dropped the clause, so the bot
+reopened with its own name over a menu that had just introduced it. And the
+compound question, `את מיקומה המדויק (באיזה בניין, קומה, דירה…)`, had a rule
+against it in two places that could not reach it: `open_request`'s description
+is only read when a tool is chosen, and no tool is chosen while answering a tap.
+
+**The fix, and the rule it restores.** Every clause in the injected context is
+now a fact about the turn and none of them says what to write. The handover
+claim is gated on `tap === 'human'`, the same field `Human tap?` routes on, so
+the claim and the transfer cannot disagree. Turn-taking went into `prompt.md`
+as one paragraph, on the owner's instruction, recorded there as a deliberate
+re-tightening: 4,179 to 4,331 chars.
+
+**What the probes then found, which was not what I went looking for.** A human
+tap was firing the handover TWICE: `Transfer the tap` made it, the model
+reported it honestly, and `Promised a transfer, made none?` read a transfer
+claim with no tool call and fired the backstop as well (`20722`, both nodes in
+the run). The guard could not have known — until the tap started reaching the
+model on 1 Sep it never produced a reply for that node to read. It now stands
+down when `$('Sort').first().json.tap === 'human'`. One transfer per tap,
+confirmed on `20734`.
+
+**Tried and rolled back, in the same hour.** The נציג reply closes on a full
+stop and asks nothing, so I added one more fact: `הנציג עוד לא יודע על מה
+הפנייה`. In a single probe the reply reopened with `היי` and the model called
+`transfer_to_human` itself on top of the workflow's transfer, apparently reading
+"the rep does not know yet" as "not properly handed over". Worse output gets
+rolled back, not supplemented. The missing question is written down instead.
+
+**And the path that had never run, ran.** Probing an ordinary leak arc, the
+model invented `HM-20240704-12345` and called no tool. `Reply usable?` rejected
+it, `Open it anyway` minted a real ticket `255-1184-26`, and **`Say it again`
+wrote the replacement in its own words** with the real number. Shipped wired but
+unexercised on 1 Sep and reported as such; this is the first live proof of the
+whole rescue chain, and it came from a phantom I did not plant.
+
+**Measured, 12 tap replies.** The name is gone from all 12. A bare `היי,` or
+`שלום לכם,` still opens **3 of 5** נציג taps against **1 of 7** of the other two
+rows, and one pass at that clause moved it from 2-of-4 to 1-of-4, which on n=4
+is not a result. Left standing and reported rather than chased into a fourth
+revision.
+
 ### One word in a list sent an emergency around the net built to catch it
 
 The owner, on a live conversation: *"its not creating any tickets and said the
