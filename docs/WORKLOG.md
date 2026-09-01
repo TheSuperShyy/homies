@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The openness rewrite is live, and the voice clobber happened again
+
+`vapi_sync.py inbound --apply` then `vapi_set_voice.py --apply`, on the owner's
+word. **The second command reported `a976c076 -> ba765d50`**, which is the prompt
+push reverting Ido's clone for the second time today. It is not a risk any more,
+it is a certainty: every prompt push reverts the voice, and the restore has to
+follow it in the same breath.
+
+Read back from the API: prompt 27,156 matching the repo, voice `ba765d50`
+sonic-3.5 with Elliot fallback, six tools, first message unchanged, and all six
+new behaviours present — content-not-phrasing, two-tools-not-one, ask-where-the-
+fault-is, two-residents-differ, doubt-is-an-emergency, 101 in words.
+
+**Audio untested, as before.** Everything here was measured in text.
+
+**Open, and shipped knowingly:** two runs in six answer an ordinary leak with a
+bare location question and no acknowledgement. The owner was told before the
+push and chose to ship.
+
+
 ### Content, not phrasing — the voice agent stops reading from a script
 
 Three separate calls with the same opening line came back **byte-identical**.
