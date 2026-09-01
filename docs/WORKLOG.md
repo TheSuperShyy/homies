@@ -72,6 +72,66 @@ with its `255` prefix and drops the `1` of `1042`, and `maxDurationSeconds` is
 180 against a prompt that now refuses to close until the caller is done.
 
 
+### It was telling residents it had opened tickets that did not exist
+
+The owner: *"can you check its not opening any tickets at all."* He was right to
+ask, and the answer was worse than the question.
+
+**The evidence.** Only two WhatsApp tickets have ever been opened by the bot for
+a real resident, 27 and 31 Aug. Every probe reply that claimed one was checked
+against the `requests` table, and this came back live:
+
+    נורה שרופה במסדרון → ...באיזה בניין מדובר ומה מספר הדירה שלכם?
+    הרצל 112 דירה 3    → תודה. פתחתי קריאת שירות לטיפול בנורה השרופה
+                          במסדרון בהרצל 112. אנחנו נטפל בזה בהקדם.
+
+No tool call, no reference, **no row**. Another run invented
+`HM-20240703-12345`. A resident is told their fault is logged and nothing is.
+
+**There is a guard for exactly this and it was broken in two ways, both mine.**
+`Reply usable?` is meant to catch a claimed-but-unopened ticket and send the
+resident to a person instead.
+
+1. **Its regex missed by one letter.** It looked for `פתחתי קריאה`; the bot
+   wrote `פתחתי קריאת שירות` — the construct form. Same failure as the transfer
+   guard missing `העברתי`: an exact-phrase list cannot cover a language that
+   inflects.
+2. **It asked the tool node whether it had run, and there is no way to ask that
+   works.** Live used `isExecuted`, which is spuriously true — so it never
+   fired. `n8n_whatsapp.py` had already moved to `$('open_request').all()` and
+   that fix had never been deployed; pushing it made things *worse*, because
+   `.all()` throws from inside that If, so the guard fired on **every** ticket
+   confirmation, replaced correct answers, and called the rescue on tickets that
+   already existed.
+
+**The signal was in the reply the whole time.** A reference exists only because
+`open_request` returned one, and ours have a fixed shape. A claim with no
+reference in that shape is a phantom — which also catches the invented
+`HM-...` number, so the old HM form is no longer accepted. Six cases checked
+before deploying, including the two false-positive traps that caused the 27 Aug
+regression: a status reply saying `הקריאה נפתחה ב־26.8`, and an offer.
+
+**A fourth place templating lives, found on the way.** `Hand over instead` is a
+Set node holding two hard-coded Hebrew sentences, and while the guard was
+over-firing it was replacing every correct ticket confirmation with one of them.
+Not in `prompt.md`, not in the agent template, not in `Sort`.
+
+**And the instrument was lying.** `probe_whatsapp.py` read
+`Answer the resident`'s raw output — what the model *said*, before three guards
+run — so a working guard looked broken for an hour. It now reads the last writer
+and prints a `GUARD:` line when a guard replaced the reply. It also took the
+node's *first* run rather than its last, which on a tool-calling turn is not the
+answer that goes out.
+
+**Where it landed, verified live:** a ticket opens, the reference is real
+(`255-1171-26`), and the model's own wording goes out with no canned override.
+Runs that lack an address ask for one and claim nothing.
+
+**Also removed:** the example reference numbers in `get_request_status`'s
+description and parameter doc. The prompt has had none since 20 Aug for exactly
+this reason; these two survived, and a probe quoted `255-1013-26` — the example
+— for a brand-new ticket.
+
 ### The bot said the same thing four times, and one of my three fixes had to be rolled back
 
 The owner, on a gas-then-fire conversation: *"its working real nice since its

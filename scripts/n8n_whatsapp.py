@@ -790,8 +790,8 @@ TOOLS = [
         "description": (
             "Call when the resident asks about an existing service call — its "
             "status, a follow-up, what happened to it. Pass the reference if "
-            "they quoted one, in any form (255-1013-26 whole, the old HM-2026-1013, "
-            "or just the serial). "
+            "they quoted one, in any form: the whole thing, an older HM-prefixed "
+            "one, or just the serial. "
             "Without a reference the building finds them; the apartment only "
             "narrows it. DO NOT ASK FOR AN APARTMENT when the fault is not in "
             "one — a lift, a lobby light, a gate and the bin store belong to the "
@@ -1684,8 +1684,8 @@ def workflow(e):
                         "reference: %s, building: %s, unit: %s, type: %s" % (
                             from_ai("reference",
                                     "The reference the resident quoted, exactly as "
-                                    "written — 255-1013-26, an old HM-2026-1013, or just the "
-                                    "serial. "
+                                    "written, whether that is the whole reference, an "
+                                    "older HM-prefixed one, or just the serial. "
                                     "Empty if none was quoted."),
                             from_ai("building", "Street and number, if no reference. "
                                                 "A partial name is fine."),
@@ -1970,21 +1970,40 @@ def workflow(e):
                             # first-person \u05e4\u05ea\u05d7\u05ea\u05d9/\u05e4\u05ea\u05d7\u05e0\u05d5 anywhere near a
                             # reference. "\u05e0\u05e4\u05ea\u05d7\u05d4 \u05d1\u05be26.8" in a status reply
                             # matches neither.
-                            " const claims = /\u05e4\u05ea\u05d7\u05ea\u05d9 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e7\u05e8\u05d9\u05d0\u05d4|\u05e4\u05ea\u05d7\u05e0\u05d5 \u05e7\u05e8\u05d9\u05d0\u05d4/.test(t)"
-                            r" || ((/\b\d{3}-\d{3,6}-\d{2}\b|\bHM-\d{4}-\d{3,6}\b/.test(t))"
-                            " && /\u05e4\u05ea\u05d7\u05ea\u05d9|\u05e4\u05ea\u05d7\u05e0\u05d5/.test(t));"
+                            # WIDENED 1 SEP, after it missed by one letter. The
+                            # bot wrote "\u05e4\u05ea\u05d7\u05ea\u05d9 \u05e7\u05e8\u05d9\u05d0\u05ea \u05e9\u05d9\u05e8\u05d5\u05ea" \u2014 the construct
+                            # form \u05e7\u05e8\u05d9\u05d0\u05ea, not \u05e7\u05e8\u05d9\u05d0\u05d4 \u2014 called no tool, and the
+                            # resident was told a ticket existed that did not.
+                            # Same failure as the transfer guard missing \u05d4\u05e2\u05d1\u05e8\u05ea\u05d9:
+                            # an exact-phrase list cannot cover a language that
+                            # inflects. Now: the verb, optionally an indirect
+                            # object, then the noun in either form.
+                            #
+                            # STILL VERB-FIRST ONLY, deliberately. A status reply
+                            # says "\u05d4\u05e7\u05e8\u05d9\u05d0\u05d4 \u05e0\u05e4\u05ea\u05d7\u05d4 \u05d1\u05be26.8" \u2014 noun then verb \u2014 and
+                            # matching that order would kill correct status
+                            # answers, which is exactly the 27 Aug regression
+                            # described above.
+                            " const claims = /(\u05e4\u05ea\u05d7\u05ea\u05d9|\u05e4\u05ea\u05d7\u05e0\u05d5|\u05e0\u05e4\u05ea\u05d7\u05d4|\u05e0\u05e4\u05ea\u05d7\u05d5)( (\u05dc\u05da|\u05dc\u05db\u05dd|\u05dc\u05db\u05df|\u05db\u05d1\u05e8|\u05d0\u05ea))* ?\u05d4?\u05e7\u05e8\u05d9\u05d0[\u05d4\u05ea]/.test(t)"
+                            ";"
                             " if (!claims) return true;"
-                            # `isExecuted` is useless on a tool node: it reported
-                            # true on the 19 Aug run where the execution shows
-                            # verify_address as the only tool called. It appears
-                            # to describe the node being reachable rather than
-                            # having been invoked. The node's OUTPUT is the
-                            # honest signal - a tool the agent never called has
-                            # produced no items, and asking for them throws.
-                            " try {"
-                            "  const r = $('open_request').all();"
-                            "  return Array.isArray(r) && r.length > 0;"
-                            " } catch (e) { return false; }"
+                            # DO NOT ASK THE TOOL NODE WHETHER IT RAN. Both ways
+                            # of asking are wrong, and each was live for a while
+                            # on 1 Sep. `isExecuted` is spuriously true — it
+                            # describes the node being reachable — so the guard
+                            # never fired and phantoms went out. `.all()` throws
+                            # from inside this If, so the guard fired on EVERY
+                            # ticket confirmation, replacing correct answers with
+                            # the canned line in "Hand over instead" and calling
+                            # the rescue on tickets that already existed.
+                            #
+                            # The reply itself carries the honest signal. A
+                            # reference only exists because open_request returned
+                            # one, and ours have a fixed shape. A claim with no
+                            # reference in that shape is a phantom — including
+                            # the invented `HM-20240703-12345` seen on 1 Sep,
+                            # which is why the old HM form is not accepted here.
+                            r" return /\b\d{3}-\d{3,6}-\d{2}\b/.test(t);"
                             " } )() }}",
                         "rightValue": "",
                         "operator": {"type": "boolean", "operation": "true",

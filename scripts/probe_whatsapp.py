@@ -122,10 +122,30 @@ for e in ex:
     row = {"exec": e["id"], "in": s.get("in_text"), "phone": mask(s.get("to", "")),
            "by": "model" if "Answer the resident" in run else "workflow"}
     if row["by"] == "model":
-        try:
-            row["reply"] = run["Answer the resident"][0]["data"]["main"][0][0]["json"].get("output", "")
-        except Exception as x:
-            row["reply"] = "(unreadable: %s)" % x
+        # LAST WRITER WINS, and the agent is not the last writer. `Hand over
+        # instead` replaces a degenerate or phantom-ticket answer; `Carry the
+        # reply` carries one whose promised transfer had to be made for it.
+        # Reading the agent node alone shows what the model said, which is not
+        # what anybody received.
+        row["reply"] = row["said"] = ""
+        for node, field in (("Answer the resident", "output"),
+                            ("Carry the reply", "text"),
+                            ("Hand over instead", "text")):
+            try:
+                # LAST run of the node, not the first: the agent node is
+                # recorded once per tool round, and only the final one
+                # carries the answer that goes out.
+                j = run[node][-1]["data"]["main"][0][0]["json"]
+            except Exception:
+                continue
+            got = j.get(field) or j.get("output") or j.get("text") or ""
+            if not got:
+                continue
+            if node == "Answer the resident":
+                row["said"] = got
+            row["reply"] = got
+        if row["reply"] != row["said"]:
+            row["overridden"] = True
     else:
         row["reply"] = s.get("text") or (s.get("menu") or {}).get("content") or json.dumps(
             {k: v for k, v in s.items() if k in ("text", "menu", "_canned", "_menu")},
@@ -139,6 +159,11 @@ for r in results:
     print("exec %s  from %s  [%s]" % (r["exec"], r["phone"], r["by"]))
     print("  IN   : %s" % r["in"])
     print("  OUT  : %s" % str(r["reply"]).replace("\n", " / "))
+    if r.get("overridden"):
+        # A guard replaced the agent's answer before it went out. Worth seeing:
+        # the model said something it should not have, and the net caught it.
+        print("  GUARD: replaced the model's reply, which was: %s"
+              % str(r.get("said", "")).replace("\n", " / ")[:150])
     if r["tools"]:
         print("  TOOLS: %s" % ", ".join(r["tools"]))
 print("=" * 76)

@@ -73,6 +73,47 @@ LOOKUP_NEW = ("const tapOpts = TAP_KIND[text.trim()] === 'human'\n"
               "  ? TAPPED[text.trim()] : null;")
 
 # --------------------------------------------------------------------------
+# 1b. The phantom-ticket guard, which was missing by one letter.
+#
+# `Reply usable?` is supposed to catch the bot claiming a ticket it never
+# opened, and send the resident to a person instead of to a number that does
+# not exist. On 1 Sep it wrote `פתחתי קריאת שירות` -- the construct form
+# קריאת, not קריאה -- called no tool at all, and the guard let it through. The
+# resident was told their fault was logged and nothing was.
+#
+# Still verb-first only: a status reply says `הקריאה נפתחה ב־26.8`, noun then
+# verb, and matching that order would kill correct status answers.
+# --------------------------------------------------------------------------
+CLAIMS_OLD = "/פתחתי קריאה|נפתחה קריאה|פתחנו קריאה/"
+CLAIMS_NEW = "/(פתחתי|פתחנו|נפתחה|נפתחו)( (לך|לכם|לכן|כבר|את))* ?ה?קריא[הת]/"
+
+# And the check itself, which live still does with `isExecuted`. n8n_whatsapp.py
+# stopped trusting that on 19 Aug -- it reports true for a tool node that was
+# never invoked, describing reachability rather than execution -- and moved to
+# asking for the node's OUTPUT, which a tool the agent never called does not
+# have. The script was fixed; live never received it, so the guard has been
+# passing every phantom claim through since.
+# Both ways of asking the tool node whether it ran are wrong, and each was live
+# for part of 1 Sep. `isExecuted` is spuriously true, so the guard never fired.
+# `.all()` throws from inside this If, so it fired on EVERY ticket confirmation
+# and replaced correct answers with the canned line in `Hand over instead`.
+# The reply carries the honest signal: a reference exists only because
+# open_request returned one, and ours have a fixed shape.
+EXEC_OLDS = [
+    "try { return $('open_request').isExecuted === true; } catch (e) { return false; }",
+    ("try { const r = $('open_request').all();"
+     " return Array.isArray(r) && r.length > 0;"
+     " } catch (e) { return false; }"),
+]
+EXEC_NEW = r" return /\b\d{3}-\d{3,6}-\d{2}\b/.test(t);"
+
+# The old second clause treated "a reference plus פתחתי" as a claim, which the
+# shape test now decides on its own -- and it accepted the HM form, which is
+# exactly the shape the model invented on 1 Sep.
+SECOND_OLD = (r" || ((/\b\d{3}-\d{3,6}-\d{2}\b|\bHM-\d{4}-\d{3,6}\b/.test(t))"
+              " && /פתחתי|פתחנו/.test(t))")
+
+# --------------------------------------------------------------------------
 # 2. The agent node's injected prompt, reduced to what the model cannot know.
 #
 # `last_bot` is the one that genuinely matters: the workflow sometimes speaks
@@ -111,6 +152,30 @@ def main():
         changes.append("Sort: only the נציג tap is canned; the rest reach the model")
     sort["parameters"]["jsCode"] = code
 
+    # 1b. The phantom-ticket guard
+    guard = by.get("Reply usable?")
+    if guard is not None:
+        conds = guard["parameters"]["conditions"]["conditions"]
+        for c in conds:
+            if c.get("id") != "phantom":
+                continue
+            lv = str(c.get("leftValue", ""))
+            if CLAIMS_OLD in lv:
+                lv = lv.replace(CLAIMS_OLD, CLAIMS_NEW, 1)
+                changes.append("Reply usable?: widen the phantom-ticket regex "
+                               "(it missed קריאת and let a fake ticket through)")
+            if SECOND_OLD in lv:
+                lv = lv.replace(SECOND_OLD, "", 1)
+                changes.append("Reply usable?: drop the second claims clause, "
+                               "which accepted the invented HM reference shape")
+            for old in EXEC_OLDS:
+                if old in lv:
+                    lv = lv.replace(old, EXEC_NEW.strip(), 1)
+                    changes.append("Reply usable?: decide on the reference shape "
+                                   "in the reply, not on asking the tool node")
+                    break
+            c["leftValue"] = lv
+
     # 2. Agent template
     agent = by["Answer the resident"]
     if agent["parameters"].get("text") != AGENT_NEW:
@@ -125,10 +190,28 @@ def main():
     #        most of what the model has to go on, so they are worth keeping in
     #        one place -- and n8n_whatsapp.py is that place again now that the
     #        two have been reconciled.
+    # No example reference number anywhere the model can read one. The prompt
+    # has had none since 20 Aug, when the bot minted one digit by digit out of
+    # an example written in the file; two survived in this tool's text, and on
+    # 1 Sep a probe quoted 255-1013-26 -- the example -- for a brand-new ticket.
+    ref = by.get("get_request_status")
+    if ref is not None:
+        jb = ref["parameters"].get("jsonBody") or ""
+        old_ref = ("exactly as written — 255-1013-26, an old HM-2026-1013, or "
+                   "just the serial.")
+        new_ref = ("exactly as written, whether that is the whole reference, an "
+                   "older HM-prefixed one, or just the serial.")
+        if old_ref in jb:
+            ref["parameters"]["jsonBody"] = jb.replace(old_ref, new_ref, 1)
+            changes.append("get_request_status: drop the example reference "
+                           "number from the parameter doc")
+
     for name, why in (("transfer_to_human",
                        "a person in a bad state, call it first, and only once"),
                       ("open_request",
-                       "gather details in a sentence, not as a form")):
+                       "gather details in a sentence, not as a form"),
+                      ("get_request_status",
+                       "no example reference number to copy")):
         node = by[name]
         want = W.tool(name)["description"]
         if node["parameters"].get("toolDescription") != want:

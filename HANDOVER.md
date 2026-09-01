@@ -213,6 +213,9 @@ its stated time.
   `אני אעדכן אותך כשהטיפול יתקדם` after opening a ticket. There is no
   proactive update path — nothing sends that message. Either build it or tell
   the bot it cannot say it; do not leave it as it is.
+- **The phantom-ticket guard decides on the reference SHAPE in the reply.** Do not change it back to asking `open_request` whether it ran: `isExecuted` never fires and `.all()` always fires, and both were live on 1 Sep. A claim with no `NNN-NNNN-NN` reference is a phantom; the old HM form is deliberately not accepted, because the model invented one.
+- **`Hand over instead` is the fourth place templating lives** — a Set node with two fixed Hebrew sentences, used when a guard replaces a reply. Nobody has been asked whether they should stay.
+- **`probe_whatsapp.py` now reports what was SENT, not what the model said**, and prints `GUARD:` when a guard replaced the reply. It read the agent node's first run until 1 Sep, which is neither the final answer nor what went out.
 - **Repetition across turns is improved, not solved.** The handover sentence no longer appears in every message and the later messages lead with content, but `אני מבין` still opens the first two, and `transfer_to_human` is still called two or three times in a long emergency instead of once. **Do not chase this with more clauses** — the attempt that targeted the opener directly made it worse and was reverted.
 - **Address the resident in the PLURAL. That one line is doing a lot of work.** It replaced roughly forty lines of gendering craft in the old prompt and is the only thing standing between the bot and `את/ה` slash-forms. Do not soften it into a list of options: as a menu of neutral forms it scored 1/3, as a single default 4/4.
 - **Register items the owner has raised, in order, and where they stand.**
