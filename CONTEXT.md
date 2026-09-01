@@ -2041,6 +2041,13 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**Probe transcripts get committed, not summarised. 1 Sep.** A claim about how an
+agent behaves is worth what its evidence is worth, and prose in a worklog cannot
+be re-read for something it did not think to mention. `prompt_chat.py` writes
+both languages to `docs/assistant/transcripts/` on exit; those files go in with
+the change they justify. They are cheap, they are the only record of behaviour
+that predates a fix, and a later session can diff against them.
+
 **Write required lines as standalone sentences, never inside a clause. 1 Sep,
 after three failures in a row.** Two things the agent had to convey were written
 as `שהקו הזה עברי, ושנציג יחזור אליהם` — a grammatical list — and it said the

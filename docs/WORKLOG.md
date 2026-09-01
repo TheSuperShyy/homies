@@ -48,6 +48,10 @@ sentence is item three now, and the probe counts it on every run.
 Three gendered slips found on the way — `אליך`, `תרצה`, `דיברת` — all inside the
 one sentence spoken to the caller least able to correct a wrong guess.
 
+The probe runs behind all of this are committed in `docs/assistant/transcripts/`
+(`6d2d52d`), in Hebrew and English side by side. Every claim in this entry can be
+read back rather than taken on trust.
+
 
 ### He told an English caller "I do not understand Hebrew"
 

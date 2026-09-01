@@ -2340,6 +2340,10 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
 API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
 English callers `אני לא מבין עברית`.
 
+**Evidence for every behaviour claim about the inbound agent is in
+`docs/assistant/transcripts/`**, Hebrew and English side by side, committed with
+the change it justifies. Read those before re-testing something by hand.
+
 **HEBREW-FIRST IS A DECISION, MADE 1 SEP, NOT AN OVERSIGHT.** The transcriber
 stays `deepgram nova-3` on `he` (300ms). English audio therefore still arrives
 empty or garbled — but the prompt no longer *rejects* English: anything that
