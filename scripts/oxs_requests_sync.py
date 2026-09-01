@@ -320,9 +320,27 @@ def departed_rows(gone):
     if not pending:
         return [], []
 
-    code, blds = sb("buildings?select=id,address&limit=500")
-    by_addr = ({b["address"]: b["id"] for b in blds}
-               if code == 200 and isinstance(blds, list) else {})
+    # TWO KEYS PER BUILDING, because OXS writes an address two ways.
+    #
+    # `buildings.address` is `street number, city`, composed at import time, and
+    # it is the exact string `requests.building` holds. But a service call on a
+    # building with an entrance letter arrives with the letter in parentheses
+    # mid-string -- `ארלוזורוב 13 (ב), רמת גן` -- which matches nothing, so the
+    # by-taskNumber lookup has no buildingId and the ticket can never resolve.
+    #
+    # Composing their other form is exact rather than fuzzy: two of the 173
+    # active buildings carry an entrance and neither sits at a duplicated
+    # street+number (measured in docs/reference/oxs-extractable.md). Found by
+    # `255-27001-26`, the one ticket of 292 the first live run left behind.
+    code, blds = sb("buildings?select=id,address,street,number,entrance,city&limit=500")
+    by_addr = {}
+    if code == 200 and isinstance(blds, list):
+        for b in blds:
+            by_addr.setdefault(b["address"], b["id"])
+            if b.get("entrance"):
+                by_addr.setdefault("%s %s (%s), %s"
+                                   % (b["street"], b["number"],
+                                      b["entrance"], b["city"]), b["id"])
 
     print("  asking OXS about %d departed ticket(s), about %.0fs at %.2fs apart"
           % (len(pending), len(pending) * PACE, PACE))

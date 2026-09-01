@@ -1843,8 +1843,12 @@ handset.**
   Conversations pages all show test traffic mixed with the real import. **No
   real resident has ever spoken to the system**: all 167 interactions and 460
   messages are our own.
-- Tickets refresh **every 15 minutes** on their own workflow since 24 Aug
-  (`oxs-requests.yml`), not twice a day. Each carries `oxs_notes` — the OXS
+- Tickets refresh on their own workflow since 24 Aug (`oxs-requests.yml`), not
+  twice a day. **It asks for every 15 minutes and GitHub delivers about 5 runs a
+  day** — measured 1 Sep across 30 consecutive runs: median gap 237 min, worst
+  746. Read the cron as a ceiling, never as a frequency; `oxs_last_seen_at`
+  records when a ticket was really last seen. The fix for the schedule is not
+  chosen yet (n8n for the clock, or the importer moved into Supabase pg_cron). Each carries `oxs_notes` — the OXS
   dispatcher's own progress notes, newest first — and `oxs_last_seen_at`.
   **254 imported tickets as of 31 Aug, of which 216 are resolved and 38 open.**
   The 70 this file used to claim was the 24 Aug figure and the importer has run
