@@ -71,6 +71,76 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### "Its a dumb bot": nine digits, nine essays, one real handover — and what professional turned out to mean
+
+The owner typed `hello` and then the digits 1 through 9 at the bot, fast, and
+posted the carnage: nine separate replies, out of order, each one a confident
+interpretation of its digit read off a **nine-option menu the model invented**
+from the three-row one — status for 2, the balance for 3, contact hours for 5,
+payment dates for 7 — each answered with a verbatim recital of a facts-list
+entry. The digit `6` was read as "talk to a rep", the reply claimed a transfer,
+and the promise backstop — doing its job on a reply it had every reason to
+believe — **made it real** (`Transfer it anyway`, exec `20912`). Separately,
+`open_request` returned `street_unknown` with no list, and the bot invented
+which buildings Homies manages, twice, differently (`20763`: רוטשילד 1,3,7,9;
+`20836`: 1,5,7). And someone declining to describe a fault got all four
+national emergency numbers (`20886`) — the exact failure prompt.md's preamble
+recorded as the stripped prompt's known risk.
+
+Three fixes, decided with the owner (quiet window "3-5 seconds", never guess,
+numbers only when danger is described):
+
+**1. A burst answers once — `scripts/n8n_whatsapp_batch.py`.**
+`Is there a message?` → `Let them finish` (Wait, 4s) → `Anything newer?`
+(PostgREST: last 12 `messages` rows for the phone, newest first) →
+`Still the last word?` (Code): if the newest inbound row is not this run's
+message, return nothing — the newer run answers; otherwise join every inbound
+row down to the last outbound — the unanswered backlog — and hand it to the
+agent as one text. Verified live: `1`,`2`,`3` sent ~2s apart → two runs
+silenced, one reply to `1\n2\n3`; a tap + the fault text 2s later → one
+reply answering both.
+
+**What did not work first, and is the finding of the night: n8n staticData is
+a PER-EXECUTION SNAPSHOT.** Loaded at run start, saved at run end; concurrent
+executions never see each other's writes. The first version stashed the burst
+there and three digits produced three runs each reporting `burst_size=1`.
+`greeted`/`tapped`/`lastBot` only ever worked because their writers finish
+before the next message arrives. The truth has to live in Postgres, and did
+all along — `Log inbound` writes every message before the wait (it sits above
+it, and executionOrder v1 runs it first). Second finding, smaller: the
+`messages.id` column is a UUID, and `order=id.desc` is ordering by nothing —
+a burst came back joined `3,1,2` and the wrong run answered until the query
+ordered by `created_at`.
+
+**2. Never guess, never volunteer — prompt.md, three lines plus one.**
+The boundary of understanding (a content-free message gets one short question,
+meaning is never invented, no action on a guess); answer at the length of the
+question, nothing unasked; a tool's silence bounds what you know (which
+buildings we manage, for example, you do not know and do not guess); and the
+emergency-numbers facts line now says who it is for: `למי שנמצא בסכנה מיידית`.
+Epoch 6, then 7 an hour later when the quoted opener — which check_greeting
+requires to sit in the prompt verbatim — started being pasted whole at the top
+of replies, question mark included, and gained an ownership clause: the
+sentence is the system's, the model never opens with it. **A quoted sentence
+gets recited; fourth time this file has paid to relearn that.**
+
+**Measured after.** The decline case now gets a short reply offering the
+office line, no emergency numbers. Gas gets the transfer AND the numbers,
+truthfully. The tap answers in the model's own words. No fact-dump recitals
+in any post-fix sample.
+
+**Open, measured, not chased (2 prompt passes is the churn line):**
+- A digit after the menu still tends to be read as "you want to open a
+  ticket" (3 of 4 samples) — ending in `מה קרה?`, so the damage is an
+  invitation, not an essay; but it is still a guess.
+- The first-contact echo — intro sentence pasted before the substance on a
+  fresh number's fault report — survived one post-clause sample.
+- The street_unknown invention could not be re-triggered: the model now
+  gathers details before calling the tool, so the exact path went unexercised.
+- A truthful self-reported transfer still double-fires the promise backstop
+  (it cannot know the tool ran — asking n8n is the lie that killed it in
+  August). Known, bounded server-side, owner-deferred.
+
 ### Audited: the intro and its menu are the only fixed text left, measured both ways
 
 The owner asked for verification that nothing is templated any more. Asserted

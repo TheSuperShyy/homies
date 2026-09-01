@@ -203,7 +203,13 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 5
+MEMORY_EPOCH = 7
+# 6 -> 7, same evening: the quoted opener grew its ownership clause after
+# being pasted whole into four replies. Buffers under 6 hold those echoes.
+# 5 -> 6, 1 Sep evening: the never-guess / never-volunteer prompt lines went
+# in, so every buffer holding the digit-storm answers and the invented
+# building lists is a demonstration of exactly what they forbid. First bump
+# the check below forced rather than a person remembered.
 
 # 12 exchanges, down from 30 (owner, 1 Sep). Long enough for one fault report
 # end to end, short enough that a bad turn ages out inside the same conversation
@@ -215,7 +221,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "df4aa644cadb",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "69102d8c6278",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "6e19bca8b5ab",   # AGENT_NEW in n8n_whatsapp_untemplate.py
 }
 
