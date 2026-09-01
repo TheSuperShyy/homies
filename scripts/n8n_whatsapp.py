@@ -705,6 +705,16 @@ TOOLS = [
             "sentence, taking the most useful thing first — not as a "
             "numbered list of requirements. A resident who is handed a "
             "four-point form usually answers none of it."
+            # TRIED AND REVERTED, 1 Sep, and worth recording so it is not tried
+            # again. To somebody trapped in a lift the model kept justifying the
+            # address question with "so we can send help to the right place",
+            # so a true reason was added here — the address decides which
+            # building the ticket is filed against. It bought nothing: the
+            # dispatch wording was still live on two turns of four afterwards,
+            # and the one live run of the ask-for-address path came back with a
+            # numbered markdown form, which is the failure the sentence above it
+            # exists to prevent. Diluting the lever that works, to no measured
+            # gain, is the trade this file has already lost once.
         ),
         "input_schema": {
             "type": "object",

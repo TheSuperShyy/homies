@@ -137,6 +137,97 @@ Ordinary fault unchanged: asks for the address, opens `255-1176-26`.
 `Promised a transfer, made none?` exists to catch and it is dead — see the entry
 above.
 
+### The prohibition supplied the phrase, and the guard against it had never fired
+
+The owner, on a live conversation an hour after the last fix went out:
+*"don't assume that the team sends help — is this fixed already? it should be
+neutral, like I will pass this to the team with emergency priority. but I don't
+want the message to be fixed."*
+
+Somebody trapped in a lift with a dead emergency button, 07:47 UTC, **after**
+the no-dispatch bullet was live:
+
+    אני מעביר את הפנייה שלכם לצוות שלנו באופן מיידי. הם יחזרו אליכם וידאגו לשחרר אתכם
+    עזרה בדרך
+    בלי הכתובת המדויקת, אני לא יכול לשלוח עזרה
+    אני אפעל במהירות כדי להזעיק עזרה
+
+**And in four turns `transfer_to_human` was never called once.** Nothing was
+recorded for a person trapped in a lift.
+
+**Why yesterday's fix did not hold, and it is the same lesson twice.** The
+bullet read `אין צוות שנמצא בדרך, ולכן אתה לא אומר שמישהו בדרך אליו` — it says
+`בדרך` twice, and the bot answered `עזרה בדרך`, `הם בדרכם`, `צוות שלנו בדרך`.
+This repo has already paid for this: the gendering line that named `את/ה` made
+slash-forms explode, and deleting the mention fixed it. **A prohibition that
+quotes the phrase it forbids supplies the phrase.** It was also in the facts
+block, which is lookup data — hours, phone, fees — not a place the model reads
+constraints on its own claims, and it offered nothing to say instead.
+
+**What replaced it.** The bullet is gone. Two things stand in its place, both
+positive, neither quoting anything: what a handover actually is, appended to the
+paragraph that was already about handovers — `מגיעה לנציג של הומיז ומסומנת
+דחוף, ונציג חוזר לדייר` — and one frame on its own line,
+**`אתה מדווח מה כבר נעשה, לא מה עומד לקרות`**. That one sentence covers the
+whole family — help on the way, they will free you, I will update you when it
+progresses — without listing a single member of it. And it is a stance, not a
+sentence: the owner's *"passed to the team with emergency priority"* is the
+register, and writing it into the file as a line to copy is how the 66k version
+taught the bot to recite.
+
+The word `בדרך` no longer appears anywhere in the prompt, and it did not appear
+in any measured reply afterwards.
+
+**The guard that had never fired.** `Promised a transfer, made none?` reads
+`$('transfer_to_human').isExecuted` and returns false when it is true — and
+`isExecuted` is spuriously true, so the node has been dead since it was built.
+The same defect removed from the phantom-ticket guard the day before, in the
+second of the two places it lived. It now decides on the promise alone, because
+there is no working way to ask a tool node whether it ran and both wrong ways
+are known: `isExecuted` never fires, `.all()` throws from inside an If and fires
+on everything. Its regex was four exact phrases covering `אני מעביר` and missing
+`העברתי`; now the verb plus a destination, first person only — the passive
+`הועברה לטיפול` is what a *status* answer says, and matching it would hand over
+a resident who only asked how their ticket was getting on. **11 cases checked
+before deploying**, including both status traps and an offer.
+
+**Three things were tried and taken back out, which is most of what this pass
+is.**
+
+1. **Deleting the 4-hour emergency standard** from the facts block, on the
+   theory that a response-time promise is a short step from somebody being sent.
+   Measured against the current prompt: the candidate was **worse**, bringing
+   back `הם בדרך לטפל בזה` and `הצוות שלנו כבר בדרך`. It never left the scratch
+   file.
+2. **Telling `open_request` why the address is really wanted** — it decides
+   which building the ticket is filed against — to displace *"so we can send
+   help to the right place"*. It bought nothing measurable, and the one live run
+   of the ask-for-address path came back with a numbered markdown form, the
+   exact failure the sentence above it exists to prevent. Pushed, then reverted.
+3. **Deriving the rescued handover's `reason` from the reply**, so an emergency
+   caught by the guard would reach the ticket-writing backstop. Live, it wrote
+   **two tickets for one lift call**: the guard fires on the promise alone, so
+   on the ordinary path the model's own transfer and the rescue both run in one
+   execution, both forward asynchronously, and both read the backstop's
+   `interaction_id` check before either insert lands. That breaks "one incident,
+   one row" from the same morning, so it came out. Closing it properly needs an
+   atomic check-and-insert — a partial unique index — which is a schema change,
+   not a wording fix.
+
+**Where it landed, measured.** Emergency arc live and offline: the default reply
+is now `העברתי את הפנייה שלכם מיד לטיפול נציג מהצוות שלנו, והוא יחזור אליכם
+בהקדם` — passed, urgent, somebody comes back — with no claim that anybody is
+coming. Ordinary leak arc unchanged: one ticket, real reference read back, no
+numbered form. One ticket per emergency conversation.
+
+**Not fixed, and reported rather than chased.** Roughly one turn in three, while
+asking for the address, still justifies the question with *"so we can send help
+there"* or *"so we can reach you quickly"*. Three prompt and tool attempts at
+this made it smaller and none removed it, and a fourth is the paralysis the
+owner warned about. The remaining levers are a guard on the claim — which can
+only replace the reply with a canned line, and canned is the thing being removed
+— or accepting it. **The owner's call, not mine.**
+
 ### Pushing the prompt reverted Ido's voice, and the warning was already written
 
 `vapi_sync.py inbound --apply` writes the WHOLE assistant, not the prompt. It
