@@ -11,6 +11,78 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### One word in a list sent an emergency around the net built to catch it
+
+The owner, on a live conversation: *"its not creating any tickets and said the
+team is on the way — it assumed something, that the team is otw."* Both halves
+are real and they have different causes.
+
+**The conversation.** A resident reported somebody fallen on the stairs, could
+not say which building, and wrote `send help`. Five turns. One handover. And
+twice the bot wrote **`הצוות שלנו בדרך, והם יטפלו בכם`** — our team is on the
+way, they will take care of you. `requests` ended the conversation empty.
+
+**Why no ticket, and it is a one-word answer.** `transfer_to_human` offered the
+model five reasons, one of them `distress`. It sent `distress`, which is the
+right English word for a frightened person and a **perfectly valid value** — the
+Edge Function stores it without complaint, so nothing anywhere reported a
+problem. But the emergency backstop in `debt-tools/index.ts`, the net that
+writes a `needs_review` ticket when a handover happens and no request was opened
+— added 20 Aug after a caller reported a fire and the table ended the day empty
+— is scoped to `reason === "emergency"` alone.
+
+**So the reason that best describes a person in trouble was the one reason that
+routed them around the net built for exactly them.** A transfer is a note:
+nothing searches `call_outcomes`, no dashboard lists it, nobody is dispatched
+off it.
+
+Fixed by not offering the word. `distress` is gone from the WhatsApp tool's
+enum; on WhatsApp a person in distress **is** the emergency case. The Edge
+Function was deliberately **not** widened instead — the voice debt agent sends
+`distress` for someone upset about money, and minting an emergency ticket for
+every distressed debtor is worse than the bug. `scripts/vapi_tools.py` untouched.
+
+The tool now also sends a `description`. The backstop writes `args.description`
+and falls back to a sentence saying *the call recording is the only account*,
+which on WhatsApp is false twice over — no call, no recording. Without it the
+ticket an emergency produces said nothing about the emergency.
+
+**Why "the team is on the way", which is a different fault.** Nothing anywhere
+said what a handover **is**. `transfer_to_human` gives the model the word
+`הצוות` and tells it to say where the message went; the prompt's facts block
+had office hours, response-time standards and the national emergency numbers,
+and no sentence about what actually happens next. The model filled the gap with
+the most reassuring thing available, which was dispatch. Offline it also wrote
+`שנוכל לשלוח עזרה`, and on 1 Sep `צוות החירום שלנו`.
+
+One bullet in the facts block, alongside `אין קו חירום נפרד` which it is
+the twin of: a representative reads it and comes back to the resident, nobody
+goes out to the site, and whoever needs somebody to physically arrive calls the
+national numbers. Placement follows the standing rule — the claim is made
+**while conversing**, in the messages after the handover, so it belongs in the
+prompt and not in a tool description. 3,864 → 4,078 chars.
+
+**Measured.** Same four-turn arc, 3 runs offline: the dispatch claim is gone
+3/3, replaced by `יחזרו אליכם` and a pointer to 100/101/102. Live probe of the
+same arc after both changes: `reason: "emergency"`, one transfer on the first
+turn, no repeat, no dispatch claim in any of three replies, and **`cleanup
+requests 1`** where the identical arc had printed `requests 0`.
+
+**Found and NOT fixed, deliberately.** `Promised a transfer, made none?` is
+dead. It reads `$('transfer_to_human').isExecuted` and returns false when that is
+true — and `isExecuted` is spuriously true, the same defect removed from the
+phantom guard the day before. So a reply that promises a handover without making
+one goes out unchallenged, which offline reproduces about one run in three. There
+is no reference-shaped signal to test the way the ticket guard tests a number,
+and the only honest fix is to stop asking and transfer whenever the reply
+promises one — firing twice costs a spare `call_outcomes` row and nothing else,
+since the backstop already checks for a prior request. **Not shipped as a third
+change in one pass.** The owner decides.
+
+Also seen and left alone: markdown bullets returned in one long emergency reply,
+and one offline run wrote `אני מבינה` in the feminine despite the prompt's
+masculine line.
+
 ### Pushing the prompt reverted Ido's voice, and the warning was already written
 
 `vapi_sync.py inbound --apply` writes the WHOLE assistant, not the prompt. It

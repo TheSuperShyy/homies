@@ -577,6 +577,10 @@ no wording that makes a complete, sendable sentence safe to show a model: if
 it is in the prompt it will be sent, so the only way to stop the reciting is
 to leave nothing to recite.
 
+**An enum is prompt text, and one wrong-but-valid word can disable a safety net silently.** `transfer_to_human` offered `distress` beside `emergency`; the emergency backstop that writes a ticket when a handover leaves no record fires only on `emergency`, so the word that best described a hurt resident was the word that skipped the net — stored without complaint, reported by nothing. **When a guard keys on one value, no sibling value may describe the same situation better.** Fixed by removing the word from the channel that misused it, not by widening the guard, because the voice agent means something else by it.
+
+**If the bot can claim it, the facts block has to deny it.** It told a resident the team was on the way. Nothing said otherwise — there is no dispatch, and no sentence anywhere said so — so the model supplied the most reassuring thing that fitted. A capability the product does not have needs a stated fact, not a rule; it sits with office hours and the emergency numbers, and it is one line.
+
 **Never ask an n8n tool node whether it ran; ask the reply.** `isExecuted` is spuriously true and `.all()` throws from inside a downstream If — one makes a guard useless, the other makes it fire on everything, and both shipped on 1 Sep. The honest signal is in the output itself: a reference number exists only because the tool returned one, and ours have a fixed shape, so a claim without one is a phantom. **Guard on evidence the model could not have fabricated, not on workflow introspection.**
 
 **An instrument that reads the wrong node will hide a working guard and invent a broken one.** `probe_whatsapp.py` read the agent's raw output, but three nodes can replace a reply before it is sent. Any tool that reports what the bot said must read the LAST writer, and the last run of it.
