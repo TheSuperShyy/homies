@@ -71,6 +71,41 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### "But make sure its not templated" — measured, and it is not
+
+The owner's one condition on the closing acts, checked the honest way: more
+samples. Two probe arcs on test numbers (5 model calls): a question answered
+from the prompt (office line) then a goodbye, and a full leak ticket
+(`255-1190-26`) then a decline.
+
+**Three completion offers, no two alike:**
+`יש משהו נוסף שאוכל לעזור לכם בו?` (owner's ticket) /
+`צריכים משהו נוסף?` (office line) /
+`אם תצטרכו משהו נוסף, אל תהססו לפנות אלינו.` (probe ticket — a statement,
+not even a question).
+
+**Four outros, no two alike:**
+`אין בעיה. אם תצטרכו עזרה נוספת בעתיד… אתם מוזמנים לפנות אלינו. יום טוב!` /
+`בכיף, אנחנו כאן לכל דבר. שיהיה לכם יום טוב!` /
+`בכיף, ערב טוב גם לכם! אל תהססו לפנות אם תצטרכו משהו נוסף.` /
+`בשמחה! אם תצטרכו עזרה נוספת בעתיד, אנחנו כאן. שיהיה לכם יום טוב!`
+The third answered the resident's own `ערב טוב` in kind — generation, not
+recitation. Shared register (`בכיף`, `אם תצטרכו`, `יום טוב`) reads as a
+person's habits, which humans also have; no sentence repeats.
+
+None of the four contains the verbatim intro sentence (no menu stapled to a
+goodbye), none asks a question after parting, and nothing resembling the
+removed `עוד משהו?` dropdown came back.
+
+**Counter-sample for the open first-contact echo:** the probe's fresh-number
+fault report opened with the verbatim intro AND engaged the leak in the same
+message (`נשמע שמדובר בנזילה רצינית…`). Tally now 1 of 4 first-contact
+samples dropping the substance.
+
+**Known limit, stated to the owner:** variety is measured across threads. One
+thread's buffer can echo its own previous goodbye back — that is memory
+behaving as memory, aged out inside 12 exchanges, not a template.
+
 ### A matter ends with an offer, a conversation with a goodbye, and neither is a sentence
 
 The owner, on an arc he called amazing up to its last line: *"after creating
