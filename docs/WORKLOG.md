@@ -1814,6 +1814,14 @@ does, the two pages would have reported different money for the same resident.
 A resident with only review months appears with `—` for the total rather than
 being dropped.
 
+**And then the fix was made unnecessary.** Documenting "these two pages must
+use the same statuses" is a note somebody has to read at the right moment.
+`OUTSTANDING` now lives in `lib/money.ts` beside `shekels` and `month`, both
+pages import it, and the coupling is enforced by the compiler rather than by
+memory. The file's reason for existing is now three-for-three: every export in
+it is a way two screens could have disagreed about one resident's money, and
+the status list is the one that actually did.
+
 **The first version was wrong and testing caught it.** It took the ids from the
 residents panel so the two sections could not disagree — but that panel is
 capped at 8 and ordered by name, so searching `גולן` listed eight Golans who

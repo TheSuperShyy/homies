@@ -347,6 +347,18 @@ PDF's example shows.** Both were found by probing and both are places where
 trusting the document would have failed silently — a wrong status value returns
 zero rows and no error, and the wrong envelope key returns one bogus row.
 
+**Two screens reading one table must share the PREDICATE, not just the
+formatter.** `shekels` and `month` were extracted so `/debts` and `/search`
+could not round a resident's total differently — and the same bug was already
+sitting one layer down, in the `WHERE`: search filtered charges to `unpaid`
+while debts read `unpaid, disputed, pending_charge`. Nothing looked wrong,
+because no row carries the other two today; it would have surfaced months later
+as two pages quoting different money for one person, with no error anywhere. A
+subset of an enum, hand-written at two call sites, is a divergence waiting for
+the first row that exercises it. The list lives in `dashboard/lib/money.ts` as
+`OUTSTANDING` and both pages import it. Extract the filter with the formatter,
+or do not bother extracting.
+
 **A panel that answers a question about a person must not inherit another
 panel's cap.** Search's debt section was first built from the ids of the
 residents panel above it, so the two could never disagree about who matched —
