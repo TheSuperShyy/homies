@@ -203,7 +203,9 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 8
+MEMORY_EPOCH = 9
+# 8 -> 9: how a matter ends went into the prompt (offer more, then a warm
+# parting), so buffers holding dead-stop ticket confirmations retire.
 # 7 -> 8: the owner's thread holds three worked examples of the get_balance
 # apartment interrogation, which the schema fix below this epoch removes.
 # 6 -> 7, same evening: the quoted opener grew its ownership clause after
@@ -223,7 +225,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "69102d8c6278",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "3fa8703af07b",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "6e19bca8b5ab",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

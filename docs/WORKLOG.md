@@ -71,6 +71,46 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### A matter ends with an offer, a conversation with a goodbye, and neither is a sentence
+
+The owner, on an arc he called amazing up to its last line: *"after creating
+the ticket it is dead. it did not even ask if can i do anything else for
+you?... the bot should have an outro as well... but i dont want it to be
+fixed."* The confirmation for `255-1188-26` ended `אנו נטפל בה בהקדם.` — full
+stop, turn dead.
+
+**The hole had a history.** The canned follow-up menu — `עוד משהו?` plus the
+rows, stapled to every completed flow by a question-mark If — came out on
+31 Aug because it was a dropdown after every ticket number. Its FORM was the
+problem; its FUNCTION was never replaced, and the prompt told the model to say
+less when it has nothing to add, so it ended matters with silence.
+
+**The fix is one prompt paragraph describing three acts and supplying zero
+sentences:** a message that completes a matter offers help with anything else,
+in the model's words; when the resident thanks or parts or says that is all,
+the bot parts warmly — thanks them for reaching out, wishes something small,
+and stops. The last clause ("no more questions after the goodbye") keeps the
+offer rule and the outro from fighting each other. Epoch 8 → 9, forced by the
+guard as designed.
+
+**Measured.** A ticket confirmation now reads
+`…ומספרה 255-1189-26. אנחנו כבר מטפלים בזה. / יש משהו נוסף שאוכל לעזור לכם בו?`
+Two closings from two threads:
+`אין בעיה. אם תצטרכו עזרה נוספת… אתם מוזמנים לפנות אלינו. יום טוב!` and
+`בכיף, אנחנו כאן לכל דבר. שיהיה לכם יום טוב!` — different in everything but
+warmth, which is "not fixed" made measurable. Neither contains the verbatim
+intro sentence, so the echo-menu clause stays out of goodbyes.
+
+**Also finally exercised, by accident:** `רוטשילד 1 רמת גן` turned out not to
+be managed either, so the street_unknown path ran for real — and the reply
+asked whether the name was written differently, **with no invented building
+list**. The 1 Sep fabrication is confirmed gone under the tool-silence line.
+
+**Data point added to the open first-contact echo:** one of three post-clause
+first-contact replies was the verbatim intro alone, with the fault it was
+replying to ignored (the menu rode along, so the resident got choices rather
+than silence). Still open, still measured, still not chased.
+
 ### "wassap" never met the menu, and the schema turned out to be a prompt too
 
 The owner's 20:21 transcript: three English greetings clarified at, in the
