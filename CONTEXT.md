@@ -577,6 +577,8 @@ no wording that makes a complete, sendable sentence safe to show a model: if
 it is in the prompt it will be sent, so the only way to stop the reciting is
 to leave nothing to recite.
 
+**A tool description is read at the moment that tool is chosen, and nowhere else.** Telling `transfer_to_human` to go back and open a ticket afterwards did nothing, because the address arrives two turns later and by then the model is not reading that text. Moved into `open_request` it worked immediately. **An instruction about what to do LATER belongs on the tool that acts later, or in the prompt — never on the tool being called now.**
+
 **An enum is prompt text, and one wrong-but-valid word can disable a safety net silently.** `transfer_to_human` offered `distress` beside `emergency`; the emergency backstop that writes a ticket when a handover leaves no record fires only on `emergency`, so the word that best described a hurt resident was the word that skipped the net — stored without complaint, reported by nothing. **When a guard keys on one value, no sibling value may describe the same situation better.** Fixed by removing the word from the channel that misused it, not by widening the guard, because the voice agent means something else by it.
 
 **If the bot can claim it, the facts block has to deny it.** It told a resident the team was on the way. Nothing said otherwise — there is no dispatch, and no sentence anywhere said so — so the model supplied the most reassuring thing that fitted. A capability the product does not have needs a stated fact, not a rule; it sits with office hours and the emergency numbers, and it is one line.

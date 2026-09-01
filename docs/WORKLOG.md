@@ -83,6 +83,60 @@ Also seen and left alone: markdown bullets returned in one long emergency reply,
 and one offline run wrote `אני מבינה` in the feminine despite the prompt's
 masculine line.
 
+### A handover is not a ticket, and the sentence that said otherwise was mine
+
+The owner, after the backstop went in: *"it still need to open a ticket."*
+Right. The backstop writes a `needs_review` stub so an emergency is not
+invisible; it is a floor, not the thing a resident is owed. Nobody had opened an
+actual ticket, and on WhatsApp the stub's reference never even reaches the model
+— the n8n router answers a write locally, so `emergency_reference` comes back to
+nothing.
+
+**The sentence that caused it.** `transfer_to_human` ended its emergency
+paragraph with *"If a message contains both, this one wins."* That is a
+straightforward instruction to transfer INSTEAD of opening a ticket, and the
+model followed it exactly. It was written on 31 Aug to fix zero transfers in six
+runs, and it over-corrected — the third time this month that a line of mine
+argued with the logic it was meant to serve.
+
+**Placement decided this, twice, and the first attempt failed.** Replacing it
+with *"come back to it: ask where they are and open the ticket"* changed
+nothing. Live: handover on turn two, the building and flat on turn three, and
+the reply was `תודה רבה על הפרטים. אני מעדכן את הצוות במיקום` — I am updating
+the team on the location — with no call to anything, and no update tool exists.
+**The address arrives two turns after the handover, and `transfer_to_human`'s
+description is what the model reads at the moment it decides to transfer.** The
+instruction went into `open_request` instead, which is what it reads when the
+address lands, and `transfer_to_human` kept only the one-line fact that handing
+over does not open a ticket. Same rule that moved the department-representative
+wording the other way on 31 Aug.
+
+**One incident had to stay one row.** An emergency transfers BEFORE it asks
+where anybody is — that is the point of the rule — so the stub always exists by
+the time the address arrives, and telling the model to open a ticket afterwards
+would have meant two rows for one fall down the stairs. The duplicate guard
+cannot catch that: it matches on building and type, and the stub has no type and
+usually no building.
+
+So `open_request` now **completes the stub in place** and keeps its reference.
+The backstop marks its row `oxs_ref: "partial:emergency_transfer"` — the other
+rescue rows already carried a `partial:` marker and this one did not, and
+identifying it by shape would have caught a genuinely separate emergency ticket.
+The description appends rather than replaces, because what somebody said while
+frightened is the only account of the moment the emergency was live. Urgency
+stays `emergency` whatever the later, calmer call rates it, and the status stays
+`needs_review`. Edge Function version 54.
+
+**Measured live, twice each.** Emergency arc: transfer fires, then the address
+arrives and a ticket opens — `255-1174-26` and `255-1175-26`, read back to the
+resident, `completed_emergency: true`, and **one row per conversation**.
+Ordinary fault unchanged: asks for the address, opens `255-1176-26`.
+
+**Still open, and still not chased.** The first turn of one probe promised
+`אני מעביר את הדיווח שלכם` with no tool call behind it. That is what
+`Promised a transfer, made none?` exists to catch and it is dead — see the entry
+above.
+
 ### Pushing the prompt reverted Ido's voice, and the warning was already written
 
 `vapi_sync.py inbound --apply` writes the WHOLE assistant, not the prompt. It

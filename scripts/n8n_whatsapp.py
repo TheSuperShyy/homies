@@ -675,6 +675,17 @@ TOOLS = [
     {
         "name": "open_request",
         "description": (
+            # 1 Sep. An emergency handover leaves no ticket — `transfer_to_human`
+            # writes a note, and nothing searches notes. Live: somebody fallen
+            # on the stairs, a handover on turn two, the building and flat given
+            # on turn three, and the reply was "I am updating the team on the
+            # location" with no call to anything. The model believed the matter
+            # was already handled, and the address is exactly the fact it had
+            # been waiting for.
+            "Handing the conversation to a person does NOT open a ticket. If "
+            "you already transferred and the address only arrives afterwards — "
+            "which is what an emergency looks like, because the person comes "
+            "before the address — that is the moment to call this.\n"
             "Open a maintenance or service ticket. Call it as soon as you "
             "know WHAT is wrong and WHERE — it verifies the address itself, "
             "inside the same call: a building Homies does not manage opens "
@@ -855,8 +866,22 @@ TOOLS = [
             "anybody reporting gas, fire, flooding, or water near "
             "electricity. A burst pipe is a ticket. A person who cannot get "
             "out is this, and it happens first — before you ask where they "
-            "live, before anything else. If a message contains both, this one "
-            "wins.\n"
+            "live, before anything else.\n"
+            # "If a message contains both, this one wins" used to close that
+            # paragraph, and it cost a real conversation on 1 Sep: somebody
+            # fallen on the stairs, five turns, a handover, and no ticket. The
+            # model read it as the transfer REPLACING the ticket, which is what
+            # it says. It was written to fix zero transfers in six runs and it
+            # over-corrected.
+            #
+            # The instruction to go back and open the ticket lives in
+            # `open_request`, not here. Put here first, and it did nothing: the
+            # address arrives two turns after the handover, and this text is
+            # what the model reads at the moment it decides to transfer, not at
+            # the moment it learns where they are. Same placement rule that
+            # moved the department-representative wording INTO this description
+            # on 31 Aug, applied in the other direction.
+            "Handing over does not open a ticket and does not replace one.\n"
             # The owner's correction, 31 Aug: they are department
             # representatives, not "a human representative". Put here rather
             # than in the prompt because a bullet in the prompt's facts list

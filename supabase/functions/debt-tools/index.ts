@@ -1715,11 +1715,75 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       residentId = who?.[0]?.id ?? null;
     }
 
+    // --- Finish the emergency stub rather than write beside it --------------
+    //
+    // An emergency hands over BEFORE it asks where the resident is — that is
+    // the whole point of the rule, and it means the backstop's `needs_review`
+    // row already exists by the time the address arrives and this runs. Two
+    // rows for one incident is the obvious next bug, and the duplicate guard
+    // above cannot catch it: the stub has no type and usually no building,
+    // which are the two columns that guard matches on.
+    //
+    // So the stub is completed in place and keeps its reference. The resident
+    // is read back the number their emergency already has, the team sees one
+    // ticket that grew details instead of a fragment beside a real one, and
+    // nothing has to be reconciled later.
+    //
+    // Scoped by the marker the backstop writes and nothing else does. Matching
+    // on the row's shape — no type, needs_review, emergency — would also catch
+    // a genuinely separate emergency ticket somebody had filed by hand.
+    const iid = await interactionId(ctx);
+    let stub: any = null;
+    if (iid) {
+      const { data: found } = await db.from("requests")
+        .select("id,reference,description")
+        .eq("interaction_id", iid)
+        .eq("oxs_ref", "partial:emergency_transfer")
+        .eq("status", "needs_review")
+        .limit(1);
+      stub = found?.[0] ?? null;
+    }
+
+    if (stub) {
+      // Append, never replace — the same convention as the duplicate guard and
+      // add_request_detail. The stub's description is what the resident said
+      // while they were frightened, and it is the only account of the moment
+      // the emergency was live; the fuller description that arrives afterwards
+      // is worth more but does not supersede it.
+      const fresh = String(args.description).trim();
+      const held = String(stub.description ?? "");
+      const merged = !fresh || held.includes(fresh)
+        ? held
+        : (held ? held + " | " + fresh : fresh);
+      const { error: upErr } = await db.from("requests")
+        .update({
+          resident_id: residentId,
+          type,
+          description: merged,
+          building,
+          unit,
+          reported_unit: reportedUnit,
+          // Stays `emergency` however this call rates it. The urgency was set
+          // by somebody in trouble, and a later, calmer sentence describing the
+          // same incident must not quietly downgrade it.
+          urgency: "emergency",
+          // `needs_review` still: nothing about completing the row makes a
+          // person's emergency safe to treat as an ordinary open ticket.
+          oxs_ref: null,
+        })
+        .eq("id", stub.id);
+      if (upErr) return { ok: false, error: upErr.message };
+      if (m.status === "found") {
+        await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id);
+      }
+      return { ok: true, reference: stub.reference, completed_emergency: true };
+    }
+
     const { data, error } = await db
       .from("requests")
       .insert({
         resident_id: residentId,
-        interaction_id: await interactionId(ctx),
+        interaction_id: iid,
         type,
         description: String(args.description),
         building,
@@ -2093,6 +2157,18 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           urgency: "emergency",
           status: "needs_review",
           opened_via: channel(ctx),
+          // MARKED, so open_request can finish this row instead of writing a
+          // second one. 1 Sep: the WhatsApp bot is now told that handing over
+          // does not open a ticket and that it must still open one once the
+          // resident is safe — which on an emergency always arrives AFTER this
+          // stub exists, because the person comes before the address. Without
+          // a marker that would be two rows for one incident, and the
+          // duplicate guard cannot catch it: this row has no type and often no
+          // building, and that guard matches on exactly those.
+          //
+          // The other rescue rows already carry a `partial:` marker; this one
+          // did not, and identifying it by its shape would have been a guess.
+          oxs_ref: "partial:emergency_transfer",
         }).select("reference").single();
         emergency_reference = em?.reference ?? null;
       }
