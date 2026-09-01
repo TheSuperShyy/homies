@@ -115,6 +115,40 @@ OXS note history now opens: `+2 earlier` was plain text with no way to read
 them, and is now a `<details>` disclosure, no client JS, so `nav.tsx` stays the
 only component that crosses into the browser.
 
+### /sync stops reporting the scheduler and starts reporting the import
+
+Half of "Recent runs" was `skipped — wrong hour`. Those are real and they are
+permanent: GitHub's cron is UTC with no daylight saving, so `oxs-sync.yml`
+schedules both possible Israel offsets and the wrong twin exits in seconds,
+twice a day, for ever. Listing them meant a reader looking for the last real
+import had to skip every other row to find one — a standing report about the
+scheduler where news about the data should be.
+
+The table now reads a filtered list. Three things kept it honest:
+
+- `lastReal`, `lastFail` and `running` still read the UNFILTERED list, so no
+  banner changes behaviour.
+- A failure can never be hidden — `skippedTwin` requires conclusion `success`.
+- The footnote says how many went, per the standing rule that a list dropping
+  rows has to admit it. `per_page` went 8 → 20 so the table still fills.
+
+`sync.stateSkipped` is gone and `sync.hidden` replaces it. Two bugs caught in
+the rewrite before they shipped: the English footnote had an unescaped
+apostrophe in "GitHub's" that closed the string, and the Hebrew said
+`שתי יבואות` — the customs sense of "imports". Now `הייבוא רץ פעמיים ביום`.
+
+**Also established while answering "is the import at 12am and 3pm?": no.** Two
+workflows run `oxs_requests_sync.py`, not one. `oxs-sync.yml` still has a
+`Maintenance requests` step even though `oxs-requests.yml`'s own header says the
+import was extracted precisely so it would stop riding the 28-minute arrears
+sweep — it was never removed from the old home. And `oxs-sync.yml` has no
+`concurrency` group where `oxs-requests.yml` does, so both can run the importer
+at once on the same key; harmless at six requests a run, but the departed-ticket
+loop paces at ~57/min against a 60/min limit, so two overlapping catch-ups would
+breach it. Neither touched — they are changes to scheduled jobs and the owner
+has not chosen yet. Observed landing times, Israel: the 00:00 run at
+01:59-04:02, the 15:00 run at 19:29-22:21.
+
 ### Nothing I fixed was running, because scheduled workflows run from `main`
 
 The dashboard still showed `gone from OXS` hours later. Neither the badge nor

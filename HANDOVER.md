@@ -1934,6 +1934,19 @@ exists. Never print a value, never commit one, never paste one into chat.
 
 ---
 
+**`/sync` hides the wrong-hour twins, so its run list is shorter than GitHub's.**
+`oxs-sync.yml` is scheduled at both possible Israel offsets and the wrong one
+exits in seconds; those rows are filtered out of the table and the footnote
+counts them. A short list is not a missing run. The failure banners read the
+unfiltered list, and a failed run is never hidden.
+
+**`oxs_requests_sync.py` runs in BOTH workflows.** `oxs-requests.yml` was
+created to take it out of `oxs-sync.yml`, but the `Maintenance requests` step
+was never deleted from the latter, so it still runs there after the arrears
+sweep. `oxs-sync.yml` also has no `concurrency` group. Not urgent — the import
+is idempotent — but two overlapping catch-up runs would cross the 60/min OXS
+limit. Both fixes are one line each and are not done.
+
 **A twelfth OXS category exists and files as `other`.** `בינוי` (construction)
 appears on live service calls. Migration 014's comment says "twelve their
 dispatchers actually use", but its `requests_type_check` lists eleven slugs and
