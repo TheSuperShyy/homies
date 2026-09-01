@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### He told an English caller "I do not understand Hebrew"
+
+A real call in English produced `אני מצטער. אני לא מבין עברית` — the opposite of
+the truth, from an agent speaking Hebrew, immediately before handing off and
+closing.
+
+**The rest of that call was correct.** The transcriber is `deepgram nova-3` on
+Hebrew, so English audio arrives as nothing or as garbage; `עדיין על הקו?` was
+the silence probe, and line 289 hands off a non-Hebrew caller. One sentence was
+wrong, and **the prompt never supplied it** — it says only "say a rep will get
+back, call `transfer_to_human`, close". The model improvised the words, and
+freeing the phrasing the night before made it improvise more.
+
+Fixed as content rather than script: **we speak Hebrew here, someone will get
+back to you**, with an explicit ban on claiming he does not understand Hebrew.
+**In the plural** — `יחזור אליכם`, not `אליך` — because that sentence is said to
+the one caller who cannot correct a wrong gender guess. And **silence is not a
+foreign language**: it now re-asks about background noise before giving up,
+which the probe confirmed. Whatever was heard goes to the office as the
+description, garbled or not, because someone there will recognise English and
+know to call back where an empty note says nothing.
+
+Live at 27,959 chars, voice restored after the push as always, both verified
+against the API.
+
+**The finding that outlasts this bug: `prompt_chat.py` cannot see it.** The model
+reads English text perfectly well and answers in Hebrew, so the failure only
+exists once real audio meets a Hebrew-only transcriber. It had to be reproduced
+by typing what Deepgram emits for English speech. **Every ASR-layer and
+audio-layer failure is invisible to every test in this repo**, which is why the
+owner's calls keep finding things the probes do not.
+
+
 ### The openness rewrite is live, and the voice clobber happened again
 
 `vapi_sync.py inbound --apply` then `vapi_set_voice.py --apply`, on the owner's

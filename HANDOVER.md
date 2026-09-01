@@ -2335,8 +2335,21 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
-**THE INBOUND PROMPT REWRITE IS LIVE (`0587640`), 27,156 chars, verified against
-the API together with the voice.** The
+**INBOUND IS LIVE AT 27,959 CHARS, voice `ba765d50`, both verified against the
+API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
+English callers `אני לא מבין עברית`.
+
+**An English-speaking caller cannot be served by this agent and that is by
+design.** `deepgram nova-3` is on Hebrew, so English audio arrives empty or
+garbled and the caller gets a hand-off note. **The English twin
+`713874a1-5e3c-4c47-b0e8-7e4e75c1e83b` exists and is unused.** If English-speaking
+residents are real, routing to it beats handing off — but that is a
+phone-number-level decision and there is no number.
+
+**NO TEST IN THIS REPO CAN SEE THE AUDIO LAYER.** `prompt_chat.py`,
+`prompt_probe.py` and `facts_check.py` all stop at the model. Transcription,
+endpointing, pace and interruption are only observable on a real call, and four
+defects so far were found that way and no other.** The
 change makes the agent stop reading from a script — worked examples became
 required *contents* with free wording. **Re-probe in this order after any further
 edit, because all three broke during it:** (1) both emergency tools fire on a

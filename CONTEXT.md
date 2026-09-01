@@ -2039,6 +2039,21 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**A sentence the prompt does not supply is a sentence the model will invent, and
+freeing the phrasing raises the stakes on every one of them. 1 Sep.** The
+non-Hebrew hand-off had no words attached — only "say a rep will get back" — and
+came out as `אני לא מבין עברית`, said by an agent speaking Hebrew. **Audit for
+places that name an action but no content, especially anything said to someone
+who cannot correct you** — a caller who does not share your language, or is
+frightened, or is about to hang up.
+
+**And the text harness is blind below the model. 1 Sep.** `prompt_chat.py` reads
+English fine and answers in Hebrew, so it cannot reproduce what happens when
+English audio meets `deepgram nova-3` on Hebrew. **Transcription, endpointing,
+pace, pronunciation and interruption are invisible to every test in this repo.**
+The owner's real calls have found four defects the probes could not, and that
+ratio is a property of the tooling, not of luck.
+
 **An indented example is an instruction to say the line inside it. Decided
 31 Aug.** No disclaimer above it changes that — WhatsApp proved it there first
 (*"saying 'not a fixed formula' next to a complete sentence does not stop the
