@@ -347,6 +347,17 @@ PDF's example shows.** Both were found by probing and both are places where
 trusting the document would have failed silently — a wrong status value returns
 zero rows and no error, and the wrong envelope key returns one bogus row.
 
+**A per-row flag must measure something about the row.** This was got wrong
+twice in one day on the same badge. "gone from OXS" fired on any ticket not seen
+for 45 minutes — but if the importer has not run, every open ticket is stale at
+once and none of them has gone anywhere, so it lit all 54 while 0 were missing.
+The test: if the flag would turn on for every row at the same instant because of
+something outside the row, it is a system fact wearing a row's clothes, and it
+belongs wherever that system is reported. Here the fix was to compare each
+ticket against the newest stamp in the table — which IS the last run — instead of
+against the clock. Importer lag has one value for the whole system and lives on
+/sync.
+
 **A status list may hide rows; the state it derives may not.** Half of `/sync`
 was `skipped — wrong hour` — real runs, permanent by design, and pure noise to
 anyone looking for the last real import. Filtering them out is right, and the

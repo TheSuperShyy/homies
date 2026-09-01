@@ -1934,6 +1934,13 @@ exists. Never print a value, never commit one, never paste one into chat.
 
 ---
 
+**The tickets page flags a ticket the LAST IMPORT could not find in OXS**, not
+one that is merely old. It compares each row's `oxs_last_seen_at` against the
+newest stamp in the table, which is when the importer last looked. Nothing
+renders in the ordinary case. Do not reintroduce a clock-based version: it lights
+every open ticket whenever the importer is behind, which with ~5 runs a day is
+most of the day. Importer lag belongs on /sync.
+
 **`/sync` WATCHES ONLY `oxs-sync.yml`.** `WORKFLOW` in
 `dashboard/app/(app)/sync/page.tsx` is a single constant, so the page shows the
 twice-daily residents/arrears job and nothing else. **`oxs-requests.yml` — the
