@@ -2041,6 +2041,16 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**Write required lines as standalone sentences, never inside a clause. 1 Sep,
+after three failures in a row.** Two things the agent had to convey were written
+as `שהקו הזה עברי, ושנציג יחזור אליהם` — a grammatical list — and it said the
+list, fragment `ש` and all. **Adding "phrase this as a full sentence" changed
+nothing**, because the literal text outranks an instruction about the text.
+**Anything the agent must say has to appear in the prompt exactly as a person
+would say it**, or not appear at all. And a numbered list of what a turn must
+contain silently becomes the *whole* turn: the closing phrase dropped off three
+of three until it was made item three.
+
 **A sentence the prompt does not supply is a sentence the model will invent, and
 freeing the phrasing raises the stakes on every one of them. 1 Sep.** The
 non-Hebrew hand-off had no words attached — only "say a rep will get back" — and

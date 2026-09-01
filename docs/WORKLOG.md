@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Hebrew stays the line's language, and English stops being a rejection
+
+The owner's intent was never a language hand-off: understand English and Hebrew,
+always answer in Hebrew. Asked which way to resolve the transcriber trade-off,
+they chose **Hebrew-first**, so `deepgram nova-3` on `he` does not move and no
+latency is spent.
+
+**Deepgram could not have done both anyway.** `nova-3 language=multi` covers ten
+languages — English, Spanish, French, German, Hindi, Russian, Portuguese,
+Japanese, Italian, Dutch — and **Hebrew sits outside that set as a separate
+monolingual model**, so `multi` would gain English and lose Hebrew. The provider
+that does both is ElevenLabs `scribe_v2_realtime` (90+ languages, auto-detect,
+mid-call switching), which was this project's transcriber until 12 Aug and was
+swapped out for latency, 700ms against 300ms. Offered, not taken. **If English
+speaking residents ever become real, that is the switch**, and
+`scripts/vapi_latency.py` exists to re-measure the 700ms, which is a year old
+against a 150ms claim today.
+
+So the prompt now says: the line is Hebrew and every answer is Hebrew; but a
+sentence that *does* arrive and is understood gets ordinary service, and only
+genuinely unreadable input takes the hand-off. Live at 28,353.
+
+**Three attempts, each failing the same way, and it is the third time today.**
+The two required lines were written inside a subordinate clause, so the agent
+said the clause — `ושנציג יחזור אליכם`, a fragment rather than a sentence.
+Adding "phrase it as a full sentence" changed nothing: **it copies the literal
+text, and an instruction not to does not outrank the text.** Only writing them
+as two standalone sentences fixed it.
+
+**Then the numbered list swallowed the ending.** The agent said both items and
+stopped — no closing phrase, three of three — which leaves the line open in
+silence in front of someone who has already stopped understanding. The closing
+sentence is item three now, and the probe counts it on every run.
+
+Three gendered slips found on the way — `אליך`, `תרצה`, `דיברת` — all inside the
+one sentence spoken to the caller least able to correct a wrong guess.
+
+
 ### He told an English caller "I do not understand Hebrew"
 
 A real call in English produced `אני מצטער. אני לא מבין עברית` — the opposite of

@@ -2340,6 +2340,17 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
 API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
 English callers `אני לא מבין עברית`.
 
+**HEBREW-FIRST IS A DECISION, MADE 1 SEP, NOT AN OVERSIGHT.** The transcriber
+stays `deepgram nova-3` on `he` (300ms). English audio therefore still arrives
+empty or garbled — but the prompt no longer *rejects* English: anything that
+reaches the model and is understood gets ordinary service, answered in Hebrew,
+and only unreadable input takes the hand-off. **The switch, if English-speaking
+residents become real, is ElevenLabs `scribe_v2_realtime`** — 90+ languages
+including Hebrew, auto-detect, mid-call switching. It was live here until 12 Aug
+and lost on latency, 700ms vs 300ms; that figure is a year old against a 150ms
+claim today, and `scripts/vapi_latency.py` re-measures it. **`nova-3
+language=multi` is NOT an option: Hebrew is outside its ten-language set.**
+
 **An English-speaking caller cannot be served by this agent and that is by
 design.** `deepgram nova-3` is on Hebrew, so English audio arrives empty or
 garbled and the caller gets a hand-off note. **The English twin
