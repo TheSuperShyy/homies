@@ -115,6 +115,35 @@ OXS note history now opens: `+2 earlier` was plain text with no way to read
 them, and is now a `<details>` disclosure, no client JS, so `nav.tsx` stays the
 only component that crosses into the browser.
 
+### Search answers "what does this person owe, and for which months"
+
+Asked for: type a name, see that resident's debt broken down by month. A new
+`Debt by month` section in search, above Residents — somebody who typed a name
+and is owed money wants the number first and the contact details second.
+
+Each resident who owes is one row: name, building, every unpaid month with its
+own amount, and their total. The per-month amounts matter and are not decoration
+— דניאלה גולן owes ₪4,992 × 3 while נתנאל וליה גולן owes ₪475 × 5, and the
+rate changing mid-year or a flat joining late shows up here and nowhere else on
+the dashboard. The apartment is printed per month only when an owner's charges
+span more than one flat, which is what migration 012 exists for.
+
+**Unpaid only**, by choice: `status` also carries paid, disputed, waived and
+pending_charge, and a total quietly including a waived month gets somebody
+chased for money they do not owe.
+
+**The first version was wrong and testing caught it.** It took the ids from the
+residents panel so the two sections could not disagree — but that panel is
+capped at 8 and ordered by name, so searching `גולן` listed eight Golans who
+owed nothing and reported **no debt at all**, while דניאלה גולן sat ninth
+alphabetically owing ₪14,976. Rebuilt as one query joining `charges` through
+`residents!inner`, capped and sorted on its own: `גולן` now returns four owing
+residents, biggest first. The general form is in CONTEXT.
+
+`shekels` and `month` were about to be copied from the debts page, so they moved
+to `dashboard/lib/money.ts` and both pages import them. Two copies of a rounding
+rule is two different totals for one resident on two screens.
+
 ### The badge I shipped this morning lit all 54 open tickets and meant nothing
 
 Reported from the dashboard: `not in OXS for 1h, still open`, on row after row.

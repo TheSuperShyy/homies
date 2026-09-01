@@ -1934,6 +1934,17 @@ exists. Never print a value, never commit one, never paste one into chat.
 
 ---
 
+**Search has a `Debt by month` section**, above Residents. A name, phone,
+building or apartment matches, and each resident who owes is listed with every
+unpaid month and its own amount — the rates are not equal month to month, and
+this is the only place on the dashboard that shows the per-month breakdown.
+Biggest debt first, capped at 8 with the usual "showing N of M" line. **Unpaid
+only**: `charges.status` also carries paid, disputed, waived and
+pending_charge, and a total including a waived month would get somebody chased
+for money they do not owe. `shekels` and `month` moved to `dashboard/lib/money.ts`
+and both pages import them — two copies of the rounding rule would mean two
+different totals for one resident on two screens.
+
 **The tickets page flags a ticket the LAST IMPORT could not find in OXS**, not
 one that is merely old. It compares each row's `oxs_last_seen_at` against the
 newest stamp in the table, which is when the importer last looked. Nothing

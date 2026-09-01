@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, label, translator, when, type Locale, type T } from '@/lib/i18n';
 import { IconInbox, IconOpenLink, IconSearch } from '@/components/icons';
+import { month, shekels } from '@/lib/money';
 
 /**
  * One box for the whole dashboard.
@@ -97,7 +98,7 @@ export default async function Search({ searchParams }: {
 
   // Four independent queries, so they go together rather than one after
   // another — the slowest one sets the wait, not the sum of them.
-  const [tickets, residents, msgs, calls] = ready
+  const [tickets, residents, msgs, calls, charges] = ready
     ? await Promise.all([
         db.from('requests')
           .select('reference,description,building,unit,status,urgency,created_at',
@@ -131,12 +132,61 @@ export default async function Search({ searchParams }: {
             `caller_phone.ilike.${like}`, `external_call_id.ilike.${like}`,
           ].join(','))
           .order('started_at', { ascending: false }).limit(LIMIT),
+        // WHAT A NAME OWES, BY MONTH.
+        //
+        // Joined from `charges` through the resident rather than filtered by
+        // the ids of the residents panel above. That was the first attempt and
+        // it was quietly wrong: the panel is capped at LIMIT and ordered by
+        // name, so a search for `גולן` listed eight Golans, none of whom
+        // happened to owe anything, and reported no debt — while דניאלה גולן,
+        // ninth alphabetically, owed ₪14,976. A section that answers "does this
+        // person owe" must not depend on where their surname sorts.
+        //
+        // Unpaid only. `status` also carries paid, disputed, waived and
+        // pending_charge, and only one of those is a debt — a total quietly
+        // including a waived month gets somebody chased for money they do not
+        // owe.
+        db.from('charges')
+          .select('period,amount,unit,residents!inner(id,full_name,building,unit)')
+          .eq('status', 'unpaid')
+          .or([
+            `full_name.ilike.${like}`, `phone.ilike.${like}`,
+            `building.ilike.${like}`, `unit.ilike.${like}`,
+          ].join(','), { referencedTable: 'residents' })
+          .order('period', { ascending: true })
+          .limit(500),
       ])
-    : [null, null, null, null];
+    : [null, null, null, null, null];
+
+  // One entry per resident who owes, biggest first — the reason somebody
+  // searched a surname is almost always the largest number under it.
+  //
+  // `charges.unit` before `residents.unit`: migration 012 put the apartment on
+  // the charge because an owner can hold several, and the resident row names
+  // only one of them.
+  type Owed = {
+    id: string; name: string | null; building: string | null;
+    months: { period: string; amount: number; unit: string | null }[];
+    total: number;
+  };
+  const byResident = new Map<string, Owed>();
+  for (const c of (charges?.data ?? []) as any[]) {
+    const p = c.residents;
+    if (!p) continue;
+    let g = byResident.get(p.id);
+    if (!g) {
+      g = { id: p.id, name: p.full_name, building: p.building, months: [], total: 0 };
+      byResident.set(p.id, g);
+    }
+    g.months.push({ period: c.period, amount: Number(c.amount), unit: c.unit || p.unit || null });
+    g.total += Number(c.amount);
+  }
+  const owingAll = [...byResident.values()].sort((a, b) => b.total - a.total);
+  const owing = owingAll.slice(0, LIMIT);
 
   const counts = [tickets, residents, msgs, calls]
-    .reduce((n, r) => n + (r?.count ?? 0), 0);
-  const failed = [tickets, residents, msgs, calls].find((r) => r?.error)?.error;
+    .reduce((n, r) => n + (r?.count ?? 0), 0) + owingAll.length;
+  const failed = [tickets, residents, msgs, calls, charges].find((r) => r?.error)?.error;
 
   return (
     <>
@@ -199,6 +249,51 @@ export default async function Search({ searchParams }: {
               </table>
             </div>
             <More shown={tickets?.data?.length ?? 0} total={tickets?.count ?? 0} t={t} />
+          </Section>
+
+          {/* Above Residents on purpose: somebody who typed a name and is
+              owed money wants the number, and the resident's contact details
+              are the thing they look at second. */}
+          <Section title={t('search.debt')} count={owingAll.length}>
+            <div className="scrollx">
+              <table>
+                <thead><tr>
+                  <th>{t('col.resident')}</th><th>{t('col.where')}</th>
+                  <th>{t('debts.monthsOwed')}</th><th>{t('debts.owed')}</th>
+                </tr></thead>
+                <tbody>
+                  {owing.map((r) => (
+                    <tr key={r.id}>
+                      <td dir="auto" data-label={t('col.resident')}>{r.name ?? '—'}</td>
+                      <td dir="auto" data-label={t('col.where')}>{r.building ?? '—'}</td>
+                      {/* Every month listed with its own amount, not just a
+                          count. The rates are not equal month to month — a flat
+                          that joined mid-year, or a rate that changed, shows up
+                          here and nowhere else on the dashboard. */}
+                      <td data-label={t('debts.monthsOwed')}>
+                        <div className="months">
+                          {r.months.map((m) => (
+                            <span key={m.period + m.unit} className="mono">
+                              {month(m.period)}
+                              <span className="muted">{' '}{shekels(m.amount)}</span>
+                              {/* Only when an owner's charges span more than
+                                  one flat, which is the case migration 012
+                                  exists for. Printing it always would put the
+                                  same apartment on every line. */}
+                              {new Set(r.months.map((x) => x.unit)).size > 1 && m.unit && (
+                                <span className="muted" dir="auto">{' · '}{m.unit}</span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="mono num" data-label={t('debts.owed')}>{shekels(r.total)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <More shown={owing.length} total={owingAll.length} t={t} />
           </Section>
 
           <Section title={t('search.residents')} count={residents?.count ?? 0}>

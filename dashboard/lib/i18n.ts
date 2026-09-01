@@ -361,6 +361,7 @@ const S = {
   'search.noneHint': { he: 'שווה לנסות רק את שם המשפחה, או את ארבע הספרות האחרונות של הטלפון.',
                        en: 'Try just the surname, or the last four digits of the phone number.' },
   'search.tickets':  { he: 'קריאות',             en: 'Tickets' },
+  'search.debt':       { he: 'חוב לפי חודש', en: 'Debt by month' },
   'search.residents':{ he: 'דיירים',             en: 'Residents' },
   'search.messages': { he: 'הודעות ווטסאפ',      en: 'WhatsApp messages' },
   'search.calls':    { he: 'שיחות טלפון',        en: 'Calls' },

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
+import { month, shekels } from '@/lib/money';
 import { Pager, pageFrom, pageSlice, perParam, sizeFrom } from '@/components/pager';
 import { callButtonEnabled, callResident, phoneNumberConnected } from '@/lib/call';
 import { getLocale, translator } from '@/lib/i18n';
@@ -38,10 +39,6 @@ type Charge = {
   residents: { full_name: string; building: string; phone: string } | null;
 };
 
-const month = (p: string) => p.slice(0, 7);
-// Whole shekels. Monthly rates from OXS carry agorot (683.4), and a total of
-// ₪105,760.7 on a card reads as a typo, not as precision anybody wanted.
-const shekels = (n: number) => '₪' + Math.round(n).toLocaleString('en-US');
 const WELL_FORMED = /^\d{4}-\d{2}$/;
 const REVIEW = { disputed: 'debts.disputed', pending: 'debts.pending' } as const;
 

@@ -347,6 +347,15 @@ PDF's example shows.** Both were found by probing and both are places where
 trusting the document would have failed silently — a wrong status value returns
 zero rows and no error, and the wrong envelope key returns one bogus row.
 
+**A panel that answers a question about a person must not inherit another
+panel's cap.** Search's debt section was first built from the ids of the
+residents panel above it, so the two could never disagree about who matched —
+which sounded like a virtue and was a bug. That panel is capped at 8 and ordered
+by name, so `גולן` listed eight Golans who owed nothing and reported no debt,
+while דניאלה גולן, ninth alphabetically, owed ₪14,976. Join from the table that
+holds the answer and cap that independently. Consistency between two lists is
+worth less than either list being right.
+
 **A per-row flag must measure something about the row.** This was got wrong
 twice in one day on the same badge. "gone from OXS" fired on any ticket not seen
 for 45 minutes — but if the importer has not run, every open ticket is stale at
