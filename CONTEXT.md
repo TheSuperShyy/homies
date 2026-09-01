@@ -347,6 +347,22 @@ PDF's example shows.** Both were found by probing and both are places where
 trusting the document would have failed silently — a wrong status value returns
 zero rows and no error, and the wrong envelope key returns one bogus row.
 
+**A scheduled workflow runs from the DEFAULT branch, so a fix on a feature
+branch is not running.** Two commits' worth of importer fix sat on
+`feature/chatbot` while every scheduled run kept executing `main`'s old copy,
+and the symptom looked exactly like the fix not working. If the change is to a
+`.github/workflows` job or anything one calls, it is not live until it is on
+`main` — and where a branch carries another session's in-flight work, cherry-pick
+the commits rather than merging the branch to get there.
+
+**GitHub's cron is best-effort, and at `*/15` that means about 5 runs a day.**
+Measured 1 Sep over 30 consecutive runs of `oxs-requests.yml`: median gap 237
+minutes, worst 746. It asks for 96 and delivers 5. Do not read a `*/n` schedule
+in this repo as a frequency — it is a ceiling nobody enforces. Anything whose
+correctness depends on a real interval needs a real scheduler; anything that
+merely wants freshness must record when it actually ran, which is what
+`oxs_last_seen_at` is for.
+
 **An upsert is not a safe way to update rows that already exist.** PostgREST's
 `on_conflict=...` with merge-duplicates reads like "UPDATE if present", and it
 is not: Postgres evaluates CHECK constraints against the tuple the INSERT

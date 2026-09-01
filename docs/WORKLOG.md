@@ -115,6 +115,56 @@ OXS note history now opens: `+2 earlier` was plain text with no way to read
 them, and is now a `<details>` disclosure, no client JS, so `nav.tsx` stays the
 only component that crosses into the browser.
 
+### Nothing I fixed was running, because scheduled workflows run from `main`
+
+The dashboard still showed `gone from OXS` hours later. Neither the badge nor
+the resolver was at fault — **none of it had ever executed**. GitHub runs
+scheduled workflows from the DEFAULT branch, the work was committed on
+`feature/chatbot`, and every scheduled run since had been executing `main`'s
+copy of the old script. 22 departures had already piled back up.
+
+Cherry-picked `3947473` and `9598c05` onto `main` rather than merging the
+branch: the merge would have been **58 commits**, 56 of them the other window's
+live WhatsApp and voice work (1,611 lines of `prompt.md`, the Ido clone, four
+n8n patch scripts), and shipping someone else's in-flight work as a side effect
+of a scheduler fix is not a trade worth making. Done in a temporary worktree so
+the shared checkout never moved under the other session. One conflict, in this
+file, where both windows had added an entry under the same date — both kept.
+
+Triggered a run on `main` to confirm: 54 open, 22 departed, **21 resolved**.
+
+### The 15-minute cron is a fiction, and it has been all along
+
+`*/15 * * * *` asks for 96 runs a day. Measured over the last 30 actual runs:
+
+    asked        every 15 min, 96/day
+    delivered    5.0/day
+    median gap   237 min   (~4 hours)
+    worst gap    746 min   (12.4 hours)
+
+GitHub is dropping ~95% of them, and it is getting worse — gaps were 55-140 min
+in late August and are 170-416 min now. The workflow's own comment anticipated
+"51 minutes late", which is now wrong rather than cautious. **The only thing we
+use GitHub Actions for here is the clock, and the clock is the part that does
+not work.** Not changed yet; the owner is deciding between moving the schedule
+to n8n (which keeps the Python and replaces only the clock) and moving the
+importer into Supabase with `pg_cron` (correct, but a TypeScript rewrite).
+
+### One ticket of 292 could not resolve, and the address was why
+
+`255-27001-26`. The run said `no building id for 1 of them — left alone`, which
+is the new badge doing its job — it is the anomaly the flag now exists to show.
+
+    buildings.address   ארלוזורוב 13, רמת גן        entrance 'ב' held in its own column
+    OXS service call    ארלוזורוב 13 (ב), רמת גן
+
+The entrance letter sits in parentheses mid-string, so the address matched
+nothing, so there was no `buildingId` for the by-taskNumber lookup, so the
+ticket could never be resolved — permanently, and so could any future ticket on
+those buildings. `departed_rows` now indexes both forms. Composed rather than
+fuzzy-matched: exactly two of the 173 active buildings carry an entrance and
+neither is at a duplicated street+number, which `oxs-extractable.md` measured.
+
 **One thing found and deliberately not fixed: `בינוי` is a twelfth OXS category**
 and files as `other`. Migration 014's own comment says "twelve their dispatchers
 actually use" but its check constraint lists eleven slugs, so the twelfth was
