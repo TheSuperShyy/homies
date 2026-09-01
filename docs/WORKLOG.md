@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Audited: the intro and its menu are the only fixed text left, measured both ways
+
+The owner asked for verification that nothing is templated any more. Asserted
+from the live workflow rather than from memory, in two directions:
+
+**Static.** A resident receives words from exactly two nodes, `Send`
+(`$json.output` or `$json.text`) and `Send menu` — so a fixed sentence reaches
+somebody only if something assigns it to `text` or `menu`. The only such
+assignment left in `Sort` is `said(MENU.content)`, the bare-greeting intro. The
+Hebrew still in the workflow beyond that: the greeting-detection regex, the
+three row titles as routing keys, `אפשר לעזור בעוד משהו?` inside the dead
+`followup` object nothing reads, and the model-facing text (prompt, injected
+turn-facts, guard regexes, tool descriptions, sticky notes). None of it can be
+sent.
+
+**Empirical.** 27 live model replies from 1 Sep, **one** exact repeat:
+`בטח, בשמחה אפתח לכם קריאת שירות. ספרו לי בבקשה מה קרה.` for the same tap from
+two different numbers with no shared memory — convergence at temperature 0.6 on
+an identical three-word input, not a stored string, because the static audit
+shows there is no stored string to replay. Reported to the owner with that
+boundary stated: *no template exists* is the guarantee; *never the same sentence
+twice for the same input* is not, and the lever for that would be temperature,
+not another rule.
+
+**Seen in the same window, not this session's work:** `scripts/housekeep.py`
+auto-committed `7ddc10d` at 19:37 — the 19:33 inbound-assistant typed transcript
+plus part of a `docs/assistant/demo-inbound.md` edit — and a further edit to
+that file (the gender-neutral-questions paragraph, form over fixed wording) is
+sitting uncommitted. That is the inbound VOICE assistant demo harness
+(`prompt_chat.py`, tools mocked, gpt-4.1-mini), being worked in a parallel
+session. Left strictly alone: chatbot first, and it is somebody's mid-flight
+edit.
+
 ### The fix was live for nineteen minutes and the memory argued it down
 
 The owner tested the tap again and got the old reply back. Not similar to it.
