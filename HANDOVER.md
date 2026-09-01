@@ -2314,6 +2314,17 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
    prompt matches the repo byte for byte, six tools attached, 27 guard
    replacements, `recordingEnabled` false, transcriber `deepgram nova-3`. This
    also finally ships `8793c9f`, so the office-number stutter is gone from live.
+**THE INBOUND PROMPT WAS REWRITTEN AGAIN ON 31 AUG (`0587640`) AND IS NOT
+PUSHED.** 23,138 → 27,156 chars. Live still carries the 23,138 version. The
+change makes the agent stop reading from a script — worked examples became
+required *contents* with free wording. **Re-probe in this order after any further
+edit, because all three broke during it:** (1) both emergency tools fire on a
+stuck lift AND a hedged gas leak — `transfer_to_human` silently stopped on the
+lift, three of three; (2) no gendered verb to the caller — one run said
+`איפה את גרה`; (3) the same opening line three times gives three different
+replies. Known and open: two runs in six answer a ceiling leak with a bare
+question and no acknowledgement.
+
 **DO NOT RUN `vapi_sync.py inbound --apply` TO CHANGE A PROMPT.** It writes the
 whole assistant and hardcodes `cartesia_voice = a976c076` (Eyal), so it reverts
 Ido's clone `ba765d50` every time. It did exactly that on 31 Aug, an hour after

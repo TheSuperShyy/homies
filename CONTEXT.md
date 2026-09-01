@@ -2006,6 +2006,24 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**An indented example is an instruction to say the line inside it. Decided
+31 Aug.** No disclaimer above it changes that — WhatsApp proved it there first
+(*"saying 'not a fixed formula' next to a complete sentence does not stop the
+sentence being sent"*) and the voice prompt reproduced it. **To stop a sentence
+being said, delete the sentence; to keep a behaviour, state it as required
+content and let the words be free** — `זה תוכן ולא נוסח`. **Negative examples are
+free** and should stay: a banned wrong sentence has no right line beside it to
+copy, so it costs nothing in variety.
+
+**And openness is paid for in safety, on this agent, every time.** Freeing the
+phrasing on 31 Aug immediately produced a misgendered caller (`איפה את גרה`) and
+silently stopped `transfer_to_human` firing on a trapped person, while a
+templated agent had done both correctly for weeks. **The fixed phrasings were
+holding the rules.** Neither was recoverable by adding a ban: what worked was
+removing the need for the risky construction at all — asking where the *fault*
+is rather than where *they* live has no second-person verb to get wrong. **Prefer
+a structural fix that makes the error unsayable over a rule that forbids it.**
+
 **Measure a proposed prompt, do not argue with it. Decided 31 Aug.** A rewrite
 arrived with a confident diagnosis — constraint overload, the model freezing —
 and `prompt_chat.py --file` settled it in ten minutes and about thirty cents: it

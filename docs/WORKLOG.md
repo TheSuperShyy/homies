@@ -11,6 +11,66 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### Content, not phrasing — the voice agent stops reading from a script
+
+Three separate calls with the same opening line came back **byte-identical**.
+The prompt taught by worked example and the model executed the examples: every
+call's second turn opened with the mandated `אה`, every distressed caller heard
+the same four words, and every emergency produced the same four sentences
+because one line said `זה התור השלם, וזה כל מה שנאמר בו`.
+
+**The method was already in the file, used exactly once**, in the office-number
+branch: `זה תוכן ולא נוסח` — the things must be said, in your words, in whatever
+order suits the call. Propagated to the emergency turn, the two-way offer, the
+acknowledgement openers, the welfare question and the follow-up check.
+
+Indented examples became prose, because **an indented block is an instruction to
+say the line inside it, whatever the paragraph above it claims** — the WhatsApp
+postmortem had already proved a disclaimer does not stop the sentence being
+sent. Negative examples stayed: banning a specific wrong sentence costs nothing
+in variety, because there is no right line beside it to copy.
+
+Ported from the WhatsApp prompt: two residents with the same problem should not
+hear the same sentence, and every turn adds something the last did not. **The
+voice prompt had thirteen anti-repetition rules and every one was scoped to a
+single call** — a model could satisfy all of them and say the identical sentence
+on a hundred consecutive calls.
+
+19,978 → 27,156 chars. Measured, same line each time: **one distinct reply in
+three runs before, four in four after.**
+
+**Four regressions caused by this, all found by probing, all fixed:**
+
+1. **Gender.** Freeing the phrasing made the model invent sentences, and invented
+   Hebrew defaults to a gendered form. One run said `איפה את גרה` — misgendering
+   the caller in their own language in the first sentence, the exact failure the
+   whole gender section exists to prevent. Two of five runs leaked. Fixed with
+   the WhatsApp guard *(if a word would be spelled differently for a woman it is
+   out)* and, mattering more, **a structural fix: ask where the FAULT is, not
+   where THEY live**, and the second-person verb disappears. Six clean after.
+2. **`transfer_to_human` stopped firing on a stuck lift**, three of three, while
+   still firing on a gas leak. The contents list let the model satisfy *"the team
+   is getting it"* by saying it. Restated as **two tool calls, not one** — the
+   sentence informs nobody, the tool does. Six of six after.
+3. **Parroting returned** the moment its worked example was removed.
+4. **`אני מצטער לשמוע` became the new template** the instant the others were
+   freed — the only sympathy sentence in the file, so everything collapsed onto
+   it.
+
+**Still worse than before, and stated rather than buried:** two runs in six
+answered a ceiling leak with the bare location question and no acknowledgement
+at all. That is the coldness fixed this morning returning in a minority of
+calls, and it is the standing cost of the trade. Every fix in that direction
+pulls back toward sameness.
+
+`facts_check` fails on three facts, all on the **whatsapp** side, from the other
+session's rewording. Voice side clean. Not touched.
+
+**Committed `0587640`, not pushed.**
+
+
+## 2026-08-31
+
 ### Audited: the intro and its menu are the only fixed text left, measured both ways
 
 The owner asked for verification that nothing is templated any more. Asserted
