@@ -310,10 +310,10 @@ const S = {
                        en: 'Triggering a run needs a GitHub token with permission to start workflows, held by this app rather than by a person. Add a fine-grained token scoped to this repository with Actions: read and write, as GITHUB_DISPATCH_TOKEN in the Vercel project. Everything above works without it.' },
   'sync.bySchedule': { he: 'לפי לוח זמנים',   en: 'schedule' },
   'sync.byHand':     { he: 'ידנית',            en: 'by hand' },
-  'sync.footnote':   { he: 'ארבע ריצות מתוזמנות ביום, מהן שתיים תמיד מדולגות: הקרון של גיטהאב הוא ב-UTC ואין בו שעון קיץ, אז שני ההיסטים האפשריים של ישראל מתוזמנים והלא נכון יוצא תוך שניות. ריצה שדולגה איננה כישלון.',
-                       en: 'Four scheduled runs a day, of which two are always skipped: GitHub’s cron is UTC and has no daylight saving, so both possible Israel offsets are scheduled and the wrong one exits in seconds. A skipped run is not a failure.' },
+  'sync.footnote':   { he: 'הייבוא רץ פעמיים ביום. הקרון של גיטהאב עובד לפי UTC ואין בו שעון קיץ, אז כל ריצה מתוזמנת פעמיים — לשני ההיסטים האפשריים של ישראל — וזו שלא בשעה הנכונה נעצרת תוך שניות. הריצות האלו לא מופיעות כאן, והן גם לא כישלון.',
+                       en: 'The import runs twice a day. GitHub schedules on UTC and has no daylight saving, so each run is scheduled twice — once for each possible Israel offset — and the wrong-hour twin quits in seconds. Those are not listed here, and they are not failures.' },
   'sync.stateRunning':{ he: 'רצה',               en: 'running' },
-  'sync.stateSkipped':{ he: 'דולגה, שעה לא נכונה', en: 'skipped — wrong hour' },
+  'sync.hidden':     { he: '{n} ריצות כאלו הוסתרו מהרשימה.', en: '{n} such exits hidden from this list.' },
   'sync.stateDone':  { he: 'יובא',               en: 'imported' },
 
   'thread.noMessages': { he: 'אין הודעות.',      en: 'No messages.' },

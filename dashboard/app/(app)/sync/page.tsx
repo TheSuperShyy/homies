@@ -34,7 +34,7 @@ type Run = {
 async function runs(): Promise<{ list: Run[]; error?: string }> {
   try {
     const r = await fetch(
-      `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=8`,
+      `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=20`,
       { cache: 'no-store', headers: { Accept: 'application/vnd.github+json' } },
     );
     if (!r.ok) return { list: [], error: `GitHub replied ${r.status}` };
@@ -145,6 +145,24 @@ export default async function Sync() {
   const lastReal = list.find(realImport);
   const lastFail = list.find(failed);
   const running = list.find((r) => r.status !== 'completed');
+
+  // THE WRONG-HOUR TWINS ARE NOT LISTED.
+  //
+  // GitHub's cron is UTC and has no daylight saving, so this workflow is
+  // scheduled at both possible Israel offsets and the wrong one exits in
+  // seconds. That is by design, twice a day, for ever — which made half of
+  // "Recent runs" a standing report about the scheduler rather than news about
+  // the import, and a reader scanning for the last real import had to skip
+  // every other row to find one.
+  //
+  // Only the table hides them. `lastReal`, `lastFail` and `running` above all
+  // read the unfiltered list, so nothing that drives a banner changes. A failed
+  // run is never hidden either: `skippedTwin` requires conclusion `success`.
+  // The footnote says how many went, because a list that drops rows has to
+  // admit it.
+  const skippedTwin = (r: Run) => r.conclusion === 'success' && !realImport(r);
+  const shown = list.filter((r) => !skippedTwin(r));
+  const hidden = list.length - shown.length;
   const token = Boolean(process.env.GITHUB_DISPATCH_TOKEN);
 
   return (
@@ -236,7 +254,7 @@ export default async function Sync() {
       <h2>{t('sync.recent')}</h2>
       <div className="panel">
         {error && <div className="empty">{error}</div>}
-        {list.length ? (
+        {shown.length ? (
           <div className="scrollx">
           <table>
             <thead><tr>
@@ -244,28 +262,21 @@ export default async function Sync() {
               <th>{t('sync.result')}</th><th>{t('sync.took')}</th><th></th>
             </tr></thead>
             <tbody>
-              {list.map((r) => {
-                const skipped = r.conclusion === 'success' && !realImport(r);
-                return (
+              {shown.map((r) => ((
                   <tr key={r.id}>
                     <td className="muted mono" data-label={t('col.when')}>{ago(r.created_at)}</td>
                     <td className="muted" data-label={t('sync.startedBy')}>{r.event === 'schedule' ? t('sync.bySchedule') : t('sync.byHand')}</td>
                     <td data-label={t('sync.result')}>
                       {r.status !== 'completed'
                         ? <span className="pill in_progress">{t('sync.stateRunning')}</span>
-                        : skipped
-                          // Named for what it is. "success" on a run that did
-                          // nothing is how a dashboard lies without a bug.
-                          ? <span className="pill cancelled">{t('sync.stateSkipped')}</span>
-                          : r.conclusion === 'success'
-                            ? <span className="pill resolved">{t('sync.stateDone')}</span>
-                            : <span className="pill needs_review">{r.conclusion}</span>}
+                        : r.conclusion === 'success'
+                          ? <span className="pill resolved">{t('sync.stateDone')}</span>
+                          : <span className="pill needs_review">{r.conclusion}</span>}
                     </td>
                     <td className="mono num" data-label={t('sync.took')}>{r.status === 'completed' ? took(r.created_at, r.updated_at) : '—'}</td>
                     <td data-label=""><a className="btn-sm" href={r.html_url}><IconOpenLink />{t('sync.openLog')}</a></td>
                   </tr>
-                );
-              })}
+                )))}
             </tbody>
           </table>
           </div>
@@ -279,6 +290,7 @@ export default async function Sync() {
 
       <p className="muted" style={{ fontSize: 13, marginBlockStart: 14 }}>
         {t('sync.footnote')}
+        {hidden > 0 && <>{' '}{t('sync.hidden', { n: hidden })}</>}
       </p>
     </>
   );
