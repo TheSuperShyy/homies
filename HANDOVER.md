@@ -1934,6 +1934,14 @@ exists. Never print a value, never commit one, never paste one into chat.
 
 ---
 
+**`/sync` WATCHES ONLY `oxs-sync.yml`.** `WORKFLOW` in
+`dashboard/app/(app)/sync/page.tsx` is a single constant, so the page shows the
+twice-daily residents/arrears job and nothing else. **`oxs-requests.yml` — the
+ticket importer, the one that actually keeps the tickets page true — is
+invisible on the dashboard.** Anyone judging "did tickets import?" from `/sync`
+is reading the wrong workflow; that page's freshness rows come from the database
+and are trustworthy, but its run list is not about tickets. Not fixed.
+
 **`/sync` hides the wrong-hour twins, so its run list is shorter than GitHub's.**
 `oxs-sync.yml` is scheduled at both possible Israel offsets and the wrong one
 exits in seconds; those rows are filtered out of the table and the footnote

@@ -124,6 +124,13 @@ twice a day, for ever. Listing them meant a reader looking for the last real
 import had to skip every other row to find one — a standing report about the
 scheduler where news about the data should be.
 
+**And the page watches the wrong workflow for this question.** `WORKFLOW` in
+`sync/page.tsx` is one constant, `oxs-sync.yml`, so `/sync` shows the twice-daily
+residents/arrears job and nothing else — `oxs-requests.yml`, the ticket importer
+fixed today, has no window on the dashboard at all. That is part of why the
+schedule read as midnight-only: the list on screen was never about tickets.
+Recorded in HANDOVER, not fixed.
+
 The table now reads a filtered list. Three things kept it honest:
 
 - `lastReal`, `lastFail` and `running` still read the UNFILTERED list, so no
