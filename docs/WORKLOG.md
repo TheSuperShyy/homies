@@ -11,6 +11,80 @@ conversation that produced it.
 
 ## 2026-08-31
 
+### The fix was live for nineteen minutes and the memory argued it down
+
+The owner tested the tap again and got the old reply back. Not similar to it.
+**Byte for byte identical to execution 20671 from that morning** — and a model
+at temperature 0.6 does not reproduce a sentence exactly, so it was copied, not
+generated.
+
+The workflow was written at `10:16:57Z`. Execution `20789` ran at `10:35:18Z`
+with the new injected note in place, `tap=human`, `tap_now=true`,
+`greeted=true`, and produced the old text anyway.
+
+**`Conversation so far` held 36 messages for that handset**, ending in the three
+taps from 09:37 to 09:39: each one paired with the instruction that had just
+been deleted, each answered with the sentence he was complaining about. Three
+consecutive verbatim demonstrations at close range, against one line of new
+instruction. The examples won. The same buffer still carried `הצוות שלנו בדרך`
+and a `transfer_to_human` call with `reason: "distress"`, behaviour removed days
+earlier and still being shown to the model as how this conversation goes.
+
+**The mechanism was documented, in the node's own comment, and I did not use
+it.** Simple Memory lives in the n8n process rather than a table, so a poisoned
+buffer cannot be deleted; the session key carries a generation number and
+bumping it orphans every buffer at once. It reads: *"Bump it again the next time
+a bad turn has to be forgotten."* It had been bumped on 26 and 27 Aug for
+exactly this. I shipped four behaviour changes and bumped nothing.
+
+**Nothing in the repo would have stopped me, which is the actual defect.**
+`patch.py` syncs the prompt and the temperature from the repo on every run and
+asserts `check_greeting()` before writing. **No script owned the memory node at
+all** — the session key could only ever be changed by hand, by somebody who
+remembered.
+
+**And twelve clean probe replies were true at the same moment.**
+`probe_whatsapp.py` invents a fresh number per phrase, so every probe starts the
+model from an empty buffer. A real resident does not. Clean probes and a broken
+conversation were not a contradiction; that is exactly what this blind spot
+looks like, and it is why the fault survived a verification pass that was
+otherwise thorough.
+
+**What changed.**
+
+| | before | after |
+| --- | --- | --- |
+| session key | `{{ $json.to }}-4`, edited by hand | `-5`, from `MEMORY_EPOCH` |
+| window | 30 exchanges | **12** (owner's call) |
+| owner of the node | nobody | `n8n_whatsapp_patch.py` |
+| forgetting to bump | free | `check_memory_epoch()` refuses the deploy |
+
+`check_memory_epoch()` is `check_greeting()` for the memory: it holds
+`sha256[:12]` of the prompt and of the injected template, and exits with the new
+hash to paste when either has moved and the epoch has not. `patch.py` checks the
+prompt, `untemplate.py` checks the template, so each script asserts the field it
+owns and `n8n_whatsapp.py` never has to import a patcher.
+
+**It refuses rather than bumping by itself, on purpose.** A bump resets everyone
+mid-conversation, and that cost belongs to a person, not to a script. With the
+window at 12 the thing discarded is at most a recent exchange.
+
+The window came down because 30 is also what let one building's fault details
+reach another building's ticket on 27 Aug: two separate incidents in view at
+once, and the model blended them.
+
+**Verified.** Live values read back as `-5` and `12`. The guard fires on a
+one-character prompt change and prints the exact lines to paste. A tap after
+**four exchanges of history** — the probe shape that was missing, and the one
+that would have caught this — came back
+`ההודעה שלכם הועברה לנציג מצוות הומיז, והוא יחזור אליכם בהקדם.`: no greeting, no
+name, truthful. The other two rows still answer with a short beat and one
+question. All six patch scripts report nothing to do.
+
+The one check I cannot run is the owner's own handset. His buffer is orphaned
+under `-4`, so his next message starts empty, but proving that means messaging
+his number and that is his to do.
+
 ### The note was lying on two rows out of three, and it was mine
 
 The owner, on a screenshot of three menu taps in a row: *"the response is bad i

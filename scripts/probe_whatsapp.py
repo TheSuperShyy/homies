@@ -22,6 +22,20 @@ is expected, harmless, and keeps test replies out of the real inbox.
 Rows written under the test numbers are deleted at the end. Never run it
 against a real resident's number, and never at more than a handful of phrases at
 a time -- every message is a real model call on the production key.
+
+WHAT IT CANNOT SEE, AND IT COST A DAY
+A fresh number has no memory buffer, so every probe here starts the model from
+nothing. A real resident does not. On 1 Sep twelve probe replies were clean at
+the same moment the owner's own handset was answering out of a 36-message
+buffer that still held three verbatim demonstrations of the bug being fixed --
+and the model copied its own last answer over the new instruction, byte for
+byte. Clean probes and a broken conversation were both true.
+
+So a clean run here says the NEW behaviour is right. It says nothing about
+anyone who has talked to the bot before; that is what MEMORY_EPOCH is for, and
+check_memory_epoch() now refuses the deploy rather than trusting anybody to
+remember. To exercise a non-empty buffer on purpose, build history on one
+number with '>>' before the phrase under test.
 """
 import io
 import json

@@ -66,6 +66,7 @@ follow for the amount and the month, and for the same reason: a claim in a
 message must not be able to become a fact in a row.
 """
 
+import hashlib
 import json
 import os
 import re
@@ -179,6 +180,44 @@ MAX_TOKENS = 4096
 # which is what 0.6 would also produce. If Hebrew degrades, step to 0.45 and
 # re-probe; that is one constant and one push.
 TEMPERATURE = 0.6
+
+# THE MEMORY EPOCH. Bump this and every existing conversation buffer is
+# abandoned at once.
+#
+# Simple Memory lives in the n8n process rather than in a table, so a poisoned
+# conversation cannot be deleted: a workflow save does not clear it and neither
+# does a reactivate. The session key is the only handle, so the key carries a
+# generation number and changing it orphans every old buffer.
+#
+# WHY IT IS ASSERTED NOW AND NOT JUST REMEMBERED. It has been bumped three times
+# (26, 27 Aug, and once before) and forgotten once, on 1 Sep, which cost the
+# whole day. Four behaviour fixes went live that afternoon and the owner tested
+# afterwards and got the OLD reply back, byte for byte -- copied out of his own
+# buffer, which held 36 messages ending in three verbatim demonstrations of the
+# bug, each paired with the instruction that had just been deleted. Twelve probe
+# runs were clean at the same moment, because probe_whatsapp.py invents a fresh
+# number and never has a buffer at all.
+#
+# The lesson is not "remember to bump it". Nothing in the repo could have
+# stopped me, so the hashes below stop the next person: they are what epoch 5
+# was minted for, and check_memory_epoch() refuses the deploy when the live text
+# has moved and the epoch has not. Same shape as check_greeting(), for the same
+# reason -- two things that must move together, asserted rather than trusted.
+MEMORY_EPOCH = 5
+
+# 12 exchanges, down from 30 (owner, 1 Sep). Long enough for one fault report
+# end to end, short enough that a bad turn ages out inside the same conversation
+# instead of teaching for days. The 30-deep window is also what let one
+# building's fault details reach another building's ticket on 27 Aug: two
+# separate incidents were in view at once and the model blended them.
+MEMORY_TURNS = 12
+
+# sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
+# and the hash it covers, together; check_memory_epoch prints the new value.
+EPOCH_COVERS = {
+    "prompt": "df4aa644cadb",   # docs/features/11-whatsapp-bot/prompt.md
+    "inject": "6e19bca8b5ab",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+}
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
 # on a schedule; pinning means the bot breaks on a date we can look up rather
@@ -613,6 +652,65 @@ def check_greeting(prompt):
             "A bare greeting is answered by MENU, not by the model, so these two\n"
             "have to be the same sentence. Fix whichever is stale, then re-run."
             % (body, os.path.relpath(PROMPT_DOC, ROOT)))
+
+
+NOT_COVERED = "\n".join([
+    "",
+    "Memory epoch %d does not cover the current %s.",
+    "  covers : %s",
+    "  now    : %s",
+    "",
+    "Every live buffer still demonstrates the old behaviour, and an example",
+    "beats an instruction. Deploying this without bumping ships it to nobody",
+    "who has already talked to the bot.",
+    "",
+    "In scripts/n8n_whatsapp.py set:",
+    "  MEMORY_EPOCH = %d",
+    "  EPOCH_COVERS[%r] = %r",
+    "",
+    "then re-run. Everyone mid-conversation starts fresh; that is the price",
+    "and it is the point.",
+])
+
+
+def epoch_hash(text):
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+
+
+def check_memory_epoch(prompt=None, inject=None):
+    """Refuse to deploy new behaviour on top of buffers that teach the old.
+
+    The agent's memory is a second source of instructions and it outranks the
+    first, because a worked example beats a rule -- that is the finding of
+    31 Aug, and it does not stop being true when the example is the bot's own
+    last answer instead of a line in prompt.md.
+
+    So a live buffer is not neutral storage. It holds the resident's turns, the
+    bot's replies, AND the bracketed context that was injected at the time, all
+    of it presented to the model as how this conversation goes. Change the
+    prompt or that injected text and every existing buffer becomes a
+    demonstration of behaviour that no longer exists, argued at close range
+    against one line of new instruction. It wins. Measured on 1 Sep: three
+    identical taps in the window, and the next tap came back byte-identical to
+    them nineteen minutes after the fix went live.
+
+    Bumping MEMORY_EPOCH is the only way to discard them, and the cost is real:
+    everyone mid-conversation starts fresh. That is why this refuses rather than
+    bumping by itself. A person decides when to spend it; the machine only
+    refuses to let it be forgotten.
+
+    Each caller checks the field it owns, which is also what keeps
+    n8n_whatsapp.py from importing the patchers that import it.
+    """
+    for name, text in (("prompt", prompt), ("inject", inject)):
+        if text is None:
+            continue
+        got = epoch_hash(text)
+        want = EPOCH_COVERS.get(name)
+        if got == want:
+            continue
+        sys.exit(NOT_COVERED % (MEMORY_EPOCH, name, want, got,
+                                MEMORY_EPOCH + 1, name, got))
 
 
 def api(method, path, body=None):
@@ -1664,9 +1762,13 @@ def workflow(e):
                 # day of elevator test runs, so the model imitated its own old
                 # turns (skipping the new ask-what-happened rule) and imported
                 # one building's fault details into another building's ticket.
+                # Bumped to -5 on 1 Sep, and this time the deploy asserts it:
+                # see MEMORY_EPOCH and check_memory_epoch() at the top. Four
+                # behaviour fixes shipped that afternoon without a bump and the
+                # owner's own handset kept answering out of a 36-message buffer.
                 parameters={"sessionIdType": "customKey",
-                            "sessionKey": "={{ $json.to }}-4",
-                            "contextWindowLength": 30},
+                            "sessionKey": "={{ $json.to }}-%d" % MEMORY_EPOCH,
+                            "contextWindowLength": MEMORY_TURNS},
                 # 12 until 8 Aug. Raised because the language choice now lives
                 # HERE and nowhere else: a resident who asks for English is
                 # remembered only for as long as that request is still inside

@@ -280,6 +280,11 @@ def main():
         if need not in by:
             sys.exit("No %r node on the live workflow -- refusing to guess." % need)
 
+    # The injected context is half of what a live buffer replays back at the
+    # model, so changing it invalidates every existing buffer exactly the way a
+    # prompt change does. Asserted here because this file owns AGENT_NEW.
+    W.check_memory_epoch(inject=AGENT_NEW)
+
     changes = []
     code = by["Sort"]["parameters"]["jsCode"]
     code = edit(code, ATTACH_OLD, ATTACH_NEW,

@@ -118,6 +118,10 @@ def main():
     # 2. the prompt
     prompt = W.system_prompt()
     W.check_greeting(prompt)
+    # And the buffers this prompt would be landing on top of. See
+    # check_memory_epoch: an old buffer is a worked example of the behaviour
+    # being replaced, argued at close range, and it wins.
+    W.check_memory_epoch(prompt=prompt)
     agent = next((n for n in kept if n["type"].endswith("langchain.agent")), None)
     if agent is None:
         sys.exit("No agent node on the live workflow -- refusing to guess.")
@@ -135,6 +139,27 @@ def main():
         changes.append("temperature: %s -> %s"
                        % (opts.get("temperature", "unset"), W.TEMPERATURE))
         opts["temperature"] = W.TEMPERATURE
+
+    # 4. the memory epoch and window
+    #
+    # This node had no owner until 1 Sep, which is exactly why the epoch went
+    # three deploys without being bumped: the prompt and the temperature were
+    # synced from the repo on every run and the session key was only ever
+    # changed by hand, in the editor, by somebody who remembered. It is synced
+    # here now, beside the two other fields that decide how the bot behaves.
+    mem = next((n for n in kept if n["type"].endswith("memoryBufferWindow")), None)
+    if mem is None:
+        sys.exit("No memory node on the live workflow -- refusing to guess.")
+    mp = mem["parameters"]
+    want_key = "={{ $json.to }}-%d" % W.MEMORY_EPOCH
+    if mp.get("sessionKey") != want_key:
+        changes.append("memory epoch: %s -> %s (every existing buffer is "
+                       "abandoned)" % (mp.get("sessionKey"), want_key))
+        mp["sessionKey"] = want_key
+    if mp.get("contextWindowLength") != W.MEMORY_TURNS:
+        changes.append("memory window: %s -> %s exchanges"
+                       % (mp.get("contextWindowLength"), W.MEMORY_TURNS))
+        mp["contextWindowLength"] = W.MEMORY_TURNS
 
     print("workflow : %s  (%s, active=%s)"
           % (W.WF_NAME, live["id"], live.get("active")))
