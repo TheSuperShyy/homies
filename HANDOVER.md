@@ -2343,7 +2343,17 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
 API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
 English callers `אני לא מבין עברית`.
 
-**THE DASHBOARD HAS A TALK-TO-MICHAEL WIDGET (2 Sep), LOCAL-ONLY UNTIL VERCEL
+**THE WIDGET BECAME A SECTION: `/voice`, "Voice Agent call" (2 Sep, same day).**
+Sidebar entry between Calls and System. Both agents: intake needs nothing; debt
+reads `v_debt_call_queue_person` read-only (NO `press_call` — nothing flips
+`handed_over`) and hands the template `debtVariableValues()`, now shared with
+the real outbound path in `lib/call.ts`. Env needed:
+`NEXT_PUBLIC_VAPI_PUBLIC_KEY`, `NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID`,
+`NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID` — all public by design, set in
+`dashboard/.env.local`, absent on Vercel. The Calls-header widget from earlier
+the same day is GONE (`voice-call.tsx` deleted); do not resurrect it.
+
+**THE DASHBOARD HAD A TALK-TO-MICHAEL WIDGET (2 Sep), LOCAL-ONLY UNTIL VERCEL
 GETS ENV VARS.** `/calls` page header, `dashboard/components/voice-call.tsx`,
 `@vapi-ai/web@2.7.0`, driven by `NEXT_PUBLIC_VAPI_PUBLIC_KEY` +
 `NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID` (both public by design; set in

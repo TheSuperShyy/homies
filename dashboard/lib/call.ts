@@ -60,6 +60,40 @@ export function phoneNumberConnected(): boolean {
   return Boolean(process.env.VAPI_PHONE_NUMBER_ID);
 }
 
+/**
+ * One composer for both roads to the debt agent. The outbound phone call
+ * (below) and the Voice Agent call page's web call must hand the template the
+ * same variables, or the two would drift apart one field at a time and the
+ * browser call would stop being a rehearsal of the real one.
+ */
+export function debtVariableValues(p: Record<string, any>, phone: string): Record<string, string> {
+  const gender = String(p.gender ?? 'unknown');
+  return {
+    phone,
+    first_name: String(p.first_name ?? ''),
+    gender,
+    gender_forms: GENDER_FORMS[gender] ?? GENDER_FORMS.unknown,
+    card_last4: String(p.card_last4 ?? ''),
+    has_card: String(p.card_last4 ?? '').trim() ? 'yes' : 'no',
+    building: String(p.building ?? ''),
+    unit: String(p.unit ?? ''),
+    amount: String(p.amount ?? ''),
+    apartments_phrase: String(p.apartments_phrase ?? ''),
+    breakdown_phrase: String(p.breakdown_phrase ?? ''),
+    months_phrase: String(p.months_phrase ?? ''),
+    attempt: String(p.attempt ?? '1'),
+    // The whitelist the end-of-call writer resolves every tool call against.
+    // Sent as JSON text: variableValues are template substitutions.
+    charges: JSON.stringify(p.charges ?? []),
+    ...FIXED,
+  };
+}
+
+/** The debt assistant id the web call should use; null hides the debt tab. */
+export function debtAssistantId(): string | null {
+  return process.env.NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID ?? DEBT_HE;
+}
+
 /** Returns 'ok:<call id>' or 'err:<reason a person can read>'. Never throws. */
 export async function callResident(phone: string, pin: string): Promise<string> {
   const PIN = process.env.CALL_PIN;
@@ -81,26 +115,7 @@ export async function callResident(phone: string, pin: string): Promise<string> 
   if (!data) return 'err:Not eligible: nothing unpaid, on do-not-call, or already called four times.';
   const p = data as Record<string, any>;
 
-  const gender = String(p.gender ?? 'unknown');
-  const variableValues: Record<string, string> = {
-    phone,
-    first_name: String(p.first_name ?? ''),
-    gender,
-    gender_forms: GENDER_FORMS[gender] ?? GENDER_FORMS.unknown,
-    card_last4: String(p.card_last4 ?? ''),
-    has_card: String(p.card_last4 ?? '').trim() ? 'yes' : 'no',
-    building: String(p.building ?? ''),
-    unit: String(p.unit ?? ''),
-    amount: String(p.amount ?? ''),
-    apartments_phrase: String(p.apartments_phrase ?? ''),
-    breakdown_phrase: String(p.breakdown_phrase ?? ''),
-    months_phrase: String(p.months_phrase ?? ''),
-    attempt: String(p.attempt ?? '1'),
-    // The whitelist the end-of-call writer resolves every tool call against.
-    // Sent as JSON text: variableValues are template substitutions.
-    charges: JSON.stringify(p.charges ?? []),
-    ...FIXED,
-  };
+  const variableValues = debtVariableValues(p, phone);
 
   const res = await fetch(`${VAPI}/call`, {
     method: 'POST',

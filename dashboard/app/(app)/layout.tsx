@@ -61,6 +61,7 @@ const NAV = [
     ['debts', '/debts'],
     ['conversations', '/conversations'],
     ['calls', '/calls'],
+    ['voice', '/voice'],
   ]],
   ['nav.group.support', [
     ['sync', '/sync'],

@@ -187,6 +187,7 @@ export const NAV_ICON = {
   debts: IconMoney,
   conversations: IconChat,
   calls: IconPhone,
+  voice: IconPhoneOut,
   sync: IconImport,
   settings: IconSettings,
 } as const;

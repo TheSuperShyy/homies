@@ -3,7 +3,6 @@ import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pag
 import { getLocale, translator, when, type Locale, type T } from '@/lib/i18n';
 import { IconInbox, IconSearch, IconOpenLink } from '@/components/icons';
 import Link from 'next/link';
-import { VoiceCall } from '@/components/voice-call';
 
 // One page, four views, state in the URL. The two extra views answer the two
 // questions ops actually asks after an outbound day: who never picked up, and
@@ -281,26 +280,7 @@ export default async function Calls({
   const searchable = view !== 'no_answer' && view !== 'links';
   return (
     <>
-      <div className="pagehead">
-        <h1>{t('calls.title')}</h1>
-        {/* Talk to Michael from here - a web call, so it works with no phone
-            number. Absent env vars hide the button entirely rather than
-            rendering one that cannot work; the same convention as the Call
-            column on the debts page. */}
-        {process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY && process.env.NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID && (
-          <VoiceCall
-            publicKey={process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY}
-            assistantId={process.env.NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID}
-            labels={{
-              start: t('calls.talk'), connecting: t('calls.talkConnecting'),
-              hangup: t('calls.talkHangup'), mute: t('calls.talkMute'),
-              unmute: t('calls.talkUnmute'), agent: t('calls.talkAgent'),
-              you: t('calls.talkYou'), failed: t('calls.talkFailed'),
-              micHint: t('calls.talkMicHint'),
-            }}
-          />
-        )}
-      </div>
+      <div className="pagehead"><h1>{t('calls.title')}</h1></div>
       <Tabs view={view} size={size} search={search} t={t} />
       {searchable && <Search view={view} size={size} search={search} t={t} />}
       {view === 'no_answer' ? <NoAnswer page={page} size={size} t={t} locale={locale} />

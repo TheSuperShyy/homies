@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-09-02
 
+### "Voice Agent call" — the test console became a dashboard section
+
+The header widget lasted one review: the owner wanted what the browser console
+is — a dedicated section — and named it **Voice Agent call**. Built as `/voice`
+with its own sidebar entry (`nav.voice`, IconPhoneOut), and the Calls-page
+header widget was removed the same hour it was born; `voice-call.tsx` deleted,
+its logic folded into `components/voice-console.tsx`.
+
+The console carries both agents. **Inbound intake (Michael)** needs nothing:
+Start call, mute, hang-up, live transcript in the product's own bubbles.
+**Debt follow-up** gets the left column the demo console had — but instead of
+the demo's built-in list it reads **`v_debt_call_queue_person`**, the same view
+`press_call()` composes real outbound calls from, WITHOUT press_call: nothing
+flips `handed_over`, nothing counts an attempt. A web call from this page is a
+rehearsal with live data. The composed variables ride the same
+`debtVariableValues()` now shared with `callResident()` — extracted so the
+browser call and the phone call cannot drift apart one field at a time — and
+they are visible on the page under "מה הסוכן מקבל לפני השיחה", because a call
+you cannot inspect is a call you cannot debug.
+
+The card's ₪ figure is summed from the `charges` whitelist, not from `amount` —
+that column is `money_say()` output, Hebrew words for the TTS, and would have
+rendered as a sentence where a number belongs.
+
+`npm run build` clean, `/voice` at 1.56 kB with the SDK still loading only on
+click. End-to-end (mic, real call, the row landing under Inbound) remains the
+owner's half. Vercel still has zero env vars; the page shows its own
+"switched off" notice there rather than a broken console.
+
+
 ### Michael is in the dashboard — a web call from the Calls page
 
 The owner asked for the voice agent in the dashboard. Almost all the plumbing
