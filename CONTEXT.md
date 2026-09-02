@@ -2068,6 +2068,14 @@ from a plain completion loop (temperature 0.3, six tool rounds — the
 `prompt_probe.py` numbers). The thread on screen is the model's context: what
 the panel shows is what the model was told, voice transcript included.
 
+**The /voice composer is one box with two roads, and hiding it mid-call was a
+design error the owner hit within minutes (2 Sep).** In a live call, typed text
+is injected INTO the call (`vapi.send add-message`) and the agent answers out
+loud; idle, it goes through the chat route. A control that serves both states
+must not disappear in one of them — the owner types English while the agent
+speaks Hebrew, so the keyboard is not a fallback input here, it is the primary
+one. Do not re-hide it while a call is up.
+
 **The dashboard's login wall covers `/api/*` too, and that is load-bearing for
 the chat route.** The middleware matcher excludes only static assets, so any
 new API route is behind the session by default — which is what lets a route
