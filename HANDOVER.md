@@ -2371,7 +2371,9 @@ debt tab shows THREE INVENTED RESIDENTS (`SAMPLE_PEOPLE` in
 `app/(app)/voice/page.tsx`) only while `v_debt_call_queue_person` returns
 nothing, with the list pill switched to "Example data"; real rows displace them
 automatically. The third example has `gender: null` on purpose — it exercises
-the neutral-forms branch.
+the neutral-forms branch. Defect closed same evening: the debt cards clipped
+their address line (globals.css pins every `button` at 38px; `.voice-card` now
+carries `height: auto` — see CONTEXT for the general trap).
 
 **THE DASHBOARD HAD A TALK-TO-MICHAEL WIDGET (2 Sep), LOCAL-ONLY UNTIL VERCEL
 GETS ENV VARS.** `/calls` page header, `dashboard/components/voice-call.tsx`,
