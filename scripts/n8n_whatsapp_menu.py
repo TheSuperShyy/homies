@@ -95,6 +95,26 @@ ITEMS_4 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
 # resident input, and the promise guard set this exact precedent.
 RECITE_OLD = ("(() => { try { return $getWorkflowStaticData('global').menu_exec"
               " === String($execution.id); } catch (e) { return false; } })() || ")
+
+# THE STATICDATA RELAY FAILED IN PRODUCTION AND THE CATCH HID IT. Owner's
+# thread, exec 22878, 2 Sep 21:43: show_menu ran and returned its success
+# string (so the TOOL sandbox has staticData and the execution id), the model
+# wrote "בטח, הנה האפשרויות העיקריות שלנו." — and Send posted content_type
+# text. The read side of the flag evaluated false inside Send's EXPRESSION
+# sandbox, which does not share the Code sandbox's facilities; the try/catch
+# built for graceful degradation swallowed exactly this failure, silently.
+# Probes never saw it because their fake conversations 404 at Send before the
+# expression's result is recorded anywhere.
+#
+# So the primary signal is now the tool's own run: $('show_menu') reads THIS
+# execution's runData — on a run where the tool never fired, .all() throws
+# (the promise-guard postmortem documented $('open_request').all() throwing)
+# and the catch turns that into false; when it fired, the items are there.
+# Nothing can leak across executions. The staticData clause stays as a
+# second chance until the owner's handset proves which one is live; strip
+# the dead one then (HANDOVER carries the reminder).
+TOOLRAN = ("(() => { try { return $('show_menu').all().length > 0; }"
+           " catch (e) { return false; } })() || ")
 RECITE_NEW = ("(() => { try { return $getWorkflowStaticData('global').menu_exec"
               " === String($execution.id); } catch (e) { return false; } })() || "
               "['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג']"
@@ -167,7 +187,10 @@ def main():
              "Send: the balance row comes back out (4 rows collapse "
              "WhatsApp's buttons into a 'Choose an item' list)"),
             (RECITE_OLD, RECITE_NEW, RECITE_NEW,
-             "Send: a reply reciting 3+ of the four flows carries the rows")):
+             "Send: a reply reciting 3+ of the four flows carries the rows"),
+            (RECITE_OLD, TOOLRAN + RECITE_OLD, TOOLRAN,
+             "Send: the tool's own run is the primary menu signal "
+             "(the staticData relay failed in Send's expression sandbox)")):
         if done in body:
             continue
         if old not in body:

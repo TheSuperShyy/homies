@@ -203,7 +203,7 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 15
+MEMORY_EPOCH = 16
 # 14 -> 15, 2 Sep evening: the balance row came back out of show_menu's
 # description with the row itself (4 rows collapse WhatsApp's buttons).
 # 12 -> 13 -> 14, 2 Sep: the show_menu rounds. 12 minted the tool and the
@@ -244,7 +244,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "f7fe02f813fb",
+    "tools": "f28d27c165f7",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1151,6 +1151,10 @@ TOOLS = [
             "words — a list, bullets, 'you could open a ticket or check a "
             "balance' — stop: that is this tool's job. Call it and keep your "
             "message to the one short line that goes above the buttons. Never "
+            "ask whether they would like to see the options and never "
+            "announce that you are about to show them — the question costs "
+            "the resident a whole round-trip; call this and show them in the "
+            "same breath. Never "
             "use it while you are already handling a concrete matter, and not "
             "twice in a row: once the options are in front of them, another "
             "list is noise. Takes no parameters."

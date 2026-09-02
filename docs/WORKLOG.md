@@ -207,6 +207,40 @@ from the API after the write.
 **Housekeeping:** the two 2 Sep WhatsApp entries below were filed under a stale
 `## 2026-08-31` header, below older entries; moved here, content untouched.
 
+### "Here are the options" — and no options. The flag Send could not read
+
+The owner found it live, which is the only place it was findable: "idk" got
+an OFFER to show the options (`אם תרצו, אוכל להציג לכם`), "ok" got
+`בטח, הנה האפשרויות העיקריות שלנו.` and nothing underneath.
+
+**Exec 22878 is the whole story.** `show_menu` ran and returned its success
+string — the TOOL sandbox has staticData and the execution id, the flag was
+written — and `Send` still posted `content_type=text`. The staticData READ
+in Send's expression evaluated false: **the expression sandbox does not
+share the Code sandbox's facilities, and the try/catch built for graceful
+degradation swallowed the missing facility silently.** The probes never saw
+it because their invented conversations 404 at Send before the expression's
+result is recorded anywhere; the owner's conversation is real, so his
+execution recorded the proof.
+
+**The fix reads the tool's own run instead:** `$('show_menu').all().length`
+in a try/catch — on a run where the tool never fired, `$()` throws (the
+promise-guard postmortem documented it) and the catch says false; when it
+fired, the items are there; nothing crosses executions. The staticData
+clause stays as a second chance until the owner's handset shows which
+clause is live; the dead one comes out next session.
+
+**Second defect, same thread:** the model asked permission instead of
+acting. The description now bans the round-trip: never ask whether they
+want to see the options, never announce them — call and show in the same
+breath. Epoch 15 → 16 (tools hash). The `אני מבין ש…` paraphrase-stamp also
+resurfaced in that reply — logged, sample of two now, still not chased.
+
+**Probe timing note:** the probe's 14s same-number wait predates the 4s
+debounce; a goodbye sent at 14s joined a still-open ticket run as one burst
+(exec 22902) and the "regression" it showed was the batcher working. The
+wait is 22s now.
+
 ### The 4th row swallowed the 3 buttons, and WhatsApp was the reason
 
 The owner's screenshot at 18:48: the intro with a collapsed English

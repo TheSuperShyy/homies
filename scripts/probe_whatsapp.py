@@ -107,8 +107,11 @@ for i, (phone, text) in enumerate(zip(phones, texts)):
     with urllib.request.urlopen(req, timeout=60):
         pass
     # A second turn on the same number has to wait for the first reply, or it
-    # arrives as two unanswered messages and tests nothing.
-    time.sleep(14 if i + 1 < len(texts) and phones[i + 1] == phone else 3)
+    # arrives as two unanswered messages and tests nothing. 14s was calibrated
+    # before the 4s debounce existed; a tool-calling turn now runs ~18s and a
+    # goodbye sent at 14s joined the still-open ticket run as one burst
+    # (exec 22902, 2 Sep) — the answer tested the batcher, not the goodbye.
+    time.sleep(22 if i + 1 < len(texts) and phones[i + 1] == phone else 3)
 
 time.sleep(22)
 ex = [e for e in W.api("GET", "/api/v1/executions?workflowId=%s&limit=40" % WF)["data"]
