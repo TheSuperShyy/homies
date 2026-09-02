@@ -1468,7 +1468,10 @@ button.danger svg { width: 15px; height: 15px; }
 .voice-cols:has(> .voice-panel:only-child) { grid-template-columns: 1fr; }
 .voice-list { display: flex; flex-direction: column; gap: 8px; }
 .voice-listhead { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted, #8a8f98); display: flex; align-items: center; gap: 8px; }
-.voice-card { display: grid; grid-template-columns: 1fr auto; text-align: start; gap: 2px 8px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--surface-border, #262a30); background: var(--surface-raised, #14171b); color: inherit; cursor: pointer; }
+/* height:auto beats the global fixed-height `button` rule (~line 825), which
+   would squash this two-row card to 38px and bleed the sub line into the next
+   card. Any multi-row button in this file needs the same override. */
+.voice-card { display: grid; grid-template-columns: 1fr auto; text-align: start; gap: 2px 8px; padding: 12px 14px; height: auto; border-radius: 10px; border: 1px solid var(--surface-border, #262a30); background: var(--surface-raised, #14171b); color: inherit; cursor: pointer; }
 .voice-card.on { border-color: var(--action, #35c2a5); }
 .voice-card:disabled { opacity: .55; cursor: default; }
 .voice-name { font-weight: 600; }

@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-09-02
 
+### The debt cards were clipping their own address line
+
+Owner's screenshot: "card 7355 · הרצל 14 · דירה 12" bled under the next
+card. The global `button` rule in globals.css fixes every button at 38px
+tall; `.voice-card` is a two-row button (name+amount, then the sub line) and
+never overrode the height, so row two overflowed the box. One line —
+`height: auto` on `.voice-card` — and a comment at the site so the next
+multi-row button doesn't rediscover this.
+
 ### "bro i cant chat when i started the call" — the composer now works mid-call
 
 First feedback on the chat: the box vanished the moment a call started,

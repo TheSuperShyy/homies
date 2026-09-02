@@ -2068,6 +2068,13 @@ from a plain completion loop (temperature 0.3, six tool rounds — the
 `prompt_probe.py` numbers). The thread on screen is the model's context: what
 the panel shows is what the model was told, voice transcript included.
 
+**The global `button` rule in globals.css fixes every button at 38px, so a
+multi-row button must set `height: auto` or its second row paints under the
+next element (found 2 Sep, `.voice-card`).** The rule (~line 825) is right for
+the text-only buttons it was written for and silently wrong for any button
+laid out as a grid of rows — the overflow is invisible in the rule and only
+shows where the card renders.
+
 **The /voice composer is one box with two roads, and hiding it mid-call was a
 design error the owner hit within minutes (2 Sep).** In a live call, typed text
 is injected INTO the call (`vapi.send add-message`) and the agent answers out
