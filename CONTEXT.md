@@ -2047,6 +2047,15 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**A rehearsal reads what the real thing reads, and never through the writer.
+Decided 2 Sep with the Voice Agent call page.** The console composes debt calls
+from `v_debt_call_queue_person` — the exact view `press_call()` uses — but never
+calls `press_call()` itself, so nothing flips `handed_over` and no attempt is
+counted. The general form: a test surface borrows the production READ path so
+what it shows is true, and stays off the production WRITE path so trying things
+costs nothing. And the composer is one shared function (`debtVariableValues()`),
+because a rehearsal that drifts from the performance stops rehearsing it.
+
 **A widget that cannot work does not render. Standing since the debts page,
 reaffirmed 2 Sep.** The talk-to-Michael button appears only when both its env
 values exist; a disabled button that explains itself is for things a user can
