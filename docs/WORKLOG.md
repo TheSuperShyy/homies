@@ -9,6 +9,138 @@ conversation that produced it.
 
 ---
 
+## 2026-09-02
+
+### The quality pass: smart, warm, human — measured, fixed, shipped
+
+The owner's brief was a quality bar, not a bug: *"smart, accommodating, human,
+warm and helpful."* Everything below went through `prompt_chat.py` before it
+shipped, and the whole pass ran on the week's standing lessons — placement,
+standalone sentences, data over rules.
+
+**The `255042` bug is dead, and the fix was never going to be in the prompt.**
+Three prompt rules and a worked example all failed to stop the model reading the
+reference's prefix. The Edge Function (v56) now returns **`reference_spoken`** —
+the middle serial as Hebrew digit words, minted by `spokenReference()` next to
+`serialOf()` — and every reference-bearing return goes through `withSpoken()`,
+so a new return site cannot ship without it. The prompt's whole job shrank to
+*"say what the tool handed you, alone, in your own turn"*. Probed 3/3:
+`אחת אפס ארבע שתיים`, no prefix, no dropped digit. **A string the model is
+handed cannot be mis-remembered; a rule can.**
+
+Step 0 mattered: one probe-tagged call proved the live tool path is the n8n
+webhook **forwarding to Supabase** (`JSON.stringify($json)` passthrough), and
+mints the Supabase format — so the prompt's rule had been right for live and
+one deploy covered everything. Two probe rows written, tagged `probe-refcheck-*`
+/ `probe-refspoken-*`.
+
+**Seven minutes.** `maxDurationSeconds` 180 → 420, the owner's explicit reversal
+of the 5 Aug request. The prompt's clock section says seven now; the write-early
+ordering it teaches is unchanged. And the first idle line is warm — *אני עדיין
+כאן, קחו את הזמן* — with the functional line-check second.
+
+**The warmth floor:** no first response opens with a bare question, 10/10, after
+one failed attempt — "a word about what you heard" taught echoing, and had to
+become "something short of your own, sized by tier, never their sentence back".
+A flooded flat now gets real varied concern; a lobby bulb gets a word and the
+point.
+
+**The sweep found three real failures, all fixed and re-probed:** an *empty*
+lift ("nobody inside") ran the full emergency script — numbers read to someone
+who needed none — because "stuck elevator" pattern-matched over the
+person-vs-thing test; a mid-call building correction opened a **second request**
+instead of fixing the first; and the location-question example taught asking an
+apartment for building faults. A person in the lift still gets the full
+emergency, 122 parses as apartment 122, an "idk" answer becomes a hedged
+`add_request_detail`, a mind-change is accepted without pushing, and two
+problems in one call get two tickets.
+
+**Residues, shipped knowingly:** the lobby-bulb acknowledgement is near-identical
+across callers (every fix for that traded a gender leak for it); the
+apartment-for-gate question still slips through occasionally; and the reference
+turn sometimes still carries a trailing question despite the number-alone rule.
+
+Verified end-to-end before push: emergencies (hedged + lift), the four HANDOVER
+paths, warmth 10/10, reference 3/3, facts clean. Pushed per protocol — and the
+voice clobber fired again, third time, restored as always. All of prompt
+(31,382), voice (`ba765d50`), 420, idle line and transcriber verified together
+from the API after the write.
+
+**Housekeeping:** the two 2 Sep WhatsApp entries below were filed under a stale
+`## 2026-08-31` header, below older entries; moved here, content untouched.
+
+### The 4th row swallowed the 3 buttons, and WhatsApp was the reason
+
+The owner's screenshot at 18:48: the intro with a collapsed English
+"Choose an item" button where his three buttons used to be. *"what happened
+to our 3 buttons."*
+
+What happened was the balance row, added the night before for completeness.
+**WhatsApp renders at most 3 reply buttons inline; a 4th item makes Chatwoot
+switch to a list message** — one collapsed button, its label not ours to set,
+that the resident must tap before seeing any option. Every menu send shares
+the one items list in `Send`, so the greeting menu changed shape too.
+
+Reverted the same day: three rows, three visible buttons, balance reachable
+by typing as it always was. `show_menu`'s description now enumerates three,
+not four (epoch 14 → 15, tools hash). The recital net keeps all four tokens —
+it reads what the model writes, and the model still names balance in words.
+The lesson is pinned above ITEMS_3 in `n8n_whatsapp_menu.py`: do not add a
+4th row without changing the whole message shape on purpose.
+
+### "idk" is not a goodbye — the menu became a judgment, with a net under it
+
+The owner's screenshot: "hey is this homies" answered well, then "idk" got
+`בסדר גמור. אם תצטרכו משהו, אני כאן.` and a dead thread. His constraint,
+verbatim: *"i dont want a strict rule for keywords i want it to be general
+remember how we input rules using keywords for trigger and we created a dumb
+bot i want to prevent that from happening again."*
+
+**The mechanism costs one flag.** `Send` already attaches the option rows to
+whatever text the reply carries (the echo clause proved it), so the missing
+piece was only a signal. `show_menu`, a Code tool, writes
+`staticData.menu_exec = <execution id>`; `Send` attaches the rows when the
+flag equals THIS run's id. The flag cannot leak: concurrent executions never
+see each other's staticData (per-execution snapshot, measured 1 Sep), and a
+later run's id differs. `isExecuted` was never considered — it is spuriously
+true and killed the promise guard for a day. If the sandbox ever lacks
+staticData or the id, the tool tells the model to describe the options in
+words instead: the failure mode is the feature without buttons, not an error.
+Verified in runData: the success string came back, so both primitives exist
+in the tool sandbox. The attached list also gained the balance row —
+Chatwoot forwards a tap's TITLE, and `יתרה ותשלומים` already reaches the
+model as plain text from the canned menu today, so Sort needed nothing.
+
+**Gemini would not reach for the tool on the vague turn, twice.** Asked
+explicitly ("show me the menu options") it called the tool every time and
+wrote the right short line. On "idk" it recited the four flows in words —
+through one prompt rewording (12→13) and one description sharpening (13→14).
+Third round is where the address-justification lesson says stop, so the
+promise-guard doctrine closed it instead: **decide on the reply alone.** A
+reply naming 3+ of the four flows (`קריאת שירות`, `קריאה קיימת`, `יתרה`,
+`נציג`) IS the options message, and `Send` attaches the rows under it. It
+reads the bot's own output, never the resident's words — the no-keyword rule
+is about resident input, and the promise guard set the precedent. A normal
+ticket confirmation names one flow; the goodbye names none; ≥3 is recital.
+
+**Measured after:** "idk" → `show_menu` called, reply written for the
+buttons: `תוכלו לבחור מבין האפשרויות שמופיעות כאן למטה, או פשוט לספר לי מה
+אתם צריכים.` When temp 0.6 makes it recite instead, the net catches that
+too. Ticket arc, goodbye, first contact: unaffected, no menu. The one thing
+probes cannot see is the rendered buttons (probe conversations 404 at Send),
+so the visual check is the owner typing idk from his handset.
+
+**A pyc trap cost twenty minutes:** a helper process imported the module
+mid-edit and cached bytecode; the final write changed neither file size nor
+mtime-second, so the next patcher run loaded a stale mixed module and the
+epoch guard reported a hash the file no longer contained. When the guard
+contradicts the file, `rm -rf scripts/__pycache__` before believing either.
+
+Epochs 12, 13, 14 tonight, each guard-forced. Data point for the standing
+issues: `אני מבין.` bare opened one idk reply (22403, epoch-13 fresh buffer)
+— the understanding-shown rule holds elsewhere; sample of one, logged.
+
+
 ## 2026-08-31
 
 ### Handle it. Transfer when they ask, or when it is an emergency
@@ -207,77 +339,6 @@ session's rewording. Voice side clean. Not touched.
 
 
 ## 2026-08-31
-
-### The 4th row swallowed the 3 buttons, and WhatsApp was the reason
-
-The owner's screenshot at 18:48: the intro with a collapsed English
-"Choose an item" button where his three buttons used to be. *"what happened
-to our 3 buttons."*
-
-What happened was the balance row, added the night before for completeness.
-**WhatsApp renders at most 3 reply buttons inline; a 4th item makes Chatwoot
-switch to a list message** — one collapsed button, its label not ours to set,
-that the resident must tap before seeing any option. Every menu send shares
-the one items list in `Send`, so the greeting menu changed shape too.
-
-Reverted the same day: three rows, three visible buttons, balance reachable
-by typing as it always was. `show_menu`'s description now enumerates three,
-not four (epoch 14 → 15, tools hash). The recital net keeps all four tokens —
-it reads what the model writes, and the model still names balance in words.
-The lesson is pinned above ITEMS_3 in `n8n_whatsapp_menu.py`: do not add a
-4th row without changing the whole message shape on purpose.
-
-### "idk" is not a goodbye — the menu became a judgment, with a net under it
-
-The owner's screenshot: "hey is this homies" answered well, then "idk" got
-`בסדר גמור. אם תצטרכו משהו, אני כאן.` and a dead thread. His constraint,
-verbatim: *"i dont want a strict rule for keywords i want it to be general
-remember how we input rules using keywords for trigger and we created a dumb
-bot i want to prevent that from happening again."*
-
-**The mechanism costs one flag.** `Send` already attaches the option rows to
-whatever text the reply carries (the echo clause proved it), so the missing
-piece was only a signal. `show_menu`, a Code tool, writes
-`staticData.menu_exec = <execution id>`; `Send` attaches the rows when the
-flag equals THIS run's id. The flag cannot leak: concurrent executions never
-see each other's staticData (per-execution snapshot, measured 1 Sep), and a
-later run's id differs. `isExecuted` was never considered — it is spuriously
-true and killed the promise guard for a day. If the sandbox ever lacks
-staticData or the id, the tool tells the model to describe the options in
-words instead: the failure mode is the feature without buttons, not an error.
-Verified in runData: the success string came back, so both primitives exist
-in the tool sandbox. The attached list also gained the balance row —
-Chatwoot forwards a tap's TITLE, and `יתרה ותשלומים` already reaches the
-model as plain text from the canned menu today, so Sort needed nothing.
-
-**Gemini would not reach for the tool on the vague turn, twice.** Asked
-explicitly ("show me the menu options") it called the tool every time and
-wrote the right short line. On "idk" it recited the four flows in words —
-through one prompt rewording (12→13) and one description sharpening (13→14).
-Third round is where the address-justification lesson says stop, so the
-promise-guard doctrine closed it instead: **decide on the reply alone.** A
-reply naming 3+ of the four flows (`קריאת שירות`, `קריאה קיימת`, `יתרה`,
-`נציג`) IS the options message, and `Send` attaches the rows under it. It
-reads the bot's own output, never the resident's words — the no-keyword rule
-is about resident input, and the promise guard set the precedent. A normal
-ticket confirmation names one flow; the goodbye names none; ≥3 is recital.
-
-**Measured after:** "idk" → `show_menu` called, reply written for the
-buttons: `תוכלו לבחור מבין האפשרויות שמופיעות כאן למטה, או פשוט לספר לי מה
-אתם צריכים.` When temp 0.6 makes it recite instead, the net catches that
-too. Ticket arc, goodbye, first contact: unaffected, no menu. The one thing
-probes cannot see is the rendered buttons (probe conversations 404 at Send),
-so the visual check is the owner typing idk from his handset.
-
-**A pyc trap cost twenty minutes:** a helper process imported the module
-mid-edit and cached bytecode; the final write changed neither file size nor
-mtime-second, so the next patcher run loaded a stale mixed module and the
-epoch guard reported a hash the file no longer contained. When the guard
-contradicts the file, `rm -rf scripts/__pycache__` before believing either.
-
-Epochs 12, 13, 14 tonight, each guard-forced. Data point for the standing
-issues: `אני מבין.` bare opened one idk reply (22403, epoch-13 fresh buffer)
-— the understanding-shown rule holds elsewhere; sample of one, logged.
 
 ### The owner redefined the report, with a screenshot
 

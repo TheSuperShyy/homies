@@ -2047,6 +2047,20 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**When a rule about what to SAY keeps losing, stop writing rules and hand the
+model the words in the tool response. Proven 2 Sep.** Three prompt rules and a
+worked example failed for a week to stop the reference prefix being read; one
+`reference_spoken` field in the Edge Function ended it in an hour, 3/3. The
+pattern generalises: anything that must be spoken exactly — numbers above all —
+should arrive as data, minted server-side, with the prompt reduced to "say what
+you were handed". `withSpoken()` wraps every reference return so a new site
+cannot ship without it.
+
+**A trigger word is not a situation.** "Stuck elevator" ran the full emergency
+script for a lift explicitly stated to be empty — numbers read to someone who
+needed none. The person-vs-thing test needs its negative stated too: the same
+words with no person in them are an ordinary fault.
+
 **The agent's job is to handle the call, not to route it. Decided 1 Sep.** What
 it is not authorised to *decide* it is still authorised to *write*, so a
 disputed amount, a contract question or a complaint about staff becomes a

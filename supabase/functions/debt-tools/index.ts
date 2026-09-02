@@ -427,6 +427,28 @@ function matchesType(row: any, type: string): boolean {
   return words.some((w) => text.includes(w.toLowerCase()));
 }
 
+
+// The words the agent says for a reference: the middle serial, digit by digit,
+// feminine forms — the shape the prompt's own example reads 1042 in,
+// "אחת אפס ארבע שתיים". Minted HERE, not in the prompt, because three prompt
+// rules and a worked example all failed to stop the model reading the prefix
+// (and once dropping a digit: 255042). A string it is handed cannot be
+// mis-remembered; a rule can. The prompt's only job left is "say what the
+// tool gave you, alone, in its own turn".
+const HEB_DIGITS = ["אפס", "אחת", "שתיים", "שלוש", "ארבע", "חמש", "שש", "שבע", "שמונה", "תשע"];
+function spokenReference(reference: unknown): string | null {
+  const raw = String(reference ?? "");
+  const m = raw.match(/^\d+-(\d+)-\d+$/) ?? raw.match(/(\d{4})/);
+  if (!m) return null;
+  return m[1].split("").map((d) => HEB_DIGITS[Number(d)]).join(" ");
+}
+// Every return that carries a reference the agent will say aloud goes through
+// here, so a new return site cannot quietly ship without the spoken form.
+function withSpoken<T extends { reference?: unknown }>(out: T): T {
+  const say = spokenReference(out.reference);
+  return say ? { ...out, reference_spoken: say } : out;
+}
+
 function serialOf(value: unknown): string | null {
   let raw = String(value ?? "").trim();
 
@@ -922,7 +944,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .in("status", ["open", "in_progress", "needs_review"])
       .limit(1);
     if (already && already.length) {
-      return { ok: true, reference: already[0].reference, duplicate: true };
+      return withSpoken({ ok: true, reference: already[0].reference, duplicate: true });
     }
 
     const { data, error } = await db
@@ -951,7 +973,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // insert loses the ticket, not the outcome, so it is reported and not thrown.
     return error
       ? { ok: true, request_opened: false, error: error.message }
-      : { ok: true, reference: data.reference };
+      : withSpoken({ ok: true, reference: data.reference });
   },
 
   /**
@@ -1698,7 +1720,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           .update({ description: held ? held + " | " + fresh : fresh })
           .eq("id", dupeRow.id);
       }
-      return { ok: true, reference: dupeRow.reference, duplicate: true };
+      return withSpoken({ ok: true, reference: dupeRow.reference, duplicate: true });
     }
     }
 
@@ -1776,7 +1798,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id);
       }
-      return { ok: true, reference: stub.reference, completed_emergency: true };
+      return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
     }
 
     const { data, error } = await db
@@ -1807,7 +1829,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
                       data.reference, data.id);
     }
 
-    return { ok: true, reference: data.reference };
+    return withSpoken({ ok: true, reference: data.reference });
   },
 
   /**
@@ -1853,7 +1875,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // that asked the same question twice. Appending it again gives the office a
     // ticket that stutters.
     const existing = String(row.description ?? "");
-    if (existing.includes(detail)) return { ok: true, reference: row.reference };
+    if (existing.includes(detail)) return withSpoken({ ok: true, reference: row.reference });
 
     const { error } = await db
       .from("requests")
@@ -1861,7 +1883,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .eq("id", row.id);
 
     return error ? { ok: false, error: error.message }
-                 : { ok: true, reference: row.reference };
+                 : withSpoken({ ok: true, reference: row.reference });
   },
 
   /**
@@ -1911,7 +1933,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // Still ok:true on a failure. The agent is seconds from losing the call and
     // there is nothing useful it can do with the error; the end-of-call report
     // writes its own partial from the transcript regardless.
-    return error ? { ok: true } : { ok: true, reference: data.reference };
+    return error ? { ok: true } : withSpoken({ ok: true, reference: data.reference });
   },
 
   /**
@@ -2011,7 +2033,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     dupe = iid ? dupe.eq("interaction_id", iid) : dupe.eq("reported_by_phone", phone);
     const { data: already } = await dupe;
     if (already && already.length) {
-      return { ok: true, reference: already[0].reference, duplicate: true };
+      return withSpoken({ ok: true, reference: already[0].reference, duplicate: true });
     }
 
     // What they actually said. `messages` is written by "Log inbound" before the

@@ -194,7 +194,12 @@ def resolve(prompt, variables):
 # Edge Function's own responses — a tool that answers with the wrong shape is
 # worse than one that is missing, because the agent believes it.
 TOOL_RESULTS = {
-    "open_request": {"ok": True, "reference": "255-1042-26"},
+    # `reference_spoken` mirrors what the live Edge Function returns since v56:
+    # the middle serial as Hebrew digit words, minted server-side because three
+    # prompt rules failed to stop the model reading the prefix. A mock without
+    # it would probe the fallback path instead of the live one.
+    "open_request": {"ok": True, "reference": "255-1042-26",
+                     "reference_spoken": "אחת אפס ארבע שתיים"},
     "get_request_status": {"ok": True, "found": True, "reference": "255-1013-26",
                            "type": "elevator", "status": "in_progress",
                            "description": "מעלית תקועה", "other_open": 2},

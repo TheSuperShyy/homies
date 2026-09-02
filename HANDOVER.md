@@ -2343,7 +2343,21 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
 API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
 English callers `אני לא מבין עברית`.
 
-**INBOUND IS LIVE AT 30,174 CHARS (1 Sep), voice `ba765d50`, verified together.**
+**INBOUND IS LIVE AT 31,382 CHARS (2 Sep) — the quality pass.** Verified
+together from the API: prompt in sync, voice `ba765d50`, **`maxDurationSeconds`
+420** (owner's reversal of the 5 Aug 180), warm first idle line, six tools.
+**The Edge Function is at v56 and returns `reference_spoken`** — Hebrew digit
+words for the middle serial — on every reference-bearing return; the prompt says
+to speak exactly that. The `255042` defect is closed, 3/3 probed. The n8n
+debt-tools workflow forwards to Supabase untouched, so one function deploy
+(`python scripts/supabase_functions.py --apply`) covers the live path. If you
+change the reference behaviour, change the FUNCTION, not the prompt — the prompt
+lost three times. Known residues, accepted by the owner's brief being met
+otherwise: near-identical lobby-bulb acknowledgements across callers, occasional
+apartment-question on building faults, occasional trailing question on the
+reference turn.
+
+**INBOUND WAS LIVE AT 30,174 CHARS (1 Sep), voice `ba765d50`, verified together.**
 The agent now handles rather than routes: **`transfer_to_human` is for a caller
 who asks for a person, or an emergency, and nothing else.** Money, contracts and
 staff complaints open a tracked request instead. If you change this prompt,

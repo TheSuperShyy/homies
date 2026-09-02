@@ -254,7 +254,11 @@ BASE = {
     # a line with no caller ID, and this is the worst possible turn to guess in
     # — the caller has already gone quiet once.
     "messagePlan": {
-        "idleMessages": ["הלו? שומעים אותי?", "עדיין על הקו?"],
+        # Warmer first probe on 2 Sep: the first thing a hesitating caller
+                # hears should read as patience, not impatience. The second stays
+                # functional — after ~24s of nothing a real line-check is honest.
+                # Both still gender-free, per the note above.
+                "idleMessages": ["אני עדיין כאן, קחו את הזמן.", "הלו? שומעים אותי?"],
         # Eight seconds. Long enough that someone reading an apartment number
         # off a door is not interrupted, short enough that it lands before the
         # caller concludes the call has dropped.
@@ -310,7 +314,12 @@ TARGETS = {
             # write a partial from the transcript with no cooperation from the
             # model at all. That is the only version that cannot be talked out
             # of, and it needs a server URL that does not exist yet.
-            "maxDurationSeconds": 180,
+            # 180 -> 420 on 2 Sep, the owner's explicit reversal of the 5 Aug
+            # request, made when "close when the caller is done" and "handle it,
+            # do not route it" both needed room a 3-minute beheading denied.
+            # The prompt's clock section moved to seven minutes with it; the
+            # write-early ordering it teaches is unchanged and still the net.
+            "maxDurationSeconds": 420,
             # Untouched. Inbound silence is usually someone reading a meter number
             # off a wall, not a dead line.
             "silenceTimeoutSeconds": 30,
