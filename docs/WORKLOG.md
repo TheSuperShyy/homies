@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-09-02
 
+### Typed chat on /voice, and example debtors while the queue is empty
+
+The owner asked for two things: a chat so they can talk to the agent by
+typing, and example residents in the debt tab until real debtors flood it.
+
+**The chat.** Vapi's hosted Chat API wants a card on file the org does not
+have (402, checked), so the loop Vapi would run is run by us:
+`app/api/voice-chat/route.ts` reads the LIVE assistant off the Vapi API
+(prompt, first message, tool definitions), runs the same model the assistant
+runs (`openai/gpt-4.1-mini` via OpenRouter), and forwards tool calls to the
+real Edge Function with the real secret — so a typed conversation opens a
+real ticket with a real `reference_spoken`. This is `prompt_chat.py` grown
+up: real tools instead of mocks. The composer sits under the transcript in
+the same thread; a voice transcript on screen is sent as context, so hanging
+up and typing continues the same conversation. Three server-only env values
+added to `dashboard/.env.local` (VAPI_PRIVATE_KEY, OPENROUTER_API_KEY,
+TOOL_SECRET); the route answers 503 without them and the login wall keeps
+anonymous visitors off it — typing spends money and writes tickets.
+
+Verified outside the wall with a scratchpad replay of the exact engine: a
+typed kitchen leak opened ticket `255-1194-26`, the agent said `אחת אחת תשע
+ארבע` verbatim and middle-only, a follow-up detail landed on the same ticket
+via `add_request_detail`, and the closing sentence came out exact. That
+ticket is real and sits in Tickets as needs_review — left there on purpose,
+it shows where typed tickets land.
+
+**The examples.** `v_debt_call_queue_person` is empty today (nobody in the
+demo data owes and is still callable), which made the debt tab untestable.
+Three invented residents render only when the view returns nothing — שחר
+(male, card on file), מיכל (female, two months), נועם (gender unknown, so
+the neutral-forms branch finally gets exercised) — through the same
+`debtVariableValues` composer as real rows, and the pill over the list says
+"Example data" instead of "Live data" so nobody mistakes the world they are
+in. The moment real debtors appear the examples never render.
+
+Known and accepted: a typed chat sends no end-of-call report, so nothing
+lands on the Calls page, and its tickets say opened_via "voice" (channel()
+keys off the call id). The reference turn still sometimes carries a trailing
+question — the standing residue, unchanged.
+
 ### "fix it not working" — two causes, both mine, ten minutes
 
 The owner opened /voice and got nothing. Two independent faults stacked:

@@ -1484,6 +1484,15 @@ button.danger svg { width: 15px; height: 15px; }
 .voice-rule { border: 0; border-top: 1px solid var(--surface-border, #262a30); margin: 14px 0; }
 .voice-thread { max-height: 340px; overflow-y: auto; }
 .voice-thread .who { display: block; font-size: 11px; opacity: .7; margin-bottom: 2px; }
+.voice-composer { display: flex; gap: 8px; margin-top: 12px; }
+.voice-composer input {
+  flex: 1; min-width: 0; font: inherit; font-size: var(--text-sm);
+  height: var(--control-sm); padding-inline: 14px;
+  border: 1px solid var(--pill-border); border-radius: var(--radius-pill);
+  background: var(--input-bg); color: var(--text-1);
+}
+.voice-composer input::placeholder { color: var(--text-3); }
+.voice-typing { opacity: .6; }
 .voice-told { margin-top: 14px; font-size: 13px; }
 .voice-told summary { cursor: pointer; color: var(--text-muted, #8a8f98); }
 .voice-told dl { margin: 8px 0 0; }

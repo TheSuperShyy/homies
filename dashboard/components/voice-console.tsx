@@ -31,6 +31,7 @@ type Labels = {
   start: string; hangup: string; mute: string; unmute: string;
   agent: string; you: string; failed: string; micHint: string;
   transcriptHint: string; told: string; pickFirst: string;
+  chatPlaceholder: string; send: string; chatFailed: string;
 };
 
 type Line = { role: 'agent' | 'you'; text: string; done: boolean };
@@ -44,8 +45,14 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
   const [state, setState] = useState<'idle' | 'connecting' | 'live' | 'error'>('idle');
   const [muted, setMuted] = useState(false);
   const [lines, setLines] = useState<Line[]>([]);
+  const [draft, setDraft] = useState('');
+  const [sending, setSending] = useState(false);
+  const [chatErr, setChatErr] = useState(false);
   const vapiRef = useRef<any>(null);
   const threadRef = useRef<HTMLDivElement>(null);
+  // One id per conversation, minted at the first typed message — it is the
+  // call id the Edge Function sees, so a whole chat groups under one "call".
+  const chatIdRef = useRef<string | null>(null);
 
   useEffect(() => () => { vapiRef.current?.stop?.(); }, []);
   useEffect(() => {
@@ -54,6 +61,13 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
 
   const row = rows.find(r => r.id === picked) ?? null;
   const canStart = agent === 'intake' || (debtId && row);
+  const canChat = agent === 'intake' || !!row;
+
+  function reset() {
+    setLines([]);
+    setChatErr(false);
+    chatIdRef.current = null;
+  }
 
   function transcript(m: any) {
     if (m?.type !== 'transcript' || !m.transcript) return;
@@ -70,10 +84,52 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
     });
   }
 
+  // Typed chat — the same agent brain over /api/voice-chat, no microphone.
+  // The thread is the context: a voice transcript already on screen is sent
+  // along, so hanging up and typing "מה מספר הפנייה?" continues the same
+  // conversation as far as the model is concerned.
+  async function send() {
+    const text = draft.trim();
+    if (!text || sending || inCall || !canChat) return;
+    setDraft('');
+    setChatErr(false);
+    if (!chatIdRef.current) chatIdRef.current = 'chat-' + crypto.randomUUID();
+    const history = [
+      ...lines.map(l => ({ role: l.role === 'agent' ? 'assistant' : 'user', content: l.text })),
+      { role: 'user', content: text },
+    ];
+    setLines(prev => [...prev, { role: 'you', text, done: true }]);
+    setSending(true);
+    try {
+      const res = await fetch('/api/voice-chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          agent, chatId: chatIdRef.current, messages: history,
+          ...(agent === 'debt' && row ? { variables: row.variables } : {}),
+        }),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.reply) throw new Error();
+      setLines(prev => {
+        // The greeting belongs at the top of a typed conversation too — the
+        // server already gave it to the model; show the reader the same thing.
+        const opened = out.first && !prev.some(l => l.role === 'agent')
+          ? [{ role: 'agent' as const, text: out.first, done: true }, ...prev]
+          : prev;
+        return [...opened, { role: 'agent', text: out.reply, done: true }];
+      });
+    } catch {
+      setChatErr(true);
+    } finally {
+      setSending(false);
+    }
+  }
+
   async function start() {
     if (!canStart) return;
     setState('connecting');
-    setLines([]);
+    reset();
     try {
       const Vapi = (await import('@vapi-ai/web')).default;
       const vapi = new Vapi(publicKey);
@@ -107,10 +163,10 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
     <div className="voice-console">
       <nav className="seg" aria-label={labels.tabIntake}>
         <button type="button" className={agent === 'intake' ? 'on' : ''}
-          disabled={inCall} onClick={() => setAgent('intake')}>{labels.tabIntake}</button>
+          disabled={inCall} onClick={() => { setAgent('intake'); reset(); }}>{labels.tabIntake}</button>
         {debtId && (
           <button type="button" className={agent === 'debt' ? 'on' : ''}
-            disabled={inCall} onClick={() => setAgent('debt')}>{labels.tabDebt}</button>
+            disabled={inCall} onClick={() => { setAgent('debt'); reset(); }}>{labels.tabDebt}</button>
         )}
       </nav>
 
@@ -168,8 +224,25 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
                     {l.text}
                   </div>
                 ))}
+                {sending && (
+                  <div className="msg bot voice-typing">
+                    <span className="who">{labels.agent}</span>…
+                  </div>
+                )}
               </div>
             )}
+
+          {!inCall && (
+            <form className="voice-composer"
+              onSubmit={e => { e.preventDefault(); send(); }}>
+              <input value={draft} onChange={e => setDraft(e.target.value)}
+                placeholder={labels.chatPlaceholder} disabled={sending || !canChat}
+                dir="auto" />
+              <button type="submit" className="btn-sm"
+                disabled={sending || !canChat || !draft.trim()}>{labels.send}</button>
+            </form>
+          )}
+          {chatErr && <p className="notice bad">{labels.chatFailed}</p>}
 
           {agent === 'debt' && row && (
             <details className="voice-told">

@@ -2353,6 +2353,24 @@ the real outbound path in `lib/call.ts`. Env needed:
 `dashboard/.env.local`, absent on Vercel. The Calls-header widget from earlier
 the same day is GONE (`voice-call.tsx` deleted); do not resurrect it.
 
+**THE SECTION ALSO CHATS (2 Sep, evening): typed messages to either agent, same
+thread as the transcript.** Vapi's hosted Chat API is unavailable (402, no card
+on the org), so `dashboard/app/api/voice-chat/route.ts` runs the loop itself:
+live assistant config off the Vapi API (5-min cache), `openai/gpt-4.1-mini` via
+OpenRouter — the model the assistants run — and tool calls forwarded to the
+real Edge Function, so **a typed chat opens real tickets** (proof: `255-1194-26`,
+typed leak, `reference_spoken` verbatim). Three server-only env values in
+`dashboard/.env.local` and `.env.example`: `VAPI_PRIVATE_KEY`,
+`OPENROUTER_API_KEY`, `TOOL_SECRET` — NEVER `NEXT_PUBLIC_`. The login wall
+covers the route (typing spends OpenRouter money); without the env it answers
+503 and the voice half still works. Typed chats send no end-of-call report —
+nothing lands on `/calls` — and their tickets say `opened_via` "voice". The
+debt tab shows THREE INVENTED RESIDENTS (`SAMPLE_PEOPLE` in
+`app/(app)/voice/page.tsx`) only while `v_debt_call_queue_person` returns
+nothing, with the list pill switched to "Example data"; real rows displace them
+automatically. The third example has `gender: null` on purpose — it exercises
+the neutral-forms branch.
+
 **THE DASHBOARD HAD A TALK-TO-MICHAEL WIDGET (2 Sep), LOCAL-ONLY UNTIL VERCEL
 GETS ENV VARS.** `/calls` page header, `dashboard/components/voice-call.tsx`,
 `@vapi-ai/web@2.7.0`, driven by `NEXT_PUBLIC_VAPI_PUBLIC_KEY` +

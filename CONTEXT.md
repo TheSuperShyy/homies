@@ -2057,6 +2057,24 @@ and read the server banner for which port it actually took.
 mobile tab bar translate separately, `t()` throws on an unknown key, and the
 throw lands in the layout, which takes every page down, not just the new one.
 
+**Vapi's hosted Chat API is closed to this org: 402 `payment_method_missing`,
+checked 2 Sep.** Pay-as-you-go orgs need a card on file for text chat, and this
+one has none. The typed chat on `/voice` therefore runs the loop itself —
+`app/api/voice-chat/route.ts`: live config off the Vapi API, the assistants'
+own model over OpenRouter, tool calls to the real Edge Function. If a card ever
+lands on the org, that route could shrink to a proxy; until then it IS the chat,
+and its behaviour drifts from a real call only where Vapi's runtime differs
+from a plain completion loop (temperature 0.3, six tool rounds — the
+`prompt_probe.py` numbers). The thread on screen is the model's context: what
+the panel shows is what the model was told, voice transcript included.
+
+**The dashboard's login wall covers `/api/*` too, and that is load-bearing for
+the chat route.** The middleware matcher excludes only static assets, so any
+new API route is behind the session by default — which is what lets a route
+that spends OpenRouter money and writes tickets exist on a dashboard at all.
+An unauthenticated POST gets a 307 to `/login`, not an error; a curl test that
+seems to "return /login" is the wall working, not the route broken.
+
 **A rehearsal reads what the real thing reads, and never through the writer.
 Decided 2 Sep with the Voice Agent call page.** The console composes debt calls
 from `v_debt_call_queue_person` — the exact view `press_call()` uses — but never
