@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-09-02
 
+### Michael is in the dashboard — a web call from the Calls page
+
+The owner asked for the voice agent in the dashboard. Almost all the plumbing
+existed: the Calls page already reads `interactions`, which is exactly where the
+end-of-call report writes; the web demo already proved the Vapi web SDK, the
+public key and the assistant id; the dashboard just had no widget.
+
+**Built:** `dashboard/components/voice-call.tsx` — a client component on the
+Calls page header. Idle: one button (לדבר עם מיכאל) and a mic hint. Live:
+connecting pill, mute, hang-up, and a live transcript rendered with the
+product's own `.thread` / `.msg` bubbles, partial turns settling in place. The
+SDK (`@vapi-ai/web@2.7.0`, exact) is imported dynamically inside the click
+handler, so reading the calls list costs none of its download. Labels arrive
+translated from the server page, the same pattern the icons use. The component
+stops the call on unmount — navigating away must not leave the mic open. Both
+env values (`NEXT_PUBLIC_VAPI_PUBLIC_KEY`, `NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID`)
+are public by design, and their absence hides the button entirely rather than
+rendering one that cannot work — the debts-page convention.
+
+**And the row it produces now tells the truth.** `endOfCall()` labelled every
+web call `outbound` (only "inbound" in `call.type` matched), so widget calls
+would have landed in the wrong tab with a null caller. Edge Function v57: a
+`webCall` to the intake assistant is `inbound` — someone came to us — while a
+web call to any other assistant (the debt demo) stays outbound.
+
+`npm run build` clean. **Not verified end-to-end:** a real widget call needs a
+browser and a microphone, which is the owner's half; the report row and the
+inbound tab placement get proven by that first call.
+
+**Vercel remains the gap:** the production project has zero env vars, so the
+widget (and Supabase itself) only work locally until they are set.
+
+
 ### The quality pass: smart, warm, human — measured, fixed, shipped
 
 The owner's brief was a quality bar, not a bug: *"smart, accommodating, human,

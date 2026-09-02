@@ -2343,6 +2343,15 @@ NEVER PROBED.** State as of the push, in order of what would bite first:
 API.** Includes the 1 Sep fix for the non-Hebrew hand-off, which was telling
 English callers `אני לא מבין עברית`.
 
+**THE DASHBOARD HAS A TALK-TO-MICHAEL WIDGET (2 Sep), LOCAL-ONLY UNTIL VERCEL
+GETS ENV VARS.** `/calls` page header, `dashboard/components/voice-call.tsx`,
+`@vapi-ai/web@2.7.0`, driven by `NEXT_PUBLIC_VAPI_PUBLIC_KEY` +
+`NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID` (both public by design; set in
+`dashboard/.env.local`, absent on Vercel where NOTHING is set — that project
+still has zero env vars and the widget hides itself there). Edge Function v57
+labels a webCall to the intake assistant `inbound`, so widget calls land in the
+right tab; the first real widget call is the end-to-end proof nobody has run.
+
 **INBOUND IS LIVE AT 31,382 CHARS (2 Sep) — the quality pass.** Verified
 together from the API: prompt in sync, voice `ba765d50`, **`maxDurationSeconds`
 420** (owner's reversal of the 5 Aug 180), warm first idle line, six tools.

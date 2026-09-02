@@ -1449,3 +1449,15 @@ button.danger svg { width: 15px; height: 15px; }
      as the cards under it. */
   thead th { padding-inline: 16px; }
 }
+
+/* ---- Talk to Michael (Calls page web-call widget) ----------------------
+   Lives in the pagehead next to the title when idle; grows a transcript
+   thread while a call runs. Reuses the conversation bubble classes so the
+   live call reads like every other thread in the product. */
+.pagehead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.voicecall { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.voicecall .hint { color: var(--text-muted, #8a8f98); font-size: 12px; }
+.voicecall.live { flex-direction: column; align-items: stretch; width: 100%; }
+.voicecall-controls { display: flex; align-items: center; gap: 10px; }
+.voicecall-thread { max-height: 260px; overflow-y: auto; margin-top: 8px; }
+.voicecall-thread .who { display: block; font-size: 11px; opacity: .7; margin-bottom: 2px; }

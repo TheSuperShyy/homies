@@ -2047,6 +2047,11 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**A widget that cannot work does not render. Standing since the debts page,
+reaffirmed 2 Sep.** The talk-to-Michael button appears only when both its env
+values exist; a disabled button that explains itself is for things a user can
+fix, and a missing server credential is not one of them.
+
 **When a rule about what to SAY keeps losing, stop writing rules and hand the
 model the words in the tool response. Proven 2 Sep.** Three prompt rules and a
 worked example failed for a week to stop the reference prefix being read; one

@@ -2302,6 +2302,11 @@ function disposition(reason: string): string {
   return reason;
 }
 
+// The inbound intake assistant on Vapi. Hardcoded the way the reference
+// format is: it changes when the assistant is recreated, which is an event,
+// not a config drift.
+const INTAKE_ASSISTANT_ID = "7752c6bb-89e9-49f3-aaf4-154ecc65cdff";
+
 async function endOfCall(message: any, ctx: CallContext) {
   const call = message?.call ?? {};
   const artifact = message?.artifact ?? {};
@@ -2357,7 +2362,16 @@ async function endOfCall(message: any, ctx: CallContext) {
     // `outboundPhoneCall` or `inboundPhoneCall`, and it is the only reliable
     // signal — the demo runs entirely on web calls, so direction cannot be
     // inferred from a customer number that is never there.
-    direction: String(call?.type ?? "").toLowerCase().includes("inbound") ? "inbound" : "outbound",
+    // A web call has no direction of its own, so it takes the assistant's:
+    // reaching the intake agent from a browser IS an inbound contact - someone
+    // came to us - and since 2 Sep the dashboard's Calls page has a
+    // talk-to-Michael widget doing exactly that, which was landing under
+    // "outbound" with a null caller and confusing the list it appeared in.
+    // A web call to any other assistant (the debt demo) stays outbound.
+    direction: String(call?.type ?? "").toLowerCase().includes("inbound") ||
+        (String(call?.type ?? "") === "webCall" &&
+         String(call?.assistantId ?? "") === INTAKE_ASSISTANT_ID)
+      ? "inbound" : "outbound",
     resident_id: ctx.residentId,
     caller_phone: call?.customer?.number ?? null,
     transcript,
