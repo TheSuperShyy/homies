@@ -2047,6 +2047,16 @@ printed `voice: cartesia a976c076… (cloned)` and that voice is stock Eyal. The
 word "cloned" was a hardcoded string next to a hardcoded id, agreeing with
 nothing.
 
+**On this machine, stopping a background `npm run dev` leaves node alive.**
+TaskStop reaches the npm wrapper; the node child keeps the port. The next
+server silently drifts to :3001 and the browser keeps talking to the corpse on
+:3000. Kill by PID (`Get-NetTCPConnection` → `Stop-Process`) before restarting,
+and read the server banner for which port it actually took.
+
+**A new nav entry needs BOTH keys, `nav.*` and `tab.*`** — the rail and the
+mobile tab bar translate separately, `t()` throws on an unknown key, and the
+throw lands in the layout, which takes every page down, not just the new one.
+
 **A rehearsal reads what the real thing reads, and never through the writer.
 Decided 2 Sep with the Voice Agent call page.** The console composes debt calls
 from `v_debt_call_queue_person` — the exact view `press_call()` uses — but never

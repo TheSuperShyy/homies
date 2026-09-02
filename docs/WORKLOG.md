@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-09-02
 
+### "fix it not working" — two causes, both mine, ten minutes
+
+The owner opened /voice and got nothing. Two independent faults stacked:
+
+1. **The browser was talking to a dead server.** Restarting the dev server had
+   left the old node process holding port 3000 — on Windows, TaskStop kills the
+   npm wrapper and the node child survives — so the new server (with the new
+   env) drifted to 3001 while the browser stayed on 3000. Killed both orphans
+   by PID, one clean server on 3000.
+2. **A missing translation key was a 500.** The layout builds the mobile tab
+   bar from `tab.${key}` and the rail from `nav.${key}`; the new nav entry got
+   `nav.voice` only, and `t()` throws on an unknown key — taking the whole
+   layout down for every page. `tab.voice` added.
+
+Verified by the log: `GET /voice 500` became `GET /voice 200` on the owner's
+own session.
+
+
 ### "Voice Agent call" — the test console became a dashboard section
 
 The header widget lasted one review: the owner wanted what the browser console

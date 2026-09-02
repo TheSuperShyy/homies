@@ -91,6 +91,7 @@ const S = {
   'tab.debts':         { he: 'חובות',            en: 'Debts' },
   'tab.conversations': { he: 'ווטסאפ',           en: 'Chats' },
   'tab.calls':         { he: 'טלפון',            en: 'Calls' },
+  'tab.voice':         { he: 'סוכן קולי',        en: 'Voice' },
   'lang.switch':       { he: 'English',          en: 'עברית' },
   'lang.switchLabel':  { he: 'Switch to English', en: 'החלף לעברית' },
 
