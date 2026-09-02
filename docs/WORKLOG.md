@@ -208,6 +208,25 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### The 4th row swallowed the 3 buttons, and WhatsApp was the reason
+
+The owner's screenshot at 18:48: the intro with a collapsed English
+"Choose an item" button where his three buttons used to be. *"what happened
+to our 3 buttons."*
+
+What happened was the balance row, added the night before for completeness.
+**WhatsApp renders at most 3 reply buttons inline; a 4th item makes Chatwoot
+switch to a list message** — one collapsed button, its label not ours to set,
+that the resident must tap before seeing any option. Every menu send shares
+the one items list in `Send`, so the greeting menu changed shape too.
+
+Reverted the same day: three rows, three visible buttons, balance reachable
+by typing as it always was. `show_menu`'s description now enumerates three,
+not four (epoch 14 → 15, tools hash). The recital net keeps all four tokens —
+it reads what the model writes, and the model still names balance in words.
+The lesson is pinned above ITEMS_3 in `n8n_whatsapp_menu.py`: do not add a
+4th row without changing the whole message shape on purpose.
+
 ### "idk" is not a goodbye — the menu became a judgment, with a net under it
 
 The owner's screenshot: "hey is this homies" answered well, then "idk" got

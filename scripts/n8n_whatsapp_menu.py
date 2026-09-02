@@ -26,11 +26,10 @@ other judgment in this workflow, and the menu itself stays the system's:
 2. `Send` attaches the option rows whenever `menu_exec` equals THIS run's id
    — the same one-message mechanism the echo clause uses: the model's own
    words on top, the rows underneath.
-3. The attached list gains the balance row, matching the real canned menu.
-   Chatwoot forwards a tap's TITLE, not its id, and 'יתרה ותשלומים' from the
-   canned menu already reaches the model as plain text today (it is not in
-   Sort's TAP_KIND) — so no Sort change, this is the behaviour that already
-   exists.
+3. The list stays at THREE rows. A balance row was tried on 2 Sep and
+   reverted the same day: WhatsApp renders at most 3 reply buttons inline,
+   and a 4th item collapses the whole thing into an English "Choose an item"
+   list button. See the note above ITEMS_3.
 
 The description's source of truth is W.tool('show_menu') in n8n_whatsapp.py,
 synced here like every other tool patcher. Idempotent: run twice, the second
@@ -71,11 +70,19 @@ COND_NEW = ("if ($('Sort').first().json.greeting || "
             " === String($execution.id); } catch (e) { return false; } })() || "
             "t.indexOf(")
 
-ITEMS_OLD = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
-             "{ title: 'לדבר עם נציג', value: 'human' }")
-ITEMS_NEW = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
-             "{ title: 'יתרה ותשלומים', value: 'balance' }, "
-             "{ title: 'לדבר עם נציג', value: 'human' }")
+# THE LIST IS THREE ROWS, AND THAT IS A WHATSAPP RENDERING FACT, NOT A CHOICE.
+# WhatsApp shows at most 3 reply buttons inline; a 4th item makes Chatwoot
+# switch to a list message — a collapsed English "Choose an item" button the
+# resident has to tap before seeing anything. A balance row was added here on
+# 2 Sep for completeness and the owner's next greeting showed the collapsed
+# button instead of his three buttons ("what happened to our 3 buttons").
+# Reverted the same day. Balance stays reachable by typing, as it always was.
+# Do not add a 4th row without changing the whole message shape on purpose.
+ITEMS_3 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
+           "{ title: 'לדבר עם נציג', value: 'human' }")
+ITEMS_4 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
+           "{ title: 'יתרה ותשלומים', value: 'balance' }, "
+           "{ title: 'לדבר עם נציג', value: 'human' }")
 
 # The net, promise-guard doctrine: decide on the reply alone. Three probes
 # (22394, 22403, 22410) showed the model reliably ANSWERS a lost resident by
@@ -156,8 +163,9 @@ def main():
     for old, new, done, label in (
             (COND_OLD, COND_NEW, RECITE_OLD,
              "Send: the menu_exec flag joins the menu condition"),
-            (ITEMS_OLD, ITEMS_NEW, ITEMS_NEW,
-             "Send: the balance row joins the attached list"),
+            (ITEMS_4, ITEMS_3, ITEMS_3,
+             "Send: the balance row comes back out (4 rows collapse "
+             "WhatsApp's buttons into a 'Choose an item' list)"),
             (RECITE_OLD, RECITE_NEW, RECITE_NEW,
              "Send: a reply reciting 3+ of the four flows carries the rows")):
         if done in body:
