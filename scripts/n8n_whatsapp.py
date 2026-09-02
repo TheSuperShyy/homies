@@ -203,7 +203,13 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 16
+MEMORY_EPOCH = 17
+# 16 -> 17, 2 Sep night: the layer audit. The owner called it: a layer
+# rule was lying. The tool return promised a list no relay could deliver;
+# transfer and get_balance both claimed the plain balance question;
+# reporter_unit demanded the flat the other tools ban asking for; the
+# mid-matter ban had no exit for a stuck resident. Signal rides the
+# agent's returnIntermediateSteps output now - text-free, template-free.
 # 14 -> 15, 2 Sep evening: the balance row came back out of show_menu's
 # description with the row itself (4 rows collapse WhatsApp's buttons).
 # 12 -> 13 -> 14, 2 Sep: the show_menu rounds. 12 minted the tool and the
@@ -244,7 +250,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "f28d27c165f7",
+    "tools": "86ab94400d9c",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -997,8 +1003,15 @@ TOOLS = [
             "handover exists and stays true: do not call this again in the "
             "same conversation, and do not tell them a second time. Later "
             "messages are for what is actually new.\n"
-            "Call it whenever money, debt, payment details or receipts come "
-            "up; when the resident asks for a person, or is angry; and "
+# Bounded 2 Sep, layer audit: "whenever money, debt ... come up" and
+            # get_balance's "asks about their balance, their debt" both claimed
+            # the same plain balance question, and which tool answered it was a
+            # coin flip. Transfer keeps money in motion or in dispute; the
+            # lookup keeps the lookup.
+            "Call it whenever money is in motion or in dispute — payment "
+            "details, receipts, a claim that a bill or a balance is wrong. A "
+            "plain how-much-do-I-owe question is get_balance's, not yours. "
+            "Call it when the resident asks for a person, or is angry; and "
             "whenever you are simply not sure — being unsure is reason enough "
             "on its own.\n"
             "And call it for a PERSON in a bad state, as opposed to a thing "
@@ -1090,8 +1103,8 @@ TOOLS = [
         "name": "get_balance",
         "description": (
             "Call when the resident asks about their balance, their debt, or "
-            "how much they owe — including a tap on the balance row of the "
-            "options list. IDENTITY FIRST: this needs the resident's full name "
+            "how much they owe. "
+            "IDENTITY FIRST: this needs the resident's full name "
             "AND their phone number, both typed by them in this conversation. "
             "Do not call it without both, do not use the number they are "
             "messaging from, and never fill either from a guess. If they have "
@@ -1154,10 +1167,13 @@ TOOLS = [
             "ask whether they would like to see the options and never "
             "announce that you are about to show them — the question costs "
             "the resident a whole round-trip; call this and show them in the "
-            "same breath. Never "
-            "use it while you are already handling a concrete matter, and not "
-            "twice in a row: once the options are in front of them, another "
-            "list is noise. Takes no parameters."
+            "same breath. Never use it while the matter is moving forward. "
+            "But when the resident cannot answer what you asked and the "
+            "matter is stuck — they say they do not know, and saying it "
+            "differently did not help — showing the choices IS the way "
+            "forward: one clarifying question, then this. Not twice in a "
+            "row: once the options are in front of them, another list is "
+            "noise. Takes no parameters."
         ),
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },

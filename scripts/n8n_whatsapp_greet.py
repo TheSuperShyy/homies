@@ -69,11 +69,13 @@ GREET_NEW = (
 # --------------------------------------------------------------------------
 # 2. Send: a verbatim intro echo carries the menu, greeted or not.
 # --------------------------------------------------------------------------
-SEND_OLD = ("if ($('Sort').first().json.greeting || "
-            "(/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true))")
-SEND_NEW = ("if ($('Sort').first().json.greeting || "
-            "t.indexOf('היי, כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || "
-            "(/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true))")
+# Re-anchored 2 Sep night: n8n_whatsapp_menu.py inserted its signal clauses
+# between `greeting ||` and the echo test, so the original whole-condition
+# anchors stopped matching an up-to-date Send and this file refused as
+# drifted. The echo clause itself is the anchor now: present = done; absent =
+# insert it before the מיכאל fallback test, wherever that sits.
+SEND_ECHO = "t.indexOf('היי, כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || "
+SEND_TAIL = "(/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true))"
 
 # --------------------------------------------------------------------------
 # 3. get_balance's unit doc: the normal case first, and never a question.
@@ -110,8 +112,15 @@ def main():
 
     edit("Sort", "jsCode", GREET_OLD, GREET_NEW,
          "Sort: the greeting list learns English small talk")
-    edit("Send", "jsonBody", SEND_OLD, SEND_NEW,
-         "Send: a verbatim intro echo carries the menu, greeted or not")
+    sval = by["Send"]["parameters"].get("jsonBody") or ""
+    if SEND_ECHO not in sval:
+        if SEND_TAIL not in sval:
+            sys.exit("Anchor missing on live Send.jsonBody -- refusing to "
+                     "guess:\n  Send: a verbatim intro echo carries the menu")
+        by["Send"]["parameters"]["jsonBody"] = sval.replace(
+            SEND_TAIL, SEND_ECHO + SEND_TAIL, 1)
+        changes.append("Send: a verbatim intro echo carries the menu, "
+                       "greeted or not")
     edit("get_balance", "jsonBody", UNIT_OLD, UNIT_NEW,
          "get_balance: the unit doc states the normal case and bans the question")
 

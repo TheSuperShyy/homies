@@ -4,36 +4,46 @@
     python scripts/n8n_whatsapp_menu.py            # dry run
     python scripts/n8n_whatsapp_menu.py --apply    # write it
 
-WHY — the owner's 2 Sep screenshot: "hey is this homies" was answered well,
-then "idk" got a warm sign-off and a dead conversation. Not knowing what you
-need was filed under needing nothing. His constraint, verbatim: "i dont want
-a strict rule for keywords i want it to be general remember how we input
-rules using keywords for trigger and we created a dumb bot i want to prevent
-that from happening again."
+WHY — the owner's 2 Sep screenshots, in order: "idk" got a warm sign-off and
+a dead thread; then, after the tool existed, "ok" got "הנה האפשרויות" with
+nothing under it. His constraints, verbatim: "i dont want a strict rule for
+keywords i want it to be general" and "i dont want any templated message".
+His diagnosis, also verbatim: "a layer rule is lying" — and one was.
 
-So the WHEN is the model's judgment, carried by a tool description like every
-other judgment in this workflow, and the menu itself stays the system's:
+THE SIGNAL, third attempt, the one that is both live-proven and text-free:
+`returnIntermediateSteps` on the agent node puts the tool calls into the
+agent's own MAIN-CHAIN output item, and Send reads them through
+$('Answer the resident') — the exact channel the promise guard exercises on
+every run. Two earlier relays died in Send's expression sandbox and their
+try/catch hid it (execs 22878, 22940, 22947: show_menu ran, success string
+returned, content_type=text posted):
 
-1. `show_menu`, a Code tool. It writes `staticData.menu_exec = <execution id>`
-   and tells the model the list will appear under its next message. THE FLAG
-   CANNOT LEAK: concurrent executions never see each other's staticData (a
-   per-execution snapshot — measured, see the batch patcher), and a later
-   execution's id differs, so the equality below fails. `isExecuted` was
-   never an option; it is spuriously true and killed the promise guard for a
-   day. If the sandbox lacks staticData or the execution id, the tool
-   degrades to telling the model to describe the options in its own words —
-   the failure mode is the feature without buttons, never an error.
-2. `Send` attaches the option rows whenever `menu_exec` equals THIS run's id
-   — the same one-message mechanism the echo clause uses: the model's own
-   words on top, the rows underneath.
-3. The list stays at THREE rows. A balance row was tried on 2 Sep and
-   reverted the same day: WhatsApp renders at most 3 reply buttons inline,
-   and a 4th item collapses the whole thing into an English "Choose an item"
-   list button. See the note above ITEMS_3.
+  1. staticData is a Code-node facility; expressions do not have it.
+  2. $('show_menu') has no main output an expression can read — ai_tool
+     nodes emit on the ai_tool channel.
 
-The description's source of truth is W.tool('show_menu') in n8n_whatsapp.py,
-synced here like every other tool patcher. Idempotent: run twice, the second
-reports nothing to do.
+Layers, after the audit (all pointing one direction now):
+  - prompt: someone lost has not finished; show the list, don't enumerate.
+  - description: judgment carrier — when to call, mid-matter tie-breaker
+    (stuck after a clarify = show the choices), never announce or ask
+    permission, not twice in a row.
+  - tool return: truthful — the buttons appear under your next message.
+  - Send: greeting || tool-called (intermediateSteps) || recital net (a
+    reply naming 3+ flows in the model's OWN words gets the buttons too,
+    the backstop for runs where the model recites instead of calling) ||
+    verbatim-intro-echo. The model's text is 100% its own on every path.
+
+Also owned here, from the same audit: open_request's `reporter_unit` doc
+stops demanding the flat "every time" — it fought get_request_status's
+DO-NOT-ASK-FOR-AN-APARTMENT rule on every lobby and lift fault.
+
+The list is THREE rows — a WhatsApp rendering fact (3 reply buttons inline;
+a 4th collapses everything into an English "Choose an item" list button; it
+happened to the owner's greeting on 2 Sep and was reverted the same day).
+
+Idempotent. This file patches the CURRENT live state to the end state and
+recognizes the end state; it does not rebuild from scratch — that recovery
+path is git history.
 """
 import os
 import sys
@@ -47,158 +57,108 @@ import n8n_whatsapp as W  # noqa: E402
 WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
 
 TOOL_CODE = """\
-// The flag Send reads to attach the option rows under this reply. Keyed by
-// execution id: concurrent runs cannot see this write (staticData is a
-// per-execution snapshot) and a later run's id differs, so it cannot leak.
-try {
-  const s = $getWorkflowStaticData('global');
-  const id = ($execution && $execution.id) ? String($execution.id) : '';
-  s.menu_exec = id;
-  if (id) {
-    return 'רשימת האפשרויות תוצג לדייר מתחת להודעה הבאה שלך. כתוב הודעה קצרה משלך; הרשימה כבר מציעה את האפשרויות, אז אל תמנה אותן בעצמך.';
-  }
-} catch (e) { }
-return 'אין אפשרות להציג את הרשימה כרגע. הצג לדייר בקצרה, במילים שלך, במה אתה יכול לעזור.';
+// This call is read by Send out of the agent's own output
+// (returnIntermediateSteps) - nothing in here signals anything. Do not put
+// a staticData write or an $execution read back: both died in Send's
+// expression sandbox (execs 22878, 22940, 22947) and the try/catch around
+// them hid it while the bot told residents the options were coming.
+return 'שלושת הכפתורים יופיעו מתחת להודעה הבאה שלך. כתוב משפט קצר משלך, בלי למנות את האפשרויות ובלי להכריז שהן בדרך - הן כבר שם.';
 """
 
-# --------------------------------------------------------------------------
-# Send: the flag joins the menu condition, and the balance row joins the list.
-# --------------------------------------------------------------------------
-COND_OLD = "if ($('Sort').first().json.greeting || t.indexOf("
-COND_NEW = ("if ($('Sort').first().json.greeting || "
-            "(() => { try { return $getWorkflowStaticData('global').menu_exec"
-            " === String($execution.id); } catch (e) { return false; } })() || "
-            "t.indexOf(")
+# The two dead relays, contiguous on the pre-fix live body, replaced by the
+# intermediateSteps read.
+DEAD = ("(() => { try { return $('show_menu').all().length > 0; }"
+        " catch (e) { return false; } })() || "
+        "(() => { try { return $getWorkflowStaticData('global').menu_exec"
+        " === String($execution.id); } catch (e) { return false; } })() || ")
+STEPS = ("(() => { try { return ($('Answer the resident').first().json"
+         ".intermediateSteps || []).some(s => ((s.action || {}).tool) === "
+         "'show_menu'); } catch (e) { return false; } })() || ")
 
-# THE LIST IS THREE ROWS, AND THAT IS A WHATSAPP RENDERING FACT, NOT A CHOICE.
-# WhatsApp shows at most 3 reply buttons inline; a 4th item makes Chatwoot
-# switch to a list message — a collapsed English "Choose an item" button the
-# resident has to tap before seeing anything. A balance row was added here on
-# 2 Sep for completeness and the owner's next greeting showed the collapsed
-# button instead of his three buttons ("what happened to our 3 buttons").
-# Reverted the same day. Balance stays reachable by typing, as it always was.
-# Do not add a 4th row without changing the whole message shape on purpose.
+# The recital-net backstop and the three-row list: asserted present, never
+# rebuilt from here.
+FILTER = ("['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג']"
+          ".filter(w => t.indexOf(w) !== -1).length >= 3 || ")
 ITEMS_3 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
            "{ title: 'לדבר עם נציג', value: 'human' }")
 ITEMS_4 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
            "{ title: 'יתרה ותשלומים', value: 'balance' }, "
            "{ title: 'לדבר עם נציג', value: 'human' }")
 
-# The net, promise-guard doctrine: decide on the reply alone. Three probes
-# (22394, 22403, 22410) showed the model reliably ANSWERS a lost resident by
-# reciting the four flows in words while leaving the tool unused — its
-# judgment about WHEN to present options is right, its format is wrong, and a
-# third prompt round is where the address-justification lesson says to stop.
-# So when a reply names three or more of the four flows, it IS the options
-# message, and the rows attach under it. This reads the bot's own output,
-# never the resident's words — the owner's no-keyword-triggers rule is about
-# resident input, and the promise guard set this exact precedent.
-RECITE_OLD = ("(() => { try { return $getWorkflowStaticData('global').menu_exec"
-              " === String($execution.id); } catch (e) { return false; } })() || ")
-
-# THE STATICDATA RELAY FAILED IN PRODUCTION AND THE CATCH HID IT. Owner's
-# thread, exec 22878, 2 Sep 21:43: show_menu ran and returned its success
-# string (so the TOOL sandbox has staticData and the execution id), the model
-# wrote "בטח, הנה האפשרויות העיקריות שלנו." — and Send posted content_type
-# text. The read side of the flag evaluated false inside Send's EXPRESSION
-# sandbox, which does not share the Code sandbox's facilities; the try/catch
-# built for graceful degradation swallowed exactly this failure, silently.
-# Probes never saw it because their fake conversations 404 at Send before the
-# expression's result is recorded anywhere.
-#
-# So the primary signal is now the tool's own run: $('show_menu') reads THIS
-# execution's runData — on a run where the tool never fired, .all() throws
-# (the promise-guard postmortem documented $('open_request').all() throwing)
-# and the catch turns that into false; when it fired, the items are there.
-# Nothing can leak across executions. The staticData clause stays as a
-# second chance until the owner's handset proves which one is live; strip
-# the dead one then (HANDOVER carries the reminder).
-TOOLRAN = ("(() => { try { return $('show_menu').all().length > 0; }"
-           " catch (e) { return false; } })() || ")
-RECITE_NEW = ("(() => { try { return $getWorkflowStaticData('global').menu_exec"
-              " === String($execution.id); } catch (e) { return false; } })() || "
-              "['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג']"
-              ".filter(w => t.indexOf(w) !== -1).length >= 3 || ")
-
-
-def clear_spot(nodes, x, y):
-    """Nudge y down until the position overlaps nothing (dx<200 AND dy<100)."""
-    while any(abs(n["position"][0] - x) < 200 and abs(n["position"][1] - y) < 100
-              for n in nodes):
-        y += 128
-    return [x, y]
+# open_request.reporter_unit: keep the send-when-known policy, kill the
+# ask-pressure that fought the other two tools' unit rules (layer audit,
+# 2 Sep). Lives only in the live jsonBody; param docs are not epoch-hashed.
+UNIT_OLD = ("The apartment the person reporting LIVES in. Send this every "
+            "time, including for a fault in the lobby or the lift.")
+UNIT_NEW = ("The apartment the person reporting LIVES in. Send it whenever "
+            "you know it - for a fault inside their flat the flow gives it "
+            "to you. For a fault in a lobby, lift or any common area, "
+            "include it only if they volunteered it, and never ask an extra "
+            "question just to fill this field.")
 
 
 def main():
     apply = "--apply" in sys.argv
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
     by = {n["name"]: n for n in live["nodes"]}
-    for need in ("Send", "Answer the resident", "get_request_status"):
+    for need in ("Send", "Answer the resident", "show_menu", "open_request"):
         if need not in by:
             sys.exit("No %r node on the live workflow -- refusing to guess." % need)
 
     W.check_memory_epoch(tools=W.tools_text())
     changes = []
+
+    # 1. The agent surfaces its tool calls on the main chain.
+    opts = by["Answer the resident"]["parameters"].setdefault("options", {})
+    if opts.get("returnIntermediateSteps") is not True:
+        opts["returnIntermediateSteps"] = True
+        changes.append("agent: returnIntermediateSteps on (the signal rides "
+                       "the agent's own output)")
+
+    # 2. The tool: judgment carrier, truthful return, no relay machinery.
+    p = by["show_menu"]["parameters"]
     want_desc = W.tool("show_menu")["description"]
+    if p.get("description") != want_desc:
+        p["description"] = want_desc
+        changes.append("show_menu: description synced from n8n_whatsapp.py")
+    if p.get("jsCode") != TOOL_CODE:
+        p["jsCode"] = TOOL_CODE
+        changes.append("show_menu: relay machinery out, truthful return in")
 
-    # 1. The tool node.
-    if "show_menu" not in by:
-        anchor = by["get_request_status"]["position"]
-        pos = clear_spot(live["nodes"], anchor[0], anchor[1] + 128)
-        live["nodes"].append({
-            "id": "showMenuJudgment1",
-            "name": "show_menu",
-            "type": "@n8n/n8n-nodes-langchain.toolCode",
-            "typeVersion": 1.1,
-            "position": pos,
-            "parameters": {
-                "name": "show_menu",
-                "description": want_desc,
-                "language": "javaScript",
-                "jsCode": TOOL_CODE,
-            },
-        })
-        changes.append("show_menu: new Code tool at %s" % pos)
-    else:
-        p = by["show_menu"]["parameters"]
-        if p.get("description") != want_desc:
-            p["description"] = want_desc
-            changes.append("show_menu: description synced from n8n_whatsapp.py")
-        if p.get("jsCode") != TOOL_CODE:
-            p["jsCode"] = TOOL_CODE
-            changes.append("show_menu: code synced")
+    # 3. Other descriptions changed by the 2 Sep layer audit.
+    for name in ("get_balance", "transfer_to_human"):
+        want = W.tool(name)["description"]
+        if by[name]["parameters"].get("toolDescription") != want:
+            by[name]["parameters"]["toolDescription"] = want
+            changes.append("%s: description synced (layer audit)" % name)
 
-    conns = live["connections"]
-    if "show_menu" not in conns:
-        conns["show_menu"] = {"ai_tool": [[
-            {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]}
-        changes.append("show_menu: wired to the agent (ai_tool)")
-
-    # 2 + 3. Send.
+    # 4. Send: swap the dead relays for the intermediateSteps read.
     body = by["Send"]["parameters"].get("jsonBody") or ""
-# `done` marks an edit as already applied. It differs from `new` for the
-    # COND edit because the recite edit rewrites part of COND_NEW's text: on an
-    # up-to-date Send, COND_NEW is no longer contiguous, but the menu_exec
-    # clause (RECITE_OLD, a substring of both states) still is.
-    for old, new, done, label in (
-            (COND_OLD, COND_NEW, RECITE_OLD,
-             "Send: the menu_exec flag joins the menu condition"),
-            (ITEMS_4, ITEMS_3, ITEMS_3,
-             "Send: the balance row comes back out (4 rows collapse "
-             "WhatsApp's buttons into a 'Choose an item' list)"),
-            (RECITE_OLD, RECITE_NEW, RECITE_NEW,
-             "Send: a reply reciting 3+ of the four flows carries the rows"),
-            (RECITE_OLD, TOOLRAN + RECITE_OLD, TOOLRAN,
-             "Send: the tool's own run is the primary menu signal "
-             "(the staticData relay failed in Send's expression sandbox)")):
-        if done in body:
-            continue
-        if old not in body:
-            sys.exit("Anchor missing on live Send.jsonBody -- refusing to "
-                     "guess:\n  %s" % label)
-        body = body.replace(old, new, 1)
-        changes.append(label)
+    if STEPS not in body:
+        if DEAD not in body:
+            sys.exit("Neither the dead relays nor the intermediateSteps read "
+                     "is on live Send.jsonBody -- refusing to guess.")
+        body = body.replace(DEAD, STEPS, 1)
+        changes.append("Send: signal = the agent's intermediateSteps; both "
+                       "dead relays removed")
+    for must, label in ((FILTER, "recital net"), (ITEMS_3, "three-row list")):
+        if must not in body:
+            sys.exit("Live Send.jsonBody lost the %s -- refusing to guess." % label)
+    if ITEMS_4 in body:
+        body = body.replace(ITEMS_4, ITEMS_3, 1)
+        changes.append("Send: the balance row comes back out (4 rows "
+                       "collapse WhatsApp's buttons)")
     by["Send"]["parameters"]["jsonBody"] = body
+
+    # 5. open_request's reporter_unit doc.
+    ob = by["open_request"]["parameters"].get("jsonBody") or ""
+    if UNIT_NEW not in ob:
+        if UNIT_OLD not in ob:
+            sys.exit("reporter_unit anchor missing on live open_request -- "
+                     "refusing to guess.")
+        by["open_request"]["parameters"]["jsonBody"] = ob.replace(UNIT_OLD, UNIT_NEW, 1)
+        changes.append("open_request: reporter_unit stops demanding the flat "
+                       "on common-area faults")
 
     print("workflow : %s  (%s, active=%s)"
           % (live["name"], live["id"], live.get("active")))

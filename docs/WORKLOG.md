@@ -207,6 +207,60 @@ from the API after the write.
 **Housekeeping:** the two 2 Sep WhatsApp entries below were filed under a stale
 `## 2026-08-31` header, below older entries; moved here, content untouched.
 
+### "A layer rule is lying" — the owner's diagnosis, and the audit that proved it
+
+He rejected two plans and said it in one line: *"i can feel that a layer rule
+is lying because its having a conflict with each other."* Audited every
+instruction-bearing text on the live workflow with prompt-architect. He was
+right, five times over:
+
+1. **The tool return lied.** "הרשימה תוצג לדייר" promised a delivery that no
+   relay could make — staticData is a Code-node facility Send's expression
+   sandbox does not have, and `$('show_menu')` has no main output to read
+   (ai_tool channel). Two dead relays, each hidden by its own
+   graceful-degradation catch.
+2. **Prompt, description and return all said never-enumerate** while the
+   only live attach channel (the recital net) required enumeration.
+3. **transfer_to_human and get_balance both claimed the plain balance
+   question** ("whenever money, debt... come up" vs "asks about their
+   balance, their debt"). A coin flip on every how-much-do-I-owe.
+4. **Three tools, three apartment policies.** open_request's reporter_unit
+   said "Send this every time, including for a fault in the lobby or the
+   lift" while get_request_status bans asking an apartment for a common
+   fault and verify_address says unit only inside a flat.
+5. **get_balance referenced a phantom UI** ("the balance row of the options
+   list") that left with the 4th button.
+
+**The third wire, and the owner's second constraint ("i dont want any
+templated message"):** `returnIntermediateSteps: true` on the agent puts its
+tool calls into its own MAIN-CHAIN output item, and Send reads them through
+`$('Answer the resident')` — the channel the promise guard proves on every
+run. Proven before shipping: exec 22973's runData shows `intermediateSteps`
+naming show_menu, and Send's exact predicate evaluates True on that json.
+The model's message stays 100% its own words on every path; the recital net
+stays as the backstop for runs where it recites instead of calling.
+
+**Fixes, all function-preserving:** boundary sentence on transfer (money in
+motion or dispute; the plain balance question is get_balance's);
+reporter_unit keeps send-when-known, loses the ask-pressure; phantom row
+dropped; show_menu's description gained the mid-matter tie-breaker (stuck
+after a clarify = show the choices) and its return tells the truth. Epoch
+16 → 17 (tools hash only; the prompt paragraph was already true once the
+wire worked and did not move).
+
+**Verified (probe matrix, runData-level):** idk → tool called, own words,
+predicate True; second idk → no tool, model recited in its own words, net
+True — buttons on both paths; stuck lift → urgent ticket, NO flat question
+(reporter_unit fix holds), predicate and net both False; balance ask → no
+transfer fired. greet.py's Send anchor had drifted under menu.py's
+restructure and refused correctly — re-anchored on the echo clause itself.
+
+**Data points on standing issues:** `אני מבין ש…` stamp sample 4; the
+recital used raw asterisks (WhatsApp renders them literally — tolerable
+under buttons, logged); the first-contact echo ate a balance question whole
+(worst form, tally grows); "not twice in a row" bent when the resident said
+idk twice (matching persistence — acceptable). None chased tonight.
+
 ### "Here are the options" — and no options. The flag Send could not read
 
 The owner found it live, which is the only place it was findable: "idk" got
