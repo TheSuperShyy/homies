@@ -90,9 +90,17 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
   // conversation as far as the model is concerned.
   async function send() {
     const text = draft.trim();
-    if (!text || sending || inCall || !canChat) return;
+    if (!text || sending || !canChat) return;
     setDraft('');
     setChatErr(false);
+    // Mid-call, the text goes INTO the call: Vapi injects it as a user turn,
+    // the agent hears it and answers out loud. The reply arrives through the
+    // normal transcript events; only our own line needs appending by hand.
+    if (inCall) {
+      vapiRef.current?.send?.({ type: 'add-message', message: { role: 'user', content: text } });
+      setLines(prev => [...prev, { role: 'you', text, done: true }]);
+      return;
+    }
     if (!chatIdRef.current) chatIdRef.current = 'chat-' + crypto.randomUUID();
     const history = [
       ...lines.map(l => ({ role: l.role === 'agent' ? 'assistant' : 'user', content: l.text })),
@@ -232,16 +240,14 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
               </div>
             )}
 
-          {!inCall && (
-            <form className="voice-composer"
-              onSubmit={e => { e.preventDefault(); send(); }}>
-              <input value={draft} onChange={e => setDraft(e.target.value)}
-                placeholder={labels.chatPlaceholder} disabled={sending || !canChat}
-                dir="auto" />
-              <button type="submit" className="btn-sm"
-                disabled={sending || !canChat || !draft.trim()}>{labels.send}</button>
-            </form>
-          )}
+          <form className="voice-composer"
+            onSubmit={e => { e.preventDefault(); send(); }}>
+            <input value={draft} onChange={e => setDraft(e.target.value)}
+              placeholder={labels.chatPlaceholder} disabled={sending || !canChat}
+              dir="auto" />
+            <button type="submit" className="btn-sm"
+              disabled={sending || !canChat || !draft.trim()}>{labels.send}</button>
+          </form>
           {chatErr && <p className="notice bad">{labels.chatFailed}</p>}
 
           {agent === 'debt' && row && (

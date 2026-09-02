@@ -2363,7 +2363,9 @@ typed leak, `reference_spoken` verbatim). Three server-only env values in
 `dashboard/.env.local` and `.env.example`: `VAPI_PRIVATE_KEY`,
 `OPENROUTER_API_KEY`, `TOOL_SECRET` — NEVER `NEXT_PUBLIC_`. The login wall
 covers the route (typing spends OpenRouter money); without the env it answers
-503 and the voice half still works. Typed chats send no end-of-call report —
+503 and the voice half still works. The composer also works MID-CALL: typed
+text is injected into the live call (`vapi.send add-message`) and the agent
+answers out loud — owner's first ask after trying it. Typed chats send no end-of-call report —
 nothing lands on `/calls` — and their tickets say `opened_via` "voice". The
 debt tab shows THREE INVENTED RESIDENTS (`SAMPLE_PEOPLE` in
 `app/(app)/voice/page.tsx`) only while `v_debt_call_queue_person` returns

@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-09-02
 
+### "bro i cant chat when i started the call" — the composer now works mid-call
+
+First feedback on the chat: the box vanished the moment a call started,
+because I hid it. Vapi's web SDK takes typed text into a live call
+(`send({type: 'add-message'})` — the agent hears it as a user turn and
+answers out loud), so the composer now stays put: mid-call it injects into
+the call, idle it goes through the chat route. One send() with two roads.
+
 ### Typed chat on /voice, and example debtors while the queue is empty
 
 The owner asked for two things: a chat so they can talk to the agent by
