@@ -208,6 +208,58 @@ session's rewording. Voice side clean. Not touched.
 
 ## 2026-08-31
 
+### "idk" is not a goodbye — the menu became a judgment, with a net under it
+
+The owner's screenshot: "hey is this homies" answered well, then "idk" got
+`בסדר גמור. אם תצטרכו משהו, אני כאן.` and a dead thread. His constraint,
+verbatim: *"i dont want a strict rule for keywords i want it to be general
+remember how we input rules using keywords for trigger and we created a dumb
+bot i want to prevent that from happening again."*
+
+**The mechanism costs one flag.** `Send` already attaches the option rows to
+whatever text the reply carries (the echo clause proved it), so the missing
+piece was only a signal. `show_menu`, a Code tool, writes
+`staticData.menu_exec = <execution id>`; `Send` attaches the rows when the
+flag equals THIS run's id. The flag cannot leak: concurrent executions never
+see each other's staticData (per-execution snapshot, measured 1 Sep), and a
+later run's id differs. `isExecuted` was never considered — it is spuriously
+true and killed the promise guard for a day. If the sandbox ever lacks
+staticData or the id, the tool tells the model to describe the options in
+words instead: the failure mode is the feature without buttons, not an error.
+Verified in runData: the success string came back, so both primitives exist
+in the tool sandbox. The attached list also gained the balance row —
+Chatwoot forwards a tap's TITLE, and `יתרה ותשלומים` already reaches the
+model as plain text from the canned menu today, so Sort needed nothing.
+
+**Gemini would not reach for the tool on the vague turn, twice.** Asked
+explicitly ("show me the menu options") it called the tool every time and
+wrote the right short line. On "idk" it recited the four flows in words —
+through one prompt rewording (12→13) and one description sharpening (13→14).
+Third round is where the address-justification lesson says stop, so the
+promise-guard doctrine closed it instead: **decide on the reply alone.** A
+reply naming 3+ of the four flows (`קריאת שירות`, `קריאה קיימת`, `יתרה`,
+`נציג`) IS the options message, and `Send` attaches the rows under it. It
+reads the bot's own output, never the resident's words — the no-keyword rule
+is about resident input, and the promise guard set the precedent. A normal
+ticket confirmation names one flow; the goodbye names none; ≥3 is recital.
+
+**Measured after:** "idk" → `show_menu` called, reply written for the
+buttons: `תוכלו לבחור מבין האפשרויות שמופיעות כאן למטה, או פשוט לספר לי מה
+אתם צריכים.` When temp 0.6 makes it recite instead, the net catches that
+too. Ticket arc, goodbye, first contact: unaffected, no menu. The one thing
+probes cannot see is the rendered buttons (probe conversations 404 at Send),
+so the visual check is the owner typing idk from his handset.
+
+**A pyc trap cost twenty minutes:** a helper process imported the module
+mid-edit and cached bytecode; the final write changed neither file size nor
+mtime-second, so the next patcher run loaded a stale mixed module and the
+epoch guard reported a hash the file no longer contained. When the guard
+contradicts the file, `rm -rf scripts/__pycache__` before believing either.
+
+Epochs 12, 13, 14 tonight, each guard-forced. Data point for the standing
+issues: `אני מבין.` bare opened one idk reply (22403, epoch-13 fresh buffer)
+— the understanding-shown rule holds elsewhere; sample of one, logged.
+
 ### The owner redefined the report, with a screenshot
 
 Asked for the 1 Sep whole-system report three times, each answer narrower:

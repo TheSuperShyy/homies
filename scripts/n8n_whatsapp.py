@@ -203,7 +203,16 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 11
+MEMORY_EPOCH = 14
+# 12 -> 13 -> 14, 2 Sep: the show_menu rounds. 12 minted the tool and the
+# orientation line; 13 reworded the line after "the list exists for this"
+# was read as an invitation to recite the options in words; 14 sharpened the
+# tool description at the decision moment ("about to write the options out
+# in words? stop"). The recital net in Send is not hashed - it reads output.
+# 9 -> 10 -> 11, 1 Sep late: understanding is shown, not announced. 10
+# banned the content-free comprehension announcement; the model dodged by
+# paraphrasing the resident back behind the same verb, so 11 bans the
+# playback too.
 # 8 -> 9: how a matter ends went into the prompt (offer more, then a warm
 # parting), so buffers holding dead-stop ticket confirmations retire.
 # 7 -> 8: the owner's thread holds three worked examples of the get_balance
@@ -225,7 +234,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "974fca20dfde",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "9e7ed5fa8e43",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "6e19bca8b5ab",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -233,7 +242,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "ea739e751a67",
+    "tools": "77e0a4fc344c",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1116,6 +1125,35 @@ TOOLS = [
             },
             "required": ["name", "phone"],
         },
+    },
+    {
+        # 2 Sep: the owner's "idk" screenshot. Not knowing what you need is
+        # not needing nothing, and the fix is a decision the MODEL makes, not
+        # a keyword trigger — his words: "we input rules using keywords for
+        # trigger and we created a dumb bot i want to prevent that from
+        # happening again." The tool writes a staticData flag keyed by the
+        # execution id; `Send` reads it back in the same run and attaches the
+        # option rows under the model's own reply text. isExecuted is
+        # spuriously true and was never an option; concurrent runs cannot see
+        # each other's staticData (snapshot), and a later run's id differs,
+        # so the flag cannot leak in either direction. Lives on the live
+        # workflow as a Code tool, deployed by n8n_whatsapp_menu.py.
+        "name": "show_menu",
+        "description": (
+            "Shows the resident the standard options list — open a service "
+            "ticket, check an existing one, balance and payments, talk to a "
+            "person — attached by the system underneath your NEXT message. "
+            "Use it whenever the resident does not know what they want, asks "
+            "what you can do, or the conversation would stall with nothing "
+            "concrete to act on. If you are about to write the options out in "
+            "words — a list, bullets, 'you could open a ticket or check a "
+            "balance' — stop: that is this tool's job. Call it and keep your "
+            "message to the one short line that goes above the buttons. Never "
+            "use it while you are already handling a concrete matter, and not "
+            "twice in a row: once the options are in front of them, another "
+            "list is noise. Takes no parameters."
+        ),
+        "input_schema": {"type": "object", "properties": {}, "required": []},
     },
 ]
 
