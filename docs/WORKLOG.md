@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-09-06
 
+### First real call on the open agent: too long, and two masculine slips
+
+The owner's call: "אני לא יודע" got four-sentence lectures, and the agent
+said תרצה and תספר to a caller of unknown gender. Both faults live in the
+words-and-pronunciation layer the owner kept, so both got one line there -
+"this is a phone call, not a lecture: one or two short sentences a turn"
+and the old suffix test compressed into the gender bullet (a word that
+would change for a woman is banned until they reveal). Fence 1,250 -> 1,443
+chars. Probed: short turns, neutral forms, and the agent closed an
+empty call itself with the exact hang-up sentence. Pushed, voice restored,
+read back.
+
 ### The owner opened the agent: 31,492 chars of rules became 1,250
 
 After a call where "im sad" got the agent reciting its own job description

@@ -800,7 +800,8 @@ still misbehaves. Current ids, and the full account of the move, are in
 **THE INBOUND AGENT IS OPEN (6 Sep, owner's explicit decision) — EVERY PRIOR
 BEHAVIORAL GUARANTEE IS VOID.** "100% fully open voice agent … no guardrails
 and no rules. only the words and pronunciation rules." The live prompt is
-1,250 chars on **gpt-4.1** (was 31,492 on gpt-4.1-mini): identity, silent
+1,443 chars on **gpt-4.1** (1,250 + the brevity line and the suffix test,
+both words-layer, added after the first real call) (was 31,492 on gpt-4.1-mini): identity, silent
 tools, Hebrew-always, numbers as words, reference_spoken verbatim, no
 machine-speak, gender-neutral until revealed, and the closing sentence as the
 hang-up mechanism. Nothing else. The four verified paths, the emergency
