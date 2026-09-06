@@ -797,6 +797,28 @@ because the ids in its *retired* column are what you grep for when something
 still misbehaves. Current ids, and the full account of the move, are in
 `docs/handover/new-vapi.md` under **30 Aug**.
 
+**THE ACCOUNT MOVED AGAIN, 6 Sep — the table below is one generation stale.**
+Now live (keys in `.env`, old pair retired as `_ACCOUNT7` with ~$0.53 and the
+14-day call history):
+
+| | now live (6 Sep) | retired (the August account) |
+|---|---|---|
+| Intake (he) | `8894680c-03af-43f6-a75b-f828872833cc` | `7752c6bb-…` |
+| Debt (he) | `14d502fc-95a9-4fb1-8d93-944dd7e00211` | `93c7f5e5-…` |
+| Intake (en) | `8672e3b6-dfc7-40a3-af33-c572d5b4b66b` | `713874a1-…` |
+| Debt (en) | `70f96178-9453-4c6e-b9e7-c97895a29e2d` | `72de8d5c-…` |
+| Public key | `ce8d6019-b0aa-40dc-8b1a-7039aff3db2e` | `36afb64b-…` |
+| Cartesia credential | `8e8f3ca5-…` holding the YARIV key (the clone's account) | `448aa856-…` |
+
+Verified live: clone `ba765d50` + `he` + 420s/240s on both Hebrew assistants,
+Edge Function v60 carries the new intake id, four Vercel production vars
+updated, demo page BUILD `2026-09-06a`. **vapi_transfer.py still seeds the
+credential from `CARTESIA_API_KEY` and 400s on the Hebrew creates — repoint
+the credential to `CARTESIA_YARIV_API_KEY` BEFORE `--apply` on the next move,
+or expect to finish the Hebrew pair by hand as this move did.** The demo repo
+(`homies-voice-demo`) is invisible to the ClixTeam579 git account — pushing it
+needs `gh auth switch -u TheSuperShyy` (switch back after).
+
 | | now live (30 Aug) | retired |
 |---|---|---|
 | Keys | `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` (the August account, live 30 Aug) | `VAPI_*_KEY_ACCOUNT6` (live 19–30 Aug), `_ACCOUNT7` (the old account 4), `_ACCOUNT5` |

@@ -1,6 +1,6 @@
 # The debt follow-up assistant — outbound
 
-Vapi assistant **`93c7f5e5-4024-49a3-9ab6-141f2b423649`** — *Homies — Debt
+Vapi assistant **`14d502fc-95a9-4fb1-8d93-944dd7e00211`** — *Homies — Debt
 Follow-up (he)*. Created 3 Aug 2026 and live.
 
 **The prompt is not in this file.** It lives in
@@ -79,7 +79,7 @@ through `assistantOverrides.variableValues`, not stored on the assistant:
 
 ```json
 {
-  "assistantId": "93c7f5e5-4024-49a3-9ab6-141f2b423649",
+  "assistantId": "14d502fc-95a9-4fb1-8d93-944dd7e00211",
   "assistantOverrides": {
     "variableValues": {
       "first_name": "צליל",

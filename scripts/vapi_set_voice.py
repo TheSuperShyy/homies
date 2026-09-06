@@ -59,8 +59,8 @@ UA = "curl/8.5.0"
 # are deliberately not here: a cloned Hebrew voice reading English is not a thing
 # anyone asked for, and they touch Cartesia not at all.
 TARGETS = [
-    ("Debt Follow-up (he)", "93c7f5e5-4024-49a3-9ab6-141f2b423649"),
-    ("Inbound Intake (he)", "7752c6bb-89e9-49f3-aaf4-154ecc65cdff"),
+    ("Debt Follow-up (he)", "14d502fc-95a9-4fb1-8d93-944dd7e00211"),
+    ("Inbound Intake (he)", "8894680c-03af-43f6-a75b-f828872833cc"),
 ]
 
 FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}

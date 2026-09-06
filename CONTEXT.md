@@ -2061,6 +2061,15 @@ and read the server banner for which port it actually took.
 mobile tab bar translate separately, `t()` throws on an unknown key, and the
 throw lands in the layout, which takes every page down, not just the new one.
 
+**Vapi validates a Cartesia voice against the org's credential AT CREATE TIME,
+so on an account move the credential must hold the clone's account key BEFORE
+any Hebrew assistant is created. Learned 6 Sep.** vapi_transfer.py seeds the
+credential from `CARTESIA_API_KEY` (the wrong account since 31 Aug) and the
+create 400s with the body swallowed - the one failure mode of the move that
+errors loudly instead of falling back to Elliot silently, and still half the
+script run is lost. The fix order: create/patch the credential to
+`CARTESIA_YARIV_API_KEY`, then create assistants.
+
 **Merging the briefing files has a fixed policy, used 6 Sep.** `docs/WORKLOG.md`
 merges as a union - keep both sides' entries, dates stay ordered, because both
 sessions append near the top and the branch deliberately leaves stubs pointing

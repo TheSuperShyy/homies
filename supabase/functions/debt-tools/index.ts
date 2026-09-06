@@ -2305,7 +2305,7 @@ function disposition(reason: string): string {
 // The inbound intake assistant on Vapi. Hardcoded the way the reference
 // format is: it changes when the assistant is recreated, which is an event,
 // not a config drift.
-const INTAKE_ASSISTANT_ID = "7752c6bb-89e9-49f3-aaf4-154ecc65cdff";
+const INTAKE_ASSISTANT_ID = "8894680c-03af-43f6-a75b-f828872833cc";
 
 async function endOfCall(message: any, ctx: CallContext) {
   const call = message?.call ?? {};

@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-09-06
 
+### Vapi moved to the 6 Sep account: fresh credit, same brain, same voice
+
+The August account was down to ~$0.53, so the owner opened a new one and
+handed both keys. Followed docs/handover/new-vapi.md + vapi_transfer.py.
+The transfer died mid-apply with a swallowed 400: the script seeds the new
+org's Cartesia credential from CARTESIA_API_KEY, and Vapi validates the
+voice at create time - the Ido clone lives on the CLIENT's Cartesia account,
+so both Hebrew creates were refused. Patched the new org's credential to
+CARTESIA_YARIV_API_KEY, re-created both Hebrew assistants by hand (same
+stripped-copy the script does), then rebuilt them deliberately from the repo
+(vapi_sync x2, vapi_set_voice, one read-back: intake 31,492 chars / debt
+54,119, clone ba765d50, he, 420s/240s).
+
+New ids: intake he 8894680c-03af-43f6-a75b-f828872833cc, debt he
+14d502fc-95a9-4fb1-8d93-944dd7e00211, intake en 8672e3b6-…c572d5b4b66b,
+debt en 70f96178-…c97895a29e2d, public key ce8d6019-…7039aff3db2e.
+Repointed 21 sites across the transfer's 14 files PLUS the three it misses
+(vapi_set_voice.py, dashboard/.env.local, the Edge Function's
+INTAKE_ASSISTANT_ID - deployed, v60) and the two off-repo ones (four Vercel
+production vars; web/index.html in its own repo, BUILD 2026-09-06a, pushed -
+the demo repo is private to TheSuperShyy, so that push needed a gh account
+switch, done and switched back). Old account keys retired as _ACCOUNT7 in
+.env - its 14-day call history stays readable there. Old-id sweep over
+py/ts/html/env: clean. One free typed probe against the new intake: full
+prompt, tools answering.
+
 ### Emergency transfer became an offer, and no transfer is a required step
 
 Owner: "not transfer anyone to the department, it should be an option not a
