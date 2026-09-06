@@ -2309,6 +2309,8 @@ suppressed. Patch idempotent, live and repo identical at 59,229 chars.
   `Promised a transfer, made none?` node catches it.
 - The three-turn probe still re-greets after a menu tap.
 
+## 2026-08-31
+
 ### The unanswerable question was answered by reading the vendor's own PDF
 
 **A dashboard question — "why does it say gone from OXS?" — turned into the
@@ -3344,6 +3346,97 @@ Four consecutive turns ended by offering to open a ticket.
 
 ---
 
+
+### A typing harness for the inbound agent, and the first probe of the 30 Aug cut
+
+`scripts/prompt_chat.py`. You type English, it puts spoken Hebrew to the live
+assistant, and it prints the reply in Hebrew and English. Built because the
+person judging this agent does not read Hebrew, so "is he a friendly voice to
+reach" was a question with no instrument behind it. `prompt_probe.py` replays
+three fixed Hebrew scenarios; this one is driven by hand.
+
+It imports the probe's engine rather than copying it — `live_prompt`, `ask`,
+`TOOL_RESULTS`, and crucially `TARGETS["inbound"]["first"]`, which is already a
+hand-synced copy of the doc's opening line. A third copy was the thing to avoid.
+`turn()` is the one deliberate near-duplicate: the probe returns tool NAMES, and
+the arguments are the whole point here — a ticket opened against the wrong
+apartment cannot be seen in `[tools] : open_request`.
+
+Tools are mocked, Vapi is only read. Nothing reached Supabase or OXS.
+
+**The translator embellished, and it was caught by its own echo line.** Typing
+`Herzl 14` produced *"the building on Herzl Street 14, there is a problem that
+needs handling"* — a complaint the caller never made, and the agent answered it.
+`TO_HE` now carries an explicit add-nothing rule. This is why the Hebrew is
+printed before it is sent: with a translation step there are two things that can
+be wrong with a bad answer, and they have to be separable.
+
+The back-translation is told to preserve register. A translator left alone turns
+anything into courteous English, and courtesy invented in translation would be
+credited to the agent by the one person who cannot check.
+
+### The 30 Aug regression patches were wrong, and three of them are live
+
+The patches shipped without a probe; this was the first look. Two runs, both
+reproducing, all inside the reference-number block — the one line of a call the
+caller writes down:
+
+1. **He reads the prefix.** The prompt gives `255, 1042, 26` as its own example
+   of what never to say. He says `255, 1042`. In the second run: `255042` — the
+   `1` gone. That is a number that does not exist, read to a caller as theirs.
+2. **He glues a question to the number.** *"The number goes out alone in its own
+   turn"* — he appends "anything else?" every time.
+3. **The read-back vanishes.** One run went apartment number → `open_request`
+   with no sentence back first.
+
+Separately, from the openness run:
+
+4. **Hand-offs go out empty.** "Can I talk to a real person" after a full noise
+   complaint called `transfer_to_human` with `building: ""`, `description: ""`.
+   The office gets a note carrying nothing.
+5. **He invents.** *"There are a lot of requests there right now, so it will take
+   time"* — nothing tells him that, and it is a timing promise he is explicitly
+   forbidden to make. He also asserted noise complaints are handled by the
+   office; that is not in the knowledge block either, and the block's own rule
+   for doubt is say we will check, and transfer.
+
+Hours and gardening he got right, and correctly answered only what was asked
+rather than reading the fee list.
+
+**On openness, the evidence is narrower than expected.** He is not cold — he
+opened with warmth on a small-talk turn and said "sorry to hear that" to the
+noise complaint. What he does is funnel: four consecutive turns ended by
+offering to open a ticket. That, not curtness, is what reads as closed.
+
+Nothing about the prompt was changed. `docs/assistant/openness-test-lines.md`
+carries the lines to type; transcripts land in `docs/assistant/transcripts/`.
+
+### Three feature branches, one per agent
+
+`feature/chatbot`, `feature/voice-inbound`, `feature/voice-outbound`, all cut
+from `main` at `1eafae8` and pushed with `-u`, so each tracks its own remote.
+Until now the three deliverables shared one line of commits and there was no way
+to move on one without moving on all three.
+
+Made with `git branch` rather than `switch -c` so the working copy never left
+`main`, and the checkout stays there: one folder, `git switch` between branches,
+no worktrees. Chatbot is still the priority, so the two voice branches sit at
+`main` as markers rather than as work in progress.
+
+**`main` is 6 commits ahead of `origin/main`.** Those six went to GitHub as part
+of the branch push — they now exist on origin under three branch names but not
+on `origin/main`, which still sits at the older commit. Pushing `main` is a
+separate call nobody has made yet.
+
+**`docs/WORKLOG.md` will conflict on every merge back.** It is ~13,900 lines and
+every session appends near the top, so three branches appending in parallel
+collide at the same point. Mechanical to resolve, but it happens every time. The
+one-line fix, offered and not yet taken: `docs/WORKLOG.md merge=union` in a root
+`.gitattributes`, which keeps both sides' lines instead of raising a conflict.
+`HANDOVER.md` and `CONTEXT.md` are edited in place rather than appended, so they
+merge normally.
+
+---
 
 ## 2026-08-30
 

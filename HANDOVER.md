@@ -2581,6 +2581,23 @@ word each time, like every spend here:
 Same tools and same fixed tool results on both halves, so the only variable is
 the wording. Worth running **before** the live push, not after.
 
+**`scripts/prompt_chat.py` is the same engine, driven by hand, and it is the one
+to reach for if you do not read Hebrew.** You type English, it puts spoken
+Hebrew to the agent and prints the reply in both languages, with tool
+*arguments* shown — which is how the empty hand-off and the mangled reference
+number were found, neither of which `prompt_probe.py` can display. Tools are
+mocked; Vapi is only read; nothing reaches Supabase or OXS.
+
+    python scripts/prompt_chat.py inbound
+
+Lines to type are in `docs/assistant/openness-test-lines.md`, grouped by what
+each group probes and annotated with what a good answer looks like. Transcripts
+are written to `docs/assistant/transcripts/` on exit, in both languages, so a
+run can be handed to a fresh session and read cold. **Read the `sent [he]` echo
+line every turn** — with a translation step in the path there are two things
+that can be wrong with a bad answer, and a turn whose Hebrew was wrong tested
+the translator, not the agent. That failure has already happened once.
+
 **`docs/knowledge/homies.md` is new and is the master for the thirteen facts
 both channels state.** Change a fact there, then in both prompts, then run
 `python scripts/facts_check.py`. It exits non-zero and names what drifted. The
