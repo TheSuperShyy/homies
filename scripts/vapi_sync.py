@@ -293,6 +293,12 @@ TARGETS = {
         "doc": "docs/assistant/demo-inbound.md",
         "extract": "fence",
         "extra": {
+            # gpt-4.1-mini (BASE) until 6 Sep, when the owner opened the agent:
+            # the prompt shrank to identity + words-and-pronunciation, and the
+            # judgment the rulebook used to supply has to come from the model.
+            # A mini filling four fields was the right trade; a mini improvising
+            # a whole call is not. Owner approved the cost the same day.
+            "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},
             # 300 -> 180 on 5 Aug, asked for directly.
             #
             # This field does not hurry anyone along: Vapi hangs up on the second

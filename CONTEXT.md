@@ -2061,6 +2061,17 @@ and read the server banner for which port it actually took.
 mobile tab bar translate separately, `t()` throws on an unknown key, and the
 throw lands in the layout, which takes every page down, not just the new one.
 
+**The inbound agent is open by owner decision (6 Sep): rules are not the
+instrument anymore, the model is.** The owner watched "im sad" get a recited
+job description — the confused model copying the prompt's nearest example —
+and chose to remove the rulebook rather than patch it: identity + tools +
+words-and-pronunciation only, on gpt-4.1. The standing engineering lessons
+(placement beats wording, data over rules, standalone sentences) still apply
+to the debt agent and to the words layer, but for inbound BEHAVIOR the unit
+of change is now the model or the tool data, never a new rule. A session
+tempted to add a trigger, a procedure, or a worked example to the inbound
+fence is contradicting an owner decision and must ask first.
+
 **Vapi validates a Cartesia voice against the org's credential AT CREATE TIME,
 so on an account move the credential must hold the clone's account key BEFORE
 any Hebrew assistant is created. Learned 6 Sep.** vapi_transfer.py seeds the

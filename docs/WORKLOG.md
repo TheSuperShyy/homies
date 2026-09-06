@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-09-06
 
+### The owner opened the agent: 31,492 chars of rules became 1,250
+
+After a call where "im sad" got the agent reciting its own job description
+(the model copied the prompt's nearest worked example when confused - the
+self-description line at what was line 561), the owner rejected the planned
+targeted fix and asked for the opposite: "100% fully open voice agent like
+im talking to an open LLM, no guardrails and no rules. only the words and
+pronunciation rules."
+
+Done literally. The fence in docs/assistant/demo-inbound.md is now 1,250
+chars: identity (Michael, Homies, no script, own judgment), the tools exist
+and are silent, and the words-and-pronunciation layer - Hebrew always,
+numbers as words (emergency services included), reference_spoken verbatim,
+no machine-speak, gender-neutral until the caller reveals, and the closing
+sentence kept ONLY as the hang-up mechanism (endCallPhrases still matches
+on it). Model upgraded gpt-4.1-mini -> gpt-4.1 on inbound (owner approved
+the cost; a mini improvising a whole call is not the mini filling four
+fields), matched in prompt_probe.MODEL and the dashboard chat route.
+
+Probed, reported, not enforced - the owner is the judge now: the im-sad
+call got genuinely human replies and ended in a proper ticket; a hedged gas
+smell got real safety advice, the numbers in words, and an emergency-urgency
+ticket by the model's own choice; "i want a real person" got a promised
+callback but NO tool call that turn - the promised-transfer-made-none
+failure is now possible again, accepted with the rest. Pushed per protocol,
+read back: 1,250 chars, gpt-4.1, clone ba765d50, he, 420s.
+
+A note went above the fence: the commentary in that file describes the
+retired rulebook; git history holds it.
+
 ### Vapi moved to the 6 Sep account: fresh credit, same brain, same voice
 
 The August account was down to ~$0.53, so the owner opened a new one and

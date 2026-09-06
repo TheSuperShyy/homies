@@ -797,6 +797,24 @@ because the ids in its *retired* column are what you grep for when something
 still misbehaves. Current ids, and the full account of the move, are in
 `docs/handover/new-vapi.md` under **30 Aug**.
 
+**THE INBOUND AGENT IS OPEN (6 Sep, owner's explicit decision) — EVERY PRIOR
+BEHAVIORAL GUARANTEE IS VOID.** "100% fully open voice agent … no guardrails
+and no rules. only the words and pronunciation rules." The live prompt is
+1,250 chars on **gpt-4.1** (was 31,492 on gpt-4.1-mini): identity, silent
+tools, Hebrew-always, numbers as words, reference_spoken verbatim, no
+machine-speak, gender-neutral until revealed, and the closing sentence as the
+hang-up mechanism. Nothing else. The four verified paths, the emergency
+procedure, the warmth floor, the transfer policy, the cross-caller dedup —
+all retired with the rulebook; do NOT re-probe against them and do NOT
+"fix" a behavior by adding a rule without asking the owner first. The
+rulebook lives in git (last carried at commit `1184308`); reinstating it is
+one revert of the fence + `vapi_sync.py inbound --apply` + voice protocol.
+Known trade already observed in probes: asked-for-a-person got a promised
+callback with no transfer_to_human call that turn. The debt agent is
+untouched and still scripted. `vapi_en.py intake` will now REFUSE against
+the tiny Hebrew prompt (its substitution table describes the old one) —
+the frozen twin stays as copied; do not regenerate.
+
 **THE ACCOUNT MOVED AGAIN, 6 Sep — the table below is one generation stale.**
 Now live (keys in `.env`, old pair retired as `_ACCOUNT7` with ~$0.53 and the
 14-day call history):

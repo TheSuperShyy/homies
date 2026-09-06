@@ -47,7 +47,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-MODEL = "openai/gpt-4.1-mini"          # what both assistants run on Vapi
+MODEL = "openai/gpt-4.1"          # what both assistants run on Vapi (inbound
+                                  # joined debt on 6 Sep, when the prompt went
+                                  # open and the judgment moved into the model)
 
 TARGETS = {
     "inbound": {

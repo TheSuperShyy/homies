@@ -18,7 +18,7 @@ import { NextResponse } from 'next/server';
 // key (reads the assistant), the OpenRouter key (pays for the model), and the
 // tool secret (authorises the Edge Function). All server-side env.
 
-const MODEL = 'openai/gpt-4.1-mini'; // what both assistants run on Vapi
+const MODEL = 'openai/gpt-4.1'; // what both assistants run on Vapi since 6 Sep
 const MAX_TOOL_ROUNDS = 6;           // same ceiling as prompt_probe.turn()
 
 const ASSISTANTS: Record<string, string | undefined> = {
