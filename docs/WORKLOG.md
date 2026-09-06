@@ -9,6 +9,31 @@ conversation that produced it.
 
 ---
 
+## 2026-09-06
+
+### Pushed the dashboard live: main merged, Vercel armed, deploy on push
+
+"Push live" from the owner. Production deploys from `main`; the /voice work
+sat on `feature/chatbot`, 113 commits ahead, and `main` had grown 11 dashboard
+commits of its own (search, /sync watcher, badge fixes) - diverged, so a
+merge, done in a throwaway worktree because the shared checkout carries
+another session's uncommitted work. Conflicts: WORKLOG twice (union, by
+design - the branch had left a stub pointing at main's fuller entry),
+HANDOVER three times (ours kept: main's side was the 31 Aug regression list,
+every item since fixed and re-documented on the branch). Merged tree builds
+clean (`next build`, all pages including /voice).
+
+Vercel: Supabase URL + anon key were already set (someone since 30 Aug);
+added the six missing production vars via the CLI - the three NEXT_PUBLIC
+Vapi ids/key, and server-side VAPI_PRIVATE_KEY / OPENROUTER_API_KEY /
+TOOL_SECRET for the chat route. `vercel link` appended `.env*` to
+dashboard/.gitignore, which would have ignored the tracked .env.example -
+trimmed to `.vercel` only.
+
+Pushed the merge to `feature/chatbot` and `main`; the main push is the
+production deploy. Verified READY and the login wall answering on
+homies-dashboard.vercel.app.
+
 ## 2026-09-02
 
 ### The debt cards were clipping their own address line

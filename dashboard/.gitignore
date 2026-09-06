@@ -2,3 +2,7 @@
 # Verification builds. See the note in next.config.mjs: a build that shares
 # .next with a running dev server pulls the stylesheet out from under it.
 .next-verify/
+
+# The Vercel CLI's project link (written by `vercel link`, 6 Sep). The CLI
+# also tried to add `.env*`, which would have ignored the tracked .env.example.
+.vercel

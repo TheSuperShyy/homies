@@ -2061,6 +2061,22 @@ and read the server banner for which port it actually took.
 mobile tab bar translate separately, `t()` throws on an unknown key, and the
 throw lands in the layout, which takes every page down, not just the new one.
 
+**Merging the briefing files has a fixed policy, used 6 Sep.** `docs/WORKLOG.md`
+merges as a union - keep both sides' entries, dates stay ordered, because both
+sessions append near the top and the branch deliberately leaves stubs pointing
+at the other line's fuller record. `HANDOVER.md` and `CONTEXT.md` are edited in
+place, so the side written LATER wins a conflict - on 6 Sep every HANDOVER
+conflict was ours-over-main because main's side was the 31 Aug regression list
+the branch had since fixed. Do not union HANDOVER: two copies of "current
+state" is worse than one stale one.
+
+**The dashboard ships by pushing `main`; Vercel holds its production env since
+6 Sep.** Project `homies-dashboard`, root `dashboard/`, production branch
+`main`, auto-deploy on push (token `VERCEL_API`; `VERCEL_TOKEN` is dead). The
+8 production vars cover Supabase reads, the /voice web call, and the typed-chat
+route. `vercel link` writes `.vercel/` AND appends `.env*` to the app
+.gitignore - trim that to `.vercel`, or the tracked .env.example goes dark.
+
 **Vapi's hosted Chat API is closed to this org: 402 `payment_method_missing`,
 checked 2 Sep.** Pay-as-you-go orgs need a card on file for text chat, and this
 one has none. The typed chat on `/voice` therefore runs the loop itself —

@@ -36,6 +36,12 @@ As of 31 Aug the repo has one branch per deliverable, all cut from `main` at
 One checkout at `Desktop/Homie`, `git switch` between them, no worktrees. The
 two voice branches still sit at `main`; the chatbot is the priority.
 
+**`feature/chatbot` and `main` were merged both ways on 6 Sep** (merge commit
+on both, resolved in a worktree): main's 11 dashboard commits (search, /sync
+watcher, badge) and the branch's 113 (voice pages, chat, WhatsApp) are one
+history again, and the main push deployed the dashboard to Vercel. If your
+local `feature/chatbot` predates this, pull before pushing.
+
 `docs/WORKLOG.md` will conflict on every merge back, because every session
 appends near the top of a ~14,000-line file. A root `.gitattributes` with
 `docs/WORKLOG.md merge=union` removes it. Offered, not yet taken.
@@ -807,7 +813,7 @@ projects were read on 30 Aug with `VERCEL_API`:
 | Project | Domain | Vapi vars |
 |---|---|---|
 | `homies-voice-demo` | `homies-voice-demo.vercel.app` | none — the keys are in the page |
-| `homies-dashboard` | `homies-dashboard.vercel.app` | **none**, and `hiddenProductionEnvCount` is 0 |
+| `homies-dashboard` | `homies-dashboard.vercel.app` | **8 set since 6 Sep** - Supabase pair + 3 NEXT_PUBLIC Vapi + VAPI_PRIVATE_KEY / OPENROUTER_API_KEY / TOOL_SECRET (production) |
 
 `homies-voice-demo` auto-deploys from `TheSuperShyy/homies-voice-demo` and is
 serving the August account: public key `36afb64b`, all four new ids, no trace of
@@ -2215,7 +2221,7 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 | OpenRouter | `OPENROUTER_API_KEY` — **key 2 since 12 Aug**, uncapped, on the $19.80 account. `_CAPPED15` is the 12-Aug key (same account, $15 cap); `_EMPTY` is a different, unfunded account. n8n credential `92ZNHDhByavmNP5T` (`N8N_OPENROUTER_CRED_ID`) — the API cannot PATCH a credential, so a key change means a **new credential and a re-push**, and every superseded one is left in place |
 | Meta/WhatsApp | `APP_ID`, `APP_SECRET`, `WHATSAPP_TOKEN`, `WHATSAPP_WABA_ID`, `WHATSAPP_PHONE_NUMBER_ID` |
 | Vercel | `VERCEL_TOKEN` — **the one in .env answers "invalidToken" (checked 24 Aug)**; deploys still go out on push |
-| Dashboard, in Vercel's env (none set yet) | `CALL_PIN` (no PIN, no Call column), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID` (no number, no call), `VAPI_DEBT_ASSISTANT_ID` (defaults to Debt he), `HOMIES_CALLBACK_NUMBER` / `HOMIES_VERIFICATION_EMAIL_SAY` / `HOMIES_ALT_PAYMENT` (defaults in `dashboard/lib/call.ts`), `GITHUB_DISPATCH_TOKEN` (Run now on `/sync`) |
+| Dashboard, in Vercel's env (8 set 6 Sep; these are the still-missing ones) | `CALL_PIN` (no PIN, no Call column), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID` (no number, no call), `VAPI_DEBT_ASSISTANT_ID` (defaults to Debt he), `HOMIES_CALLBACK_NUMBER` / `HOMIES_VERIFICATION_EMAIL_SAY` / `HOMIES_ALT_PAYMENT` (defaults in `dashboard/lib/call.ts`), `GITHUB_DISPATCH_TOKEN` (Run now on `/sync`) |
 | Internal | `TOOL_SECRET` (Vapi → n8n → Edge Function) |
 
 Empty and expected to stay empty: Twilio, Telnyx (no phone numbers yet).
@@ -2382,7 +2388,7 @@ GETS ENV VARS.** `/calls` page header, `dashboard/components/voice-call.tsx`,
 `@vapi-ai/web@2.7.0`, driven by `NEXT_PUBLIC_VAPI_PUBLIC_KEY` +
 `NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID` (both public by design; set in
 `dashboard/.env.local`, absent on Vercel where NOTHING is set — that project
-still has zero env vars and the widget hides itself there). Edge Function v57
+had zero env vars until 6 Sep - it now has the full set and the pages render). Edge Function v57
 labels a webCall to the intake assistant `inbound`, so widget calls land in the
 right tab; the first real widget call is the end-to-end proof nobody has run.
 
