@@ -2392,6 +2392,20 @@ had zero env vars until 6 Sep - it now has the full set and the pages render). E
 labels a webCall to the intake assistant `inbound`, so widget calls land in the
 right tab; the first real widget call is the end-to-end proof nobody has run.
 
+**INBOUND IS LIVE AT 31,492 CHARS (6 Sep) — transfer is caller-chosen,
+never procedural.** Owner's ask: "it should be an option not a required step."
+The one mandatory transfer — the emergency turn's two-tools rule — is gone:
+an emergency still calls `open_request` FIRST, before a word, with
+`urgency: emergency` (the write is the record), but `transfer_to_human` now
+fires only if the caller accepts the one-time offer (content item 5: *רוצים
+שנציג יחזור אליכם מיד?*) or asks for a person at any point. Declined = not
+re-offered, no transfer. The `language` dead-end keeps its transfer — a caller
+you cannot understand cannot weigh an offer. Probed 3/3 on the candidate file
+(decline / accept / plain ask-for-person) and verified live with the voice
+(`ba765d50`, `he`) and `maxDurationSeconds` 420 in one read-back. If you
+re-probe emergencies, the NEW expectation is: write fires, transfer does NOT —
+unless the caller says yes.
+
 **INBOUND IS LIVE AT 31,382 CHARS (2 Sep) — the quality pass.** Verified
 together from the API: prompt in sync, voice `ba765d50`, **`maxDurationSeconds`
 420** (owner's reversal of the 5 Aug 180), warm first idle line, six tools.

@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-09-06
 
+### Emergency transfer became an offer, and no transfer is a required step
+
+Owner: "not transfer anyone to the department, it should be an option not a
+required step." The only required transfer was the emergency turn's "two
+tools, not one" rule - rewritten so open_request stays the first action
+(before a word, urgency emergency) and transfer_to_human fires only on the
+caller's yes to a one-time offer, now content item 5 of the emergency turn,
+or on any ask-for-a-person. The policy line went from "two reasons to
+transfer" to "one reason: the caller wanted it." The language dead-end keeps
+its transfer - no way to offer options to someone you cannot understand.
+
+Probed 3/3 on the candidate (gas leak declined - write, numbers, one offer,
+no transfer, no re-offer; fallen neighbor accepted - write then transfer
+reason emergency; contract caller asking for a person - instant transfer).
+First probe ran the whole markdown doc as the prompt because --file reads
+raw text, not the fence - extract the fence first, the header's char count
+is the tell. Pushed per protocol, voice restored, one read-back verified
+prompt (31,492), clone, language he, 420s together.
+
 ### Pushed the dashboard live: main merged, Vercel armed, deploy on push
 
 "Push live" from the owner. Production deploys from `main`; the /voice work

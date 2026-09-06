@@ -2138,6 +2138,16 @@ script for a lift explicitly stated to be empty — numbers read to someone who
 needed none. The person-vs-thing test needs its negative stated too: the same
 words with no person in them are an ordinary fault.
 
+**A transfer happens because the caller chose it, never because the procedure
+did. Decided 6 Sep, sharpening the 1 Sep rule.** The emergency flow was the
+last place a transfer was a required step; now the write is the required step
+(open_request, first action, urgency emergency) and the hand-off is a one-time
+offer the caller can decline. Two things made this safe to change: the ticket
+is the searchable record (the transfer is just a note a person reads), and
+"ביקשו בן אדם בכל שלב" still transfers instantly. If a future edit reintroduces
+a mandatory transfer anywhere, it contradicts an owner decision, not a style
+preference.
+
 **The agent's job is to handle the call, not to route it. Decided 1 Sep.** What
 it is not authorised to *decide* it is still authorised to *write*, so a
 disputed amount, a contract question or a complaint about staff becomes a
