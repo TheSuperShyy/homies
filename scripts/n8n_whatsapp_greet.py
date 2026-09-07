@@ -74,8 +74,21 @@ GREET_NEW = (
 # anchors stopped matching an up-to-date Send and this file refused as
 # drifted. The echo clause itself is the anchor now: present = done; absent =
 # insert it before the מיכאל fallback test, wherever that sits.
-SEND_ECHO = "t.indexOf('היי, כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || "
+SEND_ECHO = "t.indexOf('היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || "
 SEND_TAIL = "(/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true))"
+
+# --------------------------------------------------------------------------
+# 4. 7 Sep: the intro waves (owner: "i want to add some emoji in the intro";
+#    wave only, intro only). The repo copies (MENU body, prompt ownership
+#    clause) moved in the same commit and check_greeting holds them; these
+#    two are the LIVE copies. Anchored per copy — Sort holds the plain
+#    sentence twice (content + a history comment), so the content anchor
+#    carries its JS syntax.
+# --------------------------------------------------------------------------
+SORT_PLAIN = 'content: "היי, כאן מיכאל מהומיז. במה אפשר לעזור?"'
+SORT_WAVE = 'content: "היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?"'
+ECHO_PLAIN = "'היי, כאן מיכאל מהומיז. במה אפשר לעזור?'"
+ECHO_WAVE = "'היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?'"
 
 # --------------------------------------------------------------------------
 # 3. get_balance's unit doc: the normal case first, and never a question.
@@ -112,6 +125,10 @@ def main():
 
     edit("Sort", "jsCode", GREET_OLD, GREET_NEW,
          "Sort: the greeting list learns English small talk")
+    edit("Sort", "jsCode", SORT_PLAIN, SORT_WAVE,
+         "Sort: the canned greeting waves")
+    edit("Send", "jsonBody", ECHO_PLAIN, ECHO_WAVE,
+         "Send: the echo clause matches the waving intro")
     sval = by["Send"]["parameters"].get("jsonBody") or ""
     if SEND_ECHO not in sval:
         if SEND_TAIL not in sval:

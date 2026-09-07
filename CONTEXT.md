@@ -190,6 +190,34 @@ makes promised transfers real, and the dead-end follow-up is a wired lane —
 none of these rely on model discipline. Prompts persuade; workflows and
 tools guarantee.
 
+**A handover is not done until a person is paged, and it is not over until a
+person ANSWERS.** Added 6 Sep. "Claimed" is never a name on the thread --
+somebody can assign themselves and walk away, which used to stop the
+escalation ladder AND let the 15-minute handback strip the labels the ladder
+filters on, losing a requested handover for good. The signal is Chatwoot's
+`waiting_since`, cleared only by a human agent's public reply (the bot's own
+replies and private notes never clear it); answering fires the ticker's
+`served` mode, which ENDS the handover by removing its labels, because merely
+skipping the tick would let the resident's next message restart the ladder on
+a thread a rep is working. The same rule in one line: **a guard must key on
+the thing the user actually did, not on a side effect of it.**
+
+**A handover is not done until a person is paged, and the page is a team
+mention in Chatwoot.** Decided 3 Sep. Assigning a team notifies nobody;
+`[@x](mention://team/<id>/<name>)` in a private note reaches every member on
+every channel they have on. Three owner decisions sit with it: Chatwoot only,
+no side channel; the bot keeps answering while the handover waits; out of
+hours nothing is paged until 09:00. Four Chatwoot facts, each measured on
+4.16.2: `POST /labels` and `POST /custom_attributes` REPLACE the set, so both
+are written as unions; the agent-bot token's conversation read answers 500
+once a team is assigned, so reads use the admin credential and writes stay on
+the bot; a caller cannot be published while its sub-workflow is unpublished.
+And a seat with "new conversation" notifications on is pinged at the first
+bot reply of every thread, because the bot's pending→open flip is Chatwoot's
+own bot-handoff event -- keep that preference off. And a PC's push toggle can
+show ON while the server holds no subscription (the owner's, 3 Sep): the proof
+that push is set up is the `NotificationSubscription` count, never the toggle.
+
 **The WhatsApp bot is מיכאל again, and the warmth is the name, not the
 punctuation.** Restored 24 Aug at the builder's request (nameless since 12
 Aug "sounded AI"). The brief's English example — *"Hello! Michael here from
@@ -622,6 +650,8 @@ to leave nothing to recite.
 **The intro and its menu are the only fixed text in the system.** Everything else a resident reads is written by the model, including the answer to a menu tap, the answer to a photo with no caption, and the rescue when a guard throws a reply away. Stated by the owner three times; the last four canned sentences went on 1 Sep. **Adding a stock line back — even as a fallback, even on a path that never runs — is reintroducing the thing.**
 
 **Reports to the owner leave in his voice: verb-first bullets (Built/Fixed/Tested...), casual human words, the result inside the bullet, one flat list, no em dashes.** Owner decision of 1 Sep night, given with a screenshot; supersedes the 13 Aug one-clause-no-explanation rule. The canonical spec is in Claude memory (`homies-daily-report-format`).
+
+**The canonical intro sentence carries a wave now:** `היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?` (owner, 7 Sep; wave only, intro only — button titles are tap-routing keys and stay plain). Every anchor or check that matches the intro must use the new bytes; the old comma form is history.
 
 **Send's expression can act on exactly three things: the reply text, `$('Sort')`, and any MAIN-CHAIN node's output — nothing else.** Two relays died proving it (staticData: a Code-node facility expressions lack; `$()` on an ai_tool node: no main output to read), each hidden by its own graceful catch. The agent's `returnIntermediateSteps` output is main-chain, which is why the menu signal lives there. Corollaries from the 2 Sep layer audit: no instruction layer may forbid what the delivery mechanism requires, no layer may claim system behavior that is not proven live, and when two tools' descriptions both claim the same question, the model flips a coin — write the boundary into both. The owner's two constraints stand over all of it: no keyword triggers on resident input, no templated message text.
 

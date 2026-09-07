@@ -9,6 +9,262 @@ conversation that produced it.
 
 ---
 
+### The intro waves — one emoji, four copies, epoch 19
+
+Owner ask of 7 Sep: *"i want to add some emoji in the intro."* Chosen from
+three offered styles: wave only, intro only —
+`היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?`. The buttons stay plain on
+purpose: their titles double as the tap-routing keys in `Sort`'s TAP_KIND,
+and an emoji there would break the match silently.
+
+The sentence lives in four functional copies and all moved together: MENU's
+body in `n8n_whatsapp.py`, the prompt's ownership clause (`check_greeting`
+holds those two in step), live `Sort`'s MENU.content and live `Send`'s
+echo clause (both owned by `n8n_whatsapp_greet.py`, which gained the two
+anchored edits). Epoch 18 → 19, guard-forced by the prompt hash. Verified:
+a bare `hi` probe returns the waving greeting from the workflow, no model
+call; every patcher idle after — except one, below.
+
+**`n8n_whatsapp_promise.py` reports a pending change and was NOT applied.**
+The 3 Sep handover work rebuilt that guard region (`Handover this turn?`
+decides on intermediateSteps and stands the backstop down), so the
+patcher's committed edit no longer describes the live design — applying it
+blind would revert the handover session's work. Left for a re-anchor, the
+way greet.py was re-anchored on 2 Sep.
+
+**Also found: the 3–6 Sep sessions' work was entirely uncommitted** (last
+commit on the branch was 2 Sep). This commit carries their finished
+chatbot-lane changes (epoch 18: handover tool department, time-of-day
+inject fact, prompt sentence) because they share files with the wave; their
+voice, dashboard and handover-script files stay theirs to commit.
+
+## 2026-09-06
+
+### A mention that reaches nobody, and a handover that could be lost
+
+The owner mentioned the first real seat (`seat2 test`) and nothing appeared in
+that seat's window. Reading `Messages::MentionService` on the live box gave the
+answer in one line: `valid_mentionable_user_ids` is
+`account.administrators + inbox.members`, and the mentioned ids are intersected
+with it. The seat has role `agent` and was not a member of inbox 1, so the
+mention was dropped in silence -- no notification, no email, no participant
+row, no visibility. The owner's own login had always worked only because
+administrators are mentionable everywhere. **Adding the seat to the inbox is
+the whole fix**, and it also explains where a paged conversation shows up:
+`add_mentioned_users_as_participants` writes a participant row, and
+`ConversationFinder` serves `assignee_type=mention` and `participating` -- the
+Mentions and Participating views. Nothing in n8n had to change for that.
+Verified: notification 597 for user 4 and a participant row on conversation 53.
+The seat's email flag for *mentioned* was off, so it was set to the state
+`pc-setup.md` prescribes.
+
+**Then the ask behind the ask: "so they would be assigned to that
+conversation."** Offered auto-assignment at page time and the owner chose
+against it -- the page goes to a whole department, and a named person at lunch
+is a black hole. But tracing what auto-assignment would break found a hole
+that was already there. Both the escalation ladder and the 15-minute handback
+used "has a User assignee" to mean "claimed". A rep who clicks *assign to me*
+and never replies therefore stopped the ladder AND, at T+15, got unassigned by
+the handback -- which also strips `handover`, `handover-*`, `escalated` and
+`after-hours`. The conversation reverted to the bot and could never be
+escalated again, because the labels the ladder filters on were gone. A
+requested handover, silently lost.
+
+**The claim signal is now `waiting_since`.** Chatwoot sets it on every incoming
+resident message and clears it only in `clear_waiting_since_on_outgoing_response`
+when `human_response?`, which requires `sender.is_a?(User)` -- so the bot's
+replies never clear it and private notes never clear it. `first_reply_created_at`
+was tried first and rejected: it records the first human reply of the
+conversation's whole lifetime and never updates, so a resident helped by a
+person months ago would read as "claimed" for ever.
+
+Three changes. The sub-workflow gained a **`served` mode** (`n8n_handover.py`):
+no note, no page, labels SUBTRACTED rather than added, `handover_answered_at`
+stamped -- the one mode that ends a handover instead of extending it. The
+ladder (`n8n_handback_escalate.py`) now fires `served` the moment
+`waiting_since` is clear and otherwise ignores the assignee entirely, so a
+silent self-assigner keeps escalating. Ending it on the answer, rather than
+just skipping the tick, matters: leave the labels on and the resident's next
+message sets `waiting_since` again and restarts the ladder on a thread a rep
+is actively working. And the handback got a guard: an unanswered `handover`
+thread is never handed back, whoever's name is on it.
+
+Verified on the real clock: a page on conversation 53, then a public agent
+reply -- `waiting_since` 1787581625 -> 0 -- and on the next tick the labels
+were gone and `handover_answered_at` was stamped 15:37:40, with the reply-claim
+having assigned the replier as it always did. Both patch scripts idle on
+re-run. A seventh custom-attribute definition (`Answered at`) was created so
+the sidebar shows it, and the harness's `--clean` clears it too.
+
+### Chatwoot can finally send mail
+
+SMTP had been unset since the VPS was built: no invites, no password resets,
+no email leg on the handover alert. Brevo's free relay was the pick (no card,
+300/day, plenty for 19 seats) since the owner has no access to
+office@homies-management.co.il and didn't want to depend on the mailbox he
+can't get into. He signed up, verified `testclix46@gmail.com` as the sender,
+and generated an SMTP key.
+
+`scripts/chatwoot_smtp.py` (new, dry run by default, `--apply`, idempotent)
+appends `MAILER_SENDER_EMAIL` and the six `SMTP_*` keys to
+`/opt/chatwoot/.env` only where a key is not already present, backs up the
+file first, and restarts `rails` + `sidekiq` so the new env is read. First
+`--apply` hit auto mode's classifier (a production credential write plus a
+container restart); the owner switched out of auto mode and re-ran it
+directly. The restart itself then failed once: the script called the
+container names (`chatwoot-rails`, `chatwoot-sidekiq`) instead of the compose
+service names (`rails`, `sidekiq`) -- fixed, and the restart re-run separately
+confirmed both containers healthy with the new env visible inside
+(`docker exec ... printenv`) and Rails' own `ActionMailer::Base.smtp_settings`
+reporting the Brevo host, port and login. A `deliver_now` test mail reached
+an inbox, proving the whole chain, not just the config.
+
+Then the real path, end to end: a bot-authored private note @mentioning the
+owner on conversation 53 produced notification 593 and
+`Email sent to clixteam579@gmail.com with subject "Assaf Clix, You have been
+mentioned in conversation [ID - 53]"`, delivered in 386 ms with no SMTP error,
+and the owner confirmed it arrived. One trap found on the way: the first
+attempt posted the mention with the ADMIN token, i.e. as the owner himself,
+and Chatwoot skips a User sender's self-mention -- no notification, no email.
+The alert only works because the note is written by the bot. Brevo's free
+tier is 300 mails/day, which 19 seats on a busy day could approach.
+
+Docs updated wherever they said SMTP was unset: HANDOVER's Chatwoot-hardening
+paragraph, feature 16's `context.md`, `feature.md` and `pc-setup.md`. Level-2
+escalation email to the office mailbox is still not built -- it now has
+credentials to use, the decision is still open.
+
+## 2026-09-03
+
+### A handover now pages a department in Chatwoot, verified on the test threads before the bot was wired to it
+
+The owner asked how a representative would ever know a resident wanted one,
+when every rep sits behind one number in Chatwoot. Read the PRD and the live
+system first: `transfer_to_human` wrote `call_outcomes` and stopped (the 16 Aug
+finding, still true), the bot kept answering, and the prompt's "marked urgent,
+a rep will get back to you" had nothing behind it. Two more things fell out of
+reading Chatwoot's source: assigning a TEAM notifies nobody (there is no
+team-changed handler), and the live `Show it in Open` node's pending→open flip
+on the bot token IS Chatwoot's bot-handoff event, which notifies every inbox
+member who has "new conversation" on -- invisible with one seat, a broadcast on
+every conversation with nineteen. What does notify a whole department is a
+private note that @mentions the team: `[@x](mention://team/<id>/<name>)`
+expands to every member and raises `conversation_mention` on bell, browser
+push, the mobile app and email.
+
+Options went to the owner as a plan (Chatwoot-native page vs side channels vs
+a dashboard queue; bot keeps answering vs goes silent; after-hours queued vs an
+on-call page). He chose Chatwoot only, the bot keeps answering, and queue until
+09:00.
+
+**Built.** A sub-workflow, "Homies — Hand to a person" (`oB66atFlWwtkSGgN`,
+`scripts/n8n_handover.py`): read, guard (one handover per conversation per 24
+hours; an emergency over a non-emergency is an upgrade), route by the tool's
+new `department` argument or by reason, page the team in office hours, stamp
+`handover_*` custom attributes, priority, team, labels as a union. Four modes:
+`new` from the bot, `page`/`escalate1`/`escalate2` from the minute ticker,
+which gained a second row (`scripts/n8n_handback_escalate.py`): never paged →
+page; 10 quiet minutes → team + Management, urgent, `escalated`; 15 more →
+every team; stop. A waiting handover has no person and no `bot-off`, so the
+old handback rule cannot steal it; a served one loses its handover labels on
+the way back. The bot (`scripts/n8n_whatsapp_handover.py`, 39 → 42 nodes):
+`Handover this turn?` above the promise backstop decides on the agent's
+`intermediateSteps` and the backstop's own sentence regex, fires the
+sub-workflow without waiting; the tap path pages before the Supabase write;
+the backstop stands down when the tool ran (it had been double-firing since
+the 1 Sep rewrite); `transfer_to_human` regenerated from the builder with
+`department`. Labels and attribute definitions created in Chatwoot.
+
+**Three things Chatwoot 4.16.2 taught, each measured.** `POST /labels` and
+`POST /custom_attributes` both REPLACE the set (an escalation stamp wiped the
+department and the next escalation fell back to Service), so every stamp is
+the existing attributes with the change laid over. `GET /conversations/{id}`
+with the agent-bot token answers 500 once a team is assigned (bisected on
+conversation 44; priority, labels, attributes fine) -- the read moved to the
+admin credential, writes stay on the bot so the activity log says "by Homies
+bot". And n8n refuses to publish a caller whose sub-workflow is unpublished, so
+`--publish` is now part of the builder.
+
+**Tested.** `scripts/n8n_handover_test.py`: a throwaway webhook caller, eight
+cases on conversations 53 and 44 with `now_override`, all green on the third
+run (the first found the 500, the second the replace). Then the live wiring,
+epoch 17 → 18 (tool text, prompt sentence, time-of-day fact in the injected
+template), every patch script idle on re-run, `check_whatsapp.py` all green,
+two probes: "אני רוצה לדבר עם נציג" made a handover sentence with no tool
+call -- backstop AND sub-workflow fired, source `backstop`; "אני תקוע במעלית"
+called the tool with `emergency`/`operations`, the backstop stood down, the
+sub-workflow got both values. Both executions end in the documented 404 at
+Send; every new node ran clean.
+
+**Not needed after all.** The plan had a "dispatcher" service user (the SSH
+route to create one was blocked); the bot token turned out to be allowed on
+every write the handover makes, so nobody was created.
+
+**Waiting on the owner.** The nineteen seats and the four teams' members (a
+mention reaches nobody until then), the Chatwoot mobile app on each phone with
+"assigned" and "mentioned" on and "new conversation" OFF, SMTP for invites and
+email. Verification 5 (a second seat's push) has not been run.
+
+**Correction, same evening: the representatives sit at PCs, not phones.** The
+"install the mobile app" step above is withdrawn. What a PC browser gets from
+a mention is a Windows toast (browser push -- this install already serves the
+VAPID key and `/sw.js`, no server work), the bell, and email once SMTP exists;
+the browser has to be running, so the guidance becomes "install Chatwoot as a
+browser app, start at sign-in". Proof so far: the owner's own login was put in
+the Service team, one page of conversation 53 produced notification 583
+(`conversation_mention`) on that account within the same second, and the
+account's push and email flags for mentions were switched on by API (they only
+covered assignments). The toast itself waits on the owner enabling push in the
+browser.
+
+**Then the first real page with a member in the team found a trap.** The
+notification that landed was `conversation_assignment`, not the mention:
+"Assigned to Assaf Clix via service by Homies bot". The four teams had been
+created with "allow auto assign" on, so assigning the team assigned the
+conversation to its only member -- a User assignee, which the WhatsApp gate
+reads as a takeover (bot silent) and which the 15-minute handback would have
+unassigned and stripped of its handover labels, handing a requested handover
+back to the bot. The plan's own Step 1.2 said to turn the flag off; it had not
+been done. Off on all four teams now, by API; the harness clean-up unassigns
+too. Also learned: Chatwoot keeps one notification per conversation per user
+(`RemoveDuplicateNotificationJob` deletes older ones of any type), which is why
+the mention entry vanished behind the assignment entry; the push had already
+been sent.
+
+**With the flag off, the ladder ran itself on the real clock.** Page at
+09:42:23 UTC (mention only, no assignee); the ticker escalated at 09:52:40
+(Management + Service, urgent, `escalated`, level 1) and at 10:08:41 (all
+four teams, level 2), then stopped. Conversation 53 cleaned afterwards; the
+owner's Chatwoot login stays in the Service team so someone is alerted until
+the real seats exist.
+
+**Found on the way, not fixed: the webhook's shared secret is committed.** The
+three `docs/handover/n8n-whatsapp-live-*.json` snapshots from August carry the
+live `Sort` node, and the live `Sort` node carries `N8N_WEBHOOK_SECRET` in
+clear -- in a public repository. Today's two snapshots were redacted before
+saving (`--restore` re-inserts the value from `.env`). Rotating the secret is a
+Chatwoot agent-bot URL change plus a `Sort` edit; the owner's call.
+
+**The toast, finally.** "its not pinging": the owner's push toggle showed ON
+while the server held zero `NotificationSubscription` rows, so every push job
+was finishing in 100 ms with nothing to send. The browser had never completed
+`pushManager.subscribe`, and Chatwoot's dashboard shows nothing when that
+happens. The owner redid the browser step, the subscription registered
+(`POST /notification_subscriptions` at 10:19 UTC, one row, endpoint on
+`fcm.googleapis.com`), the next page of conversation 53 (10:20:06) ran a real
+push job (784 ms) and a direct @mention followed (10:21:26); the owner
+confirmed the Windows toast. The ladder ran itself again meanwhile (Management
+10:30:40, every team 10:46:40) and conversation 53 was cleaned afterwards.
+The check and the fix are in `docs/features/16-human-handover/pc-setup.md`
+under "If no toast arrives"; the server-side proof is the subscription count.
+
+**"Install as an app is not possible, we have it via VPS."** It is possible,
+and the VPS has nothing to do with it: the install is the browser wrapping
+the site in its own window, and this server already serves the manifest
+(`display: standalone`, icons to 192 px) and `/sw.js`. The address-bar icon
+depends on the browser's own heuristics, so `pc-setup.md` step 7 now also
+gives the menu route that works for any site (Chrome ⋮ → Cast, save, and
+share → Install page as app; Edge … → Apps → Install this site as an app).
 ## 2026-09-06
 
 ### First real call on the open agent: too long, and two masculine slips

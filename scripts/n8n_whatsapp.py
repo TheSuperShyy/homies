@@ -203,7 +203,13 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 17
+MEMORY_EPOCH = 19
+# 17 -> 18, 3 Sep: the handover became real. transfer_to_human gained a
+# `department` argument and its description stopped saying routing does not
+# exist; the prompt's matching sentence went; the injected template carries
+# the time of day so the bot knows when the office is closed. Every buffer
+# older than this holds handovers announced against a routing that was not
+# there.
 # 16 -> 17, 2 Sep night: the layer audit. The owner called it: a layer
 # rule was lying. The tool return promised a list no relay could deliver;
 # transfer and get_balance both claimed the plain balance question;
@@ -242,15 +248,15 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "9e7ed5fa8e43",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "6e19bca8b5ab",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "prompt": "da25152507cd",   # docs/features/11-whatsapp-bot/prompt.md
+    "inject": "7b69a5899131",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "86ab94400d9c",
+    "tools": "0cd6baa8cdea",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -398,7 +404,12 @@ MENU = {
         # Must stay character-for-character identical to the opener in
         # prompt.md — check_greeting() below fails the deploy if they drift, and
         # they did drift once, on 13 Aug. Name restored 24 Aug.
-        "body": {"text": "היי, כאן מיכאל מהומיז. במה אפשר לעזור?"},
+        # 7 Sep: the wave is the owner's ask ("i want to add some emoji in
+        # the intro"; wave only, intro only — buttons stay plain because
+        # their titles are the tap-routing keys). Every copy of this
+        # sentence moved in the same commit: here, the prompt's ownership
+        # clause, live Sort's MENU.content and Send's echo clause.
+        "body": {"text": "היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?"},
         "footer": {"text": "אפשר גם לבחור מהרשימה"},
         "action": {
             "button": "אפשרויות",
@@ -1045,8 +1056,13 @@ TOOLS = [
             "Whoever picks it up is one of Homies' department "
             "representatives. In Hebrew that is נציג מחלקה, or simply הצוות — "
             "use one of those when you tell the resident where their message "
-            "went. Routing to a particular department does not exist yet, so "
-            "never say which department it went to.\n"
+            # 3 Sep: routing exists now. The handover pages the department's
+            # team in Chatwoot, and `department` is the model's call. What the
+            # resident hears does not change: the team has it, no department
+            # named -- the owner's rule from 31 Aug, kept on purpose.
+            "went. Choose `department` by judgment; the resident is still "
+            "never told which department it went to, only that the team has "
+            "it.\n"
             # Added 1 Sep: on a four-turn gas-then-fire conversation this was
             # called on every turn, and the bot announced the same handover
             # four times -- once even saying it was transferring them "again".
@@ -1094,6 +1110,21 @@ TOOLS = [
                                    "resident's own words. Send it every time: "
                                    "on an emergency this is the only account "
                                    "of what happened that reaches the team.",
+                },
+                # ADDED 3 Sep, with the Chatwoot handover. Which of the four
+                # teams gets paged. The model decides from what the resident
+                # said -- no keyword table anywhere, the owner's rule -- and
+                # the sub-workflow falls back to Service when this is missing
+                # or not one of the four. Never spoken to the resident.
+                "department": {
+                    "type": "string",
+                    "enum": ["collections", "operations", "management", "service"],
+                    "description": "Which team should pick this up: "
+                                   "collections = money, payments, receipts, "
+                                   "debt; operations = faults, technicians, "
+                                   "works, emergencies; management = "
+                                   "complaints, contracts, the committee; "
+                                   "service = anything else, or when unsure.",
                 },
             },
             "required": ["reason"],
@@ -1928,6 +1959,10 @@ def workflow(e):
                                 "description",
                                 tool("transfer_to_human")["input_schema"]
                                 ["properties"]["description"]["description"]),
+                            "department: %s" % from_ai(
+                                "department",
+                                tool("transfer_to_human")["input_schema"]
+                                ["properties"]["department"]["description"]),
                         )),
                     ),
                     "options": {"timeout": 25000},

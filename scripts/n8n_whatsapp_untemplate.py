@@ -257,6 +257,14 @@ AGENT_NEW = (
     "לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]' : '') "
     "+ ($json.last_bot ? ' [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא "
     "אתה, ולכן אין לו זכר בזיכרון שלך: ' + $json.last_bot + ']' : '') "
+    # ADDED 3 Sep, with the Chatwoot handover. A fact, not an instruction: the
+    # time in Israel and the day, so the office-hours line in the prompt's
+    # facts list can be applied by the model at 22:00 in its own words. A
+    # handover made out of hours is paged to the department at 09:00; what
+    # the bot says about that is its own, as everything else is.
+    "+ ' [השעה בישראל עכשיו ' + $now.setZone('Asia/Jerusalem').toFormat('HH:mm') "
+    "+ ', יום ' + ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת']"
+    "[$now.setZone('Asia/Jerusalem').weekday % 7] + '.]' "
     "+ String.fromCharCode(10) + $json.text }}"
 )
 

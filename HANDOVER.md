@@ -1,6 +1,6 @@
 # HANDOVER — Homies, everything you need to take over
 
-**Current as of 2026-08-23.** If you have just been told "read the handover",
+**Current as of 2026-09-03.** If you have just been told "read the handover",
 this file plus `CONTEXT.md` is the whole briefing. Read both, then start
 working. Go to `docs/WORKLOG.md` only when you need to know *why* something
 was decided — it is the chronology with full reasoning, newest first.
@@ -64,6 +64,17 @@ Found on 31 Aug while diffing the 35 live nodes against the 21 built, and left
 alone — it needs its own decision rather than being folded into an unrelated
 change. Note that `check_whatsapp.py` passes its security checks regardless:
 they prove a forged *Chatwoot* call writes nothing, which is a different door.
+
+## The webhook's shared secret is in the public repo
+
+The August snapshots `docs/handover/n8n-whatsapp-live-{24aug,25aug,31aug}-*.json`
+are committed and carry the live `Sort` node, whose code holds
+`N8N_WEBHOOK_SECRET` in clear. Anyone who reads the repo can post a Chatwoot
+envelope at the webhook that passes the secret check. Found 3 Sep. The two
+3 Sep snapshots are redacted (`REPLACE_WITH_N8N_WEBHOOK_SECRET`; the patch
+scripts' `--restore` re-inserts the value from `.env`). Rotating means a new
+value in `.env`, in the `Sort` literal, and in the agent bot's `outgoing_url`
+in Chatwoot. Not done; the owner decides.
 
 ---
 
@@ -223,7 +234,8 @@ its stated time.
 - **`Say it again` replaces `Hand over instead`, and there is no third fallback.** If the retry is also unusable, nothing is sent; `Open it anyway` has already written a real ticket, so the report is not lost. **It has now run live** (execution 20768, 1 Sep): the model invented `HM-20240704-12345` and called no tool, the guard rejected it, `Open it anyway` minted `255-1184-26`, and `Say it again` wrote it up with the real number. The whole chain works. Its own short prompt does NOT receive `greeted`, so a rescue message can still reintroduce Michael.
 - **`Sort` still builds a `followup` object that nothing reads** — dead since the follow-up menu came out on 31 Aug. Left alone; it cannot reach anybody.
 - **Nothing in the live system changed in the report-format cycle (1 Sep ~23:00).** The owner redefined how reports are written (spec in Claude memory); the `docs/assistant/**` files a hook flagged then were the voice session's, auto-committed as `a9ea576` - do not chase them.
-- **Epoch is 17 — the layer audit.** The menu signal is `returnIntermediateSteps` on `Answer the resident`, read by Send through `$('Answer the resident').first().json.intermediateSteps` — main-chain, promise-guard-proven channel. Both dead relays (staticData, `$('show_menu')`) are OUT of Send; do not put either back. The recital net stays as backstop. Also in 17: transfer/get_balance money boundary, reporter_unit ask-pressure removed (send-when-known kept), phantom balance-row reference dropped, mid-matter tie-breaker in show_menu. `n8n_whatsapp_greet.py` was re-anchored on the echo clause itself after menu.py's restructure drifted its whole-condition anchor — a patcher that anchors on a region another patcher owns will drift again.
+- **Epoch is 19 — the intro waves.** One emoji, four synchronized copies (MENU body, prompt ownership clause, live Sort content, live Send echo clause; greet.py owns the live two). **Do not run `n8n_whatsapp_promise.py --apply`:** its committed edit predates the 3 Sep handover rework of that guard region and now shows a pending change that would revert `Handover this turn?`'s design — it needs re-anchoring first, like greet.py on 2 Sep.
+- **Epoch was 17 — the layer audit.** The menu signal is `returnIntermediateSteps` on `Answer the resident`, read by Send through `$('Answer the resident').first().json.intermediateSteps` — main-chain, promise-guard-proven channel. Both dead relays (staticData, `$('show_menu')`) are OUT of Send; do not put either back. The recital net stays as backstop. Also in 17: transfer/get_balance money boundary, reporter_unit ask-pressure removed (send-when-known kept), phantom balance-row reference dropped, mid-matter tie-breaker in show_menu. `n8n_whatsapp_greet.py` was re-anchored on the echo clause itself after menu.py's restructure drifted its whole-condition anchor — a patcher that anchors on a region another patcher owns will drift again.
 - **Epoch was 16.** 15 removed the balance row from show_menu's description with the row itself; 16 banned the permission question ("would you like to see the options?" costs a round-trip) after the owner's live test. Send's menu signal is now `$('show_menu').all()` in a try/catch — primary — with the old staticData clause still ORed in as a second chance. **Once the owner's handset shows buttons on an idk turn, strip the staticData clause and the tool's staticData write**; if it still shows text only, the fallback diagnostic is a temporary debug field on `Log reply` (probe rows get cleaned up). The probe's same-number wait is 22s now — at 14s a goodbye joined the previous still-open run as one burst and looked like a regression.
 - **Epoch was 14.** 12 minted `show_menu` + the orientation line; 13 and 14 were the two allowed retries at making Gemini pick the tool on a vague turn (prompt line, then description); the recital net in `Send` closed the gap and is NOT epoch-hashed — it reads output, teaches nothing. The flag is the ONE safe staticData use in this workflow: keyed by `$execution.id`, snapshot isolation blocks concurrent leaks, id inequality blocks sequential ones. Never replace it with `isExecuted`. The net needs 3+ of `קריאת שירות/קריאה קיימת/יתרה/נציג` in the REPLY — if a future prompt makes normal replies enumerate flows, the menu will start appearing on them, and this is where to look. The list is THREE rows and that is a WhatsApp rendering fact: at most 3 reply buttons show inline, and a 4th item collapses everything into an English 'Choose an item' list button — a balance row added 2 Sep did exactly that to the owner's greeting and came back out the same day (epoch 15 carries the description fix). Do not add a 4th row. The owner's handset is the only place buttons are ever SEEN (probes 404 at Send).
 - **If the epoch guard reports a hash the file does not contain, delete `scripts/__pycache__`.** A same-size same-second rewrite of `n8n_whatsapp.py` can leave a stale .pyc that mixes old constants with new tool text; it happened 2 Sep and looked exactly like a guard bug.
@@ -447,8 +459,9 @@ the prompt contains no example ticket numbers anymore — the bot had
 fabricated one digit for digit. Verified live: real references in replies
 matching real rows, refusals for unmanaged addresses with the street's real
 numbers offered, no junk rows. Rollback: wa-before-ghost.json
-(patch_wa_ghost.py --restore) + redeploy the previous index.ts. Still open
-by design: the Chatwoot assign/label flag on transfers.
+(patch_wa_ghost.py --restore) + redeploy the previous index.ts. The Chatwoot
+assign/label flag on transfers, open since then, closed 3 Sep -- see "A
+handover pages the department" below.
 
 **The bot's on/off switch is the natural gesture: replying.** A public human
 reply auto-assigns the conversation to the replier (the workflow does this;
@@ -465,11 +478,46 @@ bot instead of an agent who went home. Taking over resets the clock, and so
 does every reply -- the bot never interrupts mid-conversation. Resolved
 conversations are never handed back.
 
+**A handover pages the department (3 Sep, feature 16).** All three transfer
+paths -- the `transfer_to_human` tool, the `לדבר עם נציג` tap, the promise
+backstop -- fire the sub-workflow "Homies — Hand to a person"
+(`oB66atFlWwtkSGgN`, built by `scripts/n8n_handover.py`, must stay published).
+It labels `handover` + `handover-<department>`, sets priority (urgent for an
+emergency, else high), assigns the team, stamps `handover_*` custom attributes,
+and in office hours posts a private note that @mentions the department's team
+-- **the mention is the alert**; assigning a team alone notifies nobody. Out of
+hours it labels `after-hours` and the ticker pages at 09:00. The ticker
+escalates a handover nobody ANSWERED: 10 min → team + Management, urgent,
+`escalated`; 15 more → every team; then stops. **A name on the thread is not an
+answer** (6 Sep): the claim signal is Chatwoot's `waiting_since`, which only a
+human agent's public reply clears, so a rep who clicks "assign to me" and stays
+silent keeps escalating. On the first tick after a real reply the ticker fires
+mode `served`, which strips the handover labels and stamps
+`handover_answered_at`; only then can the 15-minute handback see the thread.
+**A seat must be an inbox member or its mentions are dropped in silence** --
+`MentionService` intersects with `administrators + inbox.members`, which is why
+administrators always worked and the first real seat got nothing. A mention
+also makes the person a conversation participant, so the thread appears in
+their Mentions and Participating views without any assignment. The bot keeps answering while
+it waits (owner, 3 Sep); a person's reply claims it as before. Department is
+the model's `department` argument (no keyword table), else emergency →
+Operations, all else → Service; the resident is never told which. **The
+owner's login is the only team member (Service), and the Windows toast was
+proven on their PC on 3 Sep; nobody else is notified until the teams have
+members.** Read the
+conversation with the ADMIN credential: the bot token's read 500s once a team
+is assigned (Chatwoot 4.16.2 bug, bisected); `POST /labels` and
+`POST /custom_attributes` replace the set, so both are written as unions.
+Harness: `scripts/n8n_handover_test.py` (eight cases on conversations 53/44,
+`--clean` afterwards). Full detail in `docs/features/16-human-handover/`.
+
 Held up by: **auto-assignment OFF** on inbox 1 (on, every conversation is
 assigned on arrival and the bot never speaks), the `bot-off` label at account
 level, and two n8n credentials -- bot token for replies, admin token
 ("Chatwoot admin", `N8N_CHATWOOT_ADMIN_CRED_ID`) for assignment changes.
-Six-state switch test and reply-claim test passed 21 Aug.
+Six-state switch test and reply-claim test passed 21 Aug. **And "allow auto
+assign" OFF on all four teams (set 3 Sep):** on, assigning the team hands the
+thread to a member, which counts as a takeover and silences the bot.
 
 **One writer, reached three ways.** Every write goes through the Supabase Edge
 Function `debt-tools` (13 handlers, `--no-verify-jwt`, authenticated by
@@ -693,13 +741,27 @@ way back.
 - **Payment link delivery.** `send_payment_link` writes a row and stops. OXS
   exposes no payment-link endpoint, so the link still comes from OXS itself.
 - **Chatwoot hardening, and the seats.** Chatwoot is live in the path (see
-  above) but three things are unfinished. **SMTP is unset** --
-  `MAILER_SENDER_EMAIL` and `SMTP_ADDRESS` are absent, not blank -- so nobody
-  can be invited and nobody can recover an account; the Rails console is the
-  only door, which means losing root on the VPS means losing Chatwoot. **The 19
+  above) but two things are unfinished. **SMTP is live since 6 Sep** -- Brevo's
+  free relay (`smtp-relay.brevo.com`, sender `testclix46@gmail.com`, the
+  account's SMTP key in this repo's `.env` as `SMTP_KEY`), added to
+  `/opt/chatwoot/.env` and confirmed with a real `deliver_now` that reached
+  an inbox (`scripts/chatwoot_smtp.py`, idempotent, `--apply` restarts
+  `rails`+`sidekiq`). Invites and password resets work now; the Rails console
+  is no longer the only door. **The 19
   seats and the routing rules** do not exist: teams 1-4 (Collections,
-  Operations, Management, Service) are created and empty, and nothing routes to
-  them automatically. **The webhook secret is a query-string shared secret**,
+  Operations, Management, Service) are created and empty. Since 3 Sep a
+  handover assigns the team and @mentions it, so routing exists and reaches
+  nobody until the teams have members. The representatives work on PCs:
+  each seat enables browser push once (Profile → Notifications), keeps
+  "assigned" and "mentioned" on and "new conversation" OFF (or the bot's
+  status flip pings them on every thread), and keeps the browser running,
+  ideally Chatwoot installed as a browser app that starts at sign-in. Proven
+  3 Sep on the owner's PC: the owner's login, put in the Service team,
+  received `conversation_mention` 583 from one page, and once push was
+  re-enabled in the browser (the toggle had shown ON with no subscription on
+  the server) the Windows toast arrived. Per-PC steps and the no-toast
+  checks: `docs/features/16-human-handover/pc-setup.md`.
+  **The webhook secret is a query-string shared secret**,
   not a verified signature: Chatwoot does send `X-Chatwoot-Signature`
   (HMAC-SHA256 over `${timestamp}.${body}`) but n8n cannot check it --
   `require('crypto')` is blocked in the task-runner sandbox. The account is
