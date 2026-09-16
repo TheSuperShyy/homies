@@ -1,0 +1,41 @@
+home.txt	2917	דף הבית | הומי'ז | ניהול ואחזקת מבנים | ניקיון חדרי מדרגות	https://homies-management.co.il/
+אודות.txt	2964	חניונים | הומי'ז | ניהול ואחזקת מבנים | ניקיון חדרי מדרגות	https://homies-management.co.il/%d7%90%d7%95%d7%93%d7%95%d7%aa/
+אחזקת-הבניין.txt	2077	אחזקת הבניין | הומי'ז	https://homies-management.co.il/%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%94%d7%91%d7%a0%d7%99%d7%99%d7%9f/
+ביקורות-שוטפות.txt	2077	ביקורות שוטפות | הומי'ז	https://homies-management.co.il/%d7%91%d7%99%d7%a7%d7%95%d7%a8%d7%95%d7%aa-%d7%a9%d7%95%d7%98%d7%a4%d7%95%d7%aa/
+דף-נחיתה-הומיז.txt	3648	דף נחיתה הומיז | הומי'ז	https://homies-management.co.il/%d7%93%d7%a3-%d7%a0%d7%97%d7%99%d7%aa%d7%94-%d7%94%d7%95%d7%9e%d7%99%d7%96/
+דף-נחיתה-ניהול-ואחזקת-מבנים.txt	3581	דף נחיתה ניהול ואחזקת מבנים | הומי'ז	https://homies-management.co.il/%d7%93%d7%a3-%d7%a0%d7%97%d7%99%d7%aa%d7%94-%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d/
+דף-תודה-צביעה-ושיפוצים.txt	723	דף תודה צביעה ושיפוצים | הומי'ז	https://homies-management.co.il/%d7%93%d7%a3-%d7%aa%d7%95%d7%93%d7%94-%d7%a6%d7%91%d7%99%d7%a2%d7%94-%d7%95%d7%a9%d7%99%d7%a4%d7%95%d7%a6%d7%99%d7%9d/
+חברת-ניהול-ואחזקת-מבנים-רמת-גן.txt	3510	ניהול נכסים ברמת גן | ניהול נכסים ברמה הגבוהה בארץ | הומי'ז ניהול נכסים	https://homies-management.co.il/%d7%97%d7%91%d7%a8%d7%aa-%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%a8%d7%9e%d7%aa-%d7%92%d7%9f/
+חברת-שיפוצים.txt	2691	חברת שיפוצים | הומי'ז	https://homies-management.co.il/%d7%97%d7%91%d7%a8%d7%aa-%d7%a9%d7%99%d7%a4%d7%95%d7%a6%d7%99%d7%9d/
+מפוחים-שיחרור-עשן.txt	1949	מפוחים - שיחרור עשן | הומי'ז	https://homies-management.co.il/%d7%9e%d7%a4%d7%95%d7%97%d7%99%d7%9d-%d7%a9%d7%99%d7%97%d7%a8%d7%95%d7%a8-%d7%a2%d7%a9%d7%9f/
+משאבות-מים.txt	2192	משאבות מים | הומי'ז	https://homies-management.co.il/%d7%9e%d7%a9%d7%90%d7%91%d7%95%d7%aa-%d7%9e%d7%99%d7%9d/
+ניהול-ואחזקת-מבנים-הרצליה.txt	4034	ניהול ואחזקת מבנים – הרצליה | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%94%d7%a8%d7%a6%d7%9c%d7%99%d7%94/
+ניהול-ואחזקת-מבנים-נוא.txt	4491	ניהול ואחזקת מבנים נוא | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%a0%d7%95%d7%90/
+ניהול-ואחזקת-מבנים-רמת-גן.txt	4510	ניהול ואחזקת מבנים - רמת גן | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%a8%d7%9e%d7%aa-%d7%92%d7%9f/
+ניהול-ואחזקת-מבנים-רמת-השרון.txt	4422	ניהול ואחזקת מבנים – רמת השרון | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%a8%d7%9e%d7%aa-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/
+ניהול-ואחזקת-מבנים-תל-אביב-2.txt	4422	ניהול ואחזקת מבנים – תל אביב | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%aa%d7%9c-%d7%90%d7%91%d7%99%d7%91-2/
+ניהול-ואחזקת-מבנים-תל-אביב.txt	4420	ניהול ואחזקת מבנים - תל אביב | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%95%d7%90%d7%97%d7%96%d7%a7%d7%aa-%d7%9e%d7%91%d7%a0%d7%99%d7%9d-%d7%aa%d7%9c-%d7%90%d7%91%d7%99%d7%91/
+ניהול-נכסים.txt	2320	ניהול נכסים | ניהול דירות לטווח אורך וטווח קצר | הומי'ז ניהול נכסים	https://homies-management.co.il/%d7%a0%d7%99%d7%94%d7%95%d7%9c-%d7%a0%d7%9b%d7%a1%d7%99%d7%9d/
+ניקיון-חניונים.txt	3071	ניקיון חניונים | הומי'ז	https://homies-management.co.il/%d7%a0%d7%99%d7%a7%d7%99%d7%95%d7%9f-%d7%97%d7%a0%d7%99%d7%95%d7%a0%d7%99%d7%9d/
+רכזת-גילוי-אש.txt	1976	גילוי אש | הומי'ז	https://homies-management.co.il/%d7%a8%d7%9b%d7%96%d7%aa-%d7%92%d7%99%d7%9c%d7%95%d7%99-%d7%90%d7%a9/
+שירותי-גינון.txt	1818	שירותי גינון | הומי'ז	https://homies-management.co.il/%d7%a9%d7%99%d7%a8%d7%95%d7%aa%d7%99-%d7%92%d7%99%d7%a0%d7%95%d7%9f/
+שירותי-הדברה.txt	1872	שירותי הדברה | הומי'ז	https://homies-management.co.il/%d7%a9%d7%99%d7%a8%d7%95%d7%aa%d7%99-%d7%94%d7%93%d7%91%d7%a8%d7%94/
+שירותי-ניהול.txt	2002	שירותי ניהול | הומי'ז	https://homies-management.co.il/%d7%a9%d7%99%d7%a8%d7%95%d7%aa%d7%99-%d7%a0%d7%99%d7%94%d7%95%d7%9c/
+תחזוקת-גנרטורים.txt	1755	תחזוקת גנרטורים | הומי'ז	https://homies-management.co.il/%d7%aa%d7%97%d7%96%d7%95%d7%a7%d7%aa-%d7%92%d7%a0%d7%a8%d7%98%d7%95%d7%a8%d7%99%d7%9d/
+תחזוקת-מערכות.txt	2110	תחזוקת מערכות | הומי'ז	https://homies-management.co.il/%d7%aa%d7%97%d7%96%d7%95%d7%a7%d7%aa-%d7%9e%d7%a2%d7%a8%d7%9b%d7%95%d7%aa/
+about.txt	2167	הומי'ז - אודות | חברה לניהול והחזקת מבנים ושירותי נקיון חדרי מדרגות	https://homies-management.co.il/about/
+building-cleaning.txt	2387	כל מה שאתם צריכים לדעת על ניקיון חדרי מדרגות (מעודכן לשנת 2021 )	https://homies-management.co.il/building-cleaning/
+building-management-and-maintenance.txt	5081	הומי'ז - ניהול ואחזקת מבנים | אחזקה שוטפת | שירותי ניקיון | טיפול שוטף במערכות	https://homies-management.co.il/building-management-and-maintenance/
+cleaning-services.txt	1914	הומי'ז - שירותי ניקיון | ניקיון חדרי מדרגות ברמת גן | גבעתיים | תל אביב	https://homies-management.co.il/cleaning-services/
+contact.txt	905	הומי'ז - צור קשר | שירותי נקיון חדרי מדרגות ברמת גן | גבעתיים | תל אביב	https://homies-management.co.il/contact/
+homies-cleanline.txt	3240	הומי'ז - נקיון חדרי מדרגות | שינוי בנקיון כבר מהיום הראשון | מחירים ללא תחרות	https://homies-management.co.il/homies-cleanline/
+homies-gardening.txt	2544	הומי'ז נקיון וגינון | גינון לבניין במחיר מייוחד | הגיע הזמן שהגינה שלך תראה כמו שצריך	https://homies-management.co.il/homies-gardening/
+homies-ty.txt	732	דף תודה | הומי'ז	https://homies-management.co.il/homies-ty/
+management-of-short-term-apartments.txt	1550	הומי'ז - ניהול דירות לתקופות קצרות | ניהול דירות Airbnb ברמת גן גבעתיים ותל אביב	https://homies-management.co.il/management-of-short-term-apartments/
+new-page.txt	512	New Page | הומי'ז | ניהול ואחזקת מבנים | ניקיון חדרי מדרגות	https://homies-management.co.il/new-page/
+privacy-policy-2.txt	6419	Privacy Policy | הומי'ז	https://homies-management.co.il/privacy-policy-2/
+privacy-policy.txt	20356	תקנון אתר | הומי'ז	https://homies-management.co.il/privacy-policy/
+ptihat-takala.txt	427	פתיחת תקלות | הומי'ז	https://homies-management.co.il/ptihat-takala/
+recruitment-technistion.txt	498	recruitment - technistion | הומי'ז | ניהול ואחזקת מבנים | ניקיון חדרי מדרגות	https://homies-management.co.il/recruitment-technistion/
+recruitment.txt	490	recruitment gvia | הומי'ז | ניהול ואחזקת מבנים | ניקיון חדרי מדרגות	https://homies-management.co.il/recruitment/
+thank-park.txt	72	thank-park | הומי'ז	https://homies-management.co.il/thank-park/

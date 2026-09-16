@@ -10,8 +10,14 @@ The facts themselves came from the client on 16 Aug and are recorded in
 section is unchanged and stays the WhatsApp bot's live copy; this file was
 created from it, not instead of it.
 
-**Anything not written here does not exist.** No website, no staff names, no
-prices, no contract clauses beyond what is below. A fact we do not hold is not
+**Anything not written here does not exist.** No staff names, no prices, no
+contract clauses beyond what is below. *(This said "no website" until
+16 Sep, when the client asked for `homies-management.co.il` turned into a
+knowledge base. There is a site, its service catalogue is in
+`services.md`, and none of it is in either prompt yet — that is a
+decision, not an oversight. Read that file's contradictions section
+before quoting the site to anyone: it puts Homies open on Friday, which
+the facts below deny.)* A fact we do not hold is not
 an escalation — say so and give the office number. Never invent half of one: a
 number that sounds right, an approximate hour, a website that might exist are
 all worse than "I don't have that", because a resident will rely on them.
