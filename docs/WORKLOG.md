@@ -53,6 +53,44 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+### The electrician screenshot: an offer taken back, and a ticket that should not exist. Epoch 34.
+
+Owner sent the thread with no comment. Pulled the Hebrew out of the executions
+rather than reading his translation (44893, 44901). Three defects, two of them
+client-facing:
+
+* **It offered a service Homies does not have, then withdrew it.**
+  `אוכל להמליץ לכם על חשמלאי`, and one turn later
+  `הומיז לא ממליצה באופן פרטני על בעלי מקצוע`. Epoch 29 grounded what the bot
+  KNOWS; **nothing ever grounded what it OFFERS**. Fixed in the same paragraph,
+  because it is the same rule wearing different clothes: offers are limited to
+  what the tools actually do, and taking an offer back is worse than never
+  making it.
+* **It offered a service call for a fault inside the flat**, one sentence after
+  saying such faults are the resident's. Cause found: `תאורה` sat in the
+  common-area list that gets a ticket, and the private list named a sink, a tap,
+  an appliance and paintwork but **no electricity** — so a light in a flat
+  matched the wrong list. The lists were doing the deciding; WHERE decides now.
+* **`הבנתי,` / `אני מבין ש` opening both turns**, banned by name since epoch 32.
+
+**Both offer defects are fixed and probed clean.** Three replays of the owner's
+own conversation: no invented recommendation, no retraction, and the refusal is
+correct when asked point blank.
+
+**But the probe that mattered was the one after that.** Two of the three replays
+asked for the building before refusing, and one said in as many words
+*`כדי שאוכל לפתוח קריאת שירות`*. So I tested the obvious next move — give it the
+building — and **2 of 3 opened a real ticket for a private electrical fault**,
+`255-1267-26`. That is the client's 15 Sep decision, breached, and it was only
+found by not stopping at a probe that looked fine.
+
+**Recorded as an open defect and NOT patched.** Five prompt passes today each
+landed at 'mostly works'; a guardrail the client agreed to may not be 'mostly'.
+It belongs where the refusals already live — server-side in `open_request`,
+the shape the `log_call_outcome` enum already uses. That is a piece of work
+across the Edge Function, both tool schemas and the n8n router, so it waits for
+the owner rather than being started at the end of a long session.
+
 ### A burglary, answered like a form. I caused half of it. Epochs 32 and 33.
 
 Owner, on a screenshot: *"this is too robotic i want to have some humanity
