@@ -53,6 +53,59 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+### Their website is a knowledge base now, and it says they are open on Friday
+
+Owner: *"this is their website and i want you to scrape all the info that we
+can put as a knowledge base, all the services and stuff."*
+`homies-management.co.il` is WordPress + Elementor and fully server-rendered,
+so `scripts/scrape_site.py` reads all 41 pages (sitemap → page + post) with no
+browser. Raw text of every page in `docs/knowledge/site/`, the catalogue in
+**`docs/knowledge/services.md`**.
+
+**The scraper's one real bug, worth the line:** the first pass muted a
+container when its class looked like chrome and unmuted on `</nav>`,
+`</header>`, `</footer>` — tags that never arrive, because what it muted was a
+`div`. 37 of 41 pages came back as their `<title>` and nothing else (30–90
+chars) and it looked like a JS-rendered site. Every element carries a depth
+now and a mute is released by the close of the element that set it: 120,846
+chars.
+
+**What the site is for us:** the catalogue neither bot can answer from today —
+what an אב בית does on a visit, the generator run ten minutes monthly and
+serviced yearly, fire panel monthly + annual certification on the fire
+authority's schedule, smoke fans to ת"י 1001, water-tank disinfection yearly
+under Health Ministry rules, pest control with a 12-month warranty and a
+week's notice to residents, a named cleaner with a briefed stand-in, car-park
+washing once or twice a year, gardening, renovations (70+ a year), and the
+landlord products (property management, Airbnb/Booking short-term).
+**None of it is in either prompt.** The inbound agent is open by owner
+decision and a catalogue inside its fence is a rulebook under another name;
+how it reaches the bots is the owner's call.
+
+**The valuable part is the disagreements, kept rather than reconciled:**
+
+1. **Friday.** Our prompts say ראשון עד חמישי 09:00–17:00 and no Friday. The
+   site's contact block says ו 09:00–14:00; the footer **on the same page**
+   says א׳–ה׳ 08:00–18:00 and ו׳ 08:00–14:00. The site contradicts itself and
+   both versions contradict us, so a resident who rings on a Friday morning
+   has been told wrong by our bot either way. Needs Yariv.
+2. Years in business: 5, 10 and 15 on different pages.
+3. *מענה 24/7* on nearly every page, mostly the landlord ones, against our
+   office-hours answer and our refusal to promise a call back.
+4. A committee/resident **app** with 24/7 reports and a maintenance journal
+   that neither bot knows exists.
+5. **The company writes its own name `הומי'ז`, with a geresh** — never the
+   bare `הומיז` our prompts use. That is one of the five forms already
+   rendered in `voice/samples/name-*.mp3`, and it is the client's own
+   orthography, which makes it the one to try first.
+
+`homies.md` opened *"anything not written here does not exist. No website"*,
+which stopped being true today; narrowed to what it means and pointed at
+`services.md`. **`facts_check.py` went 15 missing → 13** across the whole
+session (measured by running it against commit `1a514bf` in a temp tree, not
+assumed): today's work fixed the voice phone and address and caused none of
+the remainder, which are wording drifts from 13–14 Sep.
+
 ### The live Vapi wallet hit -$0.03, so the demo moved to an eighth account
 
 The owner tried the dashboard's voice widget and got *"check the browser has

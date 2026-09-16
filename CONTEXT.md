@@ -2274,6 +2274,18 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**The website is reference, and the client's own facts outrank it (16 Sep).**
+`homies-management.co.il` is scraped into `docs/knowledge/services.md` with
+the raw pages beside it. Two rules travel with it. First, **marketing copy is
+not fact**: the site sells, its numbers contradict each other (5, 10 and 15
+years in business), and *מענה 24/7* is a sales promise, not an SLA a bot may
+repeat. Where the site and the client's 16 Aug facts disagree, the facts win
+until he says otherwise — and they do disagree about Friday. Second,
+**scraped content does not enter a prompt by default**: the inbound agent is
+open by owner decision, so a service catalogue inside its fence is a rulebook
+under another name. Getting this knowledge to the bots is a design decision
+(a retrieval tool, a facts row, or nothing), not an edit.
+
 **An emergency is the ticket and the team, and nothing else (16 Sep, owner,
 after the client's review).** No national numbers, no safety instructions,
 not what to do and not what not to do, even when asked directly what to do
