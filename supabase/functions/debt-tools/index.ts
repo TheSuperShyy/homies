@@ -8,6 +8,9 @@
 //   supabase functions deploy debt-tools --no-verify-jwt
 // Then set the secrets it reads:
 //   supabase secrets set TOOL_SECRET=...           # 32+ random chars
+//   N8N_VOICE_NOTE_URL / N8N_VOICE_NOTE_SECRET     # the voice team note (14 Sep);
+//                                                  # unset = no note, one warn per call
+// scripts/supabase_functions.py --apply pushes all three from .env.
 //
 // --no-verify-jwt is deliberate. Vapi is not a Supabase user and cannot present
 // a Supabase JWT. The shared secret in the X-Homies-Secret header is what
@@ -68,6 +71,12 @@ type CallContext = {
    * it aloud: it is on the call, so it goes on the row.
    */
   callerPhone: string | null;
+  /**
+   * Which assistant is on the call, from Vapi's Call resource. The team note
+   * (14 Sep) fires for the inbound intake assistant only; the debt agent's
+   * transfers keep writing their row and nothing else.
+   */
+  assistantId: string | null;
   /** Every open charge this call covers. The whitelist. Never empty on a real call. */
   charges: Charge[];
 };
@@ -158,6 +167,7 @@ function context(message: any): CallContext {
     // column was empty on the whole channel. Found 25 Aug, the hour complaints
     // became tickets — a complaint nobody can ring back is half a complaint.
     callerPhone: phoneOf(call?.customer?.number) ?? phoneOf(v.caller_phone) ?? phoneOf(v.phone),
+    assistantId: String(call?.assistantId ?? message?.assistant?.id ?? "").trim() || null,
     charges,
   };
 }
@@ -416,6 +426,9 @@ const TYPE_WORDS: Record<string, string[]> = {
   // Ours, not OXS's (migration 025, 25 Aug): a complaint is a ticket on both
   // channels. The words are what a caller says when asking about one.
   complaint: ["complaint", "noise", "neighbour", "neighbor", "תלונה", "רעש", "שכן", "שכנים"],
+  // Ours too (migration 031, 15 Sep): a resident who wants to pay gets a
+  // ticket beside the team note, and may ask after it by these words.
+  payment: ["payment", "pay", "תשלום", "לשלם", "הסדר"],
 };
 
 /** Does this row look like the thing the caller named? */
@@ -673,6 +686,113 @@ async function canonicalAddress(said: unknown): Promise<string> {
  */
 function dialled(ctx: CallContext): boolean {
   return Boolean(ctx.residentId || ctx.charges.length);
+}
+
+// ---------------------------------------------------------------------------
+// The voice team note (14 Sep)
+// ---------------------------------------------------------------------------
+// The inbound voice agent is the whole support desk, like the chatbot since
+// 13-14 Sep: past its threshold it calls `notify_team` and tells the caller
+// the team knows. On WhatsApp the n8n workflow makes that true by paging a
+// Chatwoot team on the resident's conversation. A voice call has no
+// conversation, so this function posts to the n8n workflow "Homies — Voice
+// team note" (scripts/n8n_voice_note.py), which gives the call one in the
+// Voice inbox and hands it to the same sub-workflow. Fire and forget: n8n
+// answers on receipt, this waits at most a few seconds, and nothing here can
+// fail the tool call -- the caller is mid-sentence.
+//
+// The inbound intake assistant on Vapi. Hardcoded the way the reference
+// format is: it changes when the assistant is recreated, which is an event,
+// not a config drift. The English twin is deliberately absent: nobody calls
+// it, and a note from it would page a team about a comparison run.
+const INTAKE_ASSISTANT_ID = "8894680c-03af-43f6-a75b-f828872833cc";
+// 16 Sep: a second id for the same agent. The live account's wallet hit
+// -$0.03 and refused every call, so the demo runs on a fresh Vapi account
+// where `vapi_sync.py` (which matches by NAME, not id) minted new
+// assistants. An id is a fact about one account and this Set is what
+// decides whether a voice team note reaches Chatwoot at all, so the demo
+// agent joins rather than replaces: both accounts work, and going back is
+// swapping keys, not editing this file again.
+const INTAKE_ASSISTANT_DEMO = "827bfddd-05cc-417b-99f5-17eec76528e6";
+const INTAKE_ASSISTANT_IDS = new Set([INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO]);
+
+function isIntake(ctx: CallContext): boolean {
+  // The assistant id, and nothing else. A "voice and not dialled" fallback
+  // was here for an hour on 14 Sep and turned check_tools.py's debt probe
+  // (no assistant on the envelope, no charges) into a Voice-inbox page
+  // (conversation 60). Every real Vapi message carries call.assistantId; an
+  // envelope without one is a probe, and a probe pages nobody.
+  return !!ctx.assistantId && INTAKE_ASSISTANT_IDS.has(ctx.assistantId);
+}
+
+/**
+ * Who the Chatwoot contact is. The CALL is the identity (`voice:call:<id>`),
+ * because it is the one thing that cannot change between the first note of
+ * a call and the third: the address usually arrives after the ask, and an
+ * identity built on the address opened a second thread mid-call with the
+ * same notes on it (measured on the first live probe, 14 Sep). The
+ * apartment, canonical, is the contact's NAME instead -- that is how a
+ * later call from the same flat finds the same contact (the number too,
+ * when there is one), so the sub-workflow's 24-hour guard sees the repeat.
+ */
+async function voiceLabel(building: unknown, unit: unknown): Promise<string> {
+  const b = (await canonicalAddress(building)) || String(building ?? "").trim();
+  const u = unitOf(unit) ?? String(unit ?? "").trim();
+  return b && u ? `${b} דירה ${u}` : "";
+}
+function voiceIdentity(callId: string): string {
+  return `voice:call:${callId}`;
+}
+
+type VoiceNote = {
+  call_id: string; phone: string; building: string; unit: string; identifier: string; label: string;
+  reason: string; department: string; description: string; source: "tool" | "backstop";
+};
+
+/** POST the note to n8n. Never throws; true when n8n took it. */
+async function voiceNote(payload: VoiceNote): Promise<boolean> {
+  const url = Deno.env.get("N8N_VOICE_NOTE_URL") ?? "";
+  const secret = Deno.env.get("N8N_VOICE_NOTE_SECRET") ?? "";
+  if (!url || !secret) {
+    console.warn("voice note OFF: N8N_VOICE_NOTE_URL / N8N_VOICE_NOTE_SECRET unset", payload.call_id);
+    return false;
+  }
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 3000);
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-homies-secret": secret,
+                   "user-agent": "homies-debt-tools/1.0" },
+        body: JSON.stringify(payload),
+        signal: ac.signal,
+      });
+      if (res.ok) return true;
+      console.error("voice note refused", res.status, payload.call_id, payload.source);
+    } catch (e) {
+      console.error("voice note failed", attempt, payload.call_id, String(e));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  return false;
+}
+
+// The sentence with no tool behind it. Same shapes as the WhatsApp backstop
+// (scripts/n8n_whatsapp_teamnote.py SAID), in phone forms: "I told / will
+// pass this to the team" (a verb and a destination), the sentence the prompt
+// teaches ("the team knows"), or a call-back promise. A conditional OFFER is
+// excluded -- asking whether to tell the team is not telling it.
+const SAID_TOLD = /(עדכנתי|אעדכן|הודעתי|אודיע|מסרתי|אמסור|למסור|רשמתי|ארשום|לרשום|לעדכן|להעביר|העברתי|העברנו|מעביר|מעבירה|מעבירים)/;
+const SAID_TEAM = /(לצוות|את הצוות|למחלקה|לגבייה|להנהלה|לתפעול|לשירות|לנציג|לעמית|למשרד)/;
+const SAID_KNOWS = /הצוות (כבר |כבר מ)?(יודע|מעודכן|קיבל)/;
+const SAID_PROMISED = /((יחזרו|יחזור|נחזור|תחזור) (אליך|אלייך|אליכם)|(יצרו|ייצרו|ניצור|יצור|ייצור) (אתך|איתך|אתכם|איתכם) קשר)/;
+const SAID_OFFER = /(שאעביר|האם להעביר|רוצים שנעביר|רוצים שאעביר|רוצה שאעביר|שאעדכן|האם לעדכן|רוצים שאעדכן|רוצה שאעדכן|שארשום|האם לרשום|רוצים שארשום|שאמסור|האם למסור|רוצים שאמסור|רוצה שאמסור)/;
+function saidTeamKnows(botText: string): boolean {
+  const t = String(botText ?? "");
+  if (SAID_OFFER.test(t)) return false;
+  return (SAID_TOLD.test(t) && SAID_TEAM.test(t)) || SAID_KNOWS.test(t) || SAID_PROMISED.test(t);
 }
 
 /**
@@ -1557,12 +1677,19 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // The address as WE write it, when what was said resolves to a building we
     // manage. Added 13 Aug alongside `verify_address`.
     //
-    // On VOICE this normalises and never refuses: voice agents were never
+    // Until 16 Sep this refused on WhatsApp only: voice agents were never
     // taught to verify first, and rejecting an unresolvable building would
-    // silently drop inbound voice tickets — a worse failure than the one it
-    // fixes. An unresolved voice building files as said, for a person to read.
+    // have silently dropped inbound voice tickets, so an unresolved voice
+    // building filed as said, for a person to read. The client's review of
+    // 15 Sep asked for the opposite ("we do not manage this building"), and
+    // the silent-drop worry is answered the way it was on chat: the result
+    // carries the reason, and the inbound tool text says what to do with
+    // each one, including one re-ask for a street the transcriber may have
+    // misheard. So the gate is now "the building came from the caller's
+    // words" -- every channel that is not a call we placed. A dialled call
+    // (the debt agent) carries the building as a fact and is untouched.
     //
-    // On WHATSAPP this refuses, since 23 Aug. The chat bot was taught a
+    // On WHATSAPP this has refused since 23 Aug. The chat bot was taught a
     // two-step dance — verify_address, then open_request, then answer — and
     // the field test showed the model simply does not chain: five live runs,
     // zero second calls, three invented references read to residents.
@@ -1580,7 +1707,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // are two buildings to that guard and one building to everybody else, so
     // the second report would mint a second ticket and dispatch a second van.
     const m = await matchBuilding(said);
-    if (channel(ctx) === "whatsapp" && m.status !== "found") {
+    if (!dialled(ctx) && m.status !== "found") {
       if (m.status === "street_unknown" || m.status === "empty") {
         return {
           ok: true, opened: false, building_found: false,
@@ -1640,8 +1767,14 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // "apartment" is treated as common property, because a fault wrongly filed
     // as common gets read by a person, and one wrongly pinned to a flat sends a
     // technician to knock on a stranger's door.
+    //
+    // A PAYMENT TICKET IS THE RESIDENT'S OWN FLAT (15 Sep, migration 031).
+    // The apartment/common distinction is about where a FAULT is; a resident
+    // who wants to pay has no fault location, and the model may well leave
+    // `fault_location` empty or say "common" -- so the reporter's unit is kept
+    // whatever it says. The collections side needs the flat, not a building.
     const reportedUnit = unitOf(args?.reporter_unit);
-    if (reportedUnit && String(args?.fault_location ?? "") !== "apartment") {
+    if (reportedUnit && type !== "payment" && String(args?.fault_location ?? "") !== "apartment") {
       unit = null;
     } else if (reportedUnit && !unit) {
       unit = reportedUnit;
@@ -2107,10 +2240,16 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     //
     // The fallback stays, for a genuinely unknown word. It is no longer load
     // bearing for values this system sends itself.
+    //
+    // 14 Sep: the team note's reasons name the MATTER (payment, billing,
+    // move, contract, quote, other). The WhatsApp bot had been sending them
+    // for a day and every one was stored as `caller_request` -- the same
+    // quiet lie, one channel over. Migration 030 widened the CHECK.
     const reasons = [
       "hardship", "dispute", "distress", "language", "not_understood",
       "caller_request", "ownership",
       "out_of_scope", "emergency", "repeated_failure",
+      "payment", "billing", "move", "contract", "quote", "other",
     ];
     const reason = reasons.includes(args?.reason) ? args.reason : "caller_request";
 
@@ -2211,10 +2350,42 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .update({ disposition: `transfer:${reason}` })
       .eq("external_call_id", ctx.callId);
 
+    // 14 Sep: on the inbound voice agent the row is not the point; the team
+    // is. The note goes out after the writes so a Chatwoot outage can never
+    // cost the record, and it is awaited because the isolate may not outlive
+    // the response -- the tool is async on Vapi's side, so the caller waits
+    // for nothing either way.
+    let team_notified: boolean | undefined;
+    if (isIntake(ctx)) {
+      try {
+        team_notified = await voiceNote({
+          call_id: ctx.callId,
+          phone: ctx.callerPhone ?? "",
+          building: String(args?.building ?? "").trim(),
+          unit: String(args?.unit ?? "").trim(),
+          identifier: voiceIdentity(ctx.callId),
+          label: await voiceLabel(args?.building, args?.unit),
+          reason,
+          department: String(args?.department ?? "").trim(),
+          description: String(args?.description ?? "").trim().slice(0, 500),
+          source: "tool",
+        });
+      } catch (e) {
+        console.error("voice note threw", ctx.callId, String(e));
+        team_notified = false;
+      }
+    }
+
     // `emergency_reference` is returned so the agent can read it back if it has
     // not already given one. It is never an error that it exists — the caller
-    // is told about their report either way.
-    return { ok: true, reason, charges_paused: paused, emergency_reference };
+    // is told about their report either way. Spoken form beside it, like every
+    // other reference this file returns (14 Sep; it was the one raw one).
+    const emergency_reference_spoken = spokenReference(emergency_reference);
+    return {
+      ok: true, reason, charges_paused: paused, emergency_reference,
+      ...(emergency_reference_spoken ? { emergency_reference_spoken } : {}),
+      ...(team_notified === undefined ? {} : { team_notified }),
+    };
   },
 
   /**
@@ -2244,7 +2415,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       interaction_id: await interactionId(ctx),
       outcome: args.outcome,
       posture_reached: args?.posture_reached ?? null,
-      transfer_reason: args?.transfer_reason ?? null,
+      // 16 Sep: only a transfer has a transfer reason. The open debt fence's
+      // first offline runs logged `authorized` with `caller_request` beside it;
+      // a stray reason on a paid call is noise in the outcomes report.
+      transfer_reason: args?.outcome === "transferred" ? (args?.transfer_reason ?? null) : null,
     });
     if (error) return { ok: false, error: error.message };
 
@@ -2269,6 +2443,13 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     return { ok: true, charges_bumped: ctx.charges.length };
   },
 };
+
+// 14 Sep: the inbound voice agent's tool is `notify_team`. The name is a
+// prompt -- "transfer" primed the model to step back and announce a
+// hand-off; "notify" is what happens -- and the router above dispatches by
+// name. Same handler, same row; the WhatsApp bot still calls it by the old
+// name from its tool body.
+tools.notify_team = tools.transfer_to_human;
 
 // ---------------------------------------------------------------------------
 // The end-of-call report
@@ -2302,10 +2483,7 @@ function disposition(reason: string): string {
   return reason;
 }
 
-// The inbound intake assistant on Vapi. Hardcoded the way the reference
-// format is: it changes when the assistant is recreated, which is an event,
-// not a config drift.
-const INTAKE_ASSISTANT_ID = "8894680c-03af-43f6-a75b-f828872833cc";
+// INTAKE_ASSISTANT_ID lives beside isIntake(), above the tools.
 
 async function endOfCall(message: any, ctx: CallContext) {
   const call = message?.call ?? {};
@@ -2370,7 +2548,7 @@ async function endOfCall(message: any, ctx: CallContext) {
     // A web call to any other assistant (the debt demo) stays outbound.
     direction: String(call?.type ?? "").toLowerCase().includes("inbound") ||
         (String(call?.type ?? "") === "webCall" &&
-         String(call?.assistantId ?? "") === INTAKE_ASSISTANT_ID)
+         INTAKE_ASSISTANT_IDS.has(String(call?.assistantId ?? "")))
       ? "inbound" : "outbound",
     resident_id: ctx.residentId,
     caller_phone: call?.customer?.number ?? null,
@@ -2403,7 +2581,8 @@ async function endOfCall(message: any, ctx: CallContext) {
         disposition: existing.data.disposition ?? disposition(endedReason),
       })
       .eq("id", existing.data.id);
-    return { id: existing.data.id, endedReason };
+    return { id: existing.data.id, endedReason, toolCalls, messages: artifact?.messages ?? [],
+             disposition: existing.data.disposition ?? disposition(endedReason) };
   }
 
   const { data } = await db
@@ -2411,7 +2590,57 @@ async function endOfCall(message: any, ctx: CallContext) {
     .insert({ ...row, external_call_id: ctx.callId, disposition: disposition(endedReason) })
     .select("id")
     .single();
-  return { id: data?.id ?? null, endedReason };
+  return { id: data?.id ?? null, endedReason, toolCalls, messages: artifact?.messages ?? [],
+           disposition: disposition(endedReason) };
+}
+
+/**
+ * The promise with no tool behind it, repaired after the call (14 Sep).
+ *
+ * The prompt says the tool comes before the sentence; the model sometimes
+ * says the sentence anyway (6 Sep: "I want a real person" got "someone from
+ * the team will get back to you" and no call). Mid-call there is no hook --
+ * conversation-update was left off on purpose -- so the report is where
+ * this can be caught: every spoken line and every tool call are in it. When
+ * the bot said the team knows and never called, the note is made now, from
+ * the caller's own turns, source `backstop`. Late is truer than never.
+ */
+async function backstopTeamNote(
+  interactionId: string | null, ctx: CallContext,
+  toolCalls: Array<{ name?: string }>, messages: any[], dispo: string,
+): Promise<boolean> {
+  const called = toolCalls.some((t) => t?.name === "notify_team" || t?.name === "transfer_to_human");
+  if (called || String(dispo ?? "").startsWith("transfer:")) return false;
+  // Per spoken line, as the WhatsApp backstop judges per reply: joined, a
+  // told-verb in turn two and a destination in turn five would match, and
+  // one "shall I tell the team?" anywhere would excuse a later plain
+  // "I told the team" (review, 14 Sep).
+  const said_it = (Array.isArray(messages) ? messages : [])
+    .filter((m: any) => (m?.role === "bot" || m?.role === "assistant") && m?.message)
+    .some((m: any) => saidTeamKnows(String(m.message)));
+  if (!said_it) return false;
+  const said = (Array.isArray(messages) ? messages : [])
+    .filter((m: any) => m?.role === "user" && m?.message)
+    .map((m: any) => String(m.message).trim()).filter(Boolean).join(" / ").slice(0, 500);
+  // The building and apartment, if the call wrote a ticket -- the note is
+  // otherwise a call id nobody can ring back.
+  let building = "", unit = "";
+  if (interactionId) {
+    const r = await db.from("requests").select("building, unit")
+      .eq("interaction_id", interactionId).limit(1).maybeSingle();
+    building = String(r.data?.building ?? "");
+    unit = String(r.data?.unit ?? "");
+  }
+  return await voiceNote({
+    call_id: ctx.callId,
+    phone: ctx.callerPhone ?? "",
+    building, unit,
+    identifier: voiceIdentity(ctx.callId),
+    label: await voiceLabel(building, unit),
+    reason: "other", department: "",
+    description: said || "שיחה קולית: הבוט אמר למתקשר שהצוות יודע, בלי לרשום מה",
+    source: "backstop",
+  });
 }
 
 /**
@@ -2487,13 +2716,21 @@ Deno.serve(async (req) => {
       });
     }
     try {
-      const { id, endedReason } = await endOfCall(message, ctx);
+      const { id, endedReason, toolCalls, messages, disposition: dispo } = await endOfCall(message, ctx);
       let salvaged = false;
       if (endedReason.includes("max-duration") || endedReason.includes("silence-timed-out")) {
         const artifact = message?.artifact ?? {};
         salvaged = await salvage(id, ctx, artifact?.transcript ?? message?.transcript ?? null);
       }
-      return new Response(JSON.stringify({ ok: true, interaction: id, salvaged }), {
+      let backstopped = false;
+      if (isIntake(ctx)) {
+        try {
+          backstopped = await backstopTeamNote(id, ctx, toolCalls, messages, dispo);
+        } catch (e) {
+          console.error("backstop threw", ctx.callId, String(e));
+        }
+      }
+      return new Response(JSON.stringify({ ok: true, interaction: id, salvaged, backstopped }), {
         headers: { "content-type": "application/json" },
       });
     } catch (e) {

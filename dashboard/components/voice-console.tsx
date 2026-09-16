@@ -48,13 +48,23 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [chatErr, setChatErr] = useState(false);
+  // WHY THE REASON IS KEPT. The error handler below used to be
+  // `() => setState('error')`, which threw the only description of the failure
+  // away: a call that would not connect looked identical whether the browser
+  // had refused the microphone, the key was wrong, or Vapi was out of credit.
+  // On 8 Sep that cost an afternoon on a console stuck at "connecting".
+  const [detail, setDetail] = useState('');
   const vapiRef = useRef<any>(null);
+  const watchdogRef = useRef<any>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   // One id per conversation, minted at the first typed message — it is the
   // call id the Edge Function sees, so a whole chat groups under one "call".
   const chatIdRef = useRef<string | null>(null);
 
-  useEffect(() => () => { vapiRef.current?.stop?.(); }, []);
+  useEffect(() => () => {
+    clearTimeout(watchdogRef.current);
+    vapiRef.current?.stop?.();
+  }, []);
   useEffect(() => {
     threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight });
   }, [lines]);
@@ -134,29 +144,66 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
     }
   }
 
+  // Whatever the SDK hands back — an Error, a Vapi event, a bare string — said
+  // in one line a person can act on.
+  function reason(e: any): string {
+    const raw = e?.errorMsg ?? e?.error?.message ?? e?.message ?? e?.msg ?? e;
+    const text = typeof raw === 'string' ? raw : (() => {
+      try { return JSON.stringify(raw); } catch { return String(raw); }
+    })();
+    return (text || 'unknown error').slice(0, 300);
+  }
+
+  function fail(e: any) {
+    clearTimeout(watchdogRef.current);
+    // The console is the second half of this: the badge has room for a
+    // sentence, DevTools has room for the object.
+    console.error('[voice] call failed:', e);
+    setDetail(reason(e));
+    setState('error');
+  }
+
   async function start() {
     if (!canStart) return;
     setState('connecting');
+    setDetail('');
     reset();
     try {
       const Vapi = (await import('@vapi-ai/web')).default;
       const vapi = new Vapi(publicKey);
       vapiRef.current = vapi;
-      vapi.on('call-start', () => setState('live'));
-      vapi.on('call-end', () => { setState('idle'); setMuted(false); });
-      vapi.on('error', () => setState('error'));
+      vapi.on('call-start', () => { clearTimeout(watchdogRef.current); setState('live'); });
+      vapi.on('call-end', () => {
+        clearTimeout(watchdogRef.current); setState('idle'); setMuted(false);
+      });
+      vapi.on('error', fail);
       vapi.on('message', transcript);
+      // A refused microphone can leave getUserMedia pending with no error at
+      // all, and the panel then says "connecting" until the tab is closed.
+      // Twenty seconds is far longer than a healthy connect and far shorter
+      // than for ever.
+      clearTimeout(watchdogRef.current);
+      watchdogRef.current = setTimeout(() => {
+        setState((s) => {
+          if (s !== 'connecting') return s;
+          console.error('[voice] still connecting after 20s — check the '
+            + 'microphone permission for this site, then the Vapi key and credit');
+          setDetail('timeout: no answer after 20s — check the microphone '
+            + 'permission for this site first');
+          return 'error';
+        });
+      }, 20000);
       if (agent === 'debt' && row) {
         await vapi.start(debtId!, { variableValues: row.variables } as any);
       } else {
         await vapi.start(intakeId);
       }
-    } catch {
-      setState('error');
+    } catch (e) {
+      fail(e);
     }
   }
 
-  function stop() { vapiRef.current?.stop?.(); }
+  function stop() { clearTimeout(watchdogRef.current); vapiRef.current?.stop?.(); }
   function toggleMute() {
     const v = vapiRef.current;
     if (!v) return;
@@ -209,7 +256,11 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
               <button type="button" className="btn-sm voice-start"
                 disabled={!canStart} onClick={start}>{labels.start}</button>
               <span className="hint">{labels.micHint}</span>
-              {state === 'error' && <span className="notice bad">{labels.failed}</span>}
+              {state === 'error' && (
+                <span className="notice bad">
+                  {labels.failed}{detail ? ` — ${detail}` : ''}
+                </span>
+              )}
             </div>
           ) : (
             <div className="voice-actions">

@@ -1,0 +1,453 @@
+{
+  "updatedAt": "2026-08-23T05:32:27.805Z",
+  "createdAt": "2026-08-21T11:28:36.758Z",
+  "id": "IVNR5iNn7bQS8JgP",
+  "name": "Homies — Chatwoot handback",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "hb-sticky",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -20
+      ],
+      "parameters": {
+        "content": "### Hand quiet conversations back to the bot\n\nAn agent takes a conversation (assign / `bot-off` label) and the bot goes\nquiet on it. If the thread then sits silent for **15 minutes**, this hands it\nback -- unassigns and strips the label -- so the resident's next message gets\nanswered instead of waiting on someone who left.\n\n15 min was chosen 21 Aug over the proposed 2: `last_activity_at` only moves on\nmessages, so a short limit steals threads from agents who are typing or on the\nphone. Resolved conversations are never touched.\n\nReads the first page of open conversations (25). Fine at today's volume;\npaginate before the pilot if handovers exceed that.\n\nThere is deliberately NO permanent opt-out yet: every handover expires. If a\nthread must stay human forever, that is a feature request, not a label.",
+        "height": 420,
+        "width": 480,
+        "color": 4
+      }
+    },
+    {
+      "id": "hb-tick",
+      "name": "Every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        460
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "hb-fetch",
+      "name": "Fetch open conversations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        460
+      ],
+      "parameters": {
+        "url": "https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "open"
+            }
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1qfgfvxwZ4MsUBBh",
+          "name": "Chatwoot admin (api_access_token)"
+        }
+      }
+    },
+    {
+      "id": "hb-filter",
+      "name": "Quiet for 15 minutes?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        460
+      ],
+      "parameters": {
+        "jsCode": "\n// Which handed-over conversations have gone quiet?\n//\n// The bot is off on a conversation that is assigned or labelled bot-off (the\n// same two signals the WhatsApp workflow's gate reads -- keep them in step).\n// 15 minutes of silence hands it back. last_activity_at moves on every\n// message either way, so an agent mid-conversation is never interrupted;\n// an agent who took a thread and left is overridden a quarter hour later.\nconst LIMIT = 15 * 60;\nconst now = Math.floor(Date.now() / 1000);\nconst out = [];\nfor (const c of ($input.first().json.data?.payload ?? [])) {\n  // A bot-inbox conversation is assigned to the AGENT BOT by Chatwoot itself;\n  // that is not a handover and must not be \"handed back\" every 15 minutes.\n  const a = c.meta?.assignee;\n  const t = c.meta?.assignee_type;\n  const assignee = a && (t ? t === 'User' : !a.outgoing_url) ? a : null;\n  const labels = c.labels ?? [];\n  if (!assignee && !labels.includes('bot-off')) continue;   // bot already on\n  const quiet = now - (c.last_activity_at ?? now);\n  if (quiet < LIMIT) continue;                              // still being worked\n  out.push({ json: {\n    conv_id: c.id,\n    keep_labels: labels.filter(l => l !== 'bot-off'),\n    quiet_minutes: Math.floor(quiet / 60),\n  }});\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "hb-unassign",
+      "name": "Unassign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        460
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $json.conv_id }}/assignments",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ assignee_id: null }) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1qfgfvxwZ4MsUBBh",
+          "name": "Chatwoot admin (api_access_token)"
+        }
+      }
+    },
+    {
+      "id": "hb-strip",
+      "name": "Strip the bot-off label",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        460
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Quiet for 15 minutes?').item.json.conv_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ labels: $('Quiet for 15 minutes?').item.json.keep_labels }) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1qfgfvxwZ4MsUBBh",
+          "name": "Chatwoot admin (api_access_token)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every minute": {
+      "main": [
+        [
+          {
+            "node": "Fetch open conversations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch open conversations": {
+      "main": [
+        [
+          {
+            "node": "Quiet for 15 minutes?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quiet for 15 minutes?": {
+      "main": [
+        [
+          {
+            "node": "Unassign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unassign": {
+      "main": [
+        [
+          {
+            "node": "Strip the bot-off label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jerusalem"
+  },
+  "staticData": {
+    "node:Every minute": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "efe7b225-5307-4759-b1a2-703e3db2988d",
+  "activeVersionId": "efe7b225-5307-4759-b1a2-703e3db2988d",
+  "versionCounter": 3,
+  "triggerCount": 1,
+  "sourceWorkflowId": null,
+  "shared": [
+    {
+      "updatedAt": "2026-08-21T11:28:36.760Z",
+      "createdAt": "2026-08-21T11:28:36.760Z",
+      "role": "workflow:owner",
+      "workflowId": "IVNR5iNn7bQS8JgP",
+      "projectId": "JMOPxETCwOLjmlSs",
+      "project": {
+        "updatedAt": "2026-08-04T14:53:36.559Z",
+        "createdAt": "2026-08-04T14:52:27.565Z",
+        "id": "JMOPxETCwOLjmlSs",
+        "name": "Assaf Clix <ygrant.gatchalian@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "d0ae602a-3532-40ba-a87b-ff5617aa3ca5"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-08-23T05:32:27.806Z",
+    "createdAt": "2026-08-23T05:32:27.806Z",
+    "versionId": "efe7b225-5307-4759-b1a2-703e3db2988d",
+    "workflowId": "IVNR5iNn7bQS8JgP",
+    "nodes": [
+      {
+        "id": "hb-sticky",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -40,
+          -20
+        ],
+        "parameters": {
+          "content": "### Hand quiet conversations back to the bot\n\nAn agent takes a conversation (assign / `bot-off` label) and the bot goes\nquiet on it. If the thread then sits silent for **15 minutes**, this hands it\nback -- unassigns and strips the label -- so the resident's next message gets\nanswered instead of waiting on someone who left.\n\n15 min was chosen 21 Aug over the proposed 2: `last_activity_at` only moves on\nmessages, so a short limit steals threads from agents who are typing or on the\nphone. Resolved conversations are never touched.\n\nReads the first page of open conversations (25). Fine at today's volume;\npaginate before the pilot if handovers exceed that.\n\nThere is deliberately NO permanent opt-out yet: every handover expires. If a\nthread must stay human forever, that is a feature request, not a label.",
+          "height": 420,
+          "width": 480,
+          "color": 4
+        }
+      },
+      {
+        "id": "hb-tick",
+        "name": "Every minute",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          460
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "hb-fetch",
+        "name": "Fetch open conversations",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          220,
+          460
+        ],
+        "parameters": {
+          "url": "https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "status",
+                "value": "open"
+              }
+            ]
+          },
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {
+            "timeout": 15000
+          }
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "1qfgfvxwZ4MsUBBh",
+            "name": "Chatwoot admin (api_access_token)"
+          }
+        }
+      },
+      {
+        "id": "hb-filter",
+        "name": "Quiet for 15 minutes?",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          440,
+          460
+        ],
+        "parameters": {
+          "jsCode": "\n// Which handed-over conversations have gone quiet?\n//\n// The bot is off on a conversation that is assigned or labelled bot-off (the\n// same two signals the WhatsApp workflow's gate reads -- keep them in step).\n// 15 minutes of silence hands it back. last_activity_at moves on every\n// message either way, so an agent mid-conversation is never interrupted;\n// an agent who took a thread and left is overridden a quarter hour later.\nconst LIMIT = 15 * 60;\nconst now = Math.floor(Date.now() / 1000);\nconst out = [];\nfor (const c of ($input.first().json.data?.payload ?? [])) {\n  // A bot-inbox conversation is assigned to the AGENT BOT by Chatwoot itself;\n  // that is not a handover and must not be \"handed back\" every 15 minutes.\n  const a = c.meta?.assignee;\n  const t = c.meta?.assignee_type;\n  const assignee = a && (t ? t === 'User' : !a.outgoing_url) ? a : null;\n  const labels = c.labels ?? [];\n  if (!assignee && !labels.includes('bot-off')) continue;   // bot already on\n  const quiet = now - (c.last_activity_at ?? now);\n  if (quiet < LIMIT) continue;                              // still being worked\n  out.push({ json: {\n    conv_id: c.id,\n    keep_labels: labels.filter(l => l !== 'bot-off'),\n    quiet_minutes: Math.floor(quiet / 60),\n  }});\n}\nreturn out;\n"
+        }
+      },
+      {
+        "id": "hb-unassign",
+        "name": "Unassign",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          660,
+          460
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $json.conv_id }}/assignments",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ assignee_id: null }) }}",
+          "options": {
+            "timeout": 15000
+          }
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "1qfgfvxwZ4MsUBBh",
+            "name": "Chatwoot admin (api_access_token)"
+          }
+        }
+      },
+      {
+        "id": "hb-strip",
+        "name": "Strip the bot-off label",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          880,
+          460
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Quiet for 15 minutes?').item.json.conv_id }}/labels",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ labels: $('Quiet for 15 minutes?').item.json.keep_labels }) }}",
+          "options": {
+            "timeout": 15000
+          }
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "1qfgfvxwZ4MsUBBh",
+            "name": "Chatwoot admin (api_access_token)"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Every minute": {
+        "main": [
+          [
+            {
+              "node": "Fetch open conversations",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch open conversations": {
+        "main": [
+          [
+            {
+              "node": "Quiet for 15 minutes?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Quiet for 15 minutes?": {
+        "main": [
+          [
+            {
+              "node": "Unassign",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Unassign": {
+        "main": [
+          [
+            {
+              "node": "Strip the bot-off label",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Assaf Clix",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-08-23T05:32:27.847Z",
+        "id": 252,
+        "workflowId": "IVNR5iNn7bQS8JgP",
+        "versionId": "efe7b225-5307-4759-b1a2-703e3db2988d",
+        "event": "activated",
+        "userId": "d0ae602a-3532-40ba-a87b-ff5617aa3ca5"
+      },
+      {
+        "createdAt": "2026-08-23T05:32:27.833Z",
+        "id": 251,
+        "workflowId": "IVNR5iNn7bQS8JgP",
+        "versionId": "efe7b225-5307-4759-b1a2-703e3db2988d",
+        "event": "deactivated",
+        "userId": "d0ae602a-3532-40ba-a87b-ff5617aa3ca5"
+      }
+    ]
+  }
+}

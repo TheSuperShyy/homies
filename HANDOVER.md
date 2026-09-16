@@ -1,6 +1,6 @@
 # HANDOVER — Homies, everything you need to take over
 
-**Current as of 2026-09-03.** If you have just been told "read the handover",
+**Current as of 2026-09-14.** If you have just been told "read the handover",
 this file plus `CONTEXT.md` is the whole briefing. Read both, then start
 working. Go to `docs/WORKLOG.md` only when you need to know *why* something
 was decided — it is the chronology with full reasoning, newest first.
@@ -74,7 +74,8 @@ envelope at the webhook that passes the secret check. Found 3 Sep. The two
 3 Sep snapshots are redacted (`REPLACE_WITH_N8N_WEBHOOK_SECRET`; the patch
 scripts' `--restore` re-inserts the value from `.env`). Rotating means a new
 value in `.env`, in the `Sort` literal, and in the agent bot's `outgoing_url`
-in Chatwoot. Not done; the owner decides.
+in Chatwoot. Not done; the owner decides. The voice-note webhook (14 Sep)
+does not use this secret: it has its own, in n8n's credential store.
 
 ---
 
@@ -229,7 +230,15 @@ its stated time.
   `אני אעדכן אותך כשהטיפול יתקדם` after opening a ticket. There is no
   proactive update path — nothing sends that message. Either build it or tell
   the bot it cannot say it; do not leave it as it is.
-- **`Human tap?` hangs off `Sort` and sits ABOVE the reply branch, and both halves matter.** Off `Sort` because the tap no longer takes the canned branch; above, because executionOrder v1 goes by canvas position and a failed `Send` further down ends the run first. Move it back down and requests for a person stop transferring, silently, exactly as they did in two probes on 1 Sep.
+- **Vapi moved to a DEMO account on 16 Sep (the eighth).** The real account's wallet is at **-$0.03** and refuses every call. `.env`'s active keys are the demo pair; the real ones are preserved as `VAPI_PRIVATE_KEY_ACCOUNT_LIVE` / `VAPI_PUBLIC_KEY_ACCOUNT_LIVE`. Demo ids: intake `827bfddd-05cc-417b-99f5-17eec76528e6`, debt `373bbdc1-e3f7-4a02-b554-ffe0eae326be`, public `194a34ef-a031-42b3-b222-560e4f34d90d`, Cartesia credential `e8d673a0`. The Edge Function (v72) knows BOTH intake ids, so returning is a key swap plus `dashboard/.env.local`. **Vercel still points at the dead account** — demo from localhost:3001. The demo keys were pasted in chat: retire them afterwards. See [[homies-vapi-account]].
+- **Epoch is 27 — the client's review (16 Sep), LIVE on WhatsApp and inbound voice.** Yariv's 15 Sep review; owner's decisions: no national numbers and no safety advice (an emergency is the ticket + the team note, at once, on both bots), a private-apartment fault is the resident's (no ticket; common property, building systems and unclear origin are tickets), plural address on voice, the debt agent opened. Files: WA prompt (8,452 chars) + `notify_team`/`open_request` texts; voice fence (3,350) + tool texts; `index.ts` refuses unmanaged buildings on voice (`!dialled(ctx)` gate) and stores `transfer_reason` only on a transfer; debt fence 3,379 chars (`prompt.md`, opening for the owner's ear); dashboard (resolved slice + card, `needs_review` tab, words for slugs; build green); migration 032 purge (dry-run: 85 interactions / 53 outcomes / 15 tickets); harnesses clean up. Pushed that evening: both WhatsApp patchers (idle after, `check_whatsapp.py` green), `vapi_sync.py inbound --apply` **followed by `vapi_set_voice.py --apply`** — the sync resets the voice to stock Eyal every time, so the two ALWAYS run together. Live probes 44413-44425 prove both behaviours (no numbers, no safety advice, ticket `255-1245-26`; a blocked sink opens nothing). **Still not live: the Edge Function** — the auto-mode classifier refuses `supabase_functions.py --apply` as a production deploy, so voice does not yet refuse unmanaged buildings and `transfer_reason` is still written on non-transfers; the owner runs it. **The debt agent is live and open too** — 3,504-char fence on the owner's own `gpt-5.6-sol` ("retain the llm model but change according to the feedback on the behaviour"), which `vapi_sync.py`'s debt target is now pinned to; the 26 Aug gpt-5.2→4.1 latency note argued over a 54k prompt that no longer exists, so run `vapi_latency.py` on a real call before trusting the speed. Caught before it stood: the first fence let the agent skip the amount entirely (1 of 2 runs) — "once is not zero times" fixed it, 3 of 3. Then migration 032, the name spelling (`voice/samples/name-*.mp3`), and a commit for the dashboard. Offline evidence in `docs/assistant/transcripts/2026-09-16-*`.
+- **Epoch was 26 — the "משהו אחר" button invites (15 Sep evening).** Owner's screenshot: the third button answered *במה אוכל לעזור לכם?*; its clause in the tap paragraph still said "one question, what is it about" and was read literally. Reworded to an invitation like the other taps; live 3/3 warmer (*בטח, ספרו לי בבקשה מה העניין ואשמח לעזור*). Prompt 8,188 chars.
+- **Epoch was 25 — wanting to pay is a ticket too (15 Sep).** Owner: a payment ask opens a ticket as well as the team note. Migration 031 (`payment` type, label תשלום; `complaint` → תלונה backfilled); Edge Function v68 keeps the unit on a payment ticket; the desk's rule is now fault = ticket, wanting to pay = ticket + note, the rest past the bot = note, one sentence in each prompt; `payment` in `open_request`'s enum (inbound + WhatsApp, not the debt agent) with the gloss that keeps a how-much question out. **`scripts/n8n_whatsapp_payment.py`** ships the live `open_request`/`get_balance` descriptions and the jsonBody `type` doc (snapshot `n8n-whatsapp-live-15sep-before-payment.json`, `--restore`); run it, then `n8n_whatsapp_teamnote.py --apply` for prompt/epoch. Epoch 24 lasted twenty minutes: the bot asked name + phone before the ticket (get_balance's identity rule); the tool text now says a payment ticket needs building + apartment only. Live: `255-1241-26`, `255-1242-26`; balance question opens nothing. Voice: fence 2,876 chars, pushed and read back. Do not pipe an `--apply` through `grep` in an `&&` chain: it hides the exit code.
+- **Epoch was 23 — a word for the person before the question; one emoji sometimes (14 Sep evening).** Owner: the menu tap answered `מה קרה?` is not customer service; wants concern first, the bot's own words, and a situational emoji. `prompt.md` only: the tap paragraph invites instead of naming the question; the one-question paragraph owns the floor (a short word about the thing, sized to it, never an announcement, never in place of the tool; that last clause is load-bearing, without it the bot skipped `open_request` and invented ticket numbers offline); one emoji sometimes, never first message / beside a reference or amount / refusal / danger. Shipped with `n8n_whatsapp_teamnote.py --apply` (prompt + epoch only). Live execs 41533–41569. Wobbles left: `אני מבין` openers, one `מבין/ה` slash-form, `בכיף`. Two text passes were spent; a third needs the owner.
+- **Epoch was 22 — "I've let the team know", and it is true (14 Sep).** The owner's refinement of 13 Sep: the bot is 100% of customer support; past its threshold (paying dues, a disputed bill or document, moving, contracts, quotes, a request for a person) it notes the matter for the right team with `notify_team` and says the team knows — a Chatwoot mention behind it, "like regular". Never who will call, never when; office details only when asked; emergencies end with the team notified, never the office line. `scripts/n8n_whatsapp_teamnote.py` (34 nodes; snapshot + `--restore`) owns the tool, `Team note this turn?` (tool ran OR the reply says the team knows / promises a call-back — the backstop, folded in) and `Let the team know`. Sub-workflow: matter-shaped reasons pick the team, priority medium except emergencies, guard per reason within 24 h (`handover_reasons`); ticker: only an emergency escalates. Known wobbles, measured: "יטפלו בזה"/"בדרך" in ~half the replies, the national number skipped in one of two lift runs, "I want to pay" → balance check first. **Do not run `n8n_whatsapp_nopage.py --restore`** — it would take the 14 Sep build off along with the 13 Sep one.
+- **The inbound voice agent has the same durability since 14 Sep afternoon.** `notify_team` on voice → Edge Function → n8n "Homies — Voice team note" → a conversation in Chatwoot inbox 2 (Homies — Voice) → the feature 16 mention with `channel: voice`; the note tells the rep to phone the resident and resolve (the note's words were made plain for reps on 14 Sep evening — the mention, *דייר צריך מישהו מכם*, reason, phone, what they want, one *מה לעשות* line; no "source"/"escalation" words). Contact = the call (`voice:call:<id>`), found again by number or by the apartment as its name. End-of-call backstop for a promise with no tool. Scripts: `chatwoot_voice_inbox.py`, `n8n_voice_note.py`, `voice_note_test.py` (9 cases), migration `030`. Fence 2,762 chars, pushed with the voice protocol and read back. `check_tools.py` shows 5 money-tool failures (`no charge on this call`) that predate today — its fixture has no `charges`; the two cases that matter (`transfer_to_human hardship`, `open_request`) pass.
+- **Epoch was 20 — nothing pages a person from WhatsApp (13 Sep), for one day.** The owner's call: the bot resolves what it can, opens tickets, says office matters are the office's and gives its details, promises nobody a call — and pages nobody, emergencies included (an `emergency`-urgency ticket, the national number, the office line; nobody at Homies hears about a 22:00 lift call until someone opens Chatwoot — stated, accepted). `scripts/n8n_whatsapp_nopage.py` removed eleven nodes (the נציג tap chain, `transfer_to_human`, `Handover this turn?` → `Hand to a person`, the promise backstop and `Carry the reply`, two stickies); `Reply usable?[true]` feeds `Type for a moment` and `Log reply` directly. The third button reads **משהו אחר** / `other` in every copy (live Sort MENU + TAP_KIND, live Send items, `n8n_whatsapp_menu.py`, the builder's MENU) and reaches the model like any message. A real person replying still silences the bot; the 15-minute handback still runs; the sub-workflow, ticker, teams and inbox membership stay, dormant. Snapshot `docs/handover/n8n-whatsapp-live-13sep-before-nopage.json`, `--restore` reverses it. **The bullets below about `Human tap?`, `tapped_human`, the promise guard, the נציג tap reply and the rescued handover describe machinery that is no longer on the workflow**; they are kept for the record. `n8n_whatsapp_handover.py`, `_promise.py`, `_transfer.py` and `_untemplate.py` exit on a missing node and say why in their first line; `AGENT_NEW` still lives in untemplate and is deployed by nopage.
+- **`Human tap?` hangs off `Sort` and sits ABOVE the reply branch, and both halves matter.** *(gone 13 Sep)* Off `Sort` because the tap no longer takes the canned branch; above, because executionOrder v1 goes by canvas position and a failed `Send` further down ends the run first. Move it back down and requests for a person stop transferring, silently, exactly as they did in two probes on 1 Sep.
 - **`tap_now` vs `tapped_human`.** `tap_now` says this message IS the tap; `tapped_human` says the next one answers it. The flag is written on the tap and consumed one message later, so the consume is skipped on the tap's own run — remove that guard and the model forgets the tap ever happened.
 - **`Say it again` replaces `Hand over instead`, and there is no third fallback.** If the retry is also unusable, nothing is sent; `Open it anyway` has already written a real ticket, so the report is not lost. **It has now run live** (execution 20768, 1 Sep): the model invented `HM-20240704-12345` and called no tool, the guard rejected it, `Open it anyway` minted `255-1184-26`, and `Say it again` wrote it up with the real number. The whole chain works. Its own short prompt does NOT receive `greeted`, so a rescue message can still reintroduce Michael.
 - **`Sort` still builds a `followup` object that nothing reads** — dead since the follow-up menu came out on 31 Aug. Left alone; it cannot reach anybody.
@@ -654,7 +663,8 @@ The prompt held the number as the numeral `077-6687949`; Vapi's formatter cut it
 into single digits (`numberToDigitsCutoff` default 2025, nothing sets it) and
 `voice_guard.py`'s tail pad added 300ms after each. Both Hebrew prompts now
 carry the number in words. **Do not put a numeral phone number back into a voice
-prompt.**
+prompt.** (The 6 Sep opening dropped the number from the inbound fence
+altogether; it is back since 14 Sep, in words, in the facts line.)
 
 **DEFECT OPEN: `{{callback_number}}` is still a numeral** and will break the
 same way in the debt agent's voicemail line. The value comes from
@@ -873,8 +883,30 @@ all retired with the rulebook; do NOT re-probe against them and do NOT
 rulebook lives in git (last carried at commit `1184308`); reinstating it is
 one revert of the fence + `vapi_sync.py inbound --apply` + voice protocol.
 Known trade already observed in probes: asked-for-a-person got a promised
-callback with no transfer_to_human call that turn. The debt agent is
-untouched and still scripted. `vapi_en.py intake` will now REFUSE against
+callback with no transfer_to_human call that turn — **since 14 Sep that
+exact case is the end-of-call backstop's job** (below). The debt agent was
+untouched and still scripted until 16 Sep, when the owner opened it too
+(the 16 Sep epoch bullet; not pushed yet). **14 Sep: the fence is 2,762 chars** — the
+6 Sep 1,443 plus one identity paragraph (the chatbot's durability: Michael
+is all of customer support, notes a matter past him for the team with
+`notify_team` and says the team knows, never who or when; office details
+only if asked; emergencies never end on the office line; a declined
+ticket is not argued for), one office-facts line (hours, the number in
+words, the address), and police / electric company beside the two
+emergency numbers. `transfer_to_human` is gone from the intake assistant;
+`notify_team` replaced it (reasons `payment billing move contract quote
+emergency caller_request language other`, optional `department`). The
+Edge Function aliases the name onto the old handler, widens the reason
+allow-list (migration 030), and for the intake assistant POSTs a voice
+note to n8n ("Homies — Voice team note", `pduAdXjX1EU7cA6E`) which makes
+a conversation in Chatwoot inbox 2 **Homies — Voice** and fires the
+feature 16 mention with `channel: voice`; the end-of-call report runs the
+backstop. A read-back after the push must show `notify_team` and must NOT
+show `transfer_to_human` on the intake assistant. Probe a candidate
+before pushing with `python scripts/prompt_probe.py inbound --file
+docs/assistant/demo-inbound.md --repo-tools --scenario durability --save`.
+Measured wobble, not chased: gpt-4.1 still says "יחזרו אליך" in most
+replies after the tool ran, and asks "רוצה שאעביר?" on money asks. `vapi_en.py intake` will now REFUSE against
 the tiny Hebrew prompt (its substitution table describes the old one) —
 the frozen twin stays as copied; do not regenerate.
 
@@ -2318,7 +2350,7 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 |---|---|
 | Vapi | `VAPI_PRIVATE_KEY`, `VAPI_PUBLIC_KEY` — **account 4 since 19 Aug**, promoted when account 5 went overdrawn (+ `_OLD`, `_ACCOUNT2`, `_ACCOUNT3`, `_ACCOUNT5`). Every superseded pair is kept: the one time a key was dropped it took a day to work out which account a stale assistant id belonged to |
 | Supabase | `SUPABASE_URL`, `_ANON_KEY`, `_SERVICE_ROLE_KEY`, `_DB_URL`, `_DB_PASSWORD` |
-| n8n | `N8N_BASE_URL`, `N8N_API_KEY`, `N8N_WEBHOOK_SECRET` |
+| n8n | `N8N_BASE_URL`, `N8N_API_KEY`, `N8N_WEBHOOK_SECRET`; since 14 Sep `N8N_VOICE_NOTE_SECRET` (the voice-note webhook's own header secret, minted by `n8n_voice_note.py`, pushed to the Edge Function by `supabase_functions.py`) and `N8N_VOICENOTE_CRED_ID` |
 | OXS | `OXS_KEY_GENERAL`, `OXS_KEY_DEBTS`, `OXS_KEY_REQUESTS` |
 | Cartesia | `CARTESIA_API_KEY` (attached inside Vapi as a credential) |
 | OpenRouter | `OPENROUTER_API_KEY` — **key 2 since 12 Aug**, uncapped, on the $19.80 account. `_CAPPED15` is the 12-Aug key (same account, $15 cap); `_EMPTY` is a different, unfunded account. n8n credential `92ZNHDhByavmNP5T` (`N8N_OPENROUTER_CRED_ID`) — the API cannot PATCH a credential, so a key change means a **new credential and a re-push**, and every superseded one is left in place |
@@ -2326,6 +2358,7 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 | Vercel | `VERCEL_TOKEN` — **the one in .env answers "invalidToken" (checked 24 Aug)**; deploys still go out on push |
 | Dashboard, in Vercel's env (8 set 6 Sep; these are the still-missing ones) | `CALL_PIN` (no PIN, no Call column), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID` (no number, no call), `VAPI_DEBT_ASSISTANT_ID` (defaults to Debt he), `HOMIES_CALLBACK_NUMBER` / `HOMIES_VERIFICATION_EMAIL_SAY` / `HOMIES_ALT_PAYMENT` (defaults in `dashboard/lib/call.ts`), `GITHUB_DISPATCH_TOKEN` (Run now on `/sync`) |
 | Internal | `TOOL_SECRET` (Vapi → n8n → Edge Function) |
+| Chatwoot | `CHATWOOT_API_TOKEN` (admin), `CHATWOOT_BOT_TOKEN` (agent bot), `CHATWOOT_VOICE_INBOX_ID` (inbox 2, Homies — Voice, since 14 Sep) |
 
 Empty and expected to stay empty: Twilio, Telnyx (no phone numbers yet).
 Missing if wanted: `ELEVENLABS_API_KEY` — the custom voice
@@ -2495,8 +2528,9 @@ had zero env vars until 6 Sep - it now has the full set and the pages render). E
 labels a webCall to the intake assistant `inbound`, so widget calls land in the
 right tab; the first real widget call is the end-to-end proof nobody has run.
 
-**INBOUND IS LIVE AT 31,492 CHARS (6 Sep) — transfer is caller-chosen,
-never procedural.** Owner's ask: "it should be an option not a required step."
+*Superseded 14 Sep: there is no transfer tool on inbound; see the 14 Sep
+line in the open-agent block above.* **INBOUND IS LIVE AT 31,492 CHARS
+(6 Sep) — transfer is caller-chosen, never procedural.** Owner's ask: "it should be an option not a required step."
 The one mandatory transfer — the emergency turn's two-tools rule — is gone:
 an emergency still calls `open_request` FIRST, before a word, with
 `urgency: emergency` (the write is the record), but `transfer_to_human` now
@@ -2580,7 +2614,14 @@ Ido's clone `ba765d50` every time. It did exactly that on 31 Aug, an hour after
 the clone went live, and the owner found it on a call. Use
 `scripts/vapi_set_voice.py` for voice and verify BOTH fields after any write:
 voice must read `ba765d50-19c6-4b3e-bc15-9de3b45f82f7`, sonic-3.5, Elliot
-fallback. Its dry-run label `(cloned)` next to `a976c076` is false — that id is
+fallback — and since 15 Sep `generationConfig.volume` **2.0, the maximum**
+(`CARTESIA_VOLUME` in .env, `vapi_set_voice.py --volume N --apply`; 1.4,
+then 1.7, then 2.0 within two hours at the owner's ear; measured: no
+clipping at 2.0, Cartesia limits its own output). **There is no notch
+above 2.0**: if the owner still wants louder, it is a re-clone from a
+louder reference clip, or the listening side (web call vs SIP), not this
+field with the fallback carrying the same 27 replacements
+as the primary (a voice PATCH used to strip them). Its dry-run label `(cloned)` next to `a976c076` is false — that id is
 stock Eyal.
 
 **THE INBOUND PROMPT IS LIVE AS OF 31 AUG — PUSHED, AND READ BACK TO VERIFY.**

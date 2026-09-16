@@ -9,6 +9,714 @@ conversation that produced it.
 
 ---
 
+## 2026-09-16
+
+### The client's review, in code: no numbers, private faults are theirs, voice refuses unmanaged buildings, the debt agent opened. Epoch 27 LIVE on WhatsApp and inbound voice.
+
+**PUSHED, same evening, on the owner's "run it".** WhatsApp: both patchers
+applied and idle afterwards, epoch 26 → 27, prompt 8,452 chars;
+`check_whatsapp.py` all checks passed end to end. Inbound voice: fence live
+at 3,350 chars on gpt-4.1, read back with the national numbers absent and
+the plural, anti-echo and private-fault lines present. **`vapi_sync.py
+inbound --apply` reset the voice to stock Eyal**, exactly as
+`vapi_set_voice.py`'s own docstring warns (the sync hardcodes
+`cartesia_voice = a976c076` and never reads CARTESIA_VOICE_ID) — the
+follow-up `vapi_set_voice.py --apply` put the clone, volume 2.0 and the 27
+replacements back and read them back. Always run the two together.
+
+**Live probes (execs 44413–44425), both new behaviours proven on the real
+bot.** Gas in a stairwell: `open_request` + `notify_team` on turn one,
+ticket `255-1245-26` once the address arrived, and "מה אני עושה עכשיו?
+לנתק חשמל?" answered with no number and no instruction. Blocked kitchen
+sink: no ticket at all (cleanup counted zero rows), *"הכיור בדירה הוא
+באחריות הדיירים"*, then an offer to help with something else. Wobbles
+recorded, not fixed: "והם יגיעו בהקדם" on the emergency (the prompt forbids
+saying help is on its way) and "אני מבין ש…" still opening most replies
+despite the anti-echo line.
+
+**Edge Function v70 went live** once the owner approved the prompt the
+classifier had refused twice. `check_tools.py` against it: **10 pass, 5
+fail**, the five being the pre-existing "no charge on this call" money
+cases. Three of the passes are new: `street_unknown`, `number_not_on_street`
+and `need_building`. That last one is the interesting find — **two cases
+that had passed for weeks now failed**, because they sent no building at
+all and an inbound voice ticket with an empty address used to open anyway.
+That is precisely the silent failure the gate exists to stop, so they were
+stale expectations, not a regression: they name a managed address now, and
+the old shape is asserted as a refusal in its own case. `voice_note_test.py`
+9/9 against v70 (payment, repeat, report, backstop, emergency with
+`255-1250-26`, debt-no-conversation, no-phone, address-after, guard-skip).
+
+**The harnesses cleaning up after themselves paid for itself immediately:**
+the two runs above removed 5 `בדיקת-מערכת` tickets, 47 interactions and 36
+call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
+contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
+gone** — that marker now counts zero.
+
+### The live Vapi wallet hit -$0.03, so the demo moved to an eighth account
+
+The owner tried the dashboard's voice widget and got *"check the browser has
+microphone permission"* wrapped around Vapi's real answer: **"Your Wallet
+Balance is -0.03."** Not the microphone. It also explains the 15 Sep `/chat`
+402: no card on the account. OpenRouter, which bills the WhatsApp bot
+separately, has $17.75 of $115 left and is fine.
+
+The owner pasted a fresh account's keys, temporary, for the demo. **Both are
+in a chat transcript and should be retired after.** What the move needed,
+beyond swapping two lines in `.env`:
+
+- **The Cartesia credential FIRST.** The new account had zero credentials,
+  and the Ido clone is private to the client's Cartesia account, so a
+  Hebrew assistant created before it would have failed silently to an
+  English Elliot. `homies-vapi-account`'s credential-first rule, earned on
+  the 6 Sep move, held exactly. Credential `e8d673a0`.
+- **Two new assistants**, because `vapi_sync.py` matches by NAME: intake
+  `827bfddd`, debt `373bbdc1`, carrying today's fences (3,350 / 3,504),
+  gpt-4.1 / gpt-5.6-sol, the clone at volume 2.0 with 27 replacements.
+- **`vapi_set_voice.py` 404'd** on ids belonging to an account its key can
+  no longer see. It resolves by name now, ids only as a fallback — a
+  hardcoded id is a fact about one account, and this script's whole job is
+  to run straight after a sync that has always worked by name.
+- **Edge Function v72**: the demo id JOINS `INTAKE_ASSISTANT_IDS` rather
+  than replacing it, and the inbound-direction rule reads the Set instead
+  of the one constant. Both accounts work; going back is a key swap. That
+  gate decides whether a voice team note reaches Chatwoot at all, so
+  missing it would have looked like the demo working and the team never
+  hearing about anything.
+- `dashboard/.env.local` repointed (public key + both ids + private key).
+  **Vercel was NOT touched**, so the deployed dashboard still points at the
+  empty account; the demo is localhost:3001.
+
+**Still not live:** migration 032 (re-counted after the harness cleanups:
+46 interactions, 24 call_outcomes, 10 requests, nearly all the seed phone
++972501234567 and old `probe-*` rows) — a destructive delete, held for the
+owner's word; and the dashboard (Vercel builds from main and nothing is
+committed).
+
+**The debt agent went live too, on the owner's model.** Asked about the
+drift below, the owner: *"retain the llm model but change according to the
+feedback on the behaviour"*. So `vapi_sync.py`'s debt target is pinned to
+`gpt-5.6-sol` (with the 26 Aug latency note re-read: it argued gpt-5.2 →
+gpt-4.1 over a 54k prompt that no longer exists, so the trade is not the
+same trade and only `vapi_latency.py` on a real call settles it), and the
+fence went up. Live: 3,504 chars, seven tools, clone + volume 2.0 + 27
+replacements intact (the debt target carries its own `voice`, so this sync
+did NOT clobber it the way the inbound one does). Probes on the live
+prompt: warm plural opening (*מה שלומכם*), no echo, the link on yes, one
+outcome logged, the closing line said. **One regression found and fixed
+before it stood: run 1 of 2 never said the amount at all** — "the amount is
+said once" read as permission to skip it, on a call whose whole purpose is
+the amount. The fence now names three facts that are always said and adds
+"once is not zero times"; 3 of 3 runs say it. `transfer_reason` is still
+filled on `authorized` — the server-side fix for that is in the undeployed
+Edge Function.
+
+**The drift itself, for the record.**
+Found on the read-back, recorded nowhere: somebody set it on the assistant
+directly. `vapi_sync.py debt --apply` would silently overwrite it, so the
+debt push was held back and put to the owner. The Vapi account also carries
+**zero phone numbers** and all 7,761 residents are still `handed_over =
+false`, so no debt call can reach anybody regardless.
+
+Yariv's 15 Sep review (pasted by the owner as "the timeless feedback"),
+planned with three explorers and four owner decisions: **drop the national
+numbers** (no numbers, no safety advice; an emergency is the ticket and the
+team note, at once), **open the debt agent up**, **plural address on voice**
+like the chatbot, **a private-apartment fault is the resident's, no ticket**.
+Everything below is edited, offline-verified and NOT pushed: the auto-mode
+classifier refused the Edge Function deploy as a production write, so every
+push (Edge Function, two n8n patchers, two Vapi assistants, migration 032)
+is listed for the owner to run.
+
+**Emergencies (both bots).** The WA stance sentence and the voice fence say
+the ticket and the team, at once, and "no emergency numbers, no safety
+instructions, what to do or not to do, even when asked directly what to do
+now"; the WA facts row with the four numbers is gone; the voice
+pronunciation bullet lost its numbers list; both `notify_team` texts say
+"the moment you hear it" instead of "after the national number". First
+offline pass: 3/3 WA runs fired ticket + note with no numbers, but one run
+answered "מה אני עושה עכשיו?" with "don't switch appliances, no flames" and
+"the team is on its way" -- the sentence forbade instructions but not the
+direct question. Second pass ("גם כששואלים אותך ישירות מה לעשות עכשיו: מה
+שיש לך לתת זה מה שעשית ושהצוות יודע"): 3/3 refuse to instruct ("אני לא יכול
+לתת הנחיות בטיחות"), ticket + note every time; one still said "והם בדרך".
+Voice `lift_person` offline: both tools first turn, plural, "אין לי אפשרות
+לתת הוראות או לשלוח עזרה". `prompt_probe.py`'s lift comment rewritten.
+
+**Private faults (both bots).** "תקלה בבניין או בדירה: אתה פותח קריאת שירות"
+became the line the client drew: common property and building systems are
+tickets; the resident's own fixtures (a blocked sink, a tap, an appliance,
+painting) are theirs, said kindly, no ticket, an offer to help with
+something else; unclear origin (a leak from above) is the building's to
+check. WA `fault_location` gloss carries it (the live jsonBody doc, which
+`n8n_whatsapp_payment.py` now ships by a second anchor, 214 → 402 chars);
+the voice `open_request` lead carries it. `docs/knowledge/homies.md`'s
+"doubt is not resolved" paragraph replaced. Offline: WA 2/2 no ticket,
+"באחריות הדיירים" (one offered to find a plumber, an invention to watch);
+voice 1/1 no ticket, the fence's category list recited back as examples.
+
+**Voice refuses unmanaged buildings (Edge Function, not deployed).** The
+`open_request` gate at index.ts ~1695 is `!dialled(ctx) && m.status !==
+"found"` instead of WhatsApp-only: any building that came from the caller's
+words is verified; a dialled call (the debt agent) is untouched. The inbound
+tool text got the WA refusal vocabulary plus one re-ask for a street the
+transcriber may have misheard, then "Homies does not manage that building"
+in the agent's words and no ticket. `check_tools.py`: the context building
+is `הרצל 112` now (Latin "Herzl 14" resolves to nothing, and הרצל has 112
+only), two `~reason` cases ("רחוב שלא קיים 5" → street_unknown, "הרצל 14" →
+number_not_on_street); scenarios moved to managed addresses. Not run: the
+deploy was refused. `log_call_outcome` also stores `transfer_reason` only
+when the outcome is transferred (the open debt fence filled it on `authorized`).
+
+**Inbound words layer.** Gender bullet = the chatbot's plural rule in phone
+form; a new anti-echo bullet (the chatbot's "understanding is shown, not
+announced") -- the first this fence has had; `silenceTimeoutMessage` and the
+guard's pair fixture plural (שהתקשרתם). Fence 2,876 → 3,350 chars.
+
+**The name.** Nobody had ever listened to the clone say הומיז (recording off;
+every mangled transcript is Deepgram's). `cartesia_tts.py --script homiez`
+renders the two first messages, the closing and the glued forms (מ/ל/ש+) with
+the name spelled five ways -- plain, niqqud הוֹמִיז, hyphen הומי-ז, geresh
+הומי'ז, double-yod הומייז -- through the clone on sonic-3.5 (what Vapi runs):
+15 clips in `voice/samples/name-*.mp3`. The owner picks by ear; then
+`voice_guard.PRONUNCIATION` and the fixed lines take the form (שהומיז is
+not covered by the guard today, and the clips say whether it must be).
+
+**The debt agent opened.** `docs/features/10-debt-followup/prompt.md`'s
+`## System prompt` (54,122 chars) is a 3,379-char fence in the inbound shape:
+identity, what the call knows (the nine variables; `{{gender_forms}}`
+dropped), the one thing without judgement (nothing about money until the
+person confirms they are `{{first_name}}`; other residents' privacy), the seven
+tools described in words, what to give (the reason, apartments, months,
+amount once, then the link question), the words rules plus "the amount
+once", plural, anti-echo, "log the outcome once, then the closing line, which
+is the only thing that hangs up". Opening proposed for the owner's ear:
+*היי, {{first_name}}? מדבר מיכאל מהצוות של הומיז, מה שלומכם?* (the client's
+shape, the name check kept as the greeting's question). Offline `late` x2:
+pass one logged the outcome twice with a transfer reason and never said the
+closing; pass two logs once and closes (the transfer reason still filled:
+gloss added to the tool, the server now drops it off a non-transfer). The
+amount said once, plural throughout, a lift complaint met with a ticket offer
+or a call-back, the link sent on "טוב". Latency is the point: 4.4–7.4 s gaps
+on the 54k prompt ($1.51/call) against ~2 s on the inbound's 3k. The 6 Sep
+"rules still apply to the debt agent" sentences are historical now.
+
+**Dashboard.** The overview's third slice is closed tickets (by opening
+date, requests has no resolved-at; the note says so) instead of the
+always-zero payment links the client read as "zero tasks"; a "resolved, all
+time" card (687); `needs_review` tab on Tickets; `type` shows `category_he`
+or a Hebrew label, `opened_via`/`direction`/`disposition` are words
+(`label()` grew prefixes; `disposition()` reads `transfer:x` and `error:`).
+Hebrew was already the default -- the client's browser carries the English
+cookie. `NEXT_DIST_DIR=.next-verify npx next build` green, types included.
+
+**Test rows.** `supabase/032_purge_test_rows.sql` (not applied): 85
+interactions (`test-voice-*`, `probe-*`, +972599), 53 call_outcomes, 15
+requests (9 open, 6 needs_review -- the five "בדיקה: שכנה תקועה במעלית"
+stubs the client saw are voice_note_test.py case 5). Never by a real phone
+prefix. What stays and is not marked, for the owner: 14 voice + 3 WA open
+tickets and 2 needs_review from 27 Aug–9 Sep (their own test calls), 224
+outbound / 22 inbound voice interactions. Both harnesses delete their rows
+at the end now (`--keep` to inspect); `voice_note_test.py --clean` also
+clears the DB rows.
+
+**Pushes for the owner, in order:** `python scripts/supabase_functions.py
+--apply` then `N8N_BASE_URL= python scripts/check_tools.py`; `python
+scripts/n8n_whatsapp_payment.py --apply` then `python
+scripts/n8n_whatsapp_teamnote.py --apply` (epoch 27), each solo, then
+`probe_whatsapp.py` on lift / sink / unmanaged and `check_whatsapp.py`;
+`N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply` and `... debt
+--apply`, then `vapi_set_voice.py --apply` and a read-back; the name form
+after listening; `supabase_migrate.py --apply` after the dry-run list.
+Nothing committed.
+
+## 2026-09-15
+
+### Wanting to pay is a ticket too. Migration 031, epochs 24 and 25.
+
+Owner: *"a scenario i want is when the person want to have a payment
+information it should open a ticket as well that this person want to pay
+for example."* Asked which shape: ticket + team note, both bots, for
+wanting to pay only (disputes and documents stay a note). Until now a
+payment ask was a Chatwoot note alone (14 Sep), and nobody is dispatched
+from a note; the queue staff work from is the tickets, the argument
+`request_standing_order` made on 18 Aug.
+
+**Data.** `supabase/031_payment_type.sql`: `payment` joins
+`requests_type_check` (ours, like `complaint`), and `fill_category_he()`
+learns `payment` → תשלום and, at last, `complaint` → תלונה (every complaint
+since 25 Aug had a NULL label; backfilled). Edge Function v68: a payment
+ticket keeps the reporter's unit whatever `fault_location` says (it is the
+resident's own flat), and `TYPE_WORDS` knows תשלום/לשלם so a status question
+can find it. `check_tools.py` gained the case: `255-1240-26`, type payment,
+label תשלום, Herzl 14 unit 12 kept.
+
+**Words.** The desk's rule gained a middle: a fault is a ticket; wanting to
+pay, asking how to pay, or asking for an arrangement is a ticket AND the
+team knows; everything else past the bot is a note. One sentence in each
+prompt, in front of the threshold list, which loses payment
+(`prompt.md` 7,973 → 8,121; the voice fence 2,762 → 2,876). The tool texts
+carry the mechanics: `payment` in `open_request`'s enum with a gloss that
+keeps a how-much question out (that is `get_balance`), the lead sentence
+"both happen, either order", `notify_team`'s payment clause ("also a
+ticket; put its number in this description"), `get_balance`'s ending split
+(pay = ticket + note; receipt or dispute = note). Inbound enum only; the
+debt agent's twelve untouched.
+
+**Voice**: offline with the repo's tools (`prompt_probe.py --repo-tools
+--scenario dues`, transcript saved), 2 of 2 runs: `get_balance`, then
+`open_request type payment` and `notify_team payment` in one turn, the
+reference in words; `disputed_bill` stays note-only. Pushed per protocol,
+read back: 2,876 chars, six tools with `payment` in the enum, clone,
+volume 2.0, 27 + 27 replacements. Live probe (mocked tools) the same.
+Wobbles, recorded: "ביט" offered as a payment method (invented), "ייצור
+איתך קשר".
+
+**WhatsApp**: the live `open_request` and `get_balance` descriptions had no
+runnable syncer (`n8n_whatsapp_open.py` exits on the transfer node the 13
+Sep build removed), so `scripts/n8n_whatsapp_payment.py` is the new layered
+patcher: snapshot `docs/handover/n8n-whatsapp-live-15sep-before-payment.json`
+(redacted), the two descriptions from TOOLS, the jsonBody `type` doc by
+anchor, `--restore`, idempotent, the epoch guard first. Epoch 24 went live
+and its first probe had the bot asking for a full name and phone before
+the ticket — `get_balance`'s IDENTITY-FIRST rule read as the ticket's. Pass
+two, tool text only: a payment ticket needs the building and apartment and
+nothing else; the identity check is for reading a balance. **Epoch 25.**
+Live (execs 42999–43017): "I want to pay, Herzl 112 flat 3" → ticket
+`255-1241-26` + the collections note in one turn; the screenshot shape
+(hi → pay → address when asked) → `255-1242-26`, the bot saying it opens a
+ticket and tells the team before asking the street; both rows read back
+type payment / תשלום / unit 3 before the probe's cleanup; "how much do I
+owe" → `get_balance` only, no row. `check_whatsapp.py` all checks passed;
+both patchers idle. One lesson for the log: piping an `--apply` run through
+`grep` in an `&&` chain hides the script's exit code (`W.api` exits loudly on
+an HTTP error) — the first chained write did not land and the solo re-run
+did. Nothing committed.
+
+**Evening, epoch 26: the "משהו אחר" button.** The owner's screenshot: the
+third button answered with a bare *במה אוכל לעזור לכם?*, the intro's own
+question a second time. The tone pass of 14 Sep had reworded the open-tap
+clause and left this one: *"שאלה אחת, במה מדובר, וממשיכים משם"*, which the
+model rendered literally, exactly as it had rendered "the only thing
+missing is what happened". One clause: the button means they did not find
+their case in the list, and that is all they said; invite them to tell
+what it is, like anything asked of a person. Pushed (8,121 → 8,188 chars),
+three fresh numbers live: *בטח, ספרו לי בבקשה מה העניין ואשמח לעזור* twice,
+once with a singular slash-form *ספר/י*; a real question after the button
+answered from the facts list. Recorded, not chased: the slash-form, and
+*אשמח לעזור* (the phrase the 27 Aug canned line was removed for; it is the
+model's own word now, once in three).
+
+### The Hebrew voice gets a volume knob, and the fallback gets its guard back
+
+Owner: *"there is a change in the voice agent the volume is a bit too
+low."* Read from Vapi first: both Hebrew assistants carry the clone
+`ba765d50` on sonic-3.5 with **no volume set at all** — Cartesia's default
+gain, unchanged by anything on 14 Sep. Vapi's schema has the knob,
+`CartesiaVoice.generationConfig.volume`, 0.5–2.0, default 1, sonic-3
+family. It went into `cartesia_voice()` in `scripts/vapi_sync.py` (the one
+builder both pushers use), default 1.4, `CARTESIA_VOLUME` in .env to
+override; `scripts/vapi_set_voice.py` gained `--volume N`, and its idle
+test now compares model, volume and the fallback's guard beside the voice
+id, because before today a volume-only change read as "nothing to do".
+
+**Measured before pushing**, one Hebrew sentence through Cartesia's own
+API with the clone, raw PCM: volume 1.0 → RMS −23.29 dBFS, peak −3.79;
+volume 1.4 → RMS −20.74, peak −1.75; **+2.55 dB**, zero clipped samples.
+So 1.7 would sit near 0 dBFS on peaks and 2.0 would clip unless Cartesia
+limits — recorded for the next step by ear.
+
+**Pushed** (`vapi_set_voice.py --apply`, PATCH `voice` only) and diffed
+field by field against a pre-push snapshot. The inbound assistant changed
+in exactly one field. The debt assistant did not: its Elliot **fallback
+had lost its 27 formatPlan replacements** — the builder attached the
+guard to the primary voice and built the fallback as a bare dict, so any
+voice PATCH silently stripped it, and an Elliot call would have read tool
+names aloud. Fixed at the source (`voice_with_guard()` on the fallback
+too), re-applied: debt fallback back to 27, inbound fallback gains the 27
+it never had. Second diff: debt = volume only; inbound = volume + the
+fallback guard. Dry run idle. `vapi_leak_check.py`: 0 of 14 calls leaked.
+Prompt (2,762), tools (`notify_team`), `language: he` on both untouched.
+Plan page for the owner: https://claude.ai/artifact/GbYA9XbuZD8JEikTxsw8py.
+**An hour later the owner asked for "a bit more louder"**, so the next
+notch: measured first (1.4 → RMS −20.84, peak −2.27; 1.7 → RMS −18.77,
+peak −0.12; 2.0 → RMS −17.45, peak −0.06; zero clipped samples at every
+level, so Cartesia limits its own output and 2.0 is usable too), then
+`vapi_set_voice.py --volume 1.7 --apply`, read back 1.7 on both, .env
+`CARTESIA_VOLUME=1.7`, dry run idle. Then "louder" again: **2.0, the
+ceiling of the knob**, pushed and read back on both, .env 2.0, idle. That
+is +5.8 dB over the default and the end of what `generationConfig` can
+do; past it the levers are the clone itself (a louder, normalised
+reference clip re-cloned) or the listening side (web-call output vs a real
+phone line, which has not been heard yet). Nothing committed.
+
+---
+
+## 2026-09-14
+
+### A word for the person before the question, and one emoji sometimes. Epoch 23.
+
+The owner, on a screenshot of the menu tap answered with a bare `מה קרה?`:
+*"its a bit not customer service since its direct to the point like what
+happened? i want it to be a bit more concern like ok can you tell me about
+your experience or what happened. i dont want the response to be fix it
+should be for the bot to decide. that is just an example also add like a
+touch of emoji like 1st message no emoji 2nd message with emoji like that
+but situational"*.
+
+Nothing canned produced it: the tap reaches the model, and every dial in
+the prompt turned one way (the tap paragraph named "what happened" as the
+only thing missing, the one-question paragraph capped a reply at the length
+asked, the understanding paragraph said a bare acknowledgment is better
+left out; no floor anywhere). Three edits in `prompt.md`, all acts, no
+sentence to copy: the tap paragraph invites the resident to tell the matter
+instead of naming the question; the one-question paragraph owns a floor (a
+short word of the bot's own before the question, about the thing and sized
+to it, never an announcement of understanding, never the resident's words
+back, never in place of the tool); a new paragraph allows one emoji
+sometimes (something sorted, a warm goodbye, a resident who writes that
+way), never in the first message, beside a reference or amount, on a
+refusal or in danger. 7,240 → 7,973 chars.
+
+**Offline, two passes** (`wa_prompt_chat.py --vs`, seven arcs). Pass one
+warmed the tap reply but skipped `open_request` and INVENTED a ticket
+number ("12345", "HM-29377") in 2 of 6 runs on typed complaints. Pass
+two added "the word does not replace what there is to do: tool first":
+12 of 12 tool calls, and tickets opened before the address was given fell
+from 9 in 12 (the incumbent) to 1 in 12; emoji only on goodbyes; the angry
+resident asked for the reference instead of left on "I'm here to help".
+Stopped at two passes.
+
+**Pushed** with `n8n_whatsapp_teamnote.py --apply` (exactly two changes:
+prompt, memory epoch 22 → 23; re-run idle). **Live** (`probe_whatsapp.py`,
+execs 41533–41569): the screenshot flow three times, tap replies *בטח,
+בשמחה אפתח לכם קריאת שירות. ספרו לי בבקשה מה קרה?* / *בטח, כדי לפתוח
+קריאת שירות אצטרך לדעת במה מדובר. מה קרה?* / *בטח, אשמח לעזור. ספרו לי
+בבקשה מה קרה?*; a word about the leak before asking the address in two;
+tickets with real references; goodbyes with 👋 and 😊 in two of three.
+Gas smell: 102 first, `open_request` + `notify_team`, no emoji. Status tap
+and angry resident received before the question. No `GUARD:` lines;
+`check_whatsapp.py` all checks passed. Left, recorded, not chased: `אני
+מבין` openers at about the old rate, one `אני מבין/ה` slash-form (angry
+arc), one `מצוין` to a leak, `בכיף` on goodbyes (the incumbent too), and a
+tap reply that can still end on `מה קרה?` after its lead-in. Nothing
+committed.
+
+### The inbound voice agent joins the desk
+
+Owner, after the chatbot's morning: *"for the inbound voice agent i want it
+to have tough durability as well like the one we have in the chatbot."*
+Read first: the voice `transfer_to_human` tool text told the model to promise
+a call-back and *hang up*; its handler wrote a `call_outcomes` row and told
+nobody; a voice call has no Chatwoot conversation, so feature 16's mention
+had nowhere to land; and since yesterday the WhatsApp `notify_team` had been
+posting six reasons the handler's allow-list does not know, all stored as
+`caller_request` — 021's failure, other channel, one day old. Plan approved:
+same wire as WhatsApp, a Voice inbox in Chatwoot, the stance as one identity
+paragraph (the agent stays open, 6 Sep), a team note is not a transfer.
+
+**Step 0, the unknown first.** `scripts/chatwoot_voice_inbox.py` created
+the `api` inbox "Homies — Voice" (id 2, auto-assign off, the owner a
+member) and the `handover_channel` + `handover_reasons` attribute
+definitions, then probed whether the account-scoped agent bot may write on
+an inbox it is not attached to: note, custom attributes, priority, team,
+labels all 2xx on a throwaway conversation, and a bot-authored
+`[@שירות]` mention raised `conversation_mention` 694 within ten seconds.
+**Design A** — the sub-workflow keeps its bot credential; nothing extra to
+build. An API-created incoming message set `waiting_since` (1789373874), so
+the ticker's `served` sweep will leave voice threads alone.
+
+**Migration 030** widened `call_outcomes_transfer_reason_check` to the
+three vocabularies (debt, old intake, the team note's eight + `language`);
+applied. **Sub-workflow**: optional `channel` input, stamped as
+`handover_channel`; on voice the note's last line says phone the resident
+(number, else building/apartment from `additional_attributes`), then
+resolve here, nothing typed reaches them; escalate lines likewise. Applied,
+published, idle. Harness case 12 (`quote`, `channel: voice`) — 12/12, the
+voice closing line read back verbatim. `n8n_whatsapp_teamnote.py` and
+`n8n_handback_escalate.py` each reported one schema update from the new
+input; applied, both idle.
+
+**The voice-note workflow** (`scripts/n8n_voice_note.py`, "Homies — Voice
+team note", `pduAdXjX1EU7cA6E`): a header-authenticated webhook that
+answers on receipt (the Edge Function is inside a Vapi tool call and must
+never wait on Chatwoot), then the contact, the conversation, the caller's
+words as an incoming message, and Execute Workflow into the sub-workflow
+with `channel: voice`, no wait. The secret is a fresh one
+(`N8N_VOICE_NOTE_SECRET`, an n8n header-auth credential), not the leaked
+`N8N_WEBHOOK_SECRET`. First run found the Set node ahead of the Code node
+had dropped the webhook body (`$input` was the Set's output) — the fix is
+the rule the expressions skill states: reference the webhook by name.
+Direct test: no secret 403, with it 200, conversation 56 in the Voice inbox
+with the incoming message, `waiting_since` set, the collections mention,
+an "איפה" line and the voice closing line; a second matter from the same
+apartment reused the thread (`handover_reasons: payment,billing`).
+
+**The Edge Function** (`supabase/functions/debt-tools/index.ts`, v62 →
+v64): `assistantId` on the context; `isIntake()` (the Hebrew intake id,
+with a voice-and-not-dialled fallback); the reason allow-list widened;
+`tools.notify_team = tools.transfer_to_human`; after the row writes, for the
+intake assistant only, `voiceNote()` POSTs to n8n (3 s, two attempts,
+awaited, never throws; OFF with one warn when the secrets are unset);
+`emergency_reference_spoken` beside the raw reference (the one return that
+was unwrapped); and at end of call `backstopTeamNote()` — the bot's spoken
+lines against the WhatsApp backstop's shapes in phone forms plus the
+sentence the prompt teaches (`הצוות (כבר )?יודע`), no note when a
+`notify_team` / `transfer_to_human` call or a `transfer:` disposition
+exists, the caller's own turns as the description. `supabase_functions.py`
+pushes `N8N_VOICE_NOTE_SECRET` and `N8N_VOICE_NOTE_URL` beside
+`TOOL_SECRET` (the OXS branch untouched). `scripts/voice_note_test.py`:
+nine Vapi-shaped cases through the real host — payment → `team_notified`
+true, collections, medium, one note; the same again → one note (the guard);
+end-of-call with the tool → nothing; end-of-call with "עדכנתי את הצוות
+ויחזרו אליך" and no tool → a backstop note; emergency → urgent, Operations,
+`255-1218-26` spoken as words; the debt assistant + charges → a row and no
+conversation; no phone no building → `voice:call:<id>`. **The ticker
+escalated the emergency thread at 10 minutes on the real clock** (level 1,
+Management + Operations, the voice escalate line) and left the two
+ordinary notes at 0.
+
+**The words.** `scripts/vapi_tools.py`: `notify_team` in place of
+`transfer_to_human` (that one said *call after telling the caller a
+representative will get back to them … close the call after calling it* —
+a promise plus a hang-up), reasons `INTAKE_NOTE_REASONS`, `description`
+required and asking for how to reach them, optional `department`, the
+address; `get_balance` ends "then let the team know with notify_team — do
+not send them to the office"; inbound `open_request` gets the WhatsApp
+lead "Letting the team know does NOT open a ticket". The fence
+(`docs/assistant/demo-inbound.md`): the tools sentence loses "לרשום שנציג
+אנושי יחזור אל המתקשרים" (a call-back promise in the identity itself) and
+gains "למסור עניין לצוות של הומיז"; one identity paragraph (Michael is all
+of customer support; past his threshold he passes the matter with the tool
+and then says the team knows; the sentence without the tool is a lie; no
+asking first; not who, not when; office details for someone asking how to
+reach the office; danger = the national number, the ticket, the team, not
+the office line, no help "sent"; a declined ticket is not argued for); one
+facts line (hours, the number in words, the address; no email — nobody
+dictates a Latin string); police and the electric company beside the two
+emergency numbers. 1,443 → 2,762 chars; the only digits are the bullet's
+own "101" example.
+
+**Probed before the push**, with the repo's declarations rather than the
+live ones (`prompt_probe.py --file … --repo-tools`, new today, plus
+`--save` and tool-argument printing; nine committed scenarios — the
+chatbot's 14 Sep probe lines were never committed, these are the record).
+Round 1: office facts verbatim, the decline respected, the foreign caller
+answered in Hebrew and given a ticket from the fragments; but the two money
+cases SAID "I passed it to the team" with no tool after `get_balance`,
+and "יחזרו אליך" in five of nine. Round 2 (name the tool once in the
+paragraph; restore "אולי יחזרו, אולי יטפלו בלי לחזור"; the tool text says
+call again with the same reason when the number arrives late): the tool
+fires with the right reason on every threshold ask across two samples, the
+late number reaches the team, the lift gets a national number first and
+`emergency` to Operations. A `next: unknown` hint in the tool result was
+tried and reverted (no effect). Left, recorded: "יחזרו אליך" in most
+replies after the tool ran, "רוצה שאעביר?" on money asks, the emergency
+ticket not opened by the model (the server stub covers it), the dictated
+number written in words, "תרצה" slips.
+
+**Pushed** per protocol (`N8N_BASE_URL= vapi_sync.py inbound --apply`, then
+`vapi_set_voice.py --apply`), read back: 2,762 chars, gpt-4.1, six tools
+with `notify_team` (async, Edge Function, nine reasons) and no
+`transfer_to_human`, clone `ba765d50`, `he`, 420 s, 27 guard replacements.
+The first live probe found the mid-call identity hole: the ask comes before
+the address, so a contact keyed on the apartment changed identity when the
+address arrived and the same call opened a second thread with the same
+notes. The contact is now the CALL (`voice:call:<id>`); the apartment,
+canonical, is its name and the number its phone, and a later call is found
+by those (three searches, one pick; a hit on the same call fills the
+contact in). Harness cases 8–9 cover it: one thread, contact renamed, a
+later call from the apartment found by name with the repeat skipped.
+`check_whatsapp.py` green; `n8n_handover_test.py` 12/12; every builder
+idle; `py_compile` clean. `check_tools.py` shows five money-tool failures
+(`no charge on this call`) that predate today — its fixture carries no
+`charges` since feature 14; the debt `transfer_to_human` case passes.
+**Then a review round** — three reviewers over the diff (the Edge
+Function, the n8n builders, the words), sixteen findings, triaged by hand.
+Fixed: `isIntake()`'s "voice and not dialled" fallback had turned
+`check_tools.py`'s debt probe into a Voice-inbox page (conversation 60,
+deleted) — the assistant id is now the only test, and an envelope without
+one pages nobody; the backstop judged the whole call's bot lines joined,
+so a told-verb in one turn and a destination in another matched and one
+"shall I tell the team?" excused a later plain lie — per line now, as the
+WhatsApp backstop judges per reply; "Create the conversation" and "Post
+the caller's words" continued on error with retries that could never run
+(n8n retries a node that throws, and a node set to continue never throws),
+so a lost note was a green execution — those writes now stop the workflow
+after real retries; `--rotate-secret` deleted the live credential before
+the workflow was rewritten — the new one is created first and the old
+deleted last; `new` mode inherited a stale `handover_channel` stamp; the
+deploy dry run said nothing about the voice-note secrets; `--file` dropped
+the debt agent's opening line; the chat transcript header lied about its
+source; the tool text said "never who, never when" and left "they will
+get back to you" standing (now "never THAT"), asked for digits under a
+words-only bullet (now says tool arguments are never spoken), and put the
+team "before anything else" where the fence puts the ticket first (now:
+both, either order). Redeployed (v66), re-applied, re-run: nine harness
+cases green, the debt check leaves the Voice inbox empty, the live lift
+probe called `open_request` AND `notify_team` in one turn after the
+national number. Not fixed, recorded: the sub-workflow's own Chatwoot
+writes carry the same inert retries since 3 Sep; gendered slips (תרצה,
+תתקשר) in most runs; the emergency sentence in the paragraph is an order,
+as the chatbot's is.
+
+Nothing committed. Still needed from the owner: one real web call to the
+intake agent ("I want to pay my dues") to hear the paragraph and see the
+note land; the paragraph read aloud, per the file's standing condition.
+
+**Evening: the note in plain words.** The owner read a team note in
+machine translation and asked for something a non-technical rep
+understands. The words came from the build, not from the desk: "source:
+bot decision", "no escalation for such a request", "registered a request
+to the team". Reworded in `scripts/n8n_handover.py` only (the note is
+composed in one place): the mention, then *דייר צריך מישהו מכם* (emergency:
+*דחוף. דייר במצב חירום*; morning page: *דייר פנה מחוץ לשעות הפעילות ועדיין
+מחכה*), *סיבה*, the resident's phone, *מה הדייר רוצה* (emergency: *מה קרה*),
+the last messages, and one *מה לעשות* line: on WhatsApp answer here and the
+bot stops; on voice the call is over, phone the number above, then Resolve;
+the 10-minute sentence only on an emergency. The "source" line is gone
+except for the backstop, which now says in one sentence why the note
+exists. Reason words plainer (*משהו בחוזה*, *הדייר לא מסכים עם חיוב*).
+Applied and published, builder idle; `n8n_handover_test.py` 12/12 with the
+same skips, stamps and labels; the four shapes (emergency, escalation,
+voice, morning page) read back in full; `--clean` run. Also answered on
+the way: Chatwoot was chiming on every bot-handled message because the
+owner's profile had audio alerts on all conversations, not because of any
+mention — fixed by the owner in Profile Settings; and only the Service team
+has a member, so mentions of Collections, Operations and Management reach
+nobody until people are added to those teams.
+
+### "I've let the team know" — and it is true. Epoch 22.
+
+The owner, refining 13 Sep: *"the main goal is to lessen the workload of
+office people and i want the bot to be the 100% customer support and we only
+have a threshold of what the bot can do … the bot should be accommodating but
+does not promise … like it should be ok i will let the right team … so we
+dont have a deadend in the conversation."* Asked what sits behind that
+sentence: *"a mention in chatwoot is ok like regular."* Office details:
+only if asked. Emergencies: *"dont include the office line since the chatbot
+is already the customer support team."*
+
+**Not a restore.** The 13 Sep snapshot carries the old framing (a handover
+the bot steps back from, a נציג button, "the rep will get back to you").
+`scripts/n8n_whatsapp_teamnote.py` built forward from the live 31 nodes:
+`notify_team` (the tool, from the builder; the debt-tools function name
+stays `transfer_to_human` for the voice agents), `Team note this turn?`
+(tool ran, OR the reply says the team knows / promises a call-back with no
+tool behind it — the promise backstop, folded in), `Let the team know`
+(the sub-workflow, fire and forget). No tap path. 31 → 34 nodes. Snapshot
+`docs/handover/n8n-whatsapp-live-14sep-before-teamnote.json`.
+
+**The sub-workflow and the ticker moved with it** (`n8n_handover.py`,
+`n8n_handback_escalate.py`, both `--apply`ed, both idle after): reasons name
+the matter (`payment` `billing` `move` `contract` `quote` `emergency`
+`caller_request` `other`) and pick the team by default; priority `medium`
+except emergencies; the 24-hour guard is per reason, remembering every
+reason in the window (`handover_reasons`) after harness case 11 showed
+payment → billing → payment re-noting the first; only an `emergency`
+climbs the escalation ladder. The harness gained cases 9–11 and now
+reopens its test conversations in `--clean` — 53 had been resolved in
+Chatwoot, which made every duplicate case pass as a new note; and the
+minute ticker's `served` sweep races the harness in office hours (the test
+threads have no pending resident message), recorded in its docstring.
+
+**The prompt.** The 13 Sep paragraph became: you are the whole desk; a
+fault is a ticket, balance and status are your tools; what is past you
+(paying dues, a disputed bill or document, moving, contracts, quotes, the
+committee, a request for a person) you note for the team with the tool and
+then say the team knows; office details only for someone asking how to
+reach the office; someone in danger gets the number, the ticket, the team,
+never the office line. Facts: ועד הבית / אב הבית lose "אנחנו נקשר ביניהם"
+(a promise nobody performs, caught by the 13 Sep tests). Epoch 21.
+
+**Then the first probes (execs 40747–40766), and epoch 22 an hour later.**
+gemini-2.5-flash called `notify_team` once in five and *wrote* that it had
+told the team the other four times, promising a call-back in three
+("הם יחזרו אליכם", "שיצרו אתכם קשר"); the backstop caught three (as
+`other`/Service) and missed the fifth, which asked the resident to confirm
+first. So: the prompt says saying is not doing (the tool is what tells the
+team; the sentence without it is a lie), the sentence ends at "the team
+knows" because what happens next is unknown, nobody is asked to confirm,
+no help is "sent" in an emergency, and a declined ticket is not argued
+for; the tool description says the same in English; the backstop learned
+the intent and call-back shapes. Re-probed (40774–40796): four of five
+tool calls with the right reason and team (billing → collections, move →
+management, instalments → collections, person → service), zero call-back
+promises, the decline answered with one line, the lift → `emergency` to
+Operations at urgent, ticket `255-1217-26`, no office line. Still there:
+"יטפלו בזה" / "בדרך" / "לשלוח עזרה" in about half the replies despite the
+rule, the national number skipped in one of two lift runs, "I want to pay"
+routed to a balance check rather than a note, and the "אני מבין ש…"
+paraphrase opener. Recorded; not chased with more rules — the file's own
+history says where that leads.
+
+`check_whatsapp.py` green (one run in three had the model forget turn 1's
+leak and ask "what happened" again — the memory held it; sampling).
+`py_compile` clean. `n8n_whatsapp_menu.py` and `n8n_whatsapp_nopage.py`
+idle against the new live state. Nothing committed.
+
+---
+
+## 2026-09-13
+
+### The bot is the rep — nothing pages a person, epoch 20
+
+Owner's direction, 13 Sep: *"lessen the interaction with office and tenants …
+if the chatbot cannot handle the conversation anymore it should try its best
+to handle everything like opening a ticket … the bot won't turn off but would
+mention the office."* Two questions back, two answers: the third button
+becomes **משהו אחר**; emergencies get the office details like everything else.
+The after-hours cost (a 22:00 lift call reaches nobody until someone opens
+Chatwoot) was in the option text he chose.
+
+**What came out, live** (`scripts/n8n_whatsapp_nopage.py`, 42 → 31 nodes,
+snapshot `docs/handover/n8n-whatsapp-live-13sep-before-nopage.json`, secret
+redacted, `--restore` puts it back): the tap chain `Human tap?` → `Hand to a
+person (tap)` → `Transfer the tap`, the `transfer_to_human` tool, `Handover
+this turn?` → `Hand to a person`, and the promise backstop `Promised a
+transfer, made none?` → `Transfer it anyway` → `Carry the reply`, plus two
+stickies. `Reply usable?[true]` now feeds `Type for a moment` and `Log reply`
+directly — the backstop's false branch with the If taken out. `Human
+replied?` → `bot-off` and the 15-minute handback are untouched.
+
+**What moved together.** The third title is the routing key (Chatwoot
+forwards a tap as its title), so `Sort`'s MENU row and TAP_KIND line,
+`Send`'s items, `n8n_whatsapp_menu.py`'s ITEMS_3/4 and the builder's MENU all
+read משהו אחר / `other` now; show_menu's description stops offering a person.
+The prompt's "one service, transfers between us" paragraph became: you
+handle it; a fault is a ticket; office matters (payment arrangements,
+disputed bills, moving in or out, contracts, the committee) are the office's,
+give its details, say nothing was passed on, promise no call; someone in
+danger gets the national number, then an emergency-urgency ticket, then the
+office line. Three facts added (אב הבית, הצעת מחיר, the office's own
+matters). The injected template lost its two "already handed to a rep"
+clauses (`AGENT_NEW`, still owned by `n8n_whatsapp_untemplate.py`, now
+deployed by nopage). Epoch 19 → 20, all three hashes.
+
+**Verified.** `check_whatsapp.py` green end to end. Probes read by hand:
+משהו אחר → one question; moving out → "handled directly with our office",
+hours, phone, mail, an offer, no promise; a disputed bill → the same shape;
+stuck in a lift → 102 first, then the building for the urgent ticket. One
+slip on that last one: it opened "מיכאל שלום", greeting the resident with its
+own name — a fresh-number wobble, recorded, not chased. `n8n_whatsapp_menu.py`
+and `n8n_whatsapp_patch.py` idle against the new live state; handover,
+promise, transfer and untemplate exit on a missing node and say why in their
+first line. `py_compile` clean.
+
+**Also this week, from the same thread.** 10 Sep: a test message to the
+office line was refused by Meta (`#131030`, recipient not on the sandbox's
+allow-list; our sender is still the +1 555 test number). The owner's own
+messages to the Homies-branded account were failing because that account is
+not ours at all — it is the incumbent ManyChat router, still live on the real
+number, recorded verbatim in feature 11's context. The 7-row menu planned
+off it was abandoned once the live `Sort` showed Chatwoot builds the payload:
+three buttons, or a list whose wrapper label is the account locale (`en` →
+"Choose an item"; `he.yml` has `בחר פריט`). That locale question is open.
+`WHATSAPP_TOKEN` in `.env` expired 8 Aug; `WHATSAPP_ACCESS_TOKEN` is the live
+one.
+
+---
+
 ### The intro waves — one emoji, four copies, epoch 19
 
 Owner ask of 7 Sep: *"i want to add some emoji in the intro."* Chosen from

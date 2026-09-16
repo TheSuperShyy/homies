@@ -120,6 +120,12 @@ const S = {
   'chart.tickets':     { he: 'קריאות שנפתחו',     en: 'Tickets opened' },
   'chart.calls':       { he: 'שיחות של הסוכן',    en: 'Agent calls' },
   'chart.links':       { he: 'לינקים לתשלום',     en: 'Payment links' },
+  // 16 Sep, the client's review ("the dashboard shows zero tasks"): the
+  // third slice is closed tickets now, not the payment links nobody sends.
+  // requests has no resolved-at column, so the window is by opening date.
+  'chart.resolved':    { he: 'קריאות שנסגרו',     en: 'Tickets resolved' },
+  'chart.resolvedNote':{ he: 'לפי תאריך הפתיחה: קריאות שנפתחו בטווח וכבר נסגרו.',
+                         en: 'By opening date: tickets opened in the range that are now resolved.' },
   'chart.events':      { he: 'פעולות',            en: 'events' },
   'chart.perDay':      { he: 'קריאות שנפתחו, לפי יום', en: 'Tickets opened, by day' },
   'chart.vsPrev':      { he: 'מול התקופה הקודמת', en: 'vs the period before' },
@@ -171,6 +177,51 @@ const S = {
   'status.needs_review':{ he: 'לבדיקה',   en: 'Needs review' },
   'status.all':         { he: 'הכול',     en: 'All' },
 
+  // --- every other code shown as a word (16 Sep, the client's review) ---
+  // The tickets and calls tables printed `opened_via`, `direction`,
+  // `disposition` and `type` as the database spells them. Staff read Hebrew.
+  'via.oxs':            { he: 'OXS',       en: 'OXS' },
+  'via.voice':          { he: 'טלפון',     en: 'Phone' },
+  'via.whatsapp':       { he: 'ווטסאפ',    en: 'WhatsApp' },
+  'via.staff':          { he: 'צוות',      en: 'Staff' },
+  'direction.inbound':  { he: 'נכנסת',     en: 'Inbound' },
+  'direction.outbound': { he: 'יוצאת',     en: 'Outbound' },
+  // The same words fill_category_he() writes (migrations 015, 031), for the
+  // rows that predate the trigger or carry no label.
+  'type.plumbing':      { he: 'אינסטלציה', en: 'Plumbing' },
+  'type.electrical':    { he: 'חשמל',      en: 'Electrical' },
+  'type.lighting':      { he: 'תאורה',     en: 'Lighting' },
+  'type.elevator':      { he: 'מעלית',     en: 'Elevator' },
+  'type.cleaning':      { he: 'ניקיון',    en: 'Cleaning' },
+  'type.gardening':     { he: 'גינון',     en: 'Gardening' },
+  'type.pest_control':  { he: 'הדברה',     en: 'Pest control' },
+  'type.locksmith':     { he: 'מנעולן',    en: 'Locksmith' },
+  'type.fire_safety':   { he: 'כיבוי אש',  en: 'Fire safety' },
+  'type.maintenance':   { he: 'אחזקה',     en: 'Maintenance' },
+  'type.other':         { he: 'אחר',       en: 'Other' },
+  'type.complaint':     { he: 'תלונה',     en: 'Complaint' },
+  'type.payment':       { he: 'תשלום',     en: 'Payment' },
+  // How a call ended. `transfer:<reason>` and `error:<code>` carry a prefix.
+  'disp.completed':     { he: 'הסתיימה',      en: 'Completed' },
+  'disp.caller_hung_up':{ he: 'המתקשר ניתק',  en: 'Caller hung up' },
+  'disp.silence':       { he: 'שקט על הקו',   en: 'Silence' },
+  'disp.transfer':      { he: 'נמסר לצוות',   en: 'Passed to the team' },
+  'disp.error':         { he: 'תקלה טכנית',   en: 'Technical error' },
+  'reason.caller_request': { he: 'ביקש בן אדם',  en: 'asked for a person' },
+  'reason.hardship':       { he: 'קושי כלכלי',   en: 'hardship' },
+  'reason.payment':        { he: 'תשלום',        en: 'payment' },
+  'reason.emergency':      { he: 'חירום',        en: 'emergency' },
+  'reason.contract':       { he: 'חוזה',         en: 'contract' },
+  'reason.other':          { he: 'אחר',          en: 'other' },
+  'reason.language':       { he: 'שפה',          en: 'language' },
+  'reason.distress':       { he: 'מצוקה',        en: 'distress' },
+  'reason.dispute':        { he: 'מחלוקת',       en: 'dispute' },
+  'reason.not_understood': { he: 'לא הובן',      en: 'not understood' },
+  'reason.billing':        { he: 'חיוב',         en: 'billing' },
+  'reason.move':           { he: 'כניסה או יציאה מדירה', en: 'moving' },
+  'reason.quote':          { he: 'הצעת מחיר',    en: 'quote' },
+  'reason.ownership':      { he: 'בעלות',        en: 'ownership' },
+
   'urgency.low':       { he: 'נמוכה',   en: 'Low' },
   'urgency.normal':    { he: 'רגילה',   en: 'Normal' },
   'urgency.high':      { he: 'גבוהה',   en: 'High' },
@@ -181,6 +232,7 @@ const S = {
   'overview.openTickets':{ he: 'קריאות פתוחות',        en: 'Open tickets' },
   'overview.urgent':     { he: 'דחופות ופתוחות',       en: 'Urgent, open' },
   'overview.allTickets': { he: 'קריאות, מאז ומתמיד',   en: 'Tickets, all time' },
+  'overview.resolved':   { he: 'קריאות שנסגרו, מאז ומתמיד', en: 'Resolved, all time' },
   'overview.convos':     { he: 'שיחות ווטסאפ',         en: 'Conversations' },
   'overview.calls':      { he: 'שיחות טלפון שתועדו',   en: 'Calls recorded' },
   'overview.last7':      { he: 'שבעת הימים האחרונים',  en: 'Last 7 days' },
@@ -498,8 +550,19 @@ export function translator(locale: Locale) {
 export type T = ReturnType<typeof translator>;
 
 /** A database status/urgency code rendered as a word. Unknown codes pass through. */
-export function label(t: T, prefix: 'status' | 'urgency', code?: string | null) {
+export function label(t: T, prefix: 'status' | 'urgency' | 'via' | 'direction' | 'type' | 'reason',
+                      code?: string | null) {
   if (!code) return '—';
   const key = `${prefix}.${code}` as Key;
   return key in S ? t(key) : code;
+}
+
+/** How a call ended, as words. `transfer:hardship` reads "passed to the team ·
+ *  hardship"; an `error:` code reads as a technical error, the code itself in
+ *  the title for whoever needs it. */
+export function disposition(t: T, code?: string | null) {
+  if (!code) return '—';
+  if (code.startsWith('transfer:')) return t('disp.transfer') + ' · ' + label(t, 'reason', code.slice(9));
+  if (code.startsWith('error:')) return t('disp.error');
+  return label(t, 'disp' as any, code);
 }

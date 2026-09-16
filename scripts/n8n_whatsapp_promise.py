@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Make the promise backstop actually fire, and record what it rescued.
+"""SUPERSEDED 13 Sep by n8n_whatsapp_nopage.py: the backstop it repairs was
+removed with the rest of the paging. Its dry run exits on a missing node,
+which is correct.
+
+Make the promise backstop actually fire, and record what it rescued.
 
     python scripts/n8n_whatsapp_promise.py            # dry run
     python scripts/n8n_whatsapp_promise.py --apply    # write it

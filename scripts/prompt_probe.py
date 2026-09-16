@@ -62,6 +62,7 @@ TARGETS = {
         # the wrong conversation.
         "first": "שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?",
         "vars": {},
+        "tools": "INTAKE_TOOLS",
     },
     "debt": {
         "assistant": "14d502fc-95a9-4fb1-8d93-944dd7e00211",
@@ -79,7 +80,7 @@ TARGETS = {
         # first message is here.
         "vars": {
             "first_name": "שחר",
-            "building": "הרצל 14",
+            "building": "הרצל 112",
             "apartments_phrase": "דירה 12",
             "months_phrase": "יולי",
             "breakdown_phrase": "יולי, ארבע מאות וחמישים שקלים",
@@ -89,6 +90,7 @@ TARGETS = {
             "verification_email": "Office@homies-management.co.il",
             "gender_forms": "masculine",
         },
+        "tools": "DEBT_TOOLS",
     },
 }
 
@@ -99,7 +101,7 @@ TARGETS = {
 SCENARIOS = {
     "leak": [
         "היי, יש לי נזילה מהתקרה בחדר האמבטיה, זה כבר יומיים",
-        "הרצל 14",
+        "הרצל 112",
         "דירה 12",
         "זה נוזל על הארון ואני שם דלי מתחת, מחליף אותו כל כמה שעות",
         "מה, ומתי מישהו יגיע?",
@@ -108,7 +110,7 @@ SCENARIOS = {
     "vague": [
         "שלום, אני רוצה לפתוח קריאה",
         "המעלית תקועה כבר מאתמול, אי אפשר לעלות לקומה שש",
-        "רחוב ויצמן 3",
+        "רחוב ויצמן 13",
         "רגע, לא שבע, שש",
         "אוקיי. יש עוד משהו פתוח אצלנו בבניין?",
     ],
@@ -126,7 +128,83 @@ SCENARIOS = {
         "טוב, תשלח לי את הלינק",
         "בסדר",
     ],
+    # 14 Sep -- durability, inbound. The chatbot's probe lines that day were
+    # typed at probe_whatsapp.py and never committed; these are the voice
+    # versions, and the record. What a person looks for in each transcript:
+    # the [tools] line carries notify_team with the right reason BEFORE the
+    # sentence that says the team knows; never "they will get back to you",
+    # never "help is on the way", never the office number unless asked, no
+    # goodbye on a "team knows" turn, no gendered address, no digit spoken.
+    "dues": [                      # payment (get_balance first is acceptable)
+        "שלום, אני רוצה לשלם את ועד הבית, יש לי חוב של כמה חודשים",
+        "הרצל 112, דירה 12",
+        "אז איך אני משלם? אפשר בכרטיס אשראי?",
+        "טוב. מתי מישהו יחזור אליי?",   # an honest "I do not know when", not a time
+        "בסדר, תודה",
+    ],
+    "disputed_bill": [             # billing; no arguing the bill, no persuasion
+        "קיבלתי חיוב של אלף ומאתיים שקל ואני לא מבין על מה זה",
+        "ויצמן 13, דירה 8",
+        "זה לא הגיוני, אני לא אשלם את זה",
+        "אוקיי. ומה עכשיו?",
+    ],
+    "moving_out": [                # move; description carries building, apartment, new tenant
+        "היי, אני עוזב את הדירה בסוף החודש, מה אני צריך לעשות מולכם?",
+        "בן גוריון 8, דירה 4",
+        "כן, נכנס דייר חדש אחריי",
+        "מעולה, תודה",
+    ],
+    "quote": [                     # quote; the building and the work in the description
+        "אני מוועד הבית, אנחנו רוצים הצעת מחיר לצביעה של חדר המדרגות",
+        "הרצל 112, כל הבניין, ארבע קומות",
+        "כן, זה הכל",
+    ],
+    "person": [                    # caller_request on turn 1; NOT re-noted on turn 2
+        "אני רוצה לדבר עם בן אדם אמיתי, לא עם מכונה",
+        "כי יש לי בעיה עם החוזה ואני לא רוצה לדבר על זה עם רובוט",
+        "הרצל 112 דירה 12, אפשר לחזור אליי ל-050-1234567",   # the number lands in the description
+        "טוב, בסדר",
+    ],
+    "lift_person": [               # 16 Sep: NO digits 100-103 and NO instructions (נתק, צא, אל תזוז); open_request emergency + notify_team emergency, the first turn that has a building
+        "הצילו, המעלית נתקעה ויש בפנים את השכנה שלי, היא מבוגרת והיא בפאניקה",
+        "ויצמן 13",
+        "היא לא עונה לי כבר, מה עושים?",
+        "אוקיי, אני מתקשר אליהם. תודה",
+    ],
+    "private_sink": [              # 16 Sep: the resident's own fixture -> no ticket, a kind sentence, an offer to help with something else
+        "הכיור במטבח שלי סתום ומסריח, תשלחו מישהו",
+        "הרצל 112 דירה 3",
+        "אז מי מטפל בזה?",
+        "טוב, תודה",
+    ],
+    "unmanaged": [                 # 16 Sep: street_unknown -> ask the street once more -> "we do not manage that building", no ticket (live tools only; the mock always opens)
+        "יש נזילה בלובי אצלנו בבניין",
+        "רחוב שלא קיים 5",
+        "רחוב שלא קיים חמש, כן, זה הרחוב",
+        "טוב, אז אין מה לעשות?",
+    ],
+    "leak_decline": [              # no ticket, no note, one line, no re-offer
+        "יש נזילה קטנה מתחת לכיור במטבח",
+        "לא לא, אני לא רוצה לפתוח פנייה, רק רציתי לדעת אם זה משהו שאתם מטפלים בו",
+        "בסדר, תודה",
+    ],
+    "office": [                    # hours and the number in words, verbatim
+        "היי, איך אני מגיע אליכם למשרד? מה השעות?",
+        "ויש מספר טלפון?",
+        "תודה",
+    ],
+    # What deepgram nova-3 (he) hands the model for English audio is Hebrew-
+    # transliterated fragments, not English. Typed English would be understood
+    # perfectly and would probe nothing.
+    "foreign": [                   # Hebrew replies; notify_team language with the fragments
+        "איי דונט ספיק היברו. דו יו ספיק אינגליש?",
+        "מיי אפרטמנט... נו הוט ווטר... הרצל פורטין, אפרטמנט טוולב",
+        "אוקיי... תנק יו",
+    ],
 }
+DURABILITY = ["dues", "disputed_bill", "moving_out", "quote", "person",
+              "lift_person", "leak_decline", "office", "foreign",
+              "private_sink", "unmanaged"]
 
 
 def env():
@@ -185,6 +263,26 @@ def repo_prompt(target, ref):
             tools)
 
 
+def file_prompt(target, path):
+    """A candidate from a file: the doc (or a copy of it) has its fence extracted,
+    bare text is used whole. 6 Sep: prompt_chat --file ran the entire markdown
+    as the prompt, and the header's char count was the only tell."""
+    raw = open(path, encoding="utf-8").read()
+    m = re.search(target["extract"], raw, re.S)
+    return m.group(1).strip() if m else raw.strip()
+
+
+def repo_tools(target):
+    """The declarations as scripts/vapi_tools.py has them, for probing a
+    candidate WITH a tool the live assistant does not carry yet (14 Sep:
+    notify_team before the push). Same shape live_prompt() builds; Vapi's
+    `async`, `server` and `messages` never reach the model."""
+    sys.path.insert(0, os.path.join(ROOT, "scripts"))
+    import vapi_tools
+    return [{"type": "function", "function": t["function"]}
+            for t in getattr(vapi_tools, target["tools"])]
+
+
 def resolve(prompt, variables):
     for k, v in variables.items():
         prompt = prompt.replace("{{%s}}" % k, v)
@@ -207,7 +305,12 @@ TOOL_RESULTS = {
                            "description": "מעלית תקועה", "other_open": 2},
     "get_balance": {"ok": True, "total": 450, "currency": "ILS",
                     "months": ["2026-07"]},
-    "verify_address": {"ok": True, "found": True, "building": "הרצל 14"},
+    "verify_address": {"ok": True, "found": True, "building": "הרצל 112"},
+    # 14 Sep. The live handler also returns `reason`, `charges_paused` and, on
+    # an emergency with no ticket, `emergency_reference(_spoken)`; nothing in
+    # the prompt reads any of it, and the lift probe must take its reference
+    # from open_request's mock, so the mock stays minimal on purpose.
+    "notify_team": {"ok": True, "team_notified": True},
 }
 TOOL_DEFAULT = {"ok": True}
 
@@ -245,7 +348,14 @@ def turn(messages, key, tools):
             return msg.get("content") or "", called, tin, tout
         for c in calls:
             name = c["function"]["name"]
-            called.append(name)
+            # The arguments too: on notify_team the reason IS the judgment
+            # being probed, and on an emergency the description is what
+            # the team would read.
+            try:
+                arg = json.loads(c["function"].get("arguments") or "{}")
+            except ValueError:
+                arg = c["function"].get("arguments")
+            called.append((name, arg))
             messages.append({"role": "tool", "tool_call_id": c["id"],
                              "content": json.dumps(TOOL_RESULTS.get(name, TOOL_DEFAULT),
                                                    ensure_ascii=False)})
@@ -259,15 +369,31 @@ def main():
                     help="one of: " + ", ".join(sorted(SCENARIOS)))
     ap.add_argument("--ref", default=None,
                     help="read the prompt from the repo at this commit instead of live")
+    ap.add_argument("--file", default=None,
+                    help="read the prompt from this file (the doc, or bare text) instead of live")
+    ap.add_argument("--repo-tools", action="store_true",
+                    help="declare the tools from scripts/vapi_tools.py instead of the live assistant")
+    ap.add_argument("--save", action="store_true",
+                    help="also write the run to docs/assistant/transcripts/")
     args = ap.parse_args()
+    if args.ref and args.file:
+        sys.exit("--ref and --file are two sources; pick one")
 
     key = E.get("OPENROUTER_API_KEY", "").strip()
     if not key:
         sys.exit("OPENROUTER_API_KEY missing from .env")
 
     target = TARGETS[args.target]
-    prompt, first, tools = (repo_prompt(target, args.ref) if args.ref
-                            else live_prompt(target))
+    if args.file:
+        # The live first message when the target keeps none of its own (debt):
+        # a pair whose halves open differently is not a pair.
+        _, live_first, tools = live_prompt(target)
+        prompt, first = file_prompt(target, args.file), target["first"] or live_first or ""
+    else:
+        prompt, first, tools = (repo_prompt(target, args.ref) if args.ref
+                                else live_prompt(target))
+    if args.repo_tools:
+        tools = repo_tools(target)
     # The first message is a template too. Resolving only the prompt left
     # `{{first_name}}` in the agent's opening sentence, which is the one line of
     # the call that is spoken before the model does anything at all.
@@ -282,38 +408,61 @@ def main():
                  "script, not the agent:\n  %s"
                  % ", ".join(sorted(set(left))))
 
-    names = [args.scenario] if args.scenario else sorted(SCENARIOS)
+    if args.scenario == "durability":
+        names = DURABILITY
+    else:
+        names = [args.scenario] if args.scenario else sorted(SCENARIOS)
     heb = len(re.findall(r"[֐-׿]", prompt))
-    print("source     : %s" % ("repo at " + args.ref if args.ref else "live assistant"))
-    print("prompt     : %d chars, %.0f%% Hebrew" % (len(prompt), 100.0 * heb / len(prompt)))
-    print("model      : %s" % MODEL)
-    print("tools      : %s\n" % (", ".join(x["function"]["name"]
-                                        for x in tools) or "none"))
+    out = []
+    def say(line=""):
+        print(line)
+        out.append(line)
+    say("source     : %s" % ("repo at " + args.ref if args.ref
+                             else ("file " + args.file if args.file else "live assistant")))
+    say("prompt     : %d chars, %.0f%% Hebrew" % (len(prompt), 100.0 * heb / len(prompt)))
+    say("model      : %s" % MODEL)
+    say("tools      : %s  [%s]\n" % (", ".join(x["function"]["name"] for x in tools) or "none",
+                                    "repo: vapi_tools." + target["tools"] if args.repo_tools else "live"))
 
     tin = tout = 0
     for name in names:
-        print("=" * 74)
-        print("scenario: %s" % name)
-        print("=" * 74)
+        say("=" * 74)
+        say("scenario: %s" % name)
+        say("=" * 74)
         msgs = [{"role": "system", "content": prompt}]
         if first:
             msgs.append({"role": "assistant", "content": first})
-            print("  agent   : %s" % first)
+            say("  agent   : %s" % first)
         for said in SCENARIOS[name]:
-            print("  resident: %s" % said)
+            say("  resident: %s" % said)
             msgs.append({"role": "user", "content": said})
             reply, called, a, b = turn(msgs, key, tools)
             tin, tout = tin + a, tout + b
-            if called:
-                print("  [tools] : %s" % ", ".join(called))
-            print("  agent   : %s" % reply.replace("\n", " / "))
-        print()
+            for cname, carg in called:
+                say("  [tool]  : %s %s" % (cname, json.dumps(carg, ensure_ascii=False)))
+            say("  agent   : %s" % reply.replace("\n", " / "))
+        say()
 
     # gpt-4.1-mini list price. Printed because the prompt is re-sent every turn,
     # which is the whole reason prompt length is a cost question and not only a
     # style one.
-    print("tokens: %d in, %d out  (about $%.3f at 0.40/1.60 per million)"
-          % (tin, tout, tin / 1e6 * 0.40 + tout / 1e6 * 1.60))
+    say("tokens: %d in, %d out  (about $%.3f at 0.40/1.60 per million)"
+        % (tin, tout, tin / 1e6 * 0.40 + tout / 1e6 * 1.60))
+    if args.save:
+        import datetime
+        stamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
+        # The scenario in the name: five single-scenario runs in one minute
+        # overwrote each other on 14 Sep.
+        tag = "-" + args.scenario if args.scenario else ""
+        path = os.path.join(ROOT, "docs", "assistant", "transcripts",
+                            "%s-%s-probe%s.md" % (stamp, args.target, tag))
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write("# %s — probe, %s\n\n" % (args.target, stamp))
+            f.write("> Fixed resident turns replayed through the model with MOCKED tools; "
+                    "nothing was written anywhere. The [tool] line shows what the model "
+                    "called and with what, before the sentence it then spoke.\n\n```\n")
+            f.write("\n".join(out) + "\n```\n")
+        print("saved: %s" % os.path.relpath(path, ROOT))
 
 
 if __name__ == "__main__":

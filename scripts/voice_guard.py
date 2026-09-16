@@ -199,8 +199,8 @@ SAFE_SENTENCES = [
     # A pair, because this one is meant to change: the pronunciation
     # substitution rewrites להומיז, and the second half is what it must become.
     # Getting anything else — a hole, a different rewrite — is the failure.
-    ("תודה שהתקשרת להומיז, יום טוב, ולהתראות.",
-     "תודה שהתקשרת לחברת הומיז, יום טוב, ולהתראות."),
+    ("תודה שהתקשרתם להומיז, יום טוב, ולהתראות.",
+     "תודה שהתקשרתם לחברת הומיז, יום טוב, ולהתראות."),
     "אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
     # Spoken, not written — 30 Aug. The numeral reached Cartesia only after
     # Vapi's formatter had cut it into single digits, and the call broke.

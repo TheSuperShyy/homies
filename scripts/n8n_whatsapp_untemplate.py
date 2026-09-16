@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Take the last fixed sentences out, and leave the intro and its menu in.
+"""AGENT_NEW below is still the injected template's source of truth, but since
+13 Sep it is synced live by n8n_whatsapp_nopage.py: this file's own main()
+requires `Human tap?`, which was removed with the rest of the paging, so its
+dry run exits on a missing node. That is correct; edit AGENT_NEW here, deploy
+it there.
+
+Take the last fixed sentences out, and leave the intro and its menu in.
 
     python scripts/n8n_whatsapp_untemplate.py            # dry run
     python scripts/n8n_whatsapp_untemplate.py --apply    # write it
@@ -248,11 +254,15 @@ AGENT_NEW = (
     # The missing question is left standing and written down instead. It is a
     # dead end, not a lie, and the resident can still write; a second handover
     # is a duplicate write, which this workflow has paid for twice already.
-    "+ ($json.tap === 'human' ? ' [הפנייה כבר הועברה לנציג של הומיז על ידי "
-    "המערכת, ומה שהדייר יכתוב עכשיו יגיע לנציג הזה.]' : '') "
-    "+ ($json.tapped_human && !$json.tap_now ? ' [ההודעה הזאת היא התשובה של "
-    "הדייר על מה הפנייה, אחרי שהיא כבר הועברה לנציג. היא נועדה לצוות שיחזור "
-    "אליו.]' : '') "
+    #
+    # GONE 13 Sep, both clauses. They told the model a tap on נציג had
+    # "already been passed to a Homies rep" and that the next message was
+    # for the team that would call back. Nothing pages a person from
+    # WhatsApp any more (owner's call; n8n_whatsapp_nopage.py), the third
+    # button reads משהו אחר and its tap kind is `other`, so the clauses
+    # could never fire -- and a template that can never be true is still
+    # a template the model reads. Sort still emits `tapped_human`, always
+    # false now; that 16KB script is edited by anchor only.
     "+ ($json.attachment ? ' [הדייר שלח קובץ, תמונה או מיקום בלי טקסט. אתה "
     "לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]' : '') "
     "+ ($json.last_bot ? ' [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא "

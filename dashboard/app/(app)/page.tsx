@@ -56,12 +56,16 @@ export default async function Overview({
   // way it moved.
   const prevFrom = shift(from, -span) + 'T00:00:00+03:00';
 
-  const [tickets, open, urgent, convos, calls, recent,
-         winTickets, winCalls, winLinks,
-         prevTickets, prevCalls, prevLinks] = await Promise.all([
+  const [tickets, open, urgent, resolvedAll, convos, calls, recent,
+         winTickets, winCalls, winResolved,
+         prevTickets, prevCalls, prevResolved] = await Promise.all([
     db.from('requests').select('*', { count: 'exact', head: true }),
     db.from('requests').select('*', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
     db.from('requests').select('*', { count: 'exact', head: true }).in('urgency', ['high', 'emergency']).in('status', ['open', 'in_progress']),
+    // 16 Sep, the client's review: "the dashboard shows zero tasks". It
+    // showed open and urgent and never what was finished; this is the
+    // finished pile, all time.
+    db.from('requests').select('*', { count: 'exact', head: true }).eq('status', 'resolved'),
     db.from('v_conversations').select('*'),
     db.from('interactions').select('*', { count: 'exact', head: true }).eq('channel', 'voice'),
     db.from('requests').select('reference,description,building,unit,urgency,status,opened_via,created_at')
@@ -69,13 +73,16 @@ export default async function Overview({
 
     // Three counts for the ring, and the ticket rows again — dated only —
     // because the ring needs the total and the columns need them bucketed by
-    // day, and one trip is cheaper than two. `payment_links` is filtered to
-    // `sent`: a row is written when the agent RAISES a link, and raising one is
-    // not sending it.
+    // day, and one trip is cheaper than two. The third was `payment_links`
+    // filtered to `sent` until 16 Sep, and it was always zero (nothing sends
+    // a link), which the client read as "the system does nothing". It is the
+    // resolved tickets now: `requests` has no resolved-at stamp, so a ticket
+    // counts in the window it was OPENED in, and the note under the number
+    // says so.
     db.from('requests').select('created_at').gte('created_at', gte).lt('created_at', lt),
     db.from('interactions').select('created_at').eq('channel', 'voice')
       .gte('created_at', gte).lt('created_at', lt),
-    db.from('payment_links').select('created_at').eq('status', 'sent')
+    db.from('requests').select('created_at').eq('status', 'resolved')
       .gte('created_at', gte).lt('created_at', lt),
 
     // The period before, for the deltas. Counts only — nothing plots these, so
@@ -84,7 +91,7 @@ export default async function Overview({
       .gte('created_at', prevFrom).lt('created_at', gte),
     db.from('interactions').select('*', { count: 'exact', head: true }).eq('channel', 'voice')
       .gte('created_at', prevFrom).lt('created_at', gte),
-    db.from('payment_links').select('*', { count: 'exact', head: true }).eq('status', 'sent')
+    db.from('requests').select('*', { count: 'exact', head: true }).eq('status', 'resolved')
       .gte('created_at', prevFrom).lt('created_at', gte),
   ]);
 
@@ -99,9 +106,9 @@ export default async function Overview({
     { key: 'calls', token: '--cat-2', label: t('chart.calls'),
       rows: winCalls.data, prev: prevCalls.count ?? 0,
       note: undefined as string | undefined },
-    { key: 'links', token: '--cat-3', label: t('chart.links'),
-      rows: winLinks.data, prev: prevLinks.count ?? 0,
-      note: (winLinks.data?.length ?? 0) === 0 ? t('chart.linksNote') : undefined },
+    { key: 'resolved', token: '--cat-3', label: t('chart.resolved'),
+      rows: winResolved.data, prev: prevResolved.count ?? 0,
+      note: t('chart.resolvedNote') as string | undefined },
   ].map((m) => ({
     ...m,
     value: m.rows?.length ?? 0,
@@ -142,6 +149,7 @@ export default async function Overview({
     ['hero is-open', t('overview.openTickets'), open.count ?? 0],
     ['is-urgent',    t('overview.urgent'),      urgent.count ?? 0],
     ['',             t('overview.allTickets'),  tickets.count ?? 0],
+    ['is-done',      t('overview.resolved'),    resolvedAll.count ?? 0],
     ['is-progress',  t('overview.convos'),      convos.data?.length ?? 0],
     ['',             t('overview.calls'),       calls.count ?? 0],
   ] as const;
@@ -236,7 +244,7 @@ export default async function Overview({
                     <td dir="auto" data-label={t('col.where')}>{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
                     <td data-label={t('col.urgency')}><span className={`urg ${r.urgency}`}>{label(t, 'urgency', r.urgency)}</span></td>
                     <td data-label={t('col.status')}><span className={`pill ${r.status}`}>{label(t, 'status', r.status)}</span></td>
-                    <td className="muted" data-label={t('col.via')}>{r.opened_via}</td>
+                    <td className="muted" data-label={t('col.via')}>{label(t, 'via', r.opened_via)}</td>
                     <td className="muted mono" data-label={t('col.opened')}>{when(r.created_at, locale)}</td>
                   </tr>
                 ))}

@@ -1,6 +1,6 @@
 """What each assistant is allowed to do, as Vapi function definitions.
 
-Two lists: DEBT_TOOLS (eight, outbound) and INTAKE_TOOLS (three, inbound). They
+Two lists: DEBT_TOOLS (eight, outbound) and INTAKE_TOOLS (six, inbound). They
 share one webhook and one `open_request`, which is the reason they share a file.
 
 Kept beside vapi_sync.py rather than inside it because these are a contract with
@@ -175,6 +175,19 @@ def _open_request(location):
     }
     if location == "full":
         props.update(LOCATION)
+        # 15 Sep, inbound only: a resident who wants to pay is a ticket too
+        # (migration 031), beside the team note. The gloss is what keeps a
+        # how-much question out of it; the debt agent keeps the twelve, its
+        # callers are being asked to pay, not asking to.
+        props["type"] = {
+            "type": "string",
+            "enum": props["type"]["enum"] + ["payment"],
+            "description": "The eleven building categories are faults; complaint is "
+                           "a person's account of something; payment is a resident "
+                           "who wants to pay, asks how or where to pay, or wants a "
+                           "payment arrangement. A question about how much is owed "
+                           "is not a payment ticket, that is get_balance.",
+        }
     elif location == "unit":
         # Outbound, since feature 14. The building is still a fact on the call
         # and stays absent, but a call covering several apartments sends `unit`
@@ -184,8 +197,46 @@ def _open_request(location):
         # and drops anything else to empty rather than sending a technician to a
         # guessed address.
         props["unit"] = LOCATION["unit"]
+    lead = ""
+    if location == "full":
+        # 14 Sep, the WhatsApp pattern (n8n_whatsapp.py, open_request): a
+        # person comes before an address, so on an emergency the team note
+        # often fires first and the ticket is what is still to do when the
+        # building finally arrives. Inbound only: the debt agent has no
+        # notify_team, and a description naming a tool the assistant does
+        # not carry is the 19 Aug failure (see the intake list below).
+        lead = ("Letting the team know does NOT open a ticket. If you already "
+                "called notify_team and the address only arrives afterwards — "
+                "which is what an emergency looks like, because the person "
+                "comes before the address — that is the moment to call this.\n"
+                "A resident who wants to pay, asks how or where to pay, or wants a "
+                "payment arrangement gets a ticket too: type `payment`, their words, "
+                "their building and apartment. The team note (notify_team, reason "
+                "payment) goes as well; both happen, either order.\n"
+                # 16 Sep, the client's review. The webhook verifies the address
+                # on voice now, as on WhatsApp since 23 Aug (index.ts, the
+                # `!dialled(ctx)` gate), and answers with the same reasons; on a
+                # phone line the first miss may be the transcriber, so one
+                # re-ask before the refusal. The private-fault line is the
+                # owner's answer to "a dirty sink in a private apartment".
+                "It verifies the address itself, inside the same call: a building "
+                "Homies does not manage opens nothing, and the response says why "
+                "(building_found false, with reason street_unknown / "
+                "number_not_on_street plus numbers_we_manage / need_number / "
+                "need_building / ambiguous plus candidates). On a phone line a "
+                "street that does not resolve may have been misheard: ask for the "
+                "street once more, and if it still does not resolve, say in your "
+                "own words that Homies does not manage that building, and open "
+                "nothing. A house number the street does not have: say which "
+                "numbers on that street Homies manages, and ask. Never say a "
+                "ticket exists before this returns a reference.\n"
+                "A fault in the resident's own fixtures, a blocked sink, a tap, an "
+                "appliance inside the flat, is theirs and not a ticket; common "
+                "property, the building's systems, and anything of unclear origin "
+                "(a leak from above, water in a wall) is.\n")
     return _fn(
         "open_request",
+        lead +
         "Call when the resident raises a maintenance issue during the call, asks "
         "outright for a request to be opened, or accepts the offer of one. Wait for "
         "the reference this returns before telling them a request was opened. Say "
@@ -308,7 +359,8 @@ DEBT_TOOLS = [
     _fn(
         "log_call_outcome",
         "Call at the end of every single call without exception, including voicemail, "
-        "wrong party and no answer. Include the highest posture the call reached.",
+        "wrong party and no answer. Once: a second call on the same call is a "
+        "duplicate. Include the highest posture the call reached.",
         {
             "outcome": {
                 "type": "string",
@@ -319,7 +371,13 @@ DEBT_TOOLS = [
                 ],
             },
             "posture_reached": POSTURE,
-            "transfer_reason": {"type": "string", "enum": TRANSFER_REASONS},
+            # 16 Sep: the first offline run of the open fence logged
+            # `authorized` with a transfer_reason on a call that transferred
+            # nobody. A field with no gloss gets filled.
+            "transfer_reason": {"type": "string", "enum": TRANSFER_REASONS,
+                                "description": "Only when the outcome is transferred: "
+                                               "the reason you gave transfer_to_human. "
+                                               "Leave it out otherwise."},
         },
         ["outcome"],
     ),
@@ -337,6 +395,20 @@ DEBT_TOOLS = [
 # error; it just quietly records the wrong thing forever.
 INTAKE_TRANSFER_REASONS = [
     "out_of_scope", "emergency", "caller_request", "repeated_failure", "language",
+]
+
+# 14 Sep: the inbound agent no longer transfers; it NOTES a matter for its
+# team and keeps the call. The reasons name the matter, because the note is
+# what the team reads -- the WhatsApp bot's eight plus `language`, which
+# voice keeps for a caller it cannot understand. `out_of_scope` and
+# `repeated_failure` retired with the transfer; INTAKE_TRANSFER_REASONS stays
+# above for the record and for migration 021. `distress` stays out: the
+# server's emergency backstop keys on `emergency` alone. The Edge Function's
+# allow-list and migration 030's CHECK carry these words; when they drift,
+# every note is stored as caller_request without complaint (021's lesson).
+INTAKE_NOTE_REASONS = [
+    "payment", "billing", "move", "contract", "quote",
+    "emergency", "caller_request", "language", "other",
 ]
 
 # Six tools: four writes and two reads.
@@ -411,40 +483,106 @@ INTAKE_TOOLS = [
         # here costs the same three minutes every other async tool exists to
         # protect.
     ),
+    # 14 Sep: notify_team, in place of transfer_to_human. That one said "call
+    # after telling the caller a representative will get back to them ...
+    # close the call after calling it" -- a promise plus a hang-up, the
+    # opposite of staying with the caller. The name is a prompt: "transfer"
+    # primed a step-back; "notify" is what happens (the Edge Function aliases
+    # it onto the same handler). Async, like its predecessor: nothing in the
+    # reply is needed to speak the next sentence. Behind it, on the intake
+    # assistant only, the server posts the note into Chatwoot -- the same
+    # team mention the WhatsApp bot makes -- so "the team knows" is true.
     _fn(
-        "transfer_to_human",
-        "Call after telling the caller a representative will get back to them, never "
-        "before and never on its own. This hands the call to the office in writing; it "
-        "does not connect anyone to anyone, so do not say you are putting them through. "
-        "Close the call after calling it.",
+        "notify_team",
+        "Let the right Homies team know about something you cannot finish on this "
+        "call, and keep the call. This is not a transfer: nobody is connected, nobody "
+        "is put through, the caller stays with you, and the team reads the note in "
+        "its own time.\n"
+        "Call it the moment the caller's ask is past you: paying dues or arranging a "
+        "payment (that one is also a ticket, open_request with type `payment`; put "
+        "its number in this description when you have it), a charge they dispute, a "
+        "document they need (invoice, receipt, "
+        "confirmation), moving in or out or a change of tenant, a contract, a price "
+        "quote, the committee's own business, a request to speak with a person, a "
+        "caller you cannot understand and who cannot understand you (reason "
+        "`language`), or anything else only a person at Homies can complete. A plain "
+        "how-much-do-I-owe question is get_balance's; a fault is open_request's; a "
+        "ticket's status is get_request_status's. Those you do yourself.\n"
+        # 16 Sep, the client's review: no national numbers and no safety
+        # instructions from the bot. The note and the ticket are the whole
+        # response to an emergency, so they come first.
+        "Call it for a PERSON in a bad state, the moment you hear it, before "
+        "anything that can wait: "
+        "somebody shut in a lift, on a roof, in a stairwell or a car park; somebody "
+        "hurt, alone, frightened or panicking; anybody reporting gas, fire, "
+        "flooding, or water near electricity. Reason `emergency`. It does not open "
+        "the ticket and does not replace it: the ticket (open_request, urgency "
+        "emergency, as soon as you know where) and this both happen, and the "
+        "order between them does not matter.\n"
+        "CALL IT BEFORE the sentence that tells them the team knows. That sentence "
+        "must never be said without this call behind it: calling this is the only "
+        "thing that tells the team; saying that you told them tells nobody. Do not "
+        "ask them to confirm first; the ask itself is the reason to call.\n"
+        "Once per matter, not per turn: a second question about the same thing is "
+        "not a second note. A different matter later in the same call is. And if "
+        "they tell you afterwards how to reach them — a number, the building and "
+        "apartment — call it again with the same reason and that in the "
+        "description: the team sees the addition, nothing is duplicated.\n"
+        "What the caller hears from you afterwards: that you have let the team know, "
+        "in your own words, and what you can still do for them now. Never THAT they "
+        "will get back to them (you do not know; the team may handle it without a "
+        "call), never who, never when, never what the team will do, never that help "
+        "is on the way. Never the office phone unless they ask how to reach the "
+        "office. Never which team; `department` is your judgment and is not spoken. "
+        "This ends nothing: do not say goodbye on it.",
         {
-            "reason": {"type": "string", "enum": INTAKE_TRANSFER_REASONS},
-            # 20 Aug. These two exist for one case: `reason: emergency` where no
-            # request was opened first. The server writes the ticket the agent
-            # skipped, and without these it has nothing to write into it — a row
-            # saying only "an emergency happened somewhere" is barely better
-            # than the nothing it replaces.
-            #
-            # Optional in the schema and mandatory in the prompt, on purpose. A
-            # required field the model cannot fill is a tool call that never
-            # happens, and a transfer that does not happen is worse than a
-            # transfer with a thin description.
+            "reason": {
+                "type": "string",
+                "enum": INTAKE_NOTE_REASONS,
+                "description": (
+                    "payment = paying dues, a payment arrangement, instalments; "
+                    "billing = a disputed charge or a document they need; move = "
+                    "moving in or out, a change of tenant; contract = a contract; "
+                    "quote = a price quote; emergency = a person in danger; "
+                    "caller_request = they asked for a person; language = you and "
+                    "the caller do not share a language; other = anything else "
+                    "past you."
+                ),
+            },
+            # Required, as on WhatsApp: a note that says only `other` is
+            # unreadable, and gpt-4.1 fills free text reliably. If the probes
+            # ever show a missed call over this, the 20 Aug argument (a
+            # required field the model cannot fill is a call that never
+            # happens) is the fallback -- drop it to optional then, not before.
             "description": {
                 "type": "string",
                 "description": (
-                    "What was reported, in the caller's own words. Required when "
-                    "reason is `emergency`; leave out otherwise."
+                    "What the caller wants, in Hebrew, in their own words — and how "
+                    "to reach them, if they said it: a phone number in digits (tool "
+                    "arguments are never spoken; the words-only rule is for what you "
+                    "say), or the building and apartment. Send it every time. It is "
+                    "what the team reads, and a web call carries no caller number, so "
+                    "what you write here is the only way back to them."
                 ),
             },
-            "building": {
+            "department": {
                 "type": "string",
+                "enum": ["collections", "operations", "management", "service"],
                 "description": (
-                    "The building, if one was given. Only read when reason is "
-                    "`emergency` and no request was opened."
+                    "Which team should read this: collections = money, payments, "
+                    "receipts, debt; operations = faults, technicians, works, "
+                    "emergencies; management = complaints, contracts, quotes, "
+                    "moving, the committee; service = anything else, or when "
+                    "unsure. Leave it out and the reason picks the team."
                 ),
             },
+            # The address, when they gave it: it is who the Chatwoot contact
+            # is (voice:<building>/<unit>, so the same apartment calling twice
+            # lands on one thread), and on an emergency with no ticket yet it
+            # is what the server's backstop ticket is written against.
+            **LOCATION,
         },
-        ["reason"],
+        ["reason", "description"],
     ),
     _fn(
         "get_request_status",
@@ -485,7 +623,10 @@ INTAKE_TOOLS = [
         "Call when the caller asks how much is owed on an apartment, or whether the "
         "building fee is paid. Building and apartment identify them; a full name works "
         "if they offer one. Read the amount as words. You can read a balance and you "
-        "cannot touch one — paying, receipts and disputes are a person's job.",
+        "cannot touch one: read it if they asked how much, and then, if they want to "
+        "pay or arrange payments, that is a ticket (open_request, type `payment`) and "
+        "a team note (notify_team); a receipt or a dispute is a team note. Do not send "
+        "them to the office.",
         {
             "name": {
                 "type": "string",

@@ -86,11 +86,15 @@ stays forbidden — a question about a specific request is answered from
 cleaning is included gets *"כן, ניקיון כלול"*, not the whole list. The full
 list goes out only when it is asked for.
 
-**Doubt about responsibility is not resolved.** Common versus private property
-is sometimes obvious from the law and sometimes not. Where it is not perfectly
-clear, say it will be checked and hand it to a person. Getting this wrong costs
-a resident money, which is why the responsibility fact itself ends *in case of
-doubt, contact us*.
+**Responsibility, since 16 Sep (the client's review).** Common property and
+the building's systems — lift, stairwell, lighting, entrance door, main
+pipes, roof, intercom, garden — are Homies' and a ticket. The resident's own
+fixtures — a blocked sink, a tap, an appliance, painting inside the flat —
+are the resident's: the bot says so kindly, opens nothing, and offers to
+help with something else. A fault of unclear origin — a leak from above,
+water in a wall — is the building's to check, so a ticket. Getting this
+wrong costs a resident money, which is why doubt goes to a ticket and not
+to a guess.
 
 ---
 

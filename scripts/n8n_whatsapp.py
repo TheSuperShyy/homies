@@ -203,7 +203,55 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 19
+MEMORY_EPOCH = 27
+# 26 -> 27, 16 Sep: the client's review. The national numbers left the
+# prompt (no numbers, no safety advice: an emergency is the ticket and
+# the note, at once), a fault inside the resident's own flat is theirs
+# and not a ticket, and the notify_team / open_request texts moved with
+# it. Old buffers carry "call 101 first" answers and sink tickets.
+# 25 -> 26, 15 Sep evening: the owner's screenshot of the "something
+# else" tap answered with a bare "how can I help you?" -- the one tap
+# clause the tone pass never touched still said "one question, what is
+# it about", and the model read it literally. It invites now, like the
+# other taps.
+# 24 -> 25, 15 Sep, twenty minutes later: the first live probe of 24 had
+# the bot asking for a full name and phone before a payment ticket --
+# get_balance's identity rule read as the ticket's. The open_request
+# text now says a payment ticket needs the building and apartment and
+# nothing else. Tools hash moved, so the epoch moves.
+# 23 -> 24, 15 Sep: wanting to pay is a ticket too (migration 031, type
+# payment), beside the team note. Prompt sentence + three tool texts
+# (open_request, notify_team, get_balance). Old buffers show a note-only
+# answer to "I want to pay", which is exactly the demonstration to drop.
+# 22 -> 23, 14 Sep evening: the owner found the menu tap answered with a
+# bare "what happened?" and asked for a word of concern first, in the
+# bot's own words, plus a situational emoji. The prompt now puts a floor
+# in the one-question paragraph (a short word about the thing, sized to
+# it, never an announcement, never in place of the tool), drops the
+# literal from the tap paragraph, and allows one emoji sometimes. Old
+# buffers are full of two-word questions with no word before them.
+# 21 -> 22, 14 Sep, an hour later, off the first probes of 21 (execs
+# 40747-40766): the model called notify_team once in five and WROTE that
+# it had told the team the other four times, promising a call-back in
+# three of them. So the prompt now says that saying is not doing (the
+# tool is what tells the team; the sentence without it is a lie), that
+# the sentence ends at "the team knows" because what happens next is
+# unknown, that nobody is asked to confirm first, that no help is "sent"
+# in an emergency, and that a declined ticket is not argued for. The
+# backstop regex learned the intent and call-back shapes.
+# 20 -> 21, 14 Sep: "I've let the team know", and it is true. The prompt's
+# "you handle it; office matters are the office's, here is the phone"
+# paragraph became "you note it for the right team and keep going; office
+# details only when asked; never who or when"; transfer_to_human came
+# back as notify_team with matter-shaped reasons. Every buffer older than
+# this holds the bot ending a dues question with a phone number, which is
+# the dead end the owner asked to remove.
+# 19 -> 20, 13 Sep: nothing pages a person. The prompt's "one service,
+# transfers between us" paragraph became "you handle it; office matters
+# are the office's, with its details; promise nobody a call", the third
+# button became משהו אחר, and show_menu stopped offering a person. Every
+# buffer older than this holds the bot announcing handovers that no
+# longer happen -- the exact example that would beat the new rule.
 # 17 -> 18, 3 Sep: the handover became real. transfer_to_human gained a
 # `department` argument and its description stopped saying routing does not
 # exist; the prompt's matching sentence went; the injected template carries
@@ -248,15 +296,15 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "da25152507cd",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "7b69a5899131",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "prompt": "042aa9037633",   # docs/features/11-whatsapp-bot/prompt.md
+    "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "0cd6baa8cdea",
+    "tools": "cad01d21dea0",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -420,8 +468,14 @@ MENU = {
                  "description": "מה קורה עם קריאה שכבר נפתחה"},
                 {"id": "balance", "title": "יתרה ותשלומים",
                  "description": "יתרה, חוב, קבלה, אמצעי תשלום"},
-                {"id": "human", "title": "לדבר עם נציג",
-                 "description": "הצוות יחזור בהקדם"},
+                # 13 Sep: "לדבר עם נציג" became "משהו אחר". Nothing pages a
+                # person from WhatsApp any more (owner's call; see
+                # n8n_whatsapp_nopage.py). This copy is the pre-Chatwoot
+                # shape and is dead for the menu -- the live one is
+                # Chatwoot-shaped inside Sort -- but it must not carry a
+                # title that no longer exists anywhere.
+                {"id": "other", "title": "משהו אחר",
+                 "description": "לא מצאתם את המקרה שלכם ברשימה"},
             ]}],
         },
     },
@@ -830,10 +884,20 @@ TOOLS = [
             # location" with no call to anything. The model believed the matter
             # was already handled, and the address is exactly the fact it had
             # been waiting for.
-            "Handing the conversation to a person does NOT open a ticket. If "
-            "you already transferred and the address only arrives afterwards — "
+            "Letting the team know does NOT open a ticket. If you already "
+            "called notify_team and the address only arrives afterwards — "
             "which is what an emergency looks like, because the person comes "
             "before the address — that is the moment to call this.\n"
+            # 15 Sep, owner: wanting to pay is a ticket too, beside the note
+            # (migration 031). The gloss on `type` keeps a how-much question
+            # out of it.
+            "A resident who wants to pay, asks how or where to pay, or wants a "
+            "payment arrangement gets a ticket too: type payment, their words, "
+            "their building and apartment. That is all it needs, the same as "
+            "any ticket: the full-name-and-phone identity check belongs to "
+            "get_balance, for reading a balance, and is not part of opening "
+            "this. The team note (notify_team, reason payment) goes as well; "
+            "both happen, either order.\n"
             "Open a maintenance or service ticket. Call it as soon as you "
             "know WHAT is wrong and WHERE — it verifies the address itself, "
             "inside the same call: a building Homies does not manage opens "
@@ -881,7 +945,17 @@ TOOLS = [
                     "enum": ["plumbing", "electrical", "lighting", "elevator",
                              "cleaning", "gardening", "pest_control",
                              "locksmith", "fire_safety", "maintenance",
-                             "other", "complaint"],
+                             "other", "complaint", "payment"],
+                    # 15 Sep: `payment` is ours (migration 031), and the
+                    # gloss is the whole difference between "I want to pay"
+                    # (a ticket) and "how much do I owe" (get_balance).
+                    "description": "The eleven building categories are faults; "
+                                   "complaint is a person's account of something; "
+                                   "payment is a resident who wants to pay, asks "
+                                   "how or where to pay, or wants a payment "
+                                   "arrangement. A question about how much is "
+                                   "owed is not a payment ticket, that is "
+                                   "get_balance.",
                 },
                 "building": {"type": "string", "description": "Street and number."},
                 # Two apartment fields, because there are two facts and they are
@@ -905,10 +979,18 @@ TOOLS = [
                 "fault_location": {
                     "type": "string",
                     "enum": ["apartment", "common"],
+                    # 16 Sep, the client's review ("a dirty sink in a private
+                    # apartment is not a ticket"): the gloss now says which
+                    # in-flat faults are the building's and which are the
+                    # resident's own. The prompt carries the same line.
                     "description": "Where the FAULT is, not where they live. "
-                                   "'apartment' for a leak in their kitchen; "
+                                   "'apartment' for a building-caused fault that "
+                                   "shows inside a flat: a leak from the riser or "
+                                   "the flat above, a blocked main stack; "
                                    "'common' for a lift, lobby, stairwell, "
-                                   "roof, car park, gate or yard.",
+                                   "roof, car park, gate or yard. A resident's own "
+                                   "fixtures, a blocked sink, a tap, an appliance, "
+                                   "are theirs and not a ticket at all.",
                 },
                 "urgency": {
                     "type": "string",
@@ -993,141 +1075,111 @@ TOOLS = [
         },
     },
     {
-        "name": "transfer_to_human",
+        # `notify_team`, since 14 Sep. Until 13 Sep this was `transfer_to_human`:
+        # "hand this conversation to a person", called for money disputes,
+        # anger, a request for a person, and "whenever unsure". On 13 Sep the
+        # owner took every paging path out ("the bot won't turn off but would
+        # mention the office"), and on 14 Sep refined it: the bot is 100% of
+        # customer support; past its threshold it must not dead-end the
+        # resident on a phone number, it says "I'll let the right team know"
+        # -- and a Chatwoot mention "like regular" is what makes that true.
+        # Same wire as feature 16 (a private note that @mentions the team),
+        # new words: the bot NOTES a matter for its own team and keeps the
+        # conversation. It never says who will call or when.
+        #
+        # The name is a prompt. "transfer" primed the model to step back and
+        # announce a handover; "notify" is what actually happens. The jsonBody
+        # still calls the debt-tools handler by its old name -- that handler is
+        # the voice agents' too and writes the call_outcomes row and the
+        # emergency ticket backstop. tools_text() hashes this list; see
+        # EPOCH_COVERS.
+        "name": "notify_team",
         "description": (
-            # Widened 31 Aug, when the prompt's emergency protocol was deleted
-            # with the rest of the scripting. Measured before the change: zero
-            # transfers in six runs for somebody shut in a lift or reporting
-            # gas. The owner's call was to put it here rather than back in the
-            # prompt, which is also the safer home for it — tool descriptions
-            # are English and the bot writes Hebrew, so there is no sentence in
-            # here for it to recite.
-            "Hand this conversation to a person. CALL THIS BEFORE the reply "
-            "that tells them their message is going to somebody — that "
-            "sentence must never be written without this call behind it, "
-            "because it is a promise made to somebody who may be in danger.\n"
-            # Rewritten 1 Sep. The old wording said "before your reply, never
-            # after", which the model read as "on every reply", so a four-turn
-            # fire conversation called it four times and announced the same
-            # handover four times, once saying it was transferring them again.
-            "You only hand a conversation over once. After that call the "
-            "handover exists and stays true: do not call this again in the "
-            "same conversation, and do not tell them a second time. Later "
-            "messages are for what is actually new.\n"
-# Bounded 2 Sep, layer audit: "whenever money, debt ... come up" and
-            # get_balance's "asks about their balance, their debt" both claimed
-            # the same plain balance question, and which tool answered it was a
-            # coin flip. Transfer keeps money in motion or in dispute; the
-            # lookup keeps the lookup.
-            "Call it whenever money is in motion or in dispute — payment "
-            "details, receipts, a claim that a bill or a balance is wrong. A "
-            "plain how-much-do-I-owe question is get_balance's, not yours. "
-            "Call it when the resident asks for a person, or is angry; and "
-            "whenever you are simply not sure — being unsure is reason enough "
-            "on its own.\n"
-            "And call it for a PERSON in a bad state, as opposed to a thing "
-            "that broke: somebody shut in a lift, on a roof, in a stairwell "
-            "or a car park; somebody hurt, alone, frightened or panicking; "
-            "anybody reporting gas, fire, flooding, or water near "
-            "electricity. A burst pipe is a ticket. A person who cannot get "
-            "out is this, and it happens first — before you ask where they "
-            "live, before anything else.\n"
-            # "If a message contains both, this one wins" used to close that
-            # paragraph, and it cost a real conversation on 1 Sep: somebody
-            # fallen on the stairs, five turns, a handover, and no ticket. The
-            # model read it as the transfer REPLACING the ticket, which is what
-            # it says. It was written to fix zero transfers in six runs and it
-            # over-corrected.
-            #
-            # The instruction to go back and open the ticket lives in
-            # `open_request`, not here. Put here first, and it did nothing: the
-            # address arrives two turns after the handover, and this text is
-            # what the model reads at the moment it decides to transfer, not at
-            # the moment it learns where they are. Same placement rule that
-            # moved the department-representative wording INTO this description
-            # on 31 Aug, applied in the other direction.
-            "Handing over does not open a ticket and does not replace one.\n"
-            # The owner's correction, 31 Aug: they are department
-            # representatives, not "a human representative". Put here rather
-            # than in the prompt because a bullet in the prompt's facts list
-            # did not displace the model's default — the tool description is
-            # what it reads at the moment it decides to hand over. The Hebrew
-            # term is given because that is the word it has to produce.
-            "Whoever picks it up is one of Homies' department "
-            "representatives. In Hebrew that is נציג מחלקה, or simply הצוות — "
-            "use one of those when you tell the resident where their message "
-            # 3 Sep: routing exists now. The handover pages the department's
-            # team in Chatwoot, and `department` is the model's call. What the
-            # resident hears does not change: the team has it, no department
-            # named -- the owner's rule from 31 Aug, kept on purpose.
-            "went. Choose `department` by judgment; the resident is still "
-            "never told which department it went to, only that the team has "
-            "it.\n"
-            # Added 1 Sep: on a four-turn gas-then-fire conversation this was
-            # called on every turn, and the bot announced the same handover
-            # four times -- once even saying it was transferring them "again".
-            "Call it again only if something genuinely new appears that the "
-            "first handover did not cover."
+            "Let the right Homies team know about something you cannot finish "
+            "yourself, and keep the conversation. This is not a transfer: you "
+            "stay the one talking to the resident, and the team reads the note "
+            "in its own time.\n"
+            "Call it the moment the resident's ask is past your threshold: "
+            "paying dues or arranging payments (that one is also a ticket, "
+            "open_request with type payment; put its number in this "
+            "description when you have it), a bill they dispute, a document "
+            "they need (invoice, receipt, confirmation), moving in or out or a "
+            "change of tenant, a contract, a price quote, the committee's own "
+            "business, a request to speak with a person, or anything else that "
+            "only a person at Homies can complete. A plain how-much-do-I-owe "
+            "question is get_balance's; a fault is open_request's; a ticket's "
+            "status is get_request_status's. Those you do yourself.\n"
+            # 16 Sep, the client's review: no national numbers and no safety
+            # instructions from the bot. The note and the ticket are the
+            # whole response to an emergency, so they come first.
+            "Call it for a PERSON in a bad state, the moment you hear it, "
+            "before anything that can wait: somebody shut in a lift, on a roof, in a "
+            "stairwell or a car park; somebody hurt, alone, frightened or "
+            "panicking; anybody reporting gas, fire, flooding, or water near "
+            "electricity. Reason `emergency`. It does not open the ticket and "
+            "does not replace it; go on and open the ticket too.\n"
+            "CALL IT BEFORE the reply that tells them the team knows. That "
+            "sentence must never be written without this call behind it: "
+            "calling this is the only thing that tells the team; writing "
+            "that you told them tells nobody. Do not ask them to confirm "
+            "first; the ask itself is the reason to call.\n"
+            "Once per matter, not per message: a second question about the same "
+            "thing is not a second note. A different matter later in the same "
+            "conversation is.\n"
+            "What the resident hears from you afterwards: that you have let the "
+            "team know, in your own words, and what you can still do for them "
+            "now. Never who will get back to them, never when, never a promise "
+            "of what the team will do. Never the office phone unless they ask "
+            "how to reach the office. Never which department; `department` is "
+            "your judgment and is not spoken."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                # `distress` REMOVED 1 Sep, and it is the whole reason an
-                # emergency left no record.
-                #
-                # A resident reported somebody fallen on the stairs and wrote
-                # "send help". The model handed over with reason `distress`,
-                # which is the honest English word for it and a perfectly valid
-                # value — the Edge Function stores it without complaint. But the
-                # emergency backstop in debt-tools, the thing that writes a
-                # `needs_review` ticket when a handover happens and no request
-                # was opened, is scoped to `reason === "emergency"` alone. So
-                # the one transfer reason that best describes a person in
-                # trouble was also the one that routed them around the net
-                # built for them. `requests` ended the conversation empty.
-                #
-                # Not widened at the Edge Function instead, deliberately: the
-                # voice debt agent sends `distress` for someone upset about
-                # money, and minting an emergency ticket for every distressed
-                # debtor would be worse than the bug. This tool is the WhatsApp
-                # bot's alone, and on WhatsApp a person in distress IS the
-                # emergency case, so the fix is to stop offering the word here.
-                # scripts/vapi_tools.py is untouched.
+                # The reasons name the MATTER, because the note is what the
+                # team reads. `distress` stays out (1 Sep): the debt-tools
+                # backstop writes its needs_review ticket for `emergency` only,
+                # and on WhatsApp a person in distress IS the emergency case.
                 "reason": {
                     "type": "string",
-                    "enum": ["out_of_scope", "emergency", "caller_request",
-                             "not_understood"],
+                    "enum": ["payment", "billing", "move", "contract", "quote",
+                             "emergency", "caller_request", "other"],
+                    "description": "payment = paying dues, a payment "
+                                   "arrangement, instalments; billing = a "
+                                   "disputed charge or a document they need; "
+                                   "move = moving in or out, a change of "
+                                   "tenant; contract = a contract; quote = a "
+                                   "price quote; emergency = a person in "
+                                   "danger; caller_request = they asked for a "
+                                   "person; other = anything else past you.",
                 },
-                # ADDED 1 Sep, so the backstop's row is readable. It writes
-                # `args.description` and falls back to a sentence saying the
-                # call recording is the only account — which on WhatsApp is
-                # false twice over: there is no call and there is no recording.
-                # The transcript exists, but nobody reading a `needs_review`
-                # queue knows to go and find it.
+                # ADDED 1 Sep, so the note (and the backstop's row) is readable.
                 "description": {
                     "type": "string",
-                    "description": "What was reported, in Hebrew, in the "
-                                   "resident's own words. Send it every time: "
-                                   "on an emergency this is the only account "
-                                   "of what happened that reaches the team.",
+                    "description": "What the resident wants, in Hebrew, in "
+                                   "their own words. Send it every time: it is "
+                                   "what the team reads, and on an emergency "
+                                   "it is the only account that reaches them.",
                 },
-                # ADDED 3 Sep, with the Chatwoot handover. Which of the four
-                # teams gets paged. The model decides from what the resident
-                # said -- no keyword table anywhere, the owner's rule -- and
-                # the sub-workflow falls back to Service when this is missing
-                # or not one of the four. Never spoken to the resident.
+                # Which of the four teams gets the note. The model decides
+                # from what the resident said -- no keyword table, the
+                # owner's rule -- and the sub-workflow fills a default from
+                # the reason when this is missing or not one of the four.
+                # Never spoken to the resident.
                 "department": {
                     "type": "string",
                     "enum": ["collections", "operations", "management", "service"],
-                    "description": "Which team should pick this up: "
+                    "description": "Which team should read this: "
                                    "collections = money, payments, receipts, "
                                    "debt; operations = faults, technicians, "
                                    "works, emergencies; management = "
-                                   "complaints, contracts, the committee; "
-                                   "service = anything else, or when unsure.",
+                                   "complaints, contracts, quotes, moving, "
+                                   "the committee; service = anything else, "
+                                   "or when unsure. Leave it out and the "
+                                   "reason picks the team.",
                 },
             },
-            "required": ["reason"],
+            "required": ["reason", "description"],
         },
     },
     {
@@ -1151,9 +1203,10 @@ TOOLS = [
             "ask which apartment or whether they mean a specific one. Returns "
             "the resident's name, apartment, total owed and the unpaid months, or "
             "`identity_failed` when the name and the number do not belong to "
-            "the same resident. Read-only — it cannot take a payment; anyone "
-            "who wants to actually pay, needs a receipt or disputes an amount "
-            "goes to the team."
+            "the same resident. Read-only — it cannot take a payment. Anyone "
+            "who wants to actually pay or arrange payments gets a ticket "
+            "(open_request, type payment) and a team note (notify_team); a "
+            "receipt or a disputed amount is a team note."
         ),
         "input_schema": {
             "type": "object",
@@ -1187,7 +1240,7 @@ TOOLS = [
         "name": "show_menu",
         "description": (
             "Shows the resident the standard options list — open a service "
-            "ticket, check an existing one, talk to a person — attached by "
+            "ticket, check an existing one, something else — attached by "
             "the system underneath your NEXT message. "
             "Use it whenever the resident does not know what they want, asks "
             "what you can do, or the conversation would stall with nothing "
@@ -1919,7 +1972,8 @@ def workflow(e):
                         "description: %s, type: %s, building: %s, reporter_unit: %s,"
                         " fault_location: %s, urgency: %s" % (
                             from_ai("description", tool("open_request")["input_schema"]["properties"]["description"]["description"]),
-                            from_ai("type", "One of " + "/".join(tool("open_request")["input_schema"]["properties"]["type"]["enum"])),
+                            from_ai("type", (tool("open_request")["input_schema"]["properties"]["type"].get("description", "") + " ").lstrip()
+                                    + "One of " + "/".join(tool("open_request")["input_schema"]["properties"]["type"]["enum"])),
                             from_ai("building", "Street and number, as the resident wrote it. The whole sentence is fine; this tool checks it."),
                             # `unit` is deliberately NOT offered to the model.
                             # The server derives it from these two, so there is
@@ -1938,8 +1992,11 @@ def workflow(e):
                     "toolDescription": tool("open_request")["description"],
                 },
             ),
+            # The node name is what the model calls; the function name inside
+            # the body is what debt-tools dispatches on, and that handler is
+            # shared with the voice agents, so it keeps its old name.
             node(
-                id="tool_transfer", name="transfer_to_human",
+                id="tool_transfer", name="notify_team",
                 type="n8n-nodes-base.httpRequestTool",
                 typeVersion=4.2, position=[1680, 420],
                 parameters={
@@ -1950,24 +2007,24 @@ def workflow(e):
                         "transfer_to_human",
                         ", ".join((
                             "reason: %s" % from_ai(
-                                "reason", "Use emergency for a person in a bad "
-                                "state — hurt, trapped, frightened, or "
-                                "reporting gas, fire or flooding. One of "
-                                + "/".join(tool("transfer_to_human")
-                                           ["input_schema"]["properties"]["reason"]["enum"])),
+                                "reason",
+                                tool("notify_team")["input_schema"]["properties"]["reason"]["description"]
+                                + " One of "
+                                + "/".join(tool("notify_team")
+                                           ["input_schema"]["properties"]["reason"]["enum"]) + "."),
                             "description: %s" % from_ai(
                                 "description",
-                                tool("transfer_to_human")["input_schema"]
+                                tool("notify_team")["input_schema"]
                                 ["properties"]["description"]["description"]),
                             "department: %s" % from_ai(
                                 "department",
-                                tool("transfer_to_human")["input_schema"]
+                                tool("notify_team")["input_schema"]
                                 ["properties"]["department"]["description"]),
                         )),
                     ),
                     "options": {"timeout": 25000},
                     "descriptionType": "manual",
-                    "toolDescription": tool("transfer_to_human")["description"],
+                    "toolDescription": tool("notify_team")["description"],
                 },
             ),
             # The one tool that skips the n8n router. The router answers Vapi
@@ -2400,7 +2457,7 @@ def workflow(e):
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "get_request_status": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
-            "transfer_to_human": {"ai_tool": [[
+            "notify_team": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "get_balance": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},

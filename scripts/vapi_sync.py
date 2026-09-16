@@ -278,7 +278,9 @@ BASE = {
         # The last thing they hear is now a goodbye rather than nothing. This is
         # the other half of the same complaint: a line that closes on a timeout
         # closes in silence, and the caller cannot tell a hangup from a fault.
-        "silenceTimeoutMessage": "נראה שאין קליטה. תודה שהתקשרת להומיז, יום טוב, ולהתראות.",
+        # Plural since 16 Sep, like every other line here: the caller's gender
+        # is unknown and this is spoken to half of them wrongly otherwise.
+        "silenceTimeoutMessage": "נראה שאין קליטה. תודה שהתקשרתם להומיז, יום טוב, ולהתראות.",
     },
 }
 
@@ -586,7 +588,24 @@ TARGETS = {
             # sounded broken. Chosen by the owner over dialling gpt-5.2's
             # reasoning effort down. If the Hebrew or the negotiation audibly
             # worsens, that untried option is the first thing to reach for.
-            "model": {"provider": "openai", "model": "gpt-4.1"},
+            # GPT-5.6-SOL SINCE 15 SEP, AND IT IS THE OWNER'S, NOT THIS FILE'S.
+            # Found on a read-back on 16 Sep: the live assistant carried
+            # `gpt-5.6-sol` while this file still said gpt-4.1, so a routine
+            # sync would have reverted a deliberate choice nothing recorded.
+            # Asked, the owner kept it: "retain the llm model but change
+            # according to the feedback on the behaviour". So the model is
+            # pinned here to what is live, and the 16 Sep change is the prompt
+            # alone.
+            #
+            # THAT ALSO CHANGES WHAT THE 26 AUG NOTE BELOW MEANS. It argued
+            # gpt-5.2 -> gpt-4.1 on seconds: a reasoning model spent ~3.9s of a
+            # 5.3s turn. The 54k rulebook it was reasoning over is gone (the
+            # fence is ~3.4k now), so the trade is not the same trade, and the
+            # only way to know is vapi_latency.py on a real call. If the gaps
+            # come back, that note is the argument for dropping the model again
+            # -- and it is a decision for the owner, who has now made the
+            # opposite one once.
+            "model": {"provider": "openai", "model": "gpt-5.6-sol"},
         },
         # "Echo Stone" — this agent takes a cloned voice when one exists. See
         # cloned_voice() below. The debt agent and not the inbound one because
@@ -896,6 +915,16 @@ def cartesia_voice(vid, fallback):
         "experimentalControls": {
             "emotion": [os.environ.get("CARTESIA_EMOTION", "positivity:low").strip()],
         },
+        # VOLUME, ADDED 15 SEP. The owner heard the agent "a bit too low" on a
+        # call, and the voice had no level set at all -- Cartesia's default gain
+        # of 1. Vapi's CartesiaGenerationConfig carries `volume` 0.5-2.0 (and
+        # `speed` 0.6-1.5, left at its default here) for the sonic-3 family,
+        # which sonic-3.5 is. 1.4 is roughly +3 dB: a step, not a shout. The
+        # right number is a judgement by ear, so it is one value in .env:
+        #     CARTESIA_VOLUME=1.7 python scripts/vapi_set_voice.py --apply
+        "generationConfig": {
+            "volume": float(os.environ.get("CARTESIA_VOLUME", "1.4").strip() or "1.4"),
+        },
         # sonic-3.6 by default since 31 Aug, and the default matters: this is
         # what a fresh clone of the repo sends to a live agent when .env is thin.
         # sonic-3.6 is Cartesia's current model and the only one that reads a
@@ -907,7 +936,11 @@ def cartesia_voice(vid, fallback):
         # multilingual voice reads Hebrew text as though it were English.
         "language": "he",
     })
-    voice["fallbackPlan"] = {"voices": [dict(fallback, provider="vapi")]}
+    # The fallback carries the same guard as the primary. Found 15 Sep: the debt
+    # assistant's Elliot fallback had the 27 replacements live, and a bare
+    # `dict(fallback)` here silently dropped them on the volume PATCH -- so an
+    # Elliot call would have read tool names aloud. Same object, same guard.
+    voice["fallbackPlan"] = {"voices": [voice_with_guard(dict(fallback, provider="vapi"))]}
     return voice
 
 

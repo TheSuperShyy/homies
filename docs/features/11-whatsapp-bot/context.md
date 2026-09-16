@@ -156,6 +156,100 @@ No error and no reply. **The test that catches it is posting a message envelope
 at the live URL; the test that does not is the verification handshake, which is
 the one everybody runs.**
 
+## The incumbent bot, seen live on 10 Sep
+
+The owner reached Homies' real WhatsApp number from his own handset and found
+the bot PRD item 3 calls "ManageChat" — a ManyChat router — still answering
+on it. Recorded here verbatim because it is what every Homies resident has
+been trained on, and because that number is already on Meta's Cloud API
+through it (Meta delivers to one callback URL, so taking the number over is
+a hard switch with no parallel run, and needs whoever holds the "office
+homies" Meta account).
+
+Greeting: `היי! איזה כיף שפניתם אלינו! לפניכם נתב שיחות 🔀, איך נוכל לעזור?`
+with one button, `לחצו כאן להמשך`, opening six rows:
+תשלום ועד בית/גביה 💰 · הנהלת חשבונות 📋 · קריאת שירות 🙋 · הצעת מחיר 🤝 ·
+אב הבית 👷 · מעבר לנציג 🔀. A tap echoes the choice and runs a form:
+*על מנת שנוכל לפתוח את הקריאה כראוי - ענו בבקשה על השאלות הבאות* →
+*מהו שמכם המלא?* A menu tree, not a conversation, and the thing the PRD's
+"must not feel robotic" line is about.
+
+What it changed here: the prompt's facts list gained אב הבית and הצעת מחיר
+(the two categories we had nothing for) and the office's own matters. What
+it did not change: the menu stays at three buttons. **Chatwoot builds the
+WhatsApp payload, not us** (`base_service.rb:99` on the VPS): three items
+or fewer are reply buttons, four or more become a list whose wrapper button
+is the account-locale string — account 2 is `en`, so it reads "Choose an
+item"; Chatwoot's `he.yml` has `בחר פריט`. Descriptions are dropped on both
+shapes, and the inbound tap carries only the row's **title**, which is why
+the titles are the routing table (`TAP_KIND` in the live `Sort`). Whether to
+flip the account to Hebrew for a seven-row list is open with the owner.
+
+## 16 Sep — the client's review: no numbers, no advice; a private fault is theirs
+
+Yariv's review asked for three guardrails and the owner chose the sharp
+form of each: no national numbers and no safety instructions at all (an
+emergency is the ticket and the team, at once, and the bot says that even
+when asked directly what to do now); a fault in the resident's own flat is
+theirs, no ticket, said kindly; only managed buildings (chat has refused
+since 23 Aug; voice joins it). The facts row with the four numbers left the
+prompt, the `fault_location` gloss carries the private/common line, and
+`notify_team` fires "the moment you hear it". Learned on the way: a
+prohibition on instructions does not cover the direct question; naming the
+question fixed it 3/3 offline. Epoch 27. Not pushed at the time of
+writing.
+
+## 15 Sep — wanting to pay is a ticket too
+
+The owner asked for a ticket whenever a resident wants to pay, beside the
+team note. The decision that mattered was the shape: ticket + note, for
+wanting to pay only, not for disputes or documents. The type is ours
+(`payment`, migration 031, label תשלום) and the dashboard shows the slug as
+it shows every slug. The bot learns it from one sentence in the durability
+paragraph and from the tool texts; the surprise was that `get_balance`'s
+identity rule (name + phone) was read as the ticket's until `open_request`
+said what a payment ticket needs. The live tool descriptions have their
+own patcher now, `n8n_whatsapp_payment.py`, because nothing else could
+ship them. Epoch 25.
+
+## 14 Sep, evening — a word for the person first; one emoji sometimes
+
+The owner found the menu tap answered with a bare `מה קרה?` and asked for
+concern first, in the bot's own words, plus a situational emoji. Why it
+was bare: the model wrote it under a prompt whose every register rule was
+a cap. The decision was where to put a floor, and the answer was the block
+that owns the caps, so nothing outvotes it. The price paid on the way:
+pass one's floor made the model answer with words instead of the tool on a
+typed complaint, inventing a reference twice; "the tool first, the words
+after" is part of the floor now, not a separate rule. The emoji is placed
+by moment (sorted, goodbye, a resident who writes that way), which in
+practice means goodbyes. Epoch 23. See `prompt.md` and the WORKLOG.
+
+## 14 Sep — the bot is the whole desk, and "I've let the team know" is true
+
+The owner's refinement of the day before: cut the office's workload; the bot
+is 100% of customer support; past its threshold it must not dead-end a
+resident on a phone number but say it has let the right team know — with a
+Chatwoot mention behind it ("like regular"). `notify_team` replaced
+`transfer_to_human` (feature 16's wire, new words), the threshold cases are
+noted for a team with matter-shaped reasons, office details only if asked,
+emergencies never end on the office line. Epoch 20 → 22 in one day: the
+second bump because the model wrote "I've told the team" without the tool
+and promised call-backs, and the prompt had to say that saying is not doing.
+The decline ("I don't want a ticket, just so you know") is respected since
+the same edit — it was argued with on 13 Sep and 14 Sep before it.
+
+## 13 Sep — the bot is the rep
+
+Owner's direction: fewer office–tenant interactions; the bot handles what it
+can, opens a ticket where it can, and for office matters (payment
+arrangements, disputed bills, moving in or out, contracts, the committee)
+says the office handles it and gives its details. Nobody is paged, not even
+for an emergency — asked directly, he chose office details for those too,
+with the after-hours cost in front of him. A real person replying still
+silences the bot. The third button became **משהו אחר**; the paging machinery
+came out (`scripts/n8n_whatsapp_nopage.py`, feature 16). Epoch 19 → 20.
+
 ## Still open
 
 - **The model key exists and is out of credit.** `.env` had Vapi, Cartesia, n8n,

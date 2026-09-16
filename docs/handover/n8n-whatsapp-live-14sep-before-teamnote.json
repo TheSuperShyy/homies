@@ -1,0 +1,2328 @@
+{
+ "updatedAt": "2026-09-13T07:32:17.207Z",
+ "createdAt": "2026-08-08T09:40:05.958Z",
+ "id": "u2JjrbcNPYyyh3yl",
+ "name": "Homies — WhatsApp bot",
+ "description": null,
+ "active": true,
+ "isArchived": false,
+ "nodes": [
+  {
+   "parameters": {
+    "multipleMethods": true,
+    "path": "homies-whatsapp",
+    "responseMode": "responseNode",
+    "options": {
+     "rawBody": true
+    }
+   },
+   "typeVersion": 2,
+   "id": "webhook",
+   "name": "WhatsApp",
+   "type": "n8n-nodes-base.webhook",
+   "position": [
+    -512,
+    -80
+   ],
+   "webhookId": "homies-whatsapp-v1"
+  },
+  {
+   "parameters": {
+    "jsCode": "\n// Chatwoot posts here now, not Meta. One item, one event.\nconst item = $input.first().json;\nconst q    = item.query   || {};\nconst body = item.body    || {};\n\nconst SHARED = \"REPLACE_WITH_N8N_WEBHOOK_SECRET\";\n\n// --- Is this actually from Chatwoot? --------------------------------------\n// Chatwoot DOES sign its webhooks (X-Chatwoot-Signature, HMAC-SHA256 over\n// `${timestamp}.${body}`), but verifying that here is not currently possible:\n// require('crypto') throws \"Module 'crypto' is disallowed\" in this task-runner\n// sandbox, and the Crypto node cannot prepend a timestamp to the RAW bytes -\n// re-serialising the parsed body does not reproduce them. So the door is a\n// secret in the query string, which the agent bot's outgoing_url carries.\n//\n// Fails CLOSED, and answers 200 either way: a caller who is not Chatwoot must\n// learn nothing from the response.\nif (String(q.s || '') !== SHARED) {\n  return [{ json: { _reply: '', _work: false, _rejected: 'bad secret' } }];\n}\n\n// --- Which events are ours ------------------------------------------------\n// Everything on this inbox arrives at this one URL: message_created,\n// message_updated, conversation_status_changed, and the bot's OWN outgoing\n// messages. Answering that last one is an infinite loop.\nif (body.event !== 'message_created') {\n  return [{ json: { _reply: '', _work: false } }];\n}\n// --- A human replied: that IS the takeover --------------------------------\n// Chatwoot does not assign a conversation to the agent who answers it (its\n// self_assign? is only a notification check), so an agent who replied and\n// walked away would still have the bot talking over them. The workflow closes\n// that gap: a public reply from a person assigns them the conversation, which\n// trips the switch above on the resident's next message, and the 15-minute\n// handback takes it from there.\n//\n// The bot's own replies arrive here too, as sender.type 'agent_bot' -- claiming\n// on those would assign the bot's messages to nobody and loop. Private notes\n// are excluded on purpose: writing an internal note is not claiming.\nif (body.message_type === 'outgoing'\n    && body.private !== true\n    && (body.sender || {}).type === 'user') {\n  return [{ json: { _reply: '', _work: false, _claim: true,\n                    conv_id: (body.conversation || {}).id,\n                    claim_user: (body.sender || {}).id } }];\n}\n\nif (body.message_type !== 'incoming' || body.private === true) {\n  return [{ json: { _reply: '', _work: false } }];\n}\n\nconst conv   = body.conversation || {};\nconst convId = conv.id;\n\n// --- The on/off switch ----------------------------------------------------\n// The bot answers by DEFAULT. Three things turn it off, for one conversation\n// and no other, and every one of them is a visible act in the inbox rather\n// than a hidden flag an agent cannot see:\n//\n//   assigned to somebody  - taking a conversation is taking it over\n//   labelled `bot-off`    - the explicit switch: one click, shows as a chip\n//   resolved              - the conversation is finished\n//\n// `status === 'pending'` was the signal until 21 Aug and it was the wrong one.\n// It is Chatwoot's bot-owned state, and the default conversation list HIDES it,\n// so every thread the bot was working was invisible and the inbox read as\n// empty. The rule below is the same capability aimed at something an agent can\n// actually see and click.\n//\n// Auto-assignment is OFF on inbox 1 and must stay off. With it on, Chatwoot\n// assigns an agent the moment a conversation arrives, and the first test above\n// silences the bot before it has said anything.\n// Chatwoot assigns every NEW conversation on a bot inbox to the AGENT BOT\n// ITSELF (meta.assignee_type 'AgentBot') -- found 23 Aug, when the bot fell\n// silent on every conversation created after it was linked. Being assigned to\n// yourself is not a human takeover. Only a User assignee is; the bot object\n// also carries outgoing_url, which a person never does, hence the fallback.\nconst assignee = (conv.meta || {}).assignee;\nconst aType    = (conv.meta || {}).assignee_type;\nconst humanHasIt = !!assignee &&\n  (aType ? aType === 'User' : !assignee.outgoing_url);\nconst labels   = conv.labels || [];\nif (humanHasIt || labels.includes('bot-off') || conv.status === 'resolved') {\n  return [{ json: { _reply: '', _work: false, _handedOver: true } }];\n}\n\n// Chatwoot sends E.164 with a plus; Meta sent bare digits. Everything\n// downstream - both Supabase writers, every tool, and 99 existing rows -\n// matches the bare form, so it is normalised here and nowhere else.\nconst sender = body.sender || {};\nconst from   = String(sender.phone_number || '').replace(/^\\+/, '');\nconst id     = String(body.id || '');\nconst text   = String(body.content || '');\n\n// --- Duplicate suppression ------------------------------------------------\n// On Chatwoot's message id now rather than Meta's wamid. Same reasoning:\n// stable across retries, and never on content, because a resident who sends\n// the same word twice means it twice.\nconst store = $getWorkflowStaticData('global');\nstore.seen = store.seen || {};\nconst now = Date.now();\nfor (const k of Object.keys(store.seen)) {\n  if (now - store.seen[k] > 86400000) delete store.seen[k];\n}\nif (store.seen[id]) {\n  return [{ json: { _reply: '', _work: false } }];\n}\nstore.seen[id] = now;\n\nconst lang = 'he';\nconst inText = text.trim() ? text : null;\n\n// --- Has this handset already been spoken to? -----------------------------\n// Unchanged in purpose: the menu and the canned lines never reach the model,\n// so without this the agent introduces itself a second time to someone it has\n// already greeted.\nstore.greeted = store.greeted || {};\n// A person greets again after a day of silence — and so does Michael. The\n// value is the last time this phone wrote; anything that is not a number is\n// the old boolean format and counts as stale, so every existing contact gets\n// the new introduction once.\nconst lastSeen = store.greeted[from];\nconst greeted = typeof lastSeen === 'number' && (Date.now() - lastSeen) < 24 * 60 * 60 * 1000;\nstore.greeted[from] = Date.now();\n\n// --- What the workflow itself said last -------------------------------------\n// THE HOLE THIS CLOSES HAS NOW BEEN FOUND THREE TIMES. The menu, both tap lines\n// and the attachment line are sent by THIS node, so the agent never sees them\n// and its memory has no record of them. 12 Aug: the bot introduced itself\n// twice. 25 Aug: it re-asked a resident who had tapped \"open a ticket\". 26 Aug:\n// a resident tapped \"check status\", was asked for a reference number by the\n// canned line below, answered \"אין לי\", and got \"אני מבין. על מה אפשר לעזור?\"\n// back (execution 9939) -- the model had no question in front of it, so an\n// answer read as an opening, and it opened.\n//\n// The first two were patched one flag at a time (`greeted`, `tapped_open`),\n// which fixes the case that was reported and leaves the next one standing. This\n// carries the SENTENCE rather than a flag, from the single place every canned\n// line leaves the node, so a line added later is covered by having been said.\n//\n// Half an hour, and spent on the next message: it describes the turn the\n// resident is answering, not a standing state. After that the agent's own\n// memory holds the thread, because from there on the bot's turns are its own.\nstore.lastBot = store.lastBot || {};\nfor (const k in store.lastBot) {\n  if (Date.now() - (store.lastBot[k].at || 0) > 60 * 60 * 1000) delete store.lastBot[k];\n}\nconst said = (t) => { store.lastBot[from] = { text: t, at: Date.now() }; return t; };\n\n// Three items, so Chatwoot renders reply buttons rather than a list. Four or\n// more silently becomes a list whose wrapper button reads \"Choose an item\" in\n// English. `content` and `items` are Chatwoot's field names: it builds the\n// WhatsApp payload itself, and drops anything it has no field for - which is\n// where the old row descriptions and footer went.\nconst MENU = {\n  content: \"היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?\",\n  items: [\n    { title: \"פתיחת קריאת שירות\", value: \"open\" },\n    { title: \"מצב קריאה קיימת\",   value: \"status\" },\n    { title: \"משהו אחר\",         value: \"other\" },\n  ],\n};\n\n// Media, location and stickers arrive as an attachment with empty content.\n// Answered with a fixed sentence until 1 Sep. It falls through to the model\n// now, carrying a flag the agent template turns into a note that something\n// arrived which the model cannot see. That note goes workflow-to-model and is\n// never sent to anybody, so it is not a template.\n//\n// Nothing below trips on an empty string: the greeting regex is anchored and\n// whole-string so '' is not a greeting, and TAP_KIND[''] is undefined.\nconst attachment = !text.trim();\n\n// --- A tapped button ------------------------------------------------------\n// Chatwoot discards the button's id and forwards only its TITLE, so these\n// strings ARE the routing table. Keep them identical to MENU above: reword one\n// there and the flow it starts silently stops starting, falling through to the\n// model instead of failing loudly.\n// THREE PHRASINGS PER TAP, one picked at random (owner's ask, 27 Aug): a\n// reply that is word-for-word identical on every tap reads as a machine.\n// The variants rephrase, never redirect -- each keeps the shape its flow\n// depends on: open INVITES THE STORY, status NAMES מספר הקריאה (the אין לי\n// branch reads what was negated), human CONFIRMS + ANNOUNCES THE TRANSFER\n// (a phrase the Dead end and backstop regexes both know) + ASKS THE TOPIC.\n// And every variant ends with the question -- the standing rule. said()\n// stores whichever sentence was picked, so last_bot never lies.\n// The נציג tap held three canned Hebrew lines, picked at random, until 1 Sep.\n// The owner's instruction is that the intro and its menu are the only fixed\n// text in the system, so they are gone and the tap reaches the model like any\n// other message. The reason it survived the 31 Aug cut was the transfer, not\n// the wording: see the note on tapNow below, and Human tap? now hanging off\n// Sort rather than off the canned branch.\n// Which flow the tap started, so the NEXT message can be answered knowing it\n// happened. Same keys as TAPPED; keep all three lists in step.\nconst TAP_KIND = {\n  \"פתיחת קריאת שירות\": \"open\",\n  \"מצב קריאה קיימת\":   \"status\",\n  \"משהו אחר\":          \"other\",\n};\n// A tap is still routing, and routing is still the workflow's: `tap` is carried\n// out of this node on the ordinary return, and Human tap? -> Transfer the tap\n// hangs off Sort itself, so the handover fires whether the words come from here\n// or from the model. Sending the tap to the model WITHOUT moving Human tap?\n// would have stopped requests for a person transferring, silently.\n//\n// store.tapped is written for the NEXT message: it is what stops the model\n// answering a fault description with \"shall I open a ticket?\" after the\n// resident already asked for one by tapping (live, 25 Aug). It is consumed at\n// the bottom of this node, so on the tap's own run the consume has to be\n// skipped or the flag would be spent before the answer arrives -- hence tapNow\n// being read there too.\nconst tapNow = TAP_KIND[text.trim()] || '';\nif (tapNow) {\n  store.tapped = store.tapped || {};\n  store.tapped[from] = { kind: tapNow, at: Date.now() };\n}\n\n\n// --- Was that just hello? -------------------------------------------------\n// THE THREE OPTIONS ARE ATTACHED BY THE Send NODE, and until 25 Aug the only\n// thing that triggered them was the bot's own name appearing in its reply.\n// That is a proxy for \"first message\", not for \"they said hello\": write הי a\n// second time inside 24 hours and the agent correctly does not reintroduce\n// itself, the name is absent, and the options silently vanish. Reported from a\n// real handset.\n//\n// The Meta-shaped Sort in scripts/n8n_whatsapp.py has always had this test and\n// gave a greeting the menu every time; it was lost in the Chatwoot cutover on\n// 21 Aug. Same regex, anchored and whole-string, so \"שלום, יש נזילה\" is not a\n// greeting: it has a fault in it. Punctuation and emoji come off first because\n// \"היי!!\" is the same message as \"היי\".\nconst bare = text.trim()\n  .replace(/[\\p{Extended_Pictographic}️]/gu, '')\n  .replace(/[\\s!?.,־-]+$/u, '')\n  .trim().toLowerCase();\nconst GREETING = new RegExp(\n  '^(שלום|שלום רב|היי|הי|אהלן|אהלן וסהלן|יו|מה נשמע|מה קורה|בוקר טוב|צהריים טובים|' +\n  'ערב טוב|לילה טוב|hi|hii|hey|hello|yo|good morning|good afternoon|good evening|' +\n  // English small talk, 1 Sep: wassap and whats up reached the model and\n  // were clarified at, three times, in the singular. A hello is a hello.\n  'whats up|what\\u0027s up|whatsup|wassup|wassap|wazzup|sup|' +\n  'hi there|hey there|hello there|howdy|' +\n  'shalom|ahlan)$', 'u');\nconst isGreeting = GREETING.test(bare);\n\n// A GREETING IS ANSWERED HERE, NOT BY THE MODEL, and always with the name.\n//\n// Asked for three times on 25 Aug and got progressively closer each time: the\n// opener must be \"היי, כאן מיכאל מהומיז\" whenever somebody says hello, not\n// only the first time in 24 hours. The model could not deliver that -- the\n// mid-thread rule tells it, correctly, not to reintroduce itself once a\n// conversation is running, so a second הי came back \"היי, מה קרה?\" with no\n// name. Those two rules cannot both live in the prompt.\n//\n// So a bare hello leaves the model out of it entirely, which is what the\n// Meta-shaped Sort in scripts/n8n_whatsapp.py has always done and what the\n// Chatwoot cutover dropped on 21 Aug. Same text as MENU.content, which is the\n// same text as the opener in prompt.md, which check_greeting() enforces. The\n// three buttons ride along because Send attaches them to any greeting.\n//\n// Only a bare one: \"שלום, יש נזילה\" has a fault in it and goes to the model.\nif (isGreeting) {\n  return [{ json: {\n    _reply: '', _work: false, _canned: true, _menu: false,\n    to: from, conv_id: convId, lang, text: said(MENU.content), greeting: true,\n    in_text: inText, msg_type: 'greeting', message_id: id,\n  } }];\n}\n\n// Spent on the first message after the tap and then forgotten: it describes\n// what the resident just did, not a standing state. Half an hour, because\n// somebody who taps and answers tomorrow is starting again. Stale entries are\n// swept here so the map cannot grow without limit.\nstore.tapped = store.tapped || {};\nfor (const k in store.tapped) {\n  if (Date.now() - (store.tapped[k].at || 0) > 60 * 60 * 1000) delete store.tapped[k];\n}\nconst lastTap = tapNow ? null : store.tapped[from];\nconst tappedOpen = !!lastTap && lastTap.kind === 'open'\n  && (Date.now() - lastTap.at) < 30 * 60 * 1000;\nconst tappedHuman = !!lastTap && lastTap.kind === 'human'\n  && (Date.now() - lastTap.at) < 30 * 60 * 1000;\nif (lastTap) delete store.tapped[from];\n\n// The line the resident is answering, when the workflow is what said it.\n// Same half hour as the tap, and spent the same way.\nconst prevBot = store.lastBot[from];\nconst lastBot = prevBot && (Date.now() - prevBot.at) < 30 * 60 * 1000 ? prevBot.text : '';\ndelete store.lastBot[from];\n\nreturn [{ json: {\n  _reply: '', _work: true, _canned: false, _menu: false,\n  to: from, conv_id: convId, text, lang, greeted, tapped_open: tappedOpen,\n  tapped_human: tappedHuman,\n  greeting: isGreeting, last_bot: lastBot,\n  message_id: id,\n  // `tap` is the row's kind, carried for readback. Since 13 Sep nothing routes\n  // on it (Human tap? is gone); it leaves the node on this return\n  // rather than on a canned one. `tap_now` separates the tap itself from the\n  // message that answers it, which tapped_human used to mean on its own.\n  tap: tapNow, tap_now: !!tapNow, attachment,\n  in_text: inText, msg_type: attachment ? 'attachment' : 'text',\n  followup: { content: \"אפשר לעזור בעוד משהו?\", items: MENU.items },\n} }];\n"
+   },
+   "typeVersion": 2,
+   "id": "sort",
+   "name": "Sort",
+   "type": "n8n-nodes-base.code",
+   "position": [
+    -32,
+    -80
+   ]
+  },
+  {
+   "parameters": {
+    "respondWith": "text",
+    "responseBody": "={{ $json._reply }}",
+    "options": {}
+   },
+   "typeVersion": 1.1,
+   "id": "respond",
+   "name": "Answer Meta",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "position": [
+    208,
+    -256
+   ]
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 1
+     },
+     "conditions": [
+      {
+       "id": "w",
+       "leftValue": "={{ $json._work }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "typeVersion": 2,
+   "id": "haswork",
+   "name": "Is there a message?",
+   "type": "n8n-nodes-base.if",
+   "position": [
+    208,
+    -16
+   ]
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 1
+     },
+     "conditions": [
+      {
+       "id": "c",
+       "leftValue": "={{ $json._canned }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "typeVersion": 2,
+   "id": "iscanned",
+   "name": "Canned reply?",
+   "type": "n8n-nodes-base.if",
+   "position": [
+    208,
+    160
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/messages",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ phone: $json.to, direction: 'inbound', sender: 'resident', body: $json.in_text, message_type: $json.msg_type, external_id: $json.message_id, lang: $json.lang, source: 'n8n' }) }}",
+    "options": {
+     "timeout": 10000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "loginbound",
+   "name": "Log inbound",
+   "type": "n8n-nodes-base.httpRequest",
+   "position": [
+    960,
+    -176
+   ],
+   "alwaysOutputData": true,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "YwFM2FM9NmVv5gKf",
+     "name": "Homies Supabase service key"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/messages",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ phone: $('Sort').first().json.to, direction: 'outbound', sender: 'bot', body: $json.menu ? $json.menu.content : ($json.output || $json.text), message_type: $json.menu ? 'interactive' : 'text', lang: $('Sort').first().json.lang, source: 'n8n' }) }}",
+    "options": {
+     "timeout": 10000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "logreply",
+   "name": "Log reply",
+   "type": "n8n-nodes-base.httpRequest",
+   "position": [
+    1200,
+    -64
+   ],
+   "alwaysOutputData": true,
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "YwFM2FM9NmVv5gKf",
+     "name": "Homies Supabase service key"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 1
+     },
+     "conditions": [
+      {
+       "id": "m",
+       "leftValue": "={{ $json._menu }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "typeVersion": 2,
+   "id": "ismenu",
+   "name": "Menu?",
+   "type": "n8n-nodes-base.if",
+   "position": [
+    416,
+    384
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Sort').first().json.conv_id }}/messages",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ content: $json.menu.content, message_type: 'outgoing', content_type: 'input_select', content_attributes: { items: $json.menu.items } }) }}",
+    "options": {
+     "timeout": 20000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "sendmenu",
+   "name": "Send menu",
+   "type": "n8n-nodes-base.httpRequest",
+   "position": [
+    960,
+    608
+   ],
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "ctZhJP3JSajBO6ub",
+     "name": "Chatwoot bot (api_access_token)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "promptType": "define",
+    "text": "={{ ($json.greeted ? '[אתם כבר באמצע שיחה, וכבר בירכת את הדייר והצגת את עצמך. לא עושים את זה שוב.]' : '[זו ההודעה הראשונה בשיחה.]') + ($json.tap_now ? ' [ההודעה הזאת היא לחיצה על כפתור ברשימה, לא משהו שהדייר הקליד.]' : '') + ($json.attachment ? ' [הדייר שלח קובץ, תמונה או מיקום בלי טקסט. אתה לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]' : '') + ($json.last_bot ? ' [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא אתה, ולכן אין לו זכר בזיכרון שלך: ' + $json.last_bot + ']' : '') + ' [השעה בישראל עכשיו ' + $now.setZone('Asia/Jerusalem').toFormat('HH:mm') + ', יום ' + ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'][$now.setZone('Asia/Jerusalem').weekday % 7] + '.]' + String.fromCharCode(10) + $json.text }}",
+    "options": {
+     "systemMessage": "אתה מיכאל, נציג השירות של הומיז, חברת ניהול בתים משותפים. אתה כותב לדיירים בוואטסאפ, ועל עצמך אתה מדבר בלשון זכר.\n\nאתה מטפל בפניות בעצמך, ואין אצלך העברה לאף אחד. תקלה בבניין או בדירה: אתה פותח קריאת שירות. יתרה או מצב של קריאה: יש לך כלים לזה. ומה שהמשרד עושה, ולא אתה: הסדרי תשלום, השגה על חיוב, כניסה לדירה ויציאה ממנה, חוזים, ועד הבית. על אלה אתה אומר שזה מטופל במשרד ומוסר את הפרטים שלו מהרשימה למטה, במילים שלך. אתה לא אומר שהעברת משהו, לא אומר שמישהו יחזור לדייר, ולא מבטיח טיפול שלא אתה עושה. מי שמבקש לדבר עם בן אדם מקבל את אותו הדבר: מה שאתה יכול לעשות בשבילו עכשיו, ואת המשרד למה שלא. מישהו בסכנה: קודם מספר החירום הארצי המתאים, אחר כך קריאת שירות בדחיפות חירום, ואז הטלפון של המשרד. בסדר הזה.\n\nאתה מדווח מה כבר נעשה, לא מה עומד לקרות. זה נכון במיוחד כשמישהו במצוקה ואתה רוצה להרגיע אותו: מה שמרגיע זה לדעת מה קרה עם הפנייה שלו, ולא הבטחה על ההמשך.\n\nתתנהג כמו בן אדם חכם שאכפת לו. תקרא באמת מה שנכתב לך, תבין מה הדייר צריך גם כשהוא לא ניסח את זה טוב, ותענה לו כמו שהיית רוצה שיענו לך אם זה היה קורה לך. יש לך כלים, והתיאור של כל כלי אומר מתי הוא מתאים ומה הוא צריך. תשתמש בהם בשקט, בלי להכריז שאתה בודק או מעדכן משהו.\n\nיש הבדל בין ניסוח גרוע לבין הודעה שאין בה תוכן. את הראשון אתה מבין; על השני אתה שואל, קצר, מה הכוונה. אתה לא ממציא משמעות, לא ממציא אפשרויות שלא קיימות, ולא עושה שום פעולה על סמך ניחוש.\n\nאין כאן תסריט, אין נוסח קבוע, ואין רשימת משפטים מאושרים. שני דיירים עם אותה בעיה לא אמורים לקבל את אותה הודעה, ואתה כותב למישהו שקרא את ההודעה הקודמת שלך: מה שכבר אמרת נשאר נכון בלי שתחזור עליו, וכל הודעה שלך מוסיפה משהו שלא היה בקודמת. אם אין לך מה להוסיף חוץ מלחזור על עצמך, תגיד פחות. אם שתי הודעות שונות הגיעו אליך, הן אמרו שני דברים שונים, והן מקבלות שתי תשובות שונות. השיפוט שלך הוא הכלי המרכזי, ואתה אמור להשתמש בו.\n\nכשמישהו רק מברך, המערכת עונה לו לבד, ולא אתה: \"היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?\" המשפט הזה הוא של המערכת. אתה לא כותב אותו בעצמך ולא פותח בו תשובה; כשמגיע לך להציג את עצמך, השם מספיק, ומיד אחריו העניין עצמו. משם ואילך השיחה שלך.\n\nלפעמים מגיעה אליך הודעה שהיא לחיצה על כפתור ברשימה, ולא משהו שהדייר הקליד: \"פתיחת קריאת שירות\", \"מצב קריאה קיימת\" או \"משהו אחר\". שני הראשונים אומרים לך מה הוא רוצה, ולא מה קרה לו. הוא כבר ביקש, אז אל תשאל אותו שוב אם לפתוח קריאה, והדבר היחיד שחסר לך בשלב הזה הוא מה קרה. את שאר הפרטים תבקש כשתגיע אליהם. \"משהו אחר\" אומר שהוא לא מצא את המקרה שלו ברשימה: שאלה אחת, במה מדובר, וממשיכים משם.\n\nשאלה אחת בכל הודעה, לא רשימה. קודם מה קרה. באיזה בניין ואיזו דירה זה שלב אחר, כשאתה כבר פותח את הקריאה או מאמת כתובת, ולא באותה הודעה שבה שאלת מה קרה. אתה עונה על מה שנשאלת, ובאורך של מה שנשאלת. מידע שלא ביקשו ממך לא נכנס לתשובה.\n\nהבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע שהבנת או ששמעת, גם כשהוא חוזר על מה שהדייר בדיוק כתב, לא נותן לו כלום, ועדיף בלעדיו: תגיב לדבר עצמו, או תמשיך ממנו הלאה. וכשאתה מבקש שוב משהו שכבר ביקשת, אתה לא פותח בהסכמה שבאה לרכך את הבקשה שאחריה: או שאתה מסביר בקצרה למה זה עדיין חסר, או שאתה שואל את זה אחרת.\n\nסיימת לטפל במשהו, פתחת קריאה או מסרת יתרה או ענית על מה ששאלו, ההודעה שמסכמת את זה לא נגמרת בנקודה יבשה: אתה מציע לעזור בעוד משהו, במילים שלך. וכשברור שהשיחה הסתיימה, כשהדייר מודה, נפרד, או אומר שאין עוד כלום, אתה נפרד ממנו בחום: מודה לו שפנה, מאחל משהו קטן, וזהו. בלי נוסח קבוע, בלי אותה פרידה פעמיים, ובלי להמשיך לשאול אחרי שנפרדתם.\n\nמי שלא יודע מה הוא צריך, או שואל מה בכלל אפשר, לא סיים את השיחה, להפך: זה הרגע לעזור לו להתמצא. אל תמנה לו אפשרויות במילים: תציג לו את רשימת האפשרויות עצמה, יש לך כלי שעושה בדיוק את זה ומצרף אותה מתחת להודעה קצרה שלך, וללחוץ קל לו מלהקליד. הפרידה החמה שמורה למי שבאמת סיים.\n\nשני דברים שאין בהם שיקול דעת:\n\n1. **אתה עונה על מה ששייך להומיז**: הבניין, הדירה, הרכוש המשותף, תקלות ותחזוקה, קריאות שירות, ועד בית, תשלומים ויתרות, ואיך מגיעים אלינו. כל השאר לא בתחום שלך, **גם אם אתה יודע את התשובה**: מזג אוויר, חדשות, ספורט, פוליטיקה, רפואה, משפט, חישובים, תרגום, כתיבה בשבילו, ידע כללי. הדייר כתב לחברת ניהול, לא למנוע חיפוש. תגיד שזה לא משהו שאתה עוזר בו, בלי הרצאה ובלי התנצלות ארוכה.\n\n2. **אתה לא מוסר פרטים על דייר אחר.** לא חוב שלו, לא מה כתוב בקריאה שלו, לא אם שילם, ולא אם הוא בכלל גר שם. גם אם שואלים אותך ישירות, וגם אם נשמעת סיבה טובה.\n\nועוד דבר אחד, שהוא לא כלל אלא עובדה על עברית: אתה לא יודע אם כותב לך גבר או אישה, והשם בוואטסאפ לא אומר לך. לכן אתה פונה אליו בלשון רבים, תמיד. זה נשמע טבעי בשירות ישראלי, וזה פותר את זה בלי שתצטרך לחשוב על זה בכל משפט. אם הוא עצמו כתב על עצמו בלשון זכר או נקבה, לך אחריו.\n\nעברית, תמיד. כתבו לך באנגלית, אתה עונה בעברית וממשיך בטיפול.\n\nושלוש עובדות על הערוץ, לא על הסגנון: וואטסאפ לא מציג markdown, אז כוכביות וסולמיות מגיעות לדייר כמו שהן; אין לך שליטה על מתי הוא קורא, אז הודעה אחת ממנו יכולה להגיע אחרי שכבר כתבת; והודעות בוואטסאפ קצרות, כי קוראים אותן בטלפון באמצע משהו אחר; ואנשים לא מקלידים סוגריים. מה שנדחס לתוך סוגריים או נאמר במשפט רגיל, או שלא צריך להיאמר בכלל.\n\nמה שאתה יודע על הומיז נמצא ברשימה הזאת. מה שלא כתוב בה אתה לא יודע, ואומר שאתה לא יודע ומפנה למשרד, במקום לנחש. אותו כלל חל על הכלים: מה שכלי לא החזיר לך, אתה לא יודע. אילו בניינים אנחנו מנהלים, למשל, אתה לא יודע, ולא מנחש:\n\n- **שעות פעילות:** ראשון עד חמישי, 09:00-17:00.\n- **טלפון:** 077-6687949. זה גם המספר לתקלות דחופות; אין קו חירום נפרד.\n- **משרד:** בצלאל 1, רמת גן. **מייל:** Office@homies-management.co.il\n- **כלול בתשלום ועד הבית:** ביטוח, חשבון חשמל, חשבון מעלית ובודק מעליות, ניקיון, גינון, ביקורת גילוי אש, ביקורת מערכת לשחרור עשן, טיפול במשאבות, חיטוי מאגר מים, קופה קטנה לתקלות קטנות, קווי בזק למעלית ולמערכת האש, עמלות בנק, וניהול ואחזקה וגביית כספים של חברת הניהול.\n- **לא כלול:** תיקונים ותקלות שאינם מן השוטף, תקלות עקב בלאי או שבר, פרויקטים מיוחדים, וכל דבר שאינו נכלל בתקציב השוטף.\n- **תשלום:** עד ה־10 בכל חודש, בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.\n- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, שיפנה אלינו ואנחנו נקשר ביניהם.\n- **אב הבית:** מי שצריך להגיע לאב הבית של הבניין, שיפנה אלינו ואנחנו נקשר ביניהם. משהו בבניין שצריך טיפול נפתח כקריאת שירות, ולא דרכו.\n- **הצעת מחיר:** בקשה להצעת מחיר לעבודה שאינה בשוטף היא עניין של המשרד. מה שהמשרד צריך לדעת זה באיזה בניין מדובר ומה העבודה.\n- **עניינים שהמשרד מטפל בהם, ולא הצ'אט:** כניסה לדירה ויציאה ממנה, החלפת דיירים, הסדרי תשלום, חוזים והשגות על חיוב. פונים אליו בשעות הפעילות, בטלפון או במייל.\n- **זמני טיפול:** תקלות חירום כפי שהוגדרו בהסכם, עד 4 שעות. תקלות שאינן חירום, עד 3 ימי עסקים. זה הסטנדרט הכללי, לא הבטחה על קריאה מסוימת.\n- **אחריות:** רכוש משותף על ועד הבית וחברת הניהול יחד; רכוש פרטי על הדייר.\n- **מוקדי חירום ארציים, למי שנמצא בסכנה מיידית:** משטרה 100, מד\"א 101, כיבוי אש וחילוץ 102, חברת החשמל 103.",
+     "returnIntermediateSteps": true
+    }
+   },
+   "typeVersion": 3,
+   "id": "agent",
+   "name": "Answer the resident",
+   "type": "@n8n/n8n-nodes-langchain.agent",
+   "position": [
+    960,
+    64
+   ],
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "onError": "continueErrorOutput"
+  },
+  {
+   "parameters": {
+    "model": "google/gemini-2.5-flash",
+    "options": {
+     "maxTokens": 4096,
+     "temperature": 0.6
+    }
+   },
+   "typeVersion": 1,
+   "id": "model",
+   "name": "OpenRouter",
+   "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+   "position": [
+    960,
+    432
+   ],
+   "retryOnFail": true,
+   "maxTries": 3,
+   "waitBetweenTries": 5000,
+   "credentials": {
+    "openRouterApi": {
+     "id": "92ZNHDhByavmNP5T",
+     "name": "Homies OpenRouter (key 2)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "sessionIdType": "customKey",
+    "sessionKey": "={{ $json.to }}-20",
+    "contextWindowLength": 12
+   },
+   "typeVersion": 1.3,
+   "id": "memory",
+   "name": "Conversation so far",
+   "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+   "position": [
+    1200,
+    432
+   ]
+  },
+  {
+   "parameters": {
+    "toolDescription": "Handing the conversation to a person does NOT open a ticket. If you already transferred and the address only arrives afterwards — which is what an emergency looks like, because the person comes before the address — that is the moment to call this.\nOpen a maintenance or service ticket. Call it as soon as you know WHAT is wrong and WHERE — it verifies the address itself, inside the same call: a building Homies does not manage opens nothing, and the response says why (building_found false, with reason street_unknown / number_not_on_street plus numbers_we_manage / need_number / need_building / ambiguous plus candidates) so you can tell the resident and ask again. You do NOT need verify_address before this — there is no step before this. When it opens, the response carries the real reference number, the only source of one: never invent a number, and never say a ticket exists before this returns a reference. Collect what is missing the way a person would, in a sentence, taking the most useful thing first — not as a numbered list of requirements. A resident who is handed a four-point form usually answers none of it.",
+    "method": "POST",
+    "url": "https://n8n-zqvb.srv1879140.hstgr.cloud/webhook/homies-debt-tools",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'open_request', arguments: { description: $fromAI('description', \"What the resident said is wrong, in Hebrew, in their own words.\", 'string'), type: $fromAI('type', \"One of plumbing/electrical/lighting/elevator/cleaning/gardening/pest_control/locksmith/fire_safety/maintenance/other/complaint\", 'string'), building: $fromAI('building', \"Street and number, as the resident wrote it. The whole sentence is fine; this tool checks it.\", 'string'), reporter_unit: $fromAI('reporter_unit', \"The apartment the person reporting LIVES in. Send it whenever you know it - for a fault inside their flat the flow gives it to you. For a fault in a lobby, lift or any common area, include it only if they volunteered it, and never ask an extra question just to fill this field.\", 'string'), fault_location: $fromAI('fault_location', \"Where the FAULT is, not where they live. 'apartment' for a leak in their kitchen; 'common' for a lift, lobby, stairwell, roof, car park, gate or yard. One of apartment/common.\", 'string'), urgency: $fromAI('urgency', \"Infer this; never ask the resident for it. Use emergency only for flooding, fire, gas or someone trapped in a lift. One of low/normal/high/emergency.\", 'string') } } }] } }) }}",
+    "options": {
+     "timeout": 25000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "tool_open",
+   "name": "open_request",
+   "type": "n8n-nodes-base.httpRequestTool",
+   "position": [
+    1440,
+    432
+   ]
+  },
+  {
+   "parameters": {
+    "toolDescription": "Call when the resident asks about an existing service call — its status, a follow-up, what happened to it. Pass the reference if they quoted one, in any form: the whole thing, an older HM-prefixed one, or just the serial. Without a reference the building finds them; the apartment only narrows it. DO NOT ASK FOR AN APARTMENT when the fault is not in one — a lift, a lobby light, a gate and the bin store belong to the building, and asking which flat somebody's elevator is in is a question with no answer. Name the type when they named it. Returns reference, status (open / in_progress / resolved / cancelled), dates and description; or `ambiguous_building` with the names when what they typed fits more than one, and then you ask which rather than choosing. Read-only; the answer is live from the system.",
+    "method": "POST",
+    "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'get_request_status', arguments: { reference: $fromAI('reference', \"The reference the resident quoted, exactly as written, whether that is the whole reference, an older HM-prefixed one, or just the serial. Empty if none was quoted.\", 'string'), building: $fromAI('building', \"Street and number, if no reference. A partial name is fine.\", 'string'), unit: $fromAI('unit', \"Apartment number. Empty for a lift, a lobby light, a gate — anything not inside a flat.\", 'string'), type: $fromAI('type', \"One of plumbing/electrical/lighting/elevator/cleaning/gardening/pest_control/locksmith/fire_safety/maintenance/other/complaint, if they named the thing. Empty otherwise.\", 'string') } } }] } }) }}",
+    "options": {
+     "timeout": 25000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "tool_status",
+   "name": "get_request_status",
+   "type": "n8n-nodes-base.httpRequestTool",
+   "position": [
+    1920,
+    432
+   ],
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "OeZ0OVs0X0tyEzcI",
+     "name": "Homies tool secret"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "toolDescription": "Call when the resident asks about their balance, their debt, or how much they owe. IDENTITY FIRST: this needs the resident's full name AND their phone number, both typed by them in this conversation. Do not call it without both, do not use the number they are messaging from, and never fill either from a guess. If they have not given both yet, ask — one message, both facts, in your own words. The lookup finds the resident's own apartment by itself: never ask which apartment or whether they mean a specific one. Returns the resident's name, apartment, total owed and the unpaid months, or `identity_failed` when the name and the number do not belong to the same resident. Read-only — it cannot take a payment; anyone who wants to actually pay, needs a receipt or disputes an amount goes to the team.",
+    "method": "POST",
+    "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'get_balance', arguments: { name: $fromAI('name', \"The resident's full name exactly as they typed it in this conversation — first name and surname. Required.\", 'string'), phone: $fromAI('phone', \"The phone number exactly as they typed it in this conversation. NOT the number the message arrived from. Required.\", 'string'), unit: $fromAI('unit', \"Almost always empty: the lookup finds the resident's own apartment by itself. Fill it only when the resident has already named a specific apartment on their own. NEVER ask which apartment or whether they mean a specific one — call without it.\", 'string') } } }] } }) }}",
+    "options": {
+     "timeout": 25000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "tool_balance",
+   "name": "get_balance",
+   "type": "n8n-nodes-base.httpRequestTool",
+   "position": [
+    2160,
+    432
+   ],
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "OeZ0OVs0X0tyEzcI",
+     "name": "Homies tool secret"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "toolDescription": "Check a building — and an apartment, if there is one — against the list of buildings Homies actually manages, WITHOUT opening anything. Use it only when the address itself is the question: a resident asking whether we manage their building, or grounding a location during an emergency. It is NOT a step before open_request — open_request verifies on its own; for tickets call open_request directly. Pass building exactly as they wrote it; the whole sentence is fine. Pass unit only for a fault inside a flat. Returns building_found, the canonical address when the building is real, and when it is not — why, with the numbers we do manage on that street so you can offer them.",
+    "method": "POST",
+    "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'verify_address', arguments: { building: $fromAI('building', \"The building as the resident wrote it — street and number, any phrasing. The whole sentence is fine. Required.\", 'string'), unit: $fromAI('unit', \"Apartment number, only for a fault inside a flat. Empty for a lift, lobby, stairwell or anything in the common areas.\", 'string') } } }] } }) }}",
+    "options": {
+     "timeout": 25000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "tool_address",
+   "name": "verify_address",
+   "type": "n8n-nodes-base.httpRequestTool",
+   "position": [
+    2400,
+    432
+   ],
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "OeZ0OVs0X0tyEzcI",
+     "name": "Homies tool secret"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Sort').first().json.conv_id }}/messages",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ (() => { const t = String($json.output || $json.text || '').replace(/\\[[^\\]]*\\]/g, ' ').replace(/\\s*[—–]\\s*/g, ', ').replace(/,\\s*,/g, ',').replace(/\\s+,/g, ',').replace(/,\\s*\\./g, '.').replace(/\\s{2,}/g, ' ').trim(); const body = { content: t, message_type: 'outgoing' }; if ($('Sort').first().json.greeting || (() => { try { return ($('Answer the resident').first().json.intermediateSteps || []).some(s => ((s.action || {}).tool) === 'show_menu'); } catch (e) { return false; } })() || ['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג'].filter(w => t.indexOf(w) !== -1).length >= 3 || t.indexOf('היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || (/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true)) { body.content_type = 'input_select'; body.content_attributes = { items: [ { title: 'פתיחת קריאת שירות', value: 'open' }, { title: 'מצב קריאה קיימת', value: 'status' }, { title: 'משהו אחר', value: 'other' } ] }; } return JSON.stringify(body); })() }}",
+    "options": {
+     "timeout": 20000
+    }
+   },
+   "typeVersion": 4.2,
+   "id": "send",
+   "name": "Send",
+   "type": "n8n-nodes-base.httpRequest",
+   "position": [
+    1440,
+    64
+   ],
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "ctZhJP3JSajBO6ub",
+     "name": "Chatwoot bot (api_access_token)"
+    }
+   }
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 1
+     },
+     "conditions": [
+      {
+       "id": "words",
+       "leftValue": "={{ (() => { const w = String($json.output || '').trim().split(/\\s+/).filter(Boolean).length; if (w >= 2) return true; return w === 1 && $('Sort').first().json.greeting === true; })() }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      },
+      {
+       "id": "phantom",
+       "leftValue": "={{ (() => { const t = String($json.output || ''); const claims = /(פתחתי|פתחנו|נפתחה|נפתחו)( (לך|לכם|לכן|כבר|את))* ?ה?קריא[הת]/.test(t); if (!claims) return true; return /\\b\\d{3}-\\d{3,6}-\\d{2}\\b/.test(t); })() }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "typeVersion": 2,
+   "id": "usable",
+   "name": "Reply usable?",
+   "type": "n8n-nodes-base.if",
+   "position": [
+    1200,
+    64
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to }, toolCalls: [{ id: 'rescue', function: { name: 'rescue_request', arguments: { phone: $('Sort').first().json.to, building: (() => { try { const r = $('verify_address').all(); const raw = r[r.length-1].json.results[0].result; return (typeof raw === 'string' ? JSON.parse(raw) : raw).building || ''; } catch (e) { return ''; } })(), unit: (() => { try { const r = $('verify_address').all(); const raw = r[r.length-1].json.results[0].result; return (typeof raw === 'string' ? JSON.parse(raw) : raw).unit || ''; } catch (e) { return ''; } })() } } }] } }) }}",
+    "options": {
+     "timeout": 25000
+    }
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1008,
+    240
+   ],
+   "id": "rescue00-0000-4000-8000-00000000ab01",
+   "name": "Open it anyway",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "OeZ0OVs0X0tyEzcI",
+     "name": "Homies tool secret"
+    }
+   },
+   "onError": "continueRegularOutput",
+   "notes": "The model claimed a ticket it never opened. Write it from what is on record."
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Sort').first().json.conv_id }}/toggle_status",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ status: 'open' }) }}",
+    "options": {
+     "timeout": 15000
+    }
+   },
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1680,
+    208
+   ],
+   "id": "cw-show-open-0001",
+   "name": "Show it in Open",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "ctZhJP3JSajBO6ub",
+     "name": "Chatwoot bot (api_access_token)"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 1
+     },
+     "conditions": [
+      {
+       "id": "c",
+       "leftValue": "={{ $json._claim }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   },
+   "id": "cw-claim-if-0001",
+   "name": "Human replied?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2,
+   "position": [
+    400,
+    800
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $json.conv_id }}/assignments",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ assignee_id: $json.claim_user }) }}",
+    "options": {
+     "timeout": 15000
+    }
+   },
+   "id": "cw-claim-do-0001",
+   "name": "Assign to the replier",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    656,
+    800
+   ],
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "1qfgfvxwZ4MsUBBh",
+     "name": "Chatwoot admin (api_access_token)"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "typedelay",
+   "name": "Type for a moment",
+   "type": "n8n-nodes-base.wait",
+   "typeVersion": 1.1,
+   "position": [
+    1320,
+    200
+   ],
+   "parameters": {
+    "amount": "={{ $('Sort').first().json._canned ? (0.5 + Math.random() * 1.2) : 0 }}",
+    "unit": "seconds"
+   },
+   "webhookId": "typedelay-wh"
+  },
+  {
+   "id": "menudelay",
+   "name": "Type for a moment (menu)",
+   "type": "n8n-nodes-base.wait",
+   "typeVersion": 1.1,
+   "position": [
+    1560,
+    200
+   ],
+   "parameters": {
+    "amount": "={{ 0.5 + Math.random() * 1.2 }}",
+    "unit": "seconds"
+   },
+   "webhookId": "menudelay-wh"
+  },
+  {
+   "id": "say_again",
+   "name": "Say it again",
+   "type": "@n8n/n8n-nodes-langchain.agent",
+   "typeVersion": 3,
+   "position": [
+    1200,
+    540
+   ],
+   "parameters": {
+    "promptType": "define",
+    "text": "={{ (() => { let ref = ''; try { const r = $json.results[0].result; ref = (typeof r === 'string' ? JSON.parse(r) : r).reference || ''; } catch (e) { } const said = String($('Sort').first().json.text || ''); const note = ref ? '[נפתחה עכשיו קריאה במערכת, מספר ' + ref + '. תמסור לדייר במילים שלך שהקריאה נפתחה, עם המספר.]' : '[התשובה הקודמת שלך לא יצאה לדייר. תכתוב לו תשובה קצרה וברורה על ההודעה שלו.]'; return note + String.fromCharCode(10) + said; } )() }}",
+    "options": {
+     "systemMessage": "אתה מיכאל, נציג השירות של הומיז, חברת ניהול בתים משותפים, ואתה כותב לדייר בוואטסאפ בעברית. על עצמך אתה מדבר בלשון זכר, ואל הדייר אתה פונה בלשון רבים.\nההודעה קצרה, בלי markdown, בלי כוכביות ובלי סוגריים. אין נוסח קבוע ואין משפט מוכן: תכתוב את זה במילים שלך.\nאתה מדווח מה כבר נעשה, לא מה עומד לקרות, ואתה לא אומר שמישהו יוצא לדרך או שעזרה נשלחת.\nאל תמציא מספר קריאה. אם לא נמסר לך מספר, אל תגיד שנפתחה קריאה."
+    }
+   }
+  },
+  {
+   "id": "second_ok",
+   "name": "Second try usable?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2,
+   "position": [
+    1440,
+    540
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose"
+     },
+     "conditions": [
+      {
+       "id": "ok",
+       "leftValue": "={{ String($json.output || '').trim().split(/\\s+/).filter(Boolean).length >= 2 }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    }
+   }
+  },
+  {
+   "id": "burst_wait",
+   "name": "Let them finish",
+   "type": "n8n-nodes-base.wait",
+   "typeVersion": 1.1,
+   "position": [
+    420,
+    64
+   ],
+   "parameters": {
+    "amount": 4,
+    "unit": "seconds"
+   },
+   "webhookId": "4fc5c3c4-13e7-42ee-9efe-0c80a2721c41"
+  },
+  {
+   "id": "burst_gate",
+   "name": "Still the last word?",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    780,
+    184
+   ],
+   "parameters": {
+    "jsCode": "// After `Let them finish`. The shared truth is the `messages` table: Log\n// inbound wrote this message BEFORE the wait (it sits above it on the canvas,\n// and executionOrder v1 runs it first), so every sibling execution can see\n// it. n8n staticData cannot do this job -- it is a per-execution snapshot,\n// loaded at start and saved at end, so concurrent runs never see each other.\n// Measured 1 Sep: three stashed digits, three runs, burst_size=1 in each.\n//\n// `Anything newer?` handed us the last rows for this phone, newest first,\n// both directions. If the newest inbound is not this run's message, a later\n// one arrived while we slept: say nothing, its run answers the whole backlog.\n// If the query failed or came back empty, fall through with this run's own\n// text -- the pre-batching behaviour, one reply per message, never silence.\nconst j = $('Sort').first().json;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.direction);\nconst newestIn = rows.find(r => r.direction === 'inbound');\nif (newestIn && String(newestIn.external_id) !== String(j.message_id)) {\n  return [];\n}\n// The unanswered backlog: inbound rows down to the last outbound. This join\n// is what lets a tap followed two seconds later by the fault text read as one\n// thought -- the tap's own run was silenced, but its title is a row here.\nconst backlog = [];\nfor (const r of rows) {\n  if (r.direction === 'outbound') break;\n  const b = String(r.body == null ? '' : r.body).trim();\n  if (b) backlog.push(b);\n}\nbacklog.reverse();\nconst text = backlog.length ? backlog.join('\\n') : j.text;\nreturn [{ json: Object.assign({}, j, { text: text, burst_size: backlog.length || 1 }) }];\n"
+   }
+  },
+  {
+   "id": "burst_note",
+   "name": "One reply per thought",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    380,
+    250
+   ],
+   "parameters": {
+    "content": "## One reply per thought\nPeople send three messages for one thought, so the reply branch waits 4s, asks Postgres for anything newer, and only the run holding the NEWEST inbound answers -- with the whole unanswered backlog joined. Nine digits in a minute = one model call, one reply (1 Sep: nine essays, out of order, and a real handover fired off the digit 6).\n\nThe truth is the `messages` table, written by Log inbound BEFORE the wait. n8n staticData cannot carry this: it is a per-execution snapshot, and three concurrent runs each saw only their own stash when it was tried.\n\nWhat never waits: the 200 to Chatwoot and the menu. Two messages ms apart can still both answer; the bound is the old behaviour, made rare.",
+    "height": 300,
+    "width": 340,
+    "color": 4
+   }
+  },
+  {
+   "id": "burst_query",
+   "name": "Anything newer?",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    620,
+    64
+   ],
+   "parameters": {
+    "method": "GET",
+    "url": "=https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/messages?phone=eq.{{ $('Sort').first().json.to }}&order=created_at.desc&limit=12&select=external_id,body,direction",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "options": {
+     "timeout": 10000
+    }
+   },
+   "alwaysOutputData": true,
+   "onError": "continueRegularOutput",
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "YwFM2FM9NmVv5gKf",
+     "name": "Homies Supabase service key"
+    }
+   }
+  },
+  {
+   "id": "showMenuJudgment1",
+   "name": "show_menu",
+   "type": "@n8n/n8n-nodes-langchain.toolCode",
+   "typeVersion": 1.1,
+   "position": [
+    1920,
+    560
+   ],
+   "parameters": {
+    "name": "show_menu",
+    "description": "Shows the resident the standard options list — open a service ticket, check an existing one, something else — attached by the system underneath your NEXT message. Use it whenever the resident does not know what they want, asks what you can do, or the conversation would stall with nothing concrete to act on. If you are about to write the options out in words — a list, bullets, 'you could open a ticket or check a balance' — stop: that is this tool's job. Call it and keep your message to the one short line that goes above the buttons. Never ask whether they would like to see the options and never announce that you are about to show them — the question costs the resident a whole round-trip; call this and show them in the same breath. Never use it while the matter is moving forward. But when the resident cannot answer what you asked and the matter is stuck — they say they do not know, and saying it differently did not help — showing the choices IS the way forward: one clarifying question, then this. Not twice in a row: once the options are in front of them, another list is noise. Takes no parameters.",
+    "language": "javaScript",
+    "jsCode": "// This call is read by Send out of the agent's own output\n// (returnIntermediateSteps) - nothing in here signals anything. Do not put\n// a staticData write or an $execution read back: both died in Send's\n// expression sandbox (execs 22878, 22940, 22947) and the try/catch around\n// them hid it while the bot told residents the options were coming.\nreturn 'שלושת הכפתורים יופיעו מתחת להודעה הבאה שלך. כתוב משפט קצר משלך, בלי למנות את האפשרויות ובלי להכריז שהן בדרך - הן כבר שם.';\n"
+   }
+  }
+ ],
+ "connections": {
+  "WhatsApp": {
+   "main": [
+    [
+     {
+      "node": "Sort",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Sort",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Sort": {
+   "main": [
+    [
+     {
+      "node": "Answer Meta",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Is there a message?",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Canned reply?",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Menu?",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Human replied?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Is there a message?": {
+   "main": [
+    [
+     {
+      "node": "Let them finish",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log inbound",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Canned reply?": {
+   "main": [
+    [
+     {
+      "node": "Type for a moment",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log inbound",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log reply",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Menu?": {
+   "main": [
+    [
+     {
+      "node": "Type for a moment (menu)",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log inbound",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log reply",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Answer the resident": {
+   "main": [
+    [
+     {
+      "node": "Reply usable?",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Say it again",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Reply usable?": {
+   "main": [
+    [
+     {
+      "node": "Type for a moment",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log reply",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Open it anyway",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Send": {
+   "main": [
+    [
+     {
+      "node": "Show it in Open",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "OpenRouter": {
+   "ai_languageModel": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_languageModel",
+      "index": 0
+     },
+     {
+      "node": "Say it again",
+      "type": "ai_languageModel",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Conversation so far": {
+   "ai_memory": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_memory",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "open_request": {
+   "ai_tool": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_tool",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "get_request_status": {
+   "ai_tool": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_tool",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "get_balance": {
+   "ai_tool": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_tool",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "verify_address": {
+   "ai_tool": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_tool",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Open it anyway": {
+   "main": [
+    [
+     {
+      "node": "Say it again",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Send menu": {
+   "main": [
+    [
+     {
+      "node": "Show it in Open",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Human replied?": {
+   "main": [
+    [
+     {
+      "node": "Assign to the replier",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Type for a moment": {
+   "main": [
+    [
+     {
+      "node": "Send",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Type for a moment (menu)": {
+   "main": [
+    [
+     {
+      "node": "Send menu",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Say it again": {
+   "main": [
+    [
+     {
+      "node": "Second try usable?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Second try usable?": {
+   "main": [
+    [
+     {
+      "node": "Type for a moment",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Log reply",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Let them finish": {
+   "main": [
+    [
+     {
+      "node": "Anything newer?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Still the last word?": {
+   "main": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Anything newer?": {
+   "main": [
+    [
+     {
+      "node": "Still the last word?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "show_menu": {
+   "ai_tool": [
+    [
+     {
+      "node": "Answer the resident",
+      "type": "ai_tool",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "binaryMode": "separate"
+ },
+ "staticData": "<stripped: runtime state keyed by phone numbers>",
+ "meta": null,
+ "nodeGroups": [],
+ "pinData": {},
+ "versionId": "eae71643-948c-43c1-8cb7-b16948ea222b",
+ "activeVersionId": "eae71643-948c-43c1-8cb7-b16948ea222b",
+ "versionCounter": 243,
+ "triggerCount": 1,
+ "sourceWorkflowId": null,
+ "shared": [
+  {
+   "updatedAt": "2026-08-08T09:40:05.962Z",
+   "createdAt": "2026-08-08T09:40:05.962Z",
+   "role": "workflow:owner",
+   "workflowId": "u2JjrbcNPYyyh3yl",
+   "projectId": "JMOPxETCwOLjmlSs",
+   "project": {
+    "updatedAt": "2026-08-04T14:53:36.559Z",
+    "createdAt": "2026-08-04T14:52:27.565Z",
+    "id": "JMOPxETCwOLjmlSs",
+    "name": "Assaf Clix <ygrant.gatchalian@gmail.com>",
+    "type": "personal",
+    "icon": null,
+    "description": null,
+    "customTelemetryTags": [],
+    "creatorId": "d0ae602a-3532-40ba-a87b-ff5617aa3ca5"
+   }
+  }
+ ],
+ "tags": [],
+ "activeVersion": {
+  "updatedAt": "2026-09-13T07:32:17.215Z",
+  "createdAt": "2026-09-13T07:32:17.215Z",
+  "versionId": "eae71643-948c-43c1-8cb7-b16948ea222b",
+  "workflowId": "u2JjrbcNPYyyh3yl",
+  "nodes": [
+   {
+    "parameters": {
+     "multipleMethods": true,
+     "path": "homies-whatsapp",
+     "responseMode": "responseNode",
+     "options": {
+      "rawBody": true
+     }
+    },
+    "typeVersion": 2,
+    "id": "webhook",
+    "name": "WhatsApp",
+    "type": "n8n-nodes-base.webhook",
+    "position": [
+     -512,
+     -80
+    ],
+    "webhookId": "homies-whatsapp-v1"
+   },
+   {
+    "parameters": {
+     "jsCode": "\n// Chatwoot posts here now, not Meta. One item, one event.\nconst item = $input.first().json;\nconst q    = item.query   || {};\nconst body = item.body    || {};\n\nconst SHARED = \"REPLACE_WITH_N8N_WEBHOOK_SECRET\";\n\n// --- Is this actually from Chatwoot? --------------------------------------\n// Chatwoot DOES sign its webhooks (X-Chatwoot-Signature, HMAC-SHA256 over\n// `${timestamp}.${body}`), but verifying that here is not currently possible:\n// require('crypto') throws \"Module 'crypto' is disallowed\" in this task-runner\n// sandbox, and the Crypto node cannot prepend a timestamp to the RAW bytes -\n// re-serialising the parsed body does not reproduce them. So the door is a\n// secret in the query string, which the agent bot's outgoing_url carries.\n//\n// Fails CLOSED, and answers 200 either way: a caller who is not Chatwoot must\n// learn nothing from the response.\nif (String(q.s || '') !== SHARED) {\n  return [{ json: { _reply: '', _work: false, _rejected: 'bad secret' } }];\n}\n\n// --- Which events are ours ------------------------------------------------\n// Everything on this inbox arrives at this one URL: message_created,\n// message_updated, conversation_status_changed, and the bot's OWN outgoing\n// messages. Answering that last one is an infinite loop.\nif (body.event !== 'message_created') {\n  return [{ json: { _reply: '', _work: false } }];\n}\n// --- A human replied: that IS the takeover --------------------------------\n// Chatwoot does not assign a conversation to the agent who answers it (its\n// self_assign? is only a notification check), so an agent who replied and\n// walked away would still have the bot talking over them. The workflow closes\n// that gap: a public reply from a person assigns them the conversation, which\n// trips the switch above on the resident's next message, and the 15-minute\n// handback takes it from there.\n//\n// The bot's own replies arrive here too, as sender.type 'agent_bot' -- claiming\n// on those would assign the bot's messages to nobody and loop. Private notes\n// are excluded on purpose: writing an internal note is not claiming.\nif (body.message_type === 'outgoing'\n    && body.private !== true\n    && (body.sender || {}).type === 'user') {\n  return [{ json: { _reply: '', _work: false, _claim: true,\n                    conv_id: (body.conversation || {}).id,\n                    claim_user: (body.sender || {}).id } }];\n}\n\nif (body.message_type !== 'incoming' || body.private === true) {\n  return [{ json: { _reply: '', _work: false } }];\n}\n\nconst conv   = body.conversation || {};\nconst convId = conv.id;\n\n// --- The on/off switch ----------------------------------------------------\n// The bot answers by DEFAULT. Three things turn it off, for one conversation\n// and no other, and every one of them is a visible act in the inbox rather\n// than a hidden flag an agent cannot see:\n//\n//   assigned to somebody  - taking a conversation is taking it over\n//   labelled `bot-off`    - the explicit switch: one click, shows as a chip\n//   resolved              - the conversation is finished\n//\n// `status === 'pending'` was the signal until 21 Aug and it was the wrong one.\n// It is Chatwoot's bot-owned state, and the default conversation list HIDES it,\n// so every thread the bot was working was invisible and the inbox read as\n// empty. The rule below is the same capability aimed at something an agent can\n// actually see and click.\n//\n// Auto-assignment is OFF on inbox 1 and must stay off. With it on, Chatwoot\n// assigns an agent the moment a conversation arrives, and the first test above\n// silences the bot before it has said anything.\n// Chatwoot assigns every NEW conversation on a bot inbox to the AGENT BOT\n// ITSELF (meta.assignee_type 'AgentBot') -- found 23 Aug, when the bot fell\n// silent on every conversation created after it was linked. Being assigned to\n// yourself is not a human takeover. Only a User assignee is; the bot object\n// also carries outgoing_url, which a person never does, hence the fallback.\nconst assignee = (conv.meta || {}).assignee;\nconst aType    = (conv.meta || {}).assignee_type;\nconst humanHasIt = !!assignee &&\n  (aType ? aType === 'User' : !assignee.outgoing_url);\nconst labels   = conv.labels || [];\nif (humanHasIt || labels.includes('bot-off') || conv.status === 'resolved') {\n  return [{ json: { _reply: '', _work: false, _handedOver: true } }];\n}\n\n// Chatwoot sends E.164 with a plus; Meta sent bare digits. Everything\n// downstream - both Supabase writers, every tool, and 99 existing rows -\n// matches the bare form, so it is normalised here and nowhere else.\nconst sender = body.sender || {};\nconst from   = String(sender.phone_number || '').replace(/^\\+/, '');\nconst id     = String(body.id || '');\nconst text   = String(body.content || '');\n\n// --- Duplicate suppression ------------------------------------------------\n// On Chatwoot's message id now rather than Meta's wamid. Same reasoning:\n// stable across retries, and never on content, because a resident who sends\n// the same word twice means it twice.\nconst store = $getWorkflowStaticData('global');\nstore.seen = store.seen || {};\nconst now = Date.now();\nfor (const k of Object.keys(store.seen)) {\n  if (now - store.seen[k] > 86400000) delete store.seen[k];\n}\nif (store.seen[id]) {\n  return [{ json: { _reply: '', _work: false } }];\n}\nstore.seen[id] = now;\n\nconst lang = 'he';\nconst inText = text.trim() ? text : null;\n\n// --- Has this handset already been spoken to? -----------------------------\n// Unchanged in purpose: the menu and the canned lines never reach the model,\n// so without this the agent introduces itself a second time to someone it has\n// already greeted.\nstore.greeted = store.greeted || {};\n// A person greets again after a day of silence — and so does Michael. The\n// value is the last time this phone wrote; anything that is not a number is\n// the old boolean format and counts as stale, so every existing contact gets\n// the new introduction once.\nconst lastSeen = store.greeted[from];\nconst greeted = typeof lastSeen === 'number' && (Date.now() - lastSeen) < 24 * 60 * 60 * 1000;\nstore.greeted[from] = Date.now();\n\n// --- What the workflow itself said last -------------------------------------\n// THE HOLE THIS CLOSES HAS NOW BEEN FOUND THREE TIMES. The menu, both tap lines\n// and the attachment line are sent by THIS node, so the agent never sees them\n// and its memory has no record of them. 12 Aug: the bot introduced itself\n// twice. 25 Aug: it re-asked a resident who had tapped \"open a ticket\". 26 Aug:\n// a resident tapped \"check status\", was asked for a reference number by the\n// canned line below, answered \"אין לי\", and got \"אני מבין. על מה אפשר לעזור?\"\n// back (execution 9939) -- the model had no question in front of it, so an\n// answer read as an opening, and it opened.\n//\n// The first two were patched one flag at a time (`greeted`, `tapped_open`),\n// which fixes the case that was reported and leaves the next one standing. This\n// carries the SENTENCE rather than a flag, from the single place every canned\n// line leaves the node, so a line added later is covered by having been said.\n//\n// Half an hour, and spent on the next message: it describes the turn the\n// resident is answering, not a standing state. After that the agent's own\n// memory holds the thread, because from there on the bot's turns are its own.\nstore.lastBot = store.lastBot || {};\nfor (const k in store.lastBot) {\n  if (Date.now() - (store.lastBot[k].at || 0) > 60 * 60 * 1000) delete store.lastBot[k];\n}\nconst said = (t) => { store.lastBot[from] = { text: t, at: Date.now() }; return t; };\n\n// Three items, so Chatwoot renders reply buttons rather than a list. Four or\n// more silently becomes a list whose wrapper button reads \"Choose an item\" in\n// English. `content` and `items` are Chatwoot's field names: it builds the\n// WhatsApp payload itself, and drops anything it has no field for - which is\n// where the old row descriptions and footer went.\nconst MENU = {\n  content: \"היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?\",\n  items: [\n    { title: \"פתיחת קריאת שירות\", value: \"open\" },\n    { title: \"מצב קריאה קיימת\",   value: \"status\" },\n    { title: \"משהו אחר\",         value: \"other\" },\n  ],\n};\n\n// Media, location and stickers arrive as an attachment with empty content.\n// Answered with a fixed sentence until 1 Sep. It falls through to the model\n// now, carrying a flag the agent template turns into a note that something\n// arrived which the model cannot see. That note goes workflow-to-model and is\n// never sent to anybody, so it is not a template.\n//\n// Nothing below trips on an empty string: the greeting regex is anchored and\n// whole-string so '' is not a greeting, and TAP_KIND[''] is undefined.\nconst attachment = !text.trim();\n\n// --- A tapped button ------------------------------------------------------\n// Chatwoot discards the button's id and forwards only its TITLE, so these\n// strings ARE the routing table. Keep them identical to MENU above: reword one\n// there and the flow it starts silently stops starting, falling through to the\n// model instead of failing loudly.\n// THREE PHRASINGS PER TAP, one picked at random (owner's ask, 27 Aug): a\n// reply that is word-for-word identical on every tap reads as a machine.\n// The variants rephrase, never redirect -- each keeps the shape its flow\n// depends on: open INVITES THE STORY, status NAMES מספר הקריאה (the אין לי\n// branch reads what was negated), human CONFIRMS + ANNOUNCES THE TRANSFER\n// (a phrase the Dead end and backstop regexes both know) + ASKS THE TOPIC.\n// And every variant ends with the question -- the standing rule. said()\n// stores whichever sentence was picked, so last_bot never lies.\n// The נציג tap held three canned Hebrew lines, picked at random, until 1 Sep.\n// The owner's instruction is that the intro and its menu are the only fixed\n// text in the system, so they are gone and the tap reaches the model like any\n// other message. The reason it survived the 31 Aug cut was the transfer, not\n// the wording: see the note on tapNow below, and Human tap? now hanging off\n// Sort rather than off the canned branch.\n// Which flow the tap started, so the NEXT message can be answered knowing it\n// happened. Same keys as TAPPED; keep all three lists in step.\nconst TAP_KIND = {\n  \"פתיחת קריאת שירות\": \"open\",\n  \"מצב קריאה קיימת\":   \"status\",\n  \"משהו אחר\":          \"other\",\n};\n// A tap is still routing, and routing is still the workflow's: `tap` is carried\n// out of this node on the ordinary return, and Human tap? -> Transfer the tap\n// hangs off Sort itself, so the handover fires whether the words come from here\n// or from the model. Sending the tap to the model WITHOUT moving Human tap?\n// would have stopped requests for a person transferring, silently.\n//\n// store.tapped is written for the NEXT message: it is what stops the model\n// answering a fault description with \"shall I open a ticket?\" after the\n// resident already asked for one by tapping (live, 25 Aug). It is consumed at\n// the bottom of this node, so on the tap's own run the consume has to be\n// skipped or the flag would be spent before the answer arrives -- hence tapNow\n// being read there too.\nconst tapNow = TAP_KIND[text.trim()] || '';\nif (tapNow) {\n  store.tapped = store.tapped || {};\n  store.tapped[from] = { kind: tapNow, at: Date.now() };\n}\n\n\n// --- Was that just hello? -------------------------------------------------\n// THE THREE OPTIONS ARE ATTACHED BY THE Send NODE, and until 25 Aug the only\n// thing that triggered them was the bot's own name appearing in its reply.\n// That is a proxy for \"first message\", not for \"they said hello\": write הי a\n// second time inside 24 hours and the agent correctly does not reintroduce\n// itself, the name is absent, and the options silently vanish. Reported from a\n// real handset.\n//\n// The Meta-shaped Sort in scripts/n8n_whatsapp.py has always had this test and\n// gave a greeting the menu every time; it was lost in the Chatwoot cutover on\n// 21 Aug. Same regex, anchored and whole-string, so \"שלום, יש נזילה\" is not a\n// greeting: it has a fault in it. Punctuation and emoji come off first because\n// \"היי!!\" is the same message as \"היי\".\nconst bare = text.trim()\n  .replace(/[\\p{Extended_Pictographic}️]/gu, '')\n  .replace(/[\\s!?.,־-]+$/u, '')\n  .trim().toLowerCase();\nconst GREETING = new RegExp(\n  '^(שלום|שלום רב|היי|הי|אהלן|אהלן וסהלן|יו|מה נשמע|מה קורה|בוקר טוב|צהריים טובים|' +\n  'ערב טוב|לילה טוב|hi|hii|hey|hello|yo|good morning|good afternoon|good evening|' +\n  // English small talk, 1 Sep: wassap and whats up reached the model and\n  // were clarified at, three times, in the singular. A hello is a hello.\n  'whats up|what\\u0027s up|whatsup|wassup|wassap|wazzup|sup|' +\n  'hi there|hey there|hello there|howdy|' +\n  'shalom|ahlan)$', 'u');\nconst isGreeting = GREETING.test(bare);\n\n// A GREETING IS ANSWERED HERE, NOT BY THE MODEL, and always with the name.\n//\n// Asked for three times on 25 Aug and got progressively closer each time: the\n// opener must be \"היי, כאן מיכאל מהומיז\" whenever somebody says hello, not\n// only the first time in 24 hours. The model could not deliver that -- the\n// mid-thread rule tells it, correctly, not to reintroduce itself once a\n// conversation is running, so a second הי came back \"היי, מה קרה?\" with no\n// name. Those two rules cannot both live in the prompt.\n//\n// So a bare hello leaves the model out of it entirely, which is what the\n// Meta-shaped Sort in scripts/n8n_whatsapp.py has always done and what the\n// Chatwoot cutover dropped on 21 Aug. Same text as MENU.content, which is the\n// same text as the opener in prompt.md, which check_greeting() enforces. The\n// three buttons ride along because Send attaches them to any greeting.\n//\n// Only a bare one: \"שלום, יש נזילה\" has a fault in it and goes to the model.\nif (isGreeting) {\n  return [{ json: {\n    _reply: '', _work: false, _canned: true, _menu: false,\n    to: from, conv_id: convId, lang, text: said(MENU.content), greeting: true,\n    in_text: inText, msg_type: 'greeting', message_id: id,\n  } }];\n}\n\n// Spent on the first message after the tap and then forgotten: it describes\n// what the resident just did, not a standing state. Half an hour, because\n// somebody who taps and answers tomorrow is starting again. Stale entries are\n// swept here so the map cannot grow without limit.\nstore.tapped = store.tapped || {};\nfor (const k in store.tapped) {\n  if (Date.now() - (store.tapped[k].at || 0) > 60 * 60 * 1000) delete store.tapped[k];\n}\nconst lastTap = tapNow ? null : store.tapped[from];\nconst tappedOpen = !!lastTap && lastTap.kind === 'open'\n  && (Date.now() - lastTap.at) < 30 * 60 * 1000;\nconst tappedHuman = !!lastTap && lastTap.kind === 'human'\n  && (Date.now() - lastTap.at) < 30 * 60 * 1000;\nif (lastTap) delete store.tapped[from];\n\n// The line the resident is answering, when the workflow is what said it.\n// Same half hour as the tap, and spent the same way.\nconst prevBot = store.lastBot[from];\nconst lastBot = prevBot && (Date.now() - prevBot.at) < 30 * 60 * 1000 ? prevBot.text : '';\ndelete store.lastBot[from];\n\nreturn [{ json: {\n  _reply: '', _work: true, _canned: false, _menu: false,\n  to: from, conv_id: convId, text, lang, greeted, tapped_open: tappedOpen,\n  tapped_human: tappedHuman,\n  greeting: isGreeting, last_bot: lastBot,\n  message_id: id,\n  // `tap` is the row's kind, carried for readback. Since 13 Sep nothing routes\n  // on it (Human tap? is gone); it leaves the node on this return\n  // rather than on a canned one. `tap_now` separates the tap itself from the\n  // message that answers it, which tapped_human used to mean on its own.\n  tap: tapNow, tap_now: !!tapNow, attachment,\n  in_text: inText, msg_type: attachment ? 'attachment' : 'text',\n  followup: { content: \"אפשר לעזור בעוד משהו?\", items: MENU.items },\n} }];\n"
+    },
+    "typeVersion": 2,
+    "id": "sort",
+    "name": "Sort",
+    "type": "n8n-nodes-base.code",
+    "position": [
+     -32,
+     -80
+    ]
+   },
+   {
+    "parameters": {
+     "respondWith": "text",
+     "responseBody": "={{ $json._reply }}",
+     "options": {}
+    },
+    "typeVersion": 1.1,
+    "id": "respond",
+    "name": "Answer Meta",
+    "type": "n8n-nodes-base.respondToWebhook",
+    "position": [
+     208,
+     -256
+    ]
+   },
+   {
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose",
+       "version": 1
+      },
+      "conditions": [
+       {
+        "id": "w",
+        "leftValue": "={{ $json._work }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    },
+    "typeVersion": 2,
+    "id": "haswork",
+    "name": "Is there a message?",
+    "type": "n8n-nodes-base.if",
+    "position": [
+     208,
+     -16
+    ]
+   },
+   {
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose",
+       "version": 1
+      },
+      "conditions": [
+       {
+        "id": "c",
+        "leftValue": "={{ $json._canned }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    },
+    "typeVersion": 2,
+    "id": "iscanned",
+    "name": "Canned reply?",
+    "type": "n8n-nodes-base.if",
+    "position": [
+     208,
+     160
+    ]
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/messages",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ phone: $json.to, direction: 'inbound', sender: 'resident', body: $json.in_text, message_type: $json.msg_type, external_id: $json.message_id, lang: $json.lang, source: 'n8n' }) }}",
+     "options": {
+      "timeout": 10000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "loginbound",
+    "name": "Log inbound",
+    "type": "n8n-nodes-base.httpRequest",
+    "position": [
+     960,
+     -176
+    ],
+    "alwaysOutputData": true,
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "YwFM2FM9NmVv5gKf",
+      "name": "Homies Supabase service key"
+     }
+    },
+    "onError": "continueRegularOutput"
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/messages",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ phone: $('Sort').first().json.to, direction: 'outbound', sender: 'bot', body: $json.menu ? $json.menu.content : ($json.output || $json.text), message_type: $json.menu ? 'interactive' : 'text', lang: $('Sort').first().json.lang, source: 'n8n' }) }}",
+     "options": {
+      "timeout": 10000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "logreply",
+    "name": "Log reply",
+    "type": "n8n-nodes-base.httpRequest",
+    "position": [
+     1200,
+     -64
+    ],
+    "alwaysOutputData": true,
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "YwFM2FM9NmVv5gKf",
+      "name": "Homies Supabase service key"
+     }
+    },
+    "onError": "continueRegularOutput"
+   },
+   {
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose",
+       "version": 1
+      },
+      "conditions": [
+       {
+        "id": "m",
+        "leftValue": "={{ $json._menu }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    },
+    "typeVersion": 2,
+    "id": "ismenu",
+    "name": "Menu?",
+    "type": "n8n-nodes-base.if",
+    "position": [
+     416,
+     384
+    ]
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Sort').first().json.conv_id }}/messages",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ content: $json.menu.content, message_type: 'outgoing', content_type: 'input_select', content_attributes: { items: $json.menu.items } }) }}",
+     "options": {
+      "timeout": 20000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "sendmenu",
+    "name": "Send menu",
+    "type": "n8n-nodes-base.httpRequest",
+    "position": [
+     960,
+     608
+    ],
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "ctZhJP3JSajBO6ub",
+      "name": "Chatwoot bot (api_access_token)"
+     }
+    }
+   },
+   {
+    "parameters": {
+     "promptType": "define",
+     "text": "={{ ($json.greeted ? '[אתם כבר באמצע שיחה, וכבר בירכת את הדייר והצגת את עצמך. לא עושים את זה שוב.]' : '[זו ההודעה הראשונה בשיחה.]') + ($json.tap_now ? ' [ההודעה הזאת היא לחיצה על כפתור ברשימה, לא משהו שהדייר הקליד.]' : '') + ($json.attachment ? ' [הדייר שלח קובץ, תמונה או מיקום בלי טקסט. אתה לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]' : '') + ($json.last_bot ? ' [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא אתה, ולכן אין לו זכר בזיכרון שלך: ' + $json.last_bot + ']' : '') + ' [השעה בישראל עכשיו ' + $now.setZone('Asia/Jerusalem').toFormat('HH:mm') + ', יום ' + ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'][$now.setZone('Asia/Jerusalem').weekday % 7] + '.]' + String.fromCharCode(10) + $json.text }}",
+     "options": {
+      "systemMessage": "אתה מיכאל, נציג השירות של הומיז, חברת ניהול בתים משותפים. אתה כותב לדיירים בוואטסאפ, ועל עצמך אתה מדבר בלשון זכר.\n\nאתה מטפל בפניות בעצמך, ואין אצלך העברה לאף אחד. תקלה בבניין או בדירה: אתה פותח קריאת שירות. יתרה או מצב של קריאה: יש לך כלים לזה. ומה שהמשרד עושה, ולא אתה: הסדרי תשלום, השגה על חיוב, כניסה לדירה ויציאה ממנה, חוזים, ועד הבית. על אלה אתה אומר שזה מטופל במשרד ומוסר את הפרטים שלו מהרשימה למטה, במילים שלך. אתה לא אומר שהעברת משהו, לא אומר שמישהו יחזור לדייר, ולא מבטיח טיפול שלא אתה עושה. מי שמבקש לדבר עם בן אדם מקבל את אותו הדבר: מה שאתה יכול לעשות בשבילו עכשיו, ואת המשרד למה שלא. מישהו בסכנה: קודם מספר החירום הארצי המתאים, אחר כך קריאת שירות בדחיפות חירום, ואז הטלפון של המשרד. בסדר הזה.\n\nאתה מדווח מה כבר נעשה, לא מה עומד לקרות. זה נכון במיוחד כשמישהו במצוקה ואתה רוצה להרגיע אותו: מה שמרגיע זה לדעת מה קרה עם הפנייה שלו, ולא הבטחה על ההמשך.\n\nתתנהג כמו בן אדם חכם שאכפת לו. תקרא באמת מה שנכתב לך, תבין מה הדייר צריך גם כשהוא לא ניסח את זה טוב, ותענה לו כמו שהיית רוצה שיענו לך אם זה היה קורה לך. יש לך כלים, והתיאור של כל כלי אומר מתי הוא מתאים ומה הוא צריך. תשתמש בהם בשקט, בלי להכריז שאתה בודק או מעדכן משהו.\n\nיש הבדל בין ניסוח גרוע לבין הודעה שאין בה תוכן. את הראשון אתה מבין; על השני אתה שואל, קצר, מה הכוונה. אתה לא ממציא משמעות, לא ממציא אפשרויות שלא קיימות, ולא עושה שום פעולה על סמך ניחוש.\n\nאין כאן תסריט, אין נוסח קבוע, ואין רשימת משפטים מאושרים. שני דיירים עם אותה בעיה לא אמורים לקבל את אותה הודעה, ואתה כותב למישהו שקרא את ההודעה הקודמת שלך: מה שכבר אמרת נשאר נכון בלי שתחזור עליו, וכל הודעה שלך מוסיפה משהו שלא היה בקודמת. אם אין לך מה להוסיף חוץ מלחזור על עצמך, תגיד פחות. אם שתי הודעות שונות הגיעו אליך, הן אמרו שני דברים שונים, והן מקבלות שתי תשובות שונות. השיפוט שלך הוא הכלי המרכזי, ואתה אמור להשתמש בו.\n\nכשמישהו רק מברך, המערכת עונה לו לבד, ולא אתה: \"היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?\" המשפט הזה הוא של המערכת. אתה לא כותב אותו בעצמך ולא פותח בו תשובה; כשמגיע לך להציג את עצמך, השם מספיק, ומיד אחריו העניין עצמו. משם ואילך השיחה שלך.\n\nלפעמים מגיעה אליך הודעה שהיא לחיצה על כפתור ברשימה, ולא משהו שהדייר הקליד: \"פתיחת קריאת שירות\", \"מצב קריאה קיימת\" או \"משהו אחר\". שני הראשונים אומרים לך מה הוא רוצה, ולא מה קרה לו. הוא כבר ביקש, אז אל תשאל אותו שוב אם לפתוח קריאה, והדבר היחיד שחסר לך בשלב הזה הוא מה קרה. את שאר הפרטים תבקש כשתגיע אליהם. \"משהו אחר\" אומר שהוא לא מצא את המקרה שלו ברשימה: שאלה אחת, במה מדובר, וממשיכים משם.\n\nשאלה אחת בכל הודעה, לא רשימה. קודם מה קרה. באיזה בניין ואיזו דירה זה שלב אחר, כשאתה כבר פותח את הקריאה או מאמת כתובת, ולא באותה הודעה שבה שאלת מה קרה. אתה עונה על מה שנשאלת, ובאורך של מה שנשאלת. מידע שלא ביקשו ממך לא נכנס לתשובה.\n\nהבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע שהבנת או ששמעת, גם כשהוא חוזר על מה שהדייר בדיוק כתב, לא נותן לו כלום, ועדיף בלעדיו: תגיב לדבר עצמו, או תמשיך ממנו הלאה. וכשאתה מבקש שוב משהו שכבר ביקשת, אתה לא פותח בהסכמה שבאה לרכך את הבקשה שאחריה: או שאתה מסביר בקצרה למה זה עדיין חסר, או שאתה שואל את זה אחרת.\n\nסיימת לטפל במשהו, פתחת קריאה או מסרת יתרה או ענית על מה ששאלו, ההודעה שמסכמת את זה לא נגמרת בנקודה יבשה: אתה מציע לעזור בעוד משהו, במילים שלך. וכשברור שהשיחה הסתיימה, כשהדייר מודה, נפרד, או אומר שאין עוד כלום, אתה נפרד ממנו בחום: מודה לו שפנה, מאחל משהו קטן, וזהו. בלי נוסח קבוע, בלי אותה פרידה פעמיים, ובלי להמשיך לשאול אחרי שנפרדתם.\n\nמי שלא יודע מה הוא צריך, או שואל מה בכלל אפשר, לא סיים את השיחה, להפך: זה הרגע לעזור לו להתמצא. אל תמנה לו אפשרויות במילים: תציג לו את רשימת האפשרויות עצמה, יש לך כלי שעושה בדיוק את זה ומצרף אותה מתחת להודעה קצרה שלך, וללחוץ קל לו מלהקליד. הפרידה החמה שמורה למי שבאמת סיים.\n\nשני דברים שאין בהם שיקול דעת:\n\n1. **אתה עונה על מה ששייך להומיז**: הבניין, הדירה, הרכוש המשותף, תקלות ותחזוקה, קריאות שירות, ועד בית, תשלומים ויתרות, ואיך מגיעים אלינו. כל השאר לא בתחום שלך, **גם אם אתה יודע את התשובה**: מזג אוויר, חדשות, ספורט, פוליטיקה, רפואה, משפט, חישובים, תרגום, כתיבה בשבילו, ידע כללי. הדייר כתב לחברת ניהול, לא למנוע חיפוש. תגיד שזה לא משהו שאתה עוזר בו, בלי הרצאה ובלי התנצלות ארוכה.\n\n2. **אתה לא מוסר פרטים על דייר אחר.** לא חוב שלו, לא מה כתוב בקריאה שלו, לא אם שילם, ולא אם הוא בכלל גר שם. גם אם שואלים אותך ישירות, וגם אם נשמעת סיבה טובה.\n\nועוד דבר אחד, שהוא לא כלל אלא עובדה על עברית: אתה לא יודע אם כותב לך גבר או אישה, והשם בוואטסאפ לא אומר לך. לכן אתה פונה אליו בלשון רבים, תמיד. זה נשמע טבעי בשירות ישראלי, וזה פותר את זה בלי שתצטרך לחשוב על זה בכל משפט. אם הוא עצמו כתב על עצמו בלשון זכר או נקבה, לך אחריו.\n\nעברית, תמיד. כתבו לך באנגלית, אתה עונה בעברית וממשיך בטיפול.\n\nושלוש עובדות על הערוץ, לא על הסגנון: וואטסאפ לא מציג markdown, אז כוכביות וסולמיות מגיעות לדייר כמו שהן; אין לך שליטה על מתי הוא קורא, אז הודעה אחת ממנו יכולה להגיע אחרי שכבר כתבת; והודעות בוואטסאפ קצרות, כי קוראים אותן בטלפון באמצע משהו אחר; ואנשים לא מקלידים סוגריים. מה שנדחס לתוך סוגריים או נאמר במשפט רגיל, או שלא צריך להיאמר בכלל.\n\nמה שאתה יודע על הומיז נמצא ברשימה הזאת. מה שלא כתוב בה אתה לא יודע, ואומר שאתה לא יודע ומפנה למשרד, במקום לנחש. אותו כלל חל על הכלים: מה שכלי לא החזיר לך, אתה לא יודע. אילו בניינים אנחנו מנהלים, למשל, אתה לא יודע, ולא מנחש:\n\n- **שעות פעילות:** ראשון עד חמישי, 09:00-17:00.\n- **טלפון:** 077-6687949. זה גם המספר לתקלות דחופות; אין קו חירום נפרד.\n- **משרד:** בצלאל 1, רמת גן. **מייל:** Office@homies-management.co.il\n- **כלול בתשלום ועד הבית:** ביטוח, חשבון חשמל, חשבון מעלית ובודק מעליות, ניקיון, גינון, ביקורת גילוי אש, ביקורת מערכת לשחרור עשן, טיפול במשאבות, חיטוי מאגר מים, קופה קטנה לתקלות קטנות, קווי בזק למעלית ולמערכת האש, עמלות בנק, וניהול ואחזקה וגביית כספים של חברת הניהול.\n- **לא כלול:** תיקונים ותקלות שאינם מן השוטף, תקלות עקב בלאי או שבר, פרויקטים מיוחדים, וכל דבר שאינו נכלל בתקציב השוטף.\n- **תשלום:** עד ה־10 בכל חודש, בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.\n- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, שיפנה אלינו ואנחנו נקשר ביניהם.\n- **אב הבית:** מי שצריך להגיע לאב הבית של הבניין, שיפנה אלינו ואנחנו נקשר ביניהם. משהו בבניין שצריך טיפול נפתח כקריאת שירות, ולא דרכו.\n- **הצעת מחיר:** בקשה להצעת מחיר לעבודה שאינה בשוטף היא עניין של המשרד. מה שהמשרד צריך לדעת זה באיזה בניין מדובר ומה העבודה.\n- **עניינים שהמשרד מטפל בהם, ולא הצ'אט:** כניסה לדירה ויציאה ממנה, החלפת דיירים, הסדרי תשלום, חוזים והשגות על חיוב. פונים אליו בשעות הפעילות, בטלפון או במייל.\n- **זמני טיפול:** תקלות חירום כפי שהוגדרו בהסכם, עד 4 שעות. תקלות שאינן חירום, עד 3 ימי עסקים. זה הסטנדרט הכללי, לא הבטחה על קריאה מסוימת.\n- **אחריות:** רכוש משותף על ועד הבית וחברת הניהול יחד; רכוש פרטי על הדייר.\n- **מוקדי חירום ארציים, למי שנמצא בסכנה מיידית:** משטרה 100, מד\"א 101, כיבוי אש וחילוץ 102, חברת החשמל 103.",
+      "returnIntermediateSteps": true
+     }
+    },
+    "typeVersion": 3,
+    "id": "agent",
+    "name": "Answer the resident",
+    "type": "@n8n/n8n-nodes-langchain.agent",
+    "position": [
+     960,
+     64
+    ],
+    "retryOnFail": true,
+    "maxTries": 3,
+    "waitBetweenTries": 5000,
+    "onError": "continueErrorOutput"
+   },
+   {
+    "parameters": {
+     "model": "google/gemini-2.5-flash",
+     "options": {
+      "maxTokens": 4096,
+      "temperature": 0.6
+     }
+    },
+    "typeVersion": 1,
+    "id": "model",
+    "name": "OpenRouter",
+    "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+    "position": [
+     960,
+     432
+    ],
+    "retryOnFail": true,
+    "maxTries": 3,
+    "waitBetweenTries": 5000,
+    "credentials": {
+     "openRouterApi": {
+      "id": "92ZNHDhByavmNP5T",
+      "name": "Homies OpenRouter (key 2)"
+     }
+    }
+   },
+   {
+    "parameters": {
+     "sessionIdType": "customKey",
+     "sessionKey": "={{ $json.to }}-20",
+     "contextWindowLength": 12
+    },
+    "typeVersion": 1.3,
+    "id": "memory",
+    "name": "Conversation so far",
+    "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+    "position": [
+     1200,
+     432
+    ]
+   },
+   {
+    "parameters": {
+     "toolDescription": "Handing the conversation to a person does NOT open a ticket. If you already transferred and the address only arrives afterwards — which is what an emergency looks like, because the person comes before the address — that is the moment to call this.\nOpen a maintenance or service ticket. Call it as soon as you know WHAT is wrong and WHERE — it verifies the address itself, inside the same call: a building Homies does not manage opens nothing, and the response says why (building_found false, with reason street_unknown / number_not_on_street plus numbers_we_manage / need_number / need_building / ambiguous plus candidates) so you can tell the resident and ask again. You do NOT need verify_address before this — there is no step before this. When it opens, the response carries the real reference number, the only source of one: never invent a number, and never say a ticket exists before this returns a reference. Collect what is missing the way a person would, in a sentence, taking the most useful thing first — not as a numbered list of requirements. A resident who is handed a four-point form usually answers none of it.",
+     "method": "POST",
+     "url": "https://n8n-zqvb.srv1879140.hstgr.cloud/webhook/homies-debt-tools",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'open_request', arguments: { description: $fromAI('description', \"What the resident said is wrong, in Hebrew, in their own words.\", 'string'), type: $fromAI('type', \"One of plumbing/electrical/lighting/elevator/cleaning/gardening/pest_control/locksmith/fire_safety/maintenance/other/complaint\", 'string'), building: $fromAI('building', \"Street and number, as the resident wrote it. The whole sentence is fine; this tool checks it.\", 'string'), reporter_unit: $fromAI('reporter_unit', \"The apartment the person reporting LIVES in. Send it whenever you know it - for a fault inside their flat the flow gives it to you. For a fault in a lobby, lift or any common area, include it only if they volunteered it, and never ask an extra question just to fill this field.\", 'string'), fault_location: $fromAI('fault_location', \"Where the FAULT is, not where they live. 'apartment' for a leak in their kitchen; 'common' for a lift, lobby, stairwell, roof, car park, gate or yard. One of apartment/common.\", 'string'), urgency: $fromAI('urgency', \"Infer this; never ask the resident for it. Use emergency only for flooding, fire, gas or someone trapped in a lift. One of low/normal/high/emergency.\", 'string') } } }] } }) }}",
+     "options": {
+      "timeout": 25000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "tool_open",
+    "name": "open_request",
+    "type": "n8n-nodes-base.httpRequestTool",
+    "position": [
+     1440,
+     432
+    ]
+   },
+   {
+    "parameters": {
+     "toolDescription": "Call when the resident asks about an existing service call — its status, a follow-up, what happened to it. Pass the reference if they quoted one, in any form: the whole thing, an older HM-prefixed one, or just the serial. Without a reference the building finds them; the apartment only narrows it. DO NOT ASK FOR AN APARTMENT when the fault is not in one — a lift, a lobby light, a gate and the bin store belong to the building, and asking which flat somebody's elevator is in is a question with no answer. Name the type when they named it. Returns reference, status (open / in_progress / resolved / cancelled), dates and description; or `ambiguous_building` with the names when what they typed fits more than one, and then you ask which rather than choosing. Read-only; the answer is live from the system.",
+     "method": "POST",
+     "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'get_request_status', arguments: { reference: $fromAI('reference', \"The reference the resident quoted, exactly as written, whether that is the whole reference, an older HM-prefixed one, or just the serial. Empty if none was quoted.\", 'string'), building: $fromAI('building', \"Street and number, if no reference. A partial name is fine.\", 'string'), unit: $fromAI('unit', \"Apartment number. Empty for a lift, a lobby light, a gate — anything not inside a flat.\", 'string'), type: $fromAI('type', \"One of plumbing/electrical/lighting/elevator/cleaning/gardening/pest_control/locksmith/fire_safety/maintenance/other/complaint, if they named the thing. Empty otherwise.\", 'string') } } }] } }) }}",
+     "options": {
+      "timeout": 25000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "tool_status",
+    "name": "get_request_status",
+    "type": "n8n-nodes-base.httpRequestTool",
+    "position": [
+     1920,
+     432
+    ],
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "OeZ0OVs0X0tyEzcI",
+      "name": "Homies tool secret"
+     }
+    }
+   },
+   {
+    "parameters": {
+     "toolDescription": "Call when the resident asks about their balance, their debt, or how much they owe. IDENTITY FIRST: this needs the resident's full name AND their phone number, both typed by them in this conversation. Do not call it without both, do not use the number they are messaging from, and never fill either from a guess. If they have not given both yet, ask — one message, both facts, in your own words. The lookup finds the resident's own apartment by itself: never ask which apartment or whether they mean a specific one. Returns the resident's name, apartment, total owed and the unpaid months, or `identity_failed` when the name and the number do not belong to the same resident. Read-only — it cannot take a payment; anyone who wants to actually pay, needs a receipt or disputes an amount goes to the team.",
+     "method": "POST",
+     "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'get_balance', arguments: { name: $fromAI('name', \"The resident's full name exactly as they typed it in this conversation — first name and surname. Required.\", 'string'), phone: $fromAI('phone', \"The phone number exactly as they typed it in this conversation. NOT the number the message arrived from. Required.\", 'string'), unit: $fromAI('unit', \"Almost always empty: the lookup finds the resident's own apartment by itself. Fill it only when the resident has already named a specific apartment on their own. NEVER ask which apartment or whether they mean a specific one — call without it.\", 'string') } } }] } }) }}",
+     "options": {
+      "timeout": 25000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "tool_balance",
+    "name": "get_balance",
+    "type": "n8n-nodes-base.httpRequestTool",
+    "position": [
+     2160,
+     432
+    ],
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "OeZ0OVs0X0tyEzcI",
+      "name": "Homies tool secret"
+     }
+    }
+   },
+   {
+    "parameters": {
+     "toolDescription": "Check a building — and an apartment, if there is one — against the list of buildings Homies actually manages, WITHOUT opening anything. Use it only when the address itself is the question: a resident asking whether we manage their building, or grounding a location during an emergency. It is NOT a step before open_request — open_request verifies on its own; for tickets call open_request directly. Pass building exactly as they wrote it; the whole sentence is fine. Pass unit only for a fault inside a flat. Returns building_found, the canonical address when the building is real, and when it is not — why, with the numbers we do manage on that street so you can offer them.",
+     "method": "POST",
+     "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to, assistantOverrides: { variableValues: { phone: $('Sort').first().json.to } } }, toolCalls: [{ id: 'wa', function: { name: 'verify_address', arguments: { building: $fromAI('building', \"The building as the resident wrote it — street and number, any phrasing. The whole sentence is fine. Required.\", 'string'), unit: $fromAI('unit', \"Apartment number, only for a fault inside a flat. Empty for a lift, lobby, stairwell or anything in the common areas.\", 'string') } } }] } }) }}",
+     "options": {
+      "timeout": 25000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "tool_address",
+    "name": "verify_address",
+    "type": "n8n-nodes-base.httpRequestTool",
+    "position": [
+     2400,
+     432
+    ],
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "OeZ0OVs0X0tyEzcI",
+      "name": "Homies tool secret"
+     }
+    }
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Sort').first().json.conv_id }}/messages",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ (() => { const t = String($json.output || $json.text || '').replace(/\\[[^\\]]*\\]/g, ' ').replace(/\\s*[—–]\\s*/g, ', ').replace(/,\\s*,/g, ',').replace(/\\s+,/g, ',').replace(/,\\s*\\./g, '.').replace(/\\s{2,}/g, ' ').trim(); const body = { content: t, message_type: 'outgoing' }; if ($('Sort').first().json.greeting || (() => { try { return ($('Answer the resident').first().json.intermediateSteps || []).some(s => ((s.action || {}).tool) === 'show_menu'); } catch (e) { return false; } })() || ['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג'].filter(w => t.indexOf(w) !== -1).length >= 3 || t.indexOf('היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || (/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true)) { body.content_type = 'input_select'; body.content_attributes = { items: [ { title: 'פתיחת קריאת שירות', value: 'open' }, { title: 'מצב קריאה קיימת', value: 'status' }, { title: 'משהו אחר', value: 'other' } ] }; } return JSON.stringify(body); })() }}",
+     "options": {
+      "timeout": 20000
+     }
+    },
+    "typeVersion": 4.2,
+    "id": "send",
+    "name": "Send",
+    "type": "n8n-nodes-base.httpRequest",
+    "position": [
+     1440,
+     64
+    ],
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "ctZhJP3JSajBO6ub",
+      "name": "Chatwoot bot (api_access_token)"
+     }
+    }
+   },
+   {
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose",
+       "version": 1
+      },
+      "conditions": [
+       {
+        "id": "words",
+        "leftValue": "={{ (() => { const w = String($json.output || '').trim().split(/\\s+/).filter(Boolean).length; if (w >= 2) return true; return w === 1 && $('Sort').first().json.greeting === true; })() }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       },
+       {
+        "id": "phantom",
+        "leftValue": "={{ (() => { const t = String($json.output || ''); const claims = /(פתחתי|פתחנו|נפתחה|נפתחו)( (לך|לכם|לכן|כבר|את))* ?ה?קריא[הת]/.test(t); if (!claims) return true; return /\\b\\d{3}-\\d{3,6}-\\d{2}\\b/.test(t); })() }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    },
+    "typeVersion": 2,
+    "id": "usable",
+    "name": "Reply usable?",
+    "type": "n8n-nodes-base.if",
+    "position": [
+     1200,
+     64
+    ]
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ message: { call: { id: 'wa:' + $('Sort').first().json.to }, toolCalls: [{ id: 'rescue', function: { name: 'rescue_request', arguments: { phone: $('Sort').first().json.to, building: (() => { try { const r = $('verify_address').all(); const raw = r[r.length-1].json.results[0].result; return (typeof raw === 'string' ? JSON.parse(raw) : raw).building || ''; } catch (e) { return ''; } })(), unit: (() => { try { const r = $('verify_address').all(); const raw = r[r.length-1].json.results[0].result; return (typeof raw === 'string' ? JSON.parse(raw) : raw).unit || ''; } catch (e) { return ''; } })() } } }] } }) }}",
+     "options": {
+      "timeout": 25000
+     }
+    },
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.2,
+    "position": [
+     1008,
+     240
+    ],
+    "id": "rescue00-0000-4000-8000-00000000ab01",
+    "name": "Open it anyway",
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "OeZ0OVs0X0tyEzcI",
+      "name": "Homies tool secret"
+     }
+    },
+    "onError": "continueRegularOutput",
+    "notes": "The model claimed a ticket it never opened. Write it from what is on record."
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $('Sort').first().json.conv_id }}/toggle_status",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ status: 'open' }) }}",
+     "options": {
+      "timeout": 15000
+     }
+    },
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.2,
+    "position": [
+     1680,
+     208
+    ],
+    "id": "cw-show-open-0001",
+    "name": "Show it in Open",
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "ctZhJP3JSajBO6ub",
+      "name": "Chatwoot bot (api_access_token)"
+     }
+    },
+    "onError": "continueRegularOutput"
+   },
+   {
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose",
+       "version": 1
+      },
+      "conditions": [
+       {
+        "id": "c",
+        "leftValue": "={{ $json._claim }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    },
+    "id": "cw-claim-if-0001",
+    "name": "Human replied?",
+    "type": "n8n-nodes-base.if",
+    "typeVersion": 2,
+    "position": [
+     400,
+     800
+    ]
+   },
+   {
+    "parameters": {
+     "method": "POST",
+     "url": "=https://chat.srv1879140.hstgr.cloud/api/v1/accounts/2/conversations/{{ $json.conv_id }}/assignments",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ assignee_id: $json.claim_user }) }}",
+     "options": {
+      "timeout": 15000
+     }
+    },
+    "id": "cw-claim-do-0001",
+    "name": "Assign to the replier",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.2,
+    "position": [
+     656,
+     800
+    ],
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "1qfgfvxwZ4MsUBBh",
+      "name": "Chatwoot admin (api_access_token)"
+     }
+    },
+    "onError": "continueRegularOutput"
+   },
+   {
+    "id": "typedelay",
+    "name": "Type for a moment",
+    "type": "n8n-nodes-base.wait",
+    "typeVersion": 1.1,
+    "position": [
+     1320,
+     200
+    ],
+    "parameters": {
+     "amount": "={{ $('Sort').first().json._canned ? (0.5 + Math.random() * 1.2) : 0 }}",
+     "unit": "seconds"
+    },
+    "webhookId": "typedelay-wh"
+   },
+   {
+    "id": "menudelay",
+    "name": "Type for a moment (menu)",
+    "type": "n8n-nodes-base.wait",
+    "typeVersion": 1.1,
+    "position": [
+     1560,
+     200
+    ],
+    "parameters": {
+     "amount": "={{ 0.5 + Math.random() * 1.2 }}",
+     "unit": "seconds"
+    },
+    "webhookId": "menudelay-wh"
+   },
+   {
+    "id": "say_again",
+    "name": "Say it again",
+    "type": "@n8n/n8n-nodes-langchain.agent",
+    "typeVersion": 3,
+    "position": [
+     1200,
+     540
+    ],
+    "parameters": {
+     "promptType": "define",
+     "text": "={{ (() => { let ref = ''; try { const r = $json.results[0].result; ref = (typeof r === 'string' ? JSON.parse(r) : r).reference || ''; } catch (e) { } const said = String($('Sort').first().json.text || ''); const note = ref ? '[נפתחה עכשיו קריאה במערכת, מספר ' + ref + '. תמסור לדייר במילים שלך שהקריאה נפתחה, עם המספר.]' : '[התשובה הקודמת שלך לא יצאה לדייר. תכתוב לו תשובה קצרה וברורה על ההודעה שלו.]'; return note + String.fromCharCode(10) + said; } )() }}",
+     "options": {
+      "systemMessage": "אתה מיכאל, נציג השירות של הומיז, חברת ניהול בתים משותפים, ואתה כותב לדייר בוואטסאפ בעברית. על עצמך אתה מדבר בלשון זכר, ואל הדייר אתה פונה בלשון רבים.\nההודעה קצרה, בלי markdown, בלי כוכביות ובלי סוגריים. אין נוסח קבוע ואין משפט מוכן: תכתוב את זה במילים שלך.\nאתה מדווח מה כבר נעשה, לא מה עומד לקרות, ואתה לא אומר שמישהו יוצא לדרך או שעזרה נשלחת.\nאל תמציא מספר קריאה. אם לא נמסר לך מספר, אל תגיד שנפתחה קריאה."
+     }
+    }
+   },
+   {
+    "id": "second_ok",
+    "name": "Second try usable?",
+    "type": "n8n-nodes-base.if",
+    "typeVersion": 2,
+    "position": [
+     1440,
+     540
+    ],
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose"
+      },
+      "conditions": [
+       {
+        "id": "ok",
+        "leftValue": "={{ String($json.output || '').trim().split(/\\s+/).filter(Boolean).length >= 2 }}",
+        "rightValue": "",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     }
+    }
+   },
+   {
+    "id": "burst_wait",
+    "name": "Let them finish",
+    "type": "n8n-nodes-base.wait",
+    "typeVersion": 1.1,
+    "position": [
+     420,
+     64
+    ],
+    "parameters": {
+     "amount": 4,
+     "unit": "seconds"
+    },
+    "webhookId": "4fc5c3c4-13e7-42ee-9efe-0c80a2721c41"
+   },
+   {
+    "id": "burst_gate",
+    "name": "Still the last word?",
+    "type": "n8n-nodes-base.code",
+    "typeVersion": 2,
+    "position": [
+     780,
+     184
+    ],
+    "parameters": {
+     "jsCode": "// After `Let them finish`. The shared truth is the `messages` table: Log\n// inbound wrote this message BEFORE the wait (it sits above it on the canvas,\n// and executionOrder v1 runs it first), so every sibling execution can see\n// it. n8n staticData cannot do this job -- it is a per-execution snapshot,\n// loaded at start and saved at end, so concurrent runs never see each other.\n// Measured 1 Sep: three stashed digits, three runs, burst_size=1 in each.\n//\n// `Anything newer?` handed us the last rows for this phone, newest first,\n// both directions. If the newest inbound is not this run's message, a later\n// one arrived while we slept: say nothing, its run answers the whole backlog.\n// If the query failed or came back empty, fall through with this run's own\n// text -- the pre-batching behaviour, one reply per message, never silence.\nconst j = $('Sort').first().json;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.direction);\nconst newestIn = rows.find(r => r.direction === 'inbound');\nif (newestIn && String(newestIn.external_id) !== String(j.message_id)) {\n  return [];\n}\n// The unanswered backlog: inbound rows down to the last outbound. This join\n// is what lets a tap followed two seconds later by the fault text read as one\n// thought -- the tap's own run was silenced, but its title is a row here.\nconst backlog = [];\nfor (const r of rows) {\n  if (r.direction === 'outbound') break;\n  const b = String(r.body == null ? '' : r.body).trim();\n  if (b) backlog.push(b);\n}\nbacklog.reverse();\nconst text = backlog.length ? backlog.join('\\n') : j.text;\nreturn [{ json: Object.assign({}, j, { text: text, burst_size: backlog.length || 1 }) }];\n"
+    }
+   },
+   {
+    "id": "burst_note",
+    "name": "One reply per thought",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+     380,
+     250
+    ],
+    "parameters": {
+     "content": "## One reply per thought\nPeople send three messages for one thought, so the reply branch waits 4s, asks Postgres for anything newer, and only the run holding the NEWEST inbound answers -- with the whole unanswered backlog joined. Nine digits in a minute = one model call, one reply (1 Sep: nine essays, out of order, and a real handover fired off the digit 6).\n\nThe truth is the `messages` table, written by Log inbound BEFORE the wait. n8n staticData cannot carry this: it is a per-execution snapshot, and three concurrent runs each saw only their own stash when it was tried.\n\nWhat never waits: the 200 to Chatwoot and the menu. Two messages ms apart can still both answer; the bound is the old behaviour, made rare.",
+     "height": 300,
+     "width": 340,
+     "color": 4
+    }
+   },
+   {
+    "id": "burst_query",
+    "name": "Anything newer?",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.2,
+    "position": [
+     620,
+     64
+    ],
+    "parameters": {
+     "method": "GET",
+     "url": "=https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/messages?phone=eq.{{ $('Sort').first().json.to }}&order=created_at.desc&limit=12&select=external_id,body,direction",
+     "authentication": "genericCredentialType",
+     "genericAuthType": "httpHeaderAuth",
+     "options": {
+      "timeout": 10000
+     }
+    },
+    "alwaysOutputData": true,
+    "onError": "continueRegularOutput",
+    "credentials": {
+     "httpHeaderAuth": {
+      "id": "YwFM2FM9NmVv5gKf",
+      "name": "Homies Supabase service key"
+     }
+    }
+   },
+   {
+    "id": "showMenuJudgment1",
+    "name": "show_menu",
+    "type": "@n8n/n8n-nodes-langchain.toolCode",
+    "typeVersion": 1.1,
+    "position": [
+     1920,
+     560
+    ],
+    "parameters": {
+     "name": "show_menu",
+     "description": "Shows the resident the standard options list — open a service ticket, check an existing one, something else — attached by the system underneath your NEXT message. Use it whenever the resident does not know what they want, asks what you can do, or the conversation would stall with nothing concrete to act on. If you are about to write the options out in words — a list, bullets, 'you could open a ticket or check a balance' — stop: that is this tool's job. Call it and keep your message to the one short line that goes above the buttons. Never ask whether they would like to see the options and never announce that you are about to show them — the question costs the resident a whole round-trip; call this and show them in the same breath. Never use it while the matter is moving forward. But when the resident cannot answer what you asked and the matter is stuck — they say they do not know, and saying it differently did not help — showing the choices IS the way forward: one clarifying question, then this. Not twice in a row: once the options are in front of them, another list is noise. Takes no parameters.",
+     "language": "javaScript",
+     "jsCode": "// This call is read by Send out of the agent's own output\n// (returnIntermediateSteps) - nothing in here signals anything. Do not put\n// a staticData write or an $execution read back: both died in Send's\n// expression sandbox (execs 22878, 22940, 22947) and the try/catch around\n// them hid it while the bot told residents the options were coming.\nreturn 'שלושת הכפתורים יופיעו מתחת להודעה הבאה שלך. כתוב משפט קצר משלך, בלי למנות את האפשרויות ובלי להכריז שהן בדרך - הן כבר שם.';\n"
+    }
+   }
+  ],
+  "connections": {
+   "WhatsApp": {
+    "main": [
+     [
+      {
+       "node": "Sort",
+       "type": "main",
+       "index": 0
+      }
+     ],
+     [
+      {
+       "node": "Sort",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Sort": {
+    "main": [
+     [
+      {
+       "node": "Answer Meta",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Is there a message?",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Canned reply?",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Menu?",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Human replied?",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Is there a message?": {
+    "main": [
+     [
+      {
+       "node": "Let them finish",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log inbound",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Canned reply?": {
+    "main": [
+     [
+      {
+       "node": "Type for a moment",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log inbound",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log reply",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Menu?": {
+    "main": [
+     [
+      {
+       "node": "Type for a moment (menu)",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log inbound",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log reply",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Answer the resident": {
+    "main": [
+     [
+      {
+       "node": "Reply usable?",
+       "type": "main",
+       "index": 0
+      }
+     ],
+     [
+      {
+       "node": "Say it again",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Reply usable?": {
+    "main": [
+     [
+      {
+       "node": "Type for a moment",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log reply",
+       "type": "main",
+       "index": 0
+      }
+     ],
+     [
+      {
+       "node": "Open it anyway",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Send": {
+    "main": [
+     [
+      {
+       "node": "Show it in Open",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "OpenRouter": {
+    "ai_languageModel": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_languageModel",
+       "index": 0
+      },
+      {
+       "node": "Say it again",
+       "type": "ai_languageModel",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Conversation so far": {
+    "ai_memory": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_memory",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "open_request": {
+    "ai_tool": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_tool",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "get_request_status": {
+    "ai_tool": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_tool",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "get_balance": {
+    "ai_tool": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_tool",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "verify_address": {
+    "ai_tool": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_tool",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Open it anyway": {
+    "main": [
+     [
+      {
+       "node": "Say it again",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Send menu": {
+    "main": [
+     [
+      {
+       "node": "Show it in Open",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Human replied?": {
+    "main": [
+     [
+      {
+       "node": "Assign to the replier",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Type for a moment": {
+    "main": [
+     [
+      {
+       "node": "Send",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Type for a moment (menu)": {
+    "main": [
+     [
+      {
+       "node": "Send menu",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Say it again": {
+    "main": [
+     [
+      {
+       "node": "Second try usable?",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Second try usable?": {
+    "main": [
+     [
+      {
+       "node": "Type for a moment",
+       "type": "main",
+       "index": 0
+      },
+      {
+       "node": "Log reply",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Let them finish": {
+    "main": [
+     [
+      {
+       "node": "Anything newer?",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Still the last word?": {
+    "main": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "Anything newer?": {
+    "main": [
+     [
+      {
+       "node": "Still the last word?",
+       "type": "main",
+       "index": 0
+      }
+     ]
+    ]
+   },
+   "show_menu": {
+    "ai_tool": [
+     [
+      {
+       "node": "Answer the resident",
+       "type": "ai_tool",
+       "index": 0
+      }
+     ]
+    ]
+   }
+  },
+  "nodeGroups": [],
+  "authors": "Assaf Clix",
+  "name": null,
+  "description": null,
+  "autosaved": false,
+  "workflowPublishHistory": [
+   {
+    "createdAt": "2026-09-13T07:32:17.334Z",
+    "id": 589,
+    "workflowId": "u2JjrbcNPYyyh3yl",
+    "versionId": "eae71643-948c-43c1-8cb7-b16948ea222b",
+    "event": "activated",
+    "userId": "d0ae602a-3532-40ba-a87b-ff5617aa3ca5"
+   },
+   {
+    "createdAt": "2026-09-13T07:32:17.313Z",
+    "id": 588,
+    "workflowId": "u2JjrbcNPYyyh3yl",
+    "versionId": "eae71643-948c-43c1-8cb7-b16948ea222b",
+    "event": "deactivated",
+    "userId": "d0ae602a-3532-40ba-a87b-ff5617aa3ca5"
+   }
+  ]
+ }
+}

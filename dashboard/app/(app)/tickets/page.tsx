@@ -5,11 +5,13 @@ import { getLocale, label, translator, when, type T } from '@/lib/i18n';
 import { IconInbox } from '@/components/icons';
 import Link from 'next/link';
 
-// The four values the check constraint on requests.status accepts. The list is
+// The values the check constraint on requests.status accepts. The list is
 // duplicated from the schema on purpose: the server action validates against
 // it before touching the database, so a forged form posts a clean error here
-// rather than a Postgres constraint failure.
-const STATUSES = ['open', 'in_progress', 'resolved', 'cancelled'];
+// rather than a Postgres constraint failure. `needs_review` joined the tabs
+// on 16 Sep: the voice webhook files a ticket it could not place under it,
+// and until then those rows were reachable only through "all".
+const STATUSES = ['open', 'in_progress', 'needs_review', 'resolved', 'cancelled'];
 
 // A server action rather than a route handler: the form posts here with no
 // client JS, and the anon key is all it carries — migration 011 grants that
@@ -74,7 +76,7 @@ export default async function Tickets({
   const [from, to] = pageRange(page, size);
   let q = serverClient()
     .from('requests')
-    .select('reference,description,building,unit,type,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at',
+    .select('reference,description,building,unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
   // One extra query, and it is what makes the badge above mean anything: the
@@ -177,7 +179,9 @@ export default async function Tickets({
                       mis-heard, and on a needs_review row where the audio
                       failed it is often the only way back to the person. */}
                   <td className="mono" data-label={t('col.caller')}>{r.reported_by_phone ?? <span className="muted">—</span>}</td>
-                  <td className="muted" data-label={t('col.type')}>{r.type}</td>
+                  {/* The Hebrew label the trigger wrote (OXS's own word on an
+                      imported row), else ours for the slug; never the slug. */}
+                  <td className="muted" dir="auto" data-label={t('col.type')}>{r.category_he ?? label(t, 'type', r.type)}</td>
                   <td data-label={t('col.urgency')}><span className={`urg ${r.urgency}`}>{label(t, 'urgency', r.urgency)}</span></td>
                   <td data-label={t('col.status')}>
                     <form action={updateStatus} className="status-edit">
@@ -190,7 +194,7 @@ export default async function Tickets({
                       <button type="submit">{t('tickets.save')}</button>
                     </form>
                   </td>
-                  <td className="muted" data-label={t('col.via')}>{r.opened_via}</td>
+                  <td className="muted" data-label={t('col.via')}>{label(t, 'via', r.opened_via)}</td>
                   <td className="muted mono" data-label={t('col.opened')}>
                     {when(r.created_at, locale)}
                     {r.opened_via === 'oxs' && <InOxs seen={r.oxs_last_seen_at} status={r.status} lastRun={lastRun} t={t} />}

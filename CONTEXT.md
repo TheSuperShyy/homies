@@ -190,6 +190,36 @@ makes promised transfers real, and the dead-end follow-up is a wired lane —
 none of these rely on model discipline. Prompts persuade; workflows and
 tools guarantee.
 
+**The bot notes a matter for its team, says so, and promises nothing
+further.** 14 Sep. The bot is all of customer support; past its threshold
+it calls `notify_team` (a Chatwoot mention — feature 16's wire) and tells the
+resident the team knows. The tool comes BEFORE the sentence: saying it
+without the call is a lie the workflow's backstop repairs but the prompt
+forbids. Never who will call, never when, never office details unless asked,
+never the office line on an emergency. A declined ticket is not argued for.
+The paragraph below is the one-day state this replaced. *And the inbound
+voice agent, the same afternoon, by the same words:* `notify_team` on
+voice posts through the Edge Function to "Homies — Voice team note", which
+gives the call a conversation in the Voice inbox and fires the same mention;
+an end-of-call backstop in the Edge Function makes the note when the bot
+said the team knows and never called.
+
+**Nothing pages a person from WhatsApp, since 13 Sep, and that is the
+owner's decision, not a defect.** *(Superseded 14 Sep — kept for the record.)* His words: lessen the interaction between
+office and tenants; the bot handles what it can, opens a ticket where it can,
+and for office matters (payment arrangements, disputed bills, moving in or
+out, contracts, the committee) says the office handles it and gives its
+details. Asked directly, he chose the same for emergencies, with the
+after-hours cost in front of him: a 22:00 lift call is an emergency-urgency
+ticket, the national number and the office line, and reaches nobody until
+someone opens Chatwoot. `scripts/n8n_whatsapp_nopage.py` took the three
+paging paths out (tap chain, tool, backstop; snapshot + `--restore`); the
+third button is משהו אחר; a real person replying still silences the bot.
+The two rules below describe the alert machinery as it worked from 3 to 13
+Sep and still govern the sub-workflow and ticker, which exist and are
+dormant. **Do not quietly re-add a paging path**; turning it back on is a
+new decision, made by the owner.
+
 **A handover is not done until a person is paged, and it is not over until a
 person ANSWERS.** Added 6 Sep. "Claimed" is never a name on the thread --
 somebody can assign themselves and walk away, which used to stop the
@@ -602,6 +632,18 @@ professional"). Empathy stays — "זה באמת מתסכל", "מצטער לשמ
 sounds like someone at an office desk, not a friend on the couch, even when
 the resident is angry or slangy themselves. This bounds every future "make it
 human" pass, chat and voice both.
+
+**A question gets a word for the person first, and the word never replaces
+the tool (14 Sep evening, owner).** The WhatsApp tap was answered `מה קרה?`
+because every dial in the prompt capped length and none set a floor. The
+floor lives in the block that owns the caps (the one-question paragraph),
+stated as an act: something short of the bot's own, about the thing and
+sized to it, never an announcement of understanding. Measured: a floor
+without "tool first" made the model talk instead of act and invent a
+ticket number. **One emoji, sometimes, is an owner decision** (never the
+first message, never beside a reference or amount, a refusal, or danger);
+the 27 Aug "no courtesy opener on a tap" note is superseded, it was about
+canned lines.
 
 **Warmth lives in the sentence, never in the fact.** The details pass through
 verbatim — building, apartment, reference number, amount, months, status — and
@@ -2066,6 +2108,20 @@ live rule as missing on 30 Aug. The same error in the other direction would
 report a missing rule as present, which is the dangerous half.
 
 
+**A surgical patch of one object still rewrites everything inside that
+object, so diff the read-back against a snapshot, not just the field you
+meant (15 Sep).** `vapi_set_voice.py` PATCHes `voice` alone and read back
+the voice id and volume correctly — and the debt assistant's fallback voice
+had silently lost its 27 leak-guard replacements, because the builder
+guarded the primary and built the fallback bare. Nothing printed a
+mismatch; a field-by-field diff of the whole assistant found it. The
+guard now goes on the fallback in the builder, and the pusher's idle test
+counts the fallback's replacements. The volume itself is a
+`generationConfig` knob on the same voice (0.5–2.0; at the 2.0 ceiling
+since 15 Sep after 1.4 and 1.7 within two hours, by ear, `CARTESIA_VOLUME`;
+measured clean at 2.0), not a new voice. Past the ceiling the lever is the
+clone's reference clip, not a field.
+
 **A whole-object `--apply` pushes everything the tool believes, not the change
 you made. Learned 31 Aug by breaking it.** Pushing the inbound prompt with
 `vapi_sync.py --apply` silently reverted Ido's cloned voice to the Eyal id
@@ -2097,10 +2153,19 @@ job description — the confused model copying the prompt's nearest example —
 and chose to remove the rulebook rather than patch it: identity + tools +
 words-and-pronunciation only, on gpt-4.1. The standing engineering lessons
 (placement beats wording, data over rules, standalone sentences) still apply
-to the debt agent and to the words layer, but for inbound BEHAVIOR the unit
+to the words layer (and to the debt agent until 16 Sep, when the owner
+opened it too), but for inbound BEHAVIOR the unit
 of change is now the model or the tool data, never a new rule. A session
 tempted to add a trigger, a procedure, or a worked example to the inbound
-fence is contradicting an owner decision and must ask first.
+fence is contradicting an owner decision and must ask first. *14 Sep:* the
+owner asked for the chatbot's durability on this agent, and it entered as
+one identity paragraph (who Michael is, what "helping" means past his
+threshold), one line of office facts as data, two national numbers in the
+pronunciation bullet, and a tool description — no trigger, no procedure, no
+worked example. That is the shape any future stance takes here. The
+wording wobble it left ("יחזרו אליך", a "רוצה שאעביר?" question on money
+asks) was measured and recorded after two text rounds, not chased with a
+third — the same stop the chatbot's file taught.
 
 **Vapi validates a Cartesia voice against the org's credential AT CREATE TIME,
 so on an account move the credential must hold the clone's account key BEFORE
@@ -2196,7 +2261,10 @@ offer the caller can decline. Two things made this safe to change: the ticket
 is the searchable record (the transfer is just a note a person reads), and
 "ביקשו בן אדם בכל שלב" still transfers instantly. If a future edit reintroduces
 a mandatory transfer anywhere, it contradicts an owner decision, not a style
-preference.
+preference. *14 Sep:* there is no transfer tool on inbound at all.
+`notify_team` fires on the agent's judgment, not on a yes, because nothing
+is handed anywhere — the caller stays with the agent, so there is nothing
+to offer or decline. "Never a required step" holds by construction.
 
 **The agent's job is to handle the call, not to route it. Decided 1 Sep.** What
 it is not authorised to *decide* it is still authorised to *write*, so a
@@ -2205,6 +2273,63 @@ tracked request rather than a hand-off note — which is better for the office b
 the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
+
+**An emergency is the ticket and the team, and nothing else (16 Sep, owner,
+after the client's review).** No national numbers, no safety instructions,
+not what to do and not what not to do, even when asked directly what to do
+now: what the bot has to give is what it did and that the team knows. Why
+the direct question is named: the first pass forbade instructions and the
+model still answered "מה אני עושה עכשיו?" with a don't-list and "the team is
+on its way". The cost, stated: a resident in danger hears no number from
+us. The client asked for exactly this.
+
+**A fault inside the resident's own flat is theirs (16 Sep, owner).** Common
+property and the building's systems are tickets; the resident's fixtures
+(a blocked sink, a tap, an appliance, painting) are said to be theirs,
+kindly, with no ticket and an offer to help with something else; a fault of
+unclear origin (a leak from above, water in a wall) is the building's to
+check, so a ticket. Doubt goes to a ticket, never to a guess.
+
+**Voice verifies the building like chat does (16 Sep).** The webhook's gate
+is "the building came from the caller's words" (`!dialled(ctx)`), not the
+channel; the tool result carries the reason and the inbound text says what
+to do with each, with one re-ask for a street the transcriber may have
+misheard before "Homies does not manage that building". A harness context
+with no `resident_id` is undialled, so its building must be a managed
+Hebrew address.
+
+**Both voice agents are open now (16 Sep).** The debt agent's 54k rulebook
+was the latency (4.4–7.4 s gaps, $1.51 of model per call); its fence is the
+inbound shape plus the one thing without judgement (no money before the
+name check) and "log the outcome once, then the closing line". Plural
+address on both, the chatbot's anti-echo line on both. The opening line is
+the owner's to hear before it ships. A session tempted to add a rule to
+either voice fence is contradicting an owner decision and must ask first.
+
+**Wanting to pay is a ticket AND a note (15 Sep, owner).** The 14 Sep rule
+below had two outcomes past a fault; it has three now: a fault is a row; a
+resident who wants to pay, asks how to pay or asks for an arrangement is a
+row (type `payment`, migration 031) and the collections note; everything
+else only a person can finish is a note. Why a row: nobody is dispatched
+from a note and nothing searches one; the queue staff work from is the
+tickets (the `request_standing_order` argument of 18 Aug). Why not for
+disputes and documents: the owner chose the narrow shape. The mechanics
+live in the tool texts; the prompts carry one sentence each. Learned on the
+way: a tool's identity rule (`get_balance`: full name + phone) bleeds into
+a neighbouring tool on the same subject unless the neighbour says what it
+needs and whose rule the other one is.
+
+**A team note is not a transfer: nobody is connected, the caller stays with
+the agent, and "the team knows" is true only because the tool ran first — on
+voice as on WhatsApp since 14 Sep.** Three outcomes now, not two: a fault is
+a row; a matter only a person can finish (paying, a disputed bill, moving, a
+contract, a quote, a request for a person) is a note the team reads in
+Chatwoot; there is no third. The note exists because a row nobody is
+dispatched from is the wrong record for a payment or a contract, and a
+phone number read out is the dead end the owner asked to remove. On voice
+the note lands on a conversation that exists only for it (the Voice inbox):
+a rep phones the resident and resolves; nothing typed there reaches the
+caller, and the note says so.
 
 **And a moment's confusion is not a failed call.** One unclear turn used to end
 calls; someone who has been talking to you has not become a foreign-language

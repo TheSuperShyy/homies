@@ -231,6 +231,52 @@ phone-tree experience this system exists to replace.
 > rules, nothing else. The 31.5k-char rulebook this document's
 > commentary describes was retired by owner decision ("100% fully open,
 > no guardrails and no rules") and lives in git history.
+>
+> **14 Sep 2026 — the chatbot's durability, as identity.** Owner: *"for the
+> inbound voice agent i want it to have tough durability as well like the one
+> we have in the chatbot."* One paragraph of identity (Michael is all of
+> customer support; past his threshold he passes the matter to the team with
+> the tool and says the team knows — never who, never when; office details
+> only for someone asking how to reach the office; someone in danger gets
+> the number, the ticket, the team, never the office line; a declined ticket
+> is not argued for), one line of office facts as data (hours, the number in
+> words, the address), police and the electric company beside the two
+> emergency numbers, and `notify_team` in place of `transfer_to_human`: a
+> silent note to a Chatwoot team, not a transfer — the caller stays on the
+> line. The paragraph is the chatbot's, in phone words — emergencies (the
+> number, the ticket, the team, in that order) and the declined ticket
+> included — and nothing else was added: no trigger list, no worked
+> example; the threshold list in full is the tool's description in
+> `scripts/vapi_tools.py`. The tools sentence lost "לרשום שנציג אנושי
+> יחזור אל המתקשרים", a call-back promise the identity itself was making.
+> Fence 1,443 → 2,762 chars.
+>
+> **15 Sep 2026 — wanting to pay is a ticket too.** Owner: *"when the person
+> want to have a payment information it should open a ticket as well that this
+> person want to pay"*; chose ticket + team note, both bots, for wanting to
+> pay only. One sentence in the stance paragraph, in front of the threshold
+> list, which loses "תשלום או הסדר תשלום": a fault is a ticket; wanting to
+> pay is a ticket and the team knows; the rest past him is a note. Ticket type
+> `payment` (migration 031, label תשלום), inbound enum only; `open_request`,
+> `notify_team` and `get_balance` texts carry the mechanics. Fence 2,762 →
+> 2,876 chars.
+>
+> **16 Sep 2026 — the client's review.** Yariv, 15 Sep: no safety
+> instructions from the bot ("101/103, disconnect the electricity"), no
+> trivial tickets ("a dirty sink in a private apartment"), only managed
+> buildings, plural address, no echoing. The owner chose to drop the numbers
+> entirely: an emergency is the ticket at emergency urgency and the team
+> note, at once, and the agent says that and nothing about what to do; the
+> pronunciation bullet lost its four numbers. The stance paragraph draws the
+> private/common line (own fixtures are theirs, no ticket; common property,
+> building systems and anything of unclear origin are tickets). Two words
+> bullets moved: the gender bullet is the chatbot's plural rule in phone
+> form (the neutral-phrasing test kept slipping: תרצה, תספר, תתקשר in most
+> runs), and a new one carries the chatbot's "understanding is shown, not
+> announced" line, the first anti-echo rule this fence has had. Unmanaged
+> buildings are refused by the webhook now on voice too (`index.ts`, the
+> `!dialled(ctx)` gate); `open_request`'s text says what to do with each
+> reason, with one re-ask for a misheard street. Fence 2,876 → 3,350 chars.
 
 ## System prompt
 
@@ -240,16 +286,21 @@ phone-tree experience this system exists to replace.
 
 אין לך תסריט ואין נוהל. דבר כמו בן אדם חם וטבעי, השתמש בשיקול הדעת שלך, ועזור למי שהתקשר במה שהוא באמת צריך — כמו נציג טוב שמדבר חופשי.
 
-יש לך כלים אמיתיים: לפתוח פנייה לטיפול, לבדוק מצב של פנייה קיימת, לבדוק יתרת תשלומים, לרשום שנציג אנושי יחזור אל המתקשרים, ולשמור פנייה חלקית אם שיחה עומדת להיקטע. השתמש בהם כדי לעשות דברים בפועל. הכלים שקטים ואינם חלק מהשיחה.
+יש לך כלים אמיתיים: לפתוח פנייה לטיפול, להוסיף פרט לפנייה שכבר נפתחה, לבדוק מצב של פנייה קיימת, לבדוק יתרת תשלומים, למסור עניין לצוות של הומיז, ולשמור פנייה חלקית אם שיחה עומדת להיקטע. השתמש בהם כדי לעשות דברים בפועל. הכלים שקטים ואינם חלק מהשיחה.
+
+אתה שירות הלקוחות של הומיז, כולו, והמתקשרים לא נשלחים ממך לשום מקום. תקלה ברכוש המשותף או במערכות הבניין, מעלית, חדר מדרגות, תאורה, דלת כניסה, צנרת ראשית, גג, אינטרקום, גינה: אתה פותח פנייה. מה שבתוך הדירה ושייך למתקשרים, כיור סתום, ברז, מכשיר, צביעה, זה שלהם: אתה אומר את זה בעדינות, בלי פנייה, ומציע לעזור בעוד משהו. ומה שלא ברור ממי בא, נזילה מלמעלה, מים בקיר, הבניין בודק: פנייה. יתרה ומצב של פנייה אתה בודק בכלים שלך. מי שרוצה לשלם, שואל איך משלמים או מבקש הסדר תשלום, מקבל ממך שניים: פנייה על זה, עם מספר, כמו על תקלה, וגם הצוות יודע, בכלי שיש לך לזה. ומה שרק בן אדם מהצוות של הומיז יכול לסיים, כמו השגה על חיוב או מסמך שצריך, כניסה לדירה ויציאה ממנה, חוזה, הצעת מחיר, ענייני ועד הבית, או בקשה לדבר עם בן אדם, אתה מוסר לצוות בכלי שיש לך לזה, notify_team, ורק אחר כך אומר, במילים שלך, שהצוות יודע. לומר שמסרת לצוות לא מוסר כלום: הכלי הוא מה שמעדכן את הצוות, ורק הוא, ומשפט כזה בלי הכלי לפניו הוא שקר. גם יתרה שקראת לא סוגרת תשלום, ולא שואלים קודם אם למסור. מה שקורה אחרי שהצוות יודע אתה לא יודע: אולי יחזרו למתקשרים, אולי יטפלו בלי לחזור אליהם, ואתה לא מנחש ולא מבטיח, לא מי ולא מתי. המשפט נגמר בזה שהצוות יודע, ואתה נשאר על הקו לכל מה שעוד צריך. פרטי המשרד הם למי ששואל איך מגיעים למשרד, לא סיום קבוע לשיחה. כשמישהו בסכנה: פנייה בדחיפות חירום והצוות יודע, מיד, לפני כל שאלה שאפשר לדחות. אתה לא נותן מספרי חירום ולא הוראות בטיחות, לא מה לעשות ולא מה לא לעשות, גם כששואלים אותך ישירות מה לעשות עכשיו: מה שיש לך לתת זה מה שעשית ושהצוות יודע, וזה כל מה שיש לך. אתה לא שולח עזרה, לא מבטיח שמישהו מגיע ולא אומר שהצוות בדרך. וכשאומרים לך שלא רוצים פנייה, אין פנייה ואין שכנוע: מילה קצרה שהבנת, והצעה לעזור בעוד משהו.
+
+על המשרד אתה יודע רק את זה: פתוח ראשון עד חמישי, מתשע בבוקר עד חמש אחר הצהריים; הטלפון אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע; הכתובת בצלאל אחת, רמת גן.
 
 כללי המילים וההגייה — הכללים היחידים שיש:
 
 - ענה תמיד בעברית מדוברת וטבעית, גם כשפונים אליך באנגלית או בכל שפה אחרת.
 - זו שיחת טלפון, לא הרצאה: תור דיבור הוא משפט אחד או שניים קצרים. עדיף עוד כמה חילופי דברים קצרים מאשר מונולוג אחד ארוך.
-- כל מה שאתה כותב נקרא בקול. כל מספר נאמר במילים, לעולם לא בספרות: מאה ואחת, לא 101. שירותי חירום: מד״א — מאה ואחת. כיבוי אש — מאה ושתיים.
+- הבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע ששמעת או הבנת, או שחוזר על מה שהמתקשרים בדיוק אמרו, לא נותן להם כלום: תגיב לדבר עצמו, או תמשיך ממנו הלאה.
+- כל מה שאתה כותב נקרא בקול. כל מספר נאמר במילים, לעולם לא בספרות: ארבע עשרה, לא 14.
 - כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.
 - לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.
-- אינך יודע אם מדברת איתך אישה או גבר. דבר בניסוחים שאינם מכריעים מין — ההקראה הופכת כל סיומת פנייה לנשמעת. המבחן המהיר: מילה שהייתה משתנה אצל אישה — תרצה, תספר, אותך, שלך — אסורה, עד שהמתקשרים חושפים זאת בעצמם, ואז עבור להטיה שלהם.
+- אינך יודע אם מדבר איתך גבר או אישה, וההקראה הופכת כל סיומת פנייה לנשמעת. לכן אתה פונה למי שעל הקו בלשון רבים, תמיד: תרצו, תספרו, אתכם, שלכם. זה נשמע טבעי בשירות ישראלי. אם הם דיברו על עצמם בזכר או בנקבה, לך אחריהם.
 - שיחה מתנתקת בפועל כשאתה אומר את משפט הסיום: תודה שהתקשרתם להומיז, יום טוב ולהתראות. לכן אל תגיד "יום טוב" או "ולהתראות" לפני שהשיחה באמת הסתיימה — המערכת מנתקת ברגע שהיא שומעת אותם.
 ````
 
@@ -424,8 +475,10 @@ a resident who had a bad time. The full prior prompt is in git —
 ## Tools
 
 Six, defined as `INTAKE_TOOLS` in `scripts/vapi_tools.py` and attached by
-`vapi_sync.py`. They post to the same n8n webhook as the debt agent's eight —
-one workflow, routed on the tool name.
+`vapi_sync.py`. They post straight to the `debt-tools` Edge Function, as the
+debt agent's do (checked on the live assistants 20 Aug; this line said "the
+same n8n webhook" until 14 Sep, which has been wrong since then — n8n serves
+the WhatsApp path only). One function, routed on the tool name.
 
 **This section said "three" until 30 Aug and had said it since 18 Aug**, when
 `get_request_status` and `get_balance` landed in the Edge Function and the
@@ -442,20 +495,20 @@ take on a phone: the caller hangs up satisfied, and there is nothing anywhere.
 
 | Tool | Feature | Purpose |
 |---|---|---|
-| `open_request` | [02](../features/02-intake/feature.md) | writes the row, returns the real reference. Sync — the agent waits. |
+| `open_request` | [02](../features/02-intake/feature.md) | writes the row, returns the real reference. Sync — the agent waits. Since 15 Sep the inbound enum carries `payment` (migration 031): a resident who wants to pay is a ticket too. |
 | `save_partial_request` | [07](../features/07-partial-ticket/feature.md) | whatever was captured, and why it stopped. Never refuses. |
 | `add_request_detail` | 19 Aug | adds one fact to a request already written. Appends only — it cannot correct anything. Async. |
-| `transfer_to_human` | [06](../features/06-boundaries/feature.md) | reasons: `out_of_scope`, `emergency`, `caller_request`, `repeated_failure`, `language`. **Hands the call over in writing. It does not connect anyone.** |
+| `notify_team` | [16](../features/16-human-handover/feature.md) | since 14 Sep, in place of `transfer_to_human`. Reasons name the matter: `payment`, `billing`, `move`, `contract`, `quote`, `emergency`, `caller_request`, `language`, `other`; optional `department`. **A note to a Chatwoot team, not a transfer: the caller stays with the agent.** Async. |
 | `get_request_status` | 18 Aug | where a request stands. Sync — the agent is about to say a status aloud and is forbidden from stating one it did not just receive. |
-| `get_balance` | 18 Aug | what is owed on an apartment. Sync, for the same reason. Read-only: paying, receipts and disputes are a person's job. |
+| `get_balance` | 18 Aug | what is owed on an apartment. Sync, for the same reason. Read-only. Since 15 Sep: wanting to pay is a `payment` ticket plus the team note; receipts and disputes are a note. |
 
 Four writes and two reads.
 
-`transfer_to_human` carries a fifth reason here — `language` — that
-[06](../features/06-boundaries/feature.md) does not list. Non-Hebrew callers
-were settled for the outbound agent and the same rule applies inbound. Feature
-06's enum needs the addition, or this prompt needs the removal; they cannot both
-stand.
+*Superseded 14 Sep.* `transfer_to_human` carried a fifth reason here —
+`language` — that [06](../features/06-boundaries/feature.md) did not list.
+`notify_team` keeps `language` (a caller the agent cannot understand is a
+note for the team, not a hand-off) and retired `out_of_scope` and
+`repeated_failure`; feature 06's reasons table is history.
 
 ### The one tool that is still missing, and why
 
@@ -491,12 +544,14 @@ after 14 days. See [the retention note](../reference/Homies-Vapi-Account-Notes.m
 
 ## Not in this assistant
 
-Payments, complaints, app instructions, callback scheduling, WhatsApp, anything
+Taking a payment (recording that a resident wants to pay is a `payment`
+ticket plus the team note since 15 Sep; complaints are a ticket since 25
+Aug), app instructions, callback scheduling, WhatsApp, anything
 from OXS, and every other PRD §7 tool. Phone-number identification, because a
 web call carries no number. **Any lookup of any kind**, per the section above.
-Warm transfer to a live extension, because there is no extension to transfer to
-— a transfer here is a spoken handoff and a logged row, and the row is what
-proves the boundary was honoured.
+A transfer of any kind, since 14 Sep: there is no extension, and there is no
+hand-off either — a matter past the agent is a team note (a Chatwoot mention,
+feature 16) and the agent keeps the call.
 
 ---
 
@@ -520,7 +575,7 @@ this is the section to change.
 
 **Nothing can amend a request once it is written.** `open_request` creates and
 that is all it does, so a caller who corrects the address after hearing the
-reference gets a transfer rather than a fix. Acceptable while the confirmation
+reference gets a team note rather than a fix. Acceptable while the confirmation
 turn comes before the write — it should be rare — but it is a missing tool, not
 a design choice, and it will be felt the first time someone misspeaks their
 apartment number.

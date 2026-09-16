@@ -13,10 +13,11 @@ scenarios and prints Hebrew. This one lets you drive: you type English, it puts
 real spoken Hebrew to the agent, and it prints the reply in Hebrew AND English.
 
 WHY YOUR ENGLISH IS TRANSLATED INSTEAD OF SENT AS-IS
-The prompt tells the agent that a caller who is not speaking Hebrew gets
-`transfer_to_human` with reason "language". Type English at it directly and
-every conversation ends in a hand-off on turn one, and you have tested the
-language rule rather than the agent. The translation step is load-bearing.
+The agent answers in Hebrew whatever it hears, and a caller it cannot
+understand gets a team note (`notify_team`, reason "language"; a transfer
+until 14 Sep). Type English at it directly and every conversation is the
+language case on turn one, and you have tested that rule rather than the
+agent. The translation step is load-bearing.
 
 It also means there are now TWO things that can be wrong with a bad answer:
 the agent, or the Hebrew we put in its ear. So the Hebrew that is about to be
@@ -227,7 +228,9 @@ def main():
     # anyone argues about it. Tools and the first message still come from live,
     # so the only variable is the wording.
     ap.add_argument("--file", default=None,
-                    help="read the prompt from a plain text file instead")
+                    help="read the prompt from a file instead (the doc has its fence extracted)")
+    ap.add_argument("--repo-tools", action="store_true",
+                    help="declare the tools from scripts/vapi_tools.py instead of the live assistant")
     args = ap.parse_args()
 
     key = pp.E.get("OPENROUTER_API_KEY", "").strip()
@@ -237,11 +240,13 @@ def main():
     target = pp.TARGETS[args.target]
     if args.file:
         _, first, tools = pp.live_prompt(target)
-        prompt = io.open(args.file, encoding="utf-8").read()
+        prompt = pp.file_prompt(target, args.file)
     elif args.ref:
         prompt, first, tools = pp.repo_prompt(target, args.ref)
     else:
         prompt, first, tools = pp.live_prompt(target)
+    if args.repo_tools:
+        tools = pp.repo_tools(target)
     prompt = pp.resolve(prompt, target["vars"])
     first = pp.resolve(first, target["vars"])
     left = [v for v in re.findall(r"\{\{[^}]+\}\}", prompt + first) if v != "{{...}}"]
@@ -251,7 +256,9 @@ def main():
 
     heb = len(HEBREW.findall(prompt))
     header = "\n".join([
-        "source     : %s" % ("repo at " + args.ref if args.ref else "live assistant"),
+        "source     : %s%s" % ("repo at " + args.ref if args.ref
+                               else ("file " + args.file if args.file else "live assistant"),
+                               "  [repo tools]" if args.repo_tools else ""),
         "assistant  : %s  (%s)" % (target["assistant"], target["name"]
                                    if "name" in target else args.target),
         "prompt     : %d chars, %.0f%% Hebrew" % (len(prompt), 100.0 * heb / len(prompt)),

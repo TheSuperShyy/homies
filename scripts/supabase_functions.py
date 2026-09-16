@@ -16,6 +16,12 @@ Two things this gets right that are easy to get wrong:
   (`|| !SECRET`), so deploying without it produces a function that 401s
   everything — which reads as a broken deploy rather than a missing value.
 
+  The voice team note (14 Sep) needs two more: N8N_VOICE_NOTE_SECRET (minted
+  by scripts/n8n_voice_note.py into .env) and N8N_VOICE_NOTE_URL (derived from
+  N8N_BASE_URL unless set). Both are pushed whenever the secret exists; with
+  either missing the function logs "voice note OFF" once per call and writes
+  its rows as before. A rotated secret is one --apply away from the function.
+
     python scripts/supabase_functions.py            # show what would happen
     python scripts/supabase_functions.py --apply    # do it
 """
@@ -117,6 +123,16 @@ def main():
     print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
     print("TOOL_SECRET    %s" % ("generate a new one (%d chars)" % len(tool_secret)
                                  if generated else "already in .env, reuse"))
+    voice_secret = e.get("N8N_VOICE_NOTE_SECRET", "").strip()
+    voice_url = (e.get("N8N_VOICE_NOTE_URL", "").strip()
+                 or (e.get("N8N_BASE_URL", "").strip().rstrip("/") + "/webhook/homies-voice-note"
+                     if e.get("N8N_BASE_URL", "").strip() else ""))
+    if voice_secret and voice_url:
+        print("voice note     ON -> %s" % voice_url)
+    elif not voice_secret:
+        print("voice note     OFF — N8N_VOICE_NOTE_SECRET empty (run scripts/n8n_voice_note.py --apply)")
+    else:
+        print("voice note     OFF — no URL: set N8N_BASE_URL or N8N_VOICE_NOTE_URL")
     if not apply:
         print("\nDry run. Re-run with --apply.")
         return
@@ -137,6 +153,9 @@ def main():
     # linger and quietly keep writing), and only `--oxs-mirror` pushes it. The
     # .env copy is untouched either way — the read-side importers use it.
     to_push = [{"name": "TOOL_SECRET", "value": tool_secret}]
+    if voice_secret and voice_url:
+        to_push.append({"name": "N8N_VOICE_NOTE_SECRET", "value": voice_secret})
+        to_push.append({"name": "N8N_VOICE_NOTE_URL", "value": voice_url})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
     mirror = "--oxs-mirror" in sys.argv
     if mirror and oxs_key:

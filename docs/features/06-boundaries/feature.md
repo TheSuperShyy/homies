@@ -1,5 +1,16 @@
 # 06 — Boundaries and multi-intent
 
+> **14 Sep 2026 — superseded on the inbound agent.** Nothing here
+> transfers any more. The reasons table, *"זה משהו שנציג צריך לטפל בו.
+> אני מעביר אותך"* and *"says a human is being brought in and transfers
+> immediately"* describe the tool that `notify_team` replaced: a matter past
+> the agent is noted for a Chatwoot team (feature 16) and the agent keeps
+> the call; an emergency is a ticket at emergency urgency and the team
+> notified, at once, with no national numbers and no safety instructions
+> from the bot (16 Sep, the client's review) — never the office line. The rest of the
+> boundary (what the agent does not decide, what it must not invent) still
+> holds. See `docs/assistant/demo-inbound.md`, 14 Sep note.
+
 **Estimate:** 2d
 **Depends on:** [02-intake](../02-intake/feature.md), [03-recall](../03-recall/feature.md)
 **Status:** not started

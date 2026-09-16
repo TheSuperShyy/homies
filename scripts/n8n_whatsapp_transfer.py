@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Make an emergency handover leave a record.
+"""SUPERSEDED 13 Sep by n8n_whatsapp_nopage.py: transfer_to_human is no longer
+on the WhatsApp workflow. Its dry run exits on a missing node, which is
+correct.
+
+Make an emergency handover leave a record.
 
     python scripts/n8n_whatsapp_transfer.py            # dry run
     python scripts/n8n_whatsapp_transfer.py --apply    # write it

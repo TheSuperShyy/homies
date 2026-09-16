@@ -79,11 +79,14 @@ STEPS = ("(() => { try { return ($('Answer the resident').first().json"
 # rebuilt from here.
 FILTER = ("['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג']"
           ".filter(w => t.indexOf(w) !== -1).length >= 3 || ")
+# 13 Sep: the third row reads משהו אחר / other. "לדבר עם נציג" went with
+# the paging it started (n8n_whatsapp_nopage.py owns that rename live;
+# these strings only have to recognise the current Send).
 ITEMS_3 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
-           "{ title: 'לדבר עם נציג', value: 'human' }")
+           "{ title: 'משהו אחר', value: 'other' }")
 ITEMS_4 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
            "{ title: 'יתרה ותשלומים', value: 'balance' }, "
-           "{ title: 'לדבר עם נציג', value: 'human' }")
+           "{ title: 'משהו אחר', value: 'other' }")
 
 # open_request.reporter_unit: keep the send-when-known policy, kill the
 # ask-pressure that fought the other two tools' unit rules (layer audit,
@@ -126,7 +129,12 @@ def main():
         changes.append("show_menu: relay machinery out, truthful return in")
 
     # 3. Other descriptions changed by the 2 Sep layer audit.
-    for name in ("get_balance", "transfer_to_human"):
+    # transfer_to_human left the live workflow on 13 Sep and came back as
+    # notify_team on 14 Sep (n8n_whatsapp_teamnote.py owns that node); this
+    # syncs get_balance only and skips anything absent.
+    for name in ("get_balance",):
+        if name not in by:
+            continue
         want = W.tool(name)["description"]
         if by[name]["parameters"].get("toolDescription") != want:
             by[name]["parameters"]["toolDescription"] = want

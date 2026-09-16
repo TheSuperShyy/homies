@@ -71,7 +71,45 @@ D_ELL = ("רציתי לעדכן אותך לגבי... החוב שלך, שהוא �
 D_MIX = ("אה, רציתי לעדכן אותך לגבי... החוב שלך, שהוא מאה שקלים. "
          "במערכת שלנו הוא עדיין לא הוסדר, ו, אה, צריך להסדיר אותו עד סוף השבוע.")
 
+# 16 Sep, the client's review: "the company name comes out as Homz/Himz". Nobody
+# has ever listened to how the clone says הומיז -- recording is off on the
+# assistants and every transcript record of a mangled name is Deepgram's, not
+# the voice's. So: the two live first messages and the closing line, the name
+# spelled five ways, rendered through the CLIENT's clone on the model Vapi
+# actually runs. Render with
+#
+#   CARTESIA_MODEL=sonic-3.5 python scripts/cartesia_tts.py --script homiez --key CARTESIA_YARIV_API_KEY
+#
+# and the owner listens (voice/samples/name-*.mp3). The spelling that lands
+# goes into voice_guard.PRONUNCIATION and the fixed lines; the transcripts
+# cannot settle this, only an ear can. `ido_compare.py` has the ids.
+CLONE = "ba765d50-19c6-4b3e-bc15-9de3b45f82f7"
+NAME_FORMS = [
+    ("plain",   "הומיז"),        # as written everywhere today
+    ("niqqud",  "הוֹמִיז"),       # holam + hiriq: ho-MIZ spelled out
+    ("hyphen",  "הומי-ז"),       # the client's own spelling in the 12 Aug note
+    ("geresh",  "הומי'ז"),       # the same idea with a geresh
+    ("yodyod",  "הומייז"),       # doubled yod, the long-i convention
+]
+
+
+def _homiez():
+    out = []
+    for tag, form in NAME_FORMS:
+        out.append(("name-%s-1-greet" % tag, CLONE,
+                    "שלום, מדבר מיכאל מהצוות של %s. איך אפשר לעזור?" % form, None))
+        out.append(("name-%s-2-close" % tag, CLONE,
+                    "תודה שהתקשרתם ל%s, יום טוב ולהתראות." % form, None))
+        # The glued forms the model composes: מ+, ל+, ש+. voice_guard rewrites
+        # the first two today; the third it does not, and this is where to hear
+        # whether it must.
+        out.append(("name-%s-3-glued" % tag, CLONE,
+                    "אני מתקשר מ%s, בקשר לבניין ש%s מנהלת." % (form, form), None))
+    return out
+
+
 SCRIPTS = {
+    "homiez": _homiez(),
     "clix": [
         ("c0-greeting",     NOAM,   GREET,  None),
         ("c1-debt-none",    NOAM,   D_NONE, None),

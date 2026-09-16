@@ -10,9 +10,10 @@ WHY NOT `vapi_sync.py <agent> --apply`, WHICH IS THE OBVIOUS ANSWER
 Because it is all-or-nothing, and on 31 Aug both of its targets would have
 carried a second change nobody asked for:
 
-  debt     the repo's prompt is 54,119 chars against 53,635 live. That drift has
-           been left alone on purpose since 30 Aug -- re-pushing a prompt is a
-           decision about the prompt, not a step in changing a voice.
+  debt     re-pushing a prompt is a decision about the prompt, not a step in
+           changing a voice (on 31 Aug the repo and the live prompt differed by
+           ~500 chars; on 16 Sep the prompt was rewritten open, a decision of
+           its own, pushed with vapi_sync.py debt --apply).
   inbound  worse. It builds from `docs/assistant/demo-inbound.md` at 19,978
            chars while the live assistant carries ~35,600. Running it would
            replace the production prompt with a demo one. It also hardcodes
@@ -20,7 +21,8 @@ carried a second change nobody asked for:
            CARTESIA_VOICE_ID, so it cannot install a clone even if you wanted
            the rest.
 
-So this script does the one thing: PATCH `voice`. Same surgical rule as
+So this script does the one thing: PATCH `voice` -- the voice id and, since
+15 Sep, its volume (`--volume N`, or CARTESIA_VOLUME in .env). Same surgical rule as
 `n8n_whatsapp_patch.py` -- read live, change the named field, leave every other
 byte as found.
 
@@ -58,10 +60,39 @@ UA = "curl/8.5.0"
 # The two Hebrew assistants. The English twins run `provider: vapi` (Elliot) and
 # are deliberately not here: a cloned Hebrew voice reading English is not a thing
 # anyone asked for, and they touch Cartesia not at all.
-TARGETS = [
-    ("Debt Follow-up (he)", "14d502fc-95a9-4fb1-8d93-944dd7e00211"),
-    ("Inbound Intake (he)", "8894680c-03af-43f6-a75b-f828872833cc"),
-]
+#
+# RESOLVED BY NAME SINCE 16 SEP, with the ids only as a fallback. They were bare
+# constants until the demo account arrived: the live wallet hit -$0.03 and
+# refused every call, a fresh account's keys went into .env, `vapi_sync.py`
+# created the two assistants there (it has always matched by NAME), and this
+# script then 404'd on ids belonging to an account the key can no longer see.
+# A hardcoded id is a fact about one account; the name is a fact about the
+# agent, and this script's whole job is to run straight after that sync.
+NAMES = ["Debt Follow-up (he)", "Inbound Intake (he)"]
+FALLBACK_IDS = {
+    "Debt Follow-up (he)": "14d502fc-95a9-4fb1-8d93-944dd7e00211",
+    "Inbound Intake (he)": "8894680c-03af-43f6-a75b-f828872833cc",
+}
+
+
+def targets(vapi_key):
+    """(label, id) per Hebrew assistant, from whatever account the key opens."""
+    try:
+        live = vapi("GET", "/assistant?limit=100", vapi_key)
+    except SystemExit:
+        live = []
+    found = []
+    for name in NAMES:
+        hit = next((a for a in live
+                    if name.lower() in str(a.get("name") or "").lower()), None)
+        if hit:
+            found.append((name, hit["id"]))
+        elif FALLBACK_IDS.get(name):
+            found.append((name, FALLBACK_IDS[name]))
+    if not found:
+        sys.exit("No Hebrew assistant on this account, by name or by id. "
+                 "Run `vapi_sync.py inbound --apply` first.")
+    return found
 
 FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}
 
@@ -103,6 +134,11 @@ def main():
     args = sys.argv[1:]
     apply_it = "--apply" in args
     vid = args[args.index("--voice") + 1] if "--voice" in args else env_value("CARTESIA_VOICE_ID")
+    # Volume: the flag wins, then .env, then the builder's default (1.4).
+    if "--volume" in args:
+        os.environ["CARTESIA_VOLUME"] = args[args.index("--volume") + 1]
+    else:
+        os.environ.setdefault("CARTESIA_VOLUME", env_value("CARTESIA_VOLUME") or "1.4")
     if not vid:
         sys.exit("No voice. Set CARTESIA_VOICE_ID in .env or pass --voice <id>.")
 
@@ -131,20 +167,39 @@ def main():
     # and fallbackPlan match exactly what a full sync would have produced.
     os.environ.setdefault("CARTESIA_MODEL", env_value("CARTESIA_MODEL") or "sonic-3.6")
     voice = S.cartesia_voice(vid, FALLBACK)
+    want_vol = voice["generationConfig"]["volume"]
+    print("volume     : %s   (0.5-2.0; 1 is Cartesia's default)" % want_vol)
 
+    def guard_count(v):
+        return len((((v.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or [])
+    want_fb = guard_count(voice["fallbackPlan"]["voices"][0])
+
+    # "Same" means the voice id, the model, the volume AND the fallback's guard:
+    # a volume-only change has to be visible here, or this script says "nothing
+    # to do" and ships it to nobody; and a fallback that lost its replacements
+    # (15 Sep) has to show up as work, or Elliot reads tool names aloud.
     changed = []
-    for label, aid in TARGETS:
-        live = vapi("GET", "/assistant/" + aid, vapi_key)
-        cur = (live.get("voice") or {}).get("voiceId", "")
-        same = cur == vid
+    for label, aid in targets(vapi_key):
+        lv = vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {}
+        cur = lv.get("voiceId", "")
+        cur_vol = (lv.get("generationConfig") or {}).get("volume")
+        cur_fb = guard_count(((lv.get("fallbackPlan") or {}).get("voices") or [{}])[0])
+        same = (cur == vid and lv.get("model") == voice["model"]
+                and cur_vol == want_vol and cur_fb == want_fb)
         print("\n%-22s %s" % (label, aid))
-        print("  live voice : %s%s" % (cur, "   (already correct)" if same else ""))
+        print("  live voice : %s%s" % (cur, "   (already correct)" if cur == vid else ""))
+        print("  live model : %s%s" % (lv.get("model", "-"),
+                                      "" if lv.get("model") == voice["model"] else "   -> " + voice["model"]))
+        print("  live volume: %s%s" % ("none" if cur_vol is None else cur_vol,
+                                      "" if cur_vol == want_vol else "   -> %s" % want_vol))
+        print("  fallback   : %d replacements%s" % (cur_fb, "" if cur_fb == want_fb else "   -> %d" % want_fb))
         if not same:
-            print("  -> becomes : %s" % vid)
-            changed.append((label, aid, cur))
+            if cur != vid:
+                print("  -> voice becomes %s" % vid)
+            changed.append((label, aid, cur, cur_vol))
 
     if not changed:
-        print("\nNothing to do. Both assistants already carry that voice.")
+        print("\nNothing to do. Both assistants already carry that voice, model and volume.")
         return 0
 
     if not apply_it:
@@ -152,16 +207,19 @@ def main():
         print("Only the `voice` field is sent. Prompts, models and tools are untouched.")
         return 0
 
-    for label, aid, before in changed:
+    for label, aid, before, before_vol in changed:
         vapi("PATCH", "/assistant/" + aid, vapi_key, {"voice": voice})
         after = (vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {})
         got = after.get("voiceId", "")
+        got_vol = (after.get("generationConfig") or {}).get("volume")
         print("\n%s" % label)
-        print("  %s -> %s   %s" % (before, got, "OK" if got == vid else "MISMATCH"))
-        print("  model=%s  fallback=%s" % (
-            after.get("model", "-"),
-            (after.get("fallbackPlan", {}).get("voices") or [{}])[0].get("voiceId", "none")))
-        if got != vid:
+        print("  voice  %s -> %s   %s" % (before, got, "OK" if got == vid else "MISMATCH"))
+        print("  volume %s -> %s   %s" % ("none" if before_vol is None else before_vol, got_vol,
+                                          "OK" if got_vol == want_vol else "MISMATCH"))
+        fb = (after.get("fallbackPlan", {}).get("voices") or [{}])[0]
+        print("  model=%s  replacements=%d  fallback=%s with %d replacements" % (
+            after.get("model", "-"), guard_count(after), fb.get("voiceId", "none"), guard_count(fb)))
+        if got != vid or got_vol != want_vol or guard_count(fb) != want_fb:
             sys.exit("Read-back does not match what was sent. Stop and check by hand.")
 
     print("\nWritten and read back. That proves the field is set, not that it sounds\n"
