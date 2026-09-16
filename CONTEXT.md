@@ -2274,6 +2274,21 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**Three samples cannot close a variance fault (16 Sep).** The משהו אחר tap
+was fixed on 15 Sep and verified 3/3 the same evening; cold-probed the next
+day it was bad 2 of 3. Nothing regressed — the behaviour was never better
+than about one in three, and three clean samples were luck written down as
+proof. Anything that is model judgement rather than code needs five at
+minimum before it is called fixed, and the number belongs in the note beside
+the claim. `probe_whatsapp.py` takes as many phrases as you pass it.
+
+**A banned sentence is a banned SHAPE, or the model pays you in paraphrase
+(16 Sep).** The greeting paragraph forbade writing the system's opening line;
+the model wrote `במה אוכל לעזור לכם` against its `במה אפשר לעזור` and was
+compliant by the letter. Same finding as the 1 Sep two-pass. When a rule
+names a form, name what the form DOES, list the near-misses, and prescribe
+the replacement — forbidding alone leaves the model to pick the substitute.
+
 **The two bots reach the tool layer by DIFFERENT roads, and a tool added to
 one is not added to the other (16 Sep).** The WhatsApp tool nodes post to
 the Edge Function directly (`SUPABASE_URL/functions/v1/debt-tools`); the

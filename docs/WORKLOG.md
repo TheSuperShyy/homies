@@ -53,6 +53,47 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+### The משהו אחר tap, for the second time, and what 3/3 was worth. Epochs 30 and 31.
+
+Owner sent the screenshot again: *"why its still like this"*. Two separate
+findings, and the first one matters most.
+
+**The bot was never speaking English.** The screenshot read *"Hi, Michael
+Mahomes here"*; the execution shows the bot sent `במה אוכל לעזור לכם?` and
+received `משהו אחר`, `lang: he`. WhatsApp's own on-device translation was
+rendering it, and *Mahomes* is `מהומיז` — **from Homies** — put through it.
+Worth knowing before anyone reports the bot has broken into English.
+(exec 44721, 12:50 UTC, which is 20:50 on the owner's clock.)
+
+**The tap fault is real, and epoch 26 never fixed it.** 15 Sep verified the
+fix 3/3 that evening and the note says so. Re-probed today, cold: **bad 2 of
+3**. So 3/3 bought nothing — this is a variance fault, and three samples
+cannot tell a fixed behaviour from a lucky one. What epoch 26 fixed was the
+wording of the rule.
+
+**Why the rule kept losing.** The paragraph that owns the greeting says the
+model must not write *that sentence* or open a reply with it. The model
+writes a PARAPHRASE — `במה אוכל לעזור לכם` against the greeting's
+`במה אפשר לעזור` — and is compliant by the letter. The 1 Sep lesson, again:
+ban one form and you get the other.
+
+**Epoch 30** named the question in every wording, and rode the plural rule
+along (`ספר/י` is how a model obeys *plural, always* while hedging the
+gender it was just told it does not know). Result: 5/5 now ask for the
+matter, plural clean everywhere — but 3/5 still OPENED with a banned form,
+because the clause listed an introduction among examples of *the question*,
+which is not one. **Epoch 31** split it: the system's line did two jobs,
+introduce and ask, both are done, and the first message starts with the ask.
+Result: **3/5 clean, 1/5 trails the question, 1/5 still leads with it.**
+
+**Stopping here on purpose.** That is three rules deep on one turn, and the
+standing rule is that this bot should be open rather than rule-bound. The
+only thing that makes it deterministic is answering this one tap with a
+fixed line, the way the greeting already is — and **the owner banned that on
+31 Aug** (*nothing templated*, which is why the open/status taps fall
+through to the model). Checked before proposing it. That reversal is the
+owner's to make, for this one row.
+
 ### Only what they were given: no invented number, no invented offer. Epoch 29 LIVE.
 
 Owner: *"i want the bot to only answer based on its knowledge and dont
