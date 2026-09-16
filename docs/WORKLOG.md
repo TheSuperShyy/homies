@@ -53,6 +53,54 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+### A burglary, answered like a form. I caused half of it. Epochs 32 and 33.
+
+Owner, on a screenshot: *"this is too robotic i want to have some humanity
+in it... That is just a sample i dont want any templated message
+whatsoever."* The bot had answered a reported burglary with *"I understand
+you want to report a burglary. I recommend that you contact the police as
+soon as possible. We do not handle criminal incidents. What else can I help
+you with?"*
+
+**An adversarial review of the fence found my own epoch-31 clause was half
+the cause.** 41 agents, four lenses, every finding put to a refuter that
+defaulted to refuted; almost everything was refuted, and one thing survived
+on three independent lenses. Line 277, written two hours earlier:
+`ההודעה הראשונה שלך בשיחה כזאת מתחילה במה שאתה צריך מהם` — the first message
+STARTS with the ask. Line 281, the owner's own 14 Sep decision:
+`ולפני השאלה, מילה לבן אדם ... ורק אחר כך את מה שאתה צריך ממנו` — a word for
+the person first, the ask only after. Opposite order, same message, no
+reconciling clause. The floor exists because the owner called the bot
+*"direct to the point"*; my clause licensed that failure straight back into
+the busiest opening the bot has. **I added a rule without deleting the
+competing text, which is the one thing the standing rule forbids.**
+
+**Epoch 32, mostly deletion.** That sentence is gone (the ban on repeating
+the greeting's question stays — it does not collide, and it is what bought
+the tap 4-in-5). The warmth floor had two worked examples, a ticket request
+and a fault, and **nothing for someone reporting a bad thing that is not
+Homies' business** — with no model for that moment the model reaches for a
+corporate decline. It has a third case now: something human about what they
+went through first, then plainly what Homies does and does not do, then
+what you CAN do for them. Shape and register, never wording.
+
+**Epoch 33, the finding that matters for the demo.** Owner decided a crime
+is NOT an exception to the no-advice guardrail. Four of five replies sent
+the resident to the police anyway — because the rule was written INSIDE the
+`מישהו בסכנה` sentence and reads as the danger case's rule, and a burglary
+has already happened. Declared general, with the live leaks named (police,
+insurance, council, lawyer), and my duplicate of it deleted from the floor.
+
+**Where it landed, honestly.** Warmth: fixed. Every reply now opens on what
+the resident went through, and the good ones bridge to real work — *"if the
+entrance door was forced or the cameras were damaged, we can open a service
+call"*. Non-crime out-of-scope (a scratched car): **clean, no referral at
+all**. **Crime: still says police, 3 of 3 after the fix.** That is the
+model's own safety prior beating the instruction, not a wording problem, and
+two epochs went at it. Owner's call now, and it is put to them.
+
+`check_whatsapp.py` green on epoch 33.
+
 ### The משהו אחר tap, for the second time, and what 3/3 was worth. Epochs 30 and 31.
 
 Owner sent the screenshot again: *"why its still like this"*. Two separate

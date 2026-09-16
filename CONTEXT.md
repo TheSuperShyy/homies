@@ -2274,6 +2274,20 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A rule written inside another rule's sentence inherits its scope
+(16 Sep).** The no-advice guardrail lived immediately after `מישהו בסכנה:`
+and the model read it as the danger case's rule, so a burglary — already
+happened, nobody in danger — never triggered it, and four of five replies
+sent the resident to the police. Placement is scope. A rule that must hold
+everywhere says so in its own sentence.
+
+**Some instructions lose to the model's safety prior, and no wording wins
+(16 Sep).** Told plainly and by name not to refer anyone to the police, the
+bot still does it for a crime, 3 of 3, while obeying perfectly for a
+scratched car. The refusal is about crime specifically. When two passes of
+prompt text do not move a behaviour, stop writing text: say so, measure it,
+and put it to the owner as a decision rather than spending epochs.
+
 **Three samples cannot close a variance fault (16 Sep).** The משהו אחר tap
 was fixed on 15 Sep and verified 3/3 the same evening; cold-probed the next
 day it was bad 2 of 3. Nothing regressed — the behaviour was never better
