@@ -53,6 +53,65 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+### Only what they were given: no invented number, no invented offer. Epoch 29 LIVE.
+
+Owner: *"i want the bot to only answer based on its knowledge and dont
+invent any promo or duration."* Two decisions taken with it: scope is the
+WhatsApp bot and the inbound voice agent, and **the catalogue's own
+durations stay** — the twelve-month pest warranty, the week's notice, the
+yearly tank disinfection are the client's published facts, not guesses.
+Only invention is banned. `SERVICES` is untouched; `check_knowledge.py`
+still 29/29, which is the guard that it stayed untouched.
+
+**Where the rule went, and why not into the fences.** The `get_service_info`
+description, both copies, identically: *what came back is the whole answer;
+a frequency, a duration, a guarantee, an amount or a deadline that is not in
+those facts is not something you have*, plus *Homies runs no promotions,
+discounts or free trials*. It arrives beside the facts themselves, on both
+bots, and costs neither fence a character. The chat prompt's knowledge rule
+was **tightened, not added to** — it already said *what a tool did not return,
+you do not know*; what it did not close is the hedge, so `וגם לא בערך וגם
+לא בדרך כלל` is the load-bearing half. A model told not to state a number
+complies by hedging one. The voice fence had **no knowledge rule at all** and
+got one (3,592 -> 3,971 chars).
+
+**THE FAULT THIS TURNED UP, and it is the real story.** `check_tools.py`
+came back `unknown tool get_service_info`, three times, while the live chat
+bot was answering from the catalogue in the same ten minutes. Both were
+true: the WhatsApp tool node posts to the Edge Function **directly**, and
+the voice agents go through the **n8n** `homies-debt-tools` webhook, whose
+Code node switches on the tool name and had no case for it. So the inbound
+agent shipped on the 16th with a catalogue it could not reach — it asked its
+own lookup and was told the lookup does not exist. Exactly the 19 Aug fault,
+one line up in the same switch, where `get_request_status` and `get_balance`
+had handlers in the writer and no name in the router. Fixed by adding the
+case and putting it in `READS` so n8n forwards and returns the real answer,
+then `n8n_deploy.py --apply`. **check_tools 18/18, first clean run there has
+been.** The offline probe could not have caught this: it answers tools from
+a mock, which is the harness's whole limitation.
+
+**Proven live, four turns offline and three against the real bot.** The
+voice fence, read against the new tool text before anything shipped: the
+frequency question got the per-building fact and no number; *"אבל בערך?
+בדרך כלל כמה?"* got *"אני לא יכול להגיד בערך או בדרך כלל"*; the gardening
+offer got *"אין לנו מבצעים או הנחות"* and a team note; and the control
+question was still **answered** from the facts, which is the half of the
+test that stops a pass meaning the agent has gone mute. Then the live chat
+bot, execs 44638-44641, same three baits, same three refusals.
+
+**Shipped:** `n8n_whatsapp_knowledge.py --apply` (tool text) then
+`teamnote --apply` (prompt 8,658 -> 8,925, epoch 28 -> 29), both idle after;
+`n8n_deploy.py --apply` for the router; `vapi_sync.py inbound --apply` then
+`vapi_set_voice.py --apply`, and **the trap fired again** — sync reset the
+voice to stock Eyal `a976c076` and the voice push put the clone `ba765d50`
+back. No Edge Function deploy: the catalogue and the handler never changed.
+`check_whatsapp.py` green.
+
+**Two wobbles seen and not chased.** The bot said *"אין לנו מבצעים או הנחות
+קבועות"* — *standing* discounts, a softening the prompt does not license and
+that leaves a one-off offer implied. And *"אני מבין ש…"* still opens most
+replies, unchanged since 1 Sep.
+
 ### The knowledge base became a tool, and both bots answer from it. Epoch 28.
 
 Owner: *"lets create a knowledge base for it."* The catalogue scraped this

@@ -2274,6 +2274,29 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**The two bots reach the tool layer by DIFFERENT roads, and a tool added to
+one is not added to the other (16 Sep).** The WhatsApp tool nodes post to
+the Edge Function directly (`SUPABASE_URL/functions/v1/debt-tools`); the
+voice agents post to the **n8n** `homies-debt-tools` webhook, whose Code
+node in `scripts/n8n_deploy.py` switches on the tool name and answers Vapi
+immediately, forwarding to the Edge Function only for the names in `READS`.
+So a new tool needs a handler in `index.ts` **and** a case in that switch
+**and** a line in `READS` if it returns data. Miss the n8n half and the
+symptom is invisible from the chat bot, which works perfectly, while the
+voice agent gets `unknown tool` mid-call. This has now happened twice, to
+`get_request_status`/`get_balance` on 19 Aug and to `get_service_info` on
+16 Sep. `check_tools.py` posts through the n8n webhook precisely so it sees
+the road the voice agents take; a green chat probe never will.
+
+**A rule against inventing a number has to name the hedge (16 Sep).** Told
+not to state a frequency it was not given, a model gives an approximate one
+instead — *בערך*, *בדרך כלל*, *בממוצע* — which is the same false fact with
+deniability attached. Both prompts name the hedge and refuse it beside the
+number, and the probe that proves it pushes for the approximation on purpose
+(`prompt_probe.py --scenario invent`). The second half of that probe matters
+as much: one turn the catalogue DOES answer, so a pass cannot be earned by
+an agent that has simply gone silent.
+
 **Knowledge the bots need reaches them as a TOOL, not as prompt text
 (16 Sep).** `get_service_info` answers what Homies does and how a service
 works, out of `SERVICES` in the Edge Function. Both agents are open by owner
