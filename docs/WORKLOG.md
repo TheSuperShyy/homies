@@ -87,11 +87,27 @@ beyond swapping two lines in `.env`:
   **Vercel was NOT touched**, so the deployed dashboard still points at the
   empty account; the demo is localhost:3001.
 
-**Still not live:** migration 032 (re-counted after the harness cleanups:
-46 interactions, 24 call_outcomes, 10 requests, nearly all the seed phone
-+972501234567 and old `probe-*` rows) — a destructive delete, held for the
-owner's word; and the dashboard (Vercel builds from main and nothing is
-committed).
+**Migration 032 applied** on the owner's yes: every marker now counts zero,
+and what is left is real — 225 outbound / 22 inbound voice, 39 WhatsApp,
+766 OXS tickets + 17 of ours. **Committed and pushed** (`2cd3861` on
+`feature/chatbot`, 68 files) after scanning the diff: the five new n8n
+snapshots carry the placeholder, not the secret, and the only phone-shaped
+strings are the two known test numbers.
+
+**One thing the scan turned up, not ours and not new:**
+`docs/handover/n8n-whatsapp-live-31aug-before-followup-removal.json` is
+already committed in this PUBLIC repo and contains the live
+`N8N_WEBHOOK_SECRET` twice. Deleting the file does not help — it is in the
+history. Rotating the secret is the only fix, and it is the owner's call
+(the voice-note webhook uses its own secret, so the blast radius is the
+WhatsApp tool webhook).
+
+**What is NOT done, and cannot be done from here:** nobody has heard either
+agent. Recording is off and an unresolvable Cartesia voice falls back to
+English silently, so one Hebrew web call from the dashboard is the only
+check — and it settles the name question and the debt latency at the same
+time (`vapi_latency.py <callId>`). Vercel still serves the old dashboard
+and still points at the dead Vapi account.
 
 **The debt agent went live too, on the owner's model.** Asked about the
 drift below, the owner: *"retain the llm model but change according to the
