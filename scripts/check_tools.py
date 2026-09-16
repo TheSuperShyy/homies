@@ -105,6 +105,13 @@ CASES = [
     # sees one row. The contract changed with the host; the test says so rather
     # than pretending the old guarantee survived.
     ("open_payment_ticket", {"authorization_captured": True}, "duplicate-upsert"),
+    # 16 Sep, the services lookup. Two shapes: a question that is in the
+    # catalogue, and one that deliberately is not -- `found: false` is a real
+    # answer and the agents are told what to do with it, so it has to keep
+    # working. "~~" = ok and found true; "!!" = ok and found false.
+    ("get_service_info", {"topic": "כל כמה זמן מגיע אב הבית"}, "~~super"),
+    ("get_service_info", {"topic": "מתי מחטאים את מאגר המים"}, "~~pumps"),
+    ("get_service_info", {"topic": "כמה עולה חניה לאורחים"}, "!!not in the catalogue"),
     # Must be refused: the enum is checked server-side, not trusted from the model.
     ("log_call_outcome", {"outcome": "totally-made-up"}, "!bad enum"),
     # Must be refused: the model cannot open a request with no description.
@@ -215,10 +222,19 @@ def main():
         if expect == "duplicate-upsert":
             expect, note_only = None, True
         want_refusal = bool(expect) and expect.startswith("!")
-        want_unmanaged = bool(expect) and expect.startswith("~")
+        want_found = bool(expect) and expect.startswith("~~")
+        want_absent = bool(expect) and expect.startswith("!!")
+        want_unmanaged = bool(expect) and expect.startswith("~") and not want_found
         ok = r.get("ok")
 
-        if want_unmanaged:
+        if want_found:
+            titles = [t.get("title", "") for t in (r.get("topics") or [])]
+            good = r.get("ok") is True and r.get("found") is True and bool(titles)
+            note = "topics=%s" % "/".join(titles)
+        elif want_absent:
+            good = r.get("ok") is True and r.get("found") is False
+            note = expect[2:]
+        elif want_unmanaged:
             good = (ok is True and r.get("opened") is False
                     and r.get("reason") == expect[1:])
             note = "reason=%s" % r.get("reason")

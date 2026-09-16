@@ -53,6 +53,56 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+### The knowledge base became a tool, and both bots answer from it. Epoch 28.
+
+Owner: *"lets create a knowledge base for it."* The catalogue scraped this
+morning is now **`get_service_info`** — a seventh tool on the inbound agent, a
+sixth on the chat bot, backed by `SERVICES` in the Edge Function.
+
+**Why a tool and not prompt text.** The catalogue is ~4k characters against an
+8.5k chat prompt, and both agents are open by owner decision: a catalogue in
+either fence is a rulebook under another name, re-read on every turn to serve
+a minority of them. As a tool it costs a round trip only when asked. It sits
+INSIDE `index.ts` rather than in its own module because
+`supabase_functions.py` uploads `index.ts` and nothing else — a second file
+would have deployed as a missing import and failed first mid-call.
+
+**The matcher is where the work was.** `scripts/check_knowledge.py` parses
+`SERVICES` out of the TypeScript so the data under test is the data that
+ships, and it failed **23/29** on the first run, finding two real bugs:
+
+* **The definite article sits INSIDE a Hebrew phrase.** אב בית is said
+  אב הבית, מאגר מים is said מאגר המים — so both keywords matched nothing at
+  all. Two of the likeliest questions in the catalogue, silently dead.
+  `keyForm()` drops the article at every word start, on both sides.
+* **`אש` is a word and also the first two letters of `אשפה`**, so fire
+  detection answered every question about the bin room. `hasWord()` refuses a
+  keyword of three characters or fewer that runs into a Hebrew letter; longer
+  ones keep plain containment, because בהדברה must still find הדברה.
+
+Three question-shaped keywords (מי אחראי, מי מטפל, כל כמה זמן בודקים) were
+dropped for hijacking whatever they were glued to. **29/29** after.
+
+**Deliberately absent, and this is the part to remember:** opening hours (the
+site puts Homies open on Friday and the agents say closed — answering from
+here would make the bot contradict itself), prices (the site quotes none; that
+is `notify_team` reason `quote`), the 24/7 claim, the years-in-business
+numbers that contradict each other, and the committee app we cannot verify.
+
+**Shipped and proven live.** Edge Function v74; `check_tools.py` 13 pass / 5
+pre-existing money fails, including the new `found: false` case. Inbound
+pushed (7 tools, 3,592-char fence) with `vapi_set_voice.py` straight after, as
+always. WhatsApp needed a NEW NODE, so `scripts/n8n_whatsapp_knowledge.py`
+ships it — the node comes from `n8n_whatsapp.py`'s own builder through
+`built()`, so the repo stays the definition and the patcher is only delivery
+(snapshot `n8n-whatsapp-live-16sep-before-knowledge.json`, `--restore`). Then
+`teamnote --apply` for the prompt and **epoch 28**; both patchers idle after.
+Live probes: *"אתם עושים הדברה? כל כמה זמן"* came back with the seasonal
+scope, the week's notice and the twelve-month warranty in the bot's own words;
+*"מי אחראי על הגינה"* answered from the gardening entry; *"כמה עולה הניקיון"*
+invented no price and offered the team; a lobby leak still opened
+`255-1255-26`.
+
 ### Their website is a knowledge base now, and it says they are open on Friday
 
 Owner: *"this is their website and i want you to scrape all the info that we

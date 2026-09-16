@@ -638,6 +638,21 @@ INTAKE_TOOLS = [
         wait=True,
         waiting="רגע, אני בודק.",
     ),
+    # 16 Sep: the client's own website, turned into a lookup. Inbound only --
+    # the debt agent calls about money and a services catalogue is not its
+    # conversation. The entries live in the Edge Function (SERVICES in
+    # index.ts) rather than in this fence, because both agents are open by
+    # owner decision and a catalogue in a prompt is a rulebook by another name.
+    _fn(
+        "get_service_info",
+        "Call when the caller asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\nIt answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\n`found` false means it is not there. Then say you do not have that and offer the office, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\nIt holds no prices and no opening hours. Homies quotes per building, so a price question is a matter for the team (notify_team, reason quote); the hours you already know.",
+        {"topic": {"type": "string", "description": 'What they are asking about, in their own words, in Hebrew. Their phrasing is better than your summary of it.'}},
+        ["topic"],
+        # Sync, like the other two reads: the caller asked a question and there
+        # is nothing for the agent to say until the answer is back.
+        wait=True,
+        waiting="רגע, אני בודק.",
+    ),
 ]
 
 

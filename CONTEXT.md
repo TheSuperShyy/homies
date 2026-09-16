@@ -2274,6 +2274,28 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**Knowledge the bots need reaches them as a TOOL, not as prompt text
+(16 Sep).** `get_service_info` answers what Homies does and how a service
+works, out of `SERVICES` in the Edge Function. Both agents are open by owner
+decision, so a catalogue in either fence is a rulebook under another name, and
+it would be re-read on every turn to serve a minority of them. Two rules
+travel with it. **The tool returns facts, never a sentence to read out** — a
+tool that hands a model finished prose gets it recited, the player-piano
+failure the debt prompt was cut in half over on 7 Aug. And **`found: false` is
+a real answer**: the agents already know to say they do not know and offer the
+office, so anything we are unsure of is better left out of the catalogue than
+guessed into it. Left out on purpose: opening hours (unresolved, and the
+agents already state them), prices (quoted per building — that is
+`notify_team` reason `quote`), and every marketing claim.
+
+**Hebrew matching needs the definite article dropped and short words bounded
+(16 Sep).** Hebrew puts ה INSIDE a phrase — אב בית is said אב הבית — so a
+dictionary-form keyword matches nothing; and a two-letter word like אש is a
+substring of אשפה, so it matches everything. Both rules live in `index.ts` and
+are re-implemented in `scripts/check_knowledge.py`, which is what caught them.
+Any future Hebrew keyword matching here starts from those two, and from the
+same insight in `scripts/voice_guard.py`.
+
 **The website is reference, and the client's own facts outrank it (16 Sep).**
 `homies-management.co.il` is scraped into `docs/knowledge/services.md` with
 the raw pages beside it. Two rules travel with it. First, **marketing copy is

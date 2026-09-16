@@ -885,6 +885,253 @@ function urgency(value: unknown): string {
 }
 
 // ---------------------------------------------------------------------------
+// What Homies sells (16 Sep 2026)
+// ---------------------------------------------------------------------------
+// Scraped from homies-management.co.il and curated; the catalogue and the raw
+// pages are in docs/knowledge/services.md and docs/knowledge/site/.
+//
+// WHY IT IS A TOOL AND NOT PROMPT TEXT. Fifteen services with their
+// frequencies is about 4k characters. Both agents are open by owner decision --
+// identity, tools and words rules, nothing else -- and a catalogue pasted into
+// either fence is a rulebook under another name, on top of roughly doubling the
+// chat prompt. As a tool it costs a round trip only on the turns that ask, and
+// it is edited without touching a prompt or an epoch.
+//
+// WHY IT LIVES IN THIS FILE RATHER THAN A MODULE. `supabase_functions.py`
+// uploads `index.ts` and nothing else, so a second file would deploy as a
+// missing import at runtime -- the failure would be invisible until a resident
+// asked about gardening mid-call.
+//
+// WHAT IS DELIBERATELY ABSENT, and it matters more than what is here:
+//   * Opening hours. The site puts Homies open on Friday, twice, in two
+//     different sets of hours that disagree with each other, and both disagree
+//     with the client's own 16 Aug facts. Hours are a fact the agents already
+//     state; answering them from here would make the bot contradict itself.
+//     See the open defect at the top of HANDOVER.md.
+//   * "מענה 24/7", "מעל עשור", "15 שנה". Marketing copy, and the years
+//     contradict each other across pages (5, 10 and 15). CONTEXT's rule: the
+//     site is reference, the client's facts outrank it.
+//   * The committee app. Real on the site, unverified by us, and a resident
+//     told an app exists that they cannot then find is worse off than one told
+//     to ask the office.
+// Prices are absent because the site quotes none: every page says "contact us
+// for a tailored quote", which is what `notify_team` reason `quote` is for.
+
+type Topic = { id: string; title: string; words: string[]; facts: string[] };
+
+const SERVICES: Topic[] = [
+  {
+    id: "management",
+    title: "ניהול ועד בית",
+    words: ["ועד", "ניהול", "גבייה", "גביה", "תקציב", "כספים", "הנהלת חשבונות", "דוח", "דוחות", "מאזן", "קבלה", "קבלות"],
+    facts: [
+      "בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.",
+      "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
+      "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
+      "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
+      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים.",
+    ],
+  },
+  {
+    id: "super",
+    title: "אב בית",
+    words: ["אב בית", "אבבית", "אב הבית", "טכנאי הבניין", "נציג בבניין"],
+    facts: [
+      "לכל בניין בניהול הומיז מוצמד אב בית, בעל רקע טכני, שמגיע בתדירות שסוכמה עם הבניין.",
+      "בביקור הוא בודק את התאורה בבניין ואת המערכות, ומכוון את שעוני החשמל.",
+      "הוא מטפל בתקלות ובפניות של דיירים, ומפקח על עבודת אנשי הניקיון מול המפרט שסוכם.",
+      "תיקונים קטנים שהוא עושה: החלפת נורות וגופי תאורה, כיוון ותיקון דלתות, החלפת ידיות וצילינדרים, ניקוי תעלות מרזבים.",
+      "לפני מעבר דירה בבניין הוא דואג למגן את המעלית.",
+    ],
+  },
+  {
+    id: "inspections",
+    title: "ביקורות שוטפות",
+    words: ["ביקורת", "ביקורות", "בדיקה תקופתית", "בדיקות תקופתיות"],
+    facts: [
+      "יש ביקורות שבועיות, חודשיות, רבעוניות ושנתיות, לפי סוג המערכת.",
+      "חלק מהביקורת הוא הפעלה מבוקרת של מערכות כדי שלא יישבתו: הנעת הגנרטור, הפעלת המפוחים בחניון, הפעלת המשאבות הטבולות בקיץ, ופתיחת הבורות לפני עונת הגשמים.",
+    ],
+  },
+  {
+    id: "generator",
+    title: "תחזוקת גנרטורים",
+    words: ["גנרטור", "גנרטורים", "חשמל חירום", "גיבוי חשמל"],
+    facts: [
+      "אב הבית מניע את הגנרטור לכעשר דקות, לפחות פעם בחודש, ובודק שמן, סולר ומים.",
+      "אחת לשנה מגיע טכנאי מוסמך לטיפול מקיף לפי הנחיות היצרן.",
+      "הגנרטור הוא מה שמחזיק את מערכות החירום: המשאבות, המפוחים וגילוי האש.",
+    ],
+  },
+  {
+    id: "fire",
+    title: "רכזת גילוי אש",
+    words: ["גילוי אש", "רכזת", "אש", "שריפה", "גלאי", "גלאי עשן", "כיבוי אש", "ספרינקלר"],
+    facts: [
+      "המערכת כוללת אמצעי זיהוי, לחצנים וגלאי עשן, ואמצעי התראה, צופרים והקלטה.",
+      "אב הבית בודק אותה מדי חודש; אחת לשנה מגיעה ביקורת של בעל מקצוע מוסמך.",
+      "את תדירות הביקורת קובעת רשות הכבאות וההצלה לפי מאפייני המבנה ורמת הסיכון.",
+      "האישורים נשלחים לרשות הכבאות ולחברת הביטוח ונשמרים בתיק הבניין.",
+      "כשיש חשד לתקלה בודקים מיד ולא מחכים לביקורת הבאה.",
+    ],
+  },
+  {
+    id: "fans",
+    title: "מפוחים לשחרור עשן",
+    words: ["מפוח", "מפוחים", "עשן", "שחרור עשן", "אוורור חניון"],
+    facts: [
+      "המפוחים נמצאים בדרך כלל בחניון התת קרקעי, ונכנסים לפעולה מרכזת גילוי האש או מחיישני חמצן בחניון.",
+      "אב הבית בודק אותם אחת לחודש; אחת לשנה מגיעה ביקורת של מהנדס מוסמך שמנפיק אישור תקינות.",
+      "האישור נשלח לוועד הבית ונשמר בתיק הבניין. התקן הרלוונטי הוא תקן ישראלי אלף ואחת.",
+    ],
+  },
+  {
+    id: "pumps",
+    title: "משאבות מים וחיטוי מאגר",
+    words: ["משאבה", "משאבות", "לחץ מים", "מאגר", "חיטוי", "הצפה", "מוצף", "טבולה", "טבולות"],
+    facts: [
+      "בבניין יש שלושה סוגי משאבות: להגברת לחץ המים בקומות הגבוהות, למערכת כיבוי האש, ומשאבות טבולות שמנקזות מי גשמים.",
+      "אב הבית בודק שהמשאבה עובדת, לא מתחממת ושאין אוויר במים.",
+      "בחורף הוא מוודא שהמצופים משוחררים ושהבור לא חסום; בקיץ הוא מפעיל את המשאבות הטבולות כדי שלא ייפגעו מחוסר שימוש.",
+      "חיטוי מאגר מי השתייה נעשה אחת לשנה, על ידי בעל מקצוע מוסמך, כפי שתקנות משרד הבריאות מחייבות. האישור נשלח לוועד ונשמר בתיק הבניין.",
+    ],
+  },
+  {
+    id: "cleaning",
+    title: "ניקיון הבניין",
+    words: ["ניקיון", "נקיון", "מנקה", "מנקים", "חדר אשפה", "פחים", "חדר מדרגות", "לובי", "תיבות דואר"],
+    facts: [
+      "לכל בניין מוצמד מנקה קבוע. אם הוא לא יכול להגיע, נשלח מחליף באותו יום עם תדריך על מה שצריך.",
+      "מה שמנקים בדרך כלל: חדר האשפה כולל שטיפת הפחים, חדר המדרגות, המעלית, ארונות החשמל, דלתות ומעברים ברכוש המשותף, תיבות הדואר והוויטרינות.",
+      "המפרט והתדירות נקבעים מול הבניין; אין מספר פעמים אחיד לכל הבניינים.",
+      "בבניינים חדשים נכללת גם שטיפת החניון במים בלחץ.",
+      "אב הבית מפקח על עבודת הניקיון מול המפרט שסוכם.",
+    ],
+  },
+  {
+    id: "parking",
+    title: "ניקיון חניונים",
+    words: ["חניון", "חניונים", "שטיפת חניון", "כתמי שמן", "אפוקסי"],
+    facts: [
+      "הניקיון נעשה במכונת שטיפה ייעודית, ובגיבוי מכונת לחץ מים גבוה, על משטחי אפוקסי או בטון מוחלק.",
+      "זה מסיר כתמי שמן, סולר, בוץ, פיח ועשן.",
+      "ההמלצה היא ניקיון יסודי פעם או פעמיים בשנה, והמועד מתואם עם הבניין.",
+    ],
+  },
+  {
+    id: "pest",
+    title: "הדברה",
+    words: ["הדברה", "מדביר", "גוקים", "גו'קים", "נמלים", "מזיקים", "עכברים", "חולדות", "צרעות", "מקקים"],
+    facts: [
+      "ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.",
+      "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.",
+      "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.",
+      "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים.",
+    ],
+  },
+  {
+    id: "garden",
+    title: "גינון",
+    words: ["גינון", "גינה", "גנן", "עצים", "דשא", "השקיה"],
+    facts: [
+      "צוות הגננים עובד לצד צוות הניקיון ברוב הבניינים שהומיז מנהלת.",
+      "אופי הגינון נקבע מול הבניין; מה שמובטח זה גינה מטופחת שמקבלת את הטיפולים שלה בזמן.",
+    ],
+  },
+  {
+    id: "renovation",
+    title: "שיפוצים",
+    words: ["שיפוץ", "שיפוצים", "לשפץ", "ריצוף", "צביעה", "גבס", "איטום"],
+    facts: [
+      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות.",
+    ],
+  },
+  {
+    id: "property",
+    title: "ניהול נכסים לבעלי דירות",
+    words: ["ניהול נכס", "ניהול נכסים", "בעל דירה", "להשכיר", "שוכר", "שוכרים", "חוזה שכירות", "משכיר"],
+    facts: [
+      "שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.",
+      "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו.",
+    ],
+  },
+  {
+    id: "shortterm",
+    title: "ניהול דירות לתקופות קצרות",
+    words: ["איירbnb", "airbnb", "booking", "טווח קצר", "תקופות קצרות", "נופש", "תיירים"],
+    facts: [
+      "הומיז מנהלת דירות להשכרה קצרה בפלטפורמות כמו Airbnb ו-Booking: פתיחת הפרופיל, יומן ההזמנות, כניסה ויציאה של אורחים, הכנת הדירה ותחזוקה שוטפת.",
+      "גם זה שירות לבעלי נכסים, ונרשם לצוות.",
+    ],
+  },
+  {
+    id: "areas",
+    title: "איפה הומיז פועלת",
+    words: ["איפה אתם", "אזורים", "ערים", "רמת גן", "תל אביב", "הרצליה", "רמת השרון", "גבעתיים", "מרכז הארץ"],
+    facts: [
+      "הומיז מנהלת בניינים במרכז הארץ, בין השאר ברמת גן, תל אביב, גבעתיים, הרצליה ורמת השרון.",
+      "אילו בניינים בדיוק בניהול הומיז אתה לא יודע, ואת זה בודקים מול הצוות או לפי הכתובת כשפותחים קריאה.",
+    ],
+  },
+];
+
+/**
+ * Which topics a question is about.
+ *
+ * Substring matching, not token equality, and that is the whole trick: Hebrew
+ * glues one-letter prepositions and the definite article onto the next word, so
+ * a resident writes "בהדברה" or "והגינון" and a tokeniser sees a word that is
+ * in no list. The same shape that made the pronunciation guard work in
+ * scripts/voice_guard.py.
+ *
+ * Scored by the LONGEST keyword that matched, not the count: "מים" appears in
+ * half the entries and "מאגר מים" in one, and the specific phrase is the
+ * evidence. Ties keep declaration order.
+ */
+function keyForm(v: string): string {
+  // The definite article, dropped wherever a word starts. Hebrew puts it INSIDE
+  // a two-word phrase -- אב בית is said אב הבית, מאגר מים is said מאגר המים --
+  // so a keyword written the dictionary way matches neither. Applied to both
+  // sides, so it is a comparison form and not a guess about meaning: הדברה and
+  // דברה both reduce to דברה, and only ever meet each other.
+  return (" " + v.toLowerCase() + " ").replace(/ ה/g, " ");
+}
+
+/** Does `hay` contain `needle` as a word rather than as letters inside one? */
+function hasWord(hay: string, needle: string): boolean {
+  let from = 0;
+  for (;;) {
+    const i = hay.indexOf(needle, from);
+    if (i < 0) return false;
+    // Short keywords only. אש is a word and it is also the first two letters of
+    // אשפה, which put "fire" on every question about the bin room. A Hebrew
+    // letter straight after a 2-3 character keyword means a different word.
+    // Longer keywords keep plain containment: Hebrew glues prefixes, and
+    // בהדברה must still match הדברה.
+    if (needle.length > 3 || !/[֐-׿]/.test(hay[i + needle.length] ?? " ")) return true;
+    from = i + 1;
+  }
+}
+
+function findTopics(query: unknown, limit = 3): Topic[] {
+  const q = keyForm(norm(query));
+  if (!q.trim()) return [];
+  const scored: { topic: Topic; score: number }[] = [];
+  for (const topic of SERVICES) {
+    let best = 0;
+    for (const w of topic.words) {
+      const word = keyForm(w).trim();
+      if (word && hasWord(q, word) && word.length > best) best = word.length;
+    }
+    if (best) scored.push({ topic, score: best });
+  }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit).map((s) => s.topic);
+}
+
+
+// ---------------------------------------------------------------------------
 // The tools
 // ---------------------------------------------------------------------------
 // Each returns a short object the agent can read back. Keep the strings plain:
@@ -2441,6 +2688,34 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     );
 
     return { ok: true, charges_bumped: ctx.charges.length };
+  },
+
+  /**
+   * What Homies does, for a resident who asks about a service rather than
+   * reporting a fault. Read-only, no row, no note.
+   *
+   * It answers with FACTS, not a sentence to read out: the agents compose their
+   * own Hebrew, and a tool that hands them finished prose gets it recited --
+   * the player-piano failure the debt prompt was cut in half over on 7 Aug.
+   *
+   * `found: false` is a real answer and the agents already know what to do with
+   * one: say they do not know and offer the office, rather than guess. Prices
+   * and opening hours deliberately return nothing; see the SERVICES comment.
+   */
+  async get_service_info(args, _ctx) {
+    const topics = findTopics(args?.topic ?? args?.question ?? "");
+    if (!topics.length) {
+      return {
+        ok: true,
+        found: false,
+        note: "No topic matched. Say you do not have that detail and offer the office; do not guess.",
+      };
+    }
+    return {
+      ok: true,
+      found: true,
+      topics: topics.map((t) => ({ title: t.title, facts: t.facts })),
+    };
   },
 };
 

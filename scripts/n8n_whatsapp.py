@@ -203,7 +203,11 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 27
+MEMORY_EPOCH = 28
+# 27 -> 28, 16 Sep: the services lookup. `get_service_info` is a new tool,
+# so the tools hash moves, and the prompt gained the sentence that says the
+# lookup exists. Old buffers carry "I don't have that" answers to questions
+# the bot can now answer -- pest control, the אב בית, the generator.
 # 26 -> 27, 16 Sep: the client's review. The national numbers left the
 # prompt (no numbers, no safety advice: an emergency is the ticket and
 # the note, at once), a fault inside the resident's own flat is theirs
@@ -296,7 +300,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "042aa9037633",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "8f6eaeb23f8b",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -304,7 +308,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "cad01d21dea0",
+    "tools": "c7aa1cb44b79",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1261,6 +1265,24 @@ TOOLS = [
         ),
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
+    # 16 Sep: the client's own website as a lookup. The entries live in the Edge
+    # Function (SERVICES in index.ts), not here and not in the prompt -- the
+    # catalogue is ~4k characters and the prompt is 8.5k, so pasting it in would
+    # grow the thing by half to answer a minority of turns.
+    {
+        "name": "get_service_info",
+        "description": (
+            "Call when the resident asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\n"
+            'It answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\n'
+            '`found` false means it is not there. Then say you do not have that and offer the office, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\n'
+            'It holds no prices and no opening hours. Homies quotes per building, so a price question is a matter for the team (notify_team, reason quote); the hours you already know.'
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {"topic": {"type": "string", "description": 'What they are asking about, in their own words, in Hebrew. Their phrasing is better than your summary of it.'}},
+            "required": ["topic"],
+        },
+    },
 ]
 
 
@@ -2152,6 +2174,42 @@ def workflow(e):
                                                  "name": "Homies tool secret"}}
                              if status_cred else {}),
             ),
+            # 16 Sep: the client's own website, as a lookup. Fourth straight
+            # call to the Edge Function, and the only one that reads no data
+            # about anybody -- the answer is the same for every resident, which
+            # is exactly why it does not belong in the prompt where it would be
+            # re-read on every turn to serve a minority of them.
+            #
+            # `topic` is the resident's own wording, deliberately. The matcher
+            # on the other side works on substrings with the definite article
+            # collapsed, so it copes with Hebrew's glued prefixes -- and a
+            # model's tidy summary of a question loses the very words it
+            # matches on.
+            node(
+                id="tool_services", name="get_service_info",
+                type="n8n-nodes-base.httpRequestTool",
+                typeVersion=4.2, position=[2640, 420],
+                parameters={
+                    "method": "POST",
+                    "url": fn_url,
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendBody": True, "specifyBody": "json",
+                    "jsonBody": TOOL_BODY % (
+                        "get_service_info",
+                        "topic: %s" % from_ai(
+                            "topic",
+                            tool("get_service_info")["input_schema"]
+                                ["properties"]["topic"]["description"]),
+                    ),
+                    "options": {"timeout": 25000},
+                    "descriptionType": "manual",
+                    "toolDescription": tool("get_service_info")["description"],
+                },
+                credentials=({"httpHeaderAuth": {"id": status_cred,
+                                                 "name": "Homies tool secret"}}
+                             if status_cred else {}),
+            ),
             # The error branch. Not a nicety: this is the sentence the Code node
             # used to produce from its own catch block, and without it a model
             # failure is a resident who is never answered at all.
@@ -2462,6 +2520,8 @@ def workflow(e):
             "get_balance": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "verify_address": {"ai_tool": [[
+                {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
+            "get_service_info": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
         },
     }
