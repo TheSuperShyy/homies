@@ -2274,6 +2274,31 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A guardrail the client agreed to does not live in prompt text (16 Sep).**
+Five prompt passes in one day, each verified, each landing at "mostly works":
+the tap at 4-in-5, the police refusal at 0-in-3 for a crime, and the private-
+flat rule opening a real ticket 2 runs in 3. Mostly is fine for tone and fatal
+for a promise made to the client. Anything Yariv signed off on belongs where
+the refusals already live — server-side in the Edge Function, the shape
+`log_call_outcome`'s enum already uses: checked, not trusted from the model.
+The prompt then says the same thing for the model's benefit, and the server is
+what makes it true.
+
+**Grounding covers what the bot OFFERS, not only what it KNOWS (16 Sep).**
+Epoch 29 stopped it inventing facts. It then invented a CAPABILITY — offered
+to recommend an electrician, and withdrew it one turn later when asked to. An
+offer is a promise to a resident, so the rule is the same rule: offers are
+limited to what the tools actually do, and taking one back is worse than never
+making it. Both halves live in the same paragraph on purpose.
+
+**An example list will beat the principle it illustrates (16 Sep).** The desk
+paragraph says plainly that what is inside the flat is the resident's, then
+illustrates with a sink, a tap, an appliance and paintwork — and lists
+`תאורה` among the common-area faults that get a ticket. A light inside a flat
+matched the list rather than the principle. When a rule is stated AND
+illustrated, the illustration is what gets applied; make the examples say what
+decides (here: where it is, not what kind of fault it is).
+
 **A rule written inside another rule's sentence inherits its scope
 (16 Sep).** The no-advice guardrail lived immediately after `מישהו בסכנה:`
 and the model read it as the danger case's rule, so a burglary — already

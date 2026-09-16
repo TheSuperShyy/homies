@@ -385,6 +385,7 @@ switch (fn.name) {
     break;
   }
   case 'get_request_status':
+  case 'get_service_info':
   case 'get_balance': {
     // Reads, and the only two tools here whose answer this node must not
     // invent. No `tab`, so nothing is written; `needsRealAnswer` below sends
@@ -421,7 +422,14 @@ switch (fn.name) {
 // read to a resident as fact. They are also the only tools where the round trip
 // costs nothing in perceived speed — the agent has nothing to say until the
 // answer arrives, so the wait is the work rather than a delay in front of it.
-const READS = ['get_request_status', 'get_balance'];
+// 16 Sep: get_service_info joins them, and it was shipped WITHOUT a name
+// here on the 16th -- the same fault as 19 Aug, one line up, and the same
+// symptom: the switch fell through to `unknown tool` and the inbound agent
+// asked the catalogue a question and was told its own lookup does not
+// exist. The chat bot never saw it because its tool node posts to the Edge
+// Function directly; only the voice agents come through here. What caught
+// it was check_tools.py, which goes through this webhook on purpose.
+const READS = ['get_request_status', 'get_balance', 'get_service_info'];
 const needsRealAnswer =
   (fn.name === 'open_request' && Boolean(args.description)) ||
   READS.indexOf(fn.name) >= 0;

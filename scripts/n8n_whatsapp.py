@@ -203,7 +203,61 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 28
+MEMORY_EPOCH = 34
+# 33 -> 34, 16 Sep: the owner's electrician screenshot. The bot offered
+# to recommend an electrician, then said Homies does not recommend
+# tradespeople, then offered a SERVICE CALL for a fault inside the flat
+# one sentence after saying such faults are the resident's. Three fixes:
+# (a) epoch 29 grounded what the bot KNOWS and nothing grounded what it
+# OFFERS, so the same paragraph now limits offers to what the tools
+# actually do; (b) `תאורה` sat in the common-area list while the private
+# list named a sink, a tap, an appliance and paintwork but no
+# electricity, so a light in a flat matched the wrong list -- WHERE
+# decides now, not what kind of fault; (c) the echo opener restated as a
+# first-word constraint. Buffers hold a promise the bot then broke.
+# 32 -> 33, 16 Sep: the no-advice guardrail was written INSIDE the
+# 'someone in danger' sentence, so the model scoped it to danger. A
+# burglary has already happened, so it never fired: four of five live
+# replies sent the resident to the police, minutes after the owner ruled
+# that out. Declared general now, with the live leaks named (police,
+# insurance, council, lawyer), and my duplicate of the same rule deleted
+# from the warmth floor -- one rule, one place.
+# 31 -> 32, 16 Sep: the owner's burglary screenshot -- 'this is too
+# robotic... i dont want any templated message whatsoever'. An
+# adversarial review of the fence confirmed, on three lenses, that 31's
+# own sentence ('your first message starts with what you need from
+# them') contradicted the 14 Sep floor two paragraphs down ('a word for
+# the person first, the ask only after') -- the floor the owner asked
+# for after calling the bot 'direct to the point'. I added a rule
+# without deleting the competing text, which is the one thing the
+# standing rule forbids. That sentence is deleted. The floor gained the
+# case it never had, someone reporting a bad thing that is not Homies'
+# business, and the anti-echo ban now names the live openers instead of
+# only the category. Buffers hold the burglary answer itself.
+# 30 -> 31, 16 Sep: 30's clause banned 'the question in it, in any
+# wording' and then listed an INTRODUCTION among the examples, which is
+# not a question. Muddled, and three replies of five still opened with a
+# banned form. The system's line does two jobs, introduce and ask; both
+# are named as two facts now, with the first message's opening
+# prescribed rather than only forbidden.
+# 29 -> 30, 16 Sep: the owner's screenshot of the משהו אחר tap, for the
+# SECOND time, answered with the intro's own question back. Epoch 26
+# rewrote that tap's clause and verified 3/3 that evening; re-probed
+# today it is bad 2 of 3, so 26 fixed the wording of the rule and not
+# the behaviour. The paragraph that owns the greeting banned writing
+# THAT SENTENCE; the model writes a paraphrase and is compliant by the
+# letter. Now the question itself is named in every wording, with the
+# replacement beside it -- the 1 Sep shape. The plural rule rides along:
+# ספר/י is how a model obeys 'plural, always' and hedges the gender.
+# 28 -> 29, 16 Sep: grounding. The owner asked that the bot answer only
+# from what it was given and invent no promotion and no duration, so the
+# knowledge rule in the prompt gained the numbers-and-promises clause and
+# the get_service_info text gained the line that says a found topic does
+# not license an unfound number. Prompt and tools both move, so both
+# hashes do. But the buffers are the real reason: they hold turns where
+# the bot already answered with a number it made up, and 1 Sep is the
+# precedent for the model copying its own last answer over the new
+# instruction, byte for byte.
 # 27 -> 28, 16 Sep: the services lookup. `get_service_info` is a new tool,
 # so the tools hash moves, and the prompt gained the sentence that says the
 # lookup exists. Old buffers carry "I don't have that" answers to questions
@@ -300,7 +354,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8f6eaeb23f8b",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "c062df1582bc",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -308,7 +362,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "c7aa1cb44b79",
+    "tools": "328e469ffb44",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1273,7 +1327,7 @@ TOOLS = [
         "name": "get_service_info",
         "description": (
             "Call when the resident asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\n"
-            'It answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\n'
+            'It answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\nWhat came back is the whole answer. A frequency, a duration, a guarantee, an amount or a deadline that is not in those facts is not something you have: the topic coming back does not mean the number did, and how often is usually the very thing the catalogue says is agreed per building. Do not approximate it, do not average it, do not soften it into a roughly or a usually. Homies runs no promotions, discounts or free trials: never offer or imply one.\n'
             '`found` false means it is not there. Then say you do not have that and offer the office, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\n'
             'It holds no prices and no opening hours. Homies quotes per building, so a price question is a matter for the team (notify_team, reason quote); the hours you already know.'
         ),

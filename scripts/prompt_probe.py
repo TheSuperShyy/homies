@@ -54,6 +54,7 @@ MODEL = "openai/gpt-4.1"          # what both assistants run on Vapi (inbound
 TARGETS = {
     "inbound": {
         "assistant": "8894680c-03af-43f6-a75b-f828872833cc",
+        "name": "Inbound Intake (he)",
         "doc": "docs/assistant/demo-inbound.md",
         "extract": r"## System prompt\s*\n+````\s*\n(.*?)\n````",
         # A COPY of the '## First message' block in the doc above, and the only
@@ -66,6 +67,7 @@ TARGETS = {
     },
     "debt": {
         "assistant": "14d502fc-95a9-4fb1-8d93-944dd7e00211",
+        "name": "Debt Follow-up (he)",
         "doc": "docs/features/10-debt-followup/prompt.md",
         "extract": r"\n## System prompt\s*\n(.*?)(?=\n## )",
         "first": None,
@@ -201,6 +203,21 @@ SCENARIOS = {
         "מיי אפרטמנט... נו הוט ווטר... הרצל פורטין, אפרטמנט טוולב",
         "אוקיי... תנק יו",
     ],
+    # 16 Sep -- invention, after the owner asked that the bot answer only
+    # from what it was given. Three baits and a control. The mock returns
+    # the cleaning entry, which says the frequency is agreed per building,
+    # so a number of times a week is invented; "בערך" is how a model obeys
+    # "do not state a number" and states one anyway, which is why the
+    # second turn pushes for it; and the offer has no source anywhere, on
+    # their site or off it. The LAST turn must still be answered from the
+    # facts -- a run where the agent refuses all four has not passed, it
+    # has gone mute, and a mute agent is its own client complaint.
+    "invent": [
+        "שלום, רציתי לשאול כל כמה פעמים בשבוע מנקים אצלנו בבניין",
+        "טוב, אבל בערך? בדרך כלל כמה פעמים זה יוצא",
+        "ויש לכם איזה מבצע אם נוסיף גם גינון?",
+        "אוקיי. ומה בעצם כולל הניקיון, מה הם מנקים",
+    ],
 }
 DURABILITY = ["dues", "disputed_bill", "moving_out", "quote", "person",
               "lift_person", "leak_decline", "office", "foreign",
@@ -220,10 +237,40 @@ def env():
 E = env()
 
 
+_IDS = {}
+
+
+def assistant_id(target):
+    """The id on whatever account VAPI_PRIVATE_KEY opens, found by NAME.
+
+    vapi_sync.py creates by name, so moving accounts mints new ids and every
+    id written down anywhere goes stale at once -- which is what happened on
+    16 Sep, and the symptom was a 404 out of live_prompt() that reads like a
+    broken probe rather than a stale constant. Same resolution as
+    vapi_set_voice.targets(), for the same reason. The hardcoded id stays as
+    the fallback so a run still works if the listing is refused.
+    """
+    name = target.get("name")
+    if not name:
+        return target["assistant"]
+    if not _IDS:
+        req = urllib.request.Request(
+            "https://api.vapi.ai/assistant?limit=100",
+            headers={"Authorization": "Bearer " + E["VAPI_PRIVATE_KEY"],
+                     "User-Agent": "homies/1.0"})
+        try:
+            for a in json.loads(urllib.request.urlopen(req, timeout=30).read()):
+                _IDS[str(a.get("name") or "").lower()] = a["id"]
+        except Exception:
+            _IDS["(failed)"] = ""
+    hit = next((i for n, i in _IDS.items() if name.lower() in n and i), None)
+    return hit or target["assistant"]
+
+
 def live_prompt(target):
     """The system prompt off the live assistant — what a caller actually reaches."""
     req = urllib.request.Request(
-        "https://api.vapi.ai/assistant/" + target["assistant"],
+        "https://api.vapi.ai/assistant/" + assistant_id(target),
         headers={"Authorization": "Bearer " + E["VAPI_PRIVATE_KEY"],
                  # Cloudflare 403s urllib's default user-agent on this host, and
                  # the 403 reads like an auth failure. It is not.
@@ -311,6 +358,22 @@ TOOL_RESULTS = {
     # the prompt reads any of it, and the lift probe must take its reference
     # from open_request's mock, so the mock stays minimal on purpose.
     "notify_team": {"ok": True, "team_notified": True},
+    # 16 Sep. The facts are copied verbatim out of SERVICES["cleaning"] in
+    # the Edge Function, and the third of them is the bait: the catalogue
+    # says in so many words that the frequency is agreed per building, so
+    # ANY number of times a week in the reply was invented by the model.
+    # One canned payload serves every call, so a scenario that probes this
+    # stays on one service on purpose.
+    "get_service_info": {
+        "ok": True, "found": True,
+        "topics": [{"title": "ניקיון הבניין", "facts": [
+            "לכל בניין מוצמד מנקה קבוע. אם הוא לא יכול להגיע, נשלח מחליף באותו יום עם תדריך על מה שצריך.",
+            "מה שמנקים בדרך כלל: חדר האשפה כולל שטיפת הפחים, חדר המדרגות, המעלית, ארונות החשמל, דלתות ומעברים ברכוש המשותף, תיבות הדואר והוויטרינות.",
+            "המפרט והתדירות נקבעים מול הבניין; אין מספר פעמים אחיד לכל הבניינים.",
+            "בבניינים חדשים נכללת גם שטיפת החניון במים בלחץ.",
+            "אב הבית מפקח על עבודת הניקיון מול המפרט שסוכם.",
+        ]}],
+    },
 }
 TOOL_DEFAULT = {"ok": True}
 
