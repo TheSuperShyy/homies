@@ -203,7 +203,14 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 42
+MEMORY_EPOCH = 43
+# 42 -> 43, 17 Sep: frequency. Owner wants an emoji on about 2 messages
+# in 5, not on nearly every one -- epoch 37 specified one or two PER
+# MESSAGE and never said how often, so warmth became wallpaper. Written
+# so the model can act on it: it sees its own earlier replies in the
+# buffer, so 'did my last message carry one' is answerable where a bare
+# ratio is not. Epoch 40's variety sentence deleted in the same pass --
+# it never moved anything and the frequency rule covers it.
 # 41 -> 42, 17 Sep: the owner diagnosed what four passes of mine had not.
 # The fence banned the opening WORD while the same paragraph required a
 # warm word before the question, so it forbade the cheapest thing that
@@ -407,7 +414,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "ca571d1f255c",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "26c9e315b6bb",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

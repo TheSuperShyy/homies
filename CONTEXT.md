@@ -2274,6 +2274,14 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A rate is only followable if the model can see the denominator (17 Sep).**
+"An emoji in two messages out of five" is not actionable on its own: each turn
+is composed independently and the model has no counter. What it does have is
+the conversation buffer, so the rule is phrased as *look at your own last
+reply; if it carried one, this one almost certainly should not*. Any future
+frequency or quota rule needs the same treatment — convert the ratio into a
+question the model can answer from what is in front of it.
+
 **When a ban keeps losing, check what the same fence REQUIRES (17 Sep).** Four
 passes banned אני מבין ש and it opened most replies anyway, because the same
 paragraph demanded a warm word before the question and that was the cheapest

@@ -55,6 +55,29 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### Emoji as seasoning, not wallpaper. Epoch 43.
+
+Owner, on a reply that opened with a droplet: *"remove the shitty emoji"*, and
+then, asked which: *"i want the face and thumb stays also i want the emoji to
+appear like 2 in 5 messages."*
+
+**Epoch 37 specified one or two PER MESSAGE and never said how often**, so the
+bot put one on nearly every reply and the warmth turned into wallpaper. The
+category is unchanged; the frequency rule is new, and it is written so the
+model can act on it: it can see its own earlier replies in the buffer, so
+*did my last message carry one* is answerable, where a bare ratio is not.
+Epoch 40's variety sentence went in the same pass — it never moved anything
+and the frequency rule covers it. Competing text deleted rather than left to
+pile up, which is the lesson of the whole day.
+
+**Measured over one six-turn conversation: one emoji in six replies**, down
+from nearly every message, and no object emoji at all. One conversation is not
+a ratio, so 2-in-5 is the direction rather than a proven number; if it reads
+sparse to the owner, the dial is in that sentence.
+
+**Still in that same run:** `אני מבין ש` twice in six, so epoch 42's fix is
+holding at roughly the 2-in-5 it measured earlier and has not slipped.
+
 ### The owner found the bug in my rule. Epoch 42.
 
 Owner: *"instead of something like i understand then parrot why can we do a
