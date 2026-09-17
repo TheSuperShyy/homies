@@ -2274,6 +2274,20 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A name is not a string, it is every copy of a string (17 Sep).** The company
+name lived in the prompt, the fixed greeting, the model's own conversation
+history, and two JavaScript guards that match it by exact text. Renaming the
+prompt alone left the guard hunting a sentence that no longer exists — a
+protection that still reads as present in the code and has silently stopped
+firing. Before renaming anything user-facing, grep the LIVE workflow, not just
+the repo, and ask which copies are compared rather than displayed. Those are
+the ones that fail quietly.
+
+**The client's own spelling wins, and it is worth counting (17 Sep).** We used
+הומיז from the first prompt; their site says הומי'ז 188 times against 13. The
+scraped pages in `docs/knowledge/site/` settle this kind of question in one
+command, and did.
+
 **A rule you write for the model gets read out to the resident (17 Sep).**
 Epoch 34 spelled out when a fault is the resident's and when it is the
 building's, and the bot answered a dead light with a paragraph of policy

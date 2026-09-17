@@ -203,7 +203,15 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 35
+MEMORY_EPOCH = 36
+# 35 -> 36, 17 Sep: the company's own name. We have written הומיז
+# everywhere since the start; the client writes הומי'ז on their own site,
+# 188 times against 13, and the owner read our spelling back as 'homiz
+# not homies'. Renamed inside the live fence and in the fixed greeting.
+# CHAT ONLY: the same change in the voice fences alters what Cartesia
+# says, nobody has heard those agents since 16 Sep, and the 15 name
+# samples are still waiting on the owner's ear. History comments keep
+# the old spelling, because they record what we actually did.
 # 34 -> 35, 17 Sep: epoch 34 made the ownership rule explicit and the
 # model started READING IT OUT -- a paragraph of policy at the resident,
 # both branches spelled out, and the address asked for before anyone
@@ -362,7 +370,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "499e4f3dc34d",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "92713a827fac",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -523,7 +531,7 @@ MENU = {
         # their titles are the tap-routing keys). Every copy of this
         # sentence moved in the same commit: here, the prompt's ownership
         # clause, live Sort's MENU.content and Send's echo clause.
-        "body": {"text": "היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?"},
+        "body": {"text": "היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?"},
         "footer": {"text": "אפשר גם לבחור מהרשימה"},
         "action": {
             "button": "אפשרויות",
@@ -1952,7 +1960,7 @@ def workflow(e):
                             " ברכה: ברכה קצרה בחזרה וממשיכים מאיפה שהפסקתם."
                             " אם יש בה תוכן: בלי פתיח בכלל, ישר לעניין.]'"
                             " : ' [זו ההודעה הראשונה בשיחה. פתח בשם: היי, כאן"
-                            " מיכאל מהומיז. אם ההודעה היא רק ברכה (גם \"מה נשמע\""
+                            " מיכאל מהומי'ז. אם ההודעה היא רק ברכה (גם \"מה נשמע\""
                             " ו\"מה המצב\" הן ברכה, לא שאלה. לא עונים עליהן ולא"
                             " מחזירים אותן), הוסף הצעת עזרה אחת: במה אפשר לעזור?"
                             " אם יש בהודעה תוכן, בלי \"במה אפשר לעזור\" בכלל:"

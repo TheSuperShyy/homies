@@ -74,8 +74,8 @@ GREET_NEW = (
 # anchors stopped matching an up-to-date Send and this file refused as
 # drifted. The echo clause itself is the anchor now: present = done; absent =
 # insert it before the מיכאל fallback test, wherever that sits.
-SEND_ECHO = "t.indexOf('היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?') !== -1 || "
-SEND_TAIL = "(/מיכאל מהומיז/.test(t) && $('Sort').first().json.greeted !== true))"
+SEND_ECHO = "t.indexOf('היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?') !== -1 || "
+SEND_TAIL = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greeted !== true))"
 
 # --------------------------------------------------------------------------
 # 4. 7 Sep: the intro waves (owner: "i want to add some emoji in the intro";
@@ -85,10 +85,10 @@ SEND_TAIL = "(/מיכאל מהומיז/.test(t) && $('Sort').first().json.greete
 #    sentence twice (content + a history comment), so the content anchor
 #    carries its JS syntax.
 # --------------------------------------------------------------------------
-SORT_PLAIN = 'content: "היי, כאן מיכאל מהומיז. במה אפשר לעזור?"'
-SORT_WAVE = 'content: "היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?"'
-ECHO_PLAIN = "'היי, כאן מיכאל מהומיז. במה אפשר לעזור?'"
-ECHO_WAVE = "'היי 👋 כאן מיכאל מהומיז. במה אפשר לעזור?'"
+SORT_PLAIN = 'content: "היי, כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
+SORT_WAVE = 'content: "היי 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
+ECHO_PLAIN = "'היי, כאן מיכאל מהומי'ז. במה אפשר לעזור?'"
+ECHO_WAVE = "'היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?'"
 
 # --------------------------------------------------------------------------
 # 3. get_balance's unit doc: the normal case first, and never a question.

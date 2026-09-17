@@ -55,6 +55,38 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### We have been spelling the client's name wrong since day one. Epoch 36.
+
+Owner, on the greeting: *"its still homiz not homies"*. Not a pronunciation
+problem and not the voice. We have written **הומיז** since the first prompt;
+the client writes **הומי'ז** on their own site, counted in the pages we
+scraped yesterday: **188 times against 13**. Every message we have ever sent a
+resident has misspelled the company paying for it.
+
+**The name lives in more places than the prompt, and one of them bites.** The
+live workflow carries it in the MENU body (the greeting the resident reads,
+and the only copy the model never writes), in Sort's `content:` strings (the
+greeting handed back to the model as its own history), and in Send's echo
+guards — `t.indexOf('היי 👋 כאן מיכאל מהומיז...')` and `/מיכאל מהומיז/` — which
+exist to stop the bot repeating its own greeting and **match by exact text**.
+Renaming the prompt alone leaves that guard looking for a sentence that no
+longer exists: protection that reads as present and has quietly stopped
+firing. I pushed the prompt half before knowing that, and finishing it was not
+optional.
+
+`scripts/n8n_whatsapp_rename.py` does every live copy in one pass, is
+idempotent (a second run reports nothing to do rather than producing הומי''ז),
+and snapshots first. Five occurrences across Sort, Send and Say it again. The
+anchors in `n8n_whatsapp_greet.py` and `n8n_whatsapp_sayagain.py` moved with
+them, and the two that are single-quoted Python literals now escape the
+apostrophe — the rename broke the file's syntax on the first attempt.
+
+**Chat only, on purpose.** The same change in the voice fences alters what
+Cartesia says, nobody has heard those agents since 16 Sep, and the fifteen
+name recordings are still waiting on the owner's ear. History comments keep
+the old spelling: they record what we did, not what we wish we had done.
+Proved live: `היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?`
+
 ### The bot read the rulebook out loud. Epoch 35.
 
 Owner: *"this is too long and its super robotic ... might as well ask does the
