@@ -2274,6 +2274,20 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**The emergency turn is where the model fights hardest, and prompt text keeps
+losing (17 Sep).** Reassure, promise help, look concerned: three instincts the
+fence forbids and the model reaches for anyway, on the one turn where being
+wrong matters most. Measured, not felt — emoji on a fire 1 run in 3 after
+being told twice, and `הם בדרך` live despite a clause naming that exact
+phrase. Treat the emergency path as needing enforcement in the workflow rather
+than instruction in the fence; `Hand over instead` already rewrites replies
+before they are sent and is where such a pass belongs.
+
+**Replace a rule the owner is changing, never add beside it (17 Sep).** The
+emoji ask reversed a 14 Sep decision. Both wordings live at once means the
+model picks the stricter and the new instruction silently does nothing — the
+same shape as the epoch-31 collision the same day. Find the old clause first.
+
 **A name is not a string, it is every copy of a string (17 Sep).** The company
 name lived in the prompt, the fixed greeting, the model's own conversation
 history, and two JavaScript guards that match it by exact text. Renaming the

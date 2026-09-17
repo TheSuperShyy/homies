@@ -55,6 +55,38 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### Emoji, and the emergency turn that will not behave. Epochs 37 and 38.
+
+Owner: *"also add some emoji on the responses like one to two."* The 14 Sep
+clause said the opposite — one, sometimes, never in the first reply, never on
+a refusal — so it was **replaced, not added to**: hand a model both and it
+takes the stricter one and the ask disappears. Owner chose to keep exactly one
+exclusion, absolute: nothing when someone is in danger.
+
+**The ordinary half works and reads well.** `כן, אנחנו עושים הדברה 🪳`,
+`האור כבה לכם בדירה. 💡`, `בכיף! שמחתי לעזור. 😊`, `אנחנו מטפלים גם בגינון 🌳`.
+One each, inside the sentence rather than stuck on the end.
+
+**The emergency half does not.** First fire probe came back `זה מצב חירום! 😥`.
+Epoch 37 had said *serious, and nothing*, and a worried face reads to the
+model as seriousness rather than as decoration, so it obeyed the word and
+broke the rule. Epoch 38 named the near-miss — *a worried face on a fire is
+still a face* — and it went from 1 of 1 to **1 of 3**. Better, not fixed.
+
+**And the probe caught something bigger than emoji.** The same run answered a
+burning stairwell with *`עדכנתי את הצוות שלנו, והם בדרך`* — the team is on the
+way — and another with *`שהצוות יגיע למקום הנכון במהירות`*. That is the
+client's own guardrail, `אתה לא שולח עזרה, לא אומר שעזרה בדרך ולא שהצוות
+בדרך`, and it is the wobble the 16 Sep plan recorded and nobody had proven
+since. It is proven now.
+
+**Stopping at the same wall as yesterday.** Emergencies are where the model's
+own instincts — reassure, promise help, look concerned — fight the fence
+hardest, and prompt text keeps landing at 'mostly'. The workflow already has
+the node that can rewrite a reply before it is sent (`Hand over instead`), and
+an emergency turn is exactly where a deterministic pass belongs: strip the
+emoji, strip the promise. That is a code change and the owner's call.
+
 ### We have been spelling the client's name wrong since day one. Epoch 36.
 
 Owner, on the greeting: *"its still homiz not homies"*. Not a pronunciation
