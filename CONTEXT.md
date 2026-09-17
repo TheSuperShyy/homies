@@ -2274,6 +2274,29 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A URL in a reply must be traceable to a tool observation (17 Sep).** One in
+six "pay" turns produced a payment link the model made up, with no tool call,
+under a prompt that already said "from the tool, not from your head". A
+fabricated URL is worse than any wrong sentence — a resident may pay into it
+— and it is the one failure a prompt rule cannot be trusted to prevent.
+`Reply usable?` checks every URL against the `get_payment_link` observation in
+`intermediateSteps`; a miss takes the rescue path. General form: anything the
+resident could act on outside the chat (a URL, a phone number, an amount)
+wants a mechanical check against what a tool actually returned.
+
+**A refusal note must leave the model something it CAN do (17 Sep).** The
+first `get_payment_link` text said "do not ask for their details; open the
+ticket in this same turn" — and a ticket needs an address the model did not
+have, so it claimed a ticket instead. When a tool result forbids the obvious
+next step, check that the step it prescribes is possible from that turn's
+state; if not, the model invents. Same family as the two-passes lesson.
+
+**Two walkers on one OXS key is a 429 (17 Sep).** `oxs_buildings_sync.py`
+paces itself at one request a second for the 60-a-minute limit; running a
+dry run and an apply concurrently doubled that and the apply died mid-walk.
+Limits are per key. One OXS walker at a time, and never at 00:00 or 15:00
+Israel when the CI sweep runs.
+
 **A photo is copied, not linked, and the model is told where it went (17 Sep).**
 Chatwoot keeps every WhatsApp file and hands n8n a signed URL that works
 without auth, so the temptation is to store the URL. The ticket must not

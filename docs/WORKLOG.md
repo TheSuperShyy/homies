@@ -55,6 +55,61 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### The OXS payment link, in the chat. Epochs 45 and 46.
+
+Owner: *"regarding the payment i have a new pdf... about the api key... scan
+and analyze it."* OXS External API **rev 1.3**: one new endpoint,
+`GET /apartments/:id/payment-link`, finance read-only key, one short link per
+payer, minted fresh on every call, never expiring, sent to nobody by OXS.
+Decisions taken in the same hour: WhatsApp only (a call has nowhere to put a
+URL); reuse `OXS_KEY_DEBTS`; **the link goes only to the number on file**; a
+delivered link replaces the 15 Sep ticket + note; every miss keeps that route.
+
+**Four readers and a critic, then three planners and a merge** (ultracode).
+What they settled: `send_payment_link`'s own comment said the OXS call "goes
+here when documented", but it needs voice-only charges and voice cannot
+deliver, so a new chat-only `get_payment_link`; reuse `payment_links` with
+migration 034 (per-apartment chat rows, the unique-per-interaction index
+narrowed to voice, the link stored); apartment id by the exact
+`residents.building = buildings.address` join, refusing a multi-flat owner
+rather than guessing a flat; `payerId` preferred, `isMain` as fallback, never
+a refusal on mismatch.
+
+**Pre-checks earned their keep.** 213 residents in 5 buildings had no
+`buildings` row — buildings taken on after the 13 Aug snapshot — so
+`oxs_buildings_sync.py --apply` ran (4,092 → 4,145 apartments). Its first
+attempt hit OXS's 429: my dry run was still walking the buildings when the
+apply started, two walkers on one 60-a-minute key. Nothing half-written; it
+upserts only at the end. Eight residents, not two, owe on more than one flat.
+
+**Two failures the first probes caught, fixed under epoch 46.** The bot
+CLAIMED a ticket it never opened — my tool text said "open one in this same
+turn" without asking for anything, and a ticket needs an address, so the
+model could not obey and claimed instead; the refusal notes also spelled out
+the reason and the bot recited it. Now: notes carry no reason, the text sends
+it to ask for the building and flat as for any ticket, and the phantom guard
+learned the present tense and a free word ("אני פותח לכם", "פתחתי
+בשבילכם" both slipped it). Then the worst one: **one reply in six produced
+an invented payment link** — `https://pay.homies-management.co.il/...`, no
+tool call at all. The prompt already said "from the tool, not from your
+head". A fabricated URL is the failure a sentence cannot be trusted with, so
+`Reply usable?` now requires every URL in a reply to appear in a
+`get_payment_link` observation from that execution, or the turn goes to the
+rescue path. Proven on six reply shapes in Node; the true branch proven live.
+
+**Measured after:** 9 of 9 "pay" turns from unknown numbers call the tool,
+claim nothing, invent nothing, and ask the one address question; an
+arrangement takes the ticket route with no link call; a balance question still
+asks name + phone. `check_paylink.py` 5/5 refusals (a throwaway resident for
+the on-file-but-no-apartment case, because 032 purged the seed). **The
+positive path is still owed**: it needs one real debtor's number, which only
+the owner names (`--mint`), and mints one real link that goes nowhere.
+
+Also: the PDF to `local/media/`, `docs/reference/oxs-payment-link.md` written
+so the repo keeps the contract without the vendor file, the Links tab shows a
+chat row as "WhatsApp" instead of ₪0, and every stale "OXS exposes no
+payment-link endpoint" line retired.
+
 ### A resident's photo lands on the ticket. Epoch 44.
 
 Owner, after the Make scan: *"ok so what can we adapt in our current

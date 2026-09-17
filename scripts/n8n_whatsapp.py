@@ -203,7 +203,19 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 44
+MEMORY_EPOCH = 46
+# 45 -> 46, 17 Sep, an hour later: the first refusal probes showed the
+# bot CLAIMING a ticket it never opened, because the tool text told it
+# to open one 'in this same turn' without asking for anything, and a
+# ticket needs an address. The text now sends it to ask for the building
+# and flat as for any ticket; the Edge Function's notes stopped spelling
+# out the reason (it was recited); the phantom guard learned the present
+# tense. Buffers under 45 hold that claim.
+# 44 -> 45, 17 Sep: the payment link. A new tool (get_payment_link), the
+# prompt's payment sentence and three tool texts moved: wants to pay =
+# the link; ticket + note only when no link came back, and for an
+# arrangement. Buffers under 44 show the bot asking for a building and
+# a flat, or a name and a phone, where the link now closes the matter.
 # 43 -> 44, 17 Sep: the photo on the ticket. The user-turn note for an
 # image used to say the bot cannot see files; it now says the photo is
 # saved and on the resident's ticket. A buffer minted under 43 holds
@@ -419,7 +431,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "26c9e315b6bb",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "58b95cb5f333",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "72f37df8063b",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -427,7 +439,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "328e469ffb44",
+    "tools": "8c975ee8f8fc",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1013,14 +1025,18 @@ TOOLS = [
             "before the address — that is the moment to call this.\n"
             # 15 Sep, owner: wanting to pay is a ticket too, beside the note
             # (migration 031). The gloss on `type` keeps a how-much question
-            # out of it.
-            "A resident who wants to pay, asks how or where to pay, or wants a "
-            "payment arrangement gets a ticket too: type payment, their words, "
-            "their building and apartment. That is all it needs, the same as "
-            "any ticket: the full-name-and-phone identity check belongs to "
-            "get_balance, for reading a balance, and is not part of opening "
-            "this. The team note (notify_team, reason payment) goes as well; "
-            "both happen, either order.\n"
+            # out of it. 17 Sep: the link came first. A resident who wants
+            # to pay gets get_payment_link; the ticket is what happens when
+            # that returned no link, and for an arrangement, which no link
+            # can settle.
+            "A resident who wants to pay gets get_payment_link first, not a "
+            "ticket. Only when that returned no link do they get one: type "
+            "payment, their words, their building and apartment. That is all "
+            "it needs, the same as any ticket: the full-name-and-phone "
+            "identity check belongs to get_balance, for reading a balance, "
+            "and is not part of opening this. A payment ARRANGEMENT is a "
+            "ticket straight away. The team note (notify_team, reason "
+            "payment) goes with the ticket; both happen, either order.\n"
             "Open a maintenance or service ticket. Call it as soon as you "
             "know WHAT is wrong and WHERE — it verifies the address itself, "
             "inside the same call: a building Homies does not manage opens "
@@ -1223,9 +1239,10 @@ TOOLS = [
             "stay the one talking to the resident, and the team reads the note "
             "in its own time.\n"
             "Call it the moment the resident's ask is past your threshold: "
-            "paying dues or arranging payments (that one is also a ticket, "
-            "open_request with type payment; put its number in this "
-            "description when you have it), a bill they dispute, a document "
+            "paying dues when get_payment_link returned no link, or arranging "
+            "payments (both also a ticket, open_request with type payment; "
+            "put its number in this description when you have it), a bill "
+            "they dispute, a document "
             "they need (invoice, receipt, confirmation), moving in or out or a "
             "change of tenant, a contract, a price quote, the committee's own "
             "business, a request to speak with a person, or anything else that "
@@ -1327,7 +1344,8 @@ TOOLS = [
             "the resident's name, apartment, total owed and the unpaid months, or "
             "`identity_failed` when the name and the number do not belong to "
             "the same resident. Read-only — it cannot take a payment. Anyone "
-            "who wants to actually pay or arrange payments gets a ticket "
+            "who wants to actually pay gets their link from get_payment_link, "
+            "which needs no name or number; a payment arrangement is a ticket "
             "(open_request, type payment) and a team note (notify_team); a "
             "receipt or a disputed amount is a team note."
         ),
@@ -1400,6 +1418,53 @@ TOOLS = [
             "type": "object",
             "properties": {"topic": {"type": "string", "description": 'What they are asking about, in their own words, in Hebrew. Their phrasing is better than your summary of it.'}},
             "required": ["topic"],
+        },
+    },
+    # 17 Sep: the payment link. OXS External API rev 1.3 returns the short
+    # payment link per apartment on the finance read-only key, and the Edge
+    # Function fetches it for the SENDER: identity is the number the chat
+    # comes from, matched to residents.phone, by owner decision -- the link
+    # shows and pays that apartment's balance, so it is the one read the
+    # envelope number is allowed to unlock. Nothing typed is read; the only
+    # argument is their words, kept beside the row. A link that came back
+    # closes the matter (no ticket, no note); every found:false reason and
+    # every arrangement keeps the 15 Sep route.
+    {
+        "name": "get_payment_link",
+        "description": (
+            "Call the moment a resident wants to pay, asks how or where to pay, "
+            "asks for their payment link, or says after a balance that they will "
+            "settle it. It needs NOTHING from them: the number they are writing "
+            "from is matched to their apartment on our side. Do not ask for a "
+            "name, a phone number, a building or an apartment first, do not call "
+            "get_balance first, and do not ask whether they want the link; call "
+            "this, then answer.\n"
+            "`found` true: `link` is the resident's own payment link, and "
+            "`building` and `unit` say which apartment it is for. Put the link "
+            "in your reply exactly as returned, on a line of its own, inside a "
+            "message of your own words: never alone, never retyped, shortened, "
+            "described instead of given, or wrapped in markdown. It opens that "
+            "apartment's balance and pays it. The amount is not in the result "
+            "and you do not state one: how much they owe is get_balance's "
+            "question, with its own identity check. A delivered link completes "
+            "the matter: no ticket and no team note, just your short words and "
+            "the offer of anything else.\n"
+            "`found` false: `reason` is for you, not for them: do not explain it, "
+            "and do not ask for a name or a phone number. The ticket route is "
+            "unchanged: if you do not yet have their building and apartment, ask "
+            "for them the way you would for any ticket; then open the payment "
+            "ticket (open_request, type payment) and let the team know "
+            "(notify_team, reason payment). A ticket exists only once "
+            "open_request has returned its number; never say one is open "
+            "before that.\n"
+            "A payment ARRANGEMENT, instalments, a spread, a partial payment or a "
+            "date is not this tool: that is the ticket and the note. Read-only on "
+            "OXS; asked again, it returns the same stored link."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {"said": {"type": "string", "description": "What the resident wrote about paying, in Hebrew, in their own words. Kept beside the link for the team."}},
+            "required": ["said"],
         },
     },
 ]
@@ -2329,6 +2394,35 @@ def workflow(e):
                                                  "name": "Homies tool secret"}}
                              if status_cred else {}),
             ),
+            # 17 Sep: the payment link, direct to the Edge Function like the
+            # other reads. TOOL_BODY puts the sender's number in the call id
+            # and in variableValues.phone, so the model cannot choose whose
+            # link this is; the only $fromAI is their words.
+            node(
+                id="tool_paylink", name="get_payment_link",
+                type="n8n-nodes-base.httpRequestTool",
+                typeVersion=4.2, position=[2880, 420],
+                parameters={
+                    "method": "POST",
+                    "url": fn_url,
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendBody": True, "specifyBody": "json",
+                    "jsonBody": TOOL_BODY % (
+                        "get_payment_link",
+                        "said: %s" % from_ai(
+                            "said",
+                            tool("get_payment_link")["input_schema"]
+                                ["properties"]["said"]["description"]),
+                    ),
+                    "options": {"timeout": 25000},
+                    "descriptionType": "manual",
+                    "toolDescription": tool("get_payment_link")["description"],
+                },
+                credentials=({"httpHeaderAuth": {"id": status_cred,
+                                                 "name": "Homies tool secret"}}
+                             if status_cred else {}),
+            ),
             # The error branch. Not a nicety: this is the sentence the Code node
             # used to produce from its own catch block, and without it a model
             # failure is a resident who is never answered at all.
@@ -2641,6 +2735,8 @@ def workflow(e):
             "verify_address": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
             "get_service_info": {"ai_tool": [[
+                {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
+            "get_payment_link": {"ai_tool": [[
                 {"node": "Answer the resident", "type": "ai_tool", "index": 0}]]},
         },
     }

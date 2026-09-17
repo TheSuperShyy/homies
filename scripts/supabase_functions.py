@@ -22,6 +22,13 @@ Two things this gets right that are easy to get wrong:
   either missing the function logs "voice note OFF" once per call and writes
   its rows as before. A rotated secret is one --apply away from the function.
 
+  The payment link (17 Sep) needs a fourth: OXS_KEY_DEBTS, the finance
+  READ-ONLY key the importers already use. Pushed whenever .env has it, on a
+  plain --apply, because a read key cannot write anything into OXS -- the
+  opposite of OXS_KEY_REQUESTS below, which is deleted unless --oxs-mirror
+  is passed. Without it get_payment_link answers 'unavailable' and the bot
+  takes the ticket route, which is what it did before the endpoint existed.
+
     python scripts/supabase_functions.py            # show what would happen
     python scripts/supabase_functions.py --apply    # do it
 """
@@ -133,6 +140,9 @@ def main():
         print("voice note     OFF — N8N_VOICE_NOTE_SECRET empty (run scripts/n8n_voice_note.py --apply)")
     else:
         print("voice note     OFF — no URL: set N8N_BASE_URL or N8N_VOICE_NOTE_URL")
+    finance_key = e.get("OXS_KEY_DEBTS", "").strip()
+    print("payment link   %s" % ("ON  (OXS_KEY_DEBTS, finance read-only)" if finance_key
+                                  else "OFF — OXS_KEY_DEBTS empty in .env"))
     if not apply:
         print("\nDry run. Re-run with --apply.")
         return
@@ -156,6 +166,11 @@ def main():
     if voice_secret and voice_url:
         to_push.append({"name": "N8N_VOICE_NOTE_SECRET", "value": voice_secret})
         to_push.append({"name": "N8N_VOICE_NOTE_URL", "value": voice_url})
+    # The finance key is read-only on OXS's side (finance keys can never be
+    # 'full', per the API doc), so it rides on every plain --apply and is
+    # never on the delete list below.
+    if finance_key:
+        to_push.append({"name": "OXS_KEY_DEBTS", "value": finance_key})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
     mirror = "--oxs-mirror" in sys.argv
     if mirror and oxs_key:

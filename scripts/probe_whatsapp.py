@@ -168,7 +168,8 @@ for e in ex:
             {k: v for k, v in s.items() if k in ("text", "menu", "_canned", "_menu")},
             ensure_ascii=False)
     row["tools"] = [t for t in ("open_request", "verify_address", "get_request_status",
-                                "get_balance", "notify_team", "show_menu") if t in run]
+                                "get_balance", "get_service_info", "get_payment_link",
+                                "notify_team", "show_menu") if t in run]
     results.append(row)
 
 for r in results:

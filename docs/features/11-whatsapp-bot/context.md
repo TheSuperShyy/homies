@@ -130,8 +130,10 @@ the latency work on 7 Aug. Not while that is unsettled.
 
 **Outbound and templates.** Anything outside the 24-hour window needs a
 Meta-approved message template, which needs the verified business account we do
-not have. Sending the debt payment link over WhatsApp — which the PRD assumes —
-lands here, and it is gated on the same clock as the production number.
+not have. The payment link (17 Sep) is sent INSIDE that window, as a reply to
+the resident who just asked, so it needs no template; an unprompted link to a
+debtor who has not written — what the outbound flow would want — still lands
+here, gated on the same clock as the production number.
 
 ## Deployed 8 Aug, and what is still switched off
 

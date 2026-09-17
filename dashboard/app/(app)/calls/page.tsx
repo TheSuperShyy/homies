@@ -141,7 +141,10 @@ async function LinksSent({ page, size, t, locale }: {
   const [from, to] = pageRange(page, size);
   const { data, error, count } = await serverClient()
     .from('payment_links')
-    .select('id,amount,period,status,created_at,residents(full_name,phone,building,unit)', { count: 'exact' })
+    // `channel` and never `link`: a chat row (17 Sep) carries the resident's
+    // OXS payment link, which opens and pays their balance for whoever holds
+    // it. It stays in the database; the tab shows that one went out.
+    .select('id,amount,period,status,channel,created_at,residents(full_name,phone,building,unit)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to);
 
@@ -165,7 +168,8 @@ async function LinksSent({ page, size, t, locale }: {
                   <td dir="auto" data-label={t('col.resident')}>{r.residents?.full_name ?? <span className="muted">{t('calls.unknown')}</span>}</td>
                   <td className="mono" data-label={t('col.phone')}>{r.residents?.phone ?? '—'}</td>
                   <td dir="auto" data-label={t('col.building')}>{r.residents?.building ?? '—'}</td>
-                  <td className="mono num" data-label={t('col.amount')}>₪{Number(r.amount).toLocaleString()}</td>
+                  {/* A chat link is per apartment, not per charge: no amount, no period. */}
+                  <td className="mono num" data-label={t('col.amount')}>{r.amount == null ? <span className="muted">{r.channel === 'whatsapp' ? 'WhatsApp' : '—'}</span> : `₪${Number(r.amount).toLocaleString()}`}</td>
                   <td className="mono" data-label={t('col.period')}>{r.period?.slice(0, 7) ?? '—'}</td>
                   <td data-label={t('col.status')}><span className={`pill ${r.status === 'sent' ? 'resolved' : r.status === 'failed' ? 'needs_review' : 'open'}`}>{r.status}</span></td>
                 </tr>

@@ -231,6 +231,7 @@ its stated time.
   proactive update path — nothing sends that message. Either build it or tell
   the bot it cannot say it; do not leave it as it is.
 - **OPEN, and the third guardrail now proven: on an emergency the bot says the team is on the way (17 Sep).** Live probe of `יש שריפה בחדר המדרגות!` returned `עדכנתי את הצוות שלנו, והם בדרך`, and another `שהצוות יגיע למקום הנכון במהירות`. The fence forbids it by name. This was recorded as a wobble on 16 Sep and had never been proven; it is proven now. **Same conclusion as the other two: enforce it in the workflow, not the fence.** `Hand over instead` already rewrites a reply before it is sent, and an emergency turn is the place for a deterministic pass that strips both the promise and any emoji.
+- **The OXS payment link is in the chat (17 Sep, epochs 45–46, LIVE; positive path still owed).** OXS rev 1.3 (`local/media/OXS_External_API_v1-rev1.3.pdf`, contract in `docs/reference/oxs-payment-link.md`). Migration 034, Edge Function v80 (`get_payment_link`: sender's number → `residents.phone` → the one unpaid flat → `apartments.id` → OXS; stores the link, reuses it), `OXS_KEY_DEBTS` now a function secret on every plain deploy, `scripts/n8n_whatsapp_paylink.py` (tool node + two `Reply usable?` guards: present-tense phantom claims, and **every URL must be one the tool returned**). Owner rules: link only to the number on file; a delivered link replaces the ticket + note; WhatsApp only. **Owed: `python scripts/check_paylink.py --mint +972…` once with a debtor the owner names** (mints one real link that goes nowhere, deletes its rows after) — the refusal set is 5/5 and nine live probes take the ticket route cleanly. Soft wart: 2 of 3 refusals say "no link linked to this number" — factual, not the reason, but the owner may want silence. **Ask Yariv/OXS when the three keys expire** — an expired key = silent ticket route. Dashboard Links tab shows chat rows as "WhatsApp" (reaches Vercel with the merge).
 - **A resident's photo lands on the ticket (17 Sep, epoch 44, LIVE, awaiting one real photo).** Migration 033 (`request_media`, private bucket `ticket-media`), Edge Function v76 (`store_media`, adoption in `open_request`), `scripts/n8n_whatsapp_media.py` (Sort reads `attachments[]`; `Photo to keep?` → `Keep the photo` off `Log inbound`; burst join carries `photo`), the user-turn note split into photo / other file. Dashboard shows thumbnails on `/tickets` and in `/conversations/<bare phone>` — **reaches Vercel only when `feature/chatbot` is merged to `main`.** Proven server-side by `scripts/check_media.py` (6/6) and a text-only probe; **the acceptance still owed is one real photo from a phone**: send a picture with no text, then a fault with an address within the hour, and check `request_media.request_id`, `requests.image_count`, the thumbnail, and that the reply acknowledges without asking for a photo. Parked by owner decision: the "ticket done" WhatsApp message (needs a Meta-approved template; Homies has no business verification) and the elevator-company field (needs Yariv's list). The bot NEVER invites a photo.
 - **The client's Make account is wired (17 Sep): `python scripts/make_api.py` lists it, `blueprint <id>` opens a scenario, nothing writes.** The existing WhatsApp bot is ManyChat → Make → Monday board 1270620891 and it is LIVE (ran 17 Sep morning). **The chat scripts are in ManyChat, not Make** — to extract them, get from Nir a ManyChat invite, or share links/exports of the four flows, or a ManyChat API token (list in `docs/discovery/make-scan-2026-09-17.md`). Two open questions for Yariv from the scan: the Monday-status → WhatsApp "done" scenario has not run in a month, and whether a bot ticket should also land on board 1270620891 before cutover. Meta Business Manager admin was granted to klixsteam@gmail.com — browser login only, no token in `.env` yet.
 - **The root was cleaned on 17 Sep, and `local/` is new and gitignored.** Loose client feedback is now in `docs/discovery/`, the Hebrew voice research and the pronunciation PDF in `docs/reference/voice/`. `local/env-backups/` holds the seven `.env` backups and `local/media/` the voice recordings, the OXS PDF and another client's Gantt file — all local, none of it ever committed. **Four paths are load-bearing and did NOT move:** `docs/features/11-whatsapp-bot/prompt.md` and `docs/assistant/demo-inbound.md` (read at deploy time), and `CONTEXT.md` / `HANDOVER.md` (found by the stop hook by name). Prove any future move with a dry run of `n8n_whatsapp_teamnote.py` and `vapi_sync.py inbound`.
@@ -776,8 +777,10 @@ way back.
   in +972 E.164 — and Homies' company registration documents, which are the
   long pole. Ask whether the trunk runs over the public internet before
   paying; a dedicated line cannot reach Vapi.
-- **Payment link delivery.** `send_payment_link` writes a row and stops. OXS
-  exposes no payment-link endpoint, so the link still comes from OXS itself.
+- **Payment link delivery.** On WhatsApp it is LIVE since 17 Sep
+  (`get_payment_link`, OXS rev 1.3). On voice `send_payment_link` still
+  writes a row and stops: the endpoint returns the link to us and a phone
+  call has nowhere to put a URL. See `docs/reference/oxs-payment-link.md`.
 - **Chatwoot hardening, and the seats.** Chatwoot is live in the path (see
   above) but two things are unfinished. **SMTP is live since 6 Sep** -- Brevo's
   free relay (`smtp-relay.brevo.com`, sender `testclix46@gmail.com`, the
@@ -1874,11 +1877,10 @@ handset.**
   bucketing note below — both bit once already.
 - **The overview's charts read three tables, and one of them is empty.**
   `requests` and `interactions` (channel `voice`) have real data;
-  **`payment_links` has never had a single row.** `send_payment_link` writes one
-  and stops — nothing delivers it, and OXS exposes no payment-link endpoint — so
-  the third segment is a true zero, not a bug, and a line under the chart says
-  so. It will start plotting itself the day delivery exists; RLS `staff_read`
-  already covers the table. **Do not "fix" that zero by removing the series.**
+  `payment_links` gets a row per link handed over on WhatsApp since 17 Sep
+  (`channel = 'whatsapp'`, migration 034); voice rows are still `send_payment_link`
+  writing one and stopping. The third segment plots those; the line under the
+  chart explains. **Do not "fix" a low number by removing the series.**
 - **Chart colour is validated, not picked.** `--cat-1..3` in
   `design-system/tokens/app.css` are slots 1-3 of the documented categorical
   order, checked against the real card surface in both themes. In LIGHT mode the

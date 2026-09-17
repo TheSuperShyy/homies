@@ -57,7 +57,7 @@ URL, so whatever owns the inbox owns that URL, and n8n moves behind it.
 | Toggle AI on/off per conversation | **not started** | **The structural one.** Today the bot answers every message that reaches the webhook; there is no per-conversation state and nowhere to put it. |
 | Complete chat logs | **partial and wrong shape** | The last 12 messages live in the n8n memory node, keyed on phone. That is context for the model, not a log: it is capped, it is not queryable, and it does not survive an n8n restore. |
 | Automatic thread summaries, topic tagging | **not started** | Cheap to add once conversations are stored somewhere durable. |
-| Send payment links | **exists elsewhere** | `send_payment_link` is one of the debt agent's eight tools and already writes to `payment_links`. Not attached to this bot. |
+| Send payment links | **done, 17 Sep** | `get_payment_link`: the resident's own OXS link (rev 1.3) to the number on file, in the chat, inside the 24-hour window. A delivered link replaces the payment ticket; no link = the 15 Sep ticket + note. |
 | Answer FAQs | **not started** | The prompt currently answers briefly if it knows and otherwise hands off. No source of answers. |
 | Open service tickets | **built** | Working end to end, real reference numbers. One of six. |
 | Check ticket status | **not started** | Data is in Supabase. Needs a read tool and the identity question answered — see below. |

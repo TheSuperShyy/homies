@@ -10,7 +10,9 @@
 //   supabase secrets set TOOL_SECRET=...           # 32+ random chars
 //   N8N_VOICE_NOTE_URL / N8N_VOICE_NOTE_SECRET     # the voice team note (14 Sep);
 //                                                  # unset = no note, one warn per call
-// scripts/supabase_functions.py --apply pushes all three from .env.
+//   OXS_KEY_DEBTS                                  # finance read-only key; get_payment_link
+//                                                  # (17 Sep); unset = no link, the ticket route
+// scripts/supabase_functions.py --apply pushes all four from .env.
 //
 // --no-verify-jwt is deliberate. Vapi is not a Supabase user and cannot present
 // a Supabase JWT. The shared secret in the X-Homies-Secret header is what
@@ -1224,9 +1226,11 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    *
    * This replaced open_payment_ticket on 4 Aug. Nothing here sends the link:
    * the row is the request and OXS is the sender, which is why the agent says a
-   * link is on its way rather than that one has arrived. When the OXS API is
-   * finally documented, the call to it goes here — the tool's contract with the
-   * agent does not change.
+   * link is on its way rather than that one has arrived. The OXS API is
+   * documented now (rev 1.3, 17 Sep): it returns the link to US and notifies
+   * nobody, and a phone call has nowhere to put a URL, so on voice there is
+   * still nothing to deliver and this row is still the request. The chat bot's
+   * get_payment_link, further down, is where the call actually lives.
    *
    * Deliberately does NOT touch charges.status. The old flow moved the charge to
    * `pending_charge` because a staff member was about to charge a card; a link
@@ -2805,6 +2809,129 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       found: true,
       topics: topics.map((t) => ({ title: t.title, facts: t.facts })),
     };
+  },
+
+  /**
+   * The sender's own OXS payment link, for chat (17 Sep).
+   *
+   * OXS External API rev 1.3: GET /apartments/:id/payment-link on the finance
+   * read-only key returns one link per active payer of the apartment and
+   * notifies nobody. Whoever holds a link can see and pay that apartment's
+   * balance and it never expires, so the identity here is the strongest thing
+   * a chat has: the number the message came from, matched to residents.phone.
+   * Nothing the resident TYPED is read -- unlike get_balance's name+phone gate,
+   * which was built for reading a number aloud, not for handing over a key.
+   * Owner decision. WhatsApp only: a phone call has nowhere to put a URL.
+   *
+   * The result is facts in the get_service_info style: `found` true with the
+   * link, or `found` false with a reason and what to do, so the model always
+   * has a route (the 15 Sep one: payment ticket + team note). Never an amount:
+   * how much they owe is get_balance's question, behind its own gate.
+   *
+   * Store once, reuse: OXS mints a fresh link on every call and says to keep
+   * the one you got, so a second ask returns the stored link with no call.
+   * The response body is never logged -- a 200 body is a list of links.
+   */
+  async get_payment_link(args, ctx) {
+    if (channel(ctx) !== "whatsapp") return { ok: false, error: "whatsapp only" };
+    const phone = ctx.callerPhone; // E.164 from the envelope, never an argument
+    if (!phone) return { ok: false, error: "no sender number" };
+    // The note is for the model, not for the resident: no sentence about WHY,
+    // because a reason written out gets recited ("your number is not linked to
+    // a flat"). `reason` is a code for the logs and the probe. The route is the
+    // 15 Sep one, and a ticket needs an address, so the note says to ask for
+    // it the way any ticket does -- a note that forbids asking leaves the model
+    // nothing to do but claim.
+    const ROUTE = "No link this time. Say nothing about why, and do not ask for a name or a " +
+      "phone number. If you do not yet have their building and apartment, ask for them the way " +
+      "you would for any ticket; then open the payment ticket (open_request, type payment) and " +
+      "let the team know (notify_team, reason payment). A ticket is open only once open_request " +
+      "has returned its number.";
+    const miss = (reason: string) => ({ ok: true, found: false, reason, note: ROUTE });
+
+    // Refusals return before interactionId(): they write nothing.
+    const { data: r } = await db.from("residents")
+      .select("id,building,unit,oxs_ref").eq("phone", phone).maybeSingle();
+    if (!r) return miss("number_not_on_file");
+
+    // The flat that owes, when exactly one does. residents.unit is one flat of
+    // possibly several (012), so it is not authoritative for an owner of two.
+    const { data: ch } = await db.from("charges").select("unit")
+      .eq("resident_id", r.id).eq("status", "unpaid");
+    const units = [...new Set((ch ?? []).map((c: any) => String(c.unit ?? "").trim()).filter(Boolean))];
+    if (units.length > 1) {
+      return miss("several_apartments");
+    }
+    const unit = units[0] ?? String(r.unit ?? "").trim();
+
+    // residents.building == buildings.address by construction (016): exact, not fuzzy.
+    const { data: b } = await db.from("buildings").select("id").eq("address", r.building ?? "").maybeSingle();
+    if (!b || !unit) return miss("apartment_unknown");
+    const { data: flats } = await db.from("apartments").select("id,number").eq("building_id", b.id);
+    const hits = (flats ?? []).filter((f: any) => String(f.number ?? "").trim() === unit); // 017: number is not unique
+    if (hits.length !== 1) return miss("apartment_unknown");
+    const apartmentId = String(hits[0].id);
+
+    const { data: prior } = await db.from("payment_links").select("link")
+      .eq("resident_id", r.id).eq("apartment_id", apartmentId)
+      .eq("channel", "whatsapp").eq("status", "sent").not("link", "is", null)
+      .order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (prior?.link) return { ok: true, found: true, link: prior.link, building: r.building, unit, reused: true };
+
+    const key = Deno.env.get("OXS_KEY_DEBTS") ?? "";
+    if (!key) {
+      console.warn("payment link OFF: OXS_KEY_DEBTS unset");
+      return miss("unavailable");
+    }
+    let res: Response;
+    let d: any = null;
+    try {
+      res = await fetch(`https://api.oxs.co.il/api/external/v1/apartments/${apartmentId}/payment-link`, {
+        headers: { "x-api-key": key, "user-agent": "homies-debt-tools/1.0" },
+        signal: AbortSignal.timeout(8000),
+      });
+      d = await res.json().catch(() => null);
+    } catch (e) {
+      console.error("payment link fetch failed", apartmentId, String(e).slice(0, 120));
+      return miss("unavailable");
+    }
+    // 409: this payer pays for several flats in the building (PDF §6.2).
+    if (res.status === 409) {
+      return miss("several_apartments");
+    }
+    if (res.status !== 200 || d?.status !== 1) {
+      // Status, apartment id and OXS's error STRING only -- never the body. 429 lands
+      // here too, with no retry inside the turn.
+      console.error("payment link refused", res.status, apartmentId, String(d?.error ?? "").slice(0, 120));
+      return miss("unavailable");
+    }
+    const links: any[] = Array.isArray(d?.data?.links) ? d.data.links : [];
+    if (!links.length) return miss("no_active_payer");
+    if (d.data?.buildingId && String(d.data.buildingId) !== String(b.id)) {
+      console.error("payment link building mismatch", apartmentId);
+      return miss("apartment_unknown");
+    }
+    // Every link of an apartment opens the same debt; they differ only in which
+    // payer is identified. Prefer our record for this phone, else the main payer.
+    const pick = links.find((l) => r.oxs_ref && String(l?.payerId) === String(r.oxs_ref))
+      ?? links.find((l) => l?.isMain)
+      ?? (links.length === 1 ? links[0] : null);
+    if (!pick?.link) return miss("unavailable");
+
+    const iid = await interactionId(ctx);
+    const { error } = await db.from("payment_links").insert({
+      resident_id: r.id,
+      interaction_id: iid,
+      channel: "whatsapp",
+      apartment_id: apartmentId,
+      payer_id: pick.payerId ? String(pick.payerId) : null,
+      link: String(pick.link),
+      status: "sent",
+      note: args?.said ? String(args.said).slice(0, 500) : null,
+    });
+    // The link is minted and in hand; recording it is the lesser duty.
+    if (error) console.error("payment link row failed", error.message);
+    return { ok: true, found: true, link: String(pick.link), building: r.building, unit };
   },
 
   /**
