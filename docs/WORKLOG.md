@@ -55,6 +55,26 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### One emoji, and only one. Epoch 40, and the end of what the fence can do.
+
+Owner: *"yes like face emoji and some likes."* The faces arrived with epoch 39
+and read well. The likes never did. Counted off the executions rather than
+eyeballed: **😊 in 10 replies of 12, and it is the only emoji the model has
+ever produced.** Not one 👍, 🙏, 🙂 or 💪, though all five are named in the
+clause, and always in the same position, after the closing question.
+
+Epoch 40 said it in as many words — *`ולא תמיד אותו אחד`*, sometimes a face,
+sometimes a thumb or a thanks — and changed nothing. A list is not variety: a
+model handed one picks its favourite, and that becomes a template it wrote for
+itself.
+
+**Stopping, and saying why.** The only reliable way to vary an emoji is to
+insert it in the workflow, and inserting a fixed cheerful character on a
+schedule is precisely the templated message the owner ruled out this morning.
+So the honest position is: the emoji is simple, human and Israeli, which is
+what was asked for, and it is the same one every time, which was also asked
+for and has not been delivered. The owner gets to weigh those.
+
 ### The emoji were right in number and wrong in kind. Epoch 39.
 
 Owner: *"no just use simple emoji like human and how israeli talk with each

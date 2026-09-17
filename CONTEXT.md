@@ -2274,6 +2274,15 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A list is not variety (17 Sep).** Given 🙂 😊 🙏 👍 💪 the model used 😊 and
+nothing else, 10 replies in 12, and asking for variety by name changed
+nothing. A model handed a list picks its favourite and repeats it, which is a
+template it wrote for itself. Variety in wording is achievable because each
+reply is composed fresh; variety in a SYMBOL is not, because there is nothing
+to compose. If it genuinely matters, it has to be done outside the model — and
+that is the templating this owner has ruled out, so the honest answer is to
+say it cannot be had rather than to keep writing clauses.
+
 **Saying how many is not saying which (17 Sep).** Told to use one or two
 emoji, the model illustrated the subject — a cockroach for pest control, a
 bulb for a light — which is a machine captioning its own last noun. People
