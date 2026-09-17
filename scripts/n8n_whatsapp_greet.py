@@ -88,7 +88,11 @@ SEND_TAIL = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greet
 SORT_PLAIN = 'content: "היי, כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
 SORT_WAVE = 'content: "היי 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
 ECHO_PLAIN = "'היי, כאן מיכאל מהומי'ז. במה אפשר לעזור?'"
-ECHO_WAVE = "'היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?'"
+# The apostrophe is escaped here as it is in the live single-quoted JS --
+# the outage of 17 Sep was this exact character unescaped (see
+# n8n_whatsapp_rename.py). The anchor went stale when SEND_ECHO was fixed
+# and this one was not; a dry run refused on it until 17 Sep evening.
+ECHO_WAVE = "'היי 👋 כאן מיכאל מהומי" + chr(92) + "'ז. במה אפשר לעזור?'"
 
 # --------------------------------------------------------------------------
 # 3. get_balance's unit doc: the normal case first, and never a question.

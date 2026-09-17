@@ -708,6 +708,11 @@ td .mono, td.mono, .row .mono { white-space: nowrap; }
 .muted { color: var(--text-2); }
 .faint { color: var(--text-3); }
 .sub { display: block; font-size: var(--text-sm); color: var(--text-3); margin-block-start: 3px; }
+/* The resident's photos on a ticket row: small, square, and a link to the
+   full size. 48px is enough to tell a leak from a light. */
+.thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-block-start: 6px; }
+.thumbs img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px;
+              border: 1px solid var(--border-2); display: block; }
 
 /* ----------------------------------------------------------------- pill -- */
 /* Badge: 3px 10px, pill, 11px/500. A dot and a word, never a colour on its

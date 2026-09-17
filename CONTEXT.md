@@ -2274,6 +2274,26 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A photo is copied, not linked, and the model is told where it went (17 Sep).**
+Chatwoot keeps every WhatsApp file and hands n8n a signed URL that works
+without auth, so the temptation is to store the URL. The ticket must not
+depend on another system's URL staying valid: `store_media` copies the bytes
+into our private bucket at webhook time. The bot's note about a photo is a
+FACT (saved, on the ticket, contents unseen), never an invitation — the
+owner's rule is accept and acknowledge, and a note that says where the
+picture went gives the model no reason to ask for one. Two phone shapes
+still: `request_media.phone` is bare like `messages.phone`; join to
+`requests.reported_by_phone` as `'+' || phone`.
+
+**An idempotency guard must test for the NEW text, not the absence of the
+old (17 Sep).** Four of the media patcher's anchors keep the old text as a
+prefix of the new; "old absent" could never be the done signal and the
+first version would have re-applied every run. The second dry run after
+`--apply` exists to catch exactly this. Same lesson from the other side:
+`n8n_whatsapp_greet.py` refused for a day because one anchor kept a raw
+apostrophe the outage fix had escaped — a stale anchor is a broken drift
+check, so every patcher's dry run after any live change.
+
 **The client's Make account is readable from here, and the old bot's scripts
 are not in it (17 Sep).** `scripts/make_api.py`, token `MAKE_API_TOKEN` (or
 `MAKE_API`) in `.env`, read-only by design — Make is the client's system and

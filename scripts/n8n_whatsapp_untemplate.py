@@ -263,8 +263,19 @@ AGENT_NEW = (
     # could never fire -- and a template that can never be true is still
     # a template the model reads. Sort still emits `tapped_human`, always
     # false now; that 16KB script is edited by anchor only.
-    "+ ($json.attachment ? ' [הדייר שלח קובץ, תמונה או מיקום בלי טקסט. אתה "
-    "לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]' : '') "
+    # SPLIT 17 Sep, with the photo on the ticket (n8n_whatsapp_media.py). A
+    # photo used to get the same note as a sticker: "you cannot see files".
+    # Now the workflow copies every image into our bucket and the Edge
+    # Function hangs it on the resident's ticket, so the note for a photo is
+    # what happened to it -- a fact the model can answer from, not a line to
+    # say. Nothing here invites a photo, and nothing should: the note tells
+    # the model where the picture went so it has no reason to ask for one.
+    # Anything that is not an image keeps the old sentence.
+    "+ ($json.photo ? ' [הדייר צירף תמונה להודעה הזאת. התמונה נשמרה במערכת "
+    "ומצורפת לקריאה שלו: לקריאה הפתוחה אם יש כזאת, אחרת לקריאה שתיפתח עכשיו. "
+    "אתה לא רואה את התוכן שלה, ולכן מה שקרה ואיפה מגיע רק מהמילים.]' : '') "
+    "+ ($json.attachment && !$json.photo ? ' [הדייר שלח קובץ, הקלטה או מיקום "
+    "בלי טקסט. אתה לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]' : '') "
     "+ ($json.last_bot ? ' [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא "
     "אתה, ולכן אין לו זכר בזיכרון שלך: ' + $json.last_bot + ']' : '') "
     # ADDED 3 Sep, with the Chatwoot handover. A fact, not an instruction: the

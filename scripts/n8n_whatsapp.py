@@ -203,7 +203,12 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 43
+MEMORY_EPOCH = 44
+# 43 -> 44, 17 Sep: the photo on the ticket. The user-turn note for an
+# image used to say the bot cannot see files; it now says the photo is
+# saved and on the resident's ticket. A buffer minted under 43 holds
+# the bot telling somebody it only reads text, which is exactly the
+# demonstration the new note contradicts.
 # 42 -> 43, 17 Sep: frequency. Owner wants an emoji on about 2 messages
 # in 5, not on nearly every one -- epoch 37 specified one or two PER
 # MESSAGE and never said how often, so warmth became wallpaper. Written
@@ -415,7 +420,7 @@ MEMORY_TURNS = 12
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
     "prompt": "26c9e315b6bb",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "inject": "72f37df8063b",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --

@@ -76,7 +76,10 @@ export default async function Tickets({
   const [from, to] = pageRange(page, size);
   let q = serverClient()
     .from('requests')
-    .select('reference,description,building,unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at',
+    // `request_media(...)` is the FK embed: the resident's photos, copied out
+    // of Chatwoot by the Edge Function since 17 Sep. staff_read on that table
+    // applies to the embed as it does to the row.
+    .select('reference,description,building,unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at,request_media(storage_path,mime)',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
   // One extra query, and it is what makes the badge above mean anything: the
@@ -91,6 +94,21 @@ export default async function Tickets({
       .limit(1).maybeSingle(),
   ]);
   const lastRun = newest.data?.oxs_last_seen_at ?? null;
+
+  // The bucket is private (a photo of somebody's flooded kitchen is theirs),
+  // so each thumbnail is a one-hour signed URL. One call for the whole page,
+  // not one per photo: the page shows fifty rows and a signing round-trip per
+  // image would be felt.
+  const photoPaths: string[] = (data ?? []).flatMap((r: any) =>
+    (r.request_media ?? []).map((m: any) => m.storage_path as string));
+  const photoUrl = new Map<string, string>();
+  if (photoPaths.length) {
+    const { data: signed } = await serverClient().storage
+      .from('ticket-media').createSignedUrls(photoPaths, 3600);
+    for (const s of signed ?? []) {
+      if (s.path && s.signedUrl) photoUrl.set(s.path, s.signedUrl);
+    }
+  }
 
   const tabs = ['', ...STATUSES];
 
@@ -171,6 +189,24 @@ export default async function Tickets({
                           </ol>
                         </details>
                       )
+                    )}
+                    {/* THE RESIDENT'S OWN PHOTOS. For a leak or a dark
+                        stairwell the picture is most of the report, and the
+                        old bot filed it where ours dropped it until 17 Sep.
+                        A plain <img> as everywhere else in this app; the
+                        link opens the full size in a new tab. */}
+                    {r.request_media?.length > 0 && (
+                      <span className="thumbs">
+                        {r.request_media.map((m: any) => {
+                          const url = photoUrl.get(m.storage_path);
+                          return url ? (
+                            <a key={m.storage_path} href={url} target="_blank" rel="noreferrer"
+                               title={t('tickets.photo')}>
+                              <img src={url} alt="" loading="lazy" />
+                            </a>
+                          ) : null;
+                        })}
+                      </span>
                     )}
                   </td>
                   <td dir="auto" data-label={t('col.where')}>{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>

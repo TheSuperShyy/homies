@@ -292,6 +292,87 @@ function channel(ctx: { callId?: string | null }): string {
   return String(ctx?.callId ?? "").startsWith("wa:") ? "whatsapp" : "voice";
 }
 
+// ---------------------------------------------------------------------------
+// A resident's photo (17 Sep)
+// ---------------------------------------------------------------------------
+// The old bot filed the resident's photo on the task; ours dropped it. The
+// photo reaches Chatwoot, which keeps the file and hands n8n a `data_url`;
+// n8n forwards that URL here as `store_media`, and this copies the bytes into
+// our own bucket so the ticket never depends on a Chatwoot URL staying valid.
+//
+// Only Chatwoot's own host may be fetched. The URL arrives from our workflow,
+// but a function that will fetch any address it is given is a proxy, and the
+// fence costs one line. `data:` is allowed so the probe can run without a
+// handset.
+const MEDIA_BUCKET = "ticket-media";
+const MEDIA_MAX_BYTES = 10 * 1024 * 1024; // the bucket's limit; WhatsApp caps an image at 5 MB
+const MEDIA_MAX_PER_MESSAGE = 5;
+const MEDIA_HOSTS = ["https://chat.srv1879140.hstgr.cloud/"];
+const MEDIA_MIMES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+/** The bare 972… form, the shape `messages.phone` and `request_media.phone` carry. */
+function barePhone(ctx: CallContext): string | null {
+  const id = String(ctx.callId ?? "");
+  if (id.startsWith("wa:")) return id.slice(3).replace(/\D+/g, "") || null;
+  return ctx.callerPhone ? ctx.callerPhone.replace(/^\+/, "") : null;
+}
+
+/**
+ * The ticket a photo from this phone belongs to right now: the newest one
+ * still being worked, opened in the last two hours. E.164 in, because that is
+ * what `requests.reported_by_phone` holds.
+ */
+async function linkableRequest(
+  phoneE164: string | null,
+): Promise<{ id: string; reference: string } | null> {
+  if (!phoneE164) return null;
+  const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  const { data } = await db
+    .from("requests")
+    .select("id,reference")
+    .eq("reported_by_phone", phoneE164)
+    .in("status", ["open", "in_progress", "needs_review"])
+    .gte("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data ?? null;
+}
+
+async function recountImages(requestId: string): Promise<number> {
+  const { count } = await db
+    .from("request_media")
+    .select("id", { count: "exact", head: true })
+    .eq("request_id", requestId);
+  const n = count ?? 0;
+  await db.from("requests").update({ image_count: n }).eq("id", requestId);
+  return n;
+}
+
+/**
+ * A ticket that has just opened takes the photos this phone sent in the hour
+ * before it, which is the ordinary order of events: the picture first, the
+ * words after. Returns how many it took.
+ */
+async function adoptMedia(requestId: string, bare: string | null): Promise<number> {
+  if (!bare) return 0;
+  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { data } = await db
+    .from("request_media")
+    .update({ request_id: requestId })
+    .is("request_id", null)
+    .eq("phone", bare)
+    .gte("created_at", since)
+    .select("id");
+  const n = data?.length ?? 0;
+  if (n) await recountImages(requestId);
+  return n;
+}
+
 /**
  * An apartment number, or nothing.
  *
@@ -2178,6 +2259,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id);
       }
+      await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
     }
 
@@ -2209,7 +2291,14 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
                       data.reference, data.id);
     }
 
-    return withSpoken({ ok: true, reference: data.reference });
+    // The photos this phone sent in the last hour belong to this ticket. The
+    // count goes back as a fact the model may use, not a line it must say.
+    const adopted = await adoptMedia(data.id, barePhone(ctx));
+    return withSpoken({
+      ok: true,
+      reference: data.reference,
+      ...(adopted ? { photos_attached: adopted } : {}),
+    });
   },
 
   /**
@@ -2716,6 +2805,75 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       found: true,
       topics: topics.map((t) => ({ title: t.title, facts: t.facts })),
     };
+  },
+
+  /**
+   * A photo the resident sent, copied out of Chatwoot and hung on their
+   * ticket. Called by the WhatsApp workflow, never by the model: the model
+   * cannot see images and has nothing to decide here.
+   *
+   * Links to the ticket this phone is currently working on, if there is one
+   * (see linkableRequest); otherwise the row waits for the next open_request
+   * from the same phone to adopt it. Deliberately does NOT mint an
+   * interactions row: a photo is not a call.
+   *
+   * Never throws. A failed copy is one entry in `skipped` and the reply to the
+   * resident is unaffected — the node that calls this continues on error.
+   */
+  async store_media(args, ctx) {
+    const bare = barePhone(ctx);
+    if (!bare) return { ok: false, error: "no phone" };
+    const messageId = String(args?.message_id ?? "").replace(/\D+/g, "");
+    if (!messageId) return { ok: false, error: "no message id" };
+
+    const images = (Array.isArray(args?.attachments) ? args.attachments : [])
+      .filter((a: any) => a && a.file_type === "image" && typeof a.data_url === "string")
+      .slice(0, MEDIA_MAX_PER_MESSAGE);
+    if (!images.length) return { ok: true, stored: 0, note: "no image attachments" };
+
+    const target = await linkableRequest(ctx.callerPhone);
+    const skipped: { i: number; reason: string }[] = [];
+    let stored = 0;
+
+    for (let i = 0; i < images.length; i++) {
+      const url = String(images[i].data_url);
+      const allowed = MEDIA_HOSTS.some((h) => url.startsWith(h)) || url.startsWith("data:image/");
+      if (!allowed) { skipped.push({ i, reason: "host not allowed" }); continue; }
+      try {
+        const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15000) });
+        if (!res.ok) { skipped.push({ i, reason: `fetch ${res.status}` }); continue; }
+        const mime = String(res.headers.get("content-type") ?? "").split(";")[0].trim();
+        const ext = MEDIA_MIMES[mime];
+        if (!ext) { skipped.push({ i, reason: `type ${mime || "unknown"}` }); continue; }
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        if (!bytes.length || bytes.length > MEDIA_MAX_BYTES) {
+          skipped.push({ i, reason: `size ${bytes.length}` });
+          continue;
+        }
+        const path = `${bare}/${messageId}-${i}.${ext}`;
+        const { error: upErr } = await db.storage
+          .from(MEDIA_BUCKET)
+          .upload(path, bytes, { contentType: mime, upsert: true });
+        if (upErr) { skipped.push({ i, reason: upErr.message }); continue; }
+        const { error: rowErr } = await db
+          .from("request_media")
+          .upsert({
+            request_id: target?.id ?? null,
+            phone: bare,
+            message_external_id: messageId,
+            storage_path: path,
+            mime,
+            file_size: bytes.length,
+          }, { onConflict: "storage_path", ignoreDuplicates: true });
+        if (rowErr) { skipped.push({ i, reason: rowErr.message }); continue; }
+        stored++;
+      } catch (e) {
+        skipped.push({ i, reason: String(e) });
+      }
+    }
+
+    if (target && stored) await recountImages(target.id);
+    return { ok: true, stored, linked: target?.reference ?? null, skipped };
   },
 };
 

@@ -55,6 +55,53 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### A resident's photo lands on the ticket. Epoch 44.
+
+Owner, after the Make scan: *"ok so what can we adapt in our current
+chatbot"*, then *"ok lets adopt it"* — the photo first, the "done"
+message parked until Meta approves a template, no elevator field yet, and
+the bot **accepts and acknowledges a photo, never invites one**.
+
+**Smaller than it looked, once surveyed.** The live path is Meta → Chatwoot
+→ n8n, and Chatwoot already keeps every file and hands n8n a `data_url`;
+the ticket simply never heard of it, and the bot's note told the model it
+cannot see files. Pre-flight with a 1×1 PNG posted as a private note on our
+own Chatwoot: the URL is a signed ActiveStorage redirect, 302 then 200
+image/png, no auth on either hop, first hop never expires. So: copy, do not
+link.
+
+**Shipped, in the order the plan set.** Migration 033: `request_media`
+(bare phone, Chatwoot message id, storage path) and a PRIVATE bucket
+`ticket-media` with one-hour signed URLs for staff. Edge Function v76:
+`store_media` fetches the URL (host fence: Chatwoot only), uploads, links
+to the newest live ticket from that phone under two hours old; `open_request`
+adopts unlinked photos from the previous hour and hands back
+`photos_attached` as a fact. `scripts/n8n_whatsapp_media.py`: Sort reads
+`attachments[]`, two nodes off `Log inbound` post the URLs as the same tool
+envelope the other tools use, the burst join carries the photo through, and
+`Reply usable?` no longer treats one word after a photo as a rescue. The
+user-turn note became two facts — a photo is saved and on the ticket; a
+file that is not an image still cannot be read — which moved the inject
+hash and so the epoch, 43 → 44. Dashboard: thumbnails on the ticket row and
+inside the conversation bubble, and while there the thread page's "recent
+tickets" was listing the five newest tickets in the WHOLE table and its
+resident lookup compared a bare phone to a plus one and never matched; both
+fixed, since a photo beside somebody else's tickets would mislead.
+
+**Proven without a handset:** `scripts/check_media.py`, 6/6 — stored
+unlinked, adopted by the ticket, linked at store time, count agrees, foreign
+host refused, non-image not stored; cleans up after itself. Text-only probe
+opened 255-1275-26 through the changed Sort with `Photo to keep?` taking the
+false branch. check_tools 18/18, check_whatsapp all passed, four patchers
+idle. **Not yet proven: a real photo from a phone** — the owner's to send.
+
+**Two things fixed on the way.** The media patcher's first idempotency
+guard was wrong for anchors whose old text is a prefix of the new (it would
+have re-applied on the next run); caught by the second dry run, which is
+what the second dry run is for. And `n8n_whatsapp_greet.py` had been
+refusing since the apostrophe outage: its `ECHO_WAVE` anchor kept the raw
+apostrophe the fix escaped. One character.
+
 ### The client's Make account, read from here. The chat scripts are not in it.
 
 Owner: *"how can i navigate make to the api so you can see and control it"*,

@@ -253,6 +253,7 @@ const S = {
   'tickets.notInOxs':   { he: 'לא נמצאה ב-OXS בייבוא האחרון', en: 'not found in OXS at the last import' },
   'tickets.lastSeen':   { he: 'נראתה לאחרונה ב-OXS ב-{when}', en: 'Last seen in OXS {when}' },
   'tickets.earlier':    { he: '+{n} קודמות', en: '+{n} earlier' },
+  'tickets.photo':      { he: 'תמונה מהדייר', en: 'Photo from the resident' },
 
   // --- debts --------------------------------------------------------------
   'debts.title':        { he: 'יתרות פתוחות',   en: 'Open balances' },

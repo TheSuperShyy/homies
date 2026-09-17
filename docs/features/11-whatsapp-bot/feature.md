@@ -144,7 +144,12 @@ never taken from the message body.
 3. The same message delivered twice by Meta produces **one** reply and **one**
    row.
 4. Asking for a person produces a `transferred` row and a handover line.
-5. A photo with no text produces the did-not-understand line and no row.
+5. A photo is kept and hung on the ticket (17 Sep): the bytes land in the
+   private `ticket-media` bucket, a `request_media` row links it to the
+   resident's live ticket or is adopted by the next one they open, the
+   dashboard shows the thumbnail, and the bot's reply acknowledges the photo
+   in its own words without ever asking for one. A file that is not an
+   image still gets the cannot-read note and no row.
 6. Two residents messaging at once do not see each other's context.
 7. The webhook returns 200 in under a second, measured — before the model has
    been called.
