@@ -2274,6 +2274,22 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**What the deploy reads by path, and therefore must not move (17 Sep).**
+`docs/features/11-whatsapp-bot/prompt.md` and `docs/assistant/demo-inbound.md`
+are read at deploy time by `n8n_whatsapp.py` and `vapi_sync.py` — the prompt
+IS the document, deliberately, so there is no second copy to drift. `CONTEXT.md`
+and `HANDOVER.md` are found at the root by name by the stop hook, and
+`docs/handover/*.json` by the patchers that restore them. Anything else can be
+reorganised; these four are load-bearing paths. After any move, prove it: a
+dry run of `n8n_whatsapp_teamnote.py` and of `vapi_sync.py inbound` reads both
+files and costs nothing.
+
+**An ignore rule does nothing about what is already tracked (17 Sep).**
+`.gitignore` had carried `Lotosclean-*` for months while the file itself sat
+committed, because it predated the rule. Adding a pattern is not the same as
+removing the file; `git rm --cached` is. Worth checking whenever an ignore
+rule is added in response to something already in the tree.
+
 **A rate is only followable if the model can see the denominator (17 Sep).**
 "An emoji in two messages out of five" is not actionable on its own: each turn
 is composed independently and the model has no counter. What it does have is

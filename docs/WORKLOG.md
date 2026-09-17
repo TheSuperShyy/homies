@@ -55,6 +55,44 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### The repo root, cleaned without touching production
+
+Owner: *"can we clean the rootfolder but make sure it wont affect
+production."* Twenty-one loose files at the top level, and the constraint is
+the interesting half: several paths in this repo are read at DEPLOY time, so a
+move is a refactor rather than a filesystem operation.
+
+**Surveyed before moving anything.** What the deploy actually reads is
+`docs/features/11-whatsapp-bot/prompt.md` and `docs/assistant/demo-inbound.md`,
+neither of which moved; `CONTEXT.md` and `HANDOVER.md` stay at the root
+because the stop hook looks for them there by name. One scare checked and
+dismissed: `Homies-Logo.png` is referenced from `dashboard/app/login/page.tsx`,
+but inside a COMMENT — the dashboard serves its own copies from `public/`.
+
+**Eleven tracked docs moved**, with `git mv` so they read as renames: client
+feedback to `docs/discovery/` beside the other client input, the Hebrew voice
+research and the pronunciation PDF to a new `docs/reference/voice/`. The
+`(1)` and `(3)` in three filenames were download artefacts, not versions —
+each file distinct, none with an unsuffixed twin — so the suffixes went. Every
+prose mention in CONTEXT, HANDOVER and this file now points at the new path.
+
+**One real hygiene find.** `Lotosclean-CRM-Gantt.excalidraw` was COMMITTED
+here — another client's work in a public repo — even though `.gitignore` has
+said `Lotosclean-*` for months. The file predates the rule, and an ignore rule
+does nothing about what is already tracked. `git rm --cached`; it stays on
+disk and leaves the repo from here. Still in past history, which only a
+rewrite removes.
+
+**Also off the root, into a new gitignored `local/`:** seven `.env` backups
+(never public — `.env.*` has always been ignored — but live keys do not belong
+in the first thing anyone sees), the voice recordings, and the OXS PDF. Moved,
+not deleted: the recordings are a real person's voice.
+
+**Verified after, not assumed:** `teamnote` still resolves the chat prompt and
+reports nothing to do, `vapi_sync inbound` still reads its 3,971-char fence,
+`check_knowledge` 29/29, `.env` untouched, working tree clean. Three commits,
+one category each.
+
 ### Emoji as seasoning, not wallpaper. Epoch 43.
 
 Owner, on a reply that opened with a droplet: *"remove the shitty emoji"*, and
