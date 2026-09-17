@@ -2274,6 +2274,21 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A probe that reads the model's node does not prove anyone received anything
+(17 Sep).** For four hours `probe_whatsapp.py` printed correct replies and
+`sent 5, captured 5` while every one died at Send with a syntax error. It
+reads the AGENT node, and it was built to ignore Send because invented
+conversation ids legitimately 404 — so the failure that matters looked exactly
+like the one that never does. **Wherever a check tolerates an expected
+failure, make it prove the failure is that one.**
+
+**A name with an apostrophe is executable text (17 Sep).** הומי'ז sits
+inside single-quoted JS literals in the live workflow and single-quoted Python
+literals in the patchers, and a bare `'` closes both. It broke the repo
+scripts first, was fixed there, and then took the bot off the air because
+nobody asked where else the name lived inside quoted code. Before renaming
+anything INTO a quote character, list the copies that are CODE, not prose.
+
 **A list is not variety (17 Sep).** Given 🙂 😊 🙏 👍 💪 the model used 😊 and
 nothing else, 10 replies in 12, and asking for variety by name changed
 nothing. A model handed a list picks its favourite and repeats it, which is a

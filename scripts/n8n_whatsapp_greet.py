@@ -74,7 +74,7 @@ GREET_NEW = (
 # anchors stopped matching an up-to-date Send and this file refused as
 # drifted. The echo clause itself is the anchor now: present = done; absent =
 # insert it before the מיכאל fallback test, wherever that sits.
-SEND_ECHO = "t.indexOf('היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?') !== -1 || "
+SEND_ECHO = "t.indexOf('היי 👋 כאן מיכאל מהומי\\'ז. במה אפשר לעזור?') !== -1 || "
 SEND_TAIL = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greeted !== true))"
 
 # --------------------------------------------------------------------------

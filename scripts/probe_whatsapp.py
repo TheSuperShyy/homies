@@ -186,6 +186,35 @@ for r in results:
 print("=" * 76)
 print("sent %d, captured %d" % (len(texts), len(results)))
 
+# --- Did the reply actually get SENT? -------------------------------------
+# 17 Sep, after a four-hour outage this file hid. Renaming the company put an
+# apostrophe inside a single-quoted JS string in the Send node, the literal
+# closed early, and the node threw `invalid syntax` on every turn. The model
+# kept composing perfect replies and none of them reached a living soul --
+# and this probe reads the AGENT node, so it printed those replies and
+# reported success while the bot was dead.
+#
+# A Send error is normal here and only for one reason: the conversation id is
+# invented, so Chatwoot answers 404. Any OTHER failure at Send means real
+# residents are getting nothing, and it is shouted rather than mentioned.
+bad = []
+for e in ex:
+    d = W.api("GET", "/api/v1/executions/%s?includeData=true" % e["id"])
+    rd = (d.get("data") or {}).get("resultData", {})
+    msg = str((rd.get("error") or {}).get("message") or "")
+    if msg and "could not be found" not in msg:
+        bad.append((e["id"], rd.get("lastNodeExecuted"), msg[:90]))
+if bad:
+    print("")
+    print("!" * 76)
+    print("THE REPLIES ABOVE WERE NOT DELIVERED.")
+    print("%d execution(s) failed at a node for a reason that is NOT the"
+          " expected 404 from an invented conversation id:" % len(bad))
+    for eid, node, msg in bad:
+        print("  exec %-7s at %-22s %s" % (eid, node, msg))
+    print("Fix that before reading anything above as working.")
+    print("!" * 76)
+
 # --- Clean up after ourselves ---------------------------------------------
 key = E["SUPABASE_SERVICE_ROLE_KEY"].strip()
 base = E["SUPABASE_URL"].strip().rstrip("/") + "/rest/v1/"

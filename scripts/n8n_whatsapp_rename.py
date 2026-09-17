@@ -45,6 +45,13 @@ if hasattr(sys.stdout, "reconfigure"):
 import n8n_whatsapp as W  # noqa: E402
 
 WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
+# THE NEW SPELLING CONTAINS AN APOSTROPHE, AND THAT IS A SYNTAX HAZARD.
+# The live workflow holds this name inside single-quoted JavaScript string
+# literals -- Send's echo guard, t.indexOf('<the greeting>'), is one.
+# Dropping a bare ' in there closes the literal early and the node throws
+# `invalid syntax` on every turn. That happened on 17 Sep and the bot
+# delivered nothing for four hours. Before renaming anything INTO a quote
+# character, list the copies that sit inside quoted CODE and escape those.
 OLD, NEW = "הומיז", "הומי'ז"
 SNAPSHOT = os.path.join(W.ROOT, "docs", "handover",
                         "n8n-whatsapp-live-17sep-before-rename.json")

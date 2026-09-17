@@ -55,6 +55,42 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### I took the bot off the air for four hours, and my own probe said it was fine.
+
+Owner: *"the bot aint replying."* It had not been, since the rename.
+
+**Cause, and it is mine.** הומי'ז contains an apostrophe. The live Send
+node carries the greeting inside a **single-quoted JavaScript literal** — the
+`t.indexOf('...')` guard that stops the bot repeating its own greeting. The
+blanket rename dropped a bare `'` into it, the literal closed early, and the
+node threw `invalid syntax` on every single turn. The model went on composing
+replies and not one of them reached a resident. I hit exactly this trap in a
+Python file an hour earlier, fixed it there, and never asked where else the
+name lived inside quoted code.
+
+**Why it hid, which is the worse half.** `probe_whatsapp.py` reads the reply
+off the AGENT node, and it ignores Send failures because the conversation ids
+it invents legitimately 404. So the one failure that matters was
+indistinguishable from the one that never does: it printed good replies and
+`sent 5, captured 5` throughout. **Eight probe runs on a dead bot.** It now
+re-reads every execution and shouts when anything fails at Send for a reason
+other than that 404.
+
+**Fixed live** by escaping the apostrophe inside the literal. The edit has to
+be made on the PARSED node value: putting a backslash into the serialised JSON
+is rejected as an invalid escape. `n8n_whatsapp_greet.py` held the same
+unescaped constant and would have re-broken it on its next run.
+
+**Proved on the path that matters**, not on a node: lobby leak -> address ->
+ticket `255-1272-26` opened and the reference read back. A 🙏 turned up in that
+run too, so yesterday's *"it only ever uses 😊"* was too strong — that sample
+was all closing turns, which is where 😊 belongs.
+
+**`check_whatsapp.py` now fails for its own reason.** It appends
+`בדיקת-מערכת-999` to the first message, the bot reads that as an address, says
+it is not in the system, and the conversation never reaches a ticket. The
+harness is wrong, not the agent. Recorded in HANDOVER.
+
 ### One emoji, and only one. Epoch 40, and the end of what the fence can do.
 
 Owner: *"yes like face emoji and some likes."* The faces arrived with epoch 39
