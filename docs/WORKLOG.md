@@ -55,6 +55,34 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### The owner found the bug in my rule. Epoch 42.
+
+Owner: *"instead of something like i understand then parrot why can we do a
+more natural flow like got it, then the question or som."*
+
+**That is the diagnosis four of my passes missed.** The fence banned the
+opening WORD — הבנתי, אני מבין, אני רואה — while the SAME paragraph
+required a warm word before the question. So it forbade the cheapest thing
+that satisfied its own requirement, the two fought, and the ban lost every
+time. I had described that fight in the last message and still reached for a
+fifth ban rather than seeing that the requirement was the half to change.
+
+The word was never the fault. `הבנתי.` on its own is the natural Israeli
+acknowledgement. What kills the turn is the resident's own sentence handed
+back after it. So the rule now WANTS the short word, names good ones, and bans
+the restatement instead.
+
+**Measured on the same five faults as epoch 41: parroting fell from 4 of 5 to
+2 of 5**, and the clean ones are the owner's flow exactly —
+*`אוקיי, הבנתי. איזו כתובת מדובר?`* and *`איזה מעצבן! 😥`* then
+straight to the address. The two failures take the short word AND the parrot
+(*`אוקיי, אני מבין ש...`*), so the acknowledgement landed and the habit
+rides along behind it.
+
+**One emoji regression in the same run:** a leak drew 💧 again, so epoch 41's
+closed category holds about 4 of 5 rather than absolutely. Its own probe was
+5 of 5; this is a different sample, not a change.
+
 ### A closed category beats a growing blacklist. Epoch 41.
 
 Owner, on a mould reply that opened with a water droplet: *"i dont want this i

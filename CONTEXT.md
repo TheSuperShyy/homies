@@ -2274,6 +2274,15 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**When a ban keeps losing, check what the same fence REQUIRES (17 Sep).** Four
+passes banned אני מבין ש and it opened most replies anyway, because the same
+paragraph demanded a warm word before the question and that was the cheapest
+phrase satisfying it. A prohibition that fights a requirement in its own
+prompt loses, every time, however precisely it is worded. The fix is to change
+the requirement so the cheap option no longer qualifies: ask for a SHORT
+acknowledgement and ban the restatement after it, not the word itself.
+Parroting 4 of 5 to 2 of 5 on the same probes.
+
 **Ban the category, not the instances (17 Sep).** Three wrong emoji were named
 and the model found a fourth; the blacklist would have grown forever. Stating
 the closed set it MAY use — a face or a hand, never an object — held first
