@@ -53,6 +53,30 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+## 2026-09-17
+
+### The bot read the rulebook out loud. Epoch 35.
+
+Owner: *"this is too long and its super robotic ... might as well ask does the
+electricity outage happen to your apartment or everyone else in the flat has no
+electricity."* He is right, and he described the fix better than the fence did.
+
+**Epoch 34 made the ownership rule explicit, and the model started reciting it.**
+A resident wrote that the light was out and got a paragraph of policy: both
+branches spelled out, a burnt bulb versus the building's supply, and a request
+for street, number and flat *before* anyone knew whether there was a call to
+open. Every sentence of it true, and none of it any use. Same player-piano
+failure the debt prompt was halved over on 7 Aug: **hand a model a rule and it
+reads it to the customer.**
+
+The rule is now marked as being for the bot and not for the resident, with the
+one separating question in its place, and the address asked for only once it is
+clear there is a call to open. **4 of 5 ask it now, and not one recites the
+policy:** *"היי, איזה מעצבן. האם מדובר על הפסקת חשמל כללית בבניין או רק בדירה
+שלכם?"* and *"אין לכם מים בדירה, או שאין מים בכל הבניין?"* The fifth jumped
+straight to opening a call for a water outage without asking, which is
+defensible and still wrong; `אני מבין ש` is down from 4 of 4 to 1 of 5.
+
 ### The electrician screenshot: an offer taken back, and a ticket that should not exist. Epoch 34.
 
 Owner sent the thread with no comment. Pulled the Hebrew out of the executions

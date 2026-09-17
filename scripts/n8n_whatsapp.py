@@ -203,7 +203,15 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 34
+MEMORY_EPOCH = 35
+# 34 -> 35, 17 Sep: epoch 34 made the ownership rule explicit and the
+# model started READING IT OUT -- a paragraph of policy at the resident,
+# both branches spelled out, and the address asked for before anyone
+# knew there was a call to open. Owner: 'this is too long and its super
+# robotic, might as well ask does the electricity outage happen to your
+# apartment or everyone else'. A rule handed to a model gets recited;
+# this one is now marked as being for the bot and not for the resident,
+# with the one separating question in its place.
 # 33 -> 34, 16 Sep: the owner's electrician screenshot. The bot offered
 # to recommend an electrician, then said Homies does not recommend
 # tradespeople, then offered a SERVICE CALL for a fault inside the flat
@@ -354,7 +362,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "c062df1582bc",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "499e4f3dc34d",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

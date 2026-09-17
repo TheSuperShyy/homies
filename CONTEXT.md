@@ -2274,6 +2274,24 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A rule you write for the model gets read out to the resident (17 Sep).**
+Epoch 34 spelled out when a fault is the resident's and when it is the
+building's, and the bot answered a dead light with a paragraph of policy
+explaining both branches. The instruction was followed perfectly and the
+conversation was ruined. Any rule that exists so the bot can DECIDE something
+must say it is for the bot and not for the resident, and should be paired with
+what to say or ask instead. Best form found: name the single question that
+separates the two cases (only you, or the neighbours too) and let the answer
+decide. Same failure as the debt prompt on 7 Aug, and the reason tool results
+return facts rather than sentences.
+
+**Ask, do not classify aloud (17 Sep).** Where a bot needs one fact to route
+something, the shortest human turn is the question that gets that fact, not an
+explanation of why it is being asked. The owner put it better than the fence
+did: *"might as well ask does the electricity outage happen to your apartment
+or everyone else"*. Details like the address come after the routing is known,
+never before.
+
 **A guardrail the client agreed to does not live in prompt text (16 Sep).**
 Five prompt passes in one day, each verified, each landing at "mostly works":
 the tap at 4-in-5, the police refusal at 0-in-3 for a crime, and the private-
