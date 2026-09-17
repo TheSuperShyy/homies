@@ -99,6 +99,11 @@ New Recording*
 *.m4v
 *.mov
 
+# Kept locally, never committed: env backups and the media that arrives by
+# email. Both were sitting in the project root, which is the first thing
+# anyone sees and the last place a live key should be.
+local/
+
 # Scratch
 tmp/
 *.log
