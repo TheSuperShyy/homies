@@ -608,7 +608,7 @@ transcript and summary, works in Hebrew, and puts the term in the URL so a
 search can be sent to somebody.
 
 **Both Hebrew voice agents carry the gender rules**, from
-`hebrew-voice-gender-pronunciation-skill.md`. Intake has had them since it was
+`docs/reference/voice/hebrew-voice-gender-pronunciation-skill.md`. Intake has had them since it was
 written; the debt agent got the homograph traps (לך, שלך, איתך and four more --
 spelled the same for both genders, said differently) and the neutral-phrasing
 repertoire on 20 Aug. Both sit inside the span `DEBT_BLOCKS`/`INTAKE_BLOCKS`
@@ -1522,7 +1522,7 @@ handset.**
   audio; confirmation WAVs are with the owner. **Both frozen English twins are
   now officially behind their Hebrew sources** (`vapi_en.py <twin> --dry` shows
   it); updating them is by hand and still owed. Source of the requirement:
-  `Spell female male prompt.pdf` at the repo root — its agent_gender, sales
+  `docs/reference/voice/spell-female-male-prompt.pdf` at the repo root — its agent_gender, sales
   and slang sections were deliberately not taken.
 - **Voice: every sentence now ends in a 300ms unspoken pause, on both Hebrew
   agents and their fallbacks (26 Aug evening, NOT yet heard).** Fix for the
@@ -1640,7 +1640,7 @@ handset.**
     complaint, no slang, and ending on the question mark — written WITHOUT
     naming any phrase to avoid, because the first draft named "אני מבין" and
     thereby planted it.
-  - **`Spell female male prompt.pdf` at the repo root is a VOICE spec** (nikkud
+  - **`docs/reference/voice/spell-female-male-prompt.pdf` at the repo root is a VOICE spec** (nikkud
     for TTS, `agent_gender`/`customer_gender`, ends at Text To Speech). Only a
     subset applies to a keyboard. **The voice agents were not touched** — the
     pointed half is theirs and is an unstarted pass.
@@ -2287,7 +2287,7 @@ really needs nothing, write the line saying so** rather than bypassing it.
 ### Five more, from the client's own calls on 12 Aug — four now fixed
 
 Traced to Yariv's ten calls on the debt agent, not reasoned about. Feedback
-verbatim in `feedback-yariv-voice-2026-08-12.txt`; the full reading, and what
+verbatim in `docs/discovery/feedback-yariv-voice-2026-08-12.txt`; the full reading, and what
 was done about each, is in the WORKLOG entry for 12 Aug.
 
 7. ~~The debt agent's opening is heard as "לאומיז".~~ **Fixed.** `מהומיז` was

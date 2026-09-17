@@ -315,7 +315,7 @@ this way). And `$('tool').all()` never sees ai_tool output — a did-the-tool-
 run check must use `isExecuted`. Prefer reading `$json` from the actual
 input item wherever possible.
 
-**`hebrew-voice-gender-pronunciation-skill.md` is the source for Hebrew gender
+**`docs/reference/voice/hebrew-voice-gender-pronunciation-skill.md` is the source for Hebrew gender
 and pronunciation rules.** Part A (gender) is integrated into both voice
 prompts. Part B (general homographs) is deliberately NOT: it is real Hebrew and
 almost none of it can occur in building management, and prompt length is

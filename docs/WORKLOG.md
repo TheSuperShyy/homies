@@ -6978,7 +6978,7 @@ look up, so an invitation with no promise means telling a stranger about a leak
 and not knowing whether anything happened. And the lookup branch has to **ask**,
 not observe that asking is possible.
 
-#### `Spell female male prompt.pdf`
+#### `docs/reference/voice/spell-female-male-prompt.pdf`
 
 Supplied by the owner as "the proper correct spelling for words". 31 pages,
 Hebrew, and it is a **voice** specification: it ends "ורק אז לשלוח את הטקסט ל
@@ -9311,7 +9311,7 @@ next session. Left where it is.
 ### The gender skill goes into the debt agent, where half of it was missing
 
 Asked whether both Hebrew agents carry the gender identifier, then pointed at
-`hebrew-voice-gender-pronunciation-skill.md` -- a 30,000-character Hebrew
+`docs/reference/voice/hebrew-voice-gender-pronunciation-skill.md` -- a 30,000-character Hebrew
 document in three parts: gender distinction, homographs and pronunciation, and
 safer word choices.
 
@@ -12324,7 +12324,7 @@ tag `2026-08-12b`.
 Both Hebrew assistants re-synced and live. What changed:
 
 **The Hebrew language skill was never applied to inbound.** The client's guess,
-and it was right. `hebrew-voice-gender-pronunciation-skill.md` had been worked
+and it was right. `docs/reference/voice/hebrew-voice-gender-pronunciation-skill.md` had been worked
 into the debt prompt — the formal-to-spoken table, the numbers rules, the email
 rule are all there — and the intake prompt had none of it beyond a short gender
 paragraph. It now carries the parts that earn their place on a call with **no
@@ -12390,7 +12390,7 @@ kept in step with today's greeting change.
 
 ### Yariv called the debt agent ten times, and every complaint is in the logs
 
-Saved verbatim to `feedback-yariv-voice-2026-08-12.txt` — WhatsApp, Facebook and
+Saved verbatim to `docs/discovery/feedback-yariv-voice-2026-08-12.txt` — WhatsApp, Facebook and
 seven points on the voice agent. Nothing edited yet. Each point was traced to the
 recordings rather than reasoned about, and six of the seven reproduce.
 
@@ -13898,8 +13898,8 @@ prompt-cache pricing on the model line still unverified.
 
 ### Two voice-skill docs distilled into both Hebrew assistants
 
-Two documents arrived in the repo root — `hebrew-voice-gender-pronunciation-skill.md`
-and `hebrew-voice-failure-recovery.md` — and went in the same way the
+Two documents arrived in the repo root — `docs/reference/voice/hebrew-voice-gender-pronunciation-skill.md`
+and `docs/reference/voice/hebrew-voice-failure-recovery.md` — and went in the same way the
 super-skills doc did on 7 Aug: distilled hard, most of it rejected as already
 present in stronger form or in direct conflict with rules the prompts earned.
 The latency-masking fillers lost to NEVER SPEAK THE MACHINERY (a tool call is
@@ -14368,7 +14368,7 @@ nothing. Prompt 36,443 → 37,129 chars, pushed by PATCH.
 
 ### The super-skills doc, distilled into a HUMAN LAYER — most of it rejected
 
-The root-folder `hebrew-voice-super-skills (1).md` (20 techniques for
+The root-folder `docs/reference/voice/hebrew-voice-super-skills.md` (20 techniques for
 humanlike voice agents) was asked into the debt agent. It went in as one
 compact section — THE HUMAN LAYER, after the budgets — not as twenty, because
 most of the doc either already exists in stronger form or directly conflicts
@@ -18565,7 +18565,7 @@ the rotation list with the other four.
   Spec moved to `docs/specs/` (not the brainstorming skill's default path).
 - **Moved 13 loose files out of the project root** into `prd/`, `discovery/`,
   `diagrams/`, `reference/`. Two left at root deliberately —
-  `Lotosclean-CRM-Gantt.excalidraw` and `followup-shahar.txt` are other clients'
+  `Lotosclean-CRM-Gantt.excalidraw` and `docs/discovery/followup-shahar.txt` are other clients'
   work and filing them here would misattribute them. Three markdown links
   repaired after the move.
 - **Checked Vapi pricing and the billing dashboard.** Written up in
