@@ -2274,6 +2274,13 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**Saying how many is not saying which (17 Sep).** Told to use one or two
+emoji, the model illustrated the subject — a cockroach for pest control, a
+bulb for a light — which is a machine captioning its own last noun. People
+send emoji about the moment and the person, not about the topic. Any rule
+about quantity or placement needs the KIND named beside it, with the wrong
+kind spelled out; the abstraction alone gets read as a licence.
+
 **The emergency turn is where the model fights hardest, and prompt text keeps
 losing (17 Sep).** Reassure, promise help, look concerned: three instincts the
 fence forbids and the model reaches for anyway, on the one turn where being

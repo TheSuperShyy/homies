@@ -203,7 +203,15 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 38
+MEMORY_EPOCH = 39
+# 38 -> 39, 17 Sep: epoch 37 said how MANY emoji and where, and never
+# said WHICH, so the model picked the kind a bot picks -- a cockroach on
+# pest control, a bulb on a light, a tree on gardening. Owner: 'just use
+# simple emoji like human and how israeli talk with each other'. An
+# emoji that illustrates the noun is a machine captioning itself; the
+# everyday social ones are what people actually send. The three it
+# produced are named, because naming the near-miss is the only thing
+# that has held in this file.
 # 37 -> 38, 17 Sep: epoch 37's one absolute exclusion broke on the first
 # fire probe -- a burning stairwell answered with a worried face. The
 # clause said 'serious, and nothing', and a sad emoji reads to the model
@@ -382,7 +390,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "60775046d654",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "d710906e53c8",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "75aaa639b04a",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

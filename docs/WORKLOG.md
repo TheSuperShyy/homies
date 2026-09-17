@@ -55,6 +55,27 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### The emoji were right in number and wrong in kind. Epoch 39.
+
+Owner: *"no just use simple emoji like human and how israeli talk with each
+other."* He is right and it is a distinction epoch 37 never made. That clause
+said how MANY and WHERE and never said WHICH, so the model picked the kind a
+machine picks: 🪳 on pest control, 💡 on a light, 🌳 on gardening. Each one is
+a picture of the last noun in the sentence. Nobody texts like that; a bot
+captioning itself does.
+
+Named the near-miss, which is the only technique that has held in this file,
+and named the three it actually produced. Everyday social emoji now, the ones
+people really send: `במה עוד אוכל לעזור לכם? 😊`, `...גינה מטופחת... 🙂`,
+`בכיף! שמחתי לעזור 😊`. Five probes, no illustrated nouns.
+
+**One piece of the clause is now inert and is deliberately left alone:** it
+still says an emoji should be part of the sentence *`ולא כקישוט בסוף`*, and
+the model puts it at the end of the closing question every time. That is what
+Israelis actually do, it is what the owner asked for, and rewriting the model
+to obey the stale half would make it worse. Recorded in HANDOVER so nobody
+"fixes" the behaviour to match the text.
+
 ### Emoji, and the emergency turn that will not behave. Epochs 37 and 38.
 
 Owner: *"also add some emoji on the responses like one to two."* The 14 Sep
