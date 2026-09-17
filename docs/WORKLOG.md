@@ -55,6 +55,32 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### A closed category beats a growing blacklist. Epoch 41.
+
+Owner, on a mould reply that opened with a water droplet: *"i dont want this i
+need it to be human like a like emoji or sum not like that."*
+
+Epoch 39 had named three wrong emoji — a cockroach on pest control, a bulb on a
+light, a tree on gardening — and the model went and found a fourth. **Naming
+instances teaches the instances.** What all four share is that they picture the
+SUBJECT, and what the owner keeps asking for is a face or a thumb, so the rule
+is a closed category now: always a face or a hand, never an object, an animal
+or a natural phenomenon. A blacklist grows forever; a category does not.
+
+**Held on five probes chosen to tempt it** — mould, a stuck lift, cleaning,
+cockroaches, a dead light. Faces only, 😞 and 😊, and not one object. 😞 is
+also the first emoji other than 😊 the bot has produced, which softens
+yesterday's *"it only ever uses one"*.
+
+**Unfixed in the same replies, and the owner asked for it in the same breath:**
+`אני מבין ש...` opened four of the five. Four passes have now gone at that
+phrase — banned by category on 14 Sep, by name at epoch 32, as a first-word
+constraint at epoch 34 — and it keeps coming back, because the fence also
+REQUIRES a warm word before the question and that is the cheapest one that
+qualifies. Not attempting a fifth. The one mechanism left is stripping the
+clause in the workflow when it merely restates the resident, which is a code
+change and the owner's call.
+
 ### I took the bot off the air for four hours, and my own probe said it was fine.
 
 Owner: *"the bot aint replying."* It had not been, since the rename.

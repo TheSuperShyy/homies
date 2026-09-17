@@ -2274,6 +2274,13 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**Ban the category, not the instances (17 Sep).** Three wrong emoji were named
+and the model found a fourth; the blacklist would have grown forever. Stating
+the closed set it MAY use — a face or a hand, never an object — held first
+time on five probes picked to tempt it. When a prohibition has to be repeated
+with new examples, the rule is at the wrong altitude: say what the allowed set
+is instead.
+
 **A probe that reads the model's node does not prove anyone received anything
 (17 Sep).** For four hours `probe_whatsapp.py` printed correct replies and
 `sent 5, captured 5` while every one died at Send with a syntax error. It
