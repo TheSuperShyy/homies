@@ -2274,6 +2274,16 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**The client's Make account is readable from here, and the old bot's scripts
+are not in it (17 Sep).** `scripts/make_api.py`, token `MAKE_API_TOKEN` (or
+`MAKE_API`) in `.env`, read-only by design — Make is the client's system and
+the never-write-unasked rule applies. Make only receives ManyChat's finished
+intake and files it into Monday board 1270620891; the conversation scripts
+themselves live in ManyChat under connection `nir`, so extracting them needs
+ManyChat access from Nir, not Make or Meta. Full scan in
+`docs/discovery/make-scan-2026-09-17.md`. Automation-platform lesson: the
+platform that *files* a conversation is rarely the one that *holds* it.
+
 **What the deploy reads by path, and therefore must not move (17 Sep).**
 `docs/features/11-whatsapp-bot/prompt.md` and `docs/assistant/demo-inbound.md`
 are read at deploy time by `n8n_whatsapp.py` and `vapi_sync.py` — the prompt

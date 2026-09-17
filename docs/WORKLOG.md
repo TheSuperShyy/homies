@@ -55,6 +55,32 @@ gone** — that marker now counts zero.
 
 ## 2026-09-17
 
+### The client's Make account, read from here. The chat scripts are not in it.
+
+Owner: *"how can i navigate make to the api so you can see and control it"*,
+then, token in `.env`: *"scan for the flow on make."* Meeting note behind it:
+Nir the freelancer built the existing WhatsApp bot, Clix needs the chat
+scripts as code, Yariv invited Clix to the Make org and granted Meta admin.
+
+**`scripts/make_api.py`, read-only**, token from `.env`, zone and org fixed in
+the file. First call listed the org, one team, nine scenarios, sixteen hooks,
+eight connections; `blueprint <id>` prints every module and mapping.
+
+**The finding that changes the plan: Make holds no scripts.** Every WhatsApp
+scenario begins with a webhook ManyChat fires *after* the conversation is
+over; Make files the answers into Monday. Questions, order, buttons and
+wording are in ManyChat (connection `nir`), and Meta Business Manager will not
+have them either. What Make does give us: the exact field list per flow (the
+question list in disguise), the two Monday boards nobody had written down
+(1270620891 field tasks, 1270706127 leads), and proof the old bot is live —
+a service call at 06:09 and an elevator email at 07:02 this morning.
+
+**One silent scenario:** the Monday-status → WhatsApp "done" message has no
+executions in the log window. Flagged for Yariv, not touched.
+
+Written up in `docs/discovery/make-scan-2026-09-17.md`, ending with the
+three things to ask Nir for.
+
 ### The repo root, cleaned without touching production
 
 Owner: *"can we clean the rootfolder but make sure it wont affect
