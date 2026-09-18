@@ -2274,6 +2274,22 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A tool result's field names are the words the model reaches for (18 Sep).**
+The payment-link result carried `unit`, and the bot told a resident their
+link was for "יחידה 1" — a word no Israeli uses for a flat. Renamed to
+`apartment`, the bot says דירה, unprompted. When a result will be read back
+to a person, name its fields the way that person would say them; a
+prompt rule about wording is the expensive way to fix a field name.
+
+**A positive path that needs a real record is simulated with a throwaway
+one on the test prefix (18 Sep).** No test resident has an OXS apartment,
+so the payment link was proven by inserting a `+972599…` resident whose
+building and flat point at a REAL zero-balance apartment, probing from
+that number (`PROBE_PHONE`), and deleting the row after (its link rows
+cascade). The vendor call is real and read-only; the exposure is our own
+logs; the balance shown is zero. Same shape works for anything keyed on
+the number on file.
+
 **A URL in a reply must be traceable to a tool observation (17 Sep).** One in
 six "pay" turns produced a payment link the model made up, with no tool call,
 under a prompt that already said "from the tool, not from your head". A
