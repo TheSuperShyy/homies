@@ -203,7 +203,18 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 47
+MEMORY_EPOCH = 48
+# 47 -> 48, 18 Sep, midday: the owner, over the tickets table beside
+# OXS's: "we need to get the full building address and their apartment
+# number". Every ticket is filed under the reporter's flat now, asked
+# for with the building, including a lobby or car-park fault (this
+# reverses the 2 Sep 'only if volunteered' gloss, owner's call). The
+# building goes to the tool in Hebrew whatever language the resident
+# wrote in (a replay sent 'Herzl 112' and got street_unknown), and a
+# street_unknown with no list in it is no list (the same replay recited
+# fifty invented house numbers). The user-turn note gained the retry
+# clause for the second pass (n8n_whatsapp_retry.py). Buffers under 47
+# hold the bot opening common-area tickets with no flat asked.
 # 46 -> 47, 18 Sep, early: one word in the payment-link tool text. The
 # result field `unit` became `apartment` after the first simulation read
 # it back as יחידה; the field name is the word the model reaches for.
@@ -434,15 +445,15 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "58b95cb5f333",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "72f37df8063b",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "prompt": "a037d7e1c8ac",   # docs/features/11-whatsapp-bot/prompt.md
+    "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "e53f5740cfc6",
+    "tools": "8c0817f7d0df",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1046,7 +1057,10 @@ TOOLS = [
             "nothing, and the response says why (building_found false, with "
             "reason street_unknown / number_not_on_street plus "
             "numbers_we_manage / need_number / need_building / ambiguous plus "
-            "candidates) so you can tell the resident and ask again. You do "
+            "candidates) so you can tell the resident and ask again. What you "
+            "may tell them about which buildings we manage is only what that "
+            "response carries: when it has no numbers_we_manage and no "
+            "candidates, there is no list, and you do not make one. You do "
             "NOT need verify_address before this — there is no step before "
             "this. When it opens, the response carries the real reference "
             "number, the only source of one: never invent a number, and never "
@@ -1099,7 +1113,14 @@ TOOLS = [
                                    "owed is not a payment ticket, that is "
                                    "get_balance.",
                 },
-                "building": {"type": "string", "description": "Street and number."},
+                # 18 Sep: a replay from an English-writing resident sent
+                # "Herzl 112" and the verifier, which knows Hebrew streets,
+                # answered street_unknown. The gloss names the language.
+                "building": {"type": "string",
+                             "description": "Street and number, written in Hebrew as the "
+                                            "street is written in Israel, whatever language "
+                                            "the resident wrote in: Herzl 112 is הרצל 112. "
+                                            "The whole sentence is fine; this tool checks it."},
                 # Two apartment fields, because there are two facts and they are
                 # not the same one. `unit` is where the fault is; a lift and a
                 # lobby belong to nobody, so it is empty for them. `reporter_unit`
@@ -1112,11 +1133,22 @@ TOOLS = [
                 # the model express "this is a common-area fault" by OMITTING a
                 # field, and an implicit branch is the kind this file has been
                 # burned by before.
+                # 18 Sep, owner, over the tickets table beside OXS's (every OXS
+                # ticket reads "address · flat"): every ticket is filed under
+                # the reporter's flat, so it is asked for with the building.
+                # This reverses the 2 Sep gloss ("only if they volunteered
+                # it"), which n8n_whatsapp_menu.py wrote and
+                # n8n_whatsapp_payment.py now replaces by anchor.
                 "reporter_unit": {
                     "type": "string",
                     "description": "The apartment the person reporting LIVES in. "
-                                   "Send this every time, including for a fault "
-                                   "in the lobby or the lift.",
+                                   "Every ticket is filed under the reporter's "
+                                   "apartment, so ask for it together with the "
+                                   "building, in the same question, every time: "
+                                   "for a fault in the lobby, the lift or the car "
+                                   "park as much as for one inside a flat. Send "
+                                   "it whenever they gave it. A resident who will "
+                                   "not give it still gets the ticket.",
                 },
                 "fault_location": {
                     "type": "string",
@@ -2183,7 +2215,7 @@ def workflow(e):
                             from_ai("description", tool("open_request")["input_schema"]["properties"]["description"]["description"]),
                             from_ai("type", (tool("open_request")["input_schema"]["properties"]["type"].get("description", "") + " ").lstrip()
                                     + "One of " + "/".join(tool("open_request")["input_schema"]["properties"]["type"]["enum"])),
-                            from_ai("building", "Street and number, as the resident wrote it. The whole sentence is fine; this tool checks it."),
+                            from_ai("building", tool("open_request")["input_schema"]["properties"]["building"]["description"]),
                             # `unit` is deliberately NOT offered to the model.
                             # The server derives it from these two, so there is
                             # no way for the model to pin a lobby leak to a flat

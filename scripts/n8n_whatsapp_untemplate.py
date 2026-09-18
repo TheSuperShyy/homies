@@ -283,6 +283,12 @@ AGENT_NEW = (
     # facts list can be applied by the model at 22:00 in its own words. A
     # handover made out of hours is paged to the department at 09:00; what
     # the bot says about that is its own, as everything else is.
+    # ADDED 18 Sep, with n8n_whatsapp_retry.py. When `Reply usable?` throws
+    # a reply away, the same message comes back through the agent once
+    # more with this note on it, instead of going straight to a stub
+    # ticket. The note says what was wrong in general terms -- all three
+    # guard reasons -- and what fixes it, which is the tools.
+    "+ ($json.retry_note ? ' ' + $json.retry_note : '') "
     "+ ' [השעה בישראל עכשיו ' + $now.setZone('Asia/Jerusalem').toFormat('HH:mm') "
     "+ ', יום ' + ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת']"
     "[$now.setZone('Asia/Jerusalem').weekday % 7] + '.]' "

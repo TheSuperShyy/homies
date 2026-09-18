@@ -316,6 +316,19 @@ const MEDIA_MIMES: Record<string, string> = {
   "image/webp": "webp",
 };
 
+/**
+ * The sender as `requests.reported_by_phone` holds it (+E.164). `phoneOf()`
+ * parses Israeli numbers only, so on a foreign sender `ctx.callerPhone` is
+ * null; the chat envelope still carries the number, and a ticket with no
+ * reporter is a ticket nobody can call back (18 Sep, the owner's +63 handset
+ * opened 255-1294-26 with no phone on it).
+ */
+function reporterPhone(ctx: CallContext): string | null {
+  if (ctx.callerPhone) return ctx.callerPhone;
+  const bare = barePhone(ctx);
+  return bare ? "+" + bare : null;
+}
+
 /** The bare 972… form, the shape `messages.phone` and `request_media.phone` carry. */
 function barePhone(ctx: CallContext): string | null {
   const id = String(ctx.callId ?? "");
@@ -2277,7 +2290,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         building,
         unit,
         reported_unit: reportedUnit,
-        reported_by_phone: ctx.callerPhone,
+        reported_by_phone: reporterPhone(ctx),
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
       })
@@ -2838,8 +2851,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // numbers only, so for an owner abroad (a +63 tester, a +1 landlord)
     // callerPhone is null; the call id carries the sender's number exactly as
     // WhatsApp gave it, and residents.phone holds foreign numbers the same way.
-    const bareSender = barePhone(ctx);
-    const phone = ctx.callerPhone ?? (bareSender ? "+" + bareSender : null);
+    const phone = reporterPhone(ctx);
     if (!phone) return { ok: false, error: "no sender number" };
     // The note is for the model, not for the resident: no sentence about WHY,
     // because a reason written out gets recited ("your number is not linked to

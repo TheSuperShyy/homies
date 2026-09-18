@@ -61,10 +61,34 @@ FAULT_OLD = ('$fromAI(\'fault_location\', "Where the FAULT is, not where they li
              "'string')")
 
 
+# 18 Sep, the owner over the tickets table: every ticket carries the
+# reporter's flat, asked for with the building, and the building reaches
+# the tool in Hebrew. Two more anchors, same mechanism: the live docs as
+# the 2 Sep menu patcher and the 26 Aug build wrote them, replaced whole
+# by what TOOLS says now.
+REPORTER_OLD = ('$fromAI(\'reporter_unit\', "The apartment the person reporting LIVES in. '
+                "Send it whenever you know it - for a fault inside their flat the flow "
+                "gives it to you. For a fault in a lobby, lift or any common area, "
+                "include it only if they volunteered it, and never ask an extra "
+                'question just to fill this field.", \'string\')')
+BUILDING_OLD = ('$fromAI(\'building\', "Street and number, as the resident wrote it. '
+                'The whole sentence is fine; this tool checks it.", \'string\')')
+
+
 def type_new():
     t = W.tool("open_request")["input_schema"]["properties"]["type"]
     return W.from_ai("type", (t.get("description", "") + " ").lstrip()
                      + "One of " + "/".join(t["enum"]))
+
+
+def reporter_new():
+    return W.from_ai("reporter_unit",
+                     W.tool("open_request")["input_schema"]["properties"]["reporter_unit"]["description"])
+
+
+def building_new():
+    return W.from_ai("building",
+                     W.tool("open_request")["input_schema"]["properties"]["building"]["description"])
 
 
 def fault_new():
@@ -128,7 +152,9 @@ def main():
 
     body = by["open_request"]["parameters"].get("jsonBody") or ""
     for arg, old, new in (("type", TYPE_OLD, type_new()),
-                          ("fault_location", FAULT_OLD, fault_new())):
+                          ("fault_location", FAULT_OLD, fault_new()),
+                          ("reporter_unit", REPORTER_OLD, reporter_new()),
+                          ("building", BUILDING_OLD, building_new())):
         if new in body:
             continue
         if body.count(old) != 1:

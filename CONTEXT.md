@@ -2281,6 +2281,25 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**A guard that rescues with a stub is a guard that files bad tickets (18
+Sep).** The phantom guard was right to reject "אני פותח קריאת שירות" with
+no call behind it; what it did next was mint a ticket with no building, no
+type and the message log as its description, and hand the resident a real
+reference for it. Two replays of the same conversation opened a proper
+ticket on the first try, so the model can do it -- it skipped the call
+once. The cheap correct move is a second pass with the same tools and a
+note saying the first reply was thrown away and why; the stub stays as the
+last resort. General form: when a backstop's output is worse than a retry
+would be, retry first, backstop second.
+
+**The verifier knows Hebrew streets; the model sends what it was told to
+send (18 Sep).** The live `building` gloss said "as the resident wrote it",
+so an English-writing resident's "Herzl 112" reached `matchBuilding`
+untranslated and came back `street_unknown` -- and the model then invented
+fifty house numbers we manage, because the response named a
+`numbers_we_manage` field it did not carry. Two lines fixed both: the gloss
+names the language, and the description says an absent list is no list.
+
 **A second pass that only sees the last line will greet again (18 Sep).**
 `Say it again` had the resident's last message and a bracketed note, and
 nothing telling it where in the conversation it stood, so it opened with

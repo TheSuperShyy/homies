@@ -79,7 +79,7 @@ export default async function Tickets({
     // `request_media(...)` is the FK embed: the resident's photos, copied out
     // of Chatwoot by the Edge Function since 17 Sep. staff_read on that table
     // applies to the embed as it does to the row.
-    .select('reference,description,building,unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at,request_media(storage_path,mime)',
+    .select('reference,description,building,unit,reported_unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at,request_media(storage_path,mime)',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
   // One extra query, and it is what makes the badge above mean anything: the
@@ -209,7 +209,7 @@ export default async function Tickets({
                       </span>
                     )}
                   </td>
-                  <td dir="auto" data-label={t('col.where')}>{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
+                  <td dir="auto" data-label={t('col.where')}>{r.building}{(r.unit || r.reported_unit) ? ` · ${r.unit || r.reported_unit}` : ''}</td>
                   {/* The number the call came from, kept since 19 Aug. It is
                       the only thing on an inbound ticket that cannot be
                       mis-heard, and on a needs_review row where the audio

@@ -55,6 +55,55 @@ gone** — that marker now counts zero.
 
 ## 2026-09-18
 
+### Every ticket carries the reporter's flat; a rejected reply gets a second pass. Epoch 48, PENDING.
+
+Owner, over the tickets table beside OXS's rows ("עולי הגרדום 22, תל
+אביב - יפו · 11"): *"look there is a bug also we need to get the full
+building address and their apartment number like this."* The bug is
+255-1291-26, the rescue stub -- no building, no type, the message log as
+its description. The rest: 255-1294-26 (ריח רע בחניון) has the full
+address (the server canonicalised "Rake Haviva 1, Ramat Gan" to רייק
+חביבה 1, רמת גן on its own) but no flat and, on the owner's +63 handset,
+no reporter phone.
+
+**Measured first, nothing changed.** Three replays of the mould
+conversation from fresh numbers: Hebrew opened a proper ticket
+(255-1293-26); one English replay did too (255-1292-26, type maintenance,
+building הרצל 112, common); the other English replay sent `building:
+"Herzl 112"` in Latin letters, got `street_unknown`, and then recited
+fifty invented house numbers as "the buildings we manage". With the live
+narration turn: 2 of 4. The flow is the same in all four; the model is
+what differs. Both English failures are text gaps; the narration is not.
+
+**Built, four pieces:**
+
+1. **The flat, always** (`reporter_unit` gloss, TOOLS + the live jsonBody
+   via a new anchor in `n8n_whatsapp_payment.py`; prompt line 19 gains
+   one clause). Reverses the 2 Sep "only if volunteered": every ticket is
+   filed under the reporter's apartment, asked for with the building in
+   one question, lobby and car park included; a resident who refuses
+   still gets the ticket. The `building` gloss now says Hebrew, whatever
+   language they wrote in; the description says a `street_unknown` with
+   no list in it is no list.
+2. **A second pass before the stub** (`n8n_whatsapp_retry.py`, new):
+   `Reply usable?` false -> `Already retried?` (`$runIndex > 0`) -> `Try
+   again` (Set: the agent's original item plus `retry_note`) -> `Answer
+   the resident`; the second rejection goes to `Open it anyway` as before.
+   AGENT_NEW appends the note among its bracketed facts. Expressions
+   proven in Node. Snapshot `n8n-whatsapp-live-18sep-before-retry.json`.
+3. **The reporter's phone on a foreign sender** (`reporterPhone(ctx)` in
+   the Edge Function, used by open_request and get_payment_link; v86).
+4. **The dashboard's Where shows `unit ?? reported_unit`**, the OXS shape.
+
+**Live now:** the tool texts (payment patcher) and the retry nodes (retry
+patcher), function v86. **Not live:** `n8n_whatsapp_teamnote.py --apply`
+-- the prompt clause, the agent template with the retry clause, and the
+epoch 47 -> 48 -- was refused by the sandbox ("Modify Shared Resources":
+it abandons every live buffer). Until it runs, the retry loop re-sends the
+message with no note on it, and buffers under 47 still show common-area
+tickets opened without a flat. The owner runs it; every patcher then
+reports nothing to do.
+
 ### The link landed on the owner's phone; the rescue learns it is mid-conversation
 
 **The demo happened.** 14:09 Manila, from the owner's own handset: *"אני
