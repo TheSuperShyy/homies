@@ -60,12 +60,28 @@ SAY_TEXT = (
     " ref = (typeof r === 'string' ? JSON.parse(r) : r).reference || '';"
     " } catch (e) { }"
     " const said = String($('Sort').first().json.text || '');"
+    # 18 Sep, live: the rescue said "שלום רב, אני מיכאל מהומי'ז" on turn
+    # five of a conversation and called mould "התקלה", because all it had was
+    # the resident's last line. It now also gets the draft it is replacing --
+    # the model's own discarded reply, which named the mould, the corridor
+    # and the building -- so the second attempt keeps the substance and the
+    # voice. Only on the reference path: on the other one the draft was
+    # empty, one word, or carried a link no tool returned, and nothing in it
+    # is worth keeping. URLs are stripped from the draft either way, so an
+    # invented link can never ride into the rescue (Second try usable? has
+    # no URL guard).
+    " let draft = '';"
+    " try { draft = String($('Answer the resident').first().json.output || '')"
+    ".replace(/https?:\\/\\/\\S+/g, '').trim(); } catch (e) { }"
     " const note = ref"
-    " ? '[נפתחה עכשיו קריאה במערכת, מספר ' + ref + '. תמסור לדייר במילים שלך "
-    "שהקריאה נפתחה, עם המספר.]'"
+    " ? '[נפתחה עכשיו קריאה במערכת, מספר ' + ref + '. הטיוטה שלך למטה לא יצאה "
+    "לדייר, כי הכריזה על קריאה לפני שהייתה. תכתוב אותה מחדש, על אותו עניין "
+    "ובאותו טון, עם המספר.]'"
     " : '[התשובה הקודמת שלך לא יצאה לדייר. תכתוב לו תשובה קצרה וברורה על "
     "ההודעה שלו.]';"
-    " return note + String.fromCharCode(10) + said;"
+    " const nl = String.fromCharCode(10);"
+    " return note + nl + 'הדייר כתב: ' + said"
+    " + (ref && draft ? nl + 'הטיוטה שלך: ' + draft : '');"
     " } )() }}"
 )
 
@@ -77,7 +93,13 @@ SAY_SYSTEM = (
     "אין נוסח קבוע ואין משפט מוכן: תכתוב את זה במילים שלך.\n"
     "אתה מדווח מה כבר נעשה, לא מה עומד לקרות, "
     "ואתה לא אומר שמישהו יוצא לדרך או שעזרה נשלחת.\n"
-    "אל תמציא מספר קריאה. אם לא נמסר לך מספר, אל תגיד שנפתחה קריאה."
+    "אל תמציא מספר קריאה. אם לא נמסר לך מספר, אל תגיד שנפתחה קריאה.\n"
+    # 18 Sep, live: a re-introduction on turn five, and a full stop at the
+    # end. The rescue fires mid-conversation by construction -- the resident
+    # has already been greeted -- and its message closes the matter, so it
+    # ends the way the main prompt's do.
+    "זה המשך של שיחה שכבר מתנהלת, לא התחלה שלה: בלי שלום, בלי היי, בלי "
+    "להציג את עצמך ובלי לפתוח מחדש. ובסוף, במילים שלך, אתה מציע לעזור בעוד משהו."
 )
 
 SECOND_OK = (r"={{ String($json.output || '').trim()"

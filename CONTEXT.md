@@ -2281,6 +2281,16 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**A second pass that only sees the last line will greet again (18 Sep).**
+`Say it again` had the resident's last message and a bracketed note, and
+nothing telling it where in the conversation it stood, so it opened with
+"שלום רב, אני מיכאל מהומי'ז" on turn five and called mould "התקלה". A
+rescue pass is mid-conversation by construction; say so, and hand it the
+draft it is replacing, which is where the substance is. General form: any
+node that writes to the resident needs the same two facts the main agent
+gets -- have they been greeted, and what is this about -- or it will
+reinvent both.
+
 **A real phone number pointed at a real record is the owner's action, not
 mine (18 Sep).** The sandbox refused to insert a resident row for the owner's
 own number even though the same insert on the test prefix went through

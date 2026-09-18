@@ -55,6 +55,44 @@ gone** — that marker now counts zero.
 
 ## 2026-09-18
 
+### The link landed on the owner's phone; the rescue learns it is mid-conversation
+
+**The demo happened.** 14:09 Manila, from the owner's own handset: *"אני
+רוצה לשלם את ועד הבית"* → *"בטח, הנה הקישור לתשלום ועד הבית עבור הרצל
+112, דירה 1:"*, the link on its own line, *"במה עוד אוכל לעזור לכם?"* One
+`payment_links` row, `sent`, on file. The throwaway resident row is off
+again (`paylink_demo_number.py off`); its link row cascaded with it.
+
+**Then a mould report, and the owner: *"it did not even follow the
+protocol."*** Four turns in English. The bot asked for building and flat,
+was refused, got *"Herzl 112"*, asked flat-or-common (right), got *"the
+hallway"* -- and on that turn wrote *"אני פותח קריאת שירות בנושא"* with
+**zero tool calls** (execution 47767, `intermediateSteps: []`). The live
+`reporter_unit` gloss already says never to ask just to fill it, so the
+model had building, location and description and narrated instead of
+calling: Gemini Flash's habit, the one the phantom guard exists for. The
+guard fired, `Open it anyway` minted 255-1291-26 as a stub (`needs_review`,
+no building, no type, the message log as description), and `Say it again`
+wrote the reply. That reply was the visible fault: *"שלום רב, אני מיכאל
+מהומי'ז"* on turn five, *"התקלה"* for mould, a full stop at the end. It
+had only the resident's last line and a note to work from.
+
+**Fixed in `n8n_whatsapp_sayagain.py`, live, no epoch** (the rescue is not
+hashed): the second pass now also gets the draft it is replacing -- the
+model's own discarded reply, which named the mould, the corridor and the
+building -- on the reference path only, URLs stripped so an invented link
+can never ride through (`Second try usable?` has no URL guard). The system
+text says it is a continuation: no שלום, no היי, no introduction, and it
+ends by offering more help. Expression proven in Node on three shapes;
+three direct samples from the same model all kept the substance and the
+real number, none re-introduced itself.
+
+**Not fixed, and named:** the stub ticket. A resident now holds a reference
+for a ticket with no building and no category; a person has to read
+`needs_review`. The real cure is the model calling the tool, and the next
+lever is a rescue that retries WITH tools before minting a stub -- a
+redesign of the rescue path on the shared workflow, for the owner to call.
+
 ### An owner abroad gets the link too. Function v84.
 
 The owner's test handset is Philippine (+63). `phoneOf()` accepts Israeli
