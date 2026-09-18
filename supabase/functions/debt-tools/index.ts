@@ -2876,7 +2876,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       .eq("resident_id", r.id).eq("apartment_id", apartmentId)
       .eq("channel", "whatsapp").eq("status", "sent").not("link", "is", null)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (prior?.link) return { ok: true, found: true, link: prior.link, building: r.building, unit, reused: true };
+    // `apartment`, not `unit`: the first simulation read "unit" back as יחידה,
+    // which no resident says. The field name is the word the model reaches for.
+    if (prior?.link) return { ok: true, found: true, link: prior.link, building: r.building, apartment: unit, reused: true };
 
     const key = Deno.env.get("OXS_KEY_DEBTS") ?? "";
     if (!key) {
@@ -2931,7 +2933,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     });
     // The link is minted and in hand; recording it is the lesser duty.
     if (error) console.error("payment link row failed", error.message);
-    return { ok: true, found: true, link: String(pick.link), building: r.building, unit };
+    return { ok: true, found: true, link: String(pick.link), building: r.building, apartment: unit };
   },
 
   /**

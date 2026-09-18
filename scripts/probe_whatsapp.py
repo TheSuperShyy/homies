@@ -78,7 +78,10 @@ for i, p in enumerate(phrases):
     if p.startswith(">>") and cur:
         phones.append(cur)
     else:
-        cur = "+972599%06d" % ((seed + i * 7919) % 10**6)
+        # PROBE_PHONE pins the sender (17 Sep, the payment-link simulation: a
+        # throwaway resident is put on file under a test number and the probe
+        # has to write from THAT number). Still the 599 prefix, still unroutable.
+        cur = os.environ.get("PROBE_PHONE", "").strip() or "+972599%06d" % ((seed + i * 7919) % 10**6)
         phones.append(cur)
 texts = [p[2:] if p.startswith(">>") else p for p in phrases]
 

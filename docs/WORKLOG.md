@@ -53,6 +53,34 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+## 2026-09-18
+
+### The payment link, seen end to end. Epoch 47.
+
+Owner: *"how can we simulate the payment link using the test number? can we
+try and simulate it just to see how will it look like."* No test resident
+has a real apartment, so the simulation puts one on file: a throwaway
+resident under a test number (`+972599000005`) pointing at a real flat that
+owes nothing (הרצל 112, flat 1), the probe writing from that number
+(`PROBE_PHONE`, new), the row deleted after. OXS minted a real link for a
+real flat; it went only into our own logs, and the flat's balance is zero.
+
+**It works, and it looks right.** *"בטח, הנה הקישור לתשלום עבור הרצל 112,
+תל אביב-יפו, דירה 1:"* then the link on its own line, then *"במה אוכל
+לעזור לכם עוד?"* No amount, no ticket, no note. The URL guard let it
+through (the true branch, live). Asked again: *"הנה הקישור שוב"*, the same
+link, one row — the reuse holds. Host is `www.pro.oxs.co.il`, one `www.`
+more than the PDF's example, used verbatim as the spec asks.
+
+**One word fixed on the spot:** the first reply said *"יחידה 1"* because the
+tool result named the field `unit`; renamed to `apartment` and the bot says
+דירה. The field name is the word the model reaches for. Epoch 47 for one
+word, at 05:15 Israel, no conversation to abandon.
+
+Still not measured: whether OXS's `payerId` equals `residents.oxs_ref` for a
+real resident (the throwaway had none). It costs nothing until it matters:
+the fallback to the main payer opens the same balance.
+
 ## 2026-09-17
 
 ### The OXS payment link, in the chat. Epochs 45 and 46.

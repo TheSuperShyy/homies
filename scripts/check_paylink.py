@@ -170,7 +170,7 @@ def main():
             check("6. found:true with an https link", p1.get("ok") and p1.get("found") is True
                   and link.startswith("https://"), dict(p1, link=masked(link)))
             check("7. building and unit match the record", p1.get("building") == r["building"]
-                  and str(p1.get("unit")) == unit, {"building": p1.get("building"), "unit": p1.get("unit")})
+                  and str(p1.get("apartment")) == unit, {"building": p1.get("building"), "apartment": p1.get("apartment")})
             rows, _ = rest_get("payment_links?select=id,interaction_id,channel,apartment_id,payer_id,link,status,note"
                                "&resident_id=eq.%s&channel=eq.whatsapp&order=created_at.desc&limit=2" % r["id"])
             row = rows[0] if rows else {}

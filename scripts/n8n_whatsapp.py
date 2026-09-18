@@ -203,7 +203,10 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 46
+MEMORY_EPOCH = 47
+# 46 -> 47, 18 Sep, early: one word in the payment-link tool text. The
+# result field `unit` became `apartment` after the first simulation read
+# it back as יחידה; the field name is the word the model reaches for.
 # 45 -> 46, 17 Sep, an hour later: the first refusal probes showed the
 # bot CLAIMING a ticket it never opened, because the tool text told it
 # to open one 'in this same turn' without asking for anything, and a
@@ -439,7 +442,7 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "8c975ee8f8fc",
+    "tools": "e53f5740cfc6",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1440,7 +1443,7 @@ TOOLS = [
             "get_balance first, and do not ask whether they want the link; call "
             "this, then answer.\n"
             "`found` true: `link` is the resident's own payment link, and "
-            "`building` and `unit` say which apartment it is for. Put the link "
+            "`building` and `apartment` say which flat it is for. Put the link "
             "in your reply exactly as returned, on a line of its own, inside a "
             "message of your own words: never alone, never retyped, shortened, "
             "described instead of given, or wrapped in markdown. It opens that "
