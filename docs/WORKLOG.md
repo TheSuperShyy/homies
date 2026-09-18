@@ -55,7 +55,7 @@ gone** — that marker now counts zero.
 
 ## 2026-09-18
 
-### Every ticket carries the reporter's flat; a rejected reply gets a second pass. Epoch 48, PENDING.
+### Every ticket carries the reporter's flat; a rejected reply gets a second pass. Epoch 48.
 
 Owner, over the tickets table beside OXS's rows ("עולי הגרדום 22, תל
 אביב - יפו · 11"): *"look there is a bug also we need to get the full
@@ -103,6 +103,16 @@ it abandons every live buffer). Until it runs, the retry loop re-sends the
 message with no note on it, and buffers under 47 still show common-area
 tickets opened without a flat. The owner runs it; every patcher then
 reports nothing to do.
+
+**Then the owner: *"run it to be live and be tested."*** Written at
+~12:30 Israel; all eight patchers idle. Two live replays from fresh numbers,
+both first pass, no retry: Hebrew asked "כתובת מלאה, כולל מספר בניין
+ומספר דירה" in one question and posted הרצל 112, flat 3, common,
+255-1302-26; English took the refusal, then "Herzl 112 apartment 5" went
+to the tool as הרצל 112, flat 5, 255-1303-26. The English run opened the
+ticket before asking flat-or-hallway (the resident had said "ceiling"),
+so that one is filed `apartment`; the location question is in the prompt
+and the model skipped it. Not the new text's doing; noted, not chased.
 
 ### The link landed on the owner's phone; the rescue learns it is mid-conversation
 
