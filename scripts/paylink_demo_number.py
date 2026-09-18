@@ -1,8 +1,8 @@
 """Put a phone on file as a throwaway resident of a zero-balance flat, so the
 payment link can be seen on a real handset -- then take it off again.
 
-    python scripts/paylink_demo_number.py on  +9725XXXXXXXX
-    python scripts/paylink_demo_number.py off +9725XXXXXXXX
+    python scripts/paylink_demo_number.py on  +<country><number>
+    python scripts/paylink_demo_number.py off +<country><number>
 
 `on` inserts one `residents` row (name בדיקת-מערכת, building הרצל 112, flat 1,
 which owed nothing on 18 Sep) and refuses if the number is already a real
@@ -33,8 +33,10 @@ def main():
     if len(sys.argv) != 3 or sys.argv[1] not in ("on", "off"):
         sys.exit(__doc__)
     mode, phone = sys.argv[1], sys.argv[2].strip()
-    if not phone.startswith("+972"):
-        sys.exit("give the number as +972…")
+    # Any country: the owner tests from a +63 handset, and an owner abroad is
+    # a real case the function handles (18 Sep).
+    if not (phone.startswith("+") and phone[1:].isdigit() and 9 <= len(phone) <= 16):
+        sys.exit("give the number in international form, +<country><number>")
     e = W.env()
     base = e["SUPABASE_URL"].rstrip("/") + "/rest/v1/"
     key = e["SUPABASE_SERVICE_ROLE_KEY"].strip()

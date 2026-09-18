@@ -2274,6 +2274,13 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**The Israeli-only phone parser is a silent gate for anyone abroad (18 Sep).**
+`phoneOf()` returns null for a `+63` or `+1` sender, and everything keyed on
+`ctx.callerPhone` then quietly does nothing for them. The payment link now
+falls back to the raw sender number; `get_balance` and `reported_by_phone`
+still do not. When something "works for everyone" in tests, ask whether
+everyone had a 05 number.
+
 **A real phone number pointed at a real record is the owner's action, not
 mine (18 Sep).** The sandbox refused to insert a resident row for the owner's
 own number even though the same insert on the test prefix went through

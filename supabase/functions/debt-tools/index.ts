@@ -2834,7 +2834,12 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    */
   async get_payment_link(args, ctx) {
     if (channel(ctx) !== "whatsapp") return { ok: false, error: "whatsapp only" };
-    const phone = ctx.callerPhone; // E.164 from the envelope, never an argument
+    // E.164 from the envelope, never an argument. phoneOf() accepts Israeli
+    // numbers only, so for an owner abroad (a +63 tester, a +1 landlord)
+    // callerPhone is null; the call id carries the sender's number exactly as
+    // WhatsApp gave it, and residents.phone holds foreign numbers the same way.
+    const bareSender = barePhone(ctx);
+    const phone = ctx.callerPhone ?? (bareSender ? "+" + bareSender : null);
     if (!phone) return { ok: false, error: "no sender number" };
     // The note is for the model, not for the resident: no sentence about WHY,
     // because a reason written out gets recited ("your number is not linked to

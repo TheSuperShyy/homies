@@ -55,6 +55,17 @@ gone** — that marker now counts zero.
 
 ## 2026-09-18
 
+### An owner abroad gets the link too. Function v84.
+
+The owner's test handset is Philippine (+63). `phoneOf()` accepts Israeli
+numbers only, so `ctx.callerPhone` was null for it and `get_payment_link`
+answered "no sender number" -- the ticket route, no link. Not a demo
+problem: an owner living abroad is a real resident with a foreign number on
+file. The function now falls back to the sender's number exactly as
+WhatsApp gave it (the `wa:` call id) when the Israeli parser rejects it.
+Proven with a fake `+630000000001` resident of the zero-balance flat: found,
+link, row cleaned. The demo script accepts any `+<country><number>`.
+
 ### Seeing the link on a real phone: the owner's number, by his own hand
 
 Owner: *"i want to see it in the whatsapp."* The same trick as the
