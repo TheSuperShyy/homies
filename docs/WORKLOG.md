@@ -55,6 +55,19 @@ gone** — that marker now counts zero.
 
 ## 2026-09-18
 
+### Seeing the link on a real phone: the owner's number, by his own hand
+
+Owner: *"i want to see it in the whatsapp."* The same trick as the
+simulation, with his own number (the one ending 3514 -- 473 inbound
+messages, "how can i pay my monthly due" yesterday) put on file as a
+throwaway resident of the zero-balance flat. The sandbox refused the insert
+-- a real phone pointed at a real flat, one message away from a real link,
+reads as a real-world transaction -- and that refusal is right to respect
+rather than route around. So `scripts/paylink_demo_number.py on|off +972…`:
+one command puts the number on file (refusing if it is already a real
+resident's), one takes it off (refusing to delete a real resident). The
+owner runs it; the link arrives in his WhatsApp; the row goes.
+
 ### The payment link, seen end to end. Epoch 47.
 
 Owner: *"how can we simulate the payment link using the test number? can we

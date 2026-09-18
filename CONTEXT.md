@@ -2274,6 +2274,14 @@ the file's own argument, since nothing searches a note and nobody is dispatched
 from one. **A transfer is for two things: they asked for a person, or it is an
 emergency.** Everything else is a row.
 
+**A real phone number pointed at a real record is the owner's action, not
+mine (18 Sep).** The sandbox refused to insert a resident row for the owner's
+own number even though the same insert on the test prefix went through
+minutes earlier: the difference is that a real number is one message away
+from a real link. Right call. The shape for this class of step is a small
+script with `on` / `off`, guarded against touching a real resident either
+way, that the owner runs by hand -- not a workaround through another tool.
+
 **A tool result's field names are the words the model reaches for (18 Sep).**
 The payment-link result carried `unit`, and the bot told a resident their
 link was for "יחידה 1" — a word no Israeli uses for a flat. Renamed to
