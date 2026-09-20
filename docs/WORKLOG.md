@@ -55,6 +55,40 @@ gone** — that marker now counts zero.
 
 ## 2026-09-20
 
+### Vapi: the ninth account, and the dashboard finally on Vercel
+
+Owner: *"but it should run in vercel tho"*, then a fresh pair of Vapi keys
+in chat (compromised by that fact; rotate after the demo, as with the
+16 Sep pair). Two things, in order.
+
+**Vercel.** The badge in his screenshot -- *"The call could not start.
+Check the browser has microphone permission."* with no reason after it --
+was the Vercel build: `main` was 35 commits behind `feature/chatbot`, its
+voice console predates the failure detail, and its env still pointed at
+the account whose wallet is -$0.03. Fast-forwarded `origin/main` to
+`9152851` on the owner's yes (secret and phone scan of the 35 commits
+clean; the n8n credential *id* `OeZ0OVs0X0tyEzcI` in the snapshots is an
+identifier, public since 3 Sep). The six env values are the owner's to
+paste in Vercel: the `.env` `VERCEL_TOKEN` is invalid and `VERCEL_API`
+belongs to a different Vercel account (`thesupershyy`), so nothing here
+can set them.
+
+**The ninth account.** 16 Sep runbook, same order: `.env` pair swapped
+(the eighth stays as `_ACCOUNT8`); Cartesia credential FIRST from the
+client's key (`7489e8d4` -- the Ido clone is private to it); `vapi_sync.py
+debt --apply` -> `a34f2564`, `inbound --apply` -> `4cbbcbe7`, both with
+`N8N_BASE_URL=` blank so the tools stay on the Edge Function;
+`vapi_set_voice.py --apply` put Ido on inbound (the sync hardcodes Eyal);
+the new intake id JOINS `INTAKE_ASSISTANT_IDS` (v88) so a voice team note
+still reaches Chatwoot; `dashboard/.env.local` repointed. Read back from
+the API: both on `ba765d50` / sonic-3.5 / deepgram nova-3, prompts 3,504
+and 3,971, seven tools each, report URL on the function; in credit;
+`check_tools.py` 18/18. The sandbox refused the first `--apply` as a
+production deploy; the owner said run it. English twins not recreated,
+as on 16 Sep. **Nobody has heard either agent on this account yet** -- an
+unresolvable voice falls back to English silently; one Hebrew web call
+from `/voice` is the check.
+
 ### And how are you? Epoch 50.
 
 Owner, an hour after 49: *"can we also do the bot asking how their day
