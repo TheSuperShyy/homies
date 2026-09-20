@@ -48,6 +48,21 @@ Like `Say it again`, this cannot be fired on demand -- it needs the model to
 produce an unusable reply -- so it ships wired and read back, and the
 expressions proven in Node. The first live firing is the test.
 
+TWO MORE REASONS, 20 SEP
+Live, the owner's handset: "hey wassup, i would like to report something"
+got the system's opener recited word for word and, because Send's text net
+saw the opener, the three buttons (50815); "hey how is it going? i want to
+report something" got "ספר/י" (50885), the slash form the prompt bans. Both
+are style faults, not lies, so a stub ticket is the wrong fallback for them.
+Two conditions join `Reply usable?` here (same by-id mechanism as paylink's
+`links`): `plural` rejects a gendered slash or bracket form, `opener`
+rejects a bare "how can I help" on a message that was not a bare hello.
+Both are FIRST-PASS ONLY (`$runIndex > 0 ||`): on the retry the reply goes
+out as the model wrote it rather than minting a stub. The retry note names
+both reasons without quoting the opener -- naming a phrase is how the model
+is handed it (1 Sep). Nothing here adds a word a resident could read: the
+owner's rule is no fixed message except the menu, and this keeps it.
+
 Idempotent. Running it twice reports nothing to do.
 """
 import json
@@ -71,11 +86,14 @@ PLACEHOLDER = "REPLACE_WITH_N8N_WEBHOOK_SECRET"
 TRY_POS, RETRIED_POS = [720, 300], [1440, 300]
 
 # A bracketed fact for the model, in the shape of every other note in the
-# user turn: what happened, and what fixes it. All three guard reasons are
-# named because the Set node cannot tell which one fired.
+# user turn: what happened, and what fixes it. All five guard reasons are
+# named because the Set node cannot tell which one fired. The opener is
+# described, not quoted (20 Sep).
 RETRY_NOTE = (
     "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר: או שהודיעה על "
-    "קריאה שלא נפתחה, או שנתנה קישור שלא הגיע מכלי, או שהייתה ריקה. מה "
+    "קריאה שלא נפתחה, או שנתנה קישור שלא הגיע מכלי, או שהייתה ריקה, או "
+    "שפנתה לדייר בלוכסן או ביחיד במקום בלשון רבים, או שחזרה על משפט "
+    "הפתיחה של המערכת במקום לענות על מה שכתב. מה "
     "שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
     "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link. ואם "
     "חסר לך משהו כדי לפתוח, תשאל אותו.]"
@@ -88,6 +106,68 @@ TRY_JSON = (
 )
 
 RETRIED = "={{ $runIndex > 0 }}"
+
+# The two style guards (20 Sep), as conditions on `Reply usable?`. Each is
+# true (usable) on the retry pass whatever the text says: a style fault on
+# the second attempt goes out rather than becoming a stub ticket.
+#
+# `plural`: a gendered slash or bracket form -- ספר/י, תרצה/י, ספר(י),
+# מוזמן/ת, and the full-word kind the third live probe produced, ספר/ספרי,
+# where the second word is the first word's stem plus a suffix (the
+# backreference). Two Hebrew letters before the slash keep ו/או and 20/9
+# out; the stem and the boundary after keep בניין/דירה and קריאה/תקלה out.
+# The letter after the backreference is for final forms: מוזמן/מוזמנת has ן
+# on one side and נ on the other.
+PLURAL = (r"={{ $runIndex > 0 || !/([א-ת]{2,})[א-ת]?(\/|\()(\1[א-ת]?)?(י|ה|ת|נה|ו|ות)\)?(?=[\s,.!?:;)]|$)/"
+          r".test(String($json.output || '')) }}")
+# The shape of a bare "how can I help" turn: a hello, the name or not, "how
+# can I help", nothing else. One source, two uses: the `opener` guard below
+# and Send's third menu rule.
+OPENER_RE = (r"/^(היי|הי|שלום|שלום רב|אהלן)[,!.]?( (כאן |אני )?מיכאל מהומי'ז( כאן)?[.,!]?)?"
+             r" ?במה (אפשר|אוכל|נוכל) לעזור( לכם| לך| לכם היום)?\??$/")
+STRIP = r".replace(/[\p{Extended_Pictographic}️]/gu, '').replace(/\s+/g, ' ').trim()"
+# `opener`: the whole reply is that shape -- the turn the resident has
+# already had -- on a message that was not a bare hello (a bare hello never
+# reaches this node; the canned menu answers it). Emoji and the variation
+# selector come off first, as in Sort.
+OPENER = (r"={{ $runIndex > 0 || $('Sort').first().json.greeting === true || (() => {"
+          r" const t = String($json.output || '')" + STRIP + ";"
+          r" return !" + OPENER_RE + ".test(t); })() }}")
+
+# Send's third menu rule said: the name on an ungreeted handset means the
+# intro, so attach the buttons. Written 2 Sep, when the model's first-contact
+# reply was the opener and nothing else. Now the prompt asks for the name
+# AND a question about the matter on first contact, and the owner's rule is
+# buttons only when nothing concrete was said -- so the rule fired on a good
+# reply ("היי, בוקר טוב! אני מיכאל מהומי'ז. ספרו לי מה קרה ואיפה", probe
+# 50915) and contradicted the decision. Narrowed: the name on an ungreeted
+# handset attaches the buttons only when the reply is the bare opener shape,
+# which after the `opener` guard means a second-pass recital -- the last
+# resort. The verbatim-echo test and the show_menu call before it are
+# untouched, and n8n_whatsapp_greet.py stays idle: its anchor is the echo.
+# Send's second menu rule -- the options written out in words -- matched four
+# exact strings, and the model writes "קריאות שירות", "יתרות", "תשלומים"
+# (probes 50930, 50932: the options listed in a paragraph, show_menu not
+# called, no buttons). Categories instead of strings: three of the five in
+# one reply is a list. A ticket confirmation, a balance, a payment link and
+# a status answer each touch one category, two at most.
+FILTER_OLD = ("['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג']"
+              ".filter(w => t.indexOf(w) !== -1).length >= 3 || ")
+FILTER_NEW = ("[/קריא(ת|ות) שירות|תקל/, /קריא(ה|ות) קיימ|מצב (ה)?קריא/, /יתר(ה|ות)|תשלומ/, "
+              "/נציג|בן אדם/, /מידע כללי|השירותים ש/]"
+              ".filter(r => r.test(t)).length >= 3 || ")
+SEND_TAIL_OLD = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greeted !== true))"
+SEND_TAIL_NEW = ("(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greeted !== true && "
+                 + OPENER_RE + ".test(t" + STRIP + ")))")
+
+
+def guard(gid, expr):
+    return {"id": gid, "leftValue": expr, "rightValue": "",
+            "operator": {"type": "boolean", "operation": "true", "singleValue": True}}
+
+
+PLURAL_GUARD = guard("plural", PLURAL)
+OPENER_GUARD = guard("opener", OPENER)
 
 
 def snapshot(live):
@@ -129,7 +209,7 @@ def main():
     by = {n["name"]: n for n in nodes}
     conns = live["connections"]
     for need in ("Reply usable?", "Open it anyway", "Still the last word?",
-                 "Answer the resident", "Say it again"):
+                 "Answer the resident", "Say it again", "Send"):
         if need not in by:
             sys.exit("No %r node on the live workflow -- refusing to guess." % need)
 
@@ -170,6 +250,37 @@ def main():
             }},
         })
         changes.append("Already retried?: new node, one retry and then the stub")
+
+    # --- The two style guards, by id (20 Sep) ------------------------------------
+    cond = by["Reply usable?"]["parameters"]["conditions"]["conditions"]
+    for g in (PLURAL_GUARD, OPENER_GUARD):
+        have = next((c for c in cond if c.get("id") == g["id"]), None)
+        if have is None:
+            cond.append(dict(g))
+            changes.append("Reply usable?: `%s` guard added, first pass only" % g["id"])
+        elif have.get("leftValue") != g["leftValue"]:
+            have["leftValue"] = g["leftValue"]
+            changes.append("Reply usable?: `%s` guard updated" % g["id"])
+
+    # --- Send's third menu rule, narrowed to the bare opener shape (20 Sep) ------
+    sbody = by["Send"]["parameters"].get("jsonBody") or ""
+    if SEND_TAIL_NEW not in sbody:
+        if sbody.count(SEND_TAIL_OLD) != 1:
+            sys.exit("REFUSING: Send.jsonBody does not carry the menu rule this script "
+                     "knows (found %d). Read the live body before touching it."
+                     % sbody.count(SEND_TAIL_OLD))
+        by["Send"]["parameters"]["jsonBody"] = sbody.replace(SEND_TAIL_OLD, SEND_TAIL_NEW, 1)
+        changes.append("Send: the name-on-first-contact menu rule fires only on the "
+                       "bare opener shape")
+    sbody = by["Send"]["parameters"].get("jsonBody") or ""
+    if FILTER_NEW not in sbody:
+        if sbody.count(FILTER_OLD) != 1:
+            sys.exit("REFUSING: Send.jsonBody does not carry the option-words net this "
+                     "script knows (found %d). Read the live body before touching it."
+                     % sbody.count(FILTER_OLD))
+        by["Send"]["parameters"]["jsonBody"] = sbody.replace(FILTER_OLD, FILTER_NEW, 1)
+        changes.append("Send: the options-written-out net reads categories, not four "
+                       "exact strings")
 
     # --- Wiring ------------------------------------------------------------------
     ru = conns.setdefault("Reply usable?", {}).setdefault("main", [[], []])

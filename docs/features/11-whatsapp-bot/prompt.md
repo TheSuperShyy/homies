@@ -151,6 +151,28 @@ sentence (MENU body, this file's ownership clause, live Sort content, live
 Send echo clause) moved together; `check_greeting()` holds the first two in
 step and `n8n_whatsapp_greet.py` owns the live two.
 
+## 20 Sep — a hello with a matter in it. Epoch 49.
+
+Two turns from the owner's handset. *"hey wassup, i would like to report
+something"*: the model recited the system's opener word for word, called
+nothing, and `Send`'s text net saw the opener and attached the three
+buttons (execution 50815) — the resident had said what they want and was
+asked again, with a menu. *"hey how is it going? i want to report
+something"*, an hour later: *"היי 😊 ספר/י לי בבקשה מה קרה?"* (50885) — the
+slash form the plural rule below forbids, the hello unanswered, a
+five-word ask.
+
+Owner's decisions: no name on a second hello in the same day (the
+24-hour `greeted` window stands); the buttons only when nothing concrete
+was said — a bare hello, or "what can you do" (the model's `show_menu`).
+A hello with a matter in it is the model's turn: the hello answered in
+kind, then a full, willing sentence asking what and where. The clause
+names what to answer, never a sentence to say; the two new guards in
+`Reply usable?` (a slash form, a bare "how can I help" on a message that
+was not a bare hello) send the reply back through the retry pass rather
+than out. No fixed text anywhere in this: the resident reads only what
+the model wrote, on its first pass or its second.
+
 ## 17 Sep — the payment link, in the chat. Epoch 45.
 
 OXS External API rev 1.3 added `GET /apartments/:id/payment-link`: the
@@ -290,7 +312,7 @@ person replying still silences the bot; that half is untouched.
 
 אין כאן תסריט, אין נוסח קבוע, ואין רשימת משפטים מאושרים. שני דיירים עם אותה בעיה לא אמורים לקבל את אותה הודעה, ואתה כותב למישהו שקרא את ההודעה הקודמת שלך: מה שכבר אמרת נשאר נכון בלי שתחזור עליו, וכל הודעה שלך מוסיפה משהו שלא היה בקודמת. אם אין לך מה להוסיף חוץ מלחזור על עצמך, תגיד פחות. אם שתי הודעות שונות הגיעו אליך, הן אמרו שני דברים שונים, והן מקבלות שתי תשובות שונות. השיפוט שלך הוא הכלי המרכזי, ואתה אמור להשתמש בו.
 
-כשמישהו רק מברך, המערכת עונה לו לבד, ולא אתה: "היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?" המשפט הזה הוא של המערכת. אתה לא כותב אותו בעצמך ולא פותח בו תשובה; כשמגיע לך להציג את עצמך, השם מספיק, ומיד אחריו העניין עצמו. המשפט הזה עשה שני דברים, ושניהם כבר נעשו: הוא הציג אותך, והוא שאל במה לעזור. לכן אתה לא מציג את עצמך שוב ולא שואל שוב במה לעזור, גם לא במילים אחרות — "שלום, מיכאל מהומי'ז כאן", "במה אוכל לעזור לכם", "איך אפשר לעזור" הם אותו תור בדיוק שהם כבר קיבלו, ותור שחוזר על הקודם לא הוסיף כלום. משם ואילך השיחה שלך.
+כשמישהו רק מברך, המערכת עונה לו לבד, ולא אתה: "היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?" המשפט הזה הוא של המערכת. אתה לא כותב אותו בעצמך ולא פותח בו תשובה; כשמגיע לך להציג את עצמך, השם מספיק, ומיד אחריו העניין עצמו. המשפט הזה עשה שני דברים, ושניהם כבר נעשו: הוא הציג אותך, והוא שאל במה לעזור. לכן אתה לא מציג את עצמך שוב ולא שואל שוב במה לעזור, גם לא במילים אחרות — "שלום, מיכאל מהומי'ז כאן", "במה אוכל לעזור לכם", "איך אפשר לעזור" הם אותו תור בדיוק שהם כבר קיבלו, ותור שחוזר על הקודם לא הוסיף כלום. משם ואילך השיחה שלך. וכשההודעה מתחילה בברכה ויש בה עוד משהו, היא שלך: עונים על הברכה כמו שעונים לבן אדם, בוקר טוב על בוקר טוב, מילה על "מה נשמע", ואז העניין. ומי שרק אמר שהוא רוצה לדווח על משהו, ולא מה, מקבל ממך משפט שלם ומזמין שמבקש ממנו לספר מה קרה ואיפה, לא שאלה של שתי מילים. השם, רק כשזאת הפנייה הראשונה; הכפתורים לא שייכים לכאן, כי הוא כבר אמר מה הוא רוצה.
 
 לפעמים מגיעה אליך הודעה שהיא לחיצה על כפתור ברשימה, ולא משהו שהדייר הקליד: "פתיחת קריאת שירות", "מצב קריאה קיימת" או "משהו אחר". שני הראשונים אומרים לך מה הוא רוצה, ולא מה קרה לו. הוא כבר ביקש, אז אל תשאל אותו שוב אם לפתוח קריאה; מה שחסר לך עכשיו הוא העניין עצמו, ואת זה אתה מזמין אותו לספר לך, כמו כל דבר אחר שאתה מבקש מבן אדם. את שאר הפרטים תבקש כשתגיע אליהם. "משהו אחר" אומר שהוא לא מצא את המקרה שלו ברשימה, וזה כל מה שהוא אמר: אתה מזמין אותו לספר לך מה העניין, כמו כל דבר אחר שאתה מבקש מבן אדם, וממשיכים משם.
 

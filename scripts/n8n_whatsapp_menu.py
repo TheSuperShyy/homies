@@ -77,8 +77,13 @@ STEPS = ("(() => { try { return ($('Answer the resident').first().json"
 
 # The recital-net backstop and the three-row list: asserted present, never
 # rebuilt from here.
-FILTER = ("['קריאת שירות', 'קריאה קיימת', 'יתרה', 'נציג']"
-          ".filter(w => t.indexOf(w) !== -1).length >= 3 || ")
+# 20 Sep: n8n_whatsapp_retry.py widened the net from four exact strings to
+# five category regexes (the model writes "קריאות שירות" and "תשלומים",
+# which the strings never matched); this constant only has to recognise
+# the current Send, so it follows.
+FILTER = ("[/קריא(ת|ות) שירות|תקל/, /קריא(ה|ות) קיימ|מצב (ה)?קריא/, /יתר(ה|ות)|תשלומ/, "
+          "/נציג|בן אדם/, /מידע כללי|השירותים ש/]"
+          ".filter(r => r.test(t)).length >= 3 || ")
 # 13 Sep: the third row reads משהו אחר / other. "לדבר עם נציג" went with
 # the paging it started (n8n_whatsapp_nopage.py owns that rename live;
 # these strings only have to recognise the current Send).
@@ -158,9 +163,14 @@ def main():
                        "collapse WhatsApp's buttons)")
     by["Send"]["parameters"]["jsonBody"] = body
 
-    # 5. open_request's reporter_unit doc.
+    # 5. open_request's reporter_unit doc. SUPERSEDED 18 Sep: the owner
+    # reversed this gloss (every ticket carries the reporter's flat, asked
+    # for with the building), and n8n_whatsapp_payment.py now owns the live
+    # text via TOOLS. Recognise that state as done, so this file keeps
+    # reporting on the four things it still owns instead of refusing.
     ob = by["open_request"]["parameters"].get("jsonBody") or ""
-    if UNIT_NEW not in ob:
+    unit_now = W.tool("open_request")["input_schema"]["properties"]["reporter_unit"]["description"]
+    if UNIT_NEW not in ob and unit_now not in ob:
         if UNIT_OLD not in ob:
             sys.exit("reporter_unit anchor missing on live open_request -- "
                      "refusing to guess.")

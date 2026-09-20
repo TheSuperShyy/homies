@@ -53,6 +53,57 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+## 2026-09-20
+
+### A hello with a matter in it: greet back, ask properly, no buttons. Epoch 49.
+
+Owner's handset, two turns. *"hey wassup, i would like to report
+something"*: the model recited the system opener word for word and
+`Send`'s net bolted the buttons on (50815) -- asked again what they had
+just said, with a menu. *"hey how is it going? i want to report
+something"*: *"היי 😊 ספר/י לי בבקשה מה קרה?"* (50885) -- the slash form
+the prompt bans, the hello unanswered, five words. Owner: *"it did not
+trigger the greeting like good morning, then the polite way to ask what
+happened"*, and, restated: *"i dont want any fixed message except for
+the menu."* Decisions: no name on a second hello in the same day; the
+buttons only when nothing concrete was said.
+
+**Built, no fixed text anywhere in it.** One prompt clause (a hello with
+something after it is the model's: the hello answered in kind, then a
+full sentence asking what and where; the name only on first contact; no
+buttons, they already said what they want). Two first-pass guards in
+`Reply usable?` (`n8n_whatsapp_retry.py`): `plural` rejects a gendered
+slash or bracket form, including the full-word kind (ספר/ספרי) and the
+final-letter kind (מוזמן/מוזמנת); `opener` rejects a bare "how can I
+help" on a message that was not a bare hello. Both `$runIndex > 0 ||` so
+a style fault on the retry goes out rather than minting a stub. The retry
+note names both reasons without quoting the opener.
+
+**The retry loop fired live for the first time** (50917): pass 0 wrote
+ספר/י, the guard rejected it, pass 1 wrote ספרו and that went out. The
+loop built on 18 Sep works.
+
+**`Send`'s menu rules, two of three rewritten.** The third rule (the name
+on an ungreeted handset = intro = buttons, 2 Sep) fired on a good reply
+-- *"היי, בוקר טוב! אני מיכאל מהומי'ז. ספרו לי מה קרה ואיפה"* -- because
+the prompt now asks for the name AND the question on first contact; it
+fires only on the bare opener shape now, which after the guard means a
+second-pass recital. The second rule (options written out) matched four
+exact strings the model does not write ("קריאות שירות", "תשלומים"); it
+reads five category regexes now, three of five = a list. Three
+"what can you do" probes never called `show_menu` and wrote the options
+in a paragraph; the net catches two of the three (the third answered
+from `get_service_info`, correctly no buttons). `n8n_whatsapp_menu.py`'s
+asserted constant follows, and its stale `reporter_unit` anchor (superseded
+18 Sep) now recognises the current gloss as done -- it had been refusing
+since Thursday.
+
+**Proven:** 30 shapes in Node for the two guards; the live `Send` body
+evaluated in Node against 17 replies (five live, twelve shaped); nine
+live probes. Final round: both "I want to report something" shapes get
+the name once, plural, what-and-where, no buttons; "what can you do"
+gets the buttons. All nine patchers idle, 18/18 tool checks.
+
 ## 2026-09-18
 
 ### Every ticket carries the reporter's flat; a rejected reply gets a second pass. Epoch 48.

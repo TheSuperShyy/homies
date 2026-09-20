@@ -2281,6 +2281,25 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**Every `Send`-side rule was written for the reply shape of its day (20
+Sep).** The name-on-first-contact menu rule was right on 2 Sep, when a
+first reply was the opener and nothing else; once the prompt asked for the
+name AND a question about the matter, the same rule decorated a good reply
+with a menu. And the options-written-out net matched four exact strings
+the model had stopped writing. General form: a text net encodes an
+assumption about what the model writes; every prompt change that moves the
+reply shape is a reason to re-run the nets in Node against fresh live
+replies (the harness in the scratchpad takes the live `Send` body and a
+list of replies), not to trust them.
+
+**A style fault is not a lie; retry it, never stub it (20 Sep).** A slash
+form or a recited opener is wrong for the resident but true about the
+world; the phantom guard's fallback (a ticket) is the wrong price for it.
+The `$runIndex > 0 ||` prefix is how a guard says "first pass only": on
+the retry the model's second draft goes out as written. And the first live
+firing of the retry loop was exactly this shape -- ספר/י rejected, ספרו
+sent -- which is the loop earning its place.
+
 **A guard that rescues with a stub is a guard that files bad tickets (18
 Sep).** The phantom guard was right to reject "אני פותח קריאת שירות" with
 no call behind it; what it did next was mint a ticket with no building, no
