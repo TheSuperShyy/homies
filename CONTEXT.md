@@ -2290,6 +2290,10 @@ so. Before promising to set anything on a hosted platform, call its
 answer; the same probe told the three Vapi keys apart in one call each.
 General form: a credential's presence in `.env` records that somebody once
 had it, not that it still works or that it opens the door in front of you.
+And the converse, an hour later: the token that DID work sat in the same
+file under a third name (`VERCEL_ADMIN_KEY`) that a grep for the two
+expected names never saw. Before declaring a platform unreachable, list
+every `.env` name that mentions it and ask each one who it is.
 
 **The shape of an error message tells you which build you are looking at
 (20 Sep).** The owner's badge read "The call could not start. Check the

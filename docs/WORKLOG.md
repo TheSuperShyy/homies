@@ -89,6 +89,20 @@ as on 16 Sep. **Nobody has heard either agent on this account yet** -- an
 unresolvable voice falls back to English silently; one Hebrew web call
 from `/voice` is the check.
 
+**Vercel env set from here after all.** The owner's next screenshot was
+the new build (the reason after the dash: *"Your Wallet Balance is
+-0.03"*) still on the dead account's env, and: *"use the VERCEL_ADMIN_KEY
+in the env upload it yourself."* A third token, under a name the earlier
+grep for `VERCEL_TOKEN`/`VERCEL_API` never looked at, and it reaches the
+project. All six Vapi values were already there, production-only, with
+the dead account's values; patched each in place to the ninth account's
+on all three environments (the three sensitive ones keep their stored
+type -- Vercel refuses a type change on a sensitive variable), the public
+three read back, and a forced redeploy of `a3aecdc` went READY in 60s at
+`homies-dashboard.vercel.app`. `/voice` is behind the login wall, so the
+baked-in key cannot be checked from outside; the env read-back and the
+READY build are the evidence, the owner's next Start call is the proof.
+
 CONTEXT gained three lessons from this cycle (a token is not access until
 asked who it is; an error message's shape names the build; a sandbox
 refusal is the owner's question), written after the stop hook caught the
