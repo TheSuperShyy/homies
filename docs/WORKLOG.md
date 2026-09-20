@@ -55,6 +55,29 @@ gone** — that marker now counts zero.
 
 ## 2026-09-20
 
+### And how are you? Epoch 50.
+
+Owner, an hour after 49: *"can we also do the bot asking how their day
+went or sum."* The 49 clause answered a greeting in kind and moved on;
+it never asked back. Decision (one question, three options): **only when
+the resident opens the door** -- a "מה נשמע" / "how's it going" gets a
+short answer and a question back, in the same breath as the ask about
+the matter; a straight fault report gets no small talk; once answered in
+a conversation, not asked again. Not on every first contact, not at the
+goodbye. One prompt clause, no sentence to say; the standing rule (no
+fixed message except the menu) holds.
+
+**Measured.** First cut: asked back in 3 of 5 door-opened probes, the
+other two gave a wish ("מקווה שגם אצלכם"). Tightened by four words --
+"שאלה ולא רק איחול" -- re-hashed under the same epoch (minutes apart,
+probe buffers only): 3 of 4 after. Nine door-opened probes in all: every
+one first pass, no retry, no buttons (live `Send` body in Node). The
+control cases held: "יש נזילה בלובי" got no small talk; a second turn
+after "הכל טוב" did not ask again; a bare "hey" still gets the menu.
+Two warts, counted not chased: the name was missing on three first-
+contact replies (the ask-back crowded it out; it was 2 of 2 an hour
+earlier), and one reply said "ששאלת" in the singular.
+
 ### A hello with a matter in it: greet back, ask properly, no buttons. Epoch 49.
 
 Owner's handset, two turns. *"hey wassup, i would like to report
