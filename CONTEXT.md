@@ -2281,6 +2281,21 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**Which token posts the message decides what the other bot does with it (20
+Sep).** Chatwoot's WhatsApp workflow reads every message on the inbox: an
+outgoing one from a `user` is a human takeover (the bot goes quiet for that
+resident), from an `agent_bot` it is the bot's own and ignored. So a message
+sent "by the system" has to be sent with the bot's token, and the contact
+and conversation work with the admin's. Two tokens, two jobs, or the first
+delivered link would have silenced the chat bot for the person who got it.
+
+**A demo row lives or dies by its `source` (20 Sep).** The import deletes
+`seed` residents twice a day and the sweep rewrites `oxs` charges; a row
+inserted by hand with the default source vanishes at midnight and nobody
+sees why. Before inserting anything the schedules run over, read what each
+scheduled script deletes and pick the value they all leave alone -- and say
+so in the script, because the value is a small lie about provenance.
+
 **A token in `.env` is not access until you have asked it who it is (20
 Sep).** Two Vercel tokens sat in `.env`; one answered `invalidToken`, the
 other authenticated fine -- as a different person's Vercel account, with no

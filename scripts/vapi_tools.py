@@ -251,9 +251,16 @@ def _open_request(location):
 DEBT_TOOLS = [
     _fn(
         "send_payment_link",
-        "Call when the resident has agreed to settle. OXS sends them a payment link for "
-        "the amount on this call; nothing is charged and no card is involved. Do not "
-        "call it before they have agreed, and do not call it twice on one call.",
+        # 20 Sep, owner: the link goes to WhatsApp during the call, and the
+        # agent says so -- where it went, which number, please complete it --
+        # in its own words. The result carries `sent` and never a URL.
+        "Call once the resident has agreed to settle, and once per call. The payment "
+        "link goes to their WhatsApp, at the number Homies has on file for them; "
+        "nothing is charged and no card is involved. The result says whether it went "
+        "(sent true or false). When it went, tell them in your own words where it "
+        "went -- WhatsApp, the number we have -- and ask them to complete it; when it "
+        "did not, say the office will send it and give the office number, without "
+        "saying why. Never read a link aloud: the result never contains one.",
         # `unit` and nothing else. It had an optional `note` and on 5 Aug the
         # model SPOKE IT: the resident heard "Note," and then, as a separate
         # utterance, "resident asked how to proceed and was sent the payment link

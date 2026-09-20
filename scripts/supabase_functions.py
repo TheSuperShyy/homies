@@ -29,6 +29,15 @@ Two things this gets right that are easy to get wrong:
   is passed. Without it get_payment_link answers 'unavailable' and the bot
   takes the ticket route, which is what it did before the endpoint existed.
 
+  The debt call's WhatsApp delivery (20 Sep) needs three more, all already in
+  .env for other jobs: CHATWOOT_API_TOKEN (admin: finds or creates the
+  contact and the conversation), CHATWOOT_BOT_TOKEN (posts the message as
+  the bot, so the chat workflow neither answers it nor reads it as a human
+  takeover) and OPENROUTER_API_KEY (the one model-written line above the
+  link; without it the message is the link alone). Pushed on every plain
+  --apply; without the two Chatwoot tokens send_payment_link answers
+  'unavailable' and the agent gives the office number.
+
     python scripts/supabase_functions.py            # show what would happen
     python scripts/supabase_functions.py --apply    # do it
 """
@@ -143,6 +152,14 @@ def main():
     finance_key = e.get("OXS_KEY_DEBTS", "").strip()
     print("payment link   %s" % ("ON  (OXS_KEY_DEBTS, finance read-only)" if finance_key
                                   else "OFF — OXS_KEY_DEBTS empty in .env"))
+    cw_admin = e.get("CHATWOOT_API_TOKEN", "").strip()
+    cw_bot = e.get("CHATWOOT_BOT_TOKEN", "").strip()
+    or_key = e.get("OPENROUTER_API_KEY", "").strip()
+    if cw_admin and cw_bot:
+        print("whatsapp link  ON  (CHATWOOT_API_TOKEN + CHATWOOT_BOT_TOKEN%s)"
+              % ("" if or_key else "; OPENROUTER_API_KEY empty -> the link alone"))
+    else:
+        print("whatsapp link  OFF — CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN empty in .env")
     if not apply:
         print("\nDry run. Re-run with --apply.")
         return
@@ -171,6 +188,13 @@ def main():
     # never on the delete list below.
     if finance_key:
         to_push.append({"name": "OXS_KEY_DEBTS", "value": finance_key})
+    # The WhatsApp delivery (20 Sep). Both Chatwoot tokens or neither: half a
+    # pair finds a contact it cannot write to.
+    if cw_admin and cw_bot:
+        to_push.append({"name": "CHATWOOT_API_TOKEN", "value": cw_admin})
+        to_push.append({"name": "CHATWOOT_BOT_TOKEN", "value": cw_bot})
+    if or_key:
+        to_push.append({"name": "OPENROUTER_API_KEY", "value": or_key})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
     mirror = "--oxs-mirror" in sys.argv
     if mirror and oxs_key:

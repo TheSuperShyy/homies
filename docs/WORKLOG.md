@@ -55,6 +55,55 @@ gone** — that marker now counts zero.
 
 ## 2026-09-20
 
+### The debt call sends the link to WhatsApp, during the call. Function v90.
+
+The owner's first debt call on the ninth account (`01a0bef1`): the resident
+agreed, `send_payment_link` answered *no charge on this call* (the debt tab
+was showing the invented sample people), and Michael said there had been
+an error and read out the office number. Even on a real row the tool wrote
+a `requested` row and delivered nothing. Owner: *"ok you will receive a
+payment link via whatsapp based on the number that is registered in the
+system and please complete it before anything else"*; a normal WhatsApp
+message for now (the template later); the line above the link written by
+the model; and *"register my number in the debt collection… name it clix."*
+
+**Built.** `oxsLinkFor()` -- the resolution and the OXS call lifted out of
+the chat tool, reuse across channels -- shared by `get_payment_link` (chat,
+unchanged in behaviour; refusals 5/5) and the rewritten `send_payment_link`
+(voice): resident from the runner's `resident_id` (added to
+`debtVariableValues()`; older envelopes resolve from the first charge), the
+targets' one unit, the link, then `whatsappLine()` (one OpenRouter call,
+gemini-2.5-flash, URLs and markdown stripped, link alone on timeout) and
+`whatsappDeliver()` -- Chatwoot: admin token finds/creates the contact and
+the conversation in inbox 1, the BOT token posts the message so the chat
+workflow sees `agent_bot` and neither answers nor claims; the status is
+read back after 1.5 s and `failed` (Meta's 24-hour window) comes back as
+`outside_window`. One `payment_links` row per call (the 034 unique index
+had refused the old row-per-charge insert on any two-flat call), carrying
+total, earliest month, link, `sent`/`requested` and a note. The result is
+`sent` true/false and never the link. Three more function secrets
+(`CHATWOOT_API_TOKEN`, `CHATWOOT_BOT_TOKEN`, `OPENROUTER_API_KEY`), pushed by
+`supabase_functions.py`; migration 035 is comments only. Tool text and one
+prompt sentence on the debt agent (3,504 -> 3,716 chars), pushed with
+`vapi_sync.py debt --apply` and read back.
+
+**"clix" is a debtor.** `scripts/debt_demo_person.py on +… --name clix`:
+resident + a July 2026 charge of 450, both `source='agent'` -- the only
+CHECK value the twice-daily import (deletes `seed` residents) and the
+arrears sweep (touches `oxs` charges) both leave alone. The flat is the real
+zero-balance one from the 18 Sep simulation, so the link opens ₪0 while the
+agent says ₪450 -- demo-only, named. `off` removes it; run it after.
+
+**Proven server-side, no handset:** the tool envelope posted straight to
+the function with clix's row -> `sent:true, to_last4 3514` in 8.8 s; one row
+`sent`; Chatwoot message 1642 from the bot, status **delivered**, one
+model-written line then the link; the WhatsApp workflow ran it as
+`_work:false`; a second call answered `again:true` with no second message.
+Probe rows deleted. **8.8 s is long inside a live call** (OXS mint +
+OpenRouter + Chatwoot + the 1.5 s read-back); the agent is silent for it.
+Watch `latency_ms` on the first real calls; the read-back wait is the first
+thing to cut. The owner's live call is the remaining proof.
+
 ### Vapi: the ninth account, and the dashboard finally on Vercel
 
 Owner: *"but it should run in vercel tho"*, then a fresh pair of Vapi keys

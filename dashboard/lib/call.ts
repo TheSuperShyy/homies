@@ -70,6 +70,9 @@ export function debtVariableValues(p: Record<string, any>, phone: string): Recor
   const gender = String(p.gender ?? 'unknown');
   return {
     phone,
+    // 20 Sep: send_payment_link resolves the resident from this (it used to
+    // fall back to the first charge's owner, and still does for old envelopes).
+    resident_id: String(p.resident_id ?? ''),
     first_name: String(p.first_name ?? ''),
     gender,
     gender_forms: GENDER_FORMS[gender] ?? GENDER_FORMS.unknown,
