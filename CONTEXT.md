@@ -2281,6 +2281,32 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**A token in `.env` is not access until you have asked it who it is (20
+Sep).** Two Vercel tokens sat in `.env`; one answered `invalidToken`, the
+other authenticated fine -- as a different person's Vercel account, with no
+right to the team that owns `homies-dashboard`. Nothing in the file said
+so. Before promising to set anything on a hosted platform, call its
+`whoami` (`/v2/user`, `/org`, `GET /assistant`) with the token and read the
+answer; the same probe told the three Vapi keys apart in one call each.
+General form: a credential's presence in `.env` records that somebody once
+had it, not that it still works or that it opens the door in front of you.
+
+**The shape of an error message tells you which build you are looking at
+(20 Sep).** The owner's badge read "The call could not start. Check the
+browser has microphone permission." and nothing after it. The current
+console always appends the SDK's reason after a dash; the `main` build had
+no such suffix. So the missing suffix said: Vercel, 35 commits behind,
+pointed at the dead account -- before any microphone was checked. When a
+screenshot does not match the code you have, ask which build printed it
+before debugging the code.
+
+**A sandbox refusal of a production write is the owner's question, not a
+wall (20 Sep).** `vapi_sync.py --apply` on the new account was refused as a
+production deploy; stopping with the exact commands and what would follow
+got "run it", and the same command then went through. The refusal is
+doing the owner's job of saying yes; hand it to them with everything
+prepared, never route around it and never let it strand the work.
+
 **Every `Send`-side rule was written for the reply shape of its day (20
 Sep).** The name-on-first-contact menu rule was right on 2 Sep, when a
 first reply was the opener and nothing else; once the prompt asked for the

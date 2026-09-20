@@ -89,6 +89,11 @@ as on 16 Sep. **Nobody has heard either agent on this account yet** -- an
 unresolvable voice falls back to English silently; one Hebrew web call
 from `/voice` is the check.
 
+CONTEXT gained three lessons from this cycle (a token is not access until
+asked who it is; an error message's shape names the build; a sandbox
+refusal is the owner's question), written after the stop hook caught the
+index.ts change going out without them.
+
 ### And how are you? Epoch 50.
 
 Owner, an hour after 49: *"can we also do the bot asking how their day
