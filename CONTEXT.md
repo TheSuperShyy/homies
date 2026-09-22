@@ -3152,3 +3152,11 @@ Long sweeps: run with `python -u` so progress is visible, and in the
 background. OXS rate limits are **60 requests/minute per key**, and a
 per-building payments call can return ~10,000 records — a full sweep is half
 an hour, not five minutes.
+
+**Saved explanations are re-shown, not re-derived (22 Sep).** When the owner
+says "save that when I ask it again" about an explanation he finally
+understood, the shape he understood is the deliverable: keep it verbatim in
+the repo (the ManyChat door-by-door trees live in
+`docs/discovery/manychat-scan-2026-09-22.md`, section "Door by door") and
+print that section back when asked. A rebuilt version, however faithful,
+is a different picture to him.
