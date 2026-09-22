@@ -2281,6 +2281,16 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**When the platform renders the line, put the clock in the line (22 Sep).**
+A time-of-day greeting looked like a dashboard job -- compute the hour, pass
+`greeting` as a variable -- until it was clear that an inbound phone call has
+no dashboard in front of it. Vapi renders every message as a Liquid
+template, the same engine that fills `{{first_name}}`, so the choice lives
+in the opening line itself and every caller gets it. The price is that
+every reader of that line which does not go through Vapi (the probe, the
+typed chat) now has to render the block too, with the same hours, or the
+model is handed template syntax as its own first words.
+
 **Outside Meta's 24-hour window a message is a template or nothing (22
 Sep).** Every "just send them a WhatsApp" idea -- the done message, the
 payment link after a call -- runs into the same wall: free text is refused

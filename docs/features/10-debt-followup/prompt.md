@@ -82,6 +82,17 @@ first two turns, this line is the first place to look, and
 `מהצוות של הומיז, שמנהלת את הבניין` is the way back without losing the
 client's phrasing.
 
+### The opening greets by the hour (22 Sep)
+
+`היי, {{first_name}}?` → `בוקר טוב, {{first_name}}?` / `צהריים טובים, …` /
+`ערב טוב, …`, the owner's ask for both agents. The `{% %}` block in the line
+is a Liquid template that Vapi renders when the call starts, from Jerusalem
+time (before 05:00 שלום, 05–11 בוקר טוב, 12–16 צהריים טובים, 17:00 on ערב
+טוב), so the dashboard passes nothing new. This line sits inside the system
+prompt section as well, and Vapi renders it there too, so the model reads the
+same words the voice said. `prompt_probe.py` and the typed chat render the
+block themselves. Still one fixed line; only its first word moves.
+
 **The name check survived unchanged.** `אני מדבר עם {{first_name}}?` is not
 conversational furniture — nothing about the debt may be said until it is
 answered, and the not-the-account-holder line below depends on it.
@@ -235,7 +246,7 @@ Fence: 54,119 → 3,504 chars.
 
 ### הפתיחה
 
-> היי, {{first_name}}? מדבר מיכאל מהצוות של הומיז, מה שלומכם?
+> {% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, {{first_name}}? מדבר מיכאל מהצוות של הומיז, מה שלומכם?
 
 ## Where this came from
 

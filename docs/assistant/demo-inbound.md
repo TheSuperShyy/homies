@@ -190,8 +190,23 @@ carries here unchanged:
 ## First message
 
 ```
-שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?
+{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?
 ```
+
+**The greeting follows the clock since 22 Sep.** The owner asked that both
+agents open with בוקר טוב / צהריים טובים / ערב טוב rather than a flat שלום.
+The block in `{% %}` is a Liquid template, which Vapi renders at the moment
+the call starts (the same engine that fills `{{first_name}}` on the debt
+agent), so the hour is read inside the line itself, in Jerusalem time, and
+nothing has to be passed in: an inbound phone call gets it as much as a web
+call from the dashboard. Before 05:00 it says שלום (לילה טוב is a goodbye,
+not a greeting), 05–11 בוקר טוב, 12–16 צהריים טובים, from 17:00 ערב טוב.
+What the voice says is the rendered sentence, e.g. `צהריים טובים, מדבר מיכאל
+מהצוות של הומיז. איך אפשר לעזור?`. Two readers do not go through Vapi and
+render the block themselves with the same hours: the typed chat
+(`dashboard/app/api/voice-chat/route.ts`) and `scripts/prompt_probe.py`.
+The `.strip()`-and-regex readers in `vapi_sync.py` are unaffected because the
+whole line is still one line.
 
 **The wording is the client's, 30 Aug.** `הומיז, חברת הניהול. אה, מדבר מיכאל`
 → `שלום, מדבר מיכאל מהצוות של הומיז`. The person now comes before the

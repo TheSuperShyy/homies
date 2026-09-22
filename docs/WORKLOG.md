@@ -55,6 +55,44 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### Both voice agents greet by the hour: בוקר טוב / צהריים טובים / ערב טוב
+
+Owner: *"we need to make sure the voice agent both start the conversation
+with the greeting the good morning or good afternoon or the good evening."*
+Both openings were flat (`שלום, מדבר מיכאל…` / `היי, {{first_name}}?…`).
+
+**Built.** The first word of each opening line is now a Liquid block that
+Vapi renders when the call starts, from Jerusalem time -- the same engine
+that fills `{{first_name}}`, so nothing new is passed in and an inbound
+phone call gets it as much as a dashboard web call: before 05:00 שלום,
+05–11 בוקר טוב, 12–16 צהריים טובים, from 17:00 ערב טוב. Lines changed in
+`docs/assistant/demo-inbound.md` (fence) and
+`docs/features/10-debt-followup/prompt.md` (`### הפתיחה`, which also sits
+inside the debt system prompt, rendered there too). Two readers never go
+through Vapi and render the block themselves with the same hours:
+`prompt_probe.py` (`render_greeting`, inside `resolve`) and the typed chat
+route (`voice-chat/route.ts`). `vapi_sync.py` needed nothing: the line is
+still one line.
+
+**Proven locally:** liquidjs (the engine Vapi uses) renders both doc lines
+through `vapi_sync.py`'s own extractors -- `צהריים טובים, מדבר מיכאל…` and
+`צהריים טובים, יוסי? מדבר מיכאל…` at 12:07 Jerusalem; the probe renderer
+gives the right word at 2, 5, 11, 12, 16, 17, 23; `tsc` clean; the intake
+fence and the probe's copy of it are byte-equal. **Not yet live:** the
+sandbox refused `vapi_sync.py inbound --apply` and `debt --apply` (production
+write); waits for the owner's "run it". Order when it runs: inbound sync,
+then `vapi_set_voice.py --apply` (the inbound sync resets the voice to
+Eyal), then debt sync; read both first messages back. The ear test is the
+owner's next web call from `/voice`. A first message that Vapi does not
+render would be read aloud as `{% assign h …` -- that is the failure to
+listen for on the first call, and the fix would be the dashboard passing a
+`greeting` variable instead.
+
+Also today: the owner forwarded a Google Ads "set up a Google tag" email
+(AW-18467124282, a lead-form conversion in ILS). Nothing in this repo is a
+public website -- the dashboard is staff-only behind a login -- so nothing
+was installed; the owner has to say which site it is for.
+
 ### The "done" message: a Meta template, queued by a trigger, sent by a cron. Function v92.
 
 Owner: *"help me setup a templated message for the done when the ticket
