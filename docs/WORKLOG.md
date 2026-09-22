@@ -83,7 +83,9 @@ delivered; the probe's interaction row deleted afterwards (FKs set null,
 the ticket and link row stay). The open path shares the code and was not
 forced. Also seen: the owner's 14:46 call delivered its link (message
 1646, read) -- his "hi" at 14:29 had reopened Meta's window -- before v94,
-so it has no ticket.
+so it has no ticket. That call's first line was transcribed `צהריים טובים?
+קליקס? …`, which answers the name worry from 14:27: the name is spoken, the
+earlier transcript dropped it. And that call did log its outcome.
 
 ### The owner's debt call at 14:27: no link, and nobody told the office
 
