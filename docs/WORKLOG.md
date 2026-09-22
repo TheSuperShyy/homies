@@ -55,6 +55,40 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### Voice intake: the rule is for you, not for them; the street in Hebrew. And OpenRouter is at $0.20.
+
+Owner: *"why did the bot insist on making assumptions that it might be the
+sink"* → *"lets fix that behaviour."* The chat prompt's 16 Sep clause (the
+rule is for you, not for him; no laying out both options; one short question
+when you cannot tell; the address only once a ticket is certain) had never
+been carried to the voice prompt. Ported into `demo-inbound.md`, worded for
+speech and in its plural, through three wordings against
+`prompt_probe.py --file --repo-tools` with two new scenarios
+(`bathroom_leak`, `english_street`): v1 still recited tap/sink/toilet in a
+two-question turn; v2 the same; **v3** ("one short open question, where
+the water comes from, and only it: no list, no naming tap, sink, toilet or
+ceiling, no second question in the turn; what they answer is the answer,
+if it is still unclear the building checks and you do not ask again")
+opens with a plain *מאיפה מגיעים המים?*, never says "it's yours" to a
+leak, and on *פשוט תעשו משהו* opens a check with the address asked only
+then. **One wart left:** after *בחדר האמבטיה* (a room, not a source) the
+model asks once more, with a menu of sources. `private_sink` still refuses
+kindly and names the plumber, with more explanation than the clause wants.
+Prompt 3,971 → 4,541 chars. Same push: the voice `building` gloss now says
+Hebrew (the chat wording of 18 Sep -- `english_street` sends הרצל 112), and
+the Edge Function's street_unknown carries a hint when the string is Latin
+letters (`LATIN_HINT`, `latinStreet()`, in `open_request` and
+`verify_address`; function v96). Pushed: `vapi_sync.py inbound --apply`
+then `vapi_set_voice.py --apply` (Ido back). The debt assistant's copy of
+`open_request` still carries the old gloss until its next sync.
+
+**OpenRouter ran dry mid-probe:** HTTP 402 on the second model call of two
+scenarios; `/api/v1/credits` says 114.80 of 115 used. A one-token
+completion still passes, a full intake turn does not. The WhatsApp bot,
+the typed chat and the payment-link line all run on this key; the voice
+agents do not (Vapi's own OpenAI). Owner told; topping up is his. The v4
+wording for the wart waits for credits.
+
 ### The owner's 15:05 intake call: a leak, "herzl 112" in Latin letters, no ticket
 
 Owner: *"check the recent call i have i reported a leak in my apartment."*

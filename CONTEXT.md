@@ -3161,7 +3161,10 @@ voice call did the identical thing and failed the identical way, because
 `vapi_tools.py` still said "as the caller gave it". When a tool's gloss
 changes for one channel, grep the other channel's definition the same day
 -- the matcher did not change, the callers did, and only one of them was
-told.
+told. Same afternoon, same shape, one level up: the chat prompt's "the
+rule is for you, not for him" clause of 16 Sep had made the private/common
+rule usable, and the voice prompt had the rule without the clause. A rule
+ported without its usage clause is recited to the caller.
 
 **A fallback line is a promise, and a promise needs a work item (22 Sep).**
 The debt agent's answer when the link cannot be sent -- "the office will

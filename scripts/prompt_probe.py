@@ -181,6 +181,19 @@ SCENARIOS = {
         "אז מי מטפל בזה?",
         "טוב, תודה",
     ],
+    "bathroom_leak": [             # 22 Sep: source unclear -> ONE short question, no tap/sink/shower recital, no address before it is decided
+        "יש לי נזילה",
+        "בחדר האמבטיה",
+        "פשוט תעשו משהו",
+        "הרצל 112, דירה 12",
+        "טוב, תודה",
+    ],
+    "english_street": [            # 22 Sep: the street in Latin letters -> open_request gets הרצל 112, not "herzl 112"
+        "there is a leak in the lobby, water on the floor",
+        "herzl 112",
+        "apartment 12",
+        "ok thanks",
+    ],
     "unmanaged": [                 # 16 Sep: street_unknown -> ask the street once more -> "we do not manage that building", no ticket (live tools only; the mock always opens)
         "יש נזילה בלובי אצלנו בבניין",
         "רחוב שלא קיים 5",

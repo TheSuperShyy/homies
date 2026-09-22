@@ -660,6 +660,17 @@ type Match =
   | { status: "ambiguous"; candidates: any[] }
   | { status: "need_number" | "number_off_street"; street: any; numbers: string[] };
 
+// A street in Latin letters can never match: `street_norm` is Hebrew for all
+// 198 buildings. The owner's 22 Sep call sent "herzl 112" and was told the
+// building might not be ours. The hint rides on the street_unknown result so
+// the model tries again in Hebrew inside the call instead of closing it.
+const LATIN_HINT = "The street was given in Latin letters; buildings are known by their Hebrew "
+  + "street names. Call again with the street in Hebrew (Herzl 112 is הרצל 112).";
+function latinStreet(said: unknown): boolean {
+  const s = String(said ?? "");
+  return /[A-Za-z]{3,}/.test(s) && !/[א-ת]/.test(s);
+}
+
 async function matchBuilding(saidRaw: unknown): Promise<Match> {
   const said = norm(saidRaw);
   if (!said) return { status: "empty" };
@@ -1965,7 +1976,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       return { ok: true, building_found: false, reason: "need_building" };
     }
     if (m.status === "street_unknown") {
-      return { ok: true, building_found: false, reason: "street_unknown" };
+      return { ok: true, building_found: false, reason: "street_unknown",
+        ...(latinStreet(args?.building) ? { hint: LATIN_HINT } : {}) };
     }
     if (m.status === "need_number" || m.status === "number_off_street") {
       return {
@@ -2504,6 +2516,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         return {
           ok: true, opened: false, building_found: false,
           reason: m.status === "empty" ? "need_building" : "street_unknown",
+          ...(m.status === "street_unknown" && latinStreet(said) ? { hint: LATIN_HINT } : {}),
         };
       }
       if (m.status === "need_number" || m.status === "number_off_street") {

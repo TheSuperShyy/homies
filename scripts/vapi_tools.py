@@ -135,7 +135,12 @@ UNIT_ON_CALL = {
 LOCATION = {
     "building": {
         "type": "string",
-        "description": "Building name or street address, as the caller gave it.",
+        # 22 Sep: the owner's call gave "herzl 112" in English and the matcher,
+        # which knows Hebrew streets only, said street_unknown on a managed
+        # building. The chat gloss has said this since 18 Sep; this one did not.
+        "description": "Street and number, written in Hebrew as the street is written "
+                       "in Israel, whatever language the caller spoke: Herzl 112 is "
+                       "הרצל 112. The whole sentence is fine; this tool checks it.",
     },
     "unit": {
         "type": "string",
