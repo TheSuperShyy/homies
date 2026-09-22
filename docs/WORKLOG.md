@@ -89,6 +89,11 @@ render would be read aloud as `{% assign h …` -- that is the failure to
 listen for on the first call, and the fix would be the dashboard passing a
 `greeting` variable instead.
 
+The commit split in two (an automatic housekeeping commit took the docs and
+CONTEXT first) and the push failed: gh's active account is `ClixTeam579`,
+which cannot write to `TheSuperShyy/homies`; switching accounts from the
+sandbox was refused, so the push is the owner's.
+
 Also today: the owner forwarded a Google Ads "set up a Google tag" email
 (AW-18467124282, a lead-form conversion in ILS). Nothing in this repo is a
 public website -- the dashboard is staff-only behind a login -- so nothing

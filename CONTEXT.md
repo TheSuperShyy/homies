@@ -2289,7 +2289,9 @@ template, the same engine that fills `{{first_name}}`, so the choice lives
 in the opening line itself and every caller gets it. The price is that
 every reader of that line which does not go through Vapi (the probe, the
 typed chat) now has to render the block too, with the same hours, or the
-model is handed template syntax as its own first words.
+model is handed template syntax as its own first words. The hour bands are a
+decision, not a guess: before 05:00 the line says שלום, because לילה טוב is
+a goodbye in Hebrew and a 02:00 caller greeted with ערב טוב hears a bot.
 
 **Outside Meta's 24-hour window a message is a template or nothing (22
 Sep).** Every "just send them a WhatsApp" idea -- the done message, the
