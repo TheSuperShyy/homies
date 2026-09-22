@@ -55,6 +55,45 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### The old ManyChat bot, read from here: nouns from the API, branches reconstructed
+
+Owner: *"use MANYCHAT_API_KEY but make sure it dont edit anything just do a
+read only in the system just get the flow of the branches the conversations
+and create a docs for it that we can adapt on our current chatbot list all
+the features everything."* The key (item 3 of the 17 Sep Make scan's asks)
+was in `.env`, referenced by nothing.
+
+**Found first, and it shapes everything:** ManyChat's own spec
+(`/swagger/compileJson?type=Page_API`, 34 paths) has 13 GET endpoints and
+none returns a flow's content. Flows come back as name + ns only. So the
+"flow of the branches" cannot be read by API; it was reconstructed from
+three read-only sources and each branch cites its own: the 13 custom fields
+(the questionnaire), the Make hooks (where each finished form is posted),
+and the handset observation of 10 Sep (greeting, six menu rows, the form
+opening). The owner then said he can see the workflow in the editor; the
+wording of each step comes from there, when he sends it.
+
+**Built.** `scripts/manychat_api.py` (mirror of `make_api.py`: GET only, one
+host, key never printed, no subscriber endpoint in the file; overview /
+`fields` / `export`), `docs/handover/manychat-export-2026-09-22.json`
+(page-level, redacted with the vapi_export rule, 81 .env values checked),
+`docs/discovery/manychat-scan-2026-09-22.md` (what the API shows; the bot
+reconstructed branch by branch with evidence and "confirm in the editor"
+notes; a 19-line feature list; old-vs-ours table, adapt column left to the
+owner; what the editor still has to supply). `.env.example` gains the key
+name; the Make scan, CONTEXT, HANDOVER and Feature-Status item 8 point on.
+
+**What the page holds:** הומי'ז ניהול ואחזקת מבנים (Pro); four flows —
+`wa_default` (the bot), `קריאתך טופלה בהצלחה (מהמאנדיי)` (the done message
+Make sends on a Monday status change; silent a month), `לאחר 23 שעות - האם
+פנייתך עדיין רלוונטית` (a nudge timed inside Meta's 24-hour window),
+`Untitled` (30 Jul 2026, unknown); 13 fields: name, phone, address, floor,
+flat, floors, flats, elevator company, last report, elevator report,
+house-manager call, photo, photos; tag `טסטים`; entry link `WhatsApp URL
+#1`. One correction to the plan on the way: Make's elevator scenario emails
+the office inbox naming the elevator company, not the elevator company
+itself. Nothing was touched; the overview run twice is byte-identical.
+
 ### Both voice agents greet by the hour: בוקר טוב / צהריים טובים / ערב טוב
 
 Owner: *"we need to make sure the voice agent both start the conversation

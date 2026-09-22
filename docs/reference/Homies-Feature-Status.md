@@ -148,4 +148,6 @@ campaign runs. **Nothing will dial until that is done on purpose.**
 5. **Set a date for the WhatsApp number switch**, now that Meta access is in.
 6. **Name the staff who need inbox access**, and which departments they cover.
 7. **The Telkom quote**: nothing is paid without your approval, as you asked.
-8. **Nir's WhatsApp scripts**: we are waiting to receive them.
+8. **Nir's WhatsApp scripts**: the ManyChat API key arrived (22 Sep) and gives
+   the flows' names and fields; the wording of each step is still only in the
+   ManyChat editor — a share link or screenshots of the four flows closes this.

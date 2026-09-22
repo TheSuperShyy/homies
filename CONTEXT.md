@@ -2472,6 +2472,16 @@ themselves live in ManyChat under connection `nir`, so extracting them needs
 ManyChat access from Nir, not Make or Meta. Full scan in
 `docs/discovery/make-scan-2026-09-17.md`. Automation-platform lesson: the
 platform that *files* a conversation is rarely the one that *holds* it.
+**22 Sep: the ManyChat key arrived** (`MANYCHAT_API_KEY`, `scripts/manychat_api.py`,
+GET only, no subscriber calls). It lists the bot's nouns — four flows by name,
+thirteen custom fields, a tag, an entry link — and cannot list its steps: the
+API has no flow-content endpoint. The branches were reconstructed from the
+fields, the Make hooks and what the handset saw on 10 Sep
+(`docs/discovery/manychat-scan-2026-09-22.md`); the wording still comes only
+from the editor, which the owner can open. Second lesson of the same kind: a
+bot builder's API exposes the bot's *nouns*, never its *verbs* — reconstruct
+the verbs from the systems it wrote to and from what a handset saw, and say
+on every branch which of the two it rests on.
 
 **What the deploy reads by path, and therefore must not move (17 Sep).**
 `docs/features/11-whatsapp-bot/prompt.md` and `docs/assistant/demo-inbound.md`

@@ -1,0 +1,134 @@
+{
+  "info": {
+    "id": null,
+    "name": "הומי'ז ניהול ואחזקת מבנים",
+    "category": null,
+    "avatar_link": null,
+    "username": null,
+    "about": null,
+    "description": null,
+    "is_pro": true,
+    "timezone": "Asia/Jerusalem"
+  },
+  "flows": {
+    "flows": [
+      {
+        "ns": "content20260730113317_363910",
+        "name": "Untitled",
+        "folder_id": 0
+      },
+      {
+        "ns": "content20240331074346_968302",
+        "name": "לאחר 23 שעות - האם פנייתך עדיין רלוונטית",
+        "folder_id": 0
+      },
+      {
+        "ns": "content20240325164237_508609",
+        "name": "קריאתך טופלה בהצלחה (מהמאנדיי)",
+        "folder_id": 0
+      },
+      {
+        "ns": "wa_default",
+        "name": "WhatsApp Default Reply",
+        "folder_id": 0
+      }
+    ],
+    "folders": []
+  },
+  "tags": [
+    {
+      "id": 43703507,
+      "name": "טסטים"
+    }
+  ],
+  "custom_fields": [
+    {
+      "id": 10772897,
+      "name": "כתובת",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10772906,
+      "name": "כמות קומות בבניין",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10772912,
+      "name": "כמות דיירים בבניין",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10790949,
+      "name": "שם מלא",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10790958,
+      "name": "קומת הדייר",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10790961,
+      "name": "דירת הדייר",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10791312,
+      "name": "חברת המעליות בבניין",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10802484,
+      "name": "סיכום דיווח אחרון",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10802488,
+      "name": "דיווח למעלית",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10802513,
+      "name": "קריאה לאב הבית",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10802746,
+      "name": "טלפון",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10813193,
+      "name": "תמונה",
+      "type": "text",
+      "description": ""
+    },
+    {
+      "id": 10813846,
+      "name": "תמונה אריי",
+      "type": "array",
+      "description": ""
+    }
+  ],
+  "growth_tools": [
+    {
+      "id": 23663000,
+      "name": "WhatsApp URL #1",
+      "type": "messenger_ref_url"
+    }
+  ],
+  "widgets": [],
+  "otn_topics": [],
+  "bot_fields": []
+}
