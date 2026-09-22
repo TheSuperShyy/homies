@@ -53,6 +53,49 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+## 2026-09-22
+
+### The "done" message: a Meta template, queued by a trigger, sent by a cron. Function v92.
+
+Owner: *"help me setup a templated message for the done when the ticket
+has been resolved."* Parked since 17 Sep for the reason it is a template:
+a resident who resolved a ticket has usually not written in 24 hours, and
+Meta refuses free text outside that window. Wording chosen by the owner
+(reference + what it was + write back if not fixed) -- the **second fixed
+message after the menu**, by decision, and the only sentence the model does
+not write.
+
+**Built, four pieces.** (1) `docs/features/11-whatsapp-bot/templates.md`
+is the source of truth; `scripts/wa_templates.py` lists the WABA's
+templates, submits one from the file, and shows what Chatwoot has synced.
+`ticket_resolved_he` submitted 00:50 UTC, id 1067229306199174, **PENDING**
+at Meta. The token is `WHATSAPP_ACCESS_TOKEN` (system user, never expires,
+`whatsapp_business_management`); `WHATSAPP_TOKEN` died on 8 Aug.
+(2) Migration 036: `ticket_notices` outbox + a trigger on `requests` --
+status turning `resolved` on a WhatsApp ticket with a reporter phone
+queues one row `{"1": reference, "2": description[:80]}`, unique per
+(ticket, kind). (3) `send_ticket_notices` in the Edge Function drains
+pending rows: test prefixes skipped, a template Chatwoot has not synced
+leaves the row waiting, otherwise a Chatwoot message with
+`template_params` posted as the BOT (the chat workflow ignores its own
+bot's messages), status read back after 1.5 s, `sent` / `failed` (Meta's
+reason) / five retries. `chatwootConversationFor()` factored out of the
+20 Sep `whatsappDeliver()` so both use one lookup. (4) n8n `Homies —
+ticket notices` (`pvMuradcJOASapF0`, `scripts/n8n_ticket_notices.py`):
+every 2 minutes, one POST with the tool-secret credential; created and
+activated; layout clean.
+
+**Proven server-side:** a probe ticket on `+972599…` resolved via PATCH →
+one outbox row with the right params; reopened and resolved again → still
+one row; the drainer → `skipped: test_number`, no Chatwoot call. Tools
+18/18, chat refusals 5/5. **Not yet proven:** the real send -- it waits
+on Meta's approval and Chatwoot's sync, then the owner sets 255-1294-26
+(his own, the one bot ticket with a phone) to resolved on the dashboard
+and the message should land within two minutes. Chatwoot 4.16's
+`template_params` shape (positional `processed_params`) is proven by
+that first send, not before. At cutover the template must be created
+again on Homies' own WABA from the same file.
+
 ## 2026-09-20
 
 ### The debt call sends the link to WhatsApp, during the call. Function v90.

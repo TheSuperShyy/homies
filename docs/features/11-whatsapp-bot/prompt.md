@@ -151,6 +151,18 @@ sentence (MENU body, this file's ownership clause, live Sort content, live
 Send echo clause) moved together; `check_greeting()` holds the first two in
 step and `n8n_whatsapp_greet.py` owns the live two.
 
+## 22 Sep — the "done" message, the second fixed text
+
+Owner: *"help me setup a templated message for the done when the ticket
+has been resolved."* A resident whose ticket closes has usually not
+written in 24 hours, and Meta refuses free text outside that window: the
+message is a Meta-approved template or nothing. So `ticket_resolved_he`
+(wording in `templates.md`, chosen by the owner) is the second fixed
+message after the menu -- a rule exception made on purpose, not a drift.
+The prompt does not change: the model never writes it, and a resident who
+answers it is handled as any message (`get_request_status` already says
+resolved). Nothing here for the model to recite.
+
 ## 20 Sep — and how are you? Epoch 50.
 
 An hour after epoch 49 the owner: *"can we also do the bot asking how

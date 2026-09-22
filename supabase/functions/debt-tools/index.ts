@@ -1383,6 +1383,58 @@ type Delivery = { sent: true; conversationId: number } | { sent: false; reason: 
  * after a moment and reported as `outside_window`. The template is the fix,
  * later. Nothing here logs the text or the link: status, ids, last digits.
  */
+/** One Chatwoot call: the token decides who is speaking (admin or the bot). */
+async function cw(token: string, method: string, path: string, body?: unknown) {
+  const res = await fetch(CHATWOOT + path, {
+    method,
+    headers: { api_access_token: token, "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(8000),
+  });
+  return { status: res.status, j: await res.json().catch(() => null) as any };
+}
+
+/**
+ * The resident's conversation in the WhatsApp inbox: the contact by phone
+ * (found or created), then the newest conversation of theirs in inbox 1, or a
+ * new one. Admin token throughout -- reading and creating are the desk's
+ * business; what gets SAID goes through the bot token in the callers. The
+ * conversation-create branch is untested until a resident with no
+ * conversation is reached (20 Sep).
+ */
+async function chatwootConversationFor(
+  admin: string, toE164: string, name: string,
+): Promise<{ ok: true; convId: number } | { ok: false; reason: "no_contact" | "no_conversation" }> {
+  const digits = toE164.replace(/\D+/g, "");
+  const last4 = digits.slice(-4);
+  let contactId: number | null = null;
+  const s = await cw(admin, "GET", "/contacts/search?q=" + encodeURIComponent(toE164));
+  const found = (s.j?.payload ?? []).find((c: any) => String(c?.phone_number ?? "").replace(/\D+/g, "") === digits);
+  if (found) contactId = found.id;
+  else {
+    const c = await cw(admin, "POST", "/contacts", { inbox_id: WA_INBOX_ID, name, phone_number: toE164 });
+    contactId = c.j?.payload?.contact?.id ?? c.j?.id ?? null;
+    if (!contactId) {
+      console.error("whatsapp delivery: no contact", c.status, last4);
+      return { ok: false, reason: "no_contact" };
+    }
+  }
+  const cv = await cw(admin, "GET", `/contacts/${contactId}/conversations`);
+  const convs = (cv.j?.payload ?? []).filter((x: any) => x?.inbox_id === WA_INBOX_ID);
+  convs.sort((a: any, b: any) => (b?.id ?? 0) - (a?.id ?? 0));
+  let convId: number | null = convs[0]?.id ?? null;
+  if (!convId) {
+    const nc = await cw(admin, "POST", "/conversations",
+      { inbox_id: WA_INBOX_ID, contact_id: contactId, source_id: digits, status: "open" });
+    convId = nc.j?.id ?? null;
+    if (!convId) {
+      console.error("whatsapp delivery: no conversation", nc.status, last4);
+      return { ok: false, reason: "no_conversation" };
+    }
+  }
+  return { ok: true, convId };
+}
+
 async function whatsappDeliver(toE164: string, name: string, text: string): Promise<Delivery> {
   const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
   const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
@@ -1390,44 +1442,11 @@ async function whatsappDeliver(toE164: string, name: string, text: string): Prom
     console.warn("whatsapp delivery OFF: CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN unset");
     return { sent: false, reason: "unavailable" };
   }
-  const cw = async (token: string, method: string, path: string, body?: unknown) => {
-    const res = await fetch(CHATWOOT + path, {
-      method,
-      headers: { api_access_token: token, "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(8000),
-    });
-    return { status: res.status, j: await res.json().catch(() => null) as any };
-  };
-  const digits = toE164.replace(/\D+/g, "");
-  const last4 = digits.slice(-4);
+  const last4 = toE164.replace(/\D+/g, "").slice(-4);
   try {
-    let contactId: number | null = null;
-    const s = await cw(admin, "GET", "/contacts/search?q=" + encodeURIComponent(toE164));
-    const found = (s.j?.payload ?? []).find((c: any) => String(c?.phone_number ?? "").replace(/\D+/g, "") === digits);
-    if (found) contactId = found.id;
-    else {
-      const c = await cw(admin, "POST", "/contacts", { inbox_id: WA_INBOX_ID, name, phone_number: toE164 });
-      contactId = c.j?.payload?.contact?.id ?? c.j?.id ?? null;
-      if (!contactId) {
-        console.error("whatsapp delivery: no contact", c.status, last4);
-        return { sent: false, reason: "no_contact" };
-      }
-    }
-    const cv = await cw(admin, "GET", `/contacts/${contactId}/conversations`);
-    const convs = (cv.j?.payload ?? []).filter((x: any) => x?.inbox_id === WA_INBOX_ID);
-    convs.sort((a: any, b: any) => (b?.id ?? 0) - (a?.id ?? 0));
-    let convId: number | null = convs[0]?.id ?? null;
-    if (!convId) {
-      // Untested until a resident with no conversation is reached (20 Sep).
-      const nc = await cw(admin, "POST", "/conversations",
-        { inbox_id: WA_INBOX_ID, contact_id: contactId, source_id: digits, status: "open" });
-      convId = nc.j?.id ?? null;
-      if (!convId) {
-        console.error("whatsapp delivery: no conversation", nc.status, last4);
-        return { sent: false, reason: "no_conversation" };
-      }
-    }
+    const conv = await chatwootConversationFor(admin, toE164, name);
+    if (!conv.ok) return { sent: false, reason: conv.reason };
+    const convId = conv.convId;
     const m = await cw(bot, "POST", `/conversations/${convId}/messages`,
       { content: text, message_type: "outgoing", private: false });
     const msgId = m.j?.id ?? null;
@@ -1553,6 +1572,100 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     await record();
     if (!d.sent) return miss(d.reason);
     return { ok: true, sent: true, to_last4: last4 };
+  },
+
+  /**
+   * The "done" message (22 Sep): drains the `ticket_notices` outbox that the
+   * trigger in migration 036 fills when a WhatsApp ticket turns resolved, and
+   * sends each as the Meta template named on the row -- a template, because
+   * the resident has usually not written to us in 24 hours and Meta refuses
+   * free text outside that window. Called by the n8n cron "Homies — ticket
+   * notices" every two minutes, never by a model; the envelope is the same.
+   *
+   * Chatwoot sends a template when a message carries `template_params`
+   * (name, category, language, namespace, processed_params); `content` is
+   * the filled-in text for the inbox's own record. The BOT token posts, so
+   * the chat workflow sees `agent_bot` and neither answers it nor reads it
+   * as a takeover. A template Chatwoot has not synced yet leaves the row
+   * pending (a wait, not a failure); Meta's refusal marks it failed with
+   * Meta's reason; five failures and the row is left alone. Never logs the
+   * text: counts and last digits.
+   */
+  async send_ticket_notices(args, _ctx) {
+    const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
+    const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
+    if (!admin || !bot) return { ok: false, error: "chatwoot tokens unset" };
+    const limit = Math.min(Math.max(Number(args?.limit) || 20, 1), 100);
+    const { data: rows, error } = await db.from("ticket_notices")
+      .select("id,phone,template,params,attempts")
+      .eq("status", "pending").lt("attempts", 5)
+      .order("created_at", { ascending: true }).limit(limit);
+    if (error) return { ok: false, error: error.message };
+    const out = { ok: true, sent: 0, failed: 0, skipped: 0, waiting: 0 };
+    if (!rows?.length) return out;
+
+    // The inbox's synced templates, once per drain: name -> {namespace, body}.
+    const ib = await cw(admin, "GET", `/inboxes/${WA_INBOX_ID}`);
+    const synced: Record<string, { namespace: string; body: string; category: string; language: string }> = {};
+    for (const t of (ib.j?.message_templates ?? [])) {
+      if (String(t?.status ?? "").toUpperCase() !== "APPROVED") continue;
+      const body = (t?.components ?? []).find((c: any) => c?.type === "BODY")?.text ?? "";
+      synced[String(t.name)] = { namespace: String(t.namespace ?? ""), body, category: String(t.category ?? "UTILITY"), language: String(t.language ?? "he") };
+    }
+
+    for (const n of rows) {
+      const last4 = String(n.phone).replace(/\D+/g, "").slice(-4);
+      const mark = (patch: Record<string, unknown>) => db.from("ticket_notices").update(patch).eq("id", n.id);
+      if (TEST_PREFIXES.some((p) => String(n.phone).startsWith(p))) {
+        await mark({ status: "skipped", error: "test_number" });
+        out.skipped++;
+        continue;
+      }
+      const t = synced[String(n.template)];
+      if (!t) {
+        await mark({ error: "template_not_synced" });
+        out.waiting++;
+        continue;
+      }
+      const params: Record<string, string> = n.params ?? {};
+      const content = t.body.replace(/\{\{(\d+)\}\}/g, (_m, k) => params[k] ?? "");
+      try {
+        const conv = await chatwootConversationFor(admin, String(n.phone), "");
+        if (!conv.ok) {
+          await mark({ status: "failed", error: conv.reason, attempts: n.attempts + 1 });
+          out.failed++;
+          continue;
+        }
+        const m = await cw(bot, "POST", `/conversations/${conv.convId}/messages`, {
+          content, message_type: "outgoing", private: false,
+          template_params: { name: n.template, category: t.category, language: t.language,
+            namespace: t.namespace, processed_params: params },
+        });
+        const msgId = m.j?.id ?? null;
+        if (m.status >= 300 || !msgId) {
+          await mark({ status: "failed", error: "post_refused_" + m.status, attempts: n.attempts + 1 });
+          out.failed++;
+          continue;
+        }
+        await new Promise((r) => setTimeout(r, 1500));
+        const back = await cw(admin, "GET", `/conversations/${conv.convId}/messages`);
+        const mine = (back.j?.payload ?? []).find((x: any) => x?.id === msgId);
+        if (String(mine?.status ?? "") === "failed") {
+          const why = String(mine?.content_attributes?.external_error ?? "meta_failed").slice(0, 200);
+          await mark({ status: "failed", error: why, attempts: n.attempts + 1, conversation_id: conv.convId });
+          console.error("ticket notice failed", conv.convId, last4, why.slice(0, 80));
+          out.failed++;
+          continue;
+        }
+        await mark({ status: "sent", error: null, attempts: n.attempts + 1, conversation_id: conv.convId, sent_at: new Date().toISOString() });
+        console.log("ticket notice sent", conv.convId, last4);
+        out.sent++;
+      } catch (e) {
+        await mark({ status: "failed", error: String(e).slice(0, 200), attempts: n.attempts + 1 });
+        out.failed++;
+      }
+    }
+    return out;
   },
 
   /**

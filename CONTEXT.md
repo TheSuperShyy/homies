@@ -2281,6 +2281,16 @@ falls back to the raw sender number; `get_balance` and `reported_by_phone`
 still do not. When something "works for everyone" in tests, ask whether
 everyone had a 05 number.
 
+**Outside Meta's 24-hour window a message is a template or nothing (22
+Sep).** Every "just send them a WhatsApp" idea -- the done message, the
+payment link after a call -- runs into the same wall: free text is refused
+once the resident has been quiet for a day, and a template has to be
+approved by Meta days before it is needed. So the fixed-message rule has a
+principled exception, and the shape that respects both is: the template's
+text lives in one file the owner has read, the model writes nothing of it,
+and the outbox row is the record while the cron is the retry -- a database
+trigger that talks to Meta would hang the transaction whenever Meta is slow.
+
 **Which token posts the message decides what the other bot does with it (20
 Sep).** Chatwoot's WhatsApp workflow reads every message on the inbox: an
 outgoing one from a `user` is a human takeover (the bot goes quiet for that
