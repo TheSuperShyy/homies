@@ -109,6 +109,10 @@ member ManyChat no longer has; the resident never gets a reference number;
 and every unanswered question closes the chat silently (the red lines).
 The bot pushes people to the OXS app three times and never touches OXS.
 Still not seen: the other three flows' content and the timeout length.
+Owner: *"i want to know the sub branches inside those main branches"* →
+answered as one tree per door; *"save that when i ask it again"* → the
+trees now live in the doc as "Door by door — the sub-branches" (they
+replaced the shorter map), with a memory note to answer with that section.
 
 ### Both voice agents greet by the hour: בוקר טוב / צהריים טובים / ערב טוב
 

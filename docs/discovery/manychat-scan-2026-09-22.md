@@ -81,44 +81,110 @@ button.
 
 ## `WhatsApp Default Reply`, as the editor shows it
 
-### The map
+### Door by door — the sub-branches
+
+Every question and every button, and where each one lands. FORM is the same
+four questions wherever it appears; OPEN / CLOSED are ManyChat inbox states;
+"team member" is a live assignee, "Unknown user" is a team member ManyChat
+no longer has.
+
+**Start**
 
 ```
 message arrives (no open flow)
-  → save phone into טלפון, assign a team member
+  → save the phone into טלפון, assign a team member
   → MENU  "היי! איזה כיף שפניתם אלינו! לפניכם נתב שיחות 🔀, איך נוכל לעזור?"
-          [לחצו כאן להמשך] → six rows
-
-  💰 תשלום ועד בית/גביה ─ FORM ─ "paid in the app?" ─┬─ yes but help → "passed to a rep" → OPEN, team member
-                                                     ├─ no → app link, "still need help?" ─┬─ yes → same
-                                                     │                                     └─ no → "closed 🔒" → CLOSED
-                                                     └─ back to menu → MENU
-  📋 הנהלת חשבונות ──── FORM ─ "write what you need, a rep will attend" → OPEN, team member
-  🙋 קריאת שירות ────── FORM ─ "opened in the app?" ─┬─ yes → "it's being handled; more help?" → no: CLOSED / yes: MENU
-                                                     ├─ no → "general or elevator?"
-                                                     │     ├─ general → describe → photo? → (photo) → MAKE hook khz… → CLOSED
-                                                     │     │                                → "thanks, use the OXS app for live updates"
-                                                     │     └─ elevator → "contacted the elevator company?"
-                                                     │           ├─ yes → "if it repeats, write the details" → CLOSED
-                                                     │           └─ no → which company? → describe → MAKE hook ve6… → "we'll pass it on in office hours"
-                                                     └─ back to menu → MENU
-  🤝 הצעת מחיר ───────── (no form) MAKE hook mgv… → intro + address / floors / flats (hook after each) → "a rep will call" → Unknown user
-  👷 אב הבית ─────────── FORM ─ describe → OPEN, Unknown user → "the house manager will contact you; urgent: call the office" [open a service call]
-  📱 מעבר לנציג ──────── FORM ─ "write what you need, a rep will attend" → OPEN, team member
-
-  any question left unanswered ──────────────────────────────────────────────→ CLOSED   (every red line)
+          [לחצו כאן להמשך] → six rows: תשלום ועד בית/גביה 💰 · הנהלת חשבונות 📋 · קריאת שירות 🙋 · הצעת מחיר 🤝 · אב הבית 👷 · מעבר לנציג 📱
 ```
 
-FORM = the same four questions on five of the six doors (five copies of one
-block): *"על מנת שנוכל לטפל בפנייתכם כראוי - ענו בבקשה על השאלות הבאות"* →
-`מהו שמכם המלא?` → `מהי הכתובת ממנה אתם פונים?` → `באיזו קומה אתם גרים?` →
-`באיזו דירה אתם גרים?`. (The service-call copy opens with *"…לפתוח את
-הקריאה כראוי"*.) OPEN / CLOSED are ManyChat inbox states; "team member" is
-a live assignee, "Unknown user" is not.
+**The shared form (on doors 1, 2, 3, 5, 6)**
 
-Which of the two free-text doors (accounting, rep) is which copy of the form
-is the one thing the canvas does not settle — they end at the same step, so
-it does not matter to the resident.
+```
+"על מנת שנוכל לטפל בפנייתכם כראוי - ענו בבקשה על השאלות הבאות"
+  1. מהו שמכם המלא?
+  2. מהי הכתובת ממנה אתם פונים?
+  3. באיזו קומה אתם גרים?
+  4. באיזו דירה אתם גרים?
+  any question not answered in time → chat CLOSED, no message
+```
+
+**Door 1 · תשלום ועד בית/גביה 💰**
+
+```
+FORM
+└─ "האם ניסית לשלם באפליקציה? 📱 זה ממש נוח ומבטיחים!"
+   ├─ [כן, אבל אשמח לעזרה] → "תודה, פנייתך הועברה לנציג ותטופל בהקדם ✅" → chat OPEN, assigned to a team member
+   ├─ [לא] → "ממליצים לכם בחום לנסות את אפליקציית שירות הלקוחות שלנו בכתובת: https://mc.ht/s/XXXXXX ולשלם דרכה בכרטיס אשראי. האם בכל זאת תצטרכו עזרה?"
+   │    ├─ [כן, אשמח לעזרה] → same as above → OPEN, team member
+   │    └─ [לא תודה] → "תודה, פנייתך נסגרה 🔒" → CLOSED
+   └─ [בחזרה לתפריט הראשי] → MENU
+```
+
+**Door 2 · הנהלת חשבונות 📋 and Door 6 · מעבר לנציג 📱 (identical)**
+
+```
+FORM
+└─ "אנא כתבו לנו כיצד נוכל לעזור 😊, נציג מייד יפנה ויעמוד לרשותכם"  (waits for text)
+   ├─ answered → chat OPEN, assigned to a team member   (the text stays in ManyChat; nothing is sent to Make)
+   └─ no answer → CLOSED
+```
+
+**Door 3 · קריאת שירות 🙋**
+
+```
+FORM
+└─ "האם פתחת קריאה באפליקציה?"
+   ├─ [כן] → "תודה! קיבלנו אותה והיא בטיפול 🛠️ נעדכן בהודעה חוזרת בנוגע לסטטוס הקריאה. האם יש לך צורך בעזרה נוספת?"
+   │    ├─ [לא] → CLOSED          (nothing is filed; the bot takes their word)
+   │    └─ [כן] → MENU
+   ├─ [לא] → "האם קריאתך הינה קריאה כללית או שהיא קשורה למעלית? 🏢"
+   │    ├─ [קריאה כללית]
+   │    │    └─ "על מה תרצו לדווח? ✍️"  (text → סיכום דיווח אחרון)
+   │    │       └─ "תודה, האם יש גם תמונה שיכולה לעזור לנו להבין? 📸"
+   │    │          ├─ [יש לי תמונה לצרף!] → "אנא צרפו מטה את התמונה לתיאור הבעיה 👇"  (waits for an image → תמונה)
+   │    │          │     ├─ image sent → Make hook khz… → Monday item with the photo → CLOSED
+   │    │          │     │               → "תודה רבה על פנייתך! קיבלנו אותה ונטפל בה בהקדם! רצוי לפתוח קריאות באפליקציית OXS 📱 כדי לקבל עדכונים בלייב! תודה"
+   │    │          │     └─ no image → CLOSED
+   │    │          └─ [אין לי תמונה לצרף] → Make hook khz… → Monday item → CLOSED → same thank-you
+   │    └─ [הקריאה קשורה למעלית]
+   │         └─ "האם יצרת קשר עם חברת המעליות? 📞"
+   │            ├─ [כן] → "אם כך, רק במידה ויש בעיה חוזרת שלא מקבלת מענה ראוי 🔁, אנא כתבו לנו במפורט ואנו ניצור עימם קשר"  (text) → CLOSED
+   │            │         (sent nowhere; it sits in the closed chat)
+   │            └─ [לא] → "מי חברת המעליות בבניין?"  (text → חברת המעליות בבניין)
+   │                  └─ "אוקי, אנחנו נעשה זאת עבורך באהבה ❤️ … תיאור התקלה … תקלה דחופה? התקשרו 📞 077-6687949"  (text → דיווח למעלית)
+   │                     └─ Make hook ve6… → email to the office inbox
+   │                        → "תודה, פנייתך התקבלה ✅ אנו נעביר אותה לחברת המעליות בשעות פעילות המשרד"
+   └─ [בחזרה לתפריט הראשי] → MENU
+the resident never gets a ticket number on this door
+```
+
+**Door 4 · הצעת מחיר 🤝 (the only door without the form)**
+
+```
+Make hook mgv… fires immediately (finds or creates the lead by phone on board 1270706127)
+└─ intro: "היי! תודה שפניתם אלינו, אנחנו הומיז ניהול ואחזקת מבנים, משרדינו ממוקמים ברחוב בצלאל 1 ברמת גן. נשמח לדבר איתכם על מנת להבין את צרכי הבניין ולפעול בהתאם :) בינתיים ענו לנו בבקשה על השאלות הבאות ⏰"
+   └─ "מהי כתובת הבניין?"        → Make hook again
+      └─ "כמה קומות יש בבניין?"   → Make hook again
+         └─ "כמה דיירים יש בבניין?" → Make hook again
+            └─ "מעולה! תודה, נציג יצור אתכם קשר בהקדם ונשמח לעזור גם לרשותכם 📞 ניתן להתקשר אלינו בטלפון: 077-6687949" → assigned to "Unknown user"
+any unanswered question → CLOSED
+```
+
+**Door 5 · אב הבית 👷**
+
+```
+FORM
+└─ "אנא תאר פנייתך על מנת שנוכל להעביר אותה לאב הבית האחראי 👷"  (text → קריאה לאב הבית)
+   ├─ answered → chat OPEN, assigned to "Unknown user"
+   │    └─ "מעולה! תודה, אב הבית האחראי ייצור קשר בהקדם. לפניות דחופות אנא התקשרו למשרד 📞 077-6687949 ניתן גם לפתוח קריאת שירות באפליקציית OKS או דרך הכפתור מטה"
+   │         ├─ [לפתיחת קריאת שירות] → Door 3
+   │         └─ no tap → OPEN, "Unknown user" again
+   └─ no answer → CLOSED
+nothing on this door reaches Make or Monday
+```
+
+Doors 2 and 6 end at the same step, so the canvas cannot tell which copy of
+the form is which; it makes no difference to the resident.
 
 ### The doors, verbatim
 
