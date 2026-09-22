@@ -55,8 +55,20 @@ async function assistantConfig(id: string): Promise<CacheEntry> {
   return entry;
 }
 
+// The opening line greets by the hour since 22 Sep: a Liquid `{% %}` block
+// that Vapi renders when a call starts. This route never goes through Vapi,
+// so it renders the block itself with the same hours, from Jerusalem time.
+const GREETING_BLOCK = /\{%-?\s*assign\s+h\s[\s\S]*?\{%-?\s*endif\s*-?%\}/g;
+function greetingHe(): string {
+  const h = Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hour12: false, timeZone: 'Asia/Jerusalem' })
+    .format(new Date())) % 24;
+  return h < 5 ? 'שלום' : h < 12 ? 'בוקר טוב' : h < 17 ? 'צהריים טובים' : 'ערב טוב';
+}
+
 function resolve(text: string, vars: Record<string, string>): string {
-  return text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? '');
+  return text
+    .replace(GREETING_BLOCK, greetingHe())
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? '');
 }
 
 /** The Edge Function answers exactly what it answers Vapi mid-call. */

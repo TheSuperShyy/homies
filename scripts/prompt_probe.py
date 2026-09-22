@@ -35,6 +35,7 @@ the end of every run.
 """
 
 import argparse
+import datetime
 import io
 import json
 import os
@@ -61,7 +62,8 @@ TARGETS = {
         # copy that is not kept in step automatically. Change one, change both
         # — a probe that opens with a line the agent no longer says is scoring
         # the wrong conversation.
-        "first": "שלום, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?",
+        "first": ('{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}'
+                  ", מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?"),
         "vars": {},
         "tools": "INTAKE_TOOLS",
     },
@@ -333,7 +335,39 @@ def repo_tools(target):
 def resolve(prompt, variables):
     for k, v in variables.items():
         prompt = prompt.replace("{{%s}}" % k, v)
-    return prompt
+    return render_greeting(prompt)
+
+
+# The opening line greets by the hour since 22 Sep: a Liquid `{% %}` block that
+# Vapi renders when the call starts. This harness never goes through Vapi, so
+# it renders the block itself, with the same hours, from Jerusalem time. Left
+# unrendered the model would be handed `{% assign h = ... %}` as its own first
+# words, and every probe would score a call that never happens.
+GREETING_BLOCK = re.compile(r"\{%-?\s*assign\s+h\s.*?\{%-?\s*endif\s*-?%\}", re.S)
+
+
+def greeting_he(hour):
+    if hour < 5:
+        return "שלום"
+    if hour < 12:
+        return "בוקר טוב"
+    if hour < 17:
+        return "צהריים טובים"
+    return "ערב טוב"
+
+
+def jerusalem_hour():
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.datetime.now(ZoneInfo("Asia/Jerusalem")).hour
+    except Exception:  # no tz database on this machine: Israel is UTC+2/+3
+        return (datetime.datetime.utcnow().hour + 3) % 24
+
+
+def render_greeting(text, hour=None):
+    if "{%" not in text:
+        return text
+    return GREETING_BLOCK.sub(greeting_he(jerusalem_hour() if hour is None else hour), text)
 
 
 # What the tools answer. Fixed, so both halves of a pair get the same facts back

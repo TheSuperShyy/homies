@@ -78,11 +78,12 @@ still one line.
 through `vapi_sync.py`'s own extractors -- `צהריים טובים, מדבר מיכאל…` and
 `צהריים טובים, יוסי? מדבר מיכאל…` at 12:07 Jerusalem; the probe renderer
 gives the right word at 2, 5, 11, 12, 16, 17, 23; `tsc` clean; the intake
-fence and the probe's copy of it are byte-equal. **Not yet live:** the
-sandbox refused `vapi_sync.py inbound --apply` and `debt --apply` (production
-write); waits for the owner's "run it". Order when it runs: inbound sync,
-then `vapi_set_voice.py --apply` (the inbound sync resets the voice to
-Eyal), then debt sync; read both first messages back. The ear test is the
+fence and the probe's copy of it are byte-equal. **Live** (sandbox refused the
+production write twice; owner: "run it"): inbound sync, then
+`vapi_set_voice.py --apply` (the inbound sync resets the voice to Eyal; put
+Ido back, volume 2, 27 replacements), then debt sync. Read back: both
+assistants carry the Liquid line, both on `ba765d50` sonic-3.5, prompts
+3,971 / 3,878 chars. The ear test is the
 owner's next web call from `/voice`. A first message that Vapi does not
 render would be read aloud as `{% assign h …` -- that is the failure to
 listen for on the first call, and the fix would be the dashboard passing a
