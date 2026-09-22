@@ -326,6 +326,16 @@ const MEDIA_MIMES: Record<string, string> = {
 const CHATWOOT = MEDIA_HOSTS[0].replace(/\/$/, "") + "/api/v1/accounts/2";
 const WA_INBOX_ID = 1; // the WhatsApp Cloud inbox; the Voice inbox is 2
 const TEST_PREFIXES = ["+972599", "+9725000000"];
+
+// Why a payment link did not reach WhatsApp, in the words the office reads on
+// the ticket (22 Sep). A reason not listed here is written as it came.
+const LINK_MISS_HE: Record<string, string> = {
+  outside_window: "וואטסאפ לא מאפשר הודעה חופשית כי הדייר לא כתב לנו ב-24 השעות האחרונות",
+  no_contact: "אין איש קשר בוואטסאפ למספר שרשום אצלנו",
+  no_conversation: "לא נפתחה שיחת וואטסאפ למספר שרשום אצלנו",
+  unavailable: "שליחת וואטסאפ לא מוגדרת במערכת",
+  no_link: "OXS לא החזיר קישור לתשלום",
+};
 const MONTHS_HE = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי",
   "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
 
@@ -1502,8 +1512,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
   async send_payment_link(args, ctx) {
     const t = targets(ctx, args);
     if (!t.ok) return { ok: false, error: t.error };
-    const OFFICE = "The link was not sent. Say the office will send it and give the office number; do not say why.";
-    const miss = (reason: string) => ({ ok: true, sent: false, reason, note: OFFICE });
+    const OFFICE = "The link was not sent. Say the office will send it, give the office number and, when the "
+      + "result carries one, the request number (reference); do not say why it was not sent.";
+    const miss = (reason: string, extra: Record<string, unknown> = {}) =>
+      ({ ok: true, sent: false, reason, note: OFFICE, ...extra });
 
     const units = [...new Set(t.charges.map((c) => String(c.unit ?? "").trim()).filter(Boolean))];
     if (units.length > 1) {
@@ -1547,11 +1559,50 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (error) console.error("payment link row failed", error.message);
     };
 
+    // 22 Sep, owner: "we need to open a ticket as well but if it sent to the
+    // whatsapp make the ticket status resolved". The resident said yes to a
+    // link, so the office gets a request either way: RESOLVED when the link
+    // reached WhatsApp -- the record of what was sent -- and OPEN when it did
+    // not, with the reason in Hebrew: the job of sending it by hand. Until
+    // this existed, "the office will send it" was a sentence nobody heard;
+    // the only trace was a payment_links row marked outside_window (his own
+    // call, 22 Sep 14:27). Voice-opened, so migration 036's done-template
+    // trigger never fires on it. A failed insert is logged, not thrown: by
+    // then the link itself has already gone or not, and the resident is on
+    // the line. Not filed for test numbers or when the agent has to ask
+    // again (several apartments, no resident) -- nothing was agreed yet.
+    const fileTicket = async (sent: boolean, why: string | null): Promise<{ reference?: string }> => {
+      const what = `${monthsHe(periods).join(", ") || "ועד הבית"}, ${amount} ₪, דירה ${unit || "?"}`;
+      const description = sent
+        ? `קישור לתשלום ועד הבית נשלח לדייר בוואטסאפ במהלך השיחה (${what}).`
+        : `הדייר הסכים בשיחה לקבל קישור לתשלום ועד הבית (${what}) והקישור לא נשלח: ` +
+          `${LINK_MISS_HE[why ?? ""] ?? (why || "סיבה לא ידועה")}. יש לשלוח לו את הקישור.`;
+      const { data: t, error } = await db.from("requests").insert({
+        resident_id: r.id,
+        interaction_id: iid,
+        type: "payment",
+        description,
+        building: r.building ?? null,
+        unit: unit || null,
+        reported_unit: unit || null,
+        reported_by_phone: String(r.phone),
+        urgency: "normal",
+        opened_via: channel(ctx),
+        status: sent ? "resolved" : "open",
+      }).select("reference").single();
+      if (error || !t?.reference) {
+        console.error("payment link ticket failed", error?.message ?? "no reference", last4);
+        return {};
+      }
+      console.log("payment link ticket", sent ? "resolved" : "open", t.reference, last4);
+      return { reference: String(t.reference) };
+    };
+
     const got = await oxsLinkFor(r, unit);
     if (!got.ok) {
       row.note = got.reason;
       await record();
-      return miss(got.reason);
+      return withSpoken(miss(got.reason, await fileTicket(false, got.reason)));
     }
     row.apartment_id = got.apartmentId;
     row.payer_id = got.payerId;
@@ -1570,8 +1621,11 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     row.status = d.sent ? "sent" : "requested";
     row.note = d.sent ? "whatsapp" : d.reason;
     await record();
-    if (!d.sent) return miss(d.reason);
-    return { ok: true, sent: true, to_last4: last4 };
+    const filed = await fileTicket(d.sent, d.sent ? null : d.reason);
+    if (!d.sent) return withSpoken(miss(d.reason, filed));
+    // The reference is the office's record of a link that went; the agent is
+    // not asked to read it out, so no spoken form is attached here.
+    return { ok: true, sent: true, to_last4: last4, ...filed };
   },
 
   /**

@@ -55,6 +55,36 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### A request behind every agreed payment link: resolved when it went, open when it did not. Function v94.
+
+Owner, on the 14:27 finding: *"we need to open a ticket as well but if it
+sent to the whatsapp make the ticket status resolved."* Built into
+`send_payment_link` (voice): after the delivery attempt it inserts a
+`requests` row of type `payment` for the resident -- **resolved** with
+"קישור לתשלום ועד הבית נשלח לדייר בוואטסאפ במהלך השיחה (יולי 2026, 450 ₪,
+דירה 1)" when the WhatsApp message went, **open** with "הדייר הסכים … והקישור
+לא נשלח: <reason in Hebrew>. יש לשלוח לו את הקישור" when it did not
+(`LINK_MISS_HE` glosses outside_window, no_contact, no_conversation,
+unavailable, no_link). Voice-opened, so the done-template trigger never
+fires on it; not filed for test numbers or when the agent still has to ask
+(several apartments, no resident); a failed insert is logged, not thrown.
+The result carries `reference` in both cases and `reference_spoken` only
+when the link did not go; the tool description and the prompt clause tell
+the agent to give that number with the office number, and to say nothing
+about it when the link went. `vapi_tools.py`, `prompt.md` (clause + dated
+note), `vapi_sync.py debt --apply` (3,943 chars, 7 tools). Deployed and
+pushed without a sandbox refusal this time.
+
+**Proven:** `check_knowledge.py` 29/29, `check_tools.py` green; a probe
+envelope (`probe-linkticket-*`, the clix context) against v94 → 9.1 s,
+`sent:true`, **255-1320-26 resolved**, type payment, building/unit/phone
+filled, `payment_links` row sent/whatsapp, WhatsApp message 1647
+delivered; the probe's interaction row deleted afterwards (FKs set null,
+the ticket and link row stay). The open path shares the code and was not
+forced. Also seen: the owner's 14:46 call delivered its link (message
+1646, read) -- his "hi" at 14:29 had reopened Meta's window -- before v94,
+so it has no ticket.
+
 ### The owner's debt call at 14:27: no link, and nobody told the office
 
 Owner: *"check the latest call i had with the debt collection agent it did

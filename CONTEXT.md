@@ -3159,7 +3159,10 @@ send it" -- was written as a graceful sentence and shipped without asking
 who hears it. Nobody does: the only trace is a row on the Links tab. Every
 time the model is told to say that someone will do something, the same
 turn has to create the thing that someone will find -- a ticket, a note,
-an outbox row -- or the sentence is a lie the system tells politely.
+an outbox row -- or the sentence is a lie the system tells politely. Fixed
+the same afternoon (v94): every agreed link files a request, resolved when
+it went, open with the reason when it did not, and the agent gives that
+number with the office number.
 
 **Saved explanations are re-shown, not re-derived (22 Sep).** When the owner
 says "save that when I ask it again" about an explanation he finally

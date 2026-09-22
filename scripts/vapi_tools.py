@@ -260,7 +260,12 @@ DEBT_TOOLS = [
         "(sent true or false). When it went, tell them in your own words where it "
         "went -- WhatsApp, the number we have -- and ask them to complete it; when it "
         "did not, say the office will send it and give the office number, without "
-        "saying why. Never read a link aloud: the result never contains one.",
+        "saying why. Never read a link aloud: the result never contains one. Either "
+        "way a request is filed for the office: when the link went it is filed as "
+        "done and you say nothing about it; when it did not, it stays open and the "
+        "result carries its number (reference, and reference_spoken for saying it) "
+        "-- give the resident that number with the office number, so they can ask "
+        "about it.",
         # `unit` and nothing else. It had an optional `note` and on 5 Aug the
         # model SPOKE IT: the resident heard "Note," and then, as a separate
         # utterance, "resident asked how to proceed and was sent the payment link
