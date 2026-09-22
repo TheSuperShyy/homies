@@ -55,6 +55,13 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### Rule: tests are run with Claude, not on OpenRouter
+
+Owner, after the cost discussion: *"we need to stop spending openrouter keys
+when we test use claude save that."* Recorded as a standing decision in
+CONTEXT, a line in HANDOVER and a memory. No script was changed; the rule
+is how testing is done from now on.
+
 ### Which function spent the $90: the WhatsApp bot
 
 Owner: *"what is the function that cost it 90 usd."* The $90.70 is the

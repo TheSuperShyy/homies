@@ -25,6 +25,17 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**Testing never spends OpenRouter credit; it is done with Claude (22 Sep).**
+Owner: *"we need to stop spending openrouter keys when we test use claude."*
+The account pays for the live WhatsApp assistant, and ten weeks of testing on
+an uncapped key took it from $115 to $0.16. So `prompt_probe.py`,
+`wa_prompt_chat.py`, `prompt_chat.py`, live-bot probes (`probe_whatsapp.py`,
+`check_whatsapp.py`, replays) and the dashboard typed chat are not used to
+test. A prompt change is checked by Claude playing the resident and the model
+from the prompt and tool definitions; that checks logic and wording, not the
+production model's exact behaviour, and the owner's own message or call is the
+final proof. A live check that spends OpenRouter needs the owner's go each time.
+
 **The dashboard's look comes from the supplied design system, not from taste.**
 `Re-Design/` is the delivered source and `dashboard/design-system/` is the
 vendored copy. Its token files stay byte-identical to the source; corrections
