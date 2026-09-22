@@ -101,7 +101,7 @@ export default async function Voice() {
             tabIntake: t('voice.tabIntake'), tabDebt: t('voice.tabDebt'),
             who: t('voice.who'), source: sample ? t('voice.sample') : t('voice.source'),
             chatPlaceholder: t('voice.chatPlaceholder'), send: t('voice.send'),
-            chatFailed: t('voice.chatFailed'),
+            chatIdle: t('voice.chatIdle'),
             idle: t('voice.idle'), connecting: t('voice.connecting'),
             live: t('voice.live'), start: t('voice.start'),
             hangup: t('voice.hangup'), mute: t('voice.mute'),

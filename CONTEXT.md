@@ -30,8 +30,8 @@ Owner: *"we need to stop spending openrouter keys when we test use claude."*
 The account pays for the live WhatsApp assistant, and ten weeks of testing on
 an uncapped key took it from $115 to $0.16. So `prompt_probe.py`,
 `wa_prompt_chat.py`, `prompt_chat.py`, live-bot probes (`probe_whatsapp.py`,
-`check_whatsapp.py`, replays) and the dashboard typed chat are not used to
-test. A prompt change is checked by Claude playing the resident and the model
+`check_whatsapp.py`, replays) are not used to test (the dashboard typed chat
+no longer touches OpenRouter at all since the same day). A prompt change is checked by Claude playing the resident and the model
 from the prompt and tool definitions; that checks logic and wording, not the
 production model's exact behaviour, and the owner's own message or call is the
 final proof. A live check that spends OpenRouter needs the owner's go each time.
@@ -2203,9 +2203,21 @@ state" is worse than one stale one.
 route. `vercel link` writes `.vercel/` AND appends `.env*` to the app
 .gitignore - trim that to `.vercel`, or the tracked .env.example goes dark.
 
+**Use the platform's own mechanism before building a parallel one (22 Sep).**
+The Voice page's chat box grew a second road on 2 Sep: with no call running it
+re-ran the voice assistant ourselves, GPT-4.1 over OpenRouter, because Vapi's
+text-chat API wanted a card. It worked, and it was a second brain on a second
+bill that drifted from the real one (the debt agent moved to another model on
+Vapi; the route did not). The owner pointed at another project of theirs that
+does only the platform's thing -- Vapi's `add-message` into the live call,
+box disabled otherwise -- and said *"use this kind of engineering."* The route
+is deleted. When the platform has a feature for the job, use it, and let a
+missing capability stay missing rather than rebuilding it beside the platform.
+
 **Vapi's hosted Chat API is closed to this org: 402 `payment_method_missing`,
 checked 2 Sep.** Pay-as-you-go orgs need a card on file for text chat, and this
-one has none. The typed chat on `/voice` therefore runs the loop itself —
+one has none. (Superseded 22 Sep: the route is deleted and typing works only inside a live
+call -- see the paragraph above.) The typed chat on `/voice` therefore ran the loop itself —
 `app/api/voice-chat/route.ts`: live config off the Vapi API, the assistants'
 own model over OpenRouter, tool calls to the real Edge Function. If a card ever
 lands on the org, that route could shrink to a proxy; until then it IS the chat,

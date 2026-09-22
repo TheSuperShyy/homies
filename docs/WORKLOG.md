@@ -55,6 +55,26 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### The Voice page's chat box works only inside a live call; the OpenRouter chat route is gone
+
+Owner, comparing with another project of theirs where the box is greyed out
+until a call runs and typed text goes into the call: *"use this kind of
+engineering."* Homies' box had two roads since 2 Sep: mid-call it already
+used Vapi's `add-message` (the agent hears the text as a user turn and
+answers out loud, billed on the call); with no call it went to
+`app/api/voice-chat/route.ts`, which re-ran the assistant as GPT-4.1 over
+OpenRouter -- the dashboard's only use of OpenRouter. The second road is
+removed: `send()` only injects into a live call, the input and button are
+disabled until the call is live (placeholder *אפשר לכתוב לסוכן בזמן שיחה* /
+*Start a call to type to the agent*), the route file is deleted, the typing
+indicator and the chat-failed notice went with it (Vapi reports errors
+through the call). `tsc` clean, verification build clean
+(`NEXT_DIST_DIR=.next-verify npx next build`; it also refreshed the stale
+generated types that still pointed at the route). No OpenRouter reference
+left in the dashboard. Reaches Vercel on the next push to `main`; Vercel's
+`OPENROUTER_API_KEY` variable is unused from then on (removal is the owner's
+call).
+
 ### Rule: tests are run with Claude, not on OpenRouter
 
 Owner, after the cost discussion: *"we need to stop spending openrouter keys

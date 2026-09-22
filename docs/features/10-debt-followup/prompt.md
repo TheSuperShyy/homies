@@ -90,8 +90,8 @@ is a Liquid template that Vapi renders when the call starts, from Jerusalem
 time (before 05:00 שלום, 05–11 בוקר טוב, 12–16 צהריים טובים, 17:00 on ערב
 טוב), so the dashboard passes nothing new. This line sits inside the system
 prompt section as well, and Vapi renders it there too, so the model reads the
-same words the voice said. `prompt_probe.py` and the typed chat render the
-block themselves. Still one fixed line; only its first word moves.
+same words the voice said. `prompt_probe.py` renders the
+block itself. Still one fixed line; only its first word moves.
 
 ### A request behind the link (22 Sep)
 

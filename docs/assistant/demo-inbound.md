@@ -203,8 +203,9 @@ call from the dashboard. Before 05:00 it says שלום (לילה טוב is a goo
 not a greeting), 05–11 בוקר טוב, 12–16 צהריים טובים, from 17:00 ערב טוב.
 What the voice says is the rendered sentence, e.g. `צהריים טובים, מדבר מיכאל
 מהצוות של הומיז. איך אפשר לעזור?`. Two readers do not go through Vapi and
-render the block themselves with the same hours: the typed chat
-(`dashboard/app/api/voice-chat/route.ts`) and `scripts/prompt_probe.py`.
+render the block themselves with the same hours: `scripts/prompt_probe.py`,
+and until 22 Sep the dashboard's no-call typed chat, which has since been
+removed (typing now goes into the live call, where Vapi renders the line).
 The `.strip()`-and-regex readers in `vapi_sync.py` are unaffected because the
 whole line is still one line.
 
