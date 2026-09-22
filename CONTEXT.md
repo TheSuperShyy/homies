@@ -2481,7 +2481,11 @@ fields, the Make hooks and what the handset saw on 10 Sep
 from the editor, which the owner can open. Second lesson of the same kind: a
 bot builder's API exposes the bot's *nouns*, never its *verbs* — reconstruct
 the verbs from the systems it wrote to and from what a handset saw, and say
-on every branch which of the two it rests on.
+on every branch which of the two it rests on. When the editor's canvas
+arrived a few hours later the reconstruction held on where things go and
+was wrong on where things are *asked*: the field list said floors and flats
+were collected, and they are -- from prospects asking for a quote, not from
+residents. A field list tells you what is asked, never of whom or when.
 
 **What the deploy reads by path, and therefore must not move (17 Sep).**
 `docs/features/11-whatsapp-bot/prompt.md` and `docs/assistant/demo-inbound.md`

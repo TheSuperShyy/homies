@@ -94,6 +94,22 @@ house-manager call, photo, photos; tag `טסטים`; entry link `WhatsApp URL
 the office inbox naming the elevator company, not the elevator company
 itself. Nothing was touched; the overview run twice is byte-identical.
 
+**Then the editor arrived.** The owner opened `wa_default` and sent the
+whole canvas ("simplify it i dont understand"); read tile by tile at full
+resolution and written into the same doc, replacing the reconstruction.
+What it corrected: the four-question form (name, address, floor, flat) sits
+on five of the six doors and is asked every time; floors / number of flats
+are asked only in the **quote** door, which skips the form and fires its
+Make hook after every answer; payments and service calls open with a "did
+you already do it in the OXS app?" gate whose yes files nothing; the
+elevator door asks "did you contact the elevator company?" and a yes is
+written and closed with no hook; the house-manager door has no hook at all
+and, like the quote door, assigns the chat to **"Unknown user"** -- a team
+member ManyChat no longer has; the resident never gets a reference number;
+and every unanswered question closes the chat silently (the red lines).
+The bot pushes people to the OXS app three times and never touches OXS.
+Still not seen: the other three flows' content and the timeout length.
+
 ### Both voice agents greet by the hour: בוקר טוב / צהריים טובים / ערב טוב
 
 Owner: *"we need to make sure the voice agent both start the conversation
