@@ -55,6 +55,33 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### The owner's 15:05 intake call: a leak, "herzl 112" in Latin letters, no ticket
+
+Owner: *"check the recent call i have i reported a leak in my apartment."*
+Call `01a0c901` (intake, 176 s, caller hung up). He spoke English: *there is
+a leak … its in my bathroom … just do something … herzl 112*. The agent did
+the 16 Sep rule right -- a bathroom leak is the resident's, offered a check
+in case it comes from the wall, ceiling or the flat above -- and on "just do
+something" opened one: `open_request(type plumbing, building "herzl 112",
+description נזילה בחדר האמבטיה)` → `opened:false, street_unknown`. The
+agent said it cannot find a building at הרצל 112, maybe a typo, maybe not
+ours; he hung up. Nothing filed; the Calls row and summary are correct.
+
+**Cause.** הרצל 112, תל אביב - יפו is a managed, active building. The
+matcher (`matchBuilding`) knows streets in Hebrew only (`street_norm`; no
+Latin-letter street exists in the table), and the intake agent's
+`open_request` tool still describes `building` as *"Building name or street
+address, as the caller gave it"* -- so the model passed the transcript's
+Latin letters. **The same bug was found and fixed on the chat side on 18
+Sep** (a replay sent "Herzl 112", got street_unknown; the chat gloss now
+says *written in Hebrew as the street is written in Israel, whatever
+language the resident wrote in: Herzl 112 is הרצל 112*). The voice tool
+definition was not touched then. Assessment only, nothing changed; the fix
+is the same gloss on `vapi_tools.py`'s `building` (pushed by `vapi_sync.py
+inbound --apply` + `vapi_set_voice.py --apply`), plus a hint in the
+street_unknown result when the string is Latin letters, so a second try
+happens inside the call instead of a hang-up.
+
 ### A request behind every agreed payment link: resolved when it went, open when it did not. Function v94.
 
 Owner, on the 14:27 finding: *"we need to open a ticket as well but if it

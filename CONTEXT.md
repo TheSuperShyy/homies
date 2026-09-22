@@ -3153,6 +3153,16 @@ background. OXS rate limits are **60 requests/minute per key**, and a
 per-building payments call can return ~10,000 records — a full sweep is half
 an hour, not five minutes.
 
+**A fix to one caller of a shared tool is owed to every caller (22 Sep).**
+The building matcher serves chat and voice through two tool definitions.
+On 18 Sep a chat replay sent "Herzl 112", got street_unknown, and the chat
+gloss learned to say the street in Hebrew. Four days later the owner's
+voice call did the identical thing and failed the identical way, because
+`vapi_tools.py` still said "as the caller gave it". When a tool's gloss
+changes for one channel, grep the other channel's definition the same day
+-- the matcher did not change, the callers did, and only one of them was
+told.
+
 **A fallback line is a promise, and a promise needs a work item (22 Sep).**
 The debt agent's answer when the link cannot be sent -- "the office will
 send it" -- was written as a graceful sentence and shipped without asking
