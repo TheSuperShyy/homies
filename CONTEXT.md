@@ -3153,6 +3153,14 @@ background. OXS rate limits are **60 requests/minute per key**, and a
 per-building payments call can return ~10,000 records — a full sweep is half
 an hour, not five minutes.
 
+**Read the record before inferring by elimination (22 Sep).** Asked which
+OpenRouter key the WhatsApp bot runs on, I subtracted balances and told the
+owner the bot was on none of the `.env` keys and cost "a few dollars".
+HANDOVER's credentials table had said since 12 Aug that the n8n credential
+holds `OPENROUTER_API_KEY` -- the key with $90 on it. n8n will not reveal a
+credential's secret, which is exactly why the table exists; an inference
+that contradicts a written record is the one to distrust.
+
 **A fix to one caller of a shared tool is owed to every caller (22 Sep).**
 The building matcher serves chat and voice through two tool definitions.
 On 18 Sep a chat replay sent "Herzl 112", got street_unknown, and the chat

@@ -55,6 +55,19 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### Which function spent the $90: the WhatsApp bot
+
+Owner: *"what is the function that cost it 90 usd."* The $90.70 is the
+lifetime of `OPENROUTER_API_KEY`, and that key is "key 2" -- the secret in
+n8n's `Homies OpenRouter (key 2)` credential since 12 Aug, as HANDOVER's
+credentials table records. So the spender is the bot's `OpenRouter` model
+node (gemini-2.5-flash) in `Homies — WhatsApp bot`, with the typed chat,
+the payment-link line and the probe scripts on the same key. An hour
+earlier I had told the owner the bot's share was "a few dollars", by
+elimination from balances, without reading that table; corrected in
+HANDOVER and to the owner. Per-model figures need a management key or the
+OpenRouter dashboard's Activity page.
+
 ### Voice intake: the rule is for you, not for them; the street in Hebrew. And OpenRouter is at $0.20.
 
 Owner: *"why did the bot insist on making assumptions that it might be the
