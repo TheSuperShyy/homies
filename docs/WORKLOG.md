@@ -55,6 +55,45 @@ gone** — that marker now counts zero.
 
 ## 2026-09-22
 
+### The owner's debt call at 14:27: no link, and nobody told the office
+
+Owner: *"check the latest call i had with the debt collection agent it did
+not create a ticket nor send any links."* Read the call from Vapi
+(`01a0c8de`, 88 s, ended on the closing phrase), the `interactions` and
+`payment_links` rows, and Chatwoot conversation 1.
+
+**The link.** The agent asked, the owner said אוקיי, `send_payment_link` ran,
+OXS returned a real link (payer_id on the row), the Edge Function posted it
+to Chatwoot (message 1643, 11:28 UTC) and **Meta refused it**: *"the
+WhatsApp 24-hour customer service window is closed and no template
+parameters were provided."* The owner's previous message to the bot was
+20 Sep 10:48 UTC, 48 hours earlier. The function read the failure back,
+wrote the row as `requested / outside_window`, answered `sent:false`, and
+the agent said what the note tells it to: the office will send it, here is
+the number. On 20 Sep the same path delivered (message 1642) because he had
+written to the bot three hours before. Known limit since 20 Sep; the fix
+is the payment-link Meta template, same road as `ticket_resolved_he`
+(still PENDING at Meta). He wrote "hi" at 11:29, so the window is open
+again until 23 Sep 11:29 UTC.
+
+**The ticket.** A debt call opens no ticket by design; what it writes is
+the Calls row (`interactions` 96b2820e, disposition completed, Hebrew
+summary, the tool call listed) and the Links row -- both present. Two
+things are wrong anyway: (1) **"the office will send it" has no work item
+behind it** -- no ticket, no team note, only a Links row saying
+outside_window; a promise nobody is told about. (2) The model never called
+`log_call_outcome`; it went from the fallback line straight to the goodbye
+phrase, so the disposition came from the end-of-call report, not the
+agent. **Possible third:** the first line's transcript reads `צהריים
+טובים? מדבר מיכאל…` with no name, where the 06:02 call read `היי קליקס…`.
+Vapi transcribes the bot's own audio, so this is suggestive, not proof:
+the Liquid greeting may be rendered before variableValues are applied to
+`firstMessage` (the system prompt's variables rendered fine -- the agent
+knew the building, month and amount). Listen for the name on the next
+call; if it is missing, the debt line moves to a `greeting` variable set
+by the dashboard (every debt call starts from our code) and Liquid stays
+on the intake line only. Nothing changed; assessment only, as asked.
+
 ### The old ManyChat bot, read from here: nouns from the API, branches reconstructed
 
 Owner: *"use MANYCHAT_API_KEY but make sure it dont edit anything just do a

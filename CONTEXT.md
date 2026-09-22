@@ -3153,6 +3153,14 @@ background. OXS rate limits are **60 requests/minute per key**, and a
 per-building payments call can return ~10,000 records — a full sweep is half
 an hour, not five minutes.
 
+**A fallback line is a promise, and a promise needs a work item (22 Sep).**
+The debt agent's answer when the link cannot be sent -- "the office will
+send it" -- was written as a graceful sentence and shipped without asking
+who hears it. Nobody does: the only trace is a row on the Links tab. Every
+time the model is told to say that someone will do something, the same
+turn has to create the thing that someone will find -- a ticket, a note,
+an outbox row -- or the sentence is a lie the system tells politely.
+
 **Saved explanations are re-shown, not re-derived (22 Sep).** When the owner
 says "save that when I ask it again" about an explanation he finally
 understood, the shape he understood is the deliverable: keep it verbatim in
