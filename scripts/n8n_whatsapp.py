@@ -203,7 +203,17 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 52
+MEMORY_EPOCH = 53
+# 52 -> 53, 23 Sep evening: Michael opens with the hour's greeting himself.
+# Owner, on a 21:51 screenshot reading "אני מיכאל מהומי'ז. ספרו לי בבקשה
+# במה אוכל לעזור לכם.": "make sure michael/the bot always start the
+# conversation with the greetings." At 21:51 that reply should have opened
+# ערב טוב. It did not, and the prompt was the reason -- epoch 52 told the
+# model the greeting belonged to the system and that it must not open a
+# reply with it, which is exactly the sentence the owner is missing. That
+# prohibition is deleted rather than argued with, per the standing rule:
+# delete the competing text before adding a rule. Every live buffer now
+# demonstrates a nameless, greetingless first reply.
 # 51 -> 52, 23 Sep, an hour later: the name leaves the system's sentence.
 # Owner: "no michael from homies -- then when they click the talk with a
 # rep it will then introduce as michael from homies." The greeting greets
@@ -477,7 +487,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "cb3811191a89",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "bf10f2d77813",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

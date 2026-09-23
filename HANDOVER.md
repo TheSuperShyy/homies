@@ -2990,3 +2990,13 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to
   `INTAKE_TOOLS`.~~ **Done 19 Aug**, along with the missing n8n routes. Both
   verified through the live webhook.
+- **Epoch 53 is live (23 Sep evening).** Michael now opens his first message
+  with the hour's greeting himself — the owner's *"always start the conversation
+  with the greetings"*, on a 21:51 screenshot that had none. The prompt's old
+  *"ולא פותח בו תשובה"* prohibition is deleted; the cut-offs in `prompt.md` must
+  stay in step with `Sort`'s `HELLO` ternary. **Owed: handset proof** — probes
+  404 at `Send`, so only a real phone can see it.
+- `scripts/n8n_whatsapp_untemplate.py` refuses: no `Human tap?` node on the live
+  workflow. Stale since paging was dropped 13 Sep, not a regression — but it
+  means that patcher can no longer assert the inject, so the inject's epoch hash
+  has to be trusted by hand until someone re-anchors it.

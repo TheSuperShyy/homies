@@ -9,6 +9,49 @@ conversation that produced it.
 
 ---
 
+## 2026-09-23
+
+### Michael opens with the hour's greeting himself — epoch 53 LIVE
+
+The owner sent a 21:51 screenshot of the bot's own first reply: *"אני מיכאל
+מהומי'ז. ספרו לי בבקשה במה אוכל לעזור לכם."* At 21:51 that should have opened
+**ערב טוב**. His instruction: *"make sure michael/the bot always start the
+conversation with the greetings."*
+
+**The prompt was the cause, not the model.** Epoch 52 told it, in as many
+words, that the greeting belongs to the system and *"אתה לא כותב אותו בעצמך
+ולא פותח בו תשובה"* — do not open a reply with it. The model obeyed. So the
+prohibition was **deleted** rather than argued with, per the standing rule:
+delete the competing text before adding a rule.
+
+- `prompt.md:341` — the first message to a person now always opens with the
+  hour's greeting, then the name, then the matter. It says where the hour comes
+  from (the inject already appends `[השעה בישראל עכשיו HH:mm, יום …]`) and
+  names the same cut-offs the system uses, so both sources pick the same word.
+  Explicitly *"גם כשהיא כבר בירכה לפניך וגם כשלא הספיקה"* — the owner said
+  always, and a rep who picks up a chat greets.
+- `prompt.md:343` — the נציג tap, which is where the screenshot came from, now
+  reads *"וכאן אתה מברך לפי השעה ומציג את עצמך"*.
+- Only the first message. *"ולא מברכים פעמיים"* keeps it from greeting every turn.
+
+**No guard broke, and one was checked closely.** `OPENER_RE` (`retry.py:129`)
+is anchored `^…$` and only fires when a reply is *nothing but* greeting + name +
+"how can I help" — the bare recital. A greeting followed by a real invitation
+passes untouched. Send's echo guard keys on `👋 במה אפשר לעזור?`, which the
+model's own greeting never contains, and its first-contact rule keys on
+`/מיכאל מהומי'ז/`, which still matches.
+
+Verified with **no OpenRouter spend**: live prompt read back (three new clauses
+present, the prohibition gone), `sessionKey` now `-53`, the prompt's cut-offs
+diffed against the live `HELLO` ternary at nine boundary hours — identical, and
+21:51 → ערב טוב on both sides. Seven of eight patchers dry-run idle.
+
+**Open:** the handset is the proof — probes 404 at `Send`, so only a real phone
+sees this. `n8n_whatsapp_untemplate.py` refuses on a missing `Human tap?` node;
+pre-existing drift since paging was dropped on 13 Sep, not a regression.
+
+---
+
 ## 2026-09-16
 
 ### The client's review, in code: no numbers, private faults are theirs, voice refuses unmanaged buildings, the debt agent opened. Epoch 27 LIVE on WhatsApp and inbound voice.

@@ -3303,3 +3303,21 @@ the repo (the ManyChat door-by-door trees live in
 `docs/discovery/manychat-scan-2026-09-22.md`, section "Door by door") and
 print that section back when asked. A rebuilt version, however faithful,
 is a different picture to him.
+
+**Two sources greet, and they must agree (23 Sep).** The opening line can come
+from the workflow (`Sort`'s `HELLO` ternary, for a bare hello) or from the model
+(its own first reply, and the `לדבר עם נציג` tap). Both now greet by the
+Jerusalem hour, so both have to pick the *same* word or one conversation says
+צהריים טובים and ערב טוב a second apart. The model can do this at all only
+because the inject appends `[השעה בישראל עכשיו HH:mm, יום …]` to every message —
+it has the clock, not a guess. The cut-offs are therefore written into
+`prompt.md` in the same shape as the JS (`<5` שלום, `<12` בוקר טוב, `<17`
+צהריים טובים, else ערב טוב), and changing one side means changing both.
+
+**When the bot won't do something, look for the sentence forbidding it (23 Sep).**
+The owner asked why Michael's 21:51 reply had no ערב טוב. The prompt said, in as
+many words, *"אתה לא כותב אותו בעצמך ולא פותח בו תשובה"* — epoch 52 had moved
+the greeting to the system and told the model to keep its hands off it. The
+model was obeying. Adding "always greet" on top of that would have left two
+instructions fighting; deleting the prohibition was the whole fix. A missing
+behaviour is far more often a live prohibition than a missing rule.
