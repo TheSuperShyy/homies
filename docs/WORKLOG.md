@@ -11,6 +11,43 @@ conversation that produced it.
 
 ## 2026-09-23
 
+### Opening a ticket is answered warmly, and a tap gets the greeting too — epoch 55 LIVE
+
+Owner, on two tap replies — *"בטח, ספרו לי בבקשה מה קרה ובאיזה בניין ודירה
+מדובר."* — *"make this polite and concern like for the opening of the ticket."*
+
+**Three prompt lines caused it, and the model obeyed all three.** This is the
+third time tonight the answer was a sentence already in the prompt, not the
+model's judgement:
+
+1. `"בטח"` was the **first example** in the מילה-לבן-אדם list, and the case
+   *"למי שרק ביקש לפתוח קריאה"* was prescribed the bare word `נכונות`.
+2. *"והיא באמת קצרה: מילה או שתיים"* forced the curtness on top of that.
+3. The greeting rule sat inside the paragraph about people who **only greet**,
+   so a button tap never inherited it — which is why neither reply greeted or
+   gave a name, an hour after *"always start the conversation with the
+   greetings"*. Scope, not disobedience.
+
+Fixed at the point of use: `בטח` dropped from the example list, the
+ticket-opening case carved out of the brevity rule (*"מילה אחת יבשה נשמעת כמו
+פקיד שמחכה שימלאו לו טופס"*), `נכונות` → `נכונות חמה`, and the tap clause now
+says outright that **a tap is a message too** and takes the greeting and the
+name when it is the first one.
+
+**Also fixed, same reply:** it asked two things at once (what happened *and*
+which building and flat). Already forbidden two paragraphs away and ignored —
+so the rule is now restated where the model is actually reading. *"שתי שאלות
+בהודעה אחת הופכות אותה לטופס."*
+
+### The owner's screenshots are Philippine time, five hours ahead of Israel
+
+Nearly misread the evidence. His handset stamps **UTC+8**; Israel is UTC+3.
+"22:21" on a screenshot is **17:21 in Israel**. Checked against the workflow's
+`updatedAt` (14:15 UTC = 22:15 on his phone), which put the taps six minutes
+*after* the epoch 54 deploy rather than hours before it — the difference
+between "this is current behaviour" and "this is a stale buffer". The clock
+greeting was correct at every point: 17:07 and 17:21 Israel → ערב טוב.
+
 ### The נציג tap asks how he can help, and stops assuming a fault — epoch 54 LIVE
 
 Minutes after epoch 53, the owner sent the 22:07 reply: *"ערב טוב, מיכאל

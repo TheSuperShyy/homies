@@ -2990,14 +2990,15 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to
   `INTAKE_TOOLS`.~~ **Done 19 Aug**, along with the missing n8n routes. Both
   verified through the live webhook.
-- **Epoch 54 is live (23 Sep evening).** Two owner notes on two screenshots, an
+- **Epoch 55 is live (23 Sep evening).** Two owner notes on two screenshots, an
   hour apart. (1) Michael opens his first message with the hour's greeting
   himself — *"always start the conversation with the greetings"*. The old
   *"ולא פותח בו תשובה"* prohibition is deleted; `prompt.md`'s cut-offs must stay
   in step with `Sort`'s `HELLO` ternary. (2) The `לדבר עם נציג` tap now **asks
   how he can help** instead of *"ספרו לי מה העניין"* — *"it already assume there
-  is a problem"*. **Owed: handset proof** — probes 404 at `Send`, so only a real
-  phone can see it.
+  is a problem"*. (3) The two ticket taps are answered warmly, greet and give the name, and ask
+  **one** question — *"make this polite and concern"*. **Owed: handset proof**
+  — probes 404 at `Send`, so only a real phone can see it.
 - **If you re-anchor `OPENER_RE`, keep the `tap === 'other'` exemption.** The
   `opener` guard in `n8n_whatsapp_retry.py` rejects a reply that is nothing but
   greeting + name + "how can I help" — which is now exactly what the נציג tap

@@ -3334,3 +3334,25 @@ weakening the pattern. **When a prompt change asks for a shape some guard
 catches, the guard needs a scope, not a deletion** — and check for this before
 shipping, because the symptom is silent: the reply is thrown away, retried, and
 the second attempt quietly says something else.
+
+**The model picks the first example you give it (23 Sep).** The owner rejected
+`"בטח, ספרו לי בבקשה מה קרה..."` as cold. `בטח` was the first item in the
+prompt's own list of things to say, and the same paragraph prescribed a bare
+`נכונות` for exactly that case and capped it at *"מילה או שתיים"*. The model was
+not being curt; it was reciting. **When the output is disliked, grep the prompt
+for it before touching anything else** — three times in one evening the offending
+sentence was already written down: the missing greeting (a prohibition), the
+fault-assuming question (an instruction), and this.
+
+**A rule stated far from where it applies is not read (23 Sep).** Two rules were
+already in the prompt and both were broken: one question per message (two
+paragraphs below the tap clause) and the hour greeting (inside the paragraph
+about people who *only* greet, so a button tap never inherited it). Neither was
+wrong, and neither was reaching the case. Restating them at the point of use
+fixed both. Placement is part of the instruction, not presentation.
+
+**The owner's screenshots are Philippine time, UTC+8 (23 Sep).** Israel is
+UTC+3, so a timestamp on his handset reads **five hours ahead** of the bot's
+clock. A "22:21" screenshot is 17:21 in Israel. This matters twice: for judging
+whether the hour greeting was right, and for placing a screenshot before or
+after a deploy — check the n8n workflow's `updatedAt` (UTC) rather than assuming.

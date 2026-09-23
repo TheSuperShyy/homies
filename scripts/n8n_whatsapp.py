@@ -203,7 +203,21 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 54
+MEMORY_EPOCH = 55
+# 54 -> 55, 23 Sep: opening a ticket is answered warmly, and a tap gets the
+# greeting too. Owner on two tap replies -- "בטח, ספרו לי בבקשה מה קרה
+# ובאיזה בניין ודירה מדובר." -- "make this polite and concern like for the
+# opening of the ticket." THREE PROMPT LINES CAUSED IT, all obeyed exactly:
+#   1. "בטח" is the FIRST example in the מילה-לבן-אדם list, and the case
+#      "למי שרק ביקש לפתוח קריאה" was prescribed the bare word נכונות.
+#   2. "והיא באמת קצרה: מילה או שתיים" forced the curtness on top of it.
+#   3. The greeting rule sat inside the paragraph about people who ONLY
+#      greet, so a button tap never inherited it -- which is why neither
+#      reply greeted or gave a name, an hour after the owner asked for
+#      "always start the conversation with the greetings".
+# The double question (what happened AND which building and flat) was
+# already forbidden two paragraphs down and ignored; it is restated at the
+# point of use, where the model is actually reading.
 # 53 -> 54, 23 Sep, minutes later: the first question stops assuming a fault.
 # Owner, on the 22:07 reply "ערב טוב, מיכאל מהומי'ז. ספרו לי בבקשה מה העניין
 # ואשמח לעזור.": "it already assume there is a problem. i want it to ask how
@@ -497,7 +511,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8eefe7f453bc",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "87c18f8dcac0",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
