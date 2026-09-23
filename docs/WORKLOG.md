@@ -141,8 +141,22 @@ maintain the current flow we have, the call then send the payment link in
 whatsapp after."* So pricing per message, quality rating and opt-in stay
 unasked questions.
 
-Not deployed and not submitted: both need the owner (a write to the client's
-Meta account, and a function deploy the classifier refuses).
+**Both runs done on the owner's "run it".** Function **v98 ACTIVE** (7 secrets
+pushed, payment link ON, whatsapp link ON, oxs mirror still OFF), deployed
+first on purpose so a deploy fault could not be mistaken for a template
+refusal — with the template unsynced the function logs
+`payment link template not synced` and behaves exactly as before. Then
+`wa_templates.py create payment_link_he --apply`: **accepted for review, id
+1072073112112319, PENDING, UTILITY.** Meta did not refuse the URL-in-a-variable
+outright, which was the risk; approval is still its own decision.
+
+**Still owed: the proof on a real call.** The number must be OUTSIDE the
+24-hour window (the owner wrote to the bot this morning, so tomorrow or the
+other demo number), then one debt call and yes to the link. Pass looks like:
+the message on the handset with the right months, amount and link;
+`payment_links` `sent` / `whatsapp_template`; a `payment` request **resolved**;
+the agent's ordinary "sent to your WhatsApp" line with no office number; and no
+URL in any log line.
 
 ### `ticket_resolved_he` is APPROVED and synced
 

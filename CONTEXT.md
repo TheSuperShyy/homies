@@ -3207,6 +3207,14 @@ for the closed window and nothing more. Two exist: `ticket_resolved_he` and
 `payment_link_he`, both in `docs/features/11-whatsapp-bot/templates.md`, which
 is the source of truth `wa_templates.py` submits from.
 
+**Ship the code first, then submit the template (23 Sep).** The code that uses
+a template must tolerate the template not existing — ours logs
+`payment link template not synced` and falls back to today's behaviour — which
+means it can be deployed while Meta is still reviewing. Doing it in that order
+keeps the two failures apart: if something breaks after the deploy it is the
+deploy, and if the message never goes it is Meta. The reverse order leaves you
+guessing between them, days apart, on a path you cannot rehearse.
+
 **The flow is the call first, WhatsApp after — not outreach (23 Sep).** A
 template is also a door-opener: it can be sent to anyone, any time, and the
 reply opens the window for the bot. Asked whether to use it that way for debt
