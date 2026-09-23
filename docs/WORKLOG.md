@@ -128,6 +128,19 @@ line plus the link still goes as ordinary text, which reads better than a form.
 `no_contact` and `no_conversation` keep today's behaviour — a template cannot
 create a conversation to send into.
 
+**Wording**, chosen by the owner from three versions (*"i want the combination
+of a and b"*): the callback to the call — *כמו שסיכמנו בשיחה* — which is what
+stops an out-of-nowhere message reading as a scam, plus the line *הקישור אישי
+ומיועד לדירה שלכם בלבד*, because the link opens that apartment's own balance and
+a forwarded one shows a neighbour everything. It ends with an invitation to
+write back, which also opens the 24-hour window for the bot.
+
+The owner also ruled out the wider use while we were at it: WhatsApp-first
+outreach (a template before any call) was raised and declined — *"we need to
+maintain the current flow we have, the call then send the payment link in
+whatsapp after."* So pricing per message, quality rating and opt-in stay
+unasked questions.
+
 Not deployed and not submitted: both need the owner (a write to the client's
 Meta account, and a function deploy the classifier refuses).
 

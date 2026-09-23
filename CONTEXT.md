@@ -3207,6 +3207,16 @@ for the closed window and nothing more. Two exist: `ticket_resolved_he` and
 `payment_link_he`, both in `docs/features/11-whatsapp-bot/templates.md`, which
 is the source of truth `wa_templates.py` submits from.
 
+**The flow is the call first, WhatsApp after — not outreach (23 Sep).** A
+template is also a door-opener: it can be sent to anyone, any time, and the
+reply opens the window for the bot. Asked whether to use it that way for debt
+collection, the owner said no — *"we need to maintain the current flow we have,
+the call then send the payment link in whatsapp after."* So the template is a
+rescue inside an existing call, never a first contact. Do not propose messaging
+residents first again without being asked; if it is ever reopened, the open
+questions are Meta's per-message price, the quality rating a debt-chasing
+message risks, and opt-in, which is Yariv's call and not ours.
+
 **A trigger that writes to an RLS-protected table must be SECURITY DEFINER
 (23 Sep).** Migration 036 hung a trigger on `requests` that inserts into
 `ticket_notices`, a table whose RLS grants staff read and nothing else — on

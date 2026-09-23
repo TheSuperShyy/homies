@@ -60,7 +60,12 @@ variable, which Meta's reviewers read).
 - **Decided:** owner, 23 Sep 2026, after the "done" message was proven end to
   end. The limit was recorded on 20 Sep in the Edge Function itself: *"Meta
   accepts free-form text only inside 24 hours… the template is the fix,
-  later."*
+  later."* Wording chosen from three (*"i want the combination of a and b"*):
+  the callback to the call, which is what stops it reading as spam, **and** the
+  line saying the link is personal — it opens that apartment's own balance, and
+  a forwarded link shows a neighbour the lot. The flow itself does not change:
+  *"we need to maintain the current flow we have, the call then send the
+  payment link in whatsapp after"* — no outreach, no messaging first.
 - **Sender:** `send_payment_link` in the Edge Function, on `outside_window`
   only, into the conversation the free-text attempt already resolved. Inside
   the window nothing changes: the model-written line plus the link goes as
@@ -76,7 +81,7 @@ variable, which Meta's reviewers read).
 - **body:**
 
 ```
-שלום, כאן מיכאל מהומי'ז. כמו שסיכמנו בשיחה, זה הקישור לתשלום ועד הבית עבור {{1}} בסך {{2}} ₪: {{3}} אם משהו לא ברור, פשוט כתבו לנו כאן.
+שלום, כאן מיכאל מהומי'ז. כמו שסיכמנו בשיחה, זה הקישור לתשלום ועד הבית עבור {{1}} בסך {{2}} ₪: {{3}} הקישור אישי ומיועד לדירה שלכם בלבד. אם משהו לא ברור, פשוט כתבו לנו כאן.
 ```
 
 - **variables:**
