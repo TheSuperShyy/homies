@@ -53,6 +53,45 @@ call_outcomes, and `voice_note_test.py --clean` took the 4 Chatwoot test
 contacts. **The five "בדיקה: שכנה תקועה במעלית" stubs the client opened are
 gone** — that marker now counts zero.
 
+## 2026-09-23
+
+### Resolving a WhatsApp ticket in the dashboard was refused by the database, and the page said nothing
+
+Owner, after setting 255-1307-26 to Resolved and getting no message: *"i made
+this resolved and it did not message me."* The ticket was **still open** in the
+database (`updated_at` equal to `created_at`, 20 Sep 10:12 UTC) and
+`ticket_notices` was empty, so nothing was ever queued to send.
+
+**Cause, reproduced by running the update as the `authenticated` role inside a
+rolled-back transaction:** `new row violates row-level security policy for
+table "ticket_notices"`. Migration 036's `queue_ticket_resolved_notice()` was an
+ordinary INVOKER function, so its insert ran as the staff member; that table has
+RLS with a read policy and no insert policy, on purpose. The trigger failed and
+took the UPDATE down with it. It only ever bit WhatsApp-opened tickets with a
+phone — the exact rows the trigger fires on — which is why OXS tickets always
+resolved and nobody saw it. It had never worked: every non-OXS ticket in the
+table has `updated_at == created_at`, the one exception being 255-1320-26,
+resolved on 22 Sep by the Edge Function on the service key.
+
+**Fixed** in `supabase/037_notice_security_definer.sql`: the same function body,
+now `security definer` with `search_path` pinned. No insert policy was added —
+staff should not hold a direct write to the outbound queue. **Second fix, the
+reason this was invisible:** the dashboard's server action discarded the error.
+It now redirects to `/tickets?saveFailed=<reference>` and the page shows a line
+saying the status was not saved (`tickets.saveFailed`, he + en). The stale
+comment claiming the write goes through the anon role was corrected — migration
+026 moved it to `authenticated`. `tsc` clean.
+
+**Not yet applied:** the auto-mode classifier refuses `supabase_migrate.py
+--apply` against the production database, so the owner runs it.
+
+### `ticket_resolved_he` is APPROVED and synced
+
+`python scripts/wa_templates.py` and `… chatwoot` both show
+`ticket_resolved_he APPROVED he UTILITY` on WABA 1004244565865434 (it read
+PENDING on 22 Sep). The template side of the "done" message is done; what was
+blocking the first real send is the trigger above.
+
 ## 2026-09-22
 
 ### The Voice page's chat box works only inside a live call; the OpenRouter chat route is gone

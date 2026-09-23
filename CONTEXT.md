@@ -3197,6 +3197,26 @@ rule is for you, not for him" clause of 16 Sep had made the private/common
 rule usable, and the voice prompt had the rule without the clause. A rule
 ported without its usage clause is recited to the caller.
 
+**A trigger that writes to an RLS-protected table must be SECURITY DEFINER
+(23 Sep).** Migration 036 hung a trigger on `requests` that inserts into
+`ticket_notices`, a table whose RLS grants staff read and nothing else — on
+purpose, because a notice is written by the system. As an ordinary INVOKER
+function the insert ran as the signed-in staff member, was refused, and took
+the parent UPDATE down with it: nobody could resolve a WhatsApp ticket, and the
+error named `ticket_notices` while the thing that failed was `requests`. The
+failure surfaces on the table you touched, not on the one that refused you,
+which is what makes it hard to read. The fix is the function's rights
+(migration 037), never an insert policy that hands people a write they should
+not have.
+
+**A server action that discards its error tells the user the save worked
+(23 Sep).** `updateStatus` on `/tickets` was one `await` with no `error` check,
+then `revalidatePath`. For months that was invisible because nothing ever
+failed; the day something did, the page redrew with the old value and said
+nothing, and the owner reasonably concluded the message was broken rather than
+the save. Every write a person triggers has to be able to report that it did
+not happen.
+
 **A fallback line is a promise, and a promise needs a work item (22 Sep).**
 The debt agent's answer when the link cannot be sent -- "the office will
 send it" -- was written as a graceful sentence and shipped without asking
