@@ -98,6 +98,39 @@ The dashboard half of this — the visible "not saved" line — reaches the live
 dashboard only when `feature/chatbot` merges to `main`. The database half is
 live now, and it was the half that blocked everything.
 
+### The payment link gets its own template, so a debt call can deliver it
+
+Owner, straight after the done message worked: *"ok so how about the link
+payment that would be sent on debt collection."* Same road, same reason — a
+debt call is **outbound**, so the resident has not written to us and Meta's
+24-hour window is shut by default. That is the normal case for this agent, not
+an edge case: the owner's own 22 Sep call ended with "the office will send it".
+
+**`payment_link_he`** (UTILITY, he) added to
+`docs/features/11-whatsapp-bot/templates.md`, three variables: the months, the
+amount, the link. **The link rides in a body variable**, because the tidier
+shape — a URL button with a dynamic suffix — is not available to us twice over:
+OXS mints an opaque link whose contract says to use it verbatim, so we do not
+know which part varies; and neither `wa_templates.py` (submits one BODY
+component) nor Chatwoot's payload (`processed_params`, a flat body map) can
+carry button parameters.
+
+**Edge Function.** `syncedTemplates()` and `sendTemplate()` pulled out of
+`send_ticket_notices` — same behaviour, now shared — and `whatsappDeliver()`
+returns the conversation id along with `outside_window` so nothing is looked up
+twice while the resident is on the line. `send_payment_link` then retries as the
+template into that same conversation, and on success the call continues down the
+existing road: `payment_links` row `sent` (note `whatsapp_template`), the office
+request filed **resolved**, and the agent says its ordinary "sent it to your
+WhatsApp" line instead of reading out the office number. No prompt change, no
+tool-schema change. Inside the window nothing changes at all: the model-written
+line plus the link still goes as ordinary text, which reads better than a form.
+`no_contact` and `no_conversation` keep today's behaviour — a template cannot
+create a conversation to send into.
+
+Not deployed and not submitted: both need the owner (a write to the client's
+Meta account, and a function deploy the classifier refuses).
+
 ### `ticket_resolved_he` is APPROVED and synced
 
 `python scripts/wa_templates.py` and `… chatwoot` both show

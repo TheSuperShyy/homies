@@ -48,3 +48,40 @@ variable, which Meta's reviewers read).
   - `{{2}}` — the fault in a few words: `requests.description`, the resident's
     own words, cut at 80 characters
 - **examples:** `255-1294-26` · `ריח רע בחניון`
+
+---
+
+## payment_link_he
+
+- **What:** the payment link a resident agreed to on a debt call. A debt call
+  is outbound — we ring someone who has not written to us — so Meta's 24-hour
+  window is shut by default and the free-text link is refused. This template
+  is the only way that link reaches them during the call.
+- **Decided:** owner, 23 Sep 2026, after the "done" message was proven end to
+  end. The limit was recorded on 20 Sep in the Edge Function itself: *"Meta
+  accepts free-form text only inside 24 hours… the template is the fix,
+  later."*
+- **Sender:** `send_payment_link` in the Edge Function, on `outside_window`
+  only, into the conversation the free-text attempt already resolved. Inside
+  the window nothing changes: the model-written line plus the link goes as
+  ordinary text, which reads better than a fixed form.
+- **Why the link is a body variable:** WhatsApp's tidier shape is a URL button
+  with a dynamic suffix, and we cannot use it. OXS mints an opaque link and its
+  contract says to use it verbatim (`docs/reference/oxs-payment-link.md`), so
+  we do not know which part varies; and neither `wa_templates.py` (submits one
+  BODY component) nor Chatwoot's message payload (`processed_params`, a flat
+  body map) can carry button parameters.
+- **category:** UTILITY
+- **language:** he
+- **body:**
+
+```
+שלום, כאן מיכאל מהומי'ז. כמו שסיכמנו בשיחה, זה הקישור לתשלום ועד הבית עבור {{1}} בסך {{2}} ₪: {{3}} אם משהו לא ברור, פשוט כתבו לנו כאן.
+```
+
+- **variables:**
+  - `{{1}}` — the months owed, in Hebrew (`monthsHe(periods)`, joined)
+  - `{{2}}` — the amount, digits only; the ₪ is in the fixed text
+  - `{{3}}` — the OXS payment link, verbatim. **Never written to a log, never
+    read aloud, never printed whole anywhere.**
+- **examples:** `יולי 2026` · `450` · `https://example.com/pay/sample`

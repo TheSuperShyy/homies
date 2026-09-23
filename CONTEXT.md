@@ -3197,6 +3197,16 @@ rule is for you, not for him" clause of 16 Sep had made the private/common
 rule usable, and the voice prompt had the rule without the clause. A rule
 ported without its usage clause is recited to the caller.
 
+**Outbound means the window is shut, so an outbound message is a template
+(23 Sep).** The rule "no fixed messages except the menu" (17 Sep) is about the
+bot's voice, not about Meta's rules. Anything we send to someone who has not
+written to us in 24 hours — the done message, the payment link on a debt call —
+can only be a Meta template, which is fixed text by definition. Inside the
+window the wording stays free and model-written; the template is the version
+for the closed window and nothing more. Two exist: `ticket_resolved_he` and
+`payment_link_he`, both in `docs/features/11-whatsapp-bot/templates.md`, which
+is the source of truth `wa_templates.py` submits from.
+
 **A trigger that writes to an RLS-protected table must be SECURITY DEFINER
 (23 Sep).** Migration 036 hung a trigger on `requests` that inserts into
 `ticket_notices`, a table whose RLS grants staff read and nothing else — on

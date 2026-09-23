@@ -327,6 +327,11 @@ const CHATWOOT = MEDIA_HOSTS[0].replace(/\/$/, "") + "/api/v1/accounts/2";
 const WA_INBOX_ID = 1; // the WhatsApp Cloud inbox; the Voice inbox is 2
 const TEST_PREFIXES = ["+972599", "+9725000000"];
 
+// The Meta template that carries a payment link across the 24-hour window.
+// Wording lives in docs/features/11-whatsapp-bot/templates.md, which is what
+// `scripts/wa_templates.py` submits; this name has to match it exactly.
+const PAYMENT_TEMPLATE = "payment_link_he";
+
 // Why a payment link did not reach WhatsApp, in the words the office reads on
 // the ticket (22 Sep). A reason not listed here is written as it came.
 const LINK_MISS_HE: Record<string, string> = {
@@ -1390,7 +1395,57 @@ async function whatsappLine(f: {
   }
 }
 
-type Delivery = { sent: true; conversationId: number } | { sent: false; reason: string };
+type Delivery = { sent: true; conversationId: number } | { sent: false; reason: string; conversationId?: number };
+
+/** The inbox's APPROVED templates, by name. One call; the caller decides when. */
+type Synced = { namespace: string; body: string; category: string; language: string };
+async function syncedTemplates(admin: string): Promise<Record<string, Synced>> {
+  const ib = await cw(admin, "GET", `/inboxes/${WA_INBOX_ID}`);
+  const out: Record<string, Synced> = {};
+  for (const t of (ib.j?.message_templates ?? [])) {
+    if (String(t?.status ?? "").toUpperCase() !== "APPROVED") continue;
+    const body = (t?.components ?? []).find((c: any) => c?.type === "BODY")?.text ?? "";
+    out[String(t.name)] = {
+      namespace: String(t.namespace ?? ""), body,
+      category: String(t.category ?? "UTILITY"), language: String(t.language ?? "he"),
+    };
+  }
+  return out;
+}
+
+/**
+ * One Meta template into an existing conversation, and the truth about whether
+ * Meta took it. Chatwoot sends a template when the message carries
+ * `template_params`; `content` is the filled-in text for the inbox's own
+ * record. The BOT token posts, so the chat workflow sees `agent_bot`. Meta's
+ * refusal arrives asynchronously, so the message is read back after 1.5 s --
+ * the same shape `whatsappDeliver` uses for free text.
+ *
+ * Extracted from `send_ticket_notices` on 23 Sep when the debt call's payment
+ * link needed the same thing. Nothing here logs the text or a link: a template
+ * parameter can BE the link (`payment_link_he`), so the reason is logged and
+ * the params never are.
+ */
+async function sendTemplate(
+  admin: string, bot: string, convId: number, name: string,
+  t: Synced, params: Record<string, string>,
+): Promise<{ sent: true; messageId: number } | { sent: false; reason: string }> {
+  const content = t.body.replace(/\{\{(\d+)\}\}/g, (_m, k) => params[k] ?? "");
+  const m = await cw(bot, "POST", `/conversations/${convId}/messages`, {
+    content, message_type: "outgoing", private: false,
+    template_params: { name, category: t.category, language: t.language,
+      namespace: t.namespace, processed_params: params },
+  });
+  const msgId = m.j?.id ?? null;
+  if (m.status >= 300 || !msgId) return { sent: false, reason: "post_refused_" + m.status };
+  await new Promise((r) => setTimeout(r, 1500));
+  const back = await cw(admin, "GET", `/conversations/${convId}/messages`);
+  const mine = (back.j?.payload ?? []).find((x: any) => x?.id === msgId);
+  if (String(mine?.status ?? "") === "failed") {
+    return { sent: false, reason: String(mine?.content_attributes?.external_error ?? "meta_failed").slice(0, 200) };
+  }
+  return { sent: true, messageId: msgId };
+}
 
 /**
  * A WhatsApp message to a resident, through Chatwoot, the way the chat bot's
@@ -1401,8 +1456,10 @@ type Delivery = { sent: true; conversationId: number } | { sent: false; reason: 
  * a human takeover (a message from a user would). Meta accepts free-form text
  * only inside 24 hours of the resident's last message; Chatwoot learns that
  * asynchronously and marks the message `failed`, so the status is read back
- * after a moment and reported as `outside_window`. The template is the fix,
- * later. Nothing here logs the text or the link: status, ids, last digits.
+ * after a moment and reported as `outside_window` -- with the conversation id,
+ * because the caller's answer to that is a template into the same
+ * conversation (`send_payment_link`, 23 Sep; `sendTemplate` above).
+ * Nothing here logs the text or the link: status, ids, last digits.
  */
 /** One Chatwoot call: the token decides who is speaking (admin or the bot). */
 async function cw(token: string, method: string, path: string, body?: unknown) {
@@ -1481,7 +1538,10 @@ async function whatsappDeliver(toE164: string, name: string, text: string): Prom
     if (String(mine?.status ?? "") === "failed") {
       console.error("whatsapp delivery: failed", convId,
         String(mine?.content_attributes?.external_error ?? "").slice(0, 80));
-      return { sent: false, reason: "outside_window" };
+      // The conversation rides along: the caller may want to try a template
+      // into the same conversation, and looking the contact up again would be
+      // three more Chatwoot calls while the resident is on the line.
+      return { sent: false, reason: "outside_window", conversationId: convId };
     }
     console.log("whatsapp delivery: sent", convId, last4);
     return { sent: true, conversationId: convId };
@@ -1628,9 +1688,42 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
       building: r.building ?? "", unit, months: monthsHe(periods), amount,
     });
-    const d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), (line ? line + "\n" : "") + got.link);
+    let d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), (line ? line + "\n" : "") + got.link);
+
+    // 23 Sep: a debt call is OUTBOUND -- we ring someone who has not written to
+    // us -- so Meta's 24-hour window is shut by default and the free-text link
+    // above is refused (`outside_window`). That was the normal case for this
+    // agent, not an edge case: the owner's own 22 Sep call ended with "the
+    // office will send it". A Meta template is allowed to cross that window, so
+    // the link goes again as `payment_link_he` into the same conversation, and
+    // from here on the call behaves exactly as if the first message had landed.
+    // Only for outside_window: `no_contact` and `no_conversation` mean there is
+    // nowhere to send anything, and a template does not create a conversation.
+    let viaTemplate = false;
+    const shut = !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
+    if (shut) {
+      const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
+      const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
+      const t = admin && bot ? (await syncedTemplates(admin))[PAYMENT_TEMPLATE] : undefined;
+      if (!t) {
+        console.warn("payment link template not synced", PAYMENT_TEMPLATE, last4);
+      } else {
+        const sent = await sendTemplate(admin, bot, shut, PAYMENT_TEMPLATE, t, {
+          "1": monthsHe(periods).join(", ") || "ועד הבית",
+          "2": String(amount),
+          "3": got.link,
+        });
+        if (sent.sent) {
+          viaTemplate = true;
+          d = { sent: true, conversationId: shut };
+          console.log("payment link sent as template", shut, last4);
+        } else {
+          console.error("payment link template refused", shut, last4, sent.reason.slice(0, 80));
+        }
+      }
+    }
     row.status = d.sent ? "sent" : "requested";
-    row.note = d.sent ? "whatsapp" : d.reason;
+    row.note = d.sent ? (viaTemplate ? "whatsapp_template" : "whatsapp") : d.reason;
     await record();
     const filed = await fileTicket(d.sent, d.sent ? null : d.reason);
     if (!d.sent) return withSpoken(miss(d.reason, filed));
@@ -1669,14 +1762,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const out = { ok: true, sent: 0, failed: 0, skipped: 0, waiting: 0 };
     if (!rows?.length) return out;
 
-    // The inbox's synced templates, once per drain: name -> {namespace, body}.
-    const ib = await cw(admin, "GET", `/inboxes/${WA_INBOX_ID}`);
-    const synced: Record<string, { namespace: string; body: string; category: string; language: string }> = {};
-    for (const t of (ib.j?.message_templates ?? [])) {
-      if (String(t?.status ?? "").toUpperCase() !== "APPROVED") continue;
-      const body = (t?.components ?? []).find((c: any) => c?.type === "BODY")?.text ?? "";
-      synced[String(t.name)] = { namespace: String(t.namespace ?? ""), body, category: String(t.category ?? "UTILITY"), language: String(t.language ?? "he") };
-    }
+    // The inbox's synced templates, once per drain rather than once per row.
+    const synced = await syncedTemplates(admin);
 
     for (const n of rows) {
       const last4 = String(n.phone).replace(/\D+/g, "").slice(-4);
@@ -1693,7 +1780,6 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         continue;
       }
       const params: Record<string, string> = n.params ?? {};
-      const content = t.body.replace(/\{\{(\d+)\}\}/g, (_m, k) => params[k] ?? "");
       try {
         const conv = await chatwootConversationFor(admin, String(n.phone), "");
         if (!conv.ok) {
@@ -1701,24 +1787,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           out.failed++;
           continue;
         }
-        const m = await cw(bot, "POST", `/conversations/${conv.convId}/messages`, {
-          content, message_type: "outgoing", private: false,
-          template_params: { name: n.template, category: t.category, language: t.language,
-            namespace: t.namespace, processed_params: params },
-        });
-        const msgId = m.j?.id ?? null;
-        if (m.status >= 300 || !msgId) {
-          await mark({ status: "failed", error: "post_refused_" + m.status, attempts: n.attempts + 1 });
-          out.failed++;
-          continue;
-        }
-        await new Promise((r) => setTimeout(r, 1500));
-        const back = await cw(admin, "GET", `/conversations/${conv.convId}/messages`);
-        const mine = (back.j?.payload ?? []).find((x: any) => x?.id === msgId);
-        if (String(mine?.status ?? "") === "failed") {
-          const why = String(mine?.content_attributes?.external_error ?? "meta_failed").slice(0, 200);
-          await mark({ status: "failed", error: why, attempts: n.attempts + 1, conversation_id: conv.convId });
-          console.error("ticket notice failed", conv.convId, last4, why.slice(0, 80));
+        const r = await sendTemplate(admin, bot, conv.convId, String(n.template), t, params);
+        if (!r.sent) {
+          await mark({ status: "failed", error: r.reason, attempts: n.attempts + 1, conversation_id: conv.convId });
+          console.error("ticket notice failed", conv.convId, last4, r.reason.slice(0, 80));
           out.failed++;
           continue;
         }
