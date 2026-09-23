@@ -82,8 +82,17 @@ saying the status was not saved (`tickets.saveFailed`, he + en). The stale
 comment claiming the write goes through the anon role was corrected — migration
 026 moved it to `authenticated`. `tsc` clean.
 
-**Not yet applied:** the auto-mode classifier refuses `supabase_migrate.py
---apply` against the production database, so the owner runs it.
+**APPLIED on the owner's "run it", and the whole chain then ran end to end for
+the first time.** Simulation after applying: the same update as `authenticated`
+now succeeds and queues the notice. Then the owner set 255-1307-26 to Resolved
+in the dashboard at 07:51:17 UTC, the row went `resolved`, the trigger queued
+`ticket_resolved_he`, the 07:52:30 run of `Homies — ticket notices` drained it,
+and the notice reads `sent / attempts 1 / conversation 1 / 07:52:39` with
+Chatwoot message **1648** carrying no error from Meta. The message:
+*שלום, כאן מיכאל מהומי'ז. הקריאה שלכם מספר 255-1307-26 (הפח מלא בחניון) טופלה
+ונסגרה…* This is the acceptance owed since 18 Sep. The owner looked one minute
+after saving, before the cron ran, and reported silence: **the job is every two
+minutes, so "nothing happened" is only true after two minutes.**
 
 ### `ticket_resolved_he` is APPROVED and synced
 
