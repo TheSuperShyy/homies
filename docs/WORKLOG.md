@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-09-23
 
+### The tapped button is where the resident meets you — epoch 56 LIVE
+
+Owner: *"make the response on the menu button to be Natural & Service-Oriented."*
+Epoch 55 warmed the **ticket** tap only; `מצב קריאה קיימת` was still *"בטח,
+ספרו לי בבקשה את מספר הקריאה. אם אין לכם, באיזה בניין מדובר?"* — two questions
+and an errand.
+
+The new lines name a **direction**, not a wording, so it generalises past the
+one sentence: the tap is the moment the resident meets you, and the reply is
+what he will feel about the whole service — *"בן אדם מחברת ניהול ששמח שפנו
+אליו, ולא טופס שנפתח."* For the status tap specifically: *"כשאתה מבקש ממנו
+מספר קריאה אתה לא שולח אותו לחפש בשבילך, אתה אומר לו שהעניין אצלך."*
+
+**The obvious service sentence was already banned.** *"אני בודק בשבילכם"* would
+collide with *"תשתמש בהם בשקט, בלי להכריז שאתה בודק או מעדכן משהו"*, three
+paragraphs up. The new text carries that ban with it rather than fighting it —
+competing text has caused every one of tonight's complaints, so this one does
+not add a fifth. Ban confirmed still present in the live prompt.
+
+### FOUND, not fixed: the status tap should not need a reference at all
+
+`get_request_status` falls back to the resident's own tickets via
+`ctx.residentId` (`debt-tools/index.ts:2210`) — but `residentId` is read from
+`variableValues.resident_id`, and **the WhatsApp tool body sends only `phone`**
+(`index.ts:155`). So on WhatsApp that fallback never fires, and the bot has to
+interrogate. The lookup exists: `residents` by phone at `index.ts:3403`.
+
+Wiring it would make the status tap genuinely service-oriented — tap, and get
+your ticket back without being asked anything. It needs an Edge Function deploy
+(v99), so it was **not** done tonight while the owner is testing live. Same
+class as the 1 Sep `get_balance` apartment interrogation.
+
 ### Opening a ticket is answered warmly, and a tap gets the greeting too — epoch 55 LIVE
 
 Owner, on two tap replies — *"בטח, ספרו לי בבקשה מה קרה ובאיזה בניין ודירה

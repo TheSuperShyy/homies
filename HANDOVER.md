@@ -2990,14 +2990,15 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to
   `INTAKE_TOOLS`.~~ **Done 19 Aug**, along with the missing n8n routes. Both
   verified through the live webhook.
-- **Epoch 55 is live (23 Sep evening).** Two owner notes on two screenshots, an
+- **Epoch 56 is live (23 Sep evening).** Two owner notes on two screenshots, an
   hour apart. (1) Michael opens his first message with the hour's greeting
   himself — *"always start the conversation with the greetings"*. The old
   *"ולא פותח בו תשובה"* prohibition is deleted; `prompt.md`'s cut-offs must stay
   in step with `Sort`'s `HELLO` ternary. (2) The `לדבר עם נציג` tap now **asks
   how he can help** instead of *"ספרו לי מה העניין"* — *"it already assume there
   is a problem"*. (3) The two ticket taps are answered warmly, greet and give the name, and ask
-  **one** question — *"make this polite and concern"*. **Owed: handset proof**
+  **one** question, and all three taps share one register — *"Natural &
+  Service-Oriented"*. **Owed: handset proof**
   — probes 404 at `Send`, so only a real phone can see it.
 - **If you re-anchor `OPENER_RE`, keep the `tap === 'other'` exemption.** The
   `opener` guard in `n8n_whatsapp_retry.py` rejects a reply that is nothing but
@@ -3008,3 +3009,9 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   workflow. Stale since paging was dropped 13 Sep, not a regression — but it
   means that patcher can no longer assert the inject, so the inject's epoch hash
   has to be trusted by hand until someone re-anchors it.
+- **The status tap interrogates when it should not.** `get_request_status`
+  already falls back to the resident's own tickets, but only via
+  `ctx.residentId`, which the WhatsApp tool body never sends (it sends `phone`).
+  A `residents`-by-phone lookup exists at `debt-tools/index.ts:3403`. Wiring it
+  removes the reference-number question entirely. Needs Edge Function v99;
+  offered to the owner, not started.

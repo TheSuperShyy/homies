@@ -203,7 +203,21 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 55
+MEMORY_EPOCH = 56
+# 55 -> 56, 23 Sep: the register for a tapped button, owner's words "make the
+# response on the menu button to be Natural & Service-Oriented". Epoch 55
+# warmed the TICKET tap only; מצב קריאה קיימת was still "בטח, ספרו לי בבקשה
+# את מספר הקריאה. אם אין לכם, באיזה בניין מדובר?" -- two questions and an
+# errand. The new lines name the direction rather than a wording: the tap is
+# where the resident meets you, and asking for a reference is you keeping the
+# matter, not sending him to fetch data for you.
+#
+# CAREFUL, AND THE REASON THIS IS PHRASED THE WAY IT IS: the prompt already
+# says "תשתמש בהם בשקט, בלי להכריז שאתה בודק או מעדכן משהו", so the obvious
+# service sentence -- "אני בודק בשבילכם" -- is forbidden by a line three
+# paragraphs up. The new text carries the ban with it instead of colliding
+# with it. Competing text is what has caused every one of tonight's five
+# complaints; do not add a sixth.
 # 54 -> 55, 23 Sep: opening a ticket is answered warmly, and a tap gets the
 # greeting too. Owner on two tap replies -- "בטח, ספרו לי בבקשה מה קרה
 # ובאיזה בניין ודירה מדובר." -- "make this polite and concern like for the
@@ -511,7 +525,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "87c18f8dcac0",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "8f258d894b60",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
