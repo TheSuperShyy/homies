@@ -203,7 +203,13 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 51
+MEMORY_EPOCH = 52
+# 51 -> 52, 23 Sep, an hour later: the name leaves the system's sentence.
+# Owner: "no michael from homies -- then when they click the talk with a
+# rep it will then introduce as michael from homies." The greeting greets
+# and asks; WHO is speaking is the model's own first sentence, and again
+# when somebody taps לדבר עם נציג. Every live buffer holds an opener that
+# introduced Michael before the resident said anything.
 # 50 -> 51, 23 Sep: the third menu row reads לדבר עם נציג again and the
 # opener greets by the hour. Owner: "it should be talk with a
 # representative and the bot will be the representative, also the
@@ -471,7 +477,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "9ce2330e30db",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "cb3811191a89",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -626,7 +632,12 @@ TAP_LINE = {
 # chosen by the hour in Israel inside the live Sort node, so this tail is the
 # only part that can be matched, and everything that used to match the whole
 # sentence matches this instead.
-GREETING_TAIL = "👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?"
+# 23 Sep, later the same day: the NAME came out of it. Owner: "no michael from
+# homies — then when they click the talk with a rep it will then introduce as
+# michael from homies." The system greets and asks; who it is comes from the
+# model, in its own words, on its first reply and on a נציג tap. So the tail is
+# shorter again, and every guard that matched the old one moved with it.
+GREETING_TAIL = "👋 במה אפשר לעזור?"
 
 MENU = {
     "he": {

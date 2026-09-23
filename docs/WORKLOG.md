@@ -91,6 +91,35 @@ would have matched nothing, silently. `n8n_whatsapp_menu.py` refusing on its
 `ITEMS_3` assertion is what caught it, which is exactly what that refusal is
 for. `value: "other"` never moved.
 
+### The opener stops introducing Michael; the נציג tap starts — epoch 52, LIVE
+
+Owner, an hour later: *"can we change the message on the menu like the greeting
+and the how can we help? no michael from homies — then when they click the talk
+with a rep it will then introduce as michael from homies."*
+
+So the system's sentence is now **`<ברכה> 👋 במה אפשר לעזור?`** and introduces
+nobody. Who is speaking became the model's job, in its own words: on its first
+reply to that person, and again when somebody taps לדבר עם נציג, where the
+prompt now says to give the name in one sentence and go straight to the matter.
+**No new fixed text** — that was the constraint, and the reason the
+introduction is a prompt clause rather than a canned line.
+
+The invariant tail shrank a second time, to `👋 במה אפשר לעזור?`, and every
+anchor followed again: `Send`'s echo test, `check_greeting()`/`GREETING_TAIL`,
+the prompt's ownership clause, `greet.py`'s three constants. What did NOT move
+is `Send`'s first-contact rule, `/מיכאל מהומי'ז/.test(t) && greeted !== true` —
+it means "the model just introduced itself to someone new", which is still true
+and now matters more, since the system no longer does it.
+
+**MEMORY_EPOCH 51 → 52** in the same hour as 50 → 51. Both were real: every
+live buffer held an opener that introduced Michael before the resident had said
+anything, and an example beats an instruction.
+
+All eight patchers idle, `node --check` clean on the patched `Sort`, read back
+from the live workflow. **The handset proof now covers both:** a bare hello
+should greet by the hour WITHOUT a name, and a tap on לדבר עם נציג should come
+back with one.
+
 **Shipped:** new patcher `scripts/n8n_whatsapp_rep.py` (five live edits, backed
 up to `docs/handover/n8n-whatsapp-live-23sep-before-rep.json`), then
 `n8n_whatsapp_teamnote.py --apply` for prompt + `show_menu` + **MEMORY_EPOCH

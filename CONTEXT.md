@@ -3214,6 +3214,13 @@ ownership clause, `greet.py`. When a piece of fixed text has to start varying,
 find the part that cannot vary and move every anchor onto it in the same
 commit; the alternative is a guard that reads as present and protects nothing.
 
+**Who is speaking is the model's line, not the system's (23 Sep).** The
+opener greets and asks and introduces nobody; the name arrives in the model's
+own first reply, and again on a לדבר עם נציג tap. It was tempting to make the
+tap send a canned introduction — that is exactly the thing the 1 Sep rule
+forbids, and a second piece of fixed text would have been a worse bot for a
+smaller change. A clause in the prompt does the same job and varies by itself.
+
 **The bot is the representative, and that is the whole handover story (23 Sep).**
 The third row reads `לדבר עם נציג` again, and 13 Sep still stands: nothing pages
 a person from WhatsApp. The label is honest because the prompt has cast the bot

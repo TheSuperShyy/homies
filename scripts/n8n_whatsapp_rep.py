@@ -65,24 +65,21 @@ TAP_NEW = '"לדבר עם נציג":       "other",'
 # --------------------------------------------------------------------------
 # 2. Sort: the opener follows the clock.
 # --------------------------------------------------------------------------
-CONTENT_OLD = (
-    'const MENU = {\n'
-    '  content: "היי 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?",'
-)
-CONTENT_NEW = (
-    '// 23 Sep: the opening word follows the clock in Israel, as both voice\n'
-    '// agents have since 22 Sep. ONLY the first word moves -- everything from\n'
-    '// the wave on is the invariant tail that Send\'s echo guard and\n'
-    '// check_greeting() anchor on. hourCycle h23 because h12/hour12:false\n'
-    '// returns 24 for midnight on some engines.\n'
-    'const HH = Number(new Intl.DateTimeFormat(\'en-GB\', '
-    '{ hour: \'2-digit\', hourCycle: \'h23\', timeZone: \'Asia/Jerusalem\' })'
-    '.format(new Date()));\n'
-    'const HELLO = HH < 5 ? \'שלום\' : HH < 12 ? \'בוקר טוב\' '
-    ': HH < 17 ? \'צהריים טובים\' : \'ערב טוב\';\n'
-    'const MENU = {\n'
-    '  content: HELLO + " 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?",'
-)
+# TWO STEPS IN ONE DAY, and these anchors record the second. Step one put the
+# clock in front of the old sentence. Step two took the NAME out of it, on the
+# owner's follow-up: "can we change the message on the menu like the greeting
+# and the how can we help? no michael from homies -- then when they click the
+# talk with a rep it will then introduce as michael from homies."
+#
+# So the system's sentence now greets and asks, and introduces nobody. The
+# introduction moves to the model, in its own words, on its first reply to that
+# person and again when somebody taps לדבר עם נציג -- a sentence written fresh
+# each time, never a second piece of fixed text. The invariant tail shrinks with
+# it, to `👋 במה אפשר לעזור?`, and every guard follows.
+#
+# The anchor below is therefore the step-one live state, not the original one.
+CONTENT_OLD = '  content: HELLO + " 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?",'
+CONTENT_NEW = '  content: HELLO + " 👋 במה אפשר לעזור?",'
 
 # --------------------------------------------------------------------------
 # 3. Send: the echo guard drops the first word and keeps the tail.
@@ -90,8 +87,8 @@ CONTENT_NEW = (
 # Narrow on purpose. The live literal is single-quoted JS with an escaped
 # apostrophe further along; touching only the head of it leaves that escape
 # exactly as found -- the 17 Sep outage was that character, unescaped.
-ECHO_OLD = "t.indexOf('היי 👋 כאן"
-ECHO_NEW = "t.indexOf('👋 כאן"
+ECHO_OLD = "t.indexOf('👋 כאן מיכאל מהומי\\'ז. במה אפשר לעזור?')"
+ECHO_NEW = "t.indexOf('👋 במה אפשר לעזור?')"
 
 # --------------------------------------------------------------------------
 # 4. Send: the opener SHAPE learns the three clock greetings.
