@@ -136,7 +136,20 @@ STRIP = r".replace(/[\p{Extended_Pictographic}️]/gu, '').replace(/\s+/g, ' ').
 # already had -- on a message that was not a bare hello (a bare hello never
 # reaches this node; the canned menu answers it). Emoji and the variation
 # selector come off first, as in Sort.
-OPENER = (r"={{ $runIndex > 0 || $('Sort').first().json.greeting === true || (() => {"
+# 23 Sep, epoch 54: `tap === 'other'` is exempt, and that is the owner's
+# instruction turned into a guard. He read the נציג reply -- "ספרו לי בבקשה מה
+# העניין" -- and said *"it already assume there is a problem. i want it to ask
+# how can he help."* So the prompt now asks for exactly the sentence this guard
+# was built to catch: a greeting, the name, and "במה אוכל לעזור?", nothing else.
+# On any other message that shape is still the failure it always was -- the
+# resident said something concrete and got the opener recited back. On the נציג
+# tap it is the CORRECT reply, because the resident said nothing to continue
+# from: the tap carries no content beyond "I want a person". Narrow on purpose,
+# `tap` and not `tapped_human`: `tap` is this message's own row (Sort's
+# "carried for readback"), so the exemption lasts exactly one turn and the
+# guard is live again on the next.
+OPENER = (r"={{ $runIndex > 0 || $('Sort').first().json.greeting === true"
+          r" || $('Sort').first().json.tap === 'other' || (() => {"
           r" const t = String($json.output || '')" + STRIP + ";"
           r" return !" + OPENER_RE + ".test(t); })() }}")
 

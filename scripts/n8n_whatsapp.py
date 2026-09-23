@@ -203,7 +203,17 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 53
+MEMORY_EPOCH = 54
+# 53 -> 54, 23 Sep, minutes later: the first question stops assuming a fault.
+# Owner, on the 22:07 reply "ערב טוב, מיכאל מהומי'ז. ספרו לי בבקשה מה העניין
+# ואשמח לעזור.": "it already assume there is a problem. i want it to ask how
+# can he help." Somebody who taps לדבר עם נציג has said nothing except that
+# he wants a person -- he may want to pay, or ask a question. "מה העניין"
+# hands him a fault he never mentioned. Two edits: the ban on re-asking
+# "במה לעזור" is scoped to people who HAVE said something, and the נציג
+# clause now asks the open question outright. The `opener` guard in
+# n8n_whatsapp_retry.py is exempted for this one tap in the same breath, or
+# it would throw the wanted reply away as a bare recital.
 # 52 -> 53, 23 Sep evening: Michael opens with the hour's greeting himself.
 # Owner, on a 21:51 screenshot reading "אני מיכאל מהומי'ז. ספרו לי בבקשה
 # במה אוכל לעזור לכם.": "make sure michael/the bot always start the
@@ -487,7 +497,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "bf10f2d77813",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "8eefe7f453bc",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

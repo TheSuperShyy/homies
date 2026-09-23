@@ -2990,12 +2990,19 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - ~~`scripts/vapi_tools.py` — add `get_request_status` and `get_balance` to
   `INTAKE_TOOLS`.~~ **Done 19 Aug**, along with the missing n8n routes. Both
   verified through the live webhook.
-- **Epoch 53 is live (23 Sep evening).** Michael now opens his first message
-  with the hour's greeting himself — the owner's *"always start the conversation
-  with the greetings"*, on a 21:51 screenshot that had none. The prompt's old
-  *"ולא פותח בו תשובה"* prohibition is deleted; the cut-offs in `prompt.md` must
-  stay in step with `Sort`'s `HELLO` ternary. **Owed: handset proof** — probes
-  404 at `Send`, so only a real phone can see it.
+- **Epoch 54 is live (23 Sep evening).** Two owner notes on two screenshots, an
+  hour apart. (1) Michael opens his first message with the hour's greeting
+  himself — *"always start the conversation with the greetings"*. The old
+  *"ולא פותח בו תשובה"* prohibition is deleted; `prompt.md`'s cut-offs must stay
+  in step with `Sort`'s `HELLO` ternary. (2) The `לדבר עם נציג` tap now **asks
+  how he can help** instead of *"ספרו לי מה העניין"* — *"it already assume there
+  is a problem"*. **Owed: handset proof** — probes 404 at `Send`, so only a real
+  phone can see it.
+- **If you re-anchor `OPENER_RE`, keep the `tap === 'other'` exemption.** The
+  `opener` guard in `n8n_whatsapp_retry.py` rejects a reply that is nothing but
+  greeting + name + "how can I help" — which is now exactly what the נציג tap
+  is *supposed* to produce. Drop the exemption and the bot's correct reply gets
+  thrown away and retried on every tap.
 - `scripts/n8n_whatsapp_untemplate.py` refuses: no `Human tap?` node on the live
   workflow. Stale since paging was dropped 13 Sep, not a regression — but it
   means that patcher can no longer assert the inject, so the inject's epoch hash

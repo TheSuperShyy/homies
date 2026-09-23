@@ -3321,3 +3321,16 @@ the greeting to the system and told the model to keep its hands off it. The
 model was obeying. Adding "always greet" on top of that would have left two
 instructions fighting; deleting the prohibition was the whole fix. A missing
 behaviour is far more often a live prohibition than a missing rule.
+
+**A guard is a bet on which shape is wrong, and the bet can expire (23 Sep).**
+The `opener` guard rejects a reply that is nothing but greeting + name + "how
+can I help" — written when that shape was always a recital of the canned opener
+at somebody who had just reported a fault. When the owner asked for the נציג tap
+to be answered with exactly that sentence, the guard did not become wrong; its
+scope did. A resident who tapped `לדבר עם נציג` has said nothing to continue
+from, so there the shape is the correct answer, and everywhere else it is still
+the old failure. Hence the one-turn exemption on `tap === 'other'` rather than
+weakening the pattern. **When a prompt change asks for a shape some guard
+catches, the guard needs a scope, not a deletion** — and check for this before
+shipping, because the symptom is silent: the reply is thrown away, retried, and
+the second attempt quietly says something else.

@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-09-23
 
+### The נציג tap asks how he can help, and stops assuming a fault — epoch 54 LIVE
+
+Minutes after epoch 53, the owner sent the 22:07 reply: *"ערב טוב, מיכאל
+מהומי'ז. ספרו לי בבקשה מה העניין ואשמח לעזור."* His note: *"it already assume
+there is a problem. i want it to ask how can he help."* Right — somebody who
+taps `לדבר עם נציג` has said nothing but that he wants a person. He may want to
+pay, or ask a question. *"מה העניין"* hands him a fault he never mentioned.
+
+Two prompt edits and one guard:
+
+- `prompt.md:343` — the נציג clause now greets, introduces, and **asks the open
+  question**, with the three assuming phrasings named and ruled out.
+- `prompt.md:341` — the ban on re-asking *"במה לעזור"* is **scoped** to people
+  who have already said something. Someone who has said nothing is the exact
+  opposite case: there is nothing to continue from, so the question is right.
+- `retry.py` `opener` guard — **exempt when `tap === 'other'`.**
+
+**The guard would have eaten the change.** `OPENER_RE` matches a reply that is
+nothing but greeting + name + "how can I help" — which is *precisely* what the
+owner asked for. Tested against the live regex: the wanted reply matches
+(would have been rejected and retried, a wasted OpenRouter call and a likely
+regression to "מה העניין" on the second pass); the 22:07 reply he rejected
+passes, which is why he saw it. `tap` and not `tapped_human` on purpose —
+`tap` is this message's own row, so the exemption lasts exactly one turn.
+
+Verified with **no OpenRouter spend**: guard read back live, prompt clauses read
+back (`מזמין אותו לספר לך מה העניין` gone), `sessionKey` `-54`, regex exercised
+in `node` on four replies. All six patchers idle.
+
 ### Michael opens with the hour's greeting himself — epoch 53 LIVE
 
 The owner sent a 21:51 screenshot of the bot's own first reply: *"אני מיכאל
