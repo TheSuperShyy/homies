@@ -203,7 +203,15 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 50
+MEMORY_EPOCH = 51
+# 50 -> 51, 23 Sep: the third menu row reads לדבר עם נציג again and the
+# opener greets by the hour. Owner: "it should be talk with a
+# representative and the bot will be the representative, also the
+# starting conversation should always be a greeting like good morning,
+# good afternoon, good evening." The behaviour behind the row does NOT
+# change -- nothing pages a person, as decided on 13 Sep -- but every
+# live buffer holds the old title and the old gloss, and an example
+# beats an instruction.
 # 49 -> 50, 20 Sep, an hour later: asking back. The owner: "can we also
 # do the bot asking how their day went". The 49 clause answered a
 # greeting in kind and went to the matter; now a resident who asks how
@@ -463,7 +471,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "2a6f7fc41e00",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "9ce2330e30db",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -471,7 +479,8 @@ EPOCH_COVERS = {
     # and nothing covered it. Parameter docs in the live jsonBody are NOT
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
-    "tools": "8c0817f7d0df",
+    # 23 Sep: show_menu now names the third row "talk to a representative".
+    "tools": "65f27ed67d90",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -613,6 +622,12 @@ TAP_LINE = {
 # the old "היי, כאן הומיז. מה קרה?", so every resident who opened with a plain
 # hello got the old greeting from a prompt that no longer contained it. Verified
 # live on 14 Aug from a real handset. Change both or neither.
+# The half of the opener that never changes. Since 23 Sep the first word is
+# chosen by the hour in Israel inside the live Sort node, so this tail is the
+# only part that can be matched, and everything that used to match the whole
+# sentence matches this instead.
+GREETING_TAIL = "👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?"
+
 MENU = {
     "he": {
         "type": "list",
@@ -624,7 +639,13 @@ MENU = {
         # their titles are the tap-routing keys). Every copy of this
         # sentence moved in the same commit: here, the prompt's ownership
         # clause, live Sort's MENU.content and Send's echo clause.
-        "body": {"text": "היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?"},
+        # 23 Sep: the first word follows the clock (בוקר טוב / צהריים טובים /
+        # ערב טוב, שלום before 05:00), so the sentence is no longer ONE
+        # literal and cannot be asserted as one. GREETING_TAIL below is the
+        # part that never moves, and it is what every guard anchors on now:
+        # check_greeting(), live Send's echo clause, the prompt's ownership
+        # clause. The text here is a worked example of the noon form.
+        "body": {"text": "צהריים טובים " + GREETING_TAIL},
         "footer": {"text": "אפשר גם לבחור מהרשימה"},
         "action": {
             "button": "אפשרויות",
@@ -641,8 +662,13 @@ MENU = {
                 # shape and is dead for the menu -- the live one is
                 # Chatwoot-shaped inside Sort -- but it must not carry a
                 # title that no longer exists anywhere.
-                {"id": "other", "title": "משהו אחר",
-                 "description": "לא מצאתם את המקרה שלכם ברשימה"},
+                # 23 Sep: the title goes back to "לדבר עם נציג" and the
+                # behaviour does NOT. Nothing still pages anyone; the bot is
+                # the representative, which is what the prompt has called it
+                # all along. Owner: "it should be talk with a representative
+                # and the bot will be the representative."
+                {"id": "other", "title": "לדבר עם נציג",
+                 "description": "לדבר עם מיכאל על כל דבר אחר"},
             ]}],
         },
     },
@@ -908,16 +934,22 @@ def check_greeting(prompt):
     So it is asserted rather than remembered. The prompt carries the opener as a
     worked example, verbatim, which is exactly what makes this checkable: if the
     two stop matching, the deploy stops.
+
+    23 Sep: the first word now follows the clock, so what is asserted is
+    GREETING_TAIL — the part from the wave onwards, which does not move. The
+    check is weaker by exactly one word and no weaker anywhere else: the 13 Aug
+    drift rewrote the whole sentence and would still be caught here.
     """
-    body = MENU["he"]["body"]["text"]
-    if body not in prompt:
+    if GREETING_TAIL not in prompt:
         sys.exit(
             "The menu greeting and the prompt's opener have drifted.\n"
-            "  MENU  : %s\n"
+            "  TAIL  : %s\n"
             "  ...is not in %s\n"
-            "A bare greeting is answered by MENU, not by the model, so these two\n"
-            "have to be the same sentence. Fix whichever is stale, then re-run."
-            % (body, os.path.relpath(PROMPT_DOC, ROOT)))
+            "A bare greeting is answered by the workflow, not by the model, so\n"
+            "the prompt has to quote the sentence the workflow sends. Only the\n"
+            "first word varies, by the hour; the tail must match. Fix whichever\n"
+            "is stale, then re-run."
+            % (GREETING_TAIL, os.path.relpath(PROMPT_DOC, ROOT)))
 
 
 NOT_COVERED = "\n".join([
@@ -1434,8 +1466,8 @@ TOOLS = [
         "name": "show_menu",
         "description": (
             "Shows the resident the standard options list — open a service "
-            "ticket, check an existing one, something else — attached by "
-            "the system underneath your NEXT message. "
+            "ticket, check an existing one, talk to a representative — "
+            "attached by the system underneath your NEXT message. "
             "Use it whenever the resident does not know what they want, asks "
             "what you can do, or the conversation would stall with nothing "
             "concrete to act on. If you are about to write the options out in "

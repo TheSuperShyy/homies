@@ -84,14 +84,15 @@ STEPS = ("(() => { try { return ($('Answer the resident').first().json"
 FILTER = ("[/קריא(ת|ות) שירות|תקל/, /קריא(ה|ות) קיימ|מצב (ה)?קריא/, /יתר(ה|ות)|תשלומ/, "
           "/נציג|בן אדם/, /מידע כללי|השירותים ש/]"
           ".filter(r => r.test(t)).length >= 3 || ")
-# 13 Sep: the third row reads משהו אחר / other. "לדבר עם נציג" went with
-# the paging it started (n8n_whatsapp_nopage.py owns that rename live;
-# these strings only have to recognise the current Send).
+# 13 Sep: the third row read משהו אחר / other. 23 Sep: the title went back to
+# לדבר עם נציג and the paging did NOT come with it -- the bot is the
+# representative (n8n_whatsapp_rep.py owns that rename live; these strings
+# only have to recognise the current Send). `value` has never moved.
 ITEMS_3 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
-           "{ title: 'משהו אחר', value: 'other' }")
+           "{ title: 'לדבר עם נציג', value: 'other' }")
 ITEMS_4 = ("{ title: 'מצב קריאה קיימת', value: 'status' }, "
            "{ title: 'יתרה ותשלומים', value: 'balance' }, "
-           "{ title: 'משהו אחר', value: 'other' }")
+           "{ title: 'לדבר עם נציג', value: 'other' }")
 
 # open_request.reporter_unit: keep the send-when-known policy, kill the
 # ask-pressure that fought the other two tools' unit rules (layer audit,

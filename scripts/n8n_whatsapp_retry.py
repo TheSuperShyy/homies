@@ -123,7 +123,13 @@ PLURAL = (r"={{ $runIndex > 0 || !/([א-ת]{2,})[א-ת]?(\/|\()(\1[א-ת]?)?(י|
 # The shape of a bare "how can I help" turn: a hello, the name or not, "how
 # can I help", nothing else. One source, two uses: the `opener` guard below
 # and Send's third menu rule.
-OPENER_RE = (r"/^(היי|הי|שלום|שלום רב|אהלן)[,!.]?( (כאן |אני )?מיכאל מהומי'ז( כאן)?[.,!]?)?"
+# 23 Sep: the workflow's own opener greets by the hour, so בוקר טוב /
+# צהריים טובים / ערב טוב are openers too. Without them the clock greeting
+# stops being recognised as the turn the resident has already had, and the
+# guard quietly protects nothing -- the same failure n8n_whatsapp_rename.py
+# records for Send's echo tests.
+OPENER_RE = (r"/^(היי|הי|שלום|שלום רב|אהלן|בוקר טוב|צהריים טובים|ערב טוב)[,!.]?"
+             r"( (כאן |אני )?מיכאל מהומי'ז( כאן)?[.,!]?)?"
              r" ?במה (אפשר|אוכל|נוכל) לעזור( לכם| לך| לכם היום)?\??$/")
 STRIP = r".replace(/[\p{Extended_Pictographic}️]/gu, '').replace(/\s+/g, ' ').trim()"
 # `opener`: the whole reply is that shape -- the turn the resident has

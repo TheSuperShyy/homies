@@ -4,8 +4,8 @@ real row to call and a real number to send the link to -- then take it off.
     python scripts/debt_demo_person.py on  +<country><number> --name clix
     python scripts/debt_demo_person.py off +<country><number>
 
-`on` inserts one `residents` row (the name you give, building הרצל 112,
-flat 1) and one `charges` row (July 2026, 450 shekels, unpaid), and prints the
+`on` inserts one `residents` row (the name you give, building בר כוכבא 23,
+flat 2) and one `charges` row per unpaid month, and prints the
 `v_debt_call_queue_person` row the dashboard's debt tab and the Call button
 read -- first name, apartments phrase, amount in words -- so you see what the
 agent will say. `off` deletes the resident; the charge and every payment_links
@@ -19,11 +19,15 @@ constraint both leave alone, so a demo row inserted at noon is still there at
 midnight. It is a small lie about provenance, named here, and `off` is how it
 ends.
 
-THE FLAT IS REAL AND OWES NOTHING. הרצל 112 flat 1 is the zero-balance flat the
-18 Sep chat simulation used; OXS mints a real link for it, which opens a ₪0
-balance while the agent says ₪450. Demo-only mismatch, because no real
-debtor's flat is ever used for this. While the number is on file the chat bot
-also serves it as that flat's resident (the payment link by chat included).
+THE FLAT IS HOMIES' OWN TEST FLAT (23 Sep). Yariv opened בר כוכבא 23 for us
+with ten flats and ועד בית at 250 a month, unpaid. Flat 2 is Asaf's, chosen by
+the owner: the payment page names Asaf while the message arrives on the owner's
+own handset, because OXS tenants are read-only and their phone cannot be changed
+from here. So the link opens a real balance on a flat nobody lives in, and the
+amount the agent says comes from the same charges OXS shows. Until
+this, the demo borrowed a real resident's flat and said 450 over a 0 balance.
+While the number is on file the chat bot also serves it as that flat's
+resident (the payment link by chat included).
 
 Refuses to touch a row it did not make: a number on file with any other
 source, or under the paylink throwaway's name, is left alone either way.
@@ -42,10 +46,21 @@ import n8n_whatsapp as W  # noqa: E402
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BUILDING = "הרצל 112, תל אביב - יפו"
-UNIT = "1"
-PERIOD = "2026-07-01"
-AMOUNT = 450
+# 23 Sep: moved off הרצל 112 flat 1, a real resident's flat that owes nothing,
+# onto Homies' own test building. Yariv opened בר כוכבא 23 for us that day with
+# ten flats and ועד בית charged at 250 a month, none of it paid -- so for the
+# first time the amount the agent says and the balance the link opens come from
+# the same place. Flat 2 by the owner's choice (23 Sep): it is Asaf's flat in
+# OXS, so the payment page names him while the message comes to the owner's own
+# handset -- which is the point, since OXS tenants are read-only and a phone
+# there cannot be changed from here. Flat 4 is the unnamed one if a blank payer
+# is ever wanted instead.
+BUILDING = "בר כוכבא 23, תל אביב - יפו"
+UNIT = "2"
+# The months OXS shows as charged and unpaid, up to the last one that has ended
+# -- the same rule oxs_arrears.py uses, so the demo says what a real debtor's
+# row would say. September is left out until its due date passes.
+CHARGES = [("2026-%02d-01" % m, 250) for m in range(1, 9)]
 SOURCE = "agent"
 
 
@@ -87,9 +102,11 @@ def main():
             print("resident: …%s -> %s, flat %s, named %s" % (phone[-4:], BUILDING, UNIT, name))
         ch = call("GET", "charges?resident_id=eq.%s&select=id,period,amount,status" % rid)
         if not ch:
-            call("POST", "charges", {"resident_id": rid, "period": PERIOD, "amount": AMOUNT,
-                                     "status": "unpaid", "unit": UNIT, "source": SOURCE})
-            print("charge  : %s, %d shekels, unpaid" % (PERIOD, AMOUNT))
+            call("POST", "charges", [{"resident_id": rid, "period": p, "amount": a,
+                                      "status": "unpaid", "unit": UNIT, "source": SOURCE}
+                                     for p, a in CHARGES])
+            print("charges : %d months, %d shekels each, %d total, unpaid"
+                  % (len(CHARGES), CHARGES[0][1], sum(a for _, a in CHARGES)))
         else:
             print("charge  : already there (%s)" % ", ".join("%s %s %s" % (c["period"], c["amount"], c["status"]) for c in ch))
         row = call("GET", "v_debt_call_queue_person?resident_id=eq.%s&select=first_name,building,apartments_phrase,months_phrase,amount,charges" % rid)

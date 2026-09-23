@@ -55,6 +55,60 @@ gone** — that marker now counts zero.
 
 ## 2026-09-23
 
+### The third button says "talk to a representative", and the opener greets by the hour — epoch 51, LIVE
+
+Owner: *"it should be talk with a representative and the bot will be the
+representative, also the starting conversation should always be a greeting like
+good morning, good afternoon, good evening."*
+
+**The label came back; the handover did not.** 13 Sep is the day
+`לדבר עם נציג` BECAME `משהו אחר`, because the owner wanted the bot to handle
+everything rather than pass residents on. Nothing pages a person now either —
+the prompt has cast the bot as נציג השירות since the beginning, so a resident
+asking for a representative gets one. The gloss in the prompt says it in as many
+words: *לא מעבירים אותו לאף אחד, לא אומרים לו שמישהו יחזור אליו.*
+
+**The opener follows the clock**, same cut-offs as both voice agents since
+22 Sep: before 05:00 שלום, to 12:00 בוקר טוב, to 17:00 צהריים טובים, then
+ערב טוב. Plain JS in the `Sort` Code node (`Intl.DateTimeFormat`, `hourCycle
+h23` because `hour12:false` returns 24 at midnight on some engines), not Luxon —
+the workflow carries no timezone setting, which is why the agent's inject spells
+out `setZone` too.
+
+**The design decision that made it safe:** only the first word moves, and
+everything from the wave on — `👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?` — is the
+invariant tail. Every guard that used to match the whole sentence now matches
+the tail: `Send`'s echo test, `check_greeting()`, the prompt's ownership clause,
+and `greet.py`'s anchors. `n8n_whatsapp_rename.py` had already recorded what
+happens otherwise: *"the protection reads as present and is not."*
+
+**THE TITLE IS THE ROUTING KEY, and it nearly bit.** Chatwoot drops a button's
+id and forwards only its text, so the title lives in three live places: `Sort`'s
+`MENU.items`, `Sort`'s `TAP_KIND`, and the `Send` row the handset actually
+draws. The first apply moved two of the three. Nothing errored — a handset would
+have shown one label while the routing table waited for another, and the tap
+would have matched nothing, silently. `n8n_whatsapp_menu.py` refusing on its
+`ITEMS_3` assertion is what caught it, which is exactly what that refusal is
+for. `value: "other"` never moved.
+
+**Shipped:** new patcher `scripts/n8n_whatsapp_rep.py` (five live edits, backed
+up to `docs/handover/n8n-whatsapp-live-23sep-before-rep.json`), then
+`n8n_whatsapp_teamnote.py --apply` for prompt + `show_menu` + **MEMORY_EPOCH
+50 → 51** (prompt `9ce2330e30db`, tools `65f27ed67d90`; one bump for one
+shipment), then `n8n_whatsapp_retry.py --apply` for the second live use of the
+opener shape, the `Reply usable?` guard. Repo copies moved with them: the dead
+`MENU` row, `GREETING_TAIL` + `check_greeting()`, `show_menu`'s wording, and the
+stale anchors in `menu.py`, `nopage.py`, `retry.py` and `greet.py`.
+
+**Verified without spending OpenRouter credit, per the standing rule:** all
+eight patchers read *"Nothing to do. Live already matches."*, the patched `Sort`
+passes `node --check`, the greeting JS was run for every boundary hour
+(0/4→שלום, 5/11→בוקר טוב, 12/16→צהריים טובים, 17/23→ערב טוב), and `משהו אחר`
+no longer appears anywhere in the live workflow. **Owed: the handset.** Buttons
+are only ever seen there — probes 404 at `Send` — so the proof is a bare hello
+from a real phone showing the hour's greeting and the third row, and a tap
+answered without any promise of a person.
+
 ### Resolving a WhatsApp ticket in the dashboard was refused by the database, and the page said nothing
 
 Owner, after setting 255-1307-26 to Resolved and getting no message: *"i made

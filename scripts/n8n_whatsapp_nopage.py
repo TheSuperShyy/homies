@@ -109,11 +109,14 @@ NEED = ("Sort", "Send", "show_menu", "Reply usable?", "Type for a moment",
 # --------------------------------------------------------------------------
 # Sort. Whitespace inside the two lines is the editor's column alignment, so
 # the anchors are regexes on the meaning and the replacements keep the shape.
+# 23 Sep: the NEW side reads לדבר עם נציג again -- the title came back, the
+# paging did not, and n8n_whatsapp_rep.py is what moved it live. The OLD
+# side still names `human`, so --restore is no more runnable than before.
 # --------------------------------------------------------------------------
 SORT_MENU_OLD = re.compile(r'\{ title: "לדבר עם נציג",\s*value: "human" \}')
-SORT_MENU_NEW = '{ title: "משהו אחר",         value: "other" }'
+SORT_MENU_NEW = '{ title: "לדבר עם נציג",      value: "other" }'
 SORT_KIND_OLD = re.compile(r'"לדבר עם נציג":\s*"human",')
-SORT_KIND_NEW = '"משהו אחר":          "other",'
+SORT_KIND_NEW = '"לדבר עם נציג":       "other",'
 # A comment, and only a comment: true once, false now, and a person reading
 # the live script next month deserves the current sentence.
 SORT_NOTE_OLD = "// `tap` is what Human tap? reads, and it now leaves the node on this return"
@@ -122,7 +125,7 @@ SORT_NOTE_NEW = ("// `tap` is the row's kind, carried for readback. Since 13 Sep
 
 # Send's input_select items, exact.
 SEND_OLD = "{ title: 'לדבר עם נציג', value: 'human' }"
-SEND_NEW = "{ title: 'משהו אחר', value: 'other' }"
+SEND_NEW = "{ title: 'לדבר עם נציג', value: 'other' }"
 
 # The sticky.
 STICKY_OLD = "the 200 to Chatwoot, the menu, and Human tap? -> Transfer the tap."

@@ -74,7 +74,7 @@ GREET_NEW = (
 # anchors stopped matching an up-to-date Send and this file refused as
 # drifted. The echo clause itself is the anchor now: present = done; absent =
 # insert it before the מיכאל fallback test, wherever that sits.
-SEND_ECHO = "t.indexOf('היי 👋 כאן מיכאל מהומי\\'ז. במה אפשר לעזור?') !== -1 || "
+SEND_ECHO = "t.indexOf('👋 כאן מיכאל מהומי\\'ז. במה אפשר לעזור?') !== -1 || "
 SEND_TAIL = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greeted !== true))"
 
 # --------------------------------------------------------------------------
@@ -85,14 +85,18 @@ SEND_TAIL = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greet
 #    sentence twice (content + a history comment), so the content anchor
 #    carries its JS syntax.
 # --------------------------------------------------------------------------
+# 23 Sep: the opener greets by the hour (n8n_whatsapp_rep.py), so the "done"
+# side of every anchor here is the computed form and the tail-only echo. The
+# 7 Sep sentence stays as the "before" side — this file is the record of how
+# the wave got there, and it has to read idle against a current workflow.
 SORT_PLAIN = 'content: "היי, כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
-SORT_WAVE = 'content: "היי 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
+SORT_WAVE = 'content: HELLO + " 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
 ECHO_PLAIN = "'היי, כאן מיכאל מהומי'ז. במה אפשר לעזור?'"
 # The apostrophe is escaped here as it is in the live single-quoted JS --
 # the outage of 17 Sep was this exact character unescaped (see
 # n8n_whatsapp_rename.py). The anchor went stale when SEND_ECHO was fixed
 # and this one was not; a dry run refused on it until 17 Sep evening.
-ECHO_WAVE = "'היי 👋 כאן מיכאל מהומי" + chr(92) + "'ז. במה אפשר לעזור?'"
+ECHO_WAVE = "'👋 כאן מיכאל מהומי" + chr(92) + "'ז. במה אפשר לעזור?'"
 
 # --------------------------------------------------------------------------
 # 3. get_balance's unit doc: the normal case first, and never a question.

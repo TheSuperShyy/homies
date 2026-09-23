@@ -3197,6 +3197,29 @@ rule is for you, not for him" clause of 16 Sep had made the private/common
 rule usable, and the voice prompt had the rule without the clause. A rule
 ported without its usage clause is recited to the caller.
 
+**One string in three places, and the title is the key (23 Sep).** Chatwoot
+throws a button's id away and forwards only its TEXT, so a menu row's title is
+the routing key, and it lives in three live places: `Sort`'s `MENU.items`,
+`Sort`'s `TAP_KIND`, and the `Send` row the handset draws. Move two of the three
+and nothing errors — the resident sees one label while the router waits for
+another, and the tap matches nothing. What caught it was another patcher
+refusing on an assertion it holds about a region it does not own. That refusal
+is not noise to route around; it is the only alarm this class of bug has.
+
+**Only the first word of the opener moves (23 Sep).** The greeting follows the
+clock now, so the sentence is no longer one literal. Everything from the wave
+on — `👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?` — is the invariant tail, and every
+guard anchors on that: `Send`'s echo test, `check_greeting()`, the prompt's
+ownership clause, `greet.py`. When a piece of fixed text has to start varying,
+find the part that cannot vary and move every anchor onto it in the same
+commit; the alternative is a guard that reads as present and protects nothing.
+
+**The bot is the representative, and that is the whole handover story (23 Sep).**
+The third row reads `לדבר עם נציג` again, and 13 Sep still stands: nothing pages
+a person from WhatsApp. The label is honest because the prompt has cast the bot
+as נציג השירות from the start. A label may promise only what the system does —
+here it caught up with the system rather than the other way round.
+
 **Outbound means the window is shut, so an outbound message is a template
 (23 Sep).** The rule "no fixed messages except the menu" (17 Sep) is about the
 bot's voice, not about Meta's rules. Anything we send to someone who has not
