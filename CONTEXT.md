@@ -3203,7 +3203,9 @@ ported without its usage clause is recited to the caller.
 purpose, because a notice is written by the system. As an ordinary INVOKER
 function the insert ran as the signed-in staff member, was refused, and took
 the parent UPDATE down with it: nobody could resolve a WhatsApp ticket, and the
-error named `ticket_notices` while the thing that failed was `requests`. The
+error named `ticket_notices` while the thing that failed was `requests`.
+Applied and closed the same day: ticket 255-1307-26 resolved on the dashboard,
+message 1648 delivered 82 seconds later. The
 failure surfaces on the table you touched, not on the one that refused you,
 which is what makes it hard to read. The fix is the function's rights
 (migration 037), never an insert policy that hands people a write they should

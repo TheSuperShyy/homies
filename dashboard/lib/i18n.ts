@@ -243,6 +243,8 @@ const S = {
   'tickets.save':       { he: 'שמירה',    en: 'Save' },
   'tickets.empty':      { he: 'אין קריאות.', en: 'No tickets.' },
   'tickets.emptyStatus':{ he: 'אין קריאות בסטטוס {status}.', en: 'No tickets with status {status}.' },
+  'tickets.saveFailed': { he: 'הסטטוס של קריאה {reference} לא נשמר. אפשר לנסות שוב, ואם זה חוזר כדאי לעדכן את Clix.',
+                          en: 'The status of ticket {reference} was not saved. Try again, and tell Clix if it keeps happening.' },
   'tickets.unit':       { he: 'קריאות',   en: 'tickets' },
   // Not "gone" any more — a departure is a closure and the sync writes it as
   // one. This fires only on a ticket still open our side that OXS is not

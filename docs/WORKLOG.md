@@ -94,6 +94,10 @@ Chatwoot message **1648** carrying no error from Meta. The message:
 after saving, before the cron ran, and reported silence: **the job is every two
 minutes, so "nothing happened" is only true after two minutes.**
 
+The dashboard half of this — the visible "not saved" line — reaches the live
+dashboard only when `feature/chatbot` merges to `main`. The database half is
+live now, and it was the half that blocked everything.
+
 ### `ticket_resolved_he` is APPROVED and synced
 
 `python scripts/wa_templates.py` and `… chatwoot` both show

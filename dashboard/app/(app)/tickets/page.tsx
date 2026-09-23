@@ -1,4 +1,5 @@
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase-server';
 import { Pager, pageFrom, pageRange, perParam, sizeFrom } from '@/components/pager';
 import { getLocale, label, translator, when, type T } from '@/lib/i18n';
@@ -14,15 +15,24 @@ import Link from 'next/link';
 const STATUSES = ['open', 'in_progress', 'needs_review', 'resolved', 'cancelled'];
 
 // A server action rather than a route handler: the form posts here with no
-// client JS, and the anon key is all it carries — migration 011 grants that
-// role UPDATE on the status column and nothing else, so even a hand-crafted
+// client JS, and the anon key is all it carries — the signed-in session is what
+// grants the write, through `authenticated_update_status` (migration 026, which
+// revoked the anon grant migration 011 had given). So even a hand-crafted
 // request through this action cannot rewrite a description or a reference.
+//
+// The error is reported, not discarded (23 Sep). It used to be dropped on the
+// floor, and the day a refused write appeared — a trigger rolling back every
+// attempt to resolve a WhatsApp ticket, fixed in migration 037 — the page
+// redrew with the old status and said nothing at all. A save that fails has to
+// look like a save that failed.
 async function updateStatus(formData: FormData) {
   'use server';
   const reference = String(formData.get('reference') ?? '');
   const status = String(formData.get('status') ?? '');
   if (!reference || !STATUSES.includes(status)) return;
-  await serverClient().from('requests').update({ status }).eq('reference', reference);
+  const { error } = await serverClient().from('requests')
+    .update({ status }).eq('reference', reference);
+  if (error) redirect(`/tickets?saveFailed=${encodeURIComponent(reference)}`);
   revalidatePath('/tickets');
 }
 
@@ -67,7 +77,7 @@ function InOxs({ seen, status, lastRun, t }:
 
 export default async function Tickets({
   searchParams,
-}: { searchParams: { status?: string; page?: string; per?: string } }) {
+}: { searchParams: { status?: string; page?: string; per?: string; saveFailed?: string } }) {
   const status = searchParams.status;
   const locale = getLocale();
   const t = translator(locale);
@@ -136,6 +146,11 @@ export default async function Tickets({
           </Link>
         ))}
       </nav>
+      {searchParams.saveFailed && (
+        <p className="notice bad">
+          {t('tickets.saveFailed', { reference: searchParams.saveFailed })}
+        </p>
+      )}
       <Pager page={page} size={size} total={count ?? 0} basePath="/tickets"
              params={{ status }} unit={t('tickets.unit')} t={t} />
       <div className="panel">
