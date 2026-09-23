@@ -98,6 +98,27 @@ The dashboard half of this — the visible "not saved" line — reaches the live
 dashboard only when `feature/chatbot` merges to `main`. The database half is
 live now, and it was the half that blocked everything.
 
+### The plan and the project, side by side — `docs/reference/Homies-Plan-vs-Delivered.md`
+
+Owner: *"i want to create a documentation that compares the initial plan from
+the prd to the project goal based on feedback."* For Clix, in English, blunt
+enough to hand a fresh person.
+
+It joins four things that could not previously be read together: the PRD
+(2 Aug), the feature status (16 Sep), the standing decisions in `CONTEXT.md`,
+and the old ManyChat bot the client actually measures us against. Sections:
+the five components; **what feedback changed**, dated and attributed (Yariv's
+15–16 Sep review, the owner's rules on photos, fixed messages, OXS writes,
+outreach); where we landed **ahead** of the plan; where we landed **short**,
+each marked ours or theirs; the seven success criteria scored; what the goal is
+now; and everything still open.
+
+The headline it carries: **the software is ahead of the plan, and the project
+is behind on everything only Homies can supply.** Criterion 2 is recorded as
+*obsolete* rather than met or missed — the PRD conceded that status answers
+would be a night stale with a mandatory caveat and a staff task every time, and
+the live OXS API deleted the whole problem.
+
 ### The payment link gets its own template, so a debt call can deliver it
 
 Owner, straight after the done message worked: *"ok so how about the link

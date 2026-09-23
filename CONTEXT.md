@@ -3207,6 +3207,14 @@ for the closed window and nothing more. Two exist: `ticket_resolved_he` and
 `payment_link_he`, both in `docs/features/11-whatsapp-bot/templates.md`, which
 is the source of truth `wa_templates.py` submits from.
 
+**Where plan-versus-reality lives (23 Sep).**
+`docs/reference/Homies-Plan-vs-Delivered.md` is the one page that compares the
+PRD with what exists, says which feedback moved the target and when, scores the
+seven success criteria, and splits what is outstanding into ours and theirs.
+Update it when a decision changes the *goal*; ordinary engineering lessons stay
+here, and what works today stays in `Homies-Feature-Status.md`. It exists
+because that comparison previously required reading four documents at once.
+
 **Ship the code first, then submit the template (23 Sep).** The code that uses
 a template must tolerate the template not existing — ours logs
 `payment link template not synced` and falls back to today's behaviour — which
