@@ -9,6 +9,29 @@ conversation that produced it.
 
 ---
 
+## 2026-09-24
+
+### The payment-link template came back APPROVED, and Chatwoot has it
+
+`payment_link_he` is **APPROVED** at Meta (id 1072073112112319, UTILITY, he)
+and **synced into Chatwoot inbox 1**. Both gates checked with
+`scripts/wa_templates.py` and `… chatwoot` — the second is the one that matters,
+because the Edge Function reads its template list from Chatwoot, not from Meta,
+and that sync lagged a full day for `ticket_resolved_he`.
+
+**The risk did not materialise.** Meta was expected to possibly reject a
+template whose variable carries a URL; it did not. The dynamic-URL-button
+fallback (which would have needed the OXS link host plus button support in both
+`wa_templates.py` and the Chatwoot send) is therefore not needed.
+
+So the debt-call path is complete in code: when the 24-hour window is shut,
+`send_payment_link` retries through the template instead of failing. **Still
+owed:** one real debt call from a number outside the window. Pass =
+`payment_links` reads `whatsapp_template`, a `payment` request resolved, no URL
+in any log.
+
+---
+
 ## 2026-09-23
 
 ### The tapped button is where the resident meets you — epoch 56 LIVE
