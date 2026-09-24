@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### "We are Homies" — the office number stops being a fallback — epoch 63 LIVE
+
+Asked *"can i ask how often you guys sent out a cleaner"*, the bot answered that
+it did not have the information and gave the resident Homies' switchboard and
+Homies' support email. Owner: *"when the bot dont know anything just make it i
+dont have information regarding this right now dont send homies information we
+are homies."*
+
+**Handing a Homies resident the Homies office number sends them exactly where
+they already are.** It reads as being passed along rather than helped, and it is
+the bot's own contact details it is reciting.
+
+**And it was not even true that it lacked the answer.** `get_service_info`
+exists for precisely this, in these words: *"cleaning and how often, the bin
+room, the car park wash, pest control, gardening, the אב בית…"* — it was simply
+never called. A tool that is not reached looks identical to a fact the company
+does not hold.
+
+So the rule now says three things: the office phone and email are for people who
+**ask for them**, never a fallback; when there is no information, say that
+plainly and stop — no number, no email, no referral; and **before** saying there
+is none, check there is none, because a question about what Homies does or how a
+service works is what the general-information tool is for.
+
 ### The early acknowledgement is now payment-link only
 
 The payment-link flow came out right first time: *"Hi, I understand you need a

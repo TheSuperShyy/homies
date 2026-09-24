@@ -3125,3 +3125,10 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   tickets, ticket status, balance, service questions and small talk all return
   `NONE` and get a single reply as before. Widening it again means finding
   another path with a genuine fetch in it, not just a slow one.
+- **Epoch 63: the office phone and email are never a fallback.** Only for a
+  resident who asks for them. "I don't have that information right now" is the
+  whole reply when there is nothing — no number, no email, no referral. The
+  prompt also now points a service question at `get_service_info` before the
+  model is allowed to plead ignorance; the cleaner-frequency question that
+  triggered this is named in that tool's own description and it was never
+  called, so **tool selection is worth watching here**.

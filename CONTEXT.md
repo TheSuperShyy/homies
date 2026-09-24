@@ -3560,3 +3560,17 @@ twelve-second turn. For a fault report the next thing the bot does is ask a
 question, so narrating a check is a small lie and reads as one. When adding any
 "one moment" behaviour, the test is not "will this take a while" but "is the bot
 about to go and get something".
+
+**The bot is Homies, so Homies' contact details are not an escape hatch
+(24 Sep).** Telling a resident to ring the office or email support sends them to
+the organisation they are already talking to, and reads as a brush-off. The
+office phone and email are for someone who asks for them or wants to visit,
+never the answer to something the bot does not know. When it does not know, the
+honest reply is that it does not have that information right now, full stop.
+
+**"I don't have that information" is often an untaken tool, not a missing
+fact.** The cleaner-frequency question is named almost verbatim in
+`get_service_info`'s own description and the tool was never called. A refusal is
+therefore worth reading as a bug report about tool selection before it is
+believed — and the prompt now tells the model to check the tool before
+professing ignorance.

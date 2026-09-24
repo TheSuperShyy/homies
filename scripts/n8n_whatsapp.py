@@ -203,7 +203,18 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 62
+MEMORY_EPOCH = 63
+# 62 -> 63, 24 Sep: "we are homies". Asked how often a cleaner comes, the bot
+# said it did not have the information and told the resident to ring the
+# office on 077-6687949 or email Office@homies-management.co.il. Owner: "when
+# the bot dont know anything just make it i dont have information regarding
+# this right now dont send homies information we are homies." Handing a
+# Homies resident Homies' own switchboard sends them exactly where they
+# already are. Worse, it was not even true that it lacked the answer:
+# get_service_info exists for "cleaning and how often" in those words, and it
+# was never called. So the office details are now for people who ASK for
+# them, never a fallback, and the rule names the tool the question belonged
+# to. Buffers hold the brush-off.
 # 61 -> 62, 24 Sep: the bot invented a delivery history. Asked why he had
 # not received a link, it answered "קיבלתם מאיתנו הודעה עם קישור לתשלום.
 # בדקתי וראיתי שההודעה נשלחה למייל ולטלפון הנייד שרשומים אצלנו." -- three
@@ -591,7 +602,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "20e3a879b3ad",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "257ae7fc5d1e",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "805c79df5aa0",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
