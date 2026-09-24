@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### Test rows belong in בר כוכבא 23, not in a client's building
+
+Owner, setting a standing rule while we lined up a send to Ido: *"use the
+information that is in the bar kochba building always for testing because
+outside of that is real information of the clients and we dont want to edit
+those in a way."*
+
+Swept the scripts for which buildings they write into:
+
+- `debt_demo_person.py` — בר כוכבא 23 flat 2, ₪2,000. Already compliant, moved
+  there 23 Sep.
+- `paylink_demo_number.py` — **was הרצל 112 flat 1**, a real client's building,
+  chosen when the only property that mattered was a zero balance. **Moved to
+  בר כוכבא 23 flat 3.** Flat 3 and not 2, because two demo residents in one flat
+  make the lookup ambiguous. The zero balance goes with the move (every בר כוכבא
+  flat carries ועד בית at 250 unpaid), which is the better default: a demo link
+  opening 0 proves nothing about what a resident actually receives.
+- `check_tools.py`, `check_media.py` — **still file test service calls against
+  הרצל 112.** Not fixed: several assertions lean on Herzl's street/number shape
+  (`הרצל 14` resolving to nothing is one of the cases under test), so it is a
+  job rather than a rename. In HANDOVER.md.
+
+Committed `926a876`. No send was made — the Ido test is still waiting on his
+number, which is not in the repo and will not be guessed.
+
 ### The payment-link template came back APPROVED, and Chatwoot has it
 
 `payment_link_he` is **APPROVED** at Meta (id 1072073112112319, UTILITY, he)

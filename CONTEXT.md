@@ -3356,3 +3356,23 @@ UTC+3, so a timestamp on his handset reads **five hours ahead** of the bot's
 clock. A "22:21" screenshot is 17:21 in Israel. This matters twice: for judging
 whether the hour greeting was right, and for placing a screenshot before or
 after a deploy — check the n8n workflow's `updatedAt` (UTC) rather than assuming.
+
+**בר כוכבא 23 is the only building test data may be written into (24 Sep).**
+The owner's rule, given while we were lining up a payment-link send: *"use the
+information that is in the bar kochba building always for testing because
+outside of that is real information of the clients and we dont want to edit
+those in a way."* Yariv opened that building for us on 23 Sep — ten flats,
+ועד בית at 250 a month unpaid, nobody living in it.
+
+The reasoning generalises past buildings, which is why it belongs here rather
+than in a script comment: **a test row in a client's building is editing a
+client's record even when the flat owes nothing and the row is deleted
+afterwards, because the write happened.** The zero-balance flat that
+`paylink_demo_number.py` used until 24 Sep looked harmless for exactly the
+wrong reason — it was judged by what the row would *show*, not by whose data it
+landed in. Same instinct as the OXS read-only rule and never-write-unasked, one
+level down: not the client's system, the client's records inside ours.
+
+Allocation, so two demos do not collide: flat 2 is `debt_demo_person.py`'s
+(₪2,000, the debt call), flat 3 is `paylink_demo_number.py`'s. Two demo
+residents in one flat make the resident lookup ambiguous.
