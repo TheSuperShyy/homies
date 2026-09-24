@@ -3115,3 +3115,9 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   follow-up is sent. Read via `$('Carry on')` inside a try/catch — the retry
   path never runs that node and an unexecuted-node reference throws. If you
   rewire `Carry on`, keep the catch or every retried reply dies at `Send`.
+- **Epoch 62: the bot may not describe what was sent to a resident before.** It
+  invented an email delivery history on 24 Sep. No tool returns delivery data
+  and nothing emails residents (`chatwoot_smtp.py` is staff mail only). Banned
+  in `prompt.md` and again in `get_payment_link`. **Worth re-testing
+  explicitly**: ask "I never got the payment link" and check the reply contains
+  no account of why, no email, no "I checked" — just the link.

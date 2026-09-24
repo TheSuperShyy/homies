@@ -203,7 +203,16 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 61
+MEMORY_EPOCH = 62
+# 61 -> 62, 24 Sep: the bot invented a delivery history. Asked why he had
+# not received a link, it answered "קיבלתם מאיתנו הודעה עם קישור לתשלום.
+# בדקתי וראיתי שההודעה נשלחה למייל ולטלפון הנייד שרשומים אצלנו." -- three
+# fabrications in two lines: that a message was sent, that it was sent to an
+# email, and that it had CHECKED. No tool returns delivery information and
+# Homies sends no email or SMS through the bot at all; the WhatsApp thread is
+# the only channel it has. Owner: "wdym email". This is the worst class of
+# failure in the file -- a confident invention about what the company did,
+# told to a resident -- so it is named in the prompt and again in the tool.
 # 60 -> 61, 24 Sep: the payment-link reply closes like the template, not with
 # "how else can I help?". Owner: "instead of the how else can i help you make
 # sure its like the one in the templated message but instead if us reach out
@@ -582,7 +591,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "fd09d756cbf3",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "20e3a879b3ad",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "805c79df5aa0",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -591,7 +600,7 @@ EPOCH_COVERS = {
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
     # 23 Sep: show_menu now names the third row "talk to a representative".
-    "tools": "afbe61b60dba",
+    "tools": "6caff1a032b9",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1642,7 +1651,13 @@ TOOLS = [
             "this, then answer. It also covers a resident who RAISES the payment "
             "without naming a link: chasing a reminder or a follow-up they never "
             "got, saying they were meant to pay, asking what is happening with "
-            "their payment. The link is the answer to all of those. Two things "
+            "their payment. The link is the answer to all of those, and it is "
+            "the WHOLE answer: you cannot see what was sent to them before, on "
+            "any channel, so never account for why it did not arrive, never say "
+            "it went to an email or an SMS — Homies sends neither through you, "
+            "and this WhatsApp thread is your only channel — and never say you "
+            "checked and found that it was sent. Measured on 24 Sep, invented "
+            "whole. Three things "
             "you never do here, both measured on 24 Sep: offering it and waiting "
             "for a yes (\"I can send you a payment link if you'd like\") — it "
             "costs nothing, so send it; and answering that you cannot help with a "

@@ -3535,3 +3535,20 @@ fields set upstream are gone; `$('Carry on')` is how `acked` is reached. And any
 the retry path never runs `Carry on`, and an unexecuted node reference throws
 rather than returning empty, which would have killed every retried reply at the
 last step.
+
+**The bot cannot see what was sent to a resident before, and will invent it if
+asked (24 Sep).** Asked why a payment link never arrived, it answered that the
+message had been sent to the resident's email and mobile and that it had checked
+and confirmed this. Every part was fabricated: no tool returns delivery
+information, and nothing in the stack emails a resident — the only SMTP is
+Chatwoot mailing Homies staff. The general "do not invent" rule did not catch it
+because the invention was *plausible and helpful-sounding*, which is exactly the
+shape that gets past a general rule. Specific impossibilities have to be named
+specifically: no email, no SMS, no delivery history, no "I checked" about
+anything no tool returned.
+
+**"I did not receive it" is a request for the thing, not for an explanation.**
+The failure above was made worse by the reply then *offering* to resend. When a
+resident says something never arrived, the answer is to do it again now — the
+link costs nothing and an account of why it went missing is both unknowable and
+useless to them.

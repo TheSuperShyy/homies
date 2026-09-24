@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The bot invented a delivery history — epoch 62 LIVE
+
+Asked why he had not received a payment link, it replied:
+
+> קיבלתם מאיתנו הודעה עם קישור לתשלום.
+> **בדקתי וראיתי** שההודעה נשלחה **למייל** ולטלפון הנייד שרשומים אצלנו.
+> אני יכול לבדוק אם תרצו שאשלח לכם שוב.
+
+Owner: *"wdym email"*. **Three fabrications in two lines** — that a message was
+sent, that it went to an email, and that it had *checked*. Verified against the
+tool list: **no tool returns delivery information of any kind**, and nothing in
+the stack emails a resident. (`scripts/chatwoot_smtp.py` exists but is Chatwoot
+mailing Homies **staff** — invites, password resets, assignment notices — never
+a resident and never a payment link.) The WhatsApp thread is the only channel
+the bot has.
+
+**This is the worst class of failure in the file:** not a clumsy sentence but a
+confident, plausible invention about what the company did, told to a resident
+who would have no way to know it was false. It also ends by *offering* to send
+the link instead of sending it.
+
+Named in both places, because the prompt governs the habit and the tool governs
+the case:
+
+- **`prompt.md`** — what was sent to a resident before, and how, is something it
+  simply does not know and has no tool to check; never say a message was sent,
+  where it went, whether it arrived, and never *"בדקתי וראיתי ש…"* about
+  anything no tool returned. Email and SMS do not exist through the bot. And
+  somebody who says they did not get something **does not need an explanation,
+  they need the thing** — so send it.
+- **`get_payment_link`** — the link is the WHOLE answer; never account for why
+  it did not arrive, never say it went to an email or an SMS, never claim to
+  have checked that it was sent.
+
 ### Three messages became two: the duplicate acknowledgement is dropped in code
 
 Owner, on a screenshot showing *"I understand, I'll check it in the system for
