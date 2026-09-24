@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### Three messages became two: the duplicate acknowledgement is dropped in code
+
+Owner, on a screenshot showing *"I understand, I'll check it in the system for
+you."*, then *"I understand you are waiting for a payment link."*, then the
+link: *"remove the i understand you are waiting for a link."*
+
+`Worth a word?` had sent its acknowledgement, and the model then wrote **its
+own** and split it off with `§§§` — two messages saying the same thing. The
+inject added in epoch 60 tells it exactly this (*"הודעה קצרה כבר יצאה אליו ממך
+ברגע זה … הודעה אחת, בלי §§§"*) and it did it anyway.
+
+**So it is enforced in the workflow rather than asked for again.** When `acked`
+is set, `Send` collapses any split and keeps the **second** half — the answer —
+and `Two parts?` returns false so no follow-up is sent. The duplicate is
+dropped, never the substance.
+
+Two details that make it safe:
+
+- **Read through `Carry on`, not the item.** The agent node replaces `$json`
+  with its own output, so `acked` cannot ride through on the item.
+- **`try/catch` around it.** The retry path (`Try again` → agent) never runs
+  `Carry on`, and referencing an unexecuted node throws. Without the catch,
+  every retried reply would have died at `Send`.
+
+Exercised in `node` on all four cases before applying: acked + split (duplicate
+dropped, one message), no-ack + split (two beats as before), no split (single),
+and the retry path with `Carry on` never executed. **No epoch bump** — nothing
+in the prompt, inject or tools moved; the model may still write its own
+acknowledgement and the workflow now throws it away.
+
 ### The payment-link reply closes like the template — epoch 61 LIVE
 
 Owner: *"instead of the how else can i help you make sure its like the one in

@@ -3110,3 +3110,8 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - **`payment_link_he` still says "כתבו לנו" (write to us).** The chat reply says
   "me". Aligning the template needs a Meta edit and re-approval — owner's call,
   not started.
+- **The duplicate acknowledgement is dropped in `Send`, not by the prompt.**
+  With `acked` set, any `§§§` split collapses to the second half and no
+  follow-up is sent. Read via `$('Carry on')` inside a try/catch — the retry
+  path never runs that node and an unexecuted-node reference throws. If you
+  rewire `Carry on`, keep the catch or every retried reply dies at `Send`.

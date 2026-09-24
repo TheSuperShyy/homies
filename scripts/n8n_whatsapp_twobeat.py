@@ -57,11 +57,31 @@ SRC = ("String($('Type for a moment').first().json.output || "
 # --------------------------------------------------------------------------
 # 1. Send: post the FIRST half, and drop the buttons when there is a second.
 # --------------------------------------------------------------------------
-SEND_T_OLD = "const t = String($json.output || $json.text || '')"
-SEND_T_NEW = ("const raw = String($json.output || $json.text || ''); "
+# `acked`, 24 Sep: when `Worth a word?` has ALREADY sent the resident a "one
+# moment" before the work started, the model must not send another. The inject
+# tells it so and it did it anyway -- three messages, two of them saying the
+# same thing. Instructions lost, so this is enforced here instead: with an
+# acknowledgement already out, any §§§ split is collapsed and the half that
+# survives is the SECOND one, the answer. The duplicate is dropped, never the
+# substance.
+#
+# Read through `Carry on` because the agent node replaces $json with its own
+# output, so the field cannot ride through on the item. try/catch because the
+# retry path (`Try again` -> agent) never runs `Carry on` and referencing an
+# unexecuted node throws.
+ACKED = ("(() => { try { return String($('Carry on').first().json.acked || '')"
+         ".trim(); } catch (e) { return ''; } })()")
+
+SEND_T_OLD = ("const raw = String($json.output || $json.text || ''); "
               "const parts = raw.split('%s'); "
               "const two = parts.length > 1 && parts.slice(1).join('%s').trim().length > 0; "
               "const t = String(parts[0] || '')" % (SEP, SEP))
+SEND_T_NEW = ("const raw = String($json.output || $json.text || ''); "
+              "const parts = raw.split('%s'); const acked = %s; "
+              "const two = !acked && parts.length > 1 && "
+              "parts.slice(1).join('%s').trim().length > 0; "
+              "const t = String((acked && parts.length > 1 ? "
+              "parts.slice(1).join('%s') : parts[0]) || '')" % (SEP, ACKED, SEP, SEP))
 
 # The whole button condition gets wrapped in `!two && ( ... )`. Two anchors,
 # the open and the close; the close is the last `)))` before the body block.
@@ -74,7 +94,8 @@ SEND_CLOSE_NEW = ".trim())))) { body.content_type"
 # 2. The three new nodes.
 # --------------------------------------------------------------------------
 TWO_EXPR = ("={{ (() => { const r = " + SRC + "; const p = r.split('" + SEP + "'); "
-            "return p.length > 1 && p.slice(1).join('" + SEP + "').trim().length > 0; })() }}")
+            "const a = " + ACKED + "; return !a && p.length > 1 && "
+            "p.slice(1).join('" + SEP + "').trim().length > 0; })() }}")
 
 # The second half, cleaned the same way Send cleans the first. Kept in step
 # with Send by hand: if Send's cleanup chain changes, change it here too.

@@ -3518,3 +3518,20 @@ end with a question. It is no longer on the workflow and nothing tests for a
 question mark. So the payment-link reply may now end with a full stop — but the
 same fact means nothing catches a dead-end reply either. Check the live
 workflow before relying on, or waiving, any rule whose reason is a node.
+
+**When an instruction loses twice, stop instructing and enforce it (24 Sep).**
+The model was told in the inject that an acknowledgement had already gone out
+and that it should write one message without `§§§`; it wrote its own anyway and
+the resident got the same sentence twice. Prompt text is the right tool for
+judgement and the wrong one for an invariant. `Send` now collapses the split
+whenever `acked` is set and keeps the second half, so the duplicate cannot
+reach anybody however the model behaves. The instruction stays — it saves the
+wasted sentence when it works — but nothing depends on it.
+
+**Anything read after the agent node must come from a named node, and be
+wrapped.** `$json` past `Answer the resident` is the agent's own output, so
+fields set upstream are gone; `$('Carry on')` is how `acked` is reached. And any
+`$('Node')` reference on a path that some branch skips must sit in a try/catch —
+the retry path never runs `Carry on`, and an unexecuted node reference throws
+rather than returning empty, which would have killed every retried reply at the
+last step.
