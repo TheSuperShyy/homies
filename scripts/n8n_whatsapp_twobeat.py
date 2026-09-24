@@ -18,6 +18,13 @@ One model call, no extra spend, and both halves are the model's own words --
 which is what keeps this inside the standing rule that the menu is the only
 fixed text in the system.
 
+PAYMENT LINKS ONLY, from 24 Sep. The owner asked for this shape while looking
+at a payment link and meant it there: *"didnt i told you to make that kind of
+feature in the payment link only"*, said against a question about cleaning
+frequency that came back as "I'm checking the details for you" and then the
+answer. Two gates now, because one of them is a prompt and prompts have already
+lost once on this node -- see `PAID` below.
+
 THE DELIMITER IS `§§§`, and the choice is not free. Send's cleanup strips
 `[...]` wholesale (`replace(/\\[[^\\]]*\\]/g, ' ')`), so any bracketed marker
 would be eaten before the split could see it. Em dashes are rewritten to
@@ -72,16 +79,48 @@ SRC = ("String($('Type for a moment').first().json.output || "
 ACKED = ("(() => { try { return String($('Carry on').first().json.acked || '')"
          ".trim(); } catch (e) { return ''; } })()")
 
+# `paid`, 24 Sep, second pass. The two-beat was never meant for every reply.
+# The owner, against a question about how often a cleaner comes, answered "I
+# understand ... I'm checking the details for you §§§ <the actual answer>":
+# *"didnt i told you to make that kind of feature in the payment link only"*.
+#
+# `Worth a word?` was already narrowed to payment links and behaved perfectly
+# on that turn -- execution 58898 has it returning NONE and `Say it now` never
+# firing. The split came from the model's own §§§, because the PROMPT still
+# licensed two beats for five different actions and the model read the list as
+# examples. The prompt is narrowed with this change, but instructions have
+# already lost once on this exact node, so the gate lives here too: a §§§ is
+# honoured only on a turn where the agent really called `get_payment_link`.
+#
+# `intermediateSteps` is the same signal Send's own menu rule already reads, so
+# this is a proven path rather than a new mechanism. try/catch fails closed --
+# no steps, no split -- which lands on the side the owner asked for.
+PAID = ("(() => { try { return ($('Answer the resident').first().json"
+        ".intermediateSteps || []).some(s => ((s.action || {}).tool) === "
+        "'get_payment_link'); } catch (e) { return false; } })()")
+
+# OLD is the shape live carries today, the `acked` collapse. The pre-`acked`
+# original is deliberately gone: live moved past it, and a dead anchor only
+# invites patching a workflow that no longer exists.
 SEND_T_OLD = ("const raw = String($json.output || $json.text || ''); "
-              "const parts = raw.split('%s'); "
-              "const two = parts.length > 1 && parts.slice(1).join('%s').trim().length > 0; "
-              "const t = String(parts[0] || '')" % (SEP, SEP))
-SEND_T_NEW = ("const raw = String($json.output || $json.text || ''); "
               "const parts = raw.split('%s'); const acked = %s; "
               "const two = !acked && parts.length > 1 && "
               "parts.slice(1).join('%s').trim().length > 0; "
               "const t = String((acked && parts.length > 1 ? "
               "parts.slice(1).join('%s') : parts[0]) || '')" % (SEP, ACKED, SEP, SEP))
+# Three outcomes now, and the third is the new one. Acknowledgement already
+# sent: drop the model's duplicate, send the answer. Payment link and no
+# acknowledgement: two beats, as before. A §§§ ANYWHERE ELSE: the announcement
+# half is dropped and the answer goes out by itself, as a single message --
+# never `parts[0]` alone, which would have posted "I'm checking" and swallowed
+# the reply.
+SEND_T_NEW = ("const raw = String($json.output || $json.text || ''); "
+              "const parts = raw.split('%s'); "
+              "const rest = parts.length > 1 ? parts.slice(1).join('%s') : ''; "
+              "const acked = %s; const paid = %s; "
+              "const two = !acked && paid && rest.trim().length > 0; "
+              "const t = String((rest.trim() && !two ? rest : parts[0]) || '')"
+              % (SEP, SEP, ACKED, PAID))
 
 # The whole button condition gets wrapped in `!two && ( ... )`. Two anchors,
 # the open and the close; the close is the last `)))` before the body block.
@@ -94,8 +133,9 @@ SEND_CLOSE_NEW = ".trim())))) { body.content_type"
 # 2. The three new nodes.
 # --------------------------------------------------------------------------
 TWO_EXPR = ("={{ (() => { const r = " + SRC + "; const p = r.split('" + SEP + "'); "
-            "const a = " + ACKED + "; return !a && p.length > 1 && "
-            "p.slice(1).join('" + SEP + "').trim().length > 0; })() }}")
+            "const rest = p.length > 1 ? p.slice(1).join('" + SEP + "') : ''; "
+            "const a = " + ACKED + "; const paid = " + PAID + "; "
+            "return !a && paid && rest.trim().length > 0; })() }}")
 
 # The second half, cleaned the same way Send cleans the first. Kept in step
 # with Send by hand: if Send's cleanup chain changes, change it here too.

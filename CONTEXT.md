@@ -1989,6 +1989,37 @@ surgical patch, `n8n_whatsapp.py` describes something that is not live and the
 live workflow contains things no file describes. Anything asserting "the bot
 does X" has to be read off the live workflow, not off the repo.
 
+## A behaviour with two gates is narrowed at both, or it is not narrowed
+
+The owner asked on 24 Sep for the "let me check first" two-message reply to be
+**payment links only**. It was duly narrowed — in one of the two places that can
+produce it — and the very next unrelated question came back in two messages.
+
+Two independent mechanisms split a WhatsApp reply:
+
+- **`Worth a word?`** (`n8n_whatsapp_firstword.py`) writes an acknowledgement
+  *before* the agent runs, and posts it through `Say it now`.
+- **The model's own `§§§`**, licensed by `prompt.md` and acted on by `Send` /
+  `Two parts?` / `Hold a beat` / `Send the rest`.
+
+Both end in two messages on the resident's handset, and from a screenshot they
+are indistinguishable. Narrowing one leaves the feature fully alive through the
+other. The wasted move here was reasoning from the screenshot; the cheap move
+is reading the execution, where `Worth a word?` returning `NONE` while
+`Send the rest` ran named the culprit in one look.
+
+**So: before narrowing, widening or removing a behaviour, enumerate every path
+that can produce it**, and change all of them in one commit. Where one of those
+paths is a prompt and another is code, the code gate is the one that holds — a
+prompt is a request, and this workflow has already ignored one (the duplicate
+acknowledgement, which had to be dropped in `Send` after the inject asked twice
+and was overruled by the model both times).
+
+**And when a gate declines to split, check which half it keeps.** The `§§§`
+collapse originally kept `parts[0]` — the announcement — which would have posted
+"I'm checking that for you" and silently dropped the answer behind it. A
+narrowing that loses the substance is worse than the behaviour it removed.
+
 ## State moves while you are describing it — re-read live before you assert
 
 On 31 Aug the WhatsApp bot's status was written into the briefing files twice and

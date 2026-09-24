@@ -11,6 +11,58 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### Two beats are for the payment link and nothing else — epoch 64 LIVE
+
+Asked *"can i ask how often you guys sent out a cleaner"*, the bot replied twice:
+*"I understand you want to know how often we send a cleaner. I'm checking the
+details for you"*, then the answer. Owner: *"didnt i told you to make that kind
+of feature in the payment link only."*
+
+**He had, and the narrowing that was done went to the wrong gate.** There are
+two mechanisms that can turn one reply into two, and only one of them had been
+scoped:
+
+- `Worth a word?`, the early acknowledgement node, was narrowed to payment links
+  on 24 Sep and **behaved perfectly**. Execution `58898` has it returning `NONE`,
+  and `Say it now` never fired.
+- The **prompt's own `§§§` two-beat rule** was still general. It licensed two
+  messages for *"issuing a payment link, checking a balance, checking a request,
+  opening a request, updating the team"* — and the model read that list as
+  examples, applied it to a `get_service_info` call, and split the reply itself.
+
+So the reply was the prompt being obeyed, again — the sixth time this session
+that the disliked output was a live instruction rather than a model failure.
+
+Two changes, because the prompt has already lost once on this exact node (the
+duplicate acknowledgement, dropped in `Send` on 24 Sep after the inject asked
+twice and was ignored):
+
+1. **`prompt.md`** — `§§§` is now *"one situation and one only… when the resident
+   asks for a payment link and you are issuing it. There, and in no other case."*
+   Everything else — balance, request status, opening a request, the team note,
+   pulling service information, or answering off the top of its head — is one
+   message, with no `§§§` and no sentence announcing a check. The line about
+   where "one moment, I'm checking" is allowed was scoped to match.
+2. **`Send` and `Two parts?`** — a `§§§` is honoured only on a turn where the
+   agent actually called `get_payment_link`, read off `intermediateSteps`, the
+   same signal `Send`'s own menu rule already uses. `try/catch` fails closed.
+
+**The collapse keeps the answer, not the announcement.** The old code took
+`parts[0]` when it declined to split, which would have posted "I'm checking" and
+swallowed the reply. It now drops the announcement half and sends the substance
+as a single message. Proved in `node` against the verbatim output of `58898`:
+the cleaning question now yields one message containing the answer; a payment
+link with no early acknowledgement still yields two; a payment link with one
+already sent yields the answer alone; no separator and an empty second half are
+both unchanged.
+
+Shipped: `n8n_whatsapp_twobeat.py --apply`, then `n8n_whatsapp_teamnote.py
+--apply`. `MEMORY_EPOCH` 63 → 64, prompt hash `257ae7fc5d1e` → `4c2472366ca9`,
+`sessionKey` verified `={{ $json.to }}-64` live. All nine patchers dry-run idle.
+
+**A good finding underneath it:** `get_service_info` **was** called this time and
+did answer, so the epoch 63 concern about tool selection is resolved.
+
 ### "We are Homies" — the office number stops being a fallback — epoch 63 LIVE
 
 Asked *"can i ask how often you guys sent out a cleaner"*, the bot answered that

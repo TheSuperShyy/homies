@@ -3121,6 +3121,18 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   in `prompt.md` and again in `get_payment_link`. **Worth re-testing
   explicitly**: ask "I never got the payment link" and check the reply contains
   no account of why, no email, no "I checked" — just the link.
+- **Epoch 64: two messages are for the payment link and NOTHING else.** Two gates
+  can split a reply and both are now scoped to it. `Worth a word?` decides the
+  early acknowledgement; the prompt's `§§§` decides the model's own split, and
+  until 24 Sep it still licensed two beats for balance, request status, opening
+  a request and the team note. A cleaning question took that list as examples
+  and split on a `get_service_info` call. **`Send` and `Two parts?` now honour a
+  `§§§` only when `intermediateSteps` shows `get_payment_link` ran**, so a stray
+  separator cannot produce two messages however the prompt drifts. When the split
+  is declined the **second** half is sent, not the first — the announcement is
+  dropped and the answer survives. If you ever widen the two-beat, change the
+  prompt AND `PAID` in `scripts/n8n_whatsapp_twobeat.py`, or the prompt will be
+  silently overruled.
 - **`Worth a word?` fires for the payment link ONLY** (narrowed 24 Sep). Faults,
   tickets, ticket status, balance, service questions and small talk all return
   `NONE` and get a single reply as before. Widening it again means finding
