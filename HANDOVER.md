@@ -1476,7 +1476,16 @@ handset.**
   on every deploy, and only an explicit `--oxs-mirror` flag pushes it. Do NOT
   pass that flag without the owner saying so in terms that cannot mean
   anything else. Verified off: ticket `255-1124-26` opened with `oxs_ref:
-  None` and no OXS call. The dormant machinery (oxsMirror in the Edge
+  None` and no OXS call.
+  **ON since 24 Sep for ONE number** (Edge Function **v100**): the owner asked
+  for his own reports to land in OXS too, so `--oxs-mirror` was passed and a
+  second gate added — `oxsMirror()` returns early unless the reporter is listed
+  in `OXS_MIRROR_PHONES`, which holds the owner's +63 tester (the number is in `.env`, and on the demo-debtor line above) and nothing else. A real
+  resident's ticket still never reaches OXS. Both the key and the allow-list are
+  pushed only by `--oxs-mirror` and deleted by a plain `--apply`, so there is no
+  half-on state. The mirror also needs the building to RESOLVE (`m.status ===
+  "found"`); an unresolved building stays ours-only. **Adding a number to that
+  list is a fresh decision, not a convenience.** The dormant machinery (oxsMirror in the Edge
   Function, the importer's reflection-skip, `requests.oxs_ref`) is correct
   and tested — one round trip ran clean in production before the shutdown —
   and MUST be re-enabled or removed together, never half. **No OXS write of

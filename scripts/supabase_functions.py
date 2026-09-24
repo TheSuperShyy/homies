@@ -196,14 +196,22 @@ def main():
     if or_key:
         to_push.append({"name": "OPENROUTER_API_KEY", "value": or_key})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
+    # 24 Sep: the mirror came back on for ONE number, the owner's +63 tester.
+    # `OXS_MIRROR_PHONES` is the second gate inside oxsMirror() and travels with
+    # the key — pushed only by --oxs-mirror, deleted by a plain --apply — so the
+    # off state cannot be half off, with a live allow-list waiting for a key to
+    # reappear. Empty list mirrors nobody, which is what the function does when
+    # the var is absent.
+    oxs_phones = e.get("OXS_MIRROR_PHONES", "").strip()
     mirror = "--oxs-mirror" in sys.argv
     if mirror and oxs_key:
         to_push.append({"name": "OXS_KEY_REQUESTS", "value": oxs_key})
+        to_push.append({"name": "OXS_MIRROR_PHONES", "value": oxs_phones})
     code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref, to_push)
     print("secret push    HTTP %s  (%d secrets)" % (code, len(to_push)))
     if not mirror:
         code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref,
-                         ["OXS_KEY_REQUESTS"])
+                         ["OXS_KEY_REQUESTS", "OXS_MIRROR_PHONES"])
         # 404 means the key is already gone, which IS the off state this
         # branch exists to enforce — found 27 Aug when the second plain
         # --apply after the shutdown aborted here and never deployed.

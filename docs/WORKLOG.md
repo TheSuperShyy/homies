@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### Tickets from the owner's number mirror into OXS — Edge Function v100
+
+Owner: *"from now on i want to open a ticket it should be opened in oxs as well,
+for the phone number whenever i send some report using the +63."*
+
+That reverses the 26 Aug decision, which is exactly the shape of answer CONTEXT
+says is required to reverse it — explicit, unprompted, and impossible to read
+another way. So `--oxs-mirror` was passed for the first time since the shutdown.
+
+**Nothing had to be built.** `oxsMirror()` has been sitting dormant in the Edge
+Function since 26 Aug, round-tripped against the live API back then, gated on a
+key a plain deploy deletes. The work was scoping it.
+
+**A second gate, because "for the +63" is a narrower ask than the flag.** The
+flag is all-or-nothing and would have put every resident's ticket into OXS.
+`oxsMirror()` now also requires the reporter's number to appear in
+`OXS_MIRROR_PHONES`; the list holds the owner's tester (`OXS_MIRROR_PHONES` in `.env`) and nothing else, and an
+empty or absent list mirrors nobody. Both gates travel together —
+`supabase_functions.py` pushes the key and the list only under `--oxs-mirror`
+and deletes both on a plain `--apply` — so the off state cannot be half off,
+with a live allow-list waiting for a key to reappear.
+
+Deployed v100, ACTIVE, `oxs mirror ON`. Unchanged: the mirror is best-effort and
+swallows its own failures (the resident already has the reference by then), it
+fires only when the building RESOLVES, and `requests.oxs_ref` still carries the
+created call's id so `oxs_requests_sync.py` does not re-import our own row.
+
+**Owed: one real report from the +63 handset** — pass is `requests.oxs_ref`
+populated and the call visible in OXS. Also worth saying plainly: from now on
+those tickets are visible to Homies' staff in their live system.
+
 ### Two beats are for the payment link and nothing else — epoch 64 LIVE
 
 Asked *"can i ask how often you guys sent out a cleaner"*, the bot replied twice:

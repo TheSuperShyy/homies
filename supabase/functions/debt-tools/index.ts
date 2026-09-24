@@ -764,12 +764,41 @@ async function matchBuilding(saidRaw: unknown): Promise<Match> {
  * and `availableToTenants` defaults to false — the resident's own record is
  * OUR ticket; the OXS row is for staff.
  */
+/**
+ * WHO may be mirrored, 24 Sep. The owner turned the mirror back on, but for
+ * ONE number: *"from now on i want to open a ticket it should be opened in oxs
+ * as well, for the phone number whenever i send some report using the +63"*.
+ *
+ * So there are two independent gates and both must be open: the function-side
+ * key (`OXS_KEY_REQUESTS`, still pushed only by `--oxs-mirror`) and this
+ * allow-list. An empty or missing list mirrors NOBODY, which is the safe
+ * default and what a plain `--apply` leaves behind.
+ *
+ * The list is an env var rather than a constant so that widening it later is a
+ * secret change and a redeploy of nothing — but widening it is still a decision
+ * about writing into a client's production system, and the 26 Aug rule stands
+ * for every number not named here.
+ *
+ * Compared against the number exactly as WhatsApp gave it, which is the same
+ * form `residents.phone` holds and the only form a foreign number survives in
+ * (phoneOf() accepts Israeli numbers only).
+ */
+function oxsMirrorAllowed(reporter: string | null): boolean {
+  const list = (Deno.env.get("OXS_MIRROR_PHONES") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean);
+  if (!list.length || !reporter) return false;
+  return list.includes(String(reporter).trim());
+}
+
 async function oxsMirror(
   buildingOxsId: string, description: string, unit: string | null,
-  reference: string, rowId: string,
+  reference: string, rowId: string, reporter: string | null,
 ) {
   const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
   if (!key) return; // not configured: the mirror is off, the ticket is fine
+  // Not on the allow-list: our ticket stands, OXS never hears about it. Silent
+  // by design -- this is the ordinary path for every real resident.
+  if (!oxsMirrorAllowed(reporter)) return;
   try {
     const r = await fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
       method: "POST",
@@ -2806,7 +2835,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         .eq("id", stub.id);
       if (upErr) return { ok: false, error: upErr.message };
       if (m.status === "found") {
-        await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id);
+        await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
+                        reporterPhone(ctx));
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -2837,7 +2867,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // response time; failures inside are logged and swallowed.
     if (m.status === "found") {
       await oxsMirror(String(m.building.id), String(args.description), unit,
-                      data.reference, data.id);
+                      data.reference, data.id, reporterPhone(ctx));
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The

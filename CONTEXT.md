@@ -1191,9 +1191,21 @@ guard stays RLS, not the redirect.
 reason it now has teeth.** A ticket mirror (open_request → POST
 /service-calls) was built, tested against the live API, and deployed on the
 strength of a capability question — which is not consent, as the owner made
-plain within the hour: *"i told you not to do any shit to oxs."* The mirror is
-OFF and stays off: a plain function deploy deletes its key, and only the
-explicit `--oxs-mirror` flag enables it. **A standing rule is reversed by an
+plain within the hour: *"i told you not to do any shit to oxs."* The mirror was
+OFF for a month on that basis; a plain function deploy deletes its key, and
+only the explicit `--oxs-mirror` flag enables it.
+
+**Reversed, narrowly, on 24 Sep** — *"from now on i want to open a ticket it
+should be opened in oxs as well, for the phone number whenever i send some
+report using the +63"*. That is the kind of answer the paragraph below asks
+for, so the flag was passed. It is **scoped to one number**: `oxsMirror()` now
+also requires the reporter to be on `OXS_MIRROR_PHONES`, which holds the
+owner's tester and nothing else. Every real resident's ticket still stays out
+of OXS, which is the 26 Aug rule surviving everywhere it was ever about. Both
+gates travel together — a plain `--apply` deletes the key AND the allow-list —
+so the mirror cannot come back half-on. **Widening that list is another
+decision of the same size as this one; do not add a number to it because a
+test would be easier.** **A standing rule is reversed by an
 answer that could not mean anything else, never by momentum** — and when a
 promised safeguard turns out not to exist (the "dummy building" — there are
 none), the work stops and the question goes back, rather than the safeguard
