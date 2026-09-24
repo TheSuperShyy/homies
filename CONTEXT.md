@@ -3552,3 +3552,11 @@ The failure above was made worse by the reply then *offering* to resend. When a
 resident says something never arrived, the answer is to do it again now — the
 link costs nothing and an account of why it went missing is both unknowable and
 useless to them.
+
+**"I'm checking it now" is only true when something is actually being fetched
+(24 Sep).** The early acknowledgement fires for the payment link alone, because
+that is the one path with a real external wait in it — OXS, ~2.7s of a
+twelve-second turn. For a fault report the next thing the bot does is ask a
+question, so narrating a check is a small lie and reads as one. When adding any
+"one moment" behaviour, the test is not "will this take a while" but "is the bot
+about to go and get something".

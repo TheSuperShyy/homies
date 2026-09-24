@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The early acknowledgement is now payment-link only
+
+The payment-link flow came out right first time: *"Hi, I understand you need a
+payment link. I'm checking it out right now."* then the link with the flat, the
+personal-link line and *"write to me here"*. No email, no invented delivery, no
+third message.
+
+But the next message in the same screenshot was *"the lights are out in the
+hallway"*, and it got *"I understand you, I'm checking it now"* followed by a
+request for the building and flat. **It was not checking anything** — it was
+about to ask a question, so the sentence was simply untrue. Owner: *"can we make
+that type of feature specific only for the getting of payment link only."*
+
+`Worth a word?`'s brief was the cause: it fired for *"a lookup in our system —
+payment link, balance, ticket status, opening a ticket, notifying the team"*.
+Most of those do not make the resident wait for anything; the payment link is
+the one case where the bot genuinely goes away and fetches something (OXS, about
+2.7s of the twelve), which is what makes a wait worth narrating.
+
+Narrowed to: wants a link, wants to pay, asks how or where to pay, or says they
+never got one. Everything else returns `NONE` explicitly by name — faults of any
+kind, opening a ticket, ticket status, balance, service questions, asking for a
+representative, greetings, thanks, goodbyes, small talk — **including when the
+reply will obviously need work**, since that was the exact trap.
+
+**No epoch bump:** this node's brief is not part of the prompt, inject or tools,
+so no conversation buffer is affected.
+
 ### The bot invented a delivery history — epoch 62 LIVE
 
 Asked why he had not received a payment link, it replied:

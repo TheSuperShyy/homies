@@ -3121,3 +3121,7 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   in `prompt.md` and again in `get_payment_link`. **Worth re-testing
   explicitly**: ask "I never got the payment link" and check the reply contains
   no account of why, no email, no "I checked" — just the link.
+- **`Worth a word?` fires for the payment link ONLY** (narrowed 24 Sep). Faults,
+  tickets, ticket status, balance, service questions and small talk all return
+  `NONE` and get a single reply as before. Widening it again means finding
+  another path with a genuine fetch in it, not just a slow one.

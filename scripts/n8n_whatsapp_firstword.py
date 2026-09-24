@@ -19,10 +19,18 @@ sees twelve seconds of nothing followed by two messages at once. The gap was
 never the problem; its position was.
 
 So the acknowledgement moves in front of the work. `Worth a word?` is a small
-agent that runs on the inbound message and does one thing: decides whether
-answering will need a lookup, and if so writes ONE short sentence in Michael's
-voice. If not it returns NONE and nothing is sent -- "what is the office
-number" must not be answered with "let me check the system".
+agent that runs on the inbound message and does one thing: decides whether the
+resident wants a PAYMENT LINK, and if so writes ONE short sentence in Michael's
+voice. Anything else returns NONE and nothing is sent.
+
+NARROWED TO THE PAYMENT LINK ON 24 SEP, and the owner's own screenshot is the
+argument. "the lights are out in the hallway" came back as "I understand you,
+I'm checking it now" followed by a request for the building and flat -- it was
+not checking anything, it was about to ask a question, so the sentence was
+simply untrue. The payment link is the one case where the bot really does go
+away and look something up (OXS, ~2.7s of the 12), which is what makes the wait
+worth narrating. Owner: *"can we make that type of feature specific only for the
+getting of payment link only."*
 
 WHY AN AGENT AND NOT A CHAIN: `Say it again` is already an agent v3 with a
 model and no tools, so that shape is proven on this instance. A node type n8n
@@ -71,18 +79,25 @@ SYSTEM = (
     "אתה מיכאל, נציג השירות של הומי'ז, חברת ניהול בתים משותפים, בצ'אט וואטסאפ "
     "עם דייר. על עצמך אתה מדבר בלשון זכר, ואל הדייר אתה פונה בלשון רבים.\n"
     "\n"
-    "לפניך ההודעה האחרונה שהדייר שלח. יש לך תפקיד אחד ויחיד: להחליט אם כדי לענות "
-    "לו צריך ללכת לבדוק משהו במערכת שלנו — קישור לתשלום, יתרה או חוב, מצב של "
-    "קריאת שירות, פתיחת קריאה חדשה, או העברת עניין לצוות.\n"
+    "לפניך ההודעה האחרונה שהדייר שלח. יש לך תפקיד אחד ויחיד, וצר מאוד: להחליט "
+    "אם הדייר רוצה עכשיו קישור לתשלום. רק זה ושום דבר אחר.\n"
+    "\n"
+    "זה כן: מי שמבקש קישור לתשלום, מי שאומר שהוא רוצה לשלם או שואל איך ואיפה "
+    "משלמים, ומי שאומר שלא קיבל קישור או שלא קיבל כלום בנוגע לתשלום.\n"
     "\n"
     "אם כן: כתוב הודעה אחת קצרה בעברית, במילים שלך, שאומרת לו שהבנת מה הוא צריך "
     "ושאתה בודק את זה עכשיו. משפט אחד או שניים, חם וטבעי. אין בה שום תוצאה: לא "
     "סכום, לא מספר, לא קישור, לא מה מצאת, ולא הבטחה תוך כמה זמן. היא יוצאת לפני "
     "הבדיקה ולא אחריה, אז היא לא יכולה לדעת כלום.\n"
     "\n"
-    "אם לא — שאלה שאתה עונה עליה מהראש, שיחת חולין, ברכה, תודה, פרידה, בקשה "
-    "לפרט שחסר, או כל דבר שאפשר לענות עליו בלי לבדוק — החזר בדיוק את המילה "
-    "NONE, באנגלית, ותו לא. לא משפט, לא הסבר, לא סימן פיסוק.\n"
+    "זה לא, ועל כל אלה מחזירים NONE: תקלה מכל סוג — נזילה, תאורה, מעלית, חדר "
+    "מדרגות — בקשה לפתוח קריאת שירות, שאלה על מצב של קריאה קיימת, שאלה על "
+    "היתרה או על החוב, שאלה על השירותים של הומי'ז, בקשה לדבר עם נציג, ברכה, "
+    "תודה, פרידה, שיחת חולין, או בקשה לפרט שחסר. גם כשברור לך שהמענה יצריך "
+    "עבודה או בדיקה, זה עדיין NONE: זה לא התפקיד שלך כאן.\n"
+    "\n"
+    "כשמחזירים NONE מחזירים בדיוק את המילה NONE, באנגלית, ותו לא. לא משפט, "
+    "לא הסבר, לא סימן פיסוק.\n"
     "\n"
     "אתה לא עונה כאן לדייר ולא פותר לו כלום. מישהו אחר עושה את זה מיד אחריך."
 )
