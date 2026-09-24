@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The first mirrored ticket is in OXS — `255-1327-26` → task `255-27984-26`
+
+The owner's garden report (*"הגינה יבשה, חומה, ויש בה חרקים"*) opened as ticket
+`255-1327-26` at 14:48 UTC — **seven minutes before v100 went live**, so the
+mirror was not yet on and `oxs_ref` was null. Owner: *"try and make this open
+in oxs."*
+
+`oxsMirror()` only ever runs at creation, so a ticket that missed it stays
+missed. New script **`scripts/oxs_mirror_backfill.py`**, one ticket at a time,
+dry run by default. It carries the live mirror's two gates plus one of its own:
+the write key must exist, the ticket's `reported_by_phone` must be on
+`OXS_MIRROR_PHONES`, and `oxs_ref` must be empty — so it can only ever push a
+ticket the live mirror itself would have pushed, and re-running it is a no-op.
+**There is deliberately no `--all`**: a sweep would push real residents' history
+into OXS the moment the allow-list grew, and the allow-list is meant to be the
+only thing that decides.
+
+Created and read back: OXS `_id` `6ab53b7046121b25efaeef6f`, **task number
+`255-27984-26`**, status פתוחה, building בר כוכבא 23, description carrying our
+reference in brackets. `requests.oxs_ref` written, so `oxs_requests_sync.py`
+will not re-import it as a new row.
+
+**Two things learned about the API, both worth keeping.** `GET /service-calls/:x`
+takes the **taskNumber and a `buildingId`**, not the `_id` — asking for the `_id`
+returns `403 "Resource does not belong to this company"`, which reads exactly
+like a permissions failure and is not one. And the description comes back nested
+under **`serviceCallData.description`**, not at the top level, so a filter on
+`description` silently matches nothing.
+
+`unit` was null on this ticket and that is correct, not a gap: a dry garden is a
+common-area fault, so `open_request` deliberately drops the reporter's flat and
+keeps it in `reported_unit`. The OXS description therefore carries no `(דירה 2)`.
+
 ### Tickets from the owner's number mirror into OXS — Edge Function v100
 
 Owner: *"from now on i want to open a ticket it should be opened in oxs as well,

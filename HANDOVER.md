@@ -1485,7 +1485,18 @@ handset.**
   pushed only by `--oxs-mirror` and deleted by a plain `--apply`, so there is no
   half-on state. The mirror also needs the building to RESOLVE (`m.status ===
   "found"`); an unresolved building stays ours-only. **Adding a number to that
-  list is a fresh decision, not a convenience.** The dormant machinery (oxsMirror in the Edge
+  list is a fresh decision, not a convenience.**
+  **PROVEN 24 Sep:** ticket `255-1327-26` is in OXS as task
+  `255-27984-26`, status פתוחה, read back from the API. It was opened seven
+  minutes before v100, so it was pushed by **`scripts/oxs_mirror_backfill.py`**
+  (one ticket, dry run by default, same two gates plus `oxs_ref` must be
+  empty; no `--all`, deliberately). Use that script for any ticket the live
+  mirror missed — `oxsMirror()` only ever runs at creation.
+  **Two API facts that cost time:** `GET /service-calls/:x` wants the
+  **taskNumber plus `buildingId`**, and answers a bare `_id` with
+  `403 "Resource does not belong to this company"` — a 403 here is the wrong
+  LOOKUP, not the wrong key. And the text comes back at
+  **`serviceCallData.description`**, not top level. The dormant machinery (oxsMirror in the Edge
   Function, the importer's reflection-skip, `requests.oxs_ref`) is correct
   and tested — one round trip ran clean in production before the shutdown —
   and MUST be re-enabled or removed together, never half. **No OXS write of

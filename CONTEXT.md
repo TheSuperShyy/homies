@@ -1205,7 +1205,9 @@ of OXS, which is the 26 Aug rule surviving everywhere it was ever about. Both
 gates travel together — a plain `--apply` deletes the key AND the allow-list —
 so the mirror cannot come back half-on. **Widening that list is another
 decision of the same size as this one; do not add a number to it because a
-test would be easier.** **A standing rule is reversed by an
+test would be easier.** A ticket the live mirror missed is pushed with
+`scripts/oxs_mirror_backfill.py`, one at a time and only for a number already
+on the list — backfilling is not a second decision, but widening is. **A standing rule is reversed by an
 answer that could not mean anything else, never by momentum** — and when a
 promised safeguard turns out not to exist (the "dummy building" — there are
 none), the work stops and the question goes back, rather than the safeguard
