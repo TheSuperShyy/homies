@@ -79,7 +79,8 @@ def main():
                                             ex.read().decode()[:300]))
 
     got = db("GET", "requests?reference=eq." + urllib.parse.quote(reference, safe="")
-             + "&select=id,reference,description,building,unit,oxs_ref,reported_by_phone")
+             + "&select=id,reference,description,building,unit,reported_unit,"
+               "oxs_ref,reported_by_phone")
     if not got:
         sys.exit("No ticket with reference %s." % reference)
     r = got[0]
@@ -109,10 +110,31 @@ def main():
                    + ((u" (דירה %s)" % unit) if unit else "")
                    + (u" [בוט, סימוכין %s]" % reference))
 
+    # WHO reported it, in OXS's own shape -- see oxsReportedBy() in the Edge
+    # Function for why `payer` and why no phone. Only an `oxs`-sourced tenant
+    # of the reporter's OWN flat may be named: our demo rows never go back.
+    reported_unit = (r.get("reported_unit") or "").strip()
+    by = None
+    if reported_unit:
+        who = [w for w in db("GET", "residents?building=eq."
+                             + urllib.parse.quote(address, safe="")
+                             + "&unit=eq." + urllib.parse.quote(reported_unit, safe="")
+                             + "&source=eq.oxs&select=full_name,oxs_ref")
+               if w.get("oxs_ref")]
+        if len(who) == 1:
+            by = {"entity": "payer", "entityId": str(who[0]["oxs_ref"]),
+                  "name": who[0]["full_name"], "apartmentNumber": reported_unit}
+            flats = db("GET", "apartments?building_id=eq." + building_id + "&select=id,number")
+            hit = [f for f in flats if str(f.get("number", "")).strip() == reported_unit]
+            if len(hit) == 1:
+                by["apartmentId"] = str(hit[0]["id"])
+
     print("ticket      : %s" % reference)
     print("building    : %s  (OXS %s)" % (address, building_id))
     print("reporter    : …%s  (on the allow-list)" % phone[-4:])
     print("description : %s" % description)
+    print("reported by : %s" % (json.dumps(by, ensure_ascii=False) if by
+                                else "NONE — no oxs-sourced tenant on the reporter's flat"))
 
     if not apply:
         print("\nDry run. Re-run with --apply to create it in OXS.")
@@ -122,8 +144,10 @@ def main():
         OXS_CALLS, method="POST",
         headers={"x-api-key": key, "content-type": "application/json",
                  "user-agent": "homies-debt-tools/1.0"},
-        data=json.dumps({"buildingId": building_id,
-                         "description": description}).encode("utf-8"))
+        data=json.dumps(dict({"buildingId": building_id, "description": description},
+                             **({"reportedBy": by,
+                                 "serviceCallData": {"reportedBy": by}} if by else {}))
+                        ).encode("utf-8"))
     try:
         d = json.loads(urllib.request.urlopen(req, timeout=20).read() or b"{}")
     except urllib.error.HTTPError as ex:

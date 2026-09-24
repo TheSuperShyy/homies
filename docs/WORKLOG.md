@@ -11,6 +11,55 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The mirrored ticket now carries who reported it — Edge Function v102
+
+Owner, looking at an OXS call whose reporter read "unknown": *"bro why dont you
+fill it up? how can we simulate the things we are doing?? also make sure to add
+a filter for the name … strictly make sure of that."*
+
+**Read their data before inventing a format.** 44 real service calls, company
+wide: `reportedBy.entity` is `payer` on 42 of them, `entityId` / `name` /
+`apartmentNumber` / `apartmentId` are filled on the same 42, and **`phone` is
+empty on every single one**. OXS identifies a reporter by their payer record
+and keeps the phone there, so pushing our reporter's phone onto the call would
+have been our shape, not theirs. The mirror sends the payer and no phone.
+
+**The name comes from OXS or not at all, and that is the strict part.**
+`residents` can hold two rows for one flat: an `agent`-sourced demo row behind
+the tester, and the genuine imported tenant carrying `oxs_ref`.
+`oxsReportedBy()` matches on the reporter's own flat and takes only a
+`source='oxs'` row with an `oxs_ref`. No such tenant, or two of them, and the
+call goes in with no reporter at all: a blank is recoverable, a wrong name in a
+client's system is not.
+
+**`reported_unit`, not `unit`.** Where the fault is and who reported it are
+different questions — a common-area fault has `unit: null` by design while
+`reported_unit` still names the reporter's flat. The reporter is always the
+flat the person lives in.
+
+**New: `scripts/check_oxs_mirror.py`, the simulator that was asked for.** It
+builds the payload, creates the call in OXS, reads every field back and then
+deletes it, so the round trip runs without a WhatsApp message, without a model
+call, and without leaving anything behind. Hard-coded to the test building with
+no flag to change it. It earned itself immediately: the August docstring
+claimed created records "carry no OXS user (the spec attributes them to the API
+key)" — **that is false**, `reportedBy` is honoured on create.
+
+**A third API fact, learned by leaving a mess.** `DELETE /service-calls/:x`
+wants the **taskNumber and a `buildingId`**, exactly like the GET, and answers
+a bare `_id` with `403 "Resource does not belong to this company"`. The
+simulator's first run left a test call in a client's system; it was found and
+deleted within the minute, and the script now deletes by task number. `_id` is
+good for one thing only: the value the create returns.
+
+`scripts/oxs_mirror_backfill.py` sends the reporter too, so a backfilled call
+and a live-mirrored one stay indistinguishable.
+
+**STILL OWED:** the garden call created before this change still reads
+"unknown". Correcting it in place needs a `PUT`, which the sandbox refused as a
+shared-resource write — the owner's call. The cheaper route is a fresh report
+from the tester, which now carries the name on its own.
+
 ### The first mirrored ticket is in OXS — `255-1327-26` → task `255-27984-26`
 
 The owner's garden report (*"הגינה יבשה, חומה, ויש בה חרקים"*) opened as ticket

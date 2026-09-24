@@ -790,21 +790,88 @@ function oxsMirrorAllowed(reporter: string | null): boolean {
   return list.includes(String(reporter).trim());
 }
 
+/**
+ * WHO reported it, in the shape OXS's own records use — 24 Sep.
+ *
+ * The August mirror sent a building and a sentence and nothing else, so every
+ * mirrored call showed a reporter of לא ידוע. The owner, looking at one:
+ * *"bro why dont you fill it up?"* — fair, and the fix is not to invent a
+ * format. 44 real service calls were read first: `reportedBy.entity` is
+ * `payer` on 42 of them, `entityId` / `name` / `apartmentNumber` /
+ * `apartmentId` are filled on the same 42, and **`phone` is empty on every
+ * single one**. OXS identifies a reporter by their payer record and keeps the
+ * phone there, so pushing a phone onto the call would be our shape, not
+ * theirs. A round trip (`scripts/check_oxs_mirror.py`) then proved the API
+ * honours `reportedBy` on create, which the old docstring said it would not.
+ *
+ * THE NAME IS ALWAYS THE OXS TENANT'S, NEVER OURS. `residents` can hold two
+ * rows for one flat: an `agent`-sourced demo row (the owner's +63 tester is
+ * carries a placeholder name) and the genuine imported tenant, which is the
+ * only one carrying `oxs_ref`.
+ * Only a row that came FROM OXS may go back TO it, matched on the building and
+ * the flat the reporter actually lives in. The owner asked for exactly this
+ * and asked for it strictly: a report from the tester must read the name of
+ * the tenant that flat actually belongs to, not the name on our demo row.
+ *
+ * Returns null when there is no `oxs`-sourced tenant for the flat, and the
+ * call then goes in without a reporter, as before. A blank reporter is
+ * recoverable; a wrong name in a client's system is not.
+ */
+async function oxsReportedBy(
+  reporterUnit: string | null, building: string | null, buildingOxsId: string,
+) {
+  const unit = String(reporterUnit ?? "").trim();
+  if (!unit || !building) return null;
+  const { data } = await db.from("residents")
+    .select("full_name,oxs_ref")
+    .eq("building", building).eq("unit", unit).eq("source", "oxs")
+    .not("oxs_ref", "is", null).limit(2);
+  // Exactly one, or nobody. Two tenants on a flat is a fact we cannot resolve
+  // from here, and guessing which of them reported is the wrong kind of help.
+  if (!data || data.length !== 1) return null;
+  const out: Record<string, string> = {
+    entity: "payer",
+    entityId: String(data[0].oxs_ref),
+    name: String(data[0].full_name ?? "").trim(),
+    apartmentNumber: unit,
+  };
+  // apartments.id IS the OXS apartment id (016), the same identity
+  // get_payment_link files against. Best-effort: the reporter stands without
+  // it, and 2 of the 44 real calls have no apartmentId either.
+  const { data: flats } = await db.from("apartments")
+    .select("id,number").eq("building_id", buildingOxsId);
+  const hits = (flats ?? []).filter((f: any) => String(f.number ?? "").trim() === unit);
+  if (hits.length === 1) out.apartmentId = String(hits[0].id);
+  return out;
+}
+
 async function oxsMirror(
   buildingOxsId: string, description: string, unit: string | null,
   reference: string, rowId: string, reporter: string | null,
+  reporterUnit: string | null, building: string | null,
 ) {
   const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
   if (!key) return; // not configured: the mirror is off, the ticket is fine
   // Not on the allow-list: our ticket stands, OXS never hears about it. Silent
   // by design -- this is the ordinary path for every real resident.
   if (!oxsMirrorAllowed(reporter)) return;
+  // Never fatal: a reporter we cannot resolve costs a name on the call, not
+  // the call. The resident already holds the reference by the time we are here.
+  let by: Record<string, string> | null = null;
+  try {
+    by = await oxsReportedBy(reporterUnit, building, buildingOxsId);
+  } catch (err) {
+    console.error("oxs reporter lookup failed", String(err).slice(0, 120));
+  }
   try {
     const r = await fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
       method: "POST",
       headers: { "x-api-key": key, "content-type": "application/json" },
       body: JSON.stringify({
         buildingId: buildingOxsId,
+        // Both shapes, because the API accepts the nested one and reads it
+        // back nested; the flat copy is harmless and survives a spec change.
+        ...(by ? { reportedBy: by, serviceCallData: { reportedBy: by } } : {}),
         // Staff-facing, so it carries what a dispatcher needs at a glance:
         // the fault, the flat when the fault is in one, and our reference so
         // the two systems can be joined by a human as well as by oxs_ref.
@@ -2836,7 +2903,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (upErr) return { ok: false, error: upErr.message };
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
-                        reporterPhone(ctx));
+                        reporterPhone(ctx), reportedUnit, building);
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -2867,7 +2934,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // response time; failures inside are logged and swallowed.
     if (m.status === "found") {
       await oxsMirror(String(m.building.id), String(args.description), unit,
-                      data.reference, data.id, reporterPhone(ctx));
+                      data.reference, data.id, reporterPhone(ctx),
+                      reportedUnit, building);
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The

@@ -1496,7 +1496,18 @@ handset.**
   **taskNumber plus `buildingId`**, and answers a bare `_id` with
   `403 "Resource does not belong to this company"` — a 403 here is the wrong
   LOOKUP, not the wrong key. And the text comes back at
-  **`serviceCallData.description`**, not top level. The dormant machinery (oxsMirror in the Edge
+  **`serviceCallData.description`**, not top level.
+  **v102: the mirrored call names its reporter.** `oxsReportedBy()` sends
+  `{entity:'payer', entityId, name, apartmentNumber, apartmentId}` — the shape
+  42 of 44 real calls use — and **no phone**, because `reportedBy.phone` is
+  empty on every real call; OXS keeps the phone on the payer record. The name
+  is taken ONLY from a `source='oxs'` resident carrying `oxs_ref`, matched on
+  the reporter's own `reported_unit`; a demo row never goes back to OXS, and no
+  match means no reporter rather than a wrong one. **Simulate it without a
+  WhatsApp message with `scripts/check_oxs_mirror.py`** — creates, reads every
+  field back, deletes. **DELETE also wants taskNumber + `buildingId`**; a bare
+  `_id` 403s and leaves the call behind, which is how a test call once stayed
+  in a client's system for a minute. The dormant machinery (oxsMirror in the Edge
   Function, the importer's reflection-skip, `requests.oxs_ref`) is correct
   and tested — one round trip ran clean in production before the shutdown —
   and MUST be re-enabled or removed together, never half. **No OXS write of
