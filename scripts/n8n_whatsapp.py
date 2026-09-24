@@ -203,7 +203,19 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 57
+MEMORY_EPOCH = 58
+# 57 -> 58, 24 Sep: the two beats, in the right order. The first live one
+# split in the WRONG place -- the link went out as message one and "במה אוכל
+# לעזור עוד?" as message two, which is one message broken in half, not an
+# acknowledgement followed by an answer. Owner: "the bot should act like human
+# like it will check it out on the system and after a few seconds like 2 it
+# will send the link and the format should be like the template message like
+# this link is personal and should not be shared blah blah." So: the first
+# message may carry NO result at all, the closing question belongs to the
+# second, and the order never inverts. get_payment_link's description gains
+# the personal-link caveat the template already carries. The amount stays
+# OUT of it on purpose -- stating it needs get_balance's identity check, and
+# the chat link needs none.
 # 56 -> 57, 24 Sep: a reply that did real work arrives as TWO messages.
 # Owner, on a transcript where "give me the payment link" was answered with
 # the link and nothing else: "it was straight to the point ... i dont want it
@@ -542,7 +554,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "b4d974bc1567",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "754a1cbeca3a",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -551,7 +563,7 @@ EPOCH_COVERS = {
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
     # 23 Sep: show_menu now names the third row "talk to a representative".
-    "tools": "65f27ed67d90",
+    "tools": "4f1e19178654",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1605,11 +1617,15 @@ TOOLS = [
             "in your reply exactly as returned, on a line of its own, inside a "
             "message of your own words: never alone, never retyped, shortened, "
             "described instead of given, or wrapped in markdown. It opens that "
-            "apartment's balance and pays it. The amount is not in the result "
-            "and you do not state one: how much they owe is get_balance's "
-            "question, with its own identity check. A delivered link completes "
-            "the matter: no ticket and no team note, just your short words and "
-            "the offer of anything else.\n"
+            "apartment's balance and pays it. Say which flat it is for, and "
+            "tell them in your own words that the link is personal, meant for "
+            "their apartment only, and not to be passed on — the same care the "
+            "payment_link_he template takes, because it is the same link and "
+            "whoever opens it can pay against that flat. The amount is not in "
+            "the result and you do not state one: how much they owe is "
+            "get_balance's question, with its own identity check. A delivered "
+            "link completes the matter: no ticket and no team note, just your "
+            "short words and the offer of anything else.\n"
             "`found` false: `reason` is for you, not for them: do not explain it, "
             "and do not ask for a name or a phone number. The ticket route is "
             "unchanged: if you do not yet have their building and apartment, ask "

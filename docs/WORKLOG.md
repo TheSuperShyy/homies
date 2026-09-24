@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The two beats, in the right order — epoch 58 LIVE
+
+The first live two-message reply split in the **wrong place**. Owner's
+transcript: message one carried the link, message two was
+*"במה אוכל לעזור עוד?"* — one message broken in half, not an acknowledgement
+followed by an answer. His words: *"the bot should act like human like it will
+check it out on the system and after a few seconds like 2 it will send the link
+and the format should be like the template message like this link is personal
+and should not be shared blah blah."*
+
+Three changes:
+
+- **Order, stated so it cannot invert.** The first message may carry **no
+  result at all** — not the link, the amount, the reference or the answer;
+  someone reading only it knows exactly one thing, that you are on it. The
+  closing *"anything else?"* belongs to the **second** message and is never a
+  message of its own. Named in the prompt as the failure it was.
+- **`get_payment_link`'s description gains the personal-link caveat** the
+  `payment_link_he` template already carries: say which flat it is for, and say
+  the link is personal to that apartment and not to be passed on.
+- **`Hold a beat` 1.1–1.9s → 1.7–2.6s**, per *"a few seconds like 2"*.
+
+**The amount stays out, deliberately.** The template states it because the debt
+call verified identity first; the chat link needs no identity at all, so stating
+a balance there would hand a figure to whoever holds the handset.
+`get_payment_link`'s description has always said so and still does.
+
+**The shipper does not carry tool text.** `teamnote.py --apply` moved the prompt
+and the epoch but left the description behind — tool descriptions belong to each
+tool's own patcher, and here that is `n8n_whatsapp_paylink.py`, which rebuilds
+the node from the builder. Diffed field by field before applying, because the
+builder is stale behind live for some tools: only `toolDescription` differed,
+`jsonBody` was byte-identical. Both hashes moved, so `EPOCH_COVERS['tools']`
+changed as well as `['prompt']`.
+
 ### All three test tenants now show in the debt tab
 
 Owner, on a screenshot of the Voice Agent call page listing only `clix` and

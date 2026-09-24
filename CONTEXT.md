@@ -3452,3 +3452,25 @@ cannot be dialled until somebody deliberately hands them over. When the debt tab
 looks empty for a resident who clearly owes money, this flag is the first thing
 to check, and setting it in bulk is exactly the mistake it exists to prevent —
 `bk_seed_arrears.py` flips it only for בר כוכבא 23.
+
+**`teamnote.py --apply` does not ship tool descriptions (24 Sep).** It carries
+the prompt, the inject and the epoch. A tool's `toolDescription` lives with that
+tool's own patcher — `get_balance`'s in `n8n_whatsapp_greet.py`,
+`get_payment_link`'s in `n8n_whatsapp_paylink.py` — so editing `TOOLS` in
+`n8n_whatsapp.py` and running only the shipper changes the hash, bumps the epoch
+and leaves the live text untouched. Read the description back off the live
+workflow after any tool-text change; the epoch guard will not catch this because
+it hashes the repo, not the workflow.
+
+**Diff a rebuilt node before applying it.** The tool patchers replace the whole
+`parameters` block from the builder, and the builder is deliberately stale
+behind live for some fields (`get_balance`'s `unit` doc is the standing
+example). Applying blind can regress a live `jsonBody` to a pre-Chatwoot shape.
+A field-by-field diff first is cheap and says exactly what will move.
+
+**The chat payment link states no amount, and that is a guard not an oversight.**
+`payment_link_he` states one because the debt call verified who it was talking
+to. The chat link is handed to whoever writes from the matching number, with no
+identity check at all, so a balance there would be told to whoever holds the
+handset. What the chat reply does carry is the caveat the template carries: the
+link is personal to that flat and is not to be passed on.

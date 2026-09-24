@@ -3076,3 +3076,13 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   that one resident row leaves exactly the three tenants. `bk_seed_arrears.py`
   sets `handed_over` for this building only — never run a bulk hand-over, it is
   the guard that stops a client's resident being dialled.
+- **Epoch 58: two-beat ordering fixed.** The first message carries no result;
+  the closing question belongs to the second. `Hold a beat` is now ~2s.
+  `get_payment_link` tells the resident the link is personal to their flat.
+  **Owed: handset proof** — ask for the payment link and check the
+  acknowledgement lands first, the link ~2s later with the personal-link line,
+  and no third message.
+- **Editing `TOOLS` in `n8n_whatsapp.py` is not enough to ship it.**
+  `teamnote.py` does not carry tool descriptions; run that tool's own patcher
+  (`paylink.py`, `greet.py`, `payment.py`) and read the text back off the live
+  workflow.

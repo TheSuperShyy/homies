@@ -85,8 +85,11 @@ REST_BODY = ("={{ (() => { const r = " + SRC + "; const p = r.split('" + SEP + "
              ".replace(/\\s{2,}/g, ' ').trim(); "
              "return JSON.stringify({ content: t, message_type: 'outgoing' }); })() }}")
 
-# Long enough to read as a person typing, short enough that nobody waits.
-HOLD_AMOUNT = "={{ 1.1 + Math.random() * 0.8 }}"
+# The owner, 24 Sep, watching the first live one: "after a few seconds like 2".
+# So ~2s, jittered, rather than the 1.1-1.9 it shipped with. Long enough that
+# the first message reads as somebody actually going to look, short enough that
+# nobody wonders whether it broke.
+HOLD_AMOUNT = "={{ 1.7 + Math.random() * 0.9 }}"
 
 # Positions are enforced, not just set on create: n8n_layout.py fails the
 # workflow when two nodes sit closer than the 240 x 60 grid, and the first
