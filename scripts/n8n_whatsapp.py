@@ -203,7 +203,15 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 58
+MEMORY_EPOCH = 59
+# 58 -> 59, 24 Sep: "I can send you a payment link if you'd like." The same
+# sentence that had produced the link twenty minutes earlier -- "i noticed you
+# did not send me any followup for the payment due" -- came back as a refusal
+# plus an offer, because the trigger list named wanting to pay, asking how to
+# pay and asking for the link, and CHASING a payment update is none of those
+# literally. So the list now covers raising the payment at all, and names the
+# two failures measured: offering and waiting for a yes, and saying you cannot
+# help with a payment update. Buffers hold the refusal.
 # 57 -> 58, 24 Sep: the two beats, in the right order. The first live one
 # split in the WRONG place -- the link went out as message one and "במה אוכל
 # לעזור עוד?" as message two, which is one message broken in half, not an
@@ -563,7 +571,7 @@ EPOCH_COVERS = {
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
     # 23 Sep: show_menu now names the third row "talk to a representative".
-    "tools": "4f1e19178654",
+    "tools": "1662335aeb3d",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1611,7 +1619,14 @@ TOOLS = [
             "from is matched to their apartment on our side. Do not ask for a "
             "name, a phone number, a building or an apartment first, do not call "
             "get_balance first, and do not ask whether they want the link; call "
-            "this, then answer.\n"
+            "this, then answer. It also covers a resident who RAISES the payment "
+            "without naming a link: chasing a reminder or a follow-up they never "
+            "got, saying they were meant to pay, asking what is happening with "
+            "their payment. The link is the answer to all of those. Two things "
+            "you never do here, both measured on 24 Sep: offering it and waiting "
+            "for a yes (\"I can send you a payment link if you'd like\") — it "
+            "costs nothing, so send it; and answering that you cannot help with a "
+            "payment update — you can, and this tool is how.\n"
             "`found` true: `link` is the resident's own payment link, and "
             "`building` and `apartment` say which flat it is for. Put the link "
             "in your reply exactly as returned, on a line of its own, inside a "

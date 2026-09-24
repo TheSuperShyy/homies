@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The two-second gap works; the refusal did not — epoch 59 LIVE
+
+Owner, on a screenshot of the two messages both stamped 17:22: *"it sends at
+the same time."*
+
+**It does not.** WhatsApp shows hours and minutes only, so a two-second gap is
+invisible there. Chatwoot's own timestamps on that exchange:
+
+```
+09:22:32  אני מבין שאתם מחפשים עדכון לגבי התשלום.
+09:22:34  אני מיכאל מהומי'ז...                      (+2s)
+```
+
+The pair before the bump measured +1s, so the change from 1.1–1.9s to 1.7–2.6s
+landed too. **Measure a gap in the message store, never on a phone screen.**
+(His handset is also auto-translating: the bot wrote Hebrew, the screenshot
+shows English.)
+
+**The real fault in that screenshot was the content.** *"I can send you a
+payment link if you'd like"* — an offer, plus *"I can't send you an update
+regarding the payment"*, when the identical sentence twenty minutes earlier had
+produced the link. `get_payment_link`'s description already said *"do not ask
+whether they want the link"*, so this was not a missing rule; the **trigger
+list** was the gap. It named wanting to pay, asking how to pay, and asking for
+the link — and *chasing a payment follow-up you never got* is literally none of
+those. The list now covers raising the payment at all, and names both measured
+failures: offering and waiting for a yes, and claiming you cannot help with a
+payment update.
+
+Shipped through `paylink.py --apply` (the tool text) and `teamnote.py --apply`
+(the epoch), in that order, because the shipper does not carry tool
+descriptions — the trap recorded one entry above.
+
 ### The two beats, in the right order — epoch 58 LIVE
 
 The first live two-message reply split in the **wrong place**. Owner's

@@ -3474,3 +3474,18 @@ to. The chat link is handed to whoever writes from the matching number, with no
 identity check at all, so a balance there would be told to whoever holds the
 handset. What the chat reply does carry is the caveat the template carries: the
 link is personal to that flat and is not to be passed on.
+
+**Measure a gap in the message store, not on a phone (24 Sep).** WhatsApp
+renders HH:MM, so anything under a minute looks simultaneous and a report of
+"both at the same time" is not evidence. Chatwoot's `created_at` is epoch
+seconds and settles it. The owner's handset also auto-translates, so a
+screenshot can show English for a reply that went out in Hebrew — read the
+message store before concluding the bot changed language.
+
+**A rule the model already has cannot fix a trigger it never matched.**
+`get_payment_link` said "do not ask whether they want the link" and the model
+offered anyway — not disobedience: its trigger list trapped wanting to pay,
+asking how to pay and asking for the link, while the resident was *chasing a
+follow-up*, which is none of those. When behaviour is inconsistent across two
+identical inputs, suspect the entry condition before the instruction; a rule
+only runs once the tool has been recognised as the right one.

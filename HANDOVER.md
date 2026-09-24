@@ -3086,3 +3086,8 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   `teamnote.py` does not carry tool descriptions; run that tool's own patcher
   (`paylink.py`, `greet.py`, `payment.py`) and read the text back off the live
   workflow.
+- **Epoch 59: `get_payment_link` triggers on a resident raising the payment at
+  all**, including chasing a follow-up they never got, and is told never to
+  offer-and-wait or to claim it cannot help with a payment update. **The ~2s gap
+  between the two messages is confirmed working** (Chatwoot 09:22:32 / 09:22:34);
+  a phone screen cannot show it.
