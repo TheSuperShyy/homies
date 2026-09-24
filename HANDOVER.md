@@ -3022,3 +3022,14 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   against הרצל 112, a real building. Moving them needs care: several assertions
   lean on Herzl's street/number shape (`הרצל 14` resolving to nothing is one of
   the cases under test), so it is a job, not a rename.
+- **בר כוכבא 23 tenant map (24 Sep, from `/buildings/:id/tenants`):** flat 1
+  עידו קליקס, flat 2 אסף קליקס, flat 3 יריב לוי, flat 4 empty. All ten flats
+  carry ₪3,000 unpaid for 2026. `debt_demo_person.py` owns flat 2;
+  `paylink_demo_number.py` owns **flat 4** (moved off flat 3 because that is
+  Yariv's own flat, and off הרצל 112 earlier the same day).
+- **An empty `/debts` is normal, not a fault.** 1 debtor row across 177 active
+  buildings on 24 Sep, matching the 11 Aug sweep. It is a collections ledger.
+  Arrears come from `oxs_arrears.py` / `import_arrears.py`. Do not "fix" it.
+- **OXS keys are endpoint-scoped:** GENERAL for `/tenants` + `/payments`, DEBTS
+  for `/debts`; each 403s on the other's. A 403 is the wrong key, not a
+  revoked one.

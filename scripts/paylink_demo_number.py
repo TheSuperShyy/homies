@@ -5,7 +5,7 @@ so the payment link can be seen on a real handset -- then take it off again.
     python scripts/paylink_demo_number.py off +<country><number>
 
 `on` inserts one `residents` row (name בדיקת-מערכת, building בר כוכבא 23,
-flat 3 -- Homies' own test building) and refuses if the number is already a
+flat 4 -- Homies' own test building, the one flat with no tenant) and refuses if the number is already a
 real resident. Never point this at a client's building: see the note on
 BUILDING below. Write "אני רוצה לשלם את ועד הבית" to the bot from that phone: the
 link arrives in WhatsApp. `off` deletes the row; its payment_links rows
@@ -32,15 +32,21 @@ if hasattr(sys.stdout, "reconfigure"):
 # invented resident into a real building is editing a client's data, even when
 # the flat owes nothing and the row is deleted afterwards. בר כוכבא 23 is the
 # building Yariv opened FOR us, so a test row there is a test row in a test
-# building and nothing else. Flat 3, because flat 2 is debt_demo_person.py's and
-# two demo residents in one flat make the lookup ambiguous.
+# building and nothing else.
+#
+# FLAT 4, and the reason is the tenant list. /buildings/:id/tenants (24 Sep)
+# shows בר כוכבא 23 is occupied by our own people: flat 1 עידו קליקס, flat 2
+# אסף קליקס, flat 3 יריב לוי -- Yariv being the client contact himself. Flat 4
+# has no tenant and no phone, so a demo resident there names nobody real. Flat 2
+# is also debt_demo_person.py's, and two demo residents in one flat make the
+# resident lookup ambiguous.
 #
 # The zero balance is gone with the move: every בר כוכבא flat carries ועד בית at
 # 250 a month, unpaid. That is the better default anyway -- a link that opens a
 # real balance is what a resident actually receives, and a demo showing 0 proves
 # nothing.
 BUILDING = "בר כוכבא 23, תל אביב - יפו"
-UNIT = "3"
+UNIT = "4"
 NAME = "בדיקת-מערכת סימולציית קישור"
 
 

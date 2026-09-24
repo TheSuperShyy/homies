@@ -3376,3 +3376,24 @@ level down: not the client's system, the client's records inside ours.
 Allocation, so two demos do not collide: flat 2 is `debt_demo_person.py`'s
 (₪2,000, the debt call), flat 3 is `paylink_demo_number.py`'s. Two demo
 residents in one flat make the resident lookup ambiguous.
+
+**OXS keys are scoped per endpoint, and a 403 means the wrong one (24 Sep).**
+`OXS_KEY_GENERAL` reads `/buildings`, `/apartments`, `/tenants` and
+`/apartments/:aid/payments`; `OXS_KEY_DEBTS` reads `/buildings/:id/debts`. Each
+is **403 on the other's endpoints**. Probing with one key and concluding "no
+permission" or "endpoint gone" is the trap; try the other key first.
+
+**`/buildings/:id/tenants` is where tenant names and mobiles live (24 Sep).**
+Not `/debts`, which is nearly always empty, and not the apartments list, which
+carries only `_id`, `number` and `orderIndex`. There is no per-apartment detail
+endpoint — `/apartments/:aid` returns nothing.
+
+**The OXS debts endpoint is a collections ledger, not an arrears list.** Stated
+in `oxs_debt_sync.py`'s docstring since 11 Aug and reconfirmed 24 Sep: a sweep
+of all 177 active buildings returns **one** debtor row, while our own charges
+table holds 558 unpaid. A case reaches `/debts` only once it escalates past
+ordinary chasing. Arrears are computed from payment records
+(`oxs_arrears.py`, `import_arrears.py`), and those are the only writers of
+`charges`. **Anyone alarmed by an empty `/debts` should read that docstring
+before reporting it** — the 11 Aug version of this script nearly marked 169 real
+debts as paid on the same misreading.

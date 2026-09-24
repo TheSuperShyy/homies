@@ -11,6 +11,55 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### בר כוכבא 23's tenant list, and the demo flat moved to the empty one
+
+The owner, recalling yesterday's scan: *"we did a scan on the building test that
+was opened for us which includes 3 names ido clix, assaf clix and yariv."*
+Confirmed, via `/buildings/:id/tenants` — an endpoint we had not used before
+(`/debts` was where the names were assumed to come from, and it is empty):
+
+| flat | tenant | mobile |
+|---|---|---|
+| 1 | עידו קליקס | on file |
+| 2 | אסף קליקס | on file |
+| 3 | יריב לוי | on file |
+| 4 | *(none)* | none |
+
+All ten flats carry **₪3,000 unpaid for 2026** and another ₪3,000 booked for
+2027, from `/apartments/:aid/payments?year=` with the GENERAL key.
+
+So `paylink_demo_number.py` moved again, flat 3 → **flat 4**. Flat 3 is Yariv's,
+the client contact himself; flat 4 has no tenant and no phone, so a demo
+resident there names nobody real. Flat 2 stays `debt_demo_person.py`'s.
+
+**Key scoping, for anyone probing OXS:** each key is bound to its own endpoints.
+`OXS_KEY_GENERAL` reads `/tenants` and `/payments` and is **403 on `/debts`**;
+`OXS_KEY_DEBTS` reads `/debts` and is **403 on `/payments`**. A 403 here means
+wrong key, not missing permission.
+
+### The debts endpoint is a collections ledger — reconfirmed, and it cost a scare
+
+`/debts` returned 0 rows for בר כוכבא 23 while the payments endpoint showed
+₪30,000 unpaid across its flats for 2026. Swept all **177 active buildings**:
+**1 building with any debtor row, 1 row in total.**
+
+I briefly read that as the debt pipeline being blind. **It is not**, and the
+answer was already written down in `oxs_debt_sync.py`'s own docstring from
+**11 Aug**: that sweep returned exactly one apartment then too, a 2022 balance
+against an inactive owner, while Supabase held 170 real unpaid charges. The
+endpoint is a *collections ledger* — where a case is filed once it escalates
+past normal chasing — not an arrears tracker. Month-to-month arrears are
+computed from payment records by `oxs_arrears.py` / `import_arrears.py`, which
+are the only things allowed to write charges. `oxs_debt_sync.py` was made
+report-only for this exact reason; running its old `--apply` would have marked
+169 real debts paid.
+
+Our own numbers, checked at the same time: **828 charges, 558 unpaid, 7,786
+residents.** Nothing is wrong.
+
+**The lesson is that the check cost nothing and the docstring had it.** Read the
+script before raising the alarm about the thing the script exists to warn about.
+
 ### Test rows belong in בר כוכבא 23, not in a client's building
 
 Owner, setting a standing rule while we lined up a send to Ido: *"use the
