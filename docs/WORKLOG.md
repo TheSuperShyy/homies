@@ -11,6 +11,71 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### A reply that did real work now arrives as two messages — epoch 57 LIVE
+
+Owner, on a transcript where *"give me the payment link"* was answered with the
+link and nothing else: *"it was straight to the point ... i dont want it to
+apologize but reword instead like this is just an example `I understand please
+give me a moment, i will check it out on our system.` then after it will send
+like `Hi, regarding the blah blah this is the payment link ...`"* Asked whether
+that meant two messages or one, he chose **two**.
+
+**How it works.** The model writes both halves in ONE completion, separated by
+`§§§`. New patcher `n8n_whatsapp_twobeat.py` splits them: `Send` posts the first
+half, `Two parts?` (IF) tests for a second, `Hold a beat` (Wait, 1.1–1.9s) and
+`Send the rest` post it. One model call, no extra spend, and both halves are the
+model's own words — which keeps the standing rule that the menu is the only
+fixed text in the system.
+
+**`§§§` is not an arbitrary delimiter.** `Send`'s cleanup strips `[...]`
+wholesale, so any bracketed marker would be eaten before the split could see it,
+and em dashes are rewritten to commas. `§` survives both and does not occur in
+Hebrew WhatsApp prose.
+
+**Degrades to today's behaviour.** No delimiter → one message, buttons and all,
+byte-identical to before. Exercised in `node` on both paths before applying.
+The model will sometimes forget the delimiter, and that must cost a nicety,
+never a reply.
+
+**Buttons ride on a single message only.** When the reply splits, the menu rows
+are suppressed — attaching them to the first beat would put buttons above an
+answer that has not arrived yet.
+
+**Two standing bans had to be scoped, or the model would have kept obeying
+them:** *"תשתמש בהם בשקט, בלי להכריז שאתה בודק"* forbade the exact sentence the
+owner asked for, and the understanding-announcement ban reads as forbidding the
+first half. Both now name the first message as the one allowed case. This is the
+fifth time this week the disliked behaviour was a prompt line being followed.
+
+**Layout:** the first placement put three pairs of nodes on top of each other
+and `n8n_layout.py` failed the workflow. Positions are now a table the patcher
+enforces on every run, so a dragged canvas repairs itself.
+
+### The test building's balances were zero, and the importer could not fix it
+
+Assaf asked his balance and got **₪0**. Not a lookup bug: his resident record
+carried **no charges at all**. The ₪2,000 demo charges sat on a *different* row
+on the same flat (the one pointed at the owner's +63), and בר כוכבא 23 was only
+opened for us on 23 Sep, so no arrears had ever been imported for it.
+
+**`oxs_arrears.py` cannot do it**, and that is correct behaviour: it derives each
+flat's monthly figure from its own *payment* history so nothing is invented, and
+these flats have never paid anything. With no payment to read a rate from it
+files them under "unknown" and writes nothing — the right conservative answer
+for a client's building, the wrong one here.
+
+So `bk_seed_arrears.py` (new) takes the figure from the OXS **month rows**
+themselves, which is what OXS has actually charged. Only months that have
+already ended, the same rule the importer uses. **The building id is hard-coded
+with no flag to change it**, per the owner's rule — a file that cannot be pointed
+at a client's building cannot be pointed at one by accident.
+
+It also refuses to charge the same person twice on one flat: the OXS import and
+the demo scripts both write a row, so flat 1 carries עידו קליקס from each, and
+charging both would double the flat's arrears and list one person on the
+debt-call queue twice. Assaf and Yariv now read **₪2,000**; Ido was skipped
+because his demo row already carries it.
+
 ### DELIVERED: the payment-link template landed on a real handset, outside the window
 
 The owner corrected the number — the mobile on Ido's OXS tenant record is stale

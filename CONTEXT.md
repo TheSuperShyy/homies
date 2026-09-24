@@ -3422,3 +3422,24 @@ actual line was already in Chatwoot as "Elmaliach Ido" and delivered first try.
 OXS is the record of who lives where, not of which handset answers. When a send
 fails on a number taken from OXS, check Chatwoot for the same person under a
 different number before concluding the pipeline is broken.
+
+**A reply can be two messages, and `§§§` is how (24 Sep).** The model writes both
+halves in one completion; `Two parts?` / `Hold a beat` / `Send the rest` post the
+second about a second and a half after the first. The delimiter had to survive
+`Send`'s cleanup, which strips `[...]` wholesale and rewrites em dashes — so no
+bracketed marker and no dash could have worked. Anything that changes `Send`'s
+cleanup chain must change `Send the rest`'s to match; they are kept in step by
+hand and there is no assertion that catches drift.
+
+**The acknowledgement is theatre, and that was the choice.** Both halves exist
+before either is sent, so *"give me a moment, I'll check"* describes work already
+done. The owner picked that over a single honest message because it reads the way
+a human agent types. It is the one place the prompt permits announcing a lookup;
+everywhere else the tools stay silent.
+
+**An empty balance is usually a missing charge, not a broken lookup (24 Sep).**
+`get_balance` sums the charges on the resident row it matched, so a resident with
+no charges truthfully returns ₪0. Before suspecting the tool, check whether that
+building was ever imported — and note that `oxs_arrears.py` deliberately writes
+nothing for a flat that has never paid, because it reads the monthly rate from
+payment history. A building in its first year has no such history.

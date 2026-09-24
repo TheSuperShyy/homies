@@ -203,7 +203,24 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 56
+MEMORY_EPOCH = 57
+# 56 -> 57, 24 Sep: a reply that did real work arrives as TWO messages.
+# Owner, on a transcript where "give me the payment link" was answered with
+# the link and nothing else: "it was straight to the point ... i dont want it
+# to apologize but reword instead like this is just an example `I understand
+# please give me a moment, i will check it out on our system.` then after it
+# will send like `Hi, regarding the blah blah this is the payment link ...`"
+# He chose two real messages over one when asked. The model writes both
+# halves in one completion separated by §§§ and n8n_whatsapp_twobeat.py posts
+# them ~1.5s apart, so both halves stay the model's own words and no second
+# model call is spent.
+#
+# TWO STANDING BANS HAD TO BE SCOPED, or the model would have kept obeying
+# them instead: "תשתמש בהם בשקט, בלי להכריז שאתה בודק" forbade the exact
+# sentence the owner asked for, and the understanding-announcement ban
+# ("משפט שרק מודיע שהבנת") reads as forbidding the first half. Both now name
+# the first message as the one allowed case. Every buffer holds single-message
+# answers with no acknowledgement, which is the behaviour being replaced.
 # 55 -> 56, 23 Sep: the register for a tapped button, owner's words "make the
 # response on the menu button to be Natural & Service-Oriented". Epoch 55
 # warmed the TICKET tap only; מצב קריאה קיימת was still "בטח, ספרו לי בבקשה
@@ -525,7 +542,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8f258d894b60",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "b4d974bc1567",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

@@ -3057,3 +3057,17 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - **`debt_demo_person.py` now takes `--unit`.** Needed because each בר כוכבא flat
   has a different tenant and the flat decides whose name the OXS payment page
   shows. Default is still flat 2.
+- **Epoch 57 is live: two-message replies.** `n8n_whatsapp_twobeat.py` owns the
+  three new nodes (`Two parts?`, `Hold a beat`, `Send the rest`) and the `§§§`
+  split in `Send`. **Owed: handset proof** — ask for a payment link and check two
+  messages arrive, a beat apart, and that an ordinary question still arrives as
+  one. If `Send`'s cleanup chain is ever edited, edit `Send the rest`'s to match.
+- **`bk_seed_arrears.py` (new) seeds בר כוכבא 23's arrears** from the OXS month
+  rows, because `oxs_arrears.py` writes nothing for flats that have never paid.
+  Building id is hard-coded on purpose. `--off` removes what it wrote. Assaf and
+  Yariv now read ₪2,000; Ido was skipped as a same-person duplicate on flat 1.
+- **בר כוכבא 23 carries duplicate resident rows** — the OXS import writes one per
+  tenant and the demo scripts add their own, so flat 1 has two עידו קליקס (one on
+  a stale number) and flat 2 has both `clix` (+63 demo) and אסף קליקס. Balances
+  are unaffected (`get_balance` matches one row) but the debt-call queue lists
+  those flats twice.
