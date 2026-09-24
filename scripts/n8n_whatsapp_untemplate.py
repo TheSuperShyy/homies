@@ -289,6 +289,16 @@ AGENT_NEW = (
     # ticket. The note says what was wrong in general terms -- all three
     # guard reasons -- and what fixes it, which is the tools.
     "+ ($json.retry_note ? ' ' + $json.retry_note : '') "
+    # ADDED 24 Sep, with n8n_whatsapp_firstword.py. `Worth a word?` may have
+    # already sent the resident a "one moment, I'm checking" BEFORE the agent
+    # ran -- that is the whole point of it, since both halves of a §§§ reply
+    # can only leave after the work is done. The agent has no other way to know
+    # that happened, and without this line it writes its own acknowledgement
+    # too and the resident gets three messages.
+    "+ ($json.acked ? ' [הודעה קצרה כבר יצאה אליו ממך ברגע זה: \"' + "
+    "$json.acked + '\". היא כבר אצלו. אל תחזור עליה, אל תפתח שוב בזה שאתה "
+    "בודק, ואם היא כבר בירכה והציגה אותך אל תעשה את זה שוב. ההודעה שאתה כותב "
+    "עכשיו היא התשובה עצמה, הודעה אחת, בלי §§§.]' : '') "
     "+ ' [השעה בישראל עכשיו ' + $now.setZone('Asia/Jerusalem').toFormat('HH:mm') "
     "+ ', יום ' + ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת']"
     "[$now.setZone('Asia/Jerusalem').weekday % 7] + '.]' "

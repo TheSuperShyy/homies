@@ -203,7 +203,17 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 59
+MEMORY_EPOCH = 60
+# 59 -> 60, 24 Sep: the acknowledgement moves IN FRONT of the work.
+# Execution 58640 settled a week of "it sends at the same time": resident
+# 09:37:18, first message 09:37:30, second 09:37:32. The 2s gap was always
+# real; both halves come from one completion, so neither could leave until
+# the model had finished AND the tool had returned, and the resident saw 12
+# seconds of silence then two messages at once. n8n_whatsapp_firstword.py
+# puts a small agent in front: it decides whether answering needs a lookup
+# and, if so, writes one sentence that goes out immediately. The inject now
+# tells the agent what the resident has already been told, or it writes its
+# own acknowledgement too and three messages arrive.
 # 58 -> 59, 24 Sep: "I can send you a payment link if you'd like." The same
 # sentence that had produced the link twenty minutes earlier -- "i noticed you
 # did not send me any followup for the payment due" -- came back as a refusal
@@ -563,7 +573,7 @@ MEMORY_TURNS = 12
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
     "prompt": "754a1cbeca3a",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "168349e79255",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "inject": "805c79df5aa0",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --

@@ -11,6 +11,57 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The acknowledgement moved in front of the work — epoch 60 LIVE
+
+Owner: *"so it still sends at the same time check n8n execution."* Execution
+**58640** settled it, and he was right that something was wrong — just not the
+thing either of us named:
+
+```
+resident writes      09:37:18
+Send                 09:37:30    <- 12 seconds of silence
+Hold a beat          1814 ms     <- the pause, working exactly as built
+Send the rest        09:37:32
+```
+
+**The 2s gap was always real. Its position was the bug.** Both halves come from
+ONE completion, so neither can leave until the model has finished thinking *and*
+`get_payment_link` has returned. The "one moment, I'm checking" therefore landed
+at the exact moment the answer was already in hand. Where the 12s went: **4.0s**
+debounce waiting in case the resident is still typing, 1.1s first model call,
+**2.7s** OXS, 2.8s writing, ~1.7s logging.
+
+So `n8n_whatsapp_firstword.py` puts a small agent **in front** of the work.
+`Worth a word?` reads the inbound message and does one thing: decides whether
+answering will need a lookup, and if so writes one sentence, which goes out
+immediately. Otherwise it returns `NONE` and nothing is sent — *"what is the
+office number"* must not be answered with *"let me check the system"*.
+
+**It fails open, which is why it is safe in the main path.**
+`onError: continueRegularOutput` means an outage or a rate limit costs the
+nicety and nothing else: `A word first?` sees no output, takes the false branch,
+and the reply goes out as before. Exercised in `node` on all three paths —
+sentence, `NONE`, and model-errored — before applying.
+
+**`Carry on` rebuilds the item.** The agent reads `$json.text/.photo/
+.attachment/.greeted/.tap_now/.retry_note/.last_bot`, and an agent node in
+between replaces `$json` with its own output, so the original is restored from
+`Still the last word?` plus one new field, `acked`. The inject turns that into a
+line naming what the resident was just told — **without it the model writes its
+own acknowledgement too and three messages arrive.** `untemplate.py`'s
+`AGENT_NEW` was updated in the same step and verified byte-equal to live, so the
+epoch hash describes reality.
+
+**The retry path is untouched:** `Try again` still feeds the agent directly, so
+a second attempt never acknowledges twice.
+
+Node type chosen rather than guessed: `Say it again` is already an agent v3 with
+a model and no tools, so that shape is proven on this instance. The model
+sub-node now feeds three parents, which it already did for two.
+
+**Layout:** the first placement collided with four existing nodes and
+`n8n_layout.py` named every one; moved to the empty band at y=700.
+
 ### The two-second gap works; the refusal did not — epoch 59 LIVE
 
 Owner, on a screenshot of the two messages both stamped 17:22: *"it sends at

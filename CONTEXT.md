@@ -3489,3 +3489,24 @@ asking how to pay and asking for the link, while the resident was *chasing a
 follow-up*, which is none of those. When behaviour is inconsistent across two
 identical inputs, suspect the entry condition before the instruction; a rule
 only runs once the tool has been recognised as the right one.
+
+**A two-part reply cannot make the first part arrive early (24 Sep).** Both
+halves of a §§§ split come from one completion, so neither leaves until the
+model has finished and every tool has returned. The pause between them is real
+and irrelevant: the resident's wait happens BEFORE the first message, not
+between the two. Anything that should reach somebody while they are waiting has
+to be produced by something that runs before the work — hence `Worth a word?`.
+Measure this in an n8n execution's node timings, not in the message store: the
+store shows the gap, the execution shows where the twelve seconds went.
+
+**Anything added to the main reply path must fail open.** `Worth a word?` and
+`Say it now` both carry `onError: continueRegularOutput`, so a model outage, a
+rate limit or a Chatwoot hiccup costs the acknowledgement and never the answer.
+A node that can silence the bot does not belong between a resident's message and
+their reply, however useful it is when it works.
+
+**An agent node replaces `$json` for everything downstream.** The inject reads
+seven fields off the incoming item, so inserting any LLM node into the main path
+breaks it silently — the agent still runs, just with an empty photo, empty
+`tap_now` and no text. `Carry on` restores the item from `Still the last word?`.
+Remember this before putting anything else in that line.

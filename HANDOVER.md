@@ -3091,3 +3091,15 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   offer-and-wait or to claim it cannot help with a payment update. **The ~2s gap
   between the two messages is confirmed working** (Chatwoot 09:22:32 / 09:22:34);
   a phone screen cannot show it.
+- **Epoch 60: `Worth a word?` sends the acknowledgement BEFORE the lookup.**
+  Four new nodes (`Worth a word?`, `A word first?`, `Say it now`, `Carry on`)
+  owned by `n8n_whatsapp_firstword.py`. It costs **one extra model call per
+  inbound message** — the owner approved that explicitly on 24 Sep. Both new
+  nodes fail open; if the bot ever goes silent, check them first but they cannot
+  be the cause by design. **Owed: handset proof** — send a payment question and
+  check the acknowledgement arrives within a few seconds and the answer follows
+  after the real lookup, with no third message.
+- **`untemplate.py`'s `AGENT_NEW` is byte-equal to the live inject again**
+  (verified 24 Sep). That script still refuses to run over a missing `Human tap?`
+  node, so it is a record, not a shipper — edit both it and the live text
+  together or the epoch hash stops describing reality.
