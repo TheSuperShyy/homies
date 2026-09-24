@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### DELIVERED: the payment-link template landed on a real handset, outside the window
+
+The owner corrected the number — the mobile on Ido's OXS tenant record is stale
+(it resolves to a Chatwoot contact called "Clix Solution"); his real one is a
+different line, already known to Chatwoot as **contact 44, "Elmaliach Ido"**.
+He last wrote to the bot on **15 Sep, 211 hours before the send**, so the
+24-hour window was shut, and his earlier outbound messages had delivered — so
+unlike the stale number he was already on the test number's allow-list.
+
+**Every pass criterion from HANDOVER met:**
+
+| check | result |
+|---|---|
+| `payment_links.status` | `sent` |
+| `payment_links.note` | **`whatsapp_template`** |
+| free-text attempt (msg 1700) | `failed` — window closed, *"Send an approved template message instead"* |
+| template (msg 1701) | **`delivered`** |
+| request `255-1325-26` | **`resolved`**, type `payment` |
+| apartment on the link | `…ece6` = flat 1, Ido's own |
+
+So the whole debt-call path is proven end to end: a resident who has not written
+in over 24 hours still receives their payment link, as `payment_link_he`, with
+the right months, the right amount and a link to their own flat.
+
+**Undone first:** the 8 charges and 1 link row hung on the stale-number row, so
+that person is off the debt-call queue again.
+
+**Left behind:** Ido (the real number) has 8 demo charges and is therefore ON
+the debt-call queue — delete `charges?resident_id=…` to clear it. Request
+**255-1324-26**, the failed first attempt, stays `open`; per the owner's
+standing "ok dont delete them" on test tickets it is not being removed.
+
 ### PROVEN: the payment-link template fires outside the 24-hour window
 
 First send to a number that had never written to the bot — עידו קליקס, flat 1

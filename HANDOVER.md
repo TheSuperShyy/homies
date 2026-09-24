@@ -3033,7 +3033,17 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - **OXS keys are endpoint-scoped:** GENERAL for `/tenants` + `/payments`, DEBTS
   for `/debts`; each 403s on the other's. A 403 is the wrong key, not a
   revoked one.
-- **PROVEN 24 Sep: `payment_link_he` fires outside the 24-hour window.** Chatwoot
+- **DELIVERED 24 Sep — the debt-call payment link is proven end to end.** Real
+  handset, 211 h since its last inbound, so the window was shut: free text
+  refused, `payment_link_he` delivered, `payment_links` = `sent` /
+  **`whatsapp_template`**, request `255-1325-26` **resolved**, link bound to the
+  resident's own flat. Nothing further is owed on this path.
+- **Ido has 8 demo charges and is ON the debt-call queue** (בר כוכבא 23 flat 1,
+  ₪2,000, `source: 'agent'`). Delete his `charges` rows to clear it. Request
+  `255-1324-26` (the earlier failed attempt on a stale number) stays open as
+  test noise, per the owner's "ok dont delete them".
+- **Superseded by the line above:** `payment_link_he` first fired but was
+  recipient-blocked. Chatwoot
   conversation 53: free text failed with the window error, the template followed
   two seconds later, correctly rendered, and Meta rejected only the recipient
   (`#131030`). The retry logic is good; the WABA is on Meta's **test number** and

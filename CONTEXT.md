@@ -3414,3 +3414,11 @@ tool returned `sent: false, reason: "outside_window"` for this send, which reads
 as "the template never ran". It did run — the tool reports the *first* attempt's
 reason and the retry's outcome only changes `note` when it succeeds. The two
 messages in the conversation are the real record.
+
+**A tenant's phone in OXS is not necessarily their WhatsApp (24 Sep).** The
+mobile on Ido's OXS tenant record resolved to a Chatwoot contact named "Clix
+Solution", and the send to it was rejected by Meta as not-allow-listed; his
+actual line was already in Chatwoot as "Elmaliach Ido" and delivered first try.
+OXS is the record of who lives where, not of which handset answers. When a send
+fails on a number taken from OXS, check Chatwoot for the same person under a
+different number before concluding the pipeline is broken.
