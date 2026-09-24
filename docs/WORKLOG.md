@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### PROVEN: the payment-link template fires outside the 24-hour window
+
+First send to a number that had never written to the bot — עידו קליקס, flat 1
+of the test building, on the owner's "go". **The template path works.** Chatwoot
+conversation 53 holds the whole sequence, two seconds apart:
+
+1. **msg 1696, free text, FAILED** — *"Message not sent because the WhatsApp
+   24-hour customer service window is closed and no template parameters were
+   provided. Send an approved template message instead."* Exactly the condition
+   we have never been able to reach with the owner's own handset.
+2. **msg 1697, `payment_link_he`, FIRED** — rendered correctly with his eight
+   months, ₪2,000 and his own flat's link. Meta took the template and rejected
+   only the **recipient**: `(#131030) Recipient phone number not in allowed list`.
+
+So the retry logic, the template wording and the parameter mapping are all
+proven. The one blocker is that the WABA is still on **Meta's free test number**
+(`+1 555 178-1261`), which sends only to an allow-list of up to five recipients.
+Ido is not on it. Swept the inbox to be sure it is not something broader: four
+conversations, 23 outgoing messages delivered fine, and **the only two failures
+are these two**, both in Ido's conversation.
+
+**What it took, and what it left behind.** `debt_demo_person.py` gained
+`--unit`, because בר כוכבא 23 has a different tenant per flat and sending to Ido
+means flat 1 or the payment page names somebody else. Ido turned out to be
+**already on file with `source: 'oxs'`** — a real import row — so the demo script
+refused to touch him, correctly. His charges were inserted directly instead
+(8 × ₪250, `source: 'agent'`, so the arrears sweep leaves them alone).
+
+**Left on purpose, for the retry after allow-listing:** Ido's 8 charges, which
+also put him on the debt-call queue. Remove with a delete on
+`charges?resident_id=eq.8dec598e-…`. Also left: request **255-1324-26**, the
+"office will send it" fallback the tool files when delivery fails — test noise.
+
 ### בר כוכבא 23's tenant list, and the demo flat moved to the empty one
 
 The owner, recalling yesterday's scan: *"we did a scan on the building test that

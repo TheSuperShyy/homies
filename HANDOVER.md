@@ -3033,3 +3033,17 @@ a phone call: check that `attempts` moves and the call lands under Calls.
 - **OXS keys are endpoint-scoped:** GENERAL for `/tenants` + `/payments`, DEBTS
   for `/debts`; each 403s on the other's. A 403 is the wrong key, not a
   revoked one.
+- **PROVEN 24 Sep: `payment_link_he` fires outside the 24-hour window.** Chatwoot
+  conversation 53: free text failed with the window error, the template followed
+  two seconds later, correctly rendered, and Meta rejected only the recipient
+  (`#131030`). The retry logic is good; the WABA is on Meta's **test number** and
+  its five-slot allow-list is the blocker. **To finish the proof:** add the
+  recipient in Meta (WhatsApp → API Setup → recipient phone numbers) and re-run
+  `$TEMP/ido_send.py`-style call, or move to a real business number.
+- **Ido (עידו קליקס, בר כוכבא 23 flat 1) has 8 demo charges attached
+  (`source: 'agent'`, ₪2,000)** so he is ON the debt-call queue. Left deliberately
+  so the retry is one step. Delete `charges?resident_id=eq.8dec598e-…` to remove
+  him. Request **255-1324-26** is the failed-delivery fallback, test noise.
+- **`debt_demo_person.py` now takes `--unit`.** Needed because each בר כוכבא flat
+  has a different tenant and the flat decides whose name the OXS payment page
+  shows. Default is still flat 2.

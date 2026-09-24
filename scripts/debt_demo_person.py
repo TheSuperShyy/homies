@@ -1,7 +1,7 @@
 """Put a phone on the debt-call queue as a demo debtor, so the debt agent has a
 real row to call and a real number to send the link to -- then take it off.
 
-    python scripts/debt_demo_person.py on  +<country><number> --name clix
+    python scripts/debt_demo_person.py on  +<country><number> --name clix [--unit 1]
     python scripts/debt_demo_person.py off +<country><number>
 
 `on` inserts one `residents` row (the name you give, building בר כוכבא 23,
@@ -70,6 +70,13 @@ def main():
         sys.exit(__doc__)
     mode, phone = args[0], args[1].strip()
     name = args[args.index("--name") + 1].strip() if "--name" in args else "clix"
+    # --unit, 24 Sep: בר כוכבא 23 has a tenant per flat (1 עידו קליקס,
+    # 2 אסף קליקס, 3 יריב לוי, 4 empty), so which flat the demo sits on decides
+    # whose name the OXS payment page shows. Sending to Ido means flat 1, his
+    # own, or the page names somebody else. Default stays 2.
+    unit = args[args.index("--unit") + 1].strip() if "--unit" in args else UNIT
+    if unit not in [str(n) for n in range(1, 11)]:
+        sys.exit("--unit must be a flat in בר כוכבא 23, 1 to 10 (got %r)" % unit)
     if not (phone.startswith("+") and phone[1:].isdigit() and 9 <= len(phone) <= 16):
         sys.exit("give the number in international form, +<country><number>")
     e = W.env()
@@ -97,13 +104,13 @@ def main():
             print("already on file: …%s -> %s flat %s (%s)" % (phone[-4:], have[0]["building"], have[0]["unit"], have[0]["full_name"]))
         else:
             r = call("POST", "residents", {"phone": phone, "full_name": name, "building": BUILDING,
-                                           "unit": UNIT, "source": SOURCE})
+                                           "unit": unit, "source": SOURCE})
             rid = r[0]["id"]
-            print("resident: …%s -> %s, flat %s, named %s" % (phone[-4:], BUILDING, UNIT, name))
+            print("resident: …%s -> %s, flat %s, named %s" % (phone[-4:], BUILDING, unit, name))
         ch = call("GET", "charges?resident_id=eq.%s&select=id,period,amount,status" % rid)
         if not ch:
             call("POST", "charges", [{"resident_id": rid, "period": p, "amount": a,
-                                      "status": "unpaid", "unit": UNIT, "source": SOURCE}
+                                      "status": "unpaid", "unit": unit, "source": SOURCE}
                                      for p, a in CHARGES])
             print("charges : %d months, %d shekels each, %d total, unpaid"
                   % (len(CHARGES), CHARGES[0][1], sum(a for _, a in CHARGES)))

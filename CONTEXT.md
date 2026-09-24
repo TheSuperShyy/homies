@@ -3397,3 +3397,20 @@ ordinary chasing. Arrears are computed from payment records
 `charges`. **Anyone alarmed by an empty `/debts` should read that docstring
 before reporting it** — the 11 Aug version of this script nearly marked 169 real
 debts as paid on the same misreading.
+
+**The WhatsApp number is Meta's test number, and that is an allow-list of five
+(24 Sep).** Every successful send to date has gone to a number already on it,
+which is why the 24-hour-window template branch could never be exercised: the
+owner's own handset is always inside the window *and* always allow-listed. The
+first send to an outsider produced `(#131030) Recipient phone number not in
+allowed list` — **after** the template had fired correctly, so the failure is at
+the recipient, not in our code. Before any real resident can be messaged, the
+WABA has to move to a real business number; until then "it did not arrive" has
+two quite different causes and `content_attributes.external_error` on the
+Chatwoot message is what tells them apart.
+
+**Read the Chatwoot message's `external_error`, not just the tool result.** The
+tool returned `sent: false, reason: "outside_window"` for this send, which reads
+as "the template never ran". It did run — the tool reports the *first* attempt's
+reason and the retry's outcome only changes `note` when it succeeds. The two
+messages in the conversation are the real record.
