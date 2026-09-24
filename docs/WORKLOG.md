@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### The payment-link reply closes like the template — epoch 61 LIVE
+
+Owner: *"instead of the how else can i help you make sure its like the one in
+the templated message but instead if us reach out to me."*
+
+`payment_link_he` closes *"אם משהו לא ברור, פשוט כתבו לנו כאן"*. The chat reply
+now closes the same way but in the **first person singular** — write to **me**,
+not to us — and drops *"How else can I help you?"*. Someone who asked for a link
+got exactly what they wanted; a further question reopens a matter that is
+finished.
+
+**The competing rule was scoped, not deleted.** *"ההודעה שמסכמת את זה לא נגמרת
+בנקודה יבשה: אתה מציע לעזור בעוד משהו"* is what produced the line he objected
+to, and it is right everywhere else, so the payment link is named as the one
+exception. Sixth time this week the disliked output was a prompt line being
+obeyed.
+
+**Checked before allowing a full stop:** the standing rule is that a reply
+without a `?` gets the three-button menu appended and arrives as two messages.
+That was true when it was written; the `Dead end reply?` node **no longer exists
+on the workflow** and nothing tests for a question mark any more. Verified on
+the live workflow rather than assumed — had it still been there, this change
+would have produced a stray menu after every payment link. The memory rule has
+been updated with both the removal and the exception.
+
+**Open, and the owner's call:** `payment_link_he` itself still says *"כתבו
+לנו"*. Making the template match means an edit and a fresh Meta approval cycle,
+with a rejection risk, so it has not been touched.
+
 ### The acknowledgement moved in front of the work — epoch 60 LIVE
 
 Owner: *"so it still sends at the same time check n8n execution."* Execution

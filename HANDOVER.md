@@ -3103,3 +3103,10 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   (verified 24 Sep). That script still refuses to run over a missing `Human tap?`
   node, so it is a record, not a shipper — edit both it and the live text
   together or the epoch hash stops describing reality.
+- **Epoch 61: the payment-link reply ends like the template** (personal to your
+  flat, write to **me** here) and **not** with "how else can I help?". It is the
+  only reply allowed to end without a `?`; `Dead end reply?` is gone from the
+  workflow so nothing appends the menu any more.
+- **`payment_link_he` still says "כתבו לנו" (write to us).** The chat reply says
+  "me". Aligning the template needs a Meta edit and re-approval — owner's call,
+  not started.

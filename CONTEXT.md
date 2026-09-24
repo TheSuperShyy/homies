@@ -3510,3 +3510,11 @@ seven fields off the incoming item, so inserting any LLM node into the main path
 breaks it silently — the agent still runs, just with an empty photo, empty
 `tap_now` and no text. `Carry on` restores the item from `Still the last word?`.
 Remember this before putting anything else in that line.
+
+**A guard that is gone cannot be relied on, and a guard that is gone stops
+forbidding things (24 Sep).** `Dead end reply?` used to append the three-button
+menu to any reply containing no `?`, which is why every bot line was required to
+end with a question. It is no longer on the workflow and nothing tests for a
+question mark. So the payment-link reply may now end with a full stop — but the
+same fact means nothing catches a dead-end reply either. Check the live
+workflow before relying on, or waiving, any rule whose reason is a node.

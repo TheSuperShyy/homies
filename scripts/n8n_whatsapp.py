@@ -203,7 +203,17 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 60
+MEMORY_EPOCH = 61
+# 60 -> 61, 24 Sep: the payment-link reply closes like the template, not with
+# "how else can I help?". Owner: "instead of the how else can i help you make
+# sure its like the one in the templated message but instead if us reach out
+# to me" -- so payment_link_he's closing (write to us here if anything is
+# unclear) but in the first person singular. The prompt's "offer to help with
+# something else" rule is scoped rather than deleted; it is right everywhere
+# else and it is what produced the line he is objecting to. This is now the
+# one reply allowed to end without a question -- safe because `Dead end
+# reply?`, which appended the menu to any reply lacking a "?", no longer
+# exists on the workflow (checked, not assumed).
 # 59 -> 60, 24 Sep: the acknowledgement moves IN FRONT of the work.
 # Execution 58640 settled a week of "it sends at the same time": resident
 # 09:37:18, first message 09:37:30, second 09:37:32. The 2s gap was always
@@ -572,7 +582,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "754a1cbeca3a",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "fd09d756cbf3",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "805c79df5aa0",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -581,7 +591,7 @@ EPOCH_COVERS = {
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
     # 23 Sep: show_menu now names the third row "talk to a representative".
-    "tools": "1662335aeb3d",
+    "tools": "afbe61b60dba",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1649,8 +1659,14 @@ TOOLS = [
             "whoever opens it can pay against that flat. The amount is not in "
             "the result and you do not state one: how much they owe is "
             "get_balance's question, with its own identity check. A delivered "
-            "link completes the matter: no ticket and no team note, just your "
-            "short words and the offer of anything else.\n"
+            "link completes the matter: no ticket and no team note. Close it "
+            "the way payment_link_he closes — invite them to write to you here "
+            "if anything is unclear — and NOT with an offer of further help. "
+            "\"How else can I help?\" reopens a matter that is finished and "
+            "hands them a second decision when they only wanted the link. In "
+            "the FIRST PERSON SINGULAR, unlike the template: write to ME here, "
+            "not to us. This is the one reply that may end without a "
+            "question.\n"
             "`found` false: `reason` is for you, not for them: do not explain it, "
             "and do not ask for a name or a phone number. The ticket route is "
             "unchanged: if you do not yet have their building and apartment, ask "
