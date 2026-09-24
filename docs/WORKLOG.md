@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-09-24
 
+### All three test tenants now show in the debt tab
+
+Owner, on a screenshot of the Voice Agent call page listing only `clix` and
+`עידו`: *"can we also put all the 3 names here the ido assaf and yariv."*
+
+**They had charges but no `handed_over`.** `v_debt_call_queue`
+(`013_call_per_resident.sql:116`) requires `r.handed_over = true`, and across
+the **whole system only two residents carried it** — the two demo rows. That is
+the eligibility guard doing its job: it is what stops a real client's resident
+being dialled by mistake, and it is why seeding charges alone changed nothing.
+
+So `bk_seed_arrears.py` now also hands over residents **of this building only**,
+and only ones with a phone and something unpaid. Assaf and Yariv flipped; Ido
+was already on via his demo row. The debt tab lists four.
+
+**Still four, not three.** `clix` (flat 2, the owner's +63 demo) duplicates
+Assaf's flat, so flat 2 appears twice. Left alone deliberately — he said
+*"also"*, and deleting his own test row is not an implied instruction. Removing
+it is one delete and would leave exactly the three names he asked for.
+
+**A bug caught by the dry run:** the first version listed all four residents for
+hand-over including the two that already had it, because the `select` did not
+fetch `handed_over` and `r.get("handed_over")` was therefore always `None`. A
+PATCH-everything would have been harmless here and wrong anywhere else.
+
 ### A reply that did real work now arrives as two messages — epoch 57 LIVE
 
 Owner, on a transcript where *"give me the payment link"* was answered with the

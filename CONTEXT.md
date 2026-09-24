@@ -3443,3 +3443,12 @@ no charges truthfully returns ₪0. Before suspecting the tool, check whether th
 building was ever imported — and note that `oxs_arrears.py` deliberately writes
 nothing for a flat that has never paid, because it reads the monthly rate from
 payment history. A building in its first year has no such history.
+
+**`handed_over` is the consent gate on the debt tab, not a progress flag
+(24 Sep).** `v_debt_call_queue` shows a resident only when `handed_over = true`,
+so charges alone never put anyone on the call list. Across the whole system just
+two residents carried it before today, which is the point: a client's resident
+cannot be dialled until somebody deliberately hands them over. When the debt tab
+looks empty for a resident who clearly owes money, this flag is the first thing
+to check, and setting it in bulk is exactly the mistake it exists to prevent —
+`bk_seed_arrears.py` flips it only for בר כוכבא 23.

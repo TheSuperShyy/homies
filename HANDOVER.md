@@ -3071,3 +3071,8 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   a stale number) and flat 2 has both `clix` (+63 demo) and אסף קליקס. Balances
   are unaffected (`get_balance` matches one row) but the debt-call queue lists
   those flats twice.
+- **The debt tab lists four for בר כוכבא 23: Ido, Assaf, Yariv and `clix`.**
+  The last is the owner's +63 demo row and duplicates Assaf's flat 2; deleting
+  that one resident row leaves exactly the three tenants. `bk_seed_arrears.py`
+  sets `handed_over` for this building only — never run a bulk hand-over, it is
+  the guard that stops a client's resident being dialled.

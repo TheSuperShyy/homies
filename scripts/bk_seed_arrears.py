@@ -79,7 +79,7 @@ def main():
             sys.exit("HTTP %s on %s: %s" % (ex.code, path.split("?")[0], ex.read().decode()[:300]))
 
     q = "residents?building=ilike." + urllib.parse.quote("*בר כוכבא 23*", safe="")
-    residents = rest("GET", q + "&select=id,full_name,unit,phone,source")
+    residents = rest("GET", q + "&select=id,full_name,unit,phone,source,handed_over")
     if not residents:
         sys.exit("no residents on %s -- nothing to seed." % BUILDING)
 
@@ -140,7 +140,22 @@ def main():
         print("  flat %-3s %-16s + %d month(s), %d total" % (unit, (r.get("full_name") or "")[:16], len(owed), total))
         planned.append((r, unit, owed))
 
-    if not planned:
+    # --- who the debt tab is allowed to dial ---------------------------------
+    # `handed_over` is the eligibility guard on v_debt_call_queue: a resident
+    # without it never appears in the dashboard's debt tab and cannot be called
+    # by mistake. Across the whole system only the demo rows carry it, which is
+    # exactly right for a client's resident and wrong for ours -- the owner
+    # asked for all three tenants of the test building to show up there. Only
+    # residents of THIS building are ever touched, and only ones that have a
+    # phone and something unpaid to call about.
+    to_hand = [r for r in residents
+               if not r.get("handed_over") and r.get("phone")
+               and (r["id"] in {x[0]["id"] for x in planned}
+                    or rest("GET", "charges?resident_id=eq.%s&status=eq.unpaid&select=id&limit=1" % r["id"]))]
+    for r in to_hand:
+        print("  hand over: flat %-3s %s" % (r.get("unit"), (r.get("full_name") or "")[:16]))
+
+    if not planned and not to_hand:
         print("")
         print("Nothing to do.")
         return
@@ -153,8 +168,10 @@ def main():
         rest("POST", "charges", [{"resident_id": r["id"], "period": p, "amount": a,
                                   "status": "unpaid", "unit": unit, "source": SOURCE}
                                  for p, a in owed])
+    for r in to_hand:
+        rest("PATCH", "residents?id=eq.%s" % r["id"], {"handed_over": True})
     print("")
-    print("written for %d resident(s)." % len(planned))
+    print("written: %d resident(s) charged, %d handed over." % (len(planned), len(to_hand)))
 
 
 if __name__ == "__main__":
