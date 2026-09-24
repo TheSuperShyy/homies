@@ -3017,7 +3017,8 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   offered to the owner, not started.
 - **Test rows go in בר כוכבא 23 and nowhere else (owner, 24 Sep).** Every other
   building is a live client's. `debt_demo_person.py` (flat 2, ₪2,000) and
-  `paylink_demo_number.py` (flat 3, moved off הרצל 112 on 24 Sep) both comply.
+  `paylink_demo_number.py` (flat 4, moved off הרצל 112 on 24 Sep) both comply.
+  **Flat 3 is יריב's own flat — never seed it.**
   **`check_tools.py` and `check_media.py` do not** — they file test service calls
   against הרצל 112, a real building. Moving them needs care: several assertions
   lean on Herzl's street/number shape (`הרצל 14` resolving to nothing is one of
