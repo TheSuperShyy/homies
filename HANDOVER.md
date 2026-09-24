@@ -3015,3 +3015,10 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   A `residents`-by-phone lookup exists at `debt-tools/index.ts:3403`. Wiring it
   removes the reference-number question entirely. Needs Edge Function v99;
   offered to the owner, not started.
+- **Test rows go in בר כוכבא 23 and nowhere else (owner, 24 Sep).** Every other
+  building is a live client's. `debt_demo_person.py` (flat 2, ₪2,000) and
+  `paylink_demo_number.py` (flat 3, moved off הרצל 112 on 24 Sep) both comply.
+  **`check_tools.py` and `check_media.py` do not** — they file test service calls
+  against הרצל 112, a real building. Moving them needs care: several assertions
+  lean on Herzl's street/number shape (`הרצל 14` resolving to nothing is one of
+  the cases under test), so it is a job, not a rename.
