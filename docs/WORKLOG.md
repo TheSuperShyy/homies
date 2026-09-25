@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-09-25
 
+### "Assaf got removed?" — no: four rehearsals used up his call attempts
+
+The Voice Agent panel showed two people where it had shown three an hour
+earlier. Nothing was deleted, and the charges were still `unpaid`, still
+`handed_over`, still ₪2,000.
+
+**The queue gates on `charges.attempts < 4`** (004, restated in 012 and 013),
+and every call that ends with `log_call_outcome` counts one. Flat 2's eight
+charges were sitting at exactly **4**, with `last_call_at` from 09:21 today — so
+they fell out of `v_debt_call_queue`, and with them out of
+`v_debt_call_queue_person`, which is what the dashboard reads. Four attempts is
+the system deciding to stop calling somebody, working exactly as designed on a
+number that had been rehearsed against four times in a morning.
+
+**This is the second "it was removed" in two hours and the second time it was a
+status, not a deletion** — the first was `disputed` on the same resident. Both
+were test activity being recorded correctly and then filtered out of a view.
+
+**New: `scripts/bk_reset_attempts.py`.** Puts the test building's unpaid charges
+back to attempt 0 and clears `last_call_at`. בר כוכבא 23 only, hard-coded, no
+flag — **a reset anywhere else would erase a real collections history**, and how
+many times a resident has actually been rung is the record the office works
+from, not a counter to tidy away. It deliberately does not touch `status`: a
+`paid` or `disputed` charge is out of the queue for a reason of its own and
+stays out.
+
+All three are back on the list, one per flat.
+
+**Worth deciding, not fixed:** rehearsing from the dashboard costs real
+attempts. The page's own comment says it reads the view *without* `press_call`
+so that "nothing flips handed_over, nothing counts an attempt" — but the agent
+still calls `log_call_outcome` at the end of a web call, which counts one
+anyway. Either the rehearsal path should not log an outcome, or this script gets
+run after every few tries. The owner's call which.
+
 ### A wrong answerer now gets a message to pass on (debt voice agent)
 
 Owner, with a transcript where the debtor's mother answered and the agent said

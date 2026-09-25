@@ -3091,6 +3091,15 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   A `residents`-by-phone lookup exists at `debt-tools/index.ts:3403`. Wiring it
   removes the reference-number question entirely. Needs Edge Function v99;
   offered to the owner, not started.
+- **A debtor vanishing from the Voice Agent list is almost never a deletion.**
+  Two causes, both seen on 25 Sep: `attempts` hit the `< 4` queue gate after
+  four rehearsals (`scripts/bk_reset_attempts.py --apply` puts the test
+  building back to 0), or the charges went `disputed` because a call recorded
+  "I already paid". **Check `charges.status` and `charges.attempts` before
+  looking for a missing row.** The dashboard reads
+  `v_debt_call_queue_person`, which is built on `v_debt_call_queue`, which
+  filters on both. Rehearsing from the dashboard DOES cost attempts even though
+  the page avoids `press_call`, because the agent still logs an outcome.
 - **The +63 tester IS flat 2's tenant (25 Sep), not a fourth person.**
   `scripts/bk_demo_as_tenant.py` renamed the demo row to the flat's real tenant,
   taking the name from the `source='oxs'` row so it cannot drift, restored its
