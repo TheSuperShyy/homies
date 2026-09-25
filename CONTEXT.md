@@ -1974,6 +1974,13 @@ The follow-on, same day: the owner abandoned the spent key outright. A number
 attached to a dead credential is not evidence about a live one, and quoting it
 again would be the same mistake wearing different clothes.
 
+**And the probe must ask for what the real caller asks for.** 25 Sep again: the
+key was tested with `max_tokens: 1`, it passed, and the key was cleared of
+suspicion — while every real reply, asking for 4096, was being refused. The
+probe was a real call to the real endpoint with the real key and it still
+proved nothing, because it differed from production in the one parameter that
+mattered. Copy the caller's parameters, not just its address.
+
 **So test the thing itself.** The same shape has now cost time three times in
 this project: a 403 from OXS that meant the wrong lookup rather than a revoked
 key, an empty `/debts` that meant a collections ledger rather than a blind

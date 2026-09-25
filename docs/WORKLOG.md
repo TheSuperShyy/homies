@@ -11,6 +11,57 @@ conversation that produced it.
 
 ## 2026-09-25
 
+### The bot was refused over a 2% token shortfall, not a dead key — and the balance ask got its manners back (epoch 65)
+
+**Three wrong diagnoses before the right one, and the evidence was in the error
+all along.** The bot stopped replying; the headline was
+`Payment required - perhaps check your payment details?` and that was taken at
+face value. The `description` field one level down said what was actually
+happening:
+
+> *This request requires more credits, or fewer max_tokens. You requested up to
+> 4096 tokens, but can only afford 4010.*
+
+The model node reserved **4096** tokens per reply and the account could cover
+**4010**. Every reply was refused before a single token was spent — which is
+also why the key's usage counter never moved, the fact that was being read as
+"n8n is ignoring the new credential".
+
+**What the detours cost.** A one-token probe was used to test the key, it
+passed, and the key was declared healthy; a 4096-token probe would have failed
+immediately and ended this in one step. **A probe that does not ask for what
+the real caller asks for is not a test of the real caller.** Then
+`isResolvable: false` on an API-created credential turned into a whole theory
+about n8n ignoring it. The owner was sent to paste a key into the n8n UI, which
+was not the fix, though it did leave the working key in the right place.
+
+Fixed by setting the model node's `maxTokens` to **1024**, which is still far
+more than a WhatsApp reply needs. Proved before changing anything: the same key,
+same model, fails at 4096 and succeeds at 1024. **The account is still near
+zero — affording ~4010 tokens is about a penny — so this buys time, not a fix.**
+
+**Then the tone, same screenshot.** The reply that finally came through asked
+for identity like a form: *"I understand you want to check your balance. In
+order for me to help you, I will need your full name and phone number."* Owner:
+*"i want the response to be polite and professional"*, with an example and
+*"do not copy it"*.
+
+Cause was where it always is. `get_balance`'s description is tone-neutral (*"ask
+— one message, both facts, in your own words"*), and the prompt already bans
+echoing the resident back at themselves — but **every example in that ban is
+fault-shaped** (`אני מבין שיש לכם עובש על הקיר`), so the model never read it as
+covering a *request*. Widened in place rather than by adding a rule elsewhere:
+the ban now names the request form too, and a new clause says a request for
+details looks **forward** at what you are about to do for them, never backward
+at what you require from them, with `כדי שאוכל לעזור לכם אצטרך ממכם` named as
+the phrasing that turns one line into a form. **No wanted sentence is quoted** —
+the owner said not to copy his example, and a quotable line in the prompt is a
+line the model will copy.
+
+Prompt 17,663 -> 18,236 chars. `MEMORY_EPOCH` 64 -> 65, hash `4c2472366ca9` ->
+`8a2990392dce`. Verified live: `sessionKey -65`, `maxTokens 1024` survived the
+prompt deploy, credential intact, 47 nodes, active.
+
 ### The bot went silent: the model account was spent — swapped to the second key
 
 Owner, with a screenshot of a question that got no answer at all: *"the bot not
