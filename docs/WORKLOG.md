@@ -11,6 +11,43 @@ conversation that produced it.
 
 ## 2026-09-25
 
+### A wrong answerer now gets a message to pass on (debt voice agent)
+
+Owner, with a transcript where the debtor's mother answered and the agent said
+only *"Okay, thanks for your time, have a good day"* and hung up: *"if the
+person is not there it should be can you please let assaf know that we called
+and if he can reach out to us via call or chat in whatsapp, thank you"*.
+
+**The agent was obeying the fence, word for word.** `prompt.md:242` is the
+no-discretion privacy rule — not a word about money until the person on the
+line confirms who they are — and it ended: *"if it is someone else, you do not
+say why you called, you end politely, and you record in the tool that it was
+not the right person."* Ending politely is exactly what it did. The rule was
+written to stop a debt being disclosed to a stranger and it does that job; it
+just never said to leave a message, so the call was wasted.
+
+**Changed in place, with the privacy half untouched.** The agent now asks the
+person to pass on that Homiz called and that we would be glad if they got back
+to us, by phone or on WhatsApp, thanks them, and still logs that it was not the
+right person. Explicitly: the message carries **no reason and no detail**, and
+if the answerer asks what it is about the agent says it is personal to the
+resident and only repeats the request to pass it on. **A callback request
+discloses nothing; the reason for the call is the private part, and that is
+still sealed.**
+
+Kept in the voice spelling, `הומיז` without the apostrophe — the chat bot's
+`הומי'ז` changes what the voice engine pronounces, which is why the two
+deliberately differ.
+
+Pushed with `vapi_sync.py debt --apply`. `vapi_set_voice.py` is NOT needed here:
+only the INBOUND sync resets the voice to stock, and the read-back confirms the
+custom voice survived. Live prompt 4,243 chars; all four clauses verified on the
+assistant itself, and the old "end politely" wording is gone.
+
+Standing note: [[homies-chatbot-first]] says not to extend work into the voice
+agents. This was asked for directly, which is the exception that rule allows
+for; nothing else on the voice side was touched.
+
 ### The demo number IS the flat's tenant now, not a fourth person
 
 Owner: *"i told you link clix to assaf for demo only"*. The demo row for his +63

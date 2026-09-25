@@ -1960,6 +1960,19 @@ the third attempt on it, and when a probe comes back negative, ask whether it
 tested the world or your own list. Related: [[Ask the API and read the price
 list]] and [[A measurement you wrote yourself is a hypothesis, not evidence]].
 
+## A privacy rule should say what TO do, not only what to withhold
+
+The debt agent hung up on a debtor's mother having said nothing useful, because
+the fence told it what it may not disclose and then stopped. Silence was the
+only remaining behaviour, so a call that reached a cooperative human achieved
+nothing.
+
+**When writing a rule that forbids, write the permitted action beside it.** Ask
+what the agent should DO in that case, and put it in the same sentence — here, a
+callback request, which discloses nothing because the reason for the call is the
+private part, not the fact of it. A fence with no gate is a dead end, and the
+model will find the emptiest exit available.
+
 ## "It disappeared" is usually a state change, not a deletion
 
 A demo debtor vanished from the calling list and the natural reading was that
