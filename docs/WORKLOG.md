@@ -37,6 +37,14 @@ change nothing. **That conclusion was wrong.** The second key carries its own
 call that cost $0.0000028 before anything was changed. **Test the key, never
 the balance page.**
 
+**The old key is abandoned, by instruction.** Owner, once the swap was live:
+*"disregard the openrouter key with a 427 ending"*. So the `-0.15` account
+figure stops being evidence about anything -- it is that key's history, the key
+in use has its own allowance and works. Commented out in `.env`, and the
+handover no longer offers it as a rollback. Its n8n credential
+(`Homies OpenRouter (key 2)`) is still on the instance, unused; deleting it is
+a destructive change on shared infrastructure and was not done unasked.
+
 **New: `scripts/n8n_openrouter_key.py`,** which repoints the workflow's model
 node at whichever `.env` variable holds the key. It **creates a new credential
 and never edits the old one**: n8n answers `GET /credentials/:id` with 403, as

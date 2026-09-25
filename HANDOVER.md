@@ -285,11 +285,15 @@ its stated time.
   (OPENROUTER_API_KEY_CAPPED15)` (`vwuT1dsCPHQCmpDY`), swapped with
   **`scripts/n8n_openrouter_key.py <ENV_VAR> --apply`**, which creates a new
   credential and leaves the old one alone (n8n 403s on reading a credential, so
-  in-place editing is a blind write). Rollback is one run with the old variable.
-  **Watch the cap: that key is limited to $15 and recent burn is ~$22/month, so
-  it will run out again.** `/api/v1/credits` reports the ACCOUNT and read
-  `-0.15` for a key that works perfectly -- **test the key with a one-token
-  call, never trust the balance**. Still open, the owner's call: making
+  in-place editing is a blind write).
+  **The old key (`sk-or-v1-4a1...427`) is ABANDONED by the owner's instruction,
+  25 Sep -- do not roll back to it, do not quote its balance.** The `-0.15` that
+  `/api/v1/credits` still reports belongs to that history; the key in use works
+  and carries its own allowance. `/api/v1/credits` reports the ACCOUNT, not the
+  key, so **test the key with a one-token call and never trust the balance**.
+  **Watch the cap: the key in use is limited to $15 and recent burn is
+  ~$22/month, so it will run out again.** Removing the cap needs an OpenRouter
+  PROVISIONING key, which we deliberately do not hold; it is a dashboard job. Still open, the owner's call: making
   `Say it again` fail open needs a fixed fallback line, which collides with
   "nothing templated except the menu".
 - **APPROVED AND SYNCED (24 Sep): the payment-link template `payment_link_he`.** Edge Function **v98 ACTIVE** carries `PAYMENT_TEMPLATE`, `syncedTemplates()`, `sendTemplate()` and the `outside_window` retry inside `send_payment_link`; the template is **APPROVED at Meta** (id 1072073112112319, UTILITY, he) **and synced into Chatwoot inbox 1** — both gates checked 24 Sep with `python scripts/wa_templates.py` and `… chatwoot`. The feared rejection of a URL inside a variable did not happen, so the dynamic-URL-button fallback below is moot unless the template is ever re-submitted. The path is now live end to end in code. **The one thing still owed is the proof:** a debt call from a number OUTSIDE the 24-hour window; pass = `payment_links` `sent`/`whatsapp_template`, a `payment` request resolved, the agent's ordinary line, no URL in any log. **Risk to watch:** Meta may reject a template whose variable carries a URL; `wa_templates.py` prints `rejected_reason`. If it is rejected, the fallback is a dynamic-URL button, which needs the OXS link's host (one real minted link, never written down — `check_paylink.py --mint`) plus button support in both `wa_templates.py` and the Chatwoot send, so it is a piece of work, not a retry. **At cutover, recreate it on Homies' WABA** like every other template.

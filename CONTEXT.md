@@ -1970,6 +1970,10 @@ can carry its own limit and draw against it regardless. One request with
 `max_tokens: 1`, costing three millionths of a dollar, settled in a second what
 the balance page had argued for several minutes.
 
+The follow-on, same day: the owner abandoned the spent key outright. A number
+attached to a dead credential is not evidence about a live one, and quoting it
+again would be the same mistake wearing different clothes.
+
 **So test the thing itself.** The same shape has now cost time three times in
 this project: a 403 from OXS that meant the wrong lookup rather than a revoked
 key, an empty `/debts` that meant a collections ledger rather than a blind
