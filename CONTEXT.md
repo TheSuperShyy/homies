@@ -1960,6 +1960,20 @@ the third attempt on it, and when a probe comes back negative, ask whether it
 tested the world or your own list. Related: [[Ask the API and read the price
 list]] and [[A measurement you wrote yourself is a hypothesis, not evidence]].
 
+## A rule written for one complaint is still there at the opposite complaint
+
+The double greeting shipped on 25 Sep was a clause added on 23 Sep to fix the
+exact opposite problem: a first reply that carried no greeting. It said the
+greeting applies "both when the system already greeted and when it did not",
+which was right for the complaint in front of it and wrong a day later.
+
+**So when a behaviour is asked for in reverse, find the sentence that asked for
+it the first way and turn THAT sentence around.** Adding a new rule elsewhere
+leaves two live instructions disagreeing, and the model follows whichever sits
+closer to the case. Grep the prompt for the behaviour before theorising about
+the model, count how many places say it — this one said it in three — and move
+them in one commit.
+
 ## A balance page is not a capability test
 
 25 Sep: the bot stopped answering, the model account showed `-0.15`, and both

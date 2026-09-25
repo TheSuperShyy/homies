@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-09-25
 
+### One greeting per conversation, not two — epoch 66
+
+Owner: *"can we remove the way it greets again after saying hi michael from
+homies here"*. The system sends the hour's greeting with the three buttons, and
+then the bot's first reply opened with the hour's greeting all over again.
+
+**It was doing exactly what the prompt told it to.** The rule said the bot's
+first message always opens with the hour's greeting, *"and this holds both when
+the system already greeted before you and when it didn't"* — the clause is from
+23 Sep, when the complaint was the opposite one, a first reply with no greeting
+at all. Reversed now, in the same sentence rather than by adding a rule
+somewhere else.
+
+**The model can tell.** The inject already hands it the system's own line:
+`[this message is a reply to a sentence the system sent and not you, so there
+is no trace of it in your memory: <the line>]`. Nothing new had to be plumbed;
+the rule just had to stop overriding what the model could already see.
+
+**Three places said greet, not one.** Besides the main rule, the tap clause said
+a first tap *"opens with the hour's greeting and your name"*, and the נציג clause
+said *"here you greet by the hour, introduce yourself"*. **A menu tap is the one
+case where a greeting has certainly already gone out** — the buttons arrive
+attached to it — so those two were the reliable double-greeters. All three now
+agree: the greeting is the system's when it has fired, and the bot's only when
+it has not.
+
+**The introduction stays.** The owner asked to lose the repeated greeting, not
+the name; a resident should still be told who is writing. The bot now says who
+it is and goes to the matter.
+
+Prompt 18,236 -> 18,583 chars. `MEMORY_EPOCH` 65 -> 66, hash `8a2990392dce` ->
+`a2041ed1bb20`. Verified live: all four new phrases present, the old
+"greet anyway" clause gone, `sessionKey -66`, `maxTokens` still 1024, 47 nodes,
+active.
+
 ### The bot was refused over a 2% token shortfall, not a dead key — and the balance ask got its manners back (epoch 65)
 
 **Three wrong diagnoses before the right one, and the evidence was in the error
