@@ -1986,6 +1986,20 @@ and read the timestamp on that change — it points straight at the interaction
 that caused it. Rows here are rarely destroyed; they are filtered out of a view
 by a status that some tool set on purpose.
 
+**It happened twice in two hours**, the second time on the same resident: four
+rehearsal calls pushed `charges.attempts` to the queue's `< 4` ceiling and the
+debtor left the Voice Agent list. Same shape, different column. So the check is
+two columns, not one: **`status` and `attempts`**, and the timestamp beside
+them.
+
+**And the counters themselves are records, not clutter.** `attempts` is how many
+times a person has really been rung and four of them is a decision to stop
+calling; `status` carries a dispute somebody actually made. Resetting either is
+only ever safe on בר כוכבא 23, which is why `bk_reset_attempts.py` and
+`bk_demo_as_tenant.py` are both hard-coded to it with no flag to point them
+anywhere else. A test that is easier to run is not worth a client's collections
+history.
+
 ## A rule written for one complaint is still there at the opposite complaint
 
 The double greeting shipped on 25 Sep was a clause added on 23 Sep to fix the
