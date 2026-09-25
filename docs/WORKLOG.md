@@ -11,6 +11,45 @@ conversation that produced it.
 
 ## 2026-09-25
 
+### The demo number IS the flat's tenant now, not a fourth person
+
+Owner: *"i told you link clix to assaf for demo only"*. The demo row for his +63
+tester was its own person called `clix`, sitting on flat 2 next to the flat's
+actual tenant — so a three-tenant building listed four, and anything pulled from
+that number (a balance, a payment link) belonged to nobody real.
+
+**First, why the number had vanished from the calling list.** Its eight charges
+were `disputed`, not paid. An **outbound voice call on 24 Sep at 09:10 UTC**
+recorded a dispute against all eight: the resident said they had already paid,
+the agent called `log_disputed_payment`, eight rows went into `payment_disputes`
+with a receipt requested, and the charges left `unpaid`. **That is the dispute
+flow working exactly as designed** — you do not keep ringing someone who says
+they have paid — and it is also the reason the same number read a zero balance
+in the chat that afternoon. Nothing was deleted and nothing was broken.
+
+**New: `scripts/bk_demo_as_tenant.py`.** It renames the demo row to the flat's
+real tenant, **reading the name from the `source='oxs'` row rather than taking
+it as an argument**, so the demo can never drift from what OXS says. Then it
+puts the charges back to `unpaid`, clears their disputes, and clears the charges
+off the OXS row so the tenant appears once — through the demo row, which is the
+one the +63 reaches.
+
+**The OXS row stays.** It carries the tenant's real phone and `oxs_ref`, and
+that is what `oxsReportedBy()` reads to name the reporter on a mirrored ticket;
+deleting it would make mirrored tickets anonymous again. Only its charges go,
+and those were seeded by `bk_seed_arrears.py`, not client history. The demo row
+keeps `source='agent'`, which is what protects it from the twice-daily import
+(that upserts on PHONE and would not otherwise know it), so
+`debt_demo_person.py off <phone>` still tears it down.
+
+Calling list for בר כוכבא 23 is now three, one per flat, eight months each.
+
+**Worth a look on the voice side:** the disputing call asked for the receipt to
+be sent **by email**. The voice agent does have an office mailbox so it is not
+an invention there, but the chat bot was banned from mentioning email at all on
+24 Sep (epoch 62). The two channels now answer that question differently, which
+is either correct or an oversight, and it is the owner's call which.
+
 ### One greeting per conversation, not two — epoch 66
 
 Owner: *"can we remove the way it greets again after saying hi michael from

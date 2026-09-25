@@ -3082,6 +3082,16 @@ a phone call: check that `attempts` moves and the call lands under Calls.
   A `residents`-by-phone lookup exists at `debt-tools/index.ts:3403`. Wiring it
   removes the reference-number question entirely. Needs Edge Function v99;
   offered to the owner, not started.
+- **The +63 tester IS flat 2's tenant (25 Sep), not a fourth person.**
+  `scripts/bk_demo_as_tenant.py` renamed the demo row to the flat's real tenant,
+  taking the name from the `source='oxs'` row so it cannot drift, restored its
+  charges to `unpaid`, and cleared the charges off the OXS row so the tenant
+  appears ONCE on the calling list. The OXS row itself stays — `oxsReportedBy()`
+  needs its `oxs_ref` to name a mirrored ticket's reporter. Calling list is now
+  three, one per flat. **A charge set to `disputed` leaves the calling list and
+  reads as a zero balance** — that is `log_disputed_payment` doing its job after
+  a resident says they already paid, not a bug, and it is what made this number
+  look deleted.
 - **Test rows go in בר כוכבא 23 and nowhere else (owner, 24 Sep).** Every other
   building is a live client's. `debt_demo_person.py` (flat 2, ₪2,000) and
   `paylink_demo_number.py` (flat 4, moved off הרצל 112 on 24 Sep) both comply.

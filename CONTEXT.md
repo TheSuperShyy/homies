@@ -1960,6 +1960,19 @@ the third attempt on it, and when a probe comes back negative, ask whether it
 tested the world or your own list. Related: [[Ask the API and read the price
 list]] and [[A measurement you wrote yourself is a hypothesis, not evidence]].
 
+## "It disappeared" is usually a state change, not a deletion
+
+A demo debtor vanished from the calling list and the natural reading was that
+somebody had removed it. Nothing had: its charges had moved from `unpaid` to
+`disputed` during a test call, and the list only shows `unpaid`. The same state
+change also explained a zero balance reported hours earlier and blamed on
+something else entirely.
+
+**So before looking for who deleted a row, look for what changed its status**,
+and read the timestamp on that change — it points straight at the interaction
+that caused it. Rows here are rarely destroyed; they are filtered out of a view
+by a status that some tool set on purpose.
+
 ## A rule written for one complaint is still there at the opposite complaint
 
 The double greeting shipped on 25 Sep was a clause added on 23 Sep to fix the
