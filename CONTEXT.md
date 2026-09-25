@@ -1960,6 +1960,23 @@ the third attempt on it, and when a probe comes back negative, ask whether it
 tested the world or your own list. Related: [[Ask the API and read the price
 list]] and [[A measurement you wrote yourself is a hypothesis, not evidence]].
 
+## A balance page is not a capability test
+
+25 Sep: the bot stopped answering, the model account showed `-0.15`, and both
+keys in `.env` reported that same figure with the same `creator_user_id` and
+`workspace_id`. The obvious reading -- one spent account, so a second key on it
+changes nothing -- was **wrong**. `/api/v1/credits` reports the ACCOUNT; a key
+can carry its own limit and draw against it regardless. One request with
+`max_tokens: 1`, costing three millionths of a dollar, settled in a second what
+the balance page had argued for several minutes.
+
+**So test the thing itself.** The same shape has now cost time three times in
+this project: a 403 from OXS that meant the wrong lookup rather than a revoked
+key, an empty `/debts` that meant a collections ledger rather than a blind
+pipeline, and this. A status reading is evidence ABOUT the system; the system
+is the evidence. When the cheap test exists, run it before forming the theory,
+and never let a number talk you out of trying.
+
 ## A dry run tells you what the repo wants, not what is live
 
 `python scripts/vapi_sync.py debt` printed a cloned voice id on 31 Aug while the

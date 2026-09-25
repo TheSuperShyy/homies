@@ -9,6 +9,53 @@ conversation that produced it.
 
 ---
 
+## 2026-09-25
+
+### The bot went silent: the model account was spent — swapped to the second key
+
+Owner, with a screenshot of a question that got no answer at all: *"the bot not
+replying"*.
+
+**It was not the bot.** Execution `60836`: `Worth a word?` returned
+`{"error": "Payment required - perhaps check your payment details?"}`,
+`Answer the resident` came back with `_reply: ""`, and the retry node
+`Say it again` threw the same 402 and killed the run. The account behind the
+main key had spent $115.15 of $115.
+
+**Everything except the retry failed open, which is the design working.**
+`Worth a word?` carries `onError: continueRegularOutput` and did exactly that.
+`Say it again` is the one node on the reply path that dies hard, so a provider
+outage costs the resident the whole answer and they see silence. Flagged to the
+owner; fixing it means a fixed fallback line, which collides with the standing
+"nothing templated except the menu" rule, so it is their call and is NOT done.
+
+**A balance can read negative while a key still works.** `/api/v1/credits`
+reports the ACCOUNT: it said `-0.1499` for both keys, same `creator_user_id`,
+same `workspace_id`, so the obvious conclusion was that swapping keys would
+change nothing. **That conclusion was wrong.** The second key carries its own
+`limit: 15` with `14.99` remaining and draws fine — proved with a one-token
+call that cost $0.0000028 before anything was changed. **Test the key, never
+the balance page.**
+
+**New: `scripts/n8n_openrouter_key.py`,** which repoints the workflow's model
+node at whichever `.env` variable holds the key. It **creates a new credential
+and never edits the old one**: n8n answers `GET /credentials/:id` with 403, as
+it should, so an in-place edit would be a blind write over a value nobody can
+read back. The spent credential is still there, so the rollback is one run with
+the old variable name. Idempotent on the credential name, and the name carries
+the variable because two keys from one account are otherwise identical in the
+n8n UI.
+
+Live now: node `OpenRouter` → `Homies OpenRouter (OPENROUTER_API_KEY_CAPPED15)`
+(`vwuT1dsCPHQCmpDY`), workflow still active with 47 nodes, all patchers idle.
+
+**`.env` had no `OPENROUTER_API_KEY` at all** by the time this ran — the owner
+had renamed it to `OPENROUTER_API_KEY_EMPTY` mid-conversation. Nothing warns
+about that: `supabase_functions.py` treats the empty case as "the link alone"
+and deploys happily, so the payment-link sentence would have quietly vanished.
+`OPENROUTER_API_KEY` now points at the working key, `N8N_OPENROUTER_CRED_ID` is
+the new credential, and the function is redeployed at **v104**.
+
 ## 2026-09-24
 
 ### The mirrored ticket now carries who reported it — Edge Function v102
