@@ -11,6 +11,82 @@ conversation that produced it.
 
 ## 2026-09-27
 
+### "Why is it inventing" -- an empty wallet, a tool-less rescue, and a prompt that asked for a deed
+
+The owner's tester tapped "לדבר עם נציג", wrote *"the light in the stairs 1,2
+and 3 are both flickering"*, and got back: *"היי, בדקתי את התאורה בחדרי המדרגות
+1, 2 ו-3. החלפתי את הנורות שהבהבו ועכשיו הכל תקין."* No ticket. Owner: *"wtf is
+this why is it inventing i want a rule that it stops inventing to prevent
+hallucination, lets dig deeper to check the conflicting that may cause prompt
+paralysis."*
+
+**What execution 65271 shows, in order.** The real agent never answered:
+OpenRouter refused its call three times, *"Payment required -- Prompt tokens
+limit exceeded: 20377 > 18331"*. The account had bought $115.00 and spent
+$115.17. The key's own record said "$14.98 remaining" -- its spending cap, not
+money -- and the owner read it that way: *"wait i thought we have 14usd left"*.
+Small calls still fit (the ack classifier's 574 tokens, the rescue's 325); the
+agent's 20k did not. `Answer the resident` has `onError: continueErrorOutput`,
+and its error output went to `Say it again`: no tools, a system message saying
+*"אתה מדווח מה כבר נעשה"* (report what has already been done) and *"don't say a
+ticket was opened without a number"*. Its only gate counts two words. It
+reported a repair. The same path had answered **6 of the 14 agent turns** in
+the executions still held, the other five on 25 Sep.
+
+**The prompt paralysis was real too.** Three explorers catalogued the deployed
+prompt: *"report what has already been done"* (333), *"what you have to give is
+what you did"* (331), *"you do the check itself quietly"* (347), *"…or what you
+did"* (349) -- a mandatory deed slot, never bound to a tool. The only ban on
+*"בדקתי"* was scoped to emails (341); *"not from your head"* was written only for
+service info and payment links; the ticket trigger lived only in the English
+tool text; the honest reply ("understood, the lights flicker, I've logged it")
+was banned as playback. And no guard anywhere covered claimed WORK: `phantom`
+is a phantom-ticket check.
+
+**Shipped, all live, epoch 67:**
+
+- `scripts/n8n_whatsapp_outage.py` (new): the agent's error output now goes to
+  `Tell the team the bot is down` (handover sub-workflow, reason
+  `system_error`) and `Could not answer` (agent, no tools, no memory, not shown
+  the resident's words) -> `Outage reply usable?`. `Say it again` keeps the
+  rescue only. Snapshot `docs/handover/n8n-whatsapp-live-27sep-before-outage.json`.
+- A `deeds` guard on `Reply usable?` (both passes) and `Second try usable?`.
+  NEVER tier `החלפתי|תיקנתי|סידרתי|ניקיתי|הזמנתי`: refused always. TOOLED tier
+  (checked, sent, opened, handled, we fixed, was fixed / replaced / handled /
+  sent...): refused when no tool ran; on the rescue, only open/handle with a
+  reference. "I told the team" left to `Team note this turn?`, which exists to
+  make that sentence true after the fact.
+- `sayagain.py` SAY_SYSTEM scoped to the stub ticket; `retry.py` RETRY_NOTE
+  names the new reason; both synced live by the outage patcher so each
+  patcher's own dry run stays the judge of its node.
+- `n8n_handover.py`: `system_error` labelled in Hebrew for the staff note (the
+  builder matched live exactly, so the write was that one line); dashboard
+  i18n `reason.system_error`.
+- Prompt: the rule, once, after 333 -- you do no work yourself; you say you did
+  something only when a tool did it this conversation; a fault gets a call with
+  a number, *"קריאה, לא תיקון"* -- and the four deed lines rebound to the tools.
+  18,583 -> 19,530 chars. `MEMORY_EPOCH` 66 -> 67, prompt hash `e21b28243f36`.
+- The model node's credential: `Homies OpenRouter (OPENROUTER_API_KEY)`, from
+  `.env`, as the owner asked. Same key it ran on since 25 Sep (the 402 named it
+  by hash; sha256 of the `.env` value matched) -- a relabel, not a key change.
+- `scripts/check_openrouter.py` (new, read-only): cap and wallet side by side.
+
+**Measured before shipping, no model call.** The exact JS, run in Node: 27
+fixed cases pass. Against all 863 replies the bot ever sent: 1 in the
+always-refused tier (today's), 63 that would be refused only if no tool ran.
+Against the 36 real agent turns n8n still holds (17 with tools): 0 refused.
+
+**Deviations from the approved plan, both for correctness.** Plural and
+passive forms moved from NEVER to TOOLED ("they fixed it" can be a status the
+tool returned), and `העברתי/העברנו` left out of both tiers (the team-note
+backstop's job). `retry.py` was edited after all, not just anchored, or its
+dry run would have reverted the live note.
+
+**Pre-existing, not touched:** `batch.py` dry run shows drift that would undo
+the first-word change (must not be applied); `open.py` refuses on a node
+removed 13 Sep; `facts_check.py` reports 3 WhatsApp facts missing that were
+already missing at HEAD.
+
 ### The mirror was on and still missed most tickets — only one of three paths knew how to file into OXS
 
 The owner: *"ok so what i want is when i open a ticket it should be put inside

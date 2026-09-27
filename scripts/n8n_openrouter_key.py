@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Point the WhatsApp bot's model node at a different OpenRouter key.
 
-    python scripts/n8n_openrouter_key.py OPENROUTER_API_KEY_CAPPED15
-    python scripts/n8n_openrouter_key.py OPENROUTER_API_KEY_CAPPED15 --apply
+    python scripts/n8n_openrouter_key.py OPENROUTER_API_KEY
+    python scripts/n8n_openrouter_key.py OPENROUTER_API_KEY --apply
 
 WHY, 25 Sep. The bot stopped answering mid-conversation: every model call came
 back `Payment required - perhaps check your payment details?` and the retry node
@@ -21,6 +21,18 @@ IDEMPOTENT BY CREDENTIAL NAME. The workflow stores the credential's name beside
 its id, so a second run sees the node already pointing at the target and reports
 nothing to do. That is also why the name carries the env variable in it: two
 keys from the same account are otherwise indistinguishable in the n8n UI.
+
+27 SEP: RUN WITH OPENROUTER_API_KEY. The owner consolidated .env onto that one
+variable (the CAPPED15 one is gone) and asked for the node to use it. The node
+was already on that key -- the 402 that day named it by hash, and sha256 of
+the .env value matched -- but through `key 2`, a credential pasted by hand in
+the UI on 25 Sep that nothing in the repo could trace. The run replaced a
+label, not a key: credential `Homies OpenRouter (OPENROUTER_API_KEY)`.
+`key 2` and the unused CAPPED15 credential are left on n8n; delete them in
+the UI only if the owner asks.
+
+A KEY'S CAP IS NOT MONEY. `scripts/check_openrouter.py` prints the cap and the
+wallet side by side; the wallet is the one that runs out.
 
 THE KEY IS NEVER PRINTED. Only its OpenRouter label (`sk-or-v1-abc...xyz`),
 which is what their dashboard shows, and which is the thing you actually need in
@@ -46,7 +58,7 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     apply = "--apply" in sys.argv
     if len(args) != 1:
-        sys.exit("give the .env variable holding the key, e.g. OPENROUTER_API_KEY_CAPPED15")
+        sys.exit("give the .env variable holding the key, e.g. OPENROUTER_API_KEY")
     var = args[0].strip()
 
     e = W.env()

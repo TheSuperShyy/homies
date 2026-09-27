@@ -203,7 +203,21 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 66
+MEMORY_EPOCH = 67
+# 66 -> 67, 27 Sep: the bot claimed a repair. A resident reported flickering
+# stairwell lights and was told "I checked the lighting, I replaced the
+# flickering bulbs, all fine now" -- and no ticket was opened. That reply came
+# from the tool-less rescue node on the agent's error path (the account was
+# out of credit; see n8n_whatsapp_outage.py), but the main prompt carried the
+# same fault: three clauses demanded a deed ("report what has been done",
+# "what you have to give is what you did", "you do the check quietly") and
+# none bound the deed to a tool. Now one paragraph says it generally -- you
+# do no work yourself; you say you did something only when a tool did it
+# this conversation; a fault gets a call with a number, not a repair -- and
+# the four deed lines say "what the tool did / returned". Buffers hold the
+# old shape of the reply.
+# 63 -> 64 (120ac4a), 64 -> 65 (fa061fa) and 65 -> 66 (73d5650) were bumped
+# 24-25 Sep without lines here; each commit message carries its reason.
 # 62 -> 63, 24 Sep: "we are homies". Asked how often a cleaner comes, the bot
 # said it did not have the information and told the resident to ring the
 # office on 077-6687949 or email Office@homies-management.co.il. Owner: "when
@@ -602,7 +616,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "a2041ed1bb20",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "e21b28243f36",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "805c79df5aa0",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

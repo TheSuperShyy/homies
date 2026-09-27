@@ -222,6 +222,8 @@ const REASON = {
   // Kept so an old stamp still reads; the bot no longer sends these.
   out_of_scope: 'משהו שהבוט לא מטפל בו',
   not_understood: 'הבוט לא הבין מה הדייר רוצה',
+  // 27 Sep: sent by the WhatsApp bot's outage path when its model cannot run.
+  system_error: 'הבוט לא הצליח לענות לדייר בגלל תקלה טכנית אצלנו',
 };
 // Only the backstop is worth a sentence to a rep; a tap or a bot decision
 // says nothing they act on differently (the reason already carries it).

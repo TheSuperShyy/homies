@@ -217,6 +217,7 @@ const S = {
   'reason.distress':       { he: 'מצוקה',        en: 'distress' },
   'reason.dispute':        { he: 'מחלוקת',       en: 'dispute' },
   'reason.not_understood': { he: 'לא הובן',      en: 'not understood' },
+  'reason.system_error':   { he: 'תקלה טכנית בבוט', en: 'bot technical error' },
   'reason.billing':        { he: 'חיוב',         en: 'billing' },
   'reason.move':           { he: 'כניסה או יציאה מדירה', en: 'moving' },
   'reason.quote':          { he: 'הצעת מחיר',    en: 'quote' },

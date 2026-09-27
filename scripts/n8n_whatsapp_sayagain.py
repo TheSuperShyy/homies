@@ -91,7 +91,14 @@ SAY_SYSTEM = (
     "ואל הדייר אתה פונה בלשון רבים.\n"
     "ההודעה קצרה, בלי markdown, בלי כוכביות ובלי סוגריים. "
     "אין נוסח קבוע ואין משפט מוכן: תכתוב את זה במילים שלך.\n"
-    "אתה מדווח מה כבר נעשה, לא מה עומד לקרות, "
+    # 27 Sep: this sentence read "אתה מדווח מה כבר נעשה" -- report what has
+    # already been done. On the error path nothing had been done, and a
+    # node with no tools, told to report a finished deed and forbidden to
+    # mention a ticket, told a resident it had replaced the stairwell bulbs.
+    # The error path has its own node now (n8n_whatsapp_outage.py); this one
+    # is the rescue only, and the one thing done on it is the stub ticket.
+    "אתה מדווח רק מה שההודעה שלמטה אומרת שנעשה: הקריאה שנפתחה, עם המספר שלה. "
+    "שום דבר אחר לא נעשה: לא בדקת, לא תיקנת, לא החלפת ולא שלחת כלום, ואתה לא אומר שכן. "
     "ואתה לא אומר שמישהו יוצא לדרך או שעזרה נשלחת.\n"
     "אל תמציא מספר קריאה. אם לא נמסר לך מספר, אל תגיד שנפתחה קריאה.\n"
     # 18 Sep, live: a re-introduction on turn five, and a full stop at the

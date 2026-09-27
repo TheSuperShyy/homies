@@ -2065,6 +2065,47 @@ pipeline, and this. A status reading is evidence ABOUT the system; the system
 is the evidence. When the cheap test exists, run it before forming the theory,
 and never let a number talk you out of trying.
 
+## Before theorising about a reply, find which node wrote it
+
+27 Sep: the bot told a resident it had checked the stairwell lighting and
+replaced the flickering bulbs. No ticket. The owner's instinct, and mine, was
+conflicting prompt rules -- and the main prompt did carry that fault (three
+clauses demanded a deed, none bound it to a tool). But **the main agent never
+wrote that reply.** Its model call was refused three times (`Prompt tokens
+limit exceeded: 20377 > 18331`, the account at -$0.17), the agent's error
+output fell to `Say it again`, and that node -- no tools, told to "report what
+has already been done" and forbidden to mention a ticket -- reported a repair.
+It obeyed its own prompt.
+
+So the order is: **(1) which node wrote it** -- the execution's `runData`
+names every node that ran and which one produced the `output` that reached
+`Send`; **(2) the wallet**, `python scripts/check_openrouter.py`; **(3) only
+then grep the prompt -- of the node that actually spoke.** Fixing the main
+prompt alone would have left the outage path lying on the next empty-wallet
+morning.
+
+**A key's cap is not money.** `limit_remaining` on `/auth/key` is how much more
+the key is ALLOWED to spend; `/credits` is what exists. The owner, reasonably:
+*"wait i thought we have 14usd left"*. The key had $14.98 of ceiling on a
+wallet at -$0.17. And OpenRouter pre-authorises the prompt, so a nearly empty
+wallet fails the big calls first and lets the small ones through -- which is
+exactly how a 325-token rescue got paid for when a 20k-token agent did not.
+
+**One node must not serve two opposite situations under one instruction.**
+`Say it again` was built (18 Sep) for the rescue path, where a ticket WAS just
+opened and "report what was done" is right, and the error path was wired to it
+on the belief that "if the model failed, the retry fails too". The wallet, not
+the model, failed, and the belief broke silently for five turns on 25 Sep and
+one on 27 Sep. The error path now has its own node (`Could not answer`), which
+is not even shown the resident's words.
+
+**A guard for one lie is not a guard for the class.** `phantom` caught "I
+opened a ticket" without a reference and nothing else; the model did not open
+anything, so it claimed a repair instead. The guard that holds names the class
+-- a claimed deed with no tool behind it -- and was measured against every
+reply the bot had ever sent before it shipped (1 of 863 in the always-false
+tier: this one).
+
 ## A dry run tells you what the repo wants, not what is live
 
 `python scripts/vapi_sync.py debt` printed a cloned voice id on 31 Aug while the
