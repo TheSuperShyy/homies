@@ -236,10 +236,10 @@ def _cond(cid, expr):
 
 ECHO_GUARD = _cond("echo", (
     "={{ $runIndex > 0 || (() => { " + WORKED + " "
-    "return !/(^|[.!?,:]\\s*)(אני מבין|אני מבינה|הבנתי|שמעתי)\\s+ש/.test(t); })() }}"))
+    "return !" + R.ECHO_RE + ".test(t); })() }}"))
 CLERK_GUARD = _cond("clerk", (
     "={{ $runIndex > 0 || (() => { " + WORKED + " "
-    "return !/כדי שאוכל|אצטרך/.test(t); })() }}"))
+    "return !" + R.CLERK_RE + ".test(t); })() }}"))
 
 
 def snapshot(live):

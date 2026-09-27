@@ -2214,6 +2214,32 @@ Two more from the same afternoon:
   apposition or a dash, and keeps it whenever the resident asked who they are
   talking to: then the name is the answer.
 
+## The register: casual and friendly, still polite, no slang
+
+The owner's direction on tone has moved with the failures, and it is one line,
+not two that contradict each other. August: *"polite and professional"*, after a
+curt reply ("בטח, אני מקשיב. מה קרה?") and a form-like one ("in order for me to
+help you I will need..."); slang went then. 27 Sep: *"too robotic... Casual &
+Friendly"*, after "אני מיכאל מהומי'ז. אני מבין שיש לכם בעיה עם התאורה בחדר
+המדרגות בבניין, וזה מקשה עליכם לעלות במדרגות...". Together: a nice person
+texting, at eye level, warm, light and short, polite, never slang, never a call
+centre or a letter. His samples are for the feel and are never quoted into the
+prompt: a quotable line is a line the model copies. The one quoted form is the
+name ("כאן מיכאל מהומי'ז"), his own opener from 25 Aug.
+
+**Claude playing the bot cannot measure a register problem.** The replay of
+27 Sep ran nine real scenarios through Claude on the old prompt and the new, and
+Claude was casual on BOTH: the robotic register is the real model's habit
+(Gemini), not something the old prompt forces. So for a tone change the replay
+checks the rules (greetings, the name, one question, no echo, no invented deed),
+and only the handset and `--watch` check the tone.
+
+**A rewrite must be told what was wrong when it can be.** `Try again` listed
+eight possible reasons because the IF node cannot say which guard fired, and on
+65856 the second pass fixed the wrong one and sent the echo. Two of the reasons
+are visible in the rejected text itself (`$json.output`), so the note now names
+them and says what to write instead; the rest keep the list.
+
 ## A dry run tells you what the repo wants, not what is live
 
 `python scripts/vapi_sync.py debt` printed a cloned voice id on 31 Aug while the

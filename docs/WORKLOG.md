@@ -11,6 +11,53 @@ conversation that produced it.
 
 ## 2026-09-27
 
+### "Too robotic" -- the casual register, and a rewrite that names what was wrong (epoch 69)
+
+The v2 handset test at 13:42 UTC: "hello, good afternoon" got the menu and nothing else, as
+intended. Then, 13:45 UTC, execution 65856, "hi, so i want to let you know that the light in
+the stairs 1,2 and 3 are both flickering" got "אני מיכאל מהומי'ז. אני מבין שיש לכם בעיה עם
+התאורה בחדר המדרגות בבניין, וזה מקשה עליכם לעלות במדרגות. באיזה בניין מדובר ומה מספר הדירה
+שלכם?". Owner: *"the response is too robotic instead we can go for something like this Casual &
+Friendly"*, with an English sample "just a reference for the feels", not to copy.
+
+**Traced:** `Worth a word?` said NONE (the revert holds). The first pass wrote "צהריים טובים! אני
+מיכאל מהומי'ז. אני מבין ש... אני אטפל בזה. באיזה בניין...?"; the `echo` guard sent it back;
+`Try again`'s note listed eight possible reasons without saying which, and the second pass
+deleted the promise and kept the echo (the second pass always goes out). Send then cut the
+greeting (right after the menu) and left the formal name as the opener.
+
+**Four lines pushed the register formal:** nothing described it; "say who you are, the name
+is enough" (twice) came out as a formal introduction; "something about what the fault does to
+him" came out clinical ("וזה מקשה עליכם..."); and "בנימוס ובמקצועיות". The owner's August
+direction was polite and professional after a curt reply and a form-like one, and slang was
+removed then; the no-slang line had been lost when the prompt was cut down.
+
+**Shipped (14:16 UTC, epoch 68 -> 69, prompt 19,419 -> 19,663 chars):** write like a nice
+person on WhatsApp, at eye level, warm and light, short sentences, still polite and without
+slang, not a call center, a form or an official letter; say who you are lightly ("כאן מיכאל
+מהומי'ז", his own 25 Aug opener); a friend's short reaction to the thing itself, not a summary;
+"בנימוס ובחום". And `Try again` now reads the rejected text: when the echo or the clerk is in
+it, the note says so and says what to write instead; anything else keeps the full list; wrapped
+so it can never throw. The echo and clerk patterns are one copy now (retry.py; manners.py builds
+its guards from them, byte-identical).
+
+**Asked, with both versions shown:** right after the menu, when the resident writes "hi, ...",
+does Michael say hi back? Owner: *"No, the menu already greeted"* -- the table stands.
+
+**Tested before shipping, no OpenRouter:** two Claude stand-ins played the bot, one per prompt,
+on nine real scenarios (today's, a first message, a hello mid-chat, a sink in the flat, a
+scratched car, a tap, a ticket opened, a thank-you, and the retry of 65856's draft). Finding:
+Claude is casual even on the old prompt, so the robotic register is the real model's habit and
+the replay could not measure it; it measured the rules. Every final message through the live
+filter: no echo, no clerk, no name mid-chat, no greeting after the menu, one question. The gate
+on the full candidate: 17 pins as expected, 121 cases (7 new, for the named reasons) green. On
+live after: all green; 17 patchers idle; facts_check the same 13.
+
+**Owed:** the owner's handset (a fault report after the menu should come back light, e.g. the
+name then a short human reaction then building and flat), then `check_whatsapp_rules.py --watch
+2026-09-27T14:16`, and again the next morning. Everyone mid-conversation starts fresh (third
+bump today).
+
 ### "fix this" -- a hello got an invented payment reply and two greetings; and the gate that stops fix-one-break-another
 
 12:08 UTC, executions 65683 and 65694: the tester, mid-conversation, typed "hello good

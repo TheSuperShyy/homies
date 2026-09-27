@@ -102,10 +102,36 @@ RETRY_NOTE = (
     "חסר לך משהו, תשאל עליו בשאלה אחת קצרה, בלי הקדמה ובלי הסבר.]"
 )
 
+BS = chr(92)   # a backslash, built rather than typed (27 Sep)
+
+# The echo and the clerk, as the guards on `Reply usable?` test them. One copy:
+# n8n_whatsapp_manners.py builds its `echo` and `clerk` conditions from these.
+ECHO_RE = "/(^|[.!?,:]" + BS + "s*)(אני מבין|אני מבינה|הבנתי|שמעתי)" + BS + "s+ש/"
+CLERK_RE = "/כדי שאוכל|אצטרך/"
+
+# 27 Sep evening: THE REWRITE NAMES WHAT IT CAN SEE. The note above lists eight
+# possible reasons because the Set node cannot tell which guard fired -- and in
+# execution 65856 the model, told "one of these eight", deleted a promise and
+# sent "אני מבין שיש לכם בעיה עם התאורה..." again on the second pass. But two of
+# the eight are READ OFF THE REJECTED TEXT, which is `$json.output` right here.
+# When the echo or the clerk is in it, the note says so, and says what to write
+# instead; anything else keeps the full list. Described, never quoted. Wrapped:
+# a throw here would cost the resident the reply, so it falls back to the list.
+WHY_ECHO = ("היא נפתחה בזה שהבנת אותו או בסיכום של מה שכתב, ובמקום זה תגיב לדבר "
+            "עצמו במילה או שתיים ומשם ישר לעניין")
+WHY_CLERK = "היא הסבירה לו למה אתה צריך פרט לפני ששאלה עליו, ובמקום זה פשוט תשאל"
+NOTE_HEAD = "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר, כי "
+NOTE_TAIL = (". מה שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
+             "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link.]")
+
 # `}}` anywhere inside ends an n8n expression, so the braces are spaced.
 TRY_JSON = (
     "={{ JSON.stringify(Object.assign({ }, $('Still the last word?').first().json, "
-    "{ retry_note: '" + RETRY_NOTE + "' })) }}"
+    "{ retry_note: (() => { try { const o = String($json.output || ''); const why = []; "
+    "if (" + ECHO_RE + ".test(o)) why.push('" + WHY_ECHO + "'); "
+    "if (" + CLERK_RE + ".test(o)) why.push('" + WHY_CLERK + "'); "
+    "return why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + '" + NOTE_TAIL + "' "
+    ": '" + RETRY_NOTE + "'; } catch (e) { return '" + RETRY_NOTE + "'; } })() })) }}"
 )
 
 RETRIED = "={{ $runIndex > 0 }}"

@@ -32,6 +32,7 @@ function build(X) {
     worth: compile(['$json'], 'return (' + X.worth_text + ');', 'Worth a word?'),
     word: compile(['$json'], 'return (' + X.word_gate + ');', 'A word first?'),
     inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
+    tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
   };
 }
 
@@ -257,6 +258,19 @@ function cases(E) {
   expect('a runaway stays silent', w('x'.repeat(330)), false);
   expect('a link never goes out early', w('רגע, בודק https://x.example'), false);
   expect('a short line goes out', w('רגע, אני בודק את זה עכשיו.'), true);
+
+  console.log(NL + '--- Try again: the rewrite names what was wrong (27 Sep, execution 65856) ---');
+  const still = { first: () => ({ json: { text: 'hi, the stair lights flicker', greeted: true } }) };
+  const $t = (name) => { if (name === 'Still the last word?') return still; throw new Error('no node ' + name); };
+  const why = (output) => JSON.parse(E.tryAgain({ output }, $t)).retry_note;
+  const REJ = "צהריים טובים! אני מיכאל מהומי'ז. אני מבין שיש לכם בעיה עם התאורה בחדר המדרגות בבניין, וזה מקשה עליכם לעלות במדרגות. אני אטפל בזה. באיזה בניין מדובר ומה מספר הדירה שלכם?";
+  expect('65856: the echo is named, not a list of eight', () => why(REJ).includes('נפתחה בזה שהבנת אותו') && !why(REJ).includes('או שנתנה קישור'), true);
+  expect('the clerk is named', () => why('כדי שאוכל לפתוח קריאה, אצטרך את הבניין.').includes('הסבירה לו למה אתה צריך פרט'), true);
+  expect('both are named', () => { const w = why('אני מבין שיש נזילה. כדי שאוכל לעזור אצטרך את הדירה.'); return w.includes('נפתחה בזה שהבנת') && w.includes('וגם היא הסבירה'); }, true);
+  expect('any other reason keeps the full list', () => why('החלפתי את הנורה.').includes('או שנתנה קישור'), true);
+  expect('the tools line is always there', () => why(REJ).includes('open_request') && why('x').includes('open_request'), true);
+  expect('no output at all: the full list, never a throw', () => why(undefined).startsWith('[התשובה הקודמת'), true);
+  expect("the resident's turn is carried through", () => JSON.parse(E.tryAgain({ output: REJ }, $t)).text, 'hi, the stair lights flicker');
 
   console.log(NL + '--- the inject: facts the answering model is handed ---');
   const now = { setZone: () => ({ toFormat: () => '12:20', weekday: 7 }) };

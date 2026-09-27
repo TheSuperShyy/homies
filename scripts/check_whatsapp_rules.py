@@ -72,12 +72,12 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # that one decides whether memories restart, this one whether it was tested.
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
-    'Answer the resident / system': '931cd09f1e5c',
+    'Answer the resident / system': '8afa16824480',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '79cd4d35fec8',
     'Say it again / input': '64f323ffcba1',
     'Say it again / system': 'e27b1450b7c0',
-    'Try again / note': 'd96caf886f17',
+    'Try again / note': 'f11ade213910',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'c9aaaa645060',
     'get_balance / tool': '510af1d70292',
@@ -159,6 +159,7 @@ def extract(wf):
         "worth_text": inner(by["Worth a word?"]["parameters"]["text"]),
         "word_gate": inner(conds_raw(by, "A word first?", "word")),
         "inject": inner(by["Answer the resident"]["parameters"]["text"]),
+        "try_again": inner(by["Try again"]["parameters"]["jsonOutput"]),
     }
 
 

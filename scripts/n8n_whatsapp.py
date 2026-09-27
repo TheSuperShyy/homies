@@ -203,7 +203,22 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 68
+MEMORY_EPOCH = 69
+# 68 -> 69, 27 Sep evening: casual and friendly. Owner, on "אני מיכאל מהומי'ז.
+# אני מבין שיש לכם בעיה עם התאורה בחדר המדרגות בבניין, וזה מקשה עליכם לעלות
+# במדרגות. באיזה בניין מדובר ומה מספר הדירה שלכם?": *"the response is too
+# robotic"*, with a casual English sample "just a reference for the feels".
+# Four lines pushed formal: nothing described the register; "say who you are,
+# the name is enough" came out as a formal introduction; "something about what
+# the fault does to him" came out clinical; and "politely and professionally".
+# Now: write like a nice person on WhatsApp, at eye level, warm and light,
+# still polite and without slang (his August direction); say who you are
+# lightly ("כאן מיכאל מהומי'ז", his own 25 Aug opener); a friend's short
+# reaction to the thing itself; politely and warmly. The owner kept his
+# greeting table (no second greeting right after the menu), shown both
+# versions. Replayed with Claude playing the model on nine real scenarios, old
+# prompt and new: every final message kept the rules. Buffers hold the old
+# register.
 # 67 -> 68, 27 Sep: greet back once, never twice; ask plainly; get the flat.
 # An hour after 67 the tester was answered "צהריים טובים, מיכאל מהומי'ז. אני מבין
 # שיש תקלה… כדי שאוכל לפתוח קריאת שירות ולטפל בזה, אצטרך לדעת באיזה בניין…" --
@@ -630,7 +645,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "931cd09f1e5c",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "8afa16824480",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
