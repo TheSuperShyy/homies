@@ -1207,7 +1207,30 @@ so the mirror cannot come back half-on. **Widening that list is another
 decision of the same size as this one; do not add a number to it because a
 test would be easier.** A ticket the live mirror missed is pushed with
 `scripts/oxs_mirror_backfill.py`, one at a time and only for a number already
-on the list — backfilling is not a second decision, but widening is. A name sent
+on the list — backfilling is not a second decision, but widening is.
+
+**Being on the allow-list is not the same as being mirrored, and on
+27 Sep the difference was five tickets.** Both gates had been open since
+24 Sep and exactly one of the tester's seven tickets carried an
+`oxs_ref` — the one backfilled by hand. THREE code paths insert into
+`requests` and only `open_request` called `oxsMirror()`; the five missing
+tickets had all come through `send_payment_link`, which files its own row
+and had never learned to mirror. **A gate that is open proves nothing
+about a path that never reaches it** — so the question to ask of any
+"the mirror is off" report is which handler wrote the row, not whether
+the secret is set. `grep -n 'from("requests")' ` answers it in one line.
+`rescue_request` is the third path and stays out on purpose: `type: null`,
+`status: needs_review`, nothing classified it, and an unclassified ticket
+is the wrong thing to put in a dispatcher's queue.
+
+**A resolved ticket is not mirrored either, and that is a judgement worth
+knowing about.** `send_payment_link` files *resolved* when the link
+reached WhatsApp and *open* when it did not. OXS has no status on create,
+so a mirrored resolved row would arrive in the client's queue as a live
+job that is already done — the exact noise the 26 Aug shutdown was about.
+Only the open one travels. It is one `if` if the owner wants both.
+
+A name sent
 back to OXS must have COME from OXS (`source='oxs'` + `oxs_ref`); our own demo
 rows never travel outward, and no match means no name rather than a guess. **A standing rule is reversed by an
 answer that could not mean anything else, never by momentum** — and when a

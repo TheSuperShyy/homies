@@ -9,6 +9,85 @@ conversation that produced it.
 
 ---
 
+## 2026-09-27
+
+### The mirror was on and still missed most tickets — only one of three paths knew how to file into OXS
+
+The owner: *"ok so what i want is when i open a ticket it should be put inside
+in oxs"*. Both gates were already live and correct — `OXS_KEY_REQUESTS` and
+`OXS_MIRROR_PHONES` are both present on the project, one number on the list —
+so the first job was to find out why it read as off.
+
+**Seven tickets have ever been raised from the allow-listed tester. Exactly one
+carries an `oxs_ref`, and that one was put there by hand** on 24 Sep with
+`oxs_mirror_backfill.py`. The live mirror had never filed anything by itself.
+
+**Three code paths insert into `requests`, and only one of them mirrored.**
+
+| path | what raises it | mirrored before |
+|---|---|---|
+| `open_request` | a fault reported in chat or on a call | yes |
+| `send_payment_link` → `fileTicket` | a resident agrees to a payment link | **no** |
+| `rescue_request` | the model invented a reference and the guard caught it | no, deliberately |
+
+Five of the seven tickets came through the middle row — all `type=payment`,
+all from voice, all with no `oxs_ref`. The mirror was not broken; it was absent
+from the path the owner had actually been using. The sixth, `255-1307-26`,
+predates the 24 Sep switch-on and is correct to be missing.
+
+**`rescue_request` stays out, and that is not an oversight.** It writes
+`type: null`, `status: needs_review` and `oxs_ref: 'partial:model_claimed'` —
+nothing classified that row, and an unclassified ticket is the wrong thing to
+put into a dispatcher's queue.
+
+**The fix, function v106 ACTIVE.** `fileTicket` now resolves the building with
+`matchBuilding(r.building)` and calls the same `oxsMirror()` on the same two
+gates. The address comes back from the match rather than from `r.building`, so
+the id and the string are one lookup and cannot disagree — `oxsReportedBy()`
+matches the reporter on that exact string, and a near-miss there costs the name
+on the call.
+
+**Only the OPEN one is mirrored.** `send_payment_link` files a *resolved* row
+when the link reached WhatsApp — a record of what was sent, with nothing for
+anyone to do — and an *open* row when it did not, which is the job of sending it
+by hand. **OXS has no status on create**, so mirroring the resolved row would
+put a finished job into the client's queue, which is the noise that got the
+mirror switched off on 26 Aug. Worth the owner's decision if he disagrees; it is
+one `if`.
+
+**No epoch bump.** `EPOCH_COVERS` hashes the prompt, the inject and the tool
+descriptions; nothing in `index.ts` is covered and no tool signature changed, so
+every live conversation buffer survives this deploy.
+
+### Verified without a model call and without leaving anything behind
+
+1. **The live secrets were listed** (names only): both mirror gates present.
+2. **The genuinely new step was probed.** The payment path had never handed a
+   raw `residents.building` string to `matchBuilding` before. `verify_address`
+   is that same matcher behind a tool call, so it was asked directly: the
+   canonical address resolves, `building_found: true`, unit found.
+3. **Exactly one `source='oxs'` tenant sits on that flat**, so the ticket will
+   carry a name rather than a blank reporter.
+4. **`check_oxs_mirror.py --apply`** — create, read back, delete, בר כוכבא 23
+   only. OXS honoured `reportedBy` and stored the name; the test call
+   `255-28038-26` was deleted, and a separate listing of the building confirmed
+   it is gone rather than trusting the delete's status code, which is the
+   mistake that left one behind on 24 Sep.
+
+The only bot-created call now standing in the test building is the 24 Sep garden
+ticket, which still reads its reporter as unknown — it was created before
+`oxsReportedBy()` existed and fixing it in place needs a PUT the sandbox
+refuses. A fresh report carries the name automatically.
+
+### Found, not fixed
+
+`rescue_request` tests `m.status === "ok"` on a `matchBuilding()` result.
+`matchBuilding` only ever returns `empty`, `found`, `street_unknown`,
+`ambiguous`, `need_number` or `number_off_street` — never `"ok"` — so its
+building fallback is dead code and a rescued row's building is always null
+unless `verify_address` already ran. Left alone: it is a one-word fix on a path
+that deliberately does not mirror, and it is not what was asked for.
+
 ## 2026-09-25
 
 ### "Assaf got removed?" — no: four rehearsals used up his call attempts

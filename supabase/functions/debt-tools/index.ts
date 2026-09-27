@@ -1756,12 +1756,41 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         urgency: "normal",
         opened_via: channel(ctx),
         status: sent ? "resolved" : "open",
-      }).select("reference").single();
+      }).select("id,reference").single();
       if (error || !t?.reference) {
         console.error("payment link ticket failed", error?.message ?? "no reference", last4);
         return {};
       }
       console.log("payment link ticket", sent ? "resolved" : "open", t.reference, last4);
+
+      // Into OXS as well, on the same two gates as open_request -- 27 Sep, the
+      // owner: *"when i open a ticket it should be put inside in oxs"*. Five of
+      // the seven tickets raised from the allow-listed tester came through HERE
+      // and not one of them reached OXS: only open_request knew how to mirror,
+      // so the mirror read as broken when it was merely absent from this path.
+      //
+      // ONLY THE OPEN ONE, and this is a decision rather than an oversight.
+      // `sent` files a RESOLVED row -- the link is already on the resident's
+      // phone and there is nothing for a dispatcher to do. OXS has no status on
+      // create, so mirroring that row would put a finished job into their queue,
+      // which is the noise that got the mirror switched off on 26 Aug. The open
+      // row is the opposite: it exists precisely because a person has to send
+      // the link by hand.
+      //
+      // The address comes back from matchBuilding rather than from `r.building`
+      // so the id and the string are one lookup and cannot disagree --
+      // oxsReportedBy() matches the reporter on that exact string, and a
+      // near-miss there costs the name on the call.
+      if (!sent) {
+        const m = await matchBuilding(r.building);
+        if (m.status === "found") {
+          await oxsMirror(String(m.building.id), description, unit || null,
+                          String(t.reference), String(t.id), String(r.phone),
+                          unit || null, String(m.building.address));
+        } else {
+          console.log("payment link ticket not mirrored: building", m.status, t.reference);
+        }
+      }
       return { reference: String(t.reference) };
     };
 
