@@ -230,6 +230,22 @@ RETURN_NEW = """  greeting: isGreeting, last_bot: lastBot,
 # is a writing sample beside every turn the model ever sees; the 1 Sep tap
 # clause had one. Same finding as 25 Aug, recorded in n8n_whatsapp.py.
 # --------------------------------------------------------------------------
+# Did the resident open THIS message with a greeting? (27 Sep, epoch 68.) One
+# copy of the test, as JS regex source, for its three readers: the inject below,
+# `Worth a word?` (n8n_whatsapp_firstword.py) and Send's greeting filter
+# (n8n_whatsapp_manners.py). Three copies of a word list are three lists that
+# drift, and a drifted greeting guard "reads as present and is not"
+# (n8n_whatsapp_rename.py). Sort's bare-greeting words as a PREFIX, minus the
+# how-are-you ones, which also open "what's happening with my ticket". Longer
+# alternatives first; the lookahead is the word boundary Hebrew does not have.
+RESIDENT_HELLO = (r"/^(שלום רב|שלום|היי|הי|אהלן|יו|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|"
+                  r"שבוע טוב|שבת שלום|חג שמח|יום טוב|hi there|hey there|hello there|hii|hi|"
+                  r"hey|hello|yo|good morning|good afternoon|good evening|howdy|shalom|ahlan)"
+                  r"(?=[\s,.!?:;]|$)/")
+# The resident's text as that test wants it: leading space and emoji gone,
+# lower case (a no-op on Hebrew).
+SAID_NORM = r".replace(/^[\s\p{Extended_Pictographic}]+/u, '').toLowerCase()"
+
 AGENT_NEW = (
     # The prohibition alone held for the self-introduction and lost the coin
     # toss on the greeting: "שלום לכם," opened 2 of 4 tap replies on 1 Sep
@@ -237,8 +253,19 @@ AGENT_NEW = (
     # and the prohibition points back at it, which is the shape everything
     # else in this template already has. No quoted opener: naming the phrase
     # is how yesterday supplied it.
-    "={{ ($json.greeted ? '[אתם כבר באמצע שיחה, וכבר בירכת את הדייר "
-    "והצגת את עצמך. לא עושים את זה שוב.]' : '[זו ההודעה הראשונה בשיחה.]') "
+    #
+    # 27 Sep, epoch 68: FACTS ONLY, as the rule at the top of this block says.
+    # The greeted branch claimed "וכבר בירכת את הדייר והצגת את עצמך" -- false
+    # after the canned menu, which has carried no name since epoch 52 -- and
+    # instructed. It now says where the conversation is, and a second fact says
+    # whether the resident himself opened THIS message with a greeting; the
+    # prompt turns the two into the owner's rule of 27 Sep, "greet back once,
+    # never twice". The list is Sort's bare-greeting words as a prefix, minus
+    # the how-are-you ones, which also open "what's happening with my ticket".
+    # `$json.text` here is the merged burst -- what the model reads.
+    "={{ ($json.greeted ? '[אתם כבר באמצע שיחה.]' : '[זו ההודעה הראשונה בשיחה.]') "
+    "+ ($json.greeted && " + RESIDENT_HELLO + ".test(String($json.text || '')" + SAID_NORM + ")"
+    " ? ' [הדייר פתח את ההודעה הזאת בברכה.]' : '') "
     "+ ($json.tap_now ? ' [ההודעה הזאת היא לחיצה על כפתור ברשימה, לא משהו "
     "שהדייר הקליד.]' : '') "
     # TRIED AND ROLLED BACK, 1 Sep evening. This clause closes with a full stop

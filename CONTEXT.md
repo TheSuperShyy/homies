@@ -2106,6 +2106,38 @@ anything, so it claimed a repair instead. The guard that holds names the class
 reply the bot had ever sent before it shipped (1 of 863 in the always-false
 tier: this one).
 
+## Sending a reply back is only safe when the turn did no work
+
+27 Sep, epoch 68. Two style checks were added to `Reply usable?` to send an echo
+("אני מבין ש…") or a clerk's preamble ("כדי שאוכל… אצטרך…") back for one rewrite.
+The review of that plan found the trap before it shipped: **the retry pass is
+rebuilt from `Still the last word?` and sees none of the first pass's tool
+results.** A reply sent back after open_request opened a ticket can open a
+second one; after notify_team, the note is lost; after get_payment_link, the
+second pass pastes the link from memory, fails `links`, and the resident gets a
+stub ticket instead of the link they were given. So a style check exempts any
+turn that did work (a ticket opened, a note, a link, the `§§§` two-beat), and
+a refused open_request (`opened:false`) is not work. Any future "send it back"
+check inherits this: **the retry is a blank second chance, not a correction of
+the first.**
+
+**Greeted is not remembered.** Sort's `greeted` lives in staticData and survives
+epoch bumps and restarts; the model's memory does not. After every bump, every
+conversation is "greeted" to Sort and brand new to the model, and every prompt
+clause keyed to "your first message" fires. Greeting rules therefore key on the
+inject's facts (mid-conversation; the resident opened with a greeting), and the
+one guarantee is code: Send's greeting filter only removes, never empties, and
+reads "just after the menu" from the messages table (`Anything newer?`), which
+every execution sees, not from staticData, which a concurrent run has not saved
+yet.
+
+**The owner's greeting rule, confirmed against examples on 27 Sep:** greet back
+once, never twice. First reply: hour greeting and name. Resident greets
+mid-conversation: exactly one greeting back, no name. Resident doesn't greet:
+none. Right after the system's menu or a first-word ack that greeted: none.
+Never two in one message. Greetings were reversed six times between 20 and
+25 Sep; this table is the reference now, and a change to it is the owner's.
+
 ## A dry run tells you what the repo wants, not what is live
 
 `python scripts/vapi_sync.py debt` printed a cloned voice id on 31 Aug while the

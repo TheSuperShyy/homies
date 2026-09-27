@@ -676,6 +676,55 @@ function latinStreet(said: unknown): boolean {
   return /[A-Za-z]{3,}/.test(s) && !/[א-ת]/.test(s);
 }
 
+// What the chat model is told when open_request cannot open for want of a
+// building (27 Sep). Until now the refusal was a bare reason code, and the
+// model filled the silence with its own habit: "so that I can open a service
+// call and take care of it, I'll need to know which building -- could you
+// please give me the street name and building number?" -- a clerk's preamble,
+// a promise of work, and no apartment, so the OXS mirror had no reporter to
+// name. This is the point of use, the one place the model reads at the moment
+// it composes that question. English and without a Hebrew sentence in it, so
+// there is nothing to copy; WhatsApp only, because on a call the flat question
+// is the intake agent's own business.
+const ASK_WHERE = "Nothing was opened. Ask for what is missing in one short question: the "
+  + "building (street and number) and, in the same question, the apartment they live in "
+  + "if you do not have it yet. If they answer with the building only, open the ticket "
+  + "with it; do not ask again. Just ask: no reason why you need it, nothing about what "
+  + "you will do with it.";
+
+/**
+ * The reporter's own flat from our records, for a WhatsApp sender who did not
+ * say it (27 Sep, owner: fill it from the records). `reporter_unit` is the only
+ * other source of the flat, and without one the OXS mirror sends no reporter
+ * name -- the owner's test depends on that name.
+ *
+ * Conservative on every axis, because a wrong flat is worse than none:
+ *  - the sender's phone must match a resident (the phone is unique);
+ *  - that resident's building must resolve to the SAME building the ticket
+ *    is being opened in -- a resident reporting a fault elsewhere keeps none;
+ *  - an owner whose unpaid charges span several flats gets none, and so does
+ *    one whose charges disagree with the flat on file: `residents.unit` names
+ *    one flat of possibly several (012), exactly as get_payment_link reads it.
+ *
+ * Returns the row id as well, so the ticket is attached to the person who
+ * wrote rather than to whichever row a building+flat lookup finds first (flat
+ * 2 of the test building has two).
+ */
+async function flatOnFile(phone: string | null, buildingId: string): Promise<{ id: string; unit: string } | null> {
+  if (!phone) return null;
+  const { data: r } = await db.from("residents")
+    .select("id,building,unit").eq("phone", phone).maybeSingle();
+  const unit = unitOf(r?.unit);
+  if (!r || !unit || !r.building) return null;
+  const mm = await matchBuilding(r.building);
+  if (mm.status !== "found" || String(mm.building.id) !== buildingId) return null;
+  const { data: ch } = await db.from("charges").select("unit")
+    .eq("resident_id", r.id).eq("status", "unpaid");
+  const units = [...new Set((ch ?? []).map((c: any) => String(c.unit ?? "").trim()).filter(Boolean))];
+  if (units.length > 1 || (units.length === 1 && units[0] !== unit)) return null;
+  return { id: String(r.id), unit };
+}
+
 async function matchBuilding(saidRaw: unknown): Promise<Match> {
   const said = norm(saidRaw);
   if (!said) return { status: "empty" };
@@ -2709,11 +2758,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // the second report would mint a second ticket and dispatch a second van.
     const m = await matchBuilding(said);
     if (!dialled(ctx) && m.status !== "found") {
+      // AN INVENTED BUILDING IS A MISSING ONE (27 Sep). The chat model called
+      // this with `building: "בניין מגורים"` -- "residential building", a
+      // placeholder it made up to have something to pass -- and got
+      // `street_unknown`, which tells it the resident named a street we do not
+      // manage. Nobody named anything. With no digit anywhere and not a Latin
+      // street (that one keeps its own hint), nothing that could be an address
+      // was given, and the honest reason is that we still need one. A managed
+      // street typed without its number never gets here: matchBuilding answers
+      // it with need_number.
+      const invented = m.status === "street_unknown" && !/\d/.test(String(said))
+        && !latinStreet(said);
       if (m.status === "street_unknown" || m.status === "empty") {
+        const need = m.status === "empty" || invented;
         return {
           ok: true, opened: false, building_found: false,
-          reason: m.status === "empty" ? "need_building" : "street_unknown",
+          reason: need ? "need_building" : "street_unknown",
           ...(m.status === "street_unknown" && latinStreet(said) ? { hint: LATIN_HINT } : {}),
+          ...(need && channel(ctx) === "whatsapp" ? { note: ASK_WHERE } : {}),
         };
       }
       if (m.status === "need_number" || m.status === "number_off_street") {
@@ -2722,6 +2784,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
           street: m.street.street,
           numbers_we_manage: m.numbers,
+          ...(m.status === "need_number" && channel(ctx) === "whatsapp" ? { note: ASK_WHERE } : {}),
         };
       }
       return {
@@ -2780,6 +2843,27 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       unit = null;
     } else if (reportedUnit && !unit) {
       unit = reportedUnit;
+    }
+
+    // THE REPORTER'S FLAT FROM OUR RECORDS (27 Sep, owner's decision), when a
+    // WhatsApp sender did not say it -- see flatOnFile() for the conditions.
+    // Placed AFTER the unit logic above on purpose: this names WHO reported,
+    // never where the fault is, so `unit` (the fault's flat) is decided
+    // without it exactly as before. WhatsApp only: inbound voice is not
+    // "dialled" either, but its tool has `unit` and no `reporter_unit`, and a
+    // flat pulled from a demo page's invented caller number is the 19 Aug bug
+    // `dialled()` exists to prevent. When the resident DID say a flat and it is
+    // the one on file, the phone-matched row is still preferred as the ticket's
+    // resident: it is the person who wrote, not whichever row a building+flat
+    // lookup meets first.
+    let reporterFlat = reportedUnit;
+    let reporterId: string | null = null;
+    if (channel(ctx) === "whatsapp" && m.status === "found") {
+      const known = await flatOnFile(reporterPhone(ctx), String(m.building.id));
+      if (known && (!reporterFlat || reporterFlat === known.unit)) {
+        reporterFlat = known.unit;
+        reporterId = known.id;
+      }
     }
 
     // --- The duplicate guard ------------------------------------------------
@@ -2865,10 +2949,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // a flat with no phone number on file has no `residents` row at all, which
     // is exactly why `reported_unit` is stored separately rather than being
     // reduced to this lookup.
-    let residentId = ctx.residentId;
-    if (!residentId && reportedUnit && building) {
+    let residentId = ctx.residentId || reporterId;
+    if (!residentId && reporterFlat && building) {
       const { data: who } = await db.from("residents").select("id")
-        .eq("building", building).eq("unit", reportedUnit).limit(1);
+        .eq("building", building).eq("unit", reporterFlat).limit(1);
       residentId = who?.[0]?.id ?? null;
     }
 
@@ -2919,7 +3003,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           description: merged,
           building,
           unit,
-          reported_unit: reportedUnit,
+          reported_unit: reporterFlat,
           // Stays `emergency` however this call rates it. The urgency was set
           // by somebody in trouble, and a later, calmer sentence describing the
           // same incident must not quietly downgrade it.
@@ -2932,7 +3016,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (upErr) return { ok: false, error: upErr.message };
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
-                        reporterPhone(ctx), reportedUnit, building);
+                        reporterPhone(ctx), reporterFlat, building);
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -2947,7 +3031,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         description: String(args.description),
         building,
         unit,
-        reported_unit: reportedUnit,
+        reported_unit: reporterFlat,
         reported_by_phone: reporterPhone(ctx),
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
@@ -2964,7 +3048,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     if (m.status === "found") {
       await oxsMirror(String(m.building.id), String(args.description), unit,
                       data.reference, data.id, reporterPhone(ctx),
-                      reportedUnit, building);
+                      reporterFlat, building);
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The

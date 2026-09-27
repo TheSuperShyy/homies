@@ -203,7 +203,21 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 67
+MEMORY_EPOCH = 68
+# 67 -> 68, 27 Sep: greet back once, never twice; ask plainly; get the flat.
+# An hour after 67 the tester was answered "צהריים טובים, מיכאל מהומי'ז. אני מבין
+# שיש תקלה… כדי שאוכל לפתוח קריאת שירות ולטפל בזה, אצטרך לדעת באיזה בניין…" --
+# a second greeting, the echo and the clerk's preamble, all three already asked
+# away, and no apartment. The bump had emptied the model's memory while Sort
+# still said greeted, and four prompt clauses said "greet" against one inject
+# line. The prompt quoted the very frames it banned, and required a purpose
+# clause beside them. Now: the inject states facts only (mid-conversation;
+# the resident opened with a greeting), the greeting clauses follow the owner's
+# confirmed rule, the quoted frames and the purpose clauses are gone, building
+# and apartment are one question with no re-ask, and get_request_status stops
+# saying DO NOT ASK FOR AN APARTMENT. All three hashes move. Send's greeting
+# filter (n8n_whatsapp_manners.py) went live first, so this reset cannot
+# produce another double greeting.
 # 66 -> 67, 27 Sep: the bot claimed a repair. A resident reported flickering
 # stairwell lights and was told "I checked the lighting, I replaced the
 # flickering bulbs, all fine now" -- and no ticket was opened. That reply came
@@ -616,8 +630,8 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "e21b28243f36",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "805c79df5aa0",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "prompt": "931cd09f1e5c",   # docs/features/11-whatsapp-bot/prompt.md
+    "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --
@@ -625,7 +639,8 @@ EPOCH_COVERS = {
     # hashed; when one changes, bump by hand. Recorded limit, not an
     # oversight.
     # 23 Sep: show_menu now names the third row "talk to a representative".
-    "tools": "6caff1a032b9",
+    # 27 Sep: get_request_status no longer forbids asking for an apartment.
+    "tools": "6fdfc1e98a59",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1418,10 +1433,10 @@ TOOLS = [
             "they quoted one, in any form: the whole thing, an older HM-prefixed "
             "one, or just the serial. "
             "Without a reference the building finds them; the apartment only "
-            "narrows it. DO NOT ASK FOR AN APARTMENT when the fault is not in "
-            "one — a lift, a lobby light, a gate and the bin store belong to the "
-            "building, and asking which flat somebody's elevator is in is a "
-            "question with no answer. Name the type when they named it. Returns "
+            "narrows it, so looking a ticket up never needs one. (Opening a "
+            "ticket is open_request's, and there the apartment the reporter "
+            "lives in is asked together with the building.) Name the type "
+            "when they named it. Returns "
             "reference, status (open / in_progress / resolved / cancelled), "
             "dates and description; or `ambiguous_building` with the names when "
             "what they typed fits more than one, and then you ask which rather "

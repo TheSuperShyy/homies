@@ -258,6 +258,17 @@ def main():
     if by["show_menu"]["parameters"].get("description") != menu_desc:
         by["show_menu"]["parameters"]["description"] = menu_desc
         changes.append("show_menu: description synced")
+    # 27 Sep: get_request_status's description rides here too. It is hashed into
+    # the epoch like the prompt, so it must go live in the SAME save as the new
+    # session key -- shipped from any other patcher it would reach buffers still
+    # on the old key. No other patcher owns it (menu.py syncs get_balance only,
+    # open.py exits on a node removed 13 Sep).
+    if "get_request_status" in by:
+        status_desc = W.tool("get_request_status")["description"]
+        if by["get_request_status"]["parameters"].get("toolDescription") != status_desc:
+            by["get_request_status"]["parameters"]["toolDescription"] = status_desc
+            changes.append("get_request_status: description synced (a status lookup needs "
+                           "no apartment; opening one asks it with the building)")
     mem = next((n for n in nodes if n["type"].endswith("memoryBufferWindow")), None)
     if mem is None:
         sys.exit("No memory node on the live workflow -- refusing to guess.")

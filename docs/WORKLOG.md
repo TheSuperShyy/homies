@@ -11,6 +11,106 @@ conversation that produced it.
 
 ## 2026-09-27
 
+### "Greet back once, never twice" -- the second greeting, the echo, the clerk, the missing flat (epoch 68)
+
+An hour after epoch 67 the tester reported the flickering lights again and got:
+*"צהריים טובים, מיכאל מהומי'ז. אני מבין שיש תקלה בתאורה… כדי שאוכל לפתוח קריאת
+שירות ולטפל בזה, אצטרך לדעת באיזה בניין מדובר. תוכלו בבקשה למסור לי את שם הרחוב
+ומספר הבניין?"* No invented repair -- the 67 fix held -- but a second greeting and
+re-introduction, the "I understand that…" echo, the clerk's "so that I can…,
+I'll need…", and no apartment. Owner: *"ok lets plan this thoroughly before
+making the changes"*.
+
+**Causes (execution 65421, two explorers, all 864 outbound rows, then an
+adversarial review of the plan):**
+
+- The bump had emptied the model's memory while Sort still said `greeted`, and
+  four prompt clauses said "greet and introduce" against one inject line. That
+  line also claimed "והצגת את עצמך", false after the canned menu (no name since
+  epoch 52). No code looked at a leading greeting.
+- The echo opened 102 of 733 replies before the 24 Sep bans. The prompt banned
+  it by quoting it verbatim, put "הבנתי" first in its wanted-words list, and
+  asked for "something about the fault itself", which a restatement satisfies.
+- The clerk frame was almost word for word the 24 Sep 14:47 reply. The prompt
+  quoted it, and three clauses beside it required a purpose preamble.
+- The model called open_request with `building: "בניין מגורים"` (invented), got
+  `street_unknown`, and asked for "street name and building number". The
+  get_request_status text said in capitals DO NOT ASK FOR AN APARTMENT; the
+  refusal carried no guidance; `reporter_unit` is the only source of the flat.
+
+**Owner decisions:**
+
+- Replies that still echo or use the clerk frame get one rewrite.
+- A missing flat is filled from our records.
+- Greetings: **greet back once, never twice**, confirmed against examples.
+  - First reply: hour greeting and name.
+  - Resident greets mid-conversation: one greeting back, no name.
+  - Resident doesn't greet: none.
+  - Right after the system's menu, or a first-word ack that greeted: none.
+  - Never two greetings in one message.
+
+**Shipped, all live:**
+
+- **Edge Function v108** (deployed with `--oxs-mirror`).
+  - WhatsApp `need_building`/`need_number` refusals carry a note: ask building
+    and apartment in one short question, open on a building-only answer, just
+    ask.
+  - An invented building (no digit, not Latin) is now `need_building`.
+  - **The records fallback**:
+    - WhatsApp only.
+    - Placed after the unit logic, so the fault's flat is untouched.
+    - Takes the sender's resident row by phone, only in the same building,
+      and never for an owner whose charges span several flats.
+    - Feeds `reported_unit`, the ticket's resident and the OXS reporter.
+- **`scripts/n8n_whatsapp_manners.py`** (new).
+  - A greeting filter in Send between the clean-up and `const body`
+    (`content: t` -> `content: c`, menu rules still read `t`).
+    - It only removes: a leading greeting beyond the ones allowed, and a
+      leading self-introduction where the name isn't wanted.
+    - It never empties a message and never breaks "ערב טוב גם לכם".
+    - "After the menu" comes from `last_bot` or the newest outbound row in
+      `Anything newer?`, which is race-free.
+    - The ack counts only if `Say it now` really sent it.
+  - `echo` and `clerk` on `Reply usable?`: first pass only, and exempt when
+    the turn did work (a ticket opened, a note, a link, `§§§`). The retry pass
+    sees none of the first pass's tools; the review showed a retry after work
+    could duplicate a ticket or turn a delivered link into a stub.
+- **`Worth a word?`** greets back once when the resident opened with a greeting.
+- **Prompt, 13 edits, net shorter** (19,530 -> 19,419 chars).
+  - Greetings keyed to the inject's facts.
+  - The quoted echo and clerk frames and the purpose clauses deleted.
+  - Building and apartment in one question with no re-ask; never invent a
+    building.
+- **Inject facts only**: `[אתם כבר באמצע שיחה.]` and
+  `[הדייר פתח את ההודעה הזאת בברכה.]`.
+- **The greeting-word test** is one constant
+  (`n8n_whatsapp_untemplate.RESIDENT_HELLO`) for its three readers.
+- **get_request_status** no longer forbids asking for an apartment, synced by
+  teamnote in the same save as **epoch 68**.
+
+**Measured, no model call:**
+
+- **Edge probes**, direct tool calls: 9/9.
+  - A throwaway resident on flat 7 got `reported_unit` 7 on WhatsApp and
+    nothing on voice.
+  - Nothing reached OXS; cleanup left nothing.
+- **Node**, with the shipped expressions and n8n's `$` mocked: 38/38, every
+  row of the owner's table plus the edges.
+- **Corpus**: 219 of 864 replies would change in the strictest state, 0 broken.
+- **Rewrite check** would send back (on no-work turns): echo 115, clerk 57.
+- All 18 live patchers dry-run idle (`batch.py` drift and `open.py` refusal
+  pre-existing).
+
+**Deviations from the approved plan:**
+
+- 349's status-ask purpose clause ("שזה מה שיקצר לו את הדרך") was also removed,
+  same fault.
+- The filter's version marker is a string, not a JS comment.
+
+**Still owed:** the owner's handset. The flicker message mid-conversation
+should get at most one greeting back and "which building and apartment?";
+"בר כוכבא 23" alone should get a ticket number and the tenant's name in OXS.
+
 ### "Why is it inventing" -- an empty wallet, a tool-less rescue, and a prompt that asked for a deed
 
 The owner's tester tapped "לדבר עם נציג", wrote *"the light in the stairs 1,2
