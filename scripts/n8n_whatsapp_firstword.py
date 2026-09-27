@@ -53,6 +53,18 @@ and the resident gets three messages.
 THE RETRY PATH IS DELIBERATELY UNTOUCHED. `Try again` feeds the agent directly,
 so a second attempt never acknowledges twice.
 
+27 SEP: A NOTE THAT TOLD THIS MODEL HOW TO WRITE MADE IT WRITE. For a few hours
+the mid-conversation note said, when the resident had opened with a greeting,
+"if you write a message, open it with one short greeting back". A sentence that
+presupposes a message turns NONE into one: "hello good afternoon" came back
+twice as "צהריים טובים, אני מבין שאתם צריכים קישור לתשלום. אני בודק את זה כרגע."
+(executions 65683, 65694), where the old note had answered NONE to every
+greeting since 24 Sep. Reverted the same day, byte for byte, to commit
+84d3918's TEXT. THE RULE: a gatekeeper's input carries facts, never
+instructions for the message it might write. This node's texts are pinned in
+scripts/check_whatsapp_rules.py, so changing them fails that check until the
+real inputs that reach this model have been replayed.
+
 Idempotent. Surgical. `n8n_whatsapp.py --apply` remains the wrong way to ship.
 """
 import os
@@ -60,9 +72,6 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import n8n_whatsapp as W  # noqa: E402
-# The resident's-greeting test, one copy for the inject, this node and Send
-# (27 Sep, "greet back once, never twice").
-from n8n_whatsapp_untemplate import RESIDENT_HELLO, SAID_NORM  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -113,15 +122,9 @@ TEXT = (
     "{ hour: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jerusalem' })"
     ".format(new Date())); const hello = HH < 5 ? 'שלום' : HH < 12 ? 'בוקר טוב' "
     ": HH < 17 ? 'צהריים טובים' : 'ערב טוב'; const first = $json.greeted !== true; "
-    # 27 Sep: mid-conversation, a resident who opened with a greeting gets one
-    # back, and it belongs HERE when this message goes out -- it is the first
-    # thing he reads. Send's filter then removes a second one from the answer.
-    "const hi = " + RESIDENT_HELLO + ".test(String($json.text || '')" + SAID_NORM + "); "
     "const note = first ? ('[זאת הפנייה הראשונה שלו אליך. אם אתה כותב הודעה, "
     "פתח אותה ב\"' + hello + '\" והצג את עצמך כמיכאל מהומי\\'ז, במשפט אחד.]') : "
-    "(hi ? '[אתם כבר באמצע שיחה, והוא פתח את ההודעה הזאת בברכה. אם אתה כותב הודעה, "
-    "פתח אותה בברכה אחת קצרה בחזרה, בלי להציג את עצמך.]' : "
-    "'[אתם כבר באמצע שיחה. בלי ברכה ובלי להציג את עצמך שוב.]'); "
+    "'[אתם כבר באמצע שיחה. בלי ברכה ובלי להציג את עצמך שוב.]'; "
     "return note + String.fromCharCode(10) + String($json.text || ''); })() }}"
 )
 

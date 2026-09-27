@@ -2138,6 +2138,82 @@ none. Right after the system's menu or a first-word ack that greeted: none.
 Never two in one message. Greetings were reversed six times between 20 and
 25 Sep; this table is the reference now, and a change to it is the owner's.
 
+## How a WhatsApp change ships
+
+27 Sep, after the second regression in a day. Owner: *"we need to make sure
+this wont open another bug we always experiencing this issue we fix a bug it
+cause another one and loop repeats"*. The loop had three causes. Every fix was
+tested once, in a temp folder, and the tests vanished. The morning's
+regression was in text a MODEL reads, which a test of code cannot see. And
+nothing compared a change against everything that had really happened, or
+watched real traffic after a deploy: the owner found it.
+`scripts/check_whatsapp_rules.py` (with `check_whatsapp_rules.js`) answers all
+three, spends nothing, and is the gate:
+
+1. **Before `--apply`:** `patcher --dump F` (manners.py has it; give a patcher
+   the flag the first time you change it), then
+   `python scripts/check_whatsapp_rules.py --candidate F --replay`. All cases
+   green, pins unchanged, and **every difference in the replay is one you
+   meant.** The replay runs every message residents ever sent and every reply
+   the bot ever sent through the live code and the candidate, under each row
+   of the owner's greeting table, and prints each difference. On 27 Sep it
+   found a live bug nobody had reported ("who are you" answered with a bare
+   "נציג השירות של הומיז.") before v2 shipped.
+2. **After `--apply`:** the check on live is green, and every WhatsApp
+   patcher's dry run is idle. Baseline: `batch.py` shows its old drift and is
+   never applied; `open`, `handover`, `promise`, `transfer` and `untemplate`
+   refuse on nodes removed in mid-September.
+3. **After the owner's handset:** `check_whatsapp_rules.py --watch <deploy
+   time, UTC>`, and again the next morning over real residents' traffic. Zero
+   flags is shipped.
+
+**Text a model reads changes only as an exact revert, or after a replay.** The
+pins fingerprint every such text: the prompt, the inject, the three small
+agents, the retry note, every tool. Changing one fails the check with
+"model-facing text changed". The way through is a replay of the real inputs
+that reach that model with Claude playing it (never OpenRouter), then the new
+values from `--pins`. **A bug fixed is a case added** to
+`check_whatsapp_rules.js`.
+
+**Prove the check can fail.** Run it on the workflow that misbehaved
+(`--execution <id>`): it must fail on exactly that bug. On 27 Sep, 20 of 110
+cases and one pin failed on execution 65683's workflow and nothing else did,
+and `--watch` flagged 65683 and 65694 four ways each. A check that cannot fail
+proves nothing.
+
+**Measure a race before guarding it.** The review listed three timing races
+the change could widen. History said 0 of 1,683 messages for each (the fastest
+real message after a greeting came 3-6 s later). They were left alone, and the
+watch flags each one if it ever happens: code added for something that has
+never happened is how the next bug gets in.
+
+## A model told how to write something will write it
+
+27 Sep, epoch 68. `Worth a word?` is a gatekeeper: it decides whether the
+resident wants a payment link, and otherwise answers NONE. Its note gained,
+mid-conversation when the resident had opened with a greeting, "if you write a
+message, open it with one short greeting back". That sentence presupposes a
+message. The model wrote one, the only kind it knows, and "hello good
+afternoon" came back as "I understand you need a payment link, I'm checking it
+now", twice, where the old note had answered NONE to every greeting since
+24 Sep. **A gatekeeper's input carries facts, never instructions for the
+message it might write.** The node went back byte for byte to its 24 Sep text;
+the greeting back lives in the answer, and Send's filter keeps it to one.
+
+Two more from the same afternoon:
+
+- **A run of hellos is a hello.** Sort's bare-greeting test knew one greeting,
+  so "hello good afternoon" missed the menu and reached both models. Two or
+  three plain hello words now get the menu like one. How-are-you ("בוקר טוב,
+  מה נשמע?", the 20 Sep ask-back) and goodnight (a goodbye) stay with the model.
+- **A filter that gives up must not undo what it already did.** v1 cut the
+  greeting and the name, saw the rest of the introduction ("ובשמחה…") start
+  with ו, and returned the original with both cuts undone. v2 drops a short
+  courtesy clause with the name, otherwise removes only the ו (cutting to the
+  sentence end would split a link at its first dot), keeps the name before an
+  apposition or a dash, and keeps it whenever the resident asked who they are
+  talking to: then the name is the answer.
+
 ## A dry run tells you what the repo wants, not what is live
 
 `python scripts/vapi_sync.py debt` printed a cloned voice id on 31 Aug while the

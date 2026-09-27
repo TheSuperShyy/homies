@@ -11,6 +11,68 @@ conversation that produced it.
 
 ## 2026-09-27
 
+### "fix this" -- a hello got an invented payment reply and two greetings; and the gate that stops fix-one-break-another
+
+12:08 UTC, executions 65683 and 65694: the tester, mid-conversation, typed "hello good
+afternoon" (then "hello, good afternoon"). `Say it now` sent "צהריים טובים, אני מבין שאתם
+צריכים קישור לתשלום. אני בודק את זה כרגע." -- invented -- and `Send` sent "צהריים טובים! אני
+מיכאל מהומי'ז, ובשמחה אעזור לכם. במה אוכל לעזור?", a second greeting and the name.
+
+**Three causes, traced node by node:**
+- The epoch-68 note in `Worth a word?` ("if you write a message, open it with one short
+  greeting back") primed the classifier to write. All 32 of its runs since 24 Sep: the old
+  note answered NONE to every greeting; the new one sent a payment ack on 2 of 2.
+- Sort's bare-greeting test is whole-string and knows ONE greeting; "hello good afternoon" is
+  two, so it missed the menu and reached both models.
+- Send's filter (manners v1) cut the greeting and the name, saw the leftover "ובשמחה..." start
+  with ו, and returned the original text -- both cuts undone.
+
+Owner, rejecting the first plan: *"we need to make sure this wont open another bug we always
+experiencing this issue we fix a bug it cause another one and loop repeats"*. So the plan was
+rebuilt around a gate, and the gate was built and proven before the second change shipped.
+
+**Shipped:**
+- 13:17 UTC: `Worth a word?` reverted byte for byte (`firstword.py` back to 84d3918; the
+  live node equals the pre-epoch-68 snapshot node).
+- 13:33 UTC: `manners.py` v2. Sort gives 2-3 plain hello words the menu, like one; how-are-you
+  and goodnight stay with the model. The name step drops a courtesy clause ("ובשמחה אעזור
+  לכם.") or removes only the ו (never content: cutting to the sentence end would split a link
+  at its first dot, an amount at its decimal point); an apposition or a dash keeps the name;
+  so does a resident asking who they are talking to. Snapshot
+  `docs/handover/n8n-whatsapp-live-27sep-before-manners-v2.json`.
+- No model-facing text changed, so no epoch bump and nobody's chat restarted.
+
+**The gate: `scripts/check_whatsapp_rules.py` + `check_whatsapp_rules.js`** (read only, no
+OpenRouter). 114 cases on the exact live code (the owner's greeting table, today's turns, the
+morning's 38 greeting cases, the deeds / echo / clerk / outage guards, the ack's gate, the
+inject); 17 pins on every text a model reads (change one and it fails until a replay is done);
+`--replay` (every real message, live vs candidate); `--watch` (real turns since a deploy vs the
+owner's rules).
+- Proven it can fail: on execution 65683's own workflow it fails 20 cases and 1 pin, only
+  those; `--watch 10:58` flags 65683 and 65694 four ways each.
+- v2's replay: 3 of 814 resident messages now get the menu ("hey good morning", "hello good
+  afternoon", "hello, good afternoon"); the ack's note unchanged for all 814; 3 reply texts of
+  865 change, all intended; nothing broken.
+- The replay found a live bug nobody had reported: "who are you" (2 Sep) answered with "אני
+  מיכאל, נציג השירות של הומיז." is cut by v1 to the fragment "נציג השירות של הומיז.". Fixed in
+  v2 before it shipped, with four cases.
+- A reviewer caught that the first draft of the name step (cut to the sentence end) would
+  corrupt links, amounts and ticket numbers; the shipped version cannot.
+
+**Checked, deliberately not changed:** three timing races the change could widen (two greeting
+bubbles within 20 s; a message then a greeting within 5 s; a message within 3 s of the menu):
+0 of 1,683 messages each in all history; the watch flags them if they ever happen. The ack's own
+"אני מבין ש..." wording is model-facing and gets its own replay first.
+
+17 WhatsApp patchers idle; `batch.py` drift and the refusals of `open`, `handover`, `promise`,
+`transfer`, `untemplate` (nodes gone since mid-September, absent in all three 27 Sep snapshots)
+are the old baseline.
+
+**Owed:** the owner's handset -- "hello good afternoon" should get one message, the menu with
+three buttons, with no model call -- then `check_whatsapp_rules.py --watch 2026-09-27T13:33`,
+and again the next morning. The tester's chat memory still holds today's two bad turns; they
+age out after a few exchanges.
+
 ### "Greet back once, never twice" -- the second greeting, the echo, the clerk, the missing flat (epoch 68)
 
 An hour after epoch 67 the tester reported the flickering lights again and got:

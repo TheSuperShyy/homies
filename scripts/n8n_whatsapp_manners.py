@@ -3,7 +3,9 @@
 
     python scripts/n8n_whatsapp_manners.py            # dry run
     python scripts/n8n_whatsapp_manners.py --apply    # write it
-    python scripts/n8n_whatsapp_manners.py --restore  # put the 27 Sep snapshot back
+    python scripts/n8n_whatsapp_manners.py --restore  # put the pre-v2 snapshot back
+    python scripts/n8n_whatsapp_manners.py --dump F   # dry run, plus the would-be workflow
+                                                      # in F for check_whatsapp_rules.py
 
 WHY, 27 Sep. The epoch-67 fix held -- no invented repair -- and the next reply
 to the owner's tester was: "צהריים טובים, מיכאל מהומי'ז. אני מבין שיש תקלה
@@ -39,9 +41,11 @@ examples: **"greet back once, never twice"**.
 
    The ack only counts if `Say it now` actually sent it, and only as far as it
    went: an ack that greeted takes the answer's greeting, one that named takes
-   the answer's name. `Worth a word?` now greets back itself when the resident
-   opened with a greeting (n8n_whatsapp_firstword.py), so the greeting lands
-   in the first message they read.
+   the answer's name. For a few hours on 27 Sep `Worth a word?` greeted back
+   itself when the resident opened with a greeting; that note made it answer a
+   plain hello with an invented payment request, and it was reverted the same
+   day (n8n_whatsapp_firstword.py). The ack never greets mid-conversation, so
+   the answer carries the one greeting back.
 
 2. `echo` AND `clerk` ON `Reply usable?`, first pass only -- the same
    `$runIndex > 0 ||` shape as `plural` and `opener`, so a stubborn second try
@@ -63,6 +67,35 @@ inject and get_request_status text of the same change ship by teamnote.py.
 The greeting-word test is n8n_whatsapp_untemplate.RESIDENT_HELLO, one copy for
 the inject, `Worth a word?` and this filter.
 
+V2, 27 SEP AFTERNOON. At 12:08 UTC the tester, mid-conversation, typed "hello
+good afternoon" and got an invented payment ack, then "צהריים טובים! אני מיכאל
+מהומי'ז, ובשמחה אעזור לכם. במה אוכל לעזור?" (executions 65683, 65694). Owner:
+*"fix this"*, and on the first plan *"we need to make sure this wont open
+another bug"*. Two of the three causes are fixed here:
+
+4. SORT: A RUN OF HELLO WORDS IS STILL A HELLO. The bare-greeting test matched
+   one greeting, so "hello good afternoon" missed the menu and reached both
+   models. Two or three plain hello words in a row now get the menu, exactly
+   like one does. How-are-you stays out ("בוקר טוב, מה נשמע?" is the 20 Sep
+   ask-back) and so does goodnight, a goodbye. Replayed over every inbound
+   message ever received: three change, all of them pure greetings.
+
+5. THE NAME STEP NO LONGER GIVES UP. After cutting the name, v1 saw the rest
+   of the introduction ("ובשמחה...") start with ו and returned the ORIGINAL
+   text, both cuts undone. Now a short courtesy clause goes with the name;
+   anything else keeps its content and loses only the ו (cutting to the
+   sentence end would split a link at its first dot, an amount at its decimal
+   point); an apposition or a dash keeps the name. And when the resident asked
+   who they are talking to, the name is the answer and always stays -- the
+   replay found "who are you" answered with a bare "נציג השירות של הומיז."
+   by v1. Replayed over every reply the bot ever sent: only those four change.
+
+The third cause was the ack's own note: see n8n_whatsapp_firstword.py.
+
+EVERY CHANGE HERE SHIPS THROUGH scripts/check_whatsapp_rules.py: `--dump F`,
+then `check_whatsapp_rules.py --candidate F --replay` (all cases green, only
+intended differences), then `--apply`, then the check again on live.
+
 Idempotent. Running it twice reports nothing to do. A later version of the
 filter replaces this one by its marker.
 """
@@ -81,7 +114,7 @@ from n8n_whatsapp_patch import layout_complaints  # noqa: E402
 
 WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
 SNAPSHOT = os.path.join(W.ROOT, "docs", "handover",
-                        "n8n-whatsapp-live-27sep-before-manners.json")
+                        "n8n-whatsapp-live-27sep-before-manners-v2.json")
 PLACEHOLDER = "REPLACE_WITH_N8N_WEBHOOK_SECRET"
 NEED = ("Send", "Reply usable?", "Try again", "Sort", "Carry on", "Anything newer?",
         "Say it now", "Answer the resident")
@@ -97,12 +130,24 @@ EMOJI = r"\p{Extended_Pictographic}" + VS
 # ---------------------------------------------------------------------------
 # A plain string, not a JS comment: nothing else in this workflow puts a comment
 # inside an expression, and this is not the change to find out how n8n takes one.
-MARK = "const mv = 'manners v1';"
+MARK = "const mv = 'manners v2';"
+BS = chr(92)       # a backslash, built rather than typed: this tool chain has
+NL = BS + "n"      # eaten typed ones before (27 Sep)
 BOT_HELLO = (r"/^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|"
              r"שבוע טוב|שבת שלום|חג שמח|יום טוב)( לכם| לך| לכולם)?(?=[\s,.!:;]|$)[\s,.!:;"
              + EMOJI + r"]*/u")
 NAME = (r"/^((כאן|אני|זה)\s+)?מיכאל(\s+מהומי['׳’]?ז)?(\s+כאן)?(?=[\s,.!:;]|$)[\s,.!:;"
         + EMOJI + r"]*/u")
+# v2: the short courtesy clause an introduction goes on with ("ובשמחה אעזור
+# לכם."): no digit, no colon, a real sentence end. Anything else keeps its words.
+FILLER = ("/^ו(בשמחה|אשמח|אני" + BS + "s+(כאן|פה|חלק|נציג))[^.!?" + NL + BS
+          + "d:]*[.!](?=" + BS + "s|$)" + BS + "s*/u")
+# v2: the resident asked who they are talking to. Then the name IS the answer
+# ("who are you" -> "אני מיכאל, נציג השירות...", 2 Sep), never a re-introduction.
+WHO = ("/(מי (אתה|את|זה|מדבר|מדברת|כותב|כותבת|עונה)|עם מי|מה (השם שלך|שמך)|"
+       "איך קוראים לך|בוט|רובוט|בן אדם|אדם אמיתי|who (are|r) (you|u)|who is this|"
+       "who.?s this|who am i|your name|are (you|u) (a )?(bot|robot|real|human|person)|"
+       "is this a bot|is this hom)/")
 LEAD = r"/^[\s" + EMOJI + r"]+/u"
 
 FILTER = " ".join([
@@ -111,6 +156,7 @@ FILTER = " ".join([
     "if (S.greeting === true) return t;",
     "const HELLO = " + BOT_HELLO + ";",
     "const NAME = " + NAME + ";",
+    "const FILLER = " + FILLER + ";",
     "let lastOut = '';",
     "try { const rows = $('Anything newer?').all(); for (const r of rows) "
     "{ if (r.json && r.json.direction === 'outbound') { lastOut = String(r.json.body || ''); break; } } "
@@ -127,11 +173,18 @@ FILTER = " ".join([
     "said = said" + U.SAID_NORM + ";",
     "const theyGreeted = " + U.RESIDENT_HELLO + ".test(said);",
     "const allowed = (afterMenu || ackGreeted) ? 0 : ((!mid || theyGreeted) ? 1 : 0);",
-    "const keepName = afterMenu || (!mid && !ackNamed);",
+    "const askedWho = " + WHO + ".test(said);",
+    "const keepName = askedWho || afterMenu || (!mid && !ackNamed);",
     "let head = ''; let x = t.replace(" + LEAD + ", ''); let kept = 0; let cut = false;",
     "for (let i = 0; i < 3; i++) { const m = x.match(HELLO); if (!m) break; "
     "if (kept < allowed) { head += m[0]; kept++; } else { cut = true; } x = x.slice(m[0].length); }",
-    "if (!keepName) { const n = x.match(NAME); if (n) { x = x.slice(n[0].length); cut = true; } }",
+    # v2: the name's own sentence may go on with ו. A courtesy clause goes with
+    # the name; anything else loses only the ו. An apposition ("..., נציג
+    # השירות") or a dash keeps the name rather than leave a fragment.
+    "if (!keepName) { const n = x.match(NAME); if (n) { let y = x.slice(n[0].length); "
+    "if (!/^(נציג|[-־])/.test(y)) { cut = true; "
+    "if (!/[.!?" + NL + "]/.test(n[0]) && /^ו[א-ת]/.test(y)) { const f = y.match(FILLER); "
+    "y = f ? y.slice(f[0].length) : y.slice(1); } x = y; } } }",
     "if (!cut) return t;",
     "const rest = x.trim();",
     "if (rest.split(/\\s+/).filter(Boolean).length < 2 || /^(גם|ו[א-ת])/.test(rest)) return t;",
@@ -146,6 +199,26 @@ SEND_NEW = (".replace(/\\s{2,}/g, ' ').trim(); " + FILTER + " "
             "const body = { content: c, message_type: 'outgoing' };")
 BLOCK_START = "const c = (() => { const mv = 'manners v"
 BLOCK_END = " const body = { content: c, message_type: 'outgoing' };"
+
+# ---------------------------------------------------------------------------
+# 1b. Sort (v2): a run of plain hello words is still a hello.
+# ---------------------------------------------------------------------------
+NLC = chr(10)
+SORT_OLD = "const isGreeting = GREETING.test(bare);"
+SORT_NEW = NLC.join([
+    '// 27 Sep: "hello good afternoon" is still just hello. Two or three plain',
+    "// hello words in a row get the menu, exactly like one does. Before this",
+    "// they reached the models, and the payment ack answered one with an",
+    "// invented payment request (executions 65683, 65694). How-are-you stays",
+    '// out ("בוקר טוב, מה נשמע?" is the 20 Sep ask-back), and so does',
+    "// goodnight, which is a goodbye. Kept by n8n_whatsapp_manners.py.",
+    "const HELLO_WORDS = '(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|"
+    "hi there|hey there|hello there|hii|hi|hey|hello|good morning|good afternoon|"
+    "good evening|shalom|ahlan)';",
+    "const HELLO_RUN = new RegExp('^' + HELLO_WORDS + '(?:' + /[" + BS + "s,.!]+/.source"
+    " + HELLO_WORDS + '){1,2}$', 'u');",
+    "const isGreeting = GREETING.test(bare) || HELLO_RUN.test(bare);",
+])
 
 # ---------------------------------------------------------------------------
 # 2. echo and clerk, first pass only, exempt when the turn did work.
@@ -220,6 +293,18 @@ def other_old_anchors():
     return found
 
 
+def dump(nodes, conns, path):
+    """The would-be workflow, for check_whatsapp_rules.py --candidate. The
+    webhook secret is replaced as in the snapshot; nothing the check reads
+    uses it."""
+    secret = W.env().get("N8N_WEBHOOK_SECRET", "").strip()
+    text = json.dumps({"nodes": nodes, "connections": conns}, ensure_ascii=False)
+    if secret:
+        text = text.replace(secret, PLACEHOLDER)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+
+
 def main():
     if "--restore" in sys.argv:
         return restore()
@@ -263,6 +348,17 @@ def main():
     if clash:
         sys.exit("REFUSING: the filter contains other patchers' OLD anchors: %s" % clash)
 
+    # 1b. Sort: a run of hello words, three states
+    code = by["Sort"]["parameters"].get("jsCode") or ""
+    if SORT_NEW in code:
+        pass
+    elif code.count(SORT_OLD) == 1:
+        by["Sort"]["parameters"]["jsCode"] = code.replace(SORT_OLD, SORT_NEW, 1)
+        changes.append("Sort: two or three hello words in a row get the menu, like one")
+    else:
+        sys.exit("REFUSING: Sort.jsCode does not carry `%s` exactly once (found %d). "
+                 "Read the live code first." % (SORT_OLD, code.count(SORT_OLD)))
+
     # 2. echo and clerk, by id
     cond = by["Reply usable?"]["parameters"]["conditions"]["conditions"]
     for g in (ECHO_GUARD, CLERK_GUARD):
@@ -293,6 +389,12 @@ def main():
     if worse:
         sys.exit("REFUSING TO PATCH. This would introduce placement problems "
                  "that are not already there:\n    " + "\n    ".join(worse))
+
+    if "--dump" in sys.argv:
+        path = sys.argv[sys.argv.index("--dump") + 1]
+        dump(nodes, conns, path)
+        print("")
+        print("dumped   : %s (the would-be workflow, secret replaced)" % path)
 
     if not apply:
         print("\nDry run. Re-run with --apply to write it.")
