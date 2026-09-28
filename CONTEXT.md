@@ -628,7 +628,11 @@ questions for Omni and the build are in `docs/features/15-call-button/context.md
 their PDFs are in the gitignored `local/omnitelecom/`, never in the public tree.
 The Call button still falls back to the demo agent (the August account's) at the
 owner's word ("revert back to the demo one for now"): `VAPI_DEBT_ASSISTANT_ID`
-must hold the live debt agent before the first real call.
+must hold the live debt agent before the first real call. Checked 28 Sep, read
+only: that fallback is not on the current Vapi account (404), so a press fails
+until the variable is set; Vercel has `VAPI_PRIVATE_KEY` but not `CALL_PIN`,
+`VAPI_PHONE_NUMBER_ID` or `VAPI_DEBT_ASSISTANT_ID`; the Vapi account has no
+phone number and no SIP credential.
 
 **Money-spending actions need approval every time.** Buying numbers, placing
 live calls, anything that bills.

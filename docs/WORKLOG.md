@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-09-28
 
+### What a test on the owner's own Israeli number needs -- checked against Vercel and Vapi, read-only
+
+The owner: *"so what do we need to test using real number"*. Read-only checks, nothing created,
+nothing dialled. **Vercel (production):** `VAPI_PRIVATE_KEY` is set (feature.md said "not yet
+added"; corrected); `CALL_PIN`, `VAPI_PHONE_NUMBER_ID`, `VAPI_DEBT_ASSISTANT_ID` and
+`HOMIES_ALT_PAYMENT` are not; `NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID` is the live agent `a34f2564…`.
+**Vapi (the current account's key from `.env`):** the Call button's demo fallback `14d502fc…`
+answers 404, the live debt agent answers 200, and the account has no phone number and no SIP
+credential (only Cartesia). So a press fails until `VAPI_DEBT_ASSISTANT_ID` is set, whatever the
+line. Vercel keeps the private key sealed, so its account could not be compared by hash.
+
+**The list given to the owner:** from Omni, the line (Route A's four trunk values and the number it
+calls from, over the public internet; or Route B's real token, campaign and forward, whose our-half
+is not built); from the owner, the Israeli number, a PIN and a go per ring; from us, the line in
+Vapi (owner's go), the three Vercel values, `debt_demo_person.py on`, `bk_reset_attempts.py
+--apply` after each test and `off` at the end. What only a real phone can show: caller ID, no
+answer, voicemail, someone else picking up. Before residents, not before the owner's test: the
+attempt counting fix.
+
 ### Checked before raising it with Omni: two claims corrected, one open question settled
 
 The owner: *"make sure you have the correct information before we bring this up to
