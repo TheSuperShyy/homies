@@ -11,17 +11,19 @@ import { serverClient } from '@/lib/supabase-server';
 // waiting for.
 //
 // THREE GATES, ALL SERVER-SIDE
-//   1. CALL_PIN. The dashboard has had no login wall since 9 Aug (demo mode),
-//      so a bare button on a public page would let anyone with the URL ring a
-//      resident on Homies' number and Homies' bill. The PIN lives in Vercel
-//      and is typed next to the button; without it configured the button is
-//      not rendered at all.
+//   1. CALL_PIN. Written when the dashboard had no login wall (9-26 Aug); the
+//      wall is back (middleware.ts), and the PIN stays as the second,
+//      deliberate step before a resident's phone rings about money on Homies'
+//      bill. It lives in Vercel and is typed next to the button; without it
+//      configured the button is not rendered at all.
 //   2. press_call() in Postgres (migration 024): flips handed_over for that
 //      one resident and returns their composed call — or NULL if they owe
 //      nothing, are on do-not-call, or have had four attempts.
 //   3. VAPI_PHONE_NUMBER_ID. No number, no call. The Israeli number is being
 //      ordered (Omnitelecom); until its Vapi id is set here the page says so
-//      instead of pretending.
+//      instead of pretending. 28 Sep: if Omni offers only its dialer API and no
+//      SIP trunk, the press goes to their dialer instead of Vapi -- see
+//      docs/features/15-call-button/context.md.
 //
 // The variables handed to the agent are the same set the browser demo composes
 // (web/index.html variablesFor), so the prompt sees nothing new: the SQL view
@@ -30,6 +32,9 @@ import { serverClient } from '@/lib/supabase-server';
 // two hundred lines apart does not carry the branch through the sentence.
 
 const VAPI = 'https://api.vapi.ai';
+// The demo agent, kept as the fallback for now (owner, 28 Sep: "revert back to
+// the demo one for now"). Before the first real phone call, set
+// VAPI_DEBT_ASSISTANT_ID to the live account's debt agent.
 const DEBT_HE = '14d502fc-95a9-4fb1-8d93-944dd7e00211'; // Homies — Debt Follow-up (he), the August account
 
 // The office number and email are Homies' own, from docs/reference/homies-faq.txt;

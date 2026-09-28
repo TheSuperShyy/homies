@@ -621,6 +621,9 @@ one call waiting) and never guess, because a wrong match discloses one
 resident's debt to another. The trunk is still preferred. The decision, the
 questions for Omni and the build are in `docs/features/15-call-button/context.md`;
 their PDFs are in the gitignored `local/omnitelecom/`, never in the public tree.
+The Call button still falls back to the demo agent (the August account's) at the
+owner's word ("revert back to the demo one for now"): `VAPI_DEBT_ASSISTANT_ID`
+must hold the live debt agent before the first real call.
 
 **Money-spending actions need approval every time.** Buying numbers, placing
 live calls, anything that bills.

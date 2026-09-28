@@ -292,9 +292,9 @@ export default async function Debts({
                   <td className="mono num"
                       data-label={selected === 'all' ? t('debts.owed') : t('debts.owedIn', { month: selected })}>{r.owed ? shekels(r.owed) : '—'}</td>
                   {/* One press, one call, this resident. The PIN is typed
-                      every time on purpose: this page has no login, and the
-                      cost of a mistaken press is a resident's phone ringing
-                      about money. In owner view the row already is the whole
+                      every time on purpose: signing in lets you read this
+                      page, and the PIN is the second, deliberate step before
+                      a resident's phone rings about money. In owner view the row already is the whole
                       call; in apartment view it is too — the agent gets every
                       flat the owner owes on, so pressing on either row of a
                       two-flat owner places the same call. */}

@@ -44,12 +44,13 @@ Omni forwards the answered call to our Vapi SIP address; we identify the residen
 else caller number, else the one call waiting, and never guess; unanswered calls come from
 their call log. Eight questions for Omni, deal-breakers first.
 
-**Done now:** `dashboard/lib/call.ts` has no hard-coded agent id -- the phone call uses
-`VAPI_DEBT_ASSISTANT_ID` or the Voice page's `NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID`, else a clear
-error before `press_call` runs; the Voice page's debt tab hides when unset, as its comment always
-said. Stale "no login" comments fixed (the wall is back since 26 Aug); the feature's file path
-fixed; `dashboard/.env.example` lists the Call button's three variables. The PDFs move to the
-gitignored `local/omnitelecom/`.
+**Done now:** stale "no login" comments fixed (the wall is back since 26 Aug); the feature's
+file path fixed; `dashboard/.env.example` lists the Call button's three variables; the PDFs moved
+to the gitignored `local/omnitelecom/`. **Reverted the same morning, at the owner's word ("ok
+revert back to the demo one for now"):** removing the demo agent (`14d502fc…`, the August
+account's) as the Call button's and Voice page's fallback. `lib/call.ts` behaves exactly as
+before; a comment on the constant says it stays for now and that `VAPI_DEBT_ASSISTANT_ID` must be
+set to the live debt agent before the first real call.
 
 **Waiting on Omni** for the route; the build (the `assistant-request` answer, a pending-calls
 table, the button to their dialer, the call-log sync, attempt counting) starts with their answers.

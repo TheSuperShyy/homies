@@ -29,7 +29,7 @@ release 2 as decided on 25 Aug. Nothing dials on its own.
 | Needed | Where | State |
 |---|---|---|
 | An Israeli phone number in Vapi | `VAPI_PHONE_NUMBER_ID` in Vercel | being ordered from Omnitelecom; until set the button reads "no number yet". If Omni offers only its dialer API (28 Sep scenario), the press goes to their dialer instead: see context.md |
-| The live debt agent | `VAPI_DEBT_ASSISTANT_ID`, or `NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID` when empty | no hard-coded fallback since 28 Sep: unset means a clear error, never the August account's agent |
+| The live debt agent | `VAPI_DEBT_ASSISTANT_ID` in Vercel | unset, so the button falls back to the demo agent (the August account's `14d502fc…`), kept for now at the owner's word (28 Sep); set it to the live agent before the first real call |
 | The PIN | `CALL_PIN` in Vercel | owner sets it; nothing renders without it |
 | Vapi key on the server | `VAPI_PRIVATE_KEY` in Vercel | not yet added |
 | Homies' bank-transfer line | `HOMIES_ALT_PAYMENT` | demo text until Homies confirms |
