@@ -11,22 +11,45 @@ conversation that produced it.
 
 ## 2026-09-28
 
+### Checked before raising it with Omni: two claims corrected, one open question settled
+
+The owner: *"make sure you have the correct information before we bring this up to
+omnitelecom"*. Every claim was checked against its source: the two PDFs word by word, Vapi's docs
+and its API definitions (the SDK types), and Omnitelecom's own site.
+
+**Held:** the dialer document has one endpoint, add a number to an active campaign ("200 ... if
+not already present", 404 bad fields or token), and not one word on agents, queues, transfers,
+SIP, retries, hours, callbacks, removal or caller ID. The call log needs the login in every
+request, its example is plain http, and a row has no campaign and no `external_id`, so a row can
+only be matched by number and time. **Every value in both documents is a placeholder**: the token
+is `YOUR_CLIENT_TOKEN_HERE`, the campaign id is the textbook example uuid, the number is
+`1234567890`, the login is a sample address and a sample password. On Vapi: a plain SIP address needs
+"no authentication or SIP registration"; `x-` headers fill template variables; `assistant-request`
+within 7.5 s end to end; the US signalling IPs and ports match what memory held.
+
+**Corrected in place (the entry below, context.md, CONTEXT, HANDOVER):**
+1. "In their system a call is taken by an agent on an extension": the call log's one sample is an
+   *inbound* call. What an answered dialer call does is not in either document.
+2. The agent-login alternative: Vapi describes SIP REGISTER only for authenticating outbound calls
+   over a trunk, and every inbound instruction has the provider send the call to a Vapi address.
+   Not to be offered to Omni until Vapi confirms it or a test proves it.
+
+**Settled:** Vapi's API definition for the `assistant-request` reply carries `assistantOverrides`
+beside `assistantId`, so the live debt agent plus a resident's figures is a supported reply (the
+guide shows no example; the 28 Sep morning entry had it as unconfirmed). Omnitelecom's site lists
+SIP trunking (OmniSIP), so asking for a trunk asks for a product they sell. The question list in
+`docs/features/15-call-button/context.md` gained the real token and campaign, and whether the log
+can carry our id.
+
 ### "Can we do a debt call using just the docs?" -- no: they ring a number and log it, nothing puts our agent on the line
 
 The owner asked whether Omnitelecom's two documents are enough for a debt call. **No.** The
-dialer insert starts a call and the call log reports on it afterwards; neither says who is on the
-line when the resident picks up. In their system a call is taken by an agent on an extension
-(their sample log: extension 200, agent "test user"), so with the documents alone the resident
-reaches a person or nobody, never our agent. Both documents hold only placeholders
-(`YOUR_CLIENT_TOKEN_HERE`, a sample campaign id, a sample login): even the ringing needs a real
-token and campaign from Omni.
-
-**Found:** a second way for Omni to say yes to question 1. Instead of forwarding answered calls to
-our SIP address, they give us one agent login on the campaign and Vapi signs in as that agent: its
-SIP trunk credential takes a SIP REGISTER plan (`outboundAuthenticationPlan.sipRegisterPlan`,
-domain / username / realm; read in Vapi's SDK types, not in its guides). Untested with a dialer
-like theirs; added to `docs/features/15-call-button/context.md`. Nothing built, nothing sent,
-nothing dialled.
+dialer insert starts a call and the call log reports on it afterwards; neither says what happens
+when the resident picks up, and nothing in them sends a call to an outside system, so our agent is
+not on the line unless Omni sets that up. Both documents hold only placeholders: even the ringing
+needs a real token and campaign from Omni. (Corrected the same day, see above: this entry first
+read the call log's inbound sample as how their dialer works, and offered an agent login as a
+second way, which Vapi does not document.) Nothing built, nothing sent, nothing dialled.
 
 ### Omnitelecom's two API documents, and outbound if they will not give a SIP trunk
 

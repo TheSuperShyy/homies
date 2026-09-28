@@ -62,28 +62,39 @@ in who dials and whether our AI knows who picked up.
   call go to an outside SIP address; one attempt, no retries, calling hours;
   our id as a SIP header, or the resident's number as the caller; when a number
   leaves the campaign (there is no remove call); caller ID; answering machines;
-  the number format; https, a read-only user and recordings off for the call log.
+  the number format (their log sample mixes `05…` and `972…`); the real token
+  and campaign id; https, a read-only user and recordings off for the call log,
+  and whether the log can carry our `external_id` (today it has neither the
+  campaign nor our id, so a log row is matched by number and time only).
 - **Testing:** the owner has an Israeli number, so no code exception — a demo
   debtor on it in בר כוכבא 23 (`scripts/debt_demo_person.py on …`), attempts
   reset after each test (`scripts/bk_reset_attempts.py`), each ring on the
   owner's go.
 - **The two documents alone cannot make a debt call** (owner, 28 Sep: *"can we
   do a debt call using just the docs"*). The insert starts a call and the log
-  reports on it afterwards; neither says who is on the line when the resident
-  picks up. In their system a call is taken by an agent on an extension (their
-  own sample log: extension 200, agent "test user"), so without a setting on
-  Omni's side the resident reaches a person or nobody, never our agent. Both
-  documents also hold only placeholders (`YOUR_CLIENT_TOKEN_HERE`, a sample
-  campaign id, a sample login); even the ringing needs a real token and
-  campaign from Omni.
-- **A second way for Omni to say yes to the first question:** instead of
-  forwarding to an outside SIP address, give us one agent login (an extension)
-  on the campaign, and Vapi signs in as that agent. Vapi's SIP trunk credential
-  takes a SIP REGISTER plan (`outboundAuthenticationPlan.sipRegisterPlan`:
-  domain, username, realm; read in its SDK types 28 Sep). Untested with a
-  dialer like theirs: which number the call arrives under, and whether the
-  agent must also be marked available in their panel, are for one test call
-  and for Omni.
+  reports on it afterwards; neither says what happens when the resident picks
+  up (an agent, a queue, a recorded message), and nothing in them sends a call
+  to an outside system, so our agent is not on the line unless Omni sets that
+  up. The call log's one sample is an *inbound* call to an agent on an
+  extension; it says nothing about dialer calls. Both documents hold only
+  placeholders (`YOUR_CLIENT_TOKEN_HERE`, the textbook example uuid as the
+  campaign id, a sample number and login); even the ringing needs a real token
+  and campaign from Omni.
+- **Not to be put to Omni yet: an agent login instead of forwarding.** Vapi can
+  send a SIP REGISTER (`outboundAuthenticationPlan.sipRegisterPlan`: domain,
+  username, realm), but its API describes that only for authenticating outbound
+  calls over a trunk, and its inbound instructions all have the provider send
+  the call to a Vapi address. Whether our agent would receive calls sent to such
+  a login is undocumented: ask Vapi, or test, before offering it.
+- **Checked 28 Sep against Vapi's docs and API definitions:** a plain SIP
+  address takes calls with "no authentication or SIP registration"; `x-` headers
+  fill template variables, case-insensitive; `assistant-request` is answered
+  within 7.5 s end to end, and its reply type carries `assistantOverrides`
+  beside `assistantId`, so "the live debt agent plus this resident's figures" is
+  a supported reply. US signalling `sip.vapi.ai` (44.229.228.186,
+  44.238.177.138), UDP/TCP 5060, TLS 5061; media UDP 40000-60000 from changing
+  IPs. Omni lists SIP trunking (OmniSIP) among its products, so Route A asks
+  for something they sell.
 
 **Still open.** The no-repeat rule beyond four attempts, calling windows and a
 do-not-call UI (owner: follow-up); Homies' bank-transfer wording. **Answered
