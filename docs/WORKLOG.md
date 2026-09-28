@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-09-28
 
+### The Omni list finalized: ten items, each checked against both PDFs
+
+The owner: *"finalize the list make sure everything in the docs we have"*. The dialer-only list
+went through both PDFs once more: no item is answered by their documents, and nothing their
+documents raise is missing from it. Two additions over the nine-item draft: **billing** (how the
+dialer call and the forwarded leg are charged -- money surprises are the owner's standing
+concern) and **can a log row carry our `external_id`** (their log has neither campaign nor id, so
+today rows match by number and time only). One oddity deliberately left off the vendor list:
+their log request takes epoch milliseconds while the response sample shows seconds; empirical,
+one look at the magnitude settles it. The canonical ten items now live in
+`docs/features/15-call-button/context.md`; the English send-ready text is in the conversation.
+Nothing sent by me.
+
 ### The order flipped: try Omni's dialer first, the trunk only if they offer it
 
 Evening. After the questions were verified one by one against the sources (the owner: *"is this

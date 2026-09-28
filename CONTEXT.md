@@ -627,7 +627,8 @@ what happens when the resident answers, connect nothing to an outside system,
 and hold only placeholders (no real token, campaign or login). An agent login
 instead of forwarding is not documented by Vapi for receiving calls, so it is
 not to be offered to Omni until Vapi confirms it. The decision, the
-questions for Omni and the build are in `docs/features/15-call-button/context.md`;
+final ten-item list for Omni (28 Sep evening) and the build are in
+`docs/features/15-call-button/context.md`;
 their PDFs are in the gitignored `local/omnitelecom/`, never in the public tree.
 The Call button still falls back to the demo agent (the August account's) at the
 owner's word ("revert back to the demo one for now"): `VAPI_DEBT_ASSISTANT_ID`

@@ -64,14 +64,29 @@ in who dials and whether our AI knows who picked up.
   another's debt.** Unanswered calls reach us only through Omni's call log, read
   every few minutes. Their dialer must dial once, now, with no retries, or it
   breaks the 25 Aug rule that nothing auto-dials.
-- **What decides B** — ask Omni, deal-breakers first: can an answered campaign
-  call go to an outside SIP address; one attempt, no retries, calling hours;
-  our id as a SIP header, or the resident's number as the caller; when a number
-  leaves the campaign (there is no remove call); caller ID; answering machines;
-  the number format (their log sample mixes `05…` and `972…`); the real token
-  and campaign id; https, a read-only user and recordings off for the call log,
-  and whether the log can carry our `external_id` (today it has neither the
-  campaign nor our id, so a log row is matched by number and time only).
+- **The list to Omni — FINAL, 28 Sep evening** (checked once more against both
+  PDFs: nothing asked is answered in them, and nothing they raise is missed;
+  the one oddity deliberately left out is that their log request takes epoch
+  milliseconds while their response sample shows seconds — trivially detected
+  empirically once we have access):
+  1. A live token and campaign id — the documents hold example values only.
+  2. **Deal-breaker:** can an answered campaign call be forwarded to an
+     outside SIP address? We provide the address once confirmed.
+  3. One call per number, immediately, no automatic retries, only within
+     hours we define.
+  4. Our `external_id` as a custom SIP header on the forwarded call; if not,
+     the resident's number as the calling party on that leg.
+  5. When does a number leave the campaign so it can be called again; is
+     there a way to remove one (their doc has none, and 200 = added "if not
+     already present").
+  6. Which number the resident sees — it should be Homies' own.
+  7. Answering machines: detected and dropped, or forwarded as answered.
+  8. Number format for the insert: `05…` or `972…` (their log sample mixes
+     both).
+  9. Billing: how the dialer call and the forwarded leg are charged.
+  10. Call log: a read-only user, https, recordings off for our line, and can
+      a log row carry the `external_id` we sent (today it has neither the
+      campaign nor our id, so rows are matched by number and time only).
 - **Testing:** the owner has an Israeli number, so no code exception — a demo
   debtor on it in בר כוכבא 23 (`scripts/debt_demo_person.py on …`), attempts
   reset after each test (`scripts/bk_reset_attempts.py`), each ring on the
