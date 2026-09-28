@@ -65,7 +65,25 @@ in who dials and whether our AI knows who picked up.
   the number format; https, a read-only user and recordings off for the call log.
 - **Testing:** the owner has an Israeli number, so no code exception — a demo
   debtor on it in בר כוכבא 23 (`scripts/debt_demo_person.py on …`), attempts
-  reset after each test (`scripts/bk_reset_attempts.py`), each ring on his go.
+  reset after each test (`scripts/bk_reset_attempts.py`), each ring on the
+  owner's go.
+- **The two documents alone cannot make a debt call** (owner, 28 Sep: *"can we
+  do a debt call using just the docs"*). The insert starts a call and the log
+  reports on it afterwards; neither says who is on the line when the resident
+  picks up. In their system a call is taken by an agent on an extension (their
+  own sample log: extension 200, agent "test user"), so without a setting on
+  Omni's side the resident reaches a person or nobody, never our agent. Both
+  documents also hold only placeholders (`YOUR_CLIENT_TOKEN_HERE`, a sample
+  campaign id, a sample login); even the ringing needs a real token and
+  campaign from Omni.
+- **A second way for Omni to say yes to the first question:** instead of
+  forwarding to an outside SIP address, give us one agent login (an extension)
+  on the campaign, and Vapi signs in as that agent. Vapi's SIP trunk credential
+  takes a SIP REGISTER plan (`outboundAuthenticationPlan.sipRegisterPlan`:
+  domain, username, realm; read in its SDK types 28 Sep). Untested with a
+  dialer like theirs: which number the call arrives under, and whether the
+  agent must also be marked available in their panel, are for one test call
+  and for Omni.
 
 **Still open.** The no-repeat rule beyond four attempts, calling windows and a
 do-not-call UI (owner: follow-up); Homies' bank-transfer wording. **Answered

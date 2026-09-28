@@ -618,7 +618,12 @@ SIP trunk. Then one press sends one number to their dialer, and it works only
 if Omni can forward the answered call to our Vapi SIP address; the agent must
 identify the resident (our id as a SIP header, else the caller number, else the
 one call waiting) and never guess, because a wrong match discloses one
-resident's debt to another. The trunk is still preferred. The decision, the
+resident's debt to another. The trunk is still preferred. The two documents
+alone cannot make a debt call: they ring a number and log it, say nothing about
+who answers (their system hands a call to an agent on an extension), and hold
+only placeholders, no real token or campaign. A second way for Omni to say yes
+is one agent login that our agent signs in with (Vapi's SIP REGISTER plan),
+untested. The decision, the
 questions for Omni and the build are in `docs/features/15-call-button/context.md`;
 their PDFs are in the gitignored `local/omnitelecom/`, never in the public tree.
 The Call button still falls back to the demo agent (the August account's) at the

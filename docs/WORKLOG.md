@@ -11,11 +11,28 @@ conversation that produced it.
 
 ## 2026-09-28
 
+### "Can we do a debt call using just the docs?" -- no: they ring a number and log it, nothing puts our agent on the line
+
+The owner asked whether Omnitelecom's two documents are enough for a debt call. **No.** The
+dialer insert starts a call and the call log reports on it afterwards; neither says who is on the
+line when the resident picks up. In their system a call is taken by an agent on an extension
+(their sample log: extension 200, agent "test user"), so with the documents alone the resident
+reaches a person or nobody, never our agent. Both documents hold only placeholders
+(`YOUR_CLIENT_TOKEN_HERE`, a sample campaign id, a sample login): even the ringing needs a real
+token and campaign from Omni.
+
+**Found:** a second way for Omni to say yes to question 1. Instead of forwarding answered calls to
+our SIP address, they give us one agent login on the campaign and Vapi signs in as that agent: its
+SIP trunk credential takes a SIP REGISTER plan (`outboundAuthenticationPlan.sipRegisterPlan`,
+domain / username / realm; read in Vapi's SDK types, not in its guides). Untested with a dialer
+like theirs; added to `docs/features/15-call-button/context.md`. Nothing built, nothing sent,
+nothing dialled.
+
 ### Omnitelecom's two API documents, and outbound if they will not give a SIP trunk
 
 The owner put two Omnitelecom PDFs in the repo root (27 Sep evening) and asked what they do:
 *"i was told that when we do outbound we just call the api"*, then *"what if they cant give trunk
-sip and insisted on using the docs provided to us"*, then that tests should ring his own
+sip and insisted on using the docs provided to us"*, then that tests should ring their own
 **Israeli** number.
 
 **The documents.** A dialer campaign API (`POST https://api.tokomni.cc/api/campaign/insert/`,
