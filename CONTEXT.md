@@ -613,7 +613,14 @@ one row per resident; `v_debt_call_queue` underneath it is per apartment per
 month and a runner must never iterate it). Placing real calls needs the four
 Omnitelecom SIP values and Homies' company documents, and a real outbound
 campaign needs explicit approval every time — prior approval never carries
-over.
+over. **28 Sep:** Omni may offer only their own dialer and call-log APIs, not a
+SIP trunk. Then one press sends one number to their dialer, and it works only
+if Omni can forward the answered call to our Vapi SIP address; the agent must
+identify the resident (our id as a SIP header, else the caller number, else the
+one call waiting) and never guess, because a wrong match discloses one
+resident's debt to another. The trunk is still preferred. The decision, the
+questions for Omni and the build are in `docs/features/15-call-button/context.md`;
+their PDFs are in the gitignored `local/omnitelecom/`, never in the public tree.
 
 **Money-spending actions need approval every time.** Buying numbers, placing
 live calls, anything that bills.

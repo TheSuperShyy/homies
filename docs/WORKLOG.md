@@ -9,6 +9,51 @@ conversation that produced it.
 
 ---
 
+## 2026-09-28
+
+### Omnitelecom's two API documents, and outbound if they will not give a SIP trunk
+
+The owner put two Omnitelecom PDFs in the repo root (27 Sep evening) and asked what they do:
+*"i was told that when we do outbound we just call the api"*, then *"what if they cant give trunk
+sip and insisted on using the docs provided to us"*, then that tests should ring his own
+**Israeli** number.
+
+**The documents.** A dialer campaign API (`POST https://api.tokomni.cc/api/campaign/insert/`,
+token in the URL, `{external_id, campaign_id, number}`; their dialer rings the numbers in a
+campaign; 200 added / 404; no outcome callback, no remove call) and a call log API (`POST
+app.tokomni.com/api/calllogprocesses/calllog_login`, email and password in every request,
+answered / not answered, durations, recording entries; the example is plain http). Neither
+carries the SIP values Vapi needs; neither says where an answered call goes.
+
+**What already existed (surveyed):** the Call button is built and places a real Vapi call; it is
+switched off only because `CALL_PIN` and `VAPI_PHONE_NUMBER_ID` are unset. But its debt-agent
+fallback was the August account's agent (`14d502fc…`), so a press with `VAPI_DEBT_ASSISTANT_ID`
+unset would have rung a resident with an agent on an account we no longer use. And the
+end-of-call writer never bumps attempts: only the agent's own `log_call_outcome` does, so
+unanswered, busy and voicemail calls are never counted.
+
+**Vapi, read online:** a plain SIP address (`sip:<name>@sip.vapi.ai`) takes calls with no login;
+with no fixed assistant our server answers `assistant-request` within ~7.5 s; custom SIP headers
+fill template variables (`x-first_name` -> `{{first_name}}`). Not confirmed: whether the reply
+may name an assistant plus `variableValues`, and whether headers reach the server at request
+time -- our own test call settles both.
+
+**Plan approved (docs/features/15-call-button/context.md):** Route A preferred (Vapi dials over
+Omni's trunk, already built). Route B if Omni offers only the dialer: one press sends one number;
+Omni forwards the answered call to our Vapi SIP address; we identify the resident by header,
+else caller number, else the one call waiting, and never guess; unanswered calls come from
+their call log. Eight questions for Omni, deal-breakers first.
+
+**Done now:** `dashboard/lib/call.ts` has no hard-coded agent id -- the phone call uses
+`VAPI_DEBT_ASSISTANT_ID` or the Voice page's `NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID`, else a clear
+error before `press_call` runs; the Voice page's debt tab hides when unset, as its comment always
+said. Stale "no login" comments fixed (the wall is back since 26 Aug); the feature's file path
+fixed; `dashboard/.env.example` lists the Call button's three variables. The PDFs move to the
+gitignored `local/omnitelecom/`.
+
+**Waiting on Omni** for the route; the build (the `assistant-request` answer, a pending-calls
+table, the button to their dialer, the call-log sync, attempt counting) starts with their answers.
+
 ## 2026-09-27
 
 ### "Too robotic" -- the casual register, and a rewrite that names what was wrong (epoch 69)
