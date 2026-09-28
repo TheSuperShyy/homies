@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-09-28
 
+### The order flipped: try Omni's dialer first, the trunk only if they offer it
+
+Evening. After the questions were verified one by one against the sources (the owner: *"is this
+true at all did we check triple check"* -- yes, each held; two fixes: question 3's caller-ID
+wording could be read as what the resident sees, and the translation had dropped item 8, the live
+token / read-only https log user / recordings off), the owner: *"ok so lets try that first instead
+of escalating on our preferred setup"*. So the message to Omni now asks to use their **dialer API**
+(Route B), and no trunk is requested; Route A returns only if Omni offers it themselves. Confirmed
+to the owner beforehand that nothing was ever tried against Omni -- no dialer insert, no log call,
+no trunk -- because the documents hold only placeholders and every ring costs money and needs a go.
+The English message was redrafted dialer-only (nine items, deal-breaker first). Even to try,
+Omni must send a live token and campaign id and confirm the forward; our half (the
+`assistant-request` answer, the pending-calls table, the SIP address) is the build that makes
+their answers usable the day they arrive.
+
 ### What a test on the owner's own Israeli number needs -- checked against Vercel and Vapi, read-only
 
 The owner: *"so what do we need to test using real number"*. Read-only checks, nothing created,

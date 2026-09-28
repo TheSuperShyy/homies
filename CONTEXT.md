@@ -618,7 +618,10 @@ SIP trunk. Then one press sends one number to their dialer, and it works only
 if Omni can forward the answered call to our Vapi SIP address; the agent must
 identify the resident (our id as a SIP header, else the caller number, else the
 one call waiting) and never guess, because a wrong match discloses one
-resident's debt to another. The trunk is still preferred. The two documents
+resident's debt to another. **28 Sep evening: the owner flipped the order** ("lets try that
+first instead of escalating on our preferred setup") — the ask to Omni is now
+their dialer API, and a trunk is not requested; it returns only if Omni offers
+it. The two documents
 alone cannot make a debt call: they ring a number and log it, say nothing about
 what happens when the resident answers, connect nothing to an outside system,
 and hold only placeholders (no real token, campaign or login). An agent login

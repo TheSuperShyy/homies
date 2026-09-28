@@ -44,9 +44,15 @@ answered / not answered, durations, recording entries). The owner was told
 "for outbound we just call the api". Both routes do call an API; they differ
 in who dials and whether our AI knows who picked up.
 
-- **Route A, preferred:** the button calls Vapi, Vapi dials over Omni's SIP
+- **Route A:** the button calls Vapi, Vapi dials over Omni's SIP
   trunk. Built already; the agent knows the resident from the first second;
-  Vapi reports no-answer, busy and voicemail itself.
+  Vapi reports no-answer, busy and voicemail itself. Was the preferred ask
+  until 28 Sep evening — see the order flip below.
+- **28 Sep evening, the owner flipped the order:** *"lets try that first
+  instead of escalating on our preferred setup"* — the message to Omni asks to
+  use their dialer API (Route B), not for a trunk. The trunk is no longer
+  requested; it comes back only if Omni offers it themselves. Route B's
+  technical shape and deal-breakers are unchanged.
 - **Route B, only if Omni offers no trunk:** the button sends one number to
   Omni's dialer (one press = one number = one ring; "campaign" is just their
   list). When the resident answers, Omni must forward the call to our Vapi SIP
