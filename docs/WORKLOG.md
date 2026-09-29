@@ -39,9 +39,28 @@ one question, amount once, no echo, no deed claims, money only after the name, h
 only in the closing) -- all hold. Recorded caveat: a Claude replay checks rules, not register;
 the register verdict is the owner's ear.
 
-**NOT deployed.** The owner's standing rule: he sees changed lines before any tone change ships.
-The old-vs-new lines with glosses went to him in chat; `--apply` (inbound + `vapi_set_voice`,
-then debt) waits for his yes.
+**Evening, after the owner read the lines.** Three more changes on his words. (1) His test call
+(10:14, ticket 1336 on בר כוכבא 23) answered the opener with "hi" and Michael introduced himself
+all over again -- so both scripts got a greet-back-once line: the opener already greeted and said
+who you are; a hello gets a short hello back, never a second introduction or another בוקר טוב
+(the voice twin of his WhatsApp greeting table). (2) His no-fixed-messages rule ("i told you i
+dont want fix messages"): the two closings from the morning were still dictated sentences, so
+they were freed -- Michael closes in his own words and only the last two words are fixed, יום
+טוב, ולהתראות, the hang-up trigger (backstop: a close without them is ended by the silence
+timeout, whose line carries them). (3) The idle lines became a varied three-line patient set and
+the "הלו? שומעים אותי?" check came out (Vapi doesn't say whether it picks in order or at random,
+so a mixed-intent set risks the impatient line first; a dead line is closed by the silence
+goodbye anyway). Openers stay fixed -- the one exception, like the WhatsApp menu. Checks again
+green: facts 13, extractions 4,958 / 4,825, openings byte-identical.
+
+**Deploy: HALF DONE, STOPPED BY THE PERMISSION GATE.** `vapi_sync.py inbound --apply` went
+through (read back: new prompt live, 7 tools, the new idle set) -- and then the gate denied the
+next command, so **the inbound agent is live with the STOCK VOICE (Eyal `a976c076`), not the Ido
+clone**, because an inbound sync always resets the voice, and **the debt agent still runs the
+old prompt**. The two commands the owner runs from Git Bash to finish:
+`python scripts/vapi_set_voice.py --apply` (urgent -- the voice), then
+`N8N_BASE_URL= python scripts/vapi_sync.py debt --apply`. Then one browser call each on the
+Voice page is the register verdict, and the transcripts get read as today's were.
 
 ### The full comparison written out for a document generator
 

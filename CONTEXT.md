@@ -1456,7 +1456,13 @@ speech, and the fixed lines outside the prompts (idle, silence goodbye, tool
 waits) were warmed in the same pass -- they were the most robotic thing in the
 transcripts and no prompt edit can reach them. Voice tone changes ship only
 after the owner reads the changed lines; his ear on a browser call is the only
-register test that counts (a Claude replay checks rules, not tone).
+register test that counts (a Claude replay checks rules, not tone). His
+no-fixed-messages rule covers voice too (29 Sep evening): no dictated
+sentences in the scripts — the closings are the model's own words with only
+the hang-up tail יום טוב, ולהתראות fixed; the platform lines that play where
+no model turn exists (idle, tool wait, silence goodbye) are the narrow
+exception and get variety instead, and the openers stay fixed like the
+WhatsApp menu.
 
 **Do not promise routing that does not exist.** A resident is told their ticket
 goes "לצות", never to a named department. The four Chatwoot teams exist and are

@@ -254,13 +254,20 @@ BASE = {
     # a line with no caller ID, and this is the worst possible turn to guess in
     # — the caller has already gone quiet once.
     "messagePlan": {
-        # Warmer first probe on 2 Sep, warmer again on 29 Sep (the owner heard
-                # the calls as robotic, and this line was in nearly every
-                # transcript). The second stays functional — after ~24s of
-                # nothing a real line-check is honest, and it is deliberately
-                # not softened: a dead-line check should sound like one. Both
-                # still gender-free, per the note above.
-                "idleMessages": ["אין לחץ, אני כאן, קחו את הזמן.", "הלו? שומעים אותי?"],
+        # Warmer first probe on 2 Sep. 29 Sep, on the owner's no-fixed-messages
+                # rule: these CANNOT be the model's own words (no turn exists in
+                # silence), so the honest fix is a varied set with one intent —
+                # three patient lines, and Vapi picks per prompt. The old
+                # "הלו? שומעים אותי?" line-check came OUT: Vapi does not say
+                # whether it picks in order or at random, so a mixed-intent set
+                # risks the impatient line playing first, and a truly dead line
+                # is already closed by silenceTimeoutMessage below. All
+                # gender-free, per the note above.
+                "idleMessages": [
+                    "אין לחץ, אני כאן, קחו את הזמן.",
+                    "קחו את הזמן, אני איתכם.",
+                    "אני פה, כשתהיו מוכנים תגידו.",
+                ],
         # Eight seconds. Long enough that someone reading an apartment number
         # off a door is not interrupted, short enough that it lands before the
         # caller concludes the call has dropped.
