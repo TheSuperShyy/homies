@@ -89,6 +89,13 @@ old prompt**. The two commands the owner runs from Git Bash to finish:
 `N8N_BASE_URL= python scripts/vapi_sync.py debt --apply`. Then one browser call each on the
 Voice page is the register verdict, and the transcripts get read as today's were.
 
+**Finished 14:27 UTC on the owner's "run it".** `vapi_set_voice.py --apply` answered a Vapi 504,
+but the read-back showed the PATCH had landed (inbound on the Ido clone, updated 14:26:59), so it
+was not retried; `vapi_sync.py debt --apply` pushed the debt script (4,825 chars, equal to the
+repo). Both agents read back with the greet-once line, the freed closing, the three idle lines,
+7 tools; the voice script's dry run reports nothing to do on either agent. A 504 is not a
+failure until the read-back says so.
+
 ### The full comparison written out for a document generator
 
 The owner: *"i will send this to gemini to create me a docs so give every detailss"*. New
