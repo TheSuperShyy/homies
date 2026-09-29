@@ -193,9 +193,15 @@ The owner asked what UChat is, what it costs, and how much work it would take.
 UChat (uchat.au) is a no-code chatbot builder, ManyChat's direct rival: flows
 drawn as boxes, 13 channels, an "External Request" step, inbound webhooks, an
 API (send-text/send-node added later per their feedback board), an AI agent
-on **OpenAI, DeepSeek or xAI with your own key (no Gemini, which this bot runs
-on)**, and a live-chat inbox where a staff reply pauses the bot for **30
-minutes**. WhatsApp connects straight to Meta's Cloud API through the
+on your own key, and a live-chat inbox where a staff reply pauses the bot for
+**30 minutes**. *Corrected 29 Sep, from their API spec
+(`default-api-docs/api-docs.json`):* the agent's provider list is openai,
+deepseek, xai, claude, **gemini**, groq and ainvented, so **Gemini is
+supported** even though their training page names only three; the first
+version of this section said it was not. The spec also shows what the API
+cannot do: there is no endpoint that creates an AI agent or a flow (list,
+info, provider/model and MCP attachment only), so both are built in their UI.
+`pause-bot` takes any number of minutes. WhatsApp connects straight to Meta's Cloud API through the
 business's own Meta app; UChat adds no per-message fee. Nothing in their docs
 or reviews mentions Hebrew or right-to-left.
 
@@ -212,10 +218,13 @@ workflow kept by 25 patch scripts, a 19.6k-character prompt tuned on Gemini,
 and a regression gate that runs the exact live n8n code — which cannot run
 inside UChat. Chatwoot is already the inbox (bot handoff, team paging,
 handover ladder, labels, four department teams), so UChat would *replace* it.
-- **Everything into UChat: ~4-6 weeks.** Re-tuning the Hebrew voice on
-  OpenAI, rebuilding the guards in flows (the reply checks can't be — UChat's
-  AI step gives no check-and-retry before sending), and losing the gate and
-  the history.
+- **Everything into UChat: ~3-5 weeks** (first estimated at 4-6 when Gemini
+  seemed unavailable). The prompt ports to the same model, but UChat's agent
+  wrapper still changes behaviour (it summarises after 10 messages and gets
+  none of the per-turn facts n8n injects: time of day, mid-conversation,
+  greeting), so some re-tuning remains; the guards are rebuilt in flows where
+  possible (the reply checks can't be — UChat's AI step gives no
+  check-and-retry before sending); the gate and the history are lost.
 - **UChat as the inbox only, n8n stays the brain: ~1.5-2.5 weeks** of
   rewiring every Chatwoot-shaped node, for roughly what Chatwoot gives today.
   Its send API and forward-every-message behaviour are unverified.
@@ -226,6 +235,18 @@ platform. If Homies insists, the inbox-only route, and only after UChat's
 free 14-day trial proves, on a separate test number: Hebrew in the inbox, the
 send-text API, a catch-all forward, a pause that lasts the whole conversation,
 group routing, and the billing currency.
+
+**The trial, started 29 Sep.** The owner opened the account (workspace
+"clix"), made a Manage-Flow API key (in `.env` as `Uchat_api_key`; read-only
+calls work: `/me`, `/flow/ai-agents`, empty bot) and chose a **look-and-feel
+copy first: Gemini, no tools**, so the copy reaches no data at all. Its
+prompt is the live one byte for byte (sha 8afa16824480) plus a short demo
+note: no tools, say plainly the action is unavailable in the demo, never
+invent numbers, amounts, dates or links — because a tool-less bot invents
+deeds, the exact 27 Sep bug. The paste-ready file is the gitignored
+`local/uchat/agent-prompt.txt`. The agent and the menu flow are built in
+UChat's UI by the owner; model and limits are then set through the API.
+Channel: the web chat widget only; no WhatsApp number is connected.
 
 ## 16 Sep — the client's review: no numbers, no advice; a private fault is theirs
 

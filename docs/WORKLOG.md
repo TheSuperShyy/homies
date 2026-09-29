@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-09-29
 
+### UChat trial started: a look-and-feel copy of the bot, Gemini, no tools; "no Gemini" corrected
+
+The owner opened a UChat trial and made an API key (*"lets try and replicate the chatbot in
+uchat"*). The key sits in `.env` as `Uchat_api_key` (Manage Flow only, at our advice); read-only
+calls confirm it and show an empty bot. **Their API spec (`/default-api-docs/api-docs.json`, 240
+paths) corrected this morning's write-up:** the agent's providers include **gemini** (also claude,
+groq), so the model gap was wrong; and no endpoint creates an AI agent or a flow, so both are made
+in their UI while model, limits, MCP tools, agent groups, sending and pausing are API-reachable.
+The move-everything estimate drops to ~3-5 weeks. Owner's choices, asked: **Gemini** (same model
+as the live bot, a key the owner creates and pays) and **no tools first** (reaches no data). The
+copy's prompt is the live one byte for byte (8afa16824480) plus a demo note forbidding invented
+numbers and deeds -- a tool-less bot invents actions, the 27 Sep bug -- written to the gitignored
+`local/uchat/agent-prompt.txt`. Channel: web widget only; no WhatsApp number connected, because
+connecting one moves its messages instantly (21 Aug). Live menu read from n8n for the copy:
+greeting + "👋 במה אפשר לעזור?" and three buttons. Nothing in the live bot changed.
+
 ### UChat evaluated: what it is, what it costs, how much work -- recommended against moving
 
 The owner: *"lets investigate uchat, what it is, pricing and how much work it will take"*.
@@ -18,12 +34,12 @@ Researched read-only from UChat's pricing, live-chat, cloud-API, AI-agent and AP
 independent reviews (SetSmart, Chatimize) and direct counts in the repo; nothing touched.
 
 **Found:** a no-code flow builder (ManyChat's rival) with an AI agent on OpenAI/DeepSeek/xAI and
-your own key -- **no Gemini**, which the bot runs on -- and a live-chat inbox whose pause lasts
+your own key -- *said "no Gemini" here; wrong, corrected the same day in the entry above* -- and a live-chat inbox whose pause lasts
 30 minutes per staff reply. Business plan $15/mo yearly (~$29 monthly), 1,000 contacts and 5
 seats; contacts are everyone ever talked to. For Homies: ~$80-95/mo with ~10 seats, ~$125-140
 with all ~19 staff, plus the model and Meta's fees. No Hebrew/RTL mention anywhere.
 
-**Estimated:** everything into UChat ~4-6 weeks (Hebrew re-tune on another model, guards rebuilt
+**Estimated:** everything into UChat ~4-6 weeks, *revised to ~3-5 above* (Hebrew re-tune on another model, guards rebuilt
 in flows where possible, the regression gate lost -- it runs the exact live n8n code); UChat as
 the inbox only ~1.5-2.5 weeks of rewiring the Chatwoot-shaped nodes, for about what Chatwoot
 already does. **Recommended: don't move**; if Homies insists, inbox-only after a free-trial

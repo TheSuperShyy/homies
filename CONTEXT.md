@@ -337,11 +337,14 @@ missing was wrong on 20 Aug because the check used pointed לְךָ and the prom
 writes *lekha*. Unpointed, pointed, and transliterated are three different
 strings for one word.
 
-**UChat was evaluated on 29 Sep and not adopted.** It is a no-code flow
-builder whose AI agent cannot run Gemini, whose AI step gives no check before a
-reply goes out, and whose inbox would replace Chatwoot rather than add to it:
-~4-6 weeks to move everything, ~1.5-2.5 weeks to swap only the inbox, for
-roughly what Chatwoot already does. Cost for Homies ~$80-140/month depending on
+**UChat was evaluated on 29 Sep and not adopted; a trial copy is being
+built.** It is a no-code flow builder whose AI step gives no check before a
+reply goes out and whose inbox would replace Chatwoot rather than add to it.
+It does run Gemini (their API spec; the first write-up said it did not):
+~3-5 weeks to move everything, ~1.5-2.5 weeks to swap only the inbox, for
+roughly what Chatwoot already does. The owner's trial copy runs the live prompt
+on Gemini with no tools and a demo note, on the web widget only; never connect
+a WhatsApp number to it. Cost for Homies ~$80-140/month depending on
 seats. Details and the trial checklist, should Homies insist:
 `docs/features/11-whatsapp-bot/context.md`, "29 Sep".
 
