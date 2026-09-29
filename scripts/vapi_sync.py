@@ -254,11 +254,13 @@ BASE = {
     # a line with no caller ID, and this is the worst possible turn to guess in
     # — the caller has already gone quiet once.
     "messagePlan": {
-        # Warmer first probe on 2 Sep: the first thing a hesitating caller
-                # hears should read as patience, not impatience. The second stays
-                # functional — after ~24s of nothing a real line-check is honest.
-                # Both still gender-free, per the note above.
-                "idleMessages": ["אני עדיין כאן, קחו את הזמן.", "הלו? שומעים אותי?"],
+        # Warmer first probe on 2 Sep, warmer again on 29 Sep (the owner heard
+                # the calls as robotic, and this line was in nearly every
+                # transcript). The second stays functional — after ~24s of
+                # nothing a real line-check is honest, and it is deliberately
+                # not softened: a dead-line check should sound like one. Both
+                # still gender-free, per the note above.
+                "idleMessages": ["אין לחץ, אני כאן, קחו את הזמן.", "הלו? שומעים אותי?"],
         # Eight seconds. Long enough that someone reading an apartment number
         # off a door is not interrupted, short enough that it lands before the
         # caller concludes the call has dropped.
@@ -280,7 +282,10 @@ BASE = {
         # closes in silence, and the caller cannot tell a hangup from a fault.
         # Plural since 16 Sep, like every other line here: the caller's gender
         # is unknown and this is spoken to half of them wrongly otherwise.
-        "silenceTimeoutMessage": "נראה שאין קליטה. תודה שהתקשרתם להומיז, יום טוב, ולהתראות.",
+        # 29 Sep: softened, and "תודה שהתקשרתם" dropped — BASE is shared, and on
+        # the debt agent's OUTBOUND calls nobody called us; the old line thanked
+        # half its listeners for a call they never made.
+        "silenceTimeoutMessage": "נראה שאין קליטה, אז נסיים בינתיים. יום טוב, ולהתראות.",
     },
 }
 

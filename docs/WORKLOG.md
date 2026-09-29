@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-09-29
 
+### "Nicer and more verbal" -- the voice agents get the casual register (edited, NOT yet deployed)
+
+The owner: *"I wish the Homies bot would be a little nicer and more verbal, it sounds robotic"*
+-- *"the voice agent"*, and asked which: **both**. The last 12 real browser calls (read-only)
+showed it concretely: the same stiff closing on every call, canned hold lines repeated verbatim,
+the debt opener a one-breath data dump, a clerk verification line, an echo ("תודה שסיפרתם...").
+Neither voice prompt carried any register instruction beyond "דבר כמו בן אדם חם וטבעי", and the
+stiffest lines (idle, goodbye-on-silence, tool-wait) are fixed lines in `vapi_sync.py` /
+`vapi_tools.py`, unreachable from any prompt.
+
+**Edited, reshaping existing sentences, no new rulebook** (both agents are "open" by owner
+decision): the 27 Sep WhatsApp register spoken aloud in both register lines (eye level, warm and
+light, everyday words, still polite, no slang, not a מוקד reading off a page; debt adds "the
+warmth is the point in a call nobody expected"); inbound gets the friend's-reaction beat and
+"short is not curt"; debt gets a human beat after מה שלומכם, reason split from details (not one
+breath), and the opening's name question named as the only verification; both closings warmed
+(שמחתי לעזור / תודה על הזמן ועל הסבלנות) with the hang-up words unchanged. Config: idle line 1
+is now "אין לחץ, אני כאן, קחו את הזמן." (line 2 kept on purpose -- a dead-line check should
+sound like one), the silence goodbye dropped "תודה שהתקשרתם" (BASE is shared and debt calls are
+outbound), tool waits are "רגע, אני רושם את זה." / "שנייה, אני בודק לכם.".
+
+**Checked:** `facts_check.py` still exactly 13 missing; dry runs extract 4,827 / 4,665 chars
+(openings byte-identical, 7 tools on the Supabase function, debt voice the Ido clone); a Claude
+replay of the hard cases on the new text (wrong person, refused ticket, leak, wallet of rules:
+one question, amount once, no echo, no deed claims, money only after the name, hang-up words
+only in the closing) -- all hold. Recorded caveat: a Claude replay checks rules, not register;
+the register verdict is the owner's ear.
+
+**NOT deployed.** The owner's standing rule: he sees changed lines before any tone change ships.
+The old-vs-new lines with glosses went to him in chat; `--apply` (inbound + `vapi_set_voice`,
+then debt) waits for his yes.
+
 ### The full comparison written out for a document generator
 
 The owner: *"i will send this to gemini to create me a docs so give every detailss"*. New

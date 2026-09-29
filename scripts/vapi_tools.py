@@ -249,7 +249,7 @@ def _open_request(location):
         props,
         ["description"],
         wait=True,
-        waiting="רגע, אני רושם.",
+        waiting="רגע, אני רושם את זה.",
     )
 
 
@@ -633,7 +633,7 @@ INTAKE_TOOLS = [
         wait=True,
         # Checking, not writing — the caller asked a question and nothing is
         # being recorded, so a line about writing would be a small lie.
-        waiting="רגע, אני בודק.",
+        waiting="שנייה, אני בודק לכם.",
     ),
     _fn(
         "get_balance",
@@ -653,7 +653,7 @@ INTAKE_TOOLS = [
         },
         [],
         wait=True,
-        waiting="רגע, אני בודק.",
+        waiting="שנייה, אני בודק לכם.",
     ),
     # 16 Sep: the client's own website, turned into a lookup. Inbound only --
     # the debt agent calls about money and a services catalogue is not its
@@ -668,7 +668,7 @@ INTAKE_TOOLS = [
         # Sync, like the other two reads: the caller asked a question and there
         # is nothing for the agent to say until the answer is back.
         wait=True,
-        waiting="רגע, אני בודק.",
+        waiting="שנייה, אני בודק לכם.",
     ),
 ]
 

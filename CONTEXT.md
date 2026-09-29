@@ -1449,6 +1449,15 @@ elsewhere would reject is a defect *now*, not when it fires. Same family as
 "the exception lives inside the rule it overrides", one step earlier — the
 example IS the rule the model reads first.
 
+**The register is one register, chat and voice (29 Sep).** The owner heard the
+voice agents as robotic, same words as the 27 Sep WhatsApp complaint, so both
+voice prompts now carry the same casual-polite-no-slang register adapted for
+speech, and the fixed lines outside the prompts (idle, silence goodbye, tool
+waits) were warmed in the same pass -- they were the most robotic thing in the
+transcripts and no prompt edit can reach them. Voice tone changes ship only
+after the owner reads the changed lines; his ear on a browser call is the only
+register test that counts (a Claude replay checks rules, not tone).
+
 **Do not promise routing that does not exist.** A resident is told their ticket
 goes "לצות", never to a named department. The four Chatwoot teams exist and are
 empty, and nothing routes to them automatically, so a sentence naming a
