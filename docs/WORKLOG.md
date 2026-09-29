@@ -9,6 +9,27 @@ conversation that produced it.
 
 ---
 
+## 2026-09-29
+
+### UChat evaluated: what it is, what it costs, how much work -- recommended against moving
+
+The owner: *"lets investigate uchat, what it is, pricing and how much work it will take"*.
+Researched read-only from UChat's pricing, live-chat, cloud-API, AI-agent and API docs, two
+independent reviews (SetSmart, Chatimize) and direct counts in the repo; nothing touched.
+
+**Found:** a no-code flow builder (ManyChat's rival) with an AI agent on OpenAI/DeepSeek/xAI and
+your own key -- **no Gemini**, which the bot runs on -- and a live-chat inbox whose pause lasts
+30 minutes per staff reply. Business plan $15/mo yearly (~$29 monthly), 1,000 contacts and 5
+seats; contacts are everyone ever talked to. For Homies: ~$80-95/mo with ~10 seats, ~$125-140
+with all ~19 staff, plus the model and Meta's fees. No Hebrew/RTL mention anywhere.
+
+**Estimated:** everything into UChat ~4-6 weeks (Hebrew re-tune on another model, guards rebuilt
+in flows where possible, the regression gate lost -- it runs the exact live n8n code); UChat as
+the inbox only ~1.5-2.5 weeks of rewiring the Chatwoot-shaped nodes, for about what Chatwoot
+already does. **Recommended: don't move**; if Homies insists, inbox-only after a free-trial
+checklist on a separate number. Full write-up: `docs/features/11-whatsapp-bot/context.md`,
+"29 Sep". The first seat estimate (~10 seats only) was widened after HANDOVER's ~19 staff.
+
 ## 2026-09-28
 
 ### The Omni list finalized: ten items, each checked against both PDFs

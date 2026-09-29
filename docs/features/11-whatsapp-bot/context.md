@@ -187,6 +187,46 @@ shapes, and the inbound tap carries only the row's **title**, which is why
 the titles are the routing table (`TAP_KIND` in the live `Sort`). Whether to
 flip the account to Hebrew for a seven-row list is open with the owner.
 
+## 29 Sep — UChat evaluated: a lateral move, not a step up
+
+The owner asked what UChat is, what it costs, and how much work it would take.
+UChat (uchat.au) is a no-code chatbot builder, ManyChat's direct rival: flows
+drawn as boxes, 13 channels, an "External Request" step, inbound webhooks, an
+API (send-text/send-node added later per their feedback board), an AI agent
+on **OpenAI, DeepSeek or xAI with your own key (no Gemini, which this bot runs
+on)**, and a live-chat inbox where a staff reply pauses the bot for **30
+minutes**. WhatsApp connects straight to Meta's Cloud API through the
+business's own Meta app; UChat adds no per-message fee. Nothing in their docs
+or reviews mentions Hebrew or right-to-left.
+
+**Price:** Business is $15/mo billed yearly (~$29 monthly) for 1,000 contacts
+and 5 seats; +$5 per 1,000 contacts to 5,000, +$20 per 5,000 after; seats
+$5 each on Business. Contacts are everyone the bot has ever talked to, so
+Homies (~7,400 residents) lands near **$80-95/month with ~10 seats, or
+$125-140 with all ~19 staff seated**, plus the model bill and Meta's fees,
+which exist today too.
+
+**The work, measured against what exists:** the bot is a ~50-node n8n
+workflow kept by 25 patch scripts, a 19.6k-character prompt tuned on Gemini,
+8 tools on the `debt-tools` Edge Function (plain HTTP, would move unchanged),
+and a regression gate that runs the exact live n8n code — which cannot run
+inside UChat. Chatwoot is already the inbox (bot handoff, team paging,
+handover ladder, labels, four department teams), so UChat would *replace* it.
+- **Everything into UChat: ~4-6 weeks.** Re-tuning the Hebrew voice on
+  OpenAI, rebuilding the guards in flows (the reply checks can't be — UChat's
+  AI step gives no check-and-retry before sending), and losing the gate and
+  the history.
+- **UChat as the inbox only, n8n stays the brain: ~1.5-2.5 weeks** of
+  rewiring every Chatwoot-shaped node, for roughly what Chatwoot gives today.
+  Its send API and forward-every-message behaviour are unverified.
+
+**Recommendation: don't move.** The PRD's inbox pieces are already in
+Chatwoot; what remains (filling the teams, routing) is the same work on either
+platform. If Homies insists, the inbox-only route, and only after UChat's
+free 14-day trial proves, on a separate test number: Hebrew in the inbox, the
+send-text API, a catch-all forward, a pause that lasts the whole conversation,
+group routing, and the billing currency.
+
 ## 16 Sep — the client's review: no numbers, no advice; a private fault is theirs
 
 Yariv's review asked for three guardrails and the owner chose the sharp

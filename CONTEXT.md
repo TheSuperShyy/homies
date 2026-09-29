@@ -337,6 +337,14 @@ missing was wrong on 20 Aug because the check used pointed לְךָ and the prom
 writes *lekha*. Unpointed, pointed, and transliterated are three different
 strings for one word.
 
+**UChat was evaluated on 29 Sep and not adopted.** It is a no-code flow
+builder whose AI agent cannot run Gemini, whose AI step gives no check before a
+reply goes out, and whose inbox would replace Chatwoot rather than add to it:
+~4-6 weeks to move everything, ~1.5-2.5 weeks to swap only the inbox, for
+roughly what Chatwoot already does. Cost for Homies ~$80-140/month depending on
+seats. Details and the trial checklist, should Homies insist:
+`docs/features/11-whatsapp-bot/context.md`, "29 Sep".
+
 **Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
 21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
 Meta, which beats the app-level subscription, so the number moves the moment the
