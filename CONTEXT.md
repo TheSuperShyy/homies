@@ -344,7 +344,9 @@ It does run Gemini (their API spec; the first write-up said it did not):
 ~3-5 weeks to move everything, ~1.5-2.5 weeks to swap only the inbox, for
 roughly what Chatwoot already does. The owner's trial copy runs the live prompt
 on Gemini with no tools and a demo note, on the web widget only; never connect
-a WhatsApp number to it. Cost for Homies ~$80-140/month depending on
+a WhatsApp number to it. UChat provides no numbers (any number is registered
+with Meta first), and the setup plus the numbers rule live in
+`docs/features/11-whatsapp-bot/uchat-trial.md`. Cost for Homies ~$80-140/month depending on
 seats. Details and the trial checklist, should Homies insist:
 `docs/features/11-whatsapp-bot/context.md`, "29 Sep".
 

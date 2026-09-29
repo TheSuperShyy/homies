@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-09-29
 
+### The UChat trial written down: WhatsApp numbers, the rules, the setup
+
+The owner, looking at UChat's *Add WhatsApp Number* screen (provider "WABA (Deprecated)": access
+token, WABA ID, phone number ID, API domain): *"so if we need to add a whatsapp here we need to
+register it to meta ourself?"* -- yes; UChat provides no numbers, and either of its ways
+registers the number with Meta (that manual screen, or the guided WhatsApp Cloud login). Then:
+*"ok lets create a docs stating that"*. New `docs/features/11-whatsapp-bot/uchat-trial.md`: the
+two ways, what a number needs, **why our test number and Homies' official number are
+off-limits** (a connection writes a per-number override that moves the messages at once -- the
+21 Aug outage), the spare-number route, the look-and-feel setup step by step, and the recipe to
+rebuild the gitignored prompt file -- checked: the recipe reproduces `local/uchat/agent-prompt.txt`
+byte for byte. Also answered the same morning: the OpenRouter key cannot serve UChat (no such
+provider, no base-URL field, and it is the live bot's wallet), and UChat has no free model of
+its own; of its providers only Gemini's and Groq's keys have free tiers, and Groq's 6,000
+tokens/minute is below the prompt's 7,359 (measured, o200k).
+
 ### UChat trial started: a look-and-feel copy of the bot, Gemini, no tools; "no Gemini" corrected
 
 The owner opened a UChat trial and made an API key (*"lets try and replicate the chatbot in

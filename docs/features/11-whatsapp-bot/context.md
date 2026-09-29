@@ -246,7 +246,10 @@ invent numbers, amounts, dates or links — because a tool-less bot invents
 deeds, the exact 27 Sep bug. The paste-ready file is the gitignored
 `local/uchat/agent-prompt.txt`. The agent and the menu flow are built in
 UChat's UI by the owner; model and limits are then set through the API.
-Channel: the web chat widget only; no WhatsApp number is connected.
+Channel: the web chat widget only; no WhatsApp number is connected. The setup
+steps, how UChat takes a WhatsApp number (Meta registration either way; its
+manual "WABA (Deprecated)" screen vs the guided WhatsApp Cloud login) and why
+our two numbers are off-limits: [uchat-trial.md](uchat-trial.md).
 
 ## 16 Sep — the client's review: no numbers, no advice; a private fault is theirs
 
