@@ -341,8 +341,10 @@ strings for one word.
 built.** It is a no-code flow builder whose AI step gives no check before a
 reply goes out and whose inbox would replace Chatwoot rather than add to it.
 It does run Gemini (their API spec; the first write-up said it did not):
-~3-5 weeks to move everything, ~1.5-2.5 weeks to swap only the inbox, for
-roughly what Chatwoot already does. The owner's trial copy runs the live prompt
+~4-7 weeks to move everything, ~3-4 weeks to swap only the inbox (re-estimated
+29 Sep: the tool server sends through Chatwoot in four places and the
+dashboard's WhatsApp history is fed by n8n), for roughly what Chatwoot already
+does. The owner's trial copy runs the live prompt
 on Gemini with no tools and a demo note, on the web widget only; never connect
 a WhatsApp number to it. UChat provides no numbers (any number is registered
 with Meta first), and the setup plus the numbers rule live in

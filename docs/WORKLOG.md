@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-09-29
 
+### Current stack vs UChat, and the migration re-estimated against everything that touches Chatwoot
+
+The owner asked for the whole picture: today's setup (Meta, Chatwoot and n8n on the Hostinger
+VPS, OpenRouter), what UChat gives and what we would still need, and the time to migrate.
+Mapping every Chatwoot dependency found what the morning's estimate missed: the `debt-tools`
+Edge Function talks to Chatwoot in four places (photos copied from its host, the voice team
+notes in its Voice inbox, the debt call's WhatsApp payment link, the conversation lookup behind
+them), and the dashboard's WhatsApp history is the `messages` table that only n8n writes.
+**Re-estimated:** everything into UChat ~21-34 working days (4-7 weeks, was 3-5); inbox only
+~13-19 (3-4 weeks, was 1.5-2.5). Running cost: UChat ~$80-140/month on top of today's, since
+the VPS stays for n8n either way; production needs a paid Gemini key (the free tier trains on
+traffic). Breakdown in `docs/features/11-whatsapp-bot/context.md`, "29 Sep".
+
 ### The UChat trial written down: WhatsApp numbers, the rules, the setup
 
 The owner, looking at UChat's *Add WhatsApp Number* screen (provider "WABA (Deprecated)": access

@@ -229,6 +229,30 @@ handover ladder, labels, four department teams), so UChat would *replace* it.
   rewiring every Chatwoot-shaped node, for roughly what Chatwoot gives today.
   Its send API and forward-every-message behaviour are unverified.
 
+**Re-estimated the same day, against a full map of what touches Chatwoot.**
+The estimates above missed four links inside the `debt-tools` Edge Function
+(32 mentions of Chatwoot): photos are copied from Chatwoot's host into our
+bucket; the voice agents' team notes open a conversation in Chatwoot's Voice
+inbox and fire the team mention; the debt call's payment link goes out as a
+WhatsApp message through Chatwoot (templates outside 24 hours); and all of it
+resolves the resident's Chatwoot conversation. And the dashboard's WhatsApp
+history is the `messages` table, which only n8n writes. So:
+- **Everything into UChat (it replaces Chatwoot, the n8n bot and OpenRouter):
+  ~21-34 working days, about 4-7 weeks.** Number and staff setup 2-3 days; the
+  agent, a resident lookup at conversation start, menu and handover 3-5; a
+  guarded tool bridge (MCP, own password) 2-4; guards rebuilt where flows allow
+  3-5; the four Chatwoot links plus a new feed for the dashboard 4-6; Hebrew
+  tuning under UChat's wrapper and a black-box test set in place of the gate
+  4-6; cutover with a parallel check 3-5.
+- **UChat as the inbox only (n8n and OpenRouter stay): ~13-19 working days,
+  about 3-4 weeks.** Setup 2-3; every Chatwoot-shaped node in n8n (parser,
+  send, handover sub-workflow and ticker, team notes) 5-7; the four Edge
+  Function links 3-4; the gate's parser and a replay 1-2; cutover 2-3. The
+  dashboard feed stays, because n8n still writes it.
+- Production cannot run on Gemini's free tier: Google trains on free-tier
+  traffic, which would include residents' messages, and it allows about 10
+  requests a minute. A paid key costs about what OpenRouter does today.
+
 **Recommendation: don't move.** The PRD's inbox pieces are already in
 Chatwoot; what remains (filling the teams, routing) is the same work on either
 platform. If Homies insists, the inbox-only route, and only after UChat's
