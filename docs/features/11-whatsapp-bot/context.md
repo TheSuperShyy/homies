@@ -253,6 +253,11 @@ history is the `messages` table, which only n8n writes. So:
   traffic, which would include residents' messages, and it allows about 10
   requests a minute. A paid key costs about what OpenRouter does today.
 
+The whole comparison — every piece of today's stack, UChat's features and
+prices, the gaps, both options day by day, the monthly cost table — is written
+out as hand-off material in [uchat-comparison.md](uchat-comparison.md), with
+each claim labelled VERIFIED, ESTIMATE or UNVERIFIED.
+
 **Recommendation: don't move.** The PRD's inbox pieces are already in
 Chatwoot; what remains (filling the teams, routing) is the same work on either
 platform. If Homies insists, the inbox-only route, and only after UChat's

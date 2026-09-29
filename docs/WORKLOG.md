@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-09-29
 
+### The full comparison written out for a document generator
+
+The owner: *"i will send this to gemini to create me a docs so give every detailss"*. New
+`docs/features/11-whatsapp-bot/uchat-comparison.md`: background and PRD item 3, today's stack
+piece by piece (what each does, where it runs, cost), how far the PRD is met, UChat's features,
+API reach and prices, a side-by-side table, the gaps, both migration options day by day, the
+monthly cost worked line by line ($80/$94 with 10 seats, $125/$139 with 19, yearly/monthly),
+pros and cons, the trial's status and rules, the recommendation, a glossary and the sources.
+Every claim carries VERIFIED / ESTIMATE / UNVERIFIED, and a suggested instruction for Gemini
+heads it. Written for a third party: no keys, no server addresses, no phone numbers, no account
+ids. Measured for it: the live prompt is 7,245 tokens (o200k).
+
 ### Current stack vs UChat, and the migration re-estimated against everything that touches Chatwoot
 
 The owner asked for the whole picture: today's setup (Meta, Chatwoot and n8n on the Hostinger

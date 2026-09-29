@@ -348,7 +348,8 @@ does. The owner's trial copy runs the live prompt
 on Gemini with no tools and a demo note, on the web widget only; never connect
 a WhatsApp number to it. UChat provides no numbers (any number is registered
 with Meta first), and the setup plus the numbers rule live in
-`docs/features/11-whatsapp-bot/uchat-trial.md`. Cost for Homies ~$80-140/month depending on
+`docs/features/11-whatsapp-bot/uchat-trial.md`; the full comparison, written as
+hand-off material for a document generator, is `uchat-comparison.md` beside it. Cost for Homies ~$80-140/month depending on
 seats. Details and the trial checklist, should Homies insist:
 `docs/features/11-whatsapp-bot/context.md`, "29 Sep".
 
