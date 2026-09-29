@@ -240,7 +240,7 @@ export default async function Overview({
                 {recent.data.map((r: any) => (
                   <tr key={r.reference}>
                     <td className="mono" data-label={t('col.reference')}>{r.reference}</td>
-                    <td dir="auto" data-label={t('col.what')}>{r.description}</td>
+                    <td className="freetext" dir="auto" data-label={t('col.what')}>{r.description}</td>
                     <td dir="auto" data-label={t('col.where')}>{r.building}{r.unit ? ` · ${r.unit}` : ''}</td>
                     <td data-label={t('col.urgency')}><span className={`urg ${r.urgency}`}>{label(t, 'urgency', r.urgency)}</span></td>
                     <td data-label={t('col.status')}><span className={`pill ${r.status}`}>{label(t, 'status', r.status)}</span></td>
