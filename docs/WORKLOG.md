@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-09-29
 
+### "The dashboard is broken": one imported ticket's 497-character link blanked the Tickets page
+
+The owner's screenshot (13:59 UTC): Tickets showed only the Reference and What headers, and every
+What cell looked empty on tall rows. **Nothing was broken in the data or the query**: the page
+was sending every description (1,211 tickets, all present). The OXS import at 13:55 UTC had
+brought in a ticket (10th on page 1) whose description holds a **497-character link with no
+space**. A table column is never narrower than its longest unbreakable run, so the What column
+grew to ~3,500px on every row; the other seven columns and their headers left the screen, and the
+Hebrew descriptions, `dir="auto"` and so aligned to the far side of that cell, went with them.
+
+**Fixed (`7d51b70`):** a `.freetext` class, `overflow-wrap: anywhere`, on the free-text cells only
+-- tickets What, the overview's recent tickets, a resident's tickets, the conversations list,
+calls summaries, and three search columns; chat bubbles and transcripts get it via `.msg` /
+`.transcript`. `anywhere`, not `break-word`: only `anywhere` lowers the min-content width the table
+layout reads. Not on names and buildings, where a column squeezed by a long description would
+then cut a word in half. **Verified offline, no login and no real data:** a made-up 497-character
+link in a table built on the real stylesheet, rendered by headless Chrome -- as deployed it
+reproduces the owner's screenshot exactly; fixed, all nine columns show and the link wraps inside
+its cell. `tsc` clean on this branch and on the hotfix tree.
+
+**Deploy:** production runs `origin/main` (`eda611c`, 22 Sep), 74 commits behind this branch and
+unpushed by the owner's rule. So the fix was cherry-picked onto `origin/main` alone as
+`hotfix/dashboard-long-link` (`fbf3846`, worktree `../homie-hotfix`, clean apply, same 7 files):
+pushing it to `main` deploys only this fix. **Not pushed** -- waiting on the owner's go (pushes
+need the `TheSuperShyy` gh account, switch back after).
+
 ### "Nicer and more verbal" -- the voice agents get the casual register (edited, NOT yet deployed)
 
 The owner: *"I wish the Homies bot would be a little nicer and more verbal, it sounds robotic"*

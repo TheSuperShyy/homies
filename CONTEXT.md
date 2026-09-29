@@ -1464,6 +1464,15 @@ no model turn exists (idle, tool wait, silence goodbye) are the narrow
 exception and get variety instead, and the openers stay fixed like the
 WhatsApp menu.
 
+**Free text in a dashboard table wears `.freetext` (29 Sep).** A table column is
+never narrower than the longest unbreakable run in any of its cells, so one
+pasted link in one ticket blanked the whole Tickets page: the column grew to
+~3,500px and every other column left the screen. Any new column that shows
+text a resident, OXS or a model wrote gets `className="freetext"`
+(`overflow-wrap: anywhere` — the only value that shrinks what the table layout
+measures). Names, buildings and codes do not: squeezed beside a long
+description, they would be cut mid-word.
+
 **Do not promise routing that does not exist.** A resident is told their ticket
 goes "לצות", never to a named department. The four Chatwoot teams exist and are
 empty, and nothing routes to them automatically, so a sentence naming a
