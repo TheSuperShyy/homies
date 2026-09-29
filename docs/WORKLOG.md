@@ -34,8 +34,9 @@ its cell. `tsc` clean on this branch and on the hotfix tree.
 **Deploy:** production runs `origin/main` (`eda611c`, 22 Sep), 74 commits behind this branch and
 unpushed by the owner's rule. So the fix was cherry-picked onto `origin/main` alone as
 `hotfix/dashboard-long-link` (`fbf3846`, worktree `../homie-hotfix`, clean apply, same 7 files):
-pushing it to `main` deploys only this fix. **Not pushed** -- waiting on the owner's go (pushes
-need the `TheSuperShyy` gh account, switch back after).
+pushing it to `main` deploys only this fix. **Pushed on the owner's go ("only the fix")**: `main`
+went `eda611c..fbf3846` (TheSuperShyy was already the active gh account), and Vercel built it.
+`main` and this branch now differ by that one cherry-pick; the next full push merges it cleanly.
 
 ### "Nicer and more verbal" -- the voice agents get the casual register (edited, NOT yet deployed)
 
