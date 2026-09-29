@@ -230,7 +230,7 @@ async function CallList({ view, page, size, search, t, locale }: {
                   <td className="muted mono" data-label={t('col.when')}>{when(c.started_at, locale)}</td>
                   <td data-label={t('col.direction')}>{label(t, 'direction', c.direction)}</td>
                   <td className="mono" data-label={t('col.number')}>{c.caller_phone ?? '—'}</td>
-                  <td dir="auto" data-label={t('col.summary')}>{c.summary ?? <span className="muted">{t('calls.noSummary')}</span>}</td>
+                  <td className="freetext" dir="auto" data-label={t('col.summary')}>{c.summary ??<span className="muted">{t('calls.noSummary')}</span>}</td>
                   <td className="muted" data-label={t('col.outcome')} title={c.disposition ?? undefined}>{disposition(t, c.disposition)}</td>
                   <td className="mono num" data-label={t('col.length')}>{c.duration_seconds ? `${c.duration_seconds}s` : '—'}</td>
                   {/* The <800ms target from the plan, visible per call rather

@@ -168,7 +168,7 @@ export default async function Tickets({
               {data.map((r: any) => (
                 <tr key={r.reference}>
                   <td className="mono" data-label={t('col.reference')}>{r.reference}</td>
-                  <td dir="auto" data-label={t('col.what')}>
+                  <td className="freetext" dir="auto" data-label={t('col.what')}>
                     {r.description}
                     {/* WHAT OXS ACTUALLY KNOWS ABOUT THIS TICKET.
                         Their `status` field reads `open` on every service call

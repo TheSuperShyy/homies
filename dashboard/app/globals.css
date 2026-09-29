@@ -687,6 +687,20 @@ td {
 }
 td.muted, td .muted { color: var(--text-2); }
 tbody tr:last-child td { border-block-end: 0; }
+
+/* FREE TEXT MAY CARRY A LINK HUNDREDS OF CHARACTERS LONG WITH NO SPACE IN IT.
+   A table column is never narrower than the longest unbreakable run in any of
+   its cells, so one such run sets the width for every row. On 29 Sep a single
+   ticket imported from OXS carried a 497-character link: the What column grew
+   to roughly 3,500px, the other seven columns and their headers went off the
+   right edge, and the Hebrew descriptions, aligned to the far side of that
+   cell, went with them — the page looked empty. `anywhere`, not `break-word`:
+   only `anywhere` lowers the min-content width the table layout reads, so only
+   it keeps the column from stretching. It goes on the free-text cells alone —
+   on names and buildings it would let a column squeezed by a long description
+   cut a word in half. Bubbles and transcripts are blocks, not columns, but the
+   same link would spill sideways out of them. */
+.freetext, .msg, .transcript { overflow-wrap: anywhere; }
 tbody tr { transition: background var(--transition-fast); }
 tbody tr:hover { background: var(--surface-2); }
 /* Keyboard parity: tabbing into a row's control should light the row the same

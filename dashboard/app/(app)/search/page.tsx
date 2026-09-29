@@ -239,7 +239,7 @@ export default async function Search({ searchParams }: {
                   {(tickets?.data ?? []).map((r: any) => (
                     <tr key={r.reference}>
                       <td className="mono" data-label={t('col.reference')}>{r.reference}</td>
-                      <td dir="auto" data-label={t('col.what')}>{clip(r.description)}</td>
+                      <td className="freetext" dir="auto" data-label={t('col.what')}>{clip(r.description)}</td>
                       <td dir="auto" data-label={t('col.where')}>
                         {r.building}{r.unit ? ` · ${r.unit}` : ''}
                       </td>
@@ -354,7 +354,7 @@ export default async function Search({ searchParams }: {
                       <td className="muted mono" data-label={t('col.when')}>
                         {when(m.created_at, locale)}
                       </td>
-                      <td dir="auto" data-label={t('search.said')}>
+                      <td className="freetext" dir="auto" data-label={t('search.said')}>
                         {clip(m.body)}
                         <span className="sub">
                           {m.sender === 'resident' ? t('thread.resident') : t('thread.bot')}
@@ -391,7 +391,7 @@ export default async function Search({ searchParams }: {
                         {when(c.started_at, locale)}
                       </td>
                       <td className="mono" data-label={t('col.number')}>{c.caller_phone ?? '—'}</td>
-                      <td dir="auto" data-label={t('col.summary')}>
+                      <td className="freetext" dir="auto" data-label={t('col.summary')}>
                         {c.summary ? clip(c.summary) : <span className="muted">{t('calls.noSummary')}</span>}
                       </td>
                       <td className="muted" data-label={t('col.outcome')}>{c.disposition ?? '—'}</td>
