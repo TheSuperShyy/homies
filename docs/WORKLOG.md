@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### Live WhatsApp test on the owner's "ok" (13:09 UTC, six messages, ~6 Gemini calls)
+
+Owner: *"dont edit anything but test that on whatsapp"*, then "ok" to the cost. Nothing edited.
+`probe_whatsapp.py` from invented 599 numbers; rows cleaned up (12 messages, 1 request, 1
+interaction); Send 404s on the fake conversation as designed, so nothing reached a phone.
+Israel time was 16:09.
+- **"hey how is it going"** → `צהריים טובים! כאן מיכאל מהומי'ז. אצלי הכל בסדר תודה, מה שלומכם ואיך
+  עובר עליכם היום? ובמה אוכל לעזור? 😊`. Three questions in one message.
+- **"im fine too thanks anyways the gate lock is broken again"** → `אוי איזה באסה לשמוע 😔 באיזה
+  בניין אתם גרים ובאיזו דירה, כדי שאפתח קריאת שירות?`. No reaction to "I'm fine"; slang; 😔 is not
+  on the allowed emoji list; explains why it needs the address; no "which gate".
+- **"Bar Kochba 23, apartment 4"** → `open_request` with description `מנעול שער הכניסה שבור שוב`.
+  **The model invented "the entrance gate"; the resident never said which gate.** Reply: `מבאס,
+  אבל אל דאגה, אני מטפל בזה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה בהקדם.
+  במה אוכל לעזור עוד?`: slang, "I'm handling it", and a "soon" promise.
+- **fresh "the gate lock is broken again"** → first draft `אני מבין ששער הכניסה…` was caught by
+  the clerk guard and rewritten (Try again ran). Final: `ערב טוב, כאן מיכאל מהומי'ז. שער הכניסה
+  לבניין לא עובד שוב? איזה באסה. כדי שאוכל לפתוח קריאת שירות ולטפל בזה, באיזה בניין מדובר (רחוב
+  ומספר)? ומה מספר הדירה שלכם?`. ערב טוב at 16:09 against the hour fact (the code's menu said
+  צהריים טובים a minute later); assumed the entrance gate again; "(street and number)" form talk.
+- **"hi"** → the code's menu `צהריים טובים 👋 במה אפשר לעזור?`.
+- **">>hi, the sink in my kitchen is blocked"** → model text `צהריים טובים, כאן מיכאל מהומי'ז. כיור
+  סתום בתוך הדירה זה משהו שבאחריות הדיירים, ולכן אנחנו לא יכולים לפתוח על זה קריאת שירות. במה
+  אוכל לעזור לכם עוד?`. The leading greeting is what Send's filter cuts after the menu
+  (`allowed = afterMenu ? 0 : …`; `keepName = afterMenu`), so the handset would get `כאן מיכאל…`.
+  The probe prints the model's text, before that cut, because Send errored on the fake
+  conversation. The rules check covers the case. Gentle refusal, right.
+- **Verdict:** the two behaviours the owner asked about are as the Claude replay said: no "which
+  gate" (worse: a guessed gate in the ticket), and the how-are-you carries the help question.
+  New against the prompt: slang (באסה, מבאס) in three of five model replies, a "soon" promise, an
+  off-list emoji, explaining why it needs a detail, and one hour slip.
+- Not fixed; the owner said don't edit.
+
 ### WhatsApp bot tested without OpenRouter: gate green, nine-conversation Claude replay
 
 Owner: *"can you test the chatbot but dont use the openrouter"*. Nothing spent, nothing changed.
