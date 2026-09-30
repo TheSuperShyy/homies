@@ -1474,23 +1474,21 @@ turned out to reach the first message too: his 08:51 and 08:52 UTC calls
 have it spoken as מחברת הומיז. Keeping that, or exempting the opener, is his
 call.
 
-**The inbound agent hears with Speechmatics, on trial (30 Sep).** The owner
-asked for his Hebrew survey agent's settings (another project), on inbound only:
-`enhanced`, `he`, region `us`, maxDelay 700, endOfTurnSensitivity 0.7. The
-vocabulary is this project's own: הומיז with its mishearings, ועד הבית, דמי
-ועד, אב הבית. Azure he-IL stays as the backup. The debt agent stays on
-Deepgram nova-3, which the client picked on 12 Aug for speed, not for Hebrew.
-The owner's one test call decides keep or revert. It is judged on reply speed
-(`vapi_latency.py`; the Deepgram baseline on inbound is a median of 2,160ms
-over 19 turns) and on how well it heard him. The setting lives in
-`vapi_sync.py`'s inbound target, so a sync keeps it. Street names, if added,
-come from the buildings table at sync time and never from this public repo.
-Turn-taking is untouched. The survey agent's tighter timers (wait 0.2,
-punctuation 0.1, no punctuation 0.6, number 0.4, no smart endpointing) are
-there to compare against only if the call feels slow. Evidence against it so
-far, all on the owner's English calls: phantom words in Michael's lines on
-every call, and one caller sentence (`01a0f1f8`) that got the silence line
-instead of a reply, as if Vapi had not heard him speak.
+**Speechmatics was tried on inbound on 30 Sep and dropped the same day; both
+agents hear with Deepgram nova-3.** The owner asked for his Hebrew survey
+agent's settings (another project): `enhanced`, `he`, region `us`, maxDelay
+700, endOfTurnSensitivity 0.7, with this project's own vocabulary. On every
+call, words Michael never said appeared in his lines. They were the murmur in
+the office background sound, transcribed on the agent's channel while he was
+silent, and the dashboard joined them into his bubbles. Deepgram's
+`confidenceThreshold` 0.4 drops them, and Speechmatics has no such filter.
+One caller sentence (`01a0f1f8`) also got the silence line as if unheard.
+The owner: *"lets just change the TTS i think"*, meaning the transcriber, so
+inbound went back to Deepgram with the office sound kept. Its Hebrew accuracy
+was never judged, because no Hebrew call was made. **To try another
+transcriber, turn `backgroundSound` off on that target first,** or the office
+murmur will come back as words on any engine without a confidence filter.
+The settings are in commit `dd8af72`.
 
 **The model reads back its own text, not a transcription of its voice (30 Sep,
 both agents).** `modelOutputInMessagesEnabled: true` in BASE. Vapi's default
@@ -1511,7 +1509,7 @@ phantom words transcribed while Michael was silent. The setting is left on
 because it is harmless, but nothing so far shows it working. Don't count on it.
 
 **On inbound, Michael understands a fault before he opens it (30 Sep, the
-owner).** A gate-lock report went straight to "I'll open a request, what's the
+owner; live).** A gate-lock report went straight to "I'll open a request, what's the
 address?", and the owner wanted *"what gate are we talking about? and where is
 it located and stuff"*. The fence's common-property sentence now says: first
 understand it the way whoever comes to fix it will need to know it, meaning

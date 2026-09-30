@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### Live 11:32 UTC: inbound back on Deepgram, and Michael asks what and where before opening a fault
+
+Owner: *"lets just change the TTS i think"*. The voice isn't the cause, so I read this as the
+transcriber and told him so, and said his voice stays.
+- **Speechmatics dropped on inbound.** Its override block was removed from `vapi_sync.py`, leaving
+  a dated note (settings in `dd8af72`; turn `backgroundSound` off first if another transcriber is
+  tried). Inbound inherits BASE again: Deepgram nova-3, `he`, confidence 0.4, Azure fallback. The
+  office sound is kept.
+- **The gate change went out in the same push.** The Claude replay (5 calls, no OpenRouter spend)
+  came back clean:
+  - gate: "what exactly is happening with the lock?", then "which gate?", then the address and
+    apartment together. The ticket description carried the where.
+  - lift emergency: the team was notified first, with no detail questions.
+  - details given up front: only the apartment was asked.
+  - private sink: no ticket, and the goodbye ended on ולהתראות.
+  - leak: "where is the water coming from?", then the ticket.
+  - One stray extra `notify_team` after the emergency ticket. That is older behaviour and not
+    from this change.
+- **Push:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then
+  `vapi_set_voice.py --apply` (Eyal → `ba765d50`, volume 2).
+- **Read back equal to the repo:**
+  - prompt 5,736 chars, sha `5d1ba62c87d1`;
+  - first message;
+  - Deepgram 0.4 with Azure;
+  - office sound, denoise, model-text on;
+  - gpt-4.1 0.3;
+  - 7 tools with the new `open_request.description`.
+- **No inbound call was live at the push.** Owed: the owner's next call.
+
 ### "Why is it like this": noise words inside Michael's welcome (11:26 UTC)
 
 The owner pasted the Voice page for `01a0f211`. After his "hello", Michael's bubble read
