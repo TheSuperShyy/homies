@@ -334,7 +334,10 @@ TARGETS = {
             # sound, transcribed on the agent's channel while he was silent, and
             # the dashboard joined them into his bubbles. Deepgram's
             # confidenceThreshold 0.4 drops them, and Speechmatics has no such
-            # filter. One caller sentence also got the idle line, as if unheard.
+            # filter. (A caller sentence that got the idle line on 01a0f1f8 was
+            # blamed on it at first. It was typed on the Voice page, and typing
+            # is silence to Vapi's idle timer, so it says nothing about the
+            # transcriber.)
             # No Hebrew call was made, so its Hebrew accuracy was never judged.
             # The block is in dd8af72. If it is tried again, turn backgroundSound
             # off on the same target.

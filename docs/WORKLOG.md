@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### Read back: the owner's 11:34 UTC call (`01a0f218`), the first on Deepgram and the gate change
+
+Owner: *"ok now see what the conversation i had with the bot"*. Read-only. 2m49s,
+`assistant-said-end-call-phrase`.
+- **Flow:**
+  - "hey how is it going" got an answer and the question back. "im fine too" got "great to hear,
+    how can I help".
+  - "the gate lock is broken again" got `איזה באסה. זה באמת מעצבן כשזה חוזר. אני רוצה להבין בדיוק
+    מה קורה. איפה השער נמצא בבניין ומה בדיוק לא עובד במנעול. תספרו לי קצת יותר…`.
+  - "ya so the gate in the parking lot its not closing" came in twice, 8s apart. He answered the
+    first with the echo `הבנתי, השער של החניה לא נסגר בכלל`, then asked for the address.
+  - "wait i forgot" got patience. The address came as `בר כוכבא 23, תל אביב - יפו`.
+  - `open_request` then produced `255-1338-26`: locksmith, `השער של החניה לא נסגר בכלל`, no unit.
+    It is in `requests`, opened_via voice, with no OXS ref. He read back "one three three eight",
+    and the goodbye was `…המשך יום נעים ולהתראות`.
+- **Good:**
+  - no noise words on Michael's side;
+  - the where and the what were asked, and the ticket carries the where.
+- **Off:**
+  - both detail questions in one long turn, reciting the prompt's own words;
+  - the echo;
+  - `איזה באסה` (slang);
+  - "I'll make sure they follow up", a soft promise.
+- **Found: the owner types his side.** None of his English lines on any call today carries a
+  `duration`, while spoken Hebrew lines do. They are lowercase with no apostrophes, and the address
+  came in the database's exact format.
+  - So the idle lines played while he typed.
+  - The raw log stamps a typed line about 2s after the reply to it begins.
+  - The `01a0f1f8` "unanswered sentence" blamed on Speechmatics was typed. That was corrected in
+    CONTEXT, HANDOVER and the `vapi_sync.py` note.
+  - The Voice page's `send()` sends once and clears the box, so the duplicate is either a second
+    send or unexplained.
+- Nothing changed on the agent.
+
 ### Live 11:32 UTC: inbound back on Deepgram, and Michael asks what and where before opening a fault
 
 Owner: *"lets just change the TTS i think"*. The voice isn't the cause, so I read this as the

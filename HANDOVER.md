@@ -289,8 +289,17 @@ its stated time.
       - details given up front: nothing asked twice;
       - private sink: no ticket;
       - leak: one question.
-  - **Speechmatics is DROPPED** (trial 09:17 to 11:32 UTC). Every call had words Michael never said: the office sound's murmur, transcribed on his channel. One caller sentence got the silence line as if unheard. Owner: *"lets just change the TTS i think"*, read as the transcriber. Its Hebrew accuracy was never judged. The settings are in `dd8af72`. **To try another transcriber, turn `backgroundSound` off on that target first.**
-  - **Owed:** the owner's next call. Check that the gate-style questions come, that there are no noise words, and that he is answered the first time.
+  - **Speechmatics is DROPPED** (trial 09:17 to 11:32 UTC). Every call had words Michael never said: the office sound's murmur, transcribed on his channel. Owner: *"lets just change the TTS i think"*, read as the transcriber. Its Hebrew accuracy was never judged. The settings are in `dd8af72`. **To try another transcriber, turn `backgroundSound` off on that target first.**
+  - **The owner's call on it: `01a0f218`, 11:34 UTC.** Michael ended it with the goodbye.
+    - **Worked:** no noise words; the small talk; he asked where the gate is and what's wrong.
+    - **The ticket:** `255-1338-26` in בר כוכבא 23 (locksmith, `השער של החניה לא נסגר בכלל`, voice), with no OXS ref. He read back "one three three eight", and the goodbye fitted the hour.
+    - **Off:**
+      - Both detail questions came in one long turn, reciting the prompt (`אני רוצה להבין בדיוק מה קורה…`).
+      - The echo `הבנתי, השער של החניה לא נסגר בכלל`.
+      - `איזה באסה`, which is slang.
+      - The same typed line reached him twice, 8s apart.
+    - **Not changed yet. The owner has not asked.**
+  - **Correction:** the owner TYPES his English test lines (see CONTEXT). The unanswered sentence on `01a0f1f8` was typed and says nothing about Speechmatics. The noise words were real and were on Michael's side.
 - **LIVE 30 Sep, both agents: `modelOutputInMessagesEnabled: true`.**
   - The model reads back its own text, not a garbled transcription of its voice.
   - **It does not change the transcript.** On call `01a0f1d2`, `artifact.messages` still held the opener in four spoken pieces.

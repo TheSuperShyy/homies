@@ -1482,13 +1482,23 @@ call, words Michael never said appeared in his lines. They were the murmur in
 the office background sound, transcribed on the agent's channel while he was
 silent, and the dashboard joined them into his bubbles. Deepgram's
 `confidenceThreshold` 0.4 drops them, and Speechmatics has no such filter.
-One caller sentence (`01a0f1f8`) also got the silence line as if unheard.
 The owner: *"lets just change the TTS i think"*, meaning the transcriber, so
 inbound went back to Deepgram with the office sound kept. Its Hebrew accuracy
 was never judged, because no Hebrew call was made. **To try another
 transcriber, turn `backgroundSound` off on that target first,** or the office
 murmur will come back as words on any engine without a confidence filter.
 The settings are in commit `dd8af72`.
+
+**The owner types his side of test calls on the Voice page (found 30 Sep).**
+His English lines go in through the text box (Vapi add-message). They arrive
+lowercase with no apostrophes and no `duration`, while spoken Hebrew lines
+carry one. So the transcriber never hears him on those calls, and nothing
+about hearing, including speed, can be judged from them. Vapi's idle timer
+hears typing as silence, so "take your time" plays while he types. Typed
+lines are also stamped about 2s after the reply they triggered begins, so
+the raw log shows answers before questions. Read the turns in content order.
+A sentence that got the idle line on `01a0f1f8` was first blamed on
+Speechmatics. It was typed.
 
 **The model reads back its own text, not a transcription of its voice (30 Sep,
 both agents).** `modelOutputInMessagesEnabled: true` in BASE. Vapi's default
