@@ -285,7 +285,11 @@ its stated time.
   - **First call, inconclusive:** `01a0f19e`, 09:21 UTC. Two English turns, 3,410ms and 1,266ms, no Hebrew from the caller.
   - **Owed:** one Hebrew call with several turns (הומיז, ועד הבית, a report at בר כוכבא 23, an apartment number). Then run `python scripts/vapi_latency.py --assistant inbound` against the Deepgram baseline (median 2,160ms, 19 turns), read how well it heard him, and give keep or revert.
 - **LIVE 30 Sep, both agents: `modelOutputInMessagesEnabled: true`.** The agent's lines in history and transcripts are now the model's text, not a garbled transcription of its own voice. Read the first interrupted call to learn whether a cut-off sentence is stored whole.
-- **PROPOSED, not shipped: the inbound agent asks back when asked how it is.** On 12:21 IL, "how are you" got "אני בסדר, תודה ששאלתם. איך אפשר לעזור לכם היום?" and no question back. The line is in the voice form of the WhatsApp epoch-50 clause (ask back, a question not a wish; help comes after the answer; only when the caller opens the door; once per call). It waits on the owner's OK.
+- **PREPARED and committed, NOT deployed: small talk on inbound, in the owner's own flow.** His example: opener → "hi" → Michael says hi and asks how they are → "fine" → a human word ("good to hear") → how can I help.
+  - **The fence change:** the greet-once sentence now asks how they are instead of how to help, and asks back when the caller asks first (a question, not just a wish).
+  - **The order:** Michael reacts to the answer, then asks how to help. Once per call, and only on a bare hello or a how-are-you. A caller who starts with the matter gets no small talk.
+  - **Checks:** 5,326 chars, facts 13, no hang-up words.
+  - **Ships on the owner's OK:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then `python scripts/vapi_set_voice.py --apply`.
   - **To revert:** delete the key, run `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then `python scripts/vapi_set_voice.py --apply`.
   - **Turn-taking is untouched.** The survey agent's tighter timers are in CONTEXT, for use only if the call feels slow.
 - **LIVE 30 Sep 08:11 UTC: the inbound agent opens with `שלום, <the hour's greeting>, מדבר מיכאל מהומיז. איך אפשר לעזור לכם?` and says goodbye by the hour.** *Answered since:* the voice's swap reaches the first message. The owner's 08:51 and 08:52 UTC calls have it spoken `מחברת הומיז`. Keeping that, or exempting the opener, is his call (item 2 below).

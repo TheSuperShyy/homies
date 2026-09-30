@@ -38,6 +38,19 @@ conversation that produced it.
   voice prompt never carried it.
 - A speech version was shown to the owner, not shipped. It asks back and waits, and asks how to
   help only after the answer, one question per turn.
+- **The owner redrew it as a flow:** *"i called homies then he answered this is michael from
+  homies how can i help you? then i said hi then it should say hi how are you like a human then
+  if the reply of the person is fine or like good then good to hear then how can i assist you
+  today"*. So Michael opens the small talk himself on a bare hello, not only when asked.
+- **Prepared in the fence and committed, NOT deployed:**
+  - the greet-once sentence's "hello back and how can I help" became "hello back and how are you";
+  - a caller who asks first gets an answer and the question back;
+  - Michael reacts to the answer with a human word, then asks how to help;
+  - once per call, only on a bare hello or a how-are-you, never when the caller starts with the
+    matter.
+- **Checked:** 5,043 → 5,326 chars, facts 13, no hang-up words. A Claude replay of six openings
+  held: bare hi, "fine", "not great", how-are-you first, hello with a leak, a second how-are-you.
+  This checks rules, not tone. It waits on the owner's OK.
 
 ### Inbound hears with Speechmatics (trial); the opener is spoken "מחברת הומיז"
 
