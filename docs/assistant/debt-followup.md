@@ -141,6 +141,8 @@ is a privacy judgment the client has to make.
 translation column of the transcript PDF, whose Hebrew layer is corrupt. A native
 speaker must read them against the audio before anyone dials a resident.
 
-**`gender: unknown` is untested.** The prompt handles it by phrasing around
-gendered verbs. Whether resident records even carry gender is one of the
-outstanding questions for Homies.
+**Gender comes from the first name (30 Sep, the owner).** Residents carry no
+gender from OXS. Migration 038 decides it from the first name, or takes a value
+a person set, and `unknown` (a name used for both) is masculine singular. The
+prompt is in `10-debt-followup/prompt.md`, section "30 Sep — one person, by
+their name". The variables example above predates it.

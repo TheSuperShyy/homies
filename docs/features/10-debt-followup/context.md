@@ -162,11 +162,14 @@ warning at two and a half to three months. Four attempts is encoded; the warning
 is left as a human decision. *Would be settled by: the actual written policy, if
 one exists.*
 
-**Resident gender.** Hebrew second-person verbs are gendered, and the agent
-addresses residents directly. The prompt takes a `{{gender}}` variable with a
-fallback that phrases around it. *Would be settled by: checking whether the
-resident data carries gender at all.* Getting this wrong is noticed by an Israeli
-listener in the first sentence.
+**Resident gender. Settled 30 Sep.** OXS carries no gender, so the owner's rule
+is to take it from the first name. Migration 038 holds a curated list of Israeli
+first names and `name_gender()`, and the call queue's `gender` is a value a
+person set, else the name, else `unknown`. That decides 80% of the 30 Sep
+residents. The rest, names used for both genders or no recognisable first name,
+are addressed in the masculine singular until they speak of themselves in the
+feminine. The prompt addresses one person in the singular through
+`{{gender_forms}}`. The plural (16–30 Sep) is gone.
 
 **Which employee's name does the agent use?** It currently introduces itself as
 Michal, a name belonging to no one, and discloses that it is a digital assistant.

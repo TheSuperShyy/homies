@@ -1381,6 +1381,20 @@ the conversation. A name in WhatsApp is still a guess and still counts for
 nothing. The distinction is the whole of the policy: never infer, always use
 what was actually written.
 
+**The debt call is the exception, by the owner's decision (30 Sep): one person,
+in the gender the name gives.** *"i dont want that because it means im multiple
+people it should depend the gender based on the name for the debt collection"*.
+The resident's name is on file before the call, so the call's gender comes
+from it. This is not a model guessing. Migration 038's curated
+`first_name_gender` list and `name_gender()` decide it in the database, a value
+a person set in `residents.gender` wins, and the model gets one finished
+instruction (`{{gender_forms}}`). A name used for both (עדי, טל, ליאור…) or none
+at all is `unknown`, which is masculine singular (the owner's default) until
+the person's own words show otherwise. That is 20% of the 30 Sep residents; 80%
+are decided. The plural stays on WhatsApp and inbound voice, which have no name
+before they answer. A name to add or correct goes in a new migration, `on
+conflict do update`, never an edit to 038.
+
 **Every instruction the model reads is in brackets, so a bracket in its output
 is its own thinking.** A probe on 26 Aug returned an English deliberation
 formatted like the per-turn instructions beside it, addressed to a resident.
