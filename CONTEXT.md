@@ -1497,8 +1497,8 @@ read it back as its own last turn. A transcript line of the agent's is now what
 the model wrote. Where `voice_guard.py` swaps a word, the transcript shows the
 unswapped word.
 
-**Small talk on inbound follows the owner's own flow (30 Sep; in the repo,
-live only after his OK).**
+**Small talk on inbound follows the owner's own flow (30 Sep, live 10:15 UTC
+on his "go").**
 - **His example:** opener → "hi" → Michael says hi back and asks how they are → "fine" → a
   human word → how can I help.
 - **So, on voice:**

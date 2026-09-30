@@ -55,6 +55,15 @@ conversation that produced it.
   differs from WhatsApp's no-greeting-after-the-menu: on the phone the opener is Michael's own
   voice, and the owner's example asks for the hello back. The stop hook caught the first commit
   without it.
+- **Deployed 10:15 UTC on the owner's "go".** The inbound sync and the voice restore ran as one
+  command. Read back:
+  - the prompt equals the repo (5,326 chars, sha `36a5338c95d2`), with the small-talk line;
+  - the first message equals the repo;
+  - the transcriber is still Speechmatics (enhanced, us, maxDelay 700, 4 vocabulary entries,
+    Azure fallback), because the sync carries it from the inbound target;
+  - `modelOutputInMessagesEnabled` is still true, because BASE carries it;
+  - the voice is `ba765d50`, with 7 tools.
+- **Next:** the owner's one Hebrew call, which judges the small talk and Speechmatics together.
 
 ### Inbound hears with Speechmatics (trial); the opener is spoken "מחברת הומיז"
 
