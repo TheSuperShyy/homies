@@ -1489,13 +1489,27 @@ Turn-taking is untouched. The survey agent's tighter timers (wait 0.2,
 punctuation 0.1, no punctuation 0.6, number 0.4, no smart endpointing) are
 there to compare against only if the call feels slow.
 
-**The agents' own lines are the model's text, not a transcription of their
-voice (30 Sep, both agents).** `modelOutputInMessagesEnabled: true` in BASE.
-Vapi's default transcribes the agent's voice for its side of the history and
-the transcript. On Hebrew that came back fragmented and garbled, and the model
-read it back as its own last turn. A transcript line of the agent's is now what
-the model wrote. Where `voice_guard.py` swaps a word, the transcript shows the
-unswapped word.
+**The model reads back its own text, not a transcription of its voice (30 Sep,
+both agents).** `modelOutputInMessagesEnabled: true` in BASE. Vapi's default
+builds the agent's side of the model's history from its spoken audio. On Hebrew
+that came back fragmented and garbled, and the model read it back as its own
+last turn.
+
+**It does NOT change the transcript.** Call `01a0f1d2` showed both side by
+side:
+- `messagesOpenAIFormatted` held the opener as one line;
+- `artifact.messages` and `transcript` still held it as four spoken pieces.
+
+The opener is a fixed line and not model output, so whether Michael's own
+replies also show whole in the transcript is still to be seen. **The dashboard
+joins the pieces instead** (next paragraph).
+
+**A transcript bubble is a turn, not a piece (30 Sep).** Vapi sends a speaker's
+turn as a run of final transcripts, one per settled phrase, and stores it as
+several `AI:` lines. The Voice page console and the call page now join
+consecutive pieces from the same speaker into one bubble. On the live console,
+a partial overwrites only its own part. The owner could not test from a
+word-by-word thread. Any new view of a transcript needs the same joining.
 
 **Small talk on inbound follows the owner's own flow (30 Sep, live 10:15 UTC
 on his "go").**

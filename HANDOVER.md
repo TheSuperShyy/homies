@@ -284,7 +284,14 @@ its stated time.
   - **How it was pushed:** only the `transcriber` object, PATCHed from `build()`. Every field read back equal to the repo, and the voice, prompt and tools did not move.
   - **First call, inconclusive:** `01a0f19e`, 09:21 UTC. Two English turns, 3,410ms and 1,266ms, no Hebrew from the caller.
   - **Owed:** one Hebrew call with several turns (הומיז, ועד הבית, a report at בר כוכבא 23, an apartment number). Then run `python scripts/vapi_latency.py --assistant inbound` against the Deepgram baseline (median 2,160ms, 19 turns), read how well it heard him, and give keep or revert.
-- **LIVE 30 Sep, both agents: `modelOutputInMessagesEnabled: true`.** The agent's lines in history and transcripts are now the model's text, not a garbled transcription of its own voice. Read the first interrupted call to learn whether a cut-off sentence is stored whole.
+- **LIVE 30 Sep, both agents: `modelOutputInMessagesEnabled: true`.**
+  - The model reads back its own text, not a garbled transcription of its voice.
+  - **It does not change the transcript.** On call `01a0f1d2`, `artifact.messages` still held the opener in four spoken pieces.
+  - Still to learn: whether Michael's own replies show whole, and whether an interrupted sentence is stored whole.
+- **LIVE on the dashboard 30 Sep, `main` = `a890ce5`: one bubble per turn on the Voice page and the call page (Vercel READY).** Vapi sends a turn as several final transcript pieces, and each piece used to become a bubble. The owner: *"its hard for me to test it if its being transcribe as word per word"*.
+  - **How it shipped:** fix `a18d9a9` on this branch, cherry-picked alone onto `origin/main` in a temporary worktree (removed) and pushed with the TheSuperShyy account.
+  - **Checks:** tsc clean on both trees. Both functions were run on the real 10:18 transcript and a simulated live call.
+  - **`main` and `feature/chatbot` now differ by TWO cherry-picks** (`fbf3846` and `a890ce5`). They will merge cleanly, because the content is identical.
 - **LIVE 30 Sep 10:15 UTC, on the owner's "go": small talk on inbound, in the owner's own flow.** Read back: the prompt equals the repo (5,326 chars, sha `36a5338c95d2`), the first message equals the repo, Speechmatics is kept (enhanced, us, 700, 4 words, Azure fallback), model-text lines are on, voice `ba765d50`, 7 tools. **Owed:** the owner's Hebrew test call, which also gives the Speechmatics verdict. His example: opener → "hi" → Michael says hi and asks how they are → "fine" → a human word ("good to hear") → how can I help.
   - **The fence change:** the greet-once sentence now asks how they are instead of how to help, and asks back when the caller asks first (a question, not just a wish).
   - **The order:** Michael reacts to the answer, then asks how to help. Once per call, and only on a bare hello or a how-are-you. A caller who starts with the matter gets no small talk.

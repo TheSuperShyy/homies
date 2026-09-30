@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### "It still looks like Vapi is listening to the agent": one bubble per turn, live
+
+**The owner:** *"why is it still looking like vapi is listening to the agent like the human"*,
+then *"its hard for me to test it if its being transcribe as word per word"*.
+
+**Found on his 10:18 call** (`01a0f1d2`, the opener only, then he hung up):
+- `artifact.messages` and `transcript` held the opener as four pieces: `שלום.` /
+  `צהריים טובים` / `מדבר מיכאל מחברת` / `הומיז. איך אפשר לעזור לכם`.
+- `messagesOpenAIFormatted`, what the model reads, held it as one line.
+- So `modelOutputInMessagesEnabled` changes the model's history, not the transcript. The morning
+  notes that said otherwise are corrected in CONTEXT and HANDOVER. The opener is a fixed line,
+  not model output, so how Michael's own replies are stored is still to be seen.
+- Both the Voice page console and the call page made one bubble per piece. Vapi sends a turn
+  as a run of final transcripts, one per settled phrase.
+
+**Fixed (`a18d9a9`):**
+- The console's `transcript()` joins a piece to the bubble above when the speaker is the same.
+  A partial overwrites only its own part: `base` holds the settled text, and `base` is an
+  optional field on `Line`.
+- The call page's `turns()` joins consecutive same-speaker lines.
+- **Tested:** tsc clean. Both functions were extracted from the files, compiled with the
+  dashboard's TypeScript and run. The real 10:18 blob gives one opener bubble. A simulated
+  live call (partials, finals, a typed line) gives one bubble per turn, with the partial
+  settling in place.
+
+**Live:**
+- `a18d9a9` was cherry-picked alone onto `origin/main` in a temporary worktree
+  (`hotfix/transcript-bubbles`) and applied cleanly. tsc on that tree was clean, run through a
+  junction to the main tree's node_modules that was removed as a link only.
+- Pushed with the TheSuperShyy account active: `main` went `fbf3846..a890ce5`, and Vercel
+  built it and reported READY. The worktree was then removed.
+- `main` and this branch now differ by two cherry-picks.
+
 ### The agents' lines come from the model's text; the first Speechmatics call; no ask-back
 
 **`modelOutputInMessagesEnabled: true`, both Hebrew agents.**
