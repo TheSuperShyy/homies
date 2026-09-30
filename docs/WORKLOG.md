@@ -11,6 +11,50 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### The debt call speaks to one person, in the gender the name gives (live 15:21 UTC; dashboard waits)
+
+Owner: *"i dont want that because it means im multiple people it should depend the gender based
+on the name for the debt collection"*, then *"the way we address the person is through the name
+we check if the name is female or male"*. Plan approved (masculine for a name that does not
+decide, told to him first).
+- **Before:** plural since 16 Sep. `residents.gender` NULL on all 7,839 rows, OXS sends none,
+  nothing mapped a name to a gender. The plumbing already existed: `gender` / `gender_forms`
+  flow view → `press_call` / Voice page → `call.ts` → Vapi. Only a value and a prompt that uses
+  it were missing.
+- **The list:** written by hand, grown against the live names, with tokens counted and never a
+  full name printed. 67% → 75% → 80% decided over three passes. No public gender-labelled list
+  exists (data.gov.il's 116,673 names have no gender column).
+  - Measured along the way: 408 rows where the 1st and 2nd words are names of opposite genders.
+    Nearly all are a first name plus a surname that is also a name (אורלי ברק, עופר שני), so
+    the first word wins.
+  - A `בן/בר/בת…` surname written first ("בן דוד שרה") takes the third word (29 rows).
+- **Migration 038, applied:**
+  - `first_name_gender`: 1,484 names (699 m, 667 f, 118 u), with RLS and a read for
+    authenticated;
+  - `name_tokens()`, `name_gender()`, and `call_gender(residents)` as a computed field;
+  - `v_debt_call_queue.gender` is a person's value, else the name, else unknown. The view is
+    otherwise verbatim and still `security_invoker`.
+  - **Checks:** run first inside a rolled-back transaction, then on live. 21/21 cases. Coverage
+    44% m, 36% f, 20% undecided (1,270 a both-genders name, 309 no first name). The staff role
+    reads it, and the REST embed `residents(…,call_gender)` works.
+- **The prompt (`10-debt-followup/prompt.md`):**
+  - the plural bullet replaced by one singular bullet around `{{gender_forms}}` plus the switch
+    rule;
+  - the opener's `מה שלומכם` became `מה נשמע` (gender-free; the voice reads an unpointed
+    `שלומך` one way);
+  - the third-person `הם/שלומם` in the fence became הדייר, singular;
+  - the variables table corrected, and a dated note added.
+- **Dashboard (committed, NOT on Vercel):**
+  - `call.ts` `GENDER_FORMS`: unknown is masculine singular, and f/m also cover third person;
+  - the Debts page shows `פנייה: את/אתה` under each name;
+  - tsc clean.
+- **Replay** (Claude, no OpenRouter, `transcripts/2026-09-30-debt-replay-gender.md`): מיכל
+  feminine throughout, דוד masculine, טל masculine until `אני צריכה` then feminine. No plural.
+- **Push:** `vapi_sync.py debt --apply` read back equal (4,760 chars, sha `d8325fcd06e3`). The
+  voice was untouched (`ba765d50`, volume 2), so no voice step was needed. No debt call was live.
+- **Waits on the owner:** the dashboard to `main`. Until then a unisex name gets the old
+  neutral-phrasing text from the live site. m/f names are unaffected.
+
 ### Live WhatsApp test on the owner's "ok" (13:09 UTC, six messages, ~6 Gemini calls)
 
 Owner: *"dont edit anything but test that on whatsapp"*, then "ok" to the cost. Nothing edited.

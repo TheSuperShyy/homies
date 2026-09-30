@@ -49,12 +49,18 @@ const FIXED = {
   alt_payment: process.env.HOMIES_ALT_PAYMENT ?? 'none',
 };
 
+// 30 Sep, owner: one person, in the gender the name gives. `gender` arrives from
+// the call queue (migration 038: a value a person set, else the first name, else
+// unknown). Unknown is a name used for both, or none at all, and is masculine
+// singular: the owner's default. The prompt's bullet around {{gender_forms}}
+// carries the one switch rule, so it is not repeated here.
 const GENDER_FORMS: Record<string, string> = {
-  f: 'הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי.',
-  m: 'הנמען גבר. פנה אליו בזכר לאורך כל השיחה: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה.',
+  f: 'הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי. '
+    + 'וכשאתה מדבר עליה עם מישהו אחר, גם אז בנקבה: היא, שלה, שתחזור.',
+  m: 'הנמען גבר. פנה אליו בזכר לאורך כל השיחה: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה. '
+    + 'וכשאתה מדבר עליו עם מישהו אחר, גם אז בזכר: הוא, שלו, שיחזור.',
   unknown:
-    'מין הנמען לא ידוע. דבר בניסוחים נייטרליים בלבד ואל תנחש: צריך, אפשר, בואו נראה, מה תרצו, אשמח לדעת. '
-    + 'אם הוא או היא חושפים מין בדיבור על עצמם — אני צריכה מול אני צריך — עבור מיד להטיה הזאת.',
+    'השם לא מכריע אם זה גבר או אישה. פנה בזכר, ביחיד: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה.',
 };
 
 export function callButtonEnabled(): boolean {

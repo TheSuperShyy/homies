@@ -39,8 +39,9 @@ const SAMPLE_PEOPLE: Record<string, any>[] = [
     ],
   },
   {
-    // gender null on purpose: the third example exercises the neutral-forms
-    // branch of gender_forms, the one that never gets tested by accident.
+    // gender null on purpose: the third example exercises the `unknown` branch
+    // of gender_forms (a name used for both, masculine singular since 30 Sep),
+    // the one that never gets tested by accident.
     resident_id: 'demo-3', first_name: 'נועם', gender: null, card_last4: '',
     building: 'בן גוריון 8', unit: '4', amount: 'שלוש מאות ועשרים שקלים',
     apartments_phrase: 'דירה 4', months_phrase: 'אוגוסט',

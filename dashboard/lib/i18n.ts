@@ -279,6 +279,11 @@ const S = {
   'debts.pin':          { he: 'קוד',            en: 'PIN' },
   'debts.noNumber':     { he: 'אין עדיין מספר', en: 'no number yet' },
   'debts.alsoApt':      { he: 'וגם דירה {units} · {total} בסך הכול', en: 'also apt {units} · {total} total' },
+  // How the debt call will address this resident (migration 038: a value a
+  // person set, else the first name, else unknown, which the call makes male).
+  'debts.addr.m':       { he: 'פנייה: אתה',                  en: 'Addressed as: male' },
+  'debts.addr.f':       { he: 'פנייה: את',                   en: 'Addressed as: female' },
+  'debts.addr.unknown': { he: 'פנייה: אתה (השם לא מכריע)',   en: 'Addressed as: male (name unclear)' },
   'debts.emptyAll':     { he: 'אף אחד לא חייב כלום.', en: 'Nobody owes anything.' },
   'debts.emptyMonth':   { he: 'אף אחד לא חייב עבור {month}.', en: 'Nobody owes for {month}.' },
   'debts.calling':      { he: 'מחייג ל-{phone} עכשיו, שיחה {id}. היא תופיע תחת שיחות טלפון כשתסתיים.',

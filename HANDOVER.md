@@ -279,7 +279,14 @@ its stated time.
 - **30 Sep, the debt call addresses one person, in the gender the name gives (owner's decision; plan approved).**
   - **LIVE in the database:** migration 038, applied and in the ledger. `first_name_gender` has 1,484 names: 699 m, 667 f, 118 u (used for both, never guessed from), with RLS and a read for `authenticated`. `name_gender(full_name)`, `name_tokens()`, `call_gender(residents)` (a PostgREST computed field). `v_debt_call_queue.gender` is `residents.gender`, else the name, else `unknown`.
   - **Checks:** 21/21 cases on live. Coverage 44% m, 36% f, 20% undecided (1,270 a both-genders name, 309 no first name). The staff role reads it.
-  - **Repo, pushed to Vapi only after the replay:** `prompt.md` (singular bullet with `{{gender_forms}}`, opener `מה נשמע?`, third-person singular), `call.ts` `GENDER_FORMS` (`unknown` = masculine singular; f/m also cover talking about them to someone else), and the Debts page's marker under each name (`call_gender` via the embed, i18n `debts.addr.*`). tsc clean.
+  - **LIVE on the debt agent `a34f2564`, 15:21 UTC:** `prompt.md` has a singular bullet with `{{gender_forms}}`, the opener `…, מה נשמע?`, and the resident in the third-person singular. `vapi_sync.py debt --apply` read back equal: prompt 4,760 chars, sha `d8325fcd06e3`; voice still `ba765d50` at volume 2 (no voice step needed); Deepgram 0.4; 7 tools.
+  - **Claude replay first** (`docs/assistant/transcripts/2026-09-30-debt-replay-gender.md`): מיכל feminine throughout, דוד masculine, טל masculine until "אני צריכה" then feminine. No plural anywhere.
+  - **NOT LIVE, waiting on the owner's say (Vercel = `main`):**
+    - `call.ts` `GENDER_FORMS`: `unknown` is masculine singular, and f/m also cover talking about them to someone else;
+    - the Debts page's את/אתה marker under each name (`call_gender` via the embed, i18n `debts.addr.*`).
+    - tsc is clean.
+    - Until it ships, the live dashboard still sends the OLD `unknown` text (neutral phrasing) for a unisex name. m/f are unaffected, and today's three queued rows are all m.
+    - Ship it as a single cherry-pick of the dashboard files onto `origin/main` (the `../homie-hotfix` worktree route).
   - **To correct one person:** `update residents set gender = 'f' where phone = …` (a person's value always wins).
   - **To add or fix a name:** a new migration, `insert … on conflict (name) do update`. Never edit 038.
   - **Not built:** an את/אתה control on the Debts page (needs a security-definer RPC like `press_call`).
