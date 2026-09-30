@@ -214,6 +214,15 @@ say whether the format plan touches the first message. If it does, callers hear
 מחברת הומיז no matter what this line says. The substitution was left alone on
 purpose: it guards the sentences the model composes mid-call.
 
+**Settled the same morning: it does.** The owner's two short calls at 08:51
+and 08:52 UTC (still on Deepgram) have the opener as spoken: `שלום בוקר טוב.
+מדבר מיכאל מחברת הומיז. איך אפשר לעזור לכם?`. The word מחברת exists nowhere in
+this line, so only the substitution can have put it there. Callers therefore
+hear מחברת הומיז, "from the Homies company". Keeping that, or exempting the
+opener from the swap, is the owner's call. The swap cannot be scoped to one
+message, so an exemption means spelling the opener in a form the exact match
+misses, and that spelling needs an ear check of its own.
+
 **The greeting follows the clock since 22 Sep.** The owner asked that both
 agents open with בוקר טוב / צהריים טובים / ערב טוב rather than a flat שלום.
 The block in `{% %}` is a Liquid template, which Vapi renders at the moment

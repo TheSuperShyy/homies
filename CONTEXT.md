@@ -1468,8 +1468,26 @@ and the prompt carries the time (`{{"now" | date: "%H:%M", "Asia/Jerusalem"}}`,
 rendered by Vapi) so it can. The debt script still ends יום טוב, ולהתראות. The
 inbound opener is `שלום, <the hour's greeting>, מדבר מיכאל מהומיז. איך אפשר
 לעזור לכם?`, in the owner's words ("michael from homies not from the homies
-team"). The glued מהומיז is his choice against the 12 Aug *Laumiz* misreading
-and waits on his ear.
+team"). The glued מהומיז is his choice against the 12 Aug *Laumiz* misreading.
+The voice's pronunciation swap (`voice_guard.py`, מהומיז → מחברת הומיז)
+turned out to reach the first message too: his 08:51 and 08:52 UTC calls
+have it spoken as מחברת הומיז. Keeping that, or exempting the opener, is his
+call.
+
+**The inbound agent hears with Speechmatics, on trial (30 Sep).** The owner
+asked for his Hebrew survey agent's settings (another project), on inbound only:
+`enhanced`, `he`, region `us`, maxDelay 700, endOfTurnSensitivity 0.7. The
+vocabulary is this project's own: הומיז with its mishearings, ועד הבית, דמי
+ועד, אב הבית. Azure he-IL stays as the backup. The debt agent stays on
+Deepgram nova-3, which the client picked on 12 Aug for speed, not for Hebrew.
+The owner's one test call decides keep or revert. It is judged on reply speed
+(`vapi_latency.py`; the Deepgram baseline on inbound is a median of 2,160ms
+over 19 turns) and on how well it heard him. The setting lives in
+`vapi_sync.py`'s inbound target, so a sync keeps it. Street names, if added,
+come from the buildings table at sync time and never from this public repo.
+Turn-taking is untouched. The survey agent's tighter timers (wait 0.2,
+punctuation 0.1, no punctuation 0.6, number 0.4, no smart endpointing) are
+there to compare against only if the call feels slow.
 
 **Free text in a dashboard table wears `.freetext` (29 Sep).** A table column is
 never narrower than the longest unbreakable run in any of its cells, so one

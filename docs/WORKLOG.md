@@ -11,6 +11,51 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### Inbound hears with Speechmatics (trial); the opener is spoken "מחברת הומיז"
+
+**Asked:** the owner pasted a description of a Speechmatics transcriber (Hebrew, `enhanced`, US)
+as "the live settings on Vapi right now" and asked to apply it to inbound first. It was not
+Homies' live state. Read back, both Hebrew agents ran Deepgram nova-3 `he` with the Azure
+he-IL fallback. The description came from his Hebrew survey agent, another project. Speechmatics
+had been tried here on 5 Aug (enhanced, `he`, `eu`), lasted about twenty minutes and never took
+a call. Told that, he said go, **inbound only**, with that agent's settings: `enhanced`, `he`,
+region `us`, maxDelay 700, endOfTurnSensitivity 0.7, our own vocabulary, Azure kept, the change
+held in the sync script, no test calls by me.
+
+**Shipped 09:17:49 UTC, surgically.** Only the `transcriber` object was PATCHed, built by
+`vapi_sync.py`'s own `build()` from the new `transcriber` key in the inbound target. The voice
+was never reset, so no `vapi_set_voice.py` was needed.
+
+Read back field by field:
+- All nine fields are equal to the repo, and there are no extra fields.
+- The voice is still `ba765d50`, and the first message and prompt still equal the repo.
+- 7 tools.
+- The debt agent is still on deepgram nova-3.
+- The dry runs agree: inbound gives `speechmatics default`, debt gives `deepgram nova-3`.
+
+`confidenceThreshold` was dropped because it is a Deepgram field with no Speechmatics
+equivalent.
+
+**Vocabulary:** הומיז (sounds like מומיז, הומיס, הומי זה, the mishearings the 5 Aug note
+recorded; the August list itself was never committed), ועד הבית, דמי ועד, אב הבית. Street names
+would help most, but they would publish the client's portfolio in this public repo. If they are
+wanted, they come from the buildings table at sync time.
+
+**Baseline for the comparison** (`vapi_latency.py --assistant inbound`, Deepgram): 19 turns over
+4 calls, median 2,160ms, p90 5,011ms. Per call, the medians run from 1,302 to 3,277ms. Turn-taking
+is untouched. The survey agent's tighter timers are recorded for later, only if the test call
+feels slow.
+
+**Found on the way: the voice's swap reaches the first message.** The owner's two short calls at
+08:51 and 08:52 UTC, before the switch, have the opener as spoken: `מדבר מיכאל מחברת הומיז`.
+So `voice_guard.py`'s מהומיז → מחברת הומיז applies to the first message too, and callers hear
+"from the Homies company". The greet-once line held on the second call: "hi" got
+`שלום, איך אפשר לעזור לכם?`. Keeping the swap on the opener, or exempting it, is his call.
+
+**Owed:** his one test call on the inbound agent. Then I compare reply speed against the
+baseline and how well it heard him, and give keep or revert. Reverting means deleting the
+`transcriber` key and running the inbound sync, then `vapi_set_voice.py`.
+
 ### Inbound: "hello, good morning, Michael from Homies", and a goodbye that thanks and fits the hour
 
 The owner: the debt call's opening sounds nice (*"hey good morning how are you?"*). He wants the

@@ -313,6 +313,49 @@ TARGETS = {
             # A mini filling four fields was the right trade; a mini improvising
             # a whole call is not. Owner approved the cost the same day.
             "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},
+            # SPEECHMATICS ON INBOUND ONLY, SINCE 30 SEP, as a trial against
+            # the debt agent, which stays on BASE's Deepgram nova-3. The owner
+            # asked for it with the settings his Hebrew survey agent (another
+            # project, another Vapi account) runs live: `enhanced`, `he`,
+            # region `us`, maxDelay 700, endOfTurnSensitivity 0.7.
+            #
+            # What it trades. Deepgram won this slot on 12 Aug on speed (~300ms
+            # in Vapi's panel against Scribe's ~700ms), not on Hebrew: no survey
+            # of Hebrew ASR mentions it (5 Aug). `enhanced` is Speechmatics'
+            # accurate and slower operating point, and `us` sits beside Vapi.
+            # maxDelay 700 (default 3000) caps how far a partial transcript may
+            # lag, which is the speed half of the bargain. The owner's one test
+            # call decides, on reply speed and on how well it heard him,
+            # measured against the recent Deepgram calls.
+            #
+            # The vocabulary is this project's own. The survey agent's words
+            # belong to another client and were not copied. הומיז comes with the
+            # mishearings the August transcripts showed (מומיז, הומיס, הומי זה),
+            # then the three phrases callers use for the committee, its fees and
+            # the caretaker. Street names are the obvious next entries. They
+            # would come from the buildings table at sync time, not from this
+            # public file, which would otherwise publish the client's portfolio.
+            #
+            # confidenceThreshold is Deepgram's and has no Speechmatics
+            # equivalent. The fallback is BASE's, copied unchanged: Azure he-IL
+            # when the provider fails. To revert, delete this key, run the
+            # inbound sync, then vapi_set_voice.py.
+            "transcriber": {
+                "provider": "speechmatics",
+                "model": "default",
+                "operatingPoint": "enhanced",
+                "language": "he",
+                "region": "us",
+                "maxDelay": 700,
+                "endOfTurnSensitivity": 0.7,
+                "customVocabulary": [
+                    {"content": "הומיז", "soundsLike": ["מומיז", "הומיס", "הומי זה"]},
+                    {"content": "ועד הבית"},
+                    {"content": "דמי ועד"},
+                    {"content": "אב הבית"},
+                ],
+                "fallbackPlan": json.loads(json.dumps(BASE["transcriber"]["fallbackPlan"])),
+            },
             # 300 -> 180 on 5 Aug, asked for directly.
             #
             # This field does not hurry anyone along: Vapi hangs up on the second
