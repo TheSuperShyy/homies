@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### WhatsApp checked against today's voice changes (read-only)
+
+Owner: *"ok so now lets check the chatbot if it has the same option we have now like the warm
+greeting"*. The live workflow `u2JjrbcNPYyyh3yl` has the prompt at 19,663 chars, sha
+`8afa16824480`, equal to the repo. It was last updated 27 Sep 14:16 UTC.
+- **Bare hello:** Sort's fixed menu, `<hour> 👋 במה אפשר לעזור?`, with three buttons. The last
+  real one was 29 Sep 14:32 UTC: `היי` got `ערב טוב 👋 במה אפשר לעזור?`. There is no
+  how-are-you, per the owner's 27 Sep rule.
+- **How-are-you:** an answer and a question back, then "ואז העניין", so the help question comes in
+  the same message. Voice now keeps the small talk alone.
+- **First person:** the model's own lines say אוכל, but the menu line says אפשר. That string is
+  also Send's `afterMenu` test and sits in `Reply usable?`'s opener regex, so a wording change must
+  move every copy together (`n8n_whatsapp_greet.py`, `check_greeting()`).
+- **Faults:** one question per message, first what happened, then building and apartment. It opens
+  as soon as it has what and building ("הכלי בא לפני המילים"), with no where-exactly.
+- **Goodbye:** thanks and a small wish. It already has that.
+- **No real example to show:** none of the 139 WhatsApp messages since 20 Sep is a how-are-you.
+- **Asked the owner** which to bring over. Any change ships through `check_whatsapp_rules.py`
+  with his go, and the greeting part only after he sees example chats.
+
 ### Read back: the owner's 11:34 UTC call (`01a0f218`), the first on Deepgram and the gate change
 
 Owner: *"ok now see what the conversation i had with the bot"*. Read-only. 2m49s,
