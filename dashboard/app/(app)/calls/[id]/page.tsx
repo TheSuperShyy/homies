@@ -15,6 +15,11 @@ import Link from 'next/link';
  * above it rather than becoming a turn of its own. That happens whenever the
  * caller's speech contains a newline, and dropping those lines would silently
  * lose words from the record.
+ *
+ * Consecutive lines from the same speaker are one turn (30 Sep). Vapi writes a
+ * turn as several `AI:` lines, one per settled phrase: the opener came out as
+ * four ("שלום." / "צהריים טובים" / "מדבר מיכאל מחברת" / "הומיז. איך אפשר
+ * לעזור לכם"), one bubble each, which read as a word-by-word transcription.
  */
 function turns(raw: string): { who: 'bot' | 'resident'; text: string }[] {
   const out: { who: 'bot' | 'resident'; text: string }[] = [];
@@ -22,7 +27,12 @@ function turns(raw: string): { who: 'bot' | 'resident'; text: string }[] {
     const m = /^\s*(AI|Assistant|Bot|User|Customer|Human)\s*:\s*(.*)$/i.exec(line);
     if (m) {
       const who = /^(ai|assistant|bot)$/i.test(m[1]) ? 'bot' : 'resident';
-      out.push({ who, text: m[2] });
+      const prev = out[out.length - 1];
+      if (prev && prev.who === who) {
+        if (m[2].trim()) prev.text = prev.text.trim() ? prev.text + ' ' + m[2] : m[2];
+      } else {
+        out.push({ who, text: m[2] });
+      }
     } else if (out.length && line.trim()) {
       out[out.length - 1].text += '\n' + line;
     }

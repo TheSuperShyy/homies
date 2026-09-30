@@ -34,7 +34,8 @@ type Labels = {
   chatPlaceholder: string; send: string; chatFailed: string;
 };
 
-type Line = { role: 'agent' | 'you'; text: string; done: boolean };
+// `base` is the settled text of a line while a partial is still arriving.
+type Line = { role: 'agent' | 'you'; text: string; done: boolean; base?: string };
 
 export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
   publicKey: string; intakeId: string; debtId: string | null;
@@ -85,12 +86,19 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
     const done = m.transcriptType !== 'partial';
     setLines(prev => {
       const last = prev[prev.length - 1];
-      // A partial turn overwrites itself until final, so the thread reads as
-      // speech settling rather than a stutter of duplicates.
-      if (last && last.role === role && !last.done) {
-        return [...prev.slice(0, -1), { role, text: m.transcript, done }];
+      // ONE BUBBLE PER TURN, NOT PER PIECE (30 Sep). Vapi sends a speaker's
+      // turn as a run of final transcripts, one per settled phrase, and each
+      // used to open a bubble of its own: the opener arrived as four ("שלום." /
+      // "צהריים טובים" / "מדבר מיכאל מחברת" / "הומיז. איך אפשר לעזור לכם"),
+      // which the owner could not test from. A piece from the same speaker as
+      // the bubble above joins it. A partial keeps overwriting only its own
+      // part: `base` holds what had already settled when it started.
+      if (last && last.role === role) {
+        const base = last.done ? last.text : (last.base ?? '');
+        const text = base ? base + ' ' + m.transcript : m.transcript;
+        return [...prev.slice(0, -1), { role, text, done, base }];
       }
-      return [...prev, { role, text: m.transcript, done }];
+      return [...prev, { role, text: m.transcript, done, base: '' }];
     });
   }
 
