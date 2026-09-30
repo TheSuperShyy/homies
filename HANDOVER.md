@@ -291,7 +291,11 @@ its stated time.
 - **LIVE on the dashboard 30 Sep, `main` = `a890ce5`: one bubble per turn on the Voice page and the call page (Vercel READY).** Vapi sends a turn as several final transcript pieces, and each piece used to become a bubble. The owner: *"its hard for me to test it if its being transcribe as word per word"*.
   - **How it shipped:** fix `a18d9a9` on this branch, cherry-picked alone onto `origin/main` in a temporary worktree (removed) and pushed with the TheSuperShyy account.
   - **Checks:** tsc clean on both trees. Both functions were run on the real 10:18 transcript and a simulated live call.
-  - **`main` and `feature/chatbot` now differ by TWO cherry-picks** (`fbf3846` and `a890ce5`). They will merge cleanly, because the content is identical.
+  - **`main` and `feature/chatbot` now differ by THREE cherry-picks** (`fbf3846`, `a890ce5`, `f8b984f`). They will merge cleanly, because the content is identical.
+- **LIVE on the dashboard 30 Sep, `main` = `f8b984f`: the Voice page's Mute/Unmute works.**
+  - **The bug:** it read `isMuted()` straight after `setMuted()`. The Daily call machine applies the change asynchronously, so the label was always the opposite of the mic.
+  - **The fix:** the console trusts its own state. Branch fix `a9685ca`, cherry-picked alone.
+  - **Checks:** reproduced with a stub carrying Daily's lag. The old code was wrong on every press and the new code agreed on every press. tsc clean on both trees.
 - **LIVE 30 Sep 10:15 UTC, on the owner's "go": small talk on inbound, in the owner's own flow.** Read back: the prompt equals the repo (5,326 chars, sha `36a5338c95d2`), the first message equals the repo, Speechmatics is kept (enhanced, us, 700, 4 words, Azure fallback), model-text lines are on, voice `ba765d50`, 7 tools. **Owed:** the owner's Hebrew test call, which also gives the Speechmatics verdict. His example: opener → "hi" → Michael says hi and asks how they are → "fine" → a human word ("good to hear") → how can I help.
   - **The fence change:** the greet-once sentence now asks how they are instead of how to help, and asks back when the caller asks first (a question, not just a wish).
   - **The order:** Michael reacts to the answer, then asks how to help. Once per call, and only on a bare hello or a how-are-you. A caller who starts with the matter gets no small talk.

@@ -1511,6 +1511,13 @@ consecutive pieces from the same speaker into one bubble. On the live console,
 a partial overwrites only its own part. The owner could not test from a
 word-by-word thread. Any new view of a transcript needs the same joining.
 
+**Never read the Vapi web SDK's state straight back after setting it (30 Sep).**
+`setMuted()` posts to Daily's call machine and returns. `isMuted()` reads a
+cached participant state that only changes when the machine answers, so the
+Voice page's Mute button showed the opposite of the mic on every press. The
+console keeps its own state and tells the SDK. Any new control (a device
+picker, hold) follows the same rule.
+
 **Small talk on inbound follows the owner's own flow (30 Sep, live 10:15 UTC
 on his "go").**
 - **His example:** opener → "hi" → Michael says hi back and asks how they are → "fine" → a

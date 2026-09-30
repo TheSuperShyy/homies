@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### The Voice page's Mute/Unmute showed the opposite of the mic; fixed and live
+
+**The owner:** *"the mute and unmute not working"*.
+
+**Cause, read from the installed code:**
+- Vapi web 2.7.0 `setMuted(m)` calls Daily 0.87.0 `setLocalAudio(!m)`, which only does
+  `sendMessageToCallMachine({action: "local-audio"})` and returns.
+- `isMuted()` is `localAudio() === false`, and `localAudio()` reads
+  `_participants.local.tracks.audio.state`. That cache updates only when the machine answers.
+- `toggleMute()` read `isMuted()` straight back. The first press muted the mic with the label
+  still on Mute, and every later press was inverted.
+
+**Fix (`a9685ca`):** the console's `muted` state is the truth. `next = !muted`, tell the SDK, set
+the state.
+
+**Reproduced before shipping:**
+- The old and new `toggleMute()` were extracted from HEAD and the working file and run against
+  a stub with Daily's lag.
+- The old code was WRONG on all three presses, and the new code agreed on all three.
+- tsc clean.
+
+**Live:**
+- Cherry-picked alone onto `origin/main` in a temporary worktree (`hotfix/voice-mute`). tsc on
+  that tree was clean, run through a junction that was removed as a link only.
+- Pushed `a890ce5..f8b984f`, and the worktree was removed. `main` and this branch now differ by
+  three cherry-picks.
+
 ### "It still looks like Vapi is listening to the agent": one bubble per turn, live
 
 **The owner:** *"why is it still looking like vapi is listening to the agent like the human"*,
