@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### "Why is it like this": noise words inside Michael's welcome (11:26 UTC)
+
+The owner pasted the Voice page for `01a0f211`. After his "hello", Michael's bubble read
+`מה ? היי, איזה כיף לשמוע אתכם. מה שלומכם? אני מה יש עושה`.
+- **Timings:** `מה` at 14.8s, which is 1.2s after his hello and 2s before Michael's reply began at
+  17.0s. Then `אני`, `מה`, `מה`, `יש`, `עושה` at 23–26s, while Michael waited for an answer.
+- **Cause:** the office sound, transcribed on Michael's side. The dashboard's one-bubble join puts
+  those words inside his sentence.
+- **Other calls:** the same in `01a0f210` (`מה` at 24s). `01a0f20f` was hung up during the opener.
+- **Put to the owner:** turn the office sound off on inbound (recommended, because it keeps the
+  Speechmatics trial going) or go back to Deepgram (keeps the sound).
+- Nothing changed.
+
 ### Michael understands a fault before opening it (prepared, not yet live)
 
 Owner, on `01a0f1f8`: *"i just told there was a lock issue in the gate and the agent did not ask
