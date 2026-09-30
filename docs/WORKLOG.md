@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### WhatsApp bot tested without OpenRouter: gate green, nine-conversation Claude replay
+
+Owner: *"can you test the chatbot but dont use the openrouter"*. Nothing spent, nothing changed.
+- **`check_whatsapp_rules.py` on live:** all 121 cases pass, pins unchanged (prompt sha
+  `8afa16824480`, workflow last updated 27 Sep 14:16 UTC).
+- **Claude replay** (Claude as Gemini, from the live prompt, the inject facts and the eight tool
+  descriptions; the model input for every turn was written out as the workflow builds it):
+  1. tap after the menu: name, no second greeting, "what happened?"; the fault got a human word,
+     then building and apartment in one question; ticket with the resident's words;
+  2. "hey how is it going": greeting, name, answer, ask-back, and the help question in the same
+     message;
+  3. "the gate lock is broken again": greeting, name, "אוף, שוב פעם", straight to building and
+     apartment; the ticket says only "המנעול של השער שבור שוב";
+  4. mid-conversation "hi, the sink…": one greeting back, no name, no ticket, gentle;
+  5. leak: one separating question ("from the ceiling or something inside the flat?"), then
+     building and apartment, ticket urgency high;
+  6. balance: name and phone asked in one message, then the amount and the months;
+  7. payment: `get_payment_link` first, two messages with `§§§`, link on its own line, personal,
+     "write to me here", no how-else; "תודה" got a warm goodbye with no question;
+  8. "who are you": the name, plus "במה אפשר לעזור לכם?";
+  9. lift emergency: `notify_team` before any question, then building and apartment, ticket.
+- **Verdict:** every rule held. The same three gaps against today's voice agent showed up in
+  practice: no "which gate / what exactly" before a ticket (2, 3), the help question inside the
+  how-are-you reply (2), and the impersonal "במה אפשר לעזור" (2, 8).
+- **Caveat given to the owner:** Claude checks the rules and logic, not Gemini's exact wording.
+
 ### WhatsApp checked against today's voice changes (read-only)
 
 Owner: *"ok so now lets check the chatbot if it has the same option we have now like the warm
