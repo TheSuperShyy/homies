@@ -297,7 +297,8 @@ its stated time.
   - **The bug:** it read `isMuted()` straight after `setMuted()`. The Daily call machine applies the change asynchronously, so the label was always the opposite of the mic.
   - **The fix:** the console trusts its own state. Branch fix `a9685ca`, cherry-picked alone.
   - **Checks:** reproduced with a stub carrying Daily's lag. The old code was wrong on every press and the new code agreed on every press. tsc clean on both trees.
-- **Tightened, LIVE 30 Sep (prompt 5,539 chars, sha `74681064a55c`).**
+- **Friendlier welcome, LIVE 30 Sep (prompt 5,596 chars, sha `4c0cc2c11c48`).** "hi" had got a clerk's `שלום גם לכם. מה שלומכם?`. The welcome is now warm and glad, in Michael's own words, with `שלום גם לכם` named as the thing to avoid. **The phantom-word fix is still open:** the owner rejected the question (office sound off, back to Deepgram, or a short-word filter) and has not chosen.
+- **Tightened, LIVE 30 Sep (prompt 5,539 chars, superseded by the line above).**
   - **Why:** the owner's 10:37 UTC call got "how are you" and "how can I help" in one turn.
   - **The welcome is now the whole turn.** Help is asked in the turn after the answer.
   - **First person everywhere.** Help is offered as אני יכול, never אפשר, and the opener ends `איך אני יכול לעזור לכם?`.

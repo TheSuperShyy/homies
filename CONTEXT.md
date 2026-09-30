@@ -1534,6 +1534,9 @@ on his "go").**
     second good-morning. That welcome is the whole turn: no help question rides along. The
     owner's 10:37 UTC call got both questions at once, and he called it out ("like i told you
     alr").
+  - The welcome is warm and glad, like someone happy to hear from them, never a clerk's
+    `שלום גם לכם`. The owner said *"how many time do i tell you to make it friendly"*, and it
+    was the third time he asked.
   - A caller who asks how Michael is gets a short answer and the question back, a real
     question and not just a wish (the WhatsApp epoch-50 wording).
   - The help question comes only after they have answered and got a human reaction.

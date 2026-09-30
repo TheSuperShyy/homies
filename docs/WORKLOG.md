@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### "How many times do I tell you to make it friendly": the welcome, warm and glad
+
+**The owner's screenshot** (Voice page, after the tightening): "hi" got
+`שלום גם לכם. מה שלומכם? הרבה יותר ממה`.
+- The flow held: the welcome came alone, with no help question.
+- The words were a clerk's stock reply. The model had read "שלום בחזרה" in the prompt literally.
+- `הרבה יותר ממה` is a phantom (the office sound transcribed on the agent's channel), not
+  Michael.
+- Owner: *"how many time do i tell you to make it friendly"*.
+
+**Changed, live** (5,596 chars, sha `4c0cc2c11c48`; sync and voice restore, read back equal to
+the repo, facts 13): the welcome is warm and glad, "like someone happy to hear from them", a
+light greeting back in his own words. `שלום גם לכם` is named as the clerk's reply to avoid,
+which is a negative example and allowed by CONTEXT.
+
+**Not fixed: the phantom words.** The owner rejected the question on how to fix them (office
+sound off, back to Deepgram, or a short-word filter) and pointed at friendliness instead. The
+choice is still his.
+
 ### The welcome turn is only the welcome; help is offered in the first person; phantom words found
 
 **The owner's call** (10:37 UTC, `01a0f1e3`, pasted from the Voice page, all his turns English):
