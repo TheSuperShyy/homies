@@ -1489,6 +1489,14 @@ Turn-taking is untouched. The survey agent's tighter timers (wait 0.2,
 punctuation 0.1, no punctuation 0.6, number 0.4, no smart endpointing) are
 there to compare against only if the call feels slow.
 
+**The agents' own lines are the model's text, not a transcription of their
+voice (30 Sep, both agents).** `modelOutputInMessagesEnabled: true` in BASE.
+Vapi's default transcribes the agent's voice for its side of the history and
+the transcript. On Hebrew that came back fragmented and garbled, and the model
+read it back as its own last turn. A transcript line of the agent's is now what
+the model wrote. Where `voice_guard.py` swaps a word, the transcript shows the
+unswapped word.
+
 **Free text in a dashboard table wears `.freetext` (29 Sep).** A table column is
 never narrower than the longest unbreakable run in any of its cells, so one
 pasted link in one ticket blanked the whole Tickets page: the column grew to

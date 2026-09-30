@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### The agents' lines come from the model's text; the first Speechmatics call; no ask-back
+
+**`modelOutputInMessagesEnabled: true`, both Hebrew agents.**
+- The owner asked for it after seeing his survey agent (Apify-v3) run with it. It went into
+  BASE and was pushed as a one-field PATCH on each agent, both read back True.
+- Voice, transcriber, prompt and tools are unchanged: inbound on speechmatics, debt on deepgram,
+  5,043 and 4,825 chars, 7 tools each.
+- **Why:** Vapi's default writes the agent's side of the history and the transcript by
+  transcribing the agent's own voice. On Hebrew that comes back in pieces and garbled. The
+  12:21 IL call stored `שלום. צהריים` / `טובים` / `מדבר מיכאל` as three separate lines, plus a
+  `פורסם על` that was never said, and the model reads that back as its own last turn.
+- **Side effects** are written beside the setting in `vapi_sync.py`. The transcript shows the
+  model's word where `voice_guard.py` swaps one. Whether an interrupted sentence is stored whole
+  is not documented, so the first interrupted call gets read.
+
+**The first Speechmatics call** was the owner's, `01a0f19e`, at 09:21 UTC, billed to speechmatics.
+- Two turns, both English ("hi", "how are you"), at 3,410ms and 1,266ms. The Deepgram baseline
+  median is 2,160ms.
+- **Inconclusive.** Two turns is too few, and the caller said no Hebrew, so neither speed nor
+  Hebrew accuracy can be judged yet.
+
+**"How are you" got an answer but no question back.** Michael said: "אני בסדר, תודה ששאלתם. איך
+אפשר לעזור לכם היום?". The owner wants him to ask back.
+- The WhatsApp bot has done this since 20 Sep (epoch 50: "a question, not just a wish"), and the
+  voice prompt never carried it.
+- A speech version was shown to the owner, not shipped. It asks back and waits, and asks how to
+  help only after the answer, one question per turn.
+
 ### Inbound hears with Speechmatics (trial); the opener is spoken "מחברת הומיז"
 
 **Asked:** the owner pasted a description of a Speechmatics transcriber (Hebrew, `enhanced`, US)

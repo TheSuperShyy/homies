@@ -282,7 +282,10 @@ its stated time.
   - **Backup:** the Azure he-IL fallback, unchanged.
   - **Where it lives:** the inbound target of `vapi_sync.py`, so a sync keeps it.
   - **How it was pushed:** only the `transcriber` object, PATCHed from `build()`. Every field read back equal to the repo, and the voice, prompt and tools did not move.
-  - **Owed:** the owner's one test call. Then run `python scripts/vapi_latency.py --assistant inbound` against the Deepgram baseline (median 2,160ms, 19 turns), read how well it heard him, and give keep or revert.
+  - **First call, inconclusive:** `01a0f19e`, 09:21 UTC. Two English turns, 3,410ms and 1,266ms, no Hebrew from the caller.
+  - **Owed:** one Hebrew call with several turns (הומיז, ועד הבית, a report at בר כוכבא 23, an apartment number). Then run `python scripts/vapi_latency.py --assistant inbound` against the Deepgram baseline (median 2,160ms, 19 turns), read how well it heard him, and give keep or revert.
+- **LIVE 30 Sep, both agents: `modelOutputInMessagesEnabled: true`.** The agent's lines in history and transcripts are now the model's text, not a garbled transcription of its own voice. Read the first interrupted call to learn whether a cut-off sentence is stored whole.
+- **PROPOSED, not shipped: the inbound agent asks back when asked how it is.** On 12:21 IL, "how are you" got "אני בסדר, תודה ששאלתם. איך אפשר לעזור לכם היום?" and no question back. The line is in the voice form of the WhatsApp epoch-50 clause (ask back, a question not a wish; help comes after the answer; only when the caller opens the door; once per call). It waits on the owner's OK.
   - **To revert:** delete the key, run `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then `python scripts/vapi_set_voice.py --apply`.
   - **Turn-taking is untouched.** The survey agent's tighter timers are in CONTEXT, for use only if the call feels slow.
 - **LIVE 30 Sep 08:11 UTC: the inbound agent opens with `שלום, <the hour's greeting>, מדבר מיכאל מהומיז. איך אפשר לעזור לכם?` and says goodbye by the hour.** *Answered since:* the voice's swap reaches the first message. The owner's 08:51 and 08:52 UTC calls have it spoken `מחברת הומיז`. Keeping that, or exempting the opener, is his call (item 2 below).

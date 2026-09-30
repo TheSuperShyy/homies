@@ -146,6 +146,18 @@ BASE = {
         {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}),
     "model": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.3},
     "firstMessageMode": "assistant-speaks-first",
+    # THE AGENT'S LINES ARE WHAT THE MODEL WROTE, NOT WHAT A TRANSCRIBER HEARD
+    # (30 Sep). Vapi's default builds the assistant's side of the history and
+    # the transcript by transcribing the agent's own voice. On Hebrew that came
+    # back in pieces and garbled: `שלום. צהריים` / `טובים` / `מדבר מיכאל` as
+    # separate lines, `מחברת הומיס`, `מעצב שלו` for מהצוות של. The model then
+    # read that version back as its own last turn, on every turn. The owner
+    # saw his survey agent (another project) run with this on, and asked for it
+    # on both of these. Two side effects. Where voice_guard.py swaps a word,
+    # the transcript shows the model's word, not the spoken one. And whether an
+    # interrupted sentence is stored whole or cut off is not in Vapi's docs, so
+    # the first call with an interruption should be read to find out.
+    "modelOutputInMessagesEnabled": True,
     # TRANSCRIPT ONLY, NO AUDIO. Decided 25 Aug: nothing is recorded, the
     # transcript is kept. Switched off live the same day on all four assistants;
     # this line is what stops the next push switching it back on.
