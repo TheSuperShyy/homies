@@ -283,6 +283,7 @@ its stated time.
   - **Where it lives:** the inbound target of `vapi_sync.py`, so a sync keeps it.
   - **How it was pushed:** only the `transcriber` object, PATCHed from `build()`. Every field read back equal to the repo, and the voice, prompt and tools did not move.
   - **First call, inconclusive:** `01a0f19e`, 09:21 UTC. Two English turns, 3,410ms and 1,266ms, no Hebrew from the caller.
+  - **Against it so far: phantom words.** On both Speechmatics calls, words appear in Michael's lines while he is silent (`אני יש פה ספר`, `כן, בסדר`, `פורסם על`). They are probably the office background sound, transcribed on the agent's channel. Deepgram had `confidenceThreshold` 0.4 and Speechmatics has no equivalent. The phantoms also reach `messagesOpenAIFormatted`.
   - **Owed:** one Hebrew call with several turns (הומיז, ועד הבית, a report at בר כוכבא 23, an apartment number). Then run `python scripts/vapi_latency.py --assistant inbound` against the Deepgram baseline (median 2,160ms, 19 turns), read how well it heard him, and give keep or revert.
 - **LIVE 30 Sep, both agents: `modelOutputInMessagesEnabled: true`.**
   - The model reads back its own text, not a garbled transcription of its voice.
@@ -296,6 +297,11 @@ its stated time.
   - **The bug:** it read `isMuted()` straight after `setMuted()`. The Daily call machine applies the change asynchronously, so the label was always the opposite of the mic.
   - **The fix:** the console trusts its own state. Branch fix `a9685ca`, cherry-picked alone.
   - **Checks:** reproduced with a stub carrying Daily's lag. The old code was wrong on every press and the new code agreed on every press. tsc clean on both trees.
+- **Tightened, LIVE 30 Sep (prompt 5,539 chars, sha `74681064a55c`).**
+  - **Why:** the owner's 10:37 UTC call got "how are you" and "how can I help" in one turn.
+  - **The welcome is now the whole turn.** Help is asked in the turn after the answer.
+  - **First person everywhere.** Help is offered as אני יכול, never אפשר, and the opener ends `איך אני יכול לעזור לכם?`.
+  - **Owed:** his next call.
 - **LIVE 30 Sep 10:15 UTC, on the owner's "go": small talk on inbound, in the owner's own flow.** Read back: the prompt equals the repo (5,326 chars, sha `36a5338c95d2`), the first message equals the repo, Speechmatics is kept (enhanced, us, 700, 4 words, Azure fallback), model-text lines are on, voice `ba765d50`, 7 tools. **Owed:** the owner's Hebrew test call, which also gives the Speechmatics verdict. His example: opener → "hi" → Michael says hi and asks how they are → "fine" → a human word ("good to hear") → how can I help.
   - **The fence change:** the greet-once sentence now asks how they are instead of how to help, and asks back when the caller asks first (a question, not just a wish).
   - **The order:** Michael reacts to the answer, then asks how to help. Once per call, and only on a bare hello or a how-are-you. A caller who starts with the matter gets no small talk.

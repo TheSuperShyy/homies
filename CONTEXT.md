@@ -1500,9 +1500,16 @@ side:
 - `messagesOpenAIFormatted` held the opener as one line;
 - `artifact.messages` and `transcript` still held it as four spoken pieces.
 
-The opener is a fixed line and not model output, so whether Michael's own
-replies also show whole in the transcript is still to be seen. **The dashboard
-joins the pieces instead** (next paragraph).
+**The dashboard joins the pieces instead** (next paragraph).
+
+**The first call with replies (`01a0f1e3`) showed no effect either.**
+`messagesOpenAIFormatted` holds the spoken version joined per turn, including
+phantom words transcribed while Michael was silent. The setting is left on
+because it is harmless, but nothing so far shows it working. Don't count on it.
+
+**Michael offers help in the first person (30 Sep, the owner).** It is איך אני
+יכול לעזור, never the impersonal איך אפשר לעזור, which he heard as "we". This
+applies in the opener and, by a words bullet in the fence, everywhere else.
 
 **A transcript bubble is a turn, not a piece (30 Sep).** Vapi sends a speaker's
 turn as a run of final transcripts, one per settled phrase, and stores it as
@@ -1524,7 +1531,9 @@ on his "go").**
   human word → how can I help.
 - **So, on voice:**
   - A bare hello gets a short hello back and "how are you", never a second introduction or a
-    second good-morning.
+    second good-morning. That welcome is the whole turn: no help question rides along. The
+    owner's 10:37 UTC call got both questions at once, and he called it out ("like i told you
+    alr").
   - A caller who asks how Michael is gets a short answer and the question back, a real
     question and not just a wish (the WhatsApp epoch-50 wording).
   - The help question comes only after they have answered and got a human reaction.

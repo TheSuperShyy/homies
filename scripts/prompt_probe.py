@@ -63,7 +63,7 @@ TARGETS = {
         # — a probe that opens with a line the agent no longer says is scoring
         # the wrong conversation.
         "first": ('{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}שלום, בוקר טוב{% elsif h < 17 %}שלום, צהריים טובים{% else %}שלום, ערב טוב{% endif %}'
-                  ", מדבר מיכאל מהומיז. איך אפשר לעזור לכם?"),
+                  ", מדבר מיכאל מהומיז. איך אני יכול לעזור לכם?"),
         "vars": {},
         "tools": "INTAKE_TOOLS",
     },

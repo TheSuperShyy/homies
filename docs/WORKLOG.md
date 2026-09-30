@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### The welcome turn is only the welcome; help is offered in the first person; phantom words found
+
+**The owner's call** (10:37 UTC, `01a0f1e3`, pasted from the Voice page, all his turns English):
+- "hi" got `שלום. מה שלומכם? איך אפשר לעזור לכם היום`, both questions in one turn.
+- "hi how are you" got an answer and the question back, which is right.
+- "im good thank you" got `איזה יופי לשמוע. במה אפשר לעזור לכם היום`.
+- Owner: *"like i told you alr when the person say like hi after hearing the intro it should do
+  the warm welcome like hello, how are you, and also not how can we help you its how can i help
+  you"*.
+
+**Changed, live** (prompt 5,539 chars, sha `74681064a55c`; the inbound sync and voice restore,
+read back equal to the repo):
+- A bare hello gets a warm welcome: hello back and how are you. That is the whole turn, with no
+  help question and no other question. The ask-back turn is the same.
+- The help question comes in the turn after they said how they are, with a human reaction first.
+- A new words bullet: help is offered in the first person (אני יכול, not the impersonal אפשר).
+- The opener now ends `איך אני יכול לעזור לכם?`, with the probe copy kept in step.
+- **Checks:** facts 13, no hang-up words, `אפשר לעזור` nowhere in the prompt or the opener.
+- Shipped without a separate read-through, because the owner dictated both changes. The lines
+  were shown to him after.
+
+**Found on the same call: phantom words in Michael's lines while he was silent.**
+- `אני` / `יש` / `פה ספר` at 22–25s, and `כן` / `, בסדר` at 52–54s after he had finished.
+- They are also in `messagesOpenAIFormatted`, Vapi's record of what the model is fed. On this
+  record, the model-text setting did not keep the agent channel's transcription out of the
+  model's history.
+- The likely source is the office background sound, transcribed on the agent's channel.
+  Deepgram ran with `confidenceThreshold` 0.4 and Speechmatics has no such filter. The 12:21 IL
+  call had the same (`פורסם על`, a lone `יום`).
+- It is an input to the Speechmatics keep-or-revert decision. Nothing was changed for it.
+
 ### The Voice page's Mute/Unmute showed the opposite of the mic; fixed and live
 
 **The owner:** *"the mute and unmute not working"*.
