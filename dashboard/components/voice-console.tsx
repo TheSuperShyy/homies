@@ -212,11 +212,19 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
   }
 
   function stop() { clearTimeout(watchdogRef.current); vapiRef.current?.stop?.(); }
+  // OUR STATE IS THE TRUTH, NOT isMuted() (30 Sep, owner: "the mute and
+  // unmute not working"). The SDK's setMuted() posts a message to Daily's call
+  // machine and returns at once. isMuted() reads the local participant's
+  // cached track state, which only changes when the machine reports back. So
+  // reading it straight after the set returned the OLD value: the first press
+  // muted the mic and left the label on Mute, and the second press unmuted it
+  // while the label said Unmute, inverted from then on.
   function toggleMute() {
     const v = vapiRef.current;
     if (!v) return;
-    v.setMuted(!v.isMuted());
-    setMuted(v.isMuted());
+    const next = !muted;
+    v.setMuted(next);
+    setMuted(next);
   }
 
   const inCall = state === 'connecting' || state === 'live';
