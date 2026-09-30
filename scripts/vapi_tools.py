@@ -180,6 +180,15 @@ def _open_request(location):
     }
     if location == "full":
         props.update(LOCATION)
+        # 30 Sep, inbound only, the owner: a gate-lock report got a ticket
+        # offer and an address question, and nobody asked which gate or where.
+        # The prompt now has Michael understand the fault first; this says the
+        # ticket carries the where as well as the what.
+        props["description"] = {
+            "type": "string",
+            "description": "What is wrong and where exactly in the building, in "
+                           "Hebrew, in their words where possible.",
+        }
         # 15 Sep, inbound only: a resident who wants to pay is a ticket too
         # (migration 031), beside the team note. The gloss is what keeps a
         # how-much question out of it; the debt agent keeps the twelve, its

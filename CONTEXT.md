@@ -1510,6 +1510,17 @@ side:
 phantom words transcribed while Michael was silent. The setting is left on
 because it is harmless, but nothing so far shows it working. Don't count on it.
 
+**On inbound, Michael understands a fault before he opens it (30 Sep, the
+owner).** A gate-lock report went straight to "I'll open a request, what's the
+address?", and the owner wanted *"what gate are we talking about? and where is
+it located and stuff"*. The fence's common-property sentence now says: first
+understand it the way whoever comes to fix it will need to know it, meaning
+what exactly and where exactly in the building. Michael asks for what is still
+missing, one open question at a time. The prompt holds the principle, not the
+owner's example questions, per the no-fixed-messages rule. The emergency
+sentence still comes first, a private fault still gets no questions, and the
+inbound `open_request` description asks for the where as well as the what.
+
 **Michael offers help in the first person (30 Sep, the owner).** It is איך אני
 יכול לעזור, never the impersonal איך אפשר לעזור, which he heard as "we". This
 applies in the opener and, by a words bullet in the fence, everywhere else.

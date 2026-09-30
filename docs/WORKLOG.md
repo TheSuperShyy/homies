@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### Michael understands a fault before opening it (prepared, not yet live)
+
+Owner, on `01a0f1f8`: *"i just told there was a lock issue in the gate and the agent did not ask
+for more information like what gate are we talking about? and where is it located and stuff"*.
+- **Why it happened:** Michael followed the prompt. A common-property fault was
+  `אתה פותח פנייה`, and the address comes once a ticket is certain, which a gate is from the first
+  word. The `open_request` trigger ("call when the resident raises a maintenance issue") pulls the
+  same way. Nothing said to understand the fault first.
+- **Changed in the fence:** the same sentence now says open a request, but first understand it the
+  way whoever comes to fix it will need to know it: what exactly is happening, and where exactly it
+  is in the building. Ask for what is still missing, one open question at a time. There are no
+  example questions and no list of gates. Emergency, private-fault and leak sentences are
+  untouched.
+- **Changed in `vapi_tools.py`, inbound only:** `open_request.description` asks for what is wrong
+  *and where exactly in the building*. The debt agent's copy is unchanged.
+- **Checks so far:**
+  - facts 13, unchanged;
+  - prompt 5,736 chars (was 5,596), sha `5d1ba62c87d1`;
+  - no hang-up word in the new text;
+  - dry run clean: 7 tools on Supabase, first message unchanged.
+- **Running:** a Claude replay of five calls on the new prompt: the gate, a person stuck in the
+  lift, all details given up front, a private sink, and a leak from above. No OpenRouter spend.
+- **Then:** the inbound sync, the voice restore and a read-back, and the owner's call.
+
 ### Read back: the owner's 10:59 UTC call (`01a0f1f8`), the first on the warm welcome
 
 Owner: *"pull back the previous conversation in the voice agent inbound"*. Read-only; nothing
