@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-09-30
 
+### Read back: the owner's 10:59 UTC call (`01a0f1f8`), the first on the warm welcome
+
+Owner: *"pull back the previous conversation in the voice agent inbound"*. Read-only; nothing
+changed. His turns were English again, so the Speechmatics verdict is still owed.
+- **Opener** (13:59 IL): `שלום, צהריים טובים, מדבר מיכאל מחברת הומיז. איך אני יכול לעזור לכם`.
+  The swap still turns מהומיז into מחברת הומיז.
+- **The flow held.** "hi" got `היי, איזה כיף לשמוע אתכם. מה שלומכם?` and nothing else. "im good
+  thank" got `טוב. איזה יופי, שמח לשמוע. במה אני יכול לעזור לכם היום`.
+- **New: a caller sentence went unanswered.** The gate-lock sentence is logged at 46.5s. At 49.0s
+  the silence line `קחו את הזמן, אני איתכם` played instead of a reply, 12s (`idleTimeoutSeconds`)
+  after Michael's question ended, so the silence timer never saw him speak. The model never
+  answered it. The same sentence is logged again at 56.6s and got the reply at 60.8s: sympathy,
+  "I'll open a request", and a question for the building's address. On Speechmatics, user
+  messages carry no end time (`endTime` equals `time`, no `duration`), so the log can't show
+  whether the line played over his words or just after them.
+- **Phantoms again**, in Michael's lines and in `messagesOpenAIFormatted`: `יש פה ספר` (25.6s),
+  `אוקיי` (40.7s), `על` (73.5s).
+- He gave no address. The second silence line played at 81.4s and he hung up at 85s. No ticket.
+- `01a0f1f6` at 10:58 UTC was a zero-length attempt (`did-not-receive-customer-audio`,
+  started and ended at the same instant), not a conversation.
+
 ### "How many times do I tell you to make it friendly": the welcome, warm and glad
 
 **The owner's screenshot** (Voice page, after the tightening): "hi" got

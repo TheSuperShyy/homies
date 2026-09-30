@@ -1487,7 +1487,10 @@ over 19 turns) and on how well it heard him. The setting lives in
 come from the buildings table at sync time and never from this public repo.
 Turn-taking is untouched. The survey agent's tighter timers (wait 0.2,
 punctuation 0.1, no punctuation 0.6, number 0.4, no smart endpointing) are
-there to compare against only if the call feels slow.
+there to compare against only if the call feels slow. Evidence against it so
+far, all on the owner's English calls: phantom words in Michael's lines on
+every call, and one caller sentence (`01a0f1f8`) that got the silence line
+instead of a reply, as if Vapi had not heard him speak.
 
 **The model reads back its own text, not a transcription of its voice (30 Sep,
 both agents).** `modelOutputInMessagesEnabled: true` in BASE. Vapi's default
