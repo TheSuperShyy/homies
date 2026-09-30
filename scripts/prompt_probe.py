@@ -62,8 +62,8 @@ TARGETS = {
         # copy that is not kept in step automatically. Change one, change both
         # — a probe that opens with a line the agent no longer says is scoring
         # the wrong conversation.
-        "first": ('{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}'
-                  ", מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?"),
+        "first": ('{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}שלום, בוקר טוב{% elsif h < 17 %}שלום, צהריים טובים{% else %}שלום, ערב טוב{% endif %}'
+                  ", מדבר מיכאל מהומיז. איך אפשר לעזור לכם?"),
         "vars": {},
         "tools": "INTAKE_TOOLS",
     },
@@ -348,39 +348,56 @@ def repo_tools(target):
 def resolve(prompt, variables):
     for k, v in variables.items():
         prompt = prompt.replace("{{%s}}" % k, v)
-    return render_greeting(prompt)
+    return render_now(render_greeting(prompt))
 
 
 # The opening line greets by the hour since 22 Sep: a Liquid `{% %}` block that
 # Vapi renders when the call starts. This harness never goes through Vapi, so
-# it renders the block itself, with the same hours, from Jerusalem time. Left
-# unrendered the model would be handed `{% assign h = ... %}` as its own first
-# words, and every probe would score a call that never happens.
+# it renders the block itself, from Jerusalem time. Left unrendered the model
+# would be handed `{% assign h = ... %}` as its own first words, and every probe
+# would score a call that never happens.
+#
+# 30 Sep: the words come from the block's own branches, not from a list kept
+# here. The inbound line became "שלום, בוקר טוב" while the debt line stayed
+# "בוקר טוב", and both go through this renderer, so any one list was wrong for
+# one of them. The block has to stay a flat if/elsif/else chain on `h`: the
+# pattern ends at the first endif.
 GREETING_BLOCK = re.compile(r"\{%-?\s*assign\s+h\s.*?\{%-?\s*endif\s*-?%\}", re.S)
+BRANCH = re.compile(r"\{%-?\s*(?:if|elsif)\s+h\s*<\s*(\d+)\s*-?%\}(.*?)(?=\{%)", re.S)
+OTHERWISE = re.compile(r"\{%-?\s*else\s*-?%\}(.*?)\{%-?\s*endif", re.S)
+
+# 30 Sep: the inbound prompt carries the time, so the closing wish can fit the
+# hour: `{{"now" | date: "%H:%M", "Asia/Jerusalem"}}`, also rendered by Vapi at
+# the start of the call. Left raw here, the model would read the Liquid itself.
+NOW_EXPR = re.compile(r'\{\{\s*"now"\s*\|\s*date:\s*"([^"]*)"\s*,\s*"Asia/Jerusalem"\s*\}\}')
 
 
-def greeting_he(hour):
-    if hour < 5:
-        return "שלום"
-    if hour < 12:
-        return "בוקר טוב"
-    if hour < 17:
-        return "צהריים טובים"
-    return "ערב טוב"
+def pick_branch(block, hour):
+    for limit, words in BRANCH.findall(block):
+        if hour < int(limit):
+            return words
+    m = OTHERWISE.search(block)
+    return m.group(1) if m else ""
 
 
-def jerusalem_hour():
+def jerusalem_now():
     try:
         from zoneinfo import ZoneInfo
-        return datetime.datetime.now(ZoneInfo("Asia/Jerusalem")).hour
+        return datetime.datetime.now(ZoneInfo("Asia/Jerusalem"))
     except Exception:  # no tz database on this machine: Israel is UTC+2/+3
-        return (datetime.datetime.utcnow().hour + 3) % 24
+        return datetime.datetime.utcnow() + datetime.timedelta(hours=3)
 
 
 def render_greeting(text, hour=None):
     if "{%" not in text:
         return text
-    return GREETING_BLOCK.sub(greeting_he(jerusalem_hour() if hour is None else hour), text)
+    h = jerusalem_now().hour if hour is None else hour
+    return GREETING_BLOCK.sub(lambda m: pick_branch(m.group(0), h), text)
+
+
+def render_now(text, now=None):
+    t = jerusalem_now() if now is None else now
+    return NOW_EXPR.sub(lambda m: t.strftime(m.group(1)), text)
 
 
 # What the tools answer. Fixed, so both halves of a pair get the same facts back

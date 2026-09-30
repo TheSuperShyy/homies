@@ -1459,10 +1459,17 @@ after the owner reads the changed lines; his ear on a browser call is the only
 register test that counts (a Claude replay checks rules, not tone). His
 no-fixed-messages rule covers voice too (29 Sep evening): no dictated
 sentences in the scripts — the closings are the model's own words with only
-the hang-up tail יום טוב, ולהתראות fixed; the platform lines that play where
+the hang-up tail fixed; the platform lines that play where
 no model turn exists (idle, tool wait, silence goodbye) are the narrow
 exception and get variety instead, and the openers stay fixed like the
-WhatsApp menu.
+WhatsApp menu. **On inbound since 30 Sep the fixed tail is ולהתראות alone**:
+the goodbye thanks the caller for calling and wishes whatever fits the hour,
+and the prompt carries the time (`{{"now" | date: "%H:%M", "Asia/Jerusalem"}}`,
+rendered by Vapi) so it can. The debt script still ends יום טוב, ולהתראות. The
+inbound opener is `שלום, <the hour's greeting>, מדבר מיכאל מהומיז. איך אפשר
+לעזור לכם?`, in the owner's words ("michael from homies not from the homies
+team"). The glued מהומיז is his choice against the 12 Aug *Laumiz* misreading
+and waits on his ear.
 
 **Free text in a dashboard table wears `.freetext` (29 Sep).** A table column is
 never narrower than the longest unbreakable run in any of its cells, so one

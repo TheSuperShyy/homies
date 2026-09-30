@@ -9,6 +9,57 @@ conversation that produced it.
 
 ---
 
+## 2026-09-30
+
+### Inbound: "hello, good morning, Michael from Homies", and a goodbye that thanks and fits the hour
+
+The owner: the debt call's opening sounds nice (*"hey good morning how are you?"*). He wants the
+inbound agent to open *"hello, good morning this is homies how can i help you?"* and to close
+*"like thank you for calling have a good afternoon or good day or sum"*. Read back first,
+read-only. The inbound opener has greeted by the hour since 22 Sep (`בוקר טוב / צהריים טובים /
+ערב טוב, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?`), and the 29 Sep calls heard it at 10:46,
+13:14 and 17:32. The closing's fixed tail, יום טוב, ולהתראות, wished an evening caller a good day.
+Asked, the owner chose *"michael from homies not from the homies team"*. He then chose the
+word-for-word מהומיז over מחברת הומיז, knowing the glued form was misread as *Laumiz* on 12 Aug.
+
+**Opener:** `שלום, {בוקר טוב|צהריים טובים|ערב טוב}, מדבר מיכאל מהומיז. איך אפשר לעזור לכם?`.
+Before 05:00 it is שלום alone. The Liquid chain stays flat, and no branch holds a hang-up word.
+
+**Closing:** in Michael's own words. He thanks the caller and gives a wish that fits the hour.
+Only ולהתראות is fixed, as the last word. The prompt now carries the time as
+`{{"now" | date: "%H:%M", "Asia/Jerusalem"}}`. Vapi's docs cover dynamic variables and the date
+filter in the system prompt, and the opener already uses the filter live. `endCallPhrases` is
+unchanged.
+
+**`prompt_probe.py`:**
+- Its copy of the first message was kept in step.
+- The greeting block now renders from its own branches, because the debt opener shares the
+  renderer and keeps בוקר טוב without שלום.
+- The time expression renders too.
+
+**Checked:**
+- `facts_check` still reports 13 missing.
+- Renders at 03, 09, 14 and 20 give the four lines, none with יום טוב or ולהתראות.
+- The debt opener renders unchanged.
+- The dry run shows 5,043 chars and 7 tools [supabase].
+- A Claude replay wrote closings at 09:00, 14:00, 19:00 and 23:30. Each thanked the caller, fit
+  the hour, put ולהתראות last and nowhere earlier, and used the plural. This checks rules, not
+  tone.
+
+**Deployed 08:11 UTC.** The inbound sync and the voice restore ran as one command, with no 504
+this time. Read back:
+- the first message and the prompt equal the repo (sha `7db64f76da29`);
+- 7 tools;
+- the voice is the Ido clone `ba765d50`.
+
+**Open, answered by the owner's next browser call:**
+1. Does the voice say מהומיז cleanly, or *Laumiz*?
+2. Does `voice_guard.py`'s substitution (מהומיז → מחברת הומיז) reach the first message too?
+   Vapi's docs don't say. If it does, callers hear "Homies company" whatever the line says. The
+   substitution guards the model's mid-call sentences and was left alone.
+3. Does the rendered system message show the time, not raw Liquid?
+4. Does the call end `assistant-said-end-call-phrase` on ולהתראות?
+
 ## 2026-09-29
 
 ### "The dashboard is broken": one imported ticket's 497-character link blanked the Tickets page

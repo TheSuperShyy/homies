@@ -190,8 +190,29 @@ carries here unchanged:
 ## First message
 
 ```
-{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, מדבר מיכאל מהצוות של הומיז. איך אפשר לעזור?
+{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}שלום, בוקר טוב{% elsif h < 17 %}שלום, צהריים טובים{% else %}שלום, ערב טוב{% endif %}, מדבר מיכאל מהומיז. איך אפשר לעזור לכם?
 ```
+
+**30 Sep: hello first, then the hour, and "Michael from Homies".** The owner:
+*"hello, good morning this is homies how can i help you?"*, then, shown the
+options, *"michael from homies not from the homies team"*. So שלום now comes
+before the hour's greeting (alone before 05:00, where the hour has no greeting
+of its own), the name is מיכאל מהומיז, and the question gained לכם. Rendered at
+14:00: `שלום, צהריים טובים, מדבר מיכאל מהומיז. איך אפשר לעזור לכם?`. About half
+a second longer than the 22 Sep line. The chain stays flat (no nested `if`),
+because `scripts/prompt_probe.py` renders the block by its branches and a
+nested `endif` would end the match early; and no branch may ever say יום טוב
+or ולהתראות, which are hang-up phrases.
+
+**מהומיז is the owner's choice against a known risk.** He chose the word for
+word over מחברת הומיז knowing the glued form is the one the voice read as
+*Laumiz* on 12 Aug (the note on מהצוות של הומיז below). Two things only a
+call can settle: whether the voice now says it cleanly, and whether
+`voice_guard.py`'s substitution (מהומיז → מחברת הומיז, applied to every
+chunk the model speaks) also reaches this first message. Vapi's docs do not
+say whether the format plan touches the first message. If it does, callers hear
+מחברת הומיז no matter what this line says. The substitution was left alone on
+purpose: it guards the sentences the model composes mid-call.
 
 **The greeting follows the clock since 22 Sep.** The owner asked that both
 agents open with בוקר טוב / צהריים טובים / ערב טוב rather than a flat שלום.
@@ -222,7 +243,8 @@ voice are one change — see the note on `voice` in `scripts/vapi_sync.py`,
 which has now been argued in both directions.
 
 **מהצוות של הומיז clears the 12 Aug pronunciation fault by luck, not by
-design.** That fault was מ+הומיז glued into one unfamiliar word, which the
+design.** *(Until 30 Sep. The line says מהומיז again, by the owner's choice;
+see the 30 Sep note above.)* That fault was מ+הומיז glued into one unfamiliar word, which the
 voice — and our own transcriber — read as *Laumiz* on five calls. Here the
 one-letter preposition attaches to הצוות, an ordinary word, and the company
 name stands alone after של. The `voice_guard.py` substitution is still
@@ -319,10 +341,37 @@ phone-tree experience this system exists to replace.
 - כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.
 - לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.
 - אינך יודע אם מדבר איתך גבר או אישה, וההקראה הופכת כל סיומת פנייה לנשמעת. לכן אתה פונה למי שעל הקו בלשון רבים, תמיד: תרצו, תספרו, אתכם, שלכם. זה נשמע טבעי בשירות ישראלי. אם הם דיברו על עצמם בזכר או בנקבה, לך אחריהם.
-- את השיחה אתה סוגר במילים שלך, חם וקצר, והמילים האחרונות הן תמיד בדיוק: יום טוב, ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותן, ולכן אל תגיד "יום טוב" או "ולהתראות" לפני שהשיחה באמת הסתיימה.
+- את השיחה אתה סוגר במילים שלך, חם וקצר: תודה שהתקשרו, ואיחול שמתאים לשעה ביום (השעה עכשיו {{"now" | date: "%H:%M", "Asia/Jerusalem"}}). המילה האחרונה היא תמיד בדיוק: ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותה, ולכן אל תגיד "ולהתראות" או "יום טוב" לפני שהשיחה באמת הסתיימה.
 ````
 
 ---
+
+## 30 Sep — hello, good morning; thanks for calling
+
+The owner, liking the debt call's opening ("good morning … how are you?"),
+asked the same for this agent: *"hello, good morning this is homies how can i
+help you?"* and a closing *"like thank you for calling have a good afternoon
+or good day or sum"*. The hour's greeting was already there since 22 Sep. The
+opener's changes are in the note under `## First message`: שלום first, מיכאל
+מהומיז, לכם.
+
+The closing kept its shape (Michael's own words, one fixed last word) and
+changed its content: thanks for calling, and a wish that fits the time of day.
+Until today the last words were fixed as יום טוב, ולהתראות, so an evening
+caller was wished a good day. Now only ולהתראות is fixed: it is on
+`endCallPhrases` and carries the vav, so a bare goodbye cannot trip it. The
+wish before it is the model's. To pick one it needs the time, and the prompt
+now carries it: `{{"now" | date: "%H:%M", "Asia/Jerusalem"}}`, the same
+LiquidJS filter the opener already uses live, rendered by Vapi when the call
+starts. Vapi documents dynamic variables and the date filter for the system
+prompt as well as the first message. It is the voice twin of the WhatsApp bot's
+`[השעה בישראל עכשיו HH:mm]`. No sample wishes in the text: the owner's words
+are for feel, and a list in a prompt becomes a menu the model reads from.
+
+יום טוב stays on `endCallPhrases`, so a morning "שיהיה לכם יום טוב" still
+hangs up. The trade is that an afternoon or evening goodbye ends the call on
+ולהתראות alone. The backstops are unchanged: the silence goodbye, the
+seven-minute cap, and a caller who hangs up first.
 
 ## 29 Sep — nicer and more verbal
 
