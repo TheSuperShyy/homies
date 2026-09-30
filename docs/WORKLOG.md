@@ -51,6 +51,10 @@ conversation that produced it.
 - **Checked:** 5,043 → 5,326 chars, facts 13, no hang-up words. A Claude replay of six openings
   held: bare hi, "fine", "not great", how-are-you first, hello with a leak, a second how-are-you.
   This checks rules, not tone. It waits on the owner's OK.
+- **The rule is in CONTEXT** ("Small talk on inbound follows the owner's own flow"), with why it
+  differs from WhatsApp's no-greeting-after-the-menu: on the phone the opener is Michael's own
+  voice, and the owner's example asks for the hello back. The stop hook caught the first commit
+  without it.
 
 ### Inbound hears with Speechmatics (trial); the opener is spoken "מחברת הומיז"
 

@@ -290,6 +290,7 @@ its stated time.
   - **The order:** Michael reacts to the answer, then asks how to help. Once per call, and only on a bare hello or a how-are-you. A caller who starts with the matter gets no small talk.
   - **Checks:** 5,326 chars, facts 13, no hang-up words.
   - **Ships on the owner's OK:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then `python scripts/vapi_set_voice.py --apply`.
+  - **The standing rule is in CONTEXT:** "Small talk on inbound follows the owner's own flow". It deliberately differs from WhatsApp's no-greeting-after-the-menu, so don't align the two without showing him examples.
   - **To revert:** delete the key, run `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then `python scripts/vapi_set_voice.py --apply`.
   - **Turn-taking is untouched.** The survey agent's tighter timers are in CONTEXT, for use only if the call feels slow.
 - **LIVE 30 Sep 08:11 UTC: the inbound agent opens with `שלום, <the hour's greeting>, מדבר מיכאל מהומיז. איך אפשר לעזור לכם?` and says goodbye by the hour.** *Answered since:* the voice's swap reaches the first message. The owner's 08:51 and 08:52 UTC calls have it spoken `מחברת הומיז`. Keeping that, or exempting the opener, is his call (item 2 below).

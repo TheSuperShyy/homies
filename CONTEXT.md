@@ -1497,6 +1497,23 @@ read it back as its own last turn. A transcript line of the agent's is now what
 the model wrote. Where `voice_guard.py` swaps a word, the transcript shows the
 unswapped word.
 
+**Small talk on inbound follows the owner's own flow (30 Sep; in the repo,
+live only after his OK).**
+- **His example:** opener → "hi" → Michael says hi back and asks how they are → "fine" → a
+  human word → how can I help.
+- **So, on voice:**
+  - A bare hello gets a short hello back and "how are you", never a second introduction or a
+    second good-morning.
+  - A caller who asks how Michael is gets a short answer and the question back, a real
+    question and not just a wish (the WhatsApp epoch-50 wording).
+  - The help question comes only after they have answered and got a human reaction.
+  - It happens once per call, and never when the caller opens with the matter.
+- **This differs from WhatsApp on purpose.** There, a bare hi right after the menu gets no
+  second greeting, because the menu is a system message and he chose that from examples on
+  27 Sep. On the phone the opener is Michael's own voice, and the owner's example asks for the
+  hello back.
+- **Don't "fix" one to match the other.** Show him examples first.
+
 **Free text in a dashboard table wears `.freetext` (29 Sep).** A table column is
 never narrower than the longest unbreakable run in any of its cells, so one
 pasted link in one ticket blanked the whole Tickets page: the column grew to
