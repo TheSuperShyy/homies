@@ -292,7 +292,7 @@ its stated time.
   - **How it shipped:** fix `a18d9a9` on this branch, cherry-picked alone onto `origin/main` in a temporary worktree (removed) and pushed with the TheSuperShyy account.
   - **Checks:** tsc clean on both trees. Both functions were run on the real 10:18 transcript and a simulated live call.
   - **`main` and `feature/chatbot` now differ by THREE cherry-picks** (`fbf3846`, `a890ce5`, `f8b984f`). They will merge cleanly, because the content is identical.
-- **LIVE on the dashboard 30 Sep, `main` = `f8b984f`: the Voice page's Mute/Unmute works.**
+- **LIVE on the dashboard 30 Sep, `main` = `f8b984f`: the Voice page's Mute/Unmute works (Vercel READY).**
   - **The bug:** it read `isMuted()` straight after `setMuted()`. The Daily call machine applies the change asynchronously, so the label was always the opposite of the mic.
   - **The fix:** the console trusts its own state. Branch fix `a9685ca`, cherry-picked alone.
   - **Checks:** reproduced with a stub carrying Daily's lag. The old code was wrong on every press and the new code agreed on every press. tsc clean on both trees.

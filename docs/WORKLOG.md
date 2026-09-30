@@ -35,7 +35,7 @@ the state.
 **Live:**
 - Cherry-picked alone onto `origin/main` in a temporary worktree (`hotfix/voice-mute`). tsc on
   that tree was clean, run through a junction that was removed as a link only.
-- Pushed `a890ce5..f8b984f`, and the worktree was removed. `main` and this branch now differ by
+- Pushed `a890ce5..f8b984f`, Vercel reported READY, and the worktree was removed. `main` and this branch now differ by
   three cherry-picks.
 
 ### "It still looks like Vapi is listening to the agent": one bubble per turn, live
