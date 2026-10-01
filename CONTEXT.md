@@ -2372,6 +2372,43 @@ real message after a greeting came 3-6 s later). They were left alone, and the
 watch flags each one if it ever happens: code added for something that has
 never happened is how the next bug gets in.
 
+## How the WhatsApp bot is tested without a model call
+
+1 Oct. Owner: *"i want you to do a automated testing of the chatbot like doing ab
+testing qa and stuff i dont want you to use openrouter credit strictly."* The
+gate above tests code; `scripts/wa_qa.py` (with `wa_qa.js` and
+`wa_qa_scenarios.json`) tests the model's behaviour, with Claude as the model
+and the live code around it, and spends nothing:
+
+- `bundle` reads the live workflow (GET only), extracts the code the way the
+  gate does, and writes per-variant context files (the system prompt, the
+  tool definitions with their `$fromAI` docs, the ack model's prompt), the
+  player protocol and the deck. A variant is a spec: a prompt file plus
+  tool-doc overrides, so an A/B is two bundles of the same deck.
+- Claude players (one subagent per scenario and variant, blind to the rubric
+  and to which variant is live) play the ack model, the answering model and
+  the resident; fixtures stand in for the tools.
+- `grade` runs every turn through the live expressions: the inject with the
+  scenario's clock, `A word first?`, every `Reply usable?` guard, `Try again`'s
+  note, `Send`'s filter and buttons, the payment split. What is graded is what
+  a handset would get. A rubric and the scenario's expectations follow.
+- `judge` writes blind packets; Claude judges rank the variants per scenario;
+  `report` merges everything.
+
+**What it proves and what it does not.** The code paths are real, so a guard
+that eats an honest reply shows up here before a resident meets it (two did on
+1 Oct). The model is Claude, not Gemini, so a clean run says the prompt and the
+rules hold up, and an A/B says what a wording change asks for; it cannot measure
+Gemini's own slips. Slang, "בהקדם" and an off-list emoji never appeared under
+any variant on 1 Oct, A included, while Gemini wrote all three on 30 Sep: a
+rule the prompt already has cannot be strengthened by words and then verified
+offline. The testable fix for that kind of slip is a guard, which the gate
+can prove. The final proof is still the owner's handset.
+
+**A bug found on a handset is a scenario added to the deck**, the way a bug
+fixed is a case added to the gate. The 1 Oct run and its findings are in
+`docs/assistant/transcripts/2026-10-01-whatsapp-qa-abc.md`.
+
 ## A model told how to write something will write it
 
 27 Sep, epoch 68. `Worth a word?` is a gatekeeper: it decides whether the

@@ -11,6 +11,68 @@ conversation that produced it.
 
 ## 2026-10-01
 
+### WhatsApp bot: automated A/B/C QA on the live code, Claude as the model, nothing spent
+
+Owner: *"i want you to do a automated testing of the chatbot like doing ab testing qa and stuff i
+dont want you to use openrouter credit strictly."* No OpenRouter, no message to any phone, nothing
+changed on the live bot. Full results with every transcript:
+`docs/assistant/transcripts/2026-10-01-whatsapp-qa-abc.md`.
+- **The harness, new in the repo:** `scripts/wa_qa.py`, `scripts/wa_qa.js`,
+  `scripts/wa_qa_scenarios.json`. `bundle` reads the live workflow (GET only), extracts the code
+  the way `check_whatsapp_rules.py` does, and writes per-variant context files (the system prompt,
+  the eight tool definitions with their `$fromAI` docs, the ack model's prompt), the player
+  protocol and the deck (26 scenarios: faults, taps, payments, balance, status, service info,
+  quote, emergency, refusals, goodbye, memory, a photo, an unknown street). Claude players
+  (Sonnet, one per scenario and variant, blind to the rubric and to which variant is live) play
+  `Worth a word?`, `Answer the resident` and the resident, with fixtures as tool results. `grade`
+  runs every turn through the live expressions (the inject with the scenario's clock,
+  `A word first?`, all seven `Reply usable?` guards, `Try again`'s note, `Send`'s filter and
+  buttons, `Two parts?`, `Send the rest`), then a rubric and the scenario's expectations. `judge`
+  writes blind packets; Claude judges (Opus-class) rank X/Y/Z; `report` merges.
+- **Variants:** A = live (`8afa16824480`). B = five prompt edits and one tool-doc edit for the
+  30 Sep findings (understand the fault and ask what is missing before the building; the ticket
+  holds only their words; slang by name; no "soon" / "don't worry"; the six emoji only; the hour
+  word from the clock, also on a rewrite). C = B + the how-are-you alone (the voice rule), on the
+  nine scenarios the greeting paragraph can reach. 61 conversations, 139 model turns.
+- **Gate and watch first:** 121 cases green, 17 pins unchanged. `--watch 2026-09-27`: 16 turns,
+  10 flags, all accounted for (four are the 27 Sep bugs fixed that day, six are the 30 Sep probe's
+  own executions: `lastNodeExecuted Send`, 404 on the invented conversation).
+- **Rubric:** A 5 flags, B 5, C 0, the same kinds in A and B and none a regression: the ack
+  model's "הבנתי ש" (known gap), the link inline instead of on its own line (pay_link), and two
+  live-guard defects (below). Expectations: A 101 met / 2 failed (both "asks which gate", which
+  A's prompt does not ask for), B 103 / 0, C 39 / 0.
+- **Judges, blind:** B first in 12 of 26, A in 11, C in 3 of 9 (ties count for all); average
+  place A 1.69, B 1.65. On both gate scenarios the judges put B above A: B asks which gate and the
+  ticket says "השער של החניה, מאחורה"; A opens "המנעול של השער" unresolved. B's one breach: "על
+  איזה שער מדובר, ומה בדיוק הבעיה במנעול?" bundles which gate and what exactly, two asks in one
+  message. Everywhere else: no rule difference between A and B, wording only.
+- **The how-are-you:** in A, B and C alike the player left the help question out of the
+  how-are-you reply (it read "one question per message" as the stronger rule); Gemini on 30 Sep
+  put three questions in it. The A/B does not decide this; the C transcripts show the owner what
+  his voice rule looks like in chat.
+- **Found in production, deterministic, no model involved:**
+  1. Promise words go out and nothing catches them: since the 27 Sep deploy, 2 of 3 real bot
+     replies ("אל דאגה, אני אפתח…", "הצוות שלנו יטפל בזה בהקדם"); September, 33 of 352 sent
+     replies; whole history, "בהקדם" 44, "יחזור/יחזרו אליכם" 21. The prompt forbids them; no guard
+     tests for them.
+  2. The clerk guard misses "כדי שאפתח" (11 sent replies), "אני צריך לדעת" (6), "כדי שאבדוק"
+     (3); it catches only `כדי שאוכל|אצטרך` (58).
+  3. The phantom guard rejects an honest "לא פותח קריאה" / "לא נפתחה קריאה" (reproduced on the
+     live expression). A resident who said "no ticket" gets a rewrite under the generic note. 0 such
+     sentences ever reached a handset.
+  4. The deeds guard rejects a reply that refers back to a ticket opened earlier in the
+     conversation ("הקריאה שפתחתי, מספר …" with no tool in that turn; no second-pass exemption).
+     The retry note then says to open a ticket; a second failure opens a stub via `Open it anyway`.
+     Risk: a duplicate ticket after "what do I do meanwhile?". Seen in lift_person, A and B.
+- **Not changed:** the live bot, the pins, the prompt. B is a proposal in the results doc; the
+  three guard changes (promise words, the clerk forms, the two false rejections) are gate work,
+  cases first, on the owner's say.
+- **Caveat given:** Claude played Gemini. Slang, "בהקדם", 😔 and the hour slip did not appear under
+  any variant, A included; those are Gemini's slips against rules the prompt already has, and no
+  offline run can validate a wording fix for them. The guard is the testable fix. The final proof
+  is the owner's handset.
+- **Cost:** about 7M Claude tokens (61 players at ~110K, 26 judges at ~57K), no OpenRouter.
+
 ### The Debts page's את/אתה label removed, before it ever went live
 
 Owner, asked whether gender goes on the dashboard: *"i dont think that is necessary? since the

@@ -46,6 +46,11 @@ HOW A WHATSAPP CHANGE SHIPS (CONTEXT.md, "How a WhatsApp change ships"):
 
 Real message texts are read at run time and handed to Node on stdin; they are
 never written to disk. Links and phone numbers are masked in everything printed.
+
+This file tests the CODE. The model's own behaviour is tested, still without a
+model call, by scripts/wa_qa.py: Claude plays the model, this code runs around
+every turn, blind judges rank the variants (CONTEXT.md, "How the WhatsApp bot
+is tested without a model call").
 """
 import hashlib
 import json

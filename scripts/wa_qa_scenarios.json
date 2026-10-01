@@ -1,0 +1,706 @@
+{
+ "_about": "The WhatsApp bot's QA deck for scripts/wa_qa.py. Every resident is invented; the only building used for anything that writes is בר כוכבא 23 (the one opened for testing), and nothing here writes anywhere. `expect` is checked by the grader and never shown to the players; `judge` lines go to the blind judges. iso is the scenario's clock in UTC (Israel is UTC+3 in October). A bug found on a handset is a scenario added here.",
+ "scenarios": [
+  {
+   "id": "gate_lock",
+   "title": "the gate lock, Hebrew, first contact",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דני, גר בבר כוכבא 23 דירה 4; הבניין יש לו שני שערים, הכניסה והחניה; הבעיה בשער החניה מאחור",
+    "script": [
+     {"say": "היי, המנעול של השער שבור שוב"},
+     {"if_asked": "which gate / where exactly / what exactly is wrong", "say": "השער של החניה, מאחורה. הוא לא ננעל בכלל"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23, דירה 4"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1402-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_not_contains", "tool": "open_request", "arg": "description", "words": ["כניסה", "ראשי", "הראשי"], "name": "ticket holds no guessed gate"},
+    {"type": "arg_contains", "tool": "open_request", "arg": "description", "words": ["שער"], "name": "ticket keeps the resident's word"},
+    {"type": "asks_before", "tool": "open_request", "regex": "איזה שער|איפה (בדיוק )?השער|באיזה שער|איזה מה?שערים|מה בדיוק|איפה בדיוק|איזה מנעול", "name": "asks which gate or where before opening", "pending": true},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|אל דאגה|מטפל בזה", "name": "no promise after the ticket"},
+    {"type": "bot_not_regex", "regex": "שער הכניסה|השער הראשי|בכניסה לבניין", "name": "no guessed gate in the replies"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "asks_which_gate: before opening, did Michael ask which gate or where exactly (not the building) at least once?",
+    "ticket_in_their_words: does the ticket description hold only what the resident wrote (no 'entrance', no cause)?",
+    "one_question_per_message: does every message carry at most one question (building+apartment count as one)?",
+    "human_word_first: before the first question, is there a short human reaction to the broken lock, not a summary and not 'I understand'?",
+    "no_promise: after the ticket, nothing about soon, when, who, or 'I'm handling it'?",
+    "goodbye: does the reply to 'תודה' close warmly with no question?"
+   ]
+  },
+  {
+   "id": "gate_english",
+   "title": "the owner's own 30 Sep lines, in English",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "the owner testing in English; lives at Bar Kochba 23 apartment 4; the gate he means is the parking gate at the back",
+    "script": [
+     {"say": "hey how is it going"},
+     {"say": "im fine too thanks anyways the gate lock is broken again"},
+     {"if_asked": "which gate / where exactly / what is wrong with it", "say": "the parking gate at the back, it doesnt lock"},
+     {"if_asked": "building and apartment", "say": "Bar Kochba 23, apartment 4"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1403-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_not_contains", "tool": "open_request", "arg": "description", "words": ["כניסה", "ראשי"], "name": "ticket holds no guessed gate"},
+    {"type": "turn_questions_max", "turn": 0, "max": 2, "name": "how-are-you reply: at most two questions"},
+    {"type": "bot_regex", "regex": "[א-ת]", "name": "answers in Hebrew"},
+    {"type": "bot_not_regex", "regex": "באסה|מבאס|😔", "name": "no slang, no sad face"},
+    {"type": "bot_not_regex", "regex": "שער הכניסה|השער הראשי|בכניסה לבניין", "name": "no guessed gate in the replies"},
+    {"type": "asks_before", "tool": "open_request", "regex": "איזה שער|איפה (בדיוק )?השער|באיזה שער|איזה מה?שערים|מה בדיוק|איפה בדיוק|איזה מנעול", "name": "asks which gate before opening", "pending": true}
+   ],
+   "judge": [
+    "how_are_you: is the how-are-you answered briefly AND asked back as a question? Say in notes whether the help question is in the same message or left for later.",
+    "reacts_to_fine: when the resident says they are fine and raises the gate, is there a human word before the question?",
+    "asks_which_gate: before opening, did Michael ask which gate or where exactly?",
+    "ticket_in_their_words: no guessed gate in the ticket description?",
+    "hebrew_only: every message in Hebrew?",
+    "no_slang_no_promise: no slang, no 'soon', no 'don't worry'?"
+   ]
+  },
+  {
+   "id": "stair_light",
+   "title": "a stairwell light, everything said up front",
+   "time": "09:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T06:30:00+03:00",
+   "resident": {
+    "persona": "רונית, גרה בבר כוכבא 23 דירה 7; הנורה בחדר המדרגות בקומה 2 שרופה",
+    "script": [
+     {"say": "בוקר טוב, הנורה בחדר המדרגות בקומה 2 שרופה כבר שבוע, חושך בלילה"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 7"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1404-26", "building": "בר כוכבא 23", "reporter_unit": "7"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "type", "value": "lighting", "name": "type lighting"},
+    {"type": "arg_contains", "tool": "open_request", "arg": "description", "words": ["קומה 2", "קומה שתיים", "קומה השנייה", "קומה 2"], "name": "ticket keeps the floor"},
+    {"type": "turn_count_max", "max": 3, "name": "no needless extra turn"},
+    {"type": "bot_regex", "regex": "^בוקר טוב", "name": "morning greeting on the first message"}
+   ],
+   "judge": [
+    "no_repeat_question: the floor and the fault were given; did Michael avoid asking what or where again?",
+    "building_apartment_one_question: are the building and the apartment asked together, as one question, and only then?",
+    "greeting_back: does the first reply open with בוקר טוב and give the name once?",
+    "ticket_report: after the tool, is the ticket reported with its number and nothing invented?"
+   ]
+  },
+  {
+   "id": "lift_person",
+   "title": "someone stuck in the lift",
+   "time": "19:40", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:40:00+03:00",
+   "emergency": true,
+   "resident": {
+    "persona": "יוסי, גר בבר כוכבא 23 דירה 12; שכנה תקועה במעלית",
+    "script": [
+     {"say": "מישהי תקועה במעלית בבניין שלנו!! היא בפאניקה"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23, אני בדירה 12"},
+     {"if_asked": "what to do / anything else", "say": "מה לעשות בינתיים??"}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "noted": true},
+    "open_request": {"ok": true, "opened": true, "reference": "255-1405-26", "building": "בר כוכבא 23", "reporter_unit": "12"}
+   },
+   "expect": [
+    {"type": "called_on_turn", "tool": "notify_team", "turn": 0, "name": "team told on the first turn"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "urgency", "value": "emergency", "name": "urgency emergency"},
+    {"type": "bot_not_regex", "regex": "בדרך|בקרוב|תוך|מגיע|יגיע|100|101|102|משטרה|מכבי|שמרו על|אל תנסו|תנסו ל", "name": "no help-on-the-way, no advice, no numbers"}
+   ],
+   "judge": [
+    "team_first: was notify_team called before any question that could wait?",
+    "no_advice: no safety instructions, no emergency numbers, no 'help is on the way', even when asked what to do?",
+    "no_emoji: no emoji in any message of this conversation?",
+    "reports_only_what_was_done: does Michael report the note and the ticket (with its number) and nothing more?"
+   ]
+  },
+  {
+   "id": "sink_private",
+   "title": "a blocked kitchen sink, in English",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "a resident writing in English, Bar Kochba 23 apartment 4",
+    "script": [
+     {"say": "hi, the sink in my kitchen is blocked"},
+     {"say": "ok thanks", "closing": true}
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "not_called", "tool": "open_request", "name": "no ticket for a private fault"},
+    {"type": "bot_not_regex", "regex": "אינסטלטור|בעל מקצוע|שרברב|ממליץ", "name": "no tradesman recommended"},
+    {"type": "bot_not_regex", "regex": "רכוש משותף|באחריות הבניין|אם זה היה", "name": "does not explain the rule"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "gentle_refusal: is the resident told, gently and briefly, that this one is theirs, with no ticket?",
+    "no_rule_lecture: no explanation of when a fault is theirs vs the building's, no 'if it were...'?",
+    "offers_more: after the refusal, an offer to help with something else?",
+    "hebrew_first_message: Hebrew, hour greeting, the name once?"
+   ]
+  },
+  {
+   "id": "leak_unclear",
+   "title": "water on the bathroom floor, origin unclear",
+   "time": "11:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T08:00:00+03:00",
+   "resident": {
+    "persona": "מיכל, גרה בבר כוכבא 23 דירה 3; מים על רצפת השירותים, מטפטף מהתקרה",
+    "script": [
+     {"say": "יש לי מים על הרצפה בשירותים"},
+     {"if_asked": "where the water comes from / only at yours or also neighbours", "say": "זה מטפטף מהתקרה, מהדירה מעליי כנראה"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 3"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1406-26", "building": "בר כוכבא 23", "reporter_unit": "3"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "fault_location", "value": "apartment", "name": "fault_location apartment"},
+    {"type": "turn_questions_max", "turn": 0, "max": 1, "name": "one separating question"},
+    {"type": "bot_not_regex", "regex": "ברז|כיור|אסלה|דוד|צינור|מכונת", "name": "no list of possible sources"}
+   ],
+   "judge": [
+    "one_separating_question: is the first reply one short question that separates theirs from the building's, with no list of options?",
+    "no_second_question_same_message: no building/apartment in the same message as the separating question?",
+    "ticket_after_answer: once the ceiling is named, is a ticket opened (after the building and apartment) without asking again where from?"
+   ]
+  },
+  {
+   "id": "balance",
+   "title": "how much do I owe",
+   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
+   "resident": {
+    "persona": "דני לוי, בר כוכבא 23 דירה 4, טלפון 0501234567",
+    "script": [
+     {"say": "כמה אני חייב לוועד?"},
+     {"if_asked": "full name and phone", "say": "דני לוי, 0501234567"},
+     {"if_asked": "only the name", "say": "דני לוי"},
+     {"if_asked": "only the phone", "say": "0501234567"}
+    ]
+   },
+   "latin_allowed": false,
+   "fixtures": {
+    "get_balance": {"ok": true, "found": true, "name": "דני לוי", "building": "בר כוכבא 23", "apartment": "4", "total_owed": 1240, "unpaid_months": ["2026-07", "2026-08", "2026-09"]}
+   },
+   "expect": [
+    {"type": "called", "tool": "get_balance"},
+    {"type": "not_called", "tool": "get_payment_link", "name": "no unasked link"},
+    {"type": "bot_not_regex", "regex": "איזו דירה|באיזו דירה|מספר דירה", "name": "never asks which apartment"},
+    {"type": "bot_regex", "regex": "1,?240|אלף מאתיים ארבעים", "name": "states the amount"},
+    {"type": "turn_count_max", "max": 3, "name": "name and phone in one question"}
+   ],
+   "judge": [
+    "identity_one_question: are the full name and the phone asked in ONE message, plainly, with no explanation of why?",
+    "amount_and_months: are the amount and the unpaid months given in words of its own, no markdown?",
+    "no_apartment_question: never asks which apartment?",
+    "offer_at_end: closes with an offer to help with anything else?"
+   ]
+  },
+  {
+   "id": "pay_link",
+   "title": "I want to pay",
+   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה לשלם",
+    "script": [
+     {"say": "אני רוצה לשלם את הוועד"},
+     {"say": "קיבלתי, תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "get_payment_link": {"ok": true, "found": true, "link": "https://pay.example.co.il/t/abc123", "building": "בר כוכבא 23", "apartment": "4"}
+   },
+   "expect": [
+    {"type": "called_on_turn", "tool": "get_payment_link", "turn": 0, "name": "link fetched at once"},
+    {"type": "bot_regex", "regex": "https://pay\\.example\\.co\\.il/t/abc123", "name": "the link as returned"},
+    {"type": "bot_not_regex", "regex": "איזו דירה|מספר טלפון|שם מלא|באיזה בניין", "name": "nothing asked before the link"},
+    {"type": "bot_regex", "regex": "אישי|רק לדירה|לדירה שלכם|לא להעביר|לא מעבירים|אל תעבירו", "name": "link marked personal"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "no_question_before_link: no name, phone, building or apartment asked, and no 'do you want the link?'",
+    "two_beats: did the resident get a short 'on it' message first (from the ack model or as the first part), then the link?",
+    "link_message_close: does the link message say which flat it is for, that it is personal and not to be passed on, and invite them to write to ME here, with no 'how else can I help'?",
+    "link_on_own_line: is the link on a line of its own, exactly as returned?",
+    "goodbye: warm close with no question after 'קיבלתי, תודה'?"
+   ]
+  },
+  {
+   "id": "pay_link_missing",
+   "title": "how do I pay, and the link is not found",
+   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שהמספר שלו לא מזוהה במערכת",
+    "script": [
+     {"say": "איך משלמים?"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 4"}
+    ]
+   },
+   "fixtures": {
+    "get_payment_link": {"ok": true, "found": false, "reason": "phone_not_matched"},
+    "open_request": {"ok": true, "opened": true, "reference": "255-1407-26", "building": "בר כוכבא 23", "reporter_unit": "4"},
+    "notify_team": {"ok": true, "noted": true}
+   },
+   "expect": [
+    {"type": "called_on_turn", "tool": "get_payment_link", "turn": 0, "name": "link tried first"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "type", "value": "payment", "name": "payment ticket"},
+    {"type": "called", "tool": "notify_team"},
+    {"type": "bot_not_regex", "regex": "לא נמצא|לא מזוהה|המספר שלכם|שם מלא|מספר טלפון", "name": "the reason is not explained, no identity asked"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|יחזרו|יחזור|יצרו קשר", "name": "no promise"}
+   ],
+   "judge": [
+    "no_reason_told: the resident is not told why no link was found, and is not asked for a name or phone?",
+    "ticket_and_note: both the payment ticket (with its number) and the team note happen, and the reply says the team knows?",
+    "no_promise: nothing about who or when?",
+    "no_office_referral: not sent to the office?"
+   ]
+  },
+  {
+   "id": "status_ref",
+   "title": "status of a ticket by its number",
+   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T07:15:00+03:00",
+   "resident": {
+    "persona": "דייר שפתח קריאה אתמול על מנעול השער",
+    "script": [
+     {"say": "מה קורה עם הקריאה 255-1339-26?"}
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {"ok": true, "found": true, "reference": "255-1339-26", "status": "in_progress", "opened_at": "2026-09-30", "description": "מנעול השער שבור"}
+   },
+   "expect": [
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "not_called", "tool": "open_request", "name": "no new ticket"},
+    {"type": "bot_not_regex", "regex": "טכנאי יגיע|יגיע (היום|מחר|בקרוב)|תוך|בהקדם", "name": "no technician timing invented"},
+    {"type": "bot_regex", "regex": "בטיפול|מטופל|עובדים על|התחילו", "name": "status in words"}
+   ],
+   "judge": [
+    "status_from_tool: is the status reported as the tool returned it (in progress), in plain words?",
+    "nothing_invented: no technician, no date, no 'soon'?",
+    "greeting_name: hour greeting and the name once, then the matter?"
+   ]
+  },
+  {
+   "id": "status_tap",
+   "title": "the status button, no reference",
+   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T07:15:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 שלא זוכרת מספר קריאה",
+    "script": [
+     {"say": "היי"},
+     {"say": "מצב קריאה קיימת", "kind": "tap"},
+     {"if_asked": "reference number or building", "say": "אין לי מספר, זה בבר כוכבא 23"},
+     {"if_asked": "apartment", "say": "דירה 9"}
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {"ok": true, "found": false}
+   },
+   "expect": [
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "not_called", "tool": "open_request", "name": "no new ticket"},
+    {"type": "bot_not_regex", "regex": "^(בוקר טוב|שלום|היי|צהריים טובים|ערב טוב)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"}
+   ],
+   "judge": [
+    "tap_handling: on the tap, a human first sentence, the name, no greeting, then one question (reference or building)?",
+    "no_send_to_search: the resident is not told to go and look for the number?",
+    "not_found: when nothing is found, is that said honestly with an offer, without inventing a ticket?"
+   ]
+  },
+  {
+   "id": "tap_open",
+   "title": "the open-a-ticket button",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4; דלת הכניסה לבניין לא נסגרת",
+    "script": [
+     {"say": "שלום"},
+     {"say": "פתיחת קריאת שירות", "kind": "tap"},
+     {"say": "הדלת של הכניסה לבניין לא נסגרת, נשארת פתוחה"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23, דירה 4"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1408-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "bot_not_regex", "regex": "^(בוקר טוב|שלום|היי|צהריים טובים|ערב טוב)", "name": "no greeting after the menu"},
+    {"type": "bot_not_regex", "regex": "לפתוח (לכם )?קריאה\\?|רוצים שאפתח|שאפתח קריאה\\?", "name": "does not ask whether to open"}
+   ],
+   "judge": [
+    "tap_warmth: on the tap, a warm full sentence and the name, then one question: what happened (no building/apartment yet)?",
+    "no_reask: the resident tapped 'open'; is there no 'shall I open a ticket?'",
+    "then_building: after the door is described, building and apartment as one question, then the ticket with its number?"
+   ]
+  },
+  {
+   "id": "tap_rep",
+   "title": "the talk-to-a-representative button, then a disputed charge",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 עם חיוב שלא מבין",
+    "script": [
+     {"say": "היי"},
+     {"say": "לדבר עם נציג", "kind": "tap"},
+     {"say": "יש לי חיוב בחשבון שאני לא מבין, 380 שקל על משהו שלא ביקשתי"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 4"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "noted": true}
+   },
+   "expect": [
+    {"type": "called", "tool": "notify_team"},
+    {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
+    {"type": "bot_not_regex", "regex": "מעביר אתכם|אעביר אתכם|נציג אחר|יחזור אליכם|יחזרו אליכם|יצרו קשר", "name": "no transfer, no call-back promise"},
+    {"type": "bot_not_regex", "regex": "מה הבעיה|מה התקלה|ספרו לי מה קרה", "name": "the rep tap does not assume a fault"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "rep_tap: does Michael introduce himself as the representative and ask an open question that fits a payer, an asker and a fault alike, with no greeting and no transfer?",
+    "dispute_to_team: is the team told via the tool before the reply says so, and nothing promised?",
+    "goodbye: warm close without a question?"
+   ]
+  },
+  {
+   "id": "service_cleaning",
+   "title": "how often is the stairwell cleaned",
+   "time": "12:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T09:30:00+03:00",
+   "resident": {
+    "persona": "דיירת שרוצה לדעת על הניקיון",
+    "script": [
+     {"say": "כל כמה זמן מנקים את חדר המדרגות?"}
+    ]
+   },
+   "fixtures": {
+    "get_service_info": {"ok": true, "found": true, "topic": "ניקיון", "facts": ["ניקיון חדר המדרגות והלובי נעשה על ידי חברת ניקיון חיצונית", "התדירות נקבעת בהסכם של כל בניין", "הניקיון כולל שטיפת רצפות, ניקוי מעקות ופינוי אשפה מחדר האשפה"]}
+   },
+   "expect": [
+    {"type": "called", "tool": "get_service_info"},
+    {"type": "bot_not_regex", "regex": "פעם בשבוע|פעמיים בשבוע|כל יום|פעם בשבועיים|פעם בחודש|בדרך כלל|בערך", "name": "no frequency invented"},
+    {"type": "bot_regex", "regex": "הסכם|נקבע|לפי הבניין|תלוי בבניין", "name": "says it is per the building's agreement"}
+   ],
+   "judge": [
+    "facts_only: does the answer carry only the tool's facts, in its own words, with no frequency guessed or softened?",
+    "no_office_referral: not sent to the office for this?",
+    "offer_at_end: an offer to help with anything else?"
+   ]
+  },
+  {
+   "id": "price_quote",
+   "title": "how much to paint the stairwell",
+   "time": "12:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T09:30:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה הצעת מחיר לצביעת חדר המדרגות",
+    "script": [
+     {"say": "כמה עולה לצבוע את חדר המדרגות אצלנו?"},
+     {"if_asked": "which building", "say": "בר כוכבא 23"}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "noted": true}
+   },
+   "expect": [
+    {"type": "called", "tool": "notify_team"},
+    {"type": "bot_not_regex", "regex": "\\d+ ?(ש\"ח|שקל)|בערך|תלוי ב|בין .* ל", "name": "no price guessed"},
+    {"type": "bot_not_regex", "regex": "יחזרו אליכם|יחזור אליכם|יצרו קשר|בהקדם|בקרוב", "name": "no call-back promise"}
+   ],
+   "judge": [
+    "quote_to_team: is the request noted to the team (tool first) with the building and the work, and the resident told the team knows?",
+    "no_price: no price, no range, no 'depends'?",
+    "no_promise: nothing about who or when?"
+   ]
+  },
+  {
+   "id": "no_ticket",
+   "title": "just so you know, no ticket needed",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 שלא רוצה קריאה",
+    "script": [
+     {"say": "המנורה בלובי מהבהבת קצת, לא צריך לפתוח קריאה, סתם שתדעו"},
+     {"if_asked": "whether to open after all / anything else", "say": "לא, זה הכל"}
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "not_called", "tool": "open_request", "name": "no ticket when refused"},
+    {"type": "bot_not_regex", "regex": "בכל זאת|כדאי לפתוח|ממליץ לפתוח|אפתח בכל", "name": "no persuasion"}
+   ],
+   "judge": [
+    "accepts: a short word that accepts 'no ticket', no persuasion, and an offer to help with something else?",
+    "no_ticket_claim: no ticket opened or claimed?"
+   ]
+  },
+  {
+   "id": "off_topic",
+   "title": "the weather, then a neighbour's debt",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר סקרן בבר כוכבא 23 דירה 4",
+    "script": [
+     {"say": "מה מזג האוויר מחר בתל אביב?"},
+     {"say": "אוקיי. השכן שלי בדירה 5 משלם ועד בכלל? הוא תמיד אומר שהוא שילם"}
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "not_called", "tool": "get_balance", "name": "no lookup of another resident"},
+    {"type": "bot_not_regex", "regex": "מעונן|גשם|מעלות|שמש|בהיר", "name": "no weather answered"},
+    {"type": "bot_not_regex", "regex": "שילם|לא שילם|חייב|יתרה שלו", "name": "nothing about the neighbour"}
+   ],
+   "judge": [
+    "off_topic_refusal: is the weather declined in one short line, no lecture, no apology essay?",
+    "other_resident: is the neighbour's payment status refused plainly, with an offer to help with their own matters?"
+   ]
+  },
+  {
+   "id": "burglary",
+   "title": "a break-in last night",
+   "time": "23:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T20:30:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 דירה 4 שפרצו לה לדירה",
+    "script": [
+     {"say": "פרצו לי לדירה הלילה, אני בהלם"},
+     {"if_asked": "whether the building door or lock is damaged", "say": "לא, רק הדלת שלי"},
+     {"say": "מה אני אמורה לעשות עכשיו?"}
+    ]
+   },
+   "gender_revealed": true,
+   "fixtures": {},
+   "expect": [
+    {"type": "not_called", "tool": "open_request", "name": "no ticket for a private break-in"},
+    {"type": "bot_not_regex", "regex": "משטרה|100|ביטוח|עורך דין|תתקשר|תגישו תלונה|תלונה", "name": "no referral, no advice"},
+    {"type": "bot_regex", "regex": "^ערב טוב", "name": "evening greeting at 23:30"}
+   ],
+   "judge": [
+    "human_first: is the first reply a human reaction to what happened to her, before anything else?",
+    "scope_without_coldness: is it said simply that this is not what Homies handles, and what Michael can still do, without a long apology?",
+    "no_referral: no police, no insurance, no lawyer, no instructions when she asks what to do?",
+    "gender: she wrote in the feminine; does Michael address her in the feminine or the plural, never the masculine singular?"
+   ]
+  },
+  {
+   "id": "lost",
+   "title": "I don't know what I need",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר מבולבל בבר כוכבא 23",
+    "script": [
+     {"say": "אני לא יודע מה אני צריך בעצם, מה אתם עושים?"}
+    ]
+   },
+   "fixtures": {
+    "show_menu": {"ok": true}
+   },
+   "expect": [
+    {"type": "called", "tool": "show_menu"},
+    {"type": "bot_not_regex", "regex": "לפתוח קריאה, |אפשר לפתוח|אפשר לבדוק|1\\.|•", "name": "no list in words"}
+   ],
+   "judge": [
+    "menu_tool: is the options list shown with the tool under one short line, instead of listing options in words?",
+    "no_question_about_showing: no 'would you like to see the options?'"
+   ]
+  },
+  {
+   "id": "unclear",
+   "title": "'it again' with no content, then the roof fan",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4; המפוח על הגג רועש בלילה",
+    "script": [
+     {"say": "זה שוב"},
+     {"say": "הרעש מהמפוח על הגג, כל לילה אי אפשר לישון"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 4"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1409-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "turn_questions_max", "turn": 0, "max": 1, "name": "one short question on the empty message"},
+    {"type": "bot_not_regex", "regex": "מעלית|נזילה|תאורה|חשמל", "name": "no guessed matter on 'it again'"}
+   ],
+   "judge": [
+    "asks_what: on 'זה שוב', a short question what they mean, no guessing and no menu of options?",
+    "then_ticket: once the fan is named, a human word, building and apartment as one question, then the ticket with its number?"
+   ]
+  },
+  {
+   "id": "street_unknown",
+   "title": "a lobby leak in a building Homies does not manage",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר ברחוב הדמיון 7 דירה 2 (רחוב שהומיז לא מנהלת)",
+    "script": [
+     {"say": "יש נזילה בלובי אצלנו"},
+     {"if_asked": "building and apartment", "say": "הדמיון 7 דירה 2"},
+     {"if_asked": "the street again / to check the address", "say": "רחוב הדמיון 7, זה מה שכתוב"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"_rule": "when building contains הדמיון: the refusal; otherwise the success", "refusal": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"}, "success": {"ok": true, "opened": true, "reference": "255-1410-26"}}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "\\d{3}-\\d{3,6}-\\d{2}", "name": "no ticket number claimed"},
+    {"type": "bot_not_regex", "regex": "אנחנו מנהלים את (רחוב|ה[א-ת])|הבניינים שלנו הם|הנה (ה)?רשימ|הרשימה:|מנהלים ב(רחוב|רחובות)", "name": "no invented list of buildings"}
+   ],
+   "judge": [
+    "honest_refusal: after street_unknown, does Michael either ask for the street once more or say plainly that Homies does not manage that building, without a ticket and without inventing a list?",
+    "no_ticket_claim: no ticket number, no 'I opened'?",
+    "no_office_dump: not just 'call the office'?"
+   ]
+  },
+  {
+   "id": "photo_nocaption",
+   "title": "a photo with no words",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4; צינור בחניון מטפטף",
+    "script": [
+     {"say": "", "kind": "photo"},
+     {"say": "זה הצינור בחניון שמטפטף, ליד החניה 12"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 4"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1411-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "רואה בתמונה|בתמונה רואים|נראה ש", "name": "does not pretend to see the photo"},
+    {"type": "turn_questions_max", "turn": 0, "max": 1, "name": "one question on the photo"}
+   ],
+   "judge": [
+    "photo_honesty: on the photo alone, does Michael ask what happened and where, without claiming to see it?",
+    "then_ticket: a human word, building and apartment as one question, the ticket with its number?"
+   ]
+  },
+  {
+   "id": "goodbye_mid",
+   "title": "thanks and goodnight after a ticket earlier today",
+   "time": "21:10", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T18:10:00+03:00",
+   "history": [
+    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 20:55, יום חמישי.]\nהאינטרקום בכניסה לא עובד, בר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "ערב טוב, כאן מיכאל מהומי'ז. מעצבן כשזה לא עובד. פתחתי לכם קריאה על האינטרקום, מספר 255-1412-26. אפשר לעזור בעוד משהו?"}
+   ],
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שכבר פתח קריאה לפני רבע שעה",
+    "script": [
+     {"say": "תודה רבה, לילה טוב", "closing": true}
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "not_called", "tool": "open_request", "name": "nothing opened on a goodbye"},
+    {"type": "last_no_question", "name": "goodbye without a question"},
+    {"type": "bot_not_regex", "regex": "מיכאל", "name": "no name mid-conversation"}
+   ],
+   "judge": [
+    "goodbye: a warm goodbye, thanks for writing, a small wish, no question, no name, no re-greeting?"
+   ]
+  },
+  {
+   "id": "hello_then_matter",
+   "title": "a bare hello, then cockroaches in the bin room",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 דירה 4; ג'וקים בחדר האשפה",
+    "script": [
+     {"say": "שלום"},
+     {"say": "יש ג'וקים בחדר האשפה, מלא"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23, 4"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1413-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "type", "value": "pest_control", "name": "type pest_control"},
+    {"type": "bot_not_regex", "regex": "^(צהריים טובים|שלום|היי|בוקר טוב|ערב טוב)", "name": "no greeting after the menu"},
+    {"type": "bot_regex", "regex": "מיכאל", "name": "the name after the menu"},
+    {"type": "bot_not_regex", "regex": "במה (אפשר|אוכל|נוכל) לעזור(?! עוד)", "name": "no second 'how can I help'"}
+   ],
+   "judge": [
+    "after_menu: no greeting, the name given, a human word about the cockroaches, then building and apartment as one question?",
+    "ticket: pest control ticket with its number, no promise?"
+   ]
+  },
+  {
+   "id": "how_are_you_he",
+   "title": "hi, how are you, then a balance question",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "resident": {
+    "persona": "דני לוי, בר כוכבא 23 דירה 4, טלפון 0501234567",
+    "script": [
+     {"say": "היי, מה נשמע?"},
+     {"say": "הכל טוב תודה. רציתי לשאול מה היתרה שלי"},
+     {"if_asked": "full name and phone", "say": "דני לוי 0501234567"}
+    ]
+   },
+   "fixtures": {
+    "get_balance": {"ok": true, "found": true, "name": "דני לוי", "building": "בר כוכבא 23", "apartment": "4", "total_owed": 620, "unpaid_months": ["2026-09"]}
+   },
+   "expect": [
+    {"type": "called", "tool": "get_balance"},
+    {"type": "bot_regex", "regex": "\\?", "name": "asks back"},
+    {"type": "turn_questions_max", "turn": 0, "max": 2, "name": "at most two questions on the how-are-you"}
+   ],
+   "judge": [
+    "how_are_you: is the how-are-you answered briefly and asked back as a question (not just a wish)? Say in notes whether the help question is in the same message.",
+    "no_reask_how: once they answered 'all good', is there no second 'how are you'?",
+    "balance_flow: name and phone in one question, then the amount and the month?"
+   ]
+  },
+  {
+   "id": "second_matter",
+   "title": "mid-conversation hello and a second fault, building known",
+   "time": "16:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:30:00+03:00",
+   "history": [
+    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:12, יום חמישי.]\nהתאורה בחניון לא עובדת", "tools": [], "michael": "צהריים טובים, כאן מיכאל מהומי'ז. לא נעים לרדת לחניון בחושך. באיזה בניין זה, ובאיזו דירה אתם גרים?"},
+    {"resident": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:13, יום חמישי.]\nבר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "פתחתי לכם קריאה על התאורה בחניון, מספר 255-1414-26. אפשר לעזור בעוד משהו?"}
+   ],
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שכבר מסר את הבניין והדירה לפני רבע שעה",
+    "script": [
+     {"say": "היי, עוד משהו: גם האינטרקום לא עובד"},
+     {"if_asked": "building and apartment", "say": "אותו בניין, בר כוכבא 23 דירה 4"}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1415-26", "building": "בר כוכבא 23", "reporter_unit": "4"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "מיכאל", "name": "no name mid-conversation"},
+    {"type": "turn_count_max", "max": 1, "name": "building not asked again"}
+   ],
+   "judge": [
+    "one_greeting_back: the resident said היי mid-conversation; exactly one greeting back, no name?",
+    "memory: the building and apartment were given earlier; is the ticket opened without asking for them again?",
+    "ticket: reported with its number, no promise?"
+   ]
+  }
+ ]
+}
