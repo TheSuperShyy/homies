@@ -187,6 +187,23 @@ shapes, and the inbound tap carries only the row's **title**, which is why
 the titles are the routing table (`TAP_KIND` in the live `Sort`). Whether to
 flip the account to Hebrew for a seven-row list is open with the owner.
 
+## 1 Oct, evening — one person, in the singular
+
+The owner noticed the bot writing "במה אוכל לעזור לכם?" to one person: *"it still uses how can i
+help you all which is awkward"*. He wants the Hebrew default instead: masculine until the person
+shows otherwise, then feminine, without making a thing of it. The plural had been the prompt's own
+instruction since 31 Aug, the fix for a model that wrote ספר/י when told not to guess a gender.
+
+`scripts/n8n_whatsapp_gender.py` carries it to live in one write: the prompt paragraph, the three
+small writers (in words that fit both, since they see no history), the retry note, and the three
+pieces of code that read "you" and knew only the plural (the team note, the promise filter, the
+opener shape). On all 872 past replies the new code decides exactly as the old. The memory epoch
+goes to 70, because every stored conversation is a plural example.
+
+What a resident sees: a man, or anyone who hasn't said, gets "תוכל", "אתה". A woman who writes
+"אני צריכה" or "אני גרה" gets "תוכלי", "את" from then on. Short system lines like "רגע, אני בודק
+לך" read the same for both.
+
 ## 1 Oct — Send removes promises the model writes
 
 The prompt has forbidden "soon", "they'll get back to you", "don't worry, I'm on it" and "help is

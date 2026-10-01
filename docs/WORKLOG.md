@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-10-01
 
+### WhatsApp: one person, in the singular (ready, waiting on the owner's go)
+
+Owner: *"i notice it still uses how can i help you all which is awkward"*, with the Hebrew default
+he wants: masculine until the person shows otherwise, then feminine. *"the bot should adapt if the
+person on the other line uses feminine words or adjectives or something to identify it should
+know"*.
+- **Cause:** the prompt said "plural, always" (our 31 Aug fix for a model that wrote ספר/י). Three
+  small writers said the same, and the retry note called a singular reply a reason it was rejected.
+- **What:** `scripts/n8n_whatsapp_gender.py`, one write. It sets the prompt paragraph to singular,
+  masculine until it is clear a woman is writing, then feminine, with no remark. The payment ack,
+  the rescue and the outage note get "words that fit both" (they see no history). It drops the
+  retry note's plural clause. Three pieces of code read "you" and knew only the plural: the team
+  note's promise list, the promise filter (v2) and the opener shape. They now know אליך / אלייך /
+  אותך / איתך too. MEMORY_EPOCH 69 -> 70, because every buffer is a plural example.
+- **Proof so far:**
+  1. On live, exactly the 9 new singular cases fail (167 cases).
+  2. On the candidate, 167/167 pass. Only the 5 intended pins move. Of 872 past replies under 7
+     states, 0 change in Send, and the team note decides the same on all 872 (fires on 72).
+  3. In a dry-run simulation against the would-be workflow, every patcher is idle except the
+     documented baseline.
+- **Harness:** the rubric now flags a plural "you", a masculine "you" after a feminine cue, and
+  a feminine "you" with no cue. The deck gained four gender scenarios. Players no longer see the
+  judges' questions. Histories in the deck went singular.
+- **Owed:** the Claude-played replay (30 conversations plus the rescue and outage writers), the
+  new pins, the owner's go, `--apply`, the gate on live, the patchers idle, the owner's handset,
+  then `--watch`.
+
 ### WhatsApp: no promise reaches a resident (LIVE 11:31 UTC, a filter in Send)
 
 Owner, on the QA's first finding: *"ok lets fix that but make sure it wont break any other

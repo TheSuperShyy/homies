@@ -2394,6 +2394,29 @@ reply (1 Oct: a dangling "אם…", found only by reading all 53 changed replies
 and the dashboard keep the model's raw text, so what residents got is read from the executions
 (`--watch`), never from the table.
 
+## The bot writes to one person: masculine until she writes in the feminine
+
+1 Oct, epoch 70 (`scripts/n8n_whatsapp_gender.py`). Owner: *"it still uses how can i help you
+all which is awkward"*, and the bot should switch when the person writes in the feminine. The
+prompt had said "plural, always" since 31 Aug, written so the model would not guess a gender after
+a no-gender line made it write ספר/י. Now:
+
+- **The rule** is one paragraph of `prompt.md` ("ועוד דבר אחד, על עברית"): singular; masculine
+  until it is clear a woman is writing ("אני צריכה", "אני גרה"); then feminine to the end, with no
+  remark; never a slash. The bot's own memory keeps the switch: its feminine replies stay in the
+  window after her cue scrolls out.
+- **The three small writers** (`Worth a word?`, `Say it again`, `Could not answer`) see one message
+  and no history, so they write in words that fit both (לך, שלך) and cannot contradict a switch.
+- **Code that reads "you" knows both forms.** The team note's promise list (`teamnote.SAID`), the
+  promise filter v2 (`nopromise.PHRASES`), the opener shape (`retry.OPENER_RE`). A phrase with
+  "you" added to any of them gets אליך / אלייך / אותך / איתך beside אליכם / אתכם / איתכם.
+- **Not used: the WhatsApp profile name.** Debt calls choose by the name, because a voice agent
+  must speak before the person does. On WhatsApp the person's own words come first.
+- **Checked:** `--watch` flags a plural "you" in anything sent, and a masculine "you" to a resident
+  who wrote in the feminine earlier in the same window. A feminine reply with no cue in the
+  window is an info line (the cue may be older). `wa_qa.py`'s rubric flags the same three. The
+  regexes live once, in `check_whatsapp_rules.py` (`PLURAL_YOU`, `MASC_YOU`, `FEM_YOU`, `FEM_CUE`).
+
 ## How the WhatsApp bot is tested without a model call
 
 1 Oct. Owner: *"i want you to do a automated testing of the chatbot like doing ab
@@ -2409,7 +2432,9 @@ and the live code around it, and spends nothing:
   tool-doc overrides, so an A/B is two bundles of the same deck.
 - Claude players (one subagent per scenario and variant, blind to the rubric
   and to which variant is live) play the ack model, the answering model and
-  the resident; fixtures stand in for the tools.
+  the resident; fixtures stand in for the tools. The deck they see carries
+  neither the expectations nor the judges' questions (1 Oct evening: a judge
+  line had named the gender check).
 - `grade` runs every turn through the live expressions: the inject with the
   scenario's clock, `A word first?`, every `Reply usable?` guard, `Try again`'s
   note, `Send`'s filter and buttons, the payment split. What is graded is what
