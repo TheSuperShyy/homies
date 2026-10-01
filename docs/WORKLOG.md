@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-01
 
-### WhatsApp: the payment note goes out only on payment words (READY, NOT live)
+### WhatsApp: the payment note goes out only on payment words (LIVE 14:20 UTC)
 
 The owner's handset, 14:01 UTC (execution 74654): after the ticket he wrote "nothing so far thats
 about it thanks" and got "אני רואה שאתה מחפש קישור לתשלום. אני בודק את זה עכשיו." before the
@@ -43,7 +43,11 @@ goodbye. His words: *"wth is this"*.
   note back. Since 13:52 it flags exactly 74654.
 - **Rollback, after an apply:** `--restore` (snapshot `docs/handover/n8n-whatsapp-live-01oct-before-payack.json`,
   scanned: the same URLs, emails and credential references as the committed snapshots).
-- **Waiting on:** the owner's go.
+- **Applied 14:20 UTC, on the owner's "push live":** the fresh dump was byte-identical to the
+  tested candidate, and the read-back matches both fields. The gate on live is 194/194 with pins
+  unchanged, and every patcher's dry run is idle except the baseline (6 of 28; firstword went idle
+  with the write). `--watch 2026-10-01T14:20`: 0 turns yet. No conversation restarted.
+- **Owed:** `--watch 2026-10-01T14:20` after real traffic, and again the next morning.
 
 ### WhatsApp: the representative says hi (LIVE 13:52 UTC, epoch 71)
 

@@ -2457,7 +2457,7 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
 
 ## A gatekeeper model's NONE is not a guard; the necessary condition goes in code
 
-1 Oct, evening (`scripts/n8n_whatsapp_payack.py`). `Worth a word?` writes the "one moment, I'm
+1 Oct, evening (`scripts/n8n_whatsapp_payack.py`, live 14:20 UTC). `Worth a word?` writes the "one moment, I'm
 checking" before a payment link, and its prompt says NONE to greetings, thanks and goodbyes. In
 every retained run where it wrote anything (27 Sep - 1 Oct), it wrote an invented payment request:
 on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
