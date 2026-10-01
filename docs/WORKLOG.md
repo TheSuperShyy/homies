@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-10-01
 
+### Voice, incoming calls: one person, in the singular (READY, NOT live)
+
+Owner, after hearing which agents follow the gender rule: *"apply to incoming as well"*.
+- **Before:** the incoming-call agent addressed every caller in the plural, always ("תרצו, תספרו,
+  אתכם, שלכם"), opening with "איך אני יכול לעזור לכם?". Only its own words switched once the
+  caller showed a gender.
+- **What:** `docs/assistant/demo-inbound.md`, four lines:
+  - the opener: "איך אני יכול לעזור לְךָ?";
+  - the address bullet: one person; masculine until it is clear a woman is speaking (אני צריכה,
+    אני גרה, אני לא בטוחה), then feminine to the end, with no remark. It gives the pointed forms the
+    debt call already speaks (`dashboard/lib/call.ts`: לְךָ / לָךְ, שלְךָ / שלָךְ, איתְּךָ / איתָּךְ)
+    and asks for them, and for the second-person past (התקשרתָּ / התקשרתְּ), pointed, because they
+    are spelled alike and said differently;
+  - the clerk's "שלום גם לכם" and the goodbye's "תודה שהתקשרו" went singular.
+  - The descriptive plurals (המתקשרים, שלהם) speak about callers in general and stay.
+- **Checks so far:** the live assistant equals the repo before the edit (prompt `5d1ba62c87d1`, the
+  same first message; the turn-taking plans differ only as 1 vs 1.0). The dry run: 6,014 characters,
+  7 tools on the Edge Function, the same end-of-call report. The fact check is identical before and
+  after (the same 13 voice gaps as on 30 Sep). Five simulated calls are being played by Claude
+  (no model, no call, no credits).
+- **Ships on the owner's word,** as on 30 Sep: `N8N_BASE_URL= python scripts/vapi_sync.py inbound
+  --apply`, then `python scripts/vapi_set_voice.py --apply` (the sync resets the voice; this puts
+  Michael's back), then read back. The English twin is not touched.
+
 ### WhatsApp: the payment note goes out only on payment words (LIVE 14:20 UTC)
 
 The owner's handset, 14:01 UTC (execution 74654): after the ticket he wrote "nothing so far thats
