@@ -38,7 +38,12 @@ Owner, after hearing which agents follow the gender rule: *"apply to incoming as
 - **Refined after it:** the small talk's "מה שלומך?" came out unpointed, so the voice could read
   it either way. The pointing clause now covers every word ending in the address suffix (לך, שלך,
   איתך, אליך, שלומך) and shows שלומְךָ / שלומֵךְ. 6,094 characters; the dry run is otherwise
-  the same. A second round replays the small-talk calls on it.
+  the same.
+- **Round 2, on it:** the woman's small-talk call again, and a man's (asked back how Michael is).
+  Both pointed everything: "מה שלומְךָ?", "מִמְּךָ", "ששאלתָּ", then "שלָךְ" and "התקשרתְּ" for
+  her. Across all seven calls: no plural, no slash, every call ends on ולהתראות
+  (`docs/assistant/transcripts/2026-10-01-inbound-replay-singular.md`).
+- **Waiting on:** the owner's word to ship.
 - **Ships on the owner's word,** as on 30 Sep: `N8N_BASE_URL= python scripts/vapi_sync.py inbound
   --apply`, then `python scripts/vapi_set_voice.py --apply` (the sync resets the voice; this puts
   Michael's back), then read back. The English twin is not touched.
