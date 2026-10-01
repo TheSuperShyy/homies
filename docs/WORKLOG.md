@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-01
 
-### WhatsApp: the representative says hi (READY, NOT live; epoch 71)
+### WhatsApp: the representative says hi (LIVE 13:52 UTC, epoch 71)
 
 Owner, after tapping לדבר עם נציג at 13:14 UTC and getting "כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור
 לך?": *"can we make it like for example talk to a rep liek the agent should be like hi how are you
@@ -52,7 +52,13 @@ this is michael from homies..."*.
 - **Rollback, after an apply:** `python scripts/n8n_whatsapp_rephello.py --restore` (snapshot
   `docs/handover/n8n-whatsapp-live-01oct-before-rephello.json`, scanned: same URLs, emails and
   credential references as the committed snapshots), plus a git revert of the repo side.
-- **Waiting on:** the owner's "make it live".
+- **Applied 13:52 UTC, on the owner's "make it live":** the fresh dump was byte-identical to the
+  tested candidate. Read-back: prompt `98ada1b25f27`, key `-71`, manners v3 + promise v2 in Send,
+  one `}}`. The gate on live is 177/177 with pins unchanged, and every patcher's dry run is idle
+  except the baseline (6 of 27; manners, teamnote, nopage and patch went idle with the write).
+  `--watch 2026-10-01T13:52`: 0 turns yet. Every conversation restarted at 13:52.
+- **Owed:** the owner's handset (tap לדבר עם נציג), then `--watch 2026-10-01T13:52`, and again the
+  next morning.
 
 ### WhatsApp: one person, in the singular (LIVE 13:02 UTC, epoch 70)
 

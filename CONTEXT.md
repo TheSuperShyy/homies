@@ -2435,8 +2435,8 @@ a no-gender line made it write ספר/י. Now:
 
 ## The representative button says hi: the one greeting after the menu
 
-1 Oct, evening, epoch 71 (`scripts/n8n_whatsapp_rephello.py`; ready, and live only on the owner's
-go). The owner tapped לדבר עם נציג right after the menu and got "כאן מיכאל מהומי'ז! 😊 במה אוכל
+1 Oct, evening, epoch 71 (`scripts/n8n_whatsapp_rephello.py`), live 13:52 UTC on the owner's
+"make it live". The owner tapped לדבר עם נציג right after the menu and got "כאן מיכאל מהומי'ז! 😊 במה אוכל
 לעזור לך?". The model had written "היי, " and Send's greeting filter cut it, as his 27 Sep table
 says. His ask: *"the agent should be like hi how are you this is michael from homies..."*.
 
