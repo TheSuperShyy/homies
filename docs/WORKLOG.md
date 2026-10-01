@@ -9,6 +9,19 @@ conversation that produced it.
 
 ---
 
+## 2026-10-01
+
+### The Debts page's את/אתה label removed, before it ever went live
+
+Owner, asked whether gender goes on the dashboard: *"i dont think that is necessary? since the
+agent can run a checker if the name is a male or not"*.
+- **Removed:** the label under each name on the Debts page (the page and i18n restored to 17fef22).
+  tsc clean.
+- **Stays in the database:** `call_gender()`, which is harmless and unused by the page.
+- **Still waits on the owner's say:** `call.ts` `GENDER_FORMS`. It makes a unisex name start
+  masculine singular; the live site still sends the old neutral text for those. m/f names are
+  right already.
+
 ## 2026-09-30
 
 ### The debt call speaks to one person, in the gender the name gives (live 15:21 UTC; dashboard waits)

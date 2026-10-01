@@ -36,12 +36,8 @@ async function placeCall(formData: FormData) {
 // and would need a second query just to know which months exist.
 type Charge = {
   period: string; amount: number; status: string; unit: string;
-  // call_gender: a computed field (migration 038), how the call will address them.
-  residents: { full_name: string; building: string; phone: string; call_gender: string | null } | null;
+  residents: { full_name: string; building: string; phone: string } | null;
 };
-
-const ADDR = { m: 'debts.addr.m', f: 'debts.addr.f', unknown: 'debts.addr.unknown' } as const;
-const addr = (g: string | null | undefined) => ADDR[(g === 'm' || g === 'f') ? g : 'unknown'];
 
 const WELL_FORMED = /^\d{4}-\d{2}$/;
 const REVIEW = { disputed: 'debts.disputed', pending: 'debts.pending' } as const;
@@ -62,7 +58,7 @@ export default async function Debts({
   const outcome = searchParams?.result ?? '';
   const { data, error } = await serverClient()
     .from('charges')
-    .select('period,amount,status,unit,residents(full_name,building,phone,call_gender)')
+    .select('period,amount,status,unit,residents(full_name,building,phone)')
     .in('status', [...OUTSTANDING])
     .order('period', { ascending: true });
 
@@ -107,14 +103,14 @@ export default async function Debts({
   // occur in either, so two flats belonging to one owner can never collide and
   // an odd apartment label can never merge two people.
   const byApartment = new Map<string, {
-    name: string; gender: string | null; building: string; unit: string; phone: string;
+    name: string; building: string; unit: string; phone: string;
     owed: number; months: string[]; inReview: string[];
   }>();
   for (const c of scoped) {
     if (!c.residents) continue;
     const key = `${c.residents.phone}\u0000${c.unit}`;
     const row = byApartment.get(key) ?? {
-      name: c.residents.full_name, gender: c.residents.call_gender, building: c.residents.building,
+      name: c.residents.full_name, building: c.residents.building,
       unit: c.unit, phone: c.residents.phone,
       owed: 0, months: [], inReview: [],
     };
@@ -268,11 +264,7 @@ export default async function Debts({
                 const others = (owner?.units ?? []).filter((u) => u !== r.unit);
                 return (
                 <tr key={byOwnerView ? r.phone : `${r.phone} ${r.unit}`}>
-                  <td dir="auto" data-label={t('col.resident')}>
-                    {r.name}
-                    {/* What the call will say to them, before anybody presses. */}
-                    <span className="sub">{t(addr(r.gender))}</span>
-                  </td>
+                  <td dir="auto" data-label={t('col.resident')}>{r.name}</td>
                   <td dir="auto" data-label={t('col.building')}>{r.building}</td>
                   {/* From the charge, not the resident. In apartment view an
                       owner of two flats has two rows, and the marker is what

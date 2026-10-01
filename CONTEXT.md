@@ -1394,8 +1394,9 @@ the person's own words show otherwise. That is 20% of the 30 Sep residents; 80%
 are decided. The plural stays on WhatsApp and inbound voice, which have no name
 before they answer. A name to add or correct goes in a new migration, `on
 conflict do update`, never an edit to 038. Live on the debt agent since 15:21 UTC on 30 Sep. The dashboard half
-(`call.ts` `GENDER_FORMS`, the Debts page's את/אתה) reaches Vercel only on the
-owner's say.
+(`call.ts` `GENDER_FORMS`) reaches Vercel only on the owner's say. **No gender is
+shown on the Debts page:** the owner, 1 Oct, *"i dont think that is necessary"*; the
+check runs on its own before every call.
 
 **Every instruction the model reads is in brackets, so a bracket in its output
 is its own thinking.** A probe on 26 Aug returned an English deliberation

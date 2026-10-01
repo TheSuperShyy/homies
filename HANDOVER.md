@@ -283,13 +283,13 @@ its stated time.
   - **Claude replay first** (`docs/assistant/transcripts/2026-09-30-debt-replay-gender.md`): מיכל feminine throughout, דוד masculine, טל masculine until "אני צריכה" then feminine. No plural anywhere.
   - **NOT LIVE, waiting on the owner's say (Vercel = `main`):**
     - `call.ts` `GENDER_FORMS`: `unknown` is masculine singular, and f/m also cover talking about them to someone else;
-    - the Debts page's את/אתה marker under each name (`call_gender` via the embed, i18n `debts.addr.*`).
     - tsc is clean.
     - Until it ships, the live dashboard still sends the OLD `unknown` text (neutral phrasing) for a unisex name. m/f are unaffected, and today's three queued rows are all m.
-    - Ship it as a single cherry-pick of the dashboard files onto `origin/main` (the `../homie-hotfix` worktree route).
+    - Ship it as a single cherry-pick of `dashboard/lib/call.ts` onto `origin/main` (the `../homie-hotfix` worktree route).
+    - **The Debts page את/אתה marker was removed on 1 Oct**, at the owner's word: *"i dont think that is necessary? since the agent can run a checker"*. `call_gender(residents)` stays in the database, unused by the page.
   - **To correct one person:** `update residents set gender = 'f' where phone = …` (a person's value always wins).
   - **To add or fix a name:** a new migration, `insert … on conflict (name) do update`. Never edit 038.
-  - **Not built:** an את/אתה control on the Debts page (needs a security-definer RPC like `press_call`).
+  - **Not built, and not wanted:** any את/אתה label or control on the Debts page.
   - **Copies not on the live path, left as they were:** `GENDER_FORMS` in `vapi_mock.py`, `vapi_call.py` and `web/index.html`; the English twin.
   - **Dashboard reaches Vercel only on the owner's say** (a single cherry-pick to `main`).
 - **OPEN (30 Sep, live test 13:09 UTC on the owner's "ok"): the WhatsApp bot guesses which gate and writes the guess into the ticket.** "the gate lock is broken again" → ticket description `מנעול שער הכניסה שבור שוב` (entrance gate; the resident never said which). Same run: slang (`איזה באסה`, `מבאס`) in 3 of 5 model replies, `הצוות שלנו יטפל בזה בהקדם` (a "soon" promise), 😔 (off the emoji list), "כדי שאפתח קריאת שירות" (explains why it needs the address), `ערב טוב` at 16:09. The clerk guard did catch one `אני מבין ש…` and the retry rewrote it. **Not fixed: the owner said don't edit.** Full replies in WORKLOG. Any fix goes through `check_whatsapp_rules.py --candidate --replay`, with the greeting part shown as examples first. Note: `probe_whatsapp.py` prints the model's text BEFORE Send's greeting cut, so a greeting after the menu in its output is not what a handset gets.
