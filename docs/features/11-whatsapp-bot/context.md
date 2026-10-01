@@ -187,6 +187,26 @@ shapes, and the inbound tap carries only the row's **title**, which is why
 the titles are the routing table (`TAP_KIND` in the live `Sort`). Whether to
 flip the account to Hebrew for a seven-row list is open with the owner.
 
+## 1 Oct — Send removes promises the model writes
+
+The prompt has forbidden "soon", "they'll get back to you", "don't worry, I'm on it" and "help is
+on the way" for weeks, and Gemini kept writing them: 2 of the 3 real replies after the 27 Sep
+deploy, 72 of the 870 rows ever sent. The 1 Oct automated QA found it, the owner said fix it
+without breaking anything, and `promise v1` went into Send that day
+(`scripts/n8n_whatsapp_nopromise.py`). It sits after the greeting filter. It cuts only the promise
+clause when a clean sentence is left, else the sentence. It never removes a ticket number or a
+link, never empties a message, and never adds a word. Its residents-facing effect on all past
+replies was read reply by reply before the apply: 53 distinct replies change, none broken.
+
+Two consequences worth knowing:
+- **The dashboard shows the model's words, not the resident's.** `Log reply` writes before Send,
+  so a cut promise is still in the messages table. The greeting filter has always worked this
+  way. What a resident actually got is in the n8n execution, and `check_whatsapp_rules.py
+  --watch` reads it there.
+- **Promises are now a list, not a sentence in the prompt.** A new phrase goes into `PHRASES` in
+  the patcher, with a case in the gate and a full replay read. The prompt's own rule stays: it is
+  what keeps most replies clean in the first place.
+
 ## 29 Sep — UChat evaluated: a lateral move, not a step up
 
 The owner asked what UChat is, what it costs, and how much work it would take.

@@ -7,6 +7,8 @@ blind judges grade what a handset would get. Spends nothing. Read only.
     python scripts/wa_qa.py grade  --run DIR
     python scripts/wa_qa.py judge  --run DIR        # blind packets, one per scenario
     python scripts/wa_qa.py report --run DIR        # rubric + expectations + verdicts
+    python scripts/wa_qa.py bundle --run DIR2 --candidate F   # the same, on a patcher's --dump
+    python scripts/wa_qa.py diff --run DIR --against DIR2     # every handset text that differs
 
 HOW A RUN GOES (1 Oct, after the owner asked for "automated testing ... ab
 testing qa and stuff" with no OpenRouter spend, strictly):
@@ -254,8 +256,10 @@ answering model's final text, exactly, newlines as `\\n`. Nothing else in the fi
 """
 
 
-def bundle(run, variants):
-    wf = C.load_live()
+def bundle(run, variants, candidate=None):
+    # --candidate F: a patcher's --dump, laid over live the way the gate does it,
+    # so the same transcripts can be graded through a would-be workflow's code.
+    wf = C.load_candidate([candidate]) if candidate else C.load_live()
     code = extract_code(wf)
     texts = model_texts(wf)
     tools = tools_of(wf)
@@ -808,6 +812,29 @@ def report(run):
     print("wrote %s (%d scenarios, %d verdicts)" % (os.path.join(run, "report.md"), len(deck["scenarios"]), len(verdicts)))
 
 
+def diff(run, against):
+    """Every turn whose handset text differs between two graded runs of the
+    same transcripts (one graded on live code, one on a candidate)."""
+    a = load_json(os.path.join(run, "results.json"))
+    b = load_json(os.path.join(against, "results.json"))
+    changed, same = 0, 0
+    for key in sorted(set(a) & set(b)):
+        for i, (x, y) in enumerate(zip(a[key]["turns"], b[key]["turns"])):
+            hx, hy = x.get("handset", []), y.get("handset", [])
+            if hx == hy:
+                same += 1
+                continue
+            changed += 1
+            print("%s turn %d" % (key, i + 1))
+            print("   %s: %s" % (os.path.basename(run.rstrip("/\\")), C.mask(" / ".join(hx), 300)))
+            print("   %s: %s" % (os.path.basename(against.rstrip("/\\")), C.mask(" / ".join(hy), 300)))
+    only = sorted(set(a) ^ set(b))
+    print("")
+    print("turns compared: %d | same handset text: %d | different: %d%s"
+          % (same + changed, same, changed, (" | in one run only: %s" % ", ".join(only)) if only else ""))
+    return changed
+
+
 def main():
     argv = sys.argv[1:]
     if not argv or "--run" not in argv:
@@ -820,7 +847,10 @@ def main():
             if a == "--variant":
                 label, spec = argv[i + 1].split("=", 1)
                 variants.append((label, spec))
-        bundle(run, variants)
+        cand = argv[argv.index("--candidate") + 1] if "--candidate" in argv else None
+        bundle(run, variants, cand)
+    elif cmd == "diff":
+        sys.exit(1 if diff(run, argv[argv.index("--against") + 1]) else 0)
     elif cmd == "grade":
         grade(run)
     elif cmd == "judge":

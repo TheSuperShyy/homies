@@ -11,6 +11,51 @@ conversation that produced it.
 
 ## 2026-10-01
 
+### WhatsApp: no promise reaches a resident (LIVE 11:31 UTC, a filter in Send)
+
+Owner, on the QA's first finding: *"ok lets fix that but make sure it wont break any other
+feature"*, then approved the plan. The bot's replies carried promises the prompt already forbids
+("הצוות שלנו יטפל בזה בהקדם", "יחזרו אליכם בהקדם", "אל דאגה, אני מטפל בזה", "עזרה בדרך"): 2 of
+the 3 real replies after the 27 Sep deploy, 72 of 870 rows ever sent.
+- **What:** `scripts/n8n_whatsapp_nopromise.py` puts `promise v1` into Send, after the greeting
+  filter and before the buttons rule. It cuts the promise clause when a clean sentence is left,
+  else drops the sentence, and never removes a ticket number or a link, never empties a message,
+  never adds a word. The canned menu and the first beat of a two-part payment reply are left
+  alone. Same shape as the greeting filter. No text a model reads changed: pins and
+  MEMORY_EPOCH untouched.
+- **Why not a guard that sends the reply back:** the retry pass does not see the first pass's
+  tool results, and most promises come right after a ticket opened, so a retry would open a
+  second ticket (manners.py, the 27 Sep review). It would also be a second Gemini call.
+- **Proof, in order:**
+  1. The gate on live with the new cases: exactly the 20 cut-expecting cases failed, nothing
+     else (the check can fail).
+  2. `--candidate --replay`: 150/150 cases, 17 pins unchanged, no resident message sorted
+     differently, 53 distinct past replies changed, 0 broken. All 53 were read in full.
+  3. The read found one defect, a dangling "אם…" left from a 17 Sep reply whose promise was the
+     main clause. Fixed: a comma cut never leaves a sentence that opens with אם/ברגע/כש. The
+     same pass added "יגיעו". Two cases were added for these, and the chain was re-run.
+  4. The 61 Claude-played QA conversations, re-graded through the candidate code: 151 turns,
+     0 handset texts different.
+  5. `--apply`, read back (both filters on Send, one `}}`). Gate on live: 150/150, pins unchanged.
+     Every WhatsApp patcher idle except the documented baseline (batch drift; handover, open,
+     promise, transfer, untemplate on removed nodes).
+- **Gate:** a new section of cases ("Send: no promises reach a resident"). Two older expectations
+  changed on purpose because their sample replies carried a promise: "a ticket number after the
+  name survives" now ends "…123-4567-89. יש עוד משהו?", and "a question about a person on the
+  team…" is now "עוד משהו?" ("הטכנאי יגיע מחר בבוקר" is an invented promise).
+- **Watch:** `--watch` now flags "a promise in the answer/rest" and prints an info line when the
+  model wrote one and the filter cut it. Run over traffic since 27 Sep, it flags 65963 and 65990
+  (the two real promise replies), which it could not see before.
+- **Known:** the messages table and the dashboard keep the model's raw text (`Log reply` logs
+  before Send), as they already do for the greeting filter. A single-sentence reply that is all
+  promise stays whole. One false positive in all history ("לפנות למשטרה בהקדם", itself a
+  banned referral).
+- **Owed:** the owner's handset (a fault with a building: the ticket line without "בהקדם"; "talk
+  to a rep"; a payment link still in two messages), then `--watch 2026-10-01T11:31` and again the
+  next morning.
+- Rollback: `python scripts/n8n_whatsapp_nopromise.py --restore`
+  (`docs/handover/n8n-whatsapp-live-01oct-before-nopromise.json`).
+
 ### WhatsApp bot: automated A/B/C QA on the live code, Claude as the model, nothing spent
 
 Owner: *"i want you to do a automated testing of the chatbot like doing ab testing qa and stuff i

@@ -275,7 +275,11 @@ def watch(since):
         cursor = page.get("nextCursor")
         if not cursor or len(fresh) < len(page["data"]):
             break
-    flagged, turns, menus = 0, 0, []
+    flagged, turns, menus, cut = 0, 0, [], 0
+    try:                                  # the promise phrases, one list (1 Oct)
+        from n8n_whatsapp_nopromise import PROMISE_PY
+    except Exception:  # noqa: BLE001 -- the watch still runs without it
+        PROMISE_PY = None
     for eid in sorted(ids, key=int):
         ex = api("/api/v1/executions/%s?includeData=true" % eid)
         rd = ((ex.get("data") or {}).get("resultData") or {}).get("runData") or {}
@@ -326,6 +330,23 @@ def watch(since):
                              % (k, " (known gap: the ack's own wording)" if k == "ack" else ""))
             if CLERK.search(t):
                 flags.append("the clerk's 'so that I can / I will need' in the %s" % k)
+        # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
+        # what went out is a flag; the ack and the first beat of a two-part
+        # payment reply may say "I'm on it". One the filter cut is an info line.
+        infos = []
+        if PROMISE_PY is not None and not canned:
+            two_beat = any(k == "rest" for k, _ in sent)
+            for k, t in sent:
+                hit = PROMISE_PY.search(t) if (k == "rest" or (k == "answer" and not two_beat)) else None
+                if hit:
+                    flags.append("a promise in the %s: %s" % (k, hit.group(0).strip()))
+            raw = str((first("Type for a moment") or {}).get("output") or "")
+            answers = [t for k, t in sent if k == "answer"]      # none when Send failed
+            said_hit = any(PROMISE_PY.search(t) for t in answers)
+            if raw and answers and not two_beat and not said_hit and PROMISE_PY.search(raw):
+                cut += 1
+                infos.append("the model wrote a promise and the filter cut it: %s"
+                             % mask(PROMISE_PY.search(raw).group(0).strip(), 40))
         if "Tell the team the bot is down" in rd:
             flags.append("the outage path ran")
         if ex.get("status") != "success":
@@ -337,11 +358,13 @@ def watch(since):
                 flags.append("a real message stood down for a greeting (it may go unanswered)")
         if canned:
             menus.append((str(S.get("to")), ex["startedAt"], eid))
-        if flags:
-            flagged += 1
-            print("FLAG %s  %s UTC" % (eid, ex["startedAt"][:19].replace("T", " ")))
+        if flags or infos:
+            flagged += 1 if flags else 0
+            print("%s %s  %s UTC" % ("FLAG" if flags else "INFO", eid, ex["startedAt"][:19].replace("T", " ")))
             for f in flags:
                 print("     - " + f)
+            for f in infos:
+                print("     info: " + f)
             print("     resident: " + mask(S.get("text") or ""))
             for k, t in sent:
                 print("     %-8s: %s" % (k, mask(t)))
@@ -351,8 +374,9 @@ def watch(since):
             flagged += 1
             print("FLAG %s + %s  two menus to one resident within 20 s" % (ia, ib))
     print("")
-    print("watched %d resident turns since %s: %s" % (
-        turns, since, "%d flagged" % flagged if flagged else "nothing broke the rules"))
+    print("watched %d resident turns since %s: %s%s" % (
+        turns, since, "%d flagged" % flagged if flagged else "nothing broke the rules",
+        "; the filter cut a promise from %d" % cut if cut else ""))
     return flagged
 
 

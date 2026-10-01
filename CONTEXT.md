@@ -2372,6 +2372,28 @@ real message after a greeting came 3-6 s later). They were left alone, and the
 watch flags each one if it ever happens: code added for something that has
 never happened is how the next bug gets in.
 
+## Send removes promises; it never sends a reply back for one
+
+1 Oct. Owner: *"ok lets fix that but make sure it wont break any other feature."* The prompt
+forbids "soon", "they'll get back to you", "don't worry, I'm on it", "help is on the way", and the
+model wrote them anyway (2 of 3 real replies after the 27 Sep deploy). `promise v1` in Send
+(`scripts/n8n_whatsapp_nopromise.py`) removes them, after the greeting filter and before the
+buttons rule, with the greeting filter's contract: it only removes. It cuts the clause when a clean
+sentence is left, else the sentence. It never touches a ticket number or a link, never empties a
+message, and is byte-identical when nothing matches.
+
+**Why not a `Reply usable?` guard.** A rejected reply is rewritten by a pass that cannot see the
+first pass's tool results. Most promises sit right after an opened ticket, so a retry would open a
+second one, and a second rejection goes to `Open it anyway` (a stub). For text that is wrong but
+whose turn did real work, remove the words in Send. Send the reply back only when nothing was done.
+
+**The list is the rule.** The phrases live once, in the patcher (`PHRASES`), used by the filter and
+by `--watch` (`PROMISE_PY`). A phrase added is a case added to `check_whatsapp_rules.js`, and the
+full `--replay` read in full, because a cut that reads fine in a test can leave a fragment in a real
+reply (1 Oct: a dangling "אם…", found only by reading all 53 changed replies). The messages table
+and the dashboard keep the model's raw text, so what residents got is read from the executions
+(`--watch`), never from the table.
+
 ## How the WhatsApp bot is tested without a model call
 
 1 Oct. Owner: *"i want you to do a automated testing of the chatbot like doing ab
