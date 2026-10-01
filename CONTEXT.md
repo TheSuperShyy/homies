@@ -2403,7 +2403,7 @@ and the dashboard keep the model's raw text, so what residents got is read from 
 
 ## The bot writes to one person: masculine until she writes in the feminine
 
-1 Oct, epoch 70 (`scripts/n8n_whatsapp_gender.py`). Owner: *"it still uses how can i help you
+1 Oct, epoch 70, live 13:02 UTC (`scripts/n8n_whatsapp_gender.py`). Owner: *"it still uses how can i help you
 all which is awkward"*, and the bot should switch when the person writes in the feminine. The
 prompt had said "plural, always" since 31 Aug, written so the model would not guess a gender after
 a no-gender line made it write ספר/י. Now:

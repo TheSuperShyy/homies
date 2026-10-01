@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-01
 
-### WhatsApp: one person, in the singular (ready, waiting on the owner's go)
+### WhatsApp: one person, in the singular (LIVE 13:02 UTC, epoch 70)
 
 Owner: *"i notice it still uses how can i help you all which is awkward"*, with the Hebrew default
 he wants: masculine until the person shows otherwise, then feminine. *"the bot should adapt if the
@@ -43,8 +43,13 @@ know"*.
   judges' questions. Histories in the deck went singular.
 - **`--watch` found the owner's own turn:** execution 74380 (11:43 UTC), the representative
   button answered "…במה אוכל לעזור לכם?". It is now flagged as a plural "you".
-- **Owed:** the owner's go, `--apply`, the gate on live, every patcher idle, the owner's handset,
-  then `--watch`.
+- **Live:** owner, *"make it live"*. The fresh dry run's dump was byte-identical to the tested
+  candidate. `--apply` at 13:02 UTC (16:02 Israel); live `updatedAt` 13:02:54. The read-back matched
+  every field: prompt `c6956ac921cf`, memory key `-70`, promise v2 and manners v2 in Send, one `}}`,
+  all eight `Reply usable?` conditions. The gate on live: 167/167, 17 pins unchanged. Every
+  patcher's real dry run is idle except the baseline. `--watch 2026-10-01T13:02`: 0 turns yet.
+- **Owed:** the owner's handset ("אני צריכה…" gets the feminine, "אני צריך…" the masculine, no
+  "לכם"), then `--watch 2026-10-01T13:02`, and again the next morning.
 - **New pre-apply check, kept:** `scripts/check_patchers_idle.py F` runs every patcher's dry run
   against the would-be workflow, writes blocked. On the gender dump, 6 of 26 are not idle, all
   of them the baseline.
