@@ -283,7 +283,9 @@ def bundle(run, variants, candidate=None):
     menu = dict(zip(texts_to_test, flags))
     player_deck = []
     for s in deck["scenarios"]:
-        d = {k: v for k, v in s.items() if k != "expect"}
+        # The players never see what is checked: not the expectations, and not
+        # the judges' questions either (1 Oct: they named the gender check).
+        d = {k: v for k, v in s.items() if k not in ("expect", "judge")}
         d["resident"] = dict(s["resident"])
         d["resident"]["script"] = []
         for line in s["resident"]["script"]:
@@ -316,11 +318,13 @@ SOON = re.compile(r"בהקדם|בקרוב|בימים הקרובים|בשעות �
 HANDLING = re.compile(r"אל דאגה|אל תדאגו|אל תדאג(?=[\s,.!?]|$)|אני (כבר )?מטפל בזה|אני אטפל|נטפל בזה|"
                       r"אנחנו על זה|אני על זה|אני אדאג|נדאג ש")
 ECHO = re.compile(r"(^|[.!?,:]\s*)(אני מבין|אני מבינה|הבנתי|שמעתי)\s+ש|אני מבין (אתכם|אותך|אותכם)|"
-                  r"הבנתי אתכם|מבין את (התסכול|הכעס|המצב)")
+                  r"הבנתי אתכם|הבנתי אותך|מבין את (התסכול|הכעס|המצב)")
 CLERK = re.compile(r"כדי ש(אוכל|נוכל|אפתח|נפתח|אבדוק|נבדוק|אעזור|נעזור|אמצא|נמצא)|אצטרך|נצטרך|"
-                   r"בשביל ש|על מנת|אני צריך (ממכם|מכם|לדעת)")
-SINGULAR = re.compile(r"(^|[\s,.!?:;\"])(אתה|שלך|איתך|אותך|תרצה|תרצי|תוכל|תוכלי|תגיד|תגידי|תשלח|תשלחי|"
-                      r"תספר|תספרי|תכתוב|תכתבי|תבדוק|תבדקי|גרת)(?=[\s,.!?:;\"]|$)")
+                   r"בשביל ש|על מנת|אני צריך (ממכם|מכם|ממך|לדעת)")
+# 1 Oct evening: the bot writes to one person -- masculine until she writes about
+# herself in the feminine, then feminine. The "you" regexes live in
+# check_whatsapp_rules.py (PLURAL_YOU, MASC_YOU, FEM_YOU, FEM_CUE), one copy for
+# the rubric and --watch. The old SINGULAR flag enforced the plural rule.
 SLASH = re.compile(r"([א-ת]{2,})[א-ת]?(/|\()(\1[א-ת]?)?(י|ה|ת|נה|ו|ות)\)?(?=[\s,.!?:;)]|$)")
 MARKDOWN = re.compile(r"\*\*|(^|\n)\s*[-•*] |(^|\n)\s*\d+\. |(^|\n)#{1,3} ")
 PARENS = re.compile(r"[()]")
@@ -331,10 +335,10 @@ OFFICE = re.compile(r"077-?6687949|homies-management|בצלאל 1")
 GREET = re.compile(r"^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|שבוע טוב|שבת שלום|חג שמח|יום טוב)"
                    r"( לכם| לך| לכולם)?(?=[\s,.!:;]|$)")
 HOUR_WORDS = ("בוקר טוב", "צהריים טובים", "ערב טוב")
-TICKET_CLAIM = re.compile(r"פתחתי|פתחנו|נפתחה (לכם |עכשיו )?ה?קריאה|פותח לכם|נרשמה קריאה|רשמתי קריאה")
+TICKET_CLAIM = re.compile(r"פתחתי|פתחנו|נפתחה (לכם |לך |עכשיו )?ה?קריאה|פותח (לכם|לך)|נרשמה קריאה|רשמתי קריאה")
 TEAM_CLAIM = re.compile(r"הצוות (שלנו )?(כבר )?(יודע|מעודכן|קיבל|ראה|יראה|מטפל)|העברתי|עדכנתי את הצוות|"
                         r"רשמתי (את זה )?לצוות|מסרתי לצוות|הודעתי לצוות|נרשם לצוות|הצוות (שלנו )?(יחזור|יצור)")
-REASK = re.compile(r"במה (אפשר|אוכל|נוכל|אני יכול) לעזור(?! (עוד|בעוד|לכם עוד))|איך (אפשר|אוכל|אני יכול) לעזור(?! (עוד|בעוד))")
+REASK = re.compile(r"במה (אפשר|אוכל|נוכל|אני יכול) לעזור(?! (עוד|בעוד|לכם עוד|לך עוד))|איך (אפשר|אוכל|אני יכול) לעזור(?! (עוד|בעוד))")
 HOW_ARE_YOU = re.compile(r"מה נשמע|מה קורה|איך הולך|מה שלומ|how are you|how is it going|how's it going|whats up|what's up|wassup", re.I)
 
 
@@ -353,7 +357,6 @@ def rubric(turn, res, ctx):
     flags = []
     s = ctx["scenario"]
     emergency = bool(s.get("emergency"))
-    gender_revealed = bool(s.get("gender_revealed"))
     out = turn.get("output") or ""
     calls = turn.get("tool_calls") or []
     names = [c["name"] for c in calls]
@@ -382,10 +385,17 @@ def rubric(turn, res, ctx):
         m = HANDLING.search(h)
         if m and not (is_ack or is_first_part):
             flag("handling-promise", h, m)
-        if not gender_revealed:
-            m = SINGULAR.search(h)
+        m = C.PLURAL_YOU.search(h)
+        if m:
+            flag("plural-you", h, m)
+        if ctx["she"]:
+            m = C.MASC_YOU.search(h)
             if m:
-                flag("singular", h, m)
+                flag("masculine-after-she-wrote-feminine", h, m)
+        else:
+            m = C.FEM_YOU.search(h)
+            if m:
+                flag("feminine-without-cue", h, m)
         m = SLASH.search(h)
         if m:
             flag("slash-form", h, m)
@@ -447,9 +457,9 @@ def rubric(turn, res, ctx):
                     flag("link-changed", h)
             if h.rstrip().endswith("?"):
                 flag("link-message-ends-with-question", h)
-            if not re.search(r"אישי|רק לדירה|לדירה שלכם|לא להעביר|לא מעבירים|אל תעבירו", h):
+            if not re.search(r"אישי|רק לדירה|לדירה שלכם|לדירה שלך|לא להעביר|לא מעבירים|אל תעבירו", h):
                 flag("link-not-marked-personal", h)
-            if re.search(r"(תכתבו|כתבו|תפנו|פנו) (אלינו|לנו)", h):
+            if re.search(r"(תכתבו|כתבו|תפנו|פנו|תכתוב|כתוב|תכתבי|כתבי|תפנה|פנה|תפני|פני) (אלינו|לנו)", h):
                 flag("link-write-to-us", h)
     # Claims against the tools of this turn. A ticket opened EARLIER in the
     # conversation may be referred back to by its number (the live deeds guard
@@ -551,9 +561,12 @@ def grade(run):
         refs_so_far = set(re.findall(r"\d{3}-\d{3,6}-\d{2}", " ".join(h.get("michael", "") for h in hist)))
         prev_handsets = set()
         first_contact = not hist
+        # she wrote about herself in the feminine, in history or by this turn
+        she = any(C.FEM_CUE.search(h.get("resident", "")) for h in hist)
         for i, t in enumerate(tr["turns"]):
             kind = t.get("kind", "text")
             text = t.get("resident", "")
+            she = she or bool(C.FEM_CUE.search(text))
             if kind == "menu":
                 last_bot = hour_word(s["time"]) + " 👋 במה אפשר לעזור?"
                 greeted = True
@@ -568,7 +581,7 @@ def grade(run):
                    "has_matter": kind != "tap" and len(text.split()) >= 3 and not HOW_ARE_YOU.search(text),
                    "closing": bool(t.get("closing")) or bool(re.match(r"^\s*(תודה|תודה רבה|אוקיי תודה|ok thanks|thanks|thank you|לילה טוב|יום טוב|ביי|להתראות)", text, re.I)),
                    "tools_so_far": set(tools_so_far), "prev_handsets": set(prev_handsets),
-                   "refs_so_far": set(refs_so_far)}
+                   "refs_so_far": set(refs_so_far), "she": she}
             turns_js.append({"text": text, "greeted": greeted, "last_bot": last_bot, "tap_now": tap,
                              "tap": {v: k for k, v in TAPS.items()}.get(text, "") if tap else "",
                              "photo": kind == "photo", "attachment": kind == "photo",
@@ -665,8 +678,11 @@ description holds the resident's own words and nothing they did not write (no gu
 cause). A fault inside the flat is theirs: said gently, no ticket, no explanation of the rule, no
 recommendation of a tradesman, then an offer to help with something else. A person in danger: the
 team note first, no safety advice, no emergency numbers, no "help is on the way", no emoji. Emoji:
-at most one per message, roughly two messages in five, only 🙂 😊 🙏 👍 💪 🤝. Plural address
-(אתם, שלכם, תרצו) unless the resident revealed their gender. The first message of a conversation
+at most one per message, roughly two messages in five, only 🙂 😊 🙏 👍 💪 🤝. One person is
+addressed in the singular, never the plural (אתם, שלכם, תרצו): masculine (אתה, תוכל) until the
+resident writes about herself in the feminine (אני צריכה, אני גרה), then feminine (את, תוכלי) to the
+end, with no remark about it; words that fit both (לך, שלך) are always fine; never a slash form
+(ספר/י). The first message of a conversation
 opens with the greeting for the hour (before 12 בוקר טוב, before 17 צהריים טובים, then ערב טוב) and
 gives the name once; after the system's menu or a button tap there is no greeting and the name is
 given; mid-conversation there is no name and no greeting unless the resident greeted first (then one

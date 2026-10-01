@@ -109,12 +109,15 @@ TOOL_RAN = ("(() => { try { return %s.some(s => ((s.action || {}).tool) === "
 # call-back promise ("they will get back to you") with no tool behind it --
 # the note is what brings that promise closest to true. Only a conditional
 # OFFER is excluded; a bare "אם תרצו" elsewhere in the reply is not.
+# 1 Oct: the bot addresses one person now, so the promise list also reads
+# אליך / אלייך / אתך / איתך, and the offer list "רוצה שנעביר". The plural
+# forms match exactly what they matched before.
 SAID = ("(() => { const t = String($json.output || ''); "
         "const told = /(עדכנתי|אעדכן|הודעתי|אודיע|מסרתי|רשמתי|ארשום|לרשום|לעדכן|להעביר|העברתי|העברנו|מעביר|מעבירה|מעבירים)/.test(t) "
         "&& /(לצוות|את הצוות|למחלקה|לגבייה|להנהלה|לתפעול|לשירות|לנציג|לעמית)/.test(t); "
-        "const promised = /(יחזרו אליכם|יחזור אליכם|נחזור אליכם|יצרו אתכם קשר|יצרו איתכם קשר|ייצרו אתכם קשר|ייצרו איתכם קשר|ניצור אתכם קשר|ניצור איתכם קשר|יצור אתכם קשר|יצור איתכם קשר)/.test(t); "
+        "const promised = /((יחזרו|יחזור|נחזור) (אליכם|אליך|אלייך)|(יצרו|ייצרו|ניצור|יצור) (אתכם|איתכם|אתך|איתך) קשר)/.test(t); "
         "if (!told && !promised) return false; "
-        "if (/(שאעביר|האם להעביר|רוצים שנעביר|רוצים שאעביר|שאעדכן|האם לעדכן|רוצים שאעדכן|שארשום|האם לרשום|רוצים שארשום)/.test(t)) return false; "
+        "if (/(שאעביר|האם להעביר|רוצים שנעביר|רוצה שנעביר|רוצים שאעביר|שאעדכן|האם לעדכן|רוצים שאעדכן|שארשום|האם לרשום|רוצים שארשום)/.test(t)) return false; "
         "return true; })()")
 
 NOTE_THIS_TURN = "={{ %s || %s }}" % (TOOL_RAN, SAID)

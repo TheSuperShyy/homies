@@ -75,16 +75,19 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # replay has been done and the new value pasted here from --pins. The prompt,
 # inject and tool texts are ALSO covered by MEMORY_EPOCH in n8n_whatsapp.py;
 # that one decides whether memories restart, this one whether it was tested.
+# 1 Oct evening: five moved together (n8n_whatsapp_gender.py: one person, in
+# the singular), after 30 Claude-played conversations and the rescue and
+# outage writers replayed on the new texts (scratchpad run wa_qa_gender).
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
-    'Answer the resident / system': '8afa16824480',
+    'Answer the resident / system': 'c6956ac921cf',
     'Could not answer / input': 'd9c06797ffa6',
-    'Could not answer / system': '79cd4d35fec8',
+    'Could not answer / system': '542bde9b64e6',
     'Say it again / input': '64f323ffcba1',
-    'Say it again / system': 'e27b1450b7c0',
-    'Try again / note': 'f11ade213910',
+    'Say it again / system': '6927944fbfb0',
+    'Try again / note': '323688694803',
     'Worth a word? / input': '0d3156ee53a4',
-    'Worth a word? / system': 'c9aaaa645060',
+    'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '510af1d70292',
     'get_payment_link / tool': '58ab6a539158',
     'get_request_status / tool': '76e812f28aaa',
@@ -165,6 +168,8 @@ def extract(wf):
         "word_gate": inner(conds_raw(by, "A word first?", "word")),
         "inject": inner(by["Answer the resident"]["parameters"]["text"]),
         "try_again": inner(by["Try again"]["parameters"]["jsonOutput"]),
+        # 1 Oct: it reads "you", and the bot's "you" went singular.
+        "team_note": inner(conds_raw(by, "Team note this turn?", "teamnote")),
     }
 
 
@@ -257,6 +262,24 @@ PAY = re.compile(r"תשלום|לשלם|שילמ|קישור|לינק|חוב|ית�
                  re.I)
 ECHO = re.compile(r"(^|[.!?,:]\s*)(אני מבין|אני מבינה|הבנתי|שמעתי)\s+ש")
 CLERK = re.compile(r"כדי שאוכל|אצטרך")
+# 1 Oct: the bot writes to one person, masculine until she writes about herself
+# in the feminine (n8n_whatsapp_gender.py). One copy, read by --watch here and by
+# wa_qa.py's rubric. "you" in the plural, as a pronoun or a verb:
+PLURAL_YOU = re.compile(r"(?:^|\W)(?:ו|ש|כש)?(אתם|לכם|אתכם|אליכם|שלכם|איתכם|עבורכם|בשבילכם|אצלכם|"
+                        r"מכם|ממכם|עליכם|תרצו|תוכלו|תצטרכו|תשלחו|תכתבו|תגידו|תספרו|תבדקו|תעדכנו|"
+                        r"תפנו|תבחרו|תקבלו|תראו|תשלמו|ספרו)(?=\W|$)")
+# "you", masculine only and feminine only. Future 2nd person masculine is also
+# 3rd person feminine ("היא תוכל"), so a hit is read, not trusted.
+MASC_YOU = re.compile(r"(?:^|\W)(?:ו|ש|כש)?(אתה|תוכל|תרצה|תצטרך|תשלח|תכתוב|תגיד|תספר|תבדוק|תעדכן|"
+                      r"תפנה|תבחר|תשלם|תודיע|ספר לי|שלח לי|כתוב לי|מוזמן)(?=\W|$)")
+FEM_YOU = re.compile(r"(?:^|\W)(?:ו|ש|כש)?(תוכלי|תרצי|תצטרכי|תשלחי|תכתבי|תגידי|תספרי|תבדקי|תעדכני|"
+                     r"תפני|תבחרי|תשלמי|תודיעי|ספרי לי|שלחי לי|כתבי לי|מוזמנת|את בטוחה)(?=\W|$)")
+# A woman writing about herself: "אני" and a feminine present form. "אני" is
+# required -- "המעלית צריכה" is the lift, not the resident.
+FEM_CUE = re.compile(r"(?:^|\W)(?:ו|ש|כש|כי )?אני\s+(?:לא\s+|כבר\s+|עדיין\s+|ממש\s+|גם\s+|פשוט\s+)?"
+                     r"(צריכה|יכולה|גרה|יודעת|מבקשת|מעוניינת|בטוחה|חושבת|שואלת|כותבת|מחפשת|מתקשרת|"
+                     r"עובדת|נמצאת|זקוקה|מוכנה|מצטערת|מרגישה|משלמת|מגיעה|יוצאת|חוזרת|שומעת|מבינה|"
+                     r"זוכרת|אמורה|מודאגת|לחוצה)(?=\W|$)")
 
 
 def mask(s, n=110):
@@ -276,6 +299,7 @@ def watch(since):
         if not cursor or len(fresh) < len(page["data"]):
             break
     flagged, turns, menus, cut = 0, 0, [], 0
+    she = set()                           # residents seen writing in the feminine
     try:                                  # the promise phrases, one list (1 Oct)
         from n8n_whatsapp_nopromise import PROMISE_PY
     except Exception:  # noqa: BLE001 -- the watch still runs without it
@@ -347,6 +371,25 @@ def watch(since):
                 cut += 1
                 infos.append("the model wrote a promise and the filter cut it: %s"
                              % mask(PROMISE_PY.search(raw).group(0).strip(), 40))
+        # 1 Oct: one person, in the singular; feminine once she has written in
+        # the feminine (in this window: an earlier cue is not seen, so a
+        # feminine reply with no cue here is an info line, not a flag).
+        if not canned:
+            who = str(S.get("to") or "")
+            if FEM_CUE.search(str(S.get("text") or "")):
+                she.add(who)
+            for k, t in sent:
+                m = PLURAL_YOU.search(t)
+                if m:
+                    flags.append("plural 'you' in the %s: %s" % (k, m.group(1)))
+                m = MASC_YOU.search(t)
+                if m and who in she:
+                    flags.append("masculine to a resident who wrote in the feminine, in the %s: %s"
+                                 % (k, m.group(1)))
+                m = FEM_YOU.search(t)
+                if m and who not in she:
+                    infos.append("feminine with no feminine cue in this window, in the %s: %s"
+                                 % (k, m.group(1)))
         if "Tell the team the bot is down" in rd:
             flags.append("the outage path ran")
         if ex.get("status") != "success":

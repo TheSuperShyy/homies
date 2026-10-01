@@ -25,17 +25,25 @@ know"*.
   retry note's plural clause. Three pieces of code read "you" and knew only the plural: the team
   note's promise list, the promise filter (v2) and the opener shape. They now know אליך / אלייך /
   אותך / איתך too. MEMORY_EPOCH 69 -> 70, because every buffer is a plural example.
-- **Proof so far:**
+- **Proof:**
   1. On live, exactly the 9 new singular cases fail (167 cases).
   2. On the candidate, 167/167 pass. Only the 5 intended pins move. Of 872 past replies under 7
      states, 0 change in Send, and the team note decides the same on all 872 (fires on 72).
   3. In a dry-run simulation against the would-be workflow, every patcher is idle except the
      documented baseline.
+  4. The Claude-played replay covered 30 conversations and 68 turns (the 26 of the morning plus
+     4 new gender scenarios). It found 0 plural "you", 0 masculine after a feminine cue, 0
+     feminine with no cue, and 0 slashes. This morning's live prompt, on the same rubric, had 47
+     plural "you". Other flags are the morning's known kinds. The rescue and outage writers (7
+     samples) are all singular, fit both genders and promise nothing.
+     `docs/assistant/transcripts/2026-10-01-whatsapp-gender.md`.
+  5. New pins pasted. Gate on the candidate: all green.
 - **Harness:** the rubric now flags a plural "you", a masculine "you" after a feminine cue, and
   a feminine "you" with no cue. The deck gained four gender scenarios. Players no longer see the
   judges' questions. Histories in the deck went singular.
-- **Owed:** the Claude-played replay (30 conversations plus the rescue and outage writers), the
-  new pins, the owner's go, `--apply`, the gate on live, the patchers idle, the owner's handset,
+- **`--watch` found the owner's own turn:** execution 74380 (11:43 UTC), the representative
+  button answered "…במה אוכל לעזור לכם?". It is now flagged as a plural "you".
+- **Owed:** the owner's go, `--apply`, the gate on live, every patcher idle, the owner's handset,
   then `--watch`.
 
 ### WhatsApp: no promise reaches a resident (LIVE 11:31 UTC, a filter in Send)

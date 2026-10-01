@@ -228,7 +228,7 @@
     {"type": "called_on_turn", "tool": "get_payment_link", "turn": 0, "name": "link fetched at once"},
     {"type": "bot_regex", "regex": "https://pay\\.example\\.co\\.il/t/abc123", "name": "the link as returned"},
     {"type": "bot_not_regex", "regex": "איזו דירה|מספר טלפון|שם מלא|באיזה בניין", "name": "nothing asked before the link"},
-    {"type": "bot_regex", "regex": "אישי|רק לדירה|לדירה שלכם|לא להעביר|לא מעבירים|אל תעבירו", "name": "link marked personal"},
+    {"type": "bot_regex", "regex": "אישי|רק לדירה|לדירה שלכם|לדירה שלך|לא להעביר|לא מעבירים|אל תעבירו", "name": "link marked personal"},
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
@@ -260,7 +260,7 @@
     {"type": "called", "tool": "open_request"},
     {"type": "arg_equals", "tool": "open_request", "arg": "type", "value": "payment", "name": "payment ticket"},
     {"type": "called", "tool": "notify_team"},
-    {"type": "bot_not_regex", "regex": "לא נמצא|לא מזוהה|המספר שלכם|שם מלא|מספר טלפון", "name": "the reason is not explained, no identity asked"},
+    {"type": "bot_not_regex", "regex": "לא נמצא|לא מזוהה|המספר שלכם|המספר שלך|שם מלא|מספר טלפון", "name": "the reason is not explained, no identity asked"},
     {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|יחזרו|יחזור|יצרו קשר", "name": "no promise"}
    ],
    "judge": [
@@ -343,7 +343,7 @@
     {"type": "called", "tool": "open_request"},
     {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
     {"type": "bot_not_regex", "regex": "^(בוקר טוב|שלום|היי|צהריים טובים|ערב טוב)", "name": "no greeting after the menu"},
-    {"type": "bot_not_regex", "regex": "לפתוח (לכם )?קריאה\\?|רוצים שאפתח|שאפתח קריאה\\?", "name": "does not ask whether to open"}
+    {"type": "bot_not_regex", "regex": "לפתוח (לכם |לך )?קריאה\\?|רוצים שאפתח|רוצה שאפתח|שאפתח קריאה\\?", "name": "does not ask whether to open"}
    ],
    "judge": [
     "tap_warmth: on the tap, a warm full sentence and the name, then one question: what happened (no building/apartment yet)?",
@@ -371,8 +371,8 @@
    "expect": [
     {"type": "called", "tool": "notify_team"},
     {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
-    {"type": "bot_not_regex", "regex": "מעביר אתכם|אעביר אתכם|נציג אחר|יחזור אליכם|יחזרו אליכם|יצרו קשר", "name": "no transfer, no call-back promise"},
-    {"type": "bot_not_regex", "regex": "מה הבעיה|מה התקלה|ספרו לי מה קרה", "name": "the rep tap does not assume a fault"},
+    {"type": "bot_not_regex", "regex": "מעביר אתכם|אעביר אתכם|מעביר אותך|אעביר אותך|נציג אחר|יחזור אלי(כם|ך|יך)|יחזרו אלי(כם|ך|יך)|יצרו קשר", "name": "no transfer, no call-back promise"},
+    {"type": "bot_not_regex", "regex": "מה הבעיה|מה התקלה|ספרו לי מה קרה|ספר לי מה קרה|ספרי לי מה קרה", "name": "the rep tap does not assume a fault"},
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
@@ -422,7 +422,7 @@
    "expect": [
     {"type": "called", "tool": "notify_team"},
     {"type": "bot_not_regex", "regex": "\\d+ ?(ש\"ח|שקל)|בערך|תלוי ב|בין .* ל", "name": "no price guessed"},
-    {"type": "bot_not_regex", "regex": "יחזרו אליכם|יחזור אליכם|יצרו קשר|בהקדם|בקרוב", "name": "no call-back promise"}
+    {"type": "bot_not_regex", "regex": "יחזרו אלי(כם|ך|יך)|יחזור אלי(כם|ך|יך)|יצרו קשר|בהקדם|בקרוב", "name": "no call-back promise"}
    ],
    "judge": [
     "quote_to_team: is the request noted to the team (tool first) with the building and the work, and the resident told the team knows?",
@@ -485,7 +485,6 @@
      {"say": "מה אני אמורה לעשות עכשיו?"}
     ]
    },
-   "gender_revealed": true,
    "fixtures": {},
    "expect": [
     {"type": "not_called", "tool": "open_request", "name": "no ticket for a private break-in"},
@@ -496,7 +495,7 @@
     "human_first: is the first reply a human reaction to what happened to her, before anything else?",
     "scope_without_coldness: is it said simply that this is not what Homies handles, and what Michael can still do, without a long apology?",
     "no_referral: no police, no insurance, no lawyer, no instructions when she asks what to do?",
-    "gender: she wrote in the feminine; does Michael address her in the feminine or the plural, never the masculine singular?"
+    "gender: before her 'מה אני אמורה לעשות' nothing shows she is a woman, so the masculine or words that fit both are right; from that line on, is she addressed in the feminine or in words that fit both, never the masculine, never the plural, and with no remark about it?"
    ]
   },
   {
@@ -602,7 +601,7 @@
    "title": "thanks and goodnight after a ticket earlier today",
    "time": "21:10", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T18:10:00+03:00",
    "history": [
-    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 20:55, יום חמישי.]\nהאינטרקום בכניסה לא עובד, בר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "ערב טוב, כאן מיכאל מהומי'ז. מעצבן כשזה לא עובד. פתחתי לכם קריאה על האינטרקום, מספר 255-1412-26. אפשר לעזור בעוד משהו?"}
+    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 20:55, יום חמישי.]\nהאינטרקום בכניסה לא עובד, בר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "ערב טוב, כאן מיכאל מהומי'ז. מעצבן כשזה לא עובד. פתחתי לך קריאה על האינטרקום, מספר 255-1412-26. אפשר לעזור בעוד משהו?"}
    ],
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4 שכבר פתח קריאה לפני רבע שעה",
@@ -678,8 +677,8 @@
    "title": "mid-conversation hello and a second fault, building known",
    "time": "16:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:30:00+03:00",
    "history": [
-    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:12, יום חמישי.]\nהתאורה בחניון לא עובדת", "tools": [], "michael": "צהריים טובים, כאן מיכאל מהומי'ז. לא נעים לרדת לחניון בחושך. באיזה בניין זה, ובאיזו דירה אתם גרים?"},
-    {"resident": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:13, יום חמישי.]\nבר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "פתחתי לכם קריאה על התאורה בחניון, מספר 255-1414-26. אפשר לעזור בעוד משהו?"}
+    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:12, יום חמישי.]\nהתאורה בחניון לא עובדת", "tools": [], "michael": "צהריים טובים, כאן מיכאל מהומי'ז. לא נעים לרדת לחניון בחושך. באיזה בניין זה, ובאיזו דירה אתה גר?"},
+    {"resident": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:13, יום חמישי.]\nבר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "פתחתי לך קריאה על התאורה בחניון, מספר 255-1414-26. אפשר לעזור בעוד משהו?"}
    ],
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4 שכבר מסר את הבניין והדירה לפני רבע שעה",
@@ -700,6 +699,118 @@
     "one_greeting_back: the resident said היי mid-conversation; exactly one greeting back, no name?",
     "memory: the building and apartment were given earlier; is the ticket opened without asking for them again?",
     "ticket: reported with its number, no promise?"
+   ]
+  },
+  {
+   "id": "fem_light_first",
+   "title": "a woman reports a stairwell light, the feminine in her first line",
+   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T07:15:00+03:00",
+   "resident": {
+    "persona": "מיכל, גרה בבר כוכבא 23 דירה 6; האור בחדר המדרגות בקומה 3 לא נדלק כבר יומיים",
+    "script": [
+     {"say": "היי, אני גרה בבר כוכבא 23 דירה 6, והאור בחדר המדרגות בקומה 3 לא נדלק כבר יומיים"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23, דירה 6"},
+     {"say": "תודה רבה!", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1420-26", "building": "בר כוכבא 23", "reporter_unit": "6"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "(^|[^א-ת])(אתה|תוכל|תרצה|תצטרך|תשלח|תכתוב|תגיד|מוזמן)([^א-ת]|$)", "name": "never the masculine to her"},
+    {"type": "bot_not_regex", "regex": "(^|[^א-ת])(לכם|אתכם|אליכם|שלכם|אתם|תרצו|תוכלו)([^א-ת]|$)", "name": "never the plural"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "gender: she wrote 'אני גרה' in her first line; is every reply in the feminine or in words that fit both, never the masculine, never the plural, with no remark about it?",
+    "ticket: opened at once with the building, the apartment and the floor she gave, reported with its number and no promise?",
+    "goodbye: a warm close with no question?"
+   ]
+  },
+  {
+   "id": "fem_late_cue",
+   "title": "a leak, the feminine only in her second message",
+   "time": "13:40", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T10:40:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 דירה 2; מים מטפטפים מהתקרה בחדר המדרגות בקומה הראשונה, ליד הדלת שלה, מהבוקר; לא יודעת מאיפה זה בא",
+    "script": [
+     {"say": "יש מים שמטפטפים מהתקרה בחדר המדרגות"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 2. אני לא בטוחה מאיפה זה מגיע, אולי מהגג"},
+     {"if_asked": "where exactly or since when", "say": "בקומה הראשונה, ליד הדלת שלי. מהבוקר"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1421-26", "building": "בר כוכבא 23", "reporter_unit": "2"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "(^|[^א-ת])(לכם|אתכם|אליכם|שלכם|אתם|תרצו|תוכלו)([^א-ת]|$)", "name": "never the plural"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "gender: her first message shows no gender, so the masculine or words that fit both are right there; from 'אני לא בטוחה' on, is she addressed in the feminine or in words that fit both, never the masculine, with no remark about the switch?",
+    "ticket: opened once the building and apartment are known, with her words, reported with its number and no promise?",
+    "goodbye: a warm close with no question?"
+   ]
+  },
+  {
+   "id": "fem_pay",
+   "title": "a woman asks for the payment link",
+   "time": "19:05", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:05:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 דירה 4 שרוצה לשלם את הוועד",
+    "script": [
+     {"say": "היי, אני צריכה את הקישור לתשלום הוועד"},
+     {"say": "מעולה, תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "get_payment_link": {"ok": true, "found": true, "link": "https://pay.example.co.il/t/fem456", "building": "בר כוכבא 23", "apartment": "4"}
+   },
+   "expect": [
+    {"type": "called_on_turn", "tool": "get_payment_link", "turn": 0, "name": "link fetched at once"},
+    {"type": "bot_regex", "regex": "https://pay[.]example[.]co[.]il/t/fem456", "name": "the link as returned"},
+    {"type": "bot_not_regex", "regex": "(^|[^א-ת])(אתה|תוכל|תרצה|תצטרך|תשלח|תכתוב|תגיד|מוזמן|כתוב לי)([^א-ת]|$)", "name": "never the masculine to her"},
+    {"type": "bot_not_regex", "regex": "(^|[^א-ת])(לכם|אתכם|אליכם|שלכם|אתם|תרצו|תוכלו|תכתבו)([^א-ת]|$)", "name": "never the plural"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "gender: she wrote 'אני צריכה'; are the short ack, the link message and the goodbye in the feminine or in words that fit both, never the masculine, never the plural?",
+    "two_beats: did she get a short 'on it' message first, then the link?",
+    "link_message_close: does the link message say it is personal and invite her to write here, with no 'how else can I help'?",
+    "goodbye: warm close with no question?"
+   ]
+  },
+  {
+   "id": "fem_rep_tap",
+   "title": "the representative button, then a woman disputes a charge",
+   "time": "15:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T12:30:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 דירה 4 שחויבה פעמיים על ספטמבר",
+    "script": [
+     {"say": "היי"},
+     {"say": "לדבר עם נציג", "kind": "tap"},
+     {"say": "אני חושבת שחייבו אותי פעמיים על ספטמבר, אני רוצה לברר את זה"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 4"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "noted": true}
+   },
+   "expect": [
+    {"type": "called", "tool": "notify_team"},
+    {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
+    {"type": "bot_not_regex", "regex": "יחזרו אלי(כם|ך|יך)|יחזור אלי(כם|ך|יך)|יצרו קשר|בהקדם|בקרוב", "name": "no call-back promise"},
+    {"type": "bot_not_regex", "regex": "(^|[^א-ת])(לכם|אתכם|אליכם|שלכם|אתם|תרצו|תוכלו)([^א-ת]|$)", "name": "never the plural"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "gender: the tap shows nothing, so the reply to it is masculine or in words that fit both; from 'אני חושבת' on, is she addressed in the feminine or in words that fit both, never the masculine, never the plural?",
+    "dispute_to_team: is the team told via the tool before the reply says so, and nothing promised?",
+    "goodbye: warm close without a question?"
    ]
   }
  ]

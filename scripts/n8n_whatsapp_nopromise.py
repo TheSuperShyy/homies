@@ -68,6 +68,10 @@ script also compiles the new Send body in Node and runs two turns through it.
 
 Idempotent. Running it twice reports nothing to do. A later version replaces
 this one by its marker.
+
+v2, 1 Oct: the singular "you" forms (אותך, אליך, אלייך) beside the plural ones,
+because the bot now writes to one person. Applied by n8n_whatsapp_gender.py in
+the same write as the prompt change; this script is idle after it.
 """
 import json
 import os
@@ -96,23 +100,26 @@ NEED = ("Send", "Sort", "Carry on", "Answer the resident", "Two parts?",
 # is replaced once, at the end; an assertion checks none is left.
 BS = chr(92)
 PH = "¤"
-MARK = "const pv = 'promise v1';"
+MARK = "const pv = 'promise v2';"
 
 # The promise phrases. One list, two wrappers: the JS filter and PROMISE_PY.
 # Not here, on purpose: "עד מחר" ("אפשר לשלם עד מחר" is a fact in the link
 # message), "תוך…" and "עד 3 ימי עסקים" (the facts answer), "בטיפול" (a status
 # the tool returned), "אני בודק את זה עכשיו" (the ack), "עוד היום" (too often a
 # plain fact), "זה יצור קשר עם…" (the pronoun is required).
+# v2, 1 Oct: the bot addresses one person now (the owner: "it still uses how
+# can i help you all"), so every "you" in the list also has its singular,
+# masculine and feminine: אותך, אליך, אלייך. The plural forms are unchanged.
 PHRASES = ("בהקדם|בקרוב|בימים הקרובים|בשעות הקרובות|בהמשך היום|"
            "אל דאגה|אל תדאגו|אל תדאגי|אל תדאג|אנחנו על זה|אני על זה|"
            "אני כבר מטפל בזה|אני מטפל בזה|מטפל בזה מיד|אני אטפל בזה|נטפל בזה|נטפל בה|"
            "יטפלו? (בזה|בו|בה|בעניין)|"
            "(יחזרו|יחזור|תחזור|נחזור|אחזור) (אליכם|אלייך|אליך)|"
            "(ייצרו|יצרו|ייצור|יצור|ניצור|תיצור) ((אתכם|איתכם|איתך|אתך) קשר|קשר (אתכם|איתכם|איתך|אתך))|"
-           "(יעדכנו|יעדכן|נעדכן|אעדכן) אתכם|"
-           "בדרך אליכם|(עזרה|מישהו|הצוות|הטכנאי) בדרך|"
-           "הטכנאי יגיע|מישהו יגיע|(נשלח|ישלחו) (אליכם )?(מישהו|טכנאי)|"
-           "יגיעו? (אליכם|בקרוב|היום|מחר)")
+           "(יעדכנו|יעדכן|נעדכן|אעדכן) (אתכם|אותך)|"
+           "בדרך (אליכם|אליך|אלייך)|(עזרה|מישהו|הצוות|הטכנאי) בדרך|"
+           "הטכנאי יגיע|מישהו יגיע|(נשלח|ישלחו) ((אליכם|אליך|אלייך) )?(מישהו|טכנאי)|"
+           "יגיעו? (אליכם|אליך|אלייך|בקרוב|היום|מחר)")
 # The ones that open a sentence and can be cut away with their comma.
 OPENERS = ("אל דאגה|אל תדאגו|אל תדאגי|אל תדאג|אנחנו על זה|אני על זה|"
            "אני כבר מטפל בזה|אני מטפל בזה|מטפל בזה מיד|אני אטפל בזה|נטפל בזה")

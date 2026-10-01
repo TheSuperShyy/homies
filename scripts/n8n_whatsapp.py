@@ -203,7 +203,17 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 69
+MEMORY_EPOCH = 70
+# 69 -> 70, 1 Oct: one person, in the singular. Owner: *"i notice it still uses
+# how can i help you all which is awkward"*, and the bot should switch when the
+# person writes in the feminine. The prompt said "plural, always" (written so the
+# bot would not guess a gender, after a no-gender prompt invented ספר/י). Now:
+# singular, masculine until it is clear a woman is writing ("אני צריכה",
+# "אני גרה"), then feminine to the end, without remarking on it; never a slash.
+# The two quoted examples of what not to ask went singular with it. Every buffer
+# holds plural replies, which an example would keep alive. The three small
+# writers (payment ack, rescue, outage) see no history, so they write words that
+# fit both (לך, שלך); their texts are in firstword / sayagain / outage.py.
 # 68 -> 69, 27 Sep evening: casual and friendly. Owner, on "אני מיכאל מהומי'ז.
 # אני מבין שיש לכם בעיה עם התאורה בחדר המדרגות בבניין, וזה מקשה עליכם לעלות
 # במדרגות. באיזה בניין מדובר ומה מספר הדירה שלכם?": *"the response is too
@@ -645,7 +655,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8afa16824480",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "c6956ac921cf",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

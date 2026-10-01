@@ -33,6 +33,7 @@ function build(X) {
     word: compile(['$json'], 'return (' + X.word_gate + ');', 'A word first?'),
     inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
+    teamNote: compile(['$json', '$'], 'return (' + X.team_note + ');', 'Team note this turn?'),
   };
 }
 
@@ -369,6 +370,41 @@ function cases(E) {
   expect('first message: no fact', () => inj(false, 'hi, lights')().includes('הדייר פתח'), false);
   expect('"מה קורה עם הקריאה" is not a greeting', () => inj(true, 'מה קורה עם הקריאה שלי?')().includes('הדייר פתח'), false);
   expect('the false "you introduced yourself" stays gone', () => inj(true, 'x')().includes('והצגת את עצמך'), false);
+
+  // 1 Oct evening (scripts/n8n_whatsapp_gender.py): the owner, "it still uses
+  // how can i help you all which is awkward". The bot writes to one person now,
+  // so every piece of code that reads "you" must know the singular, masculine
+  // and feminine, and still match the plural exactly as before.
+  console.log(NL + '--- one person, in the singular (1 Oct evening) ---');
+  expect('promise v2: "נעדכן אותך" goes, the ticket stays',
+    say({ reply: 'פתחתי לך קריאה מספר 255-1339-26. נעדכן אותך כשיהיה משהו חדש. אפשר לעזור בעוד משהו?', said: 'lights' }),
+    'פתחתי לך קריאה מספר 255-1339-26. אפשר לעזור בעוד משהו?');
+  expect('promise v2: "בדרך אלייך" goes with its clause',
+    say({ reply: 'העברתי את זה לצוות שלנו, והם בדרך אלייך. יש עוד משהו?', said: 'help' }),
+    'העברתי את זה לצוות שלנו. יש עוד משהו?');
+  expect('promise v2: "ונשלח אליך טכנאי" is cut at its ו',
+    say({ reply: 'פתחתי לך קריאה 255-1339-26 ונשלח אליך טכנאי. יש עוד משהו?', said: 'lift' }),
+    'פתחתי לך קריאה 255-1339-26. יש עוד משהו?');
+  expect('promise v2: "יגיע אלייך היום" goes',
+    say({ reply: 'העברתי את זה לצוות. מישהו מהצוות יגיע אלייך היום. יש עוד משהו?', said: 'help' }),
+    'העברתי את זה לצוות. יש עוד משהו?');
+  const FEM = 'איזה מעצבן. תוכלי לכתוב לי באיזה בניין ובאיזו דירה?';
+  expect('a feminine reply with nothing to remove: byte-identical', say({ reply: FEM, said: 'אני צריכה עזרה' }), FEM);
+  const tn = (output, steps) => () => E.teamNote({ output }, turn({ steps }).$);
+  expect('team note: "יחזור אלייך" makes the note', tn('נציג מהצוות יחזור אלייך בהקדם.'), true);
+  expect('team note: "ניצור איתך קשר" makes the note', tn('ניצור איתך קשר בהמשך היום.'), true);
+  expect('team note: the plural still makes it', tn('נציג יחזור אליכם בהקדם.'), true);
+  expect('team note: "I passed it to the team" still makes it', tn('העברתי את זה לצוות שלנו.'), true);
+  expect('team note: "רוצה שנעביר...?" is an offer, no note', tn('רוצה שנעביר את הפנייה לצוות, שיחזרו אליכם?'), false);
+  expect('team note: a plain question makes none', tn('איזה מעצבן. באיזה בניין ובאיזו דירה?'), false);
+  expect('team note: notify_team ran', tn('תודה.', [{ action: { tool: 'notify_team' } }]), true);
+  const op = (output, S) => () => E.reply.opener({ output }, 0, turn({ S }).$);
+  expect('opener: "במה אוכל לעזור לך היום?" after a concrete message is sent back', op('היי! במה אוכל לעזור לך היום?'), false);
+  expect('opener: the plural shape is still sent back', op('היי! במה אוכל לעזור לכם היום?'), false);
+  expect('opener: a real answer passes', op('איזה מעצבן. באיזה בניין ובאיזו דירה?'), true);
+  expect('opener: the נציג tap is exempt', op('היי! במה אוכל לעזור לך היום?', { tap: 'other' }), true);
+  expect('menu rule: the bare singular opener with the name, first contact, gets the buttons',
+    () => sent(E, { reply: "היי, כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", S: { greeted: false }, said: 'hi' }).content_type, 'input_select');
 
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;

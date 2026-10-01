@@ -88,11 +88,12 @@ TRY_POS, RETRIED_POS = [720, 300], [1440, 300]
 # A bracketed fact for the model, in the shape of every other note in the
 # user turn: what happened, and what fixes it. All five guard reasons are
 # named because the Set node cannot tell which one fired. The opener is
-# described, not quoted (20 Sep).
+# described, not quoted (20 Sep). 1 Oct: the slash reason no longer says
+# "singular instead of plural" -- the bot speaks to one person now.
 RETRY_NOTE = (
     "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר: או שהודיעה על "
     "קריאה שלא נפתחה, או שנתנה קישור שלא הגיע מכלי, או שהייתה ריקה, או "
-    "שפנתה לדייר בלוכסן או ביחיד במקום בלשון רבים, או שחזרה על משפט "
+    "שפנתה לדייר בלוכסן או בסוגריים, או שחזרה על משפט "
     "הפתיחה של המערכת במקום לענות על מה שכתב, או שסיפרה שבדקת, תיקנת, "
     "החלפת או שלחת משהו בלי שכלי עשה את זה, או שפתחה בהודעה שהבנת אותו "
     "או בסיכום של מה שכתב, או שהסבירה לו למה אתה צריך פרט לפני ששאלה "
@@ -157,9 +158,11 @@ PLURAL = (r"={{ $runIndex > 0 || !/([א-ת]{2,})[א-ת]?(\/|\()(\1[א-ת]?)?(י|
 # stops being recognised as the turn the resident has already had, and the
 # guard quietly protects nothing -- the same failure n8n_whatsapp_rename.py
 # records for Send's echo tests.
+# 1 Oct: "לך היום" beside "לכם היום" -- the bot addresses one person now,
+# and the singular shape has to count as the opener the plural one did.
 OPENER_RE = (r"/^(היי|הי|שלום|שלום רב|אהלן|בוקר טוב|צהריים טובים|ערב טוב)[,!.]?"
              r"( (כאן |אני )?מיכאל מהומי'ז( כאן)?[.,!]?)?"
-             r" ?במה (אפשר|אוכל|נוכל) לעזור( לכם| לך| לכם היום)?\??$/")
+             r" ?במה (אפשר|אוכל|נוכל) לעזור( לכם| לך| לכם היום| לך היום)?\??$/")
 STRIP = r".replace(/[\p{Extended_Pictographic}️]/gu, '').replace(/\s+/g, ' ').trim()"
 # `opener`: the whole reply is that shape -- the turn the resident has
 # already had -- on a message that was not a bare hello (a bare hello never
