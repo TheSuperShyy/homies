@@ -43,6 +43,8 @@ Owner, after hearing which agents follow the gender rule: *"apply to incoming as
   Both pointed everything: "מה שלומְךָ?", "מִמְּךָ", "ששאלתָּ", then "שלָךְ" and "התקשרתְּ" for
   her. Across all seven calls: no plural, no slash, every call ends on ולהתראות
   (`docs/assistant/transcripts/2026-10-01-inbound-replay-singular.md`).
+- **Shown to the owner** with the before and after lines (the opener's לכם → לְךָ, the always-plural
+  rule → masculine until she shows otherwise) and examples from the calls, with English glosses.
 - **Waiting on:** the owner's word to ship.
 - **Ships on the owner's word,** as on 30 Sep: `N8N_BASE_URL= python scripts/vapi_sync.py inbound
   --apply`, then `python scripts/vapi_set_voice.py --apply` (the sync resets the voice; this puts

@@ -2432,6 +2432,11 @@ a no-gender line made it write ספר/י. Now:
   the same ones the debt call speaks, and asks for every word that ends in the address suffix
   to be pointed (a bare "מה שלומך?" can be read either way). The opener says "לְךָ" before
   anyone has spoken.
+- **A voice prompt change is tested the same way, without a call:** one Claude player per
+  simulated call, given the rendered opener, the rendered prompt and the live tool definitions,
+  with fixed tool results, playing both the model and a scripted caller
+  (`docs/assistant/transcripts/2026-10-01-inbound-replay-singular.md`). It checks the words. How
+  the voice reads the pointing, and gpt-4.1's own compliance, only the owner's one test call shows.
 - **Not used: the WhatsApp profile name.** Debt calls choose by the name, because a voice agent
   must speak before the person does. On WhatsApp the person's own words come first.
 - **Checked:** `--watch` flags a plural "you" in anything sent, and a masculine "you" to a resident
