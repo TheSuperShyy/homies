@@ -29,8 +29,16 @@ Owner, after hearing which agents follow the gender rule: *"apply to incoming as
 - **Checks so far:** the live assistant equals the repo before the edit (prompt `5d1ba62c87d1`, the
   same first message; the turn-taking plans differ only as 1 vs 1.0). The dry run: 6,014 characters,
   7 tools on the Edge Function, the same end-of-call report. The fact check is identical before and
-  after (the same 13 voice gaps as on 30 Sep). Five simulated calls are being played by Claude
-  (no model, no call, no credits).
+  after (the same 13 voice gaps as on 30 Sep).
+- **Simulated calls, first round (Claude as the model; no model, no call, no credits):** a man
+  reporting a light, an English speaker, a how-are-you then a payment, and a woman whose gender
+  shows only in her third line. All singular. The men got the masculine, pointed (לְךָ,
+  התקשרתָּ). The woman got the masculine until "אני צריכה… אני לא בטוחה", then "את גרה",
+  "שלָךְ", "לָךְ" and "התקשרתְּ", with no remark. Every call ended on ולהתראות.
+- **Refined after it:** the small talk's "מה שלומך?" came out unpointed, so the voice could read
+  it either way. The pointing clause now covers every word ending in the address suffix (לך, שלך,
+  איתך, אליך, שלומך) and shows שלומְךָ / שלומֵךְ. 6,094 characters; the dry run is otherwise
+  the same. A second round replays the small-talk calls on it.
 - **Ships on the owner's word,** as on 30 Sep: `N8N_BASE_URL= python scripts/vapi_sync.py inbound
   --apply`, then `python scripts/vapi_set_voice.py --apply` (the sync resets the voice; this puts
   Michael's back), then read back. The English twin is not touched.

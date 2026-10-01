@@ -2429,7 +2429,9 @@ a no-gender line made it write ספר/י. Now:
 - **Incoming calls follow the same rule (1 Oct evening, owner: "apply to incoming as well").**
   The voice reads every ending aloud, so there the rule hands the model pointed forms for the
   words spelled alike for both (לְךָ / לָךְ, שלְךָ / שלָךְ, איתְּךָ / איתָּךְ, התקשרתָּ / התקשרתְּ),
-  the same ones the debt call speaks, and the opener says "לְךָ" before anyone has spoken.
+  the same ones the debt call speaks, and asks for every word that ends in the address suffix
+  to be pointed (a bare "מה שלומך?" can be read either way). The opener says "לְךָ" before
+  anyone has spoken.
 - **Not used: the WhatsApp profile name.** Debt calls choose by the name, because a voice agent
   must speak before the person does. On WhatsApp the person's own words come first.
 - **Checked:** `--watch` flags a plural "you" in anything sent, and a masculine "you" to a resident
