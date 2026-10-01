@@ -45,6 +45,9 @@ know"*.
   button answered "…במה אוכל לעזור לכם?". It is now flagged as a plural "you".
 - **Owed:** the owner's go, `--apply`, the gate on live, every patcher idle, the owner's handset,
   then `--watch`.
+- **New pre-apply check, kept:** `scripts/check_patchers_idle.py F` runs every patcher's dry run
+  against the would-be workflow, writes blocked. On the gender dump, 6 of 26 are not idle, all
+  of them the baseline.
 
 ### WhatsApp: no promise reaches a resident (LIVE 11:31 UTC, a filter in Send)
 

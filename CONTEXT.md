@@ -2343,7 +2343,14 @@ three, spends nothing, and is the gate:
    the bot ever sent through the live code and the candidate, under each row
    of the owner's greeting table, and prints each difference. On 27 Sep it
    found a live bug nobody had reported ("who are you" answered with a bare
-   "נציג השירות של הומיז.") before v2 shipped.
+   "נציג השירות של הומיז.") before v2 shipped. Then
+   `python scripts/check_patchers_idle.py F` runs every patcher's dry run
+   against the would-be workflow, with writes blocked. Idle except the
+   baseline means no patcher will push its old text over the new one.
+   **A change that spans texts owned by several patchers** (1 Oct,
+   `n8n_whatsapp_gender.py`) edits each owner's constant, then carries them
+   all to live in one write. Each field is rewritten only if live is exactly
+   the old text. Until that write, no owner runs with `--apply` alone.
 2. **After `--apply`:** the check on live is green, and every WhatsApp
    patcher's dry run is idle. Baseline: `batch.py` shows its old drift and is
    never applied; `open`, `handover`, `promise`, `transfer` and `untemplate`
