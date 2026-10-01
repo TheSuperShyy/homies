@@ -354,7 +354,7 @@ phone-tree experience this system exists to replace.
 - כל מה שאתה כותב נקרא בקול. כל מספר נאמר במילים, לעולם לא בספרות: ארבע עשרה, לא 14.
 - כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.
 - לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.
-- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה, לְךָ, שלְךָ, איתְּךָ. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: את, תוכלי, תרצי, לָךְ, שלָךְ, איתָּךְ. המילים לך, שלך ואיתך נכתבות אותו דבר לגבר ולאישה ונשמעות אחרת, אז אותן אתה כותב תמיד מנוקדות, כמו כאן, וכך גם עבר בגוף שני: התקשרתָּ לגבר, התקשרתְּ לאישה.
+- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה, לְךָ, שלְךָ, איתְּךָ. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: את, תוכלי, תרצי, לָךְ, שלָךְ, איתָּךְ. כל מילה שנגמרת בפנייה אליו או אליה, כמו לך, שלך, איתך, אליך ושלומך, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב תמיד מנוקדת, כמו כאן ובמה שלומְךָ לגבר ומה שלומֵךְ לאישה, וכך גם עבר בגוף שני: התקשרתָּ לגבר, התקשרתְּ לאישה.
 - את העזרה אתה מציע בגוף ראשון, כי אתה זה שעוזר: אני יכול, ולא בלשון הסתמית של אפשר.
 - את השיחה אתה סוגר במילים שלך, חם וקצר: תודה לו שהתקשר, ואיחול שמתאים לשעה ביום (השעה עכשיו {{"now" | date: "%H:%M", "Asia/Jerusalem"}}). המילה האחרונה היא תמיד בדיוק: ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותה, ולכן אל תגיד "ולהתראות" או "יום טוב" לפני שהשיחה באמת הסתיימה.
 ````
@@ -372,8 +372,10 @@ speaking (אני צריכה, אני גרה), then feminine to the end, with no r
 
 The voice is why the forms are written out. לך, שלך and איתך are spelled the same for both and
 said differently (lekha / lakh), so the rule hands the model the pointed forms the debt call
-already speaks (`dashboard/lib/call.ts`) and asks it to point them, and the second-person past
-(התקשרת) with them. The opener says "לְךָ", masculine, before anyone has spoken, which is
+already speaks (`dashboard/lib/call.ts`) and asks it to point every word that ends in the address
+suffix, and the second-person past (התקשרת) with them. The first simulated calls pointed לְךָ
+and התקשרתָּ but left the small talk's "מה שלומך?" bare, so the clause names שלומך and אליך
+too and shows שלומְךָ / שלומֵךְ. The opener says "לְךָ", masculine, before anyone has spoken, which is
 the owner's own example ("איך אפשר לעזור לךָ?"). The clerk's "שלום גם לכם" went singular with
 it, and the goodbye's "תודה שהתקשרו" became one person. The descriptive plurals (המתקשרים,
 שלהם) speak about callers in general and stay.
