@@ -35,10 +35,15 @@ this is michael from homies..."*.
      through Sort and the ack's note. Of 874 past replies, 0 change in the seven old states; in the
      new tap state 226 keep their hello and nothing else changes; 0 broken.
   3. Every patcher's dry run against the would-be workflow is idle except the baseline (6).
-  4. The Claude-played deck (33 scenarios, 3 new for the tap) is running. The four tap scenarios
-     graded so far meet every check, e.g. "היי 🙂 מה שלומך? כאן מיכאל מהומי'ז, במה אפשר לעזור?",
-     and "and you?" gets "אני מצוין, תודה ששאלת. אז מה אפשר לעשות בשבילך?" with no second
-     how-are-you. The other two buttons and text typed after the menu still get no greeting.
+  4. The Claude-played deck: 33 conversations, 81 model turns (3 new scenarios for the tap;
+     `docs/assistant/transcripts/2026-10-01-whatsapp-rephello.md`). All 5 taps open with "היי", a
+     how-are-you and the name, never the hour's greeting, e.g. "היי 🙂 מה שלומך? כאן מיכאל מהומי'ז,
+     במה אפשר לעזור?". "fine, thanks" and "and you?" are not asked again ("אני מצוין, תודה ששאלת. אז
+     מה אפשר לעשות בשבילך?"). 0 greetings after the other two buttons or after typed text, 0 plural,
+     0 slash. 153 expectations met; 2 failed, the pending which-gate checks. The flags are the
+     morning's known kinds: the ack's "הבנתי ש…", the link line, and the phantom guard on an honest
+     "אני לא פותח עליה קריאה". Replies ending without a question: 17% of turns, against 14% on the
+     morning's live prompt, so player variance.
 - **Harness:** the gate has 10 new cases and a replay state for the tap. `--watch` exempts the tap
   from "a greeting right after the menu", flags a tap answered without the name, and adds an info
   line for a tap with no hello or with the hour's word. The rubric learned `rep-no-hello`,
@@ -47,7 +52,7 @@ this is michael from homies..."*.
 - **Rollback, after an apply:** `python scripts/n8n_whatsapp_rephello.py --restore` (snapshot
   `docs/handover/n8n-whatsapp-live-01oct-before-rephello.json`, scanned: same URLs, emails and
   credential references as the committed snapshots), plus a git revert of the repo side.
-- **Waiting on:** the rest of the Claude-played deck, then the owner's "make it live".
+- **Waiting on:** the owner's "make it live".
 
 ### WhatsApp: one person, in the singular (LIVE 13:02 UTC, epoch 70)
 

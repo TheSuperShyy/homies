@@ -2452,7 +2452,8 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
   replies keep their hello and nothing else changes, with 0 changes in the other seven states;
   `--watch` (the tap answered without the name is a flag; without a hello, or with the hour's word,
   an info line); and the rubric (`rep-no-hello`, `rep-no-how-are-you`, `rep-hello-repeats-menu`,
-  `how-are-you-again`; the tap's how-are-you does not count as a second question).
+  `how-are-you-again`; the tap's how-are-you does not count as a second question). The
+  Claude-played deck (33 conversations): all 5 taps right, 0 greeting flags anywhere else.
 
 ## How the WhatsApp bot is tested without a model call
 
