@@ -41,7 +41,8 @@ function build(X) {
     // Date is an argument so the ack note's hour word follows the scenario's
     // clock and not this machine's.
     worth: compile(['$json', 'Date'], 'return (' + X.worth_text + ');', 'Worth a word?'),
-    word: compile(['$json'], 'return (' + X.word_gate + ');', 'A word first?'),
+    word: compile(['$json', '$'], 'return (' + X.word_gate + ');', 'A word first?'),
+    carry: X.carry_on ? compile(['$json', '$'], 'return (' + X.carry_on + ');', 'Carry on') : null,
     inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
     sayNow: compile(['$json'], 'return (' + X.say_now + ');', 'Say it now'),
@@ -73,8 +74,9 @@ function run(E, clock, o) {
     to: '599000000', conv_id: 0, burst_size: 1,
   };
   const ack = String(o.ack || '').trim();
-  const acked = ack.toUpperCase() === 'NONE' ? '' : ack;          // Carry on
-  const ackSent = acked !== '' && E.word({ output: acked }) === true; // A word first?
+  const wrote = ack.toUpperCase() === 'NONE' ? '' : ack;
+  let ackSent = false;
+  let acked = '';
   const steps = stepsOf(o.tool_calls);
   const $now = { setZone: () => ({ toFormat: () => clock.time, weekday: clock.weekday }) };
   const nodes = {
@@ -88,6 +90,10 @@ function run(E, clock, o) {
     'Worth a word?': { first: () => ({ json: { output: ack || 'NONE' } }) },
   };
   const $ = (name) => { if (!nodes[name]) throw new Error('no node ' + name); return nodes[name]; };
+  // A word first? reads the resident's words (1 Oct evening), and Carry on reports
+  // only a note that went out; a code.json from before has no carry_on.
+  ackSent = wrote !== '' && E.word({ output: wrote }, $) === true;
+  acked = E.carry ? String(JSON.parse(E.carry({}, $)).acked || '') : wrote;
 
   const out = { text: o.text || '' };
   // What the two models read.

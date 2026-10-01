@@ -168,6 +168,8 @@ def extract(wf):
         "outage_gate": conds("Outage reply usable?"),
         "worth_text": inner(by["Worth a word?"]["parameters"]["text"]),
         "word_gate": inner(conds_raw(by, "A word first?", "word")),
+        # 1 Oct evening: it decides what the answering model is told was sent.
+        "carry_on": inner(by["Carry on"]["parameters"]["jsonOutput"]),
         "inject": inner(by["Answer the resident"]["parameters"]["text"]),
         "try_again": inner(by["Try again"]["parameters"]["jsonOutput"]),
         # 1 Oct: it reads "you", and the bot's "you" went singular.
@@ -360,10 +362,20 @@ def watch(since):
             named = [k for k, t in sent if "מיכאל" in t]
             if named:
                 flags.append("the name mid-conversation (%s)" % " + ".join(named))
+        # 1 Oct evening: the gate's own payment words (n8n_whatsapp_payack.py), so a
+        # flag here means the gate let through what it should have held.
+        try:
+            from n8n_whatsapp_firstword import PAY_PY as pay
+        except Exception:  # noqa: BLE001 -- the watch still runs without it
+            pay = PAY
+        said = str((first("Carry on") or {}).get("text") or S.get("text") or "")
         if first("Say it now"):
-            said = str((first("Carry on") or {}).get("text") or S.get("text") or "")
-            if not PAY.search(said):
+            if not pay.search(said):
                 flags.append("a payment ack on a message with no payment words")
+        else:
+            wrote = str((first("Worth a word?") or {}).get("output") or "").strip()
+            if wrote and wrote.upper() != "NONE":
+                infos.append("the ack model wrote a note and the gate held it: %s" % mask(wrote, 60))
         for k, t in sent:
             if ECHO.search(t):
                 flags.append("'I understand that...' in the %s%s"

@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-10-01
 
+### WhatsApp: the payment note goes out only on payment words (READY, NOT live)
+
+The owner's handset, 14:01 UTC (execution 74654): after the ticket he wrote "nothing so far thats
+about it thanks" and got "אני רואה שאתה מחפש קישור לתשלום. אני בודק את זה עכשיו." before the
+goodbye. His words: *"wth is this"*.
+- **Cause:** `Worth a word?`, the small model that writes the "one moment, I'm checking" before a
+  payment link (firstword.py), invented a payment request, and `A word first?` checked only that
+  the note was short with no link. Its prompt already says NONE to thanks and goodbyes. Not from
+  today's greeting change.
+- **History (all 185 retained runs, 27 Sep - 1 Oct):** the model ran on 21 and wrote a sentence on
+  3, and all 3 were this invention ("hello good afternoon" twice, 65683 and 65694, and 74654).
+  There was no real payment request among them.
+- **What:** `scripts/n8n_whatsapp_payack.py`, one write of two firstword.py texts:
+  - `A word first?`: the note goes out only when the resident's own message has a payment word
+    (`firstword.PAY_HE` / `PAY_EN`: לשלם, תשלום, קישור, לינק, ועד, pay, link, fee ...; English with
+    edges, so "blinking" is not "link");
+  - `Carry on`: `acked` only when `Say it now` really ran, so a held-back note is never reported to
+    the answering model as sent.
+  - No model-facing text changes: pins and MEMORY_EPOCH stay, and no conversation restarts.
+- **Proof:**
+  1. On live, exactly the 7 new cases fail (194).
+  2. On the candidate, 194/194 with pins unchanged; the replay changes nothing in Sort, the ack's
+     note or Send. Of 830 real inbound messages, the note can now go out on 36, every one about
+     paying. The 12 money-related ones it can't are balance questions, which the ack's own prompt
+     answers NONE.
+  3. Every patcher's dry run against the would-be workflow: idle except the baseline (6 of 28).
+  4. The 33 Claude-played conversations, re-graded on the candidate: 89 of 89 turns identical on
+     the handset. The real notes in the two payment scenarios still go out.
+- **`--watch`** now uses the gate's own payment words and adds an info line when the gate holds a
+  note back. Since 13:52 it flags exactly 74654.
+- **Rollback, after an apply:** `--restore` (snapshot `docs/handover/n8n-whatsapp-live-01oct-before-payack.json`,
+  scanned: the same URLs, emails and credential references as the committed snapshots).
+- **Waiting on:** the owner's go.
+
 ### WhatsApp: the representative says hi (LIVE 13:52 UTC, epoch 71)
 
 Owner, after tapping לדבר עם נציג at 13:14 UTC and getting "כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור
@@ -57,8 +91,10 @@ this is michael from homies..."*.
   one `}}`. The gate on live is 177/177 with pins unchanged, and every patcher's dry run is idle
   except the baseline (6 of 27; manners, teamnote, nopage and patch went idle with the write).
   `--watch 2026-10-01T13:52`: 0 turns yet. Every conversation restarted at 13:52.
-- **Owed:** the owner's handset (tap לדבר עם נציג), then `--watch 2026-10-01T13:52`, and again the
-  next morning.
+- **Handset, 13:54 UTC (execution 74603):** the tap got "היי, כאן מיכאל מהומי'ז. מה שלומך ואיך אני
+  יכול לעזור לך היום? 😊". Gemini wrote it as asked, and "im good, how are you?" got "אני בסדר גמור,
+  תודה ששאלת! 🙏 במה אוכל לעזור לך?". `--watch` since 13:52: 7 turns. The one flag is 74654, the
+  payment note (the entry above). **Owed:** `--watch` again the next morning.
 
 ### WhatsApp: one person, in the singular (LIVE 13:02 UTC, epoch 70)
 

@@ -2455,6 +2455,23 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
   `how-are-you-again`; the tap's how-are-you does not count as a second question). The
   Claude-played deck (33 conversations): all 5 taps right, 0 greeting flags anywhere else.
 
+## A gatekeeper model's NONE is not a guard; the necessary condition goes in code
+
+1 Oct, evening (`scripts/n8n_whatsapp_payack.py`). `Worth a word?` writes the "one moment, I'm
+checking" before a payment link, and its prompt says NONE to greetings, thanks and goodbyes. In
+every retained run where it wrote anything (27 Sep - 1 Oct), it wrote an invented payment request:
+on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
+
+- **The rule:** when a small model decides whether something may go out, the code checks the
+  condition the model was supposed to check, wherever words can decide it. The payment note now
+  needs a payment word in the resident's own message (`firstword.PAY_HE` / `PAY_EN`). The words
+  are one list, read by the gate and by `--watch`.
+- **What a node is told was sent must be what was sent.** `Carry on` had passed the model's note
+  to the answering model as "already sent" even when `A word first?` held it back. It now passes it
+  only when `Say it now` ran, the same test Send's greeting filter uses (`ackSent`).
+- **A held-back note costs nothing.** The answer still comes, and the two-part payment reply still
+  splits (`!acked && paid`), so the gate is only allowed to hold notes back, never to send one.
+
 ## How the WhatsApp bot is tested without a model call
 
 1 Oct. Owner: *"i want you to do a automated testing of the chatbot like doing ab

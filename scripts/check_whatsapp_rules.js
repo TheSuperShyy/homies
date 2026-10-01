@@ -30,7 +30,8 @@ function build(X) {
     second: map(X.second_try, ['$json', '$runIndex', '$']),
     outage: map(X.outage_gate, ['$json', '$runIndex', '$']),
     worth: compile(['$json'], 'return (' + X.worth_text + ');', 'Worth a word?'),
-    word: compile(['$json'], 'return (' + X.word_gate + ');', 'A word first?'),
+    word: compile(['$json', '$'], 'return (' + X.word_gate + ');', 'A word first?'),
+    carry: compile(['$json', '$'], 'return (' + X.carry_on + ');', 'Carry on'),
     inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
     teamNote: compile(['$json', '$'], 'return (' + X.team_note + ');', 'Team note this turn?'),
@@ -43,6 +44,7 @@ function turn(o) {
   const S = Object.assign({ greeting: !!o.canned, greeted: true, last_bot: '', text: o.said || '', tap_now: false }, o.S || {});
   const nodes = {
     'Sort': { first: () => ({ json: S }) },
+    'Still the last word?': { first: () => ({ json: S }) },
     'Carry on': { first: () => ({ json: { acked: o.acked || '', text: o.said || '' } }) },
     'Answer the resident': { first: () => ({ json: { intermediateSteps: o.steps || [] } }) },
     'Anything newer?': { all: () => (o.rows || []).map((r) => ({ json: r })) },
@@ -341,13 +343,43 @@ function cases(E) {
   expect("the resident's words follow the note", () => String(E.worth({ greeted: true, text: 'hello' })).split(NL)[1], 'hello');
 
   console.log(NL + '--- A word first?: what may go out before the answer ---');
-  const w = (output) => () => E.word({ output });
+  const PAYS = 'אני רוצה לשלם את הוועד';
+  const w = (output, said) => () => E.word({ output }, turn({ said: said === undefined ? PAYS : said }).$);
   expect('NONE stays silent', w('NONE'), false);
   expect('"none" stays silent', w('none'), false);
   expect('empty stays silent', w(''), false);
   expect('a runaway stays silent', w('x'.repeat(330)), false);
   expect('a link never goes out early', w('רגע, בודק https://x.example'), false);
   expect('a short line goes out', w('רגע, אני בודק את זה עכשיו.'), true);
+  // 1 Oct evening, execution 74654 (owner: "wth is this"): the ack model wrote a
+  // payment note on a goodbye, as it had on "hello good afternoon" (65683, 65694).
+  // Every sentence it wrote since 27 Sep was that invention. The note now goes out
+  // only when the resident's own message has a payment word.
+  const INVENTED = 'אני רואה שאתה מחפש קישור לתשלום. אני בודק את זה עכשיו.';
+  expect('74654: a payment note on a goodbye stays silent', w(INVENTED, 'nothing so far thats about it thanks'), false);
+  expect('65683: a payment note on a hello stays silent', w(INVENTED, 'hello good afternoon'), false);
+  expect('a payment note on a fault stays silent', w(INVENTED, 'השער של החניה לא ננעל'), false);
+  expect('"blinking" is not "link"', w(INVENTED, 'the light keeps blinking'), false);
+  expect('"רחוב" is not a payment word', w(INVENTED, 'יש נזילה ברחוב הרצל'), false);
+  expect('no resident text to read: silent', () => E.word({ output: INVENTED }, (n) => { throw new Error('no node ' + n); }), false);
+  for (const said of ['אני רוצה לשלם', 'איך משלמים?', 'לא קיבלתי את הקישור', 'שלח לי לינק לתשלום', 'שילמתי כבר את הוועד?',
+    'can i pay online?', 'send me the payment link', 'where do i pay the fee']) {
+    expect('a payment word lets the note out: ' + JSON.stringify(said), w('רגע, אני בודק את זה עכשיו.', said), true);
+  }
+  // Carry on tells the answering model what was already sent: only what was.
+  const carried = (out, sent) => () => {
+    const nodes = {
+      'Still the last word?': { first: () => ({ json: { text: PAYS, greeted: true } }) },
+      'Worth a word?': { first: () => ({ json: { output: out } }) },
+      'Say it now': { all: () => { if (!sent) throw new Error('unexecuted'); return [{ json: {} }]; } },
+    };
+    const $ = (n) => { if (!nodes[n]) throw new Error('no node ' + n); return nodes[n]; };
+    const j = JSON.parse(E.carry({}, $));
+    return j.text === PAYS ? j.acked : 'LOST THE ITEM';
+  };
+  expect('Carry on: a note that went out is what the answer hears', carried('רגע, אני בודק.', true), 'רגע, אני בודק.');
+  expect('Carry on: a note the gate held back is not reported as sent', carried(INVENTED, false), '');
+  expect('Carry on: NONE is nothing', carried('NONE', true), '');
 
   console.log(NL + '--- Try again: the rewrite names what was wrong (27 Sep, execution 65856) ---');
   const still = { first: () => ({ json: { text: 'hi, the stair lights flicker', greeted: true } }) };
@@ -472,6 +504,22 @@ function replay(L, C, corpus) {
     }
   }
   console.log('changed: ' + noteDiff);
+
+  // 1 Oct evening: A word first? reads the resident's words now. Live lets any
+  // short note out; the candidate only on a message with a payment word.
+  console.log(NL + '--- the same messages, through A word first? with a short note in hand ---');
+  const NOTE = 'רגע, אני בודק את זה עכשיו.';
+  const said$ = (t) => (n) => { if (n !== 'Still the last word?') throw new Error('no node ' + n); return { first: () => ({ json: { text: t } }) }; };
+  const lets = (E, t) => { try { return E.word({ output: NOTE }, said$(t)) === true; } catch (e) { return 'THREW ' + e.message; } };
+  let liveLets = 0; const candLets = [];
+  for (const t of inbound) {
+    if (lets(L, t) === true) liveLets++;
+    const c = lets(C, t);
+    if (typeof c === 'string') broken++;
+    if (c === true) candLets.push(t);
+  }
+  console.log('live lets a note out on ' + liveLets + ' of ' + inbound.length + '; the candidate on ' + candLets.length + ':');
+  for (const t of candLets) console.log('   ' + mask(t));
 
   console.log(NL + "--- every reply the bot ever sent (" + outbound.length + "), through Send, under each row of the owner's table ---");
   const REP_STATE = 'the representative tap, right after the menu';

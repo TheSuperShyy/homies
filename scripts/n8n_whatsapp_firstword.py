@@ -68,6 +68,7 @@ real inputs that reach this model have been replayed.
 Idempotent. Surgical. `n8n_whatsapp.py --apply` remains the wrong way to ship.
 """
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -139,10 +140,30 @@ TEXT = (
 # The length cap is the runaway guard: this node is allowed to send WITHOUT the
 # model having seen the prompt's rules about what the bot may say, so anything
 # that is not a short sentence is treated as a malfunction and dropped.
+#
+# 1 OCT EVENING: AND THE RESIDENT MUST HAVE WRITTEN ABOUT PAYING. The owner, on
+# "nothing so far thats about it thanks" answered with "אני רואה שאתה מחפש קישור
+# לתשלום. אני בודק את זה עכשיו." (execution 74654): *"wth is this"*. Every
+# sentence this model wrote in the retained history (27 Sep - 1 Oct, 21 runs)
+# was that same invention: "hello good afternoon" twice (65683, 65694) and this
+# goodbye. Not one real payment request was among them. A model told to say NONE
+# to greetings and thanks did not, so the test moves into code: the note goes
+# out only when the message itself has a payment word. It can only hold a note
+# back, and a note held back costs nothing: the answer still comes, two beats
+# and all. The same words are --watch's (PAY_PY).
+PAY_HE = ("תשלום|תשלומ|לשלם|משלם|משלמ|אשלם|נשלם|ישלם|תשלם|שילם|שילמ|שולם|שולמ|"
+          "קישור|לינק|וועד|ועד בית|ועד הבית|דמי ועד|דמי ניהול")
+PAY_EN = "pay|paid|paying|payment|payments|link|links|invoice|invoices|bill|bills|fee|fees"
+# English needs edges ("blinking" holds "link"); Hebrew takes its prefixes (ל, ה, ב, ו).
+PAY_JS = "/(" + PAY_HE + ")|(^|[^A-Za-z])(" + PAY_EN + ")(?=[^A-Za-z]|$)/i"
+PAY_PY = re.compile("(" + PAY_HE + ")|(^|[^A-Za-z])(" + PAY_EN + ")(?=[^A-Za-z]|$)", re.I)
+
 WORD_EXPR = (
     "={{ (() => { const t = String($json.output || '').trim(); "
+    "let said = ''; try { said = String($('Still the last word?').first().json.text || ''); } "
+    "catch (e) { said = ''; } "
     "return t.length > 0 && t.length < 320 && t.toUpperCase() !== 'NONE' "
-    "&& t.indexOf('http') === -1; })() }}"
+    "&& t.indexOf('http') === -1 && " + PAY_JS + ".test(said); })() }}"
 )
 
 SAY_BODY = (
@@ -154,12 +175,16 @@ SAY_BODY = (
 # --------------------------------------------------------------------------
 # 3. Carry on -- the agent's item back, plus what the resident was just told.
 # --------------------------------------------------------------------------
+# 1 Oct evening: `acked` only when `Say it now` really ran. Before, a note the
+# gate held back was still handed to the answering model as "already sent", and
+# with the payment-word test that would be every invented one: the model would
+# be told it had promised to look up a payment link.
 CARRY = (
     "={{ JSON.stringify(Object.assign({ }, "
-    "$('Still the last word?').first().json, { acked: "
-    "String($('Worth a word?').first().json.output || '').trim().toUpperCase() "
-    "=== 'NONE' ? '' : String($('Worth a word?').first().json.output || '')"
-    ".trim() })) }}"
+    "$('Still the last word?').first().json, { acked: (() => { let sent = false; "
+    "try { sent = $('Say it now').all().length > 0; } catch (e) { sent = false; } "
+    "const t = String($('Worth a word?').first().json.output || '').trim(); "
+    "return sent && t.toUpperCase() !== 'NONE' ? t : ''; })() })) }}"
 )
 
 # --------------------------------------------------------------------------
