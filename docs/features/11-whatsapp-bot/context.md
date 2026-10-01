@@ -187,6 +187,22 @@ shapes, and the inbound tap carries only the row's **title**, which is why
 the titles are the routing table (`TAP_KIND` in the live `Sort`). Whether to
 flip the account to Hebrew for a seven-row list is open with the owner.
 
+## 1 Oct, later — the representative says hi
+
+The owner tapped "לדבר עם נציג" and got "כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור לך?". The model had
+greeted, and Send's greeting filter took the "היי" off, because the menu had already greeted. He
+wants the opposite on that button: *"the agent should be like hi how are you this is michael from
+homies..."*. Asking for a representative means waiting for a person, and a person joining says hi.
+
+`scripts/n8n_whatsapp_rephello.py` carries it in one write: the prompt (that tap opens with "היי",
+asks how he is, gives the name and asks how to help, in one short message; never the hour's
+greeting, which the menu gave), Send's greeting filter v3 (one hello and the name stay on that tap),
+and memory epoch 71. The other two buttons, anything typed after the menu, and every other row of
+the greeting table are unchanged; the replay of all 874 past replies shows it.
+
+What a resident sees after tapping it: "היי, מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?", in
+the model's words each time.
+
 ## 1 Oct, evening — one person, in the singular
 
 The owner noticed the bot writing "במה אוכל לעזור לכם?" to one person: *"it still uses how can i

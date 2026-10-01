@@ -2351,6 +2351,9 @@ three, spends nothing, and is the gate:
    `n8n_whatsapp_gender.py`) edits each owner's constant, then carries them
    all to live in one write. Each field is rewritten only if live is exactly
    the old text. Until that write, no owner runs with `--apply` alone.
+   **A carrier that bumps the epoch checks the prompt and the memory key only
+   while the epoch is its own** (`later = MEMORY_EPOCH > its epoch`). Otherwise
+   the next prompt change leaves it refusing: gender.py did, until 1 Oct evening.
 2. **After `--apply`:** the check on live is green, and every WhatsApp
    patcher's dry run is idle. Baseline: `batch.py` shows its old drift and is
    never applied; `open`, `handover`, `promise`, `transfer` and `untemplate`
@@ -2423,6 +2426,27 @@ a no-gender line made it write ספר/י. Now:
   who wrote in the feminine earlier in the same window. A feminine reply with no cue in the
   window is an info line (the cue may be older). `wa_qa.py`'s rubric flags the same three. The
   regexes live once, in `check_whatsapp_rules.py` (`PLURAL_YOU`, `MASC_YOU`, `FEM_YOU`, `FEM_CUE`).
+
+## The representative button says hi: the one greeting after the menu
+
+1 Oct, evening, epoch 71 (`scripts/n8n_whatsapp_rephello.py`; ready, and live only on the owner's
+go). The owner tapped לדבר עם נציג right after the menu and got "כאן מיכאל מהומי'ז! 😊 במה אוכל
+לעזור לך?". The model had written "היי, " and Send's greeting filter cut it, as his 27 Sep table
+says. His ask: *"the agent should be like hi how are you this is michael from homies..."*.
+
+- **The rule now:** that one tap opens like a person joining the chat: "היי" (never the hour's
+  greeting, which the menu already gave), a how-are-you, the name, and how can I help, in one short
+  message. The other two buttons, anything typed after the menu, and every other row of the
+  greeting table are unchanged.
+- **Where it lives:** the prompt's tap paragraph. The two general clauses it would contradict (no
+  greeting after the system's; only the resident opens how-are-you) name it as their one exception,
+  so no new rule competes with them. In Send, manners v3's `repTap` (Sort's `tap === 'other'`, the
+  same test as the `opener` guard) keeps one hello and the name.
+- **Checked:** 10 gate cases (four fail on the old code); a replay state for the tap, where 226 past
+  replies keep their hello and nothing else changes, with 0 changes in the other seven states;
+  `--watch` (the tap answered without the name is a flag; without a hello, or with the hour's word,
+  an info line); and the rubric (`rep-no-hello`, `rep-no-how-are-you`, `rep-hello-repeats-menu`,
+  `how-are-you-again`; the tap's how-are-you does not count as a second question).
 
 ## How the WhatsApp bot is tested without a model call
 
