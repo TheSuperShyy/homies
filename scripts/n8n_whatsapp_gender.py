@@ -220,9 +220,13 @@ def main():
 
     prompt = W.system_prompt()
     W.check_memory_epoch(prompt=prompt, inject=U.AGENT_NEW, tools=W.tools_text())
-    if W.MEMORY_EPOCH != OLD_EPOCH + 1:
+    if W.MEMORY_EPOCH < OLD_EPOCH + 1:
         sys.exit("REFUSING: MEMORY_EPOCH is %d; this change was written for %d -> %d."
                  % (W.MEMORY_EPOCH, OLD_EPOCH, OLD_EPOCH + 1))
+    # A later epoch owns the prompt and the memory key from then on (the first was
+    # n8n_whatsapp_rephello.py, epoch 71, 1 Oct evening). This script then checks
+    # only its own fields, so it stays idle instead of refusing on a newer prompt.
+    later = W.MEMORY_EPOCH > OLD_EPOCH + 1
 
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
     nodes, conns = live["nodes"], live["connections"]
@@ -238,7 +242,7 @@ def main():
     # The prompt: by hash, the way MEMORY_EPOCH covers it.
     agent = by["Answer the resident"]["parameters"].setdefault("options", {})
     have = agent.get("systemMessage") or ""
-    if have != prompt:
+    if not later and have != prompt:
         if W.epoch_hash(have) != OLD_PROMPT:
             sys.exit("REFUSING: the live prompt is %s, neither the one this replaces (%s) "
                      "nor the new one (%s)." % (W.epoch_hash(have), OLD_PROMPT, W.epoch_hash(prompt)))
@@ -251,7 +255,7 @@ def main():
     # The memory: every buffer holds plural replies.
     mem = by["Conversation so far"]["parameters"]
     want_key = MEMORY_KEY % W.MEMORY_EPOCH
-    if mem.get("sessionKey") != want_key:
+    if not later and mem.get("sessionKey") != want_key:
         if mem.get("sessionKey") != MEMORY_KEY % OLD_EPOCH:
             sys.exit("REFUSING: the memory key is %r, not epoch %d." % (mem.get("sessionKey"), OLD_EPOCH))
         mem["sessionKey"] = want_key

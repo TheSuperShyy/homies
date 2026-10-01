@@ -2354,6 +2354,12 @@ three, spends nothing, and is the gate:
    **A carrier that bumps the epoch checks the prompt and the memory key only
    while the epoch is its own** (`later = MEMORY_EPOCH > its epoch`). Otherwise
    the next prompt change leaves it refusing: gender.py did, until 1 Oct evening.
+   **Between the repo edit and the carrier's `--apply`, live dry runs are not
+   idle, and that is expected:** `manners`, `teamnote`, `nopage` and `patch`
+   follow the repo's epoch, prompt and filter, so each wants to push its share
+   (1 Oct evening: 11 of 27 not idle on live, the baseline's 6 plus those 4 and
+   the carrier). Never `--apply` one of them alone; the simulation on the dump
+   is the idle check that counts until the carrier ships.
 2. **After `--apply`:** the check on live is green, and every WhatsApp
    patcher's dry run is idle. Baseline: `batch.py` shows its old drift and is
    never applied; `open`, `handover`, `promise`, `transfer` and `untemplate`

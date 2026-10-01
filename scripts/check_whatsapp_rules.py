@@ -78,9 +78,11 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # 1 Oct evening: five moved together (n8n_whatsapp_gender.py: one person, in
 # the singular), after 30 Claude-played conversations and the rescue and
 # outage writers replayed on the new texts (scratchpad run wa_qa_gender).
+# 1 Oct, later: the prompt alone (n8n_whatsapp_rephello.py: the representative
+# tap opens with hi, how are you, the name), after the Claude-played deck.
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
-    'Answer the resident / system': 'c6956ac921cf',
+    'Answer the resident / system': '98ada1b25f27',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     'Say it again / input': '64f323ffcba1',
@@ -334,12 +336,26 @@ def watch(since):
         prev = next((str(r.get("body") or "") for r in (items("Anything newer?") or [])
                      if r.get("direction") == "outbound"), "")
         after_menu = MENU in prev or "במה אפשר לעזור" in str(S.get("last_bot") or "")
-        flags = []
+        flags, infos = [], []
         hellos = [k for k, t in sent if BOT_HELLO.match(LEAD.sub("", t))]
         if len(hellos) > 1:
             flags.append("two greetings in one turn (%s)" % " + ".join(hellos))
-        if not canned and after_menu and sent and BOT_HELLO.match(LEAD.sub("", sent[0][1])):
+        rep_tap = S.get("tap") == "other"
+        if not canned and after_menu and not rep_tap and sent and BOT_HELLO.match(LEAD.sub("", sent[0][1])):
             flags.append("a greeting right after the menu (%s)" % sent[0][0])
+        # 1 Oct evening: the לדבר עם נציג tap opens "hi, how are you, this is
+        # Michael" (n8n_whatsapp_rephello.py). The name is the one thing the
+        # filter cannot add, so its absence is a flag; the hello's form is read.
+        if not canned and rep_tap:
+            answers = [t for k, t in sent if k == "answer"]
+            if answers and "מיכאל" not in answers[0]:
+                flags.append("the representative tap answered without the name")
+            if answers:
+                h = BOT_HELLO.match(LEAD.sub("", answers[0]))
+                if not h:
+                    infos.append("the representative tap answered without a hello")
+                elif h.group(1) in ("בוקר טוב", "צהריים טובים", "ערב טוב", "שלום"):
+                    infos.append("the representative's hello is the hour's word the menu used: %s" % h.group(1))
         if not canned and S.get("greeted") is True and not after_menu:
             named = [k for k, t in sent if "מיכאל" in t]
             if named:
@@ -357,7 +373,6 @@ def watch(since):
         # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
         # what went out is a flag; the ack and the first beat of a two-part
         # payment reply may say "I'm on it". One the filter cut is an info line.
-        infos = []
         if PROMISE_PY is not None and not canned:
             two_beat = any(k == "rest" for k, _ in sent)
             for k, t in sent:

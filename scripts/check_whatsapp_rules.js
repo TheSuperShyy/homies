@@ -406,6 +406,39 @@ function cases(E) {
   expect('menu rule: the bare singular opener with the name, first contact, gets the buttons',
     () => sent(E, { reply: "היי, כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", S: { greeted: false }, said: 'hi' }).content_type, 'input_select');
 
+
+  console.log(NL + '--- the representative says hi (1 Oct evening, execution 74529) ---');
+  // Owner, on "כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור לך?" (the model's "היי, " cut by
+  // the filter): "the agent should be like hi how are you this is michael from
+  // homies...". The one exception to "no greeting right after the menu" is the
+  // לדבר עם נציג tap (n8n_whatsapp_rephello.py, manners v3). Every other row stays.
+  const REP = "היי, מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?";
+  const REP_TAP = { last_bot: MENU_TEXT, tap: 'other', tap_now: true };
+  expect('rep tap right after the menu: hi, how are you and the name go out whole',
+    say({ reply: REP, said: 'לדבר עם נציג', S: REP_TAP }), REP);
+  expect('rep tap, race: last_bot empty but Anything newer? shows the menu: the same',
+    say({ reply: REP, said: 'לדבר עם נציג', S: { tap: 'other', tap_now: true },
+      rows: [{ direction: 'inbound', body: 'לדבר עם נציג' }, MENU_ROW, HI_ROW] }), REP);
+  expect('rep tap: two hellos, one kept',
+    say({ reply: "היי! צהריים טובים, מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?", said: 'לדבר עם נציג', S: REP_TAP }),
+    "היי! מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?");
+  expect('rep tap from an old menu, mid-conversation: the hello and the name stay',
+    say({ reply: REP, said: 'לדבר עם נציג', S: { tap: 'other', tap_now: true } }), REP);
+  expect('the open-a-ticket tap right after the menu: still no hello, name kept',
+    say({ reply: "היי! כאן מיכאל מהומי'ז, טוב שפנית. מה קרה?", said: 'פתיחת קריאת שירות',
+      S: { last_bot: MENU_TEXT, tap: 'open', tap_now: true } }), "כאן מיכאל מהומי'ז, טוב שפנית. מה קרה?");
+  expect('the status tap right after the menu: still no hello, name kept',
+    say({ reply: "היי, כאן מיכאל מהומי'ז. מה מספר הקריאה?", said: 'מצב קריאה קיימת',
+      S: { last_bot: MENU_TEXT, tap: 'status', tap_now: true } }), "כאן מיכאל מהומי'ז. מה מספר הקריאה?");
+  expect('the turn after the rep tap: no hello',
+    say({ reply: 'היי, שמח לשמוע! במה אוכל לעזור?', said: 'טוב תודה' }), 'שמח לשמוע! במה אוכל לעזור?');
+  expect('rep tap after an ack that greeted (not a real path): the ack keeps the only hello',
+    say({ reply: REP, said: 'לדבר עם נציג', S: REP_TAP, acked: 'צהריים טובים, רגע אני בודק.', ackSent: true }),
+    "מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?");
+  expect('opener guard: the rep opener passes on the tap',
+    () => E.reply.opener({ output: REP }, 0, turn({ S: REP_TAP }).$), true);
+  expect('menu rule: the rep opener does not bring the menu back',
+    () => sent(E, { reply: REP, said: 'לדבר עם נציג', S: REP_TAP }).content_type || 'text', 'text');
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }
@@ -441,6 +474,8 @@ function replay(L, C, corpus) {
   console.log('changed: ' + noteDiff);
 
   console.log(NL + "--- every reply the bot ever sent (" + outbound.length + "), through Send, under each row of the owner's table ---");
+  const REP_STATE = 'the representative tap, right after the menu';
+  let restored = 0;
   const STATES = {
     'first contact, resident greeted': { S: { greeted: false }, said: 'hi, question' },
     'first contact, no hello': { S: { greeted: false }, said: 'question' },
@@ -449,6 +484,9 @@ function replay(L, C, corpus) {
     'right after the menu': { S: { last_bot: MENU_TEXT }, said: 'question' },
     'after an ack that greeted': { said: 'hi, link please', acked: 'צהריים טובים, רגע אני בודק.', ackSent: true },
     'first contact, after an ack that greeted and named': { S: { greeted: false }, said: 'hi, link please', acked: "צהריים טובים, כאן מיכאל מהומי'ז, רגע אני בודק.", ackSent: true },
+    // 1 Oct evening: the one state whose rule moved (manners v3). A change here is
+    // expected when it only puts back the hello the menu rule used to cut.
+    [REP_STATE]: { S: { last_bot: MENU_TEXT, tap: 'other', tap_now: true }, said: 'לדבר עם נציג' },
   };
   const changed = new Map();
   for (const t of outbound) {
@@ -461,11 +499,17 @@ function replay(L, C, corpus) {
         const words = String(b).trim().split(/\s+/).filter(Boolean).length;
         const bad = words < 2 || /^(גם|ו[א-ת])/.test(String(b).trim());
         if (bad) broken++;
+        if (st === REP_STATE && !bad && String(b).length > String(a).length && String(b).endsWith(String(a))) {
+          restored++;
+          continue;
+        }
         if (!changed.has(t)) changed.set(t, []);
         changed.get(t).push({ st, a, b, bad });
       }
     }
   }
+  console.log('[' + REP_STATE + '] ' + restored + ' replies keep the hello the menu rule used to cut '
+    + '(after = that hello + before; any other change there is listed below)');
   console.log('replies that change in at least one state: ' + changed.size);
   for (const [t, rows] of changed) {
     console.log('   reply : ' + mask(t));

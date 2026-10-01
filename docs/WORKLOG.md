@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-10-01
 
+### WhatsApp: the representative says hi (READY, NOT live; epoch 71)
+
+Owner, after tapping לדבר עם נציג at 13:14 UTC and getting "כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור
+לך?": *"can we make it like for example talk to a rep liek the agent should be like hi how are you
+this is michael from homies..."*.
+- **Cause:** the model had written "היי, " (execution 74529), and Send's greeting filter cut it, by
+  the owner's 27 Sep table (no greeting right after the menu). The prompt said the same for every
+  tap.
+- **What:** `scripts/n8n_whatsapp_rephello.py`, one write, not applied yet:
+  - the prompt's tap paragraph: that tap opens with "היי" (never the hour's greeting the menu
+    gave), a how-are-you, the name and how can I help, in one short message. The two general
+    clauses (no greeting after the system's; only the resident opens how-are-you) name it as
+    their one exception. Prompt `c6956ac921cf` -> `98ada1b25f27`;
+  - Send's greeting filter v3 (`scripts/n8n_whatsapp_manners.py`): `repTap` (Sort's
+    `tap === 'other'`) keeps one hello and the name on that tap;
+  - MEMORY_EPOCH 70 -> 71.
+  - `n8n_whatsapp_gender.py` now leaves the prompt and the key to a later epoch instead of refusing.
+- **Proof so far:**
+  1. On live, exactly the 4 new hello cases fail (177 cases), and the prompt pin differs, as it
+     should.
+  2. On the candidate, 177/177 and all 17 pins unchanged. Replay: 823 inbound messages unchanged
+     through Sort and the ack's note. Of 874 past replies, 0 change in the seven old states; in the
+     new tap state 226 keep their hello and nothing else changes; 0 broken.
+  3. Every patcher's dry run against the would-be workflow is idle except the baseline (6).
+  4. The Claude-played deck (33 scenarios, 3 new for the tap) is running. The four tap scenarios
+     graded so far meet every check, e.g. "היי 🙂 מה שלומך? כאן מיכאל מהומי'ז, במה אפשר לעזור?",
+     and "and you?" gets "אני מצוין, תודה ששאלת. אז מה אפשר לעשות בשבילך?" with no second
+     how-are-you. The other two buttons and text typed after the menu still get no greeting.
+- **Harness:** the gate has 10 new cases and a replay state for the tap. `--watch` exempts the tap
+  from "a greeting right after the menu", flags a tap answered without the name, and adds an info
+  line for a tap with no hello or with the hour's word. The rubric learned `rep-no-hello`,
+  `rep-no-how-are-you`, `rep-hello-repeats-menu` and `how-are-you-again`; the tap's how-are-you is
+  not a second question. New `turn_regex` / `turn_not_regex` expectations; 3 new scenarios.
+- **Rollback, after an apply:** `python scripts/n8n_whatsapp_rephello.py --restore` (snapshot
+  `docs/handover/n8n-whatsapp-live-01oct-before-rephello.json`, scanned: same URLs, emails and
+  credential references as the committed snapshots), plus a git revert of the repo side.
+- **Waiting on:** the rest of the Claude-played deck, then the owner's "make it live".
+
 ### WhatsApp: one person, in the singular (LIVE 13:02 UTC, epoch 70)
 
 Owner: *"i notice it still uses how can i help you all which is awkward"*, with the Hebrew default

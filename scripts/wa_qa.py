@@ -340,6 +340,9 @@ TEAM_CLAIM = re.compile(r"הצוות (שלנו )?(כבר )?(יודע|מעודכ�
                         r"רשמתי (את זה )?לצוות|מסרתי לצוות|הודעתי לצוות|נרשם לצוות|הצוות (שלנו )?(יחזור|יצור)")
 REASK = re.compile(r"במה (אפשר|אוכל|נוכל|אני יכול) לעזור(?! (עוד|בעוד|לכם עוד|לך עוד))|איך (אפשר|אוכל|אני יכול) לעזור(?! (עוד|בעוד))")
 HOW_ARE_YOU = re.compile(r"מה נשמע|מה קורה|איך הולך|מה שלומ|how are you|how is it going|how's it going|whats up|what's up|wassup", re.I)
+# 1 Oct evening: the bot asks it itself on the representative tap
+# (n8n_whatsapp_rephello.py), so its own forms count too.
+BOT_HAY = re.compile(HOW_ARE_YOU.pattern + r"|איך אתה|איך את(?=[\s,.!?]|$)|מה איתך|איך עובר", re.I)
 
 
 def emojis(s):
@@ -413,7 +416,8 @@ def rubric(turn, res, ctx):
             flag("two-emoji", h)
         if any(e not in ALLOWED_EMOJI for e in em):
             flag("emoji-off-list", h)
-        if h.count("?") >= 2:
+        rep = ctx.get("tap_kind") == "other"
+        if h.count("?") >= 2 and not (rep and BOT_HAY.search(h)):
             flag("two-questions", h)
         if len(h.split()) > 70:
             flag("long", h)
@@ -423,12 +427,22 @@ def rubric(turn, res, ctx):
             word = g.group(1)
             if word in HOUR_WORDS and word != ctx["hour_word"]:
                 flag("hour-slip", h, g)
-            if ctx["after_menu"] or ctx["tap"]:
+            if rep:
+                if word in HOUR_WORDS:
+                    flag("rep-hello-repeats-menu", h, g)
+            elif ctx["after_menu"] or ctx["tap"]:
                 flag("greeting-after-menu", h, g)
             elif not ctx["first"] and not ctx["they_greeted"]:
                 flag("greeting-mid-conversation", h, g)
         if len(GREET.findall(h)) > 1:
             flag("two-greetings", h)
+        if rep and i == 0:
+            if not g:
+                flag("rep-no-hello", h)
+            if not BOT_HAY.search(h):
+                flag("rep-no-how-are-you", h)
+        elif BOT_HAY.search(h) and any(BOT_HAY.search(p) for p in ctx["prev_handsets"]):
+            flag("how-are-you-again", h)
         if "מיכאל" in h:
             if not (ctx["first"] or ctx["after_menu"] or ctx["tap"] or ctx["asked_who"]):
                 flag("name-mid-conversation", h)
@@ -528,6 +542,10 @@ def expectations(scen, turns, results):
             ok = any(re.search(e["regex"], h) for _, h in bot_msgs)
         elif typ == "bot_not_regex":
             ok = not any(re.search(e["regex"], h) for _, h in bot_msgs)
+        elif typ in ("turn_regex", "turn_not_regex"):
+            msgs = [h for i, h in bot_msgs if i == e["turn"]]
+            hit = any(re.search(e["regex"], h) for h in msgs)
+            ok = bool(msgs) and (hit if typ == "turn_regex" else not hit)
         elif typ == "turn_questions_max":
             msgs = [h for i, h in bot_msgs if i == e["turn"]]
             ok = bool(msgs) and sum(h.count("?") for h in msgs) <= e["max"]
@@ -575,6 +593,7 @@ def grade(run):
                 continue
             tap = kind == "tap"
             ctx = {"scenario": s, "first": not greeted, "after_menu": bool(last_bot), "tap": tap,
+                   "tap_kind": {v: k for k, v in TAPS.items()}.get(text, "") if tap else "",
                    "first_contact": first_contact, "hour_word": hour_word(s["time"]),
                    "they_greeted": bool(re.match(r"^[\s\W]*(שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|hi|hey|hello|good (morning|afternoon|evening)|shalom|ahlan)(?=[\s,.!?:;]|$)", text, re.I)),
                    "asked_who": bool(re.search(r"מי (אתה|את|זה|מדבר|כותב|עונה)|עם מי|who (are|r) (you|u)|who is this|bot|רובוט|בוט", text, re.I)),
@@ -684,9 +703,12 @@ resident writes about herself in the feminine (אני צריכה, אני גרה)
 end, with no remark about it; words that fit both (לך, שלך) are always fine; never a slash form
 (ספר/י). The first message of a conversation
 opens with the greeting for the hour (before 12 בוקר טוב, before 17 צהריים טובים, then ערב טוב) and
-gives the name once; after the system's menu or a button tap there is no greeting and the name is
-given; mid-conversation there is no name and no greeting unless the resident greeted first (then one
-back). Someone who already said what they need is not asked "how can I help" again. A finished
+gives the name once; after the system's menu, or a tap on one of the first two buttons, there is no
+greeting and the name is given. The one exception is the third button, לדבר עם נציג: Michael
+answers it like a representative joining the chat, in one short message: "היי" (not the hour's
+greeting, which the menu already gave), a how-are-you, his name, and an open question about how he
+can help; the resident's answer to that how-are-you is not asked again. Mid-conversation there is
+no name and no greeting unless the resident greeted first (then one back). Someone who already said what they need is not asked "how can I help" again. A finished
 matter ends with an offer to help with anything else; the one exception is the message that carries
 a payment link, which closes by saying the link is personal and to write here if anything is
 unclear, with no further question. A thank-you or goodbye gets a warm goodbye with no question.

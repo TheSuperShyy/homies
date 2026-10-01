@@ -369,6 +369,10 @@
     "notify_team": {"ok": true, "noted": true}
    },
    "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "called", "tool": "notify_team"},
     {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
     {"type": "bot_not_regex", "regex": "מעביר אתכם|אעביר אתכם|מעביר אותך|אעביר אותך|נציג אחר|יחזור אלי(כם|ך|יך)|יחזרו אלי(כם|ך|יך)|יצרו קשר", "name": "no transfer, no call-back promise"},
@@ -376,7 +380,7 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "rep_tap: does Michael introduce himself as the representative and ask an open question that fits a payer, an asker and a fault alike, with no greeting and no transfer?",
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
     "dispute_to_team: is the team told via the tool before the reply says so, and nothing promised?",
     "goodbye: warm close without a question?"
    ]
@@ -801,6 +805,10 @@
     "notify_team": {"ok": true, "noted": true}
    },
    "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "called", "tool": "notify_team"},
     {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
     {"type": "bot_not_regex", "regex": "יחזרו אלי(כם|ך|יך)|יחזור אלי(כם|ך|יך)|יצרו קשר|בהקדם|בקרוב", "name": "no call-back promise"},
@@ -808,8 +816,115 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
     "gender: the tap shows nothing, so the reply to it is masculine or in words that fit both; from 'אני חושבת' on, is she addressed in the feminine or in words that fit both, never the masculine, never the plural?",
     "dispute_to_team: is the team told via the tool before the reply says so, and nothing promised?",
+    "goodbye: warm close without a question?"
+   ]
+  },
+  {
+   "id": "rep_fine_thanks",
+   "title": "the representative button, a plain 'fine, thanks', then a cleaning question",
+   "time": "16:20", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:20:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 9 שרוצה לשאול על הניקיון, עונה בקצרה",
+    "script": [
+     {"say": "היי"},
+     {"say": "לדבר עם נציג", "kind": "tap"},
+     {"say": "טוב תודה"},
+     {"say": "רציתי לשאול כל כמה זמן מנקים את חדר המדרגות"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "get_service_info": {"ok": true, "found": true, "topic": "ניקיון", "facts": ["ניקיון חדר המדרגות והלובי נעשה על ידי חברת ניקיון חיצונית", "התדירות נקבעת בהסכם של כל בניין", "הניקיון כולל שטיפת רצפות, ניקוי מעקות ופינוי אשפה מחדר האשפה"]}
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "'fine, thanks' is not asked again"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "^\\W*(היי|הי|שלום|בוקר טוב|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no second hello"},
+    {"type": "called", "tool": "get_service_info"},
+    {"type": "bot_not_regex", "regex": "פעם בשבוע|פעמיים בשבוע|כל יום|פעם בשבועיים|פעם בחודש", "name": "no frequency invented"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "fine_thanks: after 'טוב תודה', a short warm word and an open question about what he needs, with no second hello and no second how-are-you?",
+    "facts_only: does the cleaning answer carry only the tool's facts, with no frequency guessed?",
+    "goodbye: warm close without a question?"
+   ]
+  },
+  {
+   "id": "rep_and_you",
+   "title": "the representative button in the evening; he asks back 'and you?', then the intercom",
+   "time": "20:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T17:15:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 8, מנומס, שואל בחזרה מה שלומו",
+    "script": [
+     {"say": "ערב טוב"},
+     {"say": "לדבר עם נציג", "kind": "tap"},
+     {"say": "בסדר גמור, ואתה?"},
+     {"say": "רציתי לדווח שהאינטרקום בכניסה לא עובד"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 8"},
+     {"say": "תודה רבה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1451-26", "building": "בר כוכבא 23", "reporter_unit": "8"}
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "after he answered, how-are-you is not asked again"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "^\\W*(היי|הי|שלום|בוקר טוב|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no second hello"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|אל דאגה|מטפל בזה", "name": "no promise after the ticket"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "and_you: does 'and you?' get a short, warm answer about Michael himself, then an open question about what he needs, with no second how-are-you?",
+    "ticket: building and apartment in one question, then the ticket with its number, nothing promised?",
+    "goodbye: warm close without a question?"
+   ]
+  },
+  {
+   "id": "rep_morning_matter",
+   "title": "the representative button in the morning; the answer to how-are-you carries the matter",
+   "time": "09:05", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T06:05:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 דירה 5; יש נזילה בחניון מתחת לחניה 3",
+    "script": [
+     {"say": "בוקר טוב"},
+     {"say": "לדבר עם נציג", "kind": "tap"},
+     {"say": "הכל טוב, תודה. יש נזילה בחניון, מתחת לחניה 3"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 5"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1452-26", "building": "בר כוכבא 23", "reporter_unit": "5"}
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "how-are-you is not asked again"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "במה (אפשר|אוכל) לעזור|איך אפשר לעזור", "name": "the matter is taken up, not 'how can I help' again"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_contains", "tool": "open_request", "arg": "description", "words": ["נזיל"], "name": "the ticket keeps her word"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "matter_at_once: her answer carried the matter; does the next reply go straight to it (a short human word, then building and apartment in one question), with no second how-are-you?",
+    "ticket: then the ticket with its number, nothing promised?",
     "goodbye: warm close without a question?"
    ]
   }

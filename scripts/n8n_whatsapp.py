@@ -203,7 +203,17 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 70
+MEMORY_EPOCH = 71
+# 70 -> 71, 1 Oct evening: the representative says hi. Owner, on the reply to
+# his לדבר עם נציג tap ("כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור לך?", execution
+# 74529, where Send's greeting filter had cut the model's "היי, "): *"the agent
+# should be like hi how are you this is michael from homies..."*. The one
+# exception to "no greeting after the system's menu": that tap is a person
+# joining, so it opens with "היי" (not the hour's greeting the menu gave), asks
+# how he is, gives the name and asks how to help, in one short message. The
+# other two buttons and anything typed after the menu are unchanged. Every
+# buffer holds tap replies without the hello. Send's filter (manners v3) keeps
+# that one hello; the carrier is n8n_whatsapp_rephello.py.
 # 69 -> 70, 1 Oct: one person, in the singular. Owner: *"i notice it still uses
 # how can i help you all which is awkward"*, and the bot should switch when the
 # person writes in the feminine. The prompt said "plural, always" (written so the
@@ -655,7 +665,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "c6956ac921cf",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "98ada1b25f27",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

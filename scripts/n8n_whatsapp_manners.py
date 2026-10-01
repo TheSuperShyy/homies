@@ -21,6 +21,7 @@ examples: **"greet back once, never twice"**.
   resident doesn't greet, mid-conversation    none
   right after the system's menu greeting,     none (the name is kept after the menu)
     or after a first-word ack that greeted
+  the לדבר עם נציג tap (v3, 1 Oct evening)     one hello (היי), how are you, the name
   anywhere                                    never two greetings in one message
 
 1. THE GREETING FILTER, IN SEND. Deterministic, because no prompt clause can
@@ -96,6 +97,19 @@ EVERY CHANGE HERE SHIPS THROUGH scripts/check_whatsapp_rules.py: `--dump F`,
 then `check_whatsapp_rules.py --candidate F --replay` (all cases green, only
 intended differences), then `--apply`, then the check again on live.
 
+V3, 1 OCT EVENING. The owner tapped לדבר עם נציג right after the menu and got
+"כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור לך?": the model had written "היי, " and this
+filter cut it, as the table said (execution 74529). He asked for the opposite
+on that tap: *"the agent should be like hi how are you this is michael from
+homies..."*. A person joining greets. So `repTap` (Sort's `tap` is 'other', this
+message's own row, the same test the `opener` guard uses) allows one hello and
+keeps the name, wherever the tap comes from; an ack that greeted still takes
+the hello. The other two buttons, anything typed after the menu, and every
+other row are exactly v2, which the gate's replay shows on every reply ever
+sent. The prompt asks for "היי", not the hour's greeting the menu gave; this
+filter only removes, so that part is the prompt's (and --watch's info line).
+Carried to live with the prompt and epoch 71 by n8n_whatsapp_rephello.py.
+
 Idempotent. Running it twice reports nothing to do. A later version of the
 filter replaces this one by its marker.
 """
@@ -130,7 +144,7 @@ EMOJI = r"\p{Extended_Pictographic}" + VS
 # ---------------------------------------------------------------------------
 # A plain string, not a JS comment: nothing else in this workflow puts a comment
 # inside an expression, and this is not the change to find out how n8n takes one.
-MARK = "const mv = 'manners v2';"
+MARK = "const mv = 'manners v3';"
 BS = chr(92)       # a backslash, built rather than typed: this tool chain has
 NL = BS + "n"      # eaten typed ones before (27 Sep)
 BOT_HELLO = (r"/^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|"
@@ -172,9 +186,14 @@ FILTER = " ".join([
     "if (!said) said = String(S.text || '');",
     "said = said" + U.SAID_NORM + ";",
     "const theyGreeted = " + U.RESIDENT_HELLO + ".test(said);",
-    "const allowed = (afterMenu || ackGreeted) ? 0 : ((!mid || theyGreeted) ? 1 : 0);",
+    # v3, 1 Oct evening: the לדבר עם נציג tap is a person joining, and the owner
+    # wants it to open "hi, how are you, this is Michael" (execution 74529 lost
+    # its "היי, " here). One hello stays on that tap even right after the menu;
+    # an ack that greeted still takes it. Every other row of the table is as v2.
+    "const repTap = S.tap === 'other';",
+    "const allowed = ackGreeted ? 0 : (repTap ? 1 : (afterMenu ? 0 : ((!mid || theyGreeted) ? 1 : 0)));",
     "const askedWho = " + WHO + ".test(said);",
-    "const keepName = askedWho || afterMenu || (!mid && !ackNamed);",
+    "const keepName = askedWho || afterMenu || repTap || (!mid && !ackNamed);",
     "let head = ''; let x = t.replace(" + LEAD + ", ''); let kept = 0; let cut = false;",
     "for (let i = 0; i < 3; i++) { const m = x.match(HELLO); if (!m) break; "
     "if (kept < allowed) { head += m[0]; kept++; } else { cut = true; } x = x.slice(m[0].length); }",
