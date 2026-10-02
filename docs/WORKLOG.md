@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-02
 
+### Voice A, exclamation marks + happy, slowed down (nothing live)
+
+Owner: *"15-A-exclaim-happy.wav but this is a bit faster that is a bit weird"*. Measured: 15 has
+10.0s of sound against today's 11.7s, so happy speech on A runs about 15% quicker. Vapi's
+`generationConfig.speed` is weaker than its number: 0.95-0.85 sat inside one render's variation,
+and a two-render test put 0.8 about 13% slower (9.4-9.8s → 10.7-11.1s), the same as Cartesia's
+inline `<speed ratio="0.8"/>`. Samples: `16-A-exclaim-happy-speed-0.8` (10.5s of sound) and
+`17-A-exclaim-happy-speed-0.7` (12.1s, about today's pace). Vapi accepts 0.6-1.5.
+
 ### Voice A, happier: emotion tags against exclamation marks (nothing live)
 
 Owner on `7-new-voice-A`: *"can we make this more happy or some sort"*. Rendered on A, same lines
