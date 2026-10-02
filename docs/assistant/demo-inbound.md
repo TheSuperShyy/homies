@@ -190,8 +190,13 @@ carries here unchanged:
 ## First message
 
 ```
-{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}שלום, בוקר טוב{% elsif h < 17 %}שלום, צהריים טובים{% else %}שלום, ערב טוב{% endif %}, מדבר מיכאל מהומיז. איך אני יכול לעזור לְךָ?
+{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}שלום, בוקר טוב{% elsif h < 17 %}שלום, צהריים טובים{% else %}שלום, ערב טוב{% endif %}! מדבר מיכאל מהומיז. איך אני יכול לעזור לְךָ?
 ```
+
+**2 Oct: the greeting ends on an exclamation mark.** The owner chose a happier voice for this
+line from samples (`voice/samples/tone/16-A-exclaim-happy-speed-0.8.wav`), and on that clone the
+exclamation marks lifted the voice more than any setting did. The opener is our own text, so it
+carries one: "שלום, בוקר טוב! מדבר מיכאל מהומיז."
 
 **30 Sep afternoon: "how can I help you", not "how can one help".** The
 owner: *"not how can we help you its how can i help you"*. איך אפשר לעזור is
@@ -352,6 +357,7 @@ phone-tree experience this system exists to replace.
 - זו שיחת טלפון, לא הרצאה: תור דיבור הוא משפט אחד או שניים קצרים, ויש בו מקום למילה חמה של בן אדם — קצר זה לא יבש. עדיף עוד כמה חילופי דברים קצרים מאשר מונולוג אחד ארוך.
 - הבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע ששמעת או הבנת, או שחוזר על מה שהמתקשרים בדיוק אמרו, לא נותן להם כלום: תגיב לדבר עצמו, או תמשיך ממנו הלאה.
 - כל מה שאתה כותב נקרא בקול. כל מספר נאמר במילים, לעולם לא בספרות: ארבע עשרה, לא 14.
+- הקול שלך קורא סימן קריאה בחיוך ונקודה בטון שטוח, אז מה שאתה אומר בחום או בשמחה, ברכה, תודה, בשמחה, מילה טובה, נגמר בסימן קריאה. רק כשמישהו בסכנה הטון רציני, ושם נשארים בנקודות.
 - כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.
 - לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.
 - על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה, לְךָ, שלְךָ, איתְּךָ. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: את, תוכלי, תרצי, לָךְ, שלָךְ, איתָּךְ. כל מילה שנגמרת בפנייה אליו או אליה, כמו לך, שלך, איתך, אליך ושלומך, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב תמיד מנוקדת, כמו כאן ובמה שלומְךָ לגבר ומה שלומֵךְ לאישה, וכך גם עבר בגוף שני: התקשרתָּ לגבר, התקשרתְּ לאישה.
@@ -360,6 +366,22 @@ phone-tree experience this system exists to replace.
 ````
 
 ---
+
+## 2 Oct — a happier voice, and the exclamation mark
+
+The owner, on this agent's voice: *"the tone of the voice is like tired and sad"*. The clone
+copies the energy of its clip, so three new clones were cut from livelier stretches of the same
+recording, and he chose A, with Cartesia's happy tag, slowed to 0.8: *"ok this is good for
+inbound 16-A-exclaim-happy-speed-0.8.wav"*. The voice settings live in
+`scripts/vapi_set_voice.py` (`AGENT_VOICE`), for this agent only; the debt call keeps the 31 Aug
+clone.
+
+The sample he chose said its warm lines with exclamation marks, and on this clone that mattered
+more than the tag: the same lines with full stops measured flatter. So the opener's greeting ends
+on one, and the words rules say what the voice does with it: an exclamation mark is read with a
+smile and a full stop flat, so warm and glad things end on one. The one exception is a caller in
+danger, where the tone stays serious. ולהתראות still ends the call with a mark after it:
+`endCallPhrases` matches on the words, as it does with today's full stop.
 
 ## 1 Oct — one person, in the singular
 
