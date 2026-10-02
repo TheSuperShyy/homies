@@ -2426,7 +2426,7 @@ a no-gender line made it write ספר/י. Now:
 - **Code that reads "you" knows both forms.** The team note's promise list (`teamnote.SAID`), the
   promise filter v2 (`nopromise.PHRASES`), the opener shape (`retry.OPENER_RE`). A phrase with
   "you" added to any of them gets אליך / אלייך / אותך / איתך beside אליכם / אתכם / איתכם.
-- **Incoming calls follow the same rule (1 Oct evening, owner: "apply to incoming as well").**
+- **Incoming calls follow the same rule (owner: "apply to incoming as well"; live 2 Oct 06:04 UTC).**
   The voice reads every ending aloud, so there the rule hands the model pointed forms for the
   words spelled alike for both (לְךָ / לָךְ, שלְךָ / שלָךְ, איתְּךָ / איתָּךְ, התקשרתָּ / התקשרתְּ),
   the same ones the debt call speaks, and asks for every word that ends in the address suffix

@@ -9,9 +9,23 @@ conversation that produced it.
 
 ---
 
+## 2026-10-02
+
+### Voice, incoming calls: one person, in the singular (LIVE 06:04 UTC)
+
+On the owner's "make it live" (the 1 Oct entry below has the change and its simulated calls).
+- **Before the write:** the live assistant was still the 30 Sep one (prompt `5d1ba62c87d1`, opener
+  "…לעזור לכם?"), and the voice script's dry run had nothing to do.
+- **Applied:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply` at 06:04 UTC, then
+  `python scripts/vapi_set_voice.py --apply` (the sync had reset the voice to the stock a976c076;
+  Michael's `ba765d50` is back, read back by the script).
+- **Read back:** prompt 6,094 characters, sha `d3e52762f87a` = repo; first message = repo ("…לעזור
+  לְךָ?"); 7 tools, gpt-4.1, the end-of-call report; turn-taking and transcriber equal to the repo.
+- **Owed:** the owner's one test call: the voice's reading of לְךָ / לָךְ, and the switch on gpt-4.1.
+
 ## 2026-10-01
 
-### Voice, incoming calls: one person, in the singular (READY, NOT live)
+### Voice, incoming calls: one person, in the singular (LIVE 2 Oct 06:04 UTC)
 
 Owner, after hearing which agents follow the gender rule: *"apply to incoming as well"*.
 - **Before:** the incoming-call agent addressed every caller in the plural, always ("תרצו, תספרו,
