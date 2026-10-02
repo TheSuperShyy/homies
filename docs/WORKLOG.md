@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-10-02
 
+### WhatsApp: more emoji since the singular? Measured, not a coincidence (nothing changed)
+
+Owner: *"i just noticed the chatbot produced emoji on the chat more often or just a coincidence"*.
+Read-only, the bot's own replies (the menu's 👋 left out), from the messages table:
+- 1-14 Sep, before the emoji rule: 4% of 171. 14-27 Sep, the rule, plural: 23% of 165 (22 of them
+  the old 👋). 27 Sep-1 Oct 13:02: 0 of 3. **Since 1 Oct 13:02, singular: 57% of 14**, five of them
+  right after a message that already had one, and two off-list faces (😕 on a gate fault, 😔 on 2 Oct).
+- The emoji paragraph did not change: the system prompt's diff since epoch 69 is the singular lines
+  and the representative's hello only. The rule asks for about two in five, never two in a row,
+  and only 🙂 😊 🙏 👍 💪 🤝. So the singular "you" made the bot chattier, and the emoji came with
+  it. Few messages, all the owner's tests, and mostly greetings and goodbyes, where the rule allows
+  them most; but the back-to-back and off-list ones break the rule outright.
+- Offered, not started: a filter in Send like the promise filter (keep only the six, and drop an
+  emoji when the bot's previous message had one), or a prompt line. Owner's call.
+
 ### Voice, incoming calls: voice A, happy, speed 0.8, and the exclamation mark (READY, NOT live)
 
 Owner: *"ok this is good for inbound 16-A-exclaim-happy-speed-0.8.wav"*. For the incoming line only;

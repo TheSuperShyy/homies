@@ -2808,6 +2808,10 @@ On A, exclamation marks in the text lifted the voice more than any emotion tag d
 also runs about 15% quicker, and `generationConfig.speed` is weak (0.8 is about 13% slower, 0.7
 brings it back to today's pace).
 
+**The singular made the WhatsApp bot chattier (2 Oct).** With the same emoji paragraph, its
+replies went from about one in four with an emoji to 8 of 14, some back to back and two off the
+allowed list. A change of address is a change of register; measure the emoji after one.
+
 **Each Hebrew agent has its own voice since 2 Oct** (`AGENT_VOICE` in `vapi_set_voice.py`). The
 owner chose A, happy, at 0.8 for the incoming line and left the debt call on `ba765d50`. Emotion
 reaches Cartesia as an inline tag put on every chunk by a formatPlan replacement, the one hook
