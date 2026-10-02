@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-02
 
+### Voice, incoming calls: voice A, happy, speed 0.8, and the exclamation mark (READY, NOT live)
+
+Owner: *"ok this is good for inbound 16-A-exclaim-happy-speed-0.8.wav"*. For the incoming line only;
+the debt call keeps `ba765d50`.
+- **`scripts/vapi_set_voice.py`, per agent:** `AGENT_VOICE` gives each Hebrew agent its own voice,
+  speed and emotion; `--agent inbound|debt` picks one; `--plain` drops speed and tag (rollback).
+  Inbound: `4486a4a7` (A), `generationConfig.speed` 0.8, and a formatPlan replacement `^` →
+  `<emotion value="happy"/>` appended after the guard, so every chunk starts with the tag (the same
+  hook that has carried the `<break/>` pads since 26 Aug, which calls have shown Cartesia obeys).
+  The sonic-2 `experimentalControls` is dropped where a tag is set. The idle test now compares id,
+  model, volume, speed, that control, every replacement and the fallback's guard.
+- **Dry run:** debt, nothing to change. Inbound: voice `ba765d50` → `4486a4a7`, speed None → 0.8,
+  `experimentalControls` → None, replacements 27 → 28 (+ the happy tag), fallback 27.
+- **`docs/assistant/demo-inbound.md`:** the opener's greeting ends on "!" ("שלום, בוקר טוב! מדבר
+  מיכאל מהומיז."), and one words rule: the voice reads "!" with a smile and "." flat, so warm and
+  glad things end on "!", and a caller in danger stays on full stops. 6,094 → 6,273 characters.
+  `endCallPhrases` matches the words, so "ולהתראות!" still hangs up. Dated note "## 2 Oct".
+- **Checks:** the sync's dry run builds 7 tools and the same report; `facts_check.py` the same 13
+  voice gaps. Six simulated calls (Claude players, no model, no call) on the new prompt are running:
+  a light, a hello then a woman, a how-are-you then paying, English, a child stuck in the lift, a
+  private sink.
+- **Ships on the owner's word:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then
+  `python scripts/vapi_set_voice.py --agent inbound --apply`, then read back. **Rollback:** the
+  previous `demo-inbound.md` through the same sync, then `vapi_set_voice.py --agent inbound --voice
+  ba765d50-19c6-4b3e-bc15-9de3b45f82f7 --plain --apply`.
+
 ### Voice A, exclamation marks + happy, slowed down (nothing live)
 
 Owner: *"15-A-exclaim-happy.wav but this is a bit faster that is a bit weird"*. Measured: 15 has

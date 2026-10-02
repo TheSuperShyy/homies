@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 r"""Change ONLY the voice on the live Hebrew assistants, touching nothing else.
 
-    python scripts/vapi_set_voice.py                  # show live vs intended
+    python scripts/vapi_set_voice.py                  # show live vs intended, both agents
     python scripts/vapi_set_voice.py --apply
-    python scripts/vapi_set_voice.py --voice a976c076-3e31-4bf2-a178-8c3ce3d52b2a --apply   # rollback to Eyal
+    python scripts/vapi_set_voice.py --agent inbound --apply               # one agent (AGENT_VOICE)
+    python scripts/vapi_set_voice.py --agent inbound --voice ba765d50-19c6-4b3e-bc15-9de3b45f82f7 --plain --apply
+                                                      # the incoming line back to the 31 Aug clone
+    python scripts/vapi_set_voice.py --voice a976c076-3e31-4bf2-a178-8c3ce3d52b2a --plain --apply   # rollback to Eyal
+
+Since 2 Oct each agent has its own voice, speed and emotion tag (AGENT_VOICE).
 
 WHY NOT `vapi_sync.py <agent> --apply`, WHICH IS THE OBVIOUS ANSWER
 
@@ -96,6 +101,59 @@ def targets(vapi_key):
 
 FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language": "he"}
 
+# PER AGENT SINCE 2 OCT. Until then both Hebrew agents took one voice from .env.
+# The owner called that voice "tired and sad", picked a new clone cut from a
+# livelier stretch of the same recording (A, "Echo Stone Lively 1"), and chose its
+# happy, slowed sample for the incoming line only: "ok this is good for inbound
+# 16-A-exclaim-happy-speed-0.8". The debt agent keeps the 31 Aug clone.
+#
+#   voice    None = CARTESIA_VOICE_ID from .env; `--voice` overrides it.
+#   speed    generationConfig.speed. Weaker than its number on this clone: happy
+#            speech runs ~15% quick, and 0.8 brings it back about 13%.
+#   emotion  Cartesia's inline tag, put at the start of every chunk by a formatPlan
+#            replacement (EMOTION_RULE). Vapi has no emotion field for sonic-3, and
+#            the builder's experimentalControls "positivity:low" is the sonic-2
+#            control, so it is dropped where a tag is set. The same hook carries the
+#            <break/> pads since 26 Aug; sonic-3.5 obeys the tag in Hebrew rather
+#            than reading it out (probe, 2 Oct).
+AGENT_VOICE = {
+    "Debt Follow-up (he)": {"voice": None, "speed": None, "emotion": None},
+    "Inbound Intake (he)": {"voice": "4486a4a7-9ef6-44d4-88e8-10eab571b577",
+                            "speed": 0.8, "emotion": "happy"},
+}
+AGENT_FLAG = {"debt": "Debt Follow-up (he)", "inbound": "Inbound Intake (he)"}
+
+
+def emotion_rule(emotion):
+    # `^` is zero-width: it puts the tag in front of each chunk and removes nothing.
+    # Appended after the guard, so no deletion rule can reach it.
+    return {"type": "regex", "regex": "^", "value": '<emotion value="%s"/>' % emotion}
+
+
+def build_voice(vid, spec):
+    voice = S.cartesia_voice(vid, FALLBACK)
+    if spec.get("speed"):
+        voice["generationConfig"]["speed"] = spec["speed"]
+    if spec.get("emotion"):
+        voice.pop("experimentalControls", None)
+        voice["chunkPlan"]["formatPlan"]["replacements"].append(emotion_rule(spec["emotion"]))
+    return voice
+
+
+def shape(v):
+    """What this script owns in a voice, in a form a live read and a build share."""
+    reps = (((v.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or []
+    fb = ((v.get("fallbackPlan") or {}).get("voices") or [{}])[0]
+    return {
+        "voiceId": v.get("voiceId"),
+        "model": v.get("model"),
+        "volume": (v.get("generationConfig") or {}).get("volume"),
+        "speed": (v.get("generationConfig") or {}).get("speed"),
+        "experimentalControls": v.get("experimentalControls"),
+        "replacements": [(r.get("regex"), r.get("value")) for r in reps],
+        "fallback": len((((fb.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or []),
+    }
+
 
 def env_value(name):
     m = re.search(r"^%s=(.*)$" % re.escape(name),
@@ -133,73 +191,83 @@ def visible_to_credential(voice_id, cartesia_key):
 def main():
     args = sys.argv[1:]
     apply_it = "--apply" in args
-    vid = args[args.index("--voice") + 1] if "--voice" in args else env_value("CARTESIA_VOICE_ID")
     # Volume: the flag wins, then .env, then the builder's default (1.4).
     if "--volume" in args:
         os.environ["CARTESIA_VOLUME"] = args[args.index("--volume") + 1]
     else:
         os.environ.setdefault("CARTESIA_VOLUME", env_value("CARTESIA_VOLUME") or "1.4")
-    if not vid:
-        sys.exit("No voice. Set CARTESIA_VOICE_ID in .env or pass --voice <id>.")
+    os.environ.setdefault("CARTESIA_MODEL", env_value("CARTESIA_MODEL") or "sonic-3.6")
+    only = None
+    if "--agent" in args:
+        flag = args[args.index("--agent") + 1]
+        if flag not in AGENT_FLAG:
+            sys.exit("--agent takes %s" % " or ".join(sorted(AGENT_FLAG)))
+        only = AGENT_FLAG[flag]
+    # --voice overrides the id for the agents selected (a rollback names one);
+    # --plain drops the agent's speed and emotion with it, back to the bare clone.
+    override = args[args.index("--voice") + 1] if "--voice" in args else None
+    plain = "--plain" in args
 
     vapi_key = env_value("VAPI_PRIVATE_KEY")
     if not vapi_key:
         sys.exit("VAPI_PRIVATE_KEY is not set in .env")
 
+    plan = []
+    for label, aid in targets(vapi_key):
+        if only and label != only:
+            continue
+        spec = {} if plain else dict(AGENT_VOICE.get(label) or {})
+        vid = override or spec.get("voice") or env_value("CARTESIA_VOICE_ID")
+        if not vid:
+            sys.exit("No voice for %s. Set CARTESIA_VOICE_ID in .env or pass --voice <id>." % label)
+        plan.append((label, aid, vid, spec))
+
     # WHICH CARTESIA ACCOUNT IS VAPI ACTUALLY USING? Vapi masks the key on read,
     # so this cannot be answered from Vapi. The honest check is: the credential
     # was repointed by scripts/vapi_cartesia_key.py, and whichever .env key can
     # see this voice is the one that has to be on it.
-    seen_by = [v for v in ("CARTESIA_YARIV_API_KEY", "CARTESIA_API_KEY")
-               if env_value(v) and visible_to_credential(vid, env_value(v))[0]]
-    ok_any = bool(seen_by)
-    name = visible_to_credential(vid, env_value(seen_by[0]))[1] if ok_any else "?"
+    for vid in sorted({p[2] for p in plan}):
+        seen_by = [v for v in ("CARTESIA_YARIV_API_KEY", "CARTESIA_API_KEY")
+                   if env_value(v) and visible_to_credential(vid, env_value(v))[0]]
+        name = visible_to_credential(vid, env_value(seen_by[0]))[1] if seen_by else "?"
+        print("voice      : %s  (%s)" % (vid, name))
+        print("visible to : %s" % (", ".join(seen_by) if seen_by else "NO KEY IN .env CAN SEE IT"))
+        if not seen_by:
+            sys.exit("\nREFUSING. No Cartesia key in .env can resolve that voice, so Vapi's\n"
+                     "credential almost certainly cannot either -- and it would not error,\n"
+                     "it would answer in English. Check the id.")
+    print("model      : %s" % os.environ["CARTESIA_MODEL"])
 
-    print("voice      : %s  (%s)" % (vid, name))
-    print("visible to : %s" % (", ".join(seen_by) if seen_by else "NO KEY IN .env CAN SEE IT"))
-    if not ok_any:
-        sys.exit("\nREFUSING. No Cartesia key in .env can resolve that voice, so Vapi's\n"
-                 "credential almost certainly cannot either -- and it would not error,\n"
-                 "it would answer in English. Check the id.")
-    print("model      : %s" % os.environ.get("CARTESIA_MODEL", env_value("CARTESIA_MODEL") or "sonic-3.6"))
-
-    # Build with vapi_sync's own builder so the emotion control, language guard
-    # and fallbackPlan match exactly what a full sync would have produced.
-    os.environ.setdefault("CARTESIA_MODEL", env_value("CARTESIA_MODEL") or "sonic-3.6")
-    voice = S.cartesia_voice(vid, FALLBACK)
-    want_vol = voice["generationConfig"]["volume"]
-    print("volume     : %s   (0.5-2.0; 1 is Cartesia's default)" % want_vol)
-
-    def guard_count(v):
-        return len((((v.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or [])
-    want_fb = guard_count(voice["fallbackPlan"]["voices"][0])
-
-    # "Same" means the voice id, the model, the volume AND the fallback's guard:
-    # a volume-only change has to be visible here, or this script says "nothing
-    # to do" and ships it to nobody; and a fallback that lost its replacements
-    # (15 Sep) has to show up as work, or Elliot reads tool names aloud.
+    # Built with vapi_sync's own builder so the emotion control, language guard
+    # and fallbackPlan match exactly what a full sync would have produced; the
+    # agent's speed and tag go on top (build_voice).
+    #
+    # "Same" means everything shape() reads: id, model, volume, speed, the old
+    # emotion control, every replacement (so the tag shows up as work), and the
+    # fallback's guard -- a fallback that lost its replacements (15 Sep) has to
+    # show up as work, or Elliot reads tool names aloud.
     changed = []
-    for label, aid in targets(vapi_key):
+    for label, aid, vid, spec in plan:
+        voice = build_voice(vid, spec)
+        want = shape(voice)
         lv = vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {}
-        cur = lv.get("voiceId", "")
-        cur_vol = (lv.get("generationConfig") or {}).get("volume")
-        cur_fb = guard_count(((lv.get("fallbackPlan") or {}).get("voices") or [{}])[0])
-        same = (cur == vid and lv.get("model") == voice["model"]
-                and cur_vol == want_vol and cur_fb == want_fb)
+        have = shape(lv)
         print("\n%-22s %s" % (label, aid))
-        print("  live voice : %s%s" % (cur, "   (already correct)" if cur == vid else ""))
-        print("  live model : %s%s" % (lv.get("model", "-"),
-                                      "" if lv.get("model") == voice["model"] else "   -> " + voice["model"]))
-        print("  live volume: %s%s" % ("none" if cur_vol is None else cur_vol,
-                                      "" if cur_vol == want_vol else "   -> %s" % want_vol))
-        print("  fallback   : %d replacements%s" % (cur_fb, "" if cur_fb == want_fb else "   -> %d" % want_fb))
-        if not same:
-            if cur != vid:
-                print("  -> voice becomes %s" % vid)
-            changed.append((label, aid, cur, cur_vol))
+        for k in ("voiceId", "model", "volume", "speed", "experimentalControls"):
+            print("  %-21s %s%s" % (k, have[k], "" if have[k] == want[k] else "   -> %s" % want[k]))
+        extra = [r for r in want["replacements"] if r not in have["replacements"]]
+        gone = [r for r in have["replacements"] if r not in want["replacements"]]
+        print("  %-21s %d%s" % ("replacements", len(have["replacements"]),
+                                "" if have["replacements"] == want["replacements"] else
+                                "   -> %d (+%s, -%s)" % (len(want["replacements"]),
+                                                         [r[1] for r in extra], [r[1] for r in gone])))
+        print("  %-21s %d%s" % ("fallback replacements", have["fallback"],
+                                "" if have["fallback"] == want["fallback"] else "   -> %d" % want["fallback"]))
+        if have != want:
+            changed.append((label, aid, voice, want))
 
     if not changed:
-        print("\nNothing to do. Both assistants already carry that voice, model and volume.")
+        print("\nNothing to do. Live already carries that voice, model, volume, speed and tag.")
         return 0
 
     if not apply_it:
@@ -207,19 +275,16 @@ def main():
         print("Only the `voice` field is sent. Prompts, models and tools are untouched.")
         return 0
 
-    for label, aid, before, before_vol in changed:
+    for label, aid, voice, want in changed:
         vapi("PATCH", "/assistant/" + aid, vapi_key, {"voice": voice})
-        after = (vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {})
-        got = after.get("voiceId", "")
-        got_vol = (after.get("generationConfig") or {}).get("volume")
+        got = shape(vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {})
         print("\n%s" % label)
-        print("  voice  %s -> %s   %s" % (before, got, "OK" if got == vid else "MISMATCH"))
-        print("  volume %s -> %s   %s" % ("none" if before_vol is None else before_vol, got_vol,
-                                          "OK" if got_vol == want_vol else "MISMATCH"))
-        fb = (after.get("fallbackPlan", {}).get("voices") or [{}])[0]
-        print("  model=%s  replacements=%d  fallback=%s with %d replacements" % (
-            after.get("model", "-"), guard_count(after), fb.get("voiceId", "none"), guard_count(fb)))
-        if got != vid or got_vol != want_vol or guard_count(fb) != want_fb:
+        for k in ("voiceId", "volume", "speed"):
+            print("  %-7s %s   %s" % (k, got[k], "OK" if got[k] == want[k] else "MISMATCH"))
+        print("  replacements %d, fallback %d   %s" % (
+            len(got["replacements"]), got["fallback"],
+            "OK" if (got["replacements"], got["fallback"]) == (want["replacements"], want["fallback"]) else "MISMATCH"))
+        if got != want:
             sys.exit("Read-back does not match what was sent. Stop and check by hand.")
 
     print("\nWritten and read back. That proves the field is set, not that it sounds\n"
