@@ -2795,6 +2795,14 @@ since 15 Sep after 1.4 and 1.7 within two hours, by ear, `CARTESIA_VOLUME`;
 measured clean at 2.0), not a new voice. Past the ceiling the lever is the
 clone's reference clip, not a field.
 
+**Emotion on sonic-3 is not the field the builder sets (2 Oct).** `cartesia_voice()` sends
+`experimentalControls.emotion ["positivity:low"]`, the sonic-2 control; Cartesia's sonic-3 docs
+know only `generation_config.emotion` and the inline tag `<emotion value="..."/>`, and Vapi's
+generationConfig has speed and volume but no emotion. So the voice most likely speaks with no
+emotion set, and the tone is the clone's clip. The inline tag works in Hebrew on sonic-3.5 (not
+read aloud); speed works on an instant clone like Ido's. The owner called the tone "tired and
+sad" on 2 Oct; samples in `voice/samples/tone/`.
+
 **A whole-object `--apply` pushes everything the tool believes, not the change
 you made. Learned 31 Aug by breaking it.** Pushing the inbound prompt with
 `vapi_sync.py --apply` silently reverted Ido's cloned voice to the Eyal id

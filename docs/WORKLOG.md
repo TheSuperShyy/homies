@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-10-02
 
+### Voice, incoming calls: "tired and sad", six tone samples (nothing live)
+
+Owner, first: *"i told you i want the inbound voice agent to be talkative friendly and service
+oriented"*, then, before any change: *"ok pause the tone of the voice is like tired and sad can we
+change the tone of the voice give me samples"*. The talkative prompt work is paused, not started.
+- **What the voice has live (read back):** the Ido clone `ba765d50`, sonic-3.5, `generationConfig`
+  volume 2, speed unset (1.0), and `experimentalControls.emotion ["positivity:low"]`.
+- **Found:** that emotion control is the old sonic-2 one. Cartesia's sonic-3 docs control emotion
+  only by `generation_config.emotion` or an inline tag `<emotion value="..."/>`, and do not mention
+  the old one, so the live voice most likely runs with no emotion at all and sounds like the
+  clone's own clip. Vapi's `CartesiaGenerationConfig` carries speed, volume and
+  `accentLocalization`, and no emotion. So what can ship is speed, and the inline tag in the text.
+- **Probe:** sonic-3.5 obeys the tag in Hebrew rather than reading it out (the opener 4.56s
+  plain, 4.88s tagged; three tagged lines add nothing like the 1.5s each a spoken tag would).
+- **Samples** (`voice/samples/tone/`, gitignored like every recording; Cartesia credits only, no
+  OpenRouter, no call): the opener, a reply to a dark stairwell and a goodbye, on the live clone,
+  model and volume: `1-today` (as live), `2-faster` (speed 1.1), `3-content`, `4-happy`,
+  `5-happy-faster` (1.1), `6-enthusiastic` (1.05). A rough pitch measure moves little (happy
+  144 Hz median against 134), so on a clone the tag may be mild; the owner's ear decides.
+- **If he picks one:** speed is `generationConfig.speed` in `vapi_sync.cartesia_voice()`; the tag
+  needs a way into every chunk Vapi sends (a `formatPlan` replacement or the first message), to be
+  built and tested only after he chooses. If none is better, the lever left is the clone's
+  reference clip (a livelier stretch of the recording), as the 15 Sep volume note says.
+
 ### Voice, incoming calls: one person, in the singular (LIVE 06:04 UTC)
 
 On the owner's "make it live" (the 1 Oct entry below has the change and its simulated calls).
