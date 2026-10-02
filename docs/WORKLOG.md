@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-02
 
+### Voice A, happier: emotion tags against exclamation marks (nothing live)
+
+Owner on `7-new-voice-A`: *"can we make this more happy or some sort"*. Rendered on A, same lines
+and volume (`voice/samples/tone/10-15`): the tags happy, happy at speed 1.1, excited and
+enthusiastic at 1.05, then the same lines written with exclamation marks ("בוקר טוב!", "זה באמת לא
+נעים!", "בשמחה!"), plain and with happy. On the rough measure the tags do not brighten A (happy
+121 Hz, excited 110 Hz, against plain A's 137 Hz, one render each), and the exclamation marks do:
+`14-A-exclaim` is the highest and most melodic of all (142 Hz, a 12.4-semitone spread). So on
+this clone the words carry the mood more than the tag. The opener is our own fixed line, so it
+can carry them directly; mid-call lines are the model's, so that would be a prompt line (the paused
+"talkative" ask). Before shipping, check that "ולהתראות!" still trips `endCallPhrases`.
+
 ### Voice: three new clones from livelier stretches of Ido's recording (nothing live)
 
 Owner, asked whether Michael can sound less tired: *"lets try and do thenumber 1"*, i.e. clone

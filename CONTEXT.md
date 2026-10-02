@@ -2804,6 +2804,7 @@ read aloud); speed works on an instant clone like Ido's. The owner called the to
 sad" on 2 Oct; samples in `voice/samples/tone/`. The tone itself lives in the clip: sonic-3.5
 reads about its first ten seconds, so on the owner's go three new clones were cut from livelier
 stretches of the same recording (A `4486a4a7`, B `1d12fe3a`, C `1ffd7bf1`), none live yet.
+On A, exclamation marks in the text lifted the voice more than any emotion tag did.
 
 **A whole-object `--apply` pushes everything the tool believes, not the change
 you made. Learned 31 Aug by breaking it.** Pushing the inbound prompt with
