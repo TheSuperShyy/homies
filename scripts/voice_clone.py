@@ -132,6 +132,8 @@ VERSION = "2026-03-01"
 #     clone-candidate-f/g/h.wav  various      pause-bounded, 30 Aug
 #     clone-candidate-i.wav      f+g joined   9.379s  -> the v2 clone
 #     clone-candidate-long.wav   29.95-85.42s 55.470s -> 31 Aug, for Sonic 3.6   <- default
+#     clone-candidate-lively-1/2/3.wav  79.61-92.70s, 176.02-189.72s, 118.32-131.02s
+#                                -> 2 Oct, "tired and sad": the livelier stretches, for 3.5
 #
 # `long` is the 30-85s run taken whole rather than sampled: speech runs from
 # 30.036s to 85.321s with only ordinary 0.25-0.35s sentence pauses inside it, and

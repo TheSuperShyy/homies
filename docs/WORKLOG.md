@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-10-02
 
+### Voice: three new clones from livelier stretches of Ido's recording (nothing live)
+
+Owner, asked whether Michael can sound less tired: *"lets try and do thenumber 1"*, i.e. clone
+again from the most upbeat parts of the recording we have, without asking Ido for a new one.
+That adds voices to the client's Cartesia account (`CARTESIA_YARIV_API_KEY`), which his go covers.
+- **Why the clip decides:** a clone copies the energy of its clip, and production runs sonic-3.5,
+  which reads about the first ten seconds of it. Vapi refuses sonic-3.6 for Hebrew. So the live
+  voice sounds like 30-40s of `echo-stone-sample.wav`.
+- **Picked:** pause-bounded windows of 10-14s across the 220s recording, none clipping, scored on
+  pitch height, pitch movement (octave errors dropped), loudness movement, pace and pause share.
+  The live clip's opening ranks 7th of 38, so the recording is calm throughout and the spread
+  is narrow. The three best that do not overlap the live clip:
+  - `voice/clone-candidate-lively-1.wav`, 79.61-92.70s → **A** `4486a4a7` "Echo Stone Lively 1";
+  - `-lively-2.wav`, 176.02-189.72s → **B** `1d12fe3a`;
+  - `-lively-3.wav`, 118.32-131.02s → **C** `1ffd7bf1`.
+  The edges are silent (-40 to -54 dB), the peaks are -0.9 to -1.9 dB, and all are private and
+  cloned with `voice_clone.py --go --clip … --name … --key CARTESIA_YARIV_API_KEY`.
+- **Samples** (`voice/samples/tone/7-new-voice-A.wav`, `8-…-B`, `9-…-C`): the same three lines as
+  `1-today`, sonic-3.5, volume 2, no emotion tag. The same rough measure: today 126 Hz with a
+  7.3-semitone spread; A 137 Hz and 11.2; B 119 Hz and 10.7; C 125 Hz and 5.1 (flatter). The
+  ear decides.
+- **To ship a pick:** `python scripts/vapi_set_voice.py --voice <id> --apply` (both Hebrew agents
+  share the voice), then read back. **Rollback:** the same with `ba765d50-19c6-4b3e-bc15-9de3b45f82f7`.
+
 ### Voice, incoming calls: "tired and sad", six tone samples (nothing live)
 
 Owner, first: *"i told you i want the inbound voice agent to be talkative friendly and service

@@ -2801,7 +2801,9 @@ know only `generation_config.emotion` and the inline tag `<emotion value="..."/>
 generationConfig has speed and volume but no emotion. So the voice most likely speaks with no
 emotion set, and the tone is the clone's clip. The inline tag works in Hebrew on sonic-3.5 (not
 read aloud); speed works on an instant clone like Ido's. The owner called the tone "tired and
-sad" on 2 Oct; samples in `voice/samples/tone/`.
+sad" on 2 Oct; samples in `voice/samples/tone/`. The tone itself lives in the clip: sonic-3.5
+reads about its first ten seconds, so on the owner's go three new clones were cut from livelier
+stretches of the same recording (A `4486a4a7`, B `1d12fe3a`, C `1ffd7bf1`), none live yet.
 
 **A whole-object `--apply` pushes everything the tool believes, not the change
 you made. Learned 31 Aug by breaking it.** Pushing the inbound prompt with

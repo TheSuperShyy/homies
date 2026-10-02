@@ -63,7 +63,7 @@ prints all 29 voices with their ids if they need rebuilding.
 | `listen.html` | The original clone-candidate picker |
 | `ido-vs-eyal.html` | **The live question**: does any Ido clone beat Eyal? Five rows per line — Eyal, both rejected clones, the control, the candidate |
 
-## Three clones exist, two are rejected, and the reason was two of my own numbers
+## Six clones exist, two are rejected, and the reason was two of my own numbers
 
 The clone lives on **the client's Cartesia account** (`CARTESIA_YARIV_API_KEY`),
 approved by Yariv on 30 Aug, because ours has never had the cloning entitlement:
@@ -75,7 +75,10 @@ that can play these back.
 |---|---|---|---|
 | `61e911a7…` v1 | 10s, cut at round timestamps | `sonic-3` | rejected — cut words off |
 | `493006a2…` v2 | 9.4s, pause-bounded | `sonic-3` | rejected — "sudden high tone and low tone, unsettling" |
-| `ba765d50…` long | 55.5s, pause-bounded | `sonic-3.6` | cut 31 Aug, awaiting a listen |
+| `ba765d50…` long | 55.5s, pause-bounded | `sonic-3.6` | cut 31 Aug, LIVE on sonic-3.5 |
+| `4486a4a7…` lively 1 (A) | 79.61-92.70s, 13.1s | `sonic-3.5` | 2 Oct, the owner called the live voice "tired and sad"; awaiting a listen |
+| `1d12fe3a…` lively 2 (B) | 176.02-189.72s, 13.7s | `sonic-3.5` | 2 Oct, the same |
+| `1ffd7bf1…` lively 3 (C) | 118.32-131.02s, 12.7s | `sonic-3.5` | 2 Oct, the same |
 
 **v1's fault was mine.** `clone-candidate-a.wav` was cut at 162.0s and opened on
 a 0.146s fragment of a syllable, so the clone learned to swallow the starts of
