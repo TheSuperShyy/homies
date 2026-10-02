@@ -2812,7 +2812,8 @@ brings it back to today's pace).
 owner chose A, happy, at 0.8 for the incoming line and left the debt call on `ba765d50`. Emotion
 reaches Cartesia as an inline tag put on every chunk by a formatPlan replacement, the one hook
 that touches every chunk (as the `<break/>` pads do). On this clone the words carry the mood:
-the incoming prompt asks for "!" on warm and glad lines, full stops when someone is in danger.
+the incoming prompt asks for "!" on warm and glad lines, full stops when someone is in danger
+(six simulated calls kept both, `docs/assistant/transcripts/2026-10-02-inbound-happy.md`).
 
 **A whole-object `--apply` pushes everything the tool believes, not the change
 you made. Learned 31 Aug by breaking it.** Pushing the inbound prompt with

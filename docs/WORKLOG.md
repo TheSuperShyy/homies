@@ -29,9 +29,11 @@ the debt call keeps `ba765d50`.
   glad things end on "!", and a caller in danger stays on full stops. 6,094 → 6,273 characters.
   `endCallPhrases` matches the words, so "ולהתראות!" still hangs up. Dated note "## 2 Oct".
 - **Checks:** the sync's dry run builds 7 tools and the same report; `facts_check.py` the same 13
-  voice gaps. Six simulated calls (Claude players, no model, no call) on the new prompt are running:
-  a light, a hello then a woman, a how-are-you then paying, English, a child stuck in the lift, a
-  private sink.
+  voice gaps. Six simulated calls (Claude players, no model, no call;
+  `docs/assistant/transcripts/2026-10-02-inbound-happy.md`): a light, a hello then a woman, a
+  how-are-you then paying, English, a child stuck in the lift, a private sink. Warm and glad lines
+  end on "!", questions keep "?", the balance is said with a full stop, the lift emergency is full
+  stops throughout, and ולהתראות is the last word in all six. One quirk: a ticket number got an "!".
 - **Ships on the owner's word:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --apply`, then
   `python scripts/vapi_set_voice.py --agent inbound --apply`, then read back. **Rollback:** the
   previous `demo-inbound.md` through the same sync, then `vapi_set_voice.py --agent inbound --voice
