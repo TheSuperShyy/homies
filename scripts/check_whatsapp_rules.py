@@ -83,9 +83,12 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # 4 Oct: the prompt and Try again's note (n8n_whatsapp_rephay.py: the tap asks
 # how he is and only that; the note names a tap reply that did not), after the
 # Claude-played deck (33 conversations, scratchpad run wa_qa_rephay).
+# 4 Oct evening: the prompt alone (n8n_whatsapp_calmword.py: the word before the
+# question is caring, no "אוף", no "מעצבן"), after a blind replay of 27 reaction
+# turns from that day's runs: irritated openings 13 (old), 7 (softer), 0 (this).
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
-    'Answer the resident / system': 'c056ecfc373b',
+    'Answer the resident / system': '65c56f9d9c40',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     'Say it again / input': '64f323ffcba1',

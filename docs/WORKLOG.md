@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp bot: the calm-word change is LIVE (14:53 UTC), on the owner's "live it"
+
+- **Blind replay of the firmer wording (Z).** There were no irritated openings in the 27 reaction
+  turns (the old prompt had 13, the softer one 7), and no reply says the rule aloud (no "I'm not
+  annoyed"). The reactions are now mostly "אוי, לא נעים" plus variants: "אוי, חבל", "זה נשמע
+  מלחיץ", "ברור שזה לא נעים".
+- **Pin.** `check_whatsapp_rules.py` PINS['Answer the resident / system'] went from c056ecfc373b
+  to 65c56f9d9c40.
+- **`n8n_whatsapp_calmword.py --apply`.** It wrote the prompt (65c56f9d9c40) and the memory key
+  (-73). Every conversation's memory restarted. The workflow's updatedAt is 14:53:47 UTC and it
+  is active.
+- **Checks on live:**
+  - the carrier's dry run says "Nothing to do";
+  - `check_whatsapp_rules.py` is all green (207 cases, the pins, the typing nodes);
+  - `check_patchers_idle.py` is at the baseline six.
+- **Then 9 Claude-played conversations on live, 3 per button.** They reuse the cards where
+  "מעצבן" came up (lift, gate, leak; Dalia, Gilad, Amit; Esther, gas, "are you a bot"), in
+  scratchpad `wa_qa_menu_after_04oct`.
+
 ### WhatsApp bot: the calm-word change, firmer, with the owner's go ("live it")
 
 - **The blind replay of the first wording.** It was run on the 27 reaction turns from today's
