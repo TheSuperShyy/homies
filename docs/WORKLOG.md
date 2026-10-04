@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Vapi: the tenth account is live, a one-to-one copy of the ninth (11:45-11:52 UTC)
+
+Owner: *"run it"*.
+- **The copy, 11:45 UTC** (`vapi_transfer.py --to VAPI_PRIVATE_KEY_NEW --apply`): the Cartesia
+  credential `f43b1a37` from the client's key, then Inbound `00d91473-1aaa-4a57-a380-ca5bb2b7f1af` and Debt `9e0209d2-c835-4163-813f-6844f9e07651`.
+- **Old against new, field by field** (all but ids and timestamps): identical. Prompts 6,616 /
+  4,760 characters, 7 tools each on the function, voice A `4486a4a7` sonic-3.5 at 0.8 with 29
+  replacements / `ba765d50` with 27, the same server blocks. One field Vapi now writes on create:
+  `analysisPlan.successEvaluationPlan {enabled: false}`. The ninth had none and ran Vapi's
+  pass/fail on every call (all five of today's calls carry one), so both copies got
+  `{enabled: true}` at 11:47 UTC, the rest of `analysisPlan` unchanged. Nothing of ours reads it;
+  it keeps the calls the same.
+- **Switched over:**
+  - `.env`: the active pair is the tenth, the ninth kept as `_ACCOUNT9`; in credit.
+  - Edge Function **v112** (11:48 UTC): `INTAKE_ASSISTANT_DEMO10` joins `INTAKE_ASSISTANT_IDS`;
+    the deployed body carries both ids.
+  - `dashboard/.env.local`: 4 values.
+  - Vercel: the 4 Vapi values on all three environments (the private key stays sensitive; the
+    three public ones read back right), then a redeploy of `f8b984f` (= `origin/main`), READY at
+    11:52 UTC on `homies-dashboard.vercel.app`.
+  - `vapi_set_voice.py` `FALLBACK_IDS`; `vapi-export.json` is the tenth (`--check` clean).
+- **Read back:** the `vapi_sync.py` dry runs resolve `00d91473` and `9e0209d2` by name (the key
+  swap works); `vapi_set_voice.py`: "Nothing to do".
+- `vapi_transfer.py` `ID_FILES` gained `scripts/vapi_set_voice.py` and `dashboard/.env.local`,
+  the two sites the grep found outside it.
+- **Not done, on purpose:** `check_tools.py` (it writes rows, and no tool changed); `web/index.html`
+  (on the 6 Sep account since 6 Sep, not used); the English twins (not on the ninth either);
+  `VAPI_DEBT_ASSISTANT_ID` on Vercel stays unset, as the owner left it on 28 Sep.
+- **Owed:** the owner's test call; we place none. The pasted keys are compromised: rotate after
+  the demo.
+
 ### Vapi: the move to a tenth account, prepared (the copy waits on the owner's permission)
 
 Owner, told the wallet is at -$0.17 (60 calls, $5.17 against the $5 trial; OpenRouter $24.79,

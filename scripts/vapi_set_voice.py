@@ -80,10 +80,11 @@ UA = "curl/8.5.0"
 # A hardcoded id is a fact about one account; the name is a fact about the
 # agent, and this script's whole job is to run straight after that sync.
 NAMES = ["Debt Follow-up (he)", "Inbound Intake (he)"]
-# Refreshed 4 Oct to the account the key opens now; the August ids 404'd.
+# Refreshed 4 Oct to the account the key opens now (the tenth, copied one to one
+# from the ninth the same day); the August ids 404'd.
 FALLBACK_IDS = {
-    "Debt Follow-up (he)": "a34f2564-3694-4213-b44a-1535b8b627c4",
-    "Inbound Intake (he)": "4cbbcbe7-3e5e-4bd8-b4b3-024bd56f7187",
+    "Debt Follow-up (he)": "9e0209d2-c835-4163-813f-6844f9e07651",
+    "Inbound Intake (he)": "00d91473-1aaa-4a57-a380-ca5bb2b7f1af",
 }
 
 

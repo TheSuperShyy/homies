@@ -1032,7 +1032,11 @@ const INTAKE_ASSISTANT_DEMO = "827bfddd-05cc-417b-99f5-17eec76528e6";
 // 20 Sep: the ninth account. Same rule -- it JOINS the set, so every
 // account that still holds an intake assistant keeps paging the team.
 const INTAKE_ASSISTANT_DEMO9 = "4cbbcbe7-3e5e-4bd8-b4b3-024bd56f7187";
-const INTAKE_ASSISTANT_IDS = new Set([INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO, INTAKE_ASSISTANT_DEMO9]);
+// 4 Oct: the tenth account (the ninth's wallet at -$0.17), a one-to-one copy.
+const INTAKE_ASSISTANT_DEMO10 = "00d91473-1aaa-4a57-a380-ca5bb2b7f1af";
+const INTAKE_ASSISTANT_IDS = new Set([
+  INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO, INTAKE_ASSISTANT_DEMO9, INTAKE_ASSISTANT_DEMO10,
+]);
 
 function isIntake(ctx: CallContext): boolean {
   // The assistant id, and nothing else. A "voice and not dialled" fallback

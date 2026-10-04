@@ -2940,6 +2940,13 @@ script run is lost. The fix order: create/patch the credential to
 `CARTESIA_YARIV_API_KEY`, then create assistants. **Fixed in the script on 4 Oct**
 (`CARTESIA_VAR`): `CARTESIA_API_KEY` answers 404 for both clones, the client's key 200.
 
+**A copy is proven by a field-by-field diff, because Vapi writes its own defaults on create
+(4 Oct).** The tenth account's copies matched the ninth in every field but one:
+`analysisPlan.successEvaluationPlan`, absent on the 20 Sep assistants (which ran Vapi's
+pass/fail on every call) and written as `{enabled: false}` on a create today. So a verbatim copy
+quietly changed behaviour. After every move, GET old and new, drop ids and timestamps, compare,
+and set back whatever Vapi defaulted.
+
 **Merging the briefing files has a fixed policy, used 6 Sep.** `docs/WORKLOG.md`
 merges as a union - keep both sides' entries, dates stay ordered, because both
 sessions append near the top and the branch deliberately leaves stubs pointing

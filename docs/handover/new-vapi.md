@@ -506,3 +506,31 @@ intake. That is drift the copy carried over faithfully — a copy reproduces wha
 *is* live, not what the repo says should be. Re-pushing is `vapi_sync.py debt
 --apply` and `inbound --apply`, and it is a decision about the prompt, not a step
 in the move, so it was left for whoever owns the prompt to make.
+
+## 4 Oct: the tenth account, copied one to one
+
+The ninth account (20 Sep) ran its $5 trial to -$0.17 over 60 calls, and Vapi refused every
+call. The owner sent a fresh pair in chat. `vapi_transfer.py --apply` copied both Hebrew
+assistants verbatim:
+
+| | The ninth account | The tenth (current) |
+|---|---|---|
+| Intake (he) | `4cbbcbe7` | `00d91473-1aaa-4a57-a380-ca5bb2b7f1af` |
+| Debt (he) | `a34f2564` | `9e0209d2-c835-4163-813f-6844f9e07651` |
+| Cartesia credential | `7489e8d4` | `f43b1a37-b436-4e4b-9ec9-cc28d14a8cde` |
+| Phone number | none | none |
+
+Three things this move taught, all now in the script or in this file:
+
+- **The Cartesia credential comes from the client's key** (`CARTESIA_VAR` =
+  `CARTESIA_YARIV_API_KEY`). Both clones answer 404 to `CARTESIA_API_KEY`.
+- **Diff old against new after the copy.** Vapi writes `successEvaluationPlan {enabled: false}`
+  on create. The ninth's assistants had no such field and ran the evaluation, so it was set back
+  on. Every other field matched.
+- **The sites outside `ID_FILES`:** `scripts/vapi_set_voice.py` and `dashboard/.env.local` (now
+  in the list); the Edge Function's `INTAKE_ASSISTANT_IDS` (by hand: the new id joins the Set,
+  then `supabase_functions.py --oxs-mirror --apply`); Vercel's four Vapi variables (patched in
+  place with `VERCEL_ADMIN_KEY` on all three environments, then a redeploy of the current
+  production deployment).
+
+`web/index.html` was left on the 6 Sep account, where it has been since 6 Sep.

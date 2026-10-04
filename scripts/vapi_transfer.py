@@ -117,6 +117,13 @@ ID_FILES = [
     "docs/assistant/inbound-test-script.md",
     "docs/features/04-interruption-pacing/feature.md",
     ".env",
+    # Both missed by the script and found by the grep on the 4 Oct move:
+    # vapi_set_voice.py's FALLBACK_IDS, and the local dashboard's two ids
+    # (its keys there are swapped by hand, like .env's). The Edge Function's
+    # INTAKE_ASSISTANT_IDS is NOT listed on purpose: a new id JOINS that Set,
+    # it never replaces one, so it is edited by hand and deployed.
+    "scripts/vapi_set_voice.py",
+    "dashboard/.env.local",
 ]
 
 

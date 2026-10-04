@@ -29,7 +29,7 @@ release 2 as decided on 25 Aug. Nothing dials on its own.
 | Needed | Where | State |
 |---|---|---|
 | An Israeli phone number in Vapi | `VAPI_PHONE_NUMBER_ID` in Vercel | not set; the current Vapi account has no phone number and no SIP credential (checked 28 Sep). Being ordered from Omnitelecom; until set the button reads "no number yet". If Omni offers only its dialer API (28 Sep scenario), the press goes to their dialer instead: see context.md |
-| The live debt agent | `VAPI_DEBT_ASSISTANT_ID` in Vercel | not set, so the button falls back to the demo agent (`14d502fc…`), kept for now at the owner's word (28 Sep). That agent is not on the current Vapi account (404 with its key, checked 28 Sep), so **a press fails until this is set** to the live agent `a34f2564…` (which the Voice page already uses via `NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID`) |
+| The live debt agent | `VAPI_DEBT_ASSISTANT_ID` in Vercel | not set, so the button falls back to the demo agent (`14d502fc…`), kept for now at the owner's word (28 Sep). That agent is not on the current Vapi account (404 with its key, checked 28 Sep), so **a press fails until this is set** to the live agent `9e0209d2…` (the tenth account since 4 Oct) (which the Voice page already uses via `NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID`) |
 | The PIN | `CALL_PIN` in Vercel | not set; the owner picks it; nothing renders without it |
 | Vapi key on the server | `VAPI_PRIVATE_KEY` in Vercel | set in all three environments (checked 28 Sep; Vercel keeps it sealed, so which account it belongs to cannot be read back) |
 | Homies' bank-transfer line | `HOMIES_ALT_PAYMENT` | demo text until Homies confirms |
