@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Incoming calls: Assaf's balance read as ₪0; the lookup found nothing (finding, fix waits on the owner)
+
+Owner, with a screenshot of his 10:01 UTC web call (`01a1065c`): *"why its 0"*. Flat 2 at בר כוכבא 23
+owes ₪2,000 (8 unpaid months, on the `agent` row `63c44e57`). Three things lined up:
+- **The lookup missed.** `get_balance` on voice matches `residents.building` with `.eq`, letter for
+  letter. Michael sent "בר כוכבא 23"; the record is "בר כוכבא 23, תל אביב - יפו", and so is every
+  building's (they all carry the city). Nothing matched, the charges fallback is exact too, no name
+  was passed: `{"ok":true,"found":0}`. `get_request_status` resolves the same words through
+  `matchBuilding()`; `get_balance` never did, while its own `building` text says "the whole sentence
+  is fine; this tool checks it".
+- **"Not found" was read as zero.** gpt-4.1 said "היתרה שלך … היא אפס שקלים. הכול מסודר אצלך!" from
+  `found: 0`. Neither the result nor the tool text says that `found: 0` is not a balance.
+- **Flat 2 has two Assaf rows** (OXS `7d46a287`, no charges; agent `63c44e57`, ₪2,000), and the
+  lookup takes `.limit(1)` unordered, so a matching lookup could still pick the empty one.
+- No real caller has met it: the incoming line has no phone number yet.
+- **Proposed:** `get_balance` resolves the building through `matchBuilding()` like the status check,
+  and on a flat with several rows takes the one with charges; a miss says plainly it is not a zero
+  balance, and the tool text says so (Edge Function with `--oxs-mirror --apply`, then
+  `vapi_sync.py inbound --keep-voice --apply`). Test read-only against בר כוכבא 23.
+- Same call, the "hi" turn: gpt-4.1 wrote "היי! איזה כיף לשמוע ממך. מה שלומְךָ היום?" (the 09:59
+  change working), but the voice's own transcript has only "היי, איזה כיף לשמוע ממך." and the bot
+  stopped speaking a second later. Every other multi-sentence turn of the call was spoken whole, and
+  there is no recording to check. Watch it on his next test.
+
 ### Incoming calls: the "היי … היום" opener and "how are you" once are LIVE (09:59 UTC)
 
 Owner: *"live"*. `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` from Git

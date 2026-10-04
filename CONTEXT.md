@@ -2819,6 +2819,11 @@ was the cap (now two or three, always with a warm word, one question a turn) and
 sentence, not new rules. Lines that play with no model turn (idle, tool-wait) carry no "you" at
 all, so no address rule can go stale in them.
 
+**A lookup that finds nothing must not look like a zero (4 Oct).** `get_balance` answered
+`{"ok":true,"found":0}` for an address it could not match, and gpt-4.1 told the caller his balance
+was ₪0 and all in order. A miss on a money question has to say in words that nothing was found and
+that this is not a zero balance, in the result and in the tool's text.
+
 **A reply rule that ignores what was already said asks twice (4 Oct).** The incoming agent's "whoever
 asks how you are gets an answer and a question back" made Michael ask "how's your day going?" of a
 caller who had just said "I'm good, how are you" (the owner's call `01a10644`). What to ask depends on
