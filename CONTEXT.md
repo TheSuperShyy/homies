@@ -2937,7 +2937,8 @@ credential from `CARTESIA_API_KEY` (the wrong account since 31 Aug) and the
 create 400s with the body swallowed - the one failure mode of the move that
 errors loudly instead of falling back to Elliot silently, and still half the
 script run is lost. The fix order: create/patch the credential to
-`CARTESIA_YARIV_API_KEY`, then create assistants.
+`CARTESIA_YARIV_API_KEY`, then create assistants. **Fixed in the script on 4 Oct**
+(`CARTESIA_VAR`): `CARTESIA_API_KEY` answers 404 for both clones, the client's key 200.
 
 **Merging the briefing files has a fixed policy, used 6 Sep.** `docs/WORKLOG.md`
 merges as a union - keep both sides' entries, dates stay ordered, because both

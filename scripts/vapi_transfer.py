@@ -60,8 +60,8 @@ THE THREE THINGS THAT DO NOT COME ACROSS
    deleted after 14 days regardless, so pull anything wanted first.
 3. **Riley.** Every new account arrives with its own; the id differs each time.
 
-The Cartesia credential DOES come across, which is new — `CARTESIA_API_KEY` is
-in `.env`, so the credential is created rather than left as blocker 1 of the
+The Cartesia credential DOES come across, which is new — the client's key
+(`CARTESIA_VAR`) is in `.env`, so the credential is created rather than left as blocker 1 of the
 runbook. That blocker was the dangerous one: without it the Hebrew voice falls
 back to `vapi/Elliot` and the agent talks in an American accent, silently.
 """
@@ -86,6 +86,14 @@ READ_ONLY = {"id", "orgId", "createdAt", "updatedAt", "isServerUrlSecretSet",
 
 # Ours. Anything else on the account is somebody else's and is not touched.
 OURS = re.compile(r"^Homies", re.I)
+
+# The key the Cartesia credential is made from. Both Hebrew voices (voice A
+# `4486a4a7` on incoming, `ba765d50` on debt) are clones on the CLIENT's Cartesia
+# account; `CARTESIA_API_KEY` has been a different account since 31 Aug and
+# answers 404 for both. Vapi checks a Cartesia voice against the org's
+# credential when the assistant is created, so a credential from the wrong key
+# fails the Hebrew creates (6 Sep). Checked again on 4 Oct, before the tenth move.
+CARTESIA_VAR = "CARTESIA_YARIV_API_KEY"
 
 # Every file that hardcodes an assistant id, and it is the list that matters:
 # a file missing from here keeps pointing at the old account and nothing says so.
@@ -239,7 +247,7 @@ def preflight(e):
                                           for c in creds) or "none")
 
     print("\nWHAT IS NEEDED TO REBUILD IT")
-    need = {"CARTESIA_API_KEY": "the Hebrew voice — without it, a silent American accent",
+    need = {CARTESIA_VAR: "the Hebrew voice — without it, a silent American accent",
             "TOOL_SECRET": "the tool server header",
             "N8N_WEBHOOK_SECRET": "the same value, used by the tool webhooks"}
     for k, why in need.items():
@@ -551,10 +559,11 @@ def main():
     creds = api("GET", "/credential", target)
     have_cartesia = any(c["provider"] == "cartesia" for c in creds)
     print("  cartesia credential: %s" % ("already there" if have_cartesia
-                                         else "will be created from CARTESIA_API_KEY"))
-    if not have_cartesia and not e.get("CARTESIA_API_KEY"):
-        sys.exit("  CARTESIA_API_KEY missing from .env. Stopping: a Hebrew assistant "
-                 "without it falls back to an American voice and nothing reports it.")
+                                         else "will be created from " + CARTESIA_VAR))
+    if not have_cartesia and not e.get(CARTESIA_VAR):
+        sys.exit("  %s missing from .env. Stopping: a Hebrew assistant "
+                 "without it falls back to an American voice and nothing reports it."
+                 % CARTESIA_VAR)
     for a in ours:
         print("  create  %s" % a["name"])
 
@@ -566,7 +575,7 @@ def main():
 
     if not have_cartesia:
         c = api("POST", "/credential", target,
-                {"provider": "cartesia", "apiKey": e["CARTESIA_API_KEY"],
+                {"provider": "cartesia", "apiKey": e[CARTESIA_VAR],
                  "name": "Cartesia (Hebrew TTS)"})
         print("  credential created: %s" % c["id"])
 

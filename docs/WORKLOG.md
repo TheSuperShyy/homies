@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Vapi: the move to a tenth account, prepared (the copy waits on the owner's permission)
+
+Owner, told the wallet is at -$0.17 (60 calls, $5.17 against the $5 trial; OpenRouter $24.79,
+fine): *"use this free vapi credits for now dont worry they are just for the demo we ran out of
+credits make sure we transfer it one is to one"*, with a new key pair in chat (compromised by
+that; rotate after the demo).
+- **Keys:** told apart by a read (the private one lists assistants, the public one gets 401) and
+  saved to `.env` as `VAPI_PRIVATE_KEY_NEW` / `VAPI_PUBLIC_KEY_NEW`; the active pair is still the
+  ninth. The new account: Riley only, no credential, in credit (the no-cost probe reaches
+  "assistant does not exist").
+- **One to one is a copy, not a rebuild:** `vapi_transfer.py --apply` posts the live JSON of both
+  Hebrew agents (voice A + happy + 0.8 on incoming, `ba765d50` on debt, prompts, tools, server
+  blocks), where the 20 Sep move rebuilt them from the repo.
+- **Fixed in `vapi_transfer.py`:** it made the Cartesia credential from `CARTESIA_API_KEY`, which
+  answers 404 for both clones; `CARTESIA_YARIV_API_KEY` answers 200 for `4486a4a7` and
+  `ba765d50`. Now `CARTESIA_VAR` = the client's key. Dry run: the credential from
+  `CARTESIA_YARIV_API_KEY`, two creates, 0 ids in `ID_FILES` (the ninth's ids sit elsewhere).
+- **Recorded before leaving:** `vapi_export.py --archive account9-04oct` (`vapi-export.json` had
+  still held the 6 Sep account); `--check` clean.
+- **Blocked:** the session's permission check refused the `--apply` before it ran. The new account
+  still holds only Riley and no credential; nothing live changed. Waiting on the owner.
+- **After the copy:** diff old and new field by field (0 differences expected outside ids);
+  promote the `.env` pair (the ninth to `_ACCOUNT9`); the new incoming id JOINS
+  `INTAKE_ASSISTANT_IDS` (`index.ts`, then `supabase_functions.py --oxs-mirror --apply`);
+  `dashboard/.env.local` (4 values); Vercel's six Vapi values and a redeploy
+  (`VERCEL_ADMIN_KEY`); `vapi_set_voice.py` `FALLBACK_IDS`; `vapi_export.py` on the new account;
+  the memory note. `web/index.html` still points at the 6 Sep account (not moved on 16 or 20 Sep)
+  and stays as it is.
+
 ### Incoming calls: how Michael addresses the caller, checked on live (nothing changed)
 
 Owner: *"i just want to make sure as well the voice agent inbound if the way it address the person
