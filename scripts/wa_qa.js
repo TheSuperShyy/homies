@@ -105,11 +105,11 @@ function run(E, clock, o) {
   out.ack_sent = ackSent;
   out.ack_text = ackSent ? JSON.parse(E.sayNow({ output: acked })).content : '';
 
-  // The guards, by id, on the first pass.
+  // The guards, by id, on the first pass or (run_index 1) on Try again's.
   const j = { output: o.output || '', intermediateSteps: steps };
   out.guards = {};
   for (const [id, f] of Object.entries(E.reply)) {
-    try { out.guards[id] = f(j, 0, $) === true; } catch (e) { out.guards[id] = 'THREW ' + e.message; }
+    try { out.guards[id] = f(j, o.run_index || 0, $) === true; } catch (e) { out.guards[id] = 'THREW ' + e.message; }
   }
   out.failed = Object.entries(out.guards).filter(([, v]) => v !== true).map(([k]) => k);
   out.retry_note = out.failed.length ? JSON.parse(E.tryAgain({ output: o.output || '' }, $)).retry_note : '';
@@ -134,6 +134,35 @@ function run(E, clock, o) {
 const E = build(P.code);
 if (P.mode === 'sort') {
   console.log(JSON.stringify((P.texts || []).map((t) => E.isGreeting(t) === true)));
+} else if (P.mode === 'say_again') {
+  // After two rejected passes: Open it anyway's result, then what Say it again
+  // reads; with `output`, Second try usable?'s checks on what it wrote.
+  const S = { greeting: false, greeted: true, last_bot: '', text: P.text || '', tap_now: false, tap: '',
+              photo: false, attachment: false, to: '599000000', conv_id: 0, burst_size: 1 };
+  const nodes = {
+    'Sort': { first: () => ({ json: S }) },
+    'Still the last word?': { first: () => ({ json: Object.assign({}, S) }) },
+    'Carry on': { first: () => ({ json: Object.assign({}, S, { acked: '' }) }) },
+    'Answer the resident': { first: () => ({ json: { output: P.draft || '', intermediateSteps: [] } }) },
+    'Type for a moment': { first: () => ({ json: { output: P.output || '' } }) },
+    'Anything newer?': { all: () => [] },
+    'Say it now': { all: () => { throw new Error('unexecuted'); } },
+    'Worth a word?': { first: () => ({ json: { output: 'NONE' } }) },
+  };
+  const $ = (name) => { if (!nodes[name]) throw new Error('no node ' + name); return nodes[name]; };
+  const reads = compile(['$json', '$'], 'return (' + P.code.say_again_text + ');', 'Say it again');
+  const out = { reads: String(reads({ results: [{ result: JSON.stringify(P.rescue || {}) }] }, $)) };
+  if (P.output) {
+    out.checks = {};
+    for (const [id, v] of Object.entries(P.code.second_try || {})) {
+      try { out.checks[id] = compile(['$json'], 'return (' + v + ');', id)({ output: P.output }) === true; } catch (e) { out.checks[id] = 'THREW ' + e.message; }
+    }
+    out.failed = Object.entries(out.checks).filter(([, v]) => v !== true).map(([k]) => k);
+    if (!out.failed.length) {
+      try { out.sent = JSON.parse(E.send({ output: P.output }, $)).content; } catch (e) { out.sent = 'THREW ' + e.message; }
+    }
+  }
+  console.log(JSON.stringify(out));
 } else {
   const res = (P.turns || []).map((t) => {
     try { return run(E, P.clock, t); } catch (e) { return { error: e.message, text: t.text }; }

@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp bot: the three menu buttons, 15 conversations with residents who act like people (nothing spent, nothing changed live)
+
+Owner, after asking whether the testing had someone act like a human: *"run only the 3 menu buttons
+we have like 5 scenarios each and list the conversation the bot have on the exchange between
+conversation"*. Every conversation is in `docs/assistant/transcripts/2026-10-04-whatsapp-menu-buttons.md`, each Hebrew line with its English under it.
+- **Free residents.** `scripts/wa_qa_menu_buttons.json` holds 15 cards, 5 per button. A card says who
+  the person is, how they type, what they know, what they want and what they may do. Only the
+  hello and the tap are scripted; after that a Claude player is the person and reacts to the
+  phone's text.
+- **`wa_qa.py turn`.** The player calls it on every message, so the live code decides every step:
+  the hello test, both models' inputs, the ack gate, the guards, Try again's rewrite (the note and
+  the retry's input) and Say it again after two rejections. Supporting changes:
+  - `wa_qa.js` passes the run index to the guards and has a `say_again` mode;
+  - `--deck` picks another deck, and a deck's `defaults` give the tool results;
+  - grade counts a rejected pass's tools as done.
+  - The morning's 48 regrade unchanged: 218/221.
+- **The run.** 15 Sonnet players, one conversation each; live prompt `c056ecfc373b` (unchanged since
+  10:38 UTC). 109 turns: 15 menus and 94 model turns, plus 1 ack. 8 tickets, 10 look-ups, 18 team
+  notes, 1 link, 1 balance. Expectations 92/93; the one failure is the check's own regex. 3 drafts
+  blocked by guards, all false alarms, all rewritten and sent.
+- **Found in the live code.** These are deterministic; each fix needs the owner's word:
+  - Send's `.replace(/\s{2,}/g, ' ')` turns the blank lines around the payment link into spaces.
+    That is the cause of the morning's "link not on its own line".
+  - Send's `promise v2` cut two wishes: "יחזרו אליך" (the hot water) and "יגיע אליך" (a delivery).
+    It also cut "אני על זה" together with its comma.
+  - Guard false alarms:
+    - deeds on "שפתחתי" a message after the ticket (known);
+    - deeds on "סומנה כטופלה", quoting an old ticket (new);
+    - phantom on "באיזה בניין נפתחה הקריאה?" (new).
+- **Found in the model, the owner's call:**
+  - "אני לא יכול להגיד לך מה לעשות" on a gas smell;
+  - "up to 3 business days" frightened three residents;
+  - the stock "anything else?" set off an angry man ("עוד משהו?? אני תקוע בחוץ עכשיו!!");
+  - asked, Michael says he is a digital assistant behind the "talk to a representative" button.
+- **Checker gaps (the harness, not the bot).** These raised 9 of the 10 rubric marks:
+  - `FEM_CUE` misses "לא יודעת", "מסתדרת" and "מפחדת";
+  - the goodbye test fires on "thanks + a question".
+
 ### WhatsApp bot: every feature and button tested, 48 Claude-played conversations (nothing spent, nothing changed live)
 
 Owner: *"create a list of different scenario and test all the feature and buttons of the whatsapp

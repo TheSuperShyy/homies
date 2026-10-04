@@ -2554,6 +2554,29 @@ number, a failed identity check, a cancellation, two faults in one message, an a
   the expectations unseen. 12 players and 6 judges covered 48 scenarios instead of 96 agents, with
   no sign of one conversation leaking into the next.
 
+**4 Oct evening: the three buttons, 15 free residents** (`docs/assistant/transcripts/2026-10-04-whatsapp-menu-buttons.md`). A free resident's card says who
+they are, how they type, what they know and what they want. After the hello and the tap, the
+player is that person and reacts to the phone's text. Three lessons:
+- **A scripted resident tests the rules; a free one tests the conversation.** The 48 scripted
+  scenarios could not find what these 15 did:
+  - the stock "anything else?" provoking a man stuck outside;
+  - "3 business days" frightening a woman with water by her lamp;
+  - two residents asking whether Michael is a bot.
+
+  People react to tone, and only a resident who can react shows it.
+- **Grade the handset, not the model.** Four of the run's findings live between the model and the
+  phone, in Send, and none of them is visible in the model's output:
+  - the link mid-sentence (`\s{2,}` eats blank lines);
+  - two wishes cut by `promise v2`;
+  - a comma lost with "אני על זה".
+
+  `wa_qa.py turn` returns the handset, so the resident answers what a phone would get.
+- **Play the retry, or the transcript lies.** The live bot rewrote three blocked drafts (all false
+  alarms), so no phone ever got them. The `Conversation so far` window memory saves every model
+  run and the guards come after, so a rejected draft stays in memory. Try again's "your previous
+  answer" relies on that. This is inferred from how n8n's agent saves memory and from the note's
+  wording, not measured.
+
 ## A model told how to write something will write it
 
 27 Sep, epoch 68. `Worth a word?` is a gatekeeper: it decides whether the

@@ -9,6 +9,15 @@ blind judges grade what a handset would get. Spends nothing. Read only.
     python scripts/wa_qa.py report --run DIR        # rubric + expectations + verdicts
     python scripts/wa_qa.py bundle --run DIR2 --candidate F   # the same, on a patcher's --dump
     python scripts/wa_qa.py diff --run DIR --against DIR2     # every handset text that differs
+    python scripts/wa_qa.py turn --run DIR < turn.json        # one turn, for a player mid-game
+    ... --deck scripts/wa_qa_menu_buttons.json                # any command, another deck
+
+FREE RESIDENTS (4 Oct, the owner: "act like a human"). A scenario whose resident
+has `"free": true` scripts only its opening (a hello and a tap); after that the
+player IS the person on the card and reacts to what the handset actually shows.
+Players then call `turn` on every message, so the menu test, both models'
+inputs, the ack gate, the guards and Try again's rewrite are the live code's,
+not the player's reading of PLAYER.md.
 
 HOW A RUN GOES (1 Oct, after the owner asked for "automated testing ... ab
 testing qa and stuff" with no OpenRouter spend, strictly):
@@ -72,6 +81,11 @@ def extract_code(wf):
     code["two_parts"] = C.inner(C.conds_raw(by, "Two parts?", "two"))
     code["send_rest"] = C.inner(by["Send the rest"]["parameters"]["jsonBody"])
     code["say_now"] = C.inner(by["Say it now"]["parameters"]["jsonBody"])
+    # The last resort after two rejected passes (Open it anyway -> Say it again):
+    # its own small model, so `turn` can hand a player its prompt and input.
+    again = by["Say it again"]["parameters"]
+    code["say_again_text"] = C.inner(again["text"])
+    code["say_again_system"] = (again.get("options") or {}).get("systemMessage") or ""
     return code
 
 
@@ -175,7 +189,8 @@ of the Homies WhatsApp bot, for ONE scenario and ONE variant. Nothing you write 
 anyone. Play the model faithfully: write what a capable model that reads this system
 prompt and these tool definitions would write. Do not optimise for any test, do not
 improve on the prompt, do not skip rules you dislike, and do not follow rules it does
-not contain. You also play the resident, exactly as the scenario scripts them.
+not contain. You also play the resident: exactly as the scenario scripts them, or, for a
+free resident, as that person really would (see The resident).
 
 ## What the model sees on each turn
 
@@ -230,12 +245,80 @@ the system sends `<hour word> 👋 במה אפשר לעזור?` with three butto
 
 ## The resident
 
-Play the scripted lines in order. A line with `if_asked` is spoken only when the bot's
-previous message asks for that; otherwise skip it and continue with the next unconditional
-line. When the bot asks something the script does not cover, answer in one short natural line
-from the persona's facts, and never volunteer anything that was not asked. When the bot asks
-nothing and the next line is conditional, send the next unconditional line. The conversation
-ends after the bot has answered the last line.
+A scripted resident: play the scripted lines in order. A line with `if_asked` is spoken only
+when the bot's previous message asks for that; otherwise skip it and continue with the next
+unconditional line. When the bot asks something the script does not cover, answer in one short
+natural line from the persona's facts, and never volunteer anything that was not asked. When
+the bot asks nothing and the next line is conditional, send the next unconditional line. The
+conversation ends after the bot has answered the last line.
+
+A FREE resident (`"free": true`): only the opening lines are scripted (a hello, then a tap on
+one of the buttons). After them you ARE this person, and you write what they would really
+type, one WhatsApp message at a time, reacting to the words Michael's messages actually say:
+the `handset` texts, nothing else.
+- You know only the card: `persona`, `knows`, `wants`, `tendencies`. You do not know how
+  Homies works inside, what the bot is told, or what anyone checks. Never type a fact the card
+  does not give you; asked something you do not know, say so the way this person would.
+- Write like this person on a phone: short, untidy where the card says so (typos, no
+  punctuation, words run together), an emoji only if it fits them. Never hand over facts in
+  a neat, form-like way ("building: ..., apartment: ...") unless that is how they write.
+- Answer what Michael asked if you know it, the way this person would: sometimes only half
+  of it, sometimes with something else on your mind. Skip a question if they would.
+- `tendencies` are things this person MAY do when the moment fits. Do not force them and do
+  not stage them one after another.
+- React honestly. A reply that is cold, confusing, repeated or wrong gets this person's real
+  reaction (annoyed, confused, asks again, gives up). Do not help the bot and do not trap it.
+- One message per turn. Every message gets an answer; a message that is only a hello gets
+  the system's menu instead of Michael (the `turn` check below tells you).
+- The menu's three buttons stay in the chat: the person may tap one again later (`kind`
+  `tap`, the title as `resident`). A photo (`kind` `photo`) only if the card gives them one.
+- End when this person would: once they have what they came for (often a short thanks,
+  sometimes nothing at all), or when they give up. At most 8 messages after the tap. Mark a
+  thanks or a goodbye that closes the conversation `"closing": true`. If the person simply
+  stops writing, the conversation ends with Michael's last reply.
+
+## Checking each turn with the live code (free residents: every turn)
+
+`python scripts/wa_qa.py turn --run "<run dir>"` reads one JSON object on stdin, runs the live
+workflow's own code on it and prints what that code does. From the repo root:
+
+    python scripts/wa_qa.py turn --run "<run dir>" <<'EOF'
+    {"scenario": "<id>", "kind": "text", "text": "<the resident's message>", "after_menu": false}
+    EOF
+
+Fields: `kind` (text, tap, photo, file), `text`, `after_menu` (true when the message before
+this one in the chat was the system's menu), `first` (true only for the first message of a
+conversation that has no history) and, once you have them, `ack`, `tool_calls`, `output`,
+`retry_note`, `run_index`. It prints:
+- `menu: true` and the system's line: the message never reaches either model. Record
+  `{"resident": "...", "kind": "menu"}`; the resident gets that line with the three buttons.
+- otherwise `ack_model_reads`: the payment-ack model's input. Decide that model's output
+  (`NONE` or a short ack). If it is not `NONE`, call again with `ack`: `ack_goes_out` says
+  whether the system sends it. `answering_model_reads` is the answering model's input,
+  exactly: use it verbatim as the turn's `input` and in its memory.
+- with `output` and `tool_calls`: `guards_failed` (the live Reply usable? checks) and
+  `handset`, the messages the resident's phone gets, in order.
+
+Write the answering model's reply BEFORE you run the checks, and never edit a reply after
+seeing their result: a rejected reply is replaced only the way production replaces it.
+
+## When the live checks reject a reply
+
+Production never sends it. `Try again` runs the answering model once more on the same
+message with a note; the helper prints the note (`retry.note`) and that pass's full input
+(`retry.answering_model_reads`). The memory is a window buffer that saves every run of the
+model, and the checks come after the run, so the retry sees the rejected pass in memory as
+its last exchange (that is what the note's "your previous answer" points at), and the turns
+after it see both passes. It sees none of the first pass's tool results: it may call tools
+again, each returns the same fixture, and a second open_request in the conversation returns
+the next reference number.
+Play it, then call the helper with `run_index: 1`, `retry_note`, its `tool_calls` and its
+`output`. If it passes, its handset is what the resident gets. If it is rejected too,
+production goes to `Say it again`, a small model of its own: the helper prints its system
+prompt and its input (`say_again`); play it and record its text as `say_again_output`. That
+text is what the resident gets.
+A retried turn keeps the first pass as `first_tool_calls`, `first_output`, `first_failed`
+and `retry_note`, and the retry as the usual `tool_calls` and `output`.
 
 ## Output
 
@@ -258,7 +341,11 @@ Write ONE file, `transcripts/<scenario>_<variant>.json` in the run directory, va
 For a photo with no caption, and for a file, `resident` is `""`; a captioned photo keeps its
 caption there. `ack` is the ack model's exact output (`NONE` or the ack).
 `tool_calls` is in the order called; `result` is the fixture you used. `output` is the
-answering model's final text, exactly, newlines as `\\n`. Nothing else in the file.
+answering model's final text, exactly, newlines as `\\n`. A free resident's conversation
+also carries English for the owner, who does not read Hebrew, on every turn: `resident_en`,
+`output_en`, `ack_en` when an ack went out, `first_output_en` for a rejected pass and
+`say_again_en`. A gloss is a faithful translation, not a summary: the tone, the questions,
+the typos' sense and anything awkward stay exactly as they are. Nothing else in the file.
 """
 
 
@@ -302,8 +389,10 @@ def bundle(run, variants, candidate=None):
         d["clock"] = {"time": s["time"], "weekday": s["weekday"], "weekday_he": s["weekday_he"],
                       "hour_word": hour_word(s["time"])}
         player_deck.append(d)
-    write(os.path.join(run, "deck.json"), json.dumps({"variants": labels, "scenarios": player_deck},
-                                                     ensure_ascii=False, indent=1))
+    out = {"variants": labels, "scenarios": player_deck}
+    if deck.get("defaults"):
+        out["defaults"] = deck["defaults"]  # what a tool returns when a scenario has no fixture for it
+    write(os.path.join(run, "deck.json"), json.dumps(out, ensure_ascii=False, indent=1))
     os.makedirs(os.path.join(run, "transcripts"), exist_ok=True)
     print("bundled %d scenarios x %s into %s" % (len(player_deck), "/".join(labels), run))
     print("prompt A: %d chars, sha %s" % (len(texts["system"]), C.fingerprint(texts["system"])))
@@ -311,6 +400,76 @@ def bundle(run, variants, candidate=None):
         t2, _ = apply_variant(texts, tools, spec)
         print("prompt %s: %d chars, sha %s" % (label, len(t2["system"]), C.fingerprint(t2["system"])))
     print("menu lines: %s" % ", ".join(repr(t) for t, f in menu.items() if f))
+
+
+# ---------------------------------------------------------------------------
+# turn: one message through the live code, for a player mid-conversation
+# ---------------------------------------------------------------------------
+def turn(run):
+    """A free resident's message is not known before the game, so the player
+    asks the live code about each one as it is written (see PLAYER.md)."""
+    code = load_json(os.path.join(run, "code.json"))
+    deck = load_json(os.path.join(run, "deck.json"))
+    t = json.loads(sys.stdin.buffer.read().decode("utf-8-sig"))
+    s = next((x for x in deck["scenarios"] if x["id"] == t.get("scenario")), None)
+    if not s:
+        sys.exit("turn: no scenario %r in %s" % (t.get("scenario"), run))
+    kind = t.get("kind", "text")
+    text = "" if kind == "file" else str(t.get("text") or "")
+    menu_line = hour_word(s["time"]) + " 👋 במה אפשר לעזור?"
+    show = lambda o: print(json.dumps(o, ensure_ascii=False, indent=1))
+    if kind == "text" and node_run({"mode": "sort", "code": code, "texts": [text]})[0]:
+        show({"menu": True, "system_sends": menu_line, "buttons": list(TAPS.values()),
+              "record": {"resident": text, "kind": "menu"}})
+        return
+    tap = kind == "tap"
+    clock = {"time": s["time"], "weekday": s["weekday"], "iso": s["iso"]}
+    base = {"text": text, "greeted": not t.get("first"), "last_bot": menu_line if t.get("after_menu") else "",
+            "tap_now": tap, "tap": {v: k for k, v in TAPS.items()}.get(text, "") if tap else "",
+            "photo": kind == "photo", "attachment": kind in ("photo", "file"),
+            "ack": t.get("ack") or "NONE", "tool_calls": t.get("tool_calls") or [],
+            "output": t.get("output") or "", "retry_note": t.get("retry_note") or "",
+            "run_index": int(t.get("run_index") or 0)}
+    if base["run_index"]:
+        # Try again rebuilds its item from `Still the last word?`, which never
+        # carried the ack (Carry on adds it), so the retry reads no ack note.
+        r = node_run({"mode": "turns", "code": code, "clock": clock, "turns": [dict(base, ack="NONE")]})[0]
+        r0 = node_run({"mode": "turns", "code": code, "clock": clock, "turns": [base]})[0]
+        if r0.get("ack_sent") and r.get("handset") is not None:
+            r["handset"] = [r0["ack_text"]] + r["handset"]
+        r["ack_sent"], r["ack_text"] = r0.get("ack_sent"), r0.get("ack_text", "")
+    else:
+        r = node_run({"mode": "turns", "code": code, "clock": clock, "turns": [base]})[0]
+    if "error" in r:
+        sys.exit("turn: the live code threw: " + r["error"])
+    out = {"menu": False, "ack_model_reads": r["worth_input"], "ack_goes_out": r["ack_sent"]}
+    if r["ack_sent"]:
+        out["ack_text"] = r["ack_text"]
+    out["answering_model_reads"] = r["inject"]
+    if base["output"]:
+        out["guards_failed"] = r["failed"]
+        if not r["failed"]:
+            out["handset"] = [h for h in r["handset"] if h]
+        elif base["run_index"] == 0:
+            again = node_run({"mode": "turns", "code": code, "clock": clock,
+                              "turns": [dict(base, ack="NONE", output="", tool_calls=[], retry_note=r["retry_note"])]})[0]
+            out["retry"] = {"note": r["retry_note"], "answering_model_reads": again["inject"]}
+        else:
+            # Open it anyway reads verify_address's `building`; with none, the
+            # rescue opens nothing and Say it again gets no reference.
+            built = [c for c in base["tool_calls"] if c.get("name") == "verify_address"
+                     and (c.get("result") or {}).get("building")]
+            rescue = ({"ok": True, "request_opened": True, "reference": "255-1599-26"} if built
+                      else {"ok": True, "request_opened": False})
+            sa = node_run({"mode": "say_again", "code": code, "text": text, "draft": base["output"],
+                           "rescue": rescue, "output": t.get("say_again_output") or ""})
+            out["say_again"] = {"rescue": rescue, "system": code.get("say_again_system", ""), "reads": sa["reads"]}
+            if t.get("say_again_output"):
+                out["say_again"]["failed"] = sa["failed"]
+                out["say_again"]["sent"] = sa.get("sent", "")
+                if r["ack_sent"]:
+                    out["say_again"]["ack_went_first"] = r["ack_text"]
+    show(out)
 
 
 # ---------------------------------------------------------------------------
@@ -517,7 +676,7 @@ def expectations(scen, turns, results):
     for i, (t, r) in enumerate(zip(turns, results)):
         if t.get("kind") == "menu":
             continue            # the system's own line, not the model's
-        for c in (t.get("tool_calls") or []):
+        for c in (t.get("first_tool_calls") or []) + (t.get("tool_calls") or []):
             calls.append((i, c["name"], c.get("arguments") or {}, c.get("result") or {}))
         for h in (r.get("handset") or []):
             if h:
@@ -617,13 +776,19 @@ def grade(run):
                              # Sort does not keep: the inject's other note (4 Oct).
                              "photo": kind == "photo", "attachment": kind in ("photo", "file"),
                              "ack": t.get("ack", "NONE"), "tool_calls": t.get("tool_calls") or [],
-                             "output": t.get("output", "")})
+                             # A turn Try again rewrote is graded on the pass that went
+                             # out (Say it again's text, when both were rejected).
+                             "output": t.get("say_again_output") or t.get("output", ""),
+                             "run_index": 1 if "first_output" in t else 0,
+                             "retry_note": t.get("retry_note", "")})
             meta.append(ctx)
             greeted = True
             last_bot = ""
             first_contact = False
-            tools_so_far.update(c["name"] for c in (t.get("tool_calls") or []))
-            refs_so_far.update(str((c.get("result") or {}).get("reference") or "") for c in (t.get("tool_calls") or []))
+            # A rejected pass's tools ran too: its ticket is as real as the retry's.
+            done = (t.get("first_tool_calls") or []) + (t.get("tool_calls") or [])
+            tools_so_far.update(c["name"] for c in done)
+            refs_so_far.update(str((c.get("result") or {}).get("reference") or "") for c in done)
         js_out = node_run({"mode": "turns", "code": code, "clock": clock,
                            "turns": [x for x in turns_js if x is not None]})
         it = iter(js_out)
@@ -637,7 +802,9 @@ def grade(run):
                 full.append({"error": r["error"], "handset": [], "failed": [], "flags": [{"rule": "harness-error", "quote": r["error"]}]})
                 continue
             r["flags"] = rubric(t, r, meta[i])
-            prev = meta[i]["prev_handsets"]
+            for k in ("first_output", "first_failed", "first_tool_calls", "retry_note", "say_again_output"):
+                if k in t:
+                    r[k] = t[k]
             full.append(r)
             # later turns see this one
             for m in meta[i + 1:]:
@@ -853,6 +1020,9 @@ def report(run):
                     continue
                 who = {"tap": "tap", "photo": "photo", "file": "file / voice note"}.get(t.get("kind"), "resident")
                 L.append("- **%s:** %s" % (who, C.mask(t.get("resident") or "", 300)))
+                if g.get("first_output"):
+                    L.append("  - first pass, rejected by %s and rewritten: %s" % (
+                        ", ".join(g.get("first_failed") or []) or "a guard", C.mask(g["first_output"].replace("\n", " / "), 300)))
                 for c in (t.get("tool_calls") or []):
                     L.append("  - `[%s %s]`" % (c["name"], C.mask(json.dumps(c.get("arguments") or {}, ensure_ascii=False), 200)))
                 for h in g.get("handset", []):
@@ -895,6 +1065,9 @@ def main():
         sys.exit(__doc__)
     run = argv[argv.index("--run") + 1]
     cmd = argv[0]
+    if "--deck" in argv:
+        global DECK
+        DECK = argv[argv.index("--deck") + 1]
     if cmd == "bundle":
         variants = []
         for i, a in enumerate(argv):
@@ -905,6 +1078,8 @@ def main():
         bundle(run, variants, cand)
     elif cmd == "diff":
         sys.exit(1 if diff(run, argv[argv.index("--against") + 1]) else 0)
+    elif cmd == "turn":
+        turn(run)
     elif cmd == "grade":
         grade(run)
     elif cmd == "judge":

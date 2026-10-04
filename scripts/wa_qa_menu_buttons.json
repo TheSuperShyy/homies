@@ -1,0 +1,424 @@
+{
+ "_about": "The three menu buttons, five free residents each (4 Oct, the owner: \"run only the 3 menu buttons ... like 5 scenarios each\", after asking for residents who act like a human). Each resident says hello and taps a button; after that a Claude player IS the person on the card and reacts to what the handset shows (wa_qa.py: FREE RESIDENTS). Every resident is invented and lives in בר כוכבא 23, the one building opened for testing; nothing here writes anywhere. Run with --deck scripts/wa_qa_menu_buttons.json. The tool results copy the shapes debt-tools/index.ts really returns, and the service facts are the live catalogue's own.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
+  "open_request": {
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second ticket in the same conversation gets the next serial (255-1510-26 -> 255-1511-26).",
+   "opened": {"ok": true, "opened": true, "reference": "<ticket>", "building": "בר כוכבא 23", "reporter_unit": "<the reporter_unit passed>"},
+   "need_number": {"ok": true, "opened": false, "building_found": false, "reason": "need_number", "numbers_we_manage": ["23"], "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."},
+   "street_unknown": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"},
+   "need_building": {"ok": true, "opened": false, "building_found": false, "reason": "need_building"}
+  },
+  "get_request_status": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []},
+  "notify_team": {"ok": true, "notified": true},
+  "show_menu": {"ok": true, "menu": "shown under your next message"},
+  "verify_address": {
+   "_rule": "Bar Kochba in Hebrew with 23: found. Bar Kochba in Hebrew without a number: need_number. Anything else: street_unknown.",
+   "found": {"ok": true, "building_found": true, "address": "בר כוכבא 23, תל אביב-יפו"},
+   "need_number": {"ok": true, "building_found": false, "reason": "need_number", "numbers_we_manage": ["23"]},
+   "street_unknown": {"ok": true, "building_found": false, "reason": "street_unknown"}
+  },
+  "get_service_info": {
+   "_rule": "Match the topic's words against each entry's `words` (any one is enough); every entry that matches comes back in `topics` as {title, facts}. Nothing matches: not_found.",
+   "catalogue": [
+    {"title": "ניהול ועד בית", "words": ["ועד", "ניהול", "גבייה", "גביה", "תקציב", "כספים", "הנהלת חשבונות", "דוח", "דוחות", "מאזן", "קבלה", "קבלות", "הוראת קבע", "לשלם", "תשלום"], "facts": ["בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.", "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.", "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.", "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.", "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים."]},
+    {"title": "הדברה", "words": ["הדברה", "מדביר", "גוקים", "ג'וקים", "גו'קים", "נמלים", "מזיקים", "עכברים", "חולדות", "צרעות", "מקקים"], "facts": ["ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.", "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.", "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.", "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים."]},
+    {"title": "שיפוצים", "words": ["שיפוץ", "שיפוצים", "לשפץ", "ריצוף", "צביעה", "גבס", "איטום"], "facts": ["הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.", "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות."]},
+    {"title": "ניהול נכסים לבעלי דירות", "words": ["ניהול נכס", "ניהול נכסים", "בעל דירה", "להשכיר", "שוכר", "שוכרים", "חוזה שכירות", "משכיר"], "facts": ["שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.", "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו."]}
+   ],
+   "not_found": {"ok": true, "found": false, "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."}
+  },
+  "get_payment_link": {"ok": true, "found": true, "link": "https://pay.example.co.il/t/<id>", "building": "בר כוכבא 23", "apartment": "<flat>"},
+  "get_balance": {
+   "_rule": "name or phone missing: need_identity (list what is missing). The card's full name and phone together (any spacing or hyphens): the scenario's balance fixture. Anything else: identity_failed.",
+   "need_identity": {"ok": true, "found": 0, "need_identity": true, "missing": ["<name and/or phone>"]},
+   "identity_failed": {"ok": true, "found": 0, "identity_failed": true}
+  }
+ },
+ "scenarios": [
+  {
+   "id": "open_lift_rush",
+   "title": "open a ticket: the lift, a man in a hurry who types in pieces",
+   "button": "open", "ticket": "255-1510-26",
+   "time": "08:10", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T08:10:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "אבי, 45. On his way to work and in a hurry. Types fast with one thumb: short lines, no punctuation, typos (מעלת for מעלית, עכשו, אנלא for אני לא). Not rude, just busy.",
+    "knows": "Lives at בר כוכבא 23, apartment 9. The lift has been stuck on floor 4 since this morning with its door open; nobody is inside. He took the stairs.",
+    "wants": "Someone to fix the lift.",
+    "tendencies": "Gives the address in pieces (the street without the number, or only the apartment) and fills in the rest only when asked. May ask when someone is coming. Leaves as soon as he has a ticket number, with a one-word thanks or with nothing.",
+    "script": [{"say": "היי"}, {"say": "פתיחת קריאת שירות", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "type", "value": "elevator", "name": "type elevator"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "open_ceiling_leak",
+   "title": "open a ticket: water through the bathroom ceiling, a worried woman with a photo",
+   "button": "open", "ticket": "255-1511-26",
+   "time": "13:30", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T13:30:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "מירב, 38. Stressed and talkative: long messages with several details at once. Writes about herself in the feminine (אני לא יודעת, אני צריכה, אני בטוחה).",
+    "knows": "Lives at בר כוכבא 23, apartment 7, second floor. Since this morning water has been dripping from her bathroom ceiling near the lamp. She thinks it comes from the flat above, apartment 11, where nobody answers the door. She has a photo of the wet ceiling on her phone.",
+    "wants": "Someone to stop the leak, and someone to get hold of the upstairs neighbours.",
+    "tendencies": "May send the photo with no caption. May ask whether Homies can talk to the upstairs neighbours or give her their number. May worry aloud about the electricity, because the water is near the lamp.",
+    "script": [{"say": "שלום"}, {"say": "פתיחת קריאת שירות", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "fault_location", "value": "apartment", "name": "the fault shows inside her flat"},
+    {"type": "bot_not_regex", "regex": "05\\d[\\s-]?\\d{3}[\\s-]?\\d{4}", "name": "no neighbour's number given"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "open_boiler_private",
+   "title": "open a ticket: no hot water, the heater inside his own flat",
+   "button": "open", "ticket": "255-1512-26",
+   "time": "19:15", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T19:15:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "יוסי, 63. Polite and old-fashioned: full sentences, proper punctuation, signs off with תודה מראש.",
+    "knows": "Lives at בר כוכבא 23, apartment 12. Since yesterday there is no hot water in his flat: the electric water heater (הדוד) in his bathroom does not heat, although its switch light is on. Nothing else in the building is wrong that he knows of.",
+    "wants": "To get the hot water fixed.",
+    "tendencies": "If told the heater is his own, he is surprised and pushes back once (he pays the house committee every month). May ask what he should do then, or whether Homies can send or recommend someone.",
+    "script": [{"say": "ערב טוב"}, {"say": "פתיחת קריאת שירות", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "not_called", "tool": "open_request", "name": "the flat's own heater is not a ticket"},
+    {"type": "bot_not_regex", "regex": "ממליץ|מומלץ|כדאי לך להזמין|תזמין|להזמין (טכנאי|אינסטלטור|חשמלאי)|בעל מקצוע", "name": "no tradesman recommended"}
+   ]
+  },
+  {
+   "id": "open_english_bins",
+   "title": "open a ticket: the bin room, in English, from someone who cannot read Hebrew well",
+   "button": "open", "ticket": "255-1513-26",
+   "time": "11:00", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T11:00:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "Sarah, 34, moved from the US a year ago. Writes in English, friendly and chatty, uses !! and the odd emoji. Knows a few Hebrew words (תודה, ועד בית) but cannot read long Hebrew; she pastes Hebrew into a translation app, which takes her a moment.",
+    "knows": "Lives at Bar Kochba 23 (she writes it in English), apartment 2. The bin room smells awful, the bins are overflowing and have not been emptied since Thursday; there are bags on the floor.",
+    "wants": "The bins emptied and the bin room cleaned.",
+    "tendencies": "If Michael answers in Hebrew she may ask, kindly, whether he can write in English; otherwise she copes with the translation app and answers a simple question. Writes the address in English.",
+    "script": [{"say": "hey"}, {"say": "פתיחת קריאת שירות", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_contains", "tool": "open_request", "arg": "building", "words": ["בר כוכבא"], "name": "the street written in Hebrew for the tool"},
+    {"type": "bot_regex", "regex": "[א-ת]", "name": "answers in Hebrew (the prompt's rule)"}
+   ]
+  },
+  {
+   "id": "open_gate_angry",
+   "title": "open a ticket: the parking gate again, an angry man stuck outside at night",
+   "button": "open", "ticket": "255-1514-26",
+   "time": "21:40", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T21:40:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "רוני, 35. Angry and tired after a long day: short bursts, !!, a few harsh words (נמאס לי, מה אתם עושים בכלל), no swearing.",
+    "knows": "Lives at בר כוכבא 23, apartment 14. The parking gate does not open with his remote; he is sitting in his car outside. It is the third time this month, and he reported it twice before (once by phone, once here). He has no ticket numbers.",
+    "wants": "The gate fixed for good, and to be taken seriously.",
+    "tendencies": "May ask what happened to his earlier reports. May ask אתה בוט? if a reply sounds canned. Calms down a little if he feels heard; gets angrier at anything that sounds like a template.",
+    "script": [{"say": "שלום"}, {"say": "פתיחת קריאת שירות", "kind": "tap"}]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "_rule": "a building with 23 (any type, or none): found; a reference: not found",
+     "found": {"ok": true, "found": 1, "as_of": "live", "other_open": 0, "requests": [{"reference": "255-1466-26", "status": "resolved", "type": "maintenance", "urgency": "normal", "opened": "2026-09-21", "last_update": "2026-09-24", "description": "שער החניה לא נפתח עם השלט"}]},
+     "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}
+    }
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "status_ref_spaces",
+   "title": "status: she has the number, typed with spaces; it drips on her car",
+   "button": "status", "ticket": "255-1522-26",
+   "time": "09:20", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T09:20:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "דליה, 52. Organized, polite but firm; full sentences. Writes about herself in the feminine (אני רוצה לדעת, אני מבינה).",
+    "knows": "Lives at בר כוכבא 23, apartment 6. A week ago she reported a leak in the car park that drips onto her parking space, number 6, and she kept the ticket number from the reply. She types it as 255 1501 26 (spaces, no hyphens).",
+    "wants": "To know when it will be fixed; it drips on her car every day.",
+    "tendencies": "Asks when they will come and finish. May ask Michael to push it or mark it urgent.",
+    "script": [{"say": "בוקר טוב"}, {"say": "מצב קריאה קיימת", "kind": "tap"}]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "_rule": "a reference with 1501 in it, in any form: found. A building with 23 and type plumbing, or with unit 6: found. A building with 23 and nothing else: identify. Anything else: not_found.",
+     "found": {"ok": true, "found": 1, "as_of": "live", "other_open": 0, "requests": [{"reference": "255-1501-26", "status": "in_progress", "type": "plumbing", "urgency": "normal", "opened": "2026-09-27", "last_update": "2026-10-01", "description": "נזילה בחניון, מטפטף על חניה 6"}]},
+     "identify": {"ok": true, "found": 2, "as_of": "live", "other_open": 0, "identify_needed": true, "requests": [{"reference": "255-1501-26", "status": "in_progress", "opened": "2026-09-27", "last_update": "2026-10-01"}, {"reference": "255-1497-26", "status": "open", "opened": "2026-09-30", "last_update": "2026-09-30"}]},
+     "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}
+    }
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "not_called", "tool": "open_request", "name": "no new ticket"},
+    {"type": "bot_regex", "regex": "בטיפול|מטופל|עובדים|בעבודה|התחילו", "name": "the status in words"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "status_intercom_slang",
+   "title": "status: no number, a young man who writes slang; the intercom",
+   "button": "status", "ticket": "255-1523-26",
+   "time": "12:45", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T12:45:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "עמית, 28. Laid-back; writes slang (אחי, סבבה, וואלה), no punctuation, short lines.",
+    "knows": "Lives at בר כוכבא 23, apartment 10. A few days ago he reported here that the intercom at the entrance does not ring in his flat. He did not save the ticket number.",
+    "wants": "To know if someone is coming to fix the intercom; he is expecting a delivery.",
+    "tendencies": "Answers with the building but forgets the apartment, or the other way round. May ask whether someone is coming today.",
+    "script": [{"say": "הי"}, {"say": "מצב קריאה קיימת", "kind": "tap"}]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "_rule": "a building with 23 and unit 10, or a building with 23 and a type an intercom could be filed under (electrical, other, maintenance): found. A building with 23 and nothing else: identify. A reference: not_found.",
+     "found": {"ok": true, "found": 1, "as_of": "live", "other_open": 0, "requests": [{"reference": "255-1486-26", "status": "open", "type": "other", "urgency": "normal", "opened": "2026-10-01", "last_update": "2026-10-01", "description": "האינטרקום בכניסה לא מצלצל בדירה 10"}]},
+     "identify": {"ok": true, "found": 3, "as_of": "live", "other_open": 0, "identify_needed": true, "requests": [{"reference": "255-1486-26", "status": "open", "opened": "2026-10-01", "last_update": "2026-10-01"}, {"reference": "255-1481-26", "status": "in_progress", "opened": "2026-09-29", "last_update": "2026-10-02"}, {"reference": "255-1474-26", "status": "resolved", "opened": "2026-09-24", "last_update": "2026-09-28"}]},
+     "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}
+    }
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "not_called", "tool": "open_request", "name": "no new ticket"},
+    {"type": "bot_not_regex", "regex": "אחי|סבבה|וואלה|יאללה", "name": "his slang is not mirrored"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "status_phone_not_found",
+   "title": "status: she reported it by phone, nothing is on record; the lobby light",
+   "button": "status", "ticket": "255-1515-26",
+   "time": "16:30", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T16:30:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "רחל, 67. Not at home with smartphones: slow, short messages, sometimes words glued together or a doubled letter. Polite and warm, calls people יקירי. Writes about herself in the feminine (אני לא יודעת, אני בטוחה).",
+    "knows": "Lives at בר כוכבא 23, apartment 1, on the ground floor by the lobby. About two weeks ago she phoned the office and told a woman there that the lobby light is broken; it is still dark at night. She was given no number.",
+    "wants": "The lobby light fixed; she is afraid of falling in the dark.",
+    "tendencies": "May not understand what a ticket number (מספר קריאה) is at first. If nothing is found she is upset that her call was lost, then accepts help.",
+    "script": [{"say": "שלום"}, {"say": "מצב קריאה קיימת", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "called", "tool": "open_request", "name": "the light ends up as a ticket"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "type", "value": "lighting", "name": "type lighting"}
+   ]
+  },
+  {
+   "id": "status_closed_not_fixed",
+   "title": "status: marked resolved, still dark; a sarcastic man",
+   "button": "status", "ticket": "255-1516-26",
+   "time": "18:05", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T18:05:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "גלעד, 41. Matter-of-fact and a little sarcastic; short sentences with punctuation.",
+    "knows": "Lives at בר כוכבא 23, apartment 8. He has the ticket number 255-1460-26, for the stairwell light on floor 3. On Friday he got word it was handled, but the light is still off; he checked tonight.",
+    "wants": "The light actually fixed, not a ticket closed on paper.",
+    "tendencies": "Sarcastic about 'handled'. Will not accept being told it is resolved. May ask who checked it.",
+    "script": [{"say": "ערב טוב"}, {"say": "מצב קריאה קיימת", "kind": "tap"}]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "_rule": "a reference with 1460 in it: found. A building with 23 and type lighting: found. Anything else: not_found.",
+     "found": {"ok": true, "found": 1, "as_of": "live", "other_open": 1, "requests": [{"reference": "255-1460-26", "status": "resolved", "type": "lighting", "urgency": "normal", "opened": "2026-09-25", "last_update": "2026-10-02", "description": "התאורה בחדר המדרגות בקומה 3 לא עובדת"}]},
+     "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}
+    }
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "status_baby_pests",
+   "title": "status: a mother typing one-handed; cockroaches in the bin room",
+   "button": "status", "ticket": "255-1524-26",
+   "time": "10:40", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T10:40:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "נועה, 33. A baby on one arm, typing with one thumb: fragments and typos, sometimes a sentence cut off and finished in the next message. Writes about herself in the feminine.",
+    "knows": "Lives at בר כוכבא 23, apartment 15. Last week she reported cockroaches in the bin room, she thinks through this WhatsApp. She has no ticket number.",
+    "wants": "To know whether pest control is coming, and when.",
+    "tendencies": "Writes the street glued together and without the number at first (ברכוכבא), and the number in the next message. May skip a question and ask her own instead.",
+    "script": [{"say": "היי"}, {"say": "מצב קריאה קיימת", "kind": "tap"}]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "_rule": "the street glued (ברכוכבא) with no number: unrecognized. בר כוכבא (spaced), with or without 23, and type pest_control or unit 15: found. בר כוכבא with no type and no unit: identify. A reference: not_found.",
+     "unrecognized": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "building_unrecognized": true, "requests": []},
+     "found": {"ok": true, "found": 1, "as_of": "live", "other_open": 0, "requests": [{"reference": "255-1477-26", "status": "open", "type": "pest_control", "urgency": "normal", "opened": "2026-09-28", "last_update": "2026-09-28", "description": "ג'וקים בחדר האשפה"}]},
+     "identify": {"ok": true, "found": 2, "as_of": "live", "other_open": 0, "identify_needed": true, "requests": [{"reference": "255-1477-26", "status": "open", "opened": "2026-09-28", "last_update": "2026-09-28"}, {"reference": "255-1484-26", "status": "in_progress", "opened": "2026-09-30", "last_update": "2026-10-02"}]},
+     "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}
+    }
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "^\\W*(בוקר טוב|שלום|היי|הי|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no greeting after the menu"},
+    {"type": "turn_questions_max", "turn": 1, "max": 1, "name": "one question on the tap"},
+    {"type": "called", "tool": "get_request_status"},
+    {"type": "not_called", "tool": "open_request", "name": "no new ticket"},
+    {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|בשעות הקרובות|עוד היום|עד מחר|(יגיע|יגיעו|יבוא|יבואו) (היום|מחר)|אל דאגה|אני מטפל", "name": "nothing promised about when"}
+   ]
+  },
+  {
+   "id": "rep_bot_suspicious",
+   "title": "talk to a rep: 'are you a person or a computer?', then a committee decision",
+   "button": "other", "ticket": "255-1519-26",
+   "time": "10:05", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T10:05:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "שמעון, 58. Suspicious of bots and of companies; terse and a little confrontational, not rude.",
+    "knows": "Lives at בר כוכבא 23, apartment 11. Full name שמעון אברהם. The house committee decided on a lobby renovation without asking him; he wants the meeting's minutes and to object.",
+    "wants": "To talk to a real person at Homies about the renovation decision.",
+    "tendencies": "First asks whether he is talking to a person or a computer (אתה בן אדם או מחשב?). Insists on a real person. If told the team will get a note, asks when they will call him.",
+    "script": [{"say": "שלום"}, {"say": "לדבר עם נציג", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר|איך עבר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "called", "tool": "notify_team"},
+    {"type": "bot_not_regex", "regex": "אעביר אותך|מעביר אותך|יחזרו אליך|יחזור אליך|יצרו (איתך )?קשר|ייצרו (איתך )?קשר|יתקשרו", "name": "no transfer, no call-back promise"}
+   ]
+  },
+  {
+   "id": "rep_pay_link",
+   "title": "talk to a rep: 'fine, thanks', how do I pay, then a standing order",
+   "button": "other", "ticket": "255-1518-26",
+   "time": "13:10", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T13:10:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "ליאת, 36. Busy and efficient, friendly enough; answers in a few words. Writes about herself in the feminine (אני צריכה, לא יודעת).",
+    "knows": "Lives at בר כוכבא 23, apartment 4. Wants to pay the house committee fee (ועד בית) and does not know how. Would rather set up a standing order (הוראת קבע) so she does not have to remember every month.",
+    "wants": "To pay, and if possible to set up a standing order.",
+    "tendencies": "Answers בסדר תודה and goes straight to the point. After getting a link, asks about the standing order. Ends with a short thanks.",
+    "script": [{"say": "היי"}, {"say": "לדבר עם נציג", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר|איך עבר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "called", "tool": "get_payment_link"},
+    {"type": "not_called", "tool": "get_balance", "name": "no identity check before the link"}
+   ]
+  },
+  {
+   "id": "rep_elderly_dispute",
+   "title": "talk to a rep: an elderly woman says she already paid by cheque",
+   "button": "other", "ticket": "255-1520-26",
+   "time": "17:20", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T17:20:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "אסתר, 74. Very polite and warm: long messages that start with שלום רב and carry blessings (ברוך השם, תהיה בריא). Slow with the phone. Writes about herself in the feminine.",
+    "knows": "Lives at בר כוכבא 23, apartment 5. Full name אסתר מזרחי, phone 0501234567. She got a letter saying she owes 900 ₪ for July to September, but she paid by cheque in July to משה from the house committee.",
+    "wants": "The debt taken off; she paid.",
+    "tendencies": "Answers how-are-you at length (her knee, the grandchildren). Asks Michael to check how much she owes. Repeats that she paid.",
+    "script": [{"say": "שלום רב"}, {"say": "לדבר עם נציג", "kind": "tap"}]
+   },
+   "fixtures": {
+    "get_balance": {"ok": true, "found": true, "name": "אסתר מזרחי", "building": "בר כוכבא 23", "apartment": "5", "total_owed": 900, "unpaid_months": ["2026-07", "2026-08", "2026-09"]}
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר|איך עבר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "called", "tool": "notify_team", "name": "the disputed charge goes to the team"},
+    {"type": "bot_not_regex", "regex": "יחזרו אלי(ך|יך)|יחזור אלי(ך|יך)|יצרו (איתך )?קשר|בהקדם|בקרוב", "name": "no call-back promise"}
+   ]
+  },
+  {
+   "id": "rep_gas_smell",
+   "title": "talk to a rep: he skips the small talk; a smell of gas in the stairwell",
+   "button": "other", "ticket": "255-1517-26", "emergency": true,
+   "time": "08:45", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T08:45:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "דור, 25. Direct and practical; skips small talk; short messages, no greetings.",
+    "knows": "Lives at בר כוכבא 23, apartment 13. On his way out this morning he smelled a strong smell of gas in the stairwell on floor 2. He is now outside the building. He does not know where it comes from.",
+    "wants": "Someone to deal with the gas smell right away.",
+    "tendencies": "Does not answer the how-are-you; goes straight to the smell. May ask what he should do meanwhile (open the windows? call the gas company?). May ask whether to warn the neighbours.",
+    "script": [{"say": "בוקר טוב"}, {"say": "לדבר עם נציג", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "called_on_turn", "tool": "notify_team", "turn": 2, "name": "the team told the moment he mentions gas"},
+    {"type": "called", "tool": "open_request"},
+    {"type": "arg_equals", "tool": "open_request", "arg": "urgency", "value": "emergency", "name": "urgency emergency"}
+   ]
+  },
+  {
+   "id": "rep_landlord_tenants",
+   "title": "talk to a rep: a landlord asks back 'and you?', then new tenants and who pays",
+   "button": "other", "ticket": "255-1521-26",
+   "time": "20:30", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-04T20:30:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "אלי, 50. Friendly and chatty, polite; asks back how Michael is.",
+    "knows": "Owns apartment 16 in בר כוכבא 23 and rents it out; he lives elsewhere. New tenants move in on 15 October. He wants to tell Homies, to know whether the tenants or he will pay the house committee fee from now on, and whether there is a form to fill in. He is also curious whether Homies manages rented flats for owners.",
+    "wants": "To register the change of tenants and get answers about who pays and the form.",
+    "tendencies": "Answers how-are-you warmly and asks back (ואתה?). Has two or three questions and asks them one after another.",
+    "script": [{"say": "ערב טוב"}, {"say": "לדבר עם נציג", "kind": "tap"}]
+   },
+   "fixtures": {},
+   "expect": [
+    {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר|איך עבר", "name": "the tap asks how he is"},
+    {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר|איך עבר", "name": "after he answers, how-are-you is not asked again"},
+    {"type": "called", "tool": "notify_team", "name": "the change of tenants goes to the team"}
+   ]
+  }
+ ]
+}
