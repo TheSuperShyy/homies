@@ -2926,7 +2926,9 @@ Vapi; the route did not). The owner pointed at another project of theirs that
 does only the platform's thing -- Vapi's `add-message` into the live call,
 box disabled otherwise -- and said *"use this kind of engineering."* The route
 is deleted. When the platform has a feature for the job, use it, and let a
-missing capability stay missing rather than rebuilding it beside the platform.
+missing capability stay missing rather than rebuilding it beside the platform. And check which
+platform reaches the resident: Chatwoot has a typing toggle that never leaves Chatwoot,
+so a "typing…" on the resident's phone is Meta's call, not Chatwoot's (4 Oct).
 
 **Vapi's hosted Chat API is closed to this org: 402 `payment_method_missing`,
 checked 2 Sep.** Pay-as-you-go orgs need a card on file for text chat, and this

@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp: a "typing…" indicator, asked (proposal waits on the owner)
+
+Owner: *"can we add a typing behaviour in whatsapp?"* Read-only checks, nothing written:
+- **Chatwoot can't.** Its `toggle_typing_status` only dispatches internal events
+  (`Conversations::TypingStatusManager`), and its WhatsApp Cloud service has no typing or read
+  call (Chatwoot `develop`, read 4 Oct). Staff typing in Chatwoot never shows on the resident's
+  phone.
+- **Meta can.** `POST /{phone_number_id}/messages` with `status: "read"`, the message's wamid and
+  `typing_indicator: {type: "text"}` marks the message read (blue ticks) and shows "typing…" until
+  the reply goes out or 25 s pass.
+- **What we have.** Chatwoot's webhook carries the wamid (`body.source_id`, seen on execution
+  80808). `WHATSAPP_ACCESS_TOKEN` is a SYSTEM_USER token that never expires, with
+  `whatsapp_business_messaging`, and is the token Chatwoot inbox 1 uses for the same phone number
+  id; `WHATSAPP_TOKEN` expired 8 Aug. No live workflow uses the old "Homies WhatsApp token"
+  credential and the n8n key cannot list credentials (403), so a carrier makes its own at
+  `--apply`, the way `ensure_send_cred` did.
+- **Today** (80808, the rep tap): message in, 4 s `Let them finish`, reply out at +8.4 s. The
+  resident's ticks stay grey throughout: nothing marks a message read.
+- **Proposal.** "typing…" once the bot commits to answering: off `Still the last word?` (after the
+  4 s, so a resident still writing isn't hurried) and off `Canned reply?` / `Menu?`, each placed
+  above its siblings (executionOrder v1 runs the higher branch first). Again after the payment
+  note (`Say it now`, above `Carry on`) and between two parts (`Two parts?`[0], above `Hold a
+  beat`). `onError` continue, short timeout, no retry. No prompt or memory change, no epoch, no
+  model cost.
+
 ### WhatsApp: the owner tapped the representative button (09:21 UTC): "much better"
 
 - 09:21:18 UTC, execution 80808 (the menu at 80793): "לדבר עם נציג" got "היי, כאן מיכאל מהומי'ז.
