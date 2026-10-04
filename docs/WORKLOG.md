@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp: the owner tapped the representative button (09:21 UTC): "much better"
+
+- 09:21:18 UTC, execution 80808 (the menu at 80793): "לדבר עם נציג" got "היי, כאן מיכאל מהומי'ז.
+  מה שלומך?": the name, how he is, one question, one model pass (`rephay` did not fire).
+  `--watch 2026-10-04T09:12`: 2 resident turns, nothing broke the rules.
+- Owner: *"how are you today is much better"*. The reply had no "today" (his sample: "how are you
+  doing today?"), so "מה שלומך היום?" was offered in case he wants the word itself. Nothing changed.
+
 ### WhatsApp: the representative asks how you are, and only that (LIVE 09:12 UTC, epoch 72)
 
 Owner, after the finding below and the examples: *"make it live"*.
