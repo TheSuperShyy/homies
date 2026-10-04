@@ -2542,6 +2542,18 @@ can prove. The final proof is still the owner's handset.
 fixed is a case added to the gate. The 1 Oct run and its findings are in
 `docs/assistant/transcripts/2026-10-01-whatsapp-qa-abc.md`.
 
+**4 Oct: the whole bot, 48 scenarios** (`docs/assistant/transcripts/2026-10-04-whatsapp-feature-test.md`). The deck covers every button and tool. It adds a
+voice note (`"kind": "file"`, the inject's second note), a captioned photo, an unknown ticket
+number, a failed identity check, a cancellation, two faults in one message, an angry repeat, a
+02:40 flood, and a question with no answer. Two lessons:
+- **A prohibition in the prompt gets said aloud.** "Never tell them what to do, even when asked"
+  came back in 4 of 4 distress scenarios as "אני לא יכול להגיד לך מה לעשות" ("I can't tell you
+  what to do"). Every judge marked it cold. A rule that only says what not to do leaves the model
+  to announce the refusal: give it what to say instead (what was done, and that he is here).
+- **Four scenarios to a player agent works.** Each conversation starts from an empty memory, with
+  the expectations unseen. 12 players and 6 judges covered 48 scenarios instead of 96 agents, with
+  no sign of one conversation leaking into the next.
+
 ## A model told how to write something will write it
 
 27 Sep, epoch 68. `Worth a word?` is a gatekeeper: it decides whether the

@@ -312,6 +312,10 @@ FEM_CUE = re.compile(r"(?:^|\W)(?:ו|ש|כש|כי )?אני\s+(?:לא\s+|כבר\s
 def mask(s, n=110):
     s = re.sub(r"https?://\S+", "<link>", str(s))
     s = re.sub(r"\+?\d{9,15}", "<phone>", s)
+    # Israeli numbers the way people type them, with a hyphen or spaces
+    # (052-7654321, 050 123 4567, +972-52-765-4321): the line above only took
+    # unbroken digits (4 Oct). A ticket reference (255-1490-26) starts with no 0.
+    s = re.sub(r"(?:\+972[\s\-]?|\b0)(?:[23489]|[57]\d)[\s\-]?\d{3}[\s\-]?\d{4}\b", "<phone>", s)
     return re.sub(r"\s+", " ", s)[:n]
 
 

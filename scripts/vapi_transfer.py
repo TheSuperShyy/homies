@@ -195,8 +195,10 @@ def balance(public_key):
     said so for a fortnight. It is readable, from an angle: **Vapi checks the
     wallet BEFORE it looks the assistant up**, so a POST to /call/web naming an
     assistant that does not exist returns the wallet message when the account is
-    overdrawn and "assistant not found" when it is not. Nothing is created on
-    either path, so this costs nothing and can be run as often as you like.
+    overdrawn and "assistant not found" when it is not. It costs nothing and can
+    be run as often as you like. In credit, Vapi does log it as a $0 failed call
+    (`call.start.error-get-resources-validation`, no assistant), so each check
+    shows in the account's call list (seen 4 Oct): that row is this, not a call.
 
     WHY IT IS WORTH A FUNCTION
     19 Aug, an afternoon: the demo would not start, the page said

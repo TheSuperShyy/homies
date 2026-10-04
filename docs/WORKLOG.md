@@ -11,6 +11,45 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp bot: every feature and button tested, 48 Claude-played conversations (nothing spent, nothing changed live)
+
+Owner: *"create a list of different scenario and test all the feature and buttons of the whatsapp
+chatbot and create a md file for that or a artifact"*. The md file, since artifacts cost credits:
+`docs/assistant/transcripts/2026-10-04-whatsapp-feature-test.md`.
+- **No AI:** `check_whatsapp_rules.py` on live: 207 green, 17 pins unchanged, typing nodes right.
+  `--watch 2026-10-04T10:38`: 3 resident turns, the owner's handset at 10:40-10:41 UTC, all clean:
+  - "hi" got the menu;
+  - the rep tap got "היי, כאן מיכאל מהומי'ז. מה שלומך?";
+  - "im good thanks" got "בכיף! במה אוכל לעזור לך היום? 😊".
+  `Show typing` `success: true` on all three, and every node ran without an error.
+- **The deck:** 33 standing scenarios and 15 new ones: `menu_typed`, `rep_typed`, `office_hours`,
+  `night_flood`, `photo_caption`, `voice_note`, `status_not_found`, `balance_identity`,
+  `angry_repeat`, `two_faults`, `neighbor_noise`, `cancel_ticket`, `english_pay`, `rep_then_pay`,
+  `unknown_question`. `wa_qa.py` gained `"kind": "file"` (a voice note, a file or a location: the
+  inject's second note) and the captioned photo in PLAYER.md; the report masks the persona line.
+- **The run:** prompt `c056ecfc373b`. 12 Sonnet players, 4 scenarios each, each conversation from an
+  empty memory and blind to the expectations; the live code around every turn; 6 judges, 8 packets
+  each. 48 conversations, 121 model turns: 30 clean and 18 with notes.
+  - Expectations: 218 met, 3 failed. Two are the known gate checks; the third is the `rep_and_you`
+    how-are-you check, a false negative of its own regex.
+  - 3 replies rejected by a live guard; 23 judge violations.
+- **Findings, all in HANDOVER and the doc:**
+  1. "אני לא יכול להגיד לך מה לעשות" in 4 distress scenarios.
+  2. Three correct replies rejected by live guards: deeds and phantom, both known since 1 Oct, and
+     the new `HAY_ALT` gap ("איך עבר").
+  3. The payment link not on its own line (3 of 4).
+  4. The ack's "הבנתי ש…" echo.
+  5. The gate question.
+  From the handset: "בכיף!" answers a thank-you, not "I'm good"; the Hebrew reply to English is by
+  design (the prompt says "עברית, תמיד").
+- **Fixed on the way:**
+  - `check_whatsapp_rules.mask()` missed phones typed with a hyphen or spaces (052-7654321). It now
+    masks them and keeps ticket references (255-1490-26). It only feeds printed text: the watch and
+    the QA report.
+  - `vapi_transfer.py`'s balance docstring said the check creates nothing. In credit, Vapi logs it
+    as a $0 failed call (`call.start.error-get-resources-validation`); the two such rows on the
+    tenth account are this session's checks.
+
 ### Vapi: the tenth account is live, a one-to-one copy of the ninth (11:45-11:52 UTC)
 
 Owner: *"run it"*.

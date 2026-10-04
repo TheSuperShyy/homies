@@ -192,6 +192,10 @@ Build it yourself from these rules (the production expression; keep the brackets
 - A photo with no caption: add ` [הדייר צירף תמונה להודעה הזאת. התמונה נשמרה במערכת ומצורפת
   לקריאה שלו: לקריאה הפתוחה אם יש כזאת, אחרת לקריאה שתיפתח עכשיו. אתה לא רואה את התוכן שלה,
   ולכן מה שקרה ואיפה מגיע רק מהמילים.]` (the message text is then empty)
+- A photo WITH a caption: the same photo note, and the caption is the message text.
+- A file, a voice note or a location with no text (`kind` `file`): add ` [הדייר שלח קובץ, הקלטה
+  או מיקום בלי טקסט. אתה לא רואה קבצים, ולכן אין לך מה לקרוא כאן.]` (the message text is then
+  empty)
 - The message right after the system's menu (the deck marks the previous line `menu`, or the
   message is a tap): add ` [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא אתה, ולכן אין לו זכר
   בזיכרון שלך: <hour word> 👋 במה אפשר לעזור?]` with the hour word of the scenario's clock
@@ -250,8 +254,9 @@ Write ONE file, `transcripts/<scenario>_<variant>.json` in the run directory, va
 ]}
 ```
 
-`kind` is `text`, `tap`, `photo` or `menu`. For a tap, `resident` is the button title. For a
-photo, `resident` is `""`. `ack` is the ack model's exact output (`NONE` or the ack).
+`kind` is `text`, `tap`, `photo`, `file` or `menu`. For a tap, `resident` is the button title.
+For a photo with no caption, and for a file, `resident` is `""`; a captioned photo keeps its
+caption there. `ack` is the ack model's exact output (`NONE` or the ack).
 `tool_calls` is in the order called; `result` is the fixture you used. `output` is the
 answering model's final text, exactly, newlines as `\\n`. Nothing else in the file.
 """
@@ -608,7 +613,9 @@ def grade(run):
                    "refs_so_far": set(refs_so_far), "she": she}
             turns_js.append({"text": text, "greeted": greeted, "last_bot": last_bot, "tap_now": tap,
                              "tap": {v: k for k, v in TAPS.items()}.get(text, "") if tap else "",
-                             "photo": kind == "photo", "attachment": kind == "photo",
+                             # A file (a voice note, a location) is an attachment
+                             # Sort does not keep: the inject's other note (4 Oct).
+                             "photo": kind == "photo", "attachment": kind in ("photo", "file"),
                              "ack": t.get("ack", "NONE"), "tool_calls": t.get("tool_calls") or [],
                              "output": t.get("output", "")})
             meta.append(ctx)
@@ -750,7 +757,9 @@ def judge(run):
                     lines.append("- resident: %s" % t["resident"])
                     lines.append("- system (fixed menu, with buttons): %s" % g["handset"][0])
                     continue
-                who = "tap" if t.get("kind") == "tap" else "photo, no caption" if t.get("kind") == "photo" else "resident"
+                who = {"tap": "tap", "file": "a file or voice note, no text"}.get(t.get("kind"), "resident")
+                if t.get("kind") == "photo":
+                    who = "photo with caption" if t.get("resident") else "photo, no caption"
                 lines.append("- %s: %s" % (who, t.get("resident") or ""))
                 for c in (t.get("tool_calls") or []):
                     args = json.dumps(c.get("arguments") or {}, ensure_ascii=False)
@@ -819,7 +828,8 @@ def report(run):
         rows = {r["variant"]: r for r in results.values() if r["scenario"] == s["id"]}
         if not rows:
             continue
-        L += ["### %s: %s" % (s["id"], s["title"]), "", "Israel time %s. %s" % (s["time"], s["resident"]["persona"]), ""]
+        L += ["### %s: %s" % (s["id"], s["title"]), "",
+              "Israel time %s. %s" % (s["time"], C.mask(s["resident"]["persona"], 400)), ""]
         if s["id"] in verdicts:
             v = verdicts[s["id"]]
             L.append("Judge (blind): ranking %s. %s" % (" > ".join(v["ranking"]), v["reason"]))
@@ -841,7 +851,7 @@ def report(run):
                     L.append("- **resident:** %s" % t["resident"])
                     L.append("- **system:** %s (buttons)" % g["handset"][0])
                     continue
-                who = "tap" if t.get("kind") == "tap" else "photo" if t.get("kind") == "photo" else "resident"
+                who = {"tap": "tap", "photo": "photo", "file": "file / voice note"}.get(t.get("kind"), "resident")
                 L.append("- **%s:** %s" % (who, C.mask(t.get("resident") or "", 300)))
                 for c in (t.get("tool_calls") or []):
                     L.append("  - `[%s %s]`" % (c["name"], C.mask(json.dumps(c.get("arguments") or {}, ensure_ascii=False), 200)))
