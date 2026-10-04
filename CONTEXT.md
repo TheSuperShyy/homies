@@ -2360,10 +2360,19 @@ three, spends nothing, and is the gate:
    (1 Oct evening: 11 of 27 not idle on live, the baseline's 6 plus those 4 and
    the carrier). Never `--apply` one of them alone; the simulation on the dump
    is the idle check that counts until the carrier ships.
+   **A change that ADDS nodes or wires is invisible to both checks above**
+   (4 Oct, `n8n_whatsapp_typing.py`): `--candidate` and `check_patchers_idle.py`
+   lay the dump's nodes over live only where a node of that name exists, and keep
+   live's connections. So the carrier checks its own additions before any PUT
+   (the typing patcher's `problems()`: wires, side branches, drawn above its
+   siblings), and the idle check runs against the would-be workflow with its new
+   nodes AND wires. That run found two patchers (`firstword`, `twobeat`) that set
+   a node's whole wiring and would have deleted the new wires on their next run.
 2. **After `--apply`:** the check on live is green, and every WhatsApp
    patcher's dry run is idle. Baseline: `batch.py` shows its old drift and is
    never applied; `open`, `handover`, `promise`, `transfer` and `untemplate`
-   refuse on nodes removed in mid-September.
+   refuse on nodes removed in mid-September. Since 4 Oct the check on live also
+   reads the two typing nodes (`check_typing`), and there are 30 patchers.
 3. **After the owner's handset:** `check_whatsapp_rules.py --watch <deploy
    time, UTC>`, and again the next morning over real residents' traffic. Zero
    flags is shipped.

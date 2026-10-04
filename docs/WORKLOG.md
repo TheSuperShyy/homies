@@ -19,6 +19,9 @@ WhatsApp typing (Meta)" made (`yIicJfrby1WlKYq6`, id in `.env` as `N8N_WHATSAPP_
 all green (pins 17 unchanged, typing "both nodes right", 207 cases); every patcher's dry run on a
 live dump, 6 of 30 not idle (the baseline). **Owed:** his handset (blue ticks and "typing…" before
 the reply; again between the two parts of a payment-link reply), then `--watch 2026-10-04T10:38`.
+CONTEXT "How a WhatsApp change ships" gained the rule this change taught: a change that adds
+nodes or wires is invisible to `--candidate` and `check_patchers_idle.py`, so it checks its own
+additions and runs the idle check with its wires.
 
 ### WhatsApp: "typing…" while Michael writes, built and checked (ready, NOT live)
 
