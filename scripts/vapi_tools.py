@@ -642,7 +642,7 @@ INTAKE_TOOLS = [
         wait=True,
         # Checking, not writing — the caller asked a question and nothing is
         # being recorded, so a line about writing would be a small lie.
-        waiting="שנייה, אני בודק לכם.",
+        waiting="שנייה, אני בודק.",
     ),
     _fn(
         "get_balance",
@@ -662,7 +662,7 @@ INTAKE_TOOLS = [
         },
         [],
         wait=True,
-        waiting="שנייה, אני בודק לכם.",
+        waiting="שנייה, אני בודק.",
     ),
     # 16 Sep: the client's own website, turned into a lookup. Inbound only --
     # the debt agent calls about money and a services catalogue is not its
@@ -677,7 +677,7 @@ INTAKE_TOOLS = [
         # Sync, like the other two reads: the caller asked a question and there
         # is nothing for the agent to say until the answer is back.
         wait=True,
-        waiting="שנייה, אני בודק לכם.",
+        waiting="שנייה, אני בודק.",
     ),
 ]
 

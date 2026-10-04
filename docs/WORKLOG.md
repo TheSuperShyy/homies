@@ -9,6 +9,47 @@ conversation that produced it.
 
 ---
 
+## 2026-10-04
+
+### Voice, incoming calls: talkative, friendly and service-oriented (READY, NOT live)
+
+Owner, on 2 Oct before the voice samples: *"i told you i want the inbound voice agent to be
+talkative friendly and service oriented"*, then *"ok pause"*; today, on the report: *"wait the
+phone assistant is still not talkative and service oriented the inbound"*. The second time after
+29 Sep's *"nicer and more verbal"*.
+- **His test call of 2 Oct 08:25 UTC (`01a0fbb8`), read back:** clipped turns ("רגע, אני רושם את
+  זה.", "תודה. תוכל להגיד לי את המספר של"), the address asked three times of a caller who said
+  "same building i live in" and "im not sure", and the idle lines still plural ("קחו את הזמן אני
+  איתכם"). 30 Sep's calls show the same shape ("הבנתי, אין פנייה. אני יכול לעזור בעוד משהו.").
+- **`docs/assistant/demo-inbound.md`, two sentences reshaped, none added beside them:**
+  - the register: a service rep who loves the job and enjoys people; service is more than answering:
+    the caller should feel looked after, hear what is being done and what it means for him, be
+    offered what else would help, and be helped to an address he does not remember rather than
+    asked again;
+  - the turn length, the cap gpt-4.1 read literally: "משפט אחד או שניים קצרים" → "שניים או שלושה
+    משפטים קצרים", always room for a warm word, no more than one question a turn.
+  - Dated note "## 4 Oct". 6,273 → 6,579 characters (6,552 rendered).
+- **The fixed lines that play with no model turn, now with no "you":** the idle lines in
+  `vapi_sync.py` (`BASE.messagePlan`, so both Hebrew agents): "אין לחץ, אני כאן." / "אני עדיין על
+  הקו, בלי לחץ." / "אני פה, מחכה בסבלנות."; the three tool-wait lines in `vapi_tools.py` (incoming
+  only): "שנייה, אני בודק." The plural outlived 1-2 Oct's singular rule there.
+- **Live against the repo build, field by field (read-only):** incoming, 9 differences: the first
+  message (2 Oct's "!"), the prompt, the 3 idle lines, the 3 tool-wait lines, and the voice id (the
+  sync writes Eyal; the voice step puts A back). Debt, 3: the idle lines only.
+- **Eight simulated calls** (`docs/assistant/transcripts/2026-10-04-inbound-talkative.md`; Claude
+  players, no model, no call): the six of 2 Oct plus one modelled on his call (mould on the lift
+  ceiling, no address), that one on both prompts. Words per turn 14.7 → 16.3 on the six, 10.7 →
+  17.1 on his. No turn with two questions; the address helped along instead of asked again; the
+  ticket number offered as the way to check on it; an open request offered a new detail; a balance
+  followed by the offer to open the payment request. The lift emergency stays on full stops with no
+  instructions and no promise. ולהתראות last in all eight. Claude already wrote about two sentences
+  on the old prompt, so how much longer gpt-4.1 gets only his call shows.
+- **Ships on the owner's word, with 2 Oct's voice A:** `N8N_BASE_URL= python scripts/vapi_sync.py
+  inbound --apply`; `python scripts/vapi_set_voice.py --agent inbound --apply`; `N8N_BASE_URL= python
+  scripts/vapi_sync.py debt --apply` (the idle lines only); then read both back. **Rollback:** the
+  previous commit's files through the same syncs, and `vapi_set_voice.py --agent inbound --voice
+  ba765d50-19c6-4b3e-bc15-9de3b45f82f7 --plain --apply`.
+
 ## 2026-10-02
 
 ### WhatsApp: more emoji since the singular? Measured, not a coincidence (nothing changed)

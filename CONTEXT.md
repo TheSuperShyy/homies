@@ -2812,6 +2812,13 @@ brings it back to today's pace).
 replies went from about one in four with an emoji to 8 of 14, some back to back and two off the
 allowed list. A change of address is a change of register; measure the emoji after one.
 
+**gpt-4.1 reads a length as a ceiling and writes to it (4 Oct).** The incoming prompt said a turn
+is "one or two short sentences", and the owner's calls came back as one clipped line a turn while
+Claude, on the same prompt, wrote two. Asked twice for a talkative, service-minded agent, the fix
+was the cap (now two or three, always with a warm word, one question a turn) and the register
+sentence, not new rules. Lines that play with no model turn (idle, tool-wait) carry no "you" at
+all, so no address rule can go stale in them.
+
 **Each Hebrew agent has its own voice since 2 Oct** (`AGENT_VOICE` in `vapi_set_voice.py`). The
 owner chose A, happy, at 0.8 for the incoming line and left the debt call on `ba765d50`. Emotion
 reaches Cartesia as an inline tag put on every chunk by a formatPlan replacement, the one hook

@@ -276,9 +276,12 @@ BASE = {
                 # is already closed by silenceTimeoutMessage below. All
                 # gender-free, per the note above.
                 "idleMessages": [
-                    "אין לחץ, אני כאן, קחו את הזמן.",
-                    "קחו את הזמן, אני איתכם.",
-                    "אני פה, כשתהיו מוכנים תגידו.",
+                    # 4 Oct: no "you" at all. The plural ("קחו", "איתכם") outlived
+                    # the singular rule of 1-2 Oct; a line with no second person fits
+                    # a man, a woman and both agents.
+                    "אין לחץ, אני כאן.",
+                    "אני עדיין על הקו, בלי לחץ.",
+                    "אני פה, מחכה בסבלנות.",
                 ],
         # Eight seconds. Long enough that someone reading an apartment number
         # off a door is not interrupted, short enough that it lands before the
