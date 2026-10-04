@@ -2577,6 +2577,20 @@ player is that person and reacts to the phone's text. Three lessons:
   answer" relies on that. This is inferred from how n8n's agent saves memory and from the note's
   wording, not measured.
 
+**4 Oct evening: the warm word is caring, not irritated (owner).** Reading the 15 conversations,
+the owner said "איזה מעצבן" and "אוף" do not fit the bot at all. The word before the question is
+care for the resident; it is not the bot getting annoyed alongside them. Two causes were in the
+prompt:
+- **The example list is what gets said.** "איזה מעצבן" was listed, and 11 of 27 reaction replies
+  carried it.
+- **"כמו שחבר היה מגיב" invites a friend's "אוף".**
+
+The fix is the example and the framing, not a ban: on 17 Sep a ban on the opening word fought
+the rule that asks for one. **A ticket's status and urgency are the team's (owner, same message).**
+The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
+team as a note, and the urgency of a new ticket is inferred from what happened, never set
+because someone asked.
+
 ## A model told how to write something will write it
 
 27 Sep, epoch 68. `Worth a word?` is a gatekeeper: it decides whether the

@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp bot: "איזה מעצבן" out of the prompt's examples, prepared (NOT live, waits on the owner)
+
+Owner, after reading the 15 conversations: *"can we edit the ugh how annoying remarks it does
+not fit the chatbot at all and also the editing of the status that is possible right but it
+should not be done upon req"*.
+- **Where it came from.** The live prompt does two things:
+  - it lists "איזה מעצבן" among its examples of the short word before the question;
+  - it asks for a fault to get a reaction "כמו שחבר היה מגיב" (the way a friend would react).
+
+  27 replies in today's two runs open with a reaction word, and 11 of them say "מעצבן" or "אוף".
+- **The change, in the repo only.** `prompt.md` now reads "תגובה קצרה ואכפתית של בן אדם לדבר עצמו",
+  with the friend clause removed, and the example list "אוקיי", "אין בעיה", "אוי, לא נעים". Nothing
+  is banned (HANDOVER, 17 Sep: a ban on the word fought the rule that asks for one).
+  - `n8n_whatsapp.py`: MEMORY_EPOCH 72 -> 73 and EPOCH_COVERS prompt c056ecfc373b -> 82aba926c6cd.
+  - The carrier is `scripts/n8n_whatsapp_calmword.py`. It changes two things, the prompt and the
+    memory key, and refuses if live has moved.
+  - Snapshot: `docs/handover/n8n-whatsapp-live-04oct-before-calmword.json`, with the secret
+    redacted (checked). The auto housekeeping commit 0ba6715 took `prompt.md` and the snapshot.
+- **The gate on the candidate.** 207 cases green, the replay of 901 sent replies unchanged, and
+  the typing nodes right. The only red is the prompt pin, which is red by design until the replay.
+  All patchers are idle except the baseline six. The check on live is still all green (the pins
+  hold the live prompt).
+- **Replay, blind.** The 27 reaction turns are replayed under the old prompt (X) and the new (Y)
+  by one Sonnet player each, in scratchpad `calmword_replay_x` and `calmword_replay_y`. X is
+  done; Y is running.
+- **The status question needs nothing.** No tool changes a ticket's status or urgency.
+  - The ticket service updates only the photo count and the OXS reference, and a duplicate
+    report only adds its words to the description.
+  - A resident's "mark it urgent" becomes a team note.
+  - `open_request` infers urgency and never asks for it.
+
 ### WhatsApp bot: the three menu buttons, 15 conversations with residents who act like people (nothing spent, nothing changed live)
 
 Owner, after asking whether the testing had someone act like a human: *"run only the 3 menu buttons
