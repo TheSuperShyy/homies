@@ -48,6 +48,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import n8n_whatsapp as W  # noqa: E402
+import n8n_whatsapp_typing as TY  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -269,9 +270,11 @@ def main():
         "Hold a beat": {"main": [[{"node": "Send the rest", "type": "main", "index": 0}]]},
         "Send the rest": {"main": [[{"node": "Show it in Open", "type": "main", "index": 0}]]},
     }
+    # 4 Oct: the typing indicator hangs two wires here (n8n_whatsapp_typing.py);
+    # they are not this script's to judge or to drop.
     for name, spec in want.items():
-        if conns.get(name) != spec:
-            conns[name] = spec
+        if TY.without_typing(conns.get(name)) != spec:
+            conns[name] = TY.with_typing(spec, conns.get(name))
             changes.append("wiring: %s" % name)
 
     print("workflow : %s  (%s, active=%s)"

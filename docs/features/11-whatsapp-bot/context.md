@@ -203,6 +203,23 @@ the greeting table are unchanged; the replay of all 874 past replies shows it.
 What a resident sees after tapping it: "היי, מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?", in
 the model's words each time.
 
+## 4 Oct — "typing…" while Michael writes (ready, not live)
+
+The owner asked for a typing behaviour, then looked for it on his phone and thought it was a Meta
+setting. It is not a setting anywhere. Chatwoot's typing toggle stays on Chatwoot's own screens;
+Meta shows "typing…" only when it is told to, per message: `POST /{phone-number-id}/messages`
+with `status: "read"`, the message's wamid and `typing_indicator: {type: "text"}`. That also turns
+the resident's ticks blue, which nothing did before. It lasts until the reply or 25 seconds.
+
+`scripts/n8n_whatsapp_typing.py` adds two side calls. `Show typing` fires when the bot commits to
+answering (after `Still the last word?`, so a resident still writing is not hurried; and before
+the menu or a canned reply). `Show typing again` fires after the payment note and between the two
+parts of a two-part reply, because each message sent ends the indicator. Both continue on error
+and never retry, so a failed call costs a "typing…" and never a reply. Where they are drawn is
+part of the change: executionOrder v1 runs siblings top to bottom, so each sits above every
+sibling it has. `check_whatsapp_rules.py` checks that on live; `--watch` notes a "typing…" that
+did not show.
+
 ## 4 Oct — the representative asks how you are, and only that
 
 Three days later the tap got "היי, אני מיכאל מהומי'ז. במה אוכל לעזור לך?" (execution 80740): the

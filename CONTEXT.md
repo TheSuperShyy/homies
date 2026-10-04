@@ -2819,6 +2819,13 @@ was the cap (now two or three, always with a warm word, one question a turn) and
 sentence, not new rules. Lines that play with no model turn (idle, tool-wait) carry no "you" at
 all, so no address rule can go stale in them.
 
+**A patcher that pins a node's whole wiring deletes wires other patchers add (4 Oct).**
+`n8n_whatsapp_firstword.py` and `n8n_whatsapp_twobeat.py` set `conns[name] = spec` for the nodes
+they own, so the typing indicator's wires on those nodes would have read as drift and gone on
+their next run. They now compare and rewrite without the typing wires. `check_patchers_idle.py`
+overlays nodes, not connections, so it cannot see this; a change that adds wires needs the idle
+check run against its nodes AND its wires.
+
 **A lookup that finds nothing must not look like a zero (4 Oct).** `get_balance` answered
 `{"ok":true,"found":0}` for an address it could not match, and gpt-4.1 told the caller his balance
 was ₪0 and all in order. A miss on a money question has to say in words that nothing was found and

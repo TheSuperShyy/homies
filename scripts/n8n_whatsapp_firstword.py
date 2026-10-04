@@ -73,6 +73,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import n8n_whatsapp as W  # noqa: E402
+import n8n_whatsapp_typing as TY  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -290,9 +291,11 @@ def main():
         "Say it now": {"main": [[{"node": "Carry on", "type": "main", "index": 0}]]},
         "Carry on": {"main": [[{"node": "Answer the resident", "type": "main", "index": 0}]]},
     }
+    # 4 Oct: the typing indicator hangs two wires here (n8n_whatsapp_typing.py);
+    # they are not this script's to judge or to drop.
     for name, spec in want_conns.items():
-        if conns.get(name) != spec:
-            conns[name] = spec
+        if TY.without_typing(conns.get(name)) != spec:
+            conns[name] = TY.with_typing(spec, conns.get(name))
             changes.append("wiring: %s" % name)
 
     # The model sub-node feeds a third parent. It already feeds two, so this is

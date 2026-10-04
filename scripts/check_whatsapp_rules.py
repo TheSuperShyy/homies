@@ -212,6 +212,26 @@ def fingerprint(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
 
 
+# 4 Oct: "typing…" (n8n_whatsapp_typing.py). Two side-branch calls to Meta whose
+# whole correctness is where they hang and where they are drawn: executionOrder
+# v1 runs a node's children top to bottom, so one drawn below a sibling would
+# show "typing…" after the reply. The patcher's own problems() is the check.
+def check_typing(wf):
+    import n8n_whatsapp_typing as TY
+    print("--- typing indicator (n8n_whatsapp_typing.py) ---")
+    names = {n["name"] for n in wf["nodes"]}
+    if not any(name in names for name in TY.PARENTS):
+        print("not on this workflow")
+        return 0
+    probs = TY.problems(wf)
+    if not probs:
+        print("both nodes right: Meta's typing call, side branches, each above its siblings")
+        return 0
+    for p in probs:
+        print("FAIL " + p)
+    return len(probs)
+
+
 def check_pins(wf):
     now = {k: fingerprint(v) for k, v in model_texts(wf).items()}
     bad = sorted(k for k in set(now) | set(PINS) if now.get(k) != PINS.get(k))
@@ -429,6 +449,17 @@ def watch(since):
                 if m and who not in she:
                     infos.append("feminine with no feminine cue in this window, in the %s: %s"
                                  % (k, m.group(1)))
+        # 4 Oct: "typing…" is Meta's answer to a side call that continues on
+        # error, so a failure shows nowhere but here.
+        for name in ("Show typing", "Show typing again"):
+            for run in rd.get(name) or []:
+                try:
+                    j = run["data"]["main"][0][0]["json"]
+                except Exception:  # noqa: BLE001
+                    continue
+                if j.get("success") is not True:
+                    infos.append("%s did not show: %s" % (name, mask(json.dumps(j.get("error") or j,
+                                                                             ensure_ascii=False), 90)))
         if "Tell the team the bot is down" in rd:
             flags.append("the outage path ran")
         if ex.get("status") != "success":
@@ -498,6 +529,8 @@ def main():
     print("checking %s" % label)
     print("")
     bad = check_pins(wf)
+    print("")
+    bad += check_typing(wf)
     print("")
     bad += 1 if node({"mode": "cases", "code": extract(wf)}) else 0
     if "--replay" in argv:

@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp: "typing…" while Michael writes, built and checked (ready, NOT live)
+
+Owner, after looking for it on his phone: *"it does not have the typing indictor on it i thinks
+its on meta settings"*. Not a setting: it was never built (his earlier "live" went to the voice
+greeting), and Meta shows it only when the bot calls for it per message.
+- **`scripts/n8n_whatsapp_typing.py`** (new carrier; snapshot
+  `docs/handover/n8n-whatsapp-live-04oct-before-typing.json`, secret masked, no token in it):
+  `Show typing` off `Still the last word?`, `Canned reply?` and `Menu?` at [720, -360];
+  `Show typing again` off `Say it now` and `Two parts?` (true) at [1920, -360]. Each above every
+  sibling (v1 order). Meta `v23.0`, the test number's id, 4 s timeout, no retry, continue on
+  error; its own n8n credential "Homies WhatsApp typing (Meta)" from `WHATSAPP_ACCESS_TOKEN`, made
+  at `--apply` (id to `N8N_WHATSAPP_TYPING_CRED_ID`). The wamid is read from the webhook's
+  second output (multipleMethods: GET 0, POST 1; execution 80808 had [0, 1] items), then the
+  first. `problems()` checks the nodes, wires and drawing order; Node smoke turns check the body.
+- **Meta, checked with a made-up wamid** (nothing reaches a phone): v21.0, v23.0 and v25.0
+  validate `typing_indicator.type` (enum `[text]`) and refuse only the id (131009).
+- **The gate:** `check_whatsapp_rules.py` runs `problems()` on live ("not on this workflow" until
+  applied) and `--watch` notes a "typing…" Meta did not confirm. On live now: 207 green.
+- **A conflict found and closed:** `n8n_whatsapp_firstword.py` (`Still the last word?`, `Say it
+  now`) and `n8n_whatsapp_twobeat.py` (`Two parts?`) pin those nodes' whole wiring, so a re-run
+  after this would have read the typing wires as drift and deleted them. Both now compare and
+  rewrite without the typing wires (`TY.without_typing` / `with_typing`).
+- **Idle checks:** on the dump, 7 of 30 not idle (the baseline 6 and this one, which wants to add
+  its nodes); against the would-be workflow with its new nodes AND wires (`check_patchers_idle`
+  overlays nodes only, so a scratch variant), 6 of 30, the baseline.
+- **Ships on his "make it live":** `python scripts/n8n_whatsapp_typing.py --apply`, re-run idle,
+  the gate on live, the idle check on a live dump, his handset (blue ticks and "typing…" before
+  each reply, and between the two parts of a payment-link reply), `--watch`.
+
 ### Incoming calls: a balance by address is found, and a miss is never a zero (LIVE 10:18-10:19 UTC)
 
 Owner: *"fix it make sure it wont affect other features"*.
