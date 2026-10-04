@@ -471,6 +471,38 @@ function cases(E) {
     () => E.reply.opener({ output: REP }, 0, turn({ S: REP_TAP }).$), true);
   expect('menu rule: the rep opener does not bring the menu back',
     () => sent(E, { reply: REP, said: 'לדבר עם נציג', S: REP_TAP }).content_type || 'text', 'text');
+
+  console.log(NL + '--- the representative asks how you are, and only that (4 Oct, execution 80740) ---');
+  // Owner, on "היי, אני מיכאל מהומי'ז. במה אוכל לעזור לך?": "didnt i told you to make
+  // michael to be hi this is michael from homies how are you doing today?". The tap
+  // paragraph asks for one question now, and `rephay` sends a tap reply with no
+  // how-are-you back once (n8n_whatsapp_rephay.py, epoch 72).
+  const REP_TODAY = "היי, אני מיכאל מהומי'ז. במה אוכל לעזור לך?";
+  const REP_WANTED = "היי, כאן מיכאל מהומי'ז! מה שלומך היום?";
+  const repHay = (output, runIndex, S) => () => E.reply.rephay({ output }, runIndex, turn({ S }).$);
+  expect('rephay: 80740, the tap answered with no how-are-you, goes back', repHay(REP_TODAY, 0, REP_TAP), false);
+  expect('rephay: hi, the name, how are you doing today passes', repHay(REP_WANTED, 0, REP_TAP), true);
+  expect('rephay: the feminine "איך את היום?" passes', repHay("היי, כאן מיכאל מהומי'ז! איך את היום?", 0, REP_TAP), true);
+  expect('rephay: English passes', repHay('Hi, this is Michael from Homies, how are you doing today?', 0, REP_TAP), true);
+  expect('rephay: the 1 Oct shape (both questions) still passes', repHay(REP, 0, REP_TAP), true);
+  expect('rephay: the second pass goes out whatever it says', repHay(REP_TODAY, 1, REP_TAP), true);
+  expect('rephay: the open-a-ticket tap is not asked', repHay("כאן מיכאל מהומי'ז, טוב שפנית. מה קרה?", 0,
+    { last_bot: MENU_TEXT, tap: 'open', tap_now: true }), true);
+  expect('rephay: a typed message is not asked', repHay('איזה מעצבן. באיזה בניין ובאיזו דירה?', 0, {}), true);
+  expect('rep tap right after the menu: the wanted shape goes out whole',
+    say({ reply: REP_WANTED, said: 'לדבר עם נציג', S: REP_TAP }), REP_WANTED);
+  expect('rep tap: the hour word before it is still taken out',
+    say({ reply: "היי, בוקר טוב! כאן מיכאל מהומי'ז! מה שלומך היום?", said: 'לדבר עם נציג', S: REP_TAP }),
+    "היי, כאן מיכאל מהומי'ז! מה שלומך היום?");
+  expect('opener guard: the wanted shape passes on the tap',
+    () => E.reply.opener({ output: REP_WANTED }, 0, turn({ S: REP_TAP }).$), true);
+  const repStill = { first: () => ({ json: { text: 'לדבר עם נציג', tap: 'other', greeted: true } }) };
+  const $rep = (name) => { if (name === 'Still the last word?') return repStill; throw new Error('no node ' + name); };
+  const repWhy = (output) => JSON.parse(E.tryAgain({ output }, $rep)).retry_note;
+  expect('Try again: 80740 is named as the missing how-are-you, without the tools line',
+    () => repWhy(REP_TODAY).includes('לא שאלה אותו לשלומו') && !repWhy(REP_TODAY).includes('open_request'), true);
+  expect('Try again: a tap reply that asked keeps the full list',
+    () => repWhy(REP_WANTED).includes('או שנתנה קישור'), true);
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }

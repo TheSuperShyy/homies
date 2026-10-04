@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp: the representative asks how you are, and only that (LIVE 09:12 UTC, epoch 72)
+
+Owner, after the finding below and the examples: *"make it live"*.
+- **Prompt** (`docs/features/11-whatsapp-bot/prompt.md`): the tap sentence asks for "היי", the name
+  and how he is, "וזאת השאלה היחידה בה", and how to help after he answers with a word about what he
+  said. Dated note "## 4 Oct". sha `98ada1b25f27` → `c056ecfc373b`; MEMORY_EPOCH 71 → 72.
+- **Guard** (`scripts/n8n_whatsapp_retry.py`): `rephay` on `Reply usable?`, first pass only: on
+  the tap's own turn (Sort's `tap` = 'other') a reply that matches no how-are-you goes back once.
+  `Try again` names it ("היא לא שאלה אותו לשלומו…") and leaves the tools line off a note about the
+  tap alone. `HAY_ALT` is the one copy (Hebrew and English, no apostrophes), read by the guard,
+  `wa_qa.py`'s rubric (`BOT_HAY`) and `--watch`.
+- **Carrier** `scripts/n8n_whatsapp_rephay.py` (snapshot
+  `docs/handover/n8n-whatsapp-live-04oct-before-rephay.json`): the prompt by hash, the memory key,
+  the guard by id, the note by hash; Node smoke turns before any PUT.
+- **Gate:** 13 new cases ("the representative asks how you are, and only that", from 80740);
+  `--watch` flags a tap answered without asking how he is, and notes one that also asked how to
+  help. On the candidate 207 cases pass and the replay changes nothing; on live before the write
+  exactly the 9 cases that need the guard failed. Pins: prompt `c056ecfc373b`, Try again
+  `49907a4bd8c4`.
+- **QA** (`docs/assistant/transcripts/2026-10-04-whatsapp-rephay.md`): the 33-scenario deck,
+  Claude-played: 160 expectations met; the five tap conversations open "היי, כאן מיכאל מהומי'ז 🙂
+  מה שלומך?" and ask how to help after the answer; `rephay` never fired; the two gate expectations
+  that have failed since 1 Oct failed again, and phantom/deeds fired three times as before. The
+  rubric lost the rep tap's two-questions exemption and gained `rep-asks-how-to-help`; two scenarios
+  check the turn after the answer.
+- **Applied 09:12:26 UTC:** read back prompt `c056ecfc373b`, key `-72`, guards …, `rephay`, note
+  `49907a4bd8c4`. After: the gate on live all green (207), the carrier "Nothing to do", 6 of 29
+  patchers not idle (the baseline), `--watch` from 09:12: no turns yet. **Owed:** the owner's
+  handset (tap לדבר עם נציג), then `--watch 2026-10-04T09:12`.
+
 ### WhatsApp: the representative tap answered without "how are you" (found, nothing changed)
 
 Owner, on a screenshot of 4 Oct 08:44 UTC (his WhatsApp shows a translation; the chat is Hebrew):

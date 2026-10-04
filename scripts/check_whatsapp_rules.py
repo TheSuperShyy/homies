@@ -80,14 +80,17 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # outage writers replayed on the new texts (scratchpad run wa_qa_gender).
 # 1 Oct, later: the prompt alone (n8n_whatsapp_rephello.py: the representative
 # tap opens with hi, how are you, the name), after the Claude-played deck.
+# 4 Oct: the prompt and Try again's note (n8n_whatsapp_rephay.py: the tap asks
+# how he is and only that; the note names a tap reply that did not), after the
+# Claude-played deck (33 conversations, scratchpad run wa_qa_rephay).
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
-    'Answer the resident / system': '98ada1b25f27',
+    'Answer the resident / system': 'c056ecfc373b',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     'Say it again / input': '64f323ffcba1',
     'Say it again / system': '6927944fbfb0',
-    'Try again / note': '323688694803',
+    'Try again / note': '49907a4bd8c4',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '510af1d70292',
@@ -348,10 +351,19 @@ def watch(since):
         # 1 Oct evening: the לדבר עם נציג tap opens "hi, how are you, this is
         # Michael" (n8n_whatsapp_rephello.py). The name is the one thing the
         # filter cannot add, so its absence is a flag; the hello's form is read.
+        # 4 Oct (n8n_whatsapp_rephay.py): and it asks how he is, the one question
+        # (execution 80740 asked how to help instead). `rephay` sends such a reply
+        # back once, so a flag here means the second pass went out without it too.
         if not canned and rep_tap:
             answers = [t for k, t in sent if k == "answer"]
             if answers and "מיכאל" not in answers[0]:
                 flags.append("the representative tap answered without the name")
+            from n8n_whatsapp_retry import HAY_PY as hay
+            if answers and not hay.search(answers[0]):
+                flags.append("the representative tap answered without asking how he is")
+            if answers and re.search(r"במה (אפשר|אוכל|אני יכול) לעזור|איך (אפשר|אני יכול) לעזור|how can i help",
+                                     answers[0], re.I):
+                infos.append("the representative's hello also asked how to help")
             if answers:
                 h = BOT_HELLO.match(LEAD.sub("", answers[0]))
                 if not h:

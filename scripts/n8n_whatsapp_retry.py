@@ -63,6 +63,17 @@ both reasons without quoting the opener -- naming a phrase is how the model
 is handed it (1 Sep). Nothing here adds a word a resident could read: the
 owner's rule is no fixed message except the menu, and this keeps it.
 
+A THIRD, 4 OCT: `rephay`. The owner's לדבר עם נציג tap got "היי, אני מיכאל
+מהומי'ז. במה אוכל לעזור לך?" (execution 80740) and he asked again for "hi this is
+michael from homies how are you doing today?". The prompt now asks for that and
+for nothing else on the tap (epoch 72, n8n_whatsapp_rephay.py), and this guard
+backs it: on the tap's own turn (Sort's `tap` is 'other'), a reply that does not
+ask how he is goes back once, first pass only like the other two. `Try again`
+reads the same thing off the rejected text and names it; that note alone does
+not carry the tools line, because there is nothing to open. HAY_ALT is the one
+copy of "the bot asked how he is": wa_qa.py's rubric and the --watch flag in
+check_whatsapp_rules.py read it from here.
+
 Idempotent. Running it twice reports nothing to do.
 """
 import json
@@ -125,13 +136,32 @@ NOTE_HEAD = "[התשובה הקודמת שלך להודעה הזאת נפסלה 
 NOTE_TAIL = (". מה שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
              "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link.]")
 
+# 4 Oct: "the bot asked how he is", one copy. Hebrew and English, the forms a
+# person uses; no apostrophes (`.` stands in), so it sits in an n8n expression
+# as safely as in Python. The `rephay` guard and `Try again` use HAY_JS;
+# wa_qa.py's rubric and the --watch flag use HAY_PY.
+HAY_ALT = (r"מה שלומ|מה נשמע|מה קורה|מה העניינים|מה המצב|מה איתך|איך הולך|איך עובר|איך היום"
+           r"|איך אתה|איך את(?=[\s,.!?]|$)"
+           r"|how are you|how is it going|how.s it going|how is your day|how.s your day"
+           r"|how are things|what.?s up|wassup")
+HAY_JS = "/" + HAY_ALT + "/i"
+HAY_PY = __import__("re").compile(HAY_ALT, __import__("re").I)
+WHY_REPHAY = ("היא לא שאלה אותו לשלומו, ובלחיצה על לדבר עם נציג הנציג שנכנס לשיחה אומר היי, "
+              "אומר מי הוא ושואל מה שלומו, וזאת השאלה היחידה בהודעה")
+
 # `}}` anywhere inside ends an n8n expression, so the braces are spaced.
+# 4 Oct: the representative tap's missing how-are-you is named too. The tools
+# line rides only on the echo and the clerk, as before; a note that names the
+# tap alone ends there, because a tap opens nothing.
 TRY_JSON = (
     "={{ JSON.stringify(Object.assign({ }, $('Still the last word?').first().json, "
     "{ retry_note: (() => { try { const o = String($json.output || ''); const why = []; "
     "if (" + ECHO_RE + ".test(o)) why.push('" + WHY_ECHO + "'); "
     "if (" + CLERK_RE + ".test(o)) why.push('" + WHY_CLERK + "'); "
-    "return why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + '" + NOTE_TAIL + "' "
+    "const tools = why.length > 0; let rep = false; "
+    "try { rep = $('Still the last word?').first().json.tap === 'other'; } catch (e) { rep = false; } "
+    "if (rep && !" + HAY_JS + ".test(o)) why.push('" + WHY_REPHAY + "'); "
+    "return why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.]') "
     ": '" + RETRY_NOTE + "'; } catch (e) { return '" + RETRY_NOTE + "'; } })() })) }}"
 )
 
@@ -217,8 +247,14 @@ def guard(gid, expr):
             "operator": {"type": "boolean", "operation": "true", "singleValue": True}}
 
 
+# `rephay` (4 Oct): on the לדבר עם נציג tap's own turn, the reply asks how he is,
+# or it goes back once. First pass only, like the two above.
+REPHAY = (r"={{ $runIndex > 0 || $('Sort').first().json.tap !== 'other' || "
+          + HAY_JS + r".test(String($json.output || '')) }}")
+
 PLURAL_GUARD = guard("plural", PLURAL)
 OPENER_GUARD = guard("opener", OPENER)
+REPHAY_GUARD = guard("rephay", REPHAY)
 
 
 def snapshot(live):
@@ -304,7 +340,7 @@ def main():
 
     # --- The two style guards, by id (20 Sep) ------------------------------------
     cond = by["Reply usable?"]["parameters"]["conditions"]["conditions"]
-    for g in (PLURAL_GUARD, OPENER_GUARD):
+    for g in (PLURAL_GUARD, OPENER_GUARD, REPHAY_GUARD):
         have = next((c for c in cond if c.get("id") == g["id"]), None)
         if have is None:
             cond.append(dict(g))

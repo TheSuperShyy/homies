@@ -51,6 +51,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import check_whatsapp_rules as C  # noqa: E402  (load_live, extract, inner, mask)
+import n8n_whatsapp_retry as R  # noqa: E402  (HAY_PY: the bot asked how he is)
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -342,7 +343,8 @@ REASK = re.compile(r"במה (אפשר|אוכל|נוכל|אני יכול) לעז�
 HOW_ARE_YOU = re.compile(r"מה נשמע|מה קורה|איך הולך|מה שלומ|how are you|how is it going|how's it going|whats up|what's up|wassup", re.I)
 # 1 Oct evening: the bot asks it itself on the representative tap
 # (n8n_whatsapp_rephello.py), so its own forms count too.
-BOT_HAY = re.compile(HOW_ARE_YOU.pattern + r"|איך אתה|איך את(?=[\s,.!?]|$)|מה איתך|איך עובר", re.I)
+# 4 Oct: one copy, the `rephay` guard's (n8n_whatsapp_retry.HAY_ALT).
+BOT_HAY = R.HAY_PY
 
 
 def emojis(s):
@@ -417,7 +419,8 @@ def rubric(turn, res, ctx):
         if any(e not in ALLOWED_EMOJI for e in em):
             flag("emoji-off-list", h)
         rep = ctx.get("tap_kind") == "other"
-        if h.count("?") >= 2 and not (rep and BOT_HAY.search(h)):
+        # 4 Oct: the rep tap asks one question now too (how he is), so no exemption.
+        if h.count("?") >= 2:
             flag("two-questions", h)
         if len(h.split()) > 70:
             flag("long", h)
@@ -441,6 +444,8 @@ def rubric(turn, res, ctx):
                 flag("rep-no-hello", h)
             if not BOT_HAY.search(h):
                 flag("rep-no-how-are-you", h)
+            if REASK.search(h):
+                flag("rep-asks-how-to-help", h)
         elif BOT_HAY.search(h) and any(BOT_HAY.search(p) for p in ctx["prev_handsets"]):
             flag("how-are-you-again", h)
         if "מיכאל" in h:
@@ -706,8 +711,9 @@ opens with the greeting for the hour (before 12 בוקר טוב, before 17 צה�
 gives the name once; after the system's menu, or a tap on one of the first two buttons, there is no
 greeting and the name is given. The one exception is the third button, לדבר עם נציג: Michael
 answers it like a representative joining the chat, in one short message: "היי" (not the hour's
-greeting, which the menu already gave), a how-are-you, his name, and an open question about how he
-can help; the resident's answer to that how-are-you is not asked again. Mid-conversation there is
+greeting, which the menu already gave), his name, and a how-are-you as the one question (4 Oct);
+how he can help is asked after the resident answers, with a word about the answer, and the
+how-are-you is not asked again. Mid-conversation there is
 no name and no greeting unless the resident greeted first (then one back). Someone who already said what they need is not asked "how can I help" again. A finished
 matter ends with an offer to help with anything else; the one exception is the message that carries
 a payment link, which closes by saying the link is personal and to write here if anything is

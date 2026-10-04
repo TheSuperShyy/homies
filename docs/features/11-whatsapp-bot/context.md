@@ -203,6 +203,20 @@ the greeting table are unchanged; the replay of all 874 past replies shows it.
 What a resident sees after tapping it: "היי, מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?", in
 the model's words each time.
 
+## 4 Oct — the representative asks how you are, and only that
+
+Three days later the tap got "היי, אני מיכאל מהומי'ז. במה אוכל לעזור לך?" (execution 80740): the
+how-are-you was never written. The 1 Oct paragraph asked for two questions in one short message,
+beside the one-question rule, and Gemini kept one. The owner: *"hi this is michael from homies how
+are you doing today? something like that right?"*, one question. So the tap asks how he is and
+nothing else, and how to help comes after he answers (`scripts/n8n_whatsapp_rephay.py`, epoch
+72). A rule the model already skipped once gets a backstop: `rephay` on `Reply usable?` sends a
+tap reply with no how-are-you back once, and `Try again` names why. One copy of "the bot asked
+how he is" (`HAY_ALT` in n8n_whatsapp_retry.py) serves the guard, the QA rubric and `--watch`.
+
+What a resident sees now: "היי, כאן מיכאל מהומי'ז 🙂 מה שלומך?", and after "טוב תודה", "שמח
+לשמוע! במה אוכל לעזור לך היום?".
+
 ## 1 Oct, evening — one person, in the singular
 
 The owner noticed the bot writing "במה אוכל לעזור לכם?" to one person: *"it still uses how can i

@@ -2822,7 +2822,9 @@ all, so no address rule can go stale in them.
 **Two questions asked for in one message lose one (4 Oct).** The WhatsApp rep paragraph asked for
 "how are you" and "how can I help" in one short message, next to the one-question rule; Gemini
 dropped the how-are-you. When a turn needs two things asked, ask one and let the other follow
-the answer.
+the answer. Since 4 Oct the WhatsApp rep tap asks how he is and nothing else, and a `rephay`
+guard sends a tap reply with no how-are-you back once (epoch 72): a rule the model has already
+skipped once gets a backstop, not a louder sentence.
 
 **gpt-4.1 says the prompt's own words; write rules as what to do, not as a line (4 Oct).** "אין
 פנייה ואין שכנוע: מילה קצרה שהבנת" came back on a call as "הבנתי, אין פנייה.", word for word.

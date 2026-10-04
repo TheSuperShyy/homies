@@ -372,6 +372,7 @@
     {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
     {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
     {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that (4 Oct)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "called", "tool": "notify_team"},
     {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
@@ -380,7 +381,7 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), the name Michael, and a how-are-you as the one question, in one short message, with how he can help left for after the resident answers?",
     "dispute_to_team: is the team told via the tool before the reply says so, and nothing promised?",
     "goodbye: warm close without a question?"
    ]
@@ -808,6 +809,7 @@
     {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
     {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
     {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that (4 Oct)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "called", "tool": "notify_team"},
     {"type": "not_called", "tool": "open_request", "name": "a dispute is a note, not a ticket"},
@@ -816,7 +818,7 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), the name Michael, and a how-are-you as the one question, in one short message, with how he can help left for after the resident answers?",
     "gender: the tap shows nothing, so the reply to it is masculine or in words that fit both; from 'אני חושבת' on, is she addressed in the feminine or in words that fit both, never the masculine, never the plural?",
     "dispute_to_team: is the team told via the tool before the reply says so, and nothing promised?",
     "goodbye: warm close without a question?"
@@ -843,15 +845,17 @@
     {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
     {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
     {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that (4 Oct)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "'fine, thanks' is not asked again"},
+    {"type": "turn_regex", "turn": 2, "regex": "לעזור|לעשות בשביל|how can i help|what can i do", "name": "after he answers, how to help is asked (4 Oct)"},
     {"type": "turn_not_regex", "turn": 2, "regex": "^\\W*(היי|הי|שלום|בוקר טוב|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no second hello"},
     {"type": "called", "tool": "get_service_info"},
     {"type": "bot_not_regex", "regex": "פעם בשבוע|פעמיים בשבוע|כל יום|פעם בשבועיים|פעם בחודש", "name": "no frequency invented"},
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), the name Michael, and a how-are-you as the one question, in one short message, with how he can help left for after the resident answers?",
     "fine_thanks: after 'טוב תודה', a short warm word and an open question about what he needs, with no second hello and no second how-are-you?",
     "facts_only: does the cleaning answer carry only the tool's facts, with no frequency guessed?",
     "goodbye: warm close without a question?"
@@ -879,15 +883,17 @@
     {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
     {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
     {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that (4 Oct)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "after he answered, how-are-you is not asked again"},
+    {"type": "turn_regex", "turn": 2, "regex": "לעזור|לעשות בשביל|how can i help|what can i do", "name": "after he answers, how to help is asked (4 Oct)"},
     {"type": "turn_not_regex", "turn": 2, "regex": "^\\W*(היי|הי|שלום|בוקר טוב|צהריים טובים|ערב טוב)(?=[\\s,.!]|$)", "name": "no second hello"},
     {"type": "called", "tool": "open_request"},
     {"type": "bot_not_regex", "regex": "בהקדם|בקרוב|אל דאגה|מטפל בזה", "name": "no promise after the ticket"},
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), the name Michael, and a how-are-you as the one question, in one short message, with how he can help left for after the resident answers?",
     "and_you: does 'and you?' get a short, warm answer about Michael himself, then an open question about what he needs, with no second how-are-you?",
     "ticket: building and apartment in one question, then the ticket with its number, nothing promised?",
     "goodbye: warm close without a question?"
@@ -914,6 +920,7 @@
     {"type": "turn_regex", "turn": 1, "regex": "^\\W*(היי|הי)(?=[\\s,.!]|$)", "name": "the tap opens with היי"},
     {"type": "turn_regex", "turn": 1, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "the tap asks how he is"},
     {"type": "turn_regex", "turn": 1, "regex": "מיכאל", "name": "the tap gives the name"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "במה (אפשר|אוכל|נוכל|אני יכול) לעזור|איך (אפשר|אוכל|אני יכול) לעזור", "name": "the tap asks how he is, and only that (4 Oct)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "בוקר טוב|צהריים טובים|ערב טוב", "name": "the menu's hour greeting is not repeated"},
     {"type": "turn_not_regex", "turn": 2, "regex": "מה שלומ|מה נשמע|איך אתה|איך את(?=[\\s,.!?]|$)|מה איתך|איך עובר", "name": "how-are-you is not asked again"},
     {"type": "turn_not_regex", "turn": 2, "regex": "במה (אפשר|אוכל) לעזור|איך אפשר לעזור", "name": "the matter is taken up, not 'how can I help' again"},
@@ -922,7 +929,7 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), a how-are-you, the name Michael, and an open question about how he can help that fits a payer, an asker and a fault alike, in one short message?",
+    "rep_open: does the reply to the tap read like a representative joining the chat: a 'היי' (not the hour's greeting the menu already gave), the name Michael, and a how-are-you as the one question, in one short message, with how he can help left for after the resident answers?",
     "matter_at_once: her answer carried the matter; does the next reply go straight to it (a short human word, then building and apartment in one question), with no second how-are-you?",
     "ticket: then the ticket with its number, nothing promised?",
     "goodbye: warm close without a question?"

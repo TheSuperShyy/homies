@@ -203,7 +203,15 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 71
+MEMORY_EPOCH = 72
+# 71 -> 72, 4 Oct: the representative asks how you are, and only that. The owner,
+# on execution 80740 ("היי, אני מיכאל מהומי'ז. במה אוכל לעזור לך?"): *"didnt i
+# told you to make michael to be hi this is michael from homies how are you doing
+# today?"*. The 1 Oct paragraph asked for two questions in one message beside the
+# one-question rule, and the model kept one. Now: hi, the name, how he is, and
+# that is the only question; how to help after he answers. A `rephay` guard on
+# `Reply usable?` sends a tap reply with no how-are-you back once. Every buffer
+# holds tap replies that asked how to help first. Carrier: n8n_whatsapp_rephay.py.
 # 70 -> 71, 1 Oct evening: the representative says hi. Owner, on the reply to
 # his לדבר עם נציג tap ("כאן מיכאל מהומי'ז! 😊 במה אוכל לעזור לך?", execution
 # 74529, where Send's greeting filter had cut the model's "היי, "): *"the agent
@@ -665,7 +673,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "98ada1b25f27",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "c056ecfc373b",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
