@@ -294,8 +294,10 @@ PRONUNCIATION = [
 # the pause the voice-DNA files prize — and at the end of the turn it is the
 # margin that keeps the teardown out of the last word.
 #
-# These rules run LAST. Everything above deletes or rewrites words, and a rule
-# that ran after this one could eat the tag it just appended.
+# These rules run last in the guard. Everything above deletes or rewrites words,
+# and a rule that ran after this one could eat the tag it just appended. The one
+# rule after them (since 4 Oct, incoming only) is vapi_set_voice.py's emotion tag,
+# which only inserts at the start of a chunk and so cannot touch a pad.
 PAD = ' <break time="300ms"/>'
 PAD_RULES = [
     {"type": "regex", "regex": r"\.\s*$", "value": "." + PAD},
@@ -323,7 +325,9 @@ def replacements():
     # way round that cannot happen.
     out += [{"type": "exact", "key": k, "value": v, "replaceAllEnabled": True}
             for k, v in PRONUNCIATION]
-    # Tail padding last — see PAD_RULES above. After this point nothing may run.
+    # Tail padding last — see PAD_RULES above. After this point nothing may delete;
+    # vapi_set_voice.py appends one insert-only rule (the emotion tag) on the
+    # incoming agent.
     out += PAD_RULES
     return out
 

@@ -2819,6 +2819,17 @@ was the cap (now two or three, always with a warm word, one question a turn) and
 sentence, not new rules. Lines that play with no model turn (idle, tool-wait) carry no "you" at
 all, so no address rule can go stale in them.
 
+**gpt-4.1 says the prompt's own words; write rules as what to do, not as a line (4 Oct).** "אין
+פנייה ואין שכנוע: מילה קצרה שהבנת" came back on a call as "הבנתי, אין פנייה.", word for word.
+A rule that names a phrase, or asks for "a short word", gets that phrase. The double-check
+reshaped six such sentences, and the incoming agent now sends nobody to the office for what it
+does not know (paragraph 4 always said callers are sent nowhere).
+
+**The voice is `vapi_set_voice.py`'s; prompt pushes keep it (4 Oct).** `vapi_sync.py --keep-voice`
+leaves the live voice out of the PATCH, so a failed or forgotten voice step never leaves a line
+on the stock voice. The emotion tag rule is `^(?=\s*\S)`: insert-only, after the guard, and never
+on an empty chunk.
+
 **Each Hebrew agent has its own voice since 2 Oct** (`AGENT_VOICE` in `vapi_set_voice.py`). The
 owner chose A, happy, at 0.8 for the incoming line and left the debt call on `ba765d50`. Emotion
 reaches Cartesia as an inline tag put on every chunk by a formatPlan replacement, the one hook

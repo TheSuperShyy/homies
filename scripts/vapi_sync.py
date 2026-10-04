@@ -9,6 +9,16 @@ silently — edit the markdown and re-run this instead.
     python scripts/vapi_sync.py debt --apply      # write it
     python scripts/vapi_sync.py inbound --apply
 
+    N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply
+                                                  # everything but the voice (4 Oct)
+
+--keep-voice leaves the live voice as it is when updating an existing assistant.
+The voice is vapi_set_voice.py's (per agent, AGENT_VOICE); this script's inbound
+build would write the stock Eyal voice, so a prompt push without the flag leaves
+the line on Eyal until vapi_set_voice.py runs. Run it from Git Bash: in PowerShell
+an empty N8N_BASE_URL is deleted, load_env() refills it from .env, and every tool
+points at n8n. The dry run's `tools :` line must end in [supabase].
+
 Reads VAPI_PRIVATE_KEY from .env. Never takes a key on the command line.
 """
 
@@ -281,7 +291,7 @@ BASE = {
                     # a man, a woman and both agents.
                     "אין לחץ, אני כאן.",
                     "אני עדיין על הקו, בלי לחץ.",
-                    "אני פה, מחכה בסבלנות.",
+                    "אני פה, כמה זמן שצריך.",
                 ],
         # Eight seconds. Long enough that someone reading an apartment number
         # off a door is not interrupted, short enough that it lands before the
@@ -1163,6 +1173,14 @@ def main():
                                   "hold the whole call with an answering machine"))
 
     print("target        : %s" % (("update " + existing[0]["id"]) if existing else "create new"))
+
+    # 4 Oct: the voice belongs to vapi_set_voice.py now (each agent its own). Leaving
+    # it out of the PATCH keeps the live one, so a failed or forgotten voice step can
+    # never leave the line on the stock voice this build carries. A new assistant
+    # still needs one, so it is only dropped on an update.
+    if "--keep-voice" in sys.argv and existing:
+        payload.pop("voice", None)
+        print("voice         : NOT SENT (--keep-voice); the live voice stays")
 
     if not apply_it:
         print("\nDry run. Re-run with --apply to write.")

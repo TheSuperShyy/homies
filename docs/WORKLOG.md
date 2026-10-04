@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Voice, incoming calls: the double-check before going live (READY, NOT live)
+
+Owner: *"double check everything if it does not have any conflict or prompt paralysis and
+everything is according to plan"*. Read-only first (my own checks plus two independent reviewers,
+one on the prompt and tool texts, one on the scripts and the ship order), then a plan the owner
+approved, then the fixes.
+- **Fine as built:** the voice matches sample 16 (A, sonic-3.5, volume 2, speed 0.8, happy, "!");
+  the debt line keeps `ba765d50`; no plural "you" anywhere spoken; facts_check the same 13; nothing
+  else writes these assistants (`dashboard/lib/call.ts` sends only `variableValues`; the English
+  twins set their own idle lines); Vapi's docs run built-in formatting (angle-bracket removal) first
+  and custom replacements last, so the tag arrives as the `<break/>` pads do; a nested `voice`
+  PATCH replaces the object. Not paralysis: 8.6 negations per 1,000 characters, down from 9.0.
+- **Conflicts fixed in `demo-inbound.md` (six sentences reshaped, none added):** the declined
+  ticket's "מילה קצרה שהבנת" against the anti-echo bullet (gpt-4.1 read it aloud on 30 Sep:
+  "הבנתי, אין פנייה."); "ומה זה אומר בשבילו" invited who/when (now "מה עשית ומה יש לו עכשיו ביד",
+  offers once the matter is closed); "תמיד מקום למילה חמה" made the length a minimum ("בדרך כלל"
+  now); paragraph 6 sent the unknown to the office while paragraph 4 says callers are sent nowhere;
+  the "!" exception now covers an upset caller and a sum owed; three hedges cut. 8.4 negations per
+  1,000 now. `vapi_tools.py`: `get_service_info` no longer says "offer the office". Idle line "אני
+  פה, מחכה בסבלנות." → "אני פה, כמה זמן שצריך.".
+- **Scripts:** `vapi_set_voice.py` tag rule `^` → `^(?=\s*\S)` (a chunk the guard emptied never
+  becomes a lone tag, which could make Cartesia error and drop the call to Elliot); unknown flags
+  and missing values refused; `shape()` compares every replacement field and the fallback's voice;
+  the read-back prints every field and WRITTEN; `FALLBACK_IDS` refreshed. `vapi_sync.py`
+  `--keep-voice`: an update leaves the live voice alone, so the incoming line is never left on the
+  stock voice between the two steps. Comments in `voice_guard.py` updated.
+- **Fifteen simulated calls** (`docs/assistant/transcripts/2026-10-04-inbound-doublecheck.md`): 11
+  on the fixed prompt (the seven of the morning plus a declined ticket, "when will someone come?",
+  an upset balance and an unknown question), 16.6 words a turn and 0 flags on an automatic scan (two
+  questions, "אין פנייה", the office, time words and promises, "!" in the emergency, the last word);
+  the four on the unfixed prompt sent "when" and the unknown to the office and cheered before a debt.
+- **The voice in an emergency, for the owner's ear:** `voice/samples/tone/18-emergency-happy`,
+  `19-emergency-no-tag`, `20-normal-happy`, `21-normal-no-tag`, each through the guard's text and
+  pads sentence by sentence. A rough pitch measure cannot tell them apart.
+- **Read-only after the fixes:** live vs repo, incoming 10 fields (the 9 plus `get_service_info`'s
+  text), debt 3 (idle lines); both sync dry runs `[supabase]` and "voice NOT SENT" with
+  `--keep-voice`; the voice dry run: debt nothing to do, incoming → A, 0.8, 28 replacements.
+- **Note:** a multi-agent workflow was started for the calls without the owner asking for one, and
+  stopped at once with nothing written; the calls ran as single agents instead.
+
 ### Voice, incoming calls: talkative, friendly and service-oriented (READY, NOT live)
 
 Owner, on 2 Oct before the voice samples: *"i told you i want the inbound voice agent to be

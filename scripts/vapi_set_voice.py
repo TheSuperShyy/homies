@@ -8,7 +8,13 @@ r"""Change ONLY the voice on the live Hebrew assistants, touching nothing else.
                                                       # the incoming line back to the 31 Aug clone
     python scripts/vapi_set_voice.py --voice a976c076-3e31-4bf2-a178-8c3ce3d52b2a --plain --apply   # rollback to Eyal
 
-Since 2 Oct each agent has its own voice, speed and emotion tag (AGENT_VOICE).
+Since 2 Oct each agent has its own voice, speed and emotion tag (AGENT_VOICE), and
+this script writes all of them: the voice id, the volume, the speed and the tag
+rule. Since 4 Oct a prompt push runs `vapi_sync.py <agent> --keep-voice --apply`,
+which leaves the live voice alone, and then this script; without --keep-voice the
+inbound sync writes the stock Eyal voice and this script must follow at once.
+Flags: --apply, --plain, --agent inbound|debt, --voice <id>, --volume <n>;
+anything else is refused.
 
 WHY NOT `vapi_sync.py <agent> --apply`, WHICH IS THE OBVIOUS ANSWER
 
@@ -74,9 +80,10 @@ UA = "curl/8.5.0"
 # A hardcoded id is a fact about one account; the name is a fact about the
 # agent, and this script's whole job is to run straight after that sync.
 NAMES = ["Debt Follow-up (he)", "Inbound Intake (he)"]
+# Refreshed 4 Oct to the account the key opens now; the August ids 404'd.
 FALLBACK_IDS = {
-    "Debt Follow-up (he)": "14d502fc-95a9-4fb1-8d93-944dd7e00211",
-    "Inbound Intake (he)": "8894680c-03af-43f6-a75b-f828872833cc",
+    "Debt Follow-up (he)": "a34f2564-3694-4213-b44a-1535b8b627c4",
+    "Inbound Intake (he)": "4cbbcbe7-3e5e-4bd8-b4b3-024bd56f7187",
 }
 
 
@@ -84,7 +91,8 @@ def targets(vapi_key):
     """(label, id) per Hebrew assistant, from whatever account the key opens."""
     try:
         live = vapi("GET", "/assistant?limit=100", vapi_key)
-    except SystemExit:
+    except SystemExit as e:
+        print("Listing the assistants failed (%s); using FALLBACK_IDS." % str(e)[:200])
         live = []
     found = []
     for name in NAMES:
@@ -125,9 +133,13 @@ AGENT_FLAG = {"debt": "Debt Follow-up (he)", "inbound": "Inbound Intake (he)"}
 
 
 def emotion_rule(emotion):
-    # `^` is zero-width: it puts the tag in front of each chunk and removes nothing.
-    # Appended after the guard, so no deletion rule can reach it.
-    return {"type": "regex", "regex": "^", "value": '<emotion value="%s"/>' % emotion}
+    # Zero-width: it puts the tag in front of a chunk and removes nothing. Vapi runs
+    # its own formatting (angle-bracket removal included) first and custom
+    # replacements last, so the tag reaches Cartesia, as the <break/> pads do.
+    # Appended after the guard, so no deletion rule can reach it. The lookahead
+    # (4 Oct) keeps a chunk the guard emptied empty: a lone tag with no words
+    # could make Cartesia error, and Vapi would fall to Elliot for the call.
+    return {"type": "regex", "regex": r"^(?=\s*\S)", "value": '<emotion value="%s"/>' % emotion}
 
 
 def build_voice(vid, spec):
@@ -140,19 +152,50 @@ def build_voice(vid, spec):
     return voice
 
 
+def rep_key(r):
+    """One replacement as everything that decides what it does."""
+    return (r.get("type"), r.get("regex") if r.get("type") == "regex" else r.get("key"),
+            r.get("value"), bool(r.get("replaceAllEnabled")),
+            tuple(sorted((o.get("type"), bool(o.get("enabled"))) for o in (r.get("options") or []))))
+
+
+def reps_of(v):
+    return [rep_key(r) for r in
+            ((((v.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or [])]
+
+
 def shape(v):
     """What this script owns in a voice, in a form a live read and a build share."""
-    reps = (((v.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or []
     fb = ((v.get("fallbackPlan") or {}).get("voices") or [{}])[0]
     return {
+        "provider": v.get("provider"),
         "voiceId": v.get("voiceId"),
         "model": v.get("model"),
+        "language": v.get("language"),
         "volume": (v.get("generationConfig") or {}).get("volume"),
         "speed": (v.get("generationConfig") or {}).get("speed"),
-        "experimentalControls": v.get("experimentalControls"),
-        "replacements": [(r.get("regex"), r.get("value")) for r in reps],
-        "fallback": len((((fb.get("chunkPlan") or {}).get("formatPlan") or {}).get("replacements")) or []),
+        "experimentalControls": v.get("experimentalControls") or None,
+        "replacements": reps_of(v),
+        "fallback": (fb.get("provider"), fb.get("voiceId"), reps_of(fb)),
     }
+
+
+def report(have, want, readback=False):
+    """Every field shape() reads; a dry run shows `-> want`, a read-back OK or MISMATCH."""
+    def mark(same, target):
+        if readback:
+            return "   OK" if same else "   MISMATCH (sent %s)" % (target,)
+        return "" if same else "   -> %s" % (target,)
+    for k in ("provider", "voiceId", "model", "language", "volume", "speed", "experimentalControls"):
+        print("  %-21s %s%s" % (k, have[k], mark(have[k] == want[k], want[k])))
+    extra = [r[2] for r in want["replacements"] if r not in have["replacements"]]
+    gone = [r[2] for r in have["replacements"] if r not in want["replacements"]]
+    same = have["replacements"] == want["replacements"]
+    print("  %-21s %d%s" % ("replacements", len(have["replacements"]),
+                            mark(same, "%d (+%s, -%s)" % (len(want["replacements"]), extra, gone))))
+    hf, wf = have["fallback"], want["fallback"]
+    print("  %-21s %s %s, %d replacements%s" % ("fallback", hf[0], hf[1], len(hf[2]),
+                                               mark(hf == wf, "%s %s, %d" % (wf[0], wf[1], len(wf[2])))))
 
 
 def env_value(name):
@@ -188,25 +231,46 @@ def visible_to_credential(voice_id, cartesia_key):
         return False, "HTTP %s" % e.code
 
 
+BOOL_FLAGS = ("--apply", "--plain")
+VALUE_FLAGS = ("--agent", "--voice", "--volume")
+
+
+def parse(argv):
+    """Known flags only. A misspelled --plain in a rollback must stop, not be ignored."""
+    opts, i = {}, 0
+    while i < len(argv):
+        a = argv[i]
+        if a in BOOL_FLAGS:
+            opts[a] = True
+            i += 1
+        elif a in VALUE_FLAGS:
+            if i + 1 >= len(argv) or argv[i + 1].startswith("--"):
+                sys.exit("%s needs a value." % a)
+            opts[a] = argv[i + 1]
+            i += 2
+        else:
+            sys.exit("Unknown argument %r. Known: %s" % (a, " ".join(BOOL_FLAGS + VALUE_FLAGS)))
+    return opts
+
+
 def main():
-    args = sys.argv[1:]
-    apply_it = "--apply" in args
+    opts = parse(sys.argv[1:])
+    apply_it = opts.get("--apply", False)
     # Volume: the flag wins, then .env, then the builder's default (1.4).
-    if "--volume" in args:
-        os.environ["CARTESIA_VOLUME"] = args[args.index("--volume") + 1]
+    if "--volume" in opts:
+        os.environ["CARTESIA_VOLUME"] = opts["--volume"]
     else:
         os.environ.setdefault("CARTESIA_VOLUME", env_value("CARTESIA_VOLUME") or "1.4")
     os.environ.setdefault("CARTESIA_MODEL", env_value("CARTESIA_MODEL") or "sonic-3.6")
     only = None
-    if "--agent" in args:
-        flag = args[args.index("--agent") + 1]
-        if flag not in AGENT_FLAG:
+    if "--agent" in opts:
+        if opts["--agent"] not in AGENT_FLAG:
             sys.exit("--agent takes %s" % " or ".join(sorted(AGENT_FLAG)))
-        only = AGENT_FLAG[flag]
+        only = AGENT_FLAG[opts["--agent"]]
     # --voice overrides the id for the agents selected (a rollback names one);
     # --plain drops the agent's speed and emotion with it, back to the bare clone.
-    override = args[args.index("--voice") + 1] if "--voice" in args else None
-    plain = "--plain" in args
+    override = opts.get("--voice")
+    plain = opts.get("--plain", False)
 
     vapi_key = env_value("VAPI_PRIVATE_KEY")
     if not vapi_key:
@@ -253,16 +317,7 @@ def main():
         lv = vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {}
         have = shape(lv)
         print("\n%-22s %s" % (label, aid))
-        for k in ("voiceId", "model", "volume", "speed", "experimentalControls"):
-            print("  %-21s %s%s" % (k, have[k], "" if have[k] == want[k] else "   -> %s" % want[k]))
-        extra = [r for r in want["replacements"] if r not in have["replacements"]]
-        gone = [r for r in have["replacements"] if r not in want["replacements"]]
-        print("  %-21s %d%s" % ("replacements", len(have["replacements"]),
-                                "" if have["replacements"] == want["replacements"] else
-                                "   -> %d (+%s, -%s)" % (len(want["replacements"]),
-                                                         [r[1] for r in extra], [r[1] for r in gone])))
-        print("  %-21s %d%s" % ("fallback replacements", have["fallback"],
-                                "" if have["fallback"] == want["fallback"] else "   -> %d" % want["fallback"]))
+        report(have, want)
         if have != want:
             changed.append((label, aid, voice, want))
 
@@ -278,14 +333,12 @@ def main():
     for label, aid, voice, want in changed:
         vapi("PATCH", "/assistant/" + aid, vapi_key, {"voice": voice})
         got = shape(vapi("GET", "/assistant/" + aid, vapi_key).get("voice") or {})
-        print("\n%s" % label)
-        for k in ("voiceId", "volume", "speed"):
-            print("  %-7s %s   %s" % (k, got[k], "OK" if got[k] == want[k] else "MISMATCH"))
-        print("  replacements %d, fallback %d   %s" % (
-            len(got["replacements"]), got["fallback"],
-            "OK" if (got["replacements"], got["fallback"]) == (want["replacements"], want["fallback"]) else "MISMATCH"))
+        print("\n%s, read back" % label)
+        report(got, want, readback=True)
         if got != want:
-            sys.exit("Read-back does not match what was sent. Stop and check by hand.")
+            sys.exit("Read-back of %s does not match what was sent (MISMATCH above). "
+                     "Stop and check by hand." % label)
+        print("WRITTEN %s" % label)
 
     print("\nWritten and read back. That proves the field is set, not that it sounds\n"
           "right -- a voice Vapi cannot resolve fails silently to Elliot at call time.\n"
