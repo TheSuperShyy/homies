@@ -21,9 +21,14 @@ reaction "כמו שחבר היה מגיב" (the way a friend would react).
 WHAT CHANGES, in one write. The text is owned by prompt.md; this only carries it:
   - The prompt (docs/features/11-whatsapp-bot/prompt.md): a fault gets "תגובה קצרה
     ואכפתית של בן אדם לדבר עצמו" (a short, caring human reaction to the thing
-    itself), and the example list reads "אוקיי", "אין בעיה", "אוי, לא נעים". Nothing
-    is banned: the 17 Sep note in HANDOVER.md says a ban on the opening word
-    fought the rule that asks for one, and lost. MEMORY_EPOCH 72 -> 73: every
+    itself), and the example list reads "אוקיי", "אין בעיה", "אוי, לא נעים". Those
+    two alone took a blind replay of 27 reaction turns from 13 irritated openings
+    to 7, with "אוף, איזה מעצבן" left for the angriest resident. So one sentence
+    after the list names it: "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן",
+    גם כשהוא כועס" (care for him, not irritation; even when he is angry). The
+    warm word itself stays required: the 17 Sep note in HANDOVER.md says a ban on
+    the opening word fought the rule that asks for one, and lost; this bans two
+    words inside it, with the caring one listed. MEMORY_EPOCH 72 -> 73: every
     buffer holds replies that open with "איזה מעצבן", and an example beats a rule.
 
 WHAT IT DOES NOT TOUCH. Send, the guards, Try again, the menu, Sort, the inject,
@@ -61,8 +66,9 @@ NL = chr(10)
 
 # The two edits, as they read before and after. The new prompt must hold the
 # new fragments and neither old one, or this refuses.
-GONE = ("כמו שחבר היה מגיב", "\"איזה מעצבן\"")
-KEPT = ("תגובה קצרה ואכפתית של בן אדם לדבר עצמו", "\"אוקיי\", \"אין בעיה\", \"אוי, לא נעים\"")
+GONE = ("כמו שחבר היה מגיב", "\"אוקיי\", \"אין בעיה\", \"איזה מעצבן\"")
+KEPT = ("תגובה קצרה ואכפתית של בן אדם לדבר עצמו", "\"אוקיי\", \"אין בעיה\", \"אוי, לא נעים\"",
+        "היא אכפתיות כלפיו ולא עצבים: לא \"אוף\" ולא \"מעצבן\", גם כשהוא כועס.")
 
 
 def node_of(by, name):
@@ -140,8 +146,8 @@ def main():
         olds.append(have)
         news.append(prompt)
         changes.append("Answer the resident: prompt %s -> %s (a short, caring word before the "
-                       "question; the example \"איזה מעצבן\" is now \"אוי, לא נעים\")"
-                       % (OLD_PROMPT, W.epoch_hash(prompt)))
+                       "question; the example \"איזה מעצבן\" is now \"אוי, לא נעים\"; no \"אוף\", "
+                       "no \"מעצבן\")" % (OLD_PROMPT, W.epoch_hash(prompt)))
 
     # The memory: every buffer holds replies that open with "איזה מעצבן".
     mem = by["Conversation so far"]["parameters"]

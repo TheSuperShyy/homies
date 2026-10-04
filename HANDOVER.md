@@ -297,9 +297,9 @@ its stated time.
   - **Dashboard reaches Vercel only on the owner's say** (a single cherry-pick to `main`).
 - **(Done, LIVE 4 Oct 08:35 UTC.) PAUSED 2 Oct, owner: the incoming-call agent should be "talkative, friendly and service oriented".** He raised it, then said *"ok pause"* and asked about the voice instead. Nothing changed in `demo-inbound.md`; the turn-length bullet ("משפט אחד או שניים קצרים") is the first thing to look at when he picks it up.
 - **OPEN 2 Oct: the WhatsApp bot uses more emoji since the singular (1 Oct 13:02).** 8 of its last 14 replies (57%; the rule asks about 2 in 5), 5 right after another, and 2 off-list sad faces (😕, 😔). The emoji paragraph did not change. Offered a Send filter (only 🙂 😊 🙏 👍 💪 🤝, none right after one) or a prompt line; waiting on the owner.
-- **PREPARED 4 Oct evening, NOT LIVE (owner: "can we edit the ugh how annoying remarks it does not fit the chatbot at all"): the calm-word prompt change.** The repo is AHEAD of live:
-  - `docs/features/11-whatsapp-bot/prompt.md` has "תגובה קצרה ואכפתית של בן אדם לדבר עצמו" and the example "אוי, לא נעים" where "איזה מעצבן" was.
-  - `n8n_whatsapp.py` says MEMORY_EPOCH 73 and prompt 82aba926c6cd. Live is still epoch 72 and prompt c056ecfc373b.
+- **PREPARED 4 Oct evening, NOT LIVE YET, owner's go given ("live it"): the calm-word prompt change.** The owner asked "can we edit the ugh how annoying remarks it does not fit the chatbot at all". The apply follows the blind replay of the firmer wording (scratchpad `calmword_replay_z`); this line flips to LIVE once it is written. The repo is AHEAD of live:
+  - `docs/features/11-whatsapp-bot/prompt.md` has "תגובה קצרה ואכפתית של בן אדם לדבר עצמו" and the example "אוי, לא נעים" where "איזה מעצבן" was, plus "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן", גם כשהוא כועס."
+  - `n8n_whatsapp.py` says MEMORY_EPOCH 73 and prompt 65c56f9d9c40. Live is still epoch 72 and prompt c056ecfc373b.
   - The pin in `check_whatsapp_rules.py` stays on the live value until the apply, so the check on live stays green (it is green now).
 
   **Do not run any WhatsApp patcher with --apply before the owner's go**, because a carrier would ship this.

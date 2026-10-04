@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp bot: the calm-word change, firmer, with the owner's go ("live it")
+
+- **The blind replay of the first wording.** It was run on the 27 reaction turns from today's
+  runs, with irritated openings ("אוף" or "מעצבן") counted. The old prompt had 13; the new had 7.
+  It worked for the lift, the intercom and Esther. "אוף, איזה מעצבן" stayed for the angry man at
+  the gate and "אוף, זה באמת מעצבן" for Dalia.
+- **One sentence was added after the example list:** "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא
+  "מעצבן", גם כשהוא כועס." The prompt hash is now 65c56f9d9c40, and the carrier's KEPT and
+  EPOCH_COVERS were updated; the epoch is still 73, since nothing is live yet.
+- **The gate on that candidate:** 207 green, the replay unchanged, only the pin red (by design),
+  and patchers at the baseline.
+- **The owner's go.** "live it and run 3 scenario in each menu button". The apply follows the
+  replay of this wording (Z). After it come 9 Claude-played conversations on live, 3 per button,
+  reusing the cards where "מעצבן" came up.
+
 ### WhatsApp bot: "איזה מעצבן" out of the prompt's examples, prepared (NOT live, waits on the owner)
 
 Owner, after reading the 15 conversations: *"can we edit the ugh how annoying remarks it does

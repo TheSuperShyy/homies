@@ -2585,8 +2585,11 @@ prompt:
   carried it.
 - **"כמו שחבר היה מגיב" invites a friend's "אוף".**
 
-The fix is the example and the framing, not a ban: on 17 Sep a ban on the opening word fought
-the rule that asks for one. **A ticket's status and urgency are the team's (owner, same message).**
+The first fix changed only the example and the framing, because on 17 Sep a ban on the opening
+word fought the rule that asks for one. In a blind replay that halved the irritated openings
+(13 to 7 of 27) but left "אוף, איזה מעצבן" for the angriest resident. A feel described in the
+prompt moves the average; a word the owner wants gone "at all" has to be named. So one sentence
+names "אוף" and "מעצבן", with the caring word still required and listed. **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

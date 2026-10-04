@@ -210,8 +210,11 @@ MEMORY_EPOCH = 73
 # "איזה מעצבן" among its examples of that word and asked for a reaction "the way a
 # friend would react"; the bot said "איזה מעצבן" in 6 of 15 conversations and once
 # "אוף, איזה מעצבן". The example is now "אוי, לא נעים" and the reaction "short and
-# caring". Every buffer holds replies that open with "איזה מעצבן". Carrier:
-# n8n_whatsapp_calmword.py.
+# caring". That alone took a blind replay of 27 reaction turns from 13 to 7, with
+# "אוף, איזה מעצבן" left for the angriest resident, so one sentence names it: the
+# word is care for him, not irritation, no "אוף" and no "מעצבן", even when he is
+# angry (the owner's "it does not fit at all"). Every buffer holds replies that
+# open with "איזה מעצבן". Carrier: n8n_whatsapp_calmword.py.
 # 71 -> 72, 4 Oct: the representative asks how you are, and only that. The owner,
 # on execution 80740 ("היי, אני מיכאל מהומי'ז. במה אוכל לעזור לך?"): *"didnt i
 # told you to make michael to be hi this is michael from homies how are you doing
@@ -681,7 +684,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "82aba926c6cd",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "65c56f9d9c40",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
