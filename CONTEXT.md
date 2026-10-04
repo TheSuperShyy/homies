@@ -2577,6 +2577,14 @@ player is that person and reacts to the phone's text. Three lessons:
   answer" relies on that. This is inferred from how n8n's agent saves memory and from the note's
   wording, not measured.
 
+**A Hebrew translation of a report is a sibling file, `-hebrew.md`, not a rewrite in place
+(4 Oct).** `2026-10-04-whatsapp-menu-buttons-hebrew.md` sits next to the English original. Drop
+the italic English gloss under each already-Hebrew line (no longer needed once the whole document
+reads in one language); keep a line exactly as it was actually typed when that is itself the
+point (Sarah's English messages in conversation 4 stay English — the finding is that English in
+got Hebrew out). **It is a translation, not a second source of truth**: if the English report is
+edited, the Hebrew one goes stale silently, because nothing regenerates it.
+
 **4 Oct evening: the warm word is caring, not irritated (owner).** Reading the 15 conversations,
 the owner said "איזה מעצבן" and "אוף" do not fit the bot at all. The word before the question is
 care for the resident; it is not the bot getting annoyed alongside them. Two causes were in the

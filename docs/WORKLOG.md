@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Hebrew translation of the three-buttons QA report
+
+Owner, pasting the filename of the 4 Oct menu-buttons report: "give me the hebrew version of
+this." Read the full English doc (1065 lines: the 15 free-resident conversations, the findings,
+the checker's own false positives) and wrote a full Hebrew counterpart,
+`docs/assistant/transcripts/2026-10-04-whatsapp-menu-buttons-hebrew.md`, same folder, `-hebrew`
+suffix. Everything that was English prose (the summary, the findings, every "My read") is now
+Hebrew; everything that was already Hebrew dialogue stayed as it was; the italic English gloss
+line under each Hebrew message was dropped, since a reader of an all-Hebrew document does not
+need it restated in English. The one exception is Sarah's conversation (4): she typed in English
+and the bot answered in Hebrew, and that contrast is the finding, so her lines stayed English.
+It is a one-time translation, not a synchronized copy — if the English report changes, this one
+does not follow automatically. The housekeeping script auto-committed the new file
+(`b4f2bea`) without touching the briefing trio; this entry, plus the CONTEXT and HANDOVER notes
+alongside it, close that gap.
+
 ### WhatsApp bot: the calm-word change is LIVE (14:53 UTC), on the owner's "live it"
 
 - **Blind replay of the firmer wording (Z).** There were no irritated openings in the 27 reaction
