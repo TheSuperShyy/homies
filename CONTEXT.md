@@ -2819,6 +2819,11 @@ was the cap (now two or three, always with a warm word, one question a turn) and
 sentence, not new rules. Lines that play with no model turn (idle, tool-wait) carry no "you" at
 all, so no address rule can go stale in them.
 
+**A reply rule that ignores what was already said asks twice (4 Oct).** The incoming agent's "whoever
+asks how you are gets an answer and a question back" made Michael ask "how's your day going?" of a
+caller who had just said "I'm good, how are you" (the owner's call `01a10644`). What to ask depends on
+what the caller has not said yet, so the rule says that condition, not a fixed reply.
+
 **Two questions asked for in one message lose one (4 Oct).** The WhatsApp rep paragraph asked for
 "how are you" and "how can I help" in one short message, next to the one-question rule; Gemini
 dropped the how-are-you. When a turn needs two things asked, ask one and let the other follow

@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Incoming calls: "Hi, good morning … how can I help you today?", and "how are you" once (ready, NOT live)
+
+Owner: *"ok so the voice agent inbound is like good morning this is michel for homies how can i help
+you / it can be more warmer like / Hi good morning this michael from homies speaking, how can i help
+you today? / then if for example the person says hi / it should be like hi, how are you?"*
+- **His call at 09:35 UTC (`01a10644`):** the opener, then he said "hi im good how are you". Michael:
+  "איזה כיף לשמוע. אני בסדר גמור. תודה ששאלת." and "איך עובר עליך היום?", a second how-are-you to
+  someone who had just said he was good. Twelve seconds of silence, the idle line, he hung up.
+- **Opener** (`demo-inbound.md`, and its copy in `prompt_probe.py`, stale since 1 Oct): "היי, בוקר טוב!
+  מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?". היי for שלום in all four branches (alone before
+  05:00), a comma before the question as in his line, and היום.
+- **Small talk:** "hi" alone already got a greeting back and how he is. The sentence for a caller who
+  asks how Michael is said "and a question back" every time; it now asks back only while he has not
+  said how he is, and the next sentence (how Michael can help) takes the rest. Fence 6,583 → 6,616.
+- **Simulated calls** (`docs/assistant/transcripts/2026-10-04-inbound-hello.md`, 7, Claude-played):
+  "היי" → "היי! איזה כיף לשמוע אותְךָ! מה שלומְךָ?"; his own words → "אני מצוין, תודה ששאלתָּ! שמח
+  לשמוע שגם אצלְךָ הכל טוב! במה אני יכול לעזור לְךָ?"; a matter first gets no how-are-you; "הלו?" gets
+  a greeting and how he is; the feminine switch holds.
+- **Live vs repo:** exactly 2 fields (first message, prompt). Dry run: tools `[supabase]`, voice not
+  sent. **Ships on his "make it live":** `N8N_BASE_URL= python scripts/vapi_sync.py inbound
+  --keep-voice --apply` from Git Bash, read back; then his test call.
+
 ### WhatsApp: a "typing…" indicator, asked (proposal waits on the owner)
 
 Owner: *"can we add a typing behaviour in whatsapp?"* Read-only checks, nothing written:

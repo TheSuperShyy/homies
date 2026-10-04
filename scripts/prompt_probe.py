@@ -62,8 +62,8 @@ TARGETS = {
         # copy that is not kept in step automatically. Change one, change both
         # — a probe that opens with a line the agent no longer says is scoring
         # the wrong conversation.
-        "first": ('{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}שלום, בוקר טוב{% elsif h < 17 %}שלום, צהריים טובים{% else %}שלום, ערב טוב{% endif %}'
-                  ", מדבר מיכאל מהומיז. איך אני יכול לעזור לכם?"),
+        "first": ('{% assign h = "now" | date: "%H", "Asia/Jerusalem" | plus: 0 %}{% if h < 5 %}היי{% elsif h < 12 %}היי, בוקר טוב{% elsif h < 17 %}היי, צהריים טובים{% else %}היי, ערב טוב{% endif %}'
+                  "! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?"),
         "vars": {},
         "tools": "INTAKE_TOOLS",
     },
