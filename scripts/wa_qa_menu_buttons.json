@@ -3,11 +3,12 @@
  "defaults": {
   "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
   "open_request": {
-   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second ticket in the same conversation gets the next serial (255-1510-26 -> 255-1511-26).",
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second call with the same building and the same type returns the FIRST ticket's reference as `duplicate` (the ticket service's 30-minute duplicate guard: same building, same type, still open); a different type gets the next serial (255-1510-26 -> 255-1511-26).",
    "opened": {"ok": true, "opened": true, "reference": "<ticket>", "building": "בר כוכבא 23", "reporter_unit": "<the reporter_unit passed>"},
    "need_number": {"ok": true, "opened": false, "building_found": false, "reason": "need_number", "numbers_we_manage": ["23"], "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."},
    "street_unknown": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"},
-   "need_building": {"ok": true, "opened": false, "building_found": false, "reason": "need_building"}
+   "need_building": {"ok": true, "opened": false, "building_found": false, "reason": "need_building"},
+   "duplicate": {"ok": true, "reference": "<the first ticket's reference>", "duplicate": true}
   },
   "get_request_status": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []},
   "notify_team": {"ok": true, "notified": true},

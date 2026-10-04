@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp bot: 9 conversations on the live bot after the calm-word change, 3 per button
+
+The owner asked: "run 3 scenario in each menu button". The conversations are in `docs/assistant/transcripts/2026-10-04-whatsapp-menu-buttons-calmword.md`, with every
+message in Hebrew and English and a before and after of each first reaction.
+- **The run.** 9 Sonnet players on the live code, bundled read-only after 14:53 UTC (prompt
+  65c56f9d9c40). They reuse the morning's cards: lift, leak and gate; Dalia, Amit and Gilad;
+  Shimon, Esther and Dor.
+- **The result.** "מעצבן" and "אוף" appeared in 6 bot messages on these cards before and 0 of 62
+  after. The reactions now read "אוי, לא נעים", "אוי, חבל" and "זה באמת מלחיץ". Expectations were
+  56 of 57; the one failure is the check's own ("שיתקשרו" inside "you asked them to call you
+  today").
+- **Still open, all from the first report:**
+  - Send's `promise v2` cut 4 replies in 9. Three were wishes with "בקרוב". The fourth was the
+    bot's honest "אם ומתי יחזרו אליך אני לא יודע", so Shimon got only the next question and wrote
+    "you didn't answer".
+  - The stock "anything else?" set off Roni twice.
+  - The time standard got "3 days??" three times.
+  - "I can't tell you what to do" came twice (gas, leak).
+  - Two deeds false alarms; one rewrite lost "the photo is on your ticket".
+- **Harness fix.** The deck's open_request default and PLAYER.md now follow the ticket service's
+  30-minute duplicate guard: the same building and type return the first reference with
+  `duplicate: true`. The gas conversation's retry had re-called the tool and the stand-in minted
+  255-1518-26; production would have answered 255-1517-26 again.
+
 ### Hebrew translation of the three-buttons QA report
 
 Owner, pasting the filename of the 4 Oct menu-buttons report: "give me the hebrew version of

@@ -2599,7 +2599,21 @@ word fought the rule that asks for one. In a blind replay that halved the irrita
 prompt moves the average; a word the owner wants gone "at all" has to be named. So one sentence
 names "אוף" and "מעצבן", with the caring word still required and listed. In the blind replay,
 that took the irritated openings to 0 of 27, without the bot ever announcing the rule. It went live
-on 4 Oct at 14:53 UTC (epoch 73). **A ticket's status and urgency are the team's (owner, same message).**
+on 4 Oct at 14:53 UTC (epoch 73). Nine conversations on live then had none in 62 replies.
+
+**A warmer bot meets the promise filter more often (4 Oct).** After the change, Send's `promise v2`
+cut 4 replies in 9 conversations:
+- **Three were wishes with "בקרוב"** ("may it be sorted soon").
+- **One was a negation:** "אם ומתי יחזרו אליך אני לא יודע" ("whether and when they'll get back to
+  you, I don't know").
+
+The filter reads words, not meaning, so it cannot tell a wish or a refusal to promise from a
+promise. When it cuts the answer to the question that was asked, the resident sees an evasion ("you
+didn't answer"). Any fix belongs to the owner's call on finding 2 of the menu-button report.
+
+**A stand-in must copy the real tool's guards.** A retry re-calls tools it cannot remember calling.
+Where the real service deduplicates (open_request's 30-minute guard), a stand-in that does not will
+show a phantom second ticket. The deck's defaults now return the first reference as `duplicate`. **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

@@ -310,8 +310,9 @@ message with a note; the helper prints the note (`retry.note`) and that pass's f
 model, and the checks come after the run, so the retry sees the rejected pass in memory as
 its last exchange (that is what the note's "your previous answer" points at), and the turns
 after it see both passes. It sees none of the first pass's tool results: it may call tools
-again, each returns the same fixture, and a second open_request in the conversation returns
-the next reference number.
+again, and each returns the same fixture. A second open_request for the same building and
+type returns the first ticket's reference with `duplicate: true`, as the ticket service's
+30-minute duplicate guard does; the resident hears the same number again.
 Play it, then call the helper with `run_index: 1`, `retry_note`, its `tool_calls` and its
 `output`. If it passes, its handset is what the resident gets. If it is rejected too,
 production goes to `Say it again`, a small model of its own: the helper prints its system

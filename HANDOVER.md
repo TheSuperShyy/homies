@@ -305,7 +305,14 @@ its stated time.
   - **To undo:** run `python scripts/n8n_whatsapp_calmword.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-04oct-before-calmword.json`), then `git revert` the calm-word commits.
   - **Watch:** the reaction is now mostly "אוי, לא נעים". The prompt asks for a different word each time within one conversation, but across conversations it may read as stock. The owner's phone, or `--watch`, will tell.
   - **Settled the same evening:** the bot cannot change a ticket's status or urgency, and the owner wants it that way ("it should not be done upon req").
-  - **Running:** 9 Claude-played conversations on live, 3 per button (scratchpad `wa_qa_menu_after_04oct`).
+  - **Done, 9 Claude-played conversations on live, 3 per button** (`docs/assistant/transcripts/2026-10-04-whatsapp-menu-buttons-calmword.md`): "מעצבן" or "אוף" appeared in 6 bot messages before and 0 of 62 after.
+  - **Still waiting on the owner:**
+    - Send's promise filter cut 4 replies in 9: three "בקרוב" wishes, and the honest "I don't know whether they'll get back to you" (Shimon: "you didn't answer").
+    - "Anything else?" set off the angry man twice.
+    - The time standard backfired 3 times.
+    - "I can't tell you what to do" came back twice.
+    - Two deeds false alarms.
+  - **Harness:** open_request's stand-in follows the 30-minute duplicate guard now (deck defaults, PLAYER.md).
 - **DONE 4 Oct evening, read-only (owner: "run only the 3 menu buttons we have like 5 scenarios each and list the conversation"): the three menu buttons, 15 conversations with free residents.** `docs/assistant/transcripts/2026-10-04-whatsapp-menu-buttons.md`, every message in Hebrew with English under it. Cards in `scripts/wa_qa_menu_buttons.json`; the players run `wa_qa.py turn` on every message, so the live code decides every step, Try again included. All 15 first replies kept the button rules. Nothing spent, nothing sent. **A full Hebrew
 translation of this report exists**, `2026-10-04-whatsapp-menu-buttons-hebrew.md` in the same
 folder — same findings and numbers, English gloss lines dropped, English-as-typed kept where
