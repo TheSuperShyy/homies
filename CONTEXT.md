@@ -2819,6 +2819,11 @@ was the cap (now two or three, always with a warm word, one question a turn) and
 sentence, not new rules. Lines that play with no model turn (idle, tool-wait) carry no "you" at
 all, so no address rule can go stale in them.
 
+**Two questions asked for in one message lose one (4 Oct).** The WhatsApp rep paragraph asked for
+"how are you" and "how can I help" in one short message, next to the one-question rule; Gemini
+dropped the how-are-you. When a turn needs two things asked, ask one and let the other follow
+the answer.
+
 **gpt-4.1 says the prompt's own words; write rules as what to do, not as a line (4 Oct).** "אין
 פנייה ואין שכנוע: מילה קצרה שהבנת" came back on a call as "הבנתי, אין פנייה.", word for word.
 A rule that names a phrase, or asks for "a short word", gets that phrase. The double-check

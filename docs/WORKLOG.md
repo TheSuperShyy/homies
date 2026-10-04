@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp: the representative tap answered without "how are you" (found, nothing changed)
+
+Owner, on a screenshot of 4 Oct 08:44 UTC (his WhatsApp shows a translation; the chat is Hebrew):
+*"didnt i told you to make michael to be hi this is michael from homies how are you doing today?
+something like that right?"*. Execution 80740: the model wrote "היי, בוקר טוב! אני מיכאל מהומי'ז.
+במה אוכל לעזור לך?", Send's greeting filter took the second "בוקר טוב" out as designed, and "how
+are you" was never written. Since the 1 Oct change (epoch 71) two taps were answered: 1 Oct 13:54
+with both questions in one sentence, 4 Oct without the how-are-you.
+- **Why:** the rep paragraph asks for two questions in one short message ("שואל לשלומו ... ושואל
+  במה אתה יכול לעזור"), next to "ואתה שואל שאלה אחת" and the 1 Sep one-question rule. Gemini keeps
+  one of the two. The owner's own shape has one question: hi, Michael from Homies, how are you
+  doing today; "how can I help" comes after he answers.
+- **`--watch` cannot see it:** it flags a rep reply without the name, not one without the
+  how-are-you.
+- **Proposed, waiting on the owner's go (his greeting rule: examples first):** the rep sentence
+  asks only how he is, and once he answers, a human word and how you can help; plus a retry guard
+  for the rep tap when no how-are-you was written, and a `--watch` flag.
+
 ### Voice, incoming calls: voice A, happy, talkative, and the double-check's fixes are LIVE (08:35-08:37 UTC)
 
 Owner, after the double-check and the samples: *"ok make it live"*. He did not ask to drop the
