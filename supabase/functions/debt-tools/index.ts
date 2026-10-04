@@ -725,6 +725,41 @@ async function flatOnFile(phone: string | null, buildingId: string): Promise<{ i
   return { id: String(r.id), unit };
 }
 
+/**
+ * Every resident row on one flat (4 Oct). A flat can carry more than one: the
+ * OXS import writes a row per tenant and the demo scripts add their own, so
+ * flat 2 of the test building has two אסף קליקס, one holding the charges and
+ * one holding nothing. Ten is more than any flat has; the cap only bounds a
+ * bad match.
+ */
+async function flatResidents(building: string, unit: string): Promise<any[]> {
+  const { data } = await db.from("residents").select("id,full_name,building,unit")
+    .eq("building", building).eq("unit", unit).limit(10);
+  return data ?? [];
+}
+
+/**
+ * Of a flat's rows, the one that owes on that flat, else the first (4 Oct).
+ * get_balance used to take whichever row came back first, so a flat with an
+ * empty duplicate could read as owing nothing. One row and never a sum: two
+ * rows of the same person holding the same months would double the figure.
+ */
+async function owingFirst(rows: any[], unit: string): Promise<any | null> {
+  if (rows.length < 2) return rows[0] ?? null;
+  const { data } = await db.from("charges").select("resident_id")
+    .in("resident_id", rows.map((r) => r.id)).eq("unit", unit).eq("status", "unpaid").limit(50);
+  const owing = new Set((data ?? []).map((c: any) => String(c.resident_id)));
+  return rows.find((r) => owing.has(String(r.id))) ?? rows[0];
+}
+
+// 4 Oct: `{found: 0}` on its own was read to a caller as "your balance is zero,
+// everything is in order" (call 01a1065c; the flat owed ₪2,000). Nothing was
+// read, so the answer says so in words. English and with no Hebrew in it, so
+// there is no sentence for the agent to repeat.
+const NO_BALANCE_READ = "No single apartment matched, so no balance was read: this is NOT a "
+  + "zero balance. Say you could not find it, and ask for or check the street, number and "
+  + "apartment with them.";
+
 async function matchBuilding(saidRaw: unknown): Promise<Match> {
   const said = norm(saidRaw);
   if (!said) return { status: "empty" };
@@ -2614,9 +2649,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       const building = String(args?.building ?? "").trim();
       const unit = String(args?.unit ?? "").trim();
       if (building && unit) {
-        const { data } = await db.from("residents").select(fields)
-          .eq("building", building).eq("unit", unit).limit(1);
-        resident = data?.[0] ?? null;
+        // 4 Oct: the building as said, then as the building list knows it.
+        // `residents.building` is the list's full address, city included
+        // ("בר כוכבא 23, תל אביב - יפו"), and this compared letter for letter,
+        // so "בר כוכבא 23" -- what a caller says, and what the tool's own text
+        // invites -- found nothing, and the agent told the caller a zero.
+        // get_request_status resolves the same words through matchBuilding();
+        // now this does too. The words as given are tried first, so a lookup
+        // that matched before still finds the same rows.
+        let where = building;
+        let rows = await flatResidents(where, unit);
+        if (!rows.length) {
+          const mb = await matchBuilding(building);
+          if (mb.status === "found" && String(mb.building.address) !== building) {
+            where = String(mb.building.address);
+            rows = await flatResidents(where, unit);
+          }
+        }
+        resident = await owingFirst(rows, unit);
         if (resident) askedUnit = unit;
 
         // `residents.unit` names only ONE of an owner's flats — since
@@ -2627,7 +2677,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         if (!resident) {
           const { data: viaCharge } = await db.from("charges")
             .select("unit,residents!inner(id,full_name,building,unit)")
-            .eq("unit", unit).eq("residents.building", building).limit(1);
+            .eq("unit", unit).eq("residents.building", where).limit(1);
           const hit: any = viaCharge?.[0]?.residents ?? null;
           if (hit) {
             resident = hit;
@@ -2641,11 +2691,11 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (name.length >= 2) {
         const { data } = await db.from("residents").select(fields)
           .ilike("full_name", "%" + name + "%").limit(2);
-        if (data && data.length > 1) return { ok: true, found: 0, ambiguous_name: true };
+        if (data && data.length > 1) return { ok: true, found: 0, ambiguous_name: true, note: NO_BALANCE_READ };
         resident = data?.[0] ?? null;
       }
     }
-    if (!resident) return { ok: true, found: 0 };
+    if (!resident) return { ok: true, found: 0, note: NO_BALANCE_READ };
 
     let q = db
       .from("charges")

@@ -652,7 +652,9 @@ INTAKE_TOOLS = [
         "cannot touch one: read it if they asked how much, and then, if they want to "
         "pay or arrange payments, that is a ticket (open_request, type `payment`) and "
         "a team note (notify_team); a receipt or a dispute is a team note. Do not send "
-        "them to the office.",
+        "them to the office. found 0 means no apartment matched and nothing was read: "
+        "that is not a zero balance. Say you could not find it and check the address "
+        "with them.",
         {
             "name": {
                 "type": "string",

@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Incoming calls: a balance by address is found, and a miss is never a zero (LIVE 10:18-10:19 UTC)
+
+Owner: *"fix it make sure it wont affect other features"*.
+- **Edge Function** (`index.ts`, v108 → **v110**, 10:18 UTC, `supabase_functions.py --oxs-mirror
+  --apply`): in `get_balance`'s building+apartment branch, the words as given first (unchanged),
+  then the building `matchBuilding()` resolves, the same resolver `get_request_status` uses; the
+  charges fallback uses the resolved address too. A flat with several rows gives the one owing on
+  it (`owingFirst`), never a sum; one row behaves as before. A miss and `ambiguous_name` carry
+  `note` (NO_BALANCE_READ, English): no balance was read, this is not a zero, check the address.
+  The WhatsApp identity paths and the dialled-resident path return before this code and are
+  untouched.
+- **Before deploying:** live v108 = repo HEAD (the last three commits' lines all in the deployed
+  bundle, removed ones absent); the nine secrets the deploy pushes have the same sha256 as live
+  (so `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES` stay as they were); TypeScript syntax check 0
+  diagnostics before and after. 7,648 of 7,846 residents' `building` equals an active building's
+  `address`, which is what the resolved lookup compares.
+- **11 read-only probes, before → after** (בר כוכבא 23 and an invented street only):
+  "בר כוכבא 23" flat 2: found 0 → ₪2,000 (אסף קליקס); flat 1: found 0 → ₪2,000 (עידו קליקס); a
+  whole sentence, flat 2: found 0 → ₪2,000; no such flat, an invented street, a name on two rows:
+  now with the note. Unchanged: the full address (₪2,000), WhatsApp without identity
+  (`need_identity`), the debt call's dialled resident (₪2,000), `get_request_status`,
+  `get_service_info`. WhatsApp's verified path (name + phone) on the test rows answers as before;
+  `check_whatsapp_rules.py` on live: 207 green.
+- **Tool text** (`vapi_tools.py`, inbound `get_balance`): "found 0 means no apartment matched and
+  nothing was read: that is not a zero balance. Say you could not find it and check the address
+  with them." Pushed 10:19 UTC with `--keep-voice`; the diff before was exactly that one field;
+  read back 0 differences, voice untouched. The debt agent's tools were not pushed.
+- **Not changed, noted:** on WhatsApp, Assaf's flat reads ₪0 by his OXS row's number, because the
+  demo charges sit on the `agent` row with the owner's +63, which `phoneOf()` refuses (Israeli
+  numbers only). Test data, not code.
+- **Owed:** the owner's call (Bar Kochba 23 flat 2 → ₪2,000; a flat that does not exist → "could
+  not find it").
+
 ### Incoming calls: Assaf's balance read as ₪0; the lookup found nothing (finding, fix waits on the owner)
 
 Owner, with a screenshot of his 10:01 UTC web call (`01a1065c`): *"why its 0"*. Flat 2 at בר כוכבא 23
