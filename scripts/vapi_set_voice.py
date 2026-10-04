@@ -119,7 +119,7 @@ FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language":
 #   speed    generationConfig.speed. Weaker than its number on this clone: happy
 #            speech runs ~15% quick, and 0.8 brings it back about 13%.
 #   emotion  Cartesia's inline tag, put at the start of every chunk by a formatPlan
-#            replacement (EMOTION_RULE). Vapi has no emotion field for sonic-3, and
+#            replacement (emotion_rules). Vapi has no emotion field for sonic-3, and
 #            the builder's experimentalControls "positivity:low" is the sonic-2
 #            control, so it is dropped where a tag is set. The same hook carries the
 #            <break/> pads since 26 Aug; sonic-3.5 obeys the tag in Hebrew rather
@@ -132,14 +132,26 @@ AGENT_VOICE = {
 AGENT_FLAG = {"debt": "Debt Follow-up (he)", "inbound": "Inbound Intake (he)"}
 
 
-def emotion_rule(emotion):
-    # Zero-width: it puts the tag in front of a chunk and removes nothing. Vapi runs
-    # its own formatting (angle-bracket removal included) first and custom
-    # replacements last, so the tag reaches Cartesia, as the <break/> pads do.
-    # Appended after the guard, so no deletion rule can reach it. The lookahead
-    # (4 Oct) keeps a chunk the guard emptied empty: a lone tag with no words
-    # could make Cartesia error, and Vapi would fall to Elliot for the call.
-    return {"type": "regex", "regex": r"^(?=\s*\S)", "value": '<emotion value="%s"/>' % emotion}
+def emotion_rules(emotion):
+    """Two replacements: the tag in front of a chunk, then a chunk that is nothing
+    but the tag back to empty.
+
+    `^` is zero-width: it puts the tag in front of a chunk and removes nothing. Vapi
+    runs its own formatting (angle-bracket removal included) first and custom
+    replacements last, so the tag reaches Cartesia, as the <break/> pads do. Both
+    rules go after the guard, so no deletion rule can reach the tag.
+
+    The second rule keeps a chunk the guard emptied empty: a lone tag with no words
+    could make Cartesia error, and Vapi would fall to Elliot for the call. It is a
+    second rule and not a lookahead because Vapi checks every pattern with RE2,
+    which has none: `^(?=\\s*\\S)` was refused with a 400 on 4 Oct ("invalid perl
+    operator: (?="). Only `^`, literal text, `\\s*` and `$` here, all RE2.
+    """
+    if not re.match(r"^[a-z]+$", emotion):
+        sys.exit("Emotion %r: letters only (it is written into a pattern)." % emotion)
+    tag = '<emotion value="%s"/>' % emotion
+    return [{"type": "regex", "regex": "^", "value": tag},
+            {"type": "regex", "regex": "^" + tag + r"\s*$", "value": ""}]
 
 
 def build_voice(vid, spec):
@@ -148,7 +160,7 @@ def build_voice(vid, spec):
         voice["generationConfig"]["speed"] = spec["speed"]
     if spec.get("emotion"):
         voice.pop("experimentalControls", None)
-        voice["chunkPlan"]["formatPlan"]["replacements"].append(emotion_rule(spec["emotion"]))
+        voice["chunkPlan"]["formatPlan"]["replacements"].extend(emotion_rules(spec["emotion"]))
     return voice
 
 

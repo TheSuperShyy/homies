@@ -2827,8 +2827,10 @@ does not know (paragraph 4 always said callers are sent nowhere).
 
 **The voice is `vapi_set_voice.py`'s; prompt pushes keep it (4 Oct).** `vapi_sync.py --keep-voice`
 leaves the live voice out of the PATCH, so a failed or forgotten voice step never leaves a line
-on the stock voice. The emotion tag rule is `^(?=\s*\S)`: insert-only, after the guard, and never
-on an empty chunk.
+on the stock voice. The emotion tag is two rules after the guard: `^` → the tag, then a chunk that
+is only the tag back to empty. Not a lookahead: **Vapi validates every replacement pattern with
+RE2**, which has no lookarounds (a 400 on 4 Oct for `^(?=\s*\S)`, valid JavaScript). Test a new
+pattern against RE2's syntax, not Node's, before it reaches a live voice.
 
 **Each Hebrew agent has its own voice since 2 Oct** (`AGENT_VOICE` in `vapi_set_voice.py`). The
 owner chose A, happy, at 0.8 for the incoming line and left the debt call on `ba765d50`. Emotion

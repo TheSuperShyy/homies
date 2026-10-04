@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Voice, incoming calls: voice A, happy, talkative, and the double-check's fixes are LIVE (08:35-08:37 UTC)
+
+Owner, after the double-check and the samples: *"ok make it live"*. He did not ask to drop the
+happy tag, so it stayed on, as in sample 16.
+- **08:35:24 UTC, step 1:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice
+  --apply` (pre-flight: tools `[supabase]`, voice NOT SENT, target `4cbbcbe7`). The prompt, opener,
+  idle lines, tool-wait lines and `get_service_info` text went live on the old voice `ba765d50`.
+- **08:35:33, step 2 refused, nothing changed:** Vapi answered 400 "voice.chunkPlan.formatPlan ...
+  must be a valid regex ... invalid perl operator: (?= ... make sure your regex is supported by
+  RE2". Vapi checks every pattern with RE2, which has no lookarounds; the double-check's
+  `^(?=\s*\S)` was valid JavaScript, not RE2. The PATCH was refused whole, and because of
+  `--keep-voice` the line stayed on `ba765d50` rather than the stock voice: the reason S1 exists.
+- **The fix:** two rules instead of a lookahead: `^` → the tag, then `^<emotion value="happy"/>\s*$`
+  → "" (a chunk that is only the tag goes back to empty). Only `^`, literal text, `\s*` and `$`, all
+  RE2 and all already in the live guard. Checked in Node: "" and "   " stay empty, every spoken
+  chunk gets the tag. Dry run 27 → 29 replacements.
+- **08:37:00 UTC, step 2:** `python scripts/vapi_set_voice.py --agent inbound --apply`, read back
+  field by field OK: `4486a4a7`, sonic-3.5, he, volume 2, speed 0.8, no experimentalControls, 29
+  replacements with the two tag rules last, fallback Elliot with 27. WRITTEN.
+- **08:37:08 UTC, step 3:** `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply`
+  (pre-flight the same): the debt line's idle lines.
+- **Read back:** incoming prompt = repo (6,583 characters, sha `a5fa0f7aa3cb`), first message = repo,
+  the only differences from the sync's build are under `voice` (the voice is `vapi_set_voice.py`'s,
+  which says "Nothing to do" for both agents); debt 0 differences, prompt unchanged (`d8325fcd06e3`).
+- **Owed:** the owner's one test call (the opener's "!", voice A at 0.8 and happy, two or three
+  sentences a turn, and whether happy sounds right; `AGENT_VOICE` inbound `"emotion": None` and the
+  voice step turn it off). We place no calls.
+
 ### Voice, incoming calls: the double-check before going live (READY, NOT live)
 
 Owner: *"double check everything if it does not have any conflict or prompt paralysis and
