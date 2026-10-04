@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### WhatsApp: "typing…" is LIVE (10:38 UTC)
+
+Owner: *"live it"*. `scripts/n8n_whatsapp_typing.py --apply` at 10:38:42 UTC: credential "Homies
+WhatsApp typing (Meta)" made (`yIicJfrby1WlKYq6`, id in `.env` as `N8N_WHATSAPP_TYPING_CRED_ID`),
+52 nodes written, active, read back right. After: the re-run "Nothing to do"; the gate on live
+all green (pins 17 unchanged, typing "both nodes right", 207 cases); every patcher's dry run on a
+live dump, 6 of 30 not idle (the baseline). **Owed:** his handset (blue ticks and "typing…" before
+the reply; again between the two parts of a payment-link reply), then `--watch 2026-10-04T10:38`.
+
 ### WhatsApp: "typing…" while Michael writes, built and checked (ready, NOT live)
 
 Owner, after looking for it on his phone: *"it does not have the typing indictor on it i thinks

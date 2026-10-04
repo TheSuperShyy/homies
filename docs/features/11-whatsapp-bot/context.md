@@ -203,7 +203,7 @@ the greeting table are unchanged; the replay of all 874 past replies shows it.
 What a resident sees after tapping it: "היי, מה שלומך? כאן מיכאל מהומי'ז. במה אוכל לעזור לך?", in
 the model's words each time.
 
-## 4 Oct — "typing…" while Michael writes (ready, not live)
+## 4 Oct — "typing…" while Michael writes (live 10:38 UTC)
 
 The owner asked for a typing behaviour, then looked for it on his phone and thought it was a Meta
 setting. It is not a setting anywhere. Chatwoot's typing toggle stays on Chatwoot's own screens;
