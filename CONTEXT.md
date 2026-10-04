@@ -1535,6 +1535,17 @@ side:
 phantom words transcribed while Michael was silent. The setting is left on
 because it is harmless, but nothing so far shows it working. Don't count on it.
 
+**To see what the model wrote, read the call log, not the call record (4 Oct).**
+`transcript`, `artifact.messages` and `messagesOpenAIFormatted` all carry
+Michael's side as a transcription of his audio: no vowel marks, misheard words
+("2º" for "שנייה"). The model's own text, as it left the model, is in the log:
+`GET /call/{id}` → `artifact.presignedLogUrl` (gzip, JSON lines,
+`completionText`). The list endpoint's `artifact.logUrl` is unsigned and
+answers 400. **A writing instruction proven in simulation is not proven on the
+live model.** The incoming pointing clause came back fully pointed when Claude
+played Michael (1 Oct). From gpt-4.1 on real calls it came back as 3 pointed
+address words out of 33, all "שלומְךָ", the one the clause shows as its example.
+
 **On inbound, Michael understands a fault before he opens it (30 Sep, the
 owner; live).** A gate-lock report went straight to "I'll open a request, what's the
 address?", and the owner wanted *"what gate are we talking about? and where is

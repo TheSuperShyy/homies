@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Incoming calls: how Michael addresses the caller, checked on live (nothing changed)
+
+Owner: *"i just want to make sure as well the voice agent inbound if the way it address the person
+like how you al doing or like maculine in defualt"*. Read-only, on the live assistant and the calls
+since the singular went live (2 Oct 06:04 UTC).
+- **Live = the rule:** the address bullet is in the live prompt word for word (one person, never
+  the plural; masculine until it is clear a woman is speaking, then feminine with no remark). The
+  opener ends "לעזור לְךָ היום?"; the idle and tool-wait lines carry no "you".
+- **12 calls since; the model's own text** (`GET /call/{id}` → `artifact.presignedLogUrl`, gzip
+  JSON lines, `completionText`) on the three with replies (`01a0fbb8`, `01a1065c`, `01a10671`):
+  singular masculine throughout (תוכל, תרצה, תצטרך, קח / תיקח, אתה, עזוב, "מה שלומְךָ היום?").
+  No plural from the model. The one plural heard was the old idle line "קחו את הזמן, אני איתכם"
+  on 2 Oct 08:25 UTC (`01a0fbb8`), replaced 4 Oct 08:35 UTC; the 4 Oct calls played the new ones.
+- **Found: gpt-4.1 points one word.** Of 33 address words in its text (לך, שלך, ממך, אצלך,
+  בשבילך, עבורך, אותך, and the past שהתקשרת / ששאלת / שסיפרת / שאמרת), 3 are pointed, all
+  "שלומְךָ", the clause's own example. 30 go to the voice bare ("אני יכול לבדוק לך את היתרה",
+  "היתרה שלך", "תודה שהתקשרת"), so Cartesia picks lekha or lakh itself; nobody has listened for
+  which. The 1 Oct simulated calls pointed everything because Claude played Michael there: they
+  tested the clause, not gpt-4.1's use of it.
+- **Not yet on a real call:** a woman caller (the calls since are in English or a few words).
+- **Open:** offered the owner renders of those sentences, bare and pointed both ways, in voice A
+  (Cartesia credits only); a fix only on his word, old and new lines with glosses first.
+- HANDOVER's one-page stack line corrected from today's live read (it still said Scribe v2,
+  Sonic 3 and four assistants): Deepgram nova-3 with Azure he-IL as the fallback, Cartesia
+  sonic-3.5, gpt-4.1 incoming and gpt-5.6-sol on debt, two assistants plus Vapi's unused "Riley".
+
 ### WhatsApp: "typing…" is LIVE (10:38 UTC)
 
 Owner: *"live it"*. `scripts/n8n_whatsapp_typing.py --apply` at 10:38:42 UTC: credential "Homies
