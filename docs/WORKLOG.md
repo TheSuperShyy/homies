@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-04
 
+### Incoming calls: the "היי … היום" opener and "how are you" once are LIVE (09:59 UTC)
+
+Owner: *"live"*. `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` from Git
+Bash at 09:59:21 UTC (dry run first: tools `[supabase]`, voice not sent). Read back: 0 fields differ
+from the repo build; first message and prompt (6,616 chars) equal the repo; the voice untouched
+(`4486a4a7`, sonic-3.5, speed 0.8, 29 replacements with the two happy-tag rules, fallback Elliot).
+**Owed:** his test call; we place none.
+
 ### Incoming calls: "Hi, good morning … how can I help you today?", and "how are you" once (ready, NOT live)
 
 Owner: *"ok so the voice agent inbound is like good morning this is michel for homies how can i help
