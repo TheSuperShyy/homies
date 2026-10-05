@@ -2625,7 +2625,14 @@ running gpt-4.1, a fifth of the real figure.
 **What a model-run test costs (5 Oct, measured).** Six voice calls are 42 model calls and about 198k tokens
 in, because the prompt and tools ride on every call. That is $0.41 on OpenRouter at list price and about
 $0.16 once the repeated prompt is cached. The caller's model is about a cent. Tests are cheap in dollars:
-the reason for Claude-played runs is the owner's rule on OpenRouter credit, not the price. **A ticket's status and urgency are the team's (owner, same message).**
+the reason for Claude-played runs is the owner's rule on OpenRouter credit, not the price.
+
+**A Claude-played call is not the live model (5 Oct, the same 6 calls on OpenRouter, $0.17).**
+- **What the real gpt-4.1 did that Claude playing it never did:**
+  - It said it was "a real person, not a computer" when the caller asked.
+  - It spoke in 65-word paragraphs, where the Claude-played turns averaged about 20 words.
+- **What the Claude-played run showed that the real run did not:** its own slips ("מעצבן", "בקרוב").
+- **Rule:** use Claude-played runs to find gaps in the prompt and the logic, and the real model, with the owner's go, to find how this model actually behaves. `voice_qa.py play` runs the real model; a call costs 2 to 4.5 cents. **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

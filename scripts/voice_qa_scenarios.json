@@ -63,7 +63,7 @@
   },
   {
    "id": "debt_cooperative", "agent": "debt", "title": "debt call: a busy woman at work agrees, and wants the link",
-   "time": "11:20", "weekday_he": "שני", "ticket": "255-1533-26",
+   "time": "11:20", "weekday_he": "שני", "ticket": "255-1533-26", "phone_last4": "4521",
    "vars": {"first_name": "מיכל", "gender": "f", "building": "בר כוכבא 23", "apartments_phrase": "דירה שש", "months_phrase": "אוגוסט וספטמבר",
             "breakdown_phrase": "אוגוסט, שלוש מאות שקלים, וספטמבר, שלוש מאות שקלים", "amount": "שש מאות שקלים",
             "alt_payment": "העברה בנקאית", "callback_number": "077-6687949", "verification_email": "Office@homies-management.co.il"},
@@ -77,7 +77,7 @@
   },
   {
    "id": "debt_dispute", "agent": "debt", "title": "debt call: he says he paid in cash, and he is annoyed to be called at dinner",
-   "time": "18:10", "weekday_he": "שני", "ticket": "255-1534-26",
+   "time": "18:10", "weekday_he": "שני", "ticket": "255-1534-26", "phone_last4": "7310",
    "vars": {"first_name": "דן", "gender": "m", "building": "בר כוכבא 23", "apartments_phrase": "דירה ארבע עשרה", "months_phrase": "יולי, אוגוסט וספטמבר",
             "breakdown_phrase": "יולי, אוגוסט וספטמבר, שלוש מאות שקלים כל חודש", "amount": "תשע מאות שקלים",
             "alt_payment": "העברה בנקאית", "callback_number": "077-6687949", "verification_email": "Office@homies-management.co.il"},
@@ -91,7 +91,7 @@
   },
   {
    "id": "debt_hardship", "agent": "debt", "title": "debt call: a widow in difficulty asks to pay in parts",
-   "time": "10:30", "weekday_he": "שני", "ticket": "255-1535-26",
+   "time": "10:30", "weekday_he": "שני", "ticket": "255-1535-26", "phone_last4": "2287",
    "vars": {"first_name": "רינה", "gender": "f", "building": "בר כוכבא 23", "apartments_phrase": "דירה אחת", "months_phrase": "יוני, יולי, אוגוסט וספטמבר",
             "breakdown_phrase": "יוני, יולי, אוגוסט וספטמבר, שלוש מאות שקלים כל חודש", "amount": "אלף ומאתיים שקלים",
             "alt_payment": "העברה בנקאית", "callback_number": "077-6687949", "verification_email": "Office@homies-management.co.il"},

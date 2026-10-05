@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### Voice agents: the same 6 calls on the real models through OpenRouter ($0.17, owner's go)
+
+The owner, after the estimate (about $0.30): *"we dont need to test the whatsapp chatbot just the voice
+agent"*, then *"ok go"*. `scripts/voice_qa.py play` was added: the agent's own model and settings (read
+from Vapi: incoming gpt-4.1 at 0.3, debt gpt-5.6-sol), gpt-4.1-mini as the caller from the same cards,
+stand-in tools that follow the deck's rules in code, Vapi's end-call phrase ending the call, and a $1
+stop. The deck gained a fictional `phone_last4` per debt call. Every call is in
+`docs/assistant/transcripts/2026-10-05-voice-agents-6-calls-openrouter.md`, in Hebrew with English.
+- **Cost:** $0.1747 by OpenRouter's per-request figures; the wallet went from $23.83 to $23.66.
+  - Incoming calls: 3 to 4.5 cents each.
+  - Debt calls: about 2 cents each.
+  - The caller model: under a cent in all.
+- **Found that the Claude-played run did not:**
+  - Asked "are you a computer?" twice, the incoming agent said it is "a real person, not a computer
+    and not a robot". The prompt does not cover the question.
+  - Incoming replies averaged 65 words a turn and reached 108, against the prompt's two or three short
+    sentences. The one real incoming call on this Vapi account averaged 14, so listen for it next call.
+  - The incoming agent offered to "set up a regular payment" it cannot set up.
+  - A cracked window was escalated as an emergency after the caller pushed. The same call said "your
+    team" when it meant our team.
+  - The widow heard "מישהי מהצוות תחזור", which makes the team member a woman.
+- **Seen again:**
+  - "Anything else?" right after the emergency ticket.
+  - No proof-by-email offer on the cash dispute.
+- **Not seen this time:** "מעצבן" and "בקרוב".
+
 ### Voice agents: 6 Claude-played calls done, and the OpenRouter cost answered
 
 Every call is in `docs/assistant/transcripts/2026-10-05-voice-agents-6-calls.md`, in Hebrew with English.

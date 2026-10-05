@@ -305,6 +305,15 @@ its stated time.
     - "anything else?" after an emergency;
     - "בקרוב" on a debt hand-off;
     - the proof-by-email step missed on a cash dispute.
+- **DONE 5 Oct, on the owner's "ok go": the same 6 voice calls on the real models through OpenRouter, $0.17.** `docs/assistant/transcripts/2026-10-05-voice-agents-6-calls-openrouter.md`. Run: `scripts/voice_qa.py play` (spends; $1 stop; scratchpad `voice_or_05oct`). Wallet $23.83 -> $23.66. Nothing written or dialled.
+  - **For the owner, proposals only:**
+    - Incoming: said it is "a real person, not a computer" when asked. This is the biggest finding. What Michael should say is the owner's call.
+    - Incoming: replies averaged 65 words a turn against the prompt's two or three short sentences. One real call averaged 14, so listen on the next test call first.
+    - Incoming: offered a regular payment it cannot set up.
+    - Incoming: escalated a cracked window as an emergency.
+    - Incoming: "your team" for "our team".
+    - Debt: "מישהי מהצוות תחזור" to the widow. The likely cause is "שתחזור" in the dashboard's feminine address note (`dashboard/lib/call.ts`).
+    - Seen again from the Claude-played run: "anything else?" after the emergency, and no proof-by-email offer on the dispute.
 - **LIVE 4 Oct 14:53 UTC, on the owner's "live it": the calm-word prompt change.** The owner had asked "can we edit the ugh how annoying remarks it does not fit the chatbot at all".
   - **What is live:** prompt 65c56f9d9c40 and memory epoch 73 (`={{ $json.to }}-73`; every conversation's memory restarted at 14:53).
   - **What the prompt now says:** a fault gets "תגובה קצרה ואכפתית של בן אדם לדבר עצמו"; the example list is "אוקיי", "אין בעיה", "אוי, לא נעים"; and after it, "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן", גם כשהוא כועס."
