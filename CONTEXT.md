@@ -2639,7 +2639,12 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - It called itself "a large language model, trained by Google".
     - Say it again wrote "ticket 123456".
   - **Cost:** `wa_qa.py play` costs about 2 cents a conversation.
-  - **Say it again's output is not proof:** its "don't invent a ticket number" line did not hold, and Second try usable? passed the made-up number. A failed Second try usable? sends nothing at all. **A ticket's status and urgency are the team's (owner, same message).**
+  - **Say it again's output is not proof:** its "don't invent a ticket number" line did not hold, and Second try usable? passed the made-up number. A failed Second try usable? sends nothing at all.
+- **Tenants who act like real ones change the result (5 Oct, the same 9 cards again, $0.22).**
+  - **Who played whom:** Claude played the tenants: pieces, typos, pushing back, giving up. The bot was Gemini itself.
+  - **More blocked drafts:** the bot's own checks blocked 29 of 72 drafts, against 14 of 59 with a model playing the tenants.
+  - **Say it again ran 6 times with no good outcome:** 3 untrue claims were sent, and 3 turns got no reply.
+  - **How to test the WhatsApp bot from now on:** Claude tenants through `wa_qa.py say`. `play`, with a model as the tenant, is only a smoke test. The owner asked for tenants who "act like a real tenant". **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

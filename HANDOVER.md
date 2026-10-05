@@ -305,6 +305,17 @@ its stated time.
     - "anything else?" after an emergency;
     - "בקרוב" on a debt hand-off;
     - the proof-by-email step missed on a cash dispute.
+- **DONE 5 Oct, owner: "act like a real tenant": the 9 WhatsApp conversations with Claude as the tenants and Gemini as the bot, $0.22.** `docs/assistant/transcripts/2026-10-05-whatsapp-real-tenants-openrouter.md`.
+  - **Harness:** `scripts/wa_qa.py tenant` / `say`, one Claude player per card. It spends; the $1 stop is shared. Scratchpad `wa_tenants_05oct`.
+  - **It replaces the model-tenant run below.** That doc is marked as replaced.
+  - **Result:** 1 of 9 tenants got everything they came for, 4 got part, 4 got nothing.
+  - **For the owner, proposals only, most serious first:**
+    1. The gas chat sent "I recommend you not call the gas company", and the leak chat got "switch off the main breaker". The no-what-to-do rule is broken both ways, and where it is kept, tenants get nothing; the office line was never offered. Decide the rule.
+    2. Say it again was 6 for 6 bad: 3 untrue claims sent, 3 silences, and "12345".
+    3. The promise filter cut 24 of 72 replies and removed honest "I don't know when" answers.
+    4. What Michael says he is: "absolutely not a bot!" in one chat, "a Google language model" in another, and "a real person" on voice. The owner's call.
+    5. A ticket went under the neighbours' apartment, buildings were invented, and Esther's balance was never checked.
+    6. "Within 4 hours" was given as a promise, and "the team is on its way" was sent.
 - **DONE 5 Oct, owner's go: 9 WhatsApp conversations on Gemini itself through OpenRouter, $0.22.** `docs/assistant/transcripts/2026-10-05-whatsapp-menu-buttons-openrouter.md`. Run: `scripts/wa_qa.py play --deck scripts/wa_qa_menu_buttons.json` (spends; $1 stop; scratchpad `wa_or_05oct`). Wallet $23.66 -> $23.45. Nothing written or sent.
   - **For the owner, proposals only, most serious first:**
     1. Say it again invented "ticket 123456" twice, against its own prompt. One went out, because Second try usable? passed it.

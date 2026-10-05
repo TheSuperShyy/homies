@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: the 9 conversations again, with Claude acting as real tenants ($0.22)
+
+Owner: *"i told you to test the chatbot right 3 scenario each menu button act like a real tenant on those conversation"*.
+The run below had gpt-4.1-mini as the tenants, and it wrote too neatly.
+- **Harness:**
+  - `wa_qa.py` gained `Chat`, one conversation's state in `DIR/chats/<id>.json`.
+  - `say` sends one tenant message and prints only what the phone shows.
+  - `tenant` writes `TENANT.md`.
+  - `play` now runs on `Chat`.
+  - The run's $1 stop is shared across parallel players.
+- **The run:** nine Claude players, one per card and blind to the bot's internals. The bot was Gemini on the live settings.
+- **The write-up:** `docs/assistant/transcripts/2026-10-05-whatsapp-real-tenants-openrouter.md`. The earlier doc is marked as replaced.
+- **Outcome:** 1 of 9 tenants got everything they came for, 4 got part, 4 got nothing. Two gave up in so many words.
+- **Cost:** $0.2172, plus a $0.0041 smoke test.
+  - The test key spent $0.60 today, which matches today's four runs ($0.61).
+  - The wallet fell $0.89 ($23.83 to $22.94). The other $0.28 went through another key, most likely the live bot's own traffic.
+- **Found:**
+  - **Gas:** "אני ממליץ לך לא להתקשר לחברת הגז" was sent. It was the model's own line, left alone after the promise filter cut the sentence before it.
+  - **Leak chat:** electrical safety advice ("switch off the main breaker"). The prompt's "not what to do and not what not to do" was broken both ways.
+  - **Say it again ran 6 times, and all 6 were bad:**
+    - 3 sent untrue claims (a closed ticket "opened for you", "reopened with apartment 7", "I'm opening a ticket").
+    - 3 were blocked, so the tenant got no reply. One of the blocked texts was the honest one.
+    - It invented "12345".
+  - **Promise filter:** it cut a sentence from 24 of 72 replies, mostly an honest "I don't know when". Twice only "anything else?" was left.
+  - **What the bot says it is:** "ממש לא בוט!" in one chat, "a large language model, trained by Google" in another.
+  - **Tickets and tools:**
+    - A leak was filed under the neighbours' apartment.
+    - Buildings were invented: "הרצל 15", "בניין שטרם נמסר".
+    - Esther's balance was never checked.
+  - **Promises:** "Within 4 hours" was given as a promise, and "our team is already on its way" was sent.
+  - **The ack line to Esther:** a typo, the masculine to a woman, and "I'm checking it now".
+  - **"Anything else?":** on 43 of 72 replies.
+
 ### WhatsApp bot: 9 conversations on Gemini itself through OpenRouter ($0.22, owner's go)
 
 The owner: *"ok so run a chatbot test as well using the openrouter credit"* (estimate about $0.40).

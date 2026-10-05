@@ -1,5 +1,7 @@
 # The WhatsApp bot: 9 conversations on its real model, through OpenRouter
 
+> **Replaced the same day by [the run with real-acting tenants](2026-10-05-whatsapp-real-tenants-openrouter.md).** Here a cheap model played the tenants and wrote too neatly; the owner had asked for tenants who act like real ones. The bot's findings below still stand, and most of them came back in the new run.
+
 5 Oct 2026. The owner: *"ok so run a chatbot test as well using the openrouter credit"*. The same nine residents and the same three buttons as the [4 Oct run after the calm-word change](2026-10-04-whatsapp-menu-buttons-calmword.md), this time with the bot's own model, Gemini 2.5 Flash, writing every reply.
 
 ## In short
