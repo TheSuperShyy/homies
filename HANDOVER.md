@@ -335,15 +335,13 @@ its stated time.
     - **Watch:** `python scripts/check_whatsapp_rules.py --watch 2026-10-05T15:03`. 0 resident turns at 15:17 UTC. Run it again the next morning; it now reports the last resort and any ticket claim whose number no tool gave that turn.
     - **To undo:** `python scripts/n8n_whatsapp_safetynet.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-05oct-before-safetynet.json`); the Edge Function by `git revert` of the line and `supabase_functions.py --apply --oxs-mirror`.
     - **A known gap:** a NEW ticket claim quoting an OLD ticket's number in the same sentence passes the checks (CONTEXT, fix 1). The watch shows each one.
-  - **Fix 2, BUILT AND TESTED, NOT LIVE:** `scripts/n8n_whatsapp_nopromise.py`, promise v3. It cuts promises only, not "I can't say when", reports, wishes or "will be handled". WORKLOG 5 Oct has the detail.
-    - **The gate on the candidate:** 290/290. The replay changes 60 of 984 replies, all intended. The patchers are idle but the baseline 6.
-    - **On live:** exactly the 52 new or changed cases fail.
-    - **To ship, on the owner's go:** `python scripts/n8n_whatsapp_nopromise.py --apply`, then the check on live, every patcher idle, and `--watch`.
-      - The snapshot `docs/handover/n8n-whatsapp-live-05oct-before-nopromise-v3.json` is of live at 15:03:39 UTC.
-      - If live has moved since, delete it and let `--apply` retake it.
-    - **To undo:** `--restore`.
+  - **Fix 2, LIVE 5 Oct 15:59 UTC on the owner's go:** `scripts/n8n_whatsapp_nopromise.py`, promise v3. It cuts promises only, not "I can't say when", reports, wishes or "will be handled". WORKLOG 5 Oct has the detail.
+    - **Before the write:** the candidate passed 290/290, and the replay changed 60 of 984 replies, all intended.
+    - **On live after:** the rule check all green (290/290), the patcher reports nothing to do, every other patcher idle but the baseline 6.
+    - **Watch:** `python scripts/check_whatsapp_rules.py --watch 2026-10-05T15:03` covers both fixes. 0 resident turns at 16:00 UTC; run it again the next morning.
+    - **To undo:** `python scripts/n8n_whatsapp_nopromise.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-05oct-before-nopromise-v3.json`, live at 15:03:39 UTC).
     - **Changed from the plan:** "never leave only 'anything else?'" is not built. The filter can only remove, so it would mean sending the promise, invented ones included.
-  - **Next:** fix 3 (the lookups), once fix 2 is live. Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
+  - **Next:** fix 3 (the lookups). Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
 - **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
   - **Kept, by the owner's word (do not delete):**
     - Tickets 255-1343-26 (lift), 255-1344-26 (leak), 255-1345-26 (gate) and 255-1346-26 (cleaning).

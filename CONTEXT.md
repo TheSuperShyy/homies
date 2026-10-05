@@ -2696,7 +2696,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **The rescue ticket dedupes only against earlier rescue tickets** (`oxs_ref` "partial:model_claimed"). A WhatsApp interaction is one row per phone, so "this conversation's ticket" had meant the phone's newest real ticket.
   - **A known gap:** "real" means any ticket number in the chat, not the one for this matter. A NEW claim with an OLD number in the same sentence passes ("פתחתי עכשיו קריאה בנושא העובש, מספר 255-1345-26", the gate's number; on 5 Oct `Say it again` wrote it, and it is gone). The checks cannot tell which matter a number belongs to.
   - **`--watch` reads the new path:** an info line when `Mend the reply` ran (what it did, the rescue ticket's number), a flag when it ran and nothing went out, and an info line for any sent ticket claim whose number no tool gave that turn, to be read for the gap above.
-- **What the promise filter cuts (5 Oct, fix 2, promise v3, `n8n_whatsapp_nopromise.py`; NOT live until the owner's go).** Send cuts a promise of a time, a call or a visit, "I'm on it" or "I'll update you". It does not cut:
+- **What the promise filter cuts (5 Oct, fix 2, promise v3, `n8n_whatsapp_nopromise.py`; LIVE 5 Oct 15:59 UTC).** Send cuts a promise of a time, a call or a visit, "I'm on it" or "I'll update you". It does not cut:
   - **"Handled", with no time:** "הצוות יטפל בזה", "נטפל בזה", "אל דאגה". The owner's reassurance.
   - **A phrase asked about or negated:** "מתי (בדיוק)? יחזרו אליך", "לא יגיע".
   - **A ש clause that reports:**

@@ -11,9 +11,16 @@ conversation that produced it.
 
 ## 2026-10-05
 
-### WhatsApp bot: fix 2 of 5, the promise filter cuts promises only (built and tested; NOT live)
+### WhatsApp bot: fix 2 of 5, the promise filter cuts promises only (LIVE 15:59 UTC)
 
-On the owner's "go" to carry on after fix 1. It goes live on his next go. He also asked: *"please dont over exahust the openrouter credits"*. Nothing here spent any ($13.56 left of the $15 cap).
+On the owner's "go" to carry on after fix 1. Live on his *"yes fix and let me know if its done"*:
+- **Before:** live unchanged since the snapshot (updatedAt 15:03:39 UTC, promise v2 in Send).
+- **Written:** `n8n_whatsapp_nopromise.py --apply` at 15:59:37 UTC, 52 nodes, read back right. Send carries promise v3, and the greeting filter is intact.
+- **On live after:**
+  - the patcher reports nothing to do;
+  - `check_whatsapp_rules.py`: all green, 290/290;
+  - `check_patchers_idle.py` with live's own nodes: only the baseline 6 are not idle.
+- **`--watch 2026-10-05T15:03`** (both fixes): 0 resident turns at 16:00 UTC. He also asked: *"please dont over exahust the openrouter credits"*. Nothing here spent any ($13.56 left of the $15 cap).
 - **Why:** on the live run the filter cut a sentence from 37 of 72 replies, and about half of those cuts were honest:
   - "I can't say exactly when";
   - what Michael asked the team;
@@ -51,10 +58,7 @@ On the owner's "go" to carry on after fix 1. It goes live on his next go. He als
     - None is empty or a fragment, and the guards are unchanged.
   - **`check_patchers_idle.py` on the dump:** only the baseline 6 are not idle.
   - **The watch, on made-up turns:** a report that went out is not flagged, a promise that went out is, and a cut one is an info line.
-- **To ship, on the owner's go:** `python scripts/n8n_whatsapp_nopromise.py --apply`.
-  - The snapshot `docs/handover/n8n-whatsapp-live-05oct-before-nopromise-v3.json` is live as of 15:03:39 UTC; retake it if live has moved.
-  - Then the check on live, every patcher idle, and `--watch`.
-  - `--restore` undoes it.
+- **Undo:** `python scripts/n8n_whatsapp_nopromise.py --restore`. It puts back the snapshot `docs/handover/n8n-whatsapp-live-05oct-before-nopromise-v3.json`, which is live as of 15:03:39 UTC (fix 1 in, promise v2).
 
 ### WhatsApp bot: fix 1 of 5, the safety net stops making things worse (LIVE 15:03 UTC)
 
