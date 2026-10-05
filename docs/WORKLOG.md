@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: the representative asks how you are today (built and tested; NOT live yet)
+
+The owner, shown the Claude-played rep-tap hello ("היי, כאן מיכאל מצוות השירות של הומי'ז 😊 מה שלומך?"): *"i want the intro to be more friendly like how are you today?"*. He meant the one *"after the menu greeting"*. That is his 4 Oct wording, *"hi this is michael from homies how are you doing today?"*. The 4 Oct note had kept "today" for when he asked.
+- **The change:** the prompt's rep-tap sentence asks how he is today, warmly (prompt `8f9e442ded13`, MEMORY_EPOCH 74 to 75, `scripts/n8n_whatsapp_hayday.py`).
+  - Only that tap. The two other buttons still go straight to what happened, and someone who writes in with a fault is not asked about his day.
+- **The gate on the dump:** 298/298 cases, the replay unchanged, and only the prompt's pin moves. The patchers are idle but the baseline 6 (35 now).
+- **Waiting on:** a Claude-played check of the tap (5 replies), then the pin, `--apply` and the checks on live.
+
 ### WhatsApp bot: fixes 4 and 5's texts, and only six emoji (LIVE 16:31 UTC)
 
 On the owner's *"start just finish it all quick"*. Nothing spent.
