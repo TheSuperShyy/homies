@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: fixes 4 and 5's texts, and only six emoji (built and tested; NOT live)
+
+On the owner's *"start just finish it all quick"*. Nothing spent.
+- **`scripts/n8n_whatsapp_straight.py`, MEMORY_EPOCH 73 to 74.** It writes the prompt, get_balance's description and the memory key. Each is rewritten only if it is the one being replaced (by hash).
+  - **The prompt** (`prompt.md`, "5 Oct" section):
+    - Michael is "מצוות השירות של הומי'ז". Asked straight out, he is the digital assistant on that team and offers a person. Never "a real person", and never who built him.
+    - **Danger:** only "I opened an urgent ticket" and its number, with no offer of a call. If pushed: "that is the only thing I can do from here", with no question after it.
+    - **"When?":** no date, but the ticket is open and will be handled. The 4h / 3-day facts line is gone.
+    - **"Anything else?":** only once his matter is done. The four places that asked for it are rewritten.
+    - **An earlier ticket** is looked up with the status tool before anything is said about it.
+    - "Waiting for a person to answer" is gone from the rep-tap paragraph. The approved rep hello is unchanged.
+  - **get_balance:** asks once, explains once ("a security check"), and a refusal becomes a team note. A number from any country, with its country code, is fine.
+- **`scripts/n8n_whatsapp_emoji.py`:** the last step in Send keeps only 🙂 😊 🙏 👍 💪 🤝 in model replies, and the menu's 👋 stays. The live run sent 😔 and 😥, goodbyes carried 👋, and once 💧.
+- **Tested:**
+  - **The straight dump:** 290/290 cases. The replay changes nothing (Send, Sort and the guards are untouched). Only the two intended pins move: the prompt `65c56f9d9c40` to `0b6de0310b70`, and get_balance `510af1d70292` to `3ef1f30b5235`. The patchers are idle but the baseline 6.
+  - **The emoji dump:** 295/295 with 5 new cases, and the pins are unchanged. The replay changes 23 replies, each losing only 👋, 💧, 😔, 😕 or 😥.
+    - The 37 live cases' expected outputs now include the emoji step: 7 lose an emoji.
+  - **A Claude-played check of Michael under the new prompt is running** (11 situations: bot?, who, danger, pushed, when?, earlier ticket, balance three ways, goodbye, rep tap).
+- **The repo is ahead of live.** The auto-commit 5396c88 took prompt.md, and MEMORY_EPOCH 74 is in n8n_whatsapp.py. Until `straight.py --apply`, six patchers that copy the repo's prompt or tool texts want to write them: greet, menu, nopage, patch, payment and teamnote. Do not `--apply` them.
+- **To ship:** review the Claude-played replies, paste the new pins, run `straight.py --apply`, then `emoji.py --apply` (its dump on top of the new live), then the check on live, every patcher idle, and `--watch`.
+
 ### WhatsApp bot: fix 3 of 5 and fix 5's half, the lookups and the typed number (Edge Function v116, LIVE 16:09 UTC)
 
 The owner: *"start just finish it all quick"*. One deploy of `supabase/functions/debt-tools/index.ts`, `supabase_functions.py --apply --oxs-mirror` (the mirror for his number stays on).

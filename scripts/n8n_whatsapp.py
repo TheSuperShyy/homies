@@ -203,7 +203,18 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 73
+MEMORY_EPOCH = 74
+# 73 -> 74, 5 Oct: straight answers (fixes 4 and 5 of the owner's five, after the
+# live run as Assaf Clix, where 1 of 9 conversations got everything). Michael is
+# "from Homies' service team" and, asked straight out, the digital assistant who
+# can pass you to a person (the bot had said "a real rep" and "a language model
+# trained by Google"); in danger, only "I opened an urgent ticket" and its number,
+# and if pushed, that this is all he can do from here; "when?" is no date but the
+# ticket is open and will be handled (the 4h / 3-day line is gone); "anything
+# else?" only once his matter is done (four places asked for it every time); an
+# earlier ticket is looked up first; get_balance asks once, explains once, and a
+# refusal is a team note. Every buffer holds "anything else?" endings and the
+# 4-hour answer. Carrier: n8n_whatsapp_straight.py.
 # 72 -> 73, 4 Oct evening: the short word before the question is caring, not
 # irritated. The owner, reading 15 Claude-played conversations: *"can we edit the
 # ugh how annoying remarks it does not fit the chatbot at all"*. The prompt listed
@@ -684,7 +695,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "65c56f9d9c40",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "0b6de0310b70",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -694,7 +705,8 @@ EPOCH_COVERS = {
     # oversight.
     # 23 Sep: show_menu now names the third row "talk to a representative".
     # 27 Sep: get_request_status no longer forbids asking for an apartment.
-    "tools": "6fdfc1e98a59",
+    # 5 Oct: get_balance asks once, explains once; a refusal is a team note.
+    "tools": "9c033bceb5df",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1634,8 +1646,22 @@ TOOLS = [
             "IDENTITY FIRST: this needs the resident's full name "
             "AND their phone number, both typed by them in this conversation. "
             "Do not call it without both, do not use the number they are "
-            "messaging from, and never fill either from a guess. If they have "
-            "not given both yet, ask — one message, both facts, in your own words. "
+            "messaging from (not even when they say it is the same one: this "
+            "is a security check, and it stays), and never fill either from a "
+            "guess. A number from any country is fine, written with its "
+            "country code. If they have not given both yet, ask once — one "
+            "message, both facts, in your own words. If they push back, "
+            "explain once, in one short sentence, that it is a security check "
+            "that protects their details, and ask again. If they still will "
+            "not type them, do not ask again: a team note (notify_team) that "
+            "they asked for their balance and did not confirm their identity, "
+            "then tell them the team knows. "
+            # 5 Oct (fix 5): the owner, *"B make it type the number"*. On the
+            # live run as Assaf Clix the bot asked for the number again and
+            # again, the tenant wrote "I already told you twice, I'm writing
+            # from my number", and a typed +63 number could never pass
+            # (phoneOf() read it as not given; get_balance now uses
+            # typedPhoneOf(), which takes a country code).
             # 1 Sep evening: an optional `unit` parameter documented as a
             # condition ("only if they asked about one specific apartment")
             # became a three-round interrogation — "עבור דירה מסוימת, או

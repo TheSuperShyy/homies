@@ -333,6 +333,22 @@ function cases(E) {
     expect('5 Oct live #' + k.n + ' (' + k.case + ')', say({ reply: k.raw, said: k.said }), k.want);
   }
 
+  // 5 Oct (scripts/n8n_whatsapp_emoji.py): the prompt allows six, a face or a
+  // hand; the live run sent 😔 and 😥, and goodbyes carry 👋. Only when the
+  // emoji step is live (a candidate without it skips these).
+  if (P.code && String(P.code.send_body || '').indexOf("const ev = 'emoji v") !== -1) {
+    console.log(NL + '--- Send: only the six emoji (5 Oct) ---');
+    expect('a sad face after a full stop goes, the sentence stays',
+      say({ reply: 'וזה באמת לא מצב נעים. 😔 באיזה בניין ובאיזו דירה?', said: 'lights' }),
+      'וזה באמת לא מצב נעים. באיזה בניין ובאיזו דירה?');
+    expect('the goodbye wave goes', say({ reply: 'תודה שפנית אלינו, ושיהיה לך יום טוב! 👋', said: 'thanks' }),
+      'תודה שפנית אלינו, ושיהיה לך יום טוב!');
+    const SIXES = 'פתחתי לך קריאה 255-1347-26 👍🏽 יש עוד פרט שחשוב שאדע? 🙂';
+    expect('the six stay, a skin tone too', say({ reply: SIXES, said: 'lift' }), SIXES);
+    expect('an emoji-only reply is never emptied', say({ reply: '😥', said: 'lights' }), '😥');
+    expect('the menu keeps its wave', () => sent(E, { canned: true, reply: MENU_TEXT }).content, MENU_TEXT);
+  }
+
   console.log(NL + '--- Reply usable?: echo and clerk (first pass only; exempt when the turn did work) ---');
   const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
   const REFUSED = [{ action: { tool: 'open_request' }, observation: obs({ ok: true, opened: false, reason: 'street_unknown' }) }];

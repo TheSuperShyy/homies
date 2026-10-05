@@ -345,7 +345,17 @@ its stated time.
     - **The status lookup:** it reads wider, leaves payment records out, and in the caller's own flat hands back the flat's requests when the category the model guessed matches nothing (the mould: 255-1341-26 is now found). The gate tickets are found by their words.
     - **The balance check:** `typedPhoneOf()` takes a typed foreign number, and the owner's +63 now passes. `phoneOf()` is untouched.
     - **To undo:** `git revert` the index.ts change, then `python scripts/supabase_functions.py --apply --oxs-mirror`.
-  - **Next:** fixes 4 and 5's texts (`scripts/n8n_whatsapp_straight.py`, epoch 74) and the emoji step (`scripts/n8n_whatsapp_emoji.py`). Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
+  - **Fixes 4 and 5's texts, and the emoji step: BUILT AND TESTED, NOT LIVE.** `scripts/n8n_whatsapp_straight.py` (prompt, get_balance text, MEMORY_EPOCH 73 to 74) and `scripts/n8n_whatsapp_emoji.py` (Send keeps six emoji). WORKLOG 5 Oct has the test results.
+    - **THE REPO IS AHEAD OF LIVE.** prompt.md (auto-commit 5396c88) and `MEMORY_EPOCH = 74` / EPOCH_COVERS are the new texts; live is still epoch 73.
+      - Until `straight.py --apply`, do not `--apply` greet, menu, nopage, patch, payment or teamnote: they copy the repo's prompt or tool texts and would ship them without the gate.
+      - `check_whatsapp_rules.py` on live still pins the old texts, as it should.
+    - **Waiting on:** the Claude-played check of Michael under the new prompt (11 situations, running), then the new pins in `check_whatsapp_rules.py`: prompt `0b6de0310b70`, get_balance `3ef1f30b5235`.
+    - **Order to ship:**
+      1. `python scripts/n8n_whatsapp_straight.py --apply`;
+      2. `python scripts/n8n_whatsapp_emoji.py --dump F`, its gate, then `--apply`;
+      3. the check on live, every patcher idle, and `--watch`.
+    - **Snapshots (undo):** `docs/handover/n8n-whatsapp-live-05oct-before-straight.json` and `...-before-emoji.json`, both of live at 15:59:37 UTC. Retake the emoji one after straight ships, since it must include straight's write: delete it and let `--dump` retake it.
+  - **Then:** the 9-card retest, about $0.22 offline and $0.35 live, only on the owner's go. Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
 - **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
   - **Kept, by the owner's word (do not delete):**
     - Tickets 255-1343-26 (lift), 255-1344-26 (leak), 255-1345-26 (gate) and 255-1346-26 (cleaning).
