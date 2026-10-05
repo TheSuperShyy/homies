@@ -313,6 +313,7 @@ its stated time.
     - the proof-by-email step missed on a cash dispute.
 - **DONE 5 Oct, owner: "act like a real tenant": the 9 WhatsApp conversations with Claude as the tenants and Gemini as the bot, $0.22.** `docs/assistant/transcripts/2026-10-05-whatsapp-real-tenants-openrouter.md`.
   - **Harness:** `scripts/wa_qa.py tenant` / `say`, one Claude player per card. It spends; the $1 stop is shared. Scratchpad `wa_tenants_05oct`.
+  - **The harness is now in git** (committed 6 Oct). Both `say` and `play` spend against OpenRouter, so get the owner's go before running either; `tenant` and `turn` do not spend.
   - **It replaces the model-tenant run below.** That doc is marked as replaced.
   - **Result:** 1 of 9 tenants got everything they came for, 4 got part, 4 got nothing.
   - **For the owner, proposals only, most serious first:**

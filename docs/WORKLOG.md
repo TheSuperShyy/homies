@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### The tenant harness is committed: `say` for one message, `tenant` for the protocol
+
+`scripts/wa_qa.py` had been edited in the working tree since 5 Oct and was never committed, so
+the 9-conversation run's harness lived only on disk. Committed now, after a compile check and a
+scan of the additions for literal keys (none; the OpenRouter key is read from `.env` at runtime).
+
+What it adds:
+- `Chat`: one conversation with the live bot, its whole state in `DIR/chats/<scenario>.json`,
+  so a Claude tenant can drive it one message at a time.
+- `say`: sends one tenant message through the live code and the models, and prints only what the
+  phone shows. **It spends.**
+- `tenant`: writes `TENANT.md`, the protocol for a Claude tenant.
+- One $1 cap (`PLAY_CAP`) shared across parallel chats in a run, read from every chat file.
+
+Nothing in this commit runs anything; the spending runs were the owner's go on 5 Oct.
+
 ### Visual version of the old-vs-ours comparison
 
 Owner wanted the comparison as a visual table, what we have now against what the ManyChat bot

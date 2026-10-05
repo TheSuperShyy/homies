@@ -10,7 +10,9 @@ blind judges grade what a handset would get. Spends nothing. Read only.
     python scripts/wa_qa.py bundle --run DIR2 --candidate F   # the same, on a patcher's --dump
     python scripts/wa_qa.py diff --run DIR --against DIR2     # every handset text that differs
     python scripts/wa_qa.py turn --run DIR < turn.json        # one turn, for a player mid-game
-    python scripts/wa_qa.py play --run DIR        # SPENDS: the live models on OpenRouter play it (WA_QA_ONLY=id,id; $1 stop)
+    python scripts/wa_qa.py play --run DIR        # SPENDS: the live models on OpenRouter, a model as the tenant (WA_QA_ONLY=id,id; $1 stop)
+    python scripts/wa_qa.py tenant --run DIR      # writes DIR/TENANT.md, the protocol for Claude tenants
+    python scripts/wa_qa.py say --run DIR < msg.json   # SPENDS: one tenant message to the live bot; prints the phone
     ... --deck scripts/wa_qa_menu_buttons.json                # any command, another deck
 
 FREE RESIDENTS (4 Oct, the owner: "act like a human"). A scenario whose resident
@@ -1204,141 +1206,190 @@ def wa_stand_in(name, a, s, defaults, state):
     return {k: v for k, v in (d or {"ok": True}).items() if not k.startswith("_")}
 
 
-def play(run):
-    import datetime
-    import prompt_probe as P
-    from voice_qa import openrouter
-    key = P.E.get("OPENROUTER_API_KEY", "").strip()
-    if not key:
-        sys.exit("OPENROUTER_API_KEY missing from .env")
-    code = load_json(os.path.join(run, "code.json"))
-    pdeck = {x["id"]: x for x in load_json(os.path.join(run, "deck.json"))["scenarios"]}
-    deck = load_json(DECK)
-    ctx = open(os.path.join(run, "context_A.md"), encoding="utf-8").read()
-    system = re.search(r"system prompt \(verbatim\)\s*\n+```\n(.*?)\n```", ctx, re.S).group(1)
-    ack_system = re.search(r"payment-ack model's system prompt \(verbatim\)\s*\n+```\n(.*?)\n```", ctx, re.S).group(1)
-    fns = play_tools(json.loads(re.search(r"## The tools.*?\n+```json\n(.*?)\n```", ctx, re.S).group(1)))
-    only = os.environ.get("WA_QA_ONLY", "").split(",") if os.environ.get("WA_QA_ONLY") else None
-    os.makedirs(os.path.join(run, "transcripts"), exist_ok=True)
-    spent = [0.0]
+class Chat:
+    """One conversation with the live bot: the live code around every message,
+    every model call the bot makes on OpenRouter. Its whole state is one JSON
+    file (DIR/chats/<scenario>.json), so a Claude player can drive it one
+    message at a time (`say`) and a model can drive it in a loop (`play`)."""
 
-    for s in deck["scenarios"]:
+    def __init__(self, run, sid, fresh=False):
+        import prompt_probe as P
+        self.run, self.key = run, P.E.get("OPENROUTER_API_KEY", "").strip()
+        if not self.key:
+            sys.exit("OPENROUTER_API_KEY missing from .env")
+        self.code = load_json(os.path.join(run, "code.json"))
+        self.deck = load_json(DECK)
+        self.s = next((x for x in self.deck["scenarios"] if x["id"] == sid), None)
+        if not self.s:
+            sys.exit("no scenario %r in %s" % (sid, DECK))
+        self.ps = next(x for x in load_json(os.path.join(run, "deck.json"))["scenarios"] if x["id"] == sid)
+        ctx = open(os.path.join(run, "context_A.md"), encoding="utf-8").read()
+        self.system = re.search(r"system prompt \(verbatim\)\s*\n+```\n(.*?)\n```", ctx, re.S).group(1)
+        self.ack_system = re.search(r"payment-ack model's system prompt \(verbatim\)\s*\n+```\n(.*?)\n```", ctx, re.S).group(1)
+        self.fns = play_tools(json.loads(re.search(r"## The tools.*?\n+```json\n(.*?)\n```", ctx, re.S).group(1)))
+        self.path = os.path.join(run, "chats", sid + ".json")
+        if os.path.exists(self.path) and not fresh:
+            self.st = load_json(self.path)
+        else:
+            self.st = {"scenario": sid, "variant": "A", "played_by": {"bot": BOT}, "turns": [], "memory": [],
+                       "opened": {}, "usage": [], "after_menu": False, "ended": ""}
+
+    def spent_run(self):
+        """Every chat in the run, so parallel players share one cap."""
+        total = sum(u["cost"] for u in self.st["usage"])
+        d = os.path.dirname(self.path)
+        for f in (os.listdir(d) if os.path.isdir(d) else []):
+            if f.endswith(".json") and f != os.path.basename(self.path):
+                try:
+                    total += sum(u["cost"] for u in load_json(os.path.join(d, f)).get("usage", []))
+                except (ValueError, OSError):
+                    pass            # another player is writing it right now
+        return total
+
+    def save(self):
+        import datetime
+        self.st["saved_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        keep = ("scenario", "variant", "played_by", "saved_at", "ended", "turns", "usage")
+        for path, body in ((self.path, self.st),
+                           (os.path.join(self.run, "transcripts", "%s_A.json" % self.st["scenario"]),
+                            {k: self.st[k] for k in keep})):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            tmp = path + ".tmp"
+            write(tmp, json.dumps(body, ensure_ascii=False, indent=1))
+            os.replace(tmp, path)
+
+    def bill(self, who, u):
+        self.st["usage"].append({"who": who, "in": u.get("prompt_tokens", 0), "out": u.get("completion_tokens", 0),
+                                 "cached": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0),
+                                 "reasoning": (u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0),
+                                 "cost": float(u.get("cost") or 0)})
+        spent = self.spent_run()
+        if spent > PLAY_CAP:
+            self.save()
+            sys.exit("stopped: the run has spent $%.4f, over the $%.2f cap" % (spent, PLAY_CAP))
+
+    def model(self, sys_text, user_text, who):
+        from voice_qa import openrouter
+        msg, u = openrouter(self.key, dict(BOT, messages=[{"role": "system", "content": sys_text},
+                                                          {"role": "user", "content": user_text}]))
+        self.bill(who, u)
+        return (msg.get("content") or "").strip()
+
+    def answer(self, inject):
+        """One run of Answer the resident: memory + this input, tools until it writes."""
+        from voice_qa import openrouter
+        msgs = [{"role": "system", "content": self.system}]
+        for i_, o_ in self.st["memory"][-MEMORY_PAIRS:]:
+            msgs += [{"role": "user", "content": i_}, {"role": "assistant", "content": o_}]
+        msgs.append({"role": "user", "content": inject})
+        calls = []
+        for _ in range(10):
+            msg, u = openrouter(self.key, dict(BOT, messages=msgs, tools=self.fns))
+            self.bill("answer", u)
+            tc = msg.get("tool_calls") or []
+            msgs.append({k: v for k, v in msg.items() if k in ("role", "content", "tool_calls")})
+            if not tc:
+                break
+            for c in tc:
+                try:
+                    a = json.loads(c["function"].get("arguments") or "{}")
+                except ValueError:
+                    a = {"_raw": c["function"].get("arguments")}
+                res = wa_stand_in(c["function"]["name"], a, self.s, self.deck["defaults"], self.st)
+                calls.append({"name": c["function"]["name"], "arguments": a, "result": res})
+                msgs.append({"role": "tool", "tool_call_id": c["id"], "content": json.dumps(res, ensure_ascii=False)})
+        out = (msg.get("content") or "").strip()
+        self.st["memory"].append([inject, out])
+        return out, calls
+
+    def message(self, kind, text, en=None, closing=False):
+        """One tenant message through the live code and the models.
+        Returns (the messages the phone gets, whether buttons came with them)."""
+        sid, code, ps = self.s["id"], self.code, self.ps
+        t = {"scenario": sid, "kind": kind, "text": text, "first": not self.st["turns"],
+             "after_menu": self.st["after_menu"]}
+        r = live_turn(code, ps, t)
+        if r["menu"]:
+            rec = {"resident": text, "kind": "menu"}
+            if en:
+                rec["resident_en"] = en
+            self.st["turns"].append(rec)
+            self.st["after_menu"] = True
+            return [r["system_sends"]], True
+        self.st["after_menu"] = False
+        ack = self.model(self.ack_system, r["ack_model_reads"], "ack") or "NONE"
+        t["ack"] = ack
+        r = live_turn(code, ps, t)
+        out, calls = self.answer(r["answering_model_reads"])
+        rec = {"resident": text, "kind": kind, "input": r["answering_model_reads"], "ack": ack,
+               "tool_calls": calls, "output": out}
+        if en:
+            rec["resident_en"] = en
+        if closing:
+            rec["closing"] = True
+        chk = live_turn(code, ps, dict(t, tool_calls=calls, output=out))
+        if chk["guards_failed"]:
+            note, inject2 = chk["retry"]["note"], chk["retry"]["answering_model_reads"]
+            out2, calls2 = self.answer(inject2)
+            rec.update(first_output=out, first_failed=chk["guards_failed"], first_tool_calls=calls,
+                       retry_note=note, tool_calls=calls2, output=out2)
+            chk = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2, output=out2))
+            if chk["guards_failed"]:
+                sa = chk["say_again"]
+                said = self.model(sa["system"], sa["reads"], "say_again")
+                rec["say_again_output"] = said
+                chk2 = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2,
+                                                output=out2, say_again_output=said))["say_again"]
+                # Second try usable? has nothing on its false branch: when Say it
+                # again's text fails too, the tenant gets nothing (but an ack).
+                hs = ([chk2["ack_went_first"]] if chk2.get("ack_went_first") else []) + \
+                     ([chk2["sent"]] if chk2.get("sent") else [])
+                rec["second_try_failed"] = chk2.get("failed") or []
+                rec["handset"] = hs
+                self.st["turns"].append(rec)
+                return hs, False
+        hs = chk.get("handset") or []
+        rec["handset"] = hs
+        self.st["turns"].append(rec)
+        return hs, bool(chk.get("buttons"))
+
+
+def phone_view(hs, buttons):
+    lines = list(hs) or ["(no reply came)"]
+    if buttons:
+        lines[-1] += "  [buttons: " + " / ".join(TAPS.values()) + "]"
+    return [C.mask(x, 100000) for x in lines]
+
+
+def play(run):
+    """A model plays every tenant (the first 5 Oct run). Kept for cheap smoke
+    runs; a Claude player through `say` acts far more like a real tenant."""
+    only = os.environ.get("WA_QA_ONLY", "").split(",") if os.environ.get("WA_QA_ONLY") else None
+    from voice_qa import openrouter
+    for s in load_json(DECK)["scenarios"]:
         if only and s["id"] not in only:
             continue
-        ps = pdeck[s["id"]]
-        usage, state, memory, turns = [], {"opened": {}}, [], []
+        chat = Chat(run, s["id"], fresh=True)
+        chat.st["played_by"]["resident"] = RESIDENT_MODEL
         card = json.dumps({k: s["resident"][k] for k in ("persona", "knows", "wants", "tendencies")},
                           ensure_ascii=False, indent=1)
         resident_msgs = [{"role": "system", "content": RESIDENT_PROMPT % (" / ".join(TAPS.values()), card)}]
-
-        def bill(who, u):
-            c = float(u.get("cost") or 0)
-            spent[0] += c
-            usage.append({"who": who, "in": u.get("prompt_tokens", 0), "out": u.get("completion_tokens", 0),
-                          "cached": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0),
-                          "reasoning": (u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0),
-                          "cost": c})
-            if spent[0] > PLAY_CAP:
-                save()
-                sys.exit("stopped: spent $%.4f, over the $%.2f cap" % (spent[0], PLAY_CAP))
-
-        def save(ended=""):
-            write(os.path.join(run, "transcripts", "%s_A.json" % s["id"]), json.dumps(
-                {"scenario": s["id"], "variant": "A", "played_by": {"bot": BOT, "resident": RESIDENT_MODEL},
-                 "played_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-                 "ended": ended, "turns": turns, "usage": usage}, ensure_ascii=False, indent=1))
-
-        def answer(inject):
-            """One run of Answer the resident: memory + this input, tools until it writes."""
-            msgs = [{"role": "system", "content": system}]
-            for i_, o_ in memory[-MEMORY_PAIRS:]:
-                msgs += [{"role": "user", "content": i_}, {"role": "assistant", "content": o_}]
-            msgs.append({"role": "user", "content": inject})
-            calls = []
-            for _ in range(10):
-                msg, u = openrouter(key, dict(BOT, messages=msgs, tools=fns))
-                bill("answer", u)
-                tc = msg.get("tool_calls") or []
-                msgs.append({k: v for k, v in msg.items() if k in ("role", "content", "tool_calls")})
-                if not tc:
-                    break
-                for c in tc:
-                    try:
-                        a = json.loads(c["function"].get("arguments") or "{}")
-                    except ValueError:
-                        a = {"_raw": c["function"].get("arguments")}
-                    res = wa_stand_in(c["function"]["name"], a, s, deck["defaults"], state)
-                    calls.append({"name": c["function"]["name"], "arguments": a, "result": res})
-                    msgs.append({"role": "tool", "tool_call_id": c["id"], "content": json.dumps(res, ensure_ascii=False)})
-            out = (msg.get("content") or "").strip()
-            memory.append((inject, out))
-            return out, calls
-
-        def model(sys_text, user_text, who):
-            msg, u = openrouter(key, dict(BOT, messages=[{"role": "system", "content": sys_text},
-                                                          {"role": "user", "content": user_text}]))
-            bill(who, u)
-            return (msg.get("content") or "").strip()
-
-        def message(kind, text, first, after_menu):
-            """One resident message through the live code and the models; returns the handset."""
-            t = {"scenario": s["id"], "kind": kind, "text": text, "first": first, "after_menu": after_menu}
-            r = live_turn(code, ps, t)
-            if r["menu"]:
-                turns.append({"resident": text, "kind": "menu"})
-                return [r["system_sends"] + "  [buttons: " + " / ".join(TAPS.values()) + "]"], True
-            ack = model(ack_system, r["ack_model_reads"], "ack") or "NONE"
-            t["ack"] = ack
-            r = live_turn(code, ps, t)
-            out, calls = answer(r["answering_model_reads"])
-            rec = {"resident": text, "kind": kind, "input": r["answering_model_reads"], "ack": ack,
-                   "tool_calls": calls, "output": out}
-            chk = live_turn(code, ps, dict(t, tool_calls=calls, output=out))
-            if chk["guards_failed"]:
-                note, inject2 = chk["retry"]["note"], chk["retry"]["answering_model_reads"]
-                out2, calls2 = answer(inject2)
-                rec.update(first_output=out, first_failed=chk["guards_failed"], first_tool_calls=calls,
-                           retry_note=note, tool_calls=calls2, output=out2)
-                chk = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2, output=out2))
-                if chk["guards_failed"]:
-                    sa = chk["say_again"]
-                    said = model(sa["system"], sa["reads"], "say_again")
-                    rec["say_again_output"] = said
-                    chk2 = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2,
-                                                    output=out2, say_again_output=said))["say_again"]
-                    # Second try usable? has nothing on its false branch: when Say it
-                    # again's text fails too, the resident gets nothing (but an ack).
-                    hs = ([chk2["ack_went_first"]] if chk2.get("ack_went_first") else []) + \
-                         ([chk2["sent"]] if chk2.get("sent") else [])
-                    rec["second_try_failed"] = chk2.get("failed") or []
-                    rec["handset"] = hs
-                    turns.append(rec)
-                    return (hs or ["(no reply came)"]), False
-            hs = chk.get("handset") or []
-            rec["handset"] = hs
-            turns.append(rec)
-            view = list(hs)
-            if chk.get("buttons") and view:
-                view[-1] += "  [buttons: " + " / ".join(TAPS.values()) + "]"
-            return view, False
-
         print("\n=== %s (%s, %s)" % (s["id"], s["button"], s["time"]))
-        first, after_menu, ended = True, False, "8 messages after the tap"
-        script = s["resident"]["script"]
-        for line in script:
+        ended = "8 messages after the tap"
+        for line in s["resident"]["script"]:
             kind = line.get("kind", "text")
-            hs, menu = message(kind, line["say"], first, after_menu)
-            first, after_menu = False, menu
-            resident_msgs += [{"role": "assistant", "content": json.dumps({"message": line["say"] if kind == "text" else "",
-                                                                             "tap": line["say"] if kind == "tap" else "", "done": False}, ensure_ascii=False)},
-                              {"role": "user", "content": "\n\n".join(hs)}]
+            view = phone_view(*chat.message(kind, line["say"]))
+            resident_msgs += [{"role": "assistant", "content": json.dumps(
+                                  {"message": line["say"] if kind == "text" else "",
+                                   "tap": line["say"] if kind == "tap" else "", "done": False}, ensure_ascii=False)},
+                              {"role": "user", "content": "\n\n".join(view)}]
             print("  resident: %s%s" % ("[tap] " if kind == "tap" else "", line["say"]))
-            for h in hs:
-                print("  handset : %s" % C.mask(h.replace("\n", " / "), 600))
+            for h in view:
+                print("  handset : %s" % h.replace("\n", " / "))
         for _ in range(8):
-            msg, u = openrouter(key, {"model": RESIDENT_MODEL, "messages": resident_msgs, "temperature": 0.7,
-                                      "response_format": {"type": "json_object"}})
-            bill("resident", u)
+            msg, u = openrouter(chat.key, {"model": RESIDENT_MODEL, "messages": resident_msgs, "temperature": 0.7,
+                                           "response_format": {"type": "json_object"}})
+            chat.bill("resident", u)
             try:
                 said = json.loads(msg.get("content") or "{}")
             except ValueError:
@@ -1351,20 +1402,112 @@ def play(run):
                 break
             kind = "tap" if tap in TAPS.values() else "text"
             print("  resident: %s%s" % ("[tap] " if kind == "tap" else "", text))
-            hs, after_menu = message(kind, text, False, after_menu)
-            if said.get("done") and turns and turns[-1].get("kind") != "menu":
-                turns[-1]["closing"] = True
-            for h in hs:
-                print("  handset : %s" % C.mask(h.replace("\n", " / "), 600))
-            resident_msgs.append({"role": "user", "content": "\n\n".join(hs)})
+            view = phone_view(*chat.message(kind, text, closing=bool(said.get("done"))))
+            for h in view:
+                print("  handset : %s" % h.replace("\n", " / "))
+            resident_msgs.append({"role": "user", "content": "\n\n".join(view)})
             if said.get("done"):
                 ended = "the resident's last message"
                 break
-        cost = sum(x["cost"] for x in usage)
-        print("  -- %s; $%.4f (bot $%.4f, resident $%.4f)" % (ended, cost,
-              sum(x["cost"] for x in usage if x["who"] != "resident"), sum(x["cost"] for x in usage if x["who"] == "resident")))
-        save(ended)
-    print("\nspent $%.4f in all (OpenRouter's own per-request cost)" % spent[0])
+        chat.st["ended"] = ended
+        chat.save()
+        print("  -- %s; $%.4f" % (ended, sum(x["cost"] for x in chat.st["usage"])))
+
+
+TENANT = """# Playing a tenant against the live Homies WhatsApp bot
+
+You are ONE tenant of a building Homies manages, writing to Homies on WhatsApp. Michael answers for
+Homies. Michael is the real bot: its own model and its own code answer every message you send, and
+each message costs a little real credit (the owner approved this run; the script stops itself at $1).
+Nothing you write reaches a real person, and nothing is opened, sent or written anywhere.
+
+## Who you are
+
+Your card (persona, knows, wants, tendencies) is in the message that started you. You know only the
+card. You do not know how Homies works inside, what the bot is told, or what anyone checks. Never type
+a fact the card does not give you; asked something you do not know, say so the way this person would.
+
+## How to write
+
+Write what this person would really type on their phone, one WhatsApp message at a time, in Hebrew
+unless the card says otherwise:
+- short and untidy where the card says so: typos, no punctuation, words run together, slang, an emoji
+  only if it fits them;
+- real tenants rarely hand over facts in a neat, form-like way: they give the address in pieces,
+  forget the apartment, answer half a question, ask something else instead, send two short lines
+  where one would do;
+- the tendencies are things this person MAY do when the moment fits; do not force them and do not
+  stage them one after another;
+- react honestly to what Michael's messages actually say: a reply that is cold, confusing, repeated,
+  slow or wrong gets this person's real reaction (annoyed, confused, asks again, gives up); a good
+  one gets a real reaction too;
+- do not help Michael and do not trap him.
+
+## How to send
+
+Start with your card's opening, exactly: the hello, then the tap on your button. After that you are
+free. Every message is one command, run from the repo root (C:/Users/Acer nitro 5/Desktop/Homie),
+with the JSON on stdin:
+
+    python scripts/wa_qa.py say --run "<run dir>" --deck scripts/wa_qa_menu_buttons.json < msg.json
+
+where msg.json (write it fresh for each message, in your scratch folder) is:
+
+    {"scenario": "<id>", "kind": "text", "text": "<your message>", "en": "<a faithful English gloss of it>"}
+
+- `kind` `tap` with a button's title as `text` presses that button. Once the menu has shown, its three
+  buttons stay in the chat: פתיחת קריאת שירות, מצב קריאה קיימת, לדבר עם נציג.
+- `kind` `photo` with `text` "" (or a caption) only if your card gives you a photo.
+- Add `"closing": true` to a thanks or goodbye that ends the conversation for you.
+- `en` is for the owner, who does not read Hebrew: what you typed, faithfully, typos' sense included.
+
+It prints what your phone shows and nothing else: `phone_shows`, the messages that arrived, in order,
+and `buttons`, the buttons that came with them. If `phone_shows` is empty, nothing came back; do what
+this person would (wait and write again, or give up).
+
+## When to stop
+
+End when this person would: once they have what they came for (often a short thanks, sometimes
+nothing at all), or when they give up. At most 8 messages after the tap. If the person simply stops
+writing, record that and stop, with this as msg.json:
+
+    {"scenario": "<id>", "end": "the tenant stopped writing"}
+
+## Rules
+
+- Use only the `say` command. Do not open, read or list any other file in the run directory or the repo.
+- When you are done, reply with one line: how many messages you sent and how the conversation ended.
+"""
+
+
+def say(run):
+    """One message from a Claude player acting as the tenant; prints only what
+    the tenant's phone shows. The owner, 5 Oct: "act like a real tenant on those
+    conversation" (the first OpenRouter run had a model playing them, too neatly)."""
+    t = json.loads(sys.stdin.buffer.read().decode("utf-8-sig"))
+    chat = Chat(run, str(t.get("scenario") or ""))
+    show = lambda o: print(json.dumps(o, ensure_ascii=False, indent=1))
+    if t.get("end"):
+        chat.st["ended"] = str(t["end"])
+        chat.save()
+        show({"ended": chat.st["ended"]})
+        return
+    if chat.st["ended"]:
+        sys.exit("this conversation has ended (%s)" % chat.st["ended"])
+    if len(chat.st["turns"]) >= 12:
+        sys.exit("12 messages already: end the conversation")
+    kind = t.get("kind", "text")
+    if kind not in ("text", "tap", "photo", "file"):
+        sys.exit("kind must be text, tap, photo or file")
+    text = "" if kind == "file" else str(t.get("text") or "")
+    if kind == "tap" and text not in TAPS.values():
+        sys.exit("a tap's text must be one of: " + " / ".join(TAPS.values()))
+    hs, buttons = chat.message(kind, text, en=t.get("en"), closing=bool(t.get("closing")))
+    if t.get("closing"):
+        chat.st["ended"] = "the tenant's last message"
+    chat.save()
+    show({"phone_shows": [C.mask(x, 100000) for x in hs],
+          "buttons": list(TAPS.values()) if buttons else []})
 
 
 def main():
@@ -1396,6 +1539,11 @@ def main():
         report(run)
     elif cmd == "play":
         play(run)
+    elif cmd == "say":
+        say(run)
+    elif cmd == "tenant":
+        write(os.path.join(run, "TENANT.md"), TENANT)
+        print("wrote " + os.path.join(run, "TENANT.md"))
     else:
         sys.exit(__doc__)
 
