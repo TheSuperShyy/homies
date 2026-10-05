@@ -2613,7 +2613,14 @@ didn't answer"). Any fix belongs to the owner's call on finding 2 of the menu-bu
 
 **A stand-in must copy the real tool's guards.** A retry re-calls tools it cannot remember calling.
 Where the real service deduplicates (open_request's 30-minute guard), a stand-in that does not will
-show a phantom second ticket. The deck's defaults now return the first reference as `duplicate`. **A ticket's status and urgency are the team's (owner, same message).**
+show a phantom second ticket. The deck's defaults now return the first reference as `duplicate`.
+
+**A voice call has no code around the model (5 Oct).** On WhatsApp, Sort, the inject, the guards and
+Send all touch every turn. On a Vapi call, the rendered prompt, the first message and the tools are the
+whole context, and the model's words go straight to the voice. So `scripts/voice_qa.py` has no `turn`
+helper: the bundle renders the prompt for the call's hour and values, and the player does the rest.
+**Check the price list before you quote a cost:** `prompt_probe.py` printed gpt-4.1-mini prices while
+running gpt-4.1, a fifth of the real figure. **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

@@ -1,0 +1,107 @@
+{
+ "_about": "Both Hebrew voice agents, three free callers each (5 Oct, the owner: \"test the voice agent both of them in 3 scenarios as well like the one we did in the chatbot\"). A Claude player is the person on the card and the agent's model; nothing is dialled, nothing is spent. Every resident is invented and lives in בר כוכבא 23. The tool results copy the shapes supabase/functions/debt-tools/index.ts returns. Run: python scripts/voice_qa.py bundle --run DIR.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {"_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. A second call with the same building and type returns the first reference with duplicate: true.",
+                   "opened": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+                   "need_number": {"ok": true, "opened": false, "building_found": false, "reason": "need_number", "numbers_we_manage": ["23"]},
+                   "street_unknown": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"}},
+  "save_partial_request": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>", "partial": true},
+  "add_request_detail": {"ok": true, "reference": "<ticket>"},
+  "notify_team": {"ok": true, "team_notified": true},
+  "get_request_status": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []},
+  "get_balance": {"ok": true, "found": 0},
+  "get_service_info": {"ok": true, "found": false, "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."},
+  "send_payment_link": {"ok": true, "sent": true, "to_last4": "<the phone's last four digits on the card>"},
+  "log_promise_to_pay": {"ok": true, "charges_written": "<number of months>"},
+  "request_standing_order": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+  "log_disputed_payment": {"ok": true, "charges_written": "<number of months>"},
+  "transfer_to_human": {"ok": true},
+  "log_call_outcome": {"ok": true, "charges_bumped": "<number of months>"}
+ },
+ "scenarios": [
+  {
+   "id": "in_lift_stuck", "agent": "inbound", "title": "incoming call: the lift is stuck and he cannot tell whether someone is inside",
+   "time": "08:30", "weekday_he": "שני", "ticket": "255-1530-26",
+   "caller": {
+    "persona": "יעקב, 50. Calling from the lobby on his way to work, out of breath, talks fast and cuts his own sentences. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 9. The lift is stuck between floors 2 and 3 with its door closed. He knocked and called out and heard nothing; he does not know whether anyone is inside. It was fine last night.",
+    "wants": "Someone to deal with the lift now.",
+    "tendencies": "Says the street first and the number only when asked. May ask whether he should call the fire brigade. May ask how long it will take. Hangs up quickly once he has an answer."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_status_angry", "agent": "inbound", "title": "incoming call: a broken stairwell window reported two weeks ago, she wants to know what is going on",
+   "time": "13:15", "weekday_he": "שני", "ticket": "255-1531-26",
+   "caller": {
+    "persona": "אורית, 45. Irritated, has called before and feels nothing happens. Speaks in full sentences but sharply; about herself in the feminine (אני רוצה לדעת, אני לא מוכנה).",
+    "knows": "Lives at בר כוכבא 23, apartment 6. About two weeks ago she phoned about the stairwell window on floor 4: the glass is cracked and the wind comes in. She has no ticket number.",
+    "wants": "To know whether anyone is handling it and when it will be fixed.",
+    "tendencies": "Opens with 'every time I call nothing happens'. Asks for a date. May ask to speak to a manager."
+   },
+   "fixtures": {
+    "get_request_status": {"_rule": "a building with 23 (with or without type or unit): found. Anything else: not found.",
+                           "found": {"ok": true, "found": 1, "as_of": "live", "other_open": 0, "requests": [{"reference": "255-1478-26", "status": "in_progress", "type": "maintenance", "urgency": "normal", "opened": "2026-09-21", "last_update": "2026-09-29", "description": "החלון בחדר המדרגות בקומה 4 סדוק, נכנסת רוח"}]},
+                           "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}}
+   }
+  },
+  {
+   "id": "in_pay_by_phone", "agent": "inbound", "title": "incoming call: an older man wants to pay the committee fee by credit card, now, on the phone",
+   "time": "17:40", "weekday_he": "שני", "ticket": "255-1532-26",
+   "caller": {
+    "persona": "מנחם, 72. Polite, old-fashioned, a little hard of hearing: sometimes asks Michael to repeat. Prefers people to machines.",
+    "knows": "Lives at בר כוכבא 23, apartment 11. Full name מנחם לוי. He thinks he owes about two months of the house committee fee. He has his credit card in his hand and wants to read out the number.",
+    "wants": "To pay now, by card, over the phone, and be done with it.",
+    "tendencies": "Starts reading the card number aloud without being asked. Asks whether he is talking to a computer. May ask for 'a real clerk'."
+   },
+   "fixtures": {
+    "get_balance": {"_rule": "building בר כוכבא 23 with unit 11 (or the name מנחם לוי with that building): found. A building with no unit and no name, or anything else: not_found.",
+                    "found": {"ok": true, "found": true, "name": "מנחם לוי", "building": "בר כוכבא 23", "apartment": "11", "total_owed": 600, "unpaid_months": ["2026-08", "2026-09"]},
+                    "not_found": {"ok": true, "found": 0}}
+   }
+  },
+  {
+   "id": "debt_cooperative", "agent": "debt", "title": "debt call: a busy woman at work agrees, and wants the link",
+   "time": "11:20", "weekday_he": "שני", "ticket": "255-1533-26",
+   "vars": {"first_name": "מיכל", "gender": "f", "building": "בר כוכבא 23", "apartments_phrase": "דירה שש", "months_phrase": "אוגוסט וספטמבר",
+            "breakdown_phrase": "אוגוסט, שלוש מאות שקלים, וספטמבר, שלוש מאות שקלים", "amount": "שש מאות שקלים",
+            "alt_payment": "העברה בנקאית", "callback_number": "077-6687949", "verification_email": "Office@homies-management.co.il"},
+   "caller": {
+    "persona": "מיכל, 34. At work, between meetings, friendly but in a hurry; short answers. Writes about herself in the feminine.",
+    "knows": "She is מיכל, apartment 6 in בר כוכבא 23. She forgot the August and September payments. Her phone ends in 4521.",
+    "wants": "To get it over with quickly, ideally by a link on WhatsApp.",
+    "tendencies": "Asks at first who is calling and why. May ask whether she can pay by bank transfer instead. Says she has to go."
+   },
+   "fixtures": {"send_payment_link": {"ok": true, "sent": true, "to_last4": "4521"}}
+  },
+  {
+   "id": "debt_dispute", "agent": "debt", "title": "debt call: he says he paid in cash, and he is annoyed to be called at dinner",
+   "time": "18:10", "weekday_he": "שני", "ticket": "255-1534-26",
+   "vars": {"first_name": "דן", "gender": "m", "building": "בר כוכבא 23", "apartments_phrase": "דירה ארבע עשרה", "months_phrase": "יולי, אוגוסט וספטמבר",
+            "breakdown_phrase": "יולי, אוגוסט וספטמבר, שלוש מאות שקלים כל חודש", "amount": "תשע מאות שקלים",
+            "alt_payment": "העברה בנקאית", "callback_number": "077-6687949", "verification_email": "Office@homies-management.co.il"},
+   "caller": {
+    "persona": "דן, 48. Answers while eating dinner with his family; annoyed, sarcastic, not abusive.",
+    "knows": "He is דן, apartment 14. He says he paid July in cash to יוסי from the house committee and has no receipt. He is not sure about August and September.",
+    "wants": "To be left alone, and for the July 'debt' to disappear.",
+    "tendencies": "Complains about being called at dinner. Says the committee is a mess. May ask for proof of the debt in writing. May agree to look into August and September."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "debt_hardship", "agent": "debt", "title": "debt call: a widow in difficulty asks to pay in parts",
+   "time": "10:30", "weekday_he": "שני", "ticket": "255-1535-26",
+   "vars": {"first_name": "רינה", "gender": "f", "building": "בר כוכבא 23", "apartments_phrase": "דירה אחת", "months_phrase": "יוני, יולי, אוגוסט וספטמבר",
+            "breakdown_phrase": "יוני, יולי, אוגוסט וספטמבר, שלוש מאות שקלים כל חודש", "amount": "אלף ומאתיים שקלים",
+            "alt_payment": "העברה בנקאית", "callback_number": "077-6687949", "verification_email": "Office@homies-management.co.il"},
+   "caller": {
+    "persona": "רינה, 70. Soft-spoken, a little embarrassed; her husband died in the spring and money is tight. About herself in the feminine.",
+    "knows": "She is רינה, apartment 1 in בר כוכבא 23. She cannot pay the whole sum now; she could pay something each month, maybe by standing order from her pension.",
+    "wants": "Not to be in trouble, and to pay in small parts.",
+    "tendencies": "Apologises a lot. Mentions her husband. Asks whether there will be a fine or interest. May ask the agent to call back another day."
+   },
+   "fixtures": {}
+  }
+ ]
+}

@@ -9,6 +9,25 @@ conversation that produced it.
 
 ---
 
+## 2026-10-05
+
+### Voice agents: 3 Claude-played calls each, and what an OpenRouter run would cost (running)
+
+Owner: *"test the voice agent both of them in 3 scenarios as well like the one we did in the chatbot,
+i want to know if you use openroutercredits to simulae the llm how much will it cost"*.
+- **New harness:** `scripts/voice_qa.py` and `scripts/voice_qa_scenarios.json`.
+  - `bundle` reads both live assistants (GET only, the tenth account) and renders each call's
+    prompt for its hour and caller values. `{{gender_forms}}` comes from `dashboard/lib/call.ts`.
+  - `cost` prices the transcripts' model calls from OpenRouter's public model list. It spends
+    nothing.
+- **Live models:** incoming is gpt-4.1 (temperature 0.3), and debt is gpt-5.6-sol (the owner's,
+  15 Sep). On OpenRouter they cost $2 in / $8 out per million tokens and $2 in / $10 out.
+  `prompt_probe.py`'s printed cost uses gpt-4.1-mini prices ($0.40/$1.60), so it reads 5x low.
+- **Prompt plus tools sent on every model call:** incoming about 5,500 tokens, debt about 3,100.
+- **6 calls, playing now:**
+  - incoming: a stuck lift, an angry status call, an elderly man who wants to pay by card;
+  - debt: a cooperative woman, a dispute, a widow in hardship.
+
 ## 2026-10-04
 
 ### WhatsApp bot: 9 conversations on the live bot after the calm-word change, 3 per button
