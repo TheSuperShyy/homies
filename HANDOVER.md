@@ -318,7 +318,7 @@ its stated time.
   - **Result:** 1 of 9 got everything, 4 part, 4 nothing. That matches the offline run, so the offline findings were real.
   - **For the owner, proposals only, most serious first:**
     1. On the live bot, Say it again told a tenant three times that a mould ticket was opened (giving another ticket's number). No ticket was opened.
-    2. The phantom check blocks honest "לא פתחתי" (a negation).
+    2. The phantom check blocks honest "לא פתחתי" (a negation), while Second try usable? passes the passive "נפתחה קריאה". Both were verified by running the live checks on the live drafts; see CONTEXT.
     3. "A large language model, trained by Google" and "a real service rep": decide what Michael says.
     4. The promise filter cut a sentence from 37 of 72 replies; there are broken endings, and once only "anything else?" was left.
     5. The balance check demands the phone number typed although the bot sees it. Decide whether the sender's number counts.

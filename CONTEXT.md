@@ -2666,6 +2666,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - the promise filter leaving only "anything else?".
   - **So:** offline runs with Claude tenants (`say`) are a fair stand-in for finding faults. A live run (`live`) confirms them on the real records, and costs about 4 cents a conversation.
   - **Spending:** the live n8n bot spends through the same OpenRouter key as `OPENROUTER_API_KEY` in .env; the key's usage and the wallet moved together.
+- **The bot's safety net blocks honest replies and passes false ones (verified 5 Oct).** The live drafts of conversation 6 were run through the live checks (`wa_qa.js`, prompt 65c56f9d9c40).
+  - **Blocked:** "לא פתחתי קריאה חדשה" ("I didn't open a new ticket") fails `phantom` and `deeds`, because the checks match "פתחתי" inside a negation.
+  - **Passed:** the last-resort rewrite's "אני רואה שנפתחה קריאה 255-1345-26", with no ticket behind it, passes Second try usable?. The passive "נפתחה" is not in its pattern.
+  - **How to fix it:** the checks need the negation and the passive; tightening the prompt will not do it. Any fix ships through `check_whatsapp_rules.py` like every other change.
 
 **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
