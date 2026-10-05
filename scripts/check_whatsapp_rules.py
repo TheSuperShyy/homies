@@ -369,9 +369,9 @@ def watch(since):
     flagged, turns, menus, cut = 0, 0, [], 0
     she = set()                           # residents seen writing in the feminine
     try:                                  # the promise phrases, one list (1 Oct)
-        from n8n_whatsapp_nopromise import PROMISE_PY
+        from n8n_whatsapp_nopromise import PROMISE_PY, hits as promise_hits
     except Exception:  # noqa: BLE001 -- the watch still runs without it
-        PROMISE_PY = None
+        PROMISE_PY = promise_hits = None
     for eid in sorted(ids, key=int):
         ex = api("/api/v1/executions/%s?includeData=true" % eid)
         rd = ((ex.get("data") or {}).get("resultData") or {}).get("runData") or {}
@@ -458,19 +458,25 @@ def watch(since):
         # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
         # what went out is a flag; the ack and the first beat of a two-part
         # payment reply may say "I'm on it". One the filter cut is an info line.
+        # 5 Oct (promise v3): a phrase is a promise only as Send reads it -- not
+        # in a reported request, a wish or "I can't say when". hits() runs Send's
+        # own definitions in Node; without Node, the bare phrase list as before.
         if PROMISE_PY is not None and not canned:
             two_beat = any(k == "rest" for k, _ in sent)
-            for k, t in sent:
-                hit = PROMISE_PY.search(t) if (k == "rest" or (k == "answer" and not two_beat)) else None
-                if hit:
-                    flags.append("a promise in the %s: %s" % (k, hit.group(0).strip()))
             raw = str((first("Type for a moment") or {}).get("output") or "")
-            answers = [t for k, t in sent if k == "answer"]      # none when Send failed
-            said_hit = any(PROMISE_PY.search(t) for t in answers)
-            if raw and answers and not two_beat and not said_hit and PROMISE_PY.search(raw):
+            texts = [t for _, t in sent] + [raw]
+            left = None
+            if promise_hits is not None and any(PROMISE_PY.search(t) for t in texts):
+                left = promise_hits(texts)
+            if left is None:
+                left = [[m.group(0).strip() for m in PROMISE_PY.finditer(t)] for t in texts]
+            for (k, t), hs in zip(sent, left):
+                if hs and (k == "rest" or (k == "answer" and not two_beat)):
+                    flags.append("a promise in the %s: %s" % (k, hs[0]))
+            answers = [hs for (k, _), hs in zip(sent, left) if k == "answer"]   # none when Send failed
+            if raw and answers and not two_beat and not any(answers) and left[-1]:
                 cut += 1
-                infos.append("the model wrote a promise and the filter cut it: %s"
-                             % mask(PROMISE_PY.search(raw).group(0).strip(), 40))
+                infos.append("the model wrote a promise and the filter cut it: %s" % mask(left[-1][0], 40))
         # 1 Oct: one person, in the singular; feminine once she has written in
         # the feminine (in this window: an earlier cue is not seen, so a
         # feminine reply with no cue here is an info line, not a flag).
@@ -607,7 +613,9 @@ def main():
     print("")
     bad += check_typing(wf)
     print("")
-    bad += 1 if node({"mode": "cases", "code": extract(wf)}) else 0
+    # 5 Oct: the live run's 37 promise cuts, each a case (promise v3).
+    fixture = json.load(open(os.path.join(HERE, "wa_promise_live_05oct.json"), encoding="utf-8"))
+    bad += 1 if node({"mode": "cases", "code": extract(wf), "promise_live": fixture["cases"]}) else 0
     if "--replay" in argv:
         print("")
         print("=== replay: every real message, live code vs %s ===" % label)

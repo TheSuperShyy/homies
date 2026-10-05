@@ -198,37 +198,40 @@ function cases(E) {
   // the clause when a clean sentence is left, else the sentence; never a
   // ticket number, never a link, never the whole message.
   console.log(NL + '--- Send: no promises reach a resident (1 Oct) ---');
-  expect('27 Sep 15:05: the two promise sentences go, the ticket stays',
+  // 5 Oct, promise v3: "אל דאגה" and "the team will handle it", with no time,
+  // are the owner's reassurance and stay; "I'm on it" and the time still go.
+  expect('27 Sep 15:05 (v3): "אני מטפל בזה" and "בהקדם" go; "אל דאגה" and "יטפל בזה" stay',
     say({ reply: 'מבאס, אבל אל דאגה, אני מטפל בזה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה בהקדם. במה אוכל לעזור עוד?', said: 'Bar Kochba 23, apartment 4' }),
-    'פתחתי לכם קריאת שירות מספר 255-1339-26. במה אוכל לעזור עוד?');
-  expect('27 Sep 14:52, first contact: "אל דאגה," goes, the rest of its sentence stays',
-    say({ reply: "היי! כאן מיכאל מהומי'ז. אני מבין, זה ממש לא נעים ללכת במדרגות ככה. אל דאגה, אני אפתח קריאת שירות כדי שיטפלו בתאורה. באיזה בניין אתם גרים ובאיזו דירה?", S: { greeted: false }, said: 'hi, lights' }),
-    "היי! כאן מיכאל מהומי'ז. אני מבין, זה ממש לא נעים ללכת במדרגות ככה. אני אפתח קריאת שירות כדי שיטפלו בתאורה. באיזה בניין אתם גרים ובאיזו דירה?");
+    'מבאס, אבל אל דאגה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה. במה אוכל לעזור עוד?');
+  const DONT_WORRY = "היי! כאן מיכאל מהומי'ז. אני מבין, זה ממש לא נעים ללכת במדרגות ככה. אל דאגה, אני אפתח קריאת שירות כדי שיטפלו בתאורה. באיזה בניין אתם גרים ובאיזו דירה?";
+  expect('27 Sep 14:52, first contact (v3): "אל דאגה," is reassurance and stays',
+    say({ reply: DONT_WORRY, S: { greeted: false }, said: 'hi, lights' }), DONT_WORRY);
   expect('the only sentence: the promise clause goes, the sentence stays',
     say({ reply: 'אני מעביר את זה לצוות, נחזור בהקדם.', said: 'question' }), 'אני מעביר את זה לצוות.');
   expect('a comma clause goes',
     say({ reply: 'העברתי את הפנייה שלכם לצוות שלנו, שיחזור אליכם בהקדם.', said: 'question' }), 'העברתי את הפנייה שלכם לצוות שלנו.');
+  // v3: the mechanics cases below use a promise v3 still cuts ("יחזור אליכם").
   expect('a ticket number in the sentence: cut from the ו, the number stays',
-    say({ reply: 'פתחתי קריאה מספר 255-1-26 והצוות יטפל בזה בהקדם.', said: 'question' }), 'פתחתי קריאה מספר 255-1-26.');
+    say({ reply: 'פתחתי קריאה מספר 255-1-26 והצוות יחזור אליכם בהקדם.', said: 'question' }), 'פתחתי קריאה מספר 255-1-26.');
   expect('a ticket number is never cut away: no clean cut, so the sentence stays whole',
-    say({ reply: 'פתחתי לכם קריאה 255-1339-26 שהצוות יטפל בה בהקדם.', said: 'question' }), 'פתחתי לכם קריאה 255-1339-26 שהצוות יטפל בה בהקדם.');
-  expect('an emergency pass-on stays true: its promise and "עזרה בדרך" go',
+    say({ reply: 'פתחתי לכם קריאה 255-1339-26 שהצוות יחזור אליכם בהקדם.', said: 'question' }), 'פתחתי לכם קריאה 255-1339-26 שהצוות יחזור אליכם בהקדם.');
+  expect('an emergency pass-on stays true: its call promise and "עזרה בדרך" go (v3: "שיטפל בזה" stays)',
     say({ reply: 'בבקשה אל תנסו לפתוח את הדלת בכוח! זה מסוכן מאוד ויכול לגרום לפציעה. אני מעביר את הפנייה הזו מיד לצוות שלנו שיטפל בזה, והם יצרו איתכם קשר בהקדם. בינתיים, נסו להישאר רגועים. עזרה בדרך.', said: 'help' }),
-    'בבקשה אל תנסו לפתוח את הדלת בכוח! זה מסוכן מאוד ויכול לגרום לפציעה. אני מעביר את הפנייה הזו מיד לצוות שלנו. בינתיים, נסו להישאר רגועים.');
+    'בבקשה אל תנסו לפתוח את הדלת בכוח! זה מסוכן מאוד ויכול לגרום לפציעה. אני מעביר את הפנייה הזו מיד לצוות שלנו שיטפל בזה. בינתיים, נסו להישאר רגועים.');
   expect('an offer keeps its question',
     say({ reply: 'אני מצטער לשמוע שאתם לא מרוצים מהשירות. אני רוצה לוודא שאני מבין אתכם נכון, האם תרצו שאעביר את הפנייה שלכם לנציג מהצוות שלנו שיחזור אליכם?', said: 'question' }),
     'אני מצטער לשמוע שאתם לא מרוצים מהשירות. אני רוצה לוודא שאני מבין אתכם נכון, האם תרצו שאעביר את הפנייה שלכם לנציג מהצוות שלנו?');
-  expect('a step back to an earlier boundary: never "וביקשתי."',
-    say({ reply: 'העברתי את פנייתכם לצוות הרלוונטי וביקשתי שיחזרו אליכם בהקדם. במה עוד אפשר לעזור?', said: 'question' }),
-    'העברתי את פנייתכם לצוות הרלוונטי. במה עוד אפשר לעזור?');
+  const ASKED = 'העברתי את פנייתכם לצוות הרלוונטי וביקשתי שיחזרו אליכם בהקדם. במה עוד אפשר לעזור?';
+  expect('v3: what was asked of the team is a report, not a promise ("וביקשתי שיחזרו אליכם בהקדם" stays)',
+    say({ reply: ASKED, said: 'question' }), ASKED);
   expect('no clean cut: the sentence goes whole, never "ברגע שאפתח קריאה."',
-    say({ reply: 'אני מבין שאתם רוצים שהתקלה תתוקן מיד. פתיחת קריאת שירות היא הדרך שלנו לטפל בתקלות כאלה ולהבטיח שהן יטופלו. ברגע שאפתח קריאה, הצוות שלנו יטפל בזה בהקדם. באיזה בניין מדובר?', said: 'question' }),
+    say({ reply: 'אני מבין שאתם רוצים שהתקלה תתוקן מיד. פתיחת קריאת שירות היא הדרך שלנו לטפל בתקלות כאלה ולהבטיח שהן יטופלו. ברגע שאפתח קריאה, הצוות שלנו יחזור אליכם בהקדם. באיזה בניין מדובר?', said: 'question' }),
     'אני מבין שאתם רוצים שהתקלה תתוקן מיד. פתיחת קריאת שירות היא הדרך שלנו לטפל בתקלות כאלה ולהבטיח שהן יטופלו. באיזה בניין מדובר?');
   expect('never "כדי." at the end of a cut',
-    say({ reply: 'אני לא יכול לראות אם בוצעה הדברה ספציפית בבניין. אם יש לכם מזיקים בדירה, אני יכול לפתוח קריאת שירות כדי שנטפל בזה. תרצו שאפתח קריאה?', said: 'question' }),
+    say({ reply: 'אני לא יכול לראות אם בוצעה הדברה ספציפית בבניין. אם יש לכם מזיקים בדירה, אני יכול לפתוח קריאת שירות כדי שיחזרו אליכם. תרצו שאפתח קריאה?', said: 'question' }),
     'אני לא יכול לראות אם בוצעה הדברה ספציפית בבניין. תרצו שאפתח קריאה?');
-  expect('a comma inside a number is not a boundary',
-    say({ reply: 'היתרה שלכם 1,240 שקלים יטופלו בקרוב.', said: 'question' }), 'היתרה שלכם 1,240 שקלים יטופלו בקרוב.');
+  expect('a comma inside a number is not a boundary (v3: the time alone goes after "יטופלו")',
+    say({ reply: 'היתרה שלכם 1,240 שקלים יטופלו בקרוב.', said: 'question' }), 'היתרה שלכם 1,240 שקלים יטופלו.');
   const PAY2 = 'אני מבין שאתם צריכים שוב את קישור התשלום שלכם. בטח, אני מטפל בזה. §§§ הנה קישור התשלום: https://pay.example.co.il/abc123 הקישור אישי.';
   const PAY_STEPS = [{ action: { tool: 'get_payment_link' } }];
   expect('the two-part payment reply: its first beat is untouched',
@@ -249,14 +252,16 @@ function cases(E) {
     say({ reply: 'היתרה שלכם היא 620 שקלים. אפשר לשלם עד מחר דרך הקישור. יש עוד משהו?', said: 'how much' }),
     'היתרה שלכם היא 620 שקלים. אפשר לשלם עד מחר דרך הקישור. יש עוד משהו?');
   expect('a message that is all promise is never emptied',
-    say({ reply: 'אל דאגה, נחזור אליכם בהקדם.', said: 'question' }), 'אל דאגה, נחזור אליכם בהקדם.');
+    say({ reply: 'נחזור אליכם בהקדם.', said: 'question' }), 'נחזור אליכם בהקדם.');
+  expect('v3: "אל דאגה," stays when the promise after its comma goes',
+    say({ reply: 'אל דאגה, נחזור אליכם בהקדם.', said: 'question' }), 'אל דאגה.');
   expect('a newline is a sentence boundary',
-    say({ reply: 'פתחתי לכם קריאה מספר 255-1339-26' + NL + 'הצוות יטפל בזה בהקדם' + NL + 'יש עוד משהו?', said: 'question' }),
+    say({ reply: 'פתחתי לכם קריאה מספר 255-1339-26' + NL + 'הצוות יחזור אליכם בהקדם' + NL + 'יש עוד משהו?', said: 'question' }),
     'פתחתי לכם קריאה מספר 255-1339-26' + NL + 'יש עוד משהו?');
   expect('an emoji stays with its sentence',
-    say({ reply: 'פתחתי קריאה 255-1339-26. 🙂 הצוות יטפל בזה בהקדם. במה עוד?', said: 'question' }), 'פתחתי קריאה 255-1339-26. 🙂 במה עוד?');
+    say({ reply: 'פתחתי קריאה 255-1339-26. 🙂 הצוות יחזור אליכם בהקדם. במה עוד?', said: 'question' }), 'פתחתי קריאה 255-1339-26. 🙂 במה עוד?');
   expect('a promise glued to an emoji goes with it',
-    say({ reply: 'פתחתי קריאה 255-1339-26. הצוות יטפל בזה בהקדם🙂 במה עוד?', said: 'question' }), 'פתחתי קריאה 255-1339-26. במה עוד?');
+    say({ reply: 'פתחתי קריאה 255-1339-26. הצוות יחזור אליכם בהקדם🙂 במה עוד?', said: 'question' }), 'פתחתי קריאה 255-1339-26. במה עוד?');
   expect('a link loses only the promise clause after it',
     say({ reply: 'הנה הקישור: https://pay.example.co.il/abc123, ואם יש בעיה אני אטפל בזה. הקישור אישי.', said: 'question' }),
     'הנה הקישור: https://pay.example.co.il/abc123. הקישור אישי.');
@@ -267,8 +272,12 @@ function cases(E) {
     () => sent(E, { reply: MENU_LIKE, said: 'what can you do' }).content_type, 'input_select');
   // Found by the 1 Oct replay (a real 17 Sep reply): when the promise IS the
   // main clause of an "if" sentence, a comma cut would leave a dangling "if…".
+  // v3: that reply's "נטפל בזה כמובן" is reassurance with no time, and stays;
+  // the dangling "אם…" rule is kept by the same sentence with a visit promise.
+  const COMMON = 'חשוב לי לציין שאם התקלה בתוך הדירה, הטיפול הוא באחריותכם. אם מדובר בתקלה ברכוש המשותף, כמו בחשמל הכללי של הבניין, נטפל בזה כמובן. במה עוד אוכל לעזור?';
+  expect('17 Sep (v3): "נטפל בזה כמובן" is reassurance and stays', say({ reply: COMMON, said: 'question' }), COMMON);
   expect('a conditional whose main clause is the promise goes whole, never a dangling "אם…"',
-    say({ reply: 'חשוב לי לציין שאם התקלה בתוך הדירה, הטיפול הוא באחריותכם. אם מדובר בתקלה ברכוש המשותף, כמו בחשמל הכללי של הבניין, נטפל בזה כמובן. במה עוד אוכל לעזור?', said: 'question' }),
+    say({ reply: 'חשוב לי לציין שאם התקלה בתוך הדירה, הטיפול הוא באחריותכם. אם מדובר בתקלה ברכוש המשותף, כמו בחשמל הכללי של הבניין, הטכנאי יגיע מחר. במה עוד אוכל לעזור?', said: 'question' }),
     'חשוב לי לציין שאם התקלה בתוך הדירה, הטיפול הוא באחריותכם. במה עוד אוכל לעזור?');
   expect('a step back past "ולדאוג": the main clause stays',
     say({ reply: 'ברגע שאקבל את הפרטים, אוכל לפתוח קריאת שירות דחופה ולדאוג שיגיעו אליכם מהר ככל האפשר. באיזה בניין מדובר?', said: 'question' }),
@@ -276,6 +285,53 @@ function cases(E) {
   expect('a technician time is an invented promise and goes',
     say({ reply: 'פתחתי לכם קריאה 255-1339-26. הטכנאי יגיע מחר בבוקר. יש עוד משהו?', said: 'question' }),
     'פתחתי לכם קריאה 255-1339-26. יש עוד משהו?');
+
+  // 5 Oct, promise v3 (scripts/n8n_whatsapp_nopromise.py, fix 2 of 5): on the
+  // live run as Assaf the filter cut 37 of 72 replies, about half of them
+  // honest: "I can't say when", what Michael asked the team, wishes, and the
+  // owner's "it will be handled". Once only "anything else?" was left.
+  console.log(NL + '--- Send: promises only, not reports, wishes or "I can\'t say when" (5 Oct) ---');
+  const same = (name, reply) => expect(name, say({ reply, said: 'question' }), reply);
+  same('v3: "I can\'t say exactly when" is not a promise',
+    'אני לא יכול להגיד לך מתי בדיוק יחזרו אליך. הצוות קיבל את הפנייה שלך ויטפל בה. במה אוכל לעזור לך עוד?');
+  same('v3: "מתי או אם יחזרו אליך" is a question, not a promise',
+    'אני לא יכול להבטיח מתי או אם יחזרו אליך, אבל העברתי את זה הלאה. במה אוכל לעזור לך עוד?');
+  same('v3: a note to the team, reported, stays ("רשמתי לצוות שלנו שיחזרו אליך")',
+    'בטח, רשמתי לצוות שלנו שיחזרו אליך דחוף. יש עוד משהו?');
+  same('v3: the tenant\'s own want stays ("שאתה מחכה שיחזרו אליך")',
+    'עדכנתי את הצוות שאתה מחכה שיחזרו אליך. יש עוד משהו?');
+  same('v3: a wish stays ("אני מקווה שיחזרו אליך בהקדם")', 'אני מקווה שיחזרו אליך בהקדם. יש עוד משהו?');
+  same('v3: "I can\'t promise that…" is honest and stays',
+    'אני לא יכול להבטיח שיחזרו אליך היום, אבל העברתי את זה לצוות. יש עוד משהו?');
+  same('v3: a negated visit is not a promise', 'לצערי הטכנאי לא יגיע היום. אפשר לעזור בעוד משהו?');
+  expect('v3: after "will be handled", the time alone goes',
+    say({ reply: 'הם קיבלו את הקריאה ויטפלו בה בהקדם. יש עוד משהו?', said: 'when?' }),
+    'הם קיבלו את הקריאה ויטפלו בה. יש עוד משהו?');
+  expect('v3: "בהקדם האפשרי" goes whole',
+    say({ reply: 'הקריאה תטופל בהקדם האפשרי. יש עוד משהו?', said: 'when?' }), 'הקריאה תטופל. יש עוד משהו?');
+  expect('v3: "במהירות האפשרית" is a time too',
+    say({ reply: 'פתחתי לך קריאה 255-1347-26. הצוות שלנו יטפל בזה במהירות האפשרית. יש עוד משהו?', said: 'lift' }),
+    'פתחתי לך קריאה 255-1347-26. הצוות שלנו יטפל בזה. יש עוד משהו?');
+  expect('v3: "העברתי את זה לצוות שיחזור אליך" is the team that will call: still cut',
+    say({ reply: 'העברתי את זה לצוות שיחזור אליך היום. יש עוד משהו?', said: 'question' }),
+    'העברתי את זה לצוות. יש עוד משהו?');
+  expect('v3: a ש clause after a comma is a relative clause: still a promise',
+    say({ reply: 'עדכנתי את הצוות שלנו, שיחזור אליך בהקדם. יש עוד משהו?', said: 'question' }),
+    'עדכנתי את הצוות שלנו. יש עוד משהו?');
+  expect('v3: "מבטיח ש…" keeps it a promise, never "אני מבטיח." left',
+    say({ reply: 'פתחתי לך קריאה 255-1347-26. אני מבטיח שיחזרו אליך היום. יש עוד משהו?', said: 'question' }),
+    'פתחתי לך קריאה 255-1347-26. יש עוד משהו?');
+  expect('v3: "the team will update you" after a comma is still cut, never a dangling "וברגע ש…"',
+    say({ reply: 'הצוות קיבל את הבקשה שלך, וברגע שיהיו חדשות, הם יעדכנו אותך. יש עוד משהו?', said: 'question' }),
+    'הצוות קיבל את הבקשה שלך. יש עוד משהו?');
+  // Not "never only anything else?": the filter can only remove, so that would
+  // mean sending the promise, and an all-promise reply can be an invented one.
+  expect('v3: a reply that is all promise still loses it, even down to "anything else?"',
+    say({ reply: 'הם יחזרו אליך בהקדם. במה אוכל לעזור לך עוד?', said: 'when?' }), 'במה אוכל לעזור לך עוד?');
+  // The 37 live replies (scripts/wa_promise_live_05oct.json): raw draft in, v3 out.
+  for (const k of P.promise_live || []) {
+    expect('5 Oct live #' + k.n + ' (' + k.case + ')', say({ reply: k.raw, said: k.said }), k.want);
+  }
 
   console.log(NL + '--- Reply usable?: echo and clerk (first pass only; exempt when the turn did work) ---');
   const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);

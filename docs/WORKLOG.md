@@ -11,6 +11,51 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: fix 2 of 5, the promise filter cuts promises only (built and tested; NOT live)
+
+On the owner's "go" to carry on after fix 1. It goes live on his next go. He also asked: *"please dont over exahust the openrouter credits"*. Nothing here spent any ($13.56 left of the $15 cap).
+- **Why:** on the live run the filter cut a sentence from 37 of 72 replies, and about half of those cuts were honest:
+  - "I can't say exactly when";
+  - what Michael asked the team;
+  - wishes;
+  - "the team will handle it".
+  - Once only "במה אוכל לעזור לך עוד?" was left.
+  - Three cuts left broken sentences: "...ולבקש.", "...ומבקש." and "וברגע שיהיו חדשות...".
+- **What promise v3 changes** (`scripts/n8n_whatsapp_nopromise.py`, the filter in Send):
+  - **Still cut:** a time, a call or a visit, "I'm on it", and "I'll update you".
+  - **No longer cut:** "יטפל/יטפלו בזה", "נטפל בזה" and "אל דאגה". That is the owner's reassurance, with no time.
+  - **Not a promise:**
+    - a phrase asked about ("מתי יחזרו אליך");
+    - a negated phrase;
+    - a ש clause that reports a request ("ביקשתי / רשמתי / עדכנתי ש"), the tenant's want ("שאתה מחכה ש") or a wish ("מקווה ש").
+    - Still a promise: a ש clause after a comma, or under "מבטיח / בטוח / יודע / אדאג".
+  - **A time after "will be handled":** only the time goes ("יטפל בזה בהקדם" becomes "יטפל בזה").
+  - **No dangling leftovers:** a cut never leaves "וברגע ש…" or "אני מבטיח." behind.
+  - **`--watch` reads promises the same way:** `hits()` runs the filter's own definitions in Node.
+- **One part of the plan not done, on purpose: "never leave only 'anything else?'".**
+  - The filter can only remove, so the only way to do it is to send the promise it was cutting, invented ones included ("הטכנאי יגיע מחר בבוקר", a 1 Oct case).
+  - With honest sentences no longer cut, none of the 72 live replies ends that way.
+  - The prompt's "anything else?" text is fix 4's.
+- **Tested, nothing spent:**
+  - **The 37 live cuts are now cases** (`scripts/wa_promise_live_05oct.json`), all as decided:
+    - 10 real promises are still cut;
+    - the honest sentences are kept;
+    - the 3 broken leftovers are mended.
+  - **On the candidate:** 290/290 cases pass.
+  - **On live:** exactly the 52 new or changed cases fail: 19 rules and 33 live replies. The other 4 come out the same under both versions.
+  - **The replay of all 984 replies ever sent (614 distinct):** 60 change, all intended:
+    - "will be handled" is kept, about 30;
+    - honest "when" answers, reports and wishes are kept;
+    - the time alone is cut;
+    - 3 broken leftovers are mended.
+    - None is empty or a fragment, and the guards are unchanged.
+  - **`check_patchers_idle.py` on the dump:** only the baseline 6 are not idle.
+  - **The watch, on made-up turns:** a report that went out is not flagged, a promise that went out is, and a cut one is an info line.
+- **To ship, on the owner's go:** `python scripts/n8n_whatsapp_nopromise.py --apply`.
+  - The snapshot `docs/handover/n8n-whatsapp-live-05oct-before-nopromise-v3.json` is live as of 15:03:39 UTC; retake it if live has moved.
+  - Then the check on live, every patcher idle, and `--watch`.
+  - `--restore` undoes it.
+
 ### WhatsApp bot: fix 1 of 5, the safety net stops making things worse (LIVE 15:03 UTC)
 
 The owner, after the live run as Assaf (1 of 9 got everything): *"what are the fix that is needed for it to be able to be consistent and not break"*. The plan was approved in chat: five fixes, one at a time, each through the gate. This is fix 1.
