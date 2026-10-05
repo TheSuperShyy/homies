@@ -23,7 +23,7 @@ conversation that produced it.
 - **Found:**
   - **Say it again on the live bot (conversation 6):** it told Assaf three times that a mould ticket was opened, "255-1345-26". None was opened; that number is the gate ticket's. Meanwhile the honest "לא פתחתי קריאה חדשה" was blocked, because the phantom check matches "פתחתי" inside a negation.
   - **What the bot says it is:** "a large language model, trained by Google" (conversation 7) and "a real service rep" (conversation 3).
-  - **The promise filter** cut a sentence from 38 of 72 replies. Some endings were broken, and once only "anything else?" was left.
+  - **The promise filter** cut a sentence from 37 of 72 replies. Some endings were broken, and once only "anything else?" was left.
   - **The balance check never ran:** the bot "can see" the number but demanded it typed, four times.
   - **The gate history:** "I can't see earlier reports" was said without a lookup.
   - **The status lookup:** for building 23, flat 2 it returned found 0 / other_open 5, while 255-1341-26 (mould, flat 2, voice, no resident or phone) is open.

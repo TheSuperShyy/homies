@@ -320,7 +320,7 @@ its stated time.
     1. On the live bot, Say it again told a tenant three times that a mould ticket was opened (giving another ticket's number). No ticket was opened.
     2. The phantom check blocks honest "לא פתחתי" (a negation).
     3. "A large language model, trained by Google" and "a real service rep": decide what Michael says.
-    4. The promise filter cut a sentence from 38 of 72 replies; there are broken endings, and once only "anything else?" was left.
+    4. The promise filter cut a sentence from 37 of 72 replies; there are broken endings, and once only "anything else?" was left.
     5. The balance check demands the phone number typed although the bot sees it. Decide whether the sender's number counts.
     6. The status lookup found nothing for building 23 flat 2 while 255-1341-26 is open there. A voice ticket with no resident or phone, worth checking in `get_request_status`.
     7. The bot said it can't see earlier reports without looking them up.
