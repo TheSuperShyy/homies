@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-05
 
-### WhatsApp bot: fixes 4 and 5's texts, and only six emoji (built and tested; NOT live)
+### WhatsApp bot: fixes 4 and 5's texts, and only six emoji (LIVE 16:31 UTC)
 
 On the owner's *"start just finish it all quick"*. Nothing spent.
 - **`scripts/n8n_whatsapp_straight.py`, MEMORY_EPOCH 73 to 74.** It writes the prompt, get_balance's description and the memory key. Each is rewritten only if it is the one being replaced (by hash).
@@ -28,9 +28,29 @@ On the owner's *"start just finish it all quick"*. Nothing spent.
   - **The straight dump:** 290/290 cases. The replay changes nothing (Send, Sort and the guards are untouched). Only the two intended pins move: the prompt `65c56f9d9c40` to `0b6de0310b70`, and get_balance `510af1d70292` to `3ef1f30b5235`. The patchers are idle but the baseline 6.
   - **The emoji dump:** 295/295 with 5 new cases, and the pins are unchanged. The replay changes 23 replies, each losing only 👋, 💧, 😔, 😕 or 😥.
     - The 37 live cases' expected outputs now include the emoji step: 7 lose an emoji.
-  - **A Claude-played check of Michael under the new prompt is running** (11 situations: bot?, who, danger, pushed, when?, earlier ticket, balance three ways, goodbye, rep tap).
-- **The repo is ahead of live.** The auto-commit 5396c88 took prompt.md, and MEMORY_EPOCH 74 is in n8n_whatsapp.py. Until `straight.py --apply`, six patchers that copy the repo's prompt or tool texts want to write them: greet, menu, nopage, patch, payment and teamnote. Do not `--apply` them.
-- **To ship:** review the Claude-played replies, paste the new pins, run `straight.py --apply`, then `emoji.py --apply` (its dump on top of the new live), then the check on live, every patcher idle, and `--watch`.
+  - **The Claude-played check:** a subagent played Michael under the new prompt in 11 situations. Each reply went through the would-be bot's own guards and Send (`wa_qa` turns mode, the straight dump with the emoji Send).
+    - **As decided:**
+      - "are you a bot?" got the digital assistant and a team note for the person;
+      - "who is this?" got "מיכאל מצוות השירות של הומי'ז";
+      - danger got the urgent ticket and its number, no advice and no call offer;
+      - "when?" got no date, but the ticket is open and will be handled, with a closing question on his matter;
+      - the earlier mould ticket was looked up first and 255-1341-26 found;
+      - the balance was asked once, explained once, then a team note;
+      - a goodbye got only a goodbye.
+    - **One fix from it:** the owner's pushed-danger line without the ticket number ("פתחתי לך קריאה דחופה, וזה הדבר היחיד…") fails fix 1's `phantom` and `deeds`. With the number it passes.
+      - The prompt now asks for the number (prompt `0e3ca2b3cfa0`).
+      - Three new cases cover it.
+    - **For the owner to see:** on the rep tap Michael said "היי, כאן מיכאל מצוות השירות של הומי'ז 😊 מה שלומך?". The approved hello is "מיכאל מהומי'ז", and the prompt's instruction for that hello is unchanged; the model blended in the new identity. It passes every guard.
+- **Shipped, on the owner's "finish it all":**
+  - **`straight.py --apply`, 16:31:02 UTC:** prompt `0e3ca2b3cfa0`, get_balance `57e5118d8e01`, memory key epoch 74. Live was unchanged since 15:59:37.
+  - **`emoji.py --apply`, 16:31:50 UTC.** Its snapshot was retaken on top of straight's write.
+  - **Before the emoji write:** 298/298 on the combined dump, the pins unchanged, and the replay changes 21 replies (emoji only). The patchers are idle but the baseline 6.
+  - **On live after:**
+    - both patchers report nothing to do;
+    - `check_whatsapp_rules.py`: all green, 298/298, 15 pins unchanged;
+    - `check_patchers_idle.py` with live's own nodes: the baseline 6 only.
+  - **`--watch 2026-10-05T15:03`:** 0 resident turns at 16:33 UTC.
+- **Undo:** `n8n_whatsapp_emoji.py --restore` (snapshot `...-before-emoji.json`, live at 16:31:02); `n8n_whatsapp_straight.py --restore` (`...-before-straight.json`, live at 15:59:37, epoch 73); then `git revert`.
 
 ### WhatsApp bot: fix 3 of 5 and fix 5's half, the lookups and the typed number (Edge Function v116, LIVE 16:09 UTC)
 

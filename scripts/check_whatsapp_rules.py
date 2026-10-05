@@ -95,13 +95,16 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # in Say it again's false claims before). Scratchpad run safetynet/retry_play.py.
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
-    'Answer the resident / system': '65c56f9d9c40',
+    # 5 Oct (n8n_whatsapp_straight.py, epoch 74): the prompt and get_balance's
+    # text, after a Claude-played check of 11 situations through the would-be
+    # bot's guards and Send (the pushed danger line now carries its number).
+    'Answer the resident / system': '0e3ca2b3cfa0',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     'Try again / note': '6a7f78f84a2b',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
-    'get_balance / tool': '510af1d70292',
+    'get_balance / tool': '3ef1f30b5235',
     'get_payment_link / tool': '58ab6a539158',
     'get_request_status / tool': '76e812f28aaa',
     'get_service_info / tool': '6223a04ed17f',

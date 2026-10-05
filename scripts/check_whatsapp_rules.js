@@ -627,6 +627,15 @@ function cases(E) {
   expect('deeds: a ticket from two turns back, with its number, no tool now (live 83362)',
     said5('deeds', OLDREF, { rows: ['פתחתי עכשיו קריאת שירות דחופה, מספר 255-1344-26'] }), true);
   expect('deeds: the same sentence with an invented number', said5('deeds', OLDREF, { rows: ['שלום'] }), false);
+  // 5 Oct, fix 4 (Claude-played check): the owner's line for a resident who
+  // presses in danger passes only with the ticket's number, so the prompt asks
+  // for it; without it this guard sends it back.
+  const PUSHED = 'פתחתי לך קריאה דחופה, מספר 255-1344-26, וזה הדבר היחיד שאני יכול לעשות מכאן.';
+  const URGENT_ROWS = { rows: ['פתחתי לך קריאה דחופה על הנזילה ליד גוף התאורה בלובי, מספר 255-1344-26.'] };
+  expect('phantom: the pushed danger line, with its number from earlier in the chat', said5('phantom', PUSHED, URGENT_ROWS), true);
+  expect('deeds: the same', said5('deeds', PUSHED, URGENT_ROWS), true);
+  expect('phantom: the pushed danger line without its number is sent back',
+    said5('phantom', 'פתחתי לך קריאה דחופה, וזה הדבר היחיד שאני יכול לעשות מכאן.', URGENT_ROWS), false);
   expect('deeds: the second pass\'s "בדקתי" after the first pass\'s lookup (live 83668)',
     said5('deeds', CHECKED, { run: 1, T: { first_steps: [flat(STATUS0)] } }), true);
   expect('deeds: "בדקתי" with no lookup in either pass', said5('deeds', CHECKED, { run: 1, T: { first_steps: [] } }), false);
