@@ -3023,7 +3023,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     let dupeQuery = db
       .from("requests")
-      .select("id,reference,description")
+      .select("id,reference,description,urgency")
       .eq("building", building)
       .eq("type", type)
       .gte("created_at", since)
@@ -3036,7 +3036,16 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     dupeQuery = unit === null ? dupeQuery.is("unit", null) : dupeQuery.eq("unit", unit);
 
     const { data: existing } = await dupeQuery;
-    if (existing && existing.length) {
+    // AN EMERGENCY IS NEVER FOLDED INTO A TICKET THAT IS NOT ONE (5 Oct, live).
+    // Water dripping onto a stairwell light came back as the intercom ticket
+    // opened 25 minutes earlier -- both `electrical`, common area -- so no
+    // emergency ticket existed, the leak was one line on a routine ticket, and
+    // the resident was read the intercom's number as "the emergency ticket".
+    // Opening the ticket is the one thing we do in an emergency (owner, 6 Oct),
+    // so it gets its own row and its own urgency. Two reports of one emergency
+    // still fold together.
+    const folds = !(urgency(args?.urgency) === "emergency" && existing?.[0]?.urgency !== "emergency");
+    if (existing && existing.length && folds) {
       // A second report of one fault inside the window often carries NEW
       // FACTS. 27 Aug, live: "תקלה במעלית" came back twenty minutes later as
       // "נתקעת בין קומות, כבר חודשיים, ביקשתי כמה פעמים" — and the guard

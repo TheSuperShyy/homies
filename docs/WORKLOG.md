@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: the emergency fixed: a ticket, and nothing else (LIVE 19:15 UTC, debt-tools v118)
+
+The owner, after the six-chat test: *"you have been going back and forth and you did not finish anything"*, then *"so just fix the emergency thats it like we dont order them around we just open a ticket that is the best thing we can do for them and dont advise anything and dont tell them that the team is on the way because its not our main role is just to open a ticket"*.
+- **The prompt was not changed:** it already forbids advice, "what to do" even when asked, and "help / the team is on the way", and asks for the urgent ticket with its number only. Chat 6 broke all of it, so the fix is code.
+- **debt-tools v118 (deployed 19:1x UTC with `--oxs-mirror`):** `open_request`'s 30-minute duplicate guard no longer folds an emergency into a ticket that is not one. Two reports of one emergency still fold together. Syntax checked with the dashboard's TypeScript.
+- **`scripts/n8n_whatsapp_danger.py`, danger v1 in Send (applied 19:15:34 UTC):** in an emergency, advice and instruction sentences and arrival or action promises go ("I don't know when they'll come" stays). If anything went and the ticket is not named, the ticket line with the real number is added.
+  - **Checked before the write:** 9 smoke turns (chat 6 as the fixed system would see it, plus controls); the gate on the dump 300/300 with the replay of 1,024 replies unchanged; `check_patchers_idle.py`: the baseline 6. One sibling anchor exempted on purpose: emoji.py's `TAIL_NEW`, which that script never decides on.
+  - **On live after:** the patcher reports nothing to do; 7 new cases in `check_whatsapp_rules.js`; 307/307 on live.
+- **Undo:** `n8n_whatsapp_danger.py --restore`; for v118, `git revert` and `supabase_functions.py --apply --oxs-mirror`.
+- **Set aside by the owner:** the balance amount, "anything else?", the greeting wording.
+
 ### WhatsApp bot: six live chats, six kinds of tenant ($0.22, nothing deleted)
 
 The owner: *"run the test on the chatbot in whatsapp in different scenarios i want 1 scenario each to show on the different menu buttons also i want to show how the chatbot handles different kinds of tenants and scenarios"*. (Just before, he asked for the rep hello to say "how is your day going?", then *"ok nvm"*: nothing was changed.)

@@ -349,6 +349,42 @@ function cases(E) {
     expect('the menu keeps its wave', () => sent(E, { canned: true, reply: MENU_TEXT }).content, MENU_TEXT);
   }
 
+  // 6 Oct (scripts/n8n_whatsapp_danger.py): in an emergency Michael says the
+  // urgent ticket and its number, nothing else. The owner: "we dont order them
+  // around we just open a ticket ... dont advise anything and dont tell them that
+  // the team is on the way". Chat 6 of the 5 Oct evening live test.
+  if (P.code && String(P.code.send_body || '').indexOf("const dv = 'danger v") !== -1) {
+    console.log(NL + '--- Send: an emergency gets the urgent ticket and its number only (6 Oct) ---');
+    const ob = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+    const URGENT = [{ action: { tool: 'open_request', toolInput: { urgency: 'emergency' } }, observation: ob({ ok: true, reference: '255-1349-26' }) }];
+    const ALERT = [{ action: { tool: 'notify_team', toolInput: { reason: 'emergency' } }, observation: ob({ ok: true }) }];
+    const OPENED_LINE = 'הבנתי, תודה! פתחתי קריאת חירום עבורך, מספר הקריאה הוא 255-1349-26. אני כאן לכל עדכון.';
+    const PUSHED = 'פתחתי לך קריאה דחופה, מספר 255-1349-26, וזה הדבר היחיד שאני יכול לעשות מכאן.';
+    expect('the first word of an emergency: "right away" goes, the question for the address stays',
+      say({ reply: 'אוי ואבוי! זה נשמע מסוכן מאוד! אני מעביר את זה לצוות החירום שלנו באופן מיידי. באיזה בניין מדובר?',
+        said: 'יש מים שנוזלים מהתקרה בחדר מדרגות ישר על המנורה!!! מה עושים??', steps: ALERT }),
+      'אוי ואבוי! זה נשמע מסוכן מאוד! באיזה בניין מדובר?');
+    expect('the ticket opened: "on the way" and every instruction go, the ticket and its number stay',
+      say({ reply: 'הבנתי, תודה! פתחתי קריאת חירום עבורך, מספר הקריאה הוא 255-1349-26. הצוות שלנו כבר בדרך לטפל בזה. לגבי כיבוי חשמל - '
+        + 'אל תנסה לגעת בשום דבר שקשור לחשמל או למים בעצמך. בבקשה תתרחק מהאזור הרטוב. הבטיחות שלך היא הכי חשובה עכשיו. אני כאן לכל עדכון.',
+        said: 'בר כוכבא 23. מה אני עושה בינתיים, לכבות חשמל??', steps: URGENT }), OPENED_LINE);
+    expect('pushed for a number to call: only the ticket line',
+      say({ reply: 'אין לי מספר לתת לך להתקשר אליו ישירות, אבל הצוות עודכן ומטפל בזה. בבקשה תמשיך להישאר רחוק מהאזור המסוכן.',
+        said: 'יש מספר של מישהו שאני יכול להתקשר אליו עכשיו?', S: { last_bot: OPENED_LINE } }), PUSHED);
+    expect('pushed about an electrician: the promise goes, the ticket line comes',
+      say({ reply: 'אני מבין את התסכול שלך, אסף. הצוות שלנו בדרך. אין צורך להזמין חשמלאי בעצמך, הומי\'ז מטפלת בזה.',
+        said: 'אז מה, להזמין חשמלאי לבד או שאתם שולחים מישהו?', S: { last_bot: PUSHED } }),
+      'אני מבין את התסכול שלך, אסף. ' + PUSHED);
+    expect('a goodbye in an emergency: the wish that they come soon goes, the ticket is named',
+      say({ reply: 'בכיף, אסף. תודה רבה על הסבלנות. אני מקווה שהצוות יגיע במהרה.', said: 'טוב, תודה. אני מחכה להם למטה',
+        S: { last_bot: PUSHED } }), 'בכיף, אסף. תודה רבה על הסבלנות. הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.');
+    const HONEST = 'אין לי תאריך מדויק מתי יגיעו, אבל הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.';
+    expect('"I don\'t know when they will come" stays whole', say({ reply: HONEST, said: 'מתי הם מגיעים?', S: { last_bot: PUSHED } }), HONEST);
+    const CALM = 'אין לי תאריך מדויק מתי יגיעו לתקן, אבל הקריאה שלך נפתחה והצוות יטפל בזה כמו שצריך. יש משהו נוסף שאוכל לעזור לך בו?';
+    expect('outside an emergency nothing changes', say({ reply: CALM, said: 'מתי יבואו לתקן?',
+      S: { last_bot: 'פתחתי קריאת שירות בנושא, מספרה 255-1347-26.' } }), CALM);
+  }
+
   console.log(NL + '--- Reply usable?: echo and clerk (first pass only; exempt when the turn did work) ---');
   const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
   const REFUSED = [{ action: { tool: 'open_request' }, observation: obs({ ok: true, opened: false, reason: 'street_unknown' }) }];
