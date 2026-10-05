@@ -790,6 +790,73 @@ def voice_tool(name, a, s, st, bk):
     return {"ok": False, "error": "unknown tool %s" % name}
 
 
+DEBT_OUTCOMES = ("authorized", "promised", "disputed", "refused", "transferred", "voicemail",
+                 "wrong_party", "not_handed_over", "no_answer", "office_to_contact")
+
+
+def debt_tool(name, a, s, st):
+    """The debt agent's tools as the deployed function answers them on a call we
+    placed (5 Oct, outbound run). The call carries the resident, the building,
+    the apartment and the charges, so nothing here looks anything up; the
+    shapes and the refusals are index.ts's. Nothing is written."""
+    months, unit = int(s.get("months") or 1), str((s.get("vars") or {}).get("apartments_phrase", "")).split()[-1]
+
+    def mint():
+        n = len(st["minted"])
+        head, serial, tail = s["ticket"].split("-")
+        ref = "%s-%d-%s" % (head, int(serial) + 10 * n, tail)
+        st["minted"].append(ref)
+        return ref
+
+    asked = str(a.get("unit") or "").strip()
+    if name in ("send_payment_link", "log_promise_to_pay", "log_disputed_payment") and asked and asked != unit:
+        return {"ok": False, "error": "apartment %s is not on this call — apartments on this call: %s" % (asked, unit)}
+    if name == "send_payment_link":
+        if st.get("link_ref"):
+            return {"ok": True, "sent": True, "again": True, "to_last4": s["phone_last4"]}
+        st["link_ref"] = mint()          # the RESOLVED payment ticket the office keeps
+        return {"ok": True, "sent": True, "to_last4": s["phone_last4"], "reference": st["link_ref"]}
+    if name == "log_promise_to_pay":
+        return ({"ok": False, "error": "said is required"} if not a.get("said")
+                else {"ok": True, "charges_written": months})
+    if name == "log_disputed_payment":
+        return {"ok": True, "charges_written": months}
+    if name == "request_standing_order":
+        if st.get("standing_ref"):
+            return with_spoken({"ok": True, "reference": st["standing_ref"], "duplicate": True})
+        st["standing_ref"] = mint()
+        return with_spoken({"ok": True, "reference": st["standing_ref"]})
+    if name == "open_request":
+        if not a.get("description"):
+            return {"ok": False, "error": "description is required"}
+        kind = a.get("type") or "other"
+        key = "%s|%s" % (kind, unit)
+        if kind != "complaint" and key in st["opened"]:
+            return with_spoken({"ok": True, "reference": st["opened"][key], "duplicate": True})
+        st["opened"][key] = mint()
+        return with_spoken({"ok": True, "reference": st["opened"][key]})
+    if name == "transfer_to_human":
+        reason = a.get("reason") if a.get("reason") in NOTE_REASONS else "caller_request"
+        out = {"ok": True, "reason": reason, "charges_paused": months if reason == "ownership" else 0,
+               "emergency_reference": None}
+        if reason == "emergency" and not st["opened"] and not st.get("emergency_stub"):
+            st["emergency_stub"] = out["emergency_reference"] = mint()
+            out["emergency_reference_spoken"] = spoken_ref(out["emergency_reference"])
+        return out
+    if name == "log_call_outcome":
+        if a.get("outcome") not in DEBT_OUTCOMES:
+            return {"ok": False, "error": "outcome must be one of: " + ", ".join(DEBT_OUTCOMES)}
+        return {"ok": True, "charges_bumped": months}
+    return {"ok": False, "error": "unknown tool %s" % name}
+
+
+def reasoning_model(model):
+    """A model that thinks before it answers: its thinking counts against any
+    token cap, so `say` does not pass Vapi's default cap to it (how Vapi applies
+    the cap to these models is not known) and reports the tokens instead."""
+    return bool(re.search(r"gpt-5|/o\d", str(model)))
+
+
 class VoiceCall:
     """One incoming call: the live model on OpenRouter, the caller a Claude
     player. Its whole state is DIR/chats/<scenario>.json, so the player can
@@ -842,14 +909,17 @@ class VoiceCall:
         """The caller's line in; what the caller hears back, and whether Vapi hung up."""
         if self.spent_run() > SAY_CAP:
             sys.exit("stopped: the run has spent over the $%.2f cap" % SAY_CAP)
-        bk = Bk23()
+        debt = self.s["agent"] == "debt"
+        bk = None if debt else Bk23()
         st = self.st
         st["turns"].append({"caller": text, "en": en} if en else {"caller": text})
         st["messages"].append({"role": "user", "content": text})
         rounds, heard, finish = [], [], None
         for _ in range(6):
             body = {"model": self.live["model"], "messages": st["messages"], "tools": self.tools,
-                    "max_tokens": self.live["max_tokens"], "usage": {"include": True}}
+                    "usage": {"include": True}}
+            if not reasoning_model(self.live["model"]):
+                body["max_tokens"] = self.live["max_tokens"]
             if self.live.get("temperature") is not None:
                 body["temperature"] = self.live["temperature"]
             req = urllib.request.Request(
@@ -864,6 +934,7 @@ class VoiceCall:
             choice, u = r["choices"][0], r.get("usage") or {}
             st["usage"].append({"in": u.get("prompt_tokens", 0), "out": u.get("completion_tokens", 0),
                                 "cached": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0),
+                                "reasoning": (u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0),
                                 "cost": float(u.get("cost") or 0)})
             msg, finish = choice["message"], choice.get("finish_reason")
             st["messages"].append({k: v for k, v in msg.items() if k in ("role", "content", "tool_calls")})
@@ -881,7 +952,7 @@ class VoiceCall:
                 fn = c["function"]["name"]
                 if fn in self.live["waiting_lines"]:
                     heard.append(self.live["waiting_lines"][fn])
-                res = voice_tool(fn, a, self.s, st, bk)
+                res = debt_tool(fn, a, self.s, st) if debt else voice_tool(fn, a, self.s, st, bk)
                 rnd.append({"tool": fn, "arguments": a, "result": res})
                 st["messages"].append({"role": "tool", "tool_call_id": c["id"],
                                        "content": json.dumps(res, ensure_ascii=False)})
@@ -999,8 +1070,20 @@ def say(run):
     show(out)
 
 
+# The debt agent rings the resident, so the player answers a phone instead of
+# making a call; everything else is the same protocol.
+TENANT_OUT = (TENANT
+              .replace("# Calling Homies as a tenant", "# Homies is calling you")
+              .replace("You are ONE tenant of a building Homies manages, phoning Homies. Michael answers.",
+                       "You are ONE resident of a building Homies manages, and Homies is phoning YOU: Michael, "
+                       "from Homies, is calling your mobile.")
+              .replace("First pick up the line (no credit is spent):",
+                       "First answer the phone (no credit is spent); you hear Michael's first words:"))
+
+
 def tenant(run, sid):
-    print(TENANT % {"run": run.replace("\\", "/"), "sid": sid})
+    s = next((x for x in run_deck(run)["scenarios"] if x["id"] == sid), {"agent": "inbound"})
+    print((TENANT_OUT if s["agent"] == "debt" else TENANT) % {"run": run.replace("\\", "/"), "sid": sid})
 
 
 # ---------------------------------------------------------------------------
@@ -1063,7 +1146,6 @@ def words_of(tr):
 def report(run, out):
     en = load(os.path.join(run, "en.json"))
     deck = {s["id"]: s for s in run_deck(run)["scenarios"]}
-    live = load(os.path.join(run, "live_inbound.json"))
     trs = {sid: load(os.path.join(run, "transcripts", sid + ".json")) for sid in en["order"]}
     md, ht = [], []
     md += ["# " + en["title"], "", en["subtitle"], ""]
@@ -1073,9 +1155,12 @@ def report(run, out):
                                       for n, x in enumerate(items)] + [""]
         tag = "ol" if title == "What we found" else "ul"
         ht += ["<h2>%s</h2>" % title, "<%s>" % tag] + ["<li>%s</li>" % _esc(x) for x in items] + ["</%s>" % tag]
-    head = ["Call", "What the tenant wanted", "The tenant", "How it went"]
-    md += ["## The four calls at a glance", "", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
-    ht += ["<h2>The four calls at a glance</h2>", '<table border="1" cellpadding="6" style="border-collapse:collapse">',
+    # The debt run's residents are rung, not ringing, so the deck's English can
+    # rename the two middle columns.
+    head = ["Call", en.get("job_header", "What the tenant wanted"), en.get("person_header", "The tenant"), "How it went"]
+    glance = "The %s calls at a glance" % {3: "three", 4: "four", 5: "five", 6: "six"}.get(len(en["order"]), len(en["order"]))
+    md += ["## " + glance, "", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    ht += ["<h2>%s</h2>" % glance, '<table border="1" cellpadding="6" style="border-collapse:collapse">',
            "<tr>" + "".join("<th>%s</th>" % h for h in head) + "</tr>"]
     for n, sid in enumerate(en["order"]):
         c = en["calls"][sid]

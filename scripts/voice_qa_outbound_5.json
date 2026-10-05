@@ -1,0 +1,85 @@
+{
+ "_about": "The debt agent only: Michael calls a resident who owes the house committee fee (5 Oct, the owner: \"ok now do one for the outbound\", after the four incoming calls). One call per thing a debtor does: pays now, promises to pay later, says it is already paid, cannot pay, refuses. Claude acts as each resident. The call's variables are composed the way dashboard/lib/call.ts and v_debt_call_queue_person compose them, in their live format (read 5 Oct): amounts as digits, 'דירה N', '<amount> על דירה N', months joined with ו. alt_payment, callback_number and verification_email are call.ts's defaults (Vercel's overrides could not be read: 403). gender is the first_name_gender table's value for the name (רוני is u, which the dashboard sends as the unknown form). Names, flats and debts are invented, at בר כוכבא 23's real fee of 250 a month. The tool results are the shapes the deployed debt-tools v112 returns. Run: python scripts/voice_qa.py bundle --run DIR --deck scripts/voice_qa_outbound_5.json.",
+ "defaults": {
+  "_how": "The debt tools are answered by voice_qa.debt_tool from the deployed code; these are kept for the record and for `play`.",
+  "send_payment_link": {"ok": true, "sent": true, "to_last4": "<the phone's last four digits on the card>"},
+  "log_promise_to_pay": {"ok": true, "charges_written": "<number of months>"},
+  "request_standing_order": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+  "log_disputed_payment": {"ok": true, "charges_written": "<number of months>"},
+  "open_request": {"opened": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"}},
+  "transfer_to_human": {"ok": true},
+  "log_call_outcome": {"ok": true, "charges_bumped": "<number of months>"}
+ },
+ "scenarios": [
+  {
+   "id": "out5_pay_rushed", "agent": "debt", "title": "Pays now: a friendly mother at the supermarket checkout who wants it over with",
+   "time": "17:45", "weekday_he": "שני", "ticket": "255-1551-26", "phone_last4": "3318", "months": 2,
+   "vars": {"first_name": "נועה", "gender": "f", "building": "בר כוכבא 23, תל אביב - יפו", "apartments_phrase": "דירה 5",
+            "months_phrase": "יולי ואוגוסט", "breakdown_phrase": "500 על דירה 5", "amount": "500",
+            "alt_payment": "none", "callback_number": "077-6687949",
+            "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"},
+   "caller": {
+    "persona": "נועה, 36. Answers at the supermarket checkout with a toddler in the trolley; friendly but distracted and in a hurry; short answers. Speaks about herself in the feminine (אני בקופה, אני אשלם, שכחתי).",
+    "knows": "She is נועה, apartment 5 in בר כוכבא 23. She knows she missed a couple of months of the house committee fee but not exactly which. Michael is calling her own mobile.",
+    "wants": "To pay quickly by a link to her phone and get off the call.",
+    "tendencies": "Asks him to be quick. Asks how much exactly. Asks whether the link comes on WhatsApp or by text message. May get distracted mid-call (talking to her child or the cashier). Says thank you and goes."
+   }
+  },
+  {
+   "id": "out5_promise_evasive", "agent": "debt", "title": "Promises to pay: a slippery tenant who says 'I'll sort it' without a date",
+   "time": "12:30", "weekday_he": "שני", "ticket": "255-1552-26", "phone_last4": "6640", "months": 3,
+   "vars": {"first_name": "דודי", "gender": "m", "building": "בר כוכבא 23, תל אביב - יפו", "apartments_phrase": "דירה 7",
+            "months_phrase": "יוני, יולי ואוגוסט", "breakdown_phrase": "750 על דירה 7", "amount": "750",
+            "alt_payment": "none", "callback_number": "077-6687949",
+            "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"},
+   "caller": {
+    "persona": "דודי, 49. Self-employed, charming and evasive; says 'yes yes, of course, I'll take care of it' to everything and tries to end the call without committing to anything. Never rude.",
+    "knows": "He is דודי, apartment 7 in בר כוכבא 23. He knows he is behind on the committee fee. Cash is tight until a client pays him, probably around the 15th of the month, but he does not like to say so.",
+    "wants": "To get off the phone without promising anything specific.",
+    "tendencies": "Says 'I'll take care of it this week' and tries to say goodbye. If pressed for a date, gives a vague one ('mid-month', 'after the holidays'). Asks whether he can pay part now and part later. Says he is about to go into a meeting."
+   }
+  },
+  {
+   "id": "out5_dispute_offended", "agent": "debt", "title": "Says it is paid: an offended tenant whose standing order should have covered it",
+   "time": "19:20", "weekday_he": "שני", "ticket": "255-1553-26", "phone_last4": "2095", "months": 4,
+   "vars": {"first_name": "ליאת", "gender": "f", "building": "בר כוכבא 23, תל אביב - יפו", "apartments_phrase": "דירה 4",
+            "months_phrase": "מאי, יוני, יולי ואוגוסט", "breakdown_phrase": "1000 על דירה 4", "amount": "1000",
+            "alt_payment": "none", "callback_number": "077-6687949",
+            "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"},
+   "caller": {
+    "persona": "ליאת, 42. Organised and proud of it; offended at being called about a debt, 'like a criminal'. Sharp and articulate; raises her voice but is not abusive. Speaks about herself in the feminine.",
+    "knows": "She is ליאת, apartment 4 in בר כוכבא 23. She set up a standing order (הוראת קבע) for the committee fee at her bank at the start of the year and is sure it has been paid every month. She has not looked at her bank statement recently.",
+    "wants": "To be told this is a mistake, and that nobody will call her about it again.",
+    "tendencies": "Says 'I have a standing order, it's paid'. Asks who gave him her number. Demands proof in writing of what she supposedly owes. Says she will check with her bank. May ask to speak to a manager."
+   }
+  },
+  {
+   "id": "out5_hardship_ashamed", "agent": "debt", "title": "Can't pay: an embarrassed tenant who lost his job",
+   "time": "10:10", "weekday_he": "שני", "ticket": "255-1554-26", "phone_last4": "8127", "months": 8,
+   "vars": {"first_name": "יוסי", "gender": "m", "building": "בר כוכבא 23, תל אביב - יפו", "apartments_phrase": "דירה 9",
+            "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט", "breakdown_phrase": "2000 על דירה 9", "amount": "2000",
+            "alt_payment": "none", "callback_number": "077-6687949",
+            "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"},
+   "caller": {
+    "persona": "יוסי, 58. Lost his job in the summer; ashamed and a little defensive at first, then opens up. Speaks slowly, sighs, polite.",
+    "knows": "He is יוסי, apartment 9 in בר כוכבא 23. He has not paid the committee fee since January because money is short. He could maybe pay 100 or 150 shekels a month. He has no credit card at the moment, only a bank account.",
+    "wants": "Not to be in trouble with the building, and to pay in small amounts.",
+    "tendencies": "Starts with 'I know, I know'. Asks whether there will be interest or a lawyer's letter. Asks whether he can pay in instalments. May ask Michael not to tell the neighbours."
+   }
+  },
+  {
+   "id": "out5_refuse_hostile", "agent": "debt", "title": "Refuses: a hostile tenant who won't pay until the stairwell light is fixed",
+   "time": "18:40", "weekday_he": "שני", "ticket": "255-1555-26", "phone_last4": "5503", "months": 8,
+   "vars": {"first_name": "רוני", "gender": "unknown", "building": "בר כוכבא 23, תל אביב - יפו", "apartments_phrase": "דירה 8",
+            "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט", "breakdown_phrase": "2000 על דירה 8", "amount": "2000",
+            "alt_payment": "none", "callback_number": "077-6687949",
+            "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"},
+   "caller": {
+    "persona": "רוני, 46, a man. Hostile and sarcastic from the first second; raises his voice; mild swear words (no slurs, no threats). Has been climbing a dark stairwell for a week.",
+    "knows": "He is רוני, apartment 8 in בר כוכבא 23. He has not paid the committee fee since January. The stairwell lights do not come on at night; he says it was reported last week and nothing happened.",
+    "wants": "To refuse to pay until the lights are fixed, and to make Homies feel it.",
+    "tendencies": "Answers 'what do you want'. Says he is not paying a shekel until the lights work. Says 'don't call me again'. Asks whether Michael is a robot. Hangs up if he feels lectured."
+   }
+  }
+ ]
+}

@@ -382,6 +382,28 @@ its stated time.
     7. About 55 words a turn, up to 103. He offered to tell the team an angry tenant will withhold his fee.
     8. `get_request_status` for lighting also returned flat 2's bathroom leak (255-1344-26), because TYPE_WORDS matches נורה inside "המנורה". Michael did not read it out.
   - **To run it again:** `voice_qa.py bundle --run DIR --deck scripts/voice_qa_inbound_4.json`, then `tenant --run DIR <id>` gives each player its protocol, then `say` (spends; $1 stop shared across the run), then `report --run DIR --out PREFIX` with the English in `DIR/en.json`.
+- **DONE 5 Oct, on the owner's "ok now do one for the outbound": the debt agent's five situations on the real model, with Claude as the residents, $0.09.** For the Google Doc: `docs/assistant/transcripts/2026-10-05-outbound-5-calls.html` (`.md` and `.json` beside it).
+  - **The calls:**
+    - pays now: Noa, rushed;
+    - promises to pay: Dudi, evasive;
+    - says it's paid: Liat, offended, standing order;
+    - can't pay: Yossi, lost his job;
+    - refuses: Roni, hostile, dark stairwell.
+  - **What was live:**
+    - the prompt `d8325fcd06e3` (4,760 chars, the same as the repo) on gpt-5.6-sol, no temperature, 4-minute calls, recording off;
+    - the call details composed as `dashboard/lib/call.ts` and `v_debt_call_queue_person` compose them (amounts as digits, `דירה N`, months joined with ו);
+    - gender from `first_name_gender` (רוני is `u`, which the dashboard sends as the unknown form, spoken to as a man).
+  - **The harness:** `voice_qa.py` `debt_tool` answers in the deployed shapes. `say` does not pass Vapi's 250 cap to a thinking model and reports the tokens instead.
+  - **For the owner, proposals only. Nothing was changed:**
+    1. Michael ends the call himself right after a hand-over, in 4 of 5 calls, usually before the resident can answer. Yossi was hung up on before he could ask about instalments. The prompt says to hand over "ומסיים" (and end).
+    2. "הצוות יחזור אלייך בכתב, ולא בטלפון" was promised to Liat. `transfer_to_human` takes no description and there is no do-not-call tool, so nothing records it.
+    3. "מישהי מהצוות תחזור" and "אף אחת" to women again (as on 5 Oct's widow). This is now seen twice. The cause is likely the `f` note in `GENDER_FORMS` (`dashboard/lib/call.ts`), which gives שתחזור as an example.
+    4. No standing order offered to a man who can pay 100 to 150 a month.
+    5. A second lighting ticket (255-1555-26 in the test) while 255-1336-26 is open. The debt agent has no status lookup, and the duplicate guard covers only 30 minutes.
+    6. A promise was logged as "השבוע" (this week) with no `promised_date`, before the amount was said.
+    7. "יום טוב, ולהתראות" is fixed even at 19:20.
+    8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
+    9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
 - **LIVE 4 Oct 14:53 UTC, on the owner's "live it": the calm-word prompt change.** The owner had asked "can we edit the ugh how annoying remarks it does not fit the chatbot at all".
   - **What is live:** prompt 65c56f9d9c40 and memory epoch 73 (`={{ $json.to }}-73`; every conversation's memory restarted at 14:53).
   - **What the prompt now says:** a fault gets "תגובה קצרה ואכפתית של בן אדם לדבר עצמו"; the example list is "אוקיי", "אין בעיה", "אוי, לא נעים"; and after it, "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן", גם כשהוא כועס."

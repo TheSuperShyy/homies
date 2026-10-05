@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### Debt agent: five situations on the real model, with Claude as the residents ($0.09)
+
+The owner, after the incoming-call document: *"ok now do one for the outbound"*.
+- **Done:**
+  - **Five calls:**
+    - pays now (Noa, rushed);
+    - promises to pay (Dudi, evasive);
+    - says it is paid (Liat, offended);
+    - can't pay (Yossi, lost his job);
+    - refuses (Roni, hostile).
+  - **The documents:** `docs/assistant/transcripts/2026-10-05-outbound-5-calls.html` (for Google Docs), the `.md` and the `.json` record.
+  - **The harness:** the cards are in `scripts/voice_qa_outbound_5.json`. `voice_qa.py` gained `debt_tool`, thinking-model handling and the residents' protocol (`TENANT_OUT`).
+- **Checked live:**
+  - **The prompt:** sha `d8325fcd06e3`, the same as the repo.
+  - **The model:** gpt-5.6-sol, with no temperature and no cap set; calls limited to 240 s; recording off.
+  - **The details a call gets:** read from `v_debt_call_queue_person`. For flat 1 that is "2000", "דירה 1" and "2000 על דירה 1".
+  - **The name genders:** רוני is `u`.
+  - **Not readable:** Vercel's env (403).
+- **Cost:** $0.0875, 3 to 7 model calls per call, about a minute of speech each. The key went from $13.65 to $13.56.
+- **Found** (details in HANDOVER):
+  - Michael hangs up right after a hand-over, in 4 of 5 calls;
+  - "בכתב, ולא בטלפון" was promised, with nowhere to record it;
+  - "מישהי מהצוות" again;
+  - no standing order offered;
+  - a duplicate lighting ticket;
+  - a promise logged with no date;
+  - "יום טוב" in the evening;
+  - turns over 250 tokens once thinking is counted;
+  - the literal "none" for `alt_payment`.
+- **Open, the owner's call:**
+  - whether Michael should stay on the line after a hand-over;
+  - where a "writing only / no more calls" wish gets recorded;
+  - the feminine example in `GENDER_FORMS`;
+  - one live debt call to see whether Vapi's 250 cap cuts thinking.
+
 ### Incoming-call agent: its four jobs on the real model, with Claude as the tenants ($0.23)
 
 The owner: *"test the voice agent and extract the transcription of it and we will put it in a gdocs for documentation ... act like a real person ... opening a ticket, checking ticket status, checking balance and trying to pay ... inbound voice agent only"*, with an OpenRouter estimate first (about 25 cents), then *"go"*.

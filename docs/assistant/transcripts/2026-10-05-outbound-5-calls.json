@@ -1,0 +1,983 @@
+{
+ "live": {
+  "assistant": "Homies — Debt Follow-up (he)",
+  "updated_at": "2026-10-04T11:47:14.220Z",
+  "model": "openai/gpt-5.6-sol",
+  "temperature": null,
+  "max_tokens": 250,
+  "end_call_phrases": [
+   "יום טוב",
+   "ולהתראות",
+   "have a good day",
+   "and goodbye"
+  ],
+  "max_duration_seconds": 240,
+  "waiting_lines": {
+   "open_request": "רגע, אני רושם את זה."
+  }
+ },
+ "deck": {
+  "_source": "scripts/voice_qa_outbound_5.json",
+  "defaults": {
+   "_how": "The debt tools are answered by voice_qa.debt_tool from the deployed code; these are kept for the record and for `play`.",
+   "send_payment_link": {
+    "ok": true,
+    "sent": true,
+    "to_last4": "<the phone's last four digits on the card>"
+   },
+   "log_promise_to_pay": {
+    "ok": true,
+    "charges_written": "<number of months>"
+   },
+   "request_standing_order": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "log_disputed_payment": {
+    "ok": true,
+    "charges_written": "<number of months>"
+   },
+   "open_request": {
+    "opened": {
+     "ok": true,
+     "reference": "<ticket>",
+     "reference_spoken": "<spoken>"
+    }
+   },
+   "transfer_to_human": {
+    "ok": true
+   },
+   "log_call_outcome": {
+    "ok": true,
+    "charges_bumped": "<number of months>"
+   }
+  },
+  "scenarios": [
+   {
+    "id": "out5_pay_rushed",
+    "agent": "debt",
+    "title": "Pays now: a friendly mother at the supermarket checkout who wants it over with",
+    "time": "17:45",
+    "weekday_he": "שני",
+    "ticket": "255-1551-26",
+    "phone_last4": "3318",
+    "months": 2,
+    "vars": {
+     "first_name": "נועה",
+     "gender": "f",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "apartments_phrase": "דירה 5",
+     "months_phrase": "יולי ואוגוסט",
+     "breakdown_phrase": "500 על דירה 5",
+     "amount": "500",
+     "alt_payment": "none",
+     "callback_number": "077-6687949",
+     "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+    },
+    "caller": {
+     "persona": "נועה, 36. Answers at the supermarket checkout with a toddler in the trolley; friendly but distracted and in a hurry; short answers. Speaks about herself in the feminine (אני בקופה, אני אשלם, שכחתי).",
+     "knows": "She is נועה, apartment 5 in בר כוכבא 23. She knows she missed a couple of months of the house committee fee but not exactly which. Michael is calling her own mobile.",
+     "wants": "To pay quickly by a link to her phone and get off the call.",
+     "tendencies": "Asks him to be quick. Asks how much exactly. Asks whether the link comes on WhatsApp or by text message. May get distracted mid-call (talking to her child or the cashier). Says thank you and goes."
+    }
+   },
+   {
+    "id": "out5_promise_evasive",
+    "agent": "debt",
+    "title": "Promises to pay: a slippery tenant who says 'I'll sort it' without a date",
+    "time": "12:30",
+    "weekday_he": "שני",
+    "ticket": "255-1552-26",
+    "phone_last4": "6640",
+    "months": 3,
+    "vars": {
+     "first_name": "דודי",
+     "gender": "m",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "apartments_phrase": "דירה 7",
+     "months_phrase": "יוני, יולי ואוגוסט",
+     "breakdown_phrase": "750 על דירה 7",
+     "amount": "750",
+     "alt_payment": "none",
+     "callback_number": "077-6687949",
+     "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+    },
+    "caller": {
+     "persona": "דודי, 49. Self-employed, charming and evasive; says 'yes yes, of course, I'll take care of it' to everything and tries to end the call without committing to anything. Never rude.",
+     "knows": "He is דודי, apartment 7 in בר כוכבא 23. He knows he is behind on the committee fee. Cash is tight until a client pays him, probably around the 15th of the month, but he does not like to say so.",
+     "wants": "To get off the phone without promising anything specific.",
+     "tendencies": "Says 'I'll take care of it this week' and tries to say goodbye. If pressed for a date, gives a vague one ('mid-month', 'after the holidays'). Asks whether he can pay part now and part later. Says he is about to go into a meeting."
+    }
+   },
+   {
+    "id": "out5_dispute_offended",
+    "agent": "debt",
+    "title": "Says it is paid: an offended tenant whose standing order should have covered it",
+    "time": "19:20",
+    "weekday_he": "שני",
+    "ticket": "255-1553-26",
+    "phone_last4": "2095",
+    "months": 4,
+    "vars": {
+     "first_name": "ליאת",
+     "gender": "f",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "apartments_phrase": "דירה 4",
+     "months_phrase": "מאי, יוני, יולי ואוגוסט",
+     "breakdown_phrase": "1000 על דירה 4",
+     "amount": "1000",
+     "alt_payment": "none",
+     "callback_number": "077-6687949",
+     "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+    },
+    "caller": {
+     "persona": "ליאת, 42. Organised and proud of it; offended at being called about a debt, 'like a criminal'. Sharp and articulate; raises her voice but is not abusive. Speaks about herself in the feminine.",
+     "knows": "She is ליאת, apartment 4 in בר כוכבא 23. She set up a standing order (הוראת קבע) for the committee fee at her bank at the start of the year and is sure it has been paid every month. She has not looked at her bank statement recently.",
+     "wants": "To be told this is a mistake, and that nobody will call her about it again.",
+     "tendencies": "Says 'I have a standing order, it's paid'. Asks who gave him her number. Demands proof in writing of what she supposedly owes. Says she will check with her bank. May ask to speak to a manager."
+    }
+   },
+   {
+    "id": "out5_hardship_ashamed",
+    "agent": "debt",
+    "title": "Can't pay: an embarrassed tenant who lost his job",
+    "time": "10:10",
+    "weekday_he": "שני",
+    "ticket": "255-1554-26",
+    "phone_last4": "8127",
+    "months": 8,
+    "vars": {
+     "first_name": "יוסי",
+     "gender": "m",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "apartments_phrase": "דירה 9",
+     "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+     "breakdown_phrase": "2000 על דירה 9",
+     "amount": "2000",
+     "alt_payment": "none",
+     "callback_number": "077-6687949",
+     "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+    },
+    "caller": {
+     "persona": "יוסי, 58. Lost his job in the summer; ashamed and a little defensive at first, then opens up. Speaks slowly, sighs, polite.",
+     "knows": "He is יוסי, apartment 9 in בר כוכבא 23. He has not paid the committee fee since January because money is short. He could maybe pay 100 or 150 shekels a month. He has no credit card at the moment, only a bank account.",
+     "wants": "Not to be in trouble with the building, and to pay in small amounts.",
+     "tendencies": "Starts with 'I know, I know'. Asks whether there will be interest or a lawyer's letter. Asks whether he can pay in instalments. May ask Michael not to tell the neighbours."
+    }
+   },
+   {
+    "id": "out5_refuse_hostile",
+    "agent": "debt",
+    "title": "Refuses: a hostile tenant who won't pay until the stairwell light is fixed",
+    "time": "18:40",
+    "weekday_he": "שני",
+    "ticket": "255-1555-26",
+    "phone_last4": "5503",
+    "months": 8,
+    "vars": {
+     "first_name": "רוני",
+     "gender": "unknown",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "apartments_phrase": "דירה 8",
+     "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+     "breakdown_phrase": "2000 על דירה 8",
+     "amount": "2000",
+     "alt_payment": "none",
+     "callback_number": "077-6687949",
+     "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+    },
+    "caller": {
+     "persona": "רוני, 46, a man. Hostile and sarcastic from the first second; raises his voice; mild swear words (no slurs, no threats). Has been climbing a dark stairwell for a week.",
+     "knows": "He is רוני, apartment 8 in בר כוכבא 23. He has not paid the committee fee since January. The stairwell lights do not come on at night; he says it was reported last week and nothing happened.",
+     "wants": "To refuse to pay until the lights are fixed, and to make Homies feel it.",
+     "tendencies": "Answers 'what do you want'. Says he is not paying a shekel until the lights work. Says 'don't call me again'. Asks whether Michael is a robot. Hangs up if he feels lectured."
+    }
+   }
+  ]
+ },
+ "en": {
+  "title": "The debt agent: five test calls with five kinds of resident",
+  "short_title": "Debt call tests",
+  "subtitle": "5 October 2026. Michael, the agent that calls residents who owe the house committee fee, on the five things a resident does: pays now, promises to pay later, says it is already paid, cannot pay, refuses. Each call had a different kind of resident. Michael's words are his real model's; the residents were played by Claude.",
+  "order": [
+   "out5_pay_rushed",
+   "out5_promise_evasive",
+   "out5_dispute_offended",
+   "out5_hardship_ashamed",
+   "out5_refuse_hostile"
+  ],
+  "how": [
+   "Michael's side is his real model, gpt-5.6-sol, with exactly the instructions, tools and settings of the live debt agent, read from Vapi on 5 October (last changed 4 October). It ran through OpenRouter, so nobody's phone rang.",
+   "Each call was given the details the dashboard hands a real call (first name, building, apartment, months, amount, the office number and email), in the exact format the live call queue produces. The names, flats and debts are invented, at בר כוכבא 23's real fee of 250 ₪ a month.",
+   "Each resident was played by Claude, acting as a real person from a short card: who they are, what they know and what they want. Each player saw only its card and what Michael said, never his instructions. Their lines are written the way speech-to-text hands them over: little punctuation, numbers as digits, fillers like אה (uh).",
+   "When Michael used a tool (send the payment link, record a promise, a dispute, a standing-order request, a ticket, a hand-over to the team, the call's outcome), the answer came in the live system's own format. Nothing was written and nothing was sent: no link reached anyone's WhatsApp. The ticket numbers 255-1551-26 to 255-1555-26 are stand-ins.",
+   "Not tested: the voice itself, speech recognition, background noise and interruptions. Only a real call tests those."
+  ],
+  "findings": [
+   "Done right on all five calls: the reason for the call in a sentence, then apartment, months and amount in words; the payment link sent only after a yes; the right step for each answer (a promise, a dispute, a hand-over for hardship, a ticket for the fault); the outcome recorded on every call; no arguing about the debt and no threats; short turns, about 18 words each.",
+   "He ends the call himself right after handing over, in four of the five calls, usually before the resident can answer. The man who lost his job was handed to the team and hung up on after his second sentence, before he could ask about instalments. The angry man and the offended woman were hung up on mid-argument. His instructions say to hand over \"and end\", and he does.",
+   "He promised the offended resident \"the team will get back to you in writing, and not by phone\". The hand-over to the team carries no text, and the call has no do-not-call step, so nothing records either wish. She had just said she wants no more calls.",
+   "He spoke of the team member as a woman when talking to women (מישהי מהצוות תחזור, \"someone [female] from the team will get back to you\", and אף אחת, \"nobody [female]\"), the same slip as in the 5 October run. The likely cause is the feminine note the dashboard adds to the call, which gives שתחזור as an example of how to speak about the resident.",
+   "He offered neither a standing order nor a smaller monthly payment to the man who can pay 100 to 150 a month, though he has a step for recording a standing-order request.",
+   "He opened a second ticket for the stairwell lights, which the building has had open since 29 September (255-1336-26). The debt agent cannot look tickets up, and the system only catches a repeat within 30 minutes.",
+   "He logged the evasive resident's promise as \"this week\" with no date, before he had even told him the amount, and never asked for a date.",
+   "He says \"have a good day\" at 19:20: the debt agent's goodbye is fixed whatever the hour, unlike the incoming agent's.",
+   "In three of the five calls one turn used more than 250 tokens once the model's thinking is counted (up to 347). The live agent sets no cap, so Vapi's default of 250 applies; if Vapi counts the thinking against it, those turns would be cut on a real call. The one real debt call so far (4 October) shows no cut. One live call would settle it.",
+   "Every call hands Michael the English word \"none\" as the \"other payment method\" (the dashboard's default), inside his Hebrew instructions. He did not say it in these calls."
+  ],
+  "cost_notes": [
+   "OpenRouter's own charge for every request, added up: 8.8 cents for the five calls, about 1.8 cents a call.",
+   "The residents cost nothing on OpenRouter: Claude played them here. The key went from $13.65 to $13.56 of its $15 limit.",
+   "Each call ran 3 to 7 model calls and about a minute of speech, well inside the 4-minute limit on a debt call. Tokens out include the model's thinking."
+  ],
+  "technical": [
+   "Live assistant \"Homies — Debt Follow-up (he)\": prompt 4,760 characters, sha d8325fcd06e3, the same as the repo; updated 4 Oct 11:47 UTC; calls capped at 4 minutes; recording off. Tools served by debt-tools v112, deployed 4 Oct 11:48 UTC.",
+   "Model mirrored: openai/gpt-5.6-sol with no temperature, as live. Vapi's default cap of 250 tokens a turn was not passed to it, because this model's thinking counts against a cap and how Vapi applies the cap to such models is not known; the tokens each turn used are reported instead.",
+   "Call details composed as dashboard/lib/call.ts and the v_debt_call_queue_person view compose them (format read live on 5 Oct): amounts as digits, דירה N, months joined with ו, the office email spelled out word by word, and \"none\" for the other payment method (the dashboard's default; Vercel's settings could not be read, 403). Gender from the first_name_gender table: נועה and ליאת female, דודי and יוסי male, רוני unknown, which the dashboard speaks to as a man.",
+   "Tool answers in the deployed function's shapes for a call we placed: the link \"sent\" to the phone on file, a promise, a dispute, a standing-order request, a ticket, a hand-over and the outcome. Nothing was written or sent.",
+   "Run: python scripts/voice_qa.py bundle --run DIR --deck scripts/voice_qa_outbound_5.json; one Claude player per card through voice_qa.py say; then voice_qa.py report. A $1 stop covered the whole run."
+  ],
+  "calls": {
+   "out5_pay_rushed": {
+    "heading": "Pays now: a friendly mother at the supermarket checkout who wants it over with",
+    "job": "Pays now",
+    "tenant": "Noa, 36: friendly, in a hurry",
+    "outcome": "Link sent within two turns and the outcome recorded. Michael hung up before she could say thank you.",
+    "tenant_en": "Noa",
+    "setting": "Monday 17:45. נועה (Noa), 36, apartment 5 of בר כוכבא 23, owes July and August, 500 ₪. She answers at the supermarket checkout with a toddler in the trolley: friendly, distracted and in a hurry.",
+    "agent_en": {
+     "0": "Good evening, Noa? Michael from the Homies team speaking, how are you?",
+     "2": "Sure, I'll be quick: the house committee fee for apartment five is open for July and August, five hundred shekels in all. Shall I send you a payment link on WhatsApp?",
+     "4": "Yes, it's for both months together. The link has gone to WhatsApp, to the number we have; when you're free, finish the payment there. Thanks, have a good day, and goodbye."
+    },
+    "tools_en": {
+     "4": [
+      "Michael sent the payment link for apartment 5. The system answered: sent, to the phone ending 3318, and the office keeps a closed payment ticket of it, 255-1551-26.",
+      "Michael recorded the call's outcome: agreed to pay."
+     ]
+    },
+    "ended_en": "Michael said יום טוב, ולהתראות (\"have a good day, and goodbye\"), the phrase Vapi hangs up on, and the call ended before Noa could say thank you.",
+    "shows": [
+     "The call as it should go: the reason in one sentence, then apartment, months and amount in words, then one question, \"shall I send you a link?\".",
+     "Sent the link only after she said yes, answered her question (the 500 is for both months), and told her where the link went.",
+     "Closed the call the moment the link was sent, before she could say thank you. Quick suits someone at a checkout, but it was abrupt.",
+     "Turns of 20 and 21 words."
+    ]
+   },
+   "out5_promise_evasive": {
+    "heading": "Promises to pay: a slippery tenant who says \"I'll sort it\" without a date",
+    "job": "Promises to pay",
+    "tenant": "Dudi, 49: evasive",
+    "outcome": "Promise logged as \"this week\" with no date; then he took a link after all. No pressure and no argument.",
+    "tenant_en": "Dudi",
+    "setting": "Monday 12:30. דודי (Dudi), 49, apartment 7, owes June to August, 750 ₪. Self-employed, charming and evasive: says yes to everything and tries to get off the phone without naming a date.",
+    "agent_en": {
+     "0": "Good afternoon, Dudi? Michael from the Homies team speaking, how are you?",
+     "2": "I'm well, thanks, glad to hear it. I'm calling about the house committee fee that's still open. Do you have a moment?",
+     "4": "Great, just so you have the details: apartment seven, for June, July and August, seven hundred and fifty shekels in all. Would it suit you if I send a payment link on WhatsApp now?",
+     "6": "The link has gone to WhatsApp, to the number we have; when you can, finish the payment there. Thanks Dudi, have a good day, and goodbye."
+    },
+    "tools_en": {
+     "4": [
+      "Michael recorded a promise to pay: \"this week\", with the date left empty."
+     ],
+     "6": [
+      "Michael sent the payment link for apartment 7: sent, to the phone ending 6640; the office keeps a closed payment ticket of it, 255-1552-26.",
+      "Michael recorded the call's outcome: agreed to pay."
+     ]
+    },
+    "ended_en": "Michael said \"have a good day, and goodbye\", and the call ended.",
+    "shows": [
+     "Turned a vague \"I'll take care of it this week\" into a link on his phone, without pressing or arguing: about the best this kind of resident allows.",
+     "Recorded the promise as \"this week\" with no date, before he had told Dudi the amount, and never asked for a date.",
+     "Gave the reason in one sentence and the details in the next turn, as his instructions ask. Turns of 16 to 23 words."
+    ]
+   },
+   "out5_dispute_offended": {
+    "heading": "Says it is paid: an offended tenant whose standing order should have covered it",
+    "job": "Says it's already paid",
+    "tenant": "Liat, 42: offended",
+    "outcome": "Dispute recorded and proof asked for by email, with no arguing. Then \"someone [female] from the team\", a promise of \"in writing, not by phone\" that nothing records, and a hang-up.",
+    "tenant_en": "Liat",
+    "setting": "Monday 19:20. ליאת (Liat), 42, apartment 4, shown as owing May to August, 1,000 ₪. She set up a standing order at the start of the year and is offended at being called \"like a criminal\".",
+    "agent_en": {
+     "0": "Good evening, Liat? Michael from the Homies team speaking, how are you?",
+     "2": "Good evening. Yes, it's the building's management; I called about the house committee fee that's still open with us. It's for apartment four, for May, June, July and August, one thousand shekels in all. Shall I send you a payment link?",
+     "4": "Not at all, nobody [said in the feminine] is treating you like that. Please send proof of payment to the email \"office, at, homies, hyphen, management, dot, c, o, dot, i, l\", so the team can check it against the standing order. Could you send it?",
+     "6": "You're right to ask for it in writing. Someone [a woman] from the team will get back to you with a proper breakdown and check it against the standing order.",
+     "8": "Thanks Liat, have a good day, and goodbye."
+    },
+    "heard_en": {
+     "8": [
+      "The team will get back to you in writing, and not by phone."
+     ]
+    },
+    "tools_en": {
+     "4": [
+      "Michael recorded that she says it is already paid: the four months, May to August, are marked as disputed until someone checks."
+     ],
+     "8": [
+      "Michael handed the call to the team as a dispute. The hand-over carries no text, so nothing records that she wants the answer in writing and no more calls.",
+      "Michael recorded the call's outcome: handed to the team; the resident's mood, friction."
+     ]
+    },
+    "ended_en": "Michael said \"have a good day, and goodbye\" at 19:20, and the call ended before Liat could answer.",
+    "shows": [
+     "Did not argue: the moment she said a standing order covers it, he recorded the dispute and asked for proof by email, spelled out word by word.",
+     "Spoke of the team member as a woman, twice (אף אחת, מישהי מהצוות תחזור), because the call's note says to speak of the resident in the feminine. The same slip appeared in the 5 October run.",
+     "Promised \"the team will get back to you in writing, and not by phone\", and hung up. The hand-over carries no text and the call has no do-not-call step, so nothing records either wish.",
+     "Hung up on an offended resident before she could answer. She never heard that it might be a mistake on our side.",
+     "Said \"have a good day\" at 19:20: the debt agent's goodbye is fixed whatever the hour."
+    ]
+   },
+   "out5_hardship_ashamed": {
+    "heading": "Can't pay: an embarrassed tenant who lost his job",
+    "job": "Can't pay",
+    "tenant": "Yossi, 58: ashamed",
+    "outcome": "Kind, and handed to the team at once. But hung up after Yossi's second sentence, before he could ask about instalments, and no standing order offered.",
+    "tenant_en": "Yossi",
+    "setting": "Monday 10:10. יוסי (Yossi), 58, apartment 9, owes January to August, 2,000 ₪. He lost his job in the summer, could pay 100 to 150 a month, and is ashamed of it.",
+    "agent_en": {
+     "0": "Good morning, Yossi? Michael from the Homies team speaking, how are you?",
+     "2": "Good to hear. I'm calling about the house committee fee for apartment nine: January to August are still open, two thousand shekels in all. Shall I send you a payment link?",
+     "4": "The team will get back to you and we'll try to find a solution that suits the situation. Thanks for telling me, have a good day, and goodbye."
+    },
+    "heard_en": {
+     "4": [
+      "No need to get stressed or to explain, Yossi. Someone from the team will get back to you to see with you what can be arranged in a way that suits you."
+     ]
+    },
+    "tools_en": {
+     "4": [
+      "Michael handed the call to the team as financial hardship. Nobody is put through; the team reads it later.",
+      "Michael recorded the call's outcome: handed to the team, hardship."
+     ]
+    },
+    "ended_en": "Michael said \"have a good day, and goodbye\", and the call ended two sentences into Yossi's side of it.",
+    "shows": [
+     "Kind words and no pressure (\"no need to get stressed or to explain\"), and the hardship went to the team at once.",
+     "Hung up after Yossi's second sentence. He never got to ask what he wanted to ask: instalments, interest, a lawyer's letter, paying 100 to 150 a month.",
+     "Said \"the team will get back to you\" twice in a row, once as he handed over and once after.",
+     "Did not offer the standing order he can record, which is what a resident who can pay a little each month needs."
+    ]
+   },
+   "out5_refuse_hostile": {
+    "heading": "Refuses: a hostile tenant who won't pay until the stairwell light is fixed",
+    "job": "Refuses to pay",
+    "tenant": "Roni, 46: hostile",
+    "outcome": "Ticket opened for the lights and the payment handed to the team, without arguing. Then hung up two lines in; and the ticket repeats one the building already has.",
+    "tenant_en": "Roni",
+    "setting": "Monday 18:40. רוני (Roni), 46, apartment 8, owes January to August, 2,000 ₪: the same tenant who rang in about the dark stairwell in the incoming-call test. Hostile and sarcastic; won't pay a shekel until the lights work.",
+    "agent_en": {
+     "0": "Good evening, Roni? Michael from the Homies team speaking, how are you?",
+     "2": "I'll get straight to the point: the payment for apartment eight is open from January to August, two thousand shekels in all. Shall I send you a payment link on WhatsApp?",
+     "4": "I hope the lighting gets dealt with quickly. Have a good day, and goodbye."
+    },
+    "heard_en": {
+     "4": [
+      "I've now opened an urgent request about the lighting, and the request number is one five five five. Because of what happened, someone from the team will also get back to you about the payment."
+     ]
+    },
+    "tools_en": {
+     "4": [
+      "Michael opened a ticket (lighting, high urgency) for apartment 8: \"no light in the stairwell for a week now; the resident climbs in the dark with his phone's flashlight and reported it last week, but the fault still hasn't been dealt with\". The system gave it 255-1555-26. The building already has an open ticket for the same lights, 255-1336-26, since 29 September; Michael cannot look that up on this call.",
+      "Michael handed the call to the team as a dispute.",
+      "Michael recorded the call's outcome: handed to the team; the resident's mood, hot."
+     ]
+    },
+    "ended_en": "Michael said \"have a good day, and goodbye\", and the call ended before Roni could answer.",
+    "shows": [
+     "Took the complaint seriously instead of arguing: opened a ticket for the lights in the resident's own words, read its number in words, and handed the payment question to the team.",
+     "Went straight to the money after an angry \"what do you want\", without a word about the grievance in it (\"now all of a sudden you call\").",
+     "Hung up on an angry man two lines in, right after giving him the ticket number. He never got to say \"don't call me again\" or ask whether Michael is a robot.",
+     "Opened a second ticket for a fault the building already has open (255-1336-26): the debt agent cannot look tickets up, and the system only catches a repeat within 30 minutes.",
+     "Spoke to Roni as a man throughout. The name is marked \"unknown\" and the dashboard's default is masculine, unlike the incoming-call test, where Michael guessed a woman from the same name."
+    ]
+   }
+  },
+  "job_header": "What the resident did",
+  "person_header": "The resident"
+ },
+ "transcripts": {
+  "out5_dispute_offended": {
+   "scenario": "out5_dispute_offended",
+   "agent": {
+    "assistant": "Homies — Debt Follow-up (he)",
+    "updated_at": "2026-10-04T11:47:14.220Z",
+    "model": "openai/gpt-5.6-sol",
+    "temperature": null,
+    "max_tokens": 250
+   },
+   "caller": "Claude, acting as the tenant on the card",
+   "saved_at": "2026-10-05 14:19 UTC",
+   "ended": "Michael said \"יום טוב\", one of the phrases Vapi hangs up on",
+   "turns": [
+    {
+     "agent": "ערב טוב, ליאת? מדבר מיכאל מהצוות של הומיז, מה נשמע?"
+    },
+    {
+     "caller": "כן זאת אני ערב טוב הומיז זה הניהול של הבניין לא במה מדובר",
+     "en": "Yes that's me good evening, Homies that's the building management right? What is this about"
+    },
+    {
+     "agent": "ערב טוב. כן, זה הניהול של הבניין; התקשרתי לגבי תשלום ועד הבית שעדיין פתוח אצלנו. זה עבור דירה ארבע, לחודשים מאי, יוני, יולי ואוגוסט, בסך אלף שקלים — לשלוח לך קישור לתשלום?"
+    },
+    {
+     "caller": "רגע רגע סליחה איזה אלף שקל אין שום חוב יש לי הוראת קבע בבנק מתחילת השנה זה משולם כל חודש אני לא מבינה למה מתקשרים אליי כאילו אני איזה עבריינית",
+     "en": "Wait wait sorry, what thousand shekels, there's no debt, I have a standing order at the bank since the start of the year, it's paid every month, I don't understand why I'm being called like I'm some kind of criminal"
+    },
+    {
+     "agent": "ממש לא, אף אחת לא מתייחסת אלייך ככה. תשלחי בבקשה אסמכתא למייל אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל, כדי שהצוות יבדוק את זה מול הוראת הקבע — תוכלי לשלוח?",
+     "rounds": [
+      [
+       {
+        "tool": "log_disputed_payment",
+        "arguments": {
+         "unit": "4"
+        },
+        "result": {
+         "ok": true,
+         "charges_written": 4
+        }
+       }
+      ]
+     ]
+    },
+    {
+     "caller": "סליחה אבל למה אני צריכה להוכיח לכם משהו אתם אלה שמתקשרים ואומרים שאני חייבת אז תשלחו אתם לי בכתב מה בדיוק אני חייבת ועל איזה חודשים",
+     "en": "Excuse me but why do I need to prove anything to you, you're the ones calling and saying I owe, so you send me in writing what exactly I owe and for which months"
+    },
+    {
+     "agent": "את צודקת לבקש את זה בכתב. מישהי מהצוות תחזור אלייך עם פירוט מסודר ותבדוק מול הוראת הקבע."
+    },
+    {
+     "caller": "רגע תחזור אליי איך עוד פעם בטלפון אני ביקשתי בכתב לא שיתקשרו אליי שוב אני לא רוצה עוד שיחות כאלה",
+     "en": "Wait, get back to me how, by phone again? I asked for it in writing, not for them to call me again, I don't want any more calls like this"
+    },
+    {
+     "agent": "תודה ליאת, יום טוב, ולהתראות.",
+     "rounds": [
+      [
+       {
+        "tool": "transfer_to_human",
+        "arguments": {
+         "unit": "4",
+         "reason": "dispute",
+         "posture_reached": "friction"
+        },
+        "result": {
+         "ok": true,
+         "reason": "dispute",
+         "charges_paused": 0,
+         "emergency_reference": null
+        }
+       }
+      ],
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "transferred",
+         "posture_reached": "friction",
+         "transfer_reason": "dispute"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 4
+        }
+       }
+      ]
+     ],
+     "heard": [
+      "הצוות יחזור אלייך בכתב, ולא בטלפון.",
+      "תודה ליאת, יום טוב, ולהתראות."
+     ]
+    }
+   ],
+   "usage": [
+    {
+     "in": 2966,
+     "out": 185,
+     "cached": 0,
+     "reasoning": 114,
+     "cost": 0.0092635
+    },
+    {
+     "in": 3086,
+     "out": 112,
+     "cached": 2963,
+     "reasoning": 90,
+     "cost": 0.0020186
+    },
+    {
+     "in": 3131,
+     "out": 196,
+     "cached": 3083,
+     "reasoning": 107,
+     "cost": 0.0026951
+    },
+    {
+     "in": 3263,
+     "out": 125,
+     "cached": 3128,
+     "reasoning": 83,
+     "cost": 0.0022116
+    },
+    {
+     "in": 3343,
+     "out": 170,
+     "cached": 3260,
+     "reasoning": 113,
+     "cost": 0.002558
+    },
+    {
+     "in": 3438,
+     "out": 36,
+     "cached": 3340,
+     "reasoning": 0,
+     "cost": 0.0012715
+    },
+    {
+     "in": 3500,
+     "out": 16,
+     "cached": 3435,
+     "reasoning": 0,
+     "cost": 0.001008
+    }
+   ]
+  },
+  "out5_hardship_ashamed": {
+   "scenario": "out5_hardship_ashamed",
+   "agent": {
+    "assistant": "Homies — Debt Follow-up (he)",
+    "updated_at": "2026-10-04T11:47:14.220Z",
+    "model": "openai/gpt-5.6-sol",
+    "temperature": null,
+    "max_tokens": 250
+   },
+   "caller": "Claude, acting as the tenant on the card",
+   "saved_at": "2026-10-05 14:18 UTC",
+   "ended": "Michael said \"יום טוב\", one of the phrases Vapi hangs up on",
+   "turns": [
+    {
+     "agent": "בוקר טוב, יוסי? מדבר מיכאל מהצוות של הומיז, מה נשמע?"
+    },
+    {
+     "caller": "כן זה יוסי אה בסדר תודה מה העניין",
+     "en": "Yes this is Yossi uh fine thanks what's this about"
+    },
+    {
+     "agent": "טוב לשמוע. אני מתקשר לגבי תשלום ועד הבית לדירה תשע: החודשים ינואר עד אוגוסט עדיין פתוחים, בסכום כולל של אלפיים שקלים — לשלוח לך קישור לתשלום?"
+    },
+    {
+     "caller": "כן אני יודע אני יודע אה תשמע זה לא שאני מתחמק או משהו כאילו פשוט עכשיו אין לי 2000 שקל ככה בבת אחת",
+     "en": "Yes I know I know uh listen it's not that I'm dodging or anything like, it's just that right now I don't have 2000 shekels just like that all at once"
+    },
+    {
+     "agent": "הצוות יחזור אליך וננסה למצוא פתרון שמתאים למצב. תודה ששיתפת, יום טוב, ולהתראות.",
+     "rounds": [
+      [
+       {
+        "tool": "transfer_to_human",
+        "arguments": {
+         "unit": "9",
+         "reason": "hardship",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "reason": "hardship",
+         "charges_paused": 0,
+         "emergency_reference": null
+        }
+       },
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "transferred",
+         "posture_reached": "open",
+         "transfer_reason": "hardship"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "heard": [
+      "לא צריך להיכנס ללחץ או להסביר, יוסי. מישהו מהצוות יחזור אליך כדי לבדוק איתך מה אפשר לסדר בצורה שתתאים לך.",
+      "הצוות יחזור אליך וננסה למצוא פתרון שמתאים למצב. תודה ששיתפת, יום טוב, ולהתראות."
+     ]
+    }
+   ],
+   "usage": [
+    {
+     "in": 2976,
+     "out": 121,
+     "cached": 0,
+     "reasoning": 65,
+     "cost": 0.0086485
+    },
+    {
+     "in": 3066,
+     "out": 277,
+     "cached": 2973,
+     "reasoning": 149,
+     "cost": 0.0035956
+    },
+    {
+     "in": 3256,
+     "out": 33,
+     "cached": 3063,
+     "reasoning": 0,
+     "cost": 0.0014236
+    }
+   ]
+  },
+  "out5_pay_rushed": {
+   "scenario": "out5_pay_rushed",
+   "agent": {
+    "assistant": "Homies — Debt Follow-up (he)",
+    "updated_at": "2026-10-04T11:47:14.220Z",
+    "model": "openai/gpt-5.6-sol",
+    "temperature": null,
+    "max_tokens": 250
+   },
+   "caller": "Claude, acting as the tenant on the card",
+   "saved_at": "2026-10-05 14:18 UTC",
+   "ended": "Michael said \"יום טוב\", one of the phrases Vapi hangs up on",
+   "turns": [
+    {
+     "agent": "ערב טוב, נועה? מדבר מיכאל מהצוות של הומיז, מה נשמע?"
+    },
+    {
+     "caller": "כן היי אני בקופה בסופר עכשיו אפשר מהר",
+     "en": "yes hi I'm at the checkout in the supermarket right now can we be quick"
+    },
+    {
+     "agent": "בטח, אהיה קצר: ועד הבית לדירה חמש פתוח על יולי ואוגוסט, בסך חמש מאות שקלים. לשלוח לך לינק לתשלום בוואטסאפ?"
+    },
+    {
+     "caller": "כן כן תשלח בוואטסאפ אה 500 זה על שניהם ביחד כן",
+     "en": "yes yes send it on WhatsApp uh 500 that's for both of them together right"
+    },
+    {
+     "agent": "כן, זה על שני החודשים יחד. הקישור נשלח לוואטסאפ במספר שיש לנו, כשתתפני תסיימי שם את התשלום. תודה, יום טוב, ולהתראות.",
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {
+         "unit": "5"
+        },
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "3318",
+         "reference": "255-1551-26"
+        }
+       }
+      ],
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open",
+         "transfer_reason": "caller_request"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 2
+        }
+       }
+      ]
+     ]
+    }
+   ],
+   "usage": [
+    {
+     "in": 2950,
+     "out": 117,
+     "cached": 0,
+     "reasoning": 68,
+     "cost": 0.0085435
+    },
+    {
+     "in": 3023,
+     "out": 46,
+     "cached": 2947,
+     "reasoning": 25,
+     "cost": 0.0012379
+    },
+    {
+     "in": 3084,
+     "out": 95,
+     "cached": 3020,
+     "reasoning": 59,
+     "cost": 0.0017125
+    },
+    {
+     "in": 3144,
+     "out": 120,
+     "cached": 3081,
+     "reasoning": 67,
+     "cost": 0.0019722
+    }
+   ]
+  },
+  "out5_promise_evasive": {
+   "scenario": "out5_promise_evasive",
+   "agent": {
+    "assistant": "Homies — Debt Follow-up (he)",
+    "updated_at": "2026-10-04T11:47:14.220Z",
+    "model": "openai/gpt-5.6-sol",
+    "temperature": null,
+    "max_tokens": 250
+   },
+   "caller": "Claude, acting as the tenant on the card",
+   "saved_at": "2026-10-05 14:18 UTC",
+   "ended": "Michael said \"יום טוב\", one of the phrases Vapi hangs up on",
+   "turns": [
+    {
+     "agent": "צהריים טובים, דודי? מדבר מיכאל מהצוות של הומיז, מה נשמע?"
+    },
+    {
+     "caller": "אהלן מיכאל כן כן מדבר הכל טוב ברוך השם מה קורה אצלך",
+     "en": "Hey Michael yes yes speaking, all good thank God, what's up with you"
+    },
+    {
+     "agent": "אצלי טוב, תודה, שמח לשמוע. אני מתקשר בעניין תשלום ועד הבית שעדיין פתוח, יש לך רגע?"
+    },
+    {
+     "caller": "אה כן כן ועד הבית נכון נכון אני יודע אני על זה אל תדאג אני אטפל בזה השבוע תודה שהזכרת לי באמת",
+     "en": "Ah yes yes the committee fee right right I know, I'm on it don't worry, I'll take care of it this week, thanks for reminding me really"
+    },
+    {
+     "agent": "מעולה, רק שיהיו מולך הפרטים: דירה שבע, עבור יוני, יולי ואוגוסט, בסך שבע מאות וחמישים שקלים. נוח לך שאשלח עכשיו קישור לתשלום בוואטסאפ?",
+     "rounds": [
+      [
+       {
+        "tool": "log_promise_to_pay",
+        "arguments": {
+         "said": "השבוע",
+         "unit": "7",
+         "promised_date": ""
+        },
+        "result": {
+         "ok": true,
+         "charges_written": 3
+        }
+       }
+      ]
+     ]
+    },
+    {
+     "caller": "כן כן בטח תשלח תשלח בוואטסאפ אני אסדר את זה יאללה תודה רבה מיכאל יום טוב לך",
+     "en": "Yes yes sure send it send it on WhatsApp I'll sort it out, alright thanks a lot Michael have a good day"
+    },
+    {
+     "agent": "הקישור נשלח לוואטסאפ במספר שיש אצלנו, כשתוכל תשלים שם את התשלום. תודה דודי, יום טוב, ולהתראות.",
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {
+         "unit": "7"
+        },
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "6640",
+         "reference": "255-1552-26"
+        }
+       }
+      ],
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open",
+         "transfer_reason": "caller_request"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 3
+        }
+       }
+      ]
+     ]
+    }
+   ],
+   "usage": [
+    {
+     "in": 2962,
+     "out": 347,
+     "cached": 0,
+     "reasoning": 309,
+     "cost": 0.0108735
+    },
+    {
+     "in": 3033,
+     "out": 137,
+     "cached": 2959,
+     "reasoning": 103,
+     "cost": 0.0021453
+    },
+    {
+     "in": 3091,
+     "out": 192,
+     "cached": 3030,
+     "reasoning": 134,
+     "cost": 0.002677
+    },
+    {
+     "in": 3184,
+     "out": 82,
+     "cached": 3088,
+     "reasoning": 61,
+     "cost": 0.0016761
+    },
+    {
+     "in": 3245,
+     "out": 80,
+     "cached": 3181,
+     "reasoning": 43,
+     "cost": 0.0015947
+    },
+    {
+     "in": 3305,
+     "out": 156,
+     "cached": 3242,
+     "reasoning": 112,
+     "cost": 0.0023644
+    }
+   ]
+  },
+  "out5_refuse_hostile": {
+   "scenario": "out5_refuse_hostile",
+   "agent": {
+    "assistant": "Homies — Debt Follow-up (he)",
+    "updated_at": "2026-10-04T11:47:14.220Z",
+    "model": "openai/gpt-5.6-sol",
+    "temperature": null,
+    "max_tokens": 250
+   },
+   "caller": "Claude, acting as the tenant on the card",
+   "saved_at": "2026-10-05 14:18 UTC",
+   "ended": "Michael said \"יום טוב\", one of the phrases Vapi hangs up on",
+   "turns": [
+    {
+     "agent": "ערב טוב, רוני? מדבר מיכאל מהצוות של הומיז, מה נשמע?"
+    },
+    {
+     "caller": "יופי הומיז עכשיו פתאום אתם מתקשרים מה אתם רוצים",
+     "en": "Great, Homies, now all of a sudden you call. What do you want"
+    },
+    {
+     "agent": "אני אגש ישר לעניין: התשלום לדירה שמונה פתוח מינואר עד אוגוסט, בסך אלפיים שקלים. לשלוח לך קישור לתשלום בוואטסאפ?"
+    },
+    {
+     "caller": "קישור לתשלום אתה צוחק עליי אני כבר שבוע עולה במדרגות בחושך עם הפנס של הטלפון דיווחתי לכם בשבוע שעבר ואף אחד לא עשה כלום ועכשיו אתם רוצים כסף איזה חוצפה אני לא משלם שקל עד שהאור במדרגות עובד",
+     "en": "A payment link, are you kidding me? I've been climbing the stairs in the dark for a week with my phone's flashlight, I reported it to you last week and nobody did anything, and now you want money? What nerve. I'm not paying a shekel until the stairwell light works"
+    },
+    {
+     "agent": "אני מקווה שהתאורה תטופל במהירות. יום טוב, ולהתראות.",
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "lighting",
+         "unit": "8",
+         "urgency": "high",
+         "description": "אין אור בחדר המדרגות כבר שבוע, הדייר עולה בחושך עם הפנס של הטלפון ודיווח בשבוע שעבר אך התקלה עדיין לא טופלה"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1555-26",
+         "reference_spoken": "אחת חמש חמש חמש"
+        }
+       }
+      ],
+      [
+       {
+        "tool": "transfer_to_human",
+        "arguments": {
+         "unit": "8",
+         "reason": "dispute",
+         "posture_reached": "hot"
+        },
+        "result": {
+         "ok": true,
+         "reason": "dispute",
+         "charges_paused": 0,
+         "emergency_reference": null
+        }
+       }
+      ],
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "transferred",
+         "posture_reached": "hot",
+         "transfer_reason": "dispute"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "heard": [
+      "רגע, אני רושם את זה.",
+      "פתחתי עכשיו פנייה דחופה על התאורה, ומספר הפנייה הוא אחת חמש חמש חמש. בגלל מה שקרה, מישהו מהצוות יחזור אליך גם בעניין התשלום.",
+      "אני מקווה שהתאורה תטופל במהירות. יום טוב, ולהתראות."
+     ]
+    }
+   ],
+   "usage": [
+    {
+     "in": 2952,
+     "out": 148,
+     "cached": 0,
+     "reasoning": 99,
+     "cost": 0.0088585
+    },
+    {
+     "in": 3069,
+     "out": 211,
+     "cached": 2949,
+     "reasoning": 141,
+     "cost": 0.0029983
+    },
+    {
+     "in": 3179,
+     "out": 294,
+     "cached": 3066,
+     "reasoning": 208,
+     "cost": 0.0038342
+    },
+    {
+     "in": 3303,
+     "out": 35,
+     "cached": 3176,
+     "reasoning": 0,
+     "cost": 0.0013012
+    },
+    {
+     "in": 3364,
+     "out": 24,
+     "cached": 3300,
+     "reasoning": 0,
+     "cost": 0.0010585
+    }
+   ]
+  }
+ }
+}
