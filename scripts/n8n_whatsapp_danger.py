@@ -33,6 +33,25 @@ an emergency, or the last bot message spoke of the urgent ticket.
   reply, else the last bot message. Nothing is ever invented.
 - Outside an emergency it changes nothing. It never returns an empty reply.
 
+V2, THE SAME EVENING, after the owner's "ok go" run of the emergency again
+(live6_leak_panic_fixed, runs 84781-84801). v118 opened its own urgent ticket
+(255-1349-26) and v1 cleaned the turn that opened it, then missed three things:
+- the model calls it "קריאת שירות דחופה", which v1's test for the last bot
+  message did not read as the urgent ticket, so the next turns went unfiltered
+  ("only a licensed electrician can decide", "keep away from the leak");
+- it gave the office number "for urgent faults", from the prompt's facts ("זה גם
+  המספר לתקלות דחופות"). The facts stay for other questions; in an emergency a
+  phone number is an instruction to call, and goes;
+- "אני מיד מטפל בזה" before the ticket existed: the reply itself naming the
+  urgent ticket now counts as an emergency.
+And "it will be handled" (יטופל) stays: it is the owner's own line for "when?".
+
+V3, the third run (live6_leak_panic_v2, runs 84817-84853): no advice, no "on
+the way" and no phone number reached him, but one turn lost everything except
+"I understand your worry" without naming the ticket: Sort's last_bot was empty
+there, so the number was not found. The chat's own recent outbound rows
+(`Anything newer?`) are read as well.
+
 EVERY CHANGE HERE SHIPS THROUGH scripts/check_whatsapp_rules.py: `--dump F`, then
 `check_whatsapp_rules.py --candidate F --replay`, `check_patchers_idle.py F`,
 `--apply`, the check again on live, every WhatsApp patcher's dry run idle.
@@ -53,14 +72,15 @@ from n8n_whatsapp_patch import layout_complaints  # noqa: E402
 
 WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
 SNAPSHOT = os.path.join(W.ROOT, "docs", "handover",
-                        "n8n-whatsapp-live-06oct-before-danger.json")
+                        "n8n-whatsapp-live-06oct-before-danger-v3.json")
 PLACEHOLDER = NP.PLACEHOLDER
 NL = chr(10)
 # A backslash is built, never typed (manners.py, 27 Sep): `¤` stands for one.
 BS = chr(92)
 PH = "¤"
 
-MARK = "const dv = 'danger v1';"
+MARK = "const dv = 'danger v3';"
+OLD_START = "body.content = (() => { const dv = 'danger v"
 ANCHOR = "body.content = (() => { const ev = 'emoji v1';"
 PUSHED = "פתחתי לך קריאה דחופה, מספר ' + ref + ', וזה הדבר היחיד שאני יכול לעשות מכאן."
 OPEN = "הקריאה הדחופה שלך פתוחה, מספר ' + ref + '."
@@ -82,19 +102,28 @@ LINES = [
     "for (const x of steps) { const tool = ((x || { }).action || { }).tool; const a = arg(x);"
     " if (tool === 'open_request' && /^(emergency|critical|immediate)$/i.test(String(a.urgency || '').trim())) { now = true; const r = res(x); if (r.reference) ref = String(r.reference); }"
     " if (tool === 'notify_team' && String(a.reason || '').trim() === 'emergency') now = true; }",
-    "const lb = String(G.last_bot || '');",
-    "const before = /קריא(?:ה|ת) (?:ה)?(?:דחופה|חירום)|הקריאה הדחופה|קריאת החירום|דחופת חירום|בדחיפות חירום/.test(lb);",
-    "if (!now && !before) return s;",
+    # v3: Sort's last_bot was empty on a live turn (84827), so the chat's own
+    # recent outbound rows, newest first, are read too.
+    "let outs = []; try { outs = $('Anything newer?').all().map((r) => r.json || { }).filter((r) => r.direction === 'outbound').map((r) => String(r.body || '')); } catch (e) { outs = []; }",
+    "const lb = [String(G.last_bot || '')].concat(outs.slice(0, 3)).join(' ');",
+    "const URGENT = /קריא(?:ה|ת)(?: ה?שירות)? (?:ה)?(?:דחופה|חירום)|קריא(?:ה|ת)(?: ה?שירות)? בדחיפות|הקריאה הדחופה|קריאת החירום|דחופת חירום|דחיפות חירום/;",
+    "if (!now && !URGENT.test(lb) && !URGENT.test(s)) return s;",
     "const REF = /¤b¤d{3}-¤d{3,6}-¤d{2}¤b/g;",
-    "if (!ref) { const m = s.match(REF) || lb.match(REF); if (m) ref = m[m.length - 1]; }",
+    "if (!ref) { const m = s.match(REF) || String(G.last_bot || '').match(REF); if (m) ref = m[m.length - 1]; }",
+    "if (!ref) { for (const b of outs) { const m = b.match(REF); if (m) { ref = m[m.length - 1]; break; } } }",
     # Advice or an instruction: always out, in an emergency.
-    "const ADVICE = /(?:^|[¤s,])אל (?!דאגה|תדאג)ת[א-ת]+|תתרחק|התרחק|להתרחק|תרחיק|להרחיק|רחוק מ|תכבה|לכבות|כבה את|תנתק|לנתק|נתק את|מפסק"
+    # Not "לוודא": "אני רוצה לוודא שאני מבין" is his own question; not "אל תהסס" (v2, the replay).
+    "const ADVICE = /(?:^|[¤s,])אל (?!דאגה|תדאג|תהסס)ת[א-ת]+|תתרחק|התרחק|להתרחק|תרחיק|להרחיק|רחוק מ|תכבה|לכבות|כבה את|תנתק|לנתק|נתק את|מפסק"
     "|תתקשר|להתקשר|התקשר|חייג|לחייג|תזמין|להזמין|חשמלאי|אינסטלטור|כיבוי אש|מד.א|משטרה|חברת החשמל|בטיחות|זהירות|היזהר|תיזהר|להיזהר"
-    "|שים לב|תשים לב|תוודא|לוודא|תישאר|להישאר|הישאר|תצא |לצאת מ|מומלץ|ממליץ|כדאי|עדיף|אין צורך|לא צריך ל|(?:^|¤D)10[0-2](?:¤D|$)/;",
+    "|שים לב|תשים לב|תוודא|(?:^|[¤s,])וודא ש|תישאר|להישאר|הישאר|תצא |לצאת מ|מומלץ|ממליץ|כדאי|עדיף|אין צורך|לא צריך ל|(?:^|¤D)10[0-2](?:¤D|$)"
+    "|(?:^|[¤s,])(?:ת?שמור|ת?שמרו|לשמור) על"
+    # A phone number is an instruction to call (v2).
+    "|(?:^|[^¤d-])0¤d{1,2}[-¤s]?¤d{3}[-¤s]?¤d{4}(?!¤d)|¤+¤d[¤d¤s-]{7,}|¤*¤d{3,5}|1-?[78]00-?¤d{2,3}-?¤d{3}/;",
     # A promise of arrival or of action: out, unless asked about or denied.
     "const ARRIVE = /בדרך(?! כלל)|(?:^|[¤s,])(?:ו|ש|וש)?(?:יגיע|יגיעו|תגיע|מגיע|מגיעה|מגיעים|יבוא|יבואו|יצאו|יוצא|יוצאים|ישלחו|שולחים)(?=[¤s,.!?]|$)"
     "|הכי מהר|כמה שיותר מהר|בהקדם|במהרה|במהירות|במיידי|באופן מיידי"
-    "|(?:^|[¤s,])(?:ו|ש|וש|ה)?(?:מטפל|מטפלת|מטפלים|מטופל|מטופלת|יטפל|יטפלו|תטופל|יטופל)(?=[¤s,.!?]|$)/g;",
+    # Handling NOW is a promise; "it will be handled" is the owner's own "when?" line (v2).
+    "|(?:^|[¤s,])(?:ו|ש|וש|ה)?(?:מטפל|מטפלת|מטפלים|מטופל|מטופלת)(?=[¤s,.!?]|$)/g;",
     "const asked = (p, i) => p.slice(0, i).split(/¤s+/).slice(-4).some((w) => /^(?:מתי|לא|אין|אינני|אינו)$/.test(w.replace(/[^א-ת]/g, '')));",
     "const promised = (p) => { ARRIVE.lastIndex = 0; let m; while ((m = ARRIVE.exec(p)) !== null) { if (!asked(p, m.index)) return true;"
     " if (m[0] === '') ARRIVE.lastIndex++; } return false; };",
@@ -151,6 +180,44 @@ SMOKE = [
     # An honest "no date" in an emergency stays whole.
     ("אין לי תאריך מדויק מתי יגיעו, אבל הקריאה הדחופה שלך פתוחה, מספר " + NEW + ".", "מתי הם מגיעים?", T3, [],
      "אין לי תאריך מדויק מתי יגיעו, אבל הקריאה הדחופה שלך פתוחה, מספר " + NEW + "."),
+    # v2, from the run again (live6_leak_panic_fixed): the reply naming the
+    # urgent ticket is an emergency before any tool ran.
+    ("אוי, זה ממש לא נעים לשמוע! אני מיד מטפל בזה. כדי שאוכל לפתוח קריאת שירות דחופה, אני צריך לדעת באיזה בניין זה קרה ובאיזו דירה אתה גר?",
+     "דחוף!!! יש מים שנוטפים מהתקרה בחדר מדרגות ישר על המנורה", "", [],
+     "אוי, זה ממש לא נעים לשמוע! כדי שאוכל לפתוח קריאת שירות דחופה, אני צריך לדעת באיזה בניין זה קרה ובאיזו דירה אתה גר?"),
+    # "קריאת שירות דחופה" in the last message is the urgent ticket; an honest
+    # "no time, it will be handled" stays, the electrician and the safety go.
+    ("אני מבין את הדאגה שלך לגבי המנורה והחשמל. אני לא יכול לתת לך הנחיות לגבי ניתוק חשמל, כי זה משהו שרק חשמלאי מוסמך יכול להחליט עליו. "
+     "פתחתי קריאת שירות דחופה (מספר " + NEW + ") והצוות שלנו כבר מעודכן. אין לי תאריך מדויק או שעה לומר לך מתי מישהו יגיע, אבל אני יכול "
+     "להבטיח לך שזה יטופל כמו שצריך ובמהירות האפשרית. שוב, הכי חשוב עכשיו זה לשמור על הבטיחות שלך ולא להתקרב לאזור הנזילה והמנורה המהבהבת.",
+     "כן אבל מה עם החשמל?? לנתק או לא? המנורה עוד מהבהבת. ומתי מישהו מגיע?",
+     "הבנתי! פתחתי עכשיו קריאת שירות דחופה לטיפול בזה, מספר הקריאה שלך הוא " + NEW + ". יש עוד משהו שאוכל לעזור בו כרגע?", [],
+     "אני מבין את הדאגה שלך לגבי המנורה והחשמל. פתחתי קריאת שירות דחופה (מספר " + NEW + ") והצוות שלנו כבר מעודכן. אין לי תאריך "
+     "מדויק או שעה לומר לך מתי מישהו יגיע, אבל אני יכול להבטיח לך שזה יטופל כמו שצריך."),
+    # A phone number in an emergency is an instruction to call (a made-up one here).
+    ("אני מבין שזה דחוף. המספר היחיד שאני יכול לתת לך הוא 03-1234567, שהוא מספר הטלפון של המשרד שלנו לתקלות דחופות. פתחתי כבר "
+     "קריאת שירות דחופה (" + NEW + ") והצוות מעודכן. זה הדבר היחיד שאני יכול לעשות מכאן.",
+     "אין מספר שאפשר להתקשר אליו עכשיו?? זה לא יכול לחכות", "פתחתי קריאת שירות דחופה (מספר " + NEW + ").", [],
+     "אני מבין שזה דחוף. פתחתי כבר קריאת שירות דחופה (" + NEW + ") והצוות מעודכן. זה הדבר היחיד שאני יכול לעשות מכאן."),
+    # From the replay of every past reply (v2): his own "make sure I understand"
+    # question stays, "keep calm" and "they'll come asap" go; "don't hesitate to
+    # ask" is not advice.
+    ("אני מבין שאין מענה מכפתור החירום. זה מתסכל, אבל אל דאגה, אנחנו כאן כדי לעזור. אני רוצה לוודא שאני מבין נכון: האם אתם במעלית בבניין "
+     "שבו אתם גרים? אם כן, אנא מסרו לי את כתובת הבניין המלאה (רחוב ומספר), ואת מספר הדירה שלכם. ברגע שאקבל את הפרטים, אוכל לפתוח "
+     "קריאת שירות דחופה ולדאוג שיגיעו אליכם מהר ככל האפשר. בינתיים, שמרו על קור רוח. אנחנו איתכם.",
+     "נתקעתי במעלית ואין מענה מכפתור החירום", "", [],
+     "אני מבין שאין מענה מכפתור החירום. זה מתסכל, אבל אל דאגה, אנחנו כאן כדי לעזור. אני רוצה לוודא שאני מבין נכון: האם אתם במעלית בבניין "
+     "שבו אתם גרים? אם כן, אנא מסרו לי את כתובת הבניין המלאה (רחוב ומספר), ואת מספר הדירה שלכם. ברגע שאקבל את הפרטים, אוכל לפתוח "
+     "קריאת שירות דחופה. אנחנו איתכם."),
+    ("פתחתי קריאת שירות דחופה, מספר 255-1202-26. אם יש לכם שאלות נוספות, אל תהססו לשאול.", "יש נזילה בלובי", "", [],
+     "פתחתי קריאת שירות דחופה, מספר 255-1202-26. אם יש לכם שאלות נוספות, אל תהססו לשאול."),
+    # v3, the third run (84827): last_bot empty, the urgent ticket in the chat's
+    # own last row; everything was cut but the worry, so the ticket line comes.
+    ("אני מבינה את הדאגה שלך. במקרים כאלה של מים וחשמל, הכי בטוח זה לא לגעת בכלום ולהתרחק מהאזור. הצוות שלנו קיבל את הקריאה הדחופה "
+     "ומטפל בזה. אין לי מידע מדויק מתי יגיעו, אבל הם בדרך לטפל בזה כמה שיותר מהר. אני כאן אם יש לך שאלות נוספות.",
+     "אבל מה אני עושה עכשיו?? לכבות את החשמל או לא? ומתי מישהו מגיע", "", [],
+     "אני מבינה את הדאגה שלך. אני כאן אם יש לך שאלות נוספות. " + T3,
+     ["תודה שעדכנת אותי. פתחתי עכשיו קריאת חירום לטיפול בנזילה. מספר הקריאה הוא " + NEW + "."]),
     # Outside an emergency nothing changes, promise-like words included.
     ("אין לי תאריך מדויק מתי יגיעו לתקן, אבל הקריאה שלך נפתחה והצוות יטפל בזה כמו שצריך. יש משהו נוסף שאוכל לעזור לך בו?",
      "יש מושג בערך מתי יבואו לתקן?", "פתחתי קריאת שירות בנושא, מספרה 255-1347-26.", [],
@@ -166,14 +233,14 @@ const P = JSON.parse(fs.readFileSync(0, 'utf8'));
 let f;
 try { f = new Function('$json', '$', 'return (' + P.expr + ');'); }
 catch (e) { console.log(JSON.stringify({ error: 'does not compile: ' + e.message })); process.exit(0); }
-const out = P.cases.map(([reply, said, lastBot, steps]) => {
+const out = P.cases.map(([reply, said, lastBot, steps, rows]) => {
   const S = { greeting: false, greeted: true, last_bot: lastBot, text: said, tap_now: false };
   const st = steps.map((x) => ({ action: { tool: x.tool, toolInput: x.toolInput }, observation: x.observation }));
   const nodes = {
     'Sort': { first: () => ({ json: S }) },
     'Carry on': { first: () => ({ json: { acked: '', text: said } }) },
     'Answer the resident': { first: () => ({ json: { intermediateSteps: st } }) },
-    'Anything newer?': { all: () => [] },
+    'Anything newer?': { all: () => (rows || []).map((b) => ({ json: { direction: 'outbound', body: b } })) },
     'Say it now': { all: () => { throw new Error('unexecuted'); } },
     'Try again': { first: () => { throw new Error('unexecuted'); } },
   };
@@ -186,7 +253,7 @@ console.log(JSON.stringify({ out }));
 
 def smoke(json_body):
     import check_whatsapp_rules as C
-    payload = {"expr": C.inner(json_body), "cases": [[r, s, lb, st] for r, s, lb, st, _ in SMOKE]}
+    payload = {"expr": C.inner(json_body), "cases": [[c[0], c[1], c[2], c[3], c[5] if len(c) > 5 else []] for c in SMOKE]}
     r = subprocess.run(["node", "-e", SMOKE_JS], capture_output=True,
                        input=json.dumps(payload, ensure_ascii=False).encode("utf-8"))
     if r.returncode != 0:
@@ -195,7 +262,8 @@ def smoke(json_body):
     if "error" in res:
         return [res["error"]]
     return ["smoke %d:%s  got  %s%s  want %s" % (i, NL, got, NL, want)
-            for i, (got, (_, _, _, _, want)) in enumerate(zip(res["out"], SMOKE)) if got != want]
+            for i, (got, c) in enumerate(zip(res["out"], SMOKE)) if got != c[4]
+            for want in [c[4]]]
 
 
 def snapshot(live):
@@ -249,8 +317,16 @@ def main():
             sys.exit("REFUSING: Send does not carry the emoji step this script inserts before. Read the live body first.")
         if NP.MARK not in body:
             sys.exit("REFUSING: Send does not carry the promise filter (%s)." % NP.MARK)
-        by["Send"]["parameters"]["jsonBody"] = body.replace(ANCHOR, BLOCK + " " + ANCHOR)
-        changes.append("Send: in an emergency, the urgent ticket and its number only (%s), before the emoji step" % MARK)
+        if OLD_START in body:
+            i, j = body.index(OLD_START), body.index(ANCHOR)
+            if not i < j:
+                sys.exit("REFUSING: the older danger step is not right before the emoji step.")
+            by["Send"]["parameters"]["jsonBody"] = body[:i] + BLOCK + " " + body[j:]
+            changes.append("Send: danger step -> %s (v3: the chat's own recent rows count as the last "
+                           "message when last_bot is empty)" % MARK)
+        else:
+            by["Send"]["parameters"]["jsonBody"] = body.replace(ANCHOR, BLOCK + " " + ANCHOR)
+            changes.append("Send: in an emergency, the urgent ticket and its number only (%s), before the emoji step" % MARK)
     new_body = by["Send"]["parameters"]["jsonBody"]
     if new_body.count("}}") != 1:
         sys.exit("REFUSING: the new Send body has %d '}}'." % new_body.count("}}"))

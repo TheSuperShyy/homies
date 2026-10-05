@@ -203,7 +203,13 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 75
+MEMORY_EPOCH = 77
+# 76 -> 77, 6 Oct, the same script again: before the emergency's third run, on
+# danger v2. The second run's buffer held "the only number I can give you is ...".
+# 75 -> 76, 6 Oct (n8n_whatsapp_fresh.py): no text changed. The emergency fix
+# (danger v1 in Send, debt-tools v118) is code, but buffers hold the model's
+# raw drafts, and the owner's held chat 6's "our team is already on its way" and
+# its safety advice, ready to be copied back -- exactly the 1 Sep failure above.
 # 74 -> 75, 5 Oct evening: the representative asks how you are TODAY. The owner,
 # shown a Claude-played rep-tap hello ("...מה שלומך?"): *"i want the intro to be
 # more friendly like how are you today?"*, the one *"after the menu greeting"* --

@@ -380,6 +380,22 @@ function cases(E) {
         S: { last_bot: PUSHED } }), 'בכיף, אסף. תודה רבה על הסבלנות. הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.');
     const HONEST = 'אין לי תאריך מדויק מתי יגיעו, אבל הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.';
     expect('"I don\'t know when they will come" stays whole', say({ reply: HONEST, said: 'מתי הם מגיעים?', S: { last_bot: PUSHED } }), HONEST);
+    // v2 (the run again, 84781-84801): the model's own words for the ticket,
+    // a phone number, and "I'm on it" before the ticket existed.
+    const SERVICE = 'פתחתי קריאת שירות דחופה (מספר 255-1349-26) והצוות שלנו כבר מעודכן.';
+    expect('"קריאת שירות דחופה" in the last message is an emergency: the electrician and the safety go, "it will be handled" stays',
+      say({ reply: 'אני לא יכול לתת לך הנחיות לגבי ניתוק חשמל, כי זה משהו שרק חשמלאי מוסמך יכול להחליט עליו. ' + SERVICE
+        + ' אין לי שעה לומר לך מתי מישהו יגיע, אבל זה יטופל כמו שצריך. שוב, הכי חשוב עכשיו זה לשמור על הבטיחות שלך.',
+        said: 'לנתק את החשמל או לא? ומתי מישהו מגיע?',
+        S: { last_bot: 'הבנתי! פתחתי עכשיו קריאת שירות דחופה, מספר הקריאה שלך הוא 255-1349-26.' } }),
+      SERVICE + ' אין לי שעה לומר לך מתי מישהו יגיע, אבל זה יטופל כמו שצריך.');
+    expect('a phone number in an emergency goes (an instruction to call)',
+      say({ reply: 'המספר היחיד שאני יכול לתת לך הוא 03-1234567, של המשרד שלנו. ' + SERVICE,
+        said: 'אין מספר שאפשר להתקשר אליו עכשיו??', S: { last_bot: SERVICE } }), SERVICE);
+    expect('the reply naming the urgent ticket is an emergency before any tool: "I\'m on it right away" goes',
+      say({ reply: 'אוי, זה ממש לא נעים לשמוע! אני מיד מטפל בזה. כדי שאוכל לפתוח קריאת שירות דחופה, באיזה בניין זה קרה?',
+        said: 'דחוף!!! יש מים שנוטפים מהתקרה ישר על המנורה' }),
+      'אוי, זה ממש לא נעים לשמוע! כדי שאוכל לפתוח קריאת שירות דחופה, באיזה בניין זה קרה?');
     const CALM = 'אין לי תאריך מדויק מתי יגיעו לתקן, אבל הקריאה שלך נפתחה והצוות יטפל בזה כמו שצריך. יש משהו נוסף שאוכל לעזור לך בו?';
     expect('outside an emergency nothing changes', say({ reply: CALM, said: 'מתי יבואו לתקן?',
       S: { last_bot: 'פתחתי קריאת שירות בנושא, מספרה 255-1347-26.' } }), CALM);

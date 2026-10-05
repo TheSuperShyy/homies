@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: the emergency run again on the fixed bot, two more fixes, the document updated
+
+The owner: *"okgo also run the new test for the whole chatbot again for the emergency only so its updated"*.
+- **Memory epoch 75 -> 76 (19:20 UTC), `scripts/n8n_whatsapp_fresh.py`:** no text changed, but the owner's buffer held chat 6's "on its way" and advice.
+- **Run 2 (live6_leak_panic_fixed, 84781-84801):**
+  - v118 worked: a separate emergency ticket, 255-1349-26 (`electrical`, urgency `emergency`).
+  - v1 cleaned the turn that opened it, then missed three things: "קריאת שירות דחופה" was not read as the urgent ticket, the office number went out "for urgent faults" (the prompt's facts say so), and "אני מיד מטפל בזה".
+- **danger v2 (19:30:10 UTC):** those three. The replay showed "לוודא" cutting the bot's own "I want to make sure I understand" question and "אל תהססו" counted as advice; both were fixed before the write. 310/310.
+- **Epoch 76 -> 77 (19:30:40 UTC):** the same script, now one epoch up from whatever is live.
+- **Run 3 (live6_leak_panic_v2, 84817-84853):** no advice, no "on the way" and no number reached him (the drafts had all three); pushed, he got the ticket line. The leak joined 255-1349-26, as two reports of one emergency should.
+  - One gap: a turn cut down to "I understand your worry" without the ticket, because Sort's `last_bot` was empty there.
+- **danger v3 (19:36:10 UTC):** also reads the chat's own recent outbound rows (`Anything newer?`). 310/310 on live.
+- **The document** (`2026-10-05-whatsapp-6-tenants.*`): chat 6 is now run 3, and the first run is described under What we found. 42 of 42 replies matched the inbox. Now 4 of 6 got what they came for.
+- **Still to polish, not asked:** Michael said "מבינה" (feminine) of himself, and the last two replies were identical.
+
 ### WhatsApp bot: the emergency fixed: a ticket, and nothing else (LIVE 19:15 UTC, debt-tools v118)
 
 The owner, after the six-chat test: *"you have been going back and forth and you did not finish anything"*, then *"so just fix the emergency thats it like we dont order them around we just open a ticket that is the best thing we can do for them and dont advise anything and dont tell them that the team is on the way because its not our main role is just to open a ticket"*.
