@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### Incoming-call agent: its four jobs on the real model, with Claude as the tenants ($0.23)
+
+The owner: *"test the voice agent and extract the transcription of it and we will put it in a gdocs for documentation ... act like a real person ... opening a ticket, checking ticket status, checking balance and trying to pay ... inbound voice agent only"*, with an OpenRouter estimate first (about 25 cents), then *"go"*.
+- **Done:**
+  - **The calls:** four calls, each with a different tenant:
+    - open a ticket: Batya, anxious and chatty;
+    - check a ticket: Roni, angry;
+    - check a balance: Shiran, suspicious;
+    - pay: Assaf, friendly, driving.
+  - **The documents:** `docs/assistant/transcripts/2026-10-05-inbound-4-calls.html` (for pasting into Google Docs), the `.md` and the `.json` record.
+  - **The harness:** `scripts/voice_qa.py` gained `--deck`, `say`, `tenant` and `report`, and the cards are in `scripts/voice_qa_inbound_4.json`.
+- **Checked live before the run:**
+  - **The prompt:** sha `d0b421ce303b`, the same as the repo, updated 4 Oct 11:47 UTC.
+  - **The tools:** debt-tools v112, deployed 4 Oct 11:48 UTC.
+  - **The test building's data:** flats 1 to 3 owe 2,000 ₪ each, for January to August. The stairwell-lights ticket is 255-1336-26, open since 29 Sep and never updated.
+  - **The settings:** recording is off; the token limit is Vapi's default of 250.
+- **Cost:** $0.2252 by OpenRouter's own figures, 9 to 11 model calls per call. The key went from $13.88 to $13.65.
+- **Found** (the full list is in HANDOVER):
+  - "a real person" and "the call is recorded", both false;
+  - an invented email, info@homies.co.il;
+  - "I'm updating the team" with no note, five times;
+  - promises of a link to "the number you called from", which no note carries;
+  - Roni made feminine, and Michael feminine about himself;
+  - untrue statements about what was on a ticket or in the system;
+  - 55 words a turn on average, up to 103;
+  - one team note cut off by the 250-token limit;
+  - the lighting lookup also returning a neighbour's leak.
+- **Open, the owner's call:**
+  - what Michael answers to "are you a robot?";
+  - which email, if any, he may give;
+  - whether to raise the 250-token limit;
+  - whether to tighten the status lookup's word match (נורה inside המנורה).
+
 ### Live test as Assaf Clix: 9 conversations on the live bot, done ($0.35, nothing deleted)
 
 `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, with every turn's n8n run number (runs 83285 to 83924).

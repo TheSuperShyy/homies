@@ -1,0 +1,82 @@
+{
+ "_about": "The incoming-call agent only, one call per job it does: open a ticket, check a ticket, check a balance, pay (5 Oct, the owner: \"opening a ticket, checking ticket status, checking balance and trying to pay ... 1 scenarios each like how it handle different kind of concern and tenants attitude\"). Claude acts as each tenant. The tool results are the shapes the DEPLOYED debt-tools v112 returns (4 Oct 11:48 UTC), not the 5 Oct deck's, whose get_balance fixture used field names the function no longer sends (total_owed / unpaid_months for owed_total / owed_months). The data is בר כוכבא 23's as read on 5 Oct: flats 1 to 3 each owe 2,000 ₪, January to August at 250, and the other flats have no record. Run: python scripts/voice_qa.py bundle --run DIR --deck scripts/voice_qa_inbound_4.json.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1541-26 -> אחת חמש ארבע אחת).",
+  "open_request": {"_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Bar Kochba with another number: number_not_on_street. Bar Kochba with no number: need_number. Any other street: street_unknown. A second call with the same building and type inside 30 minutes returns the first reference with duplicate: true.",
+                   "opened": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+                   "need_number": {"ok": true, "opened": false, "building_found": false, "reason": "need_number", "street": "בר כוכבא", "numbers_we_manage": ["23"]},
+                   "number_not_on_street": {"ok": true, "opened": false, "building_found": false, "reason": "number_not_on_street", "street": "בר כוכבא", "numbers_we_manage": ["23"]},
+                   "street_unknown": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"}},
+  "save_partial_request": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+  "add_request_detail": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+  "notify_team": {"_rule": "reason is echoed back as sent.", "ok": true, "reason": "<the reason sent>", "charges_paused": 0, "emergency_reference": null, "team_notified": true},
+  "get_request_status": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []},
+  "get_balance": {"_rule": "Building בר כוכבא 23 with apartment 1, 2 or 3: that flat's record (the scenario's fixture). Any other flat: found 0 with the note.",
+                  "flat_1": {"ok": true, "found": 1, "resident": "עידו קליקס", "building": "בר כוכבא 23, תל אביב - יפו", "unit": "1", "owed_total": 2000,
+                             "owed_months": [{"period": "2026-01", "amount": 250}, {"period": "2026-02", "amount": 250}, {"period": "2026-03", "amount": 250}, {"period": "2026-04", "amount": 250},
+                                             {"period": "2026-05", "amount": 250}, {"period": "2026-06", "amount": 250}, {"period": "2026-07", "amount": 250}, {"period": "2026-08", "amount": 250}],
+                             "in_review": []},
+                  "flat_2": {"ok": true, "found": 1, "resident": "אסף קליקס", "building": "בר כוכבא 23, תל אביב - יפו", "unit": "2", "owed_total": 2000,
+                             "owed_months": [{"period": "2026-01", "amount": 250}, {"period": "2026-02", "amount": 250}, {"period": "2026-03", "amount": 250}, {"period": "2026-04", "amount": 250},
+                                             {"period": "2026-05", "amount": 250}, {"period": "2026-06", "amount": 250}, {"period": "2026-07", "amount": 250}, {"period": "2026-08", "amount": 250}],
+                             "in_review": []},
+                  "not_found": {"ok": true, "found": 0, "note": "No single apartment matched, so no balance was read: this is NOT a zero balance. Say you could not find it, and ask for or check the street, number and apartment with them."}},
+  "get_service_info": {"ok": true, "found": false, "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."}
+ },
+ "scenarios": [
+  {
+   "id": "in4_ticket_anxious", "agent": "inbound", "title": "Open a ticket: an anxious, chatty grandmother whose intercom will not open the entrance door",
+   "time": "10:20", "weekday_he": "שני", "ticket": "255-1541-26",
+   "caller": {
+    "persona": "בתיה, 74. Warm, chatty and a little anxious; lives alone on the fourth floor. Tells the story around the problem (her grandson, the stairs, her knees) before the problem itself. Speaks about herself in the feminine (אני גרה, אני לא יודעת, הייתי צריכה). Slightly slow; repeats herself.",
+    "knows": "Lives at בר כוכבא 23, apartment 6, fourth floor. Since Saturday the intercom rings in her flat but pressing the button does not open the building's entrance door downstairs. Yesterday her grandson waited outside for twenty minutes and she had to walk down four floors to let him in. The lift works. She sometimes mixes up her house number and says 32 before correcting herself.",
+    "wants": "Someone to fix the intercom door button, and to know roughly when.",
+    "tendencies": "Opens with hello and asks how Michael is. Says the address as 32 first. Asks whether someone will call her before coming. May ask the agent to repeat the number. Thanks him warmly and at length."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in4_status_angry", "agent": "inbound", "title": "Check a ticket: an angry, sarcastic tenant whose stairwell has been dark for a week",
+   "time": "21:10", "weekday_he": "שני", "ticket": "255-1542-26",
+   "caller": {
+    "persona": "רוני, 46. Came home from work and climbed the stairs in the dark again. Angry and sarcastic, not abusive; interrupts, talks in short bursts. Has no patience for scripts.",
+    "knows": "Lives at בר כוכבא 23, apartment 8, third floor. The stairwell lights do not come on at night. He believes he (or a neighbour) reported it about a week ago, last Tuesday. He has no ticket number. He pays the house committee fee.",
+    "wants": "To know what is happening with the lights and when they will be fixed, and to feel that someone takes it seriously.",
+    "tendencies": "Opens sarcastically ('you're open at this hour? amazing'). Asks for a date. Says he is thinking of not paying the committee fee until it is fixed. Asks to speak to a manager. Calms down a little if he gets a straight answer."
+   },
+   "fixtures": {
+    "get_request_status": {"_rule": "The deployed lookup, replayed on 5 Oct data. With building בר כוכבא 23 and type lighting (any apartment; the apartment is dropped for lighting): lighting_found. With building and apartment 8 and no type, or a non-shared type: not_found (nothing is filed under apartment 8). Anything else: not_found.",
+                           "lighting_found": {"ok": true, "found": 2, "as_of": "live", "other_open": 10, "requests": [
+                             {"reference": "255-1344-26", "status": "open", "type": "plumbing", "urgency": "high", "opened": "2026-10-05", "last_update": "2026-10-05", "description": "נזילה מהתקרה באמבטיה מהבוקר מטפטף ממש ליד המנורה. נראה לי זה מדירה 4 מלמעלה דפקתי ואף אחד לא פותח"},
+                             {"reference": "255-1336-26", "status": "open", "type": "lighting", "urgency": "normal", "opened": "2026-09-29", "last_update": "2026-09-29", "description": "אין תאורה בלילה בחדר המדרגות"}]},
+                           "not_found": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []}}
+   }
+  },
+  {
+   "id": "in4_balance_suspicious", "agent": "inbound", "title": "Check a balance: a suspicious tenant who does not trust the call and disputes the amount",
+   "time": "13:05", "weekday_he": "שני", "ticket": "255-1543-26",
+   "caller": {
+    "persona": "שירן, 31. Calling on her lunch break. Sharp, suspicious of phone services and of being recorded; short sentences; wants facts, not friendliness. Speaks about herself in the feminine (אני רוצה, אני בטוחה, שילמתי).",
+    "knows": "Lives at בר כוכבא 23, apartment 1, with her partner עידו קליקס; the flat is in his name. She thinks they owe 'maybe a month or two'. She is sure they paid March by bank transfer from her own account, and she has the bank confirmation on her phone.",
+    "wants": "To know exactly how much the flat owes and for which months, and to get March taken off if it shows as unpaid.",
+    "tendencies": "Asks first whether this is a person or a robot and whether the call is recorded. Asks why he needs her address. Pushes back hard on the amount. Asks where to send the bank confirmation. Ends abruptly."
+   },
+   "fixtures": {
+    "get_balance": {"_rule": "Building בר כוכבא 23 with apartment 1, or the name עידו קליקס: the defaults' flat_1. Apartment 2: flat_2. Anything else, or a name alone that is not עידו: not_found."}
+   }
+  },
+  {
+   "id": "in4_pay_friendly", "agent": "inbound", "title": "Pay: a friendly tenant in a hurry who wants to pay right now by link or Bit",
+   "time": "08:15", "weekday_he": "שני", "ticket": "255-1544-26",
+   "caller": {
+    "persona": "אסף, 38. Driving to work with the phone on speaker; friendly, upbeat, cooperative, in a hurry. The car noise makes the speech-to-text drop or garble a word now and then. Mixes in English words (link, credit, Bit).",
+    "knows": "Lives at בר כוכבא 23, apartment 2 (אסף קליקס). Got a letter that the house committee fee has not been paid for a while; does not know the exact amount. Wants to pay everything at once today.",
+    "wants": "To pay now: a link on WhatsApp, Bit, or a card over the phone, whichever is fastest.",
+    "tendencies": "Asks for a link to his WhatsApp. Asks if he can pay with Bit. Asks how much it is. Offers to read out his card. Asks when the link will come. Says thanks and goes."
+   },
+   "fixtures": {
+    "get_balance": {"_rule": "Building בר כוכבא 23 with apartment 2, or the name אסף קליקס: the defaults' flat_2. Apartment 1: flat_1. Anything else: not_found."}
+   }
+  }
+ ]
+}

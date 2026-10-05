@@ -365,6 +365,23 @@ its stated time.
     - Incoming: "your team" for "our team".
     - Debt: "מישהי מהצוות תחזור" to the widow. The likely cause is "שתחזור" in the dashboard's feminine address note (`dashboard/lib/call.ts`).
     - Seen again from the Claude-played run: "anything else?" after the emergency, and no proof-by-email offer on the dispute.
+- **DONE 5 Oct, on the owner's "go": the incoming agent's four jobs on the real model, with Claude as the tenants, $0.23 (estimate 25 cents).** For the Google Doc: `docs/assistant/transcripts/2026-10-05-inbound-4-calls.html` (Hebrew right to left beside the English; paste the page) and `.md` (for Gemini). The run's record is the `.json` beside them.
+  - **The calls:** open a ticket (Batya, anxious and chatty), check a ticket (Roni, angry), check a balance (Shiran, suspicious, disputes March), pay (Assaf, friendly, driving). One blind Claude player per card through `voice_qa.py say`; only the agent spent.
+  - **What was live:** the prompt `d0b421ce303b` (6,616 chars, the same as the repo), gpt-4.1 at 0.3, tools from debt-tools v112. The stand-ins replay the deployed lookups on בר כוכבא 23's live rows, read-only; nothing was written.
+  - **Facts checked, not assumed:**
+    - Recording is OFF on the incoming agent (`artifactPlan.recordingEnabled` false).
+    - The agent runs at Vapi's default of 250 tokens a turn; it sets no `maxTokens`, and Vapi's API spec says "Default is 250". In the balance call a long passage plus a team note in one turn hit it, and the note's arguments were cut mid-sentence.
+    - The 5 Oct deck's `get_balance` fixture used field names the function no longer sends (`total_owed`, `unpaid_months`). The new deck and `say` use the live shape (`owed_total`, `owed_months`).
+  - **For the owner, proposals only. Nothing was changed:**
+    1. Asked "person or robot?", Michael said "a real person", and that "the call is recorded". Both are false. This is the second run in a row with "real person". What he should say is the owner's call.
+    2. He made up an email address, `info@homies.co.il`, for a tenant's bank confirmation. The prompt has no email; the debt agent's is `Office@homies-management.co.il`.
+    3. He said "I'm updating the team" with no `notify_team` behind it: three times in the status call, and twice more in the other calls.
+    4. He promised a WhatsApp link "to the number you called from", that "they'll get back to you" and "soon", and that "usually the team calls first". Web calls carry no number, and no note had one.
+    5. He made Roni (a name used for both men and women) a woman, and spoke of himself in the feminine too ("אני לא יכולה").
+    6. He said things the tools never told him: "apartment 6 is in the request", "the system found 23 A" (he heard the filler אה as the letter א), "an urgent request", "still being handled".
+    7. About 55 words a turn, up to 103. He offered to tell the team an angry tenant will withhold his fee.
+    8. `get_request_status` for lighting also returned flat 2's bathroom leak (255-1344-26), because TYPE_WORDS matches נורה inside "המנורה". Michael did not read it out.
+  - **To run it again:** `voice_qa.py bundle --run DIR --deck scripts/voice_qa_inbound_4.json`, then `tenant --run DIR <id>` gives each player its protocol, then `say` (spends; $1 stop shared across the run), then `report --run DIR --out PREFIX` with the English in `DIR/en.json`.
 - **LIVE 4 Oct 14:53 UTC, on the owner's "live it": the calm-word prompt change.** The owner had asked "can we edit the ugh how annoying remarks it does not fit the chatbot at all".
   - **What is live:** prompt 65c56f9d9c40 and memory epoch 73 (`={{ $json.to }}-73`; every conversation's memory restarted at 14:53).
   - **What the prompt now says:** a fault gets "תגובה קצרה ואכפתית של בן אדם לדבר עצמו"; the example list is "אוקיי", "אין בעיה", "אוי, לא נעים"; and after it, "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן", גם כשהוא כועס."

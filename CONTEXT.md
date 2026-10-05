@@ -2651,6 +2651,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **More blocked drafts:** the bot's own checks blocked 29 of 72 drafts, against 14 of 59 with a model playing the tenants.
   - **Say it again ran 6 times with no good outcome:** 3 untrue claims were sent, and 3 turns got no reply.
   - **How to test the WhatsApp bot from now on:** Claude tenants through `wa_qa.py say`. `play`, with a model as the tenant, is only a smoke test. The owner asked for tenants who "act like a real tenant".
+- **The incoming voice agent is tested the same way (5 Oct, the owner's "go", four calls, $0.23).**
+  - **Method:** Claude tenants through `voice_qa.py say`, one blind player per card, and only the agent runs on OpenRouter.
+  - **Tool answers:** the stand-ins run the deployed function's own lookups on בר כוכבא 23's live rows, read-only. They are not hand-written fixtures, because those drift: the 5 Oct deck's balance fixture already used field names the function no longer sends.
+  - **Cost:** a call is about 5.6 cents.
+- **The incoming agent runs at Vapi's default of 250 tokens a turn (checked 5 Oct).** The assistant sets no `maxTokens`, and Vapi's API spec gives 250 as the default. A test that leaves the limit out tests a different agent. When one turn holds a long spoken passage and a tool call, the call's arguments get cut, and the note breaks.
 - **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
   - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.
   - **What they don't reach:** the paths that failed in the test start later. A fault report, "when?", a correction, pushback and "are you a bot?" are where the checks, Try again, Say it again and the promise filter fire.
