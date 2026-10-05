@@ -536,17 +536,23 @@ function digitsFromWords(raw: string): string {
 //
 // Matching the words against the description as well as the category is what
 // finds the caller's request without widening to everybody's.
+// 5 Oct: mould and damp, and the parking gate, had no words at all. On the live
+// run as Assaf Clix the mould ticket (255-1341-26, filed `cleaning`) and the two
+// gate tickets (`maintenance`, `locksmith`) could only be found by a category
+// the model had to guess right.
 const TYPE_WORDS: Record<string, string[]> = {
   elevator: ["elevator", "lift", "מעלית"],
   lighting: ["light", "lighting", "bulb", "נורה", "תאורה", "אור"],
-  plumbing: ["leak", "water", "pipe", "drain", "נזילה", "מים", "צנרת", "ביוב"],
+  plumbing: ["leak", "water", "pipe", "drain", "damp", "mold", "mould",
+             "נזילה", "מים", "צנרת", "ביוב", "רטיבות", "עובש", "לחות"],
   electrical: ["electric", "power", "socket", "חשמל", "שקע"],
-  cleaning: ["clean", "rubbish", "bin", "ניקיון", "אשפה", "זבל"],
+  cleaning: ["clean", "rubbish", "bin", "mold", "mould", "ניקיון", "אשפה", "זבל", "עובש"],
   gardening: ["garden", "tree", "גינה", "עץ", "גינון"],
   pest_control: ["pest", "rat", "cockroach", "מזיקים", "ג'וקים", "עכבר"],
-  locksmith: ["lock", "key", "door", "מנעול", "מפתח", "דלת"],
+  locksmith: ["lock", "key", "door", "gate", "remote", "מנעול", "מפתח", "דלת", "שער", "שלט"],
   fire_safety: ["fire", "smoke", "extinguisher", "אש", "עשן", "מטפה"],
-  maintenance: ["maintenance", "תחזוקה"],
+  maintenance: ["maintenance", "damp", "mold", "mould", "gate", "parking", "remote",
+                "תחזוקה", "רטיבות", "עובש", "שער", "חניה", "חניון", "שלט"],
   // Ours, not OXS's (migration 025, 25 Aug): a complaint is a ticket on both
   // channels. The words are what a caller says when asking about one.
   complaint: ["complaint", "noise", "neighbour", "neighbor", "תלונה", "רעש", "שכן", "שכנים"],
@@ -1148,6 +1154,32 @@ function e164(national: string): string | null {
   const n = national.replace(/^0+/, "");
   // Israeli national numbers are 8 (landline) or 9 (mobile) digits.
   return n.length === 8 || n.length === 9 ? "+972" + n : null;
+}
+
+/**
+ * The number a WhatsApp resident TYPES for the balance check: phoneOf(), plus a
+ * foreign number written with its country code ("+63 917…", "0063 917…", or
+ * 11-15 digits that are not Israeli), in the form `residents.phone` holds one:
+ * "+" and the digits, as WhatsApp gives it. A foreign number in its local form
+ * ("0917…") is not guessed at.
+ *
+ * 5 Oct (the owner: *"B make it type the number"*): the typed check stays, and
+ * a foreign number now passes it. Assaf Clix, on the owner's +63 handset, could
+ * never get his balance, even typing his number exactly: phoneOf() turned it
+ * into null, and null reads as "not given". Only get_balance uses this; every
+ * other caller of phoneOf() -- the voice agents, the ticket's reporter, the OXS
+ * mirror's gate -- is unchanged.
+ */
+function typedPhoneOf(value: unknown): string | null {
+  const own = phoneOf(value);
+  if (own) return own;
+  const raw = String(value ?? "").trim();
+  const digits = raw.replace(/\D+/g, "");
+  if (raw.startsWith("+") || digits.startsWith("00")) {
+    const intl = digits.replace(/^00/, "");
+    return /^[1-9]\d{7,14}$/.test(intl) ? "+" + intl : null;
+  }
+  return /^[1-9]\d{10,14}$/.test(digits) ? "+" + digits : null;
 }
 
 /**
@@ -2354,6 +2386,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // True when the caller named a building and nothing else, so their own
     // request cannot be told from a neighbour's.
     let namedNothing = false;
+    // 5 Oct: the category named matched nothing in the caller's own flat, so
+    // the flat's requests come back whole (see below).
+    let typeUnmatched = false;
 
     const serial = serialOf(args?.reference);
     if (serial) {
@@ -2512,19 +2547,38 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         // what the caller named is answered in full, and the rest is a NUMBER.
         // Never a description, never a reference, never a category.
         const type = String(args?.type ?? "").trim();
+        // 5 Oct: a payment record is not a fault. Flat 2 of בר כוכבא 23 had
+        // seven, and on a lookup that read five rows they were most of them.
+        if (type !== "payment") q = q.or("type.is.null,type.neq.payment");
+        // 5 Oct: read wide, answer narrow. Five rows for a flat (twelve for a
+        // building) were read BEFORE the category split, so a flat with a few
+        // newer tickets hid the one asked about.
         const { data, error } = await q
           .order("created_at", { ascending: false })
-          .limit(unit ? 5 : 12);
+          .limit(unit ? 20 : 30);
         if (error) return { ok: false, error: error.message };
 
         const all = data ?? [];
-        const mine = type ? all.filter((r) => matchesType(r, type)) : all;
+        let mine = type ? all.filter((r) => matchesType(r, type)) : all;
+        // 5 Oct: IN HIS OWN FLAT, A CATEGORY THAT MATCHES NOTHING IS A GUESS,
+        // NOT AN ANSWER. Assaf Clix asked about the mould in flat 2; the model
+        // passed `other`, the ticket is filed `cleaning`, and he was told there
+        // was nothing while 255-1341-26 was in the rows read. The 19 Aug rule
+        // (a neighbour's ticket is a count, never a description) is about the
+        // building; a flat's own requests are the caller's. So with a flat
+        // given, an empty split hands back the flat's requests, flagged, and
+        // the agent finds the one meant by its description.
+        if (unit && type && !mine.length && all.length) {
+          mine = all;
+          typeUnmatched = true;
+        }
         othersInBuilding = all.length - mine.length;
         // Nothing was named to match on, so there is no way to tell the
         // caller's request from a neighbour's. The agent asks what it was
-        // about; see `identify_needed` below.
-        namedNothing = !type && all.length > 1;
-        rows = mine.slice(0, unit ? 3 : 8);
+        // about; see `identify_needed` below. A flat given is something named
+        // (5 Oct): its requests are the caller's.
+        namedNothing = !type && !unit && all.length > 1;
+        rows = mine.slice(0, unit && !typeUnmatched ? 3 : 8);
 
         // A loose match can span two buildings — "Herzl" is Herzl 14 and
         // Herzl 22. Reading one building's requests to somebody standing in
@@ -2558,6 +2612,11 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // attributed to them. Descriptions are withheld and the agent asks what
       // it was about rather than reading the list.
       identify_needed: namedNothing || undefined,
+      type_unmatched: typeUnmatched || undefined,
+      note: typeUnmatched
+        ? "The category you passed matched none of this flat's requests, so these are all of them, " +
+          "newest first. Find the one the resident means by its description; if none fits, ask him."
+        : undefined,
       requests: (rows ?? []).map((r) => ({
         reference: r.reference,
         status: r.status, // open | in_progress | resolved | cancelled
@@ -2621,7 +2680,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
     if (channel(ctx) === "whatsapp") {
       const given = String(args?.name ?? "").trim();
-      const phone = phoneOf(args?.phone);
+      const phone = typedPhoneOf(args?.phone);
       if (!given || !phone) {
         return {
           ok: true,

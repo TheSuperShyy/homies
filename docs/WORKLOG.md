@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: fix 3 of 5 and fix 5's half, the lookups and the typed number (Edge Function v116, LIVE 16:09 UTC)
+
+The owner: *"start just finish it all quick"*. One deploy of `supabase/functions/debt-tools/index.ts`, `supabase_functions.py --apply --oxs-mirror` (the mirror for his number stays on).
+- **Why:**
+  - **The mould:** the live lookup sent `{unit: "2", type: "other"}`. The flat's 5 newest rows were read before the category split, none was `other`, and the answer was "found 0". 255-1341-26 is filed `cleaning`.
+  - **The balance:** a typed +63 number was read as "not given", so Assaf could never pass.
+- **`get_request_status`:**
+  - It reads 20 rows for a flat and 30 for a building (was 5 and 12) before the split.
+  - Payment records stay out unless the type asked for is `payment`.
+  - **In the caller's own flat, a category that matches nothing hands back the flat's requests,** flagged `type_unmatched`, with a note to find the one meant by its description. The 19 Aug rule, that a neighbour's ticket is a count, still holds for the building.
+  - A flat given counts as something named, so `identify_needed` is for a building alone.
+  - **New words:** mould and damp (plumbing, cleaning, maintenance) and the parking gate (locksmith, maintenance).
+- **`get_balance`:** it uses the new `typedPhoneOf()`, which also takes a foreign number written with its country code (+, 00, or 11-15 digits). `phoneOf()` and its other callers are unchanged: the voice agents, the ticket's reporter and the mirror's gate.
+- **Checked live, read-only, on the same calls before and after:**
+
+  | Call | Before (v114) | After (v116) |
+  |---|---|---|
+  | mould, flat 2, type `other` | found 0 | 255-1341-26 among the flat's 3 |
+  | gate, no flat, `maintenance` | 255-1340-26 only | 255-1340-26 and 255-1338-26 |
+  | stairwell light, `lighting` | 255-1336-26 | 255-1336-26 |
+  | balance, the owner's number typed as +, 00 or bare | "phone missing" | found |
+
+  - Neither tool writes. The syntax was checked with the dashboard's TypeScript before the deploy.
+- **The voice agents call `get_request_status` too.** They only gain matches.
+- **Undo:** redeploy the previous `index.ts` (`git revert`, then `supabase_functions.py --apply --oxs-mirror`).
+
 ### WhatsApp bot: fix 2 of 5, the promise filter cuts promises only (LIVE 15:59 UTC)
 
 On the owner's "go" to carry on after fix 1. Live on his *"yes fix and let me know if its done"*:

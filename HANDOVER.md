@@ -341,7 +341,11 @@ its stated time.
     - **Watch:** `python scripts/check_whatsapp_rules.py --watch 2026-10-05T15:03` covers both fixes. 0 resident turns at 16:00 UTC; run it again the next morning.
     - **To undo:** `python scripts/n8n_whatsapp_nopromise.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-05oct-before-nopromise-v3.json`, live at 15:03:39 UTC).
     - **Changed from the plan:** "never leave only 'anything else?'" is not built. The filter can only remove, so it would mean sending the promise, invented ones included.
-  - **Next:** fix 3 (the lookups). Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
+  - **Fix 3, and fix 5's Edge Function half, LIVE 5 Oct 16:09 UTC as debt-tools v116** (the owner: *"start just finish it all quick"*). WORKLOG 5 Oct has the before/after table.
+    - **The status lookup:** it reads wider, leaves payment records out, and in the caller's own flat hands back the flat's requests when the category the model guessed matches nothing (the mould: 255-1341-26 is now found). The gate tickets are found by their words.
+    - **The balance check:** `typedPhoneOf()` takes a typed foreign number, and the owner's +63 now passes. `phoneOf()` is untouched.
+    - **To undo:** `git revert` the index.ts change, then `python scripts/supabase_functions.py --apply --oxs-mirror`.
+  - **Next:** fixes 4 and 5's texts (`scripts/n8n_whatsapp_straight.py`, epoch 74) and the emoji step (`scripts/n8n_whatsapp_emoji.py`). Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
 - **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
   - **Kept, by the owner's word (do not delete):**
     - Tickets 255-1343-26 (lift), 255-1344-26 (leak), 255-1345-26 (gate) and 255-1346-26 (cleaning).
