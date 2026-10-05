@@ -311,6 +311,18 @@ its stated time.
     - "anything else?" after an emergency;
     - "בקרוב" on a debt hand-off;
     - the proof-by-email step missed on a cash dispute.
+- **RUNNING 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2.**
+  - **It writes for real, by the owner's word:** tickets, the OXS mirror for his number, and notes to the team. Delete nothing afterwards.
+  - **The identity:**
+    - Resident `63c44e57` is אסף קליקס on the owner's +63 number, with 8 unpaid months from January to August at 250 ₪.
+    - Chatwoot contact 1, conversation 1, inbox 1, account 2.
+    - Do not use the +972 record `7d46a287`, which has the same name.
+  - **The harness:** `python scripts/wa_qa.py live --run DIR < msg.json`, with DIR/live_config.json. The scratchpad run is `wa_live_assaf_05oct`.
+  - **Plan:** 9 scenarios, 3 per button, one at a time on the one chat. Gas is left out until the owner says the team is warned.
+  - **How it ran:**
+    - The first message, a hello, got the real menu at 8 seconds.
+    - The bot's replies land on the owner's WhatsApp; his side does not show there.
+  - **Correction to the real-tenant report:** its extra $0.28 was not the live bot (no runs from 4 Oct 12:57 to 5 Oct 11:41 UTC). The source is unknown; the report line is fixed.
 - **DONE 5 Oct, owner: "act like a real tenant": the 9 WhatsApp conversations with Claude as the tenants and Gemini as the bot, $0.22.** `docs/assistant/transcripts/2026-10-05-whatsapp-real-tenants-openrouter.md`.
   - **Harness:** `scripts/wa_qa.py tenant` / `say`, one Claude player per card. It spends; the $1 stop is shared. Scratchpad `wa_tenants_05oct`.
   - **The harness is now in git** (committed 6 Oct). Both `say` and `play` spend against OpenRouter, so get the owner's go before running either; `tenant` and `turn` do not spend.

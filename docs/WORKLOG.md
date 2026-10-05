@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### Live test as Assaf Clix in בר כוכבא 23 (owner's go, running)
+
+The owner, after the real-tenant report: *"why is when im testing it manually it works completely fine"*, then
+*"why cant you test it using the actual n8n or the actual whatsapp usin my number"*, then *"just write only
+in the bar kochba which is owned by assaf clix ... act like human and dont delete anything"*.
+- **Why his manual tests look fine:** the live bot's runs and his Chatwoot chat show what he sent: hello, the menu, the "talk to a rep" tap and "how are you" (4 Oct 09:34–10:41 UTC; 5 Oct 11:41). The failing paths begin with a fault report, "when?", a correction or pushback.
+- **Correction:** the extra $0.28 on the wallet was not the live bot's traffic, as the report and the entry below said. The bot had no runs between 4 Oct 12:57 and 5 Oct 11:41 UTC, and today's were a menu and one greeting. It went through another key, and the source is unknown. The report line is fixed.
+- **Five copy-paste tests for his phone were given in the chat:** "are you a bot", "when?", pushback, an apartment correction, and gas (tell the team first).
+- **The persona:** אסף קליקס (resident `63c44e57`, the owner's +63 number), flat 2, 8 unpaid months from January to August at 250 ₪. Chatwoot contact 1, conversation 1, inbox 1, account 2. The +972 record `7d46a287` for the same name is not used.
+- **The harness:** `wa_qa.py live` posts Chatwoot's real envelope (copied from run 83255) to the live webhook from that number, waits for the run, records what happened inside it and prints only the phone. It cleans up nothing.
+  - The typing nodes need WhatsApp's message id. They are on continue-on-error, so their failure is harmless.
+  - `Anything newer?` reads the `messages` row that `Log inbound` writes, so an injected message is answered.
+- **First message:** "היי" brought back the real menu with its three buttons in 8 seconds. Scenarios follow one at a time on the same chat: 3 per button, no gas.
+
 ### The tenant harness is committed: `say` for one message, `tenant` for the protocol
 
 `scripts/wa_qa.py` had been edited in the working tree since 5 Oct and was never committed, so
@@ -64,7 +78,7 @@ The run below had gpt-4.1-mini as the tenants, and it wrote too neatly.
 - **Outcome:** 1 of 9 tenants got everything they came for, 4 got part, 4 got nothing. Two gave up in so many words.
 - **Cost:** $0.2172, plus a $0.0041 smoke test.
   - The test key spent $0.60 today, which matches today's four runs ($0.61).
-  - The wallet fell $0.89 ($23.83 to $22.94). The other $0.28 went through another key, most likely the live bot's own traffic.
+  - The wallet fell $0.89 ($23.83 to $22.94). The other $0.28 went through another key. It was not the live bot (see the entry above); the source is unknown.
 - **Found:**
   - **Gas:** "אני ממליץ לך לא להתקשר לחברת הגז" was sent. It was the model's own line, left alone after the promise filter cut the sentence before it.
   - **Leak chat:** electrical safety advice ("switch off the main breaker"). The prompt's "not what to do and not what not to do" was broken both ways.

@@ -7,7 +7,7 @@ Each tenant was played by Claude, acting as the person on the card: typos and sl
 ## In short
 
 - **Only 1 of the 9 tenants got everything they came for.** 4 got part of it, and 4 left without it. Two of those said so in plain words: "forget it, there's no one to talk to here" and "we'll see if anyone calls at all".
-- **Cost: $0.22**, all of it the bot's model (the tenants cost nothing on OpenRouter). Today's four test runs came to $0.61 on the test key. The wallet went from $23.83 to $22.94; the other $0.28 went through another key on the same wallet, most likely the live bot's real WhatsApp traffic.
+- **Cost: $0.22**, all of it the bot's model (the tenants cost nothing on OpenRouter). Today's four test runs came to $0.61 on the test key. The wallet went from $23.83 to $22.94. The other $0.28 went through another key on the same wallet. It was not the live bot, which handled no messages between 4 Oct 12:57 and 5 Oct 11:41 UTC; the source is unknown.
 - **Found, for the owner, most serious first:**
   1. **Dangerous advice in the gas chat:** "אני ממליץ לך לא להתקשר לחברת הגז" (I recommend you not call the gas company).
      - The model wrote it, and the promise filter cut the sentence before it, so it arrived alone.

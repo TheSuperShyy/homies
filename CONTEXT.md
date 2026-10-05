@@ -2650,7 +2650,18 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **Who played whom:** Claude played the tenants: pieces, typos, pushing back, giving up. The bot was Gemini itself.
   - **More blocked drafts:** the bot's own checks blocked 29 of 72 drafts, against 14 of 59 with a model playing the tenants.
   - **Say it again ran 6 times with no good outcome:** 3 untrue claims were sent, and 3 turns got no reply.
-  - **How to test the WhatsApp bot from now on:** Claude tenants through `wa_qa.py say`. `play`, with a model as the tenant, is only a smoke test. The owner asked for tenants who "act like a real tenant". **A ticket's status and urgency are the team's (owner, same message).**
+  - **How to test the WhatsApp bot from now on:** Claude tenants through `wa_qa.py say`. `play`, with a model as the tenant, is only a smoke test. The owner asked for tenants who "act like a real tenant".
+- **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
+  - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.
+  - **What they don't reach:** the paths that failed in the test start later. A fault report, "when?", a correction, pushback and "are you a bot?" are where the checks, Try again, Say it again and the promise filter fire.
+- **Live tests run as Assaf Clix, and nothing is deleted afterwards (owner, 5 Oct).** *"just write only in the bar kochba which is owned by assaf clix ... act like human and dont delete anything like dont delete the tickets after testing."*
+  - **The persona:** אסף קליקס, בר כוכבא 23 flat 2, the owner's own +63 number. Resident `63c44e57`; Chatwoot contact 1, conversation 1.
+  - **His debt:** 8 unpaid months, January to August 2026, at 250 ₪, which is 2,000 ₪.
+  - **How messages get in:** `wa_qa.py live` posts Chatwoot's own envelope to the live webhook, so the bot's replies reach his WhatsApp. His side of the chat does not show on the phone, because the messages are injected rather than typed.
+  - **What is real:** tickets, the OXS mirror for his number, notes to the team and the model's spend.
+  - **No cleanup:** unlike `probe_whatsapp.py`, there is no cleanup step, by design.
+
+**A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

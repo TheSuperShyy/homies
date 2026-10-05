@@ -13,6 +13,7 @@ blind judges grade what a handset would get. Spends nothing. Read only.
     python scripts/wa_qa.py play --run DIR        # SPENDS: the live models on OpenRouter, a model as the tenant (WA_QA_ONLY=id,id; $1 stop)
     python scripts/wa_qa.py tenant --run DIR      # writes DIR/TENANT.md, the protocol for Claude tenants
     python scripts/wa_qa.py say --run DIR < msg.json   # SPENDS: one tenant message to the live bot; prints the phone
+    python scripts/wa_qa.py live --run DIR < msg.json  # SPENDS AND WRITES: into the LIVE n8n bot, from DIR/live_config.json's number
     ... --deck scripts/wa_qa_menu_buttons.json                # any command, another deck
 
 FREE RESIDENTS (4 Oct, the owner: "act like a human"). A scenario whose resident
@@ -1510,6 +1511,198 @@ def say(run):
           "buttons": list(TAPS.values()) if buttons else []})
 
 
+# ---------------------------------------------------------------------------
+# live: one tenant message into the LIVE bot (SPENDS AND WRITES)
+# ---------------------------------------------------------------------------
+# 5 Oct, the owner: "just write only in the bar kochba which is owned by assaf
+# clix ... act like human and dont delete anything like dont delete the tickets
+# after testing". The message goes into the live n8n workflow through its
+# webhook, in the envelope Chatwoot itself sends (copied from a real run that
+# day), from the number and conversation in DIR/live_config.json, so the bot's
+# replies reach that WhatsApp. Everything the bot does is real: its model, its
+# checks, its tools, tickets in the ticket service (and OXS, for a number in
+# OXS_MIRROR_PHONES), notes to the team. NOTHING IS CLEANED UP AFTERWARDS, on
+# the owner's word; that is the difference from probe_whatsapp.py, which
+# deletes its rows. The player sees only what the phone got; the run keeps
+# what happened inside each execution for the report.
+LIVE_WF = "u2JjrbcNPYyyh3yl"
+
+
+def _out(rd, name, run=0):
+    """The first item a node put out on any branch, or None."""
+    try:
+        for branch in rd[name][run]["data"]["main"]:
+            if branch:
+                return branch[0]["json"]
+    except Exception:  # noqa: BLE001
+        return None
+    return None
+
+
+def _run_json(r):
+    try:
+        for branch in r["data"]["main"]:
+            if branch:
+                return branch[0]["json"]
+    except Exception:  # noqa: BLE001
+        return {}
+    return {}
+
+
+def _steps(steps):
+    """An agent run's intermediateSteps as the transcript's tool calls."""
+    out = []
+    for st in steps or []:
+        a = st.get("action") or {}
+        res = st.get("observation")
+        try:
+            o = json.loads(res) if isinstance(res, str) else res
+            if isinstance(o, list) and o and isinstance(o[0], dict) and o[0].get("results"):
+                r = o[0]["results"][0].get("result")
+                res = json.loads(r) if isinstance(r, str) else r
+            elif isinstance(o, (dict, list)):
+                res = o
+        except Exception:  # noqa: BLE001
+            pass
+        out.append({"name": a.get("tool") or "?", "arguments": a.get("toolInput") or {}, "result": res})
+    return out
+
+
+def live_record(rd):
+    """What happened inside one live execution, in the transcript's shape,
+    and whether the reply carried the menu's buttons."""
+    rec = {"ack": str((_out(rd, "Worth a word?") or {}).get("output") or "").strip() or "NONE"}
+    runs = rd.get("Answer the resident") or []
+    try_at = ((rd.get("Try again") or [{}])[0] or {}).get("startTime")
+    first = [r for r in runs if try_at is None or (r.get("startTime") or 0) < try_at]
+    second = [r for r in runs if try_at is not None and (r.get("startTime") or 0) >= try_at]
+    if first:
+        j = _run_json(first[-1])
+        rec["output"] = str(j.get("output") or "")
+        rec["tool_calls"] = _steps(j.get("intermediateSteps"))
+    if second:
+        j = _run_json(second[-1])
+        rec["first_output"], rec["first_tool_calls"] = rec.get("output", ""), rec.get("tool_calls", [])
+        rec["output"] = str(j.get("output") or "")
+        rec["tool_calls"] = _steps(j.get("intermediateSteps"))
+        rec["retry_note"] = str((_out(rd, "Try again") or {}).get("retry_note") or "")
+    if rd.get("Open it anyway"):
+        rec["rescue"] = _out(rd, "Open it anyway")
+    sa = _out(rd, "Say it again")
+    if sa is not None:
+        rec["say_again_output"] = str(sa.get("output") or "")
+    hs, buttons = [], False
+    for name in ("Say it now", "Send", "Send the rest"):
+        j = _out(rd, name)
+        if j and j.get("content"):
+            hs.append(str(j["content"]))
+            if name == "Send" and j.get("content_type") == "input_select":
+                buttons = True
+    rec["handset"] = hs
+    return rec, buttons
+
+
+def live(run):
+    """One message from a Claude player acting as the tenant, into the live bot."""
+    import time
+    import urllib.parse
+    import urllib.request
+    import n8n_whatsapp as NW
+    cfg = load_json(os.path.join(run, "live_config.json"))
+    t = json.loads(sys.stdin.buffer.read().decode("utf-8-sig"))
+    sid = str(t.get("scenario") or "").strip()
+    if not sid:
+        sys.exit("scenario missing")
+    path = os.path.join(run, "live", sid + ".json")
+    st = load_json(path) if os.path.exists(path) else {
+        "scenario": sid, "variant": "A", "turns": [], "ended": "",
+        "played_by": {"bot": "the live n8n workflow " + LIVE_WF, "tenant": "Claude"}}
+    show = lambda o: print(json.dumps(o, ensure_ascii=False, indent=1))
+
+    def save():
+        for p in (path, os.path.join(run, "transcripts", sid + "_A.json")):
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            write(p + ".tmp", json.dumps(st, ensure_ascii=False, indent=1))
+            os.replace(p + ".tmp", p)
+
+    if t.get("end"):
+        st["ended"] = str(t["end"])
+        save()
+        show({"ended": st["ended"]})
+        return
+    if st["ended"]:
+        sys.exit("this conversation has ended (%s)" % st["ended"])
+    if len(st["turns"]) >= 12:
+        sys.exit("12 messages already: end the conversation")
+    kind = t.get("kind", "text")
+    text = str(t.get("text") or "").strip()
+    if kind not in ("text", "tap") or not text:
+        sys.exit("live sends a text or a tap, never an empty message")
+    if kind == "tap" and text not in TAPS.values():
+        sys.exit("a tap's text must be one of: " + " / ".join(TAPS.values()))
+    E = NW.env()
+    hook = (E["N8N_BASE_URL"].strip().rstrip("/") + "/webhook/homies-whatsapp?s="
+            + urllib.parse.quote(E["N8N_WEBHOOK_SECRET"].strip()))
+    before = int(NW.api("GET", "/api/v1/executions?workflowId=%s&limit=1" % LIVE_WF)["data"][0]["id"])
+    mid = 9100000000 + int(time.time() * 1000) % 10**9
+    env = {"event": "message_created", "id": mid, "content": text, "message_type": "incoming",
+           "private": False, "content_type": "text", "content_attributes": {},
+           "sender": {"id": cfg["contact_id"], "type": "contact", "name": cfg["name"], "phone_number": cfg["phone"]},
+           "conversation": {"id": cfg["conv_id"], "status": "open", "inbox_id": cfg["inbox_id"], "labels": [],
+                            "meta": {"assignee": None, "assignee_type": None}},
+           "inbox": {"id": cfg["inbox_id"], "name": cfg["inbox_name"]},
+           "account": {"id": cfg["account_id"], "name": cfg["account_name"]}}
+    req = urllib.request.Request(hook, data=json.dumps(env, ensure_ascii=False).encode("utf-8"), method="POST",
+                                 headers={"Content-Type": "application/json", "User-Agent": "homies-live-tenant/1.0"})
+    urllib.request.urlopen(req, timeout=60).read()
+    # The run that took this message is the one whose webhook body carries its
+    # id. Runs that finish and are not it (the bot's own outgoing echoes) are
+    # passed over once; a run still going is looked at again.
+    mine, done, deadline = None, set(), time.time() + 240
+    while time.time() < deadline and mine is None:
+        time.sleep(4)
+        for e in sorted(NW.api("GET", "/api/v1/executions?workflowId=%s&limit=25" % LIVE_WF)["data"],
+                        key=lambda e: int(e["id"])):
+            if int(e["id"]) <= before or e["id"] in done:
+                continue
+            if not (e.get("finished") or e.get("status") in ("success", "error", "crashed", "canceled")):
+                continue
+            d = NW.api("GET", "/api/v1/executions/%s?includeData=true" % e["id"])
+            rd = ((d.get("data") or {}).get("resultData") or {}).get("runData") or {}
+            body = (_out(rd, "WhatsApp") or {}).get("body") or {}
+            done.add(e["id"])
+            if str(body.get("id")) == str(mid):
+                mine = (e["id"], d, rd)
+                break
+    if mine is None:
+        st["turns"].append({"resident": text, "kind": kind, "resident_en": t.get("en") or "", "handset": [],
+                            "note": "no finished run found within 4 minutes"})
+        save()
+        show({"phone_shows": [], "buttons": []})
+        return
+    eid, d, rd = mine
+    S = _out(rd, "Sort") or {}
+    err = str((((d.get("data") or {}).get("resultData") or {}).get("error") or {}).get("message") or "")
+    if S.get("greeting") is True:
+        hs = [str((_out(rd, "Send") or {}).get("content") or "")]
+        rec, buttons = {"resident": text, "kind": "menu", "handset": [h for h in hs if h]}, True
+    else:
+        rec, buttons = live_record(rd)
+        rec = dict({"resident": text, "kind": kind}, **rec)
+    rec["execution"] = eid
+    if t.get("en"):
+        rec["resident_en"] = t["en"]
+    if t.get("closing"):
+        rec["closing"] = True
+        st["ended"] = "the tenant's last message"
+    if err:
+        rec["error"] = err[:300]
+    st["turns"].append(rec)
+    save()
+    show({"phone_shows": [C.mask(x, 100000) for x in rec.get("handset") or []],
+          "buttons": list(TAPS.values()) if buttons and rec.get("handset") else []})
+
+
 def main():
     argv = sys.argv[1:]
     if not argv or "--run" not in argv:
@@ -1541,6 +1734,8 @@ def main():
         play(run)
     elif cmd == "say":
         say(run)
+    elif cmd == "live":
+        live(run)
     elif cmd == "tenant":
         write(os.path.join(run, "TENANT.md"), TENANT)
         print("wrote " + os.path.join(run, "TENANT.md"))
