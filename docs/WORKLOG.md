@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### Visual version of the old-vs-ours comparison
+
+Owner wanted the comparison as a visual table, what we have now against what the ManyChat bot
+had. Added `docs/discovery/manychat-vs-ours-2026-10-05.html`: a standalone page (no external
+files) with the same 23 features, a colour status per row, a count of each verdict, and the
+fix-first and do-not-copy lists. Counts: 7 better, 9 different, 3 matched, 4 missing. The
+markdown version is unchanged and stays the source for the wording; if one changes, the other
+has to be changed by hand.
+
 ### Old ManyChat bot vs ours, as of 5 Oct: a current comparison
 
 Owner asked for a comparison of what was extracted from the old ManyChat bot against what the

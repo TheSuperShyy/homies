@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ManyChat bot vs our WhatsApp bot, 5 Oct 2026</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --ink: #1d1f23; --muted: #6b6f76; --line: #e3e3df;
+    --matched: #2f7d5b; --better: #1f6fb2; --different: #8a6d1f; --missing: #b23a3a;
+    --matched-bg: #e4f2ea; --better-bg: #e2eefa; --different-bg: #f5efd9; --missing-bg: #f8e1e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101113; --card: #18191c; --ink: #ececec; --muted: #9a9ea6; --line: #2a2c31;
+      --matched: #6fcf9f; --better: #7bb8ef; --different: #e0c46b; --missing: #f08a8a;
+      --matched-bg: #1d3327; --better-bg: #1b2d40; --different-bg: #3a3118; --missing-bg: #3d1f1f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101113; --card: #18191c; --ink: #ececec; --muted: #9a9ea6; --line: #2a2c31;
+    --matched: #6fcf9f; --better: #7bb8ef; --different: #e0c46b; --missing: #f08a8a;
+    --matched-bg: #1d3327; --better-bg: #1b2d40; --different-bg: #3a3118; --missing-bg: #3d1f1f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 20px 56px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  h2 { font-size: 17px; margin: 36px 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 22px; max-width: 80ch; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .card .n { font-size: 30px; font-weight: 700; line-height: 1.1; }
+  .card .l { color: var(--muted); font-size: 13px; }
+  .card.matched .n { color: var(--matched); }
+  .card.better .n { color: var(--better); }
+  .card.different .n { color: var(--different); }
+  .card.missing .n { color: var(--missing); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 16px 0 0; color: var(--muted); font-size: 13px; }
+  .chip { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600;
+          white-space: nowrap; }
+  .chip.matched { color: var(--matched); background: var(--matched-bg); }
+  .chip.better { color: var(--better); background: var(--better-bg); }
+  .chip.different { color: var(--different); background: var(--different-bg); }
+  .chip.missing { color: var(--missing); background: var(--missing-bg); }
+  .wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; min-width: 860px; }
+  th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: start; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+       background: var(--card); position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  td.feat { font-weight: 600; width: 16%; }
+  td.old, td.ours { width: 34%; color: var(--ink); }
+  td.verdict { width: 110px; }
+  tr.missing td.feat { box-shadow: inset 3px 0 0 var(--missing); }
+  tr.better td.feat { box-shadow: inset 3px 0 0 var(--better); }
+  tr.different td.feat { box-shadow: inset 3px 0 0 var(--different); }
+  tr.matched td.feat { box-shadow: inset 3px 0 0 var(--matched); }
+  .bars { display: grid; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 120px 1fr 40px; align-items: center; gap: 12px; font-size: 13px; }
+  .bar { height: 14px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .bar span { display: block; height: 100%; }
+  .bar .matched { background: var(--matched); }
+  .bar .better { background: var(--better); }
+  .bar .different { background: var(--different); }
+  .bar .missing { background: var(--missing); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .panel h3 { font-size: 15px; margin: 0 0 8px; }
+  .panel ol, .panel ul { margin: 0; padding-inline-start: 20px; }
+  .panel li { margin: 4px 0; }
+  .note { color: var(--muted); font-size: 12.5px; margin-top: 14px; }
+  code { font: 12.5px ui-monospace, Consolas, monospace; background: var(--line); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Old ManyChat bot vs our WhatsApp bot</h1>
+  <p class="sub">As of 5 Oct 2026. The old side is from the 22 Sep scan of the ManyChat page and
+    editor, not re-read today. The "ours" side is the live code and the 4 Oct QA run. Full
+    notes in <code>manychat-vs-ours-2026-10-05.md</code>.</p>
+
+  <section class="cards" aria-label="Summary">
+    <div class="card matched"><div class="n">3</div><div class="l">Matched</div></div>
+    <div class="card better"><div class="n">7</div><div class="l">We do it better</div></div>
+    <div class="card different"><div class="n">9</div><div class="l">Done differently</div></div>
+    <div class="card missing"><div class="n">4</div><div class="l">We are missing</div></div>
+  </section>
+
+  <h2>Where each feature stands</h2>
+  <div class="bars" aria-label="Breakdown">
+    <div class="bar-row"><span>Better</span><div class="bar"><span class="better" style="width:30%"></span></div><span>7</span></div>
+    <div class="bar-row"><span>Different</span><div class="bar"><span class="different" style="width:39%"></span></div><span>9</span></div>
+    <div class="bar-row"><span>Matched</span><div class="bar"><span class="matched" style="width:13%"></span></div><span>3</span></div>
+    <div class="bar-row"><span>Missing</span><div class="bar"><span class="missing" style="width:17%"></span></div><span>4</span></div>
+  </div>
+
+  <h2>Feature by feature</h2>
+  <div class="legend">
+    <span><span class="chip better">Better</span> we do it and the old bot could not</span>
+    <span><span class="chip matched">Matched</span> both do it, same outcome</span>
+    <span><span class="chip different">Different</span> both do it, on purpose</span>
+    <span><span class="chip missing">Missing</span> the old bot did it, we do not</span>
+  </div>
+
+  <div class="wrap" style="margin-top:14px">
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>ManyChat bot (old)</th><th>Our bot today</th><th>Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr class="missing"><td class="feat">Entry link</td>
+        <td class="old"><code>WhatsApp URL #1</code>, a button on a website</td>
+        <td class="ours">None. Residents write to the number.</td>
+        <td class="verdict"><span class="chip missing">Missing</span></td></tr>
+      <tr class="different"><td class="feat">Greeting and menu</td>
+        <td class="old">Fixed greeting, "continue" button, six-row list, every time</td>
+        <td class="ours">Fixed greeting with three buttons on a bare hello: open a ticket, status, talk to a rep. The model can also show the menu.</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="different"><td class="feat">Identifying the resident</td>
+        <td class="old">Four questions (name, address, floor, flat) on five doors, every time</td>
+        <td class="ours">Building and flat only, and the sender's number. Name and phone only where money is read.</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="different"><td class="feat">"Already in the app?" gate</td>
+        <td class="old">Yes ends the chat with reassurance; nothing is filed</td>
+        <td class="ours">None. A described fault becomes a ticket; a status question reads the database.</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="different"><td class="feat">Push to the OXS app</td>
+        <td class="old">Three times: pay there, open calls there, get updates there</td>
+        <td class="ours">Not a menu step. The payment link is the resident's own OXS link.</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="better"><td class="feat">Service call</td>
+        <td class="old">Filed to a Monday board with the whole intake; the resident gets no reference</td>
+        <td class="ours">A ticket with a <code>255-NNNN-YY</code> reference, read back to the resident; on the dashboard</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="different"><td class="feat">Photo</td>
+        <td class="old">Optional yes or no, then one image attached to the Monday update</td>
+        <td class="ours">Stored on the ticket, thumbnails on the dashboard. The bot keeps a photo that arrives; it does not ask for one.</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="missing"><td class="feat">Elevator fault</td>
+        <td class="old">Asks for the elevator company, then emails the office with the company and description</td>
+        <td class="ours">A ticket like any other. No company field, no office email.</td>
+        <td class="verdict"><span class="chip missing">Missing</span></td></tr>
+      <tr class="different"><td class="feat">Repeated elevator problem</td>
+        <td class="old">Written down and closed, no hook</td>
+        <td class="ours">Opened as a ticket</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="missing"><td class="feat">Quote for a prospect</td>
+        <td class="old">Three building questions, each answer written to a leads board</td>
+        <td class="ours">One note to the team with the details. No leads board.</td>
+        <td class="verdict"><span class="chip missing">Missing</span></td></tr>
+      <tr class="better"><td class="feat">House manager</td>
+        <td class="old">Description goes to the inbox, assigned to a user who no longer exists</td>
+        <td class="ours">A note to the team, with a mention of a named person</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="better"><td class="feat">Payments</td>
+        <td class="old">App gate, then the app link, then a rep or close</td>
+        <td class="ours">Balance, payment link, and an open request if the link cannot be sent</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="better"><td class="feat">Accounting and talk to a rep</td>
+        <td class="old">Free text, assigned to a team member</td>
+        <td class="ours">A note that mentions a rep; a human reply in the inbox pauses the bot</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="matched"><td class="feat">Back to menu</td>
+        <td class="old">On two questions</td>
+        <td class="ours">On a bare hello, or on request</td>
+        <td class="verdict"><span class="chip matched">Matched</span></td></tr>
+      <tr class="different"><td class="feat">Unanswered question</td>
+        <td class="old">Chat closed silently, no message</td>
+        <td class="ours">Nothing closes; the next message continues the conversation</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="matched"><td class="feat">Last report</td>
+        <td class="old">Remembered on the subscriber</td>
+        <td class="ours">Looked up by reference, or by building and flat</td>
+        <td class="verdict"><span class="chip matched">Matched</span></td></tr>
+      <tr class="better"><td class="feat">"Done" message</td>
+        <td class="old">Monday status drives a ManyChat flow; silent for a month</td>
+        <td class="ours">Template sent when a ticket is resolved, proven end to end on 23 Sep</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="missing"><td class="feat">23-hour follow-up</td>
+        <td class="old">A flow asking "is your request still relevant?" (not seen wired)</td>
+        <td class="ours">None</td>
+        <td class="verdict"><span class="chip missing">Missing</span></td></tr>
+      <tr class="different"><td class="feat">Test tag</td>
+        <td class="old">Tag <code>טסטים</code>, checked by nothing in the flow</td>
+        <td class="ours">Test prefixes skipped in code</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="better"><td class="feat">General questions</td>
+        <td class="old">Not in the menu</td>
+        <td class="ours">Answers from the service catalogue: services, regions, fee, response time</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="better"><td class="feat">Human handover alert</td>
+        <td class="old">Assigned to a team member; no alert</td>
+        <td class="ours">A named rep is alerted on WhatsApp and on the voice agent</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="different"><td class="feat">Stack</td>
+        <td class="old">Monday for tickets, Make as router, ManyChat as inbox</td>
+        <td class="ours">Supabase and the dashboard, n8n as router, Chatwoot as inbox, Meta WhatsApp</td>
+        <td class="verdict"><span class="chip different">Different</span></td></tr>
+      <tr class="matched"><td class="feat">OXS</td>
+        <td class="old">Never read or written</td>
+        <td class="ours">Read only. The ticket mirror is on for one number only (24 Sep).</td>
+        <td class="verdict"><span class="chip matched">Matched</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>What to fix first</h2>
+  <div class="two">
+    <div class="panel">
+      <h3>We are missing, in the order it hurts residents</h3>
+      <ol>
+        <li><strong>Elevator faults.</strong> Needs the per-building elevator company list from Yariv.</li>
+        <li><strong>The 23-hour nudge.</strong> Cheap: a cron over open tickets, no template needed.</li>
+        <li><strong>Photo to the team.</strong> Covered if the team works in the dashboard.</li>
+        <li><strong>Quote leads board.</strong> A second place to write; the owner decides.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3>Do not copy from the old bot</h3>
+      <ul>
+        <li><strong>Silent close</strong> on any unanswered question.</li>
+        <li><strong>Chats assigned to "Unknown user"</strong>, so house-manager and quote chats may have reached nobody.</li>
+        <li><strong>The office email</strong> as the only record of an elevator fault.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="note">Open for the owner: whether a bot ticket should also land on the old Monday board
+  before cutover; whether the elevator branch asks the resident or looks the company up per
+  building; whether to build the 23-hour nudge at all. Still unknown: the wording of the old "done"
+  message, the 23-hour trigger, and the flow created 30 Jul 2026 (<code>Untitled</code>).</p>
+</main>
+</body>
+</html>
