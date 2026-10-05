@@ -2585,6 +2585,12 @@ point (Sarah's English messages in conversation 4 stay English — the finding i
 got Hebrew out). **It is a translation, not a second source of truth**: if the English report is
 edited, the Hebrew one goes stale silently, because nothing regenerates it.
 
+**A comparison is a dated snapshot, and the newest one wins (5 Oct).** The 22 Sep old-vs-ours
+table was right on the day and went wrong within two weeks, because the bot changed under it and
+nothing re-read the old side. Put the date in the file name, say which side was read today and
+which was carried over from an earlier scan, and when a newer comparison exists, point at it from
+HANDOVER so the old table is not copied into a report.
+
 **4 Oct evening: the warm word is caring, not irritated (owner).** Reading the 15 conversations,
 the owner said "איזה מעצבן" and "אוף" do not fit the bot at all. The word before the question is
 care for the resident; it is not the bot getting annoyed alongside them. Two causes were in the

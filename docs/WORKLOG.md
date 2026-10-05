@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### Old ManyChat bot vs ours, as of 5 Oct: a current comparison
+
+Owner asked for a comparison of what was extracted from the old ManyChat bot against what the
+chatbot does now. The 22 Sep scan had an old-vs-ours table; it was true then and is stale now
+(the 4 Oct menu, the 23 Sep "done" message going live, the 3 Sep handover alerts, epoch 73).
+Wrote `docs/discovery/manychat-vs-ours-2026-10-05.md`: a feature-by-feature table with a status
+column (matched, better, different, missing, open), what we are missing in the order it would
+hurt residents (elevator company and office email, the 23-hour nudge, the photo handoff to
+Monday, the quote leads board), what the old bot did that we should not copy (silent close on
+an unanswered question, two chats assigned to a user who no longer exists, the email as the
+only elevator record), and the open decisions for the owner. The old side is from the 22 Sep
+scan, not re-read today; the ours side is from the live code paths and the 4 Oct QA run.
+
 ### WhatsApp bot: the 9 conversations again, with Claude acting as real tenants ($0.22)
 
 Owner: *"i told you to test the chatbot right 3 scenario each menu button act like a real tenant on those conversation"*.
