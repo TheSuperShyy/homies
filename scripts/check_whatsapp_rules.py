@@ -98,10 +98,14 @@ PINS = {
     # 5 Oct (n8n_whatsapp_straight.py, epoch 74): the prompt and get_balance's
     # text, after a Claude-played check of 11 situations through the would-be
     # bot's guards and Send (the pushed danger line now carries its number).
-    'Answer the resident / system': '0e3ca2b3cfa0',
+    # 5 Oct evening (n8n_whatsapp_hayday.py, epoch 75): the rep tap asks how he is
+    # TODAY. Claude-played: 5 replies through the would-be guards and Send.
+    'Answer the resident / system': '8f9e442ded13',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
-    'Try again / note': '6a7f78f84a2b',
+    # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
+    # "איך עבר" (retry.py), which only decides whether the rephay reason is added.
+    'Try again / note': '4f16fe9d3eb9',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '3ef1f30b5235',

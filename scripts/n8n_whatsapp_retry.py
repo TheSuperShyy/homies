@@ -163,9 +163,13 @@ NOTE_TAIL = (". מה שקורה קורה רק דרך הכלים: אם יש מה 
 # person uses; no apostrophes (`.` stands in), so it sits in an n8n expression
 # as safely as in Python. The `rephay` guard and `Try again` use HAY_JS;
 # wa_qa.py's rubric and the --watch flag use HAY_PY.
-HAY_ALT = (r"מה שלומ|מה נשמע|מה קורה|מה העניינים|מה המצב|מה איתך|איך הולך|איך עובר|איך היום"
+# 5 Oct evening: "איך עבר עליך היום?" (how has your day been) -- the evening form
+# of the "today" the owner asked for -- was missing, and the guard sent a right
+# reply back (the Claude-played check of n8n_whatsapp_hayday.py).
+HAY_ALT = (r"מה שלומ|מה נשמע|מה קורה|מה העניינים|מה המצב|מה איתך|איך הולך|איך עובר|איך עבר|איך היום"
            r"|איך אתה|איך את(?=[\s,.!?]|$)"
            r"|how are you|how is it going|how.s it going|how is your day|how.s your day"
+           r"|how was your day|how has your day"
            r"|how are things|what.?s up|wassup")
 HAY_JS = "/" + HAY_ALT + "/i"
 HAY_PY = __import__("re").compile(HAY_ALT, __import__("re").I)
@@ -453,6 +457,13 @@ def main():
     print("\nchanges:")
     for c in changes:
         print("  - %s" % c)
+
+    # 5 Oct evening: the would-be workflow for the gate, as the other patchers do.
+    if "--dump" in sys.argv:
+        import n8n_whatsapp_nopromise as NP
+        path = sys.argv[sys.argv.index("--dump") + 1]
+        NP.dump(live["nodes"], live["connections"], path)
+        print("\ndumped   : %s (the would-be workflow, secret replaced)" % path)
 
     if not apply:
         print("\nDry run. Re-run with --apply to write it.")

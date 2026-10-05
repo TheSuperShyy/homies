@@ -567,6 +567,11 @@ function cases(E) {
   expect('rephay: hi, the name, how are you doing today passes', repHay(REP_WANTED, 0, REP_TAP), true);
   expect('rephay: the feminine "איך את היום?" passes', repHay("היי, כאן מיכאל מהומי'ז! איך את היום?", 0, REP_TAP), true);
   expect('rephay: English passes', repHay('Hi, this is Michael from Homies, how are you doing today?', 0, REP_TAP), true);
+  // 5 Oct evening (n8n_whatsapp_hayday.py, the owner's "how are you today?"):
+  // the Claude-played evening hello used the past form, and the guard sent it back.
+  expect('rephay: the evening "איך עבר עליך היום?" passes',
+    repHay("היי, מיכאל מהומי'ז כאן 🙂 איך עבר עליך היום?", 0, REP_TAP), true);
+  expect('rephay: "מה שלומך היום?" passes', repHay("היי, כאן מיכאל מהומי'ז 😊 מה שלומך היום?", 0, REP_TAP), true);
   expect('rephay: the 1 Oct shape (both questions) still passes', repHay(REP, 0, REP_TAP), true);
   expect('rephay: the second pass goes out whatever it says', repHay(REP_TODAY, 1, REP_TAP), true);
   expect('rephay: the open-a-ticket tap is not asked', repHay("כאן מיכאל מהומי'ז, טוב שפנית. מה קרה?", 0,

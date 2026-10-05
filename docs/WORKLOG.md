@@ -11,13 +11,31 @@ conversation that produced it.
 
 ## 2026-10-05
 
-### WhatsApp bot: the representative asks how you are today (built and tested; NOT live yet)
+### WhatsApp bot: the representative asks how you are today (LIVE 17:02 UTC)
 
 The owner, shown the Claude-played rep-tap hello ("היי, כאן מיכאל מצוות השירות של הומי'ז 😊 מה שלומך?"): *"i want the intro to be more friendly like how are you today?"*. He meant the one *"after the menu greeting"*. That is his 4 Oct wording, *"hi this is michael from homies how are you doing today?"*. The 4 Oct note had kept "today" for when he asked.
 - **The change:** the prompt's rep-tap sentence asks how he is today, warmly (prompt `8f9e442ded13`, MEMORY_EPOCH 74 to 75, `scripts/n8n_whatsapp_hayday.py`).
   - Only that tap. The two other buttons still go straight to what happened, and someone who writes in with a fault is not asked about his day.
 - **The gate on the dump:** 298/298 cases, the replay unchanged, and only the prompt's pin moves. The patchers are idle but the baseline 6 (35 now).
-- **Waiting on:** a Claude-played check of the tap (5 replies), then the pin, `--apply` and the checks on live.
+- **The Claude-played check:** 5 replies through the would-be bot's guards and Send.
+  - Morning: "היי, כאן מיכאל מהומי'ז 😊 מה שלומך היום?".
+  - Evening: "...איך עבר עליך היום?".
+  - On his answer, "what can I do for you?".
+  - The open-a-ticket tap goes straight to "what happened?".
+  - **One block:** the evening form failed the `rephay` guard, since HAY_ALT had "איך עובר" and not "איך עבר" (a gap first seen 4 Oct).
+- **The guard fix:** HAY_ALT gains "איך עבר" and English "how was / has your day" (`n8n_whatsapp_retry.py`, which also gained `--dump`).
+  - Gate: 300/300 with 2 new cases. The `Try again / note` pin moves to `4f16fe9d3eb9`: the note's words are unchanged, only HAY inside it.
+  - Shipped first: `retry.py --apply` at 17:01 UTC.
+- **Then `hayday.py --apply` at 17:02 UTC.** Its snapshot was retaken on top of the guard fix.
+  - Before the write: 300/300, all 15 pins, the replay unchanged, and the patchers idle but the baseline 6.
+  - All 5 played replies go out as written.
+- **On live after:**
+  - the patcher reports nothing to do;
+  - `check_whatsapp_rules.py`: all green, 300/300, 15 pins;
+  - every patcher is idle but the baseline 6.
+- **Undo:**
+  - `hayday.py --restore` (`docs/handover/n8n-whatsapp-live-05oct-before-hayday.json`, live at 17:01 with the guard fix, epoch 74).
+  - For the guard, revert the HAY_ALT line and run `retry.py --apply`. retry.py's own `--restore` is an old September snapshot: do not use it.
 
 ### WhatsApp bot: fixes 4 and 5's texts, and only six emoji (LIVE 16:31 UTC)
 

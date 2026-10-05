@@ -356,10 +356,13 @@ its stated time.
       3. `git revert` the repo too.
     - **For the owner to see, not a defect:** on the rep tap the model introduced himself as "מיכאל מצוות השירות של הומי'ז" (Claude-played). The approved hello is "מיכאל מהומי'ז", and the prompt's rep-tap instruction is unchanged.
   - **ALL FIVE FIXES ARE LIVE.** Run `--watch 2026-10-05T15:03` again the next morning.
-  - **5 Oct evening, BUILT AND TESTED, NOT LIVE: the rep tap asks "how are you TODAY?"** (the owner: *"i want the intro to be more friendly like how are you today?"*). `scripts/n8n_whatsapp_hayday.py`: the prompt `8f9e442ded13` and MEMORY_EPOCH 74 to 75.
-    - **The repo is ahead of live again** (epoch 75 here, 74 live). Until `hayday.py --apply`, do not `--apply` greet, menu, nopage, patch, payment or teamnote: they copy the repo's prompt.
-    - **Waiting on:** the Claude-played check of the tap (running), then the pin `'Answer the resident / system'` to `8f9e442ded13` in `check_whatsapp_rules.py`, then `--apply`, the check on live and every patcher idle.
-    - **Undo:** `--restore` (snapshot `docs/handover/n8n-whatsapp-live-05oct-before-hayday.json`, live at 16:31:50 UTC).
+  - **5 Oct evening, LIVE 17:02 UTC: the rep tap asks "how are you TODAY?"** (the owner: *"i want the intro to be more friendly like how are you today?"*).
+    - `scripts/n8n_whatsapp_hayday.py`: the prompt `8f9e442ded13`, MEMORY_EPOCH 75. Every chat started fresh again.
+    - **Shipped first, 17:01 UTC:** the `rephay` guard knows "איך עבר" (`n8n_whatsapp_retry.py`). The evening hello "איך עבר עליך היום?" had been sent back.
+    - **On live after:** 300/300, 15 pins, every patcher idle but the baseline 6. The repo and live agree again (epoch 75).
+    - **Undo:** `hayday.py --restore` (`docs/handover/n8n-whatsapp-live-05oct-before-hayday.json`, live at 17:01 with the guard fix).
+      - For the guard, revert the HAY_ALT line and run `retry.py --apply`.
+      - NOT `retry.py --restore`: its snapshot is from September and would roll back everything since.
   - **Next, only on the owner's go:** the 9-card retest, about $0.22 offline and $0.35 live. The pass bar is in the plan: at least 7 of 9, no untrue ticket claim, no silent turn. Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
 - **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
   - **Kept, by the owner's word (do not delete):**
