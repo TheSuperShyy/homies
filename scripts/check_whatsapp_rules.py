@@ -322,6 +322,10 @@ PAY = re.compile(r"תשלום|לשלם|שילמ|קישור|לינק|חוב|ית�
                  re.I)
 ECHO = re.compile(r"(^|[.!?,:]\s*)(אני מבין|אני מבינה|הבנתי|שמעתי)\s+ש")
 CLERK = re.compile(r"כדי שאוכל|אצטרך")
+# 5 Oct: a ticket claim and a ticket number, the shapes wa_truth.py's PHANTOM and
+# REF read (there as JS for n8n, here for the watch).
+TICKET_CLAIM = re.compile(r"(פתחתי|פתחנו|פותח|פותחת|נפתחה|נפתחו|נפתחת)( \S+){0,2}? ?ה?קריא[הת]")
+REF = re.compile(r"\b\d{3}-\d{3,6}-\d{2}\b")
 # 1 Oct: the bot writes to one person, masculine until she writes about herself
 # in the feminine (n8n_whatsapp_gender.py). One copy, read by --watch here and by
 # wa_qa.py's rubric. "you" in the plural, as a pronoun or a verb:
@@ -497,6 +501,40 @@ def watch(since):
                 if j.get("success") is not True:
                     infos.append("%s did not show: %s" % (name, mask(json.dumps(j.get("error") or j,
                                                                              ensure_ascii=False), 90)))
+        # 5 Oct (n8n_whatsapp_safetynet.py): the last resort is no model now.
+        # `Mend the reply` ran = both passes were rejected; what it did is an info
+        # line, and a turn where it ran and nothing went out is a flag (the old
+        # `Second try usable?` sent nothing on a failure).
+        rescued = ""
+        rescue = first("Open it anyway")
+        if rescue:
+            try:
+                r = rescue["results"][0]["result"]
+                rescued = str((json.loads(r) if isinstance(r, str) else r).get("reference") or "")
+            except Exception:  # noqa: BLE001
+                rescued = "?"
+        mend = first("Mend the reply")
+        if mend is not None:
+            infos.append("the last resort ran (%s)%s" % (mend.get("mended") or "?",
+                                                         ", rescue ticket %s" % rescued if rescue else ""))
+            if not any(k == "answer" for k, _ in sent):
+                flags.append("the last resort ran and nothing went out")
+        # A ticket claim is backed by any real number in the chat, so a NEW claim
+        # quoting an OLD ticket's number passes the checks (5 Oct, a known gap).
+        # Shown here, to be read: the same matter, or another one?
+        given = rescued
+        for run in rd.get("Answer the resident") or []:
+            try:
+                for st in run["data"]["main"][0][0]["json"].get("intermediateSteps") or []:
+                    given += " " + str(st.get("observation") or "")
+            except Exception:  # noqa: BLE001
+                continue
+        for k, t in sent:
+            if k == "answer" and TICKET_CLAIM.search(t):
+                old = [x for x in REF.findall(t) if x not in given]
+                if old:
+                    infos.append("a ticket claim with a number no tool gave this turn: %s (the same matter?)"
+                                 % ", ".join(old))
         if "Tell the team the bot is down" in rd:
             flags.append("the outage path ran")
         if ex.get("status") != "success":

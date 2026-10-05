@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-05
 
-### WhatsApp bot: fix 1 of 5, the safety net stops making things worse (built and tested; NOT live)
+### WhatsApp bot: fix 1 of 5, the safety net stops making things worse (LIVE 15:03 UTC)
 
 The owner, after the live run as Assaf (1 of 9 got everything): *"what are the fix that is needed for it to be able to be consistent and not break"*. The plan was approved in chat: five fixes, one at a time, each through the gate. This is fix 1.
 - **The four decisions, settled in chat** (his words are in HANDOVER):
@@ -51,9 +51,22 @@ The owner, after the live run as Assaf (1 of 9 got everything): *"what are the f
 - **The gate itself:** `--candidate` and `check_patchers_idle.py` now take a dump whole when it adds or removes nodes. Laid over live by name, they kept the removed nodes and dropped the new ones.
 - **The offline harness:** `wa_qa.py` / `wa_qa.js` model the new last resort, reading `Try again`'s item and the last 12 messages.
 - **Live checked, read-only:** the Edge Function is v112, the same as the repo before this edit.
-- **Waiting on the owner's go:**
-  1. `python scripts/n8n_whatsapp_safetynet.py --apply`. Snapshot `docs/handover/n8n-whatsapp-live-05oct-before-safetynet.json`; `--restore` undoes it.
-  2. `python scripts/supabase_functions.py --apply --oxs-mirror`. The flag keeps the mirror on for his number; a plain `--apply` turns it off.
+- **Shipped on the owner's "go", after a fresh dump through the gate** (236/236, the same 43 relaxations, nothing broken):
+  1. **The Edge Function first, 15:02 UTC:** `supabase_functions.py --apply --oxs-mirror`, v114 (was v112, checked just before). It went first so the new last resort never meets the old dedupe.
+     - An ignored `status-update` ping answers `ok`; nothing is written.
+     - The mirror for his number is still on: `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES` are set.
+  2. **The bot, 15:03:39 UTC:** `n8n_whatsapp_safetynet.py --apply`, 52 nodes, read back right. Snapshot `docs/handover/n8n-whatsapp-live-05oct-before-safetynet.json`; `--restore` undoes it.
+  3. **On live after:**
+     - the patcher reports nothing to do;
+     - `check_whatsapp_rules.py`: all green, 236/236;
+     - `check_patchers_idle.py` with live's own nodes: only the baseline 6 are not idle.
+  4. **`--watch 2026-10-05T15:03`:** 0 resident turns at 15:17 UTC.
+- **`--watch` reads the new path** (`check_whatsapp_rules.py`):
+  - an info line when the last resort ran: what it did, and the rescue ticket's number;
+  - a flag when it ran and nothing went out;
+  - an info line for a sent ticket claim whose number no tool gave that turn.
+  - Tested on four made-up executions with the n8n reads stubbed: all as expected.
+- **A known gap:** any ticket number in the last 12 messages backs a claim. So a NEW claim with an OLD number in the same sentence passes, as the replay's "פתחתי עכשיו קריאה בנושא העובש... 255-1345-26" did. On 5 Oct `Say it again` wrote it, and it is gone. The watch shows each such claim, to be read.
 
 ### Debt agent: five situations on the real model, with Claude as the residents ($0.09)
 

@@ -2679,7 +2679,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **Blocked:** "לא פתחתי קריאה חדשה" ("I didn't open a new ticket") fails `phantom` and `deeds`, because the checks match "פתחתי" inside a negation.
   - **Passed:** the last-resort rewrite's "אני רואה שנפתחה קריאה 255-1345-26", with no ticket behind it, passes Second try usable?. The passive "נפתחה" is not in its pattern.
   - **How to fix it:** the checks need the negation and the passive; tightening the prompt will not do it. Any fix ships through `check_whatsapp_rules.py` like every other change.
-- **What a truth check counts as a claim, and what the last resort does (5 Oct, fix 1, `n8n_whatsapp_safetynet.py`; NOT live until the owner's go).** `scripts/wa_truth.py` is the one source of the JavaScript: `phantom`, `deeds`, Try again's verdict, `Claimed a ticket?` and `Mend the reply` all build from it.
+- **What a truth check counts as a claim, and what the last resort does (5 Oct, fix 1, `n8n_whatsapp_safetynet.py`; LIVE 5 Oct 15:03 UTC, the Edge Function's half v114 at 15:02).** `scripts/wa_truth.py` is the one source of the JavaScript: `phantom`, `deeds`, Try again's verdict, `Claimed a ticket?` and `Mend the reply` all build from it.
   - **A claim is said:** a verb preceded in its clause by לא / טרם / אם, or in a sentence that ends in "?", claims nothing. "לא, פתחתי" is a claim; "לא פתחתי" is not.
   - **A ticket number is proof only when real and close:**
     - **Real:** a tool returned it this turn (either pass), or it is in `Anything newer?`'s last 12 messages.
@@ -2694,6 +2694,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - Never silence.
     - These are the bot's only fixed sentences. The owner chose them on 5 Oct over a model rewrite: Say it again had been 9 of 10 bad across the runs.
   - **The rescue ticket dedupes only against earlier rescue tickets** (`oxs_ref` "partial:model_claimed"). A WhatsApp interaction is one row per phone, so "this conversation's ticket" had meant the phone's newest real ticket.
+  - **A known gap:** "real" means any ticket number in the chat, not the one for this matter. A NEW claim with an OLD number in the same sentence passes ("פתחתי עכשיו קריאה בנושא העובש, מספר 255-1345-26", the gate's number; on 5 Oct `Say it again` wrote it, and it is gone). The checks cannot tell which matter a number belongs to.
+  - **`--watch` reads the new path:** an info line when `Mend the reply` ran (what it did, the rescue ticket's number), a flag when it ran and nothing went out, and an info line for any sent ticket claim whose number no tool gave that turn, to be read for the gap above.
 - **The gate takes a dump whole when it adds or removes nodes (5 Oct).** `check_whatsapp_rules.py --candidate` and `check_patchers_idle.py` laid a dump over live by node name, which kept removed nodes and dropped new ones: it tested code that would never run. A dump with different node names is now the would-be workflow, nodes and wires; one with the same names is laid over live as before.
 
 **A ticket's status and urgency are the team's (owner, same message).**
