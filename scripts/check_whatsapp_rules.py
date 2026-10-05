@@ -86,14 +86,19 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # 4 Oct evening: the prompt alone (n8n_whatsapp_calmword.py: the word before the
 # question is caring, no "אוף", no "מעצבן"), after a blind replay of 27 reaction
 # turns from that day's runs: irritated openings 13 (old), 7 (softer), 0 (this).
+# 5 Oct: Try again's note (n8n_whatsapp_safetynet.py: a truth failure is named,
+# and what the first pass's tools returned is handed to the second), and `Say it
+# again` gone with its two pins. Replay: the five retries of 5 Oct whose first
+# pass used tools (live 83668's mould lookup; offline, a duplicate ticket, two
+# status lookups and a refused ticket), the second pass played by Claude on the
+# new input: 5 of 5 went out, none said anything untrue (two of them had ended
+# in Say it again's false claims before). Scratchpad run safetynet/retry_play.py.
 PINS = {
     'Answer the resident / input': '31ff6f4f297f',
     'Answer the resident / system': '65c56f9d9c40',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
-    'Say it again / input': '64f323ffcba1',
-    'Say it again / system': '6927944fbfb0',
-    'Try again / note': '49907a4bd8c4',
+    'Try again / note': '6a7f78f84a2b',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '510af1d70292',
@@ -125,11 +130,26 @@ def load_live():
 
 
 def load_candidate(files):
-    """Live, with every node a patcher's --dump would change put in its place."""
+    """Live, with every node a patcher's --dump would change put in its place.
+
+    5 Oct (n8n_whatsapp_safetynet.py): a dump that ADDS or REMOVES nodes is the
+    would-be workflow whole -- its nodes and its wires -- because laying it over
+    live only where a name already exists (the rule until then) kept the removed
+    nodes, dropped the new ones, and so tested code that would never run. A dump
+    with the same node names as live is laid over it exactly as before."""
     wf = load_live()
     idx = {n["name"]: i for i, n in enumerate(wf["nodes"])}
     for f in files:
         dumped = json.load(open(f, encoding="utf-8"))
+        names = {n["name"] for n in dumped["nodes"]}
+        if names != set(idx) and "connections" in dumped:
+            for name in sorted(names - set(idx)):
+                print("candidate: + %s from %s" % (name, os.path.basename(f)))
+            for name in sorted(set(idx) - names):
+                print("candidate: - %s (not in %s)" % (name, os.path.basename(f)))
+            wf = dict(wf, nodes=dumped["nodes"], connections=dumped["connections"])
+            idx = {n["name"]: i for i, n in enumerate(wf["nodes"])}
+            continue
         for n in dumped["nodes"]:
             i = idx.get(n["name"])
             if i is not None and wf["nodes"][i] != n:
@@ -163,14 +183,22 @@ def extract(wf):
     b = code.index(";", b) + 1
 
     def conds(name):
+        # 5 Oct: `Second try usable?` is gone and `Claimed a ticket?` is new
+        # (n8n_whatsapp_safetynet.py); a node that is not there has no conditions.
+        if name not in by:
+            return {}
         return {c["id"]: inner(c["leftValue"])
                 for c in by[name]["parameters"]["conditions"]["conditions"]}
 
+    mend = by.get("Mend the reply")
     return {
         "sort_greeting": code[a:b],
         "send_body": inner(by["Send"]["parameters"]["jsonBody"]),
         "reply_usable": conds("Reply usable?"),
         "second_try": conds("Second try usable?"),
+        # 5 Oct: the last resort, no model (n8n_whatsapp_safetynet.py).
+        "claimed": conds("Claimed a ticket?"),
+        "mend": inner(mend["parameters"]["jsonOutput"]) if mend else "",
         "outage_gate": conds("Outage reply usable?"),
         "worth_text": inner(by["Worth a word?"]["parameters"]["text"]),
         "word_gate": inner(conds_raw(by, "A word first?", "word")),
@@ -197,6 +225,8 @@ def model_texts(wf):
     by = {n["name"]: n for n in wf["nodes"]}
     out = {}
     for name in ("Answer the resident", "Worth a word?", "Say it again", "Could not answer"):
+        if name not in by:          # 5 Oct: `Say it again` is gone (safetynet.py)
+            continue
         p = by[name]["parameters"]
         out[name + " / system"] = (p.get("options") or {}).get("systemMessage") or ""
         out[name + " / input"] = p.get("text") or ""

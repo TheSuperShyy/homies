@@ -46,7 +46,22 @@ function build(X) {
     inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
     sayNow: compile(['$json'], 'return (' + X.say_now + ');', 'Say it now'),
+    // 5 Oct: the last resort without a model (scripts/n8n_whatsapp_safetynet.py).
+    claimed: map(X.claimed, ['$json', '$runIndex', '$']),
+    mend: X.mend ? compile(['$json', '$'], 'return (' + X.mend + ');', 'Mend the reply') : null,
   };
+}
+
+// 5 Oct: what the truth guards read besides the reply. The last twelve messages
+// of the chat (`Anything newer?`; a ticket number from earlier in the chat is
+// real only if it is there), and on the second pass Try again's item (the first
+// pass's tools, draft and verdict). Send keeps its own world: rows there are
+// what it reads for the menu race, and an empty list is what it got before.
+function guardWorld(nodes, o) {
+  return Object.assign({}, nodes, {
+    'Anything newer?': { all: () => (o.recent || []).map((b) => ({ json: { direction: 'outbound', body: b } })) },
+    'Try again': { first: () => { if (!o.first_try) throw new Error('unexecuted'); return { json: o.first_try }; } },
+  });
 }
 
 // The agent's intermediateSteps, the way n8n records an HTTP tool's run.
@@ -106,13 +121,18 @@ function run(E, clock, o) {
   out.ack_text = ackSent ? JSON.parse(E.sayNow({ output: acked })).content : '';
 
   // The guards, by id, on the first pass or (run_index 1) on Try again's.
+  const nodesG = guardWorld(nodes, o);
+  const $g = (name) => { if (!nodesG[name]) throw new Error('no node ' + name); return nodesG[name]; };
   const j = { output: o.output || '', intermediateSteps: steps };
   out.guards = {};
   for (const [id, f] of Object.entries(E.reply)) {
-    try { out.guards[id] = f(j, o.run_index || 0, $) === true; } catch (e) { out.guards[id] = 'THREW ' + e.message; }
+    try { out.guards[id] = f(j, o.run_index || 0, $g) === true; } catch (e) { out.guards[id] = 'THREW ' + e.message; }
   }
   out.failed = Object.entries(out.guards).filter(([, v]) => v !== true).map(([k]) => k);
-  out.retry_note = out.failed.length ? JSON.parse(E.tryAgain({ output: o.output || '' }, $)).retry_note : '';
+  // Try again's whole item (5 Oct: it carries the first pass's tools, draft and
+  // verdict besides the note), so the second pass and the last resort read it.
+  out.try_item = out.failed.length ? JSON.parse(E.tryAgain(j, $g)) : null;
+  out.retry_note = out.try_item ? out.try_item.retry_note : '';
 
   // Send, and the payment split.
   let sent;
@@ -134,6 +154,36 @@ function run(E, clock, o) {
 const E = build(P.code);
 if (P.mode === 'sort') {
   console.log(JSON.stringify((P.texts || []).map((t) => E.isGreeting(t) === true)));
+} else if (P.mode === 'mend') {
+  // 5 Oct: after two rejected passes, Claimed a ticket? and Mend the reply. The
+  // rescue ticket (Open it anyway) is simulated: when Claimed fires, the ticket
+  // service mints a stub, `P.rescue`. Then Send, on the mended text.
+  const S = { greeting: false, greeted: true, last_bot: '', text: P.text || '', tap_now: false, tap: '',
+              photo: false, attachment: false, to: '599000000', conv_id: 0, burst_size: 1 };
+  const steps2 = stepsOf(P.tool_calls);
+  const nodes = {
+    'Sort': { first: () => ({ json: S }) },
+    'Still the last word?': { first: () => ({ json: Object.assign({}, S) }) },
+    'Carry on': { first: () => ({ json: Object.assign({}, S, { acked: '' }) }) },
+    'Answer the resident': { first: () => ({ json: { output: P.output || '', intermediateSteps: steps2 } }) },
+    'Anything newer?': { all: () => [] },
+    'Say it now': { all: () => { throw new Error('unexecuted'); } },
+    'Worth a word?': { first: () => ({ json: { output: 'NONE' } }) },
+  };
+  const nodesG = guardWorld(nodes, P);
+  const $g = (name) => { if (!nodesG[name]) throw new Error('no node ' + name); return nodesG[name]; };
+  const j = { output: P.output || '', intermediateSteps: steps2 };
+  let claimed = false;
+  try { claimed = Object.values(E.claimed).every((f) => f(j, 1, $g) === true); } catch (e) { claimed = 'THREW ' + e.message; }
+  const input = claimed === true ? { results: [{ result: JSON.stringify(P.rescue || {}) }] } : j;
+  let mended;
+  try { mended = JSON.parse(E.mend(input, $g)); } catch (e) { mended = { output: 'THREW ' + e.message, mended: 'error' }; }
+  nodes['Type for a moment'] = { first: () => ({ json: { output: mended.output } }) };
+  const $ = (name) => { if (!nodes[name]) throw new Error('no node ' + name); return nodes[name]; };
+  let sent;
+  try { sent = JSON.parse(E.send({ output: mended.output }, $)).content; } catch (e) { sent = 'THREW ' + e.message; }
+  console.log(JSON.stringify({ claimed, rescue: claimed === true ? (P.rescue || {}) : null, output: mended.output,
+    mended: mended.mended, sent }));
 } else if (P.mode === 'say_again') {
   // After two rejected passes: Open it anyway's result, then what Say it again
   // reads; with `output`, Second try usable?'s checks on what it wrote.

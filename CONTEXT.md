@@ -2679,6 +2679,22 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **Blocked:** "לא פתחתי קריאה חדשה" ("I didn't open a new ticket") fails `phantom` and `deeds`, because the checks match "פתחתי" inside a negation.
   - **Passed:** the last-resort rewrite's "אני רואה שנפתחה קריאה 255-1345-26", with no ticket behind it, passes Second try usable?. The passive "נפתחה" is not in its pattern.
   - **How to fix it:** the checks need the negation and the passive; tightening the prompt will not do it. Any fix ships through `check_whatsapp_rules.py` like every other change.
+- **What a truth check counts as a claim, and what the last resort does (5 Oct, fix 1, `n8n_whatsapp_safetynet.py`; NOT live until the owner's go).** `scripts/wa_truth.py` is the one source of the JavaScript: `phantom`, `deeds`, Try again's verdict, `Claimed a ticket?` and `Mend the reply` all build from it.
+  - **A claim is said:** a verb preceded in its clause by לא / טרם / אם, or in a sentence that ends in "?", claims nothing. "לא, פתחתי" is a claim; "לא פתחתי" is not.
+  - **A ticket number is proof only when real and close:**
+    - **Real:** a tool returned it this turn (either pass), or it is in `Anything newer?`'s last 12 messages.
+    - **Close:** it stands in the claim's own sentence or the next.
+    - **When the messages can't be read:** any number in the shape, the old rule.
+    - **Why per sentence:** a draft once cited an old ticket's number and claimed a new ticket three sentences later.
+  - **The second pass sees the first:** Try again carries `first_steps` (tools and results), `first_output` and `first_truth_ok` (the four truth guards' verdict on the first draft, by their own code). The guards count those tools, and the note tells the model what they returned.
+  - **The last resort has no model:**
+    - The first draft goes out when its only fault was style. A retry for style can never end worse than the draft it replaced.
+    - Otherwise the second draft goes out minus every false sentence. A false ticket claim becomes "פתחתי על זה קריאה, מספר X" with the real number: the ticket opened this turn if there is one, else the rescue ticket, which `Claimed a ticket?` opens only then.
+    - When too little is left: "סליחה, משהו השתבש לי בתשובה. אפשר לכתוב לי את זה שוב?".
+    - Never silence.
+    - These are the bot's only fixed sentences. The owner chose them on 5 Oct over a model rewrite: Say it again had been 9 of 10 bad across the runs.
+  - **The rescue ticket dedupes only against earlier rescue tickets** (`oxs_ref` "partial:model_claimed"). A WhatsApp interaction is one row per phone, so "this conversation's ticket" had meant the phone's newest real ticket.
+- **The gate takes a dump whole when it adds or removes nodes (5 Oct).** `check_whatsapp_rules.py --candidate` and `check_patchers_idle.py` laid a dump over live by node name, which kept removed nodes and dropped new ones: it tested code that would never run. A dump with different node names is now the would-be workflow, nodes and wires; one with the same names is laid over live as before.
 
 **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the

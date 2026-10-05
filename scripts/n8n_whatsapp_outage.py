@@ -91,6 +91,17 @@ Known limit, stated: in the TOOLED tier any tool this turn licenses any
 tool-shaped verb. Matching verb to tool is a later refinement if it is ever
 needed.
 
+5 OCT: A DEED IS A CLAIM ONLY WHEN IT IS SAID (wa_truth.py, carried to live by
+n8n_whatsapp_safetynet.py). The live run as Assaf: "לא פתחתי קריאה חדשה" (I did
+not open one) failed this guard twice, and the last resort then told him a
+ticket was open. `deeds` on Reply usable? is now built by wa_truth.deeds_expr():
+a negated verb (לא / טרם / אם before it in its clause) or a question claims
+nothing; on the second pass the first pass's tools count too (Try again carries
+them); and פתחתי / פתחנו with a real ticket number in the reply is true without
+a tool this turn (a ticket opened earlier in the chat, its number in the last
+twelve messages). `Say it again` and `Second try usable?` are gone: the sync of
+RESCUE_DEEDS and SAY_SYSTEM below runs only if they are on the workflow.
+
 HONEST LIMIT. The outage path cannot be fired on demand while the wallet has
 money -- the same limit sayagain.py records for the rescue. It ships wired,
 read back, and with its expressions unit-tested in Node against the corpus.
@@ -112,6 +123,7 @@ import n8n_whatsapp_untemplate as U  # noqa: E402
 import n8n_handover as H  # noqa: E402
 import n8n_whatsapp_retry as R  # noqa: E402
 import n8n_whatsapp_sayagain as S  # noqa: E402
+import wa_truth as T  # noqa: E402
 from n8n_whatsapp_handover import execute_node  # noqa: E402
 from n8n_whatsapp_patch import layout_complaints  # noqa: E402
 
@@ -127,7 +139,9 @@ NOTE = "Tell the team the bot is down"
 RESCUE = "Say it again"
 RESCUE_GATE = "Second try usable?"
 
-NEED = (AGENT, RESCUE, RESCUE_GATE, "Reply usable?", "Try again", "Open it anyway",
+# 5 Oct: RESCUE and RESCUE_GATE are no longer needed (n8n_whatsapp_safetynet.py
+# removed them); they are synced below only while they exist.
+NEED = (AGENT, "Reply usable?", "Try again", "Open it anyway",
         "OpenRouter", "Type for a moment", "Log reply", "Sort")
 
 # Grid cells (240 x 60) on the empty rows under the whole flow. The note is the
@@ -169,12 +183,12 @@ def _cond(cid, expr):
 
 
 # `}}` anywhere inside ends an n8n expression, so braces never touch.
-REPLY_DEEDS = _cond("deeds", (
-    "={{ (() => { const t = String($json.output || ''); "
-    "if (" + NEVER + ".test(t)) return false; "
-    "if (!" + TOOLED + ".test(t)) return true; "
-    "let n = 0; try { n = ($json.intermediateSteps || []).length; } catch (e) { n = 0; } "
-    "return n > 0; })() }}"))
+# 5 Oct: built by wa_truth.deeds_expr() (the docstring's 5 Oct note says why).
+# Before it, the guard read:
+#   if (NEVER.test(t)) return false; if (!TOOLED.test(t)) return true;
+#   let n = 0; try { n = ($json.intermediateSteps || []).length; } catch (e) { n = 0; } return n > 0;
+REPLY_DEEDS = _cond("deeds", T.deeds_expr())
+assert NEVER == T.NEVER and TOOLED == T.TOOLED, "outage.py's verb tiers and wa_truth.py's must be one list"
 
 RESCUE_DEEDS = _cond("deeds", (
     "={{ (() => { const t = String($json.output || ''); "
@@ -370,8 +384,11 @@ def main():
         lm[0].append({"node": WRITER, "type": "ai_languageModel", "index": 0})
         changes.append("OpenRouter also drives %s" % WRITER)
 
-    # 3. the deeds guard, by id, on both existing gates
+    # 3. the deeds guard, by id, on both existing gates (5 Oct: the rescue's gate
+    # only while it exists)
     for node, guard in (("Reply usable?", REPLY_DEEDS), (RESCUE_GATE, RESCUE_DEEDS)):
+        if node not in by:
+            continue
         cond = by[node]["parameters"]["conditions"]["conditions"]
         have = next((c for c in cond if c.get("id") == "deeds"), None)
         if have is None:
@@ -381,12 +398,14 @@ def main():
             have["leftValue"] = guard["leftValue"]
             changes.append("%s: `deeds` guard updated" % node)
 
-    # 4. the two texts whose source of truth is another script
-    opts = by[RESCUE]["parameters"].setdefault("options", {})
-    if opts.get("systemMessage") != S.SAY_SYSTEM:
-        opts["systemMessage"] = S.SAY_SYSTEM
-        changes.append("%s: system message synced from sayagain.SAY_SYSTEM "
-                       "(reports the stub ticket, nothing else)" % RESCUE)
+    # 4. the two texts whose source of truth is another script (5 Oct: the
+    # rescue's writer only while it exists)
+    if RESCUE in by:
+        opts = by[RESCUE]["parameters"].setdefault("options", {})
+        if opts.get("systemMessage") != S.SAY_SYSTEM:
+            opts["systemMessage"] = S.SAY_SYSTEM
+            changes.append("%s: system message synced from sayagain.SAY_SYSTEM "
+                           "(reports the stub ticket, nothing else)" % RESCUE)
     tp = by["Try again"]["parameters"]
     if tp.get("jsonOutput") != R.TRY_JSON:
         tp["jsonOutput"] = R.TRY_JSON
@@ -419,6 +438,8 @@ def main():
     print("\nwritten: %d nodes, active=%s" % (len(back["nodes"]), back.get("active")))
     print("  %s error -> %s" % (AGENT, [t["node"] for t in back["connections"][AGENT]["main"][1]]))
     for node in ("Reply usable?", RESCUE_GATE, GATE):
+        if node not in bb:
+            continue
         ids = [c.get("id") for c in bb[node]["parameters"]["conditions"]["conditions"]]
         print("  %-22s conditions %s" % (node, ids))
     print("Re-run without --apply to confirm it reports nothing to do.")

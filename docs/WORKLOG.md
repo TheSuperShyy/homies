@@ -11,6 +11,50 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: fix 1 of 5, the safety net stops making things worse (built and tested; NOT live)
+
+The owner, after the live run as Assaf (1 of 9 got everything): *"what are the fix that is needed for it to be able to be consistent and not break"*. The plan was approved in chat: five fixes, one at a time, each through the gate. This is fix 1.
+- **The four decisions, settled in chat** (his words are in HANDOVER):
+  - **"Are you a bot?":** Michael from Homies' service team. Asked straight out, he is the digital assistant on the team and can pass you to a person. Never "a real person", never "Google". He asked for "support staff"; denying being a bot is not built.
+  - **Balance:** the typed name and number stay. A foreign number works, he asks once, and a refusal goes to the team.
+  - **Danger:** only "I opened an urgent ticket", with its number. If pushed: "פתחתי לך קריאה דחופה, וזה הדבר היחיד שאני יכול לעשות מכאן". No promise of a call.
+  - **"When?":** the 4h / 3-day line comes out. He says there is no exact date, but the ticket is open and will be handled.
+- **What fix 1 changes:** `scripts/n8n_whatsapp_safetynet.py` carries it. `scripts/wa_truth.py` is the one source of the check code.
+  - **`phantom` and `deeds`:**
+    - a verb is a claim only when said, not negated (לא / טרם / אם) and not asked;
+    - a ticket number counts only if it is real (a tool returned it, or it is in the last 12 messages) and stands in the claim's own sentence or the next;
+    - the second pass counts the first pass's tools.
+  - **Try again:** carries `first_steps`, `first_output` and `first_truth_ok`, names a truth failure, and hands the model what the tools returned.
+  - **The last resort, no model:** `Claimed a ticket?` and `Mend the reply` replace `Say it again` and `Second try usable?`.
+    - The first draft goes out when its only fault was style.
+    - Otherwise the second goes out, minus the false sentences, with the real ticket number in place.
+    - When too little is left: "סליחה, משהו השתבש לי בתשובה. אפשר לכתוב לי את זה שוב?".
+    - Never silence.
+  - **`links`:** sees the first pass's link on the second.
+  - **The Edge Function's `rescue_request`:** dedupes only against earlier rescue tickets. It had handed back the gate's 255-1345-26 for the mould claim.
+- **Tested, nothing spent:**
+  - **On live:** exactly the 12 new cases fail, nothing else.
+  - **On the candidate:** 236/236 cases pass and the pins are recorded.
+    - The replay sent every real message and reply through both versions: Send has 0 changes.
+    - The truth guards over every reply ever sent: 43 changes, all "blocked → passes" for a real ticket number quoted, none newly blocked.
+  - **The live run's 21 first-pass blocks:**
+    - 2 are no longer blocked: the honest "לא פתחתי" and the earlier ticket;
+    - 19 are still sent back for style, as intended.
+  - **Claude-played replay of the 5 retries whose first pass used tools:**
+    - 5 of 5 went out, none untrue;
+    - a deliberately bad second pass was mended to the rescue ticket's real number.
+    - The per-sentence rule came out of this replay: one first draft claimed a NEW ticket beside an old ticket's number.
+  - **`check_patchers_idle.py` on the dump:** only the baseline 6 are not idle.
+    - `sayagain.py` is retired;
+    - `gender.py` and `outage.py` skip the removed nodes;
+    - `rephay.py`'s smoke and `retry.py`'s wiring are updated.
+- **The gate itself:** `--candidate` and `check_patchers_idle.py` now take a dump whole when it adds or removes nodes. Laid over live by name, they kept the removed nodes and dropped the new ones.
+- **The offline harness:** `wa_qa.py` / `wa_qa.js` model the new last resort, reading `Try again`'s item and the last 12 messages.
+- **Live checked, read-only:** the Edge Function is v112, the same as the repo before this edit.
+- **Waiting on the owner's go:**
+  1. `python scripts/n8n_whatsapp_safetynet.py --apply`. Snapshot `docs/handover/n8n-whatsapp-live-05oct-before-safetynet.json`; `--restore` undoes it.
+  2. `python scripts/supabase_functions.py --apply --oxs-mirror`. The flag keeps the mirror on for his number; a plain `--apply` turns it off.
+
 ### Debt agent: five situations on the real model, with Claude as the residents ($0.09)
 
 The owner, after the incoming-call document: *"ok now do one for the outbound"*.

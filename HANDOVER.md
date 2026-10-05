@@ -311,6 +311,31 @@ its stated time.
     - "anything else?" after an emergency;
     - "בקרוב" on a debt hand-off;
     - the proof-by-email step missed on a cash dispute.
+- **IN PROGRESS 5 Oct, owner-approved plan: five fixes so the WhatsApp bot stops breaking (after the live run's 1 of 9).** Plan: `~/.claude/plans/i-need-to-plan-structured-boot.md`. Order: 1 the safety net, 2 the promise filter, 3 lookups, 4 the prompt, 5 the balance, plus an emoji filter. One at a time through the gate, each live only on the owner's go.
+  - **Decisions settled in chat, 5 Oct:**
+    - **"Are you a bot?"** The owner: *"make it say hes a support staff from homies"*.
+      - Asked who he is: "מיכאל מצוות השירות של הומי'ז".
+      - Asked straight out: "אני מיכאל, העוזר הדיגיטלי בצוות השירות של הומי'ז. אם תעדיף לדבר עם בן אדם מהצוות, אני מעביר להם את הפנייה עכשיו. מה מתאים לך?"
+      - Never "a real person" or "Google". Denying he is a bot is not built.
+    - **Balance:** the owner: *"B make it type the number"*.
+      - The typed name and number stay.
+      - A foreign number works.
+      - He asks once, and a refusal goes to the team.
+    - **Danger:** the owner: *"do A but just say it opened a ticket with urgent status dont give promise to receive. if the tenant insist the agent should say something like that is the only thing he can do from there"*.
+      - If pushed: "פתחתי לך קריאה דחופה, וזה הדבר היחיד שאני יכול לעשות מכאן."
+      - Assumed, not contradicted: the team note still goes out, and a tenant's own call request is passed on with no promise.
+    - **"When?":** the owner: *"make the bot say it cant say the exact date but rest assure that the ticket was created and will be handled accordingly"*. The 4h / 3-day line comes out of the prompt.
+    - **The last resort's two fixed lines:**
+      - "פתחתי על זה קריאה, מספר X." with the real number;
+      - "סליחה, משהו השתבש לי בתשובה. אפשר לכתוב לי את זה שוב?". It does not hand on: *"we are the team there is no one to send it to"*.
+  - **Fix 1, BUILT AND TESTED, NOT LIVE:** `scripts/n8n_whatsapp_safetynet.py`; the check code is in `scripts/wa_truth.py`; WORKLOG 5 Oct has the detail.
+    - **The gate on the candidate:** all green, 236/236.
+    - **On live:** exactly the 12 new cases fail.
+    - **The patchers:** idle except the baseline 6.
+    - **To ship, on the owner's go:** `python scripts/n8n_whatsapp_safetynet.py --apply`, then `python scripts/supabase_functions.py --apply --oxs-mirror` (the rescue dedupe; without the flag the mirror for his number goes off). Then the check on live, every patcher idle, and `--watch`.
+    - **To undo:** `--restore` (snapshot `docs/handover/n8n-whatsapp-live-05oct-before-safetynet.json`) and `git revert`.
+    - **Until the Edge Function ships:** a rescue can still hand back an older real ticket of the same phone.
+  - **Next:** fix 2 (the promise filter). Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
 - **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
   - **Kept, by the owner's word (do not delete):**
     - Tickets 255-1343-26 (lift), 255-1344-26 (leak), 255-1345-26 (gate) and 255-1346-26 (cleaning).

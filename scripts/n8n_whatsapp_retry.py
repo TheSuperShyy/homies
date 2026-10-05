@@ -74,6 +74,26 @@ not carry the tools line, because there is nothing to open. HAY_ALT is the one
 copy of "the bot asked how he is": wa_qa.py's rubric and the --watch flag in
 check_whatsapp_rules.py read it from here.
 
+5 OCT, THE SECOND PASS KEEPS WHAT THE FIRST ONE KNEW (n8n_whatsapp_safetynet.py,
+which carries this to live). The live run as Assaf: the first pass looked the
+mould up, found nothing and said so; its draft was sent back for its opening
+("אני מבין ש..."); the second pass could not see the lookup, so its "בדקתי"
+failed `deeds`, and the last resort told him a ticket was open. `Try again`
+now carries three things besides the note:
+  - `first_steps`: the first pass's tools and what they returned. The truth
+    guards count them on the second pass, and the note tells the model what
+    they returned, so it neither repeats the lookup nor opens a ticket twice.
+  - `first_output` and `first_truth_ok`: the first draft and the four truth
+    guards' verdict on it (wa_truth.truth_js, the guards' own code). When its
+    only fault was style and the second pass fails a truth guard, the first
+    draft goes out (`Mend the reply`): a retry for style can never end worse
+    than the draft it replaced.
+And a truth failure is named like the echo and the clerk: an empty reply, a
+ticket claimed with no real number, a link no tool returned, a deed no tool
+did. The full list stays for a reason the node cannot see (plural, opener).
+`Already retried?`'s yes branch goes to `Claimed a ticket?` now, not straight
+to the rescue ticket.
+
 Idempotent. Running it twice reports nothing to do.
 """
 import json
@@ -85,10 +105,13 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 import n8n_whatsapp as W  # noqa: E402
+import wa_truth as T  # noqa: E402
 
 WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
 SNAPSHOT = os.path.join(W.ROOT, "docs", "handover",
                         "n8n-whatsapp-live-18sep-before-retry.json")
+# 5 Oct: where a second rejection goes (n8n_whatsapp_safetynet.py adds it).
+CLAIMED = "Claimed a ticket?"
 PLACEHOLDER = "REPLACE_WITH_N8N_WEBHOOK_SECRET"
 
 # On the 240 x 60 grid, at least 200 x 100 clear of every neighbour
@@ -149,21 +172,47 @@ HAY_PY = __import__("re").compile(HAY_ALT, __import__("re").I)
 WHY_REPHAY = ("היא לא שאלה אותו לשלומו, ובלחיצה על לדבר עם נציג הנציג שנכנס לשיחה אומר היי, "
               "אומר מי הוא ושואל מה שלומו, וזאת השאלה היחידה בהודעה")
 
+# 5 Oct: the four truth guards, named when they are the reason. Read off the
+# first draft with the guards' own code (wa_truth.truth_js), not guessed.
+WHY_WORDS = "היא הייתה ריקה"
+WHY_PHANTOM = "היא אמרה שנפתחה קריאה, ובתור הזה לא נפתחה שום קריאה ולא חזר מספר"
+WHY_LINKS = "היא נתנה קישור שלא הגיע מכלי"
+WHY_DEEDS = "היא סיפרה שבדקת, שלחת, תיקנת או טיפלת במשהו, ושום כלי לא עשה את זה בתור הזה"
+# 5 Oct: what the first pass's tools returned, as a fact in the same brackets.
+# Without it the second pass lost the lookup it was answering from.
+FACTS_HEAD = "[מה שהכלים כבר החזירו לך בתור הזה, לפני הטיוטה שנפסלה: "
+FACTS_TAIL = ". זה כבר קרה, ואפשר לענות לפיו; קריאה שכבר נפתחה לא פותחים שוב.]"
+
 # `}}` anywhere inside ends an n8n expression, so the braces are spaced.
 # 4 Oct: the representative tap's missing how-are-you is named too. The tools
-# line rides only on the echo and the clerk, as before; a note that names the
-# tap alone ends there, because a tap opens nothing.
+# line rides on the echo, the clerk and (5 Oct) any truth reason; a note that
+# names the tap alone ends there, because a tap opens nothing.
+# 5 Oct: besides the note, `first_steps`, `first_output` and `first_truth_ok`
+# (the docstring says why). A throw leaves the full list and a verdict of "not
+# true", so the last resort mends the second draft rather than trusting the first.
 TRY_JSON = (
-    "={{ JSON.stringify(Object.assign({ }, $('Still the last word?').first().json, "
-    "{ retry_note: (() => { try { const o = String($json.output || ''); const why = []; "
+    "={{ JSON.stringify(Object.assign({ }, $('Still the last word?').first().json, (() => { "
+    "const o = String($json.output || ''); try { " + T.LIB +
+    "const first_steps = stepsOf($json.intermediateSteps); "
+    + T.truth_js("o", "first_steps", T.FIRST_WORDS) +
+    "const why = []; "
+    "if (!v.words) why.push('" + WHY_WORDS + "'); "
+    "if (!v.phantom) why.push('" + WHY_PHANTOM + "'); "
+    "if (!v.links) why.push('" + WHY_LINKS + "'); "
+    "if (!v.deeds) why.push('" + WHY_DEEDS + "'); "
     "if (" + ECHO_RE + ".test(o)) why.push('" + WHY_ECHO + "'); "
     "if (" + CLERK_RE + ".test(o)) why.push('" + WHY_CLERK + "'); "
     "const tools = why.length > 0; let rep = false; "
     "try { rep = $('Still the last word?').first().json.tap === 'other'; } catch (e) { rep = false; } "
     "if (rep && !" + HAY_JS + ".test(o)) why.push('" + WHY_REPHAY + "'); "
-    "return why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.]') "
-    ": '" + RETRY_NOTE + "'; } catch (e) { return '" + RETRY_NOTE + "'; } })() })) }}"
+    "let note = why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.]') "
+    ": '" + RETRY_NOTE + "'; "
+    "if (first_steps.length) note += ' " + FACTS_HEAD + "' + first_steps.map(s => s.tool + ': ' + brief(s.observation)).join('; ') + '" + FACTS_TAIL + "'; "
+    "return { retry_note: note, first_output: o, first_steps, first_truth_ok: v.ok }; "
+    "} catch (e) { return { retry_note: '" + RETRY_NOTE + "', first_output: o, first_steps: [], first_truth_ok: false }; } "
+    "})())) }}"
 )
+assert TRY_JSON.count("}}") == 1, "a }} inside Try again ends its expression early"
 
 RETRIED = "={{ $runIndex > 0 }}"
 
@@ -295,10 +344,14 @@ def main():
     nodes = live["nodes"]
     by = {n["name"]: n for n in nodes}
     conns = live["connections"]
+    # 5 Oct: `Say it again` is gone; a second rejection goes to `Claimed a
+    # ticket?`, which n8n_whatsapp_safetynet.py adds. Until it has, this script's
+    # wiring would point at nothing, so it refuses rather than write it.
     for need in ("Reply usable?", "Open it anyway", "Still the last word?",
-                 "Answer the resident", "Say it again", "Send"):
+                 "Answer the resident", "Send", CLAIMED):
         if need not in by:
-            sys.exit("No %r node on the live workflow -- refusing to guess." % need)
+            sys.exit("No %r node on the live workflow -- refusing to guess%s." % (
+                need, " (python scripts/n8n_whatsapp_safetynet.py --apply adds it)" if need == CLAIMED else ""))
 
     print("workflow : %s  (%s, active=%s)" % (live["name"], live["id"], live.get("active")))
     print("nodes    : %d" % len(nodes))
@@ -379,12 +432,12 @@ def main():
         changes.append("Reply usable? (false) -> Already retried? (was Open it anyway)")
 
     want_retried = {"main": [
-        [{"node": "Open it anyway", "type": "main", "index": 0}],
+        [{"node": CLAIMED, "type": "main", "index": 0}],
         [{"node": "Try again", "type": "main", "index": 0}],
     ]}
     if conns.get("Already retried?") != want_retried:
         conns["Already retried?"] = want_retried
-        changes.append("Already retried? -> Open it anyway (yes) / Try again (no)")
+        changes.append("Already retried? -> %s (yes) / Try again (no)" % CLAIMED)
 
     want_try = {"main": [[{"node": "Answer the resident", "type": "main", "index": 0}]]}
     if conns.get("Try again") != want_try:

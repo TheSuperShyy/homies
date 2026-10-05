@@ -3308,10 +3308,19 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // same conversation — a model that invents a reference once will usually do
     // it again on the next message — and a resident describing one leak must
     // not collect a ticket per message.
+    //
+    // ONLY AGAINST EARLIER RESCUE TICKETS (5 Oct). Matched on the interaction
+    // alone, this handed back the phone's newest REAL ticket: on the live run as
+    // Assaf Clix the gate's 255-1345-26, opened 14 minutes before, came back for a
+    // mould claim, and the bot told him three times that a mould ticket with that
+    // number was open. A WhatsApp interaction is one row per phone, so "this
+    // conversation's ticket" is every ticket that phone ever opened. The rescue's
+    // own rows carry oxs_ref "partial:model_claimed"; nothing else does.
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     let dupe = db.from("requests").select("reference")
       .gte("created_at", since)
       .in("status", ["open", "in_progress", "needs_review"])
+      .eq("oxs_ref", "partial:model_claimed")
       .order("created_at", { ascending: false }).limit(1);
     dupe = iid ? dupe.eq("interaction_id", iid) : dupe.eq("reported_by_phone", phone);
     const { data: already } = await dupe;

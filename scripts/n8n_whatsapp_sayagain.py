@@ -1,8 +1,27 @@
 # -*- coding: utf-8 -*-
-"""The last two fixed sentences: let the model write the rescue itself.
+"""RETIRED 5 Oct 2026. The last resort is n8n_whatsapp_safetynet.py's now.
 
-    python scripts/n8n_whatsapp_sayagain.py            # dry run
-    python scripts/n8n_whatsapp_sayagain.py --apply    # write it
+    python scripts/n8n_whatsapp_sayagain.py            # says it is retired; changes nothing
+
+WHY IT WAS RETIRED. `Say it again` was 6 for 6 bad in the offline run of 5 Oct
+(3 untrue claims, 3 silences) and 3 of 4 untrue on the live run as Assaf Clix
+(docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md): told "a ticket
+was just opened, number X" when `Open it anyway` had handed back an older ticket
+of the same phone (the gate's number, on a mould report), with no memory and no
+tools, it wrote "פתחתי עכשיו קריאה בנושא העובש... 255-1345-26" three times.
+And `Second try usable?` had no false branch, so a failure sent nothing at all.
+The owner chose fixed lines over a model for this one path (5 Oct, in chat):
+`Mend the reply` takes the false sentences out of the second draft, puts the
+ticket's real number where a false ticket claim stood, and when too little is
+left says "סליחה, משהו השתבש לי בתשובה. אפשר לכתוב לי את זה שוב?". The
+constants below stay because gender.py and outage.py still import them (each
+syncs them only while the node exists, which it no longer does); main() changes
+nothing, so a dry run of every patcher stays idle and an --apply cannot bring the
+node back.
+
+THE ORIGINAL DOCSTRING, 18 Sep:
+
+The last two fixed sentences: let the model write the rescue itself.
 
 WHY
 `Reply usable?` throws a reply away when it is empty, one word, or claims a
@@ -119,6 +138,19 @@ SEND_NEW = ".trim();"
 
 
 def main():
+    # Retired 5 Oct (the docstring says why). Nothing below runs any more: it
+    # would put `Say it again` and `Second try usable?` back and rewire the rescue
+    # to them.
+    print("RETIRED 5 Oct 2026: the last resort is n8n_whatsapp_safetynet.py's "
+          "(`Claimed a ticket?` and `Mend the reply`).")
+    if "--apply" in sys.argv:
+        sys.exit("REFUSING: this patcher is retired; an --apply would bring Say it again back.")
+    print("")
+    print("Nothing to do.")
+    return
+
+
+def _retired_main():
     apply = "--apply" in sys.argv
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
     nodes = live["nodes"]

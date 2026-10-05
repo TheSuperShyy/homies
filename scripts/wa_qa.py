@@ -85,11 +85,14 @@ def extract_code(wf):
     code["two_parts"] = C.inner(C.conds_raw(by, "Two parts?", "two"))
     code["send_rest"] = C.inner(by["Send the rest"]["parameters"]["jsonBody"])
     code["say_now"] = C.inner(by["Say it now"]["parameters"]["jsonBody"])
-    # The last resort after two rejected passes (Open it anyway -> Say it again):
-    # its own small model, so `turn` can hand a player its prompt and input.
-    again = by["Say it again"]["parameters"]
-    code["say_again_text"] = C.inner(again["text"])
-    code["say_again_system"] = (again.get("options") or {}).get("systemMessage") or ""
+    # The last resort after two rejected passes. Until 5 Oct, Open it anyway ->
+    # Say it again, its own small model, so `turn` handed a player its prompt and
+    # input. Since 5 Oct (n8n_whatsapp_safetynet.py), Claimed a ticket? -> Mend the
+    # reply, code only: C.extract carries both, and `say_again_*` stays empty.
+    if "Say it again" in by:
+        again = by["Say it again"]["parameters"]
+        code["say_again_text"] = C.inner(again["text"])
+        code["say_again_system"] = (again.get("options") or {}).get("systemMessage") or ""
     return code
 
 
@@ -318,10 +321,15 @@ again, and each returns the same fixture. A second open_request for the same bui
 type returns the first ticket's reference with `duplicate: true`, as the ticket service's
 30-minute duplicate guard does; the resident hears the same number again.
 Play it, then call the helper with `run_index: 1`, `retry_note`, its `tool_calls` and its
-`output`. If it passes, its handset is what the resident gets. If it is rejected too,
-production goes to `Say it again`, a small model of its own: the helper prints its system
-prompt and its input (`say_again`); play it and record its text as `say_again_output`. That
-text is what the resident gets.
+`output`, plus `first_try` (the `retry.try_item` the first call printed: since 5 Oct the
+second pass's checks count the first pass's tools from it) and `recent` (the chat's last
+twelve messages, oldest first: a ticket number from earlier in the chat is real only if
+it is there). If it passes, its handset is what the resident gets. If it is rejected too,
+since 5 Oct no model writes again: the helper prints `mend` (Claimed a ticket? and Mend
+the reply: whether a rescue ticket was opened, and the text that goes out) and `handset`.
+Record `mend_output`. On a code.json from before 5 Oct, production went to `Say it again`,
+a small model of its own: the helper prints its system prompt and its input
+(`say_again`); play it and record its text as `say_again_output`.
 A retried turn keeps the first pass as `first_tool_calls`, `first_output`, `first_failed`
 and `retry_note`, and the retry as the usual `tool_calls` and `output`.
 
@@ -437,7 +445,11 @@ def live_turn(code, s, t):
             "photo": kind == "photo", "attachment": kind in ("photo", "file"),
             "ack": t.get("ack") or "NONE", "tool_calls": t.get("tool_calls") or [],
             "output": t.get("output") or "", "retry_note": t.get("retry_note") or "",
-            "run_index": int(t.get("run_index") or 0)}
+            "run_index": int(t.get("run_index") or 0),
+            # 5 Oct: the truth guards read the chat's last twelve messages (a ticket
+            # number from earlier is real only if it is there) and, on the second
+            # pass, Try again's item.
+            "recent": t.get("recent") or [], "first_try": t.get("first_try")}
     if base["run_index"]:
         # Try again rebuilds its item from `Still the last word?`, which never
         # carried the ack (Carry on adds it), so the retry reads no ack note.
@@ -462,7 +474,19 @@ def live_turn(code, s, t):
         elif base["run_index"] == 0:
             again = node_run({"mode": "turns", "code": code, "clock": clock,
                               "turns": [dict(base, ack="NONE", output="", tool_calls=[], retry_note=r["retry_note"])]})[0]
-            out["retry"] = {"note": r["retry_note"], "answering_model_reads": again["inject"]}
+            out["retry"] = {"note": r["retry_note"], "answering_model_reads": again["inject"],
+                            "try_item": r.get("try_item")}
+        elif code.get("mend"):
+            # 5 Oct: no model. Claimed a ticket? decides the rescue ticket (the
+            # ticket service mints a stub: simulated), Mend the reply writes what
+            # goes out, Send sends it.
+            m = node_run({"mode": "mend", "code": code, "text": text, "output": base["output"],
+                          "tool_calls": base["tool_calls"], "recent": base["recent"],
+                          "first_try": base["first_try"],
+                          "rescue": {"ok": True, "reference": "255-1599-26", "rescued": True}})
+            out["mend"] = m
+            out["handset"] = ([r["ack_text"]] if r.get("ack_sent") else []) + ([m["sent"]] if m.get("sent") else [])
+            out["buttons"] = False
         else:
             # Open it anyway reads verify_address's `building`; with none, the
             # rescue opens nothing and Say it again gets no reference.
@@ -1307,8 +1331,15 @@ class Chat:
         """One tenant message through the live code and the models.
         Returns (the messages the phone gets, whether buttons came with them)."""
         sid, code, ps = self.s["id"], self.code, self.ps
+        # 5 Oct: the chat's last twelve messages, as `Anything newer?` hands them to
+        # the truth guards (a ticket number from earlier is real only if it is there).
+        recent = []
+        for x in self.st["turns"]:
+            recent.append(str(x.get("resident") or ""))
+            recent.extend(str(h) for h in (x.get("handset") or []))
+        recent = [m for m in recent if m][-11:] + [text]
         t = {"scenario": sid, "kind": kind, "text": text, "first": not self.st["turns"],
-             "after_menu": self.st["after_menu"]}
+             "after_menu": self.st["after_menu"], "recent": recent}
         r = live_turn(code, ps, t)
         if r["menu"]:
             rec = {"resident": text, "kind": "menu"}
@@ -1334,7 +1365,19 @@ class Chat:
             out2, calls2 = self.answer(inject2)
             rec.update(first_output=out, first_failed=chk["guards_failed"], first_tool_calls=calls,
                        retry_note=note, tool_calls=calls2, output=out2)
-            chk = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2, output=out2))
+            chk = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2, output=out2,
+                                           first_try=chk["retry"].get("try_item")))
+            if chk["guards_failed"] and chk.get("mend"):
+                # 5 Oct: no model; what Mend the reply wrote is what goes out.
+                m = chk["mend"]
+                rec.update(second_failed=chk["guards_failed"], claimed=m.get("claimed"),
+                           mended=m.get("mended"), mend_output=m.get("output"))
+                if m.get("claimed") is True:
+                    rec["rescue"] = m.get("rescue")
+                hs = chk.get("handset") or []
+                rec["handset"] = hs
+                self.st["turns"].append(rec)
+                return hs, False
             if chk["guards_failed"]:
                 sa = chk["say_again"]
                 said = self.model(sa["system"], sa["reads"], "say_again")
@@ -1591,6 +1634,12 @@ def live_record(rd):
     sa = _out(rd, "Say it again")
     if sa is not None:
         rec["say_again_output"] = str(sa.get("output") or "")
+    # 5 Oct (n8n_whatsapp_safetynet.py): the last resort without a model.
+    if rd.get("Claimed a ticket?"):
+        rec["claimed"] = bool(rd["Claimed a ticket?"][0].get("data", {}).get("main", [[]])[0])
+    md = _out(rd, "Mend the reply")
+    if md is not None:
+        rec["mend_output"], rec["mended"] = str(md.get("output") or ""), str(md.get("mended") or "")
     hs, buttons = [], False
     for name in ("Say it now", "Send", "Send the rest"):
         j = _out(rd, name)

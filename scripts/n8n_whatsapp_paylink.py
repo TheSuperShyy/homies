@@ -58,6 +58,10 @@ PLACEHOLDER = "REPLACE_WITH_N8N_WEBHOOK_SECRET"
 # checks: every URL in the output must appear in a get_payment_link
 # observation, or the reply is unusable and takes the rescue path (a real
 # needs_review ticket and an honest line), never the fake link.
+# 5 Oct (n8n_whatsapp_safetynet.py carries it): on the second pass the link may
+# be the one the FIRST pass fetched -- the agent's second run cannot see that
+# step, so `Try again` carries it as `first_steps`. Without this a real link
+# repeated on the retry was "a link no tool returned".
 URL_GUARD = {
     "id": "links",
     "leftValue": (
@@ -65,6 +69,8 @@ URL_GUARD = {
         "const urls = t.match(/https?:\\/\\/\\S+/g) || []; if (!urls.length) return true; "
         "let seen = ''; try { for (const s of ($('Answer the resident').first().json.intermediateSteps || [])) { "
         "if (((s.action || {}).tool) === 'get_payment_link') seen += ' ' + String(s.observation || ''); } } catch (e) {} "
+        "if ($runIndex > 0) { try { for (const s of ($('Try again').first().json.first_steps || [])) { "
+        "if (s.tool === 'get_payment_link') seen += ' ' + String(s.observation || ''); } } catch (e) { } } "
         "return urls.every(u => seen.indexOf(u.replace(/[.,;:!?)\\]]+$/, '')) !== -1); })() }}"
     ),
     "rightValue": "",

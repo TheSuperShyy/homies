@@ -105,6 +105,8 @@ FIELDS = [
     ("Team note this turn?", "teamnote", ("leftValue",), TN.NOTE_THIS_TURN, [PROMISED, OFFER]),
     ("Reply usable?", "opener", ("leftValue",), R.OPENER_GUARD["leftValue"], [OPENER_YOU]),
 ]
+# Nodes a later change removed: their FIELDS rows are skipped while absent.
+GONE_SINCE = {"Say it again": "5 Oct, n8n_whatsapp_safetynet.py"}
 SEND_TAIL_OLD = R.SEND_TAIL_NEW.replace(OPENER_YOU[0], OPENER_YOU[1])
 PROMISE_V1 = "const pv = 'promise v1';"
 MEMORY_KEY = "={{ $json.to }}-%d"
@@ -267,6 +269,10 @@ def main():
     # The small writers, the retry note, the team note, the opener guard.
     exprs = []
     for name, cid, path, wanted, frags in FIELDS:
+        # 5 Oct: `Say it again` is gone (n8n_whatsapp_safetynet.py); its field
+        # is skipped, not refused, once the node is off the workflow.
+        if name in GONE_SINCE and name not in by:
+            continue
         holder, key = slot(by, name, cid, path)
         have = holder.get(key) or ""
         if wanted.startswith("={{"):

@@ -98,7 +98,9 @@ try {
   if (!a.includes('לא שאלה אותו לשלומו') || a.includes('open_request')) bad.push('note: the tap is not named alone');
   const b = note('אני מבין שיש נזילה בבניין.', {});
   if (!b.includes('נפתחה בזה שהבנת') || !b.includes('open_request') || b.includes('לשלומו')) bad.push('note: the echo changed');
-  const c = note('החלפתי את הנורה.', {});
+  // 5 Oct (n8n_whatsapp_safetynet.py): an invented repair is named now, like the
+  // echo; the full list stays for a reason the node cannot read off the draft.
+  const c = note('ספר/י לי מה קרה בבקשה', {});
   if (!c.includes('או שנתנה קישור')) bad.push('note: the full list is gone');
 } catch (e) { bad.push('note threw: ' + e.message); }
 console.log(JSON.stringify({ bad }));

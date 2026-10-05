@@ -28,6 +28,9 @@ function build(X) {
     send: compile(['$json', '$'], 'return (' + X.send_body + ');', 'Send'),
     reply: map(X.reply_usable, ['$json', '$runIndex', '$']),
     second: map(X.second_try, ['$json', '$runIndex', '$']),
+    // 5 Oct: the last resort without a model (scripts/n8n_whatsapp_safetynet.py).
+    claimed: map(X.claimed, ['$json', '$runIndex', '$']),
+    mend: X.mend ? compile(['$json', '$'], 'return (' + X.mend + ');', 'Mend the reply') : null,
     outage: map(X.outage_gate, ['$json', '$runIndex', '$']),
     worth: compile(['$json'], 'return (' + X.worth_text + ');', 'Worth a word?'),
     word: compile(['$json', '$'], 'return (' + X.word_gate + ');', 'A word first?'),
@@ -312,14 +315,18 @@ function cases(E) {
   expect('a verb in quotes is still caught', d('כתבתי "החלפתי" בטעות.', 1), false);
   expect('a greeting is untouched', d("בוקר טוב! מיכאל מהומי'ז כאן. במה אוכל לעזור לכם?", 0), true);
 
-  console.log(NL + '--- Second try usable?: deeds (the rescue) ---');
-  const r = (output) => () => E.second.deeds({ output }, 0, turn({}).$);
-  expect('a stub ticket with its number', r('פתחתי לכם קריאה מספר 255-1330-26 על התאורה בחדר המדרגות. במה עוד אפשר לעזור?'), true);
-  expect('handled + opened, with a number', r('טיפלתי בזה ופתחתי קריאה 255-1330-26.'), true);
-  expect('checked + opened, with a number', r('בדקתי ופתחתי קריאה 255-1330-26.'), false);
-  expect('opened, NO number', r('פתחתי לכם קריאה על התאורה.'), false);
-  expect('the invented repair', r(BULBS), false);
-  expect('a plain honest line', r('ההודעה שלכם לא יצאה כמו שצריך, אפשר לכתוב לי שוב מה קרה?'), true);
+  // 5 Oct: `Second try usable?` is gone with `Say it again`
+  // (scripts/n8n_whatsapp_safetynet.py); these run only where it still exists.
+  if (E.second.deeds) {
+    console.log(NL + '--- Second try usable?: deeds (the rescue) ---');
+    const r = (output) => () => E.second.deeds({ output }, 0, turn({}).$);
+    expect('a stub ticket with its number', r('פתחתי לכם קריאה מספר 255-1330-26 על התאורה בחדר המדרגות. במה עוד אפשר לעזור?'), true);
+    expect('handled + opened, with a number', r('טיפלתי בזה ופתחתי קריאה 255-1330-26.'), true);
+    expect('checked + opened, with a number', r('בדקתי ופתחתי קריאה 255-1330-26.'), false);
+    expect('opened, NO number', r('פתחתי לכם קריאה על התאורה.'), false);
+    expect('the invented repair', r(BULBS), false);
+    expect('a plain honest line', r('ההודעה שלכם לא יצאה כמו שצריך, אפשר לכתוב לי שוב מה קרה?'), true);
+  }
 
   console.log(NL + '--- Outage reply usable? (all its conditions) ---');
   const all = (j) => () => Object.values(E.outage).every((f) => f(j, 0, turn({}).$) === true);
@@ -389,7 +396,11 @@ function cases(E) {
   expect('65856: the echo is named, not a list of eight', () => why(REJ).includes('נפתחה בזה שהבנת אותו') && !why(REJ).includes('או שנתנה קישור'), true);
   expect('the clerk is named', () => why('כדי שאוכל לפתוח קריאה, אצטרך את הבניין.').includes('הסבירה לו למה אתה צריך פרט'), true);
   expect('both are named', () => { const w = why('אני מבין שיש נזילה. כדי שאוכל לעזור אצטרך את הדירה.'); return w.includes('נפתחה בזה שהבנת') && w.includes('וגם היא הסבירה'); }, true);
-  expect('any other reason keeps the full list', () => why('החלפתי את הנורה.').includes('או שנתנה קישור'), true);
+  // 5 Oct: a truth guard's reason is read off the draft too (wa_truth.truth_js),
+  // so an invented repair is named; the full list stays for what the node cannot see.
+  expect('an invented repair is named, with the tools line',
+    () => { const w = why('החלפתי את הנורה בחדר המדרגות.'); return w.includes('ושום כלי לא עשה את זה') && w.includes('open_request') && !w.includes('או שנתנה קישור'); }, true);
+  expect('a reason the node cannot see keeps the full list', () => why('ספר/י לי מה קרה בבקשה').includes('או שנתנה קישור'), true);
   expect('the tools line is always there', () => why(REJ).includes('open_request') && why('x').includes('open_request'), true);
   expect('no output at all: the full list, never a throw', () => why(undefined).startsWith('[התשובה הקודמת'), true);
   expect("the resident's turn is carried through", () => JSON.parse(E.tryAgain({ output: REJ }, $t)).text, 'hi, the stair lights flicker');
@@ -503,6 +514,94 @@ function cases(E) {
     () => repWhy(REP_TODAY).includes('לא שאלה אותו לשלומו') && !repWhy(REP_TODAY).includes('open_request'), true);
   expect('Try again: a tap reply that asked keeps the full list',
     () => repWhy(REP_WANTED).includes('או שנתנה קישור'), true);
+  // 5 Oct (scripts/n8n_whatsapp_safetynet.py, scripts/wa_truth.py). The live run
+  // as Assaf Clix (docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md):
+  // the worst failures came from these checks. The drafts below are his, word
+  // for word, where they were the bot's.
+  console.log(NL + '--- the safety net stops making things worse (5 Oct, the live run as Assaf) ---');
+  const obs5 = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+  const STATUS0 = { action: { tool: 'get_request_status' }, observation: obs5({ ok: true, found: 0, other_open: 5, requests: [] }) };
+  const OPEN7 = { action: { tool: 'open_request' }, observation: obs5({ ok: true, reference: '255-1347-26' }) };
+  const flat = (s) => ({ tool: s.action.tool, observation: s.observation });
+  // The world a check sees: the last twelve messages (null: unreadable), Try
+  // again's item (null: not run), and the agent's latest run.
+  const world = (o) => (name) => {
+    if (name === 'Anything newer?') { if (o.rows === null) throw new Error('unexecuted'); return { all: () => (o.rows || []).map((b) => ({ json: { direction: 'outbound', body: b } })) }; }
+    if (name === 'Try again') { if (!o.T) throw new Error('unexecuted'); return { first: () => ({ json: o.T }) }; }
+    if (name === 'Answer the resident') return { first: () => ({ json: { output: o.retry, intermediateSteps: o.steps2 || [] } }) };
+    if (name === 'Sort') return { first: () => ({ json: { greeting: false, photo: false } }) };
+    if (name === 'Still the last word?') return { first: () => ({ json: { text: o.said || 'x', greeted: true } }) };
+    throw new Error('no node ' + name);
+  };
+  const NEG = 'אני מצטער אם בלבלתי אותך. לא פתחתי קריאה חדשה. רק שאלתי אם תרצה שאפתח. לגבי מתי מישהו יגיע, אני לא יכול לתת לך הערכת זמן מדויקת. אז, לפתוח קריאה חדשה על העובש במעלית בבר כוכבא 23 דירה 2?';
+  const OLDREF = 'אני לא יכול לתת הנחיות בטיחות או עצות לגבי מה לעשות עם החשמל. מה שאני כן יכול להגיד לך זה שפתחנו קריאת שירות דחופה (מספר 255-1344-26) והצוות שלנו כבר יודע על הבעיה. יש משהו נוסף שאוכל לעזור לך בו?';
+  const CHECKED = 'אוי, זה ממש לא נעים! 😔 בדקתי ולא מצאתי קריאה פתוחה על עובש במעלית בבר כוכבא 23 דירה 2. אני יכול לפתוח עכשיו קריאת שירות חדשה בנושא. מה דעתך?';
+  const ECHOED = 'אני מבין שאתה מתוסכל מזה שאף אחד לא חזר אליך. 😔 בדקתי ולא מצאתי קריאה פתוחה על עובש במעלית בבר כוכבא 23 דירה 2. אני יכול לפתוח עכשיו קריאת שירות חדשה בנושא. מה דעתך?';
+  const said5 = (id, output, o) => () => E.reply[id]({ output, intermediateSteps: o.steps || [] }, o.run || 0, world(o));
+  expect('phantom: "לא פתחתי קריאה חדשה" is not a claim (blocked twice live)', said5('phantom', NEG, {}), true);
+  expect('deeds: the same', said5('deeds', NEG, {}), true);
+  expect('phantom: "פותח לך קריאה?" is a question, not a claim', said5('phantom', 'פותח לך קריאה?', {}), true);
+  expect('phantom: "לא, פתחתי קריאה" is a claim, and with no number fails', said5('phantom', 'לא, פתחתי קריאה כבר הבוקר.', {}), false);
+  expect('phantom: a claim with no number fails', said5('phantom', 'פתחתי לך קריאה על העובש. במה עוד?', {}), false);
+  expect('phantom: the number a tool returned this turn backs it', said5('phantom', 'פתחתי לך קריאה 255-1347-26.', { steps: [OPEN7] }), true);
+  expect('phantom: an invented number does not', said5('phantom', 'פתחתי לך קריאה 255-9999-26.', { rows: ['שלום'] }), false);
+  expect('phantom: messages unreadable, so any number in the shape, as before 5 Oct', said5('phantom', 'פתחתי לך קריאה 255-9999-26.', { rows: null }), true);
+  expect('phantom: on the second pass, the first pass\'s ticket backs it', said5('phantom', 'פתחתי לך קריאה 255-1347-26.', { run: 1, T: { first_steps: [flat(OPEN7)] } }), true);
+  expect('phantom: the number in the next sentence backs the claim', said5('phantom', 'פתחתי לך קריאה דחופה על המעלית. מספר הקריאה שלך הוא 255-1347-26. משהו נוסף?', { steps: [OPEN7] }), true);
+  // The offline run of 5 Oct: the only number was the OLD ticket's, three sentences away.
+  expect('phantom: a NEW ticket claimed beside an old ticket\'s number fails',
+    said5('phantom', 'אוי, לא נעים. אני רואה שהקריאה שלך 255-1460-26 מסומנת כמטופלת אצלנו. התאורה עדיין לא עובדת, וזה לא בסדר. אני פותח לך קריאת שירות חדשה כדי שהצוות יטפל בזה שוב. במה אוכל לעזור עוד?',
+      { rows: ['255-1460-26. התאורה בחדר מדרגות קומה 3.'] }), false);
+  expect('deeds: a ticket from two turns back, with its number, no tool now (live 83362)',
+    said5('deeds', OLDREF, { rows: ['פתחתי עכשיו קריאת שירות דחופה, מספר 255-1344-26'] }), true);
+  expect('deeds: the same sentence with an invented number', said5('deeds', OLDREF, { rows: ['שלום'] }), false);
+  expect('deeds: the second pass\'s "בדקתי" after the first pass\'s lookup (live 83668)',
+    said5('deeds', CHECKED, { run: 1, T: { first_steps: [flat(STATUS0)] } }), true);
+  expect('deeds: "בדקתי" with no lookup in either pass', said5('deeds', CHECKED, { run: 1, T: { first_steps: [] } }), false);
+  expect('deeds: "לא החלפתי" is not a repair', said5('deeds', 'לא החלפתי שום נורה, אני רק פותח קריאות. מה קרה?', {}), true);
+  expect('deeds: the invented repair still fails, tool or not', said5('deeds', BULBS, { steps: [STATUS0] }), false);
+
+  // Try again judges the first draft with the guards' own code, and carries it.
+  const tj = (output, steps) => JSON.parse(E.tryAgain({ output, intermediateSteps: steps || [] }, world({})));
+  expect('Try again: live 83668, an echo with a real lookup behind it, is a style fault only',
+    () => tj(ECHOED, [STATUS0]).first_truth_ok, true);
+  expect('Try again: it carries the lookup, and the note says what it returned',
+    () => { const j = tj(ECHOED, [STATUS0]); return j.first_steps[0].tool + '|' + j.retry_note.includes('מה שהכלים כבר החזירו לך בתור הזה') + '|' + j.retry_note.includes('"found":0'); },
+    'get_request_status|true|true');
+  expect('Try again: a numberless ticket claim is untrue, and named',
+    () => { const j = tj('פתחתי לך קריאה על העובש. במה עוד?', []); return j.first_truth_ok + '|' + j.retry_note.includes('ולא חזר מספר'); }, 'false|true');
+  expect('Try again: the first draft rides along', () => tj(ECHOED, [STATUS0]).first_output, ECHOED);
+
+  // Claimed a ticket? and Mend the reply: the last resort, no model.
+  if (E.mend && E.claimed.claimed) {
+    const cl = (output, o) => () => E.claimed.claimed({ output, intermediateSteps: o.steps || [] }, 1, world(o));
+    expect('claimed: the first draft goes out instead, so no rescue ticket', cl('פתחתי לך קריאה על העובש.', { T: { first_truth_ok: true } }), false);
+    expect('claimed: a numberless claim, nothing opened: the rescue ticket', cl('פתחתי לך קריאה על העובש. במה עוד?', { T: { first_truth_ok: false, first_steps: [flat(STATUS0)] } }), true);
+    expect('claimed: a ticket really opened this turn: its number is used, no rescue', cl('פתחתי לך קריאה על העובש.', { T: { first_truth_ok: false, first_steps: [flat(OPEN7)] } }), false);
+    expect('claimed: no claim at all: no rescue', cl('סליחה על הבלבול. מה קרה?', { T: { first_truth_ok: false } }), false);
+    const md = (o, results) => () => JSON.parse(E.mend({ output: o.retry, results }, world(o))).output;
+    const FIX = 'סליחה, משהו השתבש לי בתשובה. אפשר לכתוב לי את זה שוב?';
+    expect('mend: a style-only first draft goes out (live 83668 would have)',
+      md({ T: { first_truth_ok: true, first_output: ECHOED }, retry: 'פתחתי לך קריאה.' }), ECHOED);
+    expect('mend: the rescue ticket\'s number stands where the false claim stood',
+      md({ T: { first_truth_ok: false }, retry: 'אוי, לא נעים. פתחתי לך קריאה על העובש. יש עוד משהו שחשוב שאדע?' },
+        [{ result: JSON.stringify({ ok: true, reference: '255-1348-26', rescued: true }) }]),
+      'אוי, לא נעים. פתחתי על זה קריאה, מספר 255-1348-26. יש עוד משהו שחשוב שאדע?');
+    expect('mend: a ticket really opened this turn: its number replaces the numberless claim',
+      md({ T: { first_truth_ok: false, first_steps: [flat(OPEN7)] }, retry: 'פתחתי לך קריאה על העובש. משהו נוסף?' }),
+      'פתחתי על זה קריאה, מספר 255-1347-26. משהו נוסף?');
+    expect('mend: an invented repair goes, the rest stays',
+      md({ T: { first_truth_ok: false }, retry: 'אוי, לא נעים. החלפתי את הנורה בחדר המדרגות. באיזה בניין זה?' }), 'אוי, לא נעים. באיזה בניין זה?');
+    expect('mend: an invented link goes with its sentence',
+      md({ T: { first_truth_ok: false }, retry: 'הנה הקישור שלך: https://pay.example.co.il/zz9. הוא אישי לדירה שלך. משהו נוסף?' }), 'הוא אישי לדירה שלך. משהו נוסף?');
+    expect('mend: nothing true left: the one fixed line, never silence', md({ T: { first_truth_ok: false }, retry: 'החלפתי את הנורה.' }), FIX);
+    expect('mend: an empty second pass: the fixed line', md({ T: { first_truth_ok: false }, retry: '' }), FIX);
+    expect('mend: Try again unreadable: still the fixed line, never a throw', md({ retry: '' }), FIX);
+    expect('mend: an honest second draft goes out as it is',
+      md({ T: { first_truth_ok: false }, retry: NEG }), NEG);
+  } else {
+    console.log('(Claimed a ticket? / Mend the reply are not on this workflow: their cases are not run)');
+  }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }
@@ -595,6 +694,30 @@ function replay(L, C, corpus) {
     console.log('   reply : ' + mask(t));
     for (const x of rows) console.log('     ' + (x.bad ? 'BROKEN ' : '') + '[' + x.st + ']' + NL + '       before: ' + mask(x.a) + NL + '       after : ' + mask(x.b));
   }
+
+  // 5 Oct (scripts/n8n_whatsapp_safetynet.py): the truth guards over every reply
+  // the bot ever sent, first pass, no tool this turn, and the reply's own numbers
+  // already in the chat -- so any change is the negation and question reading,
+  // or a ticket quoted from earlier. A reply only one side lets through is listed.
+  console.log(NL + "--- the same replies, through Reply usable?'s phantom and deeds (no tool this turn, its numbers already in the chat) ---");
+  const ctx = (t) => (name) => {
+    if (name === 'Anything newer?') return { all: () => [{ json: { direction: 'outbound', body: t } }] };
+    throw new Error('no node ' + name);
+  };
+  let guardDiff = 0;
+  for (const t of outbound) {
+    for (const id of ['phantom', 'deeds']) {
+      if (!L.reply[id] || !C.reply[id]) continue;
+      let a; let b;
+      try { a = L.reply[id]({ output: t, intermediateSteps: [] }, 0, ctx(t)); } catch (e) { a = 'THREW ' + e.message; }
+      try { b = C.reply[id]({ output: t, intermediateSteps: [] }, 0, ctx(t)); } catch (e) { b = 'THREW ' + e.message; broken++; }
+      if (a !== b) {
+        guardDiff++;
+        console.log('   ' + id + ': ' + (a === true ? 'passed' : 'blocked') + ' -> ' + (b === true ? 'passes' : 'blocked') + ' : ' + mask(t));
+      }
+    }
+  }
+  console.log('changed: ' + guardDiff);
   console.log(NL + (broken ? broken + ' BROKEN results' : 'nothing broken: no empty result, no fragment'));
   return broken;
 }

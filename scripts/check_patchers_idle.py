@@ -46,6 +46,12 @@ def would_be(dump_path):
     dumped = json.loads(open(dump_path, encoding="utf-8").read().replace(PLACEHOLDER, secret))
     idx = {n["name"]: i for i, n in enumerate(live["nodes"])}
     wf = copy.deepcopy(live)
+    # 5 Oct (n8n_whatsapp_safetynet.py): a dump that adds or removes nodes is the
+    # would-be workflow whole, nodes and wires; laid over live by name it would
+    # keep the removed nodes and drop the new ones.
+    if {n["name"] for n in dumped["nodes"]} != set(idx) and "connections" in dumped:
+        wf["nodes"], wf["connections"] = dumped["nodes"], dumped["connections"]
+        return wf
     for n in dumped["nodes"]:
         if n["name"] in idx:
             wf["nodes"][idx[n["name"]]] = n
