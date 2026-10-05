@@ -203,7 +203,12 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 74
+MEMORY_EPOCH = 75
+# 74 -> 75, 5 Oct evening: the representative asks how you are TODAY. The owner,
+# shown a Claude-played rep-tap hello ("...מה שלומך?"): *"i want the intro to be
+# more friendly like how are you today?"*, the one *"after the menu greeting"* --
+# his 4 Oct wording again. The rep-tap sentence asks how he is today, warmly.
+# Every buffer holds rep hellos without it. Carrier: n8n_whatsapp_hayday.py.
 # 73 -> 74, 5 Oct: straight answers (fixes 4 and 5 of the owner's five, after the
 # live run as Assaf Clix, where 1 of 9 conversations got everything). Michael is
 # "from Homies' service team" and, asked straight out, the digital assistant who
@@ -695,7 +700,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "0e3ca2b3cfa0",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "8f9e442ded13",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

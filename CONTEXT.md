@@ -2703,6 +2703,9 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **"Anything else?":** only once his matter is done; until then the closing question carries his matter on.
   - **An earlier ticket** is looked up with the status tool before anything is said about it. The "we don't know what was sent before" paragraph is about messages.
   - **The balance (fix 5):** the typed name and number stay. Ask once, explain once, then a team note; any country's number.
+  - **The "לדבר עם נציג" tap asks how he is TODAY (5 Oct evening, epoch 75, `n8n_whatsapp_hayday.py`; NOT live until applied).** The owner: *"i want the intro to be more friendly like how are you today?"*, the intro *"after the menu greeting"*.
+    - "היי", the name, and how he is today, warmly, as its one question.
+    - Only that tap. The other two buttons and anything typed go straight to the matter.
 - **Send keeps only six emoji (5 Oct, `n8n_whatsapp_emoji.py`; LIVE 16:31 UTC):** 🙂 😊 🙏 👍 💪 🤝, in model replies only (the menu's 👋 is the owner's). It is the last step before Send returns, and it only removes.
 - **What a status lookup finds (5 Oct, fix 3, debt-tools v116, LIVE 16:09 UTC).** `get_request_status` reads 20 rows for a flat and 30 for a building before the category split, and leaves payment records out unless `payment` is asked for.
   - **In the caller's own flat, a category that matches nothing is the model's guess, not "none".** The flat's requests come back, flagged `type_unmatched`, and the model finds the one meant by its description. The live mould lookup sent `other` for a ticket filed `cleaning`.
