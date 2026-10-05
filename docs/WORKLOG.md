@@ -11,7 +11,26 @@ conversation that produced it.
 
 ## 2026-10-05
 
-### Live test as Assaf Clix in בר כוכבא 23 (owner's go, running)
+### Live test as Assaf Clix: 9 conversations on the live bot, done ($0.35, nothing deleted)
+
+`docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, with every turn's n8n run number (runs 83285 to 83924).
+- **How it ran:** nine Claude players, one after another on the owner's chat (Chatwoot conversation 1), 3 per button, no gas.
+- **What was created and kept:**
+  - Tickets 255-1343-26 (lift), 255-1344-26 (leak), 255-1345-26 (gate) and 255-1346-26 (cleaning), all in בר כוכבא 23 flat 2.
+  - 11 notes to the team.
+- **Outcome:** 1 of 9 conversations got Assaf everything he came for, 4 part, 4 nothing. That is the same split as the offline real-tenant run.
+- **Cost:** the wallet went from $22.94 to $22.59. The test key's usage moved by the same $0.35, so the live n8n bot spends through that same key.
+- **Found:**
+  - **Say it again on the live bot (conversation 6):** it told Assaf three times that a mould ticket was opened, "255-1345-26". None was opened; that number is the gate ticket's. Meanwhile the honest "לא פתחתי קריאה חדשה" was blocked, because the phantom check matches "פתחתי" inside a negation.
+  - **What the bot says it is:** "a large language model, trained by Google" (conversation 7) and "a real service rep" (conversation 3).
+  - **The promise filter** cut a sentence from 38 of 72 replies. Some endings were broken, and once only "anything else?" was left.
+  - **The balance check never ran:** the bot "can see" the number but demanded it typed, four times.
+  - **The gate history:** "I can't see earlier reports" was said without a lookup.
+  - **The status lookup:** for building 23, flat 2 it returned found 0 / other_open 5, while 255-1341-26 (mould, flat 2, voice, no resident or phone) is open.
+  - **Standards as promises:** "up to 4 hours" and "up to 3 business days". "Opened this morning" was said of a ticket opened 14 minutes earlier.
+  - **Tone:** "מעצבן" once, the name repeated mid-chat twice, and "anything else?" on 44 of 72 replies.
+
+### Live test as Assaf Clix in בר כוכבא 23 (owner's go, started)
 
 The owner, after the real-tenant report: *"why is when im testing it manually it works completely fine"*, then
 *"why cant you test it using the actual n8n or the actual whatsapp usin my number"*, then *"just write only

@@ -311,8 +311,20 @@ its stated time.
     - "anything else?" after an emergency;
     - "בקרוב" on a debt hand-off;
     - the proof-by-email step missed on a cash dispute.
-- **RUNNING 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2.**
-  - **It writes for real, by the owner's word:** tickets, the OXS mirror for his number, and notes to the team. Delete nothing afterwards.
+- **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
+  - **Kept, by the owner's word (do not delete):**
+    - Tickets 255-1343-26 (lift), 255-1344-26 (leak), 255-1345-26 (gate) and 255-1346-26 (cleaning).
+    - 11 notes to the team.
+  - **Result:** 1 of 9 got everything, 4 part, 4 nothing. That matches the offline run, so the offline findings were real.
+  - **For the owner, proposals only, most serious first:**
+    1. On the live bot, Say it again told a tenant three times that a mould ticket was opened (giving another ticket's number). No ticket was opened.
+    2. The phantom check blocks honest "לא פתחתי" (a negation).
+    3. "A large language model, trained by Google" and "a real service rep": decide what Michael says.
+    4. The promise filter cut a sentence from 38 of 72 replies; there are broken endings, and once only "anything else?" was left.
+    5. The balance check demands the phone number typed although the bot sees it. Decide whether the sender's number counts.
+    6. The status lookup found nothing for building 23 flat 2 while 255-1341-26 is open there. A voice ticket with no resident or phone, worth checking in `get_request_status`.
+    7. The bot said it can't see earlier reports without looking them up.
+  - **The live test writes for real, by the owner's word:** tickets, the OXS mirror for his number, and notes to the team. Delete nothing afterwards.
   - **The identity:**
     - Resident `63c44e57` is אסף קליקס on the owner's +63 number, with 8 unpaid months from January to August at 250 ₪.
     - Chatwoot contact 1, conversation 1, inbox 1, account 2.

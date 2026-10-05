@@ -2660,6 +2660,12 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **How messages get in:** `wa_qa.py live` posts Chatwoot's own envelope to the live webhook, so the bot's replies reach his WhatsApp. His side of the chat does not show on the phone, because the messages are injected rather than typed.
   - **What is real:** tickets, the OXS mirror for his number, notes to the team and the model's spend.
   - **No cleanup:** unlike `probe_whatsapp.py`, there is no cleanup step, by design.
+- **The live bot behaves as the offline harness predicted (5 Oct, 9 live conversations as Assaf).** The split was the same (1 of 9 got everything, 4 part, 4 nothing), and the same failures appeared:
+  - Say it again's untrue ticket claims;
+  - "a large language model, trained by Google";
+  - the promise filter leaving only "anything else?".
+  - **So:** offline runs with Claude tenants (`say`) are a fair stand-in for finding faults. A live run (`live`) confirms them on the real records, and costs about 4 cents a conversation.
+  - **Spending:** the live n8n bot spends through the same OpenRouter key as `OPENROUTER_API_KEY` in .env; the key's usage and the wallet moved together.
 
 **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
