@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: 9 conversations on Gemini itself through OpenRouter ($0.22, owner's go)
+
+The owner: *"ok so run a chatbot test as well using the openrouter credit"* (estimate about $0.40).
+`scripts/wa_qa.py play` was added (`turn`'s body became `live_turn`, which play calls).
+- **How it works:**
+  - Every model call the bot makes runs on its live settings: Gemini 2.5 Flash, 0.6, 1,024 tokens, for Worth a word?, Answer the resident and Say it again.
+  - Memory works as the window buffer does: every pass, rejected drafts included.
+  - gpt-4.1-mini plays the resident and sees only the handset.
+  - The stand-in tools follow the deck's rules in code.
+  - The run stops at $1.
+- **The cards:** the same 9 as the 4 Oct calm-word run, 3 per button.
+- **The write-up:** `docs/assistant/transcripts/2026-10-05-whatsapp-menu-buttons-openrouter.md`, with English glosses written by a Claude subagent, so no OpenRouter credit was used for them.
+- **Cost:** $0.2015, plus $0.0173 for the intercom chat run again. The wallet went from $23.66 to $23.45.
+- **Found that Claude-played runs never showed:**
+  - Say it again wrote "ticket 123456" twice, although its prompt forbids inventing a number.
+    - Once Second try usable? passed it, so it was sent.
+    - Once it was blocked. Nothing is wired on Second try usable?'s false branch, so the resident gets silence.
+  - Asked "person or computer?", the bot said "a large language model, trained by Google".
+  - Send's promise filter cut "I don't know exactly when they'll get back to you..." down to "anything else?", which was all the resident received.
+  - 14 of 59 drafts were blocked (2 of 62 when Claude played). 7 rewrites were identical; 5 of those went out, because echo and clerk only gate the first pass.
+  - Gas: no ticket opened, 😥, and "I can't give safety instructions or refer you to outside bodies".
+  - 13 "I understand that..." echoes, "מבאס" (slang), 3 off-list emoji, and "anything else?" on 37 of 59 replies.
+- **Harness fixes found here:**
+  - The intercom stand-in denied a reference it had just listed. A known reference is now found, and the chat was run again.
+  - Where production sends nothing, the resident model was shown a placeholder. It now sees "(no reply came)".
+
 ### Voice agents: the same 6 calls on the real models through OpenRouter ($0.17, owner's go)
 
 The owner, after the estimate (about $0.30): *"we dont need to test the whatsapp chatbot just the voice

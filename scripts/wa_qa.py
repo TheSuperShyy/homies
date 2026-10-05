@@ -10,6 +10,7 @@ blind judges grade what a handset would get. Spends nothing. Read only.
     python scripts/wa_qa.py bundle --run DIR2 --candidate F   # the same, on a patcher's --dump
     python scripts/wa_qa.py diff --run DIR --against DIR2     # every handset text that differs
     python scripts/wa_qa.py turn --run DIR < turn.json        # one turn, for a player mid-game
+    python scripts/wa_qa.py play --run DIR        # SPENDS: the live models on OpenRouter play it (WA_QA_ONLY=id,id; $1 stop)
     ... --deck scripts/wa_qa_menu_buttons.json                # any command, another deck
 
 FREE RESIDENTS (4 Oct, the owner: "act like a human"). A scenario whose resident
@@ -415,14 +416,17 @@ def turn(run):
     s = next((x for x in deck["scenarios"] if x["id"] == t.get("scenario")), None)
     if not s:
         sys.exit("turn: no scenario %r in %s" % (t.get("scenario"), run))
+    print(json.dumps(live_turn(code, s, t), ensure_ascii=False, indent=1))
+
+
+def live_turn(code, s, t):
+    """What the live code does with one message (turn's body; play calls it too)."""
     kind = t.get("kind", "text")
     text = "" if kind == "file" else str(t.get("text") or "")
     menu_line = hour_word(s["time"]) + " 👋 במה אפשר לעזור?"
-    show = lambda o: print(json.dumps(o, ensure_ascii=False, indent=1))
     if kind == "text" and node_run({"mode": "sort", "code": code, "texts": [text]})[0]:
-        show({"menu": True, "system_sends": menu_line, "buttons": list(TAPS.values()),
-              "record": {"resident": text, "kind": "menu"}})
-        return
+        return {"menu": True, "system_sends": menu_line, "buttons": list(TAPS.values()),
+                "record": {"resident": text, "kind": "menu"}}
     tap = kind == "tap"
     clock = {"time": s["time"], "weekday": s["weekday"], "iso": s["iso"]}
     base = {"text": text, "greeted": not t.get("first"), "last_bot": menu_line if t.get("after_menu") else "",
@@ -451,6 +455,7 @@ def turn(run):
         out["guards_failed"] = r["failed"]
         if not r["failed"]:
             out["handset"] = [h for h in r["handset"] if h]
+            out["buttons"] = bool(r.get("buttons"))
         elif base["run_index"] == 0:
             again = node_run({"mode": "turns", "code": code, "clock": clock,
                               "turns": [dict(base, ack="NONE", output="", tool_calls=[], retry_note=r["retry_note"])]})[0]
@@ -470,7 +475,7 @@ def turn(run):
                 out["say_again"]["sent"] = sa.get("sent", "")
                 if r["ack_sent"]:
                     out["say_again"]["ack_went_first"] = r["ack_text"]
-    show(out)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -1060,6 +1065,308 @@ def diff(run, against):
     return changed
 
 
+# ---------------------------------------------------------------------------
+# play: the same game with the live model on OpenRouter (SPENDS CREDIT)
+# ---------------------------------------------------------------------------
+# 5 Oct, the owner: "ok so run a chatbot test as well using the openrouter
+# credit" (after the voice run, estimate about $0.40 for 9 conversations).
+# Every model call the bot makes runs on its own settings, read from the live
+# workflow on 5 Oct: google/gemini-2.5-flash, temperature 0.6, 1024 tokens, for
+# Worth a word?, Answer the resident and Say it again alike. The memory is the
+# window buffer's: every run's input and output, rejected passes included, no
+# tool calls. The code around each call is live_turn's, the same as a Claude
+# player's. A cheap model plays the resident from the card and sees only the
+# handset. Tools are stand-ins that follow the deck's rules in code, so nothing
+# is written anywhere. The transcripts land where `grade` and `report` read them.
+BOT = {"model": "google/gemini-2.5-flash", "temperature": 0.6, "max_tokens": 1024}
+RESIDENT_MODEL = "openai/gpt-4.1-mini"
+MEMORY_PAIRS = 12           # memoryBufferWindow contextWindowLength: k exchanges
+PLAY_CAP = 1.00             # dollars for the whole run
+
+RESIDENT_PROMPT = """You are a resident of a building managed by Homies, writing to Homies on WhatsApp. \
+Michael answers for Homies. You are the person on the card below.
+
+Write what this person would really type, one WhatsApp message at a time, in Hebrew unless the card \
+says otherwise, reacting only to the words Michael's messages actually say.
+- You know only the card. You do not know how Homies works inside. Never type a fact the card does \
+not give you; asked something you do not know, say so the way this person would.
+- Write like this person on a phone: short, untidy where the card says so (typos, no punctuation, \
+words run together), an emoji only if it fits them. Never hand over facts in a neat, form-like way \
+unless that is how they write.
+- Answer what Michael asked if you know it, the way this person would: sometimes only half of it, \
+sometimes with something else on your mind. Skip a question if they would.
+- The tendencies are things this person MAY do when the moment fits. Do not force them and do not \
+stage them one after another.
+- React honestly. A reply that is cold, confusing, repeated or wrong gets this person's real reaction \
+(annoyed, confused, asks again, gives up). Do not help Michael and do not trap him.
+- The three menu buttons stay in the chat: %s. You may tap one again instead of typing.
+- End when this person would: once they have what they came for (often a short thanks, sometimes \
+nothing at all), or when they give up.
+
+Answer with JSON only:
+{"message": "<what you type, or empty>", "tap": "<a button title if you tap one instead, else empty>", \
+"done": <true if this is your last message, or if you simply stop writing (then message is empty)>}
+
+The card:
+%s"""
+
+
+def play_tools(tools):
+    """tools_of's shape as OpenAI functions. $fromAI parameters without a
+    default are required in n8n's schema, so they are required here."""
+    kinds = {"string": "string", "number": "number", "boolean": "boolean", "json": "object"}
+    return [{"type": "function", "function": {
+        "name": t["name"], "description": t["description"],
+        "parameters": {"type": "object",
+                       "properties": {p["name"]: {"type": kinds.get(p["type"], "string"), "description": p["description"]}
+                                      for p in t["parameters"]},
+                       "required": [p["name"] for p in t["parameters"]]}}} for t in tools]
+
+
+HE_BAR_KOCHBA = re.compile(r"בר[\s\-־]*כוכב")
+
+
+def wa_stand_in(name, a, s, defaults, state):
+    """What a tool returns on this conversation, following the deck's _rule texts."""
+    fx = (s.get("fixtures") or {}).get(name)
+    building, unit = str(a.get("building") or ""), str(a.get("unit") or a.get("reporter_unit") or "")
+    ours = bool(HE_BAR_KOCHBA.search(building)) and bool(re.search(r"(?<!\d)23(?!\d)", building))
+    digits = re.sub(r"\D", "", str(a.get("reference") or ""))
+    flat = (re.search(r"apartment (\d+)", s["resident"].get("knows", "")) or [None, ""])[1]
+    d = defaults.get(name)
+    if name == "get_request_status":
+        if not fx:
+            return d
+        sid, kind = s["id"], str(a.get("type") or "")
+        pick = "not_found"
+        known = [re.sub(r"\D", "", r["reference"]) for r in (fx.get("found") or {}).get("requests", [])]
+        if digits and digits in known:
+            # A real reference is found, also when the bot read it off an earlier
+            # list (5 Oct: the intercom deck said "a reference: not_found" and
+            # the stand-in denied a ticket it had itself just listed).
+            return fx["found"]
+        if sid == "status_ref_spaces":
+            if "1501" in digits or (ours and (kind == "plumbing" or unit == "6")):
+                pick = "found"
+            elif ours:
+                pick = "identify"
+        elif sid == "status_intercom_slang":
+            if ours and (unit == "10" or kind in ("electrical", "other", "maintenance")):
+                pick = "found"
+            elif ours and not digits:
+                pick = "identify"
+        elif sid == "status_closed_not_fixed":
+            if "1460" in digits or (ours and kind == "lighting"):
+                pick = "found"
+        elif ours and not digits:          # open_gate_angry and any deck with the plain rule
+            pick = "found"
+        return fx[pick]
+    if name == "get_balance":
+        name_ok = re.search(r"Full name ([^,.]+)", s["resident"].get("knows", ""))
+        phone_ok = re.search(r"phone ([\d\- ]{9,})", s["resident"].get("knows", ""))
+        said_name, said_phone = str(a.get("name") or "").strip(), re.sub(r"\D", "", str(a.get("phone") or ""))
+        missing = [x for x, v in (("name", said_name), ("phone", said_phone)) if not v]
+        if missing:
+            return {"ok": True, "found": 0, "need_identity": True, "missing": missing}
+        if (fx and name_ok and phone_ok and " ".join(name_ok.group(1).split()) == " ".join(said_name.split())
+                and re.sub(r"\D", "", phone_ok.group(1)) == said_phone):
+            return fx
+        return d["identity_failed"]
+    if fx:
+        return fx
+    if name == "open_request":
+        if not building.strip():
+            return d["need_building"]
+        if not HE_BAR_KOCHBA.search(building):
+            return d["street_unknown"]
+        if not re.search(r"\d", building):
+            return d["need_number"]
+        if not ours:
+            return {"ok": True, "opened": False, "building_found": False, "reason": "number_not_on_street",
+                    "numbers_we_manage": ["23"]}
+        kind = str(a.get("type") or "other")
+        if kind in state["opened"]:
+            return {"ok": True, "reference": state["opened"][kind], "duplicate": True}
+        head, serial, tail = s["ticket"].split("-")
+        ref = "%s-%d-%s" % (head, int(serial) + len(state["opened"]), tail)
+        state["opened"][kind] = ref
+        return dict(d["opened"], reference=ref, reporter_unit=str(a.get("reporter_unit") or ""))
+    if name == "verify_address":
+        if HE_BAR_KOCHBA.search(building) and re.search(r"(?<!\d)23(?!\d)", building):
+            return d["found"]
+        return d["need_number"] if HE_BAR_KOCHBA.search(building) and not re.search(r"\d", building) else d["street_unknown"]
+    if name == "get_service_info":
+        topic = str(a.get("topic") or "")
+        hits = [{"title": e["title"], "facts": e["facts"]} for e in d["catalogue"] if any(w in topic for w in e["words"])]
+        return {"ok": True, "found": True, "topics": hits} if hits else d["not_found"]
+    if name == "get_payment_link":
+        return dict(d, link=d["link"].replace("<id>", s["id"]), apartment=flat)
+    return {k: v for k, v in (d or {"ok": True}).items() if not k.startswith("_")}
+
+
+def play(run):
+    import datetime
+    import prompt_probe as P
+    from voice_qa import openrouter
+    key = P.E.get("OPENROUTER_API_KEY", "").strip()
+    if not key:
+        sys.exit("OPENROUTER_API_KEY missing from .env")
+    code = load_json(os.path.join(run, "code.json"))
+    pdeck = {x["id"]: x for x in load_json(os.path.join(run, "deck.json"))["scenarios"]}
+    deck = load_json(DECK)
+    ctx = open(os.path.join(run, "context_A.md"), encoding="utf-8").read()
+    system = re.search(r"system prompt \(verbatim\)\s*\n+```\n(.*?)\n```", ctx, re.S).group(1)
+    ack_system = re.search(r"payment-ack model's system prompt \(verbatim\)\s*\n+```\n(.*?)\n```", ctx, re.S).group(1)
+    fns = play_tools(json.loads(re.search(r"## The tools.*?\n+```json\n(.*?)\n```", ctx, re.S).group(1)))
+    only = os.environ.get("WA_QA_ONLY", "").split(",") if os.environ.get("WA_QA_ONLY") else None
+    os.makedirs(os.path.join(run, "transcripts"), exist_ok=True)
+    spent = [0.0]
+
+    for s in deck["scenarios"]:
+        if only and s["id"] not in only:
+            continue
+        ps = pdeck[s["id"]]
+        usage, state, memory, turns = [], {"opened": {}}, [], []
+        card = json.dumps({k: s["resident"][k] for k in ("persona", "knows", "wants", "tendencies")},
+                          ensure_ascii=False, indent=1)
+        resident_msgs = [{"role": "system", "content": RESIDENT_PROMPT % (" / ".join(TAPS.values()), card)}]
+
+        def bill(who, u):
+            c = float(u.get("cost") or 0)
+            spent[0] += c
+            usage.append({"who": who, "in": u.get("prompt_tokens", 0), "out": u.get("completion_tokens", 0),
+                          "cached": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0),
+                          "reasoning": (u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0),
+                          "cost": c})
+            if spent[0] > PLAY_CAP:
+                save()
+                sys.exit("stopped: spent $%.4f, over the $%.2f cap" % (spent[0], PLAY_CAP))
+
+        def save(ended=""):
+            write(os.path.join(run, "transcripts", "%s_A.json" % s["id"]), json.dumps(
+                {"scenario": s["id"], "variant": "A", "played_by": {"bot": BOT, "resident": RESIDENT_MODEL},
+                 "played_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+                 "ended": ended, "turns": turns, "usage": usage}, ensure_ascii=False, indent=1))
+
+        def answer(inject):
+            """One run of Answer the resident: memory + this input, tools until it writes."""
+            msgs = [{"role": "system", "content": system}]
+            for i_, o_ in memory[-MEMORY_PAIRS:]:
+                msgs += [{"role": "user", "content": i_}, {"role": "assistant", "content": o_}]
+            msgs.append({"role": "user", "content": inject})
+            calls = []
+            for _ in range(10):
+                msg, u = openrouter(key, dict(BOT, messages=msgs, tools=fns))
+                bill("answer", u)
+                tc = msg.get("tool_calls") or []
+                msgs.append({k: v for k, v in msg.items() if k in ("role", "content", "tool_calls")})
+                if not tc:
+                    break
+                for c in tc:
+                    try:
+                        a = json.loads(c["function"].get("arguments") or "{}")
+                    except ValueError:
+                        a = {"_raw": c["function"].get("arguments")}
+                    res = wa_stand_in(c["function"]["name"], a, s, deck["defaults"], state)
+                    calls.append({"name": c["function"]["name"], "arguments": a, "result": res})
+                    msgs.append({"role": "tool", "tool_call_id": c["id"], "content": json.dumps(res, ensure_ascii=False)})
+            out = (msg.get("content") or "").strip()
+            memory.append((inject, out))
+            return out, calls
+
+        def model(sys_text, user_text, who):
+            msg, u = openrouter(key, dict(BOT, messages=[{"role": "system", "content": sys_text},
+                                                          {"role": "user", "content": user_text}]))
+            bill(who, u)
+            return (msg.get("content") or "").strip()
+
+        def message(kind, text, first, after_menu):
+            """One resident message through the live code and the models; returns the handset."""
+            t = {"scenario": s["id"], "kind": kind, "text": text, "first": first, "after_menu": after_menu}
+            r = live_turn(code, ps, t)
+            if r["menu"]:
+                turns.append({"resident": text, "kind": "menu"})
+                return [r["system_sends"] + "  [buttons: " + " / ".join(TAPS.values()) + "]"], True
+            ack = model(ack_system, r["ack_model_reads"], "ack") or "NONE"
+            t["ack"] = ack
+            r = live_turn(code, ps, t)
+            out, calls = answer(r["answering_model_reads"])
+            rec = {"resident": text, "kind": kind, "input": r["answering_model_reads"], "ack": ack,
+                   "tool_calls": calls, "output": out}
+            chk = live_turn(code, ps, dict(t, tool_calls=calls, output=out))
+            if chk["guards_failed"]:
+                note, inject2 = chk["retry"]["note"], chk["retry"]["answering_model_reads"]
+                out2, calls2 = answer(inject2)
+                rec.update(first_output=out, first_failed=chk["guards_failed"], first_tool_calls=calls,
+                           retry_note=note, tool_calls=calls2, output=out2)
+                chk = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2, output=out2))
+                if chk["guards_failed"]:
+                    sa = chk["say_again"]
+                    said = model(sa["system"], sa["reads"], "say_again")
+                    rec["say_again_output"] = said
+                    chk2 = live_turn(code, ps, dict(t, run_index=1, retry_note=note, tool_calls=calls2,
+                                                    output=out2, say_again_output=said))["say_again"]
+                    # Second try usable? has nothing on its false branch: when Say it
+                    # again's text fails too, the resident gets nothing (but an ack).
+                    hs = ([chk2["ack_went_first"]] if chk2.get("ack_went_first") else []) + \
+                         ([chk2["sent"]] if chk2.get("sent") else [])
+                    rec["second_try_failed"] = chk2.get("failed") or []
+                    rec["handset"] = hs
+                    turns.append(rec)
+                    return (hs or ["(no reply came)"]), False
+            hs = chk.get("handset") or []
+            rec["handset"] = hs
+            turns.append(rec)
+            view = list(hs)
+            if chk.get("buttons") and view:
+                view[-1] += "  [buttons: " + " / ".join(TAPS.values()) + "]"
+            return view, False
+
+        print("\n=== %s (%s, %s)" % (s["id"], s["button"], s["time"]))
+        first, after_menu, ended = True, False, "8 messages after the tap"
+        script = s["resident"]["script"]
+        for line in script:
+            kind = line.get("kind", "text")
+            hs, menu = message(kind, line["say"], first, after_menu)
+            first, after_menu = False, menu
+            resident_msgs += [{"role": "assistant", "content": json.dumps({"message": line["say"] if kind == "text" else "",
+                                                                             "tap": line["say"] if kind == "tap" else "", "done": False}, ensure_ascii=False)},
+                              {"role": "user", "content": "\n\n".join(hs)}]
+            print("  resident: %s%s" % ("[tap] " if kind == "tap" else "", line["say"]))
+            for h in hs:
+                print("  handset : %s" % C.mask(h.replace("\n", " / "), 600))
+        for _ in range(8):
+            msg, u = openrouter(key, {"model": RESIDENT_MODEL, "messages": resident_msgs, "temperature": 0.7,
+                                      "response_format": {"type": "json_object"}})
+            bill("resident", u)
+            try:
+                said = json.loads(msg.get("content") or "{}")
+            except ValueError:
+                said = {"message": msg.get("content") or "", "done": False}
+            resident_msgs.append({"role": "assistant", "content": msg.get("content") or ""})
+            tap = str(said.get("tap") or "").strip()
+            text = tap if tap in TAPS.values() else str(said.get("message") or "").strip()
+            if not text:
+                ended = "the resident stopped writing"
+                break
+            kind = "tap" if tap in TAPS.values() else "text"
+            print("  resident: %s%s" % ("[tap] " if kind == "tap" else "", text))
+            hs, after_menu = message(kind, text, False, after_menu)
+            if said.get("done") and turns and turns[-1].get("kind") != "menu":
+                turns[-1]["closing"] = True
+            for h in hs:
+                print("  handset : %s" % C.mask(h.replace("\n", " / "), 600))
+            resident_msgs.append({"role": "user", "content": "\n\n".join(hs)})
+            if said.get("done"):
+                ended = "the resident's last message"
+                break
+        cost = sum(x["cost"] for x in usage)
+        print("  -- %s; $%.4f (bot $%.4f, resident $%.4f)" % (ended, cost,
+              sum(x["cost"] for x in usage if x["who"] != "resident"), sum(x["cost"] for x in usage if x["who"] == "resident")))
+        save(ended)
+    print("\nspent $%.4f in all (OpenRouter's own per-request cost)" % spent[0])
+
+
 def main():
     argv = sys.argv[1:]
     if not argv or "--run" not in argv:
@@ -1087,6 +1394,8 @@ def main():
         judge(run)
     elif cmd == "report":
         report(run)
+    elif cmd == "play":
+        play(run)
     else:
         sys.exit(__doc__)
 

@@ -2632,7 +2632,14 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - It said it was "a real person, not a computer" when the caller asked.
   - It spoke in 65-word paragraphs, where the Claude-played turns averaged about 20 words.
 - **What the Claude-played run showed that the real run did not:** its own slips ("מעצבן", "בקרוב").
-- **Rule:** use Claude-played runs to find gaps in the prompt and the logic, and the real model, with the owner's go, to find how this model actually behaves. `voice_qa.py play` runs the real model; a call costs 2 to 4.5 cents. **A ticket's status and urgency are the team's (owner, same message).**
+- **Rule:** use Claude-played runs to find gaps in the prompt and the logic, and the real model, with the owner's go, to find how this model actually behaves. `voice_qa.py play` runs the real model; a call costs 2 to 4.5 cents.
+- **The same held on WhatsApp (5 Oct, 9 conversations, $0.22).**
+  - **Blocked drafts:** the bot's own checks blocked 14 of Gemini's 59 drafts, against 2 of 62 when Claude played it.
+  - **What only Gemini did:**
+    - It called itself "a large language model, trained by Google".
+    - Say it again wrote "ticket 123456".
+  - **Cost:** `wa_qa.py play` costs about 2 cents a conversation.
+  - **Say it again's output is not proof:** its "don't invent a ticket number" line did not hold, and Second try usable? passed the made-up number. A failed Second try usable? sends nothing at all. **A ticket's status and urgency are the team's (owner, same message).**
 The bot cannot change either, by design. A resident's request to mark a ticket urgent goes to the
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.

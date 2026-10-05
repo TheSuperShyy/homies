@@ -305,6 +305,15 @@ its stated time.
     - "anything else?" after an emergency;
     - "בקרוב" on a debt hand-off;
     - the proof-by-email step missed on a cash dispute.
+- **DONE 5 Oct, owner's go: 9 WhatsApp conversations on Gemini itself through OpenRouter, $0.22.** `docs/assistant/transcripts/2026-10-05-whatsapp-menu-buttons-openrouter.md`. Run: `scripts/wa_qa.py play --deck scripts/wa_qa_menu_buttons.json` (spends; $1 stop; scratchpad `wa_or_05oct`). Wallet $23.66 -> $23.45. Nothing written or sent.
+  - **For the owner, proposals only, most serious first:**
+    1. Say it again invented "ticket 123456" twice, against its own prompt. One went out, because Second try usable? passed it.
+    2. The other was blocked, and that turn sends nothing (Second try usable? has no false branch).
+    3. "I'm a large language model, trained by Google" when asked "person or computer?". Pairs with the voice agent's "a real person".
+    4. The promise filter left only "anything else?" after cutting an honest "I don't know when".
+    5. Gas: no ticket, and "I can't give safety instructions".
+    6. 7 of 14 Try again passes were identical to the blocked draft.
+    7. Echoes, "מבאס", off-list emoji, and "anything else?" on 37 of 59 replies.
 - **DONE 5 Oct, on the owner's "ok go": the same 6 voice calls on the real models through OpenRouter, $0.17.** `docs/assistant/transcripts/2026-10-05-voice-agents-6-calls-openrouter.md`. Run: `scripts/voice_qa.py play` (spends; $1 stop; scratchpad `voice_or_05oct`). Wallet $23.83 -> $23.66. Nothing written or dialled.
   - **For the owner, proposals only:**
     - Incoming: said it is "a real person, not a computer" when asked. This is the biggest finding. What Michael should say is the owner's call.
