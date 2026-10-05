@@ -79,6 +79,26 @@ def norm(s):
     return " ".join(str(s or "").split())
 
 
+def private(s):
+    """No payment link and no phone number leaves this script (6 Oct): the 6 Oct
+    chats are the first with links in them, and the test tenant's number is the
+    owner's own. A player who typed the number wrote {PHONE} (wa_qa.py live)."""
+    s = re.sub(r"https?://\S+", "[link hidden]", str(s)).replace("{PHONE}", "[phone hidden]")
+    s = re.sub(r"\+\d{1,3}(?:[\s\-]?\d{2,4}){2,5}", "[phone hidden]", s)
+    s = re.sub(r"\+?\d{9,15}", "[phone hidden]", s)
+    return re.sub(r"(?:\+972[\s\-]?|\b0)(?:[23489]|[57]\d)[\s\-]?\d{3}[\s\-]?\d{4}\b", "[phone hidden]", s)
+
+
+def scrub(o):
+    if isinstance(o, str):
+        return private(o)
+    if isinstance(o, list):
+        return [scrub(x) for x in o]
+    if isinstance(o, dict):
+        return {k: scrub(v) for k, v in o.items()}
+    return o
+
+
 def utc(ts, fmt="%H:%M"):
     return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc).strftime(fmt)
 
@@ -109,9 +129,9 @@ def note_he(text):
     return re.sub(r"\[(@[^\]]+)\]\(mention://[^)]*\)", r"\1", str(text or "")).strip()
 
 
-def assemble(run, msgs, day, en):
+def assemble(run, msgs, day, en, since=0):
     """The chats: run turns with the inbox's replies and notes attached."""
-    today = [m for m in msgs if utc(m["created_at"], "%Y-%m-%d") == day]
+    today = [m for m in msgs if utc(m["created_at"], "%Y-%m-%d") == day and m["created_at"] >= since]
     outs = [m for m in today if m.get("message_type") == 1 and not m.get("private")]
     notes = [m for m in today if m.get("private")]
     used, chats, misses = set(), [], 0
@@ -122,7 +142,7 @@ def assemble(run, msgs, day, en):
             got = []
             for h in x.get("handset") or []:
                 cand = [o for o in outs if o["id"] not in used and norm(o["content"]) == norm(h)]
-                if i == 0 and cand:
+                if x.get("kind") == "menu" and cand:
                     # The menu is the same text every time: take the last one
                     # before this chat's next reply, not the first of the day.
                     nxt = t["turns"][1]["handset"][0] if len(t["turns"]) > 1 and t["turns"][1].get("handset") else None
@@ -191,8 +211,9 @@ def render(chats, own, en, meta):
     para("How these chats happened", en["how"])
     para("What we found", en["findings"], ordered=True)
     head = ["Chat", "Button", "The situation", "Did he get what he came for?"]
-    md += ["## The nine chats at a glance", "", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
-    ht += ["<h2>The nine chats at a glance</h2>", '<table border="1" cellpadding="6" style="border-collapse:collapse">',
+    glance = en.get("glance", "The nine chats at a glance")
+    md += ["## " + glance, "", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    ht += ["<h2>%s</h2>" % esc(glance), '<table border="1" cellpadding="6" style="border-collapse:collapse">',
            "<tr>" + "".join("<th>%s</th>" % h for h in head) + "</tr>"]
     for k, c in enumerate(chats):
         e = en["chats"][c["id"]]
@@ -227,12 +248,16 @@ def render(chats, own, en, meta):
                 aside("Behind the scenes: " + line)
             for n in tr["notes"]:
                 row("Note to the team (inbox only)", note_en(n, tr, en), note_he(n.get("content")), shade=True)
-            for b in tr["bot"]:
+            for j, b in enumerate(tr["bot"]):
                 he = b["text"] + ((" " + b["buttons"]) if b["buttons"] else "")
-                eng = e.get("bot_en", {}).get(k_) or fixed.get(b["text"], "")
+                # A turn that sent two messages has its English as a list (6 Oct).
+                eng = e.get("bot_en", {}).get(k_)
+                if isinstance(eng, list):
+                    eng = eng[j] if j < len(eng) else ""
+                eng = eng or fixed.get(b["text"], "")
                 if b["buttons"]:
                     eng = (eng + " " + fixed.get("_buttons_en", "")).strip()
-                row("Bot (fixed menu)" if tr["i"] == 0 else "Michael", eng, he)
+                row("Bot (fixed menu)" if tr["kind"] == "menu" else "Michael", eng, he)
         aside(e["ended_en"])
         md += ["**What this chat shows:**", ""] + ["- " + x for x in e["shows"]] + [""]
         ht += ["</table>", "<p><b>What this chat shows:</b></p>", "<ul>"] + ["<li>%s</li>" % esc(x) for x in e["shows"]] + ["</ul>"]
@@ -270,10 +295,13 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--conversation", type=int, default=1)
     ap.add_argument("--date", default="2026-10-05")
+    ap.add_argument("--since", default="00:00", help="HH:MM UTC on --date: the run's start, when the day held others")
     a = ap.parse_args()
     en = load(a.en)
     msgs = inbox(a.conversation)
-    chats, own, misses, n_notes = assemble(a.run, msgs, a.date, en)
+    since = datetime.datetime.strptime(a.date + " " + a.since, "%Y-%m-%d %H:%M").replace(
+        tzinfo=datetime.timezone.utc).timestamp()
+    chats, own, misses, n_notes = assemble(a.run, msgs, a.date, en, since)
     replies = sum(len(tr["bot"]) for c in chats for tr in c["turns"])
     attached = sum(len(tr["notes"]) for c in chats for tr in c["turns"])
     meta = ("Read from the inbox on %s UTC: conversation %d, %d messages on %s; the bot's %d replies in the chats "
@@ -282,9 +310,9 @@ def main():
                sum(1 for m in msgs if utc(m["created_at"], "%Y-%m-%d") == a.date), a.date, replies, misses,
                attached, n_notes))
     md, html = render(chats, own, en, meta)
-    write(a.out + ".md", md)
-    write(a.out + ".html", html)
-    write(a.out + ".json", json.dumps({"source": meta, "en": en, "chats": chats, "own": own},
+    write(a.out + ".md", private(md))
+    write(a.out + ".html", private(html))
+    write(a.out + ".json", json.dumps(scrub({"source": meta, "en": en, "chats": chats, "own": own}),
                                       ensure_ascii=False, indent=1))
     print(meta)
     print("wrote %s.md, .html and .json" % a.out)

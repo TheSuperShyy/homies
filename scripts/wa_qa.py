@@ -1689,12 +1689,16 @@ def live(run):
         sys.exit("live sends a text or a tap, never an empty message")
     if kind == "tap" and text not in TAPS.values():
         sys.exit("a tap's text must be one of: " + " / ".join(TAPS.values()))
+    # 6 Oct: the balance check wants the number typed. A player writes {PHONE}
+    # where it goes; the bot gets the real one, and neither the player's prompt
+    # nor the record ever holds it.
+    sent = text.replace("{PHONE}", str(cfg["phone"]))
     E = NW.env()
     hook = (E["N8N_BASE_URL"].strip().rstrip("/") + "/webhook/homies-whatsapp?s="
             + urllib.parse.quote(E["N8N_WEBHOOK_SECRET"].strip()))
     before = int(NW.api("GET", "/api/v1/executions?workflowId=%s&limit=1" % LIVE_WF)["data"][0]["id"])
     mid = 9100000000 + int(time.time() * 1000) % 10**9
-    env = {"event": "message_created", "id": mid, "content": text, "message_type": "incoming",
+    env = {"event": "message_created", "id": mid, "content": sent, "message_type": "incoming",
            "private": False, "content_type": "text", "content_attributes": {},
            "sender": {"id": cfg["contact_id"], "type": "contact", "name": cfg["name"], "phone_number": cfg["phone"]},
            "conversation": {"id": cfg["conv_id"], "status": "open", "inbox_id": cfg["inbox_id"], "labels": [],
@@ -1707,10 +1711,13 @@ def live(run):
     # The run that took this message is the one whose webhook body carries its
     # id. Runs that finish and are not it (the bot's own outgoing echoes) are
     # passed over once; a run still going is looked at again.
+    # 6 Oct: 100, not 25. The owner opening WhatsApp mid-test sent ~30 read
+    # receipts in two seconds, each its own run, and they pushed the reply's run
+    # (84573, answered in 18 s) out of a 25-run window: the player saw nothing.
     mine, done, deadline = None, set(), time.time() + 240
     while time.time() < deadline and mine is None:
         time.sleep(4)
-        for e in sorted(NW.api("GET", "/api/v1/executions?workflowId=%s&limit=25" % LIVE_WF)["data"],
+        for e in sorted(NW.api("GET", "/api/v1/executions?workflowId=%s&limit=100" % LIVE_WF)["data"],
                         key=lambda e: int(e["id"])):
             if int(e["id"]) <= before or e["id"] in done:
                 continue

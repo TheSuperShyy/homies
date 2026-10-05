@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: six live chats, six kinds of tenant ($0.22, nothing deleted)
+
+The owner: *"run the test on the chatbot in whatsapp in different scenarios i want 1 scenario each to show on the different menu buttons also i want to show how the chatbot handles different kinds of tenants and scenarios"*. (Just before, he asked for the rep hello to say "how is your day going?", then *"ok nvm"*: nothing was changed.)
+- **How:** `wa_qa.py live` as Assaf Clix, 18:18-18:46 UTC, six Claude players one after another: open a ticket (friendly, the intercom), status (angry, the mould), talk to a rep (suspicious, the balance), and typed in: two things at once (the fee and a mailbox lock), rushed with typos (the parking light), panicked (water on the stairwell light).
+- **The document:** `docs/assistant/transcripts/2026-10-05-whatsapp-6-tenants.{md,html,json}`. All 42 replies matched the inbox word for word.
+- **Cost:** $0.22 (the key's remaining cap from $13.56 to $13.34; the wallet from $20.70 to $20.48).
+- **Outcome:** 3 of 6 got what they came for (intercom ticket 255-1347-26, the fee and the payment link, parking ticket 255-1348-26), 1 part (mould ticket 255-1341-26 found, no date by design), 2 not (no balance amount; no emergency ticket).
+- **Found:**
+  - **The emergency was swallowed by the duplicate guard.** `open_request` for the leak came back `{reference: 255-1347-26, duplicate: true}`: the intercom ticket, also `electrical`, common area, 25 minutes earlier. The database now shows 255-1347-26 at normal urgency with the leak appended. Michael called it "the emergency ticket".
+  - **No alert went out:** `Hand to a person` ran twice (84527, 84685) with `page: false`, after hours. By the 3 Sep design the note posts at 09:00. Michael said "our team is already on its way" and gave safety advice; the promise filter missed both "on the way" phrasings.
+  - **The balance:** `get_balance` found 2,000 ₪ three times; each first draft carried a home-made link, `links` sent it back, and the second pass sent a real link without the amount.
+  - **"Anything else?"** on 5 replies in a row (mould) and 3 (intercom). The automatic watch flagged 2 of 38 turns, both style; it looks for none of the above.
+- **Harness fixes:**
+  - `wa_qa.py live` polls 100 runs, not 25. Chat 3's reply (run 84573, 18 s) was hidden behind ~30 read receipts, so the player wrote "נו?" to a reply he never saw; the record was filled from the run.
+  - `{PHONE}` in a player's text.
+  - `wa_chats_doc.py`: `--since`, links and phone numbers hidden, typed-in chats labelled, two-message turns translated per message.
+
 ### WhatsApp bot: the nine live chats of 5 Oct as a Google Doc, taken from the inbox (no new test, $0)
 
 The owner, after the two voice documents: *"ok now do one for the chatbot only get the chats you have all the api key u need"*.

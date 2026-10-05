@@ -363,6 +363,14 @@ its stated time.
     - **Undo:** `hayday.py --restore` (`docs/handover/n8n-whatsapp-live-05oct-before-hayday.json`, live at 17:01 with the guard fix).
       - For the guard, revert the HAY_ALT line and run `retry.py --apply`.
       - NOT `retry.py --restore`: its snapshot is from September and would roll back everything since.
+  - **DONE 5 Oct 18:18-18:46 UTC, owner's ask: six live chats as Assaf, one per button plus three typed in, six kinds of tenant ($0.22).** `docs/assistant/transcripts/2026-10-05-whatsapp-6-tenants.{md,html,json}` (the .html is for Google Docs). 3 of 6 got what they came for, 1 part, 2 not. **Open, each a fix for the owner's go:**
+    1. **The duplicate guard swallowed an emergency.** `open_request`'s 30-minute guard (building + type + unit) returned the intercom ticket 255-1347-26 (`electrical`, normal) for a leak on a light (also `electrical`): no emergency ticket exists, the leak is a line on the intercom ticket, and Michael read the old number out as "the emergency ticket". An emergency should never dedupe into a non-emergency, and `duplicate: true` should never be read as "opened".
+    2. **After hours nobody is alerted, even for an emergency** (by the 3 Sep design: `page` false, label `after-hours`, the ticker posts at 09:00). Michael still said "our team is already on its way". The promise filter misses "הצוות שלנו כבר בדרך" and "יגיעו הכי מהר שאפשר" (it wants the phrases adjacent). Safety advice was given too, against the owner's danger rule.
+    3. **The balance amount never reached the tenant.** The first draft had 2,000 ₪ plus a link the model wrote itself; `links` sent it back; the second pass fetched a real link and dropped the amount (three times, runs 84573, 84615, 84624).
+    4. **"Anything else?" still ends most replies** (5 in a row in the mould chat).
+    - **Morning:** the held urgent note on conversation 1 posts at 09:00 Israel time and escalates if unanswered (as of 3 Sep only the owner's login is on a team).
+    - **Kept, never delete:** tickets 255-1347-26 (intercom, with the leak appended) and 255-1348-26 (parking light).
+    - **The harness:** `wa_qa.py live` takes `{PHONE}` in a player's text (the real number goes to the bot only) and polls the last 100 runs (25 missed a reply behind ~30 read receipts). `wa_chats_doc.py` hides links and phone numbers, takes `--since`, and labels typed-in chats.
   - **Next, only on the owner's go:** the 9-card retest, about $0.22 offline and $0.35 live. The pass bar is in the plan: at least 7 of 9, no untrue ticket claim, no silent turn. Fix 4 carries the decisions above into `prompt.md` (and `MEMORY_EPOCH` 73 to 74).
 - **DONE 5 Oct, owner's go: a live test of the WhatsApp bot as Assaf Clix, בר כוכבא 23 flat 2. Nine conversations, $0.35.** `docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md`, n8n runs 83285 to 83924.
   - **Kept, by the owner's word (do not delete):**

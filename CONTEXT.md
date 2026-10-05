@@ -2711,6 +2711,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - "היי", the name, and how he is today, warmly, as its one question.
     - Only that tap. The other two buttons and anything typed go straight to the matter.
     - The `rephay` guard knows the evening form "איך עבר עליך היום?" (HAY_ALT in `n8n_whatsapp_retry.py`, 17:01 UTC). A how-are-you form missing there sends a right reply back once; add the form there and a case.
+- **A live test never puts the owner's number in a player's prompt or a document (5 Oct evening).** A player who must type it writes `{PHONE}`; `wa_qa.py live` swaps in the real one for the bot only, and `wa_chats_doc.py` hides every link and phone number in what it writes. Count-check a document for the number's digits before committing it; never print them.
+- **A live test after office hours tests the bot, not the alerts.** Handovers then hold their note until 09:00 by design, so an evening emergency chat pages nobody and leaves a note that posts in the morning.
 - **Send keeps only six emoji (5 Oct, `n8n_whatsapp_emoji.py`; LIVE 16:31 UTC):** 🙂 😊 🙏 👍 💪 🤝, in model replies only (the menu's 👋 is the owner's). It is the last step before Send returns, and it only removes.
 - **What a status lookup finds (5 Oct, fix 3, debt-tools v116, LIVE 16:09 UTC).** `get_request_status` reads 20 rows for a flat and 30 for a building before the category split, and leaves payment records out unless `payment` is asked for.
   - **In the caller's own flat, a category that matches nothing is the model's guess, not "none".** The flat's requests come back, flagged `type_unmatched`, and the model finds the one meant by its description. The live mould lookup sent `other` for a ticket filed `cleaning`.
