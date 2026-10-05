@@ -297,7 +297,14 @@ its stated time.
   - **Dashboard reaches Vercel only on the owner's say** (a single cherry-pick to `main`).
 - **(Done, LIVE 4 Oct 08:35 UTC.) PAUSED 2 Oct, owner: the incoming-call agent should be "talkative, friendly and service oriented".** He raised it, then said *"ok pause"* and asked about the voice instead. Nothing changed in `demo-inbound.md`; the turn-length bullet ("משפט אחד או שניים קצרים") is the first thing to look at when he picks it up.
 - **OPEN 2 Oct: the WhatsApp bot uses more emoji since the singular (1 Oct 13:02).** 8 of its last 14 replies (57%; the rule asks about 2 in 5), 5 right after another, and 2 off-list sad faces (😕, 😔). The emoji paragraph did not change. Offered a Send filter (only 🙂 😊 🙏 👍 💪 🤝, none right after one) or a prompt line; waiting on the owner.
-- **RUNNING 5 Oct, read-only: both voice agents, 3 Claude-played calls each, plus the OpenRouter cost question.** Harness `scripts/voice_qa.py` (bundle and cost) with `scripts/voice_qa_scenarios.json`; the run is in scratchpad `voice_qa_05oct`. Live models: incoming gpt-4.1, debt gpt-5.6-sol (not gpt-4.1 as `prompt_probe.py` says; its cost line uses mini prices). Nothing was dialled or spent.
+- **DONE 5 Oct, read-only: both voice agents, 3 Claude-played calls each, plus the OpenRouter cost.** `docs/assistant/transcripts/2026-10-05-voice-agents-6-calls.md`. Harness: `scripts/voice_qa.py` (bundle and cost) with `scripts/voice_qa_scenarios.json`. Live models: incoming gpt-4.1, debt gpt-5.6-sol. Nothing was dialled or spent.
+  - **Cost of the 6 calls on OpenRouter:** $0.41 at list price, about $0.16 with prompt caching, +$0.01 for a model caller.
+  - **For the owner, proposals only:**
+    - the calm-word sentence on the incoming voice prompt too (it said "ברור שזה מעצבן");
+    - "that I can't tell you" to "should I call the fire brigade?" (the 16 Sep no-advice rule);
+    - "anything else?" after an emergency;
+    - "בקרוב" on a debt hand-off;
+    - the proof-by-email step missed on a cash dispute.
 - **LIVE 4 Oct 14:53 UTC, on the owner's "live it": the calm-word prompt change.** The owner had asked "can we edit the ugh how annoying remarks it does not fit the chatbot at all".
   - **What is live:** prompt 65c56f9d9c40 and memory epoch 73 (`={{ $json.to }}-73`; every conversation's memory restarted at 14:53).
   - **What the prompt now says:** a fault gets "תגובה קצרה ואכפתית של בן אדם לדבר עצמו"; the example list is "אוקיי", "אין בעיה", "אוי, לא נעים"; and after it, "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן", גם כשהוא כועס."

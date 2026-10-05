@@ -11,7 +11,25 @@ conversation that produced it.
 
 ## 2026-10-05
 
-### Voice agents: 3 Claude-played calls each, and what an OpenRouter run would cost (running)
+### Voice agents: 6 Claude-played calls done, and the OpenRouter cost answered
+
+Every call is in `docs/assistant/transcripts/2026-10-05-voice-agents-6-calls.md`, in Hebrew with English.
+- **Incoming:** the lift (team note before the address, an emergency ticket, details added), the
+  window status (read out in words, nothing promised, a manager request to the team), and pay by
+  card (the card digits stopped, a payment ticket and a team note).
+- **Debt:** a link sent, a cash dispute logged and handed on, and a hardship case handed on kindly.
+- **Found:**
+  - "ברור שזה מעצבן" on voice too (the calm-word fix was WhatsApp only);
+  - "את זה אני לא יכול להגיד לְךָ" to "should I call the fire brigade?";
+  - "anything else?" after an emergency;
+  - "יחזור אלייך בקרוב" (soon);
+  - the dispute call never offered the proof-by-email step.
+- **Cost, from `voice_qa.py cost`:** 42 model calls, 198k tokens in and 1.9k out. On OpenRouter that
+  is $0.41 at list price, about $0.16 with prompt caching, and +$0.01 for a gpt-4.1-mini caller.
+  The 24 WhatsApp test chats of 4 Oct would have been about $0.20 to $0.90 on Gemini 2.5 Flash.
+- **`prompt_probe.py`'s cost line** now uses gpt-4.1's $2/$8 (it said $0.40/$1.60).
+
+### Voice agents: 3 Claude-played calls each, and what an OpenRouter run would cost (started)
 
 Owner: *"test the voice agent both of them in 3 scenarios as well like the one we did in the chatbot,
 i want to know if you use openroutercredits to simulae the llm how much will it cost"*.

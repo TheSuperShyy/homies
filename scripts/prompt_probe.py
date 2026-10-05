@@ -570,11 +570,12 @@ def main():
             say("  agent   : %s" % reply.replace("\n", " / "))
         say()
 
-    # gpt-4.1-mini list price. Printed because the prompt is re-sent every turn,
-    # which is the whole reason prompt length is a cost question and not only a
-    # style one.
-    say("tokens: %d in, %d out  (about $%.3f at 0.40/1.60 per million)"
-        % (tin, tout, tin / 1e6 * 0.40 + tout / 1e6 * 1.60))
+    # gpt-4.1's OpenRouter list price, the MODEL above. Printed because the prompt
+    # is re-sent every turn, which is the whole reason prompt length is a cost
+    # question and not only a style one. Until 5 Oct this line used gpt-4.1-mini's
+    # 0.40/1.60 and read five times low; scripts/voice_qa.py cost reads the live list.
+    say("tokens: %d in, %d out  (about $%.3f at 2.00/8.00 per million, before prompt caching)"
+        % (tin, tout, tin / 1e6 * 2.00 + tout / 1e6 * 8.00))
     if args.save:
         import datetime
         stamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
