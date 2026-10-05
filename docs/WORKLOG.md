@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### WhatsApp bot: the nine live chats of 5 Oct as a Google Doc, taken from the inbox (no new test, $0)
+
+The owner, after the two voice documents: *"ok now do one for the chatbot only get the chats you have all the api key u need"*.
+- **Done:**
+  - **The documents:** `docs/assistant/transcripts/2026-10-05-whatsapp-9-chats.html` (for Google Docs), with the `.md` and the `.json` record.
+  - **The builder:** `scripts/wa_chats_doc.py`. It reads the Chatwoot conversation read-only.
+- **Read:**
+  - **The inbox:** 5 WhatsApp conversations, 1,665 messages since 21 Aug. Your +63 chat holds 1,206 of them, and 158 are from 5 Oct.
+  - **Chosen:** the 9 live test chats of 5 Oct, 11:57 to 12:41 UTC. They are the current bot, with a different tenant situation in each.
+  - **Also included:** the owner's own two checks that day.
+- **Found:**
+  - **Injected messages are not stored in Chatwoot.** Only the bot's side and its notes are in the inbox, so the tenant's side comes from the run's record. That record was in another session's scratchpad (`2969b7fe…/wa_live_assaf_05oct`) and is now copied into the `.json`.
+  - **The match:** 81 of 81 bot replies matched word for word.
+  - **The notes:** 19 in all. 8 came from the bot's tell-the-team step and 11 were written automatically after "the team knows".
+  - **Three tell-the-team calls left no note in the inbox:**
+    - the committee minutes (chat 7);
+    - "call me back with a time" (chat 5);
+    - "I want a person" (chat 5).
+
+    Each came within a minute of another note, while the handover label was still on. That is observed, not checked in the workflow, and it predates the five fixes.
+  - **Fix 3 (v116) changed `get_request_status`.** `voice_qa.py`'s copy of it (`Bk23.status`) now mirrors it. The two voice documents of 5 Oct ran on v112's lookup.
+- **Open:**
+  - the retest of these chats on the fixed bot (the owner's go);
+  - whether a second note inside a minute should be written.
+
 ### WhatsApp bot: the representative asks how you are today (LIVE 17:02 UTC)
 
 The owner, shown the Claude-played rep-tap hello ("היי, כאן מיכאל מצוות השירות של הומי'ז 😊 מה שלומך?"): *"i want the intro to be more friendly like how are you today?"*. He meant the one *"after the menu greeting"*. That is his 4 Oct wording, *"hi this is michael from homies how are you doing today?"*. The 4 Oct note had kept "today" for when he asked.

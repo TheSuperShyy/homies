@@ -457,6 +457,15 @@ its stated time.
     7. "יום טוב, ולהתראות" is fixed even at 19:20.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
+- **DONE 5 Oct (UTC), on the owner's "now do one for the chatbot only get the chats": the nine live WhatsApp chats of 5 Oct, from the inbox.** For the Google Doc: `docs/assistant/transcripts/2026-10-05-whatsapp-9-chats.html` (`.md` and `.json` beside it).
+  - **Rebuild:** `python scripts/wa_chats_doc.py --run <the wa_qa live run dir> --en <english json> --out PREFIX`. Chatwoot is read live (GET only). The `.json` holds the chats, the English and the run's record.
+  - **Injected test messages are NOT in Chatwoot.** `wa_qa.py live` hands them to the webhook, the bot answers, and the inbox keeps only the bot's side and its notes. Any document of a live run takes the tenant's side from the run's `transcripts/*_A.json`.
+  - **These chats predate all five fixes and the new rep greeting** (15:03 to 17:02 UTC). The document says so; the retest waits for the owner's go.
+  - **Seen in the inbox, not yet explained: three tell-the-team calls left no note.**
+    - **Which:** chat 7's committee minutes, and chat 5's "call me back with a time" and "I want a person".
+    - **Pattern:** each came within a minute of another note, while the `handover` label was still on.
+    - **Before changing anything:** check `Tell the team` in the workflow for a skip on an open handover.
+  - **`voice_qa.py` `Bk23.status` now mirrors debt-tools v116.** That means 20/30 rows read, payment rows left out, and the flat's own rows when the category matches none. The 5 Oct voice documents ran on v112's lookup and stand as of then.
 - **LIVE 4 Oct 14:53 UTC, on the owner's "live it": the calm-word prompt change.** The owner had asked "can we edit the ugh how annoying remarks it does not fit the chatbot at all".
   - **What is live:** prompt 65c56f9d9c40 and memory epoch 73 (`={{ $json.to }}-73`; every conversation's memory restarted at 14:53).
   - **What the prompt now says:** a fault gets "תגובה קצרה ואכפתית של בן אדם לדבר עצמו"; the example list is "אוקיי", "אין בעיה", "אוי, לא נעים"; and after it, "היא אכפתיות כלפיו ולא עצבים: לא "אוף" ולא "מעצבן", גם כשהוא כועס."

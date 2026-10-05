@@ -2659,6 +2659,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **The call details:** composed as the dashboard composes them (`call.ts` and `v_debt_call_queue_person`, in the format read live). The residents are invented, at the test building's real fee.
   - **The tools:** answered by `voice_qa.debt_tool` in the deployed shapes.
   - **No token cap:** a thinking model (gpt-5.6-sol) is run without the 250 cap, because its thinking counts against a cap and how Vapi applies one to it is unknown. The tokens each turn used are reported instead.
+- **A document of the chatbot's real chats comes from the inbox, but not only from it (5 Oct, `wa_chats_doc.py`).**
+  - **From Chatwoot:** the bot's replies and its team notes, read through the API (GET only), exactly as the phone and the team saw them.
+  - **From the run's record:** the tenant's side of a `wa_qa.py live` test. Those messages are injected into the webhook, so the bot answers them but Chatwoot never stores them.
+  - **Check:** every reply is matched word for word, and a miss is counted, not hidden.
 - **The incoming agent runs at Vapi's default of 250 tokens a turn (checked 5 Oct).** The assistant sets no `maxTokens`, and Vapi's API spec gives 250 as the default. A test that leaves the limit out tests a different agent. When one turn holds a long spoken passage and a tool call, the call's arguments get cut, and the note breaks.
 - **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
   - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.

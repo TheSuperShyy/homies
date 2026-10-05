@@ -634,8 +634,11 @@ class Bk23:
         return any(w.lower() in text for w in self.words.get(kind, [kind]))
 
     def status(self, a):
-        """get_request_status, index.ts, inbound voice (no resident on the call)."""
-        rows, others, named_nothing, unknown = None, 0, False, None
+        """get_request_status, index.ts, inbound voice (no resident on the call).
+        Mirrors debt-tools v116 (5 Oct, fix 3): 20/30 rows read before the
+        category split, payment records left out unless asked for, and in the
+        caller's own flat every request when the category matches none."""
+        rows, others, named_nothing, unknown, unmatched = None, 0, False, None, False
         serial = serial_of(a.get("reference"))
         if serial:
             rows = [r for r in self.requests if re.search(r"-%s(-|$)" % serial, r["reference"])][:3]
@@ -659,18 +662,26 @@ class Bk23:
                 pool = [r for r in self.requests if needle and needle in str(r["building"])]
                 if unit:
                     pool = [r for r in pool if str(r["unit"]) == unit]
-                pool = pool[:5 if unit else 12]
                 kind = str(a.get("type") or "").strip()
+                if kind != "payment":
+                    pool = [r for r in pool if r["type"] != "payment"]
+                pool = pool[:20 if unit else 30]
                 mine = [r for r in pool if self.matches(r, kind)] if kind else pool
+                if unit and kind and not mine and pool:
+                    mine, unmatched = pool, True
                 others = len(pool) - len(mine)
-                named_nothing = not kind and len(pool) > 1
-                rows = mine[:3 if unit else 8]
+                named_nothing = not kind and not unit and len(pool) > 1
+                rows = mine[:3 if unit and not unmatched else 8]
         rows = rows or []
         out = {"ok": True, "found": len(rows), "as_of": "live", "other_open": others}
         if unknown and not rows:
             out["building_unrecognized"] = True
         if named_nothing:
             out["identify_needed"] = True
+        if unmatched:
+            out["type_unmatched"] = True
+            out["note"] = ("The category you passed matched none of this flat's requests, so these are all of them, "
+                           "newest first. Find the one the resident means by its description; if none fits, ask him.")
         out["requests"] = [{k: v for k, v in self.row(r).items()
                             if not (named_nothing and k in ("type", "urgency", "description"))} for r in rows]
         return out
