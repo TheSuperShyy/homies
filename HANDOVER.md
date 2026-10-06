@@ -252,7 +252,12 @@ its stated time.
   - `needs_review` is missing from the overview's open and urgent counts.
 
   When a dashboard change reaches `main`, recheck the SOP's labels.
-- **To SHOW the old bot against ours, use `docs/discovery/manychat-before-after-2026-10-06.html` (6 Oct).** 18 features as side-by-side cards, Before (ManyChat) and After (ours), each with the words the tenant actually sees (Hebrew, English under it): 8 better, 6 different, 4 missing. It carries the same verdicts as the analysis page in the next bullet. Its md twin and the builder (session scratchpad, `build_before_after.py`) go together: change one, change the other, and keep the verdicts in step with the analysis page.
+- **The old menu's six buttons against our three: `docs/discovery/manychat-before-after-2026-10-06.html` (6 Oct, narrowed to the menu at the owner's ask).** It has:
+  - the two menus side by side;
+  - a table of where each old button lives in ours;
+  - one card per old button, showing its ManyChat flow in its own words and each function in ours marked Yes, Partly, No, Extra or Dropped.
+
+  Where things stand: committee fee, accounting and talk to a rep are included (fee and accounting have no button of their own, they are typed or go through "talk to a representative"). The service call is included except the elevator-company step. Quote and house manager are only partly there. "Status of an existing ticket" is new. The md twin and the builder (session scratchpad, `build_before_after.py`) go together, and the claims must agree with the analysis page in the next bullet.
 - **The SOP screenshots are parked, not done.** `scripts/dashboard_sop_shots.py` opens Chrome at the dashboard's sign-in page, waits for a person to sign in by hand, blurs resident data, shoots 15 pages into `local/sop-shots/` (gitignored), and builds an illustrated HTML and PDF of `sop-he.html` into Downloads (`--build` rebuilds from saved shots). It has never got past the first page load: the owner switched tasks and the window was closed. **Look at every shot before the file goes anywhere.**
 - **The old-vs-ours table in `manychat-scan-2026-09-22.md` is STALE, and so is the 5 Oct one (6 Oct).** Use
   `docs/discovery/manychat-vs-ours-2026-10-06.html` (visual: colour per status, counts, a Tested

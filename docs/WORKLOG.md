@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-10-06
 
+### The before-and-after page narrowed to the menu buttons
+
+The owner, on the page: *"For this one only focus on the 6 menu button vs the button we have and the functions of it if its included"*.
+- **Same files, new content:** `docs/discovery/manychat-before-after-2026-10-06.{html,md}`, from the same scratchpad builder. The 18-feature cards are gone; the full feature comparison stays in `manychat-vs-ours-2026-10-06`.
+- **Now:**
+  - the two menus side by side (the old "continue" tap and six rows; our three buttons);
+  - a table of where each old button lives in ours;
+  - one card per old button: what tapping it does in ManyChat, step by step with its own words; then each of its functions in ours marked Yes, Partly, No, Extra or Dropped, with our real reply where a live test has one;
+  - a card for our new status button.
+- **Per old button:**
+  - **Included:** committee fee (typed, or "talk to a representative"), accounting (inside "talk to a representative"), talk to a rep.
+  - **Mostly:** service call; everything but the elevator-company step.
+  - **Partly:** price quote (a note to the team, no leads board) and house manager (reaches the team, not the house manager by name).
+  - **New:** "status of an existing ticket".
+- Rendered at desktop and phone width: no sideways scroll.
+
 ### Before and after: the old ManyChat bot next to ours, side by side
 
 The owner: *"wrong project i want you to create the breakdown comparison on the manychat and the system we have right now to compare side by side about the chatbot features they have before and after"*. This stopped the SOP screenshots below; their Chrome window was closed before the first page loaded, so nothing was captured.

@@ -3169,13 +3169,17 @@ state" is worse than one stale one.
 route. `vercel link` writes `.vercel/` AND appends `.env*` to the app
 .gitignore - trim that to `.vercel`, or the tracked .env.example goes dark.
 
-**Two comparison pages, one set of verdicts (6 Oct).** The old ManyChat bot
-against ours exists twice on purpose: `manychat-vs-ours-<date>` is the
-analysis (a Tested column, open decisions), and `manychat-before-after-<date>`
-is the one to show people (side-by-side cards with the words each bot sends).
-A verdict changed in one changes in the other. The quoted lines are word for
-word, a cut is marked with `…`, a payment link is never printed (`[קישור]`),
-and the ticket numbers are the test tenant's.
+**Two comparison pages, and they must agree (6 Oct).** The old ManyChat bot
+against ours exists twice on purpose. `manychat-vs-ours-<date>` is the
+analysis of every feature (a Tested column, open decisions).
+`manychat-before-after-<date>` covers the menu buttons only (owner, 6 Oct:
+*"only focus on the 6 menu button vs the button we have and the functions of
+it if its included"*): each of the old bot's six buttons, what it does, and
+each function's place in ours. Where both pages speak of the same thing (the
+elevator step missing, the leads board missing, the balance bug), a change to
+one is a change to the other. The quoted lines are word for word, a cut is
+marked with `…`, a payment link is never printed (`[קישור]`), and the ticket
+numbers are the test tenant's.
 
 **The staff SOP quotes the screen as `main` has it (6 Oct).**
 `docs/features/13-dashboard/sop-he.html` is the Hebrew procedure for Homies
