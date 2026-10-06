@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נוהל עבודה בדשבורד</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --paper: #ffffff;
+    --ink: #1b2330;
+    --muted: #5b6575;
+    --line: #d9dee6;
+    --accent: #1f4e8c;
+    --chip: #eef2f8;
+    --chip-ink: #1b2330;
+    --tip: #eaf4ee;
+    --tip-line: #2f7d4f;
+    --warn: #fdf1e6;
+    --warn-line: #c46a12;
+    --th: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161d;
+      --paper: #1a2029;
+      --ink: #e7ebf1;
+      --muted: #a3adbb;
+      --line: #313a47;
+      --accent: #8db4ec;
+      --chip: #262e3a;
+      --chip-ink: #e7ebf1;
+      --tip: #17291f;
+      --tip-line: #5cb884;
+      --warn: #2e2216;
+      --warn-line: #e39a4f;
+      --th: #232a35;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161d; --paper: #1a2029; --ink: #e7ebf1; --muted: #a3adbb; --line: #313a47;
+    --accent: #8db4ec; --chip: #262e3a; --chip-ink: #e7ebf1; --tip: #17291f; --tip-line: #5cb884;
+    --warn: #2e2216; --warn-line: #e39a4f; --th: #232a35;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.65 "Rubik", "Segoe UI", Arial, "Noto Sans Hebrew", sans-serif;
+  }
+  .page {
+    max-width: 880px;
+    margin: 24px auto;
+    padding: 28px 32px 40px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 0 0 6px; color: var(--accent); }
+  h2 {
+    font-size: 22px; margin: 36px 0 10px; padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  h3 { font-size: 18px; margin: 22px 0 6px; }
+  p { margin: 8px 0; }
+  .meta { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+  .lead { font-size: 17px; }
+  .legend { color: var(--muted); font-size: 14px; }
+  .ui {
+    display: inline-block;
+    padding: 0 .45em;
+    margin: 1px 0;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--chip);
+    color: var(--chip-ink);
+    font-weight: 500;
+    line-height: 1.5;
+    white-space: nowrap;
+    unicode-bidi: isolate;
+  }
+  bdi.ltr { font-family: Consolas, "Courier New", monospace; font-size: .95em; }
+  ul, ol { padding-inline-start: 1.4em; margin: 8px 0; }
+  li { margin: 5px 0; }
+  ol.steps { list-style: none; counter-reset: step; padding-inline-start: 0; }
+  ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding-inline-start: 2.3em;
+    margin: 9px 0;
+  }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute;
+    inset-inline-start: 0;
+    top: .1em;
+    width: 1.65em; height: 1.65em;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--paper);
+    font-weight: 700; font-size: .9em;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .box {
+    border: 1px solid var(--line);
+    border-inline-start: 5px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin: 16px 0;
+    break-inside: avoid;
+  }
+  .box h2 { border: 0; margin: 4px 0 6px; padding: 0; font-size: 19px; }
+  .tip { background: var(--tip); border-inline-start-color: var(--tip-line); }
+  .warn { background: var(--warn); border-inline-start-color: var(--warn-line); }
+  .tip, .warn { padding: 10px 16px; }
+  .tip b:first-child, .warn b:first-child { margin-inline-end: .3em; }
+  .scroll { overflow-x: auto; margin: 10px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: start; vertical-align: top; }
+  th { background: var(--th); font-weight: 600; }
+  td:first-child { white-space: nowrap; }
+  td.wrap { white-space: normal; }
+  blockquote {
+    margin: 10px 0;
+    padding: 10px 16px;
+    background: var(--chip);
+    border-radius: 10px;
+    border-inline-start: 4px solid var(--tip-line);
+  }
+  nav.toc ol { columns: 2; column-gap: 32px; margin: 6px 0; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  .foot { margin-top: 34px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  @media (max-width: 640px) {
+    .page { margin: 0; padding: 18px 16px 28px; border: 0; border-radius: 0; }
+    h1 { font-size: 25px; }
+    nav.toc ol { columns: 1; }
+    td:first-child { white-space: normal; }
+    .ui { white-space: normal; }
+  }
+  @media print {
+    :root { --bg: #fff; --paper: #fff; --ink: #000; --muted: #444; --line: #bbb;
+            --accent: #1f4e8c; --chip: #f1f3f6; --chip-ink: #000; --tip: #eef6f1; --warn: #fdf3ea; --th: #f0f2f5; }
+    @page { size: A4; margin: 14mm 13mm; }
+    body { font-size: 12.5px; background: #fff; }
+    .page { margin: 0; padding: 0; border: 0; max-width: none; }
+    h2 { break-after: avoid; }
+    h3 { break-after: avoid; }
+    .box, table, blockquote, ol.steps > li { break-inside: avoid; }
+    nav.toc a { color: #000; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+<h1>נוהל עבודה: הדשבורד של הומי'ז</h1>
+<p class="meta">למי: צוות השירות והגבייה &nbsp;·&nbsp; כתובת: <bdi class="ltr" dir="ltr">homies-dashboard.vercel.app</bdi> &nbsp;·&nbsp; עודכן: 6 באוקטובר 2026</p>
+<p class="lead">הדשבורד מרכז במקום אחד את הקריאות, את החובות, את השיחות של הבוט מיכאל בווטסאפ ואת השיחות של הסוכן הקולי. הנתונים מגיעים מ-OXS ומהבוטים, והוא מתעדכן לבד.</p>
+<p class="legend">מילים במסגרת, כמו <span class="ui">שמירה</span>, כתובות בדיוק כמו שהן מופיעות על המסך.</p>
+
+<section class="box">
+  <h2>חמשת הכללים</h2>
+  <ol>
+    <li>בדשבורד בעיקר צופים. בעבודה השוטפת, הדבר היחיד שמשנים בו הוא הסטטוס של קריאה, ואחרי כל שינוי לוחצים <span class="ui">שמירה</span>.</li>
+    <li>כשמסמנים <span class="ui">נסגרה</span> בקריאה שהגיעה מווטסאפ, הדייר מקבל הודעה בווטסאפ שהקריאה טופלה. לכן מסמנים <span class="ui">נסגרה</span> רק כשהתקלה באמת טופלה.</li>
+    <li>קריאה כפולה, או קריאה שנפתחה בטעות, מסמנים <span class="ui">בוטלה</span> ולא <span class="ui">נסגרה</span>.</li>
+    <li>את הקריאות שהגיעו מ-OXS מנהלים ב-OXS. הדשבורד לא כותב כלום ל-OXS.</li>
+    <li>בכל בוקר בודקים שני דברים: את <span class="ui">דחופות ופתוחות</span> במסך הסקירה, ואת הלשונית <span class="ui">לבדיקה</span> בעמוד הקריאות.</li>
+  </ol>
+</section>
+
+<nav class="toc" aria-label="תוכן העניינים">
+  <h3>תוכן העניינים</h3>
+  <ol>
+    <li><a href="#login">כניסה ויציאה</a></li>
+    <li><a href="#screen">המסך והתפריט</a></li>
+    <li><a href="#overview">סקירה</a></li>
+    <li><a href="#tickets">קריאות</a></li>
+    <li><a href="#debts">חובות</a></li>
+    <li><a href="#whatsapp">שיחות ווטסאפ</a></li>
+    <li><a href="#calls">שיחות טלפון</a></li>
+    <li><a href="#search">חיפוש</a></li>
+    <li><a href="#voice">שיחת סוכן קולי</a></li>
+    <li><a href="#import">ייבוא</a></li>
+    <li><a href="#settings">הגדרות</a></li>
+    <li><a href="#daily">סדר עבודה יומי</a></li>
+    <li><a href="#problems">תקלות נפוצות ומה עושים</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<h2 id="login">1. כניסה ויציאה</h2>
+<ol class="steps">
+  <li>פותחים דפדפן (מומלץ Chrome) ונכנסים לכתובת <bdi class="ltr" dir="ltr">homies-dashboard.vercel.app</bdi>.</li>
+  <li>מקלידים <span class="ui">אימייל</span> ו<span class="ui">סיסמה</span> ולוחצים <span class="ui">כניסה</span>.</li>
+  <li>נפתח מסך <span class="ui">סקירה</span>.</li>
+</ol>
+<ul>
+  <li>אם מופיעה ההודעה באנגלית <bdi class="ltr" dir="ltr">Invalid login credentials</bdi>, האימייל או הסיסמה לא נכונים. בודקים אותם ומנסים שוב.</li>
+  <li>אין הרשמה עצמית ואין קישור "שכחתי סיסמה". לחשבון חדש, או כשהסיסמה נשכחה, פונים ל-Clix.</li>
+  <li>כדי לצאת לוחצים <span class="ui">יציאה</span> בתחתית תפריט הצד. היציאה היא מהדפדפן הזה בלבד. במחשב משותף יוצאים בסוף כל יום עבודה.</li>
+</ul>
+
+<!-- 2 -->
+<h2 id="screen">2. המסך והתפריט</h2>
+<ul>
+  <li><b>תפריט הצד.</b> תחת <span class="ui">תפריט ראשי</span>: <span class="ui">סקירה</span>, <span class="ui">קריאות</span>, <span class="ui">חובות</span>, <span class="ui">שיחות ווטסאפ</span>, <span class="ui">שיחות טלפון</span>, <span class="ui">שיחת סוכן קולי</span>. תחת <span class="ui">מערכת</span>: <span class="ui">ייבוא</span>, <span class="ui">הגדרות</span>. בתחתית התפריט: <span class="ui">English</span> להחלפת שפה, ו<span class="ui">יציאה</span>.</li>
+  <li><b>הפס העליון.</b> תיבת <span class="ui">חיפוש בכל המערכת</span>, מתג לתצוגה בהירה או כהה, גלגל שיניים להגדרות, ושם המשתמש.</li>
+  <li><b>בטלפון.</b> התפריט עובר לתחתית המסך, וחיפוש, ייבוא והגדרות נמצאים בראש המסך.</li>
+  <li><b>רשימות ארוכות.</b> מעל הטבלה בוחרים כמה <span class="ui">שורות</span> לראות בעמוד (10, 25 או 50), ועוברים בין עמודים ב<span class="ui">הקודם</span> וב<span class="ui">הבא</span>.</li>
+  <li><b>שליחת תצוגה לעמית.</b> הלשונית, החודש והחיפוש נשמרים בכתובת של הדף. מעתיקים את הכתובת ושולחים אותה, והעמית רואה בדיוק את אותה רשימה.</li>
+</ul>
+
+<!-- 3 -->
+<h2 id="overview">3. סקירה</h2>
+<p>המסך הראשון אחרי הכניסה: תמונת מצב של כל הבניינים.</p>
+<div class="scroll"><table>
+  <tr><th>המספר</th><th>מה הוא סופר</th></tr>
+  <tr><td><span class="ui">קריאות פתוחות</span></td><td>קריאות בסטטוס פתוחה או בטיפול.</td></tr>
+  <tr><td><span class="ui">דחופות ופתוחות</span></td><td>קריאות בדחיפות גבוהה או חירום שעוד לא נסגרו. זה המספר האדום, והראשון שבודקים בבוקר.</td></tr>
+  <tr><td><span class="ui">קריאות, מאז ומתמיד</span></td><td>כל הקריאות שיש במערכת.</td></tr>
+  <tr><td><span class="ui">קריאות שנסגרו, מאז ומתמיד</span></td><td>כל הקריאות שסומנו נסגרה.</td></tr>
+  <tr><td><span class="ui">שיחות ווטסאפ</span></td><td>כמה אנשים כתבו לבוט מיכאל בווטסאפ.</td></tr>
+  <tr><td><span class="ui">שיחות טלפון שתועדו</span></td><td>כל השיחות של הסוכן הקולי.</td></tr>
+</table></div>
+<div class="box warn"><b>חשוב:</b> קריאות בלשונית <span class="ui">לבדיקה</span> לא נספרות ב<span class="ui">קריאות פתוחות</span> ולא ב<span class="ui">דחופות ופתוחות</span>, גם כשהדחיפות שלהן חירום. לכן בודקים את הלשונית הזאת בנפרד (סעיף 4).</div>
+<ul>
+  <li><span class="ui">פעילות השבוע</span>: שלושה גרפים, קריאות שנפתחו, שיחות של הסוכן וקריאות שנסגרו, וליד כל אחד השוואה <span class="ui">מול התקופה הקודמת</span>. משנים את התקופה ב<span class="ui">7 ימים</span>, <span class="ui">30 יום</span> או <span class="ui">90 יום</span>, או בוחרים <span class="ui">מתאריך</span> ו<span class="ui">עד תאריך</span> ולוחצים <span class="ui">הצג</span>. קריאות שנסגרו נספרות לפי יום הפתיחה: אלה שנפתחו בתקופה שנבחרה ונסגרו מאז.</li>
+  <li><span class="ui">שבעת הימים האחרונים</span>: שמונה הקריאות האחרונות שנפתחו. <span class="ui">לכל הקריאות</span> עובר לעמוד הקריאות.</li>
+</ul>
+
+<!-- 4 -->
+<h2 id="tickets">4. קריאות</h2>
+<p>כאן עובדים על הקריאות. זה העמוד היחיד שבו משנים משהו בנתונים.</p>
+
+<h3>4.1 מה רואים בעמוד</h3>
+<p>למעלה יש לשוניות לפי סטטוס: <span class="ui">הכול</span> <span class="ui">פתוחה</span> <span class="ui">בטיפול</span> <span class="ui">לבדיקה</span> <span class="ui">נסגרה</span> <span class="ui">בוטלה</span>. הקריאות מסודרות מהחדשה לישנה.</p>
+<div class="scroll"><table>
+  <tr><th>עמודה</th><th>מה יש בה</th></tr>
+  <tr><td><span class="ui">מספר קריאה</span></td><td>המספר שהדייר מקבל, למשל <bdi class="ltr" dir="ltr">255-1294-26</bdi>.</td></tr>
+  <tr><td><span class="ui">מה</span></td><td>תיאור התקלה. מתחתיו, אם יש: הערות מ-OXS ותמונות מהדייר.</td></tr>
+  <tr><td><span class="ui">איפה</span></td><td>הבניין והדירה.</td></tr>
+  <tr><td><span class="ui">טלפון הפונה</span></td><td>המספר שממנו פנו. לפעמים זו הדרך היחידה לחזור לפונה.</td></tr>
+  <tr><td><span class="ui">סוג</span></td><td>אינסטלציה, חשמל, ניקיון וכדומה.</td></tr>
+  <tr><td><span class="ui">דחיפות</span></td><td>נמוכה, רגילה, גבוהה או חירום.</td></tr>
+  <tr><td><span class="ui">סטטוס</span></td><td>כאן משנים את הסטטוס (סעיף 4.2).</td></tr>
+  <tr><td><span class="ui">הגיע דרך</span></td><td><span class="ui">ווטסאפ</span>: הבוט מיכאל. <span class="ui">טלפון</span>: הסוכן הקולי. <span class="ui">OXS</span>: נפתחה ב-OXS. <span class="ui">צוות</span>: נפתחה על ידי הצוות.</td></tr>
+  <tr><td><span class="ui">נפתחה</span></td><td>תאריך ושעה, לפי שעון ישראל.</td></tr>
+</table></div>
+<p>מתחת לתיאור יכולים להופיע שלושה דברים:</p>
+<ul>
+  <li><b>שורה שמתחילה ב-↳</b>: ההערה האחרונה של המוקד ב-OXS, כמו שנכתבה שם. כשבסוף השורה כתוב <span class="ui">+2 קודמות</span>, לוחצים על השורה ונפתחות ההערות הקודמות.</li>
+  <li><b>תמונות קטנות</b>: תמונות שהדייר שלח בווטסאפ. לחיצה פותחת את התמונה בגודל מלא בלשונית חדשה.</li>
+  <li><span class="ui">לא נמצאה ב-OXS בייבוא האחרון</span> (מתחת לתאריך): הקריאה פתוחה אצלנו, אבל בבדיקה האחרונה מול OXS היא לא הופיעה. בודקים אותה ב-OXS.</li>
+</ul>
+
+<h3>4.2 שינוי סטטוס</h3>
+<ol class="steps">
+  <li>מוצאים את הקריאה: בלשונית המתאימה, בדפדוף, או בחיפוש לפי מספר הקריאה.</li>
+  <li>בעמודה <span class="ui">סטטוס</span>, באותה שורה, בוחרים את הסטטוס החדש מהרשימה.</li>
+  <li>לוחצים <span class="ui">שמירה</span> באותה שורה. בלי שמירה שום דבר לא משתנה.</li>
+  <li>בודקים שהסטטוס החדש נשאר אחרי שהדף נטען. אם חזר הסטטוס הקודם, השמירה לא עברה: מנסים שוב, ואם זה חוזר מעדכנים את Clix.</li>
+</ol>
+<div class="box tip"><b>תקין:</b> בלשונית מסוננת, למשל <span class="ui">פתוחה</span>, קריאה ששינו לה סטטוס עוברת ללשונית אחרת ונעלמת מהרשימה.</div>
+
+<h3>4.3 מה אומר כל סטטוס</h3>
+<div class="scroll"><table>
+  <tr><th>סטטוס</th><th>מתי משתמשים בו</th></tr>
+  <tr><td><span class="ui">פתוחה</span></td><td>הקריאה נפתחה ועוד לא התחילו לטפל בה.</td></tr>
+  <tr><td><span class="ui">בטיפול</span></td><td>מישהו כבר מטפל: הוזמן איש מקצוע, מחכים לחלק, וכדומה.</td></tr>
+  <tr><td><span class="ui">לבדיקה</span></td><td>המערכת פתחה את הקריאה בלי כל הפרטים, כדי שלא תלך לאיבוד. למשל שיחה שנקטעה, שיחה שבה לא זוהו הבניין או הדירה, או פנייה בווטסאפ שלא סווגה. עוברים עליה, משלימים מה שחסר (אפשר לחזור לפונה לפי <span class="ui">טלפון הפונה</span>) ומעבירים לסטטוס המתאים. קריאה כאן בדחיפות <span class="ui">חירום</span> מטפלים בה מיד.</td></tr>
+  <tr><td><span class="ui">נסגרה</span></td><td>התקלה טופלה. בקריאה שהגיעה מווטסאפ הדייר מקבל הודעה (סעיף 4.4).</td></tr>
+  <tr><td><span class="ui">בוטלה</span></td><td>הקריאה לא רלוונטית: כפולה, נפתחה בטעות, או שהדייר ביטל. לא נשלחת שום הודעה.</td></tr>
+</table></div>
+
+<h3>4.4 ההודעה שהדייר מקבל כשקריאה נסגרת</h3>
+<p>כשקריאה שבעמודה <span class="ui">הגיע דרך</span> כתוב בה <span class="ui">ווטסאפ</span> עוברת ל<span class="ui">נסגרה</span> ולוחצים <span class="ui">שמירה</span>, הדייר מקבל בווטסאפ, תוך כשתי דקות, את ההודעה הזאת:</p>
+<blockquote>שלום, כאן מיכאל מהומי'ז. הקריאה שלכם מספר <bdi dir="ltr">255-1294-26</bdi> (ריח רע בחניון) טופלה ונסגרה. אם משהו עדיין לא בסדר, פשוט כתבו לנו כאן.</blockquote>
+<ul>
+  <li>ההודעה נשלחת פעם אחת בלבד לכל קריאה. אם פותחים את הקריאה מחדש וסוגרים אותה שוב, לא נשלחת הודעה שנייה.</li>
+  <li>אי אפשר לעצור אותה. מהרגע שלוחצים <span class="ui">שמירה</span> על <span class="ui">נסגרה</span> ההודעה יוצאת, גם אם מחזירים את הסטטוס מיד.</li>
+  <li>בקריאות שהגיעו מ-OXS, מהטלפון או מהצוות לא נשלחת שום הודעה.</li>
+</ul>
+
+<h3>4.5 קריאות שהגיעו מ-OXS</h3>
+<p>קריאה שבעמודה <span class="ui">הגיע דרך</span> כתוב בה <span class="ui">OXS</span> נפתחה ב-OXS, והיא שייכת ל-OXS.</p>
+<ul>
+  <li>היא מגיעה לדשבורד לבד, כמה פעמים ביום.</li>
+  <li>את הסטטוס שלה מעדכנים ב-OXS, לא כאן. סטטוס שמשנים לה בדשבורד חוזר ל<span class="ui">פתוחה</span> בייבוא הבא, כל עוד היא פתוחה ב-OXS.</li>
+  <li>כשסוגרים אותה ב-OXS, היא מסומנת <span class="ui">נסגרה</span> בדשבורד לבד, בייבוא הבא.</li>
+  <li>בכיוון ההפוך אין חיבור: שום דבר מהדשבורד לא נכתב ל-OXS. קריאה שנפתחה בווטסאפ או בטלפון לא נרשמת כרגע ב-OXS, ולכן את הקריאות האלה מנהלים בדשבורד.</li>
+</ul>
+
+<!-- 5 -->
+<h2 id="debts">5. חובות</h2>
+<p>העמוד נקרא <span class="ui">יתרות פתוחות</span>: מי חייב, כמה ועל אילו חודשים, לפי הנתונים מ-OXS.</p>
+<ul>
+  <li><b>חודש.</b> יש לשונית לכל חודש שיש בו חוב (למשל <bdi class="ltr" dir="ltr">2026-09</bdi>), ו<span class="ui">הכול</span> לכל החודשים יחד. העמוד נפתח על החודש האחרון שכבר נגמר, כי על החודש הנוכחי עוד לא גובים.</li>
+  <li><b>תצוגה.</b> <span class="ui">לפי דירה</span>: שורה לכל דירה. <span class="ui">לפי בעלים</span>: שורה לכל אדם, עם כל הדירות שלו יחד. הבחירה נשמרת כשמחליפים חודש.</li>
+  <li><b>ארבעה מספרים.</b> <span class="ui">פתוח ב-…</span> (בלשונית הכול: <span class="ui">סך הפתוח</span>), <span class="ui">דירות שחייבות</span>, <span class="ui">דיירים שחייבים</span> ו<span class="ui">בבדיקה</span>.</li>
+  <li><b>הטבלה</b>, מהחוב הגבוה לנמוך: <span class="ui">דייר</span>, <span class="ui">בניין</span>, <span class="ui">דירה</span>, <span class="ui">טלפון</span>, <span class="ui">חודשים שחייבים</span> (רק בלשונית הכול), <span class="ui">בבדיקה</span> ו<span class="ui">חוב</span>.</li>
+  <li><b>"וגם דירה…"</b> מתחת למספר הדירה: לאותו בעלים יש עוד דירה שחייבת, ולידה הסכום של כל הדירות שלו יחד.</li>
+  <li><b>בבדיקה.</b> חודשים שמסומנים <span class="ui">במחלוקת</span> או <span class="ui">ממתין</span>. הם לא נכנסים לסכום החוב, ולא גובים עליהם עד שהבירור נגמר.</li>
+  <li><b>עדכון.</b> החובות מתעדכנים מ-OXS פעמיים ביום, בחצות וב-15:00. תשלום שנעשה היום יורד מהרשימה רק אחרי הייבוא הבא.</li>
+  <li><b>חיוג.</b> החיוג מהדשבורד עוד לא פעיל, כי מספר הטלפון של הומי'ז עוד לא חובר לסוכן הקולי. אם מופיעה עמודת <span class="ui">חיוג</span> ובה <span class="ui">אין עדיין מספר</span>, זו הסיבה. כשהמספר יחובר: מקלידים את הקוד בשדה <span class="ui">קוד</span>, לוחצים <span class="ui">חייג</span>, והסוכן מתקשר לדייר הזה פעם אחת.</li>
+</ul>
+
+<!-- 6 -->
+<h2 id="whatsapp">6. שיחות ווטסאפ</h2>
+<p>כל מי שכתב לבוט מיכאל בווטסאפ, מהשיחה האחרונה לראשונה.</p>
+<div class="scroll"><table>
+  <tr><th>עמודה</th><th>מה יש בה</th></tr>
+  <tr><td><span class="ui">מי</span></td><td>שם הדייר, הבניין והדירה. אם מופיע רק מספר טלפון, הכותב לא נמצא ברשימת הדיירים.</td></tr>
+  <tr><td><span class="ui">הודעה אחרונה</span></td><td>ההודעה האחרונה בשיחה.</td></tr>
+  <tr><td><span class="ui">הודעות</span></td><td>כמה הודעות יש בשיחה. המספר שאחרי הלוכסן (in) הוא כמה מהן כתב הדייר.</td></tr>
+  <tr><td><span class="ui">שפה</span></td><td>שפת השיחה.</td></tr>
+  <tr><td><span class="ui">נציג נכנס</span></td><td><span class="ui">כן</span>: מישהו מהצוות כתב בשיחה. <span class="ui">בוט בלבד</span>: רק הבוט ענה.</td></tr>
+  <tr><td><span class="ui">פעילות אחרונה</span></td><td>מתי נכתבה ההודעה האחרונה, לפי שעון ישראל.</td></tr>
+</table></div>
+<p>לחיצה על השם פותחת את כל השיחה: בועות של <span class="ui">דייר</span>, של <span class="ui">מיכאל</span> (הבוט) ושל <span class="ui">נציג</span> (מישהו מהצוות). תמונות שהדייר שלח מופיעות בתוך הבועה. מתחת לשיחה מופיעות <span class="ui">קריאות אחרונות</span>: עד חמש הקריאות האחרונות שנפתחו מאותו מספר.</p>
+<div class="box warn"><b>חשוב:</b> השעה שבבועות מוצגת לפי שעון UTC ולא לפי שעון ישראל. בשעון קיץ היא מוקדמת בשלוש שעות ובשעון חורף בשעתיים: הודעה שנשלחה ב-21:00 מופיעה בקיץ כ-18:00.</div>
+<p>מהדשבורד אי אפשר לענות לדייר. הוא רק מציג את השיחה.</p>
+
+<!-- 7 -->
+<h2 id="calls">7. שיחות טלפון</h2>
+<p>השיחות של הסוכן הקולי. כרגע עוד אין לסוכן מספר טלפון, ולכן מופיעות כאן רק שיחות ניסיון מהדפדפן.</p>
+<ul>
+  <li><b>לשוניות:</b> <span class="ui">כל השיחות</span>, <span class="ui">נכנסות</span>, <span class="ui">יוצאות</span>, <span class="ui">ללא מענה</span> (למי הסוכן התקשר ולא ענו, ובאיזה ניסיון), ו<span class="ui">לינקים שנשלחו</span> (לינקים לתשלום שנשלחו לדיירים).</li>
+  <li><b>חיפוש במה שנאמר:</b> כותבים מילה בתיבה <span class="ui">חיפוש במה שנאמר, עברית או אנגלית</span> ולוחצים <span class="ui">חיפוש</span>. החיפוש עובר על התמלול ועל התקציר. <span class="ui">ניקוי</span> מבטל אותו.</li>
+  <li><b>עמודות:</b> <span class="ui">מתי</span>, <span class="ui">כיוון</span>, <span class="ui">מספר</span>, <span class="ui">תקציר</span>, <span class="ui">תוצאה</span> (למשל <span class="ui">הסתיימה</span>, <span class="ui">המתקשר ניתק</span>, <span class="ui">שקט על הקו</span>, <span class="ui">נמסר לצוות</span> עם הסיבה, <span class="ui">תקלה טכנית</span>), <span class="ui">אורך</span> ו<span class="ui">זמן תגובה</span> של הסוכן.</li>
+  <li><b><span class="ui">צפייה בשיחה</span></b> פותח את דף השיחה: השיחה כבועות (Caller הוא המתקשר ו-Michael הוא הסוכן), <span class="ui">תקציר</span>, <span class="ui">פרטים</span>, ו<span class="ui">כלים שהופעלו</span>, כלומר מה הסוכן עשה בפועל, למשל פתיחת קריאה. <span class="ui">הקלטה</span> יש רק לשיחות מלפני 25 באוגוסט 2026. מאז נשמר רק תמלול.</li>
+  <li>לשיחות מלפני 20 באוגוסט 2026 אין תקציר, ולכן כתוב בהן <span class="ui">אין תקציר</span>.</li>
+  <li><b>לינקים שנשלחו:</b> הסטטוס <bdi class="ltr" dir="ltr">sent</bdi> אומר ש-OXS אישרה שהלינק יצא. אם הדייר שילם, רואים את זה רק ב-OXS.</li>
+</ul>
+
+<!-- 8 -->
+<h2 id="search">8. חיפוש</h2>
+<p>התיבה <span class="ui">חיפוש בכל המערכת</span> בפס העליון (בטלפון: זכוכית המגדלת בראש המסך) מחפשת בכל הדשבורד בבת אחת.</p>
+<ul>
+  <li><b>מה אפשר לחפש:</b> שם של דייר, מספר טלפון (מספיקות ארבע הספרות האחרונות), מספר קריאה, שם בניין, או משפט שנכתב בווטסאפ או נאמר בשיחה. לפחות שני תווים, ואז Enter.</li>
+  <li><b>התוצאות</b> מחולקות לחמש קבוצות: <span class="ui">קריאות</span>, <span class="ui">חוב לפי חודש</span>, <span class="ui">דיירים</span>, <span class="ui">הודעות ווטסאפ</span> ו<span class="ui">שיחות טלפון</span>. בכל קבוצה מוצגות עד שמונה תוצאות, החדשות קודם. כשיש יותר כתוב כמה מוצגות מתוך כמה, ואז כדאי לדייק את החיפוש.</li>
+  <li><b>מעבר לפרטים:</b> <span class="ui">לדייר</span> פותח את דף הדייר, עם הפרטים שלו, השיחה שלו בווטסאפ והקריאות האחרונות שלו. <span class="ui">לשיחה</span> פותח שיחת ווטסאפ. <span class="ui">צפייה בשיחה</span> פותח שיחת טלפון.</li>
+  <li><b>לא נמצא כלום?</b> מנסים רק את שם המשפחה, או את ארבע הספרות האחרונות של הטלפון.</li>
+</ul>
+
+<!-- 9 -->
+<h2 id="voice">9. שיחת סוכן קולי</h2>
+<p>עמוד לבדיקה של הסוכן הקולי מהדפדפן. הוא לא חלק מהעבודה השוטפת.</p>
+<ul>
+  <li>יש בו שתי לשוניות: <span class="ui">קליטת פניות (מיכאל)</span>, הסוכן שעונה לדיירים, ו<span class="ui">מעקב חובות</span>, הסוכן שמתקשר לחייבים.</li>
+  <li>צריך מיקרופון. לוחצים <span class="ui">התחלת שיחה</span>, מדברים, ובסוף לוחצים <span class="ui">ניתוק</span>. בזמן השיחה אפשר גם לכתוב לסוכן.</li>
+  <li>ב<span class="ui">מעקב חובות</span> מופיעים דיירים אמיתיים מתור החובות, או <span class="ui">נתוני דוגמה</span> כשהתור ריק. השיחה לא מגיעה לדייר: היא רק בין מי שיושב מול המחשב לבין הסוכן.</li>
+</ul>
+<div class="box warn"><b>חשוב:</b> אם בשיחת ניסיון מדווחים על תקלה, הסוכן פותח קריאה אמיתית, והיא מופיעה בעמוד הקריאות. אחרי ניסיון כזה מסמנים אותה <span class="ui">בוטלה</span>. בנוסף, כל דקת שיחה עולה כסף.</div>
+
+<!-- 10 -->
+<h2 id="import">10. ייבוא</h2>
+<p>כאן רואים מתי נכנסו לאחרונה נתונים מ-OXS: <span class="ui">הייבוא האמיתי האחרון</span>, ומתחתיו <span class="ui">דיירים מ-OXS</span>, <span class="ui">חובות מ-OXS</span> ו<span class="ui">קריאות מ-OXS</span>, כל אחד עם הזמן שבו התעדכן.</p>
+<ul>
+  <li>הייבוא רץ לבד: דיירים וחובות פעמיים ביום (בחצות וב-15:00), וקריאות כמה פעמים ביום. לא צריך ללחוץ על כלום.</li>
+  <li>מסתכלים כאן כשמשהו לא נראה מעודכן, למשל תשלום שלא ירד או קריאה חדשה מ-OXS שלא הגיעה. אם הייבוא האחרון היה לפני יותר מיום, מעדכנים את Clix.</li>
+  <li>OXS היא לקריאה בלבד: הדשבורד אף פעם לא כותב אליה.</li>
+</ul>
+
+<!-- 11 -->
+<h2 id="settings">11. הגדרות</h2>
+<p>נכנסים דרך גלגל השיניים בפס העליון, או דרך <span class="ui">הגדרות</span> בתפריט.</p>
+<ul>
+  <li><span class="ui">הפרופיל שלי</span>: <span class="ui">בחירת תמונה</span> ואז <span class="ui">שמירת התמונה</span>; <span class="ui">שם לתצוגה</span> ואז <span class="ui">שמירה</span>.</li>
+  <li><span class="ui">החשבון שלי</span>: האימייל, הכניסה האחרונה ומתי נפתח החשבון. לכל מי שמחובר יש אותה גישה: צפייה בכל הבניינים.</li>
+  <li><span class="ui">שינוי סיסמה</span>: <span class="ui">הסיסמה הנוכחית</span>, <span class="ui">סיסמה חדשה</span> (לפחות 8 תווים), <span class="ui">הסיסמה החדשה שוב</span>, ואז <span class="ui">עדכון הסיסמה</span>.</li>
+  <li><span class="ui">תצוגה</span>: <span class="ui">כהה</span> או <span class="ui">בהיר</span>, ו<span class="ui">עברית</span> או <span class="ui">English</span>. הבחירה נשמרת בדפדפן הזה בלבד.</li>
+  <li><span class="ui">החיבור</span>: <span class="ui">יציאה</span> מהחשבון בדפדפן הזה.</li>
+</ul>
+<div class="box warn"><b>חשוב:</b> אם כמה אנשים נכנסים עם אותו חשבון, שינוי סיסמה משנה אותה לכולם. מתאמים לפני שמשנים.</div>
+
+<!-- 12 -->
+<h2 id="daily">12. סדר עבודה יומי</h2>
+<ol class="steps">
+  <li>נכנסים ובודקים בסקירה את <span class="ui">דחופות ופתוחות</span>. אם המספר גדול מאפס, מתחילים מהקריאות האלה.</li>
+  <li>בעמוד הקריאות, בלשונית <span class="ui">לבדיקה</span>, עוברים על כל קריאה, קודם על אלה בדחיפות <span class="ui">חירום</span>. משלימים מה שחסר ומעבירים לסטטוס המתאים.</li>
+  <li>בלשונית <span class="ui">פתוחה</span>: קריאה שמתחילים לטפל בה מעבירים ל<span class="ui">בטיפול</span>.</li>
+  <li>תקלה שטופלה: <span class="ui">נסגרה</span> ו<span class="ui">שמירה</span>. דייר שפנה בווטסאפ יקבל הודעה.</li>
+  <li>קריאה כפולה או שגויה: <span class="ui">בוטלה</span> ו<span class="ui">שמירה</span>.</li>
+  <li>קריאות מ-OXS מעדכנים ב-OXS, לא בדשבורד.</li>
+  <li>דייר שואל על קריאה או על חוב: מחפשים אותו בתיבת החיפוש לפי שם, טלפון או מספר קריאה.</li>
+</ol>
+
+<!-- 13 -->
+<h2 id="problems">13. תקלות נפוצות ומה עושים</h2>
+<div class="scroll"><table>
+  <tr><th>מה רואים</th><th>מה עושים</th></tr>
+  <tr><td class="wrap">ההודעה <bdi class="ltr" dir="ltr">Invalid login credentials</bdi></td><td>האימייל או הסיסמה לא נכונים. בודקים ומנסים שוב. סיסמה שנשכחה: פונים ל-Clix.</td></tr>
+  <tr><td class="wrap">אחרי <span class="ui">שמירה</span> הסטטוס חזר לקודם</td><td>השמירה לא עברה. מנסים שוב, ואם זה חוזר פונים ל-Clix.</td></tr>
+  <tr><td class="wrap">קריאה מ-OXS חזרה ל<span class="ui">פתוחה</span></td><td>זה תקין: את הסטטוס שלה מעדכנים ב-OXS (סעיף 4.5).</td></tr>
+  <tr><td class="wrap">קריאה מווטסאפ סומנה <span class="ui">נסגרה</span> בטעות</td><td>ההודעה לדייר כבר יצאה ואי אפשר לבטל אותה. מחזירים את הסטטוס הנכון ולוחצים <span class="ui">שמירה</span>, ואם צריך מסבירים לדייר.</td></tr>
+  <tr><td class="wrap">תמונה לא נפתחת</td><td>מרעננים את הדף (F5). הקישור לתמונה תקף לשעה.</td></tr>
+  <tr><td class="wrap">תשלום לא ירד, או קריאה מ-OXS לא הגיעה</td><td>הנתונים מתעדכנים כמה פעמים ביום. בודקים בעמוד <span class="ui">ייבוא</span> מתי היה הייבוא האחרון. אם עבר יותר מיום, פונים ל-Clix.</td></tr>
+  <tr><td class="wrap">השעה בשיחת ווטסאפ, או בדף של שיחת טלפון, לא נכונה</td><td>בשני המקומות האלה השעה מוצגת לפי UTC: שלוש שעות פחות משעון ישראל בקיץ, ושעתיים פחות בחורף.</td></tr>
+  <tr><td class="wrap">הדשבורד באנגלית</td><td>לוחצים <span class="ui">עברית</span> בתחתית תפריט הצד.</td></tr>
+  <tr><td class="wrap">הדף לא נטען, או <span class="ui">טוען…</span> זמן רב</td><td>מרעננים. אם זה חוזר, פונים ל-Clix.</td></tr>
+</table></div>
+
+<p class="foot">שאלות, תקלה שחוזרת, או חשבון חדש: פונים ל-Clix.</p>
+
+</main>
+</body>
+</html>

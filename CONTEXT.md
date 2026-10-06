@@ -3169,6 +3169,20 @@ state" is worse than one stale one.
 route. `vercel link` writes `.vercel/` AND appends `.env*` to the app
 .gitignore - trim that to `.vercel`, or the tracked .env.example goes dark.
 
+**The staff SOP quotes the screen as `main` has it (6 Oct).**
+`docs/features/13-dashboard/sop-he.html` is the Hebrew procedure for Homies
+staff. Every label in it is copied from `dashboard/lib/i18n.ts` on
+`origin/main`, the branch Vercel builds, not from a working branch, because
+staff read what is deployed. A change that reaches `main` and renames a label,
+adds or drops a tab, a column or a status, or changes what a status sends,
+updates the SOP in the same push. It speaks impersonal Hebrew (לוחצים,
+בוחרים): the owner's singular-masculine rule is for the bot writing to one
+tenant, not for a document staff read. Three of its rules are behaviour, not
+wording: an OXS ticket's status goes back to open at every import while OXS
+has it open (the importer owns those rows); the "done" message goes once per
+WhatsApp ticket and cannot be recalled; and `needs_review` is missing from the
+overview's open and urgent counts, so staff check that tab by hand.
+
 **Use the platform's own mechanism before building a parallel one (22 Sep).**
 The Voice page's chat box grew a second road on 2 Sep: with no call running it
 re-ran the voice assistant ourselves, GPT-4.1 over OpenRouter, because Vapi's

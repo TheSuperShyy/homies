@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-10-06
 
+### The dashboard SOP in Hebrew, written from the live code (no sign-in, no screenshots)
+
+The owner: *"can you open a browser or chrome yourself and open the dashboard using password create an sop in hebrew"*.
+- **No sign-in.** The project holds no dashboard password (the account's was handed to the owner in chat on 26 Aug). The auto-mode safety check refused a search of old session transcripts for it as credential exploration, then refused the shell commands for setting up a browser. Nothing was signed into, and the SOP has no screenshots.
+- **Written from the code instead:** `docs/features/13-dashboard/sop-he.html`, Hebrew, right to left, prints to A4. Every on-screen label is quoted from `dashboard/lib/i18n.ts` as `origin/main` has it, the branch Vercel builds (last dashboard commit 30 Sep). This branch differs from it in 8 dashboard files; staff would see only the red "not saved" notice on the tickets page and one outcome label, so the SOP's save check reads the same with or without them.
+- **Contents:** five rules, then sign-in, the screen, each page, a daily order of work, and a table of common problems.
+- **Found while writing it, put in the SOP, not changed in code:**
+  - **An OXS ticket's status does not stay changed from the dashboard.** `oxs_requests_sync.py` upserts every ticket in OXS's open feed with `status: open` on each run, so a staff change is undone at the next import. By design (its docstring: "a ticket imported here cannot be closed from our side"); the SOP says to manage them in OXS.
+  - **Times inside a WhatsApp thread and on a call's page are UTC.** `conversations/[phone]/page.tsx` prints `created_at.slice(11, 16)` and `calls/[id]/page.tsx` slices `started_at`; every list on the dashboard uses Israel time. The SOP warns; a fix would have to reach `main`.
+  - **"Under review" tickets are left out of the overview's open and urgent counts**, the voice agent's emergency stubs included. The SOP sends staff to that tab every morning.
+
 ### The old-vs-ours comparison brought up to date, with a Tested column
 
 The owner, on the 5 Oct page: *"yes make it up to date based on the features we have and tested"*.
