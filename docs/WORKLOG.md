@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-06
 
+### Before and after: the old ManyChat bot next to ours, side by side
+
+The owner: *"wrong project i want you to create the breakdown comparison on the manychat and the system we have right now to compare side by side about the chatbot features they have before and after"*. This stopped the SOP screenshots below; their Chrome window was closed before the first page loaded, so nothing was captured.
+- **New pair:** `docs/discovery/manychat-before-after-2026-10-06.{html,md}`, from one builder in the session scratchpad (`build_before_after.py`). One card per feature, Before (ManyChat) on the left and After (ours) on the right, each with what the tenant actually sees: the Hebrew word for word, English under it, and how ours was checked.
+- **18 features:** 8 better, 6 different on purpose, 4 missing (the elevator-company step, the 23-hour follow-up, the quote leads board, a website link to start the chat). The verdicts are the 6 Oct analysis page's; its "alert to a person", "back to menu", "accounting" and "OXS" rows are folded into others, the test tag is left out, and "a fault inside the tenant's own flat" is new.
+- **Sources:** the old side is the 22 Sep editor read (`manychat-scan-2026-09-22.md`, "Door by door"); ours is the 5 Oct six-tenant transcript and the 6 Oct "done" test. Ticket numbers shown are test tickets; the payment link is shown as `[קישור]`. Checked rendered at desktop and phone width (no sideways scroll); ticket and phone numbers kept on one line.
+- **Parked, not finished:** the SOP screenshots. `scripts/dashboard_sop_shots.py` (opens Chrome for a person to sign in, blurs resident data, shoots, builds an illustrated copy in Downloads) and the `<!-- shot:… -->` markers in `sop-he.html` are committed; the script has never got past the first page load.
+
 ### The dashboard SOP in Hebrew, written from the live code (no sign-in, no screenshots)
 
 The owner: *"can you open a browser or chrome yourself and open the dashboard using password create an sop in hebrew"*.

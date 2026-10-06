@@ -136,6 +136,12 @@
   nav.toc a { color: var(--accent); text-decoration: none; }
   nav.toc a:hover { text-decoration: underline; }
   .foot { margin-top: 34px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  /* Screenshots: only in the illustrated build (scripts/dashboard_sop_shots.py
+     swaps each <!-- shot:NAME --> marker for one). */
+  figure.shot { margin: 14px 0 20px; break-inside: avoid; }
+  figure.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
+  figure.shot.narrow img { width: auto; max-width: min(100%, 300px); }
+  figure.shot figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
   @media (max-width: 640px) {
     .page { margin: 0; padding: 18px 16px 28px; border: 0; border-radius: 0; }
     h1 { font-size: 25px; }
@@ -163,6 +169,7 @@
 <p class="meta">למי: צוות השירות והגבייה &nbsp;·&nbsp; כתובת: <bdi class="ltr" dir="ltr">homies-dashboard.vercel.app</bdi> &nbsp;·&nbsp; עודכן: 6 באוקטובר 2026</p>
 <p class="lead">הדשבורד מרכז במקום אחד את הקריאות, את החובות, את השיחות של הבוט מיכאל בווטסאפ ואת השיחות של הסוכן הקולי. הנתונים מגיעים מ-OXS ומהבוטים, והוא מתעדכן לבד.</p>
 <p class="legend">מילים במסגרת, כמו <span class="ui">שמירה</span>, כתובות בדיוק כמו שהן מופיעות על המסך.</p>
+<!-- shot-note -->
 
 <section class="box">
   <h2>חמשת הכללים</h2>
@@ -201,6 +208,7 @@
   <li>מקלידים <span class="ui">אימייל</span> ו<span class="ui">סיסמה</span> ולוחצים <span class="ui">כניסה</span>.</li>
   <li>נפתח מסך <span class="ui">סקירה</span>.</li>
 </ol>
+<!-- shot:login -->
 <ul>
   <li>אם מופיעה ההודעה באנגלית <bdi class="ltr" dir="ltr">Invalid login credentials</bdi>, האימייל או הסיסמה לא נכונים. בודקים אותם ומנסים שוב.</li>
   <li>אין הרשמה עצמית ואין קישור "שכחתי סיסמה". לחשבון חדש, או כשהסיסמה נשכחה, פונים ל-Clix.</li>
@@ -216,6 +224,8 @@
   <li><b>רשימות ארוכות.</b> מעל הטבלה בוחרים כמה <span class="ui">שורות</span> לראות בעמוד (10, 25 או 50), ועוברים בין עמודים ב<span class="ui">הקודם</span> וב<span class="ui">הבא</span>.</li>
   <li><b>שליחת תצוגה לעמית.</b> הלשונית, החודש והחיפוש נשמרים בכתובת של הדף. מעתיקים את הכתובת ושולחים אותה, והעמית רואה בדיוק את אותה רשימה.</li>
 </ul>
+<!-- shot:overview -->
+<!-- shot:mobile -->
 
 <!-- 3 -->
 <h2 id="overview">3. סקירה</h2>
@@ -234,6 +244,7 @@
   <li><span class="ui">פעילות השבוע</span>: שלושה גרפים, קריאות שנפתחו, שיחות של הסוכן וקריאות שנסגרו, וליד כל אחד השוואה <span class="ui">מול התקופה הקודמת</span>. משנים את התקופה ב<span class="ui">7 ימים</span>, <span class="ui">30 יום</span> או <span class="ui">90 יום</span>, או בוחרים <span class="ui">מתאריך</span> ו<span class="ui">עד תאריך</span> ולוחצים <span class="ui">הצג</span>. קריאות שנסגרו נספרות לפי יום הפתיחה: אלה שנפתחו בתקופה שנבחרה ונסגרו מאז.</li>
   <li><span class="ui">שבעת הימים האחרונים</span>: שמונה הקריאות האחרונות שנפתחו. <span class="ui">לכל הקריאות</span> עובר לעמוד הקריאות.</li>
 </ul>
+<!-- shot:overview-activity -->
 
 <!-- 4 -->
 <h2 id="tickets">4. קריאות</h2>
@@ -241,6 +252,7 @@
 
 <h3>4.1 מה רואים בעמוד</h3>
 <p>למעלה יש לשוניות לפי סטטוס: <span class="ui">הכול</span> <span class="ui">פתוחה</span> <span class="ui">בטיפול</span> <span class="ui">לבדיקה</span> <span class="ui">נסגרה</span> <span class="ui">בוטלה</span>. הקריאות מסודרות מהחדשה לישנה.</p>
+<!-- shot:tickets -->
 <div class="scroll"><table>
   <tr><th>עמודה</th><th>מה יש בה</th></tr>
   <tr><td><span class="ui">מספר קריאה</span></td><td>המספר שהדייר מקבל, למשל <bdi class="ltr" dir="ltr">255-1294-26</bdi>.</td></tr>
@@ -267,6 +279,7 @@
   <li>לוחצים <span class="ui">שמירה</span> באותה שורה. בלי שמירה שום דבר לא משתנה.</li>
   <li>בודקים שהסטטוס החדש נשאר אחרי שהדף נטען. אם חזר הסטטוס הקודם, השמירה לא עברה: מנסים שוב, ואם זה חוזר מעדכנים את Clix.</li>
 </ol>
+<!-- shot:ticket-row -->
 <div class="box tip"><b>תקין:</b> בלשונית מסוננת, למשל <span class="ui">פתוחה</span>, קריאה ששינו לה סטטוס עוברת ללשונית אחרת ונעלמת מהרשימה.</div>
 
 <h3>4.3 מה אומר כל סטטוס</h3>
@@ -300,6 +313,7 @@
 <!-- 5 -->
 <h2 id="debts">5. חובות</h2>
 <p>העמוד נקרא <span class="ui">יתרות פתוחות</span>: מי חייב, כמה ועל אילו חודשים, לפי הנתונים מ-OXS.</p>
+<!-- shot:debts -->
 <ul>
   <li><b>חודש.</b> יש לשונית לכל חודש שיש בו חוב (למשל <bdi class="ltr" dir="ltr">2026-09</bdi>), ו<span class="ui">הכול</span> לכל החודשים יחד. העמוד נפתח על החודש האחרון שכבר נגמר, כי על החודש הנוכחי עוד לא גובים.</li>
   <li><b>תצוגה.</b> <span class="ui">לפי דירה</span>: שורה לכל דירה. <span class="ui">לפי בעלים</span>: שורה לכל אדם, עם כל הדירות שלו יחד. הבחירה נשמרת כשמחליפים חודש.</li>
@@ -314,6 +328,7 @@
 <!-- 6 -->
 <h2 id="whatsapp">6. שיחות ווטסאפ</h2>
 <p>כל מי שכתב לבוט מיכאל בווטסאפ, מהשיחה האחרונה לראשונה.</p>
+<!-- shot:conversations -->
 <div class="scroll"><table>
   <tr><th>עמודה</th><th>מה יש בה</th></tr>
   <tr><td><span class="ui">מי</span></td><td>שם הדייר, הבניין והדירה. אם מופיע רק מספר טלפון, הכותב לא נמצא ברשימת הדיירים.</td></tr>
@@ -324,12 +339,14 @@
   <tr><td><span class="ui">פעילות אחרונה</span></td><td>מתי נכתבה ההודעה האחרונה, לפי שעון ישראל.</td></tr>
 </table></div>
 <p>לחיצה על השם פותחת את כל השיחה: בועות של <span class="ui">דייר</span>, של <span class="ui">מיכאל</span> (הבוט) ושל <span class="ui">נציג</span> (מישהו מהצוות). תמונות שהדייר שלח מופיעות בתוך הבועה. מתחת לשיחה מופיעות <span class="ui">קריאות אחרונות</span>: עד חמש הקריאות האחרונות שנפתחו מאותו מספר.</p>
+<!-- shot:thread -->
 <div class="box warn"><b>חשוב:</b> השעה שבבועות מוצגת לפי שעון UTC ולא לפי שעון ישראל. בשעון קיץ היא מוקדמת בשלוש שעות ובשעון חורף בשעתיים: הודעה שנשלחה ב-21:00 מופיעה בקיץ כ-18:00.</div>
 <p>מהדשבורד אי אפשר לענות לדייר. הוא רק מציג את השיחה.</p>
 
 <!-- 7 -->
 <h2 id="calls">7. שיחות טלפון</h2>
 <p>השיחות של הסוכן הקולי. כרגע עוד אין לסוכן מספר טלפון, ולכן מופיעות כאן רק שיחות ניסיון מהדפדפן.</p>
+<!-- shot:calls -->
 <ul>
   <li><b>לשוניות:</b> <span class="ui">כל השיחות</span>, <span class="ui">נכנסות</span>, <span class="ui">יוצאות</span>, <span class="ui">ללא מענה</span> (למי הסוכן התקשר ולא ענו, ובאיזה ניסיון), ו<span class="ui">לינקים שנשלחו</span> (לינקים לתשלום שנשלחו לדיירים).</li>
   <li><b>חיפוש במה שנאמר:</b> כותבים מילה בתיבה <span class="ui">חיפוש במה שנאמר, עברית או אנגלית</span> ולוחצים <span class="ui">חיפוש</span>. החיפוש עובר על התמלול ועל התקציר. <span class="ui">ניקוי</span> מבטל אותו.</li>
@@ -338,6 +355,7 @@
   <li>לשיחות מלפני 20 באוגוסט 2026 אין תקציר, ולכן כתוב בהן <span class="ui">אין תקציר</span>.</li>
   <li><b>לינקים שנשלחו:</b> הסטטוס <bdi class="ltr" dir="ltr">sent</bdi> אומר ש-OXS אישרה שהלינק יצא. אם הדייר שילם, רואים את זה רק ב-OXS.</li>
 </ul>
+<!-- shot:call -->
 
 <!-- 8 -->
 <h2 id="search">8. חיפוש</h2>
@@ -348,10 +366,12 @@
   <li><b>מעבר לפרטים:</b> <span class="ui">לדייר</span> פותח את דף הדייר, עם הפרטים שלו, השיחה שלו בווטסאפ והקריאות האחרונות שלו. <span class="ui">לשיחה</span> פותח שיחת ווטסאפ. <span class="ui">צפייה בשיחה</span> פותח שיחת טלפון.</li>
   <li><b>לא נמצא כלום?</b> מנסים רק את שם המשפחה, או את ארבע הספרות האחרונות של הטלפון.</li>
 </ul>
+<!-- shot:search -->
 
 <!-- 9 -->
 <h2 id="voice">9. שיחת סוכן קולי</h2>
 <p>עמוד לבדיקה של הסוכן הקולי מהדפדפן. הוא לא חלק מהעבודה השוטפת.</p>
+<!-- shot:voice -->
 <ul>
   <li>יש בו שתי לשוניות: <span class="ui">קליטת פניות (מיכאל)</span>, הסוכן שעונה לדיירים, ו<span class="ui">מעקב חובות</span>, הסוכן שמתקשר לחייבים.</li>
   <li>צריך מיקרופון. לוחצים <span class="ui">התחלת שיחה</span>, מדברים, ובסוף לוחצים <span class="ui">ניתוק</span>. בזמן השיחה אפשר גם לכתוב לסוכן.</li>
@@ -362,6 +382,7 @@
 <!-- 10 -->
 <h2 id="import">10. ייבוא</h2>
 <p>כאן רואים מתי נכנסו לאחרונה נתונים מ-OXS: <span class="ui">הייבוא האמיתי האחרון</span>, ומתחתיו <span class="ui">דיירים מ-OXS</span>, <span class="ui">חובות מ-OXS</span> ו<span class="ui">קריאות מ-OXS</span>, כל אחד עם הזמן שבו התעדכן.</p>
+<!-- shot:sync -->
 <ul>
   <li>הייבוא רץ לבד: דיירים וחובות פעמיים ביום (בחצות וב-15:00), וקריאות כמה פעמים ביום. לא צריך ללחוץ על כלום.</li>
   <li>מסתכלים כאן כשמשהו לא נראה מעודכן, למשל תשלום שלא ירד או קריאה חדשה מ-OXS שלא הגיעה. אם הייבוא האחרון היה לפני יותר מיום, מעדכנים את Clix.</li>
@@ -371,6 +392,7 @@
 <!-- 11 -->
 <h2 id="settings">11. הגדרות</h2>
 <p>נכנסים דרך גלגל השיניים בפס העליון, או דרך <span class="ui">הגדרות</span> בתפריט.</p>
+<!-- shot:settings -->
 <ul>
   <li><span class="ui">הפרופיל שלי</span>: <span class="ui">בחירת תמונה</span> ואז <span class="ui">שמירת התמונה</span>; <span class="ui">שם לתצוגה</span> ואז <span class="ui">שמירה</span>.</li>
   <li><span class="ui">החשבון שלי</span>: האימייל, הכניסה האחרונה ומתי נפתח החשבון. לכל מי שמחובר יש אותה גישה: צפייה בכל הבניינים.</li>
