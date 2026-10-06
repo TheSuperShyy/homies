@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-10-05
 
+### The Omnitelecom call, transcribed (a video the owner downloaded; nothing spent)
+
+The owner asked for the transcript of `WhatsApp Video 2026-10-05 at 18.57.47`: 14:17 of a phone call recorded on a phone. The speakers are Omnitelecom's rep, someone on our side, and Yariv.
+- **How:** transcribed on the owner's PC with faster-whisper (large-v3-turbo), audio decoded by ffmpeg. Nothing left the machine.
+- **Where it is:** `Downloads\WhatsApp Video 2026-10-05 at 18.57.47 - transcript.html`, with a summary and the English beside the Hebrew. It is not in the repo, since this is a public tree and it was a business call.
+- **What the call says:**
+  - **The move:** Homies moves to Omni's newer system, Tokomni; the move is free.
+  - **Price:** the dialer plus AI package is 250 ₪ a month for 5 concurrent lines, with no cap on calls.
+  - **Numbers:** they go in by CSV or by their campaign API, whose docs they sent.
+  - **Inbound (Yariv's call):** on weekdays the agent is a menu extension ("3, collections and customer service"), not the default. After hours, an "offices are closed, press for the on-call person" message.
+  - **A stuck agent:** a ticket for a person, not "press 2".
+  - **How the call reaches the agent:** still open. Omni asked for a URL or a phone number, our side said "a webhook", and the recording ends there.
+- **A webhook cannot carry the call audio.** Route B needs Omni to forward the answered call to our Vapi SIP address: the deal-breaker on the 28 Sep list for Omni. Raised with the owner.
+
 ### WhatsApp bot: the emergency run again on the fixed bot, two more fixes, the document updated
 
 The owner: *"okgo also run the new test for the whole chatbot again for the emergency only so its updated"*.
