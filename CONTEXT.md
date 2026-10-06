@@ -2589,7 +2589,10 @@ edited, the Hebrew one goes stale silently, because nothing regenerates it.
 table was right on the day and went wrong within two weeks, because the bot changed under it and
 nothing re-read the old side. Put the date in the file name, say which side was read today and
 which was carried over from an earlier scan, and when a newer comparison exists, point at it from
-HANDOVER so the old table is not copied into a report.
+HANDOVER so the old table is not copied into a report. Since 6 Oct each row also says how it was
+tested and when ("Live, 5 Oct: …", "Practice run, 4 Oct: …", "Not tested live"): a verdict with no
+test behind it is a claim, and the owner asked for the comparison "based on the features we have and
+tested".
 
 **4 Oct evening: the warm word is caring, not irritated (owner).** Reading the 15 conversations,
 the owner said "איזה מעצבן" and "אוף" do not fit the bot at all. The word before the question is

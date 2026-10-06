@@ -1,5 +1,7 @@
 # The old ManyChat bot vs our WhatsApp bot, as of 5 Oct 2026
 
+> **Replaced on 6 Oct by `manychat-vs-ours-2026-10-06.md`**, which adds how each feature was tested. Kept for the record.
+
 Supersedes the "Old vs ours" table in `manychat-scan-2026-09-22.md`, which was true on 22 Sep
 and is stale now: the menu changed on 4 Oct, the "done" message went live on 23 Sep, the
 human handover alerts landed on 3 Sep, and the bot is at memory epoch 73.

@@ -9,6 +9,20 @@ conversation that produced it.
 
 ---
 
+## 2026-10-06
+
+### The old-vs-ours comparison brought up to date, with a Tested column
+
+The owner, on the 5 Oct page: *"yes make it up to date based on the features we have and tested"*.
+- **New pair:** `docs/discovery/manychat-vs-ours-2026-10-06.{md,html}`, both built from one list (the builder is in the session scratchpad), on the 5 Oct page's styles. The 5 Oct pair is marked replaced and HANDOVER points at the new one.
+- **What changed:**
+  - every row says how it was tested: the 5 Oct live chats (before and after the fixes), the emergency runs, the 6 Oct "done" message, and the 4 Oct practice run;
+  - a new Emergencies row (Better);
+  - Ticket status went from Matched to Better (it finds a ticket from a description, tested live);
+  - the ours-side wording is current (the identity check, "how are you today", the digital-assistant answer, the after-hours alerts).
+- **Counts:** 24 rows: 9 better, 9 different, 2 matched, 4 missing (the same four).
+- **Found in testing, still open, on the page:** the balance amount not said, a known resident asked for the building, "anything else?", the feminine slip.
+
 ## 2026-10-05
 
 ### The Omnitelecom call, transcribed (a video the owner downloaded; nothing spent)

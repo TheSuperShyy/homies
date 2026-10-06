@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ManyChat bot vs our WhatsApp bot, 5 Oct 2026</title>
+<title>ManyChat bot vs our WhatsApp bot, 6 Oct 2026</title>
 <style>
   :root {
     --bg: #f7f7f5; --card: #ffffff; --ink: #1d1f23; --muted: #6b6f76; --line: #e3e3df;
@@ -45,13 +45,13 @@
   .chip.different { color: var(--different); background: var(--different-bg); }
   .chip.missing { color: var(--missing); background: var(--missing-bg); }
   .wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
-  table { width: 100%; border-collapse: collapse; min-width: 860px; }
+  table { width: 100%; border-collapse: collapse; min-width: 980px; }
   th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: start; }
   th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
        background: var(--card); position: sticky; top: 0; }
   tr:last-child td { border-bottom: 0; }
   td.feat { font-weight: 600; width: 16%; }
-  td.old, td.ours { width: 34%; color: var(--ink); }
+  td.old { width: 24%; } td.ours { width: 30%; } td.tested { width: 24%; color: var(--muted); font-size: 13px; }
   td.verdict { width: 110px; }
   tr.missing td.feat { box-shadow: inset 3px 0 0 var(--missing); }
   tr.better td.feat { box-shadow: inset 3px 0 0 var(--better); }
@@ -78,22 +78,20 @@
 <body>
 <main>
   <h1>Old ManyChat bot vs our WhatsApp bot</h1>
-  <p class="sub"><strong>Replaced on 6 Oct by <code>manychat-vs-ours-2026-10-06.html</code>, which adds how each feature was tested.</strong> As of 5 Oct 2026. The old side is from the 22 Sep scan of the ManyChat page and
-    editor, not re-read today. The "ours" side is the live code and the 4 Oct QA run. Full
-    notes in <code>manychat-vs-ours-2026-10-05.md</code>.</p>
+  <p class="sub">As of 6 Oct 2026, replacing the 5 Oct page. The old side is from the 22 Sep scan of the ManyChat page and editor, not re-read. The &quot;ours&quot; side is the live bot today, and the Tested column says how each feature was checked: the live chats as the test tenant Assaf Clix on 5 Oct (afternoon, before the fixes; evening, after them), the emergency runs, the &quot;done&quot; message on 6 Oct, and the 48 practice conversations of 4 Oct.</p>
 
   <section class="cards" aria-label="Summary">
-    <div class="card matched"><div class="n">3</div><div class="l">Matched</div></div>
-    <div class="card better"><div class="n">7</div><div class="l">We do it better</div></div>
+    <div class="card better"><div class="n">9</div><div class="l">We do it better</div></div>
     <div class="card different"><div class="n">9</div><div class="l">Done differently</div></div>
+    <div class="card matched"><div class="n">2</div><div class="l">Matched</div></div>
     <div class="card missing"><div class="n">4</div><div class="l">We are missing</div></div>
   </section>
 
   <h2>Where each feature stands</h2>
   <div class="bars" aria-label="Breakdown">
-    <div class="bar-row"><span>Better</span><div class="bar"><span class="better" style="width:30%"></span></div><span>7</span></div>
-    <div class="bar-row"><span>Different</span><div class="bar"><span class="different" style="width:39%"></span></div><span>9</span></div>
-    <div class="bar-row"><span>Matched</span><div class="bar"><span class="matched" style="width:13%"></span></div><span>3</span></div>
+    <div class="bar-row"><span>Better</span><div class="bar"><span class="better" style="width:38%"></span></div><span>9</span></div>
+    <div class="bar-row"><span>Different</span><div class="bar"><span class="different" style="width:38%"></span></div><span>9</span></div>
+    <div class="bar-row"><span>Matched</span><div class="bar"><span class="matched" style="width:8%"></span></div><span>2</span></div>
     <div class="bar-row"><span>Missing</span><div class="bar"><span class="missing" style="width:17%"></span></div><span>4</span></div>
   </div>
 
@@ -108,104 +106,140 @@
   <div class="wrap" style="margin-top:14px">
   <table>
     <thead>
-      <tr><th>Feature</th><th>ManyChat bot (old)</th><th>Our bot today</th><th>Verdict</th></tr>
+      <tr><th>Feature</th><th>ManyChat bot (old)</th><th>Our bot today</th><th>Tested</th><th>Verdict</th></tr>
     </thead>
     <tbody>
       <tr class="missing"><td class="feat">Entry link</td>
         <td class="old"><code>WhatsApp URL #1</code>, a button on a website</td>
         <td class="ours">None. Residents write to the number.</td>
+        <td class="tested">Nothing to test.</td>
         <td class="verdict"><span class="chip missing">Missing</span></td></tr>
       <tr class="different"><td class="feat">Greeting and menu</td>
-        <td class="old">Fixed greeting, "continue" button, six-row list, every time</td>
-        <td class="ours">Fixed greeting with three buttons on a bare hello: open a ticket, status, talk to a rep. The model can also show the menu.</td>
+        <td class="old">Fixed greeting, a &quot;continue&quot; button, a six-row list, every time</td>
+        <td class="ours">A greeting by the hour with three buttons on a bare hello: open a service ticket, ticket status, talk to a representative. The bot can also show the buttons itself when someone is lost.</td>
+        <td class="tested">Live, 5 Oct: all three buttons used by the six test tenants; the menu came on every hello.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="different"><td class="feat">Identifying the resident</td>
-        <td class="old">Four questions (name, address, floor, flat) on five doors, every time</td>
-        <td class="ours">Building and flat only, and the sender's number. Name and phone only where money is read.</td>
+        <td class="old">Four questions (name, address, floor, flat) on five of six paths, every time; nothing remembered, nothing checked</td>
+        <td class="ours">The WhatsApp number says who is writing. Building and flat are asked together in one question, only when a ticket needs them; a flat left out is filled from Homies&#x27; records; the building is checked against the ones Homies manages. A typed name and phone only for the balance (a security check, asked once, any country&#x27;s number).</td>
+        <td class="tested">Live, 5 Oct: worked in all six chats. Gap: it still asked Assaf which building, though his number is on file.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
-      <tr class="different"><td class="feat">"Already in the app?" gate</td>
-        <td class="old">Yes ends the chat with reassurance; nothing is filed</td>
-        <td class="ours">None. A described fault becomes a ticket; a status question reads the database.</td>
+      <tr class="different"><td class="feat">&quot;Already in the app?&quot; gate</td>
+        <td class="old">&quot;Yes&quot; ends the chat with reassurance; nothing is filed</td>
+        <td class="ours">None. A described fault becomes a ticket; a status question reads the system.</td>
+        <td class="tested">Live, 5 Oct: faults went straight to tickets.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="different"><td class="feat">Push to the OXS app</td>
         <td class="old">Three times: pay there, open calls there, get updates there</td>
-        <td class="ours">Not a menu step. The payment link is the resident's own OXS link.</td>
+        <td class="ours">Not a menu step. The payment link the bot sends is the resident&#x27;s own OXS link.</td>
+        <td class="tested">Live, 5 Oct: the link was sent in two chats.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="better"><td class="feat">Service call</td>
-        <td class="old">Filed to a Monday board with the whole intake; the resident gets no reference</td>
-        <td class="ours">A ticket with a <code>255-NNNN-YY</code> reference, read back to the resident; on the dashboard</td>
+        <td class="old">Filed to a Monday board; the resident gets no reference number</td>
+        <td class="ours">Opens a numbered ticket (255-…), reads the number back, and shows it on the dashboard.</td>
+        <td class="tested">Live, 5 Oct: the intercom (255-1347-26) from a long, chatty story, and the dark parking (255-1348-26) from three words full of typos.</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="better"><td class="feat">Emergencies</td>
+        <td class="old">No emergency path (none in the 22 Sep scan)</td>
+        <td class="ours">An urgent ticket with its number, and nothing else: no advice, no instructions, no &quot;the team is on the way&quot;, no phone numbers. Pushed, &quot;that&#x27;s the only thing I can do from here&quot;. After office hours the alert to the team waits until 09:00.</td>
+        <td class="tested">Live, 5 Oct: the first run failed (folded into another ticket, advice and &quot;on the way&quot; sent). Fixed the same evening; on the fixed bot the urgent ticket 255-1349-26 opened and nothing forbidden reached the tenant.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
       <tr class="different"><td class="feat">Photo</td>
-        <td class="old">Optional yes or no, then one image attached to the Monday update</td>
-        <td class="ours">Stored on the ticket, thumbnails on the dashboard. The bot keeps a photo that arrives; it does not ask for one.</td>
+        <td class="old">Optional yes/no, then one image attached to the Monday update</td>
+        <td class="ours">Kept with the ticket if one is sent (private storage, thumbnails on the dashboard). The bot does not ask for one.</td>
+        <td class="tested">Practice run, 4 Oct: passed (the copy into storage was not run). Not tested live.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="missing"><td class="feat">Elevator fault</td>
-        <td class="old">Asks for the elevator company, then emails the office with the company and description</td>
-        <td class="ours">A ticket like any other. No company field, no office email.</td>
+        <td class="old">&quot;Did you contact the elevator company?&quot;, then the company and a description, emailed to the office inbox</td>
+        <td class="ours">A ticket like any other, urgent when someone is stuck. No elevator-company question and no email.</td>
+        <td class="tested">Live, 5 Oct: the lift ticket 255-1343-26 opened. The elevator-company step does not exist.</td>
         <td class="verdict"><span class="chip missing">Missing</span></td></tr>
       <tr class="different"><td class="feat">Repeated elevator problem</td>
-        <td class="old">Written down and closed, no hook</td>
+        <td class="old">Written down and closed with no follow-up</td>
         <td class="ours">Opened as a ticket</td>
+        <td class="tested">Covered by the lift test above.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="missing"><td class="feat">Quote for a prospect</td>
-        <td class="old">Three building questions, each answer written to a leads board</td>
-        <td class="ours">One note to the team with the details. No leads board.</td>
+        <td class="old">An intro, three building questions, each answer written to a leads board</td>
+        <td class="ours">A note to the team with the details; no leads board.</td>
+        <td class="tested">Practice run, 4 Oct: the note went out.</td>
         <td class="verdict"><span class="chip missing">Missing</span></td></tr>
       <tr class="better"><td class="feat">House manager</td>
-        <td class="old">Description goes to the inbox, assigned to a user who no longer exists</td>
-        <td class="ours">A note to the team, with a mention of a named person</td>
+        <td class="old">Description to the inbox, assigned to a user who no longer exists</td>
+        <td class="ours">A note to the team that names a person. After office hours the alert waits until 09:00.</td>
+        <td class="tested">Live, 5 Oct: a call-back request was passed on; it was after hours, so the alert waited for the morning, as designed.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
       <tr class="better"><td class="feat">Payments</td>
         <td class="old">App gate, then the app link, then a rep or close</td>
-        <td class="ours">Balance, payment link, and an open request if the link cannot be sent</td>
+        <td class="ours">The balance after a typed name and phone, and the resident&#x27;s personal payment link. &quot;I want to pay&quot; with no link opens a payment ticket and tells the team.</td>
+        <td class="tested">Live, 5 Oct: the link was sent twice. Open bug: the balance (2,000 ₪) was found but never reached the tenant.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
       <tr class="better"><td class="feat">Accounting and talk to a rep</td>
         <td class="old">Free text, assigned to a team member</td>
-        <td class="ours">A note that mentions a rep; a human reply in the inbox pauses the bot</td>
+        <td class="ours">&quot;Talk to a representative&quot; opens with &quot;Hi, this is Michael from Homies, how are you today?&quot;. Asked straight out, he says he is the digital assistant and offers a person. A person&#x27;s reply in the inbox pauses the bot.</td>
+        <td class="tested">Live, 5 Oct: the greeting, and the honest &quot;digital assistant&quot; answer to &quot;person or bot?&quot;.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
       <tr class="matched"><td class="feat">Back to menu</td>
         <td class="old">On two questions</td>
-        <td class="ours">On a bare hello, or on request</td>
+        <td class="ours">The menu comes back on a bare hello, or when the bot shows it.</td>
+        <td class="tested">Live, 5 Oct: on every hello.</td>
         <td class="verdict"><span class="chip matched">Matched</span></td></tr>
       <tr class="different"><td class="feat">Unanswered question</td>
-        <td class="old">Chat closed silently, no message</td>
-        <td class="ours">Nothing closes; the next message continues the conversation</td>
+        <td class="old">The chat is closed silently, with no message</td>
+        <td class="ours">Nothing closes; the next message carries on.</td>
+        <td class="tested">Not tested on purpose.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
-      <tr class="matched"><td class="feat">Last report</td>
-        <td class="old">Remembered on the subscriber</td>
-        <td class="ours">Looked up by reference, or by building and flat</td>
-        <td class="verdict"><span class="chip matched">Matched</span></td></tr>
-      <tr class="better"><td class="feat">"Done" message</td>
-        <td class="old">Monday status drives a ManyChat flow; silent for a month</td>
-        <td class="ours">Template sent when a ticket is resolved, proven end to end on 23 Sep</td>
+      <tr class="better"><td class="feat">Ticket status</td>
+        <td class="old">A field that remembers the last report</td>
+        <td class="ours">Looks up the flat&#x27;s or building&#x27;s open tickets, by number or by description, and says honestly when there is no date.</td>
+        <td class="tested">Live, 5 Oct: found the mould ticket 255-1341-26 from a description alone (it could not before the 5 Oct fix). Was &quot;Matched&quot; on 5 Oct.</td>
+        <td class="verdict"><span class="chip better">Better</span></td></tr>
+      <tr class="better"><td class="feat">&quot;Done&quot; message</td>
+        <td class="old">Monday status drives a flow (silent for a month, wording never seen)</td>
+        <td class="ours">When the office marks a WhatsApp ticket resolved on the dashboard, the resident gets the approved &quot;your ticket was handled and closed&quot; message within 2 minutes.</td>
+        <td class="tested">Live, 6 Oct: 255-1346-26 resolved on the dashboard, delivered to the phone 2 minutes later.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
       <tr class="missing"><td class="feat">23-hour follow-up</td>
-        <td class="old">A flow asking "is your request still relevant?" (not seen wired)</td>
+        <td class="old">A flow, never seen wired</td>
         <td class="ours">None</td>
+        <td class="tested">Nothing to test.</td>
         <td class="verdict"><span class="chip missing">Missing</span></td></tr>
       <tr class="different"><td class="feat">Test tag</td>
-        <td class="old">Tag <code>טסטים</code>, checked by nothing in the flow</td>
-        <td class="ours">Test prefixes skipped in code</td>
+        <td class="old">A tag, checked by nothing</td>
+        <td class="ours">Test messages are skipped in code</td>
+        <td class="tested">Not tested.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="better"><td class="feat">General questions</td>
         <td class="old">Not in the menu</td>
-        <td class="ours">Answers from the service catalogue: services, regions, fee, response time</td>
+        <td class="ours">Answers about services, regions and the fee from Homies&#x27; own list, and nothing invented.</td>
+        <td class="tested">Live, 5 Oct: what the 250 ₪ fee covers, item by item.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
-      <tr class="better"><td class="feat">Human handover alert</td>
-        <td class="old">Assigned to a team member; no alert</td>
-        <td class="ours">A named rep is alerted on WhatsApp and on the voice agent</td>
+      <tr class="better"><td class="feat">Alert to a person</td>
+        <td class="old">Assigned to a team member, with no alert</td>
+        <td class="ours">A named person is mentioned in the inbox, on WhatsApp and from the phone agent. After office hours the alert waits until 09:00.</td>
+        <td class="tested">Live, 5 Oct: two alerts held until the morning, as designed.</td>
         <td class="verdict"><span class="chip better">Better</span></td></tr>
       <tr class="different"><td class="feat">Stack</td>
-        <td class="old">Monday for tickets, Make as router, ManyChat as inbox</td>
-        <td class="ours">Supabase and the dashboard, n8n as router, Chatwoot as inbox, Meta WhatsApp</td>
+        <td class="old">Monday for tickets, Make as the router, ManyChat as the inbox</td>
+        <td class="ours">Our own database and dashboard, n8n, Chatwoot, Meta WhatsApp</td>
+        <td class="tested">Not a test item.</td>
         <td class="verdict"><span class="chip different">Different</span></td></tr>
       <tr class="matched"><td class="feat">OXS</td>
         <td class="old">Never read or written</td>
-        <td class="ours">Read only. The ticket mirror is on for one number only (24 Sep).</td>
+        <td class="ours">Read only; tickets are copied to OXS for one test number only.</td>
+        <td class="tested">Live, 5 Oct: the test tickets reached OXS.</td>
         <td class="verdict"><span class="chip matched">Matched</span></td></tr>
     </tbody>
   </table>
   </div>
+
+  <h2>Found in testing, still open</h2>
+  <div class="panel"><ul>
+    <li>The balance amount is not said: the bot finds it, but the reply that carries it is stopped and the second try leaves it out (5 Oct).</li>
+    <li>A known resident is still asked which building (5 Oct).</li>
+    <li>&quot;Anything else?&quot; ends too many replies, five in a row in one chat (5 Oct).</li>
+    <li>Michael once spoke of himself in the feminine (מבינה) (5 Oct).</li>
+  </ul></div>
 
   <h2>What to fix first</h2>
   <div class="two">
@@ -213,7 +247,7 @@
       <h3>We are missing, in the order it hurts residents</h3>
       <ol>
         <li><strong>Elevator faults.</strong> Needs the per-building elevator company list from Yariv.</li>
-        <li><strong>The 23-hour nudge.</strong> Cheap: a cron over open tickets, no template needed.</li>
+        <li><strong>The 23-hour nudge.</strong> Cheap: a scheduled check over open tickets, no template needed.</li>
         <li><strong>Photo to the team.</strong> Covered if the team works in the dashboard.</li>
         <li><strong>Quote leads board.</strong> A second place to write; the owner decides.</li>
       </ol>
@@ -222,7 +256,7 @@
       <h3>Do not copy from the old bot</h3>
       <ul>
         <li><strong>Silent close</strong> on any unanswered question.</li>
-        <li><strong>Chats assigned to "Unknown user"</strong>, so house-manager and quote chats may have reached nobody.</li>
+        <li><strong>Chats assigned to &quot;Unknown user&quot;,</strong> so house-manager and quote chats may have reached nobody.</li>
         <li><strong>The office email</strong> as the only record of an elevator fault.</li>
       </ul>
     </div>
@@ -230,8 +264,7 @@
 
   <p class="note">Open for the owner: whether a bot ticket should also land on the old Monday board
   before cutover; whether the elevator branch asks the resident or looks the company up per
-  building; whether to build the 23-hour nudge at all. Still unknown: the wording of the old "done"
-  message, the 23-hour trigger, and the flow created 30 Jul 2026 (<code>Untitled</code>).</p>
+  building; whether to build the 23-hour nudge at all. Full notes in <code>manychat-vs-ours-2026-10-06.md</code>.</p>
 </main>
 </body>
 </html>
