@@ -1,0 +1,477 @@
+{
+ "_note": "7 Oct. Claude-played: Claude stood in for each agent's model on the live prompt (debt 4,896 chars, incoming 6,698) and played the caller from scripts/voice_qa_oct7_6.json. Not the real models. Audio: voice/samples/test-2026-10-07/ (gitignored), made with scripts/voice_qa_audio.py.",
+ "calls": {
+  "debt_assaf_1": {
+   "scenario": "debt_assaf_1",
+   "turns": [
+    {
+     "agent": "צהריים טובים, אסף? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+     "en": "Good afternoon, Assaf? This is Michael from the Homies team, how's it going?"
+    },
+    {
+     "caller": "כן אהלן הכל טוב תודה ואתה",
+     "en": "Yeah hi, all good thanks, and you"
+    },
+    {
+     "agent": "שמח לשמוע, גם אצלי הכל טוב, תודה. יש לך דקה לעניין חשוב?",
+     "en": "Glad to hear it, all good with me too, thanks. Do you have a minute for an important matter?"
+    },
+    {
+     "caller": "כן בטח תגיד",
+     "en": "Yeah sure, go ahead"
+    },
+    {
+     "agent": "רציתי לעדכן אותך שעל דירה שתיים נשארו פתוחים תשלומי ועד הבית מינואר עד אוגוסט, בסך הכל אלפיים שקלים. תרצה שאשלח לך לינק לתשלום?",
+     "en": "I wanted to let you know that on apartment two, the house committee payments from January to August are still open, two thousand shekels in total. Would you like me to send you a payment link?"
+    },
+    {
+     "caller": "אה כן כן אני יודע שהתעכבתי עם זה השנה כן תשלח לי בווצאפ",
+     "en": "Ah yeah yeah, I know I fell behind on it this year, yeah send it to me on WhatsApp"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {},
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "4521"
+        }
+       }
+      ]
+     ],
+     "agent": "שלחתי לך עכשיו לינק בוואטסאפ, למספר שמסתיים בארבע, חמש, שתיים, אחת. תיכנס אליו כשנוח לך ותסיים שם את התשלום, בסדר?",
+     "en": "I just sent you a link on WhatsApp, to the number ending in four, five, two, one. Go into it whenever it suits you and finish the payment there, okay?"
+    },
+    {
+     "caller": "סבבה מעולה אני יסדר את זה תודה רבה מיכאל באמת יום טוב לך",
+     "en": "Cool, great, I'll sort it out, thanks a lot Michael, really, have a good day"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "agent": "תודה רבה לך, אסף, שמחתי לדבר איתך. יום טוב, ולהתראות.",
+     "en": "Thanks a lot, Assaf, nice talking with you. Have a good day, and goodbye."
+    }
+   ]
+  },
+  "debt_assaf_2": {
+   "scenario": "debt_assaf_2",
+   "turns": [
+    {
+     "agent": "צהריים טובים, אסף? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+     "en": "Good afternoon, Assaf? This is Michael from the Homies team, how's it going?"
+    },
+    {
+     "caller": "כן מדבר אהלן מיכל הכל טוב תודה יושב פה בבית רגוע ואצלך מה נשמע",
+     "en": "yeah speaking hey Michal (sic, the speech-to-text's 'Michael') all good thanks just sitting here at home relaxed and you how's it going"
+    },
+    {
+     "agent": "איזה כיף, אין כמו קצת שקט בבית. גם אצלי הכל טוב, תודה, יש לך דקה לעניין חשוב?",
+     "en": "How nice, nothing like a bit of quiet at home. All good with me too, thanks, do you have a minute for an important matter?"
+    },
+    {
+     "caller": "כן בטח תגיד",
+     "en": "yeah sure go ahead"
+    },
+    {
+     "agent": "אני מתקשר בקשר לוועד הבית בבר כוכבא עשרים ושלוש: על דירה שתיים פתוחים התשלומים מינואר עד אוגוסט, בסך הכל אלפיים שקלים. רוצה שאשלח לך לינק לתשלום בוואטסאפ?",
+     "en": "I'm calling about the house committee at Bar Kochba twenty-three: for apartment two, the payments from January to August are open, two thousand shekels in total. Would you like me to send you a payment link on WhatsApp?"
+    },
+    {
+     "caller": "אה וואלה 2000 כבר הצטבר אה כן ידעתי שאני קצת מאחור עם זה כן כן תשלח לי בווטסאפ",
+     "en": "ah wow 2000 it's piled up already uh yeah I knew I was a bit behind on it yeah yeah send it to me on WhatsApp"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {},
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "4521"
+        }
+       }
+      ]
+     ],
+     "agent": "מעולה, שלחתי לך עכשיו לינק בוואטסאפ, למספר שמסתיים בארבע חמש שתיים אחת. תוכל להיכנס אליו ולסיים את התשלום?",
+     "en": "Great, I've just sent you a link on WhatsApp, to the number ending in four five two one. Can you go into it and finish the payment?"
+    },
+    {
+     "caller": "כן רגע אה כן הגיע אני רואה אותו סבבה אני אכנס לזה עוד מעט תודה רבה באמת יום טוב לך",
+     "en": "yeah wait uh yes it came I see it cool I'll get to it in a bit thanks a lot really have a good day"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "agent": "בשמחה, אסף, היה נעים לדבר איתך. יום טוב, ולהתראות.",
+     "en": "My pleasure, Assaf, it was nice talking with you. Have a good day, and goodbye."
+    }
+   ]
+  },
+  "debt_assaf_3": {
+   "scenario": "debt_assaf_3",
+   "turns": [
+    {
+     "agent": "צהריים טובים, אסף? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+     "en": "Good afternoon, Assaf? Michael speaking, from the Homies team, how's it going?"
+    },
+    {
+     "caller": "כן אהלן מיכאל הכל טוב תודה ומה איתך",
+     "en": "Yeah, hello Michael, all good thanks, and how about you"
+    },
+    {
+     "agent": "יופי, גם אצלי הכל טוב, תודה. יש לך דקה לעניין חשוב?",
+     "en": "Great, all good with me too, thanks. Do you have a minute for an important matter?"
+    },
+    {
+     "caller": "כן בטח תגיד",
+     "en": "Yeah sure, go ahead"
+    },
+    {
+     "agent": "אני מתקשר לגבי ועד הבית של דירה שתיים, יש תשלומים פתוחים מינואר עד אוגוסט, סך הכל אלפיים שקלים. תרצה שאשלח לך לינק לתשלום בוואטסאפ?",
+     "en": "I'm calling about the house committee for apartment two, there are open payments from January to August, two thousand shekels in total. Would you like me to send you a payment link on WhatsApp?"
+    },
+    {
+     "caller": "אה וואלה כבר מינואר אוקיי רגע 2000 זה על הכל ביחד",
+     "en": "Oh wow, since January already. Okay, wait, 2000 is for everything together"
+    },
+    {
+     "agent": "כן, זה על כל שמונת החודשים ביחד. לשלוח לך את הלינק?",
+     "en": "Yes, that's for all eight months together. Shall I send you the link?"
+    },
+    {
+     "caller": "כן כן תשלח לי בווטסאפ זה הכי פשוט",
+     "en": "Yes yes, send it to me on WhatsApp, that's simplest"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {},
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "4521"
+        }
+       }
+      ]
+     ],
+     "agent": "שלחתי לך עכשיו את הלינק בוואטסאפ, למספר שמסתיים בארבע חמש שתיים אחת. תוכל לסיים את התשלום משם?",
+     "en": "I've just sent you the link on WhatsApp, to the number ending in four five two one. Can you finish the payment from there?"
+    },
+    {
+     "caller": "סבבה אין בעיה אני אסדר את זה תודה רבה מיכאל יום טוב",
+     "en": "Cool, no problem, I'll sort it out, thanks a lot Michael, have a good day"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "agent": "בשמחה, אסף, ותודה לך. יום טוב, ולהתראות.",
+     "en": "My pleasure, Assaf, and thank you. Have a good day, and goodbye."
+    }
+   ]
+  },
+  "in_light_hello_1": {
+   "scenario": "in_light_hello_1",
+   "turns": [
+    {
+     "agent": "היי, צהריים טובים! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good afternoon! Michael from Homies speaking, how can I help you today?"
+    },
+    {
+     "caller": "אהלן מיכאל מה שלומך",
+     "en": "hey Michael how are you"
+    },
+    {
+     "agent": "אהלן! הכל טוב אצלי, תודה ששאלת! ומה שלומך?",
+     "en": "Hey! All good with me, thanks for asking! And how are you?"
+    },
+    {
+     "caller": "אה טוב תודה ברוך השם הכל בסדר",
+     "en": "uh good thanks, thank God, everything's fine"
+    },
+    {
+     "agent": "יופי, שמח לשמוע! במה אני יכול לעזור לך?",
+     "en": "Great, glad to hear it! What can I help you with?"
+    },
+    {
+     "caller": "כן תשמע אה מאתמול בערב האור בחדר מדרגות לא נדלק בין קומה 1 ל 2 אני לוחץ הכפתור וזה לא עושה כלום",
+     "en": "yeah listen uh since yesterday evening the light in the stairwell doesn't come on between floor 1 and 2 I'm pressing button and it doesn't do anything"
+    },
+    {
+     "agent": "אוי, לעלות במדרגות בחושך זה ממש לא נעים. מה הכתובת של הבניין?",
+     "en": "Oh, going up the stairs in the dark is really not nice. What's the address of the building?"
+    },
+    {
+     "caller": "אה ברחוב בר כוכבא",
+     "en": "uh on Bar Kochba street"
+    },
+    {
+     "agent": "ובאיזה מספר בבר כוכבא?",
+     "en": "And which number on Bar Kochba?"
+    },
+    {
+     "caller": "23",
+     "en": "23"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "lighting",
+         "building": "בר כוכבא 23",
+         "urgency": "normal",
+         "description": "האור בחדר המדרגות בין קומה 1 לקומה 2 לא נדלק מאתמול בערב. לוחצים על הכפתור וזה לא עושה כלום."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1561-26",
+         "reference_spoken": "אחת חמש שש אחת"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על התאורה בחדר המדרגות! מספר הפנייה הוא אחת חמש שש אחת. יש עוד משהו שאני יכול לעזור לך בו?",
+     "en": "I've opened a request about the stairwell lighting! The request number is one five six one. Is there anything else I can help you with?"
+    },
+    {
+     "caller": "מעולה תודה רבה יש לך מושג מתי בערך יבואו לתקן",
+     "en": "great thanks a lot do you have any idea roughly when they'll come to fix it"
+    },
+    {
+     "agent": "אין לי מידע על מתי יגיעו לתקן, ואני לא רוצה לנחש. מה שיש לך ביד זה מספר הפנייה, ואיתו אני יכול לבדוק לך מה המצב בכל פעם שתתקשר. יש עוד משהו שאני יכול לעשות בשבילך?",
+     "en": "I don't have information on when they'll come to fix it, and I don't want to guess. What you have in hand is the request number, and with it I can check the status for you any time you call. Is there anything else I can do for you?"
+    },
+    {
+     "caller": "לא זהו זה הכל תודה רבה מיכאל אתה אלוף יום טוב ביי",
+     "en": "no that's it that's all thanks a lot Michael you're a champ have a good day bye"
+    },
+    {
+     "agent": "שמחתי לעזור! תודה שהתקשרת, ושיהיה לך אחר צהריים נעים, ולהתראות!",
+     "en": "Happy to help! Thanks for calling, and have a pleasant afternoon, and goodbye!"
+    }
+   ]
+  },
+  "in_light_hello_2": {
+   "scenario": "in_light_hello_2",
+   "turns": [
+    {
+     "agent": "היי, צהריים טובים! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good afternoon! This is Michael from Homies, how can I help you today?"
+    },
+    {
+     "caller": "היי מיכאל אהלן מה שלומך",
+     "en": "Hi Michael, hey, how are you?"
+    },
+    {
+     "agent": "הכול טוב, תודה ששאלת! ומה שלומך?",
+     "en": "All good, thanks for asking! And how are you?"
+    },
+    {
+     "caller": "ברוך השם הכל טוב תודה",
+     "en": "Thank God, all good, thanks."
+    },
+    {
+     "agent": "יופי, שמח לשמוע! במה אני יכול לעזור לך היום?",
+     "en": "Great, glad to hear it! What can I help you with today?"
+    },
+    {
+     "caller": "אה תשמע אני מתקשר כי מאתמול בערב האור בחדר מדרגות לא נדלק",
+     "en": "Uh, listen, I'm calling because since yesterday evening the light in the stairwell won't come on."
+    },
+    {
+     "agent": "אוי, לעלות במדרגות בחושך זה באמת לא נעים! איפה בדיוק בחדר המדרגות זה?",
+     "en": "Oh, going up the stairs in the dark is really unpleasant! Where exactly in the stairwell is it?"
+    },
+    {
+     "caller": "בין קומה 1 ל 2 לוחצים על הכפתור וכלום לא קורא",
+     "en": "Between floor 1 and 2, you press the button and nothing happens. [the speech-to-text wrote a sound-alike word, 'reads', for 'happens']"
+    },
+    {
+     "agent": "בוא נפתח על זה פנייה! מה הכתובת של הבניין?",
+     "en": "Let's open a request for it! What's the building's address?"
+    },
+    {
+     "caller": "ברחוב בר כוכבה",
+     "en": "On Bar Kochba Street. [the speech-to-text spelled the street slightly wrong]"
+    },
+    {
+     "agent": "ובאיזה מספר בבר כוכבא?",
+     "en": "And what number on Bar Kochba?"
+    },
+    {
+     "caller": "23",
+     "en": "23."
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "lighting",
+         "building": "בר כוכבא 23",
+         "urgency": "normal",
+         "description": "האור בחדר המדרגות בין קומה 1 לקומה 2 לא נדלק בכלל מאתמול בערב, לוחצים על הכפתור ולא קורה כלום"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1561-26",
+         "reference_spoken": "אחת חמש שש אחת"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האור בחדר המדרגות, בין הקומה הראשונה לשנייה! מספר הפנייה הוא אחת חמש שש אחת. יש עוד משהו שאני יכול לעזור לך בו?",
+     "en": "I've opened a request for the stairwell light, between the first and second floors! The request number is one five six one. Is there anything else I can help you with?"
+    },
+    {
+     "caller": "מעולה תודה רבה אה רק שאלה מתי בערך יבואו לתקן את זה",
+     "en": "Great, thanks a lot, uh, just one question, roughly when will they come to fix it?"
+    },
+    {
+     "agent": "על זה אין לי מידע, ואני לא רוצה לנחש לך. הפנייה פתוחה, ואם תתקשר שוב עם המספר שלה, אני יכול לבדוק לך מה קורה איתה.",
+     "en": "I don't have information on that, and I don't want to guess for you. The request is open, and if you call again with its number, I can check for you what's happening with it."
+    },
+    {
+     "caller": "אוקיי סבבה אין בעיה תודה רבה לך מיכאל באמת שירות מעולה יום טוב",
+     "en": "Okay, cool, no problem, thanks a lot Michael, really great service, have a good day."
+    },
+    {
+     "agent": "תודה על המילים הטובות, ותודה שהתקשרת! שיהיה לך אחר צהריים נעים, ולהתראות!",
+     "en": "Thanks for the kind words, and thanks for calling! Have a nice afternoon, and goodbye!"
+    }
+   ]
+  },
+  "in_light_hello_3": {
+   "scenario": "in_light_hello_3",
+   "turns": [
+    {
+     "agent": "היי, צהריים טובים! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good afternoon! Michael from Homies speaking, how can I help you today?"
+    },
+    {
+     "caller": "היי מיכאל צהריים טובים מה שלומך",
+     "en": "hi Michael good afternoon how are you"
+    },
+    {
+     "agent": "אהלן! אצלי הכל מצוין, תודה ששאלת! ומה שלומך?",
+     "en": "Hey! All great with me, thanks for asking! And how are you?"
+    },
+    {
+     "caller": "אה ברוך השם הכל טוב תודה רבה",
+     "en": "uh thank God all good thanks a lot"
+    },
+    {
+     "agent": "יופי, שמח לשמוע! במה אני יכול לעזור לך?",
+     "en": "Great, glad to hear it! What can I help you with?"
+    },
+    {
+     "caller": "כן אז תשמע מאתמול בעבר האור בחדר מדרגות לא נדלק בכלל בין קומה 1 ל2 אני לוחץ על הכפתור וזה לא עושה כלום",
+     "en": "yeah so listen since yesterday in the past [speech-to-text garble of 'in the evening'] the light in the stairwell doesn't come on at all between floor 1 and 2 I press the button and it does nothing"
+    },
+    {
+     "agent": "אוי, לעלות במדרגות בחושך זה ממש לא כיף! אני אפתח על זה פנייה, מה הכתובת של הבניין?",
+     "en": "Oh, climbing the stairs in the dark is really no fun! I'll open a request about it, what's the building's address?"
+    },
+    {
+     "caller": "אה בר כוכבא",
+     "en": "uh Bar Kochba"
+    },
+    {
+     "agent": "ובאיזה מספר בבר כוכבא?",
+     "en": "And what number on Bar Kochba?"
+    },
+    {
+     "caller": "23",
+     "en": "23"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "lighting",
+         "building": "בר כוכבא 23",
+         "urgency": "normal",
+         "description": "מאתמול בערב האור בחדר המדרגות בין קומה 1 לקומה 2 לא נדלק בכלל. לוחצים על הכפתור וזה לא עושה כלום."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1561-26",
+         "reference_spoken": "אחת חמש שש אחת"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האור בחדר המדרגות, בין קומה ראשונה לשנייה! מספר הפנייה הוא אחת חמש שש אחת. יש עוד משהו שאני יכול לעזור לך בו?",
+     "en": "I've opened a request about the light in the stairwell, between the first and second floors! The request number is one five six one. Is there anything else I can help you with?"
+    },
+    {
+     "caller": "אחלה תודה רבה ואתה יודע בערך מתי יבואו לתקן את זה",
+     "en": "great thanks a lot and do you know roughly when they'll come to fix it"
+    },
+    {
+     "agent": "מתי בדיוק יגיעו, את זה אני לא יודע, ואני לא רוצה לנחש. מה שאני יכול זה לבדוק לך מה המצב של הפנייה בכל פעם שתתקשר, עם המספר אחת חמש שש אחת. יש עוד משהו שאני יכול לעזור לך בו?",
+     "en": "When exactly they'll come, that I don't know, and I don't want to guess. What I can do is check the status of the request for you any time you call, with the number one five six one. Is there anything else I can help you with?"
+    },
+    {
+     "caller": "אוקיי לא זהו זה תודה רבה מיכאל באמת שיהיה לך יום טוב ביי",
+     "en": "okay no that's it thanks a lot Michael really have a good day bye"
+    },
+    {
+     "agent": "בשמחה! תודה שהתקשרת, שיהיה לך אחר צהריים נעים, ולהתראות!",
+     "en": "My pleasure! Thanks for calling, have a nice afternoon, and goodbye!"
+    }
+   ]
+  }
+ }
+}

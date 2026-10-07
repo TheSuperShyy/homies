@@ -1,0 +1,233 @@
+{
+ "_note": "7 Oct test for the owner: one scenario per agent, three samples each",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {
+   "_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. A second call with the same building and type returns the first reference with duplicate: true.",
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "save_partial_request": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>",
+   "partial": true
+  },
+  "add_request_detail": {
+   "ok": true,
+   "reference": "<ticket>"
+  },
+  "notify_team": {
+   "ok": true,
+   "team_notified": true
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "get_balance": {
+   "ok": true,
+   "found": 0
+  },
+  "get_service_info": {
+   "ok": true,
+   "found": false,
+   "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+  },
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "agent": "inbound",
+   "title": "incoming call: a friendly man says hi, then reports the stairwell light is out",
+   "time": "15:50",
+   "weekday_he": "רביעי",
+   "ticket": "255-1561-26",
+   "caller": {
+    "persona": "אסף, 40. At home, relaxed and friendly, in no hurry. A man; speaks about himself in the masculine. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 2. Since yesterday evening the stairwell light between floors 1 and 2 does not come on at all; the button does nothing. Nothing else is wrong.",
+    "wants": "Someone to fix the stairwell light.",
+    "tendencies": "Opens with a greeting and a how-are-you before saying why he called. Answers how he is if asked. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael warmly at the end and says goodbye."
+   },
+   "fixtures": {},
+   "id": "in_light_hello_1"
+  },
+  {
+   "agent": "inbound",
+   "title": "incoming call: a friendly man says hi, then reports the stairwell light is out",
+   "time": "15:50",
+   "weekday_he": "רביעי",
+   "ticket": "255-1561-26",
+   "caller": {
+    "persona": "אסף, 40. At home, relaxed and friendly, in no hurry. A man; speaks about himself in the masculine. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 2. Since yesterday evening the stairwell light between floors 1 and 2 does not come on at all; the button does nothing. Nothing else is wrong.",
+    "wants": "Someone to fix the stairwell light.",
+    "tendencies": "Opens with a greeting and a how-are-you before saying why he called. Answers how he is if asked. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael warmly at the end and says goodbye."
+   },
+   "fixtures": {},
+   "id": "in_light_hello_2"
+  },
+  {
+   "agent": "inbound",
+   "title": "incoming call: a friendly man says hi, then reports the stairwell light is out",
+   "time": "15:50",
+   "weekday_he": "רביעי",
+   "ticket": "255-1561-26",
+   "caller": {
+    "persona": "אסף, 40. At home, relaxed and friendly, in no hurry. A man; speaks about himself in the masculine. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 2. Since yesterday evening the stairwell light between floors 1 and 2 does not come on at all; the button does nothing. Nothing else is wrong.",
+    "wants": "Someone to fix the stairwell light.",
+    "tendencies": "Opens with a greeting and a how-are-you before saying why he called. Answers how he is if asked. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael warmly at the end and says goodbye."
+   },
+   "fixtures": {},
+   "id": "in_light_hello_3"
+  },
+  {
+   "agent": "debt",
+   "title": "debt call: Assaf, flat 2 in Bar Kochba 23, friendly, has a minute, takes the link",
+   "time": "15:50",
+   "weekday_he": "רביעי",
+   "ticket": "255-1562-26",
+   "phone_last4": "4521",
+   "vars": {
+    "first_name": "אסף",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 2",
+    "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "2000 על דירה 2",
+    "amount": "2000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "אסף, 40. At home in the afternoon, relaxed and friendly. A man; speaks about himself in the masculine.",
+    "knows": "He is אסף, apartment 2 in בר כוכבא 23. He knows he is behind on the house committee payments this year but not the exact amount. His phone ends in 4521.",
+    "wants": "To sort it out simply, by a link on WhatsApp.",
+    "tendencies": "Answers the opener with how he is and may ask Michael how he is back. Says yes when asked for a minute. May ask how much it is in total or since when. Agrees to the link and says goodbye warmly."
+   },
+   "fixtures": {
+    "send_payment_link": {
+     "ok": true,
+     "sent": true,
+     "to_last4": "4521"
+    }
+   },
+   "id": "debt_assaf_1"
+  },
+  {
+   "agent": "debt",
+   "title": "debt call: Assaf, flat 2 in Bar Kochba 23, friendly, has a minute, takes the link",
+   "time": "15:50",
+   "weekday_he": "רביעי",
+   "ticket": "255-1562-26",
+   "phone_last4": "4521",
+   "vars": {
+    "first_name": "אסף",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 2",
+    "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "2000 על דירה 2",
+    "amount": "2000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "אסף, 40. At home in the afternoon, relaxed and friendly. A man; speaks about himself in the masculine.",
+    "knows": "He is אסף, apartment 2 in בר כוכבא 23. He knows he is behind on the house committee payments this year but not the exact amount. His phone ends in 4521.",
+    "wants": "To sort it out simply, by a link on WhatsApp.",
+    "tendencies": "Answers the opener with how he is and may ask Michael how he is back. Says yes when asked for a minute. May ask how much it is in total or since when. Agrees to the link and says goodbye warmly."
+   },
+   "fixtures": {
+    "send_payment_link": {
+     "ok": true,
+     "sent": true,
+     "to_last4": "4521"
+    }
+   },
+   "id": "debt_assaf_2"
+  },
+  {
+   "agent": "debt",
+   "title": "debt call: Assaf, flat 2 in Bar Kochba 23, friendly, has a minute, takes the link",
+   "time": "15:50",
+   "weekday_he": "רביעי",
+   "ticket": "255-1562-26",
+   "phone_last4": "4521",
+   "vars": {
+    "first_name": "אסף",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 2",
+    "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "2000 על דירה 2",
+    "amount": "2000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "אסף, 40. At home in the afternoon, relaxed and friendly. A man; speaks about himself in the masculine.",
+    "knows": "He is אסף, apartment 2 in בר כוכבא 23. He knows he is behind on the house committee payments this year but not the exact amount. His phone ends in 4521.",
+    "wants": "To sort it out simply, by a link on WhatsApp.",
+    "tendencies": "Answers the opener with how he is and may ask Michael how he is back. Says yes when asked for a minute. May ask how much it is in total or since when. Agrees to the link and says goodbye warmly."
+   },
+   "fixtures": {
+    "send_payment_link": {
+     "ok": true,
+     "sent": true,
+     "to_last4": "4521"
+    }
+   },
+   "id": "debt_assaf_3"
+  }
+ ]
+}

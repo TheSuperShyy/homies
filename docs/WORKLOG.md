@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-10-07
 
+### Both voice agents tested: one scenario each, three samples each, with audio
+
+The owner: *"ok now i want you to test both the voice agent, 1 scenario each give me 3 samples each voice agent"*.
+
+**How it was run:**
+- **Claude-played, as the "test with Claude" rule asks.** `voice_qa.py bundle` read both live prompts from Vapi (debt 4,896 chars with the new opening, incoming 6,698 with the new gender rule) into `scripts/voice_qa_oct7_6.json`'s six calls.
+- **Six independent players:** each stood in for the agent's model and played the caller from the card.
+- **The cards:**
+  - **Incoming:** a friendly man says hi, then the stairwell light in בר כוכבא 23 is out.
+  - **Debt:** Assaf, flat 2, January to August, 2,000. A friendly man who has a minute and takes the link.
+- **Transcripts:** `docs/assistant/transcripts/2026-10-07-claude-played-6-calls.json`.
+
+**Audio:** `scripts/voice_qa_audio.py` (new) rendered each call into `voice/samples/test-2026-10-07/`, with `index.html` holding the transcript and a player, gitignored.
+- **Michael's lines:** Homies' Cartesia account, the live voice of that agent, sonic-3.5, volume 2 (incoming: speed 0.8 and the happy tag), the masculine dictionary, after our own `voice_guard` swaps and pauses. The waiting line Vapi says while a tool runs is included.
+- **The caller:** our own key, Gil (a library voice).
+- **Characters:** 6,425 on Homies' account, 1,369 on ours.
+- **Checks:**
+  - A local faster-whisper pass over one call heard all of it and no tag words.
+  - A direct test on Michael's debt voice: bare "מה שלומך היום?" reads closer to the pointed masculine with or without the dictionary (4.52/4.60 against 5.26/5.22), and the dictionary id is accepted.
+
+**Seen:**
+- **Debt, 3 of 3 as the owner asked:** a short exchange, "יש לך דקה לעניין חשוב?", then the flat, the months as "January to August" and the amount once, then the link, the outcome logged, and the closing.
+  - Two players found "לעניין חשוב" heavy for a friendly call.
+  - One tenant's "wow, 2000 already" got no reply before the link.
+- **Incoming, 3 of 3:** a greeting back once, a how-are-you exchange, the fault, the street and then the number, a ticket, and "when?" answered honestly.
+  - In 2 of 3, "anything else I can help with?" came twice in a row (the WhatsApp complaint, on the phone).
+  - In all three the flat was never asked, so the ticket has no flat. That is fine for a stairwell light.
+  - After the small talk, "במה אני יכול לעזור לך?" echoes the opener.
+
+**Cost of a real-model run (`voice_qa.py cost`, nothing spent):** these six calls would be about $0.43 on OpenRouter, $0.16 with caching.
+
 ### Assaf off the Voice page's debt list again: four test calls, not a deletion
 
 The owner: *"why is assaf removed in the list again"*.

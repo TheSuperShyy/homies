@@ -2686,6 +2686,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **A busy tenant is not pushed.**
   - **This replaced the 29 Sep "reason first, details in a separate turn" split, which the model did not keep.**
   - **What the prompt describes:** the beats, not the Hebrew words (rule 1 of `docs/features/10-debt-followup/prompt.md`). The example conversation was shown to the owner in chat, and no example line goes into the prompt.
+- **A voice test the owner can hear needs audio, not a transcript (7 Oct).**
+  - **Why:** Vapi's stored lines are normalised, and a Claude-played transcript shows wording only; neither shows how a word is pronounced.
+  - **How:** `scripts/voice_qa_audio.py` turns a voice_qa run into MP3s.
+  - **Which account:** Michael's lines must be rendered on Homies' Cartesia account, because the two clones and the dictionaries live only there. The caller's lines go on our own key.
 - **A rehearsal on the Voice page counts as a real call attempt (checked 7 Oct, the second time after 25 Sep).**
   - **Why:** the page itself never touches `attempts`, but the debt agent ends every call with `log_call_outcome`, which bumps the charges. `v_debt_call_queue` keeps only `attempts < 4`, so the fourth rehearsal takes the test debtor off the list. It looks like a deletion and isn't.
   - **The fix:** `scripts/bk_reset_attempts.py --apply` restores בר כוכבא 23's unpaid demo charges, and only those.

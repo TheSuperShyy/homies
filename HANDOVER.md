@@ -488,6 +488,12 @@ its stated time.
     7. "יום טוב, ולהתראות" is fixed even at 19:20.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
+- **7 Oct: both voice agents tested Claude-played, one scenario × three samples each, with audio for the owner.**
+  - **Where:** `voice/samples/test-2026-10-07/index.html` (gitignored, this PC). Transcripts in `docs/assistant/transcripts/2026-10-07-claude-played-6-calls.json`, deck in `scripts/voice_qa_oct7_6.json`.
+  - **How to remake the audio:** `python scripts/voice_qa_audio.py RUN OUT` renders Michael on Homies' Cartesia account (live voice and dictionary) and the caller on ours.
+  - **Debt calls:** 3 of 3 followed the new opening.
+  - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
+  - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
 - **LIVE 7 Oct evening: both voice agents carry the masculine Cartesia pronunciation dictionary, the incoming gender rule changed, and the debt call has its new opening.**
   - **Where the dictionaries live:** both sit on Homies' Cartesia account, `CARTESIA_YARIV_API_KEY`. It is the only key in `.env` that can see the two live voices, so it is the account on Vapi's `Cartesia (Hebrew TTS)` credential.
     - masculine: `pdict_283cSrBWWEs472iFnk9KEx`;
