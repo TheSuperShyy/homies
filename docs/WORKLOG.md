@@ -16,6 +16,7 @@ conversation that produced it.
 The owner: Omni's *"settings they are on are not applicable to be connected to any ai agent platforms and they are requesting some sample payload from us"*. The same message said they had sent API keys; **the owner corrected that: "they did not give me any api key".**
 - **Checked:** no Omni key in `.env`, and the two PDFs still hold placeholders. The 5 Oct transcript has the rep saying the current system cannot run AI, so a non-AI setup is expected until the Tokomni move.
 - **The email to Omni, in Hebrew, given in chat (not stored):** the three samples, plus asks for a token and campaign id, SIP forwarding (the main question), and one attempt with no retries.
+- **The owner: "dont make it sound like we already agreed for the transfer".** The draft had offered to schedule the Tokomni move. Rewritten: the samples are what would pass *if* we connect, and the move is decided only after Omni's answers.
 - **Also from the transcript (3:38):** "syncing would be easier" was the rep answering our ask to give them a webhook to pull numbers: their answer is that we push numbers to their insert API.
 - **Drafted three samples for Omni,** with invented values: our insert request, the answered call as a SIP INVITE with `x-resident_id`, and an optional call-result JSON in their call log's field names. Written down in `docs/features/15-call-button/context.md`, "7 Oct".
 
