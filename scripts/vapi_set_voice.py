@@ -128,13 +128,21 @@ FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language":
 #   dict_env the .env variable holding a Cartesia pronunciation dictionary id
 #            (scripts/cartesia_dicts.py makes them: bare address words to their
 #            pointed form, so לך is said lekha every time). Unset = no dictionary,
-#            and the field is left as the live voice has it. 7 Oct, ready, not
-#            live: docs/reference/voice/hebrew-gender-consistency-2026-10-07.md.
+#            and the field is left as the live voice has it. Live on both since
+#            7 Oct: docs/reference/voice/hebrew-gender-consistency-2026-10-07.md.
+#
+# 7 OCT: THE INCOMING LINE TAKES THE DEBT VOICE. The owner, after hearing clone A
+# in test calls next to the debt voice: "the inbound voice sounds metallic and
+# unclear and also sad ... like coming from a karaoke mic". No setting reaches it:
+# A plain, A happy, and A at full speed all carry it (voice/samples/test-2026-10-07/
+# voices), and the measures found no clipping and no echo, so it is the clone's
+# timbre from its short 10-14s clip. The 31 Aug clone (CARTESIA_VOICE_ID) does
+# not have it. Back to A: voice "4486a4a7-9ef6-44d4-88e8-10eab571b577", speed
+# 0.8, emotion "happy", then `--agent inbound --apply`.
 AGENT_VOICE = {
     "Debt Follow-up (he)": {"voice": None, "speed": None, "emotion": None,
                             "dict_env": "CARTESIA_DICT_DEBT"},
-    "Inbound Intake (he)": {"voice": "4486a4a7-9ef6-44d4-88e8-10eab571b577",
-                            "speed": 0.8, "emotion": "happy",
+    "Inbound Intake (he)": {"voice": None, "speed": None, "emotion": None,
                             "dict_env": "CARTESIA_DICT_INBOUND"},
 }
 AGENT_FLAG = {"debt": "Debt Follow-up (he)", "inbound": "Inbound Intake (he)"}

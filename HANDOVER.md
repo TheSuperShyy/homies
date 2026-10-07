@@ -89,8 +89,10 @@ can be dialled), or sends a **WhatsApp message** to one Meta test number.
 incoming + debt, on the tenth account since 4 Oct (the English twins were not
 recreated after 6 Sep; "Riley" is Vapi's own unused sample). Read live 4 Oct: Deepgram
 nova-3 hears (Azure he-IL as the fallback, confidence 0.4), Cartesia sonic-3.5
-speaks (incoming voice A `4486a4a7` at 0.8 with the happy tag, debt `ba765d50`;
-Vapi's Elliot as the fallback), attached with the client's Cartesia key so Vapi
+speaks (since 7 Oct evening both agents use `ba765d50`, the 31 Aug clone, with the
+masculine pronunciation dictionary; the incoming line's voice A `4486a4a7` at 0.8 with
+the happy tag was dropped for sounding "like a karaoke mic"; Vapi's Elliot is the
+fallback), attached with the client's Cartesia key so Vapi
 bills ₪0 for TTS; the model is gpt-4.1 (0.3) incoming, gpt-5.6-sol on debt. WhatsApp messages
 go **Meta -> Chatwoot -> n8n** since 21 Aug. Chatwoot owns the number and the
 inbox; n8n is its *agent bot*, still at `/webhook/homies-whatsapp`, which checks
@@ -507,6 +509,11 @@ its stated time.
     - `CARTESIA_DICT_FEMININE` = the feminine id, which nothing uses yet;
     - the previous `.env` is at `local/env-backups/.env.before-dicts-2026-10-07`.
   - **Read back:** both voices are otherwise unchanged (incoming speed 0.8 with the happy tag; debt positivity:low; replacements 29 and 27).
+  - **Later the same evening, the incoming voice changed:** it is now the debt voice `ba765d50`, with no speed setting, no happy tag, positivity:low, 27 replacements, and the dictionary kept. That makes both agents identical in voice.
+    - **Why:** the owner said clone A sounded *"metallic and unclear and also sad ... like coming from a karaoke mic"*.
+    - **The code:** `AGENT_VOICE` in `vapi_set_voice.py` now gives incoming `voice: None`, so it follows `CARTESIA_VOICE_ID`.
+    - **Back to A:** set voice `4486a4a7-9ef6-44d4-88e8-10eab571b577`, speed 0.8, emotion "happy", then `--agent inbound --apply`.
+    - **The shared page:** https://claude.ai/artifact/BG5Tw5tdpXHakjWZ98Ti78, version 2, re-rendered in the new voice. The owner has set it to "Anyone with the link".
   - **The incoming prompt:** the gender bullet now carries the research's three edits, pushed with `--keep-voice`, and the prompt = repo.
   - **The debt prompt: LIVE.** The 7 Oct opening is a little conversation, then "do you have a minute for something important?", then the facts.
     - **Before the push:** a free practice run (Claude playing Michael on paper, three openings) passed every check.

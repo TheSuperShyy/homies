@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-10-07
 
+### The incoming calls now speak with the debt call's voice
+
+The owner, on the test samples: *"the inbound voice sounds metallic and unclear and also sad to be honest compared with the outbound debt collection voice agent"*, then *"the voice is like metalic like coming from a karaoke mic"*.
+
+**Why the incoming voice differed:** on 2 Oct the incoming line got clone A (`4486a4a7`, cut from a 10-14s "livelier" stretch of Ido's recording) with the happy tag, slowed to 0.8. The debt line kept the 31 Aug clone `ba765d50`.
+
+**Four versions of the same three incoming lines,** rendered on Homies' account (1,892 chars) with the dictionary, in `voice/samples/test-2026-10-07/voices/` (gitignored):
+1. today's;
+2. A happy at normal speed;
+3. A plain;
+4. the debt voice.
+
+**Measured:**
+- **Pitch is about the same in all four** (127-138 Hz), and the debt voice moves less (10.6 semitones against 14-15).
+- **Spectral noisiness is the same** (0.008-0.010).
+- **No clipping** (0.003% at most).
+- **No clear echo difference** in the decay after line ends.
+- **So the karaoke sound is clone A's timbre from its short clip.** Versions 1-3 all carry it, and no setting reaches it.
+
+**Done:**
+- **The switch:** `AGENT_VOICE` incoming is now the debt voice's entry (`voice: None` → `CARTESIA_VOICE_ID` = `ba765d50`, no speed, no tag, the dictionary kept).
+  - **Dry run:** voice, speed, the tag rules (29 → 27) and positivity:low change, nothing else.
+  - **Applied and read back:** both agents have identical voice settings.
+- **`voice_qa_audio.py` mirrors it.**
+- **The shared page:** the three incoming test calls were re-rendered (3,084 chars on Homies', 810 on ours) and the page republished at the same URL as version 2, with one line saying the incoming calls now use the debt voice. The owner had already set it to "Anyone with the link".
+
+**Kept:** the incoming prompt's "!" rule. On 2 Oct the exclamation marks, not the tag, were what brightened the voice.
+
+**Owed:** the owner's browser call on the incoming agent.
+
 ### Both voice agents tested: one scenario each, three samples each, with audio
 
 The owner: *"ok now i want you to test both the voice agent, 1 scenario each give me 3 samples each voice agent"*.

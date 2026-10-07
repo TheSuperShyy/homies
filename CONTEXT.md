@@ -2686,6 +2686,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **A busy tenant is not pushed.**
   - **This replaced the 29 Sep "reason first, details in a separate turn" split, which the model did not keep.**
   - **What the prompt describes:** the beats, not the Hebrew words (rule 1 of `docs/features/10-debt-followup/prompt.md`). The example conversation was shown to the owner in chat, and no example line goes into the prompt.
+- **Both Hebrew agents speak with one voice, the 31 Aug clone `ba765d50` (owner, 7 Oct).**
+  - **Why clone A went:** the incoming line's clone A from 2 Oct (a 10-14s "livelier" clip, the happy tag, 0.8 speed) sounded *"like coming from a karaoke mic"*.
+  - **What the measures showed:** no clipping, no echo, and the same pitch. The sound was the clone's timbre, which no speed or emotion setting changes.
+  - **The lesson:** a clone takes the character of its clip. A short clip makes a thin voice, and brightness belongs in the words: the "!" rule stays.
+  - **Next lever if a livelier voice is wanted again:** a new clone from a longer, clean recording, judged by ear before it ships.
 - **A voice test the owner can hear needs audio, not a transcript (7 Oct).**
   - **Why:** Vapi's stored lines are normalised, and a Claude-played transcript shows wording only; neither shows how a word is pronounced.
   - **How:** `scripts/voice_qa_audio.py` turns a voice_qa run into MP3s.

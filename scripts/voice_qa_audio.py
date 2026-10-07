@@ -27,7 +27,10 @@ os.makedirs(OUT, exist_ok=True)
 HOMIES = T.load_key("CARTESIA_YARIV_API_KEY")
 OURS = T.load_key("CARTESIA_API_KEY")
 DICT_M = re.search(r"^CARTESIA_DICT_INBOUND=(.*)$", io.open(".env", encoding="utf-8").read(), re.M).group(1).strip()
-VOICE = {"inbound": {"id": "4486a4a7-9ef6-44d4-88e8-10eab571b577", "speed": 0.8, "tag": '<emotion value="happy"/>'},
+# Mirrors scripts/vapi_set_voice.py's AGENT_VOICE. Since 7 Oct evening both agents
+# speak with the 31 Aug clone; until then the incoming line was clone A
+# (4486a4a7…, speed 0.8, the happy tag), dropped for sounding "like a karaoke mic".
+VOICE = {"inbound": {"id": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7", "speed": None, "tag": ""},
          "debt":    {"id": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7", "speed": None, "tag": ""}}
 CALLER_VOICE = "84b969ad-19c7-428d-b742-48d387f7f138"   # Gil, "Friendly Host", a library voice
 RATE = 44100
