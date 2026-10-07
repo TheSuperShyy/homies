@@ -2671,6 +2671,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **The rule:** a Cartesia pronunciation dictionary (bare word → pointed word, `scripts/cartesia_dicts.py`) makes the owner's default deterministic; the prompt keeps only what the dictionary cannot know (the switch to the feminine, pointed feminine forms, a name is never evidence, את is always אַתְּ).
   - **Why not more prompt:** an instruction the model can ignore is not a constraint; this is the voice-side twin of the WhatsApp lesson.
   - **How to read the transcripts:** Vapi's stored bot lines are normalised text (points gone, replacements applied), never what the voice was handed; the tool webhook body carries the real first message.
+  - **Live since 7 Oct evening:**
+    - **Where the dictionaries live:** both sit on Homies' Cartesia account (`CARTESIA_YARIV_API_KEY`), the account that owns both live voices.
+    - **What the agents carry:** both carry the masculine one. The ids are in `.env`; the feminine one waits for a per-call choice on debt calls.
+    - **Glued forms:** Cartesia matches whole words, so a glued form (שהתקשרת, ולך) needs its own entry. A new word goes in `WORDS`, then the dictionary is recreated: `--delete`, then `--apply`, then the new ids go into `.env` and `vapi_set_voice.py --apply` runs per agent.
 - **The incoming agent runs at Vapi's default of 250 tokens a turn (checked 5 Oct).** The assistant sets no `maxTokens`, and Vapi's API spec gives 250 as the default. A test that leaves the limit out tests a different agent. When one turn holds a long spoken passage and a tool call, the call's arguments get cut, and the note breaks.
 - **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
   - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.

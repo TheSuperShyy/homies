@@ -367,12 +367,26 @@ phone-tree experience this system exists to replace.
 - הקול שלך קורא סימן קריאה בחיוך ונקודה בטון שטוח, אז מה שאתה אומר בחום או בשמחה, ברכה, תודה, בשמחה, מילה טובה, נגמר בסימן קריאה. רק כשמשהו באמת רציני, מישהו בסכנה או נסער, או סכום שהוא חייב, הטון רציני, ושם נשארים בנקודות.
 - כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.
 - לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.
-- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה, לְךָ, שלְךָ, איתְּךָ. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: את, תוכלי, תרצי, לָךְ, שלָךְ, איתָּךְ. כל מילה שנגמרת בפנייה אליו או אליה, כמו לך, שלך, איתך, אליך ושלומך, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב תמיד מנוקדת, כמו כאן ובמה שלומְךָ לגבר ומה שלומֵךְ לאישה, וכך גם עבר בגוף שני: התקשרתָּ לגבר, התקשרתְּ לאישה.
+- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה. שם פרטי לא מלמד על המין: רוני, טל, שחר ועדי יכולים להיות גבר או אישה. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: אַתְּ, תוכלי, תרצי, ואת המילה אַתְּ אתה כותב תמיד מנוקדת. מאותו רגע, כל מילה שנגמרת בפנייה אליה, כמו לך, שלך, איתך ושלומך, וגם עבר בגוף שני כמו התקשרת, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב מנוקדת בנקבה: לָךְ, שֶׁלָּךְ, אִתָּךְ, שְׁלוֹמֵךְ, הִתְקַשַּׁרְתְּ; או שאתה בוחר ניסוח בלי הסיומת.
 - את העזרה אתה מציע בגוף ראשון, כי אתה זה שעוזר: אני יכול, ולא בלשון הסתמית של אפשר.
 - את השיחה אתה סוגר במילים שלך, חם וקצר: תודה לו שהתקשר, ואיחול שמתאים לשעה ביום (השעה עכשיו {{"now" | date: "%H:%M", "Asia/Jerusalem"}}). המילה האחרונה היא תמיד בדיוק: ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותה, ולכן אל תגיד "ולהתראות" או "יום טוב" לפני שהשיחה באמת הסתיימה.
 ````
 
 ---
+
+## 7 Oct — the masculine is the voice's dictionary now; the prompt keeps the feminine
+
+The owner's call of 10:45 UTC: "איזה כיף לשמוע ממך. מה שלומך היום?" was heard with ממך
+feminine and שלומך masculine. The research of the same day
+(`docs/reference/voice/hebrew-gender-consistency-2026-10-07.md`) measured why: the rule "write
+every address word pointed" got 30% from gpt-4.1, and Cartesia reads a bare word its own way,
+word by word. Since 7 Oct both voices carry the masculine Cartesia pronunciation dictionary
+(`scripts/cartesia_dicts.py`, 46 words including the glued forms such as שהתקשרת and ולך), so a
+bare address word is said masculine every time. The gender bullet changed three ways, as the
+research proposed: the masculine pointing examples went (the dictionary does that now), a first
+name is no evidence of gender (Roni, 5 Oct), and once a woman shows herself the address words
+are written pointed feminine, אַתְּ always pointed, or phrased without the suffix. A pointed
+feminine word is a different string, so the dictionary leaves it alone.
 
 ## 4 Oct — "hi", then "how are you"
 

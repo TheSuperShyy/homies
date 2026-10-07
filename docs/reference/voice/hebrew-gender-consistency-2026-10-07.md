@@ -4,6 +4,14 @@
 
 This is the research he asked for: what the pipeline does with gender today, what was measured, the options, and the one to ship. Nothing on the live agents was changed. Two things are ready for his word (the last section).
 
+> **Shipped the same evening, on the owner's approval of the plan.**
+> - **The dictionaries:** created on Homies' Cartesia account, the one that owns both live voices: masculine `pdict_283cSrBWWEs472iFnk9KEx` and feminine `pdict_yXyrirkyZTjGL99Es7F9Ax`.
+> - **The words:** 46 each. The 34 below plus twelve glued forms (שהתקשרת, שאמרת, שביקשת, שסיפרת, ששלחת, שכתבת, ששאלת, שציינת, שהזכרת, ששילמת, ולך, ושלך), because whole-word matching never reaches התקשרת inside "תודה שהתקשרת".
+>   - **Measured on our key:** the pointed masculine and feminine renders of the glued pronouns differ clearly. For the glued past-tense verbs the difference is within the noise, so those entries may change nothing; they cannot make it worse.
+> - **The agents:** both carry the **masculine** dictionary (`CARTESIA_DICT_INBOUND`, `CARTESIA_DICT_DEBT`). The feminine id is in `.env` as `CARTESIA_DICT_FEMININE` for the per-call choice, which is not built.
+> - **The prompt:** the three edits of section 4 are live on the incoming agent.
+> - **Still owed:** the owner's real call, which is the only proof that Vapi passes the id for sonic-3.5.
+
 ## In short
 
 - **The inconsistency is not in the model's grammar. It is in the words Hebrew writes the same for both genders.** "To you" is לך for a man and a woman; said, it is *lekha* or *lakh*. The same for שלך (yours), איתך (with you), שלומך (how are you), and the past tense "you called" (התקשרת: *hitkasharta* / *hitkashart*). The voice has to pick one reading for every such word, and it picks per word.
