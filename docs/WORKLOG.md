@@ -42,6 +42,12 @@ The owner: *"ok now i want you to test both the voice agent, 1 scenario each giv
 
 **Cost of a real-model run (`voice_qa.py cost`, nothing spent):** these six calls would be about $0.43 on OpenRouter, $0.16 with caching.
 
+**Shared:** the owner asked *"is possible we can put this for sharing that other people can listen to it?"*.
+- **Published:** a private artifact page, "Michael's Test Calls", at https://claude.ai/artifact/BG5Tw5tdpXHakjWZ98Ti78.
+- **What it holds:** the six MP3s as attached files, each call's transcript in Hebrew with English, and a plain note that the calls are simulated, not recordings.
+- **Who can open it:** nobody but the owner until he shares it from the page's Share menu.
+- **The source:** the page was built in the session scratchpad from the committed transcripts. To change it, read the artifact back and republish to the same URL.
+
 **Kept out of git:** `.gitignore` gained `voice/samples/test-*/`.
 - **Why:** the MP3s were already ignored by extension, but the listening page `index.html` beside them showed as untracked.
 - **Why not commit it:** it only works next to the MP3s on this PC.

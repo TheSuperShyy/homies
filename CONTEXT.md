@@ -2691,6 +2691,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **How:** `scripts/voice_qa_audio.py` turns a voice_qa run into MP3s.
   - **Which account:** Michael's lines must be rendered on Homies' Cartesia account, because the two clones and the dictionaries live only there. The caller's lines go on our own key.
   - **Where renders go:** `voice/samples/test-<date>/`, which git ignores in full (`*.mp3` by extension, the folder by `voice/samples/test-*/` since 7 Oct). A render is for the owner's ears on this PC, never for the public repo.
+  - **For other people:** the renders go up as a private artifact page with the MP3s attached (7 Oct, "Michael's Test Calls"), never into the repo. The page says plainly that the calls are simulated, and sharing it is the owner's call.
 - **A rehearsal on the Voice page counts as a real call attempt (checked 7 Oct, the second time after 25 Sep).**
   - **Why:** the page itself never touches `attempts`, but the debt agent ends every call with `log_call_outcome`, which bumps the charges. `v_debt_call_queue` keeps only `attempts < 4`, so the fourth rehearsal takes the test debtor off the list. It looks like a deletion and isn't.
   - **The fix:** `scripts/bk_reset_attempts.py --apply` restores בר כוכבא 23's unpaid demo charges, and only those.

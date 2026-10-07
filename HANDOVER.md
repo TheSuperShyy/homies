@@ -491,6 +491,9 @@ its stated time.
 - **7 Oct: both voice agents tested Claude-played, one scenario × three samples each, with audio for the owner.**
   - **Where:** `voice/samples/test-2026-10-07/index.html`, on this PC only. The whole folder is gitignored through `voice/samples/test-*/`, added 7 Oct (`9f9842f`), so a fresh clone has no samples. Remake them with the script below. Transcripts in `docs/assistant/transcripts/2026-10-07-claude-played-6-calls.json`, deck in `scripts/voice_qa_oct7_6.json`.
   - **How to remake the audio:** `python scripts/voice_qa_audio.py RUN OUT` renders Michael on Homies' Cartesia account (live voice and dictionary) and the caller on ours.
+  - **Shared page:** "Michael's Test Calls", https://claude.ai/artifact/BG5Tw5tdpXHakjWZ98Ti78, with the six MP3s attached.
+    - **Access:** private; only the owner can share it, from the page's Share menu.
+    - **To update it:** pass that URL. A publish without the URL makes a second page.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
