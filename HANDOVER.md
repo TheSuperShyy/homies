@@ -489,7 +489,7 @@ its stated time.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
 - **7 Oct: both voice agents tested Claude-played, one scenario × three samples each, with audio for the owner.**
-  - **Where:** `voice/samples/test-2026-10-07/index.html` (gitignored, this PC). Transcripts in `docs/assistant/transcripts/2026-10-07-claude-played-6-calls.json`, deck in `scripts/voice_qa_oct7_6.json`.
+  - **Where:** `voice/samples/test-2026-10-07/index.html`, on this PC only. The whole folder is gitignored through `voice/samples/test-*/`, added 7 Oct (`9f9842f`), so a fresh clone has no samples. Remake them with the script below. Transcripts in `docs/assistant/transcripts/2026-10-07-claude-played-6-calls.json`, deck in `scripts/voice_qa_oct7_6.json`.
   - **How to remake the audio:** `python scripts/voice_qa_audio.py RUN OUT` renders Michael on Homies' Cartesia account (live voice and dictionary) and the caller on ours.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.

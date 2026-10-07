@@ -42,6 +42,10 @@ The owner: *"ok now i want you to test both the voice agent, 1 scenario each giv
 
 **Cost of a real-model run (`voice_qa.py cost`, nothing spent):** these six calls would be about $0.43 on OpenRouter, $0.16 with caching.
 
+**Kept out of git:** `.gitignore` gained `voice/samples/test-*/`.
+- **Why:** the MP3s were already ignored by extension, but the listening page `index.html` beside them showed as untracked.
+- **Why not commit it:** it only works next to the MP3s on this PC.
+
 ### Assaf off the Voice page's debt list again: four test calls, not a deletion
 
 The owner: *"why is assaf removed in the list again"*.
