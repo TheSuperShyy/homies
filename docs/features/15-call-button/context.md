@@ -117,13 +117,13 @@ in who dials and whether our AI knows who picked up.
   IPs. Omni lists SIP trunking (OmniSIP) among its products, so Route A asks
   for something they sell.
 
-**7 Oct: Omni sent API keys and asked us for sample payloads.** The owner
-reports the keys sit on a setup that cannot connect to an AI agent platform;
-that matches the 5 Oct call ("your current system can't run the AI
-services"), where the free move to Tokomni comes first. Ask whether the keys
-change after the move. No key reached the project (none in `.env`; the PDFs
-still hold `YOUR_CLIENT_TOKEN_HERE`). The samples drafted for Omni, all values
-invented:
+**7 Oct: Omni asked us for sample payloads. They have sent no API key** (the
+owner, correcting an earlier "they sent us some api keys" the same day). Their
+current setup cannot connect to an AI agent platform; that matches the 5 Oct
+call ("your current system can't run the AI services"), where the free move to
+Tokomni comes first. Nothing to connect with yet: none in `.env`, and the PDFs
+still hold `YOUR_CLIENT_TOKEN_HERE`, so the email asks for a token and a
+campaign id. The samples drafted for Omni, all values invented:
 
 1. **Us → them, adding a number** (their own insert, one request per press of
    Call, never a bulk sync): `POST …/campaign/insert/?token=<theirs>` with
