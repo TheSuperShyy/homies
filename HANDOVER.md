@@ -490,6 +490,19 @@ its stated time.
     7. "יום טוב, ולהתראות" is fixed even at 19:20.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
+- **7 Oct: the WhatsApp bot tested the same way, three Claude-played chats per menu button, nothing spent.**
+  - **Where:**
+    - **Deck:** `scripts/wa_qa_oct7_9.json` (the 4 Oct calm-word nine, moved to 7 Oct).
+    - **Transcripts:** `docs/assistant/transcripts/2026-10-07-claude-played-9-chats.json`, with phones and links masked.
+    - **Run directory:** scratchpad `waqa-2026-10-07`, not kept.
+  - **Shared page:** "Michael's Test Chats", https://claude.ai/artifact/Gu7rE7UMgH6pGD4vq5YSr3.
+    - **Access:** private, until the owner shares it from the Share menu.
+    - **To update it:** pass that URL.
+  - **Result:** 57 of 57 expectations, five new tickets, three replies rewritten after a live check.
+  - **Open, the owner's call (in CONTEXT, under the promise filter):**
+    - the filter cuts an honest "whether" sentence, three times;
+    - the emergency step cut "where is the smell coming from?" because of the word מגיע.
+  - **`grade` forwards `recent` and `first_try` now** (`scripts/wa_qa.py`).
 - **7 Oct: both voice agents tested Claude-played, one scenario × three samples each, with audio for the owner.**
   - **Where:** `voice/samples/test-2026-10-07/index.html`, on this PC only. The whole folder is gitignored through `voice/samples/test-*/`, added 7 Oct (`9f9842f`), so a fresh clone has no samples. Remake them with the script below. Transcripts in `docs/assistant/transcripts/2026-10-07-claude-played-6-calls.json`, deck in `scripts/voice_qa_oct7_6.json`.
   - **How to remake the audio:** `python scripts/voice_qa_audio.py RUN OUT` renders Michael on Homies' Cartesia account (live voice and dictionary) and the caller on ours.

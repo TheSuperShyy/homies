@@ -813,7 +813,11 @@ def grade(run):
                              # out (Say it again's text, when both were rejected).
                              "output": t.get("say_again_output") or t.get("output", ""),
                              "run_index": 1 if "first_output" in t else 0,
-                             "retry_note": t.get("retry_note", "")})
+                             "retry_note": t.get("retry_note", ""),
+                             # 7 Oct: what the player handed `turn` (the chat's last
+                             # twelve bot messages; Try again's item on a retry), so
+                             # the truth guards read here what they read there.
+                             "recent": t.get("recent") or [], "first_try": t.get("first_try")})
             meta.append(ctx)
             greeted = True
             last_bot = ""

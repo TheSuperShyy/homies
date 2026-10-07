@@ -2527,6 +2527,15 @@ and the live code around it, and spends nothing:
   a handset would get. A rubric and the scenario's expectations follow.
 - `judge` writes blind packets; Claude judges rank the variants per scenario;
   `report` merges everything.
+- Since 5 Oct the truth guards also read the chat's last twelve bot messages
+  (`recent`). A player passes them to `turn` on every message, and since 7 Oct
+  `grade` forwards what the transcript recorded (`recent`, and `first_try` on
+  a retry). Without them, a ticket number from an earlier turn reads as
+  invented.
+- **For the owner, a run becomes a page (7 Oct, "Michael's Test Chats").** It
+  shows each chat as a phone thread, Hebrew with English under every line, and
+  is published as a private artifact. The transcripts go in the repo with phone
+  numbers and links masked.
 
 **What it proves and what it does not.** The code paths are real, so a guard
 that eats an honest reply shows up here before a resident meets it (two did on
@@ -2776,6 +2785,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **A time after "will be handled"** loses the time alone.
   - **Not built: "never only 'anything else?'".** The filter can only remove, so that would mean sending the promise it was cutting.
   - **These rules are Hebrew heuristics.** A missed honest phrasing shows in `--watch` as "the model wrote a promise and the filter cut it". Add its words to the rules and a case for it.
+  - **Seen 7 Oct, not fixed: an honest "whether" sentence is cut.** "אני לא יכול להגיד אם יגיעו היום", "אם יגיעו היום, את זה רק הצוות יודע" and "לא יודע אם יחזרו אליך" were all cut in the Claude-played chats: an אם clause under "can't say / don't know" is neither negated nor asked about. The tenant then asks again and gets no answer, and the next line can open on a "them" with nothing before it. The fix belongs in `n8n_whatsapp_nopromise.py`, with these three as cases, on the owner's word.
+  - **Seen 7 Oct, not fixed: the emergency step's ARRIVE list matches the bare word "מגיע".** So in an emergency, "אתה יודע מאיפה הריח מגיע?" is cut as an arrival promise, and the reply ends on the ticket number alone (`n8n_whatsapp_danger.py`).
 - **The gate takes a dump whole when it adds or removes nodes (5 Oct).** `check_whatsapp_rules.py --candidate` and `check_patchers_idle.py` laid a dump over live by node name, which kept removed nodes and dropped new ones: it tested code that would never run. A dump with different node names is now the would-be workflow, nodes and wires; one with the same names is laid over live as before.
 
 **A ticket's status and urgency are the team's (owner, same message).**

@@ -11,6 +11,54 @@ conversation that produced it.
 
 ## 2026-10-07
 
+### WhatsApp bot tested like the voice agents: three chats per menu button, on a page
+
+The owner: *"for the chatbot test it as well same thing give me 3 example each scenario and do it like you did for the voice agent testing"*.
+
+**How it was run (nothing spent, nothing sent, nothing changed live):**
+- **The live bot first:** `check_whatsapp_rules.py` on live, all 310 green with the pins unchanged. The last WhatsApp change is still 5 Oct's danger v3 (epoch 77).
+- **The deck:** `scripts/wa_qa_oct7_9.json`, the nine cards of the 4 Oct calm-word run moved to Wednesday 7 Oct.
+  - **Open a ticket:** Avi (the lift, in a hurry), Merav (a leak by the lamp, a photo), Roni (the car-park gate, angry, at night).
+  - **Status:** Dalia (has the number, typed with spaces), Amit (slang, no number), Gilad (marked fixed, still dark).
+  - **Representative:** Shimon ("person or computer?"), Esther (says she paid the 900 ₪), Dor (gas in the stairwell).
+- **The bundle:** `wa_qa.py bundle --deck scripts/wa_qa_oct7_9.json` read the live workflow (prompt `8f9e442ded13`, 20,942 chars).
+- **The players:** nine Sonnet players, one card each. Each played Michael from the live prompt and the tenant from the card, and called `wa_qa.py turn` on every message, passing the chat's earlier bot messages as `recent`, as production's truth guards read them.
+- **`grade` now forwards each turn's `recent` and `first_try`** (`scripts/wa_qa.py`). Before, a ticket number from an earlier turn could read as invented when graded.
+
+**Results:** 62 turns, 57 of 57 expectations met.
+- **Tickets:** five new tickets (the lift, the leak, the gate, the stairwell light, the gas). The rest were a lookup, a balance check or a note to the team.
+- **Rejected by the live checks, all three rewritten and sent:**
+  - Merav's photo reply: `deeds`, a ticket claim with no number;
+  - Dor's last reply: `deeds` again;
+  - Amit's "בשמחה.": `words`, a false alarm on a two-word goodbye.
+- **Rubric:** 3 flags, all harmless:
+  - the representative opener's 😊 before the gas was mentioned;
+  - Esther's opening blessing read as a goodbye;
+  - "במה אפשר לעזור לך היום?" after her how-are-you.
+- **Gender:** the three women got the feminine from their first cue (את גרה, תוכלי, שתרצי), and every man the masculine.
+
+**Seen, deterministic, the owner's call (nothing changed):**
+- **The promise filter (v3) cuts an honest "whether" sentence.** It removed three, all honest:
+  - "אז אני לא יכול להגיד אם יגיעו היום";
+  - "אם יגיעו היום, את זה רק הצוות יודע.";
+  - "ואני גם לא יודע אם יחזרו אליך בטלפון".
+  - **The cause:** v3 keeps a negated or asked-about phrase, but an אם clause under "can't say / don't know" is neither.
+  - **The effect:** Amit asked "so are they coming today or not bro" and never got the answer. The next reply opened with "עדכנתי אותם" with nothing before "them".
+- **The emergency step cut a question in the gas chat.** Its ARRIVE list matches the bare word "מגיע", so "אתה יודע מאיפה הריח מגיע?" ("where is the smell coming from?") went. The reply ended on the ticket number alone.
+
+**Seen in the model's wording:**
+- **"וזה יטופל כמו שצריך" in 4 of 9 chats.** Roni quoted it back: "what kind of answer is that".
+- **Dor and the no-advice rule:** he asked three times what to do (call the gas company? warn the neighbours?) and got the ticket number each time. In the end he said he would call the gas company himself. That is the owner's 6 Oct rule working as asked.
+
+**Kept:**
+- **Transcripts:** `docs/assistant/transcripts/2026-10-07-claude-played-9-chats.json`, with the phone's text and English; the tenant's phone number and any link are masked.
+- **The run:** the scratchpad's `waqa-2026-10-07`, not in the repo.
+
+**Published:** "Michael's Test Chats", https://claude.ai/artifact/Gu7rE7UMgH6pGD4vq5YSr3, private until the owner shares it.
+- **Layout:** each chat as a phone thread. The tenant is on the right, Michael on the left, and the menu shows with its three buttons.
+- **On the page:** the bot's actions are small notes, and each filter cut is marked with the sentence it removed.
+- **Rendered at desktop and 390px:** no sideways scroll.
+
 ### The incoming calls now speak with the debt call's voice
 
 The owner, on the test samples: *"the inbound voice sounds metallic and unclear and also sad to be honest compared with the outbound debt collection voice agent"*, then *"the voice is like metalic like coming from a karaoke mic"*.
