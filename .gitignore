@@ -127,3 +127,7 @@ dashboard/.vercel/
 # Personal Claude Code settings. The check itself is committed in scripts/;
 # only the choice to enforce it is local, so a public clone runs no hooks.
 .claude/settings.local.json
+
+# Test-call listening pages (7 Oct, scripts/voice_qa_audio.py): an index.html beside
+# the rendered MP3s, which only work on the PC that made them. Local only.
+voice/samples/test-*/
