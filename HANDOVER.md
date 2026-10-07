@@ -488,7 +488,7 @@ its stated time.
     7. "יום טוב, ולהתראות" is fixed even at 19:20.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
-- **LIVE 7 Oct evening: both voice agents carry the masculine Cartesia pronunciation dictionary, and the incoming gender rule changed.**
+- **LIVE 7 Oct evening: both voice agents carry the masculine Cartesia pronunciation dictionary, the incoming gender rule changed, and the debt call has its new opening.**
   - **Where the dictionaries live:** both sit on Homies' Cartesia account, `CARTESIA_YARIV_API_KEY`. It is the only key in `.env` that can see the two live voices, so it is the account on Vapi's `Cartesia (Hebrew TTS)` credential.
     - masculine: `pdict_283cSrBWWEs472iFnk9KEx`;
     - feminine: `pdict_yXyrirkyZTjGL99Es7F9Ax`;
@@ -499,9 +499,13 @@ its stated time.
     - the previous `.env` is at `local/env-backups/.env.before-dicts-2026-10-07`.
   - **Read back:** both voices are otherwise unchanged (incoming speed 0.8 with the happy tag; debt positivity:low; replacements 29 and 27).
   - **The incoming prompt:** the gender bullet now carries the research's three edits, pushed with `--keep-voice`, and the prompt = repo.
-  - **The debt prompt:** the 7 Oct opening, a little conversation, then "do you have a minute?", then the facts. It is **edited in the repo and NOT pushed yet**; it waits on the free practice run.
-    - **Push:** `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply`.
-    - **Then read back:** prompt = repo.
+  - **The debt prompt: LIVE.** The 7 Oct opening is a little conversation, then "do you have a minute for something important?", then the facts.
+    - **Before the push:** a free practice run (Claude playing Michael on paper, three openings) passed every check.
+    - **The push:** `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply`.
+    - **Read back:** prompt = repo (4,896 chars), and the voice is untouched.
+  - **Seen in the practice run, not changed, the owner's call (both older than today):**
+    - **The identity check counts any reply to the opener's "{{first_name}}?" as confirmation.** So a "מי זה?" leads on to the debt, which is a privacy risk on a shared phone.
+    - **A busy tenant is told "we'll try this evening", and nothing schedules it.** There is no "call me later" result in `log_call_outcome`.
   - **Owed:**
     - **The owner's two test calls on the Voice page:**
       - incoming: does Vapi pass the dictionary on sonic-3.5? Listen for *mimkha*, *shlomkha*, *lekha*, *hitkasharta*;

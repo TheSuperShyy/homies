@@ -2675,6 +2675,17 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **Where the dictionaries live:** both sit on Homies' Cartesia account (`CARTESIA_YARIV_API_KEY`), the account that owns both live voices.
     - **What the agents carry:** both carry the masculine one. The ids are in `.env`; the feminine one waits for a per-call choice on debt calls.
     - **Glued forms:** Cartesia matches whole words, so a glued form (שהתקשרת, ולך) needs its own entry. A new word goes in `WORDS`, then the dictionary is recreated: `--delete`, then `--apply`, then the new ids go into `.env` and `vapi_set_voice.py --apply` runs per agent.
+- **A debt call earns the money talk with a little conversation and a "do you have a minute?" (owner, 7 Oct).**
+  - **What he asked for:** *"like a human representative would talk not straight to the point"*.
+  - **The order now:**
+    - the opener's "how are you";
+    - a real reaction (answer back if asked);
+    - "do you have a minute for something important?", and a wait;
+    - then why he called, with the flat, the months and the amount once;
+    - then the link question.
+  - **A busy tenant is not pushed.**
+  - **This replaced the 29 Sep "reason first, details in a separate turn" split, which the model did not keep.**
+  - **What the prompt describes:** the beats, not the Hebrew words (rule 1 of `docs/features/10-debt-followup/prompt.md`). The example conversation was shown to the owner in chat, and no example line goes into the prompt.
 - **The incoming agent runs at Vapi's default of 250 tokens a turn (checked 5 Oct).** The assistant sets no `maxTokens`, and Vapi's API spec gives 250 as the default. A test that leaves the limit out tests a different agent. When one turn holds a long spoken passage and a tool call, the call's arguments get cut, and the note breaks.
 - **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
   - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.

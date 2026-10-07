@@ -41,11 +41,23 @@ The owner, after two test calls on the Voice page:
 - **The debt prompt (`docs/features/10-debt-followup/prompt.md`):**
   - **Replaced:** two sentences. Now there is a little conversation first, then "do you have a minute for something important?" and a wait, no pushing if it is a bad time, then the reason with the three facts.
   - **Diffed against live:** only those sentences differ (4,760 → 4,896 chars).
-  - **Not pushed yet:** waiting on a free Claude-played practice run of three openings.
+  - **Practice run, free:** Claude played Michael on paper from the new prompt against three openings: "בסדר, מה קורה?", "היי, מי זה?" and "אני באמצע משהו". Every check passed:
+    - a reaction first;
+    - "יש לך דקה?" before any money, then a wait;
+    - the flat, the months and the amount once, in one sentence;
+    - the link question;
+    - the busy tenant let go without details;
+    - no second greeting;
+    - masculine singular throughout.
+  - **Two of its flags were artifacts of the test, not the prompt:** the glued greetings came from my stripping of the Liquid tags, and "none" is the known `alt_payment` default.
+  - **Pushed:** `vapi_sync.py debt --keep-voice --apply`.
+  - **Read back:** prompt and first message = repo, gpt-5.6-sol, 7 tools, the voice untouched with the dictionary on.
+- **Seen in the practice run, not changed (all older than today):**
+  - **The identity check counts any reply to the opener's "{{first_name}}?" as confirmation.** So "היי, מי זה?" leads on to the debt. On a family phone that could tell the debt to someone else. It is a privacy question for the owner.
+  - **A busy tenant is asked when is better and told "we'll try this evening".** Nothing records or schedules that callback; only the transcript shows it.
 - **Merged the two "2026-10-07" headings:** the research entry had been filed under a second heading below 6 Oct.
 
 **Open:**
-- **The debt push** after the practice run.
 - **The owner's two test calls:**
   - incoming: listen for *mimkha*, *shlomkha*, *lekha* and *hitkasharta*. This is also the only proof that Vapi passes the dictionary id on sonic-3.5.
   - debt: a short chat, "do you have a minute?", then the facts.
