@@ -510,7 +510,9 @@ its stated time.
     - **The owner's two test calls on the Voice page:**
       - incoming: does Vapi pass the dictionary on sonic-3.5? Listen for *mimkha*, *shlomkha*, *lekha*, *hitkasharta*;
       - debt: the new opening.
-    - **Then `scripts/bk_reset_attempts.py`.**
+    - **Then `scripts/bk_reset_attempts.py --apply`.**
+      - **7 Oct:** it was already needed once. Assaf had left the list at 4 attempts, and the reset brought back flats 1, 2 and 3 at attempt 1.
+      - **Every browser test call counts an attempt,** despite the Voice page's comment: the agent's own `log_call_outcome` bumps it. So the list empties every fourth rehearsal. The fix, not built, is to skip the bump for Vapi `webCall`s.
     - **If the dictionary doesn't take effect:** the fallback is the regex swaps in `voice_guard.py` (research section 2d).
   - **Known gap:** a woman on a debt call hears masculine address words until the per-call feminine choice is built (`assistantOverrides.voice`, not built).
   - **Undo:**

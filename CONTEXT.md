@@ -2686,6 +2686,9 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **A busy tenant is not pushed.**
   - **This replaced the 29 Sep "reason first, details in a separate turn" split, which the model did not keep.**
   - **What the prompt describes:** the beats, not the Hebrew words (rule 1 of `docs/features/10-debt-followup/prompt.md`). The example conversation was shown to the owner in chat, and no example line goes into the prompt.
+- **A rehearsal on the Voice page counts as a real call attempt (checked 7 Oct, the second time after 25 Sep).**
+  - **Why:** the page itself never touches `attempts`, but the debt agent ends every call with `log_call_outcome`, which bumps the charges. `v_debt_call_queue` keeps only `attempts < 4`, so the fourth rehearsal takes the test debtor off the list. It looks like a deletion and isn't.
+  - **The fix:** `scripts/bk_reset_attempts.py --apply` restores בר כוכבא 23's unpaid demo charges, and only those.
 - **The incoming agent runs at Vapi's default of 250 tokens a turn (checked 5 Oct).** The assistant sets no `maxTokens`, and Vapi's API spec gives 250 as the default. A test that leaves the limit out tests a different agent. When one turn holds a long spoken passage and a tool call, the call's arguments get cut, and the note breaks.
 - **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
   - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.

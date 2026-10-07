@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-07
 
+### Assaf off the Voice page's debt list again: four test calls, not a deletion
+
+The owner: *"why is assaf removed in the list again"*.
+- **The cause:** `bk_reset_attempts.py`'s dry run showed אסף קליקס, flat 2, with 8 unpaid charges all at `attempts` 4. The queue view keeps only `attempts < 4`, and every call that ends in `log_call_outcome` bumps the count, browser rehearsals included. Same as 25 Sep.
+- **The fix:** `bk_reset_attempts.py --apply` (בר כוכבא 23 only, unpaid only). `v_debt_call_queue_person` now lists Assaf (flat 2), Yariv (flat 3) and Ido (flat 1) at attempt 1.
+  - The 10:55 test call was Yariv's flat 3, presumably because Assaf was already gone.
+- **Why it keeps happening:** the Voice page's header comment says a web call from it counts no attempt. That holds only for `press_call`; the agent's own `log_call_outcome` still bumps the charge. So every fourth rehearsal empties the list again.
+- **Not built:** skipping the bump when Vapi's call type is `webCall`. Raised with the owner.
+
 ### Phone agents: the gender dictionary made live, and the debt call opens with a bit of conversation
 
 The owner, after two test calls on the Voice page:
