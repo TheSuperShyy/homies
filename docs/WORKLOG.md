@@ -69,6 +69,29 @@ The owner, on the 5 Oct page: *"yes make it up to date based on the features we 
 - **Counts:** 24 rows: 9 better, 9 different, 2 matched, 4 missing (the same four).
 - **Found in testing, still open, on the page:** the balance amount not said, a known resident asked for the building, "anything else?", the feminine slip.
 
+## 2026-10-07
+
+### Voice agents: why one call mixes genders, and the fix at the voice (research, ready, not live)
+
+The owner: *"do a research we need to look for a skill for voice agent to have a consistent line of gender identification in hebrew ... the intro is like genderizing the person he is talking to a female then the next line is masculine"*.
+- **Done:**
+  - **The research:** `docs/reference/voice/hebrew-gender-consistency-2026-10-07.md`.
+  - **Ready, not live:** `scripts/cartesia_dicts.py` (the two bare-to-pointed dictionaries, 34 words each, dry run by default) and an optional `pronunciationDictId` in `scripts/vapi_set_voice.py` (`dict_env` per agent; a no-op while `CARTESIA_DICT_INBOUND` / `CARTESIA_DICT_DEBT` are unset; dry run today: "Nothing to do").
+  - **Samples for his ear:** `voice/samples/gender-*.mp3` (on this PC; gitignored), 14 files, Noam on sonic-3.5, rendered on our own Cartesia key (228 + 300 characters; the test dictionaries were deleted).
+- **Found:**
+  - **The model does not point the words.** On the 5 Oct raw transcripts gpt-4.1 pointed 27 of 88 ambiguous address words (30%); gpt-5.6-sol 0 of 7.
+  - **Bare, sonic-3.5 reads לך as a man and שלומך as a woman** (machine comparison of spectrograms; narrow on שלומך). The points are honoured when present.
+  - **Cartesia's pronunciation dictionary works for this:** applies on sonic-3.5, whole words only, before "?" and ",", and a pointed Hebrew alias flips the reading. Vapi carries the id (`CartesiaVoice.pronunciationDictId`) and can override the voice per call (`assistantOverrides.voice`).
+  - **Vapi's transcripts cannot show any of it:** the stored bot lines are normalised (points gone, replacements applied, words dropped). The webhook body shows the opener left Vapi pointed.
+  - **One model-side fault:** on 5 Oct gpt-4.1 made Roni a woman from the name alone, and spoke of itself in the feminine.
+- **Decided (proposed to the owner, nothing changed):** masculine on every ambiguous word by the dictionary until she shows otherwise; a name is never evidence; feminine by pointed forms or suffix-free phrasing; the debt call picks the feminine dictionary per call.
+- **Open, his go:**
+  - creating the two dictionaries on the client's Cartesia account (`--key CARTESIA_YARIV_API_KEY --apply`);
+  - the three prompt edits in section 4 of the doc;
+  - one real call to hear it and to confirm Vapi passes the id on sonic-3.5;
+  - the per-call choice in `call.ts` for debt calls (not built).
+- **Seen, not pursued:** the 10:55 UTC debt call's transcript repeats "לשלוח לך קישור" inside one line; likely the same normalisation.
+
 ## 2026-10-05
 
 ### The Omnitelecom call, transcribed (a video the owner downloaded; nothing spent)

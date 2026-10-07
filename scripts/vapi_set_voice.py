@@ -125,10 +125,17 @@ FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language":
 #            control, so it is dropped where a tag is set. The same hook carries the
 #            <break/> pads since 26 Aug; sonic-3.5 obeys the tag in Hebrew rather
 #            than reading it out (probe, 2 Oct).
+#   dict_env the .env variable holding a Cartesia pronunciation dictionary id
+#            (scripts/cartesia_dicts.py makes them: bare address words to their
+#            pointed form, so לך is said lekha every time). Unset = no dictionary,
+#            and the field is left as the live voice has it. 7 Oct, ready, not
+#            live: docs/reference/voice/hebrew-gender-consistency-2026-10-07.md.
 AGENT_VOICE = {
-    "Debt Follow-up (he)": {"voice": None, "speed": None, "emotion": None},
+    "Debt Follow-up (he)": {"voice": None, "speed": None, "emotion": None,
+                            "dict_env": "CARTESIA_DICT_DEBT"},
     "Inbound Intake (he)": {"voice": "4486a4a7-9ef6-44d4-88e8-10eab571b577",
-                            "speed": 0.8, "emotion": "happy"},
+                            "speed": 0.8, "emotion": "happy",
+                            "dict_env": "CARTESIA_DICT_INBOUND"},
 }
 AGENT_FLAG = {"debt": "Debt Follow-up (he)", "inbound": "Inbound Intake (he)"}
 
@@ -162,6 +169,9 @@ def build_voice(vid, spec):
     if spec.get("emotion"):
         voice.pop("experimentalControls", None)
         voice["chunkPlan"]["formatPlan"]["replacements"].extend(emotion_rules(spec["emotion"]))
+    did = env_value(spec["dict_env"]) if spec.get("dict_env") else ""
+    if did:
+        voice["pronunciationDictId"] = did
     return voice
 
 
@@ -188,6 +198,7 @@ def shape(v):
         "volume": (v.get("generationConfig") or {}).get("volume"),
         "speed": (v.get("generationConfig") or {}).get("speed"),
         "experimentalControls": v.get("experimentalControls") or None,
+        "pronunciationDictId": v.get("pronunciationDictId") or None,
         "replacements": reps_of(v),
         "fallback": (fb.get("provider"), fb.get("voiceId"), reps_of(fb)),
     }
@@ -199,7 +210,8 @@ def report(have, want, readback=False):
         if readback:
             return "   OK" if same else "   MISMATCH (sent %s)" % (target,)
         return "" if same else "   -> %s" % (target,)
-    for k in ("provider", "voiceId", "model", "language", "volume", "speed", "experimentalControls"):
+    for k in ("provider", "voiceId", "model", "language", "volume", "speed", "experimentalControls",
+              "pronunciationDictId"):
         print("  %-21s %s%s" % (k, have[k], mark(have[k] == want[k], want[k])))
     extra = [r[2] for r in want["replacements"] if r not in have["replacements"]]
     gone = [r[2] for r in have["replacements"] if r not in want["replacements"]]

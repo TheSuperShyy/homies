@@ -2666,6 +2666,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **From Chatwoot:** the bot's replies and its team notes, read through the API (GET only), exactly as the phone and the team saw them.
   - **From the run's record:** the tenant's side of a `wa_qa.py live` test. Those messages are injected into the webhook, so the bot answers them but Chatwoot never stores them.
   - **Check:** every reply is matched word for word, and a miss is counted, not hidden.
+- **Gender on the voice agents is settled at the voice, not in the prompt (7 Oct research, `docs/reference/voice/hebrew-gender-consistency-2026-10-07.md`).**
+  - **The fact:** Hebrew writes לך, שלך, שלומך and the second-person past the same for both genders. The prompt asks the model to write them pointed; measured, gpt-4.1 does so 30% of the time and gpt-5.6-sol never. Bare, Cartesia sonic-3.5 reads לך masculine and שלומך feminine, so one call mixes.
+  - **The rule:** a Cartesia pronunciation dictionary (bare word → pointed word, `scripts/cartesia_dicts.py`) makes the owner's default deterministic; the prompt keeps only what the dictionary cannot know (the switch to the feminine, pointed feminine forms, a name is never evidence, את is always אַתְּ).
+  - **Why not more prompt:** an instruction the model can ignore is not a constraint; this is the voice-side twin of the WhatsApp lesson.
+  - **How to read the transcripts:** Vapi's stored bot lines are normalised text (points gone, replacements applied), never what the voice was handed; the tool webhook body carries the real first message.
 - **The incoming agent runs at Vapi's default of 250 tokens a turn (checked 5 Oct).** The assistant sets no `maxTokens`, and Vapi's API spec gives 250 as the default. A test that leaves the limit out tests a different agent. When one turn holds a long spoken passage and a tool call, the call's arguments get cut, and the note breaks.
 - **"It works fine when I test it by hand" covers the greeting paths only (5 Oct).**
   - **What the owner's chats contain:** his own chats on the live bot (4 Oct 09:34–10:41 UTC, 5 Oct 11:41) were hello, the menu, the "talk to a rep" tap and "how are you". That is the fixed menu and one greeting.
