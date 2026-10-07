@@ -488,7 +488,32 @@ its stated time.
     7. "יום טוב, ולהתראות" is fixed even at 19:20.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
-- **DONE 7 Oct, research on the owner's "consistent line of gender identification in hebrew": the fix is at the voice, ready, not live.** `docs/reference/voice/hebrew-gender-consistency-2026-10-07.md`; samples `voice/samples/gender-*.mp3` (on this PC only; the folder is gitignored, and `scripts/cartesia_dicts.py` plus the doc say how they were made).
+- **LIVE 7 Oct evening: both voice agents carry the masculine Cartesia pronunciation dictionary, and the incoming gender rule changed.**
+  - **Where the dictionaries live:** both sit on Homies' Cartesia account, `CARTESIA_YARIV_API_KEY`. It is the only key in `.env` that can see the two live voices, so it is the account on Vapi's `Cartesia (Hebrew TTS)` credential.
+    - masculine: `pdict_283cSrBWWEs472iFnk9KEx`;
+    - feminine: `pdict_yXyrirkyZTjGL99Es7F9Ax`;
+    - 46 words each: the research's 34 plus twelve glued forms such as שהתקשרת and ולך.
+  - **In `.env`:**
+    - `CARTESIA_DICT_INBOUND` and `CARTESIA_DICT_DEBT` = the masculine id;
+    - `CARTESIA_DICT_FEMININE` = the feminine id, which nothing uses yet;
+    - the previous `.env` is at `local/env-backups/.env.before-dicts-2026-10-07`.
+  - **Read back:** both voices are otherwise unchanged (incoming speed 0.8 with the happy tag; debt positivity:low; replacements 29 and 27).
+  - **The incoming prompt:** the gender bullet now carries the research's three edits, pushed with `--keep-voice`, and the prompt = repo.
+  - **The debt prompt:** the 7 Oct opening, a little conversation, then "do you have a minute?", then the facts. It is **edited in the repo and NOT pushed yet**; it waits on the free practice run.
+    - **Push:** `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply`.
+    - **Then read back:** prompt = repo.
+  - **Owed:**
+    - **The owner's two test calls on the Voice page:**
+      - incoming: does Vapi pass the dictionary on sonic-3.5? Listen for *mimkha*, *shlomkha*, *lekha*, *hitkasharta*;
+      - debt: the new opening.
+    - **Then `scripts/bk_reset_attempts.py`.**
+    - **If the dictionary doesn't take effect:** the fallback is the regex swaps in `voice_guard.py` (research section 2d).
+  - **Known gap:** a woman on a debt call hears masculine address words until the per-call feminine choice is built (`assistantOverrides.voice`, not built).
+  - **Undo:**
+    - clear the two `.env` values and re-run `vapi_set_voice.py --agent <a> --apply`;
+    - or `cartesia_dicts.py --key CARTESIA_YARIV_API_KEY --delete`.
+  - **Changing the word list:** delete, `--apply`, new ids into `.env`, then the voice script per agent.
+- **(Shipped: see the bullet above.) DONE 7 Oct, research on the owner's "consistent line of gender identification in hebrew": the fix is at the voice, ready, not live.** `docs/reference/voice/hebrew-gender-consistency-2026-10-07.md`; samples `voice/samples/gender-*.mp3` (on this PC only; the folder is gitignored, and `scripts/cartesia_dicts.py` plus the doc say how they were made).
   - **Diagnosis:** the model leaves 70% (gpt-4.1) to 100% (gpt-5.6-sol) of the ambiguous address words bare; sonic-3.5 then reads לך masculine and שלומך feminine. The opener itself leaves Vapi pointed (seen in the tool webhook body); the stored transcripts are normalised and prove nothing either way.
   - **The fix:** a Cartesia pronunciation dictionary, bare → pointed, one per gender (34 words each, `scripts/cartesia_dicts.py`). Tested on OUR key: applies on sonic-3.5, whole words only, before punctuation, pointed alias changes the reading; test dictionaries deleted.
   - **To ship, on his go:** (1) `python scripts/cartesia_dicts.py --key CARTESIA_YARIV_API_KEY --apply` (a write to the client's Cartesia account, the one on Vapi's credential); (2) the ids into `.env` as `CARTESIA_DICT_INBOUND` (masculine) and `CARTESIA_DICT_DEBT`; (3) `python scripts/vapi_set_voice.py --agent inbound --apply` (the field is a no-op while unset; dry run 7 Oct: "Nothing to do"); (4) one real call. Rollback: unset the variable and re-run the voice script, or `--delete`.

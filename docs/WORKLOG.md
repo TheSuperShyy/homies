@@ -11,6 +11,48 @@ conversation that produced it.
 
 ## 2026-10-07
 
+### Phone agents: the gender dictionary made live, and the debt call opens with a bit of conversation
+
+The owner, after two test calls on the Voice page:
+- **The incoming call (10:45 UTC):** "איזה כיף לשמוע ממך. מה שלומך היום?" was heard with ממך feminine and שלומך masculine.
+- **The debt call (10:55 UTC):** Michael answered "בסדר, מה קורה?" with "הכול טוב, תודה" and then, in one breath, the flat, the months, the amount and the link question. The owner: *"It needs to be more friendly ... Do you have 1 minute or 10 seconds for something important? ... Like a human representative would talk not straight to the point."*
+- **His instructions:** *"also make sure the voice agent is up to date i did some edits earlier about the gender identification dictionaty"*, which is the research entry below.
+- **Approval:** he approved the plan after asking for example scripts of each kind of call.
+
+**Done:**
+- **Checked first:** both live agents matched the repo exactly (prompt, first message, model, tools), and neither voice had a dictionary.
+- **The account:** `CARTESIA_YARIV_API_KEY` (Homies' account) is the only key that can see both live voices, so it is the account on Vapi's credential.
+- **Twelve glued forms added to `scripts/cartesia_dicts.py`:** שהתקשרת, שאמרת, שביקשת, שסיפרת, ששלחת, שכתבת, ששאלת, שציינת, שהזכרת, ששילמת, ולך, ושלך.
+  - **Why:** whole-word matching never reaches התקשרת inside "תודה שהתקשרת".
+  - **Checked on OUR key:** Noam, sonic-3.5, rendered masculine, feminine and masculine again; DTW over log-mel frames, plus length. The pronouns clearly differ.
+  - **The past-tense verbs:** for half of them the difference is within the noise, so they may change nothing.
+  - **Samples:** `voice/samples/gender-glued-*.mp3`, gitignored.
+- **The dictionaries, created on Homies' account, 46 words each, read back:** masculine `pdict_283cSrBWWEs472iFnk9KEx`, feminine `pdict_yXyrirkyZTjGL99Es7F9Ax`.
+  - **In `.env`:** `CARTESIA_DICT_INBOUND` and `CARTESIA_DICT_DEBT` hold the masculine one; `CARTESIA_DICT_FEMININE` is kept for the per-call choice.
+  - **Backup:** `.env` before the change is at `local/env-backups/.env.before-dicts-2026-10-07`.
+- **`vapi_set_voice.py --agent inbound|debt --apply`:**
+  - **The dry run:** showed only `pronunciationDictId` changing.
+  - **Read back:** the dictionary is on both voices, with voice, model, volume, speed, tag and replacements unchanged.
+  - **A hiccup:** Vapi answered one 500 on a GET; the retry was clean.
+- **The incoming prompt's gender bullet (`docs/assistant/demo-inbound.md`):**
+  - **Changed:** the three edits of the research's section 4. The masculine pointing examples went, a first name is no evidence, and once a woman shows herself the address words are pointed feminine, with אַתְּ always pointed, or phrased without the suffix.
+  - **Pushed:** with `vapi_sync.py inbound --keep-voice --apply`.
+  - **Read back:** prompt and first message = repo, voice untouched, 6,616 → 6,698 chars.
+- **The debt prompt (`docs/features/10-debt-followup/prompt.md`):**
+  - **Replaced:** two sentences. Now there is a little conversation first, then "do you have a minute for something important?" and a wait, no pushing if it is a bad time, then the reason with the three facts.
+  - **Diffed against live:** only those sentences differ (4,760 → 4,896 chars).
+  - **Not pushed yet:** waiting on a free Claude-played practice run of three openings.
+- **Merged the two "2026-10-07" headings:** the research entry had been filed under a second heading below 6 Oct.
+
+**Open:**
+- **The debt push** after the practice run.
+- **The owner's two test calls:**
+  - incoming: listen for *mimkha*, *shlomkha*, *lekha* and *hitkasharta*. This is also the only proof that Vapi passes the dictionary id on sonic-3.5.
+  - debt: a short chat, "do you have a minute?", then the facts.
+- **`bk_reset_attempts.py`** after the debt test.
+- **Not built:** the feminine dictionary per debt call. Until then a woman on a debt call hears masculine address words.
+- **No "call me later" result** in `log_call_outcome`.
+
 ### Voice agents: why one call mixes genders, and the fix at the voice (research, ready, not live)
 
 The owner: *"do a research we need to look for a skill for voice agent to have a consistent line of gender identification in hebrew ... the intro is like genderizing the person he is talking to a female then the next line is masculine"*.
