@@ -117,6 +117,33 @@ in who dials and whether our AI knows who picked up.
   IPs. Omni lists SIP trunking (OmniSIP) among its products, so Route A asks
   for something they sell.
 
+**7 Oct: Omni sent API keys and asked us for sample payloads.** The owner
+reports the keys sit on a setup that cannot connect to an AI agent platform;
+that matches the 5 Oct call ("your current system can't run the AI
+services"), where the free move to Tokomni comes first. Ask whether the keys
+change after the move. No key reached the project (none in `.env`; the PDFs
+still hold `YOUR_CLIENT_TOKEN_HERE`). The samples drafted for Omni, all values
+invented:
+
+1. **Us → them, adding a number** (their own insert, one request per press of
+   Call, never a bulk sync): `POST …/campaign/insert/?token=<theirs>` with
+   `{"external_id": "<our residents.id uuid>", "campaign_id": "<theirs>",
+   "number": "05…"}`.
+2. **Them → us, the answered call:** not JSON. A SIP INVITE to our Vapi
+   address (placeholder `sip:homies-debt@sip.vapi.ai`; extension 3 gets its own,
+   e.g. `homies-service`), the tenant's number as `From`, and
+   `x-resident_id: <the external_id>`. The addresses are created only after Omni
+   confirms forwarding.
+3. **Them → us, optional call result:** a JSON POST to a web address of ours,
+   in their call log's own field names: `event`, `call_uuid`, `campaign_id`,
+   `external_id`, `number`, `status` (answered / not_answered / busy / failed),
+   `start_epoch`, `total_duration`. No such endpoint exists yet; without it we
+   read their call log.
+
+If their AI connection is not a SIP forward (for example, streaming audio to a
+web address), their document for it changes the build: ask for it before
+building anything.
+
 **Still open.** The no-repeat rule beyond four attempts, calling windows and a
 do-not-call UI (owner: follow-up); Homies' bank-transfer wording. **Answered
 28 Sep, by reading the code:** the end-of-call writer does NOT bump attempts.

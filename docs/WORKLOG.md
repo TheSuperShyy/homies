@@ -9,6 +9,15 @@ conversation that produced it.
 
 ---
 
+## 2026-10-07
+
+### Omnitelecom asked for sample payloads (answered in chat; nothing sent, nothing built)
+
+The owner: Omni *"sent us some api keys but the settings they are on are not applicable to be connected to any ai agent platforms and they are requesting some sample payload from us"*.
+- **Checked:** no Omni key in `.env`, and the two PDFs still hold placeholders. The 5 Oct transcript has the rep saying the current system cannot run AI, so the keys being on a non-AI setup is expected.
+- **Also from the transcript (3:38):** "syncing would be easier" was the rep answering our ask to give them a webhook to pull numbers: their answer is that we push numbers to their insert API.
+- **Drafted three samples for Omni,** with invented values: our insert request, the answered call as a SIP INVITE with `x-resident_id`, and an optional call-result JSON in their call log's field names. Written down in `docs/features/15-call-button/context.md`, "7 Oct".
+
 ## 2026-10-06
 
 ### The before-and-after page narrowed to the menu buttons
