@@ -527,16 +527,11 @@ its stated time.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
 - **8 Oct, the owner's go on both woman-caller fixes.**
   - **Incoming, LIVE 11:12 UTC:** the prompt prefers suffix-free phrasing once she is a woman, and אַתְּ covers its glued forms. Practice: words said masculine to her fell from 5 to 2, and the goodbye is "תודה על השיחה" in 3 of 3.
-  - **Debt, BUILT, NOT DEPLOYED:** `voiceFor()` (feminine dictionary for gender `f`).
-    - **The commit:** `cf9f141` on top of `origin/main`, local branch `deploy/feminine-dict`.
-    - **The push to `main` (the Vercel deploy) was refused by the session's safety check.** The owner pushes it:
-      - `gh auth switch -u TheSuperShyy`, then `git push origin deploy/feminine-dict:main`;
-      - check the deployment in Vercel, then switch back.
-    - The same change is on `feature/chatbot`.
-  - **Temporary worktree:** `<scratchpad>/homie-main`, detached at `cf9f141`. Its `dashboard/node_modules` is a JUNCTION to the real `dashboard/node_modules`.
-    - **To remove it:** `rmdir` the junction alone (`cmd /c rmdir <path>\dashboard
-ode_modules`), then `git worktree remove --force <path>`.
-    - Never delete that folder recursively.
+  - **Debt, LIVE about 11:25 UTC:** `voiceFor()` gives gender `f` the feminine dictionary, on both the Call button and the Voice page.
+    - **Shipped:** `cf9f141`, pushed alone onto `main`; Vercel `dpl_F1LVkgyqJ32jsEBQZe9JsmrNpkD9` READY on `homies-dashboard.vercel.app`.
+    - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
+    - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
+    - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
 - **DONE 8 Oct: a woman caller on both voice agents, Claude-played** (deck `scripts/voice_qa_oct8_fem.json`; transcripts `docs/assistant/transcripts/2026-10-08-claude-played-woman-6-calls.json`; audio `voice/samples/test-2026-10-08-woman/`). Played to the real models' habit: vowel points 30% incoming, 0% debt.
   - **Debt, OPEN:** the verbs are feminine, but 4-6 לך/איתך per call reach the voice bare and are said masculine.
     - **The fix:** pass the feminine dictionary (`CARTESIA_DICT_FEMININE`, `pdict_yXyr…`) on calls where `gender` is `f`, through the dashboard's call start (`assistantOverrides`). Not built.

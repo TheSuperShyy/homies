@@ -44,9 +44,13 @@ conversation that produced it.
 - **Type check:** `tsc --noEmit` clean on both branches.
 - **Shipping it:** built as one commit on `origin/main` in a temporary worktree: `cf9f141`, kept locally as branch `deploy/feminine-dict`.
   - **The push to `main`**, which deploys Vercel, was refused by the session's safety check as a production deploy. So was removing the worktree's `node_modules` junction.
-  - **Waiting on the owner:** the deploy.
-  - **Do not delete that worktree recursively:** its `dashboard/node_modules` is a junction to the real one.
+  - **The deploy:** the owner said *"gp"*, then *"try again"* once auto mode was off.
+    - **Pushed:** `deploy/feminine-dict` to `main`, now at `cf9f141`, with the TheSuperShyy account.
+    - **Vercel:** production deployment `dpl_F1LVkgyqJ32jsEBQZe9JsmrNpkD9` came READY, aliased to `homies-dashboard.vercel.app`. LIVE about 11:25 UTC.
+    - **Vercel env:** `CARTESIA_DICT_FEMININE` is not set there, so the code's default id is used. `VAPI_PRIVATE_KEY` and the debt assistant id were already set.
+  - **Cleanup:** the junction was removed alone (the real `node_modules` is intact), then the worktree and the merged local branch.
   - The same edits are on `feature/chatbot`.
+  - **Not heard yet:** the Voice page lists only men today (Assaf, Yariv, Ido), so a woman's rehearsal needs one in the list.
 
 ### Voice agents: a woman on the line, three calls per agent (done; two gaps found)
 
