@@ -324,7 +324,9 @@ def node(payload):
 BOT_HELLO = re.compile(r"^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|שבוע טוב|"
                        r"שבת שלום|חג שמח|יום טוב)( לכם| לך| לכולם)?(?=[\s,.!:;]|$)")
 LEAD = re.compile(r"^[\W_]+")
-MENU = "👋 במה אפשר לעזור?"
+# 8 Oct: the menu says "כאן הומי'ז" (n8n_whatsapp_menuline.py); real rows from before
+# carry the old tail, so --watch and the replay know both.
+MENUS = ("👋 כאן הומי'ז. במה אפשר לעזור?", "👋 במה אפשר לעזור?")
 PAY = re.compile(r"תשלום|לשלם|שילמ|קישור|לינק|חוב|יתרה|חשבון|pay|link|debt|balance|owe|bill|invoice",
                  re.I)
 ECHO = re.compile(r"(^|[.!?,:]\s*)(אני מבין|אני מבינה|הבנתי|שמעתי)\s+ש")
@@ -408,7 +410,7 @@ def watch(since):
                 sent.append((kind, str(j["content"])))
         prev = next((str(r.get("body") or "") for r in (items("Anything newer?") or [])
                      if r.get("direction") == "outbound"), "")
-        after_menu = MENU in prev or "במה אפשר לעזור" in str(S.get("last_bot") or "")
+        after_menu = any(m in prev for m in MENUS) or "במה אפשר לעזור" in str(S.get("last_bot") or "")
         flags, infos = [], []
         hellos = [k for k, t in sent if BOT_HELLO.match(LEAD.sub("", t))]
         if len(hellos) > 1:

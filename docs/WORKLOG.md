@@ -9,6 +9,55 @@ conversation that produced it.
 
 ---
 
+## 2026-10-08
+
+### WhatsApp menu: "כאן הומי'ז" before the question (prepared and gated; not live yet)
+
+**What the owner asked:**
+- First: *"can we change the chatbot opening message on the menu like its just hi how can i help. it should be more like homies give me some samples in hebrew with eng"*.
+- Four samples were shown, all naming the company and not Michael, since Michael already introduces himself after a tap.
+- Then *"much more simpler"*: four shorter ones.
+- Then *"i want the 1"*: `בוקר טוב 👋 כאן הומי'ז. במה אפשר לעזור?`. The first word still follows the clock.
+
+**The sentence lives in four places, carried in one write by `scripts/n8n_whatsapp_menuline.py`** (snapshot `docs/handover/n8n-whatsapp-live-08oct-before-menuline.json`, secret replaced):
+1. **Sort's `MENU.content`.**
+2. **The prompt's ownership clause** (`docs/features/11-whatsapp-bot/prompt.md`, with a dated note).
+   - Prompt `8f9e442ded13` becomes `c7a5ce8a699e`, so the memory epoch goes 77 to 78 and `Conversation so far`'s key moves with it.
+3. **Send's echo clause:** a reply that copies the menu sentence gets the buttons.
+4. **Send's `afterMenu`:** the last outbound row that is the menu.
+   - In 3 and 4 the old tail stays beside the new one, so a chat whose last menu went out before the change still reads as "after the menu".
+
+**Owners' constants moved first, so their dry runs read idle afterwards:**
+- `n8n_whatsapp.GREETING_TAIL`, plus `GREETING_TAIL_BEFORE`;
+- `greet.SORT_WAVE`;
+- `rep.CONTENT_NEW`;
+- `manners.FILTER`'s afterMenu line.
+
+**The checks follow both tails:**
+- `check_whatsapp_rules.py` `MENUS`;
+- `check_whatsapp_rules.js`: `MENU_TEXT` is the new line, `MENU_TEXT_BEFORE` the old;
+- `wa_qa.py` `MENU_TAIL`.
+
+**Gate on the candidate:**
+- **Cases:** 313 of 313. Three are new: an old-tail menu row still counts, and a copied menu sentence gets the buttons with either tail.
+- **Replay:** 0 changes across 988 resident messages and 1,040 bot replies.
+- **Pins:** the only failure is the prompt pin, as expected for a text a model reads.
+- **Idle check:** baseline 6 only.
+  - First run, 7: manners refused because the carrier's `ECHO_OLD` was a substring of the new afterMenu line ("lastOut.indexOf…" ends in "t.indexOf…").
+  - A leading space fixed the anchor; the candidate came out byte-identical.
+
+**Claude-played check of the turns the prompt change touches:**
+- **The chats:** five scripted ones on the candidate (`wa_qa.py bundle --candidate`): `tap_open`, `status_tap`, `tap_rep`, `hello_then_matter` and `rep_fine_thanks`.
+- **So far:** `hello_then_matter` is back clean. The menu said "כאן הומי'ז", then Michael wrote "כאן מיכאל מהומי'ז. אוי, לא נעים. באיזה בניין…" with no second greeting and no second "how can I help".
+- **Pending:** four still playing.
+- **Then:** the pin goes to `c7a5ce8a699e`, `--apply`, the gate on live, and the owner's handset.
+
+**On the side:** a stale `__pycache__` copy of `n8n_whatsapp.py` (same size, same second) made the epoch check read the old hash once. Deleting it fixed it.
+
+### The 7 Oct report, and the chats page opened again
+
+The owner asked for *"report 10/07"*: written in chat in the report format (Project: Homies, verb-first bullets, no numbers). Then *"can you open the chatbot test you did again"*: "Michael's Test Chats" was opened, with no change.
+
 ## 2026-10-07
 
 ### WhatsApp bot tested like the voice agents: three chats per menu button, on a page

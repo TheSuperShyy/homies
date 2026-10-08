@@ -90,7 +90,8 @@ SEND_TAIL = "(/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greet
 # 7 Sep sentence stays as the "before" side — this file is the record of how
 # the wave got there, and it has to read idle against a current workflow.
 SORT_PLAIN = 'content: "היי, כאן מיכאל מהומי\'ז. במה אפשר לעזור?"'
-SORT_WAVE = 'content: HELLO + " 👋 במה אפשר לעזור?"'
+# 8 Oct: the done side follows live again (n8n_whatsapp_menuline.py, "כאן הומי'ז").
+SORT_WAVE = 'content: HELLO + " 👋 כאן הומי\'ז. במה אפשר לעזור?"'
 ECHO_PLAIN = "'היי, כאן מיכאל מהומי'ז. במה אפשר לעזור?'"
 # The apostrophe is escaped here as it is in the live single-quoted JS --
 # the outage of 17 Sep was this exact character unescaped (see

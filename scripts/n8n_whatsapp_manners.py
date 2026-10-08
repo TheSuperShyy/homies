@@ -176,7 +176,10 @@ FILTER = " ".join([
     "{ if (r.json && r.json.direction === 'outbound') { lastOut = String(r.json.body || ''); break; } } "
     "} catch (e) { lastOut = ''; }",
     "const afterMenu = /במה אפשר לעזור/.test(String(S.last_bot || '')) "
-    "|| lastOut.indexOf('👋 במה אפשר לעזור?') !== -1;",
+    "|| lastOut.indexOf('👋 במה אפשר לעזור?') !== -1 "
+    # 8 Oct (n8n_whatsapp_menuline.py): the menu says "כאן הומי'ז" before the
+    # question. The old tail stays for chats whose last menu went out before.
+    "|| /👋 כאן הומי'ז[.] במה אפשר לעזור[?]/.test(lastOut);",
     "let ackSent = false; try { ackSent = $('Say it now').all().length > 0; } catch (e) { ackSent = false; }",
     "const ack = ackSent ? String(acked || '').replace(" + LEAD + ", '') : '';",
     "const ackGreeted = ack !== '' && HELLO.test(ack);",

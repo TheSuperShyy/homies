@@ -10,7 +10,10 @@ const fs = require('fs');
 
 const P = JSON.parse(fs.readFileSync(0, 'utf8'));
 const NL = String.fromCharCode(10);
-const MENU_TEXT = 'צהריים טובים 👋 במה אפשר לעזור?';
+// 8 Oct (n8n_whatsapp_menuline.py): the menu says it is Homies. The old sentence
+// stays as a case: a chat whose last menu went out before the change.
+const MENU_TEXT = 'צהריים טובים 👋 כאן הומי' + "'" + 'ז. במה אפשר לעזור?';
+const MENU_TEXT_BEFORE = 'צהריים טובים 👋 במה אפשר לעזור?';
 
 function compile(args, body, what) {
   try {
@@ -109,6 +112,14 @@ function cases(E) {
   expect('after the menu, race: last_bot empty but Anything newer? shows the menu',
     say({ reply: PAY_REPLY, said: 'I want to pay', rows: [{ direction: 'inbound', body: 'I want to pay' }, MENU_ROW, HI_ROW] }),
     "מיכאל מהומי'ז כאן. איך אפשר לעזור בתשלום?");
+  expect('after the menu, race: a menu sent before 8 Oct (the old tail) still counts',
+    say({ reply: PAY_REPLY, said: 'I want to pay', rows: [{ direction: 'inbound', body: 'I want to pay' },
+      { direction: 'outbound', body: MENU_TEXT_BEFORE }, HI_ROW] }),
+    "מיכאל מהומי'ז כאן. איך אפשר לעזור בתשלום?");
+  expect('a reply that copies the 8 Oct menu sentence gets the buttons',
+    () => sent(E, { reply: MENU_TEXT, said: 'hi there', S: { greeted: false } }).content_type, 'input_select');
+  expect('a reply that copies the old menu sentence still gets them',
+    () => sent(E, { reply: MENU_TEXT_BEFORE, said: 'hi there', S: { greeted: false } }).content_type, 'input_select');
   expect('an ack that greeted and named went out: the answer loses both',
     say({ reply: "שלום רב, מיכאל מהומי'ז. הנה הקישור לתשלום שלכם.", said: 'hi, link please', S: { greeted: false },
       acked: "בוקר טוב, כאן מיכאל מהומי'ז, רגע אני בודק", ackSent: true }), 'הנה הקישור לתשלום שלכם.');

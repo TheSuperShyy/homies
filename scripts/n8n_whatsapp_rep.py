@@ -79,7 +79,9 @@ TAP_NEW = '"לדבר עם נציג":       "other",'
 #
 # The anchor below is therefore the step-one live state, not the original one.
 CONTENT_OLD = '  content: HELLO + " 👋 כאן מיכאל מהומי\'ז. במה אפשר לעזור?",'
-CONTENT_NEW = '  content: HELLO + " 👋 במה אפשר לעזור?",'
+# 8 Oct: the done side follows live (n8n_whatsapp_menuline.py): the menu now says
+# "כאן הומי'ז" -- the company, still not Michael's name.
+CONTENT_NEW = '  content: HELLO + " 👋 כאן הומי\'ז. במה אפשר לעזור?",'
 
 # --------------------------------------------------------------------------
 # 3. Send: the echo guard drops the first word and keeps the tail.

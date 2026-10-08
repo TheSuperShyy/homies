@@ -65,6 +65,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import check_whatsapp_rules as C  # noqa: E402  (load_live, extract, inner, mask)
 import n8n_whatsapp_retry as R  # noqa: E402  (HAY_PY: the bot asked how he is)
+import n8n_whatsapp as W  # noqa: E402  (GREETING_TAIL: the menu's sentence after the clock word)
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -73,6 +74,7 @@ JS = os.path.join(HERE, "wa_qa.js")
 DECK = os.path.join(HERE, "wa_qa_scenarios.json")
 ALLOWED_EMOJI = set("🙂😊🙏👍💪🤝")
 TAPS = {"open": "פתיחת קריאת שירות", "status": "מצב קריאה קיימת", "other": "לדבר עם נציג"}
+MENU_TAIL = " " + W.GREETING_TAIL   # 8 Oct: "👋 כאן הומי'ז. במה אפשר לעזור?"
 
 
 # ---------------------------------------------------------------------------
@@ -220,7 +222,7 @@ Build it yourself from these rules (the production expression; keep the brackets
   empty)
 - The message right after the system's menu (the deck marks the previous line `menu`, or the
   message is a tap): add ` [ההודעה הזאת היא תשובה למשפט ששלחה המערכת ולא אתה, ולכן אין לו זכר
-  בזיכרון שלך: <hour word> 👋 במה אפשר לעזור?]` with the hour word of the scenario's clock
+  בזיכרון שלך: <hour word> 👋 כאן הומי'ז. במה אפשר לעזור?]` with the hour word of the scenario's clock
   (before 05:00 שלום, before 12:00 בוקר טוב, before 17:00 צהריים טובים, else ערב טוב).
 - If the payment-ack model wrote an ack (see below): add ` [הודעה קצרה כבר יצאה אליו ממך ברגע
   זה: "<the ack>". היא כבר אצלו. אל תחזור עליה, אל תפתח שוב בזה שאתה בודק, ואם היא כבר בירכה
@@ -234,7 +236,7 @@ in memory beyond the turn they happened in. A scenario's `history` is already in
 ## The system answers a bare hello itself
 
 A message that is only a hello (the deck marks it `menu: true`) never reaches the model:
-the system sends `<hour word> 👋 במה אפשר לעזור?` with three buttons (פתיחת קריאת שירות,
+the system sends `<hour word> 👋 כאן הומי'ז. במה אפשר לעזור?` with three buttons (פתיחת קריאת שירות,
 מצב קריאה קיימת, לדבר עם נציג). Record it as a turn with `"kind": "menu"` and nothing else.
 
 ## Two models per resident message
@@ -434,7 +436,7 @@ def live_turn(code, s, t):
     """What the live code does with one message (turn's body; play calls it too)."""
     kind = t.get("kind", "text")
     text = "" if kind == "file" else str(t.get("text") or "")
-    menu_line = hour_word(s["time"]) + " 👋 במה אפשר לעזור?"
+    menu_line = hour_word(s["time"]) + MENU_TAIL
     if kind == "text" and node_run({"mode": "sort", "code": code, "texts": [text]})[0]:
         return {"menu": True, "system_sends": menu_line, "buttons": list(TAPS.values()),
                 "record": {"resident": text, "kind": "menu"}}
@@ -788,7 +790,7 @@ def grade(run):
             text = t.get("resident", "")
             she = she or bool(C.FEM_CUE.search(text))
             if kind == "menu":
-                last_bot = hour_word(s["time"]) + " 👋 במה אפשר לעזור?"
+                last_bot = hour_word(s["time"]) + MENU_TAIL
                 greeted = True
                 meta.append({"kind": "menu", "handset": [last_bot], "buttons": True})
                 turns_js.append(None)

@@ -203,7 +203,9 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 77
+MEMORY_EPOCH = 78
+# 77 -> 78, 8 Oct (n8n_whatsapp_menuline.py): the menu says "כאן הומי'ז", and the
+# prompt's ownership clause quotes it. The prompt changed, so the hash moved.
 # 76 -> 77, 6 Oct, the same script again: before the emergency's third run, on
 # danger v2. The second run's buffer held "the only number I can give you is ...".
 # 75 -> 76, 6 Oct (n8n_whatsapp_fresh.py): no text changed. The emergency fix
@@ -706,7 +708,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8f9e442ded13",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "c7a5ce8a699e",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -868,7 +870,14 @@ TAP_LINE = {
 # michael from homies." The system greets and asks; who it is comes from the
 # model, in its own words, on its first reply and on a נציג tap. So the tail is
 # shorter again, and every guard that matched the old one moved with it.
-GREETING_TAIL = "👋 במה אפשר לעזור?"
+# 8 Oct: the company comes back into it, not the name. Owner, after the test
+# page: "it should be more like homies", then "much more simpler", picking
+# "בוקר טוב 👋 כאן הומי'ז. במה אפשר לעזור?". Michael still introduces
+# himself after a tap (the 23 Sep rule). Carried by n8n_whatsapp_menuline.py;
+# live Send also keeps knowing the old tail, for chats whose last menu went
+# out before the change.
+GREETING_TAIL = "👋 כאן הומי'ז. במה אפשר לעזור?"
+GREETING_TAIL_BEFORE = "👋 במה אפשר לעזור?"   # 23 Sep - 8 Oct
 
 MENU = {
     "he": {

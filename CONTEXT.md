@@ -4261,6 +4261,14 @@ tap send a canned introduction — that is exactly the thing the 1 Sep rule
 forbids, and a second piece of fixed text would have been a worse bot for a
 smaller change. A clause in the prompt does the same job and varies by itself.
 
+**The opener names the company, still not the person (owner, 8 Oct).** After
+the 7 Oct test page the owner wanted the menu "more like homies", then "much
+more simpler", and picked `בוקר טוב 👋 כאן הומי'ז. במה אפשר לעזור?`.
+- **The invariant tail** is now `👋 כאן הומי'ז. במה אפשר לעזור?` (`GREETING_TAIL`). Michael's name still comes from the model after a tap.
+- **Send knows both tails, old and new**, in `afterMenu` and in the echo clause. A chat whose last menu went out before the change must still read as "right after the menu". Drop the old tail only when no live chat can still hold it.
+- **Carrier:** `n8n_whatsapp_menuline.py`, epoch 78.
+- **A lesson from the idle check:** an anchor can sit inside a neighbour's longer line. `t.indexOf(...)` matched inside `lastOut.indexOf(...)`, and manners refused. Read an `_OLD` anchor against the whole would-be body, not just the spot it is meant for.
+
 **The bot is the representative, and that is the whole handover story (23 Sep).**
 The third row reads `לדבר עם נציג` again, and 13 Sep still stands: nothing pages
 a person from WhatsApp. The label is honest because the prompt has cast the bot
