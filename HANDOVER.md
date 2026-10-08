@@ -490,17 +490,19 @@ its stated time.
     7. "יום טוב, ולהתראות" is fixed even at 19:20.
     8. 3 of 5 calls had a turn over 250 tokens once thinking is counted (max 347). Whether Vapi's default 250 counts thinking is unknown; one live debt call would settle it.
     9. `alt_payment` defaults to the literal `none` in `call.ts`, which reaches the Hebrew prompt as "דרך תשלום נוספת, אם יש כזאת: none". Vercel's env could not be read (403), so an override is unverified.
-- **IN PROGRESS 8 Oct: the WhatsApp menu says "כאן הומי'ז" before the question (the owner picked it). Prepared and gated, NOT live yet.**
+- **LIVE 8 Oct 09:02 UTC: the WhatsApp menu says "כאן הומי'ז" before the question (the owner picked it).**
   - **The new line:** `<clock word> 👋 כאן הומי'ז. במה אפשר לעזור?`.
-  - **The repo is ahead of live:** epoch 78, prompt `c7a5ce8a699e`, the new `GREETING_TAIL`. Until the carrier ships, live dry runs of manners, greet, rep and fresh are not idle. That is expected; never `--apply` one of them alone.
-  - **To ship:**
-    1. finish the Claude-played check (scratchpad `waqa-menuline`, five scripted chats on the candidate);
-    2. set the pin `'Answer the resident / system': 'c7a5ce8a699e'` in `check_whatsapp_rules.py`;
-    3. `python scripts/n8n_whatsapp_menuline.py --apply`;
-    4. `check_whatsapp_rules.py` on live, and every patcher's dry run idle except the baseline 6;
-    5. the owner sends "hi" on the handset;
-    6. `--watch <deploy time>`.
-  - **Undo:** `python scripts/n8n_whatsapp_menuline.py --restore`, then `git revert` the repo side.
+  - **The carrier:** `scripts/n8n_whatsapp_menuline.py`. Epoch 78, prompt `c7a5ce8a699e`, memory key `-78`.
+  - **Send knows both tails.** Don't remove the old one while a chat could still hold an old menu.
+  - **On live:**
+    - gate all green, 313 cases;
+    - the prompt pin is `c7a5ce8a699e`;
+    - patchers idle except the baseline 6.
+  - **Checked first:** five Claude-played chats on the candidate, 34 of 34 expectations.
+  - **Owed:**
+    - the owner's "hi" on the handset;
+    - then `check_whatsapp_rules.py --watch 2026-10-08T09:02`, and again the next morning.
+  - **Undo:** `python scripts/n8n_whatsapp_menuline.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-08oct-before-menuline.json`), then `git revert` the repo side (the epoch, the tail and the pin).
 - **7 Oct: the WhatsApp bot tested the same way, three Claude-played chats per menu button, nothing spent.**
   - **Where:**
     - **Deck:** `scripts/wa_qa_oct7_9.json` (the 4 Oct calm-word nine, moved to 7 Oct).

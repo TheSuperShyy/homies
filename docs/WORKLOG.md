@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-08
 
-### WhatsApp menu: "כאן הומי'ז" before the question (prepared and gated; not live yet)
+### WhatsApp menu: "כאן הומי'ז" before the question (LIVE 09:02 UTC)
 
 **What the owner asked:**
 - First: *"can we change the chatbot opening message on the menu like its just hi how can i help. it should be more like homies give me some samples in hebrew with eng"*.
@@ -48,9 +48,29 @@ conversation that produced it.
 
 **Claude-played check of the turns the prompt change touches:**
 - **The chats:** five scripted ones on the candidate (`wa_qa.py bundle --candidate`): `tap_open`, `status_tap`, `tap_rep`, `hello_then_matter` and `rep_fine_thanks`.
-- **So far:** `hello_then_matter` is back clean. The menu said "כאן הומי'ז", then Michael wrote "כאן מיכאל מהומי'ז. אוי, לא נעים. באיזה בניין…" with no second greeting and no second "how can I help".
-- **Pending:** four still playing.
-- **Then:** the pin goes to `c7a5ce8a699e`, `--apply`, the gate on live, and the owner's handset.
+- **Graded:** 17 turns, 34 of 34 expectations, no guard rejection, no rubric flag.
+- **After the new menu line:**
+  - **The open tap:** "כאן מיכאל מהומי'ז. שמח שפנית אלינו… מה קרה?".
+  - **The status tap:** "כאן מיכאל מהומי'ז, ואני איתך על הקריאה 🙂 יש לך את המספר שלה?".
+  - **The representative tap:** "היי, כאן מיכאל מהומי'ז. שמח שכתבת 🙂 מה שלומך היום?".
+  - **A hello, then cockroaches:** "כאן מיכאל מהומי'ז. אוי, לא נעים. באיזה בניין זה…".
+  - None repeats the greeting or asks again how to help.
+- **The pin then moved:** `'Answer the resident / system'` to `c7a5ce8a699e`. The gate on the candidate was all green.
+
+**LIVE:**
+- **Applied:** `n8n_whatsapp_menuline.py --apply`, 09:02:11-09:02:16 UTC (live `updatedAt` 09:02:14).
+- **Read back:**
+  - Sort sends the new line;
+  - prompt `c7a5ce8a699e`, memory key `-78`;
+  - Send carries the echo clause, `afterMenu` and manners' filter, with one `}}`.
+- **On live after:**
+  - the carrier reports nothing to do;
+  - `check_whatsapp_rules.py`: all 313 cases green;
+  - every patcher's dry run on a dump of live is idle except the baseline 6.
+- **Every chat's memory starts fresh** (epoch 78), the owner's test chat included.
+- **Owed:**
+  - the owner sends "hi" on the handset;
+  - then `check_whatsapp_rules.py --watch 2026-10-08T09:02`.
 
 **On the side:** a stale `__pycache__` copy of `n8n_whatsapp.py` (same size, same second) made the epoch check read the old hash once. Deleting it fixed it.
 

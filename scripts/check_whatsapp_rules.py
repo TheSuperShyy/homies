@@ -100,7 +100,11 @@ PINS = {
     # bot's guards and Send (the pushed danger line now carries its number).
     # 5 Oct evening (n8n_whatsapp_hayday.py, epoch 75): the rep tap asks how he is
     # TODAY. Claude-played: 5 replies through the would-be guards and Send.
-    'Answer the resident / system': '8f9e442ded13',
+    # 8 Oct (n8n_whatsapp_menuline.py, epoch 78): the ownership clause quotes the
+    # menu's new tail, "👋 כאן הומי'ז. במה אפשר לעזור?". Claude-played on the
+    # candidate: tap_open, status_tap, tap_rep, hello_then_matter, rep_fine_thanks;
+    # 17 turns, 34/34 expectations, no guard rejection, no rubric flag.
+    'Answer the resident / system': 'c7a5ce8a699e',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
