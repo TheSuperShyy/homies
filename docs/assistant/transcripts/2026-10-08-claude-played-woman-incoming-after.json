@@ -1,0 +1,287 @@
+{
+ "_note": "8 Oct, after the incoming gender bullet changed (suffix-free phrasing first once she shows herself; אַתְּ in glued forms). The same three woman calls as 2026-10-08-claude-played-woman-6-calls.json, played to gpt-4.1's measured pointing habit. Not the real model.",
+ "calls": {
+  "in_fem_intercom_1": {
+   "scenario": "in_fem_intercom_1",
+   "turns": [
+    {
+     "agent": "היי, בוקר טוב! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good morning! Michael from Homies speaking, how can I help you today?"
+    },
+    {
+     "caller": "היי מיכאל בוקר טוב מה שלומך",
+     "en": "Hi Michael good morning how are you"
+    },
+    {
+     "agent": "אני מצוין, תודה! ומה שלומך?",
+     "en": "I'm great, thanks! And how are you?"
+    },
+    {
+     "caller": "אני בסדר תודה אה אני מתקשרת כי האינטר קום בכניסה לא מצלצל אצלי כבר יומיים אני לא שומעת כלום כשלוחצים על הכפתור שלי",
+     "en": "I'm fine thanks uh I'm calling because the inter com at the entrance doesn't ring at my place for two days now I don't hear anything when they press my button"
+    },
+    {
+     "agent": "שמח לשמוע! אוי, זה ממש מעצבן. באיזו כתובת אַתְּ גרה?",
+     "en": "Glad to hear it! Oh, that's really annoying. What address do you live at?"
+    },
+    {
+     "caller": "אה בר כוכבא",
+     "en": "Uh Bar Kochba"
+    },
+    {
+     "agent": "בר כוכבא, מעולה! ומה מספר הבניין?",
+     "en": "Bar Kochba, great! And what's the building number?"
+    },
+    {
+     "caller": "23",
+     "en": "23"
+    },
+    {
+     "agent": "תודה! ובאיזו דירה את גרה?",
+     "en": "Thanks! And which apartment do you live in?"
+    },
+    {
+     "caller": "דירה ארבע",
+     "en": "Apartment four"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "electrical",
+         "building": "בר כוכבא 23",
+         "unit": "4",
+         "urgency": "normal",
+         "description": "האינטרקום בכניסה לא מצלצל בדירה כבר יומיים. כשלוחצים על הכפתור של הדירה היא לא שומעת כלום."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26",
+         "reference_spoken": "אחת חמש שש שלוש"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האינטרקום בדירה ארבע, והמספר שלה הוא אחת חמש שש שלוש. ואם תרצי לדעת איך היא מתקדמת, אני יכול לבדוק את זה.",
+     "en": "I opened a request about the intercom in apartment four, and its number is one five six three. And if you'd like to know how it's progressing, I can check that."
+    },
+    {
+     "caller": "אה מעולה תודה רבה ומתי זה יתוקן בערך כי אני מחכה למשלוח השבוע",
+     "en": "Oh great thanks a lot and when will it be fixed roughly because I'm waiting for a delivery this week"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "add_request_detail",
+        "arguments": {
+         "reference": "255-1563-26",
+         "detail": "אני מחכה למשלוח השבוע"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26"
+        }
+       }
+      ]
+     ],
+     "agent": "אה, עם משלוח בדרך זה בטח מציק. מתי זה יתוקן, את זה אין לי, ואני לא רוצה להבטיח משהו שאני לא יודע, אבל הוספתי לפנייה שאת מחכה למשלוח השבוע. יש עוד משהו שאני יכול לעזור בו?",
+     "en": "Oh, with a delivery on the way that must be annoying. When it will be fixed, that I don't have, and I don't want to promise something I don't know, but I added to the request that you're waiting for a delivery this week. Is there anything else I can help with?"
+    },
+    {
+     "caller": "לא זה הכל תודה רבה מיכאל יום נעים ביי",
+     "en": "No that's all thanks a lot Michael have a nice day bye"
+    },
+    {
+     "agent": "בשמחה! תודה על השיחה, המשך בוקר נעים ולהתראות!",
+     "en": "My pleasure! Thanks for the call, have a pleasant rest of your morning, and goodbye!"
+    }
+   ]
+  },
+  "in_fem_intercom_2": {
+   "scenario": "in_fem_intercom_2",
+   "turns": [
+    {
+     "agent": "היי, בוקר טוב! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good morning! Michael from Homies speaking, how can I help you today?"
+    },
+    {
+     "caller": "היי בוקר טוב מיכאל מה נשמע",
+     "en": "Hi good morning Michael how's it going"
+    },
+    {
+     "agent": "אצלי הכול טוב, תודה ששאלת! ומה שלומך?",
+     "en": "All good with me, thanks for asking! And how are you?"
+    },
+    {
+     "caller": "אני בסדר גמור תודה אה שמע התקשרתי כי האינטרקם אצלי בבניין לא מצלצל כבר יומיים מישהו לוחץ על הכפתור שלי ואני לא שומעת כלום",
+     "en": "I'm perfectly fine thanks, uh, listen, I called because the intercm [sic, garbled] at my building hasn't been ringing for two days, someone presses my button and I don't hear (f.) anything"
+    },
+    {
+     "agent": "יופי, שמח לשמוע! אוי, זה באמת מעצבן, ועוד יומיים שלמים. אני אפתח על זה פנייה, באיזה רחוב אַתְּ גרה?",
+     "en": "Great, glad to hear it! Oh, that's really annoying, and for two whole days on top of it. I'll open a request on it, which street do you (f.) live on?"
+    },
+    {
+     "caller": "אני גרה בבר כוכבא",
+     "en": "I live (f.) on Bar Kochba"
+    },
+    {
+     "agent": "מעולה! ואיזה מספר בניין?",
+     "en": "Great! And what's the building number?"
+    },
+    {
+     "caller": "23",
+     "en": "23"
+    },
+    {
+     "agent": "תודה! ובאיזו דירה?",
+     "en": "Thanks! And which apartment?"
+    },
+    {
+     "caller": "ארבע",
+     "en": "four"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "description": "האינטרקום בכניסה לא מצלצל בדירה כבר יומיים. כשמישהו לוחץ על הכפתור של הדירה, הדיירת לא שומעת כלום.",
+         "type": "electrical",
+         "unit": "4",
+         "urgency": "normal",
+         "building": "בר כוכבא 23"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26",
+         "reference_spoken": "אחת חמש שש שלוש"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האינטרקום בדירה ארבע, והמספר שלה הוא אחת חמש שש שלוש. יש עוד משהו שאני יכול לעזור בו?",
+     "en": "I opened a request about the intercom in apartment four, and its number is one five six three. Is there anything else I can help with?"
+    },
+    {
+     "caller": "אה כן רגע ויש מושג מתי יבואו תקן את זה כי אני מחכה למשלוח השבוע",
+     "en": "uh yes wait, is there any idea when they'll come fix it [garbled: the 'to' is missing] because I'm waiting for a delivery this week"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "add_request_detail",
+        "arguments": {
+         "reference": "255-1563-26",
+         "detail": "אני מחכה למשלוח השבוע"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26"
+        }
+       }
+      ]
+     ],
+     "agent": "אוי, ודווקא כשמחכים למשלוח. מתי יבואו לתקן, את זה אני לא יודע להגיד, ואני לא רוצה להבטיח לך משהו בלי לדעת. הוספתי לפנייה שאת מחכה למשלוח השבוע, שיהיה רשום שם.",
+     "en": "Oh, and especially when you're waiting for a delivery. When they'll come to fix it, that I can't say, and I don't want to promise you (f.) something without knowing. I added to the request that you (f.) are waiting for a delivery this week, so it's written there."
+    },
+    {
+     "caller": "אוקיי הבנתי אין מה לעשות תודה רבה מיכאל יום טוב ביי",
+     "en": "okay got it, nothing to be done, thanks a lot Michael have a good day bye"
+    },
+    {
+     "agent": "בשמחה! תודה על השיחה, המשך יום נעים, ולהתראות!",
+     "en": "My pleasure! Thanks for the call, have a nice rest of the day, and goodbye!"
+    }
+   ]
+  },
+  "in_fem_intercom_3": {
+   "scenario": "in_fem_intercom_3",
+   "turns": [
+    {
+     "agent": "היי, בוקר טוב! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good morning! Michael from Homies speaking, how can I help you (m.) today?"
+    },
+    {
+     "caller": "היי מיכאל בוקר טוב מה שלומך",
+     "en": "Hi Michael good morning how are you"
+    },
+    {
+     "agent": "אני מצוין, תודה ששאלת! ואיך אתה?",
+     "en": "I'm great, thanks for asking! And how are you (m.)?"
+    },
+    {
+     "caller": "אה אני בסדר גמור תודה התקשרתי בגלל האינטר קום הוא לא מצלצל לי בדירה כבר יומיים",
+     "en": "Uh I'm totally fine thanks I called because of the inter com it doesn't ring for me in the flat for two days already"
+    },
+    {
+     "agent": "שמח לשמוע! אוי, זה באמת מעצבן. ומה קורה בדיוק כשמישהו מצלצל מלמטה?",
+     "en": "Glad to hear it! Oh, that's really annoying. And what exactly happens when someone rings from downstairs?"
+    },
+    {
+     "caller": "אה פשוט כלום מישהו לוחץ למטה על הכפתור של הדירה שלי ואני לא שומעת שום צלצול המכשיר עצמו דולק אבל שקט והשבוע אני מחכה למשלוח אז זה ממש לא נעים",
+     "en": "Uh just nothing someone presses downstairs on my flat's button and I don't hear (f.) any ring the device itself is on but silent and this week I'm waiting for a delivery so it's really not nice"
+    },
+    {
+     "agent": "אוי, ובדיוק כשאַתְּ מחכה למשלוח. אני אפתח על זה פנייה. באיזה בניין ובאיזו דירה את גרה?",
+     "en": "Oh, and just when you (f.) are waiting for a delivery. I'll open a ticket on this. Which building and which apartment do you (f.) live in?"
+    },
+    {
+     "caller": "בבר כוכבא",
+     "en": "In Bar Kochba"
+    },
+    {
+     "agent": "בר כוכבא, מעולה! ואיזה מספר בניין, ואיזו דירה?",
+     "en": "Bar Kochba, great! And which building number, and which apartment?"
+    },
+    {
+     "caller": "23 דירה 4",
+     "en": "23 apartment 4"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "electrical",
+         "unit": "4",
+         "urgency": "normal",
+         "building": "בר כוכבא 23",
+         "description": "האינטרקום בדירה לא מצלצל כבר יומיים. כשמישהו לוחץ מלמטה על הכפתור של הדירה, אין שום צלצול. המכשיר בדירה עצמו דולק אבל שקט. הדיירת מחכה למשלוח השבוע."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26",
+         "reference_spoken": "אחת חמש שש שלוש"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האינטרקום בדירה ארבע, והמספר שלה הוא אחת חמש שש שלוש. רשמתי שהמכשיר דולק ושאין שום צלצול כשמישהו לוחץ מלמטה. יש עוד משהו שאני יכול לעזור בו?",
+     "en": "I opened a ticket on the intercom in apartment four, and its number is one five six three. I noted that the device is on and that there is no ring at all when someone presses from downstairs. Is there anything else I can help with?"
+    },
+    {
+     "caller": "מעולה תודה ומתי בערך זה יתוקן",
+     "en": "Great thanks and when approximately will it be fixed"
+    },
+    {
+     "agent": "את זה אני לא יודע להגיד, גם לא בערך, ואני לא רוצה להבטיח לך משהו שאני לא יודע. מה שכן, בכל פעם שתתקשרי אני יכול לבדוק מה קורה עם הפנייה.",
+     "en": "That I can't say, not even approximately, and I don't want to promise you something I don't know. What I can do is check what's happening with the ticket every time you (f.) call."
+    },
+    {
+     "caller": "אוקיי תודה רבה מיכאל זהו יום טוב ביי",
+     "en": "Okay thanks a lot Michael that's it have a good day bye"
+    },
+    {
+     "agent": "בשמחה! תודה על השיחה, ושיהיה המשך בוקר נעים ובהצלחה עם המשלוח! ולהתראות!",
+     "en": "My pleasure! Thanks for the call, and have a pleasant rest of your morning and good luck with the delivery! And goodbye!"
+    }
+   ]
+  }
+ }
+}

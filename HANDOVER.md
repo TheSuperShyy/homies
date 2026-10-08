@@ -526,7 +526,7 @@ its stated time.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
 - **8 Oct, the owner's go on both woman-caller fixes.**
-  - **Incoming:** the prompt prefers suffix-free phrasing once she is a woman, and אַתְּ covers its glued forms. Pushed after its practice run (see WORKLOG 8 Oct).
+  - **Incoming, LIVE 11:12 UTC:** the prompt prefers suffix-free phrasing once she is a woman, and אַתְּ covers its glued forms. Practice: words said masculine to her fell from 5 to 2, and the goodbye is "תודה על השיחה" in 3 of 3.
   - **Debt, BUILT, NOT DEPLOYED:** `voiceFor()` (feminine dictionary for gender `f`).
     - **The commit:** `cf9f141` on top of `origin/main`, local branch `deploy/feminine-dict`.
     - **The push to `main` (the Vercel deploy) was refused by the session's safety check.** The owner pushes it:

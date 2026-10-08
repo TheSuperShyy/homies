@@ -27,7 +27,11 @@ conversation that produced it.
 **Incoming (`docs/assistant/demo-inbound.md`):**
 - **The change:** the feminine half of the gender bullet now prefers phrasing without the suffix ("תודה על השיחה" rather than "תודה שהתקשרת"), and writes the pointed feminine only when there is no natural way round. It says why (bare, the voice says it masculine) and carries אַתְּ to שאַתְּ and כשאַתְּ.
 - **Size:** prompt 6,860 to 6,985 chars. The dry-run diff is only this bullet.
-- **Practice:** three woman calls on the candidate, played to gpt-4.1's habit (scratchpad `vqa-2026-10-08-fem2`), running.
+- **Practice:** three woman calls on the candidate, played to gpt-4.1's habit (`docs/assistant/transcripts/2026-10-08-claude-played-woman-incoming-after.json`).
+  - **The goodbye:** "תודה על השיחה" in 3 of 3, where it had been "תודה שהתקשרת", bare and so masculine, in 2 of 3.
+  - **Suffix words said masculine after her cue:** 2 in all, one "להבטיח לך" in each of two calls, down from 5.
+  - **Bare את or שאת:** 4, down from 5. The glued כשאַתְּ came marked once.
+- **LIVE 11:12 UTC:** `vapi_sync.py inbound --keep-voice --apply`. Read back: prompt = repo, 6,985 chars; the first message, voice `ba765d50` and the masculine dictionary unchanged.
 
 **Debt (dashboard):**
 - **`voiceFor()` in `lib/call.ts`:**
