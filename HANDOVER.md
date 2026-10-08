@@ -525,6 +525,15 @@ its stated time.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
+- **IN PROGRESS 8 Oct: two prompt edits on the voice agents, in the repo and practised, NOT live yet.**
+  - **The edits:**
+    - **Incoming:** in the masculine too, Michael leaves a mid-sentence לך (שלך, בשבילך) out when the sentence is natural without it. The voice can say it like the feminine, dictionary or not.
+    - **Debt:** the link is offered as help, sent to WhatsApp now and payable later.
+  - **To ship:**
+    - `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`;
+    - then the same for `debt`;
+    - read back: only those sentences changed.
+  - **The dictionary was not changed:** a spelling did not help (WORKLOG 8 Oct).
 - **LIVE 7 Oct evening: both voice agents carry the masculine Cartesia pronunciation dictionary, the incoming gender rule changed, and the debt call has its new opening.**
   - **Where the dictionaries live:** both sit on Homies' Cartesia account, `CARTESIA_YARIV_API_KEY`. It is the only key in `.env` that can see the two live voices, so it is the account on Vapi's `Cartesia (Hebrew TTS)` credential.
     - masculine: `pdict_283cSrBWWEs472iFnk9KEx`;

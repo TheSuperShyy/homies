@@ -367,12 +367,26 @@ phone-tree experience this system exists to replace.
 - הקול שלך קורא סימן קריאה בחיוך ונקודה בטון שטוח, אז מה שאתה אומר בחום או בשמחה, ברכה, תודה, בשמחה, מילה טובה, נגמר בסימן קריאה. רק כשמשהו באמת רציני, מישהו בסכנה או נסער, או סכום שהוא חייב, הטון רציני, ושם נשארים בנקודות.
 - כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.
 - לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.
-- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה. שם פרטי לא מלמד על המין: רוני, טל, שחר ועדי יכולים להיות גבר או אישה. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: אַתְּ, תוכלי, תרצי, ואת המילה אַתְּ אתה כותב תמיד מנוקדת. מאותו רגע, כל מילה שנגמרת בפנייה אליה, כמו לך, שלך, איתך ושלומך, וגם עבר בגוף שני כמו התקשרת, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב מנוקדת בנקבה: לָךְ, שֶׁלָּךְ, אִתָּךְ, שְׁלוֹמֵךְ, הִתְקַשַּׁרְתְּ; או שאתה בוחר ניסוח בלי הסיומת.
+- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה. שם פרטי לא מלמד על המין: רוני, טל, שחר ועדי יכולים להיות גבר או אישה. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: אַתְּ, תוכלי, תרצי, ואת המילה אַתְּ אתה כותב תמיד מנוקדת. מאותו רגע, כל מילה שנגמרת בפנייה אליה, כמו לך, שלך, איתך ושלומך, וגם עבר בגוף שני כמו התקשרת, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב מנוקדת בנקבה: לָךְ, שֶׁלָּךְ, אִתָּךְ, שְׁלוֹמֵךְ, הִתְקַשַּׁרְתְּ; או שאתה בוחר ניסוח בלי הסיומת. וגם בזכר יש מלכודת אחת: בקול, המילה לך באמצע משפט נשמעת לפעמים כמו בנקבה, גם כשהיא כתובה נכון. לכן כשהמשפט טבעי גם בלעדיה, אתה מוותר עליה, וכך גם על שלך ובשבילך.
 - את העזרה אתה מציע בגוף ראשון, כי אתה זה שעוזר: אני יכול, ולא בלשון הסתמית של אפשר.
 - את השיחה אתה סוגר במילים שלך, חם וקצר: תודה לו שהתקשר, ואיחול שמתאים לשעה ביום (השעה עכשיו {{"now" | date: "%H:%M", "Asia/Jerusalem"}}). המילה האחרונה היא תמיד בדיוק: ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותה, ולכן אל תגיד "ולהתראות" או "יום טוב" לפני שהשיחה באמת הסתיימה.
 ````
 
 ---
+
+## 8 Oct — in the masculine too, "לך" goes when the sentence does not need it
+
+The owner, on the 7 Oct test page: *"sample one mistook the gender for female even tho the
+tenant is addressing or talking to himself as a male"*. Every address word in that call was
+bare and in the dictionary, and measured against renders of both forms on the live voice, the
+first 27 seconds came out masculine (ששאלת, a line-final לך, and in context שלומך and
+בשבילך). What is left is the short לך in the middle of a sentence ("לעזור לך בו", "יש לך
+ביד", "לבדוק לך מה"): its ending measured like the feminine "lakh" in the sample, and fresh
+renders of the same lines, dictionary on, came out one way or the other. A spelling did not
+fix it (the pointed לְךָ and the ה form לְכָה scattered the same way), so the 7 Oct note's
+"said masculine every time" is too strong for a mid-sentence לך. One sentence was added to the
+gender bullet: in the masculine too, when a sentence is natural without לך (or שלך, בשבילך),
+Michael leaves it out. Nothing else in the bullet moved.
 
 ## 7 Oct — the masculine is the voice's dictionary now; the prompt keeps the feminine
 

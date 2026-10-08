@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-10-08
 
+### Voice agents: a mid-sentence "לך" can sound feminine; and the debt link offered as help (prompts edited, practice running, not live yet)
+
+**The owner, on the 7 Oct test page:**
+- *"sample one mistook the gender for female even tho the tenant is addressing or talking to himself as a male"* (incoming, sample 1, paused at 0:27);
+- *"also for the conversation 3 ... it should be like more friendly like yeah he so in the system you have some outstanding balance ... and if you want i can send you the payment link via whatsapp while we are in this call so that you can settle it even after the call if you want? but dont copy that like a script"*.
+
+**Finding the feminine word in sample 1** (`voice/samples/test-2026-10-07/in_light_hello_1.mp3`):
+- **The text was right:** every address word was bare and in the masculine dictionary. The guard adds only breaks and "מחברת הומיז".
+- **Timestamps:** faster-whisper put 0:27 at Michael's "אוי," right after the tenant's long line.
+- **The method:** renders of each line, pointed masculine and pointed feminine, on Homies' Cartesia account with the live voice, about 3,500 characters in all. Compared by DTW over log-mel frames and by each word's last 90-150 ms (the masculine ends on the vowel "a": lekha, shlomkha, sheshaalta; the feminine on a consonant).
+- **The first 27 seconds came out masculine:**
+  - **ששאלת:** DTW 4.4 against 5.7-6.8, and its ending is a vowel;
+  - **the line-final לך:** high-frequency share 0.06, against the feminine's 0.56-0.62;
+  - **שלומך in its line:** 4.8 to the masculine groups against 5.9 to the feminine.
+- **After 0:45 the line-final words were masculine too:** בשבילך? (0.05, voiced) and שהתקשרת (0.14).
+- **What is left is the short לך in the middle of a sentence:** "לעזור לך בו" 0.50, "יש לך ביד" 0.55, "לבדוק לך מה" 0.74. Those endings are like "lakh".
+  - Fresh renders of the same lines, dictionary on, came out either way.
+  - The pointed לְךָ and the ה spelling לְכָה scattered the same way.
+  - So no spelling fixes it, and the dictionary was not touched. No write to Homies' account.
+  - **The limit:** mid-sentence, the next word blurs the ending. This is elimination plus the measure, not proof.
+
+**The changes** (repo; the dry-run diff against live shows only these):
+- **Incoming** (`docs/assistant/demo-inbound.md`): one sentence added to the gender bullet. In the masculine too, a mid-sentence לך can sound feminine in the voice, so when the sentence is natural without it (or without שלך, בשבילך), Michael leaves it out. Prompt 6,698 to 6,860 chars, with a dated 8 Oct note.
+- **Debt** (`docs/features/10-debt-followup/prompt.md`): "ואז אתה שואל אם לשלוח לינק לתשלום, ומקשיב." became an offer made as help. The link can go to WhatsApp now, during the call, and the tenant can settle it whenever it suits him, even after the call. No wording was handed over. Prompt 4,896 to 5,005 chars, with a dated note.
+
+**Practice:** six Claude-played calls on the candidate text (scratchpad `vqa-2026-10-08`, the 7 Oct deck), three per agent, running.
+
 ### WhatsApp menu: "כאן הומי'ז" before the question (LIVE 09:02 UTC)
 
 **What the owner asked:**
