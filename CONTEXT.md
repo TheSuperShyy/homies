@@ -2688,6 +2688,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **The lever left is wording:** Michael leaves לך (שלך, בשבילך) out when the sentence is natural without it. In the incoming prompt, LIVE 8 Oct 09:57 UTC; practice: 0 mid-sentence לך in Michael's own lines, against 12 the day before. The fixed opener's לְךָ is the one left.
     - **To check a word by ear:** render it pointed both ways on the live voice and compare the endings; scratchpad `gender_probe_s1.py` and `gender_cluster.py` did this on 8 Oct.
     - **The limit:** mid-sentence, the next word blurs the ending.
+- **A test call with a woman is played to the real models' habit, not Claude's (8 Oct).** Claude points Hebrew readily; the real models mostly do not (30% incoming, 0% debt, measured 7 Oct). A stand-in that points every word would make the woman's call sound right when production does not, so the brief tells the players the measured rate.
 - **The payment link is offered as help, not asked for (owner, 8 Oct; LIVE 09:57 UTC).** After the facts, Michael offers to send the link to WhatsApp now, during the call, so the tenant can settle it whenever it suits him, even after the call. The owner gave the idea, not the words (*"dont copy that like a script"*), so the prompt says what the offer does and leaves the wording to the model.
 - **A debt call earns the money talk with a little conversation and a "do you have a minute?" (owner, 7 Oct).**
   - **What he asked for:** *"like a human representative would talk not straight to the point"*.

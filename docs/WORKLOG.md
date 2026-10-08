@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-08
 
+### Voice agents: a woman on the line, three calls per agent (running)
+
+The owner: *"since michael is in masculine in default i want to test how he handles a female tenant on the inbound and outbound"*.
+- **The deck:** `scripts/voice_qa_oct8_fem.json`, three samples of one card per agent, bundled from today's live prompts (incoming 6,860, debt 5,005).
+  - **Incoming:** מיכל, flat 4, the intercom does not ring. Her first line has no gender cue; the second or third does.
+  - **Debt:** מיכל, flat 4, `gender: f`, so the prompt carries the feminine `gender_forms`; January to August, 2,000.
+- **Played to production's habit:** the players are told the 7 Oct measurement. gpt-4.1 (incoming) wrote vowel points on 27 of 88 address words, and gpt-5.6-sol (debt) on 0 of 7. Any word left bare reaches the voice's masculine dictionary and is said masculine.
+- **Next:** render to audio with the live voice and dictionary, and count the bare words to a woman.
+
 ### The call samples, copied to a folder
 
 The owner: *"download all the calls samplle and put it in a folder"*. The 12 test calls (MP3, 13 MB) were copied to `Downloads\Michael test calls\`, and the folder was opened in Explorer. Nothing in the repo changed.

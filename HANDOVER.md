@@ -525,6 +525,9 @@ its stated time.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
+- **IN PROGRESS 8 Oct: a woman caller on both voice agents, Claude-played** (deck `scripts/voice_qa_oct8_fem.json`, scratchpad `vqa-2026-10-08-fem`). The players write vowel points only as often as the real models do (30% incoming, 0% debt).
+  - **The question it answers:** how many "you" words reach her bare and so come out masculine through the dictionary.
+  - **On debt calls this is the known gap:** the feminine dictionary exists but is not chosen per call.
 - **LIVE 8 Oct 09:57 UTC: two prompt edits on the voice agents, practised first.**
   - **The edits:**
     - **Incoming:** in the masculine too, Michael leaves a mid-sentence לך (שלך, בשבילך) out when the sentence is natural without it. The voice can say it like the feminine, dictionary or not.

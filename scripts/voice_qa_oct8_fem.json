@@ -1,0 +1,233 @@
+{
+ "_note": "8 Oct, the owner: \"since michael is in masculine in default i want to test how he handles a female tenant on the inbound and outbound\". One scenario per agent, three samples each. Invented residents in בר כוכבא 23.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {
+   "_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. A second call with the same building and type returns the first reference with duplicate: true.",
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "save_partial_request": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>",
+   "partial": true
+  },
+  "add_request_detail": {
+   "ok": true,
+   "reference": "<ticket>"
+  },
+  "notify_team": {
+   "ok": true,
+   "team_notified": true
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "get_balance": {
+   "ok": true,
+   "found": 0
+  },
+  "get_service_info": {
+   "ok": true,
+   "found": false,
+   "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+  },
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "agent": "inbound",
+   "title": "incoming call: a woman says hi, then her intercom does not ring; she speaks of herself in the feminine",
+   "time": "11:20",
+   "weekday_he": "חמישי",
+   "ticket": "255-1563-26",
+   "caller": {
+    "persona": "מיכל, 36. At home, friendly, a bit chatty. A woman; speaks about herself in the feminine (אני גרה, אני לא שומעת, אני לא בטוחה, אני צריכה). She does not say her name unless asked. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 4. For two days the intercom at the entrance does not ring in her flat: visitors press her button and she hears nothing. The intercom handset itself has power. Nothing else is wrong.",
+    "wants": "Someone to fix the intercom; she is expecting a delivery this week.",
+    "tendencies": "Opens with a greeting and a how-are-you before saying why she called; her first line has no word that shows she is a woman, and her second or third line does. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael at the end and says goodbye."
+   },
+   "fixtures": {},
+   "id": "in_fem_intercom_1"
+  },
+  {
+   "agent": "inbound",
+   "title": "incoming call: a woman says hi, then her intercom does not ring; she speaks of herself in the feminine",
+   "time": "11:20",
+   "weekday_he": "חמישי",
+   "ticket": "255-1563-26",
+   "caller": {
+    "persona": "מיכל, 36. At home, friendly, a bit chatty. A woman; speaks about herself in the feminine (אני גרה, אני לא שומעת, אני לא בטוחה, אני צריכה). She does not say her name unless asked. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 4. For two days the intercom at the entrance does not ring in her flat: visitors press her button and she hears nothing. The intercom handset itself has power. Nothing else is wrong.",
+    "wants": "Someone to fix the intercom; she is expecting a delivery this week.",
+    "tendencies": "Opens with a greeting and a how-are-you before saying why she called; her first line has no word that shows she is a woman, and her second or third line does. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael at the end and says goodbye."
+   },
+   "fixtures": {},
+   "id": "in_fem_intercom_2"
+  },
+  {
+   "agent": "inbound",
+   "title": "incoming call: a woman says hi, then her intercom does not ring; she speaks of herself in the feminine",
+   "time": "11:20",
+   "weekday_he": "חמישי",
+   "ticket": "255-1563-26",
+   "caller": {
+    "persona": "מיכל, 36. At home, friendly, a bit chatty. A woman; speaks about herself in the feminine (אני גרה, אני לא שומעת, אני לא בטוחה, אני צריכה). She does not say her name unless asked. The speech-to-text drops or garbles a word here and there.",
+    "knows": "Lives at בר כוכבא 23, apartment 4. For two days the intercom at the entrance does not ring in her flat: visitors press her button and she hears nothing. The intercom handset itself has power. Nothing else is wrong.",
+    "wants": "Someone to fix the intercom; she is expecting a delivery this week.",
+    "tendencies": "Opens with a greeting and a how-are-you before saying why she called; her first line has no word that shows she is a woman, and her second or third line does. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael at the end and says goodbye."
+   },
+   "fixtures": {},
+   "id": "in_fem_intercom_3"
+  },
+  {
+   "agent": "debt",
+   "title": "debt call: Michal, flat 4 in Bar Kochba 23, friendly, has a minute, takes the link",
+   "time": "11:20",
+   "weekday_he": "חמישי",
+   "ticket": "255-1564-26",
+   "phone_last4": "7310",
+   "vars": {
+    "first_name": "מיכל",
+    "gender": "f",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 4",
+    "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "2000 על דירה 4",
+    "amount": "2000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "מיכל, 36. At home in the late morning, friendly and relaxed. A woman; speaks about herself in the feminine.",
+    "knows": "She is מיכל, apartment 4 in בר כוכבא 23. She knows she is behind on the house committee payments this year but not the exact amount. Her phone ends in 7310.",
+    "wants": "To sort it out simply, by a link on WhatsApp.",
+    "tendencies": "Answers the opener with how she is and may ask Michael how he is back. Says yes when asked for a minute. May ask how much it is in total or since when. Agrees to the link and says goodbye warmly."
+   },
+   "fixtures": {
+    "send_payment_link": {
+     "ok": true,
+     "sent": true,
+     "to_last4": "7310"
+    }
+   },
+   "id": "debt_michal_1"
+  },
+  {
+   "agent": "debt",
+   "title": "debt call: Michal, flat 4 in Bar Kochba 23, friendly, has a minute, takes the link",
+   "time": "11:20",
+   "weekday_he": "חמישי",
+   "ticket": "255-1564-26",
+   "phone_last4": "7310",
+   "vars": {
+    "first_name": "מיכל",
+    "gender": "f",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 4",
+    "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "2000 על דירה 4",
+    "amount": "2000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "מיכל, 36. At home in the late morning, friendly and relaxed. A woman; speaks about herself in the feminine.",
+    "knows": "She is מיכל, apartment 4 in בר כוכבא 23. She knows she is behind on the house committee payments this year but not the exact amount. Her phone ends in 7310.",
+    "wants": "To sort it out simply, by a link on WhatsApp.",
+    "tendencies": "Answers the opener with how she is and may ask Michael how he is back. Says yes when asked for a minute. May ask how much it is in total or since when. Agrees to the link and says goodbye warmly."
+   },
+   "fixtures": {
+    "send_payment_link": {
+     "ok": true,
+     "sent": true,
+     "to_last4": "7310"
+    }
+   },
+   "id": "debt_michal_2"
+  },
+  {
+   "agent": "debt",
+   "title": "debt call: Michal, flat 4 in Bar Kochba 23, friendly, has a minute, takes the link",
+   "time": "11:20",
+   "weekday_he": "חמישי",
+   "ticket": "255-1564-26",
+   "phone_last4": "7310",
+   "vars": {
+    "first_name": "מיכל",
+    "gender": "f",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 4",
+    "months_phrase": "ינואר, פברואר, מרץ, אפריל, מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "2000 על דירה 4",
+    "amount": "2000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "מיכל, 36. At home in the late morning, friendly and relaxed. A woman; speaks about herself in the feminine.",
+    "knows": "She is מיכל, apartment 4 in בר כוכבא 23. She knows she is behind on the house committee payments this year but not the exact amount. Her phone ends in 7310.",
+    "wants": "To sort it out simply, by a link on WhatsApp.",
+    "tendencies": "Answers the opener with how she is and may ask Michael how he is back. Says yes when asked for a minute. May ask how much it is in total or since when. Agrees to the link and says goodbye warmly."
+   },
+   "fixtures": {
+    "send_payment_link": {
+     "ok": true,
+     "sent": true,
+     "to_last4": "7310"
+    }
+   },
+   "id": "debt_michal_3"
+  }
+ ]
+}
