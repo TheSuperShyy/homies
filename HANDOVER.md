@@ -525,9 +525,13 @@ its stated time.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
-- **IN PROGRESS 8 Oct: a woman caller on both voice agents, Claude-played** (deck `scripts/voice_qa_oct8_fem.json`, scratchpad `vqa-2026-10-08-fem`). The players write vowel points only as often as the real models do (30% incoming, 0% debt).
-  - **The question it answers:** how many "you" words reach her bare and so come out masculine through the dictionary.
-  - **On debt calls this is the known gap:** the feminine dictionary exists but is not chosen per call.
+- **DONE 8 Oct: a woman caller on both voice agents, Claude-played** (deck `scripts/voice_qa_oct8_fem.json`; transcripts `docs/assistant/transcripts/2026-10-08-claude-played-woman-6-calls.json`; audio `voice/samples/test-2026-10-08-woman/`). Played to the real models' habit: vowel points 30% incoming, 0% debt.
+  - **Debt, OPEN:** the verbs are feminine, but 4-6 לך/איתך per call reach the voice bare and are said masculine.
+    - **The fix:** pass the feminine dictionary (`CARTESIA_DICT_FEMININE`, `pdict_yXyr…`) on calls where `gender` is `f`, through the dashboard's call start (`assistantOverrides`). Not built.
+    - **To reach production:** a dashboard change goes through `main`.
+  - **Incoming, OPEN:** the switch works after her cue, but 1-3 words per call stay bare and are said masculine: "תודה שהתקשרת" in 2 of 3, and לך/אצלך. "שאת" goes bare in all three.
+    - **The lever:** the prompt. Prefer suffix-free phrasing once she is a woman, and apply אַתְּ to שאַתְּ.
+  - **Waiting on:** the owner's choice of fix.
 - **LIVE 8 Oct 09:57 UTC: two prompt edits on the voice agents, practised first.**
   - **The edits:**
     - **Incoming:** in the masculine too, Michael leaves a mid-sentence לך (שלך, בשבילך) out when the sentence is natural without it. The voice can say it like the feminine, dictionary or not.

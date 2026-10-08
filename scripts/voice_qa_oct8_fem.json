@@ -95,7 +95,8 @@
     "tendencies": "Opens with a greeting and a how-are-you before saying why she called; her first line has no word that shows she is a woman, and her second or third line does. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael at the end and says goodbye."
    },
    "fixtures": {},
-   "id": "in_fem_intercom_1"
+   "id": "in_fem_intercom_1",
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   },
   {
    "agent": "inbound",
@@ -110,7 +111,8 @@
     "tendencies": "Opens with a greeting and a how-are-you before saying why she called; her first line has no word that shows she is a woman, and her second or third line does. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael at the end and says goodbye."
    },
    "fixtures": {},
-   "id": "in_fem_intercom_2"
+   "id": "in_fem_intercom_2",
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   },
   {
    "agent": "inbound",
@@ -125,7 +127,8 @@
     "tendencies": "Opens with a greeting and a how-are-you before saying why she called; her first line has no word that shows she is a woman, and her second or third line does. Gives the street first and the number when asked. May ask when it will be fixed. Thanks Michael at the end and says goodbye."
    },
    "fixtures": {},
-   "id": "in_fem_intercom_3"
+   "id": "in_fem_intercom_3",
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   },
   {
    "agent": "debt",
@@ -159,7 +162,8 @@
      "to_last4": "7310"
     }
    },
-   "id": "debt_michal_1"
+   "id": "debt_michal_1",
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   },
   {
    "agent": "debt",
@@ -193,7 +197,8 @@
      "to_last4": "7310"
     }
    },
-   "id": "debt_michal_2"
+   "id": "debt_michal_2",
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   },
   {
    "agent": "debt",
@@ -227,7 +232,8 @@
      "to_last4": "7310"
     }
    },
-   "id": "debt_michal_3"
+   "id": "debt_michal_3",
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   }
  ]
 }

@@ -33,6 +33,8 @@ DICT_M = re.search(r"^CARTESIA_DICT_INBOUND=(.*)$", io.open(".env", encoding="ut
 VOICE = {"inbound": {"id": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7", "speed": None, "tag": ""},
          "debt":    {"id": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7", "speed": None, "tag": ""}}
 CALLER_VOICE = "84b969ad-19c7-428d-b742-48d387f7f138"   # Gil, "Friendly Host", a library voice
+# A card may name its own caller voice (`caller_voice`): 8 Oct, a woman on the line is
+# Yael, "Casual Presence" (1daba551-...), a female Hebrew library voice on our key.
 RATE = 44100
 REPS = G.replacements()
 chars = {"homies": 0, "ours": 0}
@@ -76,9 +78,9 @@ def michael(agent, text):
     return tts(HOMIES, v["id"], spoken, v["speed"], DICT_M), spoken
 
 
-def caller(text):
+def caller(text, voice=CALLER_VOICE):
     chars["ours"] += len(text)
-    return tts(OURS, CALLER_VOICE, text)
+    return tts(OURS, voice, text)
 
 
 def silence(sec):
@@ -108,7 +110,7 @@ for fn in sorted(os.listdir(os.path.join(RUN, "transcripts"))):
             audio += [pcm, silence(0.45)]
             rows.append(("Michael", turn["agent"], turn.get("en", "")))
         elif "caller" in turn:
-            audio += [caller(turn["caller"]), silence(0.45)]
+            audio += [caller(turn["caller"], cards[sid].get("caller_voice") or CALLER_VOICE), silence(0.45)]
             rows.append(("Caller", turn["caller"], turn.get("en", "")))
     wav_path = os.path.join(OUT, sid + ".wav")
     with wave.open(wav_path, "wb") as w:

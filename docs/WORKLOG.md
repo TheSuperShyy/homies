@@ -11,14 +11,34 @@ conversation that produced it.
 
 ## 2026-10-08
 
-### Voice agents: a woman on the line, three calls per agent (running)
+### Voice agents: a woman on the line, three calls per agent (done; two gaps found)
 
 The owner: *"since michael is in masculine in default i want to test how he handles a female tenant on the inbound and outbound"*.
 - **The deck:** `scripts/voice_qa_oct8_fem.json`, three samples of one card per agent, bundled from today's live prompts (incoming 6,860, debt 5,005).
   - **Incoming:** מיכל, flat 4, the intercom does not ring. Her first line has no gender cue; the second or third does.
   - **Debt:** מיכל, flat 4, `gender: f`, so the prompt carries the feminine `gender_forms`; January to August, 2,000.
 - **Played to production's habit:** the players are told the 7 Oct measurement. gpt-4.1 (incoming) wrote vowel points on 27 of 88 address words, and gpt-5.6-sol (debt) on 0 of 7. Any word left bare reaches the voice's masculine dictionary and is said masculine.
-- **Next:** render to audio with the live voice and dictionary, and count the bare words to a woman.
+- **Address words that reach her bare** (so the masculine dictionary says them masculine). The object marker את is not counted:
+
+  | Call | Bare to her | Right |
+  |---|---|---|
+  | debt 1 | לך ×5, איתך | verbs: תוכלי |
+  | debt 2 | לך ×3, איתך | verbs: תסגרי, תוכלי |
+  | debt 3 | לך ×4 | verbs |
+  | incoming 1 | שהתקשרת | אַתְּ marked, verbs |
+  | incoming 2 | שהתקשרת | אַתְּ, ספרי |
+  | incoming 3 | אצלך, לך ×2 | לָךְ, שֶׁהִתְקַשַּׁרְתְּ marked |
+
+  In all three incoming calls "שאת" ("that you…") goes bare too. The rule's אַתְּ was not applied to the glued form.
+- **Before her cue, incoming stays masculine**, as the owner wants. After "אני גרה" the verbs switch at once and stay.
+- **Debt:** `gender_forms` gives her feminine verbs, and the real model points nothing, so every לך, שלך and איתך goes masculine.
+  - **The fix is ready in parts:** the feminine dictionary exists (`pdict_yXyr…`, 7 Oct). Only choosing it per call when `gender` is `f` (the dashboard's call start, `assistantOverrides`) is not built. `call.ts` reaches Vercel only through `main`.
+- **Incoming:** a call cannot know her gender at the start, so the dictionary cannot switch. The remaining lever is the prompt: once she has shown herself, prefer phrasing without the suffix, since marks reach the voice about 30% of the time. Also extend אַתְּ to the glued שאַתְּ.
+- **Audio:** `voice/samples/test-2026-10-08-woman/`, gitignored. 5,072 characters on Homies' account and 1,533 on ours.
+  - **The caller voice:** Yael, a female library voice on our key. `voice_qa_audio.py` now takes a card's `caller_voice`.
+  - **Copies:** `Downloads\Michael test calls\8 Oct - woman on the line\`.
+  - **The local page** `index.html` was opened.
+- **Transcripts:** `docs/assistant/transcripts/2026-10-08-claude-played-woman-6-calls.json`.
 
 ### The call samples, copied to a folder
 

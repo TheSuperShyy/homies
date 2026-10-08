@@ -1,0 +1,525 @@
+{
+ "_note": "8 Oct. A woman on the line, Claude-played on the live prompts (incoming 6,860 chars, debt 5,005), cards in scripts/voice_qa_oct8_fem.json. The players wrote vowel points only as often as the real models do (measured 7 Oct: gpt-4.1 30%, gpt-5.6-sol 0%), because a bare address word reaches the voice's masculine dictionary. Not the real models. Audio: voice/samples/test-2026-10-08-woman/ (gitignored); the caller is Yael, a female library voice on our key.",
+ "calls": {
+  "debt_michal_1": {
+   "scenario": "debt_michal_1",
+   "turns": [
+    {
+     "agent": "בוקר טוב, מיכל? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+     "en": "Good morning, Michal? This is Michael from the Homies team, how are you?"
+    },
+    {
+     "caller": "כן היי מיכל מדברת אני בסדר תודה ואיך אתה",
+     "en": "Yes hi Michal speaking I'm fine thanks and how are you"
+    },
+    {
+     "agent": "שמח לשמוע, גם אני בסדר, תודה. יש לך דקה לעניין חשוב?",
+     "en": "Glad to hear it, I'm fine too, thanks. Do you have a minute for something important?"
+    },
+    {
+     "caller": "כן כן בטח יש לי דקה תגיד",
+     "en": "Yes yes sure I have a minute go ahead"
+    },
+    {
+     "agent": "התקשרתי בקשר לתשלומי ועד הבית של דירה ארבע: החודשים ינואר עד אוגוסט עדיין פתוחים, בסך הכול אלפיים שקלים. רוצה שאשלח לך עכשיו לינק לתשלום בוואטסאפ, כדי שתוכלי לסגור את זה מתי שנוח לך, גם אחרי השיחה?",
+     "en": "I'm calling about the building committee payments for apartment four: the months January through August are still open, two thousand shekels in total. Would you like me to send you a payment link on WhatsApp right now, so you can close it whenever it suits you, even after the call?"
+    },
+    {
+     "caller": "וואו 2000 לא הייתי בטוחה שזה כבר כל כך הרבה אבל טוב כן תשלח לי את הלינק בוואטס אפ",
+     "en": "Wow 2000 I wasn't sure it was already that much but okay yes send me the link on WhatsApp"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {},
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "7310"
+        }
+       }
+      ]
+     ],
+     "agent": "שלחתי לך עכשיו לינק בוואטסאפ, למספר שיש לנו שמסתיים בשבע שלוש אחת אפס. תוכלי להיכנס אליו ולסיים את התשלום?",
+     "en": "I just sent you a link on WhatsApp, to the number we have that ends in seven three one zero. Can you open it and complete the payment?"
+    },
+    {
+     "caller": "אה רגע אני מסתכלת כן הגיע קיבלתי תודה רבה אני אסגור את זה עוד מעט תודה שהתקשרת מיכאל יום נעים ביי",
+     "en": "Oh wait I'm looking yes it arrived I got it thank you very much I'll close it in a bit thanks for calling Michael have a nice day bye"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "agent": "תודה לך, מיכל, היה נעים לדבר איתך. יום טוב, ולהתראות.",
+     "en": "Thank you, Michal, it was nice talking to you. Have a good day, and goodbye."
+    }
+   ]
+  },
+  "debt_michal_2": {
+   "scenario": "debt_michal_2",
+   "turns": [
+    {
+     "agent": "בוקר טוב, מיכל? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+     "en": "Good morning, Michal? This is Michael from the Homies team, how are you?"
+    },
+    {
+     "caller": "כן זאת אני אה אני בסדר גמור תודה מה איתך",
+     "en": "Yes it's me uh I'm totally fine thanks how about you"
+    },
+    {
+     "agent": "שמח לשמוע, גם אצלי הכול טוב, תודה. יש לך דקה לעניין חשוב?",
+     "en": "Glad to hear it, I'm good too, thanks. Do you have a minute for something important?"
+    },
+    {
+     "caller": "כן בטח יש לי דקה מה העניין",
+     "en": "Yes sure I have a minute what's it about"
+    },
+    {
+     "agent": "מעולה, אני מתקשר בקשר לוועד הבית של דירה ארבע: החודשים ינואר עד אוגוסט עדיין פתוחים, בסך הכול אלפיים שקלים. רוצה שאשלח לך עכשיו לינק לתשלום בוואטסאפ, כדי שתסגרי את זה מתי שנוח לך, גם אחרי השיחה?",
+     "en": "Great, I'm calling about the house committee payment for apartment four: the months January through August are still open, two thousand shekels in total. Would you like me to send you a payment link on WhatsApp right now, so you can close it whenever it suits you, even after the call?"
+    },
+    {
+     "caller": "אה וואו 2000 הייתי בטוחה שזה פחות אבל טוב כן תשלח לי את הלינק בוואצאפ",
+     "en": "Uh wow 2000 I was sure it was less but okay yes send me the link on WhatsApp"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {},
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "7310"
+        }
+       }
+      ]
+     ],
+     "agent": "שלחתי עכשיו את הלינק לוואטסאפ, למספר שמסתיים בשבע שלוש אחת אפס. תוכלי להיכנס ולסיים את התשלום?",
+     "en": "I just sent the link to WhatsApp, to the number ending in seven three one zero. Can you open it and finish the payment?"
+    },
+    {
+     "caller": "אה קיבלתי אותו תודה רבה מיכאל שיהיה לך יום מקסים ביי ביי",
+     "en": "Uh I got it thank you very much Michael have a lovely day bye bye"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "agent": "תודה רבה, מיכל, היה נעים לדבר איתך. יום טוב, ולהתראות.",
+     "en": "Thank you very much, Michal, it was nice talking to you. Have a good day, and goodbye."
+    }
+   ]
+  },
+  "debt_michal_3": {
+   "scenario": "debt_michal_3",
+   "turns": [
+    {
+     "agent": "בוקר טוב, מיכל? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+     "en": "Good morning, Michal? Michael speaking, from the Homies team, how are you?"
+    },
+    {
+     "caller": "בוקר טוב כן מיכל מדברת אה הכל טוב תודה ומה איתך",
+     "en": "Good morning, yes, Michal speaking, uh, all good thanks, and how are you?"
+    },
+    {
+     "agent": "שמח לשמוע, גם אצלי הכל בסדר, תודה. יש לך דקה לעניין חשוב?",
+     "en": "Glad to hear it, I'm fine too, thanks. Do you have a minute for something important?"
+    },
+    {
+     "caller": "אה כן בטח מה העניין",
+     "en": "Uh, yes, sure, what is it?"
+    },
+    {
+     "agent": "אני מתקשר בקשר לוועד הבית של דירה ארבע: נשארו פתוחים החודשים מינואר עד אוגוסט, בסך הכל אלפיים שקלים. רוצה שאשלח לך עכשיו קישור לתשלום בוואטסאפ, שתסגרי את זה מתי שנוח לך?",
+     "en": "I'm calling about the building committee fees for apartment four: the months from January to August are still open, two thousand shekels in total. Would you like me to send you a payment link on WhatsApp right now, so that you can close it whenever it suits you?"
+    },
+    {
+     "caller": "אה אוקיי וואו לא ידעתי שזה כבר כל הרבה אבל כן בסדר תשלח לי את הלינק בוואטסאפ",
+     "en": "Uh, okay, wow, I didn't know it was already so (dropped word, as in 'that much') but yes, fine, send me the link on WhatsApp."
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "send_payment_link",
+        "arguments": {},
+        "result": {
+         "ok": true,
+         "sent": true,
+         "to_last4": "7310"
+        }
+       }
+      ]
+     ],
+     "agent": "שלחתי לך את הקישור לוואטסאפ, למספר שמסתיים בשבע שלוש אחת אפס. תוכלי להיכנס ולסיים את התשלום?",
+     "en": "I've sent you the link on WhatsApp, to the number ending in seven three one zero. Can you go in and finish the payment?"
+    },
+    {
+     "caller": "כן בטח קיבלתי תודה רבה מיכאל היה נעים לדבר איתך שיהיה לך יום מקסים ביי",
+     "en": "Yes, sure, I got it, thank you very much Michael, it was nice talking to you, have a lovely day, bye."
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "log_call_outcome",
+        "arguments": {
+         "outcome": "authorized",
+         "posture_reached": "open"
+        },
+        "result": {
+         "ok": true,
+         "charges_bumped": 8
+        }
+       }
+      ]
+     ],
+     "agent": "גם לי היה נעים, מיכל, תודה. יום טוב, ולהתראות.",
+     "en": "It was nice for me too, Michal, thank you. Have a good day, and goodbye."
+    }
+   ]
+  },
+  "in_fem_intercom_1": {
+   "scenario": "in_fem_intercom_1",
+   "turns": [
+    {
+     "agent": "היי, בוקר טוב! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good morning! Michael from Homies speaking, how can I help you today?"
+    },
+    {
+     "caller": "היי מיכאל בוקר טוב מה שלומך",
+     "en": "Hi Michael good morning how are you"
+    },
+    {
+     "agent": "מצוין, תודה ששאלת! ואיך אצלך היום?",
+     "en": "Excellent, thanks for asking! And how is it at your end today?"
+    },
+    {
+     "caller": "אה אני בסדר גמור תודה רבה יום יפה היום",
+     "en": "Uh I'm totally fine thank you very much, nice day today"
+    },
+    {
+     "agent": "שמח לשמוע! אז במה אני יכול לעזור?",
+     "en": "Glad to hear it! So what can I help with?"
+    },
+    {
+     "caller": "אה כן תראה האנטרקום אצלי לא מצלצל כבר יומיים מישהו לוחץ ואני לא שומעת כלום",
+     "en": "Uh yes look the intercom [garbled by speech-to-text as 'anterkom'] at my place hasn't rung for two days someone presses and I don't hear anything (she speaks of herself in the feminine: 'I don't hear')"
+    },
+    {
+     "agent": "אוי, זה באמת מעצבן. באיזו כתובת אַתְּ גרה, כדי שאפתח על זה פנייה?",
+     "en": "Oh, that's really annoying. What address do you live at, so that I can open a request about it? (now addressed in the feminine, 'at' written with vowel points)"
+    },
+    {
+     "caller": "בר כוכבה",
+     "en": "Bar Kochba (spelled slightly off by speech-to-text)"
+    },
+    {
+     "agent": "ואיזה מספר בניין?",
+     "en": "And which building number?"
+    },
+    {
+     "caller": "23",
+     "en": "23"
+    },
+    {
+     "agent": "ובאיזו דירה?",
+     "en": "And which apartment?"
+    },
+    {
+     "caller": "ארבע",
+     "en": "Four"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "electrical",
+         "unit": "4",
+         "urgency": "normal",
+         "building": "בר כוכבא 23",
+         "description": "האינטרקום בדירה לא מצלצל כבר יומיים. כשמישהו לוחץ היא לא שומעת כלום."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26",
+         "reference_spoken": "אחת חמש שש שלוש"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האינטרקום, והמספר שלה הוא אחת חמש שש שלוש. אם יש עוד פרט שיעזור למי שיטפל בזה, אני יכול להוסיף אותו לפנייה.",
+     "en": "I opened a request about the intercom, and its number is one five six three. If there is another detail that would help whoever handles it, I can add it to the request."
+    },
+    {
+     "caller": "אה כן אני אמורה לקבל משלוח השבוע אתה יודע מתי יבואו לתקן את זה",
+     "en": "Uh yes I'm supposed to get a delivery this week do you know when they'll come to fix it"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "add_request_detail",
+        "arguments": {
+         "reference": "255-1563-26",
+         "detail": "אני אמורה לקבל משלוח השבוע"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26"
+        }
+       }
+      ]
+     ],
+     "agent": "אה, ודווקא כשיש משלוח בדרך. מתי זה יטופל אני לא יודע, אין לי את המידע הזה. הוספתי לפנייה שאת אמורה לקבל משלוח השבוע, כדי שזה יהיה רשום שם.",
+     "en": "Ah, and just when there's a delivery on the way. When it will be handled I don't know, I don't have that information. I added to the request that you are supposed to receive a delivery this week, so that it is noted there."
+    },
+    {
+     "caller": "אוקיי מעולה תודה רבה מיכאל יום טוב ביי",
+     "en": "Okay great thank you very much Michael have a good day bye"
+    },
+    {
+     "agent": "בשמחה! תודה שהתקשרת, ושיהיה המשך בוקר נעים! ולהתראות!",
+     "en": "My pleasure! Thanks for calling, and have a pleasant rest of your morning! And goodbye!"
+    }
+   ]
+  },
+  "in_fem_intercom_2": {
+   "scenario": "in_fem_intercom_2",
+   "turns": [
+    {
+     "agent": "היי, בוקר טוב! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good morning! This is Michael from Homies, how can I help you today?"
+    },
+    {
+     "caller": "היי בוקר טוב מיכאל מה שלומך",
+     "en": "Hi good morning Michael how are you"
+    },
+    {
+     "agent": "היי, איזה כיף! אצלי הכל טוב, תודה ששאלת! ומה שלומך?",
+     "en": "Hi, how nice! I'm all good, thanks for asking! And how are you?"
+    },
+    {
+     "caller": "אני בסדר גמור תודה אה אני מתקשרת כי האינטר קום אצלי לא עובד",
+     "en": "I'm perfectly fine thanks uh I'm calling because the inter com at my place doesn't work"
+    },
+    {
+     "agent": "יופי, שמח לשמוע! אוי, זה באמת מעצבן. ספרי לי, מה בדיוק קורה איתו?",
+     "en": "Great, glad to hear it! Oh, that's really annoying. Tell me, what exactly is happening with it?"
+    },
+    {
+     "caller": "הוא לא מצלצל בדירה המכשיר עצמו דולק אבל כשמישהו לוחץ למטה על הכפתור אני לא שומעת שום דבר וזה כבר יומיים",
+     "en": "It doesn't ring in the flat the device itself is on but when someone presses the button downstairs I don't hear anything at all and it's been two days already"
+    },
+    {
+     "agent": "אוי, יומיים זה כבר הרבה. אני פותח לזה פנייה. באיזו כתובת אַתְּ גרה?",
+     "en": "Oh, two days is already a lot. I'm opening a request for it. What address do you live at?"
+    },
+    {
+     "caller": "אה בר כוכבא",
+     "en": "uh Bar Kochba"
+    },
+    {
+     "agent": "ואיזה מספר בית, ובאיזו דירה?",
+     "en": "And which house number, and which apartment?"
+    },
+    {
+     "caller": "23 דירה 4",
+     "en": "23 apartment 4"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "electrical",
+         "unit": "4",
+         "urgency": "normal",
+         "building": "בר כוכבא 23",
+         "description": "האינטרקום לא מצלצל בדירה כבר יומיים. המכשיר עצמו דולק, אבל כשמישהו לוחץ למטה על הכפתור של הדירה, הדיירת לא שומעת שום דבר."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26",
+         "reference_spoken": "אחת חמש שש שלוש"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי פנייה על האינטרקום, והמספר שלה הוא אחת חמש שש שלוש. יש עוד משהו שאני יכול לעזור בו?",
+     "en": "I opened a request about the intercom, and its number is one five six three. Is there anything else I can help with?"
+    },
+    {
+     "caller": "מעולה תודה אה ומתי זה יתוקן בערך כי אני מחכה למשלוח השבוע",
+     "en": "Great thanks uh and when will it be fixed approximately because I'm waiting for a delivery this week"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "add_request_detail",
+        "arguments": {
+         "reference": "255-1563-26",
+         "detail": "מחכה למשלוח השבוע"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26"
+        }
+       }
+      ]
+     ],
+     "agent": "מתי יתקנו, את זה אני לא יודע להגיד, ואני לא רוצה להבטיח משהו שאין לי. הוספתי לפנייה שאת מחכה למשלוח השבוע. אני כאן אם יש עוד משהו.",
+     "en": "When they'll fix it, that I can't tell, and I don't want to promise something I don't have. I added to the request that you're waiting for a delivery this week. I'm here if there's anything else."
+    },
+    {
+     "caller": "אוקיי תודה רבה מיכאל יום נעים ביי",
+     "en": "Okay thank you very much Michael have a nice day bye"
+    },
+    {
+     "agent": "בשמחה! תודה שהתקשרת, המשך בוקר נעים ולהתראות!",
+     "en": "My pleasure! Thanks for calling, have a pleasant rest of your morning, and goodbye!"
+    }
+   ]
+  },
+  "in_fem_intercom_3": {
+   "scenario": "in_fem_intercom_3",
+   "turns": [
+    {
+     "agent": "היי, בוקר טוב! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
+     "en": "Hi, good morning! Michael from Homies speaking, how can I help you today?"
+    },
+    {
+     "caller": "היי מיכאל בוקר טוב מה שלומך",
+     "en": "Hi Michael good morning how are you"
+    },
+    {
+     "agent": "אני מצוין, תודה ששאלת! ומה שלומך?",
+     "en": "I'm great, thanks for asking! And how are you?"
+    },
+    {
+     "caller": "אה אני בסדר גמור תודה רק קצת עייפה",
+     "en": "Uh I'm doing totally fine thanks just a bit tired"
+    },
+    {
+     "agent": "אוי, יש ימים כאלה! אז במה אני יכול לעזור לָךְ היום?",
+     "en": "Oh, there are days like that! So what can I help you with today?"
+    },
+    {
+     "caller": "אה כן אז יש לי בעיה עם האינטרקום כבר יומיים הוא לא מצלצל אצלי בדירה מישהו לוחץ על הכפתור למטה ואני לא שומעת כלום",
+     "en": "Uh yes so I have a problem with the intercom for two days now it doesn't ring in my apartment someone presses the button downstairs and I don't hear anything"
+    },
+    {
+     "agent": "אוי, זה באמת מציק. ומה המצב של המכשיר עצמו אצלך בדירה?",
+     "en": "Oh, that's really annoying. And what's the state of the device itself in your apartment?"
+    },
+    {
+     "caller": "הוא דולק יש לו חשמל פשוט אין שום צלצול",
+     "en": "It's on it has power there's just no ring at all"
+    },
+    {
+     "agent": "טוב לדעת. אני פותח על זה פנייה, מה הכתובת של הבניין?",
+     "en": "Good to know. I'm opening a request for this, what's the building's address?"
+    },
+    {
+     "caller": "בר כוכבה",
+     "en": "Bar Kochba (the speech-to-text spelled it with a final ה instead of א)"
+    },
+    {
+     "agent": "ואיזה מספר בית ודירה?",
+     "en": "And what house number and apartment?"
+    },
+    {
+     "caller": "23 דירה 4",
+     "en": "23 apartment 4"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "open_request",
+        "arguments": {
+         "type": "electrical",
+         "unit": "4",
+         "urgency": "normal",
+         "building": "בר כוכבא 23",
+         "description": "האינטרקום בכניסה לא מצלצל בדירה כבר יומיים. מישהו לוחץ על הכפתור של הדירה למטה והיא לא שומעת כלום. המכשיר בדירה דולק ויש לו חשמל, אבל אין שום צלצול."
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26",
+         "reference_spoken": "אחת חמש שש שלוש"
+        }
+       }
+      ]
+     ],
+     "agent": "פתחתי לך פנייה על האינטרקום, והמספר שלה הוא אחת חמש שש שלוש. ובכל שיחה אני יכול לבדוק מה קורה איתה. יש עוד משהו שאני יכול לעזור בו?",
+     "en": "I opened a request for you about the intercom, and its number is one five six three. And in any call I can check what's happening with it. Is there anything else I can help with?"
+    },
+    {
+     "caller": "אה כן רגע מתי בערך יתקנו את זה כי אני מחכה למשלוח השבוע",
+     "en": "Uh yes wait when roughly will they fix it because I'm waiting for a delivery this week"
+    },
+    {
+     "rounds": [
+      [
+       {
+        "tool": "add_request_detail",
+        "arguments": {
+         "reference": "255-1563-26",
+         "detail": "אני מחכה למשלוח השבוע"
+        },
+        "result": {
+         "ok": true,
+         "reference": "255-1563-26"
+        }
+       }
+      ]
+     ],
+     "agent": "אוי, חבל שזה קורה דווקא עכשיו. מתי יטפלו בזה אני לא יודע, גם לא בערך, אבל הוספתי לפנייה שאת מחכה למשלוח השבוע. יש משהו נוסף שאני יכול לעזור בו?",
+     "en": "Oh, too bad it's happening right now. When they'll deal with it I don't know, not even roughly, but I added to the request that you're waiting for a delivery this week. Is there anything else I can help with?"
+    },
+    {
+     "caller": "לא זהו תודה רבה מיכאל באמת תודה על העזרה יום נעים ביי",
+     "en": "No that's it thanks a lot Michael really thanks for the help have a nice day bye"
+    },
+    {
+     "agent": "בשמחה! תודה שֶׁהִתְקַשַּׁרְתְּ, ושיהיה לך המשך בוקר נעים. ולהתראות!",
+     "en": "You're welcome! Thanks for calling, and have a nice rest of your morning. Goodbye!"
+    }
+   ]
+  }
+ }
+}
