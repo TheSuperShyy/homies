@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-10-08
 
+### The call samples, copied to a folder
+
+The owner: *"download all the calls samplle and put it in a folder"*. The 12 test calls (MP3, 13 MB) were copied to `Downloads\Michael test calls\`, and the folder was opened in Explorer. Nothing in the repo changed.
+- **`8 Oct - latest`:** today's six, the ones on the shared page.
+- **`7 Oct - before the changes`:** yesterday's six; its incoming calls are the debt-voice re-render.
+- **Names:** `Debt call 1-3.mp3` and `Incoming call 1-3.mp3`.
+
 ### Voice agents: a mid-sentence "לך" can sound feminine; and the debt link offered as help (LIVE 09:57 UTC)
 
 **The owner, on the 7 Oct test page:**
