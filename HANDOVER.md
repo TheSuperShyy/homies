@@ -545,7 +545,7 @@ its stated time.
     - **Debt:** the link is offered as help, sent to WhatsApp now and payable later.
   - **Read back:** prompts = repo (6,860 and 5,005 chars); voice, dictionary and replacements unchanged.
   - **Practice:** six Claude-played calls, `docs/assistant/transcripts/2026-10-08-claude-played-6-calls.json`. Incoming had 0 mid-sentence לך (12 the day before); all three debt calls offered the link as help.
-  - **Audio:** `voice/samples/test-2026-10-08/`, on this PC only. Copies of both days' calls, with plain names, are in `Downloads\Michael test calls\` (8 Oct).
+  - **Audio:** `voice/samples/test-2026-10-08/`, on this PC only. Copies of both days' calls, with plain names, are in `Downloads\Michael test calls\` (8 Oct). Each subfolder has a `Listen.html` page with the transcripts and players; the woman calls are in their own subfolder.
   - **The shared page:** version 3 of https://claude.ai/artifact/BG5Tw5tdpXHakjWZ98Ti78 has these calls.
   - **The dictionary was not changed:** a spelling did not help (WORKLOG 8 Oct).
   - **Still has a mid-sentence לְךָ:** only the fixed opener, "איך אני יכול לעזור לְךָ היום?". It is the owner's approved greeting; changing it needs examples first.

@@ -87,6 +87,7 @@ The owner: *"download all the calls samplle and put it in a folder"*. The 12 tes
 - **`8 Oct - latest`:** today's six, the ones on the shared page.
 - **`7 Oct - before the changes`:** yesterday's six; its incoming calls are the debt-voice re-render.
 - **Names:** `Debt call 1-3.mp3` and `Incoming call 1-3.mp3`.
+- **Later, the owner asked whether the woman-calls page was there too** (*"is this on the folder?"*). It was not; only the MP3s were. Each of the three subfolders now has `Listen.html`: the local transcript-and-player page, with its audio pointed at the renamed MP3s beside it (all 18 resolve). The `8 Oct - woman on the line` folder holds the six woman calls.
 
 ### Voice agents: a mid-sentence "לך" can sound feminine; and the debt link offered as help (LIVE 09:57 UTC)
 
