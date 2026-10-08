@@ -2685,10 +2685,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **What the agents carry:** both carry the masculine one. The ids are in `.env`; the feminine one waits for a per-call choice on debt calls.
     - **Glued forms:** Cartesia matches whole words, so a glued form (שהתקשרת, ולך) needs its own entry. A new word goes in `WORDS`, then the dictionary is recreated: `--delete`, then `--apply`, then the new ids go into `.env` and `vapi_set_voice.py --apply` runs per agent.
   - **The dictionary is not a guarantee for a mid-sentence לך (8 Oct).** On the owner's ear (incoming sample 1), the short לך inside a sentence ("לבדוק לך מה", "לעזור לך בו") can come out like "lakh", dictionary on or off. Pointing (לְךָ) and the ה spelling (לְכָה) scattered the same way. A line-final לך, שלומך, ששאלת, בשבילך and שהתקשרת measured masculine.
-    - **The lever left is wording:** Michael leaves לך (שלך, בשבילך) out when the sentence is natural without it.
+    - **The lever left is wording:** Michael leaves לך (שלך, בשבילך) out when the sentence is natural without it. In the incoming prompt, LIVE 8 Oct 09:57 UTC; practice: 0 mid-sentence לך in Michael's own lines, against 12 the day before. The fixed opener's לְךָ is the one left.
     - **To check a word by ear:** render it pointed both ways on the live voice and compare the endings; scratchpad `gender_probe_s1.py` and `gender_cluster.py` did this on 8 Oct.
     - **The limit:** mid-sentence, the next word blurs the ending.
-- **The payment link is offered as help, not asked for (owner, 8 Oct).** After the facts, Michael offers to send the link to WhatsApp now, during the call, so the tenant can settle it whenever it suits him, even after the call. The owner gave the idea, not the words (*"dont copy that like a script"*), so the prompt says what the offer does and leaves the wording to the model.
+- **The payment link is offered as help, not asked for (owner, 8 Oct; LIVE 09:57 UTC).** After the facts, Michael offers to send the link to WhatsApp now, during the call, so the tenant can settle it whenever it suits him, even after the call. The owner gave the idea, not the words (*"dont copy that like a script"*), so the prompt says what the offer does and leaves the wording to the model.
 - **A debt call earns the money talk with a little conversation and a "do you have a minute?" (owner, 7 Oct).**
   - **What he asked for:** *"like a human representative would talk not straight to the point"*.
   - **The order now:**
