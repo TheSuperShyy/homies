@@ -525,6 +525,18 @@ its stated time.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
+- **8 Oct, the owner's go on both woman-caller fixes.**
+  - **Incoming:** the prompt prefers suffix-free phrasing once she is a woman, and אַתְּ covers its glued forms. Pushed after its practice run (see WORKLOG 8 Oct).
+  - **Debt, BUILT, NOT DEPLOYED:** `voiceFor()` (feminine dictionary for gender `f`).
+    - **The commit:** `cf9f141` on top of `origin/main`, local branch `deploy/feminine-dict`.
+    - **The push to `main` (the Vercel deploy) was refused by the session's safety check.** The owner pushes it:
+      - `gh auth switch -u TheSuperShyy`, then `git push origin deploy/feminine-dict:main`;
+      - check the deployment in Vercel, then switch back.
+    - The same change is on `feature/chatbot`.
+  - **Temporary worktree:** `<scratchpad>/homie-main`, detached at `cf9f141`. Its `dashboard/node_modules` is a JUNCTION to the real `dashboard/node_modules`.
+    - **To remove it:** `rmdir` the junction alone (`cmd /c rmdir <path>\dashboard
+ode_modules`), then `git worktree remove --force <path>`.
+    - Never delete that folder recursively.
 - **DONE 8 Oct: a woman caller on both voice agents, Claude-played** (deck `scripts/voice_qa_oct8_fem.json`; transcripts `docs/assistant/transcripts/2026-10-08-claude-played-woman-6-calls.json`; audio `voice/samples/test-2026-10-08-woman/`). Played to the real models' habit: vowel points 30% incoming, 0% debt.
   - **Debt, OPEN:** the verbs are feminine, but 4-6 לך/איתך per call reach the voice bare and are said masculine.
     - **The fix:** pass the feminine dictionary (`CARTESIA_DICT_FEMININE`, `pdict_yXyr…`) on calls where `gender` is `f`, through the dashboard's call start (`assistantOverrides`). Not built.

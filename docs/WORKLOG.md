@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-10-08
 
+### A woman on the line: both fixes, on the owner's "lets do your suggestion"
+
+**The owner's worry:** *"i think it will break the masculine dictionary in default and would be confused even if the person talking is male it will be identified as female"*.
+
+**Answered in chat, nothing changed then:**
+- **Incoming fix:** wording only. It applies after she speaks of herself as a woman, and a name never counts.
+- **Debt fix:** a call whose record already says `f` (the record that already makes the verbs feminine) gets the feminine dictionary. Unisex names are `u`, so masculine.
+- **The one risk:** someone other than the tenant answers her phone. The dictionary is chosen before dialling.
+
+**Also asked: Cartesia credit or Vapi?**
+- **On calls:** the voice runs on Homies' own Cartesia account, the client's key on Vapi's credential, so Vapi bills nothing for it. Vapi's credit pays for its platform, Deepgram and the model.
+- **Today's test renders:** Homies' Cartesia for Michael, about 13,600 characters; our own key for the tenant; no Vapi.
+
+**Incoming (`docs/assistant/demo-inbound.md`):**
+- **The change:** the feminine half of the gender bullet now prefers phrasing without the suffix ("תודה על השיחה" rather than "תודה שהתקשרת"), and writes the pointed feminine only when there is no natural way round. It says why (bare, the voice says it masculine) and carries אַתְּ to שאַתְּ and כשאַתְּ.
+- **Size:** prompt 6,860 to 6,985 chars. The dry-run diff is only this bullet.
+- **Practice:** three woman calls on the candidate, played to gpt-4.1's habit (scratchpad `vqa-2026-10-08-fem2`), running.
+
+**Debt (dashboard):**
+- **`voiceFor()` in `lib/call.ts`:**
+  - **When:** for gender `f`, it reads the debt assistant's live voice with the private key and returns it with `pronunciationDictId` = `CARTESIA_DICT_FEMININE` (default `pdict_yXyrirkyZTjGL99Es7F9Ax`).
+  - **Why the whole voice:** Vapi does not document merge vs replace for `assistantOverrides.voice`. Every key on the live voice is in the `CartesiaVoice` schema, checked against `api.vapi.ai/api-json`.
+  - **On any failure:** nothing is sent, and the call is as before.
+- **Where it is used:**
+  - **The Call button:** `callResident` puts it in `assistantOverrides`.
+  - **The Voice page:** the page reads it once when a woman is listed, and `voice-console` passes it to `vapi.start`.
+- **Type check:** `tsc --noEmit` clean on both branches.
+- **Shipping it:** built as one commit on `origin/main` in a temporary worktree: `cf9f141`, kept locally as branch `deploy/feminine-dict`.
+  - **The push to `main`**, which deploys Vercel, was refused by the session's safety check as a production deploy. So was removing the worktree's `node_modules` junction.
+  - **Waiting on the owner:** the deploy.
+  - **Do not delete that worktree recursively:** its `dashboard/node_modules` is a junction to the real one.
+  - The same edits are on `feature/chatbot`.
+
 ### Voice agents: a woman on the line, three calls per agent (done; two gaps found)
 
 The owner: *"since michael is in masculine in default i want to test how he handles a female tenant on the inbound and outbound"*.
