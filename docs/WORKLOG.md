@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-08
 
-### Voice agents: a mid-sentence "לך" can sound feminine; and the debt link offered as help (prompts edited, practice running, not live yet)
+### Voice agents: a mid-sentence "לך" can sound feminine; and the debt link offered as help (LIVE 09:57 UTC)
 
 **The owner, on the 7 Oct test page:**
 - *"sample one mistook the gender for female even tho the tenant is addressing or talking to himself as a male"* (incoming, sample 1, paused at 0:27);
@@ -36,7 +36,26 @@ conversation that produced it.
 - **Incoming** (`docs/assistant/demo-inbound.md`): one sentence added to the gender bullet. In the masculine too, a mid-sentence לך can sound feminine in the voice, so when the sentence is natural without it (or without שלך, בשבילך), Michael leaves it out. Prompt 6,698 to 6,860 chars, with a dated 8 Oct note.
 - **Debt** (`docs/features/10-debt-followup/prompt.md`): "ואז אתה שואל אם לשלוח לינק לתשלום, ומקשיב." became an offer made as help. The link can go to WhatsApp now, during the call, and the tenant can settle it whenever it suits him, even after the call. No wording was handed over. Prompt 4,896 to 5,005 chars, with a dated note.
 
-**Practice:** six Claude-played calls on the candidate text (scratchpad `vqa-2026-10-08`, the 7 Oct deck), three per agent, running.
+**Practice:** six Claude-played calls on the candidate text (scratchpad `vqa-2026-10-08`, the 7 Oct deck), three per agent.
+- **Incoming:** 0 mid-sentence לך in Michael's own lines, against 12 in the 7 Oct calls. He says "אז במה אני יכול לעזור?", "אני יכול לבדוק בכל שלב מה המצב" and "ושיהיה המשך יום נעים". What is left is ששאלת, שהתקשרת and "ואיך אתה", which measured masculine or carry the gender in the word itself.
+- **Debt:** all three offered the link as help:
+  - "תרצה שאשלח לך עכשיו לינק לתשלום בוואטסאפ, כדי שתוכל לסגור את זה מתי שנוח לך, גם אחרי השיחה?";
+  - "רוצה שאשלח לך עכשיו לינק…מתי שנוח לך?";
+  - "אפשר לשלוח לְךָ עכשיו לינק…".
+- **Transcripts:** `docs/assistant/transcripts/2026-10-08-claude-played-6-calls.json`.
+
+**LIVE:**
+- **Pushed:** `vapi_sync.py inbound` and `debt --keep-voice --apply`, 09:57:31-09:57:34 UTC.
+- **Read back:** both prompts equal the repo (6,860 and 5,005 chars), and the first messages are unchanged. Voice `ba765d50`, dictionary `pdict_283c…` and 27 replacements are intact on both.
+
+**Audio and the shared page:**
+- **Audio:** `voice_qa_audio.py` rendered the six calls into `voice/samples/test-2026-10-08/`, gitignored. 5,087 characters on Homies' account and 1,424 on ours, plus about 3,500 on Homies' for the gender measurements above.
+- **The page:** "Michael's Test Calls" was republished at the same URL as version 3. It holds the new calls and a note on what changed; the owner has it shared as "Anyone with the link".
+
+**Not changed:**
+- **The fixed opener:** it keeps "לעזור לְךָ היום", the owner-approved greeting. Changing a greeting needs the owner's pick from examples first.
+- **The dictionary:** untouched.
+
 
 ### WhatsApp menu: "כאן הומי'ז" before the question (LIVE 09:02 UTC)
 
