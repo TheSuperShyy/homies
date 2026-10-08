@@ -1,6 +1,6 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, translator } from '@/lib/i18n';
-import { debtVariableValues, debtAssistantId } from '@/lib/call';
+import { debtVariableValues, debtAssistantId, voiceFor } from '@/lib/call';
 import { VoiceConsole, type DebtRow } from '@/components/voice-console';
 
 // Voice Agent call — the browser test console, inside the dashboard.
@@ -84,6 +84,12 @@ export default async function Voice() {
       // a call you cannot debug.
       variables: debtVariableValues(p, ''),
     }));
+    // 8 Oct: a woman's call is rehearsed with the voice she would get on the
+    // phone, the feminine dictionary (lib/call.ts voiceFor). Read once per page.
+    const femVoice = rows.some((r) => r.variables.gender === 'f')
+      ? await voiceFor('f', debtAssistantId())
+      : null;
+    rows = rows.map((r) => ({ ...r, voice: r.variables.gender === 'f' ? femVoice : null }));
   }
 
   return (

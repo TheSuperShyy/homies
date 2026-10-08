@@ -23,6 +23,7 @@ export type DebtRow = {
   sub: string;            // "card 7355 · הרצל 14 · דירה 7", composed server-side
   amount: string;         // "₪450"
   variables: Record<string, string>;
+  voice?: Record<string, unknown> | null;  // the feminine dictionary's voice, for a woman (8 Oct)
 };
 
 type Labels = {
@@ -202,7 +203,10 @@ export function VoiceConsole({ publicKey, intakeId, debtId, rows, labels }: {
         });
       }, 20000);
       if (agent === 'debt' && row) {
-        await vapi.start(debtId!, { variableValues: row.variables } as any);
+        await vapi.start(debtId!, {
+          variableValues: row.variables,
+          ...(row.voice ? { voice: row.voice } : {}),
+        } as any);
       } else {
         await vapi.start(intakeId);
       }

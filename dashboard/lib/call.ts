@@ -97,6 +97,34 @@ export function debtAssistantId(): string | null {
   return process.env.NEXT_PUBLIC_VAPI_DEBT_ASSISTANT_ID ?? DEBT_HE;
 }
 
+// 8 Oct, owner: "lets do your suggestion". The voice carries a pronunciation
+// dictionary that says a bare לך, שלך or איתך in the masculine (7 Oct), and the
+// debt model writes them bare, so a woman heard feminine verbs next to masculine
+// pronouns. A call to a resident the record already calls a woman (gender 'f': set
+// by a person, or a name given to women only, migration 038) carries the same
+// voice with the feminine dictionary instead. Everyone else keeps the masculine
+// one, a name used for both genders included. The whole voice is copied from the
+// assistant because Vapi does not document whether an override merges into the
+// voice or replaces it; anything that fails leaves the call exactly as it was.
+const FEMININE_DICT = process.env.CARTESIA_DICT_FEMININE ?? 'pdict_yXyrirkyZTjGL99Es7F9Ax';
+
+export async function voiceFor(gender: string, assistantId: string | null): Promise<Record<string, unknown> | null> {
+  const key = process.env.VAPI_PRIVATE_KEY;
+  if (gender !== 'f' || !assistantId || !key) return null;
+  try {
+    const res = await fetch(`${VAPI}/assistant/${assistantId}`, {
+      headers: { Authorization: `Bearer ${key}` },
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const voice = (await res.json())?.voice;
+    if (!voice || voice.provider !== 'cartesia') return null;
+    return { ...voice, pronunciationDictId: FEMININE_DICT };
+  } catch {
+    return null;
+  }
+}
+
 /** Returns 'ok:<call id>' or 'err:<reason a person can read>'. Never throws. */
 export async function callResident(phone: string, pin: string): Promise<string> {
   const PIN = process.env.CALL_PIN;
@@ -119,6 +147,7 @@ export async function callResident(phone: string, pin: string): Promise<string> 
   const p = data as Record<string, any>;
 
   const variableValues = debtVariableValues(p, phone);
+  const voice = await voiceFor(variableValues.gender, assistantId);
 
   const res = await fetch(`${VAPI}/call`, {
     method: 'POST',
@@ -127,7 +156,7 @@ export async function callResident(phone: string, pin: string): Promise<string> 
       assistantId,
       phoneNumberId,
       customer: { number: phone, name: variableValues.first_name || undefined },
-      assistantOverrides: { variableValues },
+      assistantOverrides: { variableValues, ...(voice ? { voice } : {}) },
     }),
     cache: 'no-store',
   });
