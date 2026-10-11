@@ -13,7 +13,7 @@ conversation that produced it.
 
 ### A reusable Hebrew voice kit, outside the repo
 - **Asked:** *"so im creating a voice agent tools on gdrive and i want to ask you for the tools and like files that we used that can be recycled into a new project on how we made the voice agent speak good natural hebrew ... not the stuff linked on this project"*.
-- **Done:** `Downloads\Hebrew Voice Agent Kit\` (30 files, 648 KB), for the owner to upload to Drive himself. Nothing in the repo changed.
+- **Done:** `Downloads\Hebrew Voice Agent Kit\` (30 files, 648 KB), for the owner to upload to Drive. Nothing in the repo changed.
   - **Guides:**
     - `START HERE.md`;
     - the method (voice, filter, gender, prompt, turn-taking, testing);
