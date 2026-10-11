@@ -525,6 +525,10 @@ its stated time.
   - **Debt calls:** 3 of 3 followed the new opening.
   - **Incoming calls:** "anything else?" twice in a row in 2 of 3, and the flat never asked.
   - **Not tested:** the real models. That would cost about $0.43 on OpenRouter for the six calls, and needs the owner's go.
+- **11 Oct: a reusable Hebrew voice kit for other projects** is in `Downloads\Hebrew Voice Agent Kit\` (outside the repo, for the owner's Drive).
+  - **Inside:** the method, the prompt rules, the gender findings, generic tools and the test protocol.
+  - **Leaves out:** everything of Homies.
+  - **To change it:** edit the files there; nothing in the repo depends on it. WORKLOG 11 Oct.
 - **8 Oct, the owner's go on both woman-caller fixes.**
   - **Incoming, LIVE 11:12 UTC:** the prompt prefers suffix-free phrasing once she is a woman, and אַתְּ covers its glued forms. Practice: words said masculine to her fell from 5 to 2, and the goodbye is "תודה על השיחה" in 3 of 3.
   - **Debt, LIVE about 11:25 UTC:** `voiceFor()` gives gender `f` the feminine dictionary, on both the Call button and the Voice page.

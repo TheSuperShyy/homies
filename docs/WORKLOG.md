@@ -9,6 +9,31 @@ conversation that produced it.
 
 ---
 
+## 2026-10-11
+
+### A reusable Hebrew voice kit, outside the repo
+- **Asked:** *"so im creating a voice agent tools on gdrive and i want to ask you for the tools and like files that we used that can be recycled into a new project on how we made the voice agent speak good natural hebrew ... not the stuff linked on this project"*.
+- **Done:** `Downloads\Hebrew Voice Agent Kit\` (30 files, 648 KB), for the owner to upload to Drive himself. Nothing in the repo changed.
+  - **Guides:**
+    - `START HERE.md`;
+    - the method (voice, filter, gender, prompt, turn-taking, testing);
+    - the Hebrew rules block for a prompt;
+    - the gender findings;
+    - the seven generic Hebrew guides and the gender PDF from `docs/reference/voice/`.
+  - **Tools, rewritten generic:**
+    - **From our scripts:** `voice_guard` became `speech_filter.py`; `cartesia_dicts`, `vapi_set_voice` + `cartesia_voice()`, `voice_clone`, `cartesia_tts`, `voice_qa_audio` and `vapi_latency` became their kit versions.
+    - **Settings:** the live call settings as `vapi_settings.json` + `.py`.
+    - **Names:** the 1,485 names of migration 038 as a CSV + `hebrew_names.py`.
+    - **Outbound:** `per_call_voice.ts` from `call.ts`.
+    - **New:** `transcribe_local.py` and `hebrew_speech_helpers.py`.
+    - **Protocol:** PLAYER.md, made generic.
+  - **Nothing of ours inside:** no keys, ids, client names, numbers or brand; scanned. The office number in the examples was replaced with a fake one.
+- **Tested:**
+  - **Offline:** all compile; filter self-test 7/7; names; helpers.
+  - **Read-only on the live accounts:** `vapi_voice.py` and `vapi_settings.py` dry runs against the incoming agent (no writes; the settings match live but for endCallPhrases and the summary prompt); `vapi_latency.py`; the dictionaries list; the voice list.
+  - **One paid render:** 421 characters on our own Cartesia key, read back with local Whisper.
+- **Stated honestly in the kit:** a real call has not yet proved that Vapi passes the dictionary id on sonic-3.5.
+
 ## 2026-10-08
 
 ### A woman on the line: both fixes, on the owner's "lets do your suggestion"

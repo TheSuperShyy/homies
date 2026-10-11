@@ -2677,6 +2677,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **Check:** every reply is matched word for word, and a miss is counted, not hidden.
 - **Gender on the voice agents is settled at the voice, not in the prompt (7 Oct research, `docs/reference/voice/hebrew-gender-consistency-2026-10-07.md`).**
   - **The fact:** Hebrew writes לך, שלך, שלומך and the second-person past the same for both genders. The prompt asks the model to write them pointed; measured, gpt-4.1 does so 30% of the time and gpt-5.6-sol never. Bare, Cartesia sonic-3.5 reads לך masculine and שלומך feminine, so one call mixes.
+  - **Reused outside Homies (11 Oct):** the voice lessons, made generic, are in the owner's `Downloads\Hebrew Voice Agent Kit\`. It is a copy for new projects, not a source for this one: fixes here are not mirrored there.
   - **The rule:** a Cartesia pronunciation dictionary (bare word → pointed word, `scripts/cartesia_dicts.py`) makes the owner's default deterministic; the prompt keeps only what the dictionary cannot know (the switch to the feminine, pointed feminine forms, a name is never evidence, את is always אַתְּ).
   - **Why not more prompt:** an instruction the model can ignore is not a constraint; this is the voice-side twin of the WhatsApp lesson.
   - **How to read the transcripts:** Vapi's stored bot lines are normalised text (points gone, replacements applied), never what the voice was handed; the tool webhook body carries the real first message.
