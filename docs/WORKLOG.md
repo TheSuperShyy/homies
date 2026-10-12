@@ -35,6 +35,11 @@ conversation that produced it.
     - the agent's SIP address, username and password to follow separately;
     - the three open questions: the id or the dialled number on the forwarded call, no retries, the token and campaign id.
   - **Brackets for Homies' answers,** and an optional line asking Omni to hold the move if Homies has not approved it.
+- **The owner's summary, corrected in chat:**
+  - Incoming calls use the office's existing number. On 5 Oct Yariv wanted the agent as a weekday menu option ("3"), not the first level; our side argued for the first level, left to revisit.
+  - Outbound gets the new 077 number as its caller ID.
+  - "Lines" in Omni's package means calls at the same time (5), not phone numbers.
+  - Omni's email sets up only the outbound side. A question for the reply was added: how the menu option reaches the incoming agent, which has its own address.
 
 ## 2026-10-11
 
