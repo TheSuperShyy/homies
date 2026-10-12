@@ -740,7 +740,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - does the forwarded call carry our external_id or the dialled number;
     - no retries;
     - the token and campaign id.
-  - **12 Oct: Yariv agreed to the move and the plan** (owner). The hold line is out of the reply. **Extension decided (owner): a new one dedicated to the outbound agent** (70 ₪ once, 25 ₪ a month), not a reused staff extension. Still open in the reply: the email for it, and the sender's name.
+  - **12 Oct: Yariv agreed to the move and the plan** (owner). The hold line is out of the reply. **Then Yariv settled it with Omni: ONE new extension for the bot, both directions** (the menu's "press 5 for Michael" and the dialer's calls; caller ID 077-6687949, no new numbers). Omni says an email of theirs went unanswered and will resend it. Our reply was drafted in chat. Our side must tell menu calls from dialer calls (two SIP addresses, or the external_id header). Still open in the reply: the email for it, and the sender's name.
   - **Reply drafted in chat (12 Oct), not sent by us.** The owner fills in Homies' answers: which extension, the email, OK on the 077 number, the move.
   - **Caller ID decided (owner, 12 Oct): one number for now**: the office's existing number, nothing bought. Switching to a separate 077 number later is a request to Omni (4 ₪ a month).
   - **Inbound is not in Omni's email:** the menu option to the incoming agent needs its own connection, a second SIP address (the incoming agent), maybe its own extension. A question for it was given to the owner to add to the reply.
