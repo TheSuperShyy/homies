@@ -35,6 +35,7 @@ conversation that produced it.
     - the agent's SIP address, username and password to follow separately;
     - the three open questions: the id or the dialled number on the forwarded call, no retries, the token and campaign id.
   - **Brackets for Homies' answers,** and an optional line asking Omni to hold the move if Homies has not approved it.
+- **The owner: "he agreed on the moving and the plan"** (Yariv, for Homies). The hold line came out of the reply, and the office number is filled in.
 - **The owner: "ok for now we can start at a single number".** The dialer shows the office's existing number, and no number is bought. The reply was given again in full with that item changed and the inbound question added.
 - **The owner's summary, corrected in chat:**
   - Incoming calls use the office's existing number. On 5 Oct Yariv wanted the agent as a weekday menu option ("3"), not the first level; our side argued for the first level, left to revisit.

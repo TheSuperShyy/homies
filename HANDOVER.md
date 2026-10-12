@@ -728,7 +728,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **Inbound, Yariv's call:** on weekdays the agent is a menu extension (e.g. 3, collections and customer service), not the default. Our side argued for the default and agreed to revisit it. After hours: "offices closed, press for the on-call person".
   - **A stuck agent** opens a ticket rather than transferring.
   - **Open, and it is the deal-breaker:** our side told Omni "a webhook" for handing calls to the agent. A webhook cannot carry the audio; the answered call has to be forwarded to our Vapi SIP address (Route B below). Settle this with Omni before anything else.
-  - **7 Oct: Omni asked for sample payloads; they have sent NO API key** (owner's correction). Their current setup can't take an AI agent until the Tokomni move. The Hebrew email asks for a token and campaign id. **Homies has not agreed to the move** (owner): nothing sent to Omni may read as if it had. Three samples were drafted for the owner to send (insert request, SIP forward with `x-resident_id`, optional call-result JSON): `docs/features/15-call-button/context.md`, "7 Oct". No Vapi address or endpoint exists yet; both wait on Omni confirming the SIP forward.
+  - **7 Oct: Omni asked for sample payloads; they have sent NO API key** (owner's correction). Their current setup can't take an AI agent until the Tokomni move. The Hebrew email asks for a token and campaign id. **12 Oct: Homies agreed to the move and the plan** (owner); on 7 Oct it had not. Three samples were drafted for the owner to send (insert request, SIP forward with `x-resident_id`, optional call-result JSON): `docs/features/15-call-button/context.md`, "7 Oct". No Vapi address or endpoint exists yet; both wait on Omni confirming the SIP forward.
 - **12 Oct: Omni wrote that they are starting the Tokomni move and asked for the dialer setup** (email in `local/omnitelecom/`, WORKLOG 12 Oct).
   - **Their asks:**
     - which extensions go on the dialer (25 ₪ a month each, an email each);
@@ -740,7 +740,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - does the forwarded call carry our external_id or the dialled number;
     - no retries;
     - the token and campaign id.
-  - **Homies had not agreed to the move as of 7 Oct:** confirm before Omni proceeds.
+  - **12 Oct: Yariv agreed to the move and the plan** (owner). The hold line is out of the reply; still open there: which extension, the email for it, and the sender's name.
   - **Reply drafted in chat (12 Oct), not sent by us.** The owner fills in Homies' answers: which extension, the email, OK on the 077 number, the move.
   - **Caller ID decided (owner, 12 Oct): one number for now**: the office's existing number, nothing bought. Switching to a separate 077 number later is a request to Omni (4 ₪ a month).
   - **Inbound is not in Omni's email:** the menu option to the incoming agent needs its own connection, a second SIP address (the incoming agent), maybe its own extension. A question for it was given to the owner to add to the reply.
