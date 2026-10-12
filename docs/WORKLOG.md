@@ -26,6 +26,15 @@ conversation that produced it.
   - **Building on our side:** an `assistant-request` endpoint that looks the tenant up from that header.
 - **Raised with the owner:** on 7 Oct the owner said Homies had not agreed to the move, and this email starts it. Homies must confirm or stop it.
 - **Nothing created, nothing sent.**
+- **Then:** the owner asked what a number and an extension are, what to pick, and what is needed; then *"ok write the reply"*.
+  - **The reply, in English, given in chat (not stored):**
+    - one dialer extension, for the agent only;
+    - an unused existing extension, or a new one;
+    - one email address;
+    - one new 077 number as caller ID, with call-backs to the office;
+    - the agent's SIP address, username and password to follow separately;
+    - the three open questions: the id or the dialled number on the forwarded call, no retries, the token and campaign id.
+  - **Brackets for Homies' answers,** and an optional line asking Omni to hold the move if Homies has not approved it.
 
 ## 2026-10-11
 
