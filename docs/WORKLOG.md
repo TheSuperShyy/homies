@@ -9,6 +9,24 @@ conversation that produced it.
 
 ---
 
+## 2026-10-12
+
+### Omnitelecom: "we will begin your migration", and what they need for the dialer and the bot
+- **The email,** pasted by the owner. Kept in the gitignored `local/omnitelecom/2026-10-12-migration-and-dialer-email.txt`.
+  - **The move:** they are starting the move to the new system (Tokomni).
+  - **Dialer extensions:** an extension on the dialer costs 25 ₪ a month instead of 14, and each needs its own email address. Homies has extensions 200-207.
+  - **Caller ID:** which numbers to show. Numbers can be bought: 077/074/072/073 at 4 ₪ a month, 02-09 at 8 ₪, 053/055 at 15 ₪.
+  - **The bot:** "a username and password so we can access your bot's address", on a dedicated extension (70 ₪ one time for a new one, nothing for an existing one).
+- **Read:**
+  - **The forward is possible.** The bot part is the SIP forward we asked for. Vapi's free SIP address takes exactly a username and a password for incoming INVITEs (`CreateVapiPhoneNumberDTO.authentication`, checked in the API spec today). So the deal-breaker looks answerable.
+  - **What it doesn't answer:**
+    - whether the forwarded call carries our id or the dialled number (without it the debt agent doesn't know who it's talking to);
+    - one attempt with no retries;
+    - the insert API's token and campaign id.
+  - **Building on our side:** an `assistant-request` endpoint that looks the tenant up from that header.
+- **Raised with the owner:** on 7 Oct the owner said Homies had not agreed to the move, and this email starts it. Homies must confirm or stop it.
+- **Nothing created, nothing sent.**
+
 ## 2026-10-11
 
 ### A reusable Hebrew voice kit, outside the repo
