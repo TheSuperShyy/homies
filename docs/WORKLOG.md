@@ -35,6 +35,7 @@ conversation that produced it.
     - the agent's SIP address, username and password to follow separately;
     - the three open questions: the id or the dialled number on the forwarded call, no retries, the token and campaign id.
   - **Brackets for Homies' answers,** and an optional line asking Omni to hold the move if Homies has not approved it.
+- **The owner: a new extension, dedicated to the outbound automation.** Reusing one of 200-207 could change who answers the incoming menu, and nobody has the map of who uses which. The reply's item 2 now asks for a new extension and accepts the 70 ₪.
 - **The owner: "he agreed on the moving and the plan"** (Yariv, for Homies). The hold line came out of the reply, and the office number is filled in.
 - **The owner: "ok for now we can start at a single number".** The dialer shows the office's existing number, and no number is bought. The reply was given again in full with that item changed and the inbound question added.
 - **The owner's summary, corrected in chat:**
