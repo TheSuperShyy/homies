@@ -737,6 +737,25 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
     5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
+- **18 Oct, late: a request for a manager is answered with the reason, never the same question twice (`n8n_whatsapp_procedure.py`, epoch 82): LIVE 15:58 UTC** (23:58 on the owner's phone).
+  - **The bug, on the owner's handset 15:05–15:08 UTC:** five requests for a manager, five "what is it about?", and "are you the manager?" got the fragment "מצוות השירות של הומי'ז. ...". Owner: *"like a parrot ... its the procedure we need to get information before we can do something"*.
+  - **The cause was our guards:** Gemini's first drafts explained, and `echo`/`clerk` sent them back with "just ask". The fragment came from Send's name step.
+  - **The fix:**
+    - the prompt (the reason, never the same question twice, nothing on without the matter);
+    - `notify_team`'s text;
+    - `MGR_CTX`: `echo`/`clerk` pass in a manager chat unless the reply also promises, and `Try again` names the promise;
+    - Send `manners v4`;
+    - the backstop sentence by sentence (in a manager chat, only a past-tense report, an explicit "אני מעביר את…" or a promise).
+  - **Checked:**
+    - the gate on the candidate and on live, 362 of 362, 15 of 15 pins;
+    - 8 Claude-played chats including the owner's word for word, 58 of 58, and no backstop note without the tool;
+    - tonight's six first drafts replayed;
+    - patchers idle but the baseline 6.
+  - **Owed:**
+    - the owner asks for a manager on the test phone and insists;
+    - then `--watch 2026-10-18T15:58`.
+  - **Undo:** `--restore` from `docs/handover/n8n-whatsapp-live-18oct-before-procedure.json`, then revert the repo.
+  - **Changed rule:** someone who never says what it's about is no longer noted after the second ask. Nothing goes on without the matter (owner, 18 Oct late).
 - **18 Oct, evening: a typed request for a rep is not the tap (`n8n_whatsapp_unasked.py`, epoch 81): LIVE 14:43 UTC.**
   - **The bug, on the owner's handset at 14:21 UTC:** "אני רוצה לדבר עם מנהל" got "מה שלומך היום? 😊" twice. Gemini gave the tap's reply to typed words, and the greeting filter left only the question.
   - **The fix:**

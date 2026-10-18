@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-18
 
-### WhatsApp bot: a request for a manager is answered with the reason, never the same question twice (epoch 82)
+### WhatsApp bot: a request for a manager is answered with the reason, never the same question twice (LIVE 15:58 UTC, epoch 82)
 - **The owner's handset after epoch 81, 15:05–15:08 UTC** (screenshot): he asked for a manager five times, in Hebrew and English, and got "what is it about?" five times.
   - The replies: "אני מבין שאתה רוצה לדבר עם מנהל. כדי שאוכל לעזור לך...", "אוקיי. כדי שאוכל להעביר את הפנייה שלך הלאה, מה הנושא...?", "מצוות השירות של הומי'ז. אני כאן...", "אוקיי. מה הנושא שבו תרצה לדבר עם המנהל?", "אני שומע שאתה רוצה לדבר עם מנהל. מה הנושא שתרצה לדבר עליו?".
   - Owner: *"this is like frustrating like a parrot it should be like i understand you i order for me to do that blah blah blah its the procedure we need to get information before we can do something"*.
@@ -41,7 +41,31 @@ conversation that produced it.
   - **The exception:** 5 of 1,055 replies, all in chats where a person was asked for.
   - **The backstop:** 103 notes become 97. The 6 lost are "if you want, they'll get back to you" offers.
   - **Send:** one reply changes, 112618's, now whole.
-- **Caught on the way:** replaying tonight's drafts, 112626's ("כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא?") would have passed. Send's promise filter would have cut it to "אני מבין שאתה רוצה לדבר עם מנהל." with no question, and the backstop would have noted an empty request. Hence the promise exception and the promise-aware backstop.
+- **Caught on the way:**
+  - **A promise inside the reason.** Replaying tonight's drafts, 112626's ("כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא?") would have passed. Send's promise filter would have cut it to "אני מבין שאתה רוצה לדבר עם מנהל." with no question, and the backstop would have noted an empty request. Hence the promise exception and the promise-aware backstop.
+  - **The procedure talk itself.** The Claude-played `manager_parrot` said "אני זה שמעביר פניות לצוות" and "להעביר את הפנייה שלך לצוות אני כן". Both would have noted an empty request. In a manager chat the backstop now needs a past-tense report, an explicit "אני מעביר את..." (23 Aug's "אני מעביר את זה לצוות" still notes), or a call-back promise.
+  - **The final count:** 97 of the 103 past notes stay; the 6 lost are offers.
+  - **The deck's "says why" list was too narrow twice.** It missed "כשאני יודע על מה מדובר, זה מגיע ישר…", "רק אם הוא יודע", "ובשביל זה צריך…" and "נקודת התחלה". The judge's lines carry the meaning; the list is a proxy.
+- **Gate on the candidate:** 362 of 362 cases, 36 of them new. The replay changes one reply in Send (112618, now whole). The pins were then set: prompt `9e4b0a8f158f`, `Try again / note` `7631ae8f7590`, `notify_team / tool` `0a8bb45d8a17`. All green. Idle check: baseline 6.
+- **Claude-played on the candidate** (`qa_procedure3`, the transcripts are in the session scratchpad only):
+  - `manager_parrot`, `manager_insists`, `manager_wont_say`, `manager_typed_mid`, `rep_typed`, `angry_repeat`, `stair_light`, `tap_rep`: 29 turns, 58 of 58, no guard rejection, no flag. No reply makes a backstop note without the tool.
+  - **`manager_parrot`, the owner's chat word for word:**
+    - "ברור, אני איתך. כדי שזה יגיע למנהל ויוכלו באמת לטפל בזה, קודם צריך לדעת במה מדובר. מה קרה?"
+    - "אני מבין שזה מתסכל 🙏 פשוט בלי לדעת על מה מדובר, אין לי מה להעביר למנהל... מספיק לי הנושא בכמה מילים. במה זה קשור?"
+    - "לא, אני לא המנהל, אני מיכאל מצוות השירות של הומי'ז..."
+    - "אני פה, ולא מתחמק ממך. רק צריך נקודת התחלה..."
+    - "...לחבר אותך ישירות למנהל אני לא יכול מכאן, אבל להעביר את הפנייה שלך לצוות אני כן, ובשביל זה צריך שיהיה כתוב בה על מה היא. אפילו רק 'תשלום' או 'תקלה' זה מספיק."
+    - Then the double charge was noted with the details.
+  - **`manager_wont_say`:** nothing noted, three different explanations, "רק הנושא, במילה אחת".
+  - **`tap_rep`:** still "היי, כאן מיכאל מהומי'ז 😊 מה שלומך היום?".
+  - **`stair_light`:** the echo and clerk rules unchanged.
+- **LIVE 15:58 UTC (23:58 on the owner's phone):** `n8n_whatsapp_procedure.py --apply` (live `updatedAt` 15:58:36).
+  - **Read back:** prompt `9e4b0a8f158f`, `notify_team` `62d572375b76`, `echo` `cc071e0d0437`, `clerk` `42e8f358cf3d`, `Try again` `7631ae8f7590`, Send `manners v4`, backstop `601affd8b5b0`, key `-82`.
+  - **After:** the carrier has nothing to do; the gate on live is 15 of 15 pins and 362 of 362 cases, all green; patchers idle but the baseline 6.
+- **Owed:**
+  - the owner asks for a manager again on the test phone, and insists;
+  - then `--watch 2026-10-18T15:58`.
+- **Undo:** `n8n_whatsapp_procedure.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-18oct-before-procedure.json`), then revert the commit.
 
 ### WhatsApp bot: a typed request for a rep is not the tap; the `unasked` guard (LIVE 14:43 UTC, epoch 81)
 - **The owner's handset, 14:21 UTC, 8 minutes after epoch 80** (screenshot, *"wth is this"*):

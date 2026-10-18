@@ -71,6 +71,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 import n8n_whatsapp as W  # noqa: E402
 import n8n_whatsapp_untemplate as U  # noqa: E402
+import n8n_whatsapp_retry as R  # noqa: E402
 import n8n_handover as H  # noqa: E402
 from n8n_whatsapp_handover import built, execute_node, tool_arg, STEPS, ensure_link  # noqa: E402
 from n8n_whatsapp_patch import layout_complaints  # noqa: E402
@@ -112,10 +113,20 @@ TOOL_RAN = ("(() => { try { return %s.some(s => ((s.action || {}).tool) === "
 # 1 Oct: the bot addresses one person now, so the promise list also reads
 # אליך / אלייך / אתך / איתך, and the offer list "רוצה שנעביר". The plural
 # forms match exactly what they matched before.
+BS = chr(92)   # a backslash, built rather than typed (27 Sep)
 SAID = ("(() => { const t = String($json.output || ''); "
-        "const told = /(עדכנתי|אעדכן|הודעתי|אודיע|מסרתי|רשמתי|ארשום|לרשום|לעדכן|להעביר|העברתי|העברנו|מעביר|מעבירה|מעבירים)/.test(t) "
-        "&& /(לצוות|את הצוות|למחלקה|לגבייה|להנהלה|לתפעול|לשירות|לנציג|לעמית)/.test(t); "
-        "const promised = /((יחזרו|יחזור|נחזור) (אליכם|אליך|אלייך)|(יצרו|ייצרו|ניצור|יצור) (אתכם|איתכם|אתך|איתך) קשר)/.test(t); "
+        "const TOLD = /(עדכנתי|אעדכן|הודעתי|אודיע|מסרתי|רשמתי|ארשום|לרשום|לעדכן|להעביר|העברתי|העברנו|מעביר|מעבירה|מעבירים)/; "
+        "const TEAM = /(לצוות|את הצוות|למחלקה|לגבייה|להנהלה|לתפעול|לשירות|לנציג|לעמית)/; "
+        "const told = TOLD.test(t) && TEAM.test(t); "
+        # 18 Oct, late: a call-back promise after a condition or a purpose clause in
+        # its own sentence ("כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא?",
+        # 112626's first draft; "אם תרצה, ... שיחזרו אליך") promises nothing yet. Only
+        # what comes BEFORE the promise counts: "הצוות עודכן שאתה רוצה שיחזרו אליך...,
+        # לפני שהשיפוץ מתחיל" is still a report.
+        "const parts = t.split(/[.!?:;" + BS + "n]+/); "
+        "const PROM = /((יחזרו|יחזור|נחזור) (אליכם|אליך|אלייך)|(יצרו|ייצרו|ניצור|יצור) (אתכם|איתכם|אתך|איתך) קשר)/; "
+        "const IFS = /(^|[^א-ת])ו?(אם|ברגע ש|כש|לפני ש|אחרי ש|עד ש|כדי ש)/; "
+        "const promised = parts.some(p => { const k = p.search(PROM); return k !== -1 && !IFS.test(p.slice(0, k)); }); "
         "if (!told && !promised) return false; "
         "if (/(שאעביר|האם להעביר|רוצים שנעביר|רוצה שנעביר|רוצים שאעביר|שאעדכן|האם לעדכן|רוצים שאעדכן|שארשום|האם לרשום|רוצים שארשום)/.test(t)) return false; "
         # 18 Oct (n8n_whatsapp_askfirst.py): an offer or a condition in front of
@@ -123,9 +134,27 @@ SAID = ("(() => { const t = String($json.output || ''); "
         # me what it is about, and I'll try to help or pass it on" before any
         # note, and that sentence must not note an empty request. A past-tense
         # report or a call-back promise in the same reply still makes the note.
+        # 18 Oct, late (n8n_whatsapp_procedure.py): sentence by sentence. The chat
+        # about a manager now explains the procedure ("לפני שמעבירים משהו לצוות
+        # צריך לדעת במה מדובר", "ברגע שתספר לי, אעדכן את הצוות"), so a condition
+        # (אם, ברגע ש, כש, לפני ש, אחרי ש, עד ש), a "לא" before the verb, or "אין לי
+        # מה", ahead of the verb in its own sentence, holds that sentence back; a report
+        # in another sentence of the same reply still makes the note, as before 18 Oct.
+        # 18 Oct, late, the Claude-played replay of tonight's chat: explaining the
+        # procedure, Michael talks about passing things on in every reply ("אני זה
+        # שמעביר פניות לצוות", "להעביר את הפנייה שלך לצוות אני כן"), and each would
+        # have noted an empty request. In a chat about a manager or a person
+        # (R.MGR_CTX) the note needs a past-tense report, an explicit "אני מעביר את..."
+        # (23 Aug: "אני מעביר את זה לצוות, נחזור בהקדם"), or a call-back promise; a
+        # role, an ability or an infinitive is the procedure, not a report.
+        + R.MGR_CTX +
+        "if (mgrAsk && !promised && !/(עדכנתי|הודעתי|מסרתי|רשמתי|העברתי|העברנו)/.test(t) "
+        "&& !/אני (מעביר|מעבירה|רושם|רושמת|מעדכן|מעדכנת) את /.test(t)) return false; "
+        "const HELD = /(אשמח|אוכל|יכול|יכולה|אפשר|ניתן|כדי|נוכל|אנסה|ננסה|או)( [א-ת]+)? (להעביר|לעדכן|לרשום|למסור)|"
+        "(^|[^א-ת])ו?(אם|ברגע ש|כש|לפני ש|אחרי ש|עד ש)|אין לי מה|"
+        "(^|[^א-ת])לא (אעביר|אעדכן|ארשום|מעביר|מעבירה|מעבירים|רושם|רושמת|רושמים|נרשם|נרשמת)/; "
         "if (!promised && !/(עדכנתי|הודעתי|מסרתי|רשמתי|העברתי|העברנו)/.test(t) && "
-        "/((אשמח|אוכל|יכול|יכולה|אפשר|כדי|נוכל|אנסה|ננסה|או)( [א-ת]+)? (להעביר|לעדכן|לרשום|למסור)|"
-        "אם לא[^.!?]{0,40}(אעביר|אעדכן|ארשום|אמסור|להעביר|לעדכן|לרשום|למסור))/.test(t)) return false; "
+        "!parts.some(p => { const m = p.match(TOLD); return m !== null && TEAM.test(p) && !HELD.test(p.slice(0, m.index + m[0].length)); })) return false; "
         "return true; })()")
 
 NOTE_THIS_TURN = "={{ %s || %s }}" % (TOOL_RAN, SAID)

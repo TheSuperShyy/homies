@@ -157,6 +157,9 @@ PHRASES = (TIMES + "|"
            "בדרך (אליכם|אליך|אלייך)|(עזרה|מישהו|הצוות|הטכנאי) בדרך|"
            "הטכנאי יגיע|מישהו יגיע|(נשלח|ישלחו) ((אליכם|אליך|אלייך) )?(מישהו|טכנאי)|"
            "יגיעו? (אליכם|אליך|אלייך|בקרוב|היום|מחר)")
+# 18 Oct, late: `echo` and `clerk` read the same phrases in a chat about a manager
+# (n8n_whatsapp_retry.PROMISE_PHRASES, a copy, since retry cannot import this file).
+assert PHRASES == M.R.PROMISE_PHRASES, "the promise phrases moved here and not in retry.py"
 # The ones that open a sentence and can be cut away with their comma.
 OPENERS = ("אנחנו על זה|אני על זה|"
            "אני כבר מטפל בזה|אני מטפל בזה|מטפל בזה מיד|אני אטפל בזה")

@@ -110,6 +110,15 @@ sent. The prompt asks for "היי", not the hour's greeting the menu gave; this
 filter only removes, so that part is the prompt's (and --watch's info line).
 Carried to live with the prompt and epoch 71 by n8n_whatsapp_rephello.py.
 
+V4, 18 OCT, LATE. "why would i tell you are you the manager?" got "מצוות השירות של
+הומי'ז. אני כאן כדי לעזור לך..." (execution 112618): the model answered "אני מיכאל
+מצוות השירות של הומי'ז", the way the prompt has introduced him since 5 Oct, and
+NAME took "אני מיכאל" and left the rest. Three changes, nothing else: "are you the
+manager" (and אתה המנהל) is asking who he is talking to, so the name is the answer;
+NAME takes "מצוות השירות של הומי'ז" with the name; a "from the team" tail NAME does
+not know keeps the name rather than leave a fragment. And `echo` and `clerk` pass in
+a chat about a manager (retry.MGR_CTX). Carried by n8n_whatsapp_procedure.py.
+
 Idempotent. Running it twice reports nothing to do. A later version of the
 filter replaces this one by its marker.
 """
@@ -144,13 +153,13 @@ EMOJI = r"\p{Extended_Pictographic}" + VS
 # ---------------------------------------------------------------------------
 # A plain string, not a JS comment: nothing else in this workflow puts a comment
 # inside an expression, and this is not the change to find out how n8n takes one.
-MARK = "const mv = 'manners v3';"
+MARK = "const mv = 'manners v4';"
 BS = chr(92)       # a backslash, built rather than typed: this tool chain has
 NL = BS + "n"      # eaten typed ones before (27 Sep)
 BOT_HELLO = (r"/^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|"
              r"שבוע טוב|שבת שלום|חג שמח|יום טוב)( לכם| לך| לכולם)?(?=[\s,.!:;]|$)[\s,.!:;"
              + EMOJI + r"]*/u")
-NAME = (r"/^((כאן|אני|זה)\s+)?מיכאל(\s+מהומי['׳’]?ז)?(\s+כאן)?(?=[\s,.!:;]|$)[\s,.!:;"
+NAME = (r"/^((כאן|אני|זה)\s+)?מיכאל(\s+מ(צוות השירות של |הצוות של |צוות )?הומי['׳’]?ז)?(\s+כאן)?(?=[\s,.!:;]|$)[\s,.!:;"
         + EMOJI + r"]*/u")
 # v2: the short courtesy clause an introduction goes on with ("ובשמחה אעזור
 # לכם."): no digit, no colon, a real sentence end. Anything else keeps its words.
@@ -161,7 +170,10 @@ FILLER = ("/^ו(בשמחה|אשמח|אני" + BS + "s+(כאן|פה|חלק|נצי
 WHO = ("/(מי (אתה|את|זה|מדבר|מדברת|כותב|כותבת|עונה)|עם מי|מה (השם שלך|שמך)|"
        "איך קוראים לך|בוט|רובוט|בן אדם|אדם אמיתי|who (are|r) (you|u)|who is this|"
        "who.?s this|who am i|your name|are (you|u) (a )?(bot|robot|real|human|person)|"
-       "is this a bot|is this hom)/")
+       "is this a bot|is this hom|"
+       # v4, 18 Oct: "are you the manager?" is asked who he is talking to, too.
+       "(אתה|את) (ה)?(מנהל|מנהלת|אחראי|אחראית)|(are|r) (you|u) (the |a |an )?(manager|boss|"
+       "supervisor|owner|in charge))/")
 LEAD = r"/^[\s" + EMOJI + r"]+/u"
 
 FILTER = " ".join([
@@ -204,7 +216,7 @@ FILTER = " ".join([
     # the name; anything else loses only the ו. An apposition ("..., נציג
     # השירות") or a dash keeps the name rather than leave a fragment.
     "if (!keepName) { const n = x.match(NAME); if (n) { let y = x.slice(n[0].length); "
-    "if (!/^(נציג|[-־])/.test(y)) { cut = true; "
+    "if (!/^(נציג|[-־]|מ(ה)?צוות|מהומי)/.test(y)) { cut = true; "
     "if (!/[.!?" + NL + "]/.test(n[0]) && /^ו[א-ת]/.test(y)) { const f = y.match(FILLER); "
     "y = f ? y.slice(f[0].length) : y.slice(1); } x = y; } } }",
     "if (!cut) return t;",
@@ -256,12 +268,17 @@ def _cond(cid, expr):
             "operator": {"type": "boolean", "operation": "true", "singleValue": True}}
 
 
+# 18 Oct, late (n8n_whatsapp_procedure.py): in a chat about a manager or a person,
+# "I understand you" and the reason for asking are the answer the owner wants
+# (R.MGR_CTX says why and how it is read), so neither guard sends them back there,
+# unless the same reply makes a promise Send would cut (R.PROMISE_JS says why).
 ECHO_GUARD = _cond("echo", (
-    "={{ $runIndex > 0 || (() => { " + WORKED + " "
-    "return !" + R.ECHO_RE + ".test(t); })() }}"))
+    "={{ $runIndex > 0 || (() => { " + WORKED + " " + R.MGR_CTX + "if (mgrAsk && !"
+    + R.PROMISE_JS + ".test(t)) return true; return !" + R.ECHO_RE + ".test(t); })() }}"))
 CLERK_GUARD = _cond("clerk", (
-    "={{ $runIndex > 0 || (() => { " + WORKED + " "
-    "return !" + R.CLERK_RE + ".test(t); })() }}"))
+    "={{ $runIndex > 0 || (() => { " + WORKED + " " + R.MGR_CTX + "if (mgrAsk && !"
+    + R.PROMISE_JS + ".test(t)) return true; return !" + R.CLERK_RE + ".test(t); })() }}"))
+assert ECHO_GUARD["leftValue"].count("}}") == 1 and CLERK_GUARD["leftValue"].count("}}") == 1
 
 
 def snapshot(live):

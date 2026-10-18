@@ -1371,12 +1371,12 @@
    },
    "expect": [
     {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
-    {"type": "turn_not_regex", "turn": 0, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 0)"},
-    {"type": "turn_not_regex", "turn": 1, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 1)"},
     {"type": "turn_regex", "turn": 0, "regex": "\\?", "name": "the first reply hands the turn back with a question"},
     {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
     {"type": "asks_before", "tool": "notify_team", "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "asks what it is about before the team note"},
-    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|על מה מדובר|ספר לי|תספר לי|לפרט|להסביר|מה הנושא|באיזה נושא", "name": "the second reply still asks what it is about"},
+    {"type": "turn_regex", "turn": 1, "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה", "name": "when he insists, the reply says why the details are needed (18 Oct, late)"},
+    {"type": "questions_distinct", "name": "never the same question in the same words (\"like a parrot\")"},
     {"type": "called", "tool": "notify_team"},
     {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["אב הבית", "אב בית"], "name": "the note carries what happened"},
     {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback"},
@@ -1384,7 +1384,8 @@
    ],
    "judge": [
     "hears_him: does the first reply sound like a human service rep who heard him and naturally asks for the details, not like a process or a form?",
-    "details_second: when he insists, does Michael stay calm and with him, and ask again for what is missing, without announcing who will handle it?",
+    "explains_why: when he insists, does Michael show he understands him and say, in his own words, why the details are needed (before anything goes to a manager, someone has to know what it is about), rather than ask the same question again?",
+    "not_a_parrot: across the conversation, does any reply repeat an earlier question or opening in the same words?",
     "note_with_details: once he explains, is the complaint noted for the team with what he said, and does Michael say the team knows, with no who, when or callback?",
     "tone: warm and respectful to a man who is upset, not defensive or bureaucratic?",
     "goodbye: a warm close without a question?"
@@ -1392,7 +1393,7 @@
   },
   {
    "id": "manager_wont_say",
-   "title": "asks for a manager, insists, and will not say why (18 Oct)",
+   "title": "asks for a manager, insists, and will not say why (18 Oct; late: nothing goes on without the matter)",
    "time": "12:15", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-18T12:15:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 11 שרוצה רק מנהל ולא מוכן להסביר לבוט על מה",
@@ -1400,7 +1401,6 @@
      {"say": "תעביר אותי למנהל בבקשה"},
      {"say": "לא צריך עזרה ממך, אני רוצה מנהל"},
      {"say": "זה עניין אישי, אני לא רוצה לפרט. רק שהמנהל ידע שחיפשתי אותו"},
-     {"if_asked": "building and apartment, or a name", "say": "בר כוכבא 23 דירה 11"},
      {"say": "תודה", "closing": true}
     ]
    },
@@ -1408,21 +1408,18 @@
     "notify_team": {"ok": true, "notified": true}
    },
    "expect": [
-    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
-    {"type": "turn_not_regex", "turn": 0, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 0)"},
-    {"type": "turn_not_regex", "turn": 1, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 1)"},
-    {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
-    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
-    {"type": "called", "tool": "notify_team"},
-    {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["מנהל"], "name": "the note says he wants a manager"},
+    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|על מה מדובר|ספר לי|תספר לי|לפרט|להסביר|מה הנושא|באיזה נושא", "name": "the first reply asks for the details"},
+    {"type": "turn_regex", "turn": 1, "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה", "name": "when he insists, the reply says why (turn 1)"},
+    {"type": "turn_regex", "turn": 2, "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה", "name": "when he will not say, the reply says why (turn 2)"},
+    {"type": "not_called", "tool": "notify_team", "name": "no empty note, however often he asks (18 Oct, late)"},
+    {"type": "questions_distinct", "name": "never the same question in the same words"},
     {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback, even when he asks for one"},
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
     "hears_him: does the first reply sound like a human rep who heard him and asks what it is about?",
-    "details_second: when he insists, is he asked once more, calmly, for what is missing, without announcing who will handle it?",
-    "no_third_ask: when he will not say, is he not pressed again, and is the request noted for the team with what is known?",
-    "no_callback: when he wants the manager to know, does Michael say the team knows without promising a call back?",
+    "explains_why: when he insists, does Michael say kindly, in his own words, why he needs at least the topic, and make it easy (the topic alone is enough), rather than ask the same question again?",
+    "no_empty_note: when he will not say what it is about, is nothing passed on, and does Michael stay with him without pressing the same question and without promising anything?",
     "goodbye: a warm close without a question?"
    ]
   },
@@ -1461,6 +1458,53 @@
     "not_the_tap: a typed request for a manager mid-chat is answered about his matter, not with the button's 'how are you today'?",
     "hears_him: does Michael sound like a human rep who heard him and asks for the details?",
     "note_with_details: once he explains, is it noted for the team with what he said, with no who, when or callback?",
+    "goodbye: a warm close without a question?"
+   ]
+  },
+  {
+   "id": "manager_parrot",
+   "title": "asks for a manager five times, in Hebrew and English, and asks if Michael is the manager (18 Oct, late: the owner's handset, executions 112601-112635)",
+   "time": "18:05", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-18T18:05:00+03:00",
+   "history": [
+    {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 17:40, יום ראשון.]\nמתי מגיע הגנן לבניין?", "tools": ["get_service_info"],
+     "michael": "ערב טוב, כאן מיכאל מהומי'ז. הגינון בבניין נעשה לפי ההסכם של הבניין, ואין לי כרגע תאריך מדויק לביקור הבא. יש עוד משהו שאני יכול לעזור בו?"}
+   ],
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 2 שכותב גם באנגלית, רוצה מנהל ולא מבין למה צריך להסביר לבוט; רק אחרי שמסבירים לו למה, הוא מספר שחייבו אותו פעמיים על ועד הבית של ספטמבר",
+    "script": [
+     {"say": "אני רוצה לדבר עם מנהל"},
+     {"say": "no i just need a manager"},
+     {"say": "why would i tell you are you the manager?"},
+     {"say": "i want to talk with the manager"},
+     {"say": "i told you i want a manager just get me one are you not listening"},
+     {"say": "fine. i was charged twice for the september committee fee"},
+     {"if_asked": "building and apartment", "say": "bar kochba 23 apt 2"},
+     {"say": "ok thanks", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "notified": true}
+   },
+   "expect": [
+    {"type": "turn_not_regex", "turn": 0, "regex": "מה שלומ|מה נשמע|מה איתך|איך עובר עלי|איך עבר עלי|איך היום", "name": "no how-are-you he did not ask for (112521)"},
+    {"type": "turn_regex", "turn": 1, "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה", "name": "turn 1 says why the details are needed"},
+    {"type": "turn_regex", "turn": 2, "regex": "מיכאל", "name": "\"are you the manager?\" is answered with who he is (112618)"},
+    {"type": "turn_not_regex", "turn": 2, "regex": "^\\W*מצוות", "name": "no fragment where the name was (112618)"},
+    {"type": "turn_regex", "turn": 3, "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה", "name": "turn 3 says why"},
+    {"type": "turn_regex", "turn": 4, "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה", "name": "turn 4 says why"},
+    {"type": "questions_distinct", "turns": [0, 1, 2, 3, 4], "name": "never the same question in the same words (\"like a parrot\")"},
+    {"type": "not_called_before", "tool": "notify_team", "turn": 5, "name": "no team note before the matter"},
+    {"type": "called", "tool": "notify_team"},
+    {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["פעמיים", "כפול", "חיוב", "twice"], "name": "the note carries the double charge"},
+    {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "explains_why: from his second message on, does Michael show he understands him and say why he needs to know what it is about (before anything goes to a manager, someone has to know), in his own words, the way a good call-centre rep would?",
+    "not_a_parrot: across his five requests, does any reply repeat an earlier question or opening in the same words, or get shorter and colder each time?",
+    "who_he_is: when he asks whether Michael is the manager, is he told plainly who Michael is, with no broken sentence?",
+    "note_with_details: once he says what it is, is it noted for the team with the double charge, and does Michael say the team knows, with no who, when or callback?",
+    "tone: patient and warm with a man who is losing patience, never defensive, never a form?",
     "goodbye: a warm close without a question?"
    ]
   }

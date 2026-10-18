@@ -182,6 +182,20 @@ function cases(E) {
   expect('"are you a bot?": the name stays',
     say({ reply: "אני מיכאל, נציג השירות של הומי'ז. במה אפשר לעזור?", said: 'are you a bot?' }),
     "אני מיכאל, נציג השירות של הומי'ז. במה אפשר לעזור?");
+  // 18 Oct, late (execution 112618, manners v4): "are you the manager?" got "מצוות השירות
+  // של הומי'ז. אני כאן...": the model answered with the name, as the prompt says, and
+  // the name step cut "אני מיכאל" and left the rest. Now the question keeps the name,
+  // and a cut takes "מצוות השירות של הומי'ז" with it, never a fragment.
+  const R112618 = "אני מיכאל מצוות השירות של הומי'ז. אני כאן כדי לעזור לך ולטפל בפנייה שלך. אם תספר לי במה מדובר, אוכל לרשום את זה לצוות המתאים, כולל למנהל במידת הצורך.";
+  expect('112618 exactly: "are you the manager?" is asking who he is, the name stays',
+    say({ reply: R112618, said: 'why would i tell you are you the manager?' }), R112618);
+  expect('"אתה המנהל?": the name stays', say({ reply: R112618, said: 'אתה המנהל?' }), R112618);
+  expect('not asked who: the whole introduction goes, the team with the name',
+    say({ reply: R112618, said: 'no i just need a manager' }),
+    'אני כאן כדי לעזור לך ולטפל בפנייה שלך. אם תספר לי במה מדובר, אוכל לרשום את זה לצוות המתאים, כולל למנהל במידת הצורך.');
+  const R_TEAM = "אני מיכאל מצוות הלקוחות של הומי'ז. אני כאן בשבילך. על מה מדובר?";
+  expect('a "from the team" tail the name step does not know keeps the name, never a fragment',
+    say({ reply: R_TEAM, said: 'no i just need a manager' }), R_TEAM);
   // 1 Oct: "הטכנאי יגיע מחר בבוקר" is an invented promise (the bot does not know
   // when anyone comes), and the promise filter removes it; the name still goes.
   expect('a question about a person on the team is not about us: the name still goes',
@@ -430,6 +444,39 @@ function cases(E) {
   expect('an echo after a greeting and a comma is caught', g('echo', 'היי, אני מבין שיש נזילה.', [], 0), false);
   expect('a clean reply passes both', () => g('echo', 'איזה מעצבן. באיזה בניין ובאיזו דירה?', [], 0)()
     && g('clerk', 'איזה מעצבן. באיזה בניין ובאיזו דירה?', [], 0)(), true);
+  // 18 Oct, late (executions 112601-112635, n8n_whatsapp_procedure.py): the owner asked
+  // for a manager five times and got "what is it about?" five times. The first drafts
+  // explained why the details are needed -- what he wants -- and these two sent them
+  // back. In a chat about a manager or a person (the resident's own rows, the tap's
+  // row aside; this message when the rows cannot be read) both pass.
+  const gm = (id, output, rows, said) => () => E.reply[id]({ output, intermediateSteps: [] }, 0, turn({ rows, said }).$);
+  const D112609 = 'אני מבין שחשוב לך לדבר עם מנהל. כדי שאוכל לוודא שהפנייה שלך מגיעה לאדם הנכון ושיוכלו לעזור לך במהירות, אני צריך להבין מה המצב. תוכל בכל זאת לשתף אותי במה מדובר? זה יעזור לי מאוד.';
+  const D112635 = 'אני מקשיב היטב. כדי שאוכל להעביר את הבקשה שלך למנהל, אני צריך לדעת במה מדובר. ברגע שאדע את הנושא, אוכל ליידע את הצוות המתאים.';
+  const MGR_ROWS = [{ direction: 'inbound', body: 'no i just need a manager' },
+    { direction: 'outbound', body: 'אני מבין שאתה רוצה לדבר עם מנהל. כדי שאוכל לעזור לך...' },
+    { direction: 'inbound', body: 'אני רוצה לדבר עם מנהל' }];
+  expect('112609: in a chat about a manager the echo passes', gm('echo', D112609, MGR_ROWS, 'no i just need a manager'), true);
+  expect('112609: and so does the clerk', gm('clerk', D112609, MGR_ROWS, 'no i just need a manager'), true);
+  const WHY_TELL = [{ direction: 'inbound', body: 'למה שאספר לך?' }].concat(MGR_ROWS);
+  expect('a follow-up with no manager word: the chat is still about one (112635)',
+    gm('clerk', D112635, WHY_TELL, 'למה שאספר לך?'), true);
+  expect('the rows cannot be read: this message alone decides', gm('clerk', D112635, [], 'i want to talk with the manager'), true);
+  const FAULT_ECHO = 'אני מבין שיש נזילה בלובי. כדי שאוכל לפתוח קריאה, אצטרך את הבניין והדירה.';
+  const TAPPED = [{ direction: 'inbound', body: 'יש נזילה בלובי' }, { direction: 'outbound', body: "היי, כאן מיכאל מהומי'ז! מה שלומך היום?" },
+    { direction: 'inbound', body: 'לדבר עם נציג' }];
+  expect('the לדבר עם נציג tap is not a chat about a manager: the echo still goes back',
+    gm('echo', FAULT_ECHO, TAPPED, 'יש נזילה בלובי'), false);
+  expect('...and the clerk too', gm('clerk', FAULT_ECHO, TAPPED, 'יש נזילה בלובי'), false);
+  expect("the bot's own word מנהל does not count", gm('clerk', FAULT_ECHO,
+    [{ direction: 'inbound', body: 'יש נזילה בלובי' }, { direction: 'outbound', body: 'אנחנו לא מנהלים את הבניין הזה' }], 'יש נזילה בלובי'), false);
+  expect('"personal information" is not a person', gm('clerk', FAULT_ECHO,
+    [{ direction: 'inbound', body: 'i dont want to share personal information' }], 'i dont want to share personal information'), false);
+  // The replay of 112626's first draft: a promise inside the reason ("ולדאוג שיחזרו
+  // אליך"). Let through, Send cuts its sentence and leaves "אני מבין שאתה רוצה לדבר עם
+  // מנהל." with no question. With a promise the two still send it back.
+  const D112626 = 'אני מבין שאתה רוצה לדבר עם מנהל. כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא שבו תרצה לדבר איתם?';
+  expect('112626: a promise in a chat about a manager still goes back (echo)', gm('echo', D112626, MGR_ROWS, 'i want to talk with the manager'), false);
+  expect('112626: ...and (clerk)', gm('clerk', D112626, MGR_ROWS, 'i want to talk with the manager'), false);
 
   console.log(NL + '--- Reply usable?: deeds (27 Sep, "why is it inventing") ---');
   const tools = (k) => Array.from({ length: k }, () => ({ action: { tool: 'open_request' } }));
@@ -589,6 +636,50 @@ function cases(E) {
     tn('העברתי את זה לצוות, ואם תרצה אוכל לעדכן גם את הגבייה.'), true);
   expect('team note: a call-back promise beside an offer still makes it',
     tn('אוכל להעביר את זה לצוות, והם יחזרו אליך.'), true);
+  // 18 Oct, late (n8n_whatsapp_procedure.py): sentence by sentence. The chat about a
+  // manager explains the procedure now; a condition, a "לא" before the verb or "אין
+  // לי מה" holds back its own sentence, and a report in another sentence still counts.
+  expect('team note: "לפני שמעבירים משהו לצוות" is the procedure, no note',
+    tn('לפני שמעבירים משהו לצוות, צריך לדעת במה מדובר. מה קרה?'), false);
+  expect('team note: "ברגע שתספר לי..., אעדכן את הצוות" is a condition, no note',
+    tn('אני מבין אותך. ברגע שתספר לי במה מדובר, אעדכן את הצוות. על מה זה?'), false);
+  expect('team note: "אין לי מה להעביר לצוות" is nothing passed on',
+    tn('בלי לדעת במה מדובר, אין לי מה להעביר לצוות. אפילו משפט אחד מספיק, מה קרה?'), false);
+  expect('team note: "אני לא מעביר בקשה ריקה לצוות" is a no, no note',
+    tn('אני לא מעביר בקשה ריקה לצוות, ככה זה עובד אצלנו. במה מדובר?'), false);
+  expect('team note: "כשתכתוב לי..., אני מעביר את זה לצוות" is a condition, no note',
+    tn('כשתכתוב לי על מה מדובר, אני מעביר את זה לצוות מיד. מה הנושא?'), false);
+  expect('team note: a present-tense report beside a condition still makes it',
+    tn('אני מעביר את זה לצוות עכשיו. אם יהיה צורך, אעדכן אותך?'), true);
+  expect('team note: "עכשיו אני מעביר" is a report (the כש inside עכשיו is not "when")',
+    tn('עכשיו אני מעביר את זה לצוות.'), true);
+  expect('team note: a promise to tell the team beside an offer in another sentence makes it',
+    tn('אעדכן את הצוות בזה. אם תרצה, אוכל גם לפתוח קריאה?'), true);
+  expect('team note: 112626, a call-back inside a purpose clause, is no note',
+    tn('אני מבין שאתה רוצה לדבר עם מנהל. כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא שבו תרצה לדבר איתם?'), false);
+  expect('team note: "אם תרצה, ...שיחזרו אליך" is an offer, no note (5 Oct, 12:34)',
+    tn('אם תרצה, אני יכול לעדכן את הצוות שיחזרו אליך טלפונית.'), false);
+  expect('team note: a condition AFTER the promise does not hold it back',
+    tn('הצוות עודכן שאתה רוצה שיחזרו אליך למספר הזה, ושזה חשוב לך לפני שהשיפוץ מתחיל.'), true);
+  expect('team note: a purpose clause AFTER the report does not hold it back',
+    tn('אני מעביר את זה לצוות עכשיו, כדי שיוכלו לבדוק את זה.'), true);
+  // The Claude-played replay of tonight's chat (manager_parrot): explaining the
+  // procedure, Michael talks about passing things on in every reply, and two of
+  // them would have noted an empty request. In a chat about a manager the note
+  // needs a past-tense report, an explicit "אני מעביר את...", or a call-back promise.
+  const MGR_CHAT = [{ direction: 'inbound', body: 'i want to talk with the manager' },
+    { direction: 'outbound', body: 'אני מבין שזה מתסכל...' }, { direction: 'inbound', body: 'אני רוצה לדבר עם מנהל' }];
+  const tnm = (output, rows, said) => () => E.teamNote({ output }, turn({ rows, said }).$);
+  expect('team note, a chat about a manager: "אני זה שמעביר פניות לצוות" is his job, not a report',
+    tnm("לא, אני לא המנהל, אני מיכאל מצוות השירות של הומי'ז. אני זה שמעביר פניות לצוות, והרבה דברים אפשר גם לסדר כבר מכאן. מה העניין?",
+      MGR_CHAT, 'why would i tell you are you the manager?'), false);
+  expect('team note, a chat about a manager: "להעביר את הפנייה שלך לצוות אני כן" is what he can do, not a report',
+    tnm('לחבר אותך ישירות למנהל אני לא יכול מכאן, אבל להעביר את הפנייה שלך לצוות אני כן, ובשביל זה צריך שיהיה כתוב בה על מה היא. על מה מדובר?',
+      MGR_CHAT, 'i told you i want a manager just get me one are you not listening'), false);
+  expect('team note, a chat about a manager: a past-tense report still makes it',
+    tnm('רשמתי לצוות את החיוב הכפול על ספטמבר, אז זה כבר אצלם.', MGR_CHAT, 'i was charged twice'), true);
+  expect('team note, a chat about a manager: an explicit "אני מעביר את זה לצוות" still makes it (23 Aug)',
+    tnm('אני מעביר את זה לצוות, נחזור בהקדם.', MGR_CHAT, 'אני רוצה לדבר עם נציג אנושי בבקשה'), true);
   const op = (output, S) => () => E.reply.opener({ output }, 0, turn({ S }).$);
   expect('opener: "במה אוכל לעזור לך היום?" after a concrete message is sent back', op('היי! במה אוכל לעזור לך היום?'), false);
   expect('opener: the plural shape is still sent back', op('היי! במה אוכל לעזור לכם היום?'), false);
@@ -692,6 +783,25 @@ function cases(E) {
     () => mgrWhy(BAD_HAY).includes('והוא לא שאל אותך לשלומך') && !mgrWhy(BAD_HAY).includes('open_request'), true);
   expect('Try again: a reply with no how-are-you keeps the full list',
     () => mgrWhy('אני איתך. ספר לי מה קרה?').includes('או שנתנה קישור'), true);
+  // 18 Oct, late: in a chat about a manager the echo and the clerk are not named, and
+  // the unnamed list drops both and its "ask in one short question, no reason" tail.
+  expect('Try again: 112609 in a chat about a manager names neither the echo nor the clerk',
+    () => { const w = mgrWhy(D112609); return !w.includes('נפתחה בזה שהבנת') && !w.includes('הסבירה לו למה'); }, true);
+  expect('Try again: there the list asks for no bare question',
+    () => { const w = mgrWhy(D112609); return w.includes('או שנתנה קישור') && !w.includes('בלי הקדמה ובלי הסבר') && !w.includes('שהסבירה לו למה'); }, true);
+  const whyAt = (output, text, rows) => JSON.parse(E.tryAgain({ output }, (name) => {
+    if (name === 'Still the last word?') return { first: () => ({ json: { text, tap: '', greeted: true } }) };
+    if (name === 'Anything newer?') return { all: () => rows.map((r) => ({ json: r })) };
+    throw new Error('no node ' + name); })).retry_note;
+  expect('Try again: the rows say the chat is about a manager though this message does not',
+    () => !whyAt(D112635, 'למה שאספר לך?', WHY_TELL).includes('הסבירה לו למה'), true);
+  expect('Try again: a fault after the tap still names the clerk',
+    () => whyAt(FAULT_ECHO, 'יש נזילה בלובי', TAPPED).includes('הסבירה לו למה'), true);
+  expect('Try again: 112626 names the promise, not the echo or the clerk',
+    () => { const w = whyAt(D112626, 'i want to talk with the manager', MGR_ROWS);
+      return w.includes('היא הבטיחה לו') && !w.includes('נפתחה בזה שהבנת') && !w.includes('הסבירה לו למה'); }, true);
+  expect('Try again: a promise outside a chat about a manager is not named (Send cuts it there)',
+    () => !whyAt('נציג יחזור אליך בהקדם.', 'יש נזילה בלובי', TAPPED).includes('היא הבטיחה לו'), true);
   // 5 Oct (scripts/n8n_whatsapp_safetynet.py, scripts/wa_truth.py). The live run
   // as Assaf Clix (docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md):
   // the worst failures came from these checks. The drafts below are his, word

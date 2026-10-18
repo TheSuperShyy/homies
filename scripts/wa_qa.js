@@ -59,7 +59,11 @@ function build(X) {
 // what it reads for the menu race, and an empty list is what it got before.
 function guardWorld(nodes, o) {
   return Object.assign({}, nodes, {
-    'Anything newer?': { all: () => (o.recent || []).map((b) => ({ json: { direction: 'outbound', body: b } })) },
+    // 18 Oct, late: a row may carry its direction ({direction, body}); the chat about a
+    // manager is read off the resident's own rows (n8n_whatsapp_retry.MGR_CTX). A bare
+    // string is a row of unknown direction, read as the bot's, as before.
+    'Anything newer?': { all: () => (o.recent || []).map((b) => ({ json: (b && typeof b === 'object')
+      ? { direction: b.direction, body: String(b.body || '') } : { direction: 'outbound', body: b } })) },
     'Try again': { first: () => { if (!o.first_try) throw new Error('unexecuted'); return { json: o.first_try }; } },
   });
 }

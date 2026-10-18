@@ -298,7 +298,11 @@ workflow's own code on it and prints what that code does. From the repo root:
 Fields: `kind` (text, tap, photo, file), `text`, `after_menu` (true when the message before
 this one in the chat was the system's menu), `first` (true only for the first message of a
 conversation that has no history) and, once you have them, `ack`, `tool_calls`, `output`,
-`retry_note`, `run_index`. It prints:
+`retry_note`, `run_index`. On every call also pass `recent`: the chat's last twelve messages,
+oldest first, this message last, each `{"direction": "inbound", "body": "..."}` for the
+resident's and `{"direction": "outbound", "body": "..."}` for what the phone got. The live
+checks read it the way production reads `Anything newer?` (since 18 Oct, whether this chat
+is about a request for a manager or a person). It prints:
 - `menu: true` and the system's line: the message never reaches either model. Record
   `{"resident": "...", "kind": "menu"}`; the resident gets that line with the three buttons.
 - otherwise `ack_model_reads`: the payment-ack model's input. Decide that model's output
@@ -584,6 +588,10 @@ def rubric(turn, res, ctx):
         is_first_part = res["two"] and (i == (1 if res["ack_sent"] else 0))
         for rule, rx in (("slang", SLANG), ("soon-promise", SOON), ("echo", ECHO), ("explains-why", CLERK),
                          ("markdown", MARKDOWN), ("parentheses", PARENS), ("emergency-numbers", EMERGENCY)):
+            # 18 Oct, late: in a chat about a manager or a person, "I understand
+            # you" and the reason for asking are what the owner asked for.
+            if ctx.get("mgr") and rule in ("echo", "explains-why"):
+                continue
             m = rx.search(h)
             if m:
                 # The payment ack's own "I understood that..." is what its prompt
@@ -759,6 +767,16 @@ def expectations(scen, turns, results):
         elif typ == "turn_questions_max":
             msgs = [h for i, h in bot_msgs if i == e["turn"]]
             ok = bool(msgs) and sum(h.count("?") for h in msgs) <= e["max"]
+        elif typ == "questions_distinct":
+            # 18 Oct, late ("like a parrot"): no question asked twice in the same words.
+            qs = []
+            for i, h in bot_msgs:
+                if e.get("turns") is not None and i not in e["turns"]:
+                    continue
+                found = re.findall(r"[^.!?\n]*\?", h)
+                if found:
+                    qs.append(re.sub(r"[\W_]+", " ", found[-1]).strip())
+            ok = len(qs) == len(set(qs))
         elif typ == "last_no_question":
             ok = bool(bot_msgs) and "?" not in bot_msgs[-1][1]
         elif typ == "turn_count_max":
@@ -788,6 +806,13 @@ def grade(run):
         tools_so_far = set(t for h in hist for t in (h.get("tools") or []))
         refs_so_far = set(re.findall(r"\d{3}-\d{3,6}-\d{2}", " ".join(h.get("michael", "") for h in hist)))
         prev_handsets = set()
+        # 18 Oct, late: the chat's last twelve rows, both directions, oldest first, the
+        # way `Anything newer?` hands them to the guards (this message last).
+        convo = []
+        for h in hist:
+            convo.append({"direction": "inbound", "body": str(h.get("resident", "")).split("\n")[-1]})
+            if h.get("michael"):
+                convo.append({"direction": "outbound", "body": str(h["michael"])})
         first_contact = not hist
         # she wrote about herself in the feminine, in history or by this turn
         she = any(C.FEM_CUE.search(h.get("resident", "")) for h in hist)
@@ -795,8 +820,11 @@ def grade(run):
             kind = t.get("kind", "text")
             text = t.get("resident", "")
             she = she or bool(C.FEM_CUE.search(text))
+            recent = convo[-11:] + [{"direction": "inbound", "body": text}]
+            convo.append({"direction": "inbound", "body": text})
             if kind == "menu":
                 last_bot = hour_word(s["time"]) + MENU_TAIL
+                convo.append({"direction": "outbound", "body": last_bot})
                 greeted = True
                 meta.append({"kind": "menu", "handset": [last_bot], "buttons": True})
                 turns_js.append(None)
@@ -806,7 +834,13 @@ def grade(run):
                    "tap_kind": {v: k for k, v in TAPS.items()}.get(text, "") if tap else "",
                    "first_contact": first_contact, "hour_word": hour_word(s["time"]),
                    "they_greeted": bool(re.match(r"^[\s\W]*(שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|hi|hey|hello|good (morning|afternoon|evening)|shalom|ahlan)(?=[\s,.!?:;]|$)", text, re.I)),
-                   "asked_who": bool(re.search(r"מי (אתה|את|זה|מדבר|כותב|עונה)|עם מי|who (are|r) (you|u)|who is this|bot|רובוט|בוט", text, re.I)),
+                   "asked_who": bool(re.search(r"מי (אתה|את|זה|מדבר|כותב|עונה)|עם מי|who (are|r) (you|u)|who is this|bot|רובוט|בוט"
+                                               r"|(אתה|את) (ה)?(מנהל|מנהלת|אחראי|אחראית)"
+                                               r"|(are|r) (you|u) (the |a |an )?(manager|boss|supervisor|owner|in charge)", text, re.I)),
+                   # 18 Oct, late: the chat is about a request for a manager or a
+                   # person (retry.MGR_CTX's test, on the same last twelve rows).
+                   "mgr": any(x["direction"] == "inbound" and x["body"].strip() != R.TAP_REP
+                              and R.MGR_PY.search(x["body"]) for x in recent),
                    "has_matter": kind != "tap" and len(text.split()) >= 3 and not HOW_ARE_YOU.search(text),
                    "closing": bool(t.get("closing")) or bool(re.match(r"^\s*(תודה|תודה רבה|אוקיי תודה|ok thanks|thanks|thank you|לילה טוב|יום טוב|ביי|להתראות)", text, re.I)),
                    "tools_so_far": set(tools_so_far), "prev_handsets": set(prev_handsets),
@@ -825,8 +859,11 @@ def grade(run):
                              # 7 Oct: what the player handed `turn` (the chat's last
                              # twelve bot messages; Try again's item on a retry), so
                              # the truth guards read here what they read there.
-                             "recent": t.get("recent") or [], "first_try": t.get("first_try")})
+                             "recent": recent, "first_try": t.get("first_try")})
             meta.append(ctx)
+            went = t.get("mend_output") or t.get("say_again_output") or t.get("output") or ""
+            if went:
+                convo.append({"direction": "outbound", "body": went})
             greeted = True
             last_bot = ""
             first_contact = False
@@ -1347,9 +1384,9 @@ class Chat:
         # the truth guards (a ticket number from earlier is real only if it is there).
         recent = []
         for x in self.st["turns"]:
-            recent.append(str(x.get("resident") or ""))
-            recent.extend(str(h) for h in (x.get("handset") or []))
-        recent = [m for m in recent if m][-11:] + [text]
+            recent.append({"direction": "inbound", "body": str(x.get("resident") or "")})
+            recent.extend({"direction": "outbound", "body": str(h)} for h in (x.get("handset") or []))
+        recent = [m for m in recent if m["body"]][-11:] + [{"direction": "inbound", "body": text}]
         t = {"scenario": sid, "kind": kind, "text": text, "first": not self.st["turns"],
              "after_menu": self.st["after_menu"], "recent": recent}
         r = live_turn(code, ps, t)

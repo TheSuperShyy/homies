@@ -81,6 +81,14 @@ did not ask first goes back once, first pass only, and `Try again` names it. It
 reads HAY_STRICT, not HAY_ALT, because "מה המצב" and "מה קורה" also ask about the
 matter. n8n_whatsapp_unasked.py carries it to live.
 
+18 OCT, LATE: A CHAT ABOUT A MANAGER. The owner insisted on a manager five times
+and got "what is it about?" five times, shorter each time ("like a parrot"). The
+first drafts had explained why the details are needed, which is what he wants;
+`echo` and `clerk` sent them back and the note said "just ask". MGR_CTX reads the
+chat (a request for a manager or a person among the resident's recent messages);
+there the two guards pass, `Try again` names neither, and the unnamed list drops
+both and the "no reason" tail (RETRY_NOTE_MGR). n8n_whatsapp_procedure.py carries it.
+
 5 OCT, THE SECOND PASS KEEPS WHAT THE FIRST ONE KNEW (n8n_whatsapp_safetynet.py,
 which carries this to live). The live run as Assaf: the first pass looked the
 mould up, found nothing and said so; its draft was sent back for its opening
@@ -200,6 +208,65 @@ HAY_STRICT_PY = __import__("re").compile(HAY_STRICT, __import__("re").I)
 WHY_UNASKED = ("היא שאלה אותו לשלומו, והוא לא שאל אותך לשלומך ולא לחץ על לדבר עם נציג, "
                "ובמקום זה תמשיך ממה שהוא כתב לך")
 
+# 18 Oct, late (n8n_whatsapp_procedure.py): THE CHAT IS ABOUT A MANAGER. The owner's
+# handset, 15:05-15:08 UTC (executions 112601-112635): five turns of "what is it
+# about?", each shorter than the last -- "this is like frustrating like a parrot it
+# should be like i understand you i order for me to do that blah blah blah its the
+# procedure we need to get information before we can do something". The first
+# drafts said exactly that ("אני מבין שחשוב לך לדבר עם מנהל. כדי שאוכל לוודא שהפנייה
+# שלך מגיעה לאדם הנכון..., אני צריך להבין מה המצב"); `echo` and `clerk` sent them
+# back, and the rewrite was the bare question every time. So while the chat is
+# about a request for a manager or a person, "I understand you" and the reason for
+# asking are the answer, not a fault, and the note does not ask for a bare question.
+# Read off the resident's own messages among the last twelve rows (`Anything
+# newer?`, both directions, this message among them), the לדבר עם נציג tap's own
+# row aside (it opens "hi, how are you today"); off this turn's text when the rows
+# cannot be read. No lookbehind and no backslash: it sits in n8n expressions.
+# Over the 1,055 bot replies so far it covers the two of 18 Oct 15:05 and 15:06,
+# the 18 Oct 13:25 and 5 Oct 12:29 / 12:34 person requests, and nothing else.
+MGR_ALT = (r"מנהל|אחראי|נציג|בן אדם|בנאדם|אדם אמיתי|מישהו מהצוות|מישהו אמיתי"
+           r"|manager|supervisor|representative|human(?![a-z])|person(?![a-z])|(^|[^a-z])agent(?![a-z])")
+MGR_JS = "/" + MGR_ALT + "/i"
+MGR_PY = __import__("re").compile(MGR_ALT, __import__("re").I)
+TAP_REP = "לדבר עם נציג"
+MGR_CTX = ("let mgrAsk = false; try { mgrAsk = $('Anything newer?').all().some(r => { "
+           "const x = (r || { }).json || { }; const b = String(x.body || '').trim(); "
+           "return x.direction === 'inbound' && b !== '" + TAP_REP + "' && " + MGR_JS + ".test(b); }); } "
+           "catch (e) { mgrAsk = false; } "
+           "if (!mgrAsk) { try { const b = String($('Still the last word?').first().json.text || '').trim(); "
+           "mgrAsk = b !== '" + TAP_REP + "' && " + MGR_JS + ".test(b); } catch (e) { mgrAsk = false; } } ")
+assert "}}" not in MGR_CTX, "a }} inside the manager test ends an expression early"
+# ...except when the same reply makes a promise. The replay of 112626's first draft
+# ("כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא...?") found it: let through, Send
+# cuts the promise's sentence and leaves "I understand you want a manager." with no
+# question, and the backstop notes an empty request. `echo` and `clerk` caught it
+# before; with a promise they still do, and the note names the promise. The phrases
+# are Send's (n8n_whatsapp_nopromise.PHRASES, which asserts this copy is the same:
+# nopromise imports manners, which imports this, so it cannot be imported here).
+PROMISE_PHRASES = ("בהקדם|בקרוב|בימים הקרובים|בשעות הקרובות|בהמשך היום|במהרה|במהירות האפשרית|"
+                   "אנחנו על זה|אני על זה|"
+                   "אני כבר מטפל בזה|אני מטפל בזה|מטפל בזה מיד|אני אטפל בזה|"
+                   "(יחזרו|יחזור|תחזור|נחזור|אחזור) (אליכם|אלייך|אליך)|"
+                   "(ייצרו|יצרו|ייצור|יצור|ניצור|תיצור) ((אתכם|איתכם|איתך|אתך) קשר|קשר (אתכם|איתכם|איתך|אתך))|"
+                   "(יעדכנו|יעדכן|נעדכן|אעדכן) (אתכם|אותך)|"
+                   "בדרך (אליכם|אליך|אלייך)|(עזרה|מישהו|הצוות|הטכנאי) בדרך|"
+                   "הטכנאי יגיע|מישהו יגיע|(נשלח|ישלחו) ((אליכם|אליך|אלייך) )?(מישהו|טכנאי)|"
+                   "יגיעו? (אליכם|אליך|אלייך|בקרוב|היום|מחר)")
+PROMISE_JS = "/" + PROMISE_PHRASES + "/"
+WHY_PROMISE = ("היא הבטיחה לו שיחזרו אליו, שיטפלו בזה או מתי, ואת זה אתה לא יודע, "
+               "ובמקום זה תגיד רק מה שאתה כן יודע")
+# The full list, when nothing can be named, without the two reasons the chat about
+# a manager does not have, and without "ask it in one short question, no reason".
+RETRY_NOTE_MGR = (
+    "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר: או שהודיעה על "
+    "קריאה שלא נפתחה, או שנתנה קישור שלא הגיע מכלי, או שהייתה ריקה, או "
+    "שפנתה לדייר בלוכסן או בסוגריים, או שחזרה על משפט "
+    "הפתיחה של המערכת במקום לענות על מה שכתב, או שסיפרה שבדקת, תיקנת, "
+    "החלפת או שלחת משהו בלי שכלי עשה את זה. מה "
+    "שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
+    "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link.]"
+)
+
 # 5 Oct: the four truth guards, named when they are the reason. Read off the
 # first draft with the guards' own code (wa_truth.truth_js), not guessed.
 WHY_WORDS = "היא הייתה ריקה"
@@ -228,8 +295,10 @@ TRY_JSON = (
     "if (!v.phantom) why.push('" + WHY_PHANTOM + "'); "
     "if (!v.links) why.push('" + WHY_LINKS + "'); "
     "if (!v.deeds) why.push('" + WHY_DEEDS + "'); "
-    "if (" + ECHO_RE + ".test(o)) why.push('" + WHY_ECHO + "'); "
-    "if (" + CLERK_RE + ".test(o)) why.push('" + WHY_CLERK + "'); "
+    # 18 Oct, late: in a chat about a manager, the echo and the clerk are the answer.
+    + MGR_CTX +
+    "if (!mgrAsk && " + ECHO_RE + ".test(o)) why.push('" + WHY_ECHO + "'); "
+    "if (!mgrAsk && " + CLERK_RE + ".test(o)) why.push('" + WHY_CLERK + "'); "
     "const tools = why.length > 0; let rep = false; "
     "try { rep = $('Still the last word?').first().json.tap === 'other'; } catch (e) { rep = false; } "
     "if (rep && !" + HAY_JS + ".test(o)) why.push('" + WHY_REPHAY + "'); "
@@ -237,8 +306,10 @@ TRY_JSON = (
     # `wrote`, not `said`: the truth library above already declares `said`.
     "let wrote = ''; try { wrote = String($('Still the last word?').first().json.text || ''); } catch (e) { wrote = ''; } "
     "if (!rep && " + HAY_STRICT_JS + ".test(o) && !" + HAY_JS + ".test(wrote)) why.push('" + WHY_UNASKED + "'); "
+    # 18 Oct, late: in a chat about a manager a promise is what sent it back.
+    "if (mgrAsk && " + PROMISE_JS + ".test(o)) why.push('" + WHY_PROMISE + "'); "
     "let note = why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.]') "
-    ": '" + RETRY_NOTE + "'; "
+    ": (mgrAsk ? '" + RETRY_NOTE_MGR + "' : '" + RETRY_NOTE + "'); "
     "if (first_steps.length) note += ' " + FACTS_HEAD + "' + first_steps.map(s => s.tool + ': ' + brief(s.observation)).join('; ') + '" + FACTS_TAIL + "'; "
     "return { retry_note: note, first_output: o, first_steps, first_truth_ok: v.ok }; "
     "} catch (e) { return { retry_note: '" + RETRY_NOTE + "', first_output: o, first_steps: [], first_truth_ok: false }; } "

@@ -203,7 +203,12 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 81
+MEMORY_EPOCH = 82
+# 81 -> 82, 18 Oct, late (n8n_whatsapp_procedure.py): a request for a manager is
+# answered with the reason ("before anything goes to a manager, someone has to
+# know what it is about"), never the same question twice, and nothing goes on
+# without the matter; notify_team's text with it. The owner's buffer holds "מה
+# הנושא שתרצה לדבר עליו?" four times, ready to be copied back.
 # 80 -> 81, 18 Oct, evening (n8n_whatsapp_unasked.py): a typed request for a rep is
 # not the tap (one prompt sentence, plus the `unasked` guard); the owner's buffer
 # holds "היי, כאן מיכאל מהומי'ז. מה שלומך היום?" twice, ready to be copied back.
@@ -717,7 +722,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "961e2b20119a",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "9e4b0a8f158f",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -730,7 +735,9 @@ EPOCH_COVERS = {
     # 5 Oct: get_balance asks once, explains once; a refusal is a team note.
     # 18 Oct: notify_team waits for the details on a request for a manager;
     # later the same day, worded as a service rep would, not as a process.
-    "tools": "a31b02133480",
+    # 18 Oct, late: and says the reason, never the same question twice, never an
+    # empty note (n8n_whatsapp_procedure.py).
+    "tools": "b01c94a2f6c6",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1598,15 +1605,18 @@ TOOLS = [
             "status is get_request_status's. Those you do yourself.\n"
             # 18 Oct, the owner: a request for a manager gets help first, then
             # the questions, and the note only with the details in it.
+            # 18 Oct, late (n8n_whatsapp_procedure.py): and the reason is said,
+            # never the same question twice; nothing goes on without the matter.
             "A request for a manager or a person is not one of these yet: it "
             "does not say what they need. Answer like a good service rep: show "
-            "you heard them and ask for the details, what happened and what "
-            "they need, and try to sort it out yourself with your tools; if "
-            "they insist, ask again for what is missing. Call it only for what "
-            "is really past you, with the details in `description` (reason "
-            "caller_request, unless the matter itself has a reason above); if "
-            "they still will not say after the second ask, call it with what "
-            "you have.\n"
+            "you understand them, say plainly that before anything goes to a "
+            "manager someone has to know what it is about, ask what happened, "
+            "and try to sort it out yourself with your tools. If they insist, "
+            "never the same question in the same words: explain again another "
+            "way and make it easy (the topic alone is enough). Call it only for "
+            "what is really past you, with the details in `description` (reason "
+            "caller_request, unless the matter itself has a reason above). A "
+            "request with nothing in it is never a note, however often they ask.\n"
             # 16 Sep, the client's review: no national numbers and no safety
             # instructions from the bot. The note and the ticket are the
             # whole response to an emergency, so they come first.

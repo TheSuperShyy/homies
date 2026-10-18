@@ -2530,7 +2530,9 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
     - **Nothing goes on without the matter,** however often the tenant asks.
   - **A chat about a manager** is read off the resident's own rows among the last twelve (`retry.MGR_CTX`), with the tap's row excluded. There, `echo` and `clerk` pass and `Try again` names neither. They still send a reply back if it also makes a promise Send would cut. Without that, "כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא?" would lose its question to the promise filter, and the backstop would note an empty request.
   - **"are you the manager?"** is asking who he is talking to, so Send keeps the name (`manners v4`). A cut takes "מצוות השירות של הומי'ז" with the name, never leaving a fragment.
-  - **The backstop reads sentence by sentence.** A condition or purpose clause ahead of the verb or the call-back promise holds that sentence back. Over every past reply, 97 notes instead of 103; the 6 lost are "if you want, they'll get back to you" offers.
+  - **The backstop reads sentence by sentence.** A condition or purpose clause ahead of the verb or the call-back promise holds that sentence back.
+    - **In a manager chat,** the note needs a past-tense report, an explicit "אני מעביר את…", or a call-back promise. Explaining the procedure means talking about passing things on in every reply ("אני זה שמעביר פניות לצוות", "להעביר… אני כן"), and none of that is a report.
+    - **Over every past reply:** 97 notes instead of 103. The 6 lost are "if you want, they'll get back to you" offers.
   - **Lesson: a style guard can turn the model's good draft into the bad one.** A rule written for one situation (a clerk asking for the building) fired in another, where the same words are what the owner wants. Before blaming the model for a reply, read its first pass in the execution (`Try again`'s `first_output`).
 - **The phone agents still pass a request for a person on at once** (their prompts and `vapi_tools.py`). That was not part of this change; chatbot first.
 

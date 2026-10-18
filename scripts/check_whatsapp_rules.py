@@ -121,20 +121,31 @@ PINS = {
     # rep_and_you (29 turns, 65/65, no flag), and 112521's own draft through the
     # retry (variant R: sent back by `unasked`, the note named it, the second pass
     # asked what it is about; 6/6).
-    'Answer the resident / system': '961e2b20119a',
+    # 18 Oct, late (n8n_whatsapp_procedure.py, epoch 82): a request for a manager is
+    # answered with the reason, never the same question twice, and nothing goes on
+    # without the matter; notify_team's text and Try again's note with it.
+    # Claude-played on the candidate: manager_parrot (the owner's chat word for word),
+    # manager_insists, manager_wont_say, manager_typed_mid, rep_typed, angry_repeat,
+    # stair_light, tap_rep; 29 turns, 58/58, no guard rejection, no flag, and no
+    # backstop note without the tool. Tonight's six first drafts replayed through the
+    # candidate: the five that explained go out, 112618 keeps its name, and 112626's
+    # (a promise inside the reason) goes back with the promise named.
+    'Answer the resident / system': '9e4b0a8f158f',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
     # "איך עבר" (retry.py), which only decides whether the rephay reason is added.
     # 18 Oct, evening: names a how-are-you he did not ask for (`unasked`); see above.
-    'Try again / note': '34174ed0c761',
+    # 18 Oct, late: in a chat about a manager, names neither the echo nor the clerk,
+    # names a promise instead, and its unnamed list asks for no bare question.
+    'Try again / note': '7631ae8f7590',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '3ef1f30b5235',
     'get_payment_link / tool': '58ab6a539158',
     'get_request_status / tool': '76e812f28aaa',
     'get_service_info / tool': '6223a04ed17f',
-    'notify_team / tool': '8f115297c529',
+    'notify_team / tool': '0a8bb45d8a17',     # 18 Oct, late: the reason, never an empty note
     'open_request / tool': '8e8e45124b09',
     'show_menu / tool': '58aeda4b4677',
     'verify_address / tool': 'a2a85a3d4068',
@@ -480,12 +491,22 @@ def watch(since):
             wrote = str((first("Worth a word?") or {}).get("output") or "").strip()
             if wrote and wrote.upper() != "NONE":
                 infos.append("the ack model wrote a note and the gate held it: %s" % mask(wrote, 60))
+        # 18 Oct, late (n8n_whatsapp_procedure.py): in a chat about a manager or a
+        # person, "I understand you" and the reason for asking are what the owner
+        # asked for, so they are an info line there, not a flag. The same test as
+        # the guards (retry.MGR_CTX): the resident's own rows, the tap's row aside.
+        from n8n_whatsapp_retry import MGR_PY, TAP_REP
+        mgr = any(r.get("direction") == "inbound" and str(r.get("body") or "").strip() != TAP_REP
+                  and MGR_PY.search(str(r.get("body") or "")) for r in (items("Anything newer?") or []))
         for k, t in sent:
             if ECHO.search(t):
-                flags.append("'I understand that...' in the %s%s"
-                             % (k, " (known gap: the ack's own wording)" if k == "ack" else ""))
+                (infos if mgr else flags).append(
+                    "'I understand that...' in the %s%s"
+                    % (k, " (known gap: the ack's own wording)" if k == "ack"
+                       else " (a chat about a manager: wanted)" if mgr else ""))
             if CLERK.search(t):
-                flags.append("the clerk's 'so that I can / I will need' in the %s" % k)
+                (infos if mgr else flags).append("the clerk's 'so that I can / I will need' in the %s%s"
+                                                 % (k, " (a chat about a manager: wanted)" if mgr else ""))
         # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
         # what went out is a flag; the ack and the first beat of a two-part
         # payment reply may say "I'm on it". One the filter cut is an info line.
