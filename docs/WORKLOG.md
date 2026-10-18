@@ -22,7 +22,7 @@ conversation that produced it.
 - **The message given, in English plain text:**
   - **Why Chatwoot:**
     - everything is built on it and working: the bot, the inbox, the handover to staff, tickets, payment links, photos, and the phone agents' notes;
-    - a move to UChat means building it again from the start: about 4-7 weeks, and about $80-140 a month more, against Chatwoot's $0 on our server;
+    - a move to UChat means building it again from the start: about 4-7 weeks, and about $80-140 a month more, against Chatwoot's $0. The owner added that Chatwoot shares one server with n8n, so it costs no extra hosting either;
     - we would lose the before-sending checks and the replay tests, since no way to do either was found in UChat;
     - the inbox work still left (staff in the four departments, routing, summaries) is the same on either platform.
   - **The status:**
