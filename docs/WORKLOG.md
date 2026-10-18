@@ -9,6 +9,11 @@ conversation that produced it.
 
 ---
 
+## 2026-10-19
+
+### The 10/18 and 10/19 report, combined (in chat)
+The owner asked *"is it live"*. It was read back from live: the new version since 15:58 UTC, nothing changed since, and no resident turn yet. Then *"report 10/18 and 10/19 combined"*: written in chat in the report format (Project: Homies, verb-first bullets, no numbers, no quotes of the bot's lines, plain words). 10/19 holds only the end of the same work.
+
 ## 2026-10-18
 
 ### WhatsApp bot: a request for a manager is answered with the reason, never the same question twice (LIVE 15:58 UTC, epoch 82)
