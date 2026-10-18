@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-10-18
 
+### WhatsApp bot: the manager request, answered like a person at a service desk (epoch 80)
+- **The owner, on the 79 test chat:** *"no not like that i want it to be natural like a call center but human like yes i hear you can i get some details and stuff like lowkey trying to fix everything by yourself before following up and sending it to the team"*.
+- **Why 79 read wrong:** its passage told Michael what to SAY ("say you are here to help"; "say you will try yourself, and if not, pass it on"). The model said it nearly word for word: "אנסה קודם לעזור בעצמי, ואם לא אוכל, אעביר את זה למנהל".
+- **Changed (`scripts/n8n_whatsapp_hearyou.py`):**
+  - **The passage now describes the person:**
+    - a good rep at a service desk;
+    - he shows he heard, and naturally asks for the details, as someone who means to handle it;
+    - pressed, he stays calm and asks for what is missing;
+    - until the details are in, the conversation is about the matter, not about who will handle it;
+    - then he tries to close it with his tools, and only what is past him goes to the team, with the details.
+  - **`notify_team`'s description** is worded the same way.
+  - **Epoch** 79 to 80.
+  - **Unchanged:** the 79 backstop (an offer is not a report).
+- **Deck:** the two manager chats now check that the first reply asks for the details and that the first two replies don't talk about passing it to a manager or the team. Their judge lines and `rep_typed`'s moved with it.
+- **Gate on the candidate:**
+  - **Cases:** 318 of 318.
+  - **Replay:** 0 changes.
+  - **Pins:** fail only on the prompt and `notify_team`, as expected.
+  - **Idle check:** baseline 6 only; `askfirst` stands down under the later epoch.
+- **Claude-played** (`qa_hearyou`): `manager_insists`, `manager_wont_say`, `rep_typed`, `tap_rep`, `price_quote` (in progress).
+
 ### WhatsApp bot: a request for a manager gets help first, then the questions, then the note (LIVE 13:55 UTC, epoch 79)
 - **Asked (pasted by the owner):** *"when somebody asks for a manager ..., we need to just ask him, 'Hey, I'm here to help you.' This is the first message. In the second message, if he still needs a manager or something from the team, we need to ask the questions, like, 'What do you need? What exact thing do you need from the team? Explain the situation to me, and I will try to help you, or I will send it to the team or the manager.' ... we need to get the information before we open a ticket with the team."*
 - **Found:** three texts made the bot note a request for a person at once.

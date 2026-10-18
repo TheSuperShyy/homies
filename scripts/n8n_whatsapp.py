@@ -203,7 +203,10 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 79
+MEMORY_EPOCH = 80
+# 79 -> 80, 18 Oct, later (n8n_whatsapp_hearyou.py): the same request answered like
+# a person at a service desk ("I hear you, can I get the details"), not a process;
+# 79's buffers hold "I'll try myself first, and if not, the manager".
 # 78 -> 79, 18 Oct (n8n_whatsapp_askfirst.py): a request for a manager or a person
 # gets help first, then the questions, and the team note only with the details.
 # The prompt and notify_team's description changed; buffers hold notes made at once.
@@ -711,7 +714,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "1b6624a458d8",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "ec350702a4ca",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -722,8 +725,9 @@ EPOCH_COVERS = {
     # 23 Sep: show_menu now names the third row "talk to a representative".
     # 27 Sep: get_request_status no longer forbids asking for an apartment.
     # 5 Oct: get_balance asks once, explains once; a refusal is a team note.
-    # 18 Oct: notify_team waits for the details on a request for a manager.
-    "tools": "9da037e63c61",
+    # 18 Oct: notify_team waits for the details on a request for a manager;
+    # later the same day, worded as a service rep would, not as a process.
+    "tools": "a31b02133480",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1592,12 +1596,14 @@ TOOLS = [
             # 18 Oct, the owner: a request for a manager gets help first, then
             # the questions, and the note only with the details in it.
             "A request for a manager or a person is not one of these yet: it "
-            "does not say what they need. First say you are here to help and "
-            "ask what it is about; if they still want a manager or the team, "
-            "ask what exactly they need and what happened. Call it once you "
-            "have that, with it in `description` (reason caller_request, unless "
-            "the matter itself has a reason above); if they will not say, call "
-            "it with what you have.\n"
+            "does not say what they need. Answer like a good service rep: show "
+            "you heard them and ask for the details, what happened and what "
+            "they need, and try to sort it out yourself with your tools; if "
+            "they insist, ask again for what is missing. Call it only for what "
+            "is really past you, with the details in `description` (reason "
+            "caller_request, unless the matter itself has a reason above); if "
+            "they still will not say after the second ask, call it with what "
+            "you have.\n"
             # 16 Sep, the client's review: no national numbers and no safety
             # instructions from the bot. The note and the ticket are the
             # whole response to an emergency, so they come first.

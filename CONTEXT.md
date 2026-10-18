@@ -2500,6 +2500,12 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
 - **Second reply, if he still wants a manager or the team:** ask what exactly he needs and what the situation is, and say Michael will try to help or pass it on.
 - **The team note comes only with the information.**
 
+- **Later the same day, epoch 80 (`n8n_whatsapp_hearyou.py`):** the owner wanted it "natural like a call center but human like yes i hear you can i get some details ... lowkey trying to fix everything by yourself before ... sending it to the team".
+  - **What went wrong in 79:** it told Michael what to say ("say you're here to help", "say you'll try, and if not, pass it on"), and he said it word for word.
+  - **The passage now describes the person:**
+    - he shows he heard and asks for the details;
+    - the talk stays on the matter, not on who will handle it;
+    - he tries his tools first.
 - **Where it lives:**
   - the prompt's passage right after "בקשה שמעבר לך נרשמת", described, not scripted;
   - the identity paragraph's "prefers a person";

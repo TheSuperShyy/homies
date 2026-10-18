@@ -985,7 +985,7 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "person_ask: does Michael first offer his own help and ask what it is about, rather than passing an empty request on, and once he hears the double charge, does it reach the team (notify_team) with the details, with no who, when or callback? (18 Oct)",
+    "person_ask: does Michael answer like a human rep who heard him and asks for the details, rather than passing an empty request on, and once he hears the double charge, does it reach the team (notify_team) with the details, with no who, when or callback? (18 Oct)",
     "stays: Michael stays in the chat and keeps helping, rather than ending or handing him off?",
     "dispute: the double charge is noted for the team (billing), with no refund or fix promised?",
     "first_contact: greeting by the hour and the name in the first reply?",
@@ -1370,7 +1370,9 @@
     "notify_team": {"ok": true, "notified": true}
    },
    "expect": [
-    {"type": "turn_regex", "turn": 0, "regex": "לעזור", "name": "first, he is here to help"},
+    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
+    {"type": "turn_not_regex", "turn": 0, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 0)"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 1)"},
     {"type": "turn_regex", "turn": 0, "regex": "\\?", "name": "the first reply hands the turn back with a question"},
     {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
     {"type": "asks_before", "tool": "notify_team", "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "asks what it is about before the team note"},
@@ -1381,8 +1383,8 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "help_first: does the first reply say, in Michael's own words, that he is here to help, and ask what it is about, instead of passing an empty request on?",
-    "details_second: when he insists, does Michael ask what exactly he needs from the manager and what happened, and say he will try to help or pass it on?",
+    "hears_him: does the first reply sound like a human service rep who heard him and naturally asks for the details, not like a process or a form?",
+    "details_second: when he insists, does Michael stay calm and with him, and ask again for what is missing, without announcing who will handle it?",
     "note_with_details: once he explains, is the complaint noted for the team with what he said, and does Michael say the team knows, with no who, when or callback?",
     "tone: warm and respectful to a man who is upset, not defensive or bureaucratic?",
     "goodbye: a warm close without a question?"
@@ -1406,7 +1408,9 @@
     "notify_team": {"ok": true, "notified": true}
    },
    "expect": [
-    {"type": "turn_regex", "turn": 0, "regex": "לעזור", "name": "first, he is here to help"},
+    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
+    {"type": "turn_not_regex", "turn": 0, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 0)"},
+    {"type": "turn_not_regex", "turn": 1, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 1)"},
     {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
     {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
     {"type": "called", "tool": "notify_team"},
@@ -1415,8 +1419,8 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "help_first: does the first reply offer Michael's own help and ask what it is about?",
-    "details_second: when he insists, is he asked once what exactly he needs, with the promise to help or pass it on?",
+    "hears_him: does the first reply sound like a human rep who heard him and asks what it is about?",
+    "details_second: when he insists, is he asked once more, calmly, for what is missing, without announcing who will handle it?",
     "no_third_ask: when he will not say, is he not pressed again, and is the request noted for the team with what is known?",
     "no_callback: when he wants the manager to know, does Michael say the team knows without promising a call back?",
     "goodbye: a warm close without a question?"
