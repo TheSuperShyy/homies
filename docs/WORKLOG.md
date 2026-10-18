@@ -11,25 +11,25 @@ conversation that produced it.
 
 ## 2026-10-18
 
-### A message for Yariv: why UChat for the inbox, and where the bot and phone agents stand (given in chat)
+### A message for Yariv: why we stay on Chatwoot, and where the bot and phone agents stand (given in chat)
 - **Asked:** *"do you remember the message for yariv based on the chatwoot and Uchat comparison on why we leaned more on the Uchat also a summary update on the chatbot and voice agent"*, with a Google Doc and a claude.ai page given as what was done before. Just before it: *"ok we have zadarma now"*.
 - **Found:**
   - **No such message on record,** in the repo or in any session transcript. The 29 Sep comparison (`docs/features/11-whatsapp-bot/uchat-comparison.md`) recommended **not** moving, and inbox-only if Homies insisted.
   - **Neither reference mentions UChat.** The Google Doc is test transcripts (WhatsApp bot tests, support calls, debt calls). The claude.ai page is the six simulated calls of 8 Oct.
 - **The page read:** the owner first declined it (*"no dont create artifact i mean just a message summary like hey blah blah"*), taking the read for a new page. It went through after a note that it was read-only.
-- **Given in chat, in English plain text, leaning UChat as the owner said:**
-  - **The shape:** UChat replaces only Chatwoot, as in the comparison's Option B. The bot, its checks and its tools stay.
-  - **The reasons, the comparison's verified pluses:**
-    - it is hosted;
-    - the PRD's inbox pieces are built in: departments, passing chats between staff, notes and tags, the bot stepping aside for staff, a phone app and tickets;
-    - broadcasts, and other channels later.
-  - **The cost, stated:** about $80-140 a month and about 3-4 weeks, after the trial checks Hebrew in their inbox and the department routing.
+- **First draft, leaning UChat as the asked wording read:** UChat as the inbox only (Option B), with the comparison's pluses and its cost. It was flagged to the owner that the 29 Sep write-up leaned the other way.
+- **Corrected by the owner:** *"no i mean its because of the structure we stay on the chatwoot because its already built and migration on uchat will mean we will create it from the start again"*. So the decision is the 29 Sep one: **stay on Chatwoot.**
+- **The message given, in English plain text:**
+  - **Why Chatwoot:**
+    - everything is built on it and working: the bot, the inbox, the handover to staff, tickets, payment links, photos, and the phone agents' notes;
+    - a move to UChat means building it again from the start: about 4-7 weeks, and about $80-140 a month more, against Chatwoot's $0 on our server;
+    - we would lose the before-sending checks and the replay tests, since no way to do either was found in UChat;
+    - the inbox work still left (staff in the four departments, routing, summaries) is the same on either platform.
   - **The status:**
     - today's health check, in plain words;
     - the 8 Oct change for women callers;
     - Zadarma as the next phone step;
     - the real WhatsApp number and Meta verification before tenants.
-  - **Flagged to the owner:** the 29 Sep write-up leaned the other way.
 - **Zadarma:**
   - **Known:** only the owner's line. No account details and no `.env` entry yet.
   - **How it would join Vapi:** `docs/reference/Homies-Vapi-Account-Notes.md` gives the route. It is a `byo-sip-trunk` credential (gateway, username, password), and incoming calls are forwarded to `{number}@<credential_id>.sip.vapi.ai`. It is API only, about an hour.

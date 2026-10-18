@@ -353,13 +353,12 @@ hand-off material for a document generator, is `uchat-comparison.md` beside it. 
 seats. Details and the trial checklist, should Homies insist:
 `docs/features/11-whatsapp-bot/context.md`, "29 Sep".
 
-**18 Oct: the owner says the lean is now UChat, for the team inbox only.** The
-message to Yariv (WORKLOG 18 Oct) puts it as the comparison's Option B: UChat
-replaces Chatwoot, and the bot, its before-sending checks and its tools stay.
-It quotes about $80-140 a month and 3-4 weeks, after the trial checks. Nothing
-has moved: Chatwoot is still the live inbox, and the numbers rule above still
-holds. The 29 Sep case against a full move still stands, because a full move
-loses the before-sending checks and the replay gate.
+**18 Oct: we stay on Chatwoot, confirmed by the owner.** The owner's reason:
+*"because of the structure we stay on the chatwoot because its already built
+and migration on uchat will mean we will create it from the start again"*.
+Yariv is told so, with the 29 Sep figures: about 4-7 weeks to rebuild, about
+$80-140 a month more, and the before-sending checks and replay tests lost
+(WORKLOG 18 Oct). Don't reopen the move unless the client asks.
 
 **Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
 21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
