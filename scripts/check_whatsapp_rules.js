@@ -576,6 +576,19 @@ function cases(E) {
   expect('team note: "רוצה שנעביר...?" is an offer, no note', tn('רוצה שנעביר את הפנייה לצוות, שיחזרו אליכם?'), false);
   expect('team note: a plain question makes none', tn('איזה מעצבן. באיזה בניין ובאיזו דירה?'), false);
   expect('team note: notify_team ran', tn('תודה.', [{ action: { tool: 'notify_team' } }]), true);
+  // 18 Oct (n8n_whatsapp_askfirst.py): a request for a manager gets "tell me what it
+  // is about, and I'll try to help or pass it on" before any note. An offer or a
+  // condition in front of the verb is not a report; a report or a call-back promise is.
+  expect('team note: "כדי שאוכל לעזור, או להעביר את זה לצוות…?" asks first, no note',
+    tn('אני כאן בשביל זה 🙂 כדי שאוכל לעזור, או להעביר את זה לצוות עם כל הפרטים, מה בדיוק אתה צריך מהם?'), false);
+  expect('team note: "ואם לא אוכל, אדאג להעביר את זה לצוות" is a condition, no note',
+    tn('ספר לי מה המצב, ואנסה לעזור בעצמי. ואם לא אוכל, אדאג להעביר את זה לצוות או למנהל. מה קרה?'), false);
+  expect('team note: "אשמח לעדכן את הצוות" before the details is an offer, no note',
+    tn('אשמח לעדכן את הצוות, רק ספר לי קודם מה קרה?'), false);
+  expect('team note: a report beside an offer still makes it',
+    tn('העברתי את זה לצוות, ואם תרצה אוכל לעדכן גם את הגבייה.'), true);
+  expect('team note: a call-back promise beside an offer still makes it',
+    tn('אוכל להעביר את זה לצוות, והם יחזרו אליך.'), true);
   const op = (output, S) => () => E.reply.opener({ output }, 0, turn({ S }).$);
   expect('opener: "במה אוכל לעזור לך היום?" after a concrete message is sent back', op('היי! במה אוכל לעזור לך היום?'), false);
   expect('opener: the plural shape is still sent back', op('היי! במה אוכל לעזור לכם היום?'), false);

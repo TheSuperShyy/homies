@@ -111,9 +111,12 @@ def main():
     apply = "--apply" in sys.argv
     prompt = W.system_prompt()                     # check_greeting(): the prompt quotes GREETING_TAIL
     W.check_memory_epoch(prompt=prompt, inject=U.AGENT_NEW, tools=W.tools_text())
-    if W.MEMORY_EPOCH != OLD_EPOCH + 1:
+    if W.MEMORY_EPOCH < OLD_EPOCH + 1:
         sys.exit("REFUSING: this carrier moves the epoch %d -> %d; the repo says %d."
                  % (OLD_EPOCH, OLD_EPOCH + 1, W.MEMORY_EPOCH))
+    # A later epoch owns the prompt and the memory key (18 Oct: askfirst, 79). Sort
+    # and Send stay this carrier's, and check_greeting() still holds the tail.
+    later = W.MEMORY_EPOCH > OLD_EPOCH + 1
     old_prompt = prompt.replace(W.GREETING_TAIL, W.GREETING_TAIL_BEFORE)
 
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
@@ -138,7 +141,7 @@ def main():
     # 2. the prompt and the memory key
     opts = by["Answer the resident"]["parameters"].setdefault("options", {})
     have = opts.get("systemMessage") or ""
-    if have != prompt:
+    if not later and have != prompt:
         if have != old_prompt:
             sys.exit("REFUSING: the live prompt is neither the repo's before (%s) nor after (%s); it is %s."
                      % (W.epoch_hash(old_prompt), W.epoch_hash(prompt), W.epoch_hash(have)))
@@ -146,7 +149,7 @@ def main():
         changes.append("Answer the resident: the ownership clause quotes the new tail (prompt %s -> %s)"
                        % (W.epoch_hash(old_prompt), W.epoch_hash(prompt)))
     mem = by["Conversation so far"]["parameters"]
-    if mem.get("sessionKey") != MEMORY_KEY % W.MEMORY_EPOCH:
+    if not later and mem.get("sessionKey") != MEMORY_KEY % W.MEMORY_EPOCH:
         if mem.get("sessionKey") != MEMORY_KEY % OLD_EPOCH:
             sys.exit("REFUSING: the memory key is %r, not epoch %d." % (mem.get("sessionKey"), OLD_EPOCH))
         mem["sessionKey"] = MEMORY_KEY % W.MEMORY_EPOCH

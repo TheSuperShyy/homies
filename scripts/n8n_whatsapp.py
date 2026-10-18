@@ -203,7 +203,10 @@ TEMPERATURE = 0.6
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 78
+MEMORY_EPOCH = 79
+# 78 -> 79, 18 Oct (n8n_whatsapp_askfirst.py): a request for a manager or a person
+# gets help first, then the questions, and the team note only with the details.
+# The prompt and notify_team's description changed; buffers hold notes made at once.
 # 77 -> 78, 8 Oct (n8n_whatsapp_menuline.py): the menu says "כאן הומי'ז", and the
 # prompt's ownership clause quotes it. The prompt changed, so the hash moved.
 # 76 -> 77, 6 Oct, the same script again: before the emergency's third run, on
@@ -708,7 +711,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "c7a5ce8a699e",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "1b6624a458d8",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -719,7 +722,8 @@ EPOCH_COVERS = {
     # 23 Sep: show_menu now names the third row "talk to a representative".
     # 27 Sep: get_request_status no longer forbids asking for an apartment.
     # 5 Oct: get_balance asks once, explains once; a refusal is a team note.
-    "tools": "9c033bceb5df",
+    # 18 Oct: notify_team waits for the details on a request for a manager.
+    "tools": "9da037e63c61",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1581,10 +1585,19 @@ TOOLS = [
             "they dispute, a document "
             "they need (invoice, receipt, confirmation), moving in or out or a "
             "change of tenant, a contract, a price quote, the committee's own "
-            "business, a request to speak with a person, or anything else that "
+            "business, or anything else that "
             "only a person at Homies can complete. A plain how-much-do-I-owe "
             "question is get_balance's; a fault is open_request's; a ticket's "
             "status is get_request_status's. Those you do yourself.\n"
+            # 18 Oct, the owner: a request for a manager gets help first, then
+            # the questions, and the note only with the details in it.
+            "A request for a manager or a person is not one of these yet: it "
+            "does not say what they need. First say you are here to help and "
+            "ask what it is about; if they still want a manager or the team, "
+            "ask what exactly they need and what happened. Call it once you "
+            "have that, with it in `description` (reason caller_request, unless "
+            "the matter itself has a reason above); if they will not say, call "
+            "it with what you have.\n"
             # 16 Sep, the client's review: no national numbers and no safety
             # instructions from the bot. The note and the ticket are the
             # whole response to an emergency, so they come first.
@@ -1598,7 +1611,8 @@ TOOLS = [
             "sentence must never be written without this call behind it: "
             "calling this is the only thing that tells the team; writing "
             "that you told them tells nobody. Do not ask them to confirm "
-            "first; the ask itself is the reason to call.\n"
+            "first; for a matter past your threshold, the ask itself is the "
+            "reason to call.\n"
             "Once per matter, not per message: a second question about the same "
             "thing is not a second note. A different matter later in the same "
             "conversation is.\n"

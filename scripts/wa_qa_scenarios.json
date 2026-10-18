@@ -985,7 +985,7 @@
     {"type": "last_no_question", "name": "goodbye without a question"}
    ],
    "judge": [
-    "person_ask: does the ask for a person reach the team (notify_team) without asking him to confirm, and does Michael say in his own words that the team knows, with no who, when or callback?",
+    "person_ask: does Michael first offer his own help and ask what it is about, rather than passing an empty request on, and once he hears the double charge, does it reach the team (notify_team) with the details, with no who, when or callback? (18 Oct)",
     "stays: Michael stays in the chat and keeps helping, rather than ending or handing him off?",
     "dispute: the double charge is noted for the team (billing), with no refund or fix promised?",
     "first_contact: greeting by the hour and the name in the first reply?",
@@ -1349,6 +1349,76 @@
     "no_invention: no invented answer about the building's facilities, either way?",
     "unknown: says plainly that he does not have that; record whether he refers the resident to the office (the prompt holds both 'say you do not know and refer to the office' and 'never send a resident anywhere')?",
     "first_contact: greeting by the hour and the name?",
+    "goodbye: a warm close without a question?"
+   ]
+  },
+  {
+   "id": "manager_insists",
+   "title": "asks for a manager, insists, then says what it is: a complaint about the house manager (18 Oct)",
+   "time": "10:40", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-18T10:40:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 6 שרוצה להתלונן על אב הבית, ומתעקש בהתחלה לדבר עם מנהל",
+    "script": [
+     {"say": "אני רוצה לדבר עם מנהל"},
+     {"say": "לא, אני צריך מנהל. זה חשוב"},
+     {"say": "אב הבית דיבר אליי אתמול בצורה ממש לא מכבדת מול השכנים, ואני רוצה שמנהל יטפל בזה"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 6"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "notified": true}
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 0, "regex": "לעזור", "name": "first, he is here to help"},
+    {"type": "turn_regex", "turn": 0, "regex": "\\?", "name": "the first reply hands the turn back with a question"},
+    {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
+    {"type": "asks_before", "tool": "notify_team", "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "asks what it is about before the team note"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
+    {"type": "called", "tool": "notify_team"},
+    {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["אב הבית", "אב בית"], "name": "the note carries what happened"},
+    {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "help_first: does the first reply say, in Michael's own words, that he is here to help, and ask what it is about, instead of passing an empty request on?",
+    "details_second: when he insists, does Michael ask what exactly he needs from the manager and what happened, and say he will try to help or pass it on?",
+    "note_with_details: once he explains, is the complaint noted for the team with what he said, and does Michael say the team knows, with no who, when or callback?",
+    "tone: warm and respectful to a man who is upset, not defensive or bureaucratic?",
+    "goodbye: a warm close without a question?"
+   ]
+  },
+  {
+   "id": "manager_wont_say",
+   "title": "asks for a manager, insists, and will not say why (18 Oct)",
+   "time": "12:15", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-18T12:15:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 11 שרוצה רק מנהל ולא מוכן להסביר לבוט על מה",
+    "script": [
+     {"say": "תעביר אותי למנהל בבקשה"},
+     {"say": "לא צריך עזרה ממך, אני רוצה מנהל"},
+     {"say": "זה עניין אישי, אני לא רוצה לפרט. רק שהמנהל ידע שחיפשתי אותו"},
+     {"if_asked": "building and apartment, or a name", "say": "בר כוכבא 23 דירה 11"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "notified": true}
+   },
+   "expect": [
+    {"type": "turn_regex", "turn": 0, "regex": "לעזור", "name": "first, he is here to help"},
+    {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
+    {"type": "called", "tool": "notify_team"},
+    {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["מנהל"], "name": "the note says he wants a manager"},
+    {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback, even when he asks for one"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "help_first: does the first reply offer Michael's own help and ask what it is about?",
+    "details_second: when he insists, is he asked once what exactly he needs, with the promise to help or pass it on?",
+    "no_third_ask: when he will not say, is he not pressed again, and is the request noted for the team with what is known?",
+    "no_callback: when he wants the manager to know, does Michael say the team knows without promising a call back?",
     "goodbye: a warm close without a question?"
    ]
   }

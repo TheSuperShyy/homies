@@ -737,6 +737,23 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
     5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
+- **18 Oct: WhatsApp, a request for a manager (owner's instruction): built and gate green, NOT LIVE YET.**
+  - **The behaviour:**
+    - "I'm here to help" first;
+    - then what exactly he needs and the situation;
+    - the team note only with the details;
+    - someone who still won't say is noted with what is known.
+  - **The carrier:** `scripts/n8n_whatsapp_askfirst.py`. It changes the prompt, `notify_team`'s description and the team-note backstop (`teamnote.SAID`), and moves the epoch 78 to 79.
+  - **The repo says epoch 79, but live is still 78 until `--apply`.** Until then:
+    - live dry runs of the prompt-following patchers are expected to be not idle;
+    - never `--apply` any of them alone.
+  - **Left:**
+    - the Claude-played deck (in progress; the three manager and typed-person chats came out right);
+    - the new pins in `check_whatsapp_rules.py`;
+    - `--apply`, then the check on live and every patcher idle;
+    - the owner's handset, then `--watch`.
+  - **Undo:** the snapshot is `docs/handover/n8n-whatsapp-live-18oct-before-askfirst.json`; `--restore` puts it back.
+  - **The phone agents were not changed** (CONTEXT, "A request for a manager").
 - **18 Oct: Zadarma** (owner: *"we have zadarma now"*).
   - **What we have:** no details yet, and nothing in `.env`.
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.

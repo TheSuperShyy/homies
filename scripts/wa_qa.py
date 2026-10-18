@@ -729,6 +729,9 @@ def expectations(scen, turns, results):
             ok = not any(n == e["tool"] for _, n, _, _ in calls)
         elif typ == "called_on_turn":
             ok = any(n == e["tool"] and i == e["turn"] for i, n, _, _ in calls)
+        elif typ == "not_called_before":
+            # 18 Oct: a request for a manager is noted only after the questions.
+            ok = not any(n == e["tool"] and i < e["turn"] for i, n, _, _ in calls)
         elif typ in ("arg_contains", "arg_not_contains", "arg_equals"):
             vals = [str(a.get(e["arg"], "")) for _, n, a, _ in calls if n == e["tool"]]
             if not vals:

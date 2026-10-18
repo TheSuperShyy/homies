@@ -118,6 +118,14 @@ SAID = ("(() => { const t = String($json.output || ''); "
         "const promised = /((יחזרו|יחזור|נחזור) (אליכם|אליך|אלייך)|(יצרו|ייצרו|ניצור|יצור) (אתכם|איתכם|אתך|איתך) קשר)/.test(t); "
         "if (!told && !promised) return false; "
         "if (/(שאעביר|האם להעביר|רוצים שנעביר|רוצה שנעביר|רוצים שאעביר|שאעדכן|האם לעדכן|רוצים שאעדכן|שארשום|האם לרשום|רוצים שארשום)/.test(t)) return false; "
+        # 18 Oct (n8n_whatsapp_askfirst.py): an offer or a condition in front of
+        # the verb is not a report either. A request for a manager now gets "tell
+        # me what it is about, and I'll try to help or pass it on" before any
+        # note, and that sentence must not note an empty request. A past-tense
+        # report or a call-back promise in the same reply still makes the note.
+        "if (!promised && !/(עדכנתי|הודעתי|מסרתי|רשמתי|העברתי|העברנו)/.test(t) && "
+        "/((אשמח|אוכל|יכול|יכולה|אפשר|כדי|נוכל|אנסה|ננסה|או)( [א-ת]+)? (להעביר|לעדכן|לרשום|למסור)|"
+        "אם לא[^.!?]{0,40}(אעביר|אעדכן|ארשום|אמסור|להעביר|לעדכן|לרשום|למסור))/.test(t)) return false; "
         "return true; })()")
 
 NOTE_THIS_TURN = "={{ %s || %s }}" % (TOOL_RAN, SAID)
