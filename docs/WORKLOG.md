@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-10-18
 
+### Omnitelecom: extension 208 is set up for the bot; they ask for an email and the bot's address
+- **The email (Hebrew),** pasted by the owner. Kept in the gitignored `local/omnitelecom/2026-10-18-extension-208-email.txt`.
+  - **Done on their side:** the dialer ("תותח שיחות") is set up in the PBX, linked to the bot. The bot's extension is **208**.
+  - **They ask for:**
+    - a dedicated email for 208 in Tokomni, the new dashboard;
+    - the address of the bot's server to send calls to, "or any other detail" they need to reach us.
+- **What answers it:**
+  - **The email:** Homies gives it (Yariv), one address only for 208.
+  - **The address:** a Vapi SIP address, `sip:<name>@sip.vapi.ai`, with a digest username and password. That login is Omni's "username and password" of 12 Oct. The address does not exist yet. Creating it writes to the Vapi account, so it waits on the owner's go.
+  - **First routing:** the address answers with the incoming agent.
+    - Menu calls are then right.
+    - Dialer calls reach Michael without the tenant's figures. That lasts until Omni sends the external_id header and our `assistant-request` picks the agent per call (CONTEXT, 12 Oct).
+- **The reply,** drafted in chat in Hebrew with an English gloss:
+  - **The details:** the email, then the SIP address, username and password.
+  - **Asked again, briefly:**
+    - the external_id header on dialer calls (menu calls come without it);
+    - one attempt with no retries;
+    - the token and campaign id.
+- **Nothing created, nothing sent.**
+
 ### A message for Yariv: why we stay on Chatwoot, and where the bot and phone agents stand (given in chat)
 - **Asked:** *"do you remember the message for yariv based on the chatwoot and Uchat comparison on why we leaned more on the Uchat also a summary update on the chatbot and voice agent"*, with a Google Doc and a claude.ai page given as what was done before. Just before it: *"ok we have zadarma now"*.
 - **Found:**

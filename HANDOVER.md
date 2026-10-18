@@ -742,6 +742,12 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
+- **18 Oct: Omni set up the dialer with extension 208 for the bot** (email in `local/omnitelecom/`, WORKLOG 18 Oct).
+  - **They ask for:**
+    - a dedicated email for 208, from Homies;
+    - the bot's address and login.
+  - **Next, on the owner's go:** create the Vapi SIP address (`sip:<name>@sip.vapi.ai`, digest username and password, kept in `.env` only). Point it at the incoming agent first, then fill the drafted Hebrew reply and send it.
+  - **The dialer side waits on Omni's external_id header,** plus our `assistant-request` router that picks the agent.
 - **12 Oct: Omni wrote that they are starting the Tokomni move and asked for the dialer setup** (email in `local/omnitelecom/`, WORKLOG 12 Oct).
   - **Their asks:**
     - which extensions go on the dialer (25 ₪ a month each, an email each);
