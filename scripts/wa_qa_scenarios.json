@@ -1370,13 +1370,13 @@
     "notify_team": {"ok": true, "notified": true}
    },
    "expect": [
-    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
+    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
     {"type": "turn_not_regex", "turn": 0, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 0)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 1)"},
     {"type": "turn_regex", "turn": 0, "regex": "\\?", "name": "the first reply hands the turn back with a question"},
     {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
-    {"type": "asks_before", "tool": "notify_team", "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "asks what it is about before the team note"},
-    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
+    {"type": "asks_before", "tool": "notify_team", "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "asks what it is about before the team note"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
     {"type": "called", "tool": "notify_team"},
     {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["אב הבית", "אב בית"], "name": "the note carries what happened"},
     {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback"},
@@ -1408,11 +1408,11 @@
     "notify_team": {"ok": true, "notified": true}
    },
    "expect": [
-    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
+    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the first reply asks for the details"},
     {"type": "turn_not_regex", "turn": 0, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 0)"},
     {"type": "turn_not_regex", "turn": 1, "regex": "(אעביר|להעביר|אעדכן|לעדכן|ארשום|לרשום|אמסור|למסור)[^.?!]{0,25}(למנהל|לצוות|את הצוות|להנהלה|למחלקה)|מנהל יחזור|מנהל יתקשר", "name": "no talk of passing it on before the details (turn 1)"},
     {"type": "not_called_before", "tool": "notify_team", "turn": 2, "name": "no team note on the first two replies"},
-    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|במה מדובר|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
+    {"type": "turn_regex", "turn": 1, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the second reply asks what exactly and the situation"},
     {"type": "called", "tool": "notify_team"},
     {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["מנהל"], "name": "the note says he wants a manager"},
     {"type": "bot_not_regex", "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך", "name": "no who, no when, no callback, even when he asks for one"},

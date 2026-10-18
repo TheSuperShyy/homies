@@ -737,16 +737,18 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
     5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
-- **18 Oct, later: the manager request, worded like a person at a service desk (`n8n_whatsapp_hearyou.py`, epoch 80): built, gate green, NOT LIVE YET.**
+- **18 Oct, later: the manager request, worded like a person at a service desk (`n8n_whatsapp_hearyou.py`, epoch 80): LIVE 14:13 UTC.**
   - **Why:** the owner rejected 79's feel ("natural like a call center but human like yes i hear you can i get some details ... lowkey trying to fix everything by yourself").
-  - **The repo says 80, but live is 79 until `--apply`.** Until then, never `--apply` another prompt-following patcher alone.
-  - **Left:**
-    - the Claude-played check (in progress);
-    - the new pins;
-    - `--apply`, then the checks on live;
-    - the owner's handset, then `--watch`.
+  - **Now:** Michael shows he heard and asks for the details. He never talks about passing it on before he has them.
+  - **Checked:**
+    - 5 Claude-played chats, 37 of 37;
+    - the gate on the candidate and on live, 318 of 318;
+    - patchers idle but the baseline 6.
+  - **Owed:**
+    - the owner asks for a manager from the test phone;
+    - then `--watch 2026-10-18T14:13`.
   - **Undo:** `--restore` from `docs/handover/n8n-whatsapp-live-18oct-before-hearyou.json`.
-- **18 Oct: WhatsApp, a request for a manager (owner's instruction): LIVE 13:55 UTC, epoch 79.**
+- **18 Oct: WhatsApp, a request for a manager (owner's instruction): LIVE 13:55 UTC, epoch 79** (its wording replaced by epoch 80 above; the backstop change below stays).
   - **The behaviour:**
     - "I'm here to help" first;
     - then what exactly he needs and the situation;

@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-18
 
-### WhatsApp bot: the manager request, answered like a person at a service desk (epoch 80)
+### WhatsApp bot: the manager request, answered like a person at a service desk (LIVE 14:13 UTC, epoch 80)
 - **The owner, on the 79 test chat:** *"no not like that i want it to be natural like a call center but human like yes i hear you can i get some details and stuff like lowkey trying to fix everything by yourself before following up and sending it to the team"*.
 - **Why 79 read wrong:** its passage told Michael what to SAY ("say you are here to help"; "say you will try yourself, and if not, pass it on"). The model said it nearly word for word: "אנסה קודם לעזור בעצמי, ואם לא אוכל, אעביר את זה למנהל".
 - **Changed (`scripts/n8n_whatsapp_hearyou.py`):**
@@ -30,7 +30,25 @@ conversation that produced it.
   - **Replay:** 0 changes.
   - **Pins:** fail only on the prompt and `notify_team`, as expected.
   - **Idle check:** baseline 6 only; `askfirst` stands down under the later epoch.
-- **Claude-played** (`qa_hearyou`): `manager_insists`, `manager_wont_say`, `rep_typed`, `tap_rep`, `price_quote` (in progress).
+- **Claude-played** (`qa_hearyou`): `manager_insists`, `manager_wont_say`, `rep_typed`, `tap_rep`, `price_quote`.
+  - **Graded:** 18 turns, 37 of 37 expectations, no guard rejection.
+    - The one miss on the first grade was the deck's: the ask regex had "במה מדובר" but not "על מה מדובר". It now takes both.
+  - **The manager chat:**
+    1. "בוקר טוב, כאן מיכאל מהומי'ז. אני איתך, ספר לי מה קרה ומה אתה צריך?"
+    2. On "לא, אני צריך מנהל": "מה שחשוב לך חשוב גם לי. על מה מדובר?"
+    3. On the details: the note with them, "העברתי לצוות את מה שקרה... והם יודעים".
+  - **The one who won't say**, on the second insistence: "לא צריך להיכנס לכל הפרטים, גם כמה מילים מספיקות. על מה העניין?". Then the note, "a personal matter".
+  - **Unchanged:** a disputed charge and a quote are still noted at once.
+- **Pins:** `ec350702a4ca` / `8f115297c529`. The gate on the candidate was all green.
+- **LIVE 14:13 UTC:** `n8n_whatsapp_hearyou.py --apply` (live `updatedAt` 14:13:55).
+  - **Read back:** prompt `ec350702a4ca`, `notify_team` `5656de378175`, key `-80`.
+  - **After:**
+    - the carrier reports nothing to do;
+    - the gate on live: 318 of 318, all green;
+    - patchers idle but the baseline 6.
+- **Owed:**
+  - the owner asks for a manager from the test phone;
+  - then `check_whatsapp_rules.py --watch 2026-10-18T14:13`.
 
 ### WhatsApp bot: a request for a manager gets help first, then the questions, then the note (LIVE 13:55 UTC, epoch 79)
 - **Asked (pasted by the owner):** *"when somebody asks for a manager ..., we need to just ask him, 'Hey, I'm here to help you.' This is the first message. In the second message, if he still needs a manager or something from the team, we need to ask the questions, like, 'What do you need? What exact thing do you need from the team? Explain the situation to me, and I will try to help you, or I will send it to the team or the manager.' ... we need to get the information before we open a ticket with the team."*

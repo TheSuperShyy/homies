@@ -110,7 +110,11 @@ PINS = {
     # manager_wont_say, rep_typed, tap_rep, fem_rep_tap, price_quote,
     # pay_link_missing, neighbor_noise, cancel_ticket, angry_repeat; 28 turns,
     # 59/59 expectations, no guard rejection, no rubric flag.
-    'Answer the resident / system': '1b6624a458d8',
+    # 18 Oct, later (n8n_whatsapp_hearyou.py, epoch 80): the same request answered
+    # like a person at a service desk, not a process; notify_team's text with it.
+    # Claude-played on the candidate: manager_insists, manager_wont_say, rep_typed,
+    # tap_rep, price_quote; 18 turns, 37/37 expectations, no guard rejection.
+    'Answer the resident / system': 'ec350702a4ca',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -122,7 +126,7 @@ PINS = {
     'get_payment_link / tool': '58ab6a539158',
     'get_request_status / tool': '76e812f28aaa',
     'get_service_info / tool': '6223a04ed17f',
-    'notify_team / tool': '5a0ff882fe70',
+    'notify_team / tool': '8f115297c529',
     'open_request / tool': '8e8e45124b09',
     'show_menu / tool': '58aeda4b4677',
     'verify_address / tool': 'a2a85a3d4068',
