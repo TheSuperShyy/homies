@@ -4203,7 +4203,8 @@ why and rejected alternatives).
 - **A message or update for Yariv is a Hebrew WhatsApp text (18 Oct, from the
   owner's own sent update).** It opens "עדכון קצר לגבי ההתקדמות:", has one
   plain paragraph per topic starting "לגבי …,", and closes "תודה!". What a part
-  does goes as short "- " lines (the owner: "the list of things it do"). No
+  does goes as short "- " lines of a few plain words each (the owner: "the
+  list of things it do", then "in simple terms"). No
   bold, no artifact. Give it in a code block, ready to paste.
 
 ---

@@ -35,6 +35,7 @@ conversation that produced it.
   - **The bot:** done, but on the test number, followed by the full list of what it does.
   - **The phone agents:** what changed in Michael's manner since 16 Sep, then each agent's list, read from the live prompts' tool sentences.
   - **Left out on purpose:** "tickets go into OXS", because the mirror is on for the owner's test number only. The owner was told why.
+- **Then "in simple terms":** the same coverage, but each list item became a few plain words, and the Chatwoot part became one short paragraph.
 - **Zadarma:**
   - **Known:** only the owner's line. No account details and no `.env` entry yet.
   - **How it would join Vapi:** `docs/reference/Homies-Vapi-Account-Notes.md` gives the route. It is a `byo-sip-trunk` credential (gateway, username, password), and incoming calls are forwarded to `{number}@<credential_id>.sip.vapi.ai`. It is API only, about an hour.
