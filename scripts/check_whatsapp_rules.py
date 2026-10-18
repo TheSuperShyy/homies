@@ -104,7 +104,13 @@ PINS = {
     # menu's new tail, "👋 כאן הומי'ז. במה אפשר לעזור?". Claude-played on the
     # candidate: tap_open, status_tap, tap_rep, hello_then_matter, rep_fine_thanks;
     # 17 turns, 34/34 expectations, no guard rejection, no rubric flag.
-    'Answer the resident / system': 'c7a5ce8a699e',
+    # 18 Oct (n8n_whatsapp_askfirst.py, epoch 79): a request for a manager gets help
+    # first, then the questions, and the team note only with the details; with it
+    # notify_team's text. Claude-played on the candidate: manager_insists,
+    # manager_wont_say, rep_typed, tap_rep, fem_rep_tap, price_quote,
+    # pay_link_missing, neighbor_noise, cancel_ticket, angry_repeat; 28 turns,
+    # 59/59 expectations, no guard rejection, no rubric flag.
+    'Answer the resident / system': '1b6624a458d8',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -116,7 +122,7 @@ PINS = {
     'get_payment_link / tool': '58ab6a539158',
     'get_request_status / tool': '76e812f28aaa',
     'get_service_info / tool': '6223a04ed17f',
-    'notify_team / tool': '66859110a246',
+    'notify_team / tool': '5a0ff882fe70',
     'open_request / tool': '8e8e45124b09',
     'show_menu / tool': '58aeda4b4677',
     'verify_address / tool': 'a2a85a3d4068',

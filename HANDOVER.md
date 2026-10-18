@@ -737,23 +737,23 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
     5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
-- **18 Oct: WhatsApp, a request for a manager (owner's instruction): built and gate green, NOT LIVE YET.**
+- **18 Oct: WhatsApp, a request for a manager (owner's instruction): LIVE 13:55 UTC, epoch 79.**
   - **The behaviour:**
     - "I'm here to help" first;
     - then what exactly he needs and the situation;
     - the team note only with the details;
     - someone who still won't say is noted with what is known.
-  - **The carrier:** `scripts/n8n_whatsapp_askfirst.py`. It changes the prompt, `notify_team`'s description and the team-note backstop (`teamnote.SAID`), and moves the epoch 78 to 79.
-  - **The repo says epoch 79, but live is still 78 until `--apply`.** Until then:
-    - live dry runs of the prompt-following patchers are expected to be not idle;
-    - never `--apply` any of them alone.
-  - **Left:**
-    - the Claude-played deck (in progress; the three manager and typed-person chats came out right);
-    - the new pins in `check_whatsapp_rules.py`;
-    - `--apply`, then the check on live and every patcher idle;
-    - the owner's handset, then `--watch`.
-  - **Undo:** the snapshot is `docs/handover/n8n-whatsapp-live-18oct-before-askfirst.json`; `--restore` puts it back.
+  - **The carrier:** `scripts/n8n_whatsapp_askfirst.py`. It changed the prompt (`1b6624a458d8`), `notify_team`'s description and the team-note backstop (`teamnote.SAID`, which no longer reads an offer as a report), and moved the memory key to `-79`.
+  - **Checked:**
+    - the gate on the candidate and on live, 318 of 318;
+    - every patcher idle but the baseline 6;
+    - 10 Claude-played chats, 59 of 59.
+  - **Owed:**
+    - the owner asks for a manager from the test phone;
+    - then `check_whatsapp_rules.py --watch 2026-10-18T13:55`.
+  - **Undo:** `--restore` from `docs/handover/n8n-whatsapp-live-18oct-before-askfirst.json`, then revert the repo.
   - **The phone agents were not changed** (CONTEXT, "A request for a manager").
+  - **A deck quirk, tests only:** `wa_qa_scenarios.json`'s `iso` is three hours behind `time` while carrying `+03:00`, so an ack's hour word in a test can be wrong.
 - **18 Oct: Zadarma** (owner: *"we have zadarma now"*).
   - **What we have:** no details yet, and nothing in `.env`.
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.

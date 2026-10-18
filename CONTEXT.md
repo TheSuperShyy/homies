@@ -2495,7 +2495,7 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
 
 ## A request for a manager: help first, then the details, then the note
 
-18 Oct, epoch 79 (`scripts/n8n_whatsapp_askfirst.py`), on the owner's instruction:
+18 Oct, epoch 79 (`scripts/n8n_whatsapp_askfirst.py`, live 13:55 UTC), on the owner's instruction:
 - **First reply:** "I'm here to help you".
 - **Second reply, if he still wants a manager or the team:** ask what exactly he needs and what the situation is, and say Michael will try to help or pass it on.
 - **The team note comes only with the information.**

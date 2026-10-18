@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-18
 
-### WhatsApp bot: a request for a manager gets help first, then the questions, then the note (epoch 79)
+### WhatsApp bot: a request for a manager gets help first, then the questions, then the note (LIVE 13:55 UTC, epoch 79)
 - **Asked (pasted by the owner):** *"when somebody asks for a manager ..., we need to just ask him, 'Hey, I'm here to help you.' This is the first message. In the second message, if he still needs a manager or something from the team, we need to ask the questions, like, 'What do you need? What exact thing do you need from the team? Explain the situation to me, and I will try to help you, or I will send it to the team or the manager.' ... we need to get the information before we open a ticket with the team."*
 - **Found:** three texts made the bot note a request for a person at once.
   1. **The prompt's list of things past the bot** carried "בקשה לדבר עם בן אדם", noted at once.
@@ -38,6 +38,28 @@ conversation that produced it.
   - **Idle check:** baseline 6 only.
   - **The backstop over all 1,048 past bot replies:** 105 notes before, 103 after. The two that change are offers ("אני יכול לעדכן את הצוות... האם תרצו שאעשה זאת?", "אם תרצו, אוכל לרשום את הבקשה שלכם לצוות"), which wrongly made a note before.
 - **Deck:** `manager_insists` and `manager_wont_say` added to `wa_qa_scenarios.json`, with a new expectation type `not_called_before` in `wa_qa.py`. `rep_typed`'s judge line now asks for help first.
+- **Claude-played on the candidate** (`wa_qa.py bundle --candidate`; three players, blind to the expectations).
+  - **The chats:** the two new ones, `rep_typed`, and the seven others that make a team note (`tap_rep`, `fem_rep_tap`, `price_quote`, `pay_link_missing`, `neighbor_noise`, `cancel_ticket`, `angry_repeat`).
+  - **Graded:** 10 chats, 28 turns, 59 of 59 expectations, no guard rejection, no rubric flag.
+  - **The manager chat:**
+    1. "בוקר טוב, כאן מיכאל מהומי'ז. אני כאן כדי לעזור לך 🙂 ספר לי במה מדובר?"
+    2. On "לא, אני צריך מנהל": "אני איתך. אנסה קודם לעזור בעצמי, ואם לא אוכל, אעביר את זה למנהל. מה קרה, ומה אתה צריך ממנו?"
+    3. On the house manager's rudeness: the note (`caller_request`, management) with what happened, and "רשמתי לצוות את מה שקרה... אז הם יודעים".
+  - **The one who won't say:** noted on the third message as "a personal matter, wants the manager to know", with no call-back promised.
+  - **Unchanged:** a disputed charge, a quote and a missing link are still noted at once.
+- **Pins:** `Answer the resident / system` became `1b6624a458d8` and `notify_team / tool` became `5a0ff882fe70`. The gate on the candidate was all green.
+- **LIVE 13:55 UTC:** `n8n_whatsapp_askfirst.py --apply`, 13:55:14-13:55:20 (live `updatedAt` 13:55:17).
+  - **Read back:** prompt `1b6624a458d8`, `notify_team` `76838431c158`, backstop `fb7af852e2cd`, memory key `-79`.
+  - **After:**
+    - the carrier reports nothing to do;
+    - `check_whatsapp_rules.py` on live: 318 of 318, all green;
+    - every patcher's dry run on a dump of live is idle except the baseline 6.
+  - **Every chat's memory starts fresh** (epoch 79).
+- **Owed:**
+  - the owner asks for a manager from the test phone;
+  - then `check_whatsapp_rules.py --watch 2026-10-18T13:55`.
+- **Not changed:** the phone agents, which still pass a request for a person on at once.
+- **On the side:** the deck's `iso` runs three hours behind each scenario's `time` while carrying `+03:00`. So the payment ack's hour word in a test can be wrong (a "בוקר טוב" ack at 14:00 in `pay_link_missing`). This affects tests only; the live bot uses the real clock.
 
 ### Omnitelecom: extension 208 is set up for the bot; they ask for an email and the bot's address
 - **The email (Hebrew),** pasted by the owner. Kept in the gitignored `local/omnitelecom/2026-10-18-extension-208-email.txt`.
