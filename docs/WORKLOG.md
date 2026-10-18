@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-10-18
 
+### WhatsApp bot: a request for a manager gets help first, then the questions, then the note (epoch 79)
+- **Asked (pasted by the owner):** *"when somebody asks for a manager ..., we need to just ask him, 'Hey, I'm here to help you.' This is the first message. In the second message, if he still needs a manager or something from the team, we need to ask the questions, like, 'What do you need? What exact thing do you need from the team? Explain the situation to me, and I will try to help you, or I will send it to the team or the manager.' ... we need to get the information before we open a ticket with the team."*
+- **Found:** three texts made the bot note a request for a person at once.
+  1. **The prompt's list of things past the bot** carried "בקשה לדבר עם בן אדם", noted at once.
+  2. **The identity paragraph** said a person, if preferred, is passed on.
+  3. **`notify_team`'s description** listed "a request to speak with a person" and said "the ask itself is the reason to call".
+  - So the team read "wants a person" and nothing else.
+- **Changed (all in one carrier, `scripts/n8n_whatsapp_askfirst.py`):**
+  - **The prompt** (`prompt.md`, with an "18 Oct" note):
+    - the request left the list;
+    - a passage now describes the two steps without scripting them: say he is here to help and ask what it is about; if he still wants a manager, ask what exactly and the situation, and say he will try to help or pass it on;
+    - the note goes with the details;
+    - someone who still won't say is not asked a third time and is noted with what is known (our addition, so nobody is asked in a loop);
+    - the identity paragraph's "prefers a person" now follows the same path.
+  - **`notify_team`'s description** says the same. "The ask itself is the reason" now applies to a matter past the threshold only.
+  - **The team-note backstop** (`teamnote.SAID`, live in `Team note this turn?`) stops reading an offer or a condition as "the team knows". Examples: "כדי שאוכל לעזור, או להעביר את זה לצוות", "אשמח לעדכן את הצוות", "ואם לא אוכל, אדאג להעביר".
+    - **Why:** without it, the new second message would make the backstop note an empty request.
+    - **Unchanged:** a past-tense report or a call-back promise in the same reply still makes the note.
+  - **Memory epoch** 78 to 79.
+  - **`n8n_whatsapp_menuline.py`** stands down when a later epoch owns the prompt and key, like the other carriers.
+- **Gate on the candidate:**
+  - **Cases:** 318 of 318, five of them new (offers and conditions make no note; a report or a promise beside an offer still does).
+  - **Replay:** 0 changes.
+  - **Pins:** fail only on the prompt and `notify_team`, as expected.
+  - **Idle check:** baseline 6 only.
+  - **The backstop over all 1,048 past bot replies:** 105 notes before, 103 after. The two that change are offers ("אני יכול לעדכן את הצוות... האם תרצו שאעשה זאת?", "אם תרצו, אוכל לרשום את הבקשה שלכם לצוות"), which wrongly made a note before.
+- **Deck:** `manager_insists` and `manager_wont_say` added to `wa_qa_scenarios.json`, with a new expectation type `not_called_before` in `wa_qa.py`. `rep_typed`'s judge line now asks for help first.
+
 ### Omnitelecom: extension 208 is set up for the bot; they ask for an email and the bot's address
 - **The email (Hebrew),** pasted by the owner. Kept in the gitignored `local/omnitelecom/2026-10-18-extension-208-email.txt`.
   - **Done on their side:** the dialer ("תותח שיחות") is set up in the PBX, linked to the bot. The bot's extension is **208**.

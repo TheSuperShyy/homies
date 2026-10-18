@@ -2493,6 +2493,25 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
   `how-are-you-again`; the tap's how-are-you does not count as a second question). The
   Claude-played deck (33 conversations): all 5 taps right, 0 greeting flags anywhere else.
 
+## A request for a manager: help first, then the details, then the note
+
+18 Oct, epoch 79 (`scripts/n8n_whatsapp_askfirst.py`), on the owner's instruction:
+- **First reply:** "I'm here to help you".
+- **Second reply, if he still wants a manager or the team:** ask what exactly he needs and what the situation is, and say Michael will try to help or pass it on.
+- **The team note comes only with the information.**
+
+- **Where it lives:**
+  - the prompt's passage right after "בקשה שמעבר לך נרשמת", described, not scripted;
+  - the identity paragraph's "prefers a person";
+  - `notify_team`'s description.
+
+  The request is no longer on the list of things noted at once. Someone who still won't say after the second question is noted with what is known, so nobody is asked in a loop.
+- **An offer is not a report.** The team-note backstop (`teamnote.SAID`) used to make a note whenever a reply put a pass-on verb next to a team, so "כדי שאוכל לעזור, או להעביר את זה לצוות, ספר לי…" would have noted an empty request.
+  - **Now:** a verb with an offer or a condition in front of it ("אוכל / אשמח / כדי / או להעביר", "ואם לא… אעביר") is not "the team knows".
+  - **Unless:** the same reply also has a past-tense report or a call-back promise.
+  - **Over the 1,048 past replies:** two notes change, both offers that should never have made one.
+- **The phone agents still pass a request for a person on at once** (their prompts and `vapi_tools.py`). That was not part of this change; chatbot first.
+
 ## A gatekeeper model's NONE is not a guard; the necessary condition goes in code
 
 1 Oct, evening (`scripts/n8n_whatsapp_payack.py`, live 14:20 UTC). `Worth a word?` writes the "one moment, I'm
