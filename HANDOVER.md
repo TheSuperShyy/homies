@@ -729,6 +729,14 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **A stuck agent** opens a ticket rather than transferring.
   - **Open, and it is the deal-breaker:** our side told Omni "a webhook" for handing calls to the agent. A webhook cannot carry the audio; the answered call has to be forwarded to our Vapi SIP address (Route B below). Settle this with Omni before anything else.
   - **7 Oct: Omni asked for sample payloads; they have sent NO API key** (owner's correction). Their current setup can't take an AI agent until the Tokomni move. The Hebrew email asks for a token and campaign id. **12 Oct: Homies agreed to the move and the plan** (owner); on 7 Oct it had not. Three samples were drafted for the owner to send (insert request, SIP forward with `x-resident_id`, optional call-result JSON): `docs/features/15-call-button/context.md`, "7 Oct". No Vapi address or endpoint exists yet; both wait on Omni confirming the SIP forward.
+- **18 Oct health check (WORKLOG 18 Oct):** everything built is green, read-only checked.
+  - **Before tenants:**
+    1. **The real WhatsApp number:** the bot is on Meta's test number, so Homies' real number and business verification are needed.
+    2. **One live "hi" on WhatsApp:** idle since 7 Oct, and the 8 Oct menu line has never run live.
+    3. **Test calls on both phone agents** since the 8 Oct edits.
+    4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
+    5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
+    6. **Push the eight dashboard files** that are on this branch but not on `main`.
 - **12 Oct: Omni wrote that they are starting the Tokomni move and asked for the dialer setup** (email in `local/omnitelecom/`, WORKLOG 12 Oct).
   - **Their asks:**
     - which extensions go on the dialer (25 ₪ a month each, an email each);

@@ -9,6 +9,38 @@ conversation that produced it.
 
 ---
 
+## 2026-10-18
+
+### Full health check, bot to voice, for Yariv's "is everything ready?"
+- **Asked:** *"verify everything from chatbot to voice agent if everything is working properly"*, with Yariv's message asking whether tickets, WhatsApp replies and updates, and customer info are ready.
+- **How:** read-only and free throughout, plus the self-checks that clean up after themselves. No message was sent to the bot (that would spend OpenRouter credit without the owner's go), and nothing was written live.
+- **Green:**
+  - **OpenRouter:** the wallet holds $18.34, and the key's cap has $13.29 left.
+  - **Bot rules gate:** 313/313, with the live text matching its pins.
+  - **Knowledge check:** 29/29.
+  - **n8n:** 7 workflows active. 10,030 executions since 13 Oct 16:07, the log's pruned window, with 0 errors.
+  - **The inbox-to-bot link:** WhatsApp inbox 1 is linked to the agent bot, which points at `/webhook/homies-whatsapp` with the current secret.
+  - **Meta:** the number is CONNECTED and GREEN; `ticket_resolved_he` and `payment_link_he` are APPROVED; our app is subscribed. The live token (`WHATSAPP_ACCESS_TOKEN`) is valid; `WHATSAPP_TOKEN` is dead since 8 Aug and unused.
+  - **Edge Function:** v118 ACTIVE, the same as the repo, and it refuses calls without the secret (401).
+  - **Tool checks:**
+    - `check_tools.py` via n8n: 18/18.
+    - Direct to Supabase, the live agents' route: 13/18. The 5 are the known "no charge on this call" money cases; the fixture carries no charge since feature 14.
+    - `check_paylink.py` refusals: 5/5.
+    - `check_media.py`: 6/6.
+    - All probe rows deleted.
+  - **OXS imports:** the GitHub Actions all succeed, with tickets seen today at 04:57 UTC and residents and debts updated on 17 Oct.
+  - **Ticket-closed notices:** both ever sent went out (23 Sep, 6 Oct).
+  - **Vapi:** both agents equal the repo (prompt, first message, model, tools, call settings, voice, dictionary). The calls since 7 Oct were all browser calls and all ended normally. No phone number is connected (Omni).
+  - **Dashboard:** production `cf9f141` READY 8 Oct; the login page answers 200.
+- **Not ready or not proven:**
+  1. The bot runs on Meta's **test number** (WABA "Test WhatsApp Business Account", business verification `pending_submission`). Only verified test phones can reach it, so going live needs Homies' real number and Meta verification.
+  2. Nothing has messaged the bot since 7 Oct 12:02, so the 8 Oct menu line has never run live. The owner's handset "hi" is still owed.
+  3. Since the 8 Oct voice edits there has been one 13-second debt call; both agents' test calls are still owed.
+  4. The webhook secret is still the one in the public repo's August snapshot. Rotation is not done; the owner decides.
+  5. The Vapi balance has no API; check it in the dashboard.
+  6. Eight dashboard files on this branch are not on `main`, for example the "status not saved" notice on Tickets.
+- **Given in chat:** a status reply for Yariv, in English and Hebrew.
+
 ## 2026-10-12
 
 ### Omnitelecom: "we will begin your migration", and what they need for the dialer and the bot
