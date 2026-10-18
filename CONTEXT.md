@@ -353,6 +353,14 @@ hand-off material for a document generator, is `uchat-comparison.md` beside it. 
 seats. Details and the trial checklist, should Homies insist:
 `docs/features/11-whatsapp-bot/context.md`, "29 Sep".
 
+**18 Oct: the owner says the lean is now UChat, for the team inbox only.** The
+message to Yariv (WORKLOG 18 Oct) puts it as the comparison's Option B: UChat
+replaces Chatwoot, and the bot, its before-sending checks and its tools stay.
+It quotes about $80-140 a month and 3-4 weeks, after the trial checks. Nothing
+has moved: Chatwoot is still the live inbox, and the numbers rule above still
+holds. The 29 Sep case against a full move still stands, because a full move
+loses the before-sending checks and the replay gate.
+
 **Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
 21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
 Meta, which beats the app-level subscription, so the number moves the moment the
@@ -2777,6 +2785,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
 - **Omni's "username and password for the bot's address" is Vapi's SIP auth (12 Oct).** The answered dialer call goes to a Vapi free SIP address (`provider: vapi`, `sipUri`), which can demand a username and password on every incoming INVITE (`authentication`, digest). With no assistant on that address, Vapi asks our server (`assistant-request`) which assistant to use. That is where the tenant is found from Omni's header, so the debt agent gets its variables. Never offer Omni an agent login instead.
 - **The dialer shows the office's own number, for now (owner, 12 Oct: "for now we can start at a single number").** A separate 077 number was recommended first, and the reason stays in case of spam tags:  calling many tenants about money from the office's main number risks caller-ID apps tagging it as spam, and then every office call carries the tag. A dedicated 077 number costs 4 ₪ a month, and call-backs to it are routed to the office. Only the agent's extension goes on the dialer: the agent never hands a live call to staff. That extension is a new one dedicated to the outbound agent (owner, 12 Oct). Reusing a staff extension could reroute the incoming menu, and nobody holds the map of who uses which.
 - **ONE extension for both directions, by Homies' choice with Omni (Yariv, 12 Oct), superseding the two-extension advice below.** The main number's menu (e.g. press 5, "Michael") rings the bot's extension, and the dialer's answered calls go to the same extension. So our side must tell the two apart per call: we asked Omni to send them to two SIP addresses, or to mark dialer calls with our external_id. An `assistant-request` picks the incoming agent or the debt agent with that tenant's variables. If a call cannot be told apart, it gets the incoming agent, never the debt one.
+- **Zadarma (owner, 18 Oct: "we have zadarma now").**
+  - **Known so far:** nothing more. No account details, and no `.env` entry.
+  - **How it joins Vapi:** a SIP provider like Zadarma is a `byo-sip-trunk` credential (gateway, username, password). Its incoming calls are forwarded to `{number}@<credential_id>.sip.vapi.ai` (`docs/reference/Homies-Vapi-Account-Notes.md`). It is API only, about an hour.
+  - **Not yet known:** whether it replaces the 12 Oct Omnitelecom plan or sits beside it. Ask before building either route.
 - **(Superseded 12 Oct) Inbound and outbound are two connections to Omni, not one.** The dialer hands answered calls to the debt agent. The office number's menu option hands incoming calls to the incoming agent. They are two assistants, so two SIP addresses, and Omni sets up each one on its own.
 - **What passes between us and Omnitelecom is three things, and only one is JSON we send (7 Oct).** We POST a number to their insert API; they forward the answered call to our Vapi SIP address with our id in `x-resident_id`; optionally they POST a call result to us. They have sent no API key yet, and their current setup can't take an AI agent until the Tokomni move. **Homies has agreed to the move and the plan (owner, 12 Oct; on 7 Oct it had not):** one dialer extension for the agent, the office number as caller ID for now, and the incoming menu option to the incoming agent. The samples are in `docs/features/15-call-button/context.md`, "7 Oct".
 - **A live test after office hours tests the bot, not the alerts.** Handovers then hold their note until 09:00 by design, so an evening emergency chat pages nobody and leaves a note that posts in the morning.
