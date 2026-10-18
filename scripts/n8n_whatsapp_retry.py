@@ -74,6 +74,13 @@ not carry the tools line, because there is nothing to open. HAY_ALT is the one
 copy of "the bot asked how he is": wa_qa.py's rubric and the --watch flag in
 check_whatsapp_rules.py read it from here.
 
+A FOURTH, 18 OCT: `unasked`, the mirror of `rephay`. Typed "אני רוצה לדבר עם
+מנהל" got "מה שלומך היום? 😊" twice (executions 112521, 112529): the model took
+the typed request for the tap. Off the tap, a reply that asks how he is when he
+did not ask first goes back once, first pass only, and `Try again` names it. It
+reads HAY_STRICT, not HAY_ALT, because "מה המצב" and "מה קורה" also ask about the
+matter. n8n_whatsapp_unasked.py carries it to live.
+
 5 OCT, THE SECOND PASS KEEPS WHAT THE FIRST ONE KNEW (n8n_whatsapp_safetynet.py,
 which carries this to live). The live run as Assaf: the first pass looked the
 mould up, found nothing and said so; its draft was sent back for its opening
@@ -176,6 +183,23 @@ HAY_PY = __import__("re").compile(HAY_ALT, __import__("re").I)
 WHY_REPHAY = ("היא לא שאלה אותו לשלומו, ובלחיצה על לדבר עם נציג הנציג שנכנס לשיחה אומר היי, "
               "אומר מי הוא ושואל מה שלומו, וזאת השאלה היחידה בהודעה")
 
+# 18 Oct: "how are you" nobody asked for (n8n_whatsapp_unasked.py). The owner typed
+# "אני רוצה לדבר עם מנהל" and got "מה שלומך היום? 😊" twice (executions 112521 and
+# 112529): the model answered the typed request as the לדבר עם נציג tap, and Send's
+# greeting filter left only the question. The prompt says only the resident opens
+# that door, the tap aside; `unasked` backs it. HAY_STRICT is narrower than HAY_ALT
+# on purpose: "מה קורה", "מה המצב" and "מה העניינים" also ask about the matter ("ספר
+# לי מה המצב"), and "איך אתה" also starts "איך אתה מעדיף לשלם". Over the 1,050 bot
+# replies so far it would have sent back exactly those two.
+HAY_STRICT = (r"מה שלומ|מה נשמע|מה איתך|איך עובר עלי|איך עבר עלי|איך היום|איך הולך לך"
+              r"|איך הולך(?=[?!.,]|$)|איך אתה(?=[?!.,]|$)|איך את(?=[?!.,]|$)"
+              r"|how are you|how.s it going|how is it going|how.s your day|how is your day"
+              r"|how was your day|how has your day")
+HAY_STRICT_JS = "/" + HAY_STRICT + "/i"
+HAY_STRICT_PY = __import__("re").compile(HAY_STRICT, __import__("re").I)
+WHY_UNASKED = ("היא שאלה אותו לשלומו, והוא לא שאל אותך לשלומך ולא לחץ על לדבר עם נציג, "
+               "ובמקום זה תמשיך ממה שהוא כתב לך")
+
 # 5 Oct: the four truth guards, named when they are the reason. Read off the
 # first draft with the guards' own code (wa_truth.truth_js), not guessed.
 WHY_WORDS = "היא הייתה ריקה"
@@ -209,6 +233,10 @@ TRY_JSON = (
     "const tools = why.length > 0; let rep = false; "
     "try { rep = $('Still the last word?').first().json.tap === 'other'; } catch (e) { rep = false; } "
     "if (rep && !" + HAY_JS + ".test(o)) why.push('" + WHY_REPHAY + "'); "
+    # 18 Oct: a how-are-you he did not ask for, off the tap, is named too.
+    # `wrote`, not `said`: the truth library above already declares `said`.
+    "let wrote = ''; try { wrote = String($('Still the last word?').first().json.text || ''); } catch (e) { wrote = ''; } "
+    "if (!rep && " + HAY_STRICT_JS + ".test(o) && !" + HAY_JS + ".test(wrote)) why.push('" + WHY_UNASKED + "'); "
     "let note = why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.]') "
     ": '" + RETRY_NOTE + "'; "
     "if (first_steps.length) note += ' " + FACTS_HEAD + "' + first_steps.map(s => s.tool + ': ' + brief(s.observation)).join('; ') + '" + FACTS_TAIL + "'; "
@@ -305,9 +333,20 @@ def guard(gid, expr):
 REPHAY = (r"={{ $runIndex > 0 || $('Sort').first().json.tap !== 'other' || "
           + HAY_JS + r".test(String($json.output || '')) }}")
 
+# `unasked` (18 Oct, n8n_whatsapp_unasked.py): a reply that asks how he is, when he
+# did not ask first and this is not the לדבר עם נציג tap, goes back once. First
+# pass only, like the three above. The resident's words are read where Try again
+# reads them; a throw counts as "he did not ask".
+UNASKED = (r"={{ $runIndex > 0 || $('Sort').first().json.tap === 'other' || (() => { "
+           r"let said = ''; try { said = String($('Still the last word?').first().json.text || ''); } "
+           r"catch (e) { said = ''; } return " + HAY_JS + r".test(said) || !" + HAY_STRICT_JS
+           + r".test(String($json.output || '')); })() }}")
+assert UNASKED.count("}}") == 1, "a }} inside `unasked` ends its expression early"
+
 PLURAL_GUARD = guard("plural", PLURAL)
 OPENER_GUARD = guard("opener", OPENER)
 REPHAY_GUARD = guard("rephay", REPHAY)
+UNASKED_GUARD = guard("unasked", UNASKED)
 
 
 def snapshot(live):
@@ -397,7 +436,7 @@ def main():
 
     # --- The two style guards, by id (20 Sep) ------------------------------------
     cond = by["Reply usable?"]["parameters"]["conditions"]["conditions"]
-    for g in (PLURAL_GUARD, OPENER_GUARD, REPHAY_GUARD):
+    for g in (PLURAL_GUARD, OPENER_GUARD, REPHAY_GUARD, UNASKED_GUARD):
         have = next((c for c in cond if c.get("id") == g["id"]), None)
         if have is None:
             cond.append(dict(g))

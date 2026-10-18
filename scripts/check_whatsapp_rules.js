@@ -667,6 +667,31 @@ function cases(E) {
     () => repWhy(REP_TODAY).includes('לא שאלה אותו לשלומו') && !repWhy(REP_TODAY).includes('open_request'), true);
   expect('Try again: a tap reply that asked keeps the full list',
     () => repWhy(REP_WANTED).includes('או שנתנה קישור'), true);
+
+  console.log(NL + '--- "how are you" nobody asked for (18 Oct, executions 112521 and 112529) ---');
+  // The owner typed "אני רוצה לדבר עם מנהל" and got "מה שלומך היום? 😊" twice: the
+  // model answered the typed request as the tap. `unasked` (n8n_whatsapp_unasked.py)
+  // sends such a reply back once; HAY_STRICT leaves "מה המצב" and "איך אתה מעדיף" alone.
+  const BAD_HAY = "היי, כאן מיכאל מהומי'ז. מה שלומך היום? 😊";
+  const MGR = { text: 'אני רוצה לדבר עם מנהל' };
+  const unasked = (output, runIndex, S) => () => E.reply.unasked({ output }, runIndex, turn({ S }).$);
+  expect('unasked: 112521, a typed request for a manager answered with how-are-you, goes back',
+    unasked(BAD_HAY, 0, MGR), false);
+  expect('unasked: the tap still asks how he is', unasked(REP_WANTED, 0, Object.assign({ text: 'לדבר עם נציג' }, REP_TAP)), true);
+  expect('unasked: he asked first, so the ask-back passes',
+    unasked('הכול טוב, תודה! ומה שלומך?', 0, { text: 'היי מיכאל, מה שלומך?' }), true);
+  expect('unasked: "what is the situation" is about the matter and passes',
+    unasked('אני איתך. ספר לי מה המצב ומה אתה צריך?', 0, MGR), true);
+  expect('unasked: "how do you prefer to pay" is not how-are-you',
+    unasked('איך אתה מעדיף לשלם, בהעברה או באשראי?', 0, { text: 'איך משלמים' }), true);
+  expect('unasked: the second pass goes out whatever it says', unasked(BAD_HAY, 1, MGR), true);
+  const mgrStill = { first: () => ({ json: { text: 'אני רוצה לדבר עם מנהל', tap: '', greeted: true } }) };
+  const $mgr = (name) => { if (name === 'Still the last word?') return mgrStill; throw new Error('no node ' + name); };
+  const mgrWhy = (output) => JSON.parse(E.tryAgain({ output }, $mgr)).retry_note;
+  expect('Try again: 112521 is named as a how-are-you he did not ask for, without the tools line',
+    () => mgrWhy(BAD_HAY).includes('והוא לא שאל אותך לשלומך') && !mgrWhy(BAD_HAY).includes('open_request'), true);
+  expect('Try again: a reply with no how-are-you keeps the full list',
+    () => mgrWhy('אני איתך. ספר לי מה קרה?').includes('או שנתנה קישור'), true);
   // 5 Oct (scripts/n8n_whatsapp_safetynet.py, scripts/wa_truth.py). The live run
   // as Assaf Clix (docs/assistant/transcripts/2026-10-05-whatsapp-live-assaf.md):
   // the worst failures came from these checks. The drafts below are his, word

@@ -737,6 +737,19 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
     5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
+- **18 Oct, evening: a typed request for a rep is not the tap (`n8n_whatsapp_unasked.py`, epoch 81): built, gate green, NOT LIVE YET.**
+  - **The bug, on the owner's handset at 14:21 UTC:** "אני רוצה לדבר עם מנהל" got "מה שלומך היום? 😊" twice. Gemini gave the tap's reply to typed words, and the greeting filter left only the question.
+  - **The fix:**
+    - one prompt sentence;
+    - the `unasked` guard on `Reply usable?` (off the tap, a how-are-you he didn't ask for goes back once);
+    - `Try again` names it.
+  - **The repo says 81, but live is 80 until `--apply`.**
+  - **Left:**
+    - the Claude-played check (in progress);
+    - the new pins;
+    - `--apply`, then the checks on live;
+    - the owner's handset, then `--watch`.
+  - **Undo:** `--restore` from `docs/handover/n8n-whatsapp-live-18oct-before-unasked.json`.
 - **18 Oct, later: the manager request, worded like a person at a service desk (`n8n_whatsapp_hearyou.py`, epoch 80): LIVE 14:13 UTC.**
   - **Why:** the owner rejected 79's feel ("natural like a call center but human like yes i hear you can i get some details ... lowkey trying to fix everything by yourself").
   - **Now:** Michael shows he heard and asks for the details. He never talks about passing it on before he has them.

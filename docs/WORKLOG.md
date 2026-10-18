@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-10-18
 
+### WhatsApp bot: a typed request for a rep is not the tap; the `unasked` guard (epoch 81)
+- **The owner's handset, 14:21 UTC, 8 minutes after epoch 80** (screenshot, *"wth is this"*):
+  - he typed "אני רוצה לדבר עם מנהל" twice and got "מה שלומך היום? 😊" twice.
+  - **Executions:** 112521 and 112529.
+  - **Sort:** not a tap (`tap` empty), `greeted` true.
+  - **Gemini wrote:** "היי, כאן מיכאל מהומי'ז. מה שלומך היום? 😊". That is the לדבר עם נציג tap's reply, given to a typed request.
+  - **Send's greeting filter** cut the hello and the name, mid-conversation, which left the bare question.
+  - **No tool ran, so no note was made.**
+- **Why the Claude-played run missed it:** Claude read the passage as written; Gemini matched the typed words to the tap paragraph ("לדבר עם נציג אומר שהוא רוצה לדבר עם מישהו"). Offline play cannot measure Gemini's own slips (CONTEXT, "How the WhatsApp bot is tested without a model call"). So the fix that can be proved is a guard.
+- **Changed (`scripts/n8n_whatsapp_unasked.py`):**
+  - **One prompt sentence at the point of use,** in the manager passage: a typed request for a rep is not the tap; he already said what he wants, and you go on from there.
+  - **`unasked`, a new guard on `Reply usable?`** (`n8n_whatsapp_retry.py`), the mirror of `rephay`:
+    - off the tap, a reply that asks how he is when he did not ask first goes back once, first pass only;
+    - `Try again` names it ("היא שאלה אותו לשלומו, והוא לא שאל אותך לשלומך ולא לחץ על לדבר עם נציג...") without the tools line.
+  - **The guard reads `HAY_STRICT`,** a narrower list than `HAY_ALT`. "מה המצב", "מה קורה" and "מה העניינים" also ask about the matter, and "איך אתה" also starts "איך אתה מעדיף לשלם".
+  - **Epoch** 80 to 81, because the owner's buffer holds both bad replies.
+- **Measured before building, over all 1,050 bot replies:** 15 asked how he is, and the guard would have sent back exactly 2, the two of 14:21.
+- **Caught before any write:** the carrier's parse check found `said` declared twice in `Try again`, because the truth library already has one. It is `wrote` now.
+- **Gate on the candidate:**
+  - **Cases:** 326 of 326, eight of them new. 112521's draft goes back. These pass: the tap, an ask-back after "מה שלומך?", "מה המצב", "איך אתה מעדיף לשלם" and the second pass. `Try again` names it.
+  - **Replay:** 0 changes.
+  - **Pins:** fail only on the prompt and `Try again / note`.
+  - **Idle check:** baseline 6 only.
+- **Deck:** `manager_typed_mid` added (a typed request mid-chat, after an earlier question). Claude-played on the candidate (in progress):
+  - 8 chats;
+  - a replay of 112521's draft through the retry (variant `R`).
+
 ### WhatsApp bot: the manager request, answered like a person at a service desk (LIVE 14:13 UTC, epoch 80)
 - **The owner, on the 79 test chat:** *"no not like that i want it to be natural like a call center but human like yes i hear you can i get some details and stuff like lowkey trying to fix everything by yourself before following up and sending it to the team"*.
 - **Why 79 read wrong:** its passage told Michael what to SAY ("say you are here to help"; "say you will try yourself, and if not, pass it on"). The model said it nearly word for word: "אנסה קודם לעזור בעצמי, ואם לא אוכל, אעביר את זה למנהל".

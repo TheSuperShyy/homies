@@ -1425,6 +1425,44 @@
     "no_callback: when he wants the manager to know, does Michael say the team knows without promising a call back?",
     "goodbye: a warm close without a question?"
    ]
+  },
+  {
+   "id": "manager_typed_mid",
+   "title": "types a request for a manager in the middle of a chat (18 Oct, the owner's handset: executions 112521, 112529)",
+   "time": "17:20", "weekday": 0, "weekday_he": "ראשון", "iso": "2026-10-18T17:20:00+03:00",
+   "history": [
+    {
+     "resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:50, יום ראשון.]\nכל כמה זמן מנקים את חדר המדרגות?",
+     "tools": ["get_service_info"],
+     "michael": "צהריים טובים, כאן מיכאל מהומי'ז. את חדר המדרגות מנקה חברת ניקיון חיצונית, והתדירות נקבעת בהסכם של כל בניין. יש עוד משהו שאני יכול לעזור בו?"
+    }
+   ],
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 5 שכבר שאל על הניקיון, ועכשיו רוצה מנהל כי הוועד החליט על שיפוץ בלובי בלי לשאול אף אחד",
+    "script": [
+     {"say": "אני רוצה לדבר עם מנהל"},
+     {"if_asked": "what it is about / what he needs", "say": "הוועד החליט על שיפוץ בלובי בלי לשאול אף אחד, ואני רוצה להתנגד"},
+     {"if_asked": "building and apartment", "say": "בר כוכבא 23 דירה 5"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "notify_team": {"ok": true, "notified": true}
+   },
+   "expect": [
+    {"type": "turn_not_regex", "turn": 0, "regex": "מה שלומ|מה נשמע|מה איתך|איך עובר עלי|איך עבר עלי|איך היום", "name": "no how-are-you he did not ask for (112521)"},
+    {"type": "turn_regex", "turn": 0, "regex": "מה בדיוק|מה (קרה|המצב|העניין|הסיפור)|(ב|על )מה מדובר|על מה העניין|ספר לי|תספר לי|לפרט|להסביר", "name": "the reply asks for the details"},
+    {"type": "not_called_before", "tool": "notify_team", "turn": 1, "name": "no team note before the details"},
+    {"type": "called", "tool": "notify_team"},
+    {"type": "arg_contains", "tool": "notify_team", "arg": "description", "words": ["לובי", "שיפוץ"], "name": "the note carries what he wants"},
+    {"type": "last_no_question", "name": "goodbye without a question"}
+   ],
+   "judge": [
+    "not_the_tap: a typed request for a manager mid-chat is answered about his matter, not with the button's 'how are you today'?",
+    "hears_him: does Michael sound like a human rep who heard him and asks for the details?",
+    "note_with_details: once he explains, is it noted for the team with what he said, with no who, when or callback?",
+    "goodbye: a warm close without a question?"
+   ]
   }
  ]
 }
