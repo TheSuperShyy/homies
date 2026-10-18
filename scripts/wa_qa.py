@@ -539,7 +539,10 @@ TICKET_CLAIM = re.compile(r"פתחתי|פתחנו|נפתחה (לכם |לך |עכ
 TEAM_CLAIM = re.compile(r"הצוות (שלנו )?(כבר )?(יודע|מעודכן|קיבל|ראה|יראה|מטפל)|העברתי|עדכנתי את הצוות|"
                         r"רשמתי (את זה )?לצוות|מסרתי לצוות|הודעתי לצוות|נרשם לצוות|הצוות (שלנו )?(יחזור|יצור)")
 REASK = re.compile(r"במה (אפשר|אוכל|נוכל|אני יכול) לעזור(?! (עוד|בעוד|לכם עוד|לך עוד))|איך (אפשר|אוכל|אני יכול) לעזור(?! (עוד|בעוד))")
-HOW_ARE_YOU = re.compile(r"מה נשמע|מה קורה|איך הולך|מה שלומ|how are you|how is it going|how's it going|whats up|what's up|wassup", re.I)
+# 18 Oct: "בסדר גמור, ואתה?" (fine, and you?) asks it back too; without it the
+# rubric read that answer as a matter and flagged the 4 Oct "how can I help" after it.
+HOW_ARE_YOU = re.compile(r"מה נשמע|מה קורה|איך הולך|מה שלומ|ואתה\?|ואת\?|and you\?"
+                         r"|how are you|how is it going|how's it going|whats up|what's up|wassup", re.I)
 # 1 Oct evening: the bot asks it itself on the representative tap
 # (n8n_whatsapp_rephello.py), so its own forms count too.
 # 4 Oct: one copy, the `rephay` guard's (n8n_whatsapp_retry.HAY_ALT).

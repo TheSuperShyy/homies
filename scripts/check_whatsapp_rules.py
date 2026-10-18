@@ -114,12 +114,20 @@ PINS = {
     # like a person at a service desk, not a process; notify_team's text with it.
     # Claude-played on the candidate: manager_insists, manager_wont_say, rep_typed,
     # tap_rep, price_quote; 18 turns, 37/37 expectations, no guard rejection.
-    'Answer the resident / system': 'ec350702a4ca',
+    # 18 Oct, evening (n8n_whatsapp_unasked.py, epoch 81): a typed request for a rep
+    # is not the tap; with it Try again names a how-are-you he did not ask for.
+    # Claude-played on the candidate: manager_typed_mid, manager_insists,
+    # manager_wont_say, rep_typed, tap_rep, rep_fine_thanks, how_are_you_he,
+    # rep_and_you (29 turns, 65/65, no flag), and 112521's own draft through the
+    # retry (variant R: sent back by `unasked`, the note named it, the second pass
+    # asked what it is about; 6/6).
+    'Answer the resident / system': '961e2b20119a',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
     # "איך עבר" (retry.py), which only decides whether the rephay reason is added.
-    'Try again / note': '4f16fe9d3eb9',
+    # 18 Oct, evening: names a how-are-you he did not ask for (`unasked`); see above.
+    'Try again / note': '34174ed0c761',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '3ef1f30b5235',

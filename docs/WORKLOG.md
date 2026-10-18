@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-18
 
-### WhatsApp bot: a typed request for a rep is not the tap; the `unasked` guard (epoch 81)
+### WhatsApp bot: a typed request for a rep is not the tap; the `unasked` guard (LIVE 14:43 UTC, epoch 81)
 - **The owner's handset, 14:21 UTC, 8 minutes after epoch 80** (screenshot, *"wth is this"*):
   - he typed "אני רוצה לדבר עם מנהל" twice and got "מה שלומך היום? 😊" twice.
   - **Executions:** 112521 and 112529.
@@ -34,9 +34,38 @@ conversation that produced it.
   - **Replay:** 0 changes.
   - **Pins:** fail only on the prompt and `Try again / note`.
   - **Idle check:** baseline 6 only.
-- **Deck:** `manager_typed_mid` added (a typed request mid-chat, after an earlier question). Claude-played on the candidate (in progress):
-  - 8 chats;
-  - a replay of 112521's draft through the retry (variant `R`).
+- **Deck:** `manager_typed_mid` added (a typed request mid-chat, after an earlier question).
+- **Claude-played on the candidate** (`qa_unasked`):
+  - **The chats:** `manager_typed_mid`, `manager_insists`, `manager_wont_say`, `rep_typed`, `tap_rep`, `rep_fine_thanks`, `how_are_you_he` and `rep_and_you`. 29 turns, 65 of 65, no guard rejection, no flag.
+  - **The manager chats:**
+    - mid-chat: "בטח, אני איתך. ספר לי מה קרה ומה אתה צריך?";
+    - pressed: "אני שומע אותך. תכתוב לי בכמה מילים במה מדובר?".
+  - **The how-are-you paths still allowed:**
+    - the tap's "מה שלומך היום?" / "איך עבר עליך היום?";
+    - the ask-back after "היי, מה נשמע?" ("ואצלך, איך עובר היום?").
+  - **112521's own draft through the retry (variant R):**
+    - sent back by `unasked` alone;
+    - the note named it;
+    - the second pass: "בשמחה, אני כאן בשביל זה. ספר לי במה מדובר?";
+    - then the note with the details; 6 of 6.
+  - **Two test-side fixes on the way:**
+    - the deck's tap regex lacked the evening "איך עבר", which HAY_ALT got on 5 Oct, so `rep_and_you` failed a right reply;
+    - the rubric's HOW_ARE_YOU lacked "ואתה?", so "בסדר גמור, ואתה?" read as a matter and flagged the 4 Oct "how can I help" after it.
+- **Pins:** `Answer the resident / system` `961e2b20119a`, `Try again / note` `34174ed0c761`. The gate on the candidate was all green.
+- **LIVE 14:43 UTC:** `n8n_whatsapp_unasked.py --apply` (live `updatedAt` 14:43:13).
+  - **Read back:**
+    - prompt `961e2b20119a`;
+    - key `-81`;
+    - guards: words, phantom, links, plural, opener, deeds, echo, clerk, rephay, unasked;
+    - `Try again` `34174ed0c761`.
+  - **After:**
+    - the carrier has nothing to do;
+    - the gate on live: 326 of 326, all green;
+    - patchers idle but the baseline 6.
+- **Owed:**
+  - the owner types "אני רוצה לדבר עם מנהל" again on the handset;
+  - then `--watch 2026-10-18T14:43`.
+- **Seen on the way, not changed:** a note about a committee decision or a complaint carries no building, because the bot asks for the building only when it opens a ticket, and `notify_team` has no building field. The team sees the resident's chat, but the note itself doesn't name the building.
 
 ### WhatsApp bot: the manager request, answered like a person at a service desk (LIVE 14:13 UTC, epoch 80)
 - **The owner, on the 79 test chat:** *"no not like that i want it to be natural like a call center but human like yes i hear you can i get some details and stuff like lowkey trying to fix everything by yourself before following up and sending it to the team"*.

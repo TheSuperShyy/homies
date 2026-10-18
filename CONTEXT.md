@@ -2516,7 +2516,7 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
   - **Now:** a verb with an offer or a condition in front of it ("אוכל / אשמח / כדי / או להעביר", "ואם לא… אעביר") is not "the team knows".
   - **Unless:** the same reply also has a past-tense report or a call-back promise.
   - **Over the 1,048 past replies:** two notes change, both offers that should never have made one.
-- **A typed request for a rep is not the tap (epoch 81, `n8n_whatsapp_unasked.py`).**
+- **A typed request for a rep is not the tap (epoch 81, `n8n_whatsapp_unasked.py`, live 14:43 UTC).**
   - **What happened:** on the owner's handset Gemini answered "אני רוצה לדבר עם מנהל" with the tap's "היי, כאן מיכאל מהומי'ז. מה שלומך היום? 😊", and the greeting filter left only the question. Claude never did this offline.
   - **The prompt:** one sentence now says it at the point of use.
   - **The `unasked` guard:** off the tap, a reply that asks how he is when he did not ask first goes back once.
