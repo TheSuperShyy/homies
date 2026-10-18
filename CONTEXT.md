@@ -4204,7 +4204,8 @@ why and rejected alternatives).
   owner's own sent update).** It opens "עדכון קצר לגבי ההתקדמות:", has one
   plain paragraph per topic starting "לגבי …,", and closes "תודה!". What a part
   does goes as short "- " lines of a few plain words each (the owner: "the
-  list of things it do", then "in simple terms"). No
+  list of things it do", then "in simple terms" and "less technical": no
+  server, Meta or n8n). No
   bold, no artifact. Give it in a code block, ready to paste.
 
 ---
