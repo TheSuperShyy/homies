@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-10-18
 
+### WhatsApp bot: a request for a manager is answered with the reason, never the same question twice (epoch 82)
+- **The owner's handset after epoch 81, 15:05–15:08 UTC** (screenshot): he asked for a manager five times, in Hebrew and English, and got "what is it about?" five times.
+  - The replies: "אני מבין שאתה רוצה לדבר עם מנהל. כדי שאוכל לעזור לך...", "אוקיי. כדי שאוכל להעביר את הפנייה שלך הלאה, מה הנושא...?", "מצוות השירות של הומי'ז. אני כאן...", "אוקיי. מה הנושא שבו תרצה לדבר עם המנהל?", "אני שומע שאתה רוצה לדבר עם מנהל. מה הנושא שתרצה לדבר עליו?".
+  - Owner: *"this is like frustrating like a parrot it should be like i understand you i order for me to do that blah blah blah its the procedure we need to get information before we can do something"*.
+- **What the executions show (112601, 112609, 112618, 112626, 112635):**
+  - **`unasked` worked:** 112601's first pass was the tap's "מה שלומך היום?", and it went back.
+  - **Three of Gemini's first drafts already explained,** close to the owner's words:
+    - 112609: "אני מבין שחשוב לך לדבר עם מנהל. כדי שאוכל לוודא שהפנייה שלך מגיעה לאדם הנכון..., אני צריך להבין מה המצב";
+    - 112635: "...כדי שאוכל להעביר את הבקשה שלך למנהל, אני צריך לדעת במה מדובר";
+    - 112626 the same, with a call-back promise inside.
+  - **Our guards made the parrot.** `echo` and `clerk` (27 Sep, made for fault reports) sent all three back. `Try again`'s note said "react in a word or two" and "just ask", and the second pass, which no guard checks, was the bare question.
+  - **112618's fragment:** the model answered "are you the manager?" with "אני מיכאל מצוות השירות של הומי'ז...". Send's name step cut "אני מיכאל" as a re-introduction mid-chat and left "מצוות השירות של הומי'ז." It had happened once before, also today, with no cut.
+- **Changed (`scripts/n8n_whatsapp_procedure.py`, epoch 81 to 82):**
+  - **Prompt:**
+    - Michael shows he understands, without repeating the tenant's words back, and says in his own words that before anything goes to a manager someone has to know what it's about, so whoever gets it can deal with it.
+    - Here, unlike a missing detail, the reason is part of the answer.
+    - Pressed, he never asks the same question in the same words: he explains another way and makes it easy (the topic alone is enough).
+    - Nothing goes on without the matter, however often the tenant asks. The "after a second refusal, note it with what is known" sentence is gone. `notify_team`'s text says the same.
+  - **`MGR_CTX` (`n8n_whatsapp_retry.py`):** a chat about a manager or a person is read off the resident's own rows among `Anything newer?`'s twelve, with the tap's row excluded. There:
+    - `echo` and `clerk` pass, unless the reply also makes a promise Send would cut;
+    - `Try again` names neither, and names the promise instead;
+    - the unnamed list drops both and its "no reason" tail.
+  - **Send, `manners v4`:** "are you the manager?" / "אתה המנהל?" keeps the name; a cut takes "מצוות השירות של הומי'ז" with the name; a tail it doesn't know keeps the name rather than leave a fragment.
+  - **The team-note backstop, sentence by sentence:** a condition or a "לא" ahead of the verb, or a condition or purpose clause ahead of a call-back promise, holds that sentence back.
+  - **The QA harness:** `recent` rows carry their direction (it had marked every row as the bot's). The rubric skips echo and explains-why in a manager chat. There is a new `questions_distinct` expectation, and `manager_parrot`, tonight's chat word for word, joins the deck.
+  - **The nightly watch:** in a manager chat, the echo and the clerk are info lines.
+- **Measured over every past reply before building:**
+  - **The exception:** 5 of 1,055 replies, all in chats where a person was asked for.
+  - **The backstop:** 103 notes become 97. The 6 lost are "if you want, they'll get back to you" offers.
+  - **Send:** one reply changes, 112618's, now whole.
+- **Caught on the way:** replaying tonight's drafts, 112626's ("כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא?") would have passed. Send's promise filter would have cut it to "אני מבין שאתה רוצה לדבר עם מנהל." with no question, and the backstop would have noted an empty request. Hence the promise exception and the promise-aware backstop.
+
 ### WhatsApp bot: a typed request for a rep is not the tap; the `unasked` guard (LIVE 14:43 UTC, epoch 81)
 - **The owner's handset, 14:21 UTC, 8 minutes after epoch 80** (screenshot, *"wth is this"*):
   - he typed "אני רוצה לדבר עם מנהל" twice and got "מה שלומך היום? 😊" twice.

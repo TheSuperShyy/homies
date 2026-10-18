@@ -2511,7 +2511,7 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
   - the identity paragraph's "prefers a person";
   - `notify_team`'s description.
 
-  The request is no longer on the list of things noted at once. Someone who still won't say after the second question is noted with what is known, so nobody is asked in a loop.
+  The request is no longer on the list of things noted at once. (Until epoch 82, someone who still wouldn't say after the second question was noted with what was known; see the epoch 82 bullet below.)
 - **An offer is not a report.** The team-note backstop (`teamnote.SAID`) used to make a note whenever a reply put a pass-on verb next to a team, so "כדי שאוכל לעזור, או להעביר את זה לצוות, ספר לי…" would have noted an empty request.
   - **Now:** a verb with an offer or a condition in front of it ("אוכל / אשמח / כדי / או להעביר", "ואם לא… אעביר") is not "the team knows".
   - **Unless:** the same reply also has a past-tense report or a call-back promise.
@@ -2522,6 +2522,16 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
   - **The `unasked` guard:** off the tap, a reply that asks how he is when he did not ask first goes back once.
     - It reads `HAY_STRICT`. "מה המצב" and "מה קורה" ask about the matter too, and HAY_ALT, which `rephay` reads, would send good replies back.
     - Over 1,050 past replies it would have caught exactly the two of 14:21.
+- **The reason is the answer (epoch 82, `n8n_whatsapp_procedure.py`).** On the owner's handset after 81, five requests for a manager got "what is it about?" five times, shorter each time. The owner: *"like a parrot it should be like i understand you i order for me to do that ... its the procedure we need to get information before we can do something"*.
+  - **The cause was our own guards, not the model.** Gemini's first drafts explained why the details are needed. `echo` and `clerk` (27 Sep, made for fault reports) sent them back, `Try again` said "just ask", and the second pass went out unchecked as the bare question.
+  - **Now:**
+    - **Michael explains.** He shows he understands and says, in his own words, that before anything goes to a manager someone has to know what it's about. This is the one place where the reason for asking is part of the answer.
+    - **Pressed, he never asks the same question twice.** He explains another way, and the topic alone is enough.
+    - **Nothing goes on without the matter,** however often the tenant asks.
+  - **A chat about a manager** is read off the resident's own rows among the last twelve (`retry.MGR_CTX`), with the tap's row excluded. There, `echo` and `clerk` pass and `Try again` names neither. They still send a reply back if it also makes a promise Send would cut. Without that, "כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא?" would lose its question to the promise filter, and the backstop would note an empty request.
+  - **"are you the manager?"** is asking who he is talking to, so Send keeps the name (`manners v4`). A cut takes "מצוות השירות של הומי'ז" with the name, never leaving a fragment.
+  - **The backstop reads sentence by sentence.** A condition or purpose clause ahead of the verb or the call-back promise holds that sentence back. Over every past reply, 97 notes instead of 103; the 6 lost are "if you want, they'll get back to you" offers.
+  - **Lesson: a style guard can turn the model's good draft into the bad one.** A rule written for one situation (a clerk asking for the building) fired in another, where the same words are what the owner wants. Before blaming the model for a reply, read its first pass in the execution (`Try again`'s `first_output`).
 - **The phone agents still pass a request for a person on at once** (their prompts and `vapi_tools.py`). That was not part of this change; chatbot first.
 
 ## A gatekeeper model's NONE is not a guard; the necessary condition goes in code
