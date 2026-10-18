@@ -4202,8 +4202,9 @@ why and rejected alternatives).
   not a deliverable.
 - **A message or update for Yariv is a Hebrew WhatsApp text (18 Oct, from the
   owner's own sent update).** It opens "עדכון קצר לגבי ההתקדמות:", has one
-  plain paragraph per topic starting "לגבי …,", and closes "תודה!". No bullets,
-  no bold, no artifact. Give it in a code block, ready to paste.
+  plain paragraph per topic starting "לגבי …,", and closes "תודה!". What a part
+  does goes as short "- " lines (the owner: "the list of things it do"). No
+  bold, no artifact. Give it in a code block, ready to paste.
 
 ---
 
