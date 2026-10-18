@@ -30,6 +30,7 @@ conversation that produced it.
     - the 8 Oct change for women callers;
     - Zadarma as the next phone step;
     - the real WhatsApp number and Meta verification before tenants.
+- **Then in the owner's WhatsApp shape** (a screenshot of their earlier Hebrew update to Yariv): the same content as Hebrew paragraphs. It opens "עדכון קצר לגבי ההתקדמות:", each topic starts "לגבי …,", and it closes "תודה!". An English rendering went with it for the owner. The shape is now in CONTEXT.md, "How the user wants to be answered".
 - **Zadarma:**
   - **Known:** only the owner's line. No account details and no `.env` entry yet.
   - **How it would join Vapi:** `docs/reference/Homies-Vapi-Account-Notes.md` gives the route. It is a `byo-sip-trunk` credential (gateway, username, password), and incoming calls are forwarded to `{number}@<credential_id>.sip.vapi.ai`. It is API only, about an hour.
