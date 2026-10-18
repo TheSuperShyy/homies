@@ -748,6 +748,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - the owner asks for a manager from the test phone;
     - then `--watch 2026-10-18T14:13`.
   - **Undo:** `--restore` from `docs/handover/n8n-whatsapp-live-18oct-before-hearyou.json`.
+  - **The test transcripts are not in the repo.** The 18 Oct Claude-played runs (`qa_askfirst`, `qa_hearyou`) were in that session's scratchpad only. The handset texts that matter are quoted in WORKLOG 18 Oct. To see them again, re-bundle and replay the deck's `manager_*` scenarios.
 - **18 Oct: WhatsApp, a request for a manager (owner's instruction): LIVE 13:55 UTC, epoch 79** (its wording replaced by epoch 80 above; the backstop change below stays).
   - **The behaviour:**
     - "I'm here to help" first;

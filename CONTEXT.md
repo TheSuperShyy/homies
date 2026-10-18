@@ -2500,7 +2500,7 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
 - **Second reply, if he still wants a manager or the team:** ask what exactly he needs and what the situation is, and say Michael will try to help or pass it on.
 - **The team note comes only with the information.**
 
-- **Later the same day, epoch 80 (`n8n_whatsapp_hearyou.py`):** the owner wanted it "natural like a call center but human like yes i hear you can i get some details ... lowkey trying to fix everything by yourself before ... sending it to the team".
+- **Later the same day, epoch 80 (`n8n_whatsapp_hearyou.py`, live 14:13 UTC):** the owner wanted it "natural like a call center but human like yes i hear you can i get some details ... lowkey trying to fix everything by yourself before ... sending it to the team".
   - **What went wrong in 79:** it told Michael what to say ("say you're here to help", "say you'll try, and if not, pass it on"), and he said it word for word.
   - **The passage now describes the person:**
     - he shows he heard and asks for the details;
@@ -2871,6 +2871,12 @@ Two more from the same afternoon:
   sentence end would split a link at its first dot), keeps the name before an
   apposition or a dash, and keeps it whenever the resident asked who they are
   talking to: then the name is the answer.
+
+**18 Oct, the same lesson in the answering prompt (epochs 79 and 80).**
+- **Epoch 79:** the manager-request passage said "tell him you are here to help him" and "tell him you will try yourself, and if you can't, you will pass it to the team or the manager". Michael wrote exactly that: "אנסה קודם לעזור בעצמי, ואם לא אוכל, אעביר את זה למנהל".
+- **The owner's verdict:** a process read aloud, not a person ("natural like a call center but human like").
+- **Epoch 80** describes who Michael is in that moment instead: a good rep at a service desk who shows he heard and asks for the details as someone who means to handle it. It also says where the conversation stays: on the matter, not on who handles it. The replies became his own ("אני איתך, ספר לי מה קרה ומה אתה צריך?").
+- **The rule:** say what the person is like and what the moment is about. A sentence of what he "tells him" is a script, even without quote marks.
 
 ## The register: casual and friendly, still polite, no slang
 
