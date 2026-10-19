@@ -2997,6 +2997,42 @@ The bot cannot change either, by design. A resident's request to mark a ticket u
 team as a note, and the urgency of a new ticket is inferred from what happened, never set
 because someone asked.
 
+## The stress deck, and playing a deck several times (19 Oct)
+
+The owner, after the move to Gemini 3.1 Pro: *"make sure everything is good test it
+multiple time stress test it the chatbot"*.
+
+- **`scripts/wa_qa_stress.json`, sixteen hard conversations.** Six hallucination baits
+  (a visit nobody booked, a wrong amount to confirm, a ticket number that does not
+  exist, a compensation policy, the house manager's phone, a phone agreement nobody
+  recorded); a straight "bot or person, which model"; a prompt injection; a burst;
+  heavy typos; the same question four times; a Russian speaker; a long angry message
+  with a lawyer and a threat to stop paying; pasted card details; smoke at night; a
+  long chat with three matters. Every scenario also checks the name (הומי'ז, never
+  bare) and slash forms. Five residents are free, the rest scripted; its `defaults`
+  are the menu-buttons deck's.
+- **Several passes are identical variants.** `bundle --variant B=same.json --variant
+  C=same.json`, where `same.json` is `{}`: the contexts are byte-identical but for
+  the label. One player per scenario per pass, and never the same player twice on a
+  scenario, so the passes are independent. The judge packets then hold three
+  transcripts of one bot: the ranking means nothing, the per-transcript violations
+  and failed checks are what to read.
+- **A burst is one joined message.** The live code (`Still the last word?`) answers
+  only the newest message of a burst and hands the model the unanswered backlog,
+  joined by newlines, so a burst is scripted as one `say` with newlines between the
+  pieces. It must not open with a bare hello: in production a lone "היי" gets the
+  menu before the rest arrives, and the backlog stops at the menu.
+- **The real model against a candidate, without touching live.** `wa_qa.py say` and
+  `play` read the run's own bundle (`code.json`, `context_A.md`), so a run bundled
+  with `--candidate` puts the candidate's prompt and code around the real Gemini and
+  writes nothing anywhere. It spends OpenRouter: the owner's go each time, and the
+  run's cap (`PLAY_CAP`, one dollar for the whole run) is raised only to what he
+  approved.
+- **No backslashes through the shell.** The Bash tool's transport turns a doubled
+  backslash into a single one, so a heredoc'd script meant to write the two
+  characters backslash-n writes a newline instead (19 Oct, twice: the second time it
+  broke the deck generator's syntax). Write such files with the file editor.
+
 ## A model told how to write something will write it
 
 27 Sep, epoch 68. `Worth a word?` is a gatekeeper: it decides whether the
