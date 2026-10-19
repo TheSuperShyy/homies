@@ -98,7 +98,8 @@ go **Meta -> Chatwoot -> n8n** since 21 Aug. Chatwoot owns the number and the
 inbox; n8n is its *agent bot*, still at `/webhook/homies-whatsapp`, which checks
 a shared secret in the query string, ignores everything that is not an inbound
 `message_created`, dedupes on Chatwoot's message id, and runs an AI Agent on
-OpenRouter with a 30-turn memory keyed by phone. Replies post back to Chatwoot,
+OpenRouter (`google/gemini-3.1-pro-preview` since 19 Oct 12:22 UTC, 8192 tokens for
+thinking and reply, temperature 1.0; 2.5 Flash before) with a 30-turn memory keyed by phone. Replies post back to Chatwoot,
 never to Meta, so the inbox holds both halves of every conversation.
 
 **Chatwoot assigns new conversations to the agent bot itself** (`assignee_type
@@ -735,8 +736,9 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     2. **One live "hi" on WhatsApp:** idle since 7 Oct, and the 8 Oct menu line has never run live.
     3. **Test calls on both phone agents** since the 8 Oct edits.
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
-    5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
+    5. **Top up OpenRouter:** $7.25 in the wallet at 19 Oct 12:20 UTC and $13 left on the key's cap; on Gemini 3.1 Pro that is one to two hundred messages.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
+- **19 Oct: the model is Gemini 3.1 Pro Preview (`n8n_whatsapp_model.py`): LIVE 12:22 UTC** (15:22 Israel). On the owner's word after Yariv's and Ido's afternoon chats (*"the conversation went crazy it hallucinated so right now we need to change LLM like a better one gemini 3 pro"*). The OpenRouter node only: `google/gemini-3.1-pro-preview`, 8192 tokens (the thinking counts against the cap; too small is an empty reply), temperature 1.0 (Google's rule for Gemini 3). Prompt, tools, guards and memory key untouched; gate on live 362 of 362, pins unchanged; every patcher idle but the baseline on a clean checkout. The tool round-trip was checked on OpenRouter first, in n8n's message shape ($0.0083). **About ten times the cost a message** ($0.03–0.07): the wallet's $7.25 is one to two hundred messages. **Owed:** the owner's handset, `--watch 2026-10-19T12:22`, the next morning. **Undo:** `--restore`.
 - **19 Oct: why the bot repeats itself. Found, not fixed: it waits on the owner's go** (CONTEXT, "The bot repeats itself"; WORKLOG 19 Oct).
   - **What happened:**
     - **The owner's screenshot (11:38–11:39 UTC):** the same ticket question twice got the same message twice.
@@ -875,15 +877,19 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   three you are about to change, and change all of them.** The model can see the
   system's line: the inject passes it in brackets as "a sentence the system sent
   and not you".
-- **`maxTokens` IS 1024 ON THE MODEL NODE, AND THAT IS LOAD-BEARING WHEN CREDIT
-  IS LOW (25 Sep).** OpenRouter pre-authorises the FULL `max_tokens` before it
-  answers, so at 4096 every reply was refused with `Payment required` while the
-  account could only cover 4010 — a 2% shortfall that reads exactly like a dead
-  key and spends nothing, so the usage counter never moves. **Read the error's
-  `description`, not its `message`.** If it comes back, either top up or lower
-  `maxTokens` further; 1024 is already generous for a WhatsApp reply. **Probe
-  with the real `max_tokens`** — a one-token probe passes on an empty account
-  and proves nothing.
+- **`maxTokens` IS 8192 ON THE MODEL NODE SINCE 19 OCT (1024 from 25 Sep), AND
+  THE CAP HAS TWO JOBS.** Gemini 3 thinks before it answers and OpenRouter counts
+  the thinking against `max_tokens`: a cap the thinking fills returns
+  `finish_reason: length` with empty content, a silent bot, so the cap is sized
+  for thinking plus a reply, never for a WhatsApp reply alone. And OpenRouter
+  pre-authorises the FULL `max_tokens` before it answers: on 25 Sep at 4096 every
+  reply was refused with `Payment required` while the account could only cover
+  4010 — a 2% shortfall that reads exactly like a dead key and spends nothing, so
+  the usage counter never moves. At 8192 × $12/M plus the ~13k-token prompt at
+  $2/M a call needs about $0.13 of balance. **Read the error's `description`,
+  not its `message`.** If it comes back, top up: lowering the cap under Gemini 3
+  trades a 402 for an empty reply. **Probe with the real `max_tokens`** — a
+  one-token probe passes on an empty account and proves nothing.
 - **THE MODEL KEY RAN OUT ON 25 SEP AND THE BOT WENT SILENT.** Every call came
   back `Payment required`, and `Say it again` -- the one node on the reply path
   that does NOT fail open -- threw, so the resident got nothing at all. Live now

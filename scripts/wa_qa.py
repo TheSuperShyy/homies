@@ -193,7 +193,7 @@ def context_md(label, texts, tools):
 
 PLAYER = """# Playing the Homies WhatsApp bot offline
 
-You are standing in for the production model (google/gemini-2.5-flash, temperature 0.6)
+You are standing in for the production model (google/gemini-3.1-pro-preview, temperature 1.0, since 19 Oct)
 of the Homies WhatsApp bot, for ONE scenario and ONE variant. Nothing you write reaches
 anyone. Play the model faithfully: write what a capable model that reads this system
 prompt and these tool definitions would write. Do not optimise for any test, do not
@@ -1154,7 +1154,9 @@ def diff(run, against):
 # player's. A cheap model plays the resident from the card and sees only the
 # handset. Tools are stand-ins that follow the deck's rules in code, so nothing
 # is written anywhere. The transcripts land where `grade` and `report` read them.
-BOT = {"model": "google/gemini-2.5-flash", "temperature": 0.6, "max_tokens": 1024}
+# 19 Oct: Gemini 3.1 Pro Preview, 1.0, 8192 (scripts/n8n_whatsapp_model.py). A `play`
+# run costs about ten times the 5 Oct one; PLAY_CAP still stops it at a dollar.
+BOT = {"model": "google/gemini-3.1-pro-preview", "temperature": 1.0, "max_tokens": 8192}
 RESIDENT_MODEL = "openai/gpt-4.1-mini"
 MEMORY_PAIRS = 12           # memoryBufferWindow contextWindowLength: k exchanges
 PLAY_CAP = 1.00             # dollars for the whole run

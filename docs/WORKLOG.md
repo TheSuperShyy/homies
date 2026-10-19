@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### WhatsApp bot: the model is Gemini 3.1 Pro (LIVE 12:22 UTC)
+- **Asked:** *"can retrieve the run arount 1pm to 2:30 pm margin the conversation went crazy it hallucinated so right now we need to change LLM like a better one gemini 3 pro"*.
+- **The run.** The only WhatsApp traffic in the last 24 hours is 11:30–11:57 UTC today (14:30–14:57 Israel, 19:30–19:57 Manila); nothing ran at 1–2:30 pm on any clock, and no voice call since 12 Oct. Three numbers, read from Chatwoot and the eleven executions (114474–114583):
+  - **Yariv** (conversation 54, flat 3): "היי מה קורה?" got a greeting (114474); "הכל טוב תודה. מה קורה עם הקריאה שפתחתי אני לא מבין" got **"הכל בסדר תודה, מה שלומך היום?"** (114483): the first draft asked for the reference number, the echo and clerk guards sent it back, and the second try sent the previous greeting again. No tool was called.
+  - **Ido** (conversation 44, flat 1): "סבבה אני רוצה להבין מה מצב הקריאה שלי" got "בטח, איזו קריאה **את** רוצה שאבדוק? אם יש לך מספר אסמכתא..." (114583): feminine to a man, and a reference number asked for instead of a lookup by his number.
+  - **The owner** (conversation 1): the paste glued to the tap, with a PNG, and then the same question typed, got the identical sentence twice (114528, 114536: "תוכל לשלוח לי את מספר הקריאה, או את הכתובת המלאה"). No tool was called.
+  - The second-try repeat is the workflow's (the morning's diagnosis below; the other session's epoch-83 work, in progress and uncommitted). The greeting sent as an answer, the feminine slip and the missing lookup are the model's.
+- **Changed, `scripts/n8n_whatsapp_model.py`, the OpenRouter node only.** It feeds Answer the resident, Worth a word? and Could not answer, so all three move:
+  - model `google/gemini-2.5-flash` → `google/gemini-3.1-pro-preview`. "Gemini 3 Pro" on OpenRouter is 3.1 Pro Preview; `google/gemini-3-pro-preview` is off their list. $2 in / $12 out per 1M tokens against $0.30 / $2.50.
+  - maxTokens 1024 → 8192. Gemini 3 thinks before it answers (Google's default "high"; the lmChatOpenRouter v1 node has no reasoning parameter) and OpenRouter counts the thinking against `max_tokens`: a cap the thinking fills returns `finish_reason: length` with empty content, a silent bot. OpenRouter still pre-authorises the full cap, so a call needs about $0.13 of balance.
+  - temperature 0.6 → 1.0. Google's Gemini 3 guide: *"we strongly recommend keeping the temperature parameter at its default value of 1.0 ... setting it below 1.0 may lead to unexpected behavior, such as looping or degraded performance"*.
+  - Not touched: the prompt, the tools, the guards, Send, the memory key (no epoch bump: a buffer holds plain turns). `n8n_whatsapp.py`'s MODEL / MAX_TOKENS / TEMPERATURE and `wa_qa.py`'s BOT follow.
+- **Checked before the write, $0.0083 on OpenRouter** (the model's compatibility, not a probe of the bot): a two-step tool round-trip in n8n's own message shape, the assistant's tool call echoed back without `reasoning_details`. The tool call came, then a correct Hebrew answer; 131 and 447 reasoning tokens; 4 and 7 seconds.
+- **Gate.** Candidate: 362 of 362 cases, pins unchanged, replay 0 differences. **LIVE 12:22 UTC** (`--apply`; read back: model, 8192, 1; a second run says nothing to do). On live: 362 of 362, pins unchanged. Idle check on the working copy: `model` idle; not idle are the baseline 6 and 13 whose anchors are the other session's uncommitted epoch-83 texts (prompt.md, MEMORY_EPOCH 83, retry.py, manners.py), expected until that carrier ships. In a clean checkout (HEAD plus this change alone, a scratch worktree) exactly the baseline 6 are not idle.
+- **Cost.** A resident message is two model calls (Worth a word? ~0.6k tokens in, Answer the resident ~13k in), three with a retry: about $0.03–0.07 against $0.004 on Flash. Wallet $7.25 at 12:20 UTC: one to two hundred messages. The owner tops up. The thinking adds seconds to every reply.
+- **Owed:** the owner's handset (a status question, a rep request), `--watch 2026-10-19T12:22`, the next morning.
+- **Undo:** `n8n_whatsapp_model.py --restore` (snapshot `docs/handover/n8n-whatsapp-live-19oct-before-model.json`), then revert the commit.
+
 ### WhatsApp bot: why it repeats itself (diagnosed, read-only; not fixed yet)
 - **Asked:** a screenshot (19:37–19:39 PHT = 11:37–11:39 UTC). *"do you see the issue in the chatbot"*, then: *"we have the same problem having going on for a long time ... lets see first what causes it then lets fix from there, i think its a prompt paralysis/conflict but this is just a speculation"*.
 - **Read:**

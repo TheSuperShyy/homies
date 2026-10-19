@@ -125,7 +125,17 @@ PROMPT_DOC = os.path.join(ROOT, "docs", "features", "11-whatsapp-bot", "prompt.m
 # the previous model failed on; and a bare "שלום" was answered with
 # "היי, מה שלומך?" — chattier than a building-management line should be, and the
 # first thing to put in front of a Hebrew speaker.
-MODEL = "google/gemini-2.5-flash"
+# MODEL = "google/gemini-2.5-flash"    # 8 Aug - 19 Oct
+#
+# 19 OCT: google/gemini-3.1-pro-preview, on the owner's word ("the conversation went
+# crazy it hallucinated so right now we need to change LLM like a better one gemini
+# 3 pro"), after Yariv's and Ido's chats that afternoon (executions 114483, 114583).
+# "Gemini 3 Pro" on OpenRouter is 3.1 Pro Preview; google/gemini-3-pro-preview is
+# off their list. $2 in / $12 out per 1M against Flash's $0.30 / $2.50, and it
+# thinks before it answers (see MAX_TOKENS and TEMPERATURE). Carried to live by
+# scripts/n8n_whatsapp_model.py; the two-step tool round-trip was checked on
+# OpenRouter first, in n8n's own message shape ($0.0083).
+MODEL = "google/gemini-3.1-pro-preview"
 
 # NOT APPLIED ANY MORE, and kept so that is written down rather than discovered.
 #
@@ -144,7 +154,17 @@ EFFORT = "low (no longer sent — the OpenRouter node has no reasoning parameter
 
 # Bounds thinking AND the reply together on this model, so it is not sized for a
 # WhatsApp-length answer — a reply that thought first would truncate mid-sentence.
-MAX_TOKENS = 4096
+# MAX_TOKENS = 4096    # the design value; live carried 1024 from 25 Sep to 19 Oct
+#
+# 19 OCT: 8192. Live had carried 1024 since 25 Sep (the pre-authorisation shortfall
+# when the wallet was near zero; HANDOVER). Gemini 3 thinks at "high" by default --
+# the OpenRouter node has no reasoning parameter -- and OpenRouter counts the
+# thinking against max_tokens: a cap the thinking fills comes back as
+# finish_reason "length" with EMPTY content, a silent bot. So the cap is sized for
+# thinking plus a reply, never for a WhatsApp reply alone. The price: OpenRouter
+# pre-authorises the full cap, about $0.13 a call with the ~13k-token prompt, so
+# under that balance every reply is "Payment required" again.
+MAX_TOKENS = 8192
 
 # NO TEMPERATURE WAS SENT AT ALL UNTIL 31 AUG, and that is worth a paragraph
 # because the same omission has already cost this project once.
@@ -179,7 +199,14 @@ MAX_TOKENS = 4096
 # examples, was never reproduced, and six probe replies at 0.3 had no typos --
 # which is what 0.6 would also produce. If Hebrew degrades, step to 0.45 and
 # re-probe; that is one constant and one push.
-TEMPERATURE = 0.6
+# TEMPERATURE = 0.6    # 31 Aug - 19 Oct, on 2.5 Flash
+#
+# 19 OCT: 1.0 with Gemini 3. Google's Gemini 3 guide: "we strongly recommend keeping
+# the temperature parameter at its default value of 1.0 ... setting it below 1.0 may
+# lead to unexpected behavior, such as looping or degraded performance". The 0.3 and
+# 0.6 history above is about 2.5 Flash; looping is the very complaint this move
+# answers, so the default is kept.
+TEMPERATURE = 1.0
 
 # THE MEMORY EPOCH. Bump this and every existing conversation buffer is
 # abandoned at once.

@@ -2372,6 +2372,42 @@ none. Right after the system's menu or a first-word ack that greeted: none.
 Never two in one message. Greetings were reversed six times between 20 and
 25 Sep; this table is the reference now, and a change to it is the owner's.
 
+## The model is Gemini 3.1 Pro since 19 Oct, and the token cap bounds its thinking
+
+19 Oct 12:22 UTC, on the owner's word after Yariv's and Ido's chats that afternoon
+(*"the conversation went crazy it hallucinated so right now we need to change LLM
+like a better one gemini 3 pro"*). The OpenRouter node carries
+`google/gemini-3.1-pro-preview`, 8192 tokens, temperature 1.0
+(`scripts/n8n_whatsapp_model.py`; before: 2.5 Flash, 1024, 0.6). It feeds all three
+agents: Answer the resident, Worth a word?, Could not answer. Four things follow:
+
+- **`maxTokens` is not a reply length any more.** Gemini 3 thinks before every
+  answer, the lmChatOpenRouter v1 node has no reasoning parameter (so it thinks at
+  Google's default, "high"), and OpenRouter counts the thinking against
+  `max_tokens`. A cap the thinking fills comes back as `finish_reason: length` with
+  empty content: a silent bot, not an error. Never size the cap for a WhatsApp
+  reply again. The pre-authorisation it costs (about $0.13 of balance a call) is
+  the price of a reply at all; under that balance every call is `Payment required`.
+- **Temperature stays at 1.0.** Google's Gemini 3 guide says so in as many words
+  and names looping as what a lower value causes; the 31 Aug reasons for 0.6 were
+  about 2.5 Flash.
+- **The pins did not move, the reader did.** No model-facing text changed, so
+  nothing was replayed. But every habit measured about 2.5 Flash in this file (the
+  echo opener, the intro question on the משהו אחר tap, the `במה אוכל לעזור` prior,
+  the 1-in-3 emoji on an emergency) is a claim about the old model until it is
+  seen again on this one. `--watch` after the owner's handset, and the next
+  morning, is how it is seen.
+- **The money.** About ten times a Flash turn: $0.03-0.07 a resident message, two
+  model calls (Worth a word? ~0.6k tokens in, Answer the resident ~13k) or three
+  with a retry. $7.25 in the wallet at 12:20 UTC is one to two hundred messages;
+  `scripts/check_openrouter.py` says where it stands. The lever if cost or latency
+  bites is a lower reasoning effort, which this node cannot send: an OpenRouter
+  preset (`@preset/...`, made in their dashboard) or the OpenAI chat-model node
+  pointed at OpenRouter, which has `reasoningEffort`. Either is its own change
+  through the gate. The tool round-trip itself was checked before the write, in
+  n8n's own message shape, for $0.0083: the one OpenRouter spend, for the model's
+  compatibility, not a probe of the bot.
+
 ## How a WhatsApp change ships
 
 27 Sep, after the second regression in a day. Owner: *"we need to make sure
