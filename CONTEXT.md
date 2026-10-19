@@ -2343,7 +2343,7 @@ the first.**
    - **Most of the prompt** says not to announce understanding and just to ask, without explaining why (lines 523 and 525).
    - **The epoch-82 manager passage** says "show him you understand" and to explain why the details are needed.
    - **The checks** follow the first set, except in a "manager chat": any chat whose last 12 rows hold a resident's מנהל/נציג/… other than the exact tap. At 11:38 a pasted "לדבר עם נציג" was glued to the ticket question, which flipped the chat into manager mode, so "אני מבין ש…" went out twice.
-   - **The model's own voice** is exactly that ("אני מבין ש… כדי שאוכל… אצטרך…"): 6 of the 8 rejected drafts. So the checks keep bouncing it, and every bounce feeds cause 1.
+   - **The model's own voice** is exactly that ("אני מבין ש… כדי שאוכל… אצטרך…"): 7 of the 8 rejected drafts open that way. So the checks keep bouncing it, and every bounce feeds cause 1.
 4. **The ticket question has no answer without a number or an address.**
    - **The prompt** (line 515) says to check a ticket with the tool before saying anything about it.
    - **On WhatsApp, `get_request_status` cannot use the sender:** it uses `ctx.residentId` (never set on chat), a reference or a building. `get_payment_link` finds the flat by `residents.phone`, and tickets carry `reported_by_phone`.
