@@ -3029,6 +3029,25 @@ multiple time stress test it the chatbot"*.
   writes nothing anywhere. It spends OpenRouter: the owner's go each time, and the
   run's cap (`PLAY_CAP`, one dollar for the whole run) is raised only to what he
   approved.
+- **A scenario's `iso` is the same instant as its `time`.** The harness reads the
+  answering model's clock from `time` and the payment ack's greeting from `iso`, so
+  the two must agree: Israel time with its offset (`2026-10-19T14:30:00+03:00` for
+  14:30). On 19 Oct 37 of the 56 scripted scenarios had `iso` three hours early,
+  and three first-message acks greeted for the wrong hour.
+- **Known rubric false positives: read the turn before counting the flag.**
+  `soon-promise` on a wish ("מקווה שהמשלוח יגיע") or a negated "whether"
+  ("אם ומתי יחזרו אליך … לא יודע"); `question-after-goodbye` on "תודה" followed
+  by a new question; `office-unasked` when the resident asked for the number;
+  `emoji-in-emergency` on the tap's emoji before the danger was mentioned;
+  `feminine-without-cue` after "אני לא יודעת" (the cue list lacks it);
+  `how-are-you-again` when he asked first without answering. None of them is the
+  bot's error; the rubric reads words, not the turn.
+- **A filter that only removes can delete an honest answer.** Send's promise filter
+  cuts a promise phrase even inside "אם יחזרו אליך … אני לא יודע", which is the
+  bot saying it does not know: the resident's question is left unanswered, or the
+  text is left as a fragment (19 Oct, HANDOVER). A grader that reads the handset
+  never sees what was cut; compare the model's `output` with the `handset` when a
+  resident asks the same question twice.
 - **No backslashes through the shell.** The Bash tool's transport turns a doubled
   backslash into a single one, so a heredoc'd script meant to write the two
   characters backslash-n writes a newline instead (19 Oct, twice: the second time it

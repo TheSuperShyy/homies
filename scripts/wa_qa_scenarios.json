@@ -1,10 +1,10 @@
 {
- "_about": "The WhatsApp bot's QA deck for scripts/wa_qa.py. Every resident is invented; the only building used for anything that writes is בר כוכבא 23 (the one opened for testing), and nothing here writes anywhere. `expect` is checked by the grader and never shown to the players; `judge` lines go to the blind judges. iso is the scenario's clock in UTC (Israel is UTC+3 in October). A bug found on a handset is a scenario added here.",
+ "_about": "The WhatsApp bot's QA deck for scripts/wa_qa.py. Every resident is invented; the only building used for anything that writes is בר כוכבא 23 (the one opened for testing), and nothing here writes anywhere. `expect` is checked by the grader and never shown to the players; `judge` lines go to the blind judges. iso is the same instant as `time`, written in Israel time with its offset (+03:00 in October); the payment-ack model's greeting is read from it (19 Oct: 37 scenarios had it three hours early). A bug found on a handset is a scenario added here.",
  "scenarios": [
   {
    "id": "gate_lock",
    "title": "the gate lock, Hebrew, first contact",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דני, גר בבר כוכבא 23 דירה 4; הבניין יש לו שני שערים, הכניסה והחניה; הבעיה בשער החניה מאחור",
     "script": [
@@ -38,7 +38,7 @@
   {
    "id": "gate_english",
    "title": "the owner's own 30 Sep lines, in English",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "the owner testing in English; lives at Bar Kochba 23 apartment 4; the gate he means is the parking gate at the back",
     "script": [
@@ -72,7 +72,7 @@
   {
    "id": "stair_light",
    "title": "a stairwell light, everything said up front",
-   "time": "09:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T06:30:00+03:00",
+   "time": "09:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T09:30:00+03:00",
    "resident": {
     "persona": "רונית, גרה בבר כוכבא 23 דירה 7; הנורה בחדר המדרגות בקומה 2 שרופה",
     "script": [
@@ -100,7 +100,7 @@
   {
    "id": "lift_person",
    "title": "someone stuck in the lift",
-   "time": "19:40", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:40:00+03:00",
+   "time": "19:40", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T19:40:00+03:00",
    "emergency": true,
    "resident": {
     "persona": "יוסי, גר בבר כוכבא 23 דירה 12; שכנה תקועה במעלית",
@@ -130,7 +130,7 @@
   {
    "id": "sink_private",
    "title": "a blocked kitchen sink, in English",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "a resident writing in English, Bar Kochba 23 apartment 4",
     "script": [
@@ -155,7 +155,7 @@
   {
    "id": "leak_unclear",
    "title": "water on the bathroom floor, origin unclear",
-   "time": "11:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T08:00:00+03:00",
+   "time": "11:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
    "resident": {
     "persona": "מיכל, גרה בבר כוכבא 23 דירה 3; מים על רצפת השירותים, מטפטף מהתקרה",
     "script": [
@@ -182,7 +182,7 @@
   {
    "id": "balance",
    "title": "how much do I owe",
-   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
+   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T14:00:00+03:00",
    "resident": {
     "persona": "דני לוי, בר כוכבא 23 דירה 4, טלפון 0501234567",
     "script": [
@@ -213,7 +213,7 @@
   {
    "id": "pay_link",
    "title": "I want to pay",
-   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
+   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T14:00:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה לשלם",
     "script": [
@@ -242,7 +242,7 @@
   {
    "id": "pay_link_missing",
    "title": "how do I pay, and the link is not found",
-   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T11:00:00+03:00",
+   "time": "14:00", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T14:00:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4 שהמספר שלו לא מזוהה במערכת",
     "script": [
@@ -273,7 +273,7 @@
   {
    "id": "status_ref",
    "title": "status of a ticket by its number",
-   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T07:15:00+03:00",
+   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T10:15:00+03:00",
    "resident": {
     "persona": "דייר שפתח קריאה אתמול על מנעול השער",
     "script": [
@@ -298,7 +298,7 @@
   {
    "id": "status_tap",
    "title": "the status button, no reference",
-   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T07:15:00+03:00",
+   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T10:15:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 שלא זוכרת מספר קריאה",
     "script": [
@@ -326,7 +326,7 @@
   {
    "id": "tap_open",
    "title": "the open-a-ticket button",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4; דלת הכניסה לבניין לא נסגרת",
     "script": [
@@ -354,7 +354,7 @@
   {
    "id": "tap_rep",
    "title": "the talk-to-a-representative button, then a disputed charge",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4 עם חיוב שלא מבין",
     "script": [
@@ -389,7 +389,7 @@
   {
    "id": "service_cleaning",
    "title": "how often is the stairwell cleaned",
-   "time": "12:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T09:30:00+03:00",
+   "time": "12:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T12:30:00+03:00",
    "resident": {
     "persona": "דיירת שרוצה לדעת על הניקיון",
     "script": [
@@ -413,7 +413,7 @@
   {
    "id": "price_quote",
    "title": "how much to paint the stairwell",
-   "time": "12:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T09:30:00+03:00",
+   "time": "12:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T12:30:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה הצעת מחיר לצביעת חדר המדרגות",
     "script": [
@@ -438,7 +438,7 @@
   {
    "id": "no_ticket",
    "title": "just so you know, no ticket needed",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 שלא רוצה קריאה",
     "script": [
@@ -459,7 +459,7 @@
   {
    "id": "off_topic",
    "title": "the weather, then a neighbour's debt",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר סקרן בבר כוכבא 23 דירה 4",
     "script": [
@@ -481,7 +481,7 @@
   {
    "id": "burglary",
    "title": "a break-in last night",
-   "time": "23:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T20:30:00+03:00",
+   "time": "23:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T23:30:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 דירה 4 שפרצו לה לדירה",
     "script": [
@@ -506,7 +506,7 @@
   {
    "id": "lost",
    "title": "I don't know what I need",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר מבולבל בבר כוכבא 23",
     "script": [
@@ -528,7 +528,7 @@
   {
    "id": "unclear",
    "title": "'it again' with no content, then the roof fan",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4; המפוח על הגג רועש בלילה",
     "script": [
@@ -553,7 +553,7 @@
   {
    "id": "street_unknown",
    "title": "a lobby leak in a building Homies does not manage",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר ברחוב הדמיון 7 דירה 2 (רחוב שהומיז לא מנהלת)",
     "script": [
@@ -579,7 +579,7 @@
   {
    "id": "photo_nocaption",
    "title": "a photo with no words",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 4; צינור בחניון מטפטף",
     "script": [
@@ -604,7 +604,7 @@
   {
    "id": "goodbye_mid",
    "title": "thanks and goodnight after a ticket earlier today",
-   "time": "21:10", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T18:10:00+03:00",
+   "time": "21:10", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T21:10:00+03:00",
    "history": [
     {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 20:55, יום חמישי.]\nהאינטרקום בכניסה לא עובד, בר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "ערב טוב, כאן מיכאל מהומי'ז. מעצבן כשזה לא עובד. פתחתי לך קריאה על האינטרקום, מספר 255-1412-26. אפשר לעזור בעוד משהו?"}
    ],
@@ -627,7 +627,7 @@
   {
    "id": "hello_then_matter",
    "title": "a bare hello, then cockroaches in the bin room",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 דירה 4; ג'וקים בחדר האשפה",
     "script": [
@@ -654,7 +654,7 @@
   {
    "id": "how_are_you_he",
    "title": "hi, how are you, then a balance question",
-   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:09:00+03:00",
+   "time": "16:09", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:09:00+03:00",
    "resident": {
     "persona": "דני לוי, בר כוכבא 23 דירה 4, טלפון 0501234567",
     "script": [
@@ -680,7 +680,7 @@
   {
    "id": "second_matter",
    "title": "mid-conversation hello and a second fault, building known",
-   "time": "16:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:30:00+03:00",
+   "time": "16:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:30:00+03:00",
    "history": [
     {"resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:12, יום חמישי.]\nהתאורה בחניון לא עובדת", "tools": [], "michael": "צהריים טובים, כאן מיכאל מהומי'ז. לא נעים לרדת לחניון בחושך. באיזה בניין זה, ובאיזו דירה אתה גר?"},
     {"resident": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:13, יום חמישי.]\nבר כוכבא 23 דירה 4", "tools": ["open_request"], "michael": "פתחתי לך קריאה על התאורה בחניון, מספר 255-1414-26. אפשר לעזור בעוד משהו?"}
@@ -709,7 +709,7 @@
   {
    "id": "fem_light_first",
    "title": "a woman reports a stairwell light, the feminine in her first line",
-   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T07:15:00+03:00",
+   "time": "10:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T10:15:00+03:00",
    "resident": {
     "persona": "מיכל, גרה בבר כוכבא 23 דירה 6; האור בחדר המדרגות בקומה 3 לא נדלק כבר יומיים",
     "script": [
@@ -736,7 +736,7 @@
   {
    "id": "fem_late_cue",
    "title": "a leak, the feminine only in her second message",
-   "time": "13:40", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T10:40:00+03:00",
+   "time": "13:40", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:40:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 דירה 2; מים מטפטפים מהתקרה בחדר המדרגות בקומה הראשונה, ליד הדלת שלה, מהבוקר; לא יודעת מאיפה זה בא",
     "script": [
@@ -763,7 +763,7 @@
   {
    "id": "fem_pay",
    "title": "a woman asks for the payment link",
-   "time": "19:05", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:05:00+03:00",
+   "time": "19:05", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T19:05:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 דירה 4 שרוצה לשלם את הוועד",
     "script": [
@@ -791,7 +791,7 @@
   {
    "id": "fem_rep_tap",
    "title": "the representative button, then a woman disputes a charge",
-   "time": "15:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T12:30:00+03:00",
+   "time": "15:30", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T15:30:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 דירה 4 שחויבה פעמיים על ספטמבר",
     "script": [
@@ -827,7 +827,7 @@
   {
    "id": "rep_fine_thanks",
    "title": "the representative button, a plain 'fine, thanks', then a cleaning question",
-   "time": "16:20", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T13:20:00+03:00",
+   "time": "16:20", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T16:20:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 9 שרוצה לשאול על הניקיון, עונה בקצרה",
     "script": [
@@ -864,7 +864,7 @@
   {
    "id": "rep_and_you",
    "title": "the representative button in the evening; he asks back 'and you?', then the intercom",
-   "time": "20:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T17:15:00+03:00",
+   "time": "20:15", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T20:15:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 8, מנומס, שואל בחזרה מה שלומו",
     "script": [
@@ -902,7 +902,7 @@
   {
    "id": "rep_morning_matter",
    "title": "the representative button in the morning; the answer to how-are-you carries the matter",
-   "time": "09:05", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T06:05:00+03:00",
+   "time": "09:05", "weekday": 4, "weekday_he": "חמישי", "iso": "2026-10-01T09:05:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 דירה 5; יש נזילה בחניון מתחת לחניה 3",
     "script": [
@@ -1514,7 +1514,7 @@
    "time": "14:30",
    "weekday": 1,
    "weekday_he": "שני",
-   "iso": "2026-10-19T11:30:00+03:00",
+   "iso": "2026-10-19T14:30:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 2 שפתח לפני שבוע קריאה על התאורה בחדר המדרגות ולא שמע כלום. לא זוכר מספר קריאה ולא מבין למה שואלים אותו. אם מבקשים ממנו מספר או כתובת, הוא כותב שוב את אותה שאלה בדיוק",
     "script": [
@@ -1599,7 +1599,7 @@
    "time": "14:30",
    "weekday": 1,
    "weekday_he": "שני",
-   "iso": "2026-10-19T11:30:00+03:00",
+   "iso": "2026-10-19T14:30:00+03:00",
    "resident": {
     "persona": "דייר בסוקולוב 86 שכותב מטלפון חדש; פתח קריאה בטלפון למשרד על הדלת של החניון ואין לו מספר",
     "script": [
@@ -1670,7 +1670,7 @@
    "time": "10:15",
    "weekday": 4,
    "weekday_he": "חמישי",
-   "iso": "2026-10-01T07:15:00+03:00",
+   "iso": "2026-10-01T10:15:00+03:00",
    "resident": {
     "persona": "דיירת בבר כוכבא 23 שלא זוכרת מספר קריאה",
     "script": [
@@ -1752,7 +1752,7 @@
    "time": "14:37",
    "weekday": 1,
    "weekday_he": "שני",
-   "iso": "2026-10-19T11:37:00+03:00",
+   "iso": "2026-10-19T14:37:00+03:00",
    "resident": {
     "persona": "דייר בבר כוכבא 23 דירה 2 שבודק את הבוט מהטלפון: לוחץ על נציג, עונה על מה שלומו, ואז מדביק בטעות את טקסט הכפתור לפני השאלה שלו על הקריאה. אם מבקשים ממנו מספר או כתובת, הוא כותב את השאלה שוב בלי הטקסט המודבק",
     "script": [
