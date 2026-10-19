@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### Omnitelecom: "Invalid credentials" on extension 208 (answered in chat, read-only)
+- **Asked:** a screenshot of Omni support's email (*"לאחר בדיקה, פרטי ההתחברות שנשלחו אלינו אינם נכונים … X-Reason: Invalid credentials"*): *"whats this"*.
+- **What it is:** Omni put the address and login from our reply on extension 208 and sent a test call to `sip:homies-omni-208@sip.vapi.ai`. Vapi's SIP side refused the login.
+- **Why, checked read-only:** `python scripts/vapi_sip.py` lists 0 SIP addresses on the tenth account. The address was never created: the reply went to Omni before `--apply` was run, so Vapi had nothing under that address and no login to check against. The login in `.env` (25 and 32 characters) is the one in the email, unchanged.
+- **The fix:** the owner runs `python scripts/vapi_sip.py --apply` (refused for the session twice as a production change), then tells Omni to try the same details again. Nothing in the email changes.
+- **Not done:** no write to Vapi; no reply to Omni sent.
+
 ### WhatsApp bot: stress test on the candidate (live plus the repeat fix), Claude-played, IN PROGRESS
 - **Asked:** *"so make sure everything is good test it multiple time stress test it the chatbot"* (after the move to Gemini 3.1 Pro and the voice spelling fix).
 - **What is tested:** the bot as it will be once the owner runs `n8n_whatsapp_norepeat.py --apply`: live (Gemini 3.1 Pro on the node) plus the epoch-83 repeat fix, dumped fresh from live by the carrier's dry run. Live itself is unchanged (epoch 82); no real resident has written since the 12:22 switch.

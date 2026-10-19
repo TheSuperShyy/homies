@@ -844,6 +844,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
       - It is read back after creating.
       - The dry run is clean, and `--delete` undoes it.
     - **Not created yet:** the session's permission check stopped the create twice as a production change, the second time after the owner's go. **The owner runs `python scripts/vapi_sip.py --apply` before sending.** The login is already in `.env`, so the address will match the email.
+    - **19 Oct, later: Omni tested before the address existed.** Their support wrote back *"Invalid credentials"* (`X-Reason: Invalid credentials`, from Vapi's SIP side): the reply with the login went out, but the account still has 0 SIP addresses (checked read-only). Same fix, one step further: the owner runs `python scripts/vapi_sip.py --apply`, then answers Omni that the details are now active and asks them to try the same ones again. The login in `.env` is the one in the email, so nothing is resent; a real call from 208 then proves it.
     - **An account move loses it:** `vapi_transfer.py` copies agents, not phone numbers. Run `--delete` with the old key, then `--apply` with the new one. That is also how it moves to the client's main account, which the owner plans for later.
   - **The dialer side waits on Omni's external_id header,** plus our `assistant-request` router that picks the agent.
 - **12 Oct: Omni wrote that they are starting the Tokomni move and asked for the dialer setup** (email in `local/omnitelecom/`, WORKLOG 12 Oct).
