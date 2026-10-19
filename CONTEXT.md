@@ -3050,6 +3050,19 @@ multiple time stress test it the chatbot"*.
   resident asks the same question twice. The count on 19 Oct was made that way over
   every turn of every run: each sentence of `output` that holds "לא יודע", "אין לי
   דרך לדעת" or "לא אבטיח" and is missing from the handset.
+- **When an owner decision changes what is right, the judges' rules change with it.**
+  `JUDGE_RULES` in `wa_qa.py` is the text every blind judge grades against; on 19 Oct
+  it still said "nothing is promised" and "no explanation of why", so judges flagged
+  the owner's own 5 Oct reassurance ("it will be handled", no time) and the 18 Oct
+  manager explanation as violations, and flagged the office phone as invented because
+  they never see the prompt. It now carries both decisions, the facts the prompt gives
+  the bot, and that a tool result cut off for space is no evidence of invention. Update
+  it in the same change as the decision.
+- **`duplicate: true` from `open_request` means the new words were added.** The live
+  duplicate guard appends a second report's description to the first ticket ("Append,
+  never replace", index.ts), so "I added it to the same ticket" after a duplicate is
+  true in production. A fixture returning bare `duplicate: true` hides that from a
+  judge; read the function before calling it invented.
 - **No backslashes through the shell.** The Bash tool's transport turns a doubled
   backslash into a single one, so a heredoc'd script meant to write the two
   characters backslash-n writes a newline instead (19 Oct, twice: the second time it
