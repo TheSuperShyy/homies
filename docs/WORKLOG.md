@@ -9,6 +9,13 @@ conversation that produced it.
 
 ---
 
+## 2026-10-20
+
+### WhatsApp bot: today's bot against the epoch-84 pair, and a check anyone can run on the honest answers
+- **Asked:** *"compare the current chatbot vs the new changes before i push"* (answered in chat), then *"give me script for the things for the honest answer i wanna check it"*.
+- **The comparison, on the same text, no model called:** through live's Send (promise v3, danger v3) 9 of 27 honest "when" answers arrive whole and 8 arrive as broken half-sentences ("אני לא יכול להגיד לך שיגיעו היום" goes out as "אני לא יכול להגיד לך."; "להגיד לך שיחזרו אליך מחר, את זה אני לא יכול" as "להגיד לך."; "אם מישהו כבר יחזור אליך היום, את זה אני לא יודע" is deleted and the question goes unanswered); through the new Send all 27 arrive whole; both remove all 16 real promises. Of round 3's 70 replies, the two differ in 4, each an honest answer to "will someone call me back?" that live deletes. The replay of every real past reply through the new Send changes none. Beside it, from the repeat fix (epoch 83): a near-copy of the last three messages is sent back, and a ticket question is answered by the sender's number instead of asking for the number or the address. To know before the push: every chat's memory starts fresh once (the key goes to -84); same model; Claude played the bot in every test, not Gemini; the gas chat was not in round 3; the prompt pin is pasted before the two commands. Recommended in chat: push, the pair back to back, then the handset.
+- **The script, `scripts/check_honest_answers.py`:** reads live's Send (GET), builds the same Send with promise v4 and danger v4 swapped in (by the version-free markers the carrier uses, so it keeps working after the push, when both columns match), runs each sentence through both in Node, and prints what the phone gets from each, with English for the built-in examples. Built in: 15 honest answers (3 of them ones today's bot already lets through, so the count is fair), 5 promises, 4 honest emergency lines, 2 emergency promises. Own sentences as arguments, `--emergency` for a gas or flood chat, `--file` for a list. Read-only, no model, nothing written. Today: 3 of 15, 5 of 5, 0 of 4, 2 of 2; new: 15 of 15, 5 of 5, 4 of 4, 2 of 2.
+
 ## 2026-10-19
 
 ### The 10/19 report (in chat), and the shared checkout at the day's end

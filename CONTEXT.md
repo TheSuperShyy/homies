@@ -2475,6 +2475,8 @@ depend"*.
   clause after a condition, and a cut never leaves a verb of saying hanging. `danger
   v4` keeps, in an emergency, "who / whether someone is (already) coming, I can't see"
   and the done message, and still treats "מטפל" (handling now) as a promise.
+  `scripts/check_honest_answers.py` shows what the phone gets, live against the new
+  filters, for its own examples or any sentence given to it.
 - **Epoch order.** When a later epoch is built before an earlier carrier is live,
   the later carrier carries the prompt, the tool texts the epoch covers and the key
   (the earlier one leaves them, by design); check with `--base` that the stack holds
