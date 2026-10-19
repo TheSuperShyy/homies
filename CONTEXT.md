@@ -2324,6 +2324,37 @@ a refused open_request (`opened:false`) is not work. Any future "send it back"
 check inherits this: **the retry is a blank second chance, not a correction of
 the first.**
 
+## The bot repeats itself: four causes, found 19 Oct (not fixed yet)
+
+**The trigger.** On 19 Oct a resident asked "what's happening with the ticket I opened?" twice and got the same message back. Measured from the `messages` table: **34 times since 9 Aug** the bot answered nearly word for word (85%+) what it had just sent, within 15 minutes and after the resident had written something new. The owner's guess was "prompt paralysis/conflict". That is partly right; the two biggest causes are mechanical.
+
+1. **The second try is built to parrot.** In n8n's window (18 Oct 08:37 to 19 Oct 11:41), 8 of 21 AI answers went to `Try again`. Each one:
+   - **Memory:** the rejected draft is saved as if it had been sent, and it stays for the rest of the chat. Seen in 112609's loaded memory and 114483's retry input.
+   - **The message, twice:** the resident's message is added a second time, with the rejection note glued to it.
+   - **The note:** it lists what was wrong and points at open_request and get_payment_link, never at get_request_status.
+   - **No checks:** the second answer skips every style check (`$runIndex > 0`).
+
+   **114483, 11:32 UTC:** the first draft asked for the ticket number and was rejected for echo and clerk. The second try sent a word-for-word copy of the bot's previous message ("היי 😊 כאן מיכאל מהומי'ז. הכל בסדר תודה, מה שלומך היום?") and dropped the question.
+2. **Nothing checks for a repeat.**
+   - **The prompt says it twice:** line 517 ("each message adds something") and line 525 ("ask it differently").
+   - **No check enforces it:** none of the ten checks on `Reply usable?` compares the reply with what the bot already sent, on either pass.
+   - **The result:** 114536 (11:39) repeated 114528 (11:38) exactly. It was a first try, with no tool call.
+3. **The rules pull in opposite directions.**
+   - **Most of the prompt** says not to announce understanding and just to ask, without explaining why (lines 523 and 525).
+   - **The epoch-82 manager passage** says "show him you understand" and to explain why the details are needed.
+   - **The checks** follow the first set, except in a "manager chat": any chat whose last 12 rows hold a resident's מנהל/נציג/… other than the exact tap. At 11:38 a pasted "לדבר עם נציג" was glued to the ticket question, which flipped the chat into manager mode, so "אני מבין ש…" went out twice.
+   - **The model's own voice** is exactly that ("אני מבין ש… כדי שאוכל… אצטרך…"): 6 of the 8 rejected drafts. So the checks keep bouncing it, and every bounce feeds cause 1.
+4. **The ticket question has no answer without a number or an address.**
+   - **The prompt** (line 515) says to check a ticket with the tool before saying anything about it.
+   - **On WhatsApp, `get_request_status` cannot use the sender:** it uses `ctx.residentId` (never set on chat), a reference or a building. `get_payment_link` finds the flat by `residents.phone`, and tickets carry `reported_by_phone`.
+   - **So "what's happening with my ticket?"** always becomes "send me the ticket number or the address", and a resident who just asks again gets the same thing back.
+
+**Fix direction (owner's go first; nothing changed yet):**
+- a repeat check on every pass;
+- a second try that keeps the rejected draft and the duplicate message out of memory, and gets one note about what this message needs instead of a list of don'ts;
+- the status lookup by the sender's number;
+- one consistent rule on showing understanding, with the manager exemption narrowed to the turn that actually asks for a manager.
+
 **Greeted is not remembered.** Sort's `greeted` lives in staticData and survives
 epoch bumps and restarts; the model's memory does not. After every bump, every
 conversation is "greeted" to Sort and brand new to the model, and every prompt

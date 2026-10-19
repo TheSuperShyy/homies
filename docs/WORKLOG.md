@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### WhatsApp bot: why it repeats itself (diagnosed, read-only; not fixed yet)
+- **Asked:** a screenshot (19:37–19:39 PHT = 11:37–11:39 UTC). *"do you see the issue in the chatbot"*, then: *"we have the same problem having going on for a long time ... lets see first what causes it then lets fix from there, i think its a prompt paralysis/conflict but this is just a speculation"*.
+- **Read:**
+  - `check_whatsapp_rules.py --watch 2026-10-19T11:30`;
+  - every node of executions 114483, 114528 and 114536 (scratch tracer; phone numbers redacted);
+  - the live workflow;
+  - the prompt;
+  - the Edge Function's `get_request_status` and `get_payment_link`;
+  - the `messages` table since 9 Aug;
+  - all 21 AI turns n8n still keeps (18 Oct 08:37 to 19 Oct 11:41).
+- **Found (details in CONTEXT, "The bot repeats itself"):**
+  - **114528 (11:38) and 114536 (11:39):** the AI called no tool, and both replies are identical. The echo check stood aside because a pasted "לדבר עם נציג" glued to the question made it a "manager chat" (`--watch` shows "a chat about a manager: wanted").
+  - **114483 (11:32, another number):** the first draft asked for the ticket number and was rejected (echo and clerk). The second try's input held the rejected draft as an AI turn and the message again with the note. It sent a word-for-word copy of the bot's previous message.
+  - **The second try:** 8 of 21 AI answers went to `Try again`. The rejected draft and the noted duplicate stay in memory for later turns (112609).
+  - **Repeats:** no check compares a reply with what was sent. There are 34 near-identical repeats within 15 minutes since 9 Aug.
+  - **Ticket status:** `get_request_status` ignores the sender's number on chat (only `resident_id`, reference or building), while `get_payment_link` looks up `residents.phone`.
+- **The owner's guess:** partly right. The prompt conflict is real: the epoch-82 manager passage against lines 523 and 525, and the prompt against the status tool. But the two biggest causes are the second try's design and the missing repeat check.
+- **Nothing changed live.** No model call was made.
+
 ### Omnitelecom: the extension-208 reply pulled back, and a script for the bot's SIP address (the create waits on the owner)
 - **Asked:** *"pull back the drafted email and link the account link for it that tokomi needs"*. "tokomi" is Tokomni, Omni's new system; the link is the bot's address Omni asked for on 18 Oct.
 - **The draft** had lived only in chat (18 Oct). It is now saved in the gitignored `local/omnitelecom/2026-10-19-reply-extension-208.txt`: the Hebrew to send, an English check below it, and the address filled in.

@@ -737,6 +737,16 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     4. **Rotate the webhook secret,** which is in the public repo's August snapshot.
     5. **Top up OpenRouter:** $18 in the wallet and $13 left on the key's cap.
     6. **Push the eight dashboard files** that are on this branch but not on `main`.
+- **19 Oct: why the bot repeats itself. Found, not fixed: it waits on the owner's go** (CONTEXT, "The bot repeats itself"; WORKLOG 19 Oct).
+  - **What happened:**
+    - **The owner's screenshot (11:38–11:39 UTC):** the same ticket question twice got the same message twice.
+    - **Another number (11:32):** the second try copied the bot's previous message word for word.
+  - **How often:** 34 near-identical repeats since 9 Aug.
+  - **The four causes:**
+    1. the second try (8 of 21 AI answers in a day) keeps the rejected draft in memory, adds the message again with a note of don'ts, and skips the checks;
+    2. no check compares a reply with what was already sent;
+    3. the epoch-82 manager passage ("show you understand", "explain why") contradicts the rest of the prompt, and its check exemption flips on whenever נציג/מנהל appears in the last 12 rows;
+    4. `get_request_status` can't use the sender's number on WhatsApp, so a ticket question always asks for a number or an address.
 - **18 Oct, late: a request for a manager is answered with the reason, never the same question twice (`n8n_whatsapp_procedure.py`, epoch 82): LIVE 15:58 UTC** (23:58 on the owner's phone).
   - **The bug, on the owner's handset 15:05–15:08 UTC:** five requests for a manager, five "what is it about?", and "are you the manager?" got the fragment "מצוות השירות של הומי'ז. ...". Owner: *"like a parrot ... its the procedure we need to get information before we can do something"*.
   - **The cause was our guards:** Gemini's first drafts explained, and `echo`/`clerk` sent them back with "just ask". The fragment came from Send's name step.
