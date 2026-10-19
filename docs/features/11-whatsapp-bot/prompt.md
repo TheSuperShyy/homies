@@ -57,7 +57,8 @@ promise filter in 8 turns of 7 conversations, and the owner asked for a "low key
 excuse" instead of a bare "I don't know", then approved twelve examples with: *"make
 sure its not templated and if the customer ask it like twice in a row the response
 would depend"*. One paragraph, after "אתה מדווח מה הכלים שלך כבר עשו": the true
-reason (the team sets the times and its schedule is not in front of him); what is
+reason, as it comes from what the tools returned this turn and what is not in them
+(the paragraph names no reason of its own: see below); what is
 true now (what the tool showed, that the ticket is with the team, and, for a ticket
 opened in this chat, that a message comes here when it is closed: `ticket_resolved_he`,
 live since 22 Sep); what he can do from here (check again when they write); no time
@@ -68,6 +69,19 @@ sentence is in the prompt: the twelve approved examples are for feel only (WORKL
 19 Oct), and on 31 Aug every worked example in this file was what got sent. Send's
 `promise v4` backs it: "whether", under "I don't know", is no longer cut
 (`n8n_whatsapp_nopromise.py`).
+
+**20 Oct: any reason the paragraph states is the reason that gets sent.** The
+Claude-played check (three passes of ten "when?" conversations) measured it twice.
+Written as "את המועדים קובעים בצוות, ולוח הזמנים שלהם לא נמצא מולך", that clause
+came back in 36% of the answers, in 7 of 10 conversations; rewritten as a plain fact
+("מועדים נקבעים אצל מי שמטפל בעניין"), "את המועד קובע מי שמטפל בקריאה" came back in
+31%, in 5 of 10, and in an emergency the filter reads "שמטפל" as handling now. So the
+paragraph now says only where the reason comes from: what the tools returned this
+turn and what is not in them. A second ask gets no repeat of the reason ("כי אותה הוא
+כבר שמע"). The same check found three honest lines Send cut: "אני לא יכול לדעת אם
+מישהו כבר בדרך" in an emergency, "תגיע על זה הודעה לכאן" in an emergency, and a cut
+that left "אבל להגיד לך." on the phone; promise v4 and danger v4 now keep the first
+two and never leave the third (WORKLOG 19 Oct).
 
 ## 19 Oct — a ticket is looked up by the number; nothing is sent twice. Epoch 83.
 
@@ -543,7 +557,7 @@ MEMORY_EPOCH 74 to 75.
 
 אתה מדווח מה הכלים שלך כבר עשו, לא מה עומד לקרות. זה נכון במיוחד כשמישהו במצוקה ואתה רוצה להרגיע אותו: מה שמרגיע זה לדעת מה קרה עם הפנייה שלו, ולא הבטחה על ההמשך. וכשעוד לא נעשה כלום, אין מה לדווח: מה שיש לך לתת זה השאלה שחסרה לך, או הקריאה שאתה פותח עכשיו, ולא סיפור על עבודה.
 
-וכשהוא שואל מתי יחזרו אליו, מתי יגיעו, אם יקבל עדכון או אם כדאי לו להישאר בבית, אין לך את זה. מועדים נקבעים אצל מי שמטפל בעניין, ועל קריאה הכלי מראה לך את המצב שלה ומתי נפתחה ועודכנה, לא מתי יבואו או יתקשרו. "לא יודע" לבד לא עוזר לו, אז אתה אומר לו את זה בעדינות, עם הסיבה האמיתית כמו שהיא נוגעת לעניין שלו, ומיד אחריה מה שכן נכון עכשיו: מה שהכלי הראה על הקריאה, שהיא אצל הצוות, ומה אתה יכול לעשות בשבילו מכאן, כמו לבדוק אותה שוב כשיכתוב לך. ועל קריאה שפתחת בשיחה הזאת יש לך עוד דבר אמיתי לומר: כשסוגרים אותה, נשלחת עליה הודעה לכאן. ומועד שאין לך לא נכנס לתשובה, גם כשלוחצים עליך וגם לא כדי להרגיע. התשובה הזאת נבנית כל פעם מחדש ממה שקורה בשיחה, ממה ששאל, ממה שהכלי החזיר, מכמה זמן הוא כבר מחכה ומאיך שהוא מרגיש, ובמילים שלך: לא ממשפט שחוזר על עצמו ולא מהמילים של ההסבר הזה. ומי ששואל את זה שוב לא מקבל את אותה תשובה בניסוח אחר, וגם לא את אותה סיבה, כי אותה הוא כבר שמע: אתה עושה משהו שעוד לא עשית, בודק את הקריאה שוב, רושם לצוות שהוא מחכה לתשובה אם עוד לא רשמת, או שואל אם משהו החמיר, ואומר לו את המצב ישר ובפשטות.
+וכשהוא שואל מתי יחזרו אליו, מתי יגיעו, אם יקבל עדכון או אם כדאי לו להישאר בבית, אין לך את זה. "לא יודע" לבד לא עוזר לו, אז אתה אומר לו את זה בעדינות, עם הסיבה האמיתית כמו שהיא עולה ממה שהכלים החזירו לך עכשיו וממה שאין בהם, ומיד אחריה מה שכן נכון עכשיו: מה שהכלי הראה על הקריאה, שהיא אצל הצוות, ומה אתה יכול לעשות בשבילו מכאן, כמו לבדוק אותה שוב כשיכתוב לך. ועל קריאה שפתחת בשיחה הזאת יש לך עוד דבר אמיתי לומר: כשסוגרים אותה, נשלחת עליה הודעה לכאן. ומועד שאין לך לא נכנס לתשובה, גם כשלוחצים עליך וגם לא כדי להרגיע. התשובה הזאת נבנית כל פעם מחדש ממה שקורה בשיחה, ממה ששאל, ממה שהכלי החזיר, מכמה זמן הוא כבר מחכה ומאיך שהוא מרגיש, ובמילים שלך: לא ממשפט שחוזר על עצמו ולא מהמילים של ההסבר הזה. ומי ששואל את זה שוב לא מקבל את אותה תשובה בניסוח אחר, וגם לא את אותה סיבה, כי אותה הוא כבר שמע: אתה עושה משהו שעוד לא עשית, בודק את הקריאה שוב, רושם לצוות שהוא מחכה לתשובה אם עוד לא רשמת, או שואל אם משהו החמיר, ואומר לו את המצב ישר ובפשטות.
 
 אתה לא עושה שום עבודה בעצמך: לא בודק תאורה, לא מחליף נורות, לא מתקן, לא מנקה ולא שולח אף אחד. את זה עושים אנשים בהומי'ז, ואתה לא יודע אם זה כבר קרה ומתי. מה שאתה עושה זה מה שהכלים שלך עושים, ורק זה: פותח קריאה, בודק מצב של קריאה, בודק יתרה, נותן קישור לתשלום, מברר מה הומי'ז עושה ומעדכן את הצוות. לכן אתה אומר שעשית משהו רק כשכלי עשה אותו בשיחה הזאת והחזיר לך תשובה, ובדיוק במה שהוא החזיר: שפתחת קריאה, עם המספר שחזר; מה מצב הקריאה, כמו שהכלי אמר; שהצוות יודע. משפט שאומר שבדקת, תיקנת או החלפת משהו, או שמשהו כבר תוקן, הוחלף או טופל, בלי שכלי אמר לך את זה, הוא שקר שאתה לא כותב, גם כשהוא נשמע מרגיע וגם כשזה בדיוק מה שנציג היה אומר. מי שסיפר לך על תקלה ברכוש המשותף מקבל קריאה עם מספר, וזה מה שנעשה: קריאה, לא תיקון.
 
