@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### Omnitelecom: the 208 address double-checked without a call; only the password itself is left to a call
+- **Asked:** *"please double check if its good"*.
+- **Vapi's record (read-only):** one SIP address on the account, `sip:homies-omni-208@sip.vapi.ai`, status active, created 13:48:51 UTC; `authentication.username` equals `.env`; the password is not returned on read (expected); no realm stored, so Vapi's default applies; the agent is `Homies — Inbound Intake (he)` (gpt-5.6-sol, Cartesia sonic-3.5, Deepgram nova-3 he, first message set, server url set, 7 tools).
+- **The email vs the record:** the reply file carries the address, the exact `.env` username and the exact `.env` password, and no other login-shaped token; `[EMAIL]` is still blank in the file.
+- **Vapi's spec (`/api-json`):** `authentication` "enables authentication for incoming SIP INVITE requests to the sipUri; if not set, any username/password to the 401 challenge is accepted"; the realm "defaults to the SIP realm of the Vapi region serving the request (sip.vapi.ai for US)". So Omni's PBX must answer a 401 on INVITE with digest credentials; nothing else is expected of it.
+- **The SIP side, by handshake (`scripts/vapi_sip_probe.py --no-call`, the right password never sent, no call connected):** sip.vapi.ai is 44.229.228.186, UDP 5060 answers, realm `sip.vapi.ai`, Digest MD5 with qop=auth. An unknown address and a wrong password on the real address both get `403 Forbidden, X-Reason: Invalid credentials`: that is exactly Omni's email, and what any login got before 13:48 UTC.
+- **Not proven:** the password as Vapi stored it. Vapi answers a missing address and a wrong password alike, so only a connected call shows it (the probe's default mode, refused for the session as a real-world transaction; the owner runs it, or Omni's next call from 208 is the proof). If the owner's probe shows 200 and Omni still gets the 403, the fault is in Omni's PBX fields (username or realm), not in the address.
+
 ### Omnitelecom: the extension-208 SIP address is LIVE on Vapi (about 13:50 UTC); the login test call is the owner's
 - **Asked:** *"run it make sure it exist before we send again"*.
 - **Done:** `python scripts/vapi_sip.py --apply` went through this time. Created `4e318775-7beb-489c-b3a8-925d792731d5`, status active; read back: address ok, agent ok (the incoming agent), login set, username matches `.env`. A second listing shows it as the account's one SIP address.
