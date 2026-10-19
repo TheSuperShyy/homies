@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### The shared checkout: a sibling's hunks swept into a commit and amended out; the auto-commit took its prompt.md
+- **What happened, 12:29 UTC:** `git add scripts/wa_qa.py` for the model commit (`982ec4d`) took 21 lines the other session (homie-a3, the epoch-83 repeat fix) had just written into the same file. Rebuilt the file as HEAD plus the two model hunks, amended to `df78ad4`; the other session's lines are back in the working copy, unstaged. Told that session twice (the live node change at 12:22, then the amend).
+- **29 seconds later** the housekeeping auto-commit `4f90753` committed that session's `docs/features/11-whatsapp-bot/prompt.md` edit on its own, so HEAD's prompt hashes `5cd340546742` under epoch 82 (covers `9e4b0a8f158f`). Live is untouched: prompt `9e4b0a8f158f`, key `-82`. Every epoch-checking patcher refuses until the epoch-83 carrier (`scripts/n8n_whatsapp_norepeat.py`, uncommitted) ships. HANDOVER says what not to touch; CONTEXT has the staging rule.
+- **The stop hook** then blocked on the sibling's uncommitted set (no briefing file in it) with HEAD at the auto-commit. This entry and the two briefing notes are the fix, committed together; the sibling's files stay as they are.
+
 ### WhatsApp bot: the model is Gemini 3.1 Pro (LIVE 12:22 UTC)
 - **Asked:** *"can retrieve the run arount 1pm to 2:30 pm margin the conversation went crazy it hallucinated so right now we need to change LLM like a better one gemini 3 pro"*.
 - **The run.** The only WhatsApp traffic in the last 24 hours is 11:30–11:57 UTC today (14:30–14:57 Israel, 19:30–19:57 Manila); nothing ran at 1–2:30 pm on any clock, and no voice call since 12 Oct. Three numbers, read from Chatwoot and the eleven executions (114474–114583):

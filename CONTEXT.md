@@ -2482,6 +2482,35 @@ real message after a greeting came 3-6 s later). They were left alone, and the
 watch flags each one if it ever happens: code added for something that has
 never happened is how the next bug gets in.
 
+## Two sessions in one checkout: stage from HEAD plus your own hunks, never `git add` a sibling's file
+
+19 Oct. Two sessions worked the same `feature/chatbot` checkout at once: one on
+the model switch, one on the epoch-83 repeat fix, both editing
+`scripts/n8n_whatsapp.py` and `scripts/wa_qa.py`. `git add scripts/wa_qa.py`
+swept 21 lines of the other session's unfinished work into commit `982ec4d`
+inside a minute of it being written, and the commit had to be amended
+(`df78ad4`). The file the index takes is the working copy, and the working
+copy is shared.
+
+- **To commit your part of a file someone else is editing:** build it from
+  HEAD plus your hunks only (`git show HEAD:path > tmp`, apply your edits to
+  `tmp`, `git hash-object -w tmp`, `git update-index --cacheinfo
+  100644,<blob>,path`), then commit. `git add` and `git commit -a` are for files
+  `git status` shows nobody else has touched.
+- **A clean proof needs a clean checkout.** The idle check and the gate read
+  the working copy's patchers; with a sibling mid-edit, 13 of them refused on
+  anchors that were not ours. The answer is a scratch worktree at HEAD with
+  your change copied in (and `.env` beside it), where exactly the baseline 6
+  were not idle. Never stash or revert the sibling's files to get there.
+- **The housekeeping auto-commit can sweep a sibling's partial file into HEAD**
+  (`4f90753` took the other session's `prompt.md` alone, 29 seconds after
+  `df78ad4`). So HEAD is not evidence of a consistent repo while `git status`
+  shows a sibling's files modified: read live, and read the worklog for whose
+  work is in flight.
+- **Say so to the other session** (`ListAgents` / `SendMessage`): what went
+  live, which hunks are yours, and that any dump it made before your write
+  carries the old node.
+
 ## Send removes promises; it never sends a reply back for one
 
 1 Oct. Owner: *"ok lets fix that but make sure it wont break any other feature."* The prompt
