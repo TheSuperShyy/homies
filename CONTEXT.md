@@ -3047,7 +3047,9 @@ multiple time stress test it the chatbot"*.
   bot saying it does not know: the resident's question is left unanswered, or the
   text is left as a fragment (19 Oct, HANDOVER). A grader that reads the handset
   never sees what was cut; compare the model's `output` with the `handset` when a
-  resident asks the same question twice.
+  resident asks the same question twice. The count on 19 Oct was made that way over
+  every turn of every run: each sentence of `output` that holds "לא יודע", "אין לי
+  דרך לדעת" or "לא אבטיח" and is missing from the handset.
 - **No backslashes through the shell.** The Bash tool's transport turns a doubled
   backslash into a single one, so a heredoc'd script meant to write the two
   characters backslash-n writes a newline instead (19 Oct, twice: the second time it
