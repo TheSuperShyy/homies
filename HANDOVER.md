@@ -93,7 +93,8 @@ speaks (since 7 Oct evening both agents use `ba765d50`, the 31 Aug clone, with t
 masculine pronunciation dictionary; the incoming line's voice A `4486a4a7` at 0.8 with
 the happy tag was dropped for sounding "like a karaoke mic"; Vapi's Elliot is the
 fallback), attached with the client's Cartesia key so Vapi
-bills ₪0 for TTS; the model is gpt-4.1 (0.3) incoming, gpt-5.6-sol on debt. WhatsApp messages
+bills ₪0 for TTS; the model is gpt-5.6-sol on both since 19 Oct 12:57 UTC (gpt-4.1 at 0.3 on incoming
+before), and both prompts write the name הומי'ז, with its mark, since the same minute. WhatsApp messages
 go **Meta -> Chatwoot -> n8n** since 21 Aug. Chatwoot owns the number and the
 inbox; n8n is its *agent bot*, still at `/webhook/homies-whatsapp`, which checks
 a shared secret in the query string, ignores everything that is not an inbound
@@ -537,6 +538,7 @@ its stated time.
     - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
     - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
     - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
+- **LIVE 19 Oct 12:57 UTC, both voice agents: the name is written הומי'ז and the incoming agent runs gpt-5.6-sol** (WORKLOG 19 Oct). Yariv read the 5 Oct transcripts: "Homies should be written הומי״ז", "many spelling errors". The name was bare (הומיז) in every voice-side text; the client's site has the single mark, WhatsApp had it since 17 Sep. Fixed in both prompts and first messages, in `voice_guard.py`'s rewrites (they end in מחברת הומי'ז / לחברת הומי'ז, and a bare הומיז gains its mark), so Vapi's transcript carries it too; in the Edge Function's company facts (v122); and in the dashboard's app name (not pushed). Cartesia says it the same (noise-floor DTW on our key). The other "spelling errors" were gpt-4.1's: the feminine אלייך to a man (the gender slip) and agreement slips (איזה קומה, נחשבת נפרד, זה הדרך, יצרו); the debt agent's gpt-5.6-sol had none, so incoming runs it too, no temperature. Both syncs ran with `--keep-voice` after a field-by-field comparison with live; read back clean. **Owed:** the owner's web call on each agent. **Undo:** the commented model line in `vapi_sync.py`, revert the spelling, sync both, `vapi_set_voice.py --apply`, deploy.
 - **DONE 8 Oct: a woman caller on both voice agents, Claude-played** (deck `scripts/voice_qa_oct8_fem.json`; transcripts `docs/assistant/transcripts/2026-10-08-claude-played-woman-6-calls.json`; audio `voice/samples/test-2026-10-08-woman/`). Played to the real models' habit: vowel points 30% incoming, 0% debt.
   - **Debt, OPEN:** the verbs are feminine, but 4-6 לך/איתך per call reach the voice bare and are said masculine.
     - **The fix:** pass the feminine dictionary (`CARTESIA_DICT_FEMININE`, `pdict_yXyr…`) on calls where `gender` is `f`, through the dashboard's call start (`assistantOverrides`). Not built.

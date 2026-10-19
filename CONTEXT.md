@@ -2410,6 +2410,37 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   n8n's own message shape, for $0.0083: the one OpenRouter spend, for the model's
   compatibility, not a probe of the bot.
 
+## The name is הומי'ז, with its mark, wherever a model writes it or a resident reads it
+
+19 Oct. Yariv read the 5 Oct call transcripts and sent "Homies should be written
+הומי״ז" with "many spelling errors". The voice side had written הומיז, bare, from
+the first day (chosen for the voice, never for the page); WhatsApp has written
+הומי'ז since 17 Sep; the client's own site writes הומי'ז, the single mark, eleven
+times on its home page. The double mark in his message is his keyboard's.
+
+- **The form is הומי'ז, an ASCII apostrophe between the yod and the zayin.** Not
+  bare, not ״. It goes in every prompt, first message, fixed line, menu, tool
+  text, Edge Function text and UI label. The 17 Sep rule stands: that
+  apostrophe closes a single-quoted JavaScript or Python literal, so it is
+  escaped there or the literal is double-quoted.
+- **The voice is not a reason to leave it bare.** Rendered on our own Cartesia
+  key (Noam, sonic-3.5), the greeting with הומי'ז sits at the noise floor
+  against the bare spelling: DTW 3.37 when the same text twice gives 3.41 and a
+  different word 3.71. ׳ and ’ are the same; ״ is 3.50, still well under the
+  word. So the formatter's rewrites (מהומי'ז → מחברת הומי'ז, להומי'ז → לחברת
+  הומי'ז, and a bare הומיז → הומי'ז, last) change what the transcript shows and
+  nothing the phone hears.
+- **A transcript is the formatter's output, not the model's.** Vapi stores what
+  reached the voice: vowel points gone, rewrites applied. Whatever the resident
+  must read correctly has to come out of the rewrite correct, which is why every
+  rewrite ends in the marked form.
+- **"Spelling errors" from a native reader are three things,** and only one is
+  spelling: the name; the feminine written to a man (a gender slip, the 7 Oct
+  research); and agreement slips (איזה קומה, נחשבת נפרד, זה הדרך, יצרו for
+  ייצרו), which are the model's and move with the model, never with a prompt
+  rule about spelling. gpt-4.1 made them in four calls; gpt-5.6-sol made none in
+  five, which is why the incoming agent runs it since 19 Oct.
+
 ## How a WhatsApp change ships
 
 27 Sep, after the second regression in a day. Owner: *"we need to make sure

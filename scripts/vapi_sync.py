@@ -337,7 +337,18 @@ TARGETS = {
             # judgment the rulebook used to supply has to come from the model.
             # A mini filling four fields was the right trade; a mini improvising
             # a whole call is not. Owner approved the cost the same day.
-            "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},
+            # 19 OCT: gpt-5.6-sol, the debt agent's model, on the owner's "make sure we
+            # have a good LLM that have less hallucination" after Yariv read the 5 Oct
+            # transcripts. gpt-4.1 (0.3) wrote the feminine to a man from his name alone
+            # (Roni), an email address nobody gave it, "I'm a real person", "updating the
+            # team" three times with no call, and agreement slips a native reader counts as
+            # spelling (איזה קומה, נחשבת נפרד, זה הדרך, יצרו for ייצרו). The debt agent's
+            # five test calls on gpt-5.6-sol had none of these. No temperature: the gpt-5.x
+            # models may not accept one (see the debt target). Vowel points: this model
+            # writes none (0% on 8 Oct); the Cartesia dictionary on the voice carries the
+            # gender since 7 Oct, so that no longer matters. Undo: the line below it.
+            "model": {"provider": "openai", "model": "gpt-5.6-sol"},
+            # "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},   # 6 Sep - 19 Oct
             # SPEECHMATICS WAS TRIED ON INBOUND ON 30 SEP AND DROPPED THE SAME DAY,
             # on the owner's word, so this target is back on BASE's Deepgram.
             # The owner had asked for it with his Hebrew survey agent's settings

@@ -200,7 +200,11 @@ SAFE_SENTENCES = [
     # substitution rewrites להומיז, and the second half is what it must become.
     # Getting anything else — a hole, a different rewrite — is the failure.
     ("תודה שהתקשרתם להומיז, יום טוב, ולהתראות.",
-     "תודה שהתקשרתם לחברת הומיז, יום טוב, ולהתראות."),
+     "תודה שהתקשרתם לחברת הומי'ז, יום טוב, ולהתראות."),
+    # 19 Oct: the prompts write the name with its mark now, so the glued form the
+    # model produces is להומי'ז; same rewrite, same ear.
+    ("תודה שהתקשרתם להומי'ז, יום טוב, ולהתראות.",
+     "תודה שהתקשרתם לחברת הומי'ז, יום טוב, ולהתראות."),
     "אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
     # Spoken, not written — 30 Aug. The numeral reached Cartesia only after
     # Vapi's formatter had cut it into single digits, and the call broke.
@@ -214,7 +218,11 @@ SAFE_SENTENCES = [
     # where the pronunciation substitutions run.
     "תקלות חירום עד ארבע שעות, השאר עד שלושה ימי עסקים.",
     "אין לי את הפרט הזה. אפשר לפנות למשרד בטלפון אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע.",
-    "המשרד של הומיז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
+    # 19 Oct: a bare הומיז gains its mark (the last PRONUNCIATION rule), and the
+    # marked form, which is what the prompt says now, passes untouched.
+    ("המשרד של הומיז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
+     "המשרד של הומי'ז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים."),
+    "המשרד של הומי'ז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
 ]
 
 # The 5 Aug shape: a note parameter announced by its own field name. "Please
@@ -256,9 +264,23 @@ _ICASE = [{"type": "ignore-case", "enabled": True}]
 #
 # ANYTHING ADDED HERE MUST BE CHECKED BY EAR, not by argument. A replacement
 # that fixes one word and breaks the sentence around it is worse than the word.
+# 19 OCT: THE NAME CARRIES ITS MARK, הומי'ז, THE WAY THE CLIENT WRITES IT. Yariv
+# read the 5 Oct transcripts and asked for it ("Homies should be written הומי״ז";
+# the single mark is the one on their site, 11 times on the home page). Both
+# prompts write הומי'ז now, and every rewrite here ends in the marked form, so
+# Vapi's transcript -- which shows the formatter's output, not the model's --
+# carries it too. Checked by ear's proxy on 19 Oct (our own Cartesia key, Noam,
+# sonic-3.5): the greeting with הומי'ז is at the noise floor against the bare
+# spelling (DTW 3.37; the same text twice 3.41; a different word 3.71), so the
+# phone hears exactly what it heard before. The bare keys stay for a model that
+# forgets the mark. The last rule is a bare הומיז anywhere (inside שהומיז, בהומיז
+# too); it runs after the glued forms, whose outputs it cannot touch.
 PRONUNCIATION = [
-    ("מהומיז", "מחברת הומיז"),
-    ("להומיז", "לחברת הומיז"),
+    ("מהומי'ז", "מחברת הומי'ז"),
+    ("להומי'ז", "לחברת הומי'ז"),
+    ("מהומיז", "מחברת הומי'ז"),
+    ("להומיז", "לחברת הומי'ז"),
+    ("הומיז", "הומי'ז"),
     # "בית לא נשמע כמו בעברית" — 12 Aug. The word he would have heard it in is
     # ועד בית, which is how the prompt wrote it and is not how anyone says it:
     # Israelis say ועד הבית, with the article. Without it the two nouns collide
