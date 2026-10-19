@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### Omnitelecom: the extension-208 SIP address is LIVE on Vapi (about 13:50 UTC); the login test call is the owner's
+- **Asked:** *"run it make sure it exist before we send again"*.
+- **Done:** `python scripts/vapi_sip.py --apply` went through this time. Created `4e318775-7beb-489c-b3a8-925d792731d5`, status active; read back: address ok, agent ok (the incoming agent), login set, username matches `.env`. A second listing shows it as the account's one SIP address.
+- **Proven and not proven:** the address exists with the login from the email. Vapi does not return the password on read, so only a call through it proves the password.
+- **`scripts/vapi_sip_probe.py` (new):** proves it from a PC the way Omni's PBX does, three INVITEs over UDP (then TCP, TLS): an unknown address, the real one with a wrong password, the real one with the `.env` login, hung up the moment it answers; it prints status lines and `X-Reason` only, never the login. The session's permission check refused to run it as a real-world transaction (it places a seconds-long call to the agent), so it was not placed; the owner runs it, or lets Omni's next call from 208 be the proof.
+- **Next:** tell Omni the same details are active now and to try again; nothing in the email changes.
+
 ### Omnitelecom: "Invalid credentials" on extension 208 (answered in chat, read-only)
 - **Asked:** a screenshot of Omni support's email (*"לאחר בדיקה, פרטי ההתחברות שנשלחו אלינו אינם נכונים … X-Reason: Invalid credentials"*): *"whats this"*.
 - **What it is:** Omni put the address and login from our reply on extension 208 and sent a test call to `sip:homies-omni-208@sip.vapi.ai`. Vapi's SIP side refused the login.
