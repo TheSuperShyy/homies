@@ -134,7 +134,12 @@ PINS = {
     # the number first (two sentences), nothing already sent is sent again, and
     # Try again's note speaks of a draft he never got; get_request_status's text
     # with them. Claude-played on the candidate: see the WORKLOG entry of the day.
-    'Answer the resident / system': '5cd340546742',
+    # 20 Oct (n8n_whatsapp_lowkey.py, epoch 84): asked when someone will call, come or
+    # update, a true reason from what the tools returned and what is not in them, never
+    # a stated reason (one stated was sent in a third of the answers); asked again,
+    # something new. Claude-played in three rounds, the last half size and clean
+    # (WORKLOG 19 Oct, the epoch-84 entry).
+    'Answer the resident / system': '2f9217ee3454',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

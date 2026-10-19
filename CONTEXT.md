@@ -2443,6 +2443,8 @@ times on its home page. The double mark in his message is his keyboard's.
 
 ## When a resident asks when: a true reason, what is real, what he can do (19 Oct)
 
+Live since 19 Oct, 20:00 UTC (epoch 84, with the repeat fix of epoch 83 applied 30 seconds before it).
+
 The owner, after the stress test showed the honest "I don't know whether they'll
 get back to you" cut by Send and a bare "I don't know" otherwise: *"a low key
 excuse … it should be dynamic as well on all scenarios"*, then *"make sure its not
