@@ -2959,6 +2959,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
 - **Extension 208 is the bot's (Omni, 18 Oct).** The dialer and the menu both send to it, and the bot's Vapi SIP address goes on it. Until Omni's external_id header arrives and the `assistant-request` router exists, that address answers with the incoming agent. It never answers with the debt agent, because the debt agent would have no tenant.
   - **The address is `sip:homies-omni-208@sip.vapi.ai`, made by `scripts/vapi_sip.py` (19 Oct).**
     - **Not created yet:** the owner said go, but the session's permission check refuses the Vapi write, so the owner runs `--apply` by hand. The login is already in `.env` and in the reply.
+    - **19 Oct, afternoon: Omni tried it before it existed** and got *"Invalid credentials"* back from Vapi. Checked read-only: 0 SIP addresses on the account. After `--apply` the address exists with that same login, and Omni only has to try again; a real call from 208 proves it.
     - **Where it goes:** on the current (tenth) account for now, then the client's main account later (owner: *"we can roll it out afterwards to use the main client acc"*).
   - **Its login is never optional:** without `authentication`, Vapi accepts any username and password, so anyone who learns the address could ring the agent on our bill.
   - **A Vapi account move loses it:** `vapi_transfer.py` copies agents, not phone numbers. The script recreates it with the same address and login, so Omni changes nothing.
