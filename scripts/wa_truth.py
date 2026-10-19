@@ -111,6 +111,83 @@ STEPS_FN = (
 
 LIB = SAID_FN + REFS_FN + STEPS_FN
 
+# --- A reply the resident already got (19 Oct, n8n_whatsapp_norepeat.py) -----
+# "מה קורה עם הקריאה שפתחתי?" twice, and the same message back twice, word for
+# word (executions 114528, 114536); on another number at 11:32 the second pass
+# sent back the bot's previous message entire (114483). 34 times since 9 Aug the
+# bot answered within 15 minutes with what it had just sent (85%+ the same, after
+# the resident wrote something new). The prompt says it twice (each message adds
+# something; ask it differently); nothing checked it.
+# repeats(t): t is, nearly letter for letter, a message the phone already got: one
+# of the bot's last three rows among `Anything newer?`'s twelve (newest first; what
+# was SENT, so an unsent draft never counts). Compared as letters and digits only
+# (emoji, punctuation and the §§§ seam do not make a copy new), allowing 15% edits
+# of the longer one by Levenshtein: a word or two swapped is still a copy.
+# Unreadable rows: nothing is a repeat. REP_EDITS and REP_LAST are the one copy;
+# check_whatsapp_rules.py's --watch and wa_qa.py's rubric read repeats_py below.
+# Measured over the 1,067 bot messages since 9 Aug, leaving out the fixed texts
+# and the turns that sent a link or a ticket number: against the last 12 rows'
+# bot messages, 96 flagged, some of them an earlier test session's; against the
+# last three, 64, every one of them the bot sending back what the person had just
+# read ("עוד משהו?" twice, "יש לך את מספר הקריאה?" twice, one goodbye twice).
+REP_EDITS = 0.15
+REP_LAST = 3
+REPEAT_FN = (
+    "const normRep = (s) => String(s || '').toLowerCase().split('§§§').join(' ')"
+    ".replace(/[^" + BS + "p{L}" + BS + "p{N}]+/gu, ' ').trim(); "
+    "const nearRep = (a, b) => { if (!a || !b) return false; if (a === b) return true; "
+    "const la = a.length; const lb = b.length; const big = Math.max(la, lb); "
+    "if (Math.min(la, lb) < (1 - " + repr(REP_EDITS) + ") * big) return false; "
+    "let prev = []; for (let j = 0; j <= lb; j++) prev.push(j); "
+    "for (let i = 1; i <= la; i++) { const cur = [i]; "
+    "for (let j = 1; j <= lb; j++) cur.push(Math.min(prev[j] + 1, cur[j - 1] + 1, "
+    "prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1))); prev = cur; } "
+    "return prev[lb] <= " + repr(REP_EDITS) + " * big; }; "
+    "const sentRep = () => { try { return $('Anything newer?').all().map(r => (r || { }).json || { })"
+    ".filter(x => x.direction === 'outbound').slice(0, " + str(REP_LAST) + ").map(x => normRep(x.body)).filter(Boolean); } "
+    "catch (e) { return []; } }; "
+    "const repeats = (t) => { const n = normRep(t); if (!n) return false; "
+    "return sentRep().some(b => nearRep(n, b)); }; "
+)
+assert "}}" not in REPEAT_FN, "a }} inside the repeat test ends an expression early"
+
+
+def _norm_rep(s):
+    import re
+    s = str(s or "").lower().replace("§§§", " ")
+    return re.sub(r"[\W_]+", " ", s).strip()
+
+
+def _edits(a, b):
+    prev = list(range(len(b) + 1))
+    for i in range(1, len(a) + 1):
+        cur = [i]
+        for j in range(1, len(b) + 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] != b[j - 1])))
+        prev = cur
+    return prev[len(b)]
+
+
+def repeats_py(text, sent):
+    """REPEAT_FN's repeats(), in Python: `text` nearly letter for letter one of the
+    `sent` bodies (the bot's messages the phone already got, NEWEST FIRST; only the
+    first REP_LAST are read, as the guard reads them)."""
+    n = _norm_rep(text)
+    if not n:
+        return False
+    for body in list(sent)[:REP_LAST]:
+        b = _norm_rep(body)
+        if not b:
+            continue
+        if n == b:
+            return True
+        big = max(len(n), len(b))
+        if min(len(n), len(b)) < (1 - REP_EDITS) * big:
+            continue
+        if _edits(n, b) <= REP_EDITS * big:
+            return True
+    return False
+
 # The first pass's steps, which `Try again` carries as `first_steps`: the
 # agent's second run cannot see them, and without them its "בדקתי" was a lie.
 FIRST_STEPS = "(() => { try { return $('Try again').first().json.first_steps || []; } catch (e) { return []; } })()"
@@ -210,8 +287,10 @@ def claimed_expr():
     rescue ticket opened. Not when the first draft goes out instead (its only
     fault was style), and not when a ticket really was opened this turn (its
     number is put into the reply instead)."""
-    return _expr(LIB + "let T = { }; try { T = " + TRY_AGAIN + "; } catch (e) { T = { }; } "
-                 "if (T.first_truth_ok === true) return false; "
+    # 19 Oct: the first draft goes out only when it is not a copy of what was sent
+    # (Mend the reply, below), so only then does it stand in for the second.
+    return _expr(LIB + REPEAT_FN + "let T = { }; try { T = " + TRY_AGAIN + "; } catch (e) { T = { }; } "
+                 "if (T.first_truth_ok === true && !repeats(T.first_output)) return false; "
                  "const t = String($json.output || ''); if (!said(t, " + PHANTOM + ").length) return false; "
                  "const st = [].concat(T.first_steps || [], stepsOf($json.intermediateSteps)); "
                  + known_js("st") + BACKED +
@@ -224,9 +303,14 @@ def mend_expr():
     first draft when its only fault was style; otherwise the second, with every
     sentence that claims what did not happen taken out, the ticket's real number
     put where a false ticket claim was, and, when too little is left, the one
-    fixed line. Never nothing."""
-    body = (LIB + "let T = { }; try { T = " + TRY_AGAIN + "; } catch (e) { T = { }; } "
-            "if (T.first_truth_ok === true && String(T.first_output || '').trim()) "
+    fixed line. Never nothing.
+
+    19 Oct: and never a copy of what the phone already got. A first draft that
+    was one is not the safe choice it used to be (it was sent back for exactly
+    that), and a second draft that is one after the mending gives way to the
+    fixed line, the owner's own (5 Oct) for "nothing usable is left"."""
+    body = (LIB + REPEAT_FN + "let T = { }; try { T = " + TRY_AGAIN + "; } catch (e) { T = { }; } "
+            "if (T.first_truth_ok === true && String(T.first_output || '').trim() && !repeats(T.first_output)) "
             "return JSON.stringify({ output: String(T.first_output), mended: 'first draft' }); "
             "let A = { }; try { A = $('Answer the resident').first().json; } catch (e) { A = { }; } "
             "const draft = String(A.output || '').split('§§§').join(String.fromCharCode(10)); "
@@ -252,6 +336,7 @@ def mend_expr():
             "if (ref && !placed && $json.results) { out.unshift('" + TICKET_LINE + "' + ref + '. '); placed = true; } "
             "let text = out.join('').replace(/[ " + BS + "t]+" + NLX + "/g, String.fromCharCode(10)).trim(); "
             "if (!placed && text.split(/" + BS + "s+/).filter(Boolean).length < 3) { text = '" + FALLBACK + "'; gone.push('fallback'); } "
+            "else if (!placed && repeats(text)) { text = '" + FALLBACK + "'; gone.push('repeat'); } "
             "return JSON.stringify({ output: text, mended: gone.join(',') || 'kept' }); ")
     s = "={{ (() => { " + body + "})() }}"
     assert s.count("}}") == 1, "a }} inside the expression ends it early"

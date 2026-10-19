@@ -89,6 +89,25 @@ chat (a request for a manager or a person among the resident's recent messages);
 there the two guards pass, `Try again` names neither, and the unnamed list drops
 both and the "no reason" tail (RETRY_NOTE_MGR). n8n_whatsapp_procedure.py carries it.
 
+19 OCT: THE BOT REPEATS ITSELF (n8n_whatsapp_norepeat.py carries it). "מה קורה עם
+הקריאה שפתחתי?" twice got the same message twice, word for word (114528, 114536); on
+another number the second pass sent back the bot's previous message entire (114483).
+Four changes here:
+  - `repeat`, a guard on BOTH passes (no `$runIndex > 0` way out): a reply that is,
+    nearly letter for letter, one of the bot's last three sent messages goes back,
+    unless the turn did work (wa_truth.REPEAT_FN says how it reads).
+  - The second pass no longer sees the rejected draft. `Forget the draft` (a Chat
+    Memory Manager on the same buffer, drawn above the agent so v1 runs it first)
+    deletes the first pass's two messages before it runs, so the model is not shown
+    a draft the resident never got, nor his message twice, and the turns after it
+    remember only what went out. The note says so: a draft was not sent, and what
+    was sent before did arrive (FORGET, TRY_WIRE).
+  - The tools line names get_request_status beside open_request: the note had sent a
+    question about an existing ticket toward opening a new one.
+  - MGR_CTX reads the resident's last two messages, not the twelve rows, and a
+    pasted לדבר עם נציג glued to other words counts as the tap: one "נציג" no longer
+    switches `echo` and `clerk` off for the rest of the chat (114528).
+
 5 OCT, THE SECOND PASS KEEPS WHAT THE FIRST ONE KNEW (n8n_whatsapp_safetynet.py,
 which carries this to live). The live run as Assaf: the first pass looked the
 mould up, found nothing and said so; its draft was sent back for its opening
@@ -139,17 +158,26 @@ TRY_POS, RETRIED_POS = [720, 300], [1440, 300]
 # named because the Set node cannot tell which one fired. The opener is
 # described, not quoted (20 Sep). 1 Oct: the slash reason no longer says
 # "singular instead of plural" -- the bot speaks to one person now.
+# 19 Oct (n8n_whatsapp_norepeat.py): the rejected draft is no longer in the memory
+# the second pass reads (`Forget the draft`), so the note speaks of a draft he never
+# got and says that what was sent before did arrive: a model told "your previous
+# answer did not go out" while its last visible answer DID go out is a model
+# invited to send that one again (114483 sent the bot's previous message back).
+# The tools line names the status lookup beside opening a ticket.
+NOTE_OPEN = "[טיוטה שכתבת להודעה הזאת לא יצאה לדייר"
+TOOLS_LINE = ("מה שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
+              "ורק אז תענה, עם המספר שחזר; מצב של קריאה קיימת רק מ-get_request_status; "
+              "קישור לתשלום רק מ-get_payment_link.")
+SEEN = " ההודעות שכן שלחת לו קודם בשיחה הגיעו אליו, ואין צורך לשלוח אותן שוב."
 RETRY_NOTE = (
-    "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר: או שהודיעה על "
+    NOTE_OPEN + ": או שהודיעה על "
     "קריאה שלא נפתחה, או שנתנה קישור שלא הגיע מכלי, או שהייתה ריקה, או "
     "שפנתה לדייר בלוכסן או בסוגריים, או שחזרה על משפט "
     "הפתיחה של המערכת במקום לענות על מה שכתב, או שסיפרה שבדקת, תיקנת, "
     "החלפת או שלחת משהו בלי שכלי עשה את זה, או שפתחה בהודעה שהבנת אותו "
     "או בסיכום של מה שכתב, או שהסבירה לו למה אתה צריך פרט לפני ששאלה "
-    "עליו. מה "
-    "שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
-    "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link. ואם "
-    "חסר לך משהו, תשאל עליו בשאלה אחת קצרה, בלי הקדמה ובלי הסבר.]"
+    "עליו. " + TOOLS_LINE + " ואם "
+    "חסר לך משהו, תשאל עליו בשאלה אחת קצרה, בלי הקדמה ובלי הסבר." + SEEN + "]"
 )
 
 BS = chr(92)   # a backslash, built rather than typed (27 Sep)
@@ -170,9 +198,11 @@ CLERK_RE = "/כדי שאוכל|אצטרך/"
 WHY_ECHO = ("היא נפתחה בזה שהבנת אותו או בסיכום של מה שכתב, ובמקום זה תגיב לדבר "
             "עצמו במילה או שתיים ומשם ישר לעניין")
 WHY_CLERK = "היא הסבירה לו למה אתה צריך פרט לפני ששאלה עליו, ובמקום זה פשוט תשאל"
-NOTE_HEAD = "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר, כי "
-NOTE_TAIL = (". מה שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
-             "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link.]")
+# 19 Oct: the draft was, nearly word for word, a message he already has (`repeat`).
+WHY_REPEAT = ("היא חזרה כמעט מילה במילה על הודעה ששלחת לו כבר והוא כבר קרא, ובמקום זה "
+              "תענה על מה שהוא כתב עכשיו, במילים אחרות, ואם אין לך מה להוסיף, תגיד פחות")
+NOTE_HEAD = NOTE_OPEN + ", כי "
+NOTE_TAIL = ". " + TOOLS_LINE
 
 # 4 Oct: "the bot asked how he is", one copy. Hebrew and English, the forms a
 # person uses; no apostrophes (`.` stands in), so it sits in an n8n expression
@@ -229,13 +259,34 @@ MGR_ALT = (r"מנהל|אחראי|נציג|בן אדם|בנאדם|אדם אמית
 MGR_JS = "/" + MGR_ALT + "/i"
 MGR_PY = __import__("re").compile(MGR_ALT, __import__("re").I)
 TAP_REP = "לדבר עם נציג"
-MGR_CTX = ("let mgrAsk = false; try { mgrAsk = $('Anything newer?').all().some(r => { "
-           "const x = (r || { }).json || { }; const b = String(x.body || '').trim(); "
-           "return x.direction === 'inbound' && b !== '" + TAP_REP + "' && " + MGR_JS + ".test(b); }); } "
-           "catch (e) { mgrAsk = false; } "
-           "if (!mgrAsk) { try { const b = String($('Still the last word?').first().json.text || '').trim(); "
-           "mgrAsk = b !== '" + TAP_REP + "' && " + MGR_JS + ".test(b); } catch (e) { mgrAsk = false; } } ")
+# 19 Oct (n8n_whatsapp_norepeat.py): THE RESIDENT'S LAST TWO MESSAGES, NOT TWELVE
+# ROWS. At 11:38 a pasted "לדבר עם נציג" glued to a question about a ticket made the
+# chat "about a manager" (114528), and the row stayed among the twelve for the next
+# turn (114536): "אני מבין שאתה רוצה לברר..." went out twice with the echo guard
+# standing aside. Now: this message and the one before it (the first two inbound
+# rows, newest first), each with a leading tap text taken off, so the exemption
+# lasts while he is asking for a person and ends when the chat moves on. A
+# follow-up with no manager word ("למה שאספר לך?") still counts: the message before
+# it asked.
+MGR_CTX = ("let mgrAsk = false; const mgrSaid = (s) => { const b = String(s || '').trim()"
+           ".replace(/^" + TAP_REP + "/, '').trim(); return b !== '' && " + MGR_JS + ".test(b); }; "
+           "try { const rows = $('Anything newer?').all().map(r => (r || { }).json || { })"
+           ".filter(x => x.direction === 'inbound').slice(0, 2); "
+           "mgrAsk = rows.some(x => mgrSaid(x.body)); } catch (e) { mgrAsk = false; } "
+           "if (!mgrAsk) { try { mgrAsk = mgrSaid($('Still the last word?').first().json.text); } "
+           "catch (e) { mgrAsk = false; } } ")
 assert "}}" not in MGR_CTX, "a }} inside the manager test ends an expression early"
+
+
+def mgr_py(texts):
+    """MGR_CTX in Python, for --watch and wa_qa: `texts` are the resident's
+    messages, newest first; the first two decide, a leading tap text taken off."""
+    import re
+    for s in list(texts)[:2]:
+        b = re.sub("^" + re.escape(TAP_REP), "", str(s or "").strip()).strip()
+        if b and MGR_PY.search(b):
+            return True
+    return False
 # ...except when the same reply makes a promise. The replay of 112626's first draft
 # ("כדי שאוכל לעדכן את הצוות ולדאוג שיחזרו אליך, מה הנושא...?") found it: let through, Send
 # cuts the promise's sentence and leaves "I understand you want a manager." with no
@@ -258,13 +309,11 @@ WHY_PROMISE = ("היא הבטיחה לו שיחזרו אליו, שיטפלו ב�
 # The full list, when nothing can be named, without the two reasons the chat about
 # a manager does not have, and without "ask it in one short question, no reason".
 RETRY_NOTE_MGR = (
-    "[התשובה הקודמת שלך להודעה הזאת נפסלה ולא יצאה לדייר: או שהודיעה על "
+    NOTE_OPEN + ": או שהודיעה על "
     "קריאה שלא נפתחה, או שנתנה קישור שלא הגיע מכלי, או שהייתה ריקה, או "
     "שפנתה לדייר בלוכסן או בסוגריים, או שחזרה על משפט "
     "הפתיחה של המערכת במקום לענות על מה שכתב, או שסיפרה שבדקת, תיקנת, "
-    "החלפת או שלחת משהו בלי שכלי עשה את זה. מה "
-    "שקורה קורה רק דרך הכלים: אם יש מה לפתוח, תפתח עכשיו עם open_request "
-    "ורק אז תענה, עם המספר שחזר; קישור לתשלום רק מ-get_payment_link.]"
+    "החלפת או שלחת משהו בלי שכלי עשה את זה. " + TOOLS_LINE + SEEN + "]"
 )
 
 # 5 Oct: the four truth guards, named when they are the reason. Read off the
@@ -287,7 +336,7 @@ FACTS_TAIL = ". זה כבר קרה, ואפשר לענות לפיו; קריאה �
 # true", so the last resort mends the second draft rather than trusting the first.
 TRY_JSON = (
     "={{ JSON.stringify(Object.assign({ }, $('Still the last word?').first().json, (() => { "
-    "const o = String($json.output || ''); try { " + T.LIB +
+    "const o = String($json.output || ''); try { " + T.LIB + T.REPEAT_FN +
     "const first_steps = stepsOf($json.intermediateSteps); "
     + T.truth_js("o", "first_steps", T.FIRST_WORDS) +
     "const why = []; "
@@ -295,6 +344,12 @@ TRY_JSON = (
     "if (!v.phantom) why.push('" + WHY_PHANTOM + "'); "
     "if (!v.links) why.push('" + WHY_LINKS + "'); "
     "if (!v.deeds) why.push('" + WHY_DEEDS + "'); "
+    # 19 Oct: a copy of a message he already got is named, as the `repeat` guard
+    # reads it (not when the turn did work: the guard stood aside there).
+    "const workedRep = o.indexOf('§§§') !== -1 || first_steps.some(s => s.tool === 'notify_team' "
+    "|| s.tool === 'get_payment_link' || (s.tool === 'open_request' && !/opened" + BS + "W{1,6}false/"
+    ".test(String(s.observation || '')))); "
+    "if (!workedRep && repeats(o)) why.push('" + WHY_REPEAT + "'); "
     # 18 Oct, late: in a chat about a manager, the echo and the clerk are the answer.
     + MGR_CTX +
     "if (!mgrAsk && " + ECHO_RE + ".test(o)) why.push('" + WHY_ECHO + "'); "
@@ -308,7 +363,7 @@ TRY_JSON = (
     "if (!rep && " + HAY_STRICT_JS + ".test(o) && !" + HAY_JS + ".test(wrote)) why.push('" + WHY_UNASKED + "'); "
     # 18 Oct, late: in a chat about a manager a promise is what sent it back.
     "if (mgrAsk && " + PROMISE_JS + ".test(o)) why.push('" + WHY_PROMISE + "'); "
-    "let note = why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.]') "
+    "let note = why.length ? '" + NOTE_HEAD + "' + why.join('. וגם ') + (tools ? '" + NOTE_TAIL + "' : '.') + '" + SEEN + "]' "
     ": (mgrAsk ? '" + RETRY_NOTE_MGR + "' : '" + RETRY_NOTE + "'); "
     "if (first_steps.length) note += ' " + FACTS_HEAD + "' + first_steps.map(s => s.tool + ': ' + brief(s.observation)).join('; ') + '" + FACTS_TAIL + "'; "
     "return { retry_note: note, first_output: o, first_steps, first_truth_ok: v.ok }; "
@@ -414,10 +469,84 @@ UNASKED = (r"={{ $runIndex > 0 || $('Sort').first().json.tap === 'other' || (() 
            + r".test(String($json.output || '')); })() }}")
 assert UNASKED.count("}}") == 1, "a }} inside `unasked` ends its expression early"
 
+# A turn that did work (a ticket opened, a note, a link, the two-beat): the style
+# guards stand aside, because the second pass sees none of it (CONTEXT, "Sending a
+# reply back is only safe when the turn did no work"). One copy: manners.py's
+# `echo` and `clerk` are built from this string, byte for byte as before 19 Oct.
+WORKED = ("const t = String($json.output || ''); const steps = $json.intermediateSteps || []; "
+          "const worked = t.indexOf('§§§') !== -1 || steps.some(s => { const k = ((s.action || {}).tool) || ''; "
+          "return k === 'notify_team' || k === 'get_payment_link' || (k === 'open_request' "
+          "&& !/opened" + BS + "W{1,6}false/.test(String(s.observation || ''))); }); if (worked) return true;")
+
+# `repeat` (19 Oct, n8n_whatsapp_norepeat.py): a reply that is, nearly letter for
+# letter, one of the bot's last three sent messages goes back, on EITHER pass: no
+# `$runIndex > 0` way out, because the second pass is where 114483 sent the previous
+# message back. A turn that did work is exempt like the other style guards. After
+# two rejections `Mend the reply` never sends a copy either (wa_truth.mend_expr).
+REPEAT = "={{ (() => { " + WORKED + " " + T.REPEAT_FN + "return !repeats(t); })() }}"
+assert REPEAT.count("}}") == 1, "a }} inside `repeat` ends its expression early"
+
 PLURAL_GUARD = guard("plural", PLURAL)
 OPENER_GUARD = guard("opener", OPENER)
 REPHAY_GUARD = guard("rephay", REPHAY)
 UNASKED_GUARD = guard("unasked", UNASKED)
+REPEAT_GUARD = guard("repeat", REPEAT)
+
+# `Forget the draft` (19 Oct): a Chat Memory Manager on the same buffer as the
+# agent, fed by `Try again` beside `Answer the resident` and drawn above it, so
+# executionOrder v1 runs it first. It deletes the last two messages of the buffer:
+# the first pass's human turn and the draft the resident never got. Without it the
+# second pass read its own rejected draft as the last exchange and the turns after
+# it remembered a reply that was never sent (112609's memory held one; 114483 copied
+# one back). The memory sub-node's key reads `$json.to`, which Try again's item
+# carries. `continueRegularOutput`: a failure here must not cost the resident the
+# reply; it only means the draft stays in memory, as it did before.
+FORGET = "Forget the draft"
+# On the 240 x 60 grid (n8n_layout.py), above `Answer the resident` [960, 64]
+# and clear of `Anything newer?` [620, 64] and `Show typing` [720, -360].
+FORGET_POS = [720, -120]
+MEMORY = "Conversation so far"
+
+
+def forget_node():
+    return {
+        "id": "forget_draft", "name": FORGET,
+        "type": "@n8n/n8n-nodes-langchain.memoryManager", "typeVersion": 1.1,
+        "position": list(FORGET_POS), "onError": "continueRegularOutput",
+        "parameters": {"mode": "delete", "deleteMode": "lastN", "lastMessagesCount": 2},
+    }
+
+
+def forget_problems(nodes, conns):
+    """What is wrong with `Forget the draft` on a workflow; empty when right. The
+    carrier runs it before any write and check_whatsapp_rules.py on live."""
+    by = {n["name"]: n for n in nodes}
+    out = []
+    n = by.get(FORGET)
+    if n is None:
+        return ["%s is missing" % FORGET]
+    want = forget_node()
+    for k in ("type", "typeVersion", "parameters", "onError"):
+        if n.get(k) != want[k]:
+            out.append("%s: %s is %r, not %r" % (FORGET, k, n.get(k), want[k]))
+    if any(t for b in (conns.get(FORGET) or {}).get("main") or [] for t in b or []):
+        out.append("%s feeds other nodes; it has to be a side branch" % FORGET)
+    kids = [t["node"] for t in ((conns.get("Try again") or {}).get("main") or [[]])[0] or []]
+    if FORGET not in kids:
+        out.append("%s is not fed by Try again" % FORGET)
+    if "Answer the resident" not in kids:
+        out.append("Try again no longer feeds Answer the resident")
+    mine = n.get("position") or [0, 0]
+    for k in kids:
+        pos = (by.get(k) or {}).get("position")
+        if k != FORGET and pos and (pos[1], pos[0]) <= (mine[1], mine[0]):
+            out.append("%s is drawn below %s under Try again, so it would run after it" % (FORGET, k))
+    mem = [t["node"] for b in ((conns.get(MEMORY) or {}).get("ai_memory") or []) for t in b or []]
+    if FORGET not in mem:
+        out.append("%s is not on %s's memory" % (FORGET, MEMORY))
+    if "Answer the resident" not in mem:
+        out.append("Answer the resident is no longer on %s's memory" % MEMORY)
+    return out
 
 
 def snapshot(live):
@@ -505,9 +634,26 @@ def main():
         })
         changes.append("Already retried?: new node, one retry and then the stub")
 
-    # --- The two style guards, by id (20 Sep) ------------------------------------
+    # --- Forget the draft (19 Oct) --------------------------------------------------
+    if FORGET not in by:
+        nodes.append(forget_node())
+        by[FORGET] = nodes[-1]
+        changes.append("%s: new node, the first pass's two messages out of the buffer "
+                       "before the second pass" % FORGET)
+    else:
+        want = forget_node()
+        for k in ("parameters", "onError", "type", "typeVersion"):
+            if by[FORGET].get(k) != want[k]:
+                by[FORGET][k] = want[k]
+                changes.append("%s: %s updated" % (FORGET, k))
+    mem = conns.setdefault(MEMORY, {}).setdefault("ai_memory", [[]])
+    if not any(t.get("node") == FORGET for t in mem[0]):
+        mem[0].append({"node": FORGET, "type": "ai_memory", "index": 0})
+        changes.append("%s -> %s (memory)" % (MEMORY, FORGET))
+
+    # --- The style guards, by id (20 Sep; `repeat` 19 Oct) --------------------------
     cond = by["Reply usable?"]["parameters"]["conditions"]["conditions"]
-    for g in (PLURAL_GUARD, OPENER_GUARD, REPHAY_GUARD, UNASKED_GUARD):
+    for g in (PLURAL_GUARD, OPENER_GUARD, REPHAY_GUARD, UNASKED_GUARD, REPEAT_GUARD):
         have = next((c for c in cond if c.get("id") == g["id"]), None)
         if have is None:
             cond.append(dict(g))
@@ -553,10 +699,11 @@ def main():
         conns["Already retried?"] = want_retried
         changes.append("Already retried? -> %s (yes) / Try again (no)" % CLAIMED)
 
-    want_try = {"main": [[{"node": "Answer the resident", "type": "main", "index": 0}]]}
+    want_try = {"main": [[{"node": FORGET, "type": "main", "index": 0},
+                          {"node": "Answer the resident", "type": "main", "index": 0}]]}
     if conns.get("Try again") != want_try:
         conns["Try again"] = want_try
-        changes.append("Try again -> Answer the resident")
+        changes.append("Try again -> %s (first, drawn above) and Answer the resident" % FORGET)
 
     if not changes:
         print("\nNothing to do. Live already matches.")

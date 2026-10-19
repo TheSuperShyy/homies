@@ -1507,6 +1507,339 @@
     "tone: patient and warm with a man who is losing patience, never defensive, never a form?",
     "goodbye: a warm close without a question?"
    ]
+  },
+  {
+   "id": "status_repeat",
+   "title": "asks what is happening with his ticket, and asks again (19 Oct: the owner's chat on a second number, executions 114483 and 114536)",
+   "time": "14:30",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T11:30:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 2 שפתח לפני שבוע קריאה על התאורה בחדר המדרגות ולא שמע כלום. לא זוכר מספר קריאה ולא מבין למה שואלים אותו. אם מבקשים ממנו מספר או כתובת, הוא כותב שוב את אותה שאלה בדיוק",
+    "script": [
+     {
+      "say": "היי מה קורה?"
+     },
+     {
+      "say": "הכל טוב תודה.\nמה קורה עם הקריאה שפתחתי אני לא מבין"
+     },
+     {
+      "if_asked": "a ticket number or an address",
+      "say": "מה קורה עם הקריאה שפתחתי אני לא מבין"
+     },
+     {
+      "say": "אוקיי תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1402-26",
+       "status": "in_progress",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-12",
+       "last_update": "2026-10-18",
+       "description": "תאורה בחדר המדרגות קומה 3 לא עובדת"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "255-1402-26|בטיפול|תאורה|חדר המדרגות",
+     "name": "the status is given on the first ask"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 1,
+     "regex": "מספר הקריאה|מספר קריאה|הכתובת המלאה|באיזה בניין|איזה בניין|מספר הדירה",
+     "name": "no number or address asked before looking (114528)"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words (114536)"
+    },
+    {
+     "type": "turn_count_max",
+     "max": 4,
+     "name": "answered without a second ask"
+    }
+   ],
+   "judge": [
+    "answered: on \"what's happening with the ticket I opened?\", is the ticket's status given from the lookup, without first asking for a number or an address?",
+    "no_parrot: is no reply a repeat of an earlier one, in the same or nearly the same words?",
+    "hello: on \"hi what's up\" (his first message), a greeting back, the name, and how he is asked back once?",
+    "goodbye: a warm close without a question?"
+   ]
+  },
+  {
+   "id": "status_none_by_phone",
+   "title": "asks about his ticket, but nothing is on record for his number (19 Oct)",
+   "time": "14:30",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T11:30:00+03:00",
+   "resident": {
+    "persona": "דייר בסוקולוב 86 שכותב מטלפון חדש; פתח קריאה בטלפון למשרד על הדלת של החניון ואין לו מספר",
+    "script": [
+     {
+      "say": "מה קורה עם הקריאה שפתחתי?"
+     },
+     {
+      "if_asked": "a ticket number or a building",
+      "say": "אין לי מספר. סוקולוב 86"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 0,
+     "as_of": "live",
+     "other_open": 0,
+     "requests": []
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "get_request_status",
+     "turn": 0,
+     "name": "the lookup first, with nothing"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "מספר|בניין|כתובת",
+     "name": "then the number or the building is asked for"
+    },
+    {
+     "type": "turn_questions_max",
+     "turn": 0,
+     "max": 1,
+     "name": "one question"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "פתחתי|נפתחה",
+     "name": "no ticket claimed"
+    },
+    {
+     "type": "questions_distinct"
+    }
+   ],
+   "judge": [
+    "lookup_first: is the lookup made before anything is asked, and is a number or a building asked for only after it found nothing?",
+    "honest_miss: when the building finds nothing either, is that said plainly, with an offer, no ticket invented?",
+    "no_parrot: is no reply a repeat of an earlier one?"
+   ]
+  },
+  {
+   "id": "status_tap_found",
+   "title": "the status button, and his number finds the ticket (19 Oct)",
+   "time": "10:15",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-01T07:15:00+03:00",
+   "resident": {
+    "persona": "דיירת בבר כוכבא 23 שלא זוכרת מספר קריאה",
+    "script": [
+     {
+      "say": "היי"
+     },
+     {
+      "say": "מצב קריאה קיימת",
+      "kind": "tap"
+     },
+     {
+      "if_asked": "reference number or building",
+      "say": "אין לי מספר, זה בבר כוכבא 23"
+     },
+     {
+      "say": "תודה רבה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1402-26",
+       "status": "in_progress",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-12",
+       "last_update": "2026-10-18",
+       "description": "תאורה בחדר המדרגות קומה 3 לא עובדת"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "get_request_status",
+     "turn": 1,
+     "name": "the lookup on the tap itself"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "255-1402-26|בטיפול|תאורה|חדר המדרגות",
+     "name": "the status on the tap"
+    },
+    {
+     "type": "turn_questions_max",
+     "turn": 1,
+     "max": 1,
+     "name": "one question on the tap"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "^(בוקר טוב|שלום|היי|צהריים טובים|ערב טוב)",
+     "name": "no greeting after the menu"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    }
+   ],
+   "judge": [
+    "tap_handling: on the tap, a human first sentence, the name, no greeting, and the ticket's status without asking for a number?",
+    "no_send_to_search: the resident is not told to go and look for the number?"
+   ]
+  },
+  {
+   "id": "manager_glued_tap",
+   "title": "a pasted \"talk to a representative\" glued to a ticket question, then the question again (19 Oct: the owner's handset, executions 114528 and 114536)",
+   "time": "14:37",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T11:37:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 2 שבודק את הבוט מהטלפון: לוחץ על נציג, עונה על מה שלומו, ואז מדביק בטעות את טקסט הכפתור לפני השאלה שלו על הקריאה. אם מבקשים ממנו מספר או כתובת, הוא כותב את השאלה שוב בלי הטקסט המודבק",
+    "script": [
+     {
+      "say": "hello"
+     },
+     {
+      "say": "לדבר עם נציג",
+      "kind": "tap"
+     },
+     {
+      "say": "היי מה שלומך"
+     },
+     {
+      "say": "לדבר עם נציגהכל טוב תודה. מה קורה עם הקריאה שפתחתי אני לא מבין   \nPNG"
+     },
+     {
+      "if_asked": "a ticket number or an address",
+      "say": "הכל טוב תודה. מה קורה עם הקריאה שפתחתי אני לא מבין"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1402-26",
+       "status": "in_progress",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-12",
+       "last_update": "2026-10-18",
+       "description": "תאורה בחדר המדרגות קומה 3 לא עובדת"
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "notify_team",
+     "name": "a pasted button text is not a request for a person"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 3,
+     "regex": "255-1402-26|בטיפול|תאורה|חדר המדרגות",
+     "name": "the status on the glued message"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 3,
+     "regex": "^\\W*(אני מבין ש|הבנתי ש)",
+     "name": "no echo (the chat is not about a manager)"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    }
+   ],
+   "judge": [
+    "read_through: is the pasted button text read past, and the question about the ticket answered from the lookup?",
+    "no_parrot: is no reply a repeat of an earlier one, in the same or nearly the same words?",
+    "rep_opening: on the tap, hi, the name and how he is, and only that; then a word on his answer and how to help?"
+   ]
   }
  ]
 }

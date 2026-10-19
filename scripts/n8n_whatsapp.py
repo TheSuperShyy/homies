@@ -230,7 +230,12 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 82
+MEMORY_EPOCH = 83
+# 82 -> 83, 19 Oct (n8n_whatsapp_norepeat.py): a ticket's status is looked up by
+# the number they write from before anything is asked (get_request_status's
+# text), and a message already sent is never sent again (the prompt, backed by
+# the `repeat` guard). The owner's buffer holds "תוכל לשלוח לי את מספר הקריאה, או
+# את הכתובת המלאה?" twice, ready to be copied back.
 # 81 -> 82, 18 Oct, late (n8n_whatsapp_procedure.py): a request for a manager is
 # answered with the reason ("before anything goes to a manager, someone has to
 # know what it is about"), never the same question twice, and nothing goes on
@@ -749,7 +754,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "9e4b0a8f158f",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "5cd340546742",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -764,7 +769,9 @@ EPOCH_COVERS = {
     # later the same day, worded as a service rep would, not as a process.
     # 18 Oct, late: and says the reason, never the same question twice, never an
     # empty note (n8n_whatsapp_procedure.py).
-    "tools": "b01c94a2f6c6",
+    # 19 Oct: get_request_status is called first, with nothing; the number they
+    # write from finds their tickets (n8n_whatsapp_norepeat.py).
+    "tools": "ba0d94da4e6d",
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions
@@ -1558,20 +1565,26 @@ TOOLS = [
     },
     {
         "name": "get_request_status",
+        # 19 Oct: on WhatsApp the number they write from finds their tickets, so
+        # the lookup comes first and a reference or an address is asked for only
+        # when it found nothing. Until then "what is happening with my ticket?"
+        # always became "send me the number or the address" (114528, 114536).
         "description": (
             "Call when the resident asks about an existing service call — its "
-            "status, a follow-up, what happened to it. Pass the reference if "
-            "they quoted one, in any form: the whole thing, an older HM-prefixed "
-            "one, or just the serial. "
-            "Without a reference the building finds them; the apartment only "
-            "narrows it, so looking a ticket up never needs one. (Opening a "
-            "ticket is open_request's, and there the apartment the reporter "
-            "lives in is asked together with the building.) Name the type "
-            "when they named it. Returns "
-            "reference, status (open / in_progress / resolved / cancelled), "
-            "dates and description; or `ambiguous_building` with the names when "
-            "what they typed fits more than one, and then you ask which rather "
-            "than choosing. Read-only; the answer is live from the system."
+            "status, a follow-up, what happened to it, \"what's happening with my "
+            "ticket?\". Call it at once, with whatever they gave, even nothing: "
+            "the number they write from finds their own tickets, so you never "
+            "ask for a reference, a building or an apartment before calling. "
+            "Pass the reference if they quoted one, in any form: the whole "
+            "thing, an older HM-prefixed one, or just the serial; the building "
+            "if they named one (the apartment only narrows it). Name the type "
+            "when they named it. Returns reference, status (open / in_progress / "
+            "resolved / cancelled), dates and description, newest first; "
+            "`by_phone` true when their number found them. `found` 0 means "
+            "nothing on record for them, and only then do you ask for the "
+            "reference or the building; or `ambiguous_building` with the names "
+            "when what they typed fits more than one, and then you ask which "
+            "rather than choosing. Read-only; the answer is live from the system."
         ),
         "input_schema": {
             "type": "object",
@@ -1579,8 +1592,9 @@ TOOLS = [
                 "reference": {"type": "string",
                               "description": "The reference the resident quoted, as written."},
                 "building": {"type": "string",
-                             "description": "Street and number, if no reference was quoted. "
-                                            "A partial name is fine — the match is loose."},
+                             "description": "Street and number, if they named one. "
+                                            "A partial name is fine — the match is loose. "
+                                            "Empty otherwise: their number finds their tickets."},
                 "unit": {"type": "string",
                          "description": "Apartment number. Leave out for a fault that is "
                                         "not inside a flat."},
@@ -2689,8 +2703,9 @@ def workflow(e):
                                     "written, whether that is the whole reference, an "
                                     "older HM-prefixed one, or just the serial. "
                                     "Empty if none was quoted."),
-                            from_ai("building", "Street and number, if no reference. "
-                                                "A partial name is fine."),
+                            from_ai("building", "Street and number, if they named one. "
+                                                "A partial name is fine. Empty otherwise: "
+                                                "their number finds their tickets."),
                             # Empty for anything shared. Since 19 Aug the handler
                             # no longer requires it, and requiring it here would
                             # put the unanswerable question back one layer down.

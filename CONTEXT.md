@@ -2324,7 +2324,7 @@ a refused open_request (`opened:false`) is not work. Any future "send it back"
 check inherits this: **the retry is a blank second chance, not a correction of
 the first.**
 
-## The bot repeats itself: four causes, found 19 Oct (not fixed yet)
+## The bot repeats itself: four causes, found 19 Oct, fixed the same day (built; see below for what is live)
 
 **The trigger.** On 19 Oct a resident asked "what's happening with the ticket I opened?" twice and got the same message back. Measured from the `messages` table: **34 times since 9 Aug** the bot answered nearly word for word (85%+) what it had just sent, within 15 minutes and after the resident had written something new. The owner's guess was "prompt paralysis/conflict". That is partly right; the two biggest causes are mechanical.
 
@@ -2349,11 +2349,12 @@ the first.**
    - **On WhatsApp, `get_request_status` cannot use the sender:** it uses `ctx.residentId` (never set on chat), a reference or a building. `get_payment_link` finds the flat by `residents.phone`, and tickets carry `reported_by_phone`.
    - **So "what's happening with my ticket?"** always becomes "send me the ticket number or the address", and a resident who just asks again gets the same thing back.
 
-**Fix direction (owner's go first; nothing changed yet):**
-- a repeat check on every pass;
-- a second try that keeps the rejected draft and the duplicate message out of memory, and gets one note about what this message needs instead of a list of don'ts;
-- the status lookup by the sender's number;
-- one consistent rule on showing understanding, with the manager exemption narrowed to the turn that actually asks for a manager.
+**The fixes (19 Oct, `n8n_whatsapp_norepeat.py`), and the decisions in them:**
+- **What the phone already has is never sent again.** `repeat` on `Reply usable?` compares a reply, letters and digits only, with the bot's last three sent rows (up to 15% edits), on both passes; `Mend the reply` sends a copy neither (a copied first draft gives way to the second, a copied second draft to the fixed line). Three rows and not twelve: measured over every bot message, twelve pulled in an earlier test session's texts; three caught only what the person had just read (64 of 1,067). A turn that did work is exempt, as with every style check (the section above says why).
+- **The second pass does not see its rejected draft.** `Forget the draft`, a Chat Memory Manager on the same buffer, deletes the first pass's two messages before the agent runs again. It hangs off `Try again` beside the agent and is drawn above it: v1 runs children by position, so the drawing IS the order (the same rule as the typing nodes), and `retry.forget_problems()` checks it in the carrier and in the gate. The note therefore speaks of "a draft you wrote that was not sent" and says what was sent did arrive: a model told "your previous answer did not go out" while its last visible answer did go out sends that one again (114483).
+- **A chat is about a manager for two messages, not twelve rows.** This message and the one before it, a pasted "לדבר עם נציג" taken off. The exemption lasts while he is asking for a person and ends when the chat moves on.
+- **A ticket question is answered from the lookup, not from a form.** On WhatsApp `get_request_status` finds the sender's tickets by the number on the ticket and through the resident rows that carry the number; the tool text says to call it first, with nothing, and the prompt says a number or an address is asked for only when it found nothing. A reference the resident typed still wins; a building he named is read only after the number found nothing, so a neighbour's address never widens an answer.
+- **The prompt says it in words too:** someone who writes the same thing again did not get an answer that helped; do something not yet done, or say it differently and add something. The guard is what makes it true.
 
 **Greeted is not remembered.** Sort's `greeted` lives in staticData and survives
 epoch bumps and restarts; the model's memory does not. After every bump, every

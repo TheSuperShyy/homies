@@ -130,7 +130,11 @@ PINS = {
     # backstop note without the tool. Tonight's six first drafts replayed through the
     # candidate: the five that explained go out, 112618 keeps its name, and 112626's
     # (a promise inside the reason) goes back with the promise named.
-    'Answer the resident / system': '9e4b0a8f158f',
+    # 19 Oct (n8n_whatsapp_norepeat.py, epoch 83): a ticket's status is looked up by
+    # the number first (two sentences), nothing already sent is sent again, and
+    # Try again's note speaks of a draft he never got; get_request_status's text
+    # with them. Claude-played on the candidate: see the WORKLOG entry of the day.
+    'Answer the resident / system': '5cd340546742',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -138,12 +142,16 @@ PINS = {
     # 18 Oct, evening: names a how-are-you he did not ask for (`unasked`); see above.
     # 18 Oct, late: in a chat about a manager, names neither the echo nor the clerk,
     # names a promise instead, and its unnamed list asks for no bare question.
-    'Try again / note': '7631ae8f7590',
+    # 19 Oct: names a copy of a sent message, opens with "a draft you wrote was not
+    # sent", says what was sent arrived, and its tools line names the status lookup.
+    'Try again / note': '0da4ce61e032',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '3ef1f30b5235',
     'get_payment_link / tool': '58ab6a539158',
-    'get_request_status / tool': '76e812f28aaa',
+    # 19 Oct: called first, with nothing; the number they write from finds their
+    # tickets; a reference or a building only when it found nothing (norepeat.py).
+    'get_request_status / tool': '437d0eda4866',
     'get_service_info / tool': '6223a04ed17f',
     'notify_team / tool': '0a8bb45d8a17',     # 18 Oct, late: the reason, never an empty note
     'open_request / tool': '8e8e45124b09',
@@ -299,6 +307,26 @@ def check_typing(wf):
     probs = TY.problems(wf)
     if not probs:
         print("both nodes right: Meta's typing call, side branches, each above its siblings")
+        return 0
+    for p in probs:
+        print("FAIL " + p)
+    return len(probs)
+
+
+# 19 Oct: `Forget the draft` (n8n_whatsapp_norepeat.py). A Chat Memory Manager on
+# the agent's buffer whose whole correctness is where it hangs and where it is
+# drawn: executionOrder v1 runs it before the agent only when it is drawn above.
+# retry.forget_problems() is the check, run by the carrier before any write too.
+def check_forget(wf):
+    import n8n_whatsapp_retry as R
+    print("--- Forget the draft (n8n_whatsapp_retry.py) ---")
+    if R.FORGET not in {n["name"] for n in wf["nodes"]}:
+        print("not on this workflow")
+        return 0
+    probs = R.forget_problems(wf["nodes"], wf.get("connections") or {})
+    if not probs:
+        print("right: a side branch off Try again, drawn above the agent, on its memory, "
+              "deleting the first pass's two messages")
         return 0
     for p in probs:
         print("FAIL " + p)
@@ -495,9 +523,19 @@ def watch(since):
         # person, "I understand you" and the reason for asking are what the owner
         # asked for, so they are an info line there, not a flag. The same test as
         # the guards (retry.MGR_CTX): the resident's own rows, the tap's row aside.
-        from n8n_whatsapp_retry import MGR_PY, TAP_REP
-        mgr = any(r.get("direction") == "inbound" and str(r.get("body") or "").strip() != TAP_REP
-                  and MGR_PY.search(str(r.get("body") or "")) for r in (items("Anything newer?") or []))
+        # 19 Oct: this message and the one before it, a pasted tap text taken off
+        # (retry.mgr_py, the guards' own test in Python).
+        from n8n_whatsapp_retry import mgr_py
+        newer = items("Anything newer?") or []
+        mgr = mgr_py([str(r.get("body") or "") for r in newer if r.get("direction") == "inbound"])
+        # 19 Oct (n8n_whatsapp_norepeat.py): what went out is not what the phone
+        # already had. The `repeat` guard's own test (wa_truth.repeats_py) on the
+        # bot's last three rows; a flag here means the guard let a copy through.
+        from wa_truth import repeats_py
+        had = [str(r.get("body") or "") for r in newer if r.get("direction") == "outbound"]
+        for k, t in sent:
+            if k == "answer" and not canned and repeats_py(t, had):
+                flags.append("the answer repeats what the phone already had: %s" % mask(t, 60))
         for k, t in sent:
             if ECHO.search(t):
                 (infos if mgr else flags).append(
@@ -664,6 +702,8 @@ def main():
     bad = check_pins(wf)
     print("")
     bad += check_typing(wf)
+    print("")
+    bad += check_forget(wf)
     print("")
     # 5 Oct: the live run's 37 promise cuts, each a case (promise v3).
     fixture = json.load(open(os.path.join(HERE, "wa_promise_live_05oct.json"), encoding="utf-8"))

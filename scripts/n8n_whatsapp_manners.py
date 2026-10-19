@@ -257,10 +257,8 @@ SORT_NEW = NLC.join([
 # ---------------------------------------------------------------------------
 # 2. echo and clerk, first pass only, exempt when the turn did work.
 # ---------------------------------------------------------------------------
-WORKED = ("const t = String($json.output || ''); const steps = $json.intermediateSteps || []; "
-          "const worked = t.indexOf('§§§') !== -1 || steps.some(s => { const k = ((s.action || {}).tool) || ''; "
-          "return k === 'notify_team' || k === 'get_payment_link' || (k === 'open_request' "
-          "&& !/opened\\W{1,6}false/.test(String(s.observation || ''))); }); if (worked) return true;")
+# 19 Oct: one copy, retry.py's (its `repeat` guard stands aside for the same work).
+WORKED = R.WORKED
 
 
 def _cond(cid, expr):

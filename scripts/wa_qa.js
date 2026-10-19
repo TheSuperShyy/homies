@@ -62,7 +62,11 @@ function guardWorld(nodes, o) {
     // 18 Oct, late: a row may carry its direction ({direction, body}); the chat about a
     // manager is read off the resident's own rows (n8n_whatsapp_retry.MGR_CTX). A bare
     // string is a row of unknown direction, read as the bot's, as before.
-    'Anything newer?': { all: () => (o.recent || []).map((b) => ({ json: (b && typeof b === 'object')
+    // 19 Oct: players and grade hand `recent` OLDEST first (this message last, as
+    // PLAYER.md says); production's `Anything newer?` is `order=created_at.desc`,
+    // NEWEST first, and the `repeat` guard and the manager test now read the first
+    // rows. Reversed here, once, so the checks read what they read in production.
+    'Anything newer?': { all: () => (o.recent || []).slice().reverse().map((b) => ({ json: (b && typeof b === 'object')
       ? { direction: b.direction, body: String(b.body || '') } : { direction: 'outbound', body: b } })) },
     'Try again': { first: () => { if (!o.first_try) throw new Error('unexecuted'); return { json: o.first_try }; } },
   });

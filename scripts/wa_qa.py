@@ -66,6 +66,7 @@ sys.path.insert(0, HERE)
 import check_whatsapp_rules as C  # noqa: E402  (load_live, extract, inner, mask)
 import n8n_whatsapp_retry as R  # noqa: E402  (HAY_PY: the bot asked how he is)
 import n8n_whatsapp as W  # noqa: E402  (GREETING_TAIL: the menu's sentence after the clock word)
+import wa_truth as T  # noqa: E402  (repeats_py: the `repeat` guard's own test, for the rubric)
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -302,7 +303,8 @@ conversation that has no history) and, once you have them, `ack`, `tool_calls`, 
 oldest first, this message last, each `{"direction": "inbound", "body": "..."}` for the
 resident's and `{"direction": "outbound", "body": "..."}` for what the phone got. The live
 checks read it the way production reads `Anything newer?` (since 18 Oct, whether this chat
-is about a request for a manager or a person). It prints:
+is about a request for a manager or a person; since 19 Oct, whether a reply is a copy of
+one of the last three messages the phone got, which goes back on either pass). It prints:
 - `menu: true` and the system's line: the message never reaches either model. Record
   `{"resident": "...", "kind": "menu"}`; the resident gets that line with the three buttons.
 - otherwise `ack_model_reads`: the payment-ack model's input. Decide that model's output
@@ -709,8 +711,12 @@ def rubric(turn, res, ctx):
     elif not res["two"] and not any(LINK.search(h) for h in handset) and not joined.rstrip().endswith("?") \
             and not res["ack_sent"]:
         flags.append({"rule": "info:no-question-at-end", "quote": C.mask(handset[-1] if handset else "")})
-    if ctx["prev_handsets"] and joined.strip() in ctx["prev_handsets"]:
-        flag("repeated-message", joined)
+    # 19 Oct: the `repeat` guard's own test (wa_truth.repeats_py): nearly letter for
+    # letter one of the last three messages the phone got. Before, only an exact
+    # copy of a whole earlier turn was flagged.
+    for h in handset:
+        if T.repeats_py(h, ctx.get("last_handsets") or []):
+            flag("repeated-message", h)
     return flags
 
 
@@ -838,9 +844,12 @@ def grade(run):
                                                r"|(אתה|את) (ה)?(מנהל|מנהלת|אחראי|אחראית)"
                                                r"|(are|r) (you|u) (the |a |an )?(manager|boss|supervisor|owner|in charge)", text, re.I)),
                    # 18 Oct, late: the chat is about a request for a manager or a
-                   # person (retry.MGR_CTX's test, on the same last twelve rows).
-                   "mgr": any(x["direction"] == "inbound" and x["body"].strip() != R.TAP_REP
-                              and R.MGR_PY.search(x["body"]) for x in recent),
+                   # person (retry.MGR_CTX's test; since 19 Oct this message and
+                   # the one before it, newest first, a pasted tap text taken off).
+                   "mgr": R.mgr_py([x["body"] for x in reversed(recent) if x["direction"] == "inbound"]),
+                   # 19 Oct: the last three messages the phone got, newest first, the
+                   # `repeat` guard's own view, for the rubric's repeated-message flag.
+                   "last_handsets": [x["body"] for x in reversed(convo) if x["direction"] == "outbound"][:3],
                    "has_matter": kind != "tap" and len(text.split()) >= 3 and not HOW_ARE_YOU.search(text),
                    "closing": bool(t.get("closing")) or bool(re.match(r"^\s*(תודה|תודה רבה|אוקיי תודה|ok thanks|thanks|thank you|לילה טוב|יום טוב|ביי|להתראות)", text, re.I)),
                    "tools_so_far": set(tools_so_far), "prev_handsets": set(prev_handsets),

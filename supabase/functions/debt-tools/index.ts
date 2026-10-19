@@ -2466,6 +2466,54 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       rows = data;
     }
 
+    // ON WHATSAPP THE SENDER'S NUMBER FINDS THEIR TICKETS (19 Oct).
+    // "מה קורה עם הקריאה שפתחתי?" twice got "send me the ticket number or the
+    // address" twice (executions 114528, 114536). Nothing here read the number
+    // the chat always carries, while get_payment_link finds the flat by it.
+    // Two ways to theirs, both tried: the number on the ticket, which every
+    // ticket this channel opens stores (reported_by_phone, 13 of 14), and the
+    // resident rows that carry the number, which is how the OXS import links a
+    // ticket (914 of the newest 1,000 tickets: a resident_id and no phone) --
+    // and an owner of several flats has several resident rows. Their own
+    // tickets are theirs, so descriptions come back whole. A reference they
+    // typed still wins above and is never second-guessed by this; a building
+    // they named is used below only when the number found nothing, so a
+    // neighbour's address never widens an answer.
+    let byPhone = false;
+    if (!rows?.length && !serial && channel(ctx) === "whatsapp") {
+      const mine = reporterPhone(ctx);
+      if (mine) {
+        const type = String(args?.type ?? "").trim();
+        const own = (q: any) => {
+          if (type !== "payment") q = q.or("type.is.null,type.neq.payment");
+          return q.order("created_at", { ascending: false }).limit(5);
+        };
+        const { data: who } = await db.from("residents").select("id").eq("phone", mine);
+        const ids = (who ?? []).map((r: any) => String(r.id));
+        const [byTicket, byResident] = await Promise.all([
+          own(db.from("requests").select(fields).eq("reported_by_phone", mine)),
+          ids.length
+            ? own(db.from("requests").select(fields).in("resident_id", ids))
+            : Promise.resolve({ data: [], error: null }),
+        ]);
+        if (byTicket.error) return { ok: false, error: byTicket.error.message };
+        if (byResident.error) return { ok: false, error: byResident.error.message };
+        const seen = new Set<string>();
+        const theirs = [...(byTicket.data ?? []), ...(byResident.data ?? [])]
+          .filter((r: any) => !seen.has(String(r.reference)) && seen.add(String(r.reference)))
+          .sort((a: any, b: any) => String(b.created_at).localeCompare(String(a.created_at)));
+        if (theirs.length) {
+          let picked = type ? theirs.filter((r) => matchesType(r, type)) : theirs;
+          if (type && !picked.length) {
+            picked = theirs;
+            typeUnmatched = true;
+          }
+          rows = picked.slice(0, 3);
+          byPhone = true;
+        }
+      }
+    }
+
     // The building, and the apartment only if there is one.
     //
     // BOTH HALVES OF THIS CHANGED ON 19 AUG, AND BOTH WERE WRONG THE SAME WAY:
@@ -2601,6 +2649,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // Somebody who names a street is not thereby entitled to their
       // neighbours' business.
       other_open: othersInBuilding,
+      // 19 Oct: found by the number they write from, nothing asked.
+      by_phone: byPhone || undefined,
       // "No open requests" and "I did not recognize that address" are
       // different answers, and only the caller's building being resolvable
       // separates them. Set only when a building was given, did not resolve
@@ -2614,8 +2664,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       identify_needed: namedNothing || undefined,
       type_unmatched: typeUnmatched || undefined,
       note: typeUnmatched
-        ? "The category you passed matched none of this flat's requests, so these are all of them, " +
-          "newest first. Find the one the resident means by its description; if none fits, ask him."
+        ? "The category you passed matched none of " + (byPhone ? "their" : "this flat's") +
+          " requests, so these are all of them, newest first. Find the one the resident means " +
+          "by its description; if none fits, ask him."
         : undefined,
       requests: (rows ?? []).map((r) => ({
         reference: r.reference,

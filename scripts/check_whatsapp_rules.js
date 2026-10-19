@@ -584,7 +584,9 @@ function cases(E) {
     () => { const w = why('החלפתי את הנורה בחדר המדרגות.'); return w.includes('ושום כלי לא עשה את זה') && w.includes('open_request') && !w.includes('או שנתנה קישור'); }, true);
   expect('a reason the node cannot see keeps the full list', () => why('ספר/י לי מה קרה בבקשה').includes('או שנתנה קישור'), true);
   expect('the tools line is always there', () => why(REJ).includes('open_request') && why('x').includes('open_request'), true);
-  expect('no output at all: the full list, never a throw', () => why(undefined).startsWith('[התשובה הקודמת'), true);
+  // 19 Oct: the note opens "a draft you wrote for this message was not sent" (the
+  // draft is out of the memory now), not "your previous answer".
+  expect('no output at all: the full list, never a throw', () => why(undefined).startsWith('[טיוטה שכתבת להודעה הזאת לא יצאה לדייר'), true);
   expect("the resident's turn is carried through", () => JSON.parse(E.tryAgain({ output: REJ }, $t)).text, 'hi, the stair lights flicker');
 
   console.log(NL + '--- the inject: facts the answering model is handed ---');
@@ -898,6 +900,74 @@ function cases(E) {
       md({ T: { first_truth_ok: false }, retry: NEG }), NEG);
   } else {
     console.log('(Claimed a ticket? / Mend the reply are not on this workflow: their cases are not run)');
+  }
+
+  // 19 Oct (scripts/n8n_whatsapp_norepeat.py): the bot sent back what the phone
+  // already had. "מה קורה עם הקריאה שפתחתי?" twice got ASK_NUM twice, word for word
+  // (114528, 114536); on another number the second pass sent the bot's previous
+  // message back entire (114483). Rows are newest first, as `Anything newer?`
+  // hands them (order=created_at.desc).
+  console.log(NL + '--- `repeat`: what the phone already got is not sent again (19 Oct, executions 114483, 114528, 114536) ---');
+  const ASK_NUM = 'אני מבין שאתה רוצה לברר מה קורה עם הקריאה שפתחת. תוכל לשלוח לי את מספר הקריאה, או את הכתובת המלאה בבקשה?';
+  const HAY_OPEN = "היי 😊 כאן מיכאל מהומי'ז. הכל בסדר תודה, מה שלומך היום?";
+  const TICKET_Q = 'הכל טוב תודה. מה קורה עם הקריאה שפתחתי אני לא מבין';
+  const GLUED = 'לדבר עם נציג' + TICKET_Q;
+  const inb = (b) => ({ direction: 'inbound', body: b });
+  const outb = (b) => ({ direction: 'outbound', body: b });
+  const rp = (output, rows, run, steps) => () => E.reply.repeat({ output, intermediateSteps: steps || [] }, run || 0, turn({ rows, steps }).$);
+  const ROWS_114536 = [inb(TICKET_Q), outb(ASK_NUM), inb(GLUED), outb('היי, שלומי מצוין תודה! מה שלומך אתה ואיך אני יכול לעזור לך?'), inb('היי מה שלומך')];
+  expect('114536: word for word what the phone got a minute ago goes back', rp(ASK_NUM, ROWS_114536), false);
+  expect('114483: on the second pass too (no first-pass-only way out)',
+    rp(HAY_OPEN, [inb(TICKET_Q), outb(HAY_OPEN), inb('היי מה קורה?')], 1), false);
+  expect('nearly the same (one word changed, the emoji gone) is still a copy',
+    rp("היי, כאן מיכאל מהומי'ז. הכל טוב תודה, מה שלומך היום?", [inb(TICKET_Q), outb(HAY_OPEN)]), false);
+  expect('a different answer passes',
+    rp('הקריאה שלך על התאורה, 255-1402-26, בטיפול מאז ה-12 באוקטובר. רוצה שאבדוק עוד משהו?', ROWS_114536), true);
+  expect('a copy on a turn that did work is exempt, like the other style guards', rp(ASK_NUM, ROWS_114536, 0, OPENED), true);
+  expect('a copy of a message older than the last three sent is not a repeat',
+    rp(ASK_NUM, [outb('א'), outb('ב'), outb('ג'), outb(ASK_NUM)]), true);
+  expect('the rows cannot be read: nothing is a repeat, never a throw',
+    () => E.reply.repeat({ output: ASK_NUM, intermediateSteps: [] }, 0, world({ rows: null })), true);
+  expect("the resident's own words are not the bot's: a reply that quotes them passes",
+    rp('ok, "' + TICKET_Q + '" — בודק עכשיו, רגע.', [inb(TICKET_Q)]), true);
+  // Try again names it, speaks of a draft that was not sent (the draft is out of the
+  // memory now: Forget the draft), says what was sent arrived, and its tools line
+  // names the status lookup.
+  const noteOf = (output, text, rows, steps) => JSON.parse(E.tryAgain({ output, intermediateSteps: steps || [] }, (name) => {
+    if (name === 'Still the last word?') return { first: () => ({ json: { text, tap: '', greeted: true } }) };
+    if (name === 'Anything newer?') return { all: () => rows.map((r) => ({ json: r })) };
+    throw new Error('no node ' + name); })).retry_note;
+  expect('Try again: 114536 names the copy', () => noteOf(ASK_NUM, TICKET_Q, ROWS_114536).includes('חזרה כמעט מילה במילה'), true);
+  expect('Try again: a copy on a turn that did work is not named',
+    () => noteOf(ASK_NUM, TICKET_Q, ROWS_114536, [OPEN7]).includes('חזרה כמעט מילה במילה'), false);
+  expect('Try again: the note speaks of a draft he never got, not of "your previous answer"',
+    () => { const w = noteOf(ASK_NUM, TICKET_Q, ROWS_114536); return w.startsWith('[טיוטה שכתבת להודעה הזאת לא יצאה לדייר') && !w.includes('התשובה הקודמת שלך'); }, true);
+  expect('Try again: ...and says what was sent before did arrive (the named note, the full list, the manager list)',
+    () => [noteOf(ASK_NUM, TICKET_Q, ROWS_114536), why('ספר/י לי מה קרה בבקשה'), mgrWhy('אני איתך. ספר לי מה קרה?')]
+      .every((w) => w.includes('ההודעות שכן שלחת לו קודם בשיחה הגיעו אליו') && w.endsWith(']')), true);
+  expect('Try again: the tools line names the status lookup in all three',
+    () => [noteOf(ASK_NUM, TICKET_Q, ROWS_114536), why('ספר/י לי מה קרה בבקשה'), mgrWhy('אני איתך. ספר לי מה קרה?')]
+      .every((w) => w.includes('get_request_status') && w.includes('open_request')), true);
+  // The chat about a manager is this message and the one before it, a pasted tap
+  // text taken off: the glued "לדבר עם נציג" of 11:38 switched the echo guard off for
+  // the rest of the chat.
+  expect('114528: a pasted tap text glued to a ticket question is not a request for a person: the echo goes back',
+    gm('echo', ASK_NUM, ROWS_114536.slice(2), GLUED), false);
+  expect('114536: a minute later it is not one either', gm('echo', ASK_NUM, ROWS_114536, TICKET_Q), false);
+  expect('a request for a manager three messages back no longer counts',
+    gm('echo', FAULT_ECHO, [inb('יש נזילה בלובי'), outb('x'), inb('בר כוכבא 23 דירה 2'), outb('y'), inb('אני רוצה לדבר עם מנהל')], 'יש נזילה בלובי'), false);
+  expect('the message before this one asked for a manager: still a chat about one', gm('clerk', D112635, WHY_TELL, 'למה שאספר לך?'), true);
+  if (E.mend && E.claimed.claimed) {
+    const cl2 = (output, o) => () => E.claimed.claimed({ output, intermediateSteps: o.steps || [] }, 1, world(o));
+    const md2 = (o) => () => JSON.parse(E.mend({ output: o.retry }, world(o))).output;
+    const FIX2 = 'סליחה, משהו השתבש לי בתשובה. אפשר לכתוב לי את זה שוב?';
+    expect('claimed: a first draft that copies what was sent does not stand in, so the second draft is judged',
+      cl2('פתחתי לך קריאה על העובש. במה עוד?', { T: { first_truth_ok: true, first_output: ASK_NUM, first_steps: [] }, rows: [ASK_NUM] }), true);
+    expect('mend: a first draft that copies what was sent gives way to the second',
+      md2({ T: { first_truth_ok: true, first_output: ASK_NUM }, retry: 'הקריאה שלך בטיפול. רוצה שאבדוק עוד משהו?', rows: [ASK_NUM] }), 'הקריאה שלך בטיפול. רוצה שאבדוק עוד משהו?');
+    expect('mend: a second draft that is a copy too: the fixed line, never the copy',
+      md2({ T: { first_truth_ok: false }, retry: ASK_NUM, rows: [ASK_NUM] }), FIX2);
+    expect('mend: the same second draft with nothing sent before goes out', md2({ T: { first_truth_ok: false }, retry: ASK_NUM, rows: [] }), ASK_NUM);
   }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
