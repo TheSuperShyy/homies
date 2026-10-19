@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### Omnitelecom: the extension-208 reply pulled back, and a script for the bot's SIP address (the create waits on the owner)
+- **Asked:** *"pull back the drafted email and link the account link for it that tokomi needs"*. "tokomi" is Tokomni, Omni's new system; the link is the bot's address Omni asked for on 18 Oct.
+- **The draft** had lived only in chat (18 Oct). It is now saved in the gitignored `local/omnitelecom/2026-10-19-reply-extension-208.txt`: the Hebrew to send, an English check below it, and the address filled in.
+- **Read-only first:** the tenth Vapi account had no phone numbers, and its only credential was Cartesia's.
+- **Checked against Vapi's API spec today:**
+  - `CreateVapiPhoneNumberDTO`: `provider: vapi`, `sipUri`, `assistantId`, `name` (40 characters at most) and `authentication`;
+  - `SipAuthentication`: a username and a password of 20-40 characters each;
+  - without `authentication`, any login is accepted;
+  - a read returns `authentication` and `status`.
+- **`scripts/vapi_sip.py`:**
+  - read-only by default;
+  - `--apply` makes the login into `.env` if it is missing (`VAPI_SIP_USERNAME`, `VAPI_SIP_PASSWORD`, never printed), creates `sip:homies-omni-208@sip.vapi.ai` with the incoming agent (found by name), and reads it back: the address, the agent, the login set, and the username matching `.env`;
+  - `--delete` undoes it.
+  - The dry run is clean: it would create only the address.
+  - `.env.example` now lists the two names, beside the trunk login's `SIP_USERNAME`/`SIP_PASSWORD`, which is the other direction.
+- **The create was stopped** by the session's permission check as a production change. Nothing was written to Vapi, and no login exists yet. It waits on the owner's go (or `python scripts/vapi_sip.py --apply` run by hand); then the login goes into the reply from `.env`.
+- **Still open in the reply:** the 208 email (from Yariv) and the sender's name.
+
+### Is the Vapi key from Yariv still there? (answered in chat, read-only)
+- **No Vapi key ever came from Yariv:** the owner opened every Vapi account.
+- **What came from Yariv is the Cartesia key** (`CARTESIA_YARIV_API_KEY`), Homies' own voice account. It is behind Vapi's voice credential f43b1a37.
+- **Checked live, read-only:**
+  - that key still sees the live voice;
+  - the active `VAPI_PRIVATE_KEY` (the tenth account) answers with both Hebrew agents;
+  - the 6 Sep `_ACCOUNT_LIVE` key still answers too.
+
 ### The 10/18 and 10/19 report, combined (in chat)
 The owner asked *"is it live"*. It was read back from live: the new version since 15:58 UTC, nothing changed since, and no resident turn yet. Then *"report 10/18 and 10/19 combined"*: written in chat in the report format (Project: Homies, verb-first bullets, no numbers, no quotes of the bot's lines, plain words). 10/19 holds only the end of the same work.
 

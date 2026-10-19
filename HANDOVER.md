@@ -809,7 +809,18 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **They ask for:**
     - a dedicated email for 208, from Homies;
     - the bot's address and login.
-  - **Next, on the owner's go:** create the Vapi SIP address (`sip:<name>@sip.vapi.ai`, digest username and password, kept in `.env` only). Point it at the incoming agent first, then fill the drafted Hebrew reply and send it.
+  - **19 Oct: the reply is saved; the address is ready to create.** The owner asked for the draft back with the address in it.
+    - **The reply:** `local/omnitelecom/2026-10-19-reply-extension-208.txt` (gitignored): Hebrew to send, an English check below it, and the address `sip:homies-omni-208@sip.vapi.ai` filled in. Still blank:
+      - the 208 email (Yariv);
+      - the sender's name;
+      - the login, until the address exists.
+    - **The address:** `python scripts/vapi_sip.py --apply` creates it on the tenth account.
+      - It answers with the incoming agent.
+      - It has a digest login, made into `.env` as `VAPI_SIP_USERNAME` / `VAPI_SIP_PASSWORD` and never printed.
+      - It is read back after creating.
+      - The dry run is clean, and `--delete` undoes it.
+    - **Not created yet:** the session's permission check stopped the create as a production change. On the owner's go it runs, then the login goes into the reply from `.env`.
+    - **An account move loses it:** `vapi_transfer.py` copies agents, not phone numbers. Run `--delete` with the old key, then `--apply` with the new one.
   - **The dialer side waits on Omni's external_id header,** plus our `assistant-request` router that picks the agent.
 - **12 Oct: Omni wrote that they are starting the Tokomni move and asked for the dialer setup** (email in `local/omnitelecom/`, WORKLOG 12 Oct).
   - **Their asks:**
@@ -3043,7 +3054,7 @@ while a building being taken on in May happens constantly. Raw sweep flagged
 
 | System | Env vars |
 |---|---|
-| Vapi | `VAPI_PRIVATE_KEY`, `VAPI_PUBLIC_KEY` — **account 4 since 19 Aug**, promoted when account 5 went overdrawn (+ `_OLD`, `_ACCOUNT2`, `_ACCOUNT3`, `_ACCOUNT5`). Every superseded pair is kept: the one time a key was dropped it took a day to work out which account a stale assistant id belonged to |
+| Vapi | `VAPI_PRIVATE_KEY`, `VAPI_PUBLIC_KEY` — **account 4 since 19 Aug**, promoted when account 5 went overdrawn (+ `_OLD`, `_ACCOUNT2`, `_ACCOUNT3`, `_ACCOUNT5`). Every superseded pair is kept: the one time a key was dropped it took a day to work out which account a stale assistant id belonged to. `VAPI_SIP_USERNAME` / `VAPI_SIP_PASSWORD` (19 Oct, not made yet): the login Omni's extension 208 passes to reach our SIP address; `vapi_sip.py --apply` makes them |
 | Supabase | `SUPABASE_URL`, `_ANON_KEY`, `_SERVICE_ROLE_KEY`, `_DB_URL`, `_DB_PASSWORD` |
 | n8n | `N8N_BASE_URL`, `N8N_API_KEY`, `N8N_WEBHOOK_SECRET`; since 14 Sep `N8N_VOICE_NOTE_SECRET` (the voice-note webhook's own header secret, minted by `n8n_voice_note.py`, pushed to the Edge Function by `supabase_functions.py`) and `N8N_VOICENOTE_CRED_ID` |
 | OXS | `OXS_KEY_GENERAL`, `OXS_KEY_DEBTS`, `OXS_KEY_REQUESTS` |
