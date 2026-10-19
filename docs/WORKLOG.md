@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-10-19
 
+### WhatsApp bot: stress test on the candidate (live plus the repeat fix), Claude-played, IN PROGRESS
+- **Asked:** *"so make sure everything is good test it multiple time stress test it the chatbot"* (after the move to Gemini 3.1 Pro and the voice spelling fix).
+- **What is tested:** the bot as it will be once the owner runs `n8n_whatsapp_norepeat.py --apply`: live (Gemini 3.1 Pro on the node) plus the epoch-83 repeat fix, dumped fresh from live by the carrier's dry run. Live itself is unchanged (epoch 82); no real resident has written since the 12:22 switch.
+- **Deterministic layer, done:** the gate on the candidate, 383 of 383 cases, pins unchanged, the replay of every past message and reply changes nothing, nothing broken; `check_patchers_idle.py`, only the baseline 6.
+- **Claude-played layer, running** (`scripts/wa_qa.py`, Claude as the model and the residents, the candidate's own code on every turn, never OpenRouter): the full scripted deck (56), the 15 free residents, and a new stress deck, `scripts/wa_qa_stress.json` (16: six hallucination baits, identity and prompt injection, a burst, heavy typos, the same question four times, a Russian speaker, a long angry message, pasted card details, smoke at night, a long three-matter chat; every one also checks the name's spelling and slash forms), played three times as identical variants. Runs in the session scratchpad (`stress/reg`, `stress/free`, `stress/hard`).
+- **Not tested here:** Gemini 3.1 Pro itself. The real-model mode (`wa_qa.py say`) reads the run's bundle, so the same candidate can be run on the real model with Claude as the tenants; it spends OpenRouter and waits on the owner's go.
+
 ### Voice agents: the name written הומי'ז, and the incoming agent on gpt-5.6-sol (LIVE 12:57 UTC; the Edge Function v122 at 13:01 UTC)
 - **Asked:** Yariv's note on the 5 Oct call transcripts (screenshot): *"many spelling errors. For example - Homies - should be written הומי״ז, אליך - אליך. And more and more..."*; the owner: *"we need to make sure that we have a good LLM that have less hallucination and also make sure that the spelling is correct"*.
 - **What he read, and where each error came from.** The 5 Oct docs are the real models' own text (gpt-4.1 incoming, gpt-5.6-sol debt) through OpenRouter, with Claude as the tenants: no transcriber, no voice.
