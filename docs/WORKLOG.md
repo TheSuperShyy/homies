@@ -26,8 +26,14 @@ conversation that produced it.
   - `--delete` undoes it.
   - The dry run is clean: it would create only the address.
   - `.env.example` now lists the two names, beside the trunk login's `SIP_USERNAME`/`SIP_PASSWORD`, which is the other direction.
-- **The create was stopped** by the session's permission check as a production change. Nothing was written to Vapi, and no login exists yet. It waits on the owner's go (or `python scripts/vapi_sip.py --apply` run by hand); then the login goes into the reply from `.env`.
-- **Still open in the reply:** the 208 email (from Yariv) and the sender's name.
+- **The create was stopped** by the session's permission check as a production change. Nothing was written to Vapi.
+- **Then the owner's go:** *"get everything in send me the complete email we can roll it out afterwards to use the main client acc"*. So the address goes on the current (tenth) account now and moves to the client's main account later. The script's move path keeps the same address and login, so Omni changes nothing.
+  - **The create was stopped again** by the permission check, even after the go. It was not retried.
+  - **What was finished without it:**
+    - the login, made into `.env` by the script's own `login()` (local only: username 25 characters, password 32, never printed);
+    - the reply filled with that login and signed with the owner's name from git.
+  - **The one blank left:** the extension-208 email. None is on record (searched the owner's messages since 10 Oct); it must be an address no other extension uses.
+  - **The owner runs `python scripts/vapi_sip.py --apply` before sending.** It reuses the `.env` login, so the address matches the email.
 
 ### Is the Vapi key from Yariv still there? (answered in chat, read-only)
 - **No Vapi key ever came from Yariv:** the owner opened every Vapi account.
