@@ -2578,8 +2578,11 @@ copy is shared.
   session's uncommitted bump to 84 turned the gated 14-change apply into a
   10-change one without a line of the carrier changing. So a command handed to
   the owner ("run `X --apply`") is only good from the checkout it was gated in:
-  name the commit, and apply from a scratch worktree at that commit when the
-  shared tree has moved on.
+  name the commit, and when the shared tree has moved on either apply from a
+  scratch worktree at that commit or re-gate the two carriers as a pair and hand
+  the owner the pair. 19 Oct took the pair (norepeat then lowkey, gated as one
+  stack by the other session), because the single apply would have put the old
+  prompt and memory key behind the new guards, a state nobody had tested.
 
 ## Send removes promises; it never sends a reply back for one
 
