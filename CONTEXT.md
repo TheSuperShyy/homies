@@ -2441,6 +2441,34 @@ times on its home page. The double mark in his message is his keyboard's.
   rule about spelling. gpt-4.1 made them in four calls; gpt-5.6-sol made none in
   five, which is why the incoming agent runs it since 19 Oct.
 
+## When a resident asks when: a true reason, what is real, what he can do (19 Oct)
+
+The owner, after the stress test showed the honest "I don't know whether they'll
+get back to you" cut by Send and a bare "I don't know" otherwise: *"a low key
+excuse … it should be dynamic as well on all scenarios"*, then *"make sure its not
+templated and if the customer ask it like twice in a row the response would
+depend"*.
+
+- **The shape, never the sentence.** Asked when someone will call, come or send an
+  update: a soft, true reason (the team sets the times; its schedule is not in front
+  of him), what is real now (what the tool showed, that it is with the team), what he
+  can do from here (check again when they write). No time invented, not even to
+  reassure. The prompt describes this in one paragraph and carries no example line:
+  the twelve the owner approved are in the worklog, for feel.
+- **One true "yes".** A ticket opened in this chat sends its own "done" message here
+  when it is resolved (`ticket_resolved_he`, live since 22 Sep). For a ticket found by
+  lookup the channel is unknown, so he says nothing about a message for it.
+- **Asked again, something new.** Not the first answer reworded: check the ticket
+  again, note the wait for the team if not noted, ask whether it got worse, say it
+  plainly. The `repeat` guard (epoch 83) backs the copy case.
+- **Send's filter agrees.** `promise v4` leaves "אם … , את זה אני לא יודע" alone;
+  a phrase is still a promise when no "I don't know" governs it or when it is the
+  main clause after a condition.
+- **Epoch order.** When a later epoch is built before an earlier carrier is live,
+  the later carrier carries the prompt, the tool texts the epoch covers and the key
+  (the earlier one leaves them, by design); check with `--base` that the stack holds
+  every text before claiming either is ready.
+
 ## How a WhatsApp change ships
 
 27 Sep, after the second regression in a day. Owner: *"we need to make sure
