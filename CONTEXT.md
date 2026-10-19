@@ -2571,6 +2571,15 @@ copy is shared.
 - **Say so to the other session** (`ListAgents` / `SendMessage`): what went
   live, which hunks are yours, and that any dump it made before your write
   carries the old node.
+- **A carrier's change set is not fixed while a sibling is mid-flight** (19 Oct,
+  16:10 UTC). `n8n_whatsapp_norepeat.py` reads `MEMORY_EPOCH` from the working
+  copy and, by its `later` rule, hands the prompt, the tool texts and the memory
+  key to a later epoch's carrier when one is already declared. The other
+  session's uncommitted bump to 84 turned the gated 14-change apply into a
+  10-change one without a line of the carrier changing. So a command handed to
+  the owner ("run `X --apply`") is only good from the checkout it was gated in:
+  name the commit, and apply from a scratch worktree at that commit when the
+  shared tree has moved on.
 
 ## Send removes promises; it never sends a reply back for one
 
