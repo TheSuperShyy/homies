@@ -1,23 +1,34 @@
 # -*- coding: utf-8 -*-
 r"""Prove the Omni SIP address from a PC, the way Omni's PBX reaches it.
 
-    python scripts/vapi_sip_probe.py
+    python scripts/vapi_sip_probe.py --no-call    # safe: the right password is never sent
+    python scripts/vapi_sip_probe.py              # PLACES A REAL CALL (seconds long); the owner's to run
 
-It PLACES A REAL CALL (seconds long, hung up the moment the agent answers), so it
-is the owner's to run. Three INVITEs to sip.vapi.ai, over UDP, then TCP, then TLS:
-
-  1. an address that does not exist       what Vapi says to a missing address
-                                          (Omni's case on 19 Oct, before the create)
-  2. the real address, a WRONG password   the refusal, with Vapi's X-Reason
-  3. the real address, the .env login     the agent answers; BYE at once
-
-The login is VAPI_SIP_USERNAME / VAPI_SIP_PASSWORD from .env, the same values
+Both talk SIP to sip.vapi.ai over UDP (then TCP, then TLS if UDP is silent) and
+print status lines, X-Reason headers and the realm only. The login is
+VAPI_SIP_USERNAME / VAPI_SIP_PASSWORD from .env, the same values
 `vapi_sip.py --apply` put on the address and the reply to Omni carries. Nothing
-here prints either value: only status lines, X-Reason headers and the realm.
+here prints either value.
 
-Why it exists: `vapi_sip.py` reads the address back, but Vapi never returns the
-password, so only a call proves it (19 Oct: Omni's first test came back
-"Invalid credentials", because the address had not been created yet).
+--no-call (four INVITEs, none can connect):
+  1. an unknown address, no credentials     Vapi's 401 challenge, with the realm
+  2. an unknown address, a wrong password   what Omni got on 19 Oct before the
+                                            address existed: 403, "Invalid credentials"
+  3. the real address, no credentials       the same challenge
+  4. the real address, a wrong password     the same 403
+  Vapi says "Invalid credentials" alike for a missing address and a wrong
+  password, so this mode proves the SIP side is reachable and challenging; it
+  cannot prove the password.
+
+default (three INVITEs, the last one connects):
+  1. an unknown address, no credentials
+  2. the real address, a wrong password     expect the 403
+  3. the real address, the .env login       the agent answers; BYE at once.
+  A 200 on the third line is the proof of the password. Only this mode gives it,
+  because Vapi never returns the password on a read.
+
+Measured 19 Oct (--no-call): sip.vapi.ai is 44.229.228.186, UDP 5060 answers,
+realm `sip.vapi.ai`, Digest MD5 with qop=auth.
 """
 
 import hashlib
@@ -140,12 +151,22 @@ class Link:
         return parse(head, body)
 
 
-def digest(chal, method, uri, user, pw):
-    """The Authorization value for a Digest challenge (MD5, MD5-sess, qop=auth or none)."""
+def chal_params(chal):
     chal = re.sub(r"^\s*Digest\s+", "", chal, flags=re.I)
     p = {}
     for k, v in re.findall(r'(\w+)=("[^"]*"|[^,]+)', chal):
         p[k.lower()] = v.strip().strip('"')
+    return p
+
+
+def chal_line(chal):
+    p = chal_params(chal)
+    return "challenge: realm=%r algorithm=%s qop=%r" % (p.get("realm", ""), p.get("algorithm", "MD5").upper(), p.get("qop", ""))
+
+
+def digest(chal, method, uri, user, pw):
+    """The Authorization value for a Digest challenge (MD5, MD5-sess, qop=auth or none)."""
+    p = chal_params(chal)
     realm, nonce = p.get("realm", ""), p.get("nonce", "")
     alg, qop = p.get("algorithm", "MD5").upper(), p.get("qop", "")
     cnonce, nc = rnd(16), "00000001"
@@ -163,7 +184,7 @@ def digest(chal, method, uri, user, pw):
            % (user, realm, nonce, uri, resp, alg, tail))
     if p.get("opaque"):
         out += ', opaque="%s"' % p["opaque"]
-    return out, realm, alg, qop
+    return out
 
 
 class Call:
@@ -229,6 +250,43 @@ def uri_of(v):
     return m.group(1) if m else v.split(";")[0].strip()
 
 
+def answer_request(link, m):
+    """200 OK to a request from the far side (its own BYE, say)."""
+    print("   <- request %s" % m["line"].split(" ")[0])
+    via = "\r\n".join("Via: " + v for v in m["h"].get("via", []))
+    link.send("SIP/2.0 200 OK\r\n%s\r\nFrom: %s\r\nTo: %s\r\nCall-ID: %s\r\nCSeq: %s\r\n"
+              "Content-Length: 0\r\n\r\n"
+              % (via, h1(m, "From"), h1(m, "To"), h1(m, "Call-ID"), h1(m, "CSeq")))
+
+
+def challenge_only(link, lip, uri, label, wait=8):
+    """INVITE with no credentials; ACK the final answer; never answer the challenge."""
+    c = Call(link, lip, uri)
+    print("\n== %s" % label)
+    c.invite()
+    while True:
+        m = link.recv(wait)
+        if m is None:
+            print("   nothing back within %ds" % wait)
+            return "silent"
+        if not m["line"].startswith("SIP/2.0"):
+            answer_request(link, m)
+            continue
+        parts = m["line"].split(" ", 2)
+        code, reason = int(parts[1]), (parts[2] if len(parts) > 2 else "")
+        cs = h1(m, "CSeq").split()
+        if not cs or int(cs[0]) != c.cseq:
+            continue
+        xr = h1(m, "X-Reason")
+        print("   <- %d %s%s" % (code, reason, ("   X-Reason: " + xr) if xr else ""))
+        if code < 200:
+            continue
+        c.ack_fail(tag_of(h1(m, "To")))
+        if code in (401, 407):
+            print("   " + chal_line(h1(m, "WWW-Authenticate" if code == 401 else "Proxy-Authenticate")))
+        return code
+
+
 def attempt(link, lip, uri, user, pw, label, wait=8):
     """One INVITE, answered to any Digest challenge once. Returns 'silent' or the final code."""
     c = Call(link, lip, uri)
@@ -244,12 +302,7 @@ def attempt(link, lip, uri, user, pw, label, wait=8):
             print("   nothing back within %ds" % wait)
             return "silent"
         if not m["line"].startswith("SIP/2.0"):
-            # a request from the far side (its own BYE, say): answer it and go on
-            print("   <- request %s" % m["line"].split(" ")[0])
-            via = "\r\n".join("Via: " + v for v in m["h"].get("via", []))
-            link.send("SIP/2.0 200 OK\r\n%s\r\nFrom: %s\r\nTo: %s\r\nCall-ID: %s\r\nCSeq: %s\r\n"
-                      "Content-Length: 0\r\n\r\n"
-                      % (via, h1(m, "From"), h1(m, "To"), h1(m, "Call-ID"), h1(m, "CSeq")))
+            answer_request(link, m)
             continue
         parts = m["line"].split(" ", 2)
         code, reason = int(parts[1]), (parts[2] if len(parts) > 2 else "")
@@ -273,9 +326,9 @@ def attempt(link, lip, uri, user, pw, label, wait=8):
         if code in (401, 407):
             c.ack_fail(to_tag)
             chal = h1(m, "WWW-Authenticate" if code == 401 else "Proxy-Authenticate")
-            auth, realm, alg, qop = digest(chal, "INVITE", uri, user, pw)
-            print("   challenge: realm=%r algorithm=%s qop=%r" % (realm, alg, qop or ""))
-            c.invite(("Authorization: " if code == 401 else "Proxy-Authorization: ") + auth)
+            print("   " + chal_line(chal))
+            c.invite(("Authorization: " if code == 401 else "Proxy-Authorization: ")
+                     + digest(chal, "INVITE", uri, user, pw))
             started = time.time()
             continue
         if code >= 300:
@@ -297,9 +350,15 @@ def attempt(link, lip, uri, user, pw, label, wait=8):
 
 
 def main():
+    args = sys.argv[1:]
+    if args not in ([], ["--no-call"]):
+        sys.exit("Usage: vapi_sip_probe.py [--no-call]")
+    no_call = bool(args)
     user, pw = env_value("VAPI_SIP_USERNAME"), env_value("VAPI_SIP_PASSWORD")
     if not (user and pw):
         sys.exit("VAPI_SIP_USERNAME / VAPI_SIP_PASSWORD are not in .env (vapi_sip.py --apply makes them)")
+    wrong = pw[:-1] + ("a" if pw[-1] != "a" else "b")   # same length, one character off
+
     lip = local_ip()
     print("local ip %s, %s -> %s" % (lip, HOST, socket.gethostbyname(HOST)))
     link = r1 = None
@@ -310,16 +369,31 @@ def main():
             print("%s %d: no connection (%s)" % (proto, port, e))
             continue
         print("\ntransport %s %d" % (proto, port))
-        r1 = attempt(link, lip, FAKE % rnd(6), user, pw, "1. an address that does not exist")
+        r1 = challenge_only(link, lip, FAKE % rnd(6), "1. an unknown address, no credentials")
         if r1 != "silent":
             break
         link = None
     if link is None:
         sys.exit("Vapi's SIP side did not answer on any transport; nothing proven.")
-    r2 = attempt(link, lip, REAL, user, pw + "x", "2. the real address, a WRONG password")
+
+    if no_call:
+        time.sleep(1)
+        r2 = attempt(link, lip, FAKE % rnd(6), user, wrong, "2. an unknown address, a wrong password")
+        time.sleep(1)
+        r3 = challenge_only(link, lip, REAL, "3. the real address, no credentials")
+        time.sleep(1)
+        r4 = attempt(link, lip, REAL, user, wrong, "4. the real address, a wrong password")
+        print("\nresult: unknown/no credentials -> %s | unknown/wrong -> %s | real/no credentials -> %s | real/wrong -> %s"
+              % (r1, r2, r3, r4))
+        print("No call was connected: the right password was never sent. Only the default mode proves it.")
+        return 0
+
+    time.sleep(1)
+    r2 = attempt(link, lip, REAL, user, wrong, "2. the real address, a wrong password")
+    time.sleep(1)
     r3 = attempt(link, lip, REAL, user, pw, "3. the real address, the .env login")
     print("\nresult: unknown address -> %s | wrong password -> %s | the .env login -> %s" % (r1, r2, r3))
-    print("the .env login is proven only by a 200 on the third line (the agent answered).")
+    print("The .env login is proven only by a 200 on the third line (the agent answered).")
     return 0
 
 
