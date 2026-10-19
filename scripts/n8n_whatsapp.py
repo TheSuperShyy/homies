@@ -230,7 +230,13 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 83
+MEMORY_EPOCH = 84
+# 83 -> 84, 19 Oct, late (n8n_whatsapp_lowkey.py): "when will they call me?" gets a
+# true reason, what is real now and what he can do, never a bare "I don't know", and
+# asked again, something not yet done (one prompt paragraph); Send's promise v4 stops
+# cutting "whether…, I don't know". Buffers hold the old bare answers, ready to be
+# copied back. A later epoch than norepeat's, so that carrier now carries only what it
+# alone owns, and this one carries the prompt and the key from 82 or 83.
 # 82 -> 83, 19 Oct (n8n_whatsapp_norepeat.py): a ticket's status is looked up by
 # the number they write from before anything is asked (get_request_status's
 # text), and a message already sent is never sent again (the prompt, backed by
@@ -754,7 +760,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "5cd340546742",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "2f9217ee3454",   # docs/features/11-whatsapp-bot/prompt.md
     "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

@@ -79,7 +79,7 @@ NL = chr(10)
 BS = chr(92)
 PH = "¤"
 
-MARK = "const dv = 'danger v3';"
+MARK = "const dv = 'danger v4';"
 OLD_START = "body.content = (() => { const dv = 'danger v"
 ANCHOR = "body.content = (() => { const ev = 'emoji v1';"
 PUSHED = "פתחתי לך קריאה דחופה, מספר ' + ref + ', וזה הדבר היחיד שאני יכול לעשות מכאן."
@@ -124,8 +124,30 @@ LINES = [
     "|הכי מהר|כמה שיותר מהר|בהקדם|במהרה|במהירות|במיידי|באופן מיידי"
     # Handling NOW is a promise; "it will be handled" is the owner's own "when?" line (v2).
     "|(?:^|[¤s,])(?:ו|ש|וש|ה)?(?:מטפל|מטפלת|מטפלים|מטופל|מטופלת)(?=[¤s,.!?]|$)/g;",
-    "const asked = (p, i) => p.slice(0, i).split(/¤s+/).slice(-4).some((w) => /^(?:מתי|לא|אין|אינני|אינו)$/.test(w.replace(/[^א-ת]/g, '')));",
-    "const promised = (p) => { ARRIVE.lastIndex = 0; let m; while ((m = ARRIVE.exec(p)) !== null) { if (!asked(p, m.index)) return true;"
+    # v4, 19 Oct (the check of the "when will they come?" paragraph): an honest
+    # "who is coming and when, I can't see from here" is not a promise. Besides
+    # "when" or a negation in the four words before: "who" ("מי מגיע ומתי אני לא
+    # יודע", cut on 19 Oct), "whether" under "I don't know" (as promise v4), and a
+    # fronted "to promise" with its "I can't" ("להבטיח שיגיעו היום אני לא יכול").
+    "const UNSURE = " + NP.UNSURE_RE + ";",
+    "const CANT = " + NP.CANT_RE + ";",
+    # v4, later (run 3 of the lowkey check, 20 Oct): "אני לא יכול לדעת אם מישהו כבר בדרך" was
+    # cut, two words standing between "אם" and the phrase; a subject and an adverb may now, as
+    # in promise v4. And the done message ("כשהקריאה תיסגר, תגיע על זה הודעה לכאן") is a
+    # message arriving, not help: "תגיע" with "הודעה", or "יגיע" with "עדכון", beside it.
+    "const SUBJD = " + NP.SUBJ_RE + ";",
+    "const ADVD = " + NP.ADV_RE + ";",
+    "const asked = (p, i) => { const ws = p.slice(0, i).split(/¤s+/).slice(-4).map((w) => w.replace(/[^א-ת]/g, ''));"
+    " if (ws.some((w) => /^ו?(?:מתי|מי|האם|לא|אין|אינני|אינו)$/.test(w))) return true;"
+    " const rv = ws.filter(Boolean).reverse(); let k = 0; if (k < rv.length && ADVD.test(rv[k])) k++;"
+    " if (k < rv.length && SUBJD.test(rv[k])) k++; if (k < rv.length && ADVD.test(rv[k])) k++;"
+    " if (k < rv.length && /^ו?ה?אם$/.test(rv[k]) && UNSURE.test(p)) return true;"
+    " const w5 = p.slice(0, i).split(/¤s+/).filter(Boolean).slice(-5).map((w) => w.replace(/[^א-ת]/g, ''));"
+    " return w5.some((w) => /^ו?(?:להבטיח|להגיד|לומר|לדעת)$/.test(w)) && CANT.test(p); };",
+    "const msg = (p, m) => { const v = m[0].replace(/[^א-ת]/g, '').replace(/^(?:וש|ו|ש)/, '');"
+    " const near = p.slice(0, m.index).split(/¤s+/).filter(Boolean).slice(-2).concat(p.slice(m.index + m[0].length).split(/¤s+/).filter(Boolean).slice(0, 3)).map((w) => w.replace(/[^א-ת]/g, ''));"
+    " return (v === 'תגיע' && near.some((w) => /^ו?ה?הודעה$/.test(w))) || (v === 'יגיע' && near.some((w) => /^ו?ה?עדכון$/.test(w))); };",
+    "const promised = (p) => { ARRIVE.lastIndex = 0; let m; while ((m = ARRIVE.exec(p)) !== null) { if (!asked(p, m.index) && !msg(p, m)) return true;"
     " if (m[0] === '') ARRIVE.lastIndex++; } return false; };",
     "const parts = s.match(/(?:[^.!?¤n]|[.!](?=¤S))+[.!?]*¤s*|¤s+/g) || [s];",
     "let cut = false;",
@@ -218,6 +240,22 @@ SMOKE = [
      "אבל מה אני עושה עכשיו?? לכבות את החשמל או לא? ומתי מישהו מגיע", "", [],
      "אני מבינה את הדאגה שלך. אני כאן אם יש לך שאלות נוספות. " + T3,
      ["תודה שעדכנת אותי. פתחתי עכשיו קריאת חירום לטיפול בנזילה. מספר הקריאה הוא " + NEW + "."]),
+    # v4, 19 Oct: "who is coming and when, I can't see from here" and "whether and
+    # when someone comes, I can't know" are honest and stay whole; "on the way" goes.
+    ("פתחתי קריאה דחופה, " + NEW + ", והצוות כבר יודע על העשן. מי יבוא ומתי, את זה אני לא רואה מכאן. אני כאן איתך.",
+     "מישהו בא??", T3, [],
+     "פתחתי קריאה דחופה, " + NEW + ", והצוות כבר יודע על העשן. מי יבוא ומתי, את זה אני לא רואה מכאן. אני כאן איתך."),
+    ("אם ומתי מישהו מגיע, את זה אני לא יכול לדעת מכאן, כי את זה קובעים בצוות. " + T3, "מישהו בא??", T3, [],
+     "אם ומתי מישהו מגיע, את זה אני לא יכול לדעת מכאן, כי את זה קובעים בצוות. " + T3),
+    ("הצוות בדרך אלייך. " + T3, "מישהו בא??", T3, [], T3),
+    # v4, later: an adverb beside the subject after "אם" stays; the done message stays;
+    # a conditional "on the way" and "the team will arrive" still go.
+    ("אני לא יכול לדעת אם מישהו כבר בדרך, את זה קובעים שם ולא אני. " + T3, "מישהו בא??", T3, [],
+     "אני לא יכול לדעת אם מישהו כבר בדרך, את זה קובעים שם ולא אני. " + T3),
+    ("שעה אין לי, ואני לא רוצה לנחש כשמדובר בגז. כשהקריאה תיסגר, תגיע על זה הודעה לכאן. " + T3, "מתי??", T3, [],
+     "שעה אין לי, ואני לא רוצה לנחש כשמדובר בגז. כשהקריאה תיסגר, תגיע על זה הודעה לכאן. " + T3),
+    ("אם צריך, מישהו כבר בדרך. " + T3, "מתי??", T3, [], T3),
+    ("הצוות יגיע ויעדכן אותך, ותקבל הודעה. " + T3, "מתי??", T3, [], T3),
     # Outside an emergency nothing changes, promise-like words included.
     ("אין לי תאריך מדויק מתי יגיעו לתקן, אבל הקריאה שלך נפתחה והצוות יטפל בזה כמו שצריך. יש משהו נוסף שאוכל לעזור לך בו?",
      "יש מושג בערך מתי יבואו לתקן?", "פתחתי קריאת שירות בנושא, מספרה 255-1347-26.", [],

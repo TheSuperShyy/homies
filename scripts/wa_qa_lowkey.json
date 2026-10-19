@@ -1,0 +1,1503 @@
+{
+ "_about": "19 Oct, late: the 'when will they call me?' deck, for the epoch-84 prompt paragraph and Send's promise v4 (n8n_whatsapp_lowkey.py). The owner: a 'low key excuse' instead of a bare 'I don't know', 'make sure its not templated and if the customer ask it like twice in a row the response would depend'. Ten conversations about when someone will call, come or update, most asking twice or three times; played three times each to see whether the answers vary. Six earlier scenarios ride along as a regression, played once. Every resident is invented and lives in בר כוכבא 23; nothing here writes anywhere. Run with --deck scripts/wa_qa_lowkey.json.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
+  "open_request": {
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second call with the same building and the same type returns the FIRST ticket's reference as `duplicate` (the ticket service's 30-minute duplicate guard: same building, same type, still open); a different type gets the next serial (255-1510-26 -> 255-1511-26).",
+   "opened": {
+    "ok": true,
+    "opened": true,
+    "reference": "<ticket>",
+    "building": "בר כוכבא 23",
+    "reporter_unit": "<the reporter_unit passed>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ],
+    "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   },
+   "need_building": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_building"
+   },
+   "duplicate": {
+    "ok": true,
+    "reference": "<the first ticket's reference>",
+    "duplicate": true
+   }
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "notify_team": {
+   "ok": true,
+   "notified": true
+  },
+  "show_menu": {
+   "ok": true,
+   "menu": "shown under your next message"
+  },
+  "verify_address": {
+   "_rule": "Bar Kochba in Hebrew with 23: found. Bar Kochba in Hebrew without a number: need_number. Anything else: street_unknown.",
+   "found": {
+    "ok": true,
+    "building_found": true,
+    "address": "בר כוכבא 23, תל אביב-יפו"
+   },
+   "need_number": {
+    "ok": true,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "get_service_info": {
+   "_rule": "Match the topic's words against each entry's `words` (any one is enough); every entry that matches comes back in `topics` as {title, facts}. Nothing matches: not_found.",
+   "catalogue": [
+    {
+     "title": "ניהול ועד בית",
+     "words": [
+      "ועד",
+      "ניהול",
+      "גבייה",
+      "גביה",
+      "תקציב",
+      "כספים",
+      "הנהלת חשבונות",
+      "דוח",
+      "דוחות",
+      "מאזן",
+      "קבלה",
+      "קבלות",
+      "הוראת קבע",
+      "לשלם",
+      "תשלום"
+     ],
+     "facts": [
+      "בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.",
+      "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
+      "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
+      "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
+      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים."
+     ]
+    },
+    {
+     "title": "הדברה",
+     "words": [
+      "הדברה",
+      "מדביר",
+      "גוקים",
+      "ג'וקים",
+      "גו'קים",
+      "נמלים",
+      "מזיקים",
+      "עכברים",
+      "חולדות",
+      "צרעות",
+      "מקקים"
+     ],
+     "facts": [
+      "ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.",
+      "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.",
+      "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.",
+      "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים."
+     ]
+    },
+    {
+     "title": "שיפוצים",
+     "words": [
+      "שיפוץ",
+      "שיפוצים",
+      "לשפץ",
+      "ריצוף",
+      "צביעה",
+      "גבס",
+      "איטום"
+     ],
+     "facts": [
+      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות."
+     ]
+    },
+    {
+     "title": "ניהול נכסים לבעלי דירות",
+     "words": [
+      "ניהול נכס",
+      "ניהול נכסים",
+      "בעל דירה",
+      "להשכיר",
+      "שוכר",
+      "שוכרים",
+      "חוזה שכירות",
+      "משכיר"
+     ],
+     "facts": [
+      "שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.",
+      "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו."
+     ]
+    }
+   ],
+   "not_found": {
+    "ok": true,
+    "found": false,
+    "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+   }
+  },
+  "get_payment_link": {
+   "ok": true,
+   "found": true,
+   "link": "https://pay.example.co.il/t/<id>",
+   "building": "בר כוכבא 23",
+   "apartment": "<flat>"
+  },
+  "get_balance": {
+   "_rule": "name or phone missing: need_identity (list what is missing). The card's full name and phone together (any spacing or hyphens): the scenario's balance fixture. Anything else: identity_failed.",
+   "need_identity": {
+    "ok": true,
+    "found": 0,
+    "need_identity": true,
+    "missing": [
+     "<name and/or phone>"
+    ]
+   },
+   "identity_failed": {
+    "ok": true,
+    "found": 0,
+    "identity_failed": true
+   }
+  }
+ },
+ "scenarios": [
+  {
+   "id": "lk_callback_new_ticket",
+   "title": "a ticket just opened, then 'will someone get back to me?', asked twice",
+   "time": "18:40",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T18:40:00+03:00",
+   "resident": {
+    "persona": "אלון, בר כוכבא 23 דירה 4. האור בלובי לא עובד מאתמול. אחרי שנפתחת קריאה הוא רוצה לדעת אם יחזרו אליו, ושואל שוב כשהתשובה לא מספיקה לו.",
+    "script": [
+     {
+      "say": "היי, האור בלובי לא עובד מאתמול"
+     },
+     {
+      "if_asked": "the building or the apartment",
+      "say": "בר כוכבא 23 דירה 4"
+     },
+     {
+      "say": "ומישהו יחזור אליי?"
+     },
+     {
+      "say": "אז מישהו יחזור אליי או לא?"
+     },
+     {
+      "say": "טוב תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1560-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "4"
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "open_request"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "real_now: right after it, does he say what is real (what the lookup showed, that it is with the team) and what he can do from here (check again when they write)?",
+    "done_message: the ticket was opened in this chat; if he mentions what comes next, is it only that a message comes here when it is closed, with no time?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_technician_when_twice",
+   "title": "'when is the technician coming?', then 'tomorrow or not? I need to know whether to stay home'",
+   "time": "10:20",
+   "weekday": 2,
+   "weekday_he": "שלישי",
+   "iso": "2026-10-20T10:20:00+03:00",
+   "resident": {
+    "persona": "מירב, בר כוכבא 23 דירה 6. פתחה קריאה על האינטרקום לפני שבוע ואין לה מספר. היא צריכה לדעת אם להישאר בבית מחר, ולוחצת.",
+    "script": [
+     {
+      "say": "היי, מתי הטכנאי מגיע לתקן את האינטרקום?"
+     },
+     {
+      "say": "אני צריכה לדעת אם להישאר בבית מחר. מגיע מחר או לא?"
+     },
+     {
+      "say": "טוב, תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1530-26",
+       "status": "in_progress",
+       "type": "other",
+       "urgency": "normal",
+       "opened": "2026-10-12",
+       "last_update": "2026-10-15",
+       "description": "האינטרקום בכניסה לבניין לא עובד"
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "real_now: right after it, does he say what is real (what the lookup showed, that it is with the team) and what he can do from here (check again when they write)?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "her_decision: on 'should I stay home tomorrow', does he give her what she needs to decide (no visit is set in the ticket) without inventing one, kindly?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_update_inchat",
+   "title": "a ticket opened in this chat, then 'will I get an update when it's fixed?'",
+   "time": "16:10",
+   "weekday": 3,
+   "weekday_he": "רביעי",
+   "iso": "2026-10-21T16:10:00+03:00",
+   "resident": {
+    "persona": "נועה, בר כוכבא 23 דירה 2. נזילה מהתקרה בחדר המדרגות בקומה 2. אחרי שנפתחת קריאה היא שואלת אם תקבל עדכון כשזה יתוקן.",
+    "script": [
+     {
+      "say": "יש נזילה מהתקרה בחדר המדרגות בקומה 2, אני צריכה שמישהו יבדוק"
+     },
+     {
+      "if_asked": "the building or the apartment",
+      "say": "בר כוכבא 23 דירה 2"
+     },
+     {
+      "say": "ואני אקבל עדכון כשזה יתוקן?"
+     },
+     {
+      "say": "מעולה, תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1561-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "2"
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "open_request"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "הודעה",
+     "name": "the done message is mentioned"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "done_message: asked about an update on the ticket just opened in this chat, does Michael say that a message about it comes here when it is closed, with no time promised?",
+    "real_now: right after it, does he say what is real (what the lookup showed, that it is with the team) and what he can do from here (check again when they write)?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_update_old_ticket",
+   "title": "an older ticket reported by phone; 'will I get an update when it's done?'",
+   "time": "12:05",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-22T12:05:00+03:00",
+   "resident": {
+    "persona": "רינה, בר כוכבא 23 דירה 9. דיווחה בטלפון למשרד לפני שבועיים שהתאורה בחניה לא עובדת. שואלת מה המצב, ואם תקבל עדכון כשזה ייגמר.",
+    "script": [
+     {
+      "say": "מה קורה עם התאורה בחניה? דיווחתי לפני שבועיים"
+     },
+     {
+      "say": "אני אקבל עדכון כשזה ייגמר?"
+     },
+     {
+      "say": "בסדר תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1488-26",
+       "status": "in_progress",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-07",
+       "last_update": "2026-10-14",
+       "description": "התאורה בחניה לא עובדת"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "no_false_done_claim: this ticket was NOT opened in this chat; does Michael avoid saying a message will come when it closes, and offer what he can do instead (check when she writes)?",
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_billing_when",
+   "title": "a double charge noted for the team; 'when will they get back to me?', then 'a week? a month?'",
+   "time": "11:30",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T11:30:00+03:00",
+   "resident": {
+    "persona": "דוד, בר כוכבא 23 דירה 7. חויב פעמיים על ועד הבית של ספטמבר, 250 שקל פעמיים, בכרטיס האשראי ב-10 וב-12 לספטמבר.",
+    "script": [
+     {
+      "say": "חייבו אותי פעמיים על הוועד של ספטמבר, 250 שקל פעמיים"
+     },
+     {
+      "if_asked": "the details of the charges",
+      "say": "שני חיובים באשראי, ב-10 וב-12 לספטמבר"
+     },
+     {
+      "say": "מתי יחזרו אליי עם תשובה?"
+     },
+     {
+      "say": "ומתי בערך? שבוע? חודש?"
+     },
+     {
+      "say": "אוקיי תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "notify_team"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "real_now: right after it, does he say what is real (what the lookup showed, that it is with the team) and what he can do from here (check again when they write)?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_manager_when",
+   "title": "a request for a manager, noted with its matter; 'when is the manager calling me?', then 'today?'",
+   "time": "19:15",
+   "weekday": 2,
+   "weekday_he": "שלישי",
+   "iso": "2026-10-20T19:15:00+03:00",
+   "resident": {
+    "persona": "יעל, בר כוכבא 23 דירה 3. רוצה לדבר עם מנהל על החיוב לשיפוץ בלובי, שהיא לא מסכימה איתו. נוח לה אחרי 17:00.",
+    "script": [
+     {
+      "say": "אני רוצה לדבר עם מנהל"
+     },
+     {
+      "if_asked": "what it is about",
+      "say": "על החיוב לשיפוץ בלובי, אני לא מסכימה איתו"
+     },
+     {
+      "say": "אז מתי המנהל מתקשר אליי?"
+     },
+     {
+      "say": "אבל היום? אני צריכה לדעת"
+     },
+     {
+      "say": "טוב, תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "notify_team"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "real_now: right after it, does he say what is real (what the lookup showed, that it is with the team) and what he can do from here (check again when they write)?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "manager_rule: the 18 Oct rule holds (he shows he understands, the matter goes with the note, no note without it)?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_angry_week_x3",
+   "title": "'it's been a week! when are you fixing it??' three times",
+   "time": "21:00",
+   "weekday": 3,
+   "weekday_he": "רביעי",
+   "iso": "2026-10-21T21:00:00+03:00",
+   "resident": {
+    "persona": "ניר, בר כוכבא 23 דירה 2. כועס: כבר שבוע בלי אור בחדר המדרגות. שולח את אותה שאלה שוב ושוב.",
+    "script": [
+     {
+      "say": "כבר שבוע! מתי מתקנים את האור בחדר המדרגות??"
+     },
+     {
+      "say": "כבר שבוע! מתי מתקנים את האור בחדר המדרגות??"
+     },
+     {
+      "say": "כבר שבוע! מתי מתקנים את האור בחדר המדרגות??"
+     },
+     {
+      "say": "טוב",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1402-26",
+       "status": "in_progress",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-12",
+       "last_update": "2026-10-18",
+       "description": "תאורה בחדר המדרגות קומה 3 לא עובדת"
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no duplicate ticket"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "three_different: are the three answers each different in substance, each adding something true, never a reworded copy?",
+    "escalation: is the wait put to the team (notify_team) by the second or third ask, and said only after the call?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_emergency_coming",
+   "title": "a strong gas smell, then 'is anyone coming??' and 'when??'",
+   "emergency": true,
+   "time": "22:10",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-22T22:10:00+03:00",
+   "resident": {
+    "persona": "שירה, בר כוכבא 23 דירה 5. ריח חזק של גז בחדר המדרגות, היא בלחץ.",
+    "script": [
+     {
+      "say": "יש ריח חזק של גז בחדר המדרגות!"
+     },
+     {
+      "if_asked": "the building or the apartment",
+      "say": "בר כוכבא 23 דירה 5"
+     },
+     {
+      "say": "מישהו בא??"
+     },
+     {
+      "say": "מתי??"
+     },
+     {
+      "say": "בסדר",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    },
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1562-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "5"
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "notify_team",
+     "turn": 0,
+     "name": "the team told at once"
+    },
+    {
+     "type": "arg_equals",
+     "tool": "open_request",
+     "arg": "urgency",
+     "value": "emergency",
+     "name": "gas is an emergency"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[🙂😊🙏👍💪🤝]",
+     "name": "no emoji in an emergency"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:בדרך|יגיעו|מגיעים|בהקדם)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)|אל דאגה|אל תדאגי|אל תדאג",
+     "name": "no help-on-the-way, no don't-worry"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "102|101|100|כבאות|מכבי אש|משטרה|מד\"א|חברת הגז|תצאי|לצאת|אל תדליקי|חלון|חלונות",
+     "name": "no instructions, no referral, no emergency numbers"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "coming: asked whether anyone is coming, does Michael say what was done (urgent ticket, the team knows) and that he cannot see who or when, warmly, with no arrival invented?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "serious: no emoji, no 'don't worry', no promise anyone is on the way, no safety instruction (the client's rule)?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_stay_home_free",
+   "title": "status: a shift worker wants to know when they come and whether someone calls first",
+   "button": "status",
+   "ticket": "255-1563-26",
+   "time": "18:05",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T18:05:00+03:00",
+   "resident": {
+    "free": true,
+    "persona": "טל, 35, עובד במשמרות, ענייני. כותב קצר, בלי סמיילים.",
+    "knows": "Lives at בר כוכבא 23, apartment 8. Five days ago he reported that the lift makes noise and stops between floors; he has no ticket number. He works shifts and needs to plan his days.",
+    "wants": "To know when the technician comes, and whether someone will call him before they come.",
+    "tendencies": "Asks 'מתי מגיעים?' and later 'יתקשרו אליי לפני?'. If an answer feels vague he asks again more sharply ('אז מה, לחכות סתם?'). Leaves once he has a straight answer.",
+    "script": [
+     {
+      "say": "היי"
+     },
+     {
+      "say": "מצב קריאה קיימת",
+      "kind": "tap"
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1489-26",
+       "status": "in_progress",
+       "type": "elevator",
+       "urgency": "normal",
+       "opened": "2026-10-14",
+       "last_update": "2026-10-16",
+       "description": "המעלית עושה רעש ונעצרת בין קומות"
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "reason: asked when or whether someone will call, come or update, does Michael give a soft, true reason he cannot say (the time is set by whoever handles it, and nothing he can see shows it), not a bare 'I don't know', and no time invented?",
+    "real_now: right after it, does he say what is real (what the lookup showed, that it is with the team) and what he can do from here (check again when they write)?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "lk_today_please",
+   "title": "a ticket opened yesterday; 'can they come today? it's urgent', asked twice",
+   "time": "08:40",
+   "weekday": 2,
+   "weekday_he": "שלישי",
+   "iso": "2026-10-20T08:40:00+03:00",
+   "resident": {
+    "persona": "אבי, בר כוכבא 23 דירה 10. השער של החניה לא נפתח, והוא פתח על זה קריאה אתמול. הוא לא יכול להוציא את האוטו ומבקש שיבואו היום.",
+    "script": [
+     {
+      "say": "פתחתי אתמול קריאה על השער של החניה. אפשר שיבואו כבר היום? זה דחוף, אני לא יכול להוציא את האוטו"
+     },
+     {
+      "say": "בבקשה, זה ממש דחוף. אפשר שיבואו היום?"
+     },
+     {
+      "say": "אוקיי תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1564-26",
+       "status": "open",
+       "type": "locksmith",
+       "urgency": "normal",
+       "opened": "2026-10-19",
+       "last_update": "2026-10-19",
+       "description": "השער של החניה לא נפתח"
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "called",
+     "tool": "notify_team",
+     "name": "the urgency goes to the team"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "(?:^|(?<=[.!?\n]))(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?:(?:יגיע|מגיע|יבוא|יגיעו|מגיעים|יבואו|יתקשר|יתקשרו|יחזור|יחזרו)(?: אלי?ך| אלייך)? (?:היום|מחר|הערב|בבוקר)|עד סוף (?:השבוע|החודש)|תוך (?:שבוע|חודש|יום|יומיים|[0-9])|בהקדם|בקרוב|בימים הקרובים)(?:(?!(?<![א-ת])(?:לא|אין(?! בעיה)|אינני|איני|אם|מתי|מי)(?![א-ת]))[^.!?\n])*(?=[.!?\n]|$)",
+     "name": "no time invented, no 'soon'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הומיז|הומי״ז|הומי׳ז|הומי’ז",
+     "name": "the name is written הומי'ז"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[֐-׿]/[֐-׿]",
+     "name": "no slash forms"
+    }
+   ],
+   "judge": [
+    "urgency: does Michael say plainly he cannot move the team to today, flag the urgency to the team (notify_team, said only after the call), and ask something useful (did it get worse)?",
+    "second_ask: asked the same thing again, is the second answer different in substance (something new done or said: checking again, noting the wait for the team, asking whether it got worse, saying it plainly), not the first answer reworded?",
+    "not_templated: does each answer read as written for this person and moment rather than a stock line (its wording follows what they said and what the tool returned)?"
+   ]
+  },
+  {
+   "id": "gate_lock",
+   "title": "the gate lock, Hebrew, first contact",
+   "time": "16:09",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-01T16:09:00+03:00",
+   "resident": {
+    "persona": "דני, גר בבר כוכבא 23 דירה 4; הבניין יש לו שני שערים, הכניסה והחניה; הבעיה בשער החניה מאחור",
+    "script": [
+     {
+      "say": "היי, המנעול של השער שבור שוב"
+     },
+     {
+      "if_asked": "which gate / where exactly / what exactly is wrong",
+      "say": "השער של החניה, מאחורה. הוא לא ננעל בכלל"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "בר כוכבא 23, דירה 4"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1402-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "4"
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "open_request"
+    },
+    {
+     "type": "arg_not_contains",
+     "tool": "open_request",
+     "arg": "description",
+     "words": [
+      "כניסה",
+      "ראשי",
+      "הראשי"
+     ],
+     "name": "ticket holds no guessed gate"
+    },
+    {
+     "type": "arg_contains",
+     "tool": "open_request",
+     "arg": "description",
+     "words": [
+      "שער"
+     ],
+     "name": "ticket keeps the resident's word"
+    },
+    {
+     "type": "asks_before",
+     "tool": "open_request",
+     "regex": "איזה שער|איפה (בדיוק )?השער|באיזה שער|איזה מה?שערים|מה בדיוק|איפה בדיוק|איזה מנעול",
+     "name": "asks which gate or where before opening",
+     "pending": true
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "בהקדם|בקרוב|אל דאגה|מטפל בזה",
+     "name": "no promise after the ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "שער הכניסה|השער הראשי|בכניסה לבניין",
+     "name": "no guessed gate in the replies"
+    },
+    {
+     "type": "last_no_question",
+     "name": "goodbye without a question"
+    }
+   ],
+   "judge": [
+    "asks_which_gate: before opening, did Michael ask which gate or where exactly (not the building) at least once?",
+    "ticket_in_their_words: does the ticket description hold only what the resident wrote (no 'entrance', no cause)?",
+    "one_question_per_message: does every message carry at most one question (building+apartment count as one)?",
+    "human_word_first: before the first question, is there a short human reaction to the broken lock, not a summary and not 'I understand'?",
+    "no_promise: after the ticket, nothing about soon, when, who, or 'I'm handling it'?",
+    "goodbye: does the reply to 'תודה' close warmly with no question?"
+   ]
+  },
+  {
+   "id": "status_repeat",
+   "title": "asks what is happening with his ticket, and asks again (19 Oct: the owner's chat on a second number, executions 114483 and 114536)",
+   "time": "14:30",
+   "weekday": 1,
+   "weekday_he": "שני",
+   "iso": "2026-10-19T14:30:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 2 שפתח לפני שבוע קריאה על התאורה בחדר המדרגות ולא שמע כלום. לא זוכר מספר קריאה ולא מבין למה שואלים אותו. אם מבקשים ממנו מספר או כתובת, הוא כותב שוב את אותה שאלה בדיוק",
+    "script": [
+     {
+      "say": "היי מה קורה?"
+     },
+     {
+      "say": "הכל טוב תודה.\nמה קורה עם הקריאה שפתחתי אני לא מבין"
+     },
+     {
+      "if_asked": "a ticket number or an address",
+      "say": "מה קורה עם הקריאה שפתחתי אני לא מבין"
+     },
+     {
+      "say": "אוקיי תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1402-26",
+       "status": "in_progress",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-12",
+       "last_update": "2026-10-18",
+       "description": "תאורה בחדר המדרגות קומה 3 לא עובדת"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "255-1402-26|בטיפול|תאורה|חדר המדרגות",
+     "name": "the status is given on the first ask"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 1,
+     "regex": "מספר הקריאה|מספר קריאה|הכתובת המלאה|באיזה בניין|איזה בניין|מספר הדירה",
+     "name": "no number or address asked before looking (114528)"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "no question asked twice in the same words (114536)"
+    },
+    {
+     "type": "turn_count_max",
+     "max": 4,
+     "name": "answered without a second ask"
+    }
+   ],
+   "judge": [
+    "answered: on \"what's happening with the ticket I opened?\", is the ticket's status given from the lookup, without first asking for a number or an address?",
+    "no_parrot: is no reply a repeat of an earlier one, in the same or nearly the same words?",
+    "hello: on \"hi what's up\" (his first message), a greeting back, the name, and how he is asked back once?",
+    "goodbye: a warm close without a question?"
+   ]
+  },
+  {
+   "id": "manager_parrot",
+   "title": "asks for a manager five times, in Hebrew and English, and asks if Michael is the manager (18 Oct, late: the owner's handset, executions 112601-112635)",
+   "time": "18:05",
+   "weekday": 0,
+   "weekday_he": "ראשון",
+   "iso": "2026-10-18T18:05:00+03:00",
+   "history": [
+    {
+     "resident": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 17:40, יום ראשון.]\nמתי מגיע הגנן לבניין?",
+     "tools": [
+      "get_service_info"
+     ],
+     "michael": "ערב טוב, כאן מיכאל מהומי'ז. הגינון בבניין נעשה לפי ההסכם של הבניין, ואין לי כרגע תאריך מדויק לביקור הבא. יש עוד משהו שאני יכול לעזור בו?"
+    }
+   ],
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 2 שכותב גם באנגלית, רוצה מנהל ולא מבין למה צריך להסביר לבוט; רק אחרי שמסבירים לו למה, הוא מספר שחייבו אותו פעמיים על ועד הבית של ספטמבר",
+    "script": [
+     {
+      "say": "אני רוצה לדבר עם מנהל"
+     },
+     {
+      "say": "no i just need a manager"
+     },
+     {
+      "say": "why would i tell you are you the manager?"
+     },
+     {
+      "say": "i want to talk with the manager"
+     },
+     {
+      "say": "i told you i want a manager just get me one are you not listening"
+     },
+     {
+      "say": "fine. i was charged twice for the september committee fee"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "bar kochba 23 apt 2"
+     },
+     {
+      "say": "ok thanks",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "turn_not_regex",
+     "turn": 0,
+     "regex": "מה שלומ|מה נשמע|מה איתך|איך עובר עלי|איך עבר עלי|איך היום",
+     "name": "no how-are-you he did not ask for (112521)"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה|בלי שום רקע|בלי רקע|הודעה ריקה|אין לו מה|לא יכול להתחיל|מאיפה להתחיל|להתחיל ממנו|אין לי דרך להעביר|לא נותנת לו|לא נותן לו|תלויה באוויר",
+     "name": "turn 1 says why the details are needed"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 2,
+     "regex": "מיכאל",
+     "name": "\"are you the manager?\" is answered with who he is (112618)"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 2,
+     "regex": "^\\W*מצוות",
+     "name": "no fragment where the name was (112618)"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 3,
+     "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה|בלי שום רקע|בלי רקע|הודעה ריקה|אין לו מה|לא יכול להתחיל|מאיפה להתחיל|להתחיל ממנו|אין לי דרך להעביר|לא נותנת לו|לא נותן לו|תלויה באוויר",
+     "name": "turn 3 says why"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 4,
+     "regex": "לפני ש|כדי ש|בשביל ש|על מנת|צריך לדעת|צריך להבין|צריכים לדעת|צריך את|אצטרך|ככה (זה )?עובד|ככה עובדים|נוהל|הנוהל|ההליך|בלי לדעת|אין לי מה להעביר|רק אם|כשאני יודע|כשאדע|ברגע שאדע|מגיע ישר|יגיע ישר|למי שאחראי|למי שמטפל|אחרת|בשביל זה|לשם כך|צריך שיהיה|נקודת התחלה|בלי שום רקע|בלי רקע|הודעה ריקה|אין לו מה|לא יכול להתחיל|מאיפה להתחיל|להתחיל ממנו|אין לי דרך להעביר|לא נותנת לו|לא נותן לו|תלויה באוויר",
+     "name": "turn 4 says why"
+    },
+    {
+     "type": "questions_distinct",
+     "turns": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     "name": "never the same question in the same words (\"like a parrot\")"
+    },
+    {
+     "type": "not_called_before",
+     "tool": "notify_team",
+     "turn": 5,
+     "name": "no team note before the matter"
+    },
+    {
+     "type": "called",
+     "tool": "notify_team"
+    },
+    {
+     "type": "arg_contains",
+     "tool": "notify_team",
+     "arg": "description",
+     "words": [
+      "פעמיים",
+      "כפול",
+      "חיוב",
+      "twice"
+     ],
+     "name": "the note carries the double charge"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "יחזרו אליך|יחזור אליך|יתקשרו אליך|יתקשר אליך|ייצרו איתך קשר|ייצור איתך קשר|בהקדם|בקרוב|נציג יחזור|יענו לך",
+     "name": "no who, no when, no callback"
+    },
+    {
+     "type": "last_no_question",
+     "name": "goodbye without a question"
+    }
+   ],
+   "judge": [
+    "explains_why: from his second message on, does Michael show he understands him and say why he needs to know what it is about (before anything goes to a manager, someone has to know), in his own words, the way a good call-centre rep would?",
+    "not_a_parrot: across his five requests, does any reply repeat an earlier question or opening in the same words, or get shorter and colder each time?",
+    "who_he_is: when he asks whether Michael is the manager, is he told plainly who Michael is, with no broken sentence?",
+    "note_with_details: once he says what it is, is it noted for the team with the double charge, and does Michael say the team knows, with no who, when or callback?",
+    "tone: patient and warm with a man who is losing patience, never defensive, never a form?",
+    "goodbye: a warm close without a question?"
+   ]
+  },
+  {
+   "id": "night_flood",
+   "title": "02:40, water pouring from the stairwell ceiling by a light",
+   "time": "02:40",
+   "weekday": 0,
+   "weekday_he": "ראשון",
+   "iso": "2026-10-04T02:40:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 5; באמצע הלילה מים יורדים בכמויות מהתקרה בחדר המדרגות, ממש ליד המנורה בקומה 3",
+    "script": [
+     {
+      "say": "יש מים שיורדים בכמויות מהתקרה בחדר המדרגות, ממש ליד המנורה בקומה 3"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "בר כוכבא 23, דירה 5"
+     },
+     {
+      "say": "מה אני עושה עכשיו?"
+     },
+     {
+      "say": "תודה, טוב",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    },
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1490-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "5"
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "notify_team"
+    },
+    {
+     "type": "called",
+     "tool": "open_request"
+    },
+    {
+     "type": "arg_equals",
+     "tool": "open_request",
+     "arg": "urgency",
+     "value": "emergency",
+     "name": "flooding by a light is an emergency"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "[🙂😊🙏👍💪🤝]",
+     "name": "no emoji in an emergency"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "^שלום",
+     "name": "שלום before 05:00"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "תכבה|לכבות|אל תיגע|תתרחק|להתרחק|101|102|כבאות|מכבי אש|משטרה|חשמלאי|חברת החשמל",
+     "name": "no instructions, no referral"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "בדרך|יגיעו|מגיעים|בהקדם|אל תדאג",
+     "name": "no help-on-the-way, no don't-worry"
+    }
+   ],
+   "judge": [
+    "emergency_first: the team told at once (notify_team, emergency), then building and apartment as one question, then the ticket with its number?",
+    "serious: no emoji, no 'don't worry', no promise that someone is on the way?",
+    "what_now: on 'what do I do now', no safety instructions and no referral (the rule), only what was done and that the team knows, said humanly?",
+    "night_greeting: the first reply opens with שלום (before 05:00) and the name?"
+   ]
+  },
+  {
+   "id": "pay_link",
+   "title": "I want to pay",
+   "time": "14:00",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-01T14:00:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה לשלם",
+    "script": [
+     {
+      "say": "אני רוצה לשלם את הוועד"
+     },
+     {
+      "say": "קיבלתי, תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_payment_link": {
+     "ok": true,
+     "found": true,
+     "link": "https://pay.example.co.il/t/abc123",
+     "building": "בר כוכבא 23",
+     "apartment": "4"
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "get_payment_link",
+     "turn": 0,
+     "name": "link fetched at once"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "https://pay\\.example\\.co\\.il/t/abc123",
+     "name": "the link as returned"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "איזו דירה|מספר טלפון|שם מלא|באיזה בניין",
+     "name": "nothing asked before the link"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "אישי|רק לדירה|לדירה שלכם|לדירה שלך|לא להעביר|לא מעבירים|אל תעבירו",
+     "name": "link marked personal"
+    },
+    {
+     "type": "last_no_question",
+     "name": "goodbye without a question"
+    }
+   ],
+   "judge": [
+    "no_question_before_link: no name, phone, building or apartment asked, and no 'do you want the link?'",
+    "two_beats: did the resident get a short 'on it' message first (from the ack model or as the first part), then the link?",
+    "link_message_close: does the link message say which flat it is for, that it is personal and not to be passed on, and invite them to write to ME here, with no 'how else can I help'?",
+    "link_on_own_line: is the link on a line of its own, exactly as returned?",
+    "goodbye: warm close with no question after 'קיבלתי, תודה'?"
+   ]
+  },
+  {
+   "id": "angry_repeat",
+   "title": "the third report of a stuck lift, angry",
+   "time": "08:15",
+   "weekday": 0,
+   "weekday_he": "ראשון",
+   "iso": "2026-10-04T08:15:00+03:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4, מתוסכל: זאת הפעם השלישית שהוא מדווח על המעלית שתקועה בקומה 3",
+    "script": [
+     {
+      "say": "זאת הפעם השלישית שאני מדווח שהמעלית תקועה בקומה 3 ואף אחד לא בא!! מה קורה איתכם?"
+     },
+     {
+      "if_asked": "building and apartment or a reference",
+      "say": "בר כוכבא 23, דירה 4. אין לי מספר"
+     },
+     {
+      "say": "מתי מישהו יגיע?"
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": true,
+     "reference": "255-1470-26",
+     "status": "in_progress",
+     "opened_at": "2026-10-01",
+     "description": "המעלית תקועה בקומה 3"
+    },
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1493-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "4"
+    },
+    "notify_team": {
+     "ok": true,
+     "notified": true
+    }
+   },
+   "expect": [
+    {
+     "type": "bot_not_regex",
+     "regex": "בהקדם|בקרוב|אני מבטיח|מבטיח לך|אדאג ש|יגיעו (היום|מחר)|יגיע (היום|מחר)|תוך \\d",
+     "name": "no promise of when"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "איתכם|לכם|שלכם|אתכם",
+     "name": "singular although he wrote איתכם"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "^בוקר טוב",
+     "name": "morning greeting at 08:15"
+    }
+   ],
+   "judge": [
+    "empathy_first: a short human word on the frustration, without defensiveness or a long apology?",
+    "checks: looks up the existing ticket and reports it as returned; anything more (a new ticket, a team note on the repeat) only if it fits, nothing claimed without a tool?",
+    "when: on 'when will someone come', no promise or time for this ticket (the general standard may be named as a standard, not as a promise)?"
+   ]
+  }
+ ]
+}

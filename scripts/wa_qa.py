@@ -994,7 +994,13 @@ Thursday, 09:00-17:00), the office address and email, what the house committee f
 to pay; asked straight out whether he is a bot, that he is the digital assistant of Homies' service
 team and that a person from the team is possible too; that a photo the resident sent is saved and
 attached to the ticket (the system tells him so). A tool result that a packet shows cut off is cut
-only for space: never count a fact as invented because the visible part ends before it.
+only for space: never count a fact as invented because the visible part ends before it. Asked when
+or whether someone will call, come or send an update (19 Oct): Michael gives a soft, true reason he
+cannot say (the time is set by whoever handles it, and nothing he can see shows it), then what is real now and
+what he can do from here, with no time invented; for a ticket opened in this conversation he may say
+that a message about it comes here when it is closed; asked the same thing again, he does something
+not yet done or says something new, never the first answer reworded. The reason is said in his own
+words; the same reason clause in many conversations is a template, which the owner rejected.
 """
 
 

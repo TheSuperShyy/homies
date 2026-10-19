@@ -349,6 +349,57 @@ function cases(E) {
   expect('v3: "the team will update you" after a comma is still cut, never a dangling "וברגע ש…"',
     say({ reply: 'הצוות קיבל את הבקשה שלך, וברגע שיהיו חדשות, הם יעדכנו אותך. יש עוד משהו?', said: 'question' }),
     'הצוות קיבל את הבקשה שלך. יש עוד משהו?');
+  // 19 Oct, promise v4 (the stress test, docs/assistant/transcripts/
+  // 2026-10-19-whatsapp-stress-test.md): "whether", under "I don't know", is
+  // honesty. v3 cut it, so "will someone get back to me?" went unanswered (one
+  // resident asked twice) and once left the text opening with "אבל".
+  same('v4: "whether and when they\'ll get back to you, I don\'t know" stays',
+    'אם יחזרו אליך ומתי, את זה אני לא יודע, ואני לא רוצה להבטיח לך משהו שאין לי. מה שבטוח, שתי השאלות כבר אצל הצוות. יש עוד משהו?');
+  same('v4: "no way to know from here whether they\'ll update you" stays',
+    'את זה אני לא יכול להבטיח לך, ואין לי דרך לדעת מכאן אם יעדכנו אותך. אם תכתבי לי מחר בבוקר, אבדוק שוב. מתאים לך?');
+  same('v4: one subject word between "אם" and the phrase still stays',
+    'אם מישהו יחזור אליך, את זה אני באמת לא יודע. להתקשר לא צריך, השאלות כבר אצלם. זה מסתדר לך ככה?');
+  same('v4: the honest sentence stays, so the "אבל" after it never dangles',
+    'אם יעדכנו אותך כשזה יתוקן, את זה אני לא יודע. אבל לבדוק לבד את לא צריכה: תכתבי לי מתי שתרצי ואבדוק. בסדר?');
+  expect('v4: a conditional offer is still a promise ("אם תרצה, יחזרו אליך")',
+    say({ reply: 'אם תרצה, יחזרו אליך מחר. יש עוד משהו שאוכל לעזור בו?', said: 'question' }),
+    'יש עוד משהו שאוכל לעזור בו?');
+  expect('v4: "but if needed they\'ll get back to you" is still a promise',
+    say({ reply: 'אני לא יודע מתי, אבל אם צריך הם יחזרו אליך. יש עוד משהו?', said: 'question' }),
+    'אני לא יודע מתי. יש עוד משהו?');
+  // v4, the check of the new paragraph: Hebrew fronts what it cannot promise.
+  same('v4: "להבטיח שיחזרו אליך אני לא יכול" is honest and stays',
+    'להבטיח שיחזרו אליך אני לא יכול. מה שעשיתי זה לרשום לצוות שאתה מחכה לתשובה. יש עוד משהו בתקלה שכדאי שאוסיף?');
+  same('v4: "אבל להבטיח שיגיעו היום אני לא יכול, כי…" stays',
+    'זה שזה דחוף לך כבר רשום אצל הצוות, אבל להבטיח שיגיעו היום אני לא יכול, כי את ההחלטה הזאת מקבלים שם ולא אני. משהו השתנה עם השער מאז אתמול?');
+  expect('v4: "אני מבטיח שיחזרו אליך היום" is still a promise',
+    say({ reply: 'אני מבטיח שיחזרו אליך היום. יש עוד משהו?', said: 'question' }), 'יש עוד משהו?');
+  expect('v4: "I know they\'ll get back to you tomorrow" goes whole, never a bare "אני יודע."',
+    say({ reply: 'אני יודע שיחזרו אליך מחר, אבל אני לא יכול להגיד מתי בדיוק. יש עוד משהו?', said: 'question' }), 'יש עוד משהו?');
+  // v4, later (run 3 of the lowkey check, 20 Oct): the honest answer said with a
+  // verb of saying, after "whether someone already", or with its object fronted,
+  // was cut; unnegated, a verb of saying is still a promise, and a cut never
+  // leaves "להגיד לך." behind.
+  same('v4, later: I cannot tell you they come today, stays',
+    'אני לא יכול להגיד לך שיגיעו היום. יש עוד משהו בתקלה שכדאי שאוסיף?');
+  same('v4, later: I will not be able to tell you they call tomorrow, stays',
+    'לא אוכל להגיד לך שיחזרו אליך מחר, כי זה לא כתוב אצלי. זה בסדר מבחינתך?');
+  same('v4, later: I cannot commit they come tomorrow, stays',
+    'אני לא יכול להתחייב שיגיעו מחר. רוצה שאבדוק את הקריאה שוב?');
+  same('v4, later: whether someone already calls back, I do not know, stays',
+    'אם מישהו כבר יחזור אליך היום, את זה אני לא יודע. רוצה שאוסיף לצוות שאתה מחכה?');
+  same('v4, later: to tell you they call tomorrow, that I cannot, stays',
+    'להגיד לך שיחזרו אליך מחר, את זה אני לא יכול. מה עוד חשוב שהצוות ידע?');
+  same('v4, later: that they call today I cannot promise, stays',
+    'את זה שיחזרו אליך היום אני לא יכול להבטיח. רוצה שאבדוק שוב בעוד שעה?');
+  same('v4, later: telling you they come today would not be fair, stays (run 3, cut to a fragment before)',
+    'בדקתי את הקריאה שוב עכשיו: היא עדיין פתוחה, והעדכון האחרון בה מאתמול. אני יודע כמה זה דחוף לך, אבל להגיד לך שיגיעו היום בלי שזה כתוב אצלי יהיה לא הוגן כלפיך. הצוות יודע שאתה תקוע בלי האוטו. יש שעה מסוימת שבה אתה חייב לצאת היום?');
+  expect('v4, later: I can tell you they come today, is a promise',
+    say({ reply: 'אני יכול להגיד לך שיגיעו היום. יש עוד משהו?', said: 'question' }), 'יש עוד משהו?');
+  expect('v4, later: the cut of a promise never leaves a verb of saying hanging',
+    say({ reply: 'זה דחוף, אבל אני רוצה להגיד לך שיגיעו היום. יש עוד משהו?', said: 'question' }), 'זה דחוף. יש עוד משהו?');
+  expect('v4, later: I promise today and not tomorrow, is still a promise',
+    say({ reply: 'אני מבטיח שיחזרו אליך היום ולא מחר. יש עוד משהו?', said: 'question' }), 'יש עוד משהו?');
   // Not "never only anything else?": the filter can only remove, so that would
   // mean sending the promise, and an all-promise reply can be an invented one.
   expect('v3: a reply that is all promise still loses it, even down to "anything else?"',
@@ -405,6 +456,34 @@ function cases(E) {
         S: { last_bot: PUSHED } }), 'בכיף, אסף. תודה רבה על הסבלנות. הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.');
     const HONEST = 'אין לי תאריך מדויק מתי יגיעו, אבל הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.';
     expect('"I don\'t know when they will come" stays whole', say({ reply: HONEST, said: 'מתי הם מגיעים?', S: { last_bot: PUSHED } }), HONEST);
+    // 19 Oct, danger v4 (the "when will they come?" paragraph): who and whether,
+    // under "I can't see / know", and a fronted "I can't promise", are honest.
+    if (String(P.code.send_body || '').indexOf("const dv = 'danger v4'") !== -1) {
+      const WHO = 'פתחתי קריאה דחופה, 255-1349-26, והצוות כבר יודע על העשן. מי יבוא ומתי, את זה אני לא רואה מכאן. אני כאן איתך.';
+      expect('v4: "who is coming and when, I can\'t see from here" stays whole', say({ reply: WHO, said: 'מישהו בא??', S: { last_bot: PUSHED } }), WHO);
+      const WHETHER = 'אם ומתי מישהו מגיע, את זה אני לא יכול לדעת מכאן, כי את זה קובעים בצוות. ' + PUSHED;
+      expect('v4: "whether and when someone comes, I can\'t know" stays whole', say({ reply: WHETHER, said: 'מישהו בא??', S: { last_bot: PUSHED } }), WHETHER);
+      const FRONTED = 'הקריאה הדחופה שלך פתוחה, 255-1349-26, והצוות יודע. להבטיח שיגיעו עכשיו אני לא יכול, את זה קובעים שם.';
+      expect('v4: a fronted "I can\'t promise they come now" stays whole', say({ reply: FRONTED, said: 'מתי??', S: { last_bot: PUSHED } }), FRONTED);
+      expect('v4: "the team is on the way" still goes',
+        say({ reply: 'הצוות בדרך אלייך. ' + PUSHED, said: 'מישהו בא??', S: { last_bot: PUSHED } }), PUSHED);
+      expect('v4: "if needed, someone will come today" still goes',
+        say({ reply: 'אם צריך, מישהו יגיע אלייך עוד היום. ' + PUSHED, said: 'מתי??', S: { last_bot: PUSHED } }), PUSHED);
+      // v4, later (run 3): whether someone ALREADY, a verb of saying, and the done
+      // message stay whole in an emergency; a conditional or an arrival still goes.
+      const ALREADY = 'אני לא יכול לדעת אם מישהו כבר בדרך, את זה קובעים שם ולא אני. ' + PUSHED;
+      expect('v4, later: I cannot know whether someone is already on the way, stays whole', say({ reply: ALREADY, said: 'מישהו בא??', S: { last_bot: PUSHED } }), ALREADY);
+      const TELL = 'אני לא יכול להגיד לך שמישהו כבר בדרך. ' + PUSHED;
+      expect('v4, later: I cannot tell you someone is already on the way, stays whole', say({ reply: TELL, said: 'מישהו בא??', S: { last_bot: PUSHED } }), TELL);
+      const DONE = 'שעה אין לי, ואני לא רוצה לנחש כשמדובר בגז. כשהקריאה תיסגר, תגיע על זה הודעה לכאן. ' + PUSHED;
+      expect('v4, later: the done message is a message arriving, not help, stays whole', say({ reply: DONE, said: 'מתי??', S: { last_bot: PUSHED } }), DONE);
+      expect('v4, later: if needed someone is already on the way, still goes',
+        say({ reply: 'אם צריך, מישהו כבר בדרך. ' + PUSHED, said: 'מתי??', S: { last_bot: PUSHED } }), PUSHED);
+      expect('v4, later: the team will arrive and update you, still goes',
+        say({ reply: 'הצוות יגיע ויעדכן אותך, ותקבל הודעה. ' + PUSHED, said: 'מתי??', S: { last_bot: PUSHED } }), PUSHED);
+      expect('v4, later: no matter, the team is already on the way, still goes',
+        say({ reply: 'לא נורא, הצוות כבר בדרך. ' + PUSHED, said: 'מתי??', S: { last_bot: PUSHED } }), PUSHED);
+    }
     // v2 (the run again, 84781-84801): the model's own words for the ticket,
     // a phone number, and "I'm on it" before the ticket existed.
     const SERVICE = 'פתחתי קריאת שירות דחופה (מספר 255-1349-26) והצוות שלנו כבר מעודכן.';

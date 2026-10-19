@@ -133,7 +133,7 @@ NEED = ("Send", "Sort", "Carry on", "Answer the resident", "Two parts?",
 # is replaced once, at the end; an assertion checks none is left.
 BS = chr(92)
 PH = "¤"
-MARK = "const pv = 'promise v3';"
+MARK = "const pv = 'promise v4';"
 
 # The promise phrases. One list, two wrappers: the JS filter and PROMISE_PY.
 # Not here, on purpose: "עד מחר" ("אפשר לשלם עד מחר" is a fact in the link
@@ -179,6 +179,11 @@ FRAG_RE = "/^(גם|ו[א-ת])/"
 # v3 adds the promise verbs, whose ש clause is the one cut ("אני מבטיח.").
 DANGLE_RE = ("/(^|¤s)ו?(ביקשתי|ביקשנו|לוודא|לדאוג|רוצה|רוצים|מקווה|מקווים|כדי|מנת|"
              "מבטיח|מבטיחה|מבטיחים|להבטיח|אבטיח|נבטיח|אדאג|נדאג|"
+             # v4: the other governors too ("אני יודע שיחזרו אליך מחר" left "אני יודע.").
+             "יודע|יודעת|יודעים|בטוח|בטוחה|בטוחים|"
+             # v4, later: a verb of saying, with its "to you" or without ("אבל להגיד לך.").
+             "להגיד|לומר|לכתוב|לספר|להתחייב|"
+             "(?:להגיד|לומר|לכתוב|לספר|להבטיח|להתחייב|אגיד|אומר) (?:לך|לכם|לכן)|"
              "בשביל|אבל|או|אז|גם|רק|כי|אם|ש|אשר|כך|ככה|"
              "של|את|על|עם|אל|עבור|לגבי|בנוגע|מול|לפי|אצל|בין|כמו)$/")
 # A subordinate lead-in with no main clause after it ("ברגע שאפתח קריאה").
@@ -212,6 +217,44 @@ BLOCK_RE = ("/^ו?ש?(מבטיח|מבטיחה|מבטיחים|להבטיח|אבט
             "יודע|יודעת|יודעים|סמוך|סמכי|לדאוג|אדאג|נדאג|דואג|דואגת|דואגים|ידאגו)$/")
 NEG_RE = "/^ו?(לא|אין|אינני|איני|אינו|טרם)$/"
 WHEN_RE = "/^ו?מתי$/"
+# v4, 19 Oct: "whether", under "I don't know", is honesty and not a promise. The
+# stress test (docs/assistant/transcripts/2026-10-19-whatsapp-stress-test.md) found
+# Send cutting "אם יחזרו אליך ומתי, את זה אני לא יודע" and "אין לי דרך לדעת מכאן אם
+# יעדכנו אותך" in 8 turns of 7 conversations: the resident's question was left
+# unanswered (one asked twice and never got it), or the text was left as "אבל…" or
+# "זמן אין לי.". A phrase is exempt when "אם" stands right before it, or with one
+# subject word between ("אם מישהו יחזור אליך"), and the same sentence says the bot
+# does not know, cannot see or will not promise. Still promises: "אם תרצה, יחזרו
+# אליך" (no "I don't know", and a comma between) and "אבל אם צריך הם יחזרו אליך"
+# (two words between: the call is the main clause).
+IF_RE = "/^ו?ה?אם$/"
+SUBJ_RE = "/^(מישהו|מישהי|הם|הוא|היא|הצוות|מהצוות|הטכנאי|טכנאי|המנהל|מנהל)$/"
+UNSURE_RE = ("/(לא|אינני|איני|אינו) (יודע|יודעת|יודעים)|אין לי (דרך|איך|מושג|מידע)|"
+             "לא (יכול|יכולה) (להגיד|לדעת|לומר|להבטיח)|לא (בטוח|בטוחה)|לא (רואה|רואים)|"
+             "לא (אבטיח|מבטיח|מבטיחה)/")
+# v4, the same night (the check of the new paragraph): Hebrew fronts the thing it
+# cannot promise. "להבטיח שיחזרו אליך אני לא יכול" and "להבטיח שיגיעו היום אני לא
+# יכול" were cut, because the negation stands after the ש clause and not before its
+# governor. The clause's own "I can't", before the next comma, now counts too;
+# "אני יודע שיחזרו אליך מחר, אבל אני לא יכול להגיד מתי" (a comma first) stays a promise.
+CANT_RE = ("/(^|[¤s,])(אני |אנחנו )?(לא|אינני|איני) (יכול|יכולה|יכולים|אוכל|יודע|יודעת|יודעים)"
+           "(?=[¤s,.!?:;]|$)/")
+# v4, later (run 3 of the lowkey check, 20 Oct): the honest answer is often said with a verb of
+# saying, and it was cut: "אני לא יכול להגיד לך שיגיעו היום", "לא אוכל להגיד לך שיחזרו אליך
+# מחר", "אני לא יכול להתחייב שיגיעו מחר". A verb of saying governs its ש clause like "promise"
+# when negated, and like nothing otherwise (so "ביקשתי מהם להגיד לך שיחזרו אליך" still reads
+# as the request it reports, and "אני יכול להגיד לך שיגיעו היום" stays a promise).
+SAY_RE = ("/^ו?(להגיד|לומר|לכתוב|לאשר|אגיד|נגיד|אומר|אומרת|להתחייב|אתחייב|נתחייב|מתחייב|"
+          "מתחייבת|מתחייבים)$/")
+# "אם מישהו כבר יחזור אליך": an adverb may stand beside the subject between "אם" and the phrase.
+ADV_RE = "/^ו?(כבר|עוד|גם|באמת|בכלל|אכן|בסוף|מתישהו)$/"
+# "It would not be fair / right" after a fronted "to tell you that ...": "להגיד לך שיגיעו היום
+# בלי שזה כתוב אצלי יהיה לא הוגן כלפיך".
+NOTFAIR_RE = ("/(^|[¤s,])(לא|אינו|אינה) (יהיה |יהיו |תהיה )?(הוגן|הוגנת|נכון|נכונה|אחראי|רציני|ישר|"
+              "בסדר|פייר)(?=[¤s,.!?:;]|$)/")
+# The object fronted, then "this I can't": "את זה שיחזרו אליך היום אני לא יכול להבטיח",
+# "להגיד לך שיחזרו אליך מחר, את זה אני לא יכול". Only these words may stand before its ש.
+FRONT_RE = "/^(ו?את|זה|לך|לכם|אבל|אז|להבטיח|להגיד|לומר|להתחייב)$/"
 # A word that opens a ש clause, not one that merely starts with ש.
 SH_RE = "/^ו?ש[א-ת]/"
 NOT_SH_RE = ("/^ו?(של|שלי|שלך|שלו|שלה|שלנו|שלכם|שלכן|שלהם|שלהן|שוב|שם|שני|שנה|שנים|שעה|שעות|"
@@ -241,6 +284,14 @@ DEFS = [
     "const BLOCK = " + BLOCK_RE + ";",
     "const NEG = " + NEG_RE + ";",
     "const WHEN = " + WHEN_RE + ";",
+    "const IF = " + IF_RE + ";",
+    "const SUBJ = " + SUBJ_RE + ";",
+    "const UNSURE = " + UNSURE_RE + ";",
+    "const CANT = " + CANT_RE + ";",
+    "const SAY = " + SAY_RE + ";",
+    "const ADV = " + ADV_RE + ";",
+    "const NOTFAIR = " + NOTFAIR_RE + ";",
+    "const FRONT = " + FRONT_RE + ";",
     "const SH = " + SH_RE + ";",
     "const NOT_SH = " + NOT_SH_RE + ";",
     "const word =(w) => w.replace(/^[^א-ת¤d]+|[^א-ת¤d]+$/g, '');",
@@ -253,13 +304,30 @@ DEFS = [
     "const exempt = (s, h) => { const p = h.index + h[1].length; const pre = h[2] || ''; "
     "const ws = s.slice(0, p).split(/¤s+/).filter(Boolean).reverse();",
     "if (ws.length && !stop(ws[0]) && NEG.test(word(ws[0]))) return true;",
+    # v4: "אם" right before the phrase, or one subject word between, in a sentence
+    # that says the bot does not know: "whether", not a promise.
+    # v4, later: an adverb may stand beside the subject ("אם מישהו כבר יחזור אליך").
+    "let k = 0; const at = () => k < ws.length && !stop(ws[k]);",
+    "if (at() && ADV.test(word(ws[k]))) k++; if (at() && SUBJ.test(word(ws[k]))) k++; if (at() && ADV.test(word(ws[k]))) k++;",
+    "if (UNSURE.test(s) && at() && IF.test(word(ws[k]))) return true;",
+    # v4, later: what follows the phrase in its own clause ("... אני לא יכול", "... יהיה לא
+    # הוגן"), or a next clause that takes the fronted object back ("..., את זה אני לא יכול").
+    "const rest = s.slice(h.index + h[0].length); const c1 = (rest.match(/^[^,;:.!?]*/u) || [''])[0];",
+    "const back = rest.match(/^[^,;:.!?]*,¤s*((?:ו?את )?זה [^,;:.!?]*)/u);",
+    "const after = CANT.test(c1) || NOTFAIR.test(c1) || !!(back && CANT.test(back[1]));",
+    "if ((pre === 'ש' || pre === 'וש') && ws.length <= 3 && ws.every((x) => !stop(x) && FRONT.test(word(x))) && after) return true;",
     "for (let i = 0; i < ws.length && i < 3; i++) { if (stop(ws[i])) break; if (WHEN.test(word(ws[i]))) return true; }",
     "let open = pre === 'ש' || pre === 'וש'; let seek = pre === 'וש'; let d = 0;",
     "for (let i = 0; i < ws.length && i < 24; i++) { const w = word(ws[i]); const sh = SH.test(w) && !NOT_SH.test(w);",
     "if (seek) { if (sh) { seek = false; d = 0; } continue; }",
     "if (!open) { if (stop(ws[i])) return false; if (sh) { open = true; d = 0; seek = /^וש/.test(w); } continue; }",
     "if (stop(ws[i])) return false; d++;",
-    "if (BLOCK.test(w)) { for (let j = i + 1; j < ws.length && j <= i + 3; j++) { if (NEG.test(word(ws[j]))) return true; } return false; }",
+    # v4: ... or the clause's own "I can't" after it, before the next comma.
+    "if (BLOCK.test(w)) { for (let j = i + 1; j < ws.length && j <= i + 3; j++) { if (NEG.test(word(ws[j]))) return true; } "
+    "return after; }",
+    # v4, later: a verb of saying, negated or followed by "I can't", is not a promise; otherwise read on.
+    "if (SAY.test(w)) { for (let j = i + 1; j < ws.length && j <= i + 3; j++) { if (NEG.test(word(ws[j]))) return true; } "
+    "if (after) return true; }",
     "if (REQ.test(w)) return d <= 4;",
     "if (PASS.test(w)) return d === 1;",
     "if (WANT.test(w)) return d <= 2 && i + 1 < ws.length && YOU.test(word(ws[i + 1]));",
@@ -365,6 +433,24 @@ SMOKE = [
      "\n\nבמה אוכל לעזור לך עוד?", "when?",
      "אני לא יודע להגיד לך מתי בדיוק יחזרו אליך, אבל הצוות קיבל את הפנייה שלך ויטפל בה."
      " במה אוכל לעזור לך עוד?"),
+    # v4, 19 Oct: "whether", under "I don't know", stays; a conditional offer goes.
+    ("אם יחזרו אליך ומתי, את זה אני לא יודע. מה שבטוח, הקריאה כבר אצל הצוות. יש עוד משהו?",
+     "will someone call me?",
+     "אם יחזרו אליך ומתי, את זה אני לא יודע. מה שבטוח, הקריאה כבר אצל הצוות. יש עוד משהו?"),
+    ("אם תרצה, יחזרו אליך מחר. יש עוד משהו שאוכל לעזור בו?", "question",
+     "יש עוד משהו שאוכל לעזור בו?"),
+    # v4, later (run 3 of the lowkey check): a verb of saying, negated or "not fair", stays
+    # whole; unnegated it is a promise, and its cut never leaves "להגיד לך." behind.
+    ("בדקתי את הקריאה שוב עכשיו: היא עדיין פתוחה, והעדכון האחרון בה מאתמול. אני יודע כמה זה דחוף לך, "
+     "אבל להגיד לך שיגיעו היום בלי שזה כתוב אצלי יהיה לא הוגן כלפיך. הצוות יודע שאתה תקוע בלי האוטו. "
+     "יש שעה מסוימת שבה אתה חייב לצאת היום?", "בבקשה, זה ממש דחוף. אפשר שיבואו היום?",
+     "בדקתי את הקריאה שוב עכשיו: היא עדיין פתוחה, והעדכון האחרון בה מאתמול. אני יודע כמה זה דחוף לך, "
+     "אבל להגיד לך שיגיעו היום בלי שזה כתוב אצלי יהיה לא הוגן כלפיך. הצוות יודע שאתה תקוע בלי האוטו. "
+     "יש שעה מסוימת שבה אתה חייב לצאת היום?"),
+    ("אני לא יכול להגיד לך שיגיעו היום. יש עוד משהו בתקלה שכדאי שאוסיף?", "today?",
+     "אני לא יכול להגיד לך שיגיעו היום. יש עוד משהו בתקלה שכדאי שאוסיף?"),
+    ("אני יכול להגיד לך שיגיעו היום. יש עוד משהו?", "today?", "יש עוד משהו?"),
+    ("זה דחוף, אבל אני רוצה להגיד לך שיגיעו היום. יש עוד משהו?", "today?", "זה דחוף. יש עוד משהו?"),
 ]
 SMOKE_JS = """
 const fs = require('fs');
