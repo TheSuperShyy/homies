@@ -2419,6 +2419,8 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   cached from the second call on, billed at a tenth (WORKLOG 20 Oct). And settled,
   not new: 3.8 Flash is out for that (the owner: new and unstable, an outage on 19
   Oct), so the cheaper candidate is Gemini 3 Flash, out since December 2025.
+  It failed the small test that evening (WORKLOG 20 Oct): with the prompt fixed it
+  still claimed a check it never made and invented reasons. The bot stays on 3.1 Pro.
 
 ## The name is הומי'ז, with its mark, wherever a model writes it or a resident reads it
 
