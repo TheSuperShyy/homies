@@ -2409,6 +2409,14 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   through the gate. The tool round-trip itself was checked before the write, in
   n8n's own message shape, for $0.0083: the one OpenRouter spend, for the model's
   compatibility, not a probe of the bot.
+- **Gemini, for its Hebrew (20 Oct).** The owner: *"the reason i use gemini is
+  because of its hebrew capabilities and grammar"*. A cheaper model means a cheaper
+  Gemini: Claude Haiku 5.5 and GPT-5.6 Luna, honest in the 20 Oct probe, are out on
+  that ground. The cheaper Gemini that came closest, 3.8 Flash (about 1 cent a
+  message, its Hebrew good), still states its own inferences as facts ("no need to
+  stay home, it is the common area"), what 2.5 Flash was replaced for. Gemini reuses
+  the fixed prompt between calls by itself: about 12k of 14k input tokens came back
+  cached from the second call on, billed at a tenth (WORKLOG 20 Oct).
 
 ## The name is הומי'ז, with its mark, wherever a model writes it or a resident reads it
 
