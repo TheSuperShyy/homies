@@ -2421,6 +2421,9 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   Oct), so the cheaper candidate is Gemini 3 Flash, out since December 2025.
   It failed the small test that evening (WORKLOG 20 Oct): with the prompt fixed it
   still claimed a check it never made and invented reasons. The bot stays on 3.1 Pro.
+  Gemini 3.6 Flash, tested after it, kept to the tools and the truth about times, but
+  its Hebrew slipped three times in 14 replies ("תישלח עדכון"): the very thing the
+  owner keeps Gemini for.
 
 ## The name is הומי'ז, with its mark, wherever a model writes it or a resident reads it
 
