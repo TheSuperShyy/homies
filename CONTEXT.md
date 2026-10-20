@@ -2416,7 +2416,9 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   message, its Hebrew good), still states its own inferences as facts ("no need to
   stay home, it is the common area"), what 2.5 Flash was replaced for. Gemini reuses
   the fixed prompt between calls by itself: about 12k of 14k input tokens came back
-  cached from the second call on, billed at a tenth (WORKLOG 20 Oct).
+  cached from the second call on, billed at a tenth (WORKLOG 20 Oct). And settled,
+  not new: 3.8 Flash is out for that (the owner: new and unstable, an outage on 19
+  Oct), so the cheaper candidate is Gemini 3 Flash, out since December 2025.
 
 ## The name is הומי'ז, with its mark, wherever a model writes it or a resident reads it
 
