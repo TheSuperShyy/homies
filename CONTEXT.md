@@ -2423,7 +2423,9 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   still claimed a check it never made and invented reasons. The bot stays on 3.1 Pro.
   Gemini 3.6 Flash, tested after it, kept to the tools and the truth about times, but
   its Hebrew slipped three times in 14 replies ("תישלח עדכון"): the very thing the
-  owner keeps Gemini for.
+  owner keeps Gemini for. Gemini 3.7 Flash, the last tried that evening, wrote clean
+  Hebrew in 9 replies and kept to the tools, with one invented reason and one empty
+  reply: the first cheaper Gemini good enough to try (WORKLOG 20 Oct).
 
 ## The name is הומי'ז, with its mark, wherever a model writes it or a resident reads it
 
