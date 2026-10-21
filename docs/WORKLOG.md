@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-21
 
+### Voice: live through Omni's Tokomni; the slow turns are the AI model, not Vapi's server (read-only)
+- **Asked:** *"they say we are connected on the tokomi and its live but the latency is still bad i think the server of vapi"*.
+- **Vapi's call log (tenth account, read-only):** five `inboundPhoneCall` calls today over the 208 SIP address (07:09, 08:27, 11:37 UTC: 5-9 s, no turns; 13:53 and 13:55 UTC: 51 s and 176 s, 4 and 11 turns). `vapi_latency.py --assistant inbound`: felt wait median 2,090 ms and 2,860 ms; Vapi's own per-turn total median 2,256 ms and 3,330 ms, worst 6,679 ms. PRD target <800 ms.
+- **Where it goes (11-turn call, Vapi's averages):** model 1,522 ms (913–3,607; the long ones follow `notify_team`, `open_request`, `get_balance`), voice 840 ms, transcriber 612 ms, endpointing 578 ms. Transport from and to Vapi: 20 ms each. So not Vapi's server. Not in Vapi's numbers: the Israel to `sip.vapi.ai` (Oregon) leg.
+- **Why the model:** gpt-5.6-sol on the incoming agent since 19 Oct (Yariv's spelling feedback), `reasoningEffort`, `serviceTier` and temperature unset. The 26 Aug story again (gpt-5.2, model 3.9 s of a 5.3 s turn; the owner chose gpt-4.1 then). The one measured gpt-4.1 web turn on 7 Oct: model 738 ms.
+- **Vapi's spec (`/api-json`, `OpenAIModel`):** `reasoningEffort` none / minimal / low / medium / high / xhigh, and `serviceTier` auto / default / fast (fast costs more per token).
+- **Proposed, not done:** `reasoningEffort` low or minimal on the incoming agent first (keeps the model Yariv's spelling needed), then a call through 208, `vapi_latency.py`, and a read of the Hebrew for the spelling slips. Smaller levers after it: the voice's first-chunk wait, the 0.8 s no-punctuation endpointing. Nothing changed live.
+
 ### Docs: Yariv's bot points, and his 15 Sep review against the bot today
 - **Asked:** a doc of Yariv's key points kept to the bot (https://claude.ai/artifact/9nf2FKKPJRZrYvn36mC5Eg). Then a doc comparing his review with the bot as it is now, the PRD included, and a plain-words account of the representative request (https://claude.ai/artifact/NPZeVtEjjuYtRgErpiFK7o).
 - **Source:** `Homiez Agent Review — Meeting Notes.docx` (Downloads; a copy sits in `local/omnitelecom/`), from the review of 15 Sep 2026. The PRD is item 3 (`docs/features/11-whatsapp-bot/prd.md`).
