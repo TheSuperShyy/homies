@@ -9,6 +9,14 @@ conversation that produced it.
 
 ---
 
+## 2026-10-21
+
+### Docs: Yariv's bot points, and his 15 Sep review against the bot today
+- **Asked:** a doc of Yariv's key points kept to the bot (https://claude.ai/artifact/9nf2FKKPJRZrYvn36mC5Eg). Then a doc comparing his review with the bot as it is now, the PRD included, and a plain-words account of the representative request (https://claude.ai/artifact/NPZeVtEjjuYtRgErpiFK7o).
+- **Source:** `Homiez Agent Review — Meeting Notes.docx` (Downloads; a copy sits in `local/omnitelecom/`), from the review of 15 Sep 2026. The PRD is item 3 (`docs/features/11-whatsapp-bot/prd.md`).
+- **The comparison doc:** ten of his bot points beside the bot today, and the PRD's eleven asks with where each stands, both with a Status dropdown. Open in it: switching the bot off for one chat, chat summaries and topic tags, and setting up the inbox's transfer and assignment for Homies' staff. The representative section describes the 18 Oct manager rule as a call-center opening: the bot asks what happened so it can help, tries to fix it itself, and notes the team with the matter and the mood.
+- **One point worth the owner's eye:** live, a tenant who never says what it is about gets no note at all (the 18 Oct rule: no empty request goes to the team). The doc does not state that edge.
+
 ## 2026-10-20
 
 ### WhatsApp bot: cheaper models probed against Gemini 3.1 Pro; none switched
