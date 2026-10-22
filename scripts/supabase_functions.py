@@ -53,6 +53,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_PATH = os.path.join(ROOT, ".env")
 SLUG = "debt-tools"
 SRC = os.path.join(ROOT, "supabase", "functions", SLUG, "index.ts")
+# Feature 17 (22 Oct): the pure rules live beside index.ts, which imports them.
+IDENTITY = os.path.join(ROOT, "supabase", "functions", SLUG, "identity.ts")
 API = "https://api.supabase.com"
 
 # api.supabase.com sits behind Cloudflare, which rejects urllib's default
@@ -134,6 +136,8 @@ def main():
         generated = True
 
     src = open(SRC, encoding="utf-8").read()
+    identity_src = open(IDENTITY, encoding="utf-8").read()
+    print("files          index.ts %d chars, identity.ts %d chars" % (len(src), len(identity_src)))
 
     print("project        %s" % ref)
     print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
@@ -160,6 +164,10 @@ def main():
               % ("" if or_key else "; OPENROUTER_API_KEY empty -> the link alone"))
     else:
         print("whatsapp link  OFF — CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN empty in .env")
+    # Feature 17 (22 Oct): which channels refuse a ticket without a name.
+    # Unset here leaves the project's value as it is; "off" switches it off.
+    name_channels = e.get("NAME_REQUIRED_CHANNELS", "").strip()
+    print("name required  %s" % (name_channels or "unchanged (not in .env)"))
     if not apply:
         print("\nDry run. Re-run with --apply.")
         return
@@ -195,6 +203,8 @@ def main():
         to_push.append({"name": "CHATWOOT_BOT_TOKEN", "value": cw_bot})
     if or_key:
         to_push.append({"name": "OPENROUTER_API_KEY", "value": or_key})
+    if name_channels:
+        to_push.append({"name": "NAME_REQUIRED_CHANNELS", "value": name_channels})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
     # 24 Sep: the mirror came back on for ONE number, the owner's +63 tester.
     # `OXS_MIRROR_PHONES` is the second gate inside oxsMirror() and travels with
@@ -230,6 +240,7 @@ def main():
     body, ctype = multipart([
         ("metadata", None, json.dumps(meta).encode(), "application/json"),
         ("file", "index.ts", src.encode("utf-8"), "application/typescript"),
+        ("file", "identity.ts", identity_src.encode("utf-8"), "application/typescript"),
     ])
     code, out = call(token, "POST",
                      "/v1/projects/%s/functions/deploy?slug=%s" % (ref, SLUG),

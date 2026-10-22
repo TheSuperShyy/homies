@@ -726,7 +726,16 @@ After line 136 (`    src = open(SRC, encoding="utf-8").read()`) add:
 
 - [ ] **Step 2: Push the switch when `.env` has it**
 
-After the block:
+The dry run returns before `to_push` is built, so the status line goes with the other status lines. Before `    if not apply:`, add:
+
+```python
+    # Feature 17 (22 Oct): which channels refuse a ticket without a name.
+    # Unset here leaves the project's value as it is; "off" switches it off.
+    name_channels = e.get("NAME_REQUIRED_CHANNELS", "").strip()
+    print("name required  %s" % (name_channels or "unchanged (not in .env)"))
+```
+
+and after the block:
 
 ```python
     if or_key:
@@ -736,12 +745,8 @@ After the block:
 add:
 
 ```python
-    # Feature 17 (22 Oct): which channels refuse a ticket without a name.
-    # Unset here leaves the project's value as it is; "off" switches it off.
-    name_channels = e.get("NAME_REQUIRED_CHANNELS", "").strip()
     if name_channels:
         to_push.append({"name": "NAME_REQUIRED_CHANNELS", "value": name_channels})
-    print("name required  %s" % (name_channels or "unchanged (not in .env)"))
 ```
 
 - [ ] **Step 3: Upload both files**
