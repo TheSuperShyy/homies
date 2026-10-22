@@ -2523,6 +2523,15 @@ balance check. That was deliberate and wrong.
 - **The name on OXS's record belongs to the flat, not the person.** So it is asked even when OXS
   has one. The OXS copy keeps OXS's own tenant as `reportedBy` (24 Sep) and puts the reporter in
   the text.
+- **A voice prompt change is played before it is synced, and scored by code, not by eye.**
+  - `voice_qa.py bundle --candidate` puts the repo's prompt and tools in front of Claude players.
+  - `check_name_flow.py` scores each transcript against the acceptance list.
+  - The same deck is also run on the live agent first, so the check is proven to bite (22 Oct:
+    live 0 of 3).
+  - A scorer is code too, and needs tests. Its first "not the street's name" lookahead also
+    skipped "מה השם של הדייר" and failed a correct call; a test now pins both.
+  - A played run proves the prompt and the tool texts, not gpt-5.6-sol. The owner's call through
+    208 is the model's proof.
 
 ## How a WhatsApp change ships
 

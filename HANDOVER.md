@@ -863,6 +863,13 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
         5. `check_name_gate.py`;
         6. the owner's call through 208.
       - **The dashboard did not compile since 19 Oct** (`i18n.ts` app.name). Fixed in the repo 22 Oct; Vercel still builds from `main`.
+      - **Tested offline 22 Oct, no model billed:** the live agent scored 0 of 3, the new version 10 of 10. The record is in `docs/assistant/transcripts/2026-10-22-name-before-ticket/` (`result.txt`).
+      - **To re-run after any change to the prompt or tool texts:**
+        1. `python scripts/voice_qa.py bundle --run DIR --deck scripts/voice_qa_name.json --candidate`;
+        2. one Claude subagent per card, following `DIR/PLAYER.md`;
+        3. `python scripts/check_name_flow.py DIR`.
+        The backend rules: `node --test scripts/check_identity.test.ts` and `node scripts/check_function_syntax.mjs`. The scorer: `python scripts/check_name_flow_test.py`.
+      - **Live is still the old agent:** prompt 6,992 chars, no `reporter_name` on `open_request`. Repo prompt 7,410 chars. Until Task 7 runs, the repo is ahead of Vapi on purpose. Do not read the difference as drift and "fix" it.
     - **An account move loses it:** `vapi_transfer.py` copies agents, not phone numbers. Run `--delete` with the old key, then `--apply` with the new one. That is also how it moves to the client's main account, which the owner plans for later.
   - **The dialer side waits on Omni's external_id header,** plus our `assistant-request` router that picks the agent.
 - **12 Oct: Omni wrote that they are starting the Tokomni move and asked for the dialer setup** (email in `local/omnitelecom/`, WORKLOG 12 Oct).

@@ -47,6 +47,7 @@ conversation that produced it.
     - the office-extension call gets `need_phone`, asks the tenant's number and reads it back.
   - The record is in `docs/assistant/transcripts/2026-10-22-name-before-ticket/` (`new/`, `live/`, `result.txt`).
 - **Not live.** Plan A Task 7 (deploy, sync, switch on, the owner's call through 208) waits for the owner's go.
+- **Briefing files:** an automatic housekeeping commit took the first HANDOVER/CONTEXT edits before the test commit, so the stop hook flagged the test commit. HANDOVER now says how to re-run the test and that live is deliberately behind the repo. CONTEXT has the testing method and the scorer lesson. All three were committed together.
 
 ## 2026-10-21
 
