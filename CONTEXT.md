@@ -2530,8 +2530,15 @@ balance check. That was deliberate and wrong.
     live 0 of 3).
   - A scorer is code too, and needs tests. Its first "not the street's name" lookahead also
     skipped "מה השם של הדייר" and failed a correct call; a test now pins both.
-  - A played run proves the prompt and the tool texts, not gpt-5.6-sol. The owner's call through
-    208 is the model's proof.
+  - A played run proves the prompt and the tool texts, not gpt-5.6-sol. The real model on
+    OpenRouter (`voice_qa.py say`) is the next proof, and the owner's call through 208 the last.
+  - **`say`'s tool stand-ins must replay every refusal the function makes,** or the real model
+    never meets them. Before 22 Oct the stand-in opened any ticket, so `need_name` could not
+    happen in a `say` run. `phone_of`, `reporter_name_of` and `flag_of` are ported from
+    `identity.ts` and checked against it.
+  - **A scorer flag fixed per card cannot see what the caller actually said.** On 22 Oct the
+    office caller introduced herself, the real model rightly took her name, and `asked_first`
+    failed it anyway. Read every fail by hand before calling it the agent's.
 
 ## How a WhatsApp change ships
 

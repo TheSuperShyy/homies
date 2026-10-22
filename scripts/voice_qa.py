@@ -4,7 +4,9 @@
     python scripts/voice_qa.py bundle --run DIR    # live prompts, tools, the deck, PLAYER.md
                                                    #   (--deck PATH for another card file)
                                                    #   (--candidate: the repo's prompt and tools, not live)
-    python scripts/voice_qa.py cost --run DIR      # OpenRouter price of DIR/transcripts/*.json
+                                                   #   (--name-required voice: say's tools refuse a ticket with
+                                                   #    no name whatever .env holds; --cap 0.60: say's limit)
+    python scripts/voice_qa.py cost --run DIR     # OpenRouter price of DIR/transcripts/*.json
     python scripts/voice_qa.py play --run DIR      # SPENDS: the live models on OpenRouter, into DIR/played/
                                                    #   (VOICE_QA_ONLY=id,id to run some; stops at $1)
     python scripts/voice_qa.py say --run DIR < line.json   # SPENDS: one caller line, Claude as the caller
@@ -123,7 +125,7 @@ def run_deck(run):
     return load(here) if os.path.exists(here) else load(DECK)
 
 
-def bundle(run, deck_path=DECK, candidate=False):
+def bundle(run, deck_path=DECK, candidate=False, name_required=None, cap=None):
     import prompt_probe as P
     deck = load(deck_path)
     forms = gender_forms()
@@ -188,6 +190,13 @@ def bundle(run, deck_path=DECK, candidate=False):
     player_deck = {"_source": os.path.relpath(deck_path, ROOT).replace(os.sep, "/"),
                    "defaults": deck["defaults"],
                    "scenarios": [{k: v for k, v in s.items() if k != "expect"} for s in deck["scenarios"]]}
+    # 22 Oct, feature 17: the run carries say's switch and limit. The players'
+    # say processes do not share this shell's environment, and .env must not
+    # hold the switch before the agent that sends names is synced.
+    if name_required is not None:
+        player_deck["_name_required"] = name_required
+    if cap is not None:
+        player_deck["_cap"] = cap
     write(os.path.join(run, "deck.json"), json.dumps(player_deck, ensure_ascii=False, indent=1))
     write(os.path.join(run, "PLAYER.md"), PLAYER)
     print("bundled %d calls into %s" % (len(deck["scenarios"]), run))
@@ -512,6 +521,39 @@ NOTE_REASONS = ("hardship", "dispute", "distress", "language", "not_understood",
                 "quote", "other")
 
 
+def name_required(run):
+    """NAME_REQUIRED_CHANNELS as the function sees it: the run's own setting when
+    bundle was given one, else .env's (what supabase_functions.py deploys)."""
+    import prompt_probe as P
+    d = run_deck(run)
+    raw = d["_name_required"] if "_name_required" in d else P.E.get("NAME_REQUIRED_CHANNELS", "")
+    return {x.strip().lower() for x in str(raw).split(",") if x.strip()}
+
+
+def e164(national):
+    n = national.lstrip("0")
+    return "+972" + n if len(n) in (8, 9) else None
+
+
+def phone_of(value):
+    """identity.ts phoneOf: an Israeli number in E.164, else None."""
+    digits = re.sub(r"\D+", "", str(value or ""))
+    for head in ("00972", "972", "0"):
+        if digits.startswith(head):
+            return e164(digits[len(head):])
+    return e164(digits) if re.fullmatch(r"5\d{8}", digits) else None
+
+
+def reporter_name_of(value):
+    """identity.ts reporterNameOf: a name with a letter in it, at most 80 characters."""
+    name = re.sub(r"\s+", " ", str(value or "")).strip()
+    return name if name and len(name) <= 80 and re.search(r"[^\W\d_]", name) else None
+
+
+def flag_of(value):
+    return value is True or str(value or "").strip().lower() == "true"
+
+
 def fn_block(start, end):
     src = open(FN_SRC, encoding="utf-8").read()
     i = src.index(start)
@@ -743,7 +785,7 @@ class Bk23:
         return None
 
 
-def voice_tool(name, a, s, st, bk):
+def voice_tool(name, a, s, st, bk, enforced=frozenset()):
     """What the deployed tool would answer on this call; nothing is written."""
     def mint():
         n = len(st["minted"])
@@ -755,14 +797,26 @@ def voice_tool(name, a, s, st, bk):
         if not a.get("description"):
             return {"ok": False, "error": "description is required"}
         said, kind = str(a.get("building") or ""), a.get("type") or "other"
+        held = None
         if not resolves_bk23(said):
             refuse = {"ok": True, "opened": False, "building_found": False}
             if not said.strip() or (not on_bar_kochba(said) and not re.search(r"\d", said)):
-                return dict(refuse, reason="need_building")
-            if not on_bar_kochba(said):
+                held = dict(refuse, reason="need_building")     # waits behind the name (feature 17)
+            elif not on_bar_kochba(said):
                 return dict(refuse, reason="street_unknown")
-            return dict(refuse, reason="number_not_on_street" if re.search(r"\d", said) else "need_number",
-                        street="בר כוכבא", numbers_we_manage=["23"])
+            else:
+                return dict(refuse, reason="number_not_on_street" if re.search(r"\d", said) else "need_number",
+                            street="בר כוכבא", numbers_we_manage=["23"])
+        # Feature 17, index.ts ticketGate: an incoming call is never one we
+        # dialled, and its number is its own unless the card says it has none.
+        if "voice" in enforced:
+            if not reporter_name_of(a.get("reporter_name")) and not flag_of(a.get("name_declined")):
+                return {"ok": True, "opened": False, "reason": "need_name"}
+            if (s.get("call_has_number") is False and not phone_of(a.get("reporter_phone"))
+                    and not flag_of(a.get("phone_declined"))):
+                return {"ok": True, "opened": False, "reason": "need_phone"}
+        if held:
+            return held
         unit = unit_of(a.get("unit"))
         key = "%s|%s" % (kind, unit or "")
         if kind != "complaint":
@@ -888,6 +942,7 @@ class VoiceCall:
         self.s = next((x for x in run_deck(run)["scenarios"] if x["id"] == sid), None)
         if not self.s:
             sys.exit("no scenario %r in this run" % sid)
+        self.enforced, self.cap = name_required(run), float(run_deck(run).get("_cap") or SAY_CAP)
         md = open(os.path.join(run, "context_%s.md" % sid), encoding="utf-8").read()
         self.live = load(os.path.join(run, "live_%s.json" % self.s["agent"]))
         self.tools = json.loads(re.search(r"## The tools\s*\n+```json\n(.*?)\n```", md, re.S).group(1))
@@ -925,8 +980,8 @@ class VoiceCall:
 
     def hear(self, text, en):
         """The caller's line in; what the caller hears back, and whether Vapi hung up."""
-        if self.spent_run() > SAY_CAP:
-            sys.exit("stopped: the run has spent over the $%.2f cap" % SAY_CAP)
+        if self.spent_run() > self.cap:
+            sys.exit("stopped: the run has spent over the $%.2f cap" % self.cap)
         debt = self.s["agent"] == "debt"
         bk = None if debt else Bk23()
         st = self.st
@@ -970,7 +1025,7 @@ class VoiceCall:
                 fn = c["function"]["name"]
                 if fn in self.live["waiting_lines"]:
                     heard.append(self.live["waiting_lines"][fn])
-                res = debt_tool(fn, a, self.s, st) if debt else voice_tool(fn, a, self.s, st, bk)
+                res = debt_tool(fn, a, self.s, st) if debt else voice_tool(fn, a, self.s, st, bk, self.enforced)
                 rnd.append({"tool": fn, "arguments": a, "result": res})
                 st["messages"].append({"role": "tool", "tool_call_id": c["id"],
                                        "content": json.dumps(res, ensure_ascii=False)})
@@ -996,7 +1051,7 @@ TENANT = """# Calling Homies as a tenant
 
 You are ONE tenant of a building Homies manages, phoning Homies. Michael answers. Michael is the real
 agent: its own model answers every line you say, and each line costs a little real credit (the owner
-approved this run; the script stops itself at $1). It is a test: nothing is opened, sent or written
+approved this run; the script stops itself at $%(cap).2f). It is a test: nothing is opened, sent or written
 anywhere, and no person hears you.
 
 ## Who you are
@@ -1100,8 +1155,10 @@ TENANT_OUT = (TENANT
 
 
 def tenant(run, sid):
-    s = next((x for x in run_deck(run)["scenarios"] if x["id"] == sid), {"agent": "inbound"})
-    print((TENANT_OUT if s["agent"] == "debt" else TENANT) % {"run": run.replace("\\", "/"), "sid": sid})
+    deck = run_deck(run)
+    s = next((x for x in deck["scenarios"] if x["id"] == sid), {"agent": "inbound"})
+    print((TENANT_OUT if s["agent"] == "debt" else TENANT) % {"run": run.replace("\\", "/"), "sid": sid,
+                                                             "cap": float(deck.get("_cap") or SAY_CAP)})
 
 
 # ---------------------------------------------------------------------------
@@ -1252,7 +1309,10 @@ def main():
         # --deck picks another card file (5 Oct: scripts/voice_qa_inbound_4.json);
         # cost and play then read the copy bundle leaves in the run folder.
         deck = argv[argv.index("--deck") + 1] if "--deck" in argv else DECK
-        return bundle(argv[2], deck, candidate="--candidate" in argv)
+        flag = lambda f: argv[argv.index(f) + 1] if f in argv else None
+        cap = flag("--cap")
+        return bundle(argv[2], deck, candidate="--candidate" in argv,
+                      name_required=flag("--name-required"), cap=float(cap) if cap else None)
     {"cost": cost, "play": play, "say": say}.get(argv[0], lambda run: sys.exit(__doc__))(argv[2])
 
 

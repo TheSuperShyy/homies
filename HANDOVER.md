@@ -852,7 +852,10 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - **19 Oct, earlier: Omni tested before the address existed.** Their support wrote back *"Invalid credentials"* (`X-Reason: Invalid credentials`, from Vapi's SIP side): the reply with the login had gone out while the account still had 0 SIP addresses. **Now:** tell Omni the same details are active and to try again; nothing is resent. Vapi does not return the password on read, so a call through the address is the proof: Omni's next one from 208, or `scripts/vapi_sip_probe.py` from a PC first (three INVITEs: an unknown address, a wrong password, the real login, hung up at once; prints status lines only). The session's permission check refuses to run the probe as a real-world transaction, so it is the owner's to run.
     - **Double-checked 19 Oct without a call (`vapi_sip_probe.py --no-call`, the right password never sent):** Vapi's record matches (address exact, active since 13:48:51 UTC, username as in `.env`, the Hebrew incoming agent with its first message and server url); the reply file carries exactly the `.env` username and password and nothing else login-shaped; Vapi's spec says the login is digest on the 401 challenge of the INVITE, realm defaulting to `sip.vapi.ai`. On the wire (UDP 5060, 44.229.228.186, Digest MD5 qop=auth) an unknown address and a wrong password both get `403 Forbidden, X-Reason: Invalid credentials`, which is Omni's email word for word. **If the owner's full probe shows 200 and Omni still gets that 403, the fault is in Omni's PBX fields (username or realm), not in the address.**
     - **21 Oct: connected and live through Tokomni (owner, from Omni); the wait between turns is the AI model, not Vapi's server.** Five `inboundPhoneCall` (vapi sip) calls today, two with turns (13:53 and 13:55 UTC, 15 turns). Felt wait per turn: median 2.3s and 3.3s, worst 6.7s (target <0.8s). Vapi's own transport, both ways, is about 20ms. Per-turn averages on the 11-turn call: model 1.5s (0.9–3.6s, slowest after a tool call), voice 0.84s, transcriber 0.61s, endpointing 0.58s. The model has been gpt-5.6-sol since 19 Oct (for Yariv's spelling), a thinking model with `reasoningEffort` unset; Vapi's spec offers `reasoningEffort` (none/minimal/low/…) and `serviceTier: fast`. Not measured: the Israel–US leg to `sip.vapi.ai` (Oregon). **Nothing changed;** the proposed first step is `reasoningEffort` low or minimal on the incoming agent, then a call through 208 and `vapi_latency.py`, with a check that the spelling holds. That needs the owner's go.
-    - **22 Oct: feature 17, no ticket without a name (built and tested offline, NOT live).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
+    - **22 Oct: feature 17, no ticket without a name (built, tested offline and on the real model, NOT live).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
+      - **The deploy was refused 22 Oct** by Claude Code's auto-mode check ("Production Deploy") at step 1 below, after the owner's *"ok lets push it"*. Not worked around.
+        - **What it needs:** the owner's explicit go to deploy, or the owner runs the steps themselves, in Git Bash (`vapi_sync.py` needs the empty `N8N_BASE_URL`, which PowerShell drops).
+        - **Ready:** the sync's dry run was compared field by field with live (read-only). Only the prompt and the text of `open_request` and `notify_team` change. The speaking plans differ only as `1` against `1.0`.
       - **Caller ID, corrected:** Omni passes outside numbers in local form, in the SIP URI (`sip:031234567@…`). Calls from Homies' internal extensions (200, 201, 202) show the office line 077-6687949. A dialer call shows `dialer-<the number it rang>`. `identity.ts` `callNumberOf()` reads all three.
       - **The ticket tool's refusal is off until switched on:** `NAME_REQUIRED_CHANNELS` (unset = off; `voice` for the phone line).
       - **Order to go live (Plan A Task 7, owner's go only):**
@@ -864,6 +867,16 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
         6. the owner's call through 208.
       - **The dashboard did not compile since 19 Oct** (`i18n.ts` app.name). Fixed in the repo 22 Oct; Vercel still builds from `main`.
       - **Tested offline 22 Oct, no model billed:** the live agent scored 0 of 3, the new version 10 of 10. The record is in `docs/assistant/transcripts/2026-10-22-name-before-ticket/` (`result.txt`).
+      - **Tested on the real model 22 Oct ($0.33 of OpenRouter, on the owner's go):** six cards through `voice_qa.py say`, with gpt-5.6-sol answering and Claude tenants. The transcripts are in `openrouter/` there.
+        - **Score:** the scorer passes 5 of 6.
+        - **The sixth** (`nm_staff_no_number`, asked_first) is the card's fixed flag. The caller said her name first, and the agent rightly used it.
+        - **Open for the owner, not feature 17's to settle:**
+          - a call made for someone else puts the caller's name with the tenant's number;
+          - the gas call's no-safety-advice rule sent the caller off to phone the fire department herself.
+        - **Re-run:**
+          1. `voice_qa.py bundle --run DIR --deck scripts/voice_qa_name.json --candidate --name-required voice --cap 0.60`;
+          2. one Claude subagent per card, on `voice_qa.py tenant --run DIR ID`;
+          3. `check_name_flow.py DIR`.
       - **To re-run after any change to the prompt or tool texts:**
         1. `python scripts/voice_qa.py bundle --run DIR --deck scripts/voice_qa_name.json --candidate`;
         2. one Claude subagent per card, following `DIR/PLAYER.md`;

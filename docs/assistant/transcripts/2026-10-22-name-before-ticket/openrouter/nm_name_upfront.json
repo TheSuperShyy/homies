@@ -1,0 +1,73 @@
+{
+ "scenario": "nm_name_upfront",
+ "agent": {
+  "assistant": "Homies — Inbound Intake (he)",
+  "updated_at": "2026-10-19T12:57:37.529Z",
+  "model": "openai/gpt-5.6-sol",
+  "temperature": null,
+  "max_tokens": 250
+ },
+ "caller": "Claude, acting as the tenant on the card",
+ "saved_at": "2026-10-22 10:13 UTC",
+ "ended": "the caller hung up",
+ "turns": [
+  {
+   "agent": "היי, בוקר טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?"
+  },
+  {
+   "caller": "היי בוקר טוב זאת דנה לוי מבר כוכבא 23 דירה 4 רציתי לדווח שמטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר מהבוקר",
+   "en": "Hi good morning this is Dana Levi from Bar Kochba 23 apartment 4 I wanted to report that water is dripping from the ceiling in the lobby downstairs near the mailboxes since this morning"
+  },
+  {
+   "agent": "אוי, טוב שדיווחת! פתחתי פנייה דחופה על הטפטוף בלובי ליד תיבות הדואר. מספר הפנייה הוא אחת שש אפס שתיים. יש עוד פרט שתרצי שאוסיף לפנייה?",
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "מטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר, מהבוקר.",
+       "type": "plumbing",
+       "urgency": "high",
+       "building": "בר כוכבא 23",
+       "unit": "4",
+       "reporter_name": "דנה לוי",
+       "name_declined": false,
+       "reporter_phone": "",
+       "phone_declined": false
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1602-26",
+       "reference_spoken": "אחת שש אפס שתיים"
+      }
+     }
+    ]
+   ],
+   "heard": [
+    "רגע, אני רושם את זה.",
+    "אוי, טוב שדיווחת! פתחתי פנייה דחופה על הטפטוף בלובי ליד תיבות הדואר. מספר הפנייה הוא אחת שש אפס שתיים. יש עוד פרט שתרצי שאוסיף לפנייה?"
+   ]
+  },
+  {
+   "caller": "אוקיי 1602 רשמתי לא זהו זה הכל תודה רבה ביי",
+   "hung_up": true,
+   "en": "Okay 1602 noted it no that's it that's all thanks a lot bye"
+  }
+ ],
+ "usage": [
+  {
+   "in": 5728,
+   "out": 169,
+   "cached": 0,
+   "reasoning": 82,
+   "cost": 0.032017
+  },
+  {
+   "in": 5854,
+   "out": 110,
+   "cached": 5725,
+   "reasoning": 52,
+   "cost": 0.005132
+  }
+ ]
+}

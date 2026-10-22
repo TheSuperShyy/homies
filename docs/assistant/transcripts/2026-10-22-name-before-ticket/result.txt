@@ -21,3 +21,22 @@ ok   nm_two_issues
 ok   nm_unmanaged             
 
 10 of 10 passed
+
+== the real model, 22 Oct (voice_qa.py say: gpt-5.6-sol on OpenRouter, Claude tenants; repo prompt and tools)
+Six of the ten cards. bundle --candidate --name-required voice --cap 0.60. Spent $0.3306 (37 model calls).
+ok   nm_gas                   
+ok   nm_light_noname          
+ok   nm_name_upfront          
+ok   nm_refuses               
+FAIL nm_staff_no_number       asked_first
+ok   nm_two_issues            
+
+5 of 6 passed
+
+nm_staff_no_number, read by hand: the caller said "זאת שירן מהמשרד" in her first sentence and the agent
+used that name, as the prompt says ("if not already said"). The card's static flag cannot see that, so
+asked_first is the scorer's miss, not the agent's. Worth a decision: the ticket names Shiran with the
+tenant's number; the tenant's name went in as a note only after she asked.
+nm_gas: the alert went first and the name came after, as required. The agent then refused three times to
+say whether to call the fire department or the gas company, and the caller hung up to call them herself.
+That is the prompt's standing no-safety-advice rule, not feature 17.

@@ -1,0 +1,186 @@
+{
+ "scenario": "nm_staff_no_number",
+ "agent": {
+  "assistant": "Homies — Inbound Intake (he)",
+  "updated_at": "2026-10-19T12:57:37.529Z",
+  "model": "openai/gpt-5.6-sol",
+  "temperature": null,
+  "max_tokens": 250
+ },
+ "caller": "Claude, acting as the tenant on the card",
+ "saved_at": "2026-10-22 10:14 UTC",
+ "ended": "the caller hung up",
+ "turns": [
+  {
+   "agent": "היי, צהריים טובים! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?"
+  },
+  {
+   "caller": "היי מיכאל זאת שירן מהמשרד אני מתקשרת בשביל דייר מבוגר אחד אצלנו יש לו בעיה עם השער של הבניין",
+   "en": "Hi Michael, this is Shiran from the office, I'm calling on behalf of an elderly tenant of ours, he has a problem with the building's gate"
+  },
+  {
+   "agent": "אוי, לא נעים, טוב שהתקשרת בשבילו. מה בדיוק קורה עם השער?"
+  },
+  {
+   "caller": "כן אז השער בכניסה לבניין הוא לא ננעל מהבוקר כאילו נשאר פתוח כל הזמן וזה בר כוכבא 23",
+   "en": "Yes so the gate at the building's entrance doesn't lock since this morning, like it stays open the whole time, and this is Bar Kochba 23"
+  },
+  {
+   "agent": "זה באמת משאיר את הכניסה חשופה, כדאי שיטפלו בזה. מה מספר הדירה של הדייר?"
+  },
+  {
+   "caller": "דירה 6",
+   "en": "Apartment 6"
+  },
+  {
+   "agent": "שירן, מה מספר הטלפון שאפשר לחזור אליו לגבי הפנייה?",
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "השער בכניסה לבניין לא ננעל מהבוקר ונשאר פתוח כל הזמן",
+       "type": "locksmith",
+       "urgency": "high",
+       "building": "בר כוכבא 23",
+       "unit": "6",
+       "reporter_name": "שירן",
+       "name_declined": false,
+       "reporter_phone": "",
+       "phone_declined": false
+      },
+      "result": {
+       "ok": true,
+       "opened": false,
+       "reason": "need_phone"
+      }
+     }
+    ]
+   ],
+   "heard": [
+    "רגע, אני רושם את זה.",
+    "שירן, מה מספר הטלפון שאפשר לחזור אליו לגבי הפנייה?"
+   ]
+  },
+  {
+   "caller": "אה תרשום את המספר של הדייר עצמו כן 052 441 8823",
+   "en": "Uh, write down the tenant's own number, yes, 052 441 8823"
+  },
+  {
+   "agent": "מעולה, רשמתי את המספר אפס חמש שתיים, ארבע ארבע אחת, שמונה שמונה שתיים שלוש. פתחתי פנייה לטיפול בשער, ומספר הפנייה הוא אחת שש אפס שמונה. יש עוד משהו שאוכל לעזור בו?",
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "השער בכניסה לבניין לא ננעל מהבוקר ונשאר פתוח כל הזמן",
+       "type": "locksmith",
+       "urgency": "high",
+       "building": "בר כוכבא 23",
+       "unit": "6",
+       "reporter_name": "שירן",
+       "name_declined": false,
+       "reporter_phone": "0524418823",
+       "phone_declined": false
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1608-26",
+       "reference_spoken": "אחת שש אפס שמונה"
+      }
+     }
+    ]
+   ],
+   "heard": [
+    "רגע, אני רושם את זה.",
+    "מעולה, רשמתי את המספר אפס חמש שתיים, ארבע ארבע אחת, שמונה שמונה שתיים שלוש. פתחתי פנייה לטיפול בשער, ומספר הפנייה הוא אחת שש אפס שמונה. יש עוד משהו שאוכל לעזור בו?"
+   ]
+  },
+  {
+   "caller": "רגע אבל על איזה שם זה נרשם כי זה בשביל הדייר לא בשבילי קוראים לו משה ברק",
+   "en": "Wait, but under what name was it recorded, because it's for the tenant not for me, his name is Moshe Barak"
+  },
+  {
+   "agent": "הפנייה נפתחה עם השם שלך כמי שדיווחה, ועכשיו הוספתי שהיא עבור הדייר משה ברק ושמספר הטלפון הוא שלו. הכול מופיע בפנייה אחת שש אפס שמונה. יש עוד פרט שתרצי שאוסיף?",
+   "rounds": [
+    [
+     {
+      "tool": "add_request_detail",
+      "arguments": {
+       "reference": "255-1608-26",
+       "detail": "הפנייה היא עבור הדייר משה ברק מדירה 6; מספר הטלפון שנמסר הוא של משה ברק."
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1608-26",
+       "reference_spoken": "אחת שש אפס שמונה"
+      }
+     }
+    ]
+   ]
+  },
+  {
+   "caller": "לא זהו זה מה שהיה צריך תודה רבה מיכאל יום טוב",
+   "hung_up": true,
+   "en": "No, that's it, that's what was needed, thank you very much Michael, have a good day"
+  }
+ ],
+ "usage": [
+  {
+   "in": 5717,
+   "out": 68,
+   "cached": 0,
+   "reasoning": 39,
+   "cost": 0.029942
+  },
+  {
+   "in": 5783,
+   "out": 87,
+   "cached": 5714,
+   "reasoning": 55,
+   "cost": 0.0043676
+  },
+  {
+   "in": 5823,
+   "out": 122,
+   "cached": 5780,
+   "reasoning": 35,
+   "cost": 0.004964
+  },
+  {
+   "in": 5936,
+   "out": 58,
+   "cached": 5820,
+   "reasoning": 35,
+   "cost": 0.004065
+  },
+  {
+   "in": 5982,
+   "out": 147,
+   "cached": 5933,
+   "reasoning": 55,
+   "cost": 0.0055552
+  },
+  {
+   "in": 6113,
+   "out": 165,
+   "cached": 5979,
+   "reasoning": 99,
+   "cost": 0.0063586
+  },
+  {
+   "in": 6207,
+   "out": 78,
+   "cached": 6110,
+   "reasoning": 21,
+   "cost": 0.004486
+  },
+  {
+   "in": 6304,
+   "out": 64,
+   "cached": 6204,
+   "reasoning": 0,
+   "cost": 0.0042586
+  }
+ ]
+}

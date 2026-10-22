@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-10-22
 
+### Feature 17: the go to ship it and test on OpenRouter; the deploy was refused, so the real-model test ran first
+- **Asked:** *"ok lets push it and test it again using open router but dont take too much credit give me estimate on how much the total will cost"*.
+- **Estimate, given before anything was spent:**
+  - **Going live:** $0. No step calls a paid model. The function's only OpenRouter call is the WhatsApp line above a payment link, and no probe reaches it.
+  - **Six played calls:** about $0.40, with a hard stop at $0.60. They run on the live model, `openai/gpt-5.6-sol` ($4/M in, $0.40/M cached, $20/M out). The estimate is priced from this morning's ten transcripts (the prompt and tools are 6,116 tokens) and the 5 Oct debt run's real bills ($0.0035 a model call, 86 thinking tokens). All ten calls would have been $0.60-0.85.
+  - **Wallet:** $5.28 before the run. The WhatsApp bot uses the same wallet.
+  - **The 208 test call:** Vapi bills it, not OpenRouter.
+- **The deploy was refused** by Claude Code's auto-mode check ("Production Deploy") on `supabase_functions.py --apply --oxs-mirror`. It was not worked around. Nothing is live, and the deploy needs the owner's explicit go or their own run.
+- **Ready for that go:**
+  - The offline checks pass again (18 rule tests, the function parses, the scorer's own tests).
+  - `vapi_sync.py inbound --keep-voice` dry run, compared field by field with the live assistant (read-only). Only the prompt (6,992 to 7,410 chars) and the text of `open_request` and `notify_team` change. The speaking plans differ only as `1` against `1.0`.
+- **The test ran first instead, on the repo version,** which is exactly what the deploy ships. It used `voice_qa.py say`: Claude subagents are the tenants, blind to the prompt and the checks, and only the agent runs on OpenRouter.
+- **Harness changes, `voice_qa.py`:**
+  - **The `say` stand-in for `open_request`** now replays the gate in `index.ts`'s order: a named building that isn't ours first, then `need_name`, then `need_phone` on a call with no number of its own, then `need_building`.
+  - **Ported from `identity.ts`:** `phone_of`, `reporter_name_of` and `flag_of`. Checked offline with 15 gate cases, and against `identity.ts` itself on 12 numbers, 6 names and 7 flags.
+  - **`bundle --name-required voice --cap 0.60`** writes the switch and the limit into the run. The players' processes don't share this shell's environment, and `.env` must not hold the switch before the agent that sends names is synced.
+- **Results:** six calls, $0.3306 over 37 model calls. The wallet went from $5.28 to $4.95. The scorer passes 5 of 6. Read by hand:
+  - **The light:** the name, then the building, then the flat, then the ticket with `reporter_name`.
+  - **The name given up front:** the ticket opened at once, with nothing asked again.
+  - **The refusal:** the reason was said once and the name asked again. On the second refusal the ticket opened with `name_declined`, and there was no third ask.
+  - **The two problems:** the name was asked once, and both tickets carry it.
+  - **The gas call:** the alert went before any question, then the name, and the emergency ticket carries it.
+  - **The office call with no number:** the ticket was first refused with `need_phone`. The agent asked for a number to call back and read it back in words.
+    - The scorer's one fail is `asked_first` here: the caller said "זאת שירן מהמשרד" first and the agent used that name. The card's fixed flag cannot see that.
+    - Left for the owner: the ticket names Shiran with the tenant's number. The tenant's name went in as a note, and only after she asked.
+  - **Not feature 17:** in the gas call the agent refused three times to say whether to call the fire department or the gas company. The caller hung up to call them herself. That is the prompt's standing no-safety-advice rule, held by the real model to the letter.
+  - The record is in `docs/assistant/transcripts/2026-10-22-name-before-ticket/openrouter/`, with the result appended to `result.txt`.
+- **Still not live.** It waits for the owner to allow the deploy.
+
 ### Homies' updated spec checked against live (read-only), then feature 17: no ticket without a name
 - **Asked:** *"dont edit anything i want to ask are we aligned to this"*, with Homies' pasted *אפיון מעודכן לאישור* (8 sections). Answered in chat; nothing was edited for that answer, the worklog included.
 - **Not aligned, by feature** (*"in terms of the features what are not aligned"*):

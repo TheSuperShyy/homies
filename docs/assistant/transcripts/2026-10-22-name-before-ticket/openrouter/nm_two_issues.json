@@ -1,0 +1,158 @@
+{
+ "scenario": "nm_two_issues",
+ "agent": {
+  "assistant": "Homies — Inbound Intake (he)",
+  "updated_at": "2026-10-19T12:57:37.529Z",
+  "model": "openai/gpt-5.6-sol",
+  "temperature": null,
+  "max_tokens": 250
+ },
+ "caller": "Claude, acting as the tenant on the card",
+ "saved_at": "2026-10-22 10:14 UTC",
+ "ended": "Michael said \"ולהתראות\", one of the phrases Vapi hangs up on",
+ "turns": [
+  {
+   "agent": "היי, צהריים טובים! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?"
+  },
+  {
+   "caller": "היי צהריים טובים אה אני גרה בבר כוכבא 23 ויש לנו בעיה עם המעלית היא עושה רעש כזה מטורף בין הקומות כאילו חריקה כזאת",
+   "en": "Hi good afternoon uh I live at Bar Kochba 23 and we have a problem with the lift it makes this crazy noise between the floors like a sort of grinding"
+  },
+  {
+   "agent": "אוי, חריקה חזקה במעלית זה באמת לא נעים. מה השם שלך כדי שאפתח פנייה לבדיקה?"
+  },
+  {
+   "caller": "נעמה",
+   "en": "Naama"
+  },
+  {
+   "agent": "תודה, נעמה! באיזו דירה אַתְּ גרה?"
+  },
+  {
+   "caller": "דירה 9",
+   "en": "Apartment 9"
+  },
+  {
+   "agent": "פתחתי פנייה לבדיקה בעדיפות גבוהה. מספר הפנייה הוא אחת שש אחת אפס. יש עוד משהו שאני יכול לעזור בו?",
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "המעלית עושה רעש חזק מאוד של חריקה בין הקומות",
+       "type": "elevator",
+       "urgency": "high",
+       "building": "בר כוכבא 23",
+       "unit": "9",
+       "reporter_name": "נעמה",
+       "name_declined": false,
+       "reporter_phone": "",
+       "phone_declined": false
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1610-26",
+       "reference_spoken": "אחת שש אחת אפס"
+      }
+     }
+    ]
+   ],
+   "heard": [
+    "רגע, אני רושם את זה.",
+    "פתחתי פנייה לבדיקה בעדיפות גבוהה. מספר הפנייה הוא אחת שש אחת אפס. יש עוד משהו שאני יכול לעזור בו?"
+   ]
+  },
+  {
+   "caller": "מעולה תודה אה כן ועוד דבר אחד תיבת הדואר שלי למטה הדלתית הקטנה שלה נשברה כאילו נפלה לגמרי",
+   "en": "Great thanks uh yes and one more thing my mailbox downstairs its little door broke like it fell off completely"
+  },
+  {
+   "agent": "בטח, פתחתי גם על תיבת הדואר פנייה נפרדת. המספר שלה הוא אחת שש שתיים אפס. יש עוד משהו שאוכל לסדר?",
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "הדלתית הקטנה של תיבת הדואר של דירה 9 למטה נשברה ונפלה לגמרי",
+       "type": "maintenance",
+       "urgency": "normal",
+       "building": "בר כוכבא 23",
+       "unit": "9",
+       "reporter_name": "נעמה",
+       "name_declined": false,
+       "reporter_phone": "",
+       "phone_declined": false
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1620-26",
+       "reference_spoken": "אחת שש שתיים אפס"
+      }
+     }
+    ]
+   ],
+   "heard": [
+    "רגע, אני רושם את זה.",
+    "בטח, פתחתי גם על תיבת הדואר פנייה נפרדת. המספר שלה הוא אחת שש שתיים אפס. יש עוד משהו שאוכל לסדר?"
+   ]
+  },
+  {
+   "caller": "לא זהו זה הכל תודה רבה מיכאל",
+   "en": "No that's it that's all thanks a lot Michael"
+  },
+  {
+   "agent": "בשמחה, נעמה! תודה על השיחה, המשך אחר צהריים נעים ולהתראות."
+  }
+ ],
+ "usage": [
+  {
+   "in": 5729,
+   "out": 79,
+   "cached": 0,
+   "reasoning": 45,
+   "cost": 0.030222
+  },
+  {
+   "in": 5769,
+   "out": 39,
+   "cached": 5726,
+   "reasoning": 15,
+   "cost": 0.0032824
+  },
+  {
+   "in": 5801,
+   "out": 148,
+   "cached": 5766,
+   "reasoning": 68,
+   "cost": 0.0054384
+  },
+  {
+   "in": 5919,
+   "out": 34,
+   "cached": 5798,
+   "reasoning": 0,
+   "cost": 0.0036012
+  },
+  {
+   "in": 5990,
+   "out": 142,
+   "cached": 5916,
+   "reasoning": 51,
+   "cost": 0.0055734
+  },
+  {
+   "in": 6120,
+   "out": 41,
+   "cached": 5987,
+   "reasoning": 0,
+   "cost": 0.0038768
+  },
+  {
+   "in": 6177,
+   "out": 65,
+   "cached": 6117,
+   "reasoning": 35,
+   "cost": 0.0040438
+  }
+ ]
+}

@@ -1,0 +1,115 @@
+{
+ "scenario": "nm_light_noname",
+ "agent": {
+  "assistant": "Homies — Inbound Intake (he)",
+  "updated_at": "2026-10-19T12:57:37.529Z",
+  "model": "openai/gpt-5.6-sol",
+  "temperature": null,
+  "max_tokens": 250
+ },
+ "caller": "Claude, acting as the tenant on the card",
+ "saved_at": "2026-10-22 10:13 UTC",
+ "ended": "the caller hung up",
+ "turns": [
+  {
+   "agent": "היי, בוקר טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?"
+  },
+  {
+   "caller": "כן אה המנורה בחדר מדרגות בקומה שלישית לא עובדת כבר יומיים בערב חושך שם לגמרי",
+   "en": "Yeah uh the light in the stairwell on the third floor hasn't been working for two days already, in the evening it's completely dark there"
+  },
+  {
+   "agent": "לא נעים לעלות ככה בחושך, נטפל בזה. מה השם שלך?"
+  },
+  {
+   "caller": "אבי",
+   "en": "Avi"
+  },
+  {
+   "agent": "תודה אבי! מה הכתובת של הבניין?"
+  },
+  {
+   "caller": "בר כוכבא 23",
+   "en": "Bar Kochba 23"
+  },
+  {
+   "agent": "ומה מספר הדירה, אבי?"
+  },
+  {
+   "caller": "5",
+   "en": "5"
+  },
+  {
+   "agent": "פתחתי פנייה לטיפול בתאורה. מספר הפנייה הוא אחת שש אפס אחת. יש עוד משהו שאני יכול לעזור בו?",
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי",
+       "type": "lighting",
+       "urgency": "normal",
+       "building": "בר כוכבא 23",
+       "unit": "5",
+       "reporter_name": "אבי",
+       "name_declined": false,
+       "reporter_phone": "",
+       "phone_declined": false
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1601-26",
+       "reference_spoken": "אחת שש אפס אחת"
+      }
+     }
+    ]
+   ],
+   "heard": [
+    "רגע, אני רושם את זה.",
+    "פתחתי פנייה לטיפול בתאורה. מספר הפנייה הוא אחת שש אפס אחת. יש עוד משהו שאני יכול לעזור בו?"
+   ]
+  },
+  {
+   "caller": "לא זהו תודה ביי",
+   "hung_up": true,
+   "en": "No that's it thanks bye"
+  }
+ ],
+ "usage": [
+  {
+   "in": 5712,
+   "out": 56,
+   "cached": 0,
+   "reasoning": 30,
+   "cost": 0.029677
+  },
+  {
+   "in": 5744,
+   "out": 36,
+   "cached": 5709,
+   "reasoning": 16,
+   "cost": 0.0031756
+  },
+  {
+   "in": 5774,
+   "out": 36,
+   "cached": 5741,
+   "reasoning": 22,
+   "cost": 0.0031784
+  },
+  {
+   "in": 5793,
+   "out": 143,
+   "cached": 5771,
+   "reasoning": 49,
+   "cost": 0.0052754
+  },
+  {
+   "in": 5925,
+   "out": 33,
+   "cached": 5790,
+   "reasoning": 0,
+   "cost": 0.003648
+  }
+ ]
+}
