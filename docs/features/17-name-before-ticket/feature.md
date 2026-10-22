@@ -66,6 +66,7 @@ one line. For feel only, never quoted into a prompt: *"על איזה שם לרש
 | `reporter_name` | string | yes, unless `name_declined` | The person's name as they said it. |
 | `name_declined` | boolean | no | True only after they refused a second time. |
 | `reporter_phone` | string | phone calls with no number of their own | The number they gave, in any form. Ignored on WhatsApp. |
+| `phone_declined` | boolean | no | True only when they would not give a number after `need_phone`. |
 
 New refusals, in the shape the tool already uses (`opened: false` plus a
 `reason`). No row is written when one is returned.
