@@ -9,6 +9,36 @@ conversation that produced it.
 
 ---
 
+## 2026-10-22
+
+### Homies' updated spec checked against live (read-only), then feature 17: no ticket without a name
+- **Asked:** *"dont edit anything i want to ask are we aligned to this"*, with Homies' pasted *אפיון מעודכן לאישור* (8 sections). Answered in chat; nothing was edited for that answer, the worklog included.
+- **Not aligned, by feature** (*"in terms of the features what are not aligned"*):
+  - the phone agent never asks a name (0 of 31 bot tickets in 30 days carry one);
+  - the order of the details (spec: name, phone, building, flat, then the request);
+  - speed (about 3 s, about 6 with a tool);
+  - collection calls not connected;
+  - WhatsApp keeps the "לדבר עם נציג" button;
+  - the bot hands to staff for more than emergencies;
+  - the building and flat (and, for a balance, name and phone) are asked even when the number could identify them;
+  - three small ManyChat flows unread;
+  - tickets land on our dashboard, not OXS (test number only) or Monday.
+- **Corrected the same day, from Vapi's call records:** Omni does pass outside callers' numbers. The three calls that stored the office line came from internal extensions 200, 201 and 202. Two outside calls (a landline, `03…`) stored nothing, because Vapi leaves a local-form number out of `customer.number` and our code never read the SIP URI. A dialer call arrived as `dialer-<the number it rang>`.
+- **OXS and names:** OXS keeps a name per tenant (`/buildings/:id/tenants`), and 8,016 residents are imported, all with a name and phone. OXS tickets carry `reportedBy {name, apartmentNumber, entityId}`, filled on 42 of 44 read on 24 Sep, with no phone on any. The old ManyChat bot asks full name, address, floor and flat on five of six doors.
+- **The owner's design** (*"before we can open a ticket we should include the name"*, then *"i want it naturally then test it automatically"*): `docs/features/17-name-before-ticket/` (feature.md, context.md) and Plan A, `plan-a-phone.md`, which covers the backend and the phone line. WhatsApp is Plan B, after A ships.
+- **Built (Tasks 1-5, nothing deployed):**
+  - `supabase/functions/debt-tools/identity.ts`: the pure rules (`callNumberOf` reads the SIP URI and nulls internal extensions; `ticketGate`; `reporterNameOf`; `phoneOf` moved here unchanged). 18 Node tests: `node --test scripts/check_identity.test.ts`.
+  - `index.ts`: `open_request` refuses with `need_name` / `need_phone` behind `NAME_REQUIRED_CHANNELS` (unset = off). A named building we don't manage is still said first. It writes `reported_by_name`; the OXS copy's text gains `[דיווח: name, phone]`; the voice note opens with the caller's name. `scripts/check_function_syntax.mjs` parses the function without Deno.
+  - `supabase_functions.py` uploads `identity.ts` too and pushes the switch; `scripts/check_name_gate.py` is the live probe for later.
+  - The incoming agent: `vapi_tools.py` (`reporter_name`, `name_declined`, `reporter_phone`, `phone_declined`, `notify_team.caller_name`) and two sentences of `demo-inbound.md`: the name before the building at ticket time, the number only on `need_phone`, one explanation on a refusal, and the emergency alert before everything.
+  - The dashboard's tickets page shows the name above the number.
+- **Found and fixed on the way:** `dashboard/lib/i18n.ts` did not compile since 19 Oct. `'הומי'ז'` in single quotes ends the string at the mark, so any dashboard build would have failed. It is double-quoted now, and `tsc` is clean.
+- **Testing (Task 6, in progress):**
+  - `voice_qa.py bundle --candidate` plays the repo's prompt and tools.
+  - `scripts/voice_qa_name.json` holds ten callers.
+  - `scripts/check_name_flow.py` scores the transcripts; it has 8 tests of its own.
+  - Claude subagents play the calls. Three are on the live agent, to prove the check catches the gap; ten are on the candidate.
+
 ## 2026-10-21
 
 ### Voice: live through Omni's Tokomni; the slow turns are the AI model, not Vapi's server (read-only)

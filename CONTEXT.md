@@ -2501,6 +2501,29 @@ depend"*.
   (the earlier one leaves them, by design); check with `--base` that the stack holds
   every text before claiming either is ready.
 
+## A ticket carries who reported it: the name is asked when a ticket opens (feature 17, 22 Oct)
+
+Homies' updated spec (22 Oct, section 1) lists name, phone, building, flat, then the request.
+The owner placed the name at the moment a ticket opens: *"before we can open a ticket we
+should include the name"*. Before this, no bot ticket carried a name (0 of 31 in 30 days). The
+15 Sep fix had cut ticket identity down to building and flat, and the name stayed only on the
+balance check. That was deliberate and wrong.
+- **How it is held:**
+  - The prompt asks for the name, then the building and flat, each in a short question, never
+    as a form.
+  - `open_request` refuses with `need_name`, and on a call with no number, `need_phone`.
+  - A refusal is explained once; then `name_declined` / `phone_declined` open the ticket anyway.
+  - The emergency alert never waits for a name.
+- **The switch:** `NAME_REQUIRED_CHANNELS` per channel. An agent whose tool cannot send a name
+  yet must never be enforced: it would get `need_name` forever.
+- **A caller's number can arrive outside `customer.number`.** Omni sends outside callers in
+  local form, which Vapi leaves out of that field; the SIP URI still has it. A Homies extension
+  (2-4 digits as the caller's name) on the office line is staff, not the person to call back.
+  `identity.ts` `callNumberOf()` reads all of it, under Node tests.
+- **The name on OXS's record belongs to the flat, not the person.** So it is asked even when OXS
+  has one. The OXS copy keeps OXS's own tenant as `reportedBy` (24 Sep) and puts the reporter in
+  the text.
+
 ## How a WhatsApp change ships
 
 27 Sep, after the second regression in a day. Owner: *"we need to make sure
