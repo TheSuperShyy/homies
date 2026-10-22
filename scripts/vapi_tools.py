@@ -202,6 +202,30 @@ def _open_request(location):
                            "payment arrangement. A question about how much is owed "
                            "is not a payment ticket, that is get_balance.",
         }
+        # 22 Oct, feature 17: no ticket without who reported it. The webhook
+        # refuses with need_name / need_phone (NAME_REQUIRED_CHANNELS), so
+        # none of these is `required` here: a required field the model cannot
+        # fill yet is a field it invents.
+        props["reporter_name"] = {
+            "type": "string",
+            "description": "The name of the person reporting, as they said it on "
+                           "this call. Leave out rather than guess.",
+        }
+        props["name_declined"] = {
+            "type": "boolean",
+            "description": "true only when they were asked for their name, heard once "
+                           "that it is so the team knows who to contact, and still "
+                           "would not give it.",
+        }
+        props["reporter_phone"] = {
+            "type": "string",
+            "description": "Only after this tool answered need_phone: the number they "
+                           "gave to reach them, in digits.",
+        }
+        props["phone_declined"] = {
+            "type": "boolean",
+            "description": "true only when they would not give a number after need_phone.",
+        }
     elif location == "unit":
         # Outbound, since feature 14. The building is still a fact on the call
         # and stays absent, but a call covering several apartments sends `unit`
@@ -247,7 +271,15 @@ def _open_request(location):
                 "A fault in the resident's own fixtures, a blocked sink, a tap, an "
                 "appliance inside the flat, is theirs and not a ticket; common "
                 "property, the building's systems, and anything of unclear origin "
-                "(a leak from above, water in a wall) is.\n")
+                "(a leak from above, water in a wall) is.\n"
+                # 22 Oct, feature 17: the two new refusals.
+                "It also needs who is reporting. Without reporter_name it opens "
+                "nothing and answers need_name: ask for their name and call again. "
+                "need_phone means this call came with no number of its own: ask for "
+                "a number to reach them, read it back in words, and call again with "
+                "it as reporter_phone. Someone who will not give a name or a number, "
+                "after hearing once that it is so the team knows who to contact, "
+                "still gets the ticket: name_declined or phone_declined true.\n")
     return _fn(
         "open_request",
         lead +
@@ -590,6 +622,12 @@ INTAKE_TOOLS = [
                     "what the team reads, and a web call carries no caller number, so "
                     "what you write here is the only way back to them."
                 ),
+            },
+            # 22 Oct, feature 17: the note opens with who called.
+            "caller_name": {
+                "type": "string",
+                "description": "The caller's name, if they said it on this call. "
+                               "Leave out rather than guess.",
             },
             "department": {
                 "type": "string",
