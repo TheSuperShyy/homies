@@ -89,7 +89,7 @@ export default async function Tickets({
     // `request_media(...)` is the FK embed: the resident's photos, copied out
     // of Chatwoot by the Edge Function since 17 Sep. staff_read on that table
     // applies to the embed as it does to the row.
-    .select('reference,description,building,unit,reported_unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,oxs_notes,oxs_last_update,oxs_last_seen_at,request_media(storage_path,mime)',
+    .select('reference,description,building,unit,reported_unit,type,category_he,urgency,status,opened_via,created_at,reported_by_phone,reported_by_name,oxs_notes,oxs_last_update,oxs_last_seen_at,request_media(storage_path,mime)',
             { count: 'exact' });
   if (status) q = q.eq('status', status);
   // One extra query, and it is what makes the badge above mean anything: the
@@ -229,7 +229,11 @@ export default async function Tickets({
                       the only thing on an inbound ticket that cannot be
                       mis-heard, and on a needs_review row where the audio
                       failed it is often the only way back to the person. */}
-                  <td className="mono" data-label={t('col.caller')}>{r.reported_by_phone ?? <span className="muted">—</span>}</td>
+                  <td className="mono" data-label={t('col.caller')}>
+                    {/* Feature 17: who reported it, above the number to call back. */}
+                    {r.reported_by_name && <div dir="auto" style={{ fontFamily: 'inherit' }}>{r.reported_by_name}</div>}
+                    {r.reported_by_phone ?? <span className="muted">—</span>}
+                  </td>
                   {/* The Hebrew label the trigger wrote (OXS's own word on an
                       imported row), else ours for the slug; never the slug. */}
                   <td className="muted" dir="auto" data-label={t('col.type')}>{r.category_he ?? label(t, 'type', r.type)}</td>

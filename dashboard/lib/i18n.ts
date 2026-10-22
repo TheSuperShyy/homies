@@ -69,7 +69,7 @@ type Entry = { he: string; en: string };
  */
 const S = {
   // --- chrome -------------------------------------------------------------
-  'app.name':          { he: 'הומי'ז',          en: 'Homies' },   // the mark is the client's spelling (19 Oct)
+  'app.name':          { he: "הומי'ז",          en: 'Homies' },   // the mark is the client's spelling (19 Oct); double quotes, or the mark ends the string (22 Oct)
   'app.subtitle':      { he: 'ניהול בניינים',    en: 'Building management' },
   'nav.overview':      { he: 'סקירה',            en: 'Overview' },
   'nav.tickets':       { he: 'קריאות',           en: 'Tickets' },
