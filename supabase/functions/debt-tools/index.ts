@@ -44,6 +44,11 @@
 // already in front of it, and cannot reach one that is not.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// Who is calling and what a ticket still needs (feature 17, 22 Oct). Pure, so
+// Node can test it: scripts/check_identity.test.ts.
+import {
+  callNumberOf, flagOf, phoneOf, reporterLine, reporterNameOf, requiredChannels, ticketGate,
+} from "./identity.ts";
 
 const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -171,7 +176,10 @@ function context(message: any): CallContext {
     // interaction beside it stored the right one, and the dashboard's Caller
     // column was empty on the whole channel. Found 25 Aug, the hour complaints
     // became tickets — a complaint nobody can ring back is half a complaint.
-    callerPhone: phoneOf(call?.customer?.number) ?? phoneOf(v.caller_phone) ?? phoneOf(v.phone),
+    // 22 Oct (feature 17): callNumberOf() also reads the SIP URI, where Omni
+    // puts an outside caller in local form that Vapi leaves out of
+    // customer.number, and returns nothing for a Homies internal extension.
+    callerPhone: phoneOf(callNumberOf(call)) ?? phoneOf(v.caller_phone) ?? phoneOf(v.phone),
     assistantId: String(call?.assistantId ?? message?.assistant?.id ?? "").trim() || null,
     charges,
   };
@@ -939,6 +947,7 @@ async function oxsMirror(
   buildingOxsId: string, description: string, unit: string | null,
   reference: string, rowId: string, reporter: string | null,
   reporterUnit: string | null, building: string | null,
+  reporterName: string | null = null, callback: string | null = null,
 ) {
   const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
   if (!key) return; // not configured: the mirror is off, the ticket is fine
@@ -967,7 +976,8 @@ async function oxsMirror(
         // the two systems can be joined by a human as well as by oxs_ref.
         description: description
           + (unit ? ` (דירה ${unit})` : "")
-          + ` [בוט, סימוכין ${reference}]`,
+          + ` [בוט, סימוכין ${reference}]`
+          + reporterLine(reporterName, callback),
       }),
     });
     const d = await r.json().catch(() => null);
@@ -1007,6 +1017,14 @@ async function canonicalAddress(said: unknown): Promise<string> {
  */
 function dialled(ctx: CallContext): boolean {
   return Boolean(ctx.residentId || ctx.charges.length);
+}
+
+/** The name on the resident row of a call we placed (feature 17): the debt
+ *  agent's ticket carries the person it rang, and nobody is asked. */
+async function residentName(id: string | null): Promise<string | null> {
+  if (!id) return null;
+  const { data } = await db.from("residents").select("full_name").eq("id", id).maybeSingle();
+  return reporterNameOf(data?.full_name);
 }
 
 // ---------------------------------------------------------------------------
@@ -1123,38 +1141,7 @@ function saidTeamKnows(botText: string): boolean {
   return (SAID_TOLD.test(t) && SAID_TEAM.test(t)) || SAID_KNOWS.test(t) || SAID_PROMISED.test(t);
 }
 
-/**
- * A phone number as it is stored, or nothing.
- *
- * `residents.phone` is E.164 (+972501234567) everywhere — the seed writes it
- * that way and every OXS importer normalises to it. A person typing their own
- * number into WhatsApp does not: they write 050-123-4567, or 0501234567, or
- * paste it back with the country code. Comparing those to the column as typed
- * fails on a number that is genuinely theirs, and a security check that rejects
- * the honest case is a security check nobody keeps.
- *
- * Deliberately conservative about what it accepts. Anything that does not land
- * on a plausible Israeli number returns null and is treated as *not given* —
- * the caller is asked again rather than matched loosely.
- */
-function phoneOf(value: unknown): string | null {
-  const digits = String(value ?? "").replace(/\D+/g, "");
-  if (!digits) return null;
-  // With the country code, however it was written: +972-50…, 00972 50…, 972…
-  if (digits.startsWith("00972")) return e164(digits.slice(5));
-  if (digits.startsWith("972")) return e164(digits.slice(3));
-  // Local form, with the trunk zero.
-  if (digits.startsWith("0")) return e164(digits.slice(1));
-  // A mobile with the leading zero left off — 50 1234567.
-  if (/^5\d{8}$/.test(digits)) return e164(digits);
-  return null;
-}
-
-function e164(national: string): string | null {
-  const n = national.replace(/^0+/, "");
-  // Israeli national numbers are 8 (landline) or 9 (mobile) digits.
-  return n.length === 8 || n.length === 9 ? "+972" + n : null;
-}
+// phoneOf() and e164() moved to ./identity.ts on 22 Oct (feature 17), unchanged.
 
 /**
  * The number a WhatsApp resident TYPES for the balance check: phoneOf(), plus a
@@ -2921,6 +2908,12 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // are two buildings to that guard and one building to everybody else, so
     // the second report would mint a second ticket and dispatch a second van.
     const m = await matchBuilding(said);
+    // FEATURE 17 (22 Oct): a building nobody has named yet waits behind the
+    // name, so the reporter is asked who they are before where they are
+    // (Homies' spec, section 1). A building that WAS named and is not ours is
+    // still said first: nobody is asked for a name for a ticket that cannot
+    // open.
+    let noBuildingYet: Record<string, unknown> | null = null;
     if (!dialled(ctx) && m.status !== "found") {
       // AN INVENTED BUILDING IS A MISSING ONE (27 Sep). The chat model called
       // this with `building: "בניין מגורים"` -- "residential building", a
@@ -2935,14 +2928,15 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         && !latinStreet(said);
       if (m.status === "street_unknown" || m.status === "empty") {
         const need = m.status === "empty" || invented;
-        return {
+        const refusal = {
           ok: true, opened: false, building_found: false,
           reason: need ? "need_building" : "street_unknown",
           ...(m.status === "street_unknown" && latinStreet(said) ? { hint: LATIN_HINT } : {}),
           ...(need && channel(ctx) === "whatsapp" ? { note: ASK_WHERE } : {}),
         };
-      }
-      if (m.status === "need_number" || m.status === "number_off_street") {
+        if (!need) return refusal;
+        noBuildingYet = refusal;
+      } else if (m.status === "need_number" || m.status === "number_off_street") {
         return {
           ok: true, opened: false, building_found: false,
           reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
@@ -2950,12 +2944,36 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           numbers_we_manage: m.numbers,
           ...(m.status === "need_number" && channel(ctx) === "whatsapp" ? { note: ASK_WHERE } : {}),
         };
+      } else {
+        return {
+          ok: true, opened: false, building_found: false, reason: "ambiguous",
+          candidates: m.candidates.map((b: any) => b.address).slice(0, 5),
+        };
       }
-      return {
-        ok: true, opened: false, building_found: false, reason: "ambiguous",
-        candidates: m.candidates.map((b: any) => b.address).slice(0, 5),
-      };
     }
+
+    // WHO IS REPORTING (feature 17, 22 Oct). No ticket without the name of the
+    // person reporting and a number to call them back (the owner: "before we
+    // can open a ticket we should include the name"). The prompt asks; this
+    // makes it true, because a rule a model must remember is a rule it drops
+    // (23 Aug: five runs, zero chained calls). Switched per channel by
+    // NAME_REQUIRED_CHANNELS, so an agent whose tool cannot send a name yet is
+    // never refused forever. A call we placed already knows who it rang.
+    const reporterName = reporterNameOf(args?.reporter_name)
+      ?? (dialled(ctx) ? await residentName(ctx.residentId) : null);
+    const givenPhone = phoneOf(args?.reporter_phone);
+    const missing = ticketGate({
+      channel: channel(ctx),
+      dialled: dialled(ctx),
+      enforced: requiredChannels(Deno.env.get("NAME_REQUIRED_CHANNELS")),
+      name: reporterName,
+      nameDeclined: flagOf(args?.name_declined),
+      phone: reporterPhone(ctx) ?? givenPhone,
+      phoneDeclined: flagOf(args?.phone_declined),
+    });
+    if (missing) return { ok: true, opened: false, reason: missing };
+    if (noBuildingYet) return noBuildingYet;
+
     const building = (m.status === "found" ? String(m.building.address) : "") || said;
 
     // ctx first, argument second — outbound the apartment is a fact attached to
@@ -3177,6 +3195,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           building,
           unit,
           reported_unit: reporterFlat,
+          reported_by_name: reporterName,
+          ...(givenPhone && !reporterPhone(ctx) ? { reported_by_phone: givenPhone } : {}),
           // Stays `emergency` however this call rates it. The urgency was set
           // by somebody in trouble, and a later, calmer sentence describing the
           // same incident must not quietly downgrade it.
@@ -3189,7 +3209,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (upErr) return { ok: false, error: upErr.message };
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
-                        reporterPhone(ctx), reporterFlat, building);
+                        reporterPhone(ctx), reporterFlat, building,
+                        reporterName, reporterPhone(ctx) ?? givenPhone);
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -3205,7 +3226,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         building,
         unit,
         reported_unit: reporterFlat,
-        reported_by_phone: reporterPhone(ctx),
+        reported_by_phone: reporterPhone(ctx) ?? givenPhone,
+        reported_by_name: reporterName,
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
       })
@@ -3221,7 +3243,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     if (m.status === "found") {
       await oxsMirror(String(m.building.id), String(args.description), unit,
                       data.reference, data.id, reporterPhone(ctx),
-                      reporterFlat, building);
+                      reporterFlat, building,
+                      reporterName, reporterPhone(ctx) ?? givenPhone);
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The
@@ -3635,6 +3658,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // for nothing either way.
     let team_notified: boolean | undefined;
     if (isIntake(ctx)) {
+      // Feature 17: the note opens with who called, when they said it.
+      const who = reporterNameOf(args?.caller_name);
       try {
         team_notified = await voiceNote({
           call_id: ctx.callId,
@@ -3645,7 +3670,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           label: await voiceLabel(args?.building, args?.unit),
           reason,
           department: String(args?.department ?? "").trim(),
-          description: String(args?.description ?? "").trim().slice(0, 500),
+          description: ((who ? who + ": " : "") + String(args?.description ?? "").trim()).slice(0, 500),
           source: "tool",
         });
       } catch (e) {
@@ -4007,7 +4032,7 @@ async function endOfCall(message: any, ctx: CallContext) {
          INTAKE_ASSISTANT_IDS.has(String(call?.assistantId ?? "")))
       ? "inbound" : "outbound",
     resident_id: ctx.residentId,
-    caller_phone: call?.customer?.number ?? null,
+    caller_phone: callNumberOf(call),
     transcript,
     summary: message?.summary ?? artifact?.summary ?? null,
     audio_url: message?.recordingUrl ?? artifact?.recordingUrl ?? artifact?.recording?.stereoUrl ?? null,
