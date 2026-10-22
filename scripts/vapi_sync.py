@@ -356,6 +356,10 @@ TARGETS = {
             # everything, the address before the name after a gas alert). NOT `minimal`:
             # Vapi's enum offers it, but this model does not take it (max, xhigh, high,
             # medium, low, none). Undo: drop the key (back to medium).
+            # MEASURED ON VAPI THE SAME DAY, IT SAVED NOTHING: three simulated voice calls
+            # (scripts/vapi_sim_inbound.py) had the model stage at 1.34 s median against 1.22 s
+            # on 21 Oct's medium calls. Kept because it changed nothing in what Michael says;
+            # it is not the latency fix.
             "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low"},
             # "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},   # 6 Sep - 19 Oct
             # SPEECHMATICS WAS TRIED ON INBOUND ON 30 SEP AND DROPPED THE SAME DAY,

@@ -1,0 +1,23 @@
+Voice test through Vapi's simulated callers, 22 Oct 2026 (run ce78b883, 14:27 to 14:31 UTC).
+The live incoming agent (reasoningEffort low), three calls. The caller: Assaf Clix, בר כוכבא 23 flat 2,
+with Homies' office line as caller_phone; notify_team mocked. Script: scripts/vapi_sim_inbound.py.
+Page for the owner: https://claude.ai/artifact/Aq652BHhREN13gqjHUmEC5
+
+Checks (Vapi's judge, and the tool calls read by hand): 3 of 3 passed.
+  light, name asked        name asked before the ticket; no phone asked; 255-1370-26 with reporter_name
+  leak, all given at once  nothing asked twice; 255-1371-26 with reporter_name; number read out
+  status of the light      get_request_status by building, flat and type; no new ticket
+
+Wait per turn (Vapi's turn latency, end of the caller's speech to Michael's first sound):
+  22 Oct test calls, low       3.68 s median, 3.87 s mean, 12 turns
+  21 Oct through 208, medium   3.23 s median, 3.58 s mean, 15 turns
+Stages, mean over the turns where the model answered (endpointing / transcriber / model / voice):
+  22 Oct  0.74 / 0.61 / 1.61 / 0.86 s
+  21 Oct  0.50 / 0.52 / 1.58 / 0.98 s
+Model stage median: 1.34 s on low (9 turns) against 1.22 s on medium (13 turns). Low made no
+measurable difference on Vapi's path; the OpenRouter replay's 0.7 s did not carry over.
+
+Cost: $0.61 of Vapi credit (Michael's side $0.29, the simulated caller $0.32).
+Seen along the way: get_request_status's waiting line recorded as "2º אני בודק" (first seen 21 Oct);
+the status answer read the full reference ("255. 1370 2 6") where confirmations read the short one.
+test-calls.json: the three calls' lines, tool calls and results, Vapi's evaluations and per-turn latencies.

@@ -29,6 +29,22 @@ conversation that produced it.
   - **`caller_phone`** = the office line, so it sounds like an outside call whose number came through.
   - **`notify_team` mocked**, so the team is never paged; every other tool is real.
   - **The report:** Vapi's per-turn stages, the transcript gaps (`vapi_latency.gaps`) and the tool calls, beside 21 Oct's two calls through 208 on `medium`.
+- **Ran in the background:** run `ce78b883`, 14:27 to 14:31 UTC, all three `passed`. The override Vapi sent the agent carried `reasoningEffort: low`, so the test measured the live setting.
+- **The name flow, in voice:** 3 of 3 passed (Vapi's judge, and the tool calls read by hand).
+  - **Light:** the name was asked first ("מה השם שלך כדי שאפתח פנייה?"), then the building, then the flat. Ticket 255-1370-26 carries `reporter_name`. No phone was asked.
+  - **Leak:** the ticket opened at once with the name (255-1371-26), and nothing was asked twice.
+  - **Status:** looked up by building, flat and type, with no new ticket.
+- **The wait: not fixed.**
+  - Vapi's turn latency is 3.68 s median today (12 turns), against 3.23 s on 21 Oct's real calls (15 turns).
+  - The model stage is 1.34 s median against 1.22 s, so low made no measurable difference on Vapi's path.
+  - Stage means today: endpointing 0.74 s, transcriber 0.61 s, model 1.61 s, voice 0.86 s.
+- **Cost:** $0.61 (Michael's side $0.29, the simulated caller $0.32), under the $1.20 estimate because the calls ran 54 to 82 s.
+- **Seen, separate from the name:**
+  - The lookup's waiting line is recorded as "2º אני בודק" (21 Oct's issue).
+  - The status answer read the full reference.
+- **Privacy:** the script keeps the 21 Oct real calls as timings only. Their words and tool arguments (a real address) never reach the run folder or the repo.
+- **Page for the owner:** https://claude.ai/artifact/Aq652BHhREN13gqjHUmEC5.
+- **Record:** `docs/assistant/transcripts/2026-10-22-voice-sim/` (`result.txt`, `test-calls.json`).
 
 ### Voice latency: the incoming agent thinks at `low` (LIVE 12:46:38 UTC), chosen by a replay test ($0.50)
 - **Asked:** *"so for the latency have we fixed it"* (no: nothing had changed), then *"ok lets fix that and test it automatically"*.

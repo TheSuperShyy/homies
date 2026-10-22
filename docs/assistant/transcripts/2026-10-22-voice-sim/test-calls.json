@@ -1,0 +1,389 @@
+[
+ {
+  "scenario": "status of the light",
+  "status": "passed",
+  "evaluations": [
+   {
+    "name": "opened_new_ticket",
+    "expectedValue": false,
+    "extractedValue": false,
+    "passed": true
+   }
+  ],
+  "vapi_latency": {
+   "avgTurn": 3700,
+   "avgModel": 1482,
+   "avgVoice": 390,
+   "turnCount": 4,
+   "avgEndpointing": 784,
+   "avgTranscriber": 343
+  },
+  "call_id": "01a16404-03ac-7225-b85c-2dc26c15c40d",
+  "started": "2026-10-22T14:29:07.423Z",
+  "cost": 0.104,
+  "turn_latencies": [
+   {
+    "modelLatency": 0,
+    "voiceLatency": 0,
+    "transcriberLatency": 499,
+    "endpointingLatency": 801,
+    "turnLatency": 4039
+   },
+   {
+    "modelLatency": 1851,
+    "voiceLatency": 403,
+    "transcriberLatency": 383,
+    "endpointingLatency": 801,
+    "turnLatency": 3456
+   },
+   {
+    "modelLatency": 2736,
+    "voiceLatency": 550,
+    "transcriberLatency": 0,
+    "endpointingLatency": 732,
+    "turnLatency": 4050
+   },
+   {
+    "modelLatency": 1339,
+    "voiceLatency": 605,
+    "transcriberLatency": 490,
+    "endpointingLatency": 801,
+    "turnLatency": 3255
+   }
+  ],
+  "messages": [
+   {
+    "role": "bot",
+    "secondsFromStart": 1.812,
+    "message": "היי ערב טוב מיכאל מחברת הומייז. איך אני יכול לעזור לך היום?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 9.24,
+    "message": "היי מיכאל! זה אסף כליקס בר כוכבא 23 דירה 2 רציתי לשאול מה קורה עם הנורה בחדר מדרגות בקומה 3 דיווחתי על זה קודם"
+   },
+   {
+    "role": "tool_calls",
+    "secondsFromStart": 24.123,
+    "message": "",
+    "toolCalls": [
+     {
+      "id": "call_VqxTOBdCM98Nen1pg6aV6g2K",
+      "type": "function",
+      "function": {
+       "name": "get_request_status",
+       "arguments": "{\n  \"type\": \"lighting\",\n  \"unit\": \"2\",\n  \"building\": \"בר כוכבא 23\"\n}"
+      }
+     }
+    ]
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 25.482,
+    "message": "2º אני בודק"
+   },
+   {
+    "role": "tool_call_result",
+    "secondsFromStart": 26.233,
+    "result": "{\"ok\":true,\"found\":8,\"as_of\":\"live\",\"other_open\":9,\"requests\":[{\"reference\":\"255-1370-26\",\"status\":\"open\",\"type\":\"lighting\",\"urgency\":\"normal\",\"opened\":\"2026-10-22\",\"last_update\":\"2026-10-22\",\"description\":\"הנורה בחדר המדרגות בקומה 3 לא עובדת כבר יומיים, ובערב חשוך שם.\"},{\"reference\":\"255-1365-26\",\"status\":\"open\",\"type\":\"lighting\",\"urgency\":\"normal\",\"opened\":\"2026-10-19\",\"last_update\":\"2026-10-19\",\"description\":\"האור בחדר מדרגות בקומה 2 לא עובד כבר כמה ימים חושך מוחלט בערב\"},{\"reference\":\"255-1349-26\",\"status\":\"open\",\"type\":\"electrical\",\"urgency\":\"emergency\",\"opened\":\"2026-10-05\",\"last_update\":\"2026-10-05\",\"description\":\"נזילה מהתקרה בחדר מדרגות בין קומה 1 ל-2, ישר על מנורה מהבהבת. יש שלולית על המדרגות. | נזילה מהתקרה בחדר מדרגות ישר על מנורה מהבהבת, עם שלולית על המדרגות, בין קומה 1 ל-2. הדייר שואל אם לכבות את החשמל.\"},{\"reference\":\"255-1348-26\",\"status\":\"open\",\"type\":\"lighting\",\"urgency\":\"normal\",\"opened\":\"2026-10-05\",\"last_update\":\"2026-10-05\",\"description\":\"אין אור בכל החניון\"},{\"reference\":\"255-1347-26\",\"status\":\"open\",\"type\":\"electrical\",\"urgency\":\"normal\",\"opened\":\"2026-10-05\",\"last_update\":\"2026-10-05\",\"description\":\"האינטרקום בכניסה לא מצלצל בדירה 2, לוחצים למטה ואין צלצול למעלה | נזילת מים מהתקרה בחדר מדרגות בין קומה 1 ל-2, ישירות על מנורה מהבהבת. יש שלולית על המדרגות.\"},{\"reference\":\"255-1344-26\",\"status\":\"open\",\"type\":\"plumbing\",\"urgency\":\"high\",\"opened\":\"2026-10-05\",\"last_update\":\"2026-10-05\",\"description\":\"נזילה מהתקרה באמבטיה מהבוקר מטפטף ממש ליד המנורה. נראה לי זה מדירה 4 מלמעלה דפקתי ואף אחד לא פותח\"},{\"reference\":\"255-1336-26\",\"status\":\"open\",\"type\":\"lighting\",\"urgency\":\"normal\",\"opened\":\"2026-09-29\",\"last_update\":\"2026-09-29\",\"description\":\"אין תאורה בלילה בחדר המדרגות\"},{\"reference\":\"255-1332-26\",\"status\":\"open\",\"type\":\"lighting\",\"urgency\":\"normal\",\"opened\":\"2026-09-27\",\"last_update\":\"2026-09-27\",\"description\":\"האורות בחדר המדרגות בקומה 1, 2 ו-3 מהבהבים, קשה לעלות במדרגות עם רדת החשיכה.\"}]}"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 30.44,
+    "message": "אין בעיה, אני מחכה"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 35.791998046875,
+    "message": "מצאתי את הפנייה"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 36.09,
+    "message": "כן אני פה יופי תודה אתה יודע אולי מתי זה אמור להסתדר?"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 49.432,
+    "message": "הפנייה עדיין פתוחה אבל אין לי מועד לביצוע או מידע מתי זה אמור להסתדר. מספר הפנייה הוא 255. 1370 2 6. יש עוד משהו שתרצה שאבדוק?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 65.61,
+    "message": "להתראות"
+   }
+  ]
+ },
+ {
+  "scenario": "leak, all given at once",
+  "status": "passed",
+  "evaluations": [
+   {
+    "name": "asked_again",
+    "expectedValue": false,
+    "extractedValue": false,
+    "passed": true
+   },
+   {
+    "name": "gave_ticket_number",
+    "expectedValue": true,
+    "extractedValue": true,
+    "passed": true
+   }
+  ],
+  "vapi_latency": {
+   "avgTurn": 4158,
+   "avgModel": 1063,
+   "avgVoice": 266,
+   "turnCount": 2,
+   "avgEndpointing": 552,
+   "avgTranscriber": 859
+  },
+  "call_id": "01a16405-a71b-766b-8fea-c6a247499cf4",
+  "started": "2026-10-22T14:30:54.689Z",
+  "cost": 0.0741,
+  "turn_latencies": [
+   {
+    "modelLatency": 0,
+    "voiceLatency": 0,
+    "transcriberLatency": 184,
+    "endpointingLatency": 801,
+    "turnLatency": 3809
+   },
+   {
+    "modelLatency": 2126,
+    "voiceLatency": 531,
+    "transcriberLatency": 1533,
+    "endpointingLatency": 302,
+    "turnLatency": 4507
+   }
+  ],
+  "messages": [
+   {
+    "role": "bot",
+    "secondsFromStart": 1.973,
+    "message": "היי ערב טוב מיכאל מחברת הומיז. איך אני יכול לעזור לך היום?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 9.48,
+    "message": "היי אסף כליקס. בר כוכבה 23 דירה 2 יש נזילה מהתקרה בלובי למטה ליד התיבות דואר כבר מהבוקר,"
+   },
+   {
+    "role": "tool_calls",
+    "secondsFromStart": 23.23,
+    "message": "",
+    "toolCalls": [
+     {
+      "id": "call_27LrEuJwMgELXQ0ieyFOMjgr",
+      "type": "function",
+      "function": {
+       "name": "open_request",
+       "arguments": "{\n  \"type\": \"plumbing\",\n  \"unit\": \"2\",\n  \"urgency\": \"normal\",\n  \"building\": \"בר כוכבא 23\",\n  \"description\": \"יש נזילה מהתקרה בלובי למטה ליד תיבות הדואר, כבר מהבוקר.\",\n  \"reporter_name\": \"אסף כליקס\"\n}"
+      }
+     }
+    ]
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 24.722998046875,
+    "message": "רגע אני רושם את זה"
+   },
+   {
+    "role": "tool_call_result",
+    "secondsFromStart": 25.692,
+    "result": "{\"ok\":true,\"reference\":\"255-1371-26\",\"reference_spoken\":\"אחת שלוש שבע אחת\"}"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 28.643,
+    "message": "פתחתי פנייה לטיפול בנזילה בלובי ליד תיבות הדואר."
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 29.97,
+    "message": "תודה"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 32.883,
+    "message": "מספר הפנייה הוא 1371. יש עוד פרט שכדאי שהוסיף לפנייה?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 40.61,
+    "message": "לא, זה הכל תודה רבה, לילה טוב."
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 48.132998046875,
+    "message": "בשמחה אסף. תודה על השיחה. להתראות."
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 53.36,
+    "message": "להתראות"
+   }
+  ]
+ },
+ {
+  "scenario": "light, name asked",
+  "status": "passed",
+  "evaluations": [
+   {
+    "name": "asked_name_before_ticket",
+    "expectedValue": true,
+    "extractedValue": true,
+    "passed": true
+   },
+   {
+    "name": "asked_phone",
+    "expectedValue": false,
+    "extractedValue": false,
+    "passed": true
+   }
+  ],
+  "vapi_latency": {
+   "avgTurn": 3889,
+   "avgModel": 1069,
+   "avgVoice": 937,
+   "turnCount": 6,
+   "avgEndpointing": 834,
+   "avgTranscriber": 577
+  },
+  "call_id": "01a16402-24f9-7225-b85b-a4c108298051",
+  "started": "2026-10-22T14:27:04.764Z",
+  "cost": 0.1092,
+  "turn_latencies": [
+   {
+    "modelLatency": 2424,
+    "voiceLatency": 2268,
+    "transcriberLatency": 486,
+    "endpointingLatency": 801,
+    "turnLatency": 5990
+   },
+   {
+    "modelLatency": 968,
+    "voiceLatency": 873,
+    "transcriberLatency": 883,
+    "endpointingLatency": 801,
+    "turnLatency": 3545
+   },
+   {
+    "modelLatency": 1141,
+    "voiceLatency": 483,
+    "transcriberLatency": 539,
+    "endpointingLatency": 801,
+    "turnLatency": 3001
+   },
+   {
+    "modelLatency": 0,
+    "voiceLatency": 0,
+    "transcriberLatency": 382,
+    "endpointingLatency": 1001,
+    "turnLatency": 4087
+   },
+   {
+    "modelLatency": 1131,
+    "voiceLatency": 1015,
+    "transcriberLatency": 557,
+    "endpointingLatency": 801,
+    "turnLatency": 3535
+   },
+   {
+    "modelLatency": 748,
+    "voiceLatency": 982,
+    "transcriberLatency": 612,
+    "endpointingLatency": 801,
+    "turnLatency": 3174
+   }
+  ],
+  "messages": [
+   {
+    "role": "bot",
+    "secondsFromStart": 2.18,
+    "message": "היי טוב מדבר מיכאל מחברת הומיס איך אני יכול לעזור לך היום"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 9.7000009765625,
+    "message": "הנורה בחדר מדרגות בקומה 3 לא עובדת כבר יומיים ממש חשוך שם בערב"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 22.29,
+    "message": "לא נעים לעלות ככה בחושך. מה השם שלך כדי שאפתח פנייה?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 28.69,
+    "message": "אסף כליקס"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 33.030001953125,
+    "message": "תודה, אסף. מה הכתובת של הבניין?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 37.39,
+    "message": "בר כוכבא 23 תל אביב"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 43.06,
+    "message": "ומה מספר הדירה שלך?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 47.18,
+    "message": "דירה 2"
+   },
+   {
+    "role": "tool_calls",
+    "secondsFromStart": 50.852,
+    "message": "",
+    "toolCalls": [
+     {
+      "id": "call_qt3TVlYkyNdWAng5Se6B59sH",
+      "type": "function",
+      "function": {
+       "name": "open_request",
+       "arguments": "{\n  \"type\": \"lighting\",\n  \"unit\": \"2\",\n  \"urgency\": \"normal\",\n  \"building\": \"בר כוכבא 23 תל אביב\",\n  \"description\": \"הנורה בחדר המדרגות בקומה 3 לא עובדת כבר יומיים, ובערב חשוך שם.\",\n  \"reporter_name\": \"אסף כליקס\"\n}"
+      }
+     }
+    ]
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 52.47,
+    "message": "רגע אני רושם את זה"
+   },
+   {
+    "role": "tool_call_result",
+    "secondsFromStart": 54.523,
+    "result": "{\"ok\":true,\"reference\":\"255-1370-26\",\"reference_spoken\":\"אחת שלוש שבע אפס\"}"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 56.16,
+    "message": "אין בעיה תודה"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 61.41,
+    "message": "בשמחה הפנייה נפתחה ומספר הפנייה הוא 1 3 7 0 יש עוד משהו שאני יכול לעזור בו?"
+   },
+   {
+    "role": "user",
+    "secondsFromStart": 71.27000390625,
+    "message": "תּוֹדָה רֵבָה זה הכול ערב טוב"
+   },
+   {
+    "role": "bot",
+    "secondsFromStart": 78.18,
+    "message": "בשמחה, אסף, תודה שהתקשרת. ערב נעים ולהתראות."
+   }
+  ]
+ }
+]

@@ -2557,9 +2557,20 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
     - Given everything at once, it said it was opening a ticket and asked a question instead.
     - After a gas alert, it asked the address before the name.
   - A model that does not think follows the nearest cue. The incoming agent runs `low` since 22 Oct.
-- **OpenRouter times compare levels, not the caller's wait.** Medium took 3.6 s on average there,
-  and 1.5 s on Vapi's own path (21 Oct). Only a call through 208 and `vapi_latency.py` measure
-  the real wait.
+- **OpenRouter times compare levels, not the caller's wait, and a gain there may not exist on
+  Vapi.** Medium took 3.6 s on average there and 1.5 s on Vapi's own path (21 Oct). Low saved
+  0.7 s a reply on OpenRouter. Measured on Vapi the same day it saved nothing: the model stage
+  was 1.34 s median on low against 1.22 s on medium. Judge a latency change on Vapi's path.
+- **Vapi's simulations measure that path without a phone (`scripts/vapi_sim_inbound.py`).**
+  `/eval/simulation/*` places real voice calls between a simulated caller and the live agent.
+  - Each turn gets Vapi's own stages: endpointing, transcriber, model, voice.
+  - `targetOverrides.variableValues.caller_phone` gives the call a number.
+  - `toolMocks` keeps `notify_team` from paging anyone. The other tools run for real, so the
+    tickets are real, in the test building.
+  - The run sends the assistant's model block as an override; check that it carries the live
+    settings (it did: `reasoningEffort: low`).
+  - Both sides bill: three one-minute calls cost $0.61.
+  - It does not cover Omni's leg from Israel; only calls through 208 do.
 - **Price a replay's first call per moment at full rate.** The cache does not hit the first time
   a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
   for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.

@@ -859,7 +859,13 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - none: 1.39 s mean, 1.37 s median.
         - **Choices:** low made the same choices as the original in all 8. None changed 2 of 9 against the prompt.
         - **Record:** `docs/assistant/transcripts/2026-10-22-thinking-level/`.
-        - **Not yet measured on Vapi's path:** the next call through 208, then `vapi_latency.py --turns`.
+        - **Measured on Vapi's path the same day, and low is NOT the fix.** Three simulated voice calls (`scripts/vapi_sim_inbound.py`, $0.61):
+          - The model stage was 1.34 s median against 1.22 s on 21 Oct's medium calls.
+          - The whole turn is still 3.7 s median (21 Oct: 3.2 s; the target is 0.8 s).
+          - Where a turn goes: model about 1.6 s, voice about 0.9 s, endpointing 0.5 to 0.75 s, transcriber about 0.6 s.
+          - Low stays live: it changed nothing in what Michael says.
+          - The page for the owner is https://claude.ai/artifact/Aq652BHhREN13gqjHUmEC5, and the record is in `docs/assistant/transcripts/2026-10-22-voice-sim/`.
+          - Real calls through 208 are still the only measure of the phone leg.
         - **The bigger lever is `none`,** about 2.2 s faster per reply on OpenRouter. It would need prompt work and a new go.
         - **Undo:** drop `reasoningEffort` in `vapi_sync.py` and sync with `--keep-voice`.
     - **22 Oct: feature 17, no ticket without a name (LIVE on the phone line since 10:24 UTC; WhatsApp is Plan B, not built).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
