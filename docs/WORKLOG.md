@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-22
 
+### Voice test through Vapi's simulated callers: the wait on `low` and the name flow, in voice
+- **Asked:** *"can you test it via voice agent? but run it in background use apify to talk with it like before and create an artifact for it"*. "Apify" is read as Vapi: "before" is `vapi_eval.py`, Vapi's own simulated caller. Nothing in the repo ever used Apify.
+- **Before spending:**
+  - **The Vapi account:** it has spent $0.98 since 7 Oct (15 calls). The balance cannot be read with a private key (401 on `/org`). The ninth account was a $5 trial that ran out and refused every call.
+  - **Real call costs:** 21 Oct's calls through 208 cost about $0.12-0.13 a minute on the agent's side.
+  - **Estimate:** about $1.20 for three calls. The caller hangs up by 150 s, so at most about $1.75.
+- **The API:** Vapi's spec no longer lists the old `/test-suite` paths (the endpoint still answers). The current one is `/eval/simulation/*`, which has:
+  - personality and scenario objects;
+  - `targetOverrides` (variables into the target);
+  - `toolMocks`;
+  - `latencyExpectations`;
+  - a run whose items carry the target's `callId`.
+- **`scripts/vapi_sim_inbound.py` (new):** one run with three inline simulations against the live incoming agent, over `vapi.websocket`.
+  - **The caller:** Assaf Clix, בר כוכבא 23, flat 2, on gpt-4.1 with Azure he-IL voice and transcriber.
+  - **The calls:** the light with the name asked; a leak with everything given at once; the status of the light.
+  - **`caller_phone`** = the office line, so it sounds like an outside call whose number came through.
+  - **`notify_team` mocked**, so the team is never paged; every other tool is real.
+  - **The report:** Vapi's per-turn stages, the transcript gaps (`vapi_latency.gaps`) and the tool calls, beside 21 Oct's two calls through 208 on `medium`.
+
 ### Voice latency: the incoming agent thinks at `low` (LIVE 12:46:38 UTC), chosen by a replay test ($0.50)
 - **Asked:** *"so for the latency have we fixed it"* (no: nothing had changed), then *"ok lets fix that and test it automatically"*.
 - **Found first, free:** OpenRouter's model list gives gpt-5.6-sol's thinking levels: max, xhigh, high, medium, low, none. The default is `medium`, so the agent's unset `reasoningEffort` meant medium. `minimal`, which Vapi's enum offers and the 21 Oct note proposed, is not one of them.
