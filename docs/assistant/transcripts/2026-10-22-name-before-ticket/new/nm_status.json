@@ -1,0 +1,20 @@
+{"scenario": "nm_status", "turns": [
+  {"agent": "היי, בוקר טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
+   "en": "Hi, good morning! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "כן שלום בוקר טוב אה דיווחתי אתמול על האינטרקום שלא עובד אצלנו בבניין ורציתי לדעת אם קרה עם זה משהו",
+   "en": "yes hello good morning uh I reported yesterday about the intercom that isn't working in our building and I wanted to know if anything happened with it"},
+  {"agent": "אוי, בלי אינטרקום זה באמת לא נוח! אני אבדוק מה קורה עם הפנייה. מה הכתובת?",
+   "en": "Oh, without an intercom that's really inconvenient! I'll check what's happening with the request. What's the address?"},
+  {"caller": "בר כוכבא 23 דירה 8",
+   "en": "Bar Kochba 23 apartment 8"},
+  {"rounds": [[{"tool": "get_request_status",
+                "arguments": {"building": "בר כוכבא 23", "unit": "8"},
+                "result": {"ok": true, "found": 1, "as_of": "live", "other_open": 0,
+                           "requests": [{"reference": "255-1590-26", "reference_spoken": "אחת חמש תשע אפס", "type": "maintenance", "status": "open", "description": "האינטרקום בכניסה לא עובד", "created": "yesterday"}]}}]],
+   "agent": "מצאתי אותה! הפנייה על האינטרקום בכניסה, מספר אחת חמש תשע אפס, עדיין פתוחה, ואין אצלי עדכון מעבר לזה. יש משהו שתרצה שאוסיף לה?",
+   "en": "Found it! The request about the intercom at the entrance, number one five nine zero, is still open, and I don't have an update beyond that. Is there anything you'd like me to add to it?"},
+  {"caller": "אה טוב אז זה עוד פתוח לא אין מה להוסיף רק רציתי לדעת שזה לא נשכח טוב תודה רבה יום טוב",
+   "en": "ah okay so it's still open no there's nothing to add I just wanted to know it wasn't forgotten okay thanks a lot have a good day"},
+  {"agent": "בשמחה! תודה שהתקשרת, המשך בוקר נעים ולהתראות!",
+   "en": "Gladly! Thanks for calling, have a nice rest of the morning and goodbye!"}
+]}

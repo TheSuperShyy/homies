@@ -33,11 +33,20 @@ conversation that produced it.
   - The incoming agent: `vapi_tools.py` (`reporter_name`, `name_declined`, `reporter_phone`, `phone_declined`, `notify_team.caller_name`) and two sentences of `demo-inbound.md`: the name before the building at ticket time, the number only on `need_phone`, one explanation on a refusal, and the emergency alert before everything.
   - The dashboard's tickets page shows the name above the number.
 - **Found and fixed on the way:** `dashboard/lib/i18n.ts` did not compile since 19 Oct. `'הומי'ז'` in single quotes ends the string at the mark, so any dashboard build would have failed. It is double-quoted now, and `tsc` is clean.
-- **Testing (Task 6, in progress):**
+- **Testing (Task 6, done; no model billed):**
   - `voice_qa.py bundle --candidate` plays the repo's prompt and tools.
   - `scripts/voice_qa_name.json` holds ten callers.
-  - `scripts/check_name_flow.py` scores the transcripts; it has 8 tests of its own.
-  - Claude subagents play the calls. Three are on the live agent, to prove the check catches the gap; ten are on the candidate.
+  - `scripts/check_name_flow.py` scores the transcripts; it has 10 tests of its own.
+  - Claude subagents played every call.
+  - **The live agent: 0 of 3.** Every ticket opened with no name asked, so the check catches the gap.
+  - **The new version: 10 of 10.**
+  - **One scorer bug, found by the run and fixed with a test:** its lookahead for "the street's name" also skipped "ומה השם של הדייר?", which failed a correct call.
+  - **Read by hand, not only scored:**
+    - the gas call alerts the team before any question, gives no safety advice, then asks the name, address and flat, and the emergency ticket carries the name;
+    - the refusal hears the reason once, the ticket opens with `name_declined`, and there is no third ask;
+    - the office-extension call gets `need_phone`, asks the tenant's number and reads it back.
+  - The record is in `docs/assistant/transcripts/2026-10-22-name-before-ticket/` (`new/`, `live/`, `result.txt`).
+- **Not live.** Plan A Task 7 (deploy, sync, switch on, the owner's call through 208) waits for the owner's go.
 
 ## 2026-10-21
 

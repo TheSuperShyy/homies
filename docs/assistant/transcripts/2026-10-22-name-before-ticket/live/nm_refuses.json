@@ -1,0 +1,14 @@
+{"scenario": "nm_refuses", "turns": [
+  {"agent": "היי, ערב טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?", "en": "Hi, good evening! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "כן ערב טוב אה תשמע המעלית אצלנו תקועה מהצהריים", "en": "yeah good evening uh listen our lift has been stuck since the afternoon"},
+  {"agent": "אוי, כמה שעות בלי מעלית זה באמת לא פשוט. יש מישהו תקוע בתוכה עכשיו?", "en": "Oh, a few hours without a lift really isn't easy. Is anyone stuck inside it right now?"},
+  {"caller": "לא לא אין אף אחד בפנים היא פשוט עומדת בקומה 2 ולא זזה", "en": "no no there's nobody inside it's just standing on floor 2 and not moving"},
+  {"agent": "טוב לשמוע שאין שם אף אחד! אני אפתח על זה פנייה, מה הכתובת של הבניין ומספר הדירה?", "en": "Good to hear nobody's in there! I'll open a request about it, what's the building's address and the apartment number?"},
+  {"caller": "בר כוכבא 23 דירה 7", "en": "Bar Kochba 23 apartment 7"},
+  {"rounds": [[{"tool": "open_request", "arguments": {"type": "elevator", "building": "בר כוכבא 23", "unit": "7", "urgency": "high", "description": "המעלית תקועה בקומה השנייה מהצהריים ולא זזה, אין אף אחד בתוכה"}, "result": {"ok": true, "reference": "255-1603-26", "reference_spoken": "אחת שש אפס שלוש"}}]],
+   "agent": "פתחתי פנייה על המעלית, ומספר הפנייה הוא אחת שש אפס שלוש. יש עוד משהו שאני יכול לעזור בו?", "en": "I've opened a request about the lift, and the request number is one six zero three. Is there anything else I can help with?"},
+  {"caller": "טוב נו ומתי יבואו לתקן את זה", "en": "ok well so when are they coming to fix it"},
+  {"agent": "מתי בדיוק יגיעו, את זה אין לי, ואני לא רוצה לנחש. מה שכן, הפנייה פתוחה עם כל הפרטים, ובכל פעם שתתקשר אני יכול לבדוק מה קורה איתה.", "en": "When exactly they'll come, that I don't have, and I don't want to guess. What I can say is the request is open with all the details, and any time you call I can check what's happening with it."},
+  {"caller": "טוב יאללה תודה", "en": "ok fine thanks"},
+  {"agent": "בשמחה! תודה שהתקשרת, ערב נעים ולהתראות!", "en": "My pleasure! Thanks for calling, have a nice evening, and goodbye!"}
+]}

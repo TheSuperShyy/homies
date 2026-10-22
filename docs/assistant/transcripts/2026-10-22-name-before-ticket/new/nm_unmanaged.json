@@ -1,0 +1,19 @@
+{"scenario": "nm_unmanaged", "turns": [
+  {"agent": "היי, צהריים טובים! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?", "en": "Hi, good afternoon! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "כן שלום אה הדלת כניסה של הבניין שלנו לא נסגרת", "en": "Yes hello uh the entrance door of our building doesn't close"},
+  {"agent": "אוי, זה באמת לא נעים, ככה כל אחד יכול להיכנס לבניין. מה בדיוק קורה כשסוגרים אותה?", "en": "Oh, that's really not nice, that way anyone can walk into the building. What exactly happens when you close it?"},
+  {"caller": "אה היא פשוט לא נסגרת נשארת פתוחה", "en": "Uh it just doesn't close it stays open"},
+  {"agent": "אוקיי, בוא נפתח על זה פנייה. עם מי אני מדבר?", "en": "Okay, let's open a request on it. Who am I speaking with?"},
+  {"caller": "אלי", "en": "Eli"},
+  {"agent": "נעים מאוד, אלי! מה הכתובת של הבניין?", "en": "Nice to meet you, Eli! What's the building's address?"},
+  {"caller": "הרצל 5 ברמת גן", "en": "Herzl 5 in Ramat Gan"},
+  {"agent": "תודה! ומה מספר הדירה?", "en": "Thanks! And what's the apartment number?"},
+  {"caller": "דירה 4", "en": "Apartment 4"},
+  {"rounds": [[{"tool": "open_request", "arguments": {"description": "דלת הכניסה של הבניין לא נסגרת, נשארת פתוחה", "type": "maintenance", "urgency": "normal", "building": "הרצל 5, רמת גן", "unit": "4", "reporter_name": "אלי"}, "result": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"}}]],
+   "agent": "סליחה, אלי, יכול להיות שלא שמעתי טוב. תוכל להגיד לי שוב את שם הרחוב?", "en": "Sorry, Eli, maybe I didn't hear right. Could you tell me the street name again?"},
+  {"caller": "הרצל 5 ברמת גן", "en": "Herzl 5 in Ramat Gan"},
+  {"rounds": [[{"tool": "open_request", "arguments": {"description": "דלת הכניסה של הבניין לא נסגרת, נשארת פתוחה", "type": "maintenance", "urgency": "normal", "building": "הרצל 5, רמת גן", "unit": "4", "reporter_name": "אלי"}, "result": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"}}]],
+   "agent": "אני מצטער, אלי, את הבניין בהרצל חמש ברמת גן אנחנו לא מנהלים, אז אין לי איך לפתוח עליו פנייה. על הדלת כדאי לדבר עם ועד הבית או עם מי שמנהל את הבניין. יש עוד משהו שאני יכול לעזור בו?", "en": "I'm sorry, Eli, the building at Herzl five in Ramat Gan, we don't manage it, so I have no way to open a request on it. About the door, it's worth talking to the house committee or whoever manages the building. Is there anything else I can help with?"},
+  {"caller": "אה טוב אוקיי לא זהו תודה", "en": "Ah well okay no that's it thanks"},
+  {"agent": "תודה שהתקשרת, אלי, ובהצלחה עם הדלת! המשך אחר צהריים נעים ולהתראות!", "en": "Thanks for calling, Eli, and good luck with the door! Have a nice rest of the afternoon, and goodbye!"}
+]}

@@ -3,6 +3,7 @@
 
     python scripts/voice_qa.py bundle --run DIR    # live prompts, tools, the deck, PLAYER.md
                                                    #   (--deck PATH for another card file)
+                                                   #   (--candidate: the repo's prompt and tools, not live)
     python scripts/voice_qa.py cost --run DIR      # OpenRouter price of DIR/transcripts/*.json
     python scripts/voice_qa.py play --run DIR      # SPENDS: the live models on OpenRouter, into DIR/played/
                                                    #   (VOICE_QA_ONLY=id,id to run some; stops at $1)
@@ -122,7 +123,7 @@ def run_deck(run):
     return load(here) if os.path.exists(here) else load(DECK)
 
 
-def bundle(run, deck_path=DECK):
+def bundle(run, deck_path=DECK, candidate=False):
     import prompt_probe as P
     deck = load(deck_path)
     forms = gender_forms()
@@ -131,6 +132,12 @@ def bundle(run, deck_path=DECK):
     # debt agent too, for nothing).
     for target in sorted({s["agent"] for s in deck["scenarios"]}):
         prompt, first, tools = P.live_prompt(P.TARGETS[target])
+        if candidate:
+            # 22 Oct, feature 17: the working tree's prompt and tools, so a
+            # change is played before it is synced. The live first message
+            # stays; the candidate does not change it.
+            prompt = P.file_prompt(P.TARGETS[target], os.path.join(ROOT, P.TARGETS[target]["doc"]))
+            tools = P.repo_tools(P.TARGETS[target])
         live[target] = (prompt, first, tools)
         print("%-8s live prompt %d chars, first message %d chars, tools: %s"
               % (target, len(prompt), len(first), ", ".join(t["function"]["name"] for t in tools)))
@@ -1245,7 +1252,7 @@ def main():
         # --deck picks another card file (5 Oct: scripts/voice_qa_inbound_4.json);
         # cost and play then read the copy bundle leaves in the run folder.
         deck = argv[argv.index("--deck") + 1] if "--deck" in argv else DECK
-        return bundle(argv[2], deck)
+        return bundle(argv[2], deck, candidate="--candidate" in argv)
     {"cost": cost, "play": play, "say": say}.get(argv[0], lambda run: sys.exit(__doc__))(argv[2])
 
 

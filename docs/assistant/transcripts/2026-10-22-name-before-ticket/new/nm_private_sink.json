@@ -1,0 +1,12 @@
+{"scenario": "nm_private_sink", "turns": [
+  {"agent": "היי, צהריים טובים! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
+   "en": "Hi, good afternoon! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "היי צהריים טובים אה תשמע יש לי בעיה עם הכיור במטבח מאתמול הוא לא מתנקז כמו שצריך כאילו המים יורדים אבל ממש ממש לאט אני שוטפת 2 צלחות וכבר יש לי שם הבריכה ואז אני עומדת ומחכה שזה ירד אז אני צריכה שמישהו יבוא לתקן את זה",
+   "en": "hi good afternoon uh listen I've got a problem with the sink in the kitchen since yesterday it doesn't drain properly like the water goes down but really really slowly I wash 2 plates and already there's the pool there and then I stand and wait for it to go down so I need someone to come and fix it"},
+  {"agent": "אוי, זה באמת מעצבן, במיוחד באמצע שטיפת כלים! כיור שבתוך הדירה זה כבר בטיפול שֶׁלָּךְ, עם אינסטלטור פרטי. יש עוד משהו שאני יכול לעזור בו?",
+   "en": "Oh, that's really annoying, especially in the middle of doing the dishes! A sink inside the flat, that's already yours to deal with, with a private plumber. Is there anything else I can help with?"},
+  {"caller": "אה אוקיי האמת לא ידעתי חשבתי שאתם מטפלים גם בזה טוב אין בעיה זה באמת רק אצלי בכל מקרה אז אני אזמין מישהו לא זהו זה מה שהיה לי תודה רבה מיכאל",
+   "en": "ah okay honestly I didn't know I thought you take care of that too well no problem it really is only at my place anyway so I'll get someone in no that's it that's all I had thanks a lot Michael"},
+  {"agent": "בשמחה, ובהצלחה עם הכיור! תודה על השיחה, המשך יום נעים ולהתראות!",
+   "en": "My pleasure, and good luck with the sink! Thanks for the call, have a nice rest of the day and goodbye!"}
+]}

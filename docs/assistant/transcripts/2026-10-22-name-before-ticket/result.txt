@@ -1,0 +1,23 @@
+Feature 17, played calls, 22 Oct 2026. Claude played callers and agent; no model was billed.
+Deck: scripts/voice_qa_name.json. Scorer: scripts/check_name_flow.py.
+
+== live agent (prompt and tools as on Vapi, 22 Oct)
+FAIL nm_gas                   named, asked_first
+FAIL nm_light_noname          named, asked_first
+FAIL nm_refuses               named, asked_first
+
+0 of 3 passed
+
+== new version (repo prompt and tools, voice_qa.py bundle --candidate)
+ok   nm_gas                   
+ok   nm_light_noname          
+ok   nm_name_upfront          
+ok   nm_payment               
+ok   nm_private_sink          
+ok   nm_refuses               
+ok   nm_staff_no_number       
+ok   nm_status                
+ok   nm_two_issues            
+ok   nm_unmanaged             
+
+10 of 10 passed

@@ -1,0 +1,18 @@
+{"scenario": "nm_refuses", "turns": [
+  {"agent": "היי, ערב טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?", "en": "Hi, good evening! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "כן ערב טוב אה תשמע המעלית אצלנו תקועה מהצהריים בקומה השנייה", "en": "yes good evening uh listen the lift at our place has been stuck since the afternoon on the second floor"},
+  {"agent": "אוי, זה ממש מעצבן, ועוד כל כך הרבה שעות! יש מישהו בתוך המעלית?", "en": "Oh, that's really annoying, and for so many hours too! Is there anyone inside the lift?"},
+  {"caller": "לא לא אין אף אחד בפנים היא פשוט עומדת שם בקומה שתיים", "en": "no no there's nobody inside it's just standing there on floor two"},
+  {"agent": "טוב, לפחות אף אחד לא נתקע בפנים! בוא נפתח על זה פנייה. עם מי אני מדבר?", "en": "Well, at least nobody got stuck inside! Let's open a request about it. Who am I speaking with?"},
+  {"caller": "זה לא משנה מי אני העיקר שיתקנו את המעלית", "en": "it doesn't matter who I am the main thing is that they fix the lift"},
+  {"agent": "ברור, זה העיקר! את השם אני מבקש רק כדי שהצוות יידע עם מי לדבר. מה השם?", "en": "Of course, that's the main thing! I'm only asking for the name so the team knows who to talk to. What's the name?"},
+  {"caller": "אמרתי לך זה לא משנה תפתח את זה וזהו", "en": "I told you it doesn't matter just open it and that's that"},
+  {"agent": "אין בעיה, נסתדר גם בלי! מה הכתובת של הבניין?", "en": "No problem, we'll manage without it! What's the address of the building?"},
+  {"caller": "בר כוכבה 23", "en": "Bar Kochba 23 (speech-to-text spelled the street slightly wrong)"},
+  {"agent": "תודה! ובאיזו דירה אתה?", "en": "Thanks! And which flat are you in?"},
+  {"caller": "דירה 7", "en": "flat 7"},
+  {"rounds": [[{"tool": "open_request", "arguments": {"description": "המעלית תקועה מהצהריים בקומה השנייה, אין אף אחד בפנים", "type": "elevator", "urgency": "high", "building": "בר כוכבא 23", "unit": "7", "name_declined": true}, "result": {"ok": true, "reference": "255-1603-26", "reference_spoken": "אחת שש אפס שלוש"}}]],
+   "agent": "זהו, פתחתי פנייה על המעלית! מספר הפנייה אחת שש אפס שלוש. יש עוד משהו שאני יכול לעזור בו?", "en": "There you go, I've opened a request about the lift! The request number is one six zero three. Is there anything else I can help with?"},
+  {"caller": "לא זהו תודה", "en": "no that's it thanks"},
+  {"agent": "בשמחה! תודה שהתקשרת, ערב נעים ולהתראות!", "en": "My pleasure! Thanks for calling, have a pleasant evening, and goodbye!"}
+]}

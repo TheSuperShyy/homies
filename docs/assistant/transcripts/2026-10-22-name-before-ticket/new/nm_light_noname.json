@@ -1,0 +1,14 @@
+{"scenario": "nm_light_noname", "turns": [
+  {"agent": "היי, בוקר טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?", "en": "Hi, good morning! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "אה המנורה בחדר מדרגות בקומה שלישית לא עובדת כבר יומיים בערב חושך על המדרגות", "en": "uh the light in the stairwell on the third floor hasn't been working for two days in the evening it's dark on the stairs"},
+  {"agent": "אוי, לעלות במדרגות בחושך זה באמת לא נעים! עם מי אני מדבר?", "en": "Oh, going up the stairs in the dark really isn't pleasant! Who am I speaking with?"},
+  {"caller": "אבי", "en": "Avi"},
+  {"agent": "נעים מאוד, אבי! מה הכתובת של הבניין?", "en": "Nice to meet you, Avi! What's the address of the building?"},
+  {"caller": "בר כוכבא 23", "en": "Bar Kochba 23"},
+  {"agent": "תודה! ובאיזו דירה אתה גר?", "en": "Thanks! And which apartment do you live in?"},
+  {"caller": "5", "en": "5"},
+  {"rounds": [[{"tool": "open_request", "arguments": {"description": "המנורה בחדר מדרגות בקומה שלישית לא עובדת כבר יומיים, בערב חושך על המדרגות", "type": "lighting", "urgency": "normal", "building": "בר כוכבא 23", "unit": "5", "reporter_name": "אבי"}, "result": {"ok": true, "reference": "255-1601-26", "reference_spoken": "אחת שש אפס אחת"}}]],
+   "agent": "פתחתי פנייה על המנורה בחדר המדרגות בקומה השלישית, המספר שלה אחת שש אפס אחת. יש עוד משהו שאני יכול לעזור בו?", "en": "I've opened a ticket for the light in the stairwell on the third floor, its number is one six zero one. Is there anything else I can help with?"},
+  {"caller": "לא זהו תודה", "en": "no that's it thanks"},
+  {"agent": "בשמחה, אבי! תודה שהתקשרת, המשך בוקר נעים ולהתראות!", "en": "My pleasure, Avi! Thanks for calling, have a pleasant rest of the morning, and goodbye!"}
+]}

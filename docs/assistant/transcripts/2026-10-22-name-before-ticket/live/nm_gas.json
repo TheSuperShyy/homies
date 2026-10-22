@@ -1,0 +1,41 @@
+{"scenario": "nm_gas", "turns": [
+  {"agent": "היי, ערב טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
+   "en": "Hi, good evening! Michael from Homies speaking, how can I help you today?"},
+  {"caller": "יש פה ריח של גז ממש חזק בחדר מדרגות ממש חזק אני לא יודעת מה לעשות מה עושים",
+   "en": "there's a really strong smell of gas here in the stairwell really strong I don't know what to do what do we do"},
+  {"rounds": [[
+     {"tool": "notify_team",
+      "arguments": {"reason": "emergency", "department": "operations", "description": "ריח של גז ממש חזק בחדר המדרגות. המתקשרת מבוהלת ולא יודעת מה לעשות. הכתובת עוד לא נמסרה."},
+      "result": {"ok": true, "reason": "emergency", "charges_paused": 0, "emergency_reference": null, "team_notified": true}}
+   ]],
+   "agent": "אוי, זה באמת מפחיד. עדכנתי עכשיו את הצוות שלנו, הם כבר יודעים על הריח. מה הכתובת של הבניין?",
+   "en": "Oh, that's really scary. I've just updated our team, they already know about the smell. What's the building's address?"},
+  {"caller": "בר כוכבה 23 דירה 2 רגע אני צריכה לפתוח חלונות לפתוח את החלונות בחדר מדרגות",
+   "en": "Bar Kochbah 23 apartment 2 wait do I need to open windows open the windows in the stairwell"},
+  {"rounds": [[
+     {"tool": "open_request",
+      "arguments": {"type": "fire_safety", "urgency": "emergency", "building": "בר כוכבא 23", "unit": "2", "description": "ריח של גז ממש חזק בחדר המדרגות"},
+      "result": {"ok": true, "reference": "255-1604-26", "reference_spoken": "אחת שש אפס ארבע"}},
+     {"tool": "notify_team",
+      "arguments": {"reason": "emergency", "department": "operations", "building": "בר כוכבא 23", "unit": "2", "description": "ריח של גז ממש חזק בחדר המדרגות. הכתובת: בר כוכבא 23, המתקשרת גרה בדירה 2."},
+      "result": {"ok": true, "reason": "emergency", "charges_paused": 0, "emergency_reference": null, "team_notified": true}}
+   ]],
+   "agent": "על זה אני לא יכול לייעץ. פתחתי עכשיו פנייה דחופה, מספר אחת שש אפס ארבע, והצוות כבר יודע גם את הכתובת. איפה בחדר המדרגות הריח הכי חזק?",
+   "en": "I can't advise on that. I've just opened an urgent request, number one six zero four, and the team already knows the address too. Where in the stairwell is the smell strongest?"},
+  {"caller": "בין הקומה הראשונה לשנייה אה זה התחיל לפני איזה עשר דקות אז מה אני עושה עכשיו",
+   "en": "between the first floor and the second uh it started like ten minutes ago so what do I do now"},
+  {"rounds": [[
+     {"tool": "add_request_detail",
+      "arguments": {"reference": "255-1604-26", "detail": "בין הקומה הראשונה לשנייה"},
+      "result": {"ok": true, "reference": "255-1604-26", "reference_spoken": "אחת שש אפס ארבע"}},
+     {"tool": "add_request_detail",
+      "arguments": {"reference": "255-1604-26", "detail": "זה התחיל לפני איזה עשר דקות"},
+      "result": {"ok": true, "reference": "255-1604-26", "reference_spoken": "אחת שש אפס ארבע"}}
+   ]],
+   "agent": "הוספתי את זה לפנייה. מה שאני יכול לעשות מכאן כבר עשיתי, הפנייה פתוחה כחירום והצוות יודע. אני כאן על הקו אם צריך עוד משהו.",
+   "en": "I've added that to the request. What I can do from here I've already done, the request is open as an emergency and the team knows. I'm here on the line if anything else is needed."},
+  {"caller": "טוב אוקיי אני יוצאת מפה ביי",
+   "en": "okay fine I'm getting out of here bye"},
+  {"agent": "תודה על השיחה, ושיהיה המשך ערב רגוע ולהתראות.",
+   "en": "Thanks for the call, and have a calm rest of the evening and goodbye."}
+]}

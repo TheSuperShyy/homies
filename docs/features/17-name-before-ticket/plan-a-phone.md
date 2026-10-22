@@ -1205,9 +1205,10 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-# "מה השם" but not "מה השם של הרחוב": a street question is not a name question.
-NAME_ASK = re.compile(r"(על איזה שם|על שם מי|מה השם(?!\s+של\s+ה)|מה שמך|איך קוראים ל|את שמך|"
-                      r"השם שלך|השם המלא|שם מלא|עם מי (אני|יש לי))")
+# "מה השם" but not "מה השם של הרחוב/הבניין": a place's name is not the person's.
+# "מה השם של הדייר" IS a name question (22 Oct, nm_staff_no_number).
+NAME_ASK = re.compile(r"(על איזה שם|על שם מי|מה השם(?!\s+של\s+ה?(רחוב|בניין))|מה שמך|"
+                      r"איך קוראים ל|את שמך|השם שלך|השם המלא|שם מלא|עם מי (אני|יש לי))")
 PHONE_WORD = re.compile(r"טלפון")
 PHONE_ASK = re.compile(r"(מספר (טלפון|שאפשר|נייד|ליצירת קשר|לחזור)|לאיזה מספר|באיזה מספר)")
 
@@ -1305,7 +1306,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run the checker's test**
 
 Run: `python -X utf8 scripts/check_name_flow_test.py`
-Expected: `Ran 8 tests` … `OK`.
+Expected: `Ran 10 tests` … `OK`. Two tests in a `Questions` class were added during the run (22 Oct): "ומה השם של הדייר?" is a name question, and "מה השם של הרחוב?" is not. The first lookahead had skipped the tenant's name along with the street's, and failed a correct call.
 
 - [ ] **Step 5: The deck**
 

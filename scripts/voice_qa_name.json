@@ -1,0 +1,383 @@
+{
+ "_about": "Feature 17 (22 Oct): no ticket without the reporter's name, and on a call with no number of its own, a number. Ten incoming calls in בר כוכבא 23, the one building opened for tests. Claude plays each caller as a real person and the agent from the candidate prompt and tools. Scored by scripts/check_name_flow.py against each card's expect.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1541-26 -> אחת חמש ארבע אחת).",
+  "open_request": {
+   "_rule": "Apply these in order. (1) The building, exactly as before: Bar Kochba (בר כוכבא, any spelling) with another number: number_not_on_street; Bar Kochba with no number: need_number; any other street: street_unknown. (2) ONLY if open_request's parameters in the context include reporter_name: no reporter_name and no name_declined true: need_name. (3) Only then, ONLY if the card's call_has_number is false: no reporter_phone and no phone_declined true: need_phone. (4) No building at all: need_building. Otherwise opened. A second call with the same building and type inside 30 minutes returns the first reference with duplicate: true.",
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_name": {
+    "ok": true,
+    "opened": false,
+    "reason": "need_name"
+   },
+   "need_phone": {
+    "ok": true,
+    "opened": false,
+    "reason": "need_phone"
+   },
+   "need_building": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_building"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "street": "בר כוכבא",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "number_not_on_street": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "number_not_on_street",
+    "street": "בר כוכבא",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "save_partial_request": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "add_request_detail": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "notify_team": {
+   "_rule": "reason is echoed back as sent.",
+   "ok": true,
+   "reason": "<the reason sent>",
+   "charges_paused": 0,
+   "emergency_reference": null,
+   "team_notified": true
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "get_balance": {
+   "_rule": "Building בר כוכבא 23 with apartment 1, 2 or 3: that flat's record (the scenario's fixture). Any other flat: found 0 with the note.",
+   "flat_1": {
+    "ok": true,
+    "found": 1,
+    "resident": "עידו קליקס",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "unit": "1",
+    "owed_total": 2000,
+    "owed_months": [
+     {
+      "period": "2026-01",
+      "amount": 250
+     },
+     {
+      "period": "2026-02",
+      "amount": 250
+     },
+     {
+      "period": "2026-03",
+      "amount": 250
+     },
+     {
+      "period": "2026-04",
+      "amount": 250
+     },
+     {
+      "period": "2026-05",
+      "amount": 250
+     },
+     {
+      "period": "2026-06",
+      "amount": 250
+     },
+     {
+      "period": "2026-07",
+      "amount": 250
+     },
+     {
+      "period": "2026-08",
+      "amount": 250
+     }
+    ],
+    "in_review": []
+   },
+   "flat_2": {
+    "ok": true,
+    "found": 1,
+    "resident": "אסף קליקס",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "unit": "2",
+    "owed_total": 2000,
+    "owed_months": [
+     {
+      "period": "2026-01",
+      "amount": 250
+     },
+     {
+      "period": "2026-02",
+      "amount": 250
+     },
+     {
+      "period": "2026-03",
+      "amount": 250
+     },
+     {
+      "period": "2026-04",
+      "amount": 250
+     },
+     {
+      "period": "2026-05",
+      "amount": 250
+     },
+     {
+      "period": "2026-06",
+      "amount": 250
+     },
+     {
+      "period": "2026-07",
+      "amount": 250
+     },
+     {
+      "period": "2026-08",
+      "amount": 250
+     }
+    ],
+    "in_review": []
+   },
+   "not_found": {
+    "ok": true,
+    "found": 0,
+    "note": "No single apartment matched, so no balance was read: this is NOT a zero balance. Say you could not find it, and ask for or check the street, number and apartment with them."
+   }
+  },
+  "get_service_info": {
+   "ok": true,
+   "found": false,
+   "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+  }
+ },
+ "scenarios": [
+  {
+   "id": "nm_light_noname",
+   "agent": "inbound",
+   "title": "A stairwell light is out; he never offers his name",
+   "time": "10:20",
+   "weekday_he": "שני",
+   "ticket": "255-1601-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "אבי, 45, in a hurry, polite, short answers. Speaks about himself in the masculine.",
+    "knows": "Lives at בר כוכבא 23, apartment 5. The light on the third-floor landing has been out for two days; it is dark on the stairs in the evening.",
+    "wants": "Someone to change the light.",
+    "tendencies": "Starts with the problem, not a greeting. Answers only what he is asked. Does not volunteer his name or flat."
+   },
+   "expect": {
+    "ticket": true
+   }
+  },
+  {
+   "id": "nm_name_upfront",
+   "agent": "inbound",
+   "title": "She says her name, building and flat in the first breath",
+   "time": "09:05",
+   "weekday_he": "שלישי",
+   "ticket": "255-1602-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "דנה לוי, 38, organised and direct. Speaks about herself in the feminine.",
+    "knows": "Lives at בר כוכבא 23, apartment 4. Water is dripping from the ceiling of the ground-floor lobby near the mailboxes since this morning.",
+    "wants": "A ticket for the leak.",
+    "tendencies": "Opens with: her name, building and flat, then the leak, all in one sentence. Gets a little impatient if asked for something she already said."
+   },
+   "expect": {
+    "ticket": true,
+    "name_given": true
+   }
+  },
+  {
+   "id": "nm_refuses",
+   "agent": "inbound",
+   "title": "Will not give a name: why does it matter, just fix it",
+   "time": "18:40",
+   "weekday_he": "רביעי",
+   "ticket": "255-1603-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "A man in his 60s, suspicious of giving details on the phone, gruff but not rude.",
+    "knows": "Lives at בר כוכבא 23, apartment 7. The lift has been stuck on the second floor since the afternoon; nobody is inside.",
+    "wants": "The lift fixed.",
+    "tendencies": "When asked his name, says it does not matter. If asked again, refuses again and says just open it. Gives the building and flat when asked."
+   },
+   "expect": {
+    "ticket": true,
+    "refuses_name": true
+   }
+  },
+  {
+   "id": "nm_gas",
+   "agent": "inbound",
+   "title": "A strong smell of gas in the stairwell, frightened",
+   "time": "21:10",
+   "weekday_he": "חמישי",
+   "ticket": "255-1604-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "רונית, 52, frightened and talking fast. Speaks about herself in the feminine.",
+    "knows": "Lives at בר כוכבא 23, apartment 2. A strong smell of gas on the stairwell between the first and second floors, started ten minutes ago.",
+    "wants": "Help now; asks what she should do.",
+    "tendencies": "Starts with the smell, before any greeting. Asks whether to open windows. Gives her name and building when asked, quickly."
+   },
+   "expect": {
+    "ticket": true,
+    "emergency": true
+   }
+  },
+  {
+   "id": "nm_payment",
+   "agent": "inbound",
+   "title": "Wants to arrange paying the building fee in instalments",
+   "time": "11:30",
+   "weekday_he": "ראשון",
+   "ticket": "255-1605-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "יוסי, 41, friendly, a bit embarrassed about being behind.",
+    "knows": "Lives at בר כוכבא 23, apartment 1. Knows he owes a few months of the building fee.",
+    "wants": "To pay it off in instalments.",
+    "tendencies": "Says he wants to pay but in parts. Does not ask how much he owes. Gives details when asked."
+   },
+   "expect": {
+    "ticket": true
+   }
+  },
+  {
+   "id": "nm_private_sink",
+   "agent": "inbound",
+   "title": "Her kitchen sink is blocked: her own fixture",
+   "time": "13:15",
+   "weekday_he": "שני",
+   "ticket": "255-1606-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "מירב, 33, chatty. Speaks about herself in the feminine.",
+    "knows": "Lives at בר כוכבא 23, apartment 3. Her kitchen sink drains very slowly since yesterday; nothing else in the building is affected.",
+    "wants": "Someone to come and fix the sink.",
+    "tendencies": "Explains the sink in detail. Accepts kindly when told it is hers to handle."
+   },
+   "expect": {
+    "ticket": false
+   }
+  },
+  {
+   "id": "nm_unmanaged",
+   "agent": "inbound",
+   "title": "A building Homies does not manage",
+   "time": "15:45",
+   "weekday_he": "שלישי",
+   "ticket": "255-1607-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "אלי, 50, calm.",
+    "knows": "Lives at הרצל 5, Ramat Gan. The entrance door of his building does not close.",
+    "wants": "The door fixed.",
+    "tendencies": "Says his address when asked, the same way twice if asked again."
+   },
+   "expect": {
+    "ticket": false
+   }
+  },
+  {
+   "id": "nm_staff_no_number",
+   "agent": "inbound",
+   "title": "Homies staff calling from the office extension for a tenant: the call has no number",
+   "time": "12:00",
+   "weekday_he": "רביעי",
+   "ticket": "255-1608-26",
+   "call_has_number": false,
+   "caller": {
+    "persona": "שירן from the Homies office, calling on behalf of an elderly tenant. Speaks about herself in the feminine.",
+    "knows": "The tenant is משה ברק, בר כוכבא 23, apartment 6. The building's front gate does not lock since this morning. The tenant's number is 052-4418823.",
+    "wants": "A ticket for the gate, with the tenant's details.",
+    "tendencies": "Says she is calling from the office for a tenant. Gives the tenant's name and number when asked."
+   },
+   "expect": {
+    "ticket": true
+   }
+  },
+  {
+   "id": "nm_status",
+   "agent": "inbound",
+   "title": "Asks what is happening with yesterday's ticket",
+   "time": "10:50",
+   "weekday_he": "חמישי",
+   "ticket": "255-1609-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "גדי, 60, patient.",
+    "knows": "Lives at בר כוכבא 23, apartment 8. Reported a broken intercom yesterday; does not remember the ticket number.",
+    "wants": "To know if anything happened.",
+    "tendencies": "Gives the building and flat when asked. Thanks and ends the call."
+   },
+   "expect": {
+    "ticket": false
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "requests": [
+      {
+       "reference": "255-1590-26",
+       "reference_spoken": "אחת חמש תשע אפס",
+       "type": "maintenance",
+       "status": "open",
+       "description": "האינטרקום בכניסה לא עובד",
+       "created": "yesterday"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "nm_two_issues",
+   "agent": "inbound",
+   "title": "Two problems in one call: the lift is noisy, and the mailbox door is broken",
+   "time": "16:20",
+   "weekday_he": "ראשון",
+   "ticket": "255-1610-26",
+   "call_has_number": true,
+   "caller": {
+    "persona": "נעמה, 29, cheerful. Speaks about herself in the feminine.",
+    "knows": "Lives at בר כוכבא 23, apartment 9. The lift makes a loud grinding noise between floors. The little door of the building's mailbox for flat 9 is broken off.",
+    "wants": "Both fixed.",
+    "tendencies": "Reports the lift first. After the first ticket, adds: and one more thing, the mailbox."
+   },
+   "expect": {
+    "ticket": true
+   }
+  }
+ ]
+}

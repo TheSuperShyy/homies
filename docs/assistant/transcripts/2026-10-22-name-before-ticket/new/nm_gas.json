@@ -1,0 +1,116 @@
+{
+ "scenario": "nm_gas",
+ "turns": [
+  {
+   "agent": "היי, ערב טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
+   "en": "Hi, good evening! Michael from Homies speaking, how can I help you today?"
+  },
+  {
+   "caller": "יש ריח חזק של גז בחדר מדרגות אה ממש חזק בין הקומה הראשונה לשנייה זה התחיל לפני 10 דקות אני לא יודעת מה לעשות",
+   "en": "there's a strong smell of gas in the stairwell uh really strong between the first floor and the second it started 10 minutes ago I don't know what to do"
+  },
+  {
+   "rounds": [
+    [
+     {
+      "tool": "notify_team",
+      "arguments": {
+       "reason": "emergency",
+       "description": "ריח חזק של גז בחדר המדרגות, בין הקומה הראשונה לשנייה. התחיל לפני כעשר דקות. המתקשרת מבוהלת ולא יודעת מה לעשות. כתובת ודירה עוד לא נמסרו.",
+       "department": "operations"
+      },
+      "result": {
+       "ok": true,
+       "reason": "emergency",
+       "charges_paused": 0,
+       "emergency_reference": null,
+       "team_notified": true
+      }
+     }
+    ]
+   ],
+   "agent": "אוי, זה באמת מפחיד. עדכנתי עכשיו את הצוות שלנו, והם כבר יודעים על הריח. עם מי אני מדבר?",
+   "en": "Oh, that's really frightening. I've just updated our team, and they already know about the smell. Who am I speaking with?"
+  },
+  {
+   "caller": "רונית אה תגיד אני צריכה לפתוח את החלונות בחדר מדרגות או לא",
+   "en": "Ronit uh tell me do I need to open the windows in the stairwell or not"
+  },
+  {
+   "agent": "רונית, על החלונות אני לא יכול להגיד מה לעשות. מה שעשיתי זה לעדכן את הצוות, והם יודעים על הריח. מה הכתובת של הבניין?",
+   "en": "Ronit, about the windows I can't say what to do. What I did is update the team, and they know about the smell. What's the address of the building?"
+  },
+  {
+   "caller": "בר כוכבא 23 בתל אביב",
+   "en": "Bar Kochba 23 in Tel Aviv"
+  },
+  {
+   "agent": "ובאיזו דירה אַתְּ גרה?",
+   "en": "And which flat do you live in?"
+  },
+  {
+   "caller": "דירה 2",
+   "en": "flat 2"
+  },
+  {
+   "rounds": [
+    [
+     {
+      "tool": "open_request",
+      "arguments": {
+       "description": "ריח חזק של גז בחדר המדרגות, בין הקומה הראשונה לשנייה. התחיל לפני כעשר דקות.",
+       "type": "fire_safety",
+       "urgency": "emergency",
+       "building": "בר כוכבא 23, תל אביב",
+       "unit": "2",
+       "reporter_name": "רונית"
+      },
+      "result": {
+       "ok": true,
+       "reference": "255-1604-26",
+       "reference_spoken": "אחת שש אפס ארבע"
+      }
+     }
+    ],
+    [
+     {
+      "tool": "notify_team",
+      "arguments": {
+       "reason": "emergency",
+       "description": "תוספת לריח הגז בחדר המדרגות, בין הקומה הראשונה לשנייה: המדווחת רונית, בר כוכבא 23, דירה 2. נפתחה פנייה בדחיפות חירום, מספר 255-1604-26.",
+       "caller_name": "רונית",
+       "department": "operations",
+       "building": "בר כוכבא 23, תל אביב",
+       "unit": "2"
+      },
+      "result": {
+       "ok": true,
+       "reason": "emergency",
+       "charges_paused": 0,
+       "emergency_reference": null,
+       "team_notified": true
+      }
+     }
+    ]
+   ],
+   "agent": "פתחתי פנייה דחופה על הריח, המספר שלה אחת שש אפס ארבע. הצוות יודע עכשיו גם את הכתובת והדירה. יש עוד משהו שאני יכול לעשות כרגע?",
+   "en": "I've opened an urgent request about the smell, its number is one six zero four. The team now also knows the address and the flat. Is there anything else I can do right now?"
+  },
+  {
+   "caller": "אוקיי אבל מה אני עושה עכשיו מישו בא לפה",
+   "en": "okay but what do I do now is someone coming here"
+  },
+  {
+   "agent": "על זה אין לי תשובה, רונית, ואני לא רוצה להבטיח משהו שאני לא יודע. מה שבטוח זה שהצוות כבר יודע על הריח, ושיש פנייה דחופה עם הכתובת והדירה.",
+   "en": "I don't have an answer on that, Ronit, and I don't want to promise something I don't know. What's certain is that the team already knows about the smell, and that there's an urgent request with the address and the flat."
+  },
+  {
+   "caller": "טוב טוב אוקיי תודה ביי",
+   "en": "ok ok okay thanks bye"
+  },
+  {
+   "agent": "תודה על השיחה, רונית. שיהיה המשך ערב רגוע, ולהתראות.",
+   "en": "Thanks for the call, Ronit. Have a calm rest of the evening, and goodbye."
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{"scenario": "nm_name_upfront", "turns": [
+  {"agent": "היי, בוקר טוב! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
+   "en": "Hi, good morning! This is Michael from Homies speaking, how can I help you today?"},
+  {"caller": "היי מדברת דנה לוי מבר כוכבא 23 דירה 4 אה יש נזילה בלובי למטה מטפטפים מים מהתקרה ליד תיבות הדואר מהבוקר",
+   "en": "Hi, this is Dana Levi speaking (feminine form), from Bar Kochba 23 apartment 4, uh, there's a leak in the lobby downstairs, water's dripping from the ceiling near the mailboxes since this morning"},
+  {"rounds": [[{"tool": "open_request",
+                "arguments": {"description": "יש נזילה בלובי למטה, בקומת הקרקע: מטפטפים מים מהתקרה ליד תיבות הדואר, מהבוקר",
+                              "type": "plumbing",
+                              "urgency": "normal",
+                              "building": "בר כוכבא 23",
+                              "unit": "4",
+                              "reporter_name": "דנה לוי"},
+                "result": {"ok": true, "reference": "255-1602-26", "reference_spoken": "אחת שש אפס שתיים"}}]],
+   "agent": "אוי, לא נעים לגלות דבר כזה על הבוקר! פתחתי פנייה על הנזילה, והמספר שלה אחת שש אפס שתיים. יש עוד משהו שאני יכול לעזור בו?",
+   "en": "Oh, not nice to find something like that first thing in the morning! I've opened a request for the leak, and its number is one six zero two. Is there anything else I can help with?"},
+  {"caller": "אוקיי 1602 רשמתי לא זהו תודה רבה",
+   "en": "Okay, 1602, wrote it down. No, that's it, thanks a lot"},
+  {"agent": "בשמחה, דנה! תודה על השיחה, שיהיה המשך בוקר נעים ולהתראות!",
+   "en": "My pleasure, Dana! Thanks for the call, have a pleasant rest of the morning, and goodbye!"}
+]}
