@@ -1,0 +1,18 @@
+Thinking level of the incoming agent (gpt-5.6-sol), 22 Oct 2026.
+scripts/voice_effort.py replay on the run of docs/assistant/transcripts/2026-10-22-name-before-ticket/openrouter/,
+13 moments asked, 26 answered before the $0.50 cap stopped it. OpenRouter times: they compare the levels, not Vapi's path.
+
+
+level    calls    speech 1st     tool done       all 1st  thinking   same act     cost
+default      9         3.28s         5.21s         4.26s        44       9/9  $0.1739
+low          8         3.25s         3.88s         2.88s        25       8/8  $0.1653
+none         9         1.34s         2.38s         1.34s         0       7/9  $0.1634
+(medians; speech = time to the first word, tool = time until the tool call is complete)
+spent $0.5025 in all
+
+On the 8 moments all three levels answered: first word medium 4.40 s median / 3.59 s mean, low 2.88 / 2.92, none 1.37 / 1.39.
+none changed 2 of 9 against the prompt: nm_name_upfront:1 said it was opening a ticket and asked a question instead
+of calling open_request; nm_gas:2 asked the address before the name. low changed none of 8; no agreement slips at any level.
+Not tried at low (the cap): nm_staff_no_number:6, nm_refuses:6, nm_two_issues:2, nm_gas:4, nm_two_issues:5.
+
+Live from 12:46:38 UTC: reasoningEffort low (vapi_sync.py inbound --keep-voice --apply, read back).

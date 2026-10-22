@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-22
 
+### Voice latency: the incoming agent thinks at `low` (LIVE 12:46:38 UTC), chosen by a replay test ($0.50)
+- **Asked:** *"so for the latency have we fixed it"* (no: nothing had changed), then *"ok lets fix that and test it automatically"*.
+- **Found first, free:** OpenRouter's model list gives gpt-5.6-sol's thinking levels: max, xhigh, high, medium, low, none. The default is `medium`, so the agent's unset `reasoningEffort` meant medium. `minimal`, which Vapi's enum offers and the 21 Oct note proposed, is not one of them.
+- **The test, `scripts/voice_effort.py` (new):**
+  - It replays model calls from the 22 Oct played run (`chats/*.json` hold every message each call saw) at each level, streamed and timed to the first word and to the end.
+  - Each action is compared with the original reply.
+  - The order of the levels rotates per moment.
+  - 13 moments × 3 levels were asked. The **$0.50 cap stopped it after 26 calls**.
+  - **The estimate was $0.30 and wrong.** It assumed cache hits, but the first five moments' calls were uncached at about 3 cents each; later ones cost about 0.4 cents.
+- **Results** (OpenRouter times, for comparing the levels). On the 8 moments all three answered, the first word took:
+  - medium: 3.59 s mean, 4.40 s median;
+  - low: 2.92 s mean, 2.88 s median;
+  - none: 1.39 s mean, 1.37 s median.
+- **What each level did:**
+  - Medium and low made the same choices as the original at every moment tried (9 and 8).
+  - None changed 2 of 9 against the prompt. It said it was opening Dana's ticket and asked a question instead of opening it, and after the gas alert it asked the address before the name.
+  - No agreement slips at any level (read by hand).
+- **Changed:**
+  - `vapi_sync.py`: the inbound model has `reasoningEffort: "low"`. Synced with `--keep-voice`, and the diff against live was only that key. Read back at 12:46:38 UTC: low, with the prompt, tools and voice unchanged.
+  - `voice_qa.py`: `bundle` records the live `reasoning_effort` and `say` sends it, so played calls think as live does.
+- **Not done:**
+  - Five moments were never tried at low because of the cap: the read-back, the declined-name ticket, Naama's feminine reply, the gas ticket and the second ticket.
+  - The measurement on Vapi's own path waits for the next call through 208 (`vapi_latency.py --turns`).
+- **Wallet:** $4.95 to $4.23. This test spent $0.50; the rest is other use of the same wallet since the last read.
+- **Record:** `docs/assistant/transcripts/2026-10-22-thinking-level/` (`effort.json`, `result.txt`).
+
 ### Feature 17 LIVE on the phone line (10:20 to 10:25 UTC), on the owner's "ok go"
 - **Asked:** *"ok go"*, after the estimate, the real-model test ($0.33, 5 of 6) and the refused deploy.
 - **The steps, Plan A Task 7:**

@@ -1,0 +1,744 @@
+[
+ {
+  "point": "nm_gas:1",
+  "level": "default",
+  "first_s": 4.54,
+  "end_s": 5.434,
+  "action": "notify_team(emergency)",
+  "original": "notify_team(emergency)",
+  "reasoning": 60,
+  "out": 125,
+  "in": 5708,
+  "cached": 0,
+  "cost": 0.031037,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "call_okuYHgwxMotNPib9AQSpmTid",
+     "type": "function",
+     "function": {
+      "name": "notify_team",
+      "arguments": "{\"reason\":\"emergency\",\"description\":\"ריח חזק מאוד של גז בחדר המדרגות בין הקומה הראשונה לשנייה. הכתובת עדיין לא נמסרה.\",\"caller_name\":\"\",\"department\":\"operations\",\"building\":\"\",\"unit\":\"\"}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_ycCzQGi2YIkyUktPP6hDuc9e",
+     "function": {
+      "name": "notify_team",
+      "arguments": "{\"reason\":\"emergency\",\"description\":\"המתקשר מדווח על ריח חזק מאוד של גז בחדר המדרגות, בין הקומה הראשונה לשנייה. הכתובת עדיין לא נמסרה.\",\"caller_name\":\"\",\"department\":\"operations\",\"building\":\"\",\"unit\":\"\"}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_gas:1",
+  "level": "low",
+  "first_s": 2.076,
+  "end_s": 2.804,
+  "action": "notify_team(emergency)",
+  "original": "notify_team(emergency)",
+  "reasoning": 37,
+  "out": 103,
+  "in": 5708,
+  "cached": 0,
+  "cost": 0.030597,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "call_6NpJ39YpiPY2k8eaTCqpRar8",
+     "type": "function",
+     "function": {
+      "name": "notify_team",
+      "arguments": "{\"reason\":\"emergency\",\"description\":\"ריח חזק מאוד של גז בחדר המדרגות, בין הקומה הראשונה לשנייה. הכתובת עדיין לא נמסרה.\",\"caller_name\":\"\",\"department\":\"operations\",\"building\":\"\",\"unit\":\"\"}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_ycCzQGi2YIkyUktPP6hDuc9e",
+     "function": {
+      "name": "notify_team",
+      "arguments": "{\"reason\":\"emergency\",\"description\":\"המתקשר מדווח על ריח חזק מאוד של גז בחדר המדרגות, בין הקומה הראשונה לשנייה. הכתובת עדיין לא נמסרה.\",\"caller_name\":\"\",\"department\":\"operations\",\"building\":\"\",\"unit\":\"\"}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_gas:1",
+  "level": "none",
+  "first_s": 1.442,
+  "end_s": 2.312,
+  "action": "notify_team(emergency)",
+  "original": "notify_team(emergency)",
+  "reasoning": 0,
+  "out": 63,
+  "in": 5708,
+  "cached": 0,
+  "cost": 0.029797,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "call_ZWMNgYoT6vfKwsmT2F6dlULD",
+     "type": "function",
+     "function": {
+      "name": "notify_team",
+      "arguments": "{\"reason\":\"emergency\",\"description\":\"ריח חזק מאוד של גז בחדר המדרגות בין הקומה הראשונה לשנייה. המתקשר שואל מה לעשות עכשיו.\",\"caller_name\":\"\",\"department\":\"operations\",\"building\":\"\",\"unit\":\"\"}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_ycCzQGi2YIkyUktPP6hDuc9e",
+     "function": {
+      "name": "notify_team",
+      "arguments": "{\"reason\":\"emergency\",\"description\":\"המתקשר מדווח על ריח חזק מאוד של גז בחדר המדרגות, בין הקומה הראשונה לשנייה. הכתובת עדיין לא נמסרה.\",\"caller_name\":\"\",\"department\":\"operations\",\"building\":\"\",\"unit\":\"\"}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_light_noname:1",
+  "level": "low",
+  "first_s": 3.245,
+  "end_s": 3.44,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 20,
+  "out": 50,
+  "in": 5712,
+  "cached": 0,
+  "cost": 0.029557,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "אוי, לא נעים להישאר שם בחושך. מה השם שלך כדי שאפתח פנייה?"
+  },
+  "original_reply": {
+   "content": "לא נעים לעלות ככה בחושך, נטפל בזה. מה השם שלך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_light_noname:1",
+  "level": "none",
+  "first_s": 1.286,
+  "end_s": 2.105,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 0,
+  "out": 25,
+  "in": 5712,
+  "cached": 0,
+  "cost": 0.029057,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "אוי, זה באמת לא נעים לעלות ככה בחושך. איך קוראים לך?"
+  },
+  "original_reply": {
+   "content": "לא נעים לעלות ככה בחושך, נטפל בזה. מה השם שלך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_light_noname:1",
+  "level": "default",
+  "first_s": 4.66,
+  "end_s": 4.874,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 35,
+  "out": 67,
+  "in": 5712,
+  "cached": 0,
+  "cost": 0.029897,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "אוי, זה באמת לא נעים לעלות ככה בחושך. מה השם שלך כדי שאפתח פנייה?"
+  },
+  "original_reply": {
+   "content": "לא נעים לעלות ככה בחושך, נטפל בזה. מה השם שלך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_refuses:3",
+  "level": "none",
+  "first_s": 1.339,
+  "end_s": 1.994,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 0,
+  "out": 24,
+  "in": 5797,
+  "cached": 0,
+  "cost": 0.029462,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "זה רק כדי שהצוות יידע עם מי לדבר על הפנייה. איך קוראים לך?"
+  },
+  "original_reply": {
+   "content": "זה רק כדי שהצוות יידע עם מי לדבר לגבי התקלה. מה השם שלך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_refuses:3",
+  "level": "default",
+  "first_s": 1.681,
+  "end_s": 2.115,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 11,
+  "out": 37,
+  "in": 5797,
+  "cached": 0,
+  "cost": 0.029722,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "זה רק כדי שהצוות יידע עם מי לדבר לגבי התקלה. מה השם שלך?"
+  },
+  "original_reply": {
+   "content": "זה רק כדי שהצוות יידע עם מי לדבר לגבי התקלה. מה השם שלך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_refuses:3",
+  "level": "low",
+  "first_s": 2.301,
+  "end_s": 2.942,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 10,
+  "out": 38,
+  "in": 5797,
+  "cached": 0,
+  "cost": 0.029742,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "השם הוא רק כדי שהצוות יידע עם מי לדבר לגבי התקלה. איך קוראים לך?"
+  },
+  "original_reply": {
+   "content": "זה רק כדי שהצוות יידע עם מי לדבר לגבי התקלה. מה השם שלך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_staff_no_number:4",
+  "level": "default",
+  "first_s": 4.572,
+  "end_s": 4.8,
+  "action": "says (asks phone)",
+  "original": "says (asks phone)",
+  "reasoning": 56,
+  "out": 84,
+  "in": 5936,
+  "cached": 0,
+  "cost": 0.031357,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "רק חסר לי מספר טלפון שאפשר לחזור אליו לגבי השער. מה המספר?"
+  },
+  "original_reply": {
+   "content": "שירן, מה מספר הטלפון שאפשר לחזור אליו לגבי הפנייה?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_staff_no_number:4",
+  "level": "low",
+  "first_s": 1.81,
+  "end_s": 2.557,
+  "action": "says (asks phone)",
+  "original": "says (asks phone)",
+  "reasoning": 17,
+  "out": 44,
+  "in": 5936,
+  "cached": 0,
+  "cost": 0.030557,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "חסר לי רק מספר טלפון שאפשר לחזור אליו לגבי הפנייה. מה המספר?"
+  },
+  "original_reply": {
+   "content": "שירן, מה מספר הטלפון שאפשר לחזור אליו לגבי הפנייה?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_staff_no_number:4",
+  "level": "none",
+  "first_s": 1.465,
+  "end_s": 2.399,
+  "action": "says (asks phone)",
+  "original": "says (asks phone)",
+  "reasoning": 0,
+  "out": 23,
+  "in": 5936,
+  "cached": 0,
+  "cost": 0.030137,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "אני צריך מספר טלפון שאפשר לחזור אליו לגבי הטיפול. מה המספר?"
+  },
+  "original_reply": {
+   "content": "שירן, מה מספר הטלפון שאפשר לחזור אליו לגבי הפנייה?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_name_upfront:1",
+  "level": "low",
+  "first_s": 4.257,
+  "end_s": 4.777,
+  "action": "open_request(name)",
+  "original": "open_request(name)",
+  "reasoning": 49,
+  "out": 178,
+  "in": 5728,
+  "cached": 0,
+  "cost": 0.032197,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "אוי, זה בהחלט משהו שצריך לבדוק, תודה שדיווחת! אני פותח עכשיו פנייה על הטפטוף ליד תיבות הדואר.",
+   "tool_calls": [
+    {
+     "id": "call_SF6z5aPPdQu63GnL77FFIMbt",
+     "type": "function",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"מטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר, מהבוקר\",\"type\":\"plumbing\",\"urgency\":\"high\",\"building\":\"בר כוכבא 23\",\"unit\":\"4\",\"reporter_name\":\"דנה לוי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_8ZjqkCkrOPHmoMsmTM33ePeB",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"מטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר, מהבוקר.\",\"type\":\"plumbing\",\"urgency\":\"high\",\"building\":\"בר כוכבא 23\",\"unit\":\"4\",\"reporter_name\":\"דנה לוי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_name_upfront:1",
+  "level": "none",
+  "first_s": 1.148,
+  "end_s": 2.252,
+  "action": "says",
+  "original": "open_request(name)",
+  "reasoning": 0,
+  "out": 37,
+  "in": 5728,
+  "cached": 0,
+  "cost": 0.029377,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "אוי, זה בהחלט דורש בדיקה. אני פותח עכשיו פנייה, רק תגידי לי בבקשה איך נראה הטפטוף כרגע?"
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_8ZjqkCkrOPHmoMsmTM33ePeB",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"מטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר, מהבוקר.\",\"type\":\"plumbing\",\"urgency\":\"high\",\"building\":\"בר כוכבא 23\",\"unit\":\"4\",\"reporter_name\":\"דנה לוי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_name_upfront:1",
+  "level": "default",
+  "first_s": 4.667,
+  "end_s": 5.206,
+  "action": "open_request(name)",
+  "original": "open_request(name)",
+  "reasoning": 59,
+  "out": 186,
+  "in": 5728,
+  "cached": 0,
+  "cost": 0.032357,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "אוי, זה בהחלט צריך בדיקה, טוב שדיווחת! אני פותח עכשיו פנייה על הטפטוף ליד תיבות הדואר.",
+   "tool_calls": [
+    {
+     "id": "call_2fUTiMADXm8Z3n9ha9BJuLxE",
+     "type": "function",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"מטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר, מהבוקר\",\"type\":\"plumbing\",\"urgency\":\"high\",\"building\":\"בר כוכבא 23\",\"unit\":\"4\",\"reporter_name\":\"דנה לוי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_8ZjqkCkrOPHmoMsmTM33ePeB",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"מטפטפים מים מהתקרה בלובי למטה ליד תיבות הדואר, מהבוקר.\",\"type\":\"plumbing\",\"urgency\":\"high\",\"building\":\"בר כוכבא 23\",\"unit\":\"4\",\"reporter_name\":\"דנה לוי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_gas:2",
+  "level": "none",
+  "first_s": 1.724,
+  "end_s": 2.422,
+  "action": "says",
+  "original": "says (asks name)",
+  "reasoning": 0,
+  "out": 29,
+  "in": 5845,
+  "cached": 5705,
+  "cost": 0.003559,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "זה מצב רציני. עדכנתי את הצוות מיד; מה הכתובת המדויקת של הבניין?"
+  },
+  "original_reply": {
+   "content": "זה מצב רציני, ועדכנתי מיד את הצוות. איך קוראים לך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_gas:2",
+  "level": "default",
+  "first_s": 2.488,
+  "end_s": 3.362,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 44,
+  "out": 89,
+  "in": 5845,
+  "cached": 5705,
+  "cost": 0.004759,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "זה מצב רציני. עדכנתי מיד את הצוות על ריח הגז החזק, ואני נשאר איתך כדי לפתוח פנייה דחופה. מה השם שלך?"
+  },
+  "original_reply": {
+   "content": "זה מצב רציני, ועדכנתי מיד את הצוות. איך קוראים לך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_gas:2",
+  "level": "low",
+  "first_s": 3.422,
+  "end_s": 3.828,
+  "action": "says (asks name)",
+  "original": "says (asks name)",
+  "reasoning": 27,
+  "out": 57,
+  "in": 5845,
+  "cached": 5705,
+  "cost": 0.004119,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "זה רציני. עדכנתי מיד את הצוות על ריח הגז החזק. מה השם שלך?"
+  },
+  "original_reply": {
+   "content": "זה מצב רציני, ועדכנתי מיד את הצוות. איך קוראים לך?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_refuses:4",
+  "level": "default",
+  "first_s": 1.887,
+  "end_s": 2.48,
+  "action": "says",
+  "original": "says",
+  "reasoning": 16,
+  "out": 41,
+  "in": 5846,
+  "cached": 5794,
+  "cost": 0.0033946,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "בסדר גמור, אפתח בלי שם. מה הכתובת של הבניין?"
+  },
+  "original_reply": {
+   "content": "בסדר גמור, אפתח בלי שם. מה הכתובת של הבניין?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_refuses:4",
+  "level": "low",
+  "first_s": 3.717,
+  "end_s": 4.075,
+  "action": "says",
+  "original": "says",
+  "reasoning": 17,
+  "out": 42,
+  "in": 5846,
+  "cached": 5794,
+  "cost": 0.0034146,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "בסדר גמור, אפתח בלי שם. מה הכתובת של הבניין?"
+  },
+  "original_reply": {
+   "content": "בסדר גמור, אפתח בלי שם. מה הכתובת של הבניין?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_refuses:4",
+  "level": "none",
+  "first_s": 1.393,
+  "end_s": 2.072,
+  "action": "says",
+  "original": "says",
+  "reasoning": 0,
+  "out": 23,
+  "in": 5846,
+  "cached": 5794,
+  "cost": 0.0030346,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "בסדר גמור, אפתח בלי שם. מה הכתובת של הבניין?"
+  },
+  "original_reply": {
+   "content": "בסדר גמור, אפתח בלי שם. מה הכתובת של הבניין?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_light_noname:4",
+  "level": "low",
+  "first_s": 2.508,
+  "end_s": 3.875,
+  "action": "open_request(name)",
+  "original": "open_request(name)",
+  "reasoning": 25,
+  "out": 119,
+  "in": 5793,
+  "cached": 5709,
+  "cost": 0.0050806,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "call_5DYux55MYwgcNmCLIfqPUJ3o",
+     "type": "function",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי\",\"type\":\"lighting\",\"urgency\":\"normal\",\"building\":\"בר כוכבא 23\",\"unit\":\"5\",\"reporter_name\":\"אבי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_3VynIX5PGFvehGXP7HyvqePa",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי\",\"type\":\"lighting\",\"urgency\":\"normal\",\"building\":\"בר כוכבא 23\",\"unit\":\"5\",\"reporter_name\":\"אבי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_light_noname:4",
+  "level": "none",
+  "first_s": 1.3,
+  "end_s": 2.44,
+  "action": "open_request(name)",
+  "original": "open_request(name)",
+  "reasoning": 0,
+  "out": 92,
+  "in": 5793,
+  "cached": 5709,
+  "cost": 0.0045406,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "call_L8xsZb4h2GiFYK4NoozZVWG6",
+     "type": "function",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי\",\"type\":\"lighting\",\"urgency\":\"normal\",\"building\":\"בר כוכבא 23\",\"unit\":\"5\",\"reporter_name\":\"אבי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_3VynIX5PGFvehGXP7HyvqePa",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי\",\"type\":\"lighting\",\"urgency\":\"normal\",\"building\":\"בר כוכבא 23\",\"unit\":\"5\",\"reporter_name\":\"אבי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_light_noname:4",
+  "level": "default",
+  "first_s": 4.265,
+  "end_s": 4.626,
+  "action": "open_request(name)",
+  "original": "open_request(name)",
+  "reasoning": 57,
+  "out": 151,
+  "in": 5793,
+  "cached": 5709,
+  "cost": 0.0057206,
+  "finish": "tool_calls",
+  "reply": {
+   "role": "assistant",
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "call_a2BMww9eJRQ3iYzyvri9Lwt1",
+     "type": "function",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי.\",\"type\":\"lighting\",\"urgency\":\"high\",\"building\":\"בר כוכבא 23\",\"unit\":\"5\",\"reporter_name\":\"אבי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  },
+  "original_reply": {
+   "content": null,
+   "tool_calls": [
+    {
+     "type": "function",
+     "index": 0,
+     "id": "call_3VynIX5PGFvehGXP7HyvqePa",
+     "function": {
+      "name": "open_request",
+      "arguments": "{\"description\":\"המנורה בחדר המדרגות בקומה השלישית לא עובדת כבר יומיים, ובערב חשוך שם לגמרי\",\"type\":\"lighting\",\"urgency\":\"normal\",\"building\":\"בר כוכבא 23\",\"unit\":\"5\",\"reporter_name\":\"אבי\",\"name_declined\":false,\"reporter_phone\":\"\",\"phone_declined\":false}"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "point": "nm_staff_no_number:6",
+  "level": "none",
+  "first_s": 1.216,
+  "end_s": 3.006,
+  "action": "says",
+  "original": "says",
+  "reasoning": 0,
+  "out": 59,
+  "in": 6113,
+  "cached": 5933,
+  "cost": 0.0044502,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "רשמתי לחזרה אפס חמש שתיים, ארבע ארבע אחת, שמונה שמונה שתיים שלוש, ופתחתי פנייה לטיפול בשער. מספר הפנייה הוא אחת שש אפס שמונה. יש עוד משהו שאני יכול לעזור בו?"
+  },
+  "original_reply": {
+   "content": "מעולה, רשמתי את המספר אפס חמש שתיים, ארבע ארבע אחת, שמונה שמונה שתיים שלוש. פתחתי פנייה לטיפול בשער, ומספר הפנייה הוא אחת שש אפס שמונה. יש עוד משהו שאוכל לעזור בו?",
+   "tool_calls": null
+  }
+ },
+ {
+  "point": "nm_staff_no_number:6",
+  "level": "default",
+  "first_s": 4.073,
+  "end_s": 4.376,
+  "action": "says",
+  "original": "says",
+  "reasoning": 54,
+  "out": 117,
+  "in": 6113,
+  "cached": 5933,
+  "cost": 0.0056102,
+  "finish": "stop",
+  "reply": {
+   "role": "assistant",
+   "content": "מעולה, רשמתי את המספר אפס חמש שתיים, ארבע ארבע אחת, שמונה שמונה שתיים שלוש. הפנייה נפתחה בדחיפות, ומספרה אחת שש אפס שמונה. יש עוד משהו שאוכל לעזור בו?"
+  },
+  "original_reply": {
+   "content": "מעולה, רשמתי את המספר אפס חמש שתיים, ארבע ארבע אחת, שמונה שמונה שתיים שלוש. פתחתי פנייה לטיפול בשער, ומספר הפנייה הוא אחת שש אפס שמונה. יש עוד משהו שאוכל לעזור בו?",
+   "tool_calls": null
+  }
+ }
+]

@@ -2543,6 +2543,27 @@ balance check. That was deliberate and wrong.
     office caller introduced herself, the real model rightly took her name, and `asked_first`
     failed it anyway. Read every fail by hand before calling it the agent's.
 
+## How much the voice model thinks before it speaks (22 Oct)
+
+gpt-5.6-sol thinks before every reply, and on a call the caller waits through it. The incoming
+agent left `reasoningEffort` unset, which is this model's `medium`. Its levels are max, xhigh,
+high, medium, low and none. Vapi's enum also offers `minimal`, which this model does not list.
+- **A level is chosen by replaying real moments, not by guessing.** `scripts/voice_effort.py`
+  re-asks the model at each level with the same conversation and tools. It times the first word
+  and compares the action with the original reply.
+- **Measured 22 Oct on OpenRouter:**
+  - low: about 0.7 s faster than medium on average (1.5 s at the median), with the same choices.
+  - none: about 2.2 s faster, but it broke two prompt rules.
+    - Given everything at once, it said it was opening a ticket and asked a question instead.
+    - After a gas alert, it asked the address before the name.
+  - A model that does not think follows the nearest cue. The incoming agent runs `low` since 22 Oct.
+- **OpenRouter times compare levels, not the caller's wait.** Medium took 3.6 s on average there,
+  and 1.5 s on Vapi's own path (21 Oct). Only a call through 208 and `vapi_latency.py` measure
+  the real wait.
+- **Price a replay's first call per moment at full rate.** The cache does not hit the first time
+  a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
+  for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.
+
 ## How a WhatsApp change ships
 
 27 Sep, after the second regression in a day. Owner: *"we need to make sure

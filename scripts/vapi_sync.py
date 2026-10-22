@@ -347,7 +347,16 @@ TARGETS = {
             # models may not accept one (see the debt target). Vowel points: this model
             # writes none (0% on 8 Oct); the Cartesia dictionary on the voice carries the
             # gender since 7 Oct, so that no longer matters. Undo: the line below it.
-            "model": {"provider": "openai", "model": "gpt-5.6-sol"},
+            # 22 OCT: reasoningEffort low, on the owner's "ok lets fix that and test it
+            # automatically" (21 Oct: the model was the slow part of every turn). Unset is
+            # this model's `medium`. `scripts/voice_effort.py` replayed moments of six played
+            # calls on OpenRouter: first word medium 3.59 s mean / 4.40 s median, low 2.92 /
+            # 2.88, none 1.39 / 1.37 (8 moments each). Low made the same choices in all 8;
+            # none changed 2 of 9 against the prompt (no ticket for a caller who gave
+            # everything, the address before the name after a gas alert). NOT `minimal`:
+            # Vapi's enum offers it, but this model does not take it (max, xhigh, high,
+            # medium, low, none). Undo: drop the key (back to medium).
+            "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low"},
             # "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},   # 6 Sep - 19 Oct
             # SPEECHMATICS WAS TRIED ON INBOUND ON 30 SEP AND DROPPED THE SAME DAY,
             # on the owner's word, so this target is back on BASE's Deepgram.

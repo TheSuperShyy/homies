@@ -179,6 +179,8 @@ def bundle(run, deck_path=DECK, candidate=False, name_required=None, cap=None):
             "assistant": a.get("name"), "updated_at": a.get("updatedAt"),
             "model": "%s/%s" % (m.get("provider"), m.get("model")),
             "temperature": m.get("temperature"),
+            # 22 Oct: the incoming agent thinks at `low`; unset is the model's medium.
+            "reasoning_effort": m.get("reasoningEffort"),
             # Vapi's own default when the assistant sets none.
             "max_tokens": m.get("maxTokens") or 250,
             "end_call_phrases": a.get("endCallPhrases") or [],
@@ -995,6 +997,8 @@ class VoiceCall:
                 body["max_tokens"] = self.live["max_tokens"]
             if self.live.get("temperature") is not None:
                 body["temperature"] = self.live["temperature"]
+            if self.live.get("reasoning_effort"):
+                body["reasoning"] = {"effort": self.live["reasoning_effort"]}
             req = urllib.request.Request(
                 "https://openrouter.ai/api/v1/chat/completions", method="POST",
                 data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
