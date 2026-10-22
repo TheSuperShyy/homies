@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-10-22
 
+### The 10/22 report (in chat), and a `reporter` skill that writes every report
+- **Asked:** *"create a skill named reporter to send the report we did today in the system like this format"*, with a teammate's Project Report from the Clix CRM ("Project: Clix CRM v2", one full sentence per bullet). Then `/reporter`.
+- **Where the report goes:** the Clix CRM's Project Report box (`src/scenes/morning-report/` in the Clix-CRM repo).
+  - The owner picks the project and adds one bullet per row.
+  - The post goes to the Report Chat, the project's team chat and Clix leadership's inboxes.
+  - Nothing here can post into it, so the report is given in chat to paste.
+- **The skill:** `C:\Users\Acer nitro 5\.claude\skills\reporter\SKILL.md`. It is user-level, so `/reporter` works in every project. It covers:
+  - where the day's work comes from: this conversation, the worklog, every branch's commits and the handover;
+  - what makes a bullet;
+  - one sentence of 10 to 25 words, opening with a past-tense verb;
+  - a table that turns inside terms into plain words;
+  - `Will` lines last;
+  - the teammate's report as the sample.
+- **Tested before and after on the 22 Oct notes** (Claude subagents, no OpenRouter):
+  - **Without the skill, 0 of 3 reports fit:** 14 to 21 bullets of up to 141 words, with Supabase, OpenRouter, prompt and SIP, the tests' costs, and no `Will` lines.
+  - **With it, 4 of 4 fit,** one of them finding the day's work in the repo by itself: 9 to 10 bullets of 10 to 25 words, in plain words, with `Will` lines last.
+- **The 10/22 report,** given in chat, 10 bullets:
+  - the updated spec checked against live;
+  - the name before a ticket, live on the phone line;
+  - the name on the ticket and on the team's alert;
+  - the lost landline numbers fixed, and a callback number asked only when a call has none;
+  - the name on the tickets page (not live);
+  - the dashboard's Hebrew labels fixed;
+  - the 3 spoken test calls passed;
+  - the AI thinking less, with the wait still about 3.7 s;
+  - Will: a real call to 208 and more work on the wait;
+  - Will: the name questions on WhatsApp.
+- **Memory:** the report-format memory now points at the skill, and format corrections go into the skill first.
+
 ### Voice test through Vapi's simulated callers: the wait on `low` and the name flow, in voice
 - **Asked:** *"can you test it via voice agent? but run it in background use apify to talk with it like before and create an artifact for it"*. "Apify" is read as Vapi: "before" is `vapi_eval.py`, Vapi's own simulated caller. Nothing in the repo ever used Apify.
 - **Before spending:**
