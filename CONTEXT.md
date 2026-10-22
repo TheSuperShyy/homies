@@ -2515,7 +2515,10 @@ balance check. That was deliberate and wrong.
   - A refusal is explained once; then `name_declined` / `phone_declined` open the ticket anyway.
   - The emergency alert never waits for a name.
 - **The switch:** `NAME_REQUIRED_CHANNELS` per channel. An agent whose tool cannot send a name
-  yet must never be enforced: it would get `need_name` forever.
+  yet must never be enforced: it would get `need_name` forever. So the agent is synced before the
+  switch goes on. Live on the phone line since 22 Oct, 10:24 UTC (function v126).
+- **Deleting a switch from `.env` does not switch it off.** `supabase_functions.py` pushes only
+  a value it has, so the deployed one stays. Off is `NAME_REQUIRED_CHANNELS=off` plus a redeploy.
 - **A caller's number can arrive outside `customer.number`.** Omni sends outside callers in
   local form, which Vapi leaves out of that field; the SIP URI still has it. A Homies extension
   (2-4 digits as the caller's name) on the office line is staff, not the person to call back.

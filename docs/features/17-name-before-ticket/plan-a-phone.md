@@ -1410,11 +1410,11 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 **Files:** `.env` (one line), `docs/WORKLOG.md`, `HANDOVER.md`, `CONTEXT.md`, `docs/README.md`, `docs/features/17-name-before-ticket/feature.md`
 
-- [ ] **Step 1: The owner's go.** Show the Task 6 result. Proceed only on an explicit go for these steps.
-- [ ] **Step 2: Deploy the function, switched off.** Run `python scripts/supabase_functions.py --apply --oxs-mirror`. Expected: `deploy HTTP 201` (or 200), and `name required unchanged (not in .env)`. The function now stores names and real numbers but refuses nothing new.
-- [ ] **Step 3: Probe it.** Run `python scripts/check_tools.py`. Expected: all pass except the five known `no charge on this call` money cases.
-- [ ] **Step 4: Sync the incoming agent.** Run `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice` (dry). Compare what it would send with live: only the prompt and the tools may differ. Then add `--apply`, and read back the agent's prompt (it contains `פנייה לא נפתחת בלי שם`) and the `open_request` fields.
-- [ ] **Step 5: Switch on for phone calls.** Add `NAME_REQUIRED_CHANNELS=voice` to `.env`, then run `python scripts/supabase_functions.py --apply --oxs-mirror`. Expected: `name required voice`. Then run `N8N_BASE_URL= python scripts/check_name_gate.py`. Expected: `ok   open_request with no name -> {"ok": true, "opened": false, "reason": "need_name"}`.
+- [x] **Step 1: The owner's go.** Show the Task 6 result. Proceed only on an explicit go for these steps.
+- [x] **Step 2: Deploy the function, switched off.** Run `python scripts/supabase_functions.py --apply --oxs-mirror`. Expected: `deploy HTTP 201` (or 200), and `name required unchanged (not in .env)`. The function now stores names and real numbers but refuses nothing new.
+- [x] **Step 3: Probe it.** Run `python scripts/check_tools.py`. Expected: all pass except the five known `no charge on this call` money cases.
+- [x] **Step 4: Sync the incoming agent.** Run `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice` (dry). Compare what it would send with live: only the prompt and the tools may differ. Then add `--apply`, and read back the agent's prompt (it contains `פנייה לא נפתחת בלי שם`) and the `open_request` fields.
+- [x] **Step 5: Switch on for phone calls.** Add `NAME_REQUIRED_CHANNELS=voice` to `.env`, then run `python scripts/supabase_functions.py --apply --oxs-mirror`. Expected: `name required voice`. Then run `N8N_BASE_URL= python scripts/check_name_gate.py`. Expected: `ok   open_request with no name -> {"ok": true, "opened": false, "reason": "need_name"}`.
 - [ ] **Step 6: The owner's test call through 208.** The script for the owner, from an office extension: "the light on the third floor of בר כוכבא 23 is out". Give no name until asked, and give a number when asked. Then check, read-only:
   - Run `python scripts/vapi_latency.py --turns`. It shows the newest call's turns, so you can see the name asked before the ticket and a number asked (the extension call has none).
   - Run the query below. Expected: one row with the name and the number given, and `caller_phone` empty for the extension call.

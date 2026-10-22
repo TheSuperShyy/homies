@@ -2,7 +2,7 @@
 
 **Estimate:** 2d
 **Depends on:** 02 (intake, the voice agent), 11 (WhatsApp bot)
-**Status:** designed 22 Oct 2026, owner approved the design; not built
+**Status:** live on the phone line 22 Oct 2026 (Plan A: function v126 with `NAME_REQUIRED_CHANNELS=voice`, the incoming agent synced); WhatsApp is Plan B, not built
 
 ## Purpose
 

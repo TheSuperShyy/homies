@@ -125,7 +125,7 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | 14 | [One call per resident](features/14-one-call-per-resident/feature.md) | 1d | view + demo, no runner by decision |
 | 15 | [Call button](features/15-call-button/feature.md) | 1d | built 25 Aug; waits for the Israeli number and a PIN in Vercel |
 | 16 | [Human handover](features/16-human-handover/feature.md) | 1d | built and wired live 3 Sep; pages a department team in Chatwoot; waits for the seats |
-| 17 | [Name and number before a ticket](features/17-name-before-ticket/feature.md) | 2d | designed 22 Oct (Homies' updated spec, section 1); not built |
+| 17 | [Name and number before a ticket](features/17-name-before-ticket/feature.md) | 2d | live on the phone line 22 Oct (Homies' updated spec, section 1); WhatsApp (Plan B) not built |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and

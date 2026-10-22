@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-22
 
+### Feature 17 LIVE on the phone line (10:20 to 10:25 UTC), on the owner's "ok go"
+- **Asked:** *"ok go"*, after the estimate, the real-model test ($0.33, 5 of 6) and the refused deploy.
+- **The steps, Plan A Task 7:**
+  1. **`supabase_functions.py --apply --oxs-mirror`:** v124 with the rule off (`name required unchanged`).
+  2. **`check_tools.py`:** 13 pass. The five `no charge on this call` money cases fail, as they do on every probe.
+  3. **`vapi_sync.py inbound --keep-voice --apply`:** the incoming agent was updated at 10:23:48 UTC. Read back:
+     - the prompt is 7,410 chars and holds the rule;
+     - `open_request` has the name and phone fields;
+     - `notify_team` has `caller_name`;
+     - gpt-5.6-sol, the voice and the server are unchanged.
+  4. **`NAME_REQUIRED_CHANNELS=voice`** was appended to `.env` (nothing from the file was printed). The redeploy is v126, at 10:24:23 UTC: `name required voice`, 10 secrets.
+  5. **`check_name_gate.py`:** `open_request` with no name returns `need_name`.
+- **v124 to v126:** read back, the live function is v126, from the second run. No commit or deploy from this repo came in between; the new secret is the likely cause of the extra version.
+- **Found:** deleting the `.env` line would not switch the rule off, because `supabase_functions.py` pushes only values that are set. Off is `NAME_REQUIRED_CHANNELS=off` plus a redeploy. Written into HANDOVER and CONTEXT.
+- **Open:**
+  - The owner's test call through 208, and the read-only check after it (Task 7 Step 6).
+  - The dashboard's name column is on this branch; Vercel builds from `main`.
+  - Plan B (WhatsApp) is written next.
+
 ### Feature 17: the go to ship it and test on OpenRouter; the deploy was refused, so the real-model test ran first
 - **Asked:** *"ok lets push it and test it again using open router but dont take too much credit give me estimate on how much the total will cost"*.
 - **Estimate, given before anything was spent:**
