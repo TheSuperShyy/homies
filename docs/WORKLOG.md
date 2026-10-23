@@ -52,7 +52,7 @@ conversation that produced it.
 - **The deploy was refused** by Claude Code's auto-mode check ("Production Deploy") on `vapi_sync.py inbound --keep-voice --apply`. It was not worked around; it waits for the owner's explicit go or their own run.
 - **Fast mode is not in the repo:** it needs the owner's word on the cost first.
 
-### Voice latency: an integrity run before the settings go live, and 0.5 s endpointing fails it
+### Voice latency: an integrity run before the settings go live; 0.5 s endpointing fails it, and the Vapi wallet runs out (-$0.16)
 - **Asked:** *"but we need to test the integrity if its reliable enough"*.
 - **`vapi_sim_inbound.py --integrity`** adds six calls (`INTEGRITY`), each aimed at what the faster settings can break:
   - a hesitant caller who pauses mid-sentence;
@@ -74,7 +74,17 @@ conversation that produced it.
   - **The emergency passed:** `notify_team` went first, then the name. But the caller's "אני מחכה" over the reference cut it to "מספר הפנייה הוא 1", and Michael went on without repeating it. The same happened to the leak call's reference in run `06597779`. "הפנייה התכופה" for הדחופה is back (21 Oct's slip).
     - This is the stop rule (`numWords` 2, unchanged) and the prompt. The candidate settings did not cause it. The dedicated "talks over the reference" call passed.
   - **No harm seen from Fast mode or `minCharacters` 10:** model 0.47 to 1.3 s median per call, voice 0.25 to 0.68 s.
-- **Next, running:** the two failing callers on the live 0.8 s, and on 0.65 s with Fast mode and `minCharacters` 10 (`--only hesitant,address --pause 0.65 --punct 0.3`). Four calls, about $1.20.
+- **Then the two failing callers on the live 0.8 s, and on 0.65 s** (`--only hesitant,address`, runs `e2f72ded` and `708f67a0`):
+  - **The hesitant caller on the live 0.8 s was clean.** Every pause was waited through, with whole sentences and the right name, building and flat. Vapi's judge marked `cut_in` failed, but the transcript has no cut-in, so the judge is wrong here. The reference was cut by his goodbye ("ומספר...").
+  - **So 0.5 s causes the cut-ins and 0.8 s does not.** `vapi_sync.py`'s inbound 0.1 / 0.5 override is removed: the pause stays 0.8 / 0.3, as live.
+  - **The other three calls never ran:** *"Failed to create tester call: Your Wallet Balance is -0.16"*.
+- **THE VAPI WALLET IS EMPTY (-$0.16), so the live 208 line will refuse calls until it is topped up.**
+  - This is the ninth account's failure again (its $5 trial ran to -$0.17 and Vapi refused every call).
+  - The tenth account's balance cannot be read with the key. The visible calls before today were $1.16, and today's tests spent about $3.6 ($0.70 + about $2.30 + $0.12 + the callers' side), which emptied it. So it was a small trial-sized balance, and the tests drew from the same wallet as the live line.
+  - **Lesson:** no Vapi test without the owner confirming the balance first.
+- **Where it stands:** nothing live changed today.
+  - Ready and tested clean: `minCharacters` 10 (`vapi_set_voice.py`) and Fast mode (not in the repo, the owner's call on cost).
+  - The pause stays at 0.8 s.
 
 ## 2026-10-22
 

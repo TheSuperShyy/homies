@@ -362,16 +362,11 @@ TARGETS = {
             # it is not the latency fix.
             "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low"},
             # "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},   # 6 Sep - 19 Oct
-            # 23 OCT: THE PAUSE BEFORE MICHAEL ANSWERS, 0.8 -> 0.5 s, on the owner's "ok now we
-            # need to make the latency low". Deepgram's Hebrew arrives without punctuation, so
-            # onNoPunctuationSeconds ended 10 of 12 caller turns on 22 Oct (0.801 s each); the
-            # English-trained smartEndpointingPlan never fires on Hebrew. Tried first as an
-            # override (`vapi_sim_inbound.py --candidate`, run 06597779): endpointing 0.50 s on
-            # every unpunctuated turn, no caller cut off. Numbers keep 1.0. Incoming agent only;
-            # the debt agent keeps BASE's 0.8 until it is tried there. Undo: delete this key.
-            "startSpeakingPlan": dict(BASE["startSpeakingPlan"], transcriptionEndpointingPlan=dict(
-                BASE["startSpeakingPlan"]["transcriptionEndpointingPlan"],
-                onPunctuationSeconds=0.1, onNoPunctuationSeconds=0.5)),
+            # 23 OCT: THE PAUSE STAYS AT BASE's 0.8 s (0.3 on punctuation). 0.5 / 0.1 saved 0.3 s a
+            # turn (run 06597779) but failed the integrity run (2da300f8): a hesitant caller was
+            # cut in on four times (0.1 s fired on Deepgram's "היי אממ!"), and "בר כוכבא ... 23"
+            # came back as two turns. The same hesitant caller on 0.8 s (e2f72ded) was clean.
+            # 0.65 was never measured (the wallet ran out). Do not lower it without --integrity.
             # SPEECHMATICS WAS TRIED ON INBOUND ON 30 SEP AND DROPPED THE SAME DAY,
             # on the owner's word, so this target is back on BASE's Deepgram.
             # The owner had asked for it with his Hebrew survey agent's settings

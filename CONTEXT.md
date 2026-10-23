@@ -2595,7 +2595,12 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
   - **0.5 s failed the integrity run, and the punctuation timer must not drop to 0.1 s.** A
     hesitant caller was cut in on four times. Deepgram punctuates a Hebrew filler ("היי אממ!"),
     so 0.1 s fires mid-thought. A street and its number with a pause between them came back as two
-    turns. The pause is a safety setting first and a speed setting second.
+    turns. The pause is a safety setting first and a speed setting second. The same hesitant caller
+    on 0.8 s was clean, so 0.8 / 0.3 stays.
+- **Vapi tests and the live line share one wallet, and its balance cannot be read with the key
+  (23 Oct).** The tenth account went to -$0.16 during these runs, and the 208 line stops when it
+  does, as the ninth did. Budget a Vapi test against a balance the owner has confirmed, never
+  against an estimate.
 - **Price a replay's first call per moment at full rate.** The cache does not hit the first time
   a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
   for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.

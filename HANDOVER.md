@@ -868,12 +868,13 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - Real calls through 208 are still the only measure of the phone leg.
         - **The bigger lever is `none`,** about 2.2 s faster per reply on OpenRouter. It would need prompt work and a new go.
         - **Undo:** drop `reasoningEffort` in `vapi_sync.py` and sync with `--keep-voice`.
+      - **23 OCT, ~09:00 UTC: THE VAPI WALLET (tenth account) IS AT -$0.16, so the live 208 line refuses calls until the owner tops it up.** Test runs (`vapi_sim_inbound.py`) drew from the same wallet and emptied it. The balance cannot be read with the key, so ask the owner to confirm the balance before ANY Vapi test. Org `42a9d973-6787-4a78-9f74-f4996aba24df`; the login is not on record, and the owner's usual dashboard opens the eighth account, so the org switcher is the way in.
       - **23 Oct: three settings tested, two READY BUT NOT LIVE** (owner: *"ok now we need to make the latency low"*). They were tried as overrides in Vapi's simulated calls (`vapi_sim_inbound.py --run DIR --candidate`, run `06597779`).
         - **Result:** the turn went from 3.68 s to **2.84 s** median. WORKLOG 23 Oct has the table.
         - **Ready in the repo, deploy refused by the auto-mode check, waiting for the owner's go:**
           - **Endpointing 0.8 → 0.5 s without punctuation** (0.3 → 0.1 with it), in `vapi_sync.py` inbound `startSpeakingPlan`. It decides almost every Hebrew turn, because Deepgram's Hebrew comes unpunctuated. Gain: 0.3 s a turn. Watch the first real calls for Michael cutting in on a slow caller.
           - **`chunkPlan.minCharacters` 10** (default 30), in `vapi_set_voice.py` `AGENT_VOICE` inbound. It trims the slow voice starts (mean 0.86 → 0.56 s).
-          - **To put both live**, in this order: `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`, then `python scripts/vapi_set_voice.py --agent inbound --apply`. The second reads back.
+          - **To put the voice start live:** `python scripts/vapi_set_voice.py --agent inbound --apply`, which reads back. The endpointing line above is withdrawn, so no inbound sync is needed for it.
         - **Tested, not in the repo: `serviceTier: fast`** (OpenAI's Fast mode).
           - The model stage went from 1.34 to 1.13 s median and from 1.61 to 1.05 s mean, with no turn over 1.3 s.
           - It costs about 1.5 cents a minute more (the model's share about 1.5x).
@@ -881,8 +882,9 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
         - **Before the go, an integrity run** (owner: *"we need to test the integrity if its reliable enough"*): `vapi_sim_inbound.py --run DIR --candidate --integrity`, nine calls, six of them stress cases. **Result: DO NOT SHIP the 0.5 s pause or the 0.1 s punctuation timer.**
           - Michael cut in on a hesitant caller four times, and asked for an address again when it came in two parts.
           - Fast mode and `minCharacters` 10 showed no harm.
-          - `vapi_sync.py` still carries 0.1 / 0.5 in the inbound target. It is not live, and must be changed to the value the next runs settle on, or removed, before any inbound sync.
-          - 0.65 s and the live 0.8 s are being compared on the two failing callers (WORKLOG 23 Oct).
+          - The same hesitant caller on the live 0.8 s was clean, so the pause stays 0.8 / 0.3. The override is out of `vapi_sync.py`.
+          - 0.65 s was never measured, because the wallet ran out.
+          - Still ready: `minCharacters` 10 (`vapi_set_voice.py --agent inbound --apply`, worth about 0.3 s on the slow starts), and Fast mode on the owner's word.
         - **Defect, not caused by the latency work:** when the caller speaks over the reference ("אני מחכה"), Michael's stop rule (`numWords` 2) cuts the number, and he goes on without repeating it (2 of 12 calls).
         - **Defect found, not fixed:** the building lookup refuses בר כוכבה for בר כוכבא (`street_unknown`), so a transcript with an ה/א ending variant makes Michael ask for the street again.
     - **22 Oct: feature 17, no ticket without a name (LIVE on the phone line since 10:24 UTC; WhatsApp is Plan B, not built).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
