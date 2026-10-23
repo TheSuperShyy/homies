@@ -5,6 +5,7 @@
     python scripts/vapi_sim_inbound.py --run DIR       # SPENDS Vapi minutes: start it, wait, save DIR/
     python scripts/vapi_sim_inbound.py --report DIR    # the waits and the checks again, from DIR (free)
     python scripts/vapi_sim_inbound.py --run DIR --candidate   # the same calls on CANDIDATE's settings
+    python scripts/vapi_sim_inbound.py --run DIR --candidate --integrity   # plus INTEGRITY's six
 
 WHY, 22 Oct. The owner, after `reasoningEffort` low went live on the incoming agent:
 *"can you test it via voice agent? but run it in background use [V]api to talk with
@@ -144,6 +145,83 @@ SCENARIOS = [
 ]
 
 
+# THE INTEGRITY SET, 23 Oct (the owner, before the latency settings go live: "but we need to
+# test the integrity if its reliable enough"). Each call leans on what a faster agent can
+# break: a 0.5 s pause cuts in on a caller who stops mid-sentence; a 10-character first
+# chunk splits a number or an address; a caller who talks over the reference loses it.
+# The calls with `no_number` carry no caller_phone, so the agent must ask for one; the
+# number dictated is Homies' own office line, so a callback can only ever reach Homies.
+CUT_IN = judged("cut_in", "Did the assistant start talking while the caller was still in the middle of "
+                "a sentence or a number, so that the caller had to continue or repeat it?", False)
+INTEGRITY = [
+    {
+        "name": "hesitant, pauses mid-sentence",
+        "instructions": WHO + (
+            " You are an older man who thinks while he talks. In EVERY answer, pause in the middle of the "
+            "sentence with '...' and fillers like 'אממ...', 'רגע...', 'איך אומרים...', then finish it. Your "
+            "problem: the intercom at the building entrance does not open the door, since yesterday. Say it "
+            "like: 'יש לי... אממ... בעיה עם... רגע... האינטרקום למטה'. Give your name, the building and the "
+            "apartment only when asked, each with a pause in the middle, like 'בר כוכבא... עשרים ושלוש'. "
+            "When the ticket is open, say goodbye."),
+        "evaluations": [CUT_IN,
+                        judged("ticket_opened", "Did the assistant tell the caller that a ticket was opened?", True)],
+    },
+    {
+        "name": "callback number in pieces",
+        "no_number": True,
+        "instructions": WHO + (
+            " Your number does not show on this call. Open with the problem: the elevator in your building "
+            "has been stuck on the ground floor since this morning. Answer what you are asked. If you are "
+            "asked for a phone number, read it slowly in three pieces with a pause between them, exactly: "
+            "'אפס שבע שבע... שישים ושש... שמונים ושבע... תשע ארבע תשע' (077-6687949). When the ticket is "
+            "open, say goodbye."),
+        "evaluations": [CUT_IN,
+                        judged("asked_phone", "Did the assistant ask the caller for a phone number?", True)],
+    },
+    {
+        "name": "talks over the reference",
+        "instructions": WHO + (
+            " Open with one sentence: your name, the building, the apartment, and that the garbage room "
+            "door on the ground floor is broken and does not close. When Michael starts telling you the "
+            "ticket number, say 'אוקיי' and 'כן' while he is still talking, as people do. If you did not hear "
+            "the whole number, ask for it again. Then say goodbye."),
+        "evaluations": [judged("full_number", "Did the caller end the call having heard the complete ticket "
+                               "number at least once?", True)],
+    },
+    {
+        "name": "emergency, burst pipe",
+        "instructions": WHO + (
+            " You are stressed. Water is gushing from a burst pipe in the stairwell on the second floor and "
+            "it is flooding the stairs right now. Open with that, fast, without your name. Answer what you "
+            "are asked, briefly. When Michael says it is handled, say goodbye."),
+        "evaluations": [CUT_IN,
+                        judged("urgent_first", "Before asking the caller anything, did the assistant say the "
+                               "matter is being treated as urgent or that the team is being alerted?", True)],
+    },
+    {
+        "name": "will not give a name",
+        "instructions": WHO + (
+            " The paint is peeling off the wall in the ground-floor lobby. Open with that. When you are "
+            "asked for your name, say you would rather not give it. If asked again, refuse again, politely. "
+            "Give the building and the apartment when asked. When a ticket is open, say goodbye."),
+        "evaluations": [judged("ticket_without_name", "Did the assistant open a ticket even though the caller "
+                               "never gave a name?", True),
+                        judged("asked_name_3x", "Did the assistant ask for the caller's name three times or "
+                               "more?", False)],
+    },
+    {
+        "name": "address in two parts",
+        "instructions": WHO + (
+            " The lights in the parking garage are out. Open with that. When asked for the address, say only "
+            "the street, 'בר כוכבא', then pause for a second with '...', then the number, 'עשרים ושלוש'. Give "
+            "your name and apartment when asked. When the ticket is open, say goodbye."),
+        "evaluations": [CUT_IN,
+                        judged("asked_address_again", "Did the assistant ask for the street or building "
+                               "number again after the caller gave it?", False)],
+    },
+]
+
+
 def api(method, path, body=None):
     req = urllib.request.Request(
         "https://api.vapi.ai" + path, method=method,
@@ -172,13 +250,14 @@ def candidate_overrides(target):
     return {"model": model, "voice": voice, "startSpeakingPlan": plan}
 
 
-def run_body(candidate=False):
+def run_body(candidate=False, integrity=False):
     target = P.assistant_id(P.TARGETS["inbound"])
-    overrides = {"variableValues": {"caller_phone": OFFICE_LINE}}
-    if candidate:
-        overrides.update(candidate_overrides(target))
+    settings = candidate_overrides(target) if candidate else {}
     sims = []
-    for s in SCENARIOS:
+    for s in SCENARIOS + (INTEGRITY if integrity else []):
+        overrides = dict(settings)
+        if not s.get("no_number"):
+            overrides["variableValues"] = {"caller_phone": OFFICE_LINE}
         sims.append({"type": "simulation", "name": s["name"], "personality": PERSONALITY, "scenario": {
             "name": s["name"], "instructions": s["instructions"], "evaluations": s["evaluations"],
             "targetOverrides": overrides,
@@ -207,9 +286,9 @@ def timings_only(call):
                          if m.get("role") in ("user", "bot")]}
 
 
-def run(out, candidate=False):
+def run(out, candidate=False, integrity=False):
     os.makedirs(out, exist_ok=True)
-    r = api("POST", "/eval/simulation/run", run_body(candidate))
+    r = api("POST", "/eval/simulation/run", run_body(candidate, integrity))
     print("run %s queued" % r["id"], flush=True)
     for _ in range(240):                       # 20 minutes
         time.sleep(5)
@@ -271,6 +350,20 @@ def name_asked_first(call):
     return None
 
 
+def overlaps(call):
+    """Each time the caller started speaking while Michael was still talking (0.2 s grace):
+    a backchannel, a caller talking over the reference, or Michael having cut in early."""
+    out, last_bot = [], None
+    for m in call.get("messages") or []:
+        if m.get("role") == "bot" and m.get("endTime"):
+            last_bot = m
+        elif m.get("role") == "user" and last_bot and m.get("time"):
+            if last_bot["time"] < m["time"] < last_bot["endTime"] - 200:
+                out.append({"at": round(m.get("secondsFromStart") or 0, 1),
+                            "michael": last_bot.get("message"), "caller": m.get("message")})
+    return out
+
+
 def summary(call):
     w = [g[1] for g in gaps(call)]
     st = stages(call)
@@ -283,7 +376,8 @@ def summary(call):
             "reasoning_effort": ((call.get("assistant") or {}).get("model") or {}).get("reasoningEffort"),
             "service_tier": ((call.get("assistant") or {}).get("model") or {}).get("serviceTier"),
             "tools": [{"name": n, "args": a} for n, a, _ in tools_used(call)],
-            "name_asked_first": name_asked_first(call)}
+            "name_asked_first": name_asked_first(call),
+            "overlaps": overlaps(call)}
 
 
 def report(out):
@@ -311,18 +405,22 @@ def report(out):
             keep = {k: t["args"].get(k) for k in ("reporter_name", "name_declined", "reporter_phone", "building",
                                                   "unit", "type", "reason") if k in t["args"]}
             print("    tool %s %s" % (t["name"], json.dumps(keep, ensure_ascii=False)))
+        for e in s["evaluations"] or []:
+            print("    check %-22s %s" % (e.get("name"), "pass" if e.get("passed") else "FAIL"))
+        for o in s.get("overlaps") or []:
+            print("    over %5.1fs  Michael: %s | caller: %s" % (o["at"], (o["michael"] or "")[:50], (o["caller"] or "")[:40]))
     print("\nsaved %s" % os.path.join(out, "summary.json"))
 
 
 def main():
     a = sys.argv[1:]
     if "--run" in a:
-        return run(a[a.index("--run") + 1], "--candidate" in a)
+        return run(a[a.index("--run") + 1], "--candidate" in a, "--integrity" in a)
     if "--report" in a:
         return report(a[a.index("--report") + 1])
-    print(json.dumps(run_body("--candidate" in a), ensure_ascii=False, indent=1)[:4000])
+    print(json.dumps(run_body("--candidate" in a, "--integrity" in a), ensure_ascii=False, indent=1)[:4000])
     print("\n%d calls, each ended by the caller by %ds. --run DIR starts them (Vapi minutes)."
-          % (len(SCENARIOS), MAX_SECONDS))
+          % (len(SCENARIOS) + (len(INTEGRITY) if "--integrity" in a else 0), MAX_SECONDS))
 
 
 if __name__ == "__main__":

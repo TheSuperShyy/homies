@@ -52,6 +52,19 @@ conversation that produced it.
 - **The deploy was refused** by Claude Code's auto-mode check ("Production Deploy") on `vapi_sync.py inbound --keep-voice --apply`. It was not worked around; it waits for the owner's explicit go or their own run.
 - **Fast mode is not in the repo:** it needs the owner's word on the cost first.
 
+### Voice latency: an integrity run before the settings go live (IN PROGRESS)
+- **Asked:** *"but we need to test the integrity if its reliable enough"*.
+- **`vapi_sim_inbound.py --integrity`** adds six calls (`INTEGRITY`), each aimed at what the faster settings can break:
+  - a hesitant caller who pauses mid-sentence;
+  - a callback number dictated in pieces, on a call with no number of its own. The number is Homies' own office line;
+  - a caller saying "okay" over the reference;
+  - an emergency (a burst pipe);
+  - a caller who will not give a name;
+  - an address given in two parts.
+  - Each has Vapi judge checks, including `cut_in` (did Michael start while the caller was mid-sentence or mid-number?).
+- **The report** now lists each check and every moment the caller spoke while Michael was still talking (`overlaps`), to be read by hand.
+- **Running** with the three earlier calls, all on the candidate settings (Fast mode included): 9 calls, about $2 of Vapi credit. Results go here.
+
 ## 2026-10-22
 
 ### The 10/22 report (in chat), and a `reporter` skill that writes every report

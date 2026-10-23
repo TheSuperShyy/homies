@@ -878,6 +878,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - The model stage went from 1.34 to 1.13 s median and from 1.61 to 1.05 s mean, with no turn over 1.3 s.
           - It costs about 1.5 cents a minute more (the model's share about 1.5x).
           - It is the owner's call. If yes: add `"serviceTier": "fast"` to the inbound `model` in `vapi_sync.py`, then sync as above.
+        - **Before the go, an integrity run** (owner: *"we need to test the integrity if its reliable enough"*): `vapi_sim_inbound.py --run DIR --candidate --integrity`, nine calls including six stress cases. The result is in WORKLOG 23 Oct; do not put the settings live on the first run's numbers alone.
         - **Defect found, not fixed:** the building lookup refuses בר כוכבה for בר כוכבא (`street_unknown`), so a transcript with an ה/א ending variant makes Michael ask for the street again.
     - **22 Oct: feature 17, no ticket without a name (LIVE on the phone line since 10:24 UTC; WhatsApp is Plan B, not built).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
       - **Went live on the owner's *"ok go"*.** The auto-mode check had refused the first try, after *"ok lets push it"*; it was not worked around. The steps:
