@@ -130,6 +130,11 @@ FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language":
 #            pointed form, so לך is said lekha every time). Unset = no dictionary,
 #            and the field is left as the live voice has it. Live on both since
 #            7 Oct: docs/reference/voice/hebrew-gender-consistency-2026-10-07.md.
+#   min_characters  chunkPlan.minCharacters: how much text the voice waits for before it
+#            starts. None = Vapi's default, 30. The incoming line takes 10 since 23 Oct (the
+#            owner: "make the latency low"); in the override test (vapi_sim_inbound.py
+#            --candidate) the voice stage went from 0.86 s to 0.56 s mean (median 0.61 to
+#            0.57 s: it trims the slow starts more than the typical one).
 #
 # 7 OCT: THE INCOMING LINE TAKES THE DEBT VOICE. The owner, after hearing clone A
 # in test calls next to the debt voice: "the inbound voice sounds metallic and
@@ -143,7 +148,7 @@ AGENT_VOICE = {
     "Debt Follow-up (he)": {"voice": None, "speed": None, "emotion": None,
                             "dict_env": "CARTESIA_DICT_DEBT"},
     "Inbound Intake (he)": {"voice": None, "speed": None, "emotion": None,
-                            "dict_env": "CARTESIA_DICT_INBOUND"},
+                            "dict_env": "CARTESIA_DICT_INBOUND", "min_characters": 10},
 }
 AGENT_FLAG = {"debt": "Debt Follow-up (he)", "inbound": "Inbound Intake (he)"}
 
@@ -180,6 +185,8 @@ def build_voice(vid, spec):
     did = env_value(spec["dict_env"]) if spec.get("dict_env") else ""
     if did:
         voice["pronunciationDictId"] = did
+    if spec.get("min_characters"):
+        voice["chunkPlan"]["minCharacters"] = spec["min_characters"]
     return voice
 
 
@@ -207,6 +214,7 @@ def shape(v):
         "speed": (v.get("generationConfig") or {}).get("speed"),
         "experimentalControls": v.get("experimentalControls") or None,
         "pronunciationDictId": v.get("pronunciationDictId") or None,
+        "minCharacters": (v.get("chunkPlan") or {}).get("minCharacters"),
         "replacements": reps_of(v),
         "fallback": (fb.get("provider"), fb.get("voiceId"), reps_of(fb)),
     }
@@ -219,7 +227,7 @@ def report(have, want, readback=False):
             return "   OK" if same else "   MISMATCH (sent %s)" % (target,)
         return "" if same else "   -> %s" % (target,)
     for k in ("provider", "voiceId", "model", "language", "volume", "speed", "experimentalControls",
-              "pronunciationDictId"):
+              "pronunciationDictId", "minCharacters"):
         print("  %-21s %s%s" % (k, have[k], mark(have[k] == want[k], want[k])))
     extra = [r[2] for r in want["replacements"] if r not in have["replacements"]]
     gone = [r[2] for r in have["replacements"] if r not in want["replacements"]]

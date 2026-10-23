@@ -2579,6 +2579,13 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
   12 turns on 22 Oct. Vapi's `smartEndpointingPlan` is English-trained and does not fire on Hebrew
   (LiveKit's is English-only too). So this one number is the whole endpointing stage, and lowering
   it trades the wait against cutting in on a caller who pauses.
+- **What each lever bought on the incoming agent (23 Oct, one simulated run, 10 turns):**
+  - endpointing 0.8 → 0.5 s: 0.3 s on every unpunctuated turn, free;
+  - OpenAI Fast mode: model mean 1.61 → 1.05 s, mostly by removing the 2 s turns, at about 1.5x the
+    model's cost;
+  - voice `minCharacters` 30 → 10: trims the slow starts (mean 0.86 → 0.56 s), free.
+  - The transcriber was not touched and still spikes (3.1 s once). With these, a turn is about 2.8 s;
+    the PRD's 0.8 s is not reachable on this stack (Hebrew STT + a thinking model + Cartesia).
 - **Price a replay's first call per moment at full rate.** The cache does not hit the first time
   a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
   for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.

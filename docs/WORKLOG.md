@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-23
 
-### Voice latency: three settings tried on test calls before anything goes live (IN PROGRESS)
+### Voice latency: three settings tried on test calls, 3.68 s to 2.84 s a turn; two made ready, the deploy refused, NOT live
 - **Asked:** *"ok now we need to make the latency low"*.
 - **Where the 3.7 s goes (22 Oct's run, read again per turn):**
   - **Endpointing** is the transcription timer, not a model: exactly 0.801 s on 10 of 12 turns, 1.0 s once (a number), 0.3 s once (punctuation). Deepgram's Hebrew arrives without punctuation, so `onNoPunctuationSeconds` decides almost every turn. The `smartEndpointingPlan` (`vapi`, English-trained) is set but never fires on Hebrew.
@@ -25,7 +25,32 @@ conversation that produced it.
   - `minCharacters` 10;
   - endpointing `onPunctuationSeconds` 0.3 → 0.1 and `onNoPunctuationSeconds` 0.8 → 0.5. `onNumberSeconds` stays 1.0.
 - **Before spending:** the account's visible calls total $1.16. The estimate for three calls is about $0.75 (22 Oct's $0.61, plus the faster tier on Michael's side).
-- **Running** in the background, 23 Oct. Results go here.
+- **Run `06597779`, 08:00 to 08:05 UTC, all three settings together** (they act on separate stages, so each stage's change belongs to one setting):
+
+  | Per turn | 22 Oct (live) | 23 Oct (candidate) |
+  |---|---|---|
+  | Whole turn, median | 3.68 s | **2.84 s** |
+  | Whole turn, mean | 3.87 s | 3.07 s |
+  | Endpointing | 0.80 s on almost every turn | 0.50 s on every unpunctuated turn |
+  | Model, median / mean | 1.34 / 1.61 s | 1.13 / 1.05 s; no turn over 1.3 s (22 Oct: four over 1.8 s) |
+  | Voice, median / mean | 0.61 / 0.86 s | 0.57 / 0.56 s |
+  | Transcriber (not touched) | 0.2 to 1.5 s | 0.24 to 0.6 s, but 3.09 s and 2.13 s once each |
+
+  - **Fast mode was served and billed:** the model's share of each call was about 1.5x its tokens at standard rates (22 Oct: 0.76 to 1.0x). That is about $0.045 against $0.030 for a one-minute call, so about 1.5 cents a minute more.
+  - **Cost of the run:** Michael's side $0.34; the caller's side is billed as well.
+- **The calls, read by hand:**
+  - **Light:** the name was asked first, then the address and the flat. Ticket 255-1372-26 carries the name.
+  - **Status:** looked up by building, flat and type, with no new ticket. When the caller asked to be kept updated, the agent called `notify_team` (mocked).
+  - **Leak, `failed` on Vapi's judge ("asked again"), and not because of the settings.** The caller said בר כוכבא and the transcript read **בר כוכבה**; `open_request` returned `street_unknown`, so the agent rightly asked for the street again. The second try opened 255-1373-26.
+    - **Found:** the building lookup does not match an ה/א ending variant of a street we manage. A real caller's transcript can do the same. Not fixed.
+    - The reference was cut to "1 3 7" when the caller said "אוקיי" over it, and the agent did not say it again.
+  - Nobody was cut off by the shorter pause. The simulated caller speaks in whole sentences, so a slow, real caller is the open check.
+- **Made ready, NOT live:**
+  - `vapi_sync.py` inbound `startSpeakingPlan`: 0.1 / 0.5 / 1.0 (the debt agent keeps BASE's 0.3 / 0.8 / 1.0).
+  - `vapi_set_voice.py` `AGENT_VOICE` inbound `min_characters: 10`, which the script now writes, shows and reads back.
+  - Both dry runs showed only those fields changing.
+- **The deploy was refused** by Claude Code's auto-mode check ("Production Deploy") on `vapi_sync.py inbound --keep-voice --apply`. It was not worked around; it waits for the owner's explicit go or their own run.
+- **Fast mode is not in the repo:** it needs the owner's word on the cost first.
 
 ## 2026-10-22
 
