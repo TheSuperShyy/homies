@@ -6,6 +6,7 @@
     python scripts/vapi_sim_inbound.py --report DIR    # the waits and the checks again, from DIR (free)
     python scripts/vapi_sim_inbound.py --run DIR --candidate   # the same calls on CANDIDATE's settings
     python scripts/vapi_sim_inbound.py --run DIR --candidate --integrity   # plus INTEGRITY's six
+    python scripts/vapi_sim_inbound.py --run DIR --only hesitant,address [--candidate --pause 0.65 --punct 0.3]
 
 WHY, 22 Oct. The owner, after `reasoningEffort` low went live on the incoming agent:
 *"can you test it via voice agent? but run it in background use [V]api to talk with
@@ -250,11 +251,13 @@ def candidate_overrides(target):
     return {"model": model, "voice": voice, "startSpeakingPlan": plan}
 
 
-def run_body(candidate=False, integrity=False):
+def run_body(candidate=False, integrity=False, only=None):
     target = P.assistant_id(P.TARGETS["inbound"])
     settings = candidate_overrides(target) if candidate else {}
     sims = []
-    for s in SCENARIOS + (INTEGRITY if integrity else []):
+    for s in SCENARIOS + (INTEGRITY if integrity or only else []):
+        if only and not any(s["name"].startswith(o) for o in only):
+            continue
         overrides = dict(settings)
         if not s.get("no_number"):
             overrides["variableValues"] = {"caller_phone": OFFICE_LINE}
@@ -286,9 +289,9 @@ def timings_only(call):
                          if m.get("role") in ("user", "bot")]}
 
 
-def run(out, candidate=False, integrity=False):
+def run(out, candidate=False, integrity=False, only=None):
     os.makedirs(out, exist_ok=True)
-    r = api("POST", "/eval/simulation/run", run_body(candidate, integrity))
+    r = api("POST", "/eval/simulation/run", run_body(candidate, integrity, only))
     print("run %s queued" % r["id"], flush=True)
     for _ in range(240):                       # 20 minutes
         time.sleep(5)
@@ -414,13 +417,20 @@ def report(out):
 
 def main():
     a = sys.argv[1:]
+    # --pause / --punct change CANDIDATE's endpointing for this run; --only picks calls by
+    # the start of their names, e.g. --only hesitant,address
+    for flag, key in (("--pause", "onNoPunctuationSeconds"), ("--punct", "onPunctuationSeconds")):
+        if flag in a:
+            CANDIDATE[key] = float(a[a.index(flag) + 1])
+    only = a[a.index("--only") + 1].split(",") if "--only" in a else None
     if "--run" in a:
-        return run(a[a.index("--run") + 1], "--candidate" in a, "--integrity" in a)
+        return run(a[a.index("--run") + 1], "--candidate" in a, "--integrity" in a, only)
     if "--report" in a:
         return report(a[a.index("--report") + 1])
-    print(json.dumps(run_body("--candidate" in a, "--integrity" in a), ensure_ascii=False, indent=1)[:4000])
+    body = run_body("--candidate" in a, "--integrity" in a, only)
+    print(json.dumps(body, ensure_ascii=False, indent=1)[:4000])
     print("\n%d calls, each ended by the caller by %ds. --run DIR starts them (Vapi minutes)."
-          % (len(SCENARIOS) + (len(INTEGRITY) if "--integrity" in a else 0), MAX_SECONDS))
+          % (len(body["simulations"]), MAX_SECONDS))
 
 
 if __name__ == "__main__":

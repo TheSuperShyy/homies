@@ -878,7 +878,12 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - The model stage went from 1.34 to 1.13 s median and from 1.61 to 1.05 s mean, with no turn over 1.3 s.
           - It costs about 1.5 cents a minute more (the model's share about 1.5x).
           - It is the owner's call. If yes: add `"serviceTier": "fast"` to the inbound `model` in `vapi_sync.py`, then sync as above.
-        - **Before the go, an integrity run** (owner: *"we need to test the integrity if its reliable enough"*): `vapi_sim_inbound.py --run DIR --candidate --integrity`, nine calls including six stress cases. The result is in WORKLOG 23 Oct; do not put the settings live on the first run's numbers alone.
+        - **Before the go, an integrity run** (owner: *"we need to test the integrity if its reliable enough"*): `vapi_sim_inbound.py --run DIR --candidate --integrity`, nine calls, six of them stress cases. **Result: DO NOT SHIP the 0.5 s pause or the 0.1 s punctuation timer.**
+          - Michael cut in on a hesitant caller four times, and asked for an address again when it came in two parts.
+          - Fast mode and `minCharacters` 10 showed no harm.
+          - `vapi_sync.py` still carries 0.1 / 0.5 in the inbound target. It is not live, and must be changed to the value the next runs settle on, or removed, before any inbound sync.
+          - 0.65 s and the live 0.8 s are being compared on the two failing callers (WORKLOG 23 Oct).
+        - **Defect, not caused by the latency work:** when the caller speaks over the reference ("אני מחכה"), Michael's stop rule (`numWords` 2) cuts the number, and he goes on without repeating it (2 of 12 calls).
         - **Defect found, not fixed:** the building lookup refuses בר כוכבה for בר כוכבא (`street_unknown`), so a transcript with an ה/א ending variant makes Michael ask for the street again.
     - **22 Oct: feature 17, no ticket without a name (LIVE on the phone line since 10:24 UTC; WhatsApp is Plan B, not built).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
       - **Went live on the owner's *"ok go"*.** The auto-mode check had refused the first try, after *"ok lets push it"*; it was not worked around. The steps:

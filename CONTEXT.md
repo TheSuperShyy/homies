@@ -2592,6 +2592,10 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
   - voice `minCharacters` 30 → 10: trims the slow starts (mean 0.86 → 0.56 s), free.
   - The transcriber was not touched and still spikes (3.1 s once). With these, a turn is about 2.8 s;
     the PRD's 0.8 s is not reachable on this stack (Hebrew STT + a thinking model + Cartesia).
+  - **0.5 s failed the integrity run, and the punctuation timer must not drop to 0.1 s.** A
+    hesitant caller was cut in on four times. Deepgram punctuates a Hebrew filler ("היי אממ!"),
+    so 0.1 s fires mid-thought. A street and its number with a pause between them came back as two
+    turns. The pause is a safety setting first and a speed setting second.
 - **Price a replay's first call per moment at full rate.** The cache does not hit the first time
   a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
   for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.

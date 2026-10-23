@@ -52,7 +52,7 @@ conversation that produced it.
 - **The deploy was refused** by Claude Code's auto-mode check ("Production Deploy") on `vapi_sync.py inbound --keep-voice --apply`. It was not worked around; it waits for the owner's explicit go or their own run.
 - **Fast mode is not in the repo:** it needs the owner's word on the cost first.
 
-### Voice latency: an integrity run before the settings go live (IN PROGRESS)
+### Voice latency: an integrity run before the settings go live, and 0.5 s endpointing fails it
 - **Asked:** *"but we need to test the integrity if its reliable enough"*.
 - **`vapi_sim_inbound.py --integrity`** adds six calls (`INTEGRITY`), each aimed at what the faster settings can break:
   - a hesitant caller who pauses mid-sentence;
@@ -63,7 +63,18 @@ conversation that produced it.
   - an address given in two parts.
   - Each has Vapi judge checks, including `cut_in` (did Michael start while the caller was mid-sentence or mid-number?).
 - **The report** now lists each check and every moment the caller spoke while Michael was still talking (`overlaps`), to be read by hand.
-- **Running** with the three earlier calls, all on the candidate settings (Fast mode included): 9 calls, about $2 of Vapi credit. Results go here.
+- **Run `2da300f8`: 7 of 9 passed. The two failures are the 0.5 s pause cutting in, so 0.5 s is NOT safe.**
+  - **Hesitant caller, `cut_in` failed:** Michael spoke over him four times.
+    - "בטח" came 0.1 s after "היי אממ!": Deepgram punctuated the filler, and `onPunctuationSeconds` 0.1 fired.
+    - "אוי" came mid-sentence.
+    - He asked for the building number while the caller was saying it ("בר כוכבא עמם, 23"), then asked for the flat twice.
+    - The ticket still opened with the right name, building and flat (1374), but the call was messy. Endpointing was 0.50 s on 8 of 11 turns.
+  - **Address in two parts, `asked_address_again` failed:** after "בר כוכבא" and the pause, Michael asked "מה מספר הבניין" as "23" arrived (he started 0.1 s after the caller ended).
+  - **Passed and clean:** the leak given all at once, the status, the refused name (`name_declined`, asked at most twice), the light, and the callback number in pieces. For the number, `need_phone` was asked, then `reporter_phone` 0776687949 was taken whole with no cut-in.
+  - **The emergency passed:** `notify_team` went first, then the name. But the caller's "אני מחכה" over the reference cut it to "מספר הפנייה הוא 1", and Michael went on without repeating it. The same happened to the leak call's reference in run `06597779`. "הפנייה התכופה" for הדחופה is back (21 Oct's slip).
+    - This is the stop rule (`numWords` 2, unchanged) and the prompt. The candidate settings did not cause it. The dedicated "talks over the reference" call passed.
+  - **No harm seen from Fast mode or `minCharacters` 10:** model 0.47 to 1.3 s median per call, voice 0.25 to 0.68 s.
+- **Next, running:** the two failing callers on the live 0.8 s, and on 0.65 s with Fast mode and `minCharacters` 10 (`--only hesitant,address --pause 0.65 --punct 0.3`). Four calls, about $1.20.
 
 ## 2026-10-22
 
