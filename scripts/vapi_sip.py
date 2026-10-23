@@ -4,6 +4,7 @@ r"""The SIP address Omnitelecom's extension 208 sends calls to: Vapi's free one.
     python scripts/vapi_sip.py              # show the account's SIP addresses (read only)
     python scripts/vapi_sip.py --apply      # create it, then read it back
     python scripts/vapi_sip.py --delete     # undo: remove it from the account
+    python scripts/vapi_sip.py --delete --key VAPI_PRIVATE_KEY_ACCOUNT10   # on another account
 
 WHAT IT IS
 
@@ -31,9 +32,10 @@ other direction (a provider's trunk login for calls WE place) and are not these.
 AN ACCOUNT MOVE LOSES IT
 
 The address belongs to the Vapi account, and `vapi_transfer.py` copies agents,
-not phone numbers. After a move: `--delete` with the OLD key in VAPI_PRIVATE_KEY,
-then `--apply` with the new one. The URI and the login stay the same, so Omni
-changes nothing. The agent is found by NAME, so the new account's id is picked up.
+not phone numbers. After a move: `--delete --key <the old key's .env name>`, then
+`--apply` with the new one in VAPI_PRIVATE_KEY. The URI and the login stay the
+same, so Omni changes nothing. The agent is found by NAME, so the new account's id
+is picked up. `--key` takes the NAME of a variable in .env, never a key.
 """
 
 import io
@@ -131,12 +133,20 @@ def show(n, names):
 
 def main():
     args = sys.argv[1:]
+    var = "VAPI_PRIVATE_KEY"
+    if "--key" in args:
+        i = args.index("--key")
+        if i + 1 >= len(args) or not re.match(r"^[A-Z0-9_]+$", args[i + 1]):
+            sys.exit("--key takes the NAME of a variable in .env, e.g. VAPI_PRIVATE_KEY_ACCOUNT10")
+        var = args[i + 1]
+        del args[i:i + 2]
     unknown = [a for a in args if a not in ("--apply", "--delete")]
     if unknown or len(args) > 1:
-        sys.exit("Usage: vapi_sip.py [--apply | --delete]")
-    key = env_value("VAPI_PRIVATE_KEY")
+        sys.exit("Usage: vapi_sip.py [--apply | --delete] [--key VAR]")
+    key = env_value(var)
     if not key:
-        sys.exit("VAPI_PRIVATE_KEY is not set in .env")
+        sys.exit("%s is not set in .env" % var)
+    print("account    : the one %s opens" % var)
 
     names = {a["id"]: a.get("name") for a in vapi("GET", "/assistant?limit=100", key)}
     nums = sip_numbers(key)

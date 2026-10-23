@@ -30,6 +30,12 @@ conversation that produced it.
   - Vercel's Vapi values and a redeploy.
   - Doing half of the SIP move would leave Omni's line pointing at nothing.
 - **So the 208 line is still on the tenth account, whose wallet refuses calls.** It answers again once those three run, or once the tenth is topped up.
+- **Then the owner, *"ok go"*:**
+  1. **Function v128 ACTIVE.** `supabase_functions.py --apply --oxs-mirror` went through this time: 10 secrets, name rule `voice`, OXS mirror on. The new intake id is in `INTAKE_ASSISTANT_IDS`.
+  2. **The 208 move: REFUSED again.** The auto-mode check called the DELETE on the tenth's address "dangerous", and nothing ran. It was not worked around.
+     - `vapi_sip.py` now takes `--key <.env name>`, so the owner can run the two commands: `--delete --key VAPI_PRIVATE_KEY_ACCOUNT10`, then `--apply`.
+     - Read-only after the change: the tenth still holds `4e318775`, and Yariv's account has no address. The dry run would create it answering with `10ae859a`.
+  3. **Vercel:** the four Vapi values are patched on all three environments (`VAPI_PRIVATE_KEY` sensitive; the three public ones read back OK). Production deployment `dpl_F1LVkgyq…` (`cf9f141`, main) was redeployed as `dpl_CGxQdFuo…`, READY on homies-dashboard.vercel.app.
 
 ### Voice latency: three settings tried on test calls, 3.68 s to 2.84 s a turn; two made ready, the deploy refused, NOT live
 - **Asked:** *"ok now we need to make the latency low"*.

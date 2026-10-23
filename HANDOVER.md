@@ -876,10 +876,13 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - `vapi_transfer.py --apply`: Cartesia credential `aeaa8296-5670-4179-b91c-4caf9c84f752` (client's key), **intake `10ae859a-f764-4b38-9154-cd8e82eb3a27`**, **debt `4bc03b57-018c-41bc-9c80-1b912b55496c`**.
           - Diffed field by field against the tenth: identical except `successEvaluationPlan`, which Vapi wrote off on create and which was set back on.
           - `vapi_set_voice.py` FALLBACK_IDS, `vapi_sip.py` FALLBACK_ID and `dashboard/.env.local` (ids and keys) are updated, and `vapi-export.json` is refreshed.
-        - **Refused by the auto-mode check ("Production Deploy"), waiting for the owner's explicit go:**
-          1. **The function:** the new intake id is in `INTAKE_ASSISTANT_IDS` (index.ts), not deployed. Run `python scripts/supabase_functions.py --apply --oxs-mirror`. Until it runs, the new incoming agent's team notes do not reach Chatwoot.
-          2. **The 208 SIP address:** it is still on the tenth account (`4e318775-…`, the empty wallet). Delete it there with the `_ACCOUNT10` key (a DELETE on `/phone-number/4e318775-7beb-489c-b3a8-925d792731d5`), then run `python scripts/vapi_sip.py --apply`, which now opens Yariv's account. The address and login stay the same, so Omni changes nothing.
-          3. **Vercel's four Vapi values,** then a redeploy (as on 4 Oct, with `VERCEL_ADMIN_KEY`).
+        - **After the owner's "ok go":**
+          - **The function is v128, with the new intake id. DONE.**
+          - **Vercel's four Vapi values are patched and the dashboard redeployed (READY). DONE.**
+          - **The 208 SIP address is STILL ON THE TENTH (`4e318775`, the empty wallet).** The auto-mode check refused the delete even after the go, so the owner runs:
+            `python scripts/vapi_sip.py --delete --key VAPI_PRIVATE_KEY_ACCOUNT10`
+            then `python scripts/vapi_sip.py --apply`, which creates it on Yariv's account answering with `10ae859a` and reads it back.
+          - The address and login stay the same, so Omni and Tokomni change nothing.
         - **Then:** the owner's test call through 208. The not-live `minCharacters` 10 still applies with `vapi_set_voice.py --agent inbound --apply`, which now targets Yariv's account.
       - **23 Oct: three settings tested, two READY BUT NOT LIVE** (owner: *"ok now we need to make the latency low"*). They were tried as overrides in Vapi's simulated calls (`vapi_sim_inbound.py --run DIR --candidate`, run `06597779`).
         - **Result:** the turn went from 3.68 s to **2.84 s** median. WORKLOG 23 Oct has the table.
