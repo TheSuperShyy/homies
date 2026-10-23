@@ -34,6 +34,9 @@ conversation that produced it.
   - the street spelling and the cut-off reference found.
   - Will: move the 208 line and make a test call, and decide on the faster AI tier.
 - Read-only check at 18:39 local: the 208 address is still on the tenth account.
+- **Given again after the 208 move** (*"ok now the new report where is it"*), 10 bullets.
+  - Added: "Moved the 208 phone line to Yariv's own Vapi account, so it can take calls again."
+  - The first Will line is now the test call to 208.
 
 ### Vapi: the agents copied to Yariv's own account; the function, the 208 address and Vercel wait for a go
 - **Asked:** the owner sent the keys of Yariv's Vapi account (a screenshot of a sheet): *"ok i want you to change vapi account lets link it using this one ok save it into the env as yariv vapi"*. The tenth account's wallet was at -$0.16 (the entry below).
