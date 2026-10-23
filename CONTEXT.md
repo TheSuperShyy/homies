@@ -2574,6 +2574,12 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
   - **A setting is tried as an override before it goes live** (`--candidate`, 23 Oct). The run
     sends the live agent's own model, voice and speaking plan with the new values in, so the test
     measures exactly what a sync would ship, and nothing live changes.
+  - **A speed setting also passes the stress calls before it ships** (`--integrity`, 23 Oct, on
+    the owner's *"we need to test the integrity if its reliable enough"*). Three calls show
+    speed, not safety: a shorter pause can cut in on a caller who stops mid-sentence or
+    mid-number, and a shorter first voice chunk can split a reference. The six `INTEGRITY` calls
+    aim at exactly those, and `overlaps` in the report lists every moment both sides talked at
+    once, to be read by hand.
 - **On Hebrew calls, endpointing is a fixed timer (23 Oct).** Deepgram's Hebrew transcript comes
   without punctuation, so `onNoPunctuationSeconds` ends almost every caller turn: 0.801 s on 10 of
   12 turns on 22 Oct. Vapi's `smartEndpointingPlan` is English-trained and does not fire on Hebrew
