@@ -9,6 +9,24 @@ conversation that produced it.
 
 ---
 
+## 2026-10-23
+
+### Voice latency: three settings tried on test calls before anything goes live (IN PROGRESS)
+- **Asked:** *"ok now we need to make the latency low"*.
+- **Where the 3.7 s goes (22 Oct's run, read again per turn):**
+  - **Endpointing** is the transcription timer, not a model: exactly 0.801 s on 10 of 12 turns, 1.0 s once (a number), 0.3 s once (punctuation). Deepgram's Hebrew arrives without punctuation, so `onNoPunctuationSeconds` decides almost every turn. The `smartEndpointingPlan` (`vapi`, English-trained) is set but never fires on Hebrew.
+  - **Model** 0.75 to 2.7 s; **voice** 0.4 to 1.0 s (one 2.3 s); **transcriber** 0.2 to 0.9 s (one 1.5 s).
+- **Vapi's spec (read-only):**
+  - `serviceTier`: auto / default / `fast` (the old `priority`), "faster responses at a higher per-token rate". gpt-5.6-sol is one of five models that take it.
+  - OpenAI's page puts Sol's Fast mode at twice the price ($10 / $1 cached / $60 per 1M against $5 / $0.50 / $30) for up to 2.5x the speed.
+  - `chunkPlan.minCharacters` defaults to 30 ("lower to decrease latency"). The live voice sets none.
+- **The candidate (`CANDIDATE` in `scripts/vapi_sim_inbound.py`, sent with `--candidate` as overrides on the live agent's own model, voice and speaking plan; the live agent is untouched):**
+  - `serviceTier: fast`, with reasoning kept at `low`;
+  - `minCharacters` 10;
+  - endpointing `onPunctuationSeconds` 0.3 → 0.1 and `onNoPunctuationSeconds` 0.8 → 0.5. `onNumberSeconds` stays 1.0.
+- **Before spending:** the account's visible calls total $1.16. The estimate for three calls is about $0.75 (22 Oct's $0.61, plus the faster tier on Michael's side).
+- **Running** in the background, 23 Oct. Results go here.
+
 ## 2026-10-22
 
 ### The 10/22 report (in chat), and a `reporter` skill that writes every report

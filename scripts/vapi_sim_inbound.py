@@ -4,6 +4,7 @@
     python scripts/vapi_sim_inbound.py                 # print the run it would start (free)
     python scripts/vapi_sim_inbound.py --run DIR       # SPENDS Vapi minutes: start it, wait, save DIR/
     python scripts/vapi_sim_inbound.py --report DIR    # the waits and the checks again, from DIR (free)
+    python scripts/vapi_sim_inbound.py --run DIR --candidate   # the same calls on CANDIDATE's settings
 
 WHY, 22 Oct. The owner, after `reasoningEffort` low went live on the incoming agent:
 *"can you test it via voice agent? but run it in background use [V]api to talk with
@@ -77,6 +78,23 @@ PERSONALITY = {
 
 WHO = "Your name is אסף קליקס (Assaf Clix). You live at בר כוכבא 23 in Tel Aviv, apartment 2."
 
+# THE LATENCY CANDIDATE, 23 Oct (the owner: "ok now we need to make the latency low").
+# 22 Oct's run had a turn at 3.68 s median: endpointing 0.74, transcriber 0.61, model
+# 1.61, voice 0.86 s (means). Each value below targets one of those stages. --candidate
+# sends them as overrides on the live agent's own model, voice and speaking plan, so
+# the live agent is not touched.
+CANDIDATE = {
+    # OpenAI's Fast mode (Vapi's `serviceTier`, the old `priority`): up to 2.5x the speed
+    # for twice the model's price. gpt-5.6-sol is one of the five models that take it.
+    "serviceTier": "fast",
+    # The voice starts on the first 10 characters instead of Vapi's default 30.
+    "minCharacters": 10,
+    # Endpointing was exactly 0.801 s on 10 of 12 turns: Deepgram's Hebrew comes without
+    # punctuation, so the no-punctuation timer decides almost every turn. Numbers keep 1.0.
+    "onPunctuationSeconds": 0.1,
+    "onNoPunctuationSeconds": 0.5,
+}
+
 
 def judged(name, question, expect):
     """One yes/no read of the call by Vapi's judge; our own checks come from the tool calls."""
@@ -141,13 +159,29 @@ def api(method, path, body=None):
         sys.exit("HTTP %s on %s %s\n%s" % (e.code, method, path, e.read().decode("utf-8")[:1500]))
 
 
-def run_body():
+def candidate_overrides(target):
+    """The live agent's own model, voice and speaking plan, with CANDIDATE's values in."""
+    a = api("GET", "/assistant/%s" % target)
+    model = dict(a["model"], serviceTier=CANDIDATE["serviceTier"])
+    voice = dict(a["voice"])
+    voice["chunkPlan"] = dict(voice.get("chunkPlan") or {}, minCharacters=CANDIDATE["minCharacters"])
+    plan = json.loads(json.dumps(a["startSpeakingPlan"]))
+    plan["transcriptionEndpointingPlan"].update(
+        onPunctuationSeconds=CANDIDATE["onPunctuationSeconds"],
+        onNoPunctuationSeconds=CANDIDATE["onNoPunctuationSeconds"])
+    return {"model": model, "voice": voice, "startSpeakingPlan": plan}
+
+
+def run_body(candidate=False):
     target = P.assistant_id(P.TARGETS["inbound"])
+    overrides = {"variableValues": {"caller_phone": OFFICE_LINE}}
+    if candidate:
+        overrides.update(candidate_overrides(target))
     sims = []
     for s in SCENARIOS:
         sims.append({"type": "simulation", "name": s["name"], "personality": PERSONALITY, "scenario": {
             "name": s["name"], "instructions": s["instructions"], "evaluations": s["evaluations"],
-            "targetOverrides": {"variableValues": {"caller_phone": OFFICE_LINE}},
+            "targetOverrides": overrides,
             "toolMocks": [{"toolName": "notify_team",
                            "result": json.dumps({"ok": True, "team_notified": True})}],
             # Informational: the PRD's ceiling, reported per call by Vapi itself.
@@ -173,9 +207,9 @@ def timings_only(call):
                          if m.get("role") in ("user", "bot")]}
 
 
-def run(out):
+def run(out, candidate=False):
     os.makedirs(out, exist_ok=True)
-    r = api("POST", "/eval/simulation/run", run_body())
+    r = api("POST", "/eval/simulation/run", run_body(candidate))
     print("run %s queued" % r["id"], flush=True)
     for _ in range(240):                       # 20 minutes
         time.sleep(5)
@@ -247,6 +281,7 @@ def summary(call):
             "wait_max_ms": round(max(w) * 1000) if w else None,
             "stage_median_ms": {k: med(v) for k, v in st.items()},
             "reasoning_effort": ((call.get("assistant") or {}).get("model") or {}).get("reasoningEffort"),
+            "service_tier": ((call.get("assistant") or {}).get("model") or {}).get("serviceTier"),
             "tools": [{"name": n, "args": a} for n, a, _ in tools_used(call)],
             "name_asked_first": name_asked_first(call)}
 
@@ -282,10 +317,10 @@ def report(out):
 def main():
     a = sys.argv[1:]
     if "--run" in a:
-        return run(a[a.index("--run") + 1])
+        return run(a[a.index("--run") + 1], "--candidate" in a)
     if "--report" in a:
         return report(a[a.index("--report") + 1])
-    print(json.dumps(run_body(), ensure_ascii=False, indent=1)[:4000])
+    print(json.dumps(run_body("--candidate" in a), ensure_ascii=False, indent=1)[:4000])
     print("\n%d calls, each ended by the caller by %ds. --run DIR starts them (Vapi minutes)."
           % (len(SCENARIOS), MAX_SECONDS))
 

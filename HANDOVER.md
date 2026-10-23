@@ -868,6 +868,11 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - Real calls through 208 are still the only measure of the phone leg.
         - **The bigger lever is `none`,** about 2.2 s faster per reply on OpenRouter. It would need prompt work and a new go.
         - **Undo:** drop `reasoningEffort` in `vapi_sync.py` and sync with `--keep-voice`.
+      - **23 Oct, being tested, NOT live: three settings for the wait** (owner: *"ok now we need to make the latency low"*). Tried as overrides in Vapi's simulated calls (`vapi_sim_inbound.py --run DIR --candidate`); the live agent is untouched:
+        - **`serviceTier: fast`:** OpenAI's Fast mode, twice the model's price for up to 2.5x the speed. It would double the AI part of every call's cost, so it is the owner's call before it goes live.
+        - **`chunkPlan.minCharacters` 10** (default 30): the voice starts sooner.
+        - **Endpointing 0.8 → 0.5 s without punctuation** (0.3 → 0.1 with it). It decides almost every Hebrew turn, because Deepgram's Hebrew comes unpunctuated. Watch for Michael cutting in on slow speakers.
+        - Results and the go/no-go are in WORKLOG 23 Oct.
     - **22 Oct: feature 17, no ticket without a name (LIVE on the phone line since 10:24 UTC; WhatsApp is Plan B, not built).** Spec and Plan A are in `docs/features/17-name-before-ticket/`.
       - **Went live on the owner's *"ok go"*.** The auto-mode check had refused the first try, after *"ok lets push it"*; it was not worked around. The steps:
         1. **Function v124, rule off.** `check_tools.py`: 13 pass, and the five `no charge on this call` money cases fail as they always do on a probe.

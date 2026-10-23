@@ -2571,6 +2571,14 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
     settings (it did: `reasoningEffort: low`).
   - Both sides bill: three one-minute calls cost $0.61.
   - It does not cover Omni's leg from Israel; only calls through 208 do.
+  - **A setting is tried as an override before it goes live** (`--candidate`, 23 Oct). The run
+    sends the live agent's own model, voice and speaking plan with the new values in, so the test
+    measures exactly what a sync would ship, and nothing live changes.
+- **On Hebrew calls, endpointing is a fixed timer (23 Oct).** Deepgram's Hebrew transcript comes
+  without punctuation, so `onNoPunctuationSeconds` ends almost every caller turn: 0.801 s on 10 of
+  12 turns on 22 Oct. Vapi's `smartEndpointingPlan` is English-trained and does not fire on Hebrew
+  (LiveKit's is English-only too). So this one number is the whole endpointing stage, and lowering
+  it trades the wait against cutting in on a caller who pauses.
 - **Price a replay's first call per moment at full rate.** The cache does not hit the first time
   a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
   for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.
