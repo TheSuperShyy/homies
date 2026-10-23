@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-23
 
+### The 10/23 report (in chat, `/reporter`)
+- Given in chat, 9 bullets:
+  - the three faster settings tested (3.7 to 2.8 s a reply in test calls);
+  - the stress calls, where the shorter pause cut in on hesitant callers;
+  - the pause kept, and the quicker voice start readied;
+  - the old Vapi account out of credit, so the line stopped;
+  - the agents moved to Yariv's account;
+  - the system and the live dashboard switched to it;
+  - the street spelling and the cut-off reference found.
+  - Will: move the 208 line and make a test call, and decide on the faster AI tier.
+- Read-only check at 18:39 local: the 208 address is still on the tenth account.
+
 ### Vapi: the agents copied to Yariv's own account; the function, the 208 address and Vercel wait for a go
 - **Asked:** the owner sent the keys of Yariv's Vapi account (a screenshot of a sheet): *"ok i want you to change vapi account lets link it using this one ok save it into the env as yariv vapi"*. The tenth account's wallet was at -$0.16 (the entry below).
 - **The keys:** in `.env` as `VAPI_PRIVATE_KEY_YARIV` / `VAPI_PUBLIC_KEY_YARIV`. They were told apart by use: the private one lists assistants, the public one gets 401. Neither was printed.
