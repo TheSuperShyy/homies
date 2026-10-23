@@ -83,8 +83,8 @@ NAMES = ["Debt Follow-up (he)", "Inbound Intake (he)"]
 # Refreshed 4 Oct to the account the key opens now (the tenth, copied one to one
 # from the ninth the same day); the August ids 404'd.
 FALLBACK_IDS = {
-    "Debt Follow-up (he)": "9e0209d2-c835-4163-813f-6844f9e07651",
-    "Inbound Intake (he)": "00d91473-1aaa-4a57-a380-ca5bb2b7f1af",
+    "Debt Follow-up (he)": "4bc03b57-018c-41bc-9c80-1b912b55496c",
+    "Inbound Intake (he)": "10ae859a-f764-4b38-9154-cd8e82eb3a27",
 }
 
 

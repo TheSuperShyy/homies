@@ -1058,8 +1058,12 @@ const INTAKE_ASSISTANT_DEMO = "827bfddd-05cc-417b-99f5-17eec76528e6";
 const INTAKE_ASSISTANT_DEMO9 = "4cbbcbe7-3e5e-4bd8-b4b3-024bd56f7187";
 // 4 Oct: the tenth account (the ninth's wallet at -$0.17), a one-to-one copy.
 const INTAKE_ASSISTANT_DEMO10 = "00d91473-1aaa-4a57-a380-ca5bb2b7f1af";
+// 23 Oct: Yariv's own account (the client's), on the owner's word; the tenth's wallet
+// was at -$0.16. A one-to-one copy by vapi_transfer.py.
+const INTAKE_ASSISTANT_YARIV = "10ae859a-f764-4b38-9154-cd8e82eb3a27";
 const INTAKE_ASSISTANT_IDS = new Set([
   INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO, INTAKE_ASSISTANT_DEMO9, INTAKE_ASSISTANT_DEMO10,
+  INTAKE_ASSISTANT_YARIV,
 ]);
 
 function isIntake(ctx: CallContext): boolean {

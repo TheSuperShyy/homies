@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-10-23
 
+### Vapi: the agents copied to Yariv's own account; the function, the 208 address and Vercel wait for a go
+- **Asked:** the owner sent the keys of Yariv's Vapi account (a screenshot of a sheet): *"ok i want you to change vapi account lets link it using this one ok save it into the env as yariv vapi"*. The tenth account's wallet was at -$0.16 (the entry below).
+- **The keys:** in `.env` as `VAPI_PRIVATE_KEY_YARIV` / `VAPI_PUBLIC_KEY_YARIV`. They were told apart by use: the private one lists assistants, the public one gets 401. Neither was printed.
+  - The account held only Vapi's default Riley: no credentials, no numbers, no calls.
+  - `balance()` reports it in credit.
+- **`vapi_transfer.py --to VAPI_PRIVATE_KEY_YARIV --apply`:**
+  - Cartesia credential `aeaa8296` (from the client's Cartesia key);
+  - intake `10ae859a-f764-4b38-9154-cd8e82eb3a27`, debt `4bc03b57-018c-41bc-9c80-1b912b55496c`;
+  - repointed: `vapi_set_voice.py` and `dashboard/.env.local`.
+- **Diff, old against new, field by field:** only `analysisPlan.successEvaluationPlan`. Vapi wrote `{enabled: false}` on create (as on 4 Oct), and it was set back on for both. The summary plan is identical.
+- **Promoted `.env`:** `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` are Yariv's; the tenth is kept as `_ACCOUNT10`. A copy of the old `.env` is in the session scratchpad.
+  - `dashboard/.env.local`: both keys and both ids now point at Yariv's account.
+  - `vapi_sip.py` FALLBACK_ID is updated, and `vapi-export.json` refreshed (`--check` clean).
+- **Refused by the auto-mode check ("Production Deploy"), not worked around:** `supabase_functions.py --apply --oxs-mirror`, with the new intake id joining `INTAKE_ASSISTANT_IDS`.
+- **Not attempted for the same reason:**
+  - the 208 SIP address move (delete on the tenth, `vapi_sip.py --apply` on Yariv's);
+  - Vercel's Vapi values and a redeploy.
+  - Doing half of the SIP move would leave Omni's line pointing at nothing.
+- **So the 208 line is still on the tenth account, whose wallet refuses calls.** It answers again once those three run, or once the tenth is topped up.
+
 ### Voice latency: three settings tried on test calls, 3.68 s to 2.84 s a turn; two made ready, the deploy refused, NOT live
 - **Asked:** *"ok now we need to make the latency low"*.
 - **Where the 3.7 s goes (22 Oct's run, read again per turn):**
@@ -80,7 +100,8 @@ conversation that produced it.
   - **The other three calls never ran:** *"Failed to create tester call: Your Wallet Balance is -0.16"*.
 - **THE VAPI WALLET IS EMPTY (-$0.16), so the live 208 line will refuse calls until it is topped up.**
   - This is the ninth account's failure again (its $5 trial ran to -$0.17 and Vapi refused every call).
-  - The tenth account's balance cannot be read with the key. The visible calls before today were $1.16, and today's tests spent about $3.6 ($0.70 + about $2.30 + $0.12 + the callers' side), which emptied it. So it was a small trial-sized balance, and the tests drew from the same wallet as the live line.
+  - The visible calls before today were $1.16, and today's tests spent about $3.6 ($0.70 + about $2.30 + $0.12 + the callers' side), which emptied it. So it was a small trial-sized balance, and the tests drew from the same wallet as the live line.
+  - **Corrected later the same day:** the wallet was checkable all along. `vapi_transfer.py --balance` says "in credit" or "blocked". It was missed, and the tests ran on an estimate.
   - **Lesson:** no Vapi test without the owner confirming the balance first.
 - **Where it stands:** nothing live changed today.
   - Ready and tested clean: `minCharacters` 10 (`vapi_set_voice.py`) and Fast mode (not in the repo, the owner's call on cost).

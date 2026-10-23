@@ -868,7 +868,19 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - Real calls through 208 are still the only measure of the phone leg.
         - **The bigger lever is `none`,** about 2.2 s faster per reply on OpenRouter. It would need prompt work and a new go.
         - **Undo:** drop `reasoningEffort` in `vapi_sync.py` and sync with `--keep-voice`.
-      - **23 OCT, ~09:00 UTC: THE VAPI WALLET (tenth account) IS AT -$0.16, so the live 208 line refuses calls until the owner tops it up.** Test runs (`vapi_sim_inbound.py`) drew from the same wallet and emptied it. The balance cannot be read with the key, so ask the owner to confirm the balance before ANY Vapi test. Org `42a9d973-6787-4a78-9f74-f4996aba24df`; the login is not on record, and the owner's usual dashboard opens the eighth account, so the org switcher is the way in.
+      - **23 OCT, ~09:00 UTC: THE VAPI WALLET (tenth account) WENT TO -$0.16,** and Vapi refuses calls on it. Test runs (`vapi_sim_inbound.py`) drew from the same wallet and emptied it. **Correction:** the wallet IS checkable. `python scripts/vapi_transfer.py --balance` (or `balance()` on a public key) reports in credit or blocked, though not the amount. Run it before ANY Vapi test. The owner answered by moving the agents to Yariv's account, in the next line.
+      - **23 OCT: MOVING TO YARIV'S OWN VAPI ACCOUNT (the client's), HALF DONE. The 208 line is NOT on it yet.** Owner: *"i want you to change vapi account lets link it using this one ... save it into the env as yariv vapi"*.
+        - **Done:**
+          - The keys are in `.env` as `VAPI_PRIVATE_KEY_YARIV` / `VAPI_PUBLIC_KEY_YARIV`, and promoted: `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` = Yariv's; the tenth is kept as `_ACCOUNT10`.
+          - The account is in credit (`balance()`).
+          - `vapi_transfer.py --apply`: Cartesia credential `aeaa8296-5670-4179-b91c-4caf9c84f752` (client's key), **intake `10ae859a-f764-4b38-9154-cd8e82eb3a27`**, **debt `4bc03b57-018c-41bc-9c80-1b912b55496c`**.
+          - Diffed field by field against the tenth: identical except `successEvaluationPlan`, which Vapi wrote off on create and which was set back on.
+          - `vapi_set_voice.py` FALLBACK_IDS, `vapi_sip.py` FALLBACK_ID and `dashboard/.env.local` (ids and keys) are updated, and `vapi-export.json` is refreshed.
+        - **Refused by the auto-mode check ("Production Deploy"), waiting for the owner's explicit go:**
+          1. **The function:** the new intake id is in `INTAKE_ASSISTANT_IDS` (index.ts), not deployed. Run `python scripts/supabase_functions.py --apply --oxs-mirror`. Until it runs, the new incoming agent's team notes do not reach Chatwoot.
+          2. **The 208 SIP address:** it is still on the tenth account (`4e318775-…`, the empty wallet). Delete it there with the `_ACCOUNT10` key (a DELETE on `/phone-number/4e318775-7beb-489c-b3a8-925d792731d5`), then run `python scripts/vapi_sip.py --apply`, which now opens Yariv's account. The address and login stay the same, so Omni changes nothing.
+          3. **Vercel's four Vapi values,** then a redeploy (as on 4 Oct, with `VERCEL_ADMIN_KEY`).
+        - **Then:** the owner's test call through 208. The not-live `minCharacters` 10 still applies with `vapi_set_voice.py --agent inbound --apply`, which now targets Yariv's account.
       - **23 Oct: three settings tested, two READY BUT NOT LIVE** (owner: *"ok now we need to make the latency low"*). They were tried as overrides in Vapi's simulated calls (`vapi_sim_inbound.py --run DIR --candidate`, run `06597779`).
         - **Result:** the turn went from 3.68 s to **2.84 s** median. WORKLOG 23 Oct has the table.
         - **Ready in the repo, deploy refused by the auto-mode check, waiting for the owner's go:**

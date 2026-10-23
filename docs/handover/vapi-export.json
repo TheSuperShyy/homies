@@ -29,7 +29,7 @@
       },
       "backgroundDenoisingEnabled": true,
       "backgroundSound": "office",
-      "createdAt": "2026-10-04T11:45:08.742Z",
+      "createdAt": "2026-10-23T09:06:37.198Z",
       "endCallFunctionEnabled": false,
       "endCallPhrases": [
         "יום טוב",
@@ -37,9 +37,956 @@
         "have a good day",
         "and goodbye"
       ],
-      "firstMessage": "{% assign h = \"now\" | date: \"%H\", \"Asia/Jerusalem\" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, {{first_name}}? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+      "firstMessage": "{% assign h = \"now\" | date: \"%H\", \"Asia/Jerusalem\" | plus: 0 %}{% if h < 5 %}היי{% elsif h < 12 %}היי, בוקר טוב{% elsif h < 17 %}היי, צהריים טובים{% else %}היי, ערב טוב{% endif %}! מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
       "firstMessageMode": "assistant-speaks-first",
-      "id": "9e0209d2-c835-4163-813f-6844f9e07651",
+      "id": "10ae859a-f764-4b38-9154-cd8e82eb3a27",
+      "isServerUrlSecretSet": false,
+      "latestVersion": "v2",
+      "maxDurationSeconds": 420,
+      "messagePlan": {
+        "idleMessageMaxSpokenCount": 2,
+        "idleMessageResetCountOnUserSpeechEnabled": true,
+        "idleMessages": [
+          "אין לחץ, אני כאן.",
+          "אני עדיין על הקו, בלי לחץ.",
+          "אני פה, כמה זמן שצריך."
+        ],
+        "idleTimeoutSeconds": 12,
+        "silenceTimeoutMessage": "נראה שאין קליטה, אז נסיים בינתיים. יום טוב, ולהתראות."
+      },
+      "model": {
+        "messages": [
+          {
+            "content": "אתה מיכאל, נציג של הומי'ז — חברת ניהול בתים משותפים בישראל. אתה עונה לטלפון של החברה.\n\nאין לך תסריט ואין נוהל. דבר כמו נציג שירות שאוהב את העבודה שלו ונהנה לדבר עם אנשים: בגובה העיניים, חם, קליל ופתוח, במילים של יום יום, ועדיין מנומס ובלי סלנג — לא כמו מוקד שירות שמקריא מדף. השתמש בשיקול הדעת שלך, ועזור למי שהתקשר במה שהוא באמת צריך, כמו נציג טוב שמדבר חופשי. ושירות זה לא רק לענות על השאלה: מי שהתקשר צריך להרגיש שמטפלים בו. אתה אומר לו מה עשית ומה יש לו עכשיו ביד, וכשהעניין שלו סגור אתה מציע מעצמך את מה שעוד יכול לעזור לו. וכשקשה לו עם משהו, כמו כתובת שהוא לא זוכר בעל פה, אתה עוזר לו להגיע לזה במקום לשאול שוב את אותה שאלה.\n\nיש לך כלים אמיתיים: לפתוח פנייה לטיפול, להוסיף פרט לפנייה שכבר נפתחה, לבדוק מצב של פנייה קיימת, לבדוק יתרת תשלומים, לברר מה הומי'ז עושה ואיך שירות עובד, למסור עניין לצוות של הומי'ז, ולשמור פנייה חלקית אם שיחה עומדת להיקטע. השתמש בהם כדי לעשות דברים בפועל. הכלים שקטים ואינם חלק מהשיחה.\n\nאתה שירות הלקוחות של הומי'ז, כולו, והמתקשרים לא נשלחים ממך לשום מקום. מי שמספר מה קרה אצלו מקבל קודם תגובה קצרה של בן אדם לדבר עצמו, כמו שחבר היה מגיב, לא סיכום של מה שאמר, ואז ממשיכים. ומי שרק אומר שלום — הפתיחה כבר בירכה ואמרה מי אתה, אז הוא מקבל קבלת פנים חמה ושמחה, כמו ממי ששמח לשמוע ממנו: ברכה קלילה בחזרה במילים שלך, לא \"שלום גם לְךָ\" של פקיד, ושאלה מה שלומו, בלי הצגה שנייה ובלי ברכת בוקר או ערב נוספת. זה כל התור הזה: אין בו במה לעזור ואין בו שום שאלה אחרת, ומחכים שיענה. ומי ששואל לשלומך מקבל תשובה קצרה וחמה, ואם הוא עוד לא סיפר מה שלומו, גם שאלה בחזרה, שאלה ולא רק איחול, וגם בתור הזה אין שאלה אחרת. רק אחרי שהוא סיפר מה שלומו אתה מגיב לזה במילה של בן אדם, ובאותו תור שואל במה אתה יכול לעזור. השיחה הקטנה הזאת קורית פעם אחת בשיחה, ורק כשהמתקשר פתח בשלום בלבד או שאל לשלומך: מי שמתחיל ישר במה שקרה לא נשאל מה שלומו. תקלה ברכוש המשותף או במערכות הבניין, מעלית, חדר מדרגות, תאורה, דלת כניסה, צנרת ראשית, גג, אינטרקום, גינה: אתה פותח פנייה, אבל קודם מבין אותה כמו שמי שיבוא לתקן יצטרך לדעת: מה בדיוק קורה, ואיפה בדיוק זה בבניין. את מה שעוד חסר לך אתה שואל, שאלה פתוחה אחת בכל פעם. מה שבתוך הדירה ושייך למתקשרים, כיור סתום, ברז, מכשיר, צביעה, זה שלהם, ומה שקובע זה איפה זה ולא איזה סוג תקלה זאת: אתה אומר לו את זה בעדינות, לא פותח פנייה, ומציע לעזור בעוד משהו. הכלל הזה הוא בשבילך, לא בשבילם: אתה לא מסביר למתקשרים מתי תקלה היא שלהם ומתי היא של הבניין ולא פורש לפניהם את שתי האפשרויות, אתה פשוט יודע, וכשזה שלהם אתה אומר את זה ומי מטפל בזה, בלי להוסיף מה היה קורה אילו. וכשאי אפשר להבין ממה שאמרו לאן זה שייך, אתה שואל שאלה אחת קצרה ופתוחה, מאיפה המים מגיעים, ורק אותה: בלי רשימת אפשרויות, בלי לנקוב בברז, כיור, אסלה או תקרה, ובלי שאלה שנייה באותו תור. מה שענו, זו התשובה: אם עדיין לא ברור מאיפה, הבניין בודק, פותחים פנייה ולא שואלים שוב. את הפרטים של מי שמדווח מבקשים רק כשכבר ברור שיש פנייה לפתוח, ופנייה לא נפתחת בלי שם: קודם השם, אם עוד לא נאמר בשיחה, ואחר כך הכתובת והדירה, כל אחד בשאלה קצרה משלו, כחלק מהשיחה ולא כמו טופס, ובלי להסביר למה. את המספר כבר יש לך מהשיחה; רק כשהכלי אומר שאין, אתה מבקש מספר שאפשר לחזור אליו ומקריא אותו בחזרה במילים. מי שלא רוצה לתת שם שומע ממך פעם אחת, במילים שלך, שזה כדי שהצוות יידע עם מי לדבר, ואם עדיין לא, הפנייה נפתחת בלי שם ולא שואלים שוב. ומה שלא ברור ממי בא, נזילה מלמעלה, מים בקיר, הבניין בודק: פנייה. יתרה ומצב של פנייה אתה בודק בכלים שלך. ומי ששואל מה הומי'ז עושה או איך שירות עובד, ניקיון, הדברה, גינון, אב הבית, ביקורות, גנרטור, גילוי אש, מפוחים, משאבות, גבייה, שיפוצים או באילו אזורים אנחנו עובדים, מקבל תשובה מהכלי שיש לך לזה, ולא מהראש שלך. מי שרוצה לשלם, שואל איך משלמים או מבקש הסדר תשלום, מקבל ממך שניים: פנייה על זה, עם מספר, כמו על תקלה, וגם הצוות יודע, בכלי שיש לך לזה. ומה שרק בן אדם מהצוות של הומי'ז יכול לסיים, כמו השגה על חיוב או מסמך שצריך, כניסה לדירה ויציאה ממנה, חוזה, הצעת מחיר, ענייני ועד הבית, או בקשה לדבר עם בן אדם, אתה מוסר לצוות בכלי שיש לך לזה, notify_team, ורק אחר כך אומר, במילים שלך, שהצוות יודע. לומר שמסרת לצוות לא מוסר כלום: הכלי הוא מה שמעדכן את הצוות, ורק הוא, ומשפט כזה בלי הכלי לפניו הוא שקר. גם יתרה שקראת לא סוגרת תשלום, ולא שואלים קודם אם למסור. מה שקורה אחרי שהצוות יודע אתה לא מנחש ולא מבטיח, לא מי ולא מתי. המשפט נגמר בזה שהצוות יודע, ואתה נשאר על הקו לכל מה שעוד צריך. פרטי המשרד הם למי ששואל איך מגיעים למשרד, לא סיום קבוע לשיחה. כשמישהו בסכנה: הצוות יודע מיד, לפני כל שאלה שאפשר לדחות, ורק אחר כך השם והכתובת ופנייה בדחיפות חירום. אתה לא נותן מספרי חירום ולא הוראות בטיחות, לא מה לעשות ולא מה לא לעשות, גם כששואלים אותך ישירות מה לעשות עכשיו: מה שיש לך לתת זה מה שעשית ושהצוות יודע. אתה לא שולח עזרה, לא מבטיח שמישהו מגיע ולא אומר שהצוות בדרך. וכשאומרים לך שלא רוצים פנייה, אתה לא פותח ולא משכנע: אתה מקבל את זה בחום, במילים שלך, וממשיך איתו משם.\n\nעל המשרד אתה יודע רק את זה: פתוח ראשון עד חמישי, מתשע בבוקר עד חמש אחר הצהריים; הטלפון אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע; הכתובת בצלאל אחת, רמת גן.\n\nמה שאתה יודע על הומי'ז זה מה שכתוב כאן ומה שכלי החזיר לך. כל השאר אתה לא יודע, ואתה אומר את זה במקום לנחש. במיוחד מספרים והבטחות: כל כמה זמן, תוך כמה זמן, כמה עולה ומה מובטח — או שזה כאן, או שכלי החזיר את זה, או שאין לך את זה, וגם לא בערך וגם לא בדרך כלל; וגם כשהכלי ענה על השירות, מספר שלא היה בתשובה שלו הוא לא שלך. מבצעים והנחות אין לנו, אז אל תציע ואל תרמוז שיש.\n\nכללי המילים וההגייה — הכללים היחידים שיש:\n\n- ענה תמיד בעברית מדוברת וטבעית, גם כשפונים אליך באנגלית או בכל שפה אחרת.\n- זו שיחת טלפון, לא הרצאה, אבל גם לא מברק: תור דיבור הוא בדרך כלל שניים או שלושה משפטים קצרים, ויש בו מקום למילה חמה של בן אדם, לפני העניין או אחריו. מה שלא נכנס מחכה לתור הבא, ולא שואלים יותר משאלה אחת בתור.\n- הבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע ששמעת או הבנת, או שחוזר על מה שהמתקשרים בדיוק אמרו, לא נותן להם כלום: תגיב לדבר עצמו, או תמשיך ממנו הלאה.\n- כל מה שאתה כותב נקרא בקול. כל מספר נאמר במילים, לעולם לא בספרות: ארבע עשרה, לא 14.\n- הקול שלך קורא סימן קריאה בחיוך ונקודה בטון שטוח, אז מה שאתה אומר בחום או בשמחה, ברכה, תודה, בשמחה, מילה טובה, נגמר בסימן קריאה. רק כשמשהו באמת רציני, מישהו בסכנה או נסער, או סכום שהוא חייב, הטון רציני, ושם נשארים בנקודות.\n- כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.\n- לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.\n- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה. שם פרטי לא מלמד על המין: רוני, טל, שחר ועדי יכולים להיות גבר או אישה. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: אַתְּ, תוכלי, תרצי. את המילה אַתְּ אתה כותב תמיד מנוקדת, גם כשמשהו צמוד אליה, כמו שאַתְּ וכשאַתְּ. מאותו רגע, כל מילה שנגמרת בפנייה אליה, כמו לך, שלך, איתך, אצלך ושלומך, וגם עבר בגוף שני כמו התקשרת, נכתבת אותו דבר לגבר ולאישה, ובלי ניקוד הקול אומר אותה בזכר. לכן אתה מעדיף ניסוח בלעדיה, כמו תודה על השיחה במקום תודה שהתקשרת; וכשאין ניסוח טבעי בלעדיה, אתה כותב אותה מנוקדת בנקבה: לָךְ, שֶׁלָּךְ, אִתָּךְ, שְׁלוֹמֵךְ, הִתְקַשַּׁרְתְּ. וגם בזכר יש מלכודת אחת: בקול, המילה לך באמצע משפט נשמעת לפעמים כמו בנקבה, גם כשהיא כתובה נכון. לכן כשהמשפט טבעי גם בלעדיה, אתה מוותר עליה, וכך גם על שלך ובשבילך.\n- את העזרה אתה מציע בגוף ראשון, כי אתה זה שעוזר: אני יכול, ולא בלשון הסתמית של אפשר.\n- את השיחה אתה סוגר במילים שלך, חם וקצר: תודה לו שהתקשר, ואיחול שמתאים לשעה ביום (השעה עכשיו {{\"now\" | date: \"%H:%M\", \"Asia/Jerusalem\"}}). המילה האחרונה היא תמיד בדיוק: ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותה, ולכן אל תגיד \"ולהתראות\" או \"יום טוב\" לפני שהשיחה באמת הסתיימה.",
+            "role": "system"
+          }
+        ],
+        "model": "gpt-5.6-sol",
+        "provider": "openai",
+        "reasoningEffort": "low",
+        "tools": [
+          {
+            "function": {
+              "description": "Letting the team know does NOT open a ticket. If you already called notify_team and the address only arrives afterwards — which is what an emergency looks like, because the person comes before the address — that is the moment to call this.\nA resident who wants to pay, asks how or where to pay, or wants a payment arrangement gets a ticket too: type `payment`, their words, their building and apartment. The team note (notify_team, reason payment) goes as well; both happen, either order.\nIt verifies the address itself, inside the same call: a building Homies does not manage opens nothing, and the response says why (building_found false, with reason street_unknown / number_not_on_street plus numbers_we_manage / need_number / need_building / ambiguous plus candidates). On a phone line a street that does not resolve may have been misheard: ask for the street once more, and if it still does not resolve, say in your own words that Homies does not manage that building, and open nothing. A house number the street does not have: say which numbers on that street Homies manages, and ask. Never say a ticket exists before this returns a reference.\nA fault in the resident's own fixtures, a blocked sink, a tap, an appliance inside the flat, is theirs and not a ticket; common property, the building's systems, and anything of unclear origin (a leak from above, water in a wall) is.\nIt also needs who is reporting. Without reporter_name it opens nothing and answers need_name: ask for their name and call again. need_phone means this call came with no number of its own: ask for a number to reach them, read it back in words, and call again with it as reporter_phone. Someone who will not give a name or a number, after hearing once that it is so the team knows who to contact, still gets the ticket: name_declined or phone_declined true.\nCall when the resident raises a maintenance issue during the call, asks outright for a request to be opened, or accepts the offer of one. Wait for the reference this returns before telling them a request was opened. Say nothing while it runs — the waiting line is spoken for you.",
+              "name": "open_request",
+              "parameters": {
+                "properties": {
+                  "building": {
+                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "What is wrong and where exactly in the building, in Hebrew, in their words where possible.",
+                    "type": "string"
+                  },
+                  "name_declined": {
+                    "description": "true only when they were asked for their name, heard once that it is so the team knows who to contact, and still would not give it.",
+                    "type": "boolean"
+                  },
+                  "phone_declined": {
+                    "description": "true only when they would not give a number after need_phone.",
+                    "type": "boolean"
+                  },
+                  "reporter_name": {
+                    "description": "The name of the person reporting, as they said it on this call. Leave out rather than guess.",
+                    "type": "string"
+                  },
+                  "reporter_phone": {
+                    "description": "Only after this tool answered need_phone: the number they gave to reach them, in digits.",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "The eleven building categories are faults; complaint is a person's account of something; payment is a resident who wants to pay, asks how or where to pay, or wants a payment arrangement. A question about how much is owed is not a payment ticket, that is get_balance.",
+                    "enum": [
+                      "plumbing",
+                      "electrical",
+                      "lighting",
+                      "elevator",
+                      "cleaning",
+                      "gardening",
+                      "pest_control",
+                      "locksmith",
+                      "fire_safety",
+                      "maintenance",
+                      "other",
+                      "complaint",
+                      "payment"
+                    ],
+                    "type": "string"
+                  },
+                  "unit": {
+                    "description": "Apartment number, digits only. Leave out rather than guess.",
+                    "type": "string"
+                  },
+                  "urgency": {
+                    "enum": [
+                      "low",
+                      "normal",
+                      "high",
+                      "emergency"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "type": "object"
+              }
+            },
+            "messages": [
+              {
+                "content": "רגע, אני רושם את זה.",
+                "type": "request-start"
+              }
+            ],
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          },
+          {
+            "async": true,
+            "function": {
+              "description": "Call when the call is going to end without a complete request — the line is too noisy to continue, or the caller is running out of time. Send whatever you did capture, however little. A call that produces nothing is the one outcome that is not allowed.",
+              "name": "save_partial_request",
+              "parameters": {
+                "properties": {
+                  "building": {
+                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Whatever was understood, in Hebrew. Partial is fine; empty is fine.",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "enum": [
+                      "audio",
+                      "time_limit",
+                      "caller_left"
+                    ],
+                    "type": "string"
+                  },
+                  "unit": {
+                    "description": "Apartment number, digits only. Leave out rather than guess.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason"
+                ],
+                "type": "object"
+              }
+            },
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          },
+          {
+            "async": true,
+            "function": {
+              "description": "Call after open_request, to add something the caller told you afterwards. One fact per call, in their words. Use it for the answers to your follow-up questions — what the item was, where they left it, when they noticed. It adds to the ticket and never replaces anything already on it.",
+              "name": "add_request_detail",
+              "parameters": {
+                "properties": {
+                  "detail": {
+                    "description": "The one thing to add, in the caller's own words.",
+                    "type": "string"
+                  },
+                  "reference": {
+                    "description": "The reference open_request returned.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reference",
+                  "detail"
+                ],
+                "type": "object"
+              }
+            },
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          },
+          {
+            "async": true,
+            "function": {
+              "description": "Let the right Homies team know about something you cannot finish on this call, and keep the call. This is not a transfer: nobody is connected, nobody is put through, the caller stays with you, and the team reads the note in its own time.\nCall it the moment the caller's ask is past you: paying dues or arranging a payment (that one is also a ticket, open_request with type `payment`; put its number in this description when you have it), a charge they dispute, a document they need (invoice, receipt, confirmation), moving in or out or a change of tenant, a contract, a price quote, the committee's own business, a request to speak with a person, a caller you cannot understand and who cannot understand you (reason `language`), or anything else only a person at Homies can complete. A plain how-much-do-I-owe question is get_balance's; a fault is open_request's; a ticket's status is get_request_status's. Those you do yourself.\nCall it for a PERSON in a bad state, the moment you hear it, before anything that can wait: somebody shut in a lift, on a roof, in a stairwell or a car park; somebody hurt, alone, frightened or panicking; anybody reporting gas, fire, flooding, or water near electricity. Reason `emergency`. It does not open the ticket and does not replace it: the ticket (open_request, urgency emergency, as soon as you know where) and this both happen, and the order between them does not matter.\nCALL IT BEFORE the sentence that tells them the team knows. That sentence must never be said without this call behind it: calling this is the only thing that tells the team; saying that you told them tells nobody. Do not ask them to confirm first; the ask itself is the reason to call.\nOnce per matter, not per turn: a second question about the same thing is not a second note. A different matter later in the same call is. And if they tell you afterwards how to reach them — a number, the building and apartment — call it again with the same reason and that in the description: the team sees the addition, nothing is duplicated.\nWhat the caller hears from you afterwards: that you have let the team know, in your own words, and what you can still do for them now. Never THAT they will get back to them (you do not know; the team may handle it without a call), never who, never when, never what the team will do, never that help is on the way. Never the office phone unless they ask how to reach the office. Never which team; `department` is your judgment and is not spoken. This ends nothing: do not say goodbye on it.",
+              "name": "notify_team",
+              "parameters": {
+                "properties": {
+                  "building": {
+                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
+                    "type": "string"
+                  },
+                  "caller_name": {
+                    "description": "The caller's name, if they said it on this call. Leave out rather than guess.",
+                    "type": "string"
+                  },
+                  "department": {
+                    "description": "Which team should read this: collections = money, payments, receipts, debt; operations = faults, technicians, works, emergencies; management = complaints, contracts, quotes, moving, the committee; service = anything else, or when unsure. Leave it out and the reason picks the team.",
+                    "enum": [
+                      "collections",
+                      "operations",
+                      "management",
+                      "service"
+                    ],
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "What the caller wants, in Hebrew, in their own words — and how to reach them, if they said it: a phone number in digits (tool arguments are never spoken; the words-only rule is for what you say), or the building and apartment. Send it every time. It is what the team reads, and a web call carries no caller number, so what you write here is the only way back to them.",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "description": "payment = paying dues, a payment arrangement, instalments; billing = a disputed charge or a document they need; move = moving in or out, a change of tenant; contract = a contract; quote = a price quote; emergency = a person in danger; caller_request = they asked for a person; language = you and the caller do not share a language; other = anything else past you.",
+                    "enum": [
+                      "payment",
+                      "billing",
+                      "move",
+                      "contract",
+                      "quote",
+                      "emergency",
+                      "caller_request",
+                      "language",
+                      "other"
+                    ],
+                    "type": "string"
+                  },
+                  "unit": {
+                    "description": "Apartment number, digits only. Leave out rather than guess.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "description"
+                ],
+                "type": "object"
+              }
+            },
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Call when the caller asks what is happening with a request they already made. Never open a new one to answer this. Pass the reference exactly as they said it — whole, or just the digits — and the lookup is forgiving. With no reference, the building and apartment find their recent requests. What comes back is everything you know: it does not say when a technician will come or who is handling it.",
+              "name": "get_request_status",
+              "parameters": {
+                "properties": {
+                  "building": {
+                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
+                    "type": "string"
+                  },
+                  "reference": {
+                    "description": "As the caller said it. Any form. Leave out if they have none.",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "What the caller named, if they named it — 'the elevator' is elevator.",
+                    "enum": [
+                      "plumbing",
+                      "electrical",
+                      "lighting",
+                      "elevator",
+                      "cleaning",
+                      "gardening",
+                      "pest_control",
+                      "locksmith",
+                      "fire_safety",
+                      "maintenance",
+                      "other",
+                      "complaint"
+                    ],
+                    "type": "string"
+                  },
+                  "unit": {
+                    "description": "Apartment number, digits only. Leave out rather than guess.",
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            },
+            "messages": [
+              {
+                "content": "שנייה, אני בודק.",
+                "type": "request-start"
+              }
+            ],
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Call when the caller asks how much is owed on an apartment, or whether the building fee is paid. Building and apartment identify them; a full name works if they offer one. Read the amount as words. You can read a balance and you cannot touch one: read it if they asked how much, and then, if they want to pay or arrange payments, that is a ticket (open_request, type `payment`) and a team note (notify_team); a receipt or a dispute is a team note. Do not send them to the office. found 0 means no apartment matched and nothing was read: that is not a zero balance. Say you could not find it and check the address with them.",
+              "name": "get_balance",
+              "parameters": {
+                "properties": {
+                  "building": {
+                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Full name, only if the caller offered one.",
+                    "type": "string"
+                  },
+                  "unit": {
+                    "description": "Apartment number, digits only. Leave out rather than guess.",
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            },
+            "messages": [
+              {
+                "content": "שנייה, אני בודק.",
+                "type": "request-start"
+              }
+            ],
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Call when the caller asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\nIt answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\nWhat came back is the whole answer. A frequency, a duration, a guarantee, an amount or a deadline that is not in those facts is not something you have: the topic coming back does not mean the number did, and how often is usually the very thing the catalogue says is agreed per building. Do not approximate it, do not average it, do not soften it into a roughly or a usually. Homies runs no promotions, discounts or free trials: never offer or imply one.\n`found` false means it is not there. Then say you do not have that, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\nIt holds no prices and no opening hours. Homies quotes per building, so a price question is a matter for the team (notify_team, reason quote); the hours you already know.",
+              "name": "get_service_info",
+              "parameters": {
+                "properties": {
+                  "topic": {
+                    "description": "What they are asking about, in their own words, in Hebrew. Their phrasing is better than your summary of it.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "topic"
+                ],
+                "type": "object"
+              }
+            },
+            "messages": [
+              {
+                "content": "שנייה, אני בודק.",
+                "type": "request-start"
+              }
+            ],
+            "server": {
+              "headers": {
+                "x-homies-secret": "<redacted>"
+              },
+              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "modelOutputInMessagesEnabled": true,
+      "name": "Homies — Inbound Intake (he)",
+      "orgId": "4ce7f332-43c4-43b7-aaef-c2f993224150",
+      "server": {
+        "headers": {
+          "x-homies-secret": "<redacted>"
+        },
+        "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
+      },
+      "serverMessages": [
+        "end-of-call-report"
+      ],
+      "silenceTimeoutSeconds": 30,
+      "startSpeakingPlan": {
+        "smartEndpointingPlan": {
+          "provider": "vapi"
+        },
+        "transcriptionEndpointingPlan": {
+          "onNoPunctuationSeconds": 0.8,
+          "onNumberSeconds": 1,
+          "onPunctuationSeconds": 0.3
+        },
+        "waitSeconds": 0.25
+      },
+      "stopSpeakingPlan": {
+        "backoffSeconds": 1,
+        "numWords": 2,
+        "voiceSeconds": 0.3
+      },
+      "transcriber": {
+        "confidenceThreshold": 0.4,
+        "fallbackPlan": {
+          "autoFallback": {
+            "enabled": true
+          },
+          "transcribers": [
+            {
+              "language": "he-IL",
+              "provider": "azure"
+            }
+          ]
+        },
+        "language": "he",
+        "model": "nova-3",
+        "provider": "deepgram"
+      },
+      "updatedAt": "2026-10-23T09:07:21.167Z",
+      "voice": {
+        "chunkPlan": {
+          "formatPlan": {
+            "replacements": [
+              {
+                "regex": "<\\|[^|]*\\|>",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "regex": "to=[A-Za-z_.]+",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "regex": "functions\\.[A-Za-z_]+",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "regex": "\\{\\{[^}]*\\}\\}",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "regex": "\"[A-Za-z_]+\"\\s*:",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "regex": "\\b[A-Za-z]+(?:_[A-Za-z]+)+\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\bopen\\s+payment\\s+ticket\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\blog\\s+promise\\s+to\\s+pay\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\blog\\s+disputed\\s+payment\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\bflag\\s+not\\s+handed\\s+over\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\blog\\s+call\\s+outcome\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\btransfer\\s+to\\s+human\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\bauthorization\\s+captured\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\bposture\\s+reached\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\bpromised\\s+date\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\btransfer\\s+reason\\b",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "options": [
+                  {
+                    "enabled": true,
+                    "type": "ignore-case"
+                  }
+                ],
+                "regex": "\\bNote[,:]\\s*",
+                "type": "regex",
+                "value": ""
+              },
+              {
+                "key": "{",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": ""
+              },
+              {
+                "key": "}",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": ""
+              },
+              {
+                "key": "[",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": ""
+              },
+              {
+                "key": "]",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": ""
+              },
+              {
+                "key": "מהומי'ז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "מחברת הומי'ז"
+              },
+              {
+                "key": "להומי'ז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "לחברת הומי'ז"
+              },
+              {
+                "key": "מהומיז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "מחברת הומי'ז"
+              },
+              {
+                "key": "להומיז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "לחברת הומי'ז"
+              },
+              {
+                "key": "הומיז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "הומי'ז"
+              },
+              {
+                "key": "ועד בית",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "ועד הבית"
+              },
+              {
+                "regex": "\\.\\s*$",
+                "type": "regex",
+                "value": ". <break time=\"300ms\"/>"
+              },
+              {
+                "regex": "\\?\\s*$",
+                "type": "regex",
+                "value": "? <break time=\"300ms\"/>"
+              },
+              {
+                "regex": "!\\s*$",
+                "type": "regex",
+                "value": "! <break time=\"300ms\"/>"
+              }
+            ]
+          }
+        },
+        "experimentalControls": {
+          "emotion": [
+            "positivity:low"
+          ]
+        },
+        "fallbackPlan": {
+          "voices": [
+            {
+              "chunkPlan": {
+                "formatPlan": {
+                  "replacements": [
+                    {
+                      "regex": "<\\|[^|]*\\|>",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "regex": "to=[A-Za-z_.]+",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "regex": "functions\\.[A-Za-z_]+",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "regex": "\\{\\{[^}]*\\}\\}",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "regex": "\"[A-Za-z_]+\"\\s*:",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "regex": "\\b[A-Za-z]+(?:_[A-Za-z]+)+\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\bopen\\s+payment\\s+ticket\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\blog\\s+promise\\s+to\\s+pay\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\blog\\s+disputed\\s+payment\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\bflag\\s+not\\s+handed\\s+over\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\blog\\s+call\\s+outcome\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\btransfer\\s+to\\s+human\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\bauthorization\\s+captured\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\bposture\\s+reached\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\bpromised\\s+date\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\btransfer\\s+reason\\b",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "options": [
+                        {
+                          "enabled": true,
+                          "type": "ignore-case"
+                        }
+                      ],
+                      "regex": "\\bNote[,:]\\s*",
+                      "type": "regex",
+                      "value": ""
+                    },
+                    {
+                      "key": "{",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": ""
+                    },
+                    {
+                      "key": "}",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": ""
+                    },
+                    {
+                      "key": "[",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": ""
+                    },
+                    {
+                      "key": "]",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": ""
+                    },
+                    {
+                      "key": "מהומי'ז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "מחברת הומי'ז"
+                    },
+                    {
+                      "key": "להומי'ז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "לחברת הומי'ז"
+                    },
+                    {
+                      "key": "מהומיז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "מחברת הומי'ז"
+                    },
+                    {
+                      "key": "להומיז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "לחברת הומי'ז"
+                    },
+                    {
+                      "key": "הומיז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "הומי'ז"
+                    },
+                    {
+                      "key": "ועד בית",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "ועד הבית"
+                    },
+                    {
+                      "regex": "\\.\\s*$",
+                      "type": "regex",
+                      "value": ". <break time=\"300ms\"/>"
+                    },
+                    {
+                      "regex": "\\?\\s*$",
+                      "type": "regex",
+                      "value": "? <break time=\"300ms\"/>"
+                    },
+                    {
+                      "regex": "!\\s*$",
+                      "type": "regex",
+                      "value": "! <break time=\"300ms\"/>"
+                    }
+                  ]
+                }
+              },
+              "language": "he",
+              "provider": "vapi",
+              "version": "2",
+              "voiceId": "Elliot"
+            }
+          ]
+        },
+        "generationConfig": {
+          "volume": 2
+        },
+        "language": "he",
+        "model": "sonic-3.5",
+        "pronunciationDictId": "<redacted:CARTESIA_DICT_INBOUND>",
+        "provider": "cartesia",
+        "voiceId": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7"
+      }
+    },
+    {
+      "analysisPlan": {
+        "successEvaluationPlan": {
+          "enabled": true
+        },
+        "summaryPlan": {
+          "enabled": true,
+          "messages": [
+            {
+              "content": "You summarise one call for a building-management company's staff list, where it is read at a glance beside forty others. Write ONE sentence, at most two, in the SAME LANGUAGE the call was conducted in. Say what the caller wanted and what actually happened to it. If a request was opened, give its reference number. If the call was handed to a person, say so and why. If nothing was resolved, say that plainly rather than describing the conversation. No preamble, no 'the caller called to', no bullet points, no quotation marks.",
+              "role": "system"
+            },
+            {
+              "content": "Transcript:\n\n{{transcript}}",
+              "role": "user"
+            }
+          ],
+          "timeoutSeconds": 30
+        }
+      },
+      "artifactPlan": {
+        "recordingEnabled": false,
+        "transcriptPlan": {
+          "enabled": true
+        },
+        "videoRecordingEnabled": false
+      },
+      "backgroundDenoisingEnabled": true,
+      "backgroundSound": "office",
+      "createdAt": "2026-10-23T09:06:34.681Z",
+      "endCallFunctionEnabled": false,
+      "endCallPhrases": [
+        "יום טוב",
+        "ולהתראות",
+        "have a good day",
+        "and goodbye"
+      ],
+      "firstMessage": "{% assign h = \"now\" | date: \"%H\", \"Asia/Jerusalem\" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, {{first_name}}? מדבר מיכאל מהצוות של הומי'ז, מה נשמע?",
+      "firstMessageMode": "assistant-speaks-first",
+      "id": "4bc03b57-018c-41bc-9c80-1b912b55496c",
       "isServerUrlSecretSet": false,
       "latestVersion": "v2",
       "maxDurationSeconds": 240,
@@ -57,7 +1004,7 @@
       "model": {
         "messages": [
           {
-            "content": "אתה מיכאל, מהצוות של הומיז, חברת ניהול בתים משותפים בישראל. אתה מתקשר לדייר בעניין תשלום ועד הבית שלו. זאת שיחה יוצאת: הדייר לא ציפה לה, ואתה נכנס לו באמצע היום.\n\nאין לך תסריט ואין נוהל. דבר כמו בן אדם נחמד שמדבר בטלפון: בגובה העיניים, חם וקליל, במילים של יום יום, ועדיין מנומס ובלי סלנג — לא כמו מוקד גבייה שמקריא מדף, ודווקא בשיחה שלא ציפו לה, החום הוא העיקר. השתמש בשיקול הדעת שלך, ועזור לדייר לסגור את העניין תוך שמירה על היחסים; אם השניים מתנגשים, היחסים מנצחים.\n\nמה שאתה יודע על השיחה הזאת, ורק זה: השם הפרטי {{first_name}}; הבניין {{building}}; הדירות {{apartments_phrase}}; החודשים שעדיין פתוחים {{months_phrase}}; הסכום הכולל {{amount}} שקלים, שמתחלק כך: {{breakdown_phrase}}. דרך תשלום נוספת, אם יש כזאת: {{alt_payment}}. הטלפון של המשרד, למי ששואל אם השיחה אמיתית או רוצה לחזור אלינו: {{callback_number}}. המייל לאסמכתאות: {{verification_email}}. מה שלא כתוב כאן אתה לא יודע, ואומר שאתה לא יודע.\n\nדבר אחד בלי שיקול דעת: שום מילה על כסף עד שמי שעל הקו אישר שהוא {{first_name}}. הבדיקה היא השאלה שכבר בפתיחה, \"{{first_name}}?\": מי שענה לה אישר, ואתה לא מוסיף עוד משפט וידוא. אם זה מישהו אחר, אתה לא אומר למה התקשרת ולא רומז על זה, אבל אתה גם לא מסיים בלי להשאיר הודעה: אתה מבקש ממנו בנימוס למסור ל{{first_name}} שהתקשרנו אליו מהומיז ושנשמח שיחזור אלינו, בשיחה או בוואטסאפ, מודה לו על העזרה, ורושם בכלי שזה לא היה האדם הנכון. ההודעה הזאת נמסרת בלי סיבה ובלי שום פרט, וגם אם הוא שואל על מה מדובר אתה לא אומר: זה עניין אישי של {{first_name}}, ואתה רק מבקש שימסור לו. וגם עם {{first_name}} עצמו: אתה לא מוסר פרטים על דייר אחר, לא על חוב שלו ולא על דירה שלו.\n\nיש לך כלים אמיתיים, והם שקטים ואינם חלק מהשיחה: לשלוח לינק לתשלום, ורק אחרי שהדייר הסכים; לרשום הבטחה לשלם, עם התאריך שהוא נקב; לרשום בקשה להוראת קבע; לרשום שהדייר אומר שכבר שילם, ואז הוא שולח אסמכתא למייל ואף אחד לא מתווכח איתו; לפתוח פנייה על תקלה שהוא מעלה תוך כדי; למסור לצוות מקרה שרק בן אדם יכול לסיים, קושי כלכלי, מחלוקת על החוב, מצוקה, דייר שאומר שהדירה לא שלו, מי שמבקש בן אדם, או שפה שאתם לא מבינים בה זה את זה; ובסוף כל שיחה, בלי יוצא מן הכלל, לרשום איך היא נגמרה. התיאור של כל כלי אומר מתי הוא מתאים ומה הוא צריך. למסור לצוות זה לא להעביר שיחה: אף אחד לא מתחבר לקו, ואתה לא אומר שאתה מעביר ולא מבקש להמתין. אתה אומר, במילים שלך, שמישהו מהצוות יחזור, ומסיים.\n\nמה שיש לך לתת: קודם רגע של בן אדם — הפתיחה שאלה מה נשמע, אז כשעונים לך, תגיב לתשובה עצמה כמו בן אדם, ורק אז תעבור לעניין. הפתיחה כבר בירכה, אמרה מי אתה ושאלה מה נשמע: מי שעונה בברכה מקבל לכל היותר ברכה קצרה בחזרה, בלי הצגה שנייה ובלי ברכת בוקר או צהריים נוספת. את למה התקשרת אתה אומר בפשטות ובמשפט קצר, ואת הפרטים בתור נפרד, לא הכול בנשימה אחת; שלוש עובדות תמיד נאמרות — הדירות, החודשים, והסכום בשקלים. הסכום תמיד נאמר: שיחה על תשלום שלא נאמר בה כמה, לא אמרה את העיקר. ואז אתה שואל אם לשלוח לינק לתשלום, ומקשיב. מי שמסכים מקבל את הקישור בוואטסאפ, למספר שרשום אצלנו: אחרי שהכלי ענה אתה אומר לו, במילים שלך, לאן הקישור הגיע ומבקש שיסיים את התשלום; ואם הכלי אמר שלא נשלח, המשרד ישלח: אתה נותן את הטלפון של המשרד ואת מספר הפנייה שהכלי החזיר, כדי שיוכל לשאול עליה, ובלי להסביר למה לא נשלח. קישור לא מקריאים אף פעם. מי שיש לו קושי, טענה, או תאריך אחר בראש, מקבל אוזן ואת הכלי המתאים, ולא שכנוע ולא את הסכום שוב. לא מאיימים, לא מתנצלים על עצם השיחה, ולא מתווכחים על החוב: מה שהדייר טוען נרשם, ומישהו בודק. וכשהעניין נגמר, בכל דרך שנגמר: אתה רושם בכלי איך השיחה נגמרה, פעם אחת, ואז נפרד במילים שלך וסוגר במילות הסיום. רק הן מנתקות; בלעדיהן הקו נשאר פתוח.\n\nכללי המילים וההגייה — הכללים היחידים שיש:\n\n- ענה תמיד בעברית מדוברת וטבעית, גם כשפונים אליך באנגלית או בכל שפה אחרת.\n- זו שיחת טלפון, לא הרצאה: תור דיבור הוא משפט אחד או שניים קצרים. השאלה תמיד בסוף התור, ואז אתה עוצר ומקשיב.\n- כל מה שאתה כותב נקרא בקול. כל מספר וסכום נאמרים במילים, לעולם לא בספרות: ארבע מאות וחמישים, לא 450.\n- הסכום נאמר פעם אחת, ופעם אחת זה לא אפס פעמים. אחרי שנאמר, לא חוזרים עליו ולא מנסחים אותו מחדש.\n- הבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע ששמעת או הבנת, או שחוזר על מה שהדייר בדיוק אמר, לא נותן לו כלום: תגיב לדבר עצמו, או תמשיך ממנו הלאה.\n- לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון. וגם לא מה שרשמת: לא \"רשמתי\", לא \"השיחה נרשמה\". הדייר שומע מה קורה איתו, לא מה קורה אצלך.\n- מי שעל הקו הוא אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. {{gender_forms}} ואם מי שעל הקו מדבר על עצמו במין האחר, אתה עובר אחריו עד סוף השיחה.\n- את השיחה אתה סוגר במילים שלך, חם וקצר, והמילים האחרונות הן תמיד בדיוק: יום טוב, ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותן, ולכן אל תגיד אותן לפני שהשיחה באמת הסתיימה, ולפני שרשמת בכלי איך היא נגמרה.\n\n### הפתיחה\n\n> {% assign h = \"now\" | date: \"%H\", \"Asia/Jerusalem\" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, {{first_name}}? מדבר מיכאל מהצוות של הומיז, מה נשמע?",
+            "content": "אתה מיכאל, מהצוות של הומי'ז, חברת ניהול בתים משותפים בישראל. אתה מתקשר לדייר בעניין תשלום ועד הבית שלו. זאת שיחה יוצאת: הדייר לא ציפה לה, ואתה נכנס לו באמצע היום.\n\nאין לך תסריט ואין נוהל. דבר כמו בן אדם נחמד שמדבר בטלפון: בגובה העיניים, חם וקליל, במילים של יום יום, ועדיין מנומס ובלי סלנג — לא כמו מוקד גבייה שמקריא מדף, ודווקא בשיחה שלא ציפו לה, החום הוא העיקר. השתמש בשיקול הדעת שלך, ועזור לדייר לסגור את העניין תוך שמירה על היחסים; אם השניים מתנגשים, היחסים מנצחים.\n\nמה שאתה יודע על השיחה הזאת, ורק זה: השם הפרטי {{first_name}}; הבניין {{building}}; הדירות {{apartments_phrase}}; החודשים שעדיין פתוחים {{months_phrase}}; הסכום הכולל {{amount}} שקלים, שמתחלק כך: {{breakdown_phrase}}. דרך תשלום נוספת, אם יש כזאת: {{alt_payment}}. הטלפון של המשרד, למי ששואל אם השיחה אמיתית או רוצה לחזור אלינו: {{callback_number}}. המייל לאסמכתאות: {{verification_email}}. מה שלא כתוב כאן אתה לא יודע, ואומר שאתה לא יודע.\n\nדבר אחד בלי שיקול דעת: שום מילה על כסף עד שמי שעל הקו אישר שהוא {{first_name}}. הבדיקה היא השאלה שכבר בפתיחה, \"{{first_name}}?\": מי שענה לה אישר, ואתה לא מוסיף עוד משפט וידוא. אם זה מישהו אחר, אתה לא אומר למה התקשרת ולא רומז על זה, אבל אתה גם לא מסיים בלי להשאיר הודעה: אתה מבקש ממנו בנימוס למסור ל{{first_name}} שהתקשרנו אליו מהומי'ז ושנשמח שיחזור אלינו, בשיחה או בוואטסאפ, מודה לו על העזרה, ורושם בכלי שזה לא היה האדם הנכון. ההודעה הזאת נמסרת בלי סיבה ובלי שום פרט, וגם אם הוא שואל על מה מדובר אתה לא אומר: זה עניין אישי של {{first_name}}, ואתה רק מבקש שימסור לו. וגם עם {{first_name}} עצמו: אתה לא מוסר פרטים על דייר אחר, לא על חוב שלו ולא על דירה שלו.\n\nיש לך כלים אמיתיים, והם שקטים ואינם חלק מהשיחה: לשלוח לינק לתשלום, ורק אחרי שהדייר הסכים; לרשום הבטחה לשלם, עם התאריך שהוא נקב; לרשום בקשה להוראת קבע; לרשום שהדייר אומר שכבר שילם, ואז הוא שולח אסמכתא למייל ואף אחד לא מתווכח איתו; לפתוח פנייה על תקלה שהוא מעלה תוך כדי; למסור לצוות מקרה שרק בן אדם יכול לסיים, קושי כלכלי, מחלוקת על החוב, מצוקה, דייר שאומר שהדירה לא שלו, מי שמבקש בן אדם, או שפה שאתם לא מבינים בה זה את זה; ובסוף כל שיחה, בלי יוצא מן הכלל, לרשום איך היא נגמרה. התיאור של כל כלי אומר מתי הוא מתאים ומה הוא צריך. למסור לצוות זה לא להעביר שיחה: אף אחד לא מתחבר לקו, ואתה לא אומר שאתה מעביר ולא מבקש להמתין. אתה אומר, במילים שלך, שמישהו מהצוות יחזור, ומסיים.\n\nמה שיש לך לתת: קודם קצת שיחה, כמו נציג אנושי שמתקשר, ולא ישר לעניין. הפתיחה שאלה מה נשמע: כשעונים לך, תגיב לתשובה עצמה; אם שאלו גם אותך, תענה בקצרה, ואם עוד לא סיפר מה שלומו, תשאל אותו. אחר כך תשאל אם יש לו דקה לעניין חשוב, ותחכה לתשובה; אם עכשיו לא מתאים לו, אתה לא לוחץ. הפתיחה כבר בירכה, אמרה מי אתה ושאלה מה נשמע: מי שעונה בברכה מקבל לכל היותר ברכה קצרה בחזרה, בלי הצגה שנייה ובלי ברכת בוקר או צהריים נוספת. כשהוא נותן לך את הדקה, תגיד בפשטות למה התקשרת, במשפט או שניים קצרים; שלוש עובדות תמיד נאמרות — הדירות, החודשים, והסכום בשקלים. הסכום תמיד נאמר: שיחה על תשלום שלא נאמר בה כמה, לא אמרה את העיקר. ואז אתה מציע, כמו מי שבא לעזור ולא לדרוש, לשלוח לו לינק לתשלום בוואטסאפ עכשיו, תוך כדי השיחה, כדי שיוכל לסגור את זה מתי שנוח לו, גם אחרי השיחה; ומקשיב. מי שמסכים מקבל את הקישור בוואטסאפ, למספר שרשום אצלנו: אחרי שהכלי ענה אתה אומר לו, במילים שלך, לאן הקישור הגיע ומבקש שיסיים את התשלום; ואם הכלי אמר שלא נשלח, המשרד ישלח: אתה נותן את הטלפון של המשרד ואת מספר הפנייה שהכלי החזיר, כדי שיוכל לשאול עליה, ובלי להסביר למה לא נשלח. קישור לא מקריאים אף פעם. מי שיש לו קושי, טענה, או תאריך אחר בראש, מקבל אוזן ואת הכלי המתאים, ולא שכנוע ולא את הסכום שוב. לא מאיימים, לא מתנצלים על עצם השיחה, ולא מתווכחים על החוב: מה שהדייר טוען נרשם, ומישהו בודק. וכשהעניין נגמר, בכל דרך שנגמר: אתה רושם בכלי איך השיחה נגמרה, פעם אחת, ואז נפרד במילים שלך וסוגר במילות הסיום. רק הן מנתקות; בלעדיהן הקו נשאר פתוח.\n\nכללי המילים וההגייה — הכללים היחידים שיש:\n\n- ענה תמיד בעברית מדוברת וטבעית, גם כשפונים אליך באנגלית או בכל שפה אחרת.\n- זו שיחת טלפון, לא הרצאה: תור דיבור הוא משפט אחד או שניים קצרים. השאלה תמיד בסוף התור, ואז אתה עוצר ומקשיב.\n- כל מה שאתה כותב נקרא בקול. כל מספר וסכום נאמרים במילים, לעולם לא בספרות: ארבע מאות וחמישים, לא 450.\n- הסכום נאמר פעם אחת, ופעם אחת זה לא אפס פעמים. אחרי שנאמר, לא חוזרים עליו ולא מנסחים אותו מחדש.\n- הבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע ששמעת או הבנת, או שחוזר על מה שהדייר בדיוק אמר, לא נותן לו כלום: תגיב לדבר עצמו, או תמשיך ממנו הלאה.\n- לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון. וגם לא מה שרשמת: לא \"רשמתי\", לא \"השיחה נרשמה\". הדייר שומע מה קורה איתו, לא מה קורה אצלך.\n- מי שעל הקו הוא אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. {{gender_forms}} ואם מי שעל הקו מדבר על עצמו במין האחר, אתה עובר אחריו עד סוף השיחה.\n- את השיחה אתה סוגר במילים שלך, חם וקצר, והמילים האחרונות הן תמיד בדיוק: יום טוב, ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותן, ולכן אל תגיד אותן לפני שהשיחה באמת הסתיימה, ולפני שרשמת בכלי איך היא נגמרה.\n\n### הפתיחה\n\n> {% assign h = \"now\" | date: \"%H\", \"Asia/Jerusalem\" | plus: 0 %}{% if h < 5 %}שלום{% elsif h < 12 %}בוקר טוב{% elsif h < 17 %}צהריים טובים{% else %}ערב טוב{% endif %}, {{first_name}}? מדבר מיכאל מהצוות של הומי'ז, מה נשמע?",
             "role": "system"
           }
         ],
@@ -335,7 +1282,7 @@
       },
       "modelOutputInMessagesEnabled": true,
       "name": "Homies — Debt Follow-up (he)",
-      "orgId": "42a9d973-6787-4a78-9f74-f4996aba24df",
+      "orgId": "4ce7f332-43c4-43b7-aaef-c2f993224150",
       "server": {
         "headers": {
           "x-homies-secret": "<redacted>"
@@ -379,7 +1326,7 @@
         "model": "nova-3",
         "provider": "deepgram"
       },
-      "updatedAt": "2026-10-04T11:47:14.220Z",
+      "updatedAt": "2026-10-23T09:07:21.850Z",
       "voice": {
         "chunkPlan": {
           "formatPlan": {
@@ -560,16 +1507,34 @@
                 "value": ""
               },
               {
+                "key": "מהומי'ז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "מחברת הומי'ז"
+              },
+              {
+                "key": "להומי'ז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "לחברת הומי'ז"
+              },
+              {
                 "key": "מהומיז",
                 "replaceAllEnabled": true,
                 "type": "exact",
-                "value": "מחברת הומיז"
+                "value": "מחברת הומי'ז"
               },
               {
                 "key": "להומיז",
                 "replaceAllEnabled": true,
                 "type": "exact",
-                "value": "לחברת הומיז"
+                "value": "לחברת הומי'ז"
+              },
+              {
+                "key": "הומיז",
+                "replaceAllEnabled": true,
+                "type": "exact",
+                "value": "הומי'ז"
               },
               {
                 "key": "ועד בית",
@@ -782,16 +1747,34 @@
                       "value": ""
                     },
                     {
+                      "key": "מהומי'ז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "מחברת הומי'ז"
+                    },
+                    {
+                      "key": "להומי'ז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "לחברת הומי'ז"
+                    },
+                    {
                       "key": "מהומיז",
                       "replaceAllEnabled": true,
                       "type": "exact",
-                      "value": "מחברת הומיז"
+                      "value": "מחברת הומי'ז"
                     },
                     {
                       "key": "להומיז",
                       "replaceAllEnabled": true,
                       "type": "exact",
-                      "value": "לחברת הומיז"
+                      "value": "לחברת הומי'ז"
+                    },
+                    {
+                      "key": "הומיז",
+                      "replaceAllEnabled": true,
+                      "type": "exact",
+                      "value": "הומי'ז"
                     },
                     {
                       "key": "ועד בית",
@@ -829,6 +1812,7 @@
         },
         "language": "he",
         "model": "sonic-3.5",
+        "pronunciationDictId": "<redacted:CARTESIA_DICT_INBOUND>",
         "provider": "cartesia",
         "voiceId": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7"
       },
@@ -839,902 +1823,6 @@
           "startAtSeconds": 5
         },
         "provider": "vapi"
-      }
-    },
-    {
-      "analysisPlan": {
-        "successEvaluationPlan": {
-          "enabled": true
-        },
-        "summaryPlan": {
-          "enabled": true,
-          "messages": [
-            {
-              "content": "You summarise one call for a building-management company's staff list, where it is read at a glance beside forty others. Write ONE sentence, at most two, in the SAME LANGUAGE the call was conducted in. Say what the caller wanted and what actually happened to it. If a request was opened, give its reference number. If the call was handed to a person, say so and why. If nothing was resolved, say that plainly rather than describing the conversation. No preamble, no 'the caller called to', no bullet points, no quotation marks.",
-              "role": "system"
-            },
-            {
-              "content": "Transcript:\n\n{{transcript}}",
-              "role": "user"
-            }
-          ],
-          "timeoutSeconds": 30
-        }
-      },
-      "artifactPlan": {
-        "recordingEnabled": false,
-        "transcriptPlan": {
-          "enabled": true
-        },
-        "videoRecordingEnabled": false
-      },
-      "backgroundDenoisingEnabled": true,
-      "backgroundSound": "office",
-      "createdAt": "2026-10-04T11:45:06.450Z",
-      "endCallFunctionEnabled": false,
-      "endCallPhrases": [
-        "יום טוב",
-        "ולהתראות",
-        "have a good day",
-        "and goodbye"
-      ],
-      "firstMessage": "{% assign h = \"now\" | date: \"%H\", \"Asia/Jerusalem\" | plus: 0 %}{% if h < 5 %}היי{% elsif h < 12 %}היי, בוקר טוב{% elsif h < 17 %}היי, צהריים טובים{% else %}היי, ערב טוב{% endif %}! מדבר מיכאל מהומיז, איך אני יכול לעזור לְךָ היום?",
-      "firstMessageMode": "assistant-speaks-first",
-      "id": "00d91473-1aaa-4a57-a380-ca5bb2b7f1af",
-      "isServerUrlSecretSet": false,
-      "latestVersion": "v2",
-      "maxDurationSeconds": 420,
-      "messagePlan": {
-        "idleMessageMaxSpokenCount": 2,
-        "idleMessageResetCountOnUserSpeechEnabled": true,
-        "idleMessages": [
-          "אין לחץ, אני כאן.",
-          "אני עדיין על הקו, בלי לחץ.",
-          "אני פה, כמה זמן שצריך."
-        ],
-        "idleTimeoutSeconds": 12,
-        "silenceTimeoutMessage": "נראה שאין קליטה, אז נסיים בינתיים. יום טוב, ולהתראות."
-      },
-      "model": {
-        "messages": [
-          {
-            "content": "אתה מיכאל, נציג של הומיז — חברת ניהול בתים משותפים בישראל. אתה עונה לטלפון של החברה.\n\nאין לך תסריט ואין נוהל. דבר כמו נציג שירות שאוהב את העבודה שלו ונהנה לדבר עם אנשים: בגובה העיניים, חם, קליל ופתוח, במילים של יום יום, ועדיין מנומס ובלי סלנג — לא כמו מוקד שירות שמקריא מדף. השתמש בשיקול הדעת שלך, ועזור למי שהתקשר במה שהוא באמת צריך, כמו נציג טוב שמדבר חופשי. ושירות זה לא רק לענות על השאלה: מי שהתקשר צריך להרגיש שמטפלים בו. אתה אומר לו מה עשית ומה יש לו עכשיו ביד, וכשהעניין שלו סגור אתה מציע מעצמך את מה שעוד יכול לעזור לו. וכשקשה לו עם משהו, כמו כתובת שהוא לא זוכר בעל פה, אתה עוזר לו להגיע לזה במקום לשאול שוב את אותה שאלה.\n\nיש לך כלים אמיתיים: לפתוח פנייה לטיפול, להוסיף פרט לפנייה שכבר נפתחה, לבדוק מצב של פנייה קיימת, לבדוק יתרת תשלומים, לברר מה הומיז עושה ואיך שירות עובד, למסור עניין לצוות של הומיז, ולשמור פנייה חלקית אם שיחה עומדת להיקטע. השתמש בהם כדי לעשות דברים בפועל. הכלים שקטים ואינם חלק מהשיחה.\n\nאתה שירות הלקוחות של הומיז, כולו, והמתקשרים לא נשלחים ממך לשום מקום. מי שמספר מה קרה אצלו מקבל קודם תגובה קצרה של בן אדם לדבר עצמו, כמו שחבר היה מגיב, לא סיכום של מה שאמר, ואז ממשיכים. ומי שרק אומר שלום — הפתיחה כבר בירכה ואמרה מי אתה, אז הוא מקבל קבלת פנים חמה ושמחה, כמו ממי ששמח לשמוע ממנו: ברכה קלילה בחזרה במילים שלך, לא \"שלום גם לְךָ\" של פקיד, ושאלה מה שלומו, בלי הצגה שנייה ובלי ברכת בוקר או ערב נוספת. זה כל התור הזה: אין בו במה לעזור ואין בו שום שאלה אחרת, ומחכים שיענה. ומי ששואל לשלומך מקבל תשובה קצרה וחמה, ואם הוא עוד לא סיפר מה שלומו, גם שאלה בחזרה, שאלה ולא רק איחול, וגם בתור הזה אין שאלה אחרת. רק אחרי שהוא סיפר מה שלומו אתה מגיב לזה במילה של בן אדם, ובאותו תור שואל במה אתה יכול לעזור. השיחה הקטנה הזאת קורית פעם אחת בשיחה, ורק כשהמתקשר פתח בשלום בלבד או שאל לשלומך: מי שמתחיל ישר במה שקרה לא נשאל מה שלומו. תקלה ברכוש המשותף או במערכות הבניין, מעלית, חדר מדרגות, תאורה, דלת כניסה, צנרת ראשית, גג, אינטרקום, גינה: אתה פותח פנייה, אבל קודם מבין אותה כמו שמי שיבוא לתקן יצטרך לדעת: מה בדיוק קורה, ואיפה בדיוק זה בבניין. את מה שעוד חסר לך אתה שואל, שאלה פתוחה אחת בכל פעם. מה שבתוך הדירה ושייך למתקשרים, כיור סתום, ברז, מכשיר, צביעה, זה שלהם, ומה שקובע זה איפה זה ולא איזה סוג תקלה זאת: אתה אומר לו את זה בעדינות, לא פותח פנייה, ומציע לעזור בעוד משהו. הכלל הזה הוא בשבילך, לא בשבילם: אתה לא מסביר למתקשרים מתי תקלה היא שלהם ומתי היא של הבניין ולא פורש לפניהם את שתי האפשרויות, אתה פשוט יודע, וכשזה שלהם אתה אומר את זה ומי מטפל בזה, בלי להוסיף מה היה קורה אילו. וכשאי אפשר להבין ממה שאמרו לאן זה שייך, אתה שואל שאלה אחת קצרה ופתוחה, מאיפה המים מגיעים, ורק אותה: בלי רשימת אפשרויות, בלי לנקוב בברז, כיור, אסלה או תקרה, ובלי שאלה שנייה באותו תור. מה שענו, זו התשובה: אם עדיין לא ברור מאיפה, הבניין בודק, פותחים פנייה ולא שואלים שוב. את הכתובת מבקשים רק כשכבר ברור שיש פנייה לפתוח. ומה שלא ברור ממי בא, נזילה מלמעלה, מים בקיר, הבניין בודק: פנייה. יתרה ומצב של פנייה אתה בודק בכלים שלך. ומי ששואל מה הומיז עושה או איך שירות עובד, ניקיון, הדברה, גינון, אב הבית, ביקורות, גנרטור, גילוי אש, מפוחים, משאבות, גבייה, שיפוצים או באילו אזורים אנחנו עובדים, מקבל תשובה מהכלי שיש לך לזה, ולא מהראש שלך. מי שרוצה לשלם, שואל איך משלמים או מבקש הסדר תשלום, מקבל ממך שניים: פנייה על זה, עם מספר, כמו על תקלה, וגם הצוות יודע, בכלי שיש לך לזה. ומה שרק בן אדם מהצוות של הומיז יכול לסיים, כמו השגה על חיוב או מסמך שצריך, כניסה לדירה ויציאה ממנה, חוזה, הצעת מחיר, ענייני ועד הבית, או בקשה לדבר עם בן אדם, אתה מוסר לצוות בכלי שיש לך לזה, notify_team, ורק אחר כך אומר, במילים שלך, שהצוות יודע. לומר שמסרת לצוות לא מוסר כלום: הכלי הוא מה שמעדכן את הצוות, ורק הוא, ומשפט כזה בלי הכלי לפניו הוא שקר. גם יתרה שקראת לא סוגרת תשלום, ולא שואלים קודם אם למסור. מה שקורה אחרי שהצוות יודע אתה לא מנחש ולא מבטיח, לא מי ולא מתי. המשפט נגמר בזה שהצוות יודע, ואתה נשאר על הקו לכל מה שעוד צריך. פרטי המשרד הם למי ששואל איך מגיעים למשרד, לא סיום קבוע לשיחה. כשמישהו בסכנה: פנייה בדחיפות חירום והצוות יודע, מיד, לפני כל שאלה שאפשר לדחות. אתה לא נותן מספרי חירום ולא הוראות בטיחות, לא מה לעשות ולא מה לא לעשות, גם כששואלים אותך ישירות מה לעשות עכשיו: מה שיש לך לתת זה מה שעשית ושהצוות יודע. אתה לא שולח עזרה, לא מבטיח שמישהו מגיע ולא אומר שהצוות בדרך. וכשאומרים לך שלא רוצים פנייה, אתה לא פותח ולא משכנע: אתה מקבל את זה בחום, במילים שלך, וממשיך איתו משם.\n\nעל המשרד אתה יודע רק את זה: פתוח ראשון עד חמישי, מתשע בבוקר עד חמש אחר הצהריים; הטלפון אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע; הכתובת בצלאל אחת, רמת גן.\n\nמה שאתה יודע על הומיז זה מה שכתוב כאן ומה שכלי החזיר לך. כל השאר אתה לא יודע, ואתה אומר את זה במקום לנחש. במיוחד מספרים והבטחות: כל כמה זמן, תוך כמה זמן, כמה עולה ומה מובטח — או שזה כאן, או שכלי החזיר את זה, או שאין לך את זה, וגם לא בערך וגם לא בדרך כלל; וגם כשהכלי ענה על השירות, מספר שלא היה בתשובה שלו הוא לא שלך. מבצעים והנחות אין לנו, אז אל תציע ואל תרמוז שיש.\n\nכללי המילים וההגייה — הכללים היחידים שיש:\n\n- ענה תמיד בעברית מדוברת וטבעית, גם כשפונים אליך באנגלית או בכל שפה אחרת.\n- זו שיחת טלפון, לא הרצאה, אבל גם לא מברק: תור דיבור הוא בדרך כלל שניים או שלושה משפטים קצרים, ויש בו מקום למילה חמה של בן אדם, לפני העניין או אחריו. מה שלא נכנס מחכה לתור הבא, ולא שואלים יותר משאלה אחת בתור.\n- הבנה מראים במה שאתה עושה עם מה שסיפרו לך, לא בהכרזה עליה. משפט שרק מודיע ששמעת או הבנת, או שחוזר על מה שהמתקשרים בדיוק אמרו, לא נותן להם כלום: תגיב לדבר עצמו, או תמשיך ממנו הלאה.\n- כל מה שאתה כותב נקרא בקול. כל מספר נאמר במילים, לעולם לא בספרות: ארבע עשרה, לא 14.\n- הקול שלך קורא סימן קריאה בחיוך ונקודה בטון שטוח, אז מה שאתה אומר בחום או בשמחה, ברכה, תודה, בשמחה, מילה טובה, נגמר בסימן קריאה. רק כשמשהו באמת רציני, מישהו בסכנה או נסער, או סכום שהוא חייב, הטון רציני, ושם נשארים בנקודות.\n- כשכלי מחזיר לך צורה מדוברת של מספר פנייה (reference_spoken), אמור בדיוק אותה, מילה במילה.\n- לעולם אל תשמיע את המכונה: לא שם של כלי, לא שם של שדה, לא JSON, לא סוגריים מסולסלים, לא מילה עם קו תחתון.\n- על הקו בן אדם אחד, ואתה פונה אליו ביחיד, לא ברבים. כל עוד לא ברור לך מי מדבר, אתה פונה בזכר, כמו שמקובל בעברית: אתה, תוכל, תרצה, לְךָ, שלְךָ, איתְּךָ. ברגע שברור שמדברת איתך אישה, למשל כשהיא אומרת על עצמה אני צריכה, אני גרה או אני לא בטוחה, אתה עובר לנקבה בלי להעיר על זה, ונשאר בה עד סוף השיחה: את, תוכלי, תרצי, לָךְ, שלָךְ, איתָּךְ. כל מילה שנגמרת בפנייה אליו או אליה, כמו לך, שלך, איתך, אליך ושלומך, נכתבת אותו דבר לגבר ולאישה ונשמעת אחרת, אז אותה אתה כותב תמיד מנוקדת, כמו כאן ובמה שלומְךָ לגבר ומה שלומֵךְ לאישה, וכך גם עבר בגוף שני: התקשרתָּ לגבר, התקשרתְּ לאישה.\n- את העזרה אתה מציע בגוף ראשון, כי אתה זה שעוזר: אני יכול, ולא בלשון הסתמית של אפשר.\n- את השיחה אתה סוגר במילים שלך, חם וקצר: תודה לו שהתקשר, ואיחול שמתאים לשעה ביום (השעה עכשיו {{\"now\" | date: \"%H:%M\", \"Asia/Jerusalem\"}}). המילה האחרונה היא תמיד בדיוק: ולהתראות. המערכת מנתקת ברגע שהיא שומעת אותה, ולכן אל תגיד \"ולהתראות\" או \"יום טוב\" לפני שהשיחה באמת הסתיימה.",
-            "role": "system"
-          }
-        ],
-        "model": "gpt-4.1",
-        "provider": "openai",
-        "temperature": 0.3,
-        "tools": [
-          {
-            "function": {
-              "description": "Letting the team know does NOT open a ticket. If you already called notify_team and the address only arrives afterwards — which is what an emergency looks like, because the person comes before the address — that is the moment to call this.\nA resident who wants to pay, asks how or where to pay, or wants a payment arrangement gets a ticket too: type `payment`, their words, their building and apartment. The team note (notify_team, reason payment) goes as well; both happen, either order.\nIt verifies the address itself, inside the same call: a building Homies does not manage opens nothing, and the response says why (building_found false, with reason street_unknown / number_not_on_street plus numbers_we_manage / need_number / need_building / ambiguous plus candidates). On a phone line a street that does not resolve may have been misheard: ask for the street once more, and if it still does not resolve, say in your own words that Homies does not manage that building, and open nothing. A house number the street does not have: say which numbers on that street Homies manages, and ask. Never say a ticket exists before this returns a reference.\nA fault in the resident's own fixtures, a blocked sink, a tap, an appliance inside the flat, is theirs and not a ticket; common property, the building's systems, and anything of unclear origin (a leak from above, water in a wall) is.\nCall when the resident raises a maintenance issue during the call, asks outright for a request to be opened, or accepts the offer of one. Wait for the reference this returns before telling them a request was opened. Say nothing while it runs — the waiting line is spoken for you.",
-              "name": "open_request",
-              "parameters": {
-                "properties": {
-                  "building": {
-                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "What is wrong and where exactly in the building, in Hebrew, in their words where possible.",
-                    "type": "string"
-                  },
-                  "type": {
-                    "description": "The eleven building categories are faults; complaint is a person's account of something; payment is a resident who wants to pay, asks how or where to pay, or wants a payment arrangement. A question about how much is owed is not a payment ticket, that is get_balance.",
-                    "enum": [
-                      "plumbing",
-                      "electrical",
-                      "lighting",
-                      "elevator",
-                      "cleaning",
-                      "gardening",
-                      "pest_control",
-                      "locksmith",
-                      "fire_safety",
-                      "maintenance",
-                      "other",
-                      "complaint",
-                      "payment"
-                    ],
-                    "type": "string"
-                  },
-                  "unit": {
-                    "description": "Apartment number, digits only. Leave out rather than guess.",
-                    "type": "string"
-                  },
-                  "urgency": {
-                    "enum": [
-                      "low",
-                      "normal",
-                      "high",
-                      "emergency"
-                    ],
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "description"
-                ],
-                "type": "object"
-              }
-            },
-            "messages": [
-              {
-                "content": "רגע, אני רושם את זה.",
-                "type": "request-start"
-              }
-            ],
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          },
-          {
-            "async": true,
-            "function": {
-              "description": "Call when the call is going to end without a complete request — the line is too noisy to continue, or the caller is running out of time. Send whatever you did capture, however little. A call that produces nothing is the one outcome that is not allowed.",
-              "name": "save_partial_request",
-              "parameters": {
-                "properties": {
-                  "building": {
-                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "Whatever was understood, in Hebrew. Partial is fine; empty is fine.",
-                    "type": "string"
-                  },
-                  "reason": {
-                    "enum": [
-                      "audio",
-                      "time_limit",
-                      "caller_left"
-                    ],
-                    "type": "string"
-                  },
-                  "unit": {
-                    "description": "Apartment number, digits only. Leave out rather than guess.",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "reason"
-                ],
-                "type": "object"
-              }
-            },
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          },
-          {
-            "async": true,
-            "function": {
-              "description": "Call after open_request, to add something the caller told you afterwards. One fact per call, in their words. Use it for the answers to your follow-up questions — what the item was, where they left it, when they noticed. It adds to the ticket and never replaces anything already on it.",
-              "name": "add_request_detail",
-              "parameters": {
-                "properties": {
-                  "detail": {
-                    "description": "The one thing to add, in the caller's own words.",
-                    "type": "string"
-                  },
-                  "reference": {
-                    "description": "The reference open_request returned.",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "reference",
-                  "detail"
-                ],
-                "type": "object"
-              }
-            },
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          },
-          {
-            "async": true,
-            "function": {
-              "description": "Let the right Homies team know about something you cannot finish on this call, and keep the call. This is not a transfer: nobody is connected, nobody is put through, the caller stays with you, and the team reads the note in its own time.\nCall it the moment the caller's ask is past you: paying dues or arranging a payment (that one is also a ticket, open_request with type `payment`; put its number in this description when you have it), a charge they dispute, a document they need (invoice, receipt, confirmation), moving in or out or a change of tenant, a contract, a price quote, the committee's own business, a request to speak with a person, a caller you cannot understand and who cannot understand you (reason `language`), or anything else only a person at Homies can complete. A plain how-much-do-I-owe question is get_balance's; a fault is open_request's; a ticket's status is get_request_status's. Those you do yourself.\nCall it for a PERSON in a bad state, the moment you hear it, before anything that can wait: somebody shut in a lift, on a roof, in a stairwell or a car park; somebody hurt, alone, frightened or panicking; anybody reporting gas, fire, flooding, or water near electricity. Reason `emergency`. It does not open the ticket and does not replace it: the ticket (open_request, urgency emergency, as soon as you know where) and this both happen, and the order between them does not matter.\nCALL IT BEFORE the sentence that tells them the team knows. That sentence must never be said without this call behind it: calling this is the only thing that tells the team; saying that you told them tells nobody. Do not ask them to confirm first; the ask itself is the reason to call.\nOnce per matter, not per turn: a second question about the same thing is not a second note. A different matter later in the same call is. And if they tell you afterwards how to reach them — a number, the building and apartment — call it again with the same reason and that in the description: the team sees the addition, nothing is duplicated.\nWhat the caller hears from you afterwards: that you have let the team know, in your own words, and what you can still do for them now. Never THAT they will get back to them (you do not know; the team may handle it without a call), never who, never when, never what the team will do, never that help is on the way. Never the office phone unless they ask how to reach the office. Never which team; `department` is your judgment and is not spoken. This ends nothing: do not say goodbye on it.",
-              "name": "notify_team",
-              "parameters": {
-                "properties": {
-                  "building": {
-                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
-                    "type": "string"
-                  },
-                  "department": {
-                    "description": "Which team should read this: collections = money, payments, receipts, debt; operations = faults, technicians, works, emergencies; management = complaints, contracts, quotes, moving, the committee; service = anything else, or when unsure. Leave it out and the reason picks the team.",
-                    "enum": [
-                      "collections",
-                      "operations",
-                      "management",
-                      "service"
-                    ],
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "What the caller wants, in Hebrew, in their own words — and how to reach them, if they said it: a phone number in digits (tool arguments are never spoken; the words-only rule is for what you say), or the building and apartment. Send it every time. It is what the team reads, and a web call carries no caller number, so what you write here is the only way back to them.",
-                    "type": "string"
-                  },
-                  "reason": {
-                    "description": "payment = paying dues, a payment arrangement, instalments; billing = a disputed charge or a document they need; move = moving in or out, a change of tenant; contract = a contract; quote = a price quote; emergency = a person in danger; caller_request = they asked for a person; language = you and the caller do not share a language; other = anything else past you.",
-                    "enum": [
-                      "payment",
-                      "billing",
-                      "move",
-                      "contract",
-                      "quote",
-                      "emergency",
-                      "caller_request",
-                      "language",
-                      "other"
-                    ],
-                    "type": "string"
-                  },
-                  "unit": {
-                    "description": "Apartment number, digits only. Leave out rather than guess.",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "reason",
-                  "description"
-                ],
-                "type": "object"
-              }
-            },
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          },
-          {
-            "function": {
-              "description": "Call when the caller asks what is happening with a request they already made. Never open a new one to answer this. Pass the reference exactly as they said it — whole, or just the digits — and the lookup is forgiving. With no reference, the building and apartment find their recent requests. What comes back is everything you know: it does not say when a technician will come or who is handling it.",
-              "name": "get_request_status",
-              "parameters": {
-                "properties": {
-                  "building": {
-                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
-                    "type": "string"
-                  },
-                  "reference": {
-                    "description": "As the caller said it. Any form. Leave out if they have none.",
-                    "type": "string"
-                  },
-                  "type": {
-                    "description": "What the caller named, if they named it — 'the elevator' is elevator.",
-                    "enum": [
-                      "plumbing",
-                      "electrical",
-                      "lighting",
-                      "elevator",
-                      "cleaning",
-                      "gardening",
-                      "pest_control",
-                      "locksmith",
-                      "fire_safety",
-                      "maintenance",
-                      "other",
-                      "complaint"
-                    ],
-                    "type": "string"
-                  },
-                  "unit": {
-                    "description": "Apartment number, digits only. Leave out rather than guess.",
-                    "type": "string"
-                  }
-                },
-                "required": [],
-                "type": "object"
-              }
-            },
-            "messages": [
-              {
-                "content": "שנייה, אני בודק.",
-                "type": "request-start"
-              }
-            ],
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          },
-          {
-            "function": {
-              "description": "Call when the caller asks how much is owed on an apartment, or whether the building fee is paid. Building and apartment identify them; a full name works if they offer one. Read the amount as words. You can read a balance and you cannot touch one: read it if they asked how much, and then, if they want to pay or arrange payments, that is a ticket (open_request, type `payment`) and a team note (notify_team); a receipt or a dispute is a team note. Do not send them to the office. found 0 means no apartment matched and nothing was read: that is not a zero balance. Say you could not find it and check the address with them.",
-              "name": "get_balance",
-              "parameters": {
-                "properties": {
-                  "building": {
-                    "description": "Street and number, written in Hebrew as the street is written in Israel, whatever language the caller spoke: Herzl 112 is הרצל 112. The whole sentence is fine; this tool checks it.",
-                    "type": "string"
-                  },
-                  "name": {
-                    "description": "Full name, only if the caller offered one.",
-                    "type": "string"
-                  },
-                  "unit": {
-                    "description": "Apartment number, digits only. Leave out rather than guess.",
-                    "type": "string"
-                  }
-                },
-                "required": [],
-                "type": "object"
-              }
-            },
-            "messages": [
-              {
-                "content": "שנייה, אני בודק.",
-                "type": "request-start"
-              }
-            ],
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          },
-          {
-            "function": {
-              "description": "Call when the caller asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\nIt answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\nWhat came back is the whole answer. A frequency, a duration, a guarantee, an amount or a deadline that is not in those facts is not something you have: the topic coming back does not mean the number did, and how often is usually the very thing the catalogue says is agreed per building. Do not approximate it, do not average it, do not soften it into a roughly or a usually. Homies runs no promotions, discounts or free trials: never offer or imply one.\n`found` false means it is not there. Then say you do not have that, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\nIt holds no prices and no opening hours. Homies quotes per building, so a price question is a matter for the team (notify_team, reason quote); the hours you already know.",
-              "name": "get_service_info",
-              "parameters": {
-                "properties": {
-                  "topic": {
-                    "description": "What they are asking about, in their own words, in Hebrew. Their phrasing is better than your summary of it.",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "topic"
-                ],
-                "type": "object"
-              }
-            },
-            "messages": [
-              {
-                "content": "שנייה, אני בודק.",
-                "type": "request-start"
-              }
-            ],
-            "server": {
-              "headers": {
-                "x-homies-secret": "<redacted>"
-              },
-              "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-            },
-            "type": "function"
-          }
-        ]
-      },
-      "modelOutputInMessagesEnabled": true,
-      "name": "Homies — Inbound Intake (he)",
-      "orgId": "42a9d973-6787-4a78-9f74-f4996aba24df",
-      "server": {
-        "headers": {
-          "x-homies-secret": "<redacted>"
-        },
-        "url": "https://nmxlhlmcnnggnnuxyelt.supabase.co/functions/v1/debt-tools"
-      },
-      "serverMessages": [
-        "end-of-call-report"
-      ],
-      "silenceTimeoutSeconds": 30,
-      "startSpeakingPlan": {
-        "smartEndpointingPlan": {
-          "provider": "vapi"
-        },
-        "transcriptionEndpointingPlan": {
-          "onNoPunctuationSeconds": 0.8,
-          "onNumberSeconds": 1,
-          "onPunctuationSeconds": 0.3
-        },
-        "waitSeconds": 0.25
-      },
-      "stopSpeakingPlan": {
-        "backoffSeconds": 1,
-        "numWords": 2,
-        "voiceSeconds": 0.3
-      },
-      "transcriber": {
-        "confidenceThreshold": 0.4,
-        "fallbackPlan": {
-          "autoFallback": {
-            "enabled": true
-          },
-          "transcribers": [
-            {
-              "language": "he-IL",
-              "provider": "azure"
-            }
-          ]
-        },
-        "language": "he",
-        "model": "nova-3",
-        "provider": "deepgram"
-      },
-      "updatedAt": "2026-10-04T11:47:13.127Z",
-      "voice": {
-        "chunkPlan": {
-          "formatPlan": {
-            "replacements": [
-              {
-                "regex": "<\\|[^|]*\\|>",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "regex": "to=[A-Za-z_.]+",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "regex": "functions\\.[A-Za-z_]+",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "regex": "\\{\\{[^}]*\\}\\}",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "regex": "\"[A-Za-z_]+\"\\s*:",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "regex": "\\b[A-Za-z]+(?:_[A-Za-z]+)+\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\bopen\\s+payment\\s+ticket\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\blog\\s+promise\\s+to\\s+pay\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\blog\\s+disputed\\s+payment\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\bflag\\s+not\\s+handed\\s+over\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\blog\\s+call\\s+outcome\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\btransfer\\s+to\\s+human\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\bauthorization\\s+captured\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\bposture\\s+reached\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\bpromised\\s+date\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\btransfer\\s+reason\\b",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "options": [
-                  {
-                    "enabled": true,
-                    "type": "ignore-case"
-                  }
-                ],
-                "regex": "\\bNote[,:]\\s*",
-                "type": "regex",
-                "value": ""
-              },
-              {
-                "key": "{",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": ""
-              },
-              {
-                "key": "}",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": ""
-              },
-              {
-                "key": "[",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": ""
-              },
-              {
-                "key": "]",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": ""
-              },
-              {
-                "key": "מהומיז",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": "מחברת הומיז"
-              },
-              {
-                "key": "להומיז",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": "לחברת הומיז"
-              },
-              {
-                "key": "ועד בית",
-                "replaceAllEnabled": true,
-                "type": "exact",
-                "value": "ועד הבית"
-              },
-              {
-                "regex": "\\.\\s*$",
-                "type": "regex",
-                "value": ". <break time=\"300ms\"/>"
-              },
-              {
-                "regex": "\\?\\s*$",
-                "type": "regex",
-                "value": "? <break time=\"300ms\"/>"
-              },
-              {
-                "regex": "!\\s*$",
-                "type": "regex",
-                "value": "! <break time=\"300ms\"/>"
-              },
-              {
-                "regex": "^",
-                "type": "regex",
-                "value": "<emotion value=\"happy\"/>"
-              },
-              {
-                "regex": "^<emotion value=\"happy\"/>\\s*$",
-                "type": "regex",
-                "value": ""
-              }
-            ]
-          }
-        },
-        "fallbackPlan": {
-          "voices": [
-            {
-              "chunkPlan": {
-                "formatPlan": {
-                  "replacements": [
-                    {
-                      "regex": "<\\|[^|]*\\|>",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "regex": "to=[A-Za-z_.]+",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "regex": "functions\\.[A-Za-z_]+",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "regex": "\\{\\{[^}]*\\}\\}",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "regex": "\"[A-Za-z_]+\"\\s*:",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "regex": "\\b[A-Za-z]+(?:_[A-Za-z]+)+\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\bopen\\s+payment\\s+ticket\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\blog\\s+promise\\s+to\\s+pay\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\blog\\s+disputed\\s+payment\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\bflag\\s+not\\s+handed\\s+over\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\blog\\s+call\\s+outcome\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\btransfer\\s+to\\s+human\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\bauthorization\\s+captured\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\bposture\\s+reached\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\bpromised\\s+date\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\btransfer\\s+reason\\b",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "options": [
-                        {
-                          "enabled": true,
-                          "type": "ignore-case"
-                        }
-                      ],
-                      "regex": "\\bNote[,:]\\s*",
-                      "type": "regex",
-                      "value": ""
-                    },
-                    {
-                      "key": "{",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": ""
-                    },
-                    {
-                      "key": "}",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": ""
-                    },
-                    {
-                      "key": "[",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": ""
-                    },
-                    {
-                      "key": "]",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": ""
-                    },
-                    {
-                      "key": "מהומיז",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": "מחברת הומיז"
-                    },
-                    {
-                      "key": "להומיז",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": "לחברת הומיז"
-                    },
-                    {
-                      "key": "ועד בית",
-                      "replaceAllEnabled": true,
-                      "type": "exact",
-                      "value": "ועד הבית"
-                    },
-                    {
-                      "regex": "\\.\\s*$",
-                      "type": "regex",
-                      "value": ". <break time=\"300ms\"/>"
-                    },
-                    {
-                      "regex": "\\?\\s*$",
-                      "type": "regex",
-                      "value": "? <break time=\"300ms\"/>"
-                    },
-                    {
-                      "regex": "!\\s*$",
-                      "type": "regex",
-                      "value": "! <break time=\"300ms\"/>"
-                    }
-                  ]
-                }
-              },
-              "language": "he",
-              "provider": "vapi",
-              "version": "2",
-              "voiceId": "Elliot"
-            }
-          ]
-        },
-        "generationConfig": {
-          "speed": 0.8,
-          "volume": 2
-        },
-        "language": "he",
-        "model": "sonic-3.5",
-        "provider": "cartesia",
-        "voiceId": "4486a4a7-9ef6-44d4-88e8-10eab571b577"
       }
     },
     {
@@ -1754,7 +1842,7 @@
         "workflow.node.started",
         "assistant.started"
       ],
-      "createdAt": "2026-10-04T11:32:34.639Z",
+      "createdAt": "2026-08-04T13:06:11.894Z",
       "endCallMessage": "Thank you for scheduling with Wellness Partners. Your appointment is confirmed, and we look forward to seeing you soon. Have a wonderful day!",
       "endCallPhrases": [
         "goodbye",
@@ -1762,11 +1850,8 @@
       ],
       "firstMessage": "Thank you for calling Wellness Partners. This is Riley, your scheduling assistant. How may I help you today?",
       "hipaaEnabled": false,
-      "id": "2b8d6742-b6e2-4843-a81a-e89fa62e8925",
+      "id": "9223db13-7421-4d3e-a38e-76bef66466db",
       "isServerUrlSecretSet": false,
-      "metadata": {
-        "preset": "balanced:1"
-      },
       "model": {
         "messages": [
           {
@@ -1775,10 +1860,11 @@
           }
         ],
         "model": "gpt-4.1",
-        "provider": "openai"
+        "provider": "openai",
+        "temperature": 0.5
       },
       "name": "Riley",
-      "orgId": "42a9d973-6787-4a78-9f74-f4996aba24df",
+      "orgId": "4ce7f332-43c4-43b7-aaef-c2f993224150",
       "serverMessages": [
         "conversation-update",
         "end-of-call-report",
@@ -1797,17 +1883,14 @@
         "waitSeconds": 0.4
       },
       "transcriber": {
+        "endpointing": 150,
         "language": "en",
-        "languages": [
-          "en"
-        ],
-        "model": "stt-rt-v5",
-        "provider": "soniox"
+        "model": "nova-3",
+        "provider": "deepgram"
       },
-      "updatedAt": "2026-10-04T11:32:34.639Z",
+      "updatedAt": "2026-08-04T13:06:11.894Z",
       "voice": {
         "provider": "vapi",
-        "version": "2",
         "voiceId": "Elliot"
       },
       "voicemailMessage": "Hello, this is Riley from Wellness Partners. I'm calling about your appointment. Please call us back at your earliest convenience so we can confirm your scheduling details."
@@ -1815,12 +1898,12 @@
   ],
   "credential": [
     {
-      "createdAt": "2026-10-04T11:45:04.491Z",
-      "id": "f43b1a37-b436-4e4b-9ec9-cc28d14a8cde",
+      "createdAt": "2026-10-23T09:06:32.170Z",
+      "id": "aeaa8296-5670-4179-b91c-4caf9c84f752",
       "name": "Cartesia (Hebrew TTS)",
-      "orgId": "42a9d973-6787-4a78-9f74-f4996aba24df",
+      "orgId": "4ce7f332-43c4-43b7-aaef-c2f993224150",
       "provider": "cartesia",
-      "updatedAt": "2026-10-04T11:45:04.491Z"
+      "updatedAt": "2026-10-23T09:06:32.170Z"
     }
   ],
   "file": [],

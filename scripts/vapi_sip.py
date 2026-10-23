@@ -60,8 +60,8 @@ UA = "curl/8.5.0"
 SIP_URI = "sip:homies-omni-208@sip.vapi.ai"
 LABEL = "Omni extension 208"          # Vapi caps the name at 40 characters
 AGENT = "Inbound Intake (he)"
-# The tenth account's id, used only if listing the assistants fails.
-FALLBACK_ID = "00d91473-1aaa-4a57-a380-ca5bb2b7f1af"
+# Yariv's account's id (since 23 Oct), used only if listing the assistants fails.
+FALLBACK_ID = "10ae859a-f764-4b38-9154-cd8e82eb3a27"
 
 USER_VAR, PASS_VAR = "VAPI_SIP_USERNAME", "VAPI_SIP_PASSWORD"
 # Letters and digits only: a PBX form that chokes on a symbol fails quietly,

@@ -534,3 +534,27 @@ Three things this move taught, all now in the script or in this file:
   production deployment).
 
 `web/index.html` was left on the 6 Sep account, where it has been since 6 Sep.
+
+## 23 Oct: Yariv's own account (the client's), on the owner's word
+
+The tenth account's wallet went to -$0.16 during the latency test runs. The owner sent the keys
+of Yariv's own Vapi account (org `4ce7f332…`, which held only Vapi's default Riley) and asked
+for the agents to move there. They are in `.env` as `VAPI_PRIVATE_KEY_YARIV` /
+`VAPI_PUBLIC_KEY_YARIV` and promoted to the active pair; the tenth is `_ACCOUNT10`.
+
+| | The tenth account | Yariv's account (current) |
+|---|---|---|
+| Intake (he) | `00d91473` | `10ae859a-f764-4b38-9154-cd8e82eb3a27` |
+| Debt (he) | `9e0209d2` | `4bc03b57-018c-41bc-9c80-1b912b55496c` |
+| Cartesia credential | `f43b1a37` | `aeaa8296-5670-4179-b91c-4caf9c84f752` |
+| SIP address (Omni 208) | `4e318775` | not moved yet |
+
+- **Check the wallet first:** `vapi_transfer.py --balance` (in credit or blocked, not the
+  amount). Yariv's account was in credit.
+- **The diff after the copy** found only `successEvaluationPlan`, as on 4 Oct, and it was set
+  back on.
+- **The steps the permission check refused, which wait for the owner's go:**
+  - the function deploy (the new intake id joins `INTAKE_ASSISTANT_IDS`);
+  - the SIP address: delete it on the tenth with the `_ACCOUNT10` key, then
+    `vapi_sip.py --apply` on the new key;
+  - Vercel's Vapi values and a redeploy.
