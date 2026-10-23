@@ -2602,6 +2602,12 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
   read, but whether the wallet can still place a call can: `vapi_transfer.py --balance` (a
   POST to /call/web for an assistant that does not exist answers with the wallet message first).
   Run it before every Vapi test, and budget against a balance the owner has confirmed.
+- **The agents live on Yariv's own Vapi account from 23 Oct, the owner's choice** (*"change vapi
+  account lets link it using this one"*). It is the "main client acc" the 19 Oct SIP note planned
+  for, so the throwaway trial accounts end here and future billing is the client's. A move is
+  still a one-to-one copy (`vapi_transfer.py`), and the 208 address moves with it
+  (`vapi_sip.py --delete --key <old .env name>`, then `--apply`). Every script that can act on a
+  second account takes the key's `.env` NAME, never the key.
 - **Price a replay's first call per moment at full rate.** The cache does not hit the first time
   a moment is asked: a 6,000-token prompt at $4/M is about 3 cents. The 22 Oct estimate ($0.30
   for 39 calls) assumed cache hits, and the $0.50 cap stopped the run at 26.
