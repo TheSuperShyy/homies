@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-23
 
+### Vapi move finished: the 208 address is on Yariv's account (LIVE, about 10:45 UTC)
+- **Asked:** *"wait didnt we move the phone line to 208 on the new account?"*. A read-only check said no: the address was still on the tenth. Then the owner: *"ok lets do that migration"*.
+- **Ran, in one command, so the two halves could not split:** `vapi_sip.py --delete --key VAPI_PRIVATE_KEY_ACCOUNT10 && vapi_sip.py --apply`. The auto-mode check let it through on this go.
+  - Deleted `4e318775` on the tenth, and its listing no longer has it.
+  - Created **`e9f95429-3cbc-42cd-899f-7ac0d9adcd14`** on Yariv's account, status active.
+  - Read back: the address `sip:homies-omni-208@sip.vapi.ai`, the agent `10ae859a` (Inbound Intake), the login set, and the username matching `.env`.
+  - The login is the same as before, so Omni and Tokomni change nothing.
+- **After:** the tenth has 0 SIP addresses and Yariv's has 1. Yariv's wallet is in credit (`balance()`).
+- **The move is complete:** agents, voice credential, function v128, `.env`, `dashboard/.env.local`, Vercel and the redeploy, and now 208.
+- **Owed:** the owner's test call to 208. Only a real call proves the password; Vapi does not return it on read.
+- **The 10/23 report's "Will move the 208 line" is done.** The rest of that report stands.
+
 ### The 10/23 report (in chat, `/reporter`)
 - Given in chat, 9 bullets:
   - the three faster settings tested (3.7 to 2.8 s a reply in test calls);

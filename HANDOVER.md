@@ -869,7 +869,8 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
         - **The bigger lever is `none`,** about 2.2 s faster per reply on OpenRouter. It would need prompt work and a new go.
         - **Undo:** drop `reasoningEffort` in `vapi_sync.py` and sync with `--keep-voice`.
       - **23 OCT, ~09:00 UTC: THE VAPI WALLET (tenth account) WENT TO -$0.16,** and Vapi refuses calls on it. Test runs (`vapi_sim_inbound.py`) drew from the same wallet and emptied it. **Correction:** the wallet IS checkable. `python scripts/vapi_transfer.py --balance` (or `balance()` on a public key) reports in credit or blocked, though not the amount. Run it before ANY Vapi test. The owner answered by moving the agents to Yariv's account, in the next line.
-      - **23 OCT: MOVING TO YARIV'S OWN VAPI ACCOUNT (the client's), HALF DONE. The 208 line is NOT on it yet.** Owner: *"i want you to change vapi account lets link it using this one ... save it into the env as yariv vapi"*.
+      - **23 OCT: THE AGENTS AND THE 208 LINE ARE ON YARIV'S OWN VAPI ACCOUNT (the client's). The move is COMPLETE.** The 208 SIP address is `e9f95429-3cbc-42cd-899f-7ac0d9adcd14` on Yariv's account (created about 10:45 UTC on the owner's *"ok lets do that migration"*, and read back OK). The tenth holds none. The wallet is in credit. **Owed:** the owner's test call to 208, since only a real call proves the password. The history of the move follows.
+      - **23 OCT: moving to Yariv's own Vapi account (the client's).** Owner: *"i want you to change vapi account lets link it using this one ... save it into the env as yariv vapi"*.
         - **Done:**
           - The keys are in `.env` as `VAPI_PRIVATE_KEY_YARIV` / `VAPI_PUBLIC_KEY_YARIV`, and promoted: `VAPI_PRIVATE_KEY` / `VAPI_PUBLIC_KEY` = Yariv's; the tenth is kept as `_ACCOUNT10`.
           - The account is in credit (`balance()`).
@@ -879,9 +880,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
         - **After the owner's "ok go":**
           - **The function is v128, with the new intake id. DONE.**
           - **Vercel's four Vapi values are patched and the dashboard redeployed (READY). DONE.**
-          - **The 208 SIP address is STILL ON THE TENTH (`4e318775`, the empty wallet).** The auto-mode check refused the delete even after the go, so the owner runs:
-            `python scripts/vapi_sip.py --delete --key VAPI_PRIVATE_KEY_ACCOUNT10`
-            then `python scripts/vapi_sip.py --apply`, which creates it on Yariv's account answering with `10ae859a` and reads it back.
+          - **The 208 SIP address: DONE on the second go** (*"ok lets do that migration"*). It was moved with `vapi_sip.py --delete --key VAPI_PRIVATE_KEY_ACCOUNT10 && vapi_sip.py --apply` in one command, after the first try (a raw DELETE) was refused. It is now `e9f95429` on Yariv's account, answering with `10ae859a`.
           - The address and login stay the same, so Omni and Tokomni change nothing.
         - **Then:** the owner's test call through 208. The not-live `minCharacters` 10 still applies with `vapi_set_voice.py --agent inbound --apply`, which now targets Yariv's account.
       - **23 Oct: three settings tested, two READY BUT NOT LIVE** (owner: *"ok now we need to make the latency low"*). They were tried as overrides in Vapi's simulated calls (`vapi_sim_inbound.py --run DIR --candidate`, run `06597779`).
