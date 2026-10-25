@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### WhatsApp bot speed, read from its own history (free): about 20 s a reply since Gemini 3.1 Pro, against 7 to 8 s before
+- **Asked:** *"ok do a test in the chatbot as well"*, after the phone agent's speed work.
+- **Nothing spent.** The code gate was green twice today (414 of 414 on live), and the timings come from `messages`.
+  - Nobody has written to the bot since 20 Oct 05:34 UTC, so n8n keeps no run of it.
+- **Reply time** (the resident's last message to the bot's first reply, from `messages`):
+
+  | Period | Replies | Median | Slowest tenth | Slowest |
+  |---|---|---|---|---|
+  | 20 to 30 Sep | 77 | 7.0 s | 11.7 s | 17 s |
+  | 1 to 18 Oct | 185 | 8.1 s | 11.9 s | 43 s |
+  | 19 to 20 Oct (Gemini 3.1 Pro) | 61 | **19.8 s** | **30.2 s** | 71 s |
+
+  - The 0.3 s replies are the fixed lines (menu, greeting), with no model.
+- **Where it goes** (the live workflow, updated 19 Oct 20:00 UTC):
+  - `google/gemini-3.1-pro-preview`, temperature 1, no reasoning setting (its default thinking), 8,192 max tokens.
+  - Deliberate waits: `Let them finish` is 4 s, and `Hold a beat` is 1.7 to 2.6 s on some replies. Both were there in the 7 to 8 s days.
+  - So the switch from 2.5 Flash added about 12 s a reply. The agents are `Answer the resident`, `Worth a word?` and `Could not answer`, and a reply can take more than one model step.
+- **Not changed.** The model is the owner's call (CONTEXT: Gemini for its Hebrew, 3.1 Pro for honesty).
+  - The levers: a lower thinking level on 3.1 Pro, or a faster settled Gemini (3.7 Flash passed the 20 Oct test), each graded on Hebrew and honesty; and the 4 s wait.
+- **Open:** the owner's live message to +1 555-178-1261 (Meta's test number, about 6 cents a model reply). Then n8n's per-step times for that run, read for free.
+
 ### The tool check on the Tokyo path: the same answers pinned and unpinned; the probe brought up to feature 17
 - **Asked:** *"so i just want to make sure the testing phase passes right different scenarios and stuff"*.
 - **`check_tools.py` sends the agent's `x-region` now** (`FUNCTION_REGION`). A probe without it tests a path the agent no longer takes.

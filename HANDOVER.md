@@ -112,6 +112,13 @@ OpenRouter (`google/gemini-3.1-pro-preview` since 19 Oct 12:22 UTC, 8192 tokens 
 thinking and reply, temperature 1.0; 2.5 Flash before) with a 30-turn memory keyed by phone. Replies post back to Chatwoot,
 never to Meta, so the inbox holds both halves of every conversation.
 
+**It is slow since 3.1 Pro (measured 25 Oct from `messages`, free).** A reply takes about 20 s
+(median 19.8 s, slowest tenth 30 s, 61 replies on 19 to 20 Oct), against 7 to 8 s on 2.5 Flash.
+About 4 to 6 s of either figure is deliberate: `Let them finish` waits 4 s, and `Hold a beat`
+adds 1.7 to 2.6 s on some replies. The rest is the model's thinking, which runs unset (its
+default). Speeding it up is the owner's model decision (CONTEXT, Gemini for its Hebrew and 3.1
+Pro for honesty). The bot's number is Meta's test number, +1 555-178-1261.
+
 **Chatwoot assigns new conversations to the agent bot itself** (`assignee_type
 "AgentBot"`), and only a **User** assignee counts as a takeover -- both the
 WhatsApp gate and the handback filter check the type since 23 Aug, after the
