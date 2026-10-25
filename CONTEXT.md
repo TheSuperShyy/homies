@@ -629,6 +629,15 @@ collection reports, call recordings. `.gitignore` carries the specific rules
 and the reasoning for each. Check before every `git add`, and scan the staged
 diff for phone numbers and key-shaped strings before committing.
 
+**A number from a real call counts too (25 Oct).** Two of Omni's test-call numbers
+sat in docs and in a test fixture for three days, because they were committed by
+hand, where the housekeeping scan never looks. A scan of the whole push caught
+them, and they had to be swapped out of 30 commits.
+- Fixtures and examples use the synthetic range (9725099020xx, locally 05099020xx)
+  or 03-1234567.
+- Before a push, scan `git diff origin/<branch>..HEAD` for every `.env` value and
+  for phone and email shapes. A number that reaches GitHub cannot be taken back.
+
 **Nothing dials anybody yet.** No phone number is owned; voice is web calls
 only. Every imported resident carries `handed_over = false`, which is what
 keeps both queue views empty (`v_debt_call_queue_person` is the call queue —

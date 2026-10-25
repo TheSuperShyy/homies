@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Pushed `feature/chatbot` to GitHub, after the tests and a privacy scan; two real numbers swapped out first
+- **Asked:** *"ok now i have the bypass mode on and lets push it if it passed the testing phase we conducted"*.
+  - "Push" means the 59 commits stuck since 20 Oct (a 403 as `ClixTeam579`).
+  - A push changes nothing live. The latency settings were already live, and epoch 84 stays not live.
+- **The tests, all green:**
+  - `check_whatsapp_rules.py` on live: 414 of 414.
+  - `node --test scripts/check_identity.test.ts`: 18 of 18. `check_name_flow_test.py`: 10 of 10.
+  - `check_function_syntax.mjs`: both files parse.
+  - The dashboard's `tsc` and build: this morning, and the dashboard is unchanged since.
+  - Skipped on purpose: `n8n_handover_test.py` (it builds a live n8n workflow and posts to Chatwoot) and `check_whatsapp.py` (it sends a real signed message).
+- **The privacy scan** (the repo is public), over every line the push adds:
+  - No `.env` secret anywhere. Only URLs, n8n credential ids, the WhatsApp number id and a voice id appear.
+  - The Gmail in the n8n snapshots is the n8n account's own label, and it is already in 25+ files on GitHub.
+  - **Two real numbers would have been new on GitHub:** Omni's test caller line and the mobile its dialer rang, both from 21 and 22 Oct's call logs.
+    - They sat in feature 17's docs, in `identity.ts` comments and in `check_identity.test.ts`.
+    - Neither is in any phone column of the database, so they are not residents.
+- **Swapped for test numbers before the push:** `git filter-branch --index-filter` over the 59 unpushed commits.
+  - The mobile became 050-990-2043, from the synthetic range; the landline became 03-1234567.
+  - The final tree differs from the backup in 18 lines of 5 files, and every one is a number swap.
+  - All 59 messages, authors and dates are identical, the 29 commits before 22 Oct kept their hashes, and the caller-ID tests pass on the new tree.
+  - The 30 commits from `6bf1f08` on have new hashes: `6bf1f08` is `752fbfe`, the drive-move check `7632345` is `171526a`, and the latency work `992a0e6` is `4594f91`.
+- **Pushed** with `gh auth switch -u TheSuperShyy`, then switched back to `ClixTeam579`. The backup branch, which held the real numbers, was deleted after the push.
+
 ### Phone latency: the fast tier, a 10-character voice start, and the tools run in Tokyo (LIVE 08:37 to 08:40 UTC)
 - **Asked:** *"ok right now your main goal is to reduce the latency of the bot wether we need to replace the LLM model or what but we need to make the Latency on the phone faster. dont over exhaust the open router credit limit yourself from eating a lot of credits"*.
   - "The bot on the phone" is the incoming agent on the 208 line: the thread of 21 to 23 Oct.
