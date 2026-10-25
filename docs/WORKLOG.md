@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Bypass mode never took effect today (answered in chat, read-only)
+- **Asked:** *"why cant i use the bypass mode"*.
+- **Found in the session logs:** every message of both of today's sessions ran in `auto`, including *"ok now i have the bypass mode on and lets push it"* (09:21 UTC). So the push entry below ran under auto mode, not bypass.
+- **Why:** VS Code's `claudeCode.allowDangerouslySkipPermissions` was turned on at 09:20 UTC, and that session had started at 07:25. Claude Code's docs say a conversation started without the setting cannot enter bypass. `skipDangerousModePermissionPrompt` is not in `~/.claude/settings.json`, so bypass's first-use warning has never been accepted on this PC.
+- **Nothing blocks it locally:** no `disableBypassPermissionsMode` anywhere, no managed-settings file, no registry policy, and no project `.vscode/settings.json`. A claude.ai org policy can only be seen in `/status`, under "Setting sources".
+- **Given:** reload the window, start a new conversation, pick "Bypass permissions" in the mode picker, and accept the warning.
+
 ### Which Supabase we have (answered in chat, read-only)
 - **Asked:** *"what supabase server we have"*.
 - **Read from the Management API with both tokens in `.env`:**
