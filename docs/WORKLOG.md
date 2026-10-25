@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Omnitelecom's answers: press 9 for the bot, the campaign id, one attempt, no calling hours on their side; no external_id yet (read-only)
+- **Pasted by the owner:** Omni support's email, kept in `local/omnitelecom/2026-10-25-reply-press-9-campaign.txt`. Nothing was sent and nothing was built.
+- **What it says:**
+  - **The bot from outside:** the main number, then 9. It is a temporary shortcut in the main number's menu.
+  - **The campaign id:** given, and it is in that file. **No API token yet**, so our side cannot send numbers to the dialer by itself.
+  - **external_id:** "still under review".
+  - **One attempt per number:** set, which was our ask.
+  - **No calling hours on their side:** a number sent at 2 AM is rung at 2 AM, so ours must send only in calling hours.
+  - **The Tokomni dashboard:** Yariv has given Ido access to upload numbers there by hand, for now. Omni offers a training session.
+  - **Call results, their two options:** our end-of-call report writes the outcome by external_id, which they say the bot "already receives"; or we pull Tokomni's campaign report and match it by phone number, since the report has no external_id.
+- **Checked, read-only: the one dialer call we have (21 Oct, `01a15d92` on the tenth account) carried no external_id.**
+  - Its INVITE carries `X-OMNIUF-XT: 208`, Omni's account code, call and account sids, our login as `X-Authenticated-User`, and `dialer-<number>` as the caller name.
+  - So a dialer call can be told apart from a menu call, and the number it rang can be read, but there is no tenant id.
+  - Vapi keeps every INVITE header under `phoneCallProviderDetails.sip.headers`, so an id Omni adds later will show there.
+- **The risk now:** the 208 address answers every call with the incoming agent. A real tenant's number uploaded by hand today gets Michael as a receptionist, at whatever hour it goes in.
+- **Open:**
+  - the API token;
+  - external_id from Omni, or a match by the number the dialer rang;
+  - the route that gives dialer calls to the debt agent;
+  - a calling-hours check on our side;
+  - the owner's test call (main number, then 9).
+
 ### Bypass mode never took effect today (answered in chat, read-only)
 - **Asked:** *"why cant i use the bypass mode"*.
 - **Found in the session logs:** every message of both of today's sessions ran in `auto`, including *"ok now i have the bypass mode on and lets push it"* (09:21 UTC). So the push entry below ran under auto mode, not bypass.

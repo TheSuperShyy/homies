@@ -861,10 +861,23 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
+- **25 Oct: Omni's answers** (email in `local/omnitelecom/2026-10-25-reply-press-9-campaign.txt`; WORKLOG 25 Oct).
+  - **The bot from outside:** the main number, then 9.
+  - **The dialer:**
+    - The campaign id is in that file.
+    - There is **still no API token**, so numbers go in by hand through the Tokomni dashboard. Yariv has given Ido access, and Omni offers training.
+    - One attempt per number is set.
+  - **No calling hours on Omni's side:** a number sent at 2 AM is rung at 2 AM. Our side must send numbers only in calling hours (CONTEXT).
+  - **external_id: "still under review".** The one dialer call we have (21 Oct, `01a15d92`, tenth account) carried none.
+    - Its INVITE has `X-OMNIUF-XT: 208`, Omni's account code and sids, and `dialer-<number>` as the caller name.
+    - So a dialer call can be told apart and its number read, but not its tenant.
+    - Vapi keeps the headers under `phoneCallProviderDetails.sip.headers`.
+  - **Results:** Omni suggests our end-of-call report writes the outcome by external_id, or a pull of Tokomni's campaign report matched by phone (it carries no external_id).
+  - **Until dialer calls are routed to the debt agent, the incoming agent answers them.** A real tenant's number uploaded now gets a receptionist call.
 - **18 Oct: Omni set up the dialer with extension 208 for the bot** (email in `local/omnitelecom/`, WORKLOG 18 Oct).
   - **How to reach 208 (25 Oct):**
     - From an office desk phone, dial 208. Extensions 200, 201 and 202 did on 21 Oct.
-    - From outside, call the office number 077-6687949 and take the bot's option. **Which digit Omni set is not on record.** "Press 5" was only the 12 Oct example. Outside callers did get through on 21 Oct.
+    - From outside, call the office number 077-6687949 and **press 9**. Omni set this on 25 Oct as a temporary shortcut in the main number's menu.
     - Omni's dialer can ring a number and connect the answered call to 208.
     - `vapi_sip_probe.py` from the PC proves Vapi's half only (the address and the password), never Omni's.
   - **They ask for:**
