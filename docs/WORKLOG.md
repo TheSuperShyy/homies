@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### The tool check on the Tokyo path: the same answers pinned and unpinned; the probe brought up to feature 17
+- **Asked:** *"so i just want to make sure the testing phase passes right different scenarios and stuff"*.
+- **`check_tools.py` sends the agent's `x-region` now** (`FUNCTION_REGION`). A probe without it tests a path the agent no longer takes.
+- **First run: 9 passed, 9 failed.**
+  - 5 money cases said "no charge on this call". That is every probe: it has no charges attached. 22 Oct had the same 5.
+  - 4 `open_request` cases were refused with `need_name`. The probe never sent a name, and its last run (22 Oct) was made with the rule off.
+- **The probe now names the caller** in those 4, and one new case asserts the refusal without a name.
+- **Then, pinned and with the header stripped, 14 passed and 5 failed, case for case.** Moving the tools to Tokyo changes nothing in what they answer.
+  - Tickets 255-1378 to 255-1383-26 opened and were deleted by the run's own cleanup.
+- **The scenario calls wait on the owner** confirming Yariv's Vapi balance: `vapi_sim_inbound.py --run DIR --integrity` is 9 calls on the live settings.
+  - 23 Oct's identical run cost $2.43 (Michael $1.33, the caller $1.10), at 47 to 116 s a call.
+
 ### Pushed `feature/chatbot` to GitHub, after the tests and a privacy scan; two real numbers swapped out first
 - **Asked:** *"ok now i have the bypass mode on and lets push it if it passed the testing phase we conducted"*.
   - "Push" means the 59 commits stuck since 20 Oct (a 403 as `ClixTeam579`).

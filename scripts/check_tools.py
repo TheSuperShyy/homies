@@ -39,7 +39,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from vapi_sync import load_env, tool_server  # noqa: E402
+from vapi_sync import FUNCTION_REGION, load_env, tool_server  # noqa: E402
 
 
 def env_all():
@@ -76,21 +76,28 @@ CASES = [
     # is the silent failure the new gate exists to stop, so they name a managed
     # address now and still test what they were written to test -- a ticket
     # opens and hands back a real reference.
+    # 25 Oct: every case that should open a ticket names the caller. Feature 17
+    # ("no ticket without a name", LIVE on voice since 22 Oct) refuses one without,
+    # and the case after this one asserts exactly that refusal.
     ("open_request", {"description": "leak in the lobby", "type": "plumbing",
-                      "building": "הרצל 112"}, "reference"),
+                      "building": "הרצל 112", "reporter_name": "שחר"}, "reference"),
+    ("open_request", {"description": "leak in the lobby", "type": "plumbing",
+                      "building": "הרצל 112"}, "~need_name"),
     # A complaint is a ticket, on voice as well as chat (25 Aug, migration 025).
     # Here because the type is constrained in Postgres: if the constraint and
     # the tool enums ever fall out of step, this fails rather than the resident
     # being told a complaint was filed that the database refused.
     ("open_request", {"description": "the guard is rude to residents",
-                      "type": "complaint", "building": "הרצל 112"}, "reference"),
+                      "type": "complaint", "building": "הרצל 112", "reporter_name": "שחר"}, "reference"),
     # And the case those two used to be, now asserted as a refusal: no address
     # anywhere on an undialled call opens nothing and asks for the building.
-    ("open_request", {"description": "נזילה בלובי", "type": "plumbing"}, "~need_building"),
+    ("open_request", {"description": "נזילה בלובי", "type": "plumbing",
+                      "reporter_name": "שחר"}, "~need_building"),
     # 15 Sep, migration 031: a resident who wants to pay is a ticket too. Same
     # reason the complaint case exists -- the type is constrained in Postgres.
     ("open_request", {"description": "רוצה לשלם את ועד הבית",
-                      "type": "payment", "building": "הרצל 112", "reporter_unit": "12"}, "reference"),
+                      "type": "payment", "building": "הרצל 112", "reporter_unit": "12",
+                      "reporter_name": "שחר"}, "reference"),
     # 16 Sep, the client's review: voice refuses a building Homies does not
     # manage, as chat has since 23 Aug. "~reason" = ok, opened false, that
     # reason. A street we do not have, and a number the street does not have.
@@ -185,8 +192,13 @@ def main():
         url = url + ("&" if "?" in url else "?") + "key=" + secret
     else:
         headers["x-homies-secret"] = secret
+    # 25 Oct: the agent's tools carry Supabase's x-region header (vapi_sync.py's
+    # FUNCTION_REGION), so the probe sends it too, or it tests a region the agent
+    # no longer calls.
+    if label == "supabase":
+        headers["x-region"] = FUNCTION_REGION
 
-    print("host: %s" % label)
+    print("host: %s%s" % (label, " (region %s)" % headers["x-region"] if "x-region" in headers else ""))
     print("url : %s\n" % url.split("?")[0])
 
     passed = failed = 0

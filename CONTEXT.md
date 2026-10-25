@@ -2622,6 +2622,8 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
     `vapi_sync.py`).
   - To measure a tool, force the region with that header, and take an unknown tool name as the
     no-database baseline. The difference is the function's own work.
+  - A check calls the tools exactly as the agent does, headers included: `check_tools.py` sends
+    the same `x-region`. A probe that skips it tests a path the agent no longer takes.
 - **`status-update` on the incoming agent is a warm-up, not noise (25 Oct).**
   - The function answers it 200 and ignores it.
   - Its job is to start a Tokyo worker as the call connects. A fresh worker costs 0.5 to 1.8 s,
