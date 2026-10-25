@@ -45,6 +45,7 @@ conversation that produced it.
   - To Omni: which menu key reaches 208 or a direct number, and whether it answers outside office hours.
   - To Yariv: the same, or someone in the office dials 208 and tells us when.
   - **Then *"no we need to test it internally i mean"*: both redrafted for an internal call (208 dialled from another extension).** Omni: how to do that from outside the office, and an extension on an app for us. Yariv: someone at the office dials 208 and tells us when, and his OK to ask Omni for an app extension. An extension costs Homies money (14 ₪ a month and 70 ₪ to set up a new one, Omni's 12 Oct email). Nothing sent.
+  - **Then *"for yariv we need to ask how we dial the agent or the line from outside like our end ... via mobile phones to test the latency by ourselve"*:** one message for Yariv only. It asks for a way to call the bot from our own mobiles, to test its speed ourselves: a number straight to 208, or the menu key. Nothing sent.
 
 ### WhatsApp bot speed, read from its own history (free): about 20 s a reply since Gemini 3.1 Pro, against 7 to 8 s before
 - **Asked:** *"ok do a test in the chatbot as well"*, after the phone agent's speed work.
