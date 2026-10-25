@@ -28,7 +28,12 @@ conversation that produced it.
   - `health_status` reads BLOCKED: 141000 "not linked to your WhatsApp account" and 141001 "not verified", with the fix "Register and finish the OTP".
   - Also: WABA 141006, a payment method error, which blocks business-initiated messages such as the done template; business 141010, not verified.
 - **So:** the Meta test number +1 555-178-1261 is no longer connected to the Cloud API, and nothing anyone sends it reaches us. Earlier readings of the status were never recorded, so when it changed is known only from the log.
-- **Fix, not done (a write to Meta, the owner's go):** `POST /{phone-number-id}/register` with a 6-digit PIN, then a message from the owner's phone. The lasting fix is Homies' real number, which needs business verification.
+- **Fixed on the owner's *"go"*: re-registered at 15:47:41 UTC.**
+  - `POST /{phone-number-id}/register` returned 200 `success`. The new PIN was made and written to `.env` as `WHATSAPP_REGISTER_PIN`, never printed.
+  - Read back: `status` CONNECTED (was PENDING), `platform_type` CLOUD_API (was NOT_APPLICABLE), and the number's entity AVAILABLE (was BLOCKED). The routing still points at Chatwoot.
+  - Still flagged: the WABA payment method (141006), which blocks business-initiated sends such as the done template, and business verification (141010).
+  - A read-only watcher waits for the first delivery: the rails POST, the bot's run, and the `messages` rows.
+  - The lasting fix is still Homies' real number, which needs business verification.
 
 ### The 10/25 report (in chat, `/reporter`)
 - Given in chat: 7 done bullets and 3 Will lines.

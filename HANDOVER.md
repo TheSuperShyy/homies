@@ -861,12 +861,16 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
-- **OPEN 25 Oct: THE WHATSAPP BOT GETS NOTHING. Meta stopped delivering to the test number on 20 Oct, 07:14 UTC.**
+- **25 Oct: THE WHATSAPP BOT GOT NOTHING from 20 Oct, 07:14 UTC. Re-registered at 15:47:41 UTC on the owner's go; the first real message is still owed.**
+  - **The fix:** `POST /{WHATSAPP_PHONE_NUMBER_ID}/register` returned 200 `success`.
+    - Its PIN is in `.env` as `WHATSAPP_REGISTER_PIN`, never printed. **Any later register must send the same PIN.**
+    - Read back: `status` CONNECTED, `platform_type` CLOUD_API, the number's entity AVAILABLE, and the routing still Chatwoot.
+    - Overall it still reads BLOCKED for the WABA's payment method (141006), which stops business-initiated sends only, and business verification (141010).
+  - **Owed:** the owner's WhatsApp message to +1 555-178-1261. Then confirm it in the rails log (POST), in the bot's n8n run, and in the `messages` rows.
   - **The evidence:**
     - Chatwoot's rails log has no `POST /webhooks/whatsapp` after that moment.
     - Meta's `health_status` for the number is BLOCKED: 141000 "not linked to your WhatsApp account" and 141001 "not verified". Its status is PENDING and its platform NOT_APPLICABLE.
   - **Everything of ours is healthy:** OpenRouter has $10.53, the n8n workflow is active, Chatwoot is up, and the per-number webhook override still points at Chatwoot.
-  - **The likely fix:** `POST /{WHATSAPP_PHONE_NUMBER_ID}/register` with `messaging_product: whatsapp` and a 6-digit `pin`. It writes to Meta and waits on the owner's go. Then a message from the owner's phone, and the rails log should show the POST.
   - **Also on Meta:** a WABA payment-method error (141006) blocks business-initiated messages, including the `ticket_resolved_he` done template.
   - **When the bot is quiet, check these first:**
     - `docker logs chatwoot-rails-1 | grep 'Started POST "/webhooks/whatsapp'` on the VPS;
