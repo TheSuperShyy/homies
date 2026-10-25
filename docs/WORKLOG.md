@@ -32,7 +32,12 @@ conversation that produced it.
   - `POST /{phone-number-id}/register` returned 200 `success`. The new PIN was made and written to `.env` as `WHATSAPP_REGISTER_PIN`, never printed.
   - Read back: `status` CONNECTED (was PENDING), `platform_type` CLOUD_API (was NOT_APPLICABLE), and the number's entity AVAILABLE (was BLOCKED). The routing still points at Chatwoot.
   - Still flagged: the WABA payment method (141006), which blocks business-initiated sends such as the done template, and business verification (141010).
-  - A read-only watcher waits for the first delivery: the rails POST, the bot's run, and the `messages` rows.
+  - **Confirmed by hand afterwards:**
+    - Chatwoot logged 20 Meta POSTs from 15:48 UTC.
+    - The bot had 30 n8n runs, all success.
+    - `messages` holds 4 inbound and 4 outbound rows, from 15:48:56 to 15:51:24.
+    - Chatwoot shows all 4 replies `read`. One reply took 25 s, the known 3.1 Pro wait.
+  - **The background watcher itself was broken.** `$HOME` has a space on this machine (`Acer nitro 5`), and the unquoted `$SSH` split it, so every poll failed with `Could not resolve hostname nitro`. Its 'no delivery' line was false. Quote paths in scripts here.
   - The lasting fix is still Homies' real number, which needs business verification.
 
 ### The 10/25 report (in chat, `/reporter`)

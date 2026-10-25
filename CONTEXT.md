@@ -3186,7 +3186,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   2. Meta's `health_status` for the number.
   - On 25 Oct the first showed nothing since 20 Oct 07:14 UTC, and the second showed the test number unlinked (141000/141001). Every system of ours was healthy.
   - Where a number points is `webhook_configuration.phone_number`, never the app subscription (12 Chatwoot cutover).
-  - **The fix that day:** `POST /{phone-number-id}/register` with a 6-digit PIN brought it back to CONNECTED / CLOUD_API.
+  - **The fix that day:** `POST /{phone-number-id}/register` with a 6-digit PIN brought it back to CONNECTED / CLOUD_API. Messages flowed within three minutes, and the replies were read on the owner's phone.
     - The PIN lives in `.env` as `WHATSAPP_REGISTER_PIN`. A later register with another PIN fails, because it is the number's two-step PIN now.
     - The write to Meta took the owner's go.
 - **A quiet n8n log is not an outage (18 Oct).** n8n keeps about 10,000 executions, and the two pollers (Chatwoot handback, ticket notices) fill that in about five days. So a bot with no runs in the window was simply not messaged. Check Chatwoot's last activity and the `messages` table before calling it broken. And `check_tools.py` on the Supabase route always shows the five "no charge on this call" money cases: the fixture has no charge, and the refusal is correct.

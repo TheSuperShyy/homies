@@ -861,12 +861,11 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
-- **25 Oct: THE WHATSAPP BOT GOT NOTHING from 20 Oct, 07:14 UTC. Re-registered at 15:47:41 UTC on the owner's go; the first real message is still owed.**
+- **25 Oct: THE WHATSAPP BOT GOT NOTHING from 20 Oct, 07:14 UTC. FIXED: re-registered at 15:47:41 UTC on the owner's go, and confirmed end to end at 15:48 to 15:51 UTC.** The owner's 5 messages reached Chatwoot, the bot ran 30 times (all success), and the 4 replies show `read` in Chatwoot.
   - **The fix:** `POST /{WHATSAPP_PHONE_NUMBER_ID}/register` returned 200 `success`.
     - Its PIN is in `.env` as `WHATSAPP_REGISTER_PIN`, never printed. **Any later register must send the same PIN.**
     - Read back: `status` CONNECTED, `platform_type` CLOUD_API, the number's entity AVAILABLE, and the routing still Chatwoot.
     - Overall it still reads BLOCKED for the WABA's payment method (141006), which stops business-initiated sends only, and business verification (141010).
-  - **Owed:** the owner's WhatsApp message to +1 555-178-1261. Then confirm it in the rails log (POST), in the bot's n8n run, and in the `messages` rows.
   - **The evidence:**
     - Chatwoot's rails log has no `POST /webhooks/whatsapp` after that moment.
     - Meta's `health_status` for the number is BLOCKED: 141000 "not linked to your WhatsApp account" and 141001 "not verified". Its status is PENDING and its platform NOT_APPLICABLE.
