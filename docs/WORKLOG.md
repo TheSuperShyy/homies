@@ -35,6 +35,7 @@ conversation that produced it.
   - `vapi_sip.py --route on` dry run: reads only, and shows the server URL and headers.
   - `supabase_functions.py` dry run: lists all three files.
 - **Open:** the owner's go for the two live steps, then Ido's two test calls.
+- **CONTEXT.md:** feature 18's standing decisions. A dialer call is told apart by its name. A debt conversation needs exactly one row on our own call list. Every doubt gets the incoming agent. The two composers move together. HANDOVER has the go-live steps.
 
 ### The phone tests are Ido Clix's (owner, 25 Oct)
 - **Asked:** *"the test would be ido clix"*.

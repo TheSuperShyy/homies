@@ -3193,6 +3193,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **Where it goes:** on the current (tenth) account for now, then the client's main account later (owner: *"we can roll it out afterwards to use the main client acc"*).
   - **Its login is never optional:** without `authentication`, Vapi accepts any username and password, so anyone who learns the address could ring the agent on our bill.
   - **A Vapi account move loses it:** `vapi_transfer.py` copies agents, not phone numbers. The script recreates it with the same address and login, so Omni changes nothing.
+- **Each call on 208 picks its agent; a debt conversation needs our own list (feature 18, built 25 Oct, not live).**
+  - Omni's dialer names its calls `dialer-<the number it rang>`. That name, not Omni's external_id (still "under review"), tells a dialer call from a press-9 call.
+  - The debt agent answers only when that number is exactly one row of `v_debt_call_queue_person`: unpaid, handed over, not do-not-call, under four attempts.
+  - Every other call, doubt or error gets the incoming agent. The dialer rings whatever is uploaded in Tokomni, at any hour, so a mistaken upload must meet a receptionist, never a demand for money.
+  - The variables are the Call button's, copied byte for byte. `check_route.test.ts` runs both composers side by side, so do not edit one without the other.
 - **Zadarma (owner, 18 Oct: "we have zadarma now").**
   - **Known so far:** nothing more. No account details, and no `.env` entry.
   - **How it joins Vapi:** a SIP provider like Zadarma is a `byo-sip-trunk` credential (gateway, username, password). Its incoming calls are forwarded to `{number}@<credential_id>.sip.vapi.ai` (`docs/reference/Homies-Vapi-Account-Notes.md`). It is API only, about an hour.
