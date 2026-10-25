@@ -119,6 +119,12 @@ adds 1.7 to 2.6 s on some replies. The rest is the model's thinking, which runs 
 default). Speeding it up is the owner's model decision (CONTEXT, Gemini for its Hebrew and 3.1
 Pro for honesty). The bot's number is Meta's test number, +1 555-178-1261.
 
+**25 Oct: low thinking through an OpenRouter preset was tried and NOT shipped.** The preset
+`homies-whatsapp` (in the OpenRouter account, unused) made Gemini fail 4 of 8 real-size requests
+with `MALFORMED_FUNCTION_CALL`. Do not point the bot at it. A direct `reasoning: {effort: low}`
+worked 7 of 7. The other route, n8n's OpenAI chat-model node aimed at OpenRouter with
+`reasoningEffort`, is untested.
+
 **Chatwoot assigns new conversations to the agent bot itself** (`assignee_type
 "AgentBot"`), and only a **User** assignee counts as a takeover -- both the
 WhatsApp gate and the handback filter check the type since 23 Aug, after the

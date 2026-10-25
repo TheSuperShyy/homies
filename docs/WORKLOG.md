@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### WhatsApp: Gemini 3.1 Pro on low thinking tested; the preset route breaks tool calls, so NOTHING SHIPPED ($0.60 of OpenRouter)
+- **Asked:** *"ok go"*, to making the chatbot faster.
+- **Why it is not one setting:** n8n's OpenRouter node (v1) cannot send a thinking level (`n8n_whatsapp_model.py`). The documented routes are an OpenRouter preset, or n8n's OpenAI chat-model node pointed at OpenRouter.
+- **Test 1, $0.28.** The live prompt (23,321 chars, pin `2f9217ee3454`) and the 8 live tools, run through `wa_prompt_chat.py`'s turn loop with the tools stubbed. Default against `reasoning: {effort: low}` sent directly:
+  - status question: 20.6 s against **10.4 s**;
+  - leak, then the address: 32.5 s against **27.8 s**;
+  - the same decisions, tool arguments and Hebrew.
+  - The default status reply once began with the model's own notes. None of the 52 real replies since 19 Oct shows that, so it counts for neither.
+- **The preset `homies-whatsapp`** was made through the API: the model, reasoning low, 8,192 tokens, temperature 1, and no system prompt (read back). On a small question it thinks like low.
+- **On the bot's real request it failed 4 of 8 calls,** in both the combined form and `@preset/` alone. Each failure was finish `error`, native `MALFORMED_FUNCTION_CALL`, after about 8 s, with nothing billed.
+  - The same request sent directly worked 4 of 4 (default and low), and 7 of 7 for low across the day.
+  - So the bot was NOT pointed at it, and live is unchanged. The preset stays in the OpenRouter account, unused.
+- **Low, when it works:** the first model step went from 9.2 s to 6.7 s on average (3 calls each), and the second from 10.9 to 5.3 s (one run).
+- **Spent:** $0.60 of OpenRouter in all.
+- **Open, the owner's call:**
+  1. n8n's OpenAI chat-model node with `reasoningEffort` low. Untested: OpenRouter's `reasoning_effort` may behave like the direct call or like the preset.
+  2. A faster Gemini (3.7 Flash).
+  3. A shorter 4 s wait.
+
 ### Omnitelecom: how the line is connected and how to reach it (answered in chat, read-only)
 - **Asked:** *"Help me understand so we are connected to omni telecom via what and i need to understand how to test it or how to reach that"*.
 - **Read now, nothing written:**

@@ -2418,6 +2418,12 @@ agents: Answer the resident, Worth a word?, Could not answer. Four things follow
   through the gate. The tool round-trip itself was checked before the write, in
   n8n's own message shape, for $0.0083: the one OpenRouter spend, for the model's
   compatibility, not a probe of the bot.
+  - **25 Oct: the preset route breaks tool calls.** `homies-whatsapp` (low) failed
+    4 of 8 of the bot's real-size requests with `MALFORMED_FUNCTION_CALL`. The same
+    effort sent directly in the request worked 7 of 7.
+  - So only the OpenAI-node route is left, and it is untested.
+  - Test it the same way: the live prompt and tools through `wa_prompt_chat.py`'s
+    loop. Count the failures before timing anything.
 - **Gemini, for its Hebrew (20 Oct).** The owner: *"the reason i use gemini is
   because of its hebrew capabilities and grammar"*. A cheaper model means a cheaper
   Gemini: Claude Haiku 5.5 and GPT-5.6 Luna, honest in the 20 Oct probe, are out on
