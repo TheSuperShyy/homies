@@ -41,6 +41,9 @@ conversation that produced it.
   - Omni's dialer ringing a number;
   - `vapi_sip_probe.py` from the PC, which tests Vapi's half only.
 - **Open:** the test call through 208 (owed since 23 Oct), and which menu digit reaches 208.
+- **Then** *"i need to ask for omnitelecom or yariv on how can we test it if its on a branch called 208"*: two short Hebrew messages drafted in chat, not sent by us.
+  - To Omni: which menu key reaches 208 or a direct number, and whether it answers outside office hours.
+  - To Yariv: the same, or someone in the office dials 208 and tells us when.
 
 ### WhatsApp bot speed, read from its own history (free): about 20 s a reply since Gemini 3.1 Pro, against 7 to 8 s before
 - **Asked:** *"ok do a test in the chatbot as well"*, after the phone agent's speed work.
