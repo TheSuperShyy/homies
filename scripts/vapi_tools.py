@@ -722,11 +722,12 @@ INTAKE_TOOLS = [
 ]
 
 
-def with_server(tools, url, secret, mode="header"):
+def with_server(tools, url, secret, mode="header", region=None):
     """Point every tool at whichever host is standing up the webhooks.
 
     mode="header" — Supabase Edge Function. The secret is a request header,
-    where it belongs.
+    where it belongs. `region` adds Supabase's `x-region` header, which runs the
+    function in that region instead of the one nearest the caller.
 
     mode="query" — Apps Script. It cannot read custom request headers at all, so
     the secret has to ride in the URL, where it is written to logs on every
@@ -741,6 +742,9 @@ def with_server(tools, url, secret, mode="header"):
             joiner = "&" if "?" in url else "?"
             t["server"] = {"url": "%s%skey=%s" % (url, joiner, secret)}
         else:
-            t["server"] = {"url": url, "headers": {"x-homies-secret": secret}}
+            headers = {"x-homies-secret": secret}
+            if region:
+                headers["x-region"] = region
+            t["server"] = {"url": url, "headers": headers}
         out.append(t)
     return out

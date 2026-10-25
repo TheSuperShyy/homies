@@ -40,6 +40,9 @@ if hasattr(sys.stdout, "reconfigure"):
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 API = "https://api.vapi.ai"
+# Where the Supabase project lives (nmxlhlmcnnggnnuxyelt, Tokyo), and so where the
+# tools' function runs: see the 25 Oct note in build().
+FUNCTION_REGION = "ap-northeast-1"
 
 # Shared by both assistants. HilaNeural is female, which is why every written
 # line is feminine first person.
@@ -213,6 +216,10 @@ BASE = {
                 {"role": "user", "content": "Transcript:\n\n{{transcript}}"},
             ],
         },
+        # 25 OCT: carried here so a sync cannot switch it off. Vapi writes
+        # `{enabled: false}` on create, and it was set back on by hand on both agents
+        # after the 23 Oct move; without this key a PATCH of analysisPlan drops it.
+        "successEvaluationPlan": {"enabled": True},
     },
     # See the assistant docs for why each of these departs from the default.
     "startSpeakingPlan": {
@@ -360,7 +367,15 @@ TARGETS = {
             # (scripts/vapi_sim_inbound.py) had the model stage at 1.34 s median against 1.22 s
             # on 21 Oct's medium calls. Kept because it changed nothing in what Michael says;
             # it is not the latency fix.
-            "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low"},
+            # 25 OCT: serviceTier fast, on the owner's "we need to make the Latency on the
+            # phone faster". OpenAI's Fast mode (the old `priority`), at twice the model's
+            # per-token price: about 1.5 cents more a minute (23 Oct's run billed $0.045
+            # against $0.030 for a one-minute call). Tested on 23 Oct as an override, in
+            # 12 simulated calls: the model stage went from 1.14-1.43 s median to 0.90 s,
+            # and its slowest tenth from 2.1-2.7 s to 1.3 s. No harm was seen in what
+            # Michael said (WORKLOG 23 Oct). Undo: drop the key.
+            "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low",
+                      "serviceTier": "fast"},
             # "model": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.3},   # 6 Sep - 19 Oct
             # 23 OCT: THE PAUSE STAYS AT BASE's 0.8 s (0.3 on punctuation). 0.5 / 0.1 saved 0.3 s a
             # turn (run 06597779) but failed the integrity run (2da300f8): a hesitant caller was
@@ -1097,22 +1112,37 @@ def build(target, first_message, system_prompt):
 
     server = tool_server()
     if target.get("tools") and server:
-        url, secret, mode, _ = server
-        body["model"]["tools"] = with_server(target["tools"], url, secret, mode)
+        url, secret, mode, host = server
+        # 25 OCT: the function runs next to the database, not next to Vapi. Unpinned,
+        # Supabase runs it in the region nearest the caller, so Vapi (Oregon) got a US
+        # West worker and every query crossed the Pacific to Tokyo. Measured from here,
+        # warm: a status read was 0.40 s of work in us-west-1 and 0.09 s in Tokyo, and a
+        # fresh worker's first read was 0.9 to 1.4 s. Vapi logged 2.0 to 2.5 s a tool
+        # call (21-23 Oct). The request now crosses once, not once per query.
+        # Undo: drop `region`.
+        region = FUNCTION_REGION if host == "supabase" else None
+        body["model"]["tools"] = with_server(target["tools"], url, secret, mode, region)
 
     report = report_server()
     if report:
         url, secret = report
         # `server` on the assistant, not the deprecated top-level serverUrl —
         # that form takes no headers, and this endpoint authenticates on one.
-        body["server"] = {"url": url, "headers": {"x-homies-secret": secret}}
-        # Exactly one message, deliberately. Vapi offers eleven and the tempting
+        # Pinned to the tools' region (25 Oct), for `status-update` below.
+        body["server"] = {"url": url, "headers": {"x-homies-secret": secret,
+                                                  "x-region": FUNCTION_REGION}}
+        # Two messages, deliberately. Vapi offers eleven and the tempting
         # ones — conversation-update, speech-update — fire several times a
         # SECOND, each a round trip to Tokyo from a function that writes to the
         # same row. The end-of-call report carries the transcript, the recording,
         # the duration, the ended reason and the latency in one POST after the
         # call is over, where nothing it does can cost the caller a millisecond.
-        body["serverMessages"] = ["end-of-call-report"]
+        # 25 OCT: `status-update` too, a handful a call (in-progress, ended), which
+        # the function answers 200 and ignores. Its one job is to start a Tokyo
+        # worker as the call connects, so the first tool call does not pay the cold
+        # start: 0.5 to 1.8 s on a fresh worker, measured from here. On a quiet line
+        # nearly every call's first tool call would meet a fresh worker.
+        body["serverMessages"] = ["end-of-call-report", "status-update"]
     return body
 
 

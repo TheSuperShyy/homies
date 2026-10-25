@@ -2597,6 +2597,26 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
     so 0.1 s fires mid-thought. A street and its number with a pause between them came back as two
     turns. The pause is a safety setting first and a speed setting second. The same hesitant caller
     on 0.8 s was clean, so 0.8 / 0.3 stays.
+- **The model stays gpt-5.6-sol; the speed comes from the fast tier (25 Oct).** The owner:
+  *"reduce the latency of the bot wether we need to replace the LLM model or what"*.
+  - gpt-4.1 is the faster model: 0.74 s on its one measured turn.
+  - But it was replaced on 19 Oct for the errors Yariv read: the feminine to a man from his name
+    alone, an invented email, "I'm a real person", and agreement slips.
+  - Sol on `serviceTier: fast` measured 0.90 s median on Vapi's path. So a swap now buys about
+    0.15 s and gives the quality back.
+  - A swap is the owner's quality decision. Test it on Hebrew and honesty, and time it on Vapi's
+    path.
+- **The tools run where the database is (25 Oct).**
+  - Unpinned, Supabase runs the function in the region nearest the caller. For Vapi that is US
+    West, so each query crossed to Tokyo, and Vapi logged 2.0 to 2.5 s a tool call.
+  - Every tool and the report server now carry `x-region: ap-northeast-1` (`FUNCTION_REGION` in
+    `vapi_sync.py`).
+  - To measure a tool, force the region with that header, and take an unknown tool name as the
+    no-database baseline. The difference is the function's own work.
+- **`status-update` on the incoming agent is a warm-up, not noise (25 Oct).**
+  - The function answers it 200 and ignores it.
+  - Its job is to start a Tokyo worker as the call connects. A fresh worker costs 0.5 to 1.8 s,
+    and on a quiet line nearly every call would meet one.
 - **Vapi tests and the live line share one wallet (23 Oct).** The tenth account went to -$0.16
   during these runs, and the 208 line stops when it does, as the ninth did. The amount cannot be
   read, but whether the wallet can still place a call can: `vapi_transfer.py --balance` (a

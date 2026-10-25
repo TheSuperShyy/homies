@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Phone latency: the fast tier, a 10-character voice start, and the tools run in Tokyo (LIVE 08:37 to 08:40 UTC)
+- **Asked:** *"ok right now your main goal is to reduce the latency of the bot wether we need to replace the LLM model or what but we need to make the Latency on the phone faster. dont over exhaust the open router credit limit yourself from eating a lot of credits"*.
+  - "The bot on the phone" is the incoming agent on the 208 line: the thread of 21 to 23 Oct.
+- **Read first, free:**
+  - Yariv's account has had no call since the move. Its two rows are `balance()` checks, so the numbers below are the tenth's.
+  - The OpenRouter wallet had been topped up: $19.61, against $0.06 at 07:40 UTC.
+  - Michael's own turns (Vapi's stages; the simulated caller's turns left out), median / slowest tenth:
+
+    | | Whole turn | Model | Voice |
+    |---|---|---|---|
+    | Live settings: 21 Oct real calls, 22 to 23 Oct tests | 3.2 to 3.7 / 4.1 to 4.9 s | 1.14 to 1.43 s | 0.54 to 0.90 s |
+    | 23 Oct candidate: fast tier, 10 characters, 0.5 s pause | 2.60 / 3.75 s | 0.90 s | 0.42 s |
+
+  - Tool calls in Vapi's logs (call to result): `open_request` 2.46 s median and up to 9.66 s, `get_request_status` 2.10 s, `get_balance` 2.03 s. The async tools return at once.
+  - The fillers are non-blocking, so the wait was the function itself.
+- **Why the tools were slow** (measured from here, read-only tools with no call id, so nothing was written):
+  - Unpinned, Supabase runs the function in the region nearest the caller, which for Vapi is US West. The database is in Tokyo, and the function's queries run one after another.
+  - Forced with `x-region`, warm, with an unknown tool name as the no-database baseline: a status read by reference is 0.40 s of work in us-west-1 and 0.09 s in Tokyo.
+  - A fresh worker costs more. The first call into a region nobody had called took 0.5 to 1.8 s more, and the first database read in it took 0.9 to 1.4 s.
+  - Idle: still warm after 30, 90 and 180 s (0.59 to 0.89 s, with a fresh TLS handshake from here).
+- **Changed, on the incoming agent `10ae859a` only, each read back:**
+  1. `serviceTier: "fast"` in `vapi_sync.py`'s inbound model. About 1.5 cents a minute more.
+  2. `minCharacters` 10: `vapi_set_voice.py --agent inbound --apply`.
+  3. `x-region: ap-northeast-1` on all seven tools and on the report server (`FUNCTION_REGION`, `with_server(..., region)`).
+  4. `status-update` added to `serverMessages`, so a Tokyo worker starts as the call connects. The function answered a test one 200 in 0.24 s, from Tokyo.
+  - `successEvaluationPlan {enabled: true}` is in `BASE` now, because the first diff showed the PATCH would have dropped it.
+  - Each push was diffed field by field against live first, and showed only the intended keys. Afterwards: 0 differences.
+- **Not changed:**
+  - The model. gpt-4.1 was 0.74 s on its one turn, about 0.15 s faster than sol on the fast tier, and it brought the 19 Oct errors (CONTEXT).
+  - The 0.8 s pause.
+  - The debt agent.
+- **Spent:** nothing. No OpenRouter, no Vapi call; Supabase invocations only.
+- **Expected, not measured:** plain turns around 2.9 s median (3.2 to 3.7 s before), and a tool call well under the 2 s it took.
+- **Open:**
+  - The owner's call through 208, then `vapi_latency.py --turns`.
+  - The 0.8 s pause: `customEndpointingRules`, a longer wait only after Michael asks for an address, a number or a name, or after a filler. It needs simulated calls on Yariv's wallet, with the owner's OK.
+  - WhatsApp's tool calls are unpinned too (n8n calls the same function).
+
 ### The drive move checked: nothing broke (read only, nothing spent)
 - **Asked:** *"i want you to check if all is working we just migrated from another drive"*.
   - The repo was copied to the new drive on 24 Oct, about 04:23 local, at the same path: `D:\work\Homie`.
