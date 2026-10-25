@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Omnitelecom: how the line is connected and how to reach it (answered in chat, read-only)
+- **Asked:** *"Help me understand so we are connected to omni telecom via what and i need to understand how to test it or how to reach that"*.
+- **Read now, nothing written:**
+  - `vapi_sip.py` lists one SIP address on Yariv's account: `e9f95429`, `sip:homies-omni-208@sip.vapi.ai`, login set, answering with the incoming agent.
+  - `GET /call`: no phone call through it since the 23 Oct move. There are three `balance()` checks (two on 23 Oct, one at 09:51 UTC today) and one web call on the incoming agent at 10:40 UTC today, which ended on the caller's hang-up, so the wallet had credit then.
+- **Given in chat:** the chain, from the office number through Tokomni and extension 208 to Vapi's address by a digest login, and on to Michael. There is no phone number and no SIP trunk on Vapi. Four ways in:
+  - the office number's bot option (which digit Omni set is not on record);
+  - 208 dialled from an office desk phone, as 200, 201 and 202 did on 21 Oct;
+  - Omni's dialer ringing a number;
+  - `vapi_sip_probe.py` from the PC, which tests Vapi's half only.
+- **Open:** the test call through 208 (owed since 23 Oct), and which menu digit reaches 208.
+
 ### WhatsApp bot speed, read from its own history (free): about 20 s a reply since Gemini 3.1 Pro, against 7 to 8 s before
 - **Asked:** *"ok do a test in the chatbot as well"*, after the phone agent's speed work.
 - **Nothing spent.** The code gate was green twice today (414 of 414 on live), and the timings come from `messages`.

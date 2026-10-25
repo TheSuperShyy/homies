@@ -851,6 +851,11 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
 - **18 Oct: Omni set up the dialer with extension 208 for the bot** (email in `local/omnitelecom/`, WORKLOG 18 Oct).
+  - **How to reach 208 (25 Oct):**
+    - From an office desk phone, dial 208. Extensions 200, 201 and 202 did on 21 Oct.
+    - From outside, call the office number 077-6687949 and take the bot's option. **Which digit Omni set is not on record.** "Press 5" was only the 12 Oct example. Outside callers did get through on 21 Oct.
+    - Omni's dialer can ring a number and connect the answered call to 208.
+    - `vapi_sip_probe.py` from the PC proves Vapi's half only (the address and the password), never Omni's.
   - **They ask for:**
     - a dedicated email for 208, from Homies;
     - the bot's address and login.
@@ -890,7 +895,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
         - **Expected, not measured yet:**
           - a plain turn around 2.9 s median (3.2 to 3.7 s before);
           - a tool call well under the 2 s it took.
-        - **Owed:** the owner's test call through 208, then `python scripts/vapi_latency.py --turns`. Yariv's account has had no call yet; its two rows are `balance()` checks.
+        - **Owed:** the owner's test call through 208, then `python scripts/vapi_latency.py --turns`. Yariv's account has had no phone call yet (read 25 Oct: three `balance()` checks and one web call at 10:40 UTC).
         - **Tool check on the Tokyo path:** `check_tools.py` sends the same `x-region` now. 14 pass, and the 5 money cases fail as they do on every probe (no charges). Unpinned, the answers were the same, case for case. Since 25 Oct the probe names the caller (feature 17), and asserts the refusal without a name.
         - **No scenario run (owner, 25 Oct: *"2.50 is too expensive"*).** 23 Oct's 12 simulated calls already tested the fast tier and the voice start in all nine scenarios. The owner's call through 208 is the test, and `vapi_latency.py --turns` reads it for free.
         - **The debt agent** picks up the tool and report pinning on its next sync (the shared `build()`). The fast tier is inbound only.
