@@ -5,6 +5,9 @@ r"""The SIP address Omnitelecom's extension 208 sends calls to: Vapi's free one.
     python scripts/vapi_sip.py --apply      # create it, then read it back
     python scripts/vapi_sip.py --delete     # undo: remove it from the account
     python scripts/vapi_sip.py --delete --key VAPI_PRIVATE_KEY_ACCOUNT10   # on another account
+    python scripts/vapi_sip.py --route on            # dry run: our server picks the agent per call
+    python scripts/vapi_sip.py --route on --apply    # feature 18, on the live line
+    python scripts/vapi_sip.py --route off --apply   # undo: the incoming agent answers every call
 
 WHAT IT IS
 
@@ -20,6 +23,16 @@ It answers with the incoming agent. Menu calls ("press 5 for Michael") are then
 right; dialer calls reach Michael without the tenant's figures until Omni sends
 the external_id header and an `assistant-request` router picks the agent per
 call (CONTEXT, 12 Oct). That router is a change to this address, not a new one.
+
+WHO ANSWERS: THE ROUTER (feature 18, 25 Oct)
+
+The same extension takes press-9 callers and the calls Omni's dialer connects.
+`--route on` drops the fixed agent and gives the address a server, so Vapi asks
+debt-tools at the start of every call (`assistant-request`): a dialer call to
+one tenant on the debt call list gets the debt agent with their figures, and
+everything else, every doubt and every error included, the incoming agent.
+The address and the login are untouched, so Omni changes nothing. `--route off`
+is the undo: the incoming agent answers every call again, as before.
 
 THE LOGIN LIVES IN .env ONLY
 
@@ -64,6 +77,9 @@ LABEL = "Omni extension 208"          # Vapi caps the name at 40 characters
 AGENT = "Inbound Intake (he)"
 # Yariv's account's id (since 23 Oct), used only if listing the assistants fails.
 FALLBACK_ID = "10ae859a-f764-4b38-9154-cd8e82eb3a27"
+
+# vapi_sync.py's FUNCTION_REGION: the function runs in Tokyo, next to the database.
+FUNCTION_REGION = "ap-northeast-1"
 
 USER_VAR, PASS_VAR = "VAPI_SIP_USERNAME", "VAPI_SIP_PASSWORD"
 # Letters and digits only: a PBX form that chokes on a symbol fails quietly,
@@ -123,6 +139,58 @@ def login():
     return user, pw, True
 
 
+def router_server():
+    """The server Vapi asks which agent answers (feature 18): debt-tools, as the agents reach it."""
+    url, secret = env_value("SUPABASE_URL").rstrip("/"), env_value("TOOL_SECRET")
+    if not url or not secret:
+        sys.exit("SUPABASE_URL and TOOL_SECRET must be set in .env")
+    return {"url": url + "/functions/v1/debt-tools", "timeoutSeconds": 10,
+            "headers": {"x-homies-secret": secret, "x-region": FUNCTION_REGION}}
+
+
+def set_route(route, mine, key, apply):
+    """Feature 18: --route on asks our server per call; --route off is the fixed incoming agent."""
+    if not mine:
+        sys.exit("%s is not on this account; create it first." % SIP_URI)
+    num = mine[0]
+    print()
+    if route == "on":
+        server = router_server()
+        body = {"assistantId": None, "server": server}
+        print("Would make %s ask %s which agent answers each call" % (SIP_URI, server["url"]))
+        print("(headers %s, %ss to answer), dropping its fixed agent."
+              % (", ".join(sorted(server["headers"])), server["timeoutSeconds"]))
+    else:
+        aid, aname = agent_id(key)
+        body = {"assistantId": aid}
+        print("Would make %s answer every call with %s (%s) again." % (SIP_URI, aname, aid))
+    if not apply:
+        print("Dry run. Re-run with --apply to change the live line.")
+        return 0
+
+    vapi("PATCH", "/phone-number/" + num["id"], key, body)
+    # READ IT BACK, as the create does: a 200 says Vapi took the body, not
+    # that the line now does what the body meant.
+    after = vapi("GET", "/phone-number/" + num["id"], key)
+    login_kept = bool((after.get("authentication") or {}).get("username"))
+    if route == "on":
+        srv = after.get("server") or {}
+        checks = [("no fixed agent", not after.get("assistantId")),
+                  ("server url", srv.get("url") == body["server"]["url"]),
+                  ("login still set", login_kept)]
+        shown = sorted((srv.get("headers") or {}).keys())
+        print()
+        print("headers on read: %s" % (", ".join(shown) or "none shown (Vapi may hide them)"))
+    else:
+        checks = [("agent", after.get("assistantId") == body["assistantId"]),
+                  ("login still set", login_kept)]
+    for label, ok in checks:
+        print("  %-18s %s" % (label, "ok" if ok else "NO"))
+    if not all(ok for _, ok in checks):
+        sys.exit("A check failed. `--route off --apply` puts the incoming agent back.")
+    return 0
+
+
 def show(n, names):
     auth = n.get("authentication") or {}
     print("  %s  %s  %r -> %s  login %s"
@@ -140,9 +208,16 @@ def main():
             sys.exit("--key takes the NAME of a variable in .env, e.g. VAPI_PRIVATE_KEY_ACCOUNT10")
         var = args[i + 1]
         del args[i:i + 2]
+    route = None
+    if "--route" in args:
+        i = args.index("--route")
+        if i + 1 >= len(args) or args[i + 1] not in ("on", "off"):
+            sys.exit("--route takes on or off")
+        route = args[i + 1]
+        del args[i:i + 2]
     unknown = [a for a in args if a not in ("--apply", "--delete")]
-    if unknown or len(args) > 1:
-        sys.exit("Usage: vapi_sip.py [--apply | --delete] [--key VAR]")
+    if unknown or len(args) > 1 or (route and "--delete" in args):
+        sys.exit("Usage: vapi_sip.py [--apply | --delete | --route on|off [--apply]] [--key VAR]")
     key = env_value(var)
     if not key:
         sys.exit("%s is not set in .env" % var)
@@ -154,6 +229,9 @@ def main():
     for n in nums:
         show(n, names)
     mine = [n for n in nums if (n.get("sipUri") or "").lower() == SIP_URI]
+
+    if route:
+        return set_route(route, mine, key, "--apply" in args)
 
     if "--delete" in args:
         if not mine:

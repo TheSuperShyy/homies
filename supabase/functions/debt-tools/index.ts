@@ -49,6 +49,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
   callNumberOf, flagOf, phoneOf, reporterLine, reporterNameOf, requiredChannels, ticketGate,
 } from "./identity.ts";
+// Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
+// Node can test it: scripts/check_route.test.ts.
+import { debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
 
 const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -1061,6 +1064,9 @@ const INTAKE_ASSISTANT_DEMO10 = "00d91473-1aaa-4a57-a380-ca5bb2b7f1af";
 // 23 Oct: Yariv's own account (the client's), on the owner's word; the tenth's wallet
 // was at -$0.16. A one-to-one copy by vapi_transfer.py.
 const INTAKE_ASSISTANT_YARIV = "10ae859a-f764-4b38-9154-cd8e82eb3a27";
+// The debt agent on the same account. Only the 208 line's router names it
+// (feature 18); an account move changes it here beside the intake id.
+const DEBT_ASSISTANT_YARIV = "4bc03b57-018c-41bc-9c80-1b912b55496c";
 const INTAKE_ASSISTANT_IDS = new Set([
   INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO, INTAKE_ASSISTANT_DEMO9, INTAKE_ASSISTANT_DEMO10,
   INTAKE_ASSISTANT_YARIV,
@@ -4169,6 +4175,47 @@ async function salvage(interactionId: string | null, ctx: CallContext, transcrip
 // and expects { results: [ { toolCallId, result } ] } where result is a string.
 // `arguments` arrives as an object on some versions and a JSON string on others.
 
+/**
+ * Which agent answers a call on the 208 line (feature 18). Vapi sends
+ * `assistant-request` because the address names no agent of its own.
+ *
+ * A dialer call to exactly one tenant on the debt call list gets the debt agent
+ * with that tenant's figures, composed as the Call button composes them. Every
+ * other call, and every doubt or error on the way, gets the incoming agent: the
+ * answer every call on this line got before, and always an answer, because a
+ * failed reply makes Vapi hang the caller up. Numbers are never logged.
+ */
+async function assistantFor(message: any): Promise<Record<string, unknown>> {
+  const intake = { assistantId: INTAKE_ASSISTANT_YARIV };
+  try {
+    const call = { ...(message?.call ?? {}) };
+    if (!call.customer) call.customer = message?.customer ?? {};
+    const phone = isDialerCall(call) ? callNumberOf(call) : null;
+    let rows: unknown[] = [];
+    if (phone) {
+      const { data, error } = await db.from("v_debt_call_queue_person")
+        .select("*").eq("phone", phone).limit(2);
+      if (error) console.error("route: queue read failed", String(error.message ?? error));
+      rows = data ?? [];
+    }
+    const route = routeOf(call, rows);
+    console.log("route", String(call?.id ?? ""), route.agent, route.agent === "intake" ? route.why : "");
+    if (route.agent !== "debt") return intake;
+    const fixed = {
+      callback_number: Deno.env.get("HOMIES_CALLBACK_NUMBER") ?? FIXED_DEFAULTS.callback_number,
+      verification_email: Deno.env.get("HOMIES_VERIFICATION_EMAIL_SAY") ?? FIXED_DEFAULTS.verification_email,
+      alt_payment: Deno.env.get("HOMIES_ALT_PAYMENT") ?? FIXED_DEFAULTS.alt_payment,
+    };
+    return {
+      assistantId: DEBT_ASSISTANT_YARIV,
+      assistantOverrides: { variableValues: debtVariables(route.row, route.phone, fixed) },
+    };
+  } catch (e) {
+    console.error("route threw; the incoming agent answers", String(e));
+    return intake;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.headers.get("x-homies-secret") !== SECRET || !SECRET) {
     return new Response(JSON.stringify({ error: "unauthorised" }), {
@@ -4195,6 +4242,11 @@ Deno.serve(async (req) => {
   // safe here — an unhandled one costs nothing.
   const type = String(message?.type ?? "");
   if (type && !calls.length) {
+    if (type === "assistant-request") {
+      return new Response(JSON.stringify(await assistantFor(message)), {
+        headers: { "content-type": "application/json" },
+      });
+    }
     if (type !== "end-of-call-report") {
       return new Response(JSON.stringify({ ok: true, ignored: type }), {
         headers: { "content-type": "application/json" },

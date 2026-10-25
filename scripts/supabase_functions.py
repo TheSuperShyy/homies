@@ -55,6 +55,8 @@ SLUG = "debt-tools"
 SRC = os.path.join(ROOT, "supabase", "functions", SLUG, "index.ts")
 # Feature 17 (22 Oct): the pure rules live beside index.ts, which imports them.
 IDENTITY = os.path.join(ROOT, "supabase", "functions", SLUG, "identity.ts")
+# Feature 18 (25 Oct): which agent answers a call on the 208 line, also pure.
+ROUTE = os.path.join(ROOT, "supabase", "functions", SLUG, "route.ts")
 API = "https://api.supabase.com"
 
 # api.supabase.com sits behind Cloudflare, which rejects urllib's default
@@ -137,7 +139,9 @@ def main():
 
     src = open(SRC, encoding="utf-8").read()
     identity_src = open(IDENTITY, encoding="utf-8").read()
-    print("files          index.ts %d chars, identity.ts %d chars" % (len(src), len(identity_src)))
+    route_src = open(ROUTE, encoding="utf-8").read()
+    print("files          index.ts %d chars, identity.ts %d chars, route.ts %d chars"
+          % (len(src), len(identity_src), len(route_src)))
 
     print("project        %s" % ref)
     print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
@@ -241,6 +245,7 @@ def main():
         ("metadata", None, json.dumps(meta).encode(), "application/json"),
         ("file", "index.ts", src.encode("utf-8"), "application/typescript"),
         ("file", "identity.ts", identity_src.encode("utf-8"), "application/typescript"),
+        ("file", "route.ts", route_src.encode("utf-8"), "application/typescript"),
     ])
     code, out = call(token, "POST",
                      "/v1/projects/%s/functions/deploy?slug=%s" % (ref, SLUG),

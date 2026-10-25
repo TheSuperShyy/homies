@@ -861,6 +861,21 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
+- **25 Oct: feature 18 lets each call on 208 pick its agent. It is BUILT and tested offline, and NOT LIVE** (`docs/features/18-dialer-routing/`).
+  - **What it does:** a dialer call (caller name `dialer-<number>`) to exactly one tenant on `v_debt_call_queue_person` gets the debt agent, with the Call button's variables. Everything else gets the incoming agent, as now: press 9, staff, no match, two rows, nothing owed, any error.
+  - **Checked offline:**
+    - `node --test scripts/check_route.test.ts`: 6 of 6. It runs the dashboard's own composer beside ours.
+    - Identity tests: 18 of 18.
+    - `check_function_syntax.mjs`: three files parse.
+    - Both live steps dry-run clean.
+  - **Going live, on the owner's explicit go:**
+    1. `python scripts/supabase_functions.py --apply --oxs-mirror`. It is inert until step 2, and a deploy without `--oxs-mirror` deletes the OXS mirror.
+    2. `python scripts/vapi_sip.py --route on --apply`. This writes to Yariv's Vapi account.
+    3. Ido presses 9 and gets the incoming agent. Then his own number, uploaded in Tokomni during the day, gets the debt agent with ₪2,000.
+  - **Undo:** `python scripts/vapi_sip.py --route off --apply`.
+  - **New dependency:** once routed, the line cannot answer at all if the function is down.
+  - **Not in it:** the feminine voice dictionary on dialer calls (the function has no Vapi key), the Call button to Omni (it needs the token), and the calling-hours check.
+  - **An account move also changes `DEBT_ASSISTANT_YARIV`** beside the intake id in `index.ts`.
 - **25 Oct: Omni's answers** (email in `local/omnitelecom/2026-10-25-reply-press-9-campaign.txt`; WORKLOG 25 Oct).
   - **The bot from outside:** the main number, then 9.
   - **The dialer:**

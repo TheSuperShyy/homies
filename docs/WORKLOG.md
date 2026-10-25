@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Feature 18: each call on 208 picks its agent (built, tested offline, NOT live)
+- **Asked:** *"ok so can we do that now? or it alr live"*.
+  - Not live: the 208 address still names the incoming agent.
+  - Built in the repo. The live steps wait on an explicit go: the function deploy, and a write to Yariv's Vapi account.
+- **Built:**
+  - `route.ts`, pure: `isDialerCall`, `routeOf`, and `debtVariables` with the Call button's texts copied byte for byte.
+  - `assistantFor()` in `index.ts`, answered before any other server message. Any doubt or error gets the incoming agent. No number is logged.
+  - `DEBT_ASSISTANT_YARIV` (`4bc03b57`).
+  - `vapi_sip.py --route on|off [--apply]`, with a read-back.
+  - The deploy script uploads `route.ts`, and the syntax check parses it.
+  - Docs in `docs/features/18-dialer-routing/`, plus a row in `docs/README.md`.
+- **Checked from Vapi's spec (`/api-json`):**
+  - With no `assistantId`, `squadId` or `workflowId` on the address, Vapi sends `assistant-request` to `server.url`.
+  - The reply is `{assistantId, assistantOverrides}`.
+  - With no `fallbackDestination`, a failed reply hangs up.
+  - `server.timeoutSeconds` defaults to 20; we set 10.
+  - Not settled: whether the PATCH accepts `assistantId: null` (the spec types it string). A refusal changes nothing; the fallback is delete and recreate with the same URI and login.
+- **Tests:**
+  - `check_route.test.ts`: 6 of 6. It runs the dashboard's own `debtVariableValues`, stripped from `call.ts`, beside ours on three rows.
+  - Identity tests: 18 of 18.
+  - Syntax check: 3 files ok.
+  - `vapi_sip.py --route on` dry run: reads only, and shows the server URL and headers.
+  - `supabase_functions.py` dry run: lists all three files.
+- **Open:** the owner's go for the two live steps, then Ido's two test calls.
+
 ### The phone tests are Ido Clix's (owner, 25 Oct)
 - **Asked:** *"the test would be ido clix"*.
 - **Read-only:** `v_debt_call_queue_person` lists עידו in בר כוכבא 23, flat 1: ₪2,000 owed, on a +972 mobile, attempt 1, never called. Assaf (flat 2, the owner's +63) and Yariv (flat 3) are the other two rows.
