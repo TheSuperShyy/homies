@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### WhatsApp bot status (read-only, free): every gate case passes on live; another key is draining the OpenRouter wallet
+- **Asked:** *"so status on the chatbot does it pass on everything"*.
+- **`check_whatsapp_rules.py` on live, 12:30 UTC:** 414 of 414 cases, every pin, all green.
+  - It tests the code around the model, not the model. The model was last tested on 19 to 20 Oct: the stress test, round 3, and the owner's live test.
+- **No bot run:** n8n holds no execution of `u2JjrbcNPYyyh3yl`. Nobody has written since 20 Oct.
+- **`check_openrouter.py`:** the wallet is $11.65 ($225 bought, $213.35 spent), and the key's cap has $9.25 left.
+  - The wallet was $19.61 at about 08:30 UTC, and the cap $9.85.
+  - So of today's $7.96, `OPENROUTER_API_KEY` spent $0.60, which is the other session's Gemini low test. **The other $7.36 went through another key** on the account: not the bot and not our scripts.
+  - The same thing happened on 20 Oct ($1.40), and the source is still unknown.
+  - That was within about four hours. A second reading at 12:34 UTC matched, so it is not known whether the spending is still going on. When the wallet is empty the bot goes quiet, or the rescue answers.
+- **Given in chat:** pass, with what the gate covers, and the open items: the speed (about 20 s a reply), the `מעדיף` fragment in `promise v4`, Meta's test number, and the wallet.
+
 ### WhatsApp: Gemini 3.1 Pro on low thinking tested; the preset route breaks tool calls, so NOTHING SHIPPED ($0.60 of OpenRouter)
 - **Asked:** *"ok go"*, to making the chatbot faster.
 - **Why it is not one setting:** n8n's OpenRouter node (v1) cannot send a thinking level (`n8n_whatsapp_model.py`). The documented routes are an OpenRouter preset, or n8n's OpenAI chat-model node pointed at OpenRouter.
