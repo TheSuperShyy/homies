@@ -879,6 +879,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - From an office desk phone, dial 208. Extensions 200, 201 and 202 did on 21 Oct.
     - From outside, call the office number 077-6687949 and **press 9**. Omni set this on 25 Oct as a temporary shortcut in the main number's menu.
     - Omni's dialer can ring a number and connect the answered call to 208.
+    - **The tester is Ido Clix (owner, 25 Oct).** He is on file as עידו, בר כוכבא 23 flat 1, ₪2,000 owed, on his own +972 mobile, never called. He makes the press-9 call and the dialer test, by uploading his own number in Tokomni during the day. Until dialer calls are routed to the debt agent, the incoming agent answers the dialer test; after that his row is ready for the debt agent.
     - `vapi_sip_probe.py` from the PC proves Vapi's half only (the address and the password), never Omni's.
   - **They ask for:**
     - a dedicated email for 208, from Homies;

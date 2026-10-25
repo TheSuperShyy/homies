@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### The phone tests are Ido Clix's (owner, 25 Oct)
+- **Asked:** *"the test would be ido clix"*.
+- **Read-only:** `v_debt_call_queue_person` lists עידו in בר כוכבא 23, flat 1: ₪2,000 owed, on a +972 mobile, attempt 1, never called. Assaf (flat 2, the owner's +63) and Yariv (flat 3) are the other two rows.
+- **The plan given:**
+  - Ido calls the main number and presses 9.
+  - Then, during the day, Ido uploads his own number in Tokomni and the dialer rings him. Until the debt routing is built, the incoming agent answers that call.
+  - We read both calls afterwards, for free.
+  - Once the debt routing is built, his row is ready for the debt agent, with nothing new to add.
+
 ### Omnitelecom's answers: press 9 for the bot, the campaign id, one attempt, no calling hours on their side; no external_id yet (read-only)
 - **Pasted by the owner:** Omni support's email, kept in `local/omnitelecom/2026-10-25-reply-press-9-campaign.txt`. Nothing was sent and nothing was built.
 - **What it says:**
