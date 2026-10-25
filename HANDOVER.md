@@ -885,7 +885,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - a tool call well under the 2 s it took.
         - **Owed:** the owner's test call through 208, then `python scripts/vapi_latency.py --turns`. Yariv's account has had no call yet; its two rows are `balance()` checks.
         - **Tool check on the Tokyo path:** `check_tools.py` sends the same `x-region` now. 14 pass, and the 5 money cases fail as they do on every probe (no charges). Unpinned, the answers were the same, case for case. Since 25 Oct the probe names the caller (feature 17), and asserts the refusal without a name.
-        - **The scenario run is owed:** `python scripts/vapi_sim_inbound.py --run DIR --integrity`, 9 calls on the live settings, about $2.50 on Yariv's wallet. It runs after the owner confirms the balance.
+        - **No scenario run (owner, 25 Oct: *"2.50 is too expensive"*).** 23 Oct's 12 simulated calls already tested the fast tier and the voice start in all nine scenarios. The owner's call through 208 is the test, and `vapi_latency.py --turns` reads it for free.
         - **The debt agent** picks up the tool and report pinning on its next sync (the shared `build()`). The fast tier is inbound only.
         - **WhatsApp is not pinned:** n8n's tool nodes call the same function unpinned (`n8n_whatsapp.py`). The same header would help there, but it is a WhatsApp change, so it goes through `check_whatsapp_rules.py`.
       - **22 Oct: `reasoningEffort` low is LIVE on the incoming agent (12:46:38 UTC, read back),** on the owner's *"ok lets fix that and test it automatically"*. Unset was this model's `medium`. `minimal` is not one of its levels, although Vapi's enum offers it.

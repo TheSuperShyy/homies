@@ -20,8 +20,10 @@ conversation that produced it.
 - **The probe now names the caller** in those 4, and one new case asserts the refusal without a name.
 - **Then, pinned and with the header stripped, 14 passed and 5 failed, case for case.** Moving the tools to Tokyo changes nothing in what they answer.
   - Tickets 255-1378 to 255-1383-26 opened and were deleted by the run's own cleanup.
-- **The scenario calls wait on the owner** confirming Yariv's Vapi balance: `vapi_sim_inbound.py --run DIR --integrity` is 9 calls on the live settings.
+- **The 9-call scenario run is dropped on cost.** The owner: *"2.50 is too expensive"*.
   - 23 Oct's identical run cost $2.43 (Michael $1.33, the caller $1.10), at 47 to 116 s a call.
+  - It is not needed for what went live. 23 Oct's 12 simulated calls (runs `06597779` and `2da300f8`) already carried the fast tier and `minCharacters` 10 through all nine scenarios, with no harm seen. Their only difference from live was the 0.5 s pause, which did not ship.
+  - The tool move is covered by the free check above. The untested part is the phone leg, so the owner's own call through 208 is the test (about $0.15 a minute, one side billed).
 
 ### Pushed `feature/chatbot` to GitHub, after the tests and a privacy scan; two real numbers swapped out first
 - **Asked:** *"ok now i have the bypass mode on and lets push it if it passed the testing phase we conducted"*.

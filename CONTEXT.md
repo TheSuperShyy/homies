@@ -2624,6 +2624,12 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
     no-database baseline. The difference is the function's own work.
   - A check calls the tools exactly as the agent does, headers included: `check_tools.py` sends
     the same `x-region`. A probe that skips it tests a path the agent no longer takes.
+- **A full simulated run is too expensive (25 Oct).** The owner: *"2.50 is too expensive"*, for
+  `vapi_sim_inbound.py --integrity` (9 calls, both sides billed).
+  - First reuse what earlier runs already proved for the same settings.
+  - Then run only the one or two calls a change can affect (`--only`, about $0.25 each).
+  - Or use a real call through 208. Only Michael's side bills there, and it is the one test of
+    the phone leg.
 - **`status-update` on the incoming agent is a warm-up, not noise (25 Oct).**
   - The function answers it 200 and ignores it.
   - Its job is to start a Tokyo worker as the call connects. A fresh worker costs 0.5 to 1.8 s,
