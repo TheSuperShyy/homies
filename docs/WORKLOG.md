@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Which Supabase we have (answered in chat, read-only)
+- **Asked:** *"what supabase server we have"*.
+- **Read from the Management API with both tokens in `.env`:**
+  - **Live:** `nmxlhlmcnnggnnuxyelt` "HOMIES", Tokyo (ap-northeast-1), Postgres 17.6, ACTIVE_HEALTHY, created 8 Aug. It is on our account (`SUPABASE_ACCESS_TOKEN`), which also holds another client's paused project, JobNimbus (ap-south-1).
+  - **Yariv's own:** `tfldjbwtghfgdwoyauio`, Seoul (ap-northeast-2), now INACTIVE (paused). It holds the copy made on 13 Aug. Production never moved there: Seoul is no closer to Israel than Tokyo, and a project's region cannot be changed. Its keys are the `SUPABASE_NEW_*` in `.env`, read by nothing.
+
 ### WhatsApp bot status (read-only, free): every gate case passes on live; another key is draining the OpenRouter wallet
 - **Asked:** *"so status on the chatbot does it pass on everything"*.
 - **`check_whatsapp_rules.py` on live, 12:30 UTC:** 414 of 414 cases, every pin, all green.
