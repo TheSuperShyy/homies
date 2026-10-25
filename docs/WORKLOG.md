@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### WhatsApp bot silent: Meta stopped delivering to the test number on 20 Oct, 07:14 UTC (diagnosed, read-only; not fixed)
+- **Asked:** *"why is the chatbot not working"*.
+- **Our side is healthy:**
+  - the OpenRouter wallet is $10.53 and the cap has $9.25 left;
+  - the bot workflow is active and unchanged since 19 Oct, with no run held;
+  - the Chatwoot inbox is not flagged for reauthorization, and its key is `WHATSAPP_ACCESS_TOKEN`;
+  - the Chatwoot containers have been up 8 days.
+  - Today's function deploy (v130) is not involved: nothing reaches n8n at all.
+- **Where it stops:**
+  - Chatwoot's rails log has `POST /webhooks/whatsapp` from Meta: 40 on 18 Oct, 202 on 19 Oct, 31 on 20 Oct, and **none after 20 Oct 07:14:32 UTC**.
+  - The last message rows are 20 Oct 05:34 UTC, and Chatwoot's last WhatsApp activity is 06:00.
+- **Meta (`GET /{phone-number-id}`):**
+  - The routing is right: the `webhook_configuration.phone_number` override points at Chatwoot. The app-level n8n address underneath is the expected leftover (cutover-n8n.md).
+  - The number reads `status` PENDING, `platform_type` NOT_APPLICABLE, `last_onboarded_time` none.
+  - `health_status` reads BLOCKED: 141000 "not linked to your WhatsApp account" and 141001 "not verified", with the fix "Register and finish the OTP".
+  - Also: WABA 141006, a payment method error, which blocks business-initiated messages such as the done template; business 141010, not verified.
+- **So:** the Meta test number +1 555-178-1261 is no longer connected to the Cloud API, and nothing anyone sends it reaches us. Earlier readings of the status were never recorded, so when it changed is known only from the log.
+- **Fix, not done (a write to Meta, the owner's go):** `POST /{phone-number-id}/register` with a 6-digit PIN, then a message from the owner's phone. The lasting fix is Homies' real number, which needs business verification.
+
 ### The 10/25 report (in chat, `/reporter`)
 - Given in chat: 7 done bullets and 3 Will lines.
   - Done: the debt agent live on the phone line; Omnitelecom sorted (press 9, one attempt); the faster phone assistant; the WhatsApp reply time found at about 20 s with a faster setting tried; the WhatsApp rules check (414 of 414); the tested push with two real numbers taken out; the drive move checked.

@@ -861,6 +861,16 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
+- **OPEN 25 Oct: THE WHATSAPP BOT GETS NOTHING. Meta stopped delivering to the test number on 20 Oct, 07:14 UTC.**
+  - **The evidence:**
+    - Chatwoot's rails log has no `POST /webhooks/whatsapp` after that moment.
+    - Meta's `health_status` for the number is BLOCKED: 141000 "not linked to your WhatsApp account" and 141001 "not verified". Its status is PENDING and its platform NOT_APPLICABLE.
+  - **Everything of ours is healthy:** OpenRouter has $10.53, the n8n workflow is active, Chatwoot is up, and the per-number webhook override still points at Chatwoot.
+  - **The likely fix:** `POST /{WHATSAPP_PHONE_NUMBER_ID}/register` with `messaging_product: whatsapp` and a 6-digit `pin`. It writes to Meta and waits on the owner's go. Then a message from the owner's phone, and the rails log should show the POST.
+  - **Also on Meta:** a WABA payment-method error (141006) blocks business-initiated messages, including the `ticket_resolved_he` done template.
+  - **When the bot is quiet, check these first:**
+    - `docker logs chatwoot-rails-1 | grep 'Started POST "/webhooks/whatsapp'` on the VPS;
+    - `GET /{phone-number-id}?fields=health_status,webhook_configuration,status,platform_type`.
 - **25 Oct: feature 18 is LIVE: each call on 208 picks its agent** (`docs/features/18-dialer-routing/`). Done on the owner's go: *"lets fix that one then and put the outbound agent live"*.
   - **What it does:** a dialer call (caller name `dialer-<number>`) to exactly one tenant on `v_debt_call_queue_person` gets the debt agent `4bc03b57`, with the Call button's variables. Everything else gets the incoming agent `10ae859a`: press 9, staff, no match, two rows, nothing owed, any error.
   - **Live since:**
