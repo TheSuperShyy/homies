@@ -9,6 +9,49 @@ conversation that produced it.
 
 ---
 
+## 2026-10-25
+
+### The drive move checked: nothing broke (read only, nothing spent)
+- **Asked:** *"i want you to check if all is working we just migrated from another drive"*.
+  - The repo was copied to the new drive on 24 Oct, about 04:23 local, at the same path: `D:\work\Homie`.
+  - So the Claude project folder (`d--work-Homie`) still matches, with the memory intact.
+  - Everything on C: stayed put: Python 3.12, Node 24, ffmpeg, gh, ruff, the whisper models, `~/.ssh/homies_vps` and the notification hooks.
+- **Checked, all green:**
+  - **git:** `fsck` clean on this repo and on `web/`; both trees clean.
+  - **`.env`:** all 106 keys. The three empty ones (Telnyx, Twilio, `N8N_MCP_TOKEN`) were empty before. `dashboard/.env.local` is there.
+  - **Python:** all 139 `.py` files parse. The only third-party imports (`psycopg`, `tiktoken`, `edge_tts`) resolve, and so does `faster_whisper`.
+  - **Dashboard:** `tsc --noEmit` clean; `NEXT_DIST_DIR=.next-verify npx next build` compiled all 16 routes. No dev server was up.
+  - **The WhatsApp gate:** `check_whatsapp_rules.py` on live, 414 of 414.
+  - **Services, GET only:**
+    - Supabase, REST and Postgres.
+    - Vapi: the active key is Yariv's, and intake `10ae859a` and debt `4bc03b57` both answer. `--balance` was not run: it logs a $0 failed call on Yariv's account, and no Vapi test was planned.
+    - Chatwoot (2 inboxes), and Vercel (the latest production deploy is READY).
+    - The WhatsApp Cloud API system-user token, and Cartesia's client key.
+  - **n8n (`srv1879140`):** the bot workflow is active. Handback and ticket notices run every minute, all `success`. n8n holds no executions of the bot workflow right now, so there is no recent bot turn to inspect.
+  - **GitHub Actions:** OXS requests and OXS sync are both succeeding; the last run was 06:40 UTC.
+- **Found, none of it from the move:**
+  - **The OpenRouter wallet is at $0.06**: $205.00 bought, $204.94 spent. The key's cap shows $9.85, but that is a ceiling, not money.
+    - The next agent turn can be refused.
+    - The bot then goes quiet, or the rescue answers.
+  - **Nothing has reached GitHub since 20 Oct.**
+    - `feature/chatbot` is 57 commits ahead of origin, from `d03aa84` on.
+    - `git push --dry-run` gets a 403 as `ClixTeam579`, so every housekeeping push since has failed.
+    - The known fix is in HANDOVER (the push note, 22 Sep).
+  - **Seven files still name `C:/Users/Acer nitro 5/Desktop/Homie`, which no longer exists.**
+    - `docs/diagrams/check_callflow.py` and the four `gen_*.py` read or write there.
+    - The tester briefs in `scripts/wa_qa.py` (line 1570) and `scripts/voice_qa.py` (lines 1086 and 1092) say to `cd` there.
+    - Stale from an earlier move; not changed.
+  - **The user-level `n8n` MCP server is the shared box, not Homies' own.**
+    - It points at `n8n.srv1135333.hstgr.cloud`, which takes a Bearer token only; it was already so in the 23 Oct config backup.
+    - So its tools cannot see Homies' workflows.
+    - Homies' own `n8n-zqvb.srv1879140.hstgr.cloud/mcp-server/http` answers 401 with OAuth metadata.
+    - The memory note that called it registered against Homies' box is corrected.
+- **CONTEXT.md:** no rule changed, so nothing was added. **HANDOVER.md:** the checkout's location, the push note, the wallet line, and the MCP.
+- **Open:**
+  - The wallet top-up.
+  - The push.
+  - The owner's 208 test call (from 23 Oct).
+
 ## 2026-10-23
 
 ### Vapi move finished: the 208 address is on Yariv's account (LIVE, about 10:45 UTC)
