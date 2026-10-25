@@ -3193,7 +3193,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **Where it goes:** on the current (tenth) account for now, then the client's main account later (owner: *"we can roll it out afterwards to use the main client acc"*).
   - **Its login is never optional:** without `authentication`, Vapi accepts any username and password, so anyone who learns the address could ring the agent on our bill.
   - **A Vapi account move loses it:** `vapi_transfer.py` copies agents, not phone numbers. The script recreates it with the same address and login, so Omni changes nothing.
-- **Each call on 208 picks its agent; a debt conversation needs our own list (feature 18, built 25 Oct, not live).**
+- **Each call on 208 picks its agent; a debt conversation needs our own list (feature 18, LIVE 25 Oct, 15:30 UTC).**
   - Omni's dialer names its calls `dialer-<the number it rang>`. That name, not Omni's external_id (still "under review"), tells a dialer call from a press-9 call.
   - The debt agent answers only when that number is exactly one row of `v_debt_call_queue_person`: unpaid, handed over, not do-not-call, under four attempts.
   - Every other call, doubt or error gets the incoming agent. The dialer rings whatever is uploaded in Tokomni, at any hour, so a mistaken upload must meet a receptionist, never a demand for money.

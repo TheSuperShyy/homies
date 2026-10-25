@@ -126,7 +126,7 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | 15 | [Call button](features/15-call-button/feature.md) | 1d | built 25 Aug; waits for the Israeli number and a PIN in Vercel |
 | 16 | [Human handover](features/16-human-handover/feature.md) | 1d | built and wired live 3 Sep; pages a department team in Chatwoot; waits for the seats |
 | 17 | [Name and number before a ticket](features/17-name-before-ticket/feature.md) | 2d | live on the phone line 22 Oct (Homies' updated spec, section 1); WhatsApp (Plan B) not built |
-| 18 | [Who answers on the 208 line](features/18-dialer-routing/feature.md) | 1d | built 25 Oct, tested offline; not live (the owner's go: deploy, then `vapi_sip.py --route on --apply`) |
+| 18 | [Who answers on the 208 line](features/18-dialer-routing/feature.md) | 1d | LIVE 25 Oct, 15:30 UTC (function v130); the first real calls are Ido's |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and

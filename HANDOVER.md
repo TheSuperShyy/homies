@@ -861,21 +861,26 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
   - **The route:** a `byo-sip-trunk` credential on Vapi (`docs/reference/Homies-Vapi-Account-Notes.md`), API only.
   - **Ask first:** whether it replaces Omnitelecom or sits beside it.
 - **18 Oct: we stay on Chatwoot (owner).** It is already built, and a move to UChat means building it again from the start. A message saying so, with the bot and phone status, was given in chat for Yariv as a Hebrew WhatsApp text (WORKLOG 18 Oct).
-- **25 Oct: feature 18 lets each call on 208 pick its agent. It is BUILT and tested offline, and NOT LIVE** (`docs/features/18-dialer-routing/`).
-  - **What it does:** a dialer call (caller name `dialer-<number>`) to exactly one tenant on `v_debt_call_queue_person` gets the debt agent, with the Call button's variables. Everything else gets the incoming agent, as now: press 9, staff, no match, two rows, nothing owed, any error.
-  - **Checked offline:**
-    - `node --test scripts/check_route.test.ts`: 6 of 6. It runs the dashboard's own composer beside ours.
-    - Identity tests: 18 of 18.
-    - `check_function_syntax.mjs`: three files parse.
-    - Both live steps dry-run clean.
-  - **Going live, on the owner's explicit go:**
-    1. `python scripts/supabase_functions.py --apply --oxs-mirror`. It is inert until step 2, and a deploy without `--oxs-mirror` deletes the OXS mirror.
-    2. `python scripts/vapi_sip.py --route on --apply`. This writes to Yariv's Vapi account.
-    3. Ido presses 9 and gets the incoming agent. Then his own number, uploaded in Tokomni during the day, gets the debt agent with ₪2,000.
+- **25 Oct: feature 18 is LIVE: each call on 208 picks its agent** (`docs/features/18-dialer-routing/`). Done on the owner's go: *"lets fix that one then and put the outbound agent live"*.
+  - **What it does:** a dialer call (caller name `dialer-<number>`) to exactly one tenant on `v_debt_call_queue_person` gets the debt agent `4bc03b57`, with the Call button's variables. Everything else gets the incoming agent `10ae859a`: press 9, staff, no match, two rows, nothing owed, any error.
+  - **Live since:**
+    - function v130, deployed 15:29:35 UTC with `--oxs-mirror`;
+    - the 208 address `e9f95429` switched at 15:30:13 UTC (`vapi_sip.py --route on --apply`).
+  - **Read back:** no fixed agent (the listing shows `-> assistant-request`), the server is debt-tools with `x-homies-secret` and `x-region`, and the login is unchanged. Vapi accepted `assistantId: null`.
+  - **Checked on v130 with pretend `assistant-request`s (nothing rang, nothing was written):**
+    - press 9 gets the incoming agent;
+    - the dialer ringing Ido gets the debt agent with עידו, 2000, flat 1, m, attempt 1 and 8 charges, whether the customer sits on the call or at the top of the message;
+    - an unlisted number, staff, and an empty request get the incoming agent;
+    - status-update is unchanged;
+    - answers took 0.3 to 2.0 s against a 10 s limit.
+  - **Owed: the first real calls.**
+    - Ido presses 9 and should get the incoming agent.
+    - Then Ido uploads his own number in Tokomni during the day and should get the debt agent with ₪2,000.
+    - Read both in Vapi's call log: the agent, `endedReason`, and that `call.assistantId` is set. `isIntake()` and the team-note backstop read it, with `message.assistant.id` as their fallback.
   - **Undo:** `python scripts/vapi_sip.py --route off --apply`.
-  - **New dependency:** once routed, the line cannot answer at all if the function is down.
-  - **Not in it:** the feminine voice dictionary on dialer calls (the function has no Vapi key), the Call button to Omni (it needs the token), and the calling-hours check.
-  - **An account move also changes `DEBT_ASSISTANT_YARIV`** beside the intake id in `index.ts`.
+  - **New dependency:** if debt-tools is down, the line cannot answer at all, because a failed `assistant-request` hangs up.
+  - **Not in it:** the feminine voice dictionary on dialer calls (the function has no Vapi key), the Call button to Omni (it needs the token), and a calling-hours check.
+  - **An account move:** change `DEBT_ASSISTANT_YARIV` and `INTAKE_ASSISTANT_YARIV` in `index.ts`, deploy, and re-run `vapi_sip.py --route on --apply` on the new account after `--apply`.
 - **25 Oct: Omni's answers** (email in `local/omnitelecom/2026-10-25-reply-press-9-campaign.txt`; WORKLOG 25 Oct).
   - **The bot from outside:** the main number, then 9.
   - **The dialer:**
@@ -888,7 +893,7 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - So a dialer call can be told apart and its number read, but not its tenant.
     - Vapi keeps the headers under `phoneCallProviderDetails.sip.headers`.
   - **Results:** Omni suggests our end-of-call report writes the outcome by external_id, or a pull of Tokomni's campaign report matched by phone (it carries no external_id).
-  - **Until dialer calls are routed to the debt agent, the incoming agent answers them.** A real tenant's number uploaded now gets a receptionist call.
+  - **Dialer calls are routed since 15:30 UTC (feature 18).** A listed tenant gets the debt agent. A real tenant uploaded by mistake, not on our list, gets the incoming agent.
 - **18 Oct: Omni set up the dialer with extension 208 for the bot** (email in `local/omnitelecom/`, WORKLOG 18 Oct).
   - **How to reach 208 (25 Oct):**
     - From an office desk phone, dial 208. Extensions 200, 201 and 202 did on 21 Oct.

@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### Feature 18 LIVE: the 208 line picks its agent per call (15:30 UTC), on the owner's go
+- **Asked:** *"ok so lets fix that one then and put the outbound agent live"*.
+- **Step 1:** `supabase_functions.py --apply --oxs-mirror` deployed function **v130** at 15:29:35 UTC.
+  - Ten secrets were pushed, as before: the OXS mirror stays ON and `NAME_REQUIRED_CHANNELS` stays `voice`.
+  - `check_tools.py` was not run, because it files test tickets on הרצל 112, a real building.
+- **Checked before the switch, free: pretend `assistant-request`s posted to v130.** Nothing rang and nothing was written. 7 of 7 right:
+  - press 9 gets the incoming agent;
+  - the dialer ringing Ido's number, in local form as Omni sends it, gets the debt agent with עידו, 2000, flat 1, m, attempt 1 and 8 charges, whether the customer is on the call or at the top of the message;
+  - an unlisted number, staff ext. 201, and an empty request get the incoming agent;
+  - status-update is unchanged;
+  - answers took 0.3 to 2.0 s from here.
+- **Step 2:** `vapi_sip.py --route on --apply` at 15:30:13 UTC, on Yariv's account, address `e9f95429`.
+  - Vapi accepted `assistantId: null`, so the PATCH question is settled.
+  - Read back: no fixed agent, the debt-tools URL, both headers kept, and the login still set. The listing shows `-> assistant-request`.
+- **Not placed:** a test call through Vapi. The first real proof is Ido's press 9, then his Tokomni upload. No call has come in since the switch.
+- **Open:**
+  - Ido's two calls, then a read of the call log (the agent, `endedReason`, `call.assistantId`);
+  - the feminine voice dictionary on dialer calls;
+  - the Call button to Omni, which needs the token;
+  - the calling hours.
+
 ### Feature 18: each call on 208 picks its agent (built, tested offline, NOT live)
 - **Asked:** *"ok so can we do that now? or it alr live"*.
   - Not live: the 208 address still names the incoming agent.

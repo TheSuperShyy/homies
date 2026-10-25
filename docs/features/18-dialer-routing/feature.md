@@ -2,7 +2,7 @@
 
 **Estimate:** 1d
 **Depends on:** 15-call-button (the debt agent's variables), 17-name-before-ticket (`callNumberOf`)
-**Status:** built 25 Oct, tested offline; not live
+**Status:** LIVE 25 Oct: function v130 at 15:29:35 UTC, the 208 line at 15:30:13 UTC
 
 ## Purpose
 
