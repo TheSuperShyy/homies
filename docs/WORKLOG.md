@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-10-25
 
+### The 10/25 report (in chat, `/reporter`)
+- Given in chat: 7 done bullets and 3 Will lines.
+  - Done: the debt agent live on the phone line; Omnitelecom sorted (press 9, one attempt); the faster phone assistant; the WhatsApp reply time found at about 20 s with a faster setting tried; the WhatsApp rules check (414 of 414); the tested push with two real numbers taken out; the drive move checked.
+  - Will: Ido's two test calls; the Call button to Omnitelecom once the access key comes, with the calling hours; what else uses the AI account's credit.
+
 ### Feature 18 LIVE: the 208 line picks its agent per call (15:30 UTC), on the owner's go
 - **Asked:** *"ok so lets fix that one then and put the outbound agent live"*.
 - **Step 1:** `supabase_functions.py --apply --oxs-mirror` deployed function **v130** at 15:29:35 UTC.
