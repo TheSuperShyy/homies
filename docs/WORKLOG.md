@@ -17,6 +17,10 @@ conversation that produced it.
 - **Why:** VS Code's `claudeCode.allowDangerouslySkipPermissions` was turned on at 09:20 UTC, and that session had started at 07:25. Claude Code's docs say a conversation started without the setting cannot enter bypass. `skipDangerousModePermissionPrompt` is not in `~/.claude/settings.json`, so bypass's first-use warning has never been accepted on this PC.
 - **Nothing blocks it locally:** no `disableBypassPermissionsMode` anywhere, no managed-settings file, no registry policy, and no project `.vscode/settings.json`. A claude.ai org policy can only be seen in `/status`, under "Setting sources".
 - **Given:** reload the window, start a new conversation, pick "Bypass permissions" in the mode picker, and accept the warning.
+- **Then *"can you do it fr me"*:** `permissions.defaultMode: "bypassPermissions"` added to `.claude/settings.local.json`. That file is gitignored, so the change applies to this project only. The two Stop hooks are kept, and the JSON was checked valid.
+  - VS Code's `claudeCode.initialPermissionMode` is unset, so new conversations follow the CLI's default, which is now this.
+  - `skipDangerousModePermissionPrompt` was NOT set. The owner accepts the warning themselves.
+  - It takes effect after a window reload and a new conversation. This session stays in `acceptEdits`.
 
 ### Which Supabase we have (answered in chat, read-only)
 - **Asked:** *"what supabase server we have"*.
