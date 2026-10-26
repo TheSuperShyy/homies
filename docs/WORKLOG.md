@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Can the payment link go by SMS? (answered in chat, research only)
+- **Asked:** *"so the link is being offered through whatsapp right so we dont have anything live yet like real number to send it from so it did not send the link and check if its possible to send via sms"*
+- **Today:** `send_payment_link` sends through Chatwoot, so through WhatsApp only, from Meta's test number.
+  - An outbound call is outside Meta's 24-hour window, so only a template can go, and the template did not deliver (the WABA payment method, likely).
+  - Nothing reaches a tenant until Homies' real number and Meta's payment method are in place. The office ticket is the fallback.
+  - No SMS path exists: `TWILIO_*` and `TELNYX_API_KEY` in `.env` are empty, retired in August.
+- **SMS is possible.** The change is small: when WhatsApp says no, the same OXS link goes by SMS to the resident's mobile. It needs a provider account Homies owns:
+  - **An Israeli SMS gateway** (InforU, 019, Global SMS and the like): a Hebrew sender name, priced in agorot. The price was not checked.
+  - **Twilio:** $0.2575 a segment to Israel. A Hebrew text with a link is likely 2 segments. An alphanumeric sender such as "Homies" needs domestic pre-registration, about a week. A company landline (077) may not be the sender. (twilio.com guidelines/il/sms and sms/pricing/il, read 26 Oct.)
+  - **Omnitelecom:** whether they sell SMS is unknown. Their public profile lists PBX and contact-centre products only.
+  - **Yariv:** OXS's `paymentNotes` show Homies' staff already chase by SMS, so Homies may have a provider and sender name already. Ask first.
+- Nothing built, nothing changed.
+
 ### The first real outbound debt call: routing and the name work; the payment link timed out (read-only)
 - **Asked:** *"check the recent call in the outboud"*.
 - **Vapi `01a17807`, 11:44:59 UTC (13:44 Israel), 83 s, $0.22.**
