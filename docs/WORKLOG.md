@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### 12:38 Israel: a call from Ido's number reached the incoming agent, not the debt agent (read-only; open)
+- **Vapi `01a177ca`, 10:38:43 UTC, 29 s,** 81 s after the owner created the "Ido-Test" list (12:37:22).
+  - Caller name `0545…353`, with **no `dialer-` prefix**, so the router answered "not a dialer call" and gave it to the incoming agent.
+  - The greeting was heard as "מחברת הומייז" again. Ido played a tenant with a joke complaint and hung up.
+  - The recording is in `local/recordings/2026-10-26-1238-ido-01a177ca.wav`.
+- **The INVITE matches the 07:35 press-9 call field for field.** The only difference between the four 208 calls of the day is the caller's display name: `dialer-<n>` (11:52, a dialer list), `C2C#<n>` (11:04, click-to-call), and the bare number (07:35 press 9, and this one). Every other header has the same value.
+- **Open:** was it the dialer, or Ido calling in? The Ido-Test row says which: Answered 1, or still New 1.
+  - If it was the dialer, the `dialer-` prefix is not reliable, and no header tells the dialer from the menu.
+  - Routing would then need another sign, for example the number being on the debt list. That changes what an inbound caller on the list hears, so it is the owner's decision.
+
 ### The first dialer call since routing went live: 11:52 Israel, a number not on the list, so the incoming agent answered (read-only)
 - **Screenshots from the session:**
   - Dialer settings: `Homies_Bot`, associate `OC_Homies_management`, 5 channels, the only participant "Bot EXT 208".
