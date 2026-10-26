@@ -30,6 +30,10 @@ The user is the builder. The client is Homies.
 - It writes no Supabase rows, makes no OXS calls that create anything, and makes no Meta calls.
 - A before/after fingerprint of the live system proves each round.
 - A change reaches production only by its own promotion, on the owner's go.
+- **Never run `scripts/supabase_functions.py` for anything but the live function.**
+  - It pushes and deletes **project-wide** Supabase secrets on every run: a plain `--apply` deletes `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES`, which switches off the live OXS mirror.
+  - Any other function, the sandbox included, deploys with files only (`scripts/sandbox_function.py`).
+- The sandbox shares the live OpenRouter credential (the owner, 26 Oct: *"lets use the openrouter we have rn"*). Its spend comes from the live wallet, so every sandbox run that calls the model needs the owner's go, with the price first.
 
 **Yariv's alignment document is the basis for the work from 26 Oct** (`docs/discovery/yariv-alignment-2026-10.md`, accepted by him per the owner). Its test for every decision: does it cut Homies' load and workstations, or add load?
 - It asks for:

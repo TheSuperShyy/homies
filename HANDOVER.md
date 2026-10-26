@@ -573,8 +573,14 @@ its stated time.
   - **The WABA's payment method is set since 26 Oct 12:29 UTC** (Visa on ASTDX, linked by the owner). **It was probably not needed:** a Meta test number sends free to up to 5 verified recipients, and Ido's earlier failure was registration (133010), not payment. It cannot be deleted, only revoked by Meta. The test number reaches only those 5 numbers, so real tenants need Homies' own number. 141006 cleared. **Proven 12:36:49 UTC:** Ido's `payment_link_he` template was delivered. Ticket 255-1384-26 is resolved, and his `payment_links` row reads sent. Business verification (141010) is still pending, so the limit is 250 a day.
 - **DESIGNED 26 Oct, not built: feature 19, the WhatsApp sandbox** (`docs/features/19-whatsapp-sandbox/`).
   - An independent copy for Yariv's section 6 changes (no representative button; `whoami`, which recognises the sender) and Hebrew Chatwoot. Isolation rules and acceptance are in `feature.md`.
-  - **Waiting on the owner:** a review of the spec, and the sandbox's OpenRouter key (a separate key with a cap, recommended).
-  - The server runs n8n 2.33.3, so Data Tables are available.
+  - **Plan written** (`plan.md`, 8 tasks); **waiting on the owner's go to build.** OpenRouter: the live credential is shared (the owner, 26 Oct).
+  - **The design as planned:**
+    - the live `debt-tools/index.ts` runs **unchanged** as `debt-tools-sandbox`, behind `guard.ts` (reads pass, Supabase writes are faked as `SBX-<n>`, every other host is refused);
+    - deployed by `scripts/sandbox_function.py` with files only, **never** `supabase_functions.py`, which rewrites project secrets;
+    - a second Chatwoot account in Hebrew, whose conversation is the sandbox's chat log;
+    - n8n copies made by POST only (the script refuses live ids);
+    - a local chat page on Chatwoot's public API.
+  - **Every task ends with** `sandbox_fingerprint.py --compare`.
 - **26 Oct: Yariv's accepted alignment document is the new yardstick** (`docs/discovery/yariv-alignment-2026-10.md`; the check is in WORKLOG 26 Oct).
   - **Not done yet:** remove the WhatsApp representative button; recognise the sender from our data instead of asking; shorter waits; voice asks the details before the matter.
   - **Waiting on the owner:** the order of work and the security trade-off on balances.

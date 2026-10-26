@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Feature 19: spec refined and the implementation plan written (nothing built)
+- **Asked:**
+  - *"lets use the openrouter we have rn"* (open decision 1: share the live credential);
+  - then the brainstorm's spec review, followed by the writing-plans skill.
+- **Found while planning, which changed the design to keep production further away:**
+  - **`scripts/supabase_functions.py` rewrites project-wide secrets on every run.** A plain `--apply` deletes `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES`. A sandbox deploy through it would have switched off the live OXS mirror. Hence `scripts/sandbox_function.py`, which uploads files only. CONTEXT records the rule.
+  - **The read tools write nothing:** `verify_address`, `get_request_status`, `get_balance`, `get_service_info`. Every other path writes or calls out: `interactionId` inserts, ticket and link rows, OXS, Chatwoot, OpenRouter.
+  - So the sandbox runs the live `index.ts` **unchanged** (uploaded as `app.ts`), behind `guard.ts`, which replaces `fetch`:
+    - Supabase GETs pass;
+    - Supabase writes and RPCs are faked (a `requests` insert gets `SBX-<n>`);
+    - every other host gets 503.
+  - **The live bot touches:**
+    - Chatwoot account 2 (10 nodes);
+    - Supabase `messages` (Log inbound, Log reply, `Anything newer?`, which 7 nodes read);
+    - Meta's typing indicator (2);
+    - the router `homies-debt-tools` (`open_request`, `notify_team`);
+    - the function (7);
+    - "Hand to a person" (2 calls; its `TEAMS` are account 2's ids 1-4).
+  - **The copy's fixes:** Chatwoot ids and tokens swapped; the function URL becomes `-sandbox`; the router goes direct; typing and logging become NoOps; and `Anything newer?` becomes a Chatwoot fetch plus a Code node keeping the name and the row shape.
+  - **Server facts:** n8n 2.33.3; Chatwoot has 1 account and 1 super admin, and rails runner works. The bot API returns `access_token`; API inboxes have an `inbox_identifier`; n8n credentials can be created over the API (`httpHeaderAuth` `{name, value}`).
+- **Spec refined:**
+  - the guard instead of a modified copy;
+  - the sandbox conversation as its chat log (no Data Tables);
+  - the sender lookup as two n8n nodes ("Who is writing?" GET `residents`, "Add who");
+  - an API inbox and a local chat page;
+  - no payment link (OXS mints one per call, so it is refused).
+- **Plan:** `docs/features/19-whatsapp-sandbox/plan.md`, 8 tasks.
+  1. Fingerprint.
+  2. Guard (TDD with node --test).
+  3. Files-only deploy and probe.
+  4. Chatwoot account.
+  5. n8n copy (offline transform test).
+  6. Section 6 (two buttons, 7 exact prompt edits, `WHO_RULE`, who nodes).
+  7. Chat page.
+  8. Acceptance (about $1 OpenRouter, the owner's go).
+  - The self-review fixed one bug: section 6 now receives the Supabase credential explicitly, because no sandbox node keeps it after the copy.
+- **Waiting on:** the owner's go to start building.
+
 ### Feature 19 designed: an independent WhatsApp sandbox (brainstormed; approved by the owner; spec written)
 - **Asked:**
   - *"so the number 9 lets create a sandbox for this so we dont touch the prod and the 11"*;
