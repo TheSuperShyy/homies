@@ -565,8 +565,14 @@ its stated time.
     - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
     - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
     - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
+- **LIVE 26 Oct, 08:25 UTC, both voice agents: calls are recorded again** (the owner's word: "lets activate the recording again in the vapi").
+  - **What changed:** `artifactPlan.recordingEnabled` is true; video stays off and the transcript stays on. It was a PATCH of `artifactPlan` only. The read-back shows model, voice, greeting, transcriber, server and analysis unchanged.
+  - **Kept on:** `vapi_sync.py` now sends true, so a prompt push no longer switches it off.
+  - **Background:** it was off from 25 Aug by the client's instruction. Callers are not told that a call is recorded.
+  - **Where to find a recording:** the call's `artifact.recording` in Vapi (kept 14 days), and the dashboard's call page through `audio_url` from the end-of-call report.
+  - **Undo:** set the plan back to false, in the script and live.
 - **READY 26 Oct, NOT live (it ships on the owner's go): the voice says the name from הוֹמִיז, with vowel points** (WORKLOG 26 Oct).
-  - **Why:** on the 07:35 UTC test call the owner heard "homyze", and Vapi recorded the greeting as "מחברת הומייז". Local Whisper on the September clone clips hears the marked הומי'ז as "Homie Eyes" in a glued sentence. The pointed form is clean in all three sentences.
+  - **Why:** on the 07:35 UTC test call the owner heard "homyze", and the transcriber heard the greeting as "מחברת הומייז". Local Whisper on the September clone clips hears the marked הומי'ז as "Homie Eyes" in a glued sentence. The pointed form is clean in all three sentences.
   - **What changes:** in `scripts/voice_guard.py`, every name rewrite ends in הוֹמִיז, and the marked form alone is rewritten too (31 replacements). The prompts and every written text keep הומי'ז.
   - **Checks:** `vapi_leak_check.py --safe` is 0 damaged. The dry run differs from live only in the name rules, on both agents.
   - **To ship:** `python scripts/vapi_set_voice.py --apply`, read back, then a call to hear it.

@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Recording on again, both voice agents (LIVE 08:25 UTC, on the owner's word)
+- **Asked:** *"lets activate the recording again in the vapi"*. This came right after being told that the recording was off by Yariv's choice.
+- **Live, Yariv's Vapi:**
+  - A PATCH of `artifactPlan` only, `{"transcriptPlan": {"enabled": true}, "recordingEnabled": true, "videoRecordingEnabled": false}`, on the incoming agent `10ae859a` (08:25:45 UTC) and the debt agent `4bc03b57` (08:25:46).
+  - Read back: the plan is as sent. Model, voice, first message, transcriber, server and analysis are byte-equal to before.
+- **Repo:**
+  - `scripts/vapi_sync.py` sends `recordingEnabled: True`, so the next prompt push keeps it on.
+  - CONTEXT's "transcript only" line is replaced.
+  - The `demo-inbound.md` and `debt-followup.md` rows are updated.
+- **Not done:**
+  - Callers are not told that the call is recorded.
+  - Yariv has not been told that it is back on. His instruction of 25 Aug is reversed.
+- **Correction to the entry below:** the greeting's transcript line is not the formatter's output. It is the transcriber's hearing of the voice. `modelOutputInMessagesEnabled` stores the model's text only for the turns the model writes, and the fixed first message is not one of them. So "הומייז" is how the name sounded. CONTEXT is corrected.
+
 ### Michael says the name as "homyze": the voice gets הוֹמִיז (prepared and checked; waits on the owner's go)
 - **Asked:** *"so i tested it the latency is kinda good but the homies is not sounding correct its like homyze its not good. or just get the recording of the latest call today earlier like mnutes ag"*.
 - **The call:** `01a17722-b525-7225-a5c2-c63054b9f5a8`, 26 Oct 07:35 UTC, 2 min 22 s, on the incoming agent through 208. The caller ended it.

@@ -31,7 +31,7 @@ the next level-2 heading.
 | `maxDurationSeconds` | **240** | Target is a two-minute call. Past four minutes it is a call that should have been handed over. |
 | `silenceTimeoutSeconds` | **20** | Outbound: a silent line is an answering machine or a hang-up, not someone thinking. Inbound uses 30. |
 | `endCallFunctionEnabled` | true | The agent must be able to end the call itself after a voicemail or a wrong party. |
-| `artifactPlan.recordingEnabled` | true | Quality review and dispute evidence. It stopped being the *authorisation* on 4 Aug — see below. |
+| `artifactPlan.recordingEnabled` | true | Quality review and dispute evidence. It stopped being the *authorisation* on 4 Aug — see below. Off from 25 Aug by the client's instruction; on again since 26 Oct, 08:25 UTC, on the owner's word. |
 
 ## The recording stopped being load-bearing on 4 Aug
 

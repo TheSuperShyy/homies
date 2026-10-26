@@ -278,8 +278,9 @@ read that run. Amounts are stored as OXS gives them (agorot and all) and
 **Outbound is a button, not a runner.** Decided 25 Aug: a person presses Call
 next to one resident on the Debts page; the agent rings that resident, once.
 Nothing auto-dials. The press is the `handed_over` decision. A PIN is typed
-with it because the page has no login wall. Transcript only -- recording is
-off on every assistant and the deploy scripts keep it off.
+with it because the page has no login wall. **Calls are recorded again since
+26 Oct** (the owner's word), on both agents, and `vapi_sync.py` keeps it on.
+From 25 Aug it was transcript only, by the client's instruction.
 
 **Targets the owner has set aside, 25 Aug.** Voice latency ~1.2 s is
 accepted; do not spend time chasing the PRD's 0.8 s. Ten simultaneous calls
@@ -2465,12 +2466,13 @@ times on its home page. The double mark in his message is his keyboard's.
   `vapi_set_voice.py --apply` runs on the owner's go. The 19 Oct check that
   cleared the mark (DTW at the noise floor) measured Noam, a stock voice on our
   key. It was wrong for the clone: measure the voice that is live.
-- **A voice transcript is what came back from the voice, not what was sent.** Vapi
-  stored the 26 Oct greeting as "מיכאל מחברת הומייז": the rewrite applied, the
-  points gone, the mark heard as a double yod, and the word מדבר lost. No
-  spelling in a prompt reaches that record intact. The text a resident reads
-  (WhatsApp, tickets, the dashboard's own words) is where the marked form is
-  kept.
+- **The greeting's line in a transcript is what the transcriber heard, not what
+  was sent.** `modelOutputInMessagesEnabled` (30 Sep) stores the model's own text
+  for the turns it writes. The fixed first message is not a model turn, so Vapi
+  transcribes it from the voice. On 26 Oct it read "מיכאל מחברת הומייז": the
+  rewrite applied, the mark heard as a double yod, the word מדבר lost. That line
+  shows how the name sounded; no spelling reaches it intact. The text a resident
+  reads (WhatsApp, tickets, the dashboard's own words) keeps the marked form.
 - **"Spelling errors" from a native reader are three things,** and only one is
   spelling: the name; the feminine written to a man (a gender slip, the 7 Oct
   research); and agreement slips (איזה קומה, נחשבת נפרד, זה הדרך, יצרו for

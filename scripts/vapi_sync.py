@@ -171,10 +171,13 @@ BASE = {
     # interrupted sentence is stored whole or cut off is not in Vapi's docs, so
     # the first call with an interruption should be read to find out.
     "modelOutputInMessagesEnabled": True,
-    # TRANSCRIPT ONLY, NO AUDIO. Decided 25 Aug: nothing is recorded, the
-    # transcript is kept. Switched off live the same day on all four assistants;
-    # this line is what stops the next push switching it back on.
-    "artifactPlan": {"recordingEnabled": False, "videoRecordingEnabled": False,
+    # AUDIO IS RECORDED AGAIN SINCE 26 OCT, on the owner's word ("lets activate
+    # the recording again in the vapi"). It was off from 25 Aug by the client's
+    # instruction, and in those two months no question about how the voice
+    # sounded could be settled: the 30 Aug stutter, the name heard as "homyze".
+    # Vapi keeps a recording 14 days. Video stays off. This line is what keeps the
+    # next push from switching it off again.
+    "artifactPlan": {"recordingEnabled": True, "videoRecordingEnabled": False,
                      "transcriptPlan": {"enabled": True}},
     # THE SUMMARY COLUMN WAS EMPTY ON EVERY CALL EVER RECORDED (20 Aug).
     #
