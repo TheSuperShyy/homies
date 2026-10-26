@@ -571,6 +571,9 @@ its stated time.
   - The bot is likely down again.
   - **Fix:** re-register with the same PIN on the owner's go, then find why it drops.
   - **The WABA's payment method is set since 26 Oct 12:29 UTC** (Visa on ASTDX, linked by the owner). **It was probably not needed:** a Meta test number sends free to up to 5 verified recipients, and Ido's earlier failure was registration (133010), not payment. It cannot be deleted, only revoked by Meta. The test number reaches only those 5 numbers, so real tenants need Homies' own number. 141006 cleared. **Proven 12:36:49 UTC:** Ido's `payment_link_he` template was delivered. Ticket 255-1384-26 is resolved, and his `payment_links` row reads sent. Business verification (141010) is still pending, so the limit is 250 a day.
+- **26 Oct: Yariv's accepted alignment document is the new yardstick** (`docs/discovery/yariv-alignment-2026-10.md`; the check is in WORKLOG 26 Oct).
+  - **Not done yet:** remove the WhatsApp representative button; recognise the sender from our data instead of asking; shorter waits; voice asks the details before the matter.
+  - **Waiting on the owner:** the order of work and the security trade-off on balances.
 - **26 Oct, 11:44 UTC: the first real outbound debt call. The dialer reached the debt agent with Ido's details** (WORKLOG 26 Oct; `01a17807`).
   - **Works:** the routing, and the name, heard as הומיז.
   - **Broke: `send_payment_link` passed Vapi's 10 s limit.** The function finished about 11 s after the call: link not delivered (`outside_window`, and the template did not go), office ticket `255-1384-26`. Michael then improvised the office number wrong: "0 7 7 687949", missing a 6.

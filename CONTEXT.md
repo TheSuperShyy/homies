@@ -25,6 +25,14 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**Yariv's alignment document is the basis for the work from 26 Oct** (`docs/discovery/yariv-alignment-2026-10.md`, accepted by him per the owner). Its test for every decision: does it cut Homies' load and workstations, or add load?
+- It asks for:
+  - no representative button on WhatsApp (the bot is the representative; transfer only in an extreme emergency);
+  - no asking again for what the company's data already knows reliably;
+  - the call-centre order on voice (details, then the matter);
+  - the shortest waits possible.
+- Where it meets an older rule here (the 4 Oct representative tap, the 13 Aug typed name and phone before a balance), raise it with the owner before changing anything. Do not silently pick one.
+
 **Testing never spends OpenRouter credit; it is done with Claude (22 Sep).**
 Owner: *"we need to stop spending openrouter keys when we test use claude."*
 The account pays for the live WhatsApp assistant, and ten weeks of testing on
