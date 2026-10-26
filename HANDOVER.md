@@ -571,16 +571,23 @@ its stated time.
   - The bot is likely down again.
   - **Fix:** re-register with the same PIN on the owner's go, then find why it drops.
   - **The WABA's payment method is set since 26 Oct 12:29 UTC** (Visa on ASTDX, linked by the owner). **It was probably not needed:** a Meta test number sends free to up to 5 verified recipients, and Ido's earlier failure was registration (133010), not payment. It cannot be deleted, only revoked by Meta. The test number reaches only those 5 numbers, so real tenants need Homies' own number. 141006 cleared. **Proven 12:36:49 UTC:** Ido's `payment_link_he` template was delivered. Ticket 255-1384-26 is resolved, and his `payment_links` row reads sent. Business verification (141010) is still pending, so the limit is 250 a day.
-- **DESIGNED 26 Oct, not built: feature 19, the WhatsApp sandbox** (`docs/features/19-whatsapp-sandbox/`).
-  - An independent copy for Yariv's section 6 changes (no representative button; `whoami`, which recognises the sender) and Hebrew Chatwoot. Isolation rules and acceptance are in `feature.md`.
-  - **Plan written** (`plan.md`, 8 tasks); **waiting on the owner's go to build.** OpenRouter: the live credential is shared (the owner, 26 Oct).
-  - **The design as planned:**
-    - the live `debt-tools/index.ts` runs **unchanged** as `debt-tools-sandbox`, behind `guard.ts` (reads pass, Supabase writes are faked as `SBX-<n>`, every other host is refused);
-    - deployed by `scripts/sandbox_function.py` with files only, **never** `supabase_functions.py`, which rewrites project secrets;
-    - a second Chatwoot account in Hebrew, whose conversation is the sandbox's chat log;
-    - n8n copies made by POST only (the script refuses live ids);
-    - a local chat page on Chatwoot's public API.
-  - **Every task ends with** `sandbox_fingerprint.py --compare`.
+- **BUILT 26 Oct: feature 19, the WhatsApp sandbox** (`docs/features/19-whatsapp-sandbox/`; ids and how-tos in `feature.md` "As built").
+  - An independent copy running Yariv's section 6 changes: no representative button, and the sender recognised from `residents`. Chatwoot is in Hebrew in the sandbox account only.
+  - **Pieces:**
+    - Chatwoot account 3 "הומי'ז — סביבת ניסוי" (locale he; the owner is an administrator);
+    - n8n: router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n`;
+    - `debt-tools-sandbox` v2: the live code unchanged, behind `guard.ts` (reads pass; writes faked, tickets `999-9000NN-YY`; other hosts refused);
+    - the chat page, `python scripts/sandbox_chat.py`, then http://127.0.0.1:8765.
+  - **Proven:**
+    - `sandbox_fingerprint.py --compare` said "live system unchanged" after every step;
+    - the sandbox keys get 401 on account 2;
+    - the probe's ticket left no row;
+    - a hello on the chat page gets the menu with **two** buttons.
+  - **Waiting on the owner:**
+    - the go for the paid acceptance run (`python scripts/sandbox_drive.py --run all`, under $1 on the shared OpenRouter key);
+    - then the owner's own chats;
+    - promoting each change to live is a separate go.
+  - **Departures from the plan** (router copied, memory key `-sbx`, references in the live shape, `Send`'s own button copy) are listed at the top of `plan.md`.
 - **26 Oct: Yariv's accepted alignment document is the new yardstick** (`docs/discovery/yariv-alignment-2026-10.md`; the check is in WORKLOG 26 Oct).
   - **Not done yet:** remove the WhatsApp representative button; recognise the sender from our data instead of asking; shorter waits; voice asks the details before the matter.
   - **Waiting on the owner:** the order of work and the security trade-off on balances.

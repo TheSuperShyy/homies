@@ -27,8 +27,11 @@ The user is the builder. The client is Homies.
 
 **Sandbox work never touches production (26 Oct, the owner: "make sure the prod is not being affected the sandbox is independent").**
 - Feature 19 has its own Chatwoot account, its own n8n workflows and its own backend function (`debt-tools-sandbox`).
+  - **Built 26 Oct:** Chatwoot account 3; n8n copies of the bot, the handover and the debt-tools router; function v2. Ids and how-tos are in `feature.md` "As built".
 - It writes no Supabase rows, makes no OXS calls that create anything, and makes no Meta calls.
-- A before/after fingerprint of the live system proves each round.
+  - Its fake ticket numbers are `999-9000NN-YY`: the live reference shape, so the bot's guards accept them, with a serial no real ticket has.
+- A before/after fingerprint of the live system proves each round: `python scripts/sandbox_fingerprint.py --compare local/sandbox/before.json`.
+- **The sandbox copies are generated, never edited by hand.** After a live change, re-run `scripts/n8n_sandbox.py --apply --section6` and `scripts/sandbox_function.py --apply`.
 - A change reaches production only by its own promotion, on the owner's go.
 - **Never run `scripts/supabase_functions.py` for anything but the live function.**
   - It pushes and deletes **project-wide** Supabase secrets on every run: a plain `--apply` deletes `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES`, which switches off the live OXS mirror.

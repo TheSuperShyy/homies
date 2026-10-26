@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Feature 19 built: the WhatsApp sandbox (production unchanged after every step)
+- **Asked:** *"ok lets run it"* (the plan's go). The paid Task 8 run keeps its own go.
+- **Built:** in order, each step followed by `sandbox_fingerprint.py --compare` ("live system unchanged" every time):
+  1. **Snapshot** `local/sandbox/before.json`: 7 live workflows, `debt-tools` v130, 17 project secrets (hashed), 4 personas. `SANDBOX_PERSONAS` is in `.env`.
+  2. **The guard:** 7/7 node tests.
+  3. **`debt-tools-sandbox`**, deployed with files only.
+     - The probe as Ido: the status read worked, and the ticket was faked with no row in `requests`.
+     - **Found:** `get_payment_link` reuses the link on record (`reused: true`) before any OXS call. That is a read, as live does, so it is kept, and the probe refuses only a NEW link.
+  4. **Chatwoot account 3** "הומי'ז — סביבת ניסוי" (he): API inbox 3, bot 2, teams 5-8, 8 labels with Hebrew descriptions, 9 attributes with Hebrew names. The owner is added. The sandbox admin and bot tokens get 401 on account 2.
+  5. **n8n copies.** Router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n`; the read-back matched what was sent.
+     - **Found:** `open_request` and `notify_team` go through the router, which answers before writing. The router is copied rather than bypassed.
+     - The memory key gets `-sbx`.
+     - n8n's API drops `binaryMode: separate`; there is no binary in this bot.
+  6. **Section 6 in the bot copy only.**
+     - **Found:** `Send` re-attaches its own three buttons after "how can I help", so the button is cut there too.
+     - Every other node keys the representative tap on Sort's `tap === 'other'`, which can no longer happen.
+     - "Who is writing?" and "Add who" were added, the latter checked offline for one flat, several flats, none and an error.
+     - The ticket tool's "ask for the flat every time" got a sentence for a recognised sender.
+  7. **Chat page:** a hello as the unknown number got "ערב טוב 👋 כאן הומי'ז. במה אפשר לעזור?" with two buttons, at $0.
+  8. **Driver written.** The free scenario passes.
+     - **Found:** the bot's reply guards only know `\d{3}-\d{3,6}-\d{2}`, so the fake references became `999-9000NN-YY` (function v2). The probe then got `999-900001-26`, and the live code added its spoken form.
+- **OpenRouter before the paid run:** key usage $5.83 of its $15 cap ($9.17 left); wallet $18.10 left.
+- **Open:**
+  - the owner's go for `sandbox_drive.py --run all` (under $1);
+  - the owner's own chats;
+  - the several-flats case has no persona, so it is checked offline only.
+
 ### Feature 19: spec refined and the implementation plan written (nothing built)
 - **Asked:**
   - *"lets use the openrouter we have rn"* (open decision 1: share the live credential);

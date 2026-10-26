@@ -31,9 +31,30 @@ So the sandbox's backend is the live code behind a network guard (`guard.ts`), w
 
 **Why a guard and not a modified copy (26 Oct, found while planning).** Running the live `index.ts` unchanged means what is tested is exactly what runs live, and production code is not edited. `scripts/supabase_functions.py` pushes and deletes **project-wide** secrets on every run, so a plain run would switch off the live OXS mirror. The sandbox therefore has its own deploy (`scripts/sandbox_function.py`), which only uploads files.
 
-## Why no payment link in the sandbox
+## Payment links: read, never minted
 
-OXS mints a new payment link on every call to `/payment-link` (spec rev 1.3, "Each call mints a NEW link"). A new link is a new object in the client's system, so the guard refuses OXS, and the bot takes the function's usual no-link path (a ticket and a team note, both sandbox-only).
+OXS mints a new payment link on every call to `/payment-link` (spec rev 1.3, "Each call mints a NEW link"). A new link is a new object in the client's system, so the guard refuses OXS.
+
+**Found while building (26 Oct):** the function looks in `payment_links` first and hands back a link already on record (`reused: true`) without calling OXS. That is a read, and it is what live does, so the sandbox keeps it: writing as Ido returns the link he was sent on 26 Oct. A tenant with no link on record takes the usual no-link path (a ticket and a team note, both sandbox-only).
+
+## Why the router is copied too (26 Oct, found while building)
+
+The plan sent the bot's `open_request` and `notify_team` straight to the function. But they go through the router `/webhook/homies-debt-tools`, and the router answers some tools before it writes: `notify_team` gets `{ok, reason}` at once, while the function itself would also return, for example, an emergency reference.
+
+Calling the function directly would show the sandbox bot answers the live bot never sees. So the router is copied as "SANDBOX — debt tools router", pointed at `debt-tools-sandbox`, and the copy behaves exactly like live.
+
+## Why the fake ticket numbers look real
+
+The bot's reply guards (`Send`, `Reply usable?`) recognise a reference only as `\d{3}-\d{3,6}-\d{2}`. A reply quoting `SBX-4` looked unbacked to them, and the bot would have taken a rescue path live never takes. So the guard gives `999-9000NN-YY`:
+- it has the live shape;
+- the serial starts at 900001, which no real ticket has (the highest is about 29,000), so `serialOf()` can never land on a real tenant's ticket;
+- the 999 prefix tells a tester at a glance that it is fake.
+
+The live code accepted the number as real: it added the spoken form.
+
+## Why the memory key changes
+
+n8n keeps the "Conversation so far" buffer under a session key, `<phone>-84` on live. If n8n keyed buffers by session alone, a sandbox chat as Ido would land in Ido's live memory. The copy appends `-sbx`, so isolation does not depend on how n8n scopes its buffers.
 
 ## Why the labels keep their English titles
 

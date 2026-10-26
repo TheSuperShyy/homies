@@ -12,6 +12,22 @@
 
 **Tech Stack:** Deno Edge Function (TypeScript), Node 24 `node --test` with type stripping, Python 3.12 stdlib scripts, n8n 2.33.3 public API, Chatwoot (latest) API, rails runner over SSH, Supabase Management API.
 
+## As built (26 Oct): where the build departed from this plan
+
+Tasks 1 to 7 are done, and Task 8's driver is written; its paid run waits on the owner's go. Each change below was found against the live system while building; `feature.md` "As built" and `context.md` give the reasons.
+- **Task 1:** the snapshot also hashes the project's Edge Function secrets, and it counts both stored phone forms (`interactions.caller_phone` is "+972…" since October and "972…" before).
+- **Task 3:** the probe passes `reporter_name`. A link already on record is reused, a read, and the probe allows it; a new link would fail it.
+- **Task 2 (revised after Task 7):** fake references are `999-9000NN-YY`, not `SBX-<n>`, so the bot's reply guards recognise them.
+- **Task 4:** the owner is added with no `active_at`, and Chatwoot orders `active_at DESC NULLS LAST`, so the owner's login keeps opening account 2.
+- **Task 5:**
+  - a third copy, the debt-tools router (`homies-debt-tools-sandbox`), instead of pointing the tools at the function;
+  - the memory session key gets `-sbx`;
+  - the chat-log Code node always outputs an item, as the live HTTP node did;
+  - a sticky note on each copy;
+  - the new nodes are placed on free grid spots.
+- **Task 6:** `Send` re-attaches its own copy of the three buttons, so the representative button is cut there too. The ticket tool's "ask for the flat every time" gets one sentence for a recognised sender.
+- **Task 8:** the scenarios check labels as well as words (the gas emergency must label `handover`; a typed request for a person must not), and they measure the OpenRouter spend.
+
 ## Global Constraints
 
 - **Production must not be affected; the sandbox is independent** (owner, 26 Oct). Nothing may PUT, PATCH, activate or deactivate these live n8n workflows: `u2JjrbcNPYyyh3yl`, `oB66atFlWwtkSGgN`, `lXofknAbE5wu5nwQ`, `IVNR5iNn7bQS8JgP`, `i3VMdCnXZGooI1Dj`, `pduAdXjX1EU7cA6E`, `pvMuradcJOASapF0`.
