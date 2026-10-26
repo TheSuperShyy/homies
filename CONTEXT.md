@@ -2963,7 +2963,18 @@ offline. The testable fix for that kind of slip is a guard, which the gate
 can prove. The final proof is still the owner's handset.
 
 **A bug found on a handset is a scenario added to the deck**, the way a bug
-fixed is a case added to the gate. The 1 Oct run and its findings are in
+fixed is a case added to the gate.
+
+**A client's feedback is tested by picking from the decks, not by writing new scenarios (26 Oct).**
+For Yariv's points, 22 existing scenarios from three decks were copied unchanged into two subset decks:
+the scripted ones, and the free ones with the decks' shared `defaults`. They run with `--deck <file>` on
+every command. The run is in `docs/assistant/transcripts/2026-10-26-yariv/`.
+- **The rubric's handset flags need reading before they are counted.** Four of the five rule types were
+  false there: a negated "לא יכול להבטיח" counted as a promise; an office number the tenant asked for
+  counted as unasked; the rep tap's 😊 counted as an emergency emoji before the gas was mentioned; and
+  "מה המצב שלה" (of a ticket) counted as how-are-you.
+- **The judges agreed on one thing across five emergency chats:** the danger step's fixed
+  "זה הדבר היחיד שאני יכול לעשות מכאן" reads cold. The 1 Oct run and its findings are in
 `docs/assistant/transcripts/2026-10-01-whatsapp-qa-abc.md`.
 
 **4 Oct: the whole bot, 48 scenarios** (`docs/assistant/transcripts/2026-10-04-whatsapp-feature-test.md`). The deck covers every button and tool. It adds a
