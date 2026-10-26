@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Does OXS send SMS? Yes, from its web app only, not through the API (answered in chat, read-only)
+- **Asked:** *"i think oxs have one"*, about an SMS sender for the payment link.
+- **OXS's own spec** (`local/media/OXS_External_API_v1-rev1.3.pdf`, the payment-link endpoint) says:
+  - The link is "the same link a payer receives by SMS or email when a management company sends a payment request (דרישת תשלום) from the OXS web app".
+  - And: "This endpoint does not notify anyone. It returns the link to you; OXS sends the payer nothing. If you want the payer to receive it, send it yourself."
+- **Rev 1.3's 16 endpoints have no send action.** There is nothing for SMS, notify or a payment request. So OXS's SMS is a button for Homies' staff.
+- **Today's fallback already fits it.** When a call's link does not reach WhatsApp, the open payment ticket (e.g. `255-1384-26`) asks the office to send it. Staff can do that as a דרישת תשלום in OXS, and the tenant gets OXS's SMS.
+- **To make it automatic:**
+  - ask OXS whether the API can trigger a דרישת תשלום for one apartment or payer;
+  - otherwise, an SMS provider of Homies' own.
+
 ### Can the payment link go by SMS? (answered in chat, research only)
 - **Asked:** *"so the link is being offered through whatsapp right so we dont have anything live yet like real number to send it from so it did not send the link and check if its possible to send via sms"*
 - **Today:** `send_payment_link` sends through Chatwoot, so through WhatsApp only, from Meta's test number.
