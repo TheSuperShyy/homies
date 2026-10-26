@@ -565,6 +565,12 @@ its stated time.
     - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
     - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
     - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
+- **OPEN 26 Oct: the WhatsApp test number is unregistered AGAIN** (Meta: PENDING, NOT_VERIFIED, 141000/141001).
+  - It worked after the 25 Oct 15:47 UTC register; Chatwoot's last incoming is 25 Oct 15:51 UTC.
+  - Ido's payment template failed with `(#133010) Account not registered`. The template itself is APPROVED and synced.
+  - The bot is likely down again.
+  - **Fix:** re-register with the same PIN on the owner's go, then find why it drops.
+  - The WABA's payment method (141006) still blocks every template.
 - **26 Oct, 11:44 UTC: the first real outbound debt call. The dialer reached the debt agent with Ido's details** (WORKLOG 26 Oct; `01a17807`).
   - **Works:** the routing, and the name, heard as הומיז.
   - **Broke: `send_payment_link` passed Vapi's 10 s limit.** The function finished about 11 s after the call: link not delivered (`outside_window`, and the template did not go), office ticket `255-1384-26`. Michael then improvised the office number wrong: "0 7 7 687949", missing a 6.

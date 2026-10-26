@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Why the payment link did not go on WhatsApp: the number is unregistered again, not the template (read-only)
+- **Asked:** *"why its not sending payment method in the whatsapp even tho we already setup the template on it right"*.
+- **The template is fine:** `payment_link_he` is APPROVED on Meta (UTILITY, he) and synced in Chatwoot's inbox 1.
+- **Ido's chat (Chatwoot conversation 44) holds both refusals:**
+  - 11:45:56 UTC, the free text: "the WhatsApp 24-hour customer service window is closed", as expected outbound;
+  - 11:45:58, the template: **"(#133010) Account not registered"**.
+- **Meta now (GET of the phone number):** +1 555-178-1261 is `status` PENDING, `platform_type` NOT_APPLICABLE, `code_verification_status` NOT_VERIFIED.
+  - Number: BLOCKED (141000 not linked, 141001 not verified).
+  - WABA: BLOCKED (141006, the payment method).
+  - Business: LIMITED (141010).
+  - **Unregistered again,** less than a day after the 25 Oct 15:47 UTC register. Chatwoot's last incoming WhatsApp message is 25 Oct 15:51:03 UTC, so **the chatbot is likely down again too**. When it dropped is not known.
+- **Even registered, a template is business-initiated, so 141006 would block it.** The link reaches a tenant only once both are fixed:
+  - the number stays registered, which really means Homies' own number on a verified business;
+  - the WABA has a payment method.
+- **Open:** re-register with the same PIN (`WHATSAPP_REGISTER_PIN`) on the owner's go, and find out why it drops (Meta's `account_update` webhook goes to the app-level subscription, n8n).
+
 ### Do we have full access on the OXS API? Yes, the most it offers; none of it sends SMS (answered in chat, read-only)
 - **Asked:** *"have you check we have the admin the 100% access on the api"*.
 - **OXS's spec** (rev 1.3 §2, and the API keys guide) says a key is one module at one access level. Full Control exists **only** for service_calls; full on finance or general "is rejected at creation with 400".
