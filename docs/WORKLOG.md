@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### "I think the chatbot is disconnected again": it was not; proven live (12:46 UTC)
+- **Checked:**
+  - Meta CONNECTED / CLOUD_API (LIMITED only by 141010).
+  - Chatwoot's rails log had Meta POSTs at 12:37:01-02 (the receipts for Ido's template), and no inbound since 25 Oct 15:51, before the owner's test.
+  - A 5-minute log watch (SSH with the key path quoted) saw a new Meta POST at 12:46:36.
+- **Proof:** the owner's "hey" at 12:46:29 UTC got the menu at 12:46:33 ("צהריים טובים 👋 כאן הומי'ז. במה אפשר לעזור?"), read on the phone. Four n8n runs, all success.
+- Any earlier silence was before the 12:11:38 re-register, when the number was unregistered.
+
 ### Ido's payment link sent as the template and DELIVERED (12:36:49 UTC, on the owner's "lets try sending ido his payment link")
 - **The first template outside the 24-hour window since the payment method went on.** Proven end to end.
 - **How:** exactly as `sendTemplate` does it.
