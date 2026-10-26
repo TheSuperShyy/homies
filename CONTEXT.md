@@ -2455,17 +2455,22 @@ times on its home page. The double mark in his message is his keyboard's.
   text, Edge Function text and UI label. The 17 Sep rule stands: that
   apostrophe closes a single-quoted JavaScript or Python literal, so it is
   escaped there or the literal is double-quoted.
-- **The voice is not a reason to leave it bare.** Rendered on our own Cartesia
-  key (Noam, sonic-3.5), the greeting with הומי'ז sits at the noise floor
-  against the bare spelling: DTW 3.37 when the same text twice gives 3.41 and a
-  different word 3.71. ׳ and ’ are the same; ״ is 3.50, still well under the
-  word. So the formatter's rewrites (מהומי'ז → מחברת הומי'ז, להומי'ז → לחברת
-  הומי'ז, and a bare הומיז → הומי'ז, last) change what the transcript shows and
-  nothing the phone hears.
-- **A transcript is the formatter's output, not the model's.** Vapi stores what
-  reached the voice: vowel points gone, rewrites applied. Whatever the resident
-  must read correctly has to come out of the rewrite correct, which is why every
-  rewrite ends in the marked form.
+- **The voice gets הוֹמִיז, with vowel points (26 Oct).** The mark is written,
+  and the clone does not read it as a mark. The owner heard "homyze" on the
+  26 Oct test call. Local Whisper on the 16 Sep clone clips hears הומי'ז as
+  הומיז, להומייז and "מ-Homie Eyes", and הוֹמִיז cleanly in all three sentences.
+  So every rewrite in `voice_guard.PRONUNCIATION` ends in הוֹמִיז: מהומי'ז →
+  מחברת הוֹמִיז, להומי'ז → לחברת הוֹמִיז, then הומי'ז and a bare הומיז →
+  הוֹמִיז. The prompts keep the marked form. It is in the repo; it is live once
+  `vapi_set_voice.py --apply` runs on the owner's go. The 19 Oct check that
+  cleared the mark (DTW at the noise floor) measured Noam, a stock voice on our
+  key. It was wrong for the clone: measure the voice that is live.
+- **A voice transcript is what came back from the voice, not what was sent.** Vapi
+  stored the 26 Oct greeting as "מיכאל מחברת הומייז": the rewrite applied, the
+  points gone, the mark heard as a double yod, and the word מדבר lost. No
+  spelling in a prompt reaches that record intact. The text a resident reads
+  (WhatsApp, tickets, the dashboard's own words) is where the marked form is
+  kept.
 - **"Spelling errors" from a native reader are three things,** and only one is
   spelling: the name; the feminine written to a man (a gender slip, the 7 Oct
   research); and agreement slips (איזה קומה, נחשבת נפרד, זה הדרך, יצרו for

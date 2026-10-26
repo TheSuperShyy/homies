@@ -200,11 +200,16 @@ SAFE_SENTENCES = [
     # substitution rewrites להומיז, and the second half is what it must become.
     # Getting anything else — a hole, a different rewrite — is the failure.
     ("תודה שהתקשרתם להומיז, יום טוב, ולהתראות.",
-     "תודה שהתקשרתם לחברת הומי'ז, יום טוב, ולהתראות."),
+     "תודה שהתקשרתם לחברת הוֹמִיז, יום טוב, ולהתראות."),
     # 19 Oct: the prompts write the name with its mark now, so the glued form the
     # model produces is להומי'ז; same rewrite, same ear.
     ("תודה שהתקשרתם להומי'ז, יום טוב, ולהתראות.",
-     "תודה שהתקשרתם לחברת הומי'ז, יום טוב, ולהתראות."),
+     "תודה שהתקשרתם לחברת הוֹמִיז, יום טוב, ולהתראות."),
+    # 26 Oct: the two live first messages, as the voice gets them.
+    ("מדבר מיכאל מהומי'ז, איך אני יכול לעזור לְךָ היום?",
+     "מדבר מיכאל מחברת הוֹמִיז, איך אני יכול לעזור לְךָ היום?"),
+    ("מדבר מיכאל מהצוות של הומי'ז, מה נשמע?",
+     "מדבר מיכאל מהצוות של הוֹמִיז, מה נשמע?"),
     "אני יכול לפתוח על זה קריאה, ואז זה רשום במשרד וחוזרים אליך. רוצה?",
     # Spoken, not written — 30 Aug. The numeral reached Cartesia only after
     # Vapi's formatter had cut it into single digits, and the call broke.
@@ -218,11 +223,11 @@ SAFE_SENTENCES = [
     # where the pronunciation substitutions run.
     "תקלות חירום עד ארבע שעות, השאר עד שלושה ימי עסקים.",
     "אין לי את הפרט הזה. אפשר לפנות למשרד בטלפון אפס שבע שבע, שש שש שמונה, שבע תשע ארבע תשע.",
-    # 19 Oct: a bare הומיז gains its mark (the last PRONUNCIATION rule), and the
-    # marked form, which is what the prompt says now, passes untouched.
+    # 26 Oct: the name reaches the voice with vowel points, bare or marked.
     ("המשרד של הומיז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
-     "המשרד של הומי'ז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים."),
-    "המשרד של הומי'ז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
+     "המשרד של הוֹמִיז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים."),
+    ("המשרד של הומי'ז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים.",
+     "המשרד של הוֹמִיז פתוח ראשון עד חמישי, תשע בבוקר עד חמש אחר הצהריים."),
 ]
 
 # The 5 Aug shape: a note parameter announced by its own field name. "Please
@@ -275,12 +280,23 @@ _ICASE = [{"type": "ignore-case", "enabled": True}]
 # phone hears exactly what it heard before. The bare keys stay for a model that
 # forgets the mark. The last rule is a bare הומיז anywhere (inside שהומיז, בהומיז
 # too); it runs after the glued forms, whose outputs it cannot touch.
+#
+# 26 OCT: THE VOICE GETS THE NAME WITH VOWEL POINTS, הוֹמִיז. The owner heard
+# the 07:35 UTC test call say "homyze", and Vapi's record of the greeting reads
+# מחברת הומייז (so it is not the formatter's output either: the mark and the
+# word מדבר are gone). Local Whisper on the 16 Sep clone clips (sonic-3.5,
+# voice/samples/name-*.mp3) hears the marked form as הומיז, להומייז and
+# "מ-Homie Eyes", and the pointed form as הומיז, להומיז and מהומיז / שהומיז,
+# clean in all three sentences. The prompts keep הומי'ז, the written form; only
+# the text the voice gets carries the points. The marked form alone is rewritten
+# too now, before the bare one; the outputs carry points, so no key matches them.
 PRONUNCIATION = [
-    ("מהומי'ז", "מחברת הומי'ז"),
-    ("להומי'ז", "לחברת הומי'ז"),
-    ("מהומיז", "מחברת הומי'ז"),
-    ("להומיז", "לחברת הומי'ז"),
-    ("הומיז", "הומי'ז"),
+    ("מהומי'ז", "מחברת הוֹמִיז"),
+    ("להומי'ז", "לחברת הוֹמִיז"),
+    ("מהומיז", "מחברת הוֹמִיז"),
+    ("להומיז", "לחברת הוֹמִיז"),
+    ("הומי'ז", "הוֹמִיז"),
+    ("הומיז", "הוֹמִיז"),
     # "בית לא נשמע כמו בעברית" — 12 Aug. The word he would have heard it in is
     # ועד בית, which is how the prompt wrote it and is not how anyone says it:
     # Israelis say ועד הבית, with the article. Without it the two nouns collide

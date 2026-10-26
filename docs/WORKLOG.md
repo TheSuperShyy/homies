@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Michael says the name as "homyze": the voice gets הוֹמִיז (prepared and checked; waits on the owner's go)
+- **Asked:** *"so i tested it the latency is kinda good but the homies is not sounding correct its like homyze its not good. or just get the recording of the latest call today earlier like mnutes ag"*.
+- **The call:** `01a17722-b525-7225-a5c2-c63054b9f5a8`, 26 Oct 07:35 UTC, 2 min 22 s, on the incoming agent through 208. The caller ended it.
+- **No recording exists.** Recording is off on both agents (the entry below), and `artifact.recording` is empty. Vapi keeps a packet capture of SIP calls (`pcapUrl`). It was not downloaded: getting the audio out of it would go around the client's decision not to keep audio.
+- **Why it says "homyze":**
+  - The voice got "מדבר מיכאל מחברת הומי'ז", the marked form, live since 19 Oct, after the מ+ rewrite.
+  - Vapi's record of what was said reads "מיכאל מחברת הומייז". So that record is not the formatter's output, as CONTEXT said: the mark became a double yod, and the word מדבר was lost.
+  - Local Whisper on the 16 Sep clone clips (`voice/samples/name-*.mp3`, sonic-3.5), for the greeting, closing and glued sentences:
+    - marked הומי'ז: הומיז, להומייז, "מ-Homie Eyes";
+    - double yod: הומייז, להומייז;
+    - bare: הומיז, לעומיז, מהומיז;
+    - pointed הוֹמִיז: הומיז, להומיז, מהומיז / שהומיז. **Pointed is the only form that is clean in all three.**
+  - The 19 Oct DTW check that cleared the mark measured Noam, a stock voice on our key, not the clone.
+- **Changed, local only, not live:** `scripts/voice_guard.py` `PRONUNCIATION`.
+  - Every name rule now ends in הוֹמִיז, the same characters as the clip (U+05B9 holam, U+05B4 hiriq).
+  - The marked form on its own is rewritten too, before the bare one: 31 replacements.
+  - The fixtures follow, and the two live first messages are added. `vapi_leak_check.py --safe`: 29 sentences, 0 damaged.
+  - The prompts, WhatsApp, the dashboard and the Edge Function keep הומי'ז.
+- **Dry run of `vapi_set_voice.py`:** on both agents only the name rules differ (30 → 31; the fallback is the same). Model, voice, dictionary and emotion are unchanged.
+- **Waits on:** the owner's go for `vapi_set_voice.py --apply` (Yariv's Vapi, the `voice` field of both agents), then a call to hear it. **Undo:** revert `PRONUNCIATION`, then `--apply` again.
+- **Also on the call, not touched:**
+  - A garbled clause: "צריך לתקן באופן פרטי, אם אין ולכן".
+  - The street re-ask repeated within one turn.
+  - הנרייטה סולד 4א was not found, which is right for a building that is not managed.
+
 ### Why the phone agents do not record calls (answered in chat, read-only)
 - **Asked:** *"can you check why is the voice recording disabled in the agent i mean the call record"*.
 - **It is off on purpose,** decided 25 Aug and noted in HANDOVER as "by client instruction": transcripts are kept, and no audio is recorded.
