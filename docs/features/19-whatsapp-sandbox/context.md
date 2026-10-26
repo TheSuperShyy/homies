@@ -27,11 +27,13 @@ The interface language, team names and labels are **account-wide** in Chatwoot. 
 - `requests` feeds the dashboard and, for listed numbers, the OXS mirror;
 - `messages` feeds the live bot's own guards (`Anything newer?`).
 
-So the sandbox writes its log and its tickets to n8n Data Tables, and its tickets get `SBX-` references. Reads are allowed, because they change nothing. And recognising a tenant needs the real tenant list.
+So the sandbox's backend is the live code behind a network guard (`guard.ts`), which answers every Supabase write itself. Its tickets get `SBX-` references, and its chat log is the sandbox Chatwoot conversation. Reads are allowed, because they change nothing, and recognising a tenant needs the real tenant list.
 
-## Why the stored payment link
+**Why a guard and not a modified copy (26 Oct, found while planning).** Running the live `index.ts` unchanged means what is tested is exactly what runs live, and production code is not edited. `scripts/supabase_functions.py` pushes and deletes **project-wide** secrets on every run, so a plain run would switch off the live OXS mirror. The sandbox therefore has its own deploy (`scripts/sandbox_function.py`), which only uploads files.
 
-OXS mints a new payment link on every call to `/payment-link` (spec rev 1.3, "Each call mints a NEW link"). A new link is a new object in the client's system, so the sandbox reuses the newest link already stored in `payment_links`, or shows a placeholder.
+## Why no payment link in the sandbox
+
+OXS mints a new payment link on every call to `/payment-link` (spec rev 1.3, "Each call mints a NEW link"). A new link is a new object in the client's system, so the guard refuses OXS, and the bot takes the function's usual no-link path (a ticket and a team note, both sandbox-only).
 
 ## Why the labels keep their English titles
 
@@ -39,9 +41,9 @@ The bot and "Hand to a person" find conversations by label title: `handover`, `h
 
 ## Open decisions
 
-1. **The sandbox's OpenRouter key.**
-   - **A separate key with a small cap,** created by the owner in OpenRouter, means sandbox chats can never empty the live bot's wallet. This is the recommendation.
-   - **Sharing the live key** is simpler, but its spend comes out of the live wallet.
+1. **The sandbox's OpenRouter key. Decided 26 Oct: share the live one.** The owner said *"lets use the openrouter we have rn"*.
+   - The sandbox uses the existing n8n credential "Homies OpenRouter (OPENROUTER_API_KEY)" as it is; using a credential does not change it.
+   - Its spend comes out of the live wallet. So the free offline harness carries the automated tests, live sandbox chats are the owner's own, and the balance is checked (`GET /api/v1/key`, free) before and after each round.
 2. **The balance check.** Yariv asks not to re-ask what is reliably known. The 13 Aug security rule (his own feedback then) says a handset is not an identity for money: a typed name and phone are needed before a balance. The sandbox keeps the rule; it is raised with Yariv.
 3. **Going live.** Each change is promoted separately, on the owner's go:
    - the menu and the prompt through `check_whatsapp_rules.py`;
