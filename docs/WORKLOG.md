@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Feature 19 designed: an independent WhatsApp sandbox (brainstormed; approved by the owner; spec written)
+- **Asked:**
+  - *"so the number 9 lets create a sandbox for this so we dont touch the prod and the 11"*;
+  - then option B, *"ok lets do that"*;
+  - then *"we just need to make sure the prod is not being affected the sandbox is independent"*.
+- **The live bot touches six things**, read from the workflow:
+  - Chatwoot account 2 (admin and bot tokens);
+  - Supabase `messages` (Log inbound and Log reply);
+  - Meta's typing indicator;
+  - the router `homies-debt-tools` and the function `debt-tools`;
+  - the sub-workflow "Hand to a person";
+  - the OpenRouter key.
+
+  The spec gives the sandbox its own copy of each, or forbids it. The server runs n8n 2.33.3 (Data Tables available) and Chatwoot `latest`.
+- **Spec:** `docs/features/19-whatsapp-sandbox/feature.md` and `context.md`, plus a README row. The isolation rules, `whoami`, two Data Tables, the web chat with a "writing as" picker, and 7 acceptance checks, including before/after fingerprints of the live system.
+- **Open:** the owner's review of the spec, and the sandbox's OpenRouter key (a separate capped key recommended). The balance check stays and is raised with Yariv.
+
 ### Yariv's accepted alignment document, checked against the system (read-only; answered in chat)
 - **Asked:** *"this is the verification and the one from timeless should be verified"*. The owner pasted Yariv's alignment PDF (8 sections; accepted by Yariv per the owner). "Timeless" is the 15 Sep meeting notes.
 - **Saved:** `docs/discovery/yariv-alignment-2026-10.md`. The paste had reversed word order, so it is put back in order, in Hebrew.

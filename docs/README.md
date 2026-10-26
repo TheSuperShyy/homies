@@ -127,6 +127,7 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | 16 | [Human handover](features/16-human-handover/feature.md) | 1d | built and wired live 3 Sep; pages a department team in Chatwoot; waits for the seats |
 | 17 | [Name and number before a ticket](features/17-name-before-ticket/feature.md) | 2d | live on the phone line 22 Oct (Homies' updated spec, section 1); WhatsApp (Plan B) not built |
 | 18 | [Who answers on the 208 line](features/18-dialer-routing/feature.md) | 1d | LIVE 25 Oct, 15:30 UTC (function v130); the first real calls are Ido's |
+| 19 | [WhatsApp sandbox](features/19-whatsapp-sandbox/feature.md) | 2d | designed and approved 26 Oct; not built. An independent copy (its own Chatwoot account, n8n workflows, backend function, web chat) for Yariv's section 6 changes and Hebrew Chatwoot |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and

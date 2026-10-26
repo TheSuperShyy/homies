@@ -25,6 +25,12 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**Sandbox work never touches production (26 Oct, the owner: "make sure the prod is not being affected the sandbox is independent").**
+- Feature 19 has its own Chatwoot account, its own n8n workflows and its own backend function (`debt-tools-sandbox`).
+- It writes no Supabase rows, makes no OXS calls that create anything, and makes no Meta calls.
+- A before/after fingerprint of the live system proves each round.
+- A change reaches production only by its own promotion, on the owner's go.
+
 **Yariv's alignment document is the basis for the work from 26 Oct** (`docs/discovery/yariv-alignment-2026-10.md`, accepted by him per the owner). Its test for every decision: does it cut Homies' load and workstations, or add load?
 - It asks for:
   - no representative button on WhatsApp (the bot is the representative; transfer only in an extreme emergency);
