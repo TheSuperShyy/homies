@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### The name fix is LIVE on both voice agents (10:45 UTC, on the owner's "yes")
+- **Asked:** *"yes make sure nothing is being called and give me the recording of the call earlier like minute ago"*. This came after *"the homies pronunciation is still not fixed its still homyze"* and the go question.
+- **Checked first:**
+  - No call was in progress; the newest call was 12:38's, ended.
+  - The dry run differed from live only in the name rules and the fallback's count.
+- **Applied:** `vapi_set_voice.py --apply`, debt at 10:45:22 UTC and incoming at 10:45:24.
+- **Read back:**
+  - Every field OK, 31 replacements.
+  - Both agents rewrite מהומי'ז / להומי'ז / מהומיז / להומיז to מחברת / לחברת הוֹמִיז, and הומי'ז / הומיז to הוֹמִיז.
+  - Recording is still on.
+- **The recording asked for:** the newest call is the 12:38 one, already saved in `local/recordings/2026-10-26-1238-ido-01a177ca.wav`.
+- **Owed:** the next call, to hear the name, and the 12:38 question (dialer or press 9).
+
 ### 12:38 Israel: a call from Ido's number reached the incoming agent, not the debt agent (read-only; open)
 - **Vapi `01a177ca`, 10:38:43 UTC, 29 s,** 81 s after the owner created the "Ido-Test" list (12:37:22).
   - Caller name `0545…353`, with **no `dialer-` prefix**, so the router answered "not a dialer call" and gave it to the incoming agent.

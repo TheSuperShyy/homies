@@ -2462,8 +2462,8 @@ times on its home page. The double mark in his message is his keyboard's.
   הומיז, להומייז and "מ-Homie Eyes", and הוֹמִיז cleanly in all three sentences.
   So every rewrite in `voice_guard.PRONUNCIATION` ends in הוֹמִיז: מהומי'ז →
   מחברת הוֹמִיז, להומי'ז → לחברת הוֹמִיז, then הומי'ז and a bare הומיז →
-  הוֹמִיז. The prompts keep the marked form. It is in the repo; it is live once
-  `vapi_set_voice.py --apply` runs on the owner's go. The 19 Oct check that
+  הוֹמִיז. The prompts keep the marked form. Live on both agents since 26 Oct,
+  10:45 UTC. The 19 Oct check that
   cleared the mark (DTW at the noise floor) measured Noam, a stock voice on our
   key. It was wrong for the clone: measure the voice that is live.
 - **The greeting's line in a transcript is what the transcriber heard, not what
