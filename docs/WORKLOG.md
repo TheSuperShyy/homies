@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Is the chatbot aligned with Yariv's feedback? (answered in chat, read-only)
+- **Asked:** *"ok now for the chatbot are we aligned with yariv feedback?"*
+- **Sources:**
+  - `docs/discovery/feedback-yariv-2026-08-12.txt` and the 15 Sep review notes (`local/omnitelecom/Homiez Agent Review — Meeting Notes.docx`).
+  - His 5 Oct spelling note and his 19 Oct "went crazy" chat.
+  - The 21 Oct comparison doc could not be read from this session; it needs a sharing confirmation.
+- **Answer given: mostly on how the bot behaves, not yet on setup.**
+  - **Working:**
+    - the OXS payment link in the chat;
+    - a balance only after a typed name and phone;
+    - an unmanaged address refused with no ticket;
+    - no safety advice;
+    - help before a hand-off;
+    - הומי'ז;
+    - Gemini 3.1 Pro since 19 Oct;
+    - simulated runs;
+    - tone, echo and gender working and still polished.
+  - **Open:**
+    - Homies' real number (still Meta's test number; verification and the payment method too);
+    - no direct-debit link;
+    - escalation reaches the Chatwoot inbox, not email, and Homies' staff are not in it;
+    - no notes into OXS (read-only, the owner's decision);
+    - private faults not re-tested on 3.1 Pro;
+    - name before a ticket is phone-only;
+    - three old ManyChat flows not carried over.
+  - **New since his feedback:** about 20 s a reply since the model switch, and the 20–25 Oct outage (fixed).
+
 ### The name fix is LIVE on both voice agents (10:45 UTC, on the owner's "yes")
 - **Asked:** *"yes make sure nothing is being called and give me the recording of the call earlier like minute ago"*. This came after *"the homies pronunciation is still not fixed its still homyze"* and the go question.
 - **Checked first:**
