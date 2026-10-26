@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Can templates go outside the 24-hour window? Meta says yes, limited (read-only, 12:34 UTC)
+- **Asked:** *"check the status if we can send templated message outside the 24hrs window"*.
+- **Meta now:**
+  - The number is CONNECTED, CLOUD_API, quality GREEN, `messaging_limit_tier` TIER_250, throughput STANDARD.
+  - `can_send_message` LIMITED, not BLOCKED. The WABA is AVAILABLE with no errors; the only limit is the business, 141010, not verified.
+  - `payment_link_he` and `ticket_resolved_he` are both APPROVED.
+- **Meaning:** templates may go, up to 250 recipients a day until ASTDX is verified. Unproven until one real send, which waits on the owner's go. It also holds only while the test number stays registered.
+
 ### Meta payment method added; 141006 cleared at 12:29:12 UTC (by the owner, guided)
 - **Asked:** *"so how can i add a payment method on it"*.
 - **Done by the owner in Billing & payments on the ASTDX portfolio:**
