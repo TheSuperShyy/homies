@@ -8,7 +8,10 @@
  *     reads real tenants, buildings, tickets and balances.
  *   - Supabase writes (POST, PATCH, PUT, DELETE) and every RPC are answered
  *     HERE with a fake success and never sent. An insert that asks for its row
- *     back gets the row it sent plus an id; a `requests` row gets SBX-<n>.
+ *     back gets the row it sent plus an id. A `requests` row gets a reference
+ *     in the live shape, 999-9000NN-YY: the bot's reply guards only recognise
+ *     \d{3}-\d{3,6}-\d{2}, and a serial from 900001 up can never match a real
+ *     ticket (the highest real serial is about 29,000), so a lookup by it finds nothing.
  *   - Every other host (OXS, Chatwoot, Meta, OpenRouter, Vapi, n8n) and every
  *     other Supabase path are refused with 503, which the live code already
  *     treats as "not available".
@@ -43,7 +46,9 @@ export function fakeWrite(
   const now = new Date().toISOString();
   const rows = list.map((r) => {
     const row: Record<string, unknown> = { id: crypto.randomUUID(), created_at: now, ...r };
-    if (table === "requests" && m === "POST") row.reference = `SBX-${++serial}`;
+    if (table === "requests" && m === "POST") {
+      row.reference = `999-${900000 + ++serial}-${String(new Date().getUTCFullYear()).slice(-2)}`;
+    }
     return row;
   });
   const single = accept.includes("application/vnd.pgrst.object+json");

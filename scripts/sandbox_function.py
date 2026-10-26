@@ -70,7 +70,7 @@ def probe(e):
                                              "urgency": "normal"})
     print("open_request ->", json.dumps(opened, ensure_ascii=False)[:300])
     ref = str(opened.get("reference", ""))
-    assert ref.startswith("SBX-"), "open_request did not come back with an SBX reference"
+    assert ref.startswith("999-9"), "open_request did not come back with a sandbox reference (999-9…)"
     link = tool(e, phone, "get_payment_link", {})
     print("get_payment_link ->", json.dumps({k: (v[:24] + "…" if k == "link" else v) for k, v in link.items()},
                                             ensure_ascii=False)[:200])

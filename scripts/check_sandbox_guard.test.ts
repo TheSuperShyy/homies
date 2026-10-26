@@ -31,12 +31,13 @@ test("every other host, and other Supabase paths, are refused", () => {
   assert.equal(decide("POST", SB + "/functions/v1/debt-tools", SB), "refuse");
 });
 
-test("a ticket insert that asks for its row gets an SBX reference", () => {
+test("a ticket insert that asks for its row gets a fake reference in the live shape", () => {
   const out = fakeWrite("POST", SB + "/rest/v1/requests?select=id%2Creference",
     JSON.stringify({ description: "x" }), "application/vnd.pgrst.object+json", "return=representation");
   const row = JSON.parse(out.body!);
   assert.equal(out.status, 201);
-  assert.match(row.reference, /^SBX-\d+$/);
+  assert.match(row.reference, /^999-9\d{5}-\d{2}$/);
+  assert.match(row.reference, /\b\d{3}-\d{3,6}-\d{2}\b/); // the bot's own reference pattern
   assert.equal(row.description, "x");
   assert.ok(row.id);
 });
