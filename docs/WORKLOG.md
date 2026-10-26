@@ -9,6 +9,18 @@ conversation that produced it.
 
 ---
 
+## 2026-10-26
+
+### Why the phone agents do not record calls (answered in chat, read-only)
+- **Asked:** *"can you check why is the voice recording disabled in the agent i mean the call record"*.
+- **It is off on purpose,** decided 25 Aug and noted in HANDOVER as "by client instruction": transcripts are kept, and no audio is recorded.
+  - It was switched off live on all four assistants that day.
+  - `vapi_sync.py` sends `recordingEnabled: False` so that a push cannot switch it back on.
+  - The one use a recording had, proving a spoken card authorisation (migration 006), went away on 4 Aug, when payment moved to a link OXS sends.
+- **Live today:** Michael and the debt agent both have recording and video off and the transcript on.
+- **The cost, on record:** no audio exists for any call. The 30 Aug stutter could never be settled, and the clone's pronunciation can only be heard on a live call.
+- **Turning it on** is one value in `vapi_sync.py` plus a sync. That reverses the client's decision, so it needs Yariv's word, and callers should hear that the call is recorded.
+
 ## 2026-10-25
 
 ### WhatsApp bot silent: Meta stopped delivering to the test number on 20 Oct, 07:14 UTC (diagnosed, read-only; not fixed)
