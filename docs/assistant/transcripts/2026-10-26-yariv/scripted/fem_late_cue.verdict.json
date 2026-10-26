@@ -1,0 +1,23 @@
+{
+ "scenario": "fem_late_cue",
+ "variants": {
+  "X": {
+   "checks": {
+    "gender": true,
+    "ticket": true,
+    "goodbye": true
+   },
+   "violations": [
+    {
+     "rule": "A ticket is reported as opened with its number and nothing more: after the number comes an added reassurance, which can also read as a brush-off, and an extra line about what was written in the ticket",
+     "quote": "ומאיפה זה מגיע את לא צריכה לדעת 🙂 רשמתי בקריאה שאולי זה מהגג."
+    }
+   ],
+   "notes": "Masculine אתה גר before any cue is allowed; from אני לא בטוחה on she gets את לא צריכה and שאת צריכה with no remark; ticket opened after building and apartment with her own words, number given, no promise; the goodbye is warm with no question; the only fault is the extra lines after the ticket number."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation in this packet."
+}

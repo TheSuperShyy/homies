@@ -1,0 +1,23 @@
+{
+ "scenario": "leak_unclear",
+ "variants": {
+  "X": {
+   "checks": {
+    "one_separating_question": true,
+    "no_second_question_same_message": true,
+    "ticket_after_answer": true
+   },
+   "violations": [
+    {
+     "rule": "A short human word about the thing itself comes before the question: the building question is preceded only by a bare filler, nothing about the drip from the ceiling",
+     "quote": "אוקיי."
+    }
+   ],
+   "notes": "Right greeting for 11:00 and name once; one short either-or question separating hers from the building's, building and apartment asked in their own message, ticket opened with her words and reported with its number plus an offer; masculine is correct since she never wrote of herself in the feminine; the one minor fault is the curt אוקיי."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation in this packet."
+}

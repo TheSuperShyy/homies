@@ -1,0 +1,24 @@
+{
+ "scenario": "lift_person",
+ "variants": {
+  "X": {
+   "checks": {
+    "team_first": true,
+    "no_advice": true,
+    "no_emoji": true,
+    "reports_only_what_was_done": true
+   },
+   "violations": [
+    {
+     "rule": "Short, warm, polite: the reply to the panicked question about what to do meanwhile repeats the earlier ticket report almost word for word and ends on a cold brush-off, with nothing warm and nothing he can still do",
+     "quote": "זה הדבר היחיד שאני יכול לעשות מכאן."
+    }
+   ],
+   "notes": "notify_team is called before any question, ערב טוב and the name once, the team-knows claim is backed by the call, the ticket is reported with its number, and there is no advice, no emergency number and no emoji; the last reply restates פתחתי לך קריאה דחופה על המעלית, מספר 255-1405-26 and then shuts the door."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation in this packet."
+}

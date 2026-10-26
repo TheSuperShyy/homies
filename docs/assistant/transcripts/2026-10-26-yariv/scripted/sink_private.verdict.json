@@ -1,0 +1,24 @@
+{
+ "scenario": "sink_private",
+ "variants": {
+  "X": {
+   "checks": {
+    "gentle_refusal": true,
+    "no_rule_lecture": false,
+    "offers_more": true,
+    "hebrew_first_message": true
+   },
+   "violations": [
+    {
+     "rule": "A fault inside the flat: no explanation of the rule (no_rule_lecture); the refusal states the general rule of when a fault is the tenant's instead of only saying this one is theirs",
+     "quote": "כיור בתוך הדירה הוא באחריות הדייר, אז על זה לא נפתחת אצלנו קריאה."
+    }
+   ],
+   "notes": "Hebrew reply to English with צהריים טובים and the name once, a kind word, no ticket, no tradesman, an offer to help and a warm goodbye with no question; the one fault is that the refusal is put as the rule itself."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X."
+}

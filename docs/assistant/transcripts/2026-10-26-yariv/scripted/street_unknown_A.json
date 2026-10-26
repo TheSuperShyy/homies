@@ -1,0 +1,66 @@
+{
+ "scenario": "street_unknown",
+ "variant": "A",
+ "turns": [
+  {
+   "resident": "יש נזילה בלובי אצלנו",
+   "kind": "text",
+   "input": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:09, יום חמישי.]\nיש נזילה בלובי אצלנו",
+   "ack": "NONE",
+   "tool_calls": [],
+   "output": "צהריים טובים, כאן מיכאל מהומי'ז. אוי, לא נעים. באיזה בניין זה, ובאיזו דירה אתה גר?"
+  },
+  {
+   "resident": "הדמיון 7 דירה 2",
+   "kind": "text",
+   "input": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:09, יום חמישי.]\nהדמיון 7 דירה 2",
+   "ack": "NONE",
+   "tool_calls": [
+    {
+     "name": "open_request",
+     "arguments": {
+      "description": "יש נזילה בלובי של הבניין",
+      "type": "plumbing",
+      "building": "הדמיון 7",
+      "reporter_unit": "2",
+      "fault_location": "common",
+      "urgency": "normal"
+     },
+     "result": {
+      "ok": true,
+      "opened": false,
+      "building_found": false,
+      "reason": "street_unknown"
+     }
+    }
+   ],
+   "output": "לא מצאתי את הדמיון 7 בין הבניינים שאנחנו מנהלים, ולכן הקריאה לא נפתחה. אולי שם הרחוב כתוב קצת אחרת, תוכל לבדוק?"
+  },
+  {
+   "resident": "רחוב הדמיון 7, זה מה שכתוב",
+   "kind": "text",
+   "input": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:09, יום חמישי.]\nרחוב הדמיון 7, זה מה שכתוב",
+   "ack": "NONE",
+   "tool_calls": [
+    {
+     "name": "open_request",
+     "arguments": {
+      "description": "יש נזילה בלובי של הבניין",
+      "type": "plumbing",
+      "building": "רחוב הדמיון 7",
+      "reporter_unit": "2",
+      "fault_location": "common",
+      "urgency": "normal"
+     },
+     "result": {
+      "ok": true,
+      "opened": false,
+      "building_found": false,
+      "reason": "street_unknown"
+     }
+    }
+   ],
+   "output": "תודה שבדקת 🙏 רחוב הדמיון 7 לא מופיע אצלנו בין הבניינים שהומי'ז מנהלת, אז אין לי איך לפתוח עליו קריאה. יש לבניין אולי כתובת נוספת, למשל כניסה מרחוב אחר?"
+  }
+ ]
+}

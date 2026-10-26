@@ -1,0 +1,51 @@
+{
+ "scenario": "rep_gas_smell",
+ "variants": {
+  "X": {
+   "checks": {
+    "hebrew_only_no_slang": true,
+    "one_question_per_message": true,
+    "building_flat_one_question_only_for_ticket": true,
+    "human_word_before_question": true,
+    "no_summary_or_i_understand_that": true,
+    "missing_detail_asked_plainly": true,
+    "nothing_promised": true,
+    "nothing_invented": true,
+    "team_knows_only_after_notify_team": true,
+    "ticket_description_own_words": true,
+    "ticket_reported_number_only": false,
+    "flat_fault_handled_as_theirs": null,
+    "danger_note_first_no_advice_no_emoji": true,
+    "emoji_limits": true,
+    "singular_address": true,
+    "gender_follows_resident": true,
+    "no_slash_forms": true,
+    "opening_after_menu_or_button": true,
+    "rep_button_word_on_answer_no_repeat": true,
+    "no_midconversation_greeting_or_name": true,
+    "no_repeat_how_can_i_help": true,
+    "finished_matter_offers_more_help": true,
+    "payment_link_message_close": null,
+    "thanks_gets_goodbye_no_question": null,
+    "homies_only_nothing_on_other_residents": true,
+    "no_markdown_no_parentheses": true,
+    "manager_request_understood_and_explained": null,
+    "when_asked_reason_then_real_now_and_can_do": true,
+    "asked_again_something_new": null,
+    "bot_question_digital_assistant_and_person": null,
+    "photo_saved_claim": null
+   },
+   "violations": [
+    {
+     "rule": "A ticket is reported as opened with its number and nothing more: asked what to do meanwhile, he re-sends the ticket already reported in msg 8 with a limitation clause, which his own later 'ובכל רגע שתכתוב לי אבדוק לך מה המצב שלה' contradicts",
+     "quote": "פתחתי לך קריאה דחופה, מספר 255-1517-26, והצוות יודע עליה. זה הדבר היחיד שאני יכול לעשות מכאן."
+    }
+   ],
+   "notes": "Rep opener right, danger handled to the letter (team note before the first reply, no advice, no gas-company number, no emoji after it), ticket text in his words, and a good when-answer with a reason, what is real, what he can do and the closing message; one fault: msg 10 answers 'what do I do meanwhile' by re-sending the ticket with 'the only thing I can do from here'."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X, is in this packet, so it ranks alone."
+}

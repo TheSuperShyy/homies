@@ -565,6 +565,12 @@ its stated time.
     - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
     - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
     - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
+- **DONE 26 Oct: the WhatsApp bot tested against Yariv's feedback, Claude-played, nothing spent** (`docs/assistant/transcripts/2026-10-26-yariv/summary.md`).
+  - **Result:** 22 conversations, 122 of 122 expectations, no reply blocked. Every point passes except the standing order (partly: no link exists) and the unknown street (one extra re-ask).
+  - **Open, the owner's to decide:**
+    - The emergency step's fixed line "זה הדבר היחיד שאני יכול לעשות מכאן" read cold in all 5 emergency chats, and once it came after a question.
+    - The link runs into the next sentence on the phone.
+    - Send's promise filter cut an honest clause.
 - **LIVE 26 Oct, 08:25 UTC, both voice agents: calls are recorded again** (the owner's word: "lets activate the recording again in the vapi").
   - **What changed:** `artifactPlan.recordingEnabled` is true; video stays off and the transcript stays on. It was a PATCH of `artifactPlan` only. The read-back shows model, voice, greeting, transcriber, server and analysis unchanged.
   - **Kept on:** `vapi_sync.py` now sends true, so a prompt push no longer switches it off.

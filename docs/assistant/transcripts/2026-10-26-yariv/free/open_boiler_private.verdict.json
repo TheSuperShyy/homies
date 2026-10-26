@@ -1,0 +1,23 @@
+{
+ "scenario": "open_boiler_private",
+ "variants": {
+  "X": {
+   "checks": {},
+   "violations": [
+    {
+     "rule": "A fault inside the flat is theirs: said gently, with no explanation of the rule. When he pushes back, the rule is explained through what the committee fee covers",
+     "quote": "התשלום לוועד הבית מכסה את הרכוש המשותף ואת המערכות של הבניין, ומה שבתוך הדירה עצמה, כמו הדוד, הוא באחריות הדייר."
+    },
+    {
+     "rule": "Nothing is promised (no 'don't worry, I'm on it'). An assurance is given before the fault is known, and is then contradicted by 'זה לא משהו שהומי'ז שולחת אליו מישהו'",
+     "quote": "הגעת למקום הנכון ואני כאן בשבילך"
+    }
+   ],
+   "notes": "The packet sets no checks. After the tap: no greeting, and the name is given. The private boiler is said gently, with no ticket and no tradesman. Each step ends with an offer to help with something else, and the goodbye has no question. Masculine is used throughout. Faults: the rule explained on push-back, and the 'right place' opener for a fault Homies then declines."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, so X ranks alone."
+}

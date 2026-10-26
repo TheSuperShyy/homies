@@ -1,0 +1,26 @@
+{
+ "scenario": "manager_insists",
+ "variants": {
+  "X": {
+   "checks": {
+    "hears_him": false,
+    "explains_why": true,
+    "not_a_parrot": true,
+    "note_with_details": true,
+    "tone": true,
+    "goodbye": true
+   },
+   "violations": [
+    {
+     "rule": "Check hears_him: the first reply should sound like a rep who heard him and naturally asks; instead, before he has said anything, it recites the procedure with אצלנו, so it reads like a process. The reason itself is owner-approved, but this check puts it at the insist step",
+     "quote": "אצלנו, לפני שמשהו עובר למנהל, צריך לדעת במה מדובר, כדי שמי שיקבל את זה יוכל באמת לטפל בו."
+    }
+   ],
+   "notes": "not_a_parrot true means no reply repeats an earlier question or opening in the same words: מה קרה? then על מה זה?; when he insists, Michael shows understanding and gives the reason in his own words; the complaint is noted with his words and the team-knows line has no who, when or callback; the tone is warm apart from the procedural opening; the goodbye is warm with no question."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation in this packet."
+}

@@ -1,0 +1,18 @@
+{
+ "scenario": "balance_identity",
+ "variants": {
+  "X": {
+   "checks": {
+    "identity_first": true,
+    "identity_failed": true,
+    "no_loop": true
+   },
+   "violations": [],
+   "notes": "Right greeting for 12:10 and name once; name and phone asked in one plain question before the lookup, using the typed number; the mismatch said plainly in his own words with no amount or detail revealed; when he insists, notify_team is really called and the payment link is offered instead of repeating the ask."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation in this packet."
+}

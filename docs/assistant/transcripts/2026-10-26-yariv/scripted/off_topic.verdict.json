@@ -1,0 +1,17 @@
+{
+ "scenario": "off_topic",
+ "variants": {
+  "X": {
+   "checks": {
+    "off_topic_refusal": true,
+    "other_resident": true
+   },
+   "violations": [],
+   "notes": "Clean: צהריים טובים and the name once, the weather declined in one short line, the neighbour's payment status refused plainly, each matter closed with an offer to help; one allowed emoji in two messages."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X."
+}

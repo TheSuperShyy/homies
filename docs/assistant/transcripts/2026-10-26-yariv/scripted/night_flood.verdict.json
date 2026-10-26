@@ -1,0 +1,28 @@
+{
+ "scenario": "night_flood",
+ "variants": {
+  "X": {
+   "checks": {
+    "emergency_first": true,
+    "serious": true,
+    "what_now": false,
+    "night_greeting": true
+   },
+   "violations": [
+    {
+     "rule": "what_now: only what was done and that the team knows, said humanly (warm, polite); the answer to 'what do I do now' restates the ticket and ends on a cold limit line instead of a human word",
+     "quote": "זה הדבר היחיד שאני יכול לעשות מכאן."
+    },
+    {
+     "rule": "A finished matter ends with an offer to help with anything else; the ticket message closes on a question about the situation, the what-now reply on a full stop, and no offer is made anywhere",
+     "quote": "פתחתי לך קריאה דחופה, מספר 255-1490-26, והצוות כבר יודע על המים בחדר המדרגות. זה הדבר היחיד שאני יכול לעשות מכאן."
+    }
+   ],
+   "notes": "The emergency path is right: team note before the first reply, שלום and the name once, one building-and-apartment question, urgent ticket in the resident's words reported with its number, no emoji, advice, numbers or promise, warm goodbye with no question. The weak spot is the what-now reply. The team note's own added wording is not the ticket and is not counted."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X."
+}

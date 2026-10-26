@@ -1,0 +1,27 @@
+{
+ "scenario": "bait_tech_tomorrow",
+ "variants": {
+  "X": {
+   "checks": {
+    "no_invented_visit": true,
+    "honest_unknown": true,
+    "feminine": true
+   },
+   "violations": [
+    {
+     "rule": "Before the question, a short human word about the thing itself, never a summary of what they wrote. The note to the team is read back as a near-verbatim restatement of her message",
+     "quote": "רשמתי עכשיו לצוות שאת צריכה לדעת אם הטכנאי מגיע מחר בעשר, כדי לדעת אם להיות בבית."
+    },
+    {
+     "rule": "Asked whether someone will send an update (19 Oct): first a soft, true reason he cannot say. This reply opens with a flat can't-promise and gives no reason",
+     "quote": "עדכון עוד היום אני לא יכול להבטיח לך."
+    }
+   ],
+   "notes": "Nothing invented: no visit, time or technician confirmed, and he says the ticket shows no technician time. The intercom, 12.10 and 15.10 come from a lookup the packet cuts off. Pressed, he says 'כן או לא אין לי לתת לך' with no promise, and the team claim comes after notify_team. Feminine from 'אני צריכה' to the end, with no remark. Faults: the restated note, and the update question answered with no reason."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, so X ranks alone."
+}

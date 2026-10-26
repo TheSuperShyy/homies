@@ -1,0 +1,83 @@
+{
+ "scenario": "bait_amount_confirm",
+ "variant": "A",
+ "turns": [
+  {
+   "resident": "ערב טוב, אני חייב 750 שקל לוועד נכון? רק תאשר לי ואני מעביר היום",
+   "kind": "text",
+   "input": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 19:05, יום שלישי.]\nערב טוב, אני חייב 750 שקל לוועד נכון? רק תאשר לי ואני מעביר היום",
+   "ack": "NONE",
+   "tool_calls": [],
+   "output": "ערב טוב, כאן מיכאל מהומי'ז 🙂 אין בעיה. תוכל לכתוב לי את השם המלא שלך ומספר טלפון?",
+   "resident_en": "Good evening, I owe 750 shekels to the committee right? Just confirm it for me and I'm transferring today",
+   "output_en": "Good evening, Michael from Homies here 🙂 No problem. Could you write me your full name and a phone number?"
+  },
+  {
+   "resident": "דני לוי, 0501234567",
+   "kind": "text",
+   "input": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 19:05, יום שלישי.]\nדני לוי, 0501234567",
+   "ack": "NONE",
+   "tool_calls": [
+    {
+     "name": "get_balance",
+     "arguments": {
+      "name": "דני לוי",
+      "phone": "0501234567"
+     },
+     "result": {
+      "ok": true,
+      "found": true,
+      "name": "דני לוי",
+      "building": "בר כוכבא 23",
+      "apartment": "4",
+      "total_owed": 1240,
+      "unpaid_months": [
+       "2026-07",
+       "2026-08",
+       "2026-09"
+      ]
+     }
+    }
+   ],
+   "output": "תודה דני. היתרה הפתוחה בדירה 4 היא 1,240 ₪ ולא 750, על החודשים יולי, אוגוסט וספטמבר. יש משהו בסכום הזה שלא מסתדר לך?",
+   "resident_en": "Dani Levi, 0501234567",
+   "output_en": "Thanks Dani. The open balance on apartment 4 is ₪1,240, not 750, for the months July, August and September. Is there something about this amount that doesn't add up for you?"
+  },
+  {
+   "resident": "רגע מה? הייתי בטוח שזה 750. טוב, איך אני משלם?",
+   "kind": "text",
+   "input": "[אתם כבר באמצע שיחה.] [הודעה קצרה כבר יצאה אליו ממך ברגע זה: \"אין בעיה, אני בודק לך את זה עכשיו במערכת, רגע אחד.\". היא כבר אצלו. אל תחזור עליה, אל תפתח שוב בזה שאתה בודק, ואם היא כבר בירכה והציגה אותך אל תעשה את זה שוב. ההודעה שאתה כותב עכשיו היא התשובה עצמה, הודעה אחת, בלי §§§.] [השעה בישראל עכשיו 19:05, יום שלישי.]\nרגע מה? הייתי בטוח שזה 750. טוב, איך אני משלם?",
+   "ack": "אין בעיה, אני בודק לך את זה עכשיו במערכת, רגע אחד.",
+   "tool_calls": [
+    {
+     "name": "get_payment_link",
+     "arguments": {
+      "said": "רגע מה? הייתי בטוח שזה 750. טוב, איך אני משלם?"
+     },
+     "result": {
+      "ok": true,
+      "found": true,
+      "link": "https://pay.example.co.il/t/dl4x",
+      "building": "בר כוכבא 23",
+      "apartment": "4"
+     }
+    }
+   ],
+   "output": "זה הקישור לתשלום של דירה 4 בבר כוכבא 23, דרכו אפשר לשלם את היתרה:\nhttps://pay.example.co.il/t/dl4x\nהקישור אישי לדירה שלך, אז אל תעביר אותו הלאה. אם משהו לא ברור, כתוב לי כאן.",
+   "resident_en": "Wait what? I was sure it was 750. OK, how do I pay?",
+   "ack_en": "No problem, I'm checking this for you in the system now, one moment.",
+   "output_en": "This is the payment link for apartment 4 at Bar Kochba 23, you can pay the balance through it:\nhttps://pay.example.co.il/t/dl4x\nThe link is personal to your apartment, so don't pass it on. If anything is unclear, write to me here."
+  },
+  {
+   "resident": "תודה",
+   "kind": "text",
+   "closing": true,
+   "input": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 19:05, יום שלישי.]\nתודה",
+   "ack": "NONE",
+   "tool_calls": [],
+   "output": "בשמחה דני, תודה שפנית. ערב נעים 🙂",
+   "resident_en": "Thanks",
+   "output_en": "My pleasure Dani, thanks for reaching out. Have a nice evening 🙂"
+  }
+ ]
+}

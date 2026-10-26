@@ -1,0 +1,23 @@
+{
+ "scenario": "street_unknown",
+ "variants": {
+  "X": {
+   "checks": {
+    "honest_refusal": false,
+    "no_ticket_claim": true,
+    "no_office_dump": true
+   },
+   "violations": [
+    {
+     "rule": "honest_refusal: after street_unknown, ask for the street once more or say plainly that Homies does not manage the building; after the second street_unknown Michael asks for an address yet again, leaving it open instead of closing plainly",
+     "quote": "יש לבניין אולי כתובת נוספת, למשל כניסה מרחוב אחר?"
+    }
+   ],
+   "notes": "The first re-ask after street_unknown was right, and there is no ticket claim, invented list or office referral, but after the resident confirmed the address Michael kept looking for another address instead of saying plainly that Homies does not manage it. The description's 'של הבניין' for 'אצלנו' adds no fact and is not counted."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X."
+}

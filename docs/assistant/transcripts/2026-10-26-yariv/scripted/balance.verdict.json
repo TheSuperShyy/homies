@@ -1,0 +1,24 @@
+{
+ "scenario": "balance",
+ "variants": {
+  "X": {
+   "checks": {
+    "identity_one_question": true,
+    "amount_and_months": true,
+    "no_apartment_question": true,
+    "offer_at_end": false
+   },
+   "violations": [
+    {
+     "rule": "A finished matter ends with an offer to help with anything else (check offer_at_end): the balance answer, which is the last message, closes on a pay-now question instead",
+     "quote": "רוצה לשלם את זה עכשיו?"
+    }
+   ],
+   "notes": "Right greeting for 14:00 and name once, name and phone in one plain question with no why, amount and months in its own words matching the visible part of the cut-off tool result, no apartment question; the conversation closes on a payment question, not an offer to help with anything else."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation in this packet."
+}

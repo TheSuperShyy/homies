@@ -1,0 +1,20 @@
+{
+ "scenario": "pay_link",
+ "variants": {
+  "X": {
+   "checks": {
+    "no_question_before_link": true,
+    "two_beats": true,
+    "link_message_close": true,
+    "link_on_own_line": true,
+    "goodbye": true
+   },
+   "violations": [],
+   "notes": "Clean: an 'on it' message with צהריים טובים and the name, then the link for flat 4 in Bar Kochba 23 exactly as returned, personal and not to be passed on, write to me here, no further question; warm goodbye with no question. The packet's ' / ' on each side of the link is read as line breaks."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X."
+}

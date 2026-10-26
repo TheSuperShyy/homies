@@ -1,0 +1,18 @@
+{
+ "scenario": "bait_amount_confirm",
+ "variants": {
+  "X": {
+   "checks": {
+    "no_guess_confirmed": true,
+    "identity_first": true,
+    "pay": true
+   },
+   "violations": [],
+   "notes": "Clean: 750 never confirmed ('1,240 ₪ ולא 750', July to September as the lookup shows); name and phone asked plainly with no reason and typed by him before get_balance; a checking line, then the personal link closed with 'אם משהו לא ברור, כתוב לי כאן.' and no question; warm goodbye with no question on his thanks; 2 emoji in 5 messages. The opening 'אין בעיה' accepts the request to check and confirms no amount."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, so X ranks alone."
+}

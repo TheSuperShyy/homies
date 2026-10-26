@@ -1,0 +1,55 @@
+{
+ "scenario": "rep_bot_suspicious",
+ "variants": {
+  "X": {
+   "checks": {
+    "hebrew_only_no_slang": true,
+    "one_question_per_message": true,
+    "building_flat_one_question_only_for_ticket": null,
+    "human_word_before_question": true,
+    "no_summary_or_i_understand_that": false,
+    "missing_detail_asked_plainly": null,
+    "nothing_promised": true,
+    "nothing_invented": true,
+    "team_knows_only_after_notify_team": true,
+    "ticket_description_own_words": null,
+    "ticket_reported_number_only": null,
+    "flat_fault_handled_as_theirs": null,
+    "danger_note_first_no_advice_no_emoji": null,
+    "emoji_limits": true,
+    "singular_address": true,
+    "gender_follows_resident": true,
+    "no_slash_forms": true,
+    "opening_after_menu_or_button": true,
+    "rep_button_word_on_answer_no_repeat": true,
+    "no_midconversation_greeting_or_name": true,
+    "no_repeat_how_can_i_help": true,
+    "finished_matter_offers_more_help": true,
+    "payment_link_message_close": null,
+    "thanks_gets_goodbye_no_question": true,
+    "homies_only_nothing_on_other_residents": true,
+    "no_markdown_no_parentheses": true,
+    "manager_request_understood_and_explained": true,
+    "when_asked_reason_then_real_now_and_can_do": false,
+    "asked_again_something_new": true,
+    "bot_question_digital_assistant_and_person": true,
+    "photo_saved_claim": null
+   },
+   "violations": [
+    {
+     "rule": "Never 'I understand that...' before the question (the 18 Oct rule asks him to show understanding, which msg 8 does without the formula)",
+     "quote": "מבין שזה מתסכל, ביקשת בן אדם וקיבלת אותי."
+    },
+    {
+     "rule": "Asked when someone will call (19 Oct): after the reason and what is real now comes what he can do from here; none is given, a detail question takes its place, and the resident answers 'כלומר אולי יתקשרו ואולי לא'",
+     "quote": "מה שכן בטוח, הבקשה לפרוטוקול וההתנגדות שלך כבר אצלם. השיפוץ כבר התחיל בפועל, או שבינתיים זאת רק החלטה?"
+    }
+   ],
+   "notes": "Rep opener, the straight bot question (digital assistant of the service team, a person possible too), the person request (understanding, the why in his own words, the repeat asked in new words), the team note and the office phone and hours are all right; faults are the 'מבין ש...' formula and a when-answer that offers no step he can take, so the resident asks for the phone himself."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X, is in this packet, so it ranks alone."
+}

@@ -1,0 +1,67 @@
+{
+ "scenario": "open_ceiling_leak",
+ "variants": {
+  "X": {
+   "checks": {
+    "hebrew_only_no_slang": true,
+    "one_question_per_message": true,
+    "building_flat_one_question_only_for_ticket": true,
+    "human_word_before_question": false,
+    "no_summary_or_i_understand_that": true,
+    "missing_detail_asked_plainly": true,
+    "nothing_promised": true,
+    "nothing_invented": true,
+    "team_knows_only_after_notify_team": true,
+    "ticket_description_own_words": false,
+    "ticket_reported_number_only": false,
+    "flat_fault_handled_as_theirs": null,
+    "danger_note_first_no_advice_no_emoji": true,
+    "emoji_limits": true,
+    "singular_address": true,
+    "gender_follows_resident": true,
+    "no_slash_forms": true,
+    "opening_after_menu_or_button": true,
+    "rep_button_word_on_answer_no_repeat": null,
+    "no_midconversation_greeting_or_name": true,
+    "no_repeat_how_can_i_help": true,
+    "finished_matter_offers_more_help": false,
+    "payment_link_message_close": null,
+    "thanks_gets_goodbye_no_question": true,
+    "homies_only_nothing_on_other_residents": true,
+    "no_markdown_no_parentheses": true,
+    "manager_request_understood_and_explained": null,
+    "when_asked_reason_then_real_now_and_can_do": false,
+    "asked_again_something_new": true,
+    "bot_question_digital_assistant_and_person": null,
+    "photo_saved_claim": true
+   },
+   "violations": [
+    {
+     "rule": "A short human word about the thing itself comes before the question: her 'כי אני לא יכולה לחכות ככה שזה ימשיך לטפטף' gets none; the reply opens on a refusal and goes straight to a detail question",
+     "quote": "את הטלפון של השכנים אני לא יכול למסור, אבל זה רשום בקריאה, והצוות כבר יודע. הטפטוף נשאר אותו דבר, או שהוא מתגבר?"
+    },
+    {
+     "rule": "A ticket is reported as opened with its number and nothing more: a limitation clause is added to the report, and it proves untrue when he later passes her neighbours request to the team with a new notify_team",
+     "quote": "פתחתי לך קריאה דחופה, מספר 255-1511-26, וזה הדבר היחיד שאני יכול לעשות מכאן."
+    },
+    {
+     "rule": "Asked when someone comes (19 Oct): a soft, true reason he cannot say, then what he can do from here; here a bare 'I don't have it' with no reason, and the msg-8 line 'the only thing I can do' repeated in place of what he can do",
+     "quote": "מועד הגעה אין לי, אבל כשהקריאה תיסגר תקבלי על זה הודעה כאן. זה הדבר היחיד שאני יכול לעשות מכאן."
+    },
+    {
+     "rule": "The ticket's description holds the resident's own words and nothing they did not write: she wrote 'אני בטוחה שזה מהדירה מעליי', the ticket turns her certainty into the bot's own 'probably'",
+     "quote": "כנראה מהדירה מעליה, דירה 11"
+    },
+    {
+     "rule": "A finished matter ends with an offer to help with anything else: the message that closes the matter has none, and no offer comes anywhere in the conversation",
+     "quote": "אם ומתי יצליחו להשיג אותם אני לא יודע, אבל הבקשה שלך אצלם, יחד עם הקריאה הדחופה 255-1511-26."
+    }
+   ],
+   "notes": "Danger handled to the rule (team note first, no advice, no numbers, no emoji after it), feminine held without remark, photo claim and the neighbours re-ask handled with a new team note; faults are a cold msg 8 that tacks 'the only thing I can do from here' onto the ticket, a when-answer with no reason that repeats that line, a hedged ticket text, and no offer of further help at the close."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X, is in this packet, so it ranks alone."
+}

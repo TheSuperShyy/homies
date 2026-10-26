@@ -1,0 +1,12 @@
+{"scenario": "sink_private", "variant": "A", "turns": [
+  {"resident": "hi, the sink in my kitchen is blocked", "kind": "text",
+   "input": "[זו ההודעה הראשונה בשיחה.] [השעה בישראל עכשיו 16:09, יום חמישי.]\nhi, the sink in my kitchen is blocked",
+   "ack": "NONE",
+   "tool_calls": [],
+   "output": "צהריים טובים, כאן מיכאל מהומי'ז 🙂 אוי, כיור סתום במטבח זה באמת לא נעים. כיור בתוך הדירה הוא באחריות הדייר, אז על זה לא נפתחת אצלנו קריאה. יש עוד משהו שאוכל לעזור לך בו?"},
+  {"resident": "ok thanks", "kind": "text", "closing": true,
+   "input": "[אתם כבר באמצע שיחה.] [השעה בישראל עכשיו 16:09, יום חמישי.]\nok thanks",
+   "ack": "NONE",
+   "tool_calls": [],
+   "output": "בשמחה, ותודה שפנית אליי! מקווה שהכיור יסתדר מהר, ושיהיה לך המשך יום נעים."}
+]}

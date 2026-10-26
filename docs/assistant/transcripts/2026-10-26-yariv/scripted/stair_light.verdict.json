@@ -1,0 +1,19 @@
+{
+ "scenario": "stair_light",
+ "variants": {
+  "X": {
+   "checks": {
+    "no_repeat_question": true,
+    "building_apartment_one_question": true,
+    "greeting_back": true,
+    "ticket_report": true
+   },
+   "violations": [],
+   "notes": "Clean: בוקר טוב back with the name once, a short human word, building and apartment as one question with nothing re-asked, the ticket in her own words, reported with its number and an offer to help. Masculine אתה גר follows the rule, since she never wrote about herself in the feminine."
+  }
+ },
+ "ranking": [
+  "X"
+ ],
+ "reason": "Only one conversation, X."
+}

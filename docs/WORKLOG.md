@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-26
 
-### Auto test of the chatbot against Yariv's feedback (running; Claude-played, nothing spent)
+### Auto test of the chatbot against Yariv's feedback (DONE; Claude-played, nothing spent)
 - **Asked:** *"ok auto test it"*, after the alignment answer.
 - **The method is `wa_qa.py`'s** (CONTEXT, "How the WhatsApp bot is tested without a model call"). Claude plays the bot from the live prompt and tools, and Claude plays the tenants. The live workflow's code runs around every turn. No OpenRouter.
 - **The deck: 22 existing scenarios, picked for his points, unchanged.**
@@ -21,7 +21,23 @@ conversation that produced it.
   - **10 free residents, from `wa_qa_menu_buttons.json` and `wa_qa_stress.json`:**
     - rep_pay_link (with a standing order), open_boiler_private, rep_gas_smell, rep_bot_suspicious, open_ceiling_leak;
     - open_lift_rush, emergency_smoke, bait_tech_tomorrow, bait_amount_confirm, bait_compensation.
-- **Bundled read-only** against the live prompt (23,321 chars, sha `2f9217ee3454`). The run dirs are in the session scratchpad. Seven blind players are running.
+- **Bundled read-only** against the live prompt (23,321 chars, sha `2f9217ee3454`). The run dirs are in the session scratchpad. Seven blind players, then four blind judges.
+- **Result:**
+  - 22 conversations and 90 bot replies.
+  - **122 of 122 expectations met**, no reply blocked by a live guard.
+  - Handset flags mostly false positives: a negated "I can't promise" read as a promise, an asked-for office number read as unasked, the rep tap's 😊 counted before the gas was said, and "מה המצב שלה" read as how-are-you.
+  - The judges found 6 conversations clean and small tone points in the rest.
+- **Per point** (table in `docs/assistant/transcripts/2026-10-26-yariv/summary.md`):
+  - pass: the payment link, name and phone before a balance, private faults, privacy, gender, הומי'ז, no invented answers, person or bot;
+  - partly: the standing order (no link exists, so the team is noted);
+  - pass with one extra re-ask: an unknown street.
+- **Findings for the owner:**
+  1. The emergency step's fixed "זה הדבר היחיד שאני יכול לעשות מכאן" was judged cold in all 5 emergency chats. In open_ceiling_leak it landed after the bot's question, and it was untrue there because a second note followed.
+  2. The link runs into the next sentence on the phone, because Send drops the blank line.
+  3. Send's promise filter cut an honest "ואם יחזרו אלייך ומתי, את זה אין לי".
+  4. "The team has everything" was said one message before the last detail was sent.
+- **Saved:** `docs/assistant/transcripts/2026-10-26-yariv/` holds the summary, both reports, the 22 transcripts and the verdicts. The only number is the deck's fake 0501234567; the links are example.co.il.
+- **Not covered:** Gemini's own slips. A live check spends OpenRouter and needs the owner's go.
 
 ### Is the chatbot aligned with Yariv's feedback? (answered in chat, read-only)
 - **Asked:** *"ok now for the chatbot are we aligned with yariv feedback?"*
