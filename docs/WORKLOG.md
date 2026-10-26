@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Correction: the card was probably not needed on the test number (owner: "test number can send templated message free")
+- **The owner is right, by Meta's own (earlier) Cloud API get-started text:** a test number "can send free messages to up to 5 recipient phone numbers"; the account "is meant for testing and development purposes since you don't pay for messages"; customers can neither message it nor be messaged. The current get-started page no longer says so; that quote comes through search.
+- **What I got wrong:**
+  - I read Meta's `health_status` 141006 ("will block business initiated conversation") as the reason templates fail, and asked for a card.
+  - Ido's template had actually failed on `(#133010) Account not registered`, the registration, which was fixed at 12:11:38. No template was tried between the re-register and the card going on, so the card's effect was never isolated.
+  - The template at 12:36:49 would very likely have gone without it.
+- **Now:**
+  - The card is linked and cannot be deleted (Meta only revokes; Twilio error 63103's note).
+  - Test-number messages should not be billed.
+  - **The test number's real limit is 5 verified recipients.** That covers the owner, Ido and Yariv, but no real tenant.
+  - Going live needs Homies' own number, on Homies' business and card.
+
 ### "I think the chatbot is disconnected again": it was not; proven live (12:46 UTC)
 - **Checked:**
   - Meta CONNECTED / CLOUD_API (LIMITED only by 141010).
