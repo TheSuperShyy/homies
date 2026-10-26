@@ -565,7 +565,7 @@ its stated time.
     - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
     - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
     - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
-- **OPEN 26 Oct: the WhatsApp test number is unregistered AGAIN** (Meta: PENDING, NOT_VERIFIED, 141000/141001).
+- **FIXED AGAIN 26 Oct, 12:11:38 UTC (re-registered, CONNECTED / CLOUD_API), cause unknown: the WhatsApp test number had come unregistered AGAIN** (Meta: PENDING, NOT_VERIFIED, 141000/141001). No Meta notice reached n8n. If the bot goes quiet, check `GET /{phone-number-id}` first.
   - It worked after the 25 Oct 15:47 UTC register; Chatwoot's last incoming is 25 Oct 15:51 UTC.
   - Ido's payment template failed with `(#133010) Account not registered`. The template itself is APPROVED and synced.
   - The bot is likely down again.

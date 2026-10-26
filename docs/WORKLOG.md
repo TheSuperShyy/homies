@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### WhatsApp test number re-registered again (12:11:38 UTC, on the owner's "yes fix it")
+- **`POST /{phone-number-id}/register`** with the same PIN from `.env`, never printed, returned `success`.
+- **Read back:**
+  - `status` CONNECTED, `platform_type` CLOUD_API;
+  - the number's entity AVAILABLE (only 138024, WhatsApp calling, irrelevant);
+  - routing unchanged: the number's override goes to Chatwoot `/webhooks/whatsapp/+15551781261`, the app level to n8n `/webhook/homies-whatsapp`;
+  - still BLOCKED: the WABA (141006, payment method) and the business (141010). So templates, the payment link after a call included, still cannot go.
+- **Why it dropped is still unknown.**
+  - The WABA's subscribed apps are HOMIES and Meta's own "WA DevX Webhook Events 1P App".
+  - No Meta-shaped body (`object: whatsapp_business_account`) reached the bot workflow's 34 executions since 25 Oct 15:45 UTC, so no `account_update` notice was seen.
+  - It dropped twice now: before 20 Oct 07:14 UTC, and between 25 Oct 15:51 and 26 Oct 11:45 UTC.
+  - The lasting fix is unchanged: Homies' own number on a verified business with a payment method.
+- **Owed:** one real WhatsApp message to the bot, to prove the path end to end.
+
 ### Why the payment link did not go on WhatsApp: the number is unregistered again, not the template (read-only)
 - **Asked:** *"why its not sending payment method in the whatsapp even tho we already setup the template on it right"*.
 - **The template is fine:** `payment_link_he` is APPROVED on Meta (UTILITY, he) and synced in Chatwoot's inbox 1.
