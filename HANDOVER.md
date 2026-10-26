@@ -569,7 +569,8 @@ its stated time.
   - **What changed:** `artifactPlan.recordingEnabled` is true; video stays off and the transcript stays on. It was a PATCH of `artifactPlan` only. The read-back shows model, voice, greeting, transcriber, server and analysis unchanged.
   - **Kept on:** `vapi_sync.py` now sends true, so a prompt push no longer switches it off.
   - **Background:** it was off from 25 Aug by the client's instruction. Callers are not told that a call is recorded.
-  - **Where to find a recording:** the call's `artifact.recording` in Vapi (kept 14 days), and the dashboard's call page through `audio_url` from the end-of-call report.
+  - **Where to find a recording:** in Vapi, kept 14 days. The plain links (`recordingUrl`, `artifact.recording.*`) point into a private bucket (`hipaa-recordings`) and answer 400. Download through `artifact.presignedMonoUrl` (also Stereo, Assistant and Customer), which a `GET /call/{id}` signs for about an hour.
+  - **The dashboard's player will not play them.** `audio_url` stores the plain link from the end-of-call report. Not fixed.
   - **Undo:** set the plan back to false, in the script and live.
 - **READY 26 Oct, NOT live (it ships on the owner's go): the voice says the name from הוֹמִיז, with vowel points** (WORKLOG 26 Oct).
   - **Why:** on the 07:35 UTC test call the owner heard "homyze", and the transcriber heard the greeting as "מחברת הומייז". Local Whisper on the September clone clips hears the marked הומי'ז as "Homie Eyes" in a glued sentence. The pointed form is clean in all three sentences.

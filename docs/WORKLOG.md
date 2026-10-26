@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### The first recorded calls: two click-to-call tries from Tokomni at 11:04 Israel (read-only)
+- **Seen while guiding the owner** (screenshot of `app.tokomni.com/dialer/campaigns`, dialer `Homies_Bot`):
+  - The list "test 1/0" was made 11:39:51 with 1 number: New 1, nothing dialled. No call reached Vapi after 09:05 UTC.
+  - "List 2" (25 Oct, 9:31:42) shows 1 answered.
+- **Two calls at 09:04 UTC** (`01a17773`, 23 s; `01a17774`, 38 s) are named `C2C#<Ido's mobile>`. That is Tokomni's click-to-call from its agent client, not a dialer list.
+  - Feature 18 routes only `dialer-` names to the debt agent, so the incoming agent answered both.
+  - In the second, Ido seems to ask whether the call is about the debt. Michael did not understand him.
+- **The greeting's name was heard as הומיז and הומייס,** so the sound varies from call to call.
+- **Recordings, the first since recording went back on:**
+  - Downloaded to `local/recordings/2026-10-26-1104-click-to-call-01a17773.wav` and `-01a17774.wav` (gitignored).
+  - The plain recording links point into a private R2 bucket (`hipaa-recordings`) and answer 400. The signed `artifact.presignedMonoUrl` (and Stereo, Assistant, Customer) works for about an hour after a `GET /call/{id}`.
+  - So the dashboard's `audio_url`, which is the plain link, cannot play. HANDOVER says so.
+
 ### Guiding the owner through Tokomni for the AnyDesk dialer test (chat; read-only)
 - **Asked:** *"ok so guide me on the tokomi"*.
 - **What we know about the dashboard comes from Omni's two PDFs** in `local/omnitelecom/`:
