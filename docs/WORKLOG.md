@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Ido's payment link sent as the template and DELIVERED (12:36:49 UTC, on the owner's "lets try sending ido his payment link")
+- **The first template outside the 24-hour window since the payment method went on.** Proven end to end.
+- **How:** exactly as `sendTemplate` does it.
+  - Chatwoot conversation 44 (Ido's), the BOT token, `template_params` for `payment_link_he` (the synced APPROVED copy).
+  - Params: the eight months, 2000, and the OXS link stored on the call's `payment_links` row. The link was never printed.
+  - The filled text was checked equal, word for word, to the 13:44 attempt (message 2292) before sending.
+- **Result:** message 2293 was `sent` after 3 s and **`delivered`** after 15 s, with no error.
+- **Records made true:**
+  - `payment_links`: `requested`/`outside_window` became `sent`/`whatsapp_template`.
+  - Ticket `255-1384-26`: open became **resolved**, with a dated Hebrew line saying the link went and was delivered, so the office does not send it again.
+  - No "done" notice was queued: migration 036's trigger is WhatsApp-opened only (this one is `voice`), and `ticket_notices` is unchanged since 6 Oct.
+- **Still open for future calls:**
+  - the 10 s tool timeout on the 208 line (the fix waits on the owner's go);
+  - the test number's registration, which has dropped twice.
+
 ### Can templates go outside the 24-hour window? Meta says yes, limited (read-only, 12:34 UTC)
 - **Asked:** *"check the status if we can send templated message outside the 24hrs window"*.
 - **Meta now:**
