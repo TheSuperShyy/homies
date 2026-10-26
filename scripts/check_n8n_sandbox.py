@@ -93,3 +93,27 @@ rb = {n["name"]: n for n in r["nodes"]}
 assert rb["Vapi tool call"]["parameters"]["path"] == "homies-debt-tools-sandbox"
 assert rb["Vapi tool call"]["webhookId"] == "homies-debt-tools-sandbox-v1"
 print("check_n8n_sandbox: copy ok")
+
+# --- Yariv's section 6, in the sandbox copy only ---------------------------------
+from n8n_sandbox_section6 import WHO_RULE, section6
+supa = next(n for n in keep_bot["nodes"] if n["name"] == "Anything newer?")["credentials"]["httpHeaderAuth"]
+bot_before_s6 = copy.deepcopy(bot)
+s6 = section6(bot, supa)
+assert bot == bot_before_s6, "section6 must not mutate the copy it is given"
+by6 = {n["name"]: n for n in s6["nodes"]}
+assert "לדבר עם נציג" not in by6["Sort"]["parameters"]["jsCode"], "the menu still offers a representative"
+assert "לדבר עם נציג" not in by6["Send"]["parameters"]["jsonBody"], "Send still re-attaches the representative button"
+prompt = by6["Answer the resident"]["parameters"]["options"]["systemMessage"]
+assert "לדבר עם נציג" not in prompt, "the prompt still describes the representative button"
+assert WHO_RULE in prompt
+assert "identified in the system" in by6["open_request"]["parameters"]["jsonBody"], "the ticket tool still asks every time"
+assert by6["Who is writing?"]["parameters"]["method"] == "GET"
+assert by6["Who is writing?"]["parameters"]["url"].startswith("=https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/residents?phone=eq.%2B")
+assert by6["Who is writing?"].get("alwaysOutputData") is True
+assert s6["connections"]["Still the last word?"]["main"][0] == [{"node": "Who is writing?", "type": "main", "index": 0}]
+assert s6["connections"]["Who is writing?"]["main"][0] == [{"node": "Add who", "type": "main", "index": 0}]
+assert {c["node"] for c in s6["connections"]["Add who"]["main"][0]} == {"Worth a word?", "Show typing"}
+assert "$('Add who')" in by6["Answer the resident"]["parameters"]["text"]
+assert reach(s6) == [], "section 6: calls that leave the sandbox: %s" % reach(s6)
+assert new_overlaps(s6, keep_bot) == [], "section 6: new overlapping nodes: %s" % new_overlaps(s6, keep_bot)
+print("check_n8n_sandbox: section 6 ok")
