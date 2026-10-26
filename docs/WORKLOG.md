@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Guiding the owner through Tokomni for the AnyDesk dialer test (chat; read-only)
+- **Asked:** *"ok so guide me on the tokomi"*.
+- **What we know about the dashboard comes from Omni's two PDFs** in `local/omnitelecom/`:
+  - The dashboard is `app.tokomni.com`. Its call-log API (`/api/calllogprocesses/calllog_login`) takes the user's email and password.
+  - **Each call in Tokomni's log carries `callparts[].recording`**, so Omni's PBX records calls on its side. Whether 208's calls are recorded is not checked.
+  - Adding a number is `POST api.tokomni.cc/api/campaign/insert/?token=…` with `external_id`, `campaign_id` and `number`. The example number is 10 digits with no country code.
+- **No public guide to the screens.** A web search found nothing, and `app.tokomni.com` answers 403 to an outside fetch. So the guide in chat says what to look for, not exact menu names, and asks for screenshots during the session.
+
 ### Recording: asked again, already on; the owner's 208 call measured (read-only)
 - **Asked:** *"yes turn it on"*, after the answer below.
   - A sibling session had already done it on *"lets activate the recording again in the vapi"*: both agents at 08:25 UTC (`30a28a5`).
