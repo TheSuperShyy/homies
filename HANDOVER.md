@@ -565,6 +565,11 @@ its stated time.
     - The same change is on `feature/chatbot`. The temporary worktree and its branch are gone.
     - **Not heard yet:** the Voice page's list is all men today, so a woman's rehearsal needs a woman in the queue.
     - **If a woman's call fails to start:** check the browser console. The override is the assistant's own voice with one field changed.
+- **26 Oct, 11:44 UTC: the first real outbound debt call. The dialer reached the debt agent with Ido's details** (WORKLOG 26 Oct; `01a17807`).
+  - **Works:** the routing, and the name, heard as הומיז.
+  - **Broke: `send_payment_link` passed Vapi's 10 s limit.** The function finished about 11 s after the call: link not delivered (`outside_window`, and the template did not go), office ticket `255-1384-26`. Michael then improvised the office number wrong: "0 7 7 687949", missing a 6.
+  - **Likely cause:** the 208 number's `server.timeoutSeconds: 10` from feature 18. The agents' own server has none (Vapi's default is 20).
+  - **Fix waiting on the owner's go:** 20 s in `vapi_sip.py` `router_server()`, then `--route on --apply`.
 - **DONE 26 Oct: the WhatsApp bot tested against Yariv's feedback, Claude-played, nothing spent** (`docs/assistant/transcripts/2026-10-26-yariv/summary.md`).
   - **Result:** 22 conversations, 122 of 122 expectations, no reply blocked. Every point passes except the standing order (partly: no link exists) and the unknown street (one extra re-ask).
   - **Open, the owner's to decide:**

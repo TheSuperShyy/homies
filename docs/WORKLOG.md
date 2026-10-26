@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### The first real outbound debt call: routing and the name work; the payment link timed out (read-only)
+- **Asked:** *"check the recent call in the outboud"*.
+- **Vapi `01a17807`, 11:44:59 UTC (13:44 Israel), 83 s, $0.22.**
+  - Caller name `dialer-<Ido's mobile>`. **The router gave it to the debt agent** with the right details: עידו, m, ₪2,000, דירה 1, ינואר to אוגוסט, attempt 1. Feature 18's first real proof.
+  - The greeting was heard as "מדבר מיכאל מהצוות של הומיז", so **the name fix holds**.
+  - The recording is in `local/recordings/2026-10-26-1344-dialer-debt-01a17807.wav`.
+- **The payment link:**
+  - Ido said yes. `send_payment_link` was called at 50 s, and Vapi gave up at 60 s: "Your server rejected `tool-calls` webhook. Error: timeout of 10000ms exceeded".
+  - The function still finished at 11:46:01, about 11 s after the call. It wrote `payment_links` (`requested`, note `outside_window`, the OXS link fetched). It also opened the open payment ticket `255-1384-26` so the office sends the link by hand.
+  - Meta refused free text outside the 24-hour window, and the template fallback did not deliver either. The known WABA payment-method block (141006) is the likely reason; not confirmed, because the logs endpoint here no longer serves `function_logs`.
+- **Why 10 s:** the call's record carries the 208 number's server with `timeoutSeconds: 10` (set by feature 18's router on 25 Oct). The agents' own `server` has no timeout, and Vapi's default there is 20 s. So the number's 10 s most likely governed the tool call. Not verified against Vapi's docs.
+- **What Ido heard after the timeout:** Michael improvised "הַמִשְׂרָד יֵשׁלֶךְ לֶךְ אֶת הַכִישׁוּר אפשר לפנות אליו בטלפון 0 7 7 687949". The Hebrew is garbled, and **the office number is missing a 6** (it is 077-6687949). The tool's own miss path gives a spoken number, and the timeout skipped it.
+- **Also:**
+  - After the transcriber heard "בישלנו", Michael confirmed a yes that was already clear.
+  - The goodbye was said twice.
+  - `log_call_outcome` `office_to_contact`; the queue shows Ido at attempt 2.
+- **Proposed, not done:** raise the 208 number's server timeout from 10 to 20 s (`vapi_sip.py`, a write to Yariv's Vapi). Later, make `send_payment_link` faster, and fix the Meta payment method so the template can go.
+
 ### Auto test of the chatbot against Yariv's feedback (DONE; Claude-played, nothing spent)
 - **Asked:** *"ok auto test it"*, after the alignment answer.
 - **The method is `wa_qa.py`'s** (CONTEXT, "How the WhatsApp bot is tested without a model call"). Claude plays the bot from the live prompt and tools, and Claude plays the tenants. The live workflow's code runs around every turn. No OpenRouter.
