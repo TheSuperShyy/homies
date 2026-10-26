@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Auto test of the chatbot against Yariv's feedback (running; Claude-played, nothing spent)
+- **Asked:** *"ok auto test it"*, after the alignment answer.
+- **The method is `wa_qa.py`'s** (CONTEXT, "How the WhatsApp bot is tested without a model call"). Claude plays the bot from the live prompt and tools, and Claude plays the tenants. The live workflow's code runs around every turn. No OpenRouter.
+- **The deck: 22 existing scenarios, picked for his points, unchanged.**
+  - **12 scripted, from `wa_qa_scenarios.json`:**
+    - pay_link, balance, balance_identity, street_unknown, sink_private, night_flood;
+    - lift_person, manager_insists, leak_unclear, off_topic, fem_late_cue, stair_light.
+  - **10 free residents, from `wa_qa_menu_buttons.json` and `wa_qa_stress.json`:**
+    - rep_pay_link (with a standing order), open_boiler_private, rep_gas_smell, rep_bot_suspicious, open_ceiling_leak;
+    - open_lift_rush, emergency_smoke, bait_tech_tomorrow, bait_amount_confirm, bait_compensation.
+- **Bundled read-only** against the live prompt (23,321 chars, sha `2f9217ee3454`). The run dirs are in the session scratchpad. Seven blind players are running.
+
 ### Is the chatbot aligned with Yariv's feedback? (answered in chat, read-only)
 - **Asked:** *"ok now for the chatbot are we aligned with yariv feedback?"*
 - **Sources:**
