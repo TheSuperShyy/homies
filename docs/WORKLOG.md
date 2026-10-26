@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Before the AnyDesk session with Ido: who is on the debt call list (read-only)
+- **Said:** *"ok so we will do anydesk with ido and we will access the omnitelecom"*.
+- **`v_debt_call_queue_person` has three rows,** all in בר כוכבא 23 and all ₪2,000: עידו (flat 1, attempt 1), אסף (flat 2, attempt 2) and יריב (flat 3, attempt 1).
+- **Ido's number on file ends 353.** That is the mobile he pressed 9 from on 26 Oct. The 25 Oct 12:55 UTC dialer test used a number ending 634, which is not on the list, so a dialer call to it gets the incoming agent.
+- **Israel left summer time on 25 Oct.** It is UTC+2 now, six hours behind the owner. The memory note is corrected.
+
 ### Recording on again, both voice agents (LIVE 08:25 UTC, on the owner's word)
 - **Asked:** *"lets activate the recording again in the vapi"*. This came right after being told that the recording was off by Yariv's choice.
 - **Live, Yariv's Vapi:**

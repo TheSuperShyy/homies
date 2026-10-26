@@ -898,8 +898,12 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
     - status-update is unchanged;
     - answers took 0.3 to 2.0 s against a 10 s limit.
   - **Owed: the first real calls.**
-    - Ido presses 9 and should get the incoming agent.
-    - Then Ido uploads his own number in Tokomni during the day and should get the debt agent with ₪2,000.
+    - **Done 26 Oct, 07:35 UTC:** Ido pressed 9 from his own mobile and got the incoming agent (`01a17722`, 2 min 22 s).
+    - **Still owed:** Ido uploads his own number in Tokomni during Israeli daytime and should get the debt agent with ₪2,000. The owner and Ido plan it over AnyDesk.
+      - It must be the mobile on file, the one ending 353, the same one he called from on 26 Oct.
+      - The number in the 25 Oct 12:55 UTC dialer test, ending 634, is not on the list, so it gets the incoming agent.
+      - The list has three rows, all בר כוכבא 23 and ₪2,000: Ido (flat 1), Assaf (flat 2, the owner's), and Yariv (flat 3).
+      - Calls are recorded since 26 Oct, so the audio can be pulled.
     - Read both in Vapi's call log: the agent, `endedReason`, and that `call.assistantId` is set. `isIntake()` and the team-note backstop read it, with `message.assistant.id` as their fallback.
   - **Undo:** `python scripts/vapi_sip.py --route off --apply`.
   - **New dependency:** if debt-tools is down, the line cannot answer at all, because a failed `assistant-request` hangs up.
