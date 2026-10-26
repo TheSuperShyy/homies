@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Do we have full access on the OXS API? Yes, the most it offers; none of it sends SMS (answered in chat, read-only)
+- **Asked:** *"have you check we have the admin the 100% access on the api"*.
+- **OXS's spec** (rev 1.3 §2, and the API keys guide) says a key is one module at one access level. Full Control exists **only** for service_calls; full on finance or general "is rejected at creation with 400".
+- **We hold all three modules:**
+  - `OXS_KEY_GENERAL` (read);
+  - `OXS_KEY_DEBTS` (finance, read: debts and payment links);
+  - `OXS_KEY_REQUESTS` (service_calls, Full Control, the one the mirror writes with). That is the ceiling.
+- **No module at any level has a send action.** The 16 endpoints are reads, plus create, update and delete of service calls. SMS and a דרישת תשלום are OXS web-app actions only, so automating them needs a new API feature from OXS.
+
 ### Does OXS send SMS? Yes, from its web app only, not through the API (answered in chat, read-only)
 - **Asked:** *"i think oxs have one"*, about an SMS sender for the payment link.
 - **OXS's own spec** (`local/media/OXS_External_API_v1-rev1.3.pdf`, the payment-link endpoint) says:
