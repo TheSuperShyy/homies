@@ -905,6 +905,9 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
       - The number in the 25 Oct 12:55 UTC dialer test, ending 634, is not on the list, so it gets the incoming agent.
       - The list has three rows, all בר כוכבא 23 and ₪2,000: Ido (flat 1), Assaf (flat 2, the owner's), and Yariv (flat 3).
       - Calls are recorded since 26 Oct, so the audio can be pulled.
+      - **26 Oct, 09:52 UTC:** the first dialer call since routing went live reached the router as `dialer-<number>`. Its number, ending 043, is not on the list, so the incoming agent answered, as designed. Still no external_id header.
+      - **The dialer's "Never stop" is ON.** Any contact added to a list is dialled at once, at any hour.
+      - **Tokomni's menu has no API page.** The campaign token has to come from Omni.
     - Read both in Vapi's call log: the agent, `endedReason`, and that `call.assistantId` is set. `isIntake()` and the team-note backstop read it, with `message.assistant.id` as their fallback.
   - **Undo:** `python scripts/vapi_sip.py --route off --apply`.
   - **New dependency:** if debt-tools is down, the line cannot answer at all, because a failed `assistant-request` hangs up.

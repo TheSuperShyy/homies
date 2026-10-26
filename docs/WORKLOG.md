@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### The first dialer call since routing went live: 11:52 Israel, a number not on the list, so the incoming agent answered (read-only)
+- **Screenshots from the session:**
+  - Dialer settings: `Homies_Bot`, associate `OC_Homies_management`, 5 channels, the only participant "Bot EXT 208".
+  - **"Never stop" is ON.** New contacts are dialled the moment they are added, with no Play and at any hour.
+  - Active Lists at 12:04: "testtest" (11:46:39) shows 1 in progress; "test 1/0" (11:39:51) still shows 1 New.
+  - There is no API or token page in the menu.
+- **Vapi `01a177a0`, 09:52:26 UTC:**
+  - Named `dialer-<number ending 043>`, which is not one of the three on the debt list, so the router gave it to the incoming agent. This is feature 18 working as designed.
+  - The callee hung up after 3 s, during "היי, בוקר טוב. מדבר מיכאל".
+  - The headers are `X-OMNIUF-XT: 208` and `X-CID`. **Still no external_id header.**
+  - The recording is in `local/recordings/2026-10-26-1152-dialer-01a177a0.wav`.
+- **Still owed:** a list with Ido's number (ending 353) for the debt agent. The "test 1/0" list never dialled; its number may have lost its leading 0 in the sheet.
+
 ### The first recorded calls: two click-to-call tries from Tokomni at 11:04 Israel (read-only)
 - **Seen while guiding the owner** (screenshot of `app.tokomni.com/dialer/campaigns`, dialer `Homies_Bot`):
   - The list "test 1/0" was made 11:39:51 with 1 number: New 1, nothing dialled. No call reached Vapi after 09:05 UTC.
