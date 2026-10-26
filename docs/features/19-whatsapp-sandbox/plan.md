@@ -1000,10 +1000,12 @@ def main():
     print("handover copy: %d nodes" % len(handover["nodes"]))
     if apply:
         cfg["handover_id"] = write(handover, "SANDBOX_N8N_HANDOVER_ID")
-    bot = sandboxify_bot(load("u2JjrbcNPYyyh3yl"), cfg)
+    live_bot = load("u2JjrbcNPYyyh3yl")
+    bot = sandboxify_bot(live_bot, cfg)
     if "--section6" in sys.argv:
         from n8n_sandbox_section6 import section6
-        bot = section6(bot)
+        supa = next(n for n in live_bot["nodes"] if n["name"] == "Anything newer?")["credentials"]["httpHeaderAuth"]
+        bot = section6(bot, supa)
     print("bot copy: %d nodes" % len(bot["nodes"]))
     if apply:
         print("handover %s | bot %s | both active" % (cfg["handover_id"], write(bot, "SANDBOX_N8N_BOT_ID")))
@@ -1147,15 +1149,13 @@ def section6(bot, supabase_cred):
     ans["text"] = replace_once(ans["text"], TIME_ANCHOR,
                                "+ ($('Add who').isExecuted ? ($('Add who').first().json.who_text || '') : '') " + TIME_ANCHOR)
     still = by["Still the last word?"]
-    supabase_cred = next(n for n in out["nodes"] if n["name"] == "Anything newer? (fetch)") and \
-        next(n for n in bot["nodes"] if n.get("credentials", {}).get("httpHeaderAuth", {}).get("name") == "Homies Supabase service key")["credentials"]
     who = {"name": "Who is writing?", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2,
            "position": [still["position"][0] + 200, still["position"][1] - 160],
            "alwaysOutputData": True, "onError": "continueRegularOutput",
            "parameters": {"method": "GET", "options": {"timeout": 5000},
                           "url": "=https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/residents?phone=eq.%2B{{ $('Sort').first().json.to }}&select=full_name,building,unit",
                           "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth"},
-           "credentials": copy.deepcopy(supabase_cred)}
+           "credentials": {"httpHeaderAuth": dict(supabase_cred)}}
     add = {"name": "Add who", "type": "n8n-nodes-base.code", "typeVersion": 2,
            "position": [still["position"][0] + 400, still["position"][1] - 160], "parameters": {"jsCode": ADD_WHO}}
     out["nodes"] += [who, add]
@@ -1166,7 +1166,7 @@ def section6(bot, supabase_cred):
     return out
 ```
 
-Note: the bot's `Log inbound` node (which held the Supabase service-key credential) is a NoOp after Task 5, so `section6` takes the credential from the bot passed in. The test runs `section6` on `sandboxify_bot`'s output. If no node there still carries "Homies Supabase service key", read it from the live copy (`live_bot`) and pass it in instead.
+The Supabase credential is passed in because after Task 5 no sandbox node carries it any more: `Log inbound` and `Log reply` are NoOps, and `Anything newer? (fetch)` uses the sandbox Chatwoot token. `n8n_sandbox.main` and the test both read it from the live copy's `Anything newer?` node, read-only.
 
 - [ ] **Step 4: Run the checks**
 

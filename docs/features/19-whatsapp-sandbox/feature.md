@@ -84,7 +84,7 @@ A check script snapshots the live system before the build and compares it after 
 ## Acceptance
 
 1. After the build, every live fingerprint equals the snapshot taken before it.
-2. Twenty sandbox conversations (Claude-played and the owner's) leave:
+2. The acceptance run (`scripts/sandbox_drive.py`, 6 scripted conversations) and the owner's own chats leave:
    - zero new rows in `requests`, `messages`, `payment_links` and `interactions`;
    - zero calls to Meta or to an OXS write;
    - zero calls to Chatwoot account 2.
