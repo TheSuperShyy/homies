@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Recording: asked again, already on; the owner's 208 call measured (read-only)
+- **Asked:** *"yes turn it on"*, after the answer below.
+  - A sibling session had already done it on *"lets activate the recording again in the vapi"*: both agents at 08:25 UTC (`30a28a5`).
+  - Read back now: `recordingEnabled` is true on both. My own duplicate edit to `vapi_sync.py` (a Michael-only override) was removed before any commit. Nothing was written to Vapi.
+- **The 25 Oct speed settings, first measured in production:** the owner's call through 208, `01a17722`, at 07:35 UTC, 12 turns, $0.29.
+  - A whole turn: 2.74 s median, against 3.23 s on 21 Oct.
+  - The silence heard: 2.0 to 3.3 s on every reply (median 2.8 s), against about 6 s on 21 Oct's lookup replies.
+  - The voice start: 0.55 s (0.90 s before).
+  - The model: 1.30 s median, 1.94 s slowest (1.14 s and 2.71 s before). The fast tier cut the tail, not the median.
+  - `open_request`: 1.95 s (2.46 s median and up to 9.66 s before).
+  - One 11.35 s turn: the transcriber took 8.42 s once.
+
 ### Before the AnyDesk session with Ido: who is on the debt call list (read-only)
 - **Said:** *"ok so we will do anydesk with ido and we will access the omnitelecom"*.
 - **`v_debt_call_queue_person` has three rows,** all in בר כוכבא 23 and all ₪2,000: עידו (flat 1, attempt 1), אסף (flat 2, attempt 2) and יריב (flat 3, attempt 1).

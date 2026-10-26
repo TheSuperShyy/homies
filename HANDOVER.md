@@ -965,10 +965,14 @@ English doc changes, re-translate by hand. **New for the owner, each a proposal 
           - The next lever is `customEndpointingRules`: a longer wait only after Michael asks for an address, a number or a name, or after a filler.
           - That needs a few simulated calls on Yariv's wallet. Run `vapi_transfer.py --balance` and get the owner's OK first.
         - **The model is NOT swapped:** see CONTEXT, "The model stays gpt-5.6-sol".
-        - **Expected, not measured yet:**
-          - a plain turn around 2.9 s median (3.2 to 3.7 s before);
-          - a tool call well under the 2 s it took.
-        - **Owed:** the owner's test call through 208, then `python scripts/vapi_latency.py --turns`. Yariv's account has had no phone call yet (read 25 Oct: three `balance()` checks and one web call at 10:40 UTC).
+        - **Measured on 26 Oct, the owner's call through 208** (`01a17722`, 07:35 UTC, 12 turns):
+          - a whole turn is 2.74 s median (3.23 s on 21 Oct);
+          - the silence the caller heard was 2.0 to 3.3 s on every reply (median 2.8 s), against about 6 s on 21 Oct's lookup replies;
+          - the voice start is 0.55 s (0.90 s before);
+          - the model is 1.30 s median, slowest 1.94 s (1.14 s median and 2.71 s slowest before), so the fast tier cut the tail, not the median;
+          - `open_request` took 1.95 s (2.46 s median and up to 9.66 s before);
+          - one turn took 11.35 s, because the transcriber took 8.42 s once. That is not one of these settings.
+          - The call came before recording went on (08:25 UTC), so it has no audio.
         - **Tool check on the Tokyo path:** `check_tools.py` sends the same `x-region` now. 14 pass, and the 5 money cases fail as they do on every probe (no charges). Unpinned, the answers were the same, case for case. Since 25 Oct the probe names the caller (feature 17), and asserts the refusal without a name.
         - **No scenario run (owner, 25 Oct: *"2.50 is too expensive"*).** 23 Oct's 12 simulated calls already tested the fast tier and the voice start in all nine scenarios. The owner's call through 208 is the test, and `vapi_latency.py --turns` reads it for free.
         - **The debt agent** picks up the tool and report pinning on its next sync (the shared `build()`). The fast tier is inbound only.
