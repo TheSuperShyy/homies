@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Yariv's accepted alignment document, checked against the system (read-only; answered in chat)
+- **Asked:** *"this is the verification and the one from timeless should be verified"*. The owner pasted Yariv's alignment PDF (8 sections; accepted by Yariv per the owner). "Timeless" is the 15 Sep meeting notes.
+- **Saved:** `docs/discovery/yariv-alignment-2026-10.md`. The paste had reversed word order, so it is put back in order, in Hebrew.
+- **The document asks for four things the bot does not do yet:**
+  - **WhatsApp:** remove the representative button (the bot is the representative; transfer only in an extreme emergency).
+  - **WhatsApp:** recognise the sender from the company's data and not ask again what is reliably known. Today the bot asks the building and flat; `flatOnFile` fills the reporter's flat only after a matching building is given.
+  - **Both:** shorter waits (WhatsApp about 20 s).
+  - **Voice:** details at the start of the call (name, phone, building, flat, then the matter). Today the agents ask the matter first and the details when a ticket opens.
+- **Matches:** guardrails (private faults, no safety advice, no ticket before scope), the debt flow's order, payment links, ticket status, balance, managed-building check, the Make/ManyChat flows mapped, WhatsApp chats in Chatwoot and the dashboard.
+- **Partly:** the voice recording player (plain links answer 400), the 10 s tool limit on 208, the three unported ManyChat flows, emergencies to managers (operations first, management after 10 min), staff not in Chatwoot.
+- **Tension to raise:** "do not ask again" against the 13 Aug security rule (a balance needs a typed name and phone, because a handset is not an identity). Keep it for money, use the number for tickets and status, and tell Yariv.
+
 ### Correction: the card was probably not needed on the test number (owner: "test number can send templated message free")
 - **The owner is right, by Meta's own (earlier) Cloud API get-started text:** a test number "can send free messages to up to 5 recipient phone numbers"; the account "is meant for testing and development purposes since you don't pay for messages"; customers can neither message it nor be messaged. The current get-started page no longer says so; that quote comes through search.
 - **What I got wrong:**
