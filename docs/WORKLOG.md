@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-26
 
+### Meta payment method added; 141006 cleared at 12:29:12 UTC (by the owner, guided)
+- **Asked:** *"so how can i add a payment method on it"*.
+- **Done by the owner in Billing & payments on the ASTDX portfolio:**
+  - a Visa ending 9947;
+  - linked to **Test WhatsApp Business Account** (`1004244565865434`, the bot's WABA). It had sat among other ASTDX messaging accounts, all with "No payment method".
+- **A watcher polled the number's `health_status` once a minute:** WABA errors none since 12:29:12 UTC. Left: 141010 (business not verified, LIMITED, not BLOCKED) and the irrelevant calling codes 138024/138025.
+- **So business-initiated sends can go now:** the payment-link template after a debt call, and `ticket_resolved_he`. Not yet proven by a send.
+- **Note:** the WABA belongs to ASTDX, not Homies. Meta now bills this card per template. When Homies has its own number and business, billing moves there.
+
 ### WhatsApp test number re-registered again (12:11:38 UTC, on the owner's "yes fix it")
 - **`POST /{phone-number-id}/register`** with the same PIN from `.env`, never printed, returned `success`.
 - **Read back:**

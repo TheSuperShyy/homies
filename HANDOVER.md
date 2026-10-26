@@ -570,7 +570,7 @@ its stated time.
   - Ido's payment template failed with `(#133010) Account not registered`. The template itself is APPROVED and synced.
   - The bot is likely down again.
   - **Fix:** re-register with the same PIN on the owner's go, then find why it drops.
-  - The WABA's payment method (141006) still blocks every template.
+  - **The WABA's payment method is set since 26 Oct 12:29 UTC** (Visa on ASTDX, linked by the owner). 141006 cleared, so templates can go; no template has been sent since. Business verification (141010) is still pending.
 - **26 Oct, 11:44 UTC: the first real outbound debt call. The dialer reached the debt agent with Ido's details** (WORKLOG 26 Oct; `01a17807`).
   - **Works:** the routing, and the name, heard as הומיז.
   - **Broke: `send_payment_link` passed Vapi's 10 s limit.** The function finished about 11 s after the call: link not delivered (`outside_window`, and the template did not go), office ticket `255-1384-26`. Michael then improvised the office number wrong: "0 7 7 687949", missing a 6.
