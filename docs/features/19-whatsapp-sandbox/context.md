@@ -88,6 +88,11 @@ It is gone, and the passage now says:
 - "afterwards: that you have let the team know … and what you can still do for them now", the closing line of both failed chats;
 - the reason for asking was "before anything goes to a manager", and the prompt's was "לפני שמשהו עובר למנהל" with "אין מה להעביר". So the bot promised to forward ("ואני מיד רושם את זה לצוות הרלוונטי") and then kept its promise.
 
+**The owner's protocol, the same evening, replaced all of the above for a manager request.** The owner wrote: "we dont concede we say the management is being informed but i would need your details and concerns so that we can resolve [it] faster".
+- The live manager passage and notify_team's paragraph on it are now replaced whole (`MANAGER_RULE`, `MANAGER_TOOL`) instead of patched sentence by sentence. Six rounds of patches had left old and new sentences arguing, and Gemini picked whichever was nearest.
+- Management is told on the first request, so the 18 Oct empty-note rule no longer holds for manager requests. The matter follows in a second note, under its own reason, because "Hand to a person" skips a repeated reason (`Decide the routing`, one note per matter per 24 h).
+- The pasted protocol's "phantom escalation", "trapdoor" data asks and "silent resolution" passed off as an automated check were left out. They tell the tenant something untrue, and the honesty rule ("a sentence that says you did something without a tool behind it is a lie you don't write") applies to the bot's whole voice.
+
 `NOTE_EDITS` bring the tool in line with section C. The reason for asking is now the owner's own 18 Oct wording, "we need to get information before we can do something": "כדי שאפשר יהיה לעשות משהו בעניין, צריך קודם לדעת במה מדובר".
 
 ## Why the bot checks for a newer message twice (27 Oct)

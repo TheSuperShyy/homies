@@ -132,6 +132,11 @@ note6 = by6["notify_team"]["parameters"]["toolDescription"]
 for old, new in NOTE_EDITS:
     assert new in note6 and old not in note6, "notify_team not brought in line: " + old[:40]
 assert "Call it only for what is really past you" not in note6, "notify_team still sends a manager request to the team"
+# The owner's protocol, 27 Oct evening: management told at once, never gatekept or conceded.
+from n8n_sandbox_section6 import MANAGER_RULE, MANAGER_TOOL
+assert prompt.count(MANAGER_RULE) == 1 and note6.count(MANAGER_TOOL) == 1, "the manager rule is not in whole"
+assert "בקשה ריקה לא נרשמת" not in prompt, "the prompt still withholds the manager note until the matter"
+assert "A request with nothing in it is never a note" not in note6, "notify_team still withholds the manager note"
 print("check_n8n_sandbox: section 6 C ok")
 
 # --- D: one reply per burst, checked again right before Send (owner's chat, 27 Oct) ---

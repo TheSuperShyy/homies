@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: the owner's manager protocol: management told at once, details asked, never conceded (sandbox only)
+- **Asked:** a pasted "ESCALATION & DE-ESCALATION PROTOCOL", then *"but we dont concede we say the management is being informed but i would need your details and concerns so that we can resolve the blah blah more faster. the behavior and attitude is really important"*.
+- **Taken:**
+  - never gatekeep, and inform management at once (notify_team on the first manager request);
+  - ask for the details and the concern, saying honestly that they get it sorted faster;
+  - never concede ("I'll leave it for the team"), never argue, stay warm;
+  - the matter goes to the team once the tenant gives it.
+
+  **This reverses the 18 Oct "a request with nothing in it is never a note" for manager requests.** That rule came from Yariv's ask that notes carry content, which is why the matter is added afterwards.
+- **Not taken from the pasted protocol:** conceding ("I will leave this for the team to review"), asking for data as "preparing the file" or "for the manager's screen", and presenting the bot's own answer as "an automated background check". They mislead the tenant, and the prompt's honesty rule forbids claiming what no tool did.
+- **Built:** `MANAGER_RULE` (Hebrew) and `MANAGER_TOOL` replace the live manager passage and notify_team's paragraph on it whole (`replace_span`), so no old sentence argues with the new. `check_n8n_sandbox.py` asserts both are in, and that the empty-note rule is gone from both.
+- **Run 7, both scenarios ($0.39, round 19). The protocol landed.**
+  - Yariv: "בשמחה יריב, עדכנתי את ההנהלה שביקשת לדבר עם מנהל. כדי שאוכל לעזור לך להזיז את זה מהר יותר, תגיד לי רק בכמה מילים על מה מדובר?…"
+  - "Are you a manager?" got "אני מיכאל מצוות השירות של הומי'ז…", so the identity fix holds.
+  - The topic got "הוספתי להנהלה שמדובר בדמי ועד הבית. מה קורה עם התשלום…?"
+  - "You can't help" got a warm reply that keeps going.
+  - Ido's insisting reply ended on a statement, copying the prompt's closing words. The sentence was reordered to end on asking again (round 20).
+- **In the sandbox conversations:** Ido's (33) has a real note right after the first "I need a manager." and a second one with the matter.
+  - **Yariv's (35) has only the first.** His second call reused `caller_request`, and "Hand to a person" drops the same reason twice in one conversation within 24 h. So management never saw his topic.
+  - The tool now says the matter goes under its own reason (payment, billing, other), never `caller_request` again.
+- **The owner's own chat, 14:23 to 14:38 UTC, as Ido.**
+  - Until 14:32 it shared Ido's memory with run 7, so the bot "knew" about ועד הבית before he typed it.
+  - It also showed "ההנהלה כבר מעודכנת ומטפלת בזה" and "מבלי שתצטרך לחכות". **Now:** informed is all that is said, not "handling it".
+  - "my card has been charged twice!" was noted to collections (right, a charge is staff-only) and then got "יש עוד משהו שאני יכול לעזור בו בינתיים?". **Now:** after a matter only a person can finish, the bot asks what will help the team sort it faster (when, how much, what), one question at a time, in the prompt and the tool.
+  - From 14:37 ("urgently") the chat was clean: "אני מעדכן מיד את ההנהלה שביקשת לדבר איתם. במה מדובר? הרבה פעמים יותר מהר לסדר את זה כאן."
+- **Pushed** 14:59 and 15:03 UTC **without** `--fresh-memory`, because the owner was mid-test. The round stays 20.
+  - The 15:03 push printed a read timeout after its writes. All three sandbox workflows are active with 9, 15 and 59 nodes.
+  - The live system is unchanged.
+- **Not run on Gemini after the last three wording fixes:** the owner is testing, and a driver run as Ido would share his memory. Spend on the manager flow today: $1.94.
+
 ### Feature 19: the manager flow made friendly and accommodating, proven on Gemini (3 more runs, $0.69; sandbox only)
 - **Asked:** *"but make the approach friendly and accommodating"*, after the three runs below.
 - **Run 4, both scenarios ($0.37, round 15).** It was warm and willing: a wish for a manager is fair, and the bot does not argue, correct or guard a door; the second explanation is "how it helps sort it out for him". The tone landed ("מאה אחוז עידו, אין שום בעיה 🙏", "הכל טוב, אני מבין לגמרי 🙂 בכל זאת אשמח לשמוע…").

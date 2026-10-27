@@ -608,6 +608,14 @@ its stated time.
       - **Claude-played blind (no spend):** passes on the owner's lines. "Committee fee" gets the note in one sentence plus "מה קורה עם התשלום?". "You can't help me" gets "אולי דווקא כן", what it can do, and a question. "I just want a manager. period." gets no parrot. Not Gemini's own behaviour.
       - **Checking it with the AI** is `manager_doubt` (the owner's four lines, about $0.30), on the owner's go, or the owner's own chat.
       - **The owner's retest (12:24 UTC) still ended "רשמתי את זה … יש עוד משהו שאפשר לעשות מפה בינתיים?"** The cause was notify_team's own description, which the prompt fix never touched. `NOTE_EDITS` now bring it in line, and the reason for asking no longer promises to forward. Pushed 12:36 UTC.
+      - **CURRENT (27 Oct evening): the owner's manager protocol** (WORKLOG has the runs; `MANAGER_RULE` / `MANAGER_TOOL` in `n8n_sandbox_section6.py`).
+        - Management is told on the first request (a real note), and the bot asks for the details and the concern, so it can be sorted faster.
+        - It never concedes, argues or gatekeeps, and the matter is added to the team under its own reason.
+        - After a matter only staff can finish (e.g. a double charge), it asks what the team will need, not "anything else".
+        - Proven on Gemini in run 7. The last three wording fixes (informed-only, details after a staff-only matter, the second note's reason) are not re-run, because the owner is testing.
+        - **Do not run the driver as Ido while the owner tests:** memory is per phone, and their chats mix.
+        - Memory round 20.
+      - **"Hand to a person" drops a second note with the same reason in one conversation within 24 h** (`Decide the routing`, live too). A note that adds details must carry a different reason, or the team never sees it.
       - **Then made friendly and accommodating on the owner's word, and PROVEN again** (3 more runs, $0.69; $1.55 today in all).
         - The bot treats a wish for a manager as fair: no arguing, no correcting, no gatekeeping.
         - Its one note line says what was noted, never what will follow, so there is no "a manager will get back to you" and no "until then".
@@ -619,7 +627,7 @@ its stated time.
         - **Waiting on:** the owner's own chat.
         - **Slips the AI makes now and then:** a reply ending on a full stop (2 of 8 in run 3), and once "אני העוזר הדיגיטלי…" in answer to "are you a manager?".
       - **Live defect, open:** Send's promise filter can leave a stub when it cuts inside a relative clause. On 27 Oct "רק כדי שמי שיחזור אליך…" was sent as "רק כדי שמי?". `DANGLE` lacks `מי`/`שמי`. The fix goes through the live gate.
-      - **The sandbox's memory round is 18** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
+      - **The sandbox's memory round is 20** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

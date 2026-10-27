@@ -66,17 +66,20 @@ BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
 # (in the meantime)?" in place of the matter itself.
 HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יחזור אליך|יש עוד משהו|עוד משהו ש|מעבר לזה"
            r"|האם יש משהו ש|יש משהו שאני יכול|יש משהו שאוכל")
-# Before the topic is known nothing goes to the team (the owner, 18 Oct): no note claimed, and no
-# promise of someone getting back (27 Oct, 12:49: an early note, then "רק כדי שמי?" after Send's cut).
-EARLY = r"רשמתי|עדכנתי|מעדכן את הצוות|העברתי|יחזרו אליך|יחזור אליך|שמי\?"
-# Friendly and accommodating (the owner, 27 Oct): no arguing back, no defending the question.
+# The owner's protocol, 27 Oct evening: the first reply to a manager request says management is being
+# informed (no gatekeeping) and asks for the details; nothing is conceded ("I'll leave it for the
+# team"); the bot never argues back; and the note promises nothing (27 Oct: "שמנהל יחזור אליך … עד שזה
+# יקרה"), never "until then", and no cut-off fragment ("רק כדי שמי?", Send's promise filter).
+INFORMED = r"מעדכן|עדכנתי|רשמתי|מעודכנ|יודעת|יודעים"
+CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את זה|לבדיקת הצוות"
 ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
-# The note says what he asked, never what will follow (27 Oct: "שמנהל יחזור אליך … עד שזה יקרה").
-NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים"
-TURNS = {"manager_doubt": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY, ARGUE]),
-                           2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE])},
-         "manager_retest": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY, ARGUE]),
-                            2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE])}}
+NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|שמי\?"
+TURNS = {"manager_doubt": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
+                           1: ([r"\?", r"מיכאל"], [ARGUE, CONCEDE, r"דיגיטלי"]),
+                           2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE, CONCEDE])},
+         "manager_retest": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
+                            1: ([r"\?"], [ARGUE, CONCEDE, NOTE_SAYS]),
+                            2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE, CONCEDE])}}
 
 
 def persona(label):

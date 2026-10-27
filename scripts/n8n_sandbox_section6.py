@@ -38,6 +38,9 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      goes to a manager" / "nothing to pass on", which had it promising to forward
      the request ("I immediately write it down for the relevant team") and then
      keeping that promise.
+     Then, the same evening, the owner's protocol (see MANAGER_RULE): never
+     gatekeep or concede; management is told at once; the bot asks for the details
+     and the concern so it can be sorted faster, warmly, and handles it itself.
   D. one reply per burst (the owner's sandbox chat, 27 Oct, "is there a way to fix
      this"): a second message sent while the AI was writing got its own answer,
      and two near-identical replies went out half a second apart. The live bot
@@ -66,7 +69,32 @@ PROMPT_CUTS = [
     ("שני הראשונים אומרים לך מה הוא רוצה", "שניהם אומרים לך מה הוא רוצה"),
     ("ולכן בלחיצה על אחד משני הראשונים הברכה כבר ניתנה", "ולכן בלחיצה על אחד מהם הברכה כבר ניתנה"),
 ]
-# C. Handle it ourselves; a note for the team when a manager was asked for.
+# C. The bot handles it; management is told at once (the owner, 27 Oct, evening: "we dont concede we
+# say the management is being informed but i would need your details and concerns so that we can
+# resolve [it] faster ... the behavior and attitude is really important"). The live manager passage,
+# from MANAGER_FROM to MANAGER_TO, is replaced whole by MANAGER_RULE, and notify_team's paragraph on
+# it by MANAGER_TOOL, so no old sentence is left to argue with the new one. This reverses the 18 Oct
+# "a request with nothing in it is never a note" for manager requests: the note goes at once, and the
+# matter is added to it once the tenant gives it, so the team does not keep an empty request.
+# Not taken from the protocol the owner pasted with it: presenting the bot's own answer as "an
+# automated background check" or asking for data "for the manager's screen". That misleads the
+# tenant, and the prompt's honesty rule (never claim what no tool did) forbids it.
+MANAGER_FROM = "בקשה לדבר עם מנהל, עם בן אדם או עם מישהו מהצוות"
+MANAGER_TO = "ואתה נשאר איתו, בסבלנות, עד שהוא מספר."
+MANAGER_RULE = (
+    "בקשה לדבר עם מנהל, עם בן אדם או עם מישהו מהצוות היא בקשה לגיטימית, ואתה לא שומר עליה בדלת ולא מתנה אותה "
+    "בכלום. אתה מקבל אותה בחום, רגוע ובטוח, כמו מי שבאמת בצד שלו: רושם מיד לצוות, עם הכלי שיש לך לזה, שהוא "
+    "ביקש מנהל, עם מה שכבר סיפר, ואומר לו במשפט אחד שההנהלה מעודכנת. רק את זה, לא שהיא כבר מטפלת ולא מה "
+    "יקרה אחר כך, כי את זה אתה לא יודע. ובאותה הודעה אתה מבקש ממנו את הפרטים ומה מטריד אותו, ואומר לו בפשטות ובכנות למה: איתם אפשר "
+    "לסדר את זה מהר יותר, והרבה פעמים כבר כאן. ואם הוא מתעקש, או לא רוצה לפרט, אתה לא מוותר ולא מתווכח: "
+    "ההנהלה כבר יודעת, ואתה אומר לו את זה בנעימות, עושה לו את זה קל, כי מספיקה מילה, ושואל שוב על מה מדובר, "
+    "בדרך אחרת ולא באותן מילים. כשאתה יודע במה מדובר, העניין אצלך ואתה מטפל בו עד הסוף, עם הכלים שלך ועם מה "
+    "שאתה יודע: נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה איתו, או עושה את מה שצריך. ואת מה שהוא סיפר "
+    "אתה מוסיף לצוות עם הכלי, פעם אחת, כדי שלהנהלה תהיה התמונה המלאה. ואם הוא אומר שאתה לא יכול לעזור לו בזה, "
+    "אתה לא מוותר, לא משאיר את זה לצוות ולא מתווכח: אתה מקבל את זה בחום, ושואל בכל זאת מה קורה, כי הרבה דברים "
+    "כאלה אפשר לסדר לו כאן ועכשיו. לאורך כל הדרך אתה זה שמטפל, ולא תחנת ביניים עד שיגיע מנהל: בלי \"בינתיים\", "
+    "ובלי לשאול אם יש עוד משהו כל עוד העניין שלו פתוח. מה שרק בן אדם בהומי'ז יכול לסיים נשאר אצל הצוות, עם "
+    "הפרטים, ואז אתה אומר לו שהצוות יודע.")
 SOLVE_EDITS = [
     ("חוזה, הצעת מחיר, ענייני ועד הבית, וכל דבר אחר שאתה לא יכול לגמור בעצמך",
      "חוזה, הצעת מחיר, עניין עם חברי ועד הבית עצמם, וכל דבר אחר שאתה לא יכול לגמור בעצמך"),
@@ -74,69 +102,59 @@ SOLVE_EDITS = [
      "- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי הוועד עצמם, אתה רושם את זה לצוות. "
      "דמי ועד הבית, התשלום החודשי לחברת הניהול, הם עניין שלך: כמה נשאר לשלם, איך ועד מתי משלמים, קישור לתשלום "
      "ומה כלול בתשלום."),
-    ("כשיש לך את הפרטים, אתה מנסה לסגור את העניין בעצמך עם הכלים שלך, ורק מה שבאמת מעבר לך אתה רושם לצוות, "
-     "עם מה שהוא סיפר לך, ואז אומר לו שהצוות יודע.",
-     "כשאתה יודע במה מדובר, העניין אצלך ואתה מטפל בו עד הסוף: אתה לא תחנת ביניים בדרך למנהל, ולא מעביר אותו "
-     "לאף אחד. נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה, וסוגר את זה בעצמך, עם הכלים שלך ועם מה שאתה "
-     "יודע. ומכיוון שהוא ביקש מנהל, אתה גם רושם על זה הערה לצוות עם הכלי שיש לך לזה, עם מה שהוא סיפר לך, ואומר "
-     "לו את זה במשפט אחד, על מה שרשמת ולא על מה שיקרה אחר כך, כי את זה אתה לא יודע. "
-     "ההערה היא לא הטיפול: באותה הודעה אתה ממשיך איתו בעניין עצמו, שואל מה קורה איתו או "
-     "עושה את מה שצריך, כמו מי שהעניין אצלו ולא כמו מי שמחזיק אותו עד שיגיע מנהל, ולכן בלי \"בינתיים\" ובלי לשאול "
-     "אם יש עוד משהו: העניין עצמו עוד פתוח. ואם הוא אומר שאתה לא "
-     "יכול לעזור לו בזה, אתה לא מתווכח איתו ולא מוותר: אתה מקבל את זה בחום ושואל אותו בכל זאת מה קורה, כי הרבה "
-     "דברים כאלה אפשר לסדר לו כאן ועכשיו. מה שמעבר לך נקבע לפי העניין עצמו, כשאתה כבר יודע מה הוא, ולא "
-     "לפי מה שהוא אומר עליך."),
     (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
-    ("לפני שמשהו עובר למנהל, צריך לדעת במה מדובר, כדי שמי שיקבל את זה יוכל באמת לטפל בו.",
-     "כדי שאפשר יהיה לעשות משהו בעניין, צריך קודם לדעת במה מדובר."),
-    ("בלי לדעת במה מדובר אין מה להעביר,", "בלי לדעת במה מדובר אין במה לטפל,"),
-    ("מסביר לו שוב, בדרך אחרת, למה אתה צריך את זה, ועושה לו את זה קל",
-     "מסביר לו שוב, בדרך אחרת ובחום, איך זה עוזר לסדר לו את זה, ועושה לו את זה קל"),
-    # Friendly and accommodating (the owner, 27 Oct, after the Gemini runs): a wish for a manager is
-    # fair, and the bot meets it warmly, never arguing ("אני דווקא יכול", "תתפלא") or guarding a door.
-    ("היא לא אומרת מה הוא צריך. אתה עונה עליה כמו נציג טוב במוקד שירות, אנושי ולא טופס:",
-     "היא לא אומרת מה הוא צריך. ועדיין היא בקשה לגיטימית, ואתה מקבל אותה בחום ובנכונות, כמו מי ששמח לבוא "
-     "לקראתו: בלי להתווכח איתו, בלי לתקן אותו ובלי להישמע כמו מי ששומר על הדלת. אתה עונה עליה כמו נציג טוב "
-     "במוקד שירות, אנושי ולא טופס:"),
+    # After a matter only a person can finish: what the team will need to sort it out faster, not "anything
+    # else" (27 Oct, the owner's "my card has been charged twice!").
+    ("אתה רושם לצוות המתאים עם הכלי שיש לך לזה, ואז אומר לדייר, במילים שלך, שהצוות יודע.",
+     "אתה רושם לצוות המתאים עם הכלי שיש לך לזה, ואז אומר לדייר, במילים שלך, שהצוות יודע, ושואל אותו את מה "
+     "שיעזור להם לסדר את זה מהר יותר, מתי, כמה או מה בדיוק, שאלה אחת בכל פעם, ולא אם יש עוד משהו."),
     # "Are you a manager?" is a who-are-you question, not "are you a bot?" (twice, 27 Oct: "אני העוזר הדיגיטלי…").
     ("מי ששואל מי אתה שומע שאתה מיכאל מצוות השירות של הומי'ז.",
      "מי ששואל מי אתה, או אם אתה מנהל, שומע שאתה מיכאל מצוות השירות של הומי'ז."),
 ]
-# The same, in notify_team's own description, which the model reads as it calls the tool.
+# The same in notify_team's own description, which the model reads as it calls the tool.
+NOTE_FROM = "A request for a manager or a person is not one of these yet"
+NOTE_TO = "A request with nothing in it is never a note, however often they ask."
+MANAGER_TOOL = (
+    "A request for a manager or a person is fair: never gatekeep it and never make it conditional. Call "
+    "this right away (reason caller_request, with whatever they have said), and tell them in one sentence "
+    "that management is being informed: only that, not that they are already on it and never what will "
+    "follow, since you do not know. In the "
+    "same message ask for their details and what concerns them, and say honestly why: with them it can be "
+    "sorted out faster, often right here. If they insist or will not say, do not concede and do not argue: "
+    "management already knows; ask again another way, never in the same words, and make it easy (a word "
+    "on the topic is enough). Once they say what it is about, the matter is yours to the end, not a stop "
+    "on the way to a manager: a topic is not yet what they need, so ask what is going on with it, or do "
+    "it; and call this once more with the matter, so management has the full picture, under the matter's "
+    "own reason (payment, billing, other and so on), never caller_request again: the same reason twice in "
+    "a conversation is dropped as a duplicate, and management would never see it. If they say you "
+    "can't help, do not concede, do not leave it for the team and do not argue: take it kindly and ask "
+    "anyway what is going on, since much of this can be sorted out right here. Warm, calm and on their "
+    "side throughout.")
 NOTE_EDITS = [
     ("the committee's own business, or anything else",
      "the committee members' own business (the monthly committee fee itself is yours: what is owed, "
      "paying it, the link, what it covers), or anything else"),
-    ("say plainly that before anything goes to a manager someone has to know what it is about, ask what "
-     "happened, and try to sort it out yourself with your tools.",
-     "say plainly that before anything can be done about it someone has to know what it is about, and ask "
-     "what happened."),
-    ("Call it only for what is really past you, with the details in `description` (reason caller_request, "
-     "unless the matter itself has a reason above).",
-     "Until they have said what it is about, do not call this for the request itself: a request with nothing "
-     "in it is never a note, however often they ask. Once they have said it (the topic alone is enough), the "
-     "matter is yours to the end; you are not a stop on the way to a manager. Then, because they asked for "
-     "one, call this with what they told you (reason caller_request, unless the matter itself has a reason "
-     "above), say so in one sentence, only that they asked for a manager and about what, since what happens "
-     "next you do not know, and in the same message go on with the matter itself: a topic is not "
-     "yet what they need, so ask what is going on with it, or do it. If they say you can't help with it, "
-     "don't argue and don't stop: take it kindly and ask them anyway what is going on, since much of this "
-     "can be sorted out right here."),
-    # Said once, above, where the call is decided.
-    (" A request with nothing in it is never a note, however often they ask.", ""),
     ("What the resident hears from you afterwards: that you have let the team know, in your own words, and "
      "what you can still do for them now.",
      "What the resident hears from you afterwards: that you have let the team know, in your own words, and "
      "then, in the same message, the matter itself while it is still yours. After a manager request it is: "
      "ask what is going on with it, or do it, as the one handling it, never \"in the meantime\" and never "
-     "whether there is anything else. After a matter past you: what you can still do for them now."),
-    ("explain again another way and make it easy (the topic alone is enough).",
-     "explain again another way, warmly, as what helps sort it out for them and never as what you need to "
-     "pass it on, and make it easy (the topic alone is enough)."),
-    ("Answer like a good service rep: show you understand them,",
-     "Answer like a good service rep, warm and accommodating: their wish for a manager is fair, so never argue "
-     "with them, correct them or sound like a gatekeeper. Show you understand them,"),
+     "whether there is anything else. After a matter past you: the details the team will need to sort it "
+     "out faster (when, how much, what exactly), one question at a time, never \"in the meantime\" and "
+     "never whether there is anything else; only when nothing is left to ask, what else you can do now."),
+    ("A different matter later in the same conversation is.",
+     "A different matter later in the same conversation is, and so is the matter of a manager request, "
+     "once they tell you what it is."),
 ]
+
+
+def replace_span(text, start, end, new):
+    """Replace text[start ... end] (both included) with new; each anchor must occur exactly once."""
+    assert text.count(start) == 1 and text.count(end) == 1, "span anchors moved: %r / %r" % (start[:30], end[:30])
+    a = text.index(start)
+    b = text.index(end, a) + len(end)
+    return text[:a] + new + text[b:]
 REP_TAP_START = " \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
 REP_TAP_END = "וממשיכים משם."
 WHO_AFTER = "אתה שירות הלקוחות של הומי'ז, כולו."
@@ -223,11 +241,15 @@ def section6(bot, supabase_cred):
     tool = by["open_request"]["parameters"]
     tool["jsonBody"] = replace_once(tool["jsonBody"], FLAT_ASK, FLAT_KNOWN)
     note = by["notify_team"]["parameters"]
+    note["toolDescription"] = replace_span(note["toolDescription"], NOTE_FROM, NOTE_TO, MANAGER_TOOL)
     for old, new in NOTE_EDITS:
         note["toolDescription"] = replace_once(note["toolDescription"], old, new)
     opts = by["Answer the resident"]["parameters"]["options"]
     sm = opts["systemMessage"]
-    for old, new in PROMPT_CUTS + SOLVE_EDITS:
+    for old, new in PROMPT_CUTS:
+        sm = replace_once(sm, old, new)
+    sm = replace_span(sm, MANAGER_FROM, MANAGER_TO, MANAGER_RULE)
+    for old, new in SOLVE_EDITS:
         sm = replace_once(sm, old, new)
     assert sm.count(REP_TAP_START) == 1
     start = sm.index(REP_TAP_START)
