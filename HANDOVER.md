@@ -607,7 +607,9 @@ its stated time.
       - The way out, section C's own "only what is beyond you stays with the team", is gone. The bot keeps the matter, asks what is going on, and judges "beyond me" by the matter, not by the tenant's word.
       - **Claude-played blind (no spend):** passes on the owner's lines. "Committee fee" gets the note in one sentence plus "מה קורה עם התשלום?". "You can't help me" gets "אולי דווקא כן", what it can do, and a question. "I just want a manager. period." gets no parrot. Not Gemini's own behaviour.
       - **Checking it with the AI** is `manager_doubt` (the owner's four lines, about $0.30), on the owner's go, or the owner's own chat.
-      - **The sandbox's memory round is 10** (`SANDBOX_MEMORY_ROUND` in `.env`). The "As built" table in `feature.md` says so too now; it had said 6.
+      - **The owner's retest (12:24 UTC) still ended "רשמתי את זה … יש עוד משהו שאפשר לעשות מפה בינתיים?"** The cause was notify_team's own description, which the prompt fix never touched. `NOTE_EDITS` now bring it in line, and the reason for asking no longer promises to forward. Pushed 12:36 UTC.
+      - **Not yet proven on Gemini.** The blind Claude check passed before the retest failed, so only a Gemini run counts: the owner's chat, or `manager_doubt` (about $0.30) on the go.
+      - **The sandbox's memory round is 11** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

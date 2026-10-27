@@ -126,6 +126,12 @@ for old, new in SOLVE_EDITS:
 assert "ענייני ועד הבית" not in prompt, "the committee fee is still on the staff-only list"
 assert "המשפט שלך נגמר בזה שהצוות יודע" not in prompt, "the prompt still ends a manager request on 'the team knows'"
 assert "רק מה שבאמת מעבר לך נשאר אצל הצוות" not in prompt, "a tenant's 'you can't help' is still a way out to the team"
+assert "לפני שמשהו עובר למנהל" not in prompt and "אין מה להעביר" not in prompt, "the bot still asks so it can forward"
+from n8n_sandbox_section6 import NOTE_EDITS
+note6 = by6["notify_team"]["parameters"]["toolDescription"]
+for old, new in NOTE_EDITS:
+    assert new in note6 and old not in note6, "notify_team not brought in line: " + old[:40]
+assert "Call it only for what is really past you" not in note6, "notify_team still sends a manager request to the team"
 print("check_n8n_sandbox: section 6 C ok")
 
 # --- D: one reply per burst, checked again right before Send (owner's chat, 27 Oct) ---

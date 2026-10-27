@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: the retest still handed off; the cause was notify_team's own description (sandbox only)
+- **Seen:** the owner's retest, 12:24 to 12:30 UTC (screenshot; the page was in English through Google Translate; executions 132541 to 132556).
+  - The burst got one reply: 132541's draft was dropped by the last-word check.
+  - **"i need a manager" again:** "אין לי אפשרות טכנית להעביר פנייה הלאה בלי נושא … ואני מיד רושם את זה לצוות הרלוונטי. מה הכיוון?"
+  - **"its about a payment committee":** `notify_team` (management, caller_request, "הדייר מבקש לדבר עם מנהל, הנושא הוא תשלומים וועד הבית."), then "אוקיי, תודה. רשמתי את זה עכשיו לצוות שלנו שיבדקו. יש עוד משהו שאפשר לעשות מפה בינתיים?"
+  - These are the model's own words. No guard rewrote them, and the run had the 12:17 prompt.
+- **Asked:** *"i just dont get it, its still the same"*.
+- **Cause: notify_team's `toolDescription`, copied from live and untouched by section 6 C.** The model reads it at the moment of the call. It said:
+  - "Call it only for what is really past you";
+  - "afterwards: that you have let the team know … and what you can still do for them now", which is the closing line of both failed chats;
+  - "say plainly that before anything goes to a manager someone has to know";
+  - "the committee's own business" was on the threshold list.
+
+  The prompt's own reason for asking ("לפני שמשהו עובר למנהל…", "אין מה להעביר") had the bot promise to forward the request, and then it kept the promise.
+- **My miss:** the first fix and its blind check changed and read the prompt only. The standing rule is to check the tool definitions first. A Claude-played pass did not predict Gemini here.
+- **Done (sandbox only):**
+  - `NOTE_EDITS` (4) bring notify_team in line: the fee is the bot's; the matter stays the bot's after the note; "you can't help" is no reason to stop; afterwards comes the matter itself while it is the bot's.
+  - Two more `SOLVE_EDITS`: the reason for asking becomes "כדי שאפשר יהיה לעשות משהו בעניין, צריך קודם לדעת במה מדובר" (the owner's 18 Oct "we need to get information before we can do something"), and "אין מה להעביר" becomes "אין במה לטפל".
+  - `check_n8n_sandbox.py` asserts both.
+- **Pushed** 12:36:08 UTC, memory round 11. The read-back is in line, and the live system is unchanged.
+- **Open:** proof on Gemini, through the owner's own chat, or `manager_doubt` (about $0.30) on the owner's go.
+
 ### Feature 19: "you can't help me" no longer hands the matter to the team (owner's chat; sandbox only)
 - **Seen:** the owner's chat on the sandbox page, 12:03 to 12:08 UTC, after section 6 C went in (screenshot; executions 132478 to 132503).
   - "i need to speak to a manager" / "faster" / "this is urgent" got one reply, so the burst fix holds.

@@ -29,6 +29,15 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      then you tell him the team knows", which his word alone satisfied. It is gone:
      the bot is not a stop on the way to a manager, a topic still needs what is
      going on, and "you can't help" gets what the bot can do with it and a question.
+     The retest (12:24 UTC) still ended "רשמתי את זה עכשיו לצוות שלנו שיבדקו. יש עוד
+     משהו שאפשר לעשות מפה בינתיים?". The prompt was not what Gemini followed:
+     notify_team's own description, read at the moment of the call, said "call it
+     only for what is really past you" and "afterwards: that you have let the team
+     know ... and what you can still do for them now". So NOTE_EDITS bring the
+     tool in line, and the reason the bot gives for asking stops being "before it
+     goes to a manager" / "nothing to pass on", which had it promising to forward
+     the request ("I immediately write it down for the relevant team") and then
+     keeping that promise.
   D. one reply per burst (the owner's sandbox chat, 27 Oct, "is there a way to fix
      this"): a second message sent while the AI was writing got its own answer,
      and two near-identical replies went out half a second apart. The live bot
@@ -75,6 +84,31 @@ SOLVE_EDITS = [
      "אתה כן יכול לעשות בעניין הזה, ושואל מה קורה. מה שמעבר לך נקבע לפי העניין עצמו, כשאתה כבר יודע מה הוא, ולא "
      "לפי מה שהוא אומר עליך."),
     (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
+    ("לפני שמשהו עובר למנהל, צריך לדעת במה מדובר, כדי שמי שיקבל את זה יוכל באמת לטפל בו.",
+     "כדי שאפשר יהיה לעשות משהו בעניין, צריך קודם לדעת במה מדובר."),
+    ("בלי לדעת במה מדובר אין מה להעביר,", "בלי לדעת במה מדובר אין במה לטפל,"),
+]
+# The same, in notify_team's own description, which the model reads as it calls the tool.
+NOTE_EDITS = [
+    ("the committee's own business, or anything else",
+     "the committee members' own business (the monthly committee fee itself is yours: what is owed, "
+     "paying it, the link, what it covers), or anything else"),
+    ("say plainly that before anything goes to a manager someone has to know what it is about, ask what "
+     "happened, and try to sort it out yourself with your tools.",
+     "say plainly that before anything can be done about it someone has to know what it is about, and ask "
+     "what happened."),
+    ("Call it only for what is really past you, with the details in `description` (reason caller_request, "
+     "unless the matter itself has a reason above).",
+     "Once you know the topic, the matter is yours to the end; you are not a stop on the way to a manager. "
+     "Because they asked for one, call this with what they told you (reason caller_request, unless the matter "
+     "itself has a reason above), say so in one sentence, and in the same message go on with the matter "
+     "itself: a topic is not yet what they need, so ask what is going on with it, or do it. Being told you "
+     "can't help with it is no reason to stop: say what you can do with it, and ask."),
+    ("What the resident hears from you afterwards: that you have let the team know, in your own words, and "
+     "what you can still do for them now.",
+     "What the resident hears from you afterwards: that you have let the team know, in your own words, and "
+     "then, in the same message, the matter itself while it is still yours (after a manager request it is), "
+     "or else what you can still do for them now."),
 ]
 REP_TAP_START = " \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
 REP_TAP_END = "וממשיכים משם."
@@ -161,6 +195,9 @@ def section6(bot, supabase_cred):
     send["jsonBody"] = replace_once(send["jsonBody"], SEND_CUT, "")
     tool = by["open_request"]["parameters"]
     tool["jsonBody"] = replace_once(tool["jsonBody"], FLAT_ASK, FLAT_KNOWN)
+    note = by["notify_team"]["parameters"]
+    for old, new in NOTE_EDITS:
+        note["toolDescription"] = replace_once(note["toolDescription"], old, new)
     opts = by["Answer the resident"]["parameters"]["options"]
     sm = opts["systemMessage"]
     for old, new in PROMPT_CUTS + SOLVE_EDITS:

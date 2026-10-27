@@ -83,6 +83,13 @@ It is gone, and the passage now says:
 - "you can't help me" means he doesn't yet know what the bot can do. The bot does not give up and does not pass him on. It says plainly what it can do with the matter and asks;
 - what is beyond the bot is judged by the matter once it is known, not by what the tenant says about the bot.
 
+**The retest (12:24 UTC) still ended in a hand-off**, and the prompt was not the cause. notify_team's own description is read at the moment of the call, and section 6 C had not touched it. It said:
+- "Call it only for what is really past you";
+- "afterwards: that you have let the team know … and what you can still do for them now", the closing line of both failed chats;
+- the reason for asking was "before anything goes to a manager", and the prompt's was "לפני שמשהו עובר למנהל" with "אין מה להעביר". So the bot promised to forward ("ואני מיד רושם את זה לצוות הרלוונטי") and then kept its promise.
+
+`NOTE_EDITS` bring the tool in line with section C. The reason for asking is now the owner's own 18 Oct wording, "we need to get information before we can do something": "כדי שאפשר יהיה לעשות משהו בעניין, צריך קודם לדעת במה מדובר".
+
 ## Why the bot checks for a newer message twice (27 Oct)
 
 The owner wrote, as Ido: "i need to speak to a manager", then "faster!!" 4 s later, then "faster!!" 8 s after that. Two near-identical replies came back half a second apart, and the second one introduced the bot again.
