@@ -85,6 +85,9 @@ A check script snapshots the live system before the build and compares it after 
 - `Answer the resident` puts `who_text` in its input before the time bracket.
 
 **The chat page** is `scripts/sandbox_chat.py`, served on `127.0.0.1:8765`. It proxies Chatwoot's public API for the sandbox API inbox, and has a "writing as" picker (Ido, Yariv, Assaf, an unknown number) taken from `SANDBOX_PERSONAS` in `.env`. Each persona is a Chatwoot contact carrying that phone, the way a WhatsApp contact carries its number.
+- It checks for new messages every 1.5 s and never stops: a failed check is tried again, and an answer for a conversation left in the meantime is dropped.
+- A message typed before the conversation is open waits for it. A failed send goes back into the box.
+- A line in the header says what the page is waiting for.
 
 ## Data
 
@@ -117,7 +120,7 @@ A check script snapshots the live system before the build and compares it after 
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
 
-- **To chat:** `python scripts/sandbox_chat.py`, then open http://127.0.0.1:8765.
+- **To chat:** `python scripts/sandbox_chat.py`, then open http://127.0.0.1:8765. Since 27 Oct it runs as its own process, logging to `local/sandbox/chat.log` and `chat.err.log`. After a change to the page, restart it and reload the tab. `python scripts/check_sandbox_chat.py` checks the page offline.
 - **To regenerate after a live change:** `python scripts/n8n_sandbox.py --apply --section6` and `python scripts/sandbox_function.py --apply`. They re-read live and PUT the same sandbox ids. The copies are never edited by hand.
 - **To check production:** `python scripts/sandbox_fingerprint.py --compare local/sandbox/before.json`.
 - **Acceptance run 1 (27 Oct, $0.52): 4/6 by the checks.**

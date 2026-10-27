@@ -577,7 +577,9 @@ its stated time.
     - Chatwoot account 3 "הומי'ז — סביבת ניסוי" (locale he; the owner is an administrator; auto-assignment off on inbox 3 and teams 5-8, as live). **Account 3 is the only sandbox account.** A duplicate account 4 existed for a few minutes on 27 Oct and was deleted; if `.env` ever says 4, it is stale;
     - n8n: router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n`;
     - `debt-tools-sandbox` v2: the live code unchanged, behind `guard.ts` (reads pass; writes faked, tickets `999-9000NN-YY`; other hosts refused);
-    - the chat page, `python scripts/sandbox_chat.py`, then http://127.0.0.1:8765.
+    - the chat page, `python scripts/sandbox_chat.py`, then http://127.0.0.1:8765. **Since 27 Oct 16:39 UTC it runs as its own process** (started with PowerShell `Start-Process`, logging to `local/sandbox/chat.log` and `chat.err.log`), so it outlives a Claude session. To restart it, stop the python process running `sandbox_chat.py` and start it the same way; the owner then reloads the tab.
+    - **27 Oct, "the sandbox is not working": the bot was answering, and the page had stopped showing anything.** Its check for new messages died on the first bad answer, from a persona switch, a late answer or a dropped request, and the owner's line to the server was losing about a fifth of its packets. Fixed: the page never stops checking, waits for a conversation to open instead of dropping what was typed, retries, gives a failed send back, and says what it is waiting for. `scripts/check_sandbox_chat.py`, 6/6 (WORKLOG 27 Oct).
+    - **If the owner says the sandbox is not working,** look at the sandbox bot's n8n runs first. If they answered (a hello ends in 1-2 s, an AI turn in 15-30 s), the page or the line is at fault: read `chat.err.log` and ping the server.
   - **Proven:**
     - `sandbox_fingerprint.py --compare` said "live system unchanged" after every step;
     - the sandbox keys get 401 on account 2;

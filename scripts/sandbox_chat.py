@@ -28,6 +28,7 @@ PAGE = """<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
 body{font-family:system-ui,Arial,sans-serif;margin:0;background:#efeae2;color:#111}
 header{background:#075e54;color:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 header select,header button{font-size:15px;padding:4px 8px}
+#st{font-size:14px;opacity:.9}
 #log{padding:12px;display:flex;flex-direction:column;gap:6px;height:calc(100vh - 130px);overflow-y:auto}
 .m{max-width:75%;padding:7px 10px;border-radius:8px;white-space:pre-wrap;line-height:1.4}
 .in{align-self:flex-start;background:#dcf8c6}.out{align-self:flex-end;background:#fff}
@@ -35,39 +36,68 @@ header select,header button{font-size:15px;padding:4px 8px}
 form{display:flex;gap:8px;padding:8px;background:#f0f0f0}form input{flex:1;font-size:16px;padding:8px}
 </style></head><body>
 <header><strong>סביבת ניסוי — מיכאל</strong>
-<label>כותב בתור <select id="who"></select></label><button id="new">שיחה חדשה</button></header>
+<label>כותב בתור <select id="who"></select></label><button id="new">שיחה חדשה</button><span id="st" dir="ltr"></span></header>
 <div id="log"></div>
 <form id="f"><input id="t" autocomplete="off" placeholder="הודעה…"><button>שליחה</button></form>
 <script>
-let conv = null, key = null, seen = 0;
+let conv = null, key = null, seen = 0, starts = 0, opening = null;
 const $ = (id) => document.getElementById(id);
+const OFFLINE = "No answer from the server, retrying…";
+const status = (t) => { $("st").textContent = t; };
+const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 async function j(url, body) {
   const r = await fetch(url, body ? {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(body)} : {});
-  return r.json();
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || r.status);
+  return d;
 }
-async function start() {
-  key = $("who").value; $("log").innerHTML = ""; seen = 0;
-  conv = (await j("/api/start", {key})).conv;
+function start() {
+  // No check runs while the new conversation is made, the last click wins, and a failed
+  // attempt is tried again: on a slow line opening one took up to 16 s (27 Oct).
+  const mine = ++starts, k = $("who").value;
+  conv = null; $("log").innerHTML = ""; seen = 0; status("Opening a new chat…");
+  opening = (async () => {
+    while (mine === starts) {
+      try {
+        const c = (await j("/api/start", {key: k})).conv;
+        if (mine === starts) { key = k; conv = c; status(""); }
+        return;
+      } catch (e) { if (mine === starts) status(OFFLINE); await pause(3000); }
+    }
+  })();
+  return opening;
 }
 async function send(text) {
-  if (!conv || !text.trim()) return;
-  await j("/api/send", {key, conv, content: text});
+  if (!text.trim()) return;
+  while (!conv) await (opening || pause(300));  // typed before the chat was open: it waits
+  status("Sending…");
+  try { await j("/api/send", {key, conv, content: text}); status(""); }
+  catch (e) {
+    status("Not delivered. If it doesn't show in the chat, send it again.");
+    if (!$("t").value) $("t").value = text;
+  }
 }
 async function poll() {
-  if (conv) {
-    const msgs = await j("/api/messages?key=" + key + "&conv=" + conv);
-    for (const m of msgs.slice(seen)) {
-      const d = document.createElement("div");
-      d.className = "m " + (m.out ? "out" : "in"); d.textContent = m.content;
-      if (m.buttons.length) {
-        const b = document.createElement("div"); b.className = "btns";
-        for (const t of m.buttons) { const x = document.createElement("button"); x.textContent = t; x.onclick = () => send(t); b.appendChild(x); }
-        d.appendChild(b);
+  // A check that fails is tried again next round, and an answer for a conversation
+  // left in the meantime is dropped: one bad check used to stop the page for good (27 Oct).
+  const k = key, c = conv;
+  try {
+    const msgs = c ? await j("/api/messages?key=" + k + "&conv=" + c) : null;
+    if (c && c === conv) {
+      if ($("st").textContent === OFFLINE) status("");
+      for (const m of msgs.slice(seen)) {
+        const d = document.createElement("div");
+        d.className = "m " + (m.out ? "out" : "in"); d.textContent = m.content;
+        if (m.buttons.length) {
+          const b = document.createElement("div"); b.className = "btns";
+          for (const t of m.buttons) { const x = document.createElement("button"); x.textContent = t; x.onclick = () => send(t); b.appendChild(x); }
+          d.appendChild(b);
+        }
+        $("log").appendChild(d); $("log").scrollTop = 1e9;
       }
-      $("log").appendChild(d); $("log").scrollTop = 1e9;
+      seen = msgs.length;
     }
-    seen = msgs.length;
-  }
+  } catch (e) { if (c && c === conv) status(OFFLINE); }
   setTimeout(poll, 1500);
 }
 (async () => {
@@ -123,6 +153,8 @@ class H(BaseHTTPRequestHandler):
                 return self.reply(messages(q["key"], q["conv"]))
         except urllib.error.HTTPError as x:
             return self.reply({"error": "chatwoot %s" % x.code}, code=502)
+        except OSError:  # Chatwoot too slow or out of reach: an answer, so the page can say so
+            return self.reply({"error": "chatwoot unreachable"}, code=502)
         self.send_error(404)
 
     def do_POST(self):
@@ -136,6 +168,8 @@ class H(BaseHTTPRequestHandler):
                 return self.reply({"ok": True})
         except urllib.error.HTTPError as x:
             return self.reply({"error": "chatwoot %s" % x.code}, code=502)
+        except OSError:  # Chatwoot too slow or out of reach: an answer, so the page can say so
+            return self.reply({"error": "chatwoot unreachable"}, code=502)
         self.send_error(404)
 
     def log_message(self, *a):

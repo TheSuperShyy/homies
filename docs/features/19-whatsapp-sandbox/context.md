@@ -115,6 +115,21 @@ The executions show why:
 
 **For live:** "Log reply" runs beside Send there, so the check must sit before it as well, or a dropped draft is logged as said. The fetch must also read the live conversation.
 
+## Why the chat page never stops checking (27 Oct)
+
+The owner wrote *"the sandbox is not working"*. The bot had answered every hello within 2 s, but the page showed nothing.
+- **The page stopped on its first bad check.** Its loop asked Chatwoot for new messages every 1.5 s, and one bad answer ended it, until the tab was reloaded:
+  - a switch of "writing as" could ask for the old conversation under the new persona, which is a 404;
+  - an answer for the previous conversation could arrive after "new conversation";
+  - a request could get no answer at all.
+- **That night's line made all three likely.** The owner's PC is far from the server, and a fifth of the packets were being lost. Opening a conversation took up to 16 s, and one TLS handshake timed out after 30 s.
+
+So the page now:
+- keeps checking, and drops an answer for a conversation it has left;
+- waits for a conversation to open instead of dropping what was typed;
+- retries a failed opening, and gives a failed send back to the box;
+- says in the header what it is waiting for, so a slow line no longer looks like a broken bot.
+
 ## Why the memory key changes
 
 n8n keeps the "Conversation so far" buffer under a session key, `<phone>-84` on live. If n8n keyed buffers by session alone, a sandbox chat as Ido would land in Ido's live memory. The copy appends `-sbx`, so isolation does not depend on how n8n scopes its buffers.

@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: "the sandbox is not working": the bot was answering, the chat page had stopped showing anything (fixed 16:39 UTC)
+- **Asked:** *"the sandbox is not working"*, about 16:12 UTC.
+- **Found: the bot was fine.**
+  - The owner's three hellos (16:08 to 16:10 UTC, as Ido in conversation 40 and as Assaf in 43) each got the menu within 2 s.
+  - The deployed sandbox bot is node for node what `n8n_sandbox.py --section6` builds: 59 nodes, every parameter and every connection. So the 15:03 push, which printed a timeout, landed whole.
+  - OpenRouter had $7.42 in the wallet.
+- **Found: the page had stopped for good.** Its loop that checks for new messages died on the first bad check. After that the page showed nothing, not even the tenant's own message, until it was reloaded. Reproduced in headless Chrome:
+  - **a switch of "writing as"** let a check ask for the old conversation under the new persona; the proxy answered "chatwoot 404", and the loop threw `msgs.slice is not a function`;
+  - **"new conversation"** while a check was out: the old conversation's answer was drawn into the new one and hid its first messages;
+  - **a check that got no answer:** `Failed to fetch`, and the loop stopped.
+- **Underneath, the line from this PC to the server was bad.**
+  - 4 of 20 pings to the server were lost at about 425 ms (Google: 0 of 10 lost, 5 ms).
+  - Through the page, opening a conversation took 12 to 16 s. A TLS handshake to Chatwoot timed out after 30 s, and one send was lost that way.
+  - Direct calls a few minutes later took about 2 s.
+  - The bot is not affected, because it runs on the server.
+- **Fixed in `scripts/sandbox_chat.py`:**
+  - a failed check is tried again on the next round, and an answer for a conversation left in the meantime is dropped;
+  - no check runs while a conversation is being opened, the last click wins, and a failed opening is retried every 3 s;
+  - a message typed before the conversation is open waits for it;
+  - a failed send puts the text back in the box and says so;
+  - a line in the header says "Opening a new chat…", "Sending…" or "No answer from the server, retrying…";
+  - the proxy answers a Chatwoot timeout with an error instead of dropping the request.
+- **Checked:** `scripts/check_sandbox_chat.py` runs the page against a stand-in for its server, with no Chatwoot and no bot, in 6 scenarios. The first three failed on the old page, each the way the owner saw it, and the fourth (typed before the chat was open) did too. 6/6 pass now.
+- **On the real sandbox:** the page server was restarted (16:39 UTC; it now runs as its own process, logging to `local/sandbox/chat.log` and `chat.err.log`).
+  - Five quick switches then a hello: shown, with the menu.
+  - Two "new conversation" clicks then a hello: shown, with the menu.
+  - No page errors. Only hellos were sent (the fixed menu, no AI spend), as "לא מוכר".
+  - The live system was not touched.
+- **For the owner:** reload the open tab, which still runs the old page.
+
 ### Feature 19: the owner's manager protocol: management told at once, details asked, never conceded (sandbox only)
 - **Asked:** a pasted "ESCALATION & DE-ESCALATION PROTOCOL", then *"but we dont concede we say the management is being informed but i would need your details and concerns so that we can resolve the blah blah more faster. the behavior and attitude is really important"*.
 - **Taken:**
