@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: a recognised tenant's ticket names the place (owner's decision; sandbox only)
+- **Asked:** *"ok so for the number 1 your suggestion is correct lets do that"*. No confirmation question: the reply that opens the ticket says where it was filed, building and flat.
+- **Done:**
+  - WHO_RULE in `n8n_sandbox_section6.py` rewritten ("כשאתה פותח לו קריאה, אתה לא שואל אם זה המקום. אתה אומר לו באותה הודעה איפה פתחת אותה…");
+  - the driver's `ido_lift` is now one turn, which must name "בר כוכבא 23" and "דירה 1", give a ticket number, and ask nothing about the place, "רק לוודא" included;
+  - offline checks pass; pushed with `--section6 --fresh-memory` (round 7);
+  - read back: the new rule is in the sandbox prompt and the old question is gone;
+  - production unchanged.
+- **Open:** checking it with the AI (one `ido_lift` chat, about $0.10) waits on the owner's go.
+
 ### Feature 19: acceptance run 2, the leak check and a clean re-run of Ido ($0.40; production unchanged after)
 - **Asked:** *"yes"* to both priced steps (about $0.80 quoted). The driver now fails any reply carrying the AI's reasoning (`LEAK` in `sandbox_drive.py`). It was checked against run 1: it catches all four leaks and passes all four clean replies.
 - **Step 1, the faithful copy** (the bot pushed WITHOUT `--section6`, which is the live bot's behaviour, memory round 3): three tenants (אסף, Yariv, the unknown number) each reported a fault with the building and flat in one message. **3/3 tickets opened, and all three replies right after the tool call were clean.** $0.16. Transcript `local/sandbox/runs/2026-10-27-1011.md`.

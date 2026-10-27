@@ -591,7 +591,7 @@ its stated time.
     - **Run 2 (27 Oct, $0.40):**
       - "I want a representative" asks what it's about and does not alert the team (run 1's alert came from the contaminated memory);
       - the balance asks for name and phone;
-      - **Ido's ticket opens without the place ever being confirmed or named.** The owner decides: keep the confirmation question, or name the place in the reply.
+      - **Ido's ticket opened without the place ever being confirmed or named. DECIDED 27 Oct by the owner:** the reply names the building and flat, with no confirmation question. It is in the sandbox WHO_RULE (memory round 7). Checking it with the AI is one ido_lift chat, about $0.10, on the owner's go.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.
   - **Waiting on the owner:**

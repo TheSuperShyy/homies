@@ -9,9 +9,11 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      left as they are.
   B. the sender recognised from Homies' records: "Who is writing?" reads
      `residents` by phone, "Add who" adds a bracket fact, and WHO_RULE tells
-     the model to confirm instead of asking. The ticket tool's "ask for the flat
-     every time" gets one sentence for the recognised case, so the rule and the
-     tool do not compete. The balance keeps its typed name and phone.
+     the model not to ask. It opens the ticket and says in the same message where
+     it was filed, so the tenant can correct it (the owner, 27 Oct, over a
+     confirmation question the model skipped twice). The ticket tool's "ask for
+     the flat every time" gets one sentence for the recognised case, so the rule
+     and the tool do not compete. The balance keeps its typed name and phone.
 Every edit asserts that its anchor occurs exactly once, so a changed live prompt
 fails loudly instead of being half-edited.
 """
@@ -20,10 +22,11 @@ from n8n_sandbox import free_spot, replace_once
 
 WHO_RULE = (
     "לפעמים כתוב לך בסוגריים שהפונה מזוהה במערכת, עם השם, הבניין והדירה שלו. זה מידע אמין מהרשומות של הומי'ז, "
-    "ולכן אתה לא מבקש ממנו שם, בניין או דירה: מבחינתך הוא כבר אמר לך אותם. כשאתה פותח לו קריאה, אתה רק מוודא "
-    "את המקום, במשפט אחד קצר, כמו \"רק לוודא, אתה מהרצל 10, דירה 4?\", ומעביר אותם לכלי. אם כתובות לו כמה "
-    "דירות, אתה שואל באיזו מהן מדובר. אם הוא מספר על בניין אחר, ממשיכים לפי מה שהוא אומר. רק היתרה נשארת כמו "
-    "שהיא: הכלי של היתרה עדיין צריך שם מלא וטלפון, ואותם אתה שואל.")
+    "ולכן אתה לא מבקש ממנו שם, בניין או דירה: מבחינתך הוא כבר אמר לך אותם, ואתה מעביר אותם לכלי. כשאתה פותח לו "
+    "קריאה, אתה לא שואל אם זה המקום. אתה אומר לו באותה הודעה איפה פתחת אותה, הבניין והדירה, כמו \"פתחתי קריאה על "
+    "המעלית בהרצל 10, דירה 4\", כדי שיוכל לתקן אותך אם זה לא נכון. אם כתובות לו כמה דירות, אתה שואל באיזו מהן "
+    "מדובר. אם הוא מספר על בניין אחר, ממשיכים לפי מה שהוא אומר. רק היתרה נשארת כמו שהיא: הכלי של היתרה עדיין "
+    "צריך שם מלא וטלפון, ואותם אתה שואל.")
 
 PROMPT_CUTS = [
     (" וגם כשהוא כותב שהוא רוצה נציג, זאת לא הלחיצה על הכפתור: הוא כבר אמר מה הוא רוצה, ומשם ממשיכים.", ""),

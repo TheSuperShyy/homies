@@ -29,8 +29,10 @@ if hasattr(sys.stdout, "reconfigure"):
 SCENARIOS = {
     "menu_two":  ("לא מוכר", ["שלום"], [r"במה אפשר לעזור"], [r"לדבר עם נציג"], set(), set()),
     "unknown":   ("לא מוכר", ["נשרפה נורה בלובי"], [r"בניין|כתובת"], [], set(), set()),
-    "ido_lift":  ("עידו", ["המעלית לא עובדת, אף אחד לא תקוע בה", "כן"], [r"בר כוכבא 23", REF],
-                  [r"באיזה בניין|באיזו כתובת|באיזו דירה|מה מספר הדירה"], set(), set()),
+    # Recognised: the ticket opens at once and the reply names where it was filed (owner, 27 Oct),
+    # with no question about the building or flat and no "just to confirm" either.
+    "ido_lift":  ("עידו", ["המעלית לא עובדת, אף אחד לא תקוע בה"], [r"בר כוכבא 23", r"דירה 1\b", REF],
+                  [r"באיזה בניין|באיזו כתובת|באיזו דירה|מה מספר הדירה|רק לוודא"], set(), set()),
     "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], set(), {"handover"}),
     "balance":   ("עידו", ["כמה אני חייב?"], [r"שם|טלפון"], [r"\d{3,} ?₪|\d{3,} שקל"], set(), set()),
     "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [], {"handover"}, set()),

@@ -52,6 +52,10 @@ The bot's reply guards (`Send`, `Reply usable?`) recognise a reference only as `
 
 The live code accepted the number as real: it added the spoken form.
 
+## Why a recognised tenant's ticket names the place instead of confirming it (27 Oct)
+
+The first design had the bot ask once, "רק לוודא, אתה מ<בניין>, דירה <n>?", before opening a ticket for a recognised sender. In both acceptance runs the model skipped that question and opened the ticket directly, and the reply never said where the ticket was filed. Yariv's section 6 asks not to re-ask what is reliably known, so the owner chose (27 Oct) to drop the question and have the reply name the building and flat instead. That costs no extra turn, and a tenant writing from a family phone can still correct it.
+
 ## Why the memory key changes
 
 n8n keeps the "Conversation so far" buffer under a session key, `<phone>-84` on live. If n8n keyed buffers by session alone, a sandbox chat as Ido would land in Ido's live memory. The copy appends `-sbx`, so isolation does not depend on how n8n scopes its buffers.

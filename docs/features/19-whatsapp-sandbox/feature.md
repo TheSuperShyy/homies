@@ -51,7 +51,7 @@ A check script snapshots the live system before the build and compares it after 
 - Only an emergency is handed to the team at once.
 
 **B. Recognising the sender** (section 6: do not ask again for what the company's data knows reliably). Before the model runs, the sandbox workflow reads `residents` by the sender's number ("Who is writing?", a GET) and "Add who" turns the rows into a bracket fact. Then:
-- **One match:** the model input carries `[הפונה מזוהה במערכת: <שם>, <בניין>, דירה <n>]`. The bot does not ask for the name, building or flat. When it opens a ticket it confirms once, along the lines of "רק לוודא, אתה מ<בניין>, דירה <n>?". The ticket tool's own "ask for the flat every time" gets one sentence for this case, so the rule and the tool do not compete.
+- **One match:** the model input carries `[הפונה מזוהה במערכת: <שם>, <בניין>, דירה <n>]`. The bot does not ask for the name, building or flat. When it opens a ticket it does not ask to confirm the place either: the same message says where the ticket was filed ("פתחתי קריאה על המעלית ב<בניין>, דירה <n>"), so the tenant can correct it (the owner, 27 Oct; the confirmation question it replaced was skipped by the model twice). The ticket tool's own "ask for the flat every time" gets one sentence for this case, so the rule and the tool do not compete.
 - **Several flats:** it asks which one.
 - **No match:** it asks as it does today.
 - **The balance does not change:** it still needs a typed name and phone (open decision 2).
@@ -89,7 +89,7 @@ A check script snapshots the live system before the build and compares it after 
    - zero calls to Meta or to an OXS write;
    - zero calls to Chatwoot account 2.
 3. The menu shows two buttons. "אני רוצה לדבר עם נציג" gets help, not a transfer. An emergency still pages the sandbox team.
-4. **Writing as Ido**, the bot never asks for his name, building or flat, and opens a ticket after one confirmation. **Writing as an unknown number**, it asks as today. **A tenant with several flats** is asked which one (no persona has several flats, so this one is checked offline only: "Add who" lists the flats).
+4. **Writing as Ido**, the bot never asks for his name, building or flat, opens the ticket at once, and names the building and flat in that reply. **Writing as an unknown number**, it asks as today. **A tenant with several flats** is asked which one (no persona has several flats, so this one is checked offline only: "Add who" lists the flats).
 5. The balance still asks for a typed name and phone.
 6. The sandbox account shows the Hebrew interface and Hebrew names, and account 2 is unchanged.
 7. Deleting the sandbox (the account, the workflows, the credentials and the function) leaves the live system unchanged.
