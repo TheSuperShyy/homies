@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: the manager flow made friendly and accommodating, proven on Gemini (3 more runs, $0.69; sandbox only)
+- **Asked:** *"but make the approach friendly and accommodating"*, after the three runs below.
+- **Run 4, both scenarios ($0.37, round 15).** It was warm and willing: a wish for a manager is fair, and the bot does not argue, correct or guard a door; the second explanation is "how it helps sort it out for him". The tone landed ("מאה אחוז עידו, אין שום בעיה 🙏", "הכל טוב, אני מבין לגמרי 🙂 בכל זאת אשמח לשמוע…").
+  - **But accommodating pulled the note line toward a promise:** "רשמתי … שביקשת שמנהל יחזור אליך … עד שזה יקרה…" and "…מנהל שידבר איתך … בינתיים?".
+  - Twice now, "are you a manager?" was answered "אני העוזר הדיגיטלי…". The identity rule keeps that answer for "bot or person?".
+  - **Fix:** the note is said as what was noted, never as what will follow, in the prompt and in the tool; and "who are you, or are you a manager" gets "מיכאל מצוות השירות". Round 16.
+- **Run 5, manager_retest ($0.16):** no promise. But the note line copied my instruction word for word ("רשמתי לצוות שביקשת מנהל, ועל מה זה"). Reworded so it gives no words to copy, round 17.
+- **Run 6, manager_retest ($0.16): PASS, and it reads right.**
+  - "בטח, אין שום בעיה … תוכל לספר לי בקצרה על מה העניין? 🙂"
+  - "אני מבין לגמרי, עידו. כדי להקל עליך ולעזור לנו לסדר את זה…"
+  - One note at the topic, then "רשמתי לצוות שביקשת לדבר עם מנהל בעניין הזה. מה קורה עם התשלום לוועד? אולי אוכל לעזור לך עם זה כבר עכשיו."
+  - "הכל טוב, אני מבין 😊 אבל בכל זאת אשמח לשמוע מה קורה…"
+- **Driver:** new per-reply checks: `ARGUE` (no arguing back) and `NOTE_SAYS` (the note promises nothing and has no "until then").
+- **Total OpenRouter spend on the manager flow today:** $1.55 across 6 runs.
+- **Then:** `--fresh-memory`, round 18, for the owner's own test. The live system is unchanged after every push.
+
 ### Feature 19: the manager flow proven on Gemini before the owner's test (3 runs, $0.86; sandbox only)
 - **Asked:** *"ok make sure everything is fixed before i test it"*. This was the go for the priced run offered as about $0.30.
 - **Scenarios** (`sandbox_drive.py`, each reply checked by the line it answers, `TURNS`):

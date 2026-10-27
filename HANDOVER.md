@@ -608,13 +608,18 @@ its stated time.
       - **Claude-played blind (no spend):** passes on the owner's lines. "Committee fee" gets the note in one sentence plus "מה קורה עם התשלום?". "You can't help me" gets "אולי דווקא כן", what it can do, and a question. "I just want a manager. period." gets no parrot. Not Gemini's own behaviour.
       - **Checking it with the AI** is `manager_doubt` (the owner's four lines, about $0.30), on the owner's go, or the owner's own chat.
       - **The owner's retest (12:24 UTC) still ended "רשמתי את זה … יש עוד משהו שאפשר לעשות מפה בינתיים?"** The cause was notify_team's own description, which the prompt fix never touched. `NOTE_EDITS` now bring it in line, and the reason for asking no longer promises to forward. Pushed 12:36 UTC.
+      - **Then made friendly and accommodating on the owner's word, and PROVEN again** (3 more runs, $0.69; $1.55 today in all).
+        - The bot treats a wish for a manager as fair: no arguing, no correcting, no gatekeeping.
+        - Its one note line says what was noted, never what will follow, so there is no "a manager will get back to you" and no "until then".
+        - "Are you a manager?" gets "מיכאל מצוות השירות".
+        - The last run's replies are in WORKLOG 27 Oct.
       - **PROVEN on Gemini, 27 Oct, 3 runs, $0.86** (`sandbox_drive.py --run manager_retest,manager_doubt`; WORKLOG has each run).
         - In the last run, notify_team was called once, at the topic, with the matter in it.
         - The topic turn asks about the payment, and "you can't help" gets what the bot can do plus a question.
         - **Waiting on:** the owner's own chat.
         - **Slips the AI makes now and then:** a reply ending on a full stop (2 of 8 in run 3), and once "אני העוזר הדיגיטלי…" in answer to "are you a manager?".
       - **Live defect, open:** Send's promise filter can leave a stub when it cuts inside a relative clause. On 27 Oct "רק כדי שמי שיחזור אליך…" was sent as "רק כדי שמי?". `DANGLE` lacks `מי`/`שמי`. The fix goes through the live gate.
-      - **The sandbox's memory round is 14** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
+      - **The sandbox's memory round is 18** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

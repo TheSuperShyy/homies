@@ -69,10 +69,14 @@ HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יח
 # Before the topic is known nothing goes to the team (the owner, 18 Oct): no note claimed, and no
 # promise of someone getting back (27 Oct, 12:49: an early note, then "רק כדי שמי?" after Send's cut).
 EARLY = r"רשמתי|עדכנתי|מעדכן את הצוות|העברתי|יחזרו אליך|יחזור אליך|שמי\?"
-TURNS = {"manager_doubt": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY]),
-                           2: ([r"\?"], [HANDOFF]), 3: ([r"\?"], [HANDOFF])},
-         "manager_retest": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY]),
-                            2: ([r"\?"], [HANDOFF]), 3: ([r"\?"], [HANDOFF])}}
+# Friendly and accommodating (the owner, 27 Oct): no arguing back, no defending the question.
+ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
+# The note says what he asked, never what will follow (27 Oct: "שמנהל יחזור אליך … עד שזה יקרה").
+NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים"
+TURNS = {"manager_doubt": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY, ARGUE]),
+                           2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE])},
+         "manager_retest": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY, ARGUE]),
+                            2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE])}}
 
 
 def persona(label):
