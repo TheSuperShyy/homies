@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Omni sent the dialer API token; the one-lead test is ready, nothing sent
+- **Said:** *"we receive email from omni telecom"*, with the email pasted. It is kept, minus the token, in `local/omnitelecom/2026-10-27-token-list2.txt`.
+- **The email says:**
+  - Omni set up a dedicated Tokomni user for the dialer.
+  - The token is sent, and the campaign id is the same one as 25 Oct. Every API lead goes into the campaign "List 2", which is never to be deleted.
+  - **The test:** one lead through the API with an external_id, then check on Vapi that a header arrives with the value.
+  - **List 2's rules:** press Play once (it is stopped by hand, so leads go in and nobody is rung); never press Stop; never upload a sheet into it through the list's edit, which replaces every contact.
+  - **Dialling:** one lead after another, and nobody while the bot is in a call. The ratio of 2 per free agent can leave a second tenant who answers waiting in the queue. The options are a ratio of 1, or more extensions at extra cost.
+- **Done:**
+  - `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` are in `.env`, with names only in `.env.example`.
+  - **New `scripts/tokomni_lead.py`.** The dry run is the default. It sends one lead from בר כוכבא 23 only (Ido Clix, flat 1), with the resident id as the external_id and the number in local form. It refuses outside 09:00-20:00 Israel time, and on Friday afternoon and Saturday. `--check` (read only) lists the last two hours of phone calls on Vapi and names the header that carries the id.
+  - The dry run and `--check` were run; neither writes anything.
+- **Checked, read only:**
+  - Yariv's Vapi wallet is in credit (`vapi_transfer.py --balance`; the 10:31 UTC web call is that probe).
+  - The call list still has Ido at attempt 2, so a dialer call to him would get the debt agent.
+  - Vapi keeps the INVITE under `phoneCallProviderDetails.sip.headers`. The 26 Oct dialer call has 24 headers and no external_id.
+- **Seen at 10:32:57 UTC, `01a17ceb`:** 15 s from Ido's number to the incoming agent. The caller name was his bare number, no `dialer-` prefix and no new header. Ido said "מה קורה?" and hung up. We sent nothing, so it is Ido calling in, or the dialer without its usual name (the 26 Oct 12:38 question again).
+- **Waiting on:**
+  - Play on List 2;
+  - Ido ready to answer;
+  - the owner's go for `--apply`: a write to Omni's dialer, a real call, and about $0.15-0.25 on Yariv's Vapi.
+- **For the owner:** List 2's ratio, 2 or 1.
+
 ### Feature 19: a recognised tenant's ticket names the place (owner's decision; sandbox only)
 - **Asked:** *"ok so for the number 1 your suggestion is correct lets do that"*. No confirmation question: the reply that opens the ticket says where it was filed, building and flat.
 - **Done:**

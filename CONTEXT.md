@@ -3249,6 +3249,14 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - The debt agent answers only when that number is exactly one row of `v_debt_call_queue_person`: unpaid, handed over, not do-not-call, under four attempts.
   - Every other call, doubt or error gets the incoming agent. The dialer rings whatever is uploaded in Tokomni, at any hour, so a mistaken upload must meet a receptionist, never a demand for money.
   - The variables are the Call button's, copied byte for byte. `check_route.test.ts` runs both composers side by side, so do not edit one without the other.
+- **Omni's dialer API is ours since 27 Oct: every API lead goes into Tokomni's "List 2"** (email in `local/omnitelecom/2026-10-27-token-list2.txt`; `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` in `.env`).
+  - **Sending one:** `POST api.tokomni.cc/api/campaign/insert/?token=…` with `external_id`, `campaign_id` and `number`. `scripts/tokomni_lead.py` sends one test lead from בר כוכבא 23, with the resident id as the external_id.
+  - **List 2 stays on all the time,** so a new lead is rung at once, at any hour. Omni has no calling hours, so our side sends only in calling hours.
+  - **Omni's three rules for List 2:**
+    - It needs Play pressed once.
+    - Never press Stop: it does not start again by itself.
+    - Never upload a sheet into it through the list's edit: that replaces every contact in it. Hand uploads get a list of their own.
+  - **One bot extension means one call at a time.** While the bot talks, the dialer rings nobody. List 2 rings 2 numbers per free agent, so a second tenant who answers waits in Omni's queue until the bot is free. The alternatives are a ratio of 1 (nobody waits, slower) or more extensions as agents (calls in parallel, more cost). Not decided yet.
 - **Zadarma (owner, 18 Oct: "we have zadarma now").**
   - **Known so far:** nothing more. No account details, and no `.env` entry.
   - **How it joins Vapi:** a SIP provider like Zadarma is a `byo-sip-trunk` credential (gateway, username, password). Its incoming calls are forwarded to `{number}@<credential_id>.sip.vapi.ai` (`docs/reference/Homies-Vapi-Account-Notes.md`). It is API only, about an hour.

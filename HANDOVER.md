@@ -601,6 +601,16 @@ its stated time.
 - **26 Oct: Yariv's accepted alignment document is the new yardstick** (`docs/discovery/yariv-alignment-2026-10.md`; the check is in WORKLOG 26 Oct).
   - **Not done yet:** remove the WhatsApp representative button; recognise the sender from our data instead of asking; shorter waits; voice asks the details before the matter.
   - **Waiting on the owner:** the order of work and the security trade-off on balances.
+- **27 Oct: Omni sent the dialer API token, so our side can now put a number on the dialer by itself** (WORKLOG 27 Oct; CONTEXT has List 2's rules).
+  - **In `.env`:** `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` ("List 2", the same id as 25 Oct).
+  - **The test Omni asked for:** send one lead with an external_id, then check that Vapi gets a header carrying it.
+    - The tool is `scripts/tokomni_lead.py`. It sends Ido Clix (flat 1) with his resident id as the external_id. `--check` reads Vapi's calls and names the header the id arrived in. The dry run is clean.
+  - **Waiting on:**
+    - someone with the Tokomni login presses Play on List 2 once;
+    - Ido ready to answer;
+    - the owner's go for `--apply`.
+  - **Seen 27 Oct, 10:32 UTC (`01a17ceb`):** a 15 s call from Ido's number reached the incoming agent. Its caller name was his bare number, with no `dialer-` and no new header. It was not our lead (none was sent). It is either Ido calling in or the dialer without its usual name. The second would be the 26 Oct 12:38 question again.
+  - **Owner's to decide:** List 2's ratio, 2 calls per free agent (a second tenant can wait in Omni's queue) or 1 (nobody waits).
 - **26 Oct, 11:44 UTC: the first real outbound debt call. The dialer reached the debt agent with Ido's details** (WORKLOG 26 Oct; `01a17807`).
   - **Works:** the routing, and the name, heard as הומיז.
   - **Broke: `send_payment_link` passed Vapi's 10 s limit.** The function finished about 11 s after the call: link not delivered (`outside_window`, and the template did not go), office ticket `255-1384-26`. Michael then improvised the office number wrong: "0 7 7 687949", missing a 6.
