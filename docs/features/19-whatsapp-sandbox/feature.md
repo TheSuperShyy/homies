@@ -52,6 +52,7 @@ A check script snapshots the live system before the build and compares it after 
 - **The bot handles the matter itself (the owner, 27 Oct):** *"we should handle everything in our own we dont rely on anyone but we do keep a note for the team if ever there is such a conflict like this"*.
   - A tenant who insists on a manager is asked what it is about. Then the bot works the matter itself.
   - Because a manager was asked for, it also leaves the team a note and says so in one sentence, and the same message carries on with the matter. It does not end on "the team knows".
+  - "You can't help me with this" does not end it (the owner's next chat, 27 Oct). The bot says what it can do with the matter and asks what is going on. Only the matter itself, once known, decides what is beyond the bot.
   - The committee **fee** (balance, paying, the link, what it covers) is the bot's. Only a matter with the committee's people stays on the staff-only list.
 
 **B. Recognising the sender** (section 6: do not ask again for what the company's data knows reliably). Before the model runs, the sandbox workflow reads `residents` by the sender's number ("Who is writing?", a GET) and "Add who" turns the rows into a bracket fact. Then:

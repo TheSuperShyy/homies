@@ -72,6 +72,17 @@ The owner's rule: handle everything ourselves, and keep a note for the team when
 
 The live safeguards still apply: `Team note this turn?` posts one note per turn, and an empty request is still never recorded.
 
+**The owner's next chat, the same afternoon (12:03 UTC):** *"it still did not resolve with it self it should fix everything for himself"*.
+- After the note, the bot offered "בינתיים, אולי אוכל לעזור בעצמי?", as if it were filling in until a manager.
+- To "no you cant help me for this one" it answered "הצוות יודע ויטפל בזה מולך".
+- **The way out was section C's own last sentence,** "רק מה שבאמת מעבר לך נשאר אצל הצוות, ואז אתה אומר לו שהצוות יודע". The tenant's word alone satisfied it.
+
+It is gone, and the passage now says:
+- the matter is the bot's to the end, and the bot is not a stop on the way to a manager;
+- a topic such as "the committee fee" is not yet what he needs, so the bot asks what is going on;
+- "you can't help me" means he doesn't yet know what the bot can do. The bot does not give up and does not pass him on. It says plainly what it can do with the matter and asks;
+- what is beyond the bot is judged by the matter once it is known, not by what the tenant says about the bot.
+
 ## Why the bot checks for a newer message twice (27 Oct)
 
 The owner wrote, as Ido: "i need to speak to a manager", then "faster!!" 4 s later, then "faster!!" 8 s after that. Two near-identical replies came back half a second apart, and the second one introduced the bot again.

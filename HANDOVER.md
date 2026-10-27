@@ -602,6 +602,10 @@ its stated time.
       - Code checked offline in 8/8 cases; the menu still goes out ($0). Memory round 9.
       - **Checking it with the AI** is `burst_manager` (the owner's three lines at their pace, about $0.20), on the owner's go, or the owner's own chat.
       - **This is live behaviour too:** promote it with "Log reply" moved behind the check.
+    - **27 Oct, the owner's chat at 12:03 UTC: "you can't help me" handed the matter to the team. Fixed in the sandbox** (section 6 C, memory round 10, 12:17 UTC).
+      - After the note the bot said "meanwhile, maybe I can help". To "no you cant help me for this one" it said "the team knows and will handle it".
+      - The way out, section C's own "only what is beyond you stays with the team", is gone. The bot keeps the matter, asks what is going on, and judges "beyond me" by the matter, not by the tenant's word.
+      - **Checking it with the AI** is `manager_doubt` (the owner's four lines, about $0.30), on the owner's go, or the owner's own chat.
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

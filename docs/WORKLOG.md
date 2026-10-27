@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: "you can't help me" no longer hands the matter to the team (owner's chat; sandbox only)
+- **Seen:** the owner's chat on the sandbox page, 12:03 to 12:08 UTC, after section 6 C went in (screenshot; executions 132478 to 132503).
+  - "i need to speak to a manager" / "faster" / "this is urgent" got one reply, so the burst fix holds.
+  - "are you a manager?": Michael explained why he needs to know the matter.
+  - **"its about the monthly committee fee":** `notify_team`, then "רשמתי לצוות שלנו שאתה צריך לדבר עם מנהל לגבי תשלום ועד הבית. בינתיים, אולי אוכל לעזור בעצמי? אתה רוצה לבדוק כמה נשאר לשלם, או שאשלח לך קישור לתשלום?"
+  - **"no you cant help me for this one":** no tool, then "אין בעיה, אני מבין. הצוות יודע ויטפל בזה מולך. יש עוד משהו שאוכל לעזור בו בינתיים?"
+- **Asked:** *"it still did not resolve with it self it should fix everything for himself"*.
+- **Cause, in section 6 C's own sentence:** "רק מה שבאמת מעבר לך נשאר אצל הצוות, ואז אתה אומר לו שהצוות יודע". The tenant's word alone made the matter "beyond you". And nothing said the bot is the one handling it rather than a stop on the way, so the note came first and the help became "meanwhile".
+- **Done (`SOLVE_EDITS` in `n8n_sandbox_section6.py`).** The manager passage now says:
+  - the matter is the bot's to the end, and the bot is not a stop on the way to a manager;
+  - a topic is not yet what he needs, so it asks what is going on;
+  - "you can't help me" means he doesn't yet know what the bot can do: no giving up, no passing him on, say plainly what it can do with the matter, and ask;
+  - what is beyond it is judged by the matter once known, not by what he says.
+
+  The way-out sentence is gone.
+- **Checks:**
+  - `check_n8n_sandbox.py` is ok. A new assert checks that the way out is gone.
+  - **New driver scenario `manager_doubt`:** the owner's four lines. The last reply must ask a question, and must not say the team knows or will handle it.
+- **Pushed:** `n8n_sandbox.py --apply --section6 --fresh-memory` at 12:17:56 UTC, memory round 10.
+  - Read back: the new passage is in, and the old sentence is gone.
+  - `sandbox_fingerprint.py --compare`: the live system is unchanged.
+- **Open:** the owner's own chat on the sandbox page, or `manager_doubt` with the AI (about $0.30) on the owner's go. Production is unchanged; promoting section 6 C to live is a separate go.
+
 ### Feature 19: one reply per burst; the bot checks for a newer message again before sending (owner's chat; sandbox only)
 - **Seen:** the owner's second chat as Ido (screenshot): "i need to speak to a manager", "faster!!", "faster!!" brought two near-identical replies, and the second one introduced the bot again. **Asked:** *"is there a way to fix this"*.
 - **The executions:**
