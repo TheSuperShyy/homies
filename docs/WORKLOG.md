@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: one reply per burst; the bot checks for a newer message again before sending (owner's chat; sandbox only)
+- **Seen:** the owner's second chat as Ido (screenshot): "i need to speak to a manager", "faster!!", "faster!!" brought two near-identical replies, and the second one introduced the bot again. **Asked:** *"is there a way to fix this"*.
+- **The executions:**
+  - 10:47:31 the first message; its run stayed silent, correctly (newer messages followed).
+  - 10:47:35 the first "faster!!"; checked at :39, it was the newest, so the AI started.
+  - 10:47:43 the second "faster!!" landed 8 s later, while that AI was writing, and its run answered too.
+  - Both replies were sent at 10:48:08.
+  - **Cause:** the live design checks for a newer message once, about 4 s in, and the AI then writes for 15-20 s. This is live behaviour, not a sandbox quirk.
+- **Fix (part D in `n8n_sandbox_section6.py`):** `Type for a moment` → "Anything newer before sending? (fetch)" → "Still the last word before sending?" (Code) → `Send`.
+  - The reply is dropped if a newer tenant message exists.
+  - A bare hello does not count; the test is cut from Sort's code at build time.
+  - Canned replies pass, and a failed fetch sends.
+  - The Code returns `Type for a moment`'s items unchanged, because `Send` reads `$json.output`.
+- **Checks:**
+  - offline wiring (`section 6 D ok`);
+  - the code run in Node: 8/8 cases (the owner's case dropped; the newest run, "hello?", "היי!!", a note, a failed check and the menu sent; "שלום, יש נזילה" counts as newer);
+  - pushed, round 9, and the free menu scenario passes through the new path.
+- **Driver:** a new `burst_manager` scenario sends the owner's three lines 4 s and 8 s apart without waiting. Exactly one reply may come.
+- **Production:** unchanged, plus the note of Ido's real call.
+- **Open:** running `burst_manager` (about $0.20) on the owner's go, or the owner's own chat. **For live:** "Log reply" must move behind the check.
+
 ### Feature 19: the bot handles the matter itself; a manager request leaves the team a note (owner's chat; sandbox only)
 - **Seen:** the owner's own chat on the sandbox page (screenshot): hey → the menu; פתיחת קריאת שירות → "מה קרה?"; "i want to speak with to a manager" → "before it goes to a manager I need to know what it's about"; "no i need a manager right nw" → the same, said another way; **"its about the committee fee" → "הבנתי אותך. עדכנתי עכשיו את צוות הניהול שאתה מבקש לדבר עם מנהל על העניין של ועד הבית. יש עוד משהו…"**.
 - **Asked:** *"look it did not resolve by itself we should handle everything in our own we dont rely on anyone but we do keep a note for the team if ever there is such a conflict like this"*.

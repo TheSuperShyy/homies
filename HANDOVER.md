@@ -596,6 +596,12 @@ its stated time.
       - "manager … manager now … it's about the committee fee" ended in "I updated the management team, anything else?".
       - Fixed in the sandbox (section 6 C): the fee is the bot's, a manager request leaves a note while the bot carries on, and the reply no longer ends on "the team knows". Memory round 8.
       - **Checking it with the AI** is the `manager_fee` scenario (the owner's three lines, about $0.30), on the owner's go, or the owner's own chat.
+    - **27 Oct, from the owner's second chat: double replies to a burst. Fixed in the sandbox** (section 6 D).
+      - "manager" … "faster!!" (4 s) … "faster!!" (8 s) got two near-identical answers, because the last message landed while the AI was writing.
+      - The bot now checks again right before Send and drops its reply if the tenant wrote since; a bare hello does not count.
+      - Code checked offline in 8/8 cases; the menu still goes out ($0). Memory round 9.
+      - **Checking it with the AI** is `burst_manager` (the owner's three lines at their pace, about $0.20), on the owner's go, or the owner's own chat.
+      - **This is live behaviour too:** promote it with "Log reply" moved behind the check.
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

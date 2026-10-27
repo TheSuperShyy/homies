@@ -36,6 +36,9 @@ The user is the builder. The client is Homies.
   - The committee fee (balance, paying, the link, what it covers) is the bot's.
   - A manager request: find out what it is, handle it, and leave the team a note because a manager was asked for, while the same message carries on.
   - It is in the sandbox (section 6 C) and goes live with section 6.
+- **One reply per burst: the bot checks for a newer message again right before sending** (27 Oct, from the owner's sandbox chat; sandbox now, live on go).
+  - Exceptions: a bare hello does not count, and a failed check sends.
+  - **When it goes live,** "Log reply" must move behind the check too, or a dropped draft is logged as said.
 - **The sandbox personas are real people.** Ido's and Yariv's real calls to the live line show up in the fingerprint as a NOTE, not a change: the sandbox can only ever leave WhatsApp-channel rows, so only those count.
 - **A recognised tenant's ticket names the place; it does not ask to confirm it** (the owner, 27 Oct, for section 6). The reply says "פתחתי קריאה על … ב<בניין>, דירה <n>". It is in the sandbox's WHO_RULE and goes live with the rest of section 6.
 - **To ask "does live do this?" in the sandbox,** push the faithful copy (`n8n_sandbox.py --apply --fresh-memory`, without `--section6`) and run the `leak_*` scenarios, then push `--section6` back. 27 Oct: that showed the reasoning leak was a rare slip, not live behaviour. Every scenario fails a reply carrying the AI's reasoning (`LEAK`).

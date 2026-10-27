@@ -22,6 +22,12 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      finish" list (the people on the committee stay on it), and a manager request
      becomes: find out what it is, handle it, and leave the team a note because a
      manager was asked for, while the same message carries on with the matter.
+  D. one reply per burst (the owner's sandbox chat, 27 Oct, "is there a way to fix
+     this"): a second message sent while the AI was writing got its own answer,
+     and two near-identical replies went out half a second apart. The live bot
+     checks for a newer message only BEFORE the model (about 4 s after the
+     message); the copy checks again right before Send. This one is not
+     section 6: it is a live behaviour, fixed in the sandbox first.
 Every edit asserts that its anchor occurs exactly once, so a changed live prompt
 fails loudly instead of being half-edited.
 """
@@ -60,7 +66,7 @@ SOLVE_EDITS = [
      "הודעה אתה כבר ממשיך איתו בעניין עצמו. רק מה שבאמת מעבר לך נשאר אצל הצוות, ואז אתה אומר לו שהצוות יודע."),
     (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
 ]
-REP_TAP_START =" \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
+REP_TAP_START = " \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
 REP_TAP_END = "וממשיכים משם."
 WHO_AFTER = "אתה שירות הלקוחות של הומי'ז, כולו."
 TIME_ANCHOR = "+ ' [השעה בישראל עכשיו '"
@@ -84,6 +90,55 @@ ADD_WHO = (
     "      + rows.map(r => r.building + ' דירה ' + r.unit).join('; ') + '.]';\n"
     "}\n"
     "return base.map(b => ({ json: { ...b.json, who_text: who } }));")
+# D. One reply per burst. The hello test is cut out of Sort at build time, between these two
+# anchors, so the check and Sort cannot disagree about what a bare hello is.
+HELLO_FROM = "const bare = text.trim()"
+HELLO_TO = "const isGreeting = GREETING.test(bare) || HELLO_RUN.test(bare);"
+LAST_WORD_HEAD = (
+    "// One reply per burst (27 Oct, the owner's sandbox chat: a second \"faster!!\" sent while the AI\n"
+    "// was writing got its own answer, and two near-identical replies went out half a second apart).\n"
+    "// A tenant message newer than this run's has a run of its own, and that run answers everything\n"
+    "// since the last reply, so this reply goes out only if nothing newer is there. A bare hello is\n"
+    "// the exception: it gets the menu, not the backlog, so it does not stop this reply. A failed\n"
+    "// check sends, as before: a double reply is better than none. Canned replies are not raced.\n"
+    "const items = $('Type for a moment').all();\n"
+    "const S = $('Sort').first().json;\n"
+    "if (S._canned) return items;\n"
+    "const payload = $input.first().json.payload;\n"
+    "if (!Array.isArray(payload)) return items;\n"
+    "// Sort's own hello test, copied in by scripts/n8n_sandbox_section6.py:\n"
+    "const isHello = (text) => {\n")
+LAST_WORD_TAIL = (
+    "\n  return isGreeting;\n"
+    "};\n"
+    "const mine = Number(S.message_id);\n"
+    "const newer = payload.some(m => m.message_type === 0 && !m.private && Number(m.id) > mine\n"
+    "  && !isHello(m.content || ''));\n"
+    "return newer ? [] : items;")
+
+
+def last_word_before_send(out, by):
+    """Type for a moment -> fetch the conversation -> drop this reply if the tenant wrote again -> Send."""
+    js = by["Sort"]["parameters"]["jsCode"]
+    assert js.count(HELLO_FROM) == 1 and js.count(HELLO_TO) == 1, "Sort's hello test moved"
+    hello = js[js.index(HELLO_FROM): js.index(HELLO_TO) + len(HELLO_TO)]
+    code = LAST_WORD_HEAD + "\n".join("  " + line for line in hello.split("\n")) + LAST_WORD_TAIL
+    conns = out["connections"]
+    assert conns["Type for a moment"]["main"] == [[{"node": "Send", "type": "main", "index": 0}]]
+    src, send = by["Anything newer? (fetch)"], by["Send"]
+    fetch_at = free_spot(out["nodes"], send["position"][0], send["position"][1] - 240)
+    fetch = {"id": str(uuid.uuid4()), "name": "Anything newer before sending? (fetch)", "type": src["type"],
+             "typeVersion": src["typeVersion"], "position": fetch_at, "alwaysOutputData": True,
+             "onError": "continueRegularOutput", "parameters": copy.deepcopy(src["parameters"]),
+             "credentials": copy.deepcopy(src["credentials"])}
+    out["nodes"].append(fetch)
+    check = {"id": str(uuid.uuid4()), "name": "Still the last word before sending?", "type": "n8n-nodes-base.code",
+             "typeVersion": 2, "position": free_spot(out["nodes"], fetch_at[0] + 240, fetch_at[1]),
+             "parameters": {"jsCode": code}}
+    out["nodes"].append(check)
+    conns["Type for a moment"] = {"main": [[{"node": fetch["name"], "type": "main", "index": 0}]]}
+    conns[fetch["name"]] = {"main": [[{"node": check["name"], "type": "main", "index": 0}]]}
+    conns[check["name"]] = {"main": [[{"node": "Send", "type": "main", "index": 0}]]}
 
 
 def section6(bot, supabase_cred):
@@ -127,4 +182,5 @@ def section6(bot, supabase_cred):
     out["connections"]["Still the last word?"] = {"main": [[{"node": "Who is writing?", "type": "main", "index": 0}]]}
     out["connections"]["Who is writing?"] = {"main": [[{"node": "Add who", "type": "main", "index": 0}]]}
     out["connections"]["Add who"] = after
+    last_word_before_send(out, by)
     return out

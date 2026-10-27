@@ -60,6 +60,11 @@ A check script snapshots the live system before the build and compares it after 
 - **No match:** it asks as it does today.
 - **The balance does not change:** it still needs a typed name and phone (open decision 2).
 
+**D. One reply per burst** (the owner's sandbox chat, 27 Oct; a live behaviour, fixed here first).
+- The bot waits about 4 s for the tenant to finish, then the AI writes for 15-20 s. A message sent in that gap had its own run, and both runs answered: two near-identical replies, half a second apart.
+- Right before Send, the copy now reads the conversation again and drops its reply if the tenant has written since. The newer message's run answers everything since the last reply.
+- **Exceptions:** a bare hello (it gets the menu, not the backlog) does not stop a reply, and a failed check sends, as before.
+
 **C. Chatwoot in Hebrew,** in the sandbox account only:
 - account locale `he`;
 - the account named "הומי'ז — סביבת ניסוי";

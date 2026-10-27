@@ -46,7 +46,11 @@ SCENARIOS = {
     "leak_asaf":    ("אסף", ["יש נזילה בחדר המדרגות, בר כוכבא 23 דירה 2"], [REF], [], set(), set()),
     "leak_yariv":   ("יריב", ["האור בלובי לא עובד כבר יומיים. בר כוכבא 23, דירה 3"], [REF], [], set(), set()),
     "leak_unknown": ("לא מוכר", ["הדלת של הכניסה לבניין לא נסגרת. בר כוכבא 23, דירה 5"], [REF], [], set(), set()),
+    # The owner's second chat, 27 Oct, at its own pace: the lines go out 4 s and 8 s apart without
+    # waiting for the bot, so the last one lands while the AI is writing. Exactly one reply may come.
+    "burst_manager": ("עידו", ["i need to speak to a manager", "faster!!", "faster!!"], [r"\?"], [], set(), set()),
 }
+BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
 
 
 def persona(label):
@@ -76,6 +80,27 @@ def turn(key, conv, text, wait=120, settle=12):
             for m in thread(key, conv)[before + 1:] if m.get("message_type") == 1]
 
 
+def burst(key, conv, lines, gaps, wait=120, settle=20):
+    """Send the lines at the given gaps without waiting for the bot, then collect every reply."""
+    before = len(thread(key, conv))
+    for i, line in enumerate(lines):
+        if i:
+            time.sleep(gaps[i - 1])
+        cw("POST", "/contacts/%s/conversations/%s/messages" % (contact(key), conv), {"content": line})
+    deadline, count, quiet = time.time() + wait, before + len(lines), 0
+    while time.time() < deadline:
+        time.sleep(3)
+        now = len(thread(key, conv))
+        if now > count:
+            count, quiet = now, 0
+        elif count > before + len(lines):
+            quiet += 3
+            if quiet >= settle:
+                break
+    return [(m.get("content") or "", [i.get("title") for i in ((m.get("content_attributes") or {}).get("items") or [])])
+            for m in thread(key, conv)[before:] if m.get("message_type") == 1]
+
+
 def labels(conv, wait=20):
     """The labels the sandbox handover put on the conversation (admin API, sandbox account only)."""
     url = "%s/api/v1/accounts/%s/conversations/%s" % (E["CHATWOOT_URL"].rstrip("/"), E["SANDBOX_CW_ACCOUNT_ID"], conv)
@@ -102,8 +127,8 @@ def run(name, log):
     said = []
     log.append("## %s (as %s, conversation %s)\n" % (name, label, conv))
     print("== %s (as %s)" % (name, label))
-    for line in lines:
-        out = turn(key, conv, line)
+    for line in ([" / ".join(lines)] if name in BURST else lines):
+        out = burst(key, conv, lines, BURST[name]) if name in BURST else turn(key, conv, line)
         said += out
         print("  tenant:", line)
         log.append("- **tenant:** " + line)
@@ -117,6 +142,8 @@ def run(name, log):
         fails.append("the AI's reasoning is in the reply")
     if name == "menu_two" and not any(len(b) == 2 for _, b in said):
         fails.append("menu does not have exactly two buttons")
+    if name in BURST and len(said) != 1:
+        fails.append("%d replies to one burst" % len(said))
     if lab_must or lab_not:
         got = labels(conv)
         fails += ["label %s missing" % l for l in lab_must - got] + ["label %s present" % l for l in lab_not & got]

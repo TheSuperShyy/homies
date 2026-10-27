@@ -126,3 +126,13 @@ for old, new in SOLVE_EDITS:
 assert "ענייני ועד הבית" not in prompt, "the committee fee is still on the staff-only list"
 assert "המשפט שלך נגמר בזה שהצוות יודע" not in prompt, "the prompt still ends a manager request on 'the team knows'"
 print("check_n8n_sandbox: section 6 C ok")
+
+# --- D: one reply per burst, checked again right before Send (owner's chat, 27 Oct) ---
+by6 = {n["name"]: n for n in s6["nodes"]}
+assert s6["connections"]["Type for a moment"]["main"][0][0]["node"] == "Anything newer before sending? (fetch)"
+assert s6["connections"]["Anything newer before sending? (fetch)"]["main"][0][0]["node"] == "Still the last word before sending?"
+assert s6["connections"]["Still the last word before sending?"]["main"][0][0]["node"] == "Send"
+assert by6["Anything newer before sending? (fetch)"]["alwaysOutputData"] is True
+assert "const GREETING = new RegExp(" in by6["Still the last word before sending?"]["parameters"]["jsCode"]
+assert reach(s6) == [] and new_overlaps(s6, keep_bot) == []
+print("check_n8n_sandbox: section 6 D ok")

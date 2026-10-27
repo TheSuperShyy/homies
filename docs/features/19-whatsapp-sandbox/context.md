@@ -72,6 +72,26 @@ The owner's rule: handle everything ourselves, and keep a note for the team when
 
 The live safeguards still apply: `Team note this turn?` posts one note per turn, and an empty request is still never recorded.
 
+## Why the bot checks for a newer message twice (27 Oct)
+
+The owner wrote, as Ido: "i need to speak to a manager", then "faster!!" 4 s later, then "faster!!" 8 s after that. Two near-identical replies came back half a second apart, and the second one introduced the bot again.
+
+The executions show why:
+- the live design checks for a newer message once, after "Let them finish" (about 4 s);
+- the second "faster!!" came 8 s after the first, after that run's check but while its AI was still writing (15-20 s);
+- so both runs answered.
+
+**The fix:** a second check right before Send. The older run sees the newer message and drops its reply, and the newer run answers the whole backlog. It only ever drops a reply when a newer run exists to answer.
+
+**Its exceptions:**
+- **A bare hello:** it gets the canned menu, not the backlog, so dropping the real answer for it would lose the answer. The hello test is cut from Sort's own code when the copy is built, so the two cannot disagree.
+- **Canned replies:** they are not raced.
+- **A failed fetch:** it sends, as before; a double reply is better than none.
+
+**The leftover:** the dropped run's draft stays in the AI's memory. Removing it there would race with the newer run's own save (the existing "Forget the draft" deletes the last two entries, whichever run made them), so the draft is left alone.
+
+**For live:** "Log reply" runs beside Send there, so the check must sit before it as well, or a dropped draft is logged as said. The fetch must also read the live conversation.
+
 ## Why the memory key changes
 
 n8n keeps the "Conversation so far" buffer under a session key, `<phone>-84` on live. If n8n keyed buffers by session alone, a sandbox chat as Ido would land in Ido's live memory. The copy appends `-sbx`, so isolation does not depend on how n8n scopes its buffers.
