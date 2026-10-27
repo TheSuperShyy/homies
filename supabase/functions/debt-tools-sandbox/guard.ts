@@ -9,9 +9,11 @@
  *   - Supabase writes (POST, PATCH, PUT, DELETE) and every RPC are answered
  *     HERE with a fake success and never sent. An insert that asks for its row
  *     back gets the row it sent plus an id. A `requests` row gets a reference
- *     in the live shape, 999-9000NN-YY: the bot's reply guards only recognise
+ *     in the live shape, 999-9NNNNN-YY: the bot's reply guards only recognise
  *     \d{3}-\d{3,6}-\d{2}, and a serial from 900001 up can never match a real
  *     ticket (the highest real serial is about 29,000), so a lookup by it finds nothing.
+ *     The serial is random, not counted: a counter restarts with every cold
+ *     start, and the 27 Oct run gave two tickets the same number.
  *   - Every other host (OXS, Chatwoot, Meta, OpenRouter, Vapi, n8n) and every
  *     other Supabase path are refused with 503, which the live code already
  *     treats as "not available".
@@ -27,8 +29,6 @@ export function decide(method: string, url: string, supabaseUrl: string): Decisi
   if (u.pathname.startsWith("/rest/v1/") || u.pathname.startsWith("/storage/v1/")) return read ? "pass" : "fake";
   return "refuse";
 }
-
-let serial = 0;
 
 export function fakeWrite(
   method: string, url: string, body: string | null, accept: string, prefer: string,
@@ -47,7 +47,8 @@ export function fakeWrite(
   const rows = list.map((r) => {
     const row: Record<string, unknown> = { id: crypto.randomUUID(), created_at: now, ...r };
     if (table === "requests" && m === "POST") {
-      row.reference = `999-${900000 + ++serial}-${String(new Date().getUTCFullYear()).slice(-2)}`;
+      const serial = 900001 + Math.floor(Math.random() * 99999);
+      row.reference = `999-${serial}-${String(new Date().getUTCFullYear()).slice(-2)}`;
     }
     return row;
   });

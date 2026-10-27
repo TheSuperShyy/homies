@@ -583,7 +583,13 @@ its stated time.
     - the sandbox keys get 401 on account 2;
     - the probe's ticket left no row;
     - a hello on the chat page gets the menu with **two** buttons.
-  - **27 Oct:** the owner gave the go for the paid acceptance run (`python scripts/sandbox_drive.py --run all`, under $1 on the shared OpenRouter key). It was started after the two fixes logged in WORKLOG 27 Oct; the results are in WORKLOG.
+  - **27 Oct, acceptance run 1 ($0.52): 4/6 by the checks** (WORKLOG 27 Oct has the reading).
+    - **Section 6 behaves:** two buttons; Ido's ticket opened without asking where he lives; strangers are asked.
+    - **DEFECT OPEN: the AI wrote its own reasoning into three replies to Ido** ("מלא מחשבות / ..."). It started on the reply right after a tool call and spread through his memory.
+      - It has never happened live (0 in the latest 1,000 replies), but the live bot has not run the AI since 25 Oct, so a model-side change is not ruled out.
+      - Live reaches only the test number's 5 recipients today. **Before Ido or Yariv test the live bot, run the faithful-copy check** (WORKLOG 27 Oct "Open").
+    - **Also open:** the AI notified the team on an empty "I want a representative" (contaminated state; re-test clean). The gas closing line is cold.
+    - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3); memory round 2 (`SANDBOX_MEMORY_ROUND`), so every persona is clean now.
   - **Waiting on the owner:**
     - the owner's own chats;
     - promoting each change to live is a separate go.

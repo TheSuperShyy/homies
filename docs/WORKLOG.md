@@ -19,7 +19,33 @@ conversation that produced it.
   - **Effect:** `.env` briefly pointed at account 4 while the n8n copies stayed on account 3. Production was untouched; the fingerprint compare passed.
   - **Fix:** account 4 deleted with its inbox, bot, teams and user links (rails). Its 9 orphaned attribute rows were removed by `delete_all`, scoped to the deleted id. `.env` was restored to account 3 (inbox 3, bot 2, teams 5-8; the tokens went from rails straight into `.env`). The script now finds the account by `SANDBOX_CW_ACCOUNT_ID` first, then by either name, and refuses account 2.
   - **Proven:** a re-run printed account 3, inbox 3, bot 2, teams 5-8, and made nothing new. The free hello scenario passed on account 3.
-- **Acceptance run started** (`sandbox_drive.py --run all`); results are logged below when it finishes. The chat page was restarted (the session restart had stopped it).
+- **Acceptance run started** (`sandbox_drive.py --run all`); results below. The chat page was restarted (the session restart had stopped it).
+
+### Feature 19: acceptance run 1, 4/6 by the checks, $0.52 (07:23-07:29 UTC; production unchanged after)
+Transcript: `local/sandbox/runs/2026-10-27-0729.md`. Reading it matters more than the score:
+- **Worked (Yariv's section 6):**
+  - the menu has two buttons;
+  - an unknown number is asked for building and flat;
+  - **Ido's lift ticket opened with no question about building or flat** (recognised from `residents`). It did not even give the one confirmation the rule asks for, which is why the check failed;
+  - the balance still asks for a full name and phone;
+  - the gas emergency paged the sandbox operations team (`handover`, `handover-operations`).
+- **DEFECT OPENED: the AI wrote its reasoning into three replies**, all as Ido ("מלא מחשבות / המשתמש ... / אני צריך: 1. ..." and then the answer).
+  - **Where it starts:** the reply right after a tool call (`open_request` in `ido_lift`). That call used 369 completion tokens, where clean answers used 1,700.
+  - **Why it spread:** the leaked text went into Ido's memory, and every later Ido reply copied it, even with no tool call.
+  - **Not seen elsewhere:** Yariv's gas reply after two tool calls was clean, and so was the unknown number's.
+  - **Never seen live:** 0 hits in the 1,000 latest live replies (`messages`, all-time search for the telltales). But the live bot has not run the AI since 25 Oct 15:51 UTC, so a change on the model's side (Gemini 3.1 Pro preview, through OpenRouter) cannot be ruled out without a test.
+  - **Exposure:** the live WhatsApp bot reaches only the test number's 5 recipients today (Ido, Yariv, Assaf among them), not tenants.
+- **Other findings:**
+  - **A typed "אני רוצה לדבר עם נציג"** got the right answer ("before it goes to someone we need to know what it's about"), but the AI also called `notify_team` on the empty request; its own leaked note says so. This was in the contaminated state, so it needs a clean re-test.
+  - **Balance:** it called `get_balance` with invented details before asking (contaminated state too).
+  - **The gas closing line is cold** ("זה הדבר היחיד שאני יכול לעשות מכאן כרגע"); this was already open from the voice side. One call spent its whole token limit thinking (8,830 tokens, `finish=length`) before the tool call.
+- **Fixed, sandbox only, free:**
+  - fake ticket numbers repeated after a cold start (Ido's lift and Yariv's gas were both 999-900001-26). The serial is random now; 200 tries gave 200 distinct numbers. `debt-tools-sandbox` v3, probe ok;
+  - `n8n_sandbox.py --fresh-memory` bumps `SANDBOX_MEMORY_ROUND` (now 2, key `…-84-sbx2`), so every persona starts clean. Live does the same with its epoch.
+- **Open (owner's call, each a small spend):**
+  - a check that refuses a reply carrying the AI's reasoning, tried in the sandbox first;
+  - the faithful copy (no section 6, the same as live) run on a ticket-opening chat a few times, to see whether live leaks today;
+  - a clean re-run of Ido's scenarios.
 
 ## 2026-10-26
 

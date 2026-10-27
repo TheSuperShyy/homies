@@ -3,6 +3,7 @@
     python scripts/n8n_sandbox.py                       # transform and print what would be created
     python scripts/n8n_sandbox.py --apply               # credentials, then the three workflows, then activate
     python scripts/n8n_sandbox.py --apply --section6    # the same, with Yariv's section 6 in the bot copy
+    ... --apply --section6 --fresh-memory               # and a new memory round: every persona starts clean
 
 The live workflows are only ever read (GET). Every write targets an id this
 script created; write() refuses any id in LIVE_IDS. Re-running PUTs the same
@@ -17,7 +18,10 @@ What changes in a copy, and why:
   of it keeps that behaviour, pointed at the sandbox function.
 - Webhooks: own paths and webhookIds; Sort's shared secret is the sandbox's.
 - Memory: the session key gets "-sbx", so no sandbox turn can enter a live
-  conversation's memory even if n8n keyed its buffers by session alone.
+  conversation's memory even if n8n keyed its buffers by session alone. Then
+  SANDBOX_MEMORY_ROUND, bumped by --fresh-memory: a persona's memory is its
+  phone's, so one bad reply is carried into every later test as that persona
+  (27 Oct, Ido) until the round changes. Live does the same with its -84 epoch.
 - Meta and the chat log: Show typing, Show typing again, Log inbound and Log
   reply become NoOps (a NoOp passes its input on, so the flow is unchanged).
   `Anything newer?` read the live `messages` table; the sandbox reads its own
@@ -206,7 +210,7 @@ def sandboxify_bot(wf, cfg):
                                                      'const SHARED = "%s"' % cfg["sandbox_secret"])
     memories = [n for n in out["nodes"] if n["type"] == "@n8n/n8n-nodes-langchain.memoryBufferWindow"]
     assert len(memories) == 1, "expected one memory node"
-    memories[0]["parameters"]["sessionKey"] += "-sbx"
+    memories[0]["parameters"]["sessionKey"] += "-sbx" + str(cfg.get("memory_round") or "")
     webhook(out, "homies-whatsapp-sandbox")
     for name in ("Show typing", "Show typing again", "Log inbound", "Log reply"):
         noop(out, name)
@@ -243,8 +247,12 @@ def config(apply):
     e = env()
     cfg = {"account_id": int(e["SANDBOX_CW_ACCOUNT_ID"]), "chatwoot_url": e["CHATWOOT_URL"].rstrip("/"),
            "supabase_url": e["SUPABASE_URL"].rstrip("/"), "sandbox_secret": e["SANDBOX_WEBHOOK_SECRET"],
-           "teams": json.loads(e["SANDBOX_CW_TEAMS"]), "handover_id": e.get("SANDBOX_N8N_HANDOVER_ID", "") or "PENDING"}
+           "teams": json.loads(e["SANDBOX_CW_TEAMS"]), "handover_id": e.get("SANDBOX_N8N_HANDOVER_ID", "") or "PENDING",
+           "memory_round": e.get("SANDBOX_MEMORY_ROUND", "")}
     assert cfg["account_id"] != 2, "the sandbox account must not be account 2"
+    if apply and "--fresh-memory" in sys.argv:
+        cfg["memory_round"] = str(int(cfg["memory_round"] or 1) + 1)
+        set_env("SANDBOX_MEMORY_ROUND", cfg["memory_round"])
     if apply:
         cfg["cred_admin"] = credential("SANDBOX_N8N_CRED_ADMIN", "SANDBOX Chatwoot admin", e["SANDBOX_CW_ADMIN_TOKEN"])
         cfg["cred_bot"] = credential("SANDBOX_N8N_CRED_BOT", "SANDBOX Chatwoot bot", e["SANDBOX_CW_BOT_TOKEN"])

@@ -101,7 +101,8 @@ A check script snapshots the live system before the build and compares it after 
 | Chatwoot account | 3, "הומי'ז — סביבת ניסוי", locale `he`; the owner is an administrator | `scripts/chatwoot_sandbox.py` |
 | Chatwoot inbox, bot, teams | API inbox 3 "צ'אט ניסוי"; agent bot 2 "מיכאל — ניסוי"; teams 5 גבייה, 6 תפעול ותקלות, 7 הנהלה, 8 שירות לדיירים | same |
 | n8n | router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n` (section 6 in); credentials "SANDBOX Chatwoot admin" and "SANDBOX Chatwoot bot" | `scripts/n8n_sandbox.py --apply --section6` |
-| Function | `debt-tools-sandbox` v2 | `scripts/sandbox_function.py --apply` |
+| Function | `debt-tools-sandbox` v3 (random fake serials since 27 Oct) | `scripts/sandbox_function.py --apply` |
+| Memory round | `SANDBOX_MEMORY_ROUND` 2 (key `<phone>-84-sbx2`) | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
 | Snapshot | `local/sandbox/before.json`, taken before the build | `scripts/sandbox_fingerprint.py` |
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
@@ -109,6 +110,9 @@ Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PER
 - **To chat:** `python scripts/sandbox_chat.py`, then open http://127.0.0.1:8765.
 - **To regenerate after a live change:** `python scripts/n8n_sandbox.py --apply --section6` and `python scripts/sandbox_function.py --apply`. They re-read live and PUT the same sandbox ids. The copies are never edited by hand.
 - **To check production:** `python scripts/sandbox_fingerprint.py --compare local/sandbox/before.json`.
+- **Acceptance run 1 (27 Oct, $0.52): 4/6 by the checks.**
+  - Section 6 behaved: two buttons; Ido was not asked where he lives; a stranger was.
+  - The AI wrote its reasoning into three replies to Ido. That defect is open, with the details in WORKLOG 27 Oct.
 
 **Where the sandbox knowingly differs from live:**
 - **Chat log.** It is the Chatwoot conversation. A two-part reply is two rows there, and the quick "word first" line counts as a bot message; live writes one `messages` row per reply.
