@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: acceptance run 2, the leak check and a clean re-run of Ido ($0.40; production unchanged after)
+- **Asked:** *"yes"* to both priced steps (about $0.80 quoted). The driver now fails any reply carrying the AI's reasoning (`LEAK` in `sandbox_drive.py`). It was checked against run 1: it catches all four leaks and passes all four clean replies.
+- **Step 1, the faithful copy** (the bot pushed WITHOUT `--section6`, which is the live bot's behaviour, memory round 3): three tenants (אסף, Yariv, the unknown number) each reported a fault with the building and flat in one message. **3/3 tickets opened, and all three replies right after the tool call were clean.** $0.16. Transcript `local/sandbox/runs/2026-10-27-1011.md`.
+- **Step 2, section 6 back, with Ido's memory wiped before each scenario** (rounds 4, 5, 6):
+  - `ido_lift`: a clean reply. The ticket was opened at once, with no question about building or flat. **But the bot neither confirms nor names the place** ("פתחתי עכשיו קריאה … 999-944525-26"), so Ido never hears where it was filed; this is the second time it skipped the confirmation WHO_RULE asks for. **Decision for the owner:** keep the confirmation question, or have the reply name the place ("…על המעלית בבר כוכבא 23"), which costs no extra turn and can be corrected.
+  - `rep_typed`: PASS. "Before it goes to someone in the team we need to know roughly what it's about…", and the team was **not** alerted (no labels). Run 1's team alert was the contaminated memory.
+  - `balance`: PASS. "אין בעיה. מה השם המלא ומספר הטלפון שלך?"
+- **The leak, re-read:** 0 in 7 clean replies after a tool call (3 faithful, 4 with section 6), and 0 in the latest 1,000 live replies. Run 1's leak was a rare slip that then spread through one tenant's memory. **The risk to live is low but real:** one slip would repeat for that tenant until the memory epoch changes. A guard in `Reply usable?` that refuses a reply carrying the telltales and retries would close it; that is a live change, on the owner's go.
+- **Spend:** both rounds $0.92 ($0.52 + $0.40). The key cap has $8.25 left.
+- **Sandbox state:** the bot is on section 6 again, memory round 6, and every persona is clean.
+
 ### Feature 19: two sandbox defects found and fixed before the acceptance run (production unchanged)
 - **Asked:** *"ok lets continue with the sandbox testing without any whatsapp righ"*. Read as the go for the priced acceptance run (under $1); the sandbox has no WhatsApp at all.
 - **Found: auto-assignment was ON in the sandbox.** Live inbox 1 and live teams 1-4 have it off on purpose (Sort's comment: a person assigned silences the bot). Chatwoot's default is on, and the sandbox was created with it. The first time the owner opened the sandbox in Chatwoot, each new chat would have gone to them and the bot would have gone quiet. Now off on inbox 3 and teams 5-8, and `chatwoot_sandbox.py` sets it on every run.

@@ -18,6 +18,9 @@ from sandbox_chat import E, PERSONAS, contact, cw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REF = r"\b999-9\d{5}-\d{2}\b"  # the sandbox's fake ticket numbers (guard.ts)
+# The AI's own reasoning sent as the reply (27 Oct, three replies to Ido): it talks about "the user",
+# "the instructions", or plans "I need: 1." A reply with any of these fails, whatever the scenario.
+LEAK = r"מלא מחשבות|המשתמש (?:שואל|שאל|ענה|מבקש|ביקש|כתב)|לפי ההנחיות|בהוראות|אני צריך:"
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -31,6 +34,11 @@ SCENARIOS = {
     "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], set(), {"handover"}),
     "balance":   ("עידו", ["כמה אני חייב?"], [r"שם|טלפון"], [r"\d{3,} ?₪|\d{3,} שקל"], set(), set()),
     "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [], {"handover"}, set()),
+    # Not in "all": a ticket opened in one turn, so the reply right after the tool call is the
+    # one checked. Run on the faithful copy (no --section6) they say whether live leaks too.
+    "leak_asaf":    ("אסף", ["יש נזילה בחדר המדרגות, בר כוכבא 23 דירה 2"], [REF], [], set(), set()),
+    "leak_yariv":   ("יריב", ["האור בלובי לא עובד כבר יומיים. בר כוכבא 23, דירה 3"], [REF], [], set(), set()),
+    "leak_unknown": ("לא מוכר", ["הדלת של הכניסה לבניין לא נסגרת. בר כוכבא 23, דירה 5"], [REF], [], set(), set()),
 }
 
 
@@ -98,6 +106,8 @@ def run(name, log):
             log.append("- **bot:** " + shown)
     text = "\n".join(c for c, _ in said)
     fails = [r for r in must if not re.search(r, text)] + ["NOT " + r for r in mustnt if re.search(r, text)]
+    if re.search(LEAK, text):
+        fails.append("the AI's reasoning is in the reply")
     if name == "menu_two" and not any(len(b) == 2 for _, b in said):
         fails.append("menu does not have exactly two buttons")
     if lab_must or lab_not:
@@ -116,7 +126,7 @@ if __name__ == "__main__":
             print(k, "as", v[0], "|", " / ".join(v[1]))
         sys.exit(0)
     arg = sys.argv[sys.argv.index("--run") + 1]
-    names = list(SCENARIOS) if arg == "all" else arg.split(",")
+    names = [n for n in SCENARIOS if not n.startswith("leak_")] if arg == "all" else arg.split(",")
     start = spend()
     log = ["# Sandbox acceptance run, %s UTC\n" % datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")]
     ok = sum(run(n, log) for n in names)

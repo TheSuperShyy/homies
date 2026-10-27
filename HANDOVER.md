@@ -585,11 +585,15 @@ its stated time.
     - a hello on the chat page gets the menu with **two** buttons.
   - **27 Oct, acceptance run 1 ($0.52): 4/6 by the checks** (WORKLOG 27 Oct has the reading).
     - **Section 6 behaves:** two buttons; Ido's ticket opened without asking where he lives; strangers are asked.
-    - **DEFECT OPEN: the AI wrote its own reasoning into three replies to Ido** ("מלא מחשבות / ..."). It started on the reply right after a tool call and spread through his memory.
-      - It has never happened live (0 in the latest 1,000 replies), but the live bot has not run the AI since 25 Oct, so a model-side change is not ruled out.
-      - Live reaches only the test number's 5 recipients today. **Before Ido or Yariv test the live bot, run the faithful-copy check** (WORKLOG 27 Oct "Open").
-    - **Also open:** the AI notified the team on an empty "I want a representative" (contaminated state; re-test clean). The gas closing line is cold.
-    - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3); memory round 2 (`SANDBOX_MEMORY_ROUND`), so every persona is clean now.
+    - **DEFECT, now judged a rare slip: the AI wrote its own reasoning into three replies to Ido** ("מלא מחשבות / ..."). It started on the reply right after a tool call and spread through his memory.
+      - Run 2 did not reproduce it: 0 in 7 clean replies after a tool call, 3 of them on the faithful copy, which behaves like live. There were 0 in the latest 1,000 live replies.
+      - Still, one slip would repeat for that tenant until the memory epoch changes. **The fix proposed to the owner:** a telltale check in `Reply usable?` that refuses such a reply and retries. It is a live change, so it waits on the owner's go.
+    - **Run 2 (27 Oct, $0.40):**
+      - "I want a representative" asks what it's about and does not alert the team (run 1's alert came from the contaminated memory);
+      - the balance asks for name and phone;
+      - **Ido's ticket opens without the place ever being confirmed or named.** The owner decides: keep the confirmation question, or name the place in the reply.
+    - **Also open:** the gas closing line is cold.
+    - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.
   - **Waiting on the owner:**
     - the owner's own chats;
     - promoting each change to live is a separate go.

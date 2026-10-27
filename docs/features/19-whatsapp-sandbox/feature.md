@@ -102,7 +102,7 @@ A check script snapshots the live system before the build and compares it after 
 | Chatwoot inbox, bot, teams | API inbox 3 "צ'אט ניסוי"; agent bot 2 "מיכאל — ניסוי"; teams 5 גבייה, 6 תפעול ותקלות, 7 הנהלה, 8 שירות לדיירים | same |
 | n8n | router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n` (section 6 in); credentials "SANDBOX Chatwoot admin" and "SANDBOX Chatwoot bot" | `scripts/n8n_sandbox.py --apply --section6` |
 | Function | `debt-tools-sandbox` v3 (random fake serials since 27 Oct) | `scripts/sandbox_function.py --apply` |
-| Memory round | `SANDBOX_MEMORY_ROUND` 2 (key `<phone>-84-sbx2`) | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
+| Memory round | `SANDBOX_MEMORY_ROUND` 6 (key `<phone>-84-sbx6`) | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
 | Snapshot | `local/sandbox/before.json`, taken before the build | `scripts/sandbox_fingerprint.py` |
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
@@ -113,6 +113,10 @@ Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PER
 - **Acceptance run 1 (27 Oct, $0.52): 4/6 by the checks.**
   - Section 6 behaved: two buttons; Ido was not asked where he lives; a stranger was.
   - The AI wrote its reasoning into three replies to Ido. That defect is open, with the details in WORKLOG 27 Oct.
+- **Acceptance run 2 (27 Oct, $0.40):**
+  - The faithful copy opened 3/3 tickets with clean replies, so the leak is a rare slip, not live behaviour.
+  - With clean memory, Ido's "I want a representative" and his balance pass.
+  - His lift ticket opens without the place being confirmed or named. That is the owner's call.
 
 **Where the sandbox knowingly differs from live:**
 - **Chat log.** It is the Chatwoot conversation. A two-part reply is two rows there, and the quick "word first" line counts as a bot message; live writes one `messages` row per reply.
