@@ -605,7 +605,9 @@ its stated time.
     - **27 Oct, the owner's chat at 12:03 UTC: "you can't help me" handed the matter to the team. Fixed in the sandbox** (section 6 C, memory round 10, 12:17 UTC).
       - After the note the bot said "meanwhile, maybe I can help". To "no you cant help me for this one" it said "the team knows and will handle it".
       - The way out, section C's own "only what is beyond you stays with the team", is gone. The bot keeps the matter, asks what is going on, and judges "beyond me" by the matter, not by the tenant's word.
+      - **Claude-played blind (no spend):** passes on the owner's lines. "Committee fee" gets the note in one sentence plus "מה קורה עם התשלום?". "You can't help me" gets "אולי דווקא כן", what it can do, and a question. "I just want a manager. period." gets no parrot. Not Gemini's own behaviour.
       - **Checking it with the AI** is `manager_doubt` (the owner's four lines, about $0.30), on the owner's go, or the owner's own chat.
+      - **The sandbox's memory round is 10** (`SANDBOX_MEMORY_ROUND` in `.env`). The "As built" table in `feature.md` says so too now; it had said 6.
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

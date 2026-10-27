@@ -36,6 +36,7 @@ The user is the builder. The client is Homies.
   - The committee fee (balance, paying, the link, what it covers) is the bot's.
   - A manager request: find out what it is, handle it, and leave the team a note because a manager was asked for, while the same message carries on.
   - It is in the sandbox (section 6 C) and goes live with section 6.
+  - **"You can't help me" is never a way out** (the owner, 27 Oct, on the next chat: *"it should fix everything for himself"*). The bot says what it can do with the matter and asks what is going on. Only the matter, once known, decides what is beyond the bot, never the tenant's word about it. Don't write a sentence that sends a matter to the team on the tenant's say-so. Section C's "רק מה שבאמת מעבר לך נשאר אצל הצוות, ואז אתה אומר לו שהצוות יודע" was one, and it is gone.
 - **One reply per burst: the bot checks for a newer message again right before sending** (27 Oct, from the owner's sandbox chat; sandbox now, live on go).
   - Exceptions: a bare hello does not count, and a failed check sends.
   - **When it goes live,** "Log reply" must move behind the check too, or a dropped draft is logged as said.
