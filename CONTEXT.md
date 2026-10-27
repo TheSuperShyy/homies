@@ -32,6 +32,11 @@ The user is the builder. The client is Homies.
   - Its fake ticket numbers are `999-9000NN-YY`: the live reference shape, so the bot's guards accept them, with a serial no real ticket has.
 - A before/after fingerprint of the live system proves each round: `python scripts/sandbox_fingerprint.py --compare local/sandbox/before.json`.
 - **The sandbox copies are generated, never edited by hand.** After a live change, re-run `scripts/n8n_sandbox.py --apply --section6` and `scripts/sandbox_function.py --apply`.
+- **The bot handles the matter itself; the team gets a note, not the matter** (the owner, 27 Oct: *"we should handle everything in our own we dont rely on anyone but we do keep a note for the team if ever there is such a conflict like this"*).
+  - The committee fee (balance, paying, the link, what it covers) is the bot's.
+  - A manager request: find out what it is, handle it, and leave the team a note because a manager was asked for, while the same message carries on.
+  - It is in the sandbox (section 6 C) and goes live with section 6.
+- **The sandbox personas are real people.** Ido's and Yariv's real calls to the live line show up in the fingerprint as a NOTE, not a change: the sandbox can only ever leave WhatsApp-channel rows, so only those count.
 - **A recognised tenant's ticket names the place; it does not ask to confirm it** (the owner, 27 Oct, for section 6). The reply says "פתחתי קריאה על … ב<בניין>, דירה <n>". It is in the sandbox's WHO_RULE and goes live with the rest of section 6.
 - **To ask "does live do this?" in the sandbox,** push the faithful copy (`n8n_sandbox.py --apply --fresh-memory`, without `--section6`) and run the `leak_*` scenarios, then push `--section6` back. 27 Oct: that showed the reasoning leak was a rare slip, not live behaviour. Every scenario fails a reply carrying the AI's reasoning (`LEAK`).
 - **A sandbox persona's memory is its phone's, across conversations.** One bad reply is carried into every later test as that persona: 27 Oct, Ido's first leaked reply made all his later ones leak. Start each paid round with `n8n_sandbox.py --apply --section6 --fresh-memory`, and judge a persona's scenarios in order.

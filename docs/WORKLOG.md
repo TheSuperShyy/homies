@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-10-27
 
+### Feature 19: the bot handles the matter itself; a manager request leaves the team a note (owner's chat; sandbox only)
+- **Seen:** the owner's own chat on the sandbox page (screenshot): hey → the menu; פתיחת קריאת שירות → "מה קרה?"; "i want to speak with to a manager" → "before it goes to a manager I need to know what it's about"; "no i need a manager right nw" → the same, said another way; **"its about the committee fee" → "הבנתי אותך. עדכנתי עכשיו את צוות הניהול שאתה מבקש לדבר עם מנהל על העניין של ועד הבית. יש עוד משהו…"**.
+- **Asked:** *"look it did not resolve by itself we should handle everything in our own we dont rely on anyone but we do keep a note for the team if ever there is such a conflict like this"*.
+- **Cause, in the prompt:**
+  - "ענייני ועד הבית" was on the list of things only a person can finish;
+  - the manager rule ended on "המשפט שלך נגמר בזה שהצוות יודע".
+- **Done (`SOLVE_EDITS` in `n8n_sandbox_section6.py`, sandbox only):**
+  - the committee fee left the staff-only list; a matter with the committee's people stayed;
+  - the committee line in the facts list says the fee is the bot's (balance, how and when to pay, the link, what it covers);
+  - the manager rule: find out what it is, handle it yourself, leave the team a note because a manager was asked for and say so in one sentence, and carry on in the same message;
+  - the "ends on the team knows" sentence is gone.
+- **Checks:** offline (`section 6 C ok`). The driver has a new `manager_fee` scenario, which is the owner's three lines word for word: it must talk about the balance, paying or the charge, and label `handover`. Pushed with `--section6 --fresh-memory` (round 8).
+- **The production check flagged a new `interactions` row for Ido:** a real call to the live line, 10:32 UTC, 15 s, caller hung up (Vapi `01a17ceb…`). It was not the sandbox, which has no phone path. `sandbox_fingerprint.py` now counts only WhatsApp-channel rows as a change (the only kind the sandbox could leave) and prints a persona's calls as a note. The re-run said "live system unchanged" plus that note.
+- **Open:** running `manager_fee` (about $0.30) on the owner's go, or the owner's own chat.
+
 ### Omni sent the dialer API token; the one-lead test is ready, nothing sent
 - **Said:** *"we receive email from omni telecom"*, with the email pasted. It is kept, minus the token, in `local/omnitelecom/2026-10-27-token-list2.txt`.
 - **The email says:**

@@ -49,6 +49,10 @@ A check script snapshots the live system before the build and compares it after 
 - When someone types a request for a person, the bot tries to solve it.
 - If it cannot, `notify_team` records the matter: in the sandbox, a private note in the sandbox conversation.
 - Only an emergency is handed to the team at once.
+- **The bot handles the matter itself (the owner, 27 Oct):** *"we should handle everything in our own we dont rely on anyone but we do keep a note for the team if ever there is such a conflict like this"*.
+  - A tenant who insists on a manager is asked what it is about. Then the bot works the matter itself.
+  - Because a manager was asked for, it also leaves the team a note and says so in one sentence, and the same message carries on with the matter. It does not end on "the team knows".
+  - The committee **fee** (balance, paying, the link, what it covers) is the bot's. Only a matter with the committee's people stays on the staff-only list.
 
 **B. Recognising the sender** (section 6: do not ask again for what the company's data knows reliably). Before the model runs, the sandbox workflow reads `residents` by the sender's number ("Who is writing?", a GET) and "Add who" turns the rows into a bracket fact. Then:
 - **One match:** the model input carries `[הפונה מזוהה במערכת: <שם>, <בניין>, דירה <n>]`. The bot does not ask for the name, building or flat. When it opens a ticket it does not ask to confirm the place either: the same message says where the ticket was filed ("פתחתי קריאה על המעלית ב<בניין>, דירה <n>"), so the tenant can correct it (the owner, 27 Oct; the confirmation question it replaced was skipped by the model twice). The ticket tool's own "ask for the flat every time" gets one sentence for this case, so the rule and the tool do not compete.

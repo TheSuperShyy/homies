@@ -10,8 +10,12 @@ What is snapshotted is what the sandbox must never change:
   never push or delete one; scripts/supabase_functions.py would);
 - Chatwoot account 2: name, locale, inboxes, agent bots, labels, teams and attribute definitions;
 - rows written since the snapshot for the sandbox personas' phones, in `requests`, `messages` and
-  `interactions`. The sandbox must add none. A persona using live WhatsApp in the window also shows
-  up here, so testers stay off the live number during a round.
+  `interactions`, on the WhatsApp channel: the sandbox's tool calls carry `wa:` call ids, so a row
+  it leaked could only be a WhatsApp one. The sandbox must add none. A persona using live WhatsApp
+  in the window also shows up here, so testers stay off the live number during a round.
+- the same personas' phone-line calls since the snapshot, printed as a NOTE and never as a change.
+  The personas are real people (Ido, Yariv, the owner), and their real calls are not the sandbox:
+  on 27 Oct Ido's 15-second call to the 208 line was flagged as a change before this split.
 
 --compare prints every difference and exits 1 if there is one.
 """
@@ -108,12 +112,18 @@ def snapshot(since_iso):
     snap["persona_rows_since"] = {
         label: {
             "requests": count(base, key, "requests", [("reported_by_phone", "in." + phone_forms(phone)),
-                                                      ("created_at", "gte." + since_iso)]),
+                                                      ("created_at", "gte." + since_iso),
+                                                      ("opened_via", "eq.whatsapp")]),
             "messages": count(base, key, "messages", [("phone", "in." + phone_forms(phone)),
                                                       ("created_at", "gte." + since_iso)]),
             "interactions": count(base, key, "interactions", [("caller_phone", "in." + phone_forms(phone)),
-                                                              ("started_at", "gte." + since_iso)]),
+                                                              ("started_at", "gte." + since_iso),
+                                                              ("channel", "eq.whatsapp")]),
         } for label, phone in personas(e)}
+    snap["persona_calls_since"] = {
+        label: count(base, key, "interactions", [("caller_phone", "in." + phone_forms(phone)),
+                                                 ("started_at", "gte." + since_iso), ("channel", "neq.whatsapp")])
+        for label, phone in personas(e)}
     return snap
 
 
@@ -141,8 +151,13 @@ def main():
                  len(snap["persona_rows_since"])))
     elif "--compare" in sys.argv:
         before = json.load(open(sys.argv[sys.argv.index("--compare") + 1], encoding="utf-8"))
-        diffs = compare(before, snapshot(before["since"]))
+        after = snapshot(before["since"])
+        diffs = compare(before, after)
         print("live system unchanged" if not diffs else "\n".join(["CHANGED:"] + diffs))
+        for label, n in after.get("persona_calls_since", {}).items():
+            if n:
+                print("note: %s made %d call(s) on the live phone line since %s (real use, not the sandbox)"
+                      % (label, n, before["since"][:16]))
         sys.exit(1 if diffs else 0)
     else:
         sys.exit(__doc__)

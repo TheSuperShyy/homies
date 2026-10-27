@@ -35,6 +35,11 @@ SCENARIOS = {
                   [r"באיזה בניין|באיזו כתובת|באיזו דירה|מה מספר הדירה|רק לוודא"], set(), set()),
     "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], set(), {"handover"}),
     "balance":   ("עידו", ["כמה אני חייב?"], [r"שם|טלפון"], [r"\d{3,} ?₪|\d{3,} שקל"], set(), set()),
+    # The owner's own sandbox chat, 27 Oct, word for word: the bot must take the committee fee on
+    # itself (balance, paying, a charge) and leave the team a note because a manager was asked for.
+    "manager_fee": ("עידו", ["i want to speak with to a manager", "no i need a manager right nw",
+                             "its about the committee fee"],
+                    [r"יתרה|לשלם|תשלום|קישור|חיוב"], [], {"handover"}, set()),
     "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [], {"handover"}, set()),
     # Not in "all": a ticket opened in one turn, so the reply right after the tool call is the
     # one checked. Run on the faithful copy (no --section6) they say whether live leaks too.

@@ -56,6 +56,22 @@ The live code accepted the number as real: it added the spoken form.
 
 The first design had the bot ask once, "רק לוודא, אתה מ<בניין>, דירה <n>?", before opening a ticket for a recognised sender. In both acceptance runs the model skipped that question and opened the ticket directly, and the reply never said where the ticket was filed. Yariv's section 6 asks not to re-ask what is reliably known, so the owner chose (27 Oct) to drop the question and have the reply name the building and flat instead. That costs no extra turn, and a tenant writing from a family phone can still correct it.
 
+## Why the bot keeps the matter and the team only gets a note (27 Oct)
+
+On the sandbox chat page the owner wrote, as a tenant: "i want to speak with to a manager", then "no i need a manager right nw", then "its about the committee fee". The first two replies were right: a manager needs to know what it is about. The third was "עדכנתי עכשיו את צוות הניהול … יש עוד משהו שאפשר לעזור בו בינתיים?", a hand-off of something the bot can do itself: the balance, the payment link, what the fee covers, when it is due.
+
+Two passages caused it:
+- "ענייני ועד הבית" sat on the list of things only a person can finish, so "committee fee" read as a matter for the staff;
+- the manager rule ended on "המשפט שלך נגמר בזה שהצוות יודע".
+
+The owner's rule: handle everything ourselves, and keep a note for the team when there is a conflict like this one. So:
+- the fee left the list (the committee's people stayed on it);
+- the manager rule now has the bot handle the matter;
+- it leaves the team a note, because a manager was asked for, and says so in one sentence;
+- the same message carries on with the matter.
+
+The live safeguards still apply: `Team note this turn?` posts one note per turn, and an empty request is still never recorded.
+
 ## Why the memory key changes
 
 n8n keeps the "Conversation so far" buffer under a session key, `<phone>-84` on live. If n8n keyed buffers by session alone, a sandbox chat as Ido would land in Ido's live memory. The copy appends `-sbx`, so isolation does not depend on how n8n scopes its buffers.

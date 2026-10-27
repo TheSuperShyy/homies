@@ -117,3 +117,12 @@ assert "$('Add who')" in by6["Answer the resident"]["parameters"]["text"]
 assert reach(s6) == [], "section 6: calls that leave the sandbox: %s" % reach(s6)
 assert new_overlaps(s6, keep_bot) == [], "section 6: new overlapping nodes: %s" % new_overlaps(s6, keep_bot)
 print("check_n8n_sandbox: section 6 ok")
+
+# --- C: the bot handles it; a manager request leaves the team a note (owner, 27 Oct) ---
+from n8n_sandbox_section6 import SOLVE_EDITS
+for old, new in SOLVE_EDITS:
+    if new:
+        assert new in prompt, "section 6 C missing: " + new[:40]
+assert "ענייני ועד הבית" not in prompt, "the committee fee is still on the staff-only list"
+assert "המשפט שלך נגמר בזה שהצוות יודע" not in prompt, "the prompt still ends a manager request on 'the team knows'"
+print("check_n8n_sandbox: section 6 C ok")

@@ -592,6 +592,11 @@ its stated time.
       - "I want a representative" asks what it's about and does not alert the team (run 1's alert came from the contaminated memory);
       - the balance asks for name and phone;
       - **Ido's ticket opened without the place ever being confirmed or named. DECIDED 27 Oct by the owner:** the reply names the building and flat, with no confirmation question. It is in the sandbox WHO_RULE (memory round 7). Checking it with the AI is one ido_lift chat, about $0.10, on the owner's go.
+    - **27 Oct, from the owner's own chat: the bot keeps the matter, and the team gets a note.**
+      - "manager … manager now … it's about the committee fee" ended in "I updated the management team, anything else?".
+      - Fixed in the sandbox (section 6 C): the fee is the bot's, a manager request leaves a note while the bot carries on, and the reply no longer ends on "the team knows". Memory round 8.
+      - **Checking it with the AI** is the `manager_fee` scenario (the owner's three lines, about $0.30), on the owner's go, or the owner's own chat.
+    - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.
   - **Waiting on the owner:**

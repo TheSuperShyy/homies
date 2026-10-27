@@ -14,6 +14,14 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      confirmation question the model skipped twice). The ticket tool's "ask for
      the flat every time" gets one sentence for the recognised case, so the rule
      and the tool do not compete. The balance keeps its typed name and phone.
+  C. the bot solves it, the team gets a note (the owner, 27 Oct, on a sandbox chat
+     where "I need a manager … it's about the committee fee" ended in "I updated
+     the management team, anything else?"): *"we should handle everything in our
+     own we dont rely on anyone but we do keep a note for the team if ever there
+     is such a conflict like this"*. The committee FEE leaves the "only staff can
+     finish" list (the people on the committee stay on it), and a manager request
+     becomes: find out what it is, handle it, and leave the team a note because a
+     manager was asked for, while the same message carries on with the matter.
 Every edit asserts that its anchor occurs exactly once, so a changed live prompt
 fails loudly instead of being half-edited.
 """
@@ -36,7 +44,23 @@ PROMPT_CUTS = [
     ("שני הראשונים אומרים לך מה הוא רוצה", "שניהם אומרים לך מה הוא רוצה"),
     ("ולכן בלחיצה על אחד משני הראשונים הברכה כבר ניתנה", "ולכן בלחיצה על אחד מהם הברכה כבר ניתנה"),
 ]
-REP_TAP_START = " \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
+# C. Handle it ourselves; a note for the team when a manager was asked for.
+SOLVE_EDITS = [
+    ("חוזה, הצעת מחיר, ענייני ועד הבית, וכל דבר אחר שאתה לא יכול לגמור בעצמך",
+     "חוזה, הצעת מחיר, עניין עם חברי ועד הבית עצמם, וכל דבר אחר שאתה לא יכול לגמור בעצמך"),
+    ("- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, או שיש לו עניין איתו, אתה רושם את זה לצוות.",
+     "- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי הוועד עצמם, אתה רושם את זה לצוות. "
+     "דמי ועד הבית, התשלום החודשי לחברת הניהול, הם עניין שלך: כמה נשאר לשלם, איך ועד מתי משלמים, קישור לתשלום "
+     "ומה כלול בתשלום."),
+    ("כשיש לך את הפרטים, אתה מנסה לסגור את העניין בעצמך עם הכלים שלך, ורק מה שבאמת מעבר לך אתה רושם לצוות, "
+     "עם מה שהוא סיפר לך, ואז אומר לו שהצוות יודע.",
+     "כשאתה יודע במה מדובר, אתה הנציג שמטפל בזה, ולא מעביר אותו לאף אחד: אתה שואל את מה שחסר לך כדי להבין מה "
+     "בדיוק הוא צריך, וסוגר את זה בעצמך, עם הכלים שלך ועם מה שאתה יודע. ומכיוון שהוא ביקש מנהל, אתה גם רושם על זה "
+     "הערה לצוות עם הכלי שיש לך לזה, עם מה שהוא סיפר לך, ואומר לו את זה במשפט אחד. ההערה היא לא הטיפול: באותה "
+     "הודעה אתה כבר ממשיך איתו בעניין עצמו. רק מה שבאמת מעבר לך נשאר אצל הצוות, ואז אתה אומר לו שהצוות יודע."),
+    (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
+]
+REP_TAP_START =" \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
 REP_TAP_END = "וממשיכים משם."
 WHO_AFTER = "אתה שירות הלקוחות של הומי'ז, כולו."
 TIME_ANCHOR = "+ ' [השעה בישראל עכשיו '"
@@ -74,7 +98,7 @@ def section6(bot, supabase_cred):
     tool["jsonBody"] = replace_once(tool["jsonBody"], FLAT_ASK, FLAT_KNOWN)
     opts = by["Answer the resident"]["parameters"]["options"]
     sm = opts["systemMessage"]
-    for old, new in PROMPT_CUTS:
+    for old, new in PROMPT_CUTS + SOLVE_EDITS:
         sm = replace_once(sm, old, new)
     assert sm.count(REP_TAP_START) == 1
     start = sm.index(REP_TAP_START)
