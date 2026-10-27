@@ -9,6 +9,18 @@ conversation that produced it.
 
 ---
 
+## 2026-10-27
+
+### Feature 19: two sandbox defects found and fixed before the acceptance run (production unchanged)
+- **Asked:** *"ok lets continue with the sandbox testing without any whatsapp righ"*. Read as the go for the priced acceptance run (under $1); the sandbox has no WhatsApp at all.
+- **Found: auto-assignment was ON in the sandbox.** Live inbox 1 and live teams 1-4 have it off on purpose (Sort's comment: a person assigned silences the bot). Chatwoot's default is on, and the sandbox was created with it. The first time the owner opened the sandbox in Chatwoot, each new chat would have gone to them and the bot would have gone quiet. Now off on inbox 3 and teams 5-8, and `chatwoot_sandbox.py` sets it on every run.
+- **My defect, found and fixed: a re-run of `chatwoot_sandbox.py` made a duplicate sandbox account (4).**
+  - **Why:** the script looked the account up by its English name, which its own first run renames to Hebrew.
+  - **Effect:** `.env` briefly pointed at account 4 while the n8n copies stayed on account 3. Production was untouched; the fingerprint compare passed.
+  - **Fix:** account 4 deleted with its inbox, bot, teams and user links (rails). Its 9 orphaned attribute rows were removed by `delete_all`, scoped to the deleted id. `.env` was restored to account 3 (inbox 3, bot 2, teams 5-8; the tokens went from rails straight into `.env`). The script now finds the account by `SANDBOX_CW_ACCOUNT_ID` first, then by either name, and refuses account 2.
+  - **Proven:** a re-run printed account 3, inbox 3, bot 2, teams 5-8, and made nothing new. The free hello scenario passed on account 3.
+- **Acceptance run started** (`sandbox_drive.py --run all`); results are logged below when it finishes. The chat page was restarted (the session restart had stopped it).
+
 ## 2026-10-26
 
 ### Feature 19 built: the WhatsApp sandbox (production unchanged after every step)

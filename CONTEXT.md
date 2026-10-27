@@ -32,6 +32,7 @@ The user is the builder. The client is Homies.
   - Its fake ticket numbers are `999-9000NN-YY`: the live reference shape, so the bot's guards accept them, with a serial no real ticket has.
 - A before/after fingerprint of the live system proves each round: `python scripts/sandbox_fingerprint.py --compare local/sandbox/before.json`.
 - **The sandbox copies are generated, never edited by hand.** After a live change, re-run `scripts/n8n_sandbox.py --apply --section6` and `scripts/sandbox_function.py --apply`.
+- **Auto-assignment stays OFF in the sandbox, as on live** (inbox 3, teams 5-8; 27 Oct). With it on, Chatwoot gives a new chat to whoever is online, Sort reads that as a human takeover, and the bot goes quiet. `chatwoot_sandbox.py` sets it off on every run, and finds the sandbox account by `SANDBOX_CW_ACCOUNT_ID`; looking it up by name made a duplicate once.
 - A change reaches production only by its own promotion, on the owner's go.
 - **Never run `scripts/supabase_functions.py` for anything but the live function.**
   - It pushes and deletes **project-wide** Supabase secrets on every run: a plain `--apply` deletes `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES`, which switches off the live OXS mirror.

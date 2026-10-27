@@ -574,7 +574,7 @@ its stated time.
 - **BUILT 26 Oct: feature 19, the WhatsApp sandbox** (`docs/features/19-whatsapp-sandbox/`; ids and how-tos in `feature.md` "As built").
   - An independent copy running Yariv's section 6 changes: no representative button, and the sender recognised from `residents`. Chatwoot is in Hebrew in the sandbox account only.
   - **Pieces:**
-    - Chatwoot account 3 "הומי'ז — סביבת ניסוי" (locale he; the owner is an administrator);
+    - Chatwoot account 3 "הומי'ז — סביבת ניסוי" (locale he; the owner is an administrator; auto-assignment off on inbox 3 and teams 5-8, as live). **Account 3 is the only sandbox account.** A duplicate account 4 existed for a few minutes on 27 Oct and was deleted; if `.env` ever says 4, it is stale;
     - n8n: router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n`;
     - `debt-tools-sandbox` v2: the live code unchanged, behind `guard.ts` (reads pass; writes faked, tickets `999-9000NN-YY`; other hosts refused);
     - the chat page, `python scripts/sandbox_chat.py`, then http://127.0.0.1:8765.
@@ -583,9 +583,9 @@ its stated time.
     - the sandbox keys get 401 on account 2;
     - the probe's ticket left no row;
     - a hello on the chat page gets the menu with **two** buttons.
+  - **27 Oct:** the owner gave the go for the paid acceptance run (`python scripts/sandbox_drive.py --run all`, under $1 on the shared OpenRouter key). It was started after the two fixes logged in WORKLOG 27 Oct; the results are in WORKLOG.
   - **Waiting on the owner:**
-    - the go for the paid acceptance run (`python scripts/sandbox_drive.py --run all`, under $1 on the shared OpenRouter key);
-    - then the owner's own chats;
+    - the owner's own chats;
     - promoting each change to live is a separate go.
   - **Departures from the plan** (router copied, memory key `-sbx`, references in the live shape, `Send`'s own button copy) are listed at the top of `plan.md`.
 - **26 Oct: Yariv's accepted alignment document is the new yardstick** (`docs/discovery/yariv-alignment-2026-10.md`; the check is in WORKLOG 26 Oct).
