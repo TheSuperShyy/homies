@@ -51,13 +51,28 @@ SCENARIOS = {
     "burst_manager": ("עידו", ["i need to speak to a manager", "faster!!", "faster!!"], [r"\?"], [], set(), set()),
     # The owner's next chat, 27 Oct: after the committee fee he says the bot can't help, and the bot
     # handed it to the team. The last reply must keep the matter: what it can do, and a question.
-    "manager_doubt": ("עידו", ["i need to speak to a manager", "are you a manager?",
+    # As Yariv, so it does not share Ido's memory with manager_retest in the same round.
+    "manager_doubt": ("יריב", ["i need to speak to a manager", "are you a manager?",
                                "its about the monthly committee fee", "no you cant help me for this one"],
                       [], [], {"handover"}, set()),
+    # The owner's retest, 27 Oct 12:24 UTC: a manager twice, then the topic, which ended in "I noted it
+    # for our team, anything else in the meantime?". Then the doubt, as in manager_doubt.
+    "manager_retest": ("עידו", ["I need a manager.", "I need a manager.", "it's about a payment committee",
+                                "no you cant help me for this one"], [], [], {"handover"}, set()),
 }
 BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
-# Checks on the last reply alone, where an earlier one may rightly mention the team's note.
-LAST = {"manager_doubt": ([r"\?"], [r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יחזור אליך"])}
+# Checks on one reply, by the tenant line it answers (0 is the first), where another may rightly
+# mention the team's note. A hand-off is the team knowing or handling it, or "anything else
+# (in the meantime)?" in place of the matter itself.
+HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יחזור אליך|יש עוד משהו|עוד משהו ש|מעבר לזה"
+           r"|האם יש משהו ש|יש משהו שאני יכול|יש משהו שאוכל")
+# Before the topic is known nothing goes to the team (the owner, 18 Oct): no note claimed, and no
+# promise of someone getting back (27 Oct, 12:49: an early note, then "רק כדי שמי?" after Send's cut).
+EARLY = r"רשמתי|עדכנתי|מעדכן את הצוות|העברתי|יחזרו אליך|יחזור אליך|שמי\?"
+TURNS = {"manager_doubt": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY]),
+                           2: ([r"\?"], [HANDOFF]), 3: ([r"\?"], [HANDOFF])},
+         "manager_retest": {0: ([r"\?"], [EARLY]), 1: ([r"\?"], [EARLY]),
+                            2: ([r"\?"], [HANDOFF]), 3: ([r"\?"], [HANDOFF])}}
 
 
 def persona(label):
@@ -131,12 +146,13 @@ def run(name, log):
     label, lines, must, mustnt, lab_must, lab_not = SCENARIOS[name]
     key = persona(label)
     conv = cw("POST", "/contacts/%s/conversations" % contact(key), {})["id"]
-    said = []
+    said, outs = [], []
     log.append("## %s (as %s, conversation %s)\n" % (name, label, conv))
     print("== %s (as %s)" % (name, label))
     for line in ([" / ".join(lines)] if name in BURST else lines):
         out = burst(key, conv, lines, BURST[name]) if name in BURST else turn(key, conv, line)
         said += out
+        outs.append(out)
         print("  tenant:", line)
         log.append("- **tenant:** " + line)
         for c, b in out:
@@ -147,10 +163,10 @@ def run(name, log):
     fails = [r for r in must if not re.search(r, text)] + ["NOT " + r for r in mustnt if re.search(r, text)]
     if re.search(LEAK, text):
         fails.append("the AI's reasoning is in the reply")
-    if name in LAST:
-        last = "\n".join(c for c, _ in out)
-        fails += ["last reply lacks " + r for r in LAST[name][0] if not re.search(r, last)]
-        fails += ["last reply has " + r for r in LAST[name][1] if re.search(r, last)]
+    for i, (must_i, mustnt_i) in TURNS.get(name, {}).items():
+        reply = "\n".join(c for c, _ in outs[i]) if i < len(outs) else ""
+        fails += ["reply to line %d lacks %s" % (i + 1, r) for r in must_i if not re.search(r, reply)]
+        fails += ["reply to line %d has %s" % (i + 1, r[:30]) for r in mustnt_i if re.search(r, reply)]
     if name == "menu_two" and not any(len(b) == 2 for _, b in said):
         fails.append("menu does not have exactly two buttons")
     if name in BURST and len(said) != 1:

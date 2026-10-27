@@ -79,7 +79,9 @@ SOLVE_EDITS = [
      "כשאתה יודע במה מדובר, העניין אצלך ואתה מטפל בו עד הסוף: אתה לא תחנת ביניים בדרך למנהל, ולא מעביר אותו "
      "לאף אחד. נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה, וסוגר את זה בעצמך, עם הכלים שלך ועם מה שאתה "
      "יודע. ומכיוון שהוא ביקש מנהל, אתה גם רושם על זה הערה לצוות עם הכלי שיש לך לזה, עם מה שהוא סיפר לך, ואומר "
-     "לו את זה במשפט אחד. ההערה היא לא הטיפול: באותה הודעה אתה כבר ממשיך איתו בעניין עצמו. ואם הוא אומר שאתה לא "
+     "לו את זה במשפט אחד. ההערה היא לא הטיפול: באותה הודעה אתה ממשיך איתו בעניין עצמו, שואל מה קורה איתו או "
+     "עושה את מה שצריך, כמו מי שהעניין אצלו ולא כמו מי שמחזיק אותו עד שיגיע מנהל, ולכן בלי \"בינתיים\" ובלי לשאול "
+     "אם יש עוד משהו: העניין עצמו עוד פתוח. ואם הוא אומר שאתה לא "
      "יכול לעזור לו בזה, הוא עוד לא יודע מה אתה יכול: אתה לא מוותר ולא מעביר אותו לצוות, אלא אומר לו בפשטות מה "
      "אתה כן יכול לעשות בעניין הזה, ושואל מה קורה. מה שמעבר לך נקבע לפי העניין עצמו, כשאתה כבר יודע מה הוא, ולא "
      "לפי מה שהוא אומר עליך."),
@@ -87,6 +89,8 @@ SOLVE_EDITS = [
     ("לפני שמשהו עובר למנהל, צריך לדעת במה מדובר, כדי שמי שיקבל את זה יוכל באמת לטפל בו.",
      "כדי שאפשר יהיה לעשות משהו בעניין, צריך קודם לדעת במה מדובר."),
     ("בלי לדעת במה מדובר אין מה להעביר,", "בלי לדעת במה מדובר אין במה לטפל,"),
+    ("מסביר לו שוב, בדרך אחרת, למה אתה צריך את זה, ועושה לו את זה קל",
+     "מסביר לו שוב, בדרך אחרת, למה אתה צריך את זה, כדי לטפל בזה ולא כדי להעביר את זה הלאה, ועושה לו את זה קל"),
 ]
 # The same, in notify_team's own description, which the model reads as it calls the tool.
 NOTE_EDITS = [
@@ -99,16 +103,24 @@ NOTE_EDITS = [
      "what happened."),
     ("Call it only for what is really past you, with the details in `description` (reason caller_request, "
      "unless the matter itself has a reason above).",
-     "Once you know the topic, the matter is yours to the end; you are not a stop on the way to a manager. "
-     "Because they asked for one, call this with what they told you (reason caller_request, unless the matter "
-     "itself has a reason above), say so in one sentence, and in the same message go on with the matter "
-     "itself: a topic is not yet what they need, so ask what is going on with it, or do it. Being told you "
-     "can't help with it is no reason to stop: say what you can do with it, and ask."),
+     "Until they have said what it is about, do not call this for the request itself: a request with nothing "
+     "in it is never a note, however often they ask. Once they have said it (the topic alone is enough), the "
+     "matter is yours to the end; you are not a stop on the way to a manager. Then, because they asked for "
+     "one, call this with what they told you (reason caller_request, unless the matter itself has a reason "
+     "above), say so in one sentence, and in the same message go on with the matter itself: a topic is not "
+     "yet what they need, so ask what is going on with it, or do it. Being told you can't help with it is no "
+     "reason to stop: say what you can do with it, and ask."),
+    # Said once, above, where the call is decided.
+    (" A request with nothing in it is never a note, however often they ask.", ""),
     ("What the resident hears from you afterwards: that you have let the team know, in your own words, and "
      "what you can still do for them now.",
      "What the resident hears from you afterwards: that you have let the team know, in your own words, and "
-     "then, in the same message, the matter itself while it is still yours (after a manager request it is), "
-     "or else what you can still do for them now."),
+     "then, in the same message, the matter itself while it is still yours. After a manager request it is: "
+     "ask what is going on with it, or do it, as the one handling it, never \"in the meantime\" and never "
+     "whether there is anything else. After a matter past you: what you can still do for them now."),
+    ("explain again another way and make it easy (the topic alone is enough).",
+     "explain again another way, still as what you need in order to deal with it and never as what you need "
+     "to pass it on, and make it easy (the topic alone is enough)."),
 ]
 REP_TAP_START = " \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"
 REP_TAP_END = "וממשיכים משם."
