@@ -22,6 +22,13 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      finish" list (the people on the committee stay on it), and a manager request
      becomes: find out what it is, handle it, and leave the team a note because a
      manager was asked for, while the same message carries on with the matter.
+     The owner's next chat the same day ("it still did not resolve with it self it
+     should fix everything for himself"): after the note, "meanwhile, maybe I can
+     help?", and to "no you cant help me for this one", "the team knows and will
+     handle it". The way out was "only what is beyond you stays with the team, and
+     then you tell him the team knows", which his word alone satisfied. It is gone:
+     the bot is not a stop on the way to a manager, a topic still needs what is
+     going on, and "you can't help" gets what the bot can do with it and a question.
   D. one reply per burst (the owner's sandbox chat, 27 Oct, "is there a way to fix
      this"): a second message sent while the AI was writing got its own answer,
      and two near-identical replies went out half a second apart. The live bot
@@ -60,10 +67,13 @@ SOLVE_EDITS = [
      "ומה כלול בתשלום."),
     ("כשיש לך את הפרטים, אתה מנסה לסגור את העניין בעצמך עם הכלים שלך, ורק מה שבאמת מעבר לך אתה רושם לצוות, "
      "עם מה שהוא סיפר לך, ואז אומר לו שהצוות יודע.",
-     "כשאתה יודע במה מדובר, אתה הנציג שמטפל בזה, ולא מעביר אותו לאף אחד: אתה שואל את מה שחסר לך כדי להבין מה "
-     "בדיוק הוא צריך, וסוגר את זה בעצמך, עם הכלים שלך ועם מה שאתה יודע. ומכיוון שהוא ביקש מנהל, אתה גם רושם על זה "
-     "הערה לצוות עם הכלי שיש לך לזה, עם מה שהוא סיפר לך, ואומר לו את זה במשפט אחד. ההערה היא לא הטיפול: באותה "
-     "הודעה אתה כבר ממשיך איתו בעניין עצמו. רק מה שבאמת מעבר לך נשאר אצל הצוות, ואז אתה אומר לו שהצוות יודע."),
+     "כשאתה יודע במה מדובר, העניין אצלך ואתה מטפל בו עד הסוף: אתה לא תחנת ביניים בדרך למנהל, ולא מעביר אותו "
+     "לאף אחד. נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה, וסוגר את זה בעצמך, עם הכלים שלך ועם מה שאתה "
+     "יודע. ומכיוון שהוא ביקש מנהל, אתה גם רושם על זה הערה לצוות עם הכלי שיש לך לזה, עם מה שהוא סיפר לך, ואומר "
+     "לו את זה במשפט אחד. ההערה היא לא הטיפול: באותה הודעה אתה כבר ממשיך איתו בעניין עצמו. ואם הוא אומר שאתה לא "
+     "יכול לעזור לו בזה, הוא עוד לא יודע מה אתה יכול: אתה לא מוותר ולא מעביר אותו לצוות, אלא אומר לו בפשטות מה "
+     "אתה כן יכול לעשות בעניין הזה, ושואל מה קורה. מה שמעבר לך נקבע לפי העניין עצמו, כשאתה כבר יודע מה הוא, ולא "
+     "לפי מה שהוא אומר עליך."),
     (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
 ]
 REP_TAP_START = " \"לדבר עם נציג\" אומר שהוא רוצה לדבר עם מישהו"

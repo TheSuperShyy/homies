@@ -125,6 +125,7 @@ for old, new in SOLVE_EDITS:
         assert new in prompt, "section 6 C missing: " + new[:40]
 assert "ענייני ועד הבית" not in prompt, "the committee fee is still on the staff-only list"
 assert "המשפט שלך נגמר בזה שהצוות יודע" not in prompt, "the prompt still ends a manager request on 'the team knows'"
+assert "רק מה שבאמת מעבר לך נשאר אצל הצוות" not in prompt, "a tenant's 'you can't help' is still a way out to the team"
 print("check_n8n_sandbox: section 6 C ok")
 
 # --- D: one reply per burst, checked again right before Send (owner's chat, 27 Oct) ---

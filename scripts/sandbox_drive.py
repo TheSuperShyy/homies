@@ -49,8 +49,15 @@ SCENARIOS = {
     # The owner's second chat, 27 Oct, at its own pace: the lines go out 4 s and 8 s apart without
     # waiting for the bot, so the last one lands while the AI is writing. Exactly one reply may come.
     "burst_manager": ("עידו", ["i need to speak to a manager", "faster!!", "faster!!"], [r"\?"], [], set(), set()),
+    # The owner's next chat, 27 Oct: after the committee fee he says the bot can't help, and the bot
+    # handed it to the team. The last reply must keep the matter: what it can do, and a question.
+    "manager_doubt": ("עידו", ["i need to speak to a manager", "are you a manager?",
+                               "its about the monthly committee fee", "no you cant help me for this one"],
+                      [], [], {"handover"}, set()),
 }
 BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
+# Checks on the last reply alone, where an earlier one may rightly mention the team's note.
+LAST = {"manager_doubt": ([r"\?"], [r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יחזור אליך"])}
 
 
 def persona(label):
@@ -140,6 +147,10 @@ def run(name, log):
     fails = [r for r in must if not re.search(r, text)] + ["NOT " + r for r in mustnt if re.search(r, text)]
     if re.search(LEAK, text):
         fails.append("the AI's reasoning is in the reply")
+    if name in LAST:
+        last = "\n".join(c for c, _ in out)
+        fails += ["last reply lacks " + r for r in LAST[name][0] if not re.search(r, last)]
+        fails += ["last reply has " + r for r in LAST[name][1] if re.search(r, last)]
     if name == "menu_two" and not any(len(b) == 2 for _, b in said):
         fails.append("menu does not have exactly two buttons")
     if name in BURST and len(said) != 1:

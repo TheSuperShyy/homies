@@ -32,6 +32,12 @@ conversation that produced it.
 - **Pushed:** `n8n_sandbox.py --apply --section6 --fresh-memory` at 12:17:56 UTC, memory round 10.
   - Read back: the new passage is in, and the old sentence is gone.
   - `sandbox_fingerprint.py --compare`: the live system is unchanged.
+- **Claude-played, blind, no spend:** one agent played the bot from the new prompt and tools, with the owner's lines.
+  - "committee fee": the note in one sentence, "ואת העניין עצמו אני ממשיך איתך כאן. מה קורה עם התשלום?"
+  - "you can't help me": "אולי דווקא כן", then what it can do (the balance, the link, what the fee covers and when it is due), and "אז מה בדיוק לא מסתדר?"
+  - Then "charged twice": a note with the detail (a disputed charge is staff-only), and the balance offered.
+  - "I just want a manager. period.": calm, no parrot, says it can't connect him from here, and asks about the payment.
+  - This checks the logic, not Gemini's own behaviour.
 - **Open:** the owner's own chat on the sandbox page, or `manager_doubt` with the AI (about $0.30) on the owner's go. Production is unchanged; promoting section 6 C to live is a separate go.
 
 ### Feature 19: one reply per burst; the bot checks for a newer message again before sending (owner's chat; sandbox only)
