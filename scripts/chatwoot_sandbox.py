@@ -51,7 +51,13 @@ ATTR_HE = {"handover_at": "הועבר לנציג ב", "handover_reason": "סיב
 
 RUBY = r'''
 require "securerandom"
-acc = Account.find_by(name: "Homies — Sandbox") || Account.create!(name: "Homies — Sandbox", locale: "he")
+# Found by id first: step 2 renames the account to Hebrew, so a lookup by the
+# English name alone made a duplicate on a re-run (26 Oct, account 4, deleted).
+want = ENV.fetch("SANDBOX_ACCOUNT_ID", "").to_i
+acc = (want > 0 && Account.find_by(id: want)) ||
+      Account.where(name: ["Homies — Sandbox", "הומי'ז — סביבת ניסוי"]).order(:id).first ||
+      Account.create!(name: "Homies — Sandbox", locale: "he")
+raise "refusing to touch account #{acc.id}" if acc.id == 2
 email = "sandbox-admin@homies-sandbox.test"
 u = User.find_by(email: email)
 unless u
@@ -67,10 +73,11 @@ puts "SANDBOX_JSON=" + { account_id: acc.id, admin_user_id: u.id, owner_user_id:
 '''
 
 
-def rails(owner_email):
+def rails(owner_email, account_id=""):
     remote = ("cat > /tmp/sbx.rb && docker cp /tmp/sbx.rb chatwoot-rails-1:/tmp/sbx.rb && "
-              "docker exec -e OWNER_EMAIL=%s chatwoot-rails-1 bundle exec rails runner /tmp/sbx.rb; "
-              "rm -f /tmp/sbx.rb; docker exec chatwoot-rails-1 rm -f /tmp/sbx.rb" % shlex.quote(owner_email))
+              "docker exec -e OWNER_EMAIL=%s -e SANDBOX_ACCOUNT_ID=%s chatwoot-rails-1 bundle exec rails runner /tmp/sbx.rb; "
+              "rm -f /tmp/sbx.rb; docker exec chatwoot-rails-1 rm -f /tmp/sbx.rb"
+              % (shlex.quote(owner_email), shlex.quote(str(account_id))))
     run = subprocess.run(SSH + [remote], input=RUBY.encode(), capture_output=True, timeout=300)
     out = run.stdout.decode("utf-8", "replace")
     line = next((l for l in out.splitlines() if l.startswith("SANDBOX_JSON=")), None)
@@ -102,7 +109,7 @@ def main():
           % (ACCOUNT_NAME, HEBREW_NAME, INBOX_NAME, BOT_NAME, len(TEAMS), len(LABELS)))
     if not apply:
         print("Dry run. --apply creates it."); return
-    made = rails(e["CHATWOOT_ADMIN_EMAIL"])
+    made = rails(e["CHATWOOT_ADMIN_EMAIL"], e.get("SANDBOX_CW_ACCOUNT_ID", ""))
     acc, tok = made["account_id"], made["admin_token"]
     assert acc != 2, "the sandbox account must not be account 2"
     base = cw + "/api/v1/accounts/%d" % acc
@@ -110,6 +117,10 @@ def main():
     api(base, tok, "PATCH", "", {"name": HEBREW_NAME, "locale": "he"})
     inbox = next((i for i in api(base, tok, "GET", "/inboxes")["payload"] if i["name"] == INBOX_NAME), None) \
         or api(base, tok, "POST", "/inboxes", {"name": INBOX_NAME, "channel": {"type": "api", "webhook_url": ""}})
+    # Auto-assignment OFF, as on live inbox 1 and live teams 1-4. Chatwoot's default is on, and
+    # then a new conversation goes to whichever agent is online, Sort reads that as a human
+    # takeover, and the bot falls silent the moment the owner opens the sandbox in the UI.
+    api(base, tok, "PATCH", "/inboxes/%d" % inbox["id"], {"enable_auto_assignment": False})
     bot = next((b for b in api(base, tok, "GET", "/agent_bots") if b["name"] == BOT_NAME), None)
     if bot:
         bot = api(base, tok, "PATCH", "/agent_bots/%d" % bot["id"], {"outgoing_url": hook})
@@ -120,7 +131,9 @@ def main():
     have = {t["name"]: t["id"] for t in api(base, tok, "GET", "/teams")}
     team_ids = {}
     for key, (name, desc) in TEAMS.items():
-        tid = have.get(name) or api(base, tok, "POST", "/teams", {"name": name, "description": desc})["id"]
+        tid = have.get(name) or api(base, tok, "POST", "/teams", {"name": name, "description": desc,
+                                                                   "allow_auto_assign": False})["id"]
+        api(base, tok, "PATCH", "/teams/%d" % tid, {"allow_auto_assign": False})
         api(base, tok, "POST", "/teams/%d/team_members" % tid, {"user_ids": users})
         team_ids[key] = tid
     have = {l["title"] for l in api(base, tok, "GET", "/labels")["payload"]}
