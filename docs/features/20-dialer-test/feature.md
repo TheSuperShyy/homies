@@ -2,7 +2,7 @@
 
 **Estimate:** 0.5d
 **Depends on:** 18-dialer-routing (who answers), Omni's dialer API token (27 Oct)
-**Status:** page LIVE on `homies-dashboard.vercel.app/dialer` since 28 Oct (main `c97eca3`); rings nothing until `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` are set in Vercel
+**Status:** page LIVE on `homies-dashboard.vercel.app/dialer` since 28 Oct (main `c97eca3`); `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` set in Vercel 28 Oct, 11:44 UTC; rings nothing until production is redeployed
 
 ## Purpose
 
@@ -69,13 +69,12 @@ answer), `db` (the residents check failed), `tenant`, `number`, `hours`, `off`.
 ## Going live
 
 1. **Done 28 Oct:** the page is on `main` (`c97eca3`) and deployed.
-2. **Set two values in Vercel** (project `homies-dashboard`, Settings → Environment Variables, Production and Preview), copied from the repo root `.env`:
-   - `TOKOMNI_TOKEN`, as Sensitive;
-   - `TOKOMNI_CAMPAIGN_ID`.
-
-   Then redeploy production. Until then the page says Tokomni is not connected.
-3. **List 2 must be playing** in Tokomni (Play pressed once).
-4. **The first test:** Ido ready to pick up, in calling hours, then Ring Ido. He should get the debt agent with ₪2,000.
+2. **Done 28 Oct, 11:44 UTC (owner's "set them"):** two values in Vercel (project `homies-dashboard`), copied from the repo root `.env`:
+   - `TOKOMNI_TOKEN`, as Sensitive, for Production and Preview;
+   - `TOKOMNI_CAMPAIGN_ID`, for all three environments.
+3. **Redeploy production**, so the running deployment has them. Until then the page says Tokomni is not connected. The session's permission check refused this as a production deploy, so it takes its own go, or Redeploy in Vercel.
+4. **List 2 must be playing** in Tokomni (Play pressed once).
+5. **The first test:** Ido ready to pick up, in calling hours, then Ring Ido. He should get the debt agent with ₪2,000.
 
 ## Not in this feature
 

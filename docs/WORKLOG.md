@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 20: the Tokomni pair set in Vercel; the production redeploy refused by the permission check (11:44 UTC)
+- **Asked:** *"set them"*.
+- **Done:** `TOKOMNI_TOKEN` (Sensitive, Production and Preview) and `TOKOMNI_CAMPAIGN_ID` (encrypted, all three) were added to `homies-dashboard` from `.env` at 11:44 UTC and read back (names, types and targets only).
+- **Refused:** the forced redeploy of the production deployment (`dpl_J8ALBkdSnQrivpq3cGrAEmCPhDtT`, `c97eca3`). The session's permission check called it a production deploy needing its own go. It was not worked around, and no empty commit was pushed to trigger a build.
+- **So the page still says "Tokomni is not connected"**, because the running deployment predates the pair. It changes with the redeploy: the owner's go for it, or Redeploy in Vercel.
+- **Nothing was sent to Omni.**
+
 ### Feature 19: the Gemini run tried and refused by the wallet; it now starts by itself after the top-up (11:25 UTC)
 - **Asked:** *"try and test it"*.
 - **Tried, nothing spent:** `sandbox_drive.py --run manager_retest,manager_fee --fresh` stopped before its first call ("$-1.48 above the live bot's $2 line").

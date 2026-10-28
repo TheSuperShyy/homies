@@ -678,7 +678,12 @@ its stated time.
 - **28 Oct: the dashboard has a dialer test page, `/dialer` ("בדיקת חייגן", under System), LIVE on Vercel** (feature 20; `main` = `c97eca3`, deploy `dpl_J8ALBkdSnQrivpq3cGrAEmCPhDtT` READY; the same change is `58e8063` on `feature/chatbot`).
   - **What it does:** type a number, or press Ring beside a test person (today Ido), and one lead goes into List 2 through Omni's insert API. The page says who will pick up, read from the same debt call list the 208 router reads.
   - **It refuses:** a non-Israeli number, outside calling hours (Sun-Thu 09-20, Fri until 13, Israel time), and a number on file for a tenant outside בר כוכבא 23. Only `source = 'agent'` people get a button. Yariv's OXS row in flat 3 does not.
-  - **IT RINGS NOTHING YET: Vercel has no `TOKOMNI_TOKEN` / `TOKOMNI_CAMPAIGN_ID`.** The session's permission check refused writing them (a secret-store write). They need the owner's go, or the owner adds them in Vercel (token as Sensitive, Production and Preview). Then a production redeploy, because env changes need one. Until then the page says "Tokomni is not connected" and its buttons are off.
+  - **IT RINGS NOTHING YET: the pair is in Vercel, but production has not been redeployed.**
+    - `TOKOMNI_TOKEN` (Sensitive, Production and Preview) and `TOKOMNI_CAMPAIGN_ID` (all three) were set 28 Oct, 11:44 UTC, on the owner's "set them", and read back.
+    - **The redeploy was refused** by the session's permission check as a production deploy. It needs the owner's own go for the redeploy, or Redeploy pressed in Vercel on the production deployment.
+    - The running deploy (`dpl_J8ALBkdS…`) predates the pair, so until then the page says "Tokomni is not connected" and its buttons are off.
+    - **To redeploy:** `POST /v13/deployments?teamId=…&forceNew=1` with `{"name":"homies-dashboard","deploymentId":"dpl_J8ALBkdSnQrivpq3cGrAEmCPhDtT","target":"production"}`.
+    - Do not trigger it with an empty push to `main`.
   - **Then:** List 2 playing, Ido ready, in calling hours, press "חייג לעידו". Expect the debt agent with ₪2,000 (he is on call 2 of 4).
   - **Unknown until the second press for one number:** whether Tokomni dedupes by number. The external_id carries the press time, so a dedupe by id cannot block it.
   - **Checks:** `node --test scripts/check_dialer.test.ts` (7/7), and a production build of `main` with the page.

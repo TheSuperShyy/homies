@@ -128,7 +128,7 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | 17 | [Name and number before a ticket](features/17-name-before-ticket/feature.md) | 2d | live on the phone line 22 Oct (Homies' updated spec, section 1); WhatsApp (Plan B) not built |
 | 18 | [Who answers on the 208 line](features/18-dialer-routing/feature.md) | 1d | LIVE 25 Oct, 15:30 UTC (function v130); the first real calls are Ido's |
 | 19 | [WhatsApp sandbox](features/19-whatsapp-sandbox/feature.md) | 2d | built 26 Oct, production fingerprint unchanged; the paid acceptance run waits on the owner's go. An independent copy (Chatwoot account 3 in Hebrew, three n8n copies, `debt-tools-sandbox`, a local chat page) running Yariv's section 6 changes |
-| 20 | [Dialer test on the dashboard](features/20-dialer-test/feature.md) | 0.5d | page LIVE 28 Oct on `/dialer` (`main` `c97eca3`); rings nothing until `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` are set in Vercel |
+| 20 | [Dialer test on the dashboard](features/20-dialer-test/feature.md) | 0.5d | page LIVE 28 Oct on `/dialer` (`main` `c97eca3`); the Tokomni pair is set in Vercel, and it rings nothing until production is redeployed |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and
