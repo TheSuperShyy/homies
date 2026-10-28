@@ -48,7 +48,9 @@ SCENARIOS = {
     "manager_fee": ("עידו", ["i want to speak with to a manager", "no i need a manager right nw",
                              "its about the committee fee"],
                     [r"יתרה|לשלם|תשלום|קישור|חיוב"], [], {"handover"}, set()),
-    "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [], {"handover"}, set()),
+    # 28 Oct: "הצוות מעודכן ועל זה עכשיו", a claim no tool made (the note was even held until 09:00).
+    "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [r"על זה עכשיו|כבר מטפל|מטפלים בזה"],
+                  {"handover"}, set()),
     # Not in "all": a ticket opened in one turn, so the reply right after the tool call is the
     # one checked. Run on the faithful copy (no --section6) they say whether live leaks too.
     "leak_asaf":    ("אסף", ["יש נזילה בחדר המדרגות, בר כוכבא 23 דירה 2"], [REF], [], set(), set()),
@@ -81,14 +83,27 @@ HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יח
 INFORMED = r"מעדכן|עדכנתי|רשמתי|מעודכנ|יודעת|יודעים"
 CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את זה|לבדיקת הצוות"
 ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
-NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|שמי\?"
-TURNS = {"rep_typed": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE])},
-         "manager_doubt": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
-                           1: ([r"\?", r"מיכאל"], [ARGUE, CONCEDE, r"דיגיטלי"]),
-                           2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE, CONCEDE])},
-         "manager_retest": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
-                            1: ([r"\?"], [ARGUE, CONCEDE, NOTE_SAYS]),
-                            2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE, CONCEDE])}}
+NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|בלי קשר|שמי\?|כבר מטפל|על זה עכשיו"
+# 28 Oct: a manager reply ends on its question (the rule said "ask, then say why", and 5 of 13 ended on
+# the reason); the reason for asking is the bot's own, never management's ("ככה הם יוכלו לטפל בזה",
+# "כדי שהם יוכלו לעזור לך … כשיבדקו") nor the rule's sentence pasted whole ("איתם אפשר לסדר").
+ENDS_Q = r"\?[\s🙂😊🙏👍💪🤝]*$"
+THEIRS = (r"כדי שהם|ככה הם|שהם יוכלו|כשיבדקו|כשיטפלו|להכין את הדברים|איתם אפשר"
+          r"|להעביר לצוות|להעביר להם|להעביר להנהלה|התמונה המלאה")
+TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS])},
+         "burst_manager": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS])},
+         "manager_fee": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
+                         1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS]),
+                         2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS])},
+         "manager_doubt": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
+                           1: ([ENDS_Q, r"מיכאל"], [ARGUE, CONCEDE, r"דיגיטלי", THEIRS]),
+                           # the monthly fee is the bot's; the committee's people are not the topic
+                           2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, r"חברי (?:ה)?ועד|הוועד עצמם"]),
+                           3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS])},
+         "manager_retest": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
+                            1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS]),
+                            2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS]),
+                            3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS])}}
 
 
 def call(method, path, body=None, tries=4):

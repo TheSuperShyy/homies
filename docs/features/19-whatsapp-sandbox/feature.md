@@ -115,7 +115,7 @@ A check script snapshots the live system before the build and compares it after 
 | Chatwoot inbox, bot, teams | API inbox 3 "צ'אט ניסוי"; agent bot 2 "מיכאל — ניסוי"; teams 5 גבייה, 6 תפעול ותקלות, 7 הנהלה, 8 שירות לדיירים | same |
 | n8n | router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n` (section 6 in); credentials "SANDBOX Chatwoot admin" and "SANDBOX Chatwoot bot" | `scripts/n8n_sandbox.py --apply --section6` |
 | Function | `debt-tools-sandbox` v3 (random fake serials since 27 Oct) | `scripts/sandbox_function.py --apply` |
-| Memory round | `SANDBOX_MEMORY_ROUND` 27 since 28 Oct, about 07:00 UTC (key `<phone>-84-sbx27`); a `sandbox_drive.py --fresh` run takes one round per persona reuse | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
+| Memory round | `SANDBOX_MEMORY_ROUND` 32 at 09:11 UTC on 28 Oct (key `<phone>-84-sbx32`); a `sandbox_drive.py --fresh` run takes one round per persona reuse, so `.env` is the truth | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
 | Snapshot | `local/sandbox/before.json`, taken before the build | `scripts/sandbox_fingerprint.py` |
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
