@@ -15,6 +15,18 @@ conversation that produced it.
 - **Asked:** *"ok lets test now"*.
 - **The Gemini run waits.** `check_openrouter.py` at 10:51 UTC: the wallet at $1.43 and still falling, the key's cap with $1.56 left, no top-up yet. The run ($0.39) would leave about $1.04, under the $2 line where the live bot's big turns are refused, and `sandbox_drive.py` refuses it.
 - **Instead, the free check the standing rule asks for:** two blind Claude players, each given only the rebuilt system prompt and tool texts (`sbx_candidate.py`, with the warm wording and the tool's manager branch), the owner's exact lines, and the sandbox's tool answers. One plays `manager_retest`, one `manager_fee`. They check the wording and the logic, not Gemini's own voice.
+- **Result: both pass every check** (`local/sandbox/runs/2026-10-28-1100-claude.md`, put through `sandbox_drive.py`'s checks offline).
+  - **First reply:** "בטח, כבר עדכנתי את ההנהלה שביקשת לדבר עם מנהל. כדי שנוכל לעזור לך כמה שיותר מהר, יעזור לשמוע ממך מה קרה. תרצה לספר לי מה מטריד אותך?".
+  - **Insisting:** "אל דאגה, הבקשה שלך כבר אצל ההנהלה. לא צריך להיכנס לפרטים, גם כמה מילים יעזרו לנו לעזור לך. במה מדובר, בגדול?".
+  - **Topic:** the matter noted under its own reason (payment) in both chats, and the bot keeps it: "תודה 🙏 רשמתי להנהלה גם במה מדובר, ואני איתך על זה. מה קורה עם דמי הוועד?".
+  - **"You can't help":** "בסדר גמור. אני עדיין אשמח לנסות לעזור 🙏 ספר לי, מה בדיוק קרה?".
+  - No capability claim, no "בינתיים", every reply ends on its question.
+- **The check was widened, not the bar:** manager_fee's fee words now include "דמי הוועד". The 09:52 run's hand-back still fails it.
+- **To watch on Gemini:**
+  - Both players opened with the rule's reason almost word for word ("כדי שנוכל לעזור לך כמה שיותר מהר, יעזור לשמוע ממך מה קרה"), so every tenant may hear the same sentence.
+  - "בסדר גמור" to "you can't help" reads like agreeing with it.
+  - Claude players are warmer than Gemini by nature.
+- **Spend:** none. The Gemini run ($0.39) waits for the top-up and the owner's go.
 
 ### Feature 19: "dont overtest" (10:45 UTC; no spend)
 - **The owner, on the cost answer:** *"i mean the costing for the testing dont overtest"*. He meant the number of paid runs, not the price of one.

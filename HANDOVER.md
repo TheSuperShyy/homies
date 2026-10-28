@@ -646,6 +646,7 @@ its stated time.
             - The cause is unknown. A guess: OpenRouter sends calls to different Google providers, each with its own cache. Seeing the provider needs a management key or each call's generation id, which n8n does not keep.
             - **Optional, only if the owner asks:** a probe of about $0.15 that reads OpenRouter's bill for each call. If the cache can be made to hit, every test and every live tenant message costs about half.
             - **The owner then (10:45 UTC):** *"i mean the costing for the testing dont overtest"*. He meant the number of runs (CONTEXT, "Don't overtest").
+          - **Checked for free (11:00 UTC):** two blind Claude players ran the warm wording through `manager_retest` and `manager_fee`, and both pass every check. The matter is noted at the topic and the bot keeps it. To watch on Gemini: both players opened with the rule's reason almost word for word. WORKLOG 28 Oct has the replies.
           - **Next, after a top-up, one run, and only on the owner's go:**
             - `sandbox_drive.py --run manager_retest,manager_fee --fresh`, $0.39, for the warm wording and the note of the matter. The owner's own short sandbox chat could replace it;
             - then the owner's own chat (round 44);

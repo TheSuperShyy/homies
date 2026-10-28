@@ -72,6 +72,7 @@ The user is the builder. The client is Homies.
   - The run covers only what the batch touched (`--run a,b`, $0.04-0.22 a scenario).
   - `--run all` ($1.13) only when the owner asks, or right before a live promotion. Never re-run to chase a one-off slip.
   - For tone, the owner's own short sandbox chat is the real check, and it costs cents.
+  - **The free first test is a blind Claude player.** Give it only the rebuilt prompt and tool texts (`sbx_candidate.py`), the owner's exact lines and the tool answers, never what is being checked. Then put its replies through the driver's checks offline. On 28 Oct this cleared the warm wording in both manager chats for nothing. It proves the wording and the logic; Gemini's own voice still needs its one run.
   - What a run costs is mostly the prompt: 71% of the 09:52 run was the same ~14k-token instructions resent on every call. Gemini bills those at a tenth when they come from the cache, and through n8n they mostly do not (about 15% saved). Why is not known yet.
 - **The sandbox driver refuses to run when OpenRouter is low** (28 Oct). The sandbox and the live bot spend from one key. `sandbox_drive.py` exits when a run (about $0.15 a scenario) could leave the wallet or the key's cap under `check_openrouter.py`'s $2 LOW line. Below that line the live agent's big turns get refused. A day of runs took the wallet to $1.57 before this guard existed.
 - **No claim that the team is acting** (28 Oct; sandbox now, live on go).

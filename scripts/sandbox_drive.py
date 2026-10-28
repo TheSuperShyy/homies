@@ -52,7 +52,7 @@ SCENARIOS = {
     # itself (balance, paying, a charge) and leave the team a note because a manager was asked for.
     "manager_fee": ("עידו", ["i want to speak with to a manager", "no i need a manager right nw",
                              "its about the committee fee"],
-                    [r"יתרה|לשלם|תשלום|קישור|חיוב"], [], {"handover"}, set()),
+                    [r"יתרה|לשלם|תשלום|קישור|חיוב|דמי ה?ו?ועד"], [], {"handover"}, set()),
     # 28 Oct: "הצוות מעודכן ועל זה עכשיו", a claim no tool made (the note was even held until 09:00).
     "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [r"על זה עכשיו|כבר מטפל|מטפלים בזה|קיבלו .{0,15}מיד"],
                   {"handover"}, set()),
