@@ -616,19 +616,24 @@ its stated time.
         - After a matter only staff can finish (e.g. a double charge), it asks what the team will need, not "anything else".
         - Proven on Gemini in run 7. The last three wording fixes (informed-only, details after a staff-only matter, the second note's reason) are not re-run, because the owner is testing.
         - **Do not run the driver as Ido while the owner tests:** memory is per phone, and their chats mix.
-        - Memory round 32 and climbing (28 Oct): every `--fresh` scenario takes a round.
+        - Memory round 36 (28 Oct, 09:27 UTC): every `--fresh` scenario takes a round.
       - **28 Oct: every scenario run automatically, each on a clean memory** (`sandbox_drive.py --run all --fresh`): 8/10 by the checks, $1.02. WORKLOG 28 Oct has every reply.
         - **Being fixed one cause at a time, on the owner's go** (*"ok lets start fixing it one by one … we need some harmony"*). Each fix rewrites or deletes the sentence that caused the fault, and is tested on Gemini with only the scenarios it touches. WORKLOG 28 Oct, "the run's faults fixed one at a time", has each step.
           - **Fix 1, DONE:** the lift ticket names the flat ("רשומה על דירה 1"). `WHO_RULE` asks on which flat the ticket is filed, apart from where the fault is.
           - **Fix 2, DONE:** the reason for asking is the bot's own and comes before the question, the insisting turn included. `MANAGER_TOOL` no longer repeats what to say. The second note's "full picture" purpose is gone, after the AI borrowed it as a relay reason. 8 of 9 manager replies end on a question; the slip was a polite request with a full stop.
-          - **Fix 3, made, under test at 09:11 UTC** (`manager_fee`, `rep_typed`): the quoted "בינתיים", "כבר מטפלת", "in the meantime" and "a stop on the way to a manager" are deleted from the rule and the tool.
-          - **Next:**
-            - fix 4, the committee-fee reply that recited the ועד הבית bullet (`manager_doubt`);
-            - fix 5, the claims that the team is acting, from the facts line "הצוות רואה את זה ומטפל" and the emergency sentence's "והצוות יודע, מיד" (`gas`, `ido_lift`).
+          - **Fix 3, DONE:** the quoted "בינתיים", "כבר מטפלת", "in the meantime" and "a stop on the way to a manager" are deleted from the rule and the tool. No "בינתיים" in a manager reply since.
+          - **Fix 2c, DONE (a side effect of 2b):** the committee fee went unnoted. The rule now says the note first, when the topic is told, then the handling. The driver checks two matters were noted (`handover_reasons`).
+          - **Fix 4, DONE:** the ועד הבית bullet puts the fee first and the committee's people as the exception. It is no longer read out as an either/or (`manager_doubt` PASS).
+          - **Fix 5, DONE:** `CLAIM_EDITS` remove the facts line "הצוות רואה את זה ומטפל" and make the bot the subject of the emergency sentence. Gas says "פתחתי קריאה דחופה … ועדכנתי את הצוות" with no "on it now". The lift ticket promises nothing for the team.
+          - **Left as Gemini's own slips:** 3 of 20 manager replies end on a statement (two "אשמח ש…", one asking first). Before the fixes it was 6 of 13. No text was added for them; the checks count them.
           - **Not faults:**
             - no safety line in the gas reply is the client's 16 Sep rule (Send's filter removed the AI's "תתרחקו מהאזור");
             - the gas note held until 09:00 is the owner's 3 Sep decision.
-          - **Spend so far:** about $0.50 of the $0.80 quoted (the counter lags).
+          - **Spend:** about $1.17 on the key's counter (08:55-09:30 UTC), against the $0.80 quoted, because fix 2 took two extra passes.
+          - **Production unchanged** (fingerprint compare, 09:31 UTC).
+          - **Next, on the owner's word:**
+            - the owner's own chat in the sandbox (memory round 36, every persona clean);
+            - then the live promotion of section 6 + E through `check_whatsapp_rules.py`.
         - **A sandbox test outside office hours (Sun-Thu 09:00-17:00 Israel time) shows the labels but no note.** The note waits for the live morning ticker, and the sandbox has no copy of it.
       - **"Hand to a person" drops a second note with the same reason in one conversation within 24 h** (`Decide the routing`, live too). A note that adds details must carry a different reason, or the team never sees it.
       - **Then made friendly and accommodating on the owner's word, and PROVEN again** (3 more runs, $0.69; $1.55 today in all).
@@ -642,7 +647,7 @@ its stated time.
         - **Waiting on:** the owner's own chat.
         - **Slips the AI makes now and then:** a reply ending on a full stop (2 of 8 in run 3), and once "אני העוזר הדיגיטלי…" in answer to "are you a manager?".
       - **Live defect, open:** Send's promise filter can leave a stub when it cuts inside a relative clause. On 27 Oct "רק כדי שמי שיחזור אליך…" was sent as "רק כדי שמי?". `DANGLE` lacks `מי`/`שמי`. The fix goes through the live gate.
-      - **The sandbox's memory round is 32 at 09:11 UTC on 28 Oct, and each `--fresh` scenario adds one.** `SANDBOX_MEMORY_ROUND` in `.env` is the truth; the "As built" table in `feature.md` follows it.
+      - **The sandbox's memory round is 36 since 09:27 UTC on 28 Oct, and each `--fresh` scenario adds one.** `SANDBOX_MEMORY_ROUND` in `.env` is the truth; the "As built" table in `feature.md` follows it.
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

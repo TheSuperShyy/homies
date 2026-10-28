@@ -49,6 +49,9 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      checks for a newer message only BEFORE the model (about 4 s after the
      message); the copy checks again right before Send. This one is not
      section 6: it is a live behaviour, fixed in the sandbox first.
+  E. no claim that the team is acting (the 28 Oct run: "הצוות יראה את זה ויטפל" on
+     a lift ticket, "והצוות מעודכן ועל זה עכשיו" on gas; 26 Oct: "והם קיבלו את
+     הדיווח מיד"). Live text, fixed here first, see CLAIM_EDITS.
 Every edit asserts that its anchor occurs exactly once, so a changed live prompt
 fails loudly instead of being half-edited.
 """
@@ -86,7 +89,10 @@ PROMPT_CUTS = [
 # cannot drift apart. The words the rule and the tool forbade ("בינתיים", "כבר מטפלת", "in the
 # meantime", "a stop on the way to a manager") are gone from both: quoted, they were said back
 # (manager_fee, manager_doubt), and the last one told the model a manager is coming. What the bot does
-# instead is the reason it gives for asking: it handles the matter itself.
+# instead is the reason it gives for asking: it handles the matter itself. Without the "full picture"
+# purpose, the tool's call sat after "a topic is not yet what they need" and the committee fee went
+# unnoted, so the rule now says the note first, when the topic is told, then the handling; the
+# tool's own copy of "the matter is yours" was a duplicate of the rule and is gone.
 # Not taken from the protocol the owner pasted with it: presenting the bot's own answer as "an
 # automated background check" or asking for data "for the manager's screen". That misleads the
 # tenant, and the prompt's honesty rule (never claim what no tool did) forbids it.
@@ -99,10 +105,10 @@ MANAGER_RULE = (
     "לא יודע. ובאותה הודעה אתה אומר לו בפשטות ובכנות למה אתה צריך לדעת מה קרה: כדי "
     "שתוכל לסדר את זה בעצמך, מהר יותר, והרבה פעמים כבר כאן, ושואל אותו על מה מדובר ומה מטריד אותו. ואם הוא "
     "מתעקש, או לא רוצה לפרט, אתה לא מוותר ולא מתווכח: אתה אומר לו בנעימות שההנהלה כבר יודעת, ושמספיקה לך מילה "
-    "על מה מדובר כדי להתחיל לטפל בזה בעצמך, ושואל שוב, בדרך אחרת ולא באותן מילים. כשאתה יודע במה מדובר, העניין "
-    "אצלך ואתה מטפל בו עד הסוף, עם הכלים שלך ועם מה "
-    "שאתה יודע: נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה איתו, או עושה את מה שצריך. ואת מה שהוא סיפר "
-    "אתה מוסיף לצוות עם הכלי, פעם אחת. ואם הוא אומר שאתה לא יכול לעזור לו בזה, "
+    "על מה מדובר כדי להתחיל לטפל בזה בעצמך, ושואל שוב, בדרך אחרת ולא באותן מילים. כשאתה יודע במה מדובר, אתה "
+    "מוסיף את זה לצוות עם הכלי, פעם אחת, והעניין אצלך ואתה מטפל בו עד הסוף, עם הכלים שלך ועם מה "
+    "שאתה יודע: נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה איתו, או עושה את מה שצריך. "
+    "ואם הוא אומר שאתה לא יכול לעזור לו בזה, "
     "אתה לא מוותר, לא משאיר את זה לצוות ולא מתווכח: אתה מקבל את זה בחום, אומר לו שהרבה דברים כאלה אפשר לסדר "
     "לו כאן ועכשיו, ושואל בכל זאת מה קורה. מה שרק בן אדם בהומי'ז יכול לסיים נשאר אצל הצוות, עם "
     "הפרטים, ואז אתה אומר לו שהצוות יודע.")
@@ -110,9 +116,11 @@ SOLVE_EDITS = [
     ("חוזה, הצעת מחיר, ענייני ועד הבית, וכל דבר אחר שאתה לא יכול לגמור בעצמך",
      "חוזה, הצעת מחיר, עניין עם חברי ועד הבית עצמם, וכל דבר אחר שאתה לא יכול לגמור בעצמך"),
     ("- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, או שיש לו עניין איתו, אתה רושם את זה לצוות.",
-     "- **ועד הבית:** מי שלא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי הוועד עצמם, אתה רושם את זה לצוות. "
-     "דמי ועד הבית, התשלום החודשי לחברת הניהול, הם עניין שלך: כמה נשאר לשלם, איך ועד מתי משלמים, קישור לתשלום "
-     "ומה כלול בתשלום."),
+     # The fee first and the members as the exception: as two peers the bot read them out to a tenant
+     # who said "monthly committee fee" ("אם מדובר בתשלום עצמו … אבל אם זה … חברי ועד הבית", 28 Oct).
+     "- **ועד הבית:** דמי ועד הבית, התשלום החודשי לחברת הניהול, הם עניין שלך: כמה נשאר לשלם, איך ועד מתי "
+     "משלמים, קישור לתשלום ומה כלול בתשלום. רק מי שלא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי הוועד "
+     "עצמם, נרשם לצוות."),
     (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
     # After a matter only a person can finish: what the team will need to sort it out faster, not "anything
     # else" (27 Oct, the owner's "my card has been charged twice!").
@@ -123,22 +131,28 @@ SOLVE_EDITS = [
     ("מי ששואל מי אתה שומע שאתה מיכאל מצוות השירות של הומי'ז.",
      "מי ששואל מי אתה, או אם אתה מנהל, שומע שאתה מיכאל מצוות השירות של הומי'ז."),
 ]
+# E. The facts line said the team sees it and handles it, which the passage already leaves unknown
+# ("מה שקורה אחרי שהצוות יודע אתה לא יודע"), so it goes. The emergency sentence's "the team knows, at
+# once" read as the team acting at once; the bot is its subject now, and "at once" is what the bot does.
+CLAIM_EDITS = [
+    (" הצוות רואה את זה ומטפל; כמה זמן זה ייקח אתה לא יודע.", ""),
+    ("מישהו בסכנה: קריאת שירות בדחיפות חירום והצוות יודע, מיד, לפני כל שאלה שאפשר לדחות.",
+     "מישהו בסכנה: אתה פותח מיד קריאת שירות בדחיפות חירום ומעדכן את הצוות, לפני כל שאלה שאפשר לדחות."),
+]
 # The same in notify_team's own description, which the model reads as it calls the tool.
 NOTE_FROM = "A request for a manager or a person is not one of these yet"
 NOTE_TO = "A request with nothing in it is never a note, however often they ask."
 MANAGER_TOOL = (
     "A request for a manager or a person is fair: never gatekeep it and never make it conditional. Call "
     "this right away (reason caller_request, with whatever they have said), and tell them in one sentence "
-    "that management is being informed: only that, since what follows you do not know. Once they say what "
-    "it is about, the matter is yours to the end: a topic is not yet what they need, so ask what is going "
-    "on with it, or do it; and call this once more with the matter, under the matter's "
+    "that management is being informed: only that, since what follows you do not know. The moment they say "
+    "what it is about, call this once more, with what they said, under its "
     "own reason (payment, billing, other and so on), never caller_request again: the same reason twice in "
     "a conversation is dropped as a duplicate, and management would never see it. Warm, calm and on their "
     "side throughout.")
 NOTE_EDITS = [
     ("the committee's own business, or anything else",
-     "the committee members' own business (the monthly committee fee itself is yours: what is owed, "
-     "paying it, the link, what it covers), or anything else"),
+     "the committee members' own business (not the monthly committee fee, which is yours), or anything else"),
     ("What the resident hears from you afterwards: that you have let the team know, in your own words, and "
      "what you can still do for them now.",
      "What the resident hears from you afterwards: that you have let the team know, in your own words, and "
@@ -252,7 +266,7 @@ def section6(bot, supabase_cred):
     for old, new in PROMPT_CUTS:
         sm = replace_once(sm, old, new)
     sm = replace_span(sm, MANAGER_FROM, MANAGER_TO, MANAGER_RULE)
-    for old, new in SOLVE_EDITS:
+    for old, new in SOLVE_EDITS + CLAIM_EDITS:
         sm = replace_once(sm, old, new)
     assert sm.count(REP_TAP_START) == 1
     start = sm.index(REP_TAP_START)

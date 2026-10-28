@@ -62,6 +62,39 @@ conversation that produced it.
     - "Anything else?" is now ruled on in two places: the prompt's paragraph on how a reply ends, and the staff-only matter.
   - `NOTE_SAYS` also catches "בלי קשר", rep_typed's "meanwhile" in other words.
   - Measured after fix 3: prompt 23,324 characters (start 23,435), `notify_team` 3,242 (start 4,015). None of the quoted phrases are left.
+  - **Gemini, `manager_fee` + `rep_typed` (09:10-09:14 UTC, rounds 32-33, $0.20): 1/2.**
+    - No "בינתיים". The first reply: "ההנהלה מעודכנת. 🙏 כדי שאוכל לעזור לך לסדר את העניין כמה שיותר מהר, ואולי אפילו ממש עכשיו, תרצה לשתף אותי על מה מדובר ומה מטריד אותך?".
+    - The insisting turn: "…מספיקה לי אפילו מילה אחת על מה מדובר כדי שאוכל להתחיל לקדם את זה בשבילך בעצמי. תוכל לתת לי כיוון?".
+    - The fee turn: "אתה רוצה לבדוק כמה נשאר לשלם, איך לשלם, או משהו לגבי מה שהתשלום מכסה?".
+    - rep_typed failed: "…אשמח לשמוע במה מדובר כדי שנוכל להתחיל :)" has no question mark, and its "הוספתי למנהל" was missed by a check too narrow for "הוספתי" (widened).
+    - **Found in the executions:** the committee fee was never added to the team. Fix 2b had left the tool's call right after "a topic is not yet what they need", and the AI waited for more.
+- **Fix 2c, the second note at the topic (a side effect of fix 2b).**
+  - **Change, a reorder:** the rule now says "כשאתה יודע במה מדובר, אתה מוסיף את זה לצוות עם הכלי, פעם אחת, והעניין אצלך…": the note first, then the handling. The tool says "The moment they say what it is about, call this once more, with what they said". Its own copy of "the matter is yours…" duplicated the rule and is gone.
+  - `sandbox_drive.py` now reads `handover_reasons` from the conversation, and a manager scenario with a topic fails unless two matters were noted. On the earlier runs it reads `caller_request,payment` (09:08) and `caller_request` alone (09:14).
+  - **Gemini, `manager_fee` (09:17-09:21 UTC, round 34, $0.16): noted `caller_request,billing`.**
+    - The fee turn: "הוספתי לצוות שמדובר בדמי ועד הבית. את כל מה שקשור לזה … אני מנהל ממש כאן. מה בדיוק תרצה לבדוק?".
+    - The first reply asked first and then borrowed the staff-only case's reason: "…ואם לא, זה לפחות יעזור להם לגשת לזה מהר יותר." `THEIRS` now catches "יעזור להם".
+  - **Where the first replies stand after six samples:** 3 clean, 2 polite requests with no question mark ("אשמח ש…"), 1 asking first. Before the fixes, 1 of 5 was clean. No more text was added for single samples, to keep the rule from growing again.
+  - Measured after fix 2c: prompt 23,314 characters, `notify_team` 3,130.
+- **Fix 4, the committee bullet read out to the tenant (`SOLVE_EDITS`, `NOTE_EDITS`).**
+  - **Change, a reorder:** the ועד הבית bullet puts the fee first, as the bot's matter. The committee's people come after it as the one exception ("רק מי שלא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי הוועד עצמם, נרשם לצוות"). Two peers had been read out as an either/or. The tool's list became "(not the monthly committee fee, which is yours)".
+  - **Gemini, `manager_doubt` (09:23-09:26 UTC, round 35, $0.16): PASS, noted `caller_request,payment`.**
+    - The fee turn: "הוספתי את זה עכשיו. מה הבעיה עם תשלום ועד הבית?". No either/or, no "כבר מטפלים".
+    - All four replies end on a question with the bot's own reason, and "are you a manager?" gets "אני מיכאל מצוות השירות של הומי'ז".
+  - Measured after fix 4: prompt 23,307 characters, `notify_team` 3,083.
+- **Fix 5, the claims that the team is acting (`CLAIM_EDITS`, live text fixed in the sandbox first).**
+  - **Change:**
+    - The facts line "הצוות רואה את זה ומטפל; כמה זמן זה ייקח אתה לא יודע." is deleted. The passage already says what follows the team's knowing is unknown.
+    - The emergency sentence "קריאת שירות בדחיפות חירום והצוות יודע, מיד" is now "אתה פותח מיד קריאת שירות בדחיפות חירום ומעדכן את הצוות". The bot is the subject, and "at once" is what the bot does. The 26 Oct gas reply had read it as the team: "והם קיבלו את הדיווח מיד". The client's 16 Sep rule around it is unchanged.
+  - **Gemini, `gas` + `ido_lift` (09:27-09:29 UTC, round 36, $0.16): 2/2.**
+    - Gas: "פתחתי קריאה דחופה על זה (מספר 999-953859-26) ועדכנתי את הצוות. זה הדבר היחיד שאני יכול לעשות מכאן כרגע.". It was in office hours, so the note posted: noted `emergency`.
+    - Lift: "פתחתי עכשיו קריאת שירות על המעלית בבר כוכבא 23, ורשמתי אותה על דירה 1 (המספר שלה הוא 999-970019-26). ברגע שיסגרו אותה, תשלח אליך הודעה מעדכנת לכאן. יש עוד משהו שאפשר לעזור איתו בינתיים?". Its "בינתיים" follows a ticket that is done, not a manager the bot stands in for.
+- **Where it ended:**
+  - **Every fault on the 07:03 list has its fix, each tested on Gemini.** The text the model reads went from 27,450 to 26,349 characters: prompt 23,435 → 23,266, `notify_team` 4,015 → 3,083. "Anything else?" is ruled on in 2 places instead of 7. No forbidden phrase is quoted anywhere.
+  - **Left as Gemini's own slips, below the level the 27 Oct runs had (2 of 8):** 3 of the 20 manager replies since fix 2 end on a statement. Two are polite requests with no question mark ("אשמח ש…"). One asked first and then borrowed the staff-only reason ("זה לפחות יעזור להם…"). Before the fixes it was 6 of 13. The checks now catch all three.
+  - **Spend:** about $1.17 on the key's counter between 08:55 and 09:30 UTC, against the $0.80 quoted. Fix 2 took two extra passes. The key is shared with the live bot.
+  - **Production:** `sandbox_fingerprint.py --compare` says unchanged. The memory round is 36.
+  - **Not done:** live has none of this. Section 6 and E go live only through the gate (`check_whatsapp_rules.py`), on the owner's go.
 
 ### Feature 19: every scenario run automatically, each on a clean memory: 8/10 by the checks, $1.02 (06:47-07:03 UTC; sandbox only)
 - **Asked:** *"ok for now do an auto testing with scenario based on the sandbox only"*.

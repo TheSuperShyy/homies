@@ -37,8 +37,10 @@ SCENARIOS = {
     "unknown":   ("לא מוכר", ["נשרפה נורה בלובי"], [r"בניין|כתובת"], [], set(), set()),
     # Recognised: the ticket opens at once and the reply names where it was filed (owner, 27 Oct),
     # with no question about the building or flat and no "just to confirm" either.
+    # 28 Oct: and no word of what the team will do ("הצוות יראה את זה ויטפל"); a ticket is what was done.
     "ido_lift":  ("עידו", ["המעלית לא עובדת, אף אחד לא תקוע בה"], [r"בר כוכבא 23", r"דירה 1\b", REF],
-                  [r"באיזה בניין|באיזו כתובת|באיזו דירה|מה מספר הדירה|רק לוודא"], set(), set()),
+                  [r"באיזה בניין|באיזו כתובת|באיזו דירה|מה מספר הדירה|רק לוודא",
+                   r"הצוות (?:יראה|יטפל|מטפל|על זה)|ויטפל|על זה עכשיו"], set(), set()),
     # A typed request for a person is a manager request under the owner's protocol (27 Oct evening):
     # management is told at once (a real note, so the handover label) and the reply asks what it is about.
     "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], {"handover"}, set()),
@@ -49,7 +51,7 @@ SCENARIOS = {
                              "its about the committee fee"],
                     [r"יתרה|לשלם|תשלום|קישור|חיוב"], [], {"handover"}, set()),
     # 28 Oct: "הצוות מעודכן ועל זה עכשיו", a claim no tool made (the note was even held until 09:00).
-    "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [r"על זה עכשיו|כבר מטפל|מטפלים בזה"],
+    "gas":       ("יריב", ["יש ריח חזק של גז בחדר המדרגות"], [], [r"על זה עכשיו|כבר מטפל|מטפלים בזה|קיבלו .{0,15}מיד"],
                   {"handover"}, set()),
     # Not in "all": a ticket opened in one turn, so the reply right after the tool call is the
     # one checked. Run on the faithful copy (no --section6) they say whether live leaks too.
@@ -71,6 +73,7 @@ SCENARIOS = {
                                 "no you cant help me for this one"], [], [], {"handover"}, set()),
 }
 BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
+NOTED = {"manager_fee", "manager_doubt", "manager_retest"}  # a topic is told, so two matters are noted
 # Checks on one reply, by the tenant line it answers (0 is the first), where another may rightly
 # mention the team's note. A hand-off is the team knowing or handling it, or "anything else
 # (in the meantime)?" in place of the matter itself.
@@ -80,7 +83,7 @@ HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יח
 # informed (no gatekeeping) and asks for the details; nothing is conceded ("I'll leave it for the
 # team"); the bot never argues back; and the note promises nothing (27 Oct: "שמנהל יחזור אליך … עד שזה
 # יקרה"), never "until then", and no cut-off fragment ("רק כדי שמי?", Send's promise filter).
-INFORMED = r"מעדכן|עדכנתי|רשמתי|מעודכנ|יודעת|יודעים"
+INFORMED = r"מעדכן|עדכנתי|רשמתי|הוספתי|מעודכנ|יודעת|יודעים"
 CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את זה|לבדיקת הצוות"
 ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
 NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|בלי קשר|שמי\?|כבר מטפל|על זה עכשיו"
@@ -89,7 +92,7 @@ NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידבר
 # "כדי שהם יוכלו לעזור לך … כשיבדקו") nor the rule's sentence pasted whole ("איתם אפשר לסדר").
 ENDS_Q = r"\?[\s🙂😊🙏👍💪🤝]*$"
 THEIRS = (r"כדי שהם|ככה הם|שהם יוכלו|כשיבדקו|כשיטפלו|להכין את הדברים|איתם אפשר"
-          r"|להעביר לצוות|להעביר להם|להעביר להנהלה|התמונה המלאה")
+          r"|להעביר לצוות|להעביר להם|להעביר להנהלה|התמונה המלאה|יעזור להם|לעזור להם")
 TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS])},
          "burst_manager": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS])},
          "manager_fee": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
@@ -183,20 +186,23 @@ def burst(key, conv, lines, gaps, wait=120, settle=20):
 
 
 def labels(conv, wait=20):
-    """The labels the sandbox handover put on the conversation (admin API, sandbox account only)."""
+    """The labels the sandbox handover put on the conversation (admin API, sandbox account only),
+    and the reasons it noted there (`handover_reasons`, comma-joined, one per matter)."""
     url = "%s/api/v1/accounts/%s/conversations/%s" % (E["CHATWOOT_URL"].rstrip("/"), E["SANDBOX_CW_ACCOUNT_ID"], conv)
-    got = set()
+    got, reasons = set(), []
     for _ in range(max(1, wait // 4)):
         req = urllib.request.Request(url, headers={"api_access_token": E["SANDBOX_CW_ADMIN_TOKEN"], "User-Agent": "homies/1.0"})
         try:
-            got = set(json.loads(urllib.request.urlopen(req, timeout=30).read()).get("labels") or [])
+            c = json.loads(urllib.request.urlopen(req, timeout=30).read())
         except OSError:  # a lossy line: look again
             time.sleep(4)
             continue
+        got = set(c.get("labels") or [])
+        reasons = [r for r in str((c.get("custom_attributes") or {}).get("handover_reasons") or "").split(",") if r]
         if got:
             break
         time.sleep(4)
-    return got
+    return got, reasons
 
 
 def spend():
@@ -235,10 +241,14 @@ def run(name, log):
     if name in BURST and len(said) != 1:
         fails.append("%d replies to one burst" % len(said))
     if lab_must or lab_not:
-        got = labels(conv)
+        got, reasons = labels(conv)
         fails += ["label %s missing" % l for l in lab_must - got] + ["label %s present" % l for l in lab_not & got]
-        print("  labels:", sorted(got))
-        log.append("- labels: %s" % sorted(got))
+        # 28 Oct: once the tenant names the topic, the matter is noted under its own reason, so management
+        # does not keep a bare "wants a manager" (the committee fee went unnoted once).
+        if name in NOTED and len(reasons) < 2:
+            fails.append("the matter was not noted (reasons: %s)" % ",".join(reasons))
+        print("  labels:", sorted(got), "| noted:", ",".join(reasons))
+        log.append("- labels: %s | noted: %s" % (sorted(got), ",".join(reasons)))
     print("  ->", "PASS" if not fails else "FAIL " + str(fails))
     log.append("- **result:** %s\n" % ("PASS" if not fails else "FAIL " + str(fails)))
     return not fails

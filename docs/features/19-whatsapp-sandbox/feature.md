@@ -54,6 +54,12 @@ A check script snapshots the live system before the build and compares it after 
   - Because a manager was asked for, it also leaves the team a note and says so in one sentence, and the same message carries on with the matter. It does not end on "the team knows".
   - "You can't help me with this" does not end it (the owner's next chat, 27 Oct). The bot says what it can do with the matter and asks what is going on. Only the matter itself, once known, decides what is beyond the bot.
   - The committee **fee** (balance, paying, the link, what it covers) is the bot's. Only a matter with the committee's people stays on the staff-only list.
+  - **Its reason for asking is its own, and it comes before the question** (28 Oct). It needs to know what happened to sort it out itself, faster, often right here. The insisting turn keeps that reason. It is never management's, never a relay to the team, and never "meanwhile".
+  - **The matter is noted the moment the tenant names it,** under its own reason, so management never keeps a bare "wants a manager". `sandbox_drive.py` reads `handover_reasons` to check this.
+
+**E. No claim that the team is acting** (28 Oct; live behaviour, fixed here first).
+- A reply says what the tools did: the ticket and its number, that the team was told. It never says what the team is doing or will do: no "הצוות יראה את זה ויטפל", no "ועל זה עכשיו".
+- The facts line that said the team sees it and handles it is gone. The emergency sentence has the bot as its subject ("אתה פותח מיד … ומעדכן את הצוות"), so "at once" is the bot's.
 
 **B. Recognising the sender** (section 6: do not ask again for what the company's data knows reliably). Before the model runs, the sandbox workflow reads `residents` by the sender's number ("Who is writing?", a GET) and "Add who" turns the rows into a bracket fact. Then:
 - **One match:** the model input carries `[הפונה מזוהה במערכת: <שם>, <בניין>, דירה <n>]`. The bot does not ask for the name, building or flat. When it opens a ticket it does not ask to confirm the place either: the same message says where the ticket was filed ("פתחתי קריאה על המעלית ב<בניין>, ורשמתי אותה על דירה <n>"), so the tenant can correct it (the owner, 27 Oct; the confirmation question it replaced was skipped by the model twice). The flat is named as the one the ticket is recorded on, apart from where the fault is: asked only for "where", the AI gave a lift ticket the building alone (28 Oct). The ticket tool's own "ask for the flat every time" gets one sentence for this case, so the rule and the tool do not compete.
@@ -115,7 +121,7 @@ A check script snapshots the live system before the build and compares it after 
 | Chatwoot inbox, bot, teams | API inbox 3 "צ'אט ניסוי"; agent bot 2 "מיכאל — ניסוי"; teams 5 גבייה, 6 תפעול ותקלות, 7 הנהלה, 8 שירות לדיירים | same |
 | n8n | router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n` (section 6 in); credentials "SANDBOX Chatwoot admin" and "SANDBOX Chatwoot bot" | `scripts/n8n_sandbox.py --apply --section6` |
 | Function | `debt-tools-sandbox` v3 (random fake serials since 27 Oct) | `scripts/sandbox_function.py --apply` |
-| Memory round | `SANDBOX_MEMORY_ROUND` 32 at 09:11 UTC on 28 Oct (key `<phone>-84-sbx32`); a `sandbox_drive.py --fresh` run takes one round per persona reuse, so `.env` is the truth | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
+| Memory round | `SANDBOX_MEMORY_ROUND` 36 since 09:27 UTC on 28 Oct (key `<phone>-84-sbx36`); a `sandbox_drive.py --fresh` run takes one round per persona reuse, so `.env` is the truth | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
 | Snapshot | `local/sandbox/before.json`, taken before the build | `scripts/sandbox_fingerprint.py` |
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
@@ -135,6 +141,12 @@ Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PER
   - The manager replies slip back to "so management can handle it" when the tenant insists.
   - 7 of 18 replies end on a statement.
   - The reading is in WORKLOG 28 Oct.
+- **Acceptance run 4 (28 Oct, 08:53-09:29 UTC, about $1.17): the faults fixed one cause at a time, each tested on Gemini with the scenarios it touches.**
+  - Each fix's own fault is gone in its test: the flat, the borrowed reasons, "בינתיים", the read-out committee bullet, "on it now", and the missing second note.
+  - Three runs still failed one check each, on a reply ending in a statement. Two were polite requests ("אשמח ש…"); one first reply asked first.
+  - Manager replies ending on a question: 7 of 13 before, 17 of 20 after.
+  - The text the model reads is 1,101 characters shorter.
+  - Each step is in WORKLOG 28 Oct.
 
 **Where the sandbox knowingly differs from live:**
 - **Chat log.** It is the Chatwoot conversation. A two-part reply is two rows there, and the quick "word first" line counts as a bot message; live writes one `messages` row per reply.
