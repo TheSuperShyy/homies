@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **OpenRouter is nearly empty (28 Oct, 10:20 UTC): $1.57 in the wallet, $1.56 left under the key's $15 cap** (`python scripts/check_openrouter.py`). The live WhatsApp bot runs on that key, and when it runs out, the bot answers tenants with the "technical problem" line. Run no sandbox scenario (`sandbox_drive.py`, about $0.10-0.25 each) until the owner tops up; the driver now refuses to start while the run could leave either number under $2. That day's sandbox runs used about $3.30. **Both numbers need raising:** the wallet, and the key's $15 cap in the OpenRouter dashboard, or the key stops at its cap with money still in the wallet.
+
 ---
 
 ## The project in a paragraph
@@ -616,7 +618,7 @@ its stated time.
         - After a matter only staff can finish (e.g. a double charge), it asks what the team will need, not "anything else".
         - Proven on Gemini in run 7. The last three wording fixes (informed-only, details after a staff-only matter, the second note's reason) are not re-run, because the owner is testing.
         - **Do not run the driver as Ido while the owner tests:** memory is per phone, and their chats mix.
-        - Memory round 43 (28 Oct, 09:49 UTC): every `--fresh` scenario takes a round.
+        - Memory round 44 (28 Oct, 10:15 UTC): every `--fresh` scenario takes a round.
       - **28 Oct: every scenario run automatically, each on a clean memory** (`sandbox_drive.py --run all --fresh`): 8/10 by the checks, $1.02. WORKLOG 28 Oct has every reply.
         - **Being fixed one cause at a time, on the owner's go** (*"ok lets start fixing it one by one … we need some harmony"*). Each fix rewrites or deletes the sentence that caused the fault, and is tested on Gemini with only the scenarios it touches. WORKLOG 28 Oct, "the run's faults fixed one at a time", has each step.
           - **Fix 1, DONE:** the lift ticket names the flat ("רשומה על דירה 1"). `WHO_RULE` asks on which flat the ticket is filed, apart from where the fault is.
@@ -632,14 +634,14 @@ its stated time.
           - **Spend:** about $1.17 on the key's counter (08:55-09:30 UTC), against the $0.80 quoted, because fix 2 took two extra passes.
           - **Production unchanged** (fingerprint compare, 09:31 UTC).
           - **The full run after the fixes, on the owner's "ok test it automatically" (09:36-09:52 UTC, $1.13): 7/10 by the current checks** (the 07:03 run scores 4/10 by the same checks). WORKLOG 28 Oct has every reply. Everything fixed held.
-          - **OPEN, all in the manager flow, waiting on the owner's word:**
-            - **The reply right after the second note** handed the fee back once ("תוכל להרחיב קצת כדי שידעו איך להמשיך מכאן?") and asked "anything meanwhile?" once.
-              - Likely a side effect of fix 2c: the second note carries the matter's own reason, so `notify_team`'s "afterwards" branch for "a matter past you" fires at the topic turn.
-              - The proposed fix is one existing sentence in that paragraph: the manager branch also covers the note of its matter.
-            - **3 of 13 replies end on a statement,** because the reason's "often right here" comes after the question. The proposed fix: the reason in one clause, "here and now" left to the "you can't help" sentence.
-            - **Re-test:** `manager_fee,manager_retest,rep_typed`, about $0.45.
-          - **Then, on the owner's word:**
-            - the owner's own chat in the sandbox (memory round 43);
+          - **Then the owner (10:00 UTC):** *"make it friendly, accommodating and warm not too stiff and rude like i can fix it or like i can sort it out right here tell me what happened. we need to make it the best of customer services oriented as possible"*.
+          - **PUSHED 10:15 UTC, NOT TESTED on Gemini (the wallet, see the top of this file); memory round 44:**
+            - **Tone:** the reason "so you can sort it out yourself, often right here" was fix 2's own wording, and it broke the owner's 18 Oct "lowkey". It is now a word of care, then "so we can help as quickly as possible", then a gentle question. The insisting turn: "even a few words will help us help him". "You can't help": "still want to try to help". "רגוע ובטוח" became "בחום ובהבנה".
+            - **Accuracy:** `notify_team`'s "afterwards" now gives the note of a manager request's matter the manager branch. In the full run, the "a matter past you" branch handed the fee back once ("כדי שידעו איך להמשיך מכאן").
+            - **`STIFF`** in the driver counts the capability claims on all 13 manager turns. Replayed on the 09:52 run, it flags 11 of the 13 manager replies.
+          - **Next, after a top-up and on the owner's word:**
+            - `sandbox_drive.py --run rep_typed,manager_fee,burst_manager,manager_doubt,manager_retest --fresh`, about $0.80;
+            - then the owner's own chat (round 44);
             - then the live promotion of section 6 + E through `check_whatsapp_rules.py`.
         - **A sandbox test outside office hours (Sun-Thu 09:00-17:00 Israel time) shows the labels but no note.** The note waits for the live morning ticker, and the sandbox has no copy of it.
       - **"Hand to a person" drops a second note with the same reason in one conversation within 24 h** (`Decide the routing`, live too). A note that adds details must carry a different reason, or the team never sees it.
@@ -654,7 +656,7 @@ its stated time.
         - **Waiting on:** the owner's own chat.
         - **Slips the AI makes now and then:** a reply ending on a full stop (2 of 8 in run 3), and once "אני העוזר הדיגיטלי…" in answer to "are you a manager?".
       - **Live defect, open:** Send's promise filter can leave a stub when it cuts inside a relative clause. On 27 Oct "רק כדי שמי שיחזור אליך…" was sent as "רק כדי שמי?". `DANGLE` lacks `מי`/`שמי`. The fix goes through the live gate.
-      - **The sandbox's memory round is 43 since 09:49 UTC on 28 Oct, and each `--fresh` scenario adds one.** `SANDBOX_MEMORY_ROUND` in `.env` is the truth; the "As built" table in `feature.md` follows it.
+      - **The sandbox's memory round is 44 since 10:15 UTC on 28 Oct, and each `--fresh` scenario adds one.** `SANDBOX_MEMORY_ROUND` in `.env` is the truth; the "As built" table in `feature.md` follows it.
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.

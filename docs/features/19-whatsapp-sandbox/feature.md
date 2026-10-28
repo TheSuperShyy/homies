@@ -54,7 +54,10 @@ A check script snapshots the live system before the build and compares it after 
   - Because a manager was asked for, it also leaves the team a note and says so in one sentence, and the same message carries on with the matter. It does not end on "the team knows".
   - "You can't help me with this" does not end it (the owner's next chat, 27 Oct). The bot says what it can do with the matter and asks what is going on. Only the matter itself, once known, decides what is beyond the bot.
   - The committee **fee** (balance, paying, the link, what it covers) is the bot's. Only a matter with the committee's people stays on the staff-only list.
-  - **Its reason for asking is its own, and it comes before the question** (28 Oct). It needs to know what happened to sort it out itself, faster, often right here. The insisting turn keeps that reason. It is never management's, never a relay to the team, and never "meanwhile".
+  - **Warm and accommodating, never a claim of capability** (the owner, 28 Oct, on "so I can sort it out myself, right here": *"not too stiff and rude"*).
+    - After a word of care, the reason comes before the question: so we can help as quickly as possible. The insisting turn keeps it.
+    - "You can't help me" gets willingness, not "I can fix it".
+    - Never management's reason, never a relay to the team, and never "meanwhile".
   - **The matter is noted the moment the tenant names it,** under its own reason, so management never keeps a bare "wants a manager". `sandbox_drive.py` reads `handover_reasons` to check this.
 
 **E. No claim that the team is acting** (28 Oct; live behaviour, fixed here first).

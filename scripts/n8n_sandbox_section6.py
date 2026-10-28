@@ -93,6 +93,12 @@ PROMPT_CUTS = [
 # purpose, the tool's call sat after "a topic is not yet what they need" and the committee fee went
 # unnoted, so the rule now says the note first, when the topic is told, then the handling; the
 # tool's own copy of "the matter is yours" was a duplicate of the rule and is gone.
+# 28 Oct, later, the owner on that reason: "make it friendly, accommodating and warm not too stiff and
+# rude like i can fix it or like i can sort it out right here tell me what happened". "So you can sort
+# it out yourself, often right here" broke his 18 Oct "lowkey" (fix it quietly, never announce it). The
+# reason is now his own protocol's, "so we can help you as quickly as possible", after a word of care,
+# and the bot offers willingness ("still want to try to help"), never capability. The note of the
+# matter takes the tool's manager branch, not "a matter past you" (it handed the fee back once).
 # Not taken from the protocol the owner pasted with it: presenting the bot's own answer as "an
 # automated background check" or asking for data "for the manager's screen". That misleads the
 # tenant, and the prompt's honesty rule (never claim what no tool did) forbids it.
@@ -100,17 +106,17 @@ MANAGER_FROM = "בקשה לדבר עם מנהל, עם בן אדם או עם מי
 MANAGER_TO = "ואתה נשאר איתו, בסבלנות, עד שהוא מספר."
 MANAGER_RULE = (
     "בקשה לדבר עם מנהל, עם בן אדם או עם מישהו מהצוות היא בקשה לגיטימית, ואתה לא שומר עליה בדלת ולא מתנה אותה "
-    "בכלום. אתה מקבל אותה בחום, רגוע ובטוח, כמו מי שבאמת בצד שלו: רושם מיד לצוות, עם הכלי שיש לך לזה, שהוא "
+    "בכלום. אתה מקבל אותה בחום ובהבנה, כמו מי שבאמת בצד שלו: רושם מיד לצוות, עם הכלי שיש לך לזה, שהוא "
     "ביקש מנהל, עם מה שכבר סיפר, ואומר לו במשפט אחד שההנהלה מעודכנת. רק את זה, כי מה שיקרה אחר כך אתה "
-    "לא יודע. ובאותה הודעה אתה אומר לו בפשטות ובכנות למה אתה צריך לדעת מה קרה: כדי "
-    "שתוכל לסדר את זה בעצמך, מהר יותר, והרבה פעמים כבר כאן, ושואל אותו על מה מדובר ומה מטריד אותו. ואם הוא "
-    "מתעקש, או לא רוצה לפרט, אתה לא מוותר ולא מתווכח: אתה אומר לו בנעימות שההנהלה כבר יודעת, ושמספיקה לך מילה "
-    "על מה מדובר כדי להתחיל לטפל בזה בעצמך, ושואל שוב, בדרך אחרת ולא באותן מילים. כשאתה יודע במה מדובר, אתה "
+    "לא יודע. ובאותה הודעה, אחרי שהוא שומע שאכפת לך, אתה אומר לו בפשטות שכדי שנוכל לעזור לו כמה שיותר מהר "
+    "יעזור לשמוע ממנו מה קרה, ושואל אותו בעדינות מה מטריד אותו. ואם הוא "
+    "מתעקש, או לא רוצה לפרט, אתה לא מוותר ולא מתווכח: אתה מרגיע אותו בחום שההנהלה כבר יודעת, מקל עליו, כי גם "
+    "כמה מילים יעזרו לנו לעזור לו, ושואל שוב, בדרך אחרת ולא באותן מילים. כשאתה יודע במה מדובר, אתה "
     "מוסיף את זה לצוות עם הכלי, פעם אחת, והעניין אצלך ואתה מטפל בו עד הסוף, עם הכלים שלך ועם מה "
     "שאתה יודע: נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה איתו, או עושה את מה שצריך. "
     "ואם הוא אומר שאתה לא יכול לעזור לו בזה, "
-    "אתה לא מוותר, לא משאיר את זה לצוות ולא מתווכח: אתה מקבל את זה בחום, אומר לו שהרבה דברים כאלה אפשר לסדר "
-    "לו כאן ועכשיו, ושואל בכל זאת מה קורה. מה שרק בן אדם בהומי'ז יכול לסיים נשאר אצל הצוות, עם "
+    "אתה לא מוותר, לא משאיר את זה לצוות ולא מתווכח: אתה מקבל את זה בחום ובהבנה, אומר לו שאתה עדיין רוצה לנסות "
+    "לעזור, ושואל בעדינות מה קורה. מה שרק בן אדם בהומי'ז יכול לסיים נשאר אצל הצוות, עם "
     "הפרטים, ואז אתה אומר לו שהצוות יודע.")
 SOLVE_EDITS = [
     ("חוזה, הצעת מחיר, ענייני ועד הבית, וכל דבר אחר שאתה לא יכול לגמור בעצמך",
@@ -156,8 +162,9 @@ NOTE_EDITS = [
     ("What the resident hears from you afterwards: that you have let the team know, in your own words, and "
      "what you can still do for them now.",
      "What the resident hears from you afterwards: that you have let the team know, in your own words, and "
-     "then, in the same message, the matter itself while it is still yours. After a manager request it is: "
-     "ask what is going on with it, or do it, as the one handling it. After a matter past you: the details "
+     "then, in the same message, the matter itself while it is still yours. After a manager request, and after "
+     "the note that adds its matter, it is: ask what is going on with it, or do it, as the one handling it. "
+     "After a matter past you: the details "
      "the team will need to sort it out faster (when, how much, what exactly), one question at a time; only "
      "when nothing is left to ask, what else you can do now."),
     ("A different matter later in the same conversation is.",

@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: the manager replies made warm, not capable-sounding (10:00-10:20 UTC; sandbox only; pushed, not tested)
+- **Asked:** *"so we need to make it very accurate and reliable. make it friendly, accommodating and warm not too stiff and rude like i can fix it or like i can sort it out right here tell me what happened. we need to make it the best of customer services oriented as possible"*.
+- **Found: the stiffness was fix 2's own wording.**
+  - "כדי שתוכל לסדר את זה בעצמך, מהר יותר, והרבה פעמים כבר כאן" became "כדי שאוכל לסדר את זה בעצמי… ממש כאן".
+  - The insisting turn's "מספיקה לך מילה … כדי להתחיל לטפל בזה בעצמך" became "מספיקה לי רק מילה".
+  - "You can't help" said "הרבה דברים כאלה אפשר לסדר לו כאן ועכשיו".
+  - Announcing that the bot can fix it breaks the owner's 18 Oct "lowkey". The new `STIFF` check flags 11 of the 13 manager replies of the 09:52 run.
+- **Change, the same sentences rewritten (`MANAGER_RULE`):**
+  - "רגוע ובטוח" became "בחום ובהבנה".
+  - The reason, after a word of care: "כדי שנוכל לעזור לו כמה שיותר מהר יעזור לשמוע ממנו מה קרה", then "ושואל אותו בעדינות מה מטריד אותו". This is the owner's own protocol ("so that we can resolve [it] faster"), in "we".
+  - Insisting: "אתה מרגיע אותו בחום שההנהלה כבר יודעת, מקל עליו, כי גם כמה מילים יעזרו לנו לעזור לו".
+  - "You can't help": "מקבל את זה בחום ובהבנה, אומר לו שאתה עדיין רוצה לנסות לעזור, ושואל בעדינות מה קורה".
+- **Change with it, accuracy (`NOTE_EDITS`):** `notify_team`'s "afterwards" covers "a manager request, and the note that adds its matter". The note of the matter had taken the "a matter past you" branch and handed the fee back once.
+- **Built offline and pushed at 10:15 UTC, memory round 44.** The deployed prompt was read back: it has the new sentences and none of the old ones. Prompt 23,233 characters, `notify_team` 3,125.
+- **Not tested on Gemini.** `check_openrouter.py` says the wallet is at $1.57 and the key's cap has $1.56 left: LOW, under the $2 line where the live agent's big turns get refused. The live bot runs on that key, so no scenario is run until the owner tops up the wallet and raises the cap. The re-test is the five manager scenarios, about $0.80.
+- **Guard:** `sandbox_drive.py` now refuses to start when a run (about $0.15 a scenario) could leave the wallet or the cap under that line. Checked: `--run gas` exits with "OpenRouter has $-0.44 above the live bot's $2 line…" before any push or AI call; the memory round stayed 44.
+
 ### Feature 19: every scenario run again after the five fixes (from 09:35 UTC; sandbox only)
 - **Asked:** *"ok test it automatically"*, after the fixes were reported.
 - **Run:** `sandbox_drive.py --run all --fresh`: the ten scenarios of the 07:03 run, each on a clean memory, with the checks added during the fixes. The sandbox had been quiet since 09:29, and the key's counter read 12.3142 before the run.

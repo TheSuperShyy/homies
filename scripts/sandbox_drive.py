@@ -1,7 +1,8 @@
 """Scripted conversations against the sandbox bot (feature 19). SPENDS OpenRouter
 (the live credential, shared by owner decision): five of the six scenarios reach
 the model, six tenant turns in all, each a few Gemini 3.1 Pro calls. Under $1.
-Run only on the owner's go.
+Run only on the owner's go. It refuses to start when the run could leave the key, which the live bot
+answers on, under check_openrouter.py's LOW line.
 
     python scripts/sandbox_drive.py              # list the scenarios (free)
     python scripts/sandbox_drive.py --run all    # or --run ido_lift,menu_two
@@ -21,6 +22,7 @@ import json, os, re, subprocess, sys, time, urllib.error, urllib.request
 from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sandbox_chat import E, PERSONAS, contact, cw
+from check_openrouter import LOW, get as openrouter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REF = r"\b999-9\d{5}-\d{2}\b"  # the sandbox's fake ticket numbers (guard.ts)
@@ -93,20 +95,23 @@ NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידבר
 ENDS_Q = r"\?[\s🙂😊🙏👍💪🤝]*$"
 THEIRS = (r"כדי שהם|ככה הם|שהם יוכלו|כשיבדקו|כשיטפלו|להכין את הדברים|איתם אפשר"
           r"|להעביר לצוות|להעביר להם|להעביר להנהלה|התמונה המלאה|יעזור להם|לעזור להם|כדי שידעו")
-TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS])},
-         "burst_manager": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS])},
-         "manager_fee": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
-                         1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS]),
-                         2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS])},
-         "manager_doubt": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
-                           1: ([ENDS_Q, r"מיכאל"], [ARGUE, CONCEDE, r"דיגיטלי", THEIRS]),
+# 28 Oct, the owner: "not too stiff and rude like i can fix it or like i can sort it out right here tell
+# me what happened". A manager reply offers care and willingness, never its own capability.
+STIFF = r"בעצמי|כאן ועכשיו|ממש כאן|התחום שלי|(?:אני יכול|אוכל) ל(?:סדר|פתור|טפל)|מספיקה לי"
+TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF])},
+         "burst_manager": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF])},
+         "manager_fee": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                         1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS, STIFF]),
+                         2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, STIFF])},
+         "manager_doubt": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                           1: ([ENDS_Q, r"מיכאל"], [ARGUE, CONCEDE, r"דיגיטלי", THEIRS, STIFF]),
                            # the monthly fee is the bot's; the committee's people are not the topic
-                           2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, r"חברי (?:ה)?ועד|הוועד עצמם"]),
-                           3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS])},
-         "manager_retest": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS]),
-                            1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS]),
-                            2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS]),
-                            3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS])}}
+                           2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, r"חברי (?:ה)?ועד|הוועד עצמם", STIFF]),
+                           3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS, STIFF])},
+         "manager_retest": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                            1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS, STIFF]),
+                            2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, STIFF]),
+                            3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS, STIFF])}}
 
 
 def call(method, path, body=None, tries=4):
@@ -211,6 +216,17 @@ def spend():
     return float(json.loads(urllib.request.urlopen(req, timeout=30).read())["data"].get("usage") or 0)
 
 
+def headroom():
+    """What a run may spend and still leave the live bot above check_openrouter's LOW line. The live
+    bot answers tenants on this same key (28 Oct: a day of runs left the wallet at $1.57)."""
+    key = E["OPENROUTER_API_KEY"]
+    c, k = openrouter(key, "/credits"), openrouter(key, "/auth/key")
+    left = float(c.get("total_credits") or 0) - float(c.get("total_usage") or 0)
+    if k.get("limit") is not None:
+        left = min(left, float(k.get("limit_remaining") or 0))
+    return left - LOW
+
+
 def run(name, log):
     label, lines, must, mustnt, lab_must, lab_not = SCENARIOS[name]
     key = persona(label)
@@ -261,6 +277,10 @@ if __name__ == "__main__":
         sys.exit(0)
     arg = sys.argv[sys.argv.index("--run") + 1]
     names = [n for n in SCENARIOS if not n.startswith("leak_")] if arg == "all" else arg.split(",")
+    room, need = headroom(), 0.15 * len(names)  # 28 Oct: ten scenarios cost $1.02-1.13
+    if room < need:
+        sys.exit("OpenRouter has $%.2f above the live bot's $%.0f line, and this run may cost $%.2f. "
+                 "Top up first (python scripts/check_openrouter.py)." % (room, LOW, need))
     start = spend()
     log = ["# Sandbox acceptance run, %s UTC\n" % datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")]
     fresh, spoke, ok = "--fresh" in sys.argv, set(), 0
