@@ -121,7 +121,7 @@ A check script snapshots the live system before the build and compares it after 
 | Chatwoot inbox, bot, teams | API inbox 3 "צ'אט ניסוי"; agent bot 2 "מיכאל — ניסוי"; teams 5 גבייה, 6 תפעול ותקלות, 7 הנהלה, 8 שירות לדיירים | same |
 | n8n | router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n` (section 6 in); credentials "SANDBOX Chatwoot admin" and "SANDBOX Chatwoot bot" | `scripts/n8n_sandbox.py --apply --section6` |
 | Function | `debt-tools-sandbox` v3 (random fake serials since 27 Oct) | `scripts/sandbox_function.py --apply` |
-| Memory round | `SANDBOX_MEMORY_ROUND` 36 since 09:27 UTC on 28 Oct (key `<phone>-84-sbx36`); a `sandbox_drive.py --fresh` run takes one round per persona reuse, so `.env` is the truth | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
+| Memory round | `SANDBOX_MEMORY_ROUND` 43 since 09:49 UTC on 28 Oct (key `<phone>-84-sbx43`); a `sandbox_drive.py --fresh` run takes one round per persona reuse, so `.env` is the truth | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
 | Snapshot | `local/sandbox/before.json`, taken before the build | `scripts/sandbox_fingerprint.py` |
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
@@ -147,6 +147,9 @@ Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PER
   - Manager replies ending on a question: 7 of 13 before, 17 of 20 after.
   - The text the model reads is 1,101 characters shorter.
   - Each step is in WORKLOG 28 Oct.
+- **Acceptance run 5 (28 Oct, 09:36-09:52 UTC, $1.13): every scenario after the fixes, 7/10 by the current checks.** The 07:03 run scores 4/10 by the same checks.
+  - The fixes held: the flat, the gas reply, the committee bullet, the bot's own reason on every insisting turn, and the second note on every topic turn.
+  - The three fails are all at one point: the reply right after the second note handed the fee back once ("כדי שידעו איך להמשיך") and said "בינתיים" once. Add one more "בינתיים" and 3 of 13 replies ending on a statement.
 
 **Where the sandbox knowingly differs from live:**
 - **Chat log.** It is the Chatwoot conversation. A two-part reply is two rows there, and the quick "word first" line counts as a bot message; live writes one `messages` row per reply.

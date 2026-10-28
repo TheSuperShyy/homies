@@ -14,6 +14,25 @@ conversation that produced it.
 ### Feature 19: every scenario run again after the five fixes (from 09:35 UTC; sandbox only)
 - **Asked:** *"ok test it automatically"*, after the fixes were reported.
 - **Run:** `sandbox_drive.py --run all --fresh`: the ten scenarios of the 07:03 run, each on a clean memory, with the checks added during the fixes. The sandbox had been quiet since 09:29, and the key's counter read 12.3142 before the run.
+- **Result (09:36-09:52 UTC, rounds 37-43, $1.13): 6/10 by the driver, 7/10 once two check gaps were closed.**
+  - The gaps: manager_doubt's correct "ההנהלה שלנו עודכנה" was not in `INFORMED`, and the relay "כדי שידעו" was not in `THEIRS`. Both are added.
+  - The 07:03 run scores 4/10 by the same checks.
+- **Held across the whole run:**
+  - ido_lift: "ורשמתי אותה על דירה 1".
+  - gas: "פתחתי עכשיו קריאה דחופה … ועדכנתי מיד את הצוות", with no claim for the team.
+  - The committee bullet was not read out, and there was no "כבר מטפלים".
+  - Every insisting turn gave the bot's own reason (manager_fee, manager_retest, burst_manager, manager_doubt).
+  - All three topic turns made the second note: `caller_request` then `other`, `other`, `payment`.
+  - manager_doubt is the reply the owner asked for. The fee turn: "תשלום ועד הבית זה משהו שאני מטפל בו בעצמי… תרצה שאבדוק מה היתרה שלך, לתת לך קישור לתשלום…?". "You can't help": "…תשלום ועד בית זה ממש התחום שלי… תוכל לשתף אותי מה קורה?".
+- **Still wrong, all in the manager flow:**
+  - **The reply right after the second note.**
+    - manager_fee handed the fee back: "עדכנתי עכשיו את הצוות לגבי זה. תוכל להרחיב קצת כדי שידעו איך להמשיך מכאן?".
+    - manager_retest asked "יש משהו שאני יכול לעזור בו בינתיים? אולי יש לך שאלה על היתרה…".
+    - manager_doubt was right.
+    - **Likely cause, a side effect of fix 2c:** `notify_team`'s "what the resident hears afterwards" has a branch for a manager request and one for "a matter past you" (the details the team will need). The second note carries the matter's own reason, so the model takes the second branch. Since 2c, that note comes at the topic turn, so the branch fires there.
+  - **"בינתיים" twice:** rep_typed's bridge after "ההנהלה מעודכנת", and manager_retest's above.
+  - **3 of 13 manager replies end on a statement.** The reason's second half, "often right here", comes after the question: "…ספר לי קצת על מה מדובר? הרבה פעמים אני יכול לסדר את הדברים האלה ממש כאן.".
+- **Spend on this work today:** about $1.17 for the fixes and $1.13 for this run.
 
 ### Feature 19: the run's faults fixed one at a time, each by changing the sentence that caused it (from 08:50 UTC; sandbox only)
 - **Asked:** *"ok lets start fixing it one by one for the issue we dont want multiple fixes overlapping each other rules we need some harmony so that we dont have a prompt paralysis and rules conflicts so it can work better"*.

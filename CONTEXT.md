@@ -58,6 +58,8 @@ The user is the builder. The client is Homies.
   - **Two peers in the facts get read out as an either/or.** The committee bullet listed "the committee's people go to the team" and "the fee is yours" side by side, and the bot told a tenant both. The main case comes first; the exception follows it, as an exception.
   - **A clause can make the team the subject of an action.** "קריאת שירות בדחיפות חירום והצוות יודע, מיד" was read as the team acting at once ("והם קיבלו את הדיווח מיד", "ועל זה עכשיו"). The bot is the subject of what the bot does.
   - **Stop at noise.** After the systematic cause is gone, a slip in 1 run of 6 is not answered with more text. Record it and let the checks keep counting.
+  - **Moving a step moves what follows it.** When the second note moved to the topic turn, the tool's "what the resident hears afterwards" came with it. Its branch for a matter past the bot ("the details the team will need") then handed the committee fee back once ("כדי שידעו איך להמשיך מכאן", 28 Oct). After moving a tool call, read the tool's own "afterwards" text for the new place.
+  - **Run the whole set after a round of fixes.** Each fix passed its own scenarios, and the full run still found the side effect above.
 - **One reply per burst: the bot checks for a newer message again right before sending** (27 Oct, from the owner's sandbox chat; sandbox now, live on go).
   - Exceptions: a bare hello does not count, and a failed check sends.
   - **When it goes live,** "Log reply" must move behind the check too, or a dropped draft is logged as said.
