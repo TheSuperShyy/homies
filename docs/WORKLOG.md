@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: every scenario run again after the five fixes (from 09:35 UTC; sandbox only)
+- **Asked:** *"ok test it automatically"*, after the fixes were reported.
+- **Run:** `sandbox_drive.py --run all --fresh`: the ten scenarios of the 07:03 run, each on a clean memory, with the checks added during the fixes. The sandbox had been quiet since 09:29, and the key's counter read 12.3142 before the run.
+
 ### Feature 19: the run's faults fixed one at a time, each by changing the sentence that caused it (from 08:50 UTC; sandbox only)
 - **Asked:** *"ok lets start fixing it one by one for the issue we dont want multiple fixes overlapping each other rules we need some harmony so that we dont have a prompt paralysis and rules conflicts so it can work better"*.
 - **Method:**
