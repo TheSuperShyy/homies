@@ -115,7 +115,7 @@ A check script snapshots the live system before the build and compares it after 
 | Chatwoot inbox, bot, teams | API inbox 3 "צ'אט ניסוי"; agent bot 2 "מיכאל — ניסוי"; teams 5 גבייה, 6 תפעול ותקלות, 7 הנהלה, 8 שירות לדיירים | same |
 | n8n | router `OLzT4Y7dXWYSpfXg`, handover `OnvgKPLYGGwsqY2G`, bot `SI4iUJJnLG5ghY6n` (section 6 in); credentials "SANDBOX Chatwoot admin" and "SANDBOX Chatwoot bot" | `scripts/n8n_sandbox.py --apply --section6` |
 | Function | `debt-tools-sandbox` v3 (random fake serials since 27 Oct) | `scripts/sandbox_function.py --apply` |
-| Memory round | `SANDBOX_MEMORY_ROUND` 20 since 27 Oct, 14:32 UTC (key `<phone>-84-sbx20`) | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
+| Memory round | `SANDBOX_MEMORY_ROUND` 27 since 28 Oct, about 07:00 UTC (key `<phone>-84-sbx27`); a `sandbox_drive.py --fresh` run takes one round per persona reuse | `scripts/n8n_sandbox.py --apply --section6 --fresh-memory` |
 | Snapshot | `local/sandbox/before.json`, taken before the build | `scripts/sandbox_fingerprint.py` |
 
 Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PERSONAS` (Ido, Yariv, the owner's +63 as אסף, and an unknown test number).
@@ -130,10 +130,16 @@ Every id and token is in `.env` under `SANDBOX_*`. The personas are `SANDBOX_PER
   - The faithful copy opened 3/3 tickets with clean replies, so the leak is a rare slip, not live behaviour.
   - With clean memory, Ido's "I want a representative" and his balance pass.
   - His lift ticket opens without the place being confirmed or named. That is the owner's call.
+- **Acceptance run 3 (28 Oct, $1.02): 8/10 by the checks, every scenario on a clean memory** (`--run all --fresh`).
+  - The lift ticket names the building but not the flat.
+  - The manager replies slip back to "so management can handle it" when the tenant insists.
+  - 7 of 18 replies end on a statement.
+  - The reading is in WORKLOG 28 Oct.
 
 **Where the sandbox knowingly differs from live:**
 - **Chat log.** It is the Chatwoot conversation. A two-part reply is two rows there, and the quick "word first" line counts as a bot message; live writes one `messages` row per reply.
 - **Memory key.** It ends in `-sbx`, so no sandbox turn can enter a live conversation's memory.
 - **Binary mode.** n8n's public API drops the `binaryMode: separate` setting. The bot carries no binary data (photos travel as Chatwoot links), so this has no effect.
 - **Tickets.** A sandbox ticket cannot be found later, because the status tool reads the real table. A photo is not copied, because the guard refuses the Chatwoot host.
+- **After-hours notes.** Outside Sun-Thu 09:00-17:00 Israel time, "Hand to a person" labels the conversation `after-hours` and holds the note for the live morning ticker. The ticker reads account 2 only, so a sandbox note held that way never posts. Only the labels show.
 - **Canvas.** The live bot's one overlap (`Show it in Open` over `Type for a moment (menu)`) is carried over. The added nodes overlap nothing.

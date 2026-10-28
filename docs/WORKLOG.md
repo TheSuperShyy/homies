@@ -9,6 +9,39 @@ conversation that produced it.
 
 ---
 
+## 2026-10-28
+
+### Feature 19: every scenario run automatically, each on a clean memory: 8/10 by the checks, $1.02 (06:47-07:03 UTC; sandbox only)
+- **Asked:** *"ok for now do an auto testing with scenario based on the sandbox only"*.
+- **The driver (`sandbox_drive.py`) changed first:**
+  - **`--fresh`** pushes a new memory round before the run, and again before any scenario whose persona has already spoken in it. Six scenarios are Ido's, and his memory used to carry each one into the next. The rounds went from 21 to 27.
+  - **`rep_typed`** now expects the owner's protocol: a typed request for a person informs management at once (a real note, so the handover label) and asks what it is about. The old check expected no note.
+  - **Chatwoot calls are retried on a lossy line.** A read is always retried. A write is retried only when it never left the PC, so no tenant line is sent twice. Checked offline in 4/4 cases.
+- **Results, read reply by reply and not only by the checks:**
+  - **Clean:**
+    - menu_two: the greeting with two buttons;
+    - unknown: the bot asks for the building and flat;
+    - balance: it asks for name and phone;
+    - burst_manager: one reply to three lines, saying management is informed and ending on "מה קרה?".
+  - **ido_lift FAIL.** Ticket 999-933179-26 opened at once and named בר כוכבא 23, but not the flat. The owner's 27 Oct decision is building and flat.
+  - **manager_retest FAIL.**
+    - The insisting turn gave management's reason for asking: "כדי שהם יוכלו לעזור לך הכי טוב כשיבדקו את זה".
+    - The topic turn ended on the vague "אולי יש משהו שאני יכול לעזור בו כבר עכשיו?".
+    - Both notes were real: management at 07:00:58, then collections with the matter at 07:02:23.
+  - **Passed the checks, but the reading finds slips:**
+    - **manager_fee:** "בינתיים" and "להכין את הדברים כדי שזה יטופל מהר יותר" on the first turn, and "ככה הם יוכלו לטפל בזה הכי טוב" on the insisting one. The fee turn itself was right: "יש משהו ספציפי בחיוב… אפשר לבדוק את זה כבר עכשיו".
+    - **manager_doubt:** "כי הם כבר מטפלים בזה", the "already on it" the protocol forbids. The identity answer was right ("אני מיכאל מצוות השירות של הומי'ז"), and "you can't help" kept the matter.
+    - **rep_typed:** "איתם אפשר לסדר את זה מהר יותר" was copied from the prompt, and "איתם" has nothing to point to.
+    - **gas:** an emergency ticket and the operations label, but "הצוות מעודכן ועל זה עכשיו" while the note was held for office hours, and no safety line (the known cold gas reply).
+  - **7 of 18 replies end on a statement:** rep_typed, manager_fee three times, gas, and the first reply of manager_doubt and of manager_retest. The manager rule says "ask, then say why", so the reason comes last.
+- **The pattern:** three replies made the reason for asking management's ("so they can handle it best"), which is the stand-in the owner rejected. Two of the three were the insisting turn. `MANAGER_RULE` gives no reason for that turn, so the model makes one up.
+- **Found: in the sandbox, a note held after hours never posts.**
+  - Office hours are Sun-Thu, 09:00-17:00 Israel time.
+  - Outside them, "Hand to a person" labels the conversation `after-hours` and leaves the note for the live morning ticker. The ticker only reads account 2.
+  - So the scenarios run before 09:00 Israel time have the labels and no note.
+- **Production:** `sandbox_fingerprint.py --compare` says unchanged. The memory round is 27.
+- **Not done:** no wording was changed. The fixes, and a re-run of the five affected scenarios (about $0.80), wait on the owner's go.
+
 ## 2026-10-27
 
 ### Feature 19: "the sandbox is not working": the bot was answering, the chat page had stopped showing anything (fixed 16:39 UTC)

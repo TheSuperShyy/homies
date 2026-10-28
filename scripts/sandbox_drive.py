@@ -5,13 +5,19 @@ Run only on the owner's go.
 
     python scripts/sandbox_drive.py              # list the scenarios (free)
     python scripts/sandbox_drive.py --run all    # or --run ido_lift,menu_two
+    ... --run all --fresh                        # each scenario on a clean memory (a push per persona reuse)
 
 Each scenario opens a new conversation in the sandbox inbox as one persona and
 checks the bot's words (regexes) and, where it matters, the labels the sandbox
 "Hand to a person" put on the conversation. A regex pass is not a quality pass:
 read the transcripts, which are also written to local/sandbox/runs/.
+
+A persona's memory is its phone's, across conversations, so without --fresh a persona's later
+scenarios see its earlier ones (six are Ido's). --fresh pushes a new memory round
+(n8n_sandbox.py --apply --section6 --fresh-memory) before the run and before any scenario
+whose persona has already spoken in it.
 """
-import json, os, re, sys, time, urllib.request
+import json, os, re, subprocess, sys, time, urllib.error, urllib.request
 from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sandbox_chat import E, PERSONAS, contact, cw
@@ -33,7 +39,9 @@ SCENARIOS = {
     # with no question about the building or flat and no "just to confirm" either.
     "ido_lift":  ("עידו", ["המעלית לא עובדת, אף אחד לא תקוע בה"], [r"בר כוכבא 23", r"דירה 1\b", REF],
                   [r"באיזה בניין|באיזו כתובת|באיזו דירה|מה מספר הדירה|רק לוודא"], set(), set()),
-    "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], set(), {"handover"}),
+    # A typed request for a person is a manager request under the owner's protocol (27 Oct evening):
+    # management is told at once (a real note, so the handover label) and the reply asks what it is about.
+    "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], {"handover"}, set()),
     "balance":   ("עידו", ["כמה אני חייב?"], [r"שם|טלפון"], [r"\d{3,} ?₪|\d{3,} שקל"], set(), set()),
     # The owner's own sandbox chat, 27 Oct, word for word: the bot must take the committee fee on
     # itself (balance, paying, a charge) and leave the team a note because a manager was asked for.
@@ -74,7 +82,8 @@ INFORMED = r"מעדכן|עדכנתי|רשמתי|מעודכנ|יודעת|יודע
 CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את זה|לבדיקת הצוות"
 ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
 NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|שמי\?"
-TURNS = {"manager_doubt": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
+TURNS = {"rep_typed": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE])},
+         "manager_doubt": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
                            1: ([r"\?", r"מיכאל"], [ARGUE, CONCEDE, r"דיגיטלי"]),
                            2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE, CONCEDE])},
          "manager_retest": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
@@ -82,19 +91,47 @@ TURNS = {"manager_doubt": {0: ([r"\?", INFORMED], [NOTE_SAYS, CONCEDE]),
                             2: ([r"\?"], [HANDOFF, NOTE_SAYS]), 3: ([r"\?"], [HANDOFF, ARGUE, CONCEDE])}}
 
 
+def call(method, path, body=None, tries=4):
+    """cw() on a lossy line (27 Oct evening: a fifth of the packets to the server lost, TLS handshakes
+    timing out). A read is tried again; a write only when it never left this PC (a URLError), so a
+    tenant line is never sent twice."""
+    for i in range(tries):
+        try:
+            return cw(method, path, body)
+        except urllib.error.HTTPError:
+            raise
+        except OSError as x:
+            if i == tries - 1 or (method != "GET" and not isinstance(x, urllib.error.URLError)):
+                raise
+            time.sleep(5 * (i + 1))
+
+
+def fresh_memory(tries=3):
+    """A new memory round for every persona, made the only way the sandbox copies are made."""
+    for _ in range(tries):
+        done = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "n8n_sandbox.py"),
+                               "--apply", "--section6", "--fresh-memory"], capture_output=True, text=True)
+        if done.returncode == 0 and "all active" in done.stdout:
+            env_text = open(os.path.join(ROOT, ".env"), encoding="utf-8").read()
+            print("  (fresh memory: round %s)" % re.search(r"^SANDBOX_MEMORY_ROUND=(\S+)", env_text, re.M).group(1))
+            return
+        print("  (fresh memory push failed, trying again)", (done.stderr or done.stdout)[-300:])
+    sys.exit("could not push a fresh memory round")
+
+
 def persona(label):
     return next(k for k, (l, _) in PERSONAS.items() if l == label)
 
 
 def thread(key, conv):
-    return sorted(cw("GET", "/contacts/%s/conversations/%s/messages" % (contact(key), conv)) or [],
+    return sorted(call("GET", "/contacts/%s/conversations/%s/messages" % (contact(key), conv)) or [],
                   key=lambda m: m["id"])
 
 
 def turn(key, conv, text, wait=120, settle=12):
     """Send one line and return the bot's messages to it: [(content, [button titles])]."""
     before = len(thread(key, conv))
-    cw("POST", "/contacts/%s/conversations/%s/messages" % (contact(key), conv), {"content": text})
+    call("POST", "/contacts/%s/conversations/%s/messages" % (contact(key), conv), {"content": text})
     deadline, count, quiet = time.time() + wait, before + 1, 0
     while time.time() < deadline:
         time.sleep(3)
@@ -115,7 +152,7 @@ def burst(key, conv, lines, gaps, wait=120, settle=20):
     for i, line in enumerate(lines):
         if i:
             time.sleep(gaps[i - 1])
-        cw("POST", "/contacts/%s/conversations/%s/messages" % (contact(key), conv), {"content": line})
+        call("POST", "/contacts/%s/conversations/%s/messages" % (contact(key), conv), {"content": line})
     deadline, count, quiet = time.time() + wait, before + len(lines), 0
     while time.time() < deadline:
         time.sleep(3)
@@ -136,7 +173,11 @@ def labels(conv, wait=20):
     got = set()
     for _ in range(max(1, wait // 4)):
         req = urllib.request.Request(url, headers={"api_access_token": E["SANDBOX_CW_ADMIN_TOKEN"], "User-Agent": "homies/1.0"})
-        got = set(json.loads(urllib.request.urlopen(req, timeout=30).read()).get("labels") or [])
+        try:
+            got = set(json.loads(urllib.request.urlopen(req, timeout=30).read()).get("labels") or [])
+        except OSError:  # a lossy line: look again
+            time.sleep(4)
+            continue
         if got:
             break
         time.sleep(4)
@@ -152,7 +193,7 @@ def spend():
 def run(name, log):
     label, lines, must, mustnt, lab_must, lab_not = SCENARIOS[name]
     key = persona(label)
-    conv = cw("POST", "/contacts/%s/conversations" % contact(key), {})["id"]
+    conv = call("POST", "/contacts/%s/conversations" % contact(key), {})["id"]
     said, outs = [], []
     log.append("## %s (as %s, conversation %s)\n" % (name, label, conv))
     print("== %s (as %s)" % (name, label))
@@ -197,7 +238,13 @@ if __name__ == "__main__":
     names = [n for n in SCENARIOS if not n.startswith("leak_")] if arg == "all" else arg.split(",")
     start = spend()
     log = ["# Sandbox acceptance run, %s UTC\n" % datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")]
-    ok = sum(run(n, log) for n in names)
+    fresh, spoke, ok = "--fresh" in sys.argv, set(), 0
+    for n in names:
+        if fresh and (not spoke or SCENARIOS[n][0] in spoke):
+            fresh_memory()
+            spoke = set()
+        spoke.add(SCENARIOS[n][0])
+        ok += run(n, log)
     cost = spend() - start
     print("%d/%d scenarios pass | OpenRouter spend $%.2f" % (ok, len(names), cost))
     log.append("**%d/%d pass, OpenRouter $%.2f**" % (ok, len(names), cost))

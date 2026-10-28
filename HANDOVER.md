@@ -616,7 +616,16 @@ its stated time.
         - After a matter only staff can finish (e.g. a double charge), it asks what the team will need, not "anything else".
         - Proven on Gemini in run 7. The last three wording fixes (informed-only, details after a staff-only matter, the second note's reason) are not re-run, because the owner is testing.
         - **Do not run the driver as Ido while the owner tests:** memory is per phone, and their chats mix.
-        - Memory round 20.
+        - Memory round 27 (28 Oct).
+      - **28 Oct: every scenario run automatically, each on a clean memory** (`sandbox_drive.py --run all --fresh`): 8/10 by the checks, $1.02. WORKLOG 28 Oct has every reply.
+        - **Open, waiting on the owner's go:**
+          - ido_lift names the building but not the flat;
+          - when the tenant insists, the reason for asking slides back to "so management can handle it", 3 times (`MANAGER_RULE` gives no reason for that turn);
+          - one "כי הם כבר מטפלים בזה";
+          - 7 of 18 replies end on a statement, because the rule says "ask, then say why";
+          - rep_typed copied "איתם" from the prompt.
+        - Re-running the five affected scenarios after a fix costs about $0.80.
+        - **A sandbox test outside office hours (Sun-Thu 09:00-17:00 Israel time) shows the labels but no note.** The note waits for the live morning ticker, and the sandbox has no copy of it.
       - **"Hand to a person" drops a second note with the same reason in one conversation within 24 h** (`Decide the routing`, live too). A note that adds details must carry a different reason, or the team never sees it.
       - **Then made friendly and accommodating on the owner's word, and PROVEN again** (3 more runs, $0.69; $1.55 today in all).
         - The bot treats a wish for a manager as fair: no arguing, no correcting, no gatekeeping.
@@ -629,7 +638,7 @@ its stated time.
         - **Waiting on:** the owner's own chat.
         - **Slips the AI makes now and then:** a reply ending on a full stop (2 of 8 in run 3), and once "אני העוזר הדיגיטלי…" in answer to "are you a manager?".
       - **Live defect, open:** Send's promise filter can leave a stub when it cuts inside a relative clause. On 27 Oct "רק כדי שמי שיחזור אליך…" was sent as "רק כדי שמי?". `DANGLE` lacks `מי`/`שמי`. The fix goes through the live gate.
-      - **The sandbox's memory round is 20** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
+      - **The sandbox's memory round is 27** (`SANDBOX_MEMORY_ROUND` in `.env`, and the "As built" table in `feature.md`).
     - **27 Oct, Ido called the live 208 line** (10:32 UTC, 15 s, hung up). The fingerprint now reports a persona's calls as a note, not a change.
     - **Also open:** the gas closing line is cold.
     - **Fixed:** fake ticket numbers are random (`debt-tools-sandbox` v3). The memory round is 6 now (`SANDBOX_MEMORY_ROUND`), the bot is back on section 6, and every persona is clean.
