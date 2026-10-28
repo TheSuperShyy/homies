@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: the warm wording checked without OpenRouter (from 10:51 UTC)
+- **Asked:** *"ok lets test now"*.
+- **The Gemini run waits.** `check_openrouter.py` at 10:51 UTC: the wallet at $1.43 and still falling, the key's cap with $1.56 left, no top-up yet. The run ($0.39) would leave about $1.04, under the $2 line where the live bot's big turns are refused, and `sandbox_drive.py` refuses it.
+- **Instead, the free check the standing rule asks for:** two blind Claude players, each given only the rebuilt system prompt and tool texts (`sbx_candidate.py`, with the warm wording and the tool's manager branch), the owner's exact lines, and the sandbox's tool answers. One plays `manager_retest`, one `manager_fee`. They check the wording and the logic, not Gemini's own voice.
+
 ### Feature 19: "dont overtest" (10:45 UTC; no spend)
 - **The owner, on the cost answer:** *"i mean the costing for the testing dont overtest"*. He meant the number of paid runs, not the price of one.
 - **Owned:** nine Gemini runs today, about $3.30, all under one "ok lets start fixing it". The standing rule (22 Sep, 5 Oct, 20 Oct) already said:
