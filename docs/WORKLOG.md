@@ -29,7 +29,7 @@ conversation that produced it.
 - **Nothing was sent to Omni.**
 - **CONTEXT** (added after the briefing hook caught it missing): the pair is set, and writing the secrets and redeploying production are two separate goes. HANDOVER already had this step: the pair, the refusal, the redeploy call, and no empty push.
 
-### Feature 19: the Gemini run tried and refused by the wallet; it now starts by itself after the top-up (11:25 UTC)
+### Feature 19: the Gemini run tried and refused by the wallet; two hours' wait for a top-up that did not come (11:25-13:28 UTC; nothing spent)
 - **Asked:** *"try and test it"*.
 - **Tried, nothing spent:** `sandbox_drive.py --run manager_retest,manager_fee --fresh` stopped before its first call ("$-1.48 above the live bot's $2 line").
 - **The wallet is at $0.53 (11:25 UTC), down $0.90 since 10:51, and none of it was ours:**
@@ -38,6 +38,9 @@ conversation that produced it.
   - So another key on the account spent it, about $1.60 an hour (between 10:15 and 10:35 it was $0.09). At that pace the wallet is empty by about 11:45 UTC, and the live bot then answers every tenant with the "technical problem" line.
 - **The run waits by itself:** `wait_then_run.py` (this session's scratchpad) reads the driver's own guard every minute through the free `/credits` and `/auth/key` calls, until 13:25 UTC. When the wallet and the cap both have $0.30 above the $2 line, it starts the owner's one run ($0.39), once, whatever its result.
 - **The owner's two moves:** top up the wallet, and raise the key's $15 cap. The cap has $1.56 left, under the $2 line, so a top-up alone keeps the guard shut and leaves the live bot near its ceiling.
+- **Outcome (13:28 UTC): no top-up came, so the run never started and nothing was spent.** The watcher stopped at its two-hour limit.
+  - **The wallet did not empty, and the 11:45 forecast was wrong.** The other key spent $0.10 more by 11:58 UTC, then nothing for 90 minutes, which leaves $0.41. One burst says nothing about that key's next hour.
+  - No bot turn ran in those two hours (n8n: only the handback and the ticket notices), so no tenant met the technical-problem line.
 
 ### Feature 20: a dialer test page on the dashboard; the page is live, Vercel still needs the Tokomni pair (to 11:20 UTC)
 - **Asked:** *"we need to connect the tokomni on the dashboard we have and create a section for testing there where we just insert the number there or like call ido button on that to make the dialer work without the need of creating and uploading an excel file everytime"*.
