@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 20: production redeployed with the Tokomni pair; the dialer test page can ring (12:33-12:34 UTC)
+- **Asked:** *"try again"*, after the redeploy had been refused.
+- **Done:** a forced redeploy of the production deployment from the same commit, `c97eca3`.
+  - The new deployment is `dpl_hnfcMnUHm4VasRVmyhARgD9FZRGh`, created at 12:33:41 UTC, after the pair was set at 11:44.
+  - It is READY, `/dialer` is in its build (44 s), and the production alias `homies-dashboard.vercel.app` is on it.
+  - The permission check let it through this time.
+- **Not seen yet:** the page itself without its "Tokomni is not connected" notice. That needs a login, and no dashboard password is kept here.
+- **Nothing was sent to Omni and nothing rang.**
+- **Next, the owner's:** List 2 playing, Ido ready, and "חייג לעידו" pressed in calling hours (until 20:00 Israel time today).
+
 ### Feature 20: the Tokomni pair set in Vercel; the production redeploy refused by the permission check (11:44 UTC)
 - **Asked:** *"set them"*.
 - **Done:** `TOKOMNI_TOKEN` (Sensitive, Production and Preview) and `TOKOMNI_CAMPAIGN_ID` (encrypted, all three) were added to `homies-dashboard` from `.env` at 11:44 UTC and read back (names, types and targets only).
