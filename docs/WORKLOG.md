@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: the Gemini run tried and refused by the wallet; it now starts by itself after the top-up (11:25 UTC)
+- **Asked:** *"try and test it"*.
+- **Tried, nothing spent:** `sandbox_drive.py --run manager_retest,manager_fee --fresh` stopped before its first call ("$-1.48 above the live bot's $2 line").
+- **The wallet is at $0.53 (11:25 UTC), down $0.90 since 10:51, and none of it was ours:**
+  - this key's own spend did not move: usage $13.44, $3.36 of it today, $1.56 left under the $15 cap;
+  - since 10:45 n8n ran only "Chatwoot handback" (41) and "ticket notices" (20), neither of which calls the model.
+  - So another key on the account spent it, about $1.60 an hour (between 10:15 and 10:35 it was $0.09). At that pace the wallet is empty by about 11:45 UTC, and the live bot then answers every tenant with the "technical problem" line.
+- **The run waits by itself:** `wait_then_run.py` (this session's scratchpad) reads the driver's own guard every minute through the free `/credits` and `/auth/key` calls, until 13:25 UTC. When the wallet and the cap both have $0.30 above the $2 line, it starts the owner's one run ($0.39), once, whatever its result.
+- **The owner's two moves:** top up the wallet, and raise the key's $15 cap. The cap has $1.56 left, under the $2 line, so a top-up alone keeps the guard shut and leaves the live bot near its ceiling.
+
 ### Feature 20: a dialer test page on the dashboard; the page is live, Vercel still needs the Tokomni pair (to 11:20 UTC)
 - **Asked:** *"we need to connect the tokomni on the dashboard we have and create a section for testing there where we just insert the number there or like call ido button on that to make the dialer work without the need of creating and uploading an excel file everytime"*.
 - **Built (`docs/features/20-dialer-test/`):** `/dialer`, "בדיקת חייגן", under System in the sidebar and in the phone's top bar.

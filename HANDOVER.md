@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **OpenRouter is nearly empty (28 Oct, 10:35 UTC): $1.48 in the wallet and falling, $1.56 left under the key's $15 cap** (`python scripts/check_openrouter.py`). The wallet fell $0.09 between 10:15 and 10:35 while this key's own use did not move, so another key on the account is spending too. The live WhatsApp bot runs on that key, and when it runs out, the bot answers tenants with the "technical problem" line. Run no sandbox scenario (`sandbox_drive.py`, about $0.10-0.25 each) until the owner tops up; the driver now refuses to start while the run could leave either number under $2. That day's sandbox runs used about $3.30. **Both numbers need raising:** the wallet, and the key's $15 cap in the OpenRouter dashboard, or the key stops at its cap with money still in the wallet.
+> **OpenRouter is nearly empty (28 Oct, 11:25 UTC): $0.53 in the wallet, $1.56 left under the key's $15 cap** (`python scripts/check_openrouter.py`). The wallet fell $0.90 between 10:51 and 11:25. This key's own use did not move, and n8n ran nothing that calls the model, so another key on the account spent it. At that pace the wallet is empty by about 11:45 UTC. The live WhatsApp bot runs on this key, and when the wallet runs out, the bot answers tenants with the "technical problem" line. **Both numbers need raising:** the wallet, and the key's $15 cap in the OpenRouter dashboard, or the key stops at its cap with money still in the wallet. The driver refuses any sandbox run while either number could end under $2. The owner's one Gemini run (`manager_retest` + `manager_fee`, $0.39, the owner's "try and test it") waits in `wait_then_run.py` in that session's scratchpad, started 11:25 UTC, giving up 13:25 UTC. It starts by itself, once, when both numbers have room. If that session is gone, run `python scripts/sandbox_drive.py --run manager_retest,manager_fee --fresh` after the top-up.
 
 ---
 
@@ -647,8 +647,8 @@ its stated time.
             - **Optional, only if the owner asks:** a probe of about $0.15 that reads OpenRouter's bill for each call. If the cache can be made to hit, every test and every live tenant message costs about half.
             - **The owner then (10:45 UTC):** *"i mean the costing for the testing dont overtest"*. He meant the number of runs (CONTEXT, "Don't overtest").
           - **Checked for free (11:00 UTC):** two blind Claude players ran the warm wording through `manager_retest` and `manager_fee`, and both pass every check. The matter is noted at the topic and the bot keeps it. To watch on Gemini: both players opened with the rule's reason almost word for word. WORKLOG 28 Oct has the replies.
-          - **Next, after a top-up, one run, and only on the owner's go:**
-            - `sandbox_drive.py --run manager_retest,manager_fee --fresh`, $0.39, for the warm wording and the note of the matter. The owner's own short sandbox chat could replace it;
+          - **Next, after a top-up, one run (the owner's go is in: "try and test it", 11:25 UTC):**
+            - `sandbox_drive.py --run manager_retest,manager_fee --fresh`, $0.39, for the warm wording and the note of the matter. Tried at 11:25 and refused by the guard (wallet $0.53); `wait_then_run.py` starts it once there is room, until 13:25 UTC. The owner's own short sandbox chat could replace it;
             - then the owner's own chat (round 44);
             - then the live promotion of section 6 + E through `check_whatsapp_rules.py`.
         - **A sandbox test outside office hours (Sun-Thu 09:00-17:00 Israel time) shows the labels but no note.** The note waits for the live morning ticker, and the sandbox has no copy of it.
