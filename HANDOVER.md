@@ -644,9 +644,10 @@ its stated time.
             - `sandbox_drive.py --run quick|manager|all` and it prints the expected cost before it starts. Use quick after a change; all only before a live promotion.
             - **71% of a run is the same ~14k-token instructions resent on every call.** Gemini bills that at a tenth when it comes from the cache. On 20 Oct a direct probe (3.8 Flash) got 12k of 14k cached. Through n8n the 09:52 run saved only about 15% ($1.13 charged against $1.32 at list).
             - The cause is unknown. A guess: OpenRouter sends calls to different Google providers, each with its own cache. Seeing the provider needs a management key or each call's generation id, which n8n does not keep.
-            - **The next step after the top-up** is a probe of about $0.15 that reads OpenRouter's bill for each call. If the cache can be made to hit, every test and every live tenant message costs about half.
-          - **Next, after a top-up and on the owner's word:**
-            - `sandbox_drive.py --run manager --fresh`, about $0.88;
+            - **Optional, only if the owner asks:** a probe of about $0.15 that reads OpenRouter's bill for each call. If the cache can be made to hit, every test and every live tenant message costs about half.
+            - **The owner then (10:45 UTC):** *"i mean the costing for the testing dont overtest"*. He meant the number of runs (CONTEXT, "Don't overtest").
+          - **Next, after a top-up, one run, and only on the owner's go:**
+            - `sandbox_drive.py --run manager_retest,manager_fee --fresh`, $0.39, for the warm wording and the note of the matter. The owner's own short sandbox chat could replace it;
             - then the owner's own chat (round 44);
             - then the live promotion of section 6 + E through `check_whatsapp_rules.py`.
         - **A sandbox test outside office hours (Sun-Thu 09:00-17:00 Israel time) shows the labels but no note.** The note waits for the live morning ticker, and the sandbox has no copy of it.

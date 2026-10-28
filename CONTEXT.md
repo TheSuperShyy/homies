@@ -67,9 +67,11 @@ The user is the builder. The client is Homies.
 - **One reply per burst: the bot checks for a newer message again right before sending** (27 Oct, from the owner's sandbox chat; sandbox now, live on go).
   - Exceptions: a bare hello does not count, and a failed check sends.
   - **When it goes live,** "Log reply" must move behind the check too, or a dropped draft is logged as said.
-- **Test with the smallest set that covers the change** (the owner, 28 Oct: *"can we lessen the costing of the test"*).
-  - `--run quick` ($0.42: the ticket, the emergency and the whole manager arc) after a change; `--run manager` ($0.88) for the manager flow; `--run all` ($1.13) only before a live promotion.
-  - One Gemini run per set of changes, not one per sentence.
+- **Don't overtest** (the owner, 28 Oct: *"i mean the costing for the testing dont overtest"*, the fourth time since 22 Sep). That day's nine Gemini runs cost about $3.30 under one "fix it" and left the live bot's wallet under its $2 line.
+  - Check each fix with Claude, which costs nothing. Spend only at the end of a batch of changes: one Gemini run, the price first and the owner's go every time.
+  - The run covers only what the batch touched (`--run a,b`, $0.04-0.22 a scenario).
+  - `--run all` ($1.13) only when the owner asks, or right before a live promotion. Never re-run to chase a one-off slip.
+  - For tone, the owner's own short sandbox chat is the real check, and it costs cents.
   - What a run costs is mostly the prompt: 71% of the 09:52 run was the same ~14k-token instructions resent on every call. Gemini bills those at a tenth when they come from the cache, and through n8n they mostly do not (about 15% saved). Why is not known yet.
 - **The sandbox driver refuses to run when OpenRouter is low** (28 Oct). The sandbox and the live bot spend from one key. `sandbox_drive.py` exits when a run (about $0.15 a scenario) could leave the wallet or the key's cap under `check_openrouter.py`'s $2 LOW line. Below that line the live agent's big turns get refused. A day of runs took the wallet to $1.57 before this guard existed.
 - **No claim that the team is acting** (28 Oct; sandbox now, live on go).

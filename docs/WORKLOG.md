@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: "dont overtest" (10:45 UTC; no spend)
+- **The owner, on the cost answer:** *"i mean the costing for the testing dont overtest"*. He meant the number of paid runs, not the price of one.
+- **Owned:** nine Gemini runs today, about $3.30, all under one "ok lets start fixing it". The standing rule (22 Sep, 5 Oct, 20 Oct) already said:
+  - check fixes with Claude;
+  - spend only on a final small run, with its price stated and his go each time.
+- **Now:**
+  - The memory, CONTEXT ("Don't overtest") and HANDOVER spell it out: one go buys one run; only the touched scenarios; `all` only when he asks or before a live promotion; no re-runs for one-off slips.
+  - The warm wording waits for one run of `manager_retest,manager_fee` ($0.39) after the top-up, on his go, or for his own short sandbox chat.
+  - The cache probe is optional, not the next step.
+
 ### Feature 19: what a sandbox test costs, and the cheaper way to run it (10:25-10:40 UTC; no spend)
 - **Asked:** *"can we lessen the costing of the test"*.
 - **Where the money goes (the 09:52 run's executions, read from n8n):**
