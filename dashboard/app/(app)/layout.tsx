@@ -5,7 +5,7 @@ import { serverClient } from '@/lib/supabase-server';
 import { COOKIE, THEME_COOKIE, getLocale, getTheme, translator, type Locale } from '@/lib/i18n';
 import { BackField, RailNav, TabBar, type NavGroup, type NavItem } from '@/components/nav';
 import {
-  NAV_ICON, IconImport, IconLanguage, IconMoon, IconSearch,
+  NAV_ICON, IconDialer, IconImport, IconLanguage, IconMoon, IconSearch,
   IconSettings, IconSignOut, IconSun,
 } from '@/components/icons';
 
@@ -64,6 +64,8 @@ const NAV = [
     ['voice', '/voice'],
   ]],
   ['nav.group.support', [
+    // Pressing Ring on it rings a phone, so it sits with the things you operate.
+    ['dialer', '/dialer'],
     ['sync', '/sync'],
     ['settings', '/settings'],
   ]],
@@ -174,10 +176,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      {/* THE PHONE'S TOP BAR. Brand on one side, the two things you operate on
-          the other — Import and Settings — which are exactly the two the tab
-          bar below does not carry. Desk-width readers never see this; they have
-          the sidebar, which has all seven. */}
+      {/* THE PHONE'S TOP BAR. Brand on one side, the things you operate on
+          the other — the dialer test, Import and Settings — which are exactly
+          the ones the tab bar below does not carry. Desk-width readers never
+          see this; they have the sidebar, which has all of them. */}
       <header className="mtop">
         <Link className="brand" href="/">
           <img className="mark" alt=""
@@ -190,6 +192,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link className="iconbtn" href="/search"
                 aria-label={t('search.title')} title={t('search.title')}>
             <IconSearch />
+          </Link>
+          <Link className="iconbtn" href="/dialer"
+                aria-label={t('nav.dialer')} title={t('nav.dialer')}>
+            <IconDialer />
           </Link>
           <Link className="iconbtn" href="/sync"
                 aria-label={t('nav.sync')} title={t('nav.sync')}>
