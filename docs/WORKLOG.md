@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: the run's faults fixed one at a time, each by changing the sentence that caused it (from 08:50 UTC; sandbox only)
+- **Asked:** *"ok lets start fixing it one by one for the issue we dont want multiple fixes overlapping each other rules we need some harmony so that we dont have a prompt paralysis and rules conflicts so it can work better"*.
+- **Method:**
+  - One cause at a time, in the order of the 07:03 run's list.
+  - Each fix rewrites or deletes the sentence that caused the fault; none adds a rule on top.
+  - Each fix is tested on Gemini with only the scenarios it touches, every one on a clean memory.
+  - Measured before the first fix: system prompt 23,435 characters, `notify_team` 4,015. "Anything else?" is ruled on 7 times across them, and "in the meantime" is quoted 3 times.
+- **Where each fault came from (the run's executions, read before any change):**
+  - **Lift ticket without the flat:** the AI knew the flat and filed the ticket on it (`reporter_unit` "1"); only the reply left it out. `WHO_RULE` asks for "where you opened it", and for a lift "where" is the building.
+  - **Manager replies:** the AI followed the rule's own order, "ask, then say why", so the reason came last and 6 of the 7 replies ended on a statement. "איתם אפשר לסדר את זה מהר יותר" is the rule's sentence copied whole, and its "איתם" (the details) reads as management. The insisting turn has no reason in the rule, so the AI makes one up, and management is the nearest subject. "בינתיים" and "כבר מטפלים" are quoted in the rule as things not to say.
+  - **Committee fee:** "אם מדובר בתשלום עצמו… בזה אני מטפל… אבל אם זה… חברי ועד הבית" is the facts list's ועד הבית bullet recited to the tenant.
+  - **Gas:** "הצוות מעודכן ועל זה עכשיו" claims what no tool did.
+- **Not faults, so left as they are:**
+  - **No safety line:** this is the client's rule (16 Sep, CONTEXT). The AI did write "תתרחקו מהאזור אם צריך", and Send's emergency filter removed it, as it was built to.
+  - **The gas note held until 09:00:** the owner's 3 Sep decision, that out of hours nothing is paged.
+- **Fix 1, the flat in the ticket reply (`WHO_RULE`).**
+  - **Change:** "איפה פתחת אותה, הבניין והדירה" now reads "באיזה בניין פתחת אותה ועל איזו דירה רשמת אותה". The example became "פתחתי קריאה על המעלית בהרצל 10, ורשמתי אותה על דירה 4". Nothing was added.
+  - **Gemini, `ido_lift` (08:53 UTC, round 28): PASS.** The reply was "…על המעלית בבר כוכבא 23 (רשומה על דירה 1), המספר שלה הוא 999-977061-26".
+  - **The same reply still claims things no tool did:** "פתחתי קריאה דחופה לטכנאי" and "הצוות מעודכן" (no team note was called), and it ends "יש עוד משהו שאפשר לעזור בו בינתיים?". So "בינתיים" is not only the manager rule's echo; fix 5 takes the claims.
+  - **A live slip seen on the way, not fixed here:** the AI's 😕 ended its first paragraph. Send removes that emoji and joins the paragraphs, so the reply reads "בזמן הכי לא נוח פתחתי קריאה" with no stop between them.
+- **Fix 2, the reason for asking (`MANAGER_RULE` / `MANAGER_TOOL`).**
+  - **Change:**
+    - The rule says why first and asks last: "אתה אומר לו בפשטות ובכנות למה אתה צריך לדעת מה קרה: כדי שתוכל לסדר את זה בעצמך, מהר יותר, והרבה פעמים כבר כאן, ושואל אותו…".
+    - The insisting turn keeps that same reason: "ושמספיקה לך מילה על מה מדובר כדי להתחיל לטפל בזה בעצמך, ושואל שוב".
+    - "You can't help" says what can be done here before it asks.
+    - `MANAGER_TOOL` lost its English copy of these three sentences, so what to say is stated once, in the rule. `notify_team` went from 4,015 to 3,493 characters; the prompt went from 23,435 to 23,507.
+  - **New checks in `sandbox_drive.py`:**
+    - every manager reply must end on its question (`ENDS_Q`);
+    - none may give management's reason or paste the rule's (`THEIRS`);
+    - `NOTE_SAYS` also catches "כבר מטפל" and "על זה עכשיו";
+    - gas must not say "on it now";
+    - `manager_fee` and `burst_manager` get per-reply checks too.
+    - Replayed offline against the 07:03 transcript, they flag every fault in it and pass the replies that were fine.
+
 ### Feature 19: every scenario run automatically, each on a clean memory: 8/10 by the checks, $1.02 (06:47-07:03 UTC; sandbox only)
 - **Asked:** *"ok for now do an auto testing with scenario based on the sandbox only"*.
 - **The driver (`sandbox_drive.py`) changed first:**
