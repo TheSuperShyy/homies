@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 20: a dialer test page on the dashboard; the page is live, Vercel still needs the Tokomni pair (to 11:20 UTC)
+- **Asked:** *"we need to connect the tokomni on the dashboard we have and create a section for testing there where we just insert the number there or like call ido button on that to make the dialer work without the need of creating and uploading an excel file everytime"*.
+- **Built (`docs/features/20-dialer-test/`):** `/dialer`, "בדיקת חייגן", under System in the sidebar and in the phone's top bar.
+  - **A number field** that takes an Israeli number in any form.
+  - **One Ring button per test person:** the people we put in בר כוכבא 23 ourselves (`source = 'agent'`), Israeli numbers only. Today that is Ido's mobile, with "the debt agent answers: ₪2,000, call 2 of 4".
+  - **A press is one lead into List 2** (`POST api.tokomni.cc/api/campaign/insert/`), and the outcome comes back in the URL.
+  - **Refused before sending:** no token, not Israeli, outside calling hours, or a number on file for a tenant outside the test building.
+  - **The external_id** is the resident id (or `test`) plus the press time, so a second press is a new lead.
+  - The Ring button greys out while its press is on its way.
+- **Decided, and why (context.md):**
+  - **No button for the building's OXS rows.** Yariv is flat 3 there, on the debt list with ₪2,000, and a button would be one mis-click from a debt call to the client. Any number can still be typed.
+  - **No PIN.** The owner asked for one press, and the page reaches no tenant.
+  - **Calling hours as in `tokomni_lead.py`.**
+- **Checked:**
+  - Read only: a GET on the insert path answers Tokomni's own JSON 404 ("Route Not Found") to a plain Node request, so Cloudflare lets the server through. The host's root is a Cloudflare block page. Nothing was sent to the dialer.
+  - `node --test scripts/check_dialer.test.ts` is 7/7. "Who answers" runs beside feature 18's `routeOf` on the same rows, and `check_route.test.ts` is still 6/6.
+  - tsc is clean, and a production build has `/dialer`.
+  - **The page was rendered locally** from a throwaway copy in the ignored `local/`, reading the database directly with a dummy token. The views: he/en, dark/light, phone, and the ok/http/tenant notices. No page errors. The copy is deleted.
+  - Fixed on the way: Tokomni's answer and the lead id were reordered inside a Hebrew sentence. They are now direction-isolated, and measured in place (JSON, id and ₪ amount intact).
+  - Fixed on the way: `.setinline .row` was picking up the key/value `.row`'s padding and hairline, a stray line under the field. The Settings name field had the same line.
+- **Shipped:** the dashboard commit `58e8063` was cherry-picked alone onto `origin/main` as `c97eca3`, built in a temporary worktree, and pushed (through the `TheSuperShyy` account, then switched back). Vercel `dpl_J8ALBkdSnQrivpq3cGrAEmCPhDtT` is READY, with the production alias on it. `/dialer` answers 307 to the login, like every page.
+- **Not done: Vercel has no `TOKOMNI_TOKEN` / `TOKOMNI_CAMPAIGN_ID`.** The session's permission check refused the write as a secret-store write. The page says "Tokomni is not connected" and its buttons are off until the pair is set and production is redeployed. That needs the owner's go, or the owner adds them in Vercel. `dashboard/.env.local` has them, for local runs.
+- **Nothing was sent to Omni and nothing rang.**
+- **Open:**
+  - the Vercel pair and a redeploy;
+  - List 2 playing;
+  - the first press for Ido;
+  - whether a second press for the same number rings (Tokomni's "if not already present").
+
 ### Feature 19: the warm wording checked without OpenRouter (from 10:51 UTC)
 - **Asked:** *"ok lets test now"*.
 - **The Gemini run waits.** `check_openrouter.py` at 10:51 UTC: the wallet at $1.43 and still falling, the key's cap with $1.56 left, no top-up yet. The run ($0.39) would leave about $1.04, under the $2 line where the live bot's big turns are refused, and `sandbox_drive.py` refuses it.

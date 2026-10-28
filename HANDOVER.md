@@ -675,6 +675,13 @@ its stated time.
 - **26 Oct: Yariv's accepted alignment document is the new yardstick** (`docs/discovery/yariv-alignment-2026-10.md`; the check is in WORKLOG 26 Oct).
   - **Not done yet:** remove the WhatsApp representative button; recognise the sender from our data instead of asking; shorter waits; voice asks the details before the matter.
   - **Waiting on the owner:** the order of work and the security trade-off on balances.
+- **28 Oct: the dashboard has a dialer test page, `/dialer` ("בדיקת חייגן", under System), LIVE on Vercel** (feature 20; `main` = `c97eca3`, deploy `dpl_J8ALBkdSnQrivpq3cGrAEmCPhDtT` READY; the same change is `58e8063` on `feature/chatbot`).
+  - **What it does:** type a number, or press Ring beside a test person (today Ido), and one lead goes into List 2 through Omni's insert API. The page says who will pick up, read from the same debt call list the 208 router reads.
+  - **It refuses:** a non-Israeli number, outside calling hours (Sun-Thu 09-20, Fri until 13, Israel time), and a number on file for a tenant outside בר כוכבא 23. Only `source = 'agent'` people get a button. Yariv's OXS row in flat 3 does not.
+  - **IT RINGS NOTHING YET: Vercel has no `TOKOMNI_TOKEN` / `TOKOMNI_CAMPAIGN_ID`.** The session's permission check refused writing them (a secret-store write). They need the owner's go, or the owner adds them in Vercel (token as Sensitive, Production and Preview). Then a production redeploy, because env changes need one. Until then the page says "Tokomni is not connected" and its buttons are off.
+  - **Then:** List 2 playing, Ido ready, in calling hours, press "חייג לעידו". Expect the debt agent with ₪2,000 (he is on call 2 of 4).
+  - **Unknown until the second press for one number:** whether Tokomni dedupes by number. The external_id carries the press time, so a dedupe by id cannot block it.
+  - **Checks:** `node --test scripts/check_dialer.test.ts` (7/7), and a production build of `main` with the page.
 - **27 Oct: Omni sent the dialer API token, so our side can now put a number on the dialer by itself** (WORKLOG 27 Oct; CONTEXT has List 2's rules).
   - **In `.env`:** `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` ("List 2", the same id as 25 Oct).
   - **The test Omni asked for:** send one lead with an external_id, then check that Vapi gets a header carrying it.
