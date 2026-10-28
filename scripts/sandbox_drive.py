@@ -5,7 +5,8 @@ Run only on the owner's go. It refuses to start when the run could leave the key
 answers on, under check_openrouter.py's LOW line.
 
     python scripts/sandbox_drive.py              # list the scenarios (free)
-    python scripts/sandbox_drive.py --run all    # or --run ido_lift,menu_two
+    python scripts/sandbox_drive.py --run quick  # 4 scenarios, $0.42 on 28 Oct: the usual check after a change
+    python scripts/sandbox_drive.py --run all    # 10, $1.13, before a live promotion; or --run ido_lift,gas
     ... --run all --fresh                        # each scenario on a clean memory (a push per persona reuse)
 
 Each scenario opens a new conversation in the sandbox inbox as one persona and
@@ -76,6 +77,11 @@ SCENARIOS = {
 }
 BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
 NOTED = {"manager_fee", "manager_doubt", "manager_retest"}  # a topic is told, so two matters are noted
+# Named sets for --run (28 Oct, the owner: "can we lessen the costing of the test"; that day's seven
+# runs cost about $3.30). Measured on the 09:52 run: quick $0.42 (the ticket, the emergency and the
+# whole manager arc), manager $0.88, all $1.13, which is for before a live promotion.
+SETS = {"quick": ["ido_lift", "gas", "rep_typed", "manager_retest"],
+        "manager": ["rep_typed", "manager_fee", "burst_manager", "manager_doubt", "manager_retest"]}
 # Checks on one reply, by the tenant line it answers (0 is the first), where another may rightly
 # mention the team's note. A hand-off is the team knowing or handling it, or "anything else
 # (in the meantime)?" in place of the matter itself.
@@ -276,11 +282,13 @@ if __name__ == "__main__":
             print(k, "as", v[0], "|", " / ".join(v[1]))
         sys.exit(0)
     arg = sys.argv[sys.argv.index("--run") + 1]
-    names = [n for n in SCENARIOS if not n.startswith("leak_")] if arg == "all" else arg.split(",")
+    names = ([n for n in SCENARIOS if not n.startswith("leak_")] if arg == "all"
+             else SETS[arg] if arg in SETS else arg.split(","))
     room, need = headroom(), 0.15 * len(names)  # 28 Oct: ten scenarios cost $1.02-1.13
     if room < need:
         sys.exit("OpenRouter has $%.2f above the live bot's $%.0f line, and this run may cost $%.2f. "
                  "Top up first (python scripts/check_openrouter.py)." % (room, LOW, need))
+    print("%d scenarios, up to about $%.2f ($%.2f is left above the live bot's line)" % (len(names), need, room))
     start = spend()
     log = ["# Sandbox acceptance run, %s UTC\n" % datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")]
     fresh, spoke, ok = "--fresh" in sys.argv, set(), 0

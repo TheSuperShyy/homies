@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-10-28
 
+### Feature 19: what a sandbox test costs, and the cheaper way to run it (10:25-10:40 UTC; no spend)
+- **Asked:** *"can we lessen the costing of the test"*.
+- **Where the money goes (the 09:52 run's executions, read from n8n):**
+  - One model, `google/gemini-3.1-pro-preview` (temperature 1, max 8,192), feeds the agent, the small "Worth a word?" check and the outage path.
+  - A tenant message is one check (~570 tokens in, 370-760 out, mostly thinking) and one or two agent calls (~14.8k in, 60-1,200 out).
+  - Priced at list ($2/M in, $12/M out, $0.20/M from cache), the run's 51 calls come to $1.32: agent input $0.94 (71%), agent output $0.26, the check $0.11 (mostly its thinking). OpenRouter charged $1.13, so the cache saved about 15%.
+  - On 20 Oct a direct probe (3.8 Flash) got 12k of 14k cached from the second call on.
+  - Why n8n's calls miss is not known. OpenRouter's activity, which shows the provider, needs a management key ("Only management keys can fetch activity", 403).
+- **Per scenario, charged:** manager_retest $0.22, manager_doubt $0.22, burst_manager $0.21 (three model runs for one reply), manager_fee $0.17, balance/gas/rep_typed/ido_lift about $0.07, unknown $0.04, menu_two free.
+- **Done, no bot change:**
+  - `sandbox_drive.py --run quick` (ido_lift, gas, rep_typed, manager_retest: $0.42) and `--run manager` ($0.88); `all` ($1.13) is for before a live promotion.
+  - The driver prints the expected cost before it starts. `--run quick` was refused while the wallet is low.
+- **Proposed, waiting on the top-up:**
+  - **A probe of about $0.15** reading OpenRouter's per-call bill, to find why the cache misses. If it can hit, every test and every live message costs about half.
+  - **Lower thinking on the small check:** about 9% of the cost. It is a live change, through the gate.
+- **Not proposed:** testing on a cheaper Gemini. It would not show what tenants get, and on 20 Oct the cheaper ones invented checks and reasons.
+- **The wallet:** $1.48 at 10:35 UTC, down $0.09 since 10:15 while this key's own use did not move, so another key on the account is spending too.
+
 ### Feature 19: the manager replies made warm, not capable-sounding (10:00-10:20 UTC; sandbox only; pushed, not tested)
 - **Asked:** *"so we need to make it very accurate and reliable. make it friendly, accommodating and warm not too stiff and rude like i can fix it or like i can sort it out right here tell me what happened. we need to make it the best of customer services oriented as possible"*.
 - **Found: the stiffness was fix 2's own wording.**

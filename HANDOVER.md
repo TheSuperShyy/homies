@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **OpenRouter is nearly empty (28 Oct, 10:20 UTC): $1.57 in the wallet, $1.56 left under the key's $15 cap** (`python scripts/check_openrouter.py`). The live WhatsApp bot runs on that key, and when it runs out, the bot answers tenants with the "technical problem" line. Run no sandbox scenario (`sandbox_drive.py`, about $0.10-0.25 each) until the owner tops up; the driver now refuses to start while the run could leave either number under $2. That day's sandbox runs used about $3.30. **Both numbers need raising:** the wallet, and the key's $15 cap in the OpenRouter dashboard, or the key stops at its cap with money still in the wallet.
+> **OpenRouter is nearly empty (28 Oct, 10:35 UTC): $1.48 in the wallet and falling, $1.56 left under the key's $15 cap** (`python scripts/check_openrouter.py`). The wallet fell $0.09 between 10:15 and 10:35 while this key's own use did not move, so another key on the account is spending too. The live WhatsApp bot runs on that key, and when it runs out, the bot answers tenants with the "technical problem" line. Run no sandbox scenario (`sandbox_drive.py`, about $0.10-0.25 each) until the owner tops up; the driver now refuses to start while the run could leave either number under $2. That day's sandbox runs used about $3.30. **Both numbers need raising:** the wallet, and the key's $15 cap in the OpenRouter dashboard, or the key stops at its cap with money still in the wallet.
 
 ---
 
@@ -639,8 +639,14 @@ its stated time.
             - **Tone:** the reason "so you can sort it out yourself, often right here" was fix 2's own wording, and it broke the owner's 18 Oct "lowkey". It is now a word of care, then "so we can help as quickly as possible", then a gentle question. The insisting turn: "even a few words will help us help him". "You can't help": "still want to try to help". "רגוע ובטוח" became "בחום ובהבנה".
             - **Accuracy:** `notify_team`'s "afterwards" now gives the note of a manager request's matter the manager branch. In the full run, the "a matter past you" branch handed the fee back once ("כדי שידעו איך להמשיך מכאן").
             - **`STIFF`** in the driver counts the capability claims on all 13 manager turns. Replayed on the 09:52 run, it flags 11 of the 13 manager replies.
+          - **The test's cost (the owner, 10:25 UTC: "can we lessen the costing of the test"):**
+            - Measured on the 09:52 run: quick $0.42, manager $0.88, all $1.13. Per scenario: manager_retest and manager_doubt $0.22, burst_manager $0.21 (three model runs for one reply), manager_fee $0.17, the one-turn ones $0.04-0.07, menu_two free.
+            - `sandbox_drive.py --run quick|manager|all` and it prints the expected cost before it starts. Use quick after a change; all only before a live promotion.
+            - **71% of a run is the same ~14k-token instructions resent on every call.** Gemini bills that at a tenth when it comes from the cache. On 20 Oct a direct probe (3.8 Flash) got 12k of 14k cached. Through n8n the 09:52 run saved only about 15% ($1.13 charged against $1.32 at list).
+            - The cause is unknown. A guess: OpenRouter sends calls to different Google providers, each with its own cache. Seeing the provider needs a management key or each call's generation id, which n8n does not keep.
+            - **The next step after the top-up** is a probe of about $0.15 that reads OpenRouter's bill for each call. If the cache can be made to hit, every test and every live tenant message costs about half.
           - **Next, after a top-up and on the owner's word:**
-            - `sandbox_drive.py --run rep_typed,manager_fee,burst_manager,manager_doubt,manager_retest --fresh`, about $0.80;
+            - `sandbox_drive.py --run manager --fresh`, about $0.88;
             - then the owner's own chat (round 44);
             - then the live promotion of section 6 + E through `check_whatsapp_rules.py`.
         - **A sandbox test outside office hours (Sun-Thu 09:00-17:00 Israel time) shows the labels but no note.** The note waits for the live morning ticker, and the sandbox has no copy of it.

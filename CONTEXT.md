@@ -67,6 +67,10 @@ The user is the builder. The client is Homies.
 - **One reply per burst: the bot checks for a newer message again right before sending** (27 Oct, from the owner's sandbox chat; sandbox now, live on go).
   - Exceptions: a bare hello does not count, and a failed check sends.
   - **When it goes live,** "Log reply" must move behind the check too, or a dropped draft is logged as said.
+- **Test with the smallest set that covers the change** (the owner, 28 Oct: *"can we lessen the costing of the test"*).
+  - `--run quick` ($0.42: the ticket, the emergency and the whole manager arc) after a change; `--run manager` ($0.88) for the manager flow; `--run all` ($1.13) only before a live promotion.
+  - One Gemini run per set of changes, not one per sentence.
+  - What a run costs is mostly the prompt: 71% of the 09:52 run was the same ~14k-token instructions resent on every call. Gemini bills those at a tenth when they come from the cache, and through n8n they mostly do not (about 15% saved). Why is not known yet.
 - **The sandbox driver refuses to run when OpenRouter is low** (28 Oct). The sandbox and the live bot spend from one key. `sandbox_drive.py` exits when a run (about $0.15 a scenario) could leave the wallet or the key's cap under `check_openrouter.py`'s $2 LOW line. Below that line the live agent's big turns get refused. A day of runs took the wallet to $1.57 before this guard existed.
 - **No claim that the team is acting** (28 Oct; sandbox now, live on go).
   - `CLAIM_EDITS` change two live sentences: the facts line "הצוות רואה את זה ומטפל" is gone, and the emergency sentence has the bot as its subject.
