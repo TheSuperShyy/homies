@@ -3311,7 +3311,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - A typed number on file for a tenant outside the test building is refused. Feature 18 would give that tenant the debt agent, and a real tenant's call is the Debts page's deliberate step.
     - The page keeps the calling hours itself, because Omni's dialer has none.
     - The external_id is `<resident id or test>-<press time>`, so a second press is a new lead. The resident id is the first 36 characters.
-    - Vercel needs `TOKOMNI_TOKEN` (Sensitive) and `TOKOMNI_CAMPAIGN_ID`.
+    - Vercel has `TOKOMNI_TOKEN` (Sensitive) and `TOKOMNI_CAMPAIGN_ID` since 28 Oct, 11:44 UTC. A change to either reaches the page only with a production redeploy.
+    - **Writing the secrets and redeploying production are two separate goes (28 Oct).** The session's permission check let "set them" write the pair, then refused the redeploy as a production deploy of its own. A refused redeploy waits for its own go, or for Redeploy pressed in Vercel. It is never forced through with an empty push to `main`.
   - **One bot extension means one call at a time.** While the bot talks, the dialer rings nobody. List 2 rings 2 numbers per free agent, so a second tenant who answers waits in Omni's queue until the bot is free. The alternatives are a ratio of 1 (nobody waits, slower) or more extensions as agents (calls in parallel, more cost). Not decided yet.
 - **Zadarma (owner, 18 Oct: "we have zadarma now").**
   - **Known so far:** nothing more. No account details, and no `.env` entry.

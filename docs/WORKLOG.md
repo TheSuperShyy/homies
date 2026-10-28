@@ -17,6 +17,7 @@ conversation that produced it.
 - **Refused:** the forced redeploy of the production deployment (`dpl_J8ALBkdSnQrivpq3cGrAEmCPhDtT`, `c97eca3`). The session's permission check called it a production deploy needing its own go. It was not worked around, and no empty commit was pushed to trigger a build.
 - **So the page still says "Tokomni is not connected"**, because the running deployment predates the pair. It changes with the redeploy: the owner's go for it, or Redeploy in Vercel.
 - **Nothing was sent to Omni.**
+- **CONTEXT** (added after the briefing hook caught it missing): the pair is set, and writing the secrets and redeploying production are two separate goes. HANDOVER already had this step: the pair, the refusal, the redeploy call, and no empty push.
 
 ### Feature 19: the Gemini run tried and refused by the wallet; it now starts by itself after the top-up (11:25 UTC)
 - **Asked:** *"try and test it"*.
