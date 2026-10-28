@@ -1373,6 +1373,10 @@ button.danger svg { width: 15px; height: 15px; }
   font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--text-2);
 }
 .setinline .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+/* Not the key/value `.row` further up, whose padding, hairline and dimmed
+   first child it had been picking up by sharing the class name. */
+.setinline .row { padding: 0; border-block-end: 0; }
+.setinline .row > input { color: var(--text-1); }
 .setinline input {
   flex: 1 1 200px; min-width: 0;
   height: var(--control-md); padding-inline: 16px;
@@ -1383,6 +1387,12 @@ button.danger svg { width: 15px; height: 15px; }
 }
 .setinline input::placeholder { color: var(--text-3); }
 .setinline .hint { margin: 4px 0 0; font-size: var(--text-sm); color: var(--text-3); line-height: 1.5; }
+/* The dialer test opens its panel with the field, so there is nothing above
+   it for the hairline to separate. */
+.panel > .setinline:first-child { border-block-start: 0; }
+/* A Ring button that cannot ring (outside calling hours, or while its press is
+   on its way) keeps its colour on hover rather than taking the pill's. */
+.btn-sm[disabled]:hover { background: var(--action); }
 
 /* On a phone the circle and its buttons do not fit side by side without the
    buttons wrapping one per line, which looks like three separate controls. */
