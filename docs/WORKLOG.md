@@ -20,7 +20,7 @@ conversation that produced it.
   - Measured before the first fix: system prompt 23,435 characters, `notify_team` 4,015. "Anything else?" is ruled on 7 times across them, and "in the meantime" is quoted 3 times.
 - **Where each fault came from (the run's executions, read before any change):**
   - **Lift ticket without the flat:** the AI knew the flat and filed the ticket on it (`reporter_unit` "1"); only the reply left it out. `WHO_RULE` asks for "where you opened it", and for a lift "where" is the building.
-  - **Manager replies:** the AI followed the rule's own order, "ask, then say why", so the reason came last and 6 of the 7 replies ended on a statement. "איתם אפשר לסדר את זה מהר יותר" is the rule's sentence copied whole, and its "איתם" (the details) reads as management. The insisting turn has no reason in the rule, so the AI makes one up, and management is the nearest subject. "בינתיים" and "כבר מטפלים" are quoted in the rule as things not to say.
+  - **Manager replies:** the AI followed the rule's own order, "ask, then say why". 6 of the 13 manager replies ended on a statement, 5 of them on the reason. "איתם אפשר לסדר את זה מהר יותר" is the rule's sentence copied whole, and its "איתם" (the details) reads as management. The insisting turn has no reason in the rule, so the AI makes one up, and management is the nearest subject. "בינתיים" and "כבר מטפלים" are quoted in the rule as things not to say.
   - **Committee fee:** "אם מדובר בתשלום עצמו… בזה אני מטפל… אבל אם זה… חברי ועד הבית" is the facts list's ועד הבית bullet recited to the tenant.
   - **Gas:** "הצוות מעודכן ועל זה עכשיו" claims what no tool did.
 - **Not faults, so left as they are:**
@@ -44,6 +44,24 @@ conversation that produced it.
     - gas must not say "on it now";
     - `manager_fee` and `burst_manager` get per-reply checks too.
     - Replayed offline against the 07:03 transcript, they flag every fault in it and pass the replies that were fine.
+  - **Gemini, `manager_retest` + `rep_typed` (08:58-09:02 UTC, rounds 29-30, $0.16): 2/2.**
+    - All 5 replies end on their question. The insisting turn gives the bot's own reason: "מספיקה לי ממש מילה אחת על מה מדובר כדי שאוכל להתחיל לטפל בזה בעצמי. באיזה עניין מדובר?".
+    - "איתם" is gone.
+    - **New slip:** the topic turn asked "כדי שאוכל להעביר לצוות את התמונה המלאה, תוכל לפרט…", which is the relay reason the owner rejected on 27 Oct. It was the rule's own purpose for the second note, "כדי שלהנהלה תהיה התמונה המלאה", and the tool's "so management has the full picture". Both clauses were deleted; the call itself stays. `THEIRS` now also catches "להעביר לצוות/להם/להנהלה" and "התמונה המלאה".
+    - rep_typed bridged with "בלי קשר, כדי שנוכל לסדר את זה…", a "meanwhile" in other words; that is fix 3's matter.
+  - **Gemini, `manager_retest` again (09:05-09:08 UTC, round 31, $0.30 on the counter, which lags): FAIL by one check.**
+    - The topic turn now works the matter: "אתה רוצה להסדיר תשלום, או שיש איזו בעיה עם החיוב עצמו?".
+    - The insisting turn and "you can't help" are right.
+    - The first reply ended "אשמח שתספר לי על מה מדובר ומה מטריד אותך." with a full stop: a polite request, not the reason. Across both runs, 8 of 9 manager replies end on a question (before: 7 of 13). Since 24 Sep a full stop no longer doubles the message, and the 27 Oct runs had the same occasional slip (2 of 8). No rule was added for it: it would restate the prompt's ending rule.
+  - Measured after fix 2: prompt 23,476 characters, `notify_team` 3,457.
+- **Fix 3, the forbidden words quoted in the rule (`MANAGER_RULE` / `MANAGER_TOOL` / `NOTE_EDITS`).**
+  - **Change, deletions only:**
+    - "לא שהיא כבר מטפלת ולא מה יקרה אחר כך" became "כי מה שיקרה אחר כך אתה לא יודע".
+    - The whole sentence "לאורך כל הדרך אתה זה שמטפל, ולא תחנת ביניים עד שיגיע מנהל: בלי "בינתיים", ובלי לשאול אם יש עוד משהו…" is gone. Its "until a manager arrives" told the model a manager is coming. Its point, that the bot handles the matter, is the reason fix 2 gives for asking.
+    - The tool lost "not that they are already on it", "not a stop on the way to a manager" and both "never "in the meantime" and never whether there is anything else".
+    - "Anything else?" is now ruled on in two places: the prompt's paragraph on how a reply ends, and the staff-only matter.
+  - `NOTE_SAYS` also catches "בלי קשר", rep_typed's "meanwhile" in other words.
+  - Measured after fix 3: prompt 23,324 characters (start 23,435), `notify_team` 3,242 (start 4,015). None of the quoted phrases are left.
 
 ### Feature 19: every scenario run automatically, each on a clean memory: 8/10 by the checks, $1.02 (06:47-07:03 UTC; sandbox only)
 - **Asked:** *"ok for now do an auto testing with scenario based on the sandbox only"*.
