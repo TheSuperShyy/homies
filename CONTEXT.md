@@ -42,6 +42,7 @@ The user is the builder. The client is Homies.
     - **Since 29 Oct, 17:45 UTC the note is quiet** (the owner: no "the manager is on the review", see "One voice" below). The tenant hears that Michael cares and is doing all he can, never that management knows.
     - It never gatekeeps, concedes or argues.
     - The matter goes to the team afterwards, under its own reason, since "Hand to a person" drops a repeated reason.
+    - **The bot cannot tell a dropped note from a posted one** (seen live 29 Oct, 20:18-20:20 UTC). `notify_team` answers `ok: true` before "Hand to a person" decides. Twice the bot told the owner "הוספתי את העדכון הזה לקריאה" while both notes were skipped as a repeated `other`, and a note never touches a ticket: 255-1365-26 was unchanged and the photo it "added" is on no ticket.
     - After a staff-only matter it asks what the team will need.
     - This reverses the 18 Oct "no note without the matter" for manager requests only.
     - **Declined from the protocol he pasted with it:** fake concession, "for the manager's screen" data asks, and the bot's answer dressed up as "an automated background check". They mislead tenants and break the honesty rule.

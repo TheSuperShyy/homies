@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Read only, 20:18-20:35 UTC: Chatwoot is connected; the light-ticket replies claimed what never happened
+- **Asked:** *"are we connected on the chatwoot? dont make any changes just verify"*. Then, on a screenshot of 04:17-04:20 the owner's time: *"is this real? did it notif anyone or updated the ticket"*. Nothing was changed.
+- **Connected end to end (20:18 UTC):**
+  - Meta: CONNECTED, CLOUD_API, quality GREEN; the number's webhook override is on Chatwoot.
+  - Chatwoot: inbox 1 needs no reauthorisation, and its agent bot "Homies bot" points at n8n.
+  - n8n: the bot and the number watch are active, every run green.
+  - The owner's 20:12-20:17 messages are in Chatwoot, with the replies `read` / `delivered`.
+- **The light-ticket turns (executions 139178, 139189):** only `notify_team` ran, both times answering `ok: true`.
+  - "Hand to a person" skipped both notes (139182, 139192): "already noted (other) within the last 24h". The conversation's stamp holds `other,caller_request,payment`. The `other` was 17:06 UTC, the owner's complaint that the lighting and lift tickets stay open.
+  - No private note in Chatwoot, nobody alerted. After hours nothing pages anyway (the 09:00 ticker; `handover_paged_at` is empty).
+  - Ticket 255-1365-26 untouched: last update 19 Oct, 0 photos.
+  - The photo (message 3167, 20:17:33) is stored in `request_media` with no ticket.
+  - So "רשמתי במערכת…", "והוספתי גם את התמונה ששלחת לקריאה הקיימת" and "הוספתי את העדכון הזה לקריאה" were untrue, and "כדי שהצוות ידע" is the team voice. This is the known duplicate-note gap, now seen live, plus a photo claim nothing backs.
+
 ### LIVE 20:01 UTC: the memory reset, epoch 88 → 89, no text changed (`n8n_whatsapp_fresh.py`)
 - **Asked:** the owner, after testing epoch 88 on the handset: *"ok its kidna good now so lets reset the memory again"*.
 - **Changed:** `Conversation so far`'s key `-88` → `-89` at 20:01:25 UTC (04:01 the owner's time). Nothing else. Every chat, the owner's included, starts with an empty memory. Epoch 89 covers the same prompt, inject and tool texts as 88.

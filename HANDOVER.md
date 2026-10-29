@@ -22,6 +22,10 @@ appended to.
 > - **`n8n_whatsapp_fresh.py` checks live's texts against EPOCH_COVERS**, not the repo's, which do not build live until the fold. Run it again for the next reset with no text change: bump MEMORY_EPOCH, dry run, `--apply`.
 > - **Rollback:** `n8n_whatsapp_fresh.py --restore` (snapshot `local/n8n-whatsapp-live-before-fresh-e88.json`) + git revert.
 > - **Open, not fixed (the owner asked for the reset only):** the handset test's one flag, execution 139038 (19:49 UTC). An instalment request got "…כדי שנוכל לעזור לך עם זה". "שנוכל" ("so that we can") is a "we" the one-voice rule forbids.
+> - **Open, not fixed (the owner asked to verify only), 20:18-20:20 UTC:** the light-ticket replies said the photo and an update were added to ticket 255-1365-26. Nothing was.
+>   - Only `notify_team` ran. Both notes were skipped as a repeated `other` (the 17:06 UTC note), so nobody was alerted.
+>   - The ticket is unchanged, and the photo is stored with no ticket.
+>   - "כדי שהצוות ידע" is the team voice. WORKLOG 29 Oct.
 > - **Owed:** `check_whatsapp_rules.py --watch 2026-10-29T20:01` after the owner's next test, and the next morning.
 >
 > **LIVE 29 Oct, 19:37 UTC: never an all-clear before what a lookup found (epoch 88, `scripts/n8n_whatsapp_checkword.py`).** Execution 138931 answered a balance question "הכל בסדר 🙂 … רשומה לך יתרה של 2,000 ש"ח". The owner: *"i dont want that to happen again ever"*. WORKLOG 29 Oct.
