@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **DOWN since about 13:26 UTC, 29 Oct: the bot's OpenRouter key is AT its $15 cap ("$0.00 of it not yet spent"; the wallet is $0.45).**
+> - Every model call fails with `Forbidden - perhaps check your credentials?`. That 403 is the cap, not a bad credential.
+> - The sandbox bot goes to "Could not answer" (the owner: "why the chatbot not responding"), and **so does the live WhatsApp bot**, which runs on the same key.
+> - **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Nothing needs redeploying afterwards. `check_openrouter.py` shows when it is back.
+>
 > **OpenRouter is draining (29 Oct, 11:50 UTC): $2.94 in the wallet ($265 bought), and the bot's key has only $0.58 left under its $15 cap** (`python scripts/check_openrouter.py`). A big turn reserves about $0.13, so the key fails within a few tenant messages. It was $1.25 at 08:13. The live bot has not run since 26 Oct 12:46 UTC, so the $0.67 since then went on the sandbox (runs and the owner's own chats).
 > - **The top-up of about $20 on 28 Oct is mostly gone:** $20.38 at 14:19 UTC, $6.76 at 08:13 the next morning. The bot's key spent only the owner's $0.31 test of it, and n8n runs nothing else that calls the model.
 > - **Neither key can be named or capped from here:** only the bot's key is in `.env`, and there is no management key.

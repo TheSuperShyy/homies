@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### "why the chatbot not responding": the bot's OpenRouter key hit its $15 cap (13:30 UTC; read only)
+- **Asked:** *"why the chatbot not responding"*, during the owner's manual test of round 50 (conversation 110, "good afternoon how is it going", 13:26-13:28 UTC).
+- **Found:**
+  - `check_openrouter.py` at 13:29 UTC: the cap shows "$0.00 of it not yet spent", and the wallet has $0.45 (bought $265, spent $264.55).
+  - Execution 138176: the OpenRouter node failed five times with `Forbidden - perhaps check your credentials?`, then "Tell the team the bot is down", then "Could not answer".
+  - n8n itself ran fine, so this is the AI account, not the bot or today's change.
+- **The live WhatsApp bot is down too,** since it runs on the same key.
+- **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Another key keeps draining the wallet: $2.78 at 12:36, $0.45 at 13:29. Nothing needs redeploying.
+- CONTEXT has the sign (a 403 "Forbidden" there is the cap), and the `empty-wallet-looks-like-a-bot-bug` memory has it too.
+
 ### Feature 19: F again after the owner's chat on it: "WE ARE THE TEAM" (from 13:05 UTC; no AI spend)
 - **Seen:** the owner's sandbox chat on round 49, conversation 108 (12:51-13:02 UTC, Gemini, as Ido):
   - "i need a manager";
