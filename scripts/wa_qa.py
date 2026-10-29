@@ -458,6 +458,8 @@ def live_turn(code, s, t):
             # number from earlier is real only if it is there) and, on the second
             # pass, Try again's item.
             "recent": t.get("recent") or [], "first_try": t.get("first_try")}
+    if s.get("who") is not None:
+        base["who"] = s["who"]          # 29 Oct: the sender on file, as `Add who` writes it
     if base["run_index"]:
         # Try again rebuilds its item from `Still the last word?`, which never
         # carried the ack (Carry on adds it), so the retry reads no ack note.
@@ -869,6 +871,8 @@ def grade(run):
                              # twelve bot messages; Try again's item on a retry), so
                              # the truth guards read here what they read there.
                              "recent": recent, "first_try": t.get("first_try")})
+            if s.get("who") is not None:
+                turns_js[-1]["who"] = s["who"]  # 29 Oct: the sender on file (`Add who`)
             meta.append(ctx)
             went = t.get("mend_output") or t.get("say_again_output") or t.get("output") or ""
             if went:

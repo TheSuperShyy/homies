@@ -524,6 +524,15 @@ function cases(E) {
   expect('an echo after a greeting and a comma is caught', g('echo', 'היי, אני מבין שיש נזילה.', [], 0), false);
   expect('a clean reply passes both', () => g('echo', 'איזה מעצבן. באיזה בניין ובאיזו דירה?', [], 0)()
     && g('clerk', 'איזה מעצבן. באיזה בניין ובאיזו דירה?', [], 0)(), true);
+  // 29 Oct, evening (n8n_whatsapp_ionly.py): the owner, "please send a screenshot so that i can verify it
+  // through our system". A claimed payment reads only get_balance, so the clerk saw no work this turn and
+  // sent the sentence back; "so I can verify / check it" is the bot checking, and goes out.
+  const BAL = [{ action: { tool: 'get_balance' }, observation: obs({ ok: true, found: 1, owed_total: 750 }) }];
+  expect("the owner's 'so that I can verify it in our system' passes the clerk on a balance turn",
+    g('clerk', 'אני רואה במערכת שלנו שעדיין רשום חוב של 750 ש"ח, והתשלום מאתמול לא מופיע. תוכל לשלוח לי צילום מסך של אישור התשלום, כדי שאוכל לאמת אותו במערכת?', BAL, 0), true);
+  expect("'so I can check it' passes too, one word between", g('clerk', 'כדי שאוכל באמת לבדוק את זה, תוכל לשלוח לי את האישור?', [], 0), true);
+  expect('an explanation before a question still goes back', g('clerk', 'כדי שאוכל לפתוח לך קריאה, באיזה בניין זה?', [], 0), false);
+  expect('"so I can make sure it reaches the right person" still goes back', g('clerk', 'כדי שאוכל לוודא שהפנייה שלך מגיעה לאדם הנכון, מה העניין?', [], 0), false);
   // 18 Oct, late (executions 112601-112635, n8n_whatsapp_procedure.py): the owner asked
   // for a manager five times and got "what is it about?" five times. The first drafts
   // explained why the details are needed -- what he wants -- and these two sent them
@@ -657,6 +666,11 @@ function cases(E) {
   const REJ = "צהריים טובים! אני מיכאל מהומי'ז. אני מבין שיש לכם בעיה עם התאורה בחדר המדרגות בבניין, וזה מקשה עליכם לעלות במדרגות. אני אטפל בזה. באיזה בניין מדובר ומה מספר הדירה שלכם?";
   expect('65856: the echo is named, not a list of eight', () => why(REJ).includes('נפתחה בזה שהבנת אותו') && !why(REJ).includes('או שנתנה קישור'), true);
   expect('the clerk is named', () => why('כדי שאוכל לפתוח קריאה, אצטרך את הבניין.').includes('הסבירה לו למה אתה צריך פרט'), true);
+  // (Named, the clerk adds "ובמקום זה פשוט תשאל"; unnamed, the note keeps its full list of eight.)
+  expect('29 Oct: "so that I can verify it" is not named as the clerk',
+    () => why('תוכל לשלוח לי צילום מסך של האישור, כדי שאוכל לאמת אותו במערכת?').includes('ובמקום זה פשוט תשאל'), false);
+  expect('...while the clerk named still says "just ask"',
+    () => why('כדי שאוכל לפתוח קריאה, אצטרך את הבניין.').includes('ובמקום זה פשוט תשאל'), true);
   expect('both are named', () => { const w = why('אני מבין שיש נזילה. כדי שאוכל לעזור אצטרך את הדירה.'); return w.includes('נפתחה בזה שהבנת') && w.includes('וגם היא הסבירה'); }, true);
   // 5 Oct: a truth guard's reason is read off the draft too (wa_truth.truth_js),
   // so an invented repair is named; the full list stays for what the node cannot see.

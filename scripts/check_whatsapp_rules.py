@@ -94,6 +94,15 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # new input: 5 of 5 went out, none said anything untrue (two of them had ended
 # in Say it again's false claims before). Scratchpad run safetynet/retry_play.py.
 PINS = {
+    # 29 Oct, evening (n8n_whatsapp_ionly.py, epoch 86): one voice, Michael's (the owner: "there is no the
+    # team only the agent ... it should be i and i only"). Nine texts moved together: the prompt, the
+    # outage line, six tool descriptions and Try again's note (its clerk pattern now lets "so I can
+    # verify / check it" through). Claude-played on the candidate (scripts/wa_qa_ionly.json: the owner's
+    # 17:02 chat word for word, a manager request, a claimed payment, a document, bot-or-person, the
+    # stuck lift): 6 conversations, 28 turns, no reply with a team, a manager or "we will", no guard
+    # rejection on the new code; 26/28 expectations, the two misses being "sorry" said on the first
+    # complaint rather than the second, and the payment turn graded on the retry the OLD clerk forced
+    # (its first pass, the owner's own sentence, goes out whole on the new code).
     # 29 Oct (n8n_whatsapp_section6.py, epoch 85): the sandbox's version put on live, owner's "replace
     # the old chatbot with the new version". The five texts below are section6()'s, tested in the sandbox
     # that day (three blind Claude rounds, two Gemini runs, the owner's own chats) rather than by a fresh
@@ -143,9 +152,9 @@ PINS = {
     # a stated reason (one stated was sent in a third of the answers); asked again,
     # something new. Claude-played in three rounds, the last half size and clean
     # (WORKLOG 19 Oct, the epoch-84 entry).
-    'Answer the resident / system': 'b48beffe7956',
+    'Answer the resident / system': 'ebc23e806549',
     'Could not answer / input': 'd9c06797ffa6',
-    'Could not answer / system': '542bde9b64e6',
+    'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
     # "איך עבר" (retry.py), which only decides whether the rephay reason is added.
     # 18 Oct, evening: names a how-are-you he did not ask for (`unasked`); see above.
@@ -153,18 +162,18 @@ PINS = {
     # names a promise instead, and its unnamed list asks for no bare question.
     # 19 Oct: names a copy of a sent message, opens with "a draft you wrote was not
     # sent", says what was sent arrived, and its tools line names the status lookup.
-    'Try again / note': '0da4ce61e032',
+    'Try again / note': 'acce63c34a53',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
-    'get_balance / tool': '3040c210dad8',
-    'get_payment_link / tool': '58ab6a539158',
+    'get_balance / tool': '1753e9c90dba',
+    'get_payment_link / tool': 'f3c5de92d6d2',
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': '437d0eda4866',
-    'get_service_info / tool': '6223a04ed17f',
-    'notify_team / tool': '5ac57c3e34ca',     # 18 Oct, late: the reason, never an empty note
-    'open_request / tool': 'e7bafb06282a',
-    'show_menu / tool': '58aeda4b4677',
+    'get_service_info / tool': '18ca3d507731',
+    'notify_team / tool': '82f7e6c1851c',     # 18 Oct, late: the reason, never an empty note
+    'open_request / tool': '17d2ee41f988',
+    'show_menu / tool': '427d364be55d',
     'verify_address / tool': 'a2a85a3d4068',
 }
 
@@ -400,7 +409,16 @@ MENUS = ("👋 כאן הומי'ז. במה אפשר לעזור?", "👋 במה א
 PAY = re.compile(r"תשלום|לשלם|שילמ|קישור|לינק|חוב|יתרה|חשבון|pay|link|debt|balance|owe|bill|invoice",
                  re.I)
 ECHO = re.compile(r"(^|[.!?,:]\s*)(אני מבין|אני מבינה|הבנתי|שמעתי)\s+ש")
-CLERK = re.compile(r"כדי שאוכל|אצטרך")
+# 29 Oct, evening: "so I can verify / check it" is not the clerk (n8n_whatsapp_retry.CLERK_RE).
+CLERK = re.compile(r"כדי שאוכל(?!(\s+\S+)?\s+(לאמת|לבדוק))|אצטרך")
+# 29 Oct, evening (n8n_whatsapp_ionly.py): one voice, Michael's. The owner: "there is no the team only
+# the agent ... there shouldnt be a i will pass this to the team or the team will check it or the
+# manager is on the review it should be i and i only". A team or management in a reply (his own
+# "מצוות השירות" aside), the manager by article, something passed on, or "they / we will" do it.
+TEAM_VOICE = re.compile(r"(?<![א-ת])(?!(?:מ|ב)צוות השירות)[א-ת]{0,3}צוות|(?<![א-ת])[א-ת]{0,3}הנהלה"
+                        r"|(?<![א-ת])ו?[הל]מנהל(?![א-ת])"
+                        r"|(?<![א-ת])[ושכ]?(העברתי|העברנו|אעביר|נעביר|יבדקו|יטפלו|יחזרו|יעדכנו|ידאגו"
+                        r"|נבדוק|נטפל|נחזור|נעדכן|שנוכל)(?![א-ת])")
 # 5 Oct: a ticket claim and a ticket number, the shapes wa_truth.py's PHANTOM and
 # REF read (there as JS for n8n, here for the watch).
 TICKET_CLAIM = re.compile(r"(פתחתי|פתחנו|פותח|פותחת|נפתחה|נפתחו|נפתחת)( \S+){0,2}? ?ה?קריא[הת]")
@@ -554,6 +572,9 @@ def watch(since):
             if CLERK.search(t):
                 (infos if mgr else flags).append("the clerk's 'so that I can / I will need' in the %s%s"
                                                  % (k, " (a chat about a manager: wanted)" if mgr else ""))
+            m = TEAM_VOICE.search(t)
+            if m and not canned:
+                flags.append("someone other than Michael in the %s: %s" % (k, m.group(0)))
         # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
         # what went out is a flag; the ack and the first beat of a two-part
         # payment reply may say "I'm on it". One the filter cut is an info line.

@@ -43,7 +43,8 @@ function build(X) {
     worth: compile(['$json', 'Date'], 'return (' + X.worth_text + ');', 'Worth a word?'),
     word: compile(['$json', '$'], 'return (' + X.word_gate + ');', 'A word first?'),
     carry: X.carry_on ? compile(['$json', '$'], 'return (' + X.carry_on + ');', 'Carry on') : null,
-    inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
+    // `$` since 29 Oct: section 6's inject reads the sender's line from `Add who` (as the gate's harness).
+    inject: compile(['$json', '$now', '$'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
     sayNow: compile(['$json'], 'return (' + X.say_now + ');', 'Say it now'),
     // 5 Oct: the last resort without a model (scripts/n8n_whatsapp_safetynet.py).
@@ -124,7 +125,11 @@ function run(E, clock, o) {
   out.inject = String(E.inject({
     greeted: S.greeted, text: S.text, tap_now: S.tap_now, photo: S.photo, attachment: S.attachment,
     last_bot: S.last_bot, retry_note: o.retry_note || '', acked,
-  }, $now));
+  }, $now, (name) => {
+    // n8n's `$('Add who')`: not run (a number not on file) unless the scenario gives `who`.
+    if (name !== 'Add who') return $(name);
+    return { isExecuted: o.who !== undefined, first: () => ({ json: { who_text: o.who || '' } }) };
+  }));
   out.ack_sent = ackSent;
   out.ack_text = ackSent ? JSON.parse(E.sayNow({ output: acked })).content : '';
 

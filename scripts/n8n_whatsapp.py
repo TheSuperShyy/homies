@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 85
+MEMORY_EPOCH = 86
+# 85 -> 86, 29 Oct, evening (n8n_whatsapp_ionly.py): one voice, Michael's. No team, manager or
+# management checks, knows or gets back in a reply, nothing is said to be passed on, and a
+# note is a quiet record; every live buffer (the owner's included) taught the old voice.
 # 83 -> 84, 19 Oct, late (n8n_whatsapp_lowkey.py): "when will they call me?" gets a
 # true reason, what is real now and what he can do, never a bare "I don't know", and
 # asked again, something not yet done (one prompt paragraph); Send's promise v4 stops
@@ -760,7 +763,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "b48beffe7956",   # docs/features/11-whatsapp-bot/prompt.md
+    "prompt": "ebc23e806549",   # docs/features/11-whatsapp-bot/prompt.md (29 Oct, evening, epoch 86)
     "inject": "680da3fc96bc",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
@@ -777,8 +780,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "5ab622b6f35e",  # 29 Oct, epoch 85: LIVE's tools (section 6). TOOLS below is NOT folded yet, so every
-    # patcher refuses at check_memory_epoch until it is (n8n_whatsapp_section6.py).
+    "tools": "72cac34efc1c",  # 29 Oct, evening, epoch 86: LIVE's tools (section 6, then one voice). TOOLS below is NOT
+    # folded yet, so every patcher refuses at check_memory_epoch until it is (n8n_whatsapp_section6.py,
+    # n8n_whatsapp_ionly.py).
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions

@@ -1,0 +1,446 @@
+{
+ "_about": "The deck for n8n_whatsapp_ionly.py (29 Oct, evening): one voice, Michael's. The owner's own chat on the live bot (29 Oct 17:02-17:06 UTC, executions 138669 and 138681) word for word, and five short cases the changed texts touch: a manager request, a claimed payment, a document only a person can produce, 'are you a bot?' then a person, and someone stuck in the lift. Every resident is invented except the owner's test persona; only בר כוכבא 23 is used, and nothing here writes anywhere. TEAM in the expectations is every way a reply puts someone other than Michael on the matter, or speaks as 'we' who will act. `expect` is never shown to the players.",
+ "scenarios": [
+  {
+   "id": "owner_tickets",
+   "title": "the owner's chat as Assaf, 29 Oct 19:02 Israel time: what happened to my tickets, then 'it is annoying, I opened them last month'",
+   "time": "19:02",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T19:02:00+02:00",
+   "resident": {
+    "persona": "אסף קליקס, גר בבר כוכבא 23 דירה 2, כותב באנגלית. פתח בחודש שעבר כמה קריאות בבניין (תאורה בחדר המדרגות, המעלית, נזילה מעל מנורה) ולא שמע מאז כלום. מתוסכל, לא כועס.",
+    "script": [
+     {
+      "say": "hi"
+     },
+     {
+      "say": "i havent received anything from the tickets i bring up, whats the status on them???"
+     },
+     {
+      "say": "nothing but its annoying that they are still not resolved i opened them like last month"
+     },
+     {
+      "say": "ok thanks",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 3,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1402-26",
+       "status": "open",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-09-24",
+       "last_update": "2026-09-24",
+       "description": "האור בחדר מדרגות בקומה 2 לא עובד כבר כמה ימים חושך מוחלט בערב"
+      },
+      {
+       "reference": "255-1417-26",
+       "status": "open",
+       "type": "elevator",
+       "urgency": "high",
+       "opened": "2026-09-27",
+       "last_update": "2026-09-27",
+       "description": "מעלית תקולה, הדייר מציין שצוות הבטיח לתקן ועדיין לא תוקן. כועס על העיכוב."
+      },
+      {
+       "reference": "255-1431-26",
+       "status": "open",
+       "type": "electrical",
+       "urgency": "emergency",
+       "opened": "2026-10-02",
+       "last_update": "2026-10-02",
+       "description": "נזילה מהתקרה בחדר מדרגות בין קומה 1 ל-2, ישר על מנורה מהבהבת. יש שלולית על המדרגות."
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_request_status"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no new ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|מנהל|העברתי|הועבר|אעביר|מעביר|יבדקו|יטפלו|יחזרו|יעדכנו|נבדוק|נטפל|נעדכן|נחזור|שנוכל",
+     "name": "TEAM: nobody but Michael, no 'we will'"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 1,
+     "regex": "על ההמתנה|על העיכוב",
+     "name": "no apology for the wait (138669)"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 2,
+     "regex": "מצטער|צר לי",
+     "name": "sorry to hear it, on the complaint"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 2,
+     "regex": "\\?\\s*$",
+     "name": "the complaint's reply hands the turn back"
+    }
+   ],
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]"
+  },
+  {
+   "id": "manager_quiet",
+   "title": "asks for a manager, insists, then says what it is: the house manager was rude (manager_insists, under the one voice)",
+   "time": "10:40",
+   "weekday": 5,
+   "weekday_he": "שישי",
+   "iso": "2026-10-30T10:40:00+02:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 6 שרוצה להתלונן על אב הבית, ומתעקש בהתחלה לדבר עם מנהל",
+    "script": [
+     {
+      "say": "אני רוצה לדבר עם מנהל"
+     },
+     {
+      "say": "לא, אני צריך מנהל. זה חשוב"
+     },
+     {
+      "say": "אב הבית דיבר אליי אתמול בצורה ממש לא מכבדת מול השכנים, ואני רוצה שמנהל יטפל בזה"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "בר כוכבא 23 דירה 6"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "notify_team",
+     "turn": 0,
+     "name": "the request recorded at once"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|העברתי|הועבר|אעביר|מעביר|מעודכ|יחזור|יחזרו|יטפל|יבדקו|ידאגו|נבדוק|נטפל|נחזור|שנוכל",
+     "name": "TEAM: nobody but Michael, no 'we will'"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "מה (קרה|קורה|מטריד|העניין)|ספר|לשמוע|לפרט|במה מדובר",
+     "name": "the first reply asks what happened"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "\\?",
+     "name": "the first reply hands the turn back"
+    },
+    {
+     "type": "questions_distinct",
+     "name": "never the same question twice"
+    }
+   ]
+  },
+  {
+   "id": "paid_claim",
+   "title": "says he paid yesterday through the link and still sees a debt (sender recognised)",
+   "time": "18:20",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T18:20:00+02:00",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. שילם אתמול בערב 750 ש\"ח באשראי דרך הקישור, ועדיין רואה שיש לו חוב. אין לו צילום מסך כרגע.",
+    "script": [
+     {
+      "say": "שילמתי אתמול 750 שקל דרך הקישור ועדיין כתוב לי שיש לי חוב, מה קורה?"
+     },
+     {
+      "if_asked": "how, when or how much he paid",
+      "say": "אתמול בערב, באשראי דרך הקישור ששלחתם, 750"
+     },
+     {
+      "if_asked": "a screenshot or a confirmation",
+      "say": "אין לי את זה עכשיו, אשלח אחר כך"
+     },
+     {
+      "say": "טוב תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_balance": {
+     "ok": true,
+     "found": 1,
+     "resident": "אסף קליקס",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "unit": "2",
+     "owed_total": 750,
+     "owed_months": [
+      {
+       "period": "2026-08",
+       "amount": 250
+      },
+      {
+       "period": "2026-09",
+       "amount": 250
+      },
+      {
+       "period": "2026-10",
+       "amount": 250
+      }
+     ]
+    },
+    "notify_team": {
+     "ok": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_balance"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "צילום|אישור",
+     "name": "asks for the proof"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "שאוכל|אוכל ל|אבדוק|אאמת",
+     "name": "so I can verify it (first person)"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|מנהל|גבייה|העברתי|הועבר|אעביר|מעביר|יבדקו|יטפלו|יחזרו|יעדכנו|נבדוק|נטפל|נעדכן|נחזור|שנוכל|נוכל",
+     "name": "TEAM: nobody but Michael, no 'we'"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "יוחזר|נחזיר|נתקן|יתוקן|יזוכה|נזכה",
+     "name": "no refund or correction promised"
+    }
+   ],
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]"
+  },
+  {
+   "id": "document_request",
+   "title": "wants a confirmation of a year's committee payments for the bank: only a person can produce it",
+   "time": "11:15",
+   "weekday": 5,
+   "weekday_he": "שישי",
+   "iso": "2026-10-30T11:15:00+02:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 9 שצריך אישור על תשלומי ועד הבית מינואר ועד עכשיו, בשביל משכנתא בבנק",
+    "script": [
+     {
+      "say": "אני צריך אישור על כל התשלומים של ועד הבית מהשנה האחרונה, בשביל הבנק"
+     },
+     {
+      "if_asked": "which period, or any detail of the request",
+      "say": "מינואר עד עכשיו"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "בר כוכבא 23 דירה 9"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "notify_team"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "רשמתי|רשמתי את",
+     "name": "says it recorded the request"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|מנהל|העברתי|הועבר|אעביר|מעביר|יבדקו|יטפלו|יחזרו|יעדכנו|ישלחו|יישלח|תקבל|נבדוק|נטפל|נעדכן|נחזור|נשלח|שנוכל",
+     "name": "TEAM: nobody but Michael, no promise of delivery"
+    }
+   ]
+  },
+  {
+   "id": "bot_or_person",
+   "title": "asks if it is a bot, wants a person, then says it is about the stairwell leak",
+   "time": "16:30",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T16:30:00+02:00",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. חושד שהוא מדבר עם בוט ומעדיף בן אדם. העניין: הנזילה בחדר המדרגות שדיווח עליה לפני שבועיים, ועדיין מטפטף.",
+    "script": [
+     {
+      "say": "רגע, אני מדבר עם בוט?"
+     },
+     {
+      "say": "אני מעדיף לדבר עם בן אדם אמיתי"
+     },
+     {
+      "say": "זה על הנזילה בחדר המדרגות שדיווחתי עליה לפני שבועיים, עדיין מטפטף"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "בר כוכבא 23 דירה 2"
+     },
+     {
+      "say": "אוקיי תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true
+    },
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1431-26",
+       "status": "open",
+       "type": "plumbing",
+       "urgency": "high",
+       "opened": "2026-10-15",
+       "last_update": "2026-10-15",
+       "description": "נזילה מהתקרה בחדר המדרגות בין קומה 1 ל-2"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "דיגיטלי",
+     "name": "honest: the digital assistant"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 0,
+     "regex": "בן אדם מהצוות|להעביר אותך|אעביר|אפשר גם",
+     "name": "no offer of a person from the team"
+    },
+    {
+     "type": "called",
+     "tool": "notify_team",
+     "name": "the wish for a person recorded"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות השירות.*(יבדוק|יטפל|יחזור)|הנהלה|העברתי|הועבר|אעביר|מעביר|מעודכ|יחזור|יחזרו|יטפלו|יבדקו|נבדוק|נטפל|נחזור|שנוכל",
+     "name": "TEAM: nobody but Michael, no 'we will'"
+    }
+   ],
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]"
+  },
+  {
+   "id": "lift_person",
+   "title": "someone stuck in the lift, in a panic (the main deck's lift_person, under the one voice)",
+   "time": "19:40",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T19:40:00+02:00",
+   "resident": {
+    "persona": "יוסי, גר בבר כוכבא 23 דירה 12; שכנה תקועה במעלית",
+    "script": [
+     {
+      "say": "מישהי תקועה במעלית בבניין שלנו!! היא בפאניקה"
+     },
+     {
+      "if_asked": "building and apartment",
+      "say": "בר כוכבא 23, אני בדירה 12"
+     },
+     {
+      "if_asked": "what to do / anything else",
+      "say": "מה לעשות בינתיים??"
+     }
+    ]
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "noted": true
+    },
+    "open_request": {
+     "ok": true,
+     "opened": true,
+     "reference": "255-1405-26",
+     "building": "בר כוכבא 23",
+     "reporter_unit": "12"
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "notify_team",
+     "turn": 0,
+     "name": "the emergency note on the first turn"
+    },
+    {
+     "type": "called",
+     "tool": "open_request"
+    },
+    {
+     "type": "arg_equals",
+     "tool": "open_request",
+     "arg": "urgency",
+     "value": "emergency",
+     "name": "urgency emergency"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "בדרך|בקרוב|תוך|מגיע|יגיע|100|101|102|משטרה|מכבי|שמרו על|אל תנסו|תנסו ל",
+     "name": "no help-on-the-way, no advice, no numbers"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|עדכנתי|העברתי|הועבר|יודעים",
+     "name": "TEAM: nobody but Michael"
+    }
+   ]
+  }
+ ]
+}

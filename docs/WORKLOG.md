@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### LIVE 17:45:40 UTC: one voice, Michael's; no team, manager or "we will" in a reply (`n8n_whatsapp_ionly.py`, epoch 86)
+- **What the owner saw:** a chat on the live bot as Assaf, in English, 17:02-17:06 UTC (executions 138669 and 138681). It was the first traffic through the re-registered number.
+  - The status ask got "מצטער על ההמתנה 🙏 … 3 קריאות שלך שעדיין בסטטוס פתוח ונמצאות אצל הצוות".
+  - "its annoying that they are still not resolved i opened them like last month" got a notify_team call, then "העברתי עכשיו את מה שאמרת לצוות, כדי שיבדקו למה הטיפול בקריאות מתעכב".
+- **Said:** *"i told you already there is no the team only the agent. so its like making a promise. also it apologized it should be like im so sorry to hear that im trying to check blah blach. there shouldnt be a i will pass this to the team or the team will check it or the manager is on the review it should be i and i only / im trying my best to help you, im trying to check our system, please send a screenshot so that i can verify it through our system. something like that"*.
+- **Every reply was a sentence the bot had been given.** get_request_status returned no "team" at all.
+  - "שהיא אצל הצוות" sat in the when-will-they-call passage.
+  - "רושם לצוות שהוא מחכה לתשובה" was the new thing to do when asked again.
+  - "לומר שעדכנת את הצוות … ולכן הכלי בא לפני המשפט" licensed the sentence once the tool ran.
+  - notify_team opened with "Let the right Homies team know" and ended with "that it is now with us".
+  - The manager protocol had "שההנהלה מעודכנת" and "שההנהלה כבר יודעת" (the owner's "the manager is on the review").
+  - The 29 Oct "we" edits ("שזה אצלנו", "כדי שנוכל") were still a "we".
+- **Changed, in one write** (prompt 23,570 → 23,567 characters):
+  - One sentence now opens "אתה שירות הלקוחות של הומי'ז, כולו". He speaks for himself: what he checks, what he sees in our system, what he opened or recorded, and what he needs so he can verify. Nobody else checks, handles, knows or gets back, and nothing is said to be passed on.
+  - A note is a quiet record in the system. After a request only a person can finish, he says he recorded it and asks what it still lacks.
+  - An upset tenant gets sorrow for what they are going through, then what he is doing for them.
+  - The manager request is still recorded at once (caller_request), now quietly. The bot-or-person answer no longer offers "a person from the team".
+  - "השגה על חיוב" left the past-you list. F had taken it off the facts list only.
+  - The same voice in notify_team, get_balance, open_request, get_service_info, get_payment_link, show_menu and the outage line. show_menu still described the third button that section 6 removed.
+  - MEMORY_EPOCH 85 → 86. The owner's own buffer taught the old voice.
+- **One guard narrowed** so the owner's sentence can go out.
+  - `clerk` sends back a first pass with "כדי שאוכל" when the turn opened, noted and linked nothing. A claimed payment only reads get_balance.
+  - The blind player's first draft, the owner's sentence almost word for word ("…כדי שאוכל לאמת אותו במערכת? 🙏"), went back, and the retry dropped the reason. The 29 Oct "כדי שנוכל" had passed only because it said "we".
+  - Now "כדי שאוכל" followed by לאמת or לבדוק passes. The same pattern is in Try again's naming (`n8n_whatsapp_retry.CLERK_RE`) and in --watch. Every other clerk shape still goes back.
+- **Gate:**
+  - `--candidate --replay` all green: 422 cases with 5 new ones, and the replay of every message and reply changed nothing.
+  - The new cases fail on the old live workflow.
+  - `--watch` has a new flag, "someone other than Michael". Over the turns since the 15:27 go-live it flags exactly 138669 and 138681.
+  - Nine pins were re-pinned after a blind Claude-played check on the candidate (`scripts/wa_qa_ionly.json`): the owner's chat word for word, a manager request, a claimed payment, a document for the bank, bot-or-person, and the stuck lift.
+  - The check covered 6 conversations and 28 turns. No reply had a team, a manager or "we will", and the new code rejected no guard.
+  - 26 of 28 expectations held. "Sorry" came on the first complaint, not the second. The payment turn was graded on the retry that the old clerk forced.
+  - Read back exactly as dumped; the check on live is green.
+  - The harness's inject now gets n8n's `$` for `Add who`. `wa_qa.js` had thrown "$ is not defined" since section 6.
+- **Rollback:** `python scripts/n8n_whatsapp_ionly.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-ionly.json`) + git revert.
+- **Found, not changed (a separate cause):** a second note under the same reason, sent to add details ("הוספתי לבקשה …"), is dropped by "Hand to a person" as a duplicate within 24 h. So "I've added it" can be untrue. Two of the blind conversations did it.
+- `check_patchers_idle.py` on the dump: every older patcher refuses (expected until the fold). `firstword` alone would run; it wants to rewire "Still the last word?". That was already so on live before this change.
+- **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T17:45`, and again the next morning.
+
 ### Meta unregistered the WhatsApp test number again (seen 15:36 UTC; read only)
 - **Said:** *"i think the meta disconnected the chatbot"*, right after the 15:27 UTC switch to the new bot.
 - **Meta's `GET /{phone-number-id}`** (+1 555-178-1261, "Test Number"):

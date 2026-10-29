@@ -185,7 +185,10 @@ BS = chr(92)   # a backslash, built rather than typed (27 Sep)
 # The echo and the clerk, as the guards on `Reply usable?` test them. One copy:
 # n8n_whatsapp_manners.py builds its `echo` and `clerk` conditions from these.
 ECHO_RE = "/(^|[.!?,:]" + BS + "s*)(אני מבין|אני מבינה|הבנתי|שמעתי)" + BS + "s+ש/"
-CLERK_RE = "/כדי שאוכל|אצטרך/"
+# 29 Oct, evening (n8n_whatsapp_ionly.py): "so I can verify / check it" is the bot checking, which the
+# owner asked for ("please send a screenshot so that i can verify it through our system"), so
+# "כדי שאוכל" followed by לאמת or לבדוק (one word at most between) is not the clerk.
+CLERK_RE = "/כדי שאוכל(?!(" + BS + "s+" + BS + "S+)?" + BS + "s+(לאמת|לבדוק))|אצטרך/"
 
 # 27 Sep evening: THE REWRITE NAMES WHAT IT CAN SEE. The note above lists eight
 # possible reasons because the Set node cannot tell which guard fired -- and in

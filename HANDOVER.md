@@ -8,9 +8,17 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 29 Oct, 17:45:40 UTC: one voice, Michael's, on the live WhatsApp bot (epoch 86, `scripts/n8n_whatsapp_ionly.py`).** The owner's live chat as Assaf (17:02-17:06, executions 138669/138681) got "…ונמצאות אצל הצוות", then "העברתי … לצוות, כדי שיבדקו". The owner: *"there is no the team only the agent ... it should be i and i only"*. WORKLOG 29 Oct.
+> - **Now:** he speaks for himself: what he checks, sees in our system, opened or recorded, and needs so he can verify. No team, manager or management in a reply, and nothing "passed on". A note is a quiet record; a request only a person can finish is "I recorded it", then what it lacks. An upset tenant gets "sorry to hear it", then what he is doing. A manager request is still recorded at once, quietly.
+> - **`clerk` narrowed:** "כדי שאוכל לאמת / לבדוק" passes, so "send a screenshot so I can verify it in our system" goes out. `--watch` flags "someone other than Michael".
+> - **Rollback:** `python scripts/n8n_whatsapp_ionly.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-ionly.json`) + git revert.
+> - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T17:45`, and again the next morning.
+> - **Found, not fixed (a separate cause):** a second notify_team call under the SAME reason, made to add details, is dropped by "Hand to a person" as a duplicate within 24 h. Then "הוספתי לבקשה …" is untrue. Seen in 2 of 6 blind conversations.
+> - **The fold** (TOOLS and the builder in `n8n_whatsapp.py`) must now take section 6 AND `ionly()`, with `n8n_whatsapp_retry.CLERK_RE`'s new pattern. The sandbox copy still has the 29 Oct texts. `n8n_whatsapp_firstword.py` would rewire "Still the last word?" (pre-existing since section 6), so never apply it.
+>
 > **RE-REGISTERED 29 Oct, 15:51:41 UTC, on the owner's "fix it": Meta had unregistered the WhatsApp test number again** (seen 15:36 UTC, the third time since 25 Oct; PENDING, NOT_VERIFIED, health BLOCKED 141000/141001).
 > - **Read back 15:52:05 UTC:** CONNECTED, CLOUD_API, can_send_message LIMITED. The test number sends only to its verified recipients. Only 138024 is left, SIP calling, which is not used.
-> - **Not yet seen:** a message through it. The live bot's last run is 26 Oct, 12:46 UTC.
+> - **Seen working:** the owner's chat came through it at 17:02 UTC (executions 138669, 138681).
 > - **If it drops again:** `GET /{WHATSAPP_PHONE_NUMBER_ID}?fields=status,platform_type,health_status`, then `POST /{id}/register` with `WHATSAPP_REGISTER_PIN` on the owner's go. The lasting fix is Homies' own number on a verified business.
 >
 > **LIVE 29 Oct, 15:27:21 UTC: the new WhatsApp chatbot (the sandbox's section 6 + E + F + "we", epoch 85) replaced the old one** (owner: *"replace the old chatbot with the new version"*). `scripts/n8n_whatsapp_section6.py` ran the sandbox's own section6() on live; gate 416/416, replay unchanged; five pins re-pinned on the day's sandbox testing.
