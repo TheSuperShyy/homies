@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Re-registered (18:37:16 UTC), and a watch that re-registers the number by itself (`n8n_number_watch.py`, live 18:46 UTC)
+- **Asked:**
+  - *"can we add a ping on their so that it wont close?"*
+  - Answered: a ping is not the fix. The number ran from August to 20 Oct, quiet nights included, and never dropped. This time it was gone within 80 minutes of the owner's chat. Meta's registration doc describes a number becoming unregistered only by a deliberate `POST /deregister`.
+  - Offered instead: a check every 5 minutes that registers it again.
+  - The owner: *"ok i think a small checker for now is right"*, the go for the register now and for the watch's own registers.
+- **Re-registered by hand at 18:37:16 UTC:** `success: true`, read back at 18:37:34 as CONNECTED / CLOUD_API. Only 138024 (SIP) is left.
+- **`Homies — WhatsApp number watch` (`OzdMMziMU4T4GOrb`), built by `scripts/n8n_number_watch.py`:**
+  - The flow: every 5 minutes, `GET /{id}?fields=status,platform_type`, then "Unregistered?", then a Code node, then `POST /{id}/register`.
+  - **The Code node holds Meta's limit.** Meta allows 10 registers per number in a moving 72 hours; the 11th returns 133016 and blocks registering for 72 hours.
+    - It stops at 8, counting today's two hand registers.
+    - It never tries twice within 30 minutes, and the register is never retried.
+    - Past the cap, or on a status a register does not undo (FLAGGED, RESTRICTED, BANNED), it fails the run: a red run means a person is needed.
+    - Each drop goes into the workflow's static data (`drops`), so the drop times survive pruning. `--drops` prints them.
+  - **The PIN is not in the workflow.** A new Custom Auth credential, `Homies Meta register (WhatsApp number watch)` (`FAtC4PtQ8qyo4pBR`, id in `.env` as `N8N_META_REGISTER_CRED_ID`), carries the bearer header and the PIN.
+    - n8n's HttpRequestV3 merges a Custom Auth body into the JSON body; this was read on the instance (n8n 2.33.3).
+    - The status read uses the live bot's typing credential.
+- **Checked:**
+  - The limit logic offline, in Node:
+    - it waits 30 minutes after the last register;
+    - the 9th drop in 72 hours throws at the cap of 8;
+    - FLAGGED throws;
+    - registers age out after 72 hours.
+  - The register request without calling Meta. A throwaway workflow sent exactly what "Register the number" sends to a second webhook on our n8n, which answered only fingerprints:
+    - body keys `messaging_product` and `pin`;
+    - the PIN's sha256 equal to `.env`'s;
+    - the bearer equal to the token;
+    - `application/json`.
+    - It saved no executions and was deleted.
+  - The workflow read back with the intended wiring and credentials.
+  - **First scheduled run:** 18:50:43 UTC, execution 138888, success: Meta said CONNECTED / CLOUD_API, and the run stopped at "Unregistered?" (false branch).
+- **Not yet seen:** a real drop through the watch. The register path is proven up to Meta's door, not through it.
+- **Off:** `python scripts/n8n_number_watch.py` has no off switch. Deactivate `OzdMMziMU4T4GOrb` in n8n, or `POST /api/v1/workflows/OzdMMziMU4T4GOrb/deactivate`. `.env` backup: `local/env-backups/.env.before-number-watch-2026-10-29`.
+
 ### Where the bot's committee-fee coverage comes from (the owner's question; read only)
 - **Asked:** *"where did we get the information about the specs coverage of the monthly committee fee"*.
 - **Answer:** the client's own written answers of 18 Aug 2026. They are 12 answers in Hebrew to the 13 questions we sent: #6 "מה כלול בתשלום ועד הבית" and #7 "מה לא כלול", kept verbatim in `docs/reference/homies-faq.txt`.

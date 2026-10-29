@@ -8,16 +8,15 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **META HAS UNREGISTERED THE WHATSAPP TEST NUMBER AGAIN (seen 29 Oct, 18:26 UTC; the fourth time since 25 Oct), so the live bot neither gets nor sends WhatsApp.** The owner: *"the meta has been disconnected again"*. WORKLOG 29 Oct.
-> - **State:** PENDING, NOT_VERIFIED, platform NOT_APPLICABLE, health BLOCKED (141000, 141001). The webhook override still points at Chatwoot.
-> - **When:** after 17:06:50 UTC, the owner's last message. That is under 2.5 hours after the 15:51:41 UTC re-register, which had read back CONNECTED / CLOUD_API and carried the owner's 17:02-17:06 chat.
-> - **Not our side, checked:** nothing in the repo, in n8n or in Chatwoot 4.16.2 unregisters it.
->   - n8n: the live bot touches Meta only to show typing.
->   - Chatwoot deregisters only an embedded-signup inbox that is deleted. There is no such log line or inbox write.
->   - Meta sends no notice. The cause is on Meta's side or with someone who has access to the Meta app.
-> - **To bring it back:** `POST /{WHATSAPP_PHONE_NUMBER_ID}/register` with `WHATSAPP_REGISTER_PIN`, then `GET /{id}?fields=status,platform_type,health_status` until CONNECTED / CLOUD_API.
->   - It is a write to Meta, so it needs the owner's go each time.
->   - The lasting fix is Homies' own number on a verified business.
+> **THE WHATSAPP TEST NUMBER IS WATCHED (live 29 Oct, 18:46 UTC): `Homies — WhatsApp number watch` (`OzdMMziMU4T4GOrb`, `scripts/n8n_number_watch.py`) re-registers it by itself when Meta drops it.**
+> - **Why:** Meta unregistered it four times since 20 Oct, the last within 2.5 hours of a register. Nothing of ours does it. The owner: *"ok i think a small checker for now is right"*. Re-registered by hand at 18:37:16 UTC (CONNECTED / CLOUD_API).
+> - **How:** every 5 minutes it reads the status. When it is not CONNECTED on the Cloud API, it registers again.
+>   - The PIN is in the Custom Auth credential `FAtC4PtQ8qyo4pBR` (`N8N_META_REGISTER_CRED_ID`).
+>   - It stops at 8 registers in 72 hours (Meta blocks at 10), counting the two by hand, with 30 minutes between tries.
+>   - **A red run means a person is needed** (the cap, or FLAGGED / RESTRICTED / BANNED).
+> - **`python scripts/n8n_number_watch.py --drops`** lists every drop it saw and its registers: the times are the clue to the cause.
+> - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
+> - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
 > **LIVE 29 Oct, 17:45:40 UTC: one voice, Michael's, on the live WhatsApp bot (epoch 86, `scripts/n8n_whatsapp_ionly.py`).** The owner's live chat as Assaf (17:02-17:06, executions 138669/138681) got "…ונמצאות אצל הצוות", then "העברתי … לצוות, כדי שיבדקו". The owner: *"there is no the team only the agent ... it should be i and i only"*. WORKLOG 29 Oct.
 > - **Now:** he speaks for himself: what he checks, sees in our system, opened or recorded, and needs so he can verify. No team, manager or management in a reply, and nothing "passed on". A note is a quiet record; a request only a person can finish is "I recorded it", then what it lacks. An upset tenant gets "sorry to hear it", then what he is doing. A manager request is still recorded at once, quietly.
