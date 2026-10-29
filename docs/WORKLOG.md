@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 20: Omni's 27 Oct email read again; the token is theirs exactly, and List 2's Play is the next thing to rule out (11:55 UTC; nothing inserted)
+- **Asked:** the owner pasted Omni's 27 Oct email, token included, and *"read this again"*.
+- **Checked:** `.env` and `dashboard/.env.local` hold exactly the email's token and List 2 id, character for character, so it is not a copy mistake. Vercel's id was already matched. Its token was written from `.env`.
+- **The email has no request format.** That is in Omni's earlier API document, which we follow exactly. The insert path on Tokomni's other hosts gives nothing new: app.tokomni.com is Cloudflare's 403, api.tokomni.com times out, app.tokomni.cc does not exist. Probed with a made-up token, so nothing could be inserted.
+- **The one lead it gives: List 2 is stopped by hand until someone presses Play once.** The email says a stopped list still takes API leads and only does not ring them. Yet a campaign lookup that skips a stopped campaign would answer exactly this "not found", so it is cheap to rule out.
+- **Next, the owner's:** Play on List 2 (Omni asks for it anyway), Ido ready, Ring again. If it is refused again, send the 404 email with one line added: List 2 was playing.
+- The token is not written anywhere in the repo.
+
 ### Feature 20: the email to Omni support about the 404 (11:41 UTC; nothing sent by us)
 - **Asked:** *"so auto using api does not work only manually?"*. **Answered:** for now, yes in practice. A number put into Tokomni by hand rang Ido on 26 Oct (`01a17807`, the debt agent end to end). The API's one try, the owner's press today, was refused. That is not a verdict on the API: our request follows Omni's document, and the likely cause is the token on their side.
 - **Then asked:** *"ok write an email for tokomni/omnitelecom suppport"*.
