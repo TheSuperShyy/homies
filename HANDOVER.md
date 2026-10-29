@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **META HAS UNREGISTERED THE TEST NUMBER AGAIN (seen 29 Oct, 15:36 UTC, the third time since 25 Oct), so the live bot neither gets nor sends WhatsApp.** The owner: *"i think the meta disconnected the chatbot"*.
+> - `GET /{WHATSAPP_PHONE_NUMBER_ID}`: status PENDING, NOT_VERIFIED, platform NOT_APPLICABLE, health BLOCKED (141000 not linked, 141001 not verified). Same as 25 and 26 Oct.
+> - The live bot's last run was 26 Oct, 12:46 UTC. Re-registering is a write to Meta and needs the owner's go: `POST /{id}/register` with the same PIN (`WHATSAPP_REGISTER_PIN`), as on 26 Oct 12:11 UTC.
+> - The sandbox page is not affected (no Meta in its path). The lasting fix is Homies' own number on a verified business.
+>
 > **LIVE 29 Oct, 15:27:21 UTC: the new WhatsApp chatbot (the sandbox's section 6 + E + F + "we", epoch 85) replaced the old one** (owner: *"replace the old chatbot with the new version"*). `scripts/n8n_whatsapp_section6.py` ran the sandbox's own section6() on live; gate 416/416, replay unchanged; five pins re-pinned on the day's sandbox testing.
 > - **Rollback:** `python scripts/n8n_whatsapp_section6.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-section6.json`) + git revert.
 > - **Not live:** D, one reply per burst, which needs a live version (live reads `messages`, not Chatwoot).

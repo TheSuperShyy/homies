@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Meta unregistered the WhatsApp test number again (seen 15:36 UTC; read only)
+- **Said:** *"i think the meta disconnected the chatbot"*, right after the 15:27 UTC switch to the new bot.
+- **Meta's `GET /{phone-number-id}`** (+1 555-178-1261, "Test Number"):
+  - status PENDING, code verification NOT_VERIFIED, platform NOT_APPLICABLE;
+  - health BLOCKED with 141001 "not verified" and 141000 "not linked to your WhatsApp account" (plus 138024, SIP calling not enabled, which does not matter here);
+  - the WABA itself AVAILABLE;
+  - the webhook still points at Chatwoot.
+- **The same state as 25 and 26 Oct.** The live bot's last run is 26 Oct, 12:46 UTC, 35 minutes after that day's re-register. When it dropped this time is not known without Chatwoot's rails log.
+- **Not done:** re-registering is a write to Meta. It waits for the owner's go, then `POST /{id}/register` with `WHATSAPP_REGISTER_PIN`, read back until CONNECTED / CLOUD_API.
+- The sandbox page is unaffected.
+
 ### LIVE: the new WhatsApp chatbot replaces the old one (15:27:21 UTC; `n8n_whatsapp_section6.py`, epoch 85)
 - **Asked:** *"replace the old chatbot with the new version"*, after the owner tested the sandbox, with the Hebrew checked first.
 - **The blind proofread** found three wording faults, now fixed in the sandbox and on live:
