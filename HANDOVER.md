@@ -26,8 +26,11 @@ appended to.
 >     - **Built as F** in `n8n_sandbox_section6.py` (`MONEY_EDITS`, `MONEY_BALANCE`, `MONEY_NOTE`). A disputed charge is answered from get_balance. Only a payment or refund the record misses goes to collections, and nothing is promised.
 >     - WHO_RULE's stale "the balance still needs a full name and phone" is gone too, since it contradicted `BALANCE_TOOL`.
 >     - **The driver** has `fee_dispute` (the 11:14 chat word for word; Gemini's real replies fail its checks) and `paid_already`, both under `--run money`.
->     - **Revised again, not pushed yet (13:05 UTC):** the owner's 12:51 chat on round 49 still handed a claimed link payment to "the team" ("הם יבדקו … ויטפלו בזה … בינתיים?"). The owner: *"WE ARE THE TEAM"*, and the bot should confirm, say what the system shows, and ask for a screenshot or confirmation "so we can verify it". The claim left notify_team's threshold list, the note is a quiet record, and the driver has `paid_link`, `PROOF` and `TEAM_ACTS`. Blind check 3 is running; the push follows it.
->     - **In the sandbox since 12:36 UTC, memory round 49** (`n8n_sandbox.py --apply --section6 --fresh-memory`; read back from n8n).
+>     - **In the sandbox since 13:18 UTC, memory round 50: the second F, after the owner's "WE ARE THE TEAM"** (`n8n_sandbox.py --apply --section6 --fresh-memory`; read back from n8n).
+>       - The owner's 12:51 chat on round 49 had handed a claimed link payment to "the team" ("הם יבדקו … ויטפלו בזה … בינתיים?").
+>       - Now the bot confirms the claim, says what the system shows, and asks for a screenshot or confirmation "so we can verify it". The note is a quiet record.
+>       - Blind check 3 passed all three chats.
+>       - The owner's manual test is next. The key has $0.31 left, so raise its cap first.
 >       - Blind check 1 found one miss: the note to collections went at the bare claim, before the payment details. Revised: notify_team notes only once when, how much and how have been asked.
 >       - Blind check 2 passed both chats (`local/sandbox/runs/2026-10-29-1300-claude-money2.md`).
 >       - Not live. Going live is the owner's go, through `check_whatsapp_rules.py`, with the rest of section 6.

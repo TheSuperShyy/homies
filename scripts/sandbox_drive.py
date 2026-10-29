@@ -164,8 +164,8 @@ TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIF
          "paid_link": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
                        1: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, TEAM_ACTS]),
                        2: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, PROMISE, TEAM_ACTS]),
-                       3: ([ENDS_Q, RECORD, PROOF], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, PROMISE,
-                                                     TEAM_ACTS])}}
+                       # the record answers the claim on line 3; line 4 adds the when and how, and asks for proof
+                       3: ([ENDS_Q, PROOF], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, PROMISE, TEAM_ACTS])}}
 
 
 def call(method, path, body=None, tries=4):
