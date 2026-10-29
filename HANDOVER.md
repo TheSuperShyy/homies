@@ -8,7 +8,15 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **DOWN since about 13:26 UTC, 29 Oct: the bot's OpenRouter key is AT its $15 cap ("$0.00 of it not yet spent").** The wallet was topped up by 14:09 UTC ($20 more, $20.31 in it), but the key's own limit was not raised yet, so the bot still cannot answer.
+> **BACK UP 14:17 UTC, 29 Oct: the bot now runs on the key ending 3f9, on a separate OpenRouter account** (owner: *"we have multiple api key in our env just pick one"*).
+> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $9.85, from $10 bought, and the key's cap is $1000. `check_openrouter.py` reads it.
+> - **How it was switched:** `n8n_openrouter_key.py OPENROUTER_API_KEY_ACCOUNT_B --apply` created credential `Ovw71DEq1eufagGk` ("Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)") and repointed the live bot's model node. The workflow is active. `N8N_OPENROUTER_CRED_ID` is updated.
+> - **The sandbox** was rebuilt on it, round 51.
+> - A one-off call with the bot's model at max_tokens 8192 went through first.
+> - The old credential (`EWgicRGk9KUNJ4O1`, the CAPPED15 key ending 0d6) is untouched. **Rollback:** `n8n_openrouter_key.py` with a `.env` variable holding the old key.
+> - **Why this key:** the key ending 0d6 had hit its $15 cap at about 13:26 UTC ("Forbidden"). The key ending 427 is the one abandoned on 25 Sep. The `.env` comment that sat above the 3f9 line meant 427, and it now says so.
+> - **Not switched:** the Edge Function's own `OPENROUTER_API_KEY` secret (the one model-written line above a debt call's WhatsApp payment link) still holds the capped key. That line is skipped until `supabase_functions.py --apply --oxs-mirror` pushes the new value.
+> - **The main account** (keys 0d6 and 427) has $20.31, and something keeps spending it through the 427 key.
 > - Every model call fails with `Forbidden - perhaps check your credentials?`. That 403 is the cap, not a bad credential.
 > - The sandbox bot goes to "Could not answer" (the owner: "why the chatbot not responding"), and **so does the live WhatsApp bot**, which runs on the same key.
 > - **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Nothing needs redeploying afterwards. `check_openrouter.py` shows when it is back.

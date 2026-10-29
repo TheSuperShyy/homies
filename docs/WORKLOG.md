@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### The bot moved to another OpenRouter key and is answering again (14:17 UTC)
+- **Asked:** *"we have multiple api key in our env just pick one"*, after *"so why cant we test the bot"*. The owner had topped up the main account by $20, but the bot's key ending 0d6 was still at its $15 cap.
+- **The three keys in `.env` and its copies,** read with `/key` and `/credits`, keys never printed:
+  - 0d6, the bot's: cap $15, $0 left, on the main account ($20.31).
+  - 427: no cap, $159 used over its life, on the same main account. It is the key the owner abandoned on 25 Sep (*"disregard the openrouter key with a 427 ending"*), so it was not used. It is still in `dashboard/.env.local`.
+  - 3f9 (`OPENROUTER_API_KEY_EMPTY` since 12 Aug): a separate account with $10 bought and $9.85 left, cap $1000.
+- **The `.env` comment "ABANDONED 25 Sep"** sat above the 3f9 line, but the 25 Sep entry shows it meant 427, whose line was later removed. It now names 427.
+- **Checked before switching:** one call with the bot's model (`google/gemini-3.1-pro-preview`, max_tokens 8192) on the 3f9 key went through. The reply was lost only to this terminal's Hebrew printing.
+- **Switched:**
+  - `.env`: `OPENROUTER_API_KEY_ACCOUNT_B` and `OPENROUTER_API_KEY` hold the 3f9 key (backup in `local/env-backups/`).
+  - `n8n_openrouter_key.py OPENROUTER_API_KEY_ACCOUNT_B --apply` created credential `Ovw71DEq1eufagGk` and repointed the live bot's model node; read back active. `N8N_OPENROUTER_CRED_ID` is updated (it still said the 25 Sep credential, although the node had been on `EWgicRGk9KUNJ4O1` since 27 Sep).
+  - `n8n_sandbox.py --apply --section6 --fresh-memory`: round 51, on the new credential, with F still in.
+  - `check_openrouter.py`: OK, $9.85 and $999.85 of cap.
+- **Not switched:** the Edge Function's `OPENROUTER_API_KEY` secret, used for the line above a debt call's WhatsApp payment link. That needs a function redeploy.
+
 ### "why the chatbot not responding": the bot's OpenRouter key hit its $15 cap (13:30 UTC; read only)
 - **Asked:** *"why the chatbot not responding"*, during the owner's manual test of round 50 (conversation 110, "good afternoon how is it going", 13:26-13:28 UTC).
 - **Found:**
