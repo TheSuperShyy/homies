@@ -19,7 +19,7 @@ conversation that produced it.
 - **Asked:** *"i thought we have auto recognition"*.
 - **Found, two things:**
   - **The asking is by design.** Recognition by the WhatsApp number exists for tickets: a fault report is filed straight on the tenant's flat (section 6). `get_balance` on WhatsApp needs a typed name and phone, matched to one record, even from a known number. That is the owner's 5 Oct "B make it type the number", and the code's note that a handset gets lent and shared. Yariv's alignment document asks to recognise the sender instead, and that trade-off was left with the owner (26 Oct).
-  - **A defect: a name typed in English never matches.** `get_balance` got `{"phone": "+972 54-…-353", "name": "ido clix"}` and answered `identity_failed`. The number is Ido's own and is on file. `sameName()` compares whole words, and his record reads עידו קליקס, so a Latin spelling always fails. The bot then tells a real tenant that his details do not match. The live bot has the same check.
+  - **A defect: a name typed in English never matches.** `get_balance` got `{"phone": "+972 54-…-353", "name": "ido clix"}` and answered `identity_failed`. The number is Ido's own and is on file. `sameName()` compares whole words, and his record reads עידו קליקס, so a Latin spelling always fails. The bot then tells a real tenant that their details do not match. The live bot has the same check.
 - **Not changed:** this waits for the owner's word on recognising the sender for a balance.
 
 ### Feature 19: the owner's one capped test on Gemini: 1/2 by the checks, $0.31 (08:05-08:13 UTC; sandbox only)
