@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-10-29
 
-### Is all of Yariv's chatbot feedback working now? No: the older points are live, the 26 Oct document is sandbox only (12:10 UTC; read only)
+### Is all of Yariv's chatbot feedback working now? No: the older points are live, the 26 Oct document is sandbox only (11:50 UTC; read only)
 - **Asked:** *"ok so rn all the feedback from yariv in the chatbot is working?"*
 - **Live, checked 26 Oct** (`docs/assistant/transcripts/2026-10-26-yariv/summary.md`, 122 of 122 checks):
   - the payment link;
@@ -35,6 +35,11 @@ conversation that produced it.
   - Send's promise filter cutting an honest sentence;
   - one extra re-ask for an unknown street.
 - **Right now:** the bot's OpenRouter key has $0.58 left under its $15 cap, against $1.25 at 08:13. The wallet has $2.94. HANDOVER's alert is updated.
+- **Then asked (11:57 UTC):** *"no but the mainline from yariv feedbacks like talking to a manager is it now fixed"*. **Answered: not yet.**
+  - Live is unchanged: the rep button and the old hand-off.
+  - In the sandbox, the first reply works: management told at once, the warm reason, the question.
+  - But once the matter is a disputed charge, the bot still hands it to the team ("will look into it … in the meantime"), as in the owner's 11:14 chat and this morning's 1-of-2 run.
+  - Nothing newer has been built. The fix and its one paid Gemini run are the feature 19 work's, on the owner's go and after the key's cap is raised.
 
 ### Feature 19: the owner's own sandbox chat as Ido slid back into a hand-off (11:14-11:37 UTC; read only, no AI spend)
 - **Asked:** a screenshot of the chat page (conversation 107, translated to English in the browser) and *"is this intended"*. **Answered: the first reply yes, the rest no.**
