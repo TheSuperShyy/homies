@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 19: F again after the owner's chat on it: "WE ARE THE TEAM" (from 13:05 UTC; no AI spend)
+- **Seen:** the owner's sandbox chat on round 49, conversation 108 (12:51-13:02 UTC, Gemini, as Ido):
+  - "i need a manager";
+  - "my payment its been doubled";
+  - "i payed 1k and its still 2k?";
+  - "i paid it yesterday via the link you sent in whatsapp / this should be fix quickly".
+- **What Gemini wrote:**
+  - The record came at once (₪2,000, January to August, ₪250 a month).
+  - Then the team took over: "כדי שאוסיף את הפרטים לצוות ויוכלו לבדוק את זה לעומק", "הצוות יבדוק את זה לעומק כדי לסדר את הרישום… כדי לעזור להם לאתר את התשלום", and "הוספתי לצוות … הם יבדקו בדיוק … ויטפלו בזה … יש עוד משהו … בינתיים?".
+  - That last "הוספתי לצוות" had no tool behind it, so Send's backstop wrote a service note on its own.
+- **The owner:** *"it did not even tried looking at the system and reasoning like just to clarify you payed via link and yesterday right. but in our system it says that the payment has not been settled yet. can you send some screenshots or documents for the receipt of the payment so that can verify it as well. something like that. i repeat this again WE ARE THE TEAM."*
+- **Cause:**
+  - The claimed payment stayed on notify_team's past-your-threshold list, which sends the reply to "the details the team will need … what else you can do now".
+  - The bullet's "לתקן חיוב או להחזיר כסף יכול רק בן אדם" was voiced as the team fixing it.
+- **Changed (F, again):**
+  - **The bullet:** a claimed payment, double charge or refund is checked with the tenant, "כי אתה הצוות של הומי'ז". The bot confirms how much, when and how. It says what the system shows about that payment, promises no refund or correction, and asks for "צילום מסך או אישור על התשלום, כדי שנוכל לאמת אותו", the ask last.
+  - **notify_team:** the claim leaves the threshold list. "Those you do yourself. So is a payment or a refund they say the record does not show…" makes the note a quiet record (how much, when, how, whether proof came), not mentioned to the tenant.
+  - **get_balance:** "a receipt they need from Homies is a team note. A payment they say the record does not show is checked with them against what this returns."
+  - Prompt 23,612 characters, `check_n8n_sandbox.py` ok.
+- **The driver:**
+  - `paid_link` is conversation 108 word for word (each burst as one message).
+  - `PROOF` (a screenshot, confirmation or reference asked for) and `TEAM_ACTS` (הצוות, לצוות, לגבייה, יבדקו, יטפלו, לעזור להם…) are checked on the money turns.
+  - Conversation 108 fails on exactly the owner's points. Check 2's `paid_already` now fails too ("רשמתי את זה לצוות"), which is right by the owner's word.
+- **Memory:** `we-are-the-team`, and `money-answers-from-the-system` extended.
+- **Blind check 3:** three fresh players (paid_link, paid_already, fee_dispute), running. Nothing pushed yet: the sandbox still has round 49's F.
+
 ### Feature 19: money answered from the system (F); built, blind check running, not pushed yet (from 12:00 UTC; no AI spend)
 - **Asked:** *"so right now when its about money base everything in the system since that is your evidence"*, after the manager status answer.
 - **Cause, in the text the model reads** (rebuilt with `sbx_candidate.py`): three texts made a disputed charge the team's.

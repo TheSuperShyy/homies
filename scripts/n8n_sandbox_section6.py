@@ -156,9 +156,16 @@ CLAIM_EDITS = [
 # list, and both tools called a disputed bill a team note, so a dispute was past the bot by three
 # texts. A disputed amount is now answered from what get_balance returns; only a payment or refund
 # the record does not show goes to collections, with its details, and nothing is promised.
-# The note waits until the bot has asked when, how much and how: in the first blind check both players
-# noted the bare claim at once ("רשמתי לצוות ששילמת"), so the details the tenant gave next never reached it.
-# Its timing is notify_team's to say; the prompt says only what the tenant hears (the record first).
+# The owner's chat on it (12:51 UTC, Gemini, as Ido: "my payment its been doubled", "i paid it yesterday
+# via the link") still got "הצוות יבדוק את זה לעומק", "כדי לעזור להם לאתר את התשלום" and "הם יבדקו … ויטפלו
+# בזה … בינתיים?". The owner: "it did not even tried looking at the system and reasoning like just to
+# clarify you payed via link and yesterday right. but in our system it says that the payment has not
+# been settled yet. can you send some screenshots or documents for the receipt of the payment so that
+# can verify it ... WE ARE THE TEAM". A claimed payment had stayed on notify_team's past-your-threshold
+# list, which sends the reply to "the details the team will need … what else … now", and "only a person
+# can correct or refund" was voiced as the team fixing it. So the claim is the bot's like the rest of
+# money: it confirms what the tenant says, says what the system shows, and asks for a screenshot or the
+# confirmation "so we can verify it"; the note is a quiet record, and the question is the last thing said.
 MONEY_EDITS = [
     ("- **מה שנרשם לצוות, ולא נגמר בצ'אט:** השגות על חיוב ומסמכים,",
      "- **מה שנרשם לצוות, ולא נגמר בצ'אט:** מסמכים,"),
@@ -166,8 +173,9 @@ MONEY_EDITS = [
      "עצמם, נרשם לצוות.\n"
      "- **חיובים:** בכל עניין של כסף, מה שרשום במערכת הוא הראיה שלך, ואתה עונה ממנו. מי ששואל למה הוא מחויב, "
      "או אומר שהסכום גבוה או לא נכון, שומע ממך מה רשום: אילו חודשים פתוחים, כמה על כל חודש וכמה בסך הכול. "
-     "גם מי שאומר ששילם משהו שלא רשום, שחויב פעמיים או שמגיע לו החזר, שומע קודם מה רשום, ואתה שואל אותו מתי, "
-     "כמה ואיך שילם. לתקן חיוב או להחזיר כסף יכול רק בן אדם, ואת זה אתה לא מבטיח.\n"
+     "וכשמישהו אומר ששילם משהו שלא רשום, שחויב פעמיים או שמגיע לו החזר, אתה בודק את זה איתו, כי אתה הצוות של "
+     "הומי'ז: אתה מוודא איתו כמה, מתי ואיך שילם, אומר לו מה המערכת מראה על התשלום הזה, בלי להבטיח החזר או "
+     "תיקון, ומבקש ממנו צילום מסך או אישור על התשלום, כדי שנוכל לאמת אותו.\n"
      "- **אב הבית:**"),
 ]
 MONEY_BALANCE = [
@@ -176,14 +184,18 @@ MONEY_BALANCE = [
      "what they are, and when they say an amount is too high or wrong: what it returns is the record, and the "
      "record is your answer."),
     ("a receipt or a disputed amount is a team note.",
-     "a receipt is a team note, and so is a payment or a refund they say the record does not show."),
+     "a receipt they need from Homies is a team note. A payment they say the record does not show is checked "
+     "with them against what this returns."),
 ]
 MONEY_NOTE = [
-    ("a bill they dispute, ", "a payment or a refund they say the record does not show, once you have asked when, "
-     "how much and how they paid (the note carries what they say), "),
+    ("a bill they dispute, ", ""),
     ("A plain how-much-do-I-owe question is get_balance's;",
      "A how-much-do-I-owe question, and why they are charged what they are, even when they say it is wrong, "
      "is get_balance's: what it returns is the answer;"),
+    ("Those you do yourself.",
+     "Those you do yourself. So is a payment or a refund they say the record does not show: you check it with "
+     "them, and this only records it for us, once, with what they told you (how much, when, how) and whether "
+     "they sent proof. It is a record for us, so you do not mention it to them."),
 ]
 # The same in notify_team's own description, which the model reads as it calls the tool.
 NOTE_FROM ="A request for a manager or a person is not one of these yet"

@@ -36,6 +36,12 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # name: (persona, what the tenant writes, bot text must match, must not match, labels must, labels must not)
+# 29 Oct, money (the owner): the record is the evidence, so a charge question is answered with what is on
+# record, and a claimed payment gets a screenshot or the payment confirmation asked for, "so we can verify
+# it". "WE ARE THE TEAM": a money reply never speaks of the team as someone else who will check or handle it.
+RECORD = r"250|2,?000|אלפיים|ינואר|אוגוסט|חודשים|רשום|במערכת|מופיע"
+PROOF = r"צילום מסך|צילום של|אישור (?:על |מה)?(?:ה)?(?:תשלום|העברה|בנק)|קבלה|אסמכתא|הוכחה"
+TEAM_ACTS = r"הצוות|לצוות|לגבייה|הם יבדקו|יבדקו|יטפלו|לעזור להם|כדי שיוכלו"
 SCENARIOS = {
     "menu_two":  ("לא מוכר", ["שלום"], [r"במה אפשר לעזור"], [r"לדבר עם נציג"], set(), set()),
     "unknown":   ("לא מוכר", ["נשרפה נורה בלובי"], [r"בניין|כתובת"], [], set(), set()),
@@ -90,16 +96,23 @@ SCENARIOS = {
     # and no refund or correction promised.
     "paid_already": ("עידו", ["שילמתי כבר את מרץ ואפריל, למה זה עדיין מופיע אצלכם כחוב?",
                               "העברה בנקאית, 500 שקל, בתחילת אפריל",
-                              "אז מתי תחזירו לי את הכסף?"], [], [], {"handover"}, set()),
+                              "אז מתי תחזירו לי את הכסף?"], [PROOF], [], {"handover"}, set()),
+    # The owner's chat at 12:51 UTC on the first F (two-message bursts sent as one message each): "הם יבדקו …
+    # ויטפלו בזה … בינתיים?". The owner: "just to clarify you payed via link and yesterday right. but in our
+    # system it says that the payment has not been settled yet. can you send some screenshots … WE ARE THE TEAM".
+    "paid_link": ("עידו", ["i need a manager", "my payment its been doubled what HAPPEned?1",
+                           "i payed 1k and its still 2k? how is that possible???\nthis is not right i dont understand",
+                           "i paid it yesterday via the link you sent in whatsapp\nthis should be fix quickly"],
+                  [PROOF], [], {"handover"}, set()),
 }
 BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
-NOTED = {"manager_fee", "manager_doubt", "manager_retest", "fee_dispute"}  # a topic is told, so two matters are noted
+NOTED = {"manager_fee", "manager_doubt", "manager_retest", "fee_dispute", "paid_link"}  # a topic is told, so two matters are noted
 # Named sets for --run (28 Oct, the owner: "can we lessen the costing of the test"; that day's seven
 # runs cost about $3.30). Measured on the 09:52 run: quick $0.42 (the ticket, the emergency and the
 # whole manager arc), manager $0.88, all $1.13, which is for before a live promotion.
 SETS = {"quick": ["ido_lift", "gas", "rep_typed", "manager_retest"],
         "manager": ["rep_typed", "manager_fee", "burst_manager", "manager_doubt", "manager_retest"],
-        "money": ["fee_dispute", "paid_already", "balance"]}
+        "money": ["fee_dispute", "paid_already", "paid_link", "balance"]}
 # Checks on one reply, by the tenant line it answers (0 is the first), where another may rightly
 # mention the team's note. A hand-off is the team knowing or handling it, or "anything else
 # (in the meantime)?" in place of the matter itself.
@@ -125,7 +138,6 @@ STIFF = r"בעצמי|כאן ועכשיו|ממש כאן|התחום שלי|(?:אנ
 # 29 Oct, the owner: "when its about money base everything in the system since that is your evidence".
 # A charge question is answered with what is on record (Ido: ₪250 a month, January to August, ₪2,000),
 # and a refund or a correction is never promised, since only a person can make one.
-RECORD = r"250|2,?000|אלפיים|ינואר|אוגוסט|חודשים|רשום|במערכת|מופיע"
 PROMISE = (r"נחזיר|נזכה|יוחזר|יזוכה|תקבל (?:את )?(?:הכסף|החזר|זיכוי)|ההחזר (?:יגיע|יבוצע|יעבור)"
            r"|נטפל בהחזר|אדאג ש|נתקן|יתקנו|יתוקן")
 TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF])},
@@ -143,12 +155,17 @@ TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIF
                             2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, STIFF]),
                             3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS, STIFF])},
          "fee_dispute": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
-                         1: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
-                         2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
-                         3: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE])},
-         "paid_already": {0: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE]),
-                          1: ([ENDS_Q], [NOTE_SAYS, CONCEDE, THEIRS, PROMISE]),
-                          2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE])}}
+                         1: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, TEAM_ACTS]),
+                         2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, TEAM_ACTS]),
+                         3: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE, TEAM_ACTS])},
+         "paid_already": {0: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE, TEAM_ACTS]),
+                          1: ([ENDS_Q], [NOTE_SAYS, CONCEDE, THEIRS, PROMISE, TEAM_ACTS]),
+                          2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE, TEAM_ACTS])},
+         "paid_link": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                       1: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, TEAM_ACTS]),
+                       2: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, PROMISE, TEAM_ACTS]),
+                       3: ([ENDS_Q, RECORD, PROOF], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF, PROMISE,
+                                                     TEAM_ACTS])}}
 
 
 def call(method, path, body=None, tries=4):
