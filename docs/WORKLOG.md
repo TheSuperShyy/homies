@@ -20,6 +20,7 @@ conversation that produced it.
 - **The live WhatsApp bot is down too,** since it runs on the same key.
 - **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Another key keeps draining the wallet: $2.78 at 12:36, $0.45 at 13:29. Nothing needs redeploying.
 - CONTEXT has the sign (a 403 "Forbidden" there is the cap), and the `empty-wallet-looks-like-a-bot-bug` memory has it too.
+- **14:09 UTC (owner: "is the open router reloaded now?"):** the wallet is topped up (bought $285, $20.31 in it). The key is still at its $15 cap with $0.00 left, so the bot is still down until the key's limit is raised.
 
 ### Feature 19: F again after the owner's chat on it: "WE ARE THE TEAM" (from 13:05 UTC; no AI spend)
 - **Seen:** the owner's sandbox chat on round 49, conversation 108 (12:51-13:02 UTC, Gemini, as Ido):

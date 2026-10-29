@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **DOWN since about 13:26 UTC, 29 Oct: the bot's OpenRouter key is AT its $15 cap ("$0.00 of it not yet spent"; the wallet is $0.45).**
+> **DOWN since about 13:26 UTC, 29 Oct: the bot's OpenRouter key is AT its $15 cap ("$0.00 of it not yet spent").** The wallet was topped up by 14:09 UTC ($20 more, $20.31 in it), but the key's own limit was not raised yet, so the bot still cannot answer.
 > - Every model call fails with `Forbidden - perhaps check your credentials?`. That 403 is the cap, not a bad credential.
 > - The sandbox bot goes to "Could not answer" (the owner: "why the chatbot not responding"), and **so does the live WhatsApp bot**, which runs on the same key.
 > - **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Nothing needs redeploying afterwards. `check_openrouter.py` shows when it is back.
