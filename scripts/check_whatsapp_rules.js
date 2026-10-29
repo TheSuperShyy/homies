@@ -38,7 +38,8 @@ function build(X) {
     worth: compile(['$json'], 'return (' + X.worth_text + ');', 'Worth a word?'),
     word: compile(['$json', '$'], 'return (' + X.word_gate + ');', 'A word first?'),
     carry: compile(['$json', '$'], 'return (' + X.carry_on + ');', 'Carry on'),
-    inject: compile(['$json', '$now'], 'return (' + X.inject + ');', 'the inject'),
+    // `$` since 29 Oct: section 6's inject reads the sender's line from `Add who`.
+    inject: compile(['$json', '$now', '$'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
     teamNote: compile(['$json', '$'], 'return (' + X.team_note + ');', 'Team note this turn?'),
   };
@@ -670,12 +671,20 @@ function cases(E) {
 
   console.log(NL + '--- the inject: facts the answering model is handed ---');
   const now = { setZone: () => ({ toFormat: () => '12:20', weekday: 7 }) };
-  const inj = (greeted, text) => () => String(E.inject({ greeted, text, tap_now: false }, now));
+  // n8n's `$('Add who')`: not run (a number not on file, or live before section 6) unless `who` is given.
+  const who$ = (who) => (n) => ({ isExecuted: who !== undefined, first: () => ({ json: { who_text: who || '' } }) });
+  const inj = (greeted, text, who) => () => String(E.inject({ greeted, text, tap_now: false }, now, who$(who)));
   expect('mid-conversation + "hi, …" gets the fact', () => inj(true, 'hi, so i want to let you know')().includes('הדייר פתח את ההודעה הזאת בברכה'), true);
   expect('mid-conversation + no hello: no fact', () => inj(true, 'the elevator is stuck')().includes('הדייר פתח'), false);
   expect('first message: no fact', () => inj(false, 'hi, lights')().includes('הדייר פתח'), false);
   expect('"מה קורה עם הקריאה" is not a greeting', () => inj(true, 'מה קורה עם הקריאה שלי?')().includes('הדייר פתח'), false);
   expect('the false "you introduced yourself" stays gone', () => inj(true, 'x')().includes('והצגת את עצמך'), false);
+  // 29 Oct, section 6 B: a sender on file is named to the model; on a workflow without `Add who` nothing changes.
+  if (inj(true, 'x', ' [WHO-PROBE]')().includes('WHO-PROBE')) {
+    expect('a sender on file: the model is told who is writing',
+      () => inj(true, 'המעלית תקועה', ' [הפונה מזוהה במערכת: עידו, בר כוכבא 23, דירה 1.]')().includes('הפונה מזוהה במערכת: עידו'), true);
+    expect('a number not on file: no such line', () => inj(true, 'המעלית תקועה')().includes('הפונה מזוהה'), false);
+  }
 
   // 1 Oct evening (scripts/n8n_whatsapp_gender.py): the owner, "it still uses
   // how can i help you all which is awkward". The bot writes to one person now,

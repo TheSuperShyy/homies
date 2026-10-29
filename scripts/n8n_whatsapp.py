@@ -230,7 +230,7 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 84
+MEMORY_EPOCH = 85
 # 83 -> 84, 19 Oct, late (n8n_whatsapp_lowkey.py): "when will they call me?" gets a
 # true reason, what is real now and what he can do, never a bare "I don't know", and
 # asked again, something not yet done (one prompt paragraph); Send's promise v4 stops
@@ -760,8 +760,8 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "2f9217ee3454",   # docs/features/11-whatsapp-bot/prompt.md
-    "inject": "31ff6f4f297f",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "prompt": "b48beffe7956",   # docs/features/11-whatsapp-bot/prompt.md
+    "inject": "680da3fc96bc",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --
@@ -777,7 +777,8 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "ba0d94da4e6d",
+    "tools": "5ab622b6f35e",  # 29 Oct, epoch 85: LIVE's tools (section 6). TOOLS below is NOT folded yet, so every
+    # patcher refuses at check_memory_epoch until it is (n8n_whatsapp_section6.py).
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions

@@ -110,9 +110,12 @@ assert "identified in the system" in by6["open_request"]["parameters"]["jsonBody
 assert by6["Who is writing?"]["parameters"]["method"] == "GET"
 assert by6["Who is writing?"]["parameters"]["url"].startswith("=https://nmxlhlmcnnggnnuxyelt.supabase.co/rest/v1/residents?phone=eq.%2B")
 assert by6["Who is writing?"].get("alwaysOutputData") is True
-assert s6["connections"]["Still the last word?"]["main"][0] == [{"node": "Who is writing?", "type": "main", "index": 0}]
+# 29 Oct: the typing indicator stays on "Still the last word?" (the live gate's typing case); the lookup
+# sits only on the way to the answer.
+assert {c["node"] for c in s6["connections"]["Still the last word?"]["main"][0]} <= {"Who is writing?", "Show typing"}
+assert {"node": "Who is writing?", "type": "main", "index": 0} in s6["connections"]["Still the last word?"]["main"][0]
 assert s6["connections"]["Who is writing?"]["main"][0] == [{"node": "Add who", "type": "main", "index": 0}]
-assert {c["node"] for c in s6["connections"]["Add who"]["main"][0]} == {"Worth a word?", "Show typing"}
+assert {c["node"] for c in s6["connections"]["Add who"]["main"][0]} == {"Worth a word?"}
 assert "$('Add who')" in by6["Answer the resident"]["parameters"]["text"]
 assert reach(s6) == [], "section 6: calls that leave the sandbox: %s" % reach(s6)
 assert new_overlaps(s6, keep_bot) == [], "section 6: new overlapping nodes: %s" % new_overlaps(s6, keep_bot)

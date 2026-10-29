@@ -94,7 +94,11 @@ JS = os.path.join(HERE, "check_whatsapp_rules.js")
 # new input: 5 of 5 went out, none said anything untrue (two of them had ended
 # in Say it again's false claims before). Scratchpad run safetynet/retry_play.py.
 PINS = {
-    'Answer the resident / input': '31ff6f4f297f',
+    # 29 Oct (n8n_whatsapp_section6.py, epoch 85): the sandbox's version put on live, owner's "replace
+    # the old chatbot with the new version". The five texts below are section6()'s, tested in the sandbox
+    # that day (three blind Claude rounds, two Gemini runs, the owner's own chats) rather than by a fresh
+    # replay of the real inputs; the cases are 416/416 and the replay of every message changes nothing.
+    'Answer the resident / input': '680da3fc96bc',
     # 5 Oct (n8n_whatsapp_straight.py, epoch 74): the prompt and get_balance's
     # text, after a Claude-played check of 11 situations through the would-be
     # bot's guards and Send (the pushed danger line now carries its number).
@@ -139,7 +143,7 @@ PINS = {
     # a stated reason (one stated was sent in a third of the answers); asked again,
     # something new. Claude-played in three rounds, the last half size and clean
     # (WORKLOG 19 Oct, the epoch-84 entry).
-    'Answer the resident / system': '2f9217ee3454',
+    'Answer the resident / system': 'b48beffe7956',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '542bde9b64e6',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -152,14 +156,14 @@ PINS = {
     'Try again / note': '0da4ce61e032',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
-    'get_balance / tool': '3ef1f30b5235',
+    'get_balance / tool': '3040c210dad8',
     'get_payment_link / tool': '58ab6a539158',
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': '437d0eda4866',
     'get_service_info / tool': '6223a04ed17f',
-    'notify_team / tool': '0a8bb45d8a17',     # 18 Oct, late: the reason, never an empty note
-    'open_request / tool': '8e8e45124b09',
+    'notify_team / tool': '5ac57c3e34ca',     # 18 Oct, late: the reason, never an empty note
+    'open_request / tool': 'e7bafb06282a',
     'show_menu / tool': '58aeda4b4677',
     'verify_address / tool': 'a2a85a3d4068',
 }

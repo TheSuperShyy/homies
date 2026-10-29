@@ -109,7 +109,7 @@ PROMPT_CUTS = [
 MANAGER_FROM = "בקשה לדבר עם מנהל, עם בן אדם או עם מישהו מהצוות"
 MANAGER_TO = "ואתה נשאר איתו, בסבלנות, עד שהוא מספר."
 MANAGER_RULE = (
-    "בקשה לדבר עם מנהל, עם בן אדם או עם מישהו מהצוות היא בקשה לגיטימית, ואתה לא שומר עליה בדלת ולא מתנה אותה "
+    "בקשה לדבר עם מנהל, עם בן אדם או עם מישהו מהצוות היא בקשה לגיטימית, ואתה לא חוסם אותה ולא מתנה אותה "
     "בכלום. אתה מקבל אותה בחום ובהבנה, כמו מי שבאמת בצד שלו: רושם מיד לצוות, עם הכלי שיש לך לזה, שהוא "
     "ביקש מנהל, עם מה שכבר סיפר, ואומר לו במשפט אחד שההנהלה מעודכנת. רק את זה, כי מה שיקרה אחר כך אתה "
     "לא יודע. ובאותה הודעה, אחרי שהוא שומע שאכפת לך, אתה אומר לו בפשטות שכדי שנוכל לעזור לו כמה שיותר מהר "
@@ -129,8 +129,8 @@ SOLVE_EDITS = [
      # The fee first and the members as the exception: as two peers the bot read them out to a tenant
      # who said "monthly committee fee" ("אם מדובר בתשלום עצמו … אבל אם זה … חברי ועד הבית", 28 Oct).
      "- **ועד הבית:** דמי ועד הבית, התשלום החודשי לחברת הניהול, הם עניין שלך: כמה נשאר לשלם, איך ועד מתי "
-     "משלמים, קישור לתשלום ומה כלול בתשלום. רק מי שלא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי הוועד "
-     "עצמם, נרשם לצוות."),
+     "משלמים, קישור לתשלום ומה כלול בתשלום. רק כשמישהו לא מכיר את ועד הבית שלו, או שיש לו עניין עם חברי "
+     "הוועד עצמם, זה נרשם לצוות."),
     (" המשפט שלך נגמר בזה שהצוות יודע.", ""),
     # After a matter only a person can finish: what the team will need to sort it out faster, not "anything
     # else" (27 Oct, the owner's "my card has been charged twice!").
@@ -176,9 +176,9 @@ CLAIM_EDITS = [
 MONEY_EDITS = [
     ("- **מה שנרשם לצוות, ולא נגמר בצ'אט:** השגות על חיוב ומסמכים,",
      "- **מה שנרשם לצוות, ולא נגמר בצ'אט:** מסמכים,"),
-    ("עצמם, נרשם לצוות.\n- **אב הבית:**",
-     "עצמם, נרשם לצוות.\n"
-     "- **חיובים:** בכל עניין של כסף, מה שרשום במערכת הוא הראיה שלך, ואתה עונה ממנו. מי ששואל למה הוא מחויב, "
+    ("עצמם, זה נרשם לצוות.\n- **אב הבית:**",
+     "עצמם, זה נרשם לצוות.\n"
+     "- **חיובים:** בכל עניין של כסף, מה שרשום במערכת הוא הראיה שלך, ואתה עונה לפיו. מי ששואל למה הוא מחויב, "
      "או אומר שהסכום גבוה או לא נכון, שומע ממך מה רשום: אילו חודשים פתוחים, כמה על כל חודש וכמה בסך הכול. "
      "וכשמישהו אומר ששילם משהו שלא רשום, שחויב פעמיים או שמגיע לו החזר, אתה בודק את זה איתו, כי אתה הצוות של "
      "הומי'ז: אתה מוודא איתו כמה, מתי ואיך שילם, אומר לו מה המערכת מראה על התשלום הזה, בלי להבטיח החזר או "
@@ -356,7 +356,9 @@ def last_word_before_send(out, by):
     conns[check["name"]] = {"main": [[{"node": "Send", "type": "main", "index": 0}]]}
 
 
-def section6(bot, supabase_cred):
+def section6(bot, supabase_cred, burst=True):
+    """burst=False leaves D out: its check reads the conversation through the sandbox's Chatwoot fetch
+    node, which live does not have (live reads `messages` in Supabase). n8n_whatsapp_section6.py, 29 Oct."""
     out = copy.deepcopy(bot)
     by = {n["name"]: n for n in out["nodes"]}
     sort = by["Sort"]["parameters"]
@@ -407,9 +409,15 @@ def section6(bot, supabase_cred):
     add = {"id": str(uuid.uuid4()), "name": "Add who", "type": "n8n-nodes-base.code", "typeVersion": 2,
            "position": free_spot(out["nodes"], who_at[0] + 240, who_at[1]), "parameters": {"jsCode": ADD_WHO}}
     out["nodes"].append(add)
+    # The typing indicator stays on "Still the last word?" itself (check_whatsapp_rules.py's typing case):
+    # the lookup sits only on the way to the answer, so the dots do not wait for it.
     after = out["connections"]["Still the last word?"]
-    out["connections"]["Still the last word?"] = {"main": [[{"node": "Who is writing?", "type": "main", "index": 0}]]}
+    typing = [c for c in after["main"][0] if c["node"] == "Show typing"]
+    out["connections"]["Still the last word?"] = {
+        "main": [[{"node": "Who is writing?", "type": "main", "index": 0}] + typing]}
     out["connections"]["Who is writing?"] = {"main": [[{"node": "Add who", "type": "main", "index": 0}]]}
-    out["connections"]["Add who"] = after
-    last_word_before_send(out, by)
+    out["connections"]["Add who"] = {"main": [[c for c in after["main"][0] if c["node"] != "Show typing"]]
+                                     + after["main"][1:]}
+    if burst:
+        last_word_before_send(out, by)
     return out

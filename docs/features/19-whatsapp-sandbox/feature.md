@@ -2,7 +2,7 @@
 
 **Estimate:** 2d
 **Depends on:** 11 (WhatsApp bot), 12 (Chatwoot), 16 (human handover), 17 (name before a ticket)
-**Status:** built 26 Oct 2026 (see "As built" below); the production fingerprint was unchanged after every step. The paid acceptance run waits on the owner's go.
+**Status:** built 26 Oct 2026; **LIVE 29 Oct 2026, 15:27 UTC** (sections A, B, C, E, F and the "we" wording, through `scripts/n8n_whatsapp_section6.py`; D is sandbox-only). See WORKLOG 29 Oct.
 
 ## Purpose
 

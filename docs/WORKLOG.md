@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### LIVE: the new WhatsApp chatbot replaces the old one (15:27:21 UTC; `n8n_whatsapp_section6.py`, epoch 85)
+- **Asked:** *"replace the old chatbot with the new version"*, after the owner tested the sandbox, with the Hebrew checked first.
+- **The blind proofread** found three wording faults, now fixed in the sandbox and on live:
+  - "לא שומר עליה בדלת" read as "does not protect it", so it is now "לא חוסם אותה".
+  - "רק מי ש… נרשם לצוות" read as the tenant signing up for the team, so it is now "רק כשמישהו … זה נרשם לצוות" (MONEY_EDITS' anchor followed it).
+  - "עונה ממנו" is now "עונה לפיו".
+  - הומי'ז is spelled one way everywhere.
+- **What went live:** the live bot through the sandbox's own `section6()` (`scripts/n8n_whatsapp_section6.py`, new):
+  - A, no representative button;
+  - B, the sender recognised ("Who is writing?" + "Add who"; the balance in debt-tools v134 from step 1);
+  - C, the warm manager protocol;
+  - E, no claim that the team acts;
+  - F, money from the system and proof asked "so we can verify it";
+  - the team as "we" (WE_EDITS);
+  - MEMORY_EPOCH 84 -> 85.
+  - **D, one reply per burst, is NOT live.** Its check reads the conversation through the sandbox's Chatwoot fetch node, and live reads `messages` in Supabase. `section6(..., burst=False)`. It needs a live version of its own.
+- **The gate** (`check_whatsapp_rules.py --candidate F --replay`):
+  - The typing indicator first lost its feed from "Still the last word?", so the lookup now sits only on the way to the answer.
+  - The harness compiled the inject without n8n's `$`. It now has a stand-in, plus two new cases: a sender on file is named to the model, a stranger is not.
+  - Then all 416 cases passed. Every message (1072), through Sort and both notes, changed 0; 47 of 47 notes let out; every reply (1123), through Send and the phantom/deeds guards, changed 0.
+  - The five model-facing pins (input, prompt, get_balance, notify_team, open_request) were re-pinned on the day's sandbox testing, not on a fresh replay of real inputs. The commit says so beside the pins.
+- **Applied 15:27:21 UTC:** 53 -> 55 nodes, active, prompt `b48beffe7956` (23,570 characters), tools `5ab622b6f35e`, memory key `-85`. Read back exactly as dumped.
+  - A re-run says nothing to do. `check_whatsapp_rules.py` on live: all 416 cases pass, all green.
+  - Snapshot: `local/n8n-whatsapp-live-29oct-before-section6.json` (418 KB, ignored by git). **Rollback:** `python scripts/n8n_whatsapp_section6.py --restore`, plus a git revert of this commit.
+- **The repo:**
+  - `prompt.md` holds the new prompt; MEMORY_EPOCH 85; EPOCH_COVERS prompt/inject/tools are the new live hashes.
+  - **TOOLS in n8n_whatsapp.py and the builder's Sort/Send/new nodes are NOT folded.** So `check_memory_epoch(tools=...)` refuses, and every older patcher stops there, which is the protection. Fold them before any other WhatsApp change.
+- **Owed:**
+  - the owner's handset on the live number;
+  - `check_whatsapp_rules.py --watch 2026-10-29T15:27` after it, and again the next morning;
+  - D's live version;
+  - the ticket-flow habit ("העברתי לצוות שיבדוק … ויטופל … בינתיים").
+
 ### Going live with the new chatbot, step 1: the Hebrew checked, the balance recognition in the live function (from 15:10 UTC)
 - **Asked:** *"ok so right now i think we can replace the old chatbot with the new version since i tested it out and it sounds good but im not sure with the spelling make sure the hebrew of them are good specially the homies spelling"*.
 - **The name:** every text of the live bot and of the new version spells it הומי'ז with the plain apostrophe (U+0027). There is no הומיז or הומיס anywhere. Latin "Homies" is only in node names, descriptions and URLs.

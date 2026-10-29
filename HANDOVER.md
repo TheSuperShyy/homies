@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 29 Oct, 15:27:21 UTC: the new WhatsApp chatbot (the sandbox's section 6 + E + F + "we", epoch 85) replaced the old one** (owner: *"replace the old chatbot with the new version"*). `scripts/n8n_whatsapp_section6.py` ran the sandbox's own section6() on live; gate 416/416, replay unchanged; five pins re-pinned on the day's sandbox testing.
+> - **Rollback:** `python scripts/n8n_whatsapp_section6.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-section6.json`) + git revert.
+> - **Not live:** D, one reply per burst, which needs a live version (live reads `messages`, not Chatwoot).
+> - **DO NOT run any older n8n_whatsapp_*.py patcher.** They refuse at `check_memory_epoch(tools=...)` because TOOLS in n8n_whatsapp.py (and the builder's Sort/Send/new nodes) are not folded yet. Folding them is the first WhatsApp job; `prompt.md` already holds the new prompt.
+> - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T15:27`, and again the next morning.
+>
 > **BACK UP 14:17 UTC, 29 Oct: the bot now runs on the key ending 3f9, on a separate OpenRouter account** (owner: *"we have multiple api key in our env just pick one"*).
 > - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $9.85, from $10 bought, and the key's cap is $1000. `check_openrouter.py` reads it.
 > - **How it was switched:** `n8n_openrouter_key.py OPENROUTER_API_KEY_ACCOUNT_B --apply` created credential `Ovw71DEq1eufagGk` ("Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)") and repointed the live bot's model node. The workflow is active. `N8N_OPENROUTER_CRED_ID` is updated.
