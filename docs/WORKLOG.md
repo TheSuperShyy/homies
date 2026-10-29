@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Meta unregistered the WhatsApp test number again, under 2.5 hours after the register (seen 18:26 UTC; read only)
+- **Said:** *"the meta has been disconnected again"*.
+- **Meta's `GET /{phone-number-id}`:**
+  - status PENDING, NOT_VERIFIED, platform NOT_APPLICABLE;
+  - health BLOCKED with 141000 and 141001 (plus 138024, SIP);
+  - the WABA AVAILABLE, and the webhook override still pointing at Chatwoot.
+  - The same state as 25, 26 and 29 Oct (15:36).
+- **When:** after 17:06:50 UTC, the last Meta POST in Chatwoot's rails log and the last WhatsApp message row (the owner's chat as Assaf). Nothing has gone either way since, so it dropped between 17:06 and 18:26, under 2.5 hours after the 15:51:41 register.
+- **Not our side, checked:**
+  - Nothing in the repo calls `register` or `deregister`.
+  - Of the 10 n8n workflows, only the live bot touches Meta, and only to show typing (`POST /{id}/messages`).
+  - Chatwoot 4.16.2 has a deregister call, in `Whatsapp::WebhookTeardownService`. It runs only when an inbox it made by embedded signup is deleted, and it clears the number's webhook override first.
+    - The override is intact.
+    - Chatwoot's logs have no `[WHATSAPP]` line.
+    - No inbox was written in 40 hours.
+- **So** the cause is on Meta's side or with someone who has access to the Meta app. Meta sent no notice to Chatwoot or to n8n.
+- **Not done:** re-registering is a write to Meta and waits for the owner's go: `POST /{id}/register` with `WHATSAPP_REGISTER_PIN`. Only one register falls in the last 72 hours, far under Meta's 10.
+
 ### LIVE 17:45:40 UTC: one voice, Michael's; no team, manager or "we will" in a reply (`n8n_whatsapp_ionly.py`, epoch 86)
 - **What the owner saw:** a chat on the live bot as Assaf, in English, 17:02-17:06 UTC (executions 138669 and 138681). It was the first traffic through the re-registered number.
   - The status ask got "מצטער על ההמתנה 🙏 … 3 קריאות שלך שעדיין בסטטוס פתוח ונמצאות אצל הצוות".
