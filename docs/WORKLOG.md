@@ -9,6 +9,22 @@ conversation that produced it.
 
 ---
 
+## 2026-10-29
+
+### Feature 19: the owner's one capped test, armed to start by itself; OpenRouter drained by another key (07:45-07:50 UTC; nothing spent)
+- **Asked:** *"have you tested the chatbot? whats the result in points"*.
+  - **Answered:** no new test since 28 Oct, with the 28 Oct results in points: 8/10 first run, five faults fixed one at a time, 7/10 by the stricter checks after the fixes, and the warm rewrite passing two free Claude-played chats. The Gemini check of it is still owed.
+- **Then:** *"ok test it but make sure we dont overbudget like is it possible to test 1$"*.
+- **Found, read only:**
+  - The bot's key still has $1.56 under its $15 cap. The runner needs $2.30 (the live bot's $2 line plus $0.15 a scenario), so nothing can start.
+  - The wallet fell from $20.38 (28 Oct, 14:19 UTC) to $8.12 (07:49), at $0.15-0.28 a minute while measured. The bot's key spent none of it.
+  - Only the bot's key is in `.env`, so neither the other key nor this key's cap can be changed from here.
+- **Done:** `test_when_room.py` (scratchpad) waits up to 4 hours, reading the free `/credits` and `/key` every 30 s.
+  - With $2.30 in both, it runs `sandbox_drive.py --run manager_retest,manager_fee --fresh` once. That run was about $0.39 on 28 Oct.
+  - It kills the run at $0.85 spent (the owner's ceiling is $1, and the counter lags), or if the wallet falls under $1.50.
+  - No other test or watcher was running when it was armed.
+- **Waiting on the owner:** raise the bot key's cap by at least $0.74 (OpenRouter → Keys), and stop or cap the key that is draining the wallet.
+
 ## 2026-10-28
 
 ### Feature 20: production redeployed with the Tokomni pair; the dialer test page can ring (12:33-12:34 UTC)

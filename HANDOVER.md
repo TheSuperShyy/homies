@@ -8,7 +8,14 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **OpenRouter is nearly empty (28 Oct, 13:29 UTC): $0.41 in the wallet, $1.56 left under the key's $15 cap** (`python scripts/check_openrouter.py`). Another key on the account spent $1.00 between 10:51 and 11:58 UTC and nothing in the 90 minutes after. This key's own use did not move, and n8n ran nothing that calls the model. That key's pace comes in bursts, so no time can be put on the wallet running out. The live WhatsApp bot runs on this key, and when the wallet runs out, the bot answers tenants with the "technical problem" line. **Both numbers need raising:** the wallet, and the key's $15 cap in the OpenRouter dashboard, or the key stops at its cap with money still in the wallet. The driver refuses any sandbox run while either number could end under $2. **The owner's one Gemini run has not run** (`manager_retest` + `manager_fee`, $0.39, the owner's "try and test it" at 11:25 UTC). A watcher waited until 13:28 UTC with no top-up and stopped, nothing spent. After the top-up, run `python scripts/sandbox_drive.py --run manager_retest,manager_fee --fresh`.
+> **OpenRouter is draining (29 Oct, 07:49 UTC): $8.12 in the wallet and falling $0.15-0.28 a minute, all of it another key's. The bot's key still has only $1.56 under its $15 cap** (`python scripts/check_openrouter.py`).
+> - **The top-up of about $20 on 28 Oct is mostly gone:** $20.38 at 14:19 UTC, $8.12 at 07:49 the next morning. The bot's key spent none of it, and n8n runs nothing that calls the model.
+> - **Neither key can be named or capped from here:** only the bot's key is in `.env`, and there is no management key.
+> - **What breaks:** the live WhatsApp bot answers tenants with the "technical problem" line when either the wallet or its key's cap runs out. The owner has to stop or cap the other key, and raise this key's cap.
+> - **A watcher is armed for the owner's one capped test** (29 Oct, *"test it but make sure we dont overbudget ... 1$"*): `test_when_room.py` in this session's scratchpad, until about 11:50 UTC.
+>   - It runs `sandbox_drive.py --run manager_retest,manager_fee --fresh` once (about $0.39), as soon as the wallet and the cap both have $2.30.
+>   - It kills the run at $0.85 spent, or if the wallet falls under $1.50.
+>   - **Start no second run while it waits.**
 
 ---
 
