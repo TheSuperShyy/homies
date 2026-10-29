@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 20: the first press for Ido refused by Tokomni, "404 Route Not Found"; cause not found yet (to 09:40 UTC; nothing inserted)
+- **Seen:** the owner's screenshot of `/dialer` after "Ring עידו": *"Not sent to 0545360353: Tokomni refused it (404: 404 Route Not Found)."* It was the first real send to Omni's insert API ever. `tokomni_lead.py` was only ever dry-run.
+- **Checked:**
+  - **The request matches Omni's document** (`local/omnitelecom/dialer-campaign-api.pdf`): POST `https://api.tokomni.cc/api/campaign/insert/?token=…`, JSON `external_id`, `campaign_id`, `number`. The document's own 404 is "Invalid request (e.g., missing fields, invalid token)".
+  - **Tokomni answers `{"error_msg":"404 Route Not Found"}` to every invalid request.** That covers a made-up token, no token, a GET, and our real token with an all-zero campaign and no number. Probed from this PC so that nothing could be inserted or rung. So the notice cannot say which part it refused.
+  - Any other path, the insert path without its trailing slash included, gets Cloudflare's 403 page, not Tokomni.
+  - **Vercel's campaign id is the same as `.env`'s** (read back). The token is Sensitive and cannot be read, but it was written from `.env` through the API.
+- **Still possible:** the token itself (never accepted by Tokomni yet), Vercel's copy of it, the number's form (local, 10 digits), or the external_id (`<resident id>-<press time>`, 52 characters, where the script sends the bare 36-character id).
+- **Not done:** a send from this PC with the real token and Ido's number. If it is accepted, it rings Ido, and an hour after the owner's press that needs the owner's word again. The plan on that word is the dashboard's exact request, then the bare resident id; the first 200 ends it, so Ido is rung at most once. If both are refused, it is for Omni to check the token and campaign against their log.
+
 ### Feature 19: "i thought we have auto recognition": the balance asks on purpose, and an English name never matches (09:35 UTC; read only)
 - **Seen:** the owner's own sandbox chat as Ido (screenshot, executions 137660-137680), asking about last month's balance.
   - The bot asked for his full name and phone.
