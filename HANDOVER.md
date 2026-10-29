@@ -22,6 +22,12 @@ appended to.
 >   - The watcher that waited for room was stopped first, so nothing else is queued. **No further paid run without a new go.**
 >   - **For the owner's own chat:** memory round 47 (clean for every persona), and the chat page running at http://127.0.0.1:8765 since about 08:25 UTC. The owner's messages spend the same key's last $1.25.
 >   - **His chat as Ido at 11:14-11:37 UTC (conversation 107) shows the manager_fee failure live** (WORKLOG 29 Oct). The manager reply was right. The 1k committee-fee dispute was noted to collections, but then handed on ("the team has all the details … anything else in the meantime?"), when the bot had already shown him ₪250 × 8 months = ₪2,000 at 10:39. Fixing it is a paid Gemini run on his go.
+>   - **The owner's rule for it (29 Oct, 12:00 UTC):** *"when its about money base everything in the system since that is your evidence"*.
+>     - **Built as F** in `n8n_sandbox_section6.py` (`MONEY_EDITS`, `MONEY_BALANCE`, `MONEY_NOTE`). A disputed charge is answered from get_balance. Only a payment or refund the record misses goes to collections, and nothing is promised.
+>     - WHO_RULE's stale "the balance still needs a full name and phone" is gone too, since it contradicted `BALANCE_TOOL`.
+>     - **The driver** has `fee_dispute` (the 11:14 chat word for word; Gemini's real replies fail its checks) and `paid_already`, both under `--run money`.
+>     - **Not pushed to the sandbox yet:** two blind Claude players are checking it first. Then `n8n_sandbox.py --apply --section6 --fresh-memory`.
+>     - **The Gemini proof** waits for a raised key cap and the owner's go.
 
 ---
 

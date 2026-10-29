@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 19: money answered from the system (F); built, blind check running, not pushed yet (from 12:00 UTC; no AI spend)
+- **Asked:** *"so right now when its about money base everything in the system since that is your evidence"*, after the manager status answer.
+- **Cause, in the text the model reads** (rebuilt with `sbx_candidate.py`): three texts made a disputed charge the team's.
+  - The facts' staff-only list began with "השגות על חיוב".
+  - get_balance ended "a receipt or a disputed amount is a team note".
+  - notify_team's threshold list had "a bill they dispute".
+  - The owner's conversation 107 is exactly that path. "why am i charged 1k" went to collections ("כדי שיוכלו לבדוק את זה לעומק"), then "the team has all the details … בינתיים?", then a goodbye to the refund. At 10:39, get_balance had returned ₪250 for each month, 2026-01 to 2026-08, ₪2,000 in total (execution 137792).
+- **Changed (F in `n8n_sandbox_section6.py`):**
+  - `MONEY_EDITS`: "השגות על חיוב" leaves the staff-only list. A new facts bullet, **חיובים**, says the record is the bot's evidence. A charge question gets the months, the amount each and the total. A payment or refund the record misses gets what is recorded, the question when, how much and how, and a note for collections. Correcting or refunding is a person's, so it is not promised.
+  - `MONEY_BALANCE`: get_balance is called for "why am I charged" and "it's wrong" too, and only a payment or refund the record misses is a team note.
+  - `MONEY_NOTE`: notify_team's list carries that instead of "a bill they dispute", and a charge question is get_balance's.
+  - WHO_RULE loses its last sentence, "the balance still needs a full name and phone". It contradicted this morning's `BALANCE_TOOL`, and the money path runs through it.
+  - The prompt is 23,233 → 23,537 characters. `check_n8n_sandbox.py` is ok.
+- **The driver:** `fee_dispute` (conversation 107 word for word) and `paid_already`, with `RECORD` and `PROMISE` checks, under `--run money`.
+  - Gemini's real 11:14 replies, put through the checks offline, fail on the reply to "why am I charged" (no record) and on the "too much" reply ("יש עוד משהו", "בינתיים", "יבדקו את"). The reply to the refund fails too (no record, no question).
+  - Two gaps were widened, not the bar: `THEIRS` takes "כדי שיוכלו" and `CONCEDE` takes "יבדקו את". The 28 Oct Claude check still passes, and this morning's run fails as it did.
+- **Memory:** `money-answers-from-the-system`.
+- **Next:** two blind Claude players are running on the rebuilt texts (conversation 107, and a claimed payment). Then the push to the sandbox with a fresh memory, and the owner's own chat. The Gemini proof (`--run money`, about $0.40) needs the key's cap raised ($0.58 left) and the owner's go.
+
 ### Is all of Yariv's chatbot feedback working now? No: the older points are live, the 26 Oct document is sandbox only (11:50 UTC; read only)
 - **Asked:** *"ok so rn all the feedback from yariv in the chatbot is working?"*
 - **Live, checked 26 Oct** (`docs/assistant/transcripts/2026-10-26-yariv/summary.md`, 122 of 122 checks):

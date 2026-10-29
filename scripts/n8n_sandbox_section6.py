@@ -55,6 +55,8 @@ to the sandbox copy of the WhatsApp bot (feature 19):
   E. no claim that the team is acting (the 28 Oct run: "הצוות יראה את זה ויטפל" on
      a lift ticket, "והצוות מעודכן ועל זה עכשיו" on gas; 26 Oct: "והם קיבלו את
      הדיווח מיד"). Live text, fixed here first, see CLAIM_EDITS.
+  F. money is answered from the system (the owner, 29 Oct: "when its about money
+     base everything in the system since that is your evidence"), see MONEY_EDITS.
 Every edit asserts that its anchor occurs exactly once, so a changed live prompt
 fails loudly instead of being half-edited.
 """
@@ -66,8 +68,7 @@ WHO_RULE = (
     "ולכן אתה לא מבקש ממנו שם, בניין או דירה: מבחינתך הוא כבר אמר לך אותם, ואתה מעביר אותם לכלי. כשאתה פותח לו "
     "קריאה, אתה לא שואל אם זה המקום. אתה אומר לו באותה הודעה באיזה בניין פתחת אותה ועל איזו דירה רשמת אותה, כמו "
     "\"פתחתי קריאה על המעלית בהרצל 10, ורשמתי אותה על דירה 4\", כדי שיוכל לתקן אותך אם משהו לא נכון. אם כתובות לו כמה דירות, אתה שואל באיזו מהן "
-    "מדובר. אם הוא מספר על בניין אחר, ממשיכים לפי מה שהוא אומר. רק היתרה נשארת כמו שהיא: הכלי של היתרה עדיין "
-    "צריך שם מלא וטלפון, ואותם אתה שואל.")
+    "מדובר. אם הוא מספר על בניין אחר, ממשיכים לפי מה שהוא אומר.")
 
 PROMPT_CUTS = [
     (" וגם כשהוא כותב שהוא רוצה נציג, זאת לא הלחיצה על הכפתור: הוא כבר אמר מה הוא רוצה, ומשם ממשיכים.", ""),
@@ -148,8 +149,41 @@ CLAIM_EDITS = [
     ("מישהו בסכנה: קריאת שירות בדחיפות חירום והצוות יודע, מיד, לפני כל שאלה שאפשר לדחות.",
      "מישהו בסכנה: אתה פותח מיד קריאת שירות בדחיפות חירום ומעדכן את הצוות, לפני כל שאלה שאפשר לדחות."),
 ]
+# F. Money is answered from the system (29 Oct, after the owner's own chat as Ido: "why am i charged 1k
+# shekels?!" went to collections with "so they can look into it", "too much" got "the team has all the
+# details … anything else in the meantime?", and "make it fast for the refund" a goodbye, while the
+# record said ₪250 a month, January to August). "Objections to a charge" sat on the facts' staff-only
+# list, and both tools called a disputed bill a team note, so a dispute was past the bot by three
+# texts. A disputed amount is now answered from what get_balance returns; only a payment or refund
+# the record does not show goes to collections, with its details, and nothing is promised.
+MONEY_EDITS = [
+    ("- **מה שנרשם לצוות, ולא נגמר בצ'אט:** השגות על חיוב ומסמכים,",
+     "- **מה שנרשם לצוות, ולא נגמר בצ'אט:** מסמכים,"),
+    ("עצמם, נרשם לצוות.\n- **אב הבית:**",
+     "עצמם, נרשם לצוות.\n"
+     "- **חיובים:** בכל עניין של כסף, מה שרשום במערכת הוא הראיה שלך, ואתה עונה ממנו. מי ששואל למה הוא מחויב, "
+     "או אומר שהסכום גבוה או לא נכון, שומע ממך מה רשום: אילו חודשים פתוחים, כמה על כל חודש וכמה בסך הכול. "
+     "מי שאומר ששילם משהו שלא רשום, שחויב פעמיים או שמגיע לו החזר, שומע ממך מה רשום, ואתה שואל מתי, כמה ואיך "
+     "שילם ורושם את זה לגבייה עם הכלי. לתקן חיוב או להחזיר כסף יכול רק בן אדם, ואת זה אתה לא מבטיח.\n"
+     "- **אב הבית:**"),
+]
+MONEY_BALANCE = [
+    ("Call when the resident asks about their balance, their debt, or how much they owe.",
+     "Call when the resident asks about their balance, their debt, how much they owe, or why they are charged "
+     "what they are, and when they say an amount is too high or wrong: what it returns is the record, and the "
+     "record is your answer."),
+    ("a receipt or a disputed amount is a team note.",
+     "a receipt is a team note, and so is a payment or a refund they say the record does not show, with when, "
+     "how much and how they paid."),
+]
+MONEY_NOTE = [
+    ("a bill they dispute, ", "a payment or a refund they say the record does not show, "),
+    ("A plain how-much-do-I-owe question is get_balance's;",
+     "A how-much-do-I-owe question, and why they are charged what they are, even when they say it is wrong, "
+     "is get_balance's: what it returns is the answer;"),
+]
 # The same in notify_team's own description, which the model reads as it calls the tool.
-NOTE_FROM = "A request for a manager or a person is not one of these yet"
+NOTE_FROM ="A request for a manager or a person is not one of these yet"
 NOTE_TO = "A request with nothing in it is never a note, however often they ask."
 MANAGER_TOOL = (
     "A request for a manager or a person is fair: never gatekeep it and never make it conditional. Call "
@@ -299,18 +333,20 @@ def section6(bot, supabase_cred):
     tool["toolDescription"] = replace_once(tool["toolDescription"], *TICKET_ID)
     bal = by["get_balance"]["parameters"]
     bal["toolDescription"] = replace_span(bal["toolDescription"], BALANCE_FROM, BALANCE_TO, BALANCE_TOOL)
+    for old, new in MONEY_BALANCE:
+        bal["toolDescription"] = replace_once(bal["toolDescription"], old, new)
     for old, new in BALANCE_HINTS:
         bal["jsonBody"] = replace_once(bal["jsonBody"], old, new)
     note = by["notify_team"]["parameters"]
     note["toolDescription"] = replace_span(note["toolDescription"], NOTE_FROM, NOTE_TO, MANAGER_TOOL)
-    for old, new in NOTE_EDITS:
+    for old, new in NOTE_EDITS + MONEY_NOTE:
         note["toolDescription"] = replace_once(note["toolDescription"], old, new)
     opts = by["Answer the resident"]["parameters"]["options"]
     sm = opts["systemMessage"]
     for old, new in PROMPT_CUTS:
         sm = replace_once(sm, old, new)
     sm = replace_span(sm, MANAGER_FROM, MANAGER_TO, MANAGER_RULE)
-    for old, new in SOLVE_EDITS + CLAIM_EDITS:
+    for old, new in SOLVE_EDITS + CLAIM_EDITS + MONEY_EDITS:
         sm = replace_once(sm, old, new)
     assert sm.count(REP_TAP_START) == 1
     start = sm.index(REP_TAP_START)

@@ -80,14 +80,26 @@ SCENARIOS = {
     # for our team, anything else in the meantime?". Then the doubt, as in manager_doubt.
     "manager_retest": ("עידו", ["I need a manager.", "I need a manager.", "it's about a payment committee",
                                 "no you cant help me for this one"], [], [], {"handover"}, set()),
+    # The owner's chat, 29 Oct 11:14 UTC, word for word: the charge went to collections "so they can look
+    # into it", then "the team has all the details … in the meantime?", then a goodbye to the refund.
+    # The owner: "when its about money base everything in the system since that is your evidence".
+    "fee_dispute": ("עידו", ["hey i need a manager right now", "its the committee payment why am i charged 1k shekels?!",
+                             "idk but its too much its like my monthly pay", "no but make it fast for the refund"],
+                    [], [], {"handover"}, set()),
+    # A payment the record does not show: what the record says, the details asked, a note to collections,
+    # and no refund or correction promised.
+    "paid_already": ("עידו", ["שילמתי כבר את מרץ ואפריל, למה זה עדיין מופיע אצלכם כחוב?",
+                              "העברה בנקאית, 500 שקל, בתחילת אפריל",
+                              "אז מתי תחזירו לי את הכסף?"], [], [], {"handover"}, set()),
 }
 BURST = {"burst_manager": [4, 8]}  # seconds before each line after the first
-NOTED = {"manager_fee", "manager_doubt", "manager_retest"}  # a topic is told, so two matters are noted
+NOTED = {"manager_fee", "manager_doubt", "manager_retest", "fee_dispute"}  # a topic is told, so two matters are noted
 # Named sets for --run (28 Oct, the owner: "can we lessen the costing of the test"; that day's seven
 # runs cost about $3.30). Measured on the 09:52 run: quick $0.42 (the ticket, the emergency and the
 # whole manager arc), manager $0.88, all $1.13, which is for before a live promotion.
 SETS = {"quick": ["ido_lift", "gas", "rep_typed", "manager_retest"],
-        "manager": ["rep_typed", "manager_fee", "burst_manager", "manager_doubt", "manager_retest"]}
+        "manager": ["rep_typed", "manager_fee", "burst_manager", "manager_doubt", "manager_retest"],
+        "money": ["fee_dispute", "paid_already", "balance"]}
 # Checks on one reply, by the tenant line it answers (0 is the first), where another may rightly
 # mention the team's note. A hand-off is the team knowing or handling it, or "anything else
 # (in the meantime)?" in place of the matter itself.
@@ -98,7 +110,7 @@ HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יח
 # team"); the bot never argues back; and the note promises nothing (27 Oct: "שמנהל יחזור אליך … עד שזה
 # יקרה"), never "until then", and no cut-off fragment ("רק כדי שמי?", Send's promise filter).
 INFORMED = r"מעדכן|עדכנתי|רשמתי|הוספתי|מעודכנ|עודכנ|יודעת|יודעים"
-CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את זה|לבדיקת הצוות"
+CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את|לבדיקת הצוות"
 ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
 NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|בלי קשר|שמי\?|כבר מטפל|על זה עכשיו"
 # 28 Oct: a manager reply ends on its question (the rule said "ask, then say why", and 5 of 13 ended on
@@ -106,10 +118,16 @@ NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידבר
 # "כדי שהם יוכלו לעזור לך … כשיבדקו") nor the rule's sentence pasted whole ("איתם אפשר לסדר").
 ENDS_Q = r"\?[\s🙂😊🙏👍💪🤝]*$"
 THEIRS = (r"כדי שהם|ככה הם|שהם יוכלו|כשיבדקו|כשיטפלו|להכין את הדברים|איתם אפשר"
-          r"|להעביר לצוות|להעביר להם|להעביר להנהלה|התמונה המלאה|יעזור להם|לעזור להם|כדי שידעו")
+          r"|להעביר לצוות|להעביר להם|להעביר להנהלה|התמונה המלאה|יעזור להם|לעזור להם|כדי שידעו|כדי שיוכלו")
 # 28 Oct, the owner: "not too stiff and rude like i can fix it or like i can sort it out right here tell
 # me what happened". A manager reply offers care and willingness, never its own capability.
 STIFF = r"בעצמי|כאן ועכשיו|ממש כאן|התחום שלי|(?:אני יכול|אוכל) ל(?:סדר|פתור|טפל)|מספיקה לי"
+# 29 Oct, the owner: "when its about money base everything in the system since that is your evidence".
+# A charge question is answered with what is on record (Ido: ₪250 a month, January to August, ₪2,000),
+# and a refund or a correction is never promised, since only a person can make one.
+RECORD = r"250|2,?000|אלפיים|ינואר|אוגוסט|חודשים|רשום|במערכת|מופיע"
+PROMISE = (r"נחזיר|נזכה|יוחזר|יזוכה|תקבל (?:את )?(?:הכסף|החזר|זיכוי)|ההחזר (?:יגיע|יבוצע|יעבור)"
+           r"|נטפל בהחזר|אדאג ש|נתקן|יתקנו|יתוקן")
 TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF])},
          "burst_manager": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF])},
          "manager_fee": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
@@ -123,7 +141,14 @@ TURNS = {"rep_typed": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIF
          "manager_retest": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
                             1: ([ENDS_Q], [ARGUE, CONCEDE, NOTE_SAYS, THEIRS, STIFF]),
                             2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, THEIRS, STIFF]),
-                            3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS, STIFF])}}
+                            3: ([ENDS_Q], [HANDOFF, ARGUE, CONCEDE, THEIRS, STIFF])},
+         "fee_dispute": {0: ([ENDS_Q, INFORMED], [NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                         1: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                         2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, STIFF]),
+                         3: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE])},
+         "paid_already": {0: ([ENDS_Q, RECORD], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE]),
+                          1: ([ENDS_Q], [NOTE_SAYS, CONCEDE, THEIRS, PROMISE]),
+                          2: ([ENDS_Q], [HANDOFF, NOTE_SAYS, CONCEDE, THEIRS, PROMISE])}}
 
 
 def call(method, path, body=None, tries=4):
