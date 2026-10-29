@@ -23,6 +23,24 @@ export function isDialerCall(call: any): boolean {
   return /^dialer-/i.test(String(call?.customer?.name ?? "").trim());
 }
 
+/**
+ * Which way a finished call went, for the dashboard's call log
+ * (`interactions.direction`).
+ *
+ * Vapi's `type` says only how the call reached Vapi, and every call on the 208
+ * line reaches it as `inboundPhoneCall`, the dialer's too: Omni rings the
+ * tenant and hands the answered call to our address. So a dialer call is
+ * outbound by its name, whatever its type (29 Oct). A web call has no direction
+ * of its own and takes the assistant's: the intake agent reached from a
+ * browser is someone coming to us; any other assistant (the debt demo) is not.
+ */
+export function callDirection(call: any, intakeIds: Set<string>): "inbound" | "outbound" {
+  if (isDialerCall(call)) return "outbound";
+  const type = String(call?.type ?? "");
+  if (type.toLowerCase().includes("inbound")) return "inbound";
+  return type === "webCall" && intakeIds.has(String(call?.assistantId ?? "")) ? "inbound" : "outbound";
+}
+
 export type Route =
   | { agent: "debt"; phone: string; row: Record<string, any> }
   | { agent: "intake"; why: string };

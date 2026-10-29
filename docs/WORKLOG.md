@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Dialer calls filed as outgoing in the call log (LIVE 10:08 UTC, debt-tools v132); a note for Omni drafted
+- **Asked:** *"ok can we try to fix some issues then"*, after the 404 and the call log's two limits. Taken as: fix what needs nobody's phone, and leave the test send that rings Ido for an explicit word.
+- **Fixed:** an answered dialer call was going to be filed as incoming. Vapi calls everything on 208 `inboundPhoneCall`, and the end-of-call writer took the direction from that. **Now:** `callDirection()` in `route.ts`: a `dialer-` name is outbound whatever the type, then Vapi's type, then the assistant for a web call (the old two rules, unchanged). `index.ts` passes the report's call with `message.customer` as a fallback, as the router does.
+- **Checked:**
+  - `check_route.test.ts` 7/7 with the new test; identity 18/18, dialer 7/7, sandbox guard 7/7; both files transpile clean.
+  - Before the deploy, the live v130 was the repo's last function commit (`eacb43f`, 25 Oct). The 10 secrets the deploy pushes matched the live ones by hash, so only the code changed.
+- **LIVE:** `supabase_functions.py --apply --oxs-mirror` gave v132 (the secret push made v131), ACTIVE at 10:08:14 UTC, mirror still ON. Two pretend call starts (`assistant-request`, a press-9 shape and an unlisted dialer name) both got the incoming agent, so the function boots. Nothing rang and nothing was written. The new direction shows only on a real answered dialer call.
+- **Not changed:** the unanswered ring (Tokomni sends nothing back).
+- **The 404:** a Hebrew note for Omni was drafted for the owner to send. It asks why their log refused our first insert, whether the token is active for the insert API with List 2's id, and any limit on `external_id` or the number's form. It needs no one's phone. The test send from this PC still waits for the owner's explicit word.
+
 ### Feature 20: the first press for Ido refused by Tokomni, "404 Route Not Found"; cause not found yet (to 09:40 UTC; nothing inserted)
 - **Seen:** the owner's screenshot of `/dialer` after "Ring עידו": *"Not sent to 0545360353: Tokomni refused it (404: 404 Route Not Found)."* It was the first real send to Omni's insert API ever. `tokomni_lead.py` was only ever dry-run.
 - **Checked:**

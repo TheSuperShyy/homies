@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { stripTypeScriptTypes } from "node:module";
 import {
-  debtVariables, FIXED_DEFAULTS, GENDER_FORMS, isDialerCall, routeOf,
+  callDirection, debtVariables, FIXED_DEFAULTS, GENDER_FORMS, isDialerCall, routeOf,
 } from "../supabase/functions/debt-tools/route.ts";
 
 // The 21 Oct dialer call (01a15d92), with the number swapped for a test one.
@@ -25,6 +25,16 @@ test("isDialerCall: only Omni's dialer name counts", () => {
   assert.equal(isDialerCall({ customer: { sipUri: "sip:031234567@x" } }), false);
   assert.equal(isDialerCall({}), false);
   assert.equal(isDialerCall(undefined), false);
+});
+
+test("callDirection: a dialer call is outbound in the call log, though Vapi calls it inbound", () => {
+  const intake = new Set(["intake-id"]);
+  assert.equal(callDirection({ ...DIALER, type: "inboundPhoneCall" }, intake), "outbound");
+  assert.equal(callDirection({ type: "inboundPhoneCall", customer: { name: "0545360353" } }, intake), "inbound");
+  assert.equal(callDirection({ type: "outboundPhoneCall" }, intake), "outbound");
+  assert.equal(callDirection({ type: "webCall", assistantId: "intake-id" }, intake), "inbound");
+  assert.equal(callDirection({ type: "webCall", assistantId: "debt-id" }, intake), "outbound");
+  assert.equal(callDirection({}, intake), "outbound");
 });
 
 test("routeOf: a dialer call to one tenant on the list gets the debt agent", () => {

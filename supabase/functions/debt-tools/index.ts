@@ -51,7 +51,7 @@ import {
 } from "./identity.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
-import { debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
+import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
 
 const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -4037,10 +4037,11 @@ async function endOfCall(message: any, ctx: CallContext) {
     // talk-to-Michael widget doing exactly that, which was landing under
     // "outbound" with a null caller and confusing the list it appeared in.
     // A web call to any other assistant (the debt demo) stays outbound.
-    direction: String(call?.type ?? "").toLowerCase().includes("inbound") ||
-        (String(call?.type ?? "") === "webCall" &&
-         INTAKE_ASSISTANT_IDS.has(String(call?.assistantId ?? "")))
-      ? "inbound" : "outbound",
+    // A dialer call reaches Vapi as inbound and is outbound by its name
+    // (29 Oct); callDirection in route.ts holds all three rules.
+    direction: callDirection(
+      call?.customer ? call : { ...call, customer: message?.customer ?? {} },
+      INTAKE_ASSISTANT_IDS),
     resident_id: ctx.residentId,
     caller_phone: callNumberOf(call),
     transcript,
