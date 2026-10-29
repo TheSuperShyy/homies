@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 19: the owner's own sandbox chat as Ido slid back into a hand-off (11:14-11:37 UTC; read only, no AI spend)
+- **Asked:** a screenshot of the chat page (conversation 107, translated to English in the browser) and *"is this intended"*. **Answered: the first reply yes, the rest no.**
+- **Read:** executions 137869, 137900, 137924 and 137931, and conversation 107 with its notes.
+- **Reply 1 (manager), as intended:**
+  - a real `caller_request` note to management;
+  - the warm reason, then the question.
+  - The one slip is "היי עידו, צהריים טובים": two greetings in one message, against the 27 Sep rule.
+- **Reply 2 ("committee payment, why am I charged 1k?!"), half right:**
+  - The matter note under `billing` reached collections (note 2972), so that part is right.
+  - The bot handed the matter on and asked "so that they can look into it" (a relay reason, ruled out 28 Oct), when it already knew the answer. At 10:39, in conversation 106, it had shown Ido ₪2,000 owed: ₪250 a month, January to August.
+  - "The payment link I sent earlier" was true (sent at 10:39).
+- **Reply 3 ("too much, like my monthly pay"), not intended:** "our team has received all the details and will look into it … anything else in the meantime?". This is the 27 Oct hand-off the owner rejected, with "בינתיים" filling in until a person.
+- **Reply 4 ("make it fast for the refund"), not intended:** Gemini wrote "העברתי להם בדיוק את מה שאמרת…" with no tool behind it. Send's guard cut the sentence, as designed, which left a bare goodbye. The refund itself was never addressed.
+- **This is the `manager_fee` failure in the owner's own words:** a fee dispute after a manager request goes to the team instead of staying with the bot. This morning's paid run missed one reply there.
+- **Open:** the fix is the bot keeping a disputed charge (explaining what is on record, with the note as the hand-over), proven on Gemini. That is a paid run, so it waits for the owner's go.
+
 ### Feature 20: Omni's 27 Oct email read again; the token is theirs exactly, and List 2's Play is the next thing to rule out (11:55 UTC; nothing inserted)
 - **Asked:** the owner pasted Omni's 27 Oct email, token included, and *"read this again"*.
 - **Checked:** `.env` and `dashboard/.env.local` hold exactly the email's token and List 2 id, character for character, so it is not a copy mistake. Vercel's id was already matched. Its token was written from `.env`.

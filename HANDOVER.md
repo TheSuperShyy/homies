@@ -21,6 +21,7 @@ appended to.
 >   - It ran with `--keep 0`, the live bot's $2 line dropped for that one run on the owner's word (*"can we remove the 2usd limit"*). `--keep` is a new flag in `sandbox_drive.py`, and the default is still $2.
 >   - The watcher that waited for room was stopped first, so nothing else is queued. **No further paid run without a new go.**
 >   - **For the owner's own chat:** memory round 47 (clean for every persona), and the chat page running at http://127.0.0.1:8765 since about 08:25 UTC. The owner's messages spend the same key's last $1.25.
+>   - **His chat as Ido at 11:14-11:37 UTC (conversation 107) shows the manager_fee failure live** (WORKLOG 29 Oct). The manager reply was right. The 1k committee-fee dispute was noted to collections, but then handed on ("the team has all the details … anything else in the meantime?"), when the bot had already shown him ₪250 × 8 months = ₪2,000 at 10:39. Fixing it is a paid Gemini run on his go.
 
 ---
 
