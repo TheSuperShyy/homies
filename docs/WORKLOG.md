@@ -27,6 +27,8 @@ conversation that produced it.
     - Both topic notes went under `other`, not `payment`. manager_retest's note was labelled for the service team, manager_fee's for collections.
 - **Spend:** $0.31, read a minute after the run. The bot key's cap now has $1.25 left, and the wallet is at $6.76 (another key spent about $0.41 during the run).
 - **Production:** untouched. These replies are in the sandbox only, and going live is the owner's go, through the gate.
+- **Then, for the owner's own chat** (*"ok where can i test it"*): a fresh memory round, 47, so Ido's memory no longer holds manager_fee. No AI spend.
+  - The chat page `scripts/sandbox_chat.py` was not running and was started as its own process at about 08:25 UTC (logs `local/sandbox/chat.log`, `chat.err.log`). It answers 200 on http://127.0.0.1:8765.
 
 ### The dashboard's call log: does it show what happened in a call? Yes, for every answered call (08:10 UTC; read only)
 - **Asked:** *"is a call logger implemented in the dashboard so we can know what happened in the call"*.
