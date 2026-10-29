@@ -157,7 +157,13 @@ PINS = {
     # candidate (scripts/wa_qa_gladly.json: the owner's 138868/138878 chat with its two earlier exchanges
     # in memory, and a stair-light fault): 6 turns, 7/7 expectations, no guard rejection; the balance
     # came as "לפי מה שרשום אצלנו במערכת …" and the fault opened with care, not gladness.
-    'Answer the resident / system': '3ce8680c9b2e',
+    # 29 Oct, later (n8n_whatsapp_checkword.py, epoch 88): a request to check something gets willingness to
+    # check, never a word that sounds like the answer (138931: "הכל בסדר 🙂" before a ₪2,000 debt), and the
+    # quoted "אין בעיה" is "כמובן". Claude-played on the candidate (scripts/wa_qa_checkword.json: 138931's
+    # exact input with an empty memory, the same with the chat in memory, a status check): 7/7 and 8/9 then
+    # 7/7 on the final text, no guard rejection. The OLD text played the same input well too: a Claude
+    # pass cannot see this Gemini slip, so Send's allclear v1 carries the guarantee.
+    'Answer the resident / system': 'a982cf21020a',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -420,6 +426,9 @@ CLERK = re.compile(r"כדי שאוכל(?!(\s+\S+)?\s+(לאמת|לבדוק))|אצ
 # the agent ... there shouldnt be a i will pass this to the team or the team will check it or the
 # manager is on the review it should be i and i only". A team or management in a reply (his own
 # "מצוות השירות" aside), the manager by article, something passed on, or "they / we will" do it.
+# 29 Oct, late (n8n_whatsapp_checkword.py): an all-clear in a turn that looked something up. Send cuts the
+# interjection and the joined form ("allclear v1"); this flags any form left, the "שהכל בסדר" kind included.
+ALL_CLEAR = re.compile(r"(?<![א-ת])[ושכ]?(הכל|הכול)\s+(בסדר|טוב|תקין)(?![א-ת])")
 TEAM_VOICE = re.compile(r"(?<![א-ת])(?!(?:מ|ב)צוות השירות)[א-ת]{0,3}צוות|(?<![א-ת])[א-ת]{0,3}הנהלה"
                         r"|(?<![א-ת])ו?[הל]מנהל(?![א-ת])"
                         r"|(?<![א-ת])[ושכ]?(העברתי|העברנו|אעביר|נעביר|יבדקו|יטפלו|יחזרו|יעדכנו|ידאגו"
@@ -580,6 +589,11 @@ def watch(since):
             m = TEAM_VOICE.search(t)
             if m and not canned:
                 flags.append("someone other than Michael in the %s: %s" % (k, m.group(0)))
+            looked = any((((run.get("data") or {}).get("main") or [[{}]])[0][0].get("json") or {}).get("intermediateSteps")
+                         for run in (rd.get("Answer the resident") or []))
+            m = ALL_CLEAR.search(t)
+            if m and looked and not canned and k != "ack":
+                flags.append("an all-clear in a turn that looked something up, in the %s: %s" % (k, m.group(0)))
         # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
         # what went out is a flag; the ack and the first beat of a two-part
         # payment reply may say "I'm on it". One the filter cut is an info line.

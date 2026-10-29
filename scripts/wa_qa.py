@@ -808,7 +808,9 @@ def grade(run):
             continue
         clock = {"time": s["time"], "weekday": s["weekday"], "iso": s["iso"]}
         hist = s.get("history") or []
-        greeted = bool(hist)
+        # 29 Oct, late: `greeted` without history is a chat whose memory a deploy emptied (execution
+        # 138931): the inject says mid-conversation and the model remembers nothing.
+        greeted = bool(hist) or bool(s.get("greeted"))
         last_bot = ""
         turns_js, meta = [], []
         tools_so_far = set(t for h in hist for t in (h.get("tools") or []))

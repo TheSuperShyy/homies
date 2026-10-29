@@ -811,7 +811,12 @@ was said back word for word ("אוקיי, יש לך יתרה פתוחה …", ex
 owner called it "a bit unprofessional", as he had a cold "בטח" in the same slot on
 23 Sep. The first word of that list is what the bot says, so it is the owner's own:
 *"gladly to do so"*. With it, the money rule has the bot tell an amount as what our
-system shows (*"based on the system you still have ..."*).
+system shows (*"based on the system you still have ..."*). **Since 19:37 UTC (epoch 88): a request to
+check something gets willingness to check ("בשמחה", "כמובן"), never a word that sounds like the
+answer, and Send's "allclear v1" cuts "הכל בסדר / טוב / תקין" in any turn where a tool ran**
+(execution 138931 opened a ₪2,000 debt with "הכל בסדר 🙂"; the owner: *"i dont want that to happen
+again ever"*). A rule the owner wants kept "ever" goes in code: a blind Claude player given the old
+text on 138931's exact input wrote the good reply, so a Claude-played test cannot see the slip.
 
 **Warmth lives in the sentence, never in the fact.** The details pass through
 verbatim — building, apartment, reference number, amount, months, status — and

@@ -410,6 +410,28 @@ function cases(E) {
     expect('5 Oct live #' + k.n + ' (' + k.case + ')', say({ reply: k.raw, said: k.said }), k.want);
   }
 
+  // 29 Oct, late (n8n_whatsapp_checkword.py, execution 138931): "הכל בסדר 🙂" opened a ₪2,000 debt. The
+  // owner: "i dont want that to happen again ever". In a turn where a tool ran, Send cuts an all-clear
+  // that stands as an interjection or is joined on with ו; what the tool found stays and says it.
+  // Unconditional on purpose: a workflow that loses the cut fails here.
+  console.log(NL + '--- Send: no all-clear before what a tool found (29 Oct, execution 138931) ---');
+  const LOOKED = [{ action: { tool: 'get_balance' }, observation: '[]' }];
+  const R138931 = 'הכל בסדר 🙂 \nבדקתי במערכת, ורשומה לך יתרה של 2,000 ש"ח בסך הכל. זה על החודשים ינואר עד אוגוסט 2026 (250 ש"ח לכל חודש).\n\nתרצה שאעזור עם עוד משהו?';
+  expect('138931: the all-clear before a debt is cut, the debt stays', () => {
+    const out = content(E, { reply: R138931, steps: LOOKED });
+    return out.startsWith('בדקתי במערכת') && out.includes('2,000') && !/הכל בסדר|הכול בסדר/.test(out); }, true);
+  expect('no tool this turn: "how are you?" keeps its "הכל טוב"', say({ reply: 'הכל טוב, תודה ששאלת! ומה שלומך?', said: 'מה שלומך?' }),
+    'הכל טוב, תודה ששאלת! ומה שלומך?');
+  expect('joined on with ו, it goes too', () => content(E, { reply: 'בדקתי במערכת והכל בסדר, רשומה לך יתרה של 750 ש"ח. רוצה קישור לתשלום?', steps: LOOKED }),
+    'בדקתי במערכת, רשומה לך יתרה של 750 ש"ח. רוצה קישור לתשלום?');
+  expect('after a sentence, as its own interjection', () => content(E, { reply: 'תודה שחיכית. הכול טוב! לפי המערכת יש לך יתרה של 500 ש"ח. רוצה קישור?', steps: LOOKED }),
+    'תודה שחיכית. לפי המערכת יש לך יתרה של 500 ש"ח. רוצה קישור?');
+  expect('a question is not touched', () => content(E, { reply: 'פתחתי קריאה, מספר 255-1450-26. הכל בסדר עם זה מבחינתך?', steps: [{ action: { tool: 'open_request' }, observation: '[]' }] })
+    .includes('הכל בסדר עם זה מבחינתך?'), true);
+  expect('nothing left after the cut: the reply stays whole', () => content(E, { reply: 'הכל בסדר 🙂', steps: LOOKED }).includes('הכל בסדר'), true);
+  expect('"בסך הכל" is not an all-clear', () => content(E, { reply: 'רשומה לך יתרה של 2,000 ש"ח בסך הכל. רוצה קישור?', steps: LOOKED }),
+    'רשומה לך יתרה של 2,000 ש"ח בסך הכל. רוצה קישור?');
+
   // 5 Oct (scripts/n8n_whatsapp_emoji.py): the prompt allows six, a face or a
   // hand; the live run sent 😔 and 😥, and goodbyes carry 👋. Only when the
   // emoji step is live (a candidate without it skips these).

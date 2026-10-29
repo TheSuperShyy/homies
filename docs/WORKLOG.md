@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### LIVE 19:37 UTC: never an all-clear before what a lookup found, by the prompt and in code (`n8n_whatsapp_checkword.py`, epoch 88)
+- **What the owner saw:** at 19:16 UTC, three minutes after the "בשמחה" change (execution 138931), he sent his balance question again. The epoch bump had emptied the memory, so "אה, חשבתי שזה בחינם. בכל מקרה, אני צריך לבדוק אם נשארה לי יתרה" arrived with no "it". The reply was "הכל בסדר 🙂 בדקתי במערכת, ורשומה לך יתרה של 2,000 ש"ח בסך הכל …".
+- **Said:** *"what is this?????? why did it say everything is fine"*, then *"i dont want that to happen again ever"*.
+- **Cause:**
+  - The paragraph on the word before an answer sizes it to the situation: a ticket asked for, a fault, a delay, a misfortune. It had no line for "check something for me".
+  - With nothing there, the model reached for the quoted "אין בעיה" kind of word, which before a debt reads as the verdict.
+  - My "בשמחה" check had kept the chat in memory, so this input never came up in it. That was my miss.
+- **Changed, the prompt:**
+  - The missing line: a request to check something (a balance, a ticket's status, what the fee covers) gets willingness to check, not a word that sounds like the answer, then what the system shows.
+  - The quoted "אין בעיה" is now "כמובן". It is the word taken once "בשמחה" has been said in a chat: the blind player's first round wrote "אין בעיה. לפי המערכת שלנו נשארה לך יתרה של 2,000 ₪".
+  - Prompt 23,602 → 23,737 characters. MEMORY_EPOCH 87 → 88.
+- **Changed, in code, for "never again": Send's "allclear v1".** It runs after the manners step.
+  - In a turn where a tool ran, it cuts "הכל בסדר", "הכל טוב" or "הכל תקין" (הכל or הכול, with or without "גמור"). That covers the phrase standing as an interjection (a sentence start followed by punctuation, an emoji or a line break) and the phrase joined on with ו ("…והכל בסדר.").
+  - It does not touch a question ("הכל בסדר עם זה?"), a turn with no tool ("how are you?" → "הכל טוב, ואצלך?"), or a reply it would leave under two words.
+  - Across all 1,132 bot replies ever sent, run as if a tool had run, it changes two: 138931's, as intended, and "הכל טוב, תודה. איך אפשר לעזור?". The second was a how-are-you answer in a turn that almost certainly had no tool.
+- **Gate:**
+  - 7 new Send cases, unconditional, so a workflow that loses the cut fails. The three cut cases fail on the old live workflow.
+  - `--watch` has a new flag, "an all-clear in a turn that looked something up". It catches 138931.
+  - The candidate was all green, and the replay unchanged.
+  - Read back exactly; the check on live is green (487 lines, 429 PASS).
+- **Blind Claude players** (`scripts/wa_qa_checkword.json`: 138931's exact input with an empty memory, the same input with the chat in memory, and a status check):
+  - The first round scored 8/9. The miss was "אין בעיה" in the in-memory case.
+  - The final text scored 7/7: "כמובן. לפי מה שרשום אצלנו במערכת …" and "בשמחה. לפי מה שרשום אצלנו במערכת …".
+  - **A player given the OLD text on 138931's exact input wrote "בשמחה. לפי מה שרשום …" as well.** So a Claude-played pass cannot see this Gemini slip, and the guarantee is the code.
+  - `wa_qa.py` gained `"greeted": true` without history, for a chat whose memory a deploy emptied.
+- **Rollback, in order:** `n8n_whatsapp_checkword.py --restore` (back to epoch 87, snapshot `local/n8n-whatsapp-live-29oct-before-checkword.json`), then gladly's and ionly's `--restore` only to go further back.
+- **Owed:** the owner's handset, then `--watch 2026-10-29T19:37`.
+
 ### LIVE 19:13 UTC: "בשמחה", not "אוקיי", and a balance told as what our system shows (`n8n_whatsapp_gladly.py`, epoch 87)
 - **What the owner saw:** a chat on the live number, 18:40-18:49 UTC (executions 138841-138878), the one-voice version.
   - "I need to check if I have a balance left" got "אוקיי, יש לך יתרה פתוחה של 2,000 ש"ח על החודשים ינואר עד אוגוסט 2026, 250 ש"ח לכל חודש. תרצה שאשלח לך את קישור התשלום שלך עכשיו?".

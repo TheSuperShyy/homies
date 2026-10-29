@@ -230,7 +230,9 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 87
+MEMORY_EPOCH = 88
+# 87 -> 88, 29 Oct, later (n8n_whatsapp_checkword.py): a request to check something gets willingness to
+# check, never a word that sounds like the answer; the quoted "אין בעיה" is "כמובן"; Send's allclear v1.
 # 86 -> 87, 29 Oct, late (n8n_whatsapp_gladly.py): the quoted word before an answer is "בשמחה",
 # not "אוקיי" (the owner: "a bit unprofessional"), and money is told as what our system shows.
 # 85 -> 86, 29 Oct, evening (n8n_whatsapp_ionly.py): one voice, Michael's. No team, manager or
@@ -765,7 +767,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "3ce8680c9b2e",   # docs/features/11-whatsapp-bot/prompt.md (29 Oct, late, epoch 87)
+    "prompt": "a982cf21020a",   # docs/features/11-whatsapp-bot/prompt.md (29 Oct, later, epoch 88)
     "inject": "680da3fc96bc",   # AGENT_NEW in n8n_whatsapp_untemplate.py
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does

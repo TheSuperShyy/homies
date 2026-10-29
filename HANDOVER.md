@@ -18,6 +18,13 @@ appended to.
 > - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
 > - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
+> **LIVE 29 Oct, 19:37 UTC: never an all-clear before what a lookup found (epoch 88, `scripts/n8n_whatsapp_checkword.py`).** Execution 138931 answered a balance question "הכל בסדר 🙂 … רשומה לך יתרה של 2,000 ש"ח". The owner: *"i dont want that to happen again ever"*. WORKLOG 29 Oct.
+> - **The prompt:** a request to check something gets willingness to check, never a word that sounds like the answer. The quoted "אין בעיה" is now "כמובן".
+> - **The guarantee is code:** Send's "allclear v1" cuts "הכל בסדר / טוב / תקין" (interjection or joined with ו) in any turn where a tool ran. Questions, tool-free turns and a reply it would empty are left alone. Seven gate cases are unconditional, and `--watch` flags any all-clear left in a tool turn. **Never apply an older patcher that rewrites Send's body** (they refuse on the epoch anyway); the fold must carry allclear v1.
+> - **Why code:** a blind Claude player given the OLD text on 138931's exact input wrote the good reply. Claude-played tests cannot see this Gemini slip.
+> - **Rollback:** `python scripts/n8n_whatsapp_checkword.py --restore` (back to epoch 87; snapshot `local/n8n-whatsapp-live-29oct-before-checkword.json`) + git revert.
+> - **Owed:** the owner's handset, then `check_whatsapp_rules.py --watch 2026-10-29T19:37`. The fold takes section 6, `ionly()`, `gladly()` and `checkword()`, in that order.
+>
 > **LIVE 29 Oct, 19:13 UTC: the word before an answer is "בשמחה", not "אוקיי", and a balance is told as what our system shows (epoch 87, `scripts/n8n_whatsapp_gladly.py`).** The owner, on "אוקיי, יש לך יתרה פתוחה …" (execution 138878): *"a bit unprofessional ... gladly to do so. or gotcha, based on the system you still have ..."*. Prompt only: the quoted list's first word, and the money rule now says "ואומר לו שזה מה שרשום אצלנו במערכת". WORKLOG 29 Oct.
 > - **Rollback:** `python scripts/n8n_whatsapp_gladly.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-gladly.json`) + git revert. That returns epoch 86 (one voice). `n8n_whatsapp_ionly.py --restore` after it only to undo the one voice too.
 > - **Owed:** the owner's handset, then `check_whatsapp_rules.py --watch 2026-10-29T19:13`. Since 17:45 the watch has read 5 live turns and flagged nothing.
