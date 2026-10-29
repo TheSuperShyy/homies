@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### LIVE 20:01 UTC: the memory reset, epoch 88 → 89, no text changed (`n8n_whatsapp_fresh.py`)
+- **Asked:** the owner, after testing epoch 88 on the handset: *"ok its kidna good now so lets reset the memory again"*.
+- **Changed:** `Conversation so far`'s key `-88` → `-89` at 20:01:25 UTC (04:01 the owner's time). Nothing else. Every chat, the owner's included, starts with an empty memory. Epoch 89 covers the same prompt, inject and tool texts as 88.
+- **`n8n_whatsapp_fresh.py` now checks live, not the repo.**
+  - Its `check_memory_epoch()` on the repo's texts refused. The 29 Oct patchers write live directly, so until the fold the repo builds inject 31ff6f4f297f and tools ba0d94da4e6d, not live's 680da3fc96bc and 72cac34efc1c.
+  - It now refuses unless live's prompt, inject and tools are what EPOCH_COVERS records. All three were.
+  - Its snapshot moved to `local/`, like the other patchers': `local/n8n-whatsapp-live-before-fresh-e88.json`. It reuses ionly's `snapshot()` and `restore()`.
+- **Gate:** the candidate all green, the replay of 1,139 replies unchanged. Read back with key `-89`; a re-run reports nothing to do; the check on live is green (429 cases).
+- **The watch owed for epoch 88** (`--watch 2026-10-29T19:37`, the owner's handset test): 7 resident turns, no all-clear left in a tool turn, 1 flag.
+  - Execution 139038 (19:49:39 UTC), a request to pay in instalments, after `open_request` (255-1385-26) and `notify_team`: "…ורשמתי במערכת שאתה מבקש הסדר תשלומים, כדי שנוכל לעזור לך עם זה."
+  - "שנוכל" ("so that we can") is a "we" the one-voice rule forbids. Recorded, not fixed: the owner asked for the reset only.
+- **Rollback:** `n8n_whatsapp_fresh.py --restore` puts `-88` back, and with it the buffers of 88 + git revert.
+
 ### LIVE 19:37 UTC: never an all-clear before what a lookup found, by the prompt and in code (`n8n_whatsapp_checkword.py`, epoch 88)
 - **What the owner saw:** at 19:16 UTC, three minutes after the "בשמחה" change (execution 138931), he sent his balance question again. The epoch bump had emptied the memory, so "אה, חשבתי שזה בחינם. בכל מקרה, אני צריך לבדוק אם נשארה לי יתרה" arrived with no "it". The reply was "הכל בסדר 🙂 בדקתי במערכת, ורשומה לך יתרה של 2,000 ש"ח בסך הכל …".
 - **Said:** *"what is this?????? why did it say everything is fine"*, then *"i dont want that to happen again ever"*.

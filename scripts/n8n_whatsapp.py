@@ -230,7 +230,9 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 88
+MEMORY_EPOCH = 89
+# 88 -> 89, 29 Oct, night (n8n_whatsapp_fresh.py): the key alone, no text changed. The owner, after testing
+# 88: "ok its kidna good now so lets reset the memory again".
 # 87 -> 88, 29 Oct, later (n8n_whatsapp_checkword.py): a request to check something gets willingness to
 # check, never a word that sounds like the answer; the quoted "אין בעיה" is "כמובן"; Send's allclear v1.
 # 86 -> 87, 29 Oct, late (n8n_whatsapp_gladly.py): the quoted word before an answer is "בשמחה",

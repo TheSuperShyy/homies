@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Every chat starts fresh after the emergency fix: the memory key only, 6 Oct.
+"""Every chat starts fresh: the memory key only, one epoch up (6 Oct; again 29 Oct, night).
 
     python scripts/n8n_whatsapp_fresh.py            # dry run
     python scripts/n8n_whatsapp_fresh.py --dump F   # dry run, plus the would-be workflow in F
     python scripts/n8n_whatsapp_fresh.py --apply    # write it
-    python scripts/n8n_whatsapp_fresh.py --restore  # put the 6 Oct snapshot back
+    python scripts/n8n_whatsapp_fresh.py --restore  # put the snapshot of the epoch before back
 
 WHY. The emergency fix (n8n_whatsapp_danger.py, debt-tools v118) is code, so
 check_memory_epoch() asks for no bump. But a buffer holds the model's raw
@@ -17,10 +17,20 @@ copies its own earlier lines (n8n_whatsapp.py, MEMORY_EPOCH, 1 Sep).
 WHAT CHANGES: `Conversation so far`'s key, one epoch up (MEMORY_EPOCH - 1 ->
 MEMORY_EPOCH). Nothing else. Used twice on 6 Oct: 75 -> 76 before the emergency
 was run again, 76 -> 77 before it was run a third time on danger v2 (the second
-run's buffer held "the only number I can give you is ..."). Each bump has its own
-snapshot, named for the epoch it replaced.
+run's buffer held "the only number I can give you is ..."). Used again on 29 Oct (night),
+88 -> 89, after the owner had tested epoch 88 on the handset: *"ok its kidna good
+now so lets reset the memory again"*. Each bump has its own snapshot, named for the
+epoch it replaced; the two of 6 Oct are in docs/handover/, later ones in local/
+like the other patchers'.
+
+THE CHECK READS LIVE (29 Oct, night). It was W.check_memory_epoch() on the repo's own
+texts. The 29 Oct patchers (section6, ionly, gladly, checkword) write live
+directly and wait for the fold, so that night the repo built inject 31ff6f4f297f
+and tools ba0d94da4e6d against live's 680da3fc96bc and 72cac34efc1c, and that
+check refused a bump that changes no text. What it guards is the same: live's
+prompt, inject and tool texts must be the ones EPOCH_COVERS records, or the new
+epoch would be minted over text it does not cover.
 """
-import json
 import os
 import sys
 
@@ -29,55 +39,30 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 import n8n_whatsapp as W  # noqa: E402
-import n8n_whatsapp_untemplate as U  # noqa: E402
 import n8n_whatsapp_nopromise as NP  # noqa: E402
+from n8n_whatsapp_ionly import prompt_of, tools_of, snapshot, restore  # noqa: E402
 from n8n_whatsapp_patch import layout_complaints  # noqa: E402
 
 WORKFLOW_ID = "u2JjrbcNPYyyh3yl"
 OLD_EPOCH = W.MEMORY_EPOCH - 1
-SNAPSHOT = os.path.join(W.ROOT, "docs", "handover",
-                        "n8n-whatsapp-live-before-fresh-e%d.json" % OLD_EPOCH)
-PLACEHOLDER = NP.PLACEHOLDER
+SNAPSHOT = os.path.join(W.ROOT, "local", "n8n-whatsapp-live-before-fresh-e%d.json" % OLD_EPOCH)
 MEMORY_KEY = "={{ $json.to }}-%d"
 NL = chr(10)
 
 
-def snapshot(live):
-    if os.path.exists(SNAPSHOT):
-        return False
-    secret = W.env().get("N8N_WEBHOOK_SECRET", "").strip()
-    live = dict(live, staticData="<stripped: runtime state keyed by phone numbers>")
-    text = json.dumps(live, ensure_ascii=False, indent=1)
-    if secret:
-        if secret not in text:
-            sys.exit("The live workflow does not contain N8N_WEBHOOK_SECRET from .env, "
-                     "so the snapshot's redaction would miss. Refusing to write it.")
-        text = text.replace(secret, PLACEHOLDER)
-    with open(SNAPSHOT, "w", encoding="utf-8", newline=NL) as f:
-        f.write(text)
-    return True
-
-
-def restore():
-    snap = json.load(open(SNAPSHOT, encoding="utf-8"))
-    secret = W.env().get("N8N_WEBHOOK_SECRET", "").strip()
-    if not secret:
-        sys.exit("N8N_WEBHOOK_SECRET is not in .env; the snapshot's Sort node would "
-                 "go live with a placeholder secret. Refusing.")
-    body = json.loads(json.dumps(snap, ensure_ascii=False).replace(PLACEHOLDER, secret))
-    W.api("PUT", "/api/v1/workflows/%s" % WORKFLOW_ID, {
-        "name": body["name"], "nodes": body["nodes"],
-        "connections": body["connections"], "settings": body.get("settings", {})})
-    print("restored %s from %s (%d nodes)" % (WORKFLOW_ID, SNAPSHOT, len(body["nodes"])))
-    print("MEMORY_EPOCH in n8n_whatsapp.py still says %d; the restored key is -%d. "
-          "Put the repo back too (git revert)." % (W.MEMORY_EPOCH, OLD_EPOCH))
+def covered(live):
+    """Refuse unless live's prompt, inject and tool texts are the ones the epoch covers."""
+    inject = {n["name"]: n for n in live["nodes"]}["Answer the resident"]["parameters"]["text"]
+    for name, text in (("prompt", prompt_of(live)), ("inject", inject), ("tools", tools_of(live))):
+        if W.epoch_hash(text) != W.EPOCH_COVERS.get(name):
+            sys.exit("REFUSING: live's %s is %s and the epoch covers %s. A text change goes out with its "
+                     "own patcher, which moves the epoch itself." % (name, W.epoch_hash(text), W.EPOCH_COVERS.get(name)))
 
 
 def main():
     if "--restore" in sys.argv:
-        return restore()
+        return restore(SNAPSHOT)
     apply = "--apply" in sys.argv
-    W.check_memory_epoch(prompt=W.system_prompt(), inject=U.AGENT_NEW, tools=W.tools_text())
     later = False                              # the key is always this script's to move one up
 
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
@@ -85,7 +70,8 @@ def main():
     by = {n["name"]: n for n in nodes}
     if "Conversation so far" not in by:
         sys.exit("No 'Conversation so far' node on the live workflow -- refusing to guess.")
-    if snapshot(live):
+    covered(live)
+    if snapshot(live, SNAPSHOT):
         print("snapshot : %s" % os.path.relpath(SNAPSHOT, W.ROOT))
     before_layout = layout_complaints(nodes)
 

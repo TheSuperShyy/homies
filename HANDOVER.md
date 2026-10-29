@@ -18,12 +18,18 @@ appended to.
 > - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
 > - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
+> **MEMORY EPOCH 89 SINCE 29 Oct, 20:01 UTC: the key alone, no text changed (`scripts/n8n_whatsapp_fresh.py`).** The owner, after the handset test of 88: *"ok its kidna good now so lets reset the memory again"*. Every chat started fresh; 89 covers the same texts as 88.
+> - **`n8n_whatsapp_fresh.py` checks live's texts against EPOCH_COVERS**, not the repo's, which do not build live until the fold. Run it again for the next reset with no text change: bump MEMORY_EPOCH, dry run, `--apply`.
+> - **Rollback:** `n8n_whatsapp_fresh.py --restore` (snapshot `local/n8n-whatsapp-live-before-fresh-e88.json`) + git revert.
+> - **Open, not fixed (the owner asked for the reset only):** the handset test's one flag, execution 139038 (19:49 UTC). An instalment request got "…כדי שנוכל לעזור לך עם זה". "שנוכל" ("so that we can") is a "we" the one-voice rule forbids.
+> - **Owed:** `check_whatsapp_rules.py --watch 2026-10-29T20:01` after the owner's next test, and the next morning.
+>
 > **LIVE 29 Oct, 19:37 UTC: never an all-clear before what a lookup found (epoch 88, `scripts/n8n_whatsapp_checkword.py`).** Execution 138931 answered a balance question "הכל בסדר 🙂 … רשומה לך יתרה של 2,000 ש"ח". The owner: *"i dont want that to happen again ever"*. WORKLOG 29 Oct.
 > - **The prompt:** a request to check something gets willingness to check, never a word that sounds like the answer. The quoted "אין בעיה" is now "כמובן".
 > - **The guarantee is code:** Send's "allclear v1" cuts "הכל בסדר / טוב / תקין" (interjection or joined with ו) in any turn where a tool ran. Questions, tool-free turns and a reply it would empty are left alone. Seven gate cases are unconditional, and `--watch` flags any all-clear left in a tool turn. **Never apply an older patcher that rewrites Send's body** (they refuse on the epoch anyway); the fold must carry allclear v1.
 > - **Why code:** a blind Claude player given the OLD text on 138931's exact input wrote the good reply. Claude-played tests cannot see this Gemini slip.
 > - **Rollback:** `python scripts/n8n_whatsapp_checkword.py --restore` (back to epoch 87; snapshot `local/n8n-whatsapp-live-29oct-before-checkword.json`) + git revert.
-> - **Owed:** the owner's handset, then `check_whatsapp_rules.py --watch 2026-10-29T19:37`. The fold takes section 6, `ionly()`, `gladly()` and `checkword()`, in that order.
+> - **The handset test is done** (the owner: "kinda good"). Its watch from 19:37: 7 turns, no all-clear left, the one "we" flag above. The fold takes section 6, `ionly()`, `gladly()` and `checkword()`, in that order.
 >
 > **LIVE 29 Oct, 19:13 UTC: the word before an answer is "בשמחה", not "אוקיי", and a balance is told as what our system shows (epoch 87, `scripts/n8n_whatsapp_gladly.py`).** The owner, on "אוקיי, יש לך יתרה פתוחה …" (execution 138878): *"a bit unprofessional ... gladly to do so. or gotcha, based on the system you still have ..."*. Prompt only: the quoted list's first word, and the money rule now says "ואומר לו שזה מה שרשום אצלנו במערכת". WORKLOG 29 Oct.
 > - **Rollback:** `python scripts/n8n_whatsapp_gladly.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-gladly.json`) + git revert. That returns epoch 86 (one voice). `n8n_whatsapp_ionly.py --restore` after it only to undo the one voice too.
