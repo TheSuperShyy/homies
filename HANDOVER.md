@@ -12,7 +12,11 @@ appended to.
 > - **The top-up of about $20 on 28 Oct is mostly gone:** $20.38 at 14:19 UTC, $6.76 at 08:13 the next morning. The bot's key spent only the owner's $0.31 test of it, and n8n runs nothing else that calls the model.
 > - **Neither key can be named or capped from here:** only the bot's key is in `.env`, and there is no management key.
 > - **What breaks:** the live WhatsApp bot answers tenants with the "technical problem" line when either the wallet or its key's cap runs out. The owner has to stop or cap the other key, and raise this key's cap.
-> - **DEFECT, live and sandbox: a balance asked with the name in English letters always fails** (29 Oct, the owner's chat as Ido). `get_balance`'s `sameName()` compares whole words, so "ido clix" never matches עידו קליקס, and the tenant is told their details do not match. The asking itself is the owner's 5 Oct decision. Recognising the sender by number for a balance is waiting on the owner (WORKLOG 29 Oct).
+> - **DEFECT, LIVE still: a balance asked with the name in English letters always fails** (29 Oct, the owner's chat as Ido). `get_balance`'s `sameName()` compares whole words, so "ido clix" never matches עידו קליקס, and the tenant is told their details do not match.
+> - **FIXED IN THE SANDBOX, with the balance recognising the sender** (owner's "go", 29 Oct, 10:29 UTC, WORKLOG 29 Oct).
+>   - `debt-tools-sandbox` v5 is the live `index.ts` plus `APP_EDITS` in `scripts/sandbox_function.py` (and `names.ts`). It is not the live code byte for byte any more.
+>   - The bot copy's balance text is `BALANCE_TOOL` in `n8n_sandbox_section6.py`. Memory round 48.
+>   - **Going live** is the owner's go: the same three edits in `debt-tools/index.ts` with `names.ts` beside it, deployed with `supabase_functions.py --apply --oxs-mirror` (a plain run deletes the OXS mirror), plus the tool text through `check_whatsapp_rules.py`.
 > - **The owner's one capped test ran 29 Oct, 08:05-08:12 UTC** (`manager_retest` + `manager_fee`, $0.31 against the owner's $1; WORKLOG 29 Oct). manager_retest passed and manager_fee failed one reply.
 >   - It ran with `--keep 0`, the live bot's $2 line dropped for that one run on the owner's word (*"can we remove the 2usd limit"*). `--keep` is a new flag in `sandbox_drive.py`, and the default is still $2.
 >   - The watcher that waited for room was stopped first, so nothing else is queued. **No further paid run without a new go.**

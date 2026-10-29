@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 19: the balance recognises the sender, and takes a name in English letters (sandbox; 10:15-10:35 UTC; no AI spend)
+- **Asked:** *"go"*, to the recommendation after *"i thought we have auto recognition"*.
+- **The function** (`debt-tools-sandbox` v5, deployed 10:29:27 UTC by `sandbox_function.py --apply`): app.ts is the live `index.ts` plus three `APP_EDITS`, each anchor exactly once.
+  - The import of `names.ts`.
+  - In `get_balance`, the number the message came from, on file for one resident, is that resident. This is `reporterPhone()`, the payment link's identity. A typed number is read only when it is another one.
+  - The typed check uses `sameNameAnyScript()`: Latin words compared by consonant skeletons, with ו and ח read both ways and a word that reduces to nothing matching nothing.
+- **The bot copy** (`n8n_sandbox.py --apply --section6 --fresh-memory`, round 48):
+  - `BALANCE_TOOL` replaces the tool's IDENTITY FIRST paragraph whole: call straight away, and ask once only on `need_identity`.
+  - The two `$fromAI` hints that said "Required" and "NOT the number the message arrived from" now say empty unless asked.
+  - open_request's "full-name-and-phone identity check" became "any identity check".
+  - Read back from n8n: the new text is in and the old rule is gone.
+- **Checks, all free:**
+  - `check_names.test.ts` 6/6: "ido clix", 14 common names in their English spellings, wrong names refused, two words required.
+  - `check_n8n_sandbox.py` ok, with new asserts that the typed-only rule is gone.
+  - The patched app.ts passes `node --check`.
+  - `sandbox_function.py --probe`, against the deployed function:
+    - Ido's number with nothing typed is found;
+    - a number not on file gets need_identity;
+    - "ido clix" with Ido's number typed from another phone is found;
+    - a wrong name gets identity_failed.
+  - The driver's `balance` scenario now expects the amount for Ido with no question, and a new `balance_unknown` expects the question. Neither was run (paid).
+- **Production:** the live bot is unchanged. `sandbox_fingerprint --compare` lists live function v130 to v132; v132 is the other session's 10:08 UTC call-log fix (bee1333), not this.
+- **Not done:** no Gemini run. The owner's own chat on the sandbox page is the check. The live bot still has both the typed check and the English-name defect, until the owner's go.
+
 ### Dialer calls filed as outgoing in the call log (LIVE 10:08 UTC, debt-tools v132); a note for Omni drafted
 - **Asked:** *"ok can we try to fix some issues then"*, after the 404 and the call log's two limits. Taken as: fix what needs nobody's phone, and leave the test send that rings Ido for an explicit word.
 - **Fixed:** an answered dialer call was going to be filed as incoming. Vapi calls everything on 208 `inboundPhoneCall`, and the end-of-call writer took the direction from that. **Now:** `callDirection()` in `route.ts`: a `dialer-` name is outbound whatever the type, then Vapi's type, then the assistant for a web call (the old two rules, unchanged). `index.ts` passes the report's call with `message.customer` as a fallback, as the router does.

@@ -15,7 +15,10 @@ to the sandbox copy of the WhatsApp bot (feature 19):
      out of a lift ticket (28 Oct), so the rule names the flat the ticket is
      recorded on, apart from where the fault is. The ticket tool's "ask for
      the flat every time" gets one sentence for the recognised case, so the rule
-     and the tool do not compete. The balance keeps its typed name and phone.
+     and the tool do not compete. The balance kept its typed name and phone until
+     29 Oct (the owner, "i thought we have auto recognition", then "go"). Now
+     get_balance knows the sender's number too (APP_EDITS in sandbox_function.py),
+     and BALANCE_TOOL replaces the tool's IDENTITY FIRST paragraph whole.
   C. the bot solves it, the team gets a note (the owner, 27 Oct, on a sandbox chat
      where "I need a manager … it's about the committee fee" ended in "I updated
      the management team, anything else?"): *"we should handle everything in our
@@ -173,6 +176,35 @@ NOTE_EDITS = [
 ]
 
 
+# 29 Oct (the owner's chat as Ido: asked for a name and a phone for his balance, then told his
+# details do not match): get_balance recognises the number the message came from, so its text stops
+# asking first and stops forbidding that number. One span replaced whole, so no sentence of the old
+# rule is left to argue with the new; the two input hints that said "Required" follow it.
+BALANCE_FROM = "IDENTITY FIRST:"
+BALANCE_TO = "then tell them the team knows. "
+BALANCE_TOOL = (
+    "It knows who is writing from the number the message comes from: call it straight away, before "
+    "asking anything. Only when it answers `need_identity`, because that number is not on file, ask "
+    "once, in one message and your own words, for their full name and the phone number their flat is "
+    "registered under; a number from any country is fine, with its country code. Never fill either "
+    "from a guess. If they push back, explain once, in one short sentence, that it makes sure the "
+    "balance goes to the right person, and ask again. If they still will not give them, do not ask "
+    "again: a team note (notify_team) that they asked for their balance and their number is not on "
+    "file, then tell them the team knows. "
+)
+BALANCE_HINTS = [
+    ("The resident's full name exactly as they typed it in this conversation — first name and surname. Required.",
+     "Empty, unless the tool answered need_identity and they then typed their name: their full name exactly "
+     "as they typed it, first name and surname."),
+    ("The phone number exactly as they typed it in this conversation. NOT the number the message arrived from. "
+     "Required.",
+     "Empty, unless the tool answered need_identity and they then typed a number: that number exactly as "
+     "they typed it."),
+]
+TICKET_ID = ("the full-name-and-phone identity check belongs to get_balance",
+             "any identity check belongs to get_balance")
+
+
 def replace_span(text, start, end, new):
     """Replace text[start ... end] (both included) with new; each anchor must occur exactly once."""
     assert text.count(start) == 1 and text.count(end) == 1, "span anchors moved: %r / %r" % (start[:30], end[:30])
@@ -264,6 +296,11 @@ def section6(bot, supabase_cred):
     send["jsonBody"] = replace_once(send["jsonBody"], SEND_CUT, "")
     tool = by["open_request"]["parameters"]
     tool["jsonBody"] = replace_once(tool["jsonBody"], FLAT_ASK, FLAT_KNOWN)
+    tool["toolDescription"] = replace_once(tool["toolDescription"], *TICKET_ID)
+    bal = by["get_balance"]["parameters"]
+    bal["toolDescription"] = replace_span(bal["toolDescription"], BALANCE_FROM, BALANCE_TO, BALANCE_TOOL)
+    for old, new in BALANCE_HINTS:
+        bal["jsonBody"] = replace_once(bal["jsonBody"], old, new)
     note = by["notify_team"]["parameters"]
     note["toolDescription"] = replace_span(note["toolDescription"], NOTE_FROM, NOTE_TO, MANAGER_TOOL)
     for old, new in NOTE_EDITS:

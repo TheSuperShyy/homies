@@ -48,7 +48,12 @@ SCENARIOS = {
     # A typed request for a person is a manager request under the owner's protocol (27 Oct evening):
     # management is told at once (a real note, so the handover label) and the reply asks what it is about.
     "rep_typed": ("עידו", ["אני רוצה לדבר עם נציג"], [r"\?"], [r"מעביר אותך|אעביר אותך"], {"handover"}, set()),
-    "balance":   ("עידו", ["כמה אני חייב?"], [r"שם|טלפון"], [r"\d{3,} ?₪|\d{3,} שקל"], set(), set()),
+    # 29 Oct: the balance recognises the sender (sandbox_function.py APP_EDITS). Ido's number is on
+    # file, so the amount comes straight away and nobody is asked who they are; a number not on file
+    # is still asked for a name and a phone.
+    "balance":   ("עידו", ["כמה אני חייב?"], [r"\d{3,} ?₪|₪ ?\d|\d{3,} ?ש|אלפיים"],
+                  [r"שם (ה)?מלא|מספר (ה)?טלפון"], set(), set()),
+    "balance_unknown": ("לא מוכר", ["כמה אני חייב?"], [r"שם|טלפון"], [r"\d{3,} ?₪|₪ ?\d|\d{3,} שקל"], set(), set()),
     # The owner's own sandbox chat, 27 Oct, word for word: the bot must take the committee fee on
     # itself (balance, paying, a charge) and leave the team a note because a manager was asked for.
     "manager_fee": ("עידו", ["i want to speak with to a manager", "no i need a manager right nw",

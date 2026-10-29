@@ -3332,6 +3332,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **For a building alone, the 19 Aug rule stands:** a neighbour's ticket is a count, never a description.
   - **Mould and damp, and the parking gate, have words now**, so a building-wide lookup can find them by description.
 - **The balance check takes a foreign number (5 Oct, fix 5, v116).** `get_balance` parses the typed number with `typedPhoneOf()`: `phoneOf()`, plus a number written with its country code ("+63…", "0063…", or 11-15 digits that are not Israeli), in the "+digits" form `residents.phone` holds. `phoneOf()` itself is unchanged, so the voice agents, the ticket's reporter and the OXS mirror's gate read numbers as before. The sender's own number still does not count: the owner kept the typed check (*"B make it type the number"*).
+  - **Reversed on 29 Oct, sandbox now and live on go: a balance recognises the sender.** The owner said *"i thought we have auto recognition"*, then *"go"*.
+    - The number the message came from, on file for one resident, is that resident, the payment link's identity. A typed number is read only when it is another one.
+    - A number not on file is still asked for a name and a phone.
+    - A name typed in Latin letters is matched by its consonants (`debt-tools-sandbox/names.ts`), so "ido clix" is עידו קליקס. A wrong name still fails.
+    - Why: the typed check made a known tenant prove who they are, then refused "ido clix" for עידו קליקס with the right number. The payment link, which hands over more than a balance, has trusted the sender's number since 17 Sep.
 - **What the promise filter cuts (5 Oct, fix 2, promise v3, `n8n_whatsapp_nopromise.py`; LIVE 5 Oct 15:59 UTC).** Send cuts a promise of a time, a call or a visit, "I'm on it" or "I'll update you". It does not cut:
   - **"Handled", with no time:** "הצוות יטפל בזה", "נטפל בזה", "אל דאגה". The owner's reassurance.
   - **A phrase asked about or negated:** "מתי (בדיוק)? יחזרו אליך", "לא יגיע".

@@ -116,6 +116,14 @@ assert {c["node"] for c in s6["connections"]["Add who"]["main"][0]} == {"Worth a
 assert "$('Add who')" in by6["Answer the resident"]["parameters"]["text"]
 assert reach(s6) == [], "section 6: calls that leave the sandbox: %s" % reach(s6)
 assert new_overlaps(s6, keep_bot) == [], "section 6: new overlapping nodes: %s" % new_overlaps(s6, keep_bot)
+# 29 Oct: the balance recognises the sender; nothing of the typed-only rule is left to argue with it.
+from n8n_sandbox_section6 import BALANCE_TOOL
+bal6 = by6["get_balance"]["parameters"]
+assert bal6["toolDescription"].count(BALANCE_TOOL) == 1, "the balance tool text is not the new one"
+for gone in ("IDENTITY FIRST", "not even when they say it is the same one", "do not use the number they are messaging from"):
+    assert gone not in bal6["toolDescription"], "the balance still forbids the sender's number: " + gone
+assert "NOT the number the message arrived from" not in bal6["jsonBody"] and "Required." not in bal6["jsonBody"]
+assert "full-name-and-phone" not in by6["open_request"]["parameters"]["toolDescription"]
 print("check_n8n_sandbox: section 6 ok")
 
 # --- C: the bot handles it; a manager request leaves the team a note (owner, 27 Oct) ---
