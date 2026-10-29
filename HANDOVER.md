@@ -39,6 +39,7 @@ appended to.
 >     - **Built as F** in `n8n_sandbox_section6.py` (`MONEY_EDITS`, `MONEY_BALANCE`, `MONEY_NOTE`). A disputed charge is answered from get_balance. Only a payment or refund the record misses goes to collections, and nothing is promised.
 >     - WHO_RULE's stale "the balance still needs a full name and phone" is gone too, since it contradicted `BALANCE_TOOL`.
 >     - **The driver** has `fee_dispute` (the 11:14 chat word for word; Gemini's real replies fail its checks) and `paid_already`, both under `--run money`.
+>     - **14:50 UTC, round 55: the team is "we" everywhere in the bot's texts** (`WE_EDITS`, MANAGER_RULE, the staff-only passage, notify_team). The 5-minute Gemini test (`paid_link` + `manager_doubt` in parallel, $0.45) had failed on "הצוות שלנו כבר בודק … כדי שיוכלו" and on a missing topic note. This version has not been tested yet; the same test is the next step, on the owner's go. WORKLOG 29 Oct.
 >     - **In the sandbox since 13:18 UTC, memory round 50: the second F, after the owner's "WE ARE THE TEAM"** (`n8n_sandbox.py --apply --section6 --fresh-memory`; read back from n8n).
 >       - The owner's 12:51 chat on round 49 had handed a claimed link payment to "the team" ("הם יבדקו … ויטפלו בזה … בינתיים?").
 >       - Now the bot confirms the claim, says what the system shows, and asks for a screenshot or confirmation "so we can verify it". The note is a quiet record.

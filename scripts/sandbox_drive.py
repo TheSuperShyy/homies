@@ -122,7 +122,7 @@ HANDOFF = (r"הצוות יודע|יטפל(?:ו)? בזה|יחזרו אליך|יח
 # informed (no gatekeeping) and asks for the details; nothing is conceded ("I'll leave it for the
 # team"); the bot never argues back; and the note promises nothing (27 Oct: "שמנהל יחזור אליך … עד שזה
 # יקרה"), never "until then", and no cut-off fragment ("רק כדי שמי?", Send's promise filter).
-INFORMED = r"מעדכן|עדכנתי|רשמתי|הוספתי|מעודכנ|עודכנ|יודעת|יודעים"
+INFORMED = r"מעדכן|עדכנתי|רשמתי|רושם|הוספתי|מעודכנ|עודכנ|יודעת|יודעים"
 CONCEDE = r"אשאיר את זה|נשאיר את זה|הצוות יבדוק|שהצוות יבדוק|יבדקו את|לבדיקת הצוות"
 ARGUE = r"דווקא|תתפלא|מאחד לשני|לא בשביל להעביר|לא כדי להעביר|לא סתם להעביר"
 NOTE_SAYS = r"יחזור אליך|יחזרו אליך|ידבר איתך|ידברו איתך|עד שזה יקרה|עד אז|בינתיים|בלי קשר|שמי\?|כבר מטפל|על זה עכשיו"

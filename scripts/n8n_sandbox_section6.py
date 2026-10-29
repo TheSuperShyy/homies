@@ -120,8 +120,8 @@ MANAGER_RULE = (
     "שאתה יודע: נושא עוד לא אומר מה הוא צריך, אז אתה שואל מה קורה איתו, או עושה את מה שצריך. "
     "ואם הוא אומר שאתה לא יכול לעזור לו בזה, "
     "אתה לא מוותר, לא משאיר את זה לצוות ולא מתווכח: אתה מקבל את זה בחום ובהבנה, אומר לו שאתה עדיין רוצה לנסות "
-    "לעזור, ושואל בעדינות מה קורה. מה שרק בן אדם בהומי'ז יכול לסיים נשאר אצל הצוות, עם "
-    "הפרטים, ואז אתה אומר לו שהצוות יודע.")
+    "לעזור, ושואל בעדינות מה קורה. מה שרק בן אדם בהומי'ז יכול לסיים אתה רושם אצלנו, עם "
+    "הפרטים, ואז אתה אומר לו שזה אצלנו.")
 SOLVE_EDITS = [
     ("חוזה, הצעת מחיר, ענייני ועד הבית, וכל דבר אחר שאתה לא יכול לגמור בעצמך",
      "חוזה, הצעת מחיר, עניין עם חברי ועד הבית עצמם, וכל דבר אחר שאתה לא יכול לגמור בעצמך"),
@@ -135,8 +135,8 @@ SOLVE_EDITS = [
     # After a matter only a person can finish: what the team will need to sort it out faster, not "anything
     # else" (27 Oct, the owner's "my card has been charged twice!").
     ("אתה רושם לצוות המתאים עם הכלי שיש לך לזה, ואז אומר לדייר, במילים שלך, שהצוות יודע.",
-     "אתה רושם לצוות המתאים עם הכלי שיש לך לזה, ואז אומר לדייר, במילים שלך, שהצוות יודע, ושואל אותו את מה "
-     "שיעזור להם לסדר את זה מהר יותר, מתי, כמה או מה בדיוק, שאלה אחת בכל פעם, ולא אם יש עוד משהו."),
+     "אתה רושם לצוות המתאים עם הכלי שיש לך לזה, ואז אומר לדייר, במילים שלך, שזה אצלנו, ושואל אותו את מה "
+     "שיעזור לנו לסדר את זה מהר יותר, מתי, כמה או מה בדיוק, שאלה אחת בכל פעם, ולא אם יש עוד משהו."),
     # "Are you a manager?" is a who-are-you question, not "are you a bot?" (twice, 27 Oct: "אני העוזר הדיגיטלי…").
     ("מי ששואל מי אתה שומע שאתה מיכאל מצוות השירות של הומי'ז.",
      "מי ששואל מי אתה, או אם אתה מנהל, שומע שאתה מיכאל מצוות השירות של הומי'ז."),
@@ -166,6 +166,13 @@ CLAIM_EDITS = [
 # can correct or refund" was voiced as the team fixing it. So the claim is the bot's like the rest of
 # money: it confirms what the tenant says, says what the system shows, and asks for a screenshot or the
 # confirmation "so we can verify it"; the note is a quiet record, and the question is the last thing said.
+# 29 Oct, the owner's 14:24 chat and the 14:42 Gemini run: the money check landed, but the manager parts still
+# spoke of the team as someone else ("יעזרו להם להבין … ככה הם יוכלו", "עדכנתי את הצוות … אז הם יודעים",
+# "הצוות שלנו כבר בודק את זה … כדי שיוכלו"). Four sentences told it to: MANAGER_RULE's "ואז אתה אומר לו
+# שהצוות יודע", the staff-only passage's "שהצוות יודע … מה שיעזור להם", and notify_team's "that you have let
+# the team know" and "the details the team will need". They now say it is with us, and what will help us
+# (the owner: "WE ARE THE TEAM"). And after F the model skipped the manager topic's note when the topic was a
+# fee it handles itself, so MANAGER_TOOL says to note it then too.
 MONEY_EDITS = [
     ("- **מה שנרשם לצוות, ולא נגמר בצ'אט:** השגות על חיוב ומסמכים,",
      "- **מה שנרשם לצוות, ולא נגמר בצ'אט:** מסמכים,"),
@@ -177,6 +184,19 @@ MONEY_EDITS = [
      "הומי'ז: אתה מוודא איתו כמה, מתי ואיך שילם, אומר לו מה המערכת מראה על התשלום הזה, בלי להבטיח החזר או "
      "תיקון, ומבקש ממנו צילום מסך או אישור על התשלום, כדי שנוכל לאמת אותו.\n"
      "- **אב הבית:**"),
+]
+# The passage after the manager rule told the bot to reassure with "the team knows, and it will be handled
+# properly" and listed "maybe they will get back to the tenant": the owner's "where is the manager?" (14:32)
+# got "מתי מההנהלה יחזרו אליך … העניין נמצא אצלם ויטופל". It now reassures with what is true now, and the
+# honesty list's "שהצוות יודע" is what the note made: it is with us.
+WE_EDITS = [
+    ("מה שקורה אחרי שהצוות יודע אתה לא יודע: אולי יחזרו לדייר, אולי יטפלו בלי לחזור אליו, ואתה לא מנחש ולא מבטיח.",
+     "מה שקורה אחרי שזה אצלנו אתה לא יודע, ולכן אתה לא מנחש ולא מבטיח."),
+    ("ומי ששואל מתי יטפלו בזה או מתי יגיעו מקבל תשובה ישרה",
+     "ומי ששואל מתי יטפלו בזה, מתי יגיעו או איפה המנהל, מקבל תשובה ישרה"),
+    ("ומרגיע אותו שהקריאה נפתחה, או שהצוות יודע, ושזה יטופל כמו שצריך, במילים שלך",
+     "ומרגיע אותו במה שנכון עכשיו, שהקריאה נפתחה או שזה אצלנו, במילים שלך"),
+    ("מה מצב הקריאה, כמו שהכלי אמר; שהצוות יודע.", "מה מצב הקריאה, כמו שהכלי אמר; שזה אצלנו."),
 ]
 MONEY_BALANCE = [
     ("Call when the resident asks about their balance, their debt, or how much they owe.",
@@ -204,7 +224,8 @@ MANAGER_TOOL = (
     "A request for a manager or a person is fair: never gatekeep it and never make it conditional. Call "
     "this right away (reason caller_request, with whatever they have said), and tell them in one sentence "
     "that management is being informed: only that, since what follows you do not know. The moment they say "
-    "what it is about, call this once more, with what they said, under its "
+    "what it is about, call this once more, with what they said, even when it is something you handle "
+    "yourself (a balance, the committee fee), under its "
     "own reason (payment, billing, other and so on), never caller_request again: the same reason twice in "
     "a conversation is dropped as a duplicate, and management would never see it. Warm, calm and on their "
     "side throughout.")
@@ -213,11 +234,11 @@ NOTE_EDITS = [
      "the committee members' own business (not the monthly committee fee, which is yours), or anything else"),
     ("What the resident hears from you afterwards: that you have let the team know, in your own words, and "
      "what you can still do for them now.",
-     "What the resident hears from you afterwards: that you have let the team know, in your own words, and "
+     "What the resident hears from you afterwards: that it is now with us, in your own words, and "
      "then, in the same message, the matter itself while it is still yours. After a manager request, and after "
      "the note that adds its matter, it is: ask what is going on with it, or do it, as the one handling it. "
      "After a matter past you: the details "
-     "the team will need to sort it out faster (when, how much, what exactly), one question at a time; only "
+     "we will need to sort it out faster (when, how much, what exactly), one question at a time; only "
      "when nothing is left to ask, what else you can do now."),
     ("A different matter later in the same conversation is.",
      "A different matter later in the same conversation is, and so is the matter of a manager request, "
@@ -361,7 +382,7 @@ def section6(bot, supabase_cred):
     for old, new in PROMPT_CUTS:
         sm = replace_once(sm, old, new)
     sm = replace_span(sm, MANAGER_FROM, MANAGER_TO, MANAGER_RULE)
-    for old, new in SOLVE_EDITS + CLAIM_EDITS + MONEY_EDITS:
+    for old, new in SOLVE_EDITS + CLAIM_EDITS + MONEY_EDITS + WE_EDITS:
         sm = replace_once(sm, old, new)
     assert sm.count(REP_TAP_START) == 1
     start = sm.index(REP_TAP_START)

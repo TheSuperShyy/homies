@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### The 5-minute Gemini test of the mainline, and the team spoken of as "we" (14:36-14:51 UTC; $0.45)
+- **Asked:** *"ok run a quick dry run if all scenarios are good the mainline of feedback on yariv one then lets put it on dev"*, then *"make it faster make it 5 minutes test max"*.
+- **The owner's own chat first** (conversation 111, 14:24-14:32 UTC, round 51, the new key):
+  - The money check landed: "כרגע אני עדיין לא רואה את התשלום של ה-1,000 שקלים מאתמול ברשומות שלנו … צילום מסך או אישור של התשלום כדי שנוכל לאמת".
+  - The manager parts still spoke of the team as someone else: "יעזרו להם להבין … ככה הם יוכלו", "עדכנתי את הצוות … אז הם יודעים", and for "where is the manager?" "מתי מההנהלה יחזרו אליך … העניין נמצא אצלם ויטופל. בינתיים … יעזור להם".
+- **`--run all --fresh` was started and then stopped** (about 25 minutes was too long). Nothing was read from it, and the memory rounds it took were 52-54.
+- **The 5-minute test instead:** one fresh push, then `paid_link` (Ido) and `manager_doubt` (Yariv) as two processes in parallel. It took 14:41:45-14:46:08 and cost $0.45 together.
+  - **paid_link FAIL:**
+    - The record, the when-and-how, and the proof asked "כדי שנוכל לאמת" all came.
+    - The last reply said "הצוות שלנו כבר בודק את זה, וכדי שיוכלו לאתר את התשלום".
+    - Line 3 ended on a statement and did not restate the record.
+    - Line 1's "אני רושם עכשיו למנהל" was missed by `INFORMED`, a gap in the check, now widened with רושם.
+  - **manager_doubt FAIL, on one thing:** the topic, the monthly fee, was not added to the note (reasons: caller_request only). The replies were right: the record, a link offered, and willingness on "you can't help".
+- **Cause, in the texts:** the team as a third party, in five places.
+  - MANAGER_RULE's "ואז אתה אומר לו שהצוות יודע".
+  - The staff-only passage's "שהצוות יודע … מה שיעזור להם".
+  - notify_team's "that you have let the team know" and "the details the team will need".
+  - The live passage after the manager rule. It reassured with "שהצוות יודע, ושזה יטופל כמו שצריך" and listed "אולי יחזרו לדייר", the source of the "where is the manager?" reply.
+  - The honesty list's "שהצוות יודע".
+  - And after F, the model skipped the manager topic's note when the topic was a fee it handles itself.
+- **Changed:**
+  - All five now say it is with us ("שזה אצלנו") and what will help us.
+  - The reassurance is what is true now: the ticket was opened, or it is with us. "where is the manager" joins the questions answered that way (`WE_EDITS`).
+  - MANAGER_TOOL notes a known topic "even when it is something you handle yourself".
+  - The prompt is 23,568 characters, with none of "שהצוות יודע", "שזה יטופל" or "אולי יחזרו" left. `check_n8n_sandbox.py` is ok.
+  - Not Claude-checked first, for the owner's speed.
+- **Pushed, 14:50 UTC,** round 55, on the 3f9 key. Read back: "it is now with us" and the topic note are in.
+- **"dev":** the bot has no dev stage, only the sandbox (where all of this is) and live. Going live waits for the owner's explicit "live" and `check_whatsapp_rules.py`.
+- **Next:** the same 5-minute test, about $0.45, on the owner's go.
+
 ### The bot moved to another OpenRouter key and is answering again (14:17 UTC)
 - **Asked:** *"we have multiple api key in our env just pick one"*, after *"so why cant we test the bot"*. The owner had topped up the main account by $20, but the bot's key ending 0d6 was still at its $15 cap.
 - **The three keys in `.env` and its copies,** read with `/key` and `/credits`, keys never printed:
