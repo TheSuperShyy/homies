@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 20: the email to Omni support about the 404 (11:41 UTC; nothing sent by us)
+- **Asked:** *"so auto using api does not work only manually?"*. **Answered:** for now, yes in practice. A number put into Tokomni by hand rang Ido on 26 Oct (`01a17807`, the debt agent end to end). The API's one try, the owner's press today, was refused. That is not a verdict on the API: our request follows Omni's document, and the likely cause is the token on their side.
+- **Then asked:** *"ok write an email for tokomni/omnitelecom suppport"*.
+- **Written:** `local/omnitelecom/2026-10-29-api-404-email.txt` (ignored by git), in Hebrew with an English check copy, signed as Clix Solution for הומי'ז. It contains the request exactly as sent, with the token left out, and the 404 answer. It asks for:
+  - their log's reason;
+  - that the token is active for inserts and List 2's id belongs to it;
+  - any limit on `external_id` (ours is 52 characters) or the number's form (05… or 9725…);
+  - a request that works on their side.
+
+  It also says our one probe with a campaign that does not exist can be ignored.
+- The owner sends it. Nothing was sent to Omni from here.
+
 ### Feature 19: the balance recognises the sender, and takes a name in English letters (sandbox; 10:15-10:35 UTC; no AI spend)
 - **Asked:** *"go"*, to the recommendation after *"i thought we have auto recognition"*.
 - **The function** (`debt-tools-sandbox` v5, deployed 10:29:27 UTC by `sandbox_function.py --apply`): app.ts is the live `index.ts` plus three `APP_EDITS`, each anchor exactly once.
