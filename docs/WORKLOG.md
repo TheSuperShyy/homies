@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Is all of Yariv's chatbot feedback working now? No: the older points are live, the 26 Oct document is sandbox only (12:10 UTC; read only)
+- **Asked:** *"ok so rn all the feedback from yariv in the chatbot is working?"*
+- **Live, checked 26 Oct** (`docs/assistant/transcripts/2026-10-26-yariv/summary.md`, 122 of 122 checks):
+  - the payment link;
+  - name and phone before a balance;
+  - not a Homies building;
+  - help before handing over;
+  - no safety advice, and an urgent ticket in an emergency;
+  - no ticket for a fault inside the flat;
+  - nothing about others;
+  - gender, the name הומי'ז, no invented answers, an honest "person or bot".
+  - Partly: the standing order (no link exists, so the team is noted).
+- **Nothing on the chatbot has gone live since 26 Oct.** The live bot's last run is 26 Oct 12:46 UTC, with no errors, and nobody has written to it since.
+- **Yariv's 26 Oct document (section 6) is in the sandbox only:**
+  - no representative button, with the bot handling the matter itself;
+  - recognising the sender, and since 10:35 today also for a balance and a name in English letters;
+  - plus D (one reply per burst) and E (no claim that the team acts).
+  - Not solid yet: this morning's paid run passed 1 of 2, and the owner's own chat at 11:14 slid a fee dispute back to the team.
+- **Open on live from the 26 Oct test:**
+  - the cold emergency line "זה הדבר היחיד שאני יכול לעשות מכאן" (still in `n8n_whatsapp_danger.py`);
+  - the link running into the next sentence;
+  - Send's promise filter cutting an honest sentence;
+  - one extra re-ask for an unknown street.
+- **Right now:** the bot's OpenRouter key has $0.58 left under its $15 cap, against $1.25 at 08:13. The wallet has $2.94. HANDOVER's alert is updated.
+
 ### Feature 19: the owner's own sandbox chat as Ido slid back into a hand-off (11:14-11:37 UTC; read only, no AI spend)
 - **Asked:** a screenshot of the chat page (conversation 107, translated to English in the browser) and *"is this intended"*. **Answered: the first reply yes, the rest no.**
 - **Read:** executions 137869, 137900, 137924 and 137931, and conversation 107 with its notes.

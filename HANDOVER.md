@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **OpenRouter is draining (29 Oct, 08:13 UTC): $6.76 in the wallet, falling with another key's spending. The bot's key has $1.25 left under its $15 cap** (`python scripts/check_openrouter.py`).
+> **OpenRouter is draining (29 Oct, 12:10 UTC): $2.94 in the wallet ($265 bought), and the bot's key has only $0.58 left under its $15 cap** (`python scripts/check_openrouter.py`). A big turn reserves about $0.13, so the key fails within a few tenant messages. It was $1.25 at 08:13. The live bot has not run since 26 Oct 12:46 UTC, so the $0.67 since then went on the sandbox (runs and the owner's own chats).
 > - **The top-up of about $20 on 28 Oct is mostly gone:** $20.38 at 14:19 UTC, $6.76 at 08:13 the next morning. The bot's key spent only the owner's $0.31 test of it, and n8n runs nothing else that calls the model.
 > - **Neither key can be named or capped from here:** only the bot's key is in `.env`, and there is no management key.
 > - **What breaks:** the live WhatsApp bot answers tenants with the "technical problem" line when either the wallet or its key's cap runs out. The owner has to stop or cap the other key, and raise this key's cap.
