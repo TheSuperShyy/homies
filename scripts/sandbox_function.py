@@ -48,13 +48,9 @@ RECOGNISE = '''    if (channel(ctx) === "whatsapp") {
     }
     if (!resident && channel(ctx) === "whatsapp") {
       const given = String(args?.name ?? "").trim();'''
-APP_EDITS = [
-    ('import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";',
-     'import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";\n'
-     'import { sameNameAnyScript } from "./names.ts";'),
-    ('    if (channel(ctx) === "whatsapp") {\n      const given = String(args?.name ?? "").trim();', RECOGNISE),
-    ("if (!data || !sameName(data.full_name, given)) {", "if (!data || !sameNameAnyScript(data.full_name, given)) {"),
-]
+# 29 Oct, later: the three edits went live with section 6 (debt-tools/index.ts and names.ts), so the
+# sandbox's app.ts is the live index.ts as it is.
+APP_EDITS = []
 
 
 def app_source():
@@ -73,7 +69,7 @@ def files():
     return [("index.ts", read(SBX, "index.ts")),
             ("guard_install.ts", read(SBX, "guard_install.ts")),
             ("guard.ts", read(SBX, "guard.ts")),
-            ("names.ts", read(SBX, "names.ts")),
+            ("names.ts", read(LIVE, "names.ts")),
             ("app.ts", app_source()),
             ("identity.ts", read(LIVE, "identity.ts")),
             ("route.ts", read(LIVE, "route.ts"))]

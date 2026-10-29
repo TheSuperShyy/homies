@@ -52,6 +52,7 @@ import {
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
 import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
+import { sameNameAnyScript } from "./names.ts";
 
 const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -2727,6 +2728,22 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     let askedUnit: string | null = null;
 
     if (channel(ctx) === "whatsapp") {
+      // 29 Oct (the owner: "i thought we have auto recognition", then "go"; live with section 6):
+      // the number the message came from, on file for one resident, is that
+      // resident, as for the payment link and a ticket. A typed number is read only when it is
+      // another one.
+      const sender = reporterPhone(ctx);
+      const typed = typedPhoneOf(args?.phone);
+      if (sender && (!typed || typed === sender)) {
+        const { data: own } = await db.from("residents").select(fields)
+          .eq("phone", sender).maybeSingle();
+        if (own) {
+          resident = own;
+          askedUnit = unitOf(args?.unit);
+        }
+      }
+    }
+    if (!resident && channel(ctx) === "whatsapp") {
       const given = String(args?.name ?? "").trim();
       const phone = typedPhoneOf(args?.phone);
       if (!given || !phone) {
@@ -2741,7 +2758,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         .eq("phone", phone).maybeSingle();
       // One flag for both halves. See the note above: a per-half answer is an
       // oracle, and an oracle plus a list of surnames is a search.
-      if (!data || !sameName(data.full_name, given)) {
+      if (!data || !sameNameAnyScript(data.full_name, given)) {
         return { ok: true, found: 0, identity_failed: true };
       }
       resident = data;

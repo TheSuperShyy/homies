@@ -1,4 +1,4 @@
-// The balance's name check, taking a name typed in English letters (sandbox, 29 Oct).
+// The balance's name check, taking a name typed in English letters (29 Oct; built in the sandbox, live with section 6).
 //
 // The owner's own chat as Ido: "ido clix" was typed, the record reads עידו קליקס,
 // and get_balance's sameName() compares whole words, so the number given, Ido's

@@ -2,7 +2,7 @@
 //   node --test scripts/check_names.test.ts
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { hebrewSkeletons, latinSkeleton, sameNameAnyScript } from "../supabase/functions/debt-tools-sandbox/names.ts";
+import { hebrewSkeletons, latinSkeleton, sameNameAnyScript } from "../supabase/functions/debt-tools/names.ts";
 
 test("the owner's chat: 'ido clix' is עידו קליקס", () => {
   assert.equal(sameNameAnyScript("עידו קליקס", "ido clix"), true);

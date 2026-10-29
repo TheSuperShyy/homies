@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Going live with the new chatbot, step 1: the Hebrew checked, the balance recognition in the live function (from 15:10 UTC)
+- **Asked:** *"ok so right now i think we can replace the old chatbot with the new version since i tested it out and it sounds good but im not sure with the spelling make sure the hebrew of them are good specially the homies spelling"*.
+- **The name:** every text of the live bot and of the new version spells it הומי'ז with the plain apostrophe (U+0027). There is no הומיז or הומיס anywhere. Latin "Homies" is only in node names, descriptions and URLs.
+- **The 13 new or changed Hebrew passages** (`scratchpad/new_hebrew.txt`) were read: no spelling or grammar mistakes. ועד/הוועד follows the Academy's rule (no doubled ו at the start of a word, doubled inside one). A blind Claude proofread is running.
+- **Seen in the owner's 14:54 chat (conversation 116, round 55):** the ticket flow still says "העברתי לצוות שיבדוק" and "העניין מול העיניים של הצוות ויטופל … בינתיים?". No text instructs it any more, so it is Gemini's habit. Live has the same and worse, so it is open, not a blocker.
+- **Step 1, LIVE: debt-tools v134.**
+  - The sandbox's three balance edits are in `debt-tools/index.ts`: the WhatsApp sender's number on file is the resident, and a Latin name is matched by its consonants.
+  - `names.ts` moved beside it. `sandbox_function.py`'s APP_EDITS are now empty, and `check_names.test.ts` reads the live file. `supabase_functions.py` uploads names.ts.
+  - Tests: names 6/6, route 7/7, identity 18/18, dialer 7/7, guard 7/7. Both files transpile clean.
+  - Deployed with `--oxs-mirror`; the OXS mirror is still ON. The secret push carries the 3f9 OpenRouter key, so the payment-link line works again.
+  - Read-only probe on live: Ido's number with nothing typed → found, ₪2,000; a number not on file → need_identity; "ido clix" with Ido's number from another phone → found; a wrong name → identity_failed.
+  - The current live bot is unaffected: it still sends a typed name and phone, and those still work.
+
 ### The 5-minute Gemini test of the mainline, and the team spoken of as "we" (14:36-14:51 UTC; $0.45)
 - **Asked:** *"ok run a quick dry run if all scenarios are good the mainline of feedback on yariv one then lets put it on dev"*, then *"make it faster make it 5 minutes test max"*.
 - **The owner's own chat first** (conversation 111, 14:24-14:32 UTC, round 51, the new key):
