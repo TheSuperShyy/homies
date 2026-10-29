@@ -8,6 +8,7 @@ answers on, under check_openrouter.py's LOW line.
     python scripts/sandbox_drive.py --run quick  # 4 scenarios, $0.42 on 28 Oct: the usual check after a change
     python scripts/sandbox_drive.py --run all    # 10, $1.13, before a live promotion; or --run ido_lift,gas
     ... --run all --fresh                        # each scenario on a clean memory (a push per persona reuse)
+    ... --keep 0                                 # the live bot's $2 line dropped for this one run, owner's word only
 
 Each scenario opens a new conversation in the sandbox inbox as one persona and
 checks the bot's words (regexes) and, where it matters, the labels the sandbox
@@ -222,15 +223,16 @@ def spend():
     return float(json.loads(urllib.request.urlopen(req, timeout=30).read())["data"].get("usage") or 0)
 
 
-def headroom():
-    """What a run may spend and still leave the live bot above check_openrouter's LOW line. The live
-    bot answers tenants on this same key (28 Oct: a day of runs left the wallet at $1.57)."""
+def headroom(keep=LOW):
+    """What a run may spend and still leave the live bot `keep` dollars: check_openrouter's LOW line
+    unless --keep says otherwise. The live bot answers tenants on this same key (28 Oct: a day of runs
+    left the wallet at $1.57)."""
     key = E["OPENROUTER_API_KEY"]
     c, k = openrouter(key, "/credits"), openrouter(key, "/auth/key")
     left = float(c.get("total_credits") or 0) - float(c.get("total_usage") or 0)
     if k.get("limit") is not None:
         left = min(left, float(k.get("limit_remaining") or 0))
-    return left - LOW
+    return left - keep
 
 
 def run(name, log):
@@ -284,10 +286,13 @@ if __name__ == "__main__":
     arg = sys.argv[sys.argv.index("--run") + 1]
     names = ([n for n in SCENARIOS if not n.startswith("leak_")] if arg == "all"
              else SETS[arg] if arg in SETS else arg.split(","))
-    room, need = headroom(), 0.15 * len(names)  # 28 Oct: ten scenarios cost $1.02-1.13
+    # --keep D lowers the live bot's line for one run, on the owner's word only (29 Oct: "can we
+    # remove the 2usd limit"). The key's own cap in OpenRouter still bounds what a run can spend.
+    keep = float(sys.argv[sys.argv.index("--keep") + 1]) if "--keep" in sys.argv else LOW
+    room, need = headroom(keep), 0.15 * len(names)  # 28 Oct: ten scenarios cost $1.02-1.13
     if room < need:
-        sys.exit("OpenRouter has $%.2f above the live bot's $%.0f line, and this run may cost $%.2f. "
-                 "Top up first (python scripts/check_openrouter.py)." % (room, LOW, need))
+        sys.exit("OpenRouter has $%.2f above the live bot's $%.2f line, and this run may cost $%.2f. "
+                 "Top up first (python scripts/check_openrouter.py)." % (room, keep, need))
     print("%d scenarios, up to about $%.2f ($%.2f is left above the live bot's line)" % (len(names), need, room))
     start = spend()
     log = ["# Sandbox acceptance run, %s UTC\n" % datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")]

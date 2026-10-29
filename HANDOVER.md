@@ -8,14 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **OpenRouter is draining (29 Oct, 07:49 UTC): $8.12 in the wallet and falling $0.15-0.28 a minute, all of it another key's. The bot's key still has only $1.56 under its $15 cap** (`python scripts/check_openrouter.py`).
-> - **The top-up of about $20 on 28 Oct is mostly gone:** $20.38 at 14:19 UTC, $8.12 at 07:49 the next morning. The bot's key spent none of it, and n8n runs nothing that calls the model.
+> **OpenRouter is draining (29 Oct, 08:13 UTC): $6.76 in the wallet, falling with another key's spending. The bot's key has $1.25 left under its $15 cap** (`python scripts/check_openrouter.py`).
+> - **The top-up of about $20 on 28 Oct is mostly gone:** $20.38 at 14:19 UTC, $6.76 at 08:13 the next morning. The bot's key spent only the owner's $0.31 test of it, and n8n runs nothing else that calls the model.
 > - **Neither key can be named or capped from here:** only the bot's key is in `.env`, and there is no management key.
 > - **What breaks:** the live WhatsApp bot answers tenants with the "technical problem" line when either the wallet or its key's cap runs out. The owner has to stop or cap the other key, and raise this key's cap.
-> - **A watcher is armed for the owner's one capped test** (29 Oct, *"test it but make sure we dont overbudget ... 1$"*): `test_when_room.py` in this session's scratchpad, until about 11:50 UTC.
->   - It runs `sandbox_drive.py --run manager_retest,manager_fee --fresh` once (about $0.39), as soon as the wallet and the cap both have $2.30.
->   - It kills the run at $0.85 spent, or if the wallet falls under $1.50.
->   - **Start no second run while it waits.**
+> - **The owner's one capped test ran 29 Oct, 08:05-08:12 UTC** (`manager_retest` + `manager_fee`, $0.31 against the owner's $1; WORKLOG 29 Oct). manager_retest passed and manager_fee failed one reply.
+>   - It ran with `--keep 0`, the live bot's $2 line dropped for that one run on the owner's word (*"can we remove the 2usd limit"*). `--keep` is a new flag in `sandbox_drive.py`, and the default is still $2.
+>   - The watcher that waited for room was stopped first, so nothing else is queued. **No further paid run without a new go.**
 
 ---
 

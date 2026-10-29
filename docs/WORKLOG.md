@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 19: the owner's one capped test on Gemini: 1/2 by the checks, $0.31 (08:05-08:13 UTC; sandbox only)
+- **Asked:** *"wait can we remove the 2usd limit and be part of the 7.76"*, after *"ok go"*. The key's cap had not been raised: $1.56 left.
+- **Answered:** the $2 line is ours and can go. The $7.76 is not reachable, because the key can spend only what is left under its own $15 cap.
+- **Done:**
+  - Stopped the 07:50 watcher (`test_when_room.py`) and checked that nothing else was running.
+  - Added `--keep D` to `sandbox_drive.py`: the live bot's line for one run, $2 by default. `--keep 99` was checked to refuse before anything was sent.
+  - Ran `--run manager_retest,manager_fee --fresh --keep 0` under a kill switch at $0.85 (`run_capped.py`, scratchpad). Memory rounds 45 and 46.
+- **Result: manager_retest PASS, manager_fee FAIL by one reply.** Transcript `local/sandbox/runs/2026-10-29-0811.md`.
+  - **All 8 replies are warm.** Management is told on the first request ("עדכנתי את ההנהלה שביקשת לדבר עם מנהל"). The reason for asking is ours ("כדי שנוכל לעזור לך כמה שיותר מהר"). The insisting turn reassures and asks again, and "you can't help" gets "אני עדיין ממש רוצה לנסות לעזור לך עם זה מכאן. אולי תשתף אותי בכל זאת מה קורה?".
+  - **None of the rejected phrases came back:** no "בינתיים", no "already handling it", no conceding, no handing the fee back.
+  - **The one miss:** manager_fee's topic turn ended on a statement, "…מה בעצם קורה עם דמי ועד הבית? אתה יכול לספר לי, אני ממש כאן כדי לעזור בזה.", which is flagged by `ENDS_Q` and by `STIFF` ("ממש כאן"). A one-off slip, so not re-run.
+  - **Smaller:**
+    - manager_retest said "תשלומים לוועד הבית זה משהו שאני עוזר בו הרבה", a mild capability line the checks let through.
+    - Both topic notes went under `other`, not `payment`. manager_retest's note was labelled for the service team, manager_fee's for collections.
+- **Spend:** $0.31, read a minute after the run. The bot key's cap now has $1.25 left, and the wallet is at $6.76 (another key spent about $0.41 during the run).
+- **Production:** untouched. These replies are in the sandbox only, and going live is the owner's go, through the gate.
+
 ### The dashboard's call log: does it show what happened in a call? Yes, for every answered call (08:10 UTC; read only)
 - **Asked:** *"is a call logger implemented in the dashboard so we can know what happened in the call"*.
 - **Built since 8 Aug:** Vapi's end-of-call report goes to `debt-tools`, which fills `interactions`. The dashboard's "שיחות טלפון" page lists the calls (when, direction, number, summary, outcome) and searches transcripts and summaries. A call's own page has the transcript turn by turn, the summary and the outcome. Recording has been off since 25 Aug, so there is no audio.
