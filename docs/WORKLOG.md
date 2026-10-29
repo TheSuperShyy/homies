@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Feature 20: is the dashboard's dialer working? Set up, not yet proven (07:54 UTC; read only)
+- **Asked:** *"is the auto dialer in the dashboard working that is connected in the tokomni"*.
+- **Set up right:**
+  - The production alias `homies-dashboard.vercel.app` is on `dpl_hnfcMnUHm4VasRVmyhARgD9FZRGh` (READY, `c97eca3`, built 12:33 UTC on 28 Oct, after the pair).
+  - Vercel holds `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID`, both set at 11:44 UTC on 28 Oct.
+  - `/dialer` answers 307 to the login.
+- **Not proven:** no call has reached Yariv's Vapi since 28 Oct 12:30 UTC (the same list shows the morning's calls, so the read works). Nobody has pressed Ring and been answered. Tokomni has no status API, so this cannot be checked any other way short of a press.
+- **Nothing was sent to Omni.** The proof is the owner's press: List 2 playing, then "חייג לעידו" in calling hours (Sun-Thu 09:00-20:00 Israel time, which is 15:00-02:00 in the Philippines).
+
 ### Feature 19: the owner's one capped test, armed to start by itself; OpenRouter drained by another key (07:45-07:50 UTC; nothing spent)
 - **Asked:** *"have you tested the chatbot? whats the result in points"*.
   - **Answered:** no new test since 28 Oct, with the 28 Oct results in points: 8/10 first run, five faults fixed one at a time, 7/10 by the stricter checks after the fixes, and the warm rewrite passing two free Claude-played chats. The Gemini check of it is still owed.

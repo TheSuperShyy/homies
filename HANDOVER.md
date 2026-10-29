@@ -689,6 +689,7 @@ its stated time.
     - `TOKOMNI_TOKEN` (Sensitive, Production and Preview) and `TOKOMNI_CAMPAIGN_ID` (all three) were set at 11:44 UTC on the owner's "set them", and read back.
     - Production was redeployed at 12:33 UTC on the owner's "try again": `dpl_hnfcMnUHm4VasRVmyhARgD9FZRGh`, the same `c97eca3`, READY, with the production alias on it. The first try had been refused by the permission check as a production deploy.
     - **Not yet seen by a person:** the page without its "Tokomni is not connected" notice. Nobody has pressed Ring.
+    - **Checked 29 Oct, 07:54 UTC (owner: "is the auto dialer in the dashboard working"), read only:** the production alias is on `dpl_hnfcMnUHm4…` (READY, built after the pair), and Vercel holds both values. No call has reached Vapi since 28 Oct 12:30 UTC, so no press has gone through yet. It is set up, not proven.
     - **Any later change to the pair** needs a redeploy before the page sees it: `POST /v13/deployments?teamId=…&forceNew=1` with `{"name":"homies-dashboard","deploymentId":"<current production dpl>","target":"production"}`. Never trigger it with an empty push to `main`.
   - **Then:** List 2 playing, Ido ready, in calling hours, press "חייג לעידו". Expect the debt agent with ₪2,000 (he is on call 2 of 4).
   - **Unknown until the second press for one number:** whether Tokomni dedupes by number. The external_id carries the press time, so a dedupe by id cannot block it.
