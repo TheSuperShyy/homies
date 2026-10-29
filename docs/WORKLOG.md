@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### Where the bot's committee-fee coverage comes from (the owner's question; read only)
+- **Asked:** *"where did we get the information about the specs coverage of the monthly committee fee"*.
+- **Answer:** the client's own written answers of 18 Aug 2026. They are 12 answers in Hebrew to the 13 questions we sent: #6 "מה כלול בתשלום ועד הבית" and #7 "מה לא כלול", kept verbatim in `docs/reference/homies-faq.txt`.
+  - They went into the bot's prompt the same day (`faaef6f`), after the debt voice agent had invented "cleaning, lighting and general maintenance": lighting is not on Homies' list, and the electricity bill is.
+  - The live prompt's "כלול בתשלום ועד הבית" line is that answer, lightly reworded ("טיפול במערכת המשאבות" → "טיפול במשאבות").
+- **Not the website:** the scrape of 16 Sep (`docs/knowledge/site/`) describes services in marketing terms and has no list of what the fee covers.
+- **Who sent it is not recorded:** the file says "the client". Its two open checks (the emergency number is the office's; the response times may be quoted) are addressed to Yariv.
+- CONTEXT's "a fact about Homies" paragraph now says where the facts came from, and that until the fold a fact changes the way `n8n_whatsapp_ionly.py` shipped, since `n8n_whatsapp.py --apply` refuses. HANDOVER's "owed handset test" now waits on the number's re-register (the entry below).
+
 ### Meta unregistered the WhatsApp test number again, under 2.5 hours after the register (seen 18:26 UTC; read only)
 - **Said:** *"the meta has been disconnected again"*.
 - **Meta's `GET /{phone-number-id}`:**

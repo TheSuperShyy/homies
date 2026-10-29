@@ -23,7 +23,7 @@ appended to.
 > - **Now:** he speaks for himself: what he checks, sees in our system, opened or recorded, and needs so he can verify. No team, manager or management in a reply, and nothing "passed on". A note is a quiet record; a request only a person can finish is "I recorded it", then what it lacks. An upset tenant gets "sorry to hear it", then what he is doing. A manager request is still recorded at once, quietly.
 > - **`clerk` narrowed:** "כדי שאוכל לאמת / לבדוק" passes, so "send a screenshot so I can verify it in our system" goes out. `--watch` flags "someone other than Michael".
 > - **Rollback:** `python scripts/n8n_whatsapp_ionly.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-ionly.json`) + git revert.
-> - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T17:45`, and again the next morning.
+> - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T17:45`, and again the next morning. **The handset test waits on the number:** Meta unregistered it again by 18:26 UTC (the block above), so nothing reaches the bot until it is re-registered on the owner's go.
 > - **Found, not fixed (a separate cause):** a second notify_team call under the SAME reason, made to add details, is dropped by "Hand to a person" as a duplicate within 24 h. Then "הוספתי לבקשה …" is untrue. Seen in 2 of 6 blind conversations.
 > - **The fold** (TOOLS and the builder in `n8n_whatsapp.py`) must now take section 6 AND `ionly()`, with `n8n_whatsapp_retry.CLERK_RE`'s new pattern. The sandbox copy still has the 29 Oct texts. `n8n_whatsapp_firstword.py` would rewire "Still the last word?" (pre-existing since section 6), so never apply it.
 >

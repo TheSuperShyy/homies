@@ -4808,11 +4808,17 @@ Workflows must be readable — no overlapping nodes, real names, sticky notes,
 enforced by `scripts/n8n_layout.py`.
 
 **A fact about Homies now lives in three files and deploys twice.**
-`docs/reference/homies-faq.txt` is the source and **nothing reads it**; the
-answers are written into the chatbot prompt (`מידע על הומיז`) and the debt
+`docs/reference/homies-faq.txt` is the source and **nothing reads it**. It is
+the client's own written answers of 18 Aug 2026 (12 answers to our 13
+questions); what the committee fee includes and excludes is answers 6 and 7.
+The website has no such list. The answers are written into the chatbot prompt
+(`מידע על הומיז`) and the debt
 prompt (`WHAT YOU ACTUALLY KNOW ABOUT HOMIES`). Changing one changes nothing a
 resident hears. Edit all three, then `n8n_whatsapp.py --apply` **and** the
-prompt-only PATCH plus `vapi_en.py debt --update`. This is worse than it was and
+prompt-only PATCH plus `vapi_en.py debt --update`. **Until the fold (since 29
+Oct), `n8n_whatsapp.py --apply` refuses**: a chatbot fact changes the way
+`n8n_whatsapp_ionly.py` shipped, as an exact-anchor edit of the live prompt
+through `check_whatsapp_rules.py`, with prompt.md and the epoch moved with it. This is worse than it was and
 is known: the alternative was a retrieval hop in front of every answer, and the
 failure being fixed was a bot inventing what the fee covers — which never
 triggers a lookup, because it does not know it does not know.
