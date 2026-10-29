@@ -107,7 +107,13 @@ PINS = {
     # the old chatbot with the new version". The five texts below are section6()'s, tested in the sandbox
     # that day (three blind Claude rounds, two Gemini runs, the owner's own chats) rather than by a fresh
     # replay of the real inputs; the cases are 416/416 and the replay of every message changes nothing.
-    'Answer the resident / input': '680da3fc96bc',
+    # 29 Oct, night (n8n_whatsapp_addto.py, epoch 90): the photo note no longer says the photo is on the open
+    # ticket, a new tool adds to an open ticket, and notify_team says a note never changes a ticket (the
+    # owner, on 139178/139189: "is this real? did it notif anyone or updated the ticket"). Claude-played on
+    # the candidate (scripts/wa_qa_addto.json): the owner's chat went on 255-1365-26 by the new tool, every
+    # "I added" backed by its answer, no note, no team; the same chat on the old text reproduced the claims.
+    'Answer the resident / input': 'e036f16b6d5c',
+    'add_request_detail / tool': 'b2fc05691540',
     # 5 Oct (n8n_whatsapp_straight.py, epoch 74): the prompt and get_balance's
     # text, after a Claude-played check of 11 situations through the would-be
     # bot's guards and Send (the pushed danger line now carries its number).
@@ -182,7 +188,8 @@ PINS = {
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': '437d0eda4866',
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '82f7e6c1851c',     # 18 Oct, late: the reason, never an empty note
+    'notify_team / tool': '1b1fcd44fe3f',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    # something new about an open ticket is add_request_detail's
     'open_request / tool': '17d2ee41f988',
     'show_menu / tool': '427d364be55d',
     'verify_address / tool': 'a2a85a3d4068',
@@ -429,6 +436,23 @@ CLERK = re.compile(r"כדי שאוכל(?!(\s+\S+)?\s+(לאמת|לבדוק))|אצ
 # 29 Oct, late (n8n_whatsapp_checkword.py): an all-clear in a turn that looked something up. Send cuts the
 # interjection and the joined form ("allclear v1"); this flags any form left, the "שהכל בסדר" kind included.
 ALL_CLEAR = re.compile(r"(?<![א-ת])[ושכ]?(הכל|הכול)\s+(בסדר|טוב|תקין)(?![א-ת])")
+# 29 Oct, night (n8n_whatsapp_addto.py): "I added it / the photo to the ticket" in a turn where no tool
+# added anything. 139178 and 139189 said so after a note that never touches a ticket (and was dropped as
+# a duplicate besides). Backed only by add_request_detail or open_request answering ok in that turn.
+ADDED_CLAIM = re.compile(r"(?<![א-ת])ו?(הוספתי|צירפתי|עדכנתי)(?![א-ת])[^.!?\n]{0,40}?(?<![א-ת])[לבה]?קריא[הת]")
+ADDED_OK = re.compile(r'\\*"ok\\*"\s*:\s*true')
+
+
+def added_this_turn(rd):
+    """Whether add_request_detail or open_request answered ok on any pass of this run."""
+    for run in rd.get("Answer the resident") or []:
+        for out in ((run.get("data") or {}).get("main") or []):
+            for it in out or []:
+                for s in ((it or {}).get("json") or {}).get("intermediateSteps") or []:
+                    tool = ((s or {}).get("action") or {}).get("tool")
+                    if tool in ("add_request_detail", "open_request") and ADDED_OK.search(str(s.get("observation"))):
+                        return True
+    return False
 TEAM_VOICE = re.compile(r"(?<![א-ת])(?!(?:מ|ב)צוות השירות)[א-ת]{0,3}צוות|(?<![א-ת])[א-ת]{0,3}הנהלה"
                         r"|(?<![א-ת])ו?[הל]מנהל(?![א-ת])"
                         r"|(?<![א-ת])[ושכ]?(העברתי|העברנו|אעביר|נעביר|יבדקו|יטפלו|יחזרו|יעדכנו|ידאגו"
@@ -594,6 +618,10 @@ def watch(since):
             m = ALL_CLEAR.search(t)
             if m and looked and not canned and k != "ack":
                 flags.append("an all-clear in a turn that looked something up, in the %s: %s" % (k, m.group(0)))
+            m = ADDED_CLAIM.search(t)
+            if m and not canned and k != "ack" and not added_this_turn(rd):
+                flags.append("a ticket said to be added to, with nothing added this turn, in the %s: %s"
+                             % (k, m.group(0)))
         # 1 Oct: Send removes promises (n8n_whatsapp_nopromise.py). A promise in
         # what went out is a flag; the ack and the first beat of a two-part
         # payment reply may say "I'm on it". One the filter cut is an info line.

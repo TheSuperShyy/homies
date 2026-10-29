@@ -43,6 +43,8 @@ The user is the builder. The client is Homies.
     - It never gatekeeps, concedes or argues.
     - The matter goes to the team afterwards, under its own reason, since "Hand to a person" drops a repeated reason.
     - **The bot cannot tell a dropped note from a posted one** (seen live 29 Oct, 20:18-20:20 UTC). `notify_team` answers `ok: true` before "Hand to a person" decides. Twice the bot told the owner "הוספתי את העדכון הזה לקריאה" while both notes were skipped as a repeated `other`, and a note never touches a ticket: 255-1365-26 was unchanged and the photo it "added" is on no ticket.
+    - **Since 20:56 UTC that day, something new about an open ticket goes on the ticket** (`add_request_detail`, epoch 90). It is never a note. On WhatsApp the function takes only the sender's own open ticket, and the bot may say only what the tool answered (a photo only with `photos_attached`).
+    - **A bracket note states only what the code guarantees.** The photo note said the photo was on the open ticket, the code never did that for an older ticket, and the bot said it to the owner word for word. When the bot claims an act, read what its notes and tool texts tell it before the prompt.
     - After a staff-only matter it asks what the team will need.
     - This reverses the 18 Oct "no note without the matter" for manager requests only.
     - **Declined from the protocol he pasted with it:** fake concession, "for the manager's screen" data asks, and the bot's answer dressed up as "an automated background check". They mislead tenants and break the honesty rule.

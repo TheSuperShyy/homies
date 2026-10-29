@@ -49,6 +49,20 @@ slash-forms for gender. The owner has heard this and chosen freedom. Anything
 added back is a new decision, made by a person, not a quiet re-tightening.
 
 
+## 29 Oct, night — something new about an open ticket goes on the ticket. Epoch 90.
+
+The system prompt below is unchanged; the tools and the photo note moved. On the owner's handset a
+photo of the broken stairwell light, "its the 2nd light near the emergency exit" and the bulb put
+aside on the railing got "והוספתי גם את התמונה ששלחת לקריאה הקיימת" and "הוספתי את העדכון הזה
+לקריאה". Nothing was added: the bot had no tool that adds to a ticket, so it left notes (both dropped
+as duplicates), and the photo note had told it the photo was on the open ticket, which the code never
+did for an older ticket. The owner: *"is this real? did it notif anyone or updated the ticket"*, then
+*"so how can we fix it"*. The bot now has `add_request_detail` (the sender's own open ticket only, the
+photos of the last hour attached, `photos_attached` the only basis for saying a photo is on it). The
+photo note says only what is true, and `notify_team`'s text says a note never changes a ticket.
+Shipped by `scripts/n8n_whatsapp_addto.py` with debt-tools v136, MEMORY_EPOCH 89 to 90 (89 was the
+owner's memory reset of 20:01 UTC, no text changed).
+
 ## 29 Oct, later — a check gets willingness, never a word that sounds like the answer. Epoch 88.
 
 Three minutes after the "בשמחה" change, the owner's balance question (execution 138931,

@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### LIVE 20:56 UTC: something new about an open ticket goes on the ticket, and the photo note says only what is true (`n8n_whatsapp_addto.py`, debt-tools v136, epoch 90)
+- **Asked:** *"so how can we fix it"*, after the light-ticket replies were found untrue (the read-only entry below).
+- **Two causes:**
+  - **No tool could add to a ticket.** The bot opens one, reads one or leaves a note, and a note never touches a ticket. So it noted the detail and said the ticket had it. The function has had `add_request_detail` since August (the voice agent's; it appends, never replaces); the bot never got it.
+  - **The photo note told the bot the photo was on the open ticket:** "[... התמונה נשמרה במערכת ומצורפת לקריאה שלו: לקריאה הפתוחה אם יש כזאת, אחרת לקריאה שתיפתח עכשיו ...]". It is not. `store_media` files a photo on a ticket opened from that number in the last two hours, and never for the owner's +63 number (`callerPhone` is empty there). The bot repeated what it was told.
+- **Changed, the function (debt-tools v136, deployed 20:55 UTC with `--oxs-mirror`):**
+  - `add_request_detail` on WhatsApp takes only the sender's own ticket (the number on it, or a resident row carrying it, as `get_request_status` finds theirs); a neighbour's answers "not found".
+  - A closed ticket answers `closed`.
+  - It attaches the photos this number sent in the last hour that are on no ticket yet (`adoptMedia`, as `open_request` does) and returns `photos_attached`.
+  - Voice is unchanged. Syntax clean (node's type stripper), function tests 45/45.
+  - Two write-free probes on v136: a test-building ticket of another number answered "not found"; the owner's resolved 255-1346-26 answered "closed". Both descriptions read back unchanged.
+- **Changed, the bot (20:56:41 UTC):**
+  - A new tool, `add_request_detail`, at the end of the tool row (the same call as `get_request_status`). Its text: when, what it does, and that only what it answers was added (a photo only with `photos_attached`). It is not a message to anyone: say what was added, not who will see it.
+  - The photo note now says the photo is saved, goes on a ticket when one is opened or when the resident's addition goes on an open ticket of theirs, and only the tool's answer says whether it did.
+  - `notify_team`'s text: something new about an open ticket is `add_request_detail`'s, because a note never changes a ticket.
+  - The prompt, the guards and Send are unchanged. MEMORY_EPOCH 89 → 90 (the owner's buffer held both false claims). EPOCH_COVERS inject e036f16b6d5c, tools 96cc2a6a3c5b.
+- **Gate:**
+  - The candidate failed only on the three intended pins; re-pinned, then all green. 429 cases; the replay of every reply ever sent is unchanged.
+  - Live is green after the apply.
+  - New `--watch` flag: "a ticket said to be added to, with nothing added this turn". It catches exactly 139178 and 139189 tonight.
+- **Claude-played** (`scripts/wa_qa_addto.json`, the owner's 20:17 UTC chat word for word):
+  - **On the old text** the failure came back: "תודה על התמונה, היא מצורפת לקריאה" with no tool, and the emergency-exit detail in a note ("רשמתי במערכת…").
+  - **On the candidate:** the photo, the detail and the bulb all went on 255-1365-26 by the new tool. Each "צירפתי" / "הוספתי" was backed by its answer; no note, no team.
+  - **The closed-ticket case** stayed honest when the tool said no.
+  - Two misses were the deck's, not the bot's. The rules did not count the ticket the bot itself had just opened as the resident's, and a regex read "היא לא נכנסה" as a claim. Both fixed in the deck. One rubric flag was a mid-conversation self-introduction before anything this change touches.
+  - `wa_qa.py` now takes PLAYER.md's photo note from the bundled workflow, so a live run and a candidate run each show the note that workflow adds.
+- **Rollback:** `n8n_whatsapp_addto.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-addto.json`) + git revert. The function change is harmless left in place (the old bot never calls it); otherwise revert `index.ts` and `supabase_functions.py --apply --oxs-mirror`.
+- **Owed:** the owner's handset, then `--watch 2026-10-29T20:56`.
+
 ### Read only, 20:18-20:35 UTC: Chatwoot is connected; the light-ticket replies claimed what never happened
 - **Asked:** *"are we connected on the chatwoot? dont make any changes just verify"*. Then, on a screenshot of 04:17-04:20 the owner's time: *"is this real? did it notif anyone or updated the ticket"*. Nothing was changed.
 - **Connected end to end (20:18 UTC):**

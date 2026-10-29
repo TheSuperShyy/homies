@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 89
+MEMORY_EPOCH = 90
+# 89 -> 90, 29 Oct, night (n8n_whatsapp_addto.py): something new about an open ticket goes on the ticket
+# (add_request_detail, a new tool), the photo note no longer says the photo is on the open ticket, and
+# notify_team says a note never changes a ticket. The owner's buffer holds two false "I added it" replies.
 # 88 -> 89, 29 Oct, night (n8n_whatsapp_fresh.py): the key alone, no text changed. The owner, after testing
 # 88: "ok its kidna good now so lets reset the memory again".
 # 87 -> 88, 29 Oct, later (n8n_whatsapp_checkword.py): a request to check something gets willingness to
@@ -770,7 +773,8 @@ MEMORY_TURNS = 12
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
     "prompt": "a982cf21020a",   # docs/features/11-whatsapp-bot/prompt.md (29 Oct, later, epoch 88)
-    "inject": "680da3fc96bc",   # AGENT_NEW in n8n_whatsapp_untemplate.py
+    "inject": "e036f16b6d5c",   # LIVE's (29 Oct, night, epoch 90: addto's true photo note); AGENT_NEW in
+    # n8n_whatsapp_untemplate.py is not folded yet
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a
     # tool-text change poisons buffers exactly the way a prompt change does
     # -- the interrogation above is three examples deep in one thread --
@@ -786,9 +790,10 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "72cac34efc1c",  # 29 Oct, evening, epoch 86: LIVE's tools (section 6, then one voice). TOOLS below is NOT
-    # folded yet, so every patcher refuses at check_memory_epoch until it is (n8n_whatsapp_section6.py,
-    # n8n_whatsapp_ionly.py).
+    "tools": "96cc2a6a3c5b",  # 29 Oct, night, epoch 90: LIVE's tools (section 6, one voice, then addto's notify_team
+    # clause). TOOLS below is NOT folded yet, so every patcher refuses at check_memory_epoch until it is
+    # (n8n_whatsapp_section6.py, n8n_whatsapp_ionly.py). add_request_detail is not in TOOLS, so its text is
+    # outside this hash: the gate's pin holds it, and a change to it bumps the epoch by hand.
 }
 
 # The Meta Graph API version the send call is pinned to. Meta deprecates versions

@@ -18,15 +18,21 @@ appended to.
 > - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
 > - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
-> **MEMORY EPOCH 89 SINCE 29 Oct, 20:01 UTC: the key alone, no text changed (`scripts/n8n_whatsapp_fresh.py`).** The owner, after the handset test of 88: *"ok its kidna good now so lets reset the memory again"*. Every chat started fresh; 89 covers the same texts as 88.
+> **LIVE 29 Oct, 20:56 UTC: something new about an open ticket goes on the ticket (epoch 90, `scripts/n8n_whatsapp_addto.py`, debt-tools v136).** The light-ticket replies of 20:18-20:20 UTC said the photo and the update were on 255-1365-26, and nothing was. The owner: *"so how can we fix it"*. WORKLOG 29 Oct.
+> - **The bot's new tool, `add_request_detail`:** appends the resident's words to their open ticket and attaches the photos their number sent in the last hour. It answers `photos_attached`, and only what it answers may be said.
+> - **On WhatsApp the function allows only the sender's own ticket** ("not found" for anyone else's) and only while it is open ("closed" otherwise). Voice is unchanged.
+> - **The photo note no longer says the photo is on the open ticket**, which was false. `notify_team`'s text says a note never changes a ticket.
+> - **`--watch` flags "a ticket said to be added to, with nothing added this turn".**
+> - **Rollback:** `n8n_whatsapp_addto.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-addto.json`) + git revert. The function can stay: nothing else calls it on WhatsApp.
+> - **Owed:** the owner's handset, then `check_whatsapp_rules.py --watch 2026-10-29T20:56`. The fold takes section 6, `ionly()`, `gladly()`, `checkword()` and `addto()` (the tool into TOOLS, the photo note into AGENT_NEW), in that order.
+> - **Known, not changed:**
+>   - An addition reaches our ticket, not OXS: the mirror copies new tickets only. Nobody is alerted by an addition.
+>   - A second real note of the same reason inside 24 hours is still dropped by "Hand to a person" while `notify_team` answers `ok`.
+>   - `store_media` files an Israeli number's photo on its newest ticket of the last two hours, whatever that ticket is about. For the owner's +63 number it files none (`phoneOf` takes Israeli numbers only).
+>
+> **MEMORY EPOCH 89, 29 Oct, 20:01-20:56 UTC: the key alone, no text changed (`scripts/n8n_whatsapp_fresh.py`).** The owner, after the handset test of 88: *"ok its kidna good now so lets reset the memory again"*. Epoch 90 has replaced it.
 > - **`n8n_whatsapp_fresh.py` checks live's texts against EPOCH_COVERS**, not the repo's, which do not build live until the fold. Run it again for the next reset with no text change: bump MEMORY_EPOCH, dry run, `--apply`.
-> - **Rollback:** `n8n_whatsapp_fresh.py --restore` (snapshot `local/n8n-whatsapp-live-before-fresh-e88.json`) + git revert.
 > - **Open, not fixed (the owner asked for the reset only):** the handset test's one flag, execution 139038 (19:49 UTC). An instalment request got "…כדי שנוכל לעזור לך עם זה". "שנוכל" ("so that we can") is a "we" the one-voice rule forbids.
-> - **Open, not fixed (the owner asked to verify only), 20:18-20:20 UTC:** the light-ticket replies said the photo and an update were added to ticket 255-1365-26. Nothing was.
->   - Only `notify_team` ran. Both notes were skipped as a repeated `other` (the 17:06 UTC note), so nobody was alerted.
->   - The ticket is unchanged, and the photo is stored with no ticket.
->   - "כדי שהצוות ידע" is the team voice. WORKLOG 29 Oct.
-> - **Owed:** `check_whatsapp_rules.py --watch 2026-10-29T20:01` after the owner's next test, and the next morning.
 >
 > **LIVE 29 Oct, 19:37 UTC: never an all-clear before what a lookup found (epoch 88, `scripts/n8n_whatsapp_checkword.py`).** Execution 138931 answered a balance question "הכל בסדר 🙂 … רשומה לך יתרה של 2,000 ש"ח". The owner: *"i dont want that to happen again ever"*. WORKLOG 29 Oct.
 > - **The prompt:** a request to check something gets willingness to check, never a word that sounds like the answer. The quoted "אין בעיה" is now "כמובן".

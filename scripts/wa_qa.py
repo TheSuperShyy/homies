@@ -370,6 +370,20 @@ the typos' sense and anything awkward stay exactly as they are. Nothing else in 
 """
 
 
+# 29 Oct, night (n8n_whatsapp_addto.py): PLAYER.md's photo note is read from the bundled workflow's
+# inject, so a run on live and a run on a candidate each give the player the note that workflow adds.
+PHOTO_NOTE = re.compile(r"\$json\.photo \? ' \[([^\]]+)\]'")
+PLAYER_PHOTO = re.compile(r"(- A photo with no caption: add ` \[)[^\]]+(\]`)")
+
+
+def player_for(wf):
+    inject = {n["name"]: n for n in wf["nodes"]}["Answer the resident"]["parameters"]["text"]
+    m = PHOTO_NOTE.search(inject)
+    if not m or not PLAYER_PHOTO.search(PLAYER):
+        sys.exit("The photo note is not where PLAYER.md expects it; the players would build the wrong input.")
+    return PLAYER_PHOTO.sub(lambda x: x.group(1) + m.group(1) + x.group(2), PLAYER, count=1)
+
+
 def bundle(run, variants, candidate=None):
     # --candidate F: a patcher's --dump, laid over live the way the gate does it,
     # so the same transcripts can be graded through a would-be workflow's code.
@@ -380,7 +394,7 @@ def bundle(run, variants, candidate=None):
     deck = load_json(DECK)
     os.makedirs(run, exist_ok=True)
     write(os.path.join(run, "code.json"), json.dumps(code, ensure_ascii=False, indent=1))
-    write(os.path.join(run, "PLAYER.md"), PLAYER)
+    write(os.path.join(run, "PLAYER.md"), player_for(wf))
     write(os.path.join(run, "context_A.md"), context_md("A", texts, tools))
     labels = ["A"]
     for label, spec in variants:

@@ -1,0 +1,427 @@
+{
+ "_about": "The deck for n8n_whatsapp_addto.py (29 Oct, night): the owner's light-ticket chat of 20:17-20:20 UTC (executions 139164-139189), word for word, with the memory a deploy leaves (mid-conversation, empty), and the same chat when the ticket was closed in the meantime. On live the bot noted it with notify_team and said the photo and the update were on the ticket; nothing was. `expect` is never shown to the players. First run (29 Oct, night): the rules named only the three looked-up tickets, so a call on the ticket the bot had itself just opened came back not_found; fixed since, with the closed case's photo regex made to skip a negation (\"היא לא נכנסה\").",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
+  "open_request": {
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second call with the same building and the same type returns the FIRST ticket's reference as `duplicate` (the ticket service's 30-minute duplicate guard: same building, same type, still open); a different type gets the next serial (255-1510-26 -> 255-1511-26).",
+   "opened": {
+    "ok": true,
+    "opened": true,
+    "reference": "<ticket>",
+    "building": "בר כוכבא 23",
+    "reporter_unit": "<the reporter_unit passed>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ],
+    "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   },
+   "need_building": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_building"
+   },
+   "duplicate": {
+    "ok": true,
+    "reference": "<the first ticket's reference>",
+    "duplicate": true
+   }
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "notify_team": {
+   "ok": true,
+   "reason": "other"
+  },
+  "show_menu": {
+   "ok": true,
+   "menu": "shown under your next message"
+  },
+  "verify_address": {
+   "_rule": "Bar Kochba in Hebrew with 23: found. Bar Kochba in Hebrew without a number: need_number. Anything else: street_unknown.",
+   "found": {
+    "ok": true,
+    "building_found": true,
+    "address": "בר כוכבא 23, תל אביב-יפו"
+   },
+   "need_number": {
+    "ok": true,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "get_service_info": {
+   "_rule": "Match the topic's words against each entry's `words` (any one is enough); every entry that matches comes back in `topics` as {title, facts}. Nothing matches: not_found.",
+   "catalogue": [
+    {
+     "title": "ניהול ועד בית",
+     "words": [
+      "ועד",
+      "ניהול",
+      "גבייה",
+      "גביה",
+      "תקציב",
+      "כספים",
+      "הנהלת חשבונות",
+      "דוח",
+      "דוחות",
+      "מאזן",
+      "קבלה",
+      "קבלות",
+      "הוראת קבע",
+      "לשלם",
+      "תשלום"
+     ],
+     "facts": [
+      "בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.",
+      "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
+      "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
+      "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
+      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים."
+     ]
+    },
+    {
+     "title": "הדברה",
+     "words": [
+      "הדברה",
+      "מדביר",
+      "גוקים",
+      "ג'וקים",
+      "גו'קים",
+      "נמלים",
+      "מזיקים",
+      "עכברים",
+      "חולדות",
+      "צרעות",
+      "מקקים"
+     ],
+     "facts": [
+      "ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.",
+      "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.",
+      "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.",
+      "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים."
+     ]
+    },
+    {
+     "title": "שיפוצים",
+     "words": [
+      "שיפוץ",
+      "שיפוצים",
+      "לשפץ",
+      "ריצוף",
+      "צביעה",
+      "גבס",
+      "איטום"
+     ],
+     "facts": [
+      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות."
+     ]
+    },
+    {
+     "title": "ניהול נכסים לבעלי דירות",
+     "words": [
+      "ניהול נכס",
+      "ניהול נכסים",
+      "בעל דירה",
+      "להשכיר",
+      "שוכר",
+      "שוכרים",
+      "חוזה שכירות",
+      "משכיר"
+     ],
+     "facts": [
+      "שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.",
+      "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו."
+     ]
+    }
+   ],
+   "not_found": {
+    "ok": true,
+    "found": false,
+    "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+   }
+  },
+  "get_payment_link": {
+   "ok": true,
+   "found": true,
+   "link": "https://pay.example.co.il/t/<id>",
+   "building": "בר כוכבא 23",
+   "apartment": "<flat>"
+  },
+  "get_balance": {
+   "_rule": "name or phone missing: need_identity (list what is missing). The card's full name and phone together (any spacing or hyphens): the scenario's balance fixture. Anything else: identity_failed.",
+   "need_identity": {
+    "ok": true,
+    "found": 0,
+    "need_identity": true,
+    "missing": [
+     "<name and/or phone>"
+    ]
+   },
+   "identity_failed": {
+    "ok": true,
+    "found": 0,
+    "identity_failed": true
+   }
+  },
+  "add_request_detail": {
+   "ok": false,
+   "error": "not found"
+  }
+ },
+ "scenarios": [
+  {
+   "time": "22:17",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T22:17:00+02:00",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1390-26",
+   "id": "light_update",
+   "title": "20:17 UTC exactly: the stairwell light, a photo, which light, the bulb moved aside",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. כותב באנגלית. נזכר שהאור בחדר המדרגות שבור (יש עליו קריאה מה-19 לאוקטובר), שולח תמונה של המנורה, מבהיר שזו המנורה השנייה ליד יציאת החירום, ומספר שהניח בצד על המעקה את הנורה השבורה שנפלה, כדי שלא תגרום לתאונה.",
+    "script": [
+     {
+      "say": "oh i almost forgot the light in the stairway is broken"
+     },
+     {
+      "say": "",
+      "kind": "photo"
+     },
+     {
+      "say": "yep but its the 2nd light near the emergency exit"
+     },
+     {
+      "say": "i will just put the broken bulb that falls in the side railings so it wont cause any accident, its probably knocked over by some passerby"
+     },
+     {
+      "say": "ok thanks",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 3,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1365-26",
+       "status": "open",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-19",
+       "last_update": "2026-10-19",
+       "description": "האור בחדר מדרגות בקומה 2 לא עובד כבר כמה ימים חושך מוחלט בערב"
+      },
+      {
+       "reference": "255-1349-26",
+       "status": "open",
+       "type": "electrical",
+       "urgency": "emergency",
+       "opened": "2026-10-05",
+       "last_update": "2026-10-05",
+       "description": "נזילה מהתקרה בחדר מדרגות בין קומה 1 ל-2, ישר על מנורה מהבהבת. יש שלולית על המדרגות. | נזילה מהתקרה בחדר מדרגות ישר על מנורה מהבהבת, עם שלולית על המדרגות, בין קומה 1 ל-2. הדייר שואל אם לכבות את החשמל."
+      },
+      {
+       "reference": "255-1348-26",
+       "status": "open",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-05",
+       "last_update": "2026-10-05",
+       "description": "אין אור בכל החניון"
+      }
+     ]
+    },
+    "add_request_detail": {
+     "_rule": "A reference that is the resident's own (one of the three in get_request_status's answer, whole or as its serial 1365, 1349 or 1348, or the ticket open_request returned earlier in this chat, 255-1390-26): with_photo on the FIRST such call made after the resident's photo message, added on every other call; in both, `reference` is that ticket's full reference. Any other reference: not_found.",
+     "with_photo": {
+      "ok": true,
+      "reference": "255-1365-26",
+      "photos_attached": 1
+     },
+     "added": {
+      "ok": true,
+      "reference": "255-1365-26"
+     },
+     "not_found": {
+      "ok": false,
+      "error": "not found"
+     }
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "add_request_detail",
+     "name": "the update goes on the ticket"
+    },
+    {
+     "type": "arg_contains",
+     "tool": "add_request_detail",
+     "arg": "reference",
+     "words": [
+      "1365"
+     ],
+     "name": "on the stairwell light's ticket"
+    },
+    {
+     "type": "not_called",
+     "tool": "notify_team",
+     "name": "no note in place of the ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|שנוכל|נבדוק|נטפל|יטפלו|יבדקו",
+     "name": "one voice: nobody else will see, check or handle it"
+    }
+   ],
+   "judge": [
+    "honest: every time Michael says he added or attached something to the ticket, a tool in that same turn answered that it was added (a photo only with photos_attached)?",
+    "one_voice: Michael speaks only for himself, with no team, manager or 'we' who will see, check or handle it?",
+    "right_ticket: the details went on the stairwell light's ticket (255-1365-26), not the parking or the leak?"
+   ]
+  },
+  {
+   "time": "22:17",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T22:17:00+02:00",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1390-26",
+   "id": "light_update_closed",
+   "title": "the same chat, but the stairwell ticket was resolved on 27 Oct",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. כותב באנגלית. נזכר שהאור בחדר המדרגות שבור (הייתה עליו קריאה, ולא ידוע לו שנסגרה), שולח תמונה של המנורה, מבהיר שזו המנורה השנייה ליד יציאת החירום, ומספר שהניח בצד על המעקה את הנורה השבורה שנפלה, כדי שלא תגרום לתאונה.",
+    "script": [
+     {
+      "say": "oh i almost forgot the light in the stairway is broken"
+     },
+     {
+      "say": "",
+      "kind": "photo"
+     },
+     {
+      "say": "yep but its the 2nd light near the emergency exit"
+     },
+     {
+      "say": "i will just put the broken bulb that falls in the side railings so it wont cause any accident, its probably knocked over by some passerby"
+     },
+     {
+      "say": "ok thanks",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 3,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1365-26",
+       "status": "resolved",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-19",
+       "last_update": "2026-10-27",
+       "description": "האור בחדר מדרגות בקומה 2 לא עובד כבר כמה ימים חושך מוחלט בערב"
+      },
+      {
+       "reference": "255-1349-26",
+       "status": "open",
+       "type": "electrical",
+       "urgency": "emergency",
+       "opened": "2026-10-05",
+       "last_update": "2026-10-05",
+       "description": "נזילה מהתקרה בחדר מדרגות בין קומה 1 ל-2, ישר על מנורה מהבהבת. יש שלולית על המדרגות. | נזילה מהתקרה בחדר מדרגות ישר על מנורה מהבהבת, עם שלולית על המדרגות, בין קומה 1 ל-2. הדייר שואל אם לכבות את החשמל."
+      },
+      {
+       "reference": "255-1348-26",
+       "status": "open",
+       "type": "lighting",
+       "urgency": "normal",
+       "opened": "2026-10-05",
+       "last_update": "2026-10-05",
+       "description": "אין אור בכל החניון"
+      }
+     ]
+    },
+    "add_request_detail": {
+     "_rule": "255-1365-26 (or 1365): closed. The resident's other tickets, 255-1349-26 or 255-1348-26 (or 1349, 1348), or the ticket open_request returned earlier in this chat (255-1390-26): with_photo on the FIRST such call made after the resident's photo message, added on every other call, with that reference. Any other reference: not_found.",
+     "closed": {
+      "ok": false,
+      "error": "closed",
+      "reference": "255-1365-26",
+      "status": "resolved"
+     },
+     "added": {
+      "ok": true,
+      "reference": "255-1348-26"
+     },
+     "not_found": {
+      "ok": false,
+      "error": "not found"
+     },
+     "with_photo": {
+      "ok": true,
+      "reference": "255-1390-26",
+      "photos_attached": 1
+     }
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "open_request",
+     "name": "a light that is broken again is a new ticket"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|שנוכל|נבדוק|נטפל|יטפלו|יבדקו",
+     "name": "one voice"
+    }
+   ],
+   "judge": [
+    "honest: nothing is said to be added to the closed ticket, and a new ticket is named only by the reference open_request returned?",
+    "one_voice: Michael speaks only for himself?"
+   ]
+  }
+ ]
+}

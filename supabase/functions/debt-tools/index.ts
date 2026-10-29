@@ -3315,7 +3315,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // caller says "one thousand and fifty six", not "255-1056-26".
     const { data: rows } = await db
       .from("requests")
-      .select("id,reference,description")
+      .select("id,reference,description,status,reported_by_phone,resident_id")
       .or(`reference.like.%-${serial}-%,reference.like.%-${serial}`)
       .order("created_at", { ascending: false })
       .limit(1);
@@ -3323,19 +3323,48 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const row = rows?.[0];
     if (!row) return { ok: false, error: "not found" };
 
+    // ON WHATSAPP: THE SENDER'S OWN TICKET, STILL OPEN (29 Oct). The bot got
+    // this tool after it twice told the owner it had added their photo and
+    // their update to the light ticket with nothing behind either: the only
+    // tool it had was a note, which never touches a ticket and was dropped as a
+    // duplicate besides (executions 139178, 139189). A serial typed into a chat
+    // can be anybody's, so the ticket must be one the sender's number finds, the
+    // same two ways get_request_status finds theirs; a neighbour's answers "not
+    // found", as if it did not exist. A closed ticket answers `closed`: a line
+    // added where nobody reads is the same silent claim, and a fault that is
+    // back is a new ticket. The voice agents are not changed.
+    const wa = channel(ctx) === "whatsapp";
+    if (wa) {
+      const mine = reporterPhone(ctx);
+      let theirs = !!mine && row.reported_by_phone === mine;
+      if (!theirs && mine && row.resident_id) {
+        const { data: who } = await db.from("residents").select("id")
+          .eq("phone", mine).eq("id", row.resident_id).limit(1);
+        theirs = !!who?.length;
+      }
+      if (!theirs) return { ok: false, error: "not found" };
+      if (!["open", "in_progress", "needs_review"].includes(String(row.status))) {
+        return { ok: false, error: "closed", reference: row.reference, status: row.status };
+      }
+    }
+
     // Already there — a repeated tool call on a retried webhook, or an agent
     // that asked the same question twice. Appending it again gives the office a
     // ticket that stutters.
     const existing = String(row.description ?? "");
-    if (existing.includes(detail)) return withSpoken({ ok: true, reference: row.reference });
+    if (!existing.includes(detail)) {
+      const { error } = await db
+        .from("requests")
+        .update({ description: existing ? existing + " | " + detail : detail })
+        .eq("id", row.id);
+      if (error) return { ok: false, error: error.message };
+    }
 
-    const { error } = await db
-      .from("requests")
-      .update({ description: existing ? existing + " | " + detail : detail })
-      .eq("id", row.id);
-
-    return error ? { ok: false, error: error.message }
-                 : withSpoken({ ok: true, reference: row.reference });
+    // On WhatsApp the photos this number sent in the last hour that are on no
+    // ticket yet go on this one, as open_request's do. The count goes back as a
+    // fact, and it is the only thing that lets the bot say a photo is on it.
+    const photos = wa ? await adoptMedia(row.id, barePhone(ctx)) : 0;
+    return withSpoken({ ok: true, reference: row.reference, ...(photos ? { photos_attached: photos } : {}) });
   },
 
   /**
