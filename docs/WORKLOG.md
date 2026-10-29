@@ -42,8 +42,22 @@ conversation that produced it.
     - get_balance's tail drops its own copy of the details;
     - the bullet says the record comes first ("שומע קודם מה רשום") and the question follows. The note's timing is the tool's alone.
   - Prompt 23,519 characters; `check_n8n_sandbox.py` ok.
-- **Blind check 2** on the revision: running (two fresh players, the same two chats).
-- **Next:** the push to the sandbox with a fresh memory, and the owner's own chat. The Gemini proof (`--run money`, about $0.40) needs the key's cap raised ($0.58 left) and the owner's go.
+- **Blind check 2 on the revision: both pass** (`local/sandbox/runs/2026-10-29-1300-claude-money2.md`, two fresh players, run about 12:20-12:35 UTC).
+  - **conversation 107:**
+    - "why am I charged 1k" → "לפי מה שרשום במערכת, יש אצלך 8 חודשים שלא שולמו, מינואר עד אוגוסט 2026, 250 ₪ על כל חודש, ובסך הכול 2,000 ₪. יש מהם חודש שכבר שילמת?".
+    - "too much" → an instalment arrangement offered.
+    - The refund → "לפי המערכת לא רשום תשלום על אף אחד משמונת החודשים האלה, והחזר כסף זה לא משהו שאני יכול להבטיח. אם שילמת משהו שלא מופיע אצלנו, מתי שילמת, כמה ובאיזו דרך?". No note yet.
+  - **paid_already:**
+    - The record first, then when, how and how much.
+    - The note only after the answer, carrying "אומר ששילם … בהעברה בנקאית של 500 ₪ בתחילת אפריל".
+    - "When will you return it" got no date and no promise, an offer to check the record again, and a question.
+  - **To watch on Gemini:** "אין בעיה" opening the refund reply (after the tenant's "no") reads a little like agreeing.
+- **Pushed to the sandbox, 12:36 UTC:** `n8n_sandbox.py --apply --section6 --fresh-memory`, memory round 49 (key `-84-sbx49`).
+  - Read back from n8n: the prompt is 23,519 characters with the חיובים bullet, "השגות על חיוב" and the stale balance line are gone, and both tool texts are changed.
+  - The production fingerprint differs from the snapshot only in the function, v130 → v132 (this morning's call-log fix), plus a note of Ido's real call.
+- **Next:**
+  - The owner's own chat on the sandbox page.
+  - The Gemini proof: `--run money`, three scenarios, about $0.40. It needs the key's cap raised ($0.58 left at 12:36 UTC, wallet $2.78) and the owner's go. The owner's own chat spends from the same $0.58.
 
 ### Is all of Yariv's chatbot feedback working now? No: the older points are live, the 26 Oct document is sandbox only (11:50 UTC; read only)
 - **Asked:** *"ok so rn all the feedback from yariv in the chatbot is working?"*
