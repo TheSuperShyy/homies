@@ -805,7 +805,13 @@ without "tool first" made the model talk instead of act and invent a
 ticket number. **One emoji, sometimes, is an owner decision** (never the
 first message, never beside a reference or amount, a refusal, or danger);
 the 27 Aug "no courtesy opener on a tap" note is superseded, it was about
-canned lines.
+canned lines. **The quoted words for it are "בשמחה", "אין בעיה", "אוי, לא נעים"
+since 29 Oct, late (epoch 87, `n8n_whatsapp_gladly.py`).** "אוקיי" stood first and
+was said back word for word ("אוקיי, יש לך יתרה פתוחה …", execution 138878), and the
+owner called it "a bit unprofessional", as he had a cold "בטח" in the same slot on
+23 Sep. The first word of that list is what the bot says, so it is the owner's own:
+*"gladly to do so"*. With it, the money rule has the bot tell an amount as what our
+system shows (*"based on the system you still have ..."*).
 
 **Warmth lives in the sentence, never in the fact.** The details pass through
 verbatim — building, apartment, reference number, amount, months, status — and
