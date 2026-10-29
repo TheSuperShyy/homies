@@ -21,6 +21,9 @@ conversation that produced it.
 - **The same state as 25 and 26 Oct.** The live bot's last run is 26 Oct, 12:46 UTC, 35 minutes after that day's re-register. When it dropped this time is not known without Chatwoot's rails log.
 - **Not done:** re-registering is a write to Meta. It waits for the owner's go, then `POST /{id}/register` with `WHATSAPP_REGISTER_PIN`, read back until CONNECTED / CLOUD_API.
 - The sandbox page is unaffected.
+- **Then, on the owner's "fix it":** `POST /{id}/register` with the same PIN at 15:51:41 UTC got `success: true`.
+  - Read back at 15:52:05: CONNECTED, CLOUD_API, can_send_message LIMITED (a test number reaches only its verified recipients). Only 138024 is left, SIP calling, which is not used.
+  - No message has been sent or seen through it yet.
 
 ### LIVE: the new WhatsApp chatbot replaces the old one (15:27:21 UTC; `n8n_whatsapp_section6.py`, epoch 85)
 - **Asked:** *"replace the old chatbot with the new version"*, after the owner tested the sandbox, with the Hebrew checked first.
