@@ -11,13 +11,21 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### The dashboard's call log: does it show what happened in a call? Yes, for every answered call (08:10 UTC; read only)
+- **Asked:** *"is a call logger implemented in the dashboard so we can know what happened in the call"*.
+- **Built since 8 Aug:** Vapi's end-of-call report goes to `debt-tools`, which fills `interactions`. The dashboard's "שיחות טלפון" page lists the calls (when, direction, number, summary, outcome) and searches transcripts and summaries. A call's own page has the transcript turn by turn, the summary and the outcome. Recording has been off since 25 Aug, so there is no audio.
+- **Checked on Yariv's Vapi:** all 10 calls since 25 Oct that connected are in the log, with summary and transcript. The 4 missing are web calls that never started (`call.start.error-get-resources-validation`).
+- **Two limits for the dialer:**
+  - **An unanswered dialer call is not logged.** It never reaches Vapi, and Tokomni sends no outcome.
+  - **An answered dialer call will be filed as incoming.** The writer takes `direction` from Vapi's call type, and the dialer's calls arrive at 208 as `inboundPhoneCall`. The tenant, the transcript and the summary are still there (the router passes `resident_id`). Not changed.
+
 ### Feature 20: is the dashboard's dialer working? Set up, not yet proven (07:54 UTC; read only)
 - **Asked:** *"is the auto dialer in the dashboard working that is connected in the tokomni"*.
 - **Set up right:**
   - The production alias `homies-dashboard.vercel.app` is on `dpl_hnfcMnUHm4VasRVmyhARgD9FZRGh` (READY, `c97eca3`, built 12:33 UTC on 28 Oct, after the pair).
   - Vercel holds `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID`, both set at 11:44 UTC on 28 Oct.
   - `/dialer` answers 307 to the login.
-- **Not proven:** no call has reached Yariv's Vapi since 28 Oct 12:30 UTC (the same list shows the morning's calls, so the read works). Nobody has pressed Ring and been answered. Tokomni has no status API, so this cannot be checked any other way short of a press.
+- **Not proven:** no call has reached Yariv's Vapi since 28 Oct 12:30 UTC (the same list shows the 27 Oct calls, so the read works; the newest call on the account is 27 Oct 10:32 UTC). Nobody has pressed Ring and been answered. Tokomni has no status API, so this cannot be checked any other way short of a press.
 - **Nothing was sent to Omni.** The proof is the owner's press: List 2 playing, then "חייג לעידו" in calling hours (Sun-Thu 09:00-20:00 Israel time, which is 15:00-02:00 in the Philippines).
 
 ### Feature 19: the owner's one capped test, armed to start by itself; OpenRouter drained by another key (07:45-07:50 UTC; nothing spent)
