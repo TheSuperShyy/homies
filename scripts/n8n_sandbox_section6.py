@@ -156,6 +156,9 @@ CLAIM_EDITS = [
 # list, and both tools called a disputed bill a team note, so a dispute was past the bot by three
 # texts. A disputed amount is now answered from what get_balance returns; only a payment or refund
 # the record does not show goes to collections, with its details, and nothing is promised.
+# The note waits until the bot has asked when, how much and how: in the first blind check both players
+# noted the bare claim at once ("רשמתי לצוות ששילמת"), so the details the tenant gave next never reached it.
+# Its timing is notify_team's to say; the prompt says only what the tenant hears (the record first).
 MONEY_EDITS = [
     ("- **מה שנרשם לצוות, ולא נגמר בצ'אט:** השגות על חיוב ומסמכים,",
      "- **מה שנרשם לצוות, ולא נגמר בצ'אט:** מסמכים,"),
@@ -163,8 +166,8 @@ MONEY_EDITS = [
      "עצמם, נרשם לצוות.\n"
      "- **חיובים:** בכל עניין של כסף, מה שרשום במערכת הוא הראיה שלך, ואתה עונה ממנו. מי ששואל למה הוא מחויב, "
      "או אומר שהסכום גבוה או לא נכון, שומע ממך מה רשום: אילו חודשים פתוחים, כמה על כל חודש וכמה בסך הכול. "
-     "מי שאומר ששילם משהו שלא רשום, שחויב פעמיים או שמגיע לו החזר, שומע ממך מה רשום, ואתה שואל מתי, כמה ואיך "
-     "שילם ורושם את זה לגבייה עם הכלי. לתקן חיוב או להחזיר כסף יכול רק בן אדם, ואת זה אתה לא מבטיח.\n"
+     "גם מי שאומר ששילם משהו שלא רשום, שחויב פעמיים או שמגיע לו החזר, שומע קודם מה רשום, ואתה שואל אותו מתי, "
+     "כמה ואיך שילם. לתקן חיוב או להחזיר כסף יכול רק בן אדם, ואת זה אתה לא מבטיח.\n"
      "- **אב הבית:**"),
 ]
 MONEY_BALANCE = [
@@ -173,11 +176,11 @@ MONEY_BALANCE = [
      "what they are, and when they say an amount is too high or wrong: what it returns is the record, and the "
      "record is your answer."),
     ("a receipt or a disputed amount is a team note.",
-     "a receipt is a team note, and so is a payment or a refund they say the record does not show, with when, "
-     "how much and how they paid."),
+     "a receipt is a team note, and so is a payment or a refund they say the record does not show."),
 ]
 MONEY_NOTE = [
-    ("a bill they dispute, ", "a payment or a refund they say the record does not show, "),
+    ("a bill they dispute, ", "a payment or a refund they say the record does not show, once you have asked when, "
+     "how much and how they paid (the note carries what they say), "),
     ("A plain how-much-do-I-owe question is get_balance's;",
      "A how-much-do-I-owe question, and why they are charged what they are, even when they say it is wrong, "
      "is get_balance's: what it returns is the answer;"),

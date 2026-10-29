@@ -28,7 +28,22 @@ conversation that produced it.
   - Gemini's real 11:14 replies, put through the checks offline, fail on the reply to "why am I charged" (no record) and on the "too much" reply ("יש עוד משהו", "בינתיים", "יבדקו את"). The reply to the refund fails too (no record, no question).
   - Two gaps were widened, not the bar: `THEIRS` takes "כדי שיוכלו" and `CONCEDE` takes "יבדקו את". The 28 Oct Claude check still passes, and this morning's run fails as it did.
 - **Memory:** `money-answers-from-the-system`.
-- **Next:** two blind Claude players are running on the rebuilt texts (conversation 107, and a claimed payment). Then the push to the sandbox with a fresh memory, and the owner's own chat. The Gemini proof (`--run money`, about $0.40) needs the key's cap raised ($0.58 left) and the owner's go.
+- **Blind check 1** (two Claude players, the rebuilt texts only; `local/sandbox/runs/2026-10-29-1230-claude-money.md`):
+  - **conversation 107:**
+    - "why am I charged 1k" → the manager matter noted, then "אצלנו רשומים על הדירה שלך שמונה חודשים פתוחים, מינואר עד אוגוסט, 250 ₪ על כל חודש, ובסך הכול 2,000 ₪. שילמת על חלק מהחודשים האלה?".
+    - "too much" → a payment arrangement offered, no hand-off.
+    - The refund turn missed: it noted the refund at once ("רשמתי לצוות … ושחשוב לך שיטפלו בזה מהר") and did not say what the record shows. The checks fail it on the record and on "יטפלו בזה".
+  - **paid_already:**
+    - The record came first ("מרץ ואפריל עדיין רשומים אצלנו כלא שולמו").
+    - But the note went at the bare claim, "רשמתי לצוות שלנו ששילמת אותם", before asking how and when. So the details given next (a bank transfer, ₪500, early April) never reached the team, and the claim was stated as a fact.
+    - It passes the regex checks, but reading it shows the miss.
+  - **One cause in both:** the note's moment. Revised:
+    - notify_team's item says "once you have asked when, how much and how they paid (the note carries what they say)";
+    - get_balance's tail drops its own copy of the details;
+    - the bullet says the record comes first ("שומע קודם מה רשום") and the question follows. The note's timing is the tool's alone.
+  - Prompt 23,519 characters; `check_n8n_sandbox.py` ok.
+- **Blind check 2** on the revision: running (two fresh players, the same two chats).
+- **Next:** the push to the sandbox with a fresh memory, and the owner's own chat. The Gemini proof (`--run money`, about $0.40) needs the key's cap raised ($0.58 left) and the owner's go.
 
 ### Is all of Yariv's chatbot feedback working now? No: the older points are live, the 26 Oct document is sandbox only (11:50 UTC; read only)
 - **Asked:** *"ok so rn all the feedback from yariv in the chatbot is working?"*

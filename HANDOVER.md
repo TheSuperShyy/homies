@@ -26,7 +26,10 @@ appended to.
 >     - **Built as F** in `n8n_sandbox_section6.py` (`MONEY_EDITS`, `MONEY_BALANCE`, `MONEY_NOTE`). A disputed charge is answered from get_balance. Only a payment or refund the record misses goes to collections, and nothing is promised.
 >     - WHO_RULE's stale "the balance still needs a full name and phone" is gone too, since it contradicted `BALANCE_TOOL`.
 >     - **The driver** has `fee_dispute` (the 11:14 chat word for word; Gemini's real replies fail its checks) and `paid_already`, both under `--run money`.
->     - **Not pushed to the sandbox yet:** two blind Claude players are checking it first. Then `n8n_sandbox.py --apply --section6 --fresh-memory`.
+>     - **Not pushed to the sandbox yet.**
+>       - Blind check 1 found one miss: the note to collections went at the bare claim, before the payment details, so the details never reached the team. Revised: notify_team notes only once when, how much and how have been asked.
+>       - Blind check 2 is running on the revision.
+>       - Then `n8n_sandbox.py --apply --section6 --fresh-memory`.
 >     - **The Gemini proof** waits for a raised key cap and the owner's go.
 
 ---
