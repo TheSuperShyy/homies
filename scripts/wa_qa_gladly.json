@@ -1,0 +1,59 @@
+{
+ "_about": "The deck for n8n_whatsapp_gladly.py (29 Oct, evening): the owner's live chat of 18:40-18:49 UTC word for word (executions 138841-138878, its first two exchanges already in memory, as they were), and a fault report, where a glad word would be wrong. `expect` is never shown to the players.",
+ "scenarios": [
+  {
+   "id": "owner_balance",
+   "title": "the owner's chat as Assaf, 29 Oct 20:47 Israel time: is electricity free, then is there a balance left (138878 answered 'אוקיי, יש לך יתרה פתוחה …')",
+   "time": "20:47",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T20:47:00+02:00",
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "history": [
+    {"resident": "פתיחת קריאת שירות", "michael": "כאן מיכאל מצוות השירות של הומי'ז. בשמחה, הגעת בדיוק למקום הנכון ואני כאן איתך. מה קרה? 🙂"},
+    {"resident": "היי מיכאל, אני צריך לשאול משהו לגבי מה שכוללים דמי הוועד שאני משלם כל חודש. איפה אני יכול לראות את זה? כי לא קיבלתי חוברת בהרשמה.", "michael": "ערב טוב! בשמחה, אני אעשה לך סדר בזה. התשלום החודשי מכסה את כל ההוצאות השוטפות של הבניין: ביטוח, חשבונות חשמל ומעלית, בודק מעליות, ניקיון, גינון, ביקורות של גילוי אש ומערכת שחרור עשן, טיפול במשאבות וחיטוי מאגר מים. הוא כולל גם קופה קטנה לתקלות קטנות, קווי בזק למעלית ולמערכת האש, עמלות בנק, ואת הניהול, האחזקה וגביית הכספים שלנו. מה שלא כלול זה תקלות שבר או בלאי, תיקונים חריגים ופרויקטים מיוחדים שלא נמצאים בתקציב השוטף. יש משהו מסוים שרצית לבדוק אם הוא בפנים?"}
+   ],
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. שאל מה כוללים דמי הוועד, ועכשיו רוצה לדעת אם נשארה לו יתרה. ישלם בסוף החודש, לא עכשיו.",
+    "script": [
+     {"say": "אה, אז החשמל בחינם? לא ידעתי את זה."},
+     {"say": "אה, חשבתי שזה בחינם. בכל מקרה, אני צריך לבדוק אם נשארה לי יתרה בתשלום החודשי."},
+     {"say": "לא תודה, אשלם בסוף החודש", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "get_balance": {"ok": true, "found": 1, "resident": "אסף קליקס", "building": "בר כוכבא 23, תל אביב - יפו", "unit": "2", "owed_total": 2000, "owed_months": [{"period": "2026-01", "amount": 250}, {"period": "2026-02", "amount": 250}, {"period": "2026-03", "amount": 250}, {"period": "2026-04", "amount": 250}, {"period": "2026-05", "amount": 250}, {"period": "2026-06", "amount": 250}, {"period": "2026-07", "amount": 250}, {"period": "2026-08", "amount": 250}], "in_review": []}
+   },
+   "expect": [
+    {"type": "called", "tool": "get_balance"},
+    {"type": "bot_not_regex", "regex": "אוקיי", "name": "no 'okay' (138878)"},
+    {"type": "turn_regex", "turn": 1, "regex": "מערכת", "name": "the balance told as what our system shows"},
+    {"type": "turn_regex", "turn": 1, "regex": "2,?000", "name": "the amount"}
+   ]
+  },
+  {
+   "id": "stair_light_word",
+   "title": "a fault, recognised sender: the word before the ticket is care, not gladness",
+   "time": "21:05",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-10-29T21:05:00+02:00",
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. האור בחדר המדרגות בקומה 3 לא עובד מאתמול בערב.",
+    "script": [
+     {"say": "האור בחדר המדרגות בקומה 3 לא עובד מאתמול בערב"},
+     {"say": "תודה", "closing": true}
+    ]
+   },
+   "fixtures": {
+    "open_request": {"ok": true, "opened": true, "reference": "255-1450-26", "building": "בר כוכבא 23", "reporter_unit": "2"}
+   },
+   "expect": [
+    {"type": "called", "tool": "open_request"},
+    {"type": "turn_not_regex", "turn": 0, "regex": "בשמחה", "name": "no 'gladly' on a fault"},
+    {"type": "bot_not_regex", "regex": "אוקיי", "name": "no 'okay'"}
+   ]
+  }
+ ]
+}

@@ -18,6 +18,11 @@ appended to.
 > - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
 > - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
+> **LIVE 29 Oct, 19:13 UTC: the word before an answer is "בשמחה", not "אוקיי", and a balance is told as what our system shows (epoch 87, `scripts/n8n_whatsapp_gladly.py`).** The owner, on "אוקיי, יש לך יתרה פתוחה …" (execution 138878): *"a bit unprofessional ... gladly to do so. or gotcha, based on the system you still have ..."*. Prompt only: the quoted list's first word, and the money rule now says "ואומר לו שזה מה שרשום אצלנו במערכת". WORKLOG 29 Oct.
+> - **Rollback:** `python scripts/n8n_whatsapp_gladly.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-gladly.json`) + git revert. That returns epoch 86 (one voice). `n8n_whatsapp_ionly.py --restore` after it only to undo the one voice too.
+> - **Owed:** the owner's handset, then `check_whatsapp_rules.py --watch 2026-10-29T19:13`. Since 17:45 the watch has read 5 live turns and flagged nothing.
+> - **The fold** must take section 6, `ionly()` and `gladly()`, in that order.
+>
 > **LIVE 29 Oct, 17:45:40 UTC: one voice, Michael's, on the live WhatsApp bot (epoch 86, `scripts/n8n_whatsapp_ionly.py`).** The owner's live chat as Assaf (17:02-17:06, executions 138669/138681) got "…ונמצאות אצל הצוות", then "העברתי … לצוות, כדי שיבדקו". The owner: *"there is no the team only the agent ... it should be i and i only"*. WORKLOG 29 Oct.
 > - **Now:** he speaks for himself: what he checks, sees in our system, opened or recorded, and needs so he can verify. No team, manager or management in a reply, and nothing "passed on". A note is a quiet record; a request only a person can finish is "I recorded it", then what it lacks. An upset tenant gets "sorry to hear it", then what he is doing. A manager request is still recorded at once, quietly.
 > - **`clerk` narrowed:** "כדי שאוכל לאמת / לבדוק" passes, so "send a screenshot so I can verify it in our system" goes out. `--watch` flags "someone other than Michael".

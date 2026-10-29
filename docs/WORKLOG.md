@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-10-29
 
+### LIVE 19:13 UTC: "בשמחה", not "אוקיי", and a balance told as what our system shows (`n8n_whatsapp_gladly.py`, epoch 87)
+- **What the owner saw:** a chat on the live number, 18:40-18:49 UTC (executions 138841-138878), the one-voice version.
+  - "I need to check if I have a balance left" got "אוקיי, יש לך יתרה פתוחה של 2,000 ש"ח על החודשים ינואר עד אוגוסט 2026, 250 ש"ח לכל חודש. תרצה שאשלח לך את קישור התשלום שלך עכשיו?".
+  - The balance itself was right: the number was recognised with nothing typed.
+- **Said:** *"so this is a bit unprofessional so its like. gladly to do so. or gotcha, based on the system you still have ..."*.
+- **Cause:**
+  - "אוקיי" is the first of the three words the prompt quotes for the short word before an answer ("אוקיי", "אין בעיה", "אוי, לא נעים"), and a quoted word is said back. On 23 Sep a cold "בטח" in the same slot was the same fault.
+  - The money rule made the record the bot's evidence ("ואתה עונה לפיו") but never had it say so.
+- **Changed, the prompt only** (23,567 → 23,602 characters):
+  - The quoted "אוקיי" is now the owner's "בשמחה". The list's own "not the same word twice in a conversation" keeps it from repeating.
+  - The money rule goes on "ואומר לו שזה מה שרשום אצלנו במערכת".
+  - MEMORY_EPOCH 86 → 87: the owner's buffer held the "אוקיי" reply.
+- **Gate:**
+  - The candidate was all green: 422 cases, and the replay of every message and reply unchanged. Only the prompt's pin moved.
+  - A blind Claude player was run on `scripts/wa_qa_gladly.json`: the owner's 138868/138878 chat with its two earlier exchanges in memory, plus a stair-light fault. 6 turns, 7/7 expectations, no guard rejection.
+  - The balance came as "לפי מה שרשום אצלנו במערכת, כן, יש יתרה פתוחה על דירה 2 …: 2,000 ₪ בסך הכול …". There was no "בשמחה", because the chat had used it twice already. The fault opened with "אוי, לא נעים לעלות במדרגות בחושך", care rather than gladness.
+  - Read back exactly as dumped; the check on live is green (478).
+- **Also seen:** the one-voice version held on live. `--watch 2026-10-29T17:45` read the owner's 5 turns since then and flagged nothing.
+- **Rollback, in order:** `n8n_whatsapp_gladly.py --restore` (back to epoch 86), then `n8n_whatsapp_ionly.py --restore` only to undo the one voice as well. `n8n_whatsapp_ionly.py` refuses by itself now (the memory key is 87); its `snapshot()` and `restore()` take a path, and gladly uses them.
+- **Owed:** the owner's handset, then `--watch 2026-10-29T19:13`.
+
 ### Re-registered (18:37:16 UTC), and a watch that re-registers the number by itself (`n8n_number_watch.py`, live 18:46 UTC)
 - **Asked:**
   - *"can we add a ping on their so that it wont close?"*

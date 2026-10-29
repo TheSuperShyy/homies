@@ -152,7 +152,12 @@ PINS = {
     # a stated reason (one stated was sent in a third of the answers); asked again,
     # something new. Claude-played in three rounds, the last half size and clean
     # (WORKLOG 19 Oct, the epoch-84 entry).
-    'Answer the resident / system': 'ebc23e806549',
+    # 29 Oct, late (n8n_whatsapp_gladly.py, epoch 87): the prompt alone. The quoted word before an answer
+    # is "בשמחה", not "אוקיי", and money is told as what our system shows. Claude-played on the
+    # candidate (scripts/wa_qa_gladly.json: the owner's 138868/138878 chat with its two earlier exchanges
+    # in memory, and a stair-light fault): 6 turns, 7/7 expectations, no guard rejection; the balance
+    # came as "לפי מה שרשום אצלנו במערכת …" and the fault opened with care, not gladness.
+    'Answer the resident / system': '3ce8680c9b2e',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

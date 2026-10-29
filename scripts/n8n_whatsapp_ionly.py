@@ -290,8 +290,10 @@ def ionly(wf):
     return out
 
 
-def snapshot(live):
-    if os.path.exists(SNAPSHOT):
+def snapshot(live, path=None):
+    """Live as it was before a write, the webhook secret replaced. Shared with later patchers."""
+    path = path or SNAPSHOT
+    if os.path.exists(path):
         return False
     secret = W.env().get("N8N_WEBHOOK_SECRET", "").strip()
     live = dict(live, staticData="<stripped: runtime state keyed by phone numbers>")
@@ -301,14 +303,15 @@ def snapshot(live):
             sys.exit("The live workflow does not contain N8N_WEBHOOK_SECRET from .env, "
                      "so the snapshot's redaction would miss. Refusing to write it.")
         text = text.replace(secret, NP.PLACEHOLDER)
-    os.makedirs(os.path.dirname(SNAPSHOT), exist_ok=True)
-    with open(SNAPSHOT, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
         f.write(text)
     return True
 
 
-def restore():
-    snap = json.load(open(SNAPSHOT, encoding="utf-8"))
+def restore(path=None):
+    path = path or SNAPSHOT
+    snap = json.load(open(path, encoding="utf-8"))
     secret = W.env().get("N8N_WEBHOOK_SECRET", "").strip()
     if not secret:
         sys.exit("N8N_WEBHOOK_SECRET is not in .env; the snapshot's Sort node would "
@@ -317,8 +320,8 @@ def restore():
     W.api("PUT", "/api/v1/workflows/%s" % WORKFLOW_ID, {
         "name": body["name"], "nodes": body["nodes"],
         "connections": body["connections"], "settings": body.get("settings", {})})
-    print("restored %s from %s (%d nodes)" % (WORKFLOW_ID, SNAPSHOT, len(body["nodes"])))
-    print("Put the repo back too: git revert the ionly commit (MEMORY_EPOCH, EPOCH_COVERS, prompt.md, pins).")
+    print("restored %s from %s (%d nodes)" % (WORKFLOW_ID, path, len(body["nodes"])))
+    print("Put the repo back too: git revert the commit that applied it (MEMORY_EPOCH, EPOCH_COVERS, prompt.md, pins).")
 
 
 def prompt_of(wf):
