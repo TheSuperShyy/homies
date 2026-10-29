@@ -15,7 +15,7 @@ appended to.
 > - **The owner's one capped test ran 29 Oct, 08:05-08:12 UTC** (`manager_retest` + `manager_fee`, $0.31 against the owner's $1; WORKLOG 29 Oct). manager_retest passed and manager_fee failed one reply.
 >   - It ran with `--keep 0`, the live bot's $2 line dropped for that one run on the owner's word (*"can we remove the 2usd limit"*). `--keep` is a new flag in `sandbox_drive.py`, and the default is still $2.
 >   - The watcher that waited for room was stopped first, so nothing else is queued. **No further paid run without a new go.**
->   - **For the owner's own chat:** memory round 47 (clean for every persona), and the chat page running at http://127.0.0.1:8765 since about 08:25 UTC. His messages spend the same key's last $1.25.
+>   - **For the owner's own chat:** memory round 47 (clean for every persona), and the chat page running at http://127.0.0.1:8765 since about 08:25 UTC. The owner's messages spend the same key's last $1.25.
 
 ---
 
