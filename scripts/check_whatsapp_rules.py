@@ -190,7 +190,10 @@ PINS = {
     'get_service_info / tool': '18ca3d507731',
     'notify_team / tool': '1b1fcd44fe3f',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's
-    'open_request / tool': '17d2ee41f988',
+    # 30 Oct, morning (n8n_whatsapp_name.py, epoch 91): reporter_name and name_declined, and when to ask: only
+    # after need_name, once (the owner: "ok we need to include the name in that wtf"); debt-tools v138
+    # names a tenant on file from the record and asks the rest (NAME_REQUIRED_CHANNELS voice,whatsapp).
+    'open_request / tool': 'a2cdef1e93f3',
     'show_menu / tool': '427d364be55d',
     'verify_address / tool': 'a2a85a3d4068',
 }

@@ -2648,6 +2648,16 @@ balance check. That was deliberate and wrong.
 - **The switch:** `NAME_REQUIRED_CHANNELS` per channel. An agent whose tool cannot send a name
   yet must never be enforced: it would get `need_name` forever. So the agent is synced before the
   switch goes on. Live on the phone line since 22 Oct, 10:24 UTC (function v126).
+- **WhatsApp since 30 Oct, 05:12 UTC** (debt-tools v138, `NAME_REQUIRED_CHANNELS=voice,whatsapp`,
+  epoch 91; the owner, on seeing 0 of 2 WhatsApp tickets named: *"ok we need to include the name
+  in that wtf"*).
+  - A tenant on file for the sender's number is named from the record and never asked. A name
+    they gave wins, unless it is part of the one on file: the bot passes the first name it is
+    shown ("אסף"), and the ticket gets "אסף קליקס".
+  - An unknown number gets `need_name`, and the bot asks once, after that answer.
+  - An emergency on WhatsApp opens at once, name or not.
+  - Plan B's "name, building and flat in one message" was not taken. The bot learns a name is
+    missing only from `need_name`, and the prompt keeps one question at a time.
 - **Deleting a switch from `.env` does not switch it off.** `supabase_functions.py` pushes only
   a value it has, so the deployed one stays. Off is `NAME_REQUIRED_CHANNELS=off` plus a redeploy.
 - **A caller's number can arrive outside `customer.number`.** Omni sends outside callers in

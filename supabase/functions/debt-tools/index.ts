@@ -1023,6 +1023,16 @@ function dialled(ctx: CallContext): boolean {
   return Boolean(ctx.residentId || ctx.charges.length);
 }
 
+/** The one full name on file for a number (30 Oct): the resident rows that carry
+ *  it, as the bot's `Who is writing?` reads them. Two different names on one
+ *  number is no answer, and the sender is asked. */
+async function nameOnFile(phone: string | null): Promise<string | null> {
+  if (!phone) return null;
+  const { data } = await db.from("residents").select("full_name").eq("phone", phone);
+  const names = [...new Set((data ?? []).map((r: any) => reporterNameOf(r.full_name)).filter(Boolean))];
+  return names.length === 1 ? String(names[0]) : null;
+}
+
 /** The name on the resident row of a call we placed (feature 17): the debt
  *  agent's ticket carries the person it rang, and nobody is asked. */
 async function residentName(id: string | null): Promise<string | null> {
@@ -2986,10 +2996,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // (23 Aug: five runs, zero chained calls). Switched per channel by
     // NAME_REQUIRED_CHANNELS, so an agent whose tool cannot send a name yet is
     // never refused forever. A call we placed already knows who it rang.
-    const reporterName = reporterNameOf(args?.reporter_name)
+    //
+    // ON WHATSAPP, THE NAME ON FILE FOR THE SENDER'S NUMBER (30 Oct). The
+    // owner's WhatsApp tickets carried no name: that tool sent none, nothing filled
+    // it, and the gate was on for voice only (0 of 2 since 22 Oct, against 7 of 9
+    // calls). The owner: "we need to include the name in that". The number finds
+    // the resident rows the way `Who is writing?` does, so a tenant on file is never
+    // asked. A name they gave still comes first, unless it is part of the one on
+    // file ("אסף" of "אסף קליקס", the first name the bot is shown), where the
+    // record's full name is the better one.
+    const given = reporterNameOf(args?.reporter_name);
+    const onFile = channel(ctx) === "whatsapp" ? await nameOnFile(reporterPhone(ctx)) : null;
+    const reporterName = (onFile && (!given || onFile.includes(given)) ? onFile : given)
       ?? (dialled(ctx) ? await residentName(ctx.residentId) : null);
     const givenPhone = phoneOf(args?.reporter_phone);
-    const missing = ticketGate({
+    // An emergency on WhatsApp opens at once, name or not: opening the ticket is
+    // the one thing we do in an emergency (the owner, 6 Oct). The name can follow.
+    const urgentChat = channel(ctx) === "whatsapp" && urgency(args?.urgency) === "emergency";
+    const missing = urgentChat ? null : ticketGate({
       channel: channel(ctx),
       dialled: dialled(ctx),
       enforced: requiredChannels(Deno.env.get("NAME_REQUIRED_CHANNELS")),

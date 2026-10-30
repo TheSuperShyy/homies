@@ -9,6 +9,39 @@ conversation that produced it.
 
 ---
 
+## 2026-10-30
+
+### LIVE 05:10-05:12 UTC: every WhatsApp ticket carries the name of whoever reported it (`n8n_whatsapp_name.py`, debt-tools v138, epoch 91)
+- **Asked, first read only:** *"When i open a ticket will it store the information of the tenant like the name on who opened it?"*.
+  - It stored the number, the flat, the building and, for a number on file, a link to the tenant's record.
+  - The ticket's own name field was empty: the WhatsApp tool sent no name, and the gate was on for voice only. Since 22 Oct, 0 of 2 WhatsApp tickets were named, against 7 of 9 calls and all 204 OXS imports.
+  - The dashboard shows that field, then the number, so WhatsApp tickets showed a number only.
+- **Then:** *"ok we need to include the name in that wtf"*. That is feature 17's Plan B (22 Oct, the owner: *"before we can open a ticket we should include the name"*), never built.
+- **Changed, the function (debt-tools v138, 05:12 UTC, `--oxs-mirror`; `.env` `NAME_REQUIRED_CHANNELS=voice,whatsapp`):**
+  - On WhatsApp `nameOnFile()` reads the resident rows for the sender's number. One name there names the ticket and nobody is asked; the owner's number holds exactly "אסף קליקס".
+  - A name they gave wins, unless it is part of the one on file: the bot passes the first name it is shown.
+  - An unknown number gets `need_name`. An emergency on WhatsApp opens at once, name or not.
+  - Voice is unchanged. Syntax clean; function tests 45/45.
+  - Probe on v138: an unknown number with no name answered `need_name`, and no ticket was written (nothing in `open_request` writes before the gate).
+- **Changed, the bot (05:10:00 UTC, applied before the function so the tool could already send a name):**
+  - `open_request` sends `reporter_name` and `name_declined`.
+  - Its text: a tenant on file is never asked; after `need_name`, ask once, in a sentence with whatever else is missing; a refusal still gets the ticket; an emergency never waits.
+  - MEMORY_EPOCH 90 → 91; tools 0c42f56920b2. The prompt, inject, guards and Send are unchanged.
+- **Gate:** only `open_request / tool` moved; re-pinned. 429 cases; the replay of every reply ever sent is unchanged. Live is green.
+- **`check_patchers_idle.py` on live:** the pre-fold state, unchanged. 26 refuse at the inject's epoch check; `batch` (baseline) and `firstword` (recorded) would write.
+- **Claude-played** (`scripts/wa_qa_name.json`), 7/7 expectations:
+  - An unknown number was asked building and flat, then, after `need_name`, "ומה השם המלא שלך?" once. The ticket opened as "דני לוי".
+  - The owner (on file) was never asked. The bot passed "אסף", which the function turns into "אסף קליקס".
+  - One rubric flag, the mid-conversation self-introduction, sits before anything this touched.
+- **Overnight, the watch owed for epoch 90** (`--watch 2026-10-29T20:56`): 5 resident turns, nothing broke the rules.
+  - The owner's 21:01 UTC test opened 255-1386-26 with both photos (`photos_attached` 2). The next message went on it through `open_request`'s duplicate fold and `add_request_detail`.
+  - Its "וצירפתי אליה גם את התמונה" was true: the photos went on in the turn before.
+  - Its first reply opened "כאן מיכאל. אין שום בעיה, פתחתי…": a filler of the kind "כמובן" replaced in the quoted list. Recorded, not changed.
+- **Rollback:** `n8n_whatsapp_name.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-name.json`), then `NAME_REQUIRED_CHANNELS=voice` and `supabase_functions.py --apply --oxs-mirror`. That order: never enforce WhatsApp while its tool cannot send a name.
+- **Not done:** names on tickets opened before 05:12 UTC stay empty (the owner's 255-1365/1385/1386-26 among them).
+
+---
+
 ## 2026-10-29
 
 ### LIVE 20:56 UTC: something new about an open ticket goes on the ticket, and the photo note says only what is true (`n8n_whatsapp_addto.py`, debt-tools v136, epoch 90)

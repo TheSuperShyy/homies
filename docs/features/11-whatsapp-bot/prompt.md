@@ -49,6 +49,16 @@ slash-forms for gender. The owner has heard this and chosen freedom. Anything
 added back is a new decision, made by a person, not a quiet re-tightening.
 
 
+## 30 Oct, morning — every ticket carries the name of whoever reported it. Epoch 91.
+
+The system prompt below is unchanged; `open_request`'s text moved. Asked whether a ticket stores
+who opened it, the answer was the number, the flat and a link to the tenant's record, but no name
+(0 of 2 WhatsApp tickets since 22 Oct, against 7 of 9 calls). The owner: *"ok we need to include
+the name in that wtf"*. Feature 17's WhatsApp half: the function names a tenant on file from the
+record, asks an unknown number through `need_name`, and never holds an emergency for a name;
+`open_request` sends `reporter_name` and `name_declined` and says to ask only after `need_name`.
+Shipped by `scripts/n8n_whatsapp_name.py` with debt-tools v138, MEMORY_EPOCH 90 to 91.
+
 ## 29 Oct, night — something new about an open ticket goes on the ticket. Epoch 90.
 
 The system prompt below is unchanged; the tools and the photo note moved. On the owner's handset a

@@ -230,7 +230,9 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 90
+MEMORY_EPOCH = 91
+# 90 -> 91, 30 Oct, morning (n8n_whatsapp_name.py): open_request sends the reporter's name when they gave one,
+# and asks only after need_name; the function names a tenant on file from the record.
 # 89 -> 90, 29 Oct, night (n8n_whatsapp_addto.py): something new about an open ticket goes on the ticket
 # (add_request_detail, a new tool), the photo note no longer says the photo is on the open ticket, and
 # notify_team says a note never changes a ticket. The owner's buffer holds two false "I added it" replies.
@@ -790,8 +792,8 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "96cc2a6a3c5b",  # 29 Oct, night, epoch 90: LIVE's tools (section 6, one voice, then addto's notify_team
-    # clause). TOOLS below is NOT folded yet, so every patcher refuses at check_memory_epoch until it is
+    "tools": "0c42f56920b2",  # 30 Oct, morning, epoch 91: LIVE's tools (section 6, one voice, addto's notify_team
+    # clause, then name's open_request paragraph). TOOLS below is NOT folded yet, so every patcher refuses at check_memory_epoch until it is
     # (n8n_whatsapp_section6.py, n8n_whatsapp_ionly.py). add_request_detail is not in TOOLS, so its text is
     # outside this hash: the gate's pin holds it, and a change to it bumps the epoch by hand.
 }

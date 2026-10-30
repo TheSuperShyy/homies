@@ -18,13 +18,21 @@ appended to.
 > - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
 > - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
+> **LIVE 30 Oct, 05:10-05:12 UTC: every WhatsApp ticket carries the name of whoever reported it (epoch 91, `scripts/n8n_whatsapp_name.py`, debt-tools v138, `NAME_REQUIRED_CHANNELS=voice,whatsapp`).** The owner, on hearing WhatsApp tickets had no name: *"ok we need to include the name in that wtf"*. This is feature 17's Plan B. WORKLOG 30 Oct.
+> - **A tenant on file for the sender's number is named from the record and never asked.** The owner's number gets "אסף קליקס". An unknown number gets `need_name`, and the bot asks once. An emergency opens at once.
+> - **The dashboard's ticket list shows the name** (`reported_by_name`, then the number). The OXS copy of the owner's tickets carries it in its "[דיווח: …]" line.
+> - **Rollback, in this order:** `n8n_whatsapp_name.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-name.json`), then `NAME_REQUIRED_CHANNELS=voice` and `supabase_functions.py --apply --oxs-mirror`. Never enforce WhatsApp while its tool cannot send a name.
+> - **Owed:** the owner's handset (a ticket from their number shows "אסף קליקס"), then `check_whatsapp_rules.py --watch 2026-10-30T05:10`. The fold takes `name()` after `addto()`.
+> - **Not done:** tickets opened before 05:12 UTC keep an empty name (255-1365/1385/1386-26 among them). Filling them from the linked records is a one-off on our own database, if the owner wants it.
+> - **Seen overnight, not changed:** 139279 opened "כאן מיכאל. אין שום בעיה, פתחתי…". That is the filler "כמובן" replaced in the quoted list, before a fault rather than a debt.
+>
 > **LIVE 29 Oct, 20:56 UTC: something new about an open ticket goes on the ticket (epoch 90, `scripts/n8n_whatsapp_addto.py`, debt-tools v136).** The light-ticket replies of 20:18-20:20 UTC said the photo and the update were on 255-1365-26, and nothing was. The owner: *"so how can we fix it"*. WORKLOG 29 Oct.
 > - **The bot's new tool, `add_request_detail`:** appends the resident's words to their open ticket and attaches the photos their number sent in the last hour. It answers `photos_attached`, and only what it answers may be said.
 > - **On WhatsApp the function allows only the sender's own ticket** ("not found" for anyone else's) and only while it is open ("closed" otherwise). Voice is unchanged.
 > - **The photo note no longer says the photo is on the open ticket**, which was false. `notify_team`'s text says a note never changes a ticket.
 > - **`--watch` flags "a ticket said to be added to, with nothing added this turn".**
 > - **Rollback:** `n8n_whatsapp_addto.py --restore` (snapshot `local/n8n-whatsapp-live-29oct-before-addto.json`) + git revert. The function can stay: nothing else calls it on WhatsApp.
-> - **Owed:** the owner's handset, then `check_whatsapp_rules.py --watch 2026-10-29T20:56`. The fold takes section 6, `ionly()`, `gladly()`, `checkword()` and `addto()` (the tool into TOOLS, the photo note into AGENT_NEW), in that order.
+> - **The handset test is done** (21:01 UTC). 255-1386-26 opened with both photos, and the next message went on it through the new tool. The watch from 20:56: 5 turns, nothing broke the rules. The fold takes section 6, `ionly()`, `gladly()`, `checkword()` and `addto()` (the tool into TOOLS, the photo note into AGENT_NEW), in that order.
 > - **Known, not changed:**
 >   - An addition reaches our ticket, not OXS: the mirror copies new tickets only. Nobody is alerted by an addition.
 >   - A second real note of the same reason inside 24 hours is still dropped by "Hand to a person" while `notify_team` answers `ok`.

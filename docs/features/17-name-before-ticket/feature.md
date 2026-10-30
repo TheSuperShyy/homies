@@ -2,7 +2,7 @@
 
 **Estimate:** 2d
 **Depends on:** 02 (intake, the voice agent), 11 (WhatsApp bot)
-**Status:** live on the phone line 22 Oct 2026 (Plan A: function v126 with `NAME_REQUIRED_CHANNELS=voice`, the incoming agent synced); WhatsApp is Plan B, not built
+**Status:** live on the phone line 22 Oct 2026 (Plan A: function v126 with `NAME_REQUIRED_CHANNELS=voice`, the incoming agent synced); live on WhatsApp 30 Oct 2026 (Plan B: debt-tools v138 with `NAME_REQUIRED_CHANNELS=voice,whatsapp`, `scripts/n8n_whatsapp_name.py`, epoch 91). On WhatsApp a tenant on file is named from the record and never asked, an unknown number is asked once after `need_name`, and an emergency opens at once. Plan B's "name, building and flat in one message" was not taken (CONTEXT.md, feature 17).
 
 ## Purpose
 
