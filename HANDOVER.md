@@ -40,7 +40,9 @@ appended to.
 >   - the live bot's typing nodes (`n8n_whatsapp_newnumber.py`, gate green; `--restore` puts the snapshot back).
 > - **Not the number on the owner's setup page:** +1 555-901-6064 is in the "ASTDX" account, which respond.io is subscribed to. Never put the bot there.
 > - **Owed:**
-> - **Proven:** the owner's "hi" at 09:06:11 UTC got the menu at 09:06:16, and Meta reports it read. Replies go to anyone who writes first, recipient list or not.
+> - **Proven:** the owner's "hi" at 09:06:11 UTC got the menu at 09:06:16, and Meta reports it read.
+>   - **Replies go ONLY to numbers on the test recipient list** (max 5). A tester's "Hi" at 14:43 UTC was answered by the bot, and Meta refused the reply with `131030 Recipient phone number not in allowed list`.
+>   - The owner adds testers in the App Dashboard (WhatsApp > API Setup > To > Manage phone number list), with a code to each one's WhatsApp.
 >   - The two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
 >   - The lasting fix is still Homies' own number on a verified business.
 >

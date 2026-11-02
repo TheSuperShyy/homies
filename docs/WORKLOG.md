@@ -11,10 +11,22 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### WRONG this morning: the test number does NOT answer anyone who writes first. A tester's "Hi" got no reply (131030, 14:43 UTC; read only)
+- **Asked:** *"can you check the recent webhook on the chatbot"*.
+- **The chain, read end to end:**
+  - Chatwoot's rails log: Meta POSTed to `/webhooks/whatsapp/+15550459005` at 14:43:22 UTC. The one at 10:46:53 was a status update.
+  - n8n run 148585 took the message ("Hi", conversation 90, a +63 number ending 962 that is not the owner's) and sent the canned greeting at 14:43:27.
+  - **Chatwoot's SendReplyJob was refused by Meta: `(#131030) Recipient phone number not in allowed list`.** The message shows as failed in Chatwoot.
+  - Meta's number: CONNECTED / CLOUD_API, routing still Chatwoot. The WABA has 141006 (payment method) and the business has 141010 (verification), as before.
+- **So the morning's conclusion was wrong.** A test number replies only to numbers on its recipient list, even inside the 24-hour window. The owner's number got its reply at 09:06 because it is on the list. Ido and every other tester need adding: App Dashboard, WhatsApp > API Setup > To > Manage phone number list, with a code to each number's WhatsApp; at most 5.
+- I told the owner twice today that anyone can test by writing first, and the day's report said so too. All three were corrected to the owner.
+- The failed greeting is not retried. Once the number is on the list, the tester writes again.
+
 ### Ido as a test recipient on the new WhatsApp number: only the owner can add him (and the templates are still pending)
 - **Asked:** *"ok so add ido number on the meta tester"*.
 - **Not doable from here.** Meta adds test recipients only in the App Dashboard: WhatsApp > API Setup > To > Manage phone number list. Up to 5 numbers, each confirmed by a code Meta sends to that WhatsApp (Meta's get-started guide, checked 2 Nov; no API for it). Given to the owner as steps. The From must be +1 555-045-9005, never +1 555-901-6064 (respond.io's).
 - **The list only matters for messages we start** (the two templates). Ido can already chat with the bot by writing first, as the owner's "hi" proved at 09:06 UTC.
+  - **WRONG, corrected 14:50 UTC.** A tester's reply failed with 131030 (entry above). The list governs replies too.
 - **Templates:** `payment_link_he` and `ticket_resolved_he` were still PENDING at 12:51 UTC, three hours after submission. The watcher stopped there.
 
 ### The email to Omni rewritten: what we tried, and what we need to do (owner's word; nothing sent)
@@ -215,7 +227,7 @@ conversation that produced it.
   - The two templates (`payment_link_he`, `ticket_resolved_he`) on the new account: `wa_templates.py`, then Meta's approval.
   - A payment method on the account (141006) before any template can send.
   - The test recipients.
-- **Proven end to end:** the owner's "hi" reached Chatwoot at 09:06:11 UTC (4 Meta POSTs to `/webhooks/whatsapp/+15550459005`). The bot's menu went out at 09:06:16 and Meta reports it **read**. So a test number may answer a number that is not on its recipient list, inside the 24-hour window the person's own message opens.
+- **Proven end to end:** the owner's "hi" reached Chatwoot at 09:06:11 UTC (4 Meta POSTs to `/webhooks/whatsapp/+15550459005`). The bot's menu went out at 09:06:16 and Meta reports it **read**. So a test number may answer a number that is not on its recipient list, inside the 24-hour window the person's own message opens. **WRONG (corrected 14:50 UTC):** a tester not on the list got 131030 on the reply. The owner's number answers because it is on the list.
 
 ### The bot is silent because the WhatsApp test account is gone from our reach since 31 Oct, ~14:43 UTC (read only)
 - **Asked:** *"check why the bot is not replying"*.

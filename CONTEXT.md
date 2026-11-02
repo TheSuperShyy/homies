@@ -3378,6 +3378,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - The email for Omni is `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. Until they answer, nothing can ring from the dashboard.
       - It was rewritten the same day on the owner's word: list what we tried, ask what we need to do, and leave out prices and the owner's name.
     - *(WhatsApp, not the dialer: a test number's recipients are added only in Meta's App Dashboard, each confirmed by a code sent to that WhatsApp. There is no API, so the owner adds them.)*
+    - ***A WhatsApp test number replies ONLY to its recipient list, replies included (2 Nov, 14:43 UTC).*** A tester's "Hi" was taken and answered by the bot, and Meta refused the reply with `131030 Recipient phone number not in allowed list`. The owner's number works because it is on the list.
+      - When a tester says the bot is silent, look in Chatwoot for a failed outgoing message and its `external_error` before anything else.
     - **Reading Tokomni's list page (2 Nov):**
       - ▶ under Play/Hold is the button that starts a list, so a list showing it is on hold.
       - Status "Active" means only that the list is not archived.
