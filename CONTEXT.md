@@ -3373,6 +3373,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - It needs Play pressed once.
     - Never press Stop: it does not start again by itself.
     - Never upload a sheet into it through the list's edit: that replaces every contact in it. Hand uploads get a list of their own.
+  - **2 Nov: the owner turned from the insert API to the line:** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*.
+    - Our system places the call through Omni's SIP (Vapi `byo-sip-trunk` + `byo-phone-number`), the preferred setup of 28 Sep.
+    - The email for Omni is `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. Until their values arrive, nothing can ring from the dashboard.
+    - **Tokomni's click-to-call already bridges a number to 208.** The INVITE's From name is `C2C#<number>` (26 Oct twice, 1 Nov). The router gives it the incoming agent, because only a `dialer-` name gets the debt agent.
   - **The dashboard's dialer test (feature 20, 28 Oct) is how a test call is placed now, not an Excel upload.** One press puts one number in List 2.
   - **Since 2 Nov the dashboard and `.env` send the Homies_Bot dialer's own id as `campaign_id`, not List 2's.** The owner had Tokomni open and said *"ok lets wire it up on the correct one"*.
     - Tokomni has two things here: the dialer and its lists. The dialer's settings page shows Homies_Bot: 5 channels, "Never stop" on, one participant, "Bot EXT 208".

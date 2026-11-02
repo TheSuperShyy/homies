@@ -44,10 +44,22 @@ appended to.
 >   - The two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
 >   - The lasting fix is still Homies' own number on a verified business.
 >
+> **THE DIALER GOES THROUGH OMNI'S LINE NEXT, NOT TOKOMNI'S LISTS (owner, 2 Nov).** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*. WORKLOG 2 Nov.
+> - **The plan:** our system places the call itself through Omni's SIP: a Vapi `byo-sip-trunk` credential and a `byo-phone-number`. This is the preferred setup of 28 Sep.
+> - **Waiting on Omni.** The owner sends `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. It asks for the server, username and password, outgoing permission with 077-6687949, Vapi's IPs allowed, G.711, the number's format and the price.
+> - **Then:**
+>   1. the credential and the number on Vapi;
+>   2. `VAPI_PHONE_NUMBER_ID`, `CALL_PIN` and `VAPI_DEBT_ASSISTANT_ID` in Vercel;
+>   3. the dialer page on Vapi's `/call`, with the agent picked as the router does;
+>   4. one call to Ido, on the owner's go.
+>
+>   The Debts page's Call button (`dashboard/lib/call.ts`) already does the Vapi side. Deploying the dashboard needs the push to `main`.
+> - **Tokomni's click-to-call already bridges a number to 208** (`C2C#<number>`; 26 Oct and 1 Nov). The router gives such a call the incoming agent.
+>
 > **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
 > - **Not proven until a press rings:** Tokomni answers 404 to anything wrong. "Never stop" is on, so an accepted press rings at once. Only in calling hours, and only Ido.
 > - **2 Nov, 10:52 UTC: the dialer's id was refused too.** Two presses, both `404 Route Not Found`, read in Vercel's request log. So neither id alone is the cause. Not switched back.
-> - **Next, on the owner's word (an accepted send rings Ido at once).** From this PC with `.env`'s token, stopping at the first 200:
+> - **Superseded the same day by the owner's turn to Omni's line (above); not run.** Kept in case the insert API comes back. On the owner's word only, since an accepted send rings Ido at once. From this PC with `.env`'s token, stopping at the first 200:
 >   1. the page's exact request;
 >   2. the dialer's id with the bare resident id (a UUID; ours is 52 characters with the press time);
 >   3. List 2's id with it.

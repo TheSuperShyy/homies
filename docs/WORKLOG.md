@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The owner's turn: our own system places the call through Omni's line, not leads into Tokomni (email to Omni drafted; nothing sent)
+- **Asked:** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*, after the dialer's id was refused too.
+- **Taken as:** the SIP route, the preferred setup until 28 Sep. Vapi dials out through Omni's line (a `byo-sip-trunk` credential and a `byo-phone-number`), so nothing goes into Tokomni's lists.
+- **Our side is mostly built.** The Debts page's Call button (`dashboard/lib/call.ts`, feature 15) already places a Vapi call with the debt agent's variables.
+  - It lacks `VAPI_PHONE_NUMBER_ID`, and `CALL_PIN` and `VAPI_DEBT_ASSISTANT_ID` in Vercel.
+  - The dialer test page would move to the same path.
+- **Yariv's Vapi, read only:** one credential (Cartesia) and one number, 208's SIP address. No trunk yet.
+- **Omni must give:**
+  - the SIP server, a username and a password (208's without REGISTER, or a separate extension for outgoing calls);
+  - outgoing permission with 077-6687949 as caller ID;
+  - Vapi's two signalling IPs and UDP 40000-60000 allowed, and G.711;
+  - the number's format and the price per minute.
+- **Vapi's values,** from its SIP trunk page (checked 2 Nov): US signalling `44.229.228.186/32` and `44.238.177.138/32`, RTP on UDP 40000-60000 from changing media IPs. A gateway may be a hostname.
+- **Email:** `local/omnitelecom/2026-11-02-outbound-sip-email.txt` (ignored by git), Hebrew with an English check copy. As a fallback it also asks for a click-to-call API.
+- **Found on the way: Tokomni's click-to-call already bridges a number to 208.**
+  - Three calls on Yariv's Vapi are named `C2C#<number>`: 26 Oct at 09:04 (twice) and 1 Nov at 11:01 UTC.
+  - All three went to Ido's mobile, and the incoming agent answered all three. The router gives the debt agent only to a `dialer-` name.
+- **After Omni answers:**
+  1. the credential and the number on Vapi;
+  2. `VAPI_PHONE_NUMBER_ID` in Vercel;
+  3. the dialer page on Vapi's `/call`;
+  4. one call to Ido, on the owner's go.
+
+  Deploying the dashboard needs a push to `main`: the same account question as the OXS fix.
+
 ### The dialer test refused again, now with the dialer's id: two presses at 10:52 UTC, both 404 (read only; nothing sent to Tokomni from here)
 - **Seen:** the owner's screenshot of `/dialer`: *"Not sent to 054…353: Tokomni refused it (404: 404 Route Not Found)."*
 - **Vercel's request log** (production `dpl_AhxLenaU1FL…`, this morning's redeploy with the dialer's id): POST `/dialer` at 10:52:25 and 10:52:30 UTC.
