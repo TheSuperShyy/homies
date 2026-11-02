@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The owner's press with List 2 playing and List 2's id: refused again, so the hold was not the cause (12:01 UTC)
+- **Vercel's request log** (production `dpl_HK8YDV…`): one POST `/dialer` at 12:01:42 UTC, logged `dialer 054…353 404 debt <resident id>-20261102T120143`.
+- **Ruled out now:** List 2's hold, and the campaign id. Both ids got the same 404, and List 2's was refused while the list was playing.
+- **Our copy of the token, checked without printing it:**
+  - 41 characters, all ASCII: 8, a dot, then 32. A deliberate key shape, not a sentence's full stop.
+  - No space, no lookalike letter. `.env` and `dashboard/.env.local` are identical.
+  - `.env` has CRLF line ends, which the page's `.trim()` removes.
+  - The request still matches Omni's document field for field. Nothing wrong was found on our side.
+- **Left:**
+  - the token on Omni's side (never accepted once): only their log can say;
+  - our `external_id`;
+  - an IP rule on their side.
+
+  The one variant we can still try is the bare resident id as the `external_id`, from this PC. With List 2 playing, an accepted send rings Ido at once, so it takes the owner's word.
+- **The email to Omni** (`local/omnitelecom/2026-11-02-outbound-sip-email.txt`) now names both ids and List 2 playing, and asks for their log's reason beside the SIP line.
+
 ### The dialer page back on List 2's id, with List 2 playing (about 11:52 UTC; nothing rang)
 - **The owner pressed ▶ on List 2** (screenshot: ⏸ on List 2 only; total still 1, nothing new rung). That was the first of the three steps.
 - **Done:**

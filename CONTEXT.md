@@ -3385,6 +3385,9 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **The dashboard's dialer test (feature 20, 28 Oct) is how a test call is placed now, not an Excel upload.** One press puts one number in List 2.
   - **On 2 Nov, 07:58-11:52 UTC, the dashboard and `.env` sent the Homies_Bot dialer's own id as `campaign_id`, not List 2's.** The owner had Tokomni open and said *"ok lets wire it up on the correct one"*. It got the same 404 (two presses at 10:52 UTC).
     - **Since 11:52 UTC the page sends List 2's id again, with List 2 playing** (the owner pressed ▶ at about 11:45). `.env` keeps the dialer's id as `TOKOMNI_DIALER_ID`.
+    - **It was refused again at 12:01 UTC.** So neither the campaign id nor List 2's hold explains the 404.
+      - The token is clean ASCII (8 characters, a dot, 32), exactly Omni's.
+      - What is left is Omni's side (the token's rights, an IP rule) or our `external_id`.
     - Tokomni has two things here: the dialer and its lists. The dialer's settings page shows Homies_Bot: 5 channels, "Never stop" on, one participant, "Bot EXT 208".
     - Omni's 27 Oct email gave List 2's id, and that id got the 404.
     - Which one the API's `campaign_id` means is proven only by a press that rings.

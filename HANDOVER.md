@@ -57,7 +57,8 @@ appended to.
 > - **Tokomni's click-to-call already bridges a number to 208** (`C2C#<number>`; 26 Oct and 1 Nov). The router gives such a call the incoming agent.
 > - **List 2 is PLAYING since 2 Nov, about 11:45 UTC.** The owner pressed ▶. Before that it was on hold with total 1, so none of our presses got in.
 >   - **The page sends List 2's id again** (Vercel `TOKOMNI_CAMPAIGN_ID`; production `dpl_HK8YDVgKcCHPRjNikGAgLLuJDoDw`, created 11:51:58 UTC). `.env` and `dashboard/.env.local` match, and the dialer's id is kept as `TOKOMNI_DIALER_ID`.
->   - **Waiting on the owner's Ring for Ido** (calling hours). Then read Vercel's request log for Tokomni's answer and Yariv's Vapi for the call. A 404 again means the hold was not the cause, and the email to Omni goes.
+>   - **The owner's Ring at 12:01:42 UTC was refused too (404).** So the hold was not the cause, and neither id is. Our token copy was checked and is clean.
+>   - **Next:** the owner sends the email to Omni (SIP line plus their log's reason for the 404). Optional, on the owner's word: one send from this PC with the bare resident id as the `external_id`. List 2 is playing, so an accepted send rings Ido at once.
 >   - Never press ▶ on "test 1/0": its waiting number would ring at once. Never press Stop on List 2: it does not restart by itself.
 >
 > **THE DASHBOARD'S DIALER TEST SENT THE HOMIES_BOT DIALER'S ID ON 2 Nov, 07:58-11:52 UTC, AND LIST 2'S AGAIN SINCE (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed both times).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
