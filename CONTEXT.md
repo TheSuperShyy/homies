@@ -3375,7 +3375,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - Never upload a sheet into it through the list's edit: that replaces every contact in it. Hand uploads get a list of their own.
   - **2 Nov: the owner turned from the insert API to the line:** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*.
     - Our system places the call through Omni's SIP (Vapi `byo-sip-trunk` + `byo-phone-number`), the preferred setup of 28 Sep.
-    - The email for Omni is `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. Until their values arrive, nothing can ring from the dashboard.
+    - The email for Omni is `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. Until they answer, nothing can ring from the dashboard.
+      - It was rewritten the same day on the owner's word: list what we tried, ask what we need to do, and leave out prices and the owner's name.
     - **Reading Tokomni's list page (2 Nov):**
       - ▶ under Play/Hold is the button that starts a list, so a list showing it is on hold.
       - Status "Active" means only that the list is not archived.

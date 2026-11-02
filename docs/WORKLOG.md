@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The email to Omni rewritten: what we tried, and what we need to do (owner's word; nothing sent)
+- **Asked:** *"remove my name"*, then *"ask for a solution not price like what do we have to do? we have tried this and that"*.
+- **Now, in `local/omnitelecom/2026-11-02-outbound-sip-email.txt`:**
+  - **What we tried,** with Israel times for their log: List 2's id on 29 Oct, the dialer's id twice at 12:52 today, and List 2's id at 14:01 after Play. All got 404, and no lead reached List 2.
+  - **What we need to do:** is the token active for inserts and List 2 its own; is something missing or limited in our request; a working example.
+  - **Another way they recommend:** SIP for outgoing calls through 208, or click-to-call.
+  - The SIP checklist and every price question are gone. It is signed "Clix Solution, בשם הומי'ז" only.
+
 ### The owner's press with List 2 playing and List 2's id: refused again, so the hold was not the cause (12:01 UTC)
 - **Vercel's request log** (production `dpl_HK8YDV…`): one POST `/dialer` at 12:01:42 UTC, logged `dialer 054…353 404 debt <resident id>-20261102T120143`.
 - **Ruled out now:** List 2's hold, and the campaign id. Both ids got the same 404, and List 2's was refused while the list was playing.

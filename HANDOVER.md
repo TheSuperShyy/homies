@@ -46,7 +46,12 @@ appended to.
 >
 > **THE DIALER GOES THROUGH OMNI'S LINE NEXT, NOT TOKOMNI'S LISTS (owner, 2 Nov).** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*. WORKLOG 2 Nov.
 > - **The plan:** our system places the call itself through Omni's SIP: a Vapi `byo-sip-trunk` credential and a `byo-phone-number`. This is the preferred setup of 28 Sep.
-> - **Waiting on Omni.** The owner sends `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. It asks for the server, username and password, outgoing permission with 077-6687949, Vapi's IPs allowed, G.711, the number's format and the price.
+> - **Waiting on Omni.** The owner sends `local/omnitelecom/2026-11-02-outbound-sip-email.txt`.
+>   - Rewritten on the owner's word: *"ask for a solution not price like what do we have to do? we have tried this and that"*.
+>   - It lists what we tried: List 2's id on 29 Oct, then on 2 Nov the dialer's id and List 2 playing. All got 404.
+>   - It asks what we need to do: the token's rights, our request, a working example, or another way (SIP through 208, click-to-call).
+>   - No prices, and no personal name in the signature.
+>   - **When the answer is SIP,** our side's list is in memory's Omnitelecom file: digest auth, Vapi's two signalling IPs, RTP UDP 40000-60000, G.711, caller ID 077-6687949.
 > - **Then:**
 >   1. the credential and the number on Vapi;
 >   2. `VAPI_PHONE_NUMBER_ID`, `CALL_PIN` and `VAPI_DEBT_ASSISTANT_ID` in Vercel;
