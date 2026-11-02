@@ -3377,6 +3377,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - Our system places the call through Omni's SIP (Vapi `byo-sip-trunk` + `byo-phone-number`), the preferred setup of 28 Sep.
     - The email for Omni is `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. Until they answer, nothing can ring from the dashboard.
       - It was rewritten the same day on the owner's word: list what we tried, ask what we need to do, and leave out prices and the owner's name.
+    - *(WhatsApp, not the dialer: a test number's recipients are added only in Meta's App Dashboard, each confirmed by a code sent to that WhatsApp. There is no API, so the owner adds them.)*
     - **Reading Tokomni's list page (2 Nov):**
       - ▶ under Play/Hold is the button that starts a list, so a list showing it is on hold.
       - Status "Active" means only that the list is not archived.

@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### Ido as a test recipient on the new WhatsApp number: only the owner can add him (and the templates are still pending)
+- **Asked:** *"ok so add ido number on the meta tester"*.
+- **Not doable from here.** Meta adds test recipients only in the App Dashboard: WhatsApp > API Setup > To > Manage phone number list. Up to 5 numbers, each confirmed by a code Meta sends to that WhatsApp (Meta's get-started guide, checked 2 Nov; no API for it). Given to the owner as steps. The From must be +1 555-045-9005, never +1 555-901-6064 (respond.io's).
+- **The list only matters for messages we start** (the two templates). Ido can already chat with the bot by writing first, as the owner's "hi" proved at 09:06 UTC.
+- **Templates:** `payment_link_he` and `ticket_resolved_he` were still PENDING at 12:51 UTC, three hours after submission. The watcher stopped there.
+
 ### The email to Omni rewritten: what we tried, and what we need to do (owner's word; nothing sent)
 - **Asked:** *"remove my name"*, then *"ask for a solution not price like what do we have to do? we have tried this and that"*.
 - **Now, in `local/omnitelecom/2026-11-02-outbound-sip-email.txt`:**

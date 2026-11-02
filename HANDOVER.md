@@ -45,6 +45,7 @@ appended to.
 >   - The lasting fix is still Homies' own number on a verified business.
 >
 > **THE DIALER GOES THROUGH OMNI'S LINE NEXT, NOT TOKOMNI'S LISTS (owner, 2 Nov).** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*. WORKLOG 2 Nov.
+> - *(WhatsApp, 2 Nov 12:51 UTC: both templates still PENDING after 3 h; Ido's number as a test recipient is the owner's to add in the App Dashboard, with a code to Ido's WhatsApp.)*
 > - **The plan:** our system places the call itself through Omni's SIP: a Vapi `byo-sip-trunk` credential and a `byo-phone-number`. This is the preferred setup of 28 Sep.
 > - **Waiting on Omni.** The owner sends `local/omnitelecom/2026-11-02-outbound-sip-email.txt`.
 >   - Rewritten on the owner's word: *"ask for a solution not price like what do we have to do? we have tried this and that"*.
