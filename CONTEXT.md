@@ -3385,6 +3385,8 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
       - When a tester says the bot is silent, look in Chatwoot for a failed outgoing message and its `external_error` before anything else.
     - *(Chatwoot, not the dialer, 2 Nov:)*
       - **Account 2 is in Hebrew** (`locale` he). The bot reads no Chatwoot wording, only senders, assignee, labels and status, so the language is free to change.
+      - **The admin's conversation list shows all statuses** (the "הכל" chip beside the inbox name), so resolving a conversation does not take it off that view.
+      - **An agent's public reply takes the conversation from the bot** (`Human replied?` -> `Assign to the replier`), the same as קשר אלי. A private note does not.
       - **Chatwoot's message delete only blanks a message** ("deleted" placeholder, record kept). Test traces leave only with `Message#destroy` in `rails runner`, scoped tightly.
     - **Reading Tokomni's list page (2 Nov):**
       - ▶ under Play/Hold is the button that starts a list, so a list showing it is on hold.

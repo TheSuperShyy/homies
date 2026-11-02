@@ -43,6 +43,11 @@ appended to.
 >   - The two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
 >   - The lasting fix is still Homies' own number on a verified business.
 >
+> **CHATWOOT IS IN HEBREW SINCE 2 Nov (account 2 `locale` he), AND A HEBREW ONBOARDING VIDEO EXISTS:** `local/onboarding/chatwoot-onboarding-he.mp4` (3:05; captions, click markers, phones and emails blurred). WORKLOG 2 Nov.
+> - Conversation #90, a tester's "Hi", was deleted for the video on the owner's word.
+> - **Re-record** after a Chatwoot update with `python local/onboarding/record.py`. It changes conversation #1 and puts it back (API, then `rails runner` for the activity lines). Read it before running.
+> - **Open, not changed:** a bot answer already being written (20-40 s) is not re-checked before Send. It can follow an agent's reply once; after that the reply's claim keeps the bot quiet.
+>
 > **THE DIALER GOES THROUGH OMNI'S LINE NEXT, NOT TOKOMNI'S LISTS (owner, 2 Nov).** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*. WORKLOG 2 Nov.
 > - *(WhatsApp, 2 Nov 12:51 UTC: both templates still PENDING after 3 h; Ido's number as a test recipient is the owner's to add in the App Dashboard, with a code to Ido's WhatsApp.)*
 > - **The plan:** our system places the call itself through Omni's SIP: a Vapi `byo-sip-trunk` credential and a `byo-phone-number`. This is the preferred setup of 28 Sep.
