@@ -501,6 +501,11 @@ The dashboard is the control surface and never the engine -- the importers are
 Python, they outlive a serverless timeout, and the dashboard holds only the anon
 key on purpose. Do not move execution into it.
 
+**Supabase answers at most 1,000 rows a request, whatever `limit` says, and says nothing (2 Nov).**
+Any read of a table that can pass 1,000 rows pages through it, as `sb_all()` in `scripts/oxs_requests_sync.py`
+and the residents read beside it do. The OXS ticket sync asked for `limit=2000`, got 1,000, and from late
+September resolved almost none of the tickets OXS closed: 1,124 imported tickets open here against 70 in OXS.
+
 **A green tick that did nothing is worse than a red one.** Half the scheduled
 runs exit in seconds because GitHub cron is UTC and Israel has daylight saving.
 Anything reporting on those runs must say SKIPPED, never success -- reading

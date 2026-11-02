@@ -8,6 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **THE OPEN-TICKET COUNT IS WRONG, AND THE FIX IS NOT LIVE (2 Nov).** The owner: *"why is the ticket amount not going down"*. WORKLOG 2 Nov.
+> - **Cause:** `scripts/oxs_requests_sync.py` read our tickets with `limit=2000`, and Supabase gives 1,000.
+>   - Since late September each run has resolved almost none of the tickets OXS closed.
+>   - 1,173 tickets are open; 1,124 of them are imported, against 70 in OXS's open feed.
+> - **Fixed on `feature/chatbot` only** (commit `0693934`):
+>   - `sb_all()` pages the reads;
+>   - departed tickets are asked oldest first, at most 360 a run (`--max-lookups N` by hand).
+> - **Dry run:** 1,070 departed still open here; 38 have no building id; of 15 asked, 12 came back closed and 3 with no status.
+> - **Waiting on the owner's go (asked; the reply "open" was unclear):**
+>   1. A catch-up run here: `python scripts/oxs_requests_sync.py --apply --max-lookups 1100`, about 18 minutes, writing only our `requests`.
+>   2. The script on `main`, where the Action `oxs-requests.yml` runs. The file was identical on both branches before the fix.
+> - **Left after it:** the 38 with no building id, and the ones OXS answers with no status, which are asked again each run.
+>
 > **LIVE 2 Nov, 09:55:43 UTC: the bot sees the photos tenants send (epoch 92, `scripts/n8n_whatsapp_photo.py`).** The owner: *"ok lets implement that"*. WORKLOG 2 Nov.
 > - **How:**
 >   - `Read the photos` lists the chat from Chatwoot when a turn has a photo.
