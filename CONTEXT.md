@@ -505,6 +505,9 @@ key on purpose. Do not move execution into it.
 Any read of a table that can pass 1,000 rows pages through it, as `sb_all()` in `scripts/oxs_requests_sync.py`
 and the residents read beside it do. The OXS ticket sync asked for `limit=2000`, got 1,000, and from late
 September resolved almost none of the tickets OXS closed: 1,124 imported tickets open here against 70 in OXS.
+Its lookups of departed tickets must fit the 15-minute job's 10-minute guard at the measured pace, about 2.15 s
+each: `MAX_LOOKUPS` is 150. The feed is written after the lookups, so a run the guard stops writes nothing at all.
+GitHub's `*/15` cron runs that job every 3 to 7.5 hours in practice (31 Oct-2 Nov), not every 15 minutes.
 
 **A green tick that did nothing is worse than a red one.** Half the scheduled
 runs exit in seconds because GitHub cron is UTC and Israel has daylight saving.
