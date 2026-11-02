@@ -3356,6 +3356,13 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - Never press Stop: it does not start again by itself.
     - Never upload a sheet into it through the list's edit: that replaces every contact in it. Hand uploads get a list of their own.
   - **The dashboard's dialer test (feature 20, 28 Oct) is how a test call is placed now, not an Excel upload.** One press puts one number in List 2.
+  - **Since 2 Nov the dashboard and `.env` send the Homies_Bot dialer's own id as `campaign_id`, not List 2's.** The owner had Tokomni open and said *"ok lets wire it up on the correct one"*.
+    - Tokomni has two things here: the dialer and its lists. The dialer's settings page shows Homies_Bot: 5 channels, "Never stop" on, one participant, "Bot EXT 208".
+    - Omni's 27 Oct email gave List 2's id, and that id got the 404.
+    - Which one the API's `campaign_id` means is proven only by a press that rings.
+    - List 2's id stays in `.env` and `dashboard/.env.local` as `TOKOMNI_LIST2_ID`, for a switch back.
+    - "Never stop" rings a new lead without Play, which rules out the "press Play once" lead.
+    - Neither id is ever written into the repo.
     - Only the people we put in בר כוכבא 23 ourselves (`residents.source = 'agent'`) get a Ring button. The building's OXS rows are real phones, and Yariv's is among them, on the debt list.
     - A typed number on file for a tenant outside the test building is refused. Feature 18 would give that tenant the debt agent, and a real tenant's call is the Debts page's deliberate step.
     - The page keeps the calling hours itself, because Omni's dialer has none.

@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
+> - **Not proven until a press rings:** Tokomni answers 404 to anything wrong. "Never stop" is on, so an accepted press rings at once. Only in calling hours, and only Ido.
+> - **If the dialer's id is refused too,** the id is not the cause. Switch back to List 2 (`.env` `TOKOMNI_LIST2_ID`) and send Omni the 29 Oct email: their log has the reason, likely the token.
+> - **Never write either id into the repo.**
+>
 > **THE WHATSAPP TEST NUMBER IS WATCHED (live 29 Oct, 18:46 UTC): `Homies — WhatsApp number watch` (`OzdMMziMU4T4GOrb`, `scripts/n8n_number_watch.py`) re-registers it by itself when Meta drops it.**
 > - **Why:** Meta unregistered it four times since 20 Oct, the last within 2.5 hours of a register. Nothing of ours does it. The owner: *"ok i think a small checker for now is right"*. Re-registered by hand at 18:37:16 UTC (CONNECTED / CLOUD_API).
 > - **How:** every 5 minutes it reads the status. When it is not CONNECTED on the Cloud API, it registers again.

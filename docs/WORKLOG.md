@@ -9,6 +9,23 @@ conversation that produced it.
 
 ---
 
+## 2026-11-02
+
+### The dashboard's dialer test now sends the Homies_Bot dialer's id (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed)
+- **Asked:** the owner shared Tokomni's dialer settings: *"i have access on this"*, then *"so is it linked in the dashboard"*, then *"ok lets wire it up on the correct one"*.
+- **What the page shows:** the dialer Homies_Bot, associate OC_Homies_management, 5 channels, "Never stop" on (a new contact is rung without pressing Play), and one participant, "Bot EXT 208" (our phone agents' line).
+- **What the dashboard sent:** List 2's id, from Omni's 27 Oct email, as `campaign_id`. The dialer's own id, in its settings page's address, is a different one.
+  - Read from Vercel (decrypted, compared, never printed): `TOKOMNI_CAMPAIGN_ID` was List 2's, `TOKOMNI_TOKEN` is set (sensitive, unreadable), and production was still the 28 Oct build.
+  - The only press, 29 Oct, got Tokomni's 404, which Omni's document reads as "missing fields, invalid token".
+- **Changed:**
+  - Vercel's `TOKOMNI_CAMPAIGN_ID` is the dialer's id on all three targets, read back.
+  - Production was redeployed from `dpl_hnfcMnUHm4…` (the same build, new settings) as `dpl_AhxLenaU1FL…`: READY, with the production alias on it (2 Nov, about 08:05 UTC).
+  - `.env` and `dashboard/.env.local` match. List 2's id is kept in both as `TOKOMNI_LIST2_ID`. No id is in the repo.
+- **Not proven:** Tokomni answers 404 to anything wrong, so only a press that rings shows the dialer's id is right. With "Never stop" on, an accepted press rings at once. The owner presses "חייג לעידו" in calling hours (Sun-Thu 09:00-20:00 Israel).
+- **Switch back:** set Vercel's `TOKOMNI_CAMPAIGN_ID` to `.env`'s `TOKOMNI_LIST2_ID`, then the same redeploy (`POST /v13/deployments?teamId=…&forceNew=1` from the current production deployment).
+
+---
+
 ## 2026-10-30
 
 ### LIVE 05:10-05:12 UTC: every WhatsApp ticket carries the name of whoever reported it (`n8n_whatsapp_name.py`, debt-tools v138, epoch 91)
