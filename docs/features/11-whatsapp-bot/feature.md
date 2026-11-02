@@ -150,6 +150,9 @@ never taken from the message body.
    dashboard shows the thumbnail, and the bot's reply acknowledges the photo
    in its own words without ever asking for one. A file that is not an
    image still gets the cannot-read note and no row.
+   Since 2 Nov (epoch 92) the model also sees the photos of the turn (up to
+   three, fetched from Chatwoot by `Show the photos`); when none can be
+   fetched it is told it cannot see them.
 6. Two residents messaging at once do not see each other's context.
 7. The webhook returns 200 in under a second, measured — before the model has
    been called.

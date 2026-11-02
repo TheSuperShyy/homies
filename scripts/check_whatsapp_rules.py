@@ -112,7 +112,12 @@ PINS = {
     # owner, on 139178/139189: "is this real? did it notif anyone or updated the ticket"). Claude-played on
     # the candidate (scripts/wa_qa_addto.json): the owner's chat went on 255-1365-26 by the new tool, every
     # "I added" backed by its answer, no note, no team; the same chat on the old text reproduced the claims.
-    'Answer the resident / input': 'e036f16b6d5c',
+    # 2 Nov (n8n_whatsapp_photo.py, epoch 92): the photo note says the photo is seen when Show the photos put it
+    # on the item, and keeps "you do not see its content" when none could be fetched. Checked by the five new
+    # inject cases and by Node runs of Show the photos (a photo before the words, one before the last reply,
+    # Sort's own, a failed download, five photos with a PDF among them). What Gemini makes of a real photo is
+    # the owner's handset test, not a Claude play: Claude cannot stand in for the model's eyes.
+    'Answer the resident / input': '3670f71d14b9',
     'add_request_detail / tool': 'b2fc05691540',
     # 5 Oct (n8n_whatsapp_straight.py, epoch 74): the prompt and get_balance's
     # text, after a Claude-played check of 11 situations through the would-be

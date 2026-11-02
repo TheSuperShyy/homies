@@ -537,7 +537,15 @@ def forget_problems(nodes, conns):
     kids = [t["node"] for t in ((conns.get("Try again") or {}).get("main") or [[]])[0] or []]
     if FORGET not in kids:
         out.append("%s is not fed by Try again" % FORGET)
-    if "Answer the resident" not in kids:
+    # 2 Nov (n8n_whatsapp_photo.py): the retry may reach the agent through the photo step, so the
+    # second pass sees the photos the first one saw.
+    def heads(name, i=0):
+        branches = (conns.get(name) or {}).get("main") or []
+        return [t["node"] for t in (branches[i] if i < len(branches) else None) or []]
+    via_photo = ("Any photos?" in kids and heads("Any photos?", 0) == ["Show the photos"]
+                 and heads("Show the photos") == ["Answer the resident"]
+                 and heads("Any photos?", 1) == ["Answer the resident"])
+    if "Answer the resident" not in kids and not via_photo:
         out.append("Try again no longer feeds Answer the resident")
     mine = n.get("position") or [0, 0]
     for k in kids:

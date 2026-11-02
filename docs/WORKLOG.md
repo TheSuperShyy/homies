@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### LIVE: the bot sees the photos tenants send (epoch 92, `scripts/n8n_whatsapp_photo.py`)
+- **Asked:** *"so is the image analyzer implemented"*. No: since 17 Sep a photo was kept and put on the ticket, but the model was told "you do not see its content". The owner: *"ok lets implement that"*.
+- **The platform's own way.**
+  - The Agent node (v3) hands every binary image on its input item to the model. "Automatically Passthrough Binary Images" defaults to on (read on the instance, n8n 2.33.3).
+  - A throwaway workflow proved a Code node can download an image (`this.helpers.httpRequest`) and attach it (`prepareBinaryData`) with the item's JSON intact. It was deleted, and it saved nothing.
+- **Where the photos come from:**
+  - A photo is often its own message, with the words two seconds later, and the burst join silences that photo's run.
+  - `messages` keeps no link. Our copy is in the private `ticket-media` bucket, which the bot's key (`apikey` only) cannot read.
+  - Chatwoot keeps every photo, its links need no key (checked: 200, image/jpeg), and the workflow already holds its admin credential.
+- **Five nodes:**
+  - `A photo to look at?` -> `Read the photos` hang off `Still the last word?`. They list the conversation's messages from Chatwoot, and a failed read never stops the run.
+    - They are drawn below `Show typing` (the gate wants the indicator first) and above `Who is writing?`. Under executionOrder v1 they finish before the branch to the answer.
+  - `Any photos?` -> `Show the photos` sit between {`Carry on`, `Try again`} and the agent. They take the burst's image rows as `Still the last word?` reads them, matched by Chatwoot id, and attach up to three of the newest, with `photos_shown`.
+    - A turn with no photo skips them.
+    - Any surprise passes the item on as it came.
+  - A sticky note, `Photos are seen`.
+- **The note changed in one place.** With a photo on the item, the model reads "היא מצורפת כאן ואתה רואה אותה, ומה שרואים בה הוא חלק ממה שהוא מספר לך" (the plural for two or more). When none could be fetched, the old "you do not see its content" stays.
+  - No new rule: the prompt already forbids instructions and safety advice.
+- **The gate:**
+  - Five new inject cases.
+  - `forget_problems` (`n8n_whatsapp_retry.py`) accepts the retry reaching the agent through `Any photos?`, so the second pass sees the photos too.
+  - `--candidate --replay`: all 434 cases pass, and replay changes 0 messages and 0 replies.
+  - The input re-pinned to `3670f71d14b9`. `MEMORY_EPOCH` is 92, and `EPOCH_COVERS["inject"]` follows.
+  - Node runs of `Show the photos`:
+    - a photo before the words is taken;
+    - one before the last reply is not;
+    - Sort's own photo is the fallback;
+    - a failed download shows nothing;
+    - of five, the newest three are taken, and a PDF among them is skipped.
+- **Applied:** 56 -> 61 nodes, memory key `-92`. A re-run has nothing to do, and the gate on live is all green.
+  - Snapshot: `local/n8n-whatsapp-live-02nov-before-photo.json`. **Rollback:** `python scripts/n8n_whatsapp_photo.py --restore` + git revert.
+- **Owed:** the owner's handset (a photo, and a photo then words), then `check_whatsapp_rules.py --watch 2026-11-02T10:40`.
+  - The fold takes `photo()` after `name()`.
+  - The wallet on the key ending 3f9 is $6.64.
+
 ### The two templates submitted to the new WhatsApp account (owner: "ok create those for me")
 - **`wa_templates.py create … --apply`** on `2129102787704530`, in the owner's own wording of 22 and 23 Sep from `templates.md`, unchanged:
   - `payment_link_he` is id `1654251699479866`;

@@ -3335,6 +3335,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - That is the account deleted, or the system user unassigned, in the Meta business.
     - Only someone with admin access there can fix it. A register cannot.
     - The watch goes red on it, and nothing alerts anyone when it does.
+- **The bot sees photos since 2 Nov (epoch 92).** The Agent node passes binary images on its input item to the model, on by default.
+  - So a photo is put on the item right before the agent (`Show the photos`). It is fetched from Chatwoot, which keeps every photo with a link that needs no key.
+  - The burst's photos are found by Chatwoot id from `Anything newer?`'s image rows: a photo's own run is silenced when words follow it.
+  - A side branch that must finish before the answer is drawn below `Show typing` and above `Who is writing?`. Under executionOrder v1 a parent's branches run top to bottom.
+  - The note says "you see it" only when a photo is really on the item.
   - **Since 2 Nov the bot's number is +1 555-045-9005**, a new test number in "Test Messaging Account" (HOMIES app).
     - It was moved by Chatwoot's own `register_callback`, after the inbox's number and ids were changed in its model.
     - Do not use +1 555-901-6064 in the "ASTDX" account: respond.io is subscribed to it.

@@ -722,6 +722,17 @@ function cases(E) {
     expect('a number not on file: no such line', () => inj(true, 'המעלית תקועה')().includes('הפונה מזוהה'), false);
   }
 
+  // 2 Nov (scripts/n8n_whatsapp_photo.py): a photo put on the item is said to be seen; one that could
+  // not be fetched keeps "you do not see its content".
+  const shownNote = (shown) => String(E.inject({ greeted: true, text: 'x', tap_now: false, photo: true, photos_shown: shown }, now, who$()));
+  if (shownNote(1) !== shownNote(0)) {
+    expect('a photo shown: the model is told it sees it', () => shownNote(1).includes('היא מצורפת כאן ואתה רואה אותה'), true);
+    expect('a photo shown: nothing says it cannot be seen', () => shownNote(1).includes('אתה לא רואה את התוכן שלה'), false);
+    expect('two photos shown: said in the plural', () => shownNote(2).includes('התמונות מצורפות כאן ואתה רואה אותן'), true);
+    expect('a photo that could not be fetched: the model is told it cannot see it', () => shownNote(0).includes('אתה לא רואה את התוכן שלה'), true);
+    expect('no photo: no photo note at all', () => String(E.inject({ greeted: true, text: 'x', tap_now: false, photos_shown: 0 }, now, who$())).includes('צירף תמונה'), false);
+  }
+
   // 1 Oct evening (scripts/n8n_whatsapp_gender.py): the owner, "it still uses
   // how can i help you all which is awkward". The bot writes to one person now,
   // so every piece of code that reads "you" must know the singular, masculine
