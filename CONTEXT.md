@@ -3383,12 +3383,13 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
       - A list's "Total" shows whether an API lead ever got in.
     - **Tokomni's click-to-call already bridges a number to 208.** The INVITE's From name is `C2C#<number>` (26 Oct twice, 1 Nov). The router gives it the incoming agent, because only a `dialer-` name gets the debt agent.
   - **The dashboard's dialer test (feature 20, 28 Oct) is how a test call is placed now, not an Excel upload.** One press puts one number in List 2.
-  - **Since 2 Nov the dashboard and `.env` send the Homies_Bot dialer's own id as `campaign_id`, not List 2's.** The owner had Tokomni open and said *"ok lets wire it up on the correct one"*.
+  - **On 2 Nov, 07:58-11:52 UTC, the dashboard and `.env` sent the Homies_Bot dialer's own id as `campaign_id`, not List 2's.** The owner had Tokomni open and said *"ok lets wire it up on the correct one"*. It got the same 404 (two presses at 10:52 UTC).
+    - **Since 11:52 UTC the page sends List 2's id again, with List 2 playing** (the owner pressed ▶ at about 11:45). `.env` keeps the dialer's id as `TOKOMNI_DIALER_ID`.
     - Tokomni has two things here: the dialer and its lists. The dialer's settings page shows Homies_Bot: 5 channels, "Never stop" on, one participant, "Bot EXT 208".
     - Omni's 27 Oct email gave List 2's id, and that id got the 404.
     - Which one the API's `campaign_id` means is proven only by a press that rings.
     - List 2's id stays in `.env` and `dashboard/.env.local` as `TOKOMNI_LIST2_ID`, for a switch back.
-    - "Never stop" rings a new lead without Play, which rules out the "press Play once" lead.
+    - "Never stop" was taken to ring a new lead without Play, which would have ruled out the "press Play once" lead. Tokomni's list page (2 Nov) showed List 2 on hold anyway, so the owner pressed ▶.
     - Neither id is ever written into the repo.
     - Only the people we put in בר כוכבא 23 ourselves (`residents.source = 'agent'`) get a Ring button. The building's OXS rows are real phones, and Yariv's is among them, on the debt list.
     - A typed number on file for a tenant outside the test building is refused. Feature 18 would give that tenant the debt agent, and a real tenant's call is the Debts page's deliberate step.

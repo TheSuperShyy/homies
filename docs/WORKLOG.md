@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The dialer page back on List 2's id, with List 2 playing (about 11:52 UTC; nothing rang)
+- **The owner pressed ▶ on List 2** (screenshot: ⏸ on List 2 only; total still 1, nothing new rung). That was the first of the three steps.
+- **Done:**
+  - Vercel's `TOKOMNI_CAMPAIGN_ID` (one entry, all three targets) is List 2's id again, read back.
+  - Production was redeployed from `dpl_AhxLenaU1FL…` as `dpl_HK8YDVgKcCHPRjNikGAgLLuJDoDw`: READY, created 11:51:58 UTC, with the production alias on it.
+  - In `.env` and `dashboard/.env.local`, `TOKOMNI_CAMPAIGN_ID` is List 2's again, and the dialer's id is kept as `TOKOMNI_DIALER_ID`. Backup: `local/env-backups/.env.before-list2-back-2026-11-02`.
+  - The owner stopped the run while it waited on the alias (*"wait i think lets use it to clix579 account"*), then withdrew that (*"nvm dont mind the last message i sent"*). Vercel and the redeploy were already done; the env files were set afterwards.
+- **Next, the owner's:** Ring עידו with Ido ready, in calling hours (until 20:00 Israel). Then Vercel's request log shows Tokomni's answer, and Yariv's Vapi shows the call.
+
 ### Tokomni's list page read from the owner's screenshot: List 2 is on hold, and none of our presses got in (read only)
 - **Seen:** the dialer's lists, filter "List status: Active".
   - List 2: total 1, answered 1, last run 25 Oct.
