@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **THE LIVE WHATSAPP BOT IS SILENT: SINCE 31 Oct, ~14:43 UTC, OUR META TOKENS CANNOT SEE THE TEST WHATSAPP ACCOUNT OR ITS NUMBER AT ALL** (100/33 "does not exist … missing permissions"). The owner: *"check why the bot is not replying"*. WORKLOG 2 Nov.
+> - **The tokens are fine:** system user "Assaf", HOMIES app, valid, all scopes. The ASTDX business is readable, but the test WABA `1004244565865434` is no longer among its WhatsApp accounts. Deleted or unassigned: a register cannot fix it.
+> - **Last Meta delivery:** 30 Oct 08:10 UTC. The number watch has been red every 5 minutes since 31 Oct 14:45 UTC. That is correct, but nobody is alerted when it is red.
+> - **Owner-side, in the ASTDX Meta business:** if the test account is still there, give the system user "Assaf" full control again. If it is gone, the HOMIES app's API Setup issues a new test number.
+>   - Then move Chatwoot's inbox, the typing nodes, the watch and `.env` to the new ids, and re-add the test recipients.
+>   - The lasting fix is Homies' own number on a verified business.
+>
 > **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
 > - **Not proven until a press rings:** Tokomni answers 404 to anything wrong. "Never stop" is on, so an accepted press rings at once. Only in calling hours, and only Ido.
 > - **If the dialer's id is refused too,** the id is not the cause. Switch back to List 2 (`.env` `TOKOMNI_LIST2_ID`) and send Omni the 29 Oct email: their log has the reason, likely the token.
@@ -20,7 +27,7 @@ appended to.
 >   - It stops at 8 registers in 72 hours (Meta blocks at 10), counting the two by hand, with 30 minutes between tries.
 >   - **A red run means a person is needed** (the cap, or FLAGGED / RESTRICTED / BANNED).
 > - **`python scripts/n8n_number_watch.py --drops`** lists every drop it saw and its registers: the times are the clue to the cause.
-> - **Not yet seen:** a real drop through it. The register request is proven against an echo, not yet against Meta. After the next drop, check the run reached `{"success": true}`.
+> - **Seen working once:** a drop at 30 Oct 17:50:43 UTC was registered, and the number read CONNECTED at 17:55:43. Since 31 Oct 14:45 UTC it is red on every run, because the account itself is out of reach (above).
 > - **A register by hand still needs the owner's go.** The standing go covers the watch's own registers. The lasting fix is Homies' own number on a verified business.
 >
 > **LIVE 30 Oct, 05:10-05:12 UTC: every WhatsApp ticket carries the name of whoever reported it (epoch 91, `scripts/n8n_whatsapp_name.py`, debt-tools v138, `NAME_REQUIRED_CHANNELS=voice,whatsapp`).** The owner, on hearing WhatsApp tickets had no name: *"ok we need to include the name in that wtf"*. This is feature 17's Plan B. WORKLOG 30 Oct.

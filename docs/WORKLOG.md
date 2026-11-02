@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The bot is silent because the WhatsApp test account is gone from our reach since 31 Oct, ~14:43 UTC (read only)
+- **Asked:** *"check why the bot is not replying"*.
+- **Meta, with `WHATSAPP_ACCESS_TOKEN` and `SYSTEM_USER_ACCESS_TOKEN`:**
+  - Both are the same system user, "Assaf", of the HOMIES app. They are valid, never expire, and keep all five WhatsApp/business scopes.
+  - The test WABA `1004244565865434` and its number `1207299225801644` both answer 100/33: "does not exist, cannot be loaded due to missing permissions".
+  - The business that owned it (ASTDX, `1679634916736747`) is readable, but its owned WhatsApp accounts no longer include the test WABA.
+  - The app is there.
+  - So the account was deleted or the system user's access was taken away. A register cannot undo either.
+- **When:** the number watch's last good run was 31 Oct 14:40:43 UTC and its first failure 14:45:43, on that same 100/33. Every run since has been red, more than 500, and nobody saw them: a red run alerts no one.
+- **Before that, the watch did its job once:** a drop logged 30 Oct 17:50:43 UTC with a register, and CONNECTED / CLOUD_API at 17:55:43. The register path works through Meta.
+- **Last delivery from Meta** in Chatwoot's rails log: 30 Oct 08:10:11 UTC. The bot's runs on 1 Nov 07:00 were not Meta deliveries.
+- **Needs the owner (or whoever runs the ASTDX Meta business):**
+  - Is "Test WhatsApp Business Account" still in Business Settings, under WhatsApp accounts?
+    - If it is, give the system user "Assaf" full control of it again.
+    - If it is gone, the HOMIES app's API Setup issues a new test number. Then Chatwoot's inbox, the bot's typing nodes, the watch and `.env` move to the new ids, and the test recipients confirm again.
+- **Nothing was written anywhere.**
+
 ### The dashboard's dialer test now sends the Homies_Bot dialer's id (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed)
 - **Asked:** the owner shared Tokomni's dialer settings: *"i have access on this"*, then *"so is it linked in the dashboard"*, then *"ok lets wire it up on the correct one"*.
 - **What the page shows:** the dialer Homies_Bot, associate OC_Homies_management, 5 channels, "Never stop" on (a new contact is rung without pressing Play), and one participant, "Bot EXT 208" (our phone agents' line).
