@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### Why the open-ticket count never goes down: the OXS sync read only 1,000 of our tickets (fixed in the script; not applied)
+- **Asked:** *"why is the ticket amount not going down"*.
+- **Found:** 1,173 tickets are open. 1,124 of them were imported from OXS, against 70 in OXS's open feed this morning. The rest left the feed on their own days since late September.
+  - The sync's log reads "no longer in the OXS open feed: 1000 of 1000 we hold", "already imported: 0" and "imported tickets now in the database: 1000".
+  - PostgREST answers at most 1,000 rows whatever `limit` asks, and the imported tickets passed 1,000 in late September.
+  - Every run since asked OXS about a handful of the departed (11 on the last run, 8 of them skipped with no building id), so almost none were resolved.
+- **Fixed in `scripts/oxs_requests_sync.py`:**
+  - `sb_all()` pages the four reads of our own rows.
+  - Departed tickets are asked oldest first, at most `MAX_LOOKUPS` = 360 a run (about 6 minutes at 1.05 s, inside the Action's 10-minute guard). `--max-lookups N` sets it for a run by hand.
+  - It reports how many got no status and how many are left.
+- **Dry run with the fix (read only, 15 asked):**
+  - already imported 54 (was 0); 2,194 of 2,248 held are out of the open feed;
+  - 1,070 of those are still open here; 38 have no building id;
+  - of 15 asked, 12 came back closed and 3 with no status.
+- **Not done:** the catch-up run that would resolve them, and the script on `main`, where the scheduled Action runs (the file is identical on both branches).
+
 ### LIVE: the bot sees the photos tenants send (epoch 92, `scripts/n8n_whatsapp_photo.py`)
 - **Asked:** *"so is the image analyzer implemented"*. No: since 17 Sep a photo was kept and put on the ticket, but the model was told "you do not see its content". The owner: *"ok lets implement that"*.
 - **The platform's own way.**
