@@ -8,12 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **THE LIVE WHATSAPP BOT IS SILENT: SINCE 31 Oct, ~14:43 UTC, OUR META TOKENS CANNOT SEE THE TEST WHATSAPP ACCOUNT OR ITS NUMBER AT ALL** (100/33 "does not exist … missing permissions"). The owner: *"check why the bot is not replying"*. WORKLOG 2 Nov.
-> - **The tokens are fine:** system user "Assaf", HOMIES app, valid, all scopes. The ASTDX business is readable, but the test WABA `1004244565865434` is no longer among its WhatsApp accounts. Deleted or unassigned: a register cannot fix it.
-> - **Last Meta delivery:** 30 Oct 08:10 UTC. The number watch has been red every 5 minutes since 31 Oct 14:45 UTC. That is correct, but nobody is alerted when it is red.
-> - **Owner-side, in the ASTDX Meta business:** if the test account is still there, give the system user "Assaf" full control again. If it is gone, the HOMIES app's API Setup issues a new test number.
->   - Then move Chatwoot's inbox, the typing nodes, the watch and `.env` to the new ids, and re-add the test recipients.
->   - The lasting fix is Homies' own number on a verified business.
+> **THE WHATSAPP BOT IS ON A NEW TEST NUMBER SINCE 2 Nov (~08:55 UTC): +1 555-045-9005** (`1406095812586455`, account "Test Messaging Account" `2129102787704530`, HOMIES app; owner: *"ok go"*). WORKLOG 2 Nov.
+> - **Why:** since 31 Oct, ~14:43 UTC, our Meta system user cannot see the old test account or its number at all (100/33). It was deleted or unassigned.
+> - **Moved:**
+>   - Chatwoot's inbox 1, through its model, plus its own `register_callback` (HOMIES subscribed, the phone override to Chatwoot);
+>   - the number's two-step PIN (ours);
+>   - `.env`'s two ids;
+>   - the number watch;
+>   - the live bot's typing nodes (`n8n_whatsapp_newnumber.py`, gate green; `--restore` puts the snapshot back).
+> - **Not the number on the owner's setup page:** +1 555-901-6064 is in the "ASTDX" account, which respond.io is subscribed to. Never put the bot there.
+> - **Owed:**
+>   - The owner's first message to the new number. It shows whether a test number may answer someone not on its list. Meta refused the owner's number as a recipient.
+>   - Then the two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
+>   - The lasting fix is still Homies' own number on a verified business.
 >
 > **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
 > - **Not proven until a press rings:** Tokomni answers 404 to anything wrong. "Never stop" is on, so an accepted press rings at once. Only in calling hours, and only Ido.
@@ -232,7 +239,7 @@ never to Meta, so the inbox holds both halves of every conversation.
 About 4 to 6 s of either figure is deliberate: `Let them finish` waits 4 s, and `Hold a beat`
 adds 1.7 to 2.6 s on some replies. The rest is the model's thinking, which runs unset (its
 default). Speeding it up is the owner's model decision (CONTEXT, Gemini for its Hebrew and 3.1
-Pro for honesty). The bot's number is Meta's test number, +1 555-178-1261.
+Pro for honesty). The bot's number is Meta's test number, +1 555-045-9005 since 2 Nov (+1 555-178-1261 before).
 
 **25 Oct: low thinking through an OpenRouter preset was tried and NOT shipped.** The preset
 `homies-whatsapp` (in the OpenRouter account, unused) made Gemini fail 4 of 8 real-size requests

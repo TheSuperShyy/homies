@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The WhatsApp bot moved to a new test number, +1 555-045-9005 (about 08:55 UTC; owner: "ok go")
+- **The number:** the owner made a new test number in the HOMIES app. Ours is `1406095812586455`, in "Test Messaging Account" `2129102787704530`: CONNECTED, CLOUD_API, VERIFIED.
+  - The owner's setup page showed +1 555-901-6064 instead. That number is in the "ASTDX" account `1698189384845772`, which respond.io's BSP app is subscribed to, so the bot is not on it: both would get the same messages.
+  - Meta refused the owner's number as a test recipient ("Feature unavailable"). The page's test send failed, because a typed message needs the person to write first ("Scan to reply").
+- **Chatwoot:** `channel_whatsapp` 1 (inbox 1) was moved through its own model in `rails runner`.
+  - phone_number is `+15550459005`; provider_config has the new phone_number_id and business_account_id. The api_key and webhook_verify_token were kept, and the provider check passed.
+  - Then `Whatsapp::WebhookSetupService#register_callback`: HOMIES is subscribed to the account, and the phone-level override points at `/webhooks/whatsapp/+15550459005`. Meta verified it.
+- **Meta:**
+  - The two-step PIN is set to `WHATSAPP_REGISTER_PIN` (`success: true`), so the number watch can register this number too.
+  - Health: the number is AVAILABLE. The account has 141006 (no payment method), which blocks messages we start, i.e. templates. The business has 141010.
+- **`.env`:** `WHATSAPP_PHONE_NUMBER_ID` and `WHATSAPP_WABA_ID` are the new ids. Backup: `local/env-backups/.env.before-new-number-2026-11-02`.
+- **n8n:**
+  - The number watch was re-applied. Its first run, 09:00:43, read CONNECTED.
+  - The live bot's two typing nodes call the new id, through the new `scripts/n8n_whatsapp_newnumber.py`.
+    - Gate `--candidate --replay`: all green, and 1167 replies changed 0.
+    - Applied. A re-run has nothing to do, and the gate on live is all green.
+    - Snapshot: `local/n8n-whatsapp-live-02nov-before-newnumber.json`.
+  - Inbound and replies go through Chatwoot, so nothing else named the number. The memory key is the tenant's number, unchanged.
+- **Not done:**
+  - The two templates (`payment_link_he`, `ticket_resolved_he`) on the new account: `wa_templates.py`, then Meta's approval.
+  - A payment method on the account (141006) before any template can send.
+  - The test recipients.
+- **Owed:** the owner's first message to +1 555-045-9005. It shows whether a test number may answer a number that is not on its list.
+
 ### The bot is silent because the WhatsApp test account is gone from our reach since 31 Oct, ~14:43 UTC (read only)
 - **Asked:** *"check why the bot is not replying"*.
 - **Meta, with `WHATSAPP_ACCESS_TOKEN` and `SYSTEM_USER_ACCESS_TOKEN`:**
