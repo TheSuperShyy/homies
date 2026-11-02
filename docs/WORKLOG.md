@@ -11,6 +11,44 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The dialer test refused again, now with the dialer's id: two presses at 10:52 UTC, both 404 (read only; nothing sent to Tokomni from here)
+- **Seen:** the owner's screenshot of `/dialer`: *"Not sent to 054…353: Tokomni refused it (404: 404 Route Not Found)."*
+- **Vercel's request log** (production `dpl_AhxLenaU1FL…`, this morning's redeploy with the dialer's id): POST `/dialer` at 10:52:25 and 10:52:30 UTC.
+  - Each logged `dialer 054…353 404 debt <resident id>-20261102T1052xx`.
+  - So both ids are refused: List 2's (29 Oct) and the Homies_Bot dialer's (today).
+- **Probed, with no token and no number, so nothing could be inserted:**
+  - Cloudflare lets only `/api/campaign/insert/` through, with a browser's user agent or curl's. Every other path, the same one without its slash included, gets Cloudflare's 403 page.
+  - The insert path answers a GET with `text/plain` `{"error_msg":"404 Route Not Found"}`. OPTIONS gets Cloudflare's 404.
+- **The token** is 41 characters, letters and digits with one dot, so URL encoding changes nothing in it.
+- **Still possible:**
+  - the token or the account on Omni's side (never accepted once);
+  - our `external_id`: 52 characters and not a UUID.
+    - Omni's document types `campaign_id` as a UUID, and their 25 Oct email said the external_id was "still being checked".
+    - The bare resident id is a UUID. Our router never reads the external_id; the press time is there only so a second press is a new lead;
+  - Vercel's copy of the token, which cannot be read back.
+- **Next, on the owner's word (an accepted send rings Ido at once, in calling hours).** From this PC with `.env`'s token:
+  1. the page's exact request;
+  2. the dialer's id with the bare resident id;
+  3. List 2's id with the bare resident id.
+
+  Stop at the first 200, so Ido is rung at most once. If all three are refused, only Omni's log can say why: the 29 Oct email, with today's two ids added.
+- **Also found:** Vercel refuses `VERCEL_TOKEN` and `VERCEL_API` in `.env` (403, `invalidToken`). `VERCEL_ADMIN_KEY` works (user `thesupershyy`).
+
+### The OXS catch-up: 1,029 tickets closed, 147 open now (owner: "go"); the fixed script is not on `main` yet
+- **Ran:** `python scripts/oxs_requests_sync.py --apply --max-lookups 1100`, 10:52-11:29 UTC.
+  - It took 37 minutes, because OXS answered slower than the 1.05 s pace.
+  - It wrote only our `requests`. Nothing went to OXS.
+- **Result:**
+  - OXS's open feed: 57 tickets (54 already here, 3 new), written with the run's usual upsert.
+  - Of the 1,070 departed tickets still open here, 1,032 were asked and 1,029 came back resolved. They are resolved here now.
+  - OXS gave no status for 3, which are asked again next run.
+  - 38 have no building id and were left alone.
+- **Count after (read back):** 147 tickets open, against 1,173 this morning. 98 of them are imported: the 57 in OXS's feed, the 38 with no building id, and the 3 with no status.
+- **`main`: the push was refused.** `git push` gave 403: "Permission to TheSuperShyy/homies.git denied to ClixTeam579".
+  - The commit is `69c5d18` on the local branch `sync-fix-for-main`: the fixed script only, on top of `origin/main`.
+  - Until it is on `main`, the scheduled Action runs the old script. That script sees 1,000 of our 2,251 imported tickets, so most tickets OXS closes from now on stay open here again.
+  - **Waiting on the owner:** push it through `TheSuperShyy` (logged in on this PC; used for the dashboard on 28 Oct), or give `ClixTeam579` write access.
+
 ### Why the open-ticket count never goes down: the OXS sync read only 1,000 of our tickets (fixed in the script; not applied)
 - **Asked:** *"why is the ticket amount not going down"*.
 - **Found:** 1,173 tickets are open. 1,124 of them were imported from OXS, against 70 in OXS's open feed this morning. The rest left the feed on their own days since late September.

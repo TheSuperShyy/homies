@@ -8,18 +8,18 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **THE OPEN-TICKET COUNT IS WRONG, AND THE FIX IS NOT LIVE (2 Nov).** The owner: *"why is the ticket amount not going down"*. WORKLOG 2 Nov.
-> - **Cause:** `scripts/oxs_requests_sync.py` read our tickets with `limit=2000`, and Supabase gives 1,000.
->   - Since late September each run has resolved almost none of the tickets OXS closed.
->   - 1,173 tickets are open; 1,124 of them are imported, against 70 in OXS's open feed.
-> - **Fixed on `feature/chatbot` only** (commit `0693934`):
+> **THE OPEN-TICKET COUNT IS RIGHT AGAIN, BUT THE FIX IS NOT ON `main` (2 Nov).** The owner: *"why is the ticket amount not going down"*, then *"go"*. WORKLOG 2 Nov.
+> - **Cause:** `scripts/oxs_requests_sync.py` read our tickets with `limit=2000`, and Supabase gives 1,000. Since late September each run resolved almost none of the tickets OXS closed.
+> - **Fixed on `feature/chatbot`** (commit `0693934`):
 >   - `sb_all()` pages the reads;
 >   - departed tickets are asked oldest first, at most 360 a run (`--max-lookups N` by hand).
-> - **Dry run:** 1,070 departed still open here; 38 have no building id; of 15 asked, 12 came back closed and 3 with no status.
-> - **Waiting on the owner's go (asked; the reply "open" was unclear):**
->   1. A catch-up run here: `python scripts/oxs_requests_sync.py --apply --max-lookups 1100`, about 18 minutes, writing only our `requests`.
->   2. The script on `main`, where the Action `oxs-requests.yml` runs. The file was identical on both branches before the fix.
-> - **Left after it:** the 38 with no building id, and the ones OXS answers with no status, which are asked again each run.
+> - **Catch-up run done, 10:52-11:29 UTC:** 1,029 resolved.
+>   - 147 tickets are open, against 1,173.
+>   - 98 of them are imported: 57 in OXS's open feed, 38 with no building id, and 3 with no status from OXS (asked again each run).
+> - **NOT ON `main`.** The push was refused (403: `ClixTeam579` has no write access to `TheSuperShyy/homies`).
+>   - The commit is `69c5d18` on the local branch `sync-fix-for-main`. Push it with `git push origin sync-fix-for-main:main` once an account with access is active.
+>   - Until then the scheduled Action runs the old script, and tickets OXS closes stay open here again.
+>   - **Waiting on the owner:** push through `TheSuperShyy` (logged in here, inactive), or give `ClixTeam579` access.
 >
 > **LIVE 2 Nov, 09:55:43 UTC: the bot sees the photos tenants send (epoch 92, `scripts/n8n_whatsapp_photo.py`).** The owner: *"ok lets implement that"*. WORKLOG 2 Nov.
 > - **How:**
@@ -46,7 +46,13 @@ appended to.
 >
 > **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
 > - **Not proven until a press rings:** Tokomni answers 404 to anything wrong. "Never stop" is on, so an accepted press rings at once. Only in calling hours, and only Ido.
-> - **If the dialer's id is refused too,** the id is not the cause. Switch back to List 2 (`.env` `TOKOMNI_LIST2_ID`) and send Omni the 29 Oct email: their log has the reason, likely the token.
+> - **2 Nov, 10:52 UTC: the dialer's id was refused too.** Two presses, both `404 Route Not Found`, read in Vercel's request log. So neither id alone is the cause. Not switched back.
+> - **Next, on the owner's word (an accepted send rings Ido at once).** From this PC with `.env`'s token, stopping at the first 200:
+>   1. the page's exact request;
+>   2. the dialer's id with the bare resident id (a UUID; ours is 52 characters with the press time);
+>   3. List 2's id with it.
+>
+>   Put the accepted form in the page. If all three are refused, send Omni the 29 Oct email with today's two ids added: their log has the reason, likely the token.
 > - **Never write either id into the repo.**
 >
 > **THE WHATSAPP TEST NUMBER IS WATCHED (live 29 Oct, 18:46 UTC): `Homies — WhatsApp number watch` (`OzdMMziMU4T4GOrb`, `scripts/n8n_number_watch.py`) re-registers it by itself when Meta drops it.**
