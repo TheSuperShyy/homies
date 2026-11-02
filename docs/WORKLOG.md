@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The onboarding video re-recorded without the tester's conversation (owner: "remove the alliah dela cruz on the conversation and do a recording again")
+- **Removed:** conversation #90, the tester's "Hi" and the greeting Meta refused.
+  - First it was only resolved. It still showed, because the admin's list filter is set to all statuses (the "הכל" chip beside the inbox name).
+  - Then it was deleted through the API (`DELETE …/conversations/90`, then 404). The contact itself stays in Contacts.
+- **The video again:** `local/onboarding/chatwoot-onboarding-he.mp4`, 3:05 (the pages loaded slower this run), every step passed. The list shows only Clix, Elmaliach Ido, Yariv and Clix Solution.
+  - Conversation #1 was put back as before: 0 messages since 15:00 UTC 2 Nov, open, no assignee.
+- **Also answered:** an agent's public reply does stop the bot. `Human replied?` -> `Assign to the replier` gives the conversation to whoever replied, as קשר אלי does; the video says so at 1:30.
+  - **One gap:** an answer the bot is already writing (20-40 s) is not re-checked before Send, so it can still go out after the agent's. Not changed.
+
 ### Our Chatwoot in Hebrew, and a Hebrew onboarding video of it (owner: "make ours in hebrew" + a screen recording with captions and click markers)
 - **Asked:** *"is the chatwoot in hebrew?"* (it was English: account 2's locale `en`, no user with their own language), then *"make ours in hebrew and i want you to do a screen recording for the onboaring on how to use it … with captions in correct hebrew with markings on what to click … open your own browser"*.
 - **Checked first:** no n8n workflow reads Chatwoot's English wording. All 11 were searched; the bot reads who sent a message, assignee, labels and status only. Chatwoot 4.16.2 also has a per-user language (`ui_settings.locale`, profile page), unused.
