@@ -55,6 +55,9 @@ appended to.
 >
 >   The Debts page's Call button (`dashboard/lib/call.ts`) already does the Vapi side. Deploying the dashboard needs the push to `main`.
 > - **Tokomni's click-to-call already bridges a number to 208** (`C2C#<number>`; 26 Oct and 1 Nov). The router gives such a call the incoming agent.
+> - **List 2 is on hold** (the owner's screenshot of Tokomni's lists, 2 Nov): ▶ under Play/Hold, total 1.
+>   - None of our presses got in, so nothing waits to ring.
+>   - The one 404 cause left to rule out ourselves: the owner presses ▶ on List 2 only (never on "test 1/0", whose waiting number would ring), the page goes back to List 2's id (Vercel `TOKOMNI_CAMPAIGN_ID` from `.env` `TOKOMNI_LIST2_ID`, then a production redeploy, each on the owner's go), and the owner presses Ring.
 >
 > **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.
 > - **Not proven until a press rings:** Tokomni answers 404 to anything wrong. "Never stop" is on, so an accepted press rings at once. Only in calling hours, and only Ido.

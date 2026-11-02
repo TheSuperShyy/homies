@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### Tokomni's list page read from the owner's screenshot: List 2 is on hold, and none of our presses got in (read only)
+- **Seen:** the dialer's lists, filter "List status: Active".
+  - List 2: total 1, answered 1, last run 25 Oct.
+  - Four hand tests from 26 Oct: "test 2026" (answered 1), "Ido-Test" (not answered 1), "testtest" (answered 1) and "test 1/0" (new 1, never rung).
+  - Every row shows the ▶ button under Play/Hold.
+- **Read:**
+  - **None of our three presses reached List 2** (29 Oct, 2 Nov twice): its total is still 1. So the 404s were real refusals, and nothing waits there to ring Ido later.
+  - **All five lists are on hold.** ▶ is the button that starts a list. Status "Active" means only that the list is not archived. "test 1/0" has kept its one new number unrung for a week, which a playing list would not.
+  - **The page shows times in the viewer's own clock (the owner's, UTC+8).** "test 2026" ran at 7:44:42 PM on 26 Oct, which is 11:44:42 UTC. That is 17 s before the debt agent's 83 s dialer call on Yariv's Vapi (11:44:59 UTC).
+- **What it leaves:** List 2 on hold is the one cause of the 404 we can rule out ourselves. Omni's 27 Oct email says a list on hold still takes API leads and only does not ring them.
+  - The try: the owner presses ▶ on List 2 only (it has no new number, so nothing should ring), the page goes back to List 2's id, then Ring for Ido.
+  - ▶ on "test 1/0" would ring its waiting number at once.
+  - The line through Omni stays the main route.
+
 ### The owner's turn: our own system places the call through Omni's line, not leads into Tokomni (email to Omni drafted; nothing sent)
 - **Asked:** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*, after the dialer's id was refused too.
 - **Taken as:** the SIP route, the preferred setup until 28 Sep. Vapi dials out through Omni's line (a `byo-sip-trunk` credential and a `byo-phone-number`), so nothing goes into Tokomni's lists.

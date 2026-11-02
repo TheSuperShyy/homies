@@ -3376,6 +3376,11 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **2 Nov: the owner turned from the insert API to the line:** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*.
     - Our system places the call through Omni's SIP (Vapi `byo-sip-trunk` + `byo-phone-number`), the preferred setup of 28 Sep.
     - The email for Omni is `local/omnitelecom/2026-11-02-outbound-sip-email.txt`. Until their values arrive, nothing can ring from the dashboard.
+    - **Reading Tokomni's list page (2 Nov):**
+      - ▶ under Play/Hold is the button that starts a list, so a list showing it is on hold.
+      - Status "Active" means only that the list is not archived.
+      - Times are in the viewer's own clock, the owner's UTC+8.
+      - A list's "Total" shows whether an API lead ever got in.
     - **Tokomni's click-to-call already bridges a number to 208.** The INVITE's From name is `C2C#<number>` (26 Oct twice, 1 Nov). The router gives it the incoming agent, because only a `dialer-` name gets the debt agent.
   - **The dashboard's dialer test (feature 20, 28 Oct) is how a test call is placed now, not an Excel upload.** One press puts one number in List 2.
   - **Since 2 Nov the dashboard and `.env` send the Homies_Bot dialer's own id as `campaign_id`, not List 2's.** The owner had Tokomni open and said *"ok lets wire it up on the correct one"*.
