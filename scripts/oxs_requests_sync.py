@@ -109,9 +109,13 @@ SEEN_AT = None
 # 60 requests a minute per key. The departed-ticket lookups are the only loop
 # here that can approach it; this is the pace oxs_buildings_sync.py already uses.
 PACE = 1.05
-# Departed tickets asked about per run: about 6 minutes at PACE, inside the
-# Action's 10-minute guard. `--max-lookups N` overrides it for a run by hand.
-MAX_LOOKUPS = 360
+# Departed tickets asked about per run. Each costs PACE plus OXS's answer, about
+# 2.15 s in all on 2 Nov (1,032 asked in 37 minutes), so 150 is about 5.5
+# minutes, inside the Action's 10-minute guard. 360 was first written here from
+# PACE alone, which is 13 minutes, and a run the guard stops writes nothing, not
+# even the new tickets: the feed is written after these lookups.
+# `--max-lookups N` overrides it for a run by hand.
+MAX_LOOKUPS = 150
 
 # Their twelve categories, mapped to the slugs migration 014 constrains `type`
 # to. The Hebrew label is stored beside it verbatim: the slug is for code, the
@@ -344,8 +348,8 @@ def departed_rows(gone):
     if not pending:
         return [], []
     # Oldest departure first, and at most MAX_LOOKUPS asked per run. The Action
-    # stops at 10 minutes, and a backlog (1,050 on 2 Nov) at PACE apart is about
-    # 18. It drains over a few runs, and after that a run asks about the few that
+    # stops at 10 minutes, and a backlog (1,050 on 2 Nov) took 37 minutes to ask.
+    # It drains over a few runs, and after that a run asks about the few that
     # left since the last one.
     pending.sort(key=lambda r: r.get("oxs_last_seen_at") or "")
 
