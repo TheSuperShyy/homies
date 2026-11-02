@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The two templates submitted to the new WhatsApp account (owner: "ok create those for me")
+- **`wa_templates.py create … --apply`** on `2129102787704530`, in the owner's own wording of 22 and 23 Sep from `templates.md`, unchanged:
+  - `payment_link_he` is id `1654251699479866`;
+  - `ticket_resolved_he` is id `1087828014250760`;
+  - both UTILITY / he, PENDING at submission.
+- **Nothing in the sender is tied to the old account.** `syncedTemplates()` in debt-tools reads name, namespace and body from Chatwoot's inbox 1. Once Meta approves them, Chatwoot only has to sync.
+- **What still limits them on a test number:**
+  - Meta lets a test number start a conversation only with numbers on its test list, and it refused the owner's number.
+  - The account shows 141006 (no payment method). Replies work without it. Whether templates need it, the first one will show.
+
 ### The WhatsApp bot moved to a new test number, +1 555-045-9005 (about 08:55 UTC; owner: "ok go")
 - **The number:** the owner made a new test number in the HOMIES app. Ours is `1406095812586455`, in "Test Messaging Account" `2129102787704530`: CONNECTED, CLOUD_API, VERIFIED.
   - The owner's setup page showed +1 555-901-6064 instead. That number is in the "ASTDX" account `1698189384845772`, which respond.io's BSP app is subscribed to, so the bot is not on it: both would get the same messages.
