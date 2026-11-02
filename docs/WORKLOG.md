@@ -11,6 +11,46 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### Our Chatwoot in Hebrew, and a Hebrew onboarding video of it (owner: "make ours in hebrew" + a screen recording with captions and click markers)
+- **Asked:** *"is the chatwoot in hebrew?"* (it was English: account 2's locale `en`, no user with their own language), then *"make ours in hebrew and i want you to do a screen recording for the onboaring on how to use it … with captions in correct hebrew with markings on what to click … open your own browser"*.
+- **Checked first:** no n8n workflow reads Chatwoot's English wording. All 11 were searched; the bot reads who sent a message, assignee, labels and status only. Chatwoot 4.16.2 also has a per-user language (`ui_settings.locale`, profile page), unused.
+- **Switched:** account 2 (`CLIX`) `locale` en -> he through the API, read back. Menus and the conversation's activity lines are Hebrew now. The login page stays English, because it comes before the account. The sandbox account (3) was already Hebrew.
+- **The video:** `local/onboarding/chatwoot-onboarding-he.mp4` (ignored by git). 2:39, 1920x1080, H.264, 6.4 MB.
+  - It walks the live inbox:
+    - the WhatsApp and Voice channels;
+    - the לא הוקצתה / שלי / הכל tabs;
+    - opening the owner's test chat (#1: the lamp and gate photos, ticket 255-1388-26);
+    - the side panel, then פעולות בשיחה -> קשר אלי;
+    - typing a reply and pointing at שלח (never sent);
+    - a private note with the @ list shown, then הוסף הערה;
+    - פתרון and reopening;
+    - the 15-minute hand-back;
+    - the handover labels;
+    - a summary card.
+  - Captions are plural imperative Hebrew. Each matches the bot's real rules: assigned, `bot-off` or resolved turns it off for one conversation; an agent's public reply claims it; a private note does not; a quiet taken conversation goes back to the bot after 15 minutes.
+  - **Privacy:** an overlay blurs every phone number and email on screen (contact panel, @ list, the sidebar's own address). The Voice inbox's list was never opened, because #89 there may be a real caller.
+- **How:** a private headless Chromium (Playwright, the installed chromium-1234 build), logged in as the admin. `local/onboarding/overlay.js` draws captions, a pulsing ring, a cursor and the blur. `local/onboarding/record.py` drives the steps, takes Chrome's screencast frames and encodes them with ffmpeg. Three runs: the first two found the reply/note switch flips on a click of either label, and left an "@" in the note.
+- **What the recording changed, all put back:**
+  - On conversation #1, each run assigned it to Assaf Clix, added a note, resolved and reopened it.
+  - Chatwoot's own delete only blanks a message, so the 14 traces of the three runs (activity lines and notes) were destroyed with `rails runner`, scoped to conversation #1, activity or Assaf Clix's private notes, since 15:00 UTC.
+  - Read back: 0 messages since 15:00, status open, no assignee.
+  - Nothing reached any tenant.
+
+### The OXS ticket fix is on `main`, and the automatic run closes tickets again (15:56 UTC)
+- **Asked:** *"lets fix the oxs ticket on the auto uupdate"*: the day report's Will line, the fixed `oxs_requests_sync.py` on `main`, where both scheduled workflows run it.
+- **Found first: 360 lookups did not fit the 15-minute job.**
+  - The catch-up asked 1,032 in 37 minutes, about 2.15 s each (PACE plus OXS's answer). So 360 is about 13 minutes, and `oxs-requests.yml` stops at 10.
+  - A run the guard stops writes nothing, not even the new tickets: the feed is upserted after the lookups. A backlog over about 270 would have stalled every 15-minute run.
+  - `MAX_LOOKUPS` is 150 now, about 5.5 minutes (`44d6cdc` here, cherry-picked as `4c9d2a2` for `main`).
+- **Dry run with it (read only, 53 s):** 57 in the feed, 16 of them ours and skipped, 6 new. 63 departed tickets still open here, 40 with no building id; of the 23 asked, 20 were closed in OXS since the catch-up and 3 gave no status.
+- **Pushed:** `main` went `c97eca3..4c9d2a2`, a fast-forward carrying the script only.
+  - TheSuperShyy's token was given to that one command (a `-c credential.helper` override), so `ClixTeam579` stayed the active gh account.
+  - The push also built both Vercel projects from `main` (`homies`, `homies-dashboard`), both success. No dashboard file changed.
+- **Run by hand on `main`:** `gh workflow run oxs-requests.yml`, run `41476165588`, 15:54:17-15:56:09 UTC, success. It wrote 41 rows (6 new), resolved 20, and holds 2,257 imported tickets.
+- **Count after (read back):** 133 open, 84 of them imported. That is the morning's 147, less 20, plus 6.
+- **Found: GitHub runs the 15-minute job every 3 to 7.5 hours.** The 12 scheduled runs from 31 Oct 02:06 to 2 Nov 09:49 UTC came 3 h 04 to 7 h 30 apart, and none came between 09:49 and the hand run. The twice-daily `oxs-sync.yml` runs the same script too. So a ticket OXS closes closes here within hours, not 15 minutes. Not changed.
+- The local branch `sync-fix-for-main` was deleted; its commits are `main`'s.
+
 ### The new number's test list is EMPTY, yet the owner's phone gets replies (owner's screenshot, 15:06 UTC; read only)
 - **Seen:** "Add a recipient phone number … No recipients yet" on the HOMIES app's API Setup. The owner asked why their own phone still works.
 - **Compared in Chatwoot's rails log:**

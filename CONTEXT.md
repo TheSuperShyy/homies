@@ -3380,6 +3380,9 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - *(WhatsApp, not the dialer: a test number's recipients are added only in Meta's App Dashboard, each confirmed by a code sent to that WhatsApp. There is no API, so the owner adds them.)*
     - ***A WhatsApp test number replies ONLY to its recipient list, replies included (2 Nov, 14:43 UTC).*** A tester's "Hi" was taken and answered by the bot, and Meta refused the reply with `131030 Recipient phone number not in allowed list`. The owner's number still works although the new number's list shows empty (owner's screenshot, 2 Nov). The likely reason is that its verification as a recipient of the OLD test number in the same app still counts; Ido and Yariv were verified there too. Unproven.
       - When a tester says the bot is silent, look in Chatwoot for a failed outgoing message and its `external_error` before anything else.
+    - *(Chatwoot, not the dialer, 2 Nov:)*
+      - **Account 2 is in Hebrew** (`locale` he). The bot reads no Chatwoot wording, only senders, assignee, labels and status, so the language is free to change.
+      - **Chatwoot's message delete only blanks a message** ("deleted" placeholder, record kept). Test traces leave only with `Message#destroy` in `rails runner`, scoped tightly.
     - **Reading Tokomni's list page (2 Nov):**
       - ▶ under Play/Hold is the button that starts a list, so a list showing it is on hold.
       - Status "Active" means only that the list is not archived.
