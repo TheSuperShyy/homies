@@ -8,13 +8,14 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **LIVE 2 Nov, ~10:40 UTC: the bot sees the photos tenants send (epoch 92, `scripts/n8n_whatsapp_photo.py`).** The owner: *"ok lets implement that"*. WORKLOG 2 Nov.
+> **LIVE 2 Nov, 09:55:43 UTC: the bot sees the photos tenants send (epoch 92, `scripts/n8n_whatsapp_photo.py`).** The owner: *"ok lets implement that"*. WORKLOG 2 Nov.
 > - **How:**
 >   - `Read the photos` lists the chat from Chatwoot when a turn has a photo.
 >   - `Show the photos` puts the burst's photos (up to 3) on the agent's input item, and the Agent hands them to Gemini (passthrough, on by default).
 >   - The note says "you see it" only when a photo is on the item, and keeps "you do not see its content" when none could be fetched.
 > - **Rollback:** `python scripts/n8n_whatsapp_photo.py --restore` (snapshot `local/n8n-whatsapp-live-02nov-before-photo.json`) + git revert.
-> - **Owed:** the owner's handset (a photo; a photo then words), then `check_whatsapp_rules.py --watch 2026-11-02T10:40`. The fold takes `photo()` after `name()`.
+> - **Seen on the handset (09:59 UTC):** a photo with no caption was seen ("נראה שהיא נשברה בפנים") and answered with where-is-it, in 38 s.
+> - **Owed:** a photo followed by words, then `check_whatsapp_rules.py --watch 2026-11-02T09:55`. The fold takes `photo()` after `name()`.
 >
 > **THE WHATSAPP BOT IS ON A NEW TEST NUMBER SINCE 2 Nov (~08:55 UTC): +1 555-045-9005** (`1406095812586455`, account "Test Messaging Account" `2129102787704530`, HOMIES app; owner: *"ok go"*). WORKLOG 2 Nov.
 > - **Why:** since 31 Oct, ~14:43 UTC, our Meta system user cannot see the old test account or its number at all (100/33). It was deleted or unassigned.

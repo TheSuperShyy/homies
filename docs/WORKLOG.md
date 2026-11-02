@@ -42,7 +42,12 @@ conversation that produced it.
     - of five, the newest three are taken, and a PDF among them is skipped.
 - **Applied:** 56 -> 61 nodes, memory key `-92`. A re-run has nothing to do, and the gate on live is all green.
   - Snapshot: `local/n8n-whatsapp-live-02nov-before-photo.json`. **Rollback:** `python scripts/n8n_whatsapp_photo.py --restore` + git revert.
-- **Owed:** the owner's handset (a photo, and a photo then words), then `check_whatsapp_rules.py --watch 2026-11-02T10:40`.
+- **The owner's handset, first photo (09:59:14 UTC, no caption, execution 148073):**
+  - `Read the photos` listed 20 messages, and `Show the photos` put 1 photo on the item.
+  - The model answered from it: "אוי, נראה שהיא נשברה בפנים 😕 איפה המנורה הזאת נמצאת, במעלית, בלובי או אצלך בדירה?"
+  - Out at 09:59:52 (38 s, about twice a text reply), read on the phone.
+  - Send's emoji step cut the 😕 and left "בפנים איפה" with no full stop between the two sentences. That step predates this change and was not touched.
+- **Owed:** a photo followed by words, then `check_whatsapp_rules.py --watch 2026-11-02T09:55`.
   - The fold takes `photo()` after `name()`.
   - The wallet on the key ending 3f9 is $6.64.
 
