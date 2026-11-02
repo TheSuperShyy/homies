@@ -109,6 +109,9 @@ SEEN_AT = None
 # 60 requests a minute per key. The departed-ticket lookups are the only loop
 # here that can approach it; this is the pace oxs_buildings_sync.py already uses.
 PACE = 1.05
+# Departed tickets asked about per run: about 6 minutes at PACE, inside the
+# Action's 10-minute guard. `--max-lookups N` overrides it for a run by hand.
+MAX_LOOKUPS = 360
 
 # Their twelve categories, mapped to the slugs migration 014 constrains `type`
 # to. The Hebrew label is stored beside it verbatim: the slug is for code, the
@@ -208,6 +211,27 @@ def sb(path, method="GET", body=None, prefer=None):
         h["Prefer"] = prefer
     return http(E["SUPABASE_URL"].strip().rstrip("/") + "/rest/v1/" + path,
                 h, json.dumps(body).encode() if body is not None else None, method)
+
+
+def sb_all(path, page=1000):
+    """Every row of a read, a page at a time.
+
+    PostgREST stops at 1,000 rows a response whatever `limit` asks for, and says
+    nothing. The imported tickets passed 1,000 in late September, and from then
+    on every read here saw only the first 1,000. So "already imported" read 0,
+    "gone" was the wrong set, and each run asked OXS about a handful of the
+    departed tickets instead of all of them. The open count only ever grew, and
+    on 2 Nov 1,124 imported tickets were open here against 70 in OXS's feed.
+    """
+    out, offset = [], 0
+    while True:
+        code, part = sb("%s&order=id&limit=%d&offset=%d" % (path, page, offset))
+        if code != 200 or not isinstance(part, list):
+            return code, part
+        out += part
+        if len(part) < page:
+            return 200, out
+        offset += page
 
 
 def e164(raw):
@@ -311,14 +335,19 @@ def departed_rows(gone):
     if not gone:
         return [], []
 
-    code, mine = sb("requests?select=reference,building,oxs_ref"
-                    "&opened_via=eq.oxs&status=in.(open,in_progress)&limit=2000")
+    code, mine = sb_all("requests?select=reference,building,oxs_ref,oxs_last_seen_at"
+                        "&opened_via=eq.oxs&status=in.(open,in_progress)")
     if code != 200 or not isinstance(mine, list):
         print("  could not read our own open rows (HTTP %s); resolution skipped" % code)
         return [], []
     pending = [r for r in mine if r.get("oxs_ref") in gone]
     if not pending:
         return [], []
+    # Oldest departure first, and at most MAX_LOOKUPS asked per run. The Action
+    # stops at 10 minutes, and a backlog (1,050 on 2 Nov) at PACE apart is about
+    # 18. It drains over a few runs, and after that a run asks about the few that
+    # left since the last one.
+    pending.sort(key=lambda r: r.get("oxs_last_seen_at") or "")
 
     # TWO KEYS PER BUILDING, because OXS writes an address two ways.
     #
@@ -342,21 +371,27 @@ def departed_rows(gone):
                                    % (b["street"], b["number"],
                                       b["entrance"], b["city"]), b["id"])
 
-    print("  asking OXS about %d departed ticket(s), about %.0fs at %.2fs apart"
-          % (len(pending), len(pending) * PACE, PACE))
+    askable = sum(1 for r in pending if by_addr.get(r.get("building")))
+    asking = min(askable, MAX_LOOKUPS)
+    print("  asking OXS about %d of %d departed ticket(s) (at most %d a run), about %.0fs at %.2fs apart"
+          % (asking, len(pending), MAX_LOOKUPS, asking * PACE, PACE))
 
-    rows, unmapped, missing_bld = [], [], 0
+    rows, unmapped, missing_bld, looked, no_status = [], [], 0, 0, 0
     for r in pending:
         bid = by_addr.get(r.get("building"))
         if not bid:
             missing_bld += 1
             continue
+        if looked >= MAX_LOOKUPS:
+            continue
+        looked += 1
         time.sleep(PACE)
         got = oxs("/service-calls/%s" % urllib.parse.quote(str(r["reference"])),
                   fatal=False, buildingId=bid)
         call = (got[0] if got else {}) or {}
         raw = ((call.get("status") or {}).get("status") or "").strip()
         if not raw:
+            no_status += 1
             continue
         if raw not in STATUS:
             unmapped.append(raw)
@@ -371,12 +406,18 @@ def departed_rows(gone):
         })
     if missing_bld:
         print("  no building id for %d of them — left alone" % missing_bld)
+    if no_status:
+        print("  OXS gave no status for %d of those asked — asked again next run" % no_status)
+    if len(pending) - missing_bld > looked:
+        print("  %d left for the next run(s)" % (len(pending) - missing_bld - looked))
     return rows, unmapped
 
 
 def main():
-    global SEEN_AT
+    global SEEN_AT, MAX_LOOKUPS
     apply = "--apply" in sys.argv
+    if "--max-lookups" in sys.argv:
+        MAX_LOOKUPS = int(sys.argv[sys.argv.index("--max-lookups") + 1])
     SEEN_AT = datetime.now(timezone.utc).isoformat()
 
     calls = oxs("/service-calls")
@@ -407,8 +448,7 @@ def main():
     # non-imported row already holds is not news — it is our ticket reflected.
     # Skipped BEFORE any counting: to every number below, it does not exist.
     # See "AND THE MIRROR MAKES ONE SKIP NECESSARY" in the docstring.
-    code, ours = sb("requests?select=oxs_ref&oxs_ref=not.is.null"
-                    "&opened_via=neq.oxs&limit=2000")
+    code, ours = sb_all("requests?select=oxs_ref&oxs_ref=not.is.null&opened_via=neq.oxs")
     mirrored = {r["oxs_ref"] for r in ours} if code == 200 else set()
     skipped = [r for r in rows if r["oxs_ref"] in mirrored]
     rows = [r for r in rows if r["oxs_ref"] not in mirrored]
@@ -416,7 +456,7 @@ def main():
         print("ours, reflected back by OXS and skipped: %d" % len(skipped))
 
     # What is already here, so the print says new or updated rather than "33".
-    code, have = sb("requests?select=oxs_ref&opened_via=eq.oxs&limit=2000")
+    code, have = sb_all("requests?select=oxs_ref&opened_via=eq.oxs")
     known = {r["oxs_ref"] for r in have} if code == 200 else set()
     new = [r for r in rows if r["oxs_ref"] not in known]
 
@@ -516,7 +556,7 @@ def main():
                          % (code, r["reference"], str(msg)[:200]))
         print("resolved %d departed ticket(s) from OXS" % len(closed))
 
-    code, after = sb("requests?select=reference&opened_via=eq.oxs&limit=2000")
+    code, after = sb_all("requests?select=reference&opened_via=eq.oxs")
     print("imported tickets now in the database: %d" % len(after))
 
 
