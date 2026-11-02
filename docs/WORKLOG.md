@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-02
 
+### The new number's test list is EMPTY, yet the owner's phone gets replies (owner's screenshot, 15:06 UTC; read only)
+- **Seen:** "Add a recipient phone number … No recipients yet" on the HOMIES app's API Setup. The owner asked why their own phone still works.
+- **Compared in Chatwoot's rails log:**
+  - The owner's "hi" (09:06) and the tester's "Hi" (14:43) are the same kind of message: plain text, a profile name and a `user_id`, no referral.
+  - Every reply to the owner was priced `free_customer_service` and was sent, delivered and read. The tester's reply was refused at send time with 131030.
+- **So "the owner's number is on the list" (14:50 UTC) was wrong too.** The likeliest reason: the owner, Ido and Yariv were verified recipients of the OLD test number in this same app (WORKLOG, Sept). Meta may still honour those verifications for the app, even though the new number's list shows none. The tester was never verified. **Unproven.**
+  - The test: Ido or Yariv sends "hi". An answer means they need no re-adding. A failed reply in Chatwoot means add them. The tester needs adding either way.
+
 ### WRONG this morning: the test number does NOT answer anyone who writes first. A tester's "Hi" got no reply (131030, 14:43 UTC; read only)
 - **Asked:** *"can you check the recent webhook on the chatbot"*.
 - **The chain, read end to end:**

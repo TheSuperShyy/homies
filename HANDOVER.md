@@ -43,6 +43,7 @@ appended to.
 > - **Proven:** the owner's "hi" at 09:06:11 UTC got the menu at 09:06:16, and Meta reports it read.
 >   - **Replies go ONLY to numbers on the test recipient list** (max 5). A tester's "Hi" at 14:43 UTC was answered by the bot, and Meta refused the reply with `131030 Recipient phone number not in allowed list`.
 >   - The owner adds testers in the App Dashboard (WhatsApp > API Setup > To > Manage phone number list), with a code to each one's WhatsApp.
+>   - **The new number's list shows EMPTY (owner's screenshot), yet the owner's phone gets replies.** Likely the old test number's verified recipients (the owner, Ido, Yariv) still count for the app. Unproven: a "hi" from Ido or Yariv tells.
 >   - The two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
 >   - The lasting fix is still Homies' own number on a verified business.
 >
