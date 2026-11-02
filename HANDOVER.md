@@ -18,8 +18,8 @@ appended to.
 >   - the live bot's typing nodes (`n8n_whatsapp_newnumber.py`, gate green; `--restore` puts the snapshot back).
 > - **Not the number on the owner's setup page:** +1 555-901-6064 is in the "ASTDX" account, which respond.io is subscribed to. Never put the bot there.
 > - **Owed:**
->   - The owner's first message to the new number. It shows whether a test number may answer someone not on its list. Meta refused the owner's number as a recipient.
->   - Then the two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
+> - **Proven:** the owner's "hi" at 09:06:11 UTC got the menu at 09:06:16, and Meta reports it read. Replies go to anyone who writes first, recipient list or not.
+>   - The two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
 >   - The lasting fix is still Homies' own number on a verified business.
 >
 > **THE DASHBOARD'S DIALER TEST SENDS THE HOMIES_BOT DIALER'S ID SINCE 2 Nov (Vercel `TOKOMNI_CAMPAIGN_ID`, production redeployed).** It sent List 2's id before, and that got Tokomni's 404 on 29 Oct. The owner, with Tokomni's dialer settings open: *"ok lets wire it up on the correct one"*. WORKLOG 2 Nov.

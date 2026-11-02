@@ -33,7 +33,7 @@ conversation that produced it.
   - The two templates (`payment_link_he`, `ticket_resolved_he`) on the new account: `wa_templates.py`, then Meta's approval.
   - A payment method on the account (141006) before any template can send.
   - The test recipients.
-- **Owed:** the owner's first message to +1 555-045-9005. It shows whether a test number may answer a number that is not on its list.
+- **Proven end to end:** the owner's "hi" reached Chatwoot at 09:06:11 UTC (4 Meta POSTs to `/webhooks/whatsapp/+15550459005`). The bot's menu went out at 09:06:16 and Meta reports it **read**. So a test number may answer a number that is not on its recipient list, inside the 24-hour window the person's own message opens.
 
 ### The bot is silent because the WhatsApp test account is gone from our reach since 31 Oct, ~14:43 UTC (read only)
 - **Asked:** *"check why the bot is not replying"*.
