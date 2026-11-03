@@ -4112,10 +4112,16 @@ when a person ask for a quote it will mention on the inbox"*. So:
 - a quote request is a note in the chat inbox (notify_team, reason quote, no ticket), in place of the
   old leads board.
 - **The old 23-hour reminder is replaced by an update to the tenant when the ticket closes** (owner,
-  3 Nov: *"replace the 23hrs reminder with follow up on the ticket once its closed"*). That is the one
-  item still open on Yariv's page. It is the `ticket_resolved_he` message, which is not delivered on
-  the live numbers yet (Meta's 141006 on the Chatwoot number; nothing wired on the UChat one). The
-  6 Oct comparison pages still count all four as missing: they are a dated snapshot.
+  3 Nov: *"replace the 23hrs reminder with follow up on the ticket once its closed"*, then *"the follow up
+  message when the ticket is done works right so nothing is left"*). So the ManyChat point on Yariv's
+  page is done.
+  - The message is `ticket_resolved_he`, sent by `Homies — ticket notices`. It was proven end to end on
+    23 Sep and 6 Oct: the only two rows in `ticket_notices`, both `sent`.
+  - Nothing has been sent since 6 Oct. On today's numbers it is untested.
+  - The template is APPROVED on the new test WABA (`wa_templates.py`, 3 Nov; it was PENDING on 2 Nov).
+    Whether the account's 141006 blocks the first template send is unknown until one goes.
+  - The UChat number has no ticket notices wired.
+- The 6 Oct comparison pages still count all four as missing: they are a dated snapshot.
 - **The session with Yariv has happened, and he approved the features** (owner, 3 Nov: *"we have a
   session with yariv and he approved the features"*). The joint walk through the old flows is no
   longer owed.

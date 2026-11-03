@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Yariv's page: the ManyChat point is done (owner: "no the follow up message when the ticket is done works right so nothing is left")
+- **Checked first, read only:**
+  - `wa_templates.py`: `ticket_resolved_he` and `payment_link_he` are APPROVED on WABA `2129102787704530`. They were PENDING at 12:51 UTC on 2 Nov.
+  - `ticket_notices`: only two rows ever, 23 Sep and 6 Oct, both `sent`. The message worked end to end. Nothing has gone out since 6 Oct, so it is untested on the new number, and the UChat number has none wired.
+  - My previous entry's "reaches no tenant on the live numbers yet" overstated it: what is true is "untested since 6 Oct".
+- **The point now:** status "done". The text is "עברנו על הבוט הישן ב-ManyChat והשווינו אותו למיכאל. הקישור לאתר כבר קיים, בקשה להצעת מחיר מגיעה ישר לתיבת הצ'אט, והדייר מקבל עדכון כשהקריאה שלו נסגרת. קיימנו פגישה עם יריב, והוא אישר את הפיצ'רים."
+- **Counts:** 14 done, 9 partly, 2 waiting, 2 decided (from 13 / 10).
+- **Republished:** version `1793721145-5eb9` over `1793720793-a736`, still shared by link.
+
 ### Yariv's page: the 23-hour reminder becomes an update when the ticket closes (owner: "lets remove the reminder", interrupted, then "replace the 23hrs reminder with follow up on the ticket once its closed")
 - The ManyChat point's last sentence "נשארה רק התזכורת אחרי 23 שעות" is now "נשאר רק עדכון לדייר כשהקריאה שלו נסגרת". It is still what is left, so the point stays "partly done". No "23 שעות" is left on the page.
 - It is still left because the closed-ticket message (`ticket_resolved_he`) reaches no tenant on the live numbers yet.

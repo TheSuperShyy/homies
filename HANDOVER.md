@@ -58,7 +58,13 @@ appended to.
 >     - It refuses any English outside the run's own text.
 >     - `build_en.py` and `translations.json` still build the English page it replaced, as `index-en.html`. That file is not published, and is there only if the owner asks for an English twin.
 >   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
-> - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*). **Live version `1793720793-a736`** (3 Nov, 15:46 UTC). The ManyChat point now says simply that the website link exists, a quote request reaches the chat inbox, and the session with Yariv was held and he approved the features. The one item left is an update to the tenant when the ticket closes (in place of the old 23-hour reminder), so it stays "partly done". The page does not mention the elevator anywhere, on the owner's word.
+> - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*). **Live version `1793721145-5eb9`** (3 Nov, 15:52 UTC). The ManyChat point is DONE, on the owner's word, and says simply that:
+>     - the website link exists;
+>     - a quote request reaches the chat inbox;
+>     - the tenant gets an update when the ticket closes;
+>     - the session with Yariv was held and he approved the features.
+>   - Counts are 14 done, 9 partly, 2 waiting, 2 decided.
+>   - The closed-ticket message is untested on today's numbers (CONTEXT, the ManyChat paragraph). The first resolved WhatsApp ticket on the new number will show it. The page does not mention the elevator anywhere, on the owner's word.
 >   - **The "what is still needed, and from whom" box is gone,** on the owner's word. What each side owes lives here and in WORKLOG, not on the page.
 >   - **Shared by link (read `public`).** A republish needs `shared_live: "public"` and `artifact_title: "Yariv's Feedback Status"`. The name stays English in the gallery and the tab.
 >   - **Its words follow the owner's updates to Yariv.** OXS and ManyChat stay in Latin letters (as in his own documents), and אומניטלקום is in Hebrew. Meta's business check is "אישור העסק מול וואטסאפ". `build.py` refuses any other Latin text.
