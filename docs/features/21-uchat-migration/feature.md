@@ -37,7 +37,7 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 1. UChat's default reply runs the sub flow "Michael". Its one step, an External Request, posts `{"user_ns": …}`.
 2. `Who is this? (UChat)` and `Which message? (UChat)` read the contact and their newest message back from UChat.
 3. `From UChat` hands Sort the Chatwoot event it has always read. From there on, the bot is the live bot.
-4. Replies go out through the translator. Text becomes `send-text`; the menu becomes `send-content` with buttons that run "Michael" again.
+4. Replies go out through the translator, all as the bot (`send-content`, `send_as_agent: 0`). The menu's buttons each run their own step, "Michael", "Michael 2" or "Michael 3", which hold the same External Request.
 
 **Differences from live, all on purpose:**
 - **Only test phones get through** (`UCHAT_TEST_PHONES` in `.env`, the owner's number). The copy uses the live tools, so a ticket it opens is real, like a test on the live WhatsApp bot.
@@ -84,9 +84,12 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 - **The translator's runs:** all green.
 - **The run before it** (150455, the chat opening) skipped with "nothing from the contact yet", as it should.
 
+**On WhatsApp since 3 Nov,** on the owner's own Israeli number (never in this public repo; HANDOVER says where it is), through UChat's WhatsApp Cloud:
+- **Proven 09:50 UTC on the owner's phone:** "היי" got the greeting with both buttons, and a tap on פתיחת קריאת שירות went to the AI, whose answer arrived.
+- **Each button needs its own step:** UChat makes a button's WhatsApp id from its step, and WhatsApp refuses a message whose buttons share an id (#131009). The web chat does not show this.
+
 **Not yet tried** (each one calls the AI, so it is a paid test):
-- a button tap;
-- a real question;
+- a real question through to a ticket;
 - the hand-over.
 
 **Then from here:**
@@ -98,7 +101,7 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 - Photos are not kept on the ticket: the tool server takes photos only from Chatwoot's host.
 - Voice notes stay in Chatwoot.
 - The dashboard's Conversations page does not show UChat chats.
-- WhatsApp needs a number connected in UChat, and the cutover rules below.
+- The live number stays on Chatwoot: moving it is the cutover below.
 
 ## What has to change
 

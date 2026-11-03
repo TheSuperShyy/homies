@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The UChat bot's WhatsApp replies fixed: its buttons shared one id, and a test reply paused it (owner: "fix it the bot is not replying", "i message it")
+- **What the owner saw:** "helo", "הי", "הי" on WhatsApp (17:20-17:29 on their screen, 09:20-09:29 UTC) and no answer.
+- **Cause 1, the greeting never left UChat:**
+  - UChat's error log: *"(#131009) Parameter value is not valid: Duplicate button id"*.
+  - UChat makes a WhatsApp button's id from the step the button runs, and both menu buttons ran the one step "Michael". UChat's web chat takes that message; WhatsApp refuses all of it.
+  - **So the entry below was wrong to call 09:29 proven:** message 35 sits in UChat's log as sent, but it has no WhatsApp message id (`mid`). Every message that reached the phone has one (`wamid…`).
+  - **Fix:**
+    - in the "Michael" sub flow the step is duplicated twice, as "Michael 2" and "Michael 3" (UChat's builder, published);
+    - the translator gives each button its own step (`UCHAT_MENU_NODES`, by default "Michael,Michael 2,Michael 3").
+- **Cause 2, found on the way:**
+  - My plain-text test "בדיקה" went out through `send-text`. UChat logs that as an agent's message (message 37), and an agent's message pauses the bot for that contact for 30 minutes.
+  - The copy's text replies used the same call, so the bot would have silenced itself after its first plain reply.
+  - **Fix:** every reply goes through `send-content` as the bot (`send_as_agent: 0`). The bot was resumed for the owner's contact.
+- **Put live:**
+  - `python scripts/n8n_uchat.py --apply`, read back from n8n;
+  - the setup notes it writes (`local/uchat-prep/uchat-setup.txt`) now name the three steps.
+- **Proven 09:50 UTC, on the owner's phone:**
+  - "היי" → run 150623 (no AI) → message 49, the greeting with both buttons, with a WhatsApp id;
+  - the owner tapped "פתיחת קריאת שירות" → message 51, which quotes message 49's id, so the buttons were on their screen;
+  - run 150630 (the AI) → message 53, "כאן מיכאל מהומי'ז… ספר לי, מה קרה?", sent as the bot, with a WhatsApp id;
+  - UChat's error log is empty since 09:45 UTC, and the bot is not paused for the contact.
+- **Not yet tried:** a real question through to a ticket, and the hand-over to a person.
+
 ### The UChat version answers on WhatsApp, on its own Israeli number (owner: "i have twilio", "fix it the bot is not replying")
 - **The number:**
   - the owner's Twilio number from `D:\work\Apify-v3\.env`, an Israeli `+972 53…29` that receives SMS and voice; its calls go to the Apify app;
@@ -29,7 +52,7 @@ conversation that produced it.
   - **Linked to the bot:** Omni-Channel had one WhatsApp slot, taken by the morning's WABA link to the test number. I unlinked that (typed UNLINK) and linked WhatsApp Cloud → the +972 number (typed LINK).
   - **Still silent, because UChat had the number's automation PAUSED.** The row showed a red "Paused" ("Click this button to resume automation"), UChat had no WhatsApp contact, and Meta listed no app on the account.
     - Clicked → **Active**. Right after, Meta's app list for that account turned from empty to an HTTP 500, which suggests UChat had subscribed.
-- **Proven at 09:29 UTC:**
+- **Called proven at 09:29 UTC, wrongly: the greeting never reached the phone (the entry above has why):**
   - the owner's "היי" on WhatsApp reached UChat (a new contact at 09:29:25);
   - the copy's run 150582 ran From UChat → Sort (canned greeting, no AI) → Send;
   - the translator's send-content answered "ok";

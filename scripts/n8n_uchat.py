@@ -116,6 +116,9 @@ def config(apply):
     cfg = {"n8n": e["N8N_BASE_URL"].strip().rstrip("/"),
            "flow_ns": e.get("UCHAT_FLOW_NS", ""),
            "menu_node": e.get("UCHAT_MENU_NODE", "") or "Michael",
+           # One step per menu button (see MAP_WRITE): "Michael", "Michael 2", "Michael 3".
+           "menu_nodes": [s.strip() for s in (e.get("UCHAT_MENU_NODES", "") or "Michael,Michael 2,Michael 3").split(",")
+                          if s.strip()],
            "groups": json.loads(e.get("UCHAT_GROUPS", "") or "{}"),
            "agents": json.loads(e.get("UCHAT_AGENTS", "") or "{}"),
            "test_phones": digits_list(e.get("UCHAT_TEST_PHONES", "") or e.get("OXS_MIRROR_PHONES", "")),
@@ -188,8 +191,17 @@ return out({ skip: true, code: 404, answer: { error: 'not mapped: GET ' + p.acti
 MAP_WRITE = DOOR_AND_IDS + r"""
 const AGENTS = %(agents)s;   // Chatwoot user id -> UChat agent id
 const GROUPS = %(groups)s;   // Chatwoot team id -> UChat agent group id
-const MENU_NODE = %(menu)s;  // the sub flow step a menu button runs: the External Request
+// The sub flow steps menu buttons run, one per button: each holds the same
+// External Request. UChat makes a button's WhatsApp id from its target, and
+// WhatsApp refuses two buttons with one id (#131009 "Duplicate button id",
+// 3 Nov), so no two buttons may share a step.
+const MENU_NODES = %(menu)s;
 const b = j.body || {};
+// Every reply goes as the BOT through send-content. UChat logs send-text as an
+// agent's message, and an agent's message pauses the bot for that contact for
+// 30 minutes (seen 3 Nov), so the bot would silence itself after one reply.
+const asBot = (messages) => ({ method: 'POST', path: '/subscriber/send-content',
+  body: { user_ns, send_as_agent: 0, data: { version: 'v1', content: { messages } } } });
 switch (p.action) {
   case 'messages': {
     // UChat's API has no internal note: a private note becomes the contact's
@@ -201,12 +213,11 @@ switch (p.action) {
     const items = (b.content_attributes || {}).items;
     if (b.content_type === 'input_select' && Array.isArray(items) && items.length) {
       // WhatsApp shows at most three reply buttons of 20 characters.
-      const buttons = items.slice(0, 3).map(i => ({ type: 'node', caption: String(i.title || i.value || '').slice(0, 20), target: MENU_NODE }));
-      return out({ kind: 'menu', content: b.content, call: { method: 'POST', path: '/subscriber/send-content',
-        body: { user_ns, data: { version: 'v1', content: { messages: [{ type: 'text', text: String(b.content || ''), buttons }] } } } } });
+      const buttons = items.slice(0, Math.min(3, MENU_NODES.length)).map((i, k) => (
+        { type: 'node', caption: String(i.title || i.value || '').slice(0, 20), target: MENU_NODES[k] }));
+      return out({ kind: 'menu', content: b.content, call: asBot([{ type: 'text', text: String(b.content || ''), buttons }]) });
     }
-    return out({ kind: 'text', content: b.content, call: { method: 'POST', path: '/subscriber/send-text',
-      body: { user_ns, content: String(b.content || '') } } });
+    return out({ kind: 'text', content: b.content, call: asBot([{ type: 'text', text: String(b.content || '') }]) });
   }
   case 'toggle_status': {
     const s = { open: 'open', resolved: 'done', pending: 'pending', snoozed: 'pending' }[String(b.status || 'open')] || 'open';
@@ -341,7 +352,7 @@ def facade(cfg):
          "parameters": {"multipleMethods": True, "path": "api/v1/accounts/:acc/conversations/:conv/:action",
                         "responseMode": "responseNode", "options": {}}},
         code_node("Map a read", [240, 180], js(MAP_READ, **v)),
-        code_node("Map a write", [240, 420], js(MAP_WRITE, menu=cfg["menu_node"], agents=cfg["agents"],
+        code_node("Map a write", [240, 420], js(MAP_WRITE, menu=cfg["menu_nodes"], agents=cfg["agents"],
                                                  groups=cfg["groups"], **v)),
         if_node("Read allowed?", [480, 180], "={{ $json.skip !== true }}"),
         if_node("Write needed?", [480, 420], "={{ $json.skip !== true }}"),
@@ -545,7 +556,10 @@ def setup_file(cfg):
                 "URL:     %s/webhook/%s?s=%s\n"
                 "Body:    JSON, exactly this, with the User Ns field put in through UChat's field picker:\n"
                 "         {\"user_ns\": \"<User Ns>\"}\n"
-                "Name the step: %s\n" % (cfg["n8n"], BOT_PATH, cfg["webhook_secret"], cfg["menu_node"]))
+                "Name the step: %s\n"
+                "Then duplicate it, one step per menu button: %s. WhatsApp refuses two\n"
+                "buttons with one id, and UChat makes a button's id from its step.\n"
+                % (cfg["n8n"], BOT_PATH, cfg["webhook_secret"], cfg["menu_nodes"][0], ", ".join(cfg["menu_nodes"])))
 
 
 # --- UChat setup -------------------------------------------------------------------

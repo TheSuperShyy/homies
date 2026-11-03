@@ -56,7 +56,7 @@
 - **The API cannot make flows, AI agents or integrations.** The Webhook integration and the web widget are switched on in the dashboard by a person (verified on the spec, 257 paths on 3 Nov).
 - **The API has no internal-note call.** Chatwoot's private note, which pages a department today, has no direct twin. Searched the spec for "note": only closing notes, which are reasons chosen when a chat is closed.
 - **A staff reply pauses the bot for 30 minutes,** which staff can extend (UChat's Live Chat docs). `pause-bot` takes any number of minutes.
-- **UChat's External Request step times out after 15 seconds,** plus 10 per paid add-on. Our bot takes 20-40 seconds, so it never answers inside UChat's request. It acknowledges at once and replies through `send-text`.
+- **UChat's External Request step times out after 15 seconds,** plus 10 per paid add-on. Our bot takes 20-40 seconds, so it never answers inside UChat's request. It acknowledges at once and replies through `send-content`, as the bot.
 - **UChat's API sits behind Cloudflare,** which refuses Python's default user agent ("Error 1010: browser_signature_banned", a 403 that looks like a bad key). curl's passes. `scripts/uchat_api.py` sends it.
 - **Past messages cannot be imported.** The API creates contacts, not their history.
 - **On the free plan, nothing in UChat can call another system.**
@@ -69,19 +69,20 @@
 - **Two replies to every message at the cutover,** if the old path is not switched off in the same sitting. The cutover's step 3 exists for this.
 - **The payload changes under us.** UChat does not publish it, so a silent change would break `Sort`. The copy's `Sort` must fail loudly on a shape it does not know, the lesson of 17 Sep's silent Send.
 - **A reply outside the 24-hour window fails.** It is the same Meta rule as today: `send_payment_link` already falls back to `payment_link_he`, and the "done" message is a template anyway.
-- **The tool server's sends must go as the bot, not as staff.** Today it posts with Chatwoot's bot token so the bot's workflow neither answers the message nor takes it for a staff takeover. In UChat a message sent as an agent (`send_as_agent: 1`) would start the staff pause.
+- **The tool server's sends must go as the bot, not as staff.** Today it posts with Chatwoot's bot token so the bot's workflow neither answers the message nor takes it for a staff takeover. In UChat a message sent as an agent (`send_as_agent: 1`) would start the staff pause. **Seen 3 Nov:** `send-text` is logged as an agent's message and paused the bot, so every reply goes through `send-content` with `send_as_agent: 0`.
 - **Photos stop reaching tickets** if UChat's media host is not added to `MEDIA_HOSTS`.
 - **The typing dots disappear** if UChat does not pass Meta's message id. The replies are not affected.
 
 - **The UChat version answers nobody if UChat's contact id is not `<flow>u<number>`.** The translator rebuilds the contact id from the bot's flow id (`UCHAT_FLOW_NS`) and Chatwoot's numeric conversation id. The hand-over's `Report back` types the conversation id as a number, so a text id cannot pass through.
 - **A caller without the secret still makes the way in read UChat twice** before Sort refuses them and answers nothing. They learn nothing; it costs two reads.
+- **WhatsApp refuses a menu whose buttons share an id** ("#131009 Duplicate button id", 3 Nov). UChat makes a button's id from the step it runs, so each button has its own step. UChat's web chat accepts the same message, so only WhatsApp shows the fault.
+- **A message in UChat's log is not a delivered one.** A sent message carries WhatsApp's id (`mid`, `wamid…`). Without one, WhatsApp refused it, and the reason is in UChat's error log (`GET /flow/error-logs/data`).
 
 ## Open questions
 
 Each one is settled by the dry run (feature.md, step 1) or by the UChat version's first message, unless it says otherwise.
 
-- **Whether `chat-messages` returns the newest messages first,** and whether `limit=50` reaches the newest in a long chat.
-- **What a button tap leaves in UChat's log:** its caption as an incoming message, as the way in assumes.
+- **Settled 3 Nov, on WhatsApp:** `chat-messages` returns the newest message first. A button tap arrives as a `postback` message whose content is the button's caption, quoting the menu's WhatsApp id (`reply_to_mid`); the way in reads it as the caption, as it assumed.
 
 1. **What UChat's Webhook integration posts:**
    - its fields;

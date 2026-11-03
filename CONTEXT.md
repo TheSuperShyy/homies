@@ -495,6 +495,14 @@ address comes from its WhatsApp Cloud screen, after a Facebook login.
 automation"). While paused, UChat takes no messages and Meta lists no app on the
 account. Click it to Active (3 Nov). UChat's Register dialog pre-fills the PIN
 with 123456: replace it.
+**UChat makes a WhatsApp button's id from the step the button runs** (3 Nov):
+two buttons on one step make WhatsApp refuse the whole message ("#131009
+Duplicate button id"), while UChat's web chat shows it fine. Each menu button
+has its own step. **UChat's `send-text` sends as an agent,** and an agent's
+message pauses the bot for that contact for 30 minutes, so the bot's replies go
+through `send-content` with `send_as_agent: 0`. **A message in UChat's log is
+not a delivered one:** a sent message carries WhatsApp's id (`mid`, "wamid…");
+without it WhatsApp refused it, and the reason is in UChat's error log.
 UChat's builder can be driven from here only over Chrome's own protocol:
 Playwright 1.63 cannot attach to Chrome 151.
 

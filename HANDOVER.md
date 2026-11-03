@@ -18,13 +18,17 @@ appended to.
 >   - **IT ANSWERS IN UCHAT'S WEB CHAT SINCE 3 Nov, 08:19 UTC.**
 >     - **Where:** a new UChat account (workspace "homies-uchat", bot `f315405`, `.env` `Uchat_api_key`), on UChat's free Pro trial until about 16 Nov. Then the Business plan, $15 a month, or it stops.
 >     - **Proven:** "היי" got the live greeting and the two buttons, with no AI call (execution 150459).
->     - **Not yet tried, each a paid AI test:** a tap, a real question, the hand-over.
+>     - **Not yet tried, each a paid AI test:** a real question through to a ticket, the hand-over. (A tap was tried on WhatsApp, 09:50 UTC.)
 >     - **The first account ("clix") keeps its leftovers:** the "Michael" draft flow, 9 tags, 10 fields, and the empty "homies" workspace.
->   - **WHATSAPP WORKS SINCE 3 Nov, 09:29 UTC, ON ITS OWN ISRAELI NUMBER:**
+>   - **WHATSAPP WORKS SINCE 3 Nov, 09:50 UTC, ON ITS OWN ISRAELI NUMBER:**
+>     - **Proven on the owner's phone:** the greeting with both buttons, a tap, and the AI's answer.
 >     - the owner's Twilio number (`+972 53…29`, in `D:\work\Apify-v3\.env`, never in this repo), in the WhatsApp account "hadas 1" / "ASTDX - Smart Link" (`2117787955519632`), number id `1460284440496077`, two-step PIN `UCHAT_WA_PIN`;
 >     - connected through UChat's WhatsApp Cloud and linked to the bot.
 >     - **The live Chatwoot bot keeps the test number.** Nothing was switched.
 >     - **If it goes silent, look first at the number's row in UChat → WhatsApp Cloud:** "Paused" means UChat drops the messages; click it back to Active.
+>     - **If a reply is in UChat's log but not on the phone:** a sent message without a WhatsApp id (`mid`) was refused, and the reason is in UChat's error log (`python scripts/uchat_api.py get flow/error-logs/data`).
+>       - Two menu buttons on one step give #131009 "Duplicate button id": each button needs its own step ("Michael", "Michael 2", "Michael 3").
+>       - A reply sent with `send-text` counts as staff and pauses the bot for 30 minutes. The translator sends as the bot.
 >     - **Owed:**
 >       - the display name "hadas 1" → "Homies";
 >       - a payment method on that account, for templates;
@@ -37,7 +41,7 @@ appended to.
 >     - **UChat now holds our Meta token:** update it there if the token is ever replaced.
 >   - **The builder can be driven from here:** a local Chrome with the owner's UChat login (`local/uchat-prep/browser-profile`), over Chrome's own protocol. Playwright 1.63 cannot attach to Chrome 151.
 > - **Then from here:** `--wire`, `--tester <user_ns>`, and a "היי" (the menu, no AI).
-> - **Not in it:** photos on tickets, voice notes, the dashboard's log, and WhatsApp, which needs a number in UChat.
+> - **Not in it:** photos on tickets, voice notes, the dashboard's log.
 >
 > **READY TO MOVE TO UCHAT IF EVER NEEDED (owner, 3 Nov: *"ok so we need to prep for migration to uchat just in case"*). THE MOVE ITSELF IS NOT STARTED: the 18 Oct decision to stay on Chatwoot holds, and no number has moved.** WORKLOG 3 Nov.
 > - **The plan:** `docs/features/21-uchat-migration/feature.md`. UChat replaces Chatwoot (number, inbox, seats, departments, the pause), and the bot stays in n8n with its checks, tests and memory. 13-19 days, after a free 1-day dry run.
