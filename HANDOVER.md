@@ -36,7 +36,7 @@ appended to.
 >       - `Worth a word?` runs only on a message with a payment word (`A payment word?`), about 6 s;
 >       - `Let them finish` is 2 s for typed text and none after a tap (live: 4 s);
 >       - the way in reads the contact and its messages at once.
->       - An AI reply should take about 24 s after a tap and 26 s typed (35 s before). Gemini's thinking is the bulk (about 19 s).
+>       - Measured at 10:42 UTC on the owner's messages: 44 s (a ticket lookup, rewritten once by Send's checks), 29 s and 18 s. Gemini's first call is the bulk (14–19 s).
 >     - **The owner wants 10 s at most. It is not reachable on this path with this prompt** (WORKLOG 3 Nov):
 >       - 3.7 Flash at thinking low tested at a median of 15.6 s on the phone, with invented answers, so it is not used;
 >       - 3.1 Pro at thinking low measured 8.7 s on one call against 18.8, and is untried in conversations;

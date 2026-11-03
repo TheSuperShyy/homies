@@ -70,7 +70,11 @@ conversation that produced it.
   - **The way in reads the contact and its messages at once** (Ask UChat → Who and what? (UChat), two items).
     - Checked offline, 11 cases.
     - On n8n with a contact that does not exist (run 150712): both translator calls started together, 0.91 s for the pair, and the contact was turned away as it should be.
-- **What a reply on the UChat bot should take now:** about 24 s after a tap and 26 s typed (35 s at 09:50). Gemini 3.1 Pro's thinking is still the bulk. The owner's next message is timed.
+- **Measured afterwards, on the owner's three English messages from 10:42 UTC** (UChat's own in and out times; each reply has a WhatsApp id):
+  - **"hi whatsup, so i need update with my ticket": 44 s.** Run 150727: the two reads 0.5 s, the wait 2 s, Gemini's first call 14.4 s (882 tokens), the ticket lookup 1.9 s, the reply 3.4 s. Send's checks rejected it, and Try again ran it all again (10.3, 1.8 and 3.5 s).
+  - **"all of them": 29 s.** Run 150735: Gemini's first call 19.0 s (1,550 tokens), then 2.9 s.
+  - **"nothing just make it faster and fix all of them.": 18 s.**
+  - In each, Gemini's first call is the slow one. Thinking less would cut exactly that.
 - **10 s is not reachable on this path with this prompt:**
   - each call on the 15.5k-token request takes about 3 s before its first word, even on Flash;
   - UChat takes about 3 s to hand us a message;
