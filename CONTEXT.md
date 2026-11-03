@@ -2793,6 +2793,9 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
   read, but whether the wallet can still place a call can: `vapi_transfer.py --balance` (a
   POST to /call/web for an assistant that does not exist answers with the wallet message first).
   Run it before every Vapi test, and budget against a balance the owner has confirmed.
+  A check the owner calls read-only ("dont edit anything", 30 Oct and 3 Nov) does not run it: in credit
+  the probe logs a $0 failed call (`call.start.error-get-resources-validation`) in Yariv's call list,
+  which is a write. The newest billed call is the evidence of credit instead.
 - **The agents live on Yariv's own Vapi account from 23 Oct, the owner's choice** (*"change vapi
   account lets link it using this one"*). It is the "main client acc" the 19 Oct SIP note planned
   for, so the throwaway trial accounts end here and future billing is the client's. A move is
@@ -4128,6 +4131,11 @@ resident), from an `agent_bot` it is the bot's own and ignored. So a message
 sent "by the system" has to be sent with the bot's token, and the contact
 and conversation work with the admin's. Two tokens, two jobs, or the first
 delivered link would have silenced the chat bot for the person who got it.
+
+**Chatwoot's `GET /inboxes/{id}/agent_bot` answers `{"agent_bot": {...}}` (3 Nov).**
+Read at the top level it looks like no bot is connected, and two read-only checks
+(29 Oct, 3 Nov) printed exactly that. Inbox 1's bot is id 1, "Homies bot",
+posting to our n8n.
 
 **A demo row lives or dies by its `source` (20 Sep).** The import deletes
 `seed` residents twice a day and the sweep rewrites `oxs` charges; a row

@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Read only, 06:52-07:10 UTC: the WhatsApp bot and both phone agents are working
+- **Asked:** *"make sure the chatbot and the voice agents are working. dont edit anything just let me know"*.
+- **WhatsApp:**
+  - **Meta:** +1 555-045-9005 is CONNECTED / CLOUD_API, quality GREEN, VERIFIED, and the phone override still points at Chatwoot.
+    - `health_status` reads BLOCKED for the account (141006, payment method). That blocks only messages we start; the number itself is AVAILABLE.
+  - **Chatwoot:** inbox 1 is `whatsapp_cloud`, with no reauthorization needed.
+    - Its agent bot is id 1, "Homies bot", pointing at our n8n.
+    - The check script printed "agent bot: none": the answer nests the bot under `agent_bot`. The 29 Oct check misread it the same way.
+  - **n8n:**
+    - The bot ran 94 times in 24 h, all success, the last at 16:21 UTC on 2 Nov.
+    - The number watch's last 150 runs all succeeded, and the other Homies workflows are active.
+  - **The owner's photo test (10:16-10:19 UTC, 2 Nov):** answered, a ticket opened, read on the phone. No tenant has written since the tester's "Hi" at 14:43 UTC.
+  - **`check_whatsapp_rules.py --watch 2026-11-02T09:55`, owed since the photo change:** 5 resident turns, nothing broke the rules.
+  - **OpenRouter, the key ending 3f9:** the account has $6.46 left ($10 bought, $3.54 used); the key's cap is $1000, with $996.46 left. That is about $0.70 a day since 29 Oct.
+  - **Both templates are still PENDING** at 06:55 UTC, about 21 hours after submission.
+- **Voice, on Yariv's Vapi:**
+  - **The agents:** both are unchanged since 26 Oct 10:45 UTC: openai/gpt-5.6-sol, Cartesia voice `ba765d50`, Deepgram nova-3 he, 7 tools each, all on our function.
+  - **The 208 line** (`sip:homies-omni-208@sip.vapi.ai`) is active and routes through the function.
+  - **The newest real call** was 2 Nov 14:48 UTC, from extension 200. The incoming agent took it (27 s, customer-ended, $0.08), and our call log filed it. Before it came the C2C call of 1 Nov 11:01.
+  - **The router** answered both questions, which only read: an ordinary incoming call gets the incoming agent; a dialer call to a tenant on the call list gets the debt agent with 18 variables.
+  - **The debt agent's newest real call** is still 26 Oct 11:44 UTC. No dialer lead has been accepted since.
+  - **Not run: the wallet probe.** In credit it logs a $0 failed call in Yariv's call list, which is a write. The billed call of 2 Nov is the newest evidence of credit.
+- **Also found:** the dashboard's production deployment is `dpl_2sTjRBXSxNBamoScdfTDh9ZLKBdS`, READY, built from the 2 Nov push of `4c9d2a2` to `main`, not `dpl_HK8YDV…`. HANDOVER now says so.
+- Nothing was changed, no message was sent and no call was placed.
+
 ### Ready to move to UChat if ever needed: the plan, every Chatwoot touchpoint mapped, backups (owner: "ok so we need to prep for migration to uchat just in case")
 - **Asked:** *"ok so we need to prep for migration to uchat just in case"*. The 18 Oct decision to stay on Chatwoot holds; this makes a move quick and safe if it is ever needed.
 - **The route:** UChat replaces Chatwoot; the bot stays in n8n.

@@ -33,7 +33,7 @@ appended to.
 >   - The note says "you see it" only when a photo is on the item, and keeps "you do not see its content" when none could be fetched.
 > - **Rollback:** `python scripts/n8n_whatsapp_photo.py --restore` (snapshot `local/n8n-whatsapp-live-02nov-before-photo.json`) + git revert.
 > - **Seen on the handset (09:59 UTC):** a photo with no caption was seen ("נראה שהיא נשברה בפנים") and answered with where-is-it, in 38 s.
-> - **Owed:** a photo followed by words, then `check_whatsapp_rules.py --watch 2026-11-02T09:55`. The fold takes `photo()` after `name()`.
+> - **Watched 3 Nov, 07:00 UTC:** 5 resident turns since the change, nothing broke the rules. **Still owed:** a photo followed by words. The fold takes `photo()` after `name()`.
 >
 > **THE WHATSAPP BOT IS ON A NEW TEST NUMBER SINCE 2 Nov (~08:55 UTC): +1 555-045-9005** (`1406095812586455`, account "Test Messaging Account" `2129102787704530`, HOMIES app; owner: *"ok go"*). WORKLOG 2 Nov.
 > - **Why:** since 31 Oct, ~14:43 UTC, our Meta system user cannot see the old test account or its number at all (100/33). It was deleted or unassigned.
@@ -49,7 +49,7 @@ appended to.
 >   - **Replies go ONLY to numbers on the test recipient list** (max 5). A tester's "Hi" at 14:43 UTC was answered by the bot, and Meta refused the reply with `131030 Recipient phone number not in allowed list`.
 >   - The owner adds testers in the App Dashboard (WhatsApp > API Setup > To > Manage phone number list), with a code to each one's WhatsApp.
 >   - **The new number's list shows EMPTY (owner's screenshot), yet the owner's phone gets replies.** Likely the old test number's verified recipients (the owner, Ido, Yariv) still count for the app. Unproven: a "hi" from Ido or Yariv tells.
->   - The two templates (`wa_templates.py`) and a payment method on the new account (141006) before any template can send.
+>   - The two templates (`wa_templates.py`) are still PENDING (3 Nov 06:55 UTC, about 21 h). The new account also needs a payment method before any template can send: Meta's health reads it BLOCKED (141006) for messages we start.
 >   - The lasting fix is still Homies' own number on a verified business.
 >
 > **CHATWOOT IS IN HEBREW SINCE 2 Nov (account 2 `locale` he), AND A HEBREW ONBOARDING VIDEO EXISTS:** `local/onboarding/chatwoot-onboarding-he.mp4` (3:05; captions, click markers, phones and emails blurred). WORKLOG 2 Nov.
@@ -58,7 +58,7 @@ appended to.
 > - **Open, not changed:** a bot answer already being written (20-40 s) is not re-checked before Send. It can follow an agent's reply once; after that the reply's claim keeps the bot quiet.
 >
 > **THE DIALER GOES THROUGH OMNI'S LINE NEXT, NOT TOKOMNI'S LISTS (owner, 2 Nov).** *"so instead lets connect the tokomni to ours instead of creating a data and passing it to tokomni"*. WORKLOG 2 Nov.
-> - *(WhatsApp, 2 Nov 12:51 UTC: both templates still PENDING after 3 h; Ido's number as a test recipient is the owner's to add in the App Dashboard, with a code to Ido's WhatsApp.)*
+> - *(WhatsApp, 3 Nov 06:55 UTC: both templates still PENDING after about 21 h; Ido's number as a test recipient is the owner's to add in the App Dashboard, with a code to Ido's WhatsApp.)*
 > - **The plan:** our system places the call itself through Omni's SIP: a Vapi `byo-sip-trunk` credential and a `byo-phone-number`. This is the preferred setup of 28 Sep.
 > - **Waiting on Omni.** The owner sends `local/omnitelecom/2026-11-02-outbound-sip-email.txt`.
 >   - Rewritten on the owner's word: *"ask for a solution not price like what do we have to do? we have tried this and that"*.
@@ -74,8 +74,9 @@ appended to.
 >
 >   The Debts page's Call button (`dashboard/lib/call.ts`) already does the Vapi side. Deploying the dashboard needs the push to `main`.
 > - **Tokomni's click-to-call already bridges a number to 208** (`C2C#<number>`; 26 Oct and 1 Nov). The router gives such a call the incoming agent.
+> - **The 208 line and both agents work (read 3 Nov):** the line's newest real call, 2 Nov 14:48 UTC from extension 200, went to the incoming agent (27 s) and was filed. The debt agent's newest is still 26 Oct; it waits on the dialer, not on itself.
 > - **List 2 is PLAYING since 2 Nov, about 11:45 UTC.** The owner pressed ▶. Before that it was on hold with total 1, so none of our presses got in.
->   - **The page sends List 2's id again** (Vercel `TOKOMNI_CAMPAIGN_ID`; production `dpl_HK8YDVgKcCHPRjNikGAgLLuJDoDw`, created 11:51:58 UTC). `.env` and `dashboard/.env.local` match, and the dialer's id is kept as `TOKOMNI_DIALER_ID`.
+>   - **The page sends List 2's id again** (Vercel `TOKOMNI_CAMPAIGN_ID`; production is `dpl_2sTjRBXSxNBamoScdfTDh9ZLKBdS`, built from the 2 Nov push of `4c9d2a2` to `main` with the same settings; before it, `dpl_HK8YDVgKcCHPRjNikGAgLLuJDoDw`, 11:51:58 UTC). `.env` and `dashboard/.env.local` match, and the dialer's id is kept as `TOKOMNI_DIALER_ID`.
 >   - **The owner's Ring at 12:01:42 UTC was refused too (404).** So the hold was not the cause, and neither id is. Our token copy was checked and is clean.
 >   - **Next:** the owner sends the email to Omni (SIP line plus their log's reason for the 404). Optional, on the owner's word: one send from this PC with the bare resident id as the `external_id`. List 2 is playing, so an accepted send rings Ido at once.
 >   - Never press ▶ on "test 1/0": its waiting number would ring at once. Never press Stop on List 2: it does not restart by itself.
@@ -152,7 +153,7 @@ appended to.
 > - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T15:27`, and again the next morning.
 >
 > **BACK UP 14:17 UTC, 29 Oct: the bot now runs on the key ending 3f9, on a separate OpenRouter account** (owner: *"we have multiple api key in our env just pick one"*).
-> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $9.85, from $10 bought, and the key's cap is $1000. `check_openrouter.py` reads it.
+> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $6.46 on 3 Nov 06:54 UTC ($9.85 on 29 Oct, from $10 bought; about $0.70 a day), and the key's cap is $1000. `check_openrouter.py` reads it.
 > - **How it was switched:** `n8n_openrouter_key.py OPENROUTER_API_KEY_ACCOUNT_B --apply` created credential `Ovw71DEq1eufagGk` ("Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)") and repointed the live bot's model node. The workflow is active. `N8N_OPENROUTER_CRED_ID` is updated.
 > - **The sandbox** was rebuilt on it, round 51.
 > - A one-off call with the bot's model at max_tokens 8192 went through first.
