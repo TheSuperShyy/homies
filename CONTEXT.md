@@ -4104,6 +4104,16 @@ one is a change to the other. The quoted lines are word for word, a cut is
 marked with `…`, a payment link is never printed (`[קישור]`), and the ticket
 numbers are the test tenant's.
 
+**Three of the old bot's four missing features are settled (owner, 3 Nov, on Yariv's page).** The
+owner's words: *"we dont need the list of elevators and we have the link of the website as well and
+when a person ask for a quote it will mention on the inbox"*. So:
+- the elevator-company step is not wanted, and Homies' list of elevator companies is not needed;
+- the website link exists;
+- a quote request is a note in the chat inbox (notify_team, reason quote, no ticket), in place of the
+  old leads board.
+- Only the 23-hour reminder is still missing, plus the session with Yariv on the flows we have not
+  seen. The 6 Oct comparison pages still count all four as missing: they are a dated snapshot.
+
 **The staff SOP quotes the screen as `main` has it (6 Oct).**
 `docs/features/13-dashboard/sop-he.html` is the Hebrew procedure for Homies
 staff. Every label in it is copied from `dashboard/lib/i18n.ts` on

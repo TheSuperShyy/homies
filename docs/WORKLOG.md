@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Yariv's page: the ManyChat point made simple (owner, a screenshot of it: "repphrase this to make it simple, we dont need the list of elevators and we have the link of the website as well and when a person ask for a quote it will mention on the inbox")
+- **Republished:** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY, version `1793720323-1c07` over `1793714588-73fa`. Still shared by link (`shared_live` public).
+- **The point's "מה עשינו" now reads:** "עברנו על הבוט הישן ב-ManyChat והשווינו אותו למיכאל. הקישור לאתר כבר קיים, ובקשה להצעת מחיר מגיעה ישר לתיבת הצ'אט. רשימת חברות המעליות כבר לא נחוצה. נשארו התזכורת אחרי 23 שעות, ופגישה עם יריב על שאר התהליכים."
+  - It replaced the four-item missing list: the elevator step and its list, the 23-hour reminder, the quotes board and the website link.
+- **Status kept "partly done"** (בוצע חלקית), because the 23-hour reminder and the session are still open. The counts are unchanged (13 / 10 / 2 / 2).
+- **Checked:** a diff of the built page against the one before shows this one line changed. `build.py`'s Latin check passed.
+- **The website link** is taken on the owner's word. In the 6 Oct comparison it was "a website link to start the chat". The English source (`items_en.json`) is not updated: it is unpublished.
+- **CONTEXT** now records the three decisions on the old bot's missing features.
+
 ### The simulated manager call ran and passed (owner: "go")
 - **Run** `0778bab9` (Vapi simulations), 14:55:02-14:56:54 UTC, 112 s. The calls were `01a1a1e8` (Michael) and the simulated tenant's twin.
   - **Cost: $0.40** ($0.23 Michael: llm 0.12, vapi 0.09, stt 0.02; $0.17 the tenant), plus the client's Cartesia characters for "Asaf". It was inside the $0.40-0.60 given.
