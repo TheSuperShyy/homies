@@ -20,7 +20,16 @@ appended to.
 >     - **Proven:** "היי" got the live greeting and the two buttons, with no AI call (execution 150459).
 >     - **Not yet tried, each a paid AI test:** a tap, a real question, the hand-over.
 >     - **The first account ("clix") keeps its leftovers:** the "Michael" draft flow, 9 tags, 10 fields, and the empty "homies" workspace.
->   - **WhatsApp, 3 Nov, NOT SWITCHED YET:**
+>   - **WHATSAPP WORKS SINCE 3 Nov, 09:29 UTC, ON ITS OWN ISRAELI NUMBER:**
+>     - the owner's Twilio number (`+972 53…29`, in `D:\work\Apify-v3\.env`, never in this repo), in the WhatsApp account "hadas 1" / "ASTDX - Smart Link" (`2117787955519632`), number id `1460284440496077`, two-step PIN `UCHAT_WA_PIN`;
+>     - connected through UChat's WhatsApp Cloud and linked to the bot.
+>     - **The live Chatwoot bot keeps the test number.** Nothing was switched.
+>     - **If it goes silent, look first at the number's row in UChat → WhatsApp Cloud:** "Paused" means UChat drops the messages; click it back to Active.
+>     - **Owed:**
+>       - the display name "hadas 1" → "Homies";
+>       - a payment method on that account, for templates;
+>       - the testers' numbers in `UCHAT_TEST_PHONES`.
+>   - **The morning's attempt with the test number (superseded):**
 >     - `+15550459005` is added in UChat (WABA provider, with our system-user token on the owner's word: *"no just use it"*) and linked to the bot.
 >     - **But Meta still sends the number to Chatwoot,** so the live bot still answers. UChat's WABA provider sets and shows no webhook.
 >     - **Next:** the owner's Facebook login on UChat's "Connect WhatsApp Cloud", which shows UChat's webhook; then point the number's override at it.

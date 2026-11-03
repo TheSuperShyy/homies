@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The UChat version answers on WhatsApp, on its own Israeli number (owner: "i have twilio", "fix it the bot is not replying")
+- **The number:**
+  - the owner's Twilio number from `D:\work\Apify-v3\.env`, an Israeli `+972 53…29` that receives SMS and voice; its calls go to the Apify app;
+  - read with that project's API key, on the owner's word: *"check i think we have env on the twilio in the apify project"*.
+  - Never written into this repo, which is public.
+- **Meta's sign-up** (UChat → WhatsApp Cloud → Facebook login, done by the owner in their browser):
+  - **"Enter a new phone number", verified by SMS.** A watcher read the code off Twilio's API and printed only the code.
+  - **ASTDX could not make another WhatsApp account:** "Business WABA Limit reached".
+    - Read-only, its 6 accounts: Test Messaging Account (our test number); ASTDX `…772` (`+1 555-901-6064`, respond.io); ASTDX `…193` and "vvtechazena" (empty, with an app "chatbot test" on them); "hadas 1" and "vtechazena" (empty, no app).
+    - The owner picked **"hadas 1"**.
+  - The number shows under the account `2117787955519632` "ASTDX - Smart Link" (also `1389698653006050` "hadas 1"), number id `1460284440496077`.
+  - Meta names the connector "Smart Link"; the popup called it "WA Cloud", app `1108978947018721`.
+- **Why it did not work at first:**
+  - The first sign-up ran from the old "clix" UChat account in the owner's browser, so the new account never got the number. The owner connected WhatsApp Cloud again from the new account, and **Sync Numbers** listed it.
+  - **Register number** (UChat's menu): UChat pre-filled the PIN with `123456`. I replaced it with a random PIN, saved as `UCHAT_WA_PIN` in `.env` and never shown. Meta: CONNECTED, CLOUD_API, TIER_250.
+  - **Linked to the bot:** Omni-Channel had one WhatsApp slot, taken by the morning's WABA link to the test number. I unlinked that (typed UNLINK) and linked WhatsApp Cloud → the +972 number (typed LINK).
+  - **Still silent, because UChat had the number's automation PAUSED.** The row showed a red "Paused" ("Click this button to resume automation"), UChat had no WhatsApp contact, and Meta listed no app on the account.
+    - Clicked → **Active**. Right after, Meta's app list for that account turned from empty to an HTTP 500, which suggests UChat had subscribed.
+- **Proven at 09:29 UTC:**
+  - the owner's "היי" on WhatsApp reached UChat (a new contact at 09:29:25);
+  - the copy's run 150582 ran From UChat → Sort (canned greeting, no AI) → Send;
+  - the translator's send-content answered "ok";
+  - UChat's log holds message 35, an outgoing `button_template` "בוקר טוב 👋 כאן הומי'ז. במה אפשר לעזור?".
+- **UChat's Health Check on the number:**
+  - display name not approved yet, so it is "LIMITED". The display name reads "hadas 1" and should become "Homies";
+  - the account has no payment method (141006), which blocks only messages we start;
+  - the business is not verified (141010);
+  - SIP calling is not set up (irrelevant).
+- **Still in UChat:** the morning's WABA entry for the test number, unlinked but holding our Meta token. Removing it may make UChat call Meta about that number (the live test number), so it is left until that is known.
+
 ### WhatsApp linked inside UChat, but Meta still sends the number to Chatwoot (owner: "nvm lets link uchat to the cloud api we have", then "no just use it")
 - **Before, recorded for rollback:**
   - the number's own webhook is Chatwoot's `/webhooks/whatsapp/+15550459005`;

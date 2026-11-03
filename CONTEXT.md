@@ -490,6 +490,11 @@ a scoped one), in its WhatsApp number settings: replace it there too if that
 token is ever rotated. UChat's "WABA (Deprecated)" provider stores the token
 and links the number but sets no Meta webhook and shows none; the webhook
 address comes from its WhatsApp Cloud screen, after a Facebook login.
+**A WhatsApp Cloud number in UChat can sit "Paused" after it is added**
+(red button in WhatsApp Cloud's list, tooltip "Click this button to resume
+automation"). While paused, UChat takes no messages and Meta lists no app on the
+account. Click it to Active (3 Nov). UChat's Register dialog pre-fills the PIN
+with 123456: replace it.
 UChat's builder can be driven from here only over Chrome's own protocol:
 Playwright 1.63 cannot attach to Chrome 151.
 
