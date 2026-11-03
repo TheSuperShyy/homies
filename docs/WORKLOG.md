@@ -25,6 +25,7 @@ conversation that produced it.
   - with a list, a stranger is still skipped.
 - **Put live at 11:21:30 UTC.** Read back: From UChat as tested, with `EVERYONE` true. The typing dots, the model and the wait are unchanged.
 - **What it means:** anyone who writes to the +972 number gets the bot with the live tools, so their tickets and notes are real, as on the live bot. The number is not published.
+- **Proven at 11:23 UTC:** a new contact ("Amit", WhatsApp Cloud), whom the old list would have dropped, wrote "היי" at 11:23:21. The menu with buttons went back at 11:23:29 with a WhatsApp id, and Meta accepted the typing call (run 150832).
 - **Owed:** Ido sends again. His 11:13 message was dropped before the change and will not be answered by itself.
 
 ### The typing dots are back on the UChat bot (owner: "so is i noticed the typing icon was gone", then "yes i need it back")
