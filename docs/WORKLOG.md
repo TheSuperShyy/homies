@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Read only: "Yariv's Feedback Status" checked against the system (owner: "ok so the list is good now and accurate?", "no the list in the artifcat")
+- **Checked:** the artifact as published at 12:26 UTC (version `1793707263-1210`, shared publicly). Its counts add up: 13 done, 10 partly, 2 waiting, 2 decided, 27 in all.
+- **Confirmed against the system:**
+  - the menu has two buttons;
+  - since 29 Oct the balance goes straight to the number on file;
+  - the dashboard's name label is fixed only on `feature/chatbot`, and live `main` still has `הומיז`;
+  - both agents record calls (`recordingEnabled` true since 26 Oct), and the dashboard cannot play them;
+  - debt calls wait on Omnitelecom.
+- **Not accurate:**
+  1. "We only read from OXS and never write to it" (the OXS payment-notes point). The ticket mirror writes service calls into OXS for the owner's test number (`OXS_MIRROR_PHONES`, since late September; payment-link tickets since 27 Sep).
+  2. The caller-ID point: "our request to Omnitelecom is written and about to go out". The email drafted 2 Nov (`local/omnitelecom/2026-11-02-outbound-sip-email.txt`) no longer mentions 077-6687949. The SIP checklist that held it was taken out in the owner's rewrite.
+  3. "What is still needed" asks Omnitelecom only for the caller ID and the menu option. It leaves out what blocks debt calls: their dialer refuses our requests (404), and the email asks them what to do or for the SIP line.
+- **Accurate, but leaves something out:** the official-number point describes the live bot on the test number. It does not mention the UChat version, which answers anyone on an Israeli number since 3 Nov.
+- Nothing was changed in the artifact.
+
 ### Two pages for the owner: a tester checklist for Michael, and Yariv's feedback with what was done (owner: "lets create something like this ... for our bot and also another artifact for yariv feedback and what we did to resolve that simple and not super technical terms")
 - **The reference** (the owner's copy of another project's page, `XRNofGUVsunTwY1qD42zN9`; the first link, `ETQvRQGj5Kmjmcqw1qhStS`, did not open from this account) is a Hebrew bot test checklist: what to send, what the bot should answer, ✓/✗, a note, shared marks.
 - **"Michael Test Checklist"**, https://claude.ai/artifact/H8hD1pWFvKmQbiyMuicgFx (slug `82a53417-4856-4b7e-bca1-374b99bbf567`):
