@@ -64,7 +64,8 @@ appended to.
 >     - the tenant gets an update when the ticket closes;
 >     - the session with Yariv was held and he approved the features.
 >   - Counts are 14 done, 9 partly, 2 waiting, 2 decided.
->   - The closed-ticket message is untested on today's numbers (CONTEXT, the ManyChat paragraph). The first resolved WhatsApp ticket on the new number will show it. The page does not mention the elevator anywhere, on the owner's word.
+>   - The closed-ticket message is untested on today's numbers (CONTEXT, the ManyChat paragraph). The first resolved WhatsApp ticket on the new number will show it.
+>   - **Both templates are APPROVED on the new WABA** (`ticket_resolved_he`, `payment_link_he`; `python scripts/wa_templates.py`), **but the WABA is BLOCKED for messages we start: 141006, no payment method** (`health_status`, 3 Nov 15:55 UTC). Replies inside 24 h go. A template cannot go until the owner adds a payment method in Meta's WhatsApp Manager. The page does not mention the elevator anywhere, on the owner's word.
 >   - **The "what is still needed, and from whom" box is gone,** on the owner's word. What each side owes lives here and in WORKLOG, not on the page.
 >   - **Shared by link (read `public`).** A republish needs `shared_live: "public"` and `artifact_title: "Yariv's Feedback Status"`. The name stays English in the gallery and the tab.
 >   - **Its words follow the owner's updates to Yariv.** OXS and ManyChat stay in Latin letters (as in his own documents), and אומניטלקום is in Hebrew. Meta's business check is "אישור העסק מול וואטסאפ". `build.py` refuses any other Latin text.

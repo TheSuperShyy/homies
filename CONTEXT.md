@@ -4118,8 +4118,14 @@ when a person ask for a quote it will mention on the inbox"*. So:
   - The message is `ticket_resolved_he`, sent by `Homies — ticket notices`. It was proven end to end on
     23 Sep and 6 Oct: the only two rows in `ticket_notices`, both `sent`.
   - Nothing has been sent since 6 Oct. On today's numbers it is untested.
-  - The template is APPROVED on the new test WABA (`wa_templates.py`, 3 Nov; it was PENDING on 2 Nov).
-    Whether the account's 141006 blocks the first template send is unknown until one goes.
+  - The template is APPROVED on the new test WABA (`wa_templates.py`, 3 Nov; it was PENDING on 2 Nov),
+    and so is `payment_link_he`.
+  - **But the WABA is BLOCKED for messages we start.** The number's `health_status` on 3 Nov, 15:55
+    UTC read `can_send_message: BLOCKED`, with WABA 141006, "error with the payment method … will
+    block business initiated conversation". The business also shows 141010 (not verified).
+  - So a closed-ticket message inside the tenant's 24-hour window can go as a normal reply. One after
+    the window needs the template, and it cannot go until a payment method is added in Meta's
+    WhatsApp Manager. The same holds for `payment_link_he`.
   - The UChat number has no ticket notices wired.
 - The 6 Oct comparison pages still count all four as missing: they are a dated snapshot.
 - **The session with Yariv has happened, and he approved the features** (owner, 3 Nov: *"we have a

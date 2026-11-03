@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Read only: is the payment link template approved? (owner: "also check if the payment link is approved")
+- **`wa_templates.py`:** `payment_link_he` is APPROVED (he, UTILITY) on WABA `2129102787704530`, as is `ticket_resolved_he`. There are 7 templates on the account, the rest Meta's samples.
+- **The number's `health_status`, 15:55 UTC:**
+  - `can_send_message` BLOCKED;
+  - WABA 141006: "There is an error with the payment method. This will block business initiated conversation";
+  - business 141010: not verified;
+  - phone and app 138024/138025: WhatsApp calling over SIP not enabled, which is irrelevant here.
+- **So:** both templates are approved but cannot be sent until a payment method is on the WhatsApp account. Replies inside the 24-hour window are not affected.
+- This narrows the previous entry: a closed-ticket message after the window is blocked. CONTEXT and HANDOVER now say so.
+- Nothing was changed.
+
 ### Yariv's page: the ManyChat point is done (owner: "no the follow up message when the ticket is done works right so nothing is left")
 - **Checked first, read only:**
   - `wa_templates.py`: `ticket_resolved_he` and `payment_link_he` are APPROVED on WABA `2129102787704530`. They were PENDING at 12:51 UTC on 2 Nov.
