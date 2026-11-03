@@ -547,7 +547,10 @@ Hebrew on both pages, because what is tested is the bot's answer to the Hebrew a
 **The simulated run is a review of replies the bot really gave, not a prediction (3 Nov, "Michael Simulated
 Run").** Each reply comes from one run of the live code and prompt, with stand-in tools, saved as transcripts.
 It is reviewed as it stands. When the prompt changes, the page is out of date until a new paid run replaces it.
-The English beside each reply is a translation for readers; the Hebrew is what is judged.
+It is Hebrew only (3 Nov evening, owner: "make this hebrew no english"). Its reviewers judge the Hebrew itself,
+so there is no translation beside the replies and no English around them. Its build refuses any English outside
+the run's own text (the English test message in 5.5, the payment link). An English twin, if one is ever asked
+for, comes from `build_en.py`, not from English added back into this page.
 
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before

@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **TWO PAGES FOR THE OWNER (3 Nov), private until the owner shares them:**
+> **PAGES FOR THE OWNER (3 Nov), private until the owner shares them unless noted:**
 > - **"Michael Test Checklist"** https://claude.ai/artifact/H8hD1pWFvKmQbiyMuicgFx (slug `82a53417-4856-4b7e-bca1-374b99bbf567`): 29 tests for testers on the UChat number, run through the bot first on 3 Nov (4 tests fixed). That run found the bot's own slips, listed in WORKLOG 3 Nov: "the team", an invented "you said it got worse", an implied call back from accounting, telling the tester the request was recorded, the masculine after a feminine cue, and "anything else?" while the tenant waits. Their marks are in its db, `marks/<user id>` (read with `db_list`, collection `marks`). Testers need edit access for their marks to be shared. **Its expected answers mirror the live prompt: when the prompt changes, update the page** (source `local/artifacts/michael-checklist/index.html`, republish with `edit_version`).
 >   - **Version `1793710110-a6f4` (3 Nov, owner: "fix the checklist we have"), with the source file matched:**
 >     - **2.2:** a tester whose number is not on file is asked for a full name once before the ticket (`need_name`). It has a hint to answer with the name. Only the owner (Assaf Clix) and Ido are on file.
@@ -19,14 +19,20 @@ appended to.
 >   - **Built from the Hebrew source, never edited by hand:** change `local/artifacts/michael-checklist/index.html`, run `python local/artifacts/michael-checklist-en/build.py`, then republish both. The English page republishes with `publish_files`, slug and base_version.
 >   - `build.py` refuses a new section, or a new hint (`with`) that has no English yet.
 >   - Private to the owner until they share it.
-> - **"Michael Simulated Run"** https://claude.ai/artifact/6MuTsoP1rojWBmMvxS4nqk (slug `2b68e680-ebca-4145-b6d3-1ec913a80607`, owner: *"make the checklist like a simulation so each reply have the check and x and a comment"*).
->   - **What it shows:** the 30 messages of the checklist run (3 Nov, wa_qa Chat: live code and prompt on Gemini 3.1 Pro, stand-in tools). For each: Michael's reply as the phone shows it, an English translation, what the bot did behind the scenes, what it should do, and ✓ / ✗ and a comment.
->   - **Marks:** its own shared marks, declared like the checklists.
->   - **Source:** `local/artifacts/michael-simulation/`. That holds the run's transcripts (`run-2026-11-03/`, copied from the other session's scratchpad), `translations.json` and `build.py`.
->     - The build reads the test numbers and expectations from the Hebrew checklist's source.
->     - It refuses a reply with no translation, or with the wrong number of messages.
->   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then translate it and rebuild; ask the owner first.
->   - Private to the owner until they share it.
+> - **"Michael Simulated Run"** https://claude.ai/artifact/6MuTsoP1rojWBmMvxS4nqk (slug `2b68e680-ebca-4145-b6d3-1ec913a80607`, owner: *"make the checklist like a simulation so each reply have the check and x and a comment"*). **Hebrew only, right to left, since version `1793713985-075a`** (owner: *"make this hebrew no english"*).
+>   - **What it shows:** the 30 messages of the checklist run (3 Nov, wa_qa Chat: live code and prompt on Gemini 3.1 Pro, stand-in tools). For each step it shows:
+>     - Michael's reply as the phone shows it;
+>     - what the bot did behind the scenes;
+>     - what it should do, in the Hebrew checklist's own wording;
+>     - ✓ / ✗ and a comment.
+>   - **No English on the page.** The only Latin letters are the run's own: 5.5's English test message, the payment link, and "SMS". The artifact's name stays "Michael Simulated Run" in the gallery and the tab.
+>   - **Shared by link (read `public`).** A republish needs `shared_live: "public"` and `artifact_title: "Michael Simulated Run"`.
+>   - **Marks:** its own shared marks, declared like the checklists. There were none yet when it switched to Hebrew. The step ids and the local key are unchanged, so marks stay with their reply.
+>   - **Source:** `local/artifacts/michael-simulation/`. That holds the run's transcripts (`run-2026-11-03/`, copied from the other session's scratchpad) and `build.py`.
+>     - The build reads the test numbers, the expectations and the page's look from the Hebrew checklist's source.
+>     - It refuses any English outside the run's own text.
+>     - `build_en.py` and `translations.json` still build the English page it replaced, as `index-en.html`. That file is not published, and is there only if the owner asks for an English twin.
+>   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
 > - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. Change `local/artifacts/yariv-feedback/items.json`, run `build.py` there, republish.
 > - **Not on Yariv's page:** the recording is back on since 26 Oct and he has not been told. The owner decides whether to tell him.
 >
