@@ -43,7 +43,7 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 - **Only test phones get through** (`UCHAT_TEST_PHONES` in `.env`, the owner's number). The copy uses the live tools, so a ticket it opens is real, like a test on the live WhatsApp bot.
 - **The memory key gets `-uchat`,** so the two bots never share a memory.
 - **No typing dots, and nothing written to the live `messages` log.** The burst check reads the UChat conversation instead.
-- **A private note becomes the contact's `team_note` field,** because UChat's API has no internal note. Department labels become tags. A team becomes an agent group once `UCHAT_GROUPS` maps it (no groups yet).
+- **A private note becomes the contact's `team_note` field,** because UChat's API has no internal note. A label goes on twice: as a tag, which the copies read back, and as a UChat label, which staff see. A team becomes its agent group through `UCHAT_GROUPS` (see "Set up like our Chatwoot" below).
 - **No 15-minute hand-back copy.** UChat's own pause after a staff reply does that job (30 minutes, staff can extend).
 - **`Worth a word?` runs only on a message with a payment word** (`A payment word?`, 3 Nov). Its note could go out only then anyway, so the replies are the same, and every other AI reply comes about 6 s sooner.
 - **`Let them finish` waits 2 s, and none after a button tap** (live: 4 s), and the way in reads the contact and its messages at once (3 Nov, for speed). The model stays live's: 3.7 Flash was tested and not taken (WORKLOG 3 Nov).
@@ -92,7 +92,32 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 
 **Not yet tried** (each one calls the AI, so it is a paid test):
 - a real question through to a ticket;
-- the hand-over.
+- the hand-over from a real message. Its UChat end is proven without the AI (below).
+
+### Set up like our Chatwoot (3 Nov)
+
+The owner: *"ok just make uchat like the settings we have on the chatwoot"*. Read from Chatwoot account 2 first: 4 teams, 2 users, 8 labels, 9 conversation attributes. It has no saved replies, automations, macros, webhooks or integrations. Greeting, working hours, auto-assignment and the satisfaction survey are all off.
+
+| Chatwoot | UChat now |
+|---|---|
+| Teams `collections`, `operations`, `management`, `service` (ids 1-4) | Agent groups with the same names: `20217`, `20219`, `20221`, `20223`. `UCHAT_GROUPS` in `.env` maps team id to group id |
+| Assaf Clix in `service`, the other three empty | The owner ("CLIX", UChat user `357951`) in `service`, the other three empty |
+| 8 labels | The same 8 as UChat labels; the Live Chat sidebar's "show labels" and "show department" are on |
+| 9 conversation attributes | Contact fields, made earlier by `--uchat`, plus `team_note` |
+| Account language Hebrew | The owner's UChat profile in Hebrew. UChat has no workspace language: each member picks their own. The dashboard turns right-to-left |
+| Working hours off | Business hours "open all day" every day, which only a flow that checks them reads |
+| A team assignment picks nobody | **UChat always gives the chat to a member of the group:** Random, Least Assigned or Round Robin, no "nobody". All four groups use Least Assigned, and members see every conversation |
+| The test seat "seat2 test" | Not invited: an invite emails a person, so it waits for the owner's word |
+
+**The key:** team calls need UChat's "Manage Team" ability, which the bot's key (`Uchat_api_key`, Manage Flow) lacks. A second key, "homies-team-setup", has Manage Team only. It is in `.env` as `UCHAT_API_KEY_TEAM`, and was read off the page by a script without being shown.
+
+**The translator:** written again with the groups and the labels' second call (`Map a write`, labels → `add-tags-by-name` and `add-labels-by-name`). Only it was written; the bot and hand-over copies did not change. Rollback snapshot: `local/uchat-prep/n8n-uchat-translator-before-groups-2026-11-03.json`.
+
+**Proven 3 Nov, with no AI:** the translator was called as the hand-over calls it (team 4, then the labels `handover` and `handover-service`) on the web chat's contact.
+- The contact went to group `20223`, and UChat gave it to the owner, the group's one member.
+- Both labels arrived as tags and as UChat labels.
+- **The bot was not paused** (`paused_diff_seconds` 0). In UChat only a staff reply pauses it, as in Chatwoot, where the bot keeps answering after a hand-over.
+- Everything was removed afterwards (tags, labels, the assignee), and the contact read back as it was.
 
 **Then from here:**
 - `--wire` makes "Michael" the default reply and the web chat's start flow.
@@ -177,7 +202,7 @@ payload the dry run captures.
 - The switch in the tool server, and the tests on UChat-shaped messages.
 
 **3. The number and the seats (needs the client).**
-- A paid UChat plan, the staff as team members, and the four agent groups.
+- A paid UChat plan, and the staff as team members, each put in their group (`POST /team/update-agent-group-users/{id}` with `UCHAT_API_KEY_TEAM`). The four agent groups exist since 3 Nov.
 - The number connected through UChat's **WhatsApp Cloud** (Facebook login).
   - In practice Homies' own number, which also needs the "office homies" Meta account.
   - Our Meta test number most likely cannot go through that screen (see context.md).
