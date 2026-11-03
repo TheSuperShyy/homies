@@ -15,6 +15,16 @@ appended to.
 >   - All three are active. The live bot is untouched.
 > - **Live tools, test phones only** (`UCHAT_TEST_PHONES`). Its tickets are real, like a test on WhatsApp.
 > - **Re-run `python scripts/n8n_uchat.py --apply` after any change on live,** or the copy drifts. Never edit the copies by hand.
+> - **UCHAT IS SET UP LIKE OUR CHATWOOT SINCE 3 Nov, ~11:00 UTC** (owner: *"ok just make uchat like the settings we have on the chatwoot"*). feature.md, "Set up like our Chatwoot".
+>   - **Departments:** agent groups with Chatwoot's names: collections `20217`, operations `20219`, management `20221`, service `20223`. `UCHAT_GROUPS` in `.env` maps Chatwoot team 1-4 to them.
+>     - All four use Least Assigned: UChat always gives a group's chat to a member, and has no "nobody".
+>     - The owner (UChat user `357951`) is in service, and the other three are empty, as in Chatwoot.
+>   - **Labels:** Chatwoot's 8, as UChat labels. The Live Chat sidebar shows labels and department.
+>   - **Language:** the owner's UChat profile is in Hebrew (was Default). It is per member; there is no workspace language.
+>   - **Two keys:** `Uchat_api_key` (Manage Flow) is the bot's. `UCHAT_API_KEY_TEAM` ("homies-team-setup", Manage Team only) makes groups, labels and members. Team calls with the bot's key get 403.
+>   - **The translator** writes each label twice, as a tag (which the copies read back, `bot-off` included) and as a label (which staff see), and maps a team to its group. Only the translator was written; rollback: `local/uchat-prep/n8n-uchat-translator-before-groups-2026-11-03.json`.
+>   - **Proven with no AI:** a hand-over call on the web chat's contact landed in service, with the owner as its member and both labels, and **the bot was not paused.** It was cleaned up afterwards.
+>   - **Waiting:** the test seat ("seat2 test" in Chatwoot) is not invited, because an invite emails a person. Staff join on the owner's word. A real hand-over from a message is a paid test.
 >   - **IT ANSWERS IN UCHAT'S WEB CHAT SINCE 3 Nov, 08:19 UTC.**
 >     - **Where:** a new UChat account (workspace "homies-uchat", bot `f315405`, `.env` `Uchat_api_key`), on UChat's free Pro trial until about 16 Nov. Then the Business plan, $15 a month, or it stops.
 >     - **Proven:** "היי" got the live greeting and the two buttons, with no AI call (execution 150459).

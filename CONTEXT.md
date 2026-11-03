@@ -472,6 +472,12 @@ Three facts hold with or without a move:
 - **UChat's API has no internal-note call and no history import.** A
   department page and past conversations need another road (ticket lists;
   Chatwoot kept as the archive).
+- **UChat mirrors Chatwoot's setup name for name (3 Nov, owner: "ok just make
+  uchat like the settings we have on the chatwoot").** Departments are agent
+  groups with the team names (`UCHAT_GROUPS`), and labels are UChat labels and
+  tags at once (the tag for the bot's read-back, the label for staff). Setting
+  the workspace up needs a key with "Manage Team" (`UCHAT_API_KEY_TEAM`); the
+  bot's key has "Manage Flow" only and gets 403 there.
 
 **3 Nov, later: a UChat version of the bot exists beside the live one.**
 `scripts/n8n_uchat.py` regenerates it from live, the way the sandbox is made:

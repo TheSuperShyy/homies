@@ -47,6 +47,20 @@
 - The payload, the notes question and Hebrew right-to-left are the three things that can change the plan.
 - All three are answerable with the web chat widget, without a WhatsApp number and without money.
 
+**UChat is set up like our Chatwoot, name for name (3 Nov, owner: *"ok just make uchat like the settings we have on the chatwoot"*).**
+- The four departments are UChat agent groups with Chatwoot's team names, the eight labels are UChat labels with Chatwoot's names, and the owner sits in `service`, as in Chatwoot.
+- Same names, so a hand-over reads the same in either inbox, and the mapping is one line (`UCHAT_GROUPS`).
+
+**The groups give a chat to Least Assigned (3 Nov).**
+- UChat has no "assign to the group and nobody": its methods are Random, Least Assigned and Round Robin.
+- Least Assigned spreads chats the most evenly once real staff are in. With one member it makes no difference.
+- Assignment does not pause the bot (proven 3 Nov), so the behaviour after a hand-over is Chatwoot's.
+
+**A label goes on twice, as a tag and as a UChat label (3 Nov).**
+- The tag is what the copies read back: UChat's contact record (`BotUser`) carries tags, not labels, and the off switch reads `bot-off` from it.
+- The label is what staff see and filter on in Live Chat, as they did in Chatwoot.
+- Rejected: labels only. The switch would stop seeing `bot-off`, and reading labels too would cost one more UChat call on every message.
+
 ## Constraints
 
 - **UChat provides no numbers.** Every number is registered with Meta under a Meta business account ([uchat-trial.md](../11-whatsapp-bot/uchat-trial.md)).
@@ -58,6 +72,11 @@
 - **A staff reply pauses the bot for 30 minutes,** which staff can extend (UChat's Live Chat docs). `pause-bot` takes any number of minutes.
 - **UChat's External Request step times out after 15 seconds,** plus 10 per paid add-on. Our bot takes 20-40 seconds, so it never answers inside UChat's request. It acknowledges at once and replies through `send-content`, as the bot.
 - **UChat's API sits behind Cloudflare,** which refuses Python's default user agent ("Error 1010: browser_signature_banned", a 403 that looks like a bad key). curl's passes. `scripts/uchat_api.py` sends it.
+- **Two keys, two abilities (3 Nov).** Groups, labels, members and business hours need "Manage Team"; everything the bot does needs "Manage Flow".
+  - `Uchat_api_key` ("homies-n8n", Manage Flow) is the bot's, in the translator's credential.
+  - `UCHAT_API_KEY_TEAM` ("homies-team-setup", Manage Team only) is for setting the workspace up.
+  - UChat shows a new key once. Without "Manage Team" the answer is 403 "Manage Team Permission Required".
+- **No API call invites a member.** People are added in Workspace Settings → Members, and each invite emails that person.
 - **Past messages cannot be imported.** The API creates contacts, not their history.
 - **On the free plan, nothing in UChat can call another system.**
   - External Request, Integrations (the Webhook integration), Notification and AI Actions are all Pro.
@@ -91,7 +110,9 @@ Each one is settled by the dry run (feature.md, step 1) or by the UChat version'
    - whether a signature or secret comes with it;
    - whether it still posts while the bot is paused. UChat's changelog adds a "live chat webhook" for paused chats.
 2. **How a department is paged:** a ticket-list item, or a flow node with a staff notification. Which one staff actually see on the phone app decides.
+   - **Partly settled 3 Nov:** a hand-over puts the chat in the department's group, and UChat gives it to one member (Least Assigned). What that member is notified with, on the phone app, is not yet seen.
 3. **Hebrew right-to-left** in Live Chat and the mobile app.
+   - **The web dashboard: settled 3 Nov.** With the owner's profile in Hebrew it reads Hebrew and turns right-to-left. Live Chat and the mobile app are not yet seen.
    - Hebrew is listed among UChat's interface languages, and a July 2022 post claims right-to-left.
    - Its mobile-app page lists no Hebrew, but that page is about four years old.
 4. **Whether our Meta test number can be connected at all.**

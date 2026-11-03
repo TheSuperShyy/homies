@@ -33,9 +33,11 @@ WHAT DIFFERS FROM LIVE, AND WHY
   - Show typing (Meta's call) and Log inbound / Log reply (the live `messages`
     table) are NoOps, and `Anything newer?` reads the UChat conversation, as
     the sandbox reads its Chatwoot one. Nothing in the live log changes.
-  - The hand-over copy pages through the translator. Labels become UChat tags,
-    the note goes to a contact field, `team_note` (UChat's API has no internal
-    note), and a team becomes an agent group once UCHAT_GROUPS maps it.
+  - The hand-over copy pages through the translator. Labels become UChat tags
+    (what the copies read back) and UChat labels (what staff see), the note goes
+    to a contact field, `team_note` (UChat's API has no internal note), and a
+    team becomes its agent group through UCHAT_GROUPS (Chatwoot team id -> UChat
+    group id; the four departments made 3 Nov with Chatwoot's names).
   - Speed: `Worth a word?`, a Gemini call of about 6 s, runs only when the
     message has a payment word (`A payment word?`). Its note could go out only
     then anyway (`A word first?` tests the same words on the same text), so the
@@ -248,8 +250,16 @@ switch (p.action) {
   case 'labels': {
     const names = (b.labels || []).map(String).filter(Boolean);
     if (!names.length) return out({ skip: true, answer: { payload: [] } });
-    return out({ kind: 'labels', labels: names, call: { method: 'POST', path: '/subscriber/add-tags-by-name',
-      body: { user_ns, data: names.map(n => ({ tag_name: n })) } } });
+    // Two calls, one item each. The tag is what the copies read back (`bot-off`:
+    // UChat's contact record carries tags, not labels). The label is what staff
+    // see on the chat in Live Chat, as in Chatwoot (3 Nov: the 8 labels made in
+    // UChat with Chatwoot's names). "Answer a write" answers from the first.
+    return [
+      ...out({ kind: 'labels', labels: names, call: { method: 'POST', path: '/subscriber/add-tags-by-name',
+        body: { user_ns, data: names.map(n => ({ tag_name: n })) } } }),
+      ...out({ kind: 'labels', labels: names, call: { method: 'POST', path: '/subscriber/add-labels-by-name',
+        body: { user_ns, data: names.map(n => ({ label_name: n })) } } }),
+    ];
   }
   case 'custom_attributes': {
     const ca = b.custom_attributes || {};

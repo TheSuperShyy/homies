@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### UChat set up like our Chatwoot: the four departments, the eight labels, Hebrew, and hand-overs landing in their department (from ~10:40 UTC)
+- **Asked:** *"so we need to make uchat like chatwoot like it will have departments and stuff"*, then *"ok just make uchat like the settings we have on the chatwoot"*.
+- **Read from Chatwoot account 2 (read only):**
+  - teams `collections`, `operations`, `management`, `service`, with only Assaf Clix, in `service`;
+  - users Assaf Clix (administrator) and "seat2 test" (agent);
+  - 8 labels and 9 conversation attributes;
+  - no saved replies, automations, macros, account webhooks or integrations;
+  - greeting, working hours, auto-assignment and the satisfaction survey all off; account language `he`; one agent bot, "Homies bot", to n8n.
+- **The key:** the bot's key (Manage Flow) got 403 "Manage Team Permission Required" on groups and labels.
+  - In the owner's logged-in Chrome (port 9333), in a tab of my own: the owner's tab, open on billing, was not touched, and mine was closed at the end.
+  - Your Settings → API Keys → "homies-team-setup": Manage Team only, workspace homies-uchat, bot homies-chatbot.
+  - UChat shows a key once. A script read it into `.env` as `UCHAT_API_KEY_TEAM` (60 characters) without printing it. Backup: `local/env-backups/.env.before-uchat-team-key-2026-11-03`.
+- **Made in UChat, by API:**
+  - agent groups collections `20217`, operations `20219`, management `20221`, service `20223`.
+    - Each is Least Assigned, Default status, and every member sees every conversation.
+    - UChat's own form offers Random, Least Assigned and Round Robin, with no "nobody", so a group always gives the chat to a member.
+  - the owner (UChat user `357951`) in service, and the other three empty, as in Chatwoot;
+  - the 8 labels.
+- **In UChat's dashboard:**
+  - the owner's profile language set to Hebrew (it was Default). UChat has no workspace language, and the dashboard turned right-to-left;
+  - Workspace Settings → Settings: "show labels" and "show department" turned on, saved, and read back after a reload;
+  - Business Hours left as they were: open all day, every day.
+- **Not done:** the test seat "seat2 test" was not invited. An invite emails a person, so it waits on the owner's word.
+- **Our side:**
+  - `UCHAT_GROUPS={"1": 20217, "2": 20219, "3": 20221, "4": 20223}` in `.env`. Backup: `.env.before-uchat-groups-2026-11-03`.
+  - `n8n_uchat.py` writes a label twice: `add-tags-by-name`, which the copies read back (UChat's contact record has tags, not labels), and `add-labels-by-name`, which staff see.
+  - The n8n Code-node skill was read first. The new `Map a write` ran locally in node against 8 cases: labels, teams 1-4, an unmapped team, no labels and a wrong door.
+  - Only the translator was written (`UCHAT_N8N_FACADE_ID`) and read back active, with the map and both calls. The bot and hand-over copies were not touched. Snapshot: `local/uchat-prep/n8n-uchat-translator-before-groups-2026-11-03.json`.
+- **Proven, with no AI:** the translator was called as the hand-over calls it, on the web chat's contact.
+  - Team 4 went to group 20223 and was given to the owner.
+  - `handover` and `handover-service` arrived as tags and as labels.
+  - The bot was not paused (`paused_diff_seconds` 0).
+  - All of it was removed afterwards, and the contact read back as before.
+- **Still open:** a real hand-over from a message (paid: the AI runs); the staff as members; what a member's phone shows.
+- feature.md's part of this went in with the automatic housekeeping commit `01098a1`.
+
 ### The 10-second target: 3.7 Flash tried and not taken; the UChat bot's wait and reads trimmed (owner: "its too long i need like 10s max", "ok try it")
 - **Asked:** a reply within 10 s. Proposed in chat: 3.7 Flash, a 2 s wait (none after a tap), the two reads at once, after a test with Claude playing tenants (about $0.25, capped at $1). The go: *"ok try it"*.
 - **3.7 Flash thinks a lot by default too** (the bot's real tap request, one call each):
