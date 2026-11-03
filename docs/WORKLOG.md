@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### "Michael Simulated Run" made Hebrew only (owner: "make this hebrew no english")
+- **Republished at the same link:** https://claude.ai/artifact/6MuTsoP1rojWBmMvxS4nqk, version `1793713985-075a` over `1793711643-a759`.
+  - The page is shared by link (read `public`), so the publish named it (`shared_live`).
+  - The declaration is kept: the `db` marks rules and the `user` profile.
+  - No marks had been made yet (`marks` was empty), and the step ids and local key are unchanged.
+- **What changed:** the page is right to left, on the Hebrew checklist's look.
+  - **Gone:** the English translation under every reply, the buttons' English, the English of what Michael should do, and the "translations are only a help" line.
+  - **Now Hebrew:**
+    - the bar, the intro and both boxes ("בכל תשובה" in the checklist's own words);
+    - the chat titles (the checklist's section names);
+    - "מאחורי הקלעים" (each tool in plain words);
+    - the marks, the comments, and the messages about saving.
+  - Like a phone set to Hebrew, the tester's messages are on the left and Michael's are on the right.
+- **Notes:** the 7.4 and 7.5 notes ("written to a woman", "still feminine") are dropped, because the Hebrew shows that itself. 7.7's note stays, in Hebrew, because it points back to 7.4: "חוזר ללשון זכר (תרגיש, תצטרך), אף שב-7.4 כתבו לו בלשון נקבה."
+- **Kept English on purpose:** only the run's own text, which is 5.5's test message (it tests English input) and the payment link in 5.1, plus "SMS", which is how Hebrew writes it. The artifact's name stays "Michael Simulated Run".
+- **Source:** `local/artifacts/michael-simulation/build.py` now writes the Hebrew page. It refuses English in anything the page says around the run, checking both the data and the page's own text.
+  - The old English build is kept as `build_en.py` (with `translations.json`), writing `index-en.html`, unpublished. Before the switch it was checked to rebuild the published English page byte for byte.
+- **Checked before publishing:** rendered headless (Chrome) at 1280 px and 390 px.
+  - 30 rows, `dir=rtl`, no sideways scroll and no script errors.
+  - No Latin letters in the text or the tooltips beyond the three kept.
+  - ✓ on 2.1 and ✗ on 2.3 moved the counts ("נבדקו 2 מתוך 30"), the comment box opened on ✗, and "מחיקת הסימונים שלי" cleared them.
+
 ### A UChat login for clixteam579: "Assaf Clix", admin in homies-uchat (owner: "create an account for the clixteam579")
 - **Read as UChat:** clixteam579@gmail.com already has the dashboard login (26 Aug) and is Chatwoot's administrator Assaf Clix. UChat's workspace had one member, the owner's CLIX login (`357951`, owner), read with `/team-members`.
 - **Invited** in Workspace Settings → Users (משתמשים): clixteam579@gmail.com, role admin (מנהל), as in Chatwoot. UChat's API has no invite call.
