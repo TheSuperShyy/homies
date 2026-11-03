@@ -11,6 +11,47 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The UChat version of the chatbot, built beside the live bot (owner: "lets create a uchat version as well of the chatbot")
+- **Read as feature 21's route:** UChat in front, the bot itself unchanged. Rebuilding it as a UChat AI agent would lose the reply checks, the owner's 18 Oct worry.
+- **Built by the new `scripts/n8n_uchat.py`,** regenerated from live like the sandbox. It only reads live, and refuses live and sandbox ids:
+  - **"UCHAT — Chatwoot-compatible API" `FIVPZiM5udeXFacS`, the translator.**
+    - Its webhook `uchat-cw` takes `api/v1/accounts/:acc/conversations/:conv/:action`, GET and POST, behind a door header.
+    - Messages become `send-text`; the menu becomes `send-content`, whose buttons run "Michael"; a private note becomes the `team_note` field.
+    - Status becomes `move-chat-to`; an agent or team becomes the agent or group in `UCHAT_AGENTS` / `UCHAT_GROUPS`, both empty for now.
+    - Labels become tags, attributes become fields, priority becomes the `urgent` tag.
+    - Reads go to `chat-messages` and `get-info`, answered in Chatwoot's shape.
+  - **"UCHAT — Hand to a person" `EYePE3S0E6t1kojj`:** its 6 Chatwoot steps go through the translator, and `Read the conversation` asks for `/info`.
+  - **"UCHAT — WhatsApp bot" `mKheBsTxtcMhPxu7`:** live's 61 nodes.
+    - **Changed only:**
+      - the Chatwoot host and token on 9 steps;
+      - Sort's secret;
+      - the webhook (`homies-whatsapp-uchat`);
+      - the memory key (`-uchat`);
+      - the two typing steps and the two log steps, now NoOps;
+      - the burst read, from UChat;
+      - the two hand-over links.
+    - **Added:** `Who is this? (UChat)`, `Which message? (UChat)` and `From UChat`, which turn UChat's newest message and its id into Chatwoot's `message_created`.
+    - **Untouched:** the prompt, the checks and the tools.
+  - **Two n8n credentials** (UChat's bearer key, the translator's door).
+  - **`.env`:**
+    - the `UCHAT_*` ids and two new secrets;
+    - `UCHAT_FLOW_NS` (`f306703`);
+    - `UCHAT_TEST_PHONES`, the owner's number.
+    - Backup: `local/env-backups/.env.before-uchat-version-2026-11-03`.
+- **UChat** ("clix", bot "homies-chatbot", a web bot): 9 tags and 10 contact fields created, all 201.
+- **Proven with a contact that does not exist** (no AI called):
+  - 401 without the door;
+  - UChat's "not found" answered in Chatwoot's shape;
+  - the copy's way in runs to Sort and `Answer Meta` without an error (executions 150369 and 150372).
+- **Decided:**
+  - **The live tools, behind a test-phone allowlist.** The sandbox function is v8 of 29 Oct 10:29 UTC, behind live's v138.
+  - **The message is read back from UChat,** because UChat's Last Text Input and Last Button Title outlive the message that set them.
+- **Waits on the owner in UChat's dashboard:**
+  - the "Michael" sub flow with its External Request (settings in `local/uchat-prep/uchat-setup.txt`, out of git);
+  - the web chat opened once.
+  - Then `--wire`, `--tester`, and a "היי".
+- **Not in this version:** photos on tickets (`MEDIA_HOSTS`), voice notes, the dashboard's log, and WhatsApp, which needs a number in UChat.
+
 ### Read only, 06:52-07:10 UTC: the WhatsApp bot and both phone agents are working
 - **Asked:** *"make sure the chatbot and the voice agents are working. dont edit anything just let me know"*.
 - **WhatsApp:**

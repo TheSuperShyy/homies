@@ -473,6 +473,13 @@ Three facts hold with or without a move:
   department page and past conversations need another road (ticket lists;
   Chatwoot kept as the archive).
 
+**3 Nov, later: a UChat version of the bot exists beside the live one.**
+`scripts/n8n_uchat.py` regenerates it from live, the way the sandbox is made:
+the live bot's own logic, with its Chatwoot calls answered by a translator
+workflow that works through UChat's API. It runs the live tools for test
+phones only. **Re-run it with `--apply` after any change to the live bot**, or
+the UChat version drifts. Never edit the UCHAT copies by hand.
+
 **Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
 21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
 Meta, which beats the app-level subscription, so the number moves the moment the

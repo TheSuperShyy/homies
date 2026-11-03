@@ -2,7 +2,7 @@
 
 **Estimate:** 13-19d (one developer), plus 1d for the dry run that can happen first
 **Depends on:** 11-whatsapp-bot, 12-chatwoot, 16-human-handover; a WhatsApp number UChat can connect (in practice Homies' own)
-**Status:** prepared 3 Nov 2026, not started. Nothing moves until the owner says so.
+**Status:** prepared 3 Nov 2026. **The UChat version of the bot is built and running on our side (3 Nov, owner: *"lets create a uchat version as well of the chatbot"*)**, beside the live bot, and waits for one sub flow in UChat's dashboard (below). No number is moved; the live bot is untouched.
 
 ## Purpose
 
@@ -20,6 +20,51 @@ Without this plan, a move would start from a blank page under time pressure.
 | **Moves to UChat** | The number's connection; the staff inbox (seats, departments, labels, hand-over, the bot's pause); the bot's way in and out (n8n talks to UChat's API instead of Chatwoot's); the tool server's WhatsApp sends |
 | **Stays** | The n8n bot (prompt, reply checks, memory keyed by the tenant's number, OpenRouter); Supabase (residents, tickets, the message log, photos); the dashboard; the OXS sync; the voice agents; the Meta templates, which belong to the WhatsApp account, not to the platform |
 | **Not chosen** | Rebuilding the bot as a UChat AI agent: 21-34 days, and it loses the before-sending checks and the replay tests. Kept in [uchat-comparison.md](../11-whatsapp-bot/uchat-comparison.md), Option A |
+
+## The UChat version (built 3 Nov 2026)
+
+`scripts/n8n_uchat.py` builds it from live, the way `n8n_sandbox.py` builds
+the sandbox. Re-run it after a change on live; never edit the copies by hand.
+
+| Piece | What it is |
+|---|---|
+| "UCHAT — WhatsApp bot" (`mKheBsTxtcMhPxu7`) | The live bot regenerated from live. Its prompt, reply checks, memory rules and tools are live's, unchanged. Webhook `homies-whatsapp-uchat`, with its own secret |
+| "UCHAT — Chatwoot-compatible API" (`FIVPZiM5udeXFacS`) | The translator. It takes the bot's Chatwoot calls, does them through UChat's API, and answers in Chatwoot's shape. Door: the `api_access_token` header |
+| "UCHAT — Hand to a person" (`EYePE3S0E6t1kojj`) | The live hand-over, paging through the translator |
+| UChat workspace "clix", bot "homies-chatbot" | 9 tags (`bot-off`, the handover labels, `urgent`) and 10 contact fields (`team_note`, the `handover_*` stamps), made by `--uchat` |
+
+**How a message travels:**
+1. UChat's default reply runs the sub flow "Michael". Its one step, an External Request, posts `{"user_ns": …}`.
+2. `Who is this? (UChat)` and `Which message? (UChat)` read the contact and their newest message back from UChat.
+3. `From UChat` hands Sort the Chatwoot event it has always read. From there on, the bot is the live bot.
+4. Replies go out through the translator. Text becomes `send-text`; the menu becomes `send-content` with buttons that run "Michael" again.
+
+**Differences from live, all on purpose:**
+- **Only test phones get through** (`UCHAT_TEST_PHONES` in `.env`, the owner's number). The copy uses the live tools, so a ticket it opens is real, like a test on the live WhatsApp bot.
+- **The memory key gets `-uchat`,** so the two bots never share a memory.
+- **No typing dots, and nothing written to the live `messages` log.** The burst check reads the UChat conversation instead.
+- **A private note becomes the contact's `team_note` field,** because UChat's API has no internal note. Department labels become tags. A team becomes an agent group once `UCHAT_GROUPS` maps it (no groups yet).
+- **No 15-minute hand-back copy.** UChat's own pause after a staff reply does that job (30 minutes, staff can extend).
+
+**Proven on 3 Nov, with a contact that does not exist (no AI was called):**
+- the translator refuses a call without the door (401);
+- it gets UChat's "not found" and answers it in Chatwoot's shape;
+- the copy's whole way in runs without an error, to `Sort` and `Answer Meta`.
+
+**Still to do, in UChat's dashboard (its API cannot make a flow):**
+1. A sub flow named **Michael** with one Action step, **External Request**, also named **Michael**. Its method, address and body are in `local/uchat-prep/uchat-setup.txt`, kept out of git because the address carries the secret.
+2. The bot's web chat, opened once.
+
+**Then from here:**
+- `--wire` makes "Michael" the default reply and the web chat's start flow.
+- `--tester <user_ns>` puts the test phone on that contact.
+- A first "היי" gets the menu without touching the AI.
+
+**Not in this version:**
+- Photos are not kept on the ticket: the tool server takes photos only from Chatwoot's host.
+- Voice notes stay in Chatwoot.
+- The dashboard's Conversations page does not show UChat chats.
+- WhatsApp needs a number connected in UChat, and the cutover rules below.
 
 ## What has to change
 
