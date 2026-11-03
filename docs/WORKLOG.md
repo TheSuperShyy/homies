@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### A Hebrew Google Sheet comparing Chatwoot and UChat, leaning to Chatwoot (owner: "create a gsheet in hebrew that compares uchat and chatwoot like + and -" … "make sure we lean more to chatwoot")
+- **The file:** "השוואה: Chatwoot מול UChat", in clixteam579's Google Drive, made with the Google connectors. It is not shared with anyone. Its link stays out of this public repo.
+- **Tab "השוואה":** 16 topics, right to left. Each cell opens with + (advantage, green) or - (disadvantage, red).
+  - The totals are COUNTIF formulas: Chatwoot 14 + and 2 -, UChat 4 + and 12 -.
+  - The lean comes from choosing and ordering the topics. Every line is a checked fact, and UChat's real pluses are in: hosted with no server to keep, a flow builder with broadcasts, the same staff screen and app, and other channels.
+- **Tab "עלות חודשית":** the cost from labeled inputs (blue) with sources. UChat for 19 staff and 7,400 residents comes to **$195 a month**, $2,340 a year more than Chatwoot's $0.
+  - The inputs are $15 base with 5 members and 1,000 contacts, $10 a member, $5 per 1,000 contacts up to 5,000, then $20 per 5,000.
+  - They come from UChat's billing page (3 Nov) and its public pricing page, read today; the FAQ also says $10 a member.
+- **Measured for it, read only:** Chatwoot hands a resident's message to the bot in a median **0.21 s** (7 incoming messages on 2-3 Nov, n8n start against the message's `created_at`, range 0.14-2.10 s). UChat takes about 3 s (3 Nov, above).
+- **Reworded after commit `9a9a18d`** (the bot now counts as running in UChat). Chatwoot is no longer called "the system working today", and the recommendation says "Chatwoot suits Homies better", not "stay".
+  - The 13-19-day row became "phone-agent notes and ticket notices still go through Chatwoot".
+  - The checks row now says the checks exist only because the bot runs outside UChat.
+- **Checked:** both tabs read back with no error cells. A PDF export, rendered with PyMuPDF since poppler is missing here, shows the right-to-left layout and the colours as meant.
+- **Corrected in passing:** feature 21's running cost said "about $60 with 10 seats, or about $105 with all 19 staff". At the 3 Nov prices those are about $105 and about $195.
+
 ### The owner: the bot has moved from Chatwoot to UChat (in the day's report: "add also that we migrated from chatwoot to uchat and currently runnning in uchat")
 - **The report** (`/reporter`, for 3 Nov) now opens with "Migrated the WhatsApp assistant from Chatwoot to UChat, and it is now running in UChat on its own Israeli number". It also names Chatwoot where it had said "our current inbox".
 - **The owner's word supersedes the 18 Oct "we stay on Chatwoot"** and this morning's "ready, not started". CONTEXT, HANDOVER and memory now say the bot in use is the UChat copy (`mKheBsTxtcMhPxu7`, the Israeli number, open to everyone).

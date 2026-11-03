@@ -468,6 +468,19 @@ runnning in uchat"*.
 - Voice team notes and the ticket notices (`ticket_resolved_he`) still go through Chatwoot.
 - So "the live bot" now means the UChat one. Ask before switching anything off on the Chatwoot side.
 
+**Later the same evening the owner asked for a Hebrew Google Sheet comparing the two, leaning to
+Chatwoot** (*"make sure we lean more to chatwoot"*). The sheet does not undo the line above. The
+UChat bot is still the one in use until the owner says otherwise. How the sheet is kept (where it
+is: HANDOVER):
+- **The lean comes from which topics are chosen and how they are ordered, never from an untrue line.** UChat's real
+  pluses stay in it. A new line needs a fact behind it, measured or from our records.
+- **Speed is compared with two measured numbers.** Chatwoot hands a resident's message to the bot in
+  a median 0.21 s (7 messages, 2-3 Nov). UChat takes about 3 s (3 Nov).
+- **The costs are formulas over labeled inputs on its "עלות חודשית" tab.** When a price changes,
+  change the input and keep the formulas. At 3 Nov prices, UChat for 19 staff is $195 a month.
+- **It does not call either platform "the system working today".** Both copies run, and the
+  owner counts UChat as the live one.
+
 **3 Nov, earlier: the owner asked for the move to be ready "just in case"; the 18 Oct
 decision held then.** The plan is `docs/features/21-uchat-migration/`: UChat
 replaces Chatwoot, and the bot stays in n8n with its checks, tests and memory

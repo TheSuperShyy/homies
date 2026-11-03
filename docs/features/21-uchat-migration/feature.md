@@ -258,7 +258,7 @@ Chatwoot is not switched off at the move, so the rollback needs no rebuild.
   - Business is **$15 a month** (shown down from $29): 1 bot, 1,000 contacts, 5 members.
   - Extras: 1,000 contacts $5, a member $10, a bot $10, each a month.
   - Partner is $199 a month.
-- **For the whole staff, at those prices:** about $60 a month with 10 seats, or about $105 with all 19 staff, both on the 10,000-contact tier. The 29 Sep estimate was $80-95 and $125-140, when a member was $5.
+- **For the whole staff, at those prices:** about $105 a month with 10 seats, or about $195 with all 19 staff, both on the 10,000-contact tier. That is $15, plus $10 for each member over 5, plus $40 for contacts ($5 per 1,000 up to 5,000, then $20 per 5,000, on UChat's public pricing page). The 29 Sep estimate was $80-95 and $125-140, when a member was $5. (Corrected 3 Nov evening: the first version read $60 and $105, which do not follow from these prices.) The Hebrew comparison sheet works this out from its inputs (HANDOVER).
   - Contacts count everyone who has ever written. About 7,500 residents puts it on the 10,000 tier.
 - **No AI key is needed in UChat,** because the bot stays on OpenRouter.
 - **Inbound webhooks (500 a day per bot) are not used.** Replies go through the REST API, whose rate limit UChat does not publish.
