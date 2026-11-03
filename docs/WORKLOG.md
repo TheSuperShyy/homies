@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The simulated manager call ran and passed (owner: "go")
+- **Run** `0778bab9` (Vapi simulations), 14:55:02-14:56:54 UTC, 112 s. The calls were `01a1a1e8` (Michael) and the simulated tenant's twin.
+  - **Cost: $0.40** ($0.23 Michael: llm 0.12, vapi 0.09, stt 0.02; $0.17 the tenant), plus the client's Cartesia characters for "Asaf". It was inside the $0.40-0.60 given.
+- **What Michael said** (heard locally: faster-whisper on Michael's channel matches the stored text):
+  - **"אני רוצה לדבר עם מנהל.":** notify_team (caller_request, management), quiet. Then "בטח, אני כאן איתך, ואעשה כל מה שאני יכול כדי לעזור. כדי שאוכל לעזור כמה שיותר מהר, מה מטריד אותך?"
+  - **"לא רוצה להסביר לבוט, תביא לי בן אדם.":** "זה לגמרי בסדר, אני לא אלחץ. אפילו כמה מילים כלליות על הנושא יעזרו לי לעזור. תשלום, תקלה או משהו אחר?"
+  - **The lobby leak:** name, building and flat were asked one at a time. open_request opened real ticket 255-1390-26 (flat 2, בר כוכבא 23, kept). Then "פתחתי פנייה על הנזילה מהתקרה בלובי, בקומת הקרקע. מספר הפנייה הוא 1390".
+  - **"ומתי המנהל יחזור אליי?":** "אין לי מועד לחזרה, ואני לא רוצה להבטיח זמן שאין לי. הבקשה שלך לדבר עם מנהל רשומה, וגם נפתחה פנייה על הנזילה …"
+- **Vapi's judge:** passed all three checks: no one else in a reply, no argument or refusal, and a request number given.
+- **One slip against the rule:** "הבקשה שלך לדבר עם מנהל רשומה" tells the caller about the quiet note. It is the same slip the chatbot made in the checklist run (7.1-7.3), from the when-line both prompts share ("שהפנייה נפתחה או שרשמת את זה"). It was left as it is, for the owner. Also heard: "כדי שיפתח פנייה" ("so that he opens") in the model's own text; no voice_guard rule causes it.
+- **The recording download failed at first** (HTTP 400). On this account `recordingUrl` is a private bucket path. `save_recordings` now takes the artifact's presigned links, and `--recordings DIR` fetches fresh ones (free). Saved: `recording.wav`, `recording-stereo.wav`, `michael-only.wav` and `transcript.txt` in `local/voice-tests/2026-11-03-manager/`. `recording.wav` was opened for the owner.
+
 ### Ready, not run: a simulated manager call with a Cartesia tenant (owner: "nice is it live yet? can i hear it like do a simulated test in the bg with cartesia as the tenant")
 - **Answered:** yes, live since 14:23:36 UTC (the entry below).
 - **`scripts/vapi_sim_manager.py` (new):** one call through Vapi's simulations API (`/eval/simulation/run`) to the live incoming agent, over `vapi.websocket`. It reuses `vapi_sim_inbound.py`'s API helper, personality and `WHO`.

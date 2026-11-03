@@ -2377,6 +2377,12 @@ Cartesia voice on that account, a test caller's included, spends the client's ch
 tenant with Cartesia's stock "Asaf" only because the owner asked for it ("with cartesia as the
 tenant"). Each run's price says so.
 
+**A Vapi recording downloads from its presigned link, not its plain one (3 Nov).** On Yariv's account
+`recordingUrl` and `stereoRecordingUrl` are private bucket paths (`hipaa-recordings`), and a plain GET
+answers 400. The call's artifact also carries short-lived `presignedMonoUrl`, `presignedStereoUrl`,
+`presignedAssistantUrl` and `presignedCustomerUrl`, which download as they are. Fetch the call again
+for fresh ones (`vapi_sim_manager.py --recordings DIR`).
+
 ## Ask the API and read the price list
 
 A vendor's feature documentation is not a statement about your account. Cloning

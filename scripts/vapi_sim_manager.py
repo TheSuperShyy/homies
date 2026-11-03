@@ -4,6 +4,7 @@
     python scripts/vapi_sim_manager.py              # print the run it would start (free)
     python scripts/vapi_sim_manager.py --run DIR    # SPENDS: one call, about $0.40-0.60 of Vapi
                                                     # minutes, plus the tenant's Cartesia characters
+    python scripts/vapi_sim_manager.py --recordings DIR   # the saved call's recordings again (free)
 
 WHY, 3 Nov. The incoming agent took the chatbot's way with a manager request at 14:23 UTC
 (docs/assistant/demo-inbound.md, "3 Nov"). The owner: "can i hear it like do a simulated test in
@@ -94,14 +95,16 @@ def transcript(call):
 
 
 def save_recordings(call, out):
-    """Every recording URL the call carries, downloaded beside the transcript."""
+    """The call's recordings, downloaded beside the transcript.
+
+    The plain recordingUrl is a private bucket path on this account (a 400 without auth, seen on the
+    first run); the artifact also carries short-lived presigned copies, which download as they are.
+    """
     art = call.get("artifact") or {}
-    rec = art.get("recording") or {}
     urls = {
-        "recording": art.get("recordingUrl") or call.get("recordingUrl")
-        or ((rec.get("mono") or {}).get("combinedUrl")),
-        "recording-stereo": art.get("stereoRecordingUrl") or call.get("stereoRecordingUrl")
-        or rec.get("stereoUrl"),
+        "recording": art.get("presignedMonoUrl"),
+        "recording-stereo": art.get("presignedStereoUrl"),
+        "michael-only": art.get("presignedAssistantUrl"),
     }
     saved = []
     for name, url in urls.items():
@@ -157,10 +160,21 @@ def run(out):
             print("saved %s" % p)
 
 
+def recordings_again(out):
+    """Fresh presigned links for the call saved in DIR, and the recordings downloaded again (free)."""
+    saved = json.load(open(os.path.join(out, "call.json"), encoding="utf-8"))
+    call = V.api("GET", "/call/%s" % saved["id"])
+    for p in save_recordings(call, out):
+        print("saved %s" % p)
+
+
 def main():
     a = sys.argv[1:]
     if "--run" in a:
         run(a[a.index("--run") + 1])
+        return
+    if "--recordings" in a:
+        recordings_again(a[a.index("--recordings") + 1])
         return
     b = body()
     s = b["simulations"][0]
