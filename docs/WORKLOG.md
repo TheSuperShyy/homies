@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The Michael Test Checklist fixed: 2.2 and 2.3 (owner: "fix the checklist we have")
+- **Republished** with `edit_version` over `1793709531-c792` as `1793710110-a6f4`. Five single-line edits; the first, multi-line try did not match the CRLF source. Read back. Ids, shared marks and the db rules are unchanged.
+  - **2.2:** a number on file gets the ticket at once. A number not on file is first asked for a full name, once, and the ticket opens after the answer. New hint: "אם הוא שואל מה השם המלא שלכם, עונים בשם לפני ההודעה הבאה."
+  - **2.3:** "לא מבטיח שתגיע הודעה כשהקריאה תיסגר, כי בינתיים המספר הזה לא שולח הודעה כזאת." So a promise of the closing message now counts as wrong.
+- **The source** (`local/artifacts/michael-checklist/index.html`, which HANDOVER says republishes go from) got the same five edits. Each old line was found exactly once, so source and page agree.
+- **2.3 now differs from the prompt on purpose.** The prompt allows the closing-message line; CONTEXT records the exception. Return it to the prompt's wording once notices reach the tester's number.
+
 ### Read only: the "Michael Test Checklist" (`1793709531-c792`) checked against the live rules (owner's screenshot + link: "this one is like a reply to the text in question like this")
 - **The screenshot** came from another checklist: "רשימת בדיקת הבוט (Copy)", a dress studio's bot. The link is the Homies one, after the fixes in the entry below.
 - **Still wrong for the bot as it runs now. The run below used stand-in tools, which skip both:**

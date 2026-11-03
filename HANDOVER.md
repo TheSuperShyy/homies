@@ -10,6 +10,9 @@ appended to.
 
 > **TWO PAGES FOR THE OWNER (3 Nov), private until the owner shares them:**
 > - **"Michael Test Checklist"** https://claude.ai/artifact/H8hD1pWFvKmQbiyMuicgFx (slug `82a53417-4856-4b7e-bca1-374b99bbf567`): 29 tests for testers on the UChat number, run through the bot first on 3 Nov (4 tests fixed). That run found the bot's own slips, listed in WORKLOG 3 Nov: "the team", an invented "you said it got worse", an implied call back from accounting, telling the tester the request was recorded, the masculine after a feminine cue, and "anything else?" while the tenant waits. Their marks are in its db, `marks/<user id>` (read with `db_list`, collection `marks`). Testers need edit access for their marks to be shared. **Its expected answers mirror the live prompt: when the prompt changes, update the page** (source `local/artifacts/michael-checklist/index.html`, republish with `edit_version`).
+>   - **Version `1793710110-a6f4` (3 Nov, owner: "fix the checklist we have"), with the source file matched:**
+>     - **2.2:** a tester whose number is not on file is asked for a full name once before the ticket (`need_name`). It has a hint to answer with the name. Only the owner (Assaf Clix) and Ido are on file.
+>     - **2.3:** a promise of "a message when it is closed" now counts as wrong. This is **against the prompt**, which allows the line, because nothing delivers that message on the UChat number yet, and on the test number `ticket_resolved_he` is PENDING. Return 2.3 to the prompt's wording once notices reach the tester's number, or drop the line from the prompt.
 > - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. Change `local/artifacts/yariv-feedback/items.json`, run `build.py` there, republish.
 > - **Not on Yariv's page:** the recording is back on since 26 Oct and he has not been told. The owner decides whether to tell him.
 >

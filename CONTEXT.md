@@ -529,6 +529,11 @@ message pauses the bot for that contact for 30 minutes, so the bot's replies go
 through `send-content` with `send_as_agent: 0`. **A message in UChat's log is
 not a delivered one:** a sent message carries WhatsApp's id (`mid`, "wamid…");
 without it WhatsApp refused it, and the reason is in UChat's error log.
+**One exception, by the owner's word (3 Nov, "fix the checklist we have"):** 2.3
+expects no promise of "a message when it is closed", though the prompt allows
+one. Nothing delivers that message on the UChat number yet, so on the page a
+promise the system does not keep counts as wrong. The rule below still holds.
+
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before
 every balance, which the 29 Oct change had already ended for numbers on file. Each
