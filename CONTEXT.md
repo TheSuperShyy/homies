@@ -3145,7 +3145,11 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
     - **In a manager chat,** the note needs a past-tense report, an explicit "אני מעביר את…", or a call-back promise. Explaining the procedure means talking about passing things on in every reply ("אני זה שמעביר פניות לצוות", "להעביר… אני כן"), and none of that is a report.
     - **Over every past reply:** 97 notes instead of 103. The 6 lost are "if you want, they'll get back to you" offers.
   - **Lesson: a style guard can turn the model's good draft into the bad one.** A rule written for one situation (a clerk asking for the building) fired in another, where the same words are what the owner wants. Before blaming the model for a reply, read its first pass in the execution (`Try again`'s `first_output`).
-- **The phone agents still pass a request for a person on at once** (their prompts and `vapi_tools.py`). That was not part of this change; chatbot first.
+- **The incoming phone agent handles a request for a manager the chatbot's way since 3 Nov, 14:23 UTC** (owner: *"i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything"*; `docs/assistant/demo-inbound.md`, "3 Nov").
+  - The request is noted at once (caller_request) and quietly. The caller hears that Michael cares and is doing all he can, then, if the matter is not known yet, a gentle "what happened?". Once it is known, even from before the request, the matter is his to the end.
+  - The chatbot's one voice comes with it, in phone words: no team, manager or management in anything he says, and a note is "a note in our system". `notify_team`'s own text and the "team note" wording in three other intake tools moved with the prompt, because on WhatsApp the tool text beat prompt-only fixes twice.
+  - So a change to how the chatbot speaks, or how it handles a manager, now has a twin on the incoming agent. Carry it across only when the owner asks; chatbot first still holds.
+  - **The debt agent still hands a request for a person to the team.** Its prompt says someone from the team will call back, and it ends the call. It was not part of the 3 Nov change.
 
 ## A gatekeeper model's NONE is not a guard; the necessary condition goes in code
 
