@@ -490,10 +490,23 @@ UChat bot is still the one in use until the owner says otherwise. How the sheet 
 is: HANDOVER):
 - **The lean comes from which topics are chosen and how they are ordered, never from an untrue line.** UChat's real
   pluses stay in it. A new line needs a fact behind it, measured or from our records.
+- **It compares features, not our build (owner, 3 Nov late: *"focus more on the features like
+  advantages and disadvantages makse sure all is real and accurate not invented"*).**
+  - Rows are what each platform can do: 23 features in five groups.
+  - Where-it-stands rows (what is connected, the trial, our checks) went stale within the hour, so they stay out.
+  - Every cell has its source on the third tab ("Sources" / "מקורות"): the vendor's own words and URL, or "our own" with a date.
+  - A line nobody has checked is left out, not hedged. The one gap left open is UChat's `add_note` message action.
+- **Facts that are easy to get backwards (vendors' pages, 4 Nov):**
+  - UChat agents do have in-conversation notes (a yellow Note tab).
+  - A UChat contact can sit in an agent group with no agent.
+  - UChat keeps chat history 6 months, and the bot's own messages 3.
+  - Chatwoot's free edition has macros, CSAT, automations, reports and email, but no Captain AI, no WhatsApp calls and no SLA.
 - **Speed is compared with two measured numbers.** Chatwoot hands a resident's message to the bot in
-  a median 0.21 s (7 messages, 2-3 Nov). UChat takes about 3 s (3 Nov).
+  a median 0.21 s (7 messages, 2-3 Nov). UChat takes a median 2.95 s (22 WhatsApp messages, 3 Nov,
+  stamped to the second, so "2 to 3 seconds").
 - **The costs are formulas over labeled inputs on its "עלות חודשית" tab.** When a price changes,
-  change the input and keep the formulas. At 3 Nov prices, UChat for 19 staff is $195 a month.
+  change the input and keep the formulas. UChat's first contact tier is 5,000 contacts *on top of* the
+  1,000 included (its billing help page's worked examples). At 4 Nov prices, UChat for 19 staff is $200 a month.
 - **It does not call either platform "the system working today".** Both copies run, and the
   owner counts UChat as the live one.
 - **It has an English twin in a separate file** ("Comparison: Chatwoot vs UChat", owner: *"create a

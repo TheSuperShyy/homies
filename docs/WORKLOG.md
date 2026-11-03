@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The Chatwoot-vs-UChat sheets rebuilt around features, every line sourced (owner: "so the chatwoot vs uchat comparison table focus more on the features like advantages and disadvantages makse sure all is real and accurate not invented")
+- **Both sheets, in place, same links:** the Hebrew "השוואה: Chatwoot מול UChat" and its English twin. Each comparison tab now holds 23 features in five groups: the team inbox, working with Michael, data/hosting/cost, built-in tools, channels.
+  - Totals by COUNTIF: Chatwoot 18 + and 5 -, UChat 15 + and 8 -.
+  - The project-status rows are gone (where it stands, phone agents and notices, links to Homies' systems, the reply checks). They described our build, not the platforms, and the next commit (`3ee2d1a`) had already moved some of them.
+- **A new third tab, "Sources" / "מקורות":** one source per cell, with the vendor's own words and the URL, or "our own" with the date when we saw or measured it.
+- **Lines the old sheet had wrong, corrected:**
+  - UChat does have internal notes inside the conversation: a yellow Note tab. Our own 3 Nov recording shows it, and so does UChat's Live Chat help page.
+  - "The bot can't leave UChat a note" is dropped, not claimed. UChat's message-format page documents an `add_note` action. Untested, so neither side of it is in the sheet.
+  - "A UChat department can't hold a chat" is dropped. UChat's help says a contact can have a group and no agent, so departments are now + on both sides.
+  - **Cost:** UChat's first contact tier is 5,000 contacts on top of the 1,000 included, per its billing help page's worked examples. 7,400 residents are $45, not $40. UChat for 19 staff is **$200 a month, $2,400 a year** (was $195 and $2,340). Rows 11-13 and 18-19 of both cost tabs were rewritten as formulas over the same inputs.
+- **Measured, read only:** UChat hands a WhatsApp message to the bot in a median **2.95 s**.
+  - 22 incoming messages on 3 Nov, range 2.59-5.51 s. UChat's `chat-messages` `ts` was matched against the start of the next n8n run of `mKheBsTxtcMhPxu7`.
+  - UChat stamps to the second, so the sheet says "2 to 3 seconds".
+  - The flow passes the message on in one External Request with no wait of ours (feature 21, "Michael").
+- **Read only from our Chatwoot:**
+  - version 4.16.2, account language `he`;
+  - every feature flag on: macros, automations, CSAT setting (off) on the WhatsApp inbox, help center, campaigns, email;
+  - `whatsapp_campaign` is absent, a free switch that starts off in 4.16.2.
+- **From the vendors' own pages,** checked by two research agents and spot-checked here from the saved pages:
+  - UChat keeps chat history 6 months, and the bot's own messages 3 months (its "Platform default limits", updated 23 Oct 2026).
+  - Its built-in satisfaction survey is Messenger only.
+  - "macro" appears in none of its 668 help pages.
+  - Chatwoot's free edition has no Captain AI, no WhatsApp calls and no SLA. Macros, CSAT, automations, reports and email are free.
+  - Chatwoot's phone app ships a Hebrew translation (`src/i18n/he.json`).
+- **Checked:** every tab of both sheets read back with no error cells. The Hebrew sheet's PDF export (PyMuPDF) shows right-to-left, + green, - red and grey group rows. The research and the content builder are in the session scratchpad.
+- **Briefing:** the twin rule stands. A line changes in both sheets and needs its source on the Sources tab. Feature 21's running cost is corrected to about $110 with 10 seats and about $200 with 19.
+
 ### The rest connected to UChat: the dashboard log, photos, the link and the "done" notice (owner: "lets connect everything in the uchat?")
 - **What still went through Chatwoot, read from the code:**
   - the copy's two log writes were NoOps, so the dashboard showed no UChat chat;
