@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The UChat bot answers everyone on its number (owner: "check the new message its from ido it says the bot did not respond", then "on meta we have a real number so we dont need to add anyone as test user")
+- **What happened to Ido's message:**
+  - His "היי" reached the UChat bot at 11:13:57 UTC (run 150807; the contact is "Elmaliach Ido" on WhatsApp Cloud).
+  - The copy dropped it on purpose: `uchat_skipped`, "not a test phone".
+  - `UCHAT_TEST_PHONES` held only the owner's number, our own filter from when the copy was built. Meta sets no such limit on the +972 number, which is a real number.
+- **The owner's call: no list.**
+  - `UCHAT_TEST_PHONES=all` now lets everyone through (`n8n_uchat.py`: `everyone`, From UChat's `EVERYONE`).
+  - A list of numbers still works the old way.
+  - `.env` backup: `local/env-backups/.env.before-uchat-everyone-2026-11-03`.
+- **Checked offline:**
+  - with `all`, a number on no list gets through, and a contact with no phone is still skipped;
+  - with a list, a stranger is still skipped.
+- **Put live at 11:21:30 UTC.** Read back: From UChat as tested, with `EVERYONE` true. The typing dots, the model and the wait are unchanged.
+- **What it means:** anyone who writes to the +972 number gets the bot with the live tools, so their tickets and notes are real, as on the live bot. The number is not published.
+- **Owed:** Ido sends again. His 11:13 message was dropped before the change and will not be answered by itself.
+
 ### The typing dots are back on the UChat bot (owner: "so is i noticed the typing icon was gone", then "yes i need it back")
 - **Why they were gone:** the UChat copy had `Show typing` and `Show typing again` as NoOps. Live's call needs WhatsApp's own id for the resident's message (Chatwoot's `source_id`), and the copy was built before UChat was known to keep it.
   - UChat's `chat-messages` carries it as `mid` (seen this morning on every incoming message).

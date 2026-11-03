@@ -482,8 +482,10 @@ Three facts hold with or without a move:
 **3 Nov, later: a UChat version of the bot exists beside the live one.**
 `scripts/n8n_uchat.py` regenerates it from live, the way the sandbox is made:
 the live bot's own logic, with its Chatwoot calls answered by a translator
-workflow that works through UChat's API. It runs the live tools for test
-phones only. **Re-run it with `--apply` after any change to the live bot**, or
+workflow that works through UChat's API. It runs the live tools. **Since 3
+Nov it answers everyone** on its own number (`UCHAT_TEST_PHONES=all`; the owner:
+"on meta we have a real number so we dont need to add anyone as test user"). The
+test-phone filter was ours, not Meta's, and it had dropped Ido. **Re-run it with `--apply` after any change to the live bot**, or
 the UChat version drifts. Never edit the UCHAT copies by hand.
 **On UChat's free plan nothing can call another system** (External Request,
 the Webhook integration and WhatsApp Cloud are Pro; checked 3 Nov), so the

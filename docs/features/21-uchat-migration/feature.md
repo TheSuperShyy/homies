@@ -40,7 +40,7 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 4. Replies go out through the translator, all as the bot (`send-content`, `send_as_agent: 0`). The menu's buttons each run their own step, "Michael", "Michael 2" or "Michael 3", which hold the same External Request.
 
 **Differences from live, all on purpose:**
-- **Only test phones get through** (`UCHAT_TEST_PHONES` in `.env`, the owner's number). The copy uses the live tools, so a ticket it opens is real, like a test on the live WhatsApp bot.
+- **Everyone gets through since 3 Nov** (`UCHAT_TEST_PHONES=all` in `.env`; a list of numbers brings the filter back). The copy uses the live tools, so a ticket it opens is real, as on the live WhatsApp bot.
 - **The memory key gets `-uchat`,** so the two bots never share a memory.
 - **Nothing is written to the live `messages` log.** The burst check reads the UChat conversation instead.
 - **The typing dots are live's call for the UChat number** (3 Nov). UChat keeps WhatsApp's message id (`mid`); the translator passes it on as `source_id`.

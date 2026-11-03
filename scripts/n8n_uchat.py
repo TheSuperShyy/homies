@@ -23,10 +23,11 @@ WHAT DIFFERS FROM LIVE, AND WHY
     it has always read. The id is UChat's own, so the burst check (`Still the
     last word?`) compares like with like, and a button tap reads the same as
     typed text.
-  - Only test phones get through (UCHAT_TEST_PHONES, the owner's number by
-    default). The copy uses the LIVE tools, so a ticket it opens is real, the
-    same as a test on the live WhatsApp bot; a stranger on the widget gets
-    nothing at all.
+  - Who gets through is UCHAT_TEST_PHONES: a list of numbers (the owner's by
+    default), or `all` for everyone, which it is since 3 Nov (the owner: "on
+    meta we have a real number so we dont need to add anyone as test user").
+    The copy uses the LIVE tools, so a ticket it opens is real, the same as on
+    the live WhatsApp bot; with a list, a stranger gets nothing at all.
   - Chatwoot calls: the host becomes the translator's, the Chatwoot tokens the
     translator's door token.
   - Memory: the session key gets "-uchat", so the two bots never share one.
@@ -137,11 +138,15 @@ def config(apply):
                           if s.strip()],
            "groups": json.loads(e.get("UCHAT_GROUPS", "") or "{}"),
            "agents": json.loads(e.get("UCHAT_AGENTS", "") or "{}"),
+           # UCHAT_TEST_PHONES=all lets everyone through (3 Nov, the owner, after Ido got no
+           # answer: "on meta we have a real number so we dont need to add anyone as test user").
+           "everyone": e.get("UCHAT_TEST_PHONES", "").strip().lower() == "all",
            "test_phones": digits_list(e.get("UCHAT_TEST_PHONES", "") or e.get("OXS_MIRROR_PHONES", "")),
            "wa_phone_id": e.get("UCHAT_WA_PHONE_ID", "").strip(),   # the UChat number at Meta (typing())
            "webhook_secret": e.get("UCHAT_WEBHOOK_SECRET", ""), "door": e.get("UCHAT_FACADE_SECRET", ""),
            "handover_id": e.get("UCHAT_N8N_HANDOVER_ID", "") or "PENDING"}
-    assert cfg["test_phones"], "no test phone: set UCHAT_TEST_PHONES (or OXS_MIRROR_PHONES) in .env"
+    assert cfg["test_phones"] or cfg["everyone"], \
+        "no test phone: set UCHAT_TEST_PHONES (numbers, or all) or OXS_MIRROR_PHONES in .env"
     if not cfg["flow_ns"]:
         st, a = uchat("GET", "/team-flows")
         flows = rows(a)
@@ -421,7 +426,7 @@ COPY_NOTE = ("### UCHAT copy (feature 21)\n"
              "Generated from the live workflow \"%s\" by `scripts/n8n_uchat.py`. Do not edit it here: "
              "change the script and re-run it.\n\n"
              "Its Chatwoot calls go to \"UCHAT — Chatwoot-compatible API\", which does them in UChat. "
-             "The tools are the live ones; only test phones get through.")
+             "The tools are the live ones. Who gets through is UCHAT_TEST_PHONES in .env (all: everyone).")
 
 
 def copy_note(wf, live_name):
@@ -464,7 +469,9 @@ FROM_UCHAT = r"""
 // see. This hands Sort the Chatwoot event it has always read, so Sort and
 // everything after it are the live bot's, unchanged.
 //
-// Only test phones get through: the copy runs the LIVE tools.
+// Who gets through: everyone, or only the test phones (UCHAT_TEST_PHONES). Either
+// way the copy runs the LIVE tools, so what it opens is real.
+const EVERYONE = %(everyone)s;
 const TEST_PHONES = %(phones)s;
 const hook = $('WhatsApp').first(1).json;
 const both = $input.all();
@@ -477,7 +484,7 @@ const skip = (why) => [{ json: { query: hook.query || {}, body: { event: 'uchat_
 if (!who.id) return skip('no such contact');
 if (!newest) return skip('nothing from the contact yet');
 if (!phone) return skip('no phone on the contact');
-if (!TEST_PHONES.includes(phone)) return skip('not a test phone');
+if (!EVERYONE && !TEST_PHONES.includes(phone)) return skip('not a test phone');
 const contact = { type: 'contact', phone_number: '+' + phone, name: sender.name || '' };
 return [{ json: { query: hook.query || {}, body: {
   event: 'message_created', message_type: 'incoming', private: false,
@@ -517,7 +524,8 @@ def way_in(wf, cfg):
     wf["nodes"].append(ask)
     both = facade_get("Who and what? (UChat)", free_spot(wf["nodes"], x + 240, y + 240), "={{ $json.url }}", cfg)
     wf["nodes"].append(both)
-    frm = code_node("From UChat", free_spot(wf["nodes"], x + 240, y + 120), js(FROM_UCHAT, phones=cfg["test_phones"]))
+    frm = code_node("From UChat", free_spot(wf["nodes"], x + 240, y + 120), js(FROM_UCHAT, phones=cfg["test_phones"],
+                                                                                    everyone=cfg["everyone"]))
     wf["nodes"].append(frm)
     to = lambda name: [{"node": name, "type": "main", "index": 0}]  # noqa: E731
     c = wf["connections"]
@@ -727,6 +735,7 @@ def wire(cfg):
 
 
 def tester(cfg, user_ns):
+    assert cfg["test_phones"], "--tester needs a number: UCHAT_TEST_PHONES is 'all'"
     phone = "+" + cfg["test_phones"][0]
     st, r = uchat("PUT", "/subscriber/update", {"user_ns": user_ns, "phone": phone})
     st2, info = uchat("GET", "/subscriber/get-info?user_ns=" + user_ns)
