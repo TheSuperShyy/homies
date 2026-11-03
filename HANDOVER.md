@@ -46,6 +46,10 @@ appended to.
 >   - **Two keys:** `Uchat_api_key` (Manage Flow) is the bot's. `UCHAT_API_KEY_TEAM` ("homies-team-setup", Manage Team only) makes groups, labels and members. Team calls with the bot's key get 403.
 >   - **The translator** writes each label twice, as a tag (which the copies read back, `bot-off` included) and as a label (which staff see), and maps a team to its group. Only the translator was written; rollback: `local/uchat-prep/n8n-uchat-translator-before-groups-2026-11-03.json`.
 >   - **Proven with no AI:** a hand-over call on the web chat's contact landed in service, with the owner as its member and both labels, and **the bot was not paused.** It was cleaned up afterwards.
+>   - **Members since 3 Nov, ~13:50 UTC (owner: *"create an account for the clixteam579"*):** CLIX (the owner's login, owner) and **"Assaf Clix", clixteam579@gmail.com, admin** (UChat user `358017`), as in Chatwoot, where that email is the administrator Assaf Clix. WORKLOG 3 Nov.
+>     - Its profile is in Hebrew, like the owner's. Its password went to the owner in chat and is written nowhere; the owner changes it in UChat's Security page.
+>     - It is in no department, so hand-overs still all go to CLIX.
+>     - **The trial is full at 2 users.** A third member, such as the test seat, needs Business (5 members). Invites are made only in Workspace Settings → Users: the API has no invite call.
 >   - **Waiting:** the test seat ("seat2 test" in Chatwoot) is not invited, because an invite emails a person. Staff join on the owner's word. A real hand-over from a message is a paid test.
 >   - **A HEBREW ONBOARDING VIDEO OF THE UCHAT INBOX EXISTS (3 Nov):** `local/onboarding/uchat-onboarding-he.mp4`, 2:56, 1920x1080, ignored by git. It is the Chatwoot video's twin: same overlay, captions, ring and cursor. WORKLOG 3 Nov.
 >     - **Re-record** with `python local/onboarding/uchat/record.py`. Read it first. It logs in with the owner's Chrome session (port 9333, cookies kept in memory only), and UChat must be reachable: 12 s page loads were seen on 3 Nov.

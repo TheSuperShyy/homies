@@ -478,6 +478,11 @@ Three facts hold with or without a move:
   tags at once (the tag for the bot's read-back, the label for staff). Setting
   the workspace up needs a key with "Manage Team" (`UCHAT_API_KEY_TEAM`); the
   bot's key has "Manage Flow" only and gets 403 there.
+- **UChat members are invited by email from Workspace Settings → Users, never
+  by API** (it only lists them, `/team-members`). The invite's link is a sign-up
+  page. Since 3 Nov: CLIX, the owner's login, and "Assaf Clix",
+  clixteam579@gmail.com, admin, as in Chatwoot. The trial holds 2 users, so it
+  is full.
 - **A screen recording of UChat shows nobody's chat but the owner's (3 Nov).**
   Anyone can write to the UChat number, and the chat list shows each chat's
   last message. So the list is narrowed to the owner's chat with UChat's own

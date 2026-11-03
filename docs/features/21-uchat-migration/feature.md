@@ -108,7 +108,8 @@ The owner: *"ok just make uchat like the settings we have on the chatwoot"*. Rea
 | Account language Hebrew | The owner's UChat profile in Hebrew. UChat has no workspace language: each member picks their own. The dashboard turns right-to-left |
 | Working hours off | Business hours "open all day" every day, which only a flow that checks them reads |
 | A team assignment picks nobody | **UChat always gives the chat to a member of the group:** Random, Least Assigned or Round Robin, no "nobody". All four groups use Least Assigned, and members see every conversation |
-| The test seat "seat2 test" | Not invited: an invite emails a person, so it waits for the owner's word |
+| Users Assaf Clix (administrator, clixteam579@gmail.com) and "seat2 test" (agent) | CLIX (the owner's login, owner) and, since 3 Nov, "Assaf Clix" (clixteam579@gmail.com, admin, Hebrew profile, in no group). Invites are made in Workspace Settings → Users, since the API has none. The trial holds 2 users |
+| The test seat "seat2 test" | Not invited: an invite emails a person, so it waits for the owner's word. The trial is full; a third member needs Business |
 
 **The key:** team calls need UChat's "Manage Team" ability, which the bot's key (`Uchat_api_key`, Manage Flow) lacks. A second key, "homies-team-setup", has Manage Team only. It is in `.env` as `UCHAT_API_KEY_TEAM`, and was read off the page by a script without being shown.
 

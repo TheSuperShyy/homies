@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### A UChat login for clixteam579: "Assaf Clix", admin in homies-uchat (owner: "create an account for the clixteam579")
+- **Read as UChat:** clixteam579@gmail.com already has the dashboard login (26 Aug) and is Chatwoot's administrator Assaf Clix. UChat's workspace had one member, the owner's CLIX login (`357951`, owner), read with `/team-members`.
+- **Invited** in Workspace Settings → Users (משתמשים): clixteam579@gmail.com, role admin (מנהל), as in Chatwoot. UChat's API has no invite call.
+  - Done in the UChat Chrome profile, started headless this time (port 9333), in a tab of my own. Chrome was closed at the end, as it was found.
+- **The invite email** ("New Invitation!", from UChat) reached clixteam579's Gmail, which the Gmail connector reads. Only read; nothing in the mailbox changed.
+- **Registered** from the invite's link, in a separate private browser context that shares no cookies with CLIX:
+  - name "Assaf Clix", and a generated 16-character password (UChat asks for upper and lower case, a number and a symbol);
+  - UChat's terms accepted.
+  - The password went to the owner in chat and is written nowhere.
+- **Profile language Hebrew**, like the owner's (UChat has no workspace language), read back after a reload.
+- **Proven:**
+  - `/team-members` lists CLIX (owner) and Assaf Clix (`358017`, admin).
+  - A logout, then a login with the email and password, landed in homies-uchat as Assaf Clix.
+  - The plan reads 2/2 users, the trial's limit.
+- **Not changed:** the four departments. Service still has only CLIX, so hand-overs still go to CLIX.
+- **Cleaned up:** the private session was logged out and discarded.
+- **Cost:** none. The trial includes two users, and Business ($15 a month) five.
+
 ### "Michael Simulated Run": the checklist's 30 messages with the bot's real replies, each reviewed ✓ / ✗ with a comment (owner: "make the checklist like a simulation so each reply have the check and x and a comment")
 - **No new spend:** built from the other session's checklist run, 30 messages for $1.25. That run used `wa_qa.py`'s Chat on the live code and prompt, Gemini 3.1 Pro and stand-in tools.
   - Its logs and chats were copied from that session's scratchpad into `local/artifacts/michael-simulation/run-2026-11-03/`, so they outlive it.
