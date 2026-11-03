@@ -544,6 +544,12 @@ one with english version").** `local/artifacts/michael-checklist-en/build.py` re
 Hebrew page's source, so a change to a test is made once and both pages show it. The messages to send stay
 Hebrew on both pages, because what is tested is the bot's answer to the Hebrew a tenant writes.
 
+**Yariv's Feedback Status is written for Yariv, in Hebrew (3 Nov evening, owner: "remove the one in the
+picture and make everything hebrew").** It is a status page about his points, not a to-do list, so the "what is
+still needed, and from whom" box was removed rather than translated. Its Hebrew uses the words of the owner's
+WhatsApp updates to him: OXS and ManyChat in Latin letters, אומניטלקום in Hebrew, and plain words instead of tech
+ones (no Meta, no API). It is written fresh in Hebrew, not word for word from the English it replaced.
+
 **The simulated run is a review of replies the bot really gave, not a prediction (3 Nov, "Michael Simulated
 Run").** Each reply comes from one run of the live code and prompt, with stand-in tools, saved as transcripts.
 It is reviewed as it stands. When the prompt changes, the page is out of date until a new paid run replaces it.

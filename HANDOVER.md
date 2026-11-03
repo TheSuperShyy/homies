@@ -33,7 +33,15 @@ appended to.
 >     - It refuses any English outside the run's own text.
 >     - `build_en.py` and `translations.json` still build the English page it replaced, as `index-en.html`. That file is not published, and is there only if the owner asks for an English twin.
 >   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
-> - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. Change `local/artifacts/yariv-feedback/items.json`, run `build.py` there, republish.
+> - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*).
+>   - **The "what is still needed, and from whom" box is gone,** on the owner's word. What each side owes lives here and in WORKLOG, not on the page.
+>   - **Shared by link (read `public`).** A republish needs `shared_live: "public"` and `artifact_title: "Yariv's Feedback Status"`. The name stays English in the gallery and the tab.
+>   - **Its words follow the owner's updates to Yariv.** OXS and ManyChat stay in Latin letters (as in his own documents), and אומניטלקום is in Hebrew. Meta's business check is "אישור העסק מול וואטסאפ". `build.py` refuses any other Latin text.
+>   - **Change it:** edit `local/artifacts/yariv-feedback/items.json` (Hebrew), run `build.py` there, then republish with `publish_files`.
+>     - `build_en.py` with `items_en.json` still builds the English page it replaced, as `index-en.html`. That file is unpublished, and is there only if the owner asks for English again.
+>   - **Still out of date on it, carried over unchanged** (the read-only check of 3 Nov, WORKLOG):
+>     - the OXS payment-notes point says "we only read from OXS", but the ticket mirror writes service calls into OXS for the owner's test number;
+>     - the caller-ID point says our request to אומניטלקום "is about to go out", but the 2 Nov email no longer asks for 077-6687949.
 > - **Not on Yariv's page:** the recording is back on since 26 Oct and he has not been told. The owner decides whether to tell him.
 >
 > **THE UCHAT VERSION OF THE BOT IS BUILT, BESIDE THE LIVE BOT (owner, 3 Nov: *"lets create a uchat version as well of the chatbot"*).** WORKLOG 3 Nov; `docs/features/21-uchat-migration/feature.md`, "The UChat version".

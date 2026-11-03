@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### "Yariv's Feedback Status" in Hebrew, without the still-needed box (owner, a screenshot of the box: "remove the one in the picture and make everything hebrew")
+- **Republished at the same link:** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY, version `1793714588-73fa` over `1793707263-1210`.
+  - It is shared by link (read `public`), so the publish named it (`shared_live`).
+  - The artifact's name stays "Yariv's Feedback Status".
+- **Removed:** the "What is still needed, and from whom" box (six asks of Homies, Yariv and Omnitelecom), with its data (`open`) and its CSS. `build.py` refuses it coming back.
+- **Hebrew, right to left:**
+  - the kicker, the title ("ההערות של יריב, ומה עשינו בעקבותיהן"), the lede, the four tiles and the status pills (בוצע, בוצע חלקית, ממתין ל…, הוחלט אחרת);
+  - the four section names (צ'אטבוט (וואטסאפ), סוכן קולי: שיחות נכנסות, סוכן קולי: שיחות גבייה, קו הטלפון (אומניטלקום));
+  - all 27 points, asked and done, and the dates ("12 באוגוסט");
+  - the footer (the 26 Oct document is "האפיון המעודכן", as Yariv's own title calls it).
+- **The words follow the owner's updates to Yariv:**
+  - OXS and ManyChat stay in Latin letters, as in his own documents, and אומניטלקום is in Hebrew;
+  - Meta's business check is "אישור העסק מול וואטסאפ";
+  - the representative button is "כפתור הנציג האנושי", in Yariv's own words from the alignment document.
+- **Same content:** the same 27 points in the same order, with the same statuses (13 done, 10 partly, 2 waiting, 2 decided), checked against the English source. Nothing was corrected.
+  - The two points the read-only check found out of date are carried over as they were: the OXS "we only read" line, and the caller-ID request "about to go out". HANDOVER lists them.
+- **Source:** `local/artifacts/yariv-feedback/`. `items.json` and `build.py` now hold the Hebrew; `build.py` refuses Latin text other than OXS and ManyChat.
+  - The English is kept as `items_en.json` and `build_en.py`, writing `index-en.html`, unpublished. Before the switch it was checked to rebuild the published English page byte for byte.
+- **Checked before publishing:** rendered headless (Chrome) at 1280 px and 390 px.
+  - 27 points in 4 sections, `dir=rtl`, the tiles 13 / 10 / 2 / 2.
+  - No still-needed box, no sideways scroll and no script errors.
+  - The only Latin text left is OXS and ManyChat.
+
+### Read only: the number to call Michael (owner: "what is the homies number i can call")
+- **Answered:** the office line 077-6687949 (from abroad +972 77-668-7949), then 9. That is Omni's temporary shortcut of 25 Oct to extension 208.
+- **Checked first, all read only:**
+  - `vapi_sip.py`: the 208 address `e9f95429` is on the live account, routed per call (`assistant-request`), with its login set;
+  - `vapi_transfer.py --balance`: the wallet is in credit;
+  - the last 8 calls on the live account: the newest real one was 2 Nov, 14:48 UTC, inbound, answered by the incoming agent (27 s, the caller hung up).
+- Nothing was placed or changed.
+
 ### "Michael Simulated Run" made Hebrew only (owner: "make this hebrew no english")
 - **Republished at the same link:** https://claude.ai/artifact/6MuTsoP1rojWBmMvxS4nqk, version `1793713985-075a` over `1793711643-a759`.
   - The page is shared by link (read `public`), so the publish named it (`shared_live`).
