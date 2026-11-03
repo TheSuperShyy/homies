@@ -40,6 +40,9 @@ WHAT DIFFERS FROM LIVE, AND WHY
     message has a payment word (`A payment word?`). Its note could go out only
     then anyway (`A word first?` tests the same words on the same text), so the
     replies are the same and a message without one is answered about 6 s sooner.
+  - Speed (quicker()): `Let them finish` waits 2 s, and none after a button tap
+    (live: 4 s); the two reads of the way in go out at once; UCHAT_MODEL, if
+    set, replaces the model (unset: live's 3.1 Pro).
 
 SAFETY
   The live workflows are only read (GET). write() refuses every live and every
@@ -121,6 +124,9 @@ def config(apply):
     cfg = {"n8n": e["N8N_BASE_URL"].strip().rstrip("/"),
            "flow_ns": e.get("UCHAT_FLOW_NS", ""),
            "menu_node": e.get("UCHAT_MENU_NODE", "") or "Michael",
+           # The copy's model (quicker()); empty keeps live's. 3 Nov: 3.7 Flash was tried
+           # for speed and not taken (about 15 s, and inventions; WORKLOG 3 Nov).
+           "model": e.get("UCHAT_MODEL", "").strip(),
            # One step per menu button (see MAP_WRITE): "Michael", "Michael 2", "Michael 3".
            "menu_nodes": [s.strip() for s in (e.get("UCHAT_MENU_NODES", "") or "Michael,Michael 2,Michael 3").split(",")
                           if s.strip()],
@@ -433,16 +439,18 @@ def uchatify_handover(live, cfg):
 
 FROM_UCHAT = r"""
 // UChat's External Request posts {user_ns} and nothing else. Who is writing and
-// what they wrote were read back from UChat by the two nodes before this one, so
-// a tap reads the same as typed text and the message id is UChat's own, the id
-// `Anything newer?` will see. This hands Sort the Chatwoot event it has always
-// read, so Sort and everything after it are the live bot's, unchanged.
+// what they wrote were read back from UChat by the node before this one (two
+// items, read at once: the contact, then its messages), so a tap reads the same
+// as typed text and the message id is UChat's own, the id `Anything newer?` will
+// see. This hands Sort the Chatwoot event it has always read, so Sort and
+// everything after it are the live bot's, unchanged.
 //
 // Only test phones get through: the copy runs the LIVE tools.
 const TEST_PHONES = %(phones)s;
 const hook = $('WhatsApp').first(1).json;
-const who = $('Who is this? (UChat)').first().json || {};
-const msgs = ($input.first().json || {}).payload || [];
+const both = $input.all();
+const who = (both[0] && both[0].json) || {};
+const msgs = ((both[1] && both[1].json) || {}).payload || [];
 const sender = (who.meta || {}).sender || {};
 const phone = String(sender.phone_number || '').replace(/\D/g, '');
 const newest = msgs.filter(m => m.message_type === 0).sort((a, b) => b.id - a.id)[0];
@@ -470,28 +478,54 @@ def facade_get(name, pos, url, cfg):
                            "genericAuthType": "httpHeaderAuth", "options": {"timeout": 15000}}}
 
 
+TWO_READS = r"""
+// Both reads need only the contact id, so they go out together: the next node
+// sends one request per item, all at once (3 Nov, for speed: one after the
+// other they took about a second).
+const conv = (String((($input.first().json || {}).body || {}).user_ns || '').match(/u(\d+)$/) || [null, '0'])[1];
+const base = %(base)s + conv;
+return [{ json: { url: base + '/info' } }, { json: { url: base + '/messages' } }];
+"""
+
+
 def way_in(wf, cfg):
-    """WhatsApp (POST) -> Who is this? -> Which message? -> From UChat -> Sort."""
+    """WhatsApp (POST) -> Ask UChat -> Who and what? (UChat), both reads at once -> From UChat -> Sort."""
     hook = next(n for n in wf["nodes"] if n["name"] == "WhatsApp")
     x, y = hook["position"]
-    conv = "(String($json.body.user_ns || '').match(/u(\\d+)$/) || [null, '0'])[1]"
-    base = cfg["facade"] + "/api/v1/accounts/2/conversations/"
-    who = facade_get("Who is this? (UChat)", free_spot(wf["nodes"], x, y + 240),
-                     "={{ '%s' + %s + '/info' }}" % (base, conv), cfg)
-    wf["nodes"].append(who)
-    which = facade_get("Which message? (UChat)", free_spot(wf["nodes"], x + 240, y + 240),
-                       "={{ '%s' + $json.id + '/messages' }}" % base, cfg)
-    wf["nodes"].append(which)
+    ask = code_node("Ask UChat", free_spot(wf["nodes"], x, y + 240),
+                    js(TWO_READS, base=cfg["facade"] + "/api/v1/accounts/2/conversations/"))
+    wf["nodes"].append(ask)
+    both = facade_get("Who and what? (UChat)", free_spot(wf["nodes"], x + 240, y + 240), "={{ $json.url }}", cfg)
+    wf["nodes"].append(both)
     frm = code_node("From UChat", free_spot(wf["nodes"], x + 240, y + 120), js(FROM_UCHAT, phones=cfg["test_phones"]))
     wf["nodes"].append(frm)
     to = lambda name: [{"node": name, "type": "main", "index": 0}]  # noqa: E731
     c = wf["connections"]
     assert [[t["node"] for t in br] for br in c["WhatsApp"]["main"]] == [["Sort"], ["Sort"]], \
         "the live trigger's wiring changed; read it before re-running"
-    c["WhatsApp"]["main"] = [[], to("Who is this? (UChat)")]  # GET goes nowhere; UChat only POSTs
-    c["Who is this? (UChat)"] = {"main": [to("Which message? (UChat)")]}
-    c["Which message? (UChat)"] = {"main": [to("From UChat")]}
+    c["WhatsApp"]["main"] = [[], to("Ask UChat")]  # GET goes nowhere; UChat only POSTs
+    c["Ask UChat"] = {"main": [to("Who and what? (UChat)")]}
+    c["Who and what? (UChat)"] = {"main": [to("From UChat")]}
     c["From UChat"] = {"main": [to("Sort")]}
+
+
+def quicker(wf, cfg):
+    """The UChat copy's speed settings (3 Nov, owner: "its too long i need like 10s max").
+
+    - The model, only when UCHAT_MODEL is set: it feeds all three of the copy's
+      agents, as 3.1 Pro does on live. Empty keeps live's (3 Nov: 3.7 Flash with
+      thinking low answered in about 15 s on this path, with inventions).
+    - `Let them finish` waits 2 s for a typed message (live: 4) and not at all
+      after a button tap, which is one finished action (`tap_now`, from Sort).
+    """
+    nodes = {n["name"]: n for n in wf["nodes"]}
+    model = nodes["OpenRouter"]
+    assert model["type"] == "@n8n/n8n-nodes-langchain.lmChatOpenRouter", "the model node changed on live"
+    if cfg["model"]:
+        model["parameters"]["model"] = cfg["model"]
+    wait = nodes["Let them finish"]["parameters"]
+    assert wait.get("amount") == 4 and wait.get("unit") == "seconds", "Let them finish changed on live: %r" % wait
+    wait["amount"] = "={{ $json.tap_now === true ? 0 : 2 }}"
 
 
 PAY_GATE_NOTE = ("UCHAT copy only, for speed: Worth a word? runs only on a message with a payment word. "
@@ -553,6 +587,7 @@ def uchatify_bot(live, cfg):
     chat_log_from_chatwoot(out, {"chatwoot_url": cfg["facade"], "account_id": 2, "cred_admin": cfg["cred_door"]})
     way_in(out, cfg)
     word_only_on_pay(out)
+    quicker(out, cfg)
     leftover = [n["name"] for n in out["nodes"] if CW_HOST in json.dumps(n.get("parameters") or {})]
     assert not leftover, "Chatwoot calls left in the copy: %s" % leftover
     copy_note(out, live["name"])

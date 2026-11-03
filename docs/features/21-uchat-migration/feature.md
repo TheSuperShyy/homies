@@ -46,6 +46,7 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 - **A private note becomes the contact's `team_note` field,** because UChat's API has no internal note. Department labels become tags. A team becomes an agent group once `UCHAT_GROUPS` maps it (no groups yet).
 - **No 15-minute hand-back copy.** UChat's own pause after a staff reply does that job (30 minutes, staff can extend).
 - **`Worth a word?` runs only on a message with a payment word** (`A payment word?`, 3 Nov). Its note could go out only then anyway, so the replies are the same, and every other AI reply comes about 6 s sooner.
+- **`Let them finish` waits 2 s, and none after a button tap** (live: 4 s), and the way in reads the contact and its messages at once (3 Nov, for speed). The model stays live's: 3.7 Flash was tested and not taken (WORKLOG 3 Nov).
 
 **Proven on 3 Nov, with a contact that does not exist (no AI was called):**
 - the translator refuses a call without the door (401);

@@ -503,7 +503,14 @@ word** (3 Nov, owner: "lets make the response of it faster"). That is the one
 place where it is not the live bot, and only in time: the note could go out only
 with a payment word anyway. A 3 Nov turn's 33 s were Gemini thinking (19 s:
 1,193 tokens for a 76-character reply), `Worth a word?` (6 s), the burst wait
-(4 s) and UChat (about 2.5 s). **UChat's `send-text` sends as an agent,** and an agent's
+(4 s) and UChat (about 2.5 s). **10 s is not reachable on the UChat path with
+this prompt** (3 Nov, tested; owner: "i need like 10s max"). Each model call on the
+bot's 15.5k-token request takes about 3 s before its first word, even on 3.7 Flash.
+UChat takes about 3 s to hand us a message, and many replies take two or three
+calls (tools, Send's rewrites). 3.7 Flash at thinking low answered in a median
+7.3 s per reply (about 15.6 s on the phone) and invented things 3.1 Pro was chosen
+against, so it is not used. OpenRouter's thinking level is noisy (low is not a cap),
+and n8n's OpenRouter node cannot send it. **UChat's `send-text` sends as an agent,** and an agent's
 message pauses the bot for that contact for 30 minutes, so the bot's replies go
 through `send-content` with `send_as_agent: 0`. **A message in UChat's log is
 not a delivered one:** a sent message carries WhatsApp's id (`mid`, "wamid…");

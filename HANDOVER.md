@@ -22,9 +22,15 @@ appended to.
 >     - **The first account ("clix") keeps its leftovers:** the "Michael" draft flow, 9 tags, 10 fields, and the empty "homies" workspace.
 >   - **WHATSAPP WORKS SINCE 3 Nov, 09:50 UTC, ON ITS OWN ISRAELI NUMBER:**
 >     - **Proven on the owner's phone:** the greeting with both buttons, a tap, and the AI's answer.
->     - **Faster since 10:08 UTC:** `Worth a word?` runs only on a message with a payment word (`A payment word?`), so other AI replies come about 6 s sooner with the same text.
->       - The rest of an AI reply (about 27 s) is Gemini thinking (about 19 s), the 4 s burst wait, and about 3 s of UChat and sending.
->       - The next lever is a lower thinking effort, which needs a paid test first.
+>     - **Faster since 10:08 and 10:35 UTC, with the same model (3.1 Pro):**
+>       - `Worth a word?` runs only on a message with a payment word (`A payment word?`), about 6 s;
+>       - `Let them finish` is 2 s for typed text and none after a tap (live: 4 s);
+>       - the way in reads the contact and its messages at once.
+>       - An AI reply should take about 24 s after a tap and 26 s typed (35 s before). Gemini's thinking is the bulk (about 19 s).
+>     - **The owner wants 10 s at most. It is not reachable on this path with this prompt** (WORKLOG 3 Nov):
+>       - 3.7 Flash at thinking low tested at a median of 15.6 s on the phone, with invented answers, so it is not used;
+>       - 3.1 Pro at thinking low measured 8.7 s on one call against 18.8, and is untried in conversations;
+>       - n8n's OpenRouter node cannot send a thinking level.
 >     - the owner's Twilio number (`+972 53…29`, in `D:\work\Apify-v3\.env`, never in this repo), in the WhatsApp account "hadas 1" / "ASTDX - Smart Link" (`2117787955519632`), number id `1460284440496077`, two-step PIN `UCHAT_WA_PIN`;
 >     - connected through UChat's WhatsApp Cloud and linked to the bot.
 >     - **The live Chatwoot bot keeps the test number.** Nothing was switched.

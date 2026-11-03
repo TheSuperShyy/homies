@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The 10-second target: 3.7 Flash tried and not taken; the UChat bot's wait and reads trimmed (owner: "its too long i need like 10s max", "ok try it")
+- **Asked:** a reply within 10 s. Proposed in chat: 3.7 Flash, a 2 s wait (none after a tap), the two reads at once, after a test with Claude playing tenants (about $0.25, capped at $1). The go: *"ok try it"*.
+- **3.7 Flash thinks a lot by default too** (the bot's real tap request, one call each):
+  - Flash: 9.0 s cold and 6.9 s warm (906 and 635 thinking tokens). 3.1 Pro: 18.8 s (1,193 tokens).
+  - With `reasoning: {effort: low}` sent in the request: Flash 4.2 s (179 tokens), Pro 8.7 s (709).
+  - The setting is noisy: on a small question, low and default each ranged from about 90 to 440 thinking tokens.
+  - n8n's OpenRouter node cannot send it, and its credential has no address field, so no relay can sit behind it. The OpenAI-style node's credential has one (`url`).
+- **The test** (`wa_qa.py say`, 8 free tenants from `wa_qa_menu_buttons.json`, each played by a Claude agent blind to the rubric):
+  - the bot's live code and prompt, with 3.7 Flash at thinking low sent directly; tools stood in, nothing written;
+  - 57 replies, $0.65 (about $0.75 with the probes).
+  - **Speed:** Flash's own time per reply had a median of 7.3 s (max 58.8 s). With the UChat path around it (about 5.4 s, plus the 2 s wait for typed text), the phone would wait a median of 15.6 s, 90th percentile 21 s. 1 reply of 57 came under 10 s.
+    - By model steps: one, 11.3 s median; two, 16.3 s; three, 20.2 s. A step is a tool call, or a rewrite after Send's checks rejected a draft.
+  - **Quality:** the deck's 57 expectations were all met. 34 rubric flags, among them 10 replies without a closing question, 7 parentheses, and 3 feminine forms without a cue.
+    - **Read by hand:** the Hebrew is natural, and it moved to the feminine on "שוכחת". But there were honesty slips of the kind 3.1 Pro was chosen against:
+      - to the cheque dispute, "בשלב הזה את לא צריכה לשלם שוב", and "רשמתי… לוודא מול משה" with no tool that turn;
+      - on the standing order, a fault ticket and an invented "באשראי זה בדרך כלל הכי מהיר ופשוט, כי לא צריך אישורים מהבנק".
+    - Two tenants gave up: on the gas smell, at the fixed emergency line; on the gate, at a person who never comes. Both are live's design, not Flash's.
+  - **So Flash is not on the UChat bot.**
+- **Put live on the UChat bot at 10:35 UTC** (`n8n_uchat.py`, quicker() and way_in(); the model stays 3.1 Pro):
+  - **`Let them finish`:** 2 s for typed text, and none after a button tap (`tap_now`). Live keeps 4 s.
+  - **The way in reads the contact and its messages at once** (Ask UChat → Who and what? (UChat), two items).
+    - Checked offline, 11 cases.
+    - On n8n with a contact that does not exist (run 150712): both translator calls started together, 0.91 s for the pair, and the contact was turned away as it should be.
+- **What a reply on the UChat bot should take now:** about 24 s after a tap and 26 s typed (35 s at 09:50). Gemini 3.1 Pro's thinking is still the bulk. The owner's next message is timed.
+- **10 s is not reachable on this path with this prompt:**
+  - each call on the 15.5k-token request takes about 3 s before its first word, even on Flash;
+  - UChat takes about 3 s to hand us a message;
+  - a reply often needs two or three calls.
+- **Tooling:**
+  - `wa_qa.py` takes `WA_QA_BOT_MODEL` and `WA_QA_BOT_REASONING`, and records each call's seconds;
+  - TENANT.md's repo path was fixed (`D:/work/Homie`);
+  - the run's files are in `local/uchat-prep/qa-flash-2026-11-03/`.
+
 ### The UChat bot answers about 6 seconds sooner, with the same replies (owner: "lets make the response of it faster")
 - **Where the time went** in the 09:50 tap (run 150630): 33 s from the message reaching n8n to the reply going out.
   - **"Answer the resident", Gemini 3.1 Pro: 19.0 s.** 1,193 tokens came back for a 76-character reply, so nearly all of it is the model thinking. The OpenRouter node cannot lower that (CONTEXT, "The model is Gemini 3.1 Pro").

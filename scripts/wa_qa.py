@@ -59,6 +59,7 @@ import random
 import re
 import subprocess
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -1202,7 +1203,13 @@ def diff(run, against):
 # is written anywhere. The transcripts land where `grade` and `report` read them.
 # 19 Oct: Gemini 3.1 Pro Preview, 1.0, 8192 (scripts/n8n_whatsapp_model.py). A `play`
 # run costs about ten times the 5 Oct one; PLAY_CAP still stops it at a dollar.
-BOT = {"model": "google/gemini-3.1-pro-preview", "temperature": 1.0, "max_tokens": 8192}
+# 3 Nov: WA_QA_BOT_MODEL tries another model on the same code and prompt (the
+# UChat bot's speed test, owner: "its too long i need like 10s max"). Every call's
+# seconds go into its usage record, so a run also says how long each reply took.
+BOT = {"model": os.environ.get("WA_QA_BOT_MODEL") or "google/gemini-3.1-pro-preview",
+       "temperature": 1.0, "max_tokens": 8192}
+if os.environ.get("WA_QA_BOT_REASONING"):   # e.g. low: OpenRouter's thinking level, sent in the request
+    BOT["reasoning"] = {"effort": os.environ["WA_QA_BOT_REASONING"]}
 RESIDENT_MODEL = "openai/gpt-4.1-mini"
 MEMORY_PAIRS = 12           # memoryBufferWindow contextWindowLength: k exchanges
 PLAY_CAP = 1.00             # dollars for the whole run
@@ -1380,11 +1387,11 @@ class Chat:
             write(tmp, json.dumps(body, ensure_ascii=False, indent=1))
             os.replace(tmp, path)
 
-    def bill(self, who, u):
+    def bill(self, who, u, secs=None):
         self.st["usage"].append({"who": who, "in": u.get("prompt_tokens", 0), "out": u.get("completion_tokens", 0),
                                  "cached": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0),
                                  "reasoning": (u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0),
-                                 "cost": float(u.get("cost") or 0)})
+                                 "cost": float(u.get("cost") or 0), "secs": round(secs, 2) if secs else None})
         spent = self.spent_run()
         if spent > PLAY_CAP:
             self.save()
@@ -1392,9 +1399,10 @@ class Chat:
 
     def model(self, sys_text, user_text, who):
         from voice_qa import openrouter
+        t0 = time.time()
         msg, u = openrouter(self.key, dict(BOT, messages=[{"role": "system", "content": sys_text},
                                                           {"role": "user", "content": user_text}]))
-        self.bill(who, u)
+        self.bill(who, u, time.time() - t0)
         return (msg.get("content") or "").strip()
 
     def answer(self, inject):
@@ -1406,8 +1414,9 @@ class Chat:
         msgs.append({"role": "user", "content": inject})
         calls = []
         for _ in range(10):
+            t0 = time.time()
             msg, u = openrouter(self.key, dict(BOT, messages=msgs, tools=self.fns))
-            self.bill("answer", u)
+            self.bill("answer", u, time.time() - t0)
             tc = msg.get("tool_calls") or []
             msgs.append({k: v for k, v in msg.items() if k in ("role", "content", "tool_calls")})
             if not tc:
@@ -1587,7 +1596,7 @@ unless the card says otherwise:
 ## How to send
 
 Start with your card's opening, exactly: the hello, then the tap on your button. After that you are
-free. Every message is one command, run from the repo root (C:/Users/Acer nitro 5/Desktop/Homie),
+free. Every message is one command, run from the repo root (D:/work/Homie),
 with the JSON on stdin:
 
     python scripts/wa_qa.py say --run "<run dir>" --deck scripts/wa_qa_menu_buttons.json < msg.json
