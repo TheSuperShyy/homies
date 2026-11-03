@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The owner: the bot has moved from Chatwoot to UChat (in the day's report: "add also that we migrated from chatwoot to uchat and currently runnning in uchat")
+- **The report** (`/reporter`, for 3 Nov) now opens with "Migrated the WhatsApp assistant from Chatwoot to UChat, and it is now running in UChat on its own Israeli number". It also names Chatwoot where it had said "our current inbox".
+- **The owner's word supersedes the 18 Oct "we stay on Chatwoot"** and this morning's "ready, not started". CONTEXT, HANDOVER and memory now say the bot in use is the UChat copy (`mKheBsTxtcMhPxu7`, the Israeli number, open to everyone).
+- **As found, nothing switched:** the Chatwoot copy (`u2JjrbcNPYyyh3yl`) still runs on the US test number. Voice team notes and ticket notices still go through Chatwoot. Nothing was changed tonight.
+
 ### Read only: is the payment link template approved? (owner: "also check if the payment link is approved")
 - **`wa_templates.py`:** `payment_link_he` is APPROVED (he, UTILITY) on WABA `2129102787704530`, as is `ticket_resolved_he`. There are 7 templates on the account, the rest Meta's samples.
 - **The number's `health_status`, 15:55 UTC:**
