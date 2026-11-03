@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### WhatsApp linked inside UChat, but Meta still sends the number to Chatwoot (owner: "nvm lets link uchat to the cloud api we have", then "no just use it")
+- **Before, recorded for rollback:**
+  - the number's own webhook is Chatwoot's `/webhooks/whatsapp/+15550459005`;
+  - the HOMIES app's callback is n8n `homies-whatsapp`;
+  - the apps subscribed to the account are HOMIES and "WA DevX Webhook Events 1P App".
+- **The token, the owner's choice:**
+  - UChat asked for a Meta access token. The owner was told that ours is a HOMIES system user token that never expires, with `business_management` and every `whatsapp_*` scope on all targets (read with `debug_token`), and that a token limited to the test account was the safer road.
+  - The owner: *"no just use it"*.
+  - **UChat now holds that token.** If it is ever replaced, UChat's WhatsApp number must get the new one too.
+- **In UChat (homies-uchat):**
+  - WhatsApp → WABA, provider "WABA (Deprecated)", V2 API on;
+  - `+15550459005`, the token typed from `.env` by a script and never shown, the account id, the number id, and `https://graph.facebook.com`. The row reads "Active".
+  - Then Omni-Channel → WhatsApp → Link → the number. UChat asked to type LINK, because linking removes the channel's own contacts, and it had none. It is now linked to "homies-chatbot".
+- **After, read back from Meta:** the routing is unchanged, still Chatwoot. UChat's WABA provider sets no webhook and shows none: its row's buttons copy the token back, update it, or unlink.
+  - **So the live bot still answers WhatsApp, and UChat receives nothing yet.**
+- **UChat's own guide:** its **WhatsApp Cloud** screen shows a webhook address and token for the Meta app, after a Facebook login ("Connect WhatsApp Cloud", Meta's permission popup).
+- **Next:**
+  1. The owner's Facebook login there.
+  2. Then the number's own webhook pointed at UChat's address. That is a Meta write, and the owner's "link it" covers it.
+  3. Then a "היי" from the owner's phone.
+  - Unknown: whether a Meta test number is offered in that list. If not, UChat support is the road to the WABA provider's address.
+  - **Rollback:** Chatwoot's `Whatsapp::WebhookSetupService#register_callback` for inbox 1 (`rails runner`, 2 Nov).
+
 ### The UChat version answers in UChat's web chat, on a new UChat account (owner: "lets create a new one", "i open a new account", "its already in check it")
 - **The account:** the owner opened a new UChat account, "CLIX", workspace **homies-uchat**, on the Pro free trial (13 days left).
   - I had first made a workspace "homies" in the "clix" account to test the trial. The owner stopped that, and the "homies" workspace stays there, empty.

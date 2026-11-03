@@ -20,6 +20,12 @@ appended to.
 >     - **Proven:** "היי" got the live greeting and the two buttons, with no AI call (execution 150459).
 >     - **Not yet tried, each a paid AI test:** a tap, a real question, the hand-over.
 >     - **The first account ("clix") keeps its leftovers:** the "Michael" draft flow, 9 tags, 10 fields, and the empty "homies" workspace.
+>   - **WhatsApp, 3 Nov, NOT SWITCHED YET:**
+>     - `+15550459005` is added in UChat (WABA provider, with our system-user token on the owner's word: *"no just use it"*) and linked to the bot.
+>     - **But Meta still sends the number to Chatwoot,** so the live bot still answers. UChat's WABA provider sets and shows no webhook.
+>     - **Next:** the owner's Facebook login on UChat's "Connect WhatsApp Cloud", which shows UChat's webhook; then point the number's override at it.
+>     - **Rollback:** Chatwoot's `register_callback`.
+>     - **UChat now holds our Meta token:** update it there if the token is ever replaced.
 >   - **The builder can be driven from here:** a local Chrome with the owner's UChat login (`local/uchat-prep/browser-profile`), over Chrome's own protocol. Playwright 1.63 cannot attach to Chrome 151.
 > - **Then from here:** `--wire`, `--tester <user_ns>`, and a "היי" (the menu, no AI).
 > - **Not in it:** photos on tickets, voice notes, the dashboard's log, and WhatsApp, which needs a number in UChat.

@@ -485,6 +485,11 @@ UChat version answers no one until the workspace is on Business ($15 a month).
 Since 3 Nov it runs on a new UChat account's Pro trial (workspace
 "homies-uchat", until about 16 Nov). After that it needs Business, or it
 stops answering.
+**UChat holds our Meta system-user token since 3 Nov** (the owner chose it over
+a scoped one), in its WhatsApp number settings: replace it there too if that
+token is ever rotated. UChat's "WABA (Deprecated)" provider stores the token
+and links the number but sets no Meta webhook and shows none; the webhook
+address comes from its WhatsApp Cloud screen, after a Facebook login.
 UChat's builder can be driven from here only over Chrome's own protocol:
 Playwright 1.63 cannot attach to Chrome 151.
 
