@@ -8,6 +8,20 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 3 Nov, 14:23:36 UTC: the incoming phone agent handles a request for a manager like the chatbot, and speaks only for itself** (owner: *"i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything"*). WORKLOG 3 Nov; `docs/assistant/demo-inbound.md`, "3 Nov".
+>   - **What it does now:**
+>     - A request for a manager is noted at once (notify_team, caller_request) and quietly. The caller hears that Michael cares and is doing all he can, then a gentle "what happened?" if the matter is not known yet.
+>     - Once the matter is known, even from before the request, he handles it himself, for example opening the request.
+>     - Insisting gets reassurance and the question asked another way. "When will the manager call?" gets an honest "no time" and what is true now.
+>     - Nothing he says has a team, manager or management in it, and he never says he passed something on.
+>   - **Changed:** the prompt (7,410 → 8,811 characters), and notify_team's own text plus the "team note" wording in open_request, get_balance and get_service_info. Intake only: the debt agent's tools are byte-identical, and it was not pushed.
+>   - **Pushed** with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`, after comparing every field with the live agent. Read back: prompt and tools equal the repo, voice `ba765d50`, model gpt-5.6-sol.
+>   - **Checked with Claude only** (five cases, no spend), so it checks the text, not gpt-5.6-sol. **Owed: the owner's own call:** 077-6687949, then 9, and ask for a manager.
+>   - **Not changed:**
+>     - the debt-call agent, which on a request for a person still says someone from the team will call back, and ends the call;
+>     - the end-of-call summary, which on `01a1a1ba` said "ולכן הועבר למנהל" when nothing was transferred.
+>   - **Undo:** revert the 3 Nov edits to `docs/assistant/demo-inbound.md` and `scripts/vapi_tools.py`, then run the same push.
+>
 > **PAGES FOR THE OWNER (3 Nov), private until the owner shares them unless noted:**
 > - **"Michael Test Checklist"** https://claude.ai/artifact/H8hD1pWFvKmQbiyMuicgFx (slug `82a53417-4856-4b7e-bca1-374b99bbf567`): 29 tests for testers on the UChat number, run through the bot first on 3 Nov (4 tests fixed). That run found the bot's own slips, listed in WORKLOG 3 Nov: "the team", an invented "you said it got worse", an implied call back from accounting, telling the tester the request was recorded, the masculine after a feminine cue, and "anything else?" while the tenant waits. Their marks are in its db, `marks/<user id>` (read with `db_list`, collection `marks`). Testers need edit access for their marks to be shared. **Its expected answers mirror the live prompt: when the prompt changes, update the page** (source `local/artifacts/michael-checklist/index.html`, republish with `edit_version`).
 >   - **Version `1793710110-a6f4` (3 Nov, owner: "fix the checklist we have"), with the source file matched:**

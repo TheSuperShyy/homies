@@ -214,7 +214,7 @@ def _open_request(location):
         props["name_declined"] = {
             "type": "boolean",
             "description": "true only when they were asked for their name, heard once "
-                           "that it is so the team knows who to contact, and still "
+                           "that it is so the request is under their name, and still "
                            "would not give it.",
         }
         props["reporter_phone"] = {
@@ -243,13 +243,13 @@ def _open_request(location):
         # building finally arrives. Inbound only: the debt agent has no
         # notify_team, and a description naming a tool the assistant does
         # not carry is the 19 Aug failure (see the intake list below).
-        lead = ("Letting the team know does NOT open a ticket. If you already "
+        lead = ("A note (notify_team) does NOT open a ticket. If you already "
                 "called notify_team and the address only arrives afterwards — "
                 "which is what an emergency looks like, because the person "
                 "comes before the address — that is the moment to call this.\n"
                 "A resident who wants to pay, asks how or where to pay, or wants a "
                 "payment arrangement gets a ticket too: type `payment`, their words, "
-                "their building and apartment. The team note (notify_team, reason "
+                "their building and apartment. The note (notify_team, reason "
                 "payment) goes as well; both happen, either order.\n"
                 # 16 Sep, the client's review. The webhook verifies the address
                 # on voice now, as on WhatsApp since 23 Aug (index.ts, the
@@ -278,7 +278,7 @@ def _open_request(location):
                 "need_phone means this call came with no number of its own: ask for "
                 "a number to reach them, read it back in words, and call again with "
                 "it as reporter_phone. Someone who will not give a name or a number, "
-                "after hearing once that it is so the team knows who to contact, "
+                "after hearing once that it is so the request is under their name, "
                 "still gets the ticket: name_declined or phone_declined true.\n")
     return _fn(
         "open_request",
@@ -550,22 +550,37 @@ INTAKE_TOOLS = [
     # reply is needed to speak the next sentence. Behind it, on the intake
     # assistant only, the server posts the note into Chatwoot -- the same
     # team mention the WhatsApp bot makes -- so "the team knows" is true.
+    #
+    # 3 Nov: one voice, and a request for a manager the chatbot's way (owner:
+    # "i want the voice agent to be sounding like the chatbot when the person
+    # wants a manager it will act like how the chatbot handles everything").
+    # The 14:04 UTC call asked for a manager and heard "עדכנתי את הצוות ...
+    # ויכול גם לפתוח עכשיו פנייה", which is what this text asked for ("what the
+    # caller hears from you afterwards: that you have let the team know"). The
+    # WhatsApp bot's notify_team has said since 29 Oct (epoch 86,
+    # n8n_whatsapp_ionly.NOTE_EDITS) that a note is a quiet record and nobody
+    # else is in the reply; this is that, in phone terms. The server side is
+    # unchanged: the note still reaches Chatwoot.
     _fn(
         "notify_team",
-        "Let the right Homies team know about something you cannot finish on this "
-        "call, and keep the call. This is not a transfer: nobody is connected, nobody "
-        "is put through, the caller stays with you, and the team reads the note in "
-        "its own time.\n"
+        "Leave a note in Homies' system about something you cannot finish yourself "
+        "on this call, and keep the call. A note is a quiet record, not a transfer "
+        "and not a message to anyone: nobody is connected, nobody is put through, and "
+        "you stay the only one the caller deals with.\n"
         "Call it the moment the caller's ask is past you: paying dues or arranging a "
         "payment (that one is also a ticket, open_request with type `payment`; put "
         "its number in this description when you have it), a charge they dispute, a "
         "document they need (invoice, receipt, "
         "confirmation), moving in or out or a change of tenant, a contract, a price "
-        "quote, the committee's own business, a request to speak with a person, a "
+        "quote, the committee's own business, a "
         "caller you cannot understand and who cannot understand you (reason "
         "`language`), or anything else only a person at Homies can complete. A plain "
         "how-much-do-I-owe question is get_balance's; a fault is open_request's; a "
         "ticket's status is get_request_status's. Those you do yourself.\n"
+        "A request to speak with a manager or a person: call this right away (reason "
+        "caller_request, with whatever they have said). Like every note it is quiet: "
+        "what they hear from you is that you care and are doing all you can to help "
+        "them, never that someone has been told.\n"
         # 16 Sep, the client's review: no national numbers and no safety
         # instructions from the bot. The note and the ticket are the whole
         # response to an emergency, so they come first.
@@ -577,22 +592,25 @@ INTAKE_TOOLS = [
         "the ticket and does not replace it: the ticket (open_request, urgency "
         "emergency, as soon as you know where) and this both happen, and the "
         "order between them does not matter.\n"
-        "CALL IT BEFORE the sentence that tells them the team knows. That sentence "
-        "must never be said without this call behind it: calling this is the only "
-        "thing that tells the team; saying that you told them tells nobody. Do not "
-        "ask them to confirm first; the ask itself is the reason to call.\n"
+        "Saying that you recorded something records nothing: only this call does, so "
+        "it comes before any sentence about it. Do not ask them to confirm first; the "
+        "ask itself is the reason to call.\n"
         "Once per matter, not per turn: a second question about the same thing is "
         "not a second note. A different matter later in the same call is. And if "
         "they tell you afterwards how to reach them — a number, the building and "
         "apartment — call it again with the same reason and that in the "
         "description: the team sees the addition, nothing is duplicated.\n"
-        "What the caller hears from you afterwards: that you have let the team know, "
-        "in your own words, and what you can still do for them now. Never THAT they "
-        "will get back to them (you do not know; the team may handle it without a "
-        "call), never who, never when, never what the team will do, never that help "
-        "is on the way. Never the office phone unless they ask how to reach the "
-        "office. Never which team; `department` is your judgment and is not spoken. "
-        "This ends nothing: do not say goodbye on it.",
+        "What the caller hears from you afterwards is about you and their matter, in "
+        "your own words, in the same turn. After a manager request: ask what is going "
+        "on, or do it, as the one handling it. After a matter only a person at Homies "
+        "can finish: that you have recorded their request, then what is still missing "
+        "from it (when, how much, what exactly), one question at a time; only when "
+        "nothing is left to ask, what else you can do now. Nobody else is in it: no "
+        "team, no manager, no one who will check, handle or get back to them, nothing "
+        "passed on to anyone, no when, no promise, and never that help is on the way. "
+        "Never the office phone unless they ask how to reach the office. `department` "
+        "is your judgment and is not spoken. This ends nothing: do not say goodbye on "
+        "it.",
         {
             "reason": {
                 "type": "string",
@@ -689,7 +707,7 @@ INTAKE_TOOLS = [
         "if they offer one. Read the amount as words. You can read a balance and you "
         "cannot touch one: read it if they asked how much, and then, if they want to "
         "pay or arrange payments, that is a ticket (open_request, type `payment`) and "
-        "a team note (notify_team); a receipt or a dispute is a team note. Do not send "
+        "a note (notify_team); a receipt or a dispute is a note. Do not send "
         "them to the office. found 0 means no apartment matched and nothing was read: "
         "that is not a zero balance. Say you could not find it and check the address "
         "with them.",
@@ -711,7 +729,7 @@ INTAKE_TOOLS = [
     # owner decision and a catalogue in a prompt is a rulebook by another name.
     _fn(
         "get_service_info",
-        "Call when the caller asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\nIt answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\nWhat came back is the whole answer. A frequency, a duration, a guarantee, an amount or a deadline that is not in those facts is not something you have: the topic coming back does not mean the number did, and how often is usually the very thing the catalogue says is agreed per building. Do not approximate it, do not average it, do not soften it into a roughly or a usually. Homies runs no promotions, discounts or free trials: never offer or imply one.\n`found` false means it is not there. Then say you do not have that, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\nIt holds no prices and no opening hours. Homies quotes per building, so a price question is a matter for the team (notify_team, reason quote); the hours you already know.",
+        "Call when the caller asks WHAT Homies does or HOW a service works, rather than reporting a fault: cleaning and how often, the bin room, the car park wash, pest control, gardening, the אב בית and what he does on a visit, inspections, the generator, fire detection, smoke fans, water pumps and the tank disinfection, how the committee's budget and collection work, renovations, managing a flat they own, short-term lets, or which areas Homies works in. One short topic in their own words is enough.\nIt answers with facts, not a sentence to read out: put them in your own words, and only the ones they asked about.\nWhat came back is the whole answer. A frequency, a duration, a guarantee, an amount or a deadline that is not in those facts is not something you have: the topic coming back does not mean the number did, and how often is usually the very thing the catalogue says is agreed per building. Do not approximate it, do not average it, do not soften it into a roughly or a usually. Homies runs no promotions, discounts or free trials: never offer or imply one.\n`found` false means it is not there. Then say you do not have that, the same as anything else you do not know — do not guess and do not reason it out from the name of the service.\nIt holds no prices and no opening hours. Homies quotes per building, so a price question is a note (notify_team, reason quote); the hours you already know.",
         {"topic": {"type": "string", "description": 'What they are asking about, in their own words, in Hebrew. Their phrasing is better than your summary of it.'}},
         ["topic"],
         # Sync, like the other two reads: the caller asked a question and there

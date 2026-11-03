@@ -11,6 +11,52 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### LIVE 14:23:36 UTC: the incoming phone agent handles a request for a manager the chatbot's way, and speaks only for itself (owner: "i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything")
+- **The call behind it:** 14:04 UTC (`01a1a1ba`, 2 min), the owner's test through 208.
+  - A leak at בר כוכבא 23, with "I don't know" to where the water comes from and to where exactly it shows. Then: "אני לא יודע, אני רוצה שתביא לי מנהל עכשיו".
+  - The agent made the note (notify_team, caller_request, with the leak) and said "עדכנתי את הצוות שאיתו מבקש לדבר עם מנהל בקשר לנזילה בבניין. אני נשאר איתך על הקו ויכול גם לפתוח עכשיו פנייה לבדיקה". The caller hung up.
+- **Why it said that:** both halves were instructions.
+  - The prompt put "a request to speak with a person" on the list of things handed to the team, and had that sentence end with "the team knows".
+  - notify_team's own text said "what the caller hears from you afterwards: that you have let the team know".
+- **The change:** the WhatsApp bot's one-voice and manager rules (epoch 86, `n8n_whatsapp_ionly.py`), in phone words.
+  - **Prompt** (`docs/assistant/demo-inbound.md`, with a "3 Nov" section):
+    - Michael speaks only for himself, and no team, manager or management checks, handles, knows or gets back;
+    - a note is "הערה במערכת";
+    - something only a person can finish is "I recorded your request", then what is still missing;
+    - wanting to pay is a request plus a note;
+    - an emergency is an emergency note at once, and what he gives is what he did and the urgent request with its number;
+    - a refused name hears "so the request is under your name".
+  - **The manager rule:**
+    - legitimate, never blocked or argued with, and noted at once, quietly;
+    - care and "doing all I can";
+    - "what happened?" only if the matter is not known yet;
+    - insisting gets the question asked another way;
+    - the matter is his to the end, even when told before the request;
+    - "you can't help" gets willingness;
+    - "when / where is the manager" gets an honest no-date.
+    - Two clauses the WhatsApp text lacks ("if he hasn't said what it is about yet", "even if he said it before asking") cover the 14:04 shape, where asking again would be the same question twice.
+  - **Tools** (`scripts/vapi_tools.py`, intake only):
+    - notify_team opens as a note in Homies' system and says the manager note is quiet;
+    - its "CALL IT BEFORE the sentence that tells them the team knows" and "that you have let the team know" became the chatbot's NOTE_EDITS in phone terms;
+    - open_request, get_balance and get_service_info say "a note" for "a team note", and the refused-name reason is the request's name.
+    - DEBT_TOOLS are byte-identical (checked by import).
+  - Fence 7,410 → 8,811 characters.
+- **Checked with Claude, no spend:** a subagent played the agent from the new prompt and tools alone, in five cases.
+  - **The 14:04 call:** a quiet note, then it opened the leak request itself with the number, and "I'm here with you and doing all I can".
+  - **A cold request:** care, then the reason, then a gentle "what's bothering you?".
+  - **"Don't want to explain to a bot":** reassured, and asked another way.
+  - **"When will the manager call me?":** no time, and the request is open.
+  - **"You can't help me" about a contract:** willingness, a contract note, "I recorded the request", and the address asked.
+  - No team or manager appeared in any reply. This checks the text, not gpt-5.6-sol.
+- **Pushed:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`, 14:23:36 UTC.
+  - Before it, every field the push sends was compared with the live agent (read only). Only the prompt, the four tool texts, and the speaking plans' `1` against `1.0` differed.
+  - Read back: the prompt and all seven tools equal the repo, voice `ba765d50`, model gpt-5.6-sol.
+- **Owed:** the owner's own call (077-6687949, then 9), asking for a manager.
+- **Not changed:**
+  - **The debt-call agent:** on a request for a person its prompt still says someone from the team will call back, and it ends the call.
+  - **The end-of-call summary:** on `01a1a1ba` it said "ולכן הועבר למנהל", though nothing was transferred.
+- The housekeeping auto-commit `4255575` had already taken the prompt file. This commit carries the tools and the briefing files.
+
 ### The clixteam579 UChat login's password changed to the owner's choice (owner: "make the password this one …")
 - **Changed** in UChat's Security page (Your settings → Security), signed in as Assaf Clix with the generated password, in a throwaway headless Chrome with its own empty profile (port 9334). UChat answered "הסיסמה שלך עודכנה!".
 - **Proven:** after a logout, the old password got "These credentials do not match our records", and the new one landed in homies-uchat as Assaf Clix.
