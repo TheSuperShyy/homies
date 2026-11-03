@@ -1,0 +1,88 @@
+# Moving to UChat — context
+
+## Why this exists
+
+- **29 Sep:** UChat was evaluated and not adopted ([../11-whatsapp-bot/context.md](../11-whatsapp-bot/context.md), "29 Sep"; [uchat-comparison.md](../11-whatsapp-bot/uchat-comparison.md)).
+- **18 Oct:** the owner confirmed we stay on Chatwoot, *"because its already built and migration on uchat will mean we will create it from the start again"*.
+- **3 Nov:** the owner, after a week in which Meta deleted our test account and the bot moved to a new test number: *"ok so we need to prep for migration to uchat just in case"*.
+  - The decision to stay is unchanged. This folder makes a move quick and safe if it is ever needed.
+  - It answers the owner's own 18 Oct worry: in this route, nothing about the bot is built again.
+
+## Decisions
+
+**UChat replaces Chatwoot; the bot stays in n8n.**
+- It keeps the before-sending checks, the replay tests and the memory, the things that stopped this autumn's "fix one, break another".
+- It is the shorter road: 13-19 days against 21-34.
+- Rejected: the bot rebuilt as a UChat AI agent. UChat's AI step gives no check before a reply goes out, and the Hebrew tuning would start again on another wrapper.
+
+**Build beside the live bot, as a copy, and cut over in one sitting.**
+- This is how the sandbox was built on 26 Oct, and the fingerprint of production stayed unchanged.
+- Rejected: changing the live workflow step by step. The live bot would break the day the first step lands, because the number cannot be on both platforms' bots at once.
+
+**The tool server's three WhatsApp sends go behind one switch.**
+- The cutover and the rollback then change a setting, not code.
+
+**Chatwoot keeps running after the move.**
+- It is the archive, the rollback target, and possibly the Voice inbox.
+- Turning it off would save nothing: it shares the server with n8n.
+
+**The menu becomes a UChat flow node that n8n sends.**
+- This is the platform's own way to send buttons, the owner's 22 Sep rule of using the platform's feature rather than rebuilding it. Its quick replies come back as ordinary messages.
+
+**A dry run on the free workspace comes before any build.**
+- The payload, the notes question and Hebrew right-to-left are the three things that can change the plan.
+- All three are answerable with the web chat widget, without a WhatsApp number and without money.
+
+## Constraints
+
+- **UChat provides no numbers.** Every number is registered with Meta under a Meta business account ([uchat-trial.md](../11-whatsapp-bot/uchat-trial.md)).
+- **UChat's guided connection is its own Meta app.** WhatsApp Cloud uses a Facebook login, Meta's embedded signup.
+  - Meta delivers each message to every app subscribed to the account. So whatever answers the number today keeps answering until it is switched off: two bots on one number.
+  - Seen on 2 Nov: respond.io's app on the ASTDX account, where both would get the same messages.
+- **The API cannot make flows, AI agents or integrations.** The Webhook integration and the web widget are switched on in the dashboard by a person (verified on the spec, 257 paths on 3 Nov).
+- **The API has no internal-note call.** Chatwoot's private note, which pages a department today, has no direct twin. Searched the spec for "note": only closing notes, which are reasons chosen when a chat is closed.
+- **A staff reply pauses the bot for 30 minutes,** which staff can extend (UChat's Live Chat docs). `pause-bot` takes any number of minutes.
+- **UChat's External Request step times out after 15 seconds,** plus 10 per paid add-on. Our bot takes 20-40 seconds, so it never answers inside UChat's request. It acknowledges at once and replies through `send-text`.
+- **UChat's API sits behind Cloudflare,** which refuses Python's default user agent ("Error 1010: browser_signature_banned", a 403 that looks like a bad key). curl's passes. `scripts/uchat_api.py` sends it.
+- **Past messages cannot be imported.** The API creates contacts, not their history.
+
+## Known failure modes
+
+- **Two replies to every message at the cutover,** if the old path is not switched off in the same sitting. The cutover's step 3 exists for this.
+- **The payload changes under us.** UChat does not publish it, so a silent change would break `Sort`. The copy's `Sort` must fail loudly on a shape it does not know, the lesson of 17 Sep's silent Send.
+- **A reply outside the 24-hour window fails.** It is the same Meta rule as today: `send_payment_link` already falls back to `payment_link_he`, and the "done" message is a template anyway.
+- **The tool server's sends must go as the bot, not as staff.** Today it posts with Chatwoot's bot token so the bot's workflow neither answers the message nor takes it for a staff takeover. In UChat a message sent as an agent (`send_as_agent: 1`) would start the staff pause.
+- **Photos stop reaching tickets** if UChat's media host is not added to `MEDIA_HOSTS`.
+- **The typing dots disappear** if UChat does not pass Meta's message id. The replies are not affected.
+
+## Open questions
+
+Each one is settled by the dry run (feature.md, step 1) unless it says otherwise.
+
+1. **What UChat's Webhook integration posts:**
+   - its fields;
+   - whether a photo comes as a link, and from which host;
+   - whether Meta's message id is in it;
+   - whether a signature or secret comes with it;
+   - whether it still posts while the bot is paused. UChat's changelog adds a "live chat webhook" for paused chats.
+2. **How a department is paged:** a ticket-list item, or a flow node with a staff notification. Which one staff actually see on the phone app decides.
+3. **Hebrew right-to-left** in Live Chat and the mobile app.
+   - Hebrew is listed among UChat's interface languages, and a July 2022 post claims right-to-left.
+   - Its mobile-app page lists no Hebrew, but that page is about four years old.
+4. **Whether our Meta test number can be connected at all.**
+   - It lives in the HOMIES app's test account. Embedded signup most likely does not offer it.
+   - The deprecated manual screen (token, account id, number id) might take it, if UChat still runs that screen.
+   - Settled only when a number is actually tried. Never on the live number while the bot runs on it.
+5. **The billing currency, and the plan's limits on the free workspace.** The pricing page shows no currency (29 Sep). Settled from UChat's checkout page.
+
+## Sources (read 3 Nov 2026)
+
+- UChat API spec: https://www.uchat.com.au/default-api-docs/api-docs.json (copy in `local/uchat-prep/`)
+- Integrations, including the Webhook and Chatwoot entries: https://uchat.au/features/integrations
+- Live Chat (the pause): https://docs.uchat.com.au/flow-builder/live-chat/live-chat.html
+- External Request: https://docs.uchat.com.au/flow-builder/action-external-request.html
+- Inbound webhook and timeout add-ons: https://feedback.uchat.com.au/updates/partner-can-manage-two-new-addons-inbound-webhook-and-timeout
+- Embedded signup for existing numbers: https://feedback.uchat.com.au/updates/feature-update-whatsapp-embedded-signup-to-allow-connect-an-existing-whatsapp-business-app-account-to-cloud-api
+- Interface languages: https://feedback.uchat.com.au/updates/multiple-language-support
+- Right-to-left: https://uchat.au/milestone/multilingual-support-available
+- WhatsApp Cloud API: https://docs.uchat.com.au/guide/cloudapi.html

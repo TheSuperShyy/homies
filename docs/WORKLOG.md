@@ -9,6 +9,72 @@ conversation that produced it.
 
 ---
 
+## 2026-11-03
+
+### Ready to move to UChat if ever needed: the plan, every Chatwoot touchpoint mapped, backups (owner: "ok so we need to prep for migration to uchat just in case")
+- **Asked:** *"ok so we need to prep for migration to uchat just in case"*. The 18 Oct decision to stay on Chatwoot holds; this makes a move quick and safe if it is ever needed.
+- **The route:** UChat replaces Chatwoot; the bot stays in n8n.
+  - It is 29 Sep's Option B, 13-19 days.
+  - It keeps the reply checks, the replay tests and the memory, so nothing about the bot is built again (the owner's 18 Oct worry).
+  - The full rebuild in UChat (Option A, 21-34 days) was not chosen.
+- **New `docs/features/21-uchat-migration/`:**
+  - `feature.md`: the inventory, the order of work, the cutover, the rollback, the data and the acceptance.
+  - `context.md`: why, decisions, constraints, failure modes, open questions, sources.
+  - A row in `docs/README.md`.
+  - `feature.md` went in with a parallel session's automatic housekeeping commit, `66c7a1f`.
+- **Read from live (n8n, the tool server, the dashboard). Chatwoot is touched in:**
+  - **the bot:**
+    - the trigger and `Sort` (Chatwoot's agent-bot events);
+    - `Send`, `Send menu`, `Send the rest`, `Say it now`, `Show it in Open`, `Assign to the replier`, `Read the photos`;
+    - the typing calls, which use Chatwoot's `source_id` (Meta's message id).
+  - **"Hand to a person":** private note, custom attributes, priority, team, labels.
+  - **the handback:** unassign, strip `bot-off`.
+  - **"Voice team note":** contact and conversation in the Voice inbox.
+  - **the tool server:**
+    - `send_ticket_notices`, with the templates read from inbox 1;
+    - `send_payment_link`, which falls back to `payment_link_he` outside 24 hours;
+    - `store_media` and `add_request_detail`, through the `MEDIA_HOSTS` allowlist.
+  - **Not touched:** the number watch, the call queue, debt tools (Vapi), ticket notices (it calls the tool server), and the dashboard (it reads Supabase).
+- **UChat, read only:**
+  - **The owner's workspace "clix" is alive** and the key works ("Manage Flow"). It is empty: no AI agent, flows, webhooks, groups, labels or ticket lists, one member.
+  - **Cloudflare refuses Python's default user agent** with error 1010, a 403 that looks like a bad key. curl's passes.
+  - **The spec has 257 paths** (240 on 29 Sep). Every call the move needs is "Manage Flow".
+    - There is no internal-note call and no call that writes past messages.
+    - `pause-bot` takes any number of minutes.
+  - **From the docs:**
+    - a staff reply pauses the bot for 30 minutes, extendable;
+    - External Request times out after 15 seconds (+10 per add-on), so our 20-40 s bot acknowledges at once and replies through `send-text`;
+    - the Webhook integration forwards all incoming messages, but its payload is not published;
+    - Hebrew is listed among the interface languages, but right-to-left in Live Chat is unconfirmed.
+  - **The cutover trap:**
+    - UChat's guided WhatsApp connection is its own Meta app, and Meta delivers to every app on the account. Two bots answer until the old path is off.
+    - Our Meta test number most likely cannot go through that screen.
+- **Backups in `local/uchat-prep/`** (gitignored):
+  - all 8 Homies workflows;
+  - Chatwoot account 2, with the inbox token, verify token and agent-bot address blanked: 2 inboxes, 2 agents, 4 teams, 8 labels, 9 custom attributes, 10 contacts, 9 conversations, 2,037 messages (8 attachments, links only);
+  - UChat's spec.
+- **New `scripts/uchat_api.py`:**
+  - GET only;
+  - masks phones and emails;
+  - sends curl's user agent;
+  - in Git Bash, the path goes without its leading slash.
+- **Nothing was written** to UChat, Chatwoot, n8n, Meta or the tool server.
+- **Next, only on the owner's word:** the dry run (`feature.md`, step 1), free and with no WhatsApp number. The owner switches on UChat's web widget and Webhook integration; we capture the payload and test the calls on that one contact.
+
+### What is left, read the same morning (owner: "ok what do we have let")
+- **Both WhatsApp templates are still PENDING** on the new test account, about a day after submission (`wa_templates.py`).
+- **The number watch has logged no drop since the move** (`n8n_number_watch.py --drops`: the last is 30 Oct).
+- **Answered:**
+  - **waiting on the owner:**
+    - the Omni email;
+    - a "hi" from Ido or Yariv;
+    - the photo-then-words handset test;
+    - a payment method on the account;
+  - **waiting on others:** Meta's review, Omni's answer;
+  - **ours after Omni:** the SIP line on Vapi and one call to Ido;
+  - **known gaps:** the answer already in flight; a second same-reason note dropped;
+  - **long term:** Homies' own number.
+
 ## 2026-11-02
 
 ### The onboarding video re-recorded without the tester's conversation (owner: "remove the alliah dela cruz on the conversation and do a recording again")

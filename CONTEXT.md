@@ -459,6 +459,20 @@ Yariv is told so, with the 29 Sep figures: about 4-7 weeks to rebuild, about
 $80-140 a month more, and the before-sending checks and replay tests lost
 (WORKLOG 18 Oct). Don't reopen the move unless the client asks.
 
+**3 Nov: the owner asked for the move to be ready "just in case"; the 18 Oct
+decision holds.** The plan is `docs/features/21-uchat-migration/`: UChat
+replaces Chatwoot, and the bot stays in n8n with its checks, tests and memory
+(13-19 days). Every Chatwoot touchpoint is mapped there to a UChat API call.
+Three facts hold with or without a move:
+- **Connecting a number in UChat is the cutover.** UChat's guided connection
+  is its own Meta app, and Meta delivers to every app on the account, so the
+  old platform keeps answering until it is switched off in the same sitting.
+- **UChat's Cloudflare refuses Python's default user agent** (error 1010, a
+  403 that looks like a bad key). `scripts/uchat_api.py` sends curl's.
+- **UChat's API has no internal-note call and no history import.** A
+  department page and past conversations need another road (ticket lists;
+  Chatwoot kept as the archive).
+
 **Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
 21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
 Meta, which beats the app-level subscription, so the number moves the moment the

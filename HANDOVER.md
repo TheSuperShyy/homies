@@ -8,6 +8,15 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **READY TO MOVE TO UCHAT IF EVER NEEDED (owner, 3 Nov: *"ok so we need to prep for migration to uchat just in case"*). NOT STARTED: the 18 Oct decision to stay on Chatwoot holds.** WORKLOG 3 Nov.
+> - **The plan:** `docs/features/21-uchat-migration/feature.md`. UChat replaces Chatwoot (number, inbox, seats, departments, the pause), and the bot stays in n8n with its checks, tests and memory. 13-19 days, after a free 1-day dry run.
+> - **Every Chatwoot touchpoint, read from live on 3 Nov,** is mapped there to a UChat API call: the bot, "Hand to a person", the handback, "Voice team note", and the tool server's three WhatsApp sends.
+> - **Backups:** `local/uchat-prep/`, with all 8 Homies workflows, all of Chatwoot account 2 (secrets blanked) and UChat's spec.
+> - **`python scripts/uchat_api.py`** reads the owner's workspace "clix", GET only. It is empty today; the key works.
+> - **The cutover trap:** connecting the number in UChat does not take it away from the old platform. UChat joins as a second Meta app and both get every message, so the old path goes off in the same sitting.
+> - **Next, only on the owner's word:** the dry run. The owner switches on UChat's web widget and Webhook integration; we capture the payload and try the calls on that one contact.
+> - *(3 Nov morning: both WhatsApp templates still PENDING; the number watch has logged no drop since the move.)*
+>
 > **THE OXS TICKET FIX IS ON `main`, AND THE AUTOMATIC RUN CLOSES TICKETS AGAIN (2 Nov, 15:56 UTC).** The owner: *"why is the ticket amount not going down"*, *"go"*, then *"lets fix the oxs ticket on the auto uupdate"*. WORKLOG 2 Nov.
 > - **Cause:** `scripts/oxs_requests_sync.py` read our tickets with `limit=2000`, and Supabase gives 1,000. Since late September each run resolved almost none of the tickets OXS closed.
 > - **The fix, on `main` as `4c9d2a2` and on `feature/chatbot`:**
