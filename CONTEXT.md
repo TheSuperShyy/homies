@@ -529,6 +529,11 @@ message pauses the bot for that contact for 30 minutes, so the bot's replies go
 through `send-content` with `send_as_agent: 0`. **A message in UChat's log is
 not a delivered one:** a sent message carries WhatsApp's id (`mid`, "wamid…");
 without it WhatsApp refused it, and the reason is in UChat's error log.
+**A tester checklist states what the live prompt says, not what seems right**
+(3 Nov, "Michael Test Checklist"): its first draft expected name and phone before
+every balance, which the 29 Oct change had already ended for numbers on file. Each
+expected answer is taken from `prompt.md`'s system prompt and the CONTEXT decisions,
+and the page changes when they do; otherwise testers mark correct behaviour wrong.
 **UChat keeps WhatsApp's own message id** (`mid` in `chat-messages`, 3 Nov),
 and its API has no typing call of its own. So the UChat copy shows live's typing
 dots by calling Meta itself: the read-plus-typing call for the UChat number

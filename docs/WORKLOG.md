@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Two pages for the owner: a tester checklist for Michael, and Yariv's feedback with what was done (owner: "lets create something like this ... for our bot and also another artifact for yariv feedback and what we did to resolve that simple and not super technical terms")
+- **The reference** (the owner's copy of another project's page, `XRNofGUVsunTwY1qD42zN9`; the first link, `ETQvRQGj5Kmjmcqw1qhStS`, did not open from this account) is a Hebrew bot test checklist: what to send, what the bot should answer, ✓/✗, a note, shared marks.
+- **"Michael Test Checklist"**, https://claude.ai/artifact/H8hD1pWFvKmQbiyMuicgFx (slug `82a53417-4856-4b7e-bca1-374b99bbf567`):
+  - 28 tests in 7 parts: opening, opening a service call, what gets no ticket, an existing call, payment and balance, an emergency, a person/identity/style. Hebrew for the testers, an English line under each for the owner.
+  - The expected answers come from the live system prompt (`docs/features/11-whatsapp-bot/prompt.md`, "System prompt"), read for this. The menu has two buttons, a payment link comes as two messages and ends without a question, an emergency gets no advice, a person request is taken warmly and asked what happened.
+  - It points testers at the UChat number (in the page, not in this repo), with Bar Kochba 23 for any address, because tickets are real.
+  - **Shared marks:** db `marks/<user id>`, one document per tester (rules: everyone reads, each writes only their own at `interact`; the owner tidies), plus `user` with the profile scope so marks show by name. A tester without edit access keeps marks on their own device only.
+  - **Corrected after publishing:** test 5.3 first said a balance always needs name and phone. Since 29 Oct (v134) a number on file gets it straight away; the page now says both.
+- **"Yariv's Feedback Status"**, https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`):
+  - 27 of Yariv's points (12 Aug notes, 15 Sep review, 5 and 19 Oct messages, 26 Oct alignment document), in plain English, by Chatbot, Voice agent: incoming calls, Voice agent: debt calls, Phone line.
+  - 13 done, 10 partly, 2 waiting (Homies' own WhatsApp number; the outgoing caller ID), 2 decided differently (email on escalation: kept in the chat inbox; notes into OXS: OXS stays read-only). Plus what is still needed and from whom.
+  - The status of each point came from a read-only search of WORKLOG, CONTEXT, HANDOVER and the feature docs; the balance change and the recording reversal were checked by hand.
+  - Built from `local/artifacts/yariv-feedback/items.json` by `build.py` there (ignored by git), on the dashboard's design system.
+- **Left off Yariv's page, for the owner to decide:** call recording is on again since 26 Oct on the owner's word, reversing Yariv's 25 Aug instruction, and he has not been told (WORKLOG 26 Oct).
+
 ### A Hebrew onboarding video of the UChat inbox, the Chatwoot video's twin (from ~11:00 UTC)
 - **Asked:** *"ok now create a screen recording like the one we did for chatwoot"*.
 - **The video:** `local/onboarding/uchat-onboarding-he.mp4` (ignored by git), 2:56, 1920x1080, H.264, 7.4 MB.
