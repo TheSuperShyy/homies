@@ -492,7 +492,18 @@ is: HANDOVER):
   pluses stay in it. A new line needs a fact behind it, measured or from our records.
 - **It compares features, not our build (owner, 3 Nov late: *"focus more on the features like
   advantages and disadvantages makse sure all is real and accurate not invented"*).**
-  - Rows are what each platform can do: 23 features in five groups.
+  - **Only what our bot needs (owner, next: *"only the things necessary for our bot also include the max
+    seats and stuff also how chatwoot is flexible and stuff"*):** 17 rows in four groups:
+    - Michael on WhatsApp;
+    - handing over to the team;
+    - seats and limits;
+    - flexibility and control.
+  - Inbox extras and UChat's builder, AI, broadcasts and channels are left out as not needed by Michael. The recommendation says so in those words.
+  - Limits that matter for the bot:
+    - UChat allows 1,000 API calls an hour, and each message uses at least 3.
+    - UChat waits 15 s for a reply.
+    - UChat's WhatsApp media expire after 30 days.
+    - Chatwoot's request limit is a setting on our own server: `RACK_ATTACK_LIMIT`, 3,000 a minute by default.
   - Where-it-stands rows (what is connected, the trial, our checks) went stale within the hour, so they stay out.
   - Every cell has its source on the third tab ("Sources" / "מקורות"): the vendor's own words and URL, or "our own" with a date.
   - A line nobody has checked is left out, not hedged. The one gap left open is UChat's `add_note` message action.

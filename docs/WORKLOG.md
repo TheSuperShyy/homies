@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The Chatwoot-vs-UChat sheets cut to what our bot needs, with seats, limits and Chatwoot's flexibility (owner: "only the things necessary for our bot also include the max seats and stuff also how chatwoot is flexible and stuff")
+- **Both sheets, in place:** 17 rows in four groups.
+  - "Michael on WhatsApp": speed, time to answer, photos, history, templates.
+  - "Handing over to the team": departments, when staff reply, notes.
+  - "Seats and limits": staff seats, residents (contacts), API calls.
+  - "Flexibility and control": open source, settings and upgrades, API and webhooks, residents' data, upkeep, cost.
+  - Totals: Chatwoot 16 + and 1 -, UChat 6 + and 11 -. The Sources tab was rebuilt to match, one source per cell.
+- **Out, as not needed by the bot:** saved replies, macros, survey, reports, Hebrew UI, phone app, bot builder, built-in AI, automations, broadcasts, ticket lists, WhatsApp calls, channels, email. The recommendation names UChat's strengths as things Michael doesn't need.
+- **New facts, each checked at its source:**
+  - Chatwoot's request limit is `RACK_ATTACK_LIMIT`, 3,000 a minute per address by default, a setting on our server. It is on in production (`config/initializers/rack_attack.rb` at v4.16.2).
+  - UChat allows 1,000 API calls an hour (its API help page and its "Platform default limits"). Each message to the UChat bot reads the contact, reads its messages and sends: at least 3.
+  - UChat's External Request waits 15 s, plus 10 s per $20-a-month add-on. Michael's replies took 18-44 s on 3 Nov.
+  - WhatsApp media in UChat expire after 30 days unless S3 is connected. Chatwoot keeps attachments on local storage by default.
+  - UChat exports one contact at a time. A daily MySQL copy is a $100-a-month add-on.
+  - UChat's 30-minute pause after a staff reply can be changed in the flow settings (changelog, 22 Jul 2022).
+- **Formulas, not typed numbers:** the seats cell reads $10 and $140 from the cost tab, the contacts cell $45, and the cost cell $200 and 19.
+- **Checked:** both comparison tabs read back with the totals above. The English PDF export rendered right. The key line (row 2) now wraps, after the render showed it cut off.
+
 ### The Chatwoot-vs-UChat sheets rebuilt around features, every line sourced (owner: "so the chatwoot vs uchat comparison table focus more on the features like advantages and disadvantages makse sure all is real and accurate not invented")
 - **Both sheets, in place, same links:** the Hebrew "השוואה: Chatwoot מול UChat" and its English twin. Each comparison tab now holds 23 features in five groups: the team inbox, working with Michael, data/hosting/cost, built-in tools, channels.
   - Totals by COUNTIF: Chatwoot 18 + and 5 -, UChat 15 + and 8 -.

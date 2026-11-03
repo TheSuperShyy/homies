@@ -95,8 +95,10 @@ appended to.
 > **THE CHATWOOT-VS-UCHAT SHEET (owner, 3 Nov evening: *"create a gsheet in hebrew that compares uchat and chatwoot like + and -"*, *"make sure we lean more to chatwoot"*).** WORKLOG 3 Nov.
 >   - **Where:** the Google Sheet "השוואה: Chatwoot מול UChat" in clixteam579's Drive. Find it by its title with the Drive connector; its link is kept out of this public repo. It is not shared with anyone; the owner decides who gets it.
 >   - **Tab "השוואה" (rebuilt 3 Nov late, owner: *"focus more on the features … make sure all is real and accurate not invented"*):**
->     - 23 features in five groups, right to left, + and - cells coloured by a conditional format.
->     - COUNTIF totals: Chatwoot 18 + and 5 -, UChat 15 + and 8 -. A recommendation row ends it.
+>     - Cut down the same night to only what our bot needs (owner: *"only the things necessary for our bot also include the max seats and stuff also how chatwoot is flexible and stuff"*).
+>     - 17 rows in four groups (Michael on WhatsApp, handing over, seats and limits, flexibility and control), right to left, + and - cells coloured by a conditional format.
+>     - The seats, contacts and cost cells are formulas over the cost tab.
+>     - COUNTIF totals: Chatwoot 16 + and 1 -, UChat 6 + and 11 -. A recommendation row ends it.
 >   - **Tab "עלות חודשית":** inputs in blue with their sources, and formulas that come to $200 a month for UChat with 19 staff. The contact tiers were corrected from $195.
 >   - **Tab "מקורות":** the source of every cell. A changed line gets its source here too.
 >   - **Change it in place** with the Sheets connector, so the link stays the same. CONTEXT ("Later the same evening…") says how it is kept honest while leaning.
