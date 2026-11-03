@@ -126,11 +126,18 @@ The owner: *"ok just make uchat like the settings we have on the chatwoot"*. Rea
 - `--tester <user_ns>` puts the test phone on that contact.
 - A first "היי" gets the menu without touching the AI.
 
-**Not in this version:**
-- Photos are not kept on the ticket: the tool server takes photos only from Chatwoot's host.
-- Voice notes stay in Chatwoot.
-- The dashboard's Conversations page does not show UChat chats.
-- The live number stays on Chatwoot: moving it is the cutover below.
+**Connected on 3 Nov evening** (owner: *"lets connect everything in the uchat?"*, after counting the bot as moved):
+- **The dashboard's log.** The copy's `Log inbound` / `Log reply` write the live `messages` table again, as `source` 'uchat' with ids `uchat:<n>`. UChat numbers our messages from 1, Chatwoot's range, and `external_id` is unique. Live at 17:25 UTC. No UChat row yet: nobody had written since.
+- **Photos on tickets.** The tool server (v140) lets UChat's domain through its photo fence and keeps the `uchat:` prefix, which it used to strip. A bare id would have overwritten a Chatwoot photo with the same number. `MEDIA_HOSTS_EXTRA` adds another host as a setting. Not proven with a real photo: none had come through UChat to show its host.
+- **The debt call's link and the "done" notice** leave from the UChat number when `WHATSAPP_VIA=uchat` (set). Free text goes inside 24 hours, judged by the contact's `last_interaction` (UTC, checked). Outside them a template goes by phone with `create_if_not_found`. Delivery is read back as WhatsApp's id (`mid`). `WHATSAPP_VIA=chatwoot` and an `--apply` move back.
+- **Probed with no AI and nothing stored:** `send_ticket_notices` answers `via: uchat`. `store_media` lets a UChat address through (404 on a made-up file) and refuses another host.
+
+**Not connected yet, and why:**
+- **Templates.** `ticket_resolved_he` and `payment_link_he` are approved on the Chatwoot test number's WhatsApp account ("Test Messaging Account"), not on the UChat number's ("hadas 1"). That account has none, so UChat's sync finds nothing and a notice waits as `template_not_synced`. They have to be created there; that is a write in Meta, which waits for the owner's go.
+- **Meta blocks the UChat number from starting conversations:** WABA 141006, no payment method; also business 141010, not verified. So even a template cannot go until a payment method is added in WhatsApp Manager. Replies inside 24 hours are not affected.
+- **The phone agents' notes** still open a conversation in Chatwoot's Voice inbox. UChat has no inbox for calls. Its place for them is a ticket list, which only UChat's dashboard can create (the API adds items, not lists), and the workspace has none.
+- **Residents' voice notes:** unchanged. The live bot cannot hear them either; it says the file arrived and cannot be read.
+- **The live number** stays on Chatwoot: moving it is the cutover below.
 
 ## What has to change
 

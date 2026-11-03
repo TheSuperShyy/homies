@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The rest connected to UChat: the dashboard log, photos, the link and the "done" notice (owner: "lets connect everything in the uchat?")
+- **What still went through Chatwoot, read from the code:**
+  - the copy's two log writes were NoOps, so the dashboard showed no UChat chat;
+  - the tool server's photo fence let only Chatwoot's host through, and it stripped ids to digits;
+  - the debt call's link and the "done" notice were sent through Chatwoot;
+  - the phone agents' notes go to Chatwoot's Voice inbox.
+  - Residents' voice notes are the same on both: the live bot cannot hear them either.
+- **The dashboard log** (`scripts/n8n_uchat.py`, `log_as_uchat()`; `--apply` at 17:25 UTC):
+  - live's two writes again, as source 'uchat' with `external_id` 'uchat:<n>';
+  - `Keep the photo` sends the same prefixed id.
+  - The prefix is needed: UChat's ids run 1-1431 in our workspace, and Chatwoot's latest are about 3,250.
+  - Read back from n8n. No UChat row yet, because nobody wrote after 17:25.
+- **The tool server, debt-tools v140** (`index.ts`; `supabase_functions.py --apply --oxs-mirror`, since a plain `--apply` would have deleted the OXS mirror's key, which is on):
+  - **photos:** `mediaAllowed()` lets UChat's domain through, plus `MEDIA_HOSTS_EXTRA`. `store_media` keeps the `uchat:` prefix on the row and names the file `uchat-<n>`.
+  - **WHATSAPP_VIA=uchat** (set in .env and pushed with `UCHAT_API_KEY`):
+    - `uchatDeliver` sends free text inside 24 hours, by the contact's `last_interaction` (checked: UTC, within 4 s of the message);
+    - `uchatTemplate` sends by phone with `create_if_not_found`;
+    - delivery is read back as WhatsApp's `mid`;
+    - `send_ticket_notices` runs `ticketNoticesViaUchat`;
+    - `conversation_id` holds the UChat contact's number, or nothing if it ever passes 32 bits (10 digits, under it today).
+  - Syntax-checked with TypeScript's parser (no Deno here).
+- **Probed, no AI, nothing stored:**
+  - `send_ticket_notices` gave `{via: uchat, sent 0, waiting 0}`;
+  - `store_media` on a test-prefix phone gave "fetch 404" for a made-up UChat address and "host not allowed" for example.com.
+- **Found, read only:**
+  - The two approved templates are on the Chatwoot test number's WhatsApp account. The UChat number ("hadas 1", CONNECTED) is on one with none.
+  - UChat's `/whatsapp-template/sync` ran (status ok) and still lists nothing.
+  - The UChat number's `health_status`: WABA BLOCKED 141006 (no payment method), business 141010.
+- **Not done, waiting on the owner:** the templates on "hadas 1" (a Meta write); a payment method; a UChat ticket list for the phone agents' notes.
+  - The UChat browser profile is logged out, and the API cannot make a list. So the notes stay in Chatwoot's Voice inbox.
+- **A slip, contained:** reading `local/uchat-prep/uchat-setup.txt` printed the copy's webhook address with its secret into this session's tool output. Nothing was written or committed. The secret lives in that same local file and in .env.
+
 ### The same comparison as a separate English Google Sheet (owner: "create a separate one in english")
 - **The file:** "Comparison: Chatwoot vs UChat", a new file beside the Hebrew one in clixteam579's Drive, not shared. Tabs "Comparison" and "Monthly cost", left to right.
 - **Same facts, same layout, same formulas** as the Hebrew sheet's reworded version (below): 16 topics, Chatwoot 14 + and 2 -, UChat 4 + and 12 -, UChat $195 a month and $2,340 a year more.

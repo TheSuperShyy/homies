@@ -38,6 +38,14 @@ Two things this gets right that are easy to get wrong:
   --apply; without the two Chatwoot tokens send_payment_link answers
   'unavailable' and the agent gives the office number.
 
+  Feature 21 (3 Nov): WHATSAPP_VIA=uchat in .env moves the debt call's link and
+  the "done" notice to the UChat number, with UCHAT_API_KEY taken from .env's
+  Uchat_api_key; MEDIA_HOSTS_EXTRA adds hosts a photo may come from. Each is
+  pushed when .env has it. WHATSAPP_VIA=chatwoot and an --apply moves back.
+
+  THE OXS MIRROR IS ON FOR ONE NUMBER SINCE 24 SEP: deploy with --apply
+  --oxs-mirror, or the plain --apply below deletes its key and switches it off.
+
     python scripts/supabase_functions.py            # show what would happen
     python scripts/supabase_functions.py --apply    # do it
 """
@@ -171,6 +179,15 @@ def main():
               % ("" if or_key else "; OPENROUTER_API_KEY empty -> the link alone"))
     else:
         print("whatsapp link  OFF — CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN empty in .env")
+    # Feature 21 (3 Nov): WHATSAPP_VIA=uchat sends the debt call's link and the
+    # "done" notice through UChat (UCHAT_API_KEY is the bot's key, Uchat_api_key
+    # in .env); unset or "chatwoot" keeps Chatwoot. MEDIA_HOSTS_EXTRA adds photo
+    # hosts. Each is pushed when .env has it; going back is a setting.
+    wa_via = e.get("WHATSAPP_VIA", "").strip().lower()
+    uchat_key = e.get("Uchat_api_key", "").strip()
+    media_extra = e.get("MEDIA_HOSTS_EXTRA", "").strip()
+    print("whatsapp via   %s" % ("UCHAT (UCHAT_API_KEY %s)" % ("set" if uchat_key else "MISSING")
+                                  if wa_via == "uchat" else "chatwoot (WHATSAPP_VIA %s)" % (wa_via or "unset")))
     # Feature 17 (22 Oct): which channels refuse a ticket without a name.
     # Unset here leaves the project's value as it is; "off" switches it off.
     name_channels = e.get("NAME_REQUIRED_CHANNELS", "").strip()
@@ -212,6 +229,12 @@ def main():
         to_push.append({"name": "OPENROUTER_API_KEY", "value": or_key})
     if name_channels:
         to_push.append({"name": "NAME_REQUIRED_CHANNELS", "value": name_channels})
+    if wa_via:
+        to_push.append({"name": "WHATSAPP_VIA", "value": wa_via})
+    if uchat_key:
+        to_push.append({"name": "UCHAT_API_KEY", "value": uchat_key})
+    if media_extra:
+        to_push.append({"name": "MEDIA_HOSTS_EXTRA", "value": media_extra})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
     # 24 Sep: the mirror came back on for ONE number, the owner's +63 tester.
     # `OXS_MIRROR_PHONES` is the second gate inside oxsMirror() and travels with

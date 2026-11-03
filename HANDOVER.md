@@ -82,6 +82,16 @@ appended to.
 >   - Voice team notes and ticket notices still go through Chatwoot.
 >   - Ask the owner before switching anything off on the Chatwoot side.
 >
+> **THE REST CONNECTED TO UCHAT, 3 NOV EVENING (owner: *"lets connect everything in the uchat?"*).** Feature 21, "Connected on 3 Nov evening"; WORKLOG 3 Nov.
+>   - **Live:** the UChat copy logs to `messages` for the dashboard (source 'uchat', ids 'uchat:<n>', 17:25 UTC). The tool server is debt-tools **v140** with `WHATSAPP_VIA=uchat`: photos from UChat pass its fence, and the debt call's link and the "done" notice leave from the UChat number.
+>   - **Not yet seen on a real message:** no one had written to the UChat number since 17:25, and no photo has ever come through UChat. Check the first ones: a `messages` row with source 'uchat'; for a photo, `store_media`'s `skipped`. "host not allowed" means put its host in `MEDIA_HOSTS_EXTRA` and run `--apply --oxs-mirror`.
+>   - **Waiting on the owner:**
+>     - a payment method on the UChat number's WhatsApp account (Meta 141006);
+>     - a go to create `ticket_resolved_he` and `payment_link_he` on that account ("hadas 1"). The approved ones are on the Chatwoot test number's account;
+>     - a UChat ticket list (made in UChat's dashboard) before the phone agents' notes can move. Until then they stay in Chatwoot's Voice inbox;
+>     - UChat Business before the trial ends (about 16 Nov).
+>   - **Deploying debt-tools:** `python scripts/supabase_functions.py --apply --oxs-mirror`. A plain `--apply` switches the OXS mirror off.
+>
 > **THE CHATWOOT-VS-UCHAT SHEET (owner, 3 Nov evening: *"create a gsheet in hebrew that compares uchat and chatwoot like + and -"*, *"make sure we lean more to chatwoot"*).** WORKLOG 3 Nov.
 >   - **Where:** the Google Sheet "השוואה: Chatwoot מול UChat" in clixteam579's Drive. Find it by its title with the Drive connector; its link is kept out of this public repo. It is not shared with anyone; the owner decides who gets it.
 >   - **Tab "השוואה":** 16 topics, right to left, + and - cells coloured by a conditional format. COUNTIF totals: Chatwoot 14 + and 2 -, UChat 4 + and 12 -. A recommendation row ends it.

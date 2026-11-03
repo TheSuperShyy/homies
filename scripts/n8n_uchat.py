@@ -31,9 +31,10 @@ WHAT DIFFERS FROM LIVE, AND WHY
   - Chatwoot calls: the host becomes the translator's, the Chatwoot tokens the
     translator's door token.
   - Memory: the session key gets "-uchat", so the two bots never share one.
-  - Log inbound / Log reply (the live `messages` table) are NoOps, and
-    `Anything newer?` reads the UChat conversation, as the sandbox reads its
-    Chatwoot one. Nothing in the live log changes.
+  - Log inbound / Log reply write the live `messages` table, which the dashboard
+    reads, as source 'uchat' with ids prefixed 'uchat:' (log_as_uchat(); until 3
+    Nov evening they were NoOps). `Anything newer?` still reads the UChat
+    conversation, as the sandbox reads its Chatwoot one.
   - Show typing (Meta's call) is live's, for the UChat number (UCHAT_WA_PHONE_ID)
     with UChat's copy of WhatsApp's message id (typing(); 3 Nov, the owner: "yes
     i need it back").
@@ -67,7 +68,7 @@ import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from supabase_functions import env, set_env  # noqa: E402
-from n8n_sandbox import (n8n, load, replace_once, free_spot, noop, webhook, base_copy,  # noqa: E402
+from n8n_sandbox import (n8n, load, replace_once, free_spot, webhook, base_copy,  # noqa: E402
                          chat_log_from_chatwoot, LIVE_IDS, LIVE_BOT, LIVE_HANDOVER)
 from n8n_layout import check as layout_check  # noqa: E402
 from n8n_whatsapp_firstword import PAY_JS  # noqa: E402
@@ -627,6 +628,33 @@ def typing(wf, cfg):
         n["credentials"] = {"httpHeaderAuth": dict(cfg["cred_typing"])}
 
 
+def log_as_uchat(wf):
+    """Log inbound / Log reply write the live `messages` table, marked as UChat's.
+
+    The dashboard's Conversations page reads that table, so without these the UChat
+    chats were missing from it (3 Nov evening, owner: "lets connect everything in the
+    uchat?"). Live's own two writes, with two things changed:
+    - `source` is 'uchat', so each row says which bot wrote it.
+    - UChat numbers our workspace's messages from 1, the range Chatwoot's ids are in,
+      and `external_id` is unique. So the copy's ids get a 'uchat:' prefix, here and on
+      the photo it keeps (`Keep the photo` -> request_media.message_external_id), and a
+      photo still lands in the bubble it came with.
+    Both writes keep live's onError (continue), so a failed write never stops a reply.
+    """
+    nodes = {n["name"]: n for n in wf["nodes"]}
+    inbound = nodes["Log inbound"]["parameters"]
+    inbound["jsonBody"] = replace_once(inbound["jsonBody"], "external_id: $json.message_id,",
+                                       "external_id: 'uchat:' + $json.message_id,")
+    inbound["jsonBody"] = replace_once(inbound["jsonBody"], "source: 'n8n'", "source: 'uchat'")
+    reply = nodes["Log reply"]["parameters"]
+    reply["jsonBody"] = replace_once(reply["jsonBody"], "source: 'n8n'", "source: 'uchat'")
+    photo = nodes["Keep the photo"]["parameters"]
+    photo["jsonBody"] = replace_once(photo["jsonBody"], "message_id: $('Sort').first().json.message_id,",
+                                     "message_id: 'uchat:' + $('Sort').first().json.message_id,")
+    for name in ("Log inbound", "Log reply", "Keep the photo"):
+        assert nodes[name].get("onError") == "continueRegularOutput", "%s no longer continues on error on live" % name
+
+
 def uchatify_bot(live, cfg):
     out = base_copy(live, "UCHAT — WhatsApp bot")
     for n in out["nodes"]:
@@ -642,8 +670,7 @@ def uchatify_bot(live, cfg):
     assert len(memories) == 1, "expected one memory node"
     memories[0]["parameters"]["sessionKey"] += "-uchat"
     webhook(out, BOT_PATH)
-    for name in ("Log inbound", "Log reply"):
-        noop(out, name)
+    log_as_uchat(out)
     typing(out, cfg)
     chat_log_from_chatwoot(out, {"chatwoot_url": cfg["facade"], "account_id": 2, "cred_admin": cfg["cred_door"]})
     way_in(out, cfg)

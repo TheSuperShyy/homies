@@ -15,7 +15,11 @@
 //   CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN        # the debt call's WhatsApp delivery (20 Sep):
 //                                                  # admin finds the contact, the bot posts
 //   OPENROUTER_API_KEY                             # the one line above the link; unset = link alone
-// scripts/supabase_functions.py --apply pushes all seven from .env.
+//   WHATSAPP_VIA / UCHAT_API_KEY                   # feature 21 (3 Nov): "uchat" sends the debt call's link
+//                                                  # and the "done" notice through UChat; unset = Chatwoot
+//   MEDIA_HOSTS_EXTRA                              # more hosts a photo may come from, comma-separated
+//                                                  # prefixes; optional (UChat's own domain is built in)
+// scripts/supabase_functions.py --apply pushes them from .env.
 //
 // --no-verify-jwt is deliberate. Vapi is not a Supabase user and cannot present
 // a Supabase JWT. The shared secret in the X-Homies-Secret header is what
@@ -330,6 +334,22 @@ const MEDIA_MIMES: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
+// Feature 21 (3 Nov): the UChat copy of the bot hands over UChat's own link to
+// a photo, so UChat's domain is let through too. No photo had come through
+// UChat yet to show its exact host, so MEDIA_HOSTS_EXTRA (comma-separated
+// prefixes) adds another as a setting, not a deploy. Still a fence: only these.
+const MEDIA_DOMAINS = ["uchat.com.au"];
+function mediaAllowed(url: string): boolean {
+  if (url.startsWith("data:image/")) return true;
+  const extra = (Deno.env.get("MEDIA_HOSTS_EXTRA") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if ([...MEDIA_HOSTS, ...extra].some((h) => url.startsWith(h))) return true;
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && MEDIA_DOMAINS.some((d) => u.hostname === d || u.hostname.endsWith("." + d));
+  } catch {
+    return false;
+  }
+}
 
 // The debt call's link goes out as a WhatsApp message through Chatwoot (20
 // Sep). Same host as the media fence; the account and the inbox are the ones
@@ -1776,6 +1796,187 @@ async function whatsappDeliver(toE164: string, name: string, text: string): Prom
 }
 
 // ---------------------------------------------------------------------------
+// WhatsApp through UChat (feature 21, 3 Nov evening)
+// ---------------------------------------------------------------------------
+// The owner counts the bot as moved to UChat, and asked for the rest to follow
+// ("lets connect everything in the uchat?"). With WHATSAPP_VIA=uchat the debt
+// call's link and the "done" notice leave from the UChat number, through
+// UChat's API; unset or "chatwoot" keeps the Chatwoot path above. A setting, so
+// going back is not a deploy.
+//
+// The same two moves as Chatwoot's: free text inside 24 hours of the resident's
+// last message, a Meta template outside them. UChat accepts a message it cannot
+// deliver, so delivery is read back: a message WhatsApp took carries WhatsApp's
+// own id (`mid`, "wamid..."); one without it was refused (3 Nov). Everything is
+// sent as the BOT: UChat pauses the bot for 30 minutes after an agent's message.
+// The template must be in UChat's synced list, which follows the UChat number's
+// own WhatsApp account (3 Nov: it held no templates yet), so a notice waits as
+// `template_not_synced`, exactly as it does on Chatwoot.
+const UCHAT_API = "https://www.uchat.com.au/api";
+const viaUchat = () => (Deno.env.get("WHATSAPP_VIA") ?? "").trim().toLowerCase() === "uchat";
+
+async function uc(method: string, path: string, body?: unknown) {
+  const res = await fetch(UCHAT_API + path, {
+    method,
+    headers: {
+      Authorization: "Bearer " + (Deno.env.get("UCHAT_API_KEY") ?? ""),
+      "Content-Type": "application/json", Accept: "application/json",
+      // UChat's Cloudflare refuses some default user agents (error 1010); curl's passes.
+      "User-Agent": "curl/8.9.1",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(8000),
+  });
+  return { status: res.status, j: await res.json().catch(() => null) as any };
+}
+
+/** The resident's contact on the UChat number, by phone; null if they never wrote to it. */
+async function uchatContact(toE164: string): Promise<{ ns: string; id: number; lastIn: number } | null> {
+  const digits = toE164.replace(/\D+/g, "");
+  const r = await uc("GET", "/subscriber/get-info-by-user-id?user_id=" + encodeURIComponent(digits));
+  const s = r.j?.data;
+  if (r.status >= 300 || !s?.user_ns) return null;
+  // UChat writes "YYYY-MM-DD HH:MM:SS" in UTC; `last_interaction` is their last message.
+  const t = Date.parse(String(s.last_interaction ?? "").replace(" ", "T") + "Z");
+  return {
+    ns: String(s.user_ns),
+    id: Number(String(s.user_ns).match(/u(\d+)$/)?.[1] ?? 0),
+    lastIn: Number.isFinite(t) ? t : 0,
+  };
+}
+
+/** Did WhatsApp take what we just sent? A bot message since `after` carries `mid` when it did. */
+async function uchatDelivered(ns: string, after: number): Promise<boolean> {
+  await new Promise((r) => setTimeout(r, 2000));
+  const r = await uc("GET", "/subscriber/chat-messages?user_ns=" + encodeURIComponent(ns) + "&include_bot=1&limit=5");
+  return (r.j?.data ?? []).some((m: any) =>
+    m?.type !== "in" && Number(m?.ts ?? 0) >= after / 1000 - 5 && String(m?.mid ?? "").length > 0);
+}
+
+async function uchatDeliver(toE164: string, text: string): Promise<Delivery> {
+  if (!Deno.env.get("UCHAT_API_KEY")) {
+    console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
+    return { sent: false, reason: "unavailable" };
+  }
+  const last4 = toE164.replace(/\D+/g, "").slice(-4);
+  try {
+    const c = await uchatContact(toE164);
+    // No contact: they never wrote to the number, so the window is shut.
+    if (!c || Date.now() - c.lastIn > 24 * 3600 * 1000) {
+      return { sent: false, reason: "outside_window", conversationId: c?.id ?? 0 };
+    }
+    const t0 = Date.now();
+    const m = await uc("POST", "/subscriber/send-content", { user_ns: c.ns, send_as_agent: 0,
+      data: { version: "v1", content: { messages: [{ type: "text", text }] } } });
+    if (m.status >= 300 || m.j?.status === "error") {
+      console.error("whatsapp delivery (uchat): post refused", m.status, last4);
+      return { sent: false, reason: "not_sent" };
+    }
+    if (!(await uchatDelivered(c.ns, t0))) {
+      console.error("whatsapp delivery (uchat): no WhatsApp id", c.id, last4);
+      return { sent: false, reason: "outside_window", conversationId: c.id };
+    }
+    console.log("whatsapp delivery (uchat): sent", c.id, last4);
+    return { sent: true, conversationId: c.id };
+  } catch (e) {
+    console.error("whatsapp delivery (uchat): error", String(e).slice(0, 120));
+    return { sent: false, reason: "unavailable" };
+  }
+}
+
+/**
+ * send_ticket_notices with WHATSAPP_VIA=uchat: the same outbox, the same rules
+ * (a test prefix is skipped, a template UChat has not synced leaves the row
+ * pending, a refusal marks it failed with the reason), sent from the UChat
+ * number. `conversation_id` holds the UChat contact's number.
+ */
+// The column is a 32-bit integer (036); UChat's contact numbers are 10 digits
+// and still under the limit on 3 Nov. One past it is left blank, not a failed write.
+const asInt = (n?: number) => (n && n > 0 && n <= 2147483647 ? n : null);
+
+async function ticketNoticesViaUchat(args: any) {
+  if (!Deno.env.get("UCHAT_API_KEY")) return { ok: false, error: "uchat key unset" };
+  const limit = Math.min(Math.max(Number(args?.limit) || 20, 1), 100);
+  const { data: rows, error } = await db.from("ticket_notices")
+    .select("id,phone,template,params,attempts")
+    .eq("status", "pending").lt("attempts", 5)
+    .order("created_at", { ascending: true }).limit(limit);
+  if (error) return { ok: false, error: error.message };
+  const out = { ok: true, via: "uchat", sent: 0, failed: 0, skipped: 0, waiting: 0 };
+  if (!rows?.length) return out;
+  const synced = await uchatTemplates();
+  for (const n of rows) {
+    const last4 = String(n.phone).replace(/\D+/g, "").slice(-4);
+    const mark = (patch: Record<string, unknown>) => db.from("ticket_notices").update(patch).eq("id", n.id);
+    if (TEST_PREFIXES.some((p) => String(n.phone).startsWith(p))) {
+      await mark({ status: "skipped", error: "test_number" });
+      out.skipped++;
+      continue;
+    }
+    const t = synced[String(n.template)];
+    if (!t) {
+      await mark({ error: "template_not_synced" });
+      out.waiting++;
+      continue;
+    }
+    try {
+      const r = await uchatTemplate(String(n.phone), String(n.template), t, n.params ?? {});
+      if (!r.sent) {
+        await mark({ status: "failed", error: r.reason, attempts: n.attempts + 1, conversation_id: asInt(r.contactId) });
+        console.error("ticket notice failed (uchat)", last4, r.reason.slice(0, 80));
+        out.failed++;
+        continue;
+      }
+      await mark({ status: "sent", error: null, attempts: n.attempts + 1, conversation_id: asInt(r.contactId),
+                   sent_at: new Date().toISOString() });
+      console.log("ticket notice sent (uchat)", r.contactId, last4);
+      out.sent++;
+    } catch (e) {
+      await mark({ status: "failed", error: String(e).slice(0, 200), attempts: n.attempts + 1 });
+      out.failed++;
+    }
+  }
+  return out;
+}
+
+/** UChat's synced copies of the Meta templates, by name. One call; the caller decides when. */
+type UchatTemplate = { namespace: string; lang: string };
+async function uchatTemplates(): Promise<Record<string, UchatTemplate>> {
+  const r = await uc("POST", "/whatsapp-template/list?limit=100");
+  const out: Record<string, UchatTemplate> = {};
+  for (const t of (r.j?.data ?? [])) {
+    if (!t?.name) continue;
+    const status = String(t.status ?? "APPROVED").toUpperCase();
+    if (status !== "APPROVED") continue;
+    out[String(t.name)] = { namespace: String(t.namespace ?? ""), lang: String(t.lang ?? t.language ?? "he") };
+  }
+  return out;
+}
+
+/**
+ * One template to a phone through UChat, which makes the contact when there is
+ * none (a template needs no earlier message). Params are Chatwoot's
+ * {"1": ..., "2": ...}, the body's numbered places, as UChat's BODY_{{n}}.
+ * Never logs a param: one can BE the payment link.
+ */
+async function uchatTemplate(
+  toE164: string, name: string, t: UchatTemplate, params: Record<string, string>,
+): Promise<{ sent: true; contactId: number } | { sent: false; reason: string; contactId?: number }> {
+  const p: Record<string, string> = {};
+  for (const [k, v] of Object.entries(params)) p[`BODY_{{${k}}}`] = String(v);
+  const t0 = Date.now();
+  const r = await uc("POST", "/subscriber/send-whatsapp-template-by-user-id", {
+    user_id: toE164.replace(/\D+/g, ""), create_if_not_found: "yes",
+    content: { namespace: t.namespace, name, lang: t.lang, params: p },
+  });
+  if (r.status >= 300 || r.j?.status === "error") return { sent: false, reason: "post_refused_" + r.status };
+  const c = await uchatContact(toE164);
+  if (!c) return { sent: false, reason: "no_contact" };
+  if (!(await uchatDelivered(c.ns, t0))) return { sent: false, reason: "no_whatsapp_id", contactId: c.id };
+  return { sent: true, contactId: c.id };
+}
+
+// ---------------------------------------------------------------------------
 // The tools
 // ---------------------------------------------------------------------------
 // Each returns a short object the agent can read back. Keep the strings plain:
@@ -1941,7 +2142,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
       building: r.building ?? "", unit, months: monthsHe(periods), amount,
     });
-    let d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), (line ? line + "\n" : "") + got.link);
+    const linkText = (line ? line + "\n" : "") + got.link;
+    let d = viaUchat()
+      ? await uchatDeliver(String(r.phone), linkText)
+      : await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), linkText);
 
     // 23 Sep: a debt call is OUTBOUND -- we ring someone who has not written to
     // us -- so Meta's 24-hour window is shut by default and the free-text link
@@ -1953,7 +2157,29 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // Only for outside_window: `no_contact` and `no_conversation` mean there is
     // nowhere to send anything, and a template does not create a conversation.
     let viaTemplate = false;
-    const shut = !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
+    const linkParams = {
+      "1": monthsHe(periods).join(", ") || "ועד הבית",
+      "2": String(amount),
+      "3": got.link,
+    };
+    // Through UChat a template needs no conversation first: UChat makes the
+    // contact, so a resident who never wrote to the number can still get it.
+    if (viaUchat() && !d.sent && d.reason === "outside_window") {
+      const ut = (await uchatTemplates())[PAYMENT_TEMPLATE];
+      if (!ut) {
+        console.warn("payment link template not synced (uchat)", PAYMENT_TEMPLATE, last4);
+      } else {
+        const sent = await uchatTemplate(String(r.phone), PAYMENT_TEMPLATE, ut, linkParams);
+        if (sent.sent) {
+          viaTemplate = true;
+          d = { sent: true, conversationId: sent.contactId };
+          console.log("payment link sent as template (uchat)", sent.contactId, last4);
+        } else {
+          console.error("payment link template refused (uchat)", last4, sent.reason.slice(0, 80));
+        }
+      }
+    }
+    const shut = !viaUchat() && !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
     if (shut) {
       const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
       const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
@@ -1961,11 +2187,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (!t) {
         console.warn("payment link template not synced", PAYMENT_TEMPLATE, last4);
       } else {
-        const sent = await sendTemplate(admin, bot, shut, PAYMENT_TEMPLATE, t, {
-          "1": monthsHe(periods).join(", ") || "ועד הבית",
-          "2": String(amount),
-          "3": got.link,
-        });
+        const sent = await sendTemplate(admin, bot, shut, PAYMENT_TEMPLATE, t, linkParams);
         if (sent.sent) {
           viaTemplate = true;
           d = { sent: true, conversationId: shut };
@@ -2003,6 +2225,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * text: counts and last digits.
    */
   async send_ticket_notices(args, _ctx) {
+    if (viaUchat()) return await ticketNoticesViaUchat(args);
     const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
     const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
     if (!admin || !bot) return { ok: false, error: "chatwoot tokens unset" };
@@ -3951,8 +4174,17 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
   async store_media(args, ctx) {
     const bare = barePhone(ctx);
     if (!bare) return { ok: false, error: "no phone" };
-    const messageId = String(args?.message_id ?? "").replace(/\D+/g, "");
-    if (!messageId) return { ok: false, error: "no message id" };
+    // Chatwoot's ids are digits. The UChat copy's carry a "uchat:" prefix
+    // (feature 21, 3 Nov): UChat numbers our messages from 1, Chatwoot's range,
+    // so a bare UChat id would overwrite a Chatwoot photo with the same number
+    // in the bucket. The prefix is kept on the row, where the dashboard matches
+    // it to messages.external_id, and spelled "uchat-" in the file's name.
+    const rawId = String(args?.message_id ?? "");
+    const fromUchat = /^uchat:/i.test(rawId.trim());
+    const digits = rawId.replace(/\D+/g, "");
+    if (!digits) return { ok: false, error: "no message id" };
+    const messageId = fromUchat ? "uchat:" + digits : digits;
+    const fileId = fromUchat ? "uchat-" + digits : digits;
 
     const images = (Array.isArray(args?.attachments) ? args.attachments : [])
       .filter((a: any) => a && a.file_type === "image" && typeof a.data_url === "string")
@@ -3965,8 +4197,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
     for (let i = 0; i < images.length; i++) {
       const url = String(images[i].data_url);
-      const allowed = MEDIA_HOSTS.some((h) => url.startsWith(h)) || url.startsWith("data:image/");
-      if (!allowed) { skipped.push({ i, reason: "host not allowed" }); continue; }
+      if (!mediaAllowed(url)) { skipped.push({ i, reason: "host not allowed" }); continue; }
       try {
         const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15000) });
         if (!res.ok) { skipped.push({ i, reason: `fetch ${res.status}` }); continue; }
@@ -3978,7 +4209,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           skipped.push({ i, reason: `size ${bytes.length}` });
           continue;
         }
-        const path = `${bare}/${messageId}-${i}.${ext}`;
+        const path = `${bare}/${fileId}-${i}.${ext}`;
         const { error: upErr } = await db.storage
           .from(MEDIA_BUCKET)
           .upload(path, bytes, { contentType: mime, upsert: true });

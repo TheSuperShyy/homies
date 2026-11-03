@@ -468,6 +468,22 @@ runnning in uchat"*.
 - Voice team notes and the ticket notices (`ticket_resolved_he`) still go through Chatwoot.
 - So "the live bot" now means the UChat one. Ask before switching anything off on the Chatwoot side.
 
+**3 Nov evening: the rest is connected to UChat** (owner: *"lets connect everything in the uchat?"*;
+feature 21, "Connected on 3 Nov evening"). These hold from now on:
+- **`messages` has two writers.** The UChat copy logs as `source` 'uchat' with `external_id`
+  'uchat:<n>', because UChat numbers our messages from 1, the range Chatwoot's ids are in. A
+  photo's `message_external_id` carries the same prefix. Anything new that reads the log or
+  matches ids must expect both.
+- **The tool server sends WhatsApp through UChat** (`WHATSAPP_VIA=uchat`, debt-tools v140): the
+  debt call's link and the "done" notice. `WHATSAPP_VIA=chatwoot` plus an `--apply` moves back.
+  Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
+  mirror's key.
+- **Templates belong to the number's own WhatsApp account.** The UChat number's ("hadas 1") has
+  none, and Meta blocks it from starting conversations (141006, no payment method). So no
+  template leaves UChat until both are fixed in Meta. Inside 24 hours, free text goes.
+- **The phone agents' notes stay in Chatwoot's Voice inbox** until a UChat ticket list exists.
+  Only UChat's dashboard can create one.
+
 **Later the same evening the owner asked for a Hebrew Google Sheet comparing the two, leaning to
 Chatwoot** (*"make sure we lean more to chatwoot"*). The sheet does not undo the line above. The
 UChat bot is still the one in use until the owner says otherwise. How the sheet is kept (where it
