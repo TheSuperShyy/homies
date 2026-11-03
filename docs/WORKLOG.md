@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Yariv's page: the 23-hour reminder becomes an update when the ticket closes (owner: "lets remove the reminder", interrupted, then "replace the 23hrs reminder with follow up on the ticket once its closed")
+- The ManyChat point's last sentence "נשארה רק התזכורת אחרי 23 שעות" is now "נשאר רק עדכון לדייר כשהקריאה שלו נסגרת". It is still what is left, so the point stays "partly done". No "23 שעות" is left on the page.
+- It is still left because the closed-ticket message (`ticket_resolved_he`) reaches no tenant on the live numbers yet.
+- **Republished:** version `1793720793-a736` over `1793720513-482c`, still shared by link. Counts unchanged.
+
 ### Yariv's page: the session with Yariv was held and he approved the features (owner: "also we have a session with yariv and he approved the features")
 - The ManyChat point's last sentence "נשארו התזכורת אחרי 23 שעות, ופגישה עם יריב על שאר התהליכים" is now "קיימנו פגישה עם יריב, והוא אישר את הפיצ'רים. נשארה רק התזכורת אחרי 23 שעות."
 - **Status kept "partly done":** the 23-hour reminder is still listed. Counts unchanged.
