@@ -521,6 +521,12 @@ message pauses the bot for that contact for 30 minutes, so the bot's replies go
 through `send-content` with `send_as_agent: 0`. **A message in UChat's log is
 not a delivered one:** a sent message carries WhatsApp's id (`mid`, "wamid…");
 without it WhatsApp refused it, and the reason is in UChat's error log.
+**UChat keeps WhatsApp's own message id** (`mid` in `chat-messages`, 3 Nov),
+and its API has no typing call of its own. So the UChat copy shows live's typing
+dots by calling Meta itself: the read-plus-typing call for the UChat number
+(`UCHAT_WA_PHONE_ID`), with the system-user token in a credential of the copy's
+own. The dots depend on that token still reaching the number. They are a Meta
+write on every message, made on the owner's go ("yes i need it back").
 UChat's builder can be driven from here only over Chrome's own protocol:
 Playwright 1.63 cannot attach to Chrome 151.
 

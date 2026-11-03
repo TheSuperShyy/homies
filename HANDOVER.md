@@ -37,7 +37,8 @@ appended to.
 >       - `Let them finish` is 2 s for typed text and none after a tap (live: 4 s);
 >       - the way in reads the contact and its messages at once.
 >       - Measured at 10:42 UTC on the owner's messages: 44 s (a ticket lookup, rewritten once by Send's checks), 29 s and 18 s. Gemini's first call is the bulk (14–19 s).
->     - **The typing dots are back since 11:10 UTC:** live's Meta call for the UChat number (`UCHAT_WA_PHONE_ID`), with UChat's copy of WhatsApp's message id, and the credential "UCHAT — WhatsApp typing (Meta)" (the system-user token). Owed: Meta's answer on the owner's next message.
+>     - **The typing dots are back since 11:10 UTC:** live's Meta call for the UChat number (`UCHAT_WA_PHONE_ID`), with UChat's copy of WhatsApp's message id, and the credential "UCHAT — WhatsApp typing (Meta)" (the system-user token, n8n id in `UCHAT_N8N_CRED_TYPING`). Owed: Meta's answer on the owner's next message.
+>       - **If the dots stop:** read `Show typing`'s output in the copy's run (Meta's answer). An empty `message_id` means the translator lost UChat's `mid`; a permission error means the token no longer reaches the UChat number.
 >     - **The owner wants 10 s at most. It is not reachable on this path with this prompt** (WORKLOG 3 Nov):
 >       - 3.7 Flash at thinking low tested at a median of 15.6 s on the phone, with invented answers, so it is not used;
 >       - 3.1 Pro at thinking low measured 8.7 s on one call against 18.8, and is untried in conversations;

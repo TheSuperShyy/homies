@@ -26,6 +26,7 @@ conversation that produced it.
 - **Checked offline**, 6 cases: the id travels from the translator to From UChat to both typing calls, and an empty id does not break the call.
 - **Put live at 11:10 UTC with `--apply`.** Read back: the URL, the body byte for byte as tested, the credential, and the translator's `source_id`. The model and the wait are unchanged.
 - **WhatsApp shows the dots for at most 25 s**, as on live. On the slowest replies (44 s at 10:42) they stop before the answer comes.
+- **Briefing:** CONTEXT.md got the standing fact (UChat keeps WhatsApp's id; its API has no typing call), HANDOVER.md where to look if the dots stop. These were added after the stop hook caught CONTEXT.md missing from the first commit.
 - **Owed:** Meta's answer to the call on the owner's next message.
 
 ### UChat set up like our Chatwoot: the four departments, the eight labels, Hebrew, and hand-overs landing in their department (from ~10:40 UTC)
