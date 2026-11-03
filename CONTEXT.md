@@ -479,6 +479,11 @@ the live bot's own logic, with its Chatwoot calls answered by a translator
 workflow that works through UChat's API. It runs the live tools for test
 phones only. **Re-run it with `--apply` after any change to the live bot**, or
 the UChat version drifts. Never edit the UCHAT copies by hand.
+**On UChat's free plan nothing can call another system** (External Request,
+the Webhook integration and WhatsApp Cloud are Pro; checked 3 Nov), so the
+UChat version answers no one until the workspace is on Business ($15 a month).
+UChat's builder can be driven from here only over Chrome's own protocol:
+Playwright 1.63 cannot attach to Chrome 151.
 
 **Creating a WhatsApp inbox in Chatwoot IS the cutover.** Learned the hard way
 21 Aug. Chatwoot writes a per-phone-number `webhook_configuration` override on
