@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Read only: the "Michael Test Checklist" (`1793709531-c792`) checked against the live rules (owner's screenshot + link: "this one is like a reply to the text in question like this")
+- **The screenshot** came from another checklist: "רשימת בדיקת הבוט (Copy)", a dress studio's bot. The link is the Homies one, after the fixes in the entry below.
+- **Still wrong for the bot as it runs now. The run below used stand-in tools, which skip both:**
+  1. **2.2.** A tester whose number is not on file is asked for a full name once before the ticket opens (`need_name`, since 30 Oct). The page expects the ticket at once. Only the owner (as Assaf Clix) and Ido are on file, so Amit and any new tester would mark a correct answer wrong. Emergencies (6.2) open without a name, as the page says.
+  2. **2.3 lets Michael say "כשהקריאה תיסגר, תגיע על זה הודעה לכאן".** Nothing delivers that message now. The UChat number has no ticket notices, and on the test number `ticket_resolved_he` is PENDING and the account has 141006. The line is in the bot's design (`n8n_whatsapp_danger.py`), so today it is a promise the system does not keep.
+- Nothing was changed, in the artifact or in the bot.
+
 ### The tester checklist run through the bot before testers get it: 4 tests fixed, 1 added, and the bot's own slips (owner: "so this one its accurate based from the chatbot right", then "ok" to running it, about $1-2)
 - **How:** `wa_qa.py`'s Chat, the live code and prompt on Gemini 3.1 Pro, stand-in tools (nothing written, no WhatsApp).
   - Five chats as a tester would send them, every message exactly as the page has it. Where the bot asked for an address, the tester answered as the how-to says, "בר כוכבא 23 דירה 2".
