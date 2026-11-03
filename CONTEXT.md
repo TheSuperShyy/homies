@@ -4111,8 +4111,11 @@ when a person ask for a quote it will mention on the inbox"*. So:
 - the website link exists;
 - a quote request is a note in the chat inbox (notify_team, reason quote, no ticket), in place of the
   old leads board.
-- Only the 23-hour reminder is still missing, plus the session with Yariv on the flows we have not
-  seen. The 6 Oct comparison pages still count all four as missing: they are a dated snapshot.
+- Only the 23-hour reminder is still missing. The 6 Oct comparison pages still count all four as
+  missing: they are a dated snapshot.
+- **The session with Yariv has happened, and he approved the features** (owner, 3 Nov: *"we have a
+  session with yariv and he approved the features"*). The joint walk through the old flows is no
+  longer owed.
 - **Yariv's page does not mention the elevator at all** (owner, minutes later: *"dont mention the
   elevator at all"*), not even as "not needed".
 
