@@ -2370,6 +2370,13 @@ explicitly on 30 Aug. The rule that a capability question is not consent is why
 the finding "their key can clone" and the act of cloning on it were two separate
 turns.
 
+**A simulated caller on Cartesia speaks on the client's Cartesia bill (3 Nov).** Since the move to
+Yariv's Vapi account (23 Oct), its Cartesia credential (`aeaa8296`) is the client's key, so any
+Cartesia voice on that account, a test caller's included, spends the client's characters.
+`vapi_sim_inbound.py` keeps its caller on Azure for that reason. `vapi_sim_manager.py` voices its
+tenant with Cartesia's stock "Asaf" only because the owner asked for it ("with cartesia as the
+tenant"). Each run's price says so.
+
 ## Ask the API and read the price list
 
 A vendor's feature documentation is not a statement about your account. Cloning

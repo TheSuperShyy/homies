@@ -17,6 +17,12 @@ appended to.
 >   - **Changed:** the prompt (7,410 → 8,811 characters), and notify_team's own text plus the "team note" wording in open_request, get_balance and get_service_info. Intake only: the debt agent's tools are byte-identical, and it was not pushed.
 >   - **Pushed** with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`, after comparing every field with the live agent. Read back: prompt and tools equal the repo, voice `ba765d50`, model gpt-5.6-sol.
 >   - **Checked with Claude only** (five cases, no spend), so it checks the text, not gpt-5.6-sol. **Owed: the owner's own call:** 077-6687949, then 9, and ask for a manager.
+>   - **A simulated call is ready, NOT run, waiting for the owner's go on the price.**
+>     - Command: `python scripts/vapi_sim_manager.py --run local/voice-tests/2026-11-03-manager`.
+>     - Cost: about $0.40-0.60 from the Vapi wallet, plus a few cents of the client's Cartesia characters for the tenant's voice.
+>     - The call: Assaf on Cartesia "Asaf" asks for a manager, refuses once, gives the lobby leak, then asks when the manager will call.
+>     - notify_team is mocked. open_request is real, for flat 2 at בר כוכבא 23, and its ticket is kept.
+>     - It saves the recording and the transcript into that folder. Play the recording for the owner.
 >   - **Not changed:**
 >     - the debt-call agent, which on a request for a person still says someone from the team will call back, and ends the call;
 >     - the end-of-call summary, which on `01a1a1ba` said "ולכן הועבר למנהל" when nothing was transferred.

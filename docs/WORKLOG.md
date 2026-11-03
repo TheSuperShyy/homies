@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Ready, not run: a simulated manager call with a Cartesia tenant (owner: "nice is it live yet? can i hear it like do a simulated test in the bg with cartesia as the tenant")
+- **Answered:** yes, live since 14:23:36 UTC (the entry below).
+- **`scripts/vapi_sim_manager.py` (new):** one call through Vapi's simulations API (`/eval/simulation/run`) to the live incoming agent, over `vapi.websocket`. It reuses `vapi_sim_inbound.py`'s API helper, personality and `WHO`.
+  - **The tenant:** Assaf Clix, בר כוכבא 23 flat 2, on gpt-4.1. The voice is Cartesia's stock Hebrew "Asaf" (`HEBREW_MEN["asaf"]`, sonic-3.5), which uses the account's Cartesia credential, the client's key (CONTEXT, "Whoever owns the key owns the voice"). The transcriber stays Azure.
+  - **The call:** "אני רוצה לדבר עם מנהל.", one "לא רוצה להסביר לבוט, תביא לי בן אדם.", then the lobby ceiling dripping by the mailboxes, then "ומתי המנהל יחזור אליי?", then goodbye. Up to 210 s.
+  - **Mocks:** notify_team answers "Success.", as the live async tool does. The 22 Oct script's `team_notified: true` would have been a cue toward "the team knows". open_request is real, and its ticket is kept.
+  - **Vapi's judge:** someone else in a reply (expect no), argued or refused (no), and a request number given (yes).
+  - **Saved to DIR:** run.json, items.json, call.json, transcript.txt, and the recordings (mono and stereo, when Vapi has them).
+- **Checked, free:**
+  - the dry print of the run body;
+  - `vapi_transfer.py --balance` says in credit;
+  - the live agent records (`recordingEnabled` true).
+- **Price given, go asked:** about $0.40-0.60. The 22 Oct run cost $0.61 for three calls of 54-82 s, both sides. Add a few cents of the client's Cartesia characters. Not started: one go buys one run.
+
 ### LIVE 14:23:36 UTC: the incoming phone agent handles a request for a manager the chatbot's way, and speaks only for itself (owner: "i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything")
 - **The call behind it:** 14:04 UTC (`01a1a1ba`, 2 min), the owner's test through 208.
   - A leak at בר כוכבא 23, with "I don't know" to where the water comes from and to where exactly it shows. Then: "אני לא יודע, אני רוצה שתביא לי מנהל עכשיו".
