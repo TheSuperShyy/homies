@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### A Hebrew onboarding video of the UChat inbox, the Chatwoot video's twin (from ~11:00 UTC)
+- **Asked:** *"ok now create a screen recording like the one we did for chatwoot"*.
+- **The video:** `local/onboarding/uchat-onboarding-he.mp4` (ignored by git), 2:56, 1920x1080, H.264, 7.4 MB.
+  - It opens with a title card and walks UChat's chat area:
+    - the bot answers first;
+    - the לא משוייך, הוקצה לי and הקבוצות שלי filters;
+    - קבוצות סוכנים, the departments;
+    - opening the owner's test chat;
+    - its department in the side panel;
+    - the תוויות tab (handover, handover-operations) and the hand-over details tab;
+    - taking the chat (the avatar, then CLIX);
+    - a reply typed, with a ring on שלח (never sent): a staff reply stops the bot for 30 minutes;
+    - השהה אוטומציה;
+    - a note typed in the הערה tab (never added);
+    - הזז אל הסתיים, finding the chat under הסתיים, and פתיחה מחדש;
+    - a summary card.
+  - Captions are plural imperative Hebrew, like the Chatwoot video's. Each one matches what was verified today. Assigning does not pause the bot (proven by API). A staff reply pauses it for 30 minutes (UChat's docs, and the 09:36 `send-text` test). A chat moved to done leaves the open list and closes on screen, and its button becomes פתיחה מחדש.
+- **How:** `local/onboarding/uchat/record.py`, the Chatwoot recorder's twin.
+  - A private headless Chromium (Playwright, chromium-1234), logged in with the owner's Chrome session. The cookies are read over port 9333, kept in memory and never written.
+  - `uchat/overlay.js` is the Chatwoot overlay plus a name blur, which also covers input values.
+  - Frames come from Chrome's screencast and are encoded with ffmpeg.
+- **Four takes:**
+  1. The reply and note steps failed: the reply box is a rich editor, not a textarea, and in note mode the tabs move beside שלח.
+  2. Clean, but "Elmaliach Ido" sat unblurred in the list: Ido had written at 11:13 UTC.
+  3. Overwrote take 2. Every step from opening the chat failed, because UChat was slow (its login page took 12 s; the list was still loading).
+  4. Clean, used. The list is narrowed to the owner's chat with UChat's search before recording, and holds through every filter (checked first, read only). Every contact's name is blurred, read from UChat at the start (Amit had also written in by then).
+  - A take with a failed step now goes to a separate `.failed-take.mp4` and never replaces the video.
+- **What it changed, all put back:**
+  - On the owner's WhatsApp chat only: assigned to CLIX, moved to done, reopened.
+  - Each take ended with `restore()`: unassign, group 20219 back, status open. Read back as before every time: group 20219, no agent, not paused, open, both labels and tags.
+  - Two behaviour checks outside the takes moved it to done and back.
+  - UChat's message list shows no staff message since 09:36 UTC: nothing was sent.
+- **Removed afterwards:** the raw frames (376 MB) and the exploration screenshots, which showed the owner's number unblurred.
+
 ### The UChat bot answers everyone on its number (owner: "check the new message its from ido it says the bot did not respond", then "on meta we have a real number so we dont need to add anyone as test user")
 - **What happened to Ido's message:**
   - His "היי" reached the UChat bot at 11:13:57 UTC (run 150807; the contact is "Elmaliach Ido" on WhatsApp Cloud).

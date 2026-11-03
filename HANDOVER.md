@@ -25,6 +25,10 @@ appended to.
 >   - **The translator** writes each label twice, as a tag (which the copies read back, `bot-off` included) and as a label (which staff see), and maps a team to its group. Only the translator was written; rollback: `local/uchat-prep/n8n-uchat-translator-before-groups-2026-11-03.json`.
 >   - **Proven with no AI:** a hand-over call on the web chat's contact landed in service, with the owner as its member and both labels, and **the bot was not paused.** It was cleaned up afterwards.
 >   - **Waiting:** the test seat ("seat2 test" in Chatwoot) is not invited, because an invite emails a person. Staff join on the owner's word. A real hand-over from a message is a paid test.
+>   - **A HEBREW ONBOARDING VIDEO OF THE UCHAT INBOX EXISTS (3 Nov):** `local/onboarding/uchat-onboarding-he.mp4`, 2:56, 1920x1080, ignored by git. It is the Chatwoot video's twin: same overlay, captions, ring and cursor. WORKLOG 3 Nov.
+>     - **Re-record** with `python local/onboarding/uchat/record.py`. Read it first. It logs in with the owner's Chrome session (port 9333, cookies kept in memory only), and UChat must be reachable: 12 s page loads were seen on 3 Nov.
+>     - **What it touches:** the owner's own WhatsApp chat, found by the owner's number (`OXS_MIRROR_PHONES`). It is assigned to CLIX, moved to done and reopened, then put back by API and compared with `state_before.json`. A reply and a note are typed and never sent; the bot is never paused. `--restore` puts the chat back alone.
+>     - **Privacy:** the bot answers everyone on its number since 3 Nov, so the list is narrowed to the owner's chat with UChat's own search before recording, and every contact's name (read from UChat when it starts), phone and email is blurred. The raw frames and screenshots were deleted.
 >   - **IT ANSWERS IN UCHAT'S WEB CHAT SINCE 3 Nov, 08:19 UTC.**
 >     - **Where:** a new UChat account (workspace "homies-uchat", bot `f315405`, `.env` `Uchat_api_key`), on UChat's free Pro trial until about 16 Nov. Then the Business plan, $15 a month, or it stops.
 >     - **Proven:** "היי" got the live greeting and the two buttons, with no AI call (execution 150459).

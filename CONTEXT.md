@@ -478,6 +478,12 @@ Three facts hold with or without a move:
   tags at once (the tag for the bot's read-back, the label for staff). Setting
   the workspace up needs a key with "Manage Team" (`UCHAT_API_KEY_TEAM`); the
   bot's key has "Manage Flow" only and gets 403 there.
+- **A screen recording of UChat shows nobody's chat but the owner's (3 Nov).**
+  Anyone can write to the UChat number, and the chat list shows each chat's
+  last message. So the list is narrowed to the owner's chat with UChat's own
+  search before recording starts. The overlay blurs every contact name, read
+  from UChat at the start, as well as phones and emails. Ido and Amit wrote in
+  while the video was being made.
 
 **3 Nov, later: a UChat version of the bot exists beside the live one.**
 `scripts/n8n_uchat.py` regenerates it from live, the way the sandbox is made:
