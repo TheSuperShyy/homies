@@ -19,6 +19,14 @@ appended to.
 >   - **Built from the Hebrew source, never edited by hand:** change `local/artifacts/michael-checklist/index.html`, run `python local/artifacts/michael-checklist-en/build.py`, then republish both. The English page republishes with `publish_files`, slug and base_version.
 >   - `build.py` refuses a new section, or a new hint (`with`) that has no English yet.
 >   - Private to the owner until they share it.
+> - **"Michael Simulated Run"** https://claude.ai/artifact/6MuTsoP1rojWBmMvxS4nqk (slug `2b68e680-ebca-4145-b6d3-1ec913a80607`, owner: *"make the checklist like a simulation so each reply have the check and x and a comment"*).
+>   - **What it shows:** the 30 messages of the checklist run (3 Nov, wa_qa Chat: live code and prompt on Gemini 3.1 Pro, stand-in tools). For each: Michael's reply as the phone shows it, an English translation, what the bot did behind the scenes, what it should do, and ✓ / ✗ and a comment.
+>   - **Marks:** its own shared marks, declared like the checklists.
+>   - **Source:** `local/artifacts/michael-simulation/`. That holds the run's transcripts (`run-2026-11-03/`, copied from the other session's scratchpad), `translations.json` and `build.py`.
+>     - The build reads the test numbers and expectations from the Hebrew checklist's source.
+>     - It refuses a reply with no translation, or with the wrong number of messages.
+>   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then translate it and rebuild; ask the owner first.
+>   - Private to the owner until they share it.
 > - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. Change `local/artifacts/yariv-feedback/items.json`, run `build.py` there, republish.
 > - **Not on Yariv's page:** the recording is back on since 26 Oct and he has not been told. The owner decides whether to tell him.
 >

@@ -539,6 +539,11 @@ one with english version").** `local/artifacts/michael-checklist-en/build.py` re
 Hebrew page's source, so a change to a test is made once and both pages show it. The messages to send stay
 Hebrew on both pages, because what is tested is the bot's answer to the Hebrew a tenant writes.
 
+**The simulated run is a review of replies the bot really gave, not a prediction (3 Nov, "Michael Simulated
+Run").** Each reply comes from one run of the live code and prompt, with stand-in tools, saved as transcripts.
+It is reviewed as it stands. When the prompt changes, the page is out of date until a new paid run replaces it.
+The English beside each reply is a translation for readers; the Hebrew is what is judged.
+
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before
 every balance, which the 29 Oct change had already ended for numbers on file. Each

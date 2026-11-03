@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### "Michael Simulated Run": the checklist's 30 messages with the bot's real replies, each reviewed ✓ / ✗ with a comment (owner: "make the checklist like a simulation so each reply have the check and x and a comment")
+- **No new spend:** built from the other session's checklist run, 30 messages for $1.25. That run used `wa_qa.py`'s Chat on the live code and prompt, Gemini 3.1 Pro and stand-in tools.
+  - Its logs and chats were copied from that session's scratchpad into `local/artifacts/michael-simulation/run-2026-11-03/`, so they outlive it.
+  - 3.3 uses the re-run with the checklist's current wording, sent at the end of chat 2.
+- **Published:** https://claude.ai/artifact/6MuTsoP1rojWBmMvxS4nqk (slug `2b68e680-ebca-4145-b6d3-1ec913a80607`), version `1793711643-a759`, private. Its own shared marks are declared like the checklists'.
+- **Each of the 30 steps, in five chats in the checklist's order, shows:**
+  - the message (or the button tap);
+  - Michael's reply as the phone shows it, with an English translation under each bubble;
+  - the menu's buttons where they came;
+  - what the bot did behind the scenes, in plain words (from the tool calls);
+  - what Michael should do, from the Hebrew checklist's source, English and Hebrew;
+  - ✓ Right / ✗ Wrong and a comment.
+- **Built by** `local/artifacts/michael-simulation/build.py`, from the run, `translations.json` and the checklist's source.
+  - It refuses a missing translation or a message-count mismatch, and checks for 30 steps.
+  - Translations flag what English cannot show: 7.4 and 7.5 feminine, 7.7 back to the masculine.
+- **Two corrections against the run's own records:**
+  - The test tool still models three menu buttons, but the live menu has two since 29 Oct, so the page shows the two.
+  - 1.1 is the system's fixed greeting, not an AI reply.
+- **Checked before publishing:** rendered headless at 1280 px and 390 px, 30 rows, no sideways scroll, no script errors. A ✓ and a ✗ were clicked: the counts moved, and the comment box opened on ✗.
+
 ### An English twin of the Michael Test Checklist (owner, a screenshot of 2.1: "create a new one with english version")
 - **Published:** "Michael Test Checklist (English)", https://claude.ai/artifact/98vc9XUS66HtatK4pox96L (slug `41e459fd-e681-4bda-8fa2-4f34c403b2ed`), version `1793710891-13c7`, private to the owner.
   - The same 29 tests and 7 parts, in the same order with the same ids.
