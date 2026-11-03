@@ -2,7 +2,7 @@
 
 **Estimate:** 13-19d (one developer), plus 1d for the dry run that can happen first
 **Depends on:** 11-whatsapp-bot, 12-chatwoot, 16-human-handover; a WhatsApp number UChat can connect (in practice Homies' own)
-**Status:** prepared 3 Nov 2026. **The UChat version of the bot is built and running on our side (3 Nov, owner: *"lets create a uchat version as well of the chatbot"*)**, beside the live bot, and waits for one sub flow in UChat's dashboard (below). No number is moved; the live bot is untouched.
+**Status:** prepared 3 Nov 2026. **The UChat version of the bot is built and running on our side (3 Nov, owner: *"lets create a uchat version as well of the chatbot"*)**, beside the live bot. **It waits for UChat's paid plan:** External Request, the one step that lets UChat call us, is refused on the free plan ("Upgrade to Pro account to use this feature", 3 Nov). Business is $15 a month. No number is moved; the live bot is untouched.
 
 ## Purpose
 
@@ -51,9 +51,18 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 - it gets UChat's "not found" and answers it in Chatwoot's shape;
 - the copy's whole way in runs without an error, to `Sort` and `Answer Meta`.
 
-**Still to do, in UChat's dashboard (its API cannot make a flow):**
-1. A sub flow named **Michael** with one Action step, **External Request**, also named **Michael**. Its method, address and body are in `local/uchat-prep/uchat-setup.txt`, kept out of git because the address carries the secret.
-2. The bot's web chat, opened once.
+**Done in UChat's builder (3 Nov),** driven from a local Chrome window that the owner logged in to:
+- the sub flow **Michael** (`f306703s5045787`), a draft;
+- its Start step leads to an empty Action step, "Action #1".
+
+**Blocked on the free plan:**
+- Adding **External Request** to that step was refused: *"Upgrade to Pro account to use this feature."*
+- The other ways out of UChat are Pro too: Integrations (the Webhook integration), Notification and AI Actions.
+
+**To finish, once the plan is paid:**
+1. Add the External Request. Its method, address and body are in `local/uchat-prep/uchat-setup.txt`, kept out of git because the address carries the secret.
+2. Name the step **Michael** and publish.
+3. Open the web chat once.
 
 **Then from here:**
 - `--wire` makes "Michael" the default reply and the web chat's start flow.
@@ -188,8 +197,11 @@ Chatwoot is not switched off at the move, so the rollback needs no rebuild.
 
 ## Running cost
 
-These are 29 Sep prices, not checked again:
-- **UChat Business:** about $80-95 a month with 10 seats, or $125-140 with all 19 staff.
+- **UChat's own page, 3 Nov:**
+  - Business is **$15 a month** (shown down from $29): 1 bot, 1,000 contacts, 5 members.
+  - Extras: 1,000 contacts $5, a member $10, a bot $10, each a month.
+  - Partner is $199 a month.
+- **For the whole staff, at those prices:** about $60 a month with 10 seats, or about $105 with all 19 staff, both on the 10,000-contact tier. The 29 Sep estimate was $80-95 and $125-140, when a member was $5.
   - Contacts count everyone who has ever written. About 7,500 residents puts it on the 10,000 tier.
 - **No AI key is needed in UChat,** because the bot stays on OpenRouter.
 - **Inbound webhooks (500 a day per bot) are not used.** Replies go through the REST API, whose rate limit UChat does not publish.

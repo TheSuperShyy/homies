@@ -15,9 +15,9 @@ appended to.
 >   - All three are active. The live bot is untouched.
 > - **Live tools, test phones only** (`UCHAT_TEST_PHONES`). Its tickets are real, like a test on WhatsApp.
 > - **Re-run `python scripts/n8n_uchat.py --apply` after any change on live,** or the copy drifts. Never edit the copies by hand.
-> - **Waiting on the owner in UChat's dashboard:**
->   - a sub flow "Michael" with one External Request step, also named "Michael". Its settings are in `local/uchat-prep/uchat-setup.txt`, out of git;
->   - the web chat opened once.
+>   - **Waiting on UChat's paid plan (owner's decision):** the sub flow "Michael" exists (a draft, with an empty Action step), but UChat refuses External Request on the free plan ("Upgrade to Pro account to use this feature", 3 Nov). Business is $15 a month.
+>   - **After paying:** add the External Request (`local/uchat-prep/uchat-setup.txt`, out of git), name the step "Michael", and publish.
+>   - **The builder can be driven from here:** a local Chrome with the owner's UChat login (`local/uchat-prep/browser-profile`), over Chrome's own protocol. Playwright 1.63 cannot attach to Chrome 151.
 > - **Then from here:** `--wire`, `--tester <user_ns>`, and a "היי" (the menu, no AI).
 > - **Not in it:** photos on tickets, voice notes, the dashboard's log, and WhatsApp, which needs a number in UChat.
 >

@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### UChat's builder: the "Michael" sub flow made, External Request refused on the free plan (owner: "ok you do it")
+- **How:**
+  - A local Chrome window (`local/uchat-prep/browser-profile`, out of git), with a control port on 127.0.0.1:9333.
+  - The owner logged in to UChat themselves, and a watcher saw them past the login.
+  - Playwright 1.63 could not attach to this Chrome 151: its driver dies on Chrome's new `browser_ui` targets. So the window was driven over Chrome's own protocol (`websockets`), with screenshots in `local/uchat-prep/shots/`.
+- **The workspace:** Free plan; members 1/1, contacts 0/200, bots 1/1. "homies-chatbot" is an Omni (web) bot.
+- **Made:** the sub flow **Michael** (`f306703s5045787`, a draft): its Start step leads to an empty Action step, "Action #1".
+- **Refused:**
+  - Advanced Actions → External Request gave *"Upgrade to Pro account to use this feature."*
+  - Integrations (the Webhook integration), Notification, AI Actions and WhatsApp Cloud are all marked PRO.
+  - **So on the free plan nothing in UChat can call our bot.**
+- **UChat's prices, read on its own billing page (nothing clicked to buy):**
+  - Business is $15 a month (shown down from $29): 1 bot, 1,000 contacts, 5 members.
+  - Extras: 1,000 contacts $5, a member $10, a bot $10, each a month.
+  - Partner is $199 a month.
+- **Waits on the owner's decision to subscribe.** The card is entered by the owner on that page.
+- **Then:** the External Request (`local/uchat-prep/uchat-setup.txt`), publish, `--wire`, the web chat, `--tester`, a "היי".
+
 ### The UChat version of the chatbot, built beside the live bot (owner: "lets create a uchat version as well of the chatbot")
 - **Read as feature 21's route:** UChat in front, the bot itself unchanged. Rebuilding it as a UChat AI agent would lose the reply checks, the owner's 18 Oct worry.
 - **Built by the new `scripts/n8n_uchat.py`,** regenerated from live like the sandbox. It only reads live, and refuses live and sandbox ids:

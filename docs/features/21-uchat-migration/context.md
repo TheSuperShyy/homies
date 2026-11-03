@@ -59,6 +59,10 @@
 - **UChat's External Request step times out after 15 seconds,** plus 10 per paid add-on. Our bot takes 20-40 seconds, so it never answers inside UChat's request. It acknowledges at once and replies through `send-text`.
 - **UChat's API sits behind Cloudflare,** which refuses Python's default user agent ("Error 1010: browser_signature_banned", a 403 that looks like a bad key). curl's passes. `scripts/uchat_api.py` sends it.
 - **Past messages cannot be imported.** The API creates contacts, not their history.
+- **On the free plan, nothing in UChat can call another system.**
+  - External Request, Integrations (the Webhook integration), Notification and AI Actions are all Pro.
+  - The builder refuses them with "Upgrade to Pro account to use this feature" (3 Nov).
+  - WhatsApp Cloud is Pro as well. So the UChat version needs the Business plan before it can answer anyone.
 
 ## Known failure modes
 
