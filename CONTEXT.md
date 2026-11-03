@@ -4113,6 +4113,8 @@ when a person ask for a quote it will mention on the inbox"*. So:
   old leads board.
 - Only the 23-hour reminder is still missing, plus the session with Yariv on the flows we have not
   seen. The 6 Oct comparison pages still count all four as missing: they are a dated snapshot.
+- **Yariv's page does not mention the elevator at all** (owner, minutes later: *"dont mention the
+  elevator at all"*), not even as "not needed".
 
 **The staff SOP quotes the screen as `main` has it (6 Oct).**
 `docs/features/13-dashboard/sop-he.html` is the Hebrew procedure for Homies

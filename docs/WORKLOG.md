@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### Yariv's page: no elevator at all (owner: "dont mention the elevator at all")
+- The ManyChat point lost "רשימת חברות המעליות כבר לא נחוצה". It was the page's only mention of an elevator (checked in `items.json` and in the built page: 0 left).
+- **Republished:** version `1793720444-59fa` over `1793720323-1c07`, still shared by link. Counts unchanged.
+
 ### Yariv's page: the ManyChat point made simple (owner, a screenshot of it: "repphrase this to make it simple, we dont need the list of elevators and we have the link of the website as well and when a person ask for a quote it will mention on the inbox")
 - **Republished:** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY, version `1793720323-1c07` over `1793714588-73fa`. Still shared by link (`shared_live` public).
 - **The point's "מה עשינו" now reads:** "עברנו על הבוט הישן ב-ManyChat והשווינו אותו למיכאל. הקישור לאתר כבר קיים, ובקשה להצעת מחיר מגיעה ישר לתיבת הצ'אט. רשימת חברות המעליות כבר לא נחוצה. נשארו התזכורת אחרי 23 שעות, ופגישה עם יריב על שאר התהליכים."
