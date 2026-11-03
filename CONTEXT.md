@@ -534,6 +534,9 @@ without it WhatsApp refused it, and the reason is in UChat's error log.
 every balance, which the 29 Oct change had already ended for numbers on file. Each
 expected answer is taken from `prompt.md`'s system prompt and the CONTEXT decisions,
 and the page changes when they do; otherwise testers mark correct behaviour wrong.
+Each expected answer is also something a tester can see on the phone, and every step
+the bot will ask for is written in (the address before an urgent ticket). The 3 Nov
+run through the bot found four tests that failed those two conditions.
 **UChat keeps WhatsApp's own message id** (`mid` in `chat-messages`, 3 Nov),
 and its API has no typing call of its own. So the UChat copy shows live's typing
 dots by calling Meta itself: the read-plus-typing call for the UChat number

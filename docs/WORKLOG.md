@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The tester checklist run through the bot before testers get it: 4 tests fixed, 1 added, and the bot's own slips (owner: "so this one its accurate based from the chatbot right", then "ok" to running it, about $1-2)
+- **How:** `wa_qa.py`'s Chat, the live code and prompt on Gemini 3.1 Pro, stand-in tools (nothing written, no WhatsApp).
+  - Five chats as a tester would send them, every message exactly as the page has it. Where the bot asked for an address, the tester answered as the how-to says, "בר כוכבא 23 דירה 2".
+  - 30 messages, $1.25 in two run folders (each under the harness's $1 cap).
+  - The deck and driver are in the session scratchpad. The status stand-in returns the ticket the chat opened, since it has no phone.
+- **The page was wrong or untestable in 4 places, now fixed** (republished `1793709531-c792`, 29 tests, shared marks kept):
+  - **3.3:** "there is a fault in the lobby" is too vague, and the bot rightly asked what the fault is first. The message now names a fault. Re-run ($0.06): the bot tried to open it, the street is not ours, it opened nothing and asked once about another street.
+  - **4.2:** "he checks before he speaks" cannot be seen on a phone. It now says what shows.
+  - **5.4:** a number not on file is first asked for name and phone.
+  - **6.1/6.2:** the urgent ticket needs the building, so the address is now its own step (6.2). 3.2 got the same hint.
+  - **Also:** 2.3's "a message comes when it is closed" became a may, with no "anything else?" while waiting. 7.1 gained "does not say he recorded or passed it on" (the prompt's own rule).
+- **The bot's slips against its own rules** (the page keeps these, so testers will see them too):
+  - "the team" in 2.4, 4.1 and 7.2, against the one-voice rule;
+  - 4.1 "אמרת שמשהו החמיר", which the tester never said;
+  - 5.2 "מתי נוח לך שיצרו איתך קשר מהנהלת החשבונות", an implied call back from a third party;
+  - 7.1-7.3 told the tester three times that the request was recorded;
+  - 7.7 went back to the masculine after the tester wrote as a woman;
+  - 2.3 "יש עוד משהו?" while the tester was still waiting;
+  - 2.4 and 7.7 ended without a question;
+  - 2.1 no human word before the building question;
+  - 1.2 asked what happened and where on the tap.
+- **Clean:** the menu, the ticket with building, apartment and number, the private fault, the leak from above, the car break-in, no ticket when asked, the payment link in two messages, name and phone before a balance, both emergency steps, bot or person, the feminine on the cue, Hebrew to English, another resident's debt, the weather, the options list, the goodbye.
+
 ### Read only: "Yariv's Feedback Status" checked against the system (owner: "ok so the list is good now and accurate?", "no the list in the artifcat")
 - **Checked:** the artifact as published at 12:26 UTC (version `1793707263-1210`, shared publicly). Its counts add up: 13 done, 10 partly, 2 waiting, 2 decided, 27 in all.
 - **Confirmed against the system:**
