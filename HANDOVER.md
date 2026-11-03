@@ -13,6 +13,12 @@ appended to.
 >   - **Version `1793710110-a6f4` (3 Nov, owner: "fix the checklist we have"), with the source file matched:**
 >     - **2.2:** a tester whose number is not on file is asked for a full name once before the ticket (`need_name`). It has a hint to answer with the name. Only the owner (Assaf Clix) and Ido are on file.
 >     - **2.3:** a promise of "a message when it is closed" now counts as wrong. This is **against the prompt**, which allows the line, because nothing delivers that message on the UChat number yet, and on the test number `ticket_resolved_he` is PENDING. Return 2.3 to the prompt's wording once notices reach the tester's number, or drop the line from the prompt.
+> - **"Michael Test Checklist (English)"** https://claude.ai/artifact/98vc9XUS66HtatK4pox96L (slug `41e459fd-e681-4bda-8fa2-4f34c403b2ed`, owner: *"create a new one with english version"*): the same 29 tests in English.
+>   - The messages stay Hebrew, with Copy and their English meaning; the expected behaviour is English first, Hebrew under it.
+>   - It has its own shared marks (the same `db` rules and `user` profile), so its marks are separate from the Hebrew page's.
+>   - **Built from the Hebrew source, never edited by hand:** change `local/artifacts/michael-checklist/index.html`, run `python local/artifacts/michael-checklist-en/build.py`, then republish both. The English page republishes with `publish_files`, slug and base_version.
+>   - `build.py` refuses a new section, or a new hint (`with`) that has no English yet.
+>   - Private to the owner until they share it.
 > - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. Change `local/artifacts/yariv-feedback/items.json`, run `build.py` there, republish.
 > - **Not on Yariv's page:** the recording is back on since 26 Oct and he has not been told. The owner decides whether to tell him.
 >

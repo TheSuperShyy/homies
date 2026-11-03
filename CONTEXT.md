@@ -534,6 +534,11 @@ expects no promise of "a message when it is closed", though the prompt allows
 one. Nothing delivers that message on the UChat number yet, so on the page a
 promise the system does not keep counts as wrong. The rule below still holds.
 
+**The English checklist is built from the Hebrew one, not written beside it (3 Nov, owner: "create a new
+one with english version").** `local/artifacts/michael-checklist-en/build.py` reads the tests from the
+Hebrew page's source, so a change to a test is made once and both pages show it. The messages to send stay
+Hebrew on both pages, because what is tested is the bot's answer to the Hebrew a tenant writes.
+
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before
 every balance, which the 29 Oct change had already ended for numbers on file. Each

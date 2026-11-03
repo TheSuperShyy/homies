@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### An English twin of the Michael Test Checklist (owner, a screenshot of 2.1: "create a new one with english version")
+- **Published:** "Michael Test Checklist (English)", https://claude.ai/artifact/98vc9XUS66HtatK4pox96L (slug `41e459fd-e681-4bda-8fa2-4f34c403b2ed`), version `1793710891-13c7`, private to the owner.
+  - The same 29 tests and 7 parts, in the same order with the same ids.
+  - The message to send stays Hebrew, with a Copy button and its English meaning under it.
+  - What Michael should do is English first, Hebrew under it. The how-to, the hints, the always-rules and every button are English.
+  - The how-to adds that messages are sent exactly as written, in Hebrew, and that Michael answers in Hebrew.
+- **Its own shared marks:** declared like the Hebrew page (`db` rules on `marks` and `marks/{self}`, `user` profile), contract 0.2.96. Marks on one page do not show on the other.
+- **How:** `local/artifacts/michael-checklist-en/build.py` reads SECTIONS, ITEMS and the CSS from the Hebrew source, puts the English page around them, and writes `index.html`.
+  - English section titles and hint texts live in `build.py`. It refuses a new section or hint that has no English yet.
+  - The CSS is made left-to-right: Latin font first, the failed row's tint from the left.
+- **Checked before publishing:** rendered headless at 1280 px and 390 px. 29 rows, no sideways scroll, no script errors; the 2.2 hint and the new 2.3 text are in.
+
 ### The Michael Test Checklist fixed: 2.2 and 2.3 (owner: "fix the checklist we have")
 - **Republished** with `edit_version` over `1793709531-c792` as `1793710110-a6f4`. Five single-line edits; the first, multi-line try did not match the CRLF source. Read back. Ids, shared marks and the db rules are unchanged.
   - **2.2:** a number on file gets the ticket at once. A number not on file is first asked for a full name, once, and the ticket opens after the answer. New hint: "אם הוא שואל מה השם המלא שלכם, עונים בשם לפני ההודעה הבאה."
