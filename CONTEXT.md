@@ -498,7 +498,12 @@ with 123456: replace it.
 **UChat makes a WhatsApp button's id from the step the button runs** (3 Nov):
 two buttons on one step make WhatsApp refuse the whole message ("#131009
 Duplicate button id"), while UChat's web chat shows it fine. Each menu button
-has its own step. **UChat's `send-text` sends as an agent,** and an agent's
+has its own step. **The UChat copy skips `Worth a word?` without a payment
+word** (3 Nov, owner: "lets make the response of it faster"). That is the one
+place where it is not the live bot, and only in time: the note could go out only
+with a payment word anyway. A 3 Nov turn's 33 s were Gemini thinking (19 s:
+1,193 tokens for a 76-character reply), `Worth a word?` (6 s), the burst wait
+(4 s) and UChat (about 2.5 s). **UChat's `send-text` sends as an agent,** and an agent's
 message pauses the bot for that contact for 30 minutes, so the bot's replies go
 through `send-content` with `send_as_agent: 0`. **A message in UChat's log is
 not a delivered one:** a sent message carries WhatsApp's id (`mid`, "wamid…");

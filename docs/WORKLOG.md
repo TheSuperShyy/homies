@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The UChat bot answers about 6 seconds sooner, with the same replies (owner: "lets make the response of it faster")
+- **Where the time went** in the 09:50 tap (run 150630): 33 s from the message reaching n8n to the reply going out.
+  - **"Answer the resident", Gemini 3.1 Pro: 19.0 s.** 1,193 tokens came back for a 76-character reply, so nearly all of it is the model thinking. The OpenRouter node cannot lower that (CONTEXT, "The model is Gemini 3.1 Pro").
+  - **"Worth a word?", the same model: 6.3 s**, 419 tokens, to answer NONE.
+  - **"Let them finish": 4 s**, on purpose, so a burst of messages gets one answer.
+  - UChat's reads and the send: about 2.5 s.
+- **The change, on the UChat copy only** (`scripts/n8n_uchat.py`, `word_only_on_pay`):
+  - a new IF, **"A payment word?"**, in front of "Worth a word?". It asks the question "A word first?" asks after it (`firstword.PAY_JS` on the resident's message).
+  - Without a payment word the call is skipped. Its note could not have gone out anyway (1 Oct's gate), so the replies do not change.
+  - "Carry on" now reads "Worth a word?" only when "Say it now" ran; as it was, it would fail on a skipped node.
+- **Checked offline** (Node, with n8n's `$()` stubbed):
+  - the gate agrees with "A word first?" on 19 messages, Hebrew and English, payment and not;
+  - "Carry on" gives the same `acked` as before on every path, and the old one fails where the call is skipped.
+- **Put live 10:08 UTC** with `--apply`. Read back: the wiring, and both expressions byte for byte as tested. The model and the prompt are unchanged.
+- **Not changed:**
+  - the live bot, which spends the same 6 s;
+  - Gemini's thinking, the big part. Lowering it needs the OpenAI chat-model node pointed at OpenRouter (the preset route broke tool calls on 25 Oct), and a paid test first.
+- **Owed:** the timing of the owner's next AI message.
+
 ### The UChat bot's WhatsApp replies fixed: its buttons shared one id, and a test reply paused it (owner: "fix it the bot is not replying", "i message it")
 - **What the owner saw:** "helo", "הי", "הי" on WhatsApp (17:20-17:29 on their screen, 09:20-09:29 UTC) and no answer.
 - **Cause 1, the greeting never left UChat:**

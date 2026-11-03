@@ -36,6 +36,10 @@ WHAT DIFFERS FROM LIVE, AND WHY
   - The hand-over copy pages through the translator. Labels become UChat tags,
     the note goes to a contact field, `team_note` (UChat's API has no internal
     note), and a team becomes an agent group once UCHAT_GROUPS maps it.
+  - Speed: `Worth a word?`, a Gemini call of about 6 s, runs only when the
+    message has a payment word (`A payment word?`). Its note could go out only
+    then anyway (`A word first?` tests the same words on the same text), so the
+    replies are the same and a message without one is answered about 6 s sooner.
 
 SAFETY
   The live workflows are only read (GET). write() refuses every live and every
@@ -57,6 +61,7 @@ from supabase_functions import env, set_env  # noqa: E402
 from n8n_sandbox import (n8n, load, replace_once, free_spot, noop, webhook, base_copy,  # noqa: E402
                          chat_log_from_chatwoot, LIVE_IDS, LIVE_BOT, LIVE_HANDOVER)
 from n8n_layout import check as layout_check  # noqa: E402
+from n8n_whatsapp_firstword import PAY_JS  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -489,6 +494,45 @@ def way_in(wf, cfg):
     c["From UChat"] = {"main": [to("Sort")]}
 
 
+PAY_GATE_NOTE = ("UCHAT copy only, for speed: Worth a word? runs only on a message with a payment word. "
+                 "A word first? sends its note only then, so on any other message it was thrown away.")
+
+
+def word_only_on_pay(wf):
+    """Add who -> A payment word? -> Worth a word? (yes) or Carry on (no).
+
+    `Worth a word?` is a Gemini call (6.3 s of a 33 s turn on 3 Nov) whose note
+    `A word first?` lets out only when the resident's own message has a payment
+    word (firstword.PAY_JS, tested on `Still the last word?`'s text). This asks
+    the same question first, on the same text, so the replies do not change: a
+    message without a payment word skips a call whose answer was never used.
+    """
+    nodes = {n["name"]: n for n in wf["nodes"]}
+    c = wf["connections"]
+    outs = lambda name: [[t["node"] for t in br] for br in c[name]["main"]]  # noqa: E731
+    assert (outs("Add who"), outs("Worth a word?"), outs("A word first?")) == \
+        ([["Worth a word?"]], [["A word first?"]], [["Say it now"], ["Carry on"]]), \
+        "the pre-check's wiring changed on live; read it before re-running"
+    word = nodes["A word first?"]["parameters"]["conditions"]["conditions"]
+    assert len(word) == 1 and PAY_JS in word[0]["leftValue"] and "$('Still the last word?')" in word[0]["leftValue"], \
+        "A word first? no longer tests firstword.PAY_JS on the resident's message"
+    # Carry on reads Worth a word? only when Say it now ran, which needs it to have run.
+    carry = nodes["Carry on"]["parameters"]
+    carry["jsonOutput"] = replace_once(
+        carry["jsonOutput"],
+        "const t = String($('Worth a word?').first().json.output || '').trim(); return sent && ",
+        "if (!sent) return ''; const t = String($('Worth a word?').first().json.output || '').trim(); return ")
+    x, y = nodes["Worth a word?"]["position"]
+    gate = if_node("A payment word?", free_spot(wf["nodes"], x, y - 240),
+                   "={{ (() => { let said = ''; try { said = String($('Still the last word?').first().json.text || ''); } "
+                   "catch (e) { said = ''; } return %s.test(said); })() }}" % PAY_JS)
+    gate.update({"notes": PAY_GATE_NOTE, "notesInFlow": True})
+    wf["nodes"].append(gate)
+    to = lambda name: [{"node": name, "type": "main", "index": 0}]  # noqa: E731
+    c["Add who"]["main"] = [to("A payment word?")]
+    c["A payment word?"] = {"main": [to("Worth a word?"), to("Carry on")]}
+
+
 def uchatify_bot(live, cfg):
     out = base_copy(live, "UCHAT — WhatsApp bot")
     for n in out["nodes"]:
@@ -508,6 +552,7 @@ def uchatify_bot(live, cfg):
         noop(out, name)
     chat_log_from_chatwoot(out, {"chatwoot_url": cfg["facade"], "account_id": 2, "cred_admin": cfg["cred_door"]})
     way_in(out, cfg)
+    word_only_on_pay(out)
     leftover = [n["name"] for n in out["nodes"] if CW_HOST in json.dumps(n.get("parameters") or {})]
     assert not leftover, "Chatwoot calls left in the copy: %s" % leftover
     copy_note(out, live["name"])

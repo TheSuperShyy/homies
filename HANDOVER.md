@@ -22,6 +22,9 @@ appended to.
 >     - **The first account ("clix") keeps its leftovers:** the "Michael" draft flow, 9 tags, 10 fields, and the empty "homies" workspace.
 >   - **WHATSAPP WORKS SINCE 3 Nov, 09:50 UTC, ON ITS OWN ISRAELI NUMBER:**
 >     - **Proven on the owner's phone:** the greeting with both buttons, a tap, and the AI's answer.
+>     - **Faster since 10:08 UTC:** `Worth a word?` runs only on a message with a payment word (`A payment word?`), so other AI replies come about 6 s sooner with the same text.
+>       - The rest of an AI reply (about 27 s) is Gemini thinking (about 19 s), the 4 s burst wait, and about 3 s of UChat and sending.
+>       - The next lever is a lower thinking effort, which needs a paid test first.
 >     - the owner's Twilio number (`+972 53…29`, in `D:\work\Apify-v3\.env`, never in this repo), in the WhatsApp account "hadas 1" / "ASTDX - Smart Link" (`2117787955519632`), number id `1460284440496077`, two-step PIN `UCHAT_WA_PIN`;
 >     - connected through UChat's WhatsApp Cloud and linked to the bot.
 >     - **The live Chatwoot bot keeps the test number.** Nothing was switched.
