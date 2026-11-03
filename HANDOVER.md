@@ -61,7 +61,7 @@ appended to.
 >   - **The translator** writes each label twice, as a tag (which the copies read back, `bot-off` included) and as a label (which staff see), and maps a team to its group. Only the translator was written; rollback: `local/uchat-prep/n8n-uchat-translator-before-groups-2026-11-03.json`.
 >   - **Proven with no AI:** a hand-over call on the web chat's contact landed in service, with the owner as its member and both labels, and **the bot was not paused.** It was cleaned up afterwards.
 >   - **Members since 3 Nov, ~13:50 UTC (owner: *"create an account for the clixteam579"*):** CLIX (the owner's login, owner) and **"Assaf Clix", clixteam579@gmail.com, admin** (UChat user `358017`), as in Chatwoot, where that email is the administrator Assaf Clix. WORKLOG 3 Nov.
->     - Its profile is in Hebrew, like the owner's. Its password went to the owner in chat and is written nowhere; the owner changes it in UChat's Security page.
+>     - Its profile is in Hebrew, like the owner's. **Its password is the one the owner chose** (set on 3 Nov on their word, in UChat's Security page; the old one is refused). It is written nowhere: ask the owner.
 >     - It is in no department, so hand-overs still all go to CLIX.
 >     - **The trial is full at 2 users.** A third member, such as the test seat, needs Business (5 members). Invites are made only in Workspace Settings → Users: the API has no invite call.
 >   - **Waiting:** the test seat ("seat2 test" in Chatwoot) is not invited, because an invite emails a person. Staff join on the owner's word. A real hand-over from a message is a paid test.

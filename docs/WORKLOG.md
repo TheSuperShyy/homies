@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The clixteam579 UChat login's password changed to the owner's choice (owner: "make the password this one …")
+- **Changed** in UChat's Security page (Your settings → Security), signed in as Assaf Clix with the generated password, in a throwaway headless Chrome with its own empty profile (port 9334). UChat answered "הסיסמה שלך עודכנה!".
+- **Proven:** after a logout, the old password got "These credentials do not match our records", and the new one landed in homies-uchat as Assaf Clix.
+- **Cleaned up:** logged out, Chrome closed, its profile deleted. The password is written nowhere.
+
 ### "Yariv's Feedback Status" in Hebrew, without the still-needed box (owner, a screenshot of the box: "remove the one in the picture and make everything hebrew")
 - **Republished at the same link:** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY, version `1793714588-73fa` over `1793707263-1210`.
   - It is shared by link (read `public`), so the publish named it (`shared_live`).
