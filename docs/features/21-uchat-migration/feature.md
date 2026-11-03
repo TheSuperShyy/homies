@@ -2,7 +2,7 @@
 
 **Estimate:** 13-19d (one developer), plus 1d for the dry run that can happen first
 **Depends on:** 11-whatsapp-bot, 12-chatwoot, 16-human-handover; a WhatsApp number UChat can connect (in practice Homies' own)
-**Status:** prepared 3 Nov 2026. **The UChat version of the bot is built and running on our side (3 Nov, owner: *"lets create a uchat version as well of the chatbot"*)**, beside the live bot. **It waits for UChat's paid plan:** External Request, the one step that lets UChat call us, is refused on the free plan ("Upgrade to Pro account to use this feature", 3 Nov). Business is $15 a month. No number is moved; the live bot is untouched.
+**Status:** prepared 3 Nov 2026. **The UChat version of the bot is built and running on our side (3 Nov, owner: *"lets create a uchat version as well of the chatbot"*)**, beside the live bot. **It answers in UChat's web chat since 3 Nov, 08:19 UTC**, on a new UChat account the owner opened (workspace "homies-uchat", bot `f315405`). That account is on UChat's free Pro trial, which ends about 16 Nov; after that it needs the Business plan, $15 a month, or it stops answering.
 
 ## Purpose
 
@@ -55,14 +55,39 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 - the sub flow **Michael** (`f306703s5045787`), a draft;
 - its Start step leads to an empty Action step, "Action #1".
 
-**Blocked on the free plan:**
+**Blocked on the free plan, in the first account ("clix"):**
 - Adding **External Request** to that step was refused: *"Upgrade to Pro account to use this feature."*
 - The other ways out of UChat are Pro too: Integrations (the Webhook integration), Notification and AI Actions.
 
-**To finish, once the plan is paid:**
-1. Add the External Request. Its method, address and body are in `local/uchat-prep/uchat-setup.txt`, kept out of git because the address carries the secret.
-2. Name the step **Michael** and publish.
-3. Open the web chat once.
+**Finished on a new account (3 Nov), owner: *"i open a new account"*:**
+- **The account:** "CLIX", workspace **homies-uchat**, on the Pro trial (13 days left on 3 Nov).
+- **The bot:** "homies-chatbot", an Omni bot, flow `f315405`.
+- **The sub flow Michael** (`f315405s5045807`):
+  - Start → the step **Michael**, which holds the External Request;
+  - it posts `{"user_ns": <User Ns>}` (raw JSON, the field put in with UChat's picker) to the copy's webhook;
+  - published.
+- **Its API key** ("homies-n8n"):
+  - Manage Flow only, so the team endpoints answer 403.
+  - It is in `.env` as `Uchat_api_key`; the first account's key is kept as `UCHAT_API_KEY_CLIX`.
+- **Our side, pointed at it:**
+  - `UCHAT_FLOW_NS=f315405`;
+  - the translator's UChat credential made again with the new key (the old one deleted);
+  - `--uchat` (9 tags, 10 fields) and `--apply`.
+- **`--wire`:** the default reply and the web chat's start flow are both "Michael" (read back: active, `f315405s5045807`).
+- **The web chat** is at `https://www.uchat.com.au/p/web/<bot code>`; the builder's Preview → "Open in Web Browser" gives it.
+- **`--tester`:** the first chat contact carries the test phone.
+- **Contact ids are `f315405u<digits>`,** the shape the translator rebuilds.
+
+**Proven, 3 Nov 08:19 UTC, no AI called:**
+- In UChat's web chat, "היי" got the live bot's own greeting, "בוקר טוב 👋 כאן הומי'ז. במה אפשר לעזור?", with the two buttons פתיחת קריאת שירות and מצב קריאה קיימת.
+- **The copy's run** (execution 150459, green): `From UChat` → Sort → `Canned reply?` → `Send` → `Show it in Open`.
+- **The translator's runs:** all green.
+- **The run before it** (150455, the chat opening) skipped with "nothing from the contact yet", as it should.
+
+**Not yet tried** (each one calls the AI, so it is a paid test):
+- a button tap;
+- a real question;
+- the hand-over.
 
 **Then from here:**
 - `--wire` makes "Michael" the default reply and the web chat's start flow.

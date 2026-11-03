@@ -482,6 +482,9 @@ the UChat version drifts. Never edit the UCHAT copies by hand.
 **On UChat's free plan nothing can call another system** (External Request,
 the Webhook integration and WhatsApp Cloud are Pro; checked 3 Nov), so the
 UChat version answers no one until the workspace is on Business ($15 a month).
+Since 3 Nov it runs on a new UChat account's Pro trial (workspace
+"homies-uchat", until about 16 Nov). After that it needs Business, or it
+stops answering.
 UChat's builder can be driven from here only over Chrome's own protocol:
 Playwright 1.63 cannot attach to Chrome 151.
 

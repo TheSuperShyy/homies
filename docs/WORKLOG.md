@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The UChat version answers in UChat's web chat, on a new UChat account (owner: "lets create a new one", "i open a new account", "its already in check it")
+- **The account:** the owner opened a new UChat account, "CLIX", workspace **homies-uchat**, on the Pro free trial (13 days left).
+  - I had first made a workspace "homies" in the "clix" account to test the trial. The owner stopped that, and the "homies" workspace stays there, empty.
+- **Done in the builder over the owner's Chrome window:**
+  - **the bot:** "homies-chatbot" (Omni Channel → Create New Bot → Blank Template), flow `f315405`;
+  - **the sub flow Michael** (`f315405s5045807`):
+    - Start → Action, with an External Request (POST, the copy's webhook with its secret typed from `.env` by a script, raw JSON `{"user_ns": <User Ns>}` through UChat's field picker);
+    - the step renamed **Michael**, and published. This time it was accepted.
+  - **an API key** ("homies-n8n", Manage Flow only): read off the page into `.env` as `Uchat_api_key` by a script and never shown. The old key is kept as `UCHAT_API_KEY_CLIX`. Backup: `local/env-backups/.env.before-uchat-new-account-2026-11-03`.
+- **Our side, pointed at it:**
+  - `UCHAT_FLOW_NS=f315405`;
+  - a new n8n credential for the translator holding the new key; the old one (`J0NUtugImyEswSmQ`) deleted;
+  - `--uchat`: 9 tags and 10 fields, all 201;
+  - `--apply`: the translator's maps carry `f315405`;
+  - `--wire`: the default reply and the web chat's start flow are "Michael", read back as active.
+- **The web chat** (Preview → Open in Web Browser): its first contact is `f315405u<digits>`, the shape the translator rebuilds. `--tester` gave it the test phone.
+- **Proven at 08:19 UTC, with no AI call:**
+  - "היי" got the live bot's greeting, "בוקר טוב 👋 כאן הומי'ז. במה אפשר לעזור?", with the two menu buttons.
+  - The copy's run 150459 is green (From UChat → Sort → Canned reply? → Send → Show it in Open), and so are the translator's runs.
+  - The opening run 150455 skipped with "nothing from the contact yet".
+- **Not yet tried, each a paid AI test:**
+  - a button tap (that its caption comes back as the newest message is still unverified);
+  - a real question;
+  - the hand-over.
+- **Leftovers in the first account ("clix"):**
+  - the "Michael" draft flow;
+  - the 9 tags and 10 fields;
+  - the empty "homies" workspace.
+
 ### UChat's builder: the "Michael" sub flow made, External Request refused on the free plan (owner: "ok you do it")
 - **How:**
   - A local Chrome window (`local/uchat-prep/browser-profile`, out of git), with a control port on 127.0.0.1:9333.
