@@ -42,7 +42,8 @@ the sandbox. Re-run it after a change on live; never edit the copies by hand.
 **Differences from live, all on purpose:**
 - **Only test phones get through** (`UCHAT_TEST_PHONES` in `.env`, the owner's number). The copy uses the live tools, so a ticket it opens is real, like a test on the live WhatsApp bot.
 - **The memory key gets `-uchat`,** so the two bots never share a memory.
-- **No typing dots, and nothing written to the live `messages` log.** The burst check reads the UChat conversation instead.
+- **Nothing is written to the live `messages` log.** The burst check reads the UChat conversation instead.
+- **The typing dots are live's call for the UChat number** (3 Nov). UChat keeps WhatsApp's message id (`mid`); the translator passes it on as `source_id`.
 - **A private note becomes the contact's `team_note` field,** because UChat's API has no internal note. A label goes on twice: as a tag, which the copies read back, and as a UChat label, which staff see. A team becomes its agent group through `UCHAT_GROUPS` (see "Set up like our Chatwoot" below).
 - **No 15-minute hand-back copy.** UChat's own pause after a staff reply does that job (30 minutes, staff can extend).
 - **`Worth a word?` runs only on a message with a payment word** (`A payment word?`, 3 Nov). Its note could go out only then anyway, so the replies are the same, and every other AI reply comes about 6 s sooner.

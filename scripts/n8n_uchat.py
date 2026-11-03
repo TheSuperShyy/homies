@@ -30,9 +30,12 @@ WHAT DIFFERS FROM LIVE, AND WHY
   - Chatwoot calls: the host becomes the translator's, the Chatwoot tokens the
     translator's door token.
   - Memory: the session key gets "-uchat", so the two bots never share one.
-  - Show typing (Meta's call) and Log inbound / Log reply (the live `messages`
-    table) are NoOps, and `Anything newer?` reads the UChat conversation, as
-    the sandbox reads its Chatwoot one. Nothing in the live log changes.
+  - Log inbound / Log reply (the live `messages` table) are NoOps, and
+    `Anything newer?` reads the UChat conversation, as the sandbox reads its
+    Chatwoot one. Nothing in the live log changes.
+  - Show typing (Meta's call) is live's, for the UChat number (UCHAT_WA_PHONE_ID)
+    with UChat's copy of WhatsApp's message id (typing(); 3 Nov, the owner: "yes
+    i need it back").
   - The hand-over copy pages through the translator. Labels become UChat tags
     (what the copies read back) and UChat labels (what staff see), the note goes
     to a contact field, `team_note` (UChat's API has no internal note), and a
@@ -135,6 +138,7 @@ def config(apply):
            "groups": json.loads(e.get("UCHAT_GROUPS", "") or "{}"),
            "agents": json.loads(e.get("UCHAT_AGENTS", "") or "{}"),
            "test_phones": digits_list(e.get("UCHAT_TEST_PHONES", "") or e.get("OXS_MIRROR_PHONES", "")),
+           "wa_phone_id": e.get("UCHAT_WA_PHONE_ID", "").strip(),   # the UChat number at Meta (typing())
            "webhook_secret": e.get("UCHAT_WEBHOOK_SECRET", ""), "door": e.get("UCHAT_FACADE_SECRET", ""),
            "handover_id": e.get("UCHAT_N8N_HANDOVER_ID", "") or "PENDING"}
     assert cfg["test_phones"], "no test phone: set UCHAT_TEST_PHONES (or OXS_MIRROR_PHONES) in .env"
@@ -158,9 +162,12 @@ def config(apply):
                                             "Bearer " + e["Uchat_api_key"].strip().strip('"'))
         cfg["cred_door"] = header_credential("UCHAT_N8N_CRED_DOOR", "UCHAT — translator door", "api_access_token",
                                              cfg["door"])
+        cfg["cred_typing"] = header_credential("UCHAT_N8N_CRED_TYPING", "UCHAT — WhatsApp typing (Meta)", "Authorization",
+                                               "Bearer " + e["WHATSAPP_ACCESS_TOKEN"].strip().strip('"'))
     else:
         cfg["cred_api"] = {"id": "DRY", "name": "UCHAT — UChat API (Bearer)"}
         cfg["cred_door"] = {"id": "DRY", "name": "UCHAT — translator door"}
+        cfg["cred_typing"] = {"id": "DRY", "name": "UCHAT — WhatsApp typing (Meta)"}
     return cfg
 
 
@@ -288,6 +295,8 @@ if (m.action === 'messages') {
     const image = x.msg_type === 'image' && pl.url;
     return {
       id: Number(x.id), content: String(x.content || pl.text || ''), private: false,
+      // UChat's copy of WhatsApp's own message id, as Chatwoot's source_id: the typing dots need it.
+      source_id: String(x.mid || ''),
       message_type: x.type === 'in' ? 0 : 1, content_type: 'text', created_at: Number(x.ts) || 0,
       attachments: image ? [{ file_type: 'image', data_url: pl.url }] : [],
       sender: { type: x.type === 'in' ? 'contact' : (x.type === 'agent' ? 'user' : 'agent_bot') },
@@ -472,7 +481,8 @@ if (!TEST_PHONES.includes(phone)) return skip('not a test phone');
 const contact = { type: 'contact', phone_number: '+' + phone, name: sender.name || '' };
 return [{ json: { query: hook.query || {}, body: {
   event: 'message_created', message_type: 'incoming', private: false,
-  id: newest.id, content: newest.content || '', attachments: newest.attachments || [], source_id: '',
+  id: newest.id, content: newest.content || '', attachments: newest.attachments || [],
+  source_id: String(newest.source_id || ''),   // WhatsApp's message id, for Show typing
   sender: contact,
   conversation: { id: who.id, status: 'open', labels: who.labels || [],
                   meta: { sender: contact, assignee: null, assignee_type: null } },
@@ -577,6 +587,38 @@ def word_only_on_pay(wf):
     c["A payment word?"] = {"main": [to("Worth a word?"), to("Carry on")]}
 
 
+TYPING_BODY = r"""={{ (() => {
+  // WhatsApp's id of the resident's message: UChat keeps it (`mid`), the translator
+  // hands it on as source_id, and From UChat puts it where Sort's event has it.
+  let id = '';
+  try { id = String($('From UChat').first().json.body.source_id || ''); } catch (e) { id = ''; }
+  return JSON.stringify({ messaging_product: 'whatsapp', status: 'read', message_id: id,
+                          typing_indicator: { type: 'text' } });
+})() }}"""
+
+
+def typing(wf, cfg):
+    """Show typing / Show typing again: live's Meta call, for the UChat number.
+
+    Live sends Meta's typing indicator (which also marks the message read) with
+    the id Chatwoot passes on. The copy has UChat's copy of the same id, so the
+    call is live's own with two things changed: the UChat number's id
+    (UCHAT_WA_PHONE_ID) and a credential of its own holding the system-user
+    token (WHATSAPP_ACCESS_TOKEN). Owner, 3 Nov: "yes i need it back".
+    """
+    phone_id = cfg["wa_phone_id"]
+    assert re.fullmatch(r"\d{10,20}", phone_id), "set UCHAT_WA_PHONE_ID (the UChat number's id at Meta) in .env"
+    for name in ("Show typing", "Show typing again"):
+        n = next(x for x in wf["nodes"] if x["name"] == name)
+        p = n["parameters"]
+        url = re.fullmatch(r"https://graph\.facebook\.com/(v\d+\.\d+)/\d+/messages", p.get("url") or "")
+        assert url and "typing_indicator" in p["jsonBody"] and "status: 'read'" in p["jsonBody"] \
+            and "$('WhatsApp').first(b).json.body.source_id" in p["jsonBody"], "%s changed on live" % name
+        p["url"] = "https://graph.facebook.com/%s/%s/messages" % (url.group(1), phone_id)
+        p["jsonBody"] = TYPING_BODY
+        n["credentials"] = {"httpHeaderAuth": dict(cfg["cred_typing"])}
+
+
 def uchatify_bot(live, cfg):
     out = base_copy(live, "UCHAT — WhatsApp bot")
     for n in out["nodes"]:
@@ -592,8 +634,9 @@ def uchatify_bot(live, cfg):
     assert len(memories) == 1, "expected one memory node"
     memories[0]["parameters"]["sessionKey"] += "-uchat"
     webhook(out, BOT_PATH)
-    for name in ("Show typing", "Show typing again", "Log inbound", "Log reply"):
+    for name in ("Log inbound", "Log reply"):
         noop(out, name)
+    typing(out, cfg)
     chat_log_from_chatwoot(out, {"chatwoot_url": cfg["facade"], "account_id": 2, "cred_admin": cfg["cred_door"]})
     way_in(out, cfg)
     word_only_on_pay(out)

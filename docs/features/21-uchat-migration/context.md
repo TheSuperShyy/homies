@@ -90,7 +90,7 @@
 - **A reply outside the 24-hour window fails.** It is the same Meta rule as today: `send_payment_link` already falls back to `payment_link_he`, and the "done" message is a template anyway.
 - **The tool server's sends must go as the bot, not as staff.** Today it posts with Chatwoot's bot token so the bot's workflow neither answers the message nor takes it for a staff takeover. In UChat a message sent as an agent (`send_as_agent: 1`) would start the staff pause. **Seen 3 Nov:** `send-text` is logged as an agent's message and paused the bot, so every reply goes through `send-content` with `send_as_agent: 0`.
 - **Photos stop reaching tickets** if UChat's media host is not added to `MEDIA_HOSTS`.
-- **The typing dots disappear** if UChat does not pass Meta's message id. The replies are not affected.
+- **The typing dots disappear** if UChat stops passing Meta's message id (`mid` in `chat-messages`; it does since 3 Nov), or if the system-user token loses the UChat number. The replies are not affected.
 
 - **The UChat version answers nobody if UChat's contact id is not `<flow>u<number>`.** The translator rebuilds the contact id from the bot's flow id (`UCHAT_FLOW_NS`) and Chatwoot's numeric conversation id. The hand-over's `Report back` types the conversation id as a number, so a text id cannot pass through.
 - **A caller without the secret still makes the way in read UChat twice** before Sort refuses them and answers nothing. They learn nothing; it costs two reads.

@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The typing dots are back on the UChat bot (owner: "so is i noticed the typing icon was gone", then "yes i need it back")
+- **Why they were gone:** the UChat copy had `Show typing` and `Show typing again` as NoOps. Live's call needs WhatsApp's own id for the resident's message (Chatwoot's `source_id`), and the copy was built before UChat was known to keep it.
+  - UChat's `chat-messages` carries it as `mid` (seen this morning on every incoming message).
+  - UChat's API has no typing call of its own (its spec searched).
+- **Checked read-only before the go:**
+  - Meta's `debug_token` on our system-user token: `whatsapp_business_messaging`, with no account restriction;
+  - the id `1460284440496077` reads back as the UChat number (+972 53…29, "hadas 1", CONNECTED).
+- **The change, on the UChat copy only** (`scripts/n8n_uchat.py`, typing()):
+  - the translator passes `mid` on as `source_id`, and From UChat puts it on Sort's event;
+  - both typing steps are live's own call (read receipt plus typing indicator), pointed at `UCHAT_WA_PHONE_ID`;
+  - they use a credential of their own, "UCHAT — WhatsApp typing (Meta)" (`UCHAT_N8N_CRED_TYPING`), holding `WHATSAPP_ACCESS_TOKEN`. The token went from `.env` into n8n unseen.
+  - `.env` backup: `local/env-backups/.env.before-uchat-typing-2026-11-03`.
+- **Checked offline**, 6 cases: the id travels from the translator to From UChat to both typing calls, and an empty id does not break the call.
+- **Put live at 11:10 UTC with `--apply`.** Read back: the URL, the body byte for byte as tested, the credential, and the translator's `source_id`. The model and the wait are unchanged.
+- **WhatsApp shows the dots for at most 25 s**, as on live. On the slowest replies (44 s at 10:42) they stop before the answer comes.
+- **Owed:** Meta's answer to the call on the owner's next message.
+
 ### UChat set up like our Chatwoot: the four departments, the eight labels, Hebrew, and hand-overs landing in their department (from ~10:40 UTC)
 - **Asked:** *"so we need to make uchat like chatwoot like it will have departments and stuff"*, then *"ok just make uchat like the settings we have on the chatwoot"*.
 - **Read from Chatwoot account 2 (read only):**
