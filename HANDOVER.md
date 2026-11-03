@@ -87,6 +87,7 @@ appended to.
 >   - **Tab "השוואה":** 16 topics, right to left, + and - cells coloured by a conditional format. COUNTIF totals: Chatwoot 14 + and 2 -, UChat 4 + and 12 -. A recommendation row ends it.
 >   - **Tab "עלות חודשית":** inputs in blue with their sources, and formulas that come to $195 a month for UChat with 19 staff.
 >   - **Change it in place** with the Sheets connector, so the link stays the same. CONTEXT ("Later the same evening…") says how it is kept honest while leaning.
+>   - **An English twin, a separate file** (owner: *"create a separate one in english"*): "Comparison: Chatwoot vs UChat", same Drive, tabs "Comparison" and "Monthly cost", same facts and totals. Not shared either. A fact changed in one sheet is changed in the other.
 >
 > **THE UCHAT VERSION OF THE BOT IS BUILT, BESIDE THE LIVE BOT (owner, 3 Nov: *"lets create a uchat version as well of the chatbot"*).** WORKLOG 3 Nov; `docs/features/21-uchat-migration/feature.md`, "The UChat version".
 > - **What:**

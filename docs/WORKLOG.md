@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-03
 
+### The same comparison as a separate English Google Sheet (owner: "create a separate one in english")
+- **The file:** "Comparison: Chatwoot vs UChat", a new file beside the Hebrew one in clixteam579's Drive, not shared. Tabs "Comparison" and "Monthly cost", left to right.
+- **Same facts, same layout, same formulas** as the Hebrew sheet's reworded version (below): 16 topics, Chatwoot 14 + and 2 -, UChat 4 + and 12 -, UChat $195 a month and $2,340 a year more.
+  - Written fresh in plain English for non-technical readers, not word for word from the Hebrew.
+  - The title states the finding: "Chatwoot vs UChat: Chatwoot is the better fit for Homies".
+- **Checked:** both tabs read back with no error cells and the same totals.
+
 ### A Hebrew Google Sheet comparing Chatwoot and UChat, leaning to Chatwoot (owner: "create a gsheet in hebrew that compares uchat and chatwoot like + and -" … "make sure we lean more to chatwoot")
 - **The file:** "השוואה: Chatwoot מול UChat", in clixteam579's Google Drive, made with the Google connectors. It is not shared with anyone. Its link stays out of this public repo.
 - **Tab "השוואה":** 16 topics, right to left. Each cell opens with + (advantage, green) or - (disadvantage, red).

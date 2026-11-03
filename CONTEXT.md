@@ -480,6 +480,9 @@ is: HANDOVER):
   change the input and keep the formulas. At 3 Nov prices, UChat for 19 staff is $195 a month.
 - **It does not call either platform "the system working today".** Both copies run, and the
   owner counts UChat as the live one.
+- **It has an English twin in a separate file** ("Comparison: Chatwoot vs UChat", owner: *"create a
+  separate one in english"*). The two sheets carry the same facts, each written in its own
+  language. When a fact changes, change it in both. No script keeps them in step.
 
 **3 Nov, earlier: the owner asked for the move to be ready "just in case"; the 18 Oct
 decision held then.** The plan is `docs/features/21-uchat-migration/`: UChat
