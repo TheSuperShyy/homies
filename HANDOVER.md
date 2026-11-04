@@ -63,12 +63,15 @@ appended to.
 >     - It refuses any English outside the run's own text.
 >     - `build_en.py` and `translations.json` still build the English page it replaced, as `index-en.html`. That file is not published, and is there only if the owner asks for an English twin.
 >   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
-> - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*). **Live version `1793721145-5eb9`** (3 Nov, 15:52 UTC). The ManyChat point is DONE, on the owner's word, and says simply that:
+> - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*). **Live version `1793783418-3bf0`** (4 Nov, 09:10 UTC, still shared by link). The ManyChat point is DONE, on the owner's word, and says simply that:
 >     - the website link exists;
 >     - a quote request reaches the chat inbox;
 >     - the tenant gets an update when the ticket closes;
 >     - the session with Yariv was held and he approved the features.
->   - Counts are 14 done, 9 partly, 2 waiting, 2 decided.
+>   - **4 Nov, on the owner's word, two incoming-agent points became DONE:**
+>     - pronunciation (*"this one is done for the slang"*): the name, the email address, "בית" reworded, and no slang;
+>     - telling men from women (*"this is also done"*): masculine until the caller shows otherwise, a woman's voice on our calls to women. The "a word may slip" caveat is gone.
+>   - Counts are 16 done, 7 partly, 2 waiting, 2 decided. The source is `local/artifacts/yariv-feedback/items.json`, with a backup `items.before-2026-11-04.json`, then `build.py`.
 >   - The closed-ticket message is untested on today's numbers (CONTEXT, the ManyChat paragraph). The first resolved WhatsApp ticket on the new number will show it.
 >   - **Both templates are APPROVED on the new WABA** (`ticket_resolved_he`, `payment_link_he`; `python scripts/wa_templates.py`), **but the WABA is BLOCKED for messages we start: 141006, no payment method** (`health_status`, 3 Nov 15:55 UTC). Replies inside 24 h go. A template cannot go until the owner adds a payment method in Meta's WhatsApp Manager. The page does not mention the elevator anywhere, on the owner's word.
 >   - **The "what is still needed, and from whom" box is gone,** on the owner's word. What each side owes lives here and in WORKLOG, not on the page.

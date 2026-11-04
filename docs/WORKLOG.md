@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-04
 
+### Yariv's page: pronunciation and telling men from women are done (owner, pasting each point: "this one is done for the slang", "this is also done")
+- **Both incoming-agent points of 12 Aug went from partly to done,** on the owner's word.
+- **Pronunciation now says:** the name is fixed and read from a pointed spelling since 26 Oct, the email address is read right, "בית" was reworded, and the agents speak without slang.
+  - The slang line is the register rule in both voice prompts: "ועדיין מנומס ובלי סלנג" (`demo-inbound.md`, `10-debt-followup/prompt.md`).
+  - "We still need to hear from Yariv which slang" and "not yet checked by ear" are gone.
+- **Men and women now says:** masculine until the caller shows otherwise, then feminine, and a woman's voice on the calls we start to women.
+  - The caveats ("a word or two may slip", names that fit both start masculine) are gone, as the owner closed the point.
+- **Counts:** 16 done, 7 partly, 2 waiting, 2 decided.
+- **Republished** with `publish_files` on slug `60182b09…` over `1793721145-5eb9`, as **`1793783418-3bf0`** (09:10 UTC), still public.
+- **Files:** the source `items.json` has a backup `items.before-2026-11-04.json`. `items_en.json` (unpublished) is not updated.
+
 ### The payment link template submitted on the UChat number's account (owner: "we already have that pre approved right" … "ok now submit one")
 - **Read first:** the approved `payment_link_he` and `ticket_resolved_he` are on the Chatwoot test number's account (`2129102787704530`).
   - The UChat number's account (`2117787955519632`) had 0 templates.
