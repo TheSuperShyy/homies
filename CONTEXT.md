@@ -478,8 +478,10 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   debt call's link and the "done" notice. `WHATSAPP_VIA=chatwoot` plus an `--apply` moves back.
   Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
   mirror's key.
-- **Templates belong to the number's own WhatsApp account.** The UChat number's ("hadas 1") has
-  none, and Meta blocks it from starting conversations (141006, no payment method). So no
+- **Templates belong to the number's own WhatsApp account.** The UChat number's has none, and Meta
+  blocks it from starting conversations (141006, no payment method).
+  - The account is "ASTDX - Smart Link" `2117787955519632`, in business ASTDX `1679634916736747`. That is the WABA entity in the number's own `health_status` (4 Nov). Its display name is "hadas 1".
+  - Graph also lists the number under a WABA named "hadas 1" (`1389698653006050`). That is not the one Meta reports as blocked. So no
   template leaves UChat until both are fixed in Meta. Inside 24 hours, free text goes.
 - **The phone agents' notes stay in Chatwoot's Voice inbox** until a UChat ticket list exists.
   Only UChat's dashboard can create one.

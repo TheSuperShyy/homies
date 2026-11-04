@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-04
 
+### The link for the payment method (owner: "ok send me a link i will add one")
+- **Read only, which account is blocked:** the UChat number's own `health_status` names WABA `2117787955519632` "ASTDX - Smart Link" (BLOCKED, 141006), in business `1679634916736747` "ASTDX".
+  - Graph also lists the number under "hadas 1" (`1389698653006050`), which is the number's display name, so CONTEXT now names the account by id.
+  - The Chatwoot test number is blocked separately, on "Test Messaging Account" `2129102787704530`.
+- **Sent to the owner:**
+  - WhatsApp Manager opened on that account: `https://business.facebook.com/wa/manage/home/?business_id=1679634916736747&waba_id=2117787955519632`;
+  - the fallback path, Business Settings → Accounts → WhatsApp accounts → the account → Settings → Payment settings → Add payment method (Meta's help article 488291839463771, and the path as WANotifier's guide gives it).
+- **Next:** after the owner adds it, re-read the number's `health_status` for the WABA entity.
+
 ### Read-only status check of the phone agents and the chatbot, 07:00 UTC (owner: "ok go a quick dryrun to check the status of all. the voice agent inbound and outbound and the chatbot")
 - **No call placed, no message sent, nothing written.**
 - **Vapi (Yariv's account):**
