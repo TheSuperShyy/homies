@@ -11,7 +11,7 @@ appended to.
 > **STATUS 4 Nov, 07:00 UTC, read only (owner: *"quick dryrun to check the status of all"*): green.** WORKLOG 4 Nov.
 >   - **Phone agents:** both equal the repo, the Vapi wallet is in credit, and the 208 line routes per call.
 >   - **Chatbot:** all 14 n8n workflows are active with no failed run in 24 h. OpenRouter has $53.53.
->   - **Still blocked:** both WhatsApp accounts, for messages we start (141006, payment method). Replies inside 24 h go.
+>   - **WhatsApp, 07:30 UTC:** the UChat number's account is unblocked; the owner added a card. Its account reads AVAILABLE, tier 250. The Chatwoot test number's account is still blocked (141006).
 >
 > **LIVE 3 Nov, 14:23:36 UTC: the incoming phone agent handles a request for a manager like the chatbot, and speaks only for itself** (owner: *"i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything"*). WORKLOG 3 Nov; `docs/assistant/demo-inbound.md`, "3 Nov".
 >   - **What it does now:**
@@ -91,7 +91,7 @@ appended to.
 >   - **Live:** the UChat copy logs to `messages` for the dashboard (source 'uchat', ids 'uchat:<n>', 17:25 UTC). The tool server is debt-tools **v140** with `WHATSAPP_VIA=uchat`: photos from UChat pass its fence, and the debt call's link and the "done" notice leave from the UChat number.
 >   - **Not yet seen on a real message:** no one had written to the UChat number since 17:25, and no photo has ever come through UChat. Check the first ones: a `messages` row with source 'uchat'; for a photo, `store_media`'s `skipped`. "host not allowed" means put its host in `MEDIA_HOSTS_EXTRA` and run `--apply --oxs-mirror`.
 >   - **Waiting on the owner:**
->     - a payment method on the UChat number's WhatsApp account, "ASTDX - Smart Link" `2117787955519632` (Meta 141006). The owner is adding one (4 Nov), from WhatsApp Manager: `https://business.facebook.com/wa/manage/home/?business_id=1679634916736747&waba_id=2117787955519632`. Afterwards, re-read the number's `health_status`;
+>     - (done 4 Nov, 07:30 UTC) a payment method on the UChat number's WhatsApp account, "ASTDX - Smart Link" `2117787955519632`. `health_status` reads the WABA AVAILABLE, tier 250, business still unverified (141010);
 >     - a go to create `ticket_resolved_he` and `payment_link_he` on that account (display name "hadas 1"). The approved ones are on the Chatwoot test number's account;
 >     - a UChat ticket list (made in UChat's dashboard) before the phone agents' notes can move. Until then they stay in Chatwoot's Voice inbox;
 >     - UChat Business before the trial ends (about 16 Nov).

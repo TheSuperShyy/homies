@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-04
 
+### The UChat number's account is unblocked (owner: "ok i added my other card")
+- **Read only, 07:30 UTC, the number's `health_status`:**
+  - WABA `2117787955519632` "ASTDX - Smart Link" AVAILABLE, with no error;
+  - the number LIMITED only for calling over SIP (138024);
+  - the business LIMITED for verification (141010);
+  - overall LIMITED, where it read BLOCKED before.
+- **`messaging_limit_tier` TIER_250, throughput STANDARD, `verified_name` "hadas 1" (`name_status` AVAILABLE_WITHOUT_REVIEW).**
+- **Still BLOCKED (141006): the Chatwoot test number's account "Test Messaging Account" `2129102787704530`.** The card went on the UChat number's account only.
+- **Unchanged:** the UChat number's account has no templates. The payment link and the closed-ticket notice can go outside 24 h only once `payment_link_he` and `ticket_resolved_he` exist there (a Meta write, on the owner's go).
+- **Not readable with our token:** the WABA's own fields (name, funding). Meta answers code 10, "requires that the Business that owns this App is a Business Solution Provider". `health_status` on the number is the read that works.
+
 ### The link for the payment method (owner: "ok send me a link i will add one")
 - **Read only, which account is blocked:** the UChat number's own `health_status` names WABA `2117787955519632` "ASTDX - Smart Link" (BLOCKED, 141006), in business `1679634916736747` "ASTDX".
   - Graph also lists the number under "hadas 1" (`1389698653006050`), which is the number's display name, so CONTEXT now names the account by id.

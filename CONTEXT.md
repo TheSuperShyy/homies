@@ -478,11 +478,17 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   debt call's link and the "done" notice. `WHATSAPP_VIA=chatwoot` plus an `--apply` moves back.
   Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
   mirror's key.
-- **Templates belong to the number's own WhatsApp account.** The UChat number's has none, and Meta
-  blocks it from starting conversations (141006, no payment method).
-  - The account is "ASTDX - Smart Link" `2117787955519632`, in business ASTDX `1679634916736747`. That is the WABA entity in the number's own `health_status` (4 Nov). Its display name is "hadas 1".
-  - Graph also lists the number under a WABA named "hadas 1" (`1389698653006050`). That is not the one Meta reports as blocked. So no
-  template leaves UChat until both are fixed in Meta. Inside 24 hours, free text goes.
+- **Templates belong to the number's own WhatsApp account.** The UChat number's has none, so no
+  template leaves UChat until they are created there (a Meta write, on the owner's go). Inside 24
+  hours, free text goes.
+  - The account is "ASTDX - Smart Link" `2117787955519632`, in business ASTDX `1679634916736747`. That is the WABA entity in the number's own `health_status`. The number's display name is "hadas 1".
+  - Graph also lists the number under a WABA named "hadas 1" (`1389698653006050`). That is not the one `health_status` names.
+  - **Its payment block has been gone since 4 Nov, 07:30 UTC,** after the owner added a card:
+    - the WABA reads AVAILABLE;
+    - the number is LIMITED only for calling over SIP (138024);
+    - the business is LIMITED for verification (141010);
+    - the tier is 250, so it may start conversations with up to 250 people in 24 hours.
+  - The Chatwoot test number's account ("Test Messaging Account" `2129102787704530`) is still BLOCKED (141006).
 - **The phone agents' notes stay in Chatwoot's Voice inbox** until a UChat ticket list exists.
   Only UChat's dashboard can create one.
 
