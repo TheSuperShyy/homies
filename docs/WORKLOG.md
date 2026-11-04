@@ -9,6 +9,30 @@ conversation that produced it.
 
 ---
 
+## 2026-11-04
+
+### Read-only status check of the phone agents and the chatbot, 07:00 UTC (owner: "ok go a quick dryrun to check the status of all. the voice agent inbound and outbound and the chatbot")
+- **No call placed, no message sent, nothing written.**
+- **Vapi (Yariv's account):**
+  - `vapi_transfer.py --balance`: in credit.
+  - The 208 SIP address `e9f95429` asks debt-tools per call (`assistant-request`), login set.
+  - Both agents equal the repo: the system prompt hash, the first message, the 7 tools, gpt-5.6-sol, voice `ba765d50` sonic-3.5 and debt-tools as server. Incoming: 8,811 characters `d87701b49749`, updated 3 Nov 14:23. Debt: 5,008 characters `ae453122d106`, updated 26 Oct.
+  - Last calls: incoming through the line 3 Nov 14:04 and 2 Nov, ended by the caller. The debt agent was last reached through the line on 26 Oct 11:44. The `11111111` web calls are the balance probes, failing by design.
+- **debt-tools** answers 401 to an unsigned GET, so it is up. **Chatwoot** 4.16.2: queue and data ok. **The dashboard:** `/login` 200, `/dialer` 307 to the login.
+- **n8n:** 14 workflows, all active. Every run in the last 24 h succeeded: both WhatsApp bots, the UChat translator and hand-over, the number watch, ticket notices, the handback, voice team notes and debt tools. The UChat bot's last message was 3 Nov 14:01, with none since.
+- **OpenRouter:** $53.53 in the wallet; the key's cap has $993.53 left.
+- **UChat:**
+  - the default reply is the "Michael" flow, active;
+  - WhatsApp Cloud is on among the channels;
+  - 4 contacts;
+  - members CLIX (owner) and Assaf Clix (admin).
+  - The plan and trial end cannot be read through the API.
+- **Meta:** both numbers (UChat ...3029, the Chatwoot test number ...9005) are CONNECTED, quality GREEN.
+  - Both WABAs are still BLOCKED for messages we start (141006, payment method), and the business is not verified (141010).
+  - Replies inside 24 h are not affected.
+  - The UChat number also reads LIMITED for WhatsApp calling over SIP (138024), which nothing of ours uses.
+- **Not provable without spending:** a real call through 077-6687949 and the Omni dialer, and a real WhatsApp reply.
+
 ## 2026-11-03
 
 ### The Chatwoot-vs-UChat sheets cut to what our bot needs, with seats, limits and Chatwoot's flexibility (owner: "only the things necessary for our bot also include the max seats and stuff also how chatwoot is flexible and stuff")

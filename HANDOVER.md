@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **STATUS 4 Nov, 07:00 UTC, read only (owner: *"quick dryrun to check the status of all"*): green.** WORKLOG 4 Nov.
+>   - **Phone agents:** both equal the repo, the Vapi wallet is in credit, and the 208 line routes per call.
+>   - **Chatbot:** all 14 n8n workflows are active with no failed run in 24 h. OpenRouter has $53.53.
+>   - **Still blocked:** both WhatsApp accounts, for messages we start (141006, payment method). Replies inside 24 h go.
+>
 > **LIVE 3 Nov, 14:23:36 UTC: the incoming phone agent handles a request for a manager like the chatbot, and speaks only for itself** (owner: *"i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything"*). WORKLOG 3 Nov; `docs/assistant/demo-inbound.md`, "3 Nov".
 >   - **What it does now:**
 >     - A request for a manager is noted at once (notify_team, caller_request) and quietly. The caller hears that Michael cares and is doing all he can, then a gentle "what happened?" if the matter is not known yet.
