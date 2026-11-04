@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-04
 
+### The payment link template submitted on the UChat number's account (owner: "we already have that pre approved right" … "ok now submit one")
+- **Read first:** the approved `payment_link_he` and `ticket_resolved_he` are on the Chatwoot test number's account (`2129102787704530`).
+  - The UChat number's account (`2117787955519632`) had 0 templates.
+  - The "hadas 1" account had 1, neither of ours.
+  - Templates belong to an account, so the approval does not carry over.
+- **`wa_templates.py` gained `--waba <id>`** to target another account than `.env`'s.
+- **The dry run's body and examples equal the approved template's exactly** (UTILITY, he, three body variables).
+- **Submitted at 07:43 UTC:** id `1659602039236658`, status PENDING, read back on the account.
+- **Not submitted: `ticket_resolved_he`,** since the owner said "one". It waits on their word.
+- **After approval:** UChat listed no templates at 07:44 (`/whatsapp-template/list`). debt-tools' `uchatTemplates()` sends only what UChat lists as APPROVED, so UChat's `/whatsapp-template/sync` comes before the first send.
+- **As approved on 23 Sep, the body addresses the resident in the plural** ("לכם", "כתבו"), not the singular the owner later set for WhatsApp. Kept word for word, because the owner asked for the pre-approved one.
+
 ### The UChat number's account is unblocked (owner: "ok i added my other card")
 - **Read only, 07:30 UTC, the number's `health_status`:**
   - WABA `2117787955519632` "ASTDX - Smart Link" AVAILABLE, with no error;

@@ -92,7 +92,10 @@ appended to.
 >   - **Not yet seen on a real message:** no one had written to the UChat number since 17:25, and no photo has ever come through UChat. Check the first ones: a `messages` row with source 'uchat'; for a photo, `store_media`'s `skipped`. "host not allowed" means put its host in `MEDIA_HOSTS_EXTRA` and run `--apply --oxs-mirror`.
 >   - **Waiting on the owner:**
 >     - (done 4 Nov, 07:30 UTC) a payment method on the UChat number's WhatsApp account, "ASTDX - Smart Link" `2117787955519632`. `health_status` reads the WABA AVAILABLE, tier 250, business still unverified (141010);
->     - a go to create `ticket_resolved_he` and `payment_link_he` on that account (display name "hadas 1"). The approved ones are on the Chatwoot test number's account;
+>     - **`payment_link_he` was submitted on that account 4 Nov, 07:43 UTC** (owner: *"ok now submit one"*): id `1659602039236658`, PENDING, word for word the approved one.
+>       - Check it with `python scripts/wa_templates.py --waba 2117787955519632`.
+>       - Once it is APPROVED, run UChat's template sync (`POST /whatsapp-template/sync`). debt-tools sends only what UChat's own list shows as APPROVED, and that list was empty at 07:44.
+>       - `ticket_resolved_he` is not submitted, because the owner said "one". It waits on their word: same command, same `--waba`;
 >     - a UChat ticket list (made in UChat's dashboard) before the phone agents' notes can move. Until then they stay in Chatwoot's Voice inbox;
 >     - UChat Business before the trial ends (about 16 Nov).
 >   - **Deploying debt-tools:** `python scripts/supabase_functions.py --apply --oxs-mirror`. A plain `--apply` switches the OXS mirror off.

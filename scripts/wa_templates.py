@@ -5,6 +5,7 @@
     python scripts/wa_templates.py create <name>            # dry: show what would be submitted
     python scripts/wa_templates.py create <name> --apply    # submit it to Meta for approval
     python scripts/wa_templates.py chatwoot                 # which templates Chatwoot's inbox 1 has synced
+    ... --waba <id>                                         # another WABA than .env's (the UChat number's: 2117787955519632)
 
 The source of truth is docs/features/11-whatsapp-bot/templates.md: one
 section per template, parsed here by its bullet fields and the fenced body.
@@ -80,6 +81,10 @@ def main():
     if not token or not waba:
         sys.exit("WHATSAPP_ACCESS_TOKEN / WHATSAPP_WABA_ID missing from .env")
     args = sys.argv[1:]
+    if "--waba" in args:  # a number on another account needs its own copy of every template
+        i = args.index("--waba")
+        waba = args[i + 1].strip()
+        del args[i:i + 2]
 
     if args[:1] == ["chatwoot"]:
         cw = e["CHATWOOT_URL"].rstrip("/") + "/api/v1/accounts/%s/inboxes/1" % e.get("CHATWOOT_ACCOUNT_ID", "2")

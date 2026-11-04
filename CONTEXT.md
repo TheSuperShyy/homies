@@ -478,9 +478,11 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   debt call's link and the "done" notice. `WHATSAPP_VIA=chatwoot` plus an `--apply` moves back.
   Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
   mirror's key.
-- **Templates belong to the number's own WhatsApp account.** The UChat number's has none, so no
-  template leaves UChat until they are created there (a Meta write, on the owner's go). Inside 24
-  hours, free text goes.
+- **Templates belong to the number's own WhatsApp account.** No template leaves UChat until it is
+  approved there and synced into UChat. Inside 24 hours, free text goes.
+  - **4 Nov:** `payment_link_he` was submitted there on the owner's go, PENDING. `ticket_resolved_he` is not submitted yet.
+  - **The command:** `wa_templates.py create <name> --waba 2117787955519632`. `--waba` targets an account other than `.env`'s.
+  - **debt-tools reads UChat's own template list (APPROVED only), not Meta's,** so an approval reaches the bot only after UChat's `/whatsapp-template/sync`.
   - The account is "ASTDX - Smart Link" `2117787955519632`, in business ASTDX `1679634916736747`. That is the WABA entity in the number's own `health_status`. The number's display name is "hadas 1".
   - Graph also lists the number under a WABA named "hadas 1" (`1389698653006050`). That is not the one `health_status` names.
   - **Its payment block has been gone since 4 Nov, 07:30 UTC,** after the owner added a card:
