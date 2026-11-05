@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### The "ticket closed" template submitted on the UChat number's account (owner: "submit it")
+- **The body is word for word the one approved on the test number's account:** checked against Meta's own copy there (UTILITY, he, two variables).
+- **Submitted:** `wa_templates.py create ticket_resolved_he --waba 2117787955519632 --apply` gave id `1643824720466250`, PENDING. Read back: `ticket_resolved_he` PENDING, `payment_link_he` APPROVED.
+- **After approval:** UChat's `/whatsapp-template/sync`. Then a close in OXS of a WhatsApp ticket reaches the resident.
+- **As approved on 23 Sep, the body is plural** ("שלכם", "כתבו לנו"), like the payment link's.
+
 ### The payment link template is APPROVED on the UChat number's account and synced into UChat (owner: "i thought we submit a template to meta")
 - **`wa_templates.py --waba 2117787955519632`:** `payment_link_he` APPROVED (he, UTILITY). It is the only template on that account.
 - **UChat:** `POST /whatsapp-template/sync` answered ok, and `/whatsapp-template/list` now shows `payment_link_he` APPROVED. `uchatTemplates()` in debt-tools sends only what that list approves, so the debt call's link can go out as the template, past 24 h, on the UChat number.

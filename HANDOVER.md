@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **5 Nov: `payment_link_he` is APPROVED on the UChat number's account and synced into UChat,** so the debt call's link can go out as a template there. `ticket_resolved_he` is not submitted on that account, and waits on the owner's go: until then a close in OXS closes our ticket, but the resident's message waits.
+> **5 Nov: `payment_link_he` is APPROVED on the UChat number's account and synced into UChat,** so the debt call's link can go out as a template there. `ticket_resolved_he` was submitted there on 5 Nov (id `1643824720466250`, PENDING). **Once it is APPROVED, run UChat's `/whatsapp-template/sync`:** until then a close in OXS closes our ticket, but the resident's message waits.
 >
 > **5 Nov: the 33 open test tickets in Bar Kochba 23 are `cancelled` in our system** (owner: "close all that opened tickets", "in the oxs dont touch them"). Their 16 OXS copies are untouched and still open there. The 26 bot tickets in other buildings and the 92 imported ones were left alone. WORKLOG 5 Nov.
 >
