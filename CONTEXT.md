@@ -3300,6 +3300,16 @@ on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
 - **A held-back note costs nothing.** The answer still comes, and the two-part payment reply still
   splits (`!acked && paid`), so the gate is only allowed to hold notes back, never to send one.
 
+## An outside bot can test Michael live, as real tenants (5 Nov)
+
+- **The brief:** the owner's Grok bot works from `docs/features/11-whatsapp-bot/grok-tenant-tester.md`. It holds:
+  - the hard limits: בר כוכבא 23 apartment 2 only, invented names, never pay, the plan's ~45 messages;
+  - how real tenants write;
+  - 11 conversations;
+  - the rules R1 to R25.
+- **It mirrors the live prompt and the tester checklist.** A change to what Michael should do changes the brief in the same commit.
+- **It costs real money, unlike `wa_qa.py`:** real model calls, about 4 cents a reply. It also opens real test tickets, and they stay.
+
 ## How the WhatsApp bot is tested without a model call
 
 1 Oct. Owner: *"i want you to do a automated testing of the chatbot like doing ab

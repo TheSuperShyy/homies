@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **5 Nov: a brief for the owner's Grok bot to test Michael as a real tenant:** `docs/features/11-whatsapp-bot/grok-tenant-tester.md` (owner: *"create an md file for grok bot on how to test the agent properly like a real tenant"*).
+>   - **What it holds:** 11 conversations (about 45 messages, about $2 of the bot's model), the 25 rules with the checklist's expectations, and a report format.
+>   - **Limits:** בר כוכבא 23 apartment 2 only. It has no number in it, because the repo is public.
+>   - **Its rules mirror the live prompt, so change it with the prompt,** as with the checklist.
+>
 > **LIVE 5 Nov, epoch 95: gas gets no ticket, only the gas company line, word for word** (Yariv's change 2, `n8n_whatsapp_gas.py`):
 >   - **The line:** "במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?"
 >   - **No note either:** an emergency note's backstop in debt-tools would open a ticket. Gas left notify_team's emergency list and open_request's urgency.

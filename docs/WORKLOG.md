@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### A brief for the owner's Grok bot, to test Michael like a real tenant (owner: "create an md file for grok bot on how to test the agent properly like a real tenant")
+- **The file:** `docs/features/11-whatsapp-bot/grok-tenant-tester.md`, written for the Grok tester, in English with the tenant messages in Hebrew. It covers the WhatsApp chatbot (chatbot first).
+- **What it holds:**
+  - **Hard limits:** בר כוכבא 23 apartment 2 only, never another real address, invented names, never pay, never delete a ticket, and the plan only (about 45 messages, about 4 cents a reply).
+  - How to tell a number on file from one that is not, and what each should get.
+  - How real tenants write, and how to stay in character.
+  - **11 conversations** built on the tester checklist's 30 tests, with the gas tests as of epoch 95, plus a messy free-play chat.
+  - **25 rules**, each step naming the ones it tests.
+  - How to judge (PASS, FAIL, NOTE, serious fails first) and the report format.
+- **Checked against live:** get_balance's text. On file, the balance comes at once; otherwise he asks once for the full name and the flat's registered phone.
+- **The known gap is a rule to flag:** Send's appended "וזה הדבר היחיד שאני יכול לעשות מכאן".
+- **No phone number in it,** because the repo is public. The owner gives the bot's number.
+
 ### LIVE: gas gets no ticket, only "report it to the gas company" (epoch 95, `scripts/n8n_whatsapp_gas.py`; Yariv's change 2; owner: "ok next")
 - **The client's decision** (4 Nov review, 36:11-37:10): a gas report opens no call. The resident is told to report it to the gas company, in a fixed wording.
 - **The wording is line 2 of the two offered at 10:32 UTC:** "במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?"
