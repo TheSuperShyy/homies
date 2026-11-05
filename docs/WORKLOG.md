@@ -19,6 +19,7 @@ conversation that produced it.
   3. whether a payer has an active standing order and whether the last charge failed (today we infer it from `paymentType` and `isKeva`);
   4. if none of it exists, whether it is planned.
   - It says a read key is enough.
+  - It is signed "Clix Solution, for Homies", with no person's name (owner: "remove the name").
 - **Where:** `local/oxs/2026-11-05-standing-order-api-email.txt` (gitignored), to support@oxs.co.il. No key values in it. The owner sends it.
 - **CONTEXT is unchanged:** a draft, not a rule.
 
