@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### LIVE: the bot says an urgent ticket is urgent, never "emergency" (epoch 93, `scripts/n8n_whatsapp_urgentword.py`; owner: "look at the reply it got broke why it will notify emergency services?", then "so fix that i dont like the reply of that one")
+- **What happened** (UChat number, execution 155798):
+  - The elevator test opened `255-1391-26` and asked whether someone was stuck. The owner answered "yes".
+  - The bot called `notify_team` (reason emergency) and `add_request_detail`, and replied: "עדכנתי מיד בדחיפות חירום שיש מישהו שתקוע במעלית. מספר הקריאה הדחופה שלך הוא 255-1391-26, וזה הדבר היחיד שאני יכול לעשות מכאן."
+  - Nothing outside was contacted.
+- **The cause: two phrases of the prompt's danger paragraph, said back.**
+  - "קריאת שירות בדחיפות חירום ורושם הערת חירום" became "עדכנתי מיד בדחיפות חירום", which, with no one named, reads as an emergency service alerted.
+  - The pressing case's quoted "ושזה הדבר היחיד שאתה יכול לעשות מכאן" was recited although the owner had not pressed.
+  - The tools define their own values ("emergency = a person in danger"), so the tool choice does not need the word.
+- **The change: two deletions in that paragraph, 23,737 -> 23,684 characters.** Nothing was added.
+  - "דחופה ורושם הערה דחופה";
+  - the pressing case says "מה עשית ומה המספר של הקריאה".
+  - Both `prompt.md` and live. `MEMORY_EPOCH` and the key went 92 -> 93, and `EPOCH_COVERS["prompt"]` is `de05a9dcac7f`.
+- **The gate:**
+  - `--candidate --replay`: all 434 cases pass, and 0 of 1,182 replies change through Send or Reply usable?. The only failure was the prompt's pin.
+  - Claude-played on the four real danger turns (155798's "yes", 19 Oct "זה דחוף" and "אין לכם מוקד חירום??", 5 Oct's water on the stairwell light and "שמישהו יתקשר אליי דחוף"): no "חירום" in what is said, no recited line. Then the pin was moved to `de05a9dcac7f`.
+  - `check_patchers_idle.py`: 44 of 54 not idle on the candidate, and also 44 on live as it was. The old "baseline is 6" is out of date: every one-time carrier refuses once the key moves. The only difference is `photo` joining them.
+- **Applied:** live `u2JjrbcNPYyyh3yl`, then `n8n_uchat.py --apply` regenerated the UChat bot `mKheBsTxtcMhPxu7`.
+  - The UChat bot reads prompt `de05a9dcac7f` and key `-93-uchat`. A re-run has nothing to do, and the gate on live is all green.
+  - Snapshot: `local/n8n-whatsapp-live-05nov-before-urgentword.json`. **Rollback:** `--restore`, then `n8n_uchat.py --apply`.
+- **Owed:** the owner's handset (the elevator message, then "כן"), then `check_whatsapp_rules.py --watch` from the deploy.
+
 ### Read only: how many requests the phone agent makes before a reply (owner: "how any request does the voice agent do before sendng a reply")
 - **Counted from the last 14 real calls** with turns on Yariv's Vapi account: `GET /call`, nothing placed or paid, no wallet probe. Model requests were counted per caller turn from each call's messages.
   - **One model request per reply** on 50 of 57 turns.

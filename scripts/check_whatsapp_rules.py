@@ -174,7 +174,12 @@ PINS = {
     # exact input with an empty memory, the same with the chat in memory, a status check): 7/7 and 8/9 then
     # 7/7 on the final text, no guard rejection. The OLD text played the same input well too: a Claude
     # pass cannot see this Gemini slip, so Send's allclear v1 carries the guarantee.
-    'Answer the resident / system': 'a982cf21020a',
+    # 5 Nov (n8n_whatsapp_urgentword.py, epoch 93): an urgent ticket is said as urgent, never "emergency"
+    # (155798: "עדכנתי מיד בדחיפות חירום …", read as an emergency service alerted), and the pressing case
+    # says what was done and the number, without the recited "only thing I can do". Claude-played on the
+    # four real danger turns (155798's "yes", 19 Oct "זה דחוף" and "אין לכם מוקד חירום??", 5 Oct's water
+    # on the stairwell light and "שמישהו יתקשר אליי דחוף"): no "חירום" in what is said, no recited line.
+    'Answer the resident / system': 'de05a9dcac7f',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

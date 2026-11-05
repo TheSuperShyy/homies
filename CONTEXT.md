@@ -3073,7 +3073,9 @@ three, spends nothing, and is the gate:
    nodes AND wires. That run found two patchers (`firstword`, `twobeat`) that set
    a node's whole wiring and would have deleted the new wires on their next run.
 2. **After `--apply`:** the check on live is green, and every WhatsApp
-   patcher's dry run is idle. Baseline: `batch.py` shows its old drift and is
+   patcher's dry run is idle. **Baseline, 5 Nov: 44 of 54 not idle, and that is normal.** Every one-time
+   carrier refuses once the memory key has moved past its epoch, so compare against `check_patchers_idle.py`
+   on a dump of live as it is, not against a number. Older baseline: `batch.py` shows its old drift and is
    never applied; `open`, `handover`, `promise`, `transfer` and `untemplate`
    refuse on nodes removed in mid-September. Since 4 Oct the check on live also
    reads the two typing nodes (`check_typing`), and there are 30 patchers.

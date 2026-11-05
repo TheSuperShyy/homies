@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 92
+MEMORY_EPOCH = 93
+# 92 -> 93, 5 Nov (n8n_whatsapp_urgentword.py): an urgent ticket is said as urgent, never "emergency";
+# the prompt's "בדחיפות חירום … הערת חירום" read back as an emergency service alerted (execution
+# 155798), and the pressing case's quoted "only thing I can do from here" was recited unasked.
 # 90 -> 91, 30 Oct, morning (n8n_whatsapp_name.py): open_request sends the reporter's name when they gave one,
 # and asks only after need_name; the function names a tenant on file from the record.
 # 89 -> 90, 29 Oct, night (n8n_whatsapp_addto.py): something new about an open ticket goes on the ticket
@@ -774,7 +777,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "a982cf21020a",   # docs/features/11-whatsapp-bot/prompt.md (29 Oct, later, epoch 88)
+    "prompt": "de05a9dcac7f",   # docs/features/11-whatsapp-bot/prompt.md (5 Nov, epoch 93, urgentword)
     "inject": "3670f71d14b9",   # LIVE's (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
     # n8n_whatsapp_untemplate.py is not folded yet
