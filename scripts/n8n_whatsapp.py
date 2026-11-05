@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 95
+MEMORY_EPOCH = 96
+# 95 -> 96, 5 Nov (n8n_whatsapp_standing.py, Yariv's change 3): a standing order is recorded with the new
+# request_standing_order and emailed to collections; the prompt says it is neither an arrangement nor a link,
+# and get_payment_link's text says it is not a link. Prompt and tools both moved.
 # 94 -> 95, 5 Nov (n8n_whatsapp_gas.py, Yariv's change 2): gas gets no ticket and no note, only "report it to
 # the gas company", word for word; notify_team and open_request's urgency no longer list gas as an emergency.
 # Prompt and tools both moved; every buffer holds gas answered with an urgent ticket.
@@ -783,7 +786,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "90c43a016d27",   # docs/features/11-whatsapp-bot/prompt.md (5 Nov, epoch 95, gas)
+    "prompt": "8b32b58a4d42",   # docs/features/11-whatsapp-bot/prompt.md (5 Nov, epoch 96, standing order)
     "inject": "3670f71d14b9",   # LIVE's (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
     # n8n_whatsapp_untemplate.py is not folded yet
@@ -802,7 +805,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "60094344bcd8",  # 5 Nov, epoch 95: LIVE's tools after n8n_whatsapp_gas.py (notify_team: never for gas).
+    "tools": "ba8a80ac42ff",  # 5 Nov, epoch 96: LIVE's tools after n8n_whatsapp_standing.py (get_payment_link: a
+    # standing order is not a link). request_standing_order is outside this hash, like add_request_detail.
+    # Before: "60094344bcd8", 5 Nov, epoch 95: LIVE's tools after n8n_whatsapp_gas.py (notify_team: never for gas).
     # Before: "0c42f56920b2", 30 Oct, morning, epoch 91: LIVE's tools (section 6, one voice, addto's notify_team
     # clause, then name's open_request paragraph). TOOLS below is NOT folded yet, so every patcher refuses at check_memory_epoch until it is
     # (n8n_whatsapp_section6.py, n8n_whatsapp_ionly.py). add_request_detail is not in TOOLS, so its text is

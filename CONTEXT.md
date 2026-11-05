@@ -44,6 +44,18 @@ The user is the builder. The client is Homies.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
 - **The phone agent** still opens an urgent ticket for gas until its version is built.
 
+**A standing order is recorded and emailed to collections (the client, 4 Nov review; Yariv's change 3; live on WhatsApp 5 Nov, epoch 96, debt-tools v148).**
+- **Why email:** OXS's API has one-time payments only, so nothing of ours can set one up. Homies want the request by email, not in another system to watch.
+- **The bot:** one tool, `request_standing_order`, the moment a tenant asks for one, asks whether they can pay by one, or says yes. It replaces the link, the ticket and the note.
+  - It says it recorded the request, with its number. It names nobody who will call or set it up, and asks for no card or bank details.
+  - A number on file is asked nothing. A number not on file is asked once for its full name, building and flat. The building gets open_request's answers.
+- **The record:** one open request per number, with the phone agent's marker (`oxs_ref` `standing_order`, type `other`). A second ask gets the same number and no second email. It is never mirrored into OXS.
+- **The email:** debt-tools posts to the n8n workflow "Homies — Standing order email" (`scripts/n8n_standing_order_email.py`), which sends it through Brevo, Chatwoot's relay. Supabase can't reach the mail ports, but n8n can.
+  - The address is `COLLECTIONS_EMAIL` in `.env`, written into the node at `--apply`. **Until Homies give theirs, it is our team inbox (clixteam579@gmail.com).**
+  - The sender is Brevo's verified `testclix46@gmail.com`, until Homies have their own.
+- **If OXS's API can start one** (the owner asked them on 5 Nov), this becomes the fallback, not the route.
+- **The phone agent's** request still lands in the dashboard only, with no email, until its version is built.
+
 **Sandbox work never touches production (26 Oct, the owner: "make sure the prod is not being affected the sandbox is independent").**
 - Feature 19 has its own Chatwoot account, its own n8n workflows and its own backend function (`debt-tools-sandbox`).
   - **Built 26 Oct:** Chatwoot account 3; n8n copies of the bot, the handover and the debt-tools router; function v2. Ids and how-tos are in `feature.md` "As built".

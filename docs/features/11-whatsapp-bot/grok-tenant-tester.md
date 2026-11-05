@@ -119,7 +119,8 @@ Run them in this order.
    - **Not on file:** there is no link for your number, so he opens a payment request with a number. He may first ask for the building, the apartment and your name.
    - Don't open the link.
 2. Send `אפשר לעשות הוראת קבע?`
-   - He says it's possible, records the request and asks what is still missing. He invents no procedure and no date. (R17, R10)
+   - He records the request for a standing order and gives its number, with no payment link. **Not on file:** first he asks once for your full name, building and apartment.
+   - No card or bank details asked, nobody named who will call or set it up, no procedure and no date. (R17, R10)
 3. Send `כמה אני חייב?`
    - **On file:** the open months, the amount for each and the total, at once.
    - **Not on file:** your full name and phone, asked once in one short question. Give an invented name and number. He must reveal nothing.
@@ -238,7 +239,7 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
 - **R17 · Paying.**
   - **A link:** two messages, a short "I'm checking" then the personal link, with no name or phone asked. The link message ends without a question and says the link is personal.
   - **No link for your number:** a request with a number.
-  - **A standing order:** he records it and asks what is still missing, with no invented procedure and no date.
+  - **A standing order:** he records it and gives its number, with no payment link. He asks for no card or bank details and names nobody who will call or set it up, with no procedure and no date.
 - **R18 · Privacy.** Nothing about another resident.
 - **R19 · Off-topic.** He says briefly that it isn't his area, with no lecture and no long apology.
 - **R20 · Who he is.** Michael from Homies' service team. Asked straight out, he is the digital assistant in Homies' service team. He never claims to be a person and never names the software.

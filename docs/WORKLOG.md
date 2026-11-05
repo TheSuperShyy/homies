@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### LIVE: a WhatsApp standing-order request is recorded and emailed to collections (epoch 96, debt-tools v148; Yariv's change 3; owner: "ok lets proceed to the next fix")
+- **The ask** (4 Nov review, 7:32-15:06): OXS's payment API has one-time payments only. Until it can do more, the request goes to the collections team by email: "I don't want another system I need to monitor every time".
+- **Before:** nobody had asked on WhatsApp (0 inbound messages with "קבע"). The texts would have routed it wrong: "how do I pay" is the one-time link, and "a payment arrangement" is a ticket plus a note in the inbox. The one standing-order request ever made (255-1203-26, 9 Sep) came by phone, and it sits in the dashboard.
+- **The email goes out from n8n, not the function.** Supabase can't reach the mail ports (25 and 587, and 465 by some reports). Brevo, Chatwoot's relay, took our login on 587 and 2525 from the PC.
+  - New workflow "Homies — Standing order email" (`qwFc7ObfclFHMsuD`, `scripts/n8n_standing_order_email.py`): a webhook with a header secret, a check that there is a request, then the email, with two tries.
+  - Credentials "Homies Brevo SMTP" and "Homies standing order secret" were made through the n8n API from `.env`, never printed.
+  - The address is `COLLECTIONS_EMAIL` (clixteam579@gmail.com until Homies give theirs). `--test` sent one email marked as a test, and Brevo accepted it (run 156188).
+- **debt-tools v148** (PR #5, `standing-order-email` from `main`; checks green; the pipeline deployed it, then a hand `--apply --oxs-mirror` pushed the webhook's URL and secret):
+  - `request_standing_order` works on WhatsApp. The number finds the tenant, or the bot asks with `need_name` and open_request's building answers.
+  - One open request per number; a second ask returns the same number and sends no email.
+  - The marker and words are the phone agent's. Nothing is mirrored into OXS; the sync only follows 24-hex OXS ids.
+- **Probe, no AI, from the owner's +63:** recorded 255-1392-26. The email carried "אסף קליקס", בר כוכבא 23, flat 2, and Brevo accepted it (run 156199). A second ask returned `already_recorded` with the same number and started no email run. 255-1392-26 was then set to `cancelled`, so the owner's handset test runs the whole path; cancelled sends no closed-ticket message.
+- **The bot** (`scripts/n8n_whatsapp_standing.py`):
+  - **The new tool:** `request_standing_order`, at the end of the tool row. Its text: the ask or a yes is the reason to call, it is the whole of it, no card or bank detail goes through the chat, and the bot says only that it recorded it, with the number.
+  - **The prompt (23,986 -> 24,161 characters):** one sentence saying a standing order is neither an arrangement nor a link, and his list of what he does names it.
+  - **get_payment_link:** one clause saying a standing order is not a link.
+  - **Hashes:** memory 95 -> 96, prompt `8b32b58a4d42`, tools `ba8a80ac42ff`.
+  - The guards are unchanged. "רשמתי" is not a deed they police, and the number comes back in the tool's own answer. Six new cases in `check_whatsapp_rules.js` hold that.
+- **The gate:**
+  - `--candidate --replay`: 441/441 cases, and 0 of 1,183 replies change. Then all green on live.
+  - **Claude-played** (`scripts/wa_qa_standing.json`): 3 conversations, 7 turns, 16/16, no guard rejection.
+    - "אפשר לעשות הוראת קבע?" on file got the tool alone and "רשמתי את הבקשה שלך להוראת קבע … מספר הבקשה הוא 255-1392-26".
+    - "איך משלמים?" still got the link.
+    - A number not on file was asked its name, building and flat once, then recorded.
+  - **One expectation failed first, through the deck's fault.** It wanted the name on every call, and the first call rightly had none; it was replaced.
+- **Applied:** live, then the UChat copy (`-96-uchat`, same hashes). Snapshot: `local/n8n-whatsapp-live-05nov-before-standing.json`.
+- **Also updated:** the Grok brief's C6.2 and R17, and the checklist pages' test p2 (source only, both languages, not republished).
+- **Found, not fixed:** `wa_qa.py play` has no stand-in for the new tool; only the free `turn` path was used. The phone agent's requests still get no email (chatbot first).
+- **Owed:** Homies' collections address; the owner's handset test from the +63.
+
 ### A follow-up email to Omnitelecom, drafted (owner: "create a follow up email for omnitelecm"; nothing sent)
 - **Why:** the 4 Nov review's action for 5 Nov was to follow up with Omni on "the API Error and the open-calls button". Omni had not answered the 2 Nov email in substance. I read the "open-calls button" as the click-to-call, which that email asked about.
 - **What it says**, in Hebrew with an English check copy:

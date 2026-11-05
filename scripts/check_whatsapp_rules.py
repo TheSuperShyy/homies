@@ -188,7 +188,14 @@ PINS = {
     # חזק של גז בכניסה לבניין!!"), gas in the flat, a hedged smell and "what should I do, open the
     # windows?": the line, no tool, no advice; a stuck lift with someone inside and smoke still get the
     # urgent ticket. notify_team and open_request moved with it (gas left their emergency lists).
-    'Answer the resident / system': '90c43a016d27',
+    # 5 Nov, last (n8n_whatsapp_standing.py, epoch 96, Yariv's change 3): a standing order is recorded with
+    # request_standing_order alone and emailed to collections; the prompt says it is neither an arrangement
+    # nor a link, and get_payment_link says it is not a link. Claude-played on the candidate
+    # (scripts/wa_qa_standing.json): "אפשר לעשות הוראת קבע?" on file, a number not on file moving to one,
+    # and a plain "איך משלמים?": 3 conversations, 7 turns, 16/16, no guard rejection. The standing order got
+    # the tool alone and its number, "how do I pay" still got the link, and the unknown number was asked its
+    # name, building and flat once, with no reason given; no team, no card or bank details.
+    'Answer the resident / system': '8b32b58a4d42',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -202,7 +209,8 @@ PINS = {
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
-    'get_payment_link / tool': 'f3c5de92d6d2',
+    'get_payment_link / tool': '2dd75e741bfc',   # 5 Nov, epoch 96: a standing order is not a link
+    'request_standing_order / tool': '37ade364721f',   # 5 Nov, epoch 96: new (n8n_whatsapp_standing.py)
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': '437d0eda4866',

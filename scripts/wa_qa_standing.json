@@ -1,0 +1,401 @@
+{
+ "_about": "The deck for n8n_whatsapp_standing.py (5 Nov, epoch 96, Yariv's change 3): a standing order is recorded with request_standing_order and nothing else, a plain how-to-pay still gets the link, and a number not on file is asked its name once. `expect` is never shown to the players.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
+  "open_request": {
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second call with the same building and the same type returns the FIRST ticket's reference as `duplicate` (the ticket service's 30-minute duplicate guard: same building, same type, still open); a different type gets the next serial (255-1510-26 -> 255-1511-26).",
+   "opened": {
+    "ok": true,
+    "opened": true,
+    "reference": "<ticket>",
+    "building": "בר כוכבא 23",
+    "reporter_unit": "<the reporter_unit passed>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ],
+    "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   },
+   "need_building": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_building"
+   },
+   "duplicate": {
+    "ok": true,
+    "reference": "<the first ticket's reference>",
+    "duplicate": true
+   }
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "notify_team": {
+   "ok": true,
+   "reason": "other"
+  },
+  "show_menu": {
+   "ok": true,
+   "menu": "shown under your next message"
+  },
+  "verify_address": {
+   "_rule": "Bar Kochba in Hebrew with 23: found. Bar Kochba in Hebrew without a number: need_number. Anything else: street_unknown.",
+   "found": {
+    "ok": true,
+    "building_found": true,
+    "address": "בר כוכבא 23, תל אביב-יפו"
+   },
+   "need_number": {
+    "ok": true,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "get_service_info": {
+   "_rule": "Match the topic's words against each entry's `words` (any one is enough); every entry that matches comes back in `topics` as {title, facts}. Nothing matches: not_found.",
+   "catalogue": [
+    {
+     "title": "ניהול ועד בית",
+     "words": [
+      "ועד",
+      "ניהול",
+      "גבייה",
+      "גביה",
+      "תקציב",
+      "כספים",
+      "הנהלת חשבונות",
+      "דוח",
+      "דוחות",
+      "מאזן",
+      "קבלה",
+      "קבלות",
+      "הוראת קבע",
+      "לשלם",
+      "תשלום"
+     ],
+     "facts": [
+      "בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.",
+      "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
+      "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
+      "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
+      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים."
+     ]
+    },
+    {
+     "title": "הדברה",
+     "words": [
+      "הדברה",
+      "מדביר",
+      "גוקים",
+      "ג'וקים",
+      "גו'קים",
+      "נמלים",
+      "מזיקים",
+      "עכברים",
+      "חולדות",
+      "צרעות",
+      "מקקים"
+     ],
+     "facts": [
+      "ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.",
+      "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.",
+      "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.",
+      "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים."
+     ]
+    },
+    {
+     "title": "שיפוצים",
+     "words": [
+      "שיפוץ",
+      "שיפוצים",
+      "לשפץ",
+      "ריצוף",
+      "צביעה",
+      "גבס",
+      "איטום"
+     ],
+     "facts": [
+      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות."
+     ]
+    },
+    {
+     "title": "ניהול נכסים לבעלי דירות",
+     "words": [
+      "ניהול נכס",
+      "ניהול נכסים",
+      "בעל דירה",
+      "להשכיר",
+      "שוכר",
+      "שוכרים",
+      "חוזה שכירות",
+      "משכיר"
+     ],
+     "facts": [
+      "שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.",
+      "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו."
+     ]
+    }
+   ],
+   "not_found": {
+    "ok": true,
+    "found": false,
+    "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+   }
+  },
+  "get_payment_link": {
+   "ok": true,
+   "found": true,
+   "link": "https://pay.example.co.il/t/<id>",
+   "building": "בר כוכבא 23",
+   "apartment": "<flat>"
+  },
+  "get_balance": {
+   "_rule": "name or phone missing: need_identity (list what is missing). The card's full name and phone together (any spacing or hyphens): the scenario's balance fixture. Anything else: identity_failed.",
+   "need_identity": {
+    "ok": true,
+    "found": 0,
+    "need_identity": true,
+    "missing": [
+     "<name and/or phone>"
+    ]
+   },
+   "identity_failed": {
+    "ok": true,
+    "found": 0,
+    "identity_failed": true
+   }
+  },
+  "add_request_detail": {
+   "ok": false,
+   "error": "not found"
+  },
+  "request_standing_order": {
+   "_rule": "On file (the scenario has `who`): recorded, with the scenario's `ticket` as reference. A second call in the same chat returns the same reference with already_recorded true. Not on file (no `who`): a call with no reporter_name returns need_name; a call with reporter_name and a building naming Bar Kochba in Hebrew with 23 returns recorded with the scenario's `ticket`; Bar Kochba with no number: need_number; any other street: street_unknown.",
+   "recorded": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": true,
+    "reference": "<ticket>"
+   },
+   "again": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": false,
+    "already_recorded": true,
+    "reference": "<ticket>"
+   },
+   "need_name": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_name"
+   }
+  }
+ },
+ "scenarios": [
+  {
+   "time": "16:30",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-11-05T16:30:00+02:00",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1392-26",
+   "id": "so_on_file",
+   "title": "On file: can I pay the committee fee by standing order?",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. משלם כל חודש ידנית ונמאס לו, רוצה הוראת קבע.",
+    "script": [
+     {
+      "say": "היי, אפשר לעשות הוראת קבע לועד בית?"
+     },
+     {
+      "say": "סבבה תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {
+     "type": "called",
+     "tool": "request_standing_order",
+     "name": "the request is recorded"
+    },
+    {
+     "type": "not_called",
+     "tool": "get_payment_link",
+     "name": "no one-time link for a standing order"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no ticket beside it"
+    },
+    {
+     "type": "not_called",
+     "tool": "notify_team",
+     "name": "no team note beside it"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "1392",
+     "name": "the request's number is given"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|גבייה|מחלקת|יחזרו|יחזור|ייצרו|יצרו|יצור איתך|ניצור|נציג|בהקדם|בקרוב",
+     "name": "one voice: nobody else will handle it or call"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "מספר (ה)?כרטיס|פרטי (ה)?כרטיס|חשבון (ה)?בנק|מספר חשבון|סניף",
+     "name": "no card or bank details asked"
+    }
+   ],
+   "judge": [
+    "honest: Michael says he recorded the standing-order request only after a tool recorded it, with the number it returned?",
+    "one_voice: Michael speaks only for himself, with no team, department or anyone who will call or set it up?",
+    "natural: would a tenant find the reply clear and warm, in natural Hebrew, ending in a question while the matter is open?"
+   ]
+  },
+  {
+   "time": "16:30",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-11-05T16:30:00+02:00",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1392-26",
+   "id": "pay_link_still",
+   "title": "On file: how do I pay? (the link, untouched by the change)",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. רוצה לשלם את הועד עכשיו.",
+    "script": [
+     {
+      "say": "איך משלמים ועד בית?"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {
+     "type": "called",
+     "tool": "get_payment_link",
+     "name": "a how-to-pay still gets the link"
+    },
+    {
+     "type": "not_called",
+     "tool": "request_standing_order",
+     "name": "no standing order nobody asked for"
+    }
+   ],
+   "judge": [
+    "link: the tenant got their payment link, in two messages, with nothing about standing orders pushed on him?"
+   ]
+  },
+  {
+   "time": "16:30",
+   "weekday": 4,
+   "weekday_he": "חמישי",
+   "iso": "2026-11-05T16:30:00+02:00",
+   "greeted": true,
+   "who": null,
+   "ticket": "255-1393-26",
+   "id": "so_unknown",
+   "title": "Not on file: moving to a standing order, name and address once",
+   "resident": {
+    "persona": "רונית לוי, בר כוכבא 23 דירה 4. כותבת ממספר שלא רשום אצלם. רוצה להעביר את התשלום של הוועד להוראת קבע.",
+    "script": [
+     {
+      "say": "שלום, אני רוצה להעביר את התשלום של הוועד להוראת קבע"
+     },
+     {
+      "say": "רונית לוי, בר כוכבא 23 דירה 4"
+     },
+     {
+      "say": "תודה רבה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {
+     "type": "called",
+     "tool": "request_standing_order",
+     "name": "the request is recorded"
+    },
+    {
+     "type": "arg_not_contains",
+     "tool": "request_standing_order",
+     "arg": "reporter_name",
+     "words": [
+      "אסף",
+      "ישראל",
+      "דייר"
+     ],
+     "name": "no invented name in its place"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no ticket beside it"
+    },
+    {
+     "type": "not_called",
+     "tool": "get_payment_link",
+     "name": "no one-time link"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "1393",
+     "name": "the request's number is given"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "צוות|הנהלה|גבייה|מחלקת|יחזרו|יחזור|ייצרו|יצרו|יצור איתך|ניצור|נציג|בהקדם|בקרוב",
+     "name": "one voice"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "מספר (ה)?כרטיס|פרטי (ה)?כרטיס|חשבון (ה)?בנק|מספר חשבון|סניף",
+     "name": "no card or bank details asked"
+    }
+   ],
+   "judge": [
+    "one_question: Michael asked for her name and her building and apartment once, in one short question, without explaining why?",
+    "feminine: once she wrote in the feminine, did Michael address her in the feminine, with no slashes or plural?",
+    "one_voice: no team, department or anyone who will call or set it up?"
+   ]
+  }
+ ]
+}

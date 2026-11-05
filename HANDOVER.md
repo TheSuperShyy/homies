@@ -8,6 +8,18 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 5 Nov, epoch 96 + debt-tools v148 (PR #5): a WhatsApp standing-order request is recorded and emailed to collections** (Yariv's change 3; CONTEXT has the rule):
+>   - **The bot:** `request_standing_order` (`n8n_whatsapp_standing.py`), on the live bot and the UChat copy (`-96-uchat`). No link, ticket or note beside it.
+>   - **The email:** the n8n workflow "Homies — Standing order email" (`qwFc7ObfclFHMsuD`, `n8n_standing_order_email.py`) sends through Brevo.
+>   - **Proven without AI:** a probe from the owner's +63 recorded 255-1392-26, and Brevo accepted the email for the team inbox (n8n run 156199). A second ask returned the same number and sent nothing. 255-1392-26 was then set to cancelled, so the owner's handset test runs the whole path.
+>   - **Claude-played:** 3 conversations, 16/16 expectations (`scripts/wa_qa_standing.json`). The gate is all green on live, with 441 cases and 0 of 1,183 replies changed.
+>   - **Waiting on the owner:**
+>     - Homies' collections email address. Set `COLLECTIONS_EMAIL` in `.env`, then `python scripts/n8n_standing_order_email.py --apply`. It goes to clixteam579@gmail.com until then.
+>     - The handset test from the +63: "אפשר לעשות הוראת קבע?", then check that inbox.
+>   - **Rollback:** `n8n_whatsapp_standing.py --restore`, then `n8n_uchat.py --apply`. The function's path is harmless without the tool.
+>   - **The phone agent** still records the request without an email, until its version is built.
+>   - **Checklist pages, SOURCE ONLY:** test p2 matches the change in both `local/artifacts/michael-checklist*`, and is not republished. The Grok brief's C6.2 and R17 match too.
+>
 > **5 Nov: a follow-up to Omnitelecom is drafted, not sent:** `local/omnitelecom/2026-11-05-follow-up-email.txt`, a reply in the 2 Nov thread. It asks for their log's reason for the 404 and a working example, or else a click-to-call API or SIP for outgoing calls through 208. The owner sends it. Debt calls still wait on Omni's answer.
 >
 > **5 Nov: an email to OXS support asking for API access to standing orders is drafted, not sent:** `local/oxs/2026-11-05-standing-order-api-email.txt`, English and Hebrew. It asks one thing: whether the API can start a standing order for a tenant who says yes, and for a key if it can. The follow-up questions are in the same file and go out only after OXS says yes. Starting one is a write, and finance keys are read-only today. The owner sends it. Until OXS answers, a standing-order request still goes to the collections team.

@@ -987,6 +987,21 @@ function cases(E) {
   expect('deeds: a ticket from two turns back, with its number, no tool now (live 83362)',
     said5('deeds', OLDREF, { rows: ['פתחתי עכשיו קריאת שירות דחופה, מספר 255-1344-26'] }), true);
   expect('deeds: the same sentence with an invented number', said5('deeds', OLDREF, { rows: ['שלום'] }), false);
+  // 5 Nov (n8n_whatsapp_standing.py, Yariv's change 3): a standing order is recorded by
+  // request_standing_order, whose own answer carries the number, so neither check sends the reply back,
+  // in the words it is asked for or as a "ticket".
+  const SO = { action: { tool: 'request_standing_order' },
+    observation: obs5({ ok: true, recorded: true, recorded_now: true, reference: '255-1392-26' }) };
+  const SO_SAID = 'רשמתי את הבקשה שלך להוראת קבע, מספר 255-1392-26. יש עוד משהו שאני יכול לעזור בו?';
+  const SO_OPENED = 'פתחתי לך בקשה להוראת קבע, מספר 255-1392-26. יש עוד משהו שאני יכול לעזור בו?';
+  expect('phantom: a standing order recorded this turn, with its number', said5('phantom', SO_SAID, { steps: [SO], rows: ['שלום'] }), true);
+  expect('deeds: the same', said5('deeds', SO_SAID, { steps: [SO], rows: ['שלום'] }), true);
+  expect('phantom: the same said as opened', said5('phantom', SO_OPENED, { steps: [SO], rows: ['שלום'] }), true);
+  expect('deeds: the same said as opened', said5('deeds', SO_OPENED, { steps: [SO], rows: ['שלום'] }), true);
+  expect('phantom: a standing order called a ticket ("פתחתי לך קריאה") is backed by the same number',
+    said5('phantom', 'פתחתי לך קריאה להוראת קבע, מספר 255-1392-26.', { steps: [SO], rows: ['שלום'] }), true);
+  expect('phantom: called a ticket with a number no tool gave, it is sent back',
+    said5('phantom', 'פתחתי לך קריאה להוראת קבע, מספר 255-9999-26.', { steps: [SO], rows: ['שלום'] }), false);
   // 5 Oct, fix 4 (Claude-played check): the owner's line for a resident who
   // presses in danger passes only with the ticket's number, so the prompt asks
   // for it; without it this guard sends it back.
