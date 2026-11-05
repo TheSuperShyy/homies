@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### CI/CD, feature 22: checks in front of `main`, and the function deploys from `main` (owner, asked to push the OXS sync fix: "we need a ci/cd before pushing live"; on the plan: "dont overtest tho since your test is overkill"; then "ok")
+- **Before:**
+  - The dashboard deployed from `main` (Vercel), and the OXS jobs ran from `main`.
+  - The function, n8n and the phone agents were pushed by hand from the PC. Today's v142 went that way.
+  - No checks ran, and `main` had no protection.
+  - `ClixTeam579` could only read the repo. `TheSuperShyy` is its admin.
+- **Chosen:** option 2 of 3, the recommendation. Option 1 was checks only; option 3 was everything through a sandbox stage.
+- **Built on `feature/chatbot` (`4cdf957`):**
+  - `ci.yml`, with:
+    - `checks`, only the checks that already existed, all green on 5 Nov: the syntax, 45 node tests, 155 scripts compiling, the name-flow tests and the dashboard's tsc;
+    - `deploy-function`, code only, after a push to `main` that changed the function.
+  - `supabase_functions.py`:
+    - `--code-only`;
+    - `env()` falls back to the process environment when there is no `.env`;
+    - `deploy_code()` exits non-zero unless the function comes back ACTIVE;
+    - a hand `--apply` refuses when `differs_from_main()` is not empty. Checked: REFUSED on `feature/chatbot`, nothing sent.
+  - The spec, context and plan, and the README row.
+- **Found while building PR 1:**
+  - **`main`'s function was about 1,400 lines behind live,** without `identity.ts`, `route.ts` or `names.ts`. The first deploy from `main` would have rolled live back by weeks. PR 1 therefore carries the function exactly as live, and its merge redeploys the same code.
+  - **None of the test files existed on `main`.** PR 1 carries them, and `debt-tools-sandbox/guard.ts`, which one imports.
+  - **The checks' first catch: three route tests failed on `main`.** `dashboard/lib/call.ts` there, which is what the live Call button runs, still had the old gender lines:
+    - unknown: "דבר בניסוחים נייטרליים … מה תרצו", neutral and plural;
+    - the masculine and feminine lines lacked the one about speaking of the person to someone else.
+    
+    The owner's 30 Sep rule (one person, masculine singular when the name does not decide) reached the function's dialer route but never `main`'s dashboard. PR 1 brings `feature/chatbot`'s `call.ts`: texts and comments only, tsc green.
+- **PR 1:** branch `ci-pipeline` on `origin/main`, 19 files, https://github.com/TheSuperShyy/homies/pull/1. Run on `main`'s dashboard before pushing: 45/45 tests, tsc, compileall and the name-flow tests, all green.
+- **GitHub, as `TheSuperShyy` (the owner's "ok" covered it):**
+  - `ClixTeam579` was invited with write (invitation 341697278) and accepted as `ClixTeam579`. It now reads push true.
+  - The secret `SUPABASE_ACCESS_TOKEN` was set from `.env` over a pipe, never printed.
+  - `gh` is back on `ClixTeam579`.
+- **Waiting:**
+  - PR 1's `checks`;
+  - then the protection on `main` and the merge;
+  - then a read-back that the redeploy is ACTIVE and the secrets are unchanged;
+  - then PR 2, the OXS sync fix.
+
 ### Yariv's change 1 of 6: elevator reports into OXS, classified, and our ticket closes when OXS closes it (owner: "ok so give me the list of the changes that is needed to be started based on yariv", then "ok lets do all those 1 by 1")
 - **Read first, what each part of the ask is today:**
   - **The category:** `oxsMirror()` posted only the building, the reporter and the description. Read from OXS, all 16 of our calls still open there have `facilityCategory: null`, the two elevator ones (`255-28392-26`, `255-29026-26`) too.

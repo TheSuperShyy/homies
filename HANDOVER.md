@@ -8,6 +8,27 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **CI/CD, feature 22 (5 Nov; owner: "we need a ci/cd before pushing live", "dont overtest", "ok" to option 2 of 3).** Spec, context and plan are in `docs/features/22-ci-cd/`; WORKLOG 5 Nov.
+>   - **Built:**
+>     - `.github/workflows/ci.yml`: `checks` and `deploy-function` (code only);
+>     - `supabase_functions.py --code-only`;
+>     - a hand `--apply` refuses a function that differs from `origin/main`.
+>   - **Pull request #1** (`ci-pipeline`, https://github.com/TheSuperShyy/homies/pull/1) brings `main` three things:
+>     - the pipeline;
+>     - the function exactly as live (v142);
+>     - its tests.
+>   - **The PR also fixes the live Call button.** `dashboard/lib/call.ts` on `main` gave the debt agent the old gender lines, neutral and plural for an unknown gender. The PR brings in the 30 Sep owner rule. Three route tests caught it.
+>   - **Its `checks` are running.**
+>   - **Next:**
+>     - protect `main` (`checks` required, admins included, PRs only);
+>     - merge, then read back that the redeploy is ACTIVE and the secrets are unchanged;
+>     - PR 2, the OXS sync fix (`sync-mirror-close-for-main`, to be rebased onto the new `main`).
+>   - **GitHub access (5 Nov):**
+>     - `ClixTeam579` has write access to `TheSuperShyy/homies`. The invite was accepted, so sessions push branches and open PRs as `ClixTeam579`.
+>     - `TheSuperShyy` is the admin and is used only for settings. `gh auth switch` goes back after each use.
+>     - The repo secret `SUPABASE_ACCESS_TOKEN` was added 5 Nov. `SUPABASE_URL` was already there.
+>   - **Until PR 1 merges, the function cannot be hand-deployed from `feature/chatbot`.** The guard refuses, by design.
+>
 > **CLIENT REVIEW 4 Nov, 13:59-14:56 UTC (Google Meet with Homies), from Timeless's AI notes, read 5 Nov.** The notes are in `local/meetings/2026-11-04-homies-agent-review.md` (gitignored; the share link in it also opens the recording). WORKLOG 5 Nov.
 >   - **Decided there, nothing built yet:**
 >     - elevator reports become a service call in OXS (elevator, at the address), and the bot says only that a service call was opened;

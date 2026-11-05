@@ -25,6 +25,14 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**Live code goes through a pull request to `main` (5 Nov, feature 22; the owner: *"we need a ci/cd before pushing live"*, *"dont overtest"*).**
+- `.github/workflows/ci.yml`, job `checks`, runs only the checks that already existed: the function's syntax, `node --test scripts/*.test.ts`, `compileall`, the name-flow tests and the dashboard's `tsc`. `main` requires it, admins included.
+- **The function deploys itself from `main`.** `deploy-function` runs `supabase_functions.py --apply --code-only` after a merge that touched it. It uploads code only and never pushes or deletes a secret.
+- **A hand `--apply` refuses function code that `main` does not hold.** It is for secrets, such as `--oxs-mirror`, from a checkout of `main`.
+- **Each change goes on a small branch cut from `main`**, never `feature/chatbot` into `main`. That branch is 557 commits ahead, and `main` holds newer dashboard files.
+- **Keep the checks light.** A new check earns its place by a bug it would have caught. No live probes, no spend.
+- n8n and the phone agents still deploy by their own scripts and gates.
+
 **Sandbox work never touches production (26 Oct, the owner: "make sure the prod is not being affected the sandbox is independent").**
 - Feature 19 has its own Chatwoot account, its own n8n workflows and its own backend function (`debt-tools-sandbox`).
   - **Built 26 Oct:** Chatwoot account 3; n8n copies of the bot, the handover and the debt-tools router; function v2. Ids and how-tos are in `feature.md` "As built".
@@ -112,6 +120,7 @@ The user is the builder. The client is Homies.
 - A change reaches production only by its own promotion, on the owner's go.
 - **Never run `scripts/supabase_functions.py` for anything but the live function.**
   - It pushes and deletes **project-wide** Supabase secrets on every run: a plain `--apply` deletes `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES`, which switches off the live OXS mirror.
+  - `--code-only` (the pipeline's mode, feature 22) uploads the code and touches no secret.
   - Any other function, the sandbox included, deploys with files only (`scripts/sandbox_function.py`).
 - The sandbox shares the live OpenRouter credential (the owner, 26 Oct: *"lets use the openrouter we have rn"*). Its spend comes from the live wallet, so every sandbox run that calls the model needs the owner's go, with the price first.
 
