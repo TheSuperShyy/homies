@@ -3458,7 +3458,15 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           .update({ description: held ? held + " | " + fresh : fresh })
           .eq("id", dupeRow.id);
       }
-      return withSpoken({ ok: true, reference: dupeRow.reference, duplicate: true });
+      // 5 Nov, live (execution 155838): with a fresh memory, the bot got
+      // `duplicate: true` back and still wrote "פתחתי קריאה … 255-1391-26",
+      // the 10:39 ticket. Nothing it reads says what `duplicate` means. On
+      // WhatsApp the answer now says it in fields that cannot read as an
+      // opening; the phone agent is untouched (chatbot first, the owner).
+      return withSpoken({
+        ok: true, reference: dupeRow.reference, duplicate: true,
+        ...(channel(ctx) === "whatsapp" ? { already_open: true, opened_now: false } : {}),
+      });
     }
     }
 
