@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### Cards for the CRM board from the 4 Nov review, and a `tasker` skill that writes them (owner: "create me a task for this project like based on the feedbacks", with a screenshot of the Clix CRM Tasks board; then "create a skill for this one")
+- **The cards,** given in chat to paste: ten for Homies, set to Internal, in High and Normal groups.
+  - **High:** Omnitelecom follow-up, due 5 Nov; the debt-list spec to Omnitelecom; the materials to Homies; elevator reports into OXS; gas sent to the gas company.
+  - **Normal:** direct debit by email to collections; handover routing by department; the phone agent's delay; staff training; connecting Homies' number after their choice.
+  - **Client update:** what the option does is unchecked, because the local Clix-CRM checkout dates from 3 Aug and has no such option.
+- **The skill:** `C:\Users\Acer nitro 5\.claude\skills\tasker\SKILL.md`, user-level, so `/tasker` works in every project. It covers:
+  - getting the feedback;
+  - choosing the cards: our side only, nothing done, one card per deliverable;
+  - the card shape: an order as the title, 0 to 3 detail lines, High or Normal, a due date only when stated;
+  - the output in chat.
+- **`fetch_timeless.py`** sits beside the skill. It opens a Timeless share link logged out in the system Chrome and writes `notes.md` and `meta.json` from the page's own `spaces/public` JSON.
+  - Checked: the 4 Nov link gave the notes and the recording. A made-up link landed on `/login` and exited 2.
+- **Tested before and after** (Claude subagents, no OpenRouter), on three cases: the saved 4 Nov notes, Yariv's 12 Aug feedback, and the Timeless link itself.
+  - **Without the skill, 0 of 3 fit:**
+    - one umbrella card holding nine points;
+    - nine cards with statement titles, details inside the titles, one priority and two cards for one deliverable;
+    - twelve cards over three columns, with a "Low" flag and two claims about the CRM it had not checked ("every card comes in as Normal", "Client update sends it to Homies' portal").
+  - **With it, 3 of 3 fit:** 8 to 12 cards titled as orders, High and Normal only, and a closing line naming the points left out as done.
+  - **One wording fix after that:** detail lines name things the way their users know them. The old wording kept "ticket_resolved_he" in a detail line in 2 of 2 short runs; the new one used "the closed-ticket message" in 2 of 2.
+- **Memory:** `crm-tasks-through-tasker.md` points to the skill and keeps the owner's corrections, like the report's.
+
 ### Read the Timeless notes of the 4 Nov "Homies Agent Review" (owner: "can you access a timeesslink if i send it to you", then the link)
 - **Opened** with Playwright on the system Chrome, headless and logged out; the bundled Chromium is not installed. The share page is public: it loads the meeting's `spaces/public/...` record and its recording list without a login.
 - **What the link holds:**
