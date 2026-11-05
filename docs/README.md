@@ -130,6 +130,7 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | 19 | [WhatsApp sandbox](features/19-whatsapp-sandbox/feature.md) | 2d | built 26 Oct, production fingerprint unchanged; the paid acceptance run waits on the owner's go. An independent copy (Chatwoot account 3 in Hebrew, three n8n copies, `debt-tools-sandbox`, a local chat page) running Yariv's section 6 changes |
 | 20 | [Dialer test on the dashboard](features/20-dialer-test/feature.md) | 0.5d | page LIVE 28 Oct on `/dialer` (`main` `c97eca3`); connected to Tokomni since the 12:33 UTC redeploy; the first press for Ido is owed |
 | 21 | [Moving to UChat, if ever needed](features/21-uchat-migration/feature.md) | 13-19d | prepared 3 Nov; **the UChat version of the bot is built (3 Nov)**: the live bot regenerated with UChat in front through a Chatwoot-speaking translator (`scripts/n8n_uchat.py`), live tools, test phones only; waits for the "Michael" sub flow in UChat's dashboard. No number moved |
+| 22 | [CI/CD: checks before `main`, the function deploys from `main`](features/22-ci-cd/feature.md) | 0.5d | approved 5 Nov (option 2 of 3, owner: "ok"); being built |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and

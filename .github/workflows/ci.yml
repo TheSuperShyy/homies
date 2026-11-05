@@ -1,0 +1,99 @@
+# CI/CD, feature 22 (5 Nov 2026). The owner: "we need a ci/cd before pushing
+# live", and "dont overtest". docs/features/22-ci-cd/ has the what and the why.
+#
+#   checks           every pull request to main and every push to main: only
+#                    the checks that already existed. No secrets, no live
+#                    system, no spend. `main` requires it (branch protection).
+#   deploy-function  after checks, on a push to main that changed the Edge
+#                    Function: deploys the code ONLY. No secret is pushed or
+#                    deleted, so the OXS mirror's switches stay with the
+#                    hand-run script and its explicit --oxs-mirror.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Function syntax
+        run: node scripts/check_function_syntax.mjs
+
+      - name: Function and dashboard rules
+        run: node --test scripts/*.test.ts
+
+      - name: Python scripts compile
+        run: python -m compileall -q scripts
+
+      - name: Name-flow tests
+        run: python scripts/check_name_flow_test.py
+
+      - name: Dashboard types
+        working-directory: dashboard
+        run: |
+          npm ci --no-audit --no-fund
+          npx tsc --noEmit
+
+  deploy-function:
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: deploy-function
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Only when this push changed the function. A first push, a force push
+      # or an unknown `before` counts as changed: deploying the same code again
+      # is harmless, skipping a real change is not.
+      - name: Did this push change the function?
+        id: changed
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "$BEFORE" "$GITHUB_SHA" -- supabase/functions/debt-tools; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "The function did not change in this push: nothing to deploy."
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.changed.outputs.deploy == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Deploy the function, code only
+        if: steps.changed.outputs.deploy == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: python scripts/supabase_functions.py --apply --code-only
