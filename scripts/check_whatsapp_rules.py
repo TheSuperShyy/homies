@@ -179,7 +179,11 @@ PINS = {
     # says what was done and the number, without the recited "only thing I can do". Claude-played on the
     # four real danger turns (155798's "yes", 19 Oct "זה דחוף" and "אין לכם מוקד חירום??", 5 Oct's water
     # on the stairwell light and "שמישהו יתקשר אליי דחוף"): no "חירום" in what is said, no recited line.
-    'Answer the resident / system': 'de05a9dcac7f',
+    # 5 Nov, later (n8n_whatsapp_caseword.py, epoch 94): each opening word sits with its own case (155838:
+    # "בשמחה אסף. פתחתי קריאה על המעלית"). Claude-played: the elevator fault gets "אוי, לא נעים", a balance
+    # check keeps "בשמחה"/"כמובן", a frustrated resident keeps "מצטער לשמוע", a bare request to open a
+    # ticket keeps its warm sentence.
+    'Answer the resident / system': '2b28000831e0',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

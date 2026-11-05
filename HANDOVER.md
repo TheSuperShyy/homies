@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 5 Nov, epoch 94: a fault opens with care ("אוי, לא נעים"), never "בשמחה",** with each opening word moved to its own case (`n8n_whatsapp_caseword.py`). **And debt-tools v145 (PR #4):** on WhatsApp, a ticket that was already open is answered with `already_open: true, opened_now: false`, so the bot stops saying "פתחתי" for it.
+>
 > **LIVE 5 Nov, epoch 93: the bot says an urgent ticket is urgent, never "emergency"** (owner: "why it will notify emergency services?"). It is on both the live bot and the UChat copy (`-93-uchat`). The owner's handset test is owed (the elevator message, then "כן"). WORKLOG 5 Nov; rollback with `n8n_whatsapp_urgentword.py --restore`, then `n8n_uchat.py --apply`.
 >
 > **CI/CD, feature 22 (5 Nov; owner: "we need a ci/cd before pushing live", "dont overtest", "ok" to option 2 of 3).** Spec, context and plan are in `docs/features/22-ci-cd/`; WORKLOG 5 Nov.

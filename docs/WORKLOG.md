@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### LIVE: each opening word sits with its own case, so a fault gets care, not "בשמחה" (epoch 94, `scripts/n8n_whatsapp_caseword.py`), and the "already open" answer (PR #4, v145)
+- **Cause:** the prompt's paragraph on the word before the answer already says, case by case, what that word is. It ended with a loose quoted list, "בשמחה", "כמובן", "אוי, לא נעים", and the first word was said back on a fault (155838: "בשמחה אסף. פתחתי קריאה על המעלית …").
+- **The change: the same words moved, nothing added** (23,684 -> 23,689 characters):
+  - the fault case gets "אוי, לא נעים";
+  - the check case gets the owner's "בשמחה" or "כמובן" (29 Oct);
+  - the loose list goes.
+  - `MEMORY_EPOCH` and the key went 93 -> 94, and `EPOCH_COVERS["prompt"]` and the pin are `2b28000831e0`.
+- **The gate:**
+  - `--candidate --replay`: 434/434 cases, 0 replies change.
+  - Claude-played on the cases the word covers: the elevator fault, a balance check, a frustrated resident and a bare request to open a ticket. Each got its own word.
+  - The idle check: 45 of 55 not idle, the same as before plus `urgentword`, which now refuses like every older carrier.
+- **Applied:** live (key `-94`), then the UChat copy (`-94-uchat`). A re-run has nothing to do, and the gate on live is green. Snapshot: `local/n8n-whatsapp-live-05nov-before-caseword.json`.
+- **PR #4 merged:** the pipeline deployed **v145**. On WhatsApp, the duplicate answer carries `already_open: true, opened_now: false`.
+- **Owed:** the owner's handset (an elevator report, then the same one again inside 30 minutes, then "כן"), and `check_whatsapp_rules.py --watch`.
+
 ### The bot said "פתחתי קריאה" for a ticket that was already open (owner's test, execution 155838; the owner pasted the reply: "בשמחה אסף. פתחתי קריאה על המעלית בבר כוכבא 23 … 255-1391-26 …")
 - **What happened:** with the memory fresh (epoch 93), the owner's elevator message called `open_request`. Its 30-minute guard folded the report into the 10:39 ticket and returned `{"ok":true,"reference":"255-1391-26","duplicate":true}`. The bot still wrote "פתחתי קריאה" (I opened a ticket).
 - **Why:** nothing the bot reads says what `duplicate` means. The tool's description does not mention it, and neither does the prompt.
