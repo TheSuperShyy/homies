@@ -38,6 +38,14 @@ Two things this gets right that are easy to get wrong:
   --apply; without the two Chatwoot tokens send_payment_link answers
   'unavailable' and the agent gives the office number.
 
+  Feature 21 (3 Nov): WHATSAPP_VIA=uchat in .env moves the debt call's link and
+  the "done" notice to the UChat number, with UCHAT_API_KEY taken from .env's
+  Uchat_api_key; MEDIA_HOSTS_EXTRA adds hosts a photo may come from. Each is
+  pushed when .env has it. WHATSAPP_VIA=chatwoot and an --apply moves back.
+
+  THE OXS MIRROR IS ON FOR ONE NUMBER SINCE 24 SEP: deploy with --apply
+  --oxs-mirror, or the plain --apply below deletes its key and switches it off.
+
     python scripts/supabase_functions.py            # show what would happen
     python scripts/supabase_functions.py --apply    # do it
 """
@@ -45,6 +53,7 @@ import json
 import mimetypes
 import os
 import secrets
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -53,6 +62,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_PATH = os.path.join(ROOT, ".env")
 SLUG = "debt-tools"
 SRC = os.path.join(ROOT, "supabase", "functions", SLUG, "index.ts")
+# Feature 17 (22 Oct): the pure rules live beside index.ts, which imports them.
+IDENTITY = os.path.join(ROOT, "supabase", "functions", SLUG, "identity.ts")
+# Feature 18 (25 Oct): which agent answers a call on the 208 line, also pure.
+ROUTE = os.path.join(ROOT, "supabase", "functions", SLUG, "route.ts")
+# 29 Oct: the balance's name check that takes Latin letters, also pure.
+NAMES = os.path.join(ROOT, "supabase", "functions", SLUG, "names.ts")
 API = "https://api.supabase.com"
 
 # api.supabase.com sits behind Cloudflare, which rejects urllib's default
@@ -62,13 +77,63 @@ UA = "curl/8.5.0"
 
 
 def env():
-    d = {}
-    for line in open(ENV_PATH, encoding="utf-8"):
-        s = line.strip()
-        if s and not s.startswith("#") and "=" in s:
-            k, v = s.split("=", 1)
-            d[k.strip()] = v.strip()
+    """`.env` when there is one. GitHub Actions has none: its deploy job hands
+    over SUPABASE_ACCESS_TOKEN and SUPABASE_URL as environment variables, and
+    `--code-only` needs nothing else (feature 22)."""
+    d = {k: os.environ[k] for k in ("SUPABASE_ACCESS_TOKEN", "SUPABASE_URL")
+         if os.environ.get(k)}
+    if os.path.exists(ENV_PATH):
+        for line in open(ENV_PATH, encoding="utf-8"):
+            s = line.strip()
+            if s and not s.startswith("#") and "=" in s:
+                k, v = s.split("=", 1)
+                d[k.strip()] = v.strip()
     return d
+
+
+def differs_from_main():
+    """The function files that are not as `origin/main` holds them, after a fetch.
+
+    Feature 22 (5 Nov): live code reaches the function from `main`, through a
+    pull request and the pipeline. Before it, the function went live by hand
+    from whatever was checked out -- v142 from `feature/chatbot`, 557 commits
+    ahead of `main`. A hand deploy still uploads code with the secrets, so it
+    is allowed only when that code is exactly `main`'s. Line endings are
+    normalised: Windows checkouts may carry CRLF where git stores LF.
+    """
+    subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin", "main"], check=True)
+    stale = []
+    for path in (SRC, IDENTITY, ROUTE, NAMES):
+        rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
+        r = subprocess.run(["git", "-C", ROOT, "show", "origin/main:" + rel],
+                           capture_output=True)
+        here = open(path, "rb").read().replace(b"\r\n", b"\n")
+        if r.returncode != 0 or r.stdout.replace(b"\r\n", b"\n") != here:
+            stale.append(rel)
+    return stale
+
+
+def deploy_code(token, ref, url, files):
+    """Upload the function's files; exit non-zero unless it comes back ACTIVE."""
+    meta = {"name": SLUG, "entrypoint_path": "index.ts", "verify_jwt": False}
+    body, ctype = multipart(
+        [("metadata", None, json.dumps(meta).encode(), "application/json")]
+        + [("file", name, text.encode("utf-8"), "application/typescript")
+           for name, text in files])
+    code, out = call(token, "POST",
+                     "/v1/projects/%s/functions/deploy?slug=%s" % (ref, SLUG),
+                     body, ctype)
+    print("deploy         HTTP %s" % code)
+    if code >= 300:
+        print(out)
+        sys.exit(1)
+    status = out.get("status") if isinstance(out, dict) else None
+    if isinstance(out, dict):
+        print("               version %s, status %s, verify_jwt %s"
+              % (out.get("version"), status, out.get("verify_jwt")))
+    print("\nendpoint       %s/functions/v1/%s" % (url, SLUG))
+    if status != "ACTIVE":
+        sys.exit("deployed, but the function reads %s, not ACTIVE" % status)
 
 
 def set_env(key, value):
@@ -117,6 +182,7 @@ def multipart(parts):
 
 def main():
     apply = "--apply" in sys.argv
+    code_only = "--code-only" in sys.argv
     e = env()
 
     token = e.get("SUPABASE_ACCESS_TOKEN", "").strip()
@@ -127,16 +193,44 @@ def main():
         sys.exit("SUPABASE_URL is empty in .env.")
     ref = url.split("//")[1].split(".")[0]
 
+    # Only `main`'s function goes live (feature 22). The pipeline checks out
+    # `main` itself, so the guard is for hand runs.
+    if apply and not os.environ.get("GITHUB_ACTIONS"):
+        stale = differs_from_main()
+        if stale:
+            sys.exit("REFUSED: the function here is not what main holds (%s).\n"
+                     "Live code goes through a pull request to main, and the pipeline "
+                     "deploys it. A hand deploy is for secrets, from a checkout of main."
+                     % ", ".join(stale))
+
+    src = open(SRC, encoding="utf-8").read()
+    identity_src = open(IDENTITY, encoding="utf-8").read()
+    route_src = open(ROUTE, encoding="utf-8").read()
+    names_src = open(NAMES, encoding="utf-8").read()
+    files = [("index.ts", src), ("identity.ts", identity_src),
+             ("route.ts", route_src), ("names.ts", names_src)]
+    print("files          index.ts %d chars, identity.ts %d chars, route.ts %d chars, names.ts %d chars"
+          % (len(src), len(identity_src), len(route_src), len(names_src)))
+
+    print("project        %s" % ref)
+    print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
+
+    # The pipeline's deploy: the code and nothing else. No secret is pushed
+    # or deleted, so the OXS mirror's switches stay exactly as the last hand
+    # run (--oxs-mirror) left them.
+    if code_only:
+        print("mode           code only: no secret is pushed or deleted")
+        if not apply:
+            print("\nDry run. Re-run with --apply.")
+            return
+        deploy_code(token, ref, url, files)
+        return
+
     tool_secret = e.get("TOOL_SECRET", "").strip()
     generated = False
     if not tool_secret:
         tool_secret = secrets.token_urlsafe(32)
         generated = True
-
-    src = open(SRC, encoding="utf-8").read()
-
-    print("project        %s" % ref)
-    print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
     print("TOOL_SECRET    %s" % ("generate a new one (%d chars)" % len(tool_secret)
                                  if generated else "already in .env, reuse"))
     voice_secret = e.get("N8N_VOICE_NOTE_SECRET", "").strip()
@@ -160,6 +254,19 @@ def main():
               % ("" if or_key else "; OPENROUTER_API_KEY empty -> the link alone"))
     else:
         print("whatsapp link  OFF — CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN empty in .env")
+    # Feature 21 (3 Nov): WHATSAPP_VIA=uchat sends the debt call's link and the
+    # "done" notice through UChat (UCHAT_API_KEY is the bot's key, Uchat_api_key
+    # in .env); unset or "chatwoot" keeps Chatwoot. MEDIA_HOSTS_EXTRA adds photo
+    # hosts. Each is pushed when .env has it; going back is a setting.
+    wa_via = e.get("WHATSAPP_VIA", "").strip().lower()
+    uchat_key = e.get("Uchat_api_key", "").strip()
+    media_extra = e.get("MEDIA_HOSTS_EXTRA", "").strip()
+    print("whatsapp via   %s" % ("UCHAT (UCHAT_API_KEY %s)" % ("set" if uchat_key else "MISSING")
+                                  if wa_via == "uchat" else "chatwoot (WHATSAPP_VIA %s)" % (wa_via or "unset")))
+    # Feature 17 (22 Oct): which channels refuse a ticket without a name.
+    # Unset here leaves the project's value as it is; "off" switches it off.
+    name_channels = e.get("NAME_REQUIRED_CHANNELS", "").strip()
+    print("name required  %s" % (name_channels or "unchanged (not in .env)"))
     if not apply:
         print("\nDry run. Re-run with --apply.")
         return
@@ -195,15 +302,31 @@ def main():
         to_push.append({"name": "CHATWOOT_BOT_TOKEN", "value": cw_bot})
     if or_key:
         to_push.append({"name": "OPENROUTER_API_KEY", "value": or_key})
+    if name_channels:
+        to_push.append({"name": "NAME_REQUIRED_CHANNELS", "value": name_channels})
+    if wa_via:
+        to_push.append({"name": "WHATSAPP_VIA", "value": wa_via})
+    if uchat_key:
+        to_push.append({"name": "UCHAT_API_KEY", "value": uchat_key})
+    if media_extra:
+        to_push.append({"name": "MEDIA_HOSTS_EXTRA", "value": media_extra})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
+    # 24 Sep: the mirror came back on for ONE number, the owner's +63 tester.
+    # `OXS_MIRROR_PHONES` is the second gate inside oxsMirror() and travels with
+    # the key — pushed only by --oxs-mirror, deleted by a plain --apply — so the
+    # off state cannot be half off, with a live allow-list waiting for a key to
+    # reappear. Empty list mirrors nobody, which is what the function does when
+    # the var is absent.
+    oxs_phones = e.get("OXS_MIRROR_PHONES", "").strip()
     mirror = "--oxs-mirror" in sys.argv
     if mirror and oxs_key:
         to_push.append({"name": "OXS_KEY_REQUESTS", "value": oxs_key})
+        to_push.append({"name": "OXS_MIRROR_PHONES", "value": oxs_phones})
     code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref, to_push)
     print("secret push    HTTP %s  (%d secrets)" % (code, len(to_push)))
     if not mirror:
         code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref,
-                         ["OXS_KEY_REQUESTS"])
+                         ["OXS_KEY_REQUESTS", "OXS_MIRROR_PHONES"])
         # 404 means the key is already gone, which IS the off state this
         # branch exists to enforce — found 27 Aug when the second plain
         # --apply after the shutdown aborted here and never deployed.
@@ -217,23 +340,27 @@ def main():
     if code >= 300:
         print(out)
         sys.exit(1)
-
-    meta = {"name": SLUG, "entrypoint_path": "index.ts", "verify_jwt": False}
-    body, ctype = multipart([
-        ("metadata", None, json.dumps(meta).encode(), "application/json"),
-        ("file", "index.ts", src.encode("utf-8"), "application/typescript"),
-    ])
-    code, out = call(token, "POST",
-                     "/v1/projects/%s/functions/deploy?slug=%s" % (ref, SLUG),
-                     body, ctype)
-    print("deploy         HTTP %s" % code)
+    # 5 Nov: `OXS_MIRROR_TYPES` is the third gate, the ticket types that go into
+    # OXS for ANY reporter (Yariv: every elevator report). It travels with the
+    # key like the phone list, but only when .env names types: otherwise it is
+    # deleted, so the switch is off unless the owner has turned it on. Its own
+    # DELETE, because a batch naming a secret that is absent may answer 404 and
+    # leave the others standing, which would keep the mirror half on.
+    oxs_types = e.get("OXS_MIRROR_TYPES", "").strip()
+    if mirror and oxs_key and oxs_types:
+        code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref,
+                         [{"name": "OXS_MIRROR_TYPES", "value": oxs_types}])
+        print("oxs types      ON for any reporter: %s (HTTP %s)" % (oxs_types, code))
+    else:
+        code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref, ["OXS_MIRROR_TYPES"])
+        print("oxs types      OFF (HTTP %s)" % code)
+        if code == 404:
+            code = 200
     if code >= 300:
         print(out)
         sys.exit(1)
-    if isinstance(out, dict):
-        print("               version %s, status %s, verify_jwt %s"
-              % (out.get("version"), out.get("status"), out.get("verify_jwt")))
-    print("\nendpoint       %s/functions/v1/%s" % (url, SLUG))
+
+    deploy_code(token, ref, url, files)
 
 
 if __name__ == "__main__":
