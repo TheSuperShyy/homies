@@ -11,6 +11,39 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### LIVE: gas gets no ticket, only "report it to the gas company" (epoch 95, `scripts/n8n_whatsapp_gas.py`; Yariv's change 2; owner: "ok next")
+- **The client's decision** (4 Nov review, 36:11-37:10): a gas report opens no call. The resident is told to report it to the gas company, in a fixed wording.
+- **The wording is line 2 of the two offered at 10:32 UTC:** "במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?"
+  - The owner did not pick.
+  - Line 1 fails in Send. The danger step reads its "מטפלת" ("handles it") as a promise of action whenever the chat had an urgent ticket shortly before. It cuts the sentence, and the old urgent-ticket line takes its place (probed through the gate's own harness). Line 2 passes whole.
+- **Where gas was before:** never in the prompt.
+  - notify_team listed it: "anybody reporting gas, fire, flooding … Reason `emergency`". An emergency note also makes debt-tools' backstop open a needs_review ticket.
+  - So did open_request's urgency gloss.
+- **The change** (23,689 -> 23,986 characters):
+  - **The prompt:**
+    - "חוץ ממקרה של גז" on "דייר לא נשלח ממך לשום מקום";
+    - one sentence closing the danger paragraph: with gas, no ticket, no note and no address question, and what he has to give is only the line, word for word.
+  - **notify_team:** gas leaves the emergency list, with "Never for gas".
+  - **open_request's urgency:** gas leaves it, with "Gas is never a ticket".
+  - **Hashes:** `MEMORY_EPOCH` and the key went 94 -> 95. `EPOCH_COVERS` is prompt `90c43a016d27` and tools `60094344bcd8`. The pins for the prompt, notify_team and open_request moved.
+- **The gate:**
+  - `--candidate --replay`: 435/435 cases, and 0 of 1,183 replies change. The new case: the gas line stays whole in Send right after an urgent ticket.
+  - **Claude-played** on:
+    - the only real gas report (23 Aug, "יש ריח חזק של גז בכניסה לבניין!!");
+    - gas in the flat;
+    - a hedged smell;
+    - "what should I do, open the windows?".
+
+    Each got the line, with no tool and no advice. A stuck lift with someone inside, and smoke, are unchanged.
+  - **The idle check:** 46 of 56, the same as before plus `caseword`.
+- **Applied:** live (key `-95`), then the UChat copy (`-95-uchat`, prompt `90c43a016d27`, tools `60094344bcd8`).
+  - A re-run has nothing to do, and the gate on live is all green.
+  - Snapshot: `local/n8n-whatsapp-live-05nov-before-gas.json`.
+- **A second gas message in the same chat** is said again in other words. The repeat guard sends a near-identical reply to Try again, whose note asks for other words.
+- **Not changed:** the phone agent, which still opens an urgent ticket for gas, and debt-tools.
+- **Found, not changed:** Send's danger step still adds "פתחתי לך קריאה דחופה, מספר X, וזה הדבר היחיד שאני יכול לעשות מכאן." when it cuts advice after an urgent ticket and the resident asked something. That is the line the owner disliked this morning; epoch 93 took it out of the prompt only.
+- **Owed:** the owner's handset, "יש ריח של גז בחדר המדרגות" from the +63.
+
 ### The "ticket closed" template submitted on the UChat number's account (owner: "submit it")
 - **The body is word for word the one approved on the test number's account:** checked against Meta's own copy there (UTILITY, he, two variables).
 - **Submitted:** `wa_templates.py create ticket_resolved_he --waba 2117787955519632 --apply` gave id `1643824720466250`, PENDING. Read back: `ticket_resolved_he` PENDING, `payment_link_he` APPROVED.

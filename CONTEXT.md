@@ -33,6 +33,17 @@ The user is the builder. The client is Homies.
 - **Keep the checks light.** A new check earns its place by a bug it would have caught. No live probes, no spend.
 - n8n and the phone agents still deploy by their own scripts and gates.
 
+**Gas is the gas company's: no ticket, no note, one fixed line (the client, 4 Nov review; Yariv's change 2; live on WhatsApp 5 Nov, epoch 95).**
+- **The answer:** a gas report (a smell, a leak, any gas fault) gets exactly "במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?"
+  - It opens no ticket, leaves no note and asks no address.
+  - The no-safety-advice rule still holds for gas.
+- **It is the one place the bot sends a resident elsewhere,** and the prompt says so where it forbids that ("חוץ ממקרה של גז").
+- **Why no note either:** an `emergency` note makes debt-tools' backstop open a needs_review ticket, which is mirrored into OXS for a mirrored number. So gas is out of notify_team's emergency list and open_request's urgency.
+- **A fixed line is checked against Send's steps before it is offered.**
+  - Line 1 of the two offered ("בגז מטפלת ישירות חברת הגז …") lost its sentence to the danger step's "מטפלת", read as a promise of action, whenever the chat had an urgent ticket shortly before.
+  - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
+- **The phone agent** still opens an urgent ticket for gas until its version is built.
+
 **Sandbox work never touches production (26 Oct, the owner: "make sure the prod is not being affected the sandbox is independent").**
 - Feature 19 has its own Chatwoot account, its own n8n workflows and its own backend function (`debt-tools-sandbox`).
   - **Built 26 Oct:** Chatwoot account 3; n8n copies of the bot, the handover and the debt-tools router; function v2. Ids and how-tos are in `feature.md` "As built".

@@ -479,6 +479,13 @@ function cases(E) {
         S: { last_bot: PUSHED } }), 'בכיף, אסף. תודה רבה על הסבלנות. הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.');
     const HONEST = 'אין לי תאריך מדויק מתי יגיעו, אבל הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.';
     expect('"I don\'t know when they will come" stays whole', say({ reply: HONEST, said: 'מתי הם מגיעים?', S: { last_bot: PUSHED } }), HONEST);
+    // 5 Nov (n8n_whatsapp_gas.py, Yariv's change 2): gas gets no ticket, only the gas company line, word
+    // for word. It reaches the resident whole even right after an urgent ticket in the same chat, where
+    // this step is awake. Line 1 of the two offered ("בגז מטפלת ישירות חברת הגז ...") lost its sentence
+    // here to "מטפלת", read as a promise of action.
+    const GAS = 'במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?';
+    expect('the gas company line stays whole, even right after an urgent ticket',
+      say({ reply: GAS, said: 'יש ריח של גז בחדר המדרגות', S: { last_bot: PUSHED } }), GAS);
     // 19 Oct, danger v4 (the "when will they come?" paragraph): who and whether,
     // under "I can't see / know", and a fronted "I can't promise", are honest.
     if (String(P.code.send_body || '').indexOf("const dv = 'danger v4'") !== -1) {

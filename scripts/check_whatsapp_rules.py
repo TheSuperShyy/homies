@@ -183,7 +183,12 @@ PINS = {
     # "בשמחה אסף. פתחתי קריאה על המעלית"). Claude-played: the elevator fault gets "אוי, לא נעים", a balance
     # check keeps "בשמחה"/"כמובן", a frustrated resident keeps "מצטער לשמוע", a bare request to open a
     # ticket keeps its warm sentence.
-    'Answer the resident / system': '2b28000831e0',
+    # 5 Nov, later still (n8n_whatsapp_gas.py, epoch 95, Yariv's change 2): gas gets no ticket and no note,
+    # only the gas company line, word for word. Claude-played on the one real gas report (23 Aug, "יש ריח
+    # חזק של גז בכניסה לבניין!!"), gas in the flat, a hedged smell and "what should I do, open the
+    # windows?": the line, no tool, no advice; a stuck lift with someone inside and smoke still get the
+    # urgent ticket. notify_team and open_request moved with it (gas left their emergency lists).
+    'Answer the resident / system': '90c43a016d27',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -202,12 +207,13 @@ PINS = {
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': '437d0eda4866',
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '1b1fcd44fe3f',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
-    # something new about an open ticket is add_request_detail's
+    'notify_team / tool': '8909a4a81ff0',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas
     # 30 Oct, morning (n8n_whatsapp_name.py, epoch 91): reporter_name and name_declined, and when to ask: only
     # after need_name, once (the owner: "ok we need to include the name in that wtf"); debt-tools v138
     # names a tenant on file from the record and asks the rest (NAME_REQUIRED_CHANNELS voice,whatsapp).
-    'open_request / tool': 'a2cdef1e93f3',
+    # 5 Nov (n8n_whatsapp_gas.py, epoch 95): urgency's emergency no longer lists gas; gas is never a ticket.
+    'open_request / tool': '754a2e751e63',
     'show_menu / tool': '427d364be55d',
     'verify_address / tool': 'a2a85a3d4068',
 }

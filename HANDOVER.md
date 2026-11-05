@@ -8,6 +8,15 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 5 Nov, epoch 95: gas gets no ticket, only the gas company line, word for word** (Yariv's change 2, `n8n_whatsapp_gas.py`):
+>   - **The line:** "במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?"
+>   - **No note either:** an emergency note's backstop in debt-tools would open a ticket. Gas left notify_team's emergency list and open_request's urgency.
+>   - **Where it is live:** the live bot and the UChat copy (`-95-uchat`).
+>   - **Owed:** the owner's handset, "יש ריח של גז בחדר המדרגות".
+>   - **Rollback:** `--restore`, then `n8n_uchat.py --apply`.
+>   - **The phone agent still opens an urgent ticket for gas.** Its version comes after the chatbot.
+>   - **Open:** Send's danger step still appends "וזה הדבר היחיד שאני יכול לעשות מכאן" to its urgent-ticket line, when it cuts advice and the resident asked something. The owner disliked that line on 5 Nov; epoch 93 removed it from the prompt only.
+>
 > **5 Nov: `payment_link_he` is APPROVED on the UChat number's account and synced into UChat,** so the debt call's link can go out as a template there. `ticket_resolved_he` was submitted there on 5 Nov (id `1643824720466250`, PENDING). **Once it is APPROVED, run UChat's `/whatsapp-template/sync`:** until then a close in OXS closes our ticket, but the resident's message waits.
 >
 > **5 Nov: the 33 open test tickets in Bar Kochba 23 are `cancelled` in our system** (owner: "close all that opened tickets", "in the oxs dont touch them"). Their 16 OXS copies are untouched and still open there. The 26 bot tickets in other buildings and the 92 imported ones were left alone. WORKLOG 5 Nov.
@@ -53,6 +62,7 @@ appended to.
 >     - **LIVE on `main` (PR #2, `46bae91`, 5 Nov):** `oxs_requests_sync.py` resolves our own ticket when staff close its call in OXS, which queues the WhatsApp closed-ticket message (036). It was tested on a real closed Bar Kochba 23 call. The Action's dry run finds all 15 of ours still open there.
 >     - **Already true, unchanged:** the bot never says it called the elevator company (1 of 72 elevator replies did, on 1 Sep, before the 15 Sep emergency change), and nothing emails the office.
 >     - **Not covered:** a phone-opened ticket gets no closed-ticket message, because 036 queues it for WhatsApp tickets only.
+>   - **#2, gas: LIVE on the chatbot (epoch 95, 5 Nov),** above. The phone agent's version is next after the chatbot.
 >
 > **STATUS 4 Nov, 07:00 UTC, read only (owner: *"quick dryrun to check the status of all"*): green.** WORKLOG 4 Nov.
 >   - **Phone agents:** both equal the repo, the Vapi wallet is in credit, and the 208 line routes per call.
