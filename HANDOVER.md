@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **5 Nov: an email to OXS support asking for API access to standing orders is drafted, not sent:** `local/oxs/2026-11-05-standing-order-api-email.txt`, English and Hebrew. It asks for an endpoint and key that start a standing order when the tenant says yes. That is a write, and finance keys are read-only today. It also asks for a set-up link as the fallback, and for an active or failed status. The owner sends it. Until OXS answers, a standing-order request still goes to the collections team.
+> **5 Nov: an email to OXS support asking for API access to standing orders is drafted, not sent:** `local/oxs/2026-11-05-standing-order-api-email.txt`, English and Hebrew. It asks one thing: whether the API can start a standing order for a tenant who says yes, and for a key if it can. The follow-up questions are in the same file and go out only after OXS says yes. Starting one is a write, and finance keys are read-only today. The owner sends it. Until OXS answers, a standing-order request still goes to the collections team.
 >
 > **5 Nov: a brief for the owner's Grok bot to test Michael as a real tenant:** `docs/features/11-whatsapp-bot/grok-tenant-tester.md` (owner: *"create an md file for grok bot on how to test the agent properly like a real tenant"*).
 >   - **What it holds:** 11 conversations (about 45 messages, about $2 of the bot's model), the 25 rules with the checklist's expectations, and a report format.

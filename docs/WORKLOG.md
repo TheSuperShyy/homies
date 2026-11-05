@@ -13,13 +13,15 @@ conversation that produced it.
 
 ### An email to OXS asking for API access to standing orders, drafted (owner: "we need to draft email to oxs if they can provide us api keys for the standing order as well"; nothing sent)
 - **Why:** at the 4 Nov review, Clix said OXS's API has one-time payments only, so a standing-order (הוראת קבע) request goes to the collections team by email. The rev 1.3 spec agrees: three modules (general, finance, service_calls), and nothing on standing orders.
-- **What it asks**, in English and Hebrew, rewritten after the owner's *"but i need it to work like do you want a standing order for the payment so that ... if yes it will start a standing order for that tenant"*:
-  1. an endpoint and a key that start a standing order for a tenant when they say yes. That is a write: per the spec, finance keys are read-only and only service_calls keys can be `full`;
-  2. what it needs, e.g. the card the tenant already paid with in OXS, and what proof of the tenant's yes OXS wants;
-  3. as the fallback, a link the tenant opens to finish the set-up, like the payment link;
-  4. whether a standing order is active and whether a charge failed;
-  5. if none of it exists, whether it is planned.
-  - The first draft asked only for a set-up link and said a read key was enough.
+- **What it asks**, in English and Hebrew, after two rewrites by the owner (*"but i need it to work like do you want a standing order for the payment so that ... if yes it will start a standing order for that tenant"*, then *"no it should be like a question if it exist then the follow up question should be after when they say yes"*):
+  - **One question:** does the API let our system start a standing order for a tenant who says yes to the bot, and if so, can they give us a key for it.
+  - **The follow-ups wait for OXS's yes** and are kept in the same file:
+    1. what it needs, e.g. the card the tenant already paid with in OXS, and what proof of the tenant's yes OXS wants;
+    2. a link the tenant opens to finish the set-up, if they must enter their card or bank details;
+    3. whether a standing order is active and whether a charge failed.
+    - If OXS says no, the follow-up asks whether it is planned.
+  - **Starting one is a write:** per the spec, finance keys are read-only and only service_calls keys can be `full`.
+  - The first draft asked only for a set-up link and said a read key was enough. The second asked all of the questions in one email.
   - It is signed "Clix Solution, for Homies", with no person's name (owner: "remove the name").
 - **Where:** `local/oxs/2026-11-05-standing-order-api-email.txt` (gitignored), to support@oxs.co.il. No key values in it. The owner sends it.
 - **CONTEXT is unchanged:** a draft, not a rule.
