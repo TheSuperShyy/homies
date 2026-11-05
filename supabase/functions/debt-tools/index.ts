@@ -905,20 +905,25 @@ async function matchBuilding(saidRaw: unknown): Promise<Match> {
  * form `residents.phone` holds and the only form a foreign number survives in
  * (phoneOf() accepts Israeli numbers only).
  */
-function oxsMirrorAllowed(reporter: string | null, type: string | null = null): boolean {
+function oxsMirrorAllowed(reporter: string | null, type: string | null = null,
+                          via: string | null = null): boolean {
   const list = (Deno.env.get("OXS_MIRROR_PHONES") ?? "")
     .split(",").map((s) => s.trim()).filter(Boolean);
   if (reporter && list.includes(String(reporter).trim())) return true;
   // WHAT may be mirrored, 5 Nov: Yariv, in the 4 Nov review, wants every
   // elevator report opened in OXS itself, classified as elevator, at the
-  // address. `OXS_MIRROR_TYPES` lists the ticket types that go in for ANY
-  // reporter ("elevator"). Unset, which is how it ships, it adds nobody:
-  // switching it on is the same decision as widening the phone list, and it
-  // waits on the owner's go. Test prefixes never qualify, so a probe filing a
-  // test ticket against a real building cannot put a call into OXS.
-  const types = (Deno.env.get("OXS_MIRROR_TYPES") ?? "")
+  // address. `OXS_MIRROR_TYPES` lists what goes in for ANY reporter. An entry
+  // is a type for every channel ("elevator") or a channel and a type
+  // ("whatsapp:elevator"): the owner, 5 Nov, "this should be applied in the
+  // chatbot first ... the voice agent". Unset, which is how it ships, it adds
+  // nobody: switching it on is the same decision as widening the phone list,
+  // and it waits on the owner's go. Test prefixes never qualify, so a probe
+  // filing a test ticket against a real building cannot put a call into OXS.
+  const entries = (Deno.env.get("OXS_MIRROR_TYPES") ?? "")
     .split(",").map((s) => s.trim()).filter(Boolean);
-  if (!type || !types.includes(String(type))) return false;
+  if (!type) return false;
+  const t = String(type), v = String(via ?? "");
+  if (!entries.some((e) => e === t || (v !== "" && e === `${v}:${t}`))) return false;
   return !TEST_PREFIXES.some((p) => String(reporter ?? "").startsWith(p));
 }
 
@@ -1004,13 +1009,13 @@ async function oxsMirror(
   reference: string, rowId: string, reporter: string | null,
   reporterUnit: string | null, building: string | null,
   reporterName: string | null = null, callback: string | null = null,
-  type: string | null = null,
+  type: string | null = null, via: string | null = null,
 ) {
   const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
   if (!key) return; // not configured: the mirror is off, the ticket is fine
   // Not on the allow-list: our ticket stands, OXS never hears about it. Silent
   // by design -- this is the ordinary path for every real resident.
-  if (!oxsMirrorAllowed(reporter, type)) return;
+  if (!oxsMirrorAllowed(reporter, type, via)) return;
   // Never fatal: a reporter we cannot resolve costs a name on the call, not
   // the call. The resident already holds the reference by the time we are here.
   let by: Record<string, string> | null = null;
@@ -3533,7 +3538,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
                         reporterPhone(ctx), reporterFlat, building,
-                        reporterName, reporterPhone(ctx) ?? givenPhone, type);
+                        reporterName, reporterPhone(ctx) ?? givenPhone, type, channel(ctx));
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -3567,7 +3572,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       await oxsMirror(String(m.building.id), String(args.description), unit,
                       data.reference, data.id, reporterPhone(ctx),
                       reporterFlat, building,
-                      reporterName, reporterPhone(ctx) ?? givenPhone, type);
+                      reporterName, reporterPhone(ctx) ?? givenPhone, type, channel(ctx));
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The
