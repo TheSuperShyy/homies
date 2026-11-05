@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### Yariv's changes go to the chatbot first, the phone agent after (owner: "this should be applied in the chatbot first alr the the voice agent")
+- **Read as covering every item on the list,** and #1's elevator switch in particular, which covered both channels at once.
+- **The switch now works per channel:** `oxsMirrorAllowed(reporter, type, via)`, with `oxsMirror()` passing `channel(ctx)` from `open_request` and the emergency stub.
+  - An `OXS_MIRROR_TYPES` entry is a type for every channel (`elevator`) or one channel's (`whatsapp:elevator`).
+  - It is still unset, so nothing changes until the owner's go.
+- **Checked once:** the syntax, and the gate in 5 cases:
+  - `whatsapp:elevator` passes WhatsApp and stops voice;
+  - `elevator` passes voice;
+  - `whatsapp:elevator` with lighting stops;
+  - unset stops.
+- **Shipped through the pipeline as PR #3,** the first function change to go that way.
+
 ### CI/CD, feature 22: checks in front of `main`, and the function deploys from `main` (owner, asked to push the OXS sync fix: "we need a ci/cd before pushing live"; on the plan: "dont overtest tho since your test is overkill"; then "ok")
 - **Before:**
   - The dashboard deployed from `main` (Vercel), and the OXS jobs ran from `main`.

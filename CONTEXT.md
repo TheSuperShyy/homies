@@ -1585,7 +1585,9 @@ on the list — backfilling is not a second decision, but widening is.
 **A third gate, by ticket type (5 Nov), built OFF.** Yariv asked in the 4 Nov
 review for every elevator report to open in OXS, classified as elevator.
 `OXS_MIRROR_TYPES` lists the types that go in for ANY reporter, test prefixes
-excepted. It travels like the other two: it is pushed by `--oxs-mirror` only when
+excepted. An entry is a type for every channel (`elevator`) or one channel's
+(`whatsapp:elevator`): the owner, 5 Nov, wants each change on the chatbot
+first and the phone agent after. It travels like the other two: it is pushed by `--oxs-mirror` only when
 `.env` names types, and deleted otherwise. **Setting it is the same decision as
 widening the phone list:** it needs the owner's go in so many words, and the
 recommendation is to wait for go-live, because testers on the UChat number would
