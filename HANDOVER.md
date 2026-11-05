@@ -8,6 +8,21 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **CLIENT REVIEW 4 Nov, 13:59-14:56 UTC (Google Meet with Homies), from Timeless's AI notes, read 5 Nov.** The notes are in `local/meetings/2026-11-04-homies-agent-review.md` (gitignored; the share link in it also opens the recording). WORKLOG 5 Nov.
+>   - **Decided there, nothing built yet:**
+>     - elevator reports become a service call in OXS (elevator, at the address), and the bot says only that a service call was opened;
+>     - a gas report gets no ticket, only "report it to the gas company";
+>     - debt calls go only to the debtors Homies picks, from OXS's own debt-list export;
+>     - handover is routed by department automatically;
+>     - the resident gets a notice when the OXS call closes.
+>   - **The OXS part needs the owner's go.** OXS is read-only for us except the ticket mirror, which is on for the owner's number only.
+>   - **Homies decides** between Chatwoot and UChat after reviewing our materials. Go-live comes after they approve the bot and after a training session for their staff.
+>   - **On us:**
+>     - the Omnitelecom follow-up on 5 Nov (the API error, the open-calls button);
+>     - the OXS debt-list spec to Omni;
+>     - sending Homies the bot's number, both training videos, the comparison, the ~30 test scenarios and both presentations.
+>   - **The notes are unverified.** "OCS" is OXS and "YouChat/Jitchat" is UChat. Check a point against the recording before building on it.
+>
 > **STATUS 4 Nov, 07:00 UTC, read only (owner: *"quick dryrun to check the status of all"*): green.** WORKLOG 4 Nov.
 >   - **Phone agents:** both equal the repo, the Vapi wallet is in credit, and the 208 line routes per call.
 >   - **Chatbot:** all 14 n8n workflows are active with no failed run in 24 h. OpenRouter has $53.53.

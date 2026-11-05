@@ -9,6 +9,31 @@ conversation that produced it.
 
 ---
 
+## 2026-11-05
+
+### Read the Timeless notes of the 4 Nov "Homies Agent Review" (owner: "can you access a timeesslink if i send it to you", then the link)
+- **Opened** with Playwright on the system Chrome, headless and logged out; the bundled Chromium is not installed. The share page is public: it loads the meeting's `spaces/public/...` record and its recording list without a login.
+- **What the link holds:**
+  - Timeless's AI notes, in English: a summary by topic, action items, a draft follow-up email and six open questions;
+  - the meeting's mp4 recording.
+  - The meeting was a Google Meet on 4 Nov, 13:59-14:56 UTC. It was in Hebrew and shared by Ido Elmaliach.
+- **Saved** to `local/meetings/2026-11-04-homies-agent-review.md` (gitignored), with the link. The link stays out of this public repo, since it opens the recording too.
+- **Decided there, per the notes** (Timeless's words, not checked against the recording; "OCS" is OXS, "YouChat/Jitchat" is UChat):
+  - **Elevators:** a report becomes a service call opened in OXS, classified as elevator, at the address, instead of an email to the office. The bot keeps asking its questions and says only that a service call was opened, never that it called the elevator company. This holds for WhatsApp and the phone agent.
+  - **When the OXS call closes,** the resident gets a notice.
+  - **Gas:** the bot opens nothing and tells the resident to report it to the gas company. Homies wants the exact wording settled.
+  - **Debt calls:** only the debtors Homies picks, from OXS's own debt-list export (Excel/PDF), not a template of ours.
+  - **Handover:** routed by department automatically, not by hand.
+  - **Direct debit (הוראת קבע):** OXS's public payment API has one-time payments only. Without an API, the request goes to the collections team by email. Homies wants no extra system to watch: email and/or a WhatsApp notice to staff.
+  - **The system:** Homies chooses Chatwoot or UChat after reviewing our materials. They found UChat slightly friendlier; Clix said it prefers Chatwoot.
+  - **Go-live:** after Homies is satisfied with the bot and after a training session for their staff. Homies said connecting the number was approved long ago.
+- **On Clix, per the notes:**
+  - follow up with Omnitelecom on 5 Nov on the API error and the open-calls button;
+  - send Omni the OXS debt-list template spec;
+  - send Homies the bot's number, both training videos, the comparison, the ~30 test scenarios and both presentations;
+  - build the elevator routing into OXS, the gas wording, the OXS-based debt list and automatic department routing.
+- **Nothing was changed** in the bot, the phone agents or OXS.
+
 ## 2026-11-04
 
 ### Yariv's page: pronunciation and telling men from women are done (owner, pasting each point: "this one is done for the slang", "this is also done")
