@@ -2921,6 +2921,11 @@ balance check. That was deliberate and wrong.
 
 ## How much the voice model thinks before it speaks (22 Oct)
 
+**Requests per reply (counted 5 Nov, 57 turns of the last 14 real calls):** one model request per
+reply, and two when the agent uses a tool (7 of 57). The first request picks the tool, then our
+tool server answers, then the second request says the result. The summary and the success
+evaluation are two more requests after the call. No check runs between the model and the voice.
+
 gpt-5.6-sol thinks before every reply, and on a call the caller waits through it. The incoming
 agent left `reasoningEffort` unset, which is this model's `medium`. Its levels are max, xhigh,
 high, medium, low and none. Vapi's enum also offers `minimal`, which this model does not list.

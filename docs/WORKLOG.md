@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### Read only: how many requests the phone agent makes before a reply (owner: "how any request does the voice agent do before sendng a reply")
+- **Counted from the last 14 real calls** with turns on Yariv's Vapi account: `GET /call`, nothing placed or paid, no wallet probe. Model requests were counted per caller turn from each call's messages.
+  - **One model request per reply** on 50 of 57 turns.
+  - **Two on 7** (about 1 in 8): every one was a turn where the agent used a tool. The first request picks the tool, then one call goes to our tool server, then the second request says the result.
+  - Never more than two in these calls.
+- **Around that:** Deepgram transcribes and Cartesia speaks, as streams, not model requests. After the call, Vapi runs two more model requests, the summary and the success evaluation; neither delays a reply.
+- **Nothing checks a phone reply before it is spoken:** the model's words go straight to the voice as they come. WhatsApp's Send checks have no voice counterpart.
+- CONTEXT got the counts under "How much the voice model thinks before it speaks". HANDOVER needs nothing, since nothing changed.
+
 ### Yariv's changes go to the chatbot first, the phone agent after (owner: "this should be applied in the chatbot first alr the the voice agent")
 - **Read as covering every item on the list,** and #1's elevator switch in particular, which covered both channels at once.
 - **The switch now works per channel:** `oxsMirrorAllowed(reporter, type, via)`, with `oxsMirror()` passing `channel(ctx)` from `open_request` and the emergency stub.
