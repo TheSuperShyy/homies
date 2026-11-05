@@ -90,6 +90,7 @@ and the array is stored in their order.
 
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -317,6 +318,121 @@ def build(call, residents, by_bu):
     }
 
 
+def building_index():
+    """Our building address -> its OXS `_id` (`buildings.id`, migration 016).
+
+    TWO KEYS PER BUILDING, because OXS writes an address two ways.
+
+    `buildings.address` is `street number, city`, composed at import time, and
+    it is the exact string `requests.building` holds. But a service call on a
+    building with an entrance letter arrives with the letter in parentheses
+    mid-string -- `ארלוזורוב 13 (ב), רמת גן` -- which matches nothing, so the
+    by-taskNumber lookup has no buildingId and the ticket can never resolve.
+
+    Composing their other form is exact rather than fuzzy: two of the 173
+    active buildings carry an entrance and neither sits at a duplicated
+    street+number (measured in docs/reference/oxs-extractable.md). Found by
+    `255-27001-26`, the one ticket of 292 the first live run left behind.
+    """
+    code, blds = sb("buildings?select=id,address,street,number,entrance,city&limit=500")
+    by_addr = {}
+    if code == 200 and isinstance(blds, list):
+        for b in blds:
+            by_addr.setdefault(b["address"], b["id"])
+            if b.get("entrance"):
+                by_addr.setdefault("%s %s (%s), %s"
+                                   % (b["street"], b["number"],
+                                      b["entrance"], b["city"]), b["id"])
+    return by_addr
+
+
+# An OXS `_id`. `oxs_ref` on our own tickets also carries markers that are not
+# ids -- "partial:emergency_transfer", "partial:model_claimed", "standing_order"
+# -- and none of those was ever in OXS to be closed there.
+OXS_ID = re.compile(r"^[0-9a-f]{24}$")
+# Closed calls are listed 20 a page, newest change first. A call staff closed
+# since the last run sits on page 1; three pages is slack for a busy building.
+MIRROR_PAGES = 3
+# Buildings asked about per run. Each costs up to MIRROR_PAGES requests.
+MIRROR_BUILDINGS = 30
+
+
+def mirrored_departures(open_ids):
+    """OUR tickets that staff closed in OXS (5 Nov).
+
+    A ticket the bot opens goes into OXS through the mirror (`oxsMirror()` in
+    the Edge Function), and staff work it there. Nothing brought its fate back:
+    `departed_rows` asks only about imported rows, so a call closed in OXS left
+    our ticket open for ever, and the resident never got the closed-ticket
+    message, which the trigger in 036 queues when a WhatsApp ticket turns
+    `resolved`. Yariv, 4 Nov, of elevator calls: when the call is closed in
+    OXS, the resident should get a notice.
+
+    For these we hold OXS's `_id` (`oxs_ref`), not their taskNumber, and the
+    one-call endpoint takes the taskNumber. So the building's closed list is
+    read instead (`status=close`, newest change first) and matched on `_id`.
+    Only our tickets still open here whose `_id` has left the open feed are
+    asked about. Read-only towards OXS, like everything in this script.
+
+    Returns (rows to resolve, unmapped statuses, ids not found).
+    """
+    code, mine = sb_all("requests?select=id,reference,building,oxs_ref,status"
+                        "&opened_via=neq.oxs&oxs_ref=not.is.null"
+                        "&status=in.(open,in_progress,needs_review)")
+    if code != 200 or not isinstance(mine, list):
+        print("  could not read our mirrored tickets (HTTP %s); skipped" % code)
+        return [], [], []
+    gone = [r for r in mine
+            if OXS_ID.match(str(r.get("oxs_ref") or "")) and r["oxs_ref"] not in open_ids]
+    print("ours mirrored into OXS and still open here: %d, of them gone from OXS's open feed: %d"
+          % (sum(1 for r in mine if OXS_ID.match(str(r.get("oxs_ref") or ""))), len(gone)))
+    if not gone:
+        return [], [], []
+
+    by_addr = building_index()
+    per_building = {}
+    no_bld = 0
+    for r in gone:
+        bid = by_addr.get(r.get("building"))
+        if not bid:
+            no_bld += 1
+            continue
+        per_building.setdefault(bid, []).append(r)
+    if no_bld:
+        print("  no building id for %d of them, left alone" % no_bld)
+
+    rows, unmapped, found = [], [], set()
+    for bid, want in list(per_building.items())[:MIRROR_BUILDINGS]:
+        ids = {r["oxs_ref"]: r for r in want}
+        for page in range(1, MIRROR_PAGES + 1):
+            time.sleep(PACE)
+            calls = oxs("/service-calls", fatal=False, buildingId=bid, status="close",
+                        page=page, sortBy="lastUpdate", order=-1)
+            for call in calls or []:
+                r = ids.get(call.get("_id"))
+                if not r or call["_id"] in found:
+                    continue
+                raw = ((call.get("status") or {}).get("status") or "").strip()
+                if raw not in STATUS:
+                    unmapped.append(raw)
+                    continue
+                if STATUS[raw] not in ("resolved", "cancelled"):
+                    continue
+                found.add(call["_id"])
+                rows.append({
+                    "id": r["id"],
+                    "reference": r["reference"],
+                    "status": STATUS[raw],
+                    "oxs_notes": [n for n in (call.get("treatmentLog") or []) if str(n).strip()],
+                    "oxs_last_update": call.get("lastUpdate"),
+                })
+            if len(calls or []) < 20 or all(i in found for i in ids):
+                break
+    missing = [r["reference"] for r in gone if r["oxs_ref"] not in found
+               and by_addr.get(r.get("building"))]
+    return rows, unmapped, missing
+
+
 def departed_rows(gone):
     """What OXS says about the tickets that have left its open feed.
 
@@ -353,27 +469,7 @@ def departed_rows(gone):
     # left since the last one.
     pending.sort(key=lambda r: r.get("oxs_last_seen_at") or "")
 
-    # TWO KEYS PER BUILDING, because OXS writes an address two ways.
-    #
-    # `buildings.address` is `street number, city`, composed at import time, and
-    # it is the exact string `requests.building` holds. But a service call on a
-    # building with an entrance letter arrives with the letter in parentheses
-    # mid-string -- `ארלוזורוב 13 (ב), רמת גן` -- which matches nothing, so the
-    # by-taskNumber lookup has no buildingId and the ticket can never resolve.
-    #
-    # Composing their other form is exact rather than fuzzy: two of the 173
-    # active buildings carry an entrance and neither sits at a duplicated
-    # street+number (measured in docs/reference/oxs-extractable.md). Found by
-    # `255-27001-26`, the one ticket of 292 the first live run left behind.
-    code, blds = sb("buildings?select=id,address,street,number,entrance,city&limit=500")
-    by_addr = {}
-    if code == 200 and isinstance(blds, list):
-        for b in blds:
-            by_addr.setdefault(b["address"], b["id"])
-            if b.get("entrance"):
-                by_addr.setdefault("%s %s (%s), %s"
-                                   % (b["street"], b["number"],
-                                      b["entrance"], b["city"]), b["id"])
+    by_addr = building_index()
 
     askable = sum(1 for r in pending if by_addr.get(r.get("building")))
     asking = min(askable, MAX_LOOKUPS)
@@ -499,6 +595,20 @@ def main():
     if unknown:
         print("  UNMAPPED CATEGORIES -> filed as other: %s" % unknown)
 
+    # Our own tickets that staff closed in OXS. Read before the dry-run exit so
+    # a dry run shows them; written last, after everything above.
+    mine_closed, mine_unmapped, mine_missing = mirrored_departures(
+        {c.get("_id") for c in calls})
+    if mine_closed:
+        print("  closed in OXS, to resolve here: %s"
+              % ", ".join(r["reference"] for r in mine_closed))
+    if mine_missing:
+        print("  gone from OXS's open feed but not in its closed list (deleted there?): %s"
+              % ", ".join(mine_missing))
+    if mine_unmapped:
+        print("  UNMAPPED OXS STATUS on our own tickets, left alone: %s"
+              % sorted(set(mine_unmapped)))
+
     if not apply:
         print("\nDry run. Re-run with --apply to write.")
         return
@@ -562,6 +672,28 @@ def main():
 
     code, after = sb_all("requests?select=reference&opened_via=eq.oxs")
     print("imported tickets now in the database: %d" % len(after))
+
+    # Our own tickets closed in OXS. PATCH by id, and only while the row is
+    # still open here, so a ticket a person changed on our side in the meantime
+    # is left as they set it. Turning `resolved` is what queues a WhatsApp
+    # ticket's closed-ticket message (036). A failure does not stop the run:
+    # everything above is already written, and the exit code says it after.
+    failed = []
+    for r in mine_closed:
+        body = {k: v for k, v in r.items() if k not in ("id", "reference")}
+        code, res = sb("requests?id=eq.%s&status=in.(open,in_progress,needs_review)"
+                       % urllib.parse.quote(str(r["id"]), safe=""),
+                       "PATCH", body, "return=minimal")
+        if code >= 300:
+            # Reference only, never the body: this log is readable by anybody.
+            msg = res.get("message", res) if isinstance(res, dict) else res
+            print("  FAILED resolving %s: HTTP %s %s" % (r["reference"], code, str(msg)[:160]))
+            failed.append(r["reference"])
+    if mine_closed:
+        print("resolved %d of our own ticket(s) closed in OXS"
+              % (len(mine_closed) - len(failed)))
+    if failed:
+        sys.exit("could not resolve %d of our own ticket(s): %s" % (len(failed), ", ".join(failed)))
 
 
 if __name__ == "__main__":
