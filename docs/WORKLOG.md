@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### A follow-up email to Omnitelecom, drafted (owner: "create a follow up email for omnitelecm"; nothing sent)
+- **Why:** the 4 Nov review's action for 5 Nov was to follow up with Omni on "the API Error and the open-calls button". Omni had not answered the 2 Nov email in substance. I read the "open-calls button" as the click-to-call, which that email asked about.
+- **What it says**, in Hebrew with an English check copy:
+  - we still haven't added a single lead: every request got 404, which can't tell us what is wrong, and it is what is holding up the collection calls;
+  - **asked:** their log's reason (is the token active for inserts, is List 2 its own) and a working example;
+  - **or** another way to call out: a click-to-call API, or SIP for outgoing calls through 208.
+  - It names no new attempts: no lead has been sent since 2 Nov (the debt agent's newest real call is still 26 Oct).
+- **Where:** `local/omnitelecom/2026-11-05-follow-up-email.txt` (gitignored), signed "Clix Solution, בשם הומי'ז" with no person's name, as a reply in the 2 Nov thread. The owner sends it.
+- **CONTEXT is unchanged:** a draft, not a rule.
+
 ### An email to OXS asking for API access to standing orders, drafted (owner: "we need to draft email to oxs if they can provide us api keys for the standing order as well"; nothing sent)
 - **Why:** at the 4 Nov review, Clix said OXS's API has one-time payments only, so a standing-order (הוראת קבע) request goes to the collections team by email. The rev 1.3 spec agrees: three modules (general, finance, service_calls), and nothing on standing orders.
 - **What it asks**, in English and Hebrew, after two rewrites by the owner (*"but i need it to work like do you want a standing order for the payment so that ... if yes it will start a standing order for that tenant"*, then *"no it should be like a question if it exist then the follow up question should be after when they say yes"*):
