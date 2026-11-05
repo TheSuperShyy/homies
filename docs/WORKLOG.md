@@ -43,6 +43,9 @@ conversation that produced it.
 - **Not changed:** the phone agent, which still opens an urgent ticket for gas, and debt-tools.
 - **Found, not changed:** Send's danger step still adds "פתחתי לך קריאה דחופה, מספר X, וזה הדבר היחיד שאני יכול לעשות מכאן." when it cuts advice after an urgent ticket and the resident asked something. That is the line the owner disliked this morning; epoch 93 took it out of the prompt only.
 - **Owed:** the owner's handset, "יש ריח של גז בחדר המדרגות" from the +63.
+- **The tester checklist, source only:**
+  - g1 and g2 replace the three gas tests, and e3 (smoke) and e4 (pressing) keep an emergency in the list: 30 tests. The English source is rebuilt.
+  - Not republished. The Artifact tool asked for the owner's yes to open the page ("made by someone else"), which this session cannot give.
 
 ### The "ticket closed" template submitted on the UChat number's account (owner: "submit it")
 - **The body is word for word the one approved on the test number's account:** checked against Meta's own copy there (UTILITY, he, two variables).
