@@ -243,6 +243,14 @@ def main():
         print("voice note     OFF — N8N_VOICE_NOTE_SECRET empty (run scripts/n8n_voice_note.py --apply)")
     else:
         print("voice note     OFF — no URL: set N8N_BASE_URL or N8N_VOICE_NOTE_URL")
+    # 5 Nov, Yariv's change 3: a WhatsApp standing-order request is emailed to
+    # collections by n8n (scripts/n8n_standing_order_email.py mints the secret).
+    # Missing either, the request is still recorded and nothing is emailed.
+    standing_secret = e.get("N8N_STANDING_ORDER_SECRET", "").strip()
+    standing_url = (e.get("N8N_BASE_URL", "").strip().rstrip("/") + "/webhook/homies-standing-order"
+                    if e.get("N8N_BASE_URL", "").strip() else "")
+    print("standing order %s" % ("email ON -> %s" % standing_url if standing_secret and standing_url
+                                  else "email OFF — run scripts/n8n_standing_order_email.py --apply"))
     finance_key = e.get("OXS_KEY_DEBTS", "").strip()
     print("payment link   %s" % ("ON  (OXS_KEY_DEBTS, finance read-only)" if finance_key
                                   else "OFF — OXS_KEY_DEBTS empty in .env"))
@@ -290,6 +298,9 @@ def main():
     if voice_secret and voice_url:
         to_push.append({"name": "N8N_VOICE_NOTE_SECRET", "value": voice_secret})
         to_push.append({"name": "N8N_VOICE_NOTE_URL", "value": voice_url})
+    if standing_secret and standing_url:
+        to_push.append({"name": "N8N_STANDING_ORDER_SECRET", "value": standing_secret})
+        to_push.append({"name": "N8N_STANDING_ORDER_URL", "value": standing_url})
     # The finance key is read-only on OXS's side (finance keys can never be
     # 'full', per the API doc), so it rides on every plain --apply and is
     # never on the delete list below.

@@ -1220,6 +1220,125 @@ async function voiceNote(payload: VoiceNote): Promise<boolean> {
   return false;
 }
 
+// ---------------------------------------------------------------------------
+// A standing order asked for on WhatsApp (5 Nov 2026, Yariv's change 3)
+// ---------------------------------------------------------------------------
+// OXS's API has one-time payments only, so nothing here can set a standing
+// order up. Homies, at the 4 Nov review: the request goes to the collections
+// team by email, not into another system they would have to watch ("I don't
+// want another system I need to monitor every time"). So it is recorded, once
+// per number, the way the phone agent's request is (same marker, same words for
+// the office), and emailed. Never mirrored into OXS.
+//
+// THE EMAIL. Supabase cannot reach the mail ports, so this posts to the n8n
+// workflow "Homies — Standing order email" (scripts/n8n_standing_order_email.py),
+// which sends it. Same contract as voiceNote: a header secret, answered on
+// receipt, a few seconds at most, and it never fails the tool call, because the
+// request is already recorded when it runs.
+type StandingOrderMail = {
+  reference: string; name: string; phone: string; building: string; unit: string;
+  said: string; channel: string;
+};
+
+async function standingOrderMail(payload: StandingOrderMail): Promise<boolean> {
+  const url = Deno.env.get("N8N_STANDING_ORDER_URL") ?? "";
+  const secret = Deno.env.get("N8N_STANDING_ORDER_SECRET") ?? "";
+  if (!url || !secret) {
+    console.warn("standing order email OFF: N8N_STANDING_ORDER_URL / N8N_STANDING_ORDER_SECRET unset",
+      payload.reference);
+    return false;
+  }
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 3000);
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-homies-secret": secret,
+                   "user-agent": "homies-debt-tools/1.0" },
+        body: JSON.stringify(payload),
+        signal: ac.signal,
+      });
+      if (res.ok) return true;
+      console.error("standing order email refused", res.status, payload.reference);
+    } catch (e) {
+      console.error("standing order email failed", attempt, payload.reference, String(e));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  return false;
+}
+
+// WHO. The number they write from, as every WhatsApp tool reads it. A number on
+// file gives the name, the building and the flat, and nobody is asked anything.
+// A number not on file needs them from what they wrote, because collections must
+// know whose payment it is: the building goes through matchBuilding and answers
+// in open_request's words (building_found false and why), and `need_name` asks
+// for the full name. The same request again is the same request: one open per
+// number with no time window, as the phone agent's, and no second email.
+async function standingOrderByChat(args: any, ctx: CallContext) {
+  const phone = reporterPhone(ctx);
+  if (!phone) return { ok: false, error: "no sender number" };
+  const said = String(args?.said ?? "").trim().slice(0, 500);
+
+  const { data: open } = await db.from("requests").select("reference")
+    .eq("oxs_ref", STANDING_ORDER_REF).eq("reported_by_phone", phone)
+    .in("status", ["open", "in_progress", "needs_review"]).limit(1);
+  if (open?.length) {
+    return { ok: true, recorded: true, recorded_now: false, already_recorded: true,
+             reference: open[0].reference };
+  }
+
+  const { data: rows } = await db.from("residents").select("id,full_name,building,unit")
+    .eq("phone", phone).limit(2);
+  const r = rows?.length === 1 ? rows[0] : null;
+  let building = r ? String(r.building ?? "").trim() : "";
+  let unit = r ? unitOf(r.unit) : null;
+  if (!building) {
+    const m = await matchBuilding(args?.building);
+    if (m.status === "found") {
+      building = String(m.building.address);
+      unit = unitOf(args?.unit);
+    } else if (m.status === "need_number" || m.status === "number_off_street") {
+      return { ok: true, recorded: false, building_found: false,
+               reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
+               street: m.street.street, numbers_we_manage: m.numbers };
+    } else if (m.status === "ambiguous") {
+      return { ok: true, recorded: false, building_found: false, reason: "ambiguous",
+               candidates: m.candidates.map((b: any) => b.address).slice(0, 5) };
+    } else if (m.status === "street_unknown" && /\d/.test(String(args?.building ?? ""))) {
+      return { ok: true, recorded: false, building_found: false, reason: "street_unknown" };
+    }
+  }
+  const name = (r ? reporterNameOf(r.full_name) : null) ?? reporterNameOf(args?.reporter_name);
+  if (!name) return { ok: true, recorded: false, reason: "need_name" };
+  if (!building) return { ok: true, recorded: false, reason: "need_building", note: ASK_WHERE };
+
+  const { data, error } = await db.from("requests").insert({
+    resident_id: r?.id ?? null,
+    interaction_id: await interactionId(ctx),
+    type: "other",
+    description:
+      "בקשה להוראת קבע. הדייר ביקש בוואטסאפ להסדיר את התשלום החודשי " +
+      "בהוראת קבע — יש ליצור איתו קשר להסדרה." + (said ? " מה שכתב: " + said : ""),
+    building,
+    unit,
+    urgency: "normal",
+    opened_via: channel(ctx),
+    reported_by_phone: phone,
+    reported_by_name: name,
+    oxs_ref: STANDING_ORDER_REF,
+  }).select("reference").single();
+  if (error) return { ok: false, error: error.message };
+
+  const emailed = await standingOrderMail({
+    reference: data.reference, name, phone, building, unit: unit ?? "", said, channel: "whatsapp",
+  });
+  console.log("standing order", data.reference, emailed ? "handed to the email" : "NOT emailed");
+  return { ok: true, recorded: true, recorded_now: true, reference: data.reference };
+}
+
 // The sentence with no tool behind it. Same shapes as the WhatsApp backstop
 // (scripts/n8n_whatsapp_teamnote.py SAID), in phone forms: "I told / will
 // pass this to the team" (a verb and a destination), the sentence the prompt
@@ -2426,7 +2545,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * The same silence still applies to `transfer_to_human`, which writes the
    * same table and is read by nobody. That one is open.
    */
-  async request_standing_order(_args, ctx) {
+  async request_standing_order(args, ctx) {
+    // WhatsApp (5 Nov, Yariv's change 3): no call and no charges, so who is
+    // asking is the number they write from. Its own path: standingOrderByChat.
+    if (channel(ctx) === "whatsapp") return await standingOrderByChat(args, ctx);
     if (!ctx.charges.length) return { ok: false, error: "no charge on this call" };
     const iid = await interactionId(ctx);
 
