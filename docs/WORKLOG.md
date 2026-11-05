@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### The payment link template is APPROVED on the UChat number's account and synced into UChat (owner: "i thought we submit a template to meta")
+- **`wa_templates.py --waba 2117787955519632`:** `payment_link_he` APPROVED (he, UTILITY). It is the only template on that account.
+- **UChat:** `POST /whatsapp-template/sync` answered ok, and `/whatsapp-template/list` now shows `payment_link_he` APPROVED. `uchatTemplates()` in debt-tools sends only what that list approves, so the debt call's link can go out as the template, past 24 h, on the UChat number.
+- **`ticket_resolved_he`** (the "ticket closed" message) is still not submitted on that account. It waits on the owner's go.
+
 ### The test tickets in Bar Kochba 23 closed as cancelled, in our system only (owner: "ok lets close all that opened tickets", then "in the oxs dont touch them")
 - **Read first:** 151 open tickets.
   - 92 are imported from OXS (real) and left alone.
