@@ -41,11 +41,22 @@ conversation that produced it.
   - `ClixTeam579` was invited with write (invitation 341697278) and accepted as `ClixTeam579`. It now reads push true.
   - The secret `SUPABASE_ACCESS_TOKEN` was set from `.env` over a pipe, never printed.
   - `gh` is back on `ClixTeam579`.
-- **Waiting:**
-  - PR 1's `checks`;
-  - then the protection on `main` and the merge;
-  - then a read-back that the redeploy is ACTIVE and the secrets are unchanged;
-  - then PR 2, the OXS sync fix.
+- **PR 1's `checks` passed in 15 s.** Every step ran: 45 of 45 node tests, 10 name-flow tests, and `npm ci` (50 packages) with tsc.
+- **`main` was protected,** as `TheSuperShyy`, and read back:
+  - `checks` required, from app 15368;
+  - `enforce_admins` true;
+  - PRs required, 0 approvals;
+  - no force push or deletion.
+- **PR 1 merged (`33651ba`).** `main`'s run: `checks` green, then `deploy-function`, code only, gave **v143 ACTIVE**.
+  - Read back: v143 is ACTIVE.
+  - The secrets were unchanged: `OXS_KEY_REQUESTS` and `OXS_MIRROR_PHONES` set, `OXS_MIRROR_TYPES` absent, `TOOL_SECRET`, `UCHAT_API_KEY` and `WHATSAPP_VIA` set.
+  - The function answers 401 to an unsigned call.
+- **PR 2 (`sync-mirror-close-for-main`, rebased onto the new `main`) merged (`46bae91`).**
+  - `checks` passed in 19 s.
+  - `deploy-function` printed "The function did not change in this push: nothing to deploy."
+  - A `workflow_dispatch` dry run of "OXS requests" on `main` printed "ours mirrored into OXS and still open here: 15, of them gone from OXS's open feed: 0".
+- **Cleanup:** both worktrees were removed. `wt-ci`'s `node_modules` needed `rd /s /q \\?\...`, because the path was too long for `git worktree remove`.
+- **Feature 22 is LIVE.** `differs_from_main()` on `feature/chatbot` is now empty, so a hand deploy for secrets passes the guard there.
 
 ### Yariv's change 1 of 6: elevator reports into OXS, classified, and our ticket closes when OXS closes it (owner: "ok so give me the list of the changes that is needed to be started based on yariv", then "ok lets do all those 1 by 1")
 - **Read first, what each part of the ask is today:**

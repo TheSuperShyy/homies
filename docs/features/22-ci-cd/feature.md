@@ -2,7 +2,7 @@
 
 **Estimate:** 0.5d
 **Depends on:** nothing
-**Status:** approved 5 Nov 2026 (option 2 of 3, owner: "ok"), being built
+**Status:** LIVE 5 Nov 2026 (option 2 of 3, owner: "ok"). PR #1 `33651ba`: the pipeline, the live function and its tests; first deploy v143. PR #2 `46bae91`: the first change through it.
 
 ## Purpose
 

@@ -9,25 +9,19 @@ Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
 > **CI/CD, feature 22 (5 Nov; owner: "we need a ci/cd before pushing live", "dont overtest", "ok" to option 2 of 3).** Spec, context and plan are in `docs/features/22-ci-cd/`; WORKLOG 5 Nov.
->   - **Built:**
->     - `.github/workflows/ci.yml`: `checks` and `deploy-function` (code only);
->     - `supabase_functions.py --code-only`;
->     - a hand `--apply` refuses a function that differs from `origin/main`.
->   - **Pull request #1** (`ci-pipeline`, https://github.com/TheSuperShyy/homies/pull/1) brings `main` three things:
->     - the pipeline;
->     - the function exactly as live (v142);
->     - its tests.
->   - **The PR also fixes the live Call button.** `dashboard/lib/call.ts` on `main` gave the debt agent the old gender lines, neutral and plural for an unknown gender. The PR brings in the 30 Sep owner rule. Three route tests caught it.
->   - **Its `checks` are running.**
->   - **Next:**
->     - protect `main` (`checks` required, admins included, PRs only);
->     - merge, then read back that the redeploy is ACTIVE and the secrets are unchanged;
->     - PR 2, the OXS sync fix (`sync-mirror-close-for-main`, to be rebased onto the new `main`).
+>   - **LIVE.** `.github/workflows/ci.yml` runs `checks` (about 20 s) on every PR and push to `main`, then `deploy-function`, code only, when the function changed.
+>     - `main` is protected: `checks` required (GitHub Actions, app 15368), admins included, PRs only (0 approvals), no force push or deletion.
+>     - A hand `supabase_functions.py --apply` refuses a function that differs from `origin/main`. Today it passes on `feature/chatbot`, whose function equals `main`'s.
+>   - **PR #1, merged (`33651ba`):**
+>     - The pipeline, the function exactly as live, and its tests.
+>     - The pipeline's first deploy was **debt-tools v143** ACTIVE, the same code as v142. The secrets were unchanged: the mirror key and phone list set, `OXS_MIRROR_TYPES` absent.
+>     - **It also fixed the live Call button.** `dashboard/lib/call.ts` on `main` gave the debt agent the old gender lines, neutral and plural for an unknown gender. It now has the 30 Sep owner rule. Three route tests caught it.
+>   - **PR #2, merged (`46bae91`):** the OXS sync fix from Yariv's change 1. Its deploy correctly skipped. A `workflow_dispatch` dry run of "OXS requests" on `main` printed the new line: 15 of ours open in OXS, 0 closed there.
+>   - **The way in from now on:** a branch cut from `origin/main` in a temporary worktree, pushed as `ClixTeam579`, a PR, `checks`, merge. On Windows, a worktree with `dashboard/node_modules` needs `rd /s /q \\?\...` to delete (path too long).
 >   - **GitHub access (5 Nov):**
 >     - `ClixTeam579` has write access to `TheSuperShyy/homies`. The invite was accepted, so sessions push branches and open PRs as `ClixTeam579`.
 >     - `TheSuperShyy` is the admin and is used only for settings. `gh auth switch` goes back after each use.
 >     - The repo secret `SUPABASE_ACCESS_TOKEN` was added 5 Nov. `SUPABASE_URL` was already there.
->   - **Until PR 1 merges, the function cannot be hand-deployed from `feature/chatbot`.** The guard refuses, by design.
 >
 > **CLIENT REVIEW 4 Nov, 13:59-14:56 UTC (Google Meet with Homies), from Timeless's AI notes, read 5 Nov.** The notes are in `local/meetings/2026-11-04-homies-agent-review.md` (gitignored; the share link in it also opens the recording). WORKLOG 5 Nov.
 >   - **Decided there, nothing built yet:**
@@ -47,10 +41,7 @@ appended to.
 >     - **LIVE, debt-tools v142 (5 Nov):** every mirrored call carries OXS's own category, keyed by our ticket type (`OXS_CATEGORY`). If OXS refuses the field, the call is filed again without it. Until now all 16 of our calls open in OXS read `facilityCategory: null`, the two elevator ones too.
 >       - **Unproven:** OXS's spec does not list the field. The first proof is the owner's own elevator report from the +63, read back in OXS.
 >     - **Built, OFF:** `OXS_MIRROR_TYPES=elevator` mirrors every elevator report, from any reporter, on WhatsApp or the phone. **It waits on the owner's go** (CONTEXT, the OXS rule). The recommendation is go-live.
->     - **Built, not yet running:** `oxs_requests_sync.py` resolves our own ticket when staff close its call in OXS, which queues the WhatsApp closed-ticket message (036).
->       - It was tested on a real closed Bar Kochba 23 call.
->       - Today's dry run finds all 15 of ours still open there.
->       - **The Action runs `main`, so it needs a push.** It waits on the owner's go. The prepared branch is `sync-mirror-close-for-main`.
+>     - **LIVE on `main` (PR #2, `46bae91`, 5 Nov):** `oxs_requests_sync.py` resolves our own ticket when staff close its call in OXS, which queues the WhatsApp closed-ticket message (036). It was tested on a real closed Bar Kochba 23 call. The Action's dry run finds all 15 of ours still open there.
 >     - **Already true, unchanged:** the bot never says it called the elevator company (1 of 72 elevator replies did, on 1 Sep, before the 15 Sep emergency change), and nothing emails the office.
 >     - **Not covered:** a phone-opened ticket gets no closed-ticket message, because 036 queues it for WhatsApp tickets only.
 >
