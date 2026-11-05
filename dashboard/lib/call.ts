@@ -11,17 +11,19 @@ import { serverClient } from '@/lib/supabase-server';
 // waiting for.
 //
 // THREE GATES, ALL SERVER-SIDE
-//   1. CALL_PIN. The dashboard has had no login wall since 9 Aug (demo mode),
-//      so a bare button on a public page would let anyone with the URL ring a
-//      resident on Homies' number and Homies' bill. The PIN lives in Vercel
-//      and is typed next to the button; without it configured the button is
-//      not rendered at all.
+//   1. CALL_PIN. Written when the dashboard had no login wall (9-26 Aug); the
+//      wall is back (middleware.ts), and the PIN stays as the second,
+//      deliberate step before a resident's phone rings about money on Homies'
+//      bill. It lives in Vercel and is typed next to the button; without it
+//      configured the button is not rendered at all.
 //   2. press_call() in Postgres (migration 024): flips handed_over for that
 //      one resident and returns their composed call — or NULL if they owe
 //      nothing, are on do-not-call, or have had four attempts.
 //   3. VAPI_PHONE_NUMBER_ID. No number, no call. The Israeli number is being
 //      ordered (Omnitelecom); until its Vapi id is set here the page says so
-//      instead of pretending.
+//      instead of pretending. 28 Sep: if Omni offers only its dialer API and no
+//      SIP trunk, the press goes to their dialer instead of Vapi -- see
+//      docs/features/15-call-button/context.md.
 //
 // The variables handed to the agent are the same set the browser demo composes
 // (web/index.html variablesFor), so the prompt sees nothing new: the SQL view
@@ -30,6 +32,9 @@ import { serverClient } from '@/lib/supabase-server';
 // two hundred lines apart does not carry the branch through the sentence.
 
 const VAPI = 'https://api.vapi.ai';
+// The demo agent, kept as the fallback for now (owner, 28 Sep: "revert back to
+// the demo one for now"). Before the first real phone call, set
+// VAPI_DEBT_ASSISTANT_ID to the live account's debt agent.
 const DEBT_HE = '14d502fc-95a9-4fb1-8d93-944dd7e00211'; // Homies — Debt Follow-up (he), the August account
 
 // The office number and email are Homies' own, from docs/reference/homies-faq.txt;
@@ -44,12 +49,18 @@ const FIXED = {
   alt_payment: process.env.HOMIES_ALT_PAYMENT ?? 'none',
 };
 
+// 30 Sep, owner: one person, in the gender the name gives. `gender` arrives from
+// the call queue (migration 038: a value a person set, else the first name, else
+// unknown). Unknown is a name used for both, or none at all, and is masculine
+// singular: the owner's default. The prompt's bullet around {{gender_forms}}
+// carries the one switch rule, so it is not repeated here.
 const GENDER_FORMS: Record<string, string> = {
-  f: 'הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי.',
-  m: 'הנמען גבר. פנה אליו בזכר לאורך כל השיחה: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה.',
+  f: 'הנמענת אישה. פנה אליה בנקבה לאורך כל השיחה: את, שלָךְ, לָךְ, איתָּךְ, תגידי, תשלחי, תבדקי, תסגרי, תוכלי, תרצי. '
+    + 'וכשאתה מדבר עליה עם מישהו אחר, גם אז בנקבה: היא, שלה, שתחזור.',
+  m: 'הנמען גבר. פנה אליו בזכר לאורך כל השיחה: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה. '
+    + 'וכשאתה מדבר עליו עם מישהו אחר, גם אז בזכר: הוא, שלו, שיחזור.',
   unknown:
-    'מין הנמען לא ידוע. דבר בניסוחים נייטרליים בלבד ואל תנחש: צריך, אפשר, בואו נראה, מה תרצו, אשמח לדעת. '
-    + 'אם הוא או היא חושפים מין בדיבור על עצמם — אני צריכה מול אני צריך — עבור מיד להטיה הזאת.',
+    'השם לא מכריע אם זה גבר או אישה. פנה בזכר, ביחיד: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה.',
 };
 
 export function callButtonEnabled(): boolean {

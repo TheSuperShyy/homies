@@ -15,7 +15,11 @@
 //   CHATWOOT_API_TOKEN / CHATWOOT_BOT_TOKEN        # the debt call's WhatsApp delivery (20 Sep):
 //                                                  # admin finds the contact, the bot posts
 //   OPENROUTER_API_KEY                             # the one line above the link; unset = link alone
-// scripts/supabase_functions.py --apply pushes all seven from .env.
+//   WHATSAPP_VIA / UCHAT_API_KEY                   # feature 21 (3 Nov): "uchat" sends the debt call's link
+//                                                  # and the "done" notice through UChat; unset = Chatwoot
+//   MEDIA_HOSTS_EXTRA                              # more hosts a photo may come from, comma-separated
+//                                                  # prefixes; optional (UChat's own domain is built in)
+// scripts/supabase_functions.py --apply pushes them from .env.
 //
 // --no-verify-jwt is deliberate. Vapi is not a Supabase user and cannot present
 // a Supabase JWT. The shared secret in the X-Homies-Secret header is what
@@ -44,6 +48,15 @@
 // already in front of it, and cannot reach one that is not.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// Who is calling and what a ticket still needs (feature 17, 22 Oct). Pure, so
+// Node can test it: scripts/check_identity.test.ts.
+import {
+  callNumberOf, flagOf, phoneOf, reporterLine, reporterNameOf, requiredChannels, ticketGate,
+} from "./identity.ts";
+// Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
+// Node can test it: scripts/check_route.test.ts.
+import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
+import { sameNameAnyScript } from "./names.ts";
 
 const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -171,7 +184,10 @@ function context(message: any): CallContext {
     // interaction beside it stored the right one, and the dashboard's Caller
     // column was empty on the whole channel. Found 25 Aug, the hour complaints
     // became tickets — a complaint nobody can ring back is half a complaint.
-    callerPhone: phoneOf(call?.customer?.number) ?? phoneOf(v.caller_phone) ?? phoneOf(v.phone),
+    // 22 Oct (feature 17): callNumberOf() also reads the SIP URI, where Omni
+    // puts an outside caller in local form that Vapi leaves out of
+    // customer.number, and returns nothing for a Homies internal extension.
+    callerPhone: phoneOf(callNumberOf(call)) ?? phoneOf(v.caller_phone) ?? phoneOf(v.phone),
     assistantId: String(call?.assistantId ?? message?.assistant?.id ?? "").trim() || null,
     charges,
   };
@@ -318,6 +334,22 @@ const MEDIA_MIMES: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
+// Feature 21 (3 Nov): the UChat copy of the bot hands over UChat's own link to
+// a photo, so UChat's domain is let through too. No photo had come through
+// UChat yet to show its exact host, so MEDIA_HOSTS_EXTRA (comma-separated
+// prefixes) adds another as a setting, not a deploy. Still a fence: only these.
+const MEDIA_DOMAINS = ["uchat.com.au"];
+function mediaAllowed(url: string): boolean {
+  if (url.startsWith("data:image/")) return true;
+  const extra = (Deno.env.get("MEDIA_HOSTS_EXTRA") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if ([...MEDIA_HOSTS, ...extra].some((h) => url.startsWith(h))) return true;
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && MEDIA_DOMAINS.some((d) => u.hostname === d || u.hostname.endsWith("." + d));
+  } catch {
+    return false;
+  }
+}
 
 // The debt call's link goes out as a WhatsApp message through Chatwoot (20
 // Sep). Same host as the media fence; the account and the inbox are the ones
@@ -326,6 +358,21 @@ const MEDIA_MIMES: Record<string, string> = {
 const CHATWOOT = MEDIA_HOSTS[0].replace(/\/$/, "") + "/api/v1/accounts/2";
 const WA_INBOX_ID = 1; // the WhatsApp Cloud inbox; the Voice inbox is 2
 const TEST_PREFIXES = ["+972599", "+9725000000"];
+
+// The Meta template that carries a payment link across the 24-hour window.
+// Wording lives in docs/features/11-whatsapp-bot/templates.md, which is what
+// `scripts/wa_templates.py` submits; this name has to match it exactly.
+const PAYMENT_TEMPLATE = "payment_link_he";
+
+// Why a payment link did not reach WhatsApp, in the words the office reads on
+// the ticket (22 Sep). A reason not listed here is written as it came.
+const LINK_MISS_HE: Record<string, string> = {
+  outside_window: "וואטסאפ לא מאפשר הודעה חופשית כי הדייר לא כתב לנו ב-24 השעות האחרונות",
+  no_contact: "אין איש קשר בוואטסאפ למספר שרשום אצלנו",
+  no_conversation: "לא נפתחה שיחת וואטסאפ למספר שרשום אצלנו",
+  unavailable: "שליחת וואטסאפ לא מוגדרת במערכת",
+  no_link: "OXS לא החזיר קישור לתשלום",
+};
 const MONTHS_HE = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי",
   "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
 
@@ -521,17 +568,23 @@ function digitsFromWords(raw: string): string {
 //
 // Matching the words against the description as well as the category is what
 // finds the caller's request without widening to everybody's.
+// 5 Oct: mould and damp, and the parking gate, had no words at all. On the live
+// run as Assaf Clix the mould ticket (255-1341-26, filed `cleaning`) and the two
+// gate tickets (`maintenance`, `locksmith`) could only be found by a category
+// the model had to guess right.
 const TYPE_WORDS: Record<string, string[]> = {
   elevator: ["elevator", "lift", "מעלית"],
   lighting: ["light", "lighting", "bulb", "נורה", "תאורה", "אור"],
-  plumbing: ["leak", "water", "pipe", "drain", "נזילה", "מים", "צנרת", "ביוב"],
+  plumbing: ["leak", "water", "pipe", "drain", "damp", "mold", "mould",
+             "נזילה", "מים", "צנרת", "ביוב", "רטיבות", "עובש", "לחות"],
   electrical: ["electric", "power", "socket", "חשמל", "שקע"],
-  cleaning: ["clean", "rubbish", "bin", "ניקיון", "אשפה", "זבל"],
+  cleaning: ["clean", "rubbish", "bin", "mold", "mould", "ניקיון", "אשפה", "זבל", "עובש"],
   gardening: ["garden", "tree", "גינה", "עץ", "גינון"],
   pest_control: ["pest", "rat", "cockroach", "מזיקים", "ג'וקים", "עכבר"],
-  locksmith: ["lock", "key", "door", "מנעול", "מפתח", "דלת"],
+  locksmith: ["lock", "key", "door", "gate", "remote", "מנעול", "מפתח", "דלת", "שער", "שלט"],
   fire_safety: ["fire", "smoke", "extinguisher", "אש", "עשן", "מטפה"],
-  maintenance: ["maintenance", "תחזוקה"],
+  maintenance: ["maintenance", "damp", "mold", "mould", "gate", "parking", "remote",
+                "תחזוקה", "רטיבות", "עובש", "שער", "חניה", "חניון", "שלט"],
   // Ours, not OXS's (migration 025, 25 Aug): a complaint is a ticket on both
   // channels. The words are what a caller says when asking about one.
   complaint: ["complaint", "noise", "neighbour", "neighbor", "תלונה", "רעש", "שכן", "שכנים"],
@@ -650,6 +703,101 @@ type Match =
   | { status: "ambiguous"; candidates: any[] }
   | { status: "need_number" | "number_off_street"; street: any; numbers: string[] };
 
+// A street in Latin letters can never match: `street_norm` is Hebrew for all
+// 198 buildings. The owner's 22 Sep call sent "herzl 112" and was told the
+// building might not be ours. The hint rides on the street_unknown result so
+// the model tries again in Hebrew inside the call instead of closing it.
+const LATIN_HINT = "The street was given in Latin letters; buildings are known by their Hebrew "
+  + "street names. Call again with the street in Hebrew (Herzl 112 is הרצל 112).";
+function latinStreet(said: unknown): boolean {
+  const s = String(said ?? "");
+  return /[A-Za-z]{3,}/.test(s) && !/[א-ת]/.test(s);
+}
+
+// What the chat model is told when open_request cannot open for want of a
+// building (27 Sep). Until now the refusal was a bare reason code, and the
+// model filled the silence with its own habit: "so that I can open a service
+// call and take care of it, I'll need to know which building -- could you
+// please give me the street name and building number?" -- a clerk's preamble,
+// a promise of work, and no apartment, so the OXS mirror had no reporter to
+// name. This is the point of use, the one place the model reads at the moment
+// it composes that question. English and without a Hebrew sentence in it, so
+// there is nothing to copy; WhatsApp only, because on a call the flat question
+// is the intake agent's own business.
+const ASK_WHERE = "Nothing was opened. Ask for what is missing in one short question: the "
+  + "building (street and number) and, in the same question, the apartment they live in "
+  + "if you do not have it yet. If they answer with the building only, open the ticket "
+  + "with it; do not ask again. Just ask: no reason why you need it, nothing about what "
+  + "you will do with it.";
+
+/**
+ * The reporter's own flat from our records, for a WhatsApp sender who did not
+ * say it (27 Sep, owner: fill it from the records). `reporter_unit` is the only
+ * other source of the flat, and without one the OXS mirror sends no reporter
+ * name -- the owner's test depends on that name.
+ *
+ * Conservative on every axis, because a wrong flat is worse than none:
+ *  - the sender's phone must match a resident (the phone is unique);
+ *  - that resident's building must resolve to the SAME building the ticket
+ *    is being opened in -- a resident reporting a fault elsewhere keeps none;
+ *  - an owner whose unpaid charges span several flats gets none, and so does
+ *    one whose charges disagree with the flat on file: `residents.unit` names
+ *    one flat of possibly several (012), exactly as get_payment_link reads it.
+ *
+ * Returns the row id as well, so the ticket is attached to the person who
+ * wrote rather than to whichever row a building+flat lookup finds first (flat
+ * 2 of the test building has two).
+ */
+async function flatOnFile(phone: string | null, buildingId: string): Promise<{ id: string; unit: string } | null> {
+  if (!phone) return null;
+  const { data: r } = await db.from("residents")
+    .select("id,building,unit").eq("phone", phone).maybeSingle();
+  const unit = unitOf(r?.unit);
+  if (!r || !unit || !r.building) return null;
+  const mm = await matchBuilding(r.building);
+  if (mm.status !== "found" || String(mm.building.id) !== buildingId) return null;
+  const { data: ch } = await db.from("charges").select("unit")
+    .eq("resident_id", r.id).eq("status", "unpaid");
+  const units = [...new Set((ch ?? []).map((c: any) => String(c.unit ?? "").trim()).filter(Boolean))];
+  if (units.length > 1 || (units.length === 1 && units[0] !== unit)) return null;
+  return { id: String(r.id), unit };
+}
+
+/**
+ * Every resident row on one flat (4 Oct). A flat can carry more than one: the
+ * OXS import writes a row per tenant and the demo scripts add their own, so
+ * flat 2 of the test building has two אסף קליקס, one holding the charges and
+ * one holding nothing. Ten is more than any flat has; the cap only bounds a
+ * bad match.
+ */
+async function flatResidents(building: string, unit: string): Promise<any[]> {
+  const { data } = await db.from("residents").select("id,full_name,building,unit")
+    .eq("building", building).eq("unit", unit).limit(10);
+  return data ?? [];
+}
+
+/**
+ * Of a flat's rows, the one that owes on that flat, else the first (4 Oct).
+ * get_balance used to take whichever row came back first, so a flat with an
+ * empty duplicate could read as owing nothing. One row and never a sum: two
+ * rows of the same person holding the same months would double the figure.
+ */
+async function owingFirst(rows: any[], unit: string): Promise<any | null> {
+  if (rows.length < 2) return rows[0] ?? null;
+  const { data } = await db.from("charges").select("resident_id")
+    .in("resident_id", rows.map((r) => r.id)).eq("unit", unit).eq("status", "unpaid").limit(50);
+  const owing = new Set((data ?? []).map((c: any) => String(c.resident_id)));
+  return rows.find((r) => owing.has(String(r.id))) ?? rows[0];
+}
+
+// 4 Oct: `{found: 0}` on its own was read to a caller as "your balance is zero,
+// everything is in order" (call 01a1065c; the flat owed ₪2,000). Nothing was
+// read, so the answer says so in words. English and with no Hebrew in it, so
+// there is no sentence for the agent to repeat.
+const NO_BALANCE_READ = "No single apartment matched, so no balance was read: this is NOT a "
+  + "zero balance. Say you could not find it, and ask for or check the street, number and "
+  + "apartment with them.";
+
 async function matchBuilding(saidRaw: unknown): Promise<Match> {
   const said = norm(saidRaw);
   if (!said) return { status: "empty" };
@@ -738,27 +886,174 @@ async function matchBuilding(saidRaw: unknown): Promise<Match> {
  * and `availableToTenants` defaults to false — the resident's own record is
  * OUR ticket; the OXS row is for staff.
  */
+/**
+ * WHO may be mirrored, 24 Sep. The owner turned the mirror back on, but for
+ * ONE number: *"from now on i want to open a ticket it should be opened in oxs
+ * as well, for the phone number whenever i send some report using the +63"*.
+ *
+ * So there are two independent gates and both must be open: the function-side
+ * key (`OXS_KEY_REQUESTS`, still pushed only by `--oxs-mirror`) and this
+ * allow-list. An empty or missing list mirrors NOBODY, which is the safe
+ * default and what a plain `--apply` leaves behind.
+ *
+ * The list is an env var rather than a constant so that widening it later is a
+ * secret change and a redeploy of nothing — but widening it is still a decision
+ * about writing into a client's production system, and the 26 Aug rule stands
+ * for every number not named here.
+ *
+ * Compared against the number exactly as WhatsApp gave it, which is the same
+ * form `residents.phone` holds and the only form a foreign number survives in
+ * (phoneOf() accepts Israeli numbers only).
+ */
+function oxsMirrorAllowed(reporter: string | null, type: string | null = null): boolean {
+  const list = (Deno.env.get("OXS_MIRROR_PHONES") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean);
+  if (reporter && list.includes(String(reporter).trim())) return true;
+  // WHAT may be mirrored, 5 Nov: Yariv, in the 4 Nov review, wants every
+  // elevator report opened in OXS itself, classified as elevator, at the
+  // address. `OXS_MIRROR_TYPES` lists the ticket types that go in for ANY
+  // reporter ("elevator"). Unset, which is how it ships, it adds nobody:
+  // switching it on is the same decision as widening the phone list, and it
+  // waits on the owner's go. Test prefixes never qualify, so a probe filing a
+  // test ticket against a real building cannot put a call into OXS.
+  const types = (Deno.env.get("OXS_MIRROR_TYPES") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean);
+  if (!type || !types.includes(String(type))) return false;
+  return !TEST_PREFIXES.some((p) => String(reporter ?? "").startsWith(p));
+}
+
+/**
+ * OXS's own fault categories (`facilityCategory._id`), keyed by our
+ * `requests.type` -- the same twelve labels oxs_requests_sync.py maps the other
+ * way, ids read off the imported calls on 5 Nov (`requests.oxs_category_id`).
+ * Until then every mirrored call landed in OXS with no category at all: the 16
+ * still open there read `facilityCategory: null`, the two elevator ones too.
+ * "payment" and anything else not listed goes in without one, as before.
+ */
+const OXS_CATEGORY: Record<string, string> = {
+  plumbing: "5ef476151729c50d586095da",     // אינסטלציה
+  electrical: "5ef47616a7ab6d0d5a5f8d19",   // חשמל
+  lighting: "5ef47615cb85d70d5bf44136",     // תאורה
+  elevator: "5f8c65e6acdfa15b7cf34a04",     // מעלית
+  cleaning: "5ef476162c45ed0d59ade463",     // ניקיון
+  gardening: "5ef476142c45ed0d59ade462",    // גינון
+  pest_control: "5ef47614a7ab6d0d5a5f8d18", // הדברה
+  locksmith: "5ef476141729c50d586095d9",    // מנעולן
+  fire_safety: "5ef842242c45ed0d59ade464",  // כיבוי אש
+  maintenance: "5d7f4e0eb184c844297aef58",  // אחזקה
+  other: "5f8d5507d5013f3bd712c568",        // אחר
+};
+
+/**
+ * WHO reported it, in the shape OXS's own records use — 24 Sep.
+ *
+ * The August mirror sent a building and a sentence and nothing else, so every
+ * mirrored call showed a reporter of לא ידוע. The owner, looking at one:
+ * *"bro why dont you fill it up?"* — fair, and the fix is not to invent a
+ * format. 44 real service calls were read first: `reportedBy.entity` is
+ * `payer` on 42 of them, `entityId` / `name` / `apartmentNumber` /
+ * `apartmentId` are filled on the same 42, and **`phone` is empty on every
+ * single one**. OXS identifies a reporter by their payer record and keeps the
+ * phone there, so pushing a phone onto the call would be our shape, not
+ * theirs. A round trip (`scripts/check_oxs_mirror.py`) then proved the API
+ * honours `reportedBy` on create, which the old docstring said it would not.
+ *
+ * THE NAME IS ALWAYS THE OXS TENANT'S, NEVER OURS. `residents` can hold two
+ * rows for one flat: an `agent`-sourced demo row (the owner's +63 tester is
+ * carries a placeholder name) and the genuine imported tenant, which is the
+ * only one carrying `oxs_ref`.
+ * Only a row that came FROM OXS may go back TO it, matched on the building and
+ * the flat the reporter actually lives in. The owner asked for exactly this
+ * and asked for it strictly: a report from the tester must read the name of
+ * the tenant that flat actually belongs to, not the name on our demo row.
+ *
+ * Returns null when there is no `oxs`-sourced tenant for the flat, and the
+ * call then goes in without a reporter, as before. A blank reporter is
+ * recoverable; a wrong name in a client's system is not.
+ */
+async function oxsReportedBy(
+  reporterUnit: string | null, building: string | null, buildingOxsId: string,
+) {
+  const unit = String(reporterUnit ?? "").trim();
+  if (!unit || !building) return null;
+  const { data } = await db.from("residents")
+    .select("full_name,oxs_ref")
+    .eq("building", building).eq("unit", unit).eq("source", "oxs")
+    .not("oxs_ref", "is", null).limit(2);
+  // Exactly one, or nobody. Two tenants on a flat is a fact we cannot resolve
+  // from here, and guessing which of them reported is the wrong kind of help.
+  if (!data || data.length !== 1) return null;
+  const out: Record<string, string> = {
+    entity: "payer",
+    entityId: String(data[0].oxs_ref),
+    name: String(data[0].full_name ?? "").trim(),
+    apartmentNumber: unit,
+  };
+  // apartments.id IS the OXS apartment id (016), the same identity
+  // get_payment_link files against. Best-effort: the reporter stands without
+  // it, and 2 of the 44 real calls have no apartmentId either.
+  const { data: flats } = await db.from("apartments")
+    .select("id,number").eq("building_id", buildingOxsId);
+  const hits = (flats ?? []).filter((f: any) => String(f.number ?? "").trim() === unit);
+  if (hits.length === 1) out.apartmentId = String(hits[0].id);
+  return out;
+}
+
 async function oxsMirror(
   buildingOxsId: string, description: string, unit: string | null,
-  reference: string, rowId: string,
+  reference: string, rowId: string, reporter: string | null,
+  reporterUnit: string | null, building: string | null,
+  reporterName: string | null = null, callback: string | null = null,
+  type: string | null = null,
 ) {
   const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
   if (!key) return; // not configured: the mirror is off, the ticket is fine
+  // Not on the allow-list: our ticket stands, OXS never hears about it. Silent
+  // by design -- this is the ordinary path for every real resident.
+  if (!oxsMirrorAllowed(reporter, type)) return;
+  // Never fatal: a reporter we cannot resolve costs a name on the call, not
+  // the call. The resident already holds the reference by the time we are here.
+  let by: Record<string, string> | null = null;
   try {
-    const r = await fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
+    by = await oxsReportedBy(reporterUnit, building, buildingOxsId);
+  } catch (err) {
+    console.error("oxs reporter lookup failed", String(err).slice(0, 120));
+  }
+  const category = OXS_CATEGORY[String(type ?? "")] ?? null;
+  const post = (withCategory: boolean) =>
+    fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
       method: "POST",
       headers: { "x-api-key": key, "content-type": "application/json" },
       body: JSON.stringify({
         buildingId: buildingOxsId,
+        // Both shapes, because the API accepts the nested one and reads it
+        // back nested; the flat copy is harmless and survives a spec change.
+        ...(by ? { reportedBy: by, serviceCallData: { reportedBy: by } } : {}),
+        // Their category, so the call lands classified (Yariv, 4 Nov: "open
+        // it in OXS, classify it as elevator, at this address"). The spec
+        // lists only buildingId, apartmentId and description, as it once
+        // listed no reportedBy either, which the API honours.
+        ...(withCategory && category ? { facilityCategory: category } : {}),
         // Staff-facing, so it carries what a dispatcher needs at a glance:
         // the fault, the flat when the fault is in one, and our reference so
         // the two systems can be joined by a human as well as by oxs_ref.
         description: description
           + (unit ? ` (דירה ${unit})` : "")
-          + ` [בוט, סימוכין ${reference}]`,
+          + ` [בוט, סימוכין ${reference}]`
+          + reporterLine(reporterName, callback),
       }),
     });
-    const d = await r.json().catch(() => null);
+  try {
+    let r = await post(true);
+    let d = await r.json().catch(() => null);
+    // A category OXS will not take must never cost the call itself: filed
+    // again without it, which is exactly the call the mirror made before.
+    if (category && !(d?.status === 1 && d?.data?._id)) {
+      console.error("oxs mirror refused the category, filing without it",
+                    r.status, JSON.stringify(d).slice(0, 160));
+      r = await post(false);
+      d = await r.json().catch(() => null);
+    }
     const oxsId = d?.data?._id;
     if (d?.status === 1 && oxsId) {
       await db.from("requests").update({ oxs_ref: String(oxsId) }).eq("id", rowId);
@@ -797,6 +1092,24 @@ function dialled(ctx: CallContext): boolean {
   return Boolean(ctx.residentId || ctx.charges.length);
 }
 
+/** The one full name on file for a number (30 Oct): the resident rows that carry
+ *  it, as the bot's `Who is writing?` reads them. Two different names on one
+ *  number is no answer, and the sender is asked. */
+async function nameOnFile(phone: string | null): Promise<string | null> {
+  if (!phone) return null;
+  const { data } = await db.from("residents").select("full_name").eq("phone", phone);
+  const names = [...new Set((data ?? []).map((r: any) => reporterNameOf(r.full_name)).filter(Boolean))];
+  return names.length === 1 ? String(names[0]) : null;
+}
+
+/** The name on the resident row of a call we placed (feature 17): the debt
+ *  agent's ticket carries the person it rang, and nobody is asked. */
+async function residentName(id: string | null): Promise<string | null> {
+  if (!id) return null;
+  const { data } = await db.from("residents").select("full_name").eq("id", id).maybeSingle();
+  return reporterNameOf(data?.full_name);
+}
+
 // ---------------------------------------------------------------------------
 // The voice team note (14 Sep)
 // ---------------------------------------------------------------------------
@@ -826,7 +1139,18 @@ const INTAKE_ASSISTANT_DEMO = "827bfddd-05cc-417b-99f5-17eec76528e6";
 // 20 Sep: the ninth account. Same rule -- it JOINS the set, so every
 // account that still holds an intake assistant keeps paging the team.
 const INTAKE_ASSISTANT_DEMO9 = "4cbbcbe7-3e5e-4bd8-b4b3-024bd56f7187";
-const INTAKE_ASSISTANT_IDS = new Set([INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO, INTAKE_ASSISTANT_DEMO9]);
+// 4 Oct: the tenth account (the ninth's wallet at -$0.17), a one-to-one copy.
+const INTAKE_ASSISTANT_DEMO10 = "00d91473-1aaa-4a57-a380-ca5bb2b7f1af";
+// 23 Oct: Yariv's own account (the client's), on the owner's word; the tenth's wallet
+// was at -$0.16. A one-to-one copy by vapi_transfer.py.
+const INTAKE_ASSISTANT_YARIV = "10ae859a-f764-4b38-9154-cd8e82eb3a27";
+// The debt agent on the same account. Only the 208 line's router names it
+// (feature 18); an account move changes it here beside the intake id.
+const DEBT_ASSISTANT_YARIV = "4bc03b57-018c-41bc-9c80-1b912b55496c";
+const INTAKE_ASSISTANT_IDS = new Set([
+  INTAKE_ASSISTANT_ID, INTAKE_ASSISTANT_DEMO, INTAKE_ASSISTANT_DEMO9, INTAKE_ASSISTANT_DEMO10,
+  INTAKE_ASSISTANT_YARIV,
+]);
 
 function isIntake(ctx: CallContext): boolean {
   // The assistant id, and nothing else. A "voice and not dialled" fallback
@@ -907,37 +1231,32 @@ function saidTeamKnows(botText: string): boolean {
   return (SAID_TOLD.test(t) && SAID_TEAM.test(t)) || SAID_KNOWS.test(t) || SAID_PROMISED.test(t);
 }
 
-/**
- * A phone number as it is stored, or nothing.
- *
- * `residents.phone` is E.164 (+972501234567) everywhere — the seed writes it
- * that way and every OXS importer normalises to it. A person typing their own
- * number into WhatsApp does not: they write 050-123-4567, or 0501234567, or
- * paste it back with the country code. Comparing those to the column as typed
- * fails on a number that is genuinely theirs, and a security check that rejects
- * the honest case is a security check nobody keeps.
- *
- * Deliberately conservative about what it accepts. Anything that does not land
- * on a plausible Israeli number returns null and is treated as *not given* —
- * the caller is asked again rather than matched loosely.
- */
-function phoneOf(value: unknown): string | null {
-  const digits = String(value ?? "").replace(/\D+/g, "");
-  if (!digits) return null;
-  // With the country code, however it was written: +972-50…, 00972 50…, 972…
-  if (digits.startsWith("00972")) return e164(digits.slice(5));
-  if (digits.startsWith("972")) return e164(digits.slice(3));
-  // Local form, with the trunk zero.
-  if (digits.startsWith("0")) return e164(digits.slice(1));
-  // A mobile with the leading zero left off — 50 1234567.
-  if (/^5\d{8}$/.test(digits)) return e164(digits);
-  return null;
-}
+// phoneOf() and e164() moved to ./identity.ts on 22 Oct (feature 17), unchanged.
 
-function e164(national: string): string | null {
-  const n = national.replace(/^0+/, "");
-  // Israeli national numbers are 8 (landline) or 9 (mobile) digits.
-  return n.length === 8 || n.length === 9 ? "+972" + n : null;
+/**
+ * The number a WhatsApp resident TYPES for the balance check: phoneOf(), plus a
+ * foreign number written with its country code ("+63 917…", "0063 917…", or
+ * 11-15 digits that are not Israeli), in the form `residents.phone` holds one:
+ * "+" and the digits, as WhatsApp gives it. A foreign number in its local form
+ * ("0917…") is not guessed at.
+ *
+ * 5 Oct (the owner: *"B make it type the number"*): the typed check stays, and
+ * a foreign number now passes it. Assaf Clix, on the owner's +63 handset, could
+ * never get his balance, even typing his number exactly: phoneOf() turned it
+ * into null, and null reads as "not given". Only get_balance uses this; every
+ * other caller of phoneOf() -- the voice agents, the ticket's reporter, the OXS
+ * mirror's gate -- is unchanged.
+ */
+function typedPhoneOf(value: unknown): string | null {
+  const own = phoneOf(value);
+  if (own) return own;
+  const raw = String(value ?? "").trim();
+  const digits = raw.replace(/\D+/g, "");
+  if (raw.startsWith("+") || digits.startsWith("00")) {
+    const intl = digits.replace(/^00/, "");
+    return /^[1-9]\d{7,14}$/.test(intl) ? "+" + intl : null;
+  }
+  return /^[1-9]\d{10,14}$/.test(digits) ? "+" + digits : null;
 }
 
 /**
@@ -1041,7 +1360,7 @@ const SERVICES: Topic[] = [
       "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
       "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
       "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
-      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים.",
+      "מול ספקים חיצוניים הומי'ז מתנהלת, ולא הדיירים.",
     ],
   },
   {
@@ -1049,7 +1368,7 @@ const SERVICES: Topic[] = [
     title: "אב בית",
     words: ["אב בית", "אבבית", "אב הבית", "טכנאי הבניין", "נציג בבניין"],
     facts: [
-      "לכל בניין בניהול הומיז מוצמד אב בית, בעל רקע טכני, שמגיע בתדירות שסוכמה עם הבניין.",
+      "לכל בניין בניהול הומי'ז מוצמד אב בית, בעל רקע טכני, שמגיע בתדירות שסוכמה עם הבניין.",
       "בביקור הוא בודק את התאורה בבניין ואת המערכות, ומכוון את שעוני החשמל.",
       "הוא מטפל בתקלות ובפניות של דיירים, ומפקח על עבודת אנשי הניקיון מול המפרט שסוכם.",
       "תיקונים קטנים שהוא עושה: החלפת נורות וגופי תאורה, כיוון ותיקון דלתות, החלפת ידיות וצילינדרים, ניקוי תעלות מרזבים.",
@@ -1146,7 +1465,7 @@ const SERVICES: Topic[] = [
     title: "גינון",
     words: ["גינון", "גינה", "גנן", "עצים", "דשא", "השקיה"],
     facts: [
-      "צוות הגננים עובד לצד צוות הניקיון ברוב הבניינים שהומיז מנהלת.",
+      "צוות הגננים עובד לצד צוות הניקיון ברוב הבניינים שהומי'ז מנהלת.",
       "אופי הגינון נקבע מול הבניין; מה שמובטח זה גינה מטופחת שמקבלת את הטיפולים שלה בזמן.",
     ],
   },
@@ -1155,7 +1474,7 @@ const SERVICES: Topic[] = [
     title: "שיפוצים",
     words: ["שיפוץ", "שיפוצים", "לשפץ", "ריצוף", "צביעה", "גבס", "איטום"],
     facts: [
-      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "הומי'ז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
       "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות.",
     ],
   },
@@ -1173,17 +1492,17 @@ const SERVICES: Topic[] = [
     title: "ניהול דירות לתקופות קצרות",
     words: ["איירbnb", "airbnb", "booking", "טווח קצר", "תקופות קצרות", "נופש", "תיירים"],
     facts: [
-      "הומיז מנהלת דירות להשכרה קצרה בפלטפורמות כמו Airbnb ו-Booking: פתיחת הפרופיל, יומן ההזמנות, כניסה ויציאה של אורחים, הכנת הדירה ותחזוקה שוטפת.",
+      "הומי'ז מנהלת דירות להשכרה קצרה בפלטפורמות כמו Airbnb ו-Booking: פתיחת הפרופיל, יומן ההזמנות, כניסה ויציאה של אורחים, הכנת הדירה ותחזוקה שוטפת.",
       "גם זה שירות לבעלי נכסים, ונרשם לצוות.",
     ],
   },
   {
     id: "areas",
-    title: "איפה הומיז פועלת",
+    title: "איפה הומי'ז פועלת",
     words: ["איפה אתם", "אזורים", "ערים", "רמת גן", "תל אביב", "הרצליה", "רמת השרון", "גבעתיים", "מרכז הארץ"],
     facts: [
-      "הומיז מנהלת בניינים במרכז הארץ, בין השאר ברמת גן, תל אביב, גבעתיים, הרצליה ורמת השרון.",
-      "אילו בניינים בדיוק בניהול הומיז אתה לא יודע, ואת זה בודקים מול הצוות או לפי הכתובת כשפותחים קריאה.",
+      "הומי'ז מנהלת בניינים במרכז הארץ, בין השאר ברמת גן, תל אביב, גבעתיים, הרצליה ורמת השרון.",
+      "אילו בניינים בדיוק בניהול הומי'ז אתה לא יודע, ואת זה בודקים מול הצוות או לפי הכתובת כשפותחים קריאה.",
     ],
   },
 ];
@@ -1369,7 +1688,57 @@ async function whatsappLine(f: {
   }
 }
 
-type Delivery = { sent: true; conversationId: number } | { sent: false; reason: string };
+type Delivery = { sent: true; conversationId: number } | { sent: false; reason: string; conversationId?: number };
+
+/** The inbox's APPROVED templates, by name. One call; the caller decides when. */
+type Synced = { namespace: string; body: string; category: string; language: string };
+async function syncedTemplates(admin: string): Promise<Record<string, Synced>> {
+  const ib = await cw(admin, "GET", `/inboxes/${WA_INBOX_ID}`);
+  const out: Record<string, Synced> = {};
+  for (const t of (ib.j?.message_templates ?? [])) {
+    if (String(t?.status ?? "").toUpperCase() !== "APPROVED") continue;
+    const body = (t?.components ?? []).find((c: any) => c?.type === "BODY")?.text ?? "";
+    out[String(t.name)] = {
+      namespace: String(t.namespace ?? ""), body,
+      category: String(t.category ?? "UTILITY"), language: String(t.language ?? "he"),
+    };
+  }
+  return out;
+}
+
+/**
+ * One Meta template into an existing conversation, and the truth about whether
+ * Meta took it. Chatwoot sends a template when the message carries
+ * `template_params`; `content` is the filled-in text for the inbox's own
+ * record. The BOT token posts, so the chat workflow sees `agent_bot`. Meta's
+ * refusal arrives asynchronously, so the message is read back after 1.5 s --
+ * the same shape `whatsappDeliver` uses for free text.
+ *
+ * Extracted from `send_ticket_notices` on 23 Sep when the debt call's payment
+ * link needed the same thing. Nothing here logs the text or a link: a template
+ * parameter can BE the link (`payment_link_he`), so the reason is logged and
+ * the params never are.
+ */
+async function sendTemplate(
+  admin: string, bot: string, convId: number, name: string,
+  t: Synced, params: Record<string, string>,
+): Promise<{ sent: true; messageId: number } | { sent: false; reason: string }> {
+  const content = t.body.replace(/\{\{(\d+)\}\}/g, (_m, k) => params[k] ?? "");
+  const m = await cw(bot, "POST", `/conversations/${convId}/messages`, {
+    content, message_type: "outgoing", private: false,
+    template_params: { name, category: t.category, language: t.language,
+      namespace: t.namespace, processed_params: params },
+  });
+  const msgId = m.j?.id ?? null;
+  if (m.status >= 300 || !msgId) return { sent: false, reason: "post_refused_" + m.status };
+  await new Promise((r) => setTimeout(r, 1500));
+  const back = await cw(admin, "GET", `/conversations/${convId}/messages`);
+  const mine = (back.j?.payload ?? []).find((x: any) => x?.id === msgId);
+  if (String(mine?.status ?? "") === "failed") {
+    return { sent: false, reason: String(mine?.content_attributes?.external_error ?? "meta_failed").slice(0, 200) };
+  }
+  return { sent: true, messageId: msgId };
+}
 
 /**
  * A WhatsApp message to a resident, through Chatwoot, the way the chat bot's
@@ -1380,8 +1749,10 @@ type Delivery = { sent: true; conversationId: number } | { sent: false; reason: 
  * a human takeover (a message from a user would). Meta accepts free-form text
  * only inside 24 hours of the resident's last message; Chatwoot learns that
  * asynchronously and marks the message `failed`, so the status is read back
- * after a moment and reported as `outside_window`. The template is the fix,
- * later. Nothing here logs the text or the link: status, ids, last digits.
+ * after a moment and reported as `outside_window` -- with the conversation id,
+ * because the caller's answer to that is a template into the same
+ * conversation (`send_payment_link`, 23 Sep; `sendTemplate` above).
+ * Nothing here logs the text or the link: status, ids, last digits.
  */
 /** One Chatwoot call: the token decides who is speaking (admin or the bot). */
 async function cw(token: string, method: string, path: string, body?: unknown) {
@@ -1460,7 +1831,10 @@ async function whatsappDeliver(toE164: string, name: string, text: string): Prom
     if (String(mine?.status ?? "") === "failed") {
       console.error("whatsapp delivery: failed", convId,
         String(mine?.content_attributes?.external_error ?? "").slice(0, 80));
-      return { sent: false, reason: "outside_window" };
+      // The conversation rides along: the caller may want to try a template
+      // into the same conversation, and looking the contact up again would be
+      // three more Chatwoot calls while the resident is on the line.
+      return { sent: false, reason: "outside_window", conversationId: convId };
     }
     console.log("whatsapp delivery: sent", convId, last4);
     return { sent: true, conversationId: convId };
@@ -1468,6 +1842,187 @@ async function whatsappDeliver(toE164: string, name: string, text: string): Prom
     console.error("whatsapp delivery: error", String(e).slice(0, 120));
     return { sent: false, reason: "unavailable" };
   }
+}
+
+// ---------------------------------------------------------------------------
+// WhatsApp through UChat (feature 21, 3 Nov evening)
+// ---------------------------------------------------------------------------
+// The owner counts the bot as moved to UChat, and asked for the rest to follow
+// ("lets connect everything in the uchat?"). With WHATSAPP_VIA=uchat the debt
+// call's link and the "done" notice leave from the UChat number, through
+// UChat's API; unset or "chatwoot" keeps the Chatwoot path above. A setting, so
+// going back is not a deploy.
+//
+// The same two moves as Chatwoot's: free text inside 24 hours of the resident's
+// last message, a Meta template outside them. UChat accepts a message it cannot
+// deliver, so delivery is read back: a message WhatsApp took carries WhatsApp's
+// own id (`mid`, "wamid..."); one without it was refused (3 Nov). Everything is
+// sent as the BOT: UChat pauses the bot for 30 minutes after an agent's message.
+// The template must be in UChat's synced list, which follows the UChat number's
+// own WhatsApp account (3 Nov: it held no templates yet), so a notice waits as
+// `template_not_synced`, exactly as it does on Chatwoot.
+const UCHAT_API = "https://www.uchat.com.au/api";
+const viaUchat = () => (Deno.env.get("WHATSAPP_VIA") ?? "").trim().toLowerCase() === "uchat";
+
+async function uc(method: string, path: string, body?: unknown) {
+  const res = await fetch(UCHAT_API + path, {
+    method,
+    headers: {
+      Authorization: "Bearer " + (Deno.env.get("UCHAT_API_KEY") ?? ""),
+      "Content-Type": "application/json", Accept: "application/json",
+      // UChat's Cloudflare refuses some default user agents (error 1010); curl's passes.
+      "User-Agent": "curl/8.9.1",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(8000),
+  });
+  return { status: res.status, j: await res.json().catch(() => null) as any };
+}
+
+/** The resident's contact on the UChat number, by phone; null if they never wrote to it. */
+async function uchatContact(toE164: string): Promise<{ ns: string; id: number; lastIn: number } | null> {
+  const digits = toE164.replace(/\D+/g, "");
+  const r = await uc("GET", "/subscriber/get-info-by-user-id?user_id=" + encodeURIComponent(digits));
+  const s = r.j?.data;
+  if (r.status >= 300 || !s?.user_ns) return null;
+  // UChat writes "YYYY-MM-DD HH:MM:SS" in UTC; `last_interaction` is their last message.
+  const t = Date.parse(String(s.last_interaction ?? "").replace(" ", "T") + "Z");
+  return {
+    ns: String(s.user_ns),
+    id: Number(String(s.user_ns).match(/u(\d+)$/)?.[1] ?? 0),
+    lastIn: Number.isFinite(t) ? t : 0,
+  };
+}
+
+/** Did WhatsApp take what we just sent? A bot message since `after` carries `mid` when it did. */
+async function uchatDelivered(ns: string, after: number): Promise<boolean> {
+  await new Promise((r) => setTimeout(r, 2000));
+  const r = await uc("GET", "/subscriber/chat-messages?user_ns=" + encodeURIComponent(ns) + "&include_bot=1&limit=5");
+  return (r.j?.data ?? []).some((m: any) =>
+    m?.type !== "in" && Number(m?.ts ?? 0) >= after / 1000 - 5 && String(m?.mid ?? "").length > 0);
+}
+
+async function uchatDeliver(toE164: string, text: string): Promise<Delivery> {
+  if (!Deno.env.get("UCHAT_API_KEY")) {
+    console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
+    return { sent: false, reason: "unavailable" };
+  }
+  const last4 = toE164.replace(/\D+/g, "").slice(-4);
+  try {
+    const c = await uchatContact(toE164);
+    // No contact: they never wrote to the number, so the window is shut.
+    if (!c || Date.now() - c.lastIn > 24 * 3600 * 1000) {
+      return { sent: false, reason: "outside_window", conversationId: c?.id ?? 0 };
+    }
+    const t0 = Date.now();
+    const m = await uc("POST", "/subscriber/send-content", { user_ns: c.ns, send_as_agent: 0,
+      data: { version: "v1", content: { messages: [{ type: "text", text }] } } });
+    if (m.status >= 300 || m.j?.status === "error") {
+      console.error("whatsapp delivery (uchat): post refused", m.status, last4);
+      return { sent: false, reason: "not_sent" };
+    }
+    if (!(await uchatDelivered(c.ns, t0))) {
+      console.error("whatsapp delivery (uchat): no WhatsApp id", c.id, last4);
+      return { sent: false, reason: "outside_window", conversationId: c.id };
+    }
+    console.log("whatsapp delivery (uchat): sent", c.id, last4);
+    return { sent: true, conversationId: c.id };
+  } catch (e) {
+    console.error("whatsapp delivery (uchat): error", String(e).slice(0, 120));
+    return { sent: false, reason: "unavailable" };
+  }
+}
+
+/**
+ * send_ticket_notices with WHATSAPP_VIA=uchat: the same outbox, the same rules
+ * (a test prefix is skipped, a template UChat has not synced leaves the row
+ * pending, a refusal marks it failed with the reason), sent from the UChat
+ * number. `conversation_id` holds the UChat contact's number.
+ */
+// The column is a 32-bit integer (036); UChat's contact numbers are 10 digits
+// and still under the limit on 3 Nov. One past it is left blank, not a failed write.
+const asInt = (n?: number) => (n && n > 0 && n <= 2147483647 ? n : null);
+
+async function ticketNoticesViaUchat(args: any) {
+  if (!Deno.env.get("UCHAT_API_KEY")) return { ok: false, error: "uchat key unset" };
+  const limit = Math.min(Math.max(Number(args?.limit) || 20, 1), 100);
+  const { data: rows, error } = await db.from("ticket_notices")
+    .select("id,phone,template,params,attempts")
+    .eq("status", "pending").lt("attempts", 5)
+    .order("created_at", { ascending: true }).limit(limit);
+  if (error) return { ok: false, error: error.message };
+  const out = { ok: true, via: "uchat", sent: 0, failed: 0, skipped: 0, waiting: 0 };
+  if (!rows?.length) return out;
+  const synced = await uchatTemplates();
+  for (const n of rows) {
+    const last4 = String(n.phone).replace(/\D+/g, "").slice(-4);
+    const mark = (patch: Record<string, unknown>) => db.from("ticket_notices").update(patch).eq("id", n.id);
+    if (TEST_PREFIXES.some((p) => String(n.phone).startsWith(p))) {
+      await mark({ status: "skipped", error: "test_number" });
+      out.skipped++;
+      continue;
+    }
+    const t = synced[String(n.template)];
+    if (!t) {
+      await mark({ error: "template_not_synced" });
+      out.waiting++;
+      continue;
+    }
+    try {
+      const r = await uchatTemplate(String(n.phone), String(n.template), t, n.params ?? {});
+      if (!r.sent) {
+        await mark({ status: "failed", error: r.reason, attempts: n.attempts + 1, conversation_id: asInt(r.contactId) });
+        console.error("ticket notice failed (uchat)", last4, r.reason.slice(0, 80));
+        out.failed++;
+        continue;
+      }
+      await mark({ status: "sent", error: null, attempts: n.attempts + 1, conversation_id: asInt(r.contactId),
+                   sent_at: new Date().toISOString() });
+      console.log("ticket notice sent (uchat)", r.contactId, last4);
+      out.sent++;
+    } catch (e) {
+      await mark({ status: "failed", error: String(e).slice(0, 200), attempts: n.attempts + 1 });
+      out.failed++;
+    }
+  }
+  return out;
+}
+
+/** UChat's synced copies of the Meta templates, by name. One call; the caller decides when. */
+type UchatTemplate = { namespace: string; lang: string };
+async function uchatTemplates(): Promise<Record<string, UchatTemplate>> {
+  const r = await uc("POST", "/whatsapp-template/list?limit=100");
+  const out: Record<string, UchatTemplate> = {};
+  for (const t of (r.j?.data ?? [])) {
+    if (!t?.name) continue;
+    const status = String(t.status ?? "APPROVED").toUpperCase();
+    if (status !== "APPROVED") continue;
+    out[String(t.name)] = { namespace: String(t.namespace ?? ""), lang: String(t.lang ?? t.language ?? "he") };
+  }
+  return out;
+}
+
+/**
+ * One template to a phone through UChat, which makes the contact when there is
+ * none (a template needs no earlier message). Params are Chatwoot's
+ * {"1": ..., "2": ...}, the body's numbered places, as UChat's BODY_{{n}}.
+ * Never logs a param: one can BE the payment link.
+ */
+async function uchatTemplate(
+  toE164: string, name: string, t: UchatTemplate, params: Record<string, string>,
+): Promise<{ sent: true; contactId: number } | { sent: false; reason: string; contactId?: number }> {
+  const p: Record<string, string> = {};
+  for (const [k, v] of Object.entries(params)) p[`BODY_{{${k}}}`] = String(v);
+  const t0 = Date.now();
+  const r = await uc("POST", "/subscriber/send-whatsapp-template-by-user-id", {
+    user_id: toE164.replace(/\D+/g, ""), create_if_not_found: "yes",
+    content: { namespace: t.namespace, name, lang: t.lang, params: p },
+  });
+  if (r.status >= 300 || r.j?.status === "error") return { sent: false, reason: "post_refused_" + r.status };
+  const c = await uchatContact(toE164);
+  if (!c) return { sent: false, reason: "no_contact" };
+  if (!(await uchatDelivered(c.ns, t0))) return { sent: false, reason: "no_whatsapp_id", contactId: c.id };
+  return { sent: true, contactId: c.id };
 }
 
 // ---------------------------------------------------------------------------
@@ -1502,8 +2057,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
   async send_payment_link(args, ctx) {
     const t = targets(ctx, args);
     if (!t.ok) return { ok: false, error: t.error };
-    const OFFICE = "The link was not sent. Say the office will send it and give the office number; do not say why.";
-    const miss = (reason: string) => ({ ok: true, sent: false, reason, note: OFFICE });
+    const OFFICE = "The link was not sent. Say the office will send it, give the office number and, when the "
+      + "result carries one, the request number (reference); do not say why it was not sent.";
+    const miss = (reason: string, extra: Record<string, unknown> = {}) =>
+      ({ ok: true, sent: false, reason, note: OFFICE, ...extra });
 
     const units = [...new Set(t.charges.map((c) => String(c.unit ?? "").trim()).filter(Boolean))];
     if (units.length > 1) {
@@ -1547,11 +2104,79 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (error) console.error("payment link row failed", error.message);
     };
 
+    // 22 Sep, owner: "we need to open a ticket as well but if it sent to the
+    // whatsapp make the ticket status resolved". The resident said yes to a
+    // link, so the office gets a request either way: RESOLVED when the link
+    // reached WhatsApp -- the record of what was sent -- and OPEN when it did
+    // not, with the reason in Hebrew: the job of sending it by hand. Until
+    // this existed, "the office will send it" was a sentence nobody heard;
+    // the only trace was a payment_links row marked outside_window (his own
+    // call, 22 Sep 14:27). Voice-opened, so migration 036's done-template
+    // trigger never fires on it. A failed insert is logged, not thrown: by
+    // then the link itself has already gone or not, and the resident is on
+    // the line. Not filed for test numbers or when the agent has to ask
+    // again (several apartments, no resident) -- nothing was agreed yet.
+    const fileTicket = async (sent: boolean, why: string | null): Promise<{ reference?: string }> => {
+      const what = `${monthsHe(periods).join(", ") || "ועד הבית"}, ${amount} ₪, דירה ${unit || "?"}`;
+      const description = sent
+        ? `קישור לתשלום ועד הבית נשלח לדייר בוואטסאפ במהלך השיחה (${what}).`
+        : `הדייר הסכים בשיחה לקבל קישור לתשלום ועד הבית (${what}) והקישור לא נשלח: ` +
+          `${LINK_MISS_HE[why ?? ""] ?? (why || "סיבה לא ידועה")}. יש לשלוח לו את הקישור.`;
+      const { data: t, error } = await db.from("requests").insert({
+        resident_id: r.id,
+        interaction_id: iid,
+        type: "payment",
+        description,
+        building: r.building ?? null,
+        unit: unit || null,
+        reported_unit: unit || null,
+        reported_by_phone: String(r.phone),
+        urgency: "normal",
+        opened_via: channel(ctx),
+        status: sent ? "resolved" : "open",
+      }).select("id,reference").single();
+      if (error || !t?.reference) {
+        console.error("payment link ticket failed", error?.message ?? "no reference", last4);
+        return {};
+      }
+      console.log("payment link ticket", sent ? "resolved" : "open", t.reference, last4);
+
+      // Into OXS as well, on the same two gates as open_request -- 27 Sep, the
+      // owner: *"when i open a ticket it should be put inside in oxs"*. Five of
+      // the seven tickets raised from the allow-listed tester came through HERE
+      // and not one of them reached OXS: only open_request knew how to mirror,
+      // so the mirror read as broken when it was merely absent from this path.
+      //
+      // ONLY THE OPEN ONE, and this is a decision rather than an oversight.
+      // `sent` files a RESOLVED row -- the link is already on the resident's
+      // phone and there is nothing for a dispatcher to do. OXS has no status on
+      // create, so mirroring that row would put a finished job into their queue,
+      // which is the noise that got the mirror switched off on 26 Aug. The open
+      // row is the opposite: it exists precisely because a person has to send
+      // the link by hand.
+      //
+      // The address comes back from matchBuilding rather than from `r.building`
+      // so the id and the string are one lookup and cannot disagree --
+      // oxsReportedBy() matches the reporter on that exact string, and a
+      // near-miss there costs the name on the call.
+      if (!sent) {
+        const m = await matchBuilding(r.building);
+        if (m.status === "found") {
+          await oxsMirror(String(m.building.id), description, unit || null,
+                          String(t.reference), String(t.id), String(r.phone),
+                          unit || null, String(m.building.address));
+        } else {
+          console.log("payment link ticket not mirrored: building", m.status, t.reference);
+        }
+      }
+      return { reference: String(t.reference) };
+    };
+
     const got = await oxsLinkFor(r, unit);
     if (!got.ok) {
       row.note = got.reason;
       await record();
-      return miss(got.reason);
+      return withSpoken(miss(got.reason, await fileTicket(false, got.reason)));
     }
     row.apartment_id = got.apartmentId;
     row.payer_id = got.payerId;
@@ -1566,12 +2191,69 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
       building: r.building ?? "", unit, months: monthsHe(periods), amount,
     });
-    const d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), (line ? line + "\n" : "") + got.link);
+    const linkText = (line ? line + "\n" : "") + got.link;
+    let d = viaUchat()
+      ? await uchatDeliver(String(r.phone), linkText)
+      : await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), linkText);
+
+    // 23 Sep: a debt call is OUTBOUND -- we ring someone who has not written to
+    // us -- so Meta's 24-hour window is shut by default and the free-text link
+    // above is refused (`outside_window`). That was the normal case for this
+    // agent, not an edge case: the owner's own 22 Sep call ended with "the
+    // office will send it". A Meta template is allowed to cross that window, so
+    // the link goes again as `payment_link_he` into the same conversation, and
+    // from here on the call behaves exactly as if the first message had landed.
+    // Only for outside_window: `no_contact` and `no_conversation` mean there is
+    // nowhere to send anything, and a template does not create a conversation.
+    let viaTemplate = false;
+    const linkParams = {
+      "1": monthsHe(periods).join(", ") || "ועד הבית",
+      "2": String(amount),
+      "3": got.link,
+    };
+    // Through UChat a template needs no conversation first: UChat makes the
+    // contact, so a resident who never wrote to the number can still get it.
+    if (viaUchat() && !d.sent && d.reason === "outside_window") {
+      const ut = (await uchatTemplates())[PAYMENT_TEMPLATE];
+      if (!ut) {
+        console.warn("payment link template not synced (uchat)", PAYMENT_TEMPLATE, last4);
+      } else {
+        const sent = await uchatTemplate(String(r.phone), PAYMENT_TEMPLATE, ut, linkParams);
+        if (sent.sent) {
+          viaTemplate = true;
+          d = { sent: true, conversationId: sent.contactId };
+          console.log("payment link sent as template (uchat)", sent.contactId, last4);
+        } else {
+          console.error("payment link template refused (uchat)", last4, sent.reason.slice(0, 80));
+        }
+      }
+    }
+    const shut = !viaUchat() && !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
+    if (shut) {
+      const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
+      const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
+      const t = admin && bot ? (await syncedTemplates(admin))[PAYMENT_TEMPLATE] : undefined;
+      if (!t) {
+        console.warn("payment link template not synced", PAYMENT_TEMPLATE, last4);
+      } else {
+        const sent = await sendTemplate(admin, bot, shut, PAYMENT_TEMPLATE, t, linkParams);
+        if (sent.sent) {
+          viaTemplate = true;
+          d = { sent: true, conversationId: shut };
+          console.log("payment link sent as template", shut, last4);
+        } else {
+          console.error("payment link template refused", shut, last4, sent.reason.slice(0, 80));
+        }
+      }
+    }
     row.status = d.sent ? "sent" : "requested";
-    row.note = d.sent ? "whatsapp" : d.reason;
+    row.note = d.sent ? (viaTemplate ? "whatsapp_template" : "whatsapp") : d.reason;
     await record();
-    if (!d.sent) return miss(d.reason);
-    return { ok: true, sent: true, to_last4: last4 };
+    const filed = await fileTicket(d.sent, d.sent ? null : d.reason);
+    if (!d.sent) return withSpoken(miss(d.reason, filed));
+    // The reference is the office's record of a link that went; the agent is
+    // not asked to read it out, so no spoken form is attached here.
+    return { ok: true, sent: true, to_last4: last4, ...filed };
   },
 
   /**
@@ -1592,6 +2274,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * text: counts and last digits.
    */
   async send_ticket_notices(args, _ctx) {
+    if (viaUchat()) return await ticketNoticesViaUchat(args);
     const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
     const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
     if (!admin || !bot) return { ok: false, error: "chatwoot tokens unset" };
@@ -1604,14 +2287,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const out = { ok: true, sent: 0, failed: 0, skipped: 0, waiting: 0 };
     if (!rows?.length) return out;
 
-    // The inbox's synced templates, once per drain: name -> {namespace, body}.
-    const ib = await cw(admin, "GET", `/inboxes/${WA_INBOX_ID}`);
-    const synced: Record<string, { namespace: string; body: string; category: string; language: string }> = {};
-    for (const t of (ib.j?.message_templates ?? [])) {
-      if (String(t?.status ?? "").toUpperCase() !== "APPROVED") continue;
-      const body = (t?.components ?? []).find((c: any) => c?.type === "BODY")?.text ?? "";
-      synced[String(t.name)] = { namespace: String(t.namespace ?? ""), body, category: String(t.category ?? "UTILITY"), language: String(t.language ?? "he") };
-    }
+    // The inbox's synced templates, once per drain rather than once per row.
+    const synced = await syncedTemplates(admin);
 
     for (const n of rows) {
       const last4 = String(n.phone).replace(/\D+/g, "").slice(-4);
@@ -1628,7 +2305,6 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         continue;
       }
       const params: Record<string, string> = n.params ?? {};
-      const content = t.body.replace(/\{\{(\d+)\}\}/g, (_m, k) => params[k] ?? "");
       try {
         const conv = await chatwootConversationFor(admin, String(n.phone), "");
         if (!conv.ok) {
@@ -1636,24 +2312,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           out.failed++;
           continue;
         }
-        const m = await cw(bot, "POST", `/conversations/${conv.convId}/messages`, {
-          content, message_type: "outgoing", private: false,
-          template_params: { name: n.template, category: t.category, language: t.language,
-            namespace: t.namespace, processed_params: params },
-        });
-        const msgId = m.j?.id ?? null;
-        if (m.status >= 300 || !msgId) {
-          await mark({ status: "failed", error: "post_refused_" + m.status, attempts: n.attempts + 1 });
-          out.failed++;
-          continue;
-        }
-        await new Promise((r) => setTimeout(r, 1500));
-        const back = await cw(admin, "GET", `/conversations/${conv.convId}/messages`);
-        const mine = (back.j?.payload ?? []).find((x: any) => x?.id === msgId);
-        if (String(mine?.status ?? "") === "failed") {
-          const why = String(mine?.content_attributes?.external_error ?? "meta_failed").slice(0, 200);
-          await mark({ status: "failed", error: why, attempts: n.attempts + 1, conversation_id: conv.convId });
-          console.error("ticket notice failed", conv.convId, last4, why.slice(0, 80));
+        const r = await sendTemplate(admin, bot, conv.convId, String(n.template), t, params);
+        if (!r.sent) {
+          await mark({ status: "failed", error: r.reason, attempts: n.attempts + 1, conversation_id: conv.convId });
+          console.error("ticket notice failed", conv.convId, last4, r.reason.slice(0, 80));
           out.failed++;
           continue;
         }
@@ -1911,7 +2573,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       return { ok: true, building_found: false, reason: "need_building" };
     }
     if (m.status === "street_unknown") {
-      return { ok: true, building_found: false, reason: "street_unknown" };
+      return { ok: true, building_found: false, reason: "street_unknown",
+        ...(latinStreet(args?.building) ? { hint: LATIN_HINT } : {}) };
     }
     if (m.status === "need_number" || m.status === "number_off_street") {
       return {
@@ -2003,6 +2666,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // True when the caller named a building and nothing else, so their own
     // request cannot be told from a neighbour's.
     let namedNothing = false;
+    // 5 Oct: the category named matched nothing in the caller's own flat, so
+    // the flat's requests come back whole (see below).
+    let typeUnmatched = false;
 
     const serial = serialOf(args?.reference);
     if (serial) {
@@ -2078,6 +2744,54 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         .limit(3);
       if (error) return { ok: false, error: error.message };
       rows = data;
+    }
+
+    // ON WHATSAPP THE SENDER'S NUMBER FINDS THEIR TICKETS (19 Oct).
+    // "מה קורה עם הקריאה שפתחתי?" twice got "send me the ticket number or the
+    // address" twice (executions 114528, 114536). Nothing here read the number
+    // the chat always carries, while get_payment_link finds the flat by it.
+    // Two ways to theirs, both tried: the number on the ticket, which every
+    // ticket this channel opens stores (reported_by_phone, 13 of 14), and the
+    // resident rows that carry the number, which is how the OXS import links a
+    // ticket (914 of the newest 1,000 tickets: a resident_id and no phone) --
+    // and an owner of several flats has several resident rows. Their own
+    // tickets are theirs, so descriptions come back whole. A reference they
+    // typed still wins above and is never second-guessed by this; a building
+    // they named is used below only when the number found nothing, so a
+    // neighbour's address never widens an answer.
+    let byPhone = false;
+    if (!rows?.length && !serial && channel(ctx) === "whatsapp") {
+      const mine = reporterPhone(ctx);
+      if (mine) {
+        const type = String(args?.type ?? "").trim();
+        const own = (q: any) => {
+          if (type !== "payment") q = q.or("type.is.null,type.neq.payment");
+          return q.order("created_at", { ascending: false }).limit(5);
+        };
+        const { data: who } = await db.from("residents").select("id").eq("phone", mine);
+        const ids = (who ?? []).map((r: any) => String(r.id));
+        const [byTicket, byResident] = await Promise.all([
+          own(db.from("requests").select(fields).eq("reported_by_phone", mine)),
+          ids.length
+            ? own(db.from("requests").select(fields).in("resident_id", ids))
+            : Promise.resolve({ data: [], error: null }),
+        ]);
+        if (byTicket.error) return { ok: false, error: byTicket.error.message };
+        if (byResident.error) return { ok: false, error: byResident.error.message };
+        const seen = new Set<string>();
+        const theirs = [...(byTicket.data ?? []), ...(byResident.data ?? [])]
+          .filter((r: any) => !seen.has(String(r.reference)) && seen.add(String(r.reference)))
+          .sort((a: any, b: any) => String(b.created_at).localeCompare(String(a.created_at)));
+        if (theirs.length) {
+          let picked = type ? theirs.filter((r) => matchesType(r, type)) : theirs;
+          if (type && !picked.length) {
+            picked = theirs;
+            typeUnmatched = true;
+          }
+          rows = picked.slice(0, 3);
+          byPhone = true;
+        }
+      }
     }
 
     // The building, and the apartment only if there is one.
@@ -2161,19 +2875,38 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         // what the caller named is answered in full, and the rest is a NUMBER.
         // Never a description, never a reference, never a category.
         const type = String(args?.type ?? "").trim();
+        // 5 Oct: a payment record is not a fault. Flat 2 of בר כוכבא 23 had
+        // seven, and on a lookup that read five rows they were most of them.
+        if (type !== "payment") q = q.or("type.is.null,type.neq.payment");
+        // 5 Oct: read wide, answer narrow. Five rows for a flat (twelve for a
+        // building) were read BEFORE the category split, so a flat with a few
+        // newer tickets hid the one asked about.
         const { data, error } = await q
           .order("created_at", { ascending: false })
-          .limit(unit ? 5 : 12);
+          .limit(unit ? 20 : 30);
         if (error) return { ok: false, error: error.message };
 
         const all = data ?? [];
-        const mine = type ? all.filter((r) => matchesType(r, type)) : all;
+        let mine = type ? all.filter((r) => matchesType(r, type)) : all;
+        // 5 Oct: IN HIS OWN FLAT, A CATEGORY THAT MATCHES NOTHING IS A GUESS,
+        // NOT AN ANSWER. Assaf Clix asked about the mould in flat 2; the model
+        // passed `other`, the ticket is filed `cleaning`, and he was told there
+        // was nothing while 255-1341-26 was in the rows read. The 19 Aug rule
+        // (a neighbour's ticket is a count, never a description) is about the
+        // building; a flat's own requests are the caller's. So with a flat
+        // given, an empty split hands back the flat's requests, flagged, and
+        // the agent finds the one meant by its description.
+        if (unit && type && !mine.length && all.length) {
+          mine = all;
+          typeUnmatched = true;
+        }
         othersInBuilding = all.length - mine.length;
         // Nothing was named to match on, so there is no way to tell the
         // caller's request from a neighbour's. The agent asks what it was
-        // about; see `identify_needed` below.
-        namedNothing = !type && all.length > 1;
-        rows = mine.slice(0, unit ? 3 : 8);
+        // about; see `identify_needed` below. A flat given is something named
+        // (5 Oct): its requests are the caller's.
+        namedNothing = !type && !unit && all.length > 1;
+        rows = mine.slice(0, unit && !typeUnmatched ? 3 : 8);
 
         // A loose match can span two buildings — "Herzl" is Herzl 14 and
         // Herzl 22. Reading one building's requests to somebody standing in
@@ -2196,6 +2929,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // Somebody who names a street is not thereby entitled to their
       // neighbours' business.
       other_open: othersInBuilding,
+      // 19 Oct: found by the number they write from, nothing asked.
+      by_phone: byPhone || undefined,
       // "No open requests" and "I did not recognize that address" are
       // different answers, and only the caller's building being resolvable
       // separates them. Set only when a building was given, did not resolve
@@ -2207,6 +2942,12 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // attributed to them. Descriptions are withheld and the agent asks what
       // it was about rather than reading the list.
       identify_needed: namedNothing || undefined,
+      type_unmatched: typeUnmatched || undefined,
+      note: typeUnmatched
+        ? "The category you passed matched none of " + (byPhone ? "their" : "this flat's") +
+          " requests, so these are all of them, newest first. Find the one the resident means " +
+          "by its description; if none fits, ask him."
+        : undefined,
       requests: (rows ?? []).map((r) => ({
         reference: r.reference,
         status: r.status, // open | in_progress | resolved | cancelled
@@ -2269,8 +3010,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     let askedUnit: string | null = null;
 
     if (channel(ctx) === "whatsapp") {
+      // 29 Oct (the owner: "i thought we have auto recognition", then "go"; live with section 6):
+      // the number the message came from, on file for one resident, is that
+      // resident, as for the payment link and a ticket. A typed number is read only when it is
+      // another one.
+      const sender = reporterPhone(ctx);
+      const typed = typedPhoneOf(args?.phone);
+      if (sender && (!typed || typed === sender)) {
+        const { data: own } = await db.from("residents").select(fields)
+          .eq("phone", sender).maybeSingle();
+        if (own) {
+          resident = own;
+          askedUnit = unitOf(args?.unit);
+        }
+      }
+    }
+    if (!resident && channel(ctx) === "whatsapp") {
       const given = String(args?.name ?? "").trim();
-      const phone = phoneOf(args?.phone);
+      const phone = typedPhoneOf(args?.phone);
       if (!given || !phone) {
         return {
           ok: true,
@@ -2283,7 +3040,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         .eq("phone", phone).maybeSingle();
       // One flag for both halves. See the note above: a per-half answer is an
       // oracle, and an oracle plus a list of surnames is a search.
-      if (!data || !sameName(data.full_name, given)) {
+      if (!data || !sameNameAnyScript(data.full_name, given)) {
         return { ok: true, found: 0, identity_failed: true };
       }
       resident = data;
@@ -2302,9 +3059,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       const building = String(args?.building ?? "").trim();
       const unit = String(args?.unit ?? "").trim();
       if (building && unit) {
-        const { data } = await db.from("residents").select(fields)
-          .eq("building", building).eq("unit", unit).limit(1);
-        resident = data?.[0] ?? null;
+        // 4 Oct: the building as said, then as the building list knows it.
+        // `residents.building` is the list's full address, city included
+        // ("בר כוכבא 23, תל אביב - יפו"), and this compared letter for letter,
+        // so "בר כוכבא 23" -- what a caller says, and what the tool's own text
+        // invites -- found nothing, and the agent told the caller a zero.
+        // get_request_status resolves the same words through matchBuilding();
+        // now this does too. The words as given are tried first, so a lookup
+        // that matched before still finds the same rows.
+        let where = building;
+        let rows = await flatResidents(where, unit);
+        if (!rows.length) {
+          const mb = await matchBuilding(building);
+          if (mb.status === "found" && String(mb.building.address) !== building) {
+            where = String(mb.building.address);
+            rows = await flatResidents(where, unit);
+          }
+        }
+        resident = await owingFirst(rows, unit);
         if (resident) askedUnit = unit;
 
         // `residents.unit` names only ONE of an owner's flats — since
@@ -2315,7 +3087,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         if (!resident) {
           const { data: viaCharge } = await db.from("charges")
             .select("unit,residents!inner(id,full_name,building,unit)")
-            .eq("unit", unit).eq("residents.building", building).limit(1);
+            .eq("unit", unit).eq("residents.building", where).limit(1);
           const hit: any = viaCharge?.[0]?.residents ?? null;
           if (hit) {
             resident = hit;
@@ -2329,11 +3101,11 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (name.length >= 2) {
         const { data } = await db.from("residents").select(fields)
           .ilike("full_name", "%" + name + "%").limit(2);
-        if (data && data.length > 1) return { ok: true, found: 0, ambiguous_name: true };
+        if (data && data.length > 1) return { ok: true, found: 0, ambiguous_name: true, note: NO_BALANCE_READ };
         resident = data?.[0] ?? null;
       }
     }
-    if (!resident) return { ok: true, found: 0 };
+    if (!resident) return { ok: true, found: 0, note: NO_BALANCE_READ };
 
     let q = db
       .from("charges")
@@ -2445,26 +3217,86 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // are two buildings to that guard and one building to everybody else, so
     // the second report would mint a second ticket and dispatch a second van.
     const m = await matchBuilding(said);
+    // FEATURE 17 (22 Oct): a building nobody has named yet waits behind the
+    // name, so the reporter is asked who they are before where they are
+    // (Homies' spec, section 1). A building that WAS named and is not ours is
+    // still said first: nobody is asked for a name for a ticket that cannot
+    // open.
+    let noBuildingYet: Record<string, unknown> | null = null;
     if (!dialled(ctx) && m.status !== "found") {
+      // AN INVENTED BUILDING IS A MISSING ONE (27 Sep). The chat model called
+      // this with `building: "בניין מגורים"` -- "residential building", a
+      // placeholder it made up to have something to pass -- and got
+      // `street_unknown`, which tells it the resident named a street we do not
+      // manage. Nobody named anything. With no digit anywhere and not a Latin
+      // street (that one keeps its own hint), nothing that could be an address
+      // was given, and the honest reason is that we still need one. A managed
+      // street typed without its number never gets here: matchBuilding answers
+      // it with need_number.
+      const invented = m.status === "street_unknown" && !/\d/.test(String(said))
+        && !latinStreet(said);
       if (m.status === "street_unknown" || m.status === "empty") {
-        return {
+        const need = m.status === "empty" || invented;
+        const refusal = {
           ok: true, opened: false, building_found: false,
-          reason: m.status === "empty" ? "need_building" : "street_unknown",
+          reason: need ? "need_building" : "street_unknown",
+          ...(m.status === "street_unknown" && latinStreet(said) ? { hint: LATIN_HINT } : {}),
+          ...(need && channel(ctx) === "whatsapp" ? { note: ASK_WHERE } : {}),
         };
-      }
-      if (m.status === "need_number" || m.status === "number_off_street") {
+        if (!need) return refusal;
+        noBuildingYet = refusal;
+      } else if (m.status === "need_number" || m.status === "number_off_street") {
         return {
           ok: true, opened: false, building_found: false,
           reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
           street: m.street.street,
           numbers_we_manage: m.numbers,
+          ...(m.status === "need_number" && channel(ctx) === "whatsapp" ? { note: ASK_WHERE } : {}),
+        };
+      } else {
+        return {
+          ok: true, opened: false, building_found: false, reason: "ambiguous",
+          candidates: m.candidates.map((b: any) => b.address).slice(0, 5),
         };
       }
-      return {
-        ok: true, opened: false, building_found: false, reason: "ambiguous",
-        candidates: m.candidates.map((b: any) => b.address).slice(0, 5),
-      };
     }
+
+    // WHO IS REPORTING (feature 17, 22 Oct). No ticket without the name of the
+    // person reporting and a number to call them back (the owner: "before we
+    // can open a ticket we should include the name"). The prompt asks; this
+    // makes it true, because a rule a model must remember is a rule it drops
+    // (23 Aug: five runs, zero chained calls). Switched per channel by
+    // NAME_REQUIRED_CHANNELS, so an agent whose tool cannot send a name yet is
+    // never refused forever. A call we placed already knows who it rang.
+    //
+    // ON WHATSAPP, THE NAME ON FILE FOR THE SENDER'S NUMBER (30 Oct). The
+    // owner's WhatsApp tickets carried no name: that tool sent none, nothing filled
+    // it, and the gate was on for voice only (0 of 2 since 22 Oct, against 7 of 9
+    // calls). The owner: "we need to include the name in that". The number finds
+    // the resident rows the way `Who is writing?` does, so a tenant on file is never
+    // asked. A name they gave still comes first, unless it is part of the one on
+    // file ("אסף" of "אסף קליקס", the first name the bot is shown), where the
+    // record's full name is the better one.
+    const given = reporterNameOf(args?.reporter_name);
+    const onFile = channel(ctx) === "whatsapp" ? await nameOnFile(reporterPhone(ctx)) : null;
+    const reporterName = (onFile && (!given || onFile.includes(given)) ? onFile : given)
+      ?? (dialled(ctx) ? await residentName(ctx.residentId) : null);
+    const givenPhone = phoneOf(args?.reporter_phone);
+    // An emergency on WhatsApp opens at once, name or not: opening the ticket is
+    // the one thing we do in an emergency (the owner, 6 Oct). The name can follow.
+    const urgentChat = channel(ctx) === "whatsapp" && urgency(args?.urgency) === "emergency";
+    const missing = urgentChat ? null : ticketGate({
+      channel: channel(ctx),
+      dialled: dialled(ctx),
+      enforced: requiredChannels(Deno.env.get("NAME_REQUIRED_CHANNELS")),
+      name: reporterName,
+      nameDeclined: flagOf(args?.name_declined),
+      phone: reporterPhone(ctx) ?? givenPhone,
+      phoneDeclined: flagOf(args?.phone_declined),
+    });
+    if (missing) return { ok: true, opened: false, reason: missing };
+    if (noBuildingYet) return noBuildingYet;
+
     const building = (m.status === "found" ? String(m.building.address) : "") || said;
 
     // ctx first, argument second — outbound the apartment is a fact attached to
@@ -2518,6 +3350,27 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       unit = reportedUnit;
     }
 
+    // THE REPORTER'S FLAT FROM OUR RECORDS (27 Sep, owner's decision), when a
+    // WhatsApp sender did not say it -- see flatOnFile() for the conditions.
+    // Placed AFTER the unit logic above on purpose: this names WHO reported,
+    // never where the fault is, so `unit` (the fault's flat) is decided
+    // without it exactly as before. WhatsApp only: inbound voice is not
+    // "dialled" either, but its tool has `unit` and no `reporter_unit`, and a
+    // flat pulled from a demo page's invented caller number is the 19 Aug bug
+    // `dialled()` exists to prevent. When the resident DID say a flat and it is
+    // the one on file, the phone-matched row is still preferred as the ticket's
+    // resident: it is the person who wrote, not whichever row a building+flat
+    // lookup meets first.
+    let reporterFlat = reportedUnit;
+    let reporterId: string | null = null;
+    if (channel(ctx) === "whatsapp" && m.status === "found") {
+      const known = await flatOnFile(reporterPhone(ctx), String(m.building.id));
+      if (known && (!reporterFlat || reporterFlat === known.unit)) {
+        reporterFlat = known.unit;
+        reporterId = known.id;
+      }
+    }
+
     // --- The duplicate guard ------------------------------------------------
     //
     // Same place, same kind of fault, still open, opened in the last 30 minutes
@@ -2562,7 +3415,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     let dupeQuery = db
       .from("requests")
-      .select("id,reference,description")
+      .select("id,reference,description,urgency")
       .eq("building", building)
       .eq("type", type)
       .gte("created_at", since)
@@ -2575,7 +3428,16 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     dupeQuery = unit === null ? dupeQuery.is("unit", null) : dupeQuery.eq("unit", unit);
 
     const { data: existing } = await dupeQuery;
-    if (existing && existing.length) {
+    // AN EMERGENCY IS NEVER FOLDED INTO A TICKET THAT IS NOT ONE (5 Oct, live).
+    // Water dripping onto a stairwell light came back as the intercom ticket
+    // opened 25 minutes earlier -- both `electrical`, common area -- so no
+    // emergency ticket existed, the leak was one line on a routine ticket, and
+    // the resident was read the intercom's number as "the emergency ticket".
+    // Opening the ticket is the one thing we do in an emergency (owner, 6 Oct),
+    // so it gets its own row and its own urgency. Two reports of one emergency
+    // still fold together.
+    const folds = !(urgency(args?.urgency) === "emergency" && existing?.[0]?.urgency !== "emergency");
+    if (existing && existing.length && folds) {
       // A second report of one fault inside the window often carries NEW
       // FACTS. 27 Aug, live: "תקלה במעלית" came back twenty minutes later as
       // "נתקעת בין קומות, כבר חודשיים, ביקשתי כמה פעמים" — and the guard
@@ -2601,10 +3463,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // a flat with no phone number on file has no `residents` row at all, which
     // is exactly why `reported_unit` is stored separately rather than being
     // reduced to this lookup.
-    let residentId = ctx.residentId;
-    if (!residentId && reportedUnit && building) {
+    let residentId = ctx.residentId || reporterId;
+    if (!residentId && reporterFlat && building) {
       const { data: who } = await db.from("residents").select("id")
-        .eq("building", building).eq("unit", reportedUnit).limit(1);
+        .eq("building", building).eq("unit", reporterFlat).limit(1);
       residentId = who?.[0]?.id ?? null;
     }
 
@@ -2655,7 +3517,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           description: merged,
           building,
           unit,
-          reported_unit: reportedUnit,
+          reported_unit: reporterFlat,
+          reported_by_name: reporterName,
+          ...(givenPhone && !reporterPhone(ctx) ? { reported_by_phone: givenPhone } : {}),
           // Stays `emergency` however this call rates it. The urgency was set
           // by somebody in trouble, and a later, calmer sentence describing the
           // same incident must not quietly downgrade it.
@@ -2667,7 +3531,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         .eq("id", stub.id);
       if (upErr) return { ok: false, error: upErr.message };
       if (m.status === "found") {
-        await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id);
+        await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
+                        reporterPhone(ctx), reporterFlat, building,
+                        reporterName, reporterPhone(ctx) ?? givenPhone, type);
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -2682,8 +3548,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         description: String(args.description),
         building,
         unit,
-        reported_unit: reportedUnit,
-        reported_by_phone: reporterPhone(ctx),
+        reported_unit: reporterFlat,
+        reported_by_phone: reporterPhone(ctx) ?? givenPhone,
+        reported_by_name: reporterName,
         urgency: urgency(args?.urgency),
         opened_via: channel(ctx),
       })
@@ -2698,7 +3565,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // response time; failures inside are logged and swallowed.
     if (m.status === "found") {
       await oxsMirror(String(m.building.id), String(args.description), unit,
-                      data.reference, data.id);
+                      data.reference, data.id, reporterPhone(ctx),
+                      reporterFlat, building,
+                      reporterName, reporterPhone(ctx) ?? givenPhone, type);
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The
@@ -2742,7 +3611,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // caller says "one thousand and fifty six", not "255-1056-26".
     const { data: rows } = await db
       .from("requests")
-      .select("id,reference,description")
+      .select("id,reference,description,status,reported_by_phone,resident_id")
       .or(`reference.like.%-${serial}-%,reference.like.%-${serial}`)
       .order("created_at", { ascending: false })
       .limit(1);
@@ -2750,19 +3619,48 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     const row = rows?.[0];
     if (!row) return { ok: false, error: "not found" };
 
+    // ON WHATSAPP: THE SENDER'S OWN TICKET, STILL OPEN (29 Oct). The bot got
+    // this tool after it twice told the owner it had added their photo and
+    // their update to the light ticket with nothing behind either: the only
+    // tool it had was a note, which never touches a ticket and was dropped as a
+    // duplicate besides (executions 139178, 139189). A serial typed into a chat
+    // can be anybody's, so the ticket must be one the sender's number finds, the
+    // same two ways get_request_status finds theirs; a neighbour's answers "not
+    // found", as if it did not exist. A closed ticket answers `closed`: a line
+    // added where nobody reads is the same silent claim, and a fault that is
+    // back is a new ticket. The voice agents are not changed.
+    const wa = channel(ctx) === "whatsapp";
+    if (wa) {
+      const mine = reporterPhone(ctx);
+      let theirs = !!mine && row.reported_by_phone === mine;
+      if (!theirs && mine && row.resident_id) {
+        const { data: who } = await db.from("residents").select("id")
+          .eq("phone", mine).eq("id", row.resident_id).limit(1);
+        theirs = !!who?.length;
+      }
+      if (!theirs) return { ok: false, error: "not found" };
+      if (!["open", "in_progress", "needs_review"].includes(String(row.status))) {
+        return { ok: false, error: "closed", reference: row.reference, status: row.status };
+      }
+    }
+
     // Already there — a repeated tool call on a retried webhook, or an agent
     // that asked the same question twice. Appending it again gives the office a
     // ticket that stutters.
     const existing = String(row.description ?? "");
-    if (existing.includes(detail)) return withSpoken({ ok: true, reference: row.reference });
+    if (!existing.includes(detail)) {
+      const { error } = await db
+        .from("requests")
+        .update({ description: existing ? existing + " | " + detail : detail })
+        .eq("id", row.id);
+      if (error) return { ok: false, error: error.message };
+    }
 
-    const { error } = await db
-      .from("requests")
-      .update({ description: existing ? existing + " | " + detail : detail })
-      .eq("id", row.id);
-
-    return error ? { ok: false, error: error.message }
-                 : withSpoken({ ok: true, reference: row.reference });
+    // On WhatsApp the photos this number sent in the last hour that are on no
+    // ticket yet go on this one, as open_request's do. The count goes back as a
+    // fact, and it is the only thing that lets the bot say a photo is on it.
+    const photos = wa ? await adoptMedia(row.id, barePhone(ctx)) : 0;
+    return withSpoken({ ok: true, reference: row.reference, ...(photos ? { photos_attached: photos } : {}) });
   },
 
   /**
@@ -2904,10 +3802,19 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // same conversation — a model that invents a reference once will usually do
     // it again on the next message — and a resident describing one leak must
     // not collect a ticket per message.
+    //
+    // ONLY AGAINST EARLIER RESCUE TICKETS (5 Oct). Matched on the interaction
+    // alone, this handed back the phone's newest REAL ticket: on the live run as
+    // Assaf Clix the gate's 255-1345-26, opened 14 minutes before, came back for a
+    // mould claim, and the bot told him three times that a mould ticket with that
+    // number was open. A WhatsApp interaction is one row per phone, so "this
+    // conversation's ticket" is every ticket that phone ever opened. The rescue's
+    // own rows carry oxs_ref "partial:model_claimed"; nothing else does.
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     let dupe = db.from("requests").select("reference")
       .gte("created_at", since)
       .in("status", ["open", "in_progress", "needs_review"])
+      .eq("oxs_ref", "partial:model_claimed")
       .order("created_at", { ascending: false }).limit(1);
     dupe = iid ? dupe.eq("interaction_id", iid) : dupe.eq("reported_by_phone", phone);
     const { data: already } = await dupe;
@@ -3103,6 +4010,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // for nothing either way.
     let team_notified: boolean | undefined;
     if (isIntake(ctx)) {
+      // Feature 17: the note opens with who called, when they said it.
+      const who = reporterNameOf(args?.caller_name);
       try {
         team_notified = await voiceNote({
           call_id: ctx.callId,
@@ -3113,7 +4022,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           label: await voiceLabel(args?.building, args?.unit),
           reason,
           department: String(args?.department ?? "").trim(),
-          description: String(args?.description ?? "").trim().slice(0, 500),
+          description: ((who ? who + ": " : "") + String(args?.description ?? "").trim()).slice(0, 500),
           source: "tool",
         });
       } catch (e) {
@@ -3314,8 +4223,17 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
   async store_media(args, ctx) {
     const bare = barePhone(ctx);
     if (!bare) return { ok: false, error: "no phone" };
-    const messageId = String(args?.message_id ?? "").replace(/\D+/g, "");
-    if (!messageId) return { ok: false, error: "no message id" };
+    // Chatwoot's ids are digits. The UChat copy's carry a "uchat:" prefix
+    // (feature 21, 3 Nov): UChat numbers our messages from 1, Chatwoot's range,
+    // so a bare UChat id would overwrite a Chatwoot photo with the same number
+    // in the bucket. The prefix is kept on the row, where the dashboard matches
+    // it to messages.external_id, and spelled "uchat-" in the file's name.
+    const rawId = String(args?.message_id ?? "");
+    const fromUchat = /^uchat:/i.test(rawId.trim());
+    const digits = rawId.replace(/\D+/g, "");
+    if (!digits) return { ok: false, error: "no message id" };
+    const messageId = fromUchat ? "uchat:" + digits : digits;
+    const fileId = fromUchat ? "uchat-" + digits : digits;
 
     const images = (Array.isArray(args?.attachments) ? args.attachments : [])
       .filter((a: any) => a && a.file_type === "image" && typeof a.data_url === "string")
@@ -3328,8 +4246,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
     for (let i = 0; i < images.length; i++) {
       const url = String(images[i].data_url);
-      const allowed = MEDIA_HOSTS.some((h) => url.startsWith(h)) || url.startsWith("data:image/");
-      if (!allowed) { skipped.push({ i, reason: "host not allowed" }); continue; }
+      if (!mediaAllowed(url)) { skipped.push({ i, reason: "host not allowed" }); continue; }
       try {
         const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15000) });
         if (!res.ok) { skipped.push({ i, reason: `fetch ${res.status}` }); continue; }
@@ -3341,7 +4258,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           skipped.push({ i, reason: `size ${bytes.length}` });
           continue;
         }
-        const path = `${bare}/${messageId}-${i}.${ext}`;
+        const path = `${bare}/${fileId}-${i}.${ext}`;
         const { error: upErr } = await db.storage
           .from(MEDIA_BUCKET)
           .upload(path, bytes, { contentType: mime, upsert: true });
@@ -3470,12 +4387,13 @@ async function endOfCall(message: any, ctx: CallContext) {
     // talk-to-Michael widget doing exactly that, which was landing under
     // "outbound" with a null caller and confusing the list it appeared in.
     // A web call to any other assistant (the debt demo) stays outbound.
-    direction: String(call?.type ?? "").toLowerCase().includes("inbound") ||
-        (String(call?.type ?? "") === "webCall" &&
-         INTAKE_ASSISTANT_IDS.has(String(call?.assistantId ?? "")))
-      ? "inbound" : "outbound",
+    // A dialer call reaches Vapi as inbound and is outbound by its name
+    // (29 Oct); callDirection in route.ts holds all three rules.
+    direction: callDirection(
+      call?.customer ? call : { ...call, customer: message?.customer ?? {} },
+      INTAKE_ASSISTANT_IDS),
     resident_id: ctx.residentId,
-    caller_phone: call?.customer?.number ?? null,
+    caller_phone: callNumberOf(call),
     transcript,
     summary: message?.summary ?? artifact?.summary ?? null,
     audio_url: message?.recordingUrl ?? artifact?.recordingUrl ?? artifact?.recording?.stereoUrl ?? null,
@@ -3608,6 +4526,47 @@ async function salvage(interactionId: string | null, ctx: CallContext, transcrip
 // and expects { results: [ { toolCallId, result } ] } where result is a string.
 // `arguments` arrives as an object on some versions and a JSON string on others.
 
+/**
+ * Which agent answers a call on the 208 line (feature 18). Vapi sends
+ * `assistant-request` because the address names no agent of its own.
+ *
+ * A dialer call to exactly one tenant on the debt call list gets the debt agent
+ * with that tenant's figures, composed as the Call button composes them. Every
+ * other call, and every doubt or error on the way, gets the incoming agent: the
+ * answer every call on this line got before, and always an answer, because a
+ * failed reply makes Vapi hang the caller up. Numbers are never logged.
+ */
+async function assistantFor(message: any): Promise<Record<string, unknown>> {
+  const intake = { assistantId: INTAKE_ASSISTANT_YARIV };
+  try {
+    const call = { ...(message?.call ?? {}) };
+    if (!call.customer) call.customer = message?.customer ?? {};
+    const phone = isDialerCall(call) ? callNumberOf(call) : null;
+    let rows: unknown[] = [];
+    if (phone) {
+      const { data, error } = await db.from("v_debt_call_queue_person")
+        .select("*").eq("phone", phone).limit(2);
+      if (error) console.error("route: queue read failed", String(error.message ?? error));
+      rows = data ?? [];
+    }
+    const route = routeOf(call, rows);
+    console.log("route", String(call?.id ?? ""), route.agent, route.agent === "intake" ? route.why : "");
+    if (route.agent !== "debt") return intake;
+    const fixed = {
+      callback_number: Deno.env.get("HOMIES_CALLBACK_NUMBER") ?? FIXED_DEFAULTS.callback_number,
+      verification_email: Deno.env.get("HOMIES_VERIFICATION_EMAIL_SAY") ?? FIXED_DEFAULTS.verification_email,
+      alt_payment: Deno.env.get("HOMIES_ALT_PAYMENT") ?? FIXED_DEFAULTS.alt_payment,
+    };
+    return {
+      assistantId: DEBT_ASSISTANT_YARIV,
+      assistantOverrides: { variableValues: debtVariables(route.row, route.phone, fixed) },
+    };
+  } catch (e) {
+    console.error("route threw; the incoming agent answers", String(e));
+    return intake;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.headers.get("x-homies-secret") !== SECRET || !SECRET) {
     return new Response(JSON.stringify({ error: "unauthorised" }), {
@@ -3634,6 +4593,11 @@ Deno.serve(async (req) => {
   // safe here — an unhandled one costs nothing.
   const type = String(message?.type ?? "");
   if (type && !calls.length) {
+    if (type === "assistant-request") {
+      return new Response(JSON.stringify(await assistantFor(message)), {
+        headers: { "content-type": "application/json" },
+      });
+    }
     if (type !== "end-of-call-report") {
       return new Response(JSON.stringify({ ok: true, ignored: type }), {
         headers: { "content-type": "application/json" },
