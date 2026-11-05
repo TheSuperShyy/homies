@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### Yariv's change 1 of 6: elevator reports into OXS, classified, and our ticket closes when OXS closes it (owner: "ok so give me the list of the changes that is needed to be started based on yariv", then "ok lets do all those 1 by 1")
+- **Read first, what each part of the ask is today:**
+  - **The category:** `oxsMirror()` posted only the building, the reporter and the description. Read from OXS, all 16 of our calls still open there have `facilityCategory: null`, the two elevator ones (`255-28392-26`, `255-29026-26`) too.
+  - **Into OXS for every resident:** the mirror covers the owner's +63 only (`OXS_MIRROR_PHONES`). All 21 mirrored tickets are Bar Kochba 23.
+  - **The words:** 72 bot replies about elevators since August. One mentioned the elevator company, on 1 Sep, in the "press the emergency button" advice removed on 15 Sep. Neither prompt has it, so nothing was added (a quoted forbidden phrase gets said back).
+  - **"Not by email to the office":** nothing emails the office about tickets (there is no SMTP), so nothing was changed.
+  - **The notice when OXS closes it:** missing. `departed_rows()` asks only about imported rows (`opened_via=oxs`), so a mirrored ticket closed in OXS stayed open here, and 036's trigger never queued its closed-ticket message. None has been closed there yet: all 15 still open here are open in OXS.
+- **Built and LIVE, debt-tools v142 (`--apply --oxs-mirror`):**
+  - `OXS_CATEGORY` maps our 11 types to OXS's `facilityCategory._id`, read off the imported calls' `oxs_category_id` (elevator `5f8c65e6acdfa15b7cf34a04`, מעלית). "payment" has none.
+  - The POST carries `facilityCategory`. If OXS refuses it, the same call is posted again without it, so the mirror never does worse than before.
+  - OXS's spec lists only buildingId, apartmentId and description, so whether the field takes is proven only by the owner's next elevator report from the +63, read back in OXS.
+- **Built, OFF: the third gate.** `oxsMirrorAllowed(reporter, type)` also passes a type listed in `OXS_MIRROR_TYPES`, for any reporter except test prefixes.
+  - `supabase_functions.py` pushes it with `--oxs-mirror` when `.env` names types, and deletes it otherwise, in its own DELETE.
+  - The deploy printed "oxs types OFF (HTTP 404)": it was never set.
+  - Checked on the real code, transpiled with TypeScript, in 7 cases: the owner's number with any type, a resident's elevator report with the switch off and on, lighting, a test prefix, no phone, and nothing set.
+- **Built, not yet running: the sync resolves our own closed tickets.** `mirrored_departures()` in `oxs_requests_sync.py` handles our tickets still open here whose OXS `_id` left the open feed.
+  - For each building it reads the closed list (`status=close`, newest change first, up to 3 pages of 20, 30 buildings a run) and matches on `_id`. It needs this because we hold their `_id`, not their taskNumber.
+  - It PATCHes by id, only while the row is still open here, so the 036 trigger queues the WhatsApp message.
+  - A failed PATCH is printed and fails the run at the end, after everything else is written.
+  - `building_index()` is now shared with `departed_rows()`.
+  - Checked:
+    - the dry run against live: 15 of ours open here, 0 gone from the feed;
+    - the found path against a real closed Bar Kochba 23 call (`255-2387-23`) posing as ours: resolved, an unknown id reported as missing, a `partial:` marker skipped;
+    - the PATCH filter against an id that does not exist: HTTP 200, 0 rows.
+  - **The 15-minute Action runs `main`.** The script alone is prepared on `sync-mirror-close-for-main`, on top of `origin/main`, and the push waits on the owner's go.
+- **Not covered:** a ticket opened by phone gets no closed-ticket message, because 036 queues it for WhatsApp tickets only.
+
 ### Cards for the CRM board from the 4 Nov review, and a `tasker` skill that writes them (owner: "create me a task for this project like based on the feedbacks", with a screenshot of the Clix CRM Tasks board; then "create a skill for this one")
 - **The cards,** given in chat to paste: ten for Homies, set to Internal, in High and Normal groups.
   - **High:** Omnitelecom follow-up, due 5 Nov; the debt-list spec to Omnitelecom; the materials to Homies; elevator reports into OXS; gas sent to the gas company.

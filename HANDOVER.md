@@ -22,6 +22,16 @@ appended to.
 >     - the OXS debt-list spec to Omni;
 >     - sending Homies the bot's number, both training videos, the comparison, the ~30 test scenarios and both presentations.
 >   - **The notes are unverified.** "OCS" is OXS and "YouChat/Jitchat" is UChat. Check a point against the recording before building on it.
+>   - **Being built one by one (owner, 5 Nov: "ok lets do all those 1 by 1"). #1, elevators into OXS:**
+>     - **LIVE, debt-tools v142 (5 Nov):** every mirrored call carries OXS's own category, keyed by our ticket type (`OXS_CATEGORY`). If OXS refuses the field, the call is filed again without it. Until now all 16 of our calls open in OXS read `facilityCategory: null`, the two elevator ones too.
+>       - **Unproven:** OXS's spec does not list the field. The first proof is the owner's own elevator report from the +63, read back in OXS.
+>     - **Built, OFF:** `OXS_MIRROR_TYPES=elevator` mirrors every elevator report, from any reporter, on WhatsApp or the phone. **It waits on the owner's go** (CONTEXT, the OXS rule). The recommendation is go-live.
+>     - **Built, not yet running:** `oxs_requests_sync.py` resolves our own ticket when staff close its call in OXS, which queues the WhatsApp closed-ticket message (036).
+>       - It was tested on a real closed Bar Kochba 23 call.
+>       - Today's dry run finds all 15 of ours still open there.
+>       - **The Action runs `main`, so it needs a push.** It waits on the owner's go. The prepared branch is `sync-mirror-close-for-main`.
+>     - **Already true, unchanged:** the bot never says it called the elevator company (1 of 72 elevator replies did, on 1 Sep, before the 15 Sep emergency change), and nothing emails the office.
+>     - **Not covered:** a phone-opened ticket gets no closed-ticket message, because 036 queues it for WhatsApp tickets only.
 >
 > **STATUS 4 Nov, 07:00 UTC, read only (owner: *"quick dryrun to check the status of all"*): green.** WORKLOG 4 Nov.
 >   - **Phone agents:** both equal the repo, the Vapi wallet is in credit, and the 208 line routes per call.

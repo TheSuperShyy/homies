@@ -905,12 +905,44 @@ async function matchBuilding(saidRaw: unknown): Promise<Match> {
  * form `residents.phone` holds and the only form a foreign number survives in
  * (phoneOf() accepts Israeli numbers only).
  */
-function oxsMirrorAllowed(reporter: string | null): boolean {
+function oxsMirrorAllowed(reporter: string | null, type: string | null = null): boolean {
   const list = (Deno.env.get("OXS_MIRROR_PHONES") ?? "")
     .split(",").map((s) => s.trim()).filter(Boolean);
-  if (!list.length || !reporter) return false;
-  return list.includes(String(reporter).trim());
+  if (reporter && list.includes(String(reporter).trim())) return true;
+  // WHAT may be mirrored, 5 Nov: Yariv, in the 4 Nov review, wants every
+  // elevator report opened in OXS itself, classified as elevator, at the
+  // address. `OXS_MIRROR_TYPES` lists the ticket types that go in for ANY
+  // reporter ("elevator"). Unset, which is how it ships, it adds nobody:
+  // switching it on is the same decision as widening the phone list, and it
+  // waits on the owner's go. Test prefixes never qualify, so a probe filing a
+  // test ticket against a real building cannot put a call into OXS.
+  const types = (Deno.env.get("OXS_MIRROR_TYPES") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean);
+  if (!type || !types.includes(String(type))) return false;
+  return !TEST_PREFIXES.some((p) => String(reporter ?? "").startsWith(p));
 }
+
+/**
+ * OXS's own fault categories (`facilityCategory._id`), keyed by our
+ * `requests.type` -- the same twelve labels oxs_requests_sync.py maps the other
+ * way, ids read off the imported calls on 5 Nov (`requests.oxs_category_id`).
+ * Until then every mirrored call landed in OXS with no category at all: the 16
+ * still open there read `facilityCategory: null`, the two elevator ones too.
+ * "payment" and anything else not listed goes in without one, as before.
+ */
+const OXS_CATEGORY: Record<string, string> = {
+  plumbing: "5ef476151729c50d586095da",     // אינסטלציה
+  electrical: "5ef47616a7ab6d0d5a5f8d19",   // חשמל
+  lighting: "5ef47615cb85d70d5bf44136",     // תאורה
+  elevator: "5f8c65e6acdfa15b7cf34a04",     // מעלית
+  cleaning: "5ef476162c45ed0d59ade463",     // ניקיון
+  gardening: "5ef476142c45ed0d59ade462",    // גינון
+  pest_control: "5ef47614a7ab6d0d5a5f8d18", // הדברה
+  locksmith: "5ef476141729c50d586095d9",    // מנעולן
+  fire_safety: "5ef842242c45ed0d59ade464",  // כיבוי אש
+  maintenance: "5d7f4e0eb184c844297aef58",  // אחזקה
+  other: "5f8d5507d5013f3bd712c568",        // אחר
+};
 
 /**
  * WHO reported it, in the shape OXS's own records use — 24 Sep.
@@ -972,12 +1004,13 @@ async function oxsMirror(
   reference: string, rowId: string, reporter: string | null,
   reporterUnit: string | null, building: string | null,
   reporterName: string | null = null, callback: string | null = null,
+  type: string | null = null,
 ) {
   const key = Deno.env.get("OXS_KEY_REQUESTS") ?? "";
   if (!key) return; // not configured: the mirror is off, the ticket is fine
   // Not on the allow-list: our ticket stands, OXS never hears about it. Silent
   // by design -- this is the ordinary path for every real resident.
-  if (!oxsMirrorAllowed(reporter)) return;
+  if (!oxsMirrorAllowed(reporter, type)) return;
   // Never fatal: a reporter we cannot resolve costs a name on the call, not
   // the call. The resident already holds the reference by the time we are here.
   let by: Record<string, string> | null = null;
@@ -986,8 +1019,9 @@ async function oxsMirror(
   } catch (err) {
     console.error("oxs reporter lookup failed", String(err).slice(0, 120));
   }
-  try {
-    const r = await fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
+  const category = OXS_CATEGORY[String(type ?? "")] ?? null;
+  const post = (withCategory: boolean) =>
+    fetch("https://api.oxs.co.il/api/external/v1/service-calls", {
       method: "POST",
       headers: { "x-api-key": key, "content-type": "application/json" },
       body: JSON.stringify({
@@ -995,6 +1029,11 @@ async function oxsMirror(
         // Both shapes, because the API accepts the nested one and reads it
         // back nested; the flat copy is harmless and survives a spec change.
         ...(by ? { reportedBy: by, serviceCallData: { reportedBy: by } } : {}),
+        // Their category, so the call lands classified (Yariv, 4 Nov: "open
+        // it in OXS, classify it as elevator, at this address"). The spec
+        // lists only buildingId, apartmentId and description, as it once
+        // listed no reportedBy either, which the API honours.
+        ...(withCategory && category ? { facilityCategory: category } : {}),
         // Staff-facing, so it carries what a dispatcher needs at a glance:
         // the fault, the flat when the fault is in one, and our reference so
         // the two systems can be joined by a human as well as by oxs_ref.
@@ -1004,7 +1043,17 @@ async function oxsMirror(
           + reporterLine(reporterName, callback),
       }),
     });
-    const d = await r.json().catch(() => null);
+  try {
+    let r = await post(true);
+    let d = await r.json().catch(() => null);
+    // A category OXS will not take must never cost the call itself: filed
+    // again without it, which is exactly the call the mirror made before.
+    if (category && !(d?.status === 1 && d?.data?._id)) {
+      console.error("oxs mirror refused the category, filing without it",
+                    r.status, JSON.stringify(d).slice(0, 160));
+      r = await post(false);
+      d = await r.json().catch(() => null);
+    }
     const oxsId = d?.data?._id;
     if (d?.status === 1 && oxsId) {
       await db.from("requests").update({ oxs_ref: String(oxsId) }).eq("id", rowId);
@@ -3484,7 +3533,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       if (m.status === "found") {
         await oxsMirror(String(m.building.id), merged, unit, stub.reference, stub.id,
                         reporterPhone(ctx), reporterFlat, building,
-                        reporterName, reporterPhone(ctx) ?? givenPhone);
+                        reporterName, reporterPhone(ctx) ?? givenPhone, type);
       }
       await adoptMedia(stub.id, barePhone(ctx));
       return withSpoken({ ok: true, reference: stub.reference, completed_emergency: true });
@@ -3518,7 +3567,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       await oxsMirror(String(m.building.id), String(args.description), unit,
                       data.reference, data.id, reporterPhone(ctx),
                       reporterFlat, building,
-                      reporterName, reporterPhone(ctx) ?? givenPhone);
+                      reporterName, reporterPhone(ctx) ?? givenPhone, type);
     }
 
     // The photos this phone sent in the last hour belong to this ticket. The

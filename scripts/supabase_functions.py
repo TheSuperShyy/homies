@@ -265,6 +265,25 @@ def main():
     if code >= 300:
         print(out)
         sys.exit(1)
+    # 5 Nov: `OXS_MIRROR_TYPES` is the third gate, the ticket types that go into
+    # OXS for ANY reporter (Yariv: every elevator report). It travels with the
+    # key like the phone list, but only when .env names types: otherwise it is
+    # deleted, so the switch is off unless the owner has turned it on. Its own
+    # DELETE, because a batch naming a secret that is absent may answer 404 and
+    # leave the others standing, which would keep the mirror half on.
+    oxs_types = e.get("OXS_MIRROR_TYPES", "").strip()
+    if mirror and oxs_key and oxs_types:
+        code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref,
+                         [{"name": "OXS_MIRROR_TYPES", "value": oxs_types}])
+        print("oxs types      ON for any reporter: %s (HTTP %s)" % (oxs_types, code))
+    else:
+        code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref, ["OXS_MIRROR_TYPES"])
+        print("oxs types      OFF (HTTP %s)" % code)
+        if code == 404:
+            code = 200
+    if code >= 300:
+        print(out)
+        sys.exit(1)
 
     meta = {"name": SLUG, "entrypoint_path": "index.ts", "verify_jwt": False}
     body, ctype = multipart([
