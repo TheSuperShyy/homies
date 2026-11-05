@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### The bot said "פתחתי קריאה" for a ticket that was already open (owner's test, execution 155838; the owner pasted the reply: "בשמחה אסף. פתחתי קריאה על המעלית בבר כוכבא 23 … 255-1391-26 …")
+- **What happened:** with the memory fresh (epoch 93), the owner's elevator message called `open_request`. Its 30-minute guard folded the report into the 10:39 ticket and returned `{"ok":true,"reference":"255-1391-26","duplicate":true}`. The bot still wrote "פתחתי קריאה" (I opened a ticket).
+- **Why:** nothing the bot reads says what `duplicate` means. The tool's description does not mention it, and neither does the prompt.
+- **The fix, function-side and WhatsApp only** (the chatbot-first rule: `channel(ctx) === "whatsapp"`): the duplicate answer also carries `already_open: true, opened_now: false`. The phone agent's answer is unchanged.
+- **Also in that reply, a second cause, not fixed in this change:** "בשמחה" opened a fault report. It is the first of the prompt's three quoted words ("בשמחה", "כמובן", "אוי, לא נעים"), said back, as "אוקיי" was before 29 Oct.
+- **Checked once:** the syntax and 45/45 node tests. It ships through the pipeline as PR #4.
+
 ### LIVE: the bot says an urgent ticket is urgent, never "emergency" (epoch 93, `scripts/n8n_whatsapp_urgentword.py`; owner: "look at the reply it got broke why it will notify emergency services?", then "so fix that i dont like the reply of that one")
 - **What happened** (UChat number, execution 155798):
   - The elevator test opened `255-1391-26` and asked whether someone was stuck. The owner answered "yes".
