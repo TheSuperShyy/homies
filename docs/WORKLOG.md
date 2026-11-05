@@ -21,7 +21,7 @@ conversation that produced it.
   - `elevator` passes voice;
   - `whatsapp:elevator` with lighting stops;
   - unset stops.
-- **Shipped through the pipeline as PR #3,** the first function change to go that way.
+- **Shipped through the pipeline as PR #3,** the first function change to go that way: merged as `b603420`, and the pipeline deployed **v144 ACTIVE**, code only. The function answers 401 to an unsigned call.
 
 ### CI/CD, feature 22: checks in front of `main`, and the function deploys from `main` (owner, asked to push the OXS sync fix: "we need a ci/cd before pushing live"; on the plan: "dont overtest tho since your test is overkill"; then "ok")
 - **Before:**
