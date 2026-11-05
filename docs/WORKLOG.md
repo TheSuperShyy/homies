@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### An email to OXS asking for API access to standing orders, drafted (owner: "we need to draft email to oxs if they can provide us api keys for the standing order as well"; nothing sent)
+- **Why:** at the 4 Nov review, Clix said OXS's API has one-time payments only, so a standing-order (הוראת קבע) request goes to the collections team by email. The rev 1.3 spec agrees: three modules (general, finance, service_calls), and nothing on standing orders.
+- **What it asks**, in English and Hebrew:
+  1. a key or module for standing orders;
+  2. a link where the resident sets one up, like the payment link;
+  3. whether a payer has an active standing order and whether the last charge failed (today we infer it from `paymentType` and `isKeva`);
+  4. if none of it exists, whether it is planned.
+  - It says a read key is enough.
+- **Where:** `local/oxs/2026-11-05-standing-order-api-email.txt` (gitignored), to support@oxs.co.il. No key values in it. The owner sends it.
+- **CONTEXT is unchanged:** a draft, not a rule.
+
 ### A brief for the owner's Grok bot, to test Michael like a real tenant (owner: "create an md file for grok bot on how to test the agent properly like a real tenant")
 - **The file:** `docs/features/11-whatsapp-bot/grok-tenant-tester.md`, written for the Grok tester, in English with the tenant messages in Hebrew. It covers the WhatsApp chatbot (chatbot first).
 - **What it holds:**
