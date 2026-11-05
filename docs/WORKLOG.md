@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-05
 
+### The test tickets in Bar Kochba 23 closed as cancelled, in our system only (owner: "ok lets close all that opened tickets", then "in the oxs dont touch them")
+- **Read first:** 151 open tickets.
+  - 92 are imported from OXS (real) and left alone.
+  - 33 are bot tickets in Bar Kochba 23, the test building: 17 from the owner's +63, 9 from phone-line tests, the rest from other testers. 16 of them are mirrored into OXS.
+  - 26 are bot tickets in other buildings. Some may be real calls, so they were left alone.
+- **Done:** the 33 were PATCHed to `cancelled`, by id and only while still open. All 33 changed and none is left open.
+  - `cancelled`, not `resolved`, because 036's trigger queues the closed-ticket message on `resolved`. 0 notices were queued.
+- **OXS untouched,** per the owner. Its 16 copies stay open there. If staff close one, the sync skips it, since ours is no longer open, so no message.
+- **The owner asked whether a close in OXS sends a message.** Yes, through the 5 Nov sync, for WhatsApp tickets, but on the UChat number only once `ticket_resolved_he` is approved on that account. It is not submitted yet, and waits on the owner.
+
 ### LIVE: each opening word sits with its own case, so a fault gets care, not "בשמחה" (epoch 94, `scripts/n8n_whatsapp_caseword.py`), and the "already open" answer (PR #4, v145)
 - **Cause:** the prompt's paragraph on the word before the answer already says, case by case, what that word is. It ended with a loose quoted list, "בשמחה", "כמובן", "אוי, לא נעים", and the first word was said back on a fault (155838: "בשמחה אסף. פתחתי קריאה על המעלית …").
 - **The change: the same words moved, nothing added** (23,684 -> 23,689 characters):

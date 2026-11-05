@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **5 Nov: the 33 open test tickets in Bar Kochba 23 are `cancelled` in our system** (owner: "close all that opened tickets", "in the oxs dont touch them"). Their 16 OXS copies are untouched and still open there. The 26 bot tickets in other buildings and the 92 imported ones were left alone. WORKLOG 5 Nov.
+>
 > **LIVE 5 Nov, epoch 94: a fault opens with care ("אוי, לא נעים"), never "בשמחה",** with each opening word moved to its own case (`n8n_whatsapp_caseword.py`). **And debt-tools v145 (PR #4):** on WhatsApp, a ticket that was already open is answered with `already_open: true, opened_now: false`, so the bot stops saying "פתחתי" for it.
 >
 > **LIVE 5 Nov, epoch 93: the bot says an urgent ticket is urgent, never "emergency"** (owner: "why it will notify emergency services?"). It is on both the live bot and the UChat copy (`-93-uchat`). The owner's handset test is owed (the elevator message, then "כן"). WORKLOG 5 Nov; rollback with `n8n_whatsapp_urgentword.py --restore`, then `n8n_uchat.py --apply`.
