@@ -324,7 +324,8 @@ RETRY_NOTE_MGR = (
 WHY_WORDS = "היא הייתה ריקה"
 WHY_PHANTOM = "היא אמרה שנפתחה קריאה, ובתור הזה לא נפתחה שום קריאה ולא חזר מספר"
 WHY_LINKS = "היא נתנה קישור שלא הגיע מכלי"
-WHY_DEEDS = "היא סיפרה שבדקת, שלחת, תיקנת או טיפלת במשהו, ושום כלי לא עשה את זה בתור הזה"
+# 6 Nov (n8n_whatsapp_retest3.py): "רשמת, הוספת" with the verbs the deeds guard gained.
+WHY_DEEDS = "היא סיפרה שבדקת, שלחת, רשמת, הוספת, תיקנת או טיפלת במשהו, ושום כלי לא עשה את זה בתור הזה"
 # 5 Oct: what the first pass's tools returned, as a fact in the same brackets.
 # Without it the second pass lost the lookup it was answering from.
 FACTS_HEAD = "[מה שהכלים כבר החזירו לך בתור הזה, לפני הטיוטה שנפסלה: "

@@ -8,9 +8,23 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **BUILT 6 Nov, epoch 99, NOT LIVE YET: the tester's third run fixed** (`n8n_whatsapp_retest3.py`). Live and the UChat copy are still epoch 98 (`-98`, `-98-uchat`), while the repo already carries epoch 99's texts (`prompt.md`, `MEMORY_EPOCH = 99`, the deeds verbs in `wa_truth.py`/`n8n_whatsapp_outage.py`, Try again's reason in `n8n_whatsapp_retry.py`). Until the apply, those differ from live by design.
+>   - **What it changes:**
+>     - Send's ref v1 names the one ticket the tools gave when the reply names none (C2).
+>     - `Still the last word?` lastword v2 reads a burst after the menu whole and tells the model the menu went out (C11).
+>     - The deeds guard counts "רשמתי"/"הוספתי"/"עדכנתי" (C6.4's false "I recorded", invisible to the tester).
+>     - The prompt gives the name after the system's greeting even to someone in memory (C5), and ends the manager's "when" on the matter (C9.4).
+>   - **Checked:**
+>     - Gate 473/473 on the candidate, with only the prompt and Try again pins waiting on the Claude-played check.
+>     - On real turns, each change touches only the faulty ones: ref v1 7 of 133, lastword 1 of 137, the deeds verbs 1 of 23.
+>     - Claude-played: C5 and C11 now open with the name. The manager and cheque pair is still being played.
+>   - **Next:** the new pins, `python scripts/n8n_whatsapp_retest3.py --apply`, the gate on live, then `python scripts/n8n_uchat.py --apply`. Rollback: `--restore` (snapshot `local/n8n-whatsapp-live-06nov-before-retest3.json`), then `n8n_uchat.py --apply`.
+>   - **C10.1 was answered** (159074, UChat "ok" at 10:20:53 UTC) and never seen by the tester. Only the +63 phone can show whether it arrived (18:20 PH).
+>   - **Owed after the apply:** the tester reruns C1, C2, C5, C6 (steps 3-4), C9, C11, then C10. C10 never ran past its first step.
+>
 > **LIVE 6 Nov: the incoming phone agent sends gas to the gas company too** (Yariv's change 2 on the phone). The chatbot's line, word for word; no ticket, no note. Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` after a field-by-field compare with live, which showed only the prompt and notify_team's text differing. Read back equal to the repo. Claude-played 3 calls (`scripts/voice_qa_gas.json`): both gas calls got the line with no tool; smoke still got the note and the urgent ticket. **Owed:** the owner's call, 077-6687949 then 9, "יש ריח של גז בחדר המדרגות".
 >
-> **LIVE 6 Nov, epoch 98: the tester's second run fixed** (`n8n_whatsapp_retest2.py`; live and `-98-uchat`). A status answer names its ticket; after "when?" the closing question stays on the matter; a manager request is never "recorded" later either; Send's slang v1 turns "מבאס"/"באסה" into "לא נעים". Gate green on live; the replay changes only 5 slang swaps. **Owed:** the tester reruns C1, C2, C9 and C11 only.
+> **LIVE 6 Nov, epoch 98: the tester's second run fixed** (`n8n_whatsapp_retest2.py`; live and `-98-uchat`). A status answer names its ticket; after "when?" the closing question stays on the matter; a manager request is never "recorded" later either; Send's slang v1 turns "מבאס"/"באסה" into "לא נעים". Gate green on live; the replay changes only 5 slang swaps. The tester's run against it (the third, the full plan) is the epoch 99 entry above.
 >
 > **LIVE 6 Nov, epoch 97: the Grok tester's failures fixed** (`n8n_whatsapp_retest.py`; owner: "lets fix and give me the instructions to test again"). Live and the UChat copy (`-97-uchat`); the incoming phone agent got the same text edits.
 >   - **Send's danger v5:** a turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) is not an emergency turn, unless the reply names the urgent ticket. Its one appended line is "הקריאה הדחופה שלך פתוחה, מספר …". "…וזה הדבר היחיד שאני יכול לעשות מכאן" is gone from the code. That was C9: the step cut good replies and stuck the smoke ticket on each.

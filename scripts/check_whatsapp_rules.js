@@ -42,6 +42,8 @@ function build(X) {
     inject: compile(['$json', '$now', '$'], 'return (' + X.inject + ');', 'the inject'),
     tryAgain: compile(['$json', '$'], 'return (' + X.try_again + ');', 'Try again'),
     teamNote: compile(['$json', '$'], 'return (' + X.team_note + ');', 'Team note this turn?'),
+    // 6 Nov (scripts/n8n_whatsapp_retest3.py): a Code node's body, run as n8n runs it.
+    lastWord: X.last_word ? compile(['$input', '$'], X.last_word, 'Still the last word?') : null,
   };
 }
 
@@ -463,6 +465,85 @@ function cases(E) {
     expect('a reply with no slang is untouched', say({ reply: PLAIN, said: 'המעלית תקועה' }), PLAIN);
   }
 
+  // 6 Nov (scripts/n8n_whatsapp_retest3.py, the tester's third run, C2, execution 158760): the lookup and
+  // the add both gave 255-1403-26 and the reply named neither. Epoch 98's tool text held in C5 and C11 and
+  // not there, so the number is put in by code when the turn's tools gave exactly one ticket.
+  if (P.code && String(P.code.send_body || '').indexOf("const rv = 'ref v") !== -1) {
+    console.log(NL + "--- Send: a ticket the tools found is named by its number (6 Nov, the tester's C2) ---");
+    const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+    const STATUS1 = { action: { tool: 'get_request_status' }, observation: obs({ ok: true, found: 1, requests: [{ reference: '255-1403-26', status: 'open' }] }) };
+    const ADD1 = { action: { tool: 'add_request_detail' }, observation: obs({ ok: true, reference: '255-1403-26' }) };
+    const C2 = 'הוספתי לקריאה את העדכון שלך שהמעלית עדיין לא עובדת. המצב שלה כרגע עדיין מופיע כפתוחה. מישהו תקוע בפנים או שהיא פשוט עומדת?';
+    expect('C2 exactly (158760): the number goes in after the first word for the ticket',
+      () => content(E, { reply: C2, steps: [STATUS1, ADD1], said: 'שוב אני, המעלית עדיין לא עובדת' }),
+      'הוספתי לקריאה (255-1403-26) את העדכון שלך שהמעלית עדיין לא עובדת. המצב שלה כרגע עדיין מופיע כפתוחה. מישהו תקוע בפנים או שהיא פשוט עומדת?');
+    expect('"the ticket of yours": after the possessive',
+      () => content(E, { reply: 'הקריאה שלך עדיין פתוחה במערכת. משהו השתנה מאז?', steps: [STATUS1] }),
+      'הקריאה שלך (255-1403-26) עדיין פתוחה במערכת. משהו השתנה מאז?');
+    const NAMED = 'הקריאה 255-1403-26 עדיין פתוחה. משהו השתנה מאז?';
+    expect('a reply that already names a ticket is untouched', () => content(E, { reply: NAMED, steps: [STATUS1] }), NAMED);
+    const THREE = { action: { tool: 'get_request_status' }, observation: obs({ ok: true, found: 3, requests: [{ reference: '255-1404-26' }, { reference: '255-1403-26' }, { reference: '255-1402-26' }] }) };
+    const VAGUE = 'אני רואה במערכת את שלוש הקריאות הפתוחות. לאיזו מהן התכוונת?';
+    expect('three tickets found: nothing is guessed', () => content(E, { reply: VAGUE, steps: [THREE] }), VAGUE);
+    const WHEN = 'הקריאה על הניקיון כבר פתוחה. משהו השתנה מאז?';
+    expect('no tool this turn: untouched', () => content(E, { reply: WHEN, steps: [] }), WHEN);
+    const NOWORD = 'הוספתי את זה, טוב שזה רק טפטוף. יש עוד פרט שחשוב שאדע?';
+    expect('no word for the ticket: untouched', () => content(E, { reply: NOWORD, steps: [ADD1] }), NOWORD);
+    const NOTOPEN = { action: { tool: 'open_request' }, observation: obs({ ok: true, opened: false, reason: 'street_unknown' }) };
+    const ASK = 'הכתובת הזאת לא מופיעה אצלנו. תוכל לבדוק אם זו הכתובת המדויקת לקריאה?';
+    expect('an open that opened nothing: untouched', () => content(E, { reply: ASK, steps: [NOTOPEN] }), ASK);
+    expect("the first pass's add, carried flat by Try again, counts too", () => {
+      const m = turn({ reply: 'הוספתי עכשיו לקריאה שאתה מחכה לתשובה. מישהו תקוע בפנים?', steps: [] });
+      const $ = (n) => (n === 'Try again'
+        ? { first: () => ({ json: { first_steps: [{ tool: 'add_request_detail', observation: obs({ ok: true, reference: '255-1403-26' }) }] } }) }
+        : m.$(n));
+      return JSON.parse(E.send(m.$json, $)).content;
+    }, 'הוספתי עכשיו לקריאה (255-1403-26) שאתה מחכה לתשובה. מישהו תקוע בפנים?');
+    expect('a closed ticket the lookup found is named the same way',
+      () => content(E, { reply: 'הקריאה על המעלית כבר נסגרה. משהו קורה איתה שוב?', steps: [{ action: { tool: 'get_request_status' }, observation: obs({ ok: true, found: 1, requests: [{ reference: '255-1390-26', status: 'closed' }] }) }] }),
+      'הקריאה (255-1390-26) על המעלית כבר נסגרה. משהו קורה איתה שוב?');
+  }
+
+  // 6 Nov (scripts/n8n_whatsapp_retest3.py, the tester's C11, executions 159008-159015): "שלום", "יש בעיה"
+  // and the fault, seconds apart. The menu was logged after the other two, so the backlog stopped on it at
+  // once, and Sort's note that the menu went out had been spent by a silenced run.
+  if (E.lastWord && String((P.code || {}).last_word || '').indexOf('lastword v2') !== -1) {
+    console.log(NL + "--- Still the last word?: a burst after the menu (6 Nov, the tester's C11) ---");
+    const lw = (S, rows) => {
+      const $ = (name) => { if (name === 'Sort') return { first: () => ({ json: S }) }; throw new Error('no node ' + name); };
+      return E.lastWord({ all: () => rows.map((r) => ({ json: r })) }, $);
+    };
+    const one = (S, rows) => { const r = lw(S, rows); return r.length === 1 ? r[0].json : { none: true }; };
+    const MENU_ROW2 = { direction: 'outbound', body: MENU_TEXT, external_id: '37315', message_type: 'text' };
+    const INTERCOM = { direction: 'inbound', body: 'האינטרקום לא עובד כבר יומיים', external_id: '37313', message_type: 'text' };
+    const PROBLEM = { direction: 'inbound', body: 'יש בעיה', external_id: '37307', message_type: 'text' };
+    const SHALOM = { direction: 'inbound', body: 'שלום', external_id: '37305', message_type: 'text' };
+    const PREV = { direction: 'outbound', body: 'זמן מדויק אין לי. משהו השתנה מאז?', external_id: '37295', message_type: 'text' };
+    const S11 = { message_id: '37313', text: 'האינטרקום לא עובד כבר יומיים', last_bot: '', photo: false };
+    const BOTH = 'יש בעיה' + NL + 'האינטרקום לא עובד כבר יומיים';
+    expect('C11 exactly (the menu logged after the burst): both messages reach the model',
+      () => one(S11, [MENU_ROW2, INTERCOM, PROBLEM, SHALOM, PREV]).text, BOTH);
+    expect('C11 exactly: the model is told the menu went out',
+      () => one(S11, [MENU_ROW2, INTERCOM, PROBLEM, SHALOM, PREV]).last_bot, MENU_TEXT);
+    expect('the menu logged in its place: the same text',
+      () => one(S11, [INTERCOM, PROBLEM, MENU_ROW2, SHALOM, PREV]).text, BOTH);
+    expect('the menu logged in its place: told too',
+      () => one(S11, [INTERCOM, PROBLEM, MENU_ROW2, SHALOM, PREV]).last_bot, MENU_TEXT);
+    expect("the last thing sent was Michael's own reply: no word of a menu",
+      () => one(S11, [INTERCOM, PROBLEM, PREV]).last_bot, '');
+    expect("Sort's own note stands when it has one",
+      () => one(Object.assign({}, S11, { last_bot: 'אפשר לעזור בעוד משהו?' }), [INTERCOM, PREV]).last_bot, 'אפשר לעזור בעוד משהו?');
+    expect('a later message arrived: this run says nothing',
+      () => lw(Object.assign({}, S11, { message_id: '37307', text: 'יש בעיה' }), [MENU_ROW2, INTERCOM, PROBLEM, SHALOM, PREV]).length, 0);
+    expect('a hello with more in it is not left out',
+      () => one(S11, [MENU_ROW2, INTERCOM, { direction: 'inbound', body: 'שלום, יש בעיה', external_id: '37307' }, PREV]).text,
+      'שלום, יש בעיה' + NL + 'האינטרקום לא עובד כבר יומיים');
+    expect("a tap and the fault two seconds later still read as one (the join's first job)",
+      () => one({ message_id: '21', text: 'המעלית תקועה', last_bot: '' },
+        [{ direction: 'inbound', body: 'המעלית תקועה', external_id: '21' }, { direction: 'inbound', body: 'פתיחת קריאת שירות', external_id: '20' }, MENU_ROW2, SHALOM]).text,
+      'פתיחת קריאת שירות' + NL + 'המעלית תקועה');
+  }
+
   // 6 Oct (scripts/n8n_whatsapp_danger.py): in an emergency Michael says the
   // urgent ticket and its number, nothing else. The owner: "we dont order them
   // around we just open a ticket ... dont advise anything and dont tell them that
@@ -655,6 +736,17 @@ function cases(E) {
   expect('"all fine" is not "was arranged"', d('הכל בסדר, במה עוד אפשר לעזור?', 0), true);
   expect('a verb in quotes is still caught', d('כתבתי "החלפתי" בטעות.', 1), false);
   expect('a greeting is untouched', d("בוקר טוב! מיכאל מהומי'ז כאן. במה אוכל לעזור לכם?", 0), true);
+  // 6 Nov (scripts/n8n_whatsapp_retest3.py, the tester's C6.4, execution 158913): "I recorded the details"
+  // with no tool that turn went out, because "רשמתי" was never one of the verbs. Only where it now is.
+  if (String(((P.code || {}).reply_usable || {}).deeds || '').indexOf('רשמתי') !== -1) {
+    const C64 = 'אין בעיה. רשמתי את הפרטים שנתת לי (צ\'ק של כ-500 ש"ח מאמצע יולי). כשיהיה לך את הצילום או הקבלה, פשוט תשלח לי לכאן. יש עוד משהו שאוכל לעשות בשבילך היום?';
+    expect('C6.4 exactly: "I recorded the details", no tool', d(C64, 0), false);
+    expect('the same, with the tool that recorded them', d(C64, 1), true);
+    expect('"I added it to the ticket", no tool', d('הוספתי את זה לקריאה, טוב שזה רק טפטוף. יש עוד משהו?', 0), false);
+    expect('"I updated the ticket", no tool', d('עדכנתי את הקריאה שהמעלית עדיין לא עובדת. משהו השתנה?', 0), false);
+    expect('"already recorded" is a state, not a deed', d('הבקשה שלך להוראת קבע כבר רשומה, מספר 255-1395-26. יש עוד משהו?', 0), true);
+    expect('"I have not recorded anything" is not a deed', d('לא רשמתי שום דבר עדיין. מה הסכום ששילמת?', 0), true);
+  }
 
   // 5 Oct: `Second try usable?` is gone with `Say it again`
   // (scripts/n8n_whatsapp_safetynet.py); these run only where it still exists.

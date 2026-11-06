@@ -230,7 +230,11 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 98
+MEMORY_EPOCH = 99
+# 98 -> 99, 6 Nov (n8n_whatsapp_retest3.py, the tester's third run): the name after the system's greeting
+# to someone already in memory, the manager's "when" ends on the matter; with them, code: Send's ref v1
+# names the one ticket the tools gave, `Still the last word?` reads a burst after the menu whole, and the
+# deeds guard counts "רשמתי"/"הוספתי"/"עדכנתי" as deeds.
 # 97 -> 98, 6 Nov (n8n_whatsapp_retest2.py, the tester's second run): a status answer names its ticket
 # (get_request_status), the question after "when?" stays on the matter, a manager request is never
 # "recorded" later either, and Send's slang v1 turns "מבאס"/"באסה" into "לא נעים".
@@ -792,7 +796,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "56e15b725d51",   # docs/features/11-whatsapp-bot/prompt.md (6 Nov, epoch 98, the tester's second run)
+    "prompt": "5043db415c92",   # docs/features/11-whatsapp-bot/prompt.md (6 Nov, epoch 99, the tester's third run)
     "inject": "3670f71d14b9",   # LIVE's (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
     # n8n_whatsapp_untemplate.py is not folded yet

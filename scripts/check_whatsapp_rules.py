@@ -333,6 +333,9 @@ def extract(wf):
         "try_again": inner(by["Try again"]["parameters"]["jsonOutput"]),
         # 1 Oct: it reads "you", and the bot's "you" went singular.
         "team_note": inner(conds_raw(by, "Team note this turn?", "teamnote")),
+        # 6 Nov (n8n_whatsapp_retest3.py): which run answers a burst, the text it hands the model,
+        # and whether it tells the model the menu went out.
+        "last_word": (by.get("Still the last word?") or {}).get("parameters", {}).get("jsCode", ""),
     }
 
 

@@ -48,7 +48,11 @@ _Q = BS + "u0022" + BS + "u0027" + BS + "u05f3"   # " ' and the Hebrew geresh
 B = "(^|[" + BS + "s,.!?:;()" + _Q + "])[ושכה]?"
 E = "(?=[" + BS + "s,.!?:;()" + _Q + "]|$)"
 NEVER_VERBS = "החלפתי|תיקנתי|סידרתי|ניקיתי|הזמנתי"
+# 6 Nov (n8n_whatsapp_retest3.py, the tester's C6.4, execution 158913): "רשמתי את הפרטים" went out with no
+# tool that turn. Recorded, added and updated are tool-shaped too: true only when a tool ran. Over the
+# retained executions of both bots, 23 real replies used one of the five, and only that one had no tool.
 TOOLED_VERBS = ("בדקתי|בדקנו|שלחתי|שלחנו|פתחתי|פתחנו|טיפלתי|טיפלנו|"
+                "רשמתי|רשמנו|הוספתי|הוספנו|עדכנתי|"
                 "החלפנו|תיקנו|סידרנו|ניקינו|הזמנו|"
                 "הוחלף|הוחלפה|הוחלפו|תוקן|תוקנה|תוקנו|טופל|טופלה|טופלו|"
                 "סודר|סודרה|סודרו|נוקה|נוקו|הוזמן|הוזמנה|הוזמנו|"

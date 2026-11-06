@@ -1,0 +1,521 @@
+{
+ "_about": "The deck for n8n_whatsapp_retest3.py (6 Nov, epoch 99): the tester's third run. The name after the system's greeting to someone already in memory (C5, C11's merged burst), the manager's when ends on the matter (C9.4), and the cheque details after the deeds guard sends back a false 'I recorded' (C6.4; the first pass is Gemini's real draft, 158913).",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
+  "open_request": {
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second call with the same building and the same type returns the FIRST ticket's reference as `duplicate` (the ticket service's 30-minute duplicate guard: same building, same type, still open); a different type gets the next serial (255-1510-26 -> 255-1511-26).",
+   "opened": {
+    "ok": true,
+    "opened": true,
+    "reference": "<ticket>",
+    "building": "בר כוכבא 23",
+    "reporter_unit": "<the reporter_unit passed>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ],
+    "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   },
+   "need_building": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_building"
+   },
+   "duplicate": {
+    "ok": true,
+    "reference": "<the first ticket's reference>",
+    "duplicate": true
+   }
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "notify_team": {
+   "ok": true,
+   "reason": "other"
+  },
+  "show_menu": {
+   "ok": true,
+   "menu": "shown under your next message"
+  },
+  "verify_address": {
+   "_rule": "Bar Kochba in Hebrew with 23: found. Bar Kochba in Hebrew without a number: need_number. Anything else: street_unknown.",
+   "found": {
+    "ok": true,
+    "building_found": true,
+    "address": "בר כוכבא 23, תל אביב-יפו"
+   },
+   "need_number": {
+    "ok": true,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "get_service_info": {
+   "_rule": "Match the topic's words against each entry's `words` (any one is enough); every entry that matches comes back in `topics` as {title, facts}. Nothing matches: not_found.",
+   "catalogue": [
+    {
+     "title": "ניהול ועד בית",
+     "words": [
+      "ועד",
+      "ניהול",
+      "גבייה",
+      "גביה",
+      "תקציב",
+      "כספים",
+      "הנהלת חשבונות",
+      "דוח",
+      "דוחות",
+      "מאזן",
+      "קבלה",
+      "קבלות",
+      "הוראת קבע",
+      "לשלם",
+      "תשלום"
+     ],
+     "facts": [
+      "בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.",
+      "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
+      "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
+      "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
+      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים."
+     ]
+    },
+    {
+     "title": "הדברה",
+     "words": [
+      "הדברה",
+      "מדביר",
+      "גוקים",
+      "ג'וקים",
+      "גו'קים",
+      "נמלים",
+      "מזיקים",
+      "עכברים",
+      "חולדות",
+      "צרעות",
+      "מקקים"
+     ],
+     "facts": [
+      "ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.",
+      "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.",
+      "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.",
+      "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים."
+     ]
+    },
+    {
+     "title": "שיפוצים",
+     "words": [
+      "שיפוץ",
+      "שיפוצים",
+      "לשפץ",
+      "ריצוף",
+      "צביעה",
+      "גבס",
+      "איטום"
+     ],
+     "facts": [
+      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות."
+     ]
+    },
+    {
+     "title": "ניהול נכסים לבעלי דירות",
+     "words": [
+      "ניהול נכס",
+      "ניהול נכסים",
+      "בעל דירה",
+      "להשכיר",
+      "שוכר",
+      "שוכרים",
+      "חוזה שכירות",
+      "משכיר"
+     ],
+     "facts": [
+      "שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.",
+      "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו."
+     ]
+    }
+   ],
+   "not_found": {
+    "ok": true,
+    "found": false,
+    "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+   }
+  },
+  "get_payment_link": {
+   "ok": true,
+   "found": true,
+   "link": "https://pay.example.co.il/t/<id>",
+   "building": "בר כוכבא 23",
+   "apartment": "<flat>"
+  },
+  "get_balance": {
+   "_rule": "name or phone missing: need_identity (list what is missing). The card's full name and phone together (any spacing or hyphens): the scenario's balance fixture. Anything else: identity_failed.",
+   "need_identity": {
+    "ok": true,
+    "found": 0,
+    "need_identity": true,
+    "missing": [
+     "<name and/or phone>"
+    ]
+   },
+   "identity_failed": {
+    "ok": true,
+    "found": 0,
+    "identity_failed": true
+   }
+  },
+  "add_request_detail": {
+   "ok": false,
+   "error": "not found"
+  },
+  "request_standing_order": {
+   "_rule": "On file (the scenario has `who`): recorded, with the scenario's `ticket` as reference. A second call in the same chat returns the same reference with already_recorded true. Not on file (no `who`): a call with no reporter_name returns need_name; a call with reporter_name and a building naming Bar Kochba in Hebrew with 23 returns recorded with the scenario's `ticket`; Bar Kochba with no number: need_number; any other street: street_unknown.",
+   "recorded": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": true,
+    "reference": "<ticket>"
+   },
+   "again": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": false,
+    "already_recorded": true,
+    "reference": "<ticket>"
+   },
+   "need_name": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_name"
+   }
+  }
+ },
+ "scenarios": [
+  {
+   "time": "12:30",
+   "weekday": 5,
+   "weekday_he": "שישי",
+   "iso": "2026-11-06T12:30:00+02:00",
+   "id": "status_tap_back",
+   "title": "Back after an earlier chat: hello, then the status tap (C5)",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1403-26",
+   "history": [
+    {
+     "resident": "פתיחת קריאת שירות",
+     "michael": "כאן מיכאל מצוות השירות של הומי'ז. הגעת למקום הנכון ואני איתך, מה קרה? 😊"
+    },
+    {
+     "resident": "המעלית תקועה בקומה 3 מהבוקר",
+     "michael": "אוי, זה ממש מתסכל. פתחתי עכשיו קריאה על המעלית בבר כוכבא 23 (מספר הקריאה הוא 255-1403-26), ורשמתי אותה על דירה 2. מישהו תקוע בפנים?",
+     "tools": [
+      "open_request"
+     ]
+    },
+    {
+     "resident": "לא, אין אף אחד בפנים",
+     "michael": "טוב לשמוע שאף אחד לא תקוע. הקריאה 255-1403-26 פתוחה, וכשסוגרים אותה נשלחת עליה הודעה לכאן. משהו נוסף השתנה עם המעלית?"
+    }
+   ],
+   "resident": {
+    "persona": "יוסי, חוזר לבדוק.",
+    "script": [
+     {
+      "say": "היי"
+     },
+     {
+      "say": "מצב קריאה קיימת",
+      "kind": "tap"
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 3,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1404-26",
+       "status": "open",
+       "type": "plumbing",
+       "urgency": "high",
+       "opened": "2026-11-06",
+       "last_update": "2026-11-06",
+       "description": "יורדים מים מהתקרה באמבטיה, נראה לי מהשכנים למעלה | זה רק טפטוף בינתיים"
+      },
+      {
+       "reference": "255-1403-26",
+       "status": "open",
+       "type": "elevator",
+       "urgency": "high",
+       "opened": "2026-11-06",
+       "last_update": "2026-11-06",
+       "description": "המעלית תקועה בקומה 3 מהבוקר"
+      },
+      {
+       "reference": "255-1402-26",
+       "status": "open",
+       "type": "other",
+       "urgency": "emergency",
+       "opened": "2026-11-06",
+       "last_update": "2026-11-06",
+       "description": "יש עשן בחדר המדרגות"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "מיכאל",
+     "name": "after the system's greeting he says who he is, though they spoke before"
+    },
+    {
+     "type": "called",
+     "tool": "get_request_status",
+     "name": "the lookup first"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 1,
+     "regex": "^(בוקר טוב|צהריים טובים|שלום|היי)",
+     "name": "no second greeting"
+    }
+   ]
+  },
+  {
+   "time": "12:30",
+   "weekday": 5,
+   "weekday_he": "שישי",
+   "iso": "2026-11-06T12:30:00+02:00",
+   "id": "burst_after_menu",
+   "title": "Back after an earlier chat: hello, then 'there's a problem' + the intercom in one burst (C11)",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1406-26",
+   "history": [
+    {
+     "resident": "פתיחת קריאת שירות",
+     "michael": "כאן מיכאל מצוות השירות של הומי'ז. הגעת למקום הנכון ואני איתך, מה קרה? 😊"
+    },
+    {
+     "resident": "המעלית תקועה בקומה 3 מהבוקר",
+     "michael": "אוי, זה ממש מתסכל. פתחתי עכשיו קריאה על המעלית בבר כוכבא 23 (מספר הקריאה הוא 255-1403-26), ורשמתי אותה על דירה 2. מישהו תקוע בפנים?",
+     "tools": [
+      "open_request"
+     ]
+    },
+    {
+     "resident": "לא, אין אף אחד בפנים",
+     "michael": "טוב לשמוע שאף אחד לא תקוע. הקריאה 255-1403-26 פתוחה, וכשסוגרים אותה נשלחת עליה הודעה לכאן. משהו נוסף השתנה עם המעלית?"
+    }
+   ],
+   "resident": {
+    "persona": "מאיר, 70, כותב בלי פיסוק.",
+    "script": [
+     {
+      "say": "שלום"
+     },
+     {
+      "say": "יש בעיה\nהאינטרקום לא עובד כבר יומיים"
+     }
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "מיכאל",
+     "name": "after the system's greeting he says who he is"
+    },
+    {
+     "type": "called",
+     "tool": "open_request",
+     "name": "the intercom ticket"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "1406",
+     "name": "with its number"
+    }
+   ]
+  },
+  {
+   "time": "12:30",
+   "weekday": 5,
+   "weekday_he": "שישי",
+   "iso": "2026-11-06T12:30:00+02:00",
+   "id": "manager_when3",
+   "title": "A manager, insisting, the cleaning, then when will the manager call (C9)",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1405-26",
+   "resident": {
+    "persona": "אבי, כועס.",
+    "script": [
+     {
+      "say": "אני רוצה לדבר עם מנהל."
+     },
+     {
+      "say": "לא רוצה להסביר לבוט, תביא לי בן אדם."
+     },
+     {
+      "say": "טוב. לא מנקים את חדר המדרגות כבר שבועיים."
+     },
+     {
+      "say": "ומתי המנהל יחזור אליי?"
+     }
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {
+     "type": "turn_not_regex",
+     "turn": 3,
+     "regex": "יש עוד משהו|בעוד משהו|במה עוד|עוד משהו ש",
+     "name": "after 'when?' no 'anything else'"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 3,
+     "regex": "\\?\\s*$",
+     "name": "it still ends on a question"
+    },
+    {
+     "type": "turn_not_regex",
+     "turn": 3,
+     "regex": "הבקשה שלך|רשומה|רשמתי את הבקשה|ורשומות",
+     "name": "never that the manager request is recorded"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "הצוות|בהקדם|בקרוב",
+     "name": "one voice, no promise"
+    }
+   ]
+  },
+  {
+   "time": "12:30",
+   "weekday": 5,
+   "weekday_he": "שישי",
+   "iso": "2026-11-06T12:30:00+02:00",
+   "id": "cheque_details",
+   "title": "A cheque the record misses, then the amount with no photo (C6.4)",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1407-26",
+   "history": [
+    {
+     "resident": "כמה אני חייב?",
+     "michael": "כמובן. המערכת מראה שסך החוב על דירה 2 הוא 2,000 ש\"ח: 250 ש\"ח לכל חודש, ינואר עד אוגוסט 2026. תרצה את הקישור לתשלום?",
+     "tools": [
+      "get_balance"
+     ]
+    }
+   ],
+   "resident": {
+    "persona": "עומר, בטוח ששילם.",
+    "script": [
+     {
+      "say": "שילמתי כבר בצ'ק ביולי, למה כתוב שאני חייב?"
+     },
+     {
+      "say": "בערך 500 שקל, באמצע יולי. אין לי תמונה עכשיו"
+     }
+    ]
+   },
+   "fixtures": {
+    "get_balance": {
+     "ok": true,
+     "found": 1,
+     "resident": "אסף קליקס",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "unit": "2",
+     "owed_total": 2000,
+     "owed_months": [
+      {
+       "period": "2026-01",
+       "amount": 250
+      },
+      {
+       "period": "2026-02",
+       "amount": 250
+      },
+      {
+       "period": "2026-03",
+       "amount": 250
+      },
+      {
+       "period": "2026-04",
+       "amount": 250
+      },
+      {
+       "period": "2026-05",
+       "amount": 250
+      },
+      {
+       "period": "2026-06",
+       "amount": 250
+      },
+      {
+       "period": "2026-07",
+       "amount": 250
+      },
+      {
+       "period": "2026-08",
+       "amount": 250
+      }
+     ],
+     "in_review": []
+    }
+   },
+   "expect": [
+    {
+     "type": "turn_not_regex",
+     "turn": 1,
+     "regex": "רשמתי|שנוכל|לסדר",
+     "name": "what goes out claims no record, no 'we', no fixing"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "צילום|קבלה|אישור",
+     "name": "the proof is still asked for"
+    }
+   ]
+  }
+ ]
+}

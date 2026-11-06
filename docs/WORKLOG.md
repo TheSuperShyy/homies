@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-11-06
 
+### BUILT, not live yet: the tester's third run fixed (epoch 99; the owner pasted its report)
+- **The third run** (C1-C7, C9, C11, C8, C10): one serious fail (C2) and four others (C5, C6.4, C9.4, C11). C10 stopped on a missing reply. Money, gas, smoke and "never recorded" held; epoch 98's question after "when?" held in C1.4, and slang v1 turned C11's "מבאס" into "לא נעים".
+- **Read against the UChat copy's executions (158718-159074):**
+  - **C2** (158760): get_request_status and add_request_detail both returned 255-1403-26, and the reply named neither ("הוספתי לקריאה את העדכון שלך…"). Epoch 98's tool clause held in C5 and C11.2, not here.
+  - **C5** (158840): told the menu had just gone out, exactly as in C1's tap, and no name. The tap paragraph's "if this is your first message to this person" beat "after the system's greeting"; the buffer held C1 to C4.
+  - **C11** (159008-159015): the menu was logged after "יש בעיה" and the intercom message. `Still the last word?` stopped on it at once, so "יש בעיה" never reached the model, and Sort's `last_bot` had been spent by "יש בעיה"'s silenced run (static data is per execution).
+  - **C6.4** (158913): "רשמתי את הפרטים שנתת לי…" with no tool that turn, then "כדי שנוכל לאמת ולסדר את זה במערכת". "רשמתי" was never one of the deeds guard's verbs. The tester cannot see tools, so this false claim was hidden from the report.
+  - **C9.4** (158988): "…יש עוד משהו שתרצה שאוסיף לקריאה בינתיים?". The manager paragraph's when-line ends "אתה נשאר בשיחה וממשיך לעזור בכל מה שעוד יש"; epoch 98's question went into the other when-line.
+  - **C9.1's bare note** ("הדייר ביקש לדבר עם מנהל") is the owner's 27 Oct rule, not a slip.
+  - **C10.1** (159074): answered in 18 s and handed to UChat with "ok" at 10:20:53 UTC, carrying the smoke ticket ("אני העוזר הדיגיטלי בצוות השירות של הומי'ז. הקריאה הדחופה על העשן פתוחה…"). The tester saw nothing. As with the first run's C8.2, only the phone proves delivery.
+- **The change** (`scripts/n8n_whatsapp_retest3.py`):
+  - **Send, ref v1** (after danger v5): when this turn's tools gave exactly one ticket and the reply names no reference, the number goes in brackets after the first word for the ticket.
+  - **`Still the last word?`, lastword v2:** a menu on top of inbound rows is read past, the bare hello it answered is left out, and `last_bot` is the menu whenever the newest outbound row is the menu.
+  - **The deeds guard:** "רשמתי", "רשמנו", "הוספתי", "הוספנו", "עדכנתי" join the verbs, in Reply usable?, Try again, Outage reply usable? and Mend the reply. Try again's reason names them. `wa_truth.py`, `n8n_whatsapp_outage.py`'s copy (it asserts one list) and `n8n_whatsapp_retry.py` carry the same.
+  - **The prompt:** the tap clause becomes "…ואתה אומר בה מי אתה, גם למי שכבר דיבר איתך קודם"; the manager when-line's last sentence becomes "והשאלה שבסוף ההודעה נשארת על העניין שלו, כמו אם משהו השתנה מאז". Prompt `5043db415c92` (24,514 -> 24,527 chars), memory 98 -> 99. Tool texts unchanged.
+- **The gate** (`--candidate --replay`): 473/473 cases, 24 of them new (ref v1 9, lastword v2 9, deeds 6). The only failures are the two pins, the prompt and Try again's note. The replay changes 0 of 1,297 replies through Send. With no tool assumed, the deeds pass flips 59 replies, each one saying one of the five verbs.
+- **Real turns with their real tools** (scratchpad scripts, both bots' retained executions):
+  - ref v1 changes 7 of 133 replies, each a lookup or an add whose number was missing ("בדקתי את הקריאה (255-1398-26) שוב עכשיו…" is the second run's C2);
+  - lastword v2 changes 1 of 137 runs, C11's;
+  - the deeds verbs change 1 of the 23 replies that use them, C6.4's.
+- **Claude-played** (`scripts/wa_qa_retest3.json`, on the candidate): status_tap_back and burst_after_menu both opened "כאן מיכאל מהומי'ז", with the three tickets and 255-1406-26 by number, and no guard rejection. manager_when3 and cheque_details are still being played.
+- **The guide:** C5 and C11 expect the name after the system's greeting, and R2 says so.
+- **Not changed, noted:**
+  - "מתי יחזרו אליך" in C9.4 presupposes a call back (the tester's note);
+  - "בשמחה" opening a manager request (C9.1), a status (C5.1) and a service answer (C11.3);
+  - the lift's "is someone stuck?" asked twice in near-identical words (C1.5, C2).
+- **Owed:** the second pair played, the pins, `--apply`, the gate on live and `n8n_uchat.py --apply`. Then the tester reruns C1, C2, C5, C6 (steps 3-4), C9, C11 and C10, and the owner checks the phone for C10.1's reply.
+
 ### LIVE: the tester's second run fixed (epoch 98; the owner pasted its report)
 - **The second run** (C1-C7, C9, C11, C8, C10, the new order): one serious fail and four others. Money, gas, smoke, privacy, the singular link and "כמובן" all held. C8 and C9 no longer carry the smoke ticket.
 - **Read against the UChat copy's executions:**
