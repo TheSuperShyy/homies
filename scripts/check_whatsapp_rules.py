@@ -205,7 +205,13 @@ PINS = {
     # question stays on the matter, and a manager request is not "recorded" later either. Claude-played
     # (scripts/wa_qa_retest2.json): the lift's when and re-ask ended on the lift and named 255-1398-26; the
     # manager's when gave the cleaning ticket and no "recorded". The one deck miss was a turn-index slip.
-    'Answer the resident / system': '56e15b725d51',
+    # 6 Nov, evening (n8n_whatsapp_retest3.py, epoch 99, the tester's third run): the name after the system's
+    # greeting even to someone in memory, and the manager's "when" ends on the matter. Claude-played on the
+    # candidate (scripts/wa_qa_retest3.json): the status tap and a burst after the menu, each with an earlier
+    # chat in memory, both opened "כאן מיכאל מהומי'ז"; the manager's when named 255-1405-26 with no
+    # "recorded", its question on the stairwell ("יש עוד משהו על חדר המדרגות שחשוב לך שאוסיף לקריאה?", the
+    # deck's one miss, on its words); 11/12.
+    'Answer the resident / system': '5043db415c92',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -215,7 +221,11 @@ PINS = {
     # names a promise instead, and its unnamed list asks for no bare question.
     # 19 Oct: names a copy of a sent message, opens with "a draft you wrote was not
     # sent", says what was sent arrived, and its tools line names the status lookup.
-    'Try again / note': 'acce63c34a53',
+    # 6 Nov, evening (n8n_whatsapp_retest3.py): the deeds guard's verbs gained recorded, added and updated,
+    # and the note's reason names them. Claude-played the retry on C6.4's real first draft (158913, "רשמתי
+    # את הפרטים…" with no tool): sent back by `deeds`, the second pass noted the details with notify_team,
+    # never mentioned it, and asked for the cheque's photo, with no "we" and nothing fixed.
+    'Try again / note': '80f711f381c4',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',

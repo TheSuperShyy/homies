@@ -8,19 +8,20 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **BUILT 6 Nov, epoch 99, NOT LIVE YET: the tester's third run fixed** (`n8n_whatsapp_retest3.py`). Live and the UChat copy are still epoch 98 (`-98`, `-98-uchat`), while the repo already carries epoch 99's texts (`prompt.md`, `MEMORY_EPOCH = 99`, the deeds verbs in `wa_truth.py`/`n8n_whatsapp_outage.py`, Try again's reason in `n8n_whatsapp_retry.py`). Until the apply, those differ from live by design.
+> **LIVE 6 Nov, epoch 99: the tester's third run fixed** (`n8n_whatsapp_retest3.py`; live and `-99-uchat`, both read back).
 >   - **What it changes:**
 >     - Send's ref v1 names the one ticket the tools gave when the reply names none (C2).
 >     - `Still the last word?` lastword v2 reads a burst after the menu whole and tells the model the menu went out (C11).
 >     - The deeds guard counts "רשמתי"/"הוספתי"/"עדכנתי" (C6.4's false "I recorded", invisible to the tester).
 >     - The prompt gives the name after the system's greeting even to someone in memory (C5), and ends the manager's "when" on the matter (C9.4).
 >   - **Checked:**
->     - Gate 473/473 on the candidate, with only the prompt and Try again pins waiting on the Claude-played check.
+>     - Gate 473/473 on live, all 17 pins unchanged.
 >     - On real turns, each change touches only the faulty ones: ref v1 7 of 133, lastword 1 of 137, the deeds verbs 1 of 23.
->     - Claude-played: C5 and C11 now open with the name. The manager and cheque pair is still being played.
->   - **Next:** the new pins, `python scripts/n8n_whatsapp_retest3.py --apply`, the gate on live, then `python scripts/n8n_uchat.py --apply`. Rollback: `--restore` (snapshot `local/n8n-whatsapp-live-06nov-before-retest3.json`), then `n8n_uchat.py --apply`.
+>     - Claude-played (`scripts/wa_qa_retest3.json`), 11/12: C5 and C11 open with the name; C6.4's real draft goes back, and the retry asks for the photo with no claim.
+>   - **The one miss, judged to pass:** C9.4's "when" ended "יש עוד משהו על חדר המדרגות שחשוב לך שאוסיף לקריאה?". It is a question about his ticket, which the prompt allows; the guide's R5 now says so (CONTEXT has the rule). The owner may still want no "יש עוד משהו" opener at all while he waits: one more prompt sentence.
+>   - **Rollback:** `python scripts/n8n_whatsapp_retest3.py --restore` (snapshot `local/n8n-whatsapp-live-06nov-before-retest3.json`), then `python scripts/n8n_uchat.py --apply`.
 >   - **C10.1 was answered** (159074, UChat "ok" at 10:20:53 UTC) and never seen by the tester. Only the +63 phone can show whether it arrived (18:20 PH).
->   - **Owed after the apply:** the tester reruns C1, C2, C5, C6 (steps 3-4), C9, C11, then C10. C10 never ran past its first step.
+>   - **Owed:** the tester reruns C1, C2, C5, C6 (from step 3), C9, C11, then C10. C10 never ran past its first step.
 >
 > **LIVE 6 Nov: the incoming phone agent sends gas to the gas company too** (Yariv's change 2 on the phone). The chatbot's line, word for word; no ticket, no note. Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` after a field-by-field compare with live, which showed only the prompt and notify_team's text differing. Read back equal to the repo. Claude-played 3 calls (`scripts/voice_qa_gas.json`): both gas calls got the line with no tool; smoke still got the note and the urgent ticket. **Owed:** the owner's call, 077-6687949 then 9, "יש ריח של גז בחדר המדרגות".
 >

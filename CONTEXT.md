@@ -58,6 +58,8 @@ The user is the builder. The client is Homies.
 
 **Recorded, added and updated are deeds (6 Nov, epoch 99).** "רשמתי", "רשמנו", "הוספתי", "הוספנו" and "עדכנתי" are in the deeds guard's verbs (`wa_truth.TOOLED_VERBS`, with `n8n_whatsapp_outage.py`'s copy), so they are true only when a tool ran this turn; Try again's reason names them. The tester's C6.4 said "רשמתי את הפרטים" with no tool. Over the retained executions, 23 real replies used one of the five, and only that one had no tool.
 
+**While he waits, the last question is about his matter, in whatever words (6 Nov, epoch 99).** Only a bare "יש עוד משהו?" waits until the matter is done (the prompt's question paragraph). "יש עוד משהו על חדר המדרגות שחשוב לך שאוסיף לקריאה?" is a question about his ticket and passes. The tester's guide (R5) said less than the prompt, so it failed one such ending in the third run; it now says the same as the prompt. Judge the ending by what it asks, not by its first words.
+
 **A limit is the bot's, not the tenant's (6 Nov, both channels).** In a danger or gas follow-up the bot says what it did, never what it cannot give. The prompt says it with its own idiom, "הכלל הזה הוא בשבילך, לא בשבילו", not with a quoted forbidden phrase.
 
 **A tester's run comes from one number, so the bot sees one tenant.** What one conversation sets carries into the next: the name, the feminine, an emergency. `grok-tenant-tester.md` orders the conversations around it. Judge a carried state as correct, not as a slip.

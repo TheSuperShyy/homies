@@ -11,7 +11,15 @@ conversation that produced it.
 
 ## 2026-11-06
 
-### BUILT, not live yet: the tester's third run fixed (epoch 99; the owner pasted its report)
+### LIVE: the tester's third run fixed (epoch 99; the owner pasted its report)
+- **Applied** after the Claude-played check below: live, then the UChat copy (`-99-uchat`), both read back with ref v1, lastword v2, the deeds verbs in all four nodes, Try again's reason, prompt `5043db415c92` and tools `81322f5daf6b`. Snapshot: `local/n8n-whatsapp-live-06nov-before-retest3.json`.
+- **The gate on live:** 473/473, all 17 pins unchanged (the prompt and Try again pins set from this run).
+- **Claude-played, the second pair:**
+  - **cheque_details:** `deeds` sent C6.4's real first draft back. The note named "רשמת, הוספת"; the second pass noted the details with notify_team, never mentioned it, and asked for the cheque's photo, with no "we" and nothing fixed.
+  - **manager_when3:** the "when" named 255-1405-26 with no "recorded" and ended "יש עוד משהו על חדר המדרגות שחשוב לך שאוסיף לקריאה?". It is the deck's one miss (11/12), on its words.
+- **That ending is judged to pass:** it asks about his ticket, and the prompt's question paragraph keeps only a bare "יש עוד משהו?" for the end. The guide's R5 said less than the prompt and now says the same. If the owner wants no "יש עוד משהו" opener at all while he waits, that is one more prompt sentence.
+
+### Before the apply: the third run read, and the fixes built (epoch 99)
 - **The third run** (C1-C7, C9, C11, C8, C10): one serious fail (C2) and four others (C5, C6.4, C9.4, C11). C10 stopped on a missing reply. Money, gas, smoke and "never recorded" held; epoch 98's question after "when?" held in C1.4, and slang v1 turned C11's "מבאס" into "לא נעים".
 - **Read against the UChat copy's executions (158718-159074):**
   - **C2** (158760): get_request_status and add_request_detail both returned 255-1403-26, and the reply named neither ("הוספתי לקריאה את העדכון שלך…"). Epoch 98's tool clause held in C5 and C11.2, not here.
@@ -31,13 +39,13 @@ conversation that produced it.
   - ref v1 changes 7 of 133 replies, each a lookup or an add whose number was missing ("בדקתי את הקריאה (255-1398-26) שוב עכשיו…" is the second run's C2);
   - lastword v2 changes 1 of 137 runs, C11's;
   - the deeds verbs change 1 of the 23 replies that use them, C6.4's.
-- **Claude-played** (`scripts/wa_qa_retest3.json`, on the candidate): status_tap_back and burst_after_menu both opened "כאן מיכאל מהומי'ז", with the three tickets and 255-1406-26 by number, and no guard rejection. manager_when3 and cheque_details are still being played.
+- **Claude-played** (`scripts/wa_qa_retest3.json`, on the candidate): status_tap_back and burst_after_menu both opened "כאן מיכאל מהומי'ז", with the three tickets and 255-1406-26 by number, and no guard rejection. The second pair is in the LIVE entry above.
 - **The guide:** C5 and C11 expect the name after the system's greeting, and R2 says so.
 - **Not changed, noted:**
   - "מתי יחזרו אליך" in C9.4 presupposes a call back (the tester's note);
   - "בשמחה" opening a manager request (C9.1), a status (C5.1) and a service answer (C11.3);
   - the lift's "is someone stuck?" asked twice in near-identical words (C1.5, C2).
-- **Owed:** the second pair played, the pins, `--apply`, the gate on live and `n8n_uchat.py --apply`. Then the tester reruns C1, C2, C5, C6 (steps 3-4), C9, C11 and C10, and the owner checks the phone for C10.1's reply.
+- **Owed:** the tester reruns C1, C2, C5, C6 (steps 3-4), C9, C11 and C10, and the owner checks the phone for C10.1's reply.
 
 ### LIVE: the tester's second run fixed (epoch 98; the owner pasted its report)
 - **The second run** (C1-C7, C9, C11, C8, C10, the new order): one serious fail and four others. Money, gas, smoke, privacy, the singular link and "כמובן" all held. C8 and C9 no longer carry the smoke ticket.
