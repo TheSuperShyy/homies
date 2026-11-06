@@ -21,6 +21,37 @@ conversation that produced it.
 - **Not mine, left alone:** the uncommitted `scripts/vapi_tools.py` (the phone agent's gas text) and `scripts/voice_qa_gas.json` belong to another session in this checkout. They were not staged.
 - CONTEXT and HANDOVER are unchanged: cards in chat change no rule and nothing a fresh session would act on.
 
+## 2026-11-06
+
+### Read only: the Grok tester's run of 5-6 Nov, checked against the executions (the owner pasted its report)
+- **The run:** 11 conversations, 43 messages, from the owner's +63 through the UChat number. Its fault tickets 255-1393, 1394, 1396 and 1397-26 were mirrored into OXS (the mirror is on for that number). 255-1395-26 is a standing-order request made on the live bot by Gemini: "רשמתי את הבקשה שלך להוראת קבע, המספר שלה הוא 255-1395-26".
+- **C9 is Send's danger step, not the model** (UChat copy 156623, 156642, 156650):
+  - The model wrote "…כדי שאוכל להבין בדיוק ולטפל בזה הכי מהר שאפשר, תוכל לספר לי עוד מה קורה עכשיו בבניין?". Send cut it for "הכי מהר" and appended "הקריאה הדחופה שלך פתוחה, מספר 255-1396-26".
+  - "מעבר לזה, רציתי לשאול בזהירות – מה קורה עם העשן…" was cut for "זהירות", leaving "הכל בסדר?".
+  - **Why it stays on:** it is awake while any of the last three outbound messages names an urgent ticket, and its own appended line keeps it so.
+- **C8.2 was answered** in 20 s (156607). The translator's UChat write answered `{"status":"ok"}` (156611), as for the replies the tester did get. UChat's chat-messages holds only the tenant's messages and none of the bot's, so delivery is unprovable from here.
+- **The closing-message promise** (C1.4, C11.2) is in no text the bot reads. The gate keeps "כשהקריאה תיסגר, תגיע על זה הודעה לכאן" whole as true (danger v4). On the UChat number `ticket_resolved_he` is PENDING at Meta (`wa_templates.py --waba 2117787955519632`), and UChat's list has only `payment_link_he`.
+- **Artifacts of one number:** C10's feminine carried into C11, and C9 linked to C8's smoke.
+- **The fix order is in HANDOVER.** Nothing was changed by this read.
+
+### LIVE: the incoming phone agent sends gas to the gas company (Yariv's change 2 on the phone, after the chatbot; owner: "ok lets continue building whats on the feedback what is next")
+- **The rest of the list is blocked:**
+  - #4, the debt calls from OXS's own debt-list export: no export file exists here to read its columns from;
+  - #5, routing by department: waits on Homies' staff per department and their choice of inbox;
+  - #6, the wait before the phone agent answers: waits on Omnitelecom.
+
+  So the chatbot's #2 and #3 go to the phone agent next.
+- **The change:**
+  - **The prompt** (`docs/assistant/demo-inbound.md`): "חוץ ממקרה של גז" on "והמתקשרים לא נשלחים ממך לשום מקום", and the chatbot's gas sentence after the danger paragraph, with the line word for word.
+  - **notify_team** (`vapi_tools.py`): gas leaves the emergency list, with "Never for gas".
+  - **The debt agent** is unchanged: it has no note tool and no danger paragraph.
+- **Claude-played, free** (`scripts/voice_qa_gas.json`, `voice_qa.py bundle --candidate`):
+  - a strong smell in the stairwell, and a hedged smell by the meters: the line, word for word, and no tool;
+  - smoke: the note first, then the urgent ticket, as before.
+  - **Shared with the tester's C7.2:** asked what to do, the agent says it can't give safety instructions. That is the next fix, both channels.
+- **Pushed** with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`. The field-by-field compare first showed only the prompt and notify_team differing (the two speaking plans differ only as 1 against 1.0). Read back: prompt and tools equal the repo, voice `ba765d50`, model gpt-5.6-sol.
+- **Owed:** the owner's call: 077-6687949, then 9.
+
 ## 2026-11-05
 
 ### LIVE: a WhatsApp standing-order request is recorded and emailed to collections (epoch 96, debt-tools v148; Yariv's change 3; owner: "ok lets proceed to the next fix")

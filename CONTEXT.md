@@ -42,7 +42,7 @@ The user is the builder. The client is Homies.
 - **A fixed line is checked against Send's steps before it is offered.**
   - Line 1 of the two offered ("בגז מטפלת ישירות חברת הגז …") lost its sentence to the danger step's "מטפלת", read as a promise of action, whenever the chat had an urgent ticket shortly before.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
-- **The phone agent** still opens an urgent ticket for gas until its version is built.
+- **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
 **A standing order is recorded and emailed to collections (the client, 4 Nov review; Yariv's change 3; live on WhatsApp 5 Nov, epoch 96, debt-tools v148).**
 - **Why email:** OXS's API has one-time payments only, so nothing of ours can set one up. Homies want the request by email, not in another system to watch.
