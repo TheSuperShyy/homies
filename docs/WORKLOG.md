@@ -9,6 +9,18 @@ conversation that produced it.
 
 ---
 
+## 2026-11-06
+
+### Cards for the CRM board: what is open, and what was done on 5 Nov (owner: "/tasker", then "what about for yesterday")
+- **In chat only, through the `tasker` skill.** Nothing here writes to the board.
+- **Open, not covered by the ten meeting cards:**
+  - republish the tester checklist (High, waits on the owner's yes in a session that can show the prompt);
+  - take "the only thing I can do" out of the emergency filter (waits on the owner's go);
+  - fix what the Grok tenant test fails (waits on its report).
+- **Done on 5 Nov:** 11 cards. The meeting cards 1 (Omnitelecom, drafted), 4 (elevator), 5 (gas) and 6 (standing orders by email) are to be moved, not doubled.
+- **Not mine, left alone:** the uncommitted `scripts/vapi_tools.py` (the phone agent's gas text) and `scripts/voice_qa_gas.json` belong to another session in this checkout. They were not staged.
+- CONTEXT and HANDOVER are unchanged: cards in chat change no rule and nothing a fresh session would act on.
+
 ## 2026-11-05
 
 ### LIVE: a WhatsApp standing-order request is recorded and emailed to collections (epoch 96, debt-tools v148; Yariv's change 3; owner: "ok lets proceed to the next fix")
