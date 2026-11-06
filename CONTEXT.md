@@ -49,6 +49,15 @@ The user is the builder. The client is Homies.
 
 **No slang reaches a tenant (6 Nov, epoch 98, Send's slang v1).** "מבאס" and "באסה" become "לא נעים" in code, beside emoji v1. The prompt's "בלי סלנג" alone let it through twice in two tester runs. A new slang word joins that list, with a gate case, rather than becoming a sentence in the prompt.
 
+**A ticket the tools found is named by its number (6 Nov, epoch 99, Send's ref v1).** When this turn's tools gave exactly one ticket (a lookup that found one, an add, an open) and the reply names no reference, Send puts the number in brackets after the first word for the ticket: "הוספתי לקריאה (255-1403-26) את העדכון שלך…". Several tickets, none, or a reply that already has a number: untouched.
+- **Why code:** the tester's C2 failed twice. Epoch 98's tool-text clause held in some Gemini turns and not in the one that spoke of the add rather than the lookup. On the retained real turns it changes 7 of 133 replies, each the same missing number.
+
+**After the system's greeting, Michael says who he is, even to someone in memory (6 Nov, epoch 99).** A tester's run, or a tenant coming back, has earlier chats in the buffer, and the tap paragraph's "if this is your first message to this person" let the name drop (C5). The condition is gone.
+- **A burst after the menu** is read whole by `Still the last word?` (lastword v2): a menu logged after the burst's messages (it is logged once it has gone out) is read past, the bare hello it answered is left out, and `last_bot` is the menu whenever the newest outbound row is the menu.
+- **Why there and not in Sort:** Sort's `last_bot` lives in static data, which is per execution, so a silenced run of the burst spent it (C11). The messages table is the shared truth, as for the burst itself.
+
+**Recorded, added and updated are deeds (6 Nov, epoch 99).** "רשמתי", "רשמנו", "הוספתי", "הוספנו" and "עדכנתי" are in the deeds guard's verbs (`wa_truth.TOOLED_VERBS`, with `n8n_whatsapp_outage.py`'s copy), so they are true only when a tool ran this turn; Try again's reason names them. The tester's C6.4 said "רשמתי את הפרטים" with no tool. Over the retained executions, 23 real replies used one of the five, and only that one had no tool.
+
 **A limit is the bot's, not the tenant's (6 Nov, both channels).** In a danger or gas follow-up the bot says what it did, never what it cannot give. The prompt says it with its own idiom, "הכלל הזה הוא בשבילך, לא בשבילו", not with a quoted forbidden phrase.
 
 **A tester's run comes from one number, so the bot sees one tenant.** What one conversation sets carries into the next: the name, the feminine, an emergency. `grok-tenant-tester.md` orders the conversations around it. Judge a carried state as correct, not as a slip.

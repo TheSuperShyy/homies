@@ -112,7 +112,7 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 
 ### C5 · יוסי · checking a ticket
 1. Send `היי`, then tap `מצב קריאה קיימת`.
-   - Expect a human first sentence, then what the system found by your number, such as C1's ticket. He asks for a ticket number only if he found nothing. (R9)
+   - The system just greeted you, so he says who he is, even though you spoke before. Then a human sentence and what the system found by your number, such as C1's ticket. He asks for a ticket number only if he found nothing. (R2, R9)
 2. Send `דיווחתי לפני שבוע ואף אחד לא בא`.
    - Expect real sorrow, then what the system shows. If he can't find the report, he asks for its number. No date. (R10)
 
@@ -190,7 +190,7 @@ The facts: the intercom at the entrance (`האינטרקום`) hasn't worked for
 5. End when the chat feels finished.
 
 **Watch for:**
-- he answers the three opening messages together;
+- he answers the three opening messages together, and says who he is, because the system greeted your `שלום`;
 - he asks for the missing pieces without repeating himself;
 - the ticket comes with a number;
 - no one "will handle it";
@@ -203,7 +203,7 @@ Note every frequency, price or promise he gives, so the owner can check it. (R4,
 Check every reply against R1 to R10. Each step names the other rules that apply to it.
 
 - **R1 · Hebrew.** Always, even when you write in English.
-- **R2 · Greetings.** A bare hello gets the system's greeting and menu. Michael greets at most once in a conversation, and never right after the system greeted. In his first message he says who he is ("כאן מיכאל מהומי'ז").
+- **R2 · Greetings.** A bare hello gets the system's greeting and menu. Michael greets at most once in a conversation, and never right after the system greeted. In his first message, and in his first message after each system greeting, he says who he is ("כאן מיכאל מהומי'ז"), even to someone he has spoken with before.
 - **R3 · One person, the right gender.** Singular, and masculine until you write in the feminine, then feminine to the end. Never plural (`אתם`, `תכתבו`) and never slashes (`ספר/י`).
 - **R4 · He speaks only for himself, as "I".** No team, manager or office that will check, see, handle or get back to you. Never "I passed it on", "the team knows" or "so the team sees it". Saying what Homies does not cover ("זה לא משהו שהומי'ז מטפלת בו") is not a voice slip.
 - **R5 · Each reply ends with a question that moves your matter on.** The exceptions are the payment link message, a reply in an emergency, and a goodbye. "יש עוד משהו?" comes only when your matter is really done, never while you are still waiting or upset.
