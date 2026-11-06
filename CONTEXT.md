@@ -44,6 +44,13 @@ The user is the builder. The client is Homies.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
 - **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
+**After an emergency, Send's danger step guards only the emergency (6 Nov, epoch 97, danger v5).** It is awake on a turn that opened an urgent ticket or an emergency note, when the reply names the urgent ticket, or when a recent outbound message does and this turn's tools handled nothing else. A turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) goes as the model wrote it. It appends one line only, "הקריאה הדחופה שלך פתוחה, מספר …".
+- **Why:** the Grok tester's C9. Awake on any message after an urgent ticket, it cut "הכי מהר" and "בזהירות" out of good replies and stuck the urgent ticket on each, which woke it again.
+
+**A limit is the bot's, not the tenant's (6 Nov, both channels).** In a danger or gas follow-up the bot says what it did, never what it cannot give. The prompt says it with its own idiom, "הכלל הזה הוא בשבילך, לא בשבילו", not with a quoted forbidden phrase.
+
+**A tester's run comes from one number, so the bot sees one tenant.** What one conversation sets carries into the next: the name, the feminine, an emergency. `grok-tenant-tester.md` orders the conversations around it. Judge a carried state as correct, not as a slip.
+
 **A standing order is recorded and emailed to collections (the client, 4 Nov review; Yariv's change 3; live on WhatsApp 5 Nov, epoch 96, debt-tools v148).**
 - **Why email:** OXS's API has one-time payments only, so nothing of ours can set one up. Homies want the request by email, not in another system to watch.
 - **The bot:** one tool, `request_standing_order`, the moment a tenant asks for one, asks whether they can pay by one, or says yes. It replaces the link, the ticket and the note.

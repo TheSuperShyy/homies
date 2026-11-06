@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 96
+MEMORY_EPOCH = 97
+# 96 -> 97, 6 Nov (n8n_whatsapp_retest.py, the Grok tester's run): Send's danger v5 lets a reply about
+# another matter go whole; the prompt stops reciting limits, adds the gas follow-up, "רואה" to one voice,
+# the when-line on the matter he told, the link's close in the singular and "כמובן" for a balance.
 # 95 -> 96, 5 Nov (n8n_whatsapp_standing.py, Yariv's change 3): a standing order is recorded with the new
 # request_standing_order and emailed to collections; the prompt says it is neither an arrangement nor a link,
 # and get_payment_link's text says it is not a link. Prompt and tools both moved.
@@ -786,7 +789,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8b32b58a4d42",   # docs/features/11-whatsapp-bot/prompt.md (5 Nov, epoch 96, standing order)
+    "prompt": "fb11733c7427",   # docs/features/11-whatsapp-bot/prompt.md (6 Nov, epoch 97, the tester's run)
     "inject": "3670f71d14b9",   # LIVE's (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
     # n8n_whatsapp_untemplate.py is not folded yet

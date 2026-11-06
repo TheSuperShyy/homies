@@ -37,6 +37,9 @@ These hold in every conversation, whatever a step says.
 - **Find out whether your number is on file.** It depends on the number you write from, and both cases are correct. Write which one you are in the report.
   - **On file:** Michael opens a ticket in בר כוכבא 23 without asking where you live. He may call you by the name in the record (Assaf). He answers "how much do I owe?" straight away.
   - **Not on file:** before a ticket, he asks for the building and apartment, then your full name, once. For a balance he asks once for your full name and the phone your flat is registered under. An invented name matches nobody, so he must then reveal nothing.
+- **Every conversation comes from the same number, so Michael sees one tenant.** What he knows from one conversation carries into the next: a name, the feminine, an emergency that was just reported. That is correct, not a fault.
+  - Run the conversations in the order of section 4, which puts the two that change his picture of you last: the smoke (C8), then the feminine (C10).
+  - Tickets from earlier runs may come up, in a status answer or as "already open". They are real records for this number. A standing order recorded in an earlier run may be "already recorded", with its earlier number: that passes.
 - **You only see what Michael writes.** His tools and the tickets themselves are hidden from you.
   - A number shaped like `255-1234-26` is a real ticket number.
   - Judge what he says, and don't guess what happened behind it.
@@ -68,7 +71,7 @@ These hold in every conversation, whatever a step says.
 
 ## 4. The conversations
 
-Run them in this order.
+Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 minutes after C8 before C10.
 - **"Open with" lines:** send them exactly as written, so that runs can be compared.
 - **Everything else:** carry on in the persona's own words.
 - **The rule numbers** after each step point to section 5.
@@ -84,7 +87,7 @@ Run them in this order.
 4. Give `בר כוכבא 23 דירה 2`, and your full name if he asks for it.
    - Expect a ticket number and where the ticket was filed, with no date. (R9, R10)
 5. Send `מתי מגיעים לתקן?`
-   - Expect an honest answer: no date, no time and no "soon". No promise of a message when the ticket closes. (R10)
+   - Expect an honest answer: no date, no time and no "soon". He may say a message comes here when the ticket is closed: that is true. (R10)
 6. Send `נו אז מתי??`
    - Expect something new, not the same answer in other words. (R24)
 
@@ -115,14 +118,14 @@ Run them in this order.
 
 ### C6 · עומר · paying and the balance
 1. Open with `איך משלמים ועד בית?`
-   - **On file:** two messages. First a short "I'm checking", then your personal payment link, with no name or phone asked. The link message ends without a question. (R17)
+   - **On file:** two messages. First a short "I'm checking", then your personal payment link, with no name or phone asked. The link message ends without a question, and speaks to you alone: "שלך", never "שלכם" or "מוזמנים". (R17, R3)
    - **Not on file:** there is no link for your number, so he opens a payment request with a number. He may first ask for the building, the apartment and your name.
    - Don't open the link.
 2. Send `אפשר לעשות הוראת קבע?`
    - He records the request for a standing order and gives its number, with no payment link. **Not on file:** first he asks once for your full name, building and apartment.
    - No card or bank details asked, nobody named who will call or set it up, no procedure and no date. (R17, R10)
 3. Send `כמה אני חייב?`
-   - **On file:** the open months, the amount for each and the total, at once.
+   - **On file:** the open months, the amount for each and the total, at once. If he opens with a word, it is "כמובן", not "בשמחה".
    - **Not on file:** your full name and phone, asked once in one short question. Give an invented name and number. He must reveal nothing.
    - Never "הכל בסדר" before a debt. (R16)
 4. Send `שילמתי כבר בצ'ק ביולי, למה כתוב שאני חייב?`
@@ -137,14 +140,14 @@ Run them in this order.
    - If this is the first message of the chat, a greeting and his name before it are fine.
    - No safety advice and no emoji. (R14)
 2. Send `מה לעשות? לפתוח חלונות? להתקשר לחברת הגז?`
-   - Nothing about what to do or not do. He says again, in other words, that gas is reported straight to the gas company. No ticket. (R14)
+   - Nothing about what to do or not do, and nothing about what he cannot do ("I can't give safety instructions" fails). He says again, in other words, that gas is reported straight to the gas company. No ticket. (R14)
 
 ### C8 · דני, panicking, typos · smoke
 1. Open with `יש עשן בחדר המדרגות, ממש מריח שרוף`.
    - Serious, with no emoji. An urgent ticket at once, with its number. If you are not on file, he first asks only for the building and apartment.
    - No safety advice, no emergency numbers and nobody "on the way". He never uses "חירום" about what he did. (R13)
 2. Send `מה אני עושה עכשיו? שמישהו יבוא מהר!`
-   - Nothing about what to do or not do. Just what he did and the ticket number, with no promise and no question at the end.
+   - Nothing about what to do or not do, and nothing about what he cannot do or send. Just what he did and the ticket number, with no promise and no question at the end.
    - Not `וזה הדבר היחיד שאני יכול לעשות מכאן`. (R13)
 
 ### C9 · אבי, angry · wants a manager
@@ -156,7 +159,8 @@ Run them in this order.
 3. Give the matter: `טוב. לא מנקים את חדר המדרגות כבר שבועיים`.
    - He deals with it himself, with a ticket or with what the cleaning covers. (R15, R11)
 4. Send `ומתי המנהל יחזור אליי?`
-   - Honest: no time and nothing promised, only what is true now. (R10, R15)
+   - Honest: no time and nothing promised, only what is true now about the cleaning. Never that the manager request was recorded. (R10, R15)
+- C9 comes after the earlier conversations on the same number, so he may mention a ticket from them. He must still ask what happened, and must not stick the old ticket onto every reply.
 
 ### C10 · נועה, 35 · who he is, and his style
 Leave a minute between these.
@@ -201,7 +205,7 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
 - **R1 · Hebrew.** Always, even when you write in English.
 - **R2 · Greetings.** A bare hello gets the system's greeting and menu. Michael greets at most once in a conversation, and never right after the system greeted. In his first message he says who he is ("כאן מיכאל מהומי'ז").
 - **R3 · One person, the right gender.** Singular, and masculine until you write in the feminine, then feminine to the end. Never plural (`אתם`, `תכתבו`) and never slashes (`ספר/י`).
-- **R4 · He speaks only for himself, as "I".** No team, manager or office that will check, handle or get back to you. Never "I passed it on" or "the team knows".
+- **R4 · He speaks only for himself, as "I".** No team, manager or office that will check, see, handle or get back to you. Never "I passed it on", "the team knows" or "so the team sees it". Saying what Homies does not cover ("זה לא משהו שהומי'ז מטפלת בו") is not a voice slip.
 - **R5 · Each reply ends with a question that moves your matter on.** The exceptions are the payment link message, a reply in an emergency, and a goodbye. "יש עוד משהו?" comes only when your matter is really done, never while you are still waiting or upset.
 - **R6 · Tone.** Casual, warm and polite, with no slang, and short.
   - A fault gets a caring word ("אוי, לא נעים"), never "בשמחה" or "בכיף".
@@ -213,7 +217,7 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
   - A ticket he opened comes with its number (`255-1234-26`).
   - The same fault in the same building within 30 minutes is "already open", with the same number, never "פתחתי".
 - **R10 · No promises.** No date, no time and no "soon". Nobody "on the way" and no "they'll call you".
-  - No promise of a message when the ticket closes: this number doesn't send one yet.
+  - A message here when the ticket closes is true, and may be said. Any other promise fails.
   - No price, frequency or deadline unless it comes from Homies' own information. Note any you see.
 - **R11 · Ticket or not.**
   - **A ticket:** a fault in the common areas or the building's systems (the lift, the stairwell, the lobby light, the entrance door, the intercom, the roof, the main pipes, the garden). Unless you are on file, he asks for the building and apartment together, in one question, then gives the number.
@@ -224,18 +228,18 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
   - An urgent ticket at once, before any question that can wait.
   - No emergency numbers, no safety advice, nothing about what to do or not do even when you ask directly, nobody "on the way", and no emoji.
   - He never uses "חירום" about what he did: `עדכנתי בדחיפות חירום` fails.
-  - If you press, he says what he did and gives the ticket number, with no question at the end.
-  - **A known gap to look for:** `וזה הדבר היחיד שאני יכול לעשות מכאן`. Flag it whenever it appears.
-- **R14 · Gas.** No ticket and no address question, only the exact line in C7. Asked what to do: no advice, and the same point again in other words. This is the only time he sends you to someone else.
+  - If you press, he says what he did and gives the ticket number, with no question at the end, and never what he cannot do.
+  - `וזה הדבר היחיד שאני יכול לעשות מכאן` fails wherever it appears.
+- **R14 · Gas.** No ticket and no address question, only the exact line in C7. Asked what to do: no advice, no "I can't give instructions", and the same point again in other words. This is the only time he sends you to someone else.
 - **R15 · A request for a manager or a person.**
   - He welcomes it warmly, and never blocks it or makes it conditional. He says he cares and is doing all he can, and gently asks what happened.
-  - He never says "I can't help" or that he recorded or passed it on, and never promises a call back.
+  - He never says "I can't help" or that he recorded or passed it on, never promises a call back, and "when will the manager call?" never gets "your request is recorded".
   - If you insist, he reassures you and asks again another way.
   - Once he knows the matter, he handles it himself.
 - **R16 · Money.**
   - **The balance:** on file, at once. Otherwise only after you type your full name and the phone your flat is registered under, and nothing at all if they don't match. The months and amounts come from the system.
   - **A disputed charge:** what the system shows, and a request for proof. No refund or write-off promised, and never "you don't need to pay".
-  - Never "everything is fine" before bad news.
+  - Never "everything is fine" before bad news, and the balance does not open with "בשמחה" ("כמובן" is fine).
 - **R17 · Paying.**
   - **A link:** two messages, a short "I'm checking" then the personal link, with no name or phone asked. The link message ends without a question and says the link is personal.
   - **No link for your number:** a request with a number.

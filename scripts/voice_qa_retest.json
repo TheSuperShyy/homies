@@ -1,0 +1,131 @@
+{
+ "_about": "The phone agent's copy of the tester fixes (6 Nov, later): gas and smoke follow-ups recite no limits; 'when will the manager call?' never says the manager request is recorded.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {
+   "_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. A second call with the same building and type returns the first reference with duplicate: true.",
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "save_partial_request": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>",
+   "partial": true
+  },
+  "add_request_detail": {
+   "ok": true,
+   "reference": "<ticket>"
+  },
+  "notify_team": {
+   "ok": true,
+   "team_notified": true
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "get_balance": {
+   "ok": true,
+   "found": 0
+  },
+  "get_service_info": {
+   "ok": true,
+   "found": false,
+   "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+  },
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "id": "in_gas_stairwell",
+   "agent": "inbound",
+   "title": "incoming call: a strong smell of gas in the stairwell",
+   "time": "18:40",
+   "weekday_he": "חמישי",
+   "ticket": "255-1540-26",
+   "caller": {
+    "persona": "מיכל, 40. Worried, calling from the stairwell, talks quickly.",
+    "knows": "Lives at בר כוכבא 23, apartment 5. There is a strong smell of gas in the stairwell since she came home ten minutes ago.",
+    "wants": "Someone to do something about the gas.",
+    "tendencies": "Opens with the smell, not the address. If told to contact the gas company, asks once what she should do now, open the windows? Then thanks and hangs up."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_smoke_check",
+   "agent": "inbound",
+   "title": "incoming call: smoke in the stairwell (unchanged: the urgent ticket)",
+   "time": "21:05",
+   "weekday_he": "רביעי",
+   "ticket": "255-1542-26",
+   "caller": {
+    "persona": "דני, 30. Panicking, short sentences.",
+    "knows": "Lives at בר כוכבא 23, apartment 7. Smoke in the stairwell on the third floor, it smells burnt.",
+    "wants": "Someone to come now.",
+    "tendencies": "Gives the address when asked. Asks what to do now."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_manager_when",
+   "agent": "inbound",
+   "title": "incoming call: wants a manager, then the cleaning, then when will the manager call",
+   "time": "17:20",
+   "weekday_he": "שישי",
+   "ticket": "255-1543-26",
+   "caller": {
+    "persona": "אבי, 55. Angry, short sentences, does not want to explain to a bot.",
+    "knows": "Lives at בר כוכבא 23, apartment 3. The stairwell has not been cleaned for two weeks.",
+    "wants": "To speak to a manager, and the stairwell cleaned.",
+    "tendencies": "Opens with 'I want to speak to a manager'. Refuses once to explain to a bot. Then says the stairwell has not been cleaned for two weeks, gives his name and address when asked. Then asks: so when will the manager call me back?"
+   },
+   "fixtures": {}
+  }
+ ]
+}

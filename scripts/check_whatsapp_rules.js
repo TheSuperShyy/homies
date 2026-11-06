@@ -467,13 +467,39 @@ function cases(E) {
       say({ reply: 'הבנתי, תודה! פתחתי קריאת חירום עבורך, מספר הקריאה הוא 255-1349-26. הצוות שלנו כבר בדרך לטפל בזה. לגבי כיבוי חשמל - '
         + 'אל תנסה לגעת בשום דבר שקשור לחשמל או למים בעצמך. בבקשה תתרחק מהאזור הרטוב. הבטיחות שלך היא הכי חשובה עכשיו. אני כאן לכל עדכון.',
         said: 'בר כוכבא 23. מה אני עושה בינתיים, לכבות חשמל??', steps: URGENT }), OPENED_LINE);
+    // 6 Nov, danger v5 (n8n_whatsapp_retest.py): the step appends one line only, the plain one. "וזה הדבר
+    // היחיד שאני יכול לעשות מכאן" was the line the owner disliked on 5 Nov; v4 still appended it to a question.
+    const V5 = String(P.code.send_body || '').indexOf("const dv = 'danger v5'") !== -1;
+    const APPENDED = V5 ? 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.' : PUSHED;
     expect('pushed for a number to call: only the ticket line',
       say({ reply: 'אין לי מספר לתת לך להתקשר אליו ישירות, אבל הצוות עודכן ומטפל בזה. בבקשה תמשיך להישאר רחוק מהאזור המסוכן.',
-        said: 'יש מספר של מישהו שאני יכול להתקשר אליו עכשיו?', S: { last_bot: OPENED_LINE } }), PUSHED);
+        said: 'יש מספר של מישהו שאני יכול להתקשר אליו עכשיו?', S: { last_bot: OPENED_LINE } }), APPENDED);
     expect('pushed about an electrician: the promise goes, the ticket line comes',
       say({ reply: 'אני מבין את התסכול שלך, אסף. הצוות שלנו בדרך. אין צורך להזמין חשמלאי בעצמך, הומי\'ז מטפלת בזה.',
         said: 'אז מה, להזמין חשמלאי לבד או שאתם שולחים מישהו?', S: { last_bot: PUSHED } }),
-      'אני מבין את התסכול שלך, אסף. ' + PUSHED);
+      'אני מבין את התסכול שלך, אסף. ' + APPENDED);
+    if (V5) {
+      // 6 Nov, danger v5: the Grok tester's C9 (156623, 156650). A turn whose tools handled another matter is
+      // not an emergency turn, so the model's reply goes whole; with no such tool the step still guards.
+      const SMOKE = 'פתחתי מיד קריאה דחופה על זה, המספר שלה הוא 255-1396-26.';
+      const MGR = [{ action: { tool: 'notify_team', toolInput: { reason: 'caller_request' } }, observation: ob({ ok: true }) }];
+      const CLEAN = [{ action: { tool: 'open_request', toolInput: { urgency: 'normal', type: 'cleaning' } }, observation: ob({ ok: true, reference: '255-1398-26' }) }];
+      const C91 = 'אני רואה שאתה בלחץ ומבין לגמרי למה. אני כאן כדי לעשות כל מה שאפשר כדי לעזור. כדי שאוכל להבין בדיוק ולטפל בזה הכי מהר שאפשר, תוכל לספר לי עוד מה קורה עכשיו בבניין?';
+      expect('v5: a manager request after an urgent ticket, noted this turn, goes whole (C9.1)',
+        say({ reply: C91, said: 'אני רוצה לדבר עם מנהל', S: { last_bot: SMOKE }, steps: MGR }), C91);
+      const C93 = 'הבנתי אותך. פתחתי קריאה על הניקיון בחדר המדרגות, מספר 255-1398-26. ורציתי לשאול בזהירות, מה קורה עם העשן עכשיו?';
+      expect('v5: a new complaint after an urgent ticket, ticketed this turn, goes whole (C9.3)',
+        say({ reply: C93, said: 'טוב. לא מנקים את חדר המדרגות כבר שבועיים.', S: { last_bot: SMOKE }, steps: CLEAN }), C93);
+      expect('v5: a reply that names the urgent ticket is still guarded, whatever the tools did',
+        say({ reply: 'הקריאה הדחופה שלך פתוחה, 255-1396-26. הצוות כבר בדרך.', said: 'אני רוצה לדבר עם מנהל', S: { last_bot: SMOKE }, steps: MGR }),
+        'הקריאה הדחופה שלך פתוחה, 255-1396-26.');
+      expect('v5: with no tool this turn, advice after an urgent ticket still goes and the ticket is named',
+        say({ reply: 'אני מבין לגמרי את הלחץ. כדאי לצאת מהבניין עכשיו.', said: 'לא רוצה להסביר לבוט, תביא לי בן אדם', S: { last_bot: SMOKE } }),
+        'אני מבין לגמרי את הלחץ. הקריאה הדחופה שלך פתוחה, מספר 255-1396-26.');
+      expect('v5: a note about another matter does not let advice through when the reply names the urgent ticket',
+        say({ reply: 'הקריאה הדחופה שלך פתוחה, 255-1396-26. כדאי לצאת מהבניין עכשיו.', said: 'אני רוצה לדבר עם מנהל', S: { last_bot: SMOKE }, steps: MGR }),
+        'הקריאה הדחופה שלך פתוחה, 255-1396-26.');
+    }
     expect('a goodbye in an emergency: the wish that they come soon goes, the ticket is named',
       say({ reply: 'בכיף, אסף. תודה רבה על הסבלנות. אני מקווה שהצוות יגיע במהרה.', said: 'טוב, תודה. אני מחכה להם למטה',
         S: { last_bot: PUSHED } }), 'בכיף, אסף. תודה רבה על הסבלנות. הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.');
@@ -488,7 +514,7 @@ function cases(E) {
       say({ reply: GAS, said: 'יש ריח של גז בחדר המדרגות', S: { last_bot: PUSHED } }), GAS);
     // 19 Oct, danger v4 (the "when will they come?" paragraph): who and whether,
     // under "I can't see / know", and a fronted "I can't promise", are honest.
-    if (String(P.code.send_body || '').indexOf("const dv = 'danger v4'") !== -1) {
+    if (/const dv = 'danger v[45]'/.test(String(P.code.send_body || ''))) {
       const WHO = 'פתחתי קריאה דחופה, 255-1349-26, והצוות כבר יודע על העשן. מי יבוא ומתי, את זה אני לא רואה מכאן. אני כאן איתך.';
       expect('v4: "who is coming and when, I can\'t see from here" stays whole', say({ reply: WHO, said: 'מישהו בא??', S: { last_bot: PUSHED } }), WHO);
       const WHETHER = 'אם ומתי מישהו מגיע, את זה אני לא יכול לדעת מכאן, כי את זה קובעים בצוות. ' + PUSHED;

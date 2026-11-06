@@ -10,18 +10,25 @@ appended to.
 
 > **LIVE 6 Nov: the incoming phone agent sends gas to the gas company too** (Yariv's change 2 on the phone). The chatbot's line, word for word; no ticket, no note. Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` after a field-by-field compare with live, which showed only the prompt and notify_team's text differing. Read back equal to the repo. Claude-played 3 calls (`scripts/voice_qa_gas.json`): both gas calls got the line with no tool; smoke still got the note and the urgent ticket. **Owed:** the owner's call, 077-6687949 then 9, "יש ריח של גז בחדר המדרגות".
 >
-> **THE GROK TESTER'S RUN, 5-6 Nov (pasted by the owner), checked against the executions (read only).** It ran from the owner's +63 through the UChat number, so its 4 fault tickets (255-1393/1394/1396/1397-26) are mirrored into OXS, and 255-1395-26 is a live standing-order request, recorded and emailed.
->   - **Real, to fix, in this order:**
->     1. **Send's danger step** stays awake while any of the last three outbound messages names an urgent ticket. It cuts innocent sentences ("לשאול בזהירות", "כמה שיותר מהר", a question) and appends the urgent line, which keeps it awake again. That is C9 (156623, 156642, 156650): the model wrote the right replies, and Send turned them into "הכל בסדר? הקריאה הדחופה שלך פתוחה…". Code; ~20 danger cases in `check_whatsapp_rules.js` to keep.
->     2. **Limits recited** in gas and danger follow-ups: "אין לי אפשרות לתת הוראות בטיחות", "…להגיד לך מה לעשות עכשיו או לשלוח מישהו" (C7.2, C8.2; the phone agent's played calls too). Prompt, both channels.
->     3. **One voice:** "כדי שהצוות יראה את זה" (C5.3); "הבקשה שלך לדבר עם מנהל רשומה" (C9.4, the known when-line).
->     4. **Plural** in the payment-link close, "שלכם", "מוזמנים" (C6.1). The prompt's own words for it are third-person plural ("שלהם", "שיכתבו").
->   - **Test artifacts, not bugs:** one number played all 11 tenants, so the bot saw one person. C10's feminine carried into C11, and C9 kept linking to C8's smoke. The brief should say so, or order the conversations around it.
->   - **C8.2 "no reply":** the bot answered in 20 s (156607) and UChat answered "ok" (156611), the same as for the replies that arrived. UChat keeps no record of the bot's messages, so only the owner's phone can show whether WhatsApp delivered it.
->   - **The owner's call:**
->     - **"A message arrives here when it closes"** (C1.4, C11.2): no text tells the bot that, but the system does send it, and the gate keeps that sentence whole. On the UChat number `ticket_resolved_he` is still PENDING at Meta, so outside 24 h it does not go out yet.
->     - **"בשמחה" before a debt** (C6.3) is the 5 Nov caseword rule for a balance check.
->   - **Noted:** misspelt words from the AI ("מחוים", "מארבי", "כלל בניין", "ואם הבית"), Gemini at temperature 1.0.
+> **LIVE 6 Nov, epoch 97: the Grok tester's failures fixed** (`n8n_whatsapp_retest.py`; owner: "lets fix and give me the instructions to test again"). Live and the UChat copy (`-97-uchat`); the incoming phone agent got the same text edits.
+>   - **Send's danger v5:** a turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) is not an emergency turn, unless the reply names the urgent ticket. Its one appended line is "הקריאה הדחופה שלך פתוחה, מספר …". "…וזה הדבר היחיד שאני יכול לעשות מכאן" is gone from the code. That was C9: the step cut good replies and stuck the smoke ticket on each.
+>   - **The prompt (both channels):**
+>     - the danger rule is "for you, not for him": they hear what he did, not what he cannot give;
+>     - a gas follow-up repeats the gas company in other words;
+>     - "רואה" joins one voice;
+>     - the when-line reassures with the matter he told, so a manager request is never "recorded";
+>     - the link's close is singular, and a balance opens with "כמובן".
+>   - **Kept, the owner's call:** the closing-message sentence. It IS in the prompt ("…כשסוגרים אותה, נשלחת עליה הודעה לכאן"); the 6 Nov read missed it. On the UChat number `ticket_resolved_he` is still PENDING at Meta, so outside 24 h the message does not go out yet.
+>   - **Checked:**
+>     - gate 446/446 on live (5 new danger v5 cases), with 0 of 1,183 replies changed;
+>     - Claude-played on WhatsApp (`scripts/wa_qa_retest.json`): 4 conversations, 12 turns, 18/18;
+>     - Claude-played on the phone (`scripts/voice_qa_retest.json`): gas, smoke and the manager's "when", all clean.
+>   - **The tester's guide** (`grok-tenant-tester.md`) follows the change:
+>     - one number is one tenant to Michael, so the run order ends with C8, then C10;
+>     - a closing message may be promised; "Homies does not cover this" is no voice slip;
+>     - the disliked line, recited limits and "בשמחה" before a balance fail.
+>   - **C8.2's reply** (156607) was handed to UChat with "ok". Delivery is only provable on the owner's phone.
+>   - **Owed:** the tester's rerun and the owner's phone call.
 >
 > **LIVE 5 Nov, epoch 96 + debt-tools v148 (PR #5): a WhatsApp standing-order request is recorded and emailed to collections** (Yariv's change 3; CONTEXT has the rule):
 >   - **The bot:** `request_standing_order` (`n8n_whatsapp_standing.py`), on the live bot and the UChat copy (`-96-uchat`). No link, ticket or note beside it.

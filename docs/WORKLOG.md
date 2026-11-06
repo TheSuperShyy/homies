@@ -11,6 +11,41 @@ conversation that produced it.
 
 ## 2026-11-06
 
+### LIVE: the Grok tester's failures fixed (epoch 97; owner: "lets fix and give me the instructions to test again")
+- **The owner's two calls**, taken as recommended:
+  - **The closing-message sentence stays.** It is the prompt's own "…כשסוגרים אותה, נשלחת עליה הודעה לכאן", and the gate keeps it whole. The guide now lets it pass.
+  - **A balance opens with "כמובן".**
+- **Send, danger v5** (`scripts/n8n_whatsapp_retest.py`):
+  - **What it does now:** a turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) is not an emergency turn, unless the reply itself names the urgent ticket. The step appends one line only, "הקריאה הדחופה שלך פתוחה, מספר …".
+  - **The cases:** the two that wanted "וזה הדבר היחיד שאני יכול לעשות מכאן" now want the plain line, on v5 only. Five new v5 cases cover C9.1, C9.3, a reply that names the urgent ticket, advice with no tool, and advice beside a note.
+  - **Tried and dropped:** stripping the step's own line from what wakes it. The same words were the model's own urgent confirmation until epoch 93, and two v4 cases rest on them.
+- **The prompt (24,161 -> 24,400 characters), prompt `fb11733c7427`, memory 96 -> 97:**
+  - the danger rule gets the prompt's own "הכלל הזה הוא בשבילך, לא בשבילו";
+  - a gas follow-up hears the gas company again, in other words;
+  - "רואה" joins those who never appear as checking or handling;
+  - the when-line reassures with the matter he told;
+  - the link's close is singular;
+  - a balance gets "כמובן" as its own case.
+- **The gate:** 446/446 on live, 0 of 1,183 replies changed in the replay.
+- **Claude-played on WhatsApp** (`scripts/wa_qa_retest.json`): 4 conversations, 12 turns, 18/18, no guard rejection.
+  - **Gas, then what to do:** "כן, להתקשר לחברת הגז שמספקת את הגז לבניין ולדווח להם ישירות על הריח…".
+  - **Smoke, then pressing:** what he did and 255-1396-26.
+  - **Manager, then cleaning, then when:** no "recorded"; the cleaning ticket and the closing message instead.
+  - **Link:** "…לדירה שלך בלבד… תכתוב לי כאן". **Balance:** "כמובן. …2,000 ₪". **A week's wait:** no team.
+  - One player had read the deck's expectations while working out a flag. That run is weighed lower.
+- **The phone agent** (`docs/assistant/demo-inbound.md`, "6 Nov, later") got the same text edits.
+  - Claude-played (`scripts/voice_qa_retest.json`):
+    - gas, then windows: the gas company again;
+    - smoke, then what do I do: what he did and the number;
+    - manager, then cleaning, then when: "אין לי מועד… הפנייה על חדר המדרגות פתוחה ורשומה".
+  - Pushed after a compare that showed only the prompt differing; read back equal to the repo.
+- **Applied:** live, then the UChat copy (`-97-uchat`). Snapshot: `local/n8n-whatsapp-live-06nov-before-retest.json`. Rollback: `--restore`, then `n8n_uchat.py --apply`.
+- **The guide** (`grok-tenant-tester.md`) follows the change:
+  - one number is one tenant, and the order is C1-C7, C9, C11, C8, then C10 after 5 minutes;
+  - the expectations for R4, R10, R13, R14, R15, R16 and C6 match the change.
+- **Owed:** the tester's rerun and the owner's phone call.
+
+
 ### Cards for the CRM board: what is open, and what was done on 5 Nov (owner: "/tasker", then "what about for yesterday")
 - **In chat only, through the `tasker` skill.** Nothing here writes to the board.
 - **Open, not covered by the ten meeting cards:**
@@ -30,7 +65,7 @@ conversation that produced it.
   - "מעבר לזה, רציתי לשאול בזהירות – מה קורה עם העשן…" was cut for "זהירות", leaving "הכל בסדר?".
   - **Why it stays on:** it is awake while any of the last three outbound messages names an urgent ticket, and its own appended line keeps it so.
 - **C8.2 was answered** in 20 s (156607). The translator's UChat write answered `{"status":"ok"}` (156611), as for the replies the tester did get. UChat's chat-messages holds only the tenant's messages and none of the bot's, so delivery is unprovable from here.
-- **The closing-message promise** (C1.4, C11.2) is in no text the bot reads. The gate keeps "כשהקריאה תיסגר, תגיע על זה הודעה לכאן" whole as true (danger v4). On the UChat number `ticket_resolved_he` is PENDING at Meta (`wa_templates.py --waba 2117787955519632`), and UChat's list has only `payment_link_he`.
+- **The closing-message promise** (C1.4, C11.2). CORRECTED the same day: it IS in the prompt, "ועל קריאה שפתחת בשיחה הזאת יש לך עוד דבר אמיתי לומר: כשסוגרים אותה, נשלחת עליה הודעה לכאן". The first search looked for other verb forms. The gate keeps "כשהקריאה תיסגר, תגיע על זה הודעה לכאן" whole as true (danger v4). On the UChat number `ticket_resolved_he` is PENDING at Meta (`wa_templates.py --waba 2117787955519632`), and UChat's list has only `payment_link_he`.
 - **Artifacts of one number:** C10's feminine carried into C11, and C9 linked to C8's smoke.
 - **The fix order is in HANDOVER.** Nothing was changed by this read.
 

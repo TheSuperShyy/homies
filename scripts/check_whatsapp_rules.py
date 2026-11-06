@@ -195,7 +195,13 @@ PINS = {
     # and a plain "איך משלמים?": 3 conversations, 7 turns, 16/16, no guard rejection. The standing order got
     # the tool alone and its number, "how do I pay" still got the link, and the unknown number was asked its
     # name, building and flat once, with no reason given; no team, no card or bank details.
-    'Answer the resident / system': '8b32b58a4d42',
+    # 6 Nov (n8n_whatsapp_retest.py, epoch 97, the Grok tester's run): no recited limits in a danger or gas
+    # follow-up, the gas follow-up repeats the gas company, "רואה" joins one voice, the when-line reassures with
+    # the matter he told, the link's close is singular, a balance opens with "כמובן". Send's danger v5 rides
+    # with it (code, its own cases). Claude-played on the candidate (scripts/wa_qa_retest.json): gas then
+    # what to do, smoke then pressing, a manager then cleaning then when, a link then a balance then a week's
+    # wait: 4 conversations, 12 turns, 18/18, no guard rejection.
+    'Answer the resident / system': 'fb11733c7427',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
