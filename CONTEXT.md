@@ -47,6 +47,8 @@ The user is the builder. The client is Homies.
 **After an emergency, Send's danger step guards only the emergency (6 Nov, epoch 97, danger v5).** It is awake on a turn that opened an urgent ticket or an emergency note, when the reply names the urgent ticket, or when a recent outbound message does and this turn's tools handled nothing else. A turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) goes as the model wrote it. It appends one line only, "הקריאה הדחופה שלך פתוחה, מספר …".
 - **Why:** the Grok tester's C9. Awake on any message after an urgent ticket, it cut "הכי מהר" and "בזהירות" out of good replies and stuck the urgent ticket on each, which woke it again.
 
+**No slang reaches a tenant (6 Nov, epoch 98, Send's slang v1).** "מבאס" and "באסה" become "לא נעים" in code, beside emoji v1. The prompt's "בלי סלנג" alone let it through twice in two tester runs. A new slang word joins that list, with a gate case, rather than becoming a sentence in the prompt.
+
 **A limit is the bot's, not the tenant's (6 Nov, both channels).** In a danger or gas follow-up the bot says what it did, never what it cannot give. The prompt says it with its own idiom, "הכלל הזה הוא בשבילך, לא בשבילו", not with a quoted forbidden phrase.
 
 **A tester's run comes from one number, so the bot sees one tenant.** What one conversation sets carries into the next: the name, the feminine, an emergency. `grok-tenant-tester.md` orders the conversations around it. Judge a carried state as correct, not as a slip.

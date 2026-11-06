@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-11-06
 
+### LIVE: the tester's second run fixed (epoch 98; the owner pasted its report)
+- **The second run** (C1-C7, C9, C11, C8, C10, the new order): one serious fail and four others. Money, gas, smoke, privacy, the singular link and "כמובן" all held. C8 and C9 no longer carry the smoke ticket.
+- **Read against the UChat copy's executions:**
+  - **C2** (158324): "שוב אני…" went to get_request_status, which returned 255-1398-26, and the reply said only "היא עדיין פתוחה". Nothing in that tool asks for the number; C10.3 listed three tickets the same way.
+  - **"Anything else" after "when?"** (C1.4, C2, C9.4; 158295, 158324, 158538): the rule sits in the question paragraph, away from the when-line the model follows.
+  - **C9.4** (158538): "גם הבקשה שלך וגם קריאת השירות … פתוחות ורשומות". The manager paragraph's "not telling" covered the first reply only.
+  - **C11.1:** "מבאס" again (C4.1 last run), under a prompt that already says "בלי סלנג".
+- **The change** (`scripts/n8n_whatsapp_retest2.py`):
+  - **get_request_status:** "name each ticket by its reference". Tools hash `81322f5daf6b`.
+  - **The when-line:** "והשאלה שבסוף ההודעה הזאת נשארת על העניין שלו, כמו אם משהו השתנה או החמיר".
+  - **The manager paragraph:** "…גם לא אחר כך כשהוא שואל מתי יחזרו אליו".
+  - **Send, slang v1:** "מבאס" and "באסה" become "לא נעים", beside emoji v1.
+  - **Hashes:** prompt `56e15b725d51`, memory 97 -> 98.
+- **The gate:**
+  - 3 new slang cases, and the 27 Sep case allows the swap.
+  - All green on live and the candidate.
+  - The replay changes exactly 5 real replies, each a slang swap ("איזה לא נעים שהשער…", "לא נעים להיות בלי אינטרקום…").
+- **Claude-played** (`scripts/wa_qa_retest2.json`):
+  - **The lift:** the "when?" answer ended on the lift; "still not working" named 255-1398-26 and ended "משהו החמיר בינתיים?".
+  - **The manager's "when":** the cleaning ticket and the closing message, no "recorded".
+  - **8/9:** the one miss was the deck's turn index; the player added the "nobody inside" answer.
+- **Applied:** live, then the UChat copy (`-98-uchat`). Snapshot: `local/n8n-whatsapp-live-06nov-before-retest2.json`.
+- **The phone agent is unchanged:** its played manager call was clean.
+- **Not changed, noted:** "הבניין שלכם" in C11.3's service answer; "בעדינות" turned onto the tenant in C9.1.
+- **Owed:** a short rerun of C1, C2, C9 and C11.
+
+
 ### LIVE: the Grok tester's failures fixed (epoch 97; owner: "lets fix and give me the instructions to test again")
 - **The owner's two calls**, taken as recommended:
   - **The closing-message sentence stays.** It is the prompt's own "…כשסוגרים אותה, נשלחת עליה הודעה לכאן", and the gate keeps it whole. The guide now lets it pass.

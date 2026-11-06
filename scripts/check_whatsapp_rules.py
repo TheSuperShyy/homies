@@ -201,7 +201,11 @@ PINS = {
     # with it (code, its own cases). Claude-played on the candidate (scripts/wa_qa_retest.json): gas then
     # what to do, smoke then pressing, a manager then cleaning then when, a link then a balance then a week's
     # wait: 4 conversations, 12 turns, 18/18, no guard rejection.
-    'Answer the resident / system': 'fb11733c7427',
+    # 6 Nov, later (n8n_whatsapp_retest2.py, epoch 98, the tester's second run): the when-line's closing
+    # question stays on the matter, and a manager request is not "recorded" later either. Claude-played
+    # (scripts/wa_qa_retest2.json): the lift's when and re-ask ended on the lift and named 255-1398-26; the
+    # manager's when gave the cleaning ticket and no "recorded". The one deck miss was a turn-index slip.
+    'Answer the resident / system': '56e15b725d51',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -219,7 +223,7 @@ PINS = {
     'request_standing_order / tool': '37ade364721f',   # 5 Nov, epoch 96: new (n8n_whatsapp_standing.py)
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
-    'get_request_status / tool': '437d0eda4866',
+    'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
     'notify_team / tool': '8909a4a81ff0',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas

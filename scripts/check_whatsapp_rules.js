@@ -228,7 +228,9 @@ function cases(E) {
   // are the owner's reassurance and stay; "I'm on it" and the time still go.
   expect('27 Sep 15:05 (v3): "אני מטפל בזה" and "בהקדם" go; "אל דאגה" and "יטפל בזה" stay',
     say({ reply: 'מבאס, אבל אל דאגה, אני מטפל בזה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה בהקדם. במה אוכל לעזור עוד?', said: 'Bar Kochba 23, apartment 4' }),
-    'מבאס, אבל אל דאגה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה. במה אוכל לעזור עוד?');
+    // 6 Nov: with slang v1 the opening "מבאס" is "לא נעים"; what this case tests (the promise clauses) is unchanged.
+    (String(P.code.send_body || '').indexOf("const sv = 'slang v") !== -1 ? 'לא נעים' : 'מבאס')
+      + ', אבל אל דאגה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה. במה אוכל לעזור עוד?');
   const DONT_WORRY = "היי! כאן מיכאל מהומי'ז. אני מבין, זה ממש לא נעים ללכת במדרגות ככה. אל דאגה, אני אפתח קריאת שירות כדי שיטפלו בתאורה. באיזה בניין אתם גרים ובאיזו דירה?";
   expect('27 Sep 14:52, first contact (v3): "אל דאגה," is reassurance and stays',
     say({ reply: DONT_WORRY, S: { greeted: false }, said: 'hi, lights' }), DONT_WORRY);
@@ -446,6 +448,19 @@ function cases(E) {
     expect('the six stay, a skin tone too', say({ reply: SIXES, said: 'lift' }), SIXES);
     expect('an emoji-only reply is never emptied', say({ reply: '😥', said: 'lights' }), '😥');
     expect('the menu keeps its wave', () => sent(E, { canned: true, reply: MENU_TEXT }).content, MENU_TEXT);
+  }
+  // 6 Nov (scripts/n8n_whatsapp_retest2.py): "מבאס" twice in two tester runs, under a prompt that already
+  // says "בלי סלנג". The owner's register holds in code, as the six emoji do.
+  if (P.code && String(P.code.send_body || '').indexOf("const sv = 'slang v") !== -1) {
+    console.log(NL + '--- Send: no slang (6 Nov) ---');
+    expect('"מבאס" at the start becomes "לא נעים"',
+      say({ reply: 'מבאס להיות בלי אינטרקום יומיים. פתחתי קריאה, מספר 255-1401-26.', said: 'האינטרקום לא עובד' }),
+      'לא נעים להיות בלי אינטרקום יומיים. פתחתי קריאה, מספר 255-1401-26.');
+    expect('"ממש מבאס" mid-sentence becomes "ממש לא נעים"',
+      say({ reply: 'אוי, זה ממש מבאס שיש חושך בלובי. באיזה בניין?', said: 'אין אור בלובי' }),
+      'אוי, זה ממש לא נעים שיש חושך בלובי. באיזה בניין?');
+    const PLAIN = 'אוי, לא נעים. פתחתי קריאה על המעלית, מספר 255-1398-26.';
+    expect('a reply with no slang is untouched', say({ reply: PLAIN, said: 'המעלית תקועה' }), PLAIN);
   }
 
   // 6 Oct (scripts/n8n_whatsapp_danger.py): in an emergency Michael says the

@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 97
+MEMORY_EPOCH = 98
+# 97 -> 98, 6 Nov (n8n_whatsapp_retest2.py, the tester's second run): a status answer names its ticket
+# (get_request_status), the question after "when?" stays on the matter, a manager request is never
+# "recorded" later either, and Send's slang v1 turns "מבאס"/"באסה" into "לא נעים".
 # 96 -> 97, 6 Nov (n8n_whatsapp_retest.py, the Grok tester's run): Send's danger v5 lets a reply about
 # another matter go whole; the prompt stops reciting limits, adds the gas follow-up, "רואה" to one voice,
 # the when-line on the matter he told, the link's close in the singular and "כמובן" for a balance.
@@ -789,7 +792,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "fb11733c7427",   # docs/features/11-whatsapp-bot/prompt.md (6 Nov, epoch 97, the tester's run)
+    "prompt": "56e15b725d51",   # docs/features/11-whatsapp-bot/prompt.md (6 Nov, epoch 98, the tester's second run)
     "inject": "3670f71d14b9",   # LIVE's (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
     # n8n_whatsapp_untemplate.py is not folded yet
@@ -808,7 +811,8 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "ba8a80ac42ff",  # 5 Nov, epoch 96: LIVE's tools after n8n_whatsapp_standing.py (get_payment_link: a
+    "tools": "81322f5daf6b",  # 6 Nov, epoch 98: get_request_status names each ticket by its reference.
+    # Before: "ba8a80ac42ff", 5 Nov, epoch 96: LIVE's tools after n8n_whatsapp_standing.py (get_payment_link: a
     # standing order is not a link). request_standing_order is outside this hash, like add_request_detail.
     # Before: "60094344bcd8", 5 Nov, epoch 95: LIVE's tools after n8n_whatsapp_gas.py (notify_team: never for gas).
     # Before: "0c42f56920b2", 30 Oct, morning, epoch 91: LIVE's tools (section 6, one voice, addto's notify_team

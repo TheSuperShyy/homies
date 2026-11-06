@@ -10,6 +10,8 @@ appended to.
 
 > **LIVE 6 Nov: the incoming phone agent sends gas to the gas company too** (Yariv's change 2 on the phone). The chatbot's line, word for word; no ticket, no note. Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` after a field-by-field compare with live, which showed only the prompt and notify_team's text differing. Read back equal to the repo. Claude-played 3 calls (`scripts/voice_qa_gas.json`): both gas calls got the line with no tool; smoke still got the note and the urgent ticket. **Owed:** the owner's call, 077-6687949 then 9, "יש ריח של גז בחדר המדרגות".
 >
+> **LIVE 6 Nov, epoch 98: the tester's second run fixed** (`n8n_whatsapp_retest2.py`; live and `-98-uchat`). A status answer names its ticket; after "when?" the closing question stays on the matter; a manager request is never "recorded" later either; Send's slang v1 turns "מבאס"/"באסה" into "לא נעים". Gate green on live; the replay changes only 5 slang swaps. **Owed:** the tester reruns C1, C2, C9 and C11 only.
+>
 > **LIVE 6 Nov, epoch 97: the Grok tester's failures fixed** (`n8n_whatsapp_retest.py`; owner: "lets fix and give me the instructions to test again"). Live and the UChat copy (`-97-uchat`); the incoming phone agent got the same text edits.
 >   - **Send's danger v5:** a turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) is not an emergency turn, unless the reply names the urgent ticket. Its one appended line is "הקריאה הדחופה שלך פתוחה, מספר …". "…וזה הדבר היחיד שאני יכול לעשות מכאן" is gone from the code. That was C9: the step cut good replies and stuck the smoke ticket on each.
 >   - **The prompt (both channels):**

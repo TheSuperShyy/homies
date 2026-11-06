@@ -93,7 +93,7 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 
 ### C2 · יוסי again, within 30 minutes of C1 · the same lift
 1. Open with `שוב אני, המעלית עדיין לא עובדת`.
-   - He says the ticket is already open, with C1's number. He never says "פתחתי" (I opened). (R9)
+   - He says the ticket is already open, with C1's number, whether he found it by opening or by checking. He never says "פתחתי" (I opened). (R9)
 
 ### C3 · רונית, 60, polite, writes long sentences · ticket or not
 1. Open with `שלום, הברז בכיור במטבח שלי מטפטף כבר כמה ימים`.
@@ -207,7 +207,7 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
 - **R3 · One person, the right gender.** Singular, and masculine until you write in the feminine, then feminine to the end. Never plural (`אתם`, `תכתבו`) and never slashes (`ספר/י`).
 - **R4 · He speaks only for himself, as "I".** No team, manager or office that will check, see, handle or get back to you. Never "I passed it on", "the team knows" or "so the team sees it". Saying what Homies does not cover ("זה לא משהו שהומי'ז מטפלת בו") is not a voice slip.
 - **R5 · Each reply ends with a question that moves your matter on.** The exceptions are the payment link message, a reply in an emergency, and a goodbye. "יש עוד משהו?" comes only when your matter is really done, never while you are still waiting or upset.
-- **R6 · Tone.** Casual, warm and polite, with no slang, and short.
+- **R6 · Tone.** Casual, warm and polite, with no slang (`מבאס` and `באסה` fail), and short.
   - A fault gets a caring word ("אוי, לא נעים"), never "בשמחה" or "בכיף".
   - He doesn't sum up what you just wrote.
   - He doesn't announce his steps, except the "רגע, אני בודק" just before a payment link.
