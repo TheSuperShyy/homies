@@ -603,7 +603,7 @@ function cases(E) {
   // 8 Nov, later (scripts/n8n_whatsapp_retest5.py, the tester's fifth run, C9.4 R15, execution 164822): the
   // retry answered "ומתי המנהל יחזור אליי?" with "וגם הבקשה שלך לדבר עם מנהל רשומה", from C9.1's quiet
   // notify_team; the prompt says never to tell it. The same claim on 29 Oct and in the 5 Nov run's C9.4.
-  if (P.code && String(P.code.send_body || '').indexOf("const mg = 'manager v1'") !== -1) {
+  if (P.code && String(P.code.send_body || '').indexOf("const mg = 'manager v") !== -1) {
     console.log(NL + "--- Send: a manager request is never \"recorded\" (8 Nov, the tester's fifth run) ---");
     const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
     const OPENED = { action: { tool: 'open_request' }, observation: obs({ ok: true, reference: '255-1418-26' }) };
@@ -644,6 +644,40 @@ function cases(E) {
       'רשמתי את התלונה במערכת. יש עוד משהו שתרצה שאוסיף?',
     ]) {
       expect('untouched: ' + same.slice(0, 40), say({ reply: same }), same);
+    }
+  }
+
+  // 8 Nov, night (scripts/n8n_whatsapp_manager2.py, the C5/C9 retest, execution 165118): the first draft for
+  // "ומתי המנהל יחזור אליי?" said "וגם רשמתי במערכת את הבקשה שלך", with no "manager" in it. The truth check
+  // sent it back; on a retry, or in the passive, manager v1 would have let it through.
+  if (P.code && String(P.code.send_body || '').indexOf("const mg = 'manager v2'") !== -1) {
+    console.log(NL + "--- Send: \"your request\" is the manager request when he asked for one (8 Nov, the retest) ---");
+    const ASK = 'ומתי המנהל יחזור אליי?';
+    expect('165118\'s first draft exactly: ", וגם רשמתי במערכת את הבקשה שלך" goes, the ticket stays',
+      say({ reply: 'אין לי זמן מדויק לתת לך. מה שכן נכון עכשיו זה שהקריאה על הניקיון פתוחה ונמצאת אצלנו בטיפול, וגם רשמתי במערכת את הבקשה שלך. יש לכלוך ספציפי בקומה שלך או בחדר המדרגות שכדאי שאוסיף עליו עדכון לקריאה הקיימת בינתיים?', said: ASK }),
+      'אין לי זמן מדויק לתת לך. מה שכן נכון עכשיו זה שהקריאה על הניקיון פתוחה ונמצאת אצלנו בטיפול. יש לכלוך ספציפי בקומה שלך או בחדר המדרגות שכדאי שאוסיף עליו עדכון לקריאה הקיימת בינתיים?');
+    expect('the passive with no "manager": the sentence goes',
+      say({ reply: 'אין לי שעה לתת לך. הבקשה שלך רשומה אצלי. יש עוד משהו שתרצה שאוסיף לקריאה?', said: ASK }),
+      'אין לי שעה לתת לך. יש עוד משהו שתרצה שאוסיף לקריאה?');
+    expect('"והפנייה שלך הועברה" after he asked for a person: the clause goes',
+      say({ reply: 'אני מבין אותך לגמרי והפנייה שלך הועברה. מה קרה בבניין?', said: 'תביא לי בן אדם' }),
+      'אני מבין אותך לגמרי. מה קרה בבניין?');
+    expect('", אבל העברתי לצוות את הבקשה …" goes from its comma, the honest half stays',
+      say({ reply: 'אני לא יכול להבטיח מתי בדיוק יחזרו אליך, אבל העברתי לצוות את הבקשה הדחופה שלך. יש משהו נוסף שאוכל לעזור לך בו?', said: 'תביא לי בן אדם' }),
+      'אני לא יכול להבטיח מתי בדיוק יחזרו אליך. יש משהו נוסף שאוכל לעזור לך בו?');
+    for (const [same, said] of [
+      // A request for something named stays, even when he asked for a person in the same breath.
+      ['בטח 👍 רשמתי את הבקשה שלך להוראת קבע, מספר הבקשה הוא 255-1417-26. יש עוד משהו שאוכל לעזור איתו?', 'לדבר עם נציג'],
+      ['הבקשה שלך להוראת קבע כבר רשומה אצלנו במערכת, מספר הבקשה הוא 255-1395-26. יש עוד משהו?', 'לדבר עם נציג'],
+      // No manager in what he wrote: "the request" is his own matter (the standing order, 255-1417-26's turn).
+      ['רשמתי את הבקשה שלך במערכת. יש עוד משהו שאוכל לעזור בו?', 'אפשר לעשות הוראת קבע?'],
+      ['בטח, רשמתי את הבקשה שלך להוראת קבע, מספר הבקשה הוא 255-1417-26. יש עוד משהו?', 'אפשר לעשות הוראת קבע?'],
+      // "בבקשה" is "please", never the request.
+      ['רשמתי את מה שאמרת, תכתוב לי בבקשה אם יש עוד משהו. מה עוד קורה שם?', 'אני רוצה מנהל'],
+      // The retest's sent C9.4, word for word.
+      ['זמן מדויק למתי יחזרו אליך אין לי כרגע, אני אומר לך בפשטות. מה שכן, הקריאה על הניקיון באמת נמצאת בטיפול אצלנו, ואני פה עושה כל מה שאפשר כדי לעזור לך עם זה. יש עוד אזור בבניין חוץ מחדר המדרגות שתרצה שאציין שלא נוקה?', ASK],
+    ]) {
+      expect('untouched: ' + same.slice(0, 40), say({ reply: same, said }), same);
     }
   }
 

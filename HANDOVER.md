@@ -8,6 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 8 Nov, night: the tester's C5/C9 retest passed, and Send's manager v2** (`n8n_whatsapp_manager2.py`; live and the UChat copy, both read back; code only, still epoch 99). Together with the fifth run, every conversation in the guide now passes.
+>   - **C5 (165050):** the model named itself ("היי, אני מיכאל מהומי'ז"; manners cut the "היי") and gave 6 open, with the three newest. intro v1 had nothing to add.
+>   - **C9.4 (165118):**
+>     - The first draft said "וגם רשמתי במערכת את הבקשה שלך". The truth check sent it back, and the retry went out clean.
+>     - manager v1 would not have cut that wording, because it has no "manager" in it.
+>     - So **manager v2** counts "the request" as the manager request when the tenant's own words this turn name a manager or a person. It never counts "בבקשה", or a request for something named ("…להוראת קבע").
+>     - The joining word is the first within four words, and a lone "אבל" before the claim goes with it.
+>   - **Checked:** the gate passes 537/537 on live, with 10 new cases. The replay changes 9 old drafts, all under the representative tap, each losing a passed-on or recorded claim. Nothing is broken.
+>   - **Rollback:** `python scripts/n8n_whatsapp_manager2.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-manager2.json`), then `python scripts/n8n_uchat.py --apply`.
+>   - **Seen, not changed:**
+>     - C5.5 answered "I don't remember the fault" with show_menu and a feminine line copied from C10.6 ("הנה האפשרויות שלנו, תוכלי…"), after the tenant had written in the masculine twice.
+>     - C5.3's feminine is C10's Noa, carried on the one number, as designed.
+>
 > **8 Nov, later: Omni answered about the dialer's 404s, and the dialer test page is rebuilt for their lead API. Built, not live** (their email: `local/omnitelecom/2026-11-08-lead-api-v1.txt`). The 404s since 29 Oct were Omni's: the address in their first document was wrong, and the 27 Oct token was a dashboard token, which they have deleted.
 >   - **Built:**
 >     - PR #9 (`fix/dialer-api-v1`) has CI green and a Vercel preview built. It is **not merged**.
@@ -29,7 +42,7 @@ appended to.
 >     - The gate passes 527/527 on live. There are 26 new cases, including both drafts word for word. Two old 5 Oct expectations now lose "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי", as R15 wants.
 >     - The replay: 2,294 drafts gain the name in the two after-the-menu states, 6 lose a manager claim, and nothing is broken. All 17 pins are unchanged.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest5.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest5.json`), then `python scripts/n8n_uchat.py --apply`.
->   - **Owed: the tester's rerun of C5 and C9.** No ticket prep: the run's six open tickets (255-1415-26 to 255-1420-26) stay, so C5 lists the newest three and says 6 open. C10's "6 open in all" was the tool's own `open_total`, which is right.
+>   - **The rerun of C5 and C9 passed** (8 Nov, night; the entry above). C10's "6 open in all" was the tool's own `open_total`, which is right.
 >   - **Seen, not changed:** C5 said "שלוש קריאות פתוחות" for two open tickets and one cancelled. The lookup lists the three newest of any status, and the model called them all open. The phone agent's same manager slip (the 3 Nov entry below) stays open.
 >
 > **LIVE 8 Nov, evening: Send's voice v2** (`n8n_whatsapp_voice2.py`; live and the UChat copy, both read back; code only, still epoch 99). This is from the owner's own test of the fixes below (executions 164335-164424). That test passed the count (20 in all, 4 for the lift) and the cheque, where voice v1 turned the draft's "כדי שנוכל לסדר" into "כדי שאוכל לסדר".

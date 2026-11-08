@@ -77,6 +77,11 @@ The user is the builder. The client is Homies.
 - **What goes, smallest first:** from the joining word ("וגם", "ובנוסף", "והבקשה", or the recording verb itself); else the clause with the comma before it; else, when the sentence opens with it, the clause and its comma, with an "אבל" after it; else the whole sentence.
 - **What never goes:** a ticket number or a link. A cut that would leave a lead-in alone ("מה שבטוח.") takes the sentence instead.
 - The replay changes 6 replies, each one of these claims, including two 5 Oct "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי". The phone agent's same slip is not touched (chatbot first).
+- **manager v2 (8 Nov, night, from the C5/C9 retest):** the first draft for "ומתי המנהל יחזור אליי?" said "וגם רשמתי במערכת את הבקשה שלך", with no "manager" in it. The truth check caught it, but a retry or the passive would not have been caught.
+  - When the tenant's own words this turn name a manager or a person, "הבקשה / הפנייה (שלך)", "בקשתך" and "פנייתך" count as the request.
+  - Never "בבקשה", and never a request for something named ("הבקשה שלך להוראת קבע"). One "to the team" still counts.
+  - The joining word is the first within four words of the claim, so "וגם רשמתי …" goes from "וגם". A lone "אבל" before it goes with it, from its comma.
+  - The replay changes 9 old drafts, all under the representative tap.
 
 **"For when" is asking when, not promising (8 Nov, Send's promise v5).** promise v4 lets "יחזרו אליך" through after "מתי", since asking when promises nothing; "למתי" is the same question. Without it, the tester's C9.4 lost its honest "תאריך או שעה מדויקת למתי יחזרו אליך אין לי", and "מה שכן, …" went out alone.
 

@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### LIVE: the tester's C5/C9 retest passed, and Send's manager v2 (the owner pasted the retest's report)
+- **The retest** (9 messages, 22:09-22:22 PH; the UChat copy's executions 165044-165118) had no fail of any kind. With the fifth run, every conversation in the guide passes.
+- **Read with the drafts:**
+  - **C5.2 (165050):** the model wrote "היי, אני מיכאל מהומי'ז" itself. manners cut the "היי", and intro v1 had nothing to add.
+  - **C9.4 (165118):** the first draft said "וגם רשמתי במערכת את הבקשה שלך". The deeds check sent it back, and the retry was clean.
+  - manager v1 would not have cut that wording, since it has no "manager" in it. The same thing on a retry, which the truth check does not see again (164822), or in the passive, would have gone out.
+- **Built:** manager v2 (`scripts/n8n_whatsapp_manager2.py`, Send only, still epoch 99):
+  - "the request" counts as the manager request when the tenant's words this turn name a manager or a person;
+  - the joining word is the first within four words;
+  - a lone "אבל" before the claim goes with it.
+- **Gate:**
+  - The first candidate passed all 534 cases. The replay, though, showed two wrong cuts under the representative tap: standing-order replies ("רשמתי את הבקשה שלך להוראת קבע" became "המספר שלה הוא …"), and ", אבל העברתי …" taking its sentence's honest half.
+  - So a request for something named is not the request, and the optional "שלך" can no longer slip past that check.
+  - Then 537/537 on the candidate and on live (10 new cases). The replay changes 9 old drafts, each a passed-on or recorded claim. Nothing is broken.
+- **Live:** live, then the UChat copy, read back with `-99-uchat`. Snapshot: `local/n8n-whatsapp-live-08nov-before-manager2.json`.
+- **Seen, not changed:** C5.5's show_menu with C10.6's feminine line after a masculine "אני לא זוכר".
+
 ### Omni's answer on the dialer's 404s, and the dialer test page rebuilt for their lead API (built, PR #9 not merged; the owner pasted Omni's email)
 - **Omni's answer** (`local/omnitelecom/2026-11-08-lead-api-v1.txt`):
   - The address in their first document was wrong, so every send since 29 Oct got a 404.
