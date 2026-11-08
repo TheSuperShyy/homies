@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### LIVE: Send's voice v2 (the owner pasted their own test of the fixes)
+- **The owner's test** (11 messages, 18:43-18:57 PH; executions 164335-164424):
+  - The count held both ways: 20 "בסך הכול", and 4 lift tickets with the update added to 255-1409-26.
+  - The cheque turn proved voice v1 on live: draft "כדי שנוכל לסדר את זה", sent "כדי שאוכל לסדר את זה".
+  - The manager's "when" opened "זמן מדויק אין לי כרגע".
+- **Two forms went out, each the model's own against a text it has:**
+  - **164367:** "הלוואי שהייתה לי שעה להגיד לך, אבל זה כרגע אצל הצוות שמטפל בזה". The owner's test flagged it.
+    - The prompt names nobody else as one who handles it.
+    - "אצל הצוות" is the 29 Oct form that started the one-voice rule: 12 replies had it, 1 since that change.
+  - **164410:** "פתחתי עכשיו קריאה למחלקת הניקיון". notify_team says "Never which department". 2 replies had it, 1 since the change.
+- **Built:** voice v2 (`scripts/n8n_whatsapp_voice2.py`, Send only):
+  - a clause holding "אצל הצוות" is cut from the "ו" word or the comma that starts it;
+  - "קריאה … למחלקת X" loses "למחלקת X".
+- **Gate:**
+  - The first candidate failed one old case: v4's "מה שבטוח, שתי השאלות כבר אצל הצוות." would have become "מה שבטוח.".
+  - So a cut must leave three words of its sentence, not ending on a lead-in, or it is not made.
+  - Then 501/501 on the candidate and on live, with 11 new cases.
+- **Replay:** 10 more replies change against live's voice v1 (word diffs read): today's two, 29 Oct's, 19 Oct's, and six August "בטיפול אצל הצוות". Nothing empty and no fragment.
+- **Live:** live, then the UChat copy, read back (voice v2, promise v5, `-99-uchat`). Snapshot: `local/n8n-whatsapp-live-08nov-before-voice2.json`.
+- **The owner's test also opened 255-1414-26** (cleaning). The earlier 255-1411-26 was two hours old, past open_request's 30 minutes, so a new ticket is by design.
+
 ### LIVE: the count names its kind (PR #8, debt-tools v151; owner: "so what will i test on the chatbot")
 - **Found while writing the owner's test list:** read-only on live, `type=elevator` for the test number gave `open_total` 4 with "The resident has 4 open tickets in all". Those were 4 lift tickets out of 20, so Michael would have said a wrong total.
 - **Fixed:** asked about one kind, the note says "of the kind asked about"; "in all" is only for no kind, or a kind that matched nothing.

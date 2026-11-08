@@ -559,6 +559,44 @@ function cases(E) {
     }
   }
 
+  // 8 Nov, evening (scripts/n8n_whatsapp_voice2.py, the owner's own test, executions 164367 and 164410): the
+  // matter "אצל הצוות" (the form of the owner's 29 Oct chat that started the one-voice rule), and a ticket
+  // "למחלקת הניקיון" (notify_team: "Never which department"). The drafts are the executions' own.
+  if (P.code && String(P.code.send_body || '').indexOf("const vv = 'voice v2'") !== -1) {
+    console.log(NL + "--- Send: nobody else holds the matter, no department named (8 Nov, the owner's test) ---");
+    const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+    const ADDLIFT = { action: { tool: 'add_request_detail' }, observation: obs({ ok: true, reference: '255-1409-26' }) };
+    const OPENED = { action: { tool: 'open_request' }, observation: obs({ ok: true, reference: '255-1414-26' }) };
+    const NOTE = { action: { tool: 'notify_team' }, observation: obs({ ok: true, reason: 'caller_request' }) };
+    expect('164367 exactly: ", אבל זה כרגע אצל הצוות שמטפל בזה" goes, the wish stays',
+      () => content(E, { reply: 'אני באמת מבין את התסכול, אסף. הוספתי עכשיו לקריאה שאתה לוחץ לדעת מתי מגיעים ומחכה לתשובה בהקדם. ' + NL + NL + 'הלוואי שהייתה לי שעה להגיד לך, אבל זה כרגע אצל הצוות שמטפל בזה. תרצה שאבדוק את זה שוב בשבילך יותר מאוחר?', steps: [ADDLIFT], said: 'נו אז מתי??' }),
+      'אני באמת מבין את התסכול, אסף. הוספתי עכשיו לקריאה (255-1409-26) שאתה לוחץ לדעת מתי מגיעים ומחכה לתשובה בהקדם. הלוואי שהייתה לי שעה להגיד לך. תרצה שאבדוק את זה שוב בשבילך יותר מאוחר?');
+    expect('164410 exactly: "קריאה למחלקת הניקיון" is "קריאה"',
+      () => content(E, { reply: 'באמת לא נעים. פתחתי עכשיו קריאה למחלקת הניקיון על חדר המדרגות בבר כוכבא 23 (מספר 255-1414-26). ' + NL + NL + 'תרצה שאבדוק משהו נוסף?', steps: [NOTE, OPENED], said: 'לא מנקים את חדר המדרגות כבר שבועיים' }),
+      'באמת לא נעים. פתחתי עכשיו קריאה על חדר המדרגות בבר כוכבא 23 (מספר 255-1414-26). תרצה שאבדוק משהו נוסף?');
+    expect('29 Oct 17:03 (the chat that started the rule): " ונמצאות אצל הצוות" goes, the list stays',
+      say({ reply: 'מצטער על ההמתנה 🙏 אני רואה כרגע במערכת 3 קריאות שלך שעדיין בסטטוס פתוח ונמצאות אצל הצוות, ביניהן הקריאות על המעלית ועל התאורה בקומה 2. משהו שם החמיר?' }),
+      'מצטער על ההמתנה 🙏 אני רואה כרגע במערכת 3 קריאות שלך שעדיין בסטטוס פתוח, ביניהן הקריאות על המעלית ועל התאורה בקומה 2. משהו שם החמיר?');
+    expect('"ואצל הצוות" goes',
+      say({ reply: 'הקריאה הדחופה כבר פתוחה ואצל הצוות. משהו השתנה מאז?' }), 'הקריאה הדחופה כבר פתוחה. משהו השתנה מאז?');
+    expect('"ובטיפול אצל הצוות" goes',
+      say({ reply: 'בדקתי במערכת: הקריאה על הנזילה בלובי עדיין פתוחה ובטיפול אצל הצוות. משהו החמיר?' }),
+      'בדקתי במערכת: הקריאה על הנזילה בלובי עדיין פתוחה. משהו החמיר?');
+    expect('", היא אצל הצוות" goes',
+      say({ reply: 'הקריאה על הנזילה בלובי עדיין פתוחה, היא אצל הצוות. יש משהו חדש שחשוב שאוסיף?' }),
+      'הקריאה על הנזילה בלובי עדיין פתוחה. יש משהו חדש שחשוב שאוסיף?');
+    for (const same of [
+      'מה שרשום אצלנו במערכת הוא 2,000 ש"ח. זה מסתדר עם מה שידוע לך?',
+      'אני העוזר הדיגיטלי בצוות השירות של הומי\'ז. במה אוכל לעזור?',
+      'פתחתי קריאה, מספרה 255-1414-26. היא אצל צוות החשמל.',
+      'הקריאה פתוחה, וזה אצל הצוות לפי 255-1409-26. משהו השתנה?',
+      // A cut that would leave "מה שבטוח." alone is no cut (the v4 case above has the same sentence).
+      'אין לי שעה. מה שבטוח, שתי השאלות כבר אצל הצוות. יש עוד משהו?',
+    ]) {
+      expect('untouched: ' + same.slice(0, 40), say({ reply: same }), same);
+    }
+  }
+
   // 8 Nov (scripts/n8n_whatsapp_retest4.py, the tester's C9.4, execution 164030): "ומתי המנהל יחזור אליי?"
   // was answered "תאריך או שעה מדויקת למתי יחזרו אליך אין לי, …", and promise v4, which lets "יחזרו אליך"
   // through after "מתי", did not know "למתי": the sentence was cut whole and "מה שכן, …" went alone.

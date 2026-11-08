@@ -64,6 +64,11 @@ The user is the builder. The client is Homies.
 - A purpose clause that has someone else knowing, seeing or handling it ("כדי שידעו …", "כדי שהצוות יראה …") is cut to the end of its clause. A reply that opens with one loses it up to its comma. It is never cut when what goes holds a ticket number or a link, or would leave fewer than two words.
 - "כדי שנוכל" becomes "כדי שאוכל"; "רשמתי / ציינתי / כתבתי / השארתי … לצוות" becomes "… במערכת"; "נשלח לך עדכון / הודעה" becomes "יישלח / תישלח לך …".
 - **Why code:** the sentence is already in the prompt, and add_request_detail's text already says "say what you added, not who will see it". One more sentence would be a rule on top. The replay changes 19 of 1,342 replies, each one of these forms. A new form joins the list with a gate case, as a slang word does.
+- **voice v2 (8 Nov, evening, from the owner's own test):** two more forms.
+  - A clause that puts the matter "אצל הצוות" is cut: ", אבל זה כרגע אצל הצוות שמטפל בזה", "ונמצאות אצל הצוות", "ואצל הצוות". This is the form of the owner's 29 Oct chat that started the rule.
+  - "קריאה למחלקת הניקיון" becomes "קריאה" (notify_team: "Never which department").
+  - A cut that would leave under three words of its sentence, or end on a lead-in ("מה שבטוח."), is not made. A sentence that is nothing but the team ("היא אצל צוות החשמל.") stays too.
+  - The replay changes 10 more replies, each one of these forms.
 
 **"For when" is asking when, not promising (8 Nov, Send's promise v5).** promise v4 lets "יחזרו אליך" through after "מתי", since asking when promises nothing; "למתי" is the same question. Without it, the tester's C9.4 lost its honest "תאריך או שעה מדויקת למתי יחזרו אליך אין לי", and "מה שכן, …" went out alone.
 

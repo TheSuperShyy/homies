@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 8 Nov, evening: Send's voice v2** (`n8n_whatsapp_voice2.py`; live and the UChat copy, both read back; code only, still epoch 99). This is from the owner's own test of the fixes below (executions 164335-164424). That test passed the count (20 in all, 4 for the lift) and the cheque, where voice v1 turned the draft's "כדי שנוכל לסדר" into "כדי שאוכל לסדר".
+>   - **Two more forms went out, and are now cut:** "…, אבל זה כרגע אצל הצוות שמטפל בזה" (the 29 Oct form) and "קריאה למחלקת הניקיון". A cut that would leave a fragment ("מה שבטוח.") is not made.
+>   - **Checked:** the gate passes 501/501 on live, with 11 new cases including both drafts word for word. The replay changes 10 more replies, each one of the forms. All 17 pins are unchanged.
+>   - **Rollback:** `python scripts/n8n_whatsapp_voice2.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-voice2.json`), then `python scripts/n8n_uchat.py --apply`.
+>
 > **LIVE 8 Nov: the tester's fourth run fixed** (the owner pasted its report). `n8n_whatsapp_retest4.py` on live and the UChat copy, both read back; PR #7 merged as `363cf35`, so CI deployed **debt-tools v150**.
 >   - **What it changes:**
 >     - **Send's voice v1** (the five R4 fails): "כדי שידעו …" is cut, "כדי שנוכל" becomes "כדי שאוכל", "רשמתי … לצוות" becomes "… במערכת", and "נשלח לך עדכון" becomes "יישלח לך עדכון".
