@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  answererOf, answerText, e164, externalIdFor, inCallingHours, israelClock, localForm,
+  answererOf, answerText, e164, externalIdFor, inCallingHours, israelClock, leadsAdded, localForm,
 } from "../dashboard/lib/dialer-rules.ts";
 import { routeOf } from "../supabase/functions/debt-tools/route.ts";
 
@@ -88,4 +88,22 @@ test("answerText: Tokomni's answer as one short line", () => {
   assert.equal(answerText("added"), "added");
   assert.equal(answerText("x".repeat(500)).length, 200);
   assert.equal(answerText(""), "");
+});
+
+// Omni, 8 Nov: the v1 lead API answers with how many went in and why any did not.
+test("answerText: Omni's v1 answer says what went in and what did not", () => {
+  assert.equal(answerText('{"inserted_count":1}'), "inserted 1");
+  assert.equal(answerText('{"inserted_count":0,"blacklisted_items":["05XXXXXXXX"]}'), "inserted 0, blacklisted 1");
+  assert.equal(answerText('{"inserted_count":0,"failed_items":[{"number":"05XXXXXXXX","reason":"campaign not found"}]}'),
+               "inserted 0, failed: campaign not found");
+  assert.equal(answerText('{"invalid":[{"error":"number must be digits"}]}'), "invalid: number must be digits");
+  assert.equal(answerText('{"failed_items":[{"number":"05XXXXXXXX"}]}'), 'failed: {"number":"05XXXXXXXX"}');
+});
+
+test("leadsAdded: inserted_count when Tokomni gives it, else null", () => {
+  assert.equal(leadsAdded('{"inserted_count":1}'), 1);
+  assert.equal(leadsAdded('{"inserted_count":0,"blacklisted_items":["05XXXXXXXX"]}'), 0);
+  assert.equal(leadsAdded('{"ok":true}'), null);
+  assert.equal(leadsAdded("<html></html>"), null);
+  assert.equal(leadsAdded(""), null);
 });
