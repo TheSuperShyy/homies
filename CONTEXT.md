@@ -3694,7 +3694,19 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - Every other call, doubt or error gets the incoming agent. The dialer rings whatever is uploaded in Tokomni, at any hour, so a mistaken upload must meet a receptionist, never a demand for money.
   - The variables are the Call button's, copied byte for byte. `check_route.test.ts` runs both composers side by side, so do not edit one without the other.
 - **Omni's dialer API is ours since 27 Oct: every API lead goes into Tokomni's "List 2"** (email in `local/omnitelecom/2026-10-27-token-list2.txt`; `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` in `.env`).
-  - **Sending one:** `POST api.tokomni.cc/api/campaign/insert/?token=…` with `external_id`, `campaign_id` and `number`. `scripts/tokomni_lead.py` sends one test lead from בר כוכבא 23, with the resident id as the external_id.
+  - **Sending one (Omni, 8 Nov, `local/omnitelecom/2026-11-08-lead-api-v1.txt`):** `POST https://api.tokomni.cc/api/v1/dialer/campaign/`, with a lead token as `Authorization: Bearer`, never in the URL, and `campaign_id`, `external_id` and `number` (digits only). An array sends several.
+    - **Why every send got a 404 until then:** the address in Omni's first document (`/api/campaign/insert/?token=…`) was wrong, and the token they gave on 27 Oct was for their dashboard. They deleted it.
+    - **The lead token** starts with `eyJ` and is valid for a year. It is tied to our domain, and `campaign_id` picks the list: List 2's id, never the Homies_Bot dialer's.
+    - **Answers:**
+      - 200 means all were received, with `inserted_count`.
+      - 207 means some went in, with `failed_items`.
+      - 502 means none went in (a wrong list id), with `failed_items`.
+      - 400 means nothing valid, with `invalid`.
+      - 401 means the token.
+      - A blacklisted number is in `blacklisted_items` and is not rung. The same number and external_id already waiting is not added twice.
+    - **external_id:** up to 64 characters from A-Z a-z 0-9 - _ . : (ours is 52). It reaches the bot as the SIP header `X-External-Id`.
+    - **Omni recommends staying on the dialer**, not SIP out through 208 or their click-to-call. It has redial attempts, a blacklist and lead reports. Their next step is a health check: one lead to a staff member's phone, the exact time sent to them, and a look on Vapi for `X-External-Id`.
+    - `scripts/tokomni_lead.py` sends one test lead from בר כוכבא 23, with the resident id and the moment as the external_id.
   - **List 2 stays on all the time,** so a new lead is rung at once, at any hour. Omni has no calling hours, so our side sends only in calling hours.
   - **Omni's three rules for List 2:**
     - It needs Play pressed once.
@@ -3736,7 +3748,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - The external_id is `<resident id or test>-<press time>`, so a second press is a new lead. The resident id is the first 36 characters.
     - Vercel has `TOKOMNI_TOKEN` (Sensitive) and `TOKOMNI_CAMPAIGN_ID` since 28 Oct, 11:44 UTC. A change to either reaches the page only with a production redeploy.
     - **Writing the secrets and redeploying production are two separate goes (28 Oct).** The session's permission check let "set them" write the pair, then refused the redeploy as a production deploy of its own. The owner's next word, "try again", cleared the redeploy. A refused redeploy waits for its own go, or for Redeploy pressed in Vercel. It is never forced through with an empty push to `main`.
-    - **Tokomni's 404 says nothing about the cause.** `{"error_msg":"404 Route Not Found"}` comes back for a made-up token, no token, a GET, and a real token with a campaign that does not exist (probed 29 Oct with requests that could insert nothing). Omni's document calls 404 "missing fields, invalid token". Only Omni's log or a request that succeeds tells the parts apart. The email asking Omni for that log is `local/omnitelecom/2026-10-29-api-404-email.txt` (29 Oct). The token and List 2 id in `.env` and `dashboard/.env.local` are exactly those of Omni's 27 Oct email (checked 29 Oct), so a 404 is never a copy mistake on our side. Any other path, the insert path without its trailing slash included, gets Cloudflare's 403 page, whatever the user agent. **On 2 Nov the Homies_Bot dialer's id got the same 404 (two presses), so neither id alone is the cause.**
+    - **Settled 8 Nov by Omni: the 404s were their wrong address and a dashboard token** (above). What follows is the hunt as it was. **Tokomni's 404 says nothing about the cause.** `{"error_msg":"404 Route Not Found"}` comes back for a made-up token, no token, a GET, and a real token with a campaign that does not exist (probed 29 Oct with requests that could insert nothing). Omni's document calls 404 "missing fields, invalid token". Only Omni's log or a request that succeeds tells the parts apart. The email asking Omni for that log is `local/omnitelecom/2026-10-29-api-404-email.txt` (29 Oct). The token and List 2 id in `.env` and `dashboard/.env.local` are exactly those of Omni's 27 Oct email (checked 29 Oct), so a 404 is never a copy mistake on our side. Any other path, the insert path without its trailing slash included, gets Cloudflare's 403 page, whatever the user agent. **On 2 Nov the Homies_Bot dialer's id got the same 404 (two presses), so neither id alone is the cause.**
     - **A press leaves one line in Vercel's request log, kept a few days (found 2 Nov).** It reads `dialer <masked number> <Tokomni's status> <agent> <external_id>`.
       - Read it through `https://vercel.com/api/logs/request-logs?projectId=…&ownerId=<team>&deploymentId=…&startDate=…&endDate=…` with `VERCEL_ADMIN_KEY`.
       - Vercel refuses `VERCEL_TOKEN` and `VERCEL_API` since at least 2 Nov. The runtime-logs API only streams new lines.

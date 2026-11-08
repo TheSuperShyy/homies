@@ -14,14 +14,23 @@ that value. No dialer call has carried one so far (21 and 26 Oct), so the router
 the tenant by that number.
 
 THE LEAD. `external_id` is the tenant's resident id from `v_debt_call_queue_person`,
-the id the router would look up once the header comes through. `number` is their
-mobile in the local form of Omni's own example (10 digits, no country code).
+the id the router would look up once the header comes through, then the moment it
+is sent, as the dashboard's /dialer page does. `number` is their mobile in the
+local form of Omni's own example (10 digits, no country code, digits only).
 
-    POST https://api.tokomni.cc/api/campaign/insert/?token=...
-    {"external_id": "<resident id>", "campaign_id": "<List 2>", "number": "05..."}
+THE ADDRESS (Omni, 8 Nov, local/omnitelecom/2026-11-08-lead-api-v1.txt). The one
+in their first document was wrong, so every send got a 404, and the token we had
+was for their dashboard (they deleted it). The lead API:
 
-200 means "added if not already present", so the same lead sent twice may ring
-nobody the second time. 404 means a missing field or a bad token.
+    POST https://api.tokomni.cc/api/v1/dialer/campaign/
+    Authorization: Bearer <lead token, starts eyJ, valid a year>
+    {"campaign_id": "<List 2>", "external_id": "<id>-<YYYYMMDDTHHMMSS>", "number": "05..."}
+
+200 with `inserted_count`; 207 some in, some not (`failed_items`); 502 none (a
+wrong list id); 400 nothing valid (`invalid`); 401 the token. A blacklisted number
+is in `blacklisted_items` and is not rung, and the same number and external_id
+already waiting is not added twice. external_id: up to 64 of A-Z a-z 0-9 - _ . :.
+Omni passes it to the bot as the SIP header X-External-Id.
 
 WHAT OMNI SAID ABOUT LIST 2
 - It is stopped by hand until someone presses Play on it once in Tokomni. Until
@@ -51,7 +60,7 @@ import n8n_whatsapp as W  # noqa: E402
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-INSERT = "https://api.tokomni.cc/api/campaign/insert/"
+INSERT = "https://api.tokomni.cc/api/v1/dialer/campaign/"
 BUILDING = u"בר כוכבא 23, תל אביב - יפו"
 ISRAEL = zoneinfo.ZoneInfo("Asia/Jerusalem")
 VAPI = "https://api.vapi.ai"
@@ -100,10 +109,10 @@ def lead(e, unit):
 
 
 def send(token, body):
+    # Omni, 8 Nov: the token goes in the Authorization header, never in the URL.
     req = urllib.request.Request(
-        INSERT + "?" + urllib.parse.urlencode({"token": token}), method="POST",
-        data=json.dumps(body).encode("utf-8"),
-        headers={"Content-Type": "application/json", "User-Agent": UA})
+        INSERT, method="POST", data=json.dumps(body).encode("utf-8"),
+        headers={"Authorization": "Bearer " + token, "Content-Type": "application/json", "User-Agent": UA})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             return r.status, r.read().decode("utf-8", "replace")
@@ -156,15 +165,19 @@ def main():
     if not number:
         sys.exit("%s's number is not an Israeli one; Omni's dialer is not tried on those."
                  % row["first_name"])
-    body = {"external_id": row["resident_id"], "campaign_id": campaign, "number": number}
+    # The dashboard's form (externalIdFor): the resident id, then the moment, so a second send
+    # is a new lead and not "the same number and external_id already waiting".
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S")
+    body = {"campaign_id": campaign, "external_id": "%s-%s" % (row["resident_id"], stamp), "number": number}
     now = datetime.datetime.now(ISRAEL)
     inside = calling_hours(now)
 
     print("campaign     %s…  (List 2)" % campaign[:8])
-    print("token        %s.…" % token.split(".")[0])
+    print("token        %s  (%d characters)" % ("the lead token, eyJ…" if token.startswith("eyJ")
+                                               else "NOT a lead token: Omni's start with eyJ", len(token)))
     print("the lead     %s, flat %s, %s owed, attempt %s"
           % (row["first_name"], row["unit"], row["amount"], row["attempt"]))
-    print("  external_id  %s  (resident id)" % body["external_id"])
+    print("  external_id  %s  (resident id, then the moment)" % body["external_id"])
     print("  number       %s" % mask(number))
     print("Israel time  %s: %s" % (now.strftime("%a %H:%M"),
                                   "inside calling hours" if inside else "OUTSIDE calling hours"))

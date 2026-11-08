@@ -8,6 +8,20 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **8 Nov, later: Omni answered about the dialer's 404s, and the dialer test page is rebuilt for their lead API. Built, not live** (their email: `local/omnitelecom/2026-11-08-lead-api-v1.txt`). The 404s since 29 Oct were Omni's: the address in their first document was wrong, and the 27 Oct token was a dashboard token, which they have deleted.
+>   - **Built:**
+>     - PR #9 (`fix/dialer-api-v1`) has CI green and a Vercel preview built. It is **not merged**.
+>     - The page sends to `api.tokomni.cc/api/v1/dialer/campaign/` with the token as a Bearer header. A press counts as sent only on a 200 that took the lead.
+>     - `scripts/tokomni_lead.py` does the same, with the moment in the external_id.
+>   - **List 2's id in `.env` is the email's.** The token in `.env` and in Vercel is the old, deleted one. The new lead token (it starts `eyJ`) was not in the paste.
+>   - **Owed, in this order, each on the owner's go:**
+>     1. the new token into `.env` and Vercel's `TOKOMNI_TOKEN` (Sensitive);
+>     2. merge PR #9, which redeploys production with the token;
+>     3. the owner presses Ring once on `/dialer` for a staff phone, in calling hours;
+>     4. `python scripts/tokomni_lead.py --check` (on Vapi: did `X-External-Id` arrive?);
+>     5. a reply to Omni with the exact time it was sent.
+>   - **Open, the owner's call:** Omni recommends their dialer over SIP out through 208 or click-to-call, which was the 2 Nov plan. They also list redial attempts; ours was set to one attempt on 25 Oct.
+>
 > **LIVE 8 Nov, later: the tester's fifth run fixed in Send** (`n8n_whatsapp_retest5.py`; live and the UChat copy, both read back; code only, still epoch 99). The fifth run (45 messages, 20:12-21:34 PH; executions 164557-164977) had no serious fail and two others, each the model's own words against a text it has:
 >   - **C5 R2 (164670):** after the menu, the status tap's draft opened "בשמחה, בוא נראה." with no name, although the prompt asks for it twice. 7 of the 24 first replies after the menu since 25 Oct had no name. **intro v1** (Send's last step) now opens such a reply with "כאן מיכאל מהומי'ז.", after a greeting the draft kept. It is skipped when the reply already has "מיכאל" or "העוזר הדיגיטלי", on a canned line, and when a short "I'm checking" already went out this turn.
 >   - **C9.4 R15 (164822):** the truth check sent back a first draft ("רשמתי את כל מה שאמרת", with no tool that turn), and the retry wrote "וגם הבקשה שלך לדבר עם מנהל רשומה", from C9.1's quiet notify_team. The same claim went out on 29 Oct and in the 5 Nov run's C9.4. **manager v1** (after voice v2) cuts a clause that says a request for a manager or a person was recorded or passed on: from its joining word, else with its comma, else the sentence. It never cuts a ticket number, and never a clause where the request and the recording word are more than five words apart.

@@ -37,10 +37,16 @@ where we just insert the number there or like call ido button"*.
 4. **Otherwise one lead goes to Omni:**
 
    ```
-   POST https://api.tokomni.cc/api/campaign/insert/?token=<TOKOMNI_TOKEN>
-   {"external_id": "<resident id or test>-<YYYYMMDDTHHMMSS UTC>",
-    "campaign_id": "<TOKOMNI_CAMPAIGN_ID>", "number": "05XXXXXXXX"}
+   POST https://api.tokomni.cc/api/v1/dialer/campaign/
+   Authorization: Bearer <TOKOMNI_TOKEN>
+   {"campaign_id": "<TOKOMNI_CAMPAIGN_ID>",
+    "external_id": "<resident id or test>-<YYYYMMDDTHHMMSS UTC>", "number": "05XXXXXXXX"}
    ```
+
+   Since 8 Nov (Omni's answer: the first document's address and token were
+   wrong). A press is "sent" only on a 200 that took the lead: with
+   `inserted_count` 0 (blacklisted, or already waiting) it shows as not sent,
+   with the reason.
 
    It waits 8 seconds for an answer. List 2 is always on, so the dialer rings
    the number at once. The answered call reaches 208 and Vapi, and feature 18

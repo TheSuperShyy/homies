@@ -1,7 +1,7 @@
 import 'server-only';
 import { serverClient } from '@/lib/supabase-server';
 import {
-  answerText, answererOf, e164, externalIdFor, inCallingHours, localForm, type Answerer,
+  answerText, answererOf, e164, externalIdFor, inCallingHours, leadsAdded, localForm, type Answerer,
 } from '@/lib/dialer-rules';
 
 // The dialer test page (feature 20): one number into Omni's dialer, so a test
@@ -20,8 +20,15 @@ import {
 //   - a number on file for a tenant outside the test building. The page rings
 //     testers and numbers that are no tenant's; a real tenant is called from
 //     the Debts page, on purpose.
-
-const INSERT = 'https://api.tokomni.cc/api/campaign/insert/';
+//
+// THE ADDRESS AND THE TOKEN (Omni, 8 Nov). The address in their first document
+// was wrong, which is why every press got a 404, and the token we had was for
+// their dashboard, so they deleted it. The lead API is this address, with a
+// lead-sending token (it starts "eyJ", valid for a year) as a Bearer header,
+// never in the URL. It answers 200 with `inserted_count`; a lead it did not
+// take (blacklisted, or the same number and external_id already waiting) is in
+// the answer, so a 200 that took nothing is not "sent". 401 is the token.
+const INSERT = 'https://api.tokomni.cc/api/v1/dialer/campaign/';
 export const TEST_BUILDING = 'בר כוכבא 23, תל אביב - יפו';
 
 const QUEUE_COLUMNS = 'resident_id,phone,first_name,amount,attempt';
@@ -95,10 +102,12 @@ export async function dial(typed: string): Promise<Record<string, string>> {
   let status: number;
   let body: string;
   try {
-    const token = new URLSearchParams({ token: process.env.TOKOMNI_TOKEN!.trim() });
-    const res = await fetch(`${INSERT}?${token}`, {
+    const res = await fetch(INSERT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${process.env.TOKOMNI_TOKEN!.trim()}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         external_id: externalId,
         campaign_id: process.env.TOKOMNI_CAMPAIGN_ID!.trim(),
@@ -116,8 +125,10 @@ export async function dial(typed: string): Promise<Record<string, string>> {
     return { r: 'net', n: local, b: String(e).slice(0, 200) };
   }
   console.log('dialer', mask(local), status, who.agent, externalId);
+  // 200 is "all received"; 207, 400, 401 and 502 each took nothing for a one-lead
+  // press, and a 200 whose inserted_count is 0 took nothing either.
   return {
-    r: status >= 200 && status < 300 ? 'ok' : 'http',
+    r: status === 200 && leadsAdded(body) !== 0 ? 'ok' : 'http',
     n: local, s: String(status), b: answerText(body), x: externalId, ...whoParams(who),
   };
 }

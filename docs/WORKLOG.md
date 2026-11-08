@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### Omni's answer on the dialer's 404s, and the dialer test page rebuilt for their lead API (built, PR #9 not merged; the owner pasted Omni's email)
+- **Omni's answer** (`local/omnitelecom/2026-11-08-lead-api-v1.txt`):
+  - The address in their first document was wrong, so every send since 29 Oct got a 404.
+  - The 27 Oct token was for their dashboard; they deleted it.
+  - The lead API is `POST https://api.tokomni.cc/api/v1/dialer/campaign/`, with a new lead token (`eyJ…`, a year) as a Bearer header, and List 2's id as `campaign_id`.
+  - Answers: 200 `inserted_count`, 207/502 `failed_items`, 400 `invalid`, 401 the token, plus `blacklisted_items`.
+  - external_id reaches the bot as `X-External-Id`.
+  - They recommend staying on the dialer over SIP out or click-to-call, and ask for a health check: one lead to a staff phone, and the exact time sent.
+- **Checked, printing neither:** List 2's id in `.env` equals the email's. The token in `.env` is the old one (41 characters, not `eyJ`). The new one was not in the paste.
+- **Built:**
+  - PR #9 (`fix/dialer-api-v1`, cut from `main`): `dashboard/lib/dialer.ts` sends there with the header.
+  - A press is "sent" only on a 200 whose `inserted_count` is not 0.
+  - `answerText` reads the v1 answer. There are two new tests.
+  - The same change is on this branch.
+- **Checks:**
+  - 9/9 dialer tests and `tsc` clean locally.
+  - CI `checks` green and the Vercel previews built.
+  - Locally, 3 route tests in `check_route.test.ts` fail on `main` itself as well, with or without the change. CI on Linux passes them.
+- **`scripts/tokomni_lead.py`:** the new address and the Bearer header. The external_id is the resident id plus the moment, and it no longer prints the token's first part. Dry run on Sunday at 16:33 Israel: inside calling hours, Ido's flat 1.
+- **Not merged:** merging redeploys production. The token, the Vercel secret, the merge and the Ring are each the owner's go.
+
 ### LIVE: the tester's fifth run fixed in Send (intro v1, manager v1; the owner pasted its report)
 - **The fifth run** (every conversation, 45 messages, 20:12-21:34 PH; the UChat copy's executions 164557-164977, all read with their drafts):
   - No serious fail and two others: C5 R2 and C9.4 R15.
