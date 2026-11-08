@@ -415,9 +415,12 @@ function cases(E) {
     say({ reply: 'הם יחזרו אליך בהקדם. במה אוכל לעזור לך עוד?', said: 'when?' }), 'במה אוכל לעזור לך עוד?');
   // The 37 live replies (scripts/wa_promise_live_05oct.json): raw draft in, v3 out.
   // 8 Nov: with voice v1, #11's "רשמתי לצוות שלנו" is "רשמתי במערכת"; the file keeps what v3 sent that day.
+  // 8 Nov, later: with manager v1, #14's and #33's "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי." goes (R15).
   const voiced = (String(P.code.send_body || '').indexOf("const vv = 'voice v") !== -1);
+  const managed = (String(P.code.send_body || '').indexOf("const mg = 'manager v") !== -1);
   for (const k of P.promise_live || []) {
-    const want = voiced ? String(k.want).replace('רשמתי לצוות שלנו', 'רשמתי במערכת') : k.want;
+    let want = voiced ? String(k.want).replace('רשמתי לצוות שלנו', 'רשמתי במערכת') : k.want;
+    if (managed) want = String(want).replace(' עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי.', '');
     expect('5 Oct live #' + k.n + ' (' + k.case + ')', say({ reply: k.raw, said: k.said }), want);
   }
 
@@ -595,6 +598,95 @@ function cases(E) {
     ]) {
       expect('untouched: ' + same.slice(0, 40), say({ reply: same }), same);
     }
+  }
+
+  // 8 Nov, later (scripts/n8n_whatsapp_retest5.py, the tester's fifth run, C9.4 R15, execution 164822): the
+  // retry answered "ומתי המנהל יחזור אליי?" with "וגם הבקשה שלך לדבר עם מנהל רשומה", from C9.1's quiet
+  // notify_team; the prompt says never to tell it. The same claim on 29 Oct and in the 5 Nov run's C9.4.
+  if (P.code && String(P.code.send_body || '').indexOf("const mg = 'manager v1'") !== -1) {
+    console.log(NL + "--- Send: a manager request is never \"recorded\" (8 Nov, the tester's fifth run) ---");
+    const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+    const OPENED = { action: { tool: 'open_request' }, observation: obs({ ok: true, reference: '255-1418-26' }) };
+    const R164822 = 'האמת שאין לי שעה מדויקת לתת לך, כי המערכת פשוט לא מראה לי זמנים או מתי יחזרו. מה שכן בטוח כרגע זה שהקריאה פתוחה ומטופלת, וגם הבקשה שלך לדבר עם מנהל רשומה. כשיסגרו את הקריאה אתה תקבל על זה עדכון אוטומטי ממש לכאן, ואם תרצה תוכל תמיד לכתוב לי ואני אבדוק בשמחה מה קורה איתה. ';
+    expect('164822 exactly (the retry): ", וגם הבקשה שלך לדבר עם מנהל רשומה" goes, the rest stays',
+      () => content(E, { reply: R164822 + NL + NL + 'יש עוד קומה בבניין או אזור ששמת לב שמלוכלך במיוחד עכשיו?', steps: [], said: 'ומתי המנהל יחזור אליי?' }),
+      'האמת שאין לי שעה מדויקת לתת לך, כי המערכת פשוט לא מראה לי זמנים או מתי יחזרו. מה שכן בטוח כרגע זה שהקריאה פתוחה ומטופלת. כשיסגרו את הקריאה אתה תקבל על זה עדכון אוטומטי ממש לכאן, ואם תרצה תוכל תמיד לכתוב לי ואני אבדוק בשמחה מה קורה איתה. יש עוד קומה בבניין או אזור ששמת לב שמלוכלך במיוחד עכשיו?');
+    expect('the 5 Nov run\'s C9.4: ", אבל הבקשה … רשומה …" goes, the honest no-time stays',
+      say({ reply: 'זמן מדויק אין לי, אבל הבקשה שלך לדבר עם מנהל רשומה אצלנו מסודר יחד עם התלונה על הניקיון. יש עוד משהו שקשור לניקיון שאוסיף?', said: 'ומתי המנהל יחזור אליי?' }),
+      'זמן מדויק אין לי. יש עוד משהו שקשור לניקיון שאוסיף?');
+    expect('29 Oct: a sentence that opens with it loses it up to its comma, and the "אבל" after it',
+      say({ reply: 'רשמתי את הבקשה שלך לדבר עם מנהל אצלנו במערכת, אבל חשוב לי לבדוק איתך אם אוכל לעזור בעצמי. מה קרה?' }),
+      'חשוב לי לבדוק איתך אם אוכל לעזור בעצמי. מה קרה?');
+    expect('a sentence that is only that goes whole',
+      say({ reply: 'עדכנתי את ההנהלה שביקשת לדבר עם מנהל. כדי שאוכל לעזור כמה שיותר מהר, מה מטריד אותך?' }),
+      'כדי שאוכל לעזור כמה שיותר מהר, מה מטריד אותך?');
+    expect('joined by "ו" after the ticket: the number stays, the claim goes',
+      () => content(E, { reply: 'פתחתי קריאה (255-1418-26) ורשמתי גם שביקשת לדבר עם מנהל. יש עוד מקומות בבניין שלא נוקו?', steps: [OPENED] }),
+      'פתחתי קריאה (255-1418-26). יש עוד מקומות בבניין שלא נוקו?');
+    expect('"וגם" with no comma: the claim goes',
+      say({ reply: 'הקריאה על הניקיון פתוחה וגם הבקשה שלך למנהל נרשמה. משהו השתנה מאז?' }),
+      'הקריאה על הניקיון פתוחה. משהו השתנה מאז?');
+    expect('on one line after other words: the claim goes from its verb, "שוב ושוב" stays',
+      say({ reply: 'אני מבין את התסכול כשזה עולה שוב ושוב רשמתי את הבקשה שלך לדבר עם מנהל, אבל חשוב לי לבדוק איתך אם אוכל לעזור. מה קרה?' }),
+      'אני מבין את התסכול כשזה עולה שוב ושוב, אבל חשוב לי לבדוק איתך אם אוכל לעזור. מה קרה?');
+    expect('"כבר עדכנתי" alone before it: the sentence goes',
+      say({ reply: 'כבר עדכנתי את ההנהלה שביקשת לדבר עם מנהל. מה מטריד אותך?' }), 'מה מטריד אותך?');
+    expect('a lead-in that would stand alone takes the sentence with it',
+      say({ reply: 'אין לי שעה. מה שבטוח, הבקשה שלך לדבר עם מנהל רשומה. יש עוד משהו שתרצה שאוסיף לקריאה?' }),
+      'אין לי שעה. יש עוד משהו שתרצה שאוסיף לקריאה?');
+    for (const same of [
+      // C9.1 and C9.2 of the fifth run, word for word.
+      'הבנתי, אני לגמרי מבין אותך וממש רוצה לעזור לך עם זה כמה שיותר מהר. כדי שאוכל לעשות את זה על הצד הטוב ביותר, יעזור מאוד אם תוכל לספר לי בקצרה על מה העניין?',
+      'אני באמת העוזר הדיגיטלי בצוות השירות של הומי\'ז. אני מבין לגמרי שאתה רוצה לדבר עם בן אדם, ואני כאן כדי לעזור לזה לקרות הכי מהר שאפשר. גם כמה מילים ממש יעזרו לי לקדם את זה בשבילך, אפשר לקבל רק כיוון כללי של מה שמטריד אותך?',
+      'אני מבין שאתה רוצה לדבר עם מנהל, ורשמתי את התלונה על הניקיון במערכת. מה עוד קורה שם?',
+      'רשמתי את התלונה על הניקיון ואני מבין שחשוב לך מאוד לדבר עם מנהל. מה עוד קורה שם?',
+      'רשמתי בקריאה 255-1418-26 גם את הבקשה שלך לדבר עם מנהל. משהו נוסף?',
+      'רשמתי את התלונה במערכת. יש עוד משהו שתרצה שאוסיף?',
+    ]) {
+      expect('untouched: ' + same.slice(0, 40), say({ reply: same }), same);
+    }
+  }
+
+  // 8 Nov, later (scripts/n8n_whatsapp_retest5.py, the tester's fifth run, C5 R2, execution 164670): after the
+  // menu, a tap on "מצב קריאה קיימת" got "בשמחה, בוא נראה." with no name; the prompt asks for it twice. Of the
+  // first replies after the menu since 25 Oct, 7 of 24 had no name. The draft below is the execution's own.
+  if (P.code && String(P.code.send_body || '').indexOf("const iv = 'intro v1'") !== -1) {
+    console.log(NL + "--- Send: after the system's greeting, he says who he is (8 Nov, the tester's fifth run) ---");
+    const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+    const STATUS = { action: { tool: 'get_request_status' }, observation: obs({ ok: true, found: 3, requests: [{ reference: '255-1416-26', status: 'open' }, { reference: '255-1415-26', status: 'open' }, { reference: '255-1414-26', status: 'cancelled' }] }) };
+    const R164670 = 'בשמחה, בוא נראה.' + NL + NL + 'מצאתי שלוש קריאות פתוחות שרשומות עליך. קריאה 255-1416-26 על המים שיורדים מהתקרה באמבטיה נמצאת בסטטוס \'פתוחה\'. גם קריאה 255-1415-26 על המעלית התקועה עדיין פתוחה, וקריאה 255-1414-26 על הניקיון בחדר המדרגות בוטלה.' + NL + NL + 'האם תרצה שאבדוק על אחת מהן משהו ספציפי או שתרצה להוסיף להן פרטים?';
+    const TAP = { last_bot: MENU_TEXT, tap: 'status', tap_now: true };
+    expect('164670 exactly: the status tap after the menu opens with his name',
+      () => content(E, { reply: R164670, steps: [STATUS], said: 'מצב קריאה קיימת', S: TAP }),
+      'כאן מיכאל מהומי\'ז. בשמחה, בוא נראה. מצאתי שלוש קריאות פתוחות שרשומות עליך. קריאה 255-1416-26 על המים שיורדים מהתקרה באמבטיה נמצאת בסטטוס \'פתוחה\'. גם קריאה 255-1415-26 על המעלית התקועה עדיין פתוחה, וקריאה 255-1414-26 על הניקיון בחדר המדרגות בוטלה. האם תרצה שאבדוק על אחת מהן משהו ספציפי או שתרצה להוסיף להן פרטים?');
+    expect('typed after the menu (6 Nov, the C11 burst): the name, then the reply',
+      say({ reply: 'לא נעים להיות בלי אינטרקום. תוכל להגיד לי אם זה בפאנל למטה או רק אצלך בדירה?', said: 'האינטרקום לא עובד כבר יומיים', S: { last_bot: MENU_TEXT } }),
+      'כאן מיכאל מהומי\'ז. לא נעים להיות בלי אינטרקום. תוכל להגיד לי אם זה בפאנל למטה או רק אצלך בדירה?');
+    expect('the menu as the chat\'s last outbound message, Sort\'s note spent: the name too',
+      say({ reply: 'אוי, לא נעים. איפה בדיוק זה קורה?', said: 'יש נזילה', rows: [{ direction: 'outbound', body: MENU_TEXT }] }),
+      'כאן מיכאל מהומי\'ז. אוי, לא נעים. איפה בדיוק זה קורה?');
+    expect('a greeting the draft kept comes first, then the name',
+      say({ reply: 'היי, מה שלומך היום? 😊', said: 'לדבר עם נציג', S: { last_bot: MENU_TEXT, tap: 'other', tap_now: true } }),
+      'היי, כאן מיכאל מהומי\'ז. מה שלומך היום? 😊');
+    expect('the old menu line counts as the menu',
+      say({ reply: 'אוי, לא נעים. איפה בדיוק?', said: 'יש נזילה', S: { last_bot: MENU_TEXT_BEFORE } }),
+      'כאן מיכאל מהומי\'ז. אוי, לא נעים. איפה בדיוק?');
+    expect('already named: untouched (C1\'s tap, word for word)',
+      say({ reply: 'כאן מיכאל מצוות השירות של הומי\'ז. בשמחה אסף, אני כאן בדיוק בשביל זה 😊 ספר לי, מה קרה?', said: 'פתיחת קריאת שירות', S: { last_bot: MENU_TEXT, tap: 'open', tap_now: true } }),
+      'כאן מיכאל מצוות השירות של הומי\'ז. בשמחה אסף, אני כאן בדיוק בשביל זה 😊 ספר לי, מה קרה?');
+    expect('"who are you?" right after the menu: the digital-assistant answer is who he is',
+      say({ reply: 'אני העוזר הדיגיטלי בצוות השירות של הומי\'ז. במה אוכל לעזור?', said: 'אתה בוט?', S: { last_bot: MENU_TEXT } }),
+      'אני העוזר הדיגיטלי בצוות השירות של הומי\'ז. במה אוכל לעזור?');
+    expect('mid-conversation, no menu before it: untouched',
+      say({ reply: 'אוי, לא נעים. איפה בדיוק?', said: 'יש נזילה' }), 'אוי, לא נעים. איפה בדיוק?');
+    expect('a short "I\'m checking" already went out this turn: untouched',
+      say({ reply: 'זה הקישור לתשלום שלך.', said: 'איך משלמים?', S: { last_bot: MENU_TEXT }, acked: 'רגע, אני בודק.', ackSent: true }),
+      'זה הקישור לתשלום שלך.');
+    expect('the system\'s own greeting: untouched',
+      say({ reply: MENU_TEXT, canned: true, S: { last_bot: MENU_TEXT } }), MENU_TEXT);
+    expect('a follow-up menu ("אפשר לעזור בעוד משהו?") is no greeting: untouched',
+      say({ reply: 'אוי, לא נעים. איפה בדיוק?', said: 'יש נזילה', rows: [{ direction: 'outbound', body: 'אפשר לעזור בעוד משהו?' }] }),
+      'אוי, לא נעים. איפה בדיוק?');
   }
 
   // 8 Nov (scripts/n8n_whatsapp_retest4.py, the tester's C9.4, execution 164030): "ומתי המנהל יחזור אליי?"
@@ -1432,6 +1524,17 @@ function replay(L, C, corpus) {
     [REP_STATE]: { S: { last_bot: MENU_TEXT, tap: 'other', tap_now: true }, said: 'לדבר עם נציג' },
   };
   const changed = new Map();
+  // 8 Nov, later (intro v1): after the menu a reply with no name opens with it. That change, and only
+  // that change, is counted here instead of listed: "כאן מיכאל מהומי'ז. " + before, or after a greeting
+  // the draft kept, "היי, כאן מיכאל מהומי'ז. " + the rest of before.
+  const NAMED = "כאן מיכאל מהומי'ז.";
+  const AFTER_MENU = new Set(['right after the menu', REP_STATE]);
+  const introduced = (a, b) => {
+    if (b === NAMED + ' ' + a) return true;
+    const h = String(a).match(/^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב)(?=[\s,.!:;]|$)[\s,.!:;]*/u);
+    return !!h && b === h[1] + ', ' + NAMED + ' ' + String(a).slice(h[0].length);
+  };
+  let named = 0;
   for (const t of outbound) {
     for (const [st, o] of Object.entries(STATES)) {
       let a;
@@ -1442,6 +1545,10 @@ function replay(L, C, corpus) {
         const words = String(b).trim().split(/\s+/).filter(Boolean).length;
         const bad = words < 2 || /^(גם|ו[א-ת])/.test(String(b).trim());
         if (bad) broken++;
+        if (AFTER_MENU.has(st) && !bad && introduced(a, b)) {
+          named++;
+          continue;
+        }
         if (st === REP_STATE && !bad && String(b).length > String(a).length && String(b).endsWith(String(a))) {
           restored++;
           continue;
@@ -1453,6 +1560,8 @@ function replay(L, C, corpus) {
   }
   console.log('[' + REP_STATE + '] ' + restored + ' replies keep the hello the menu rule used to cut '
     + '(after = that hello + before; any other change there is listed below)');
+  if (named) console.log('[after the menu] ' + named + ' replies open with "' + NAMED + '" (after = that name + before; '
+    + 'any other change there is listed below)');
   console.log('replies that change in at least one state: ' + changed.size);
   for (const [t, rows] of changed) {
     console.log('   reply : ' + mask(t));

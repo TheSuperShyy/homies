@@ -55,6 +55,8 @@ The user is the builder. The client is Homies.
 **After the system's greeting, Michael says who he is, even to someone in memory (6 Nov, epoch 99).** A tester's run, or a tenant coming back, has earlier chats in the buffer, and the tap paragraph's "if this is your first message to this person" let the name drop (C5). The condition is gone.
 - **A burst after the menu** is read whole by `Still the last word?` (lastword v2): a menu logged after the burst's messages (it is logged once it has gone out) is read past, the bare hello it answered is left out, and `last_bot` is the menu whenever the newest outbound row is the menu.
 - **Why there and not in Sort:** Sort's `last_bot` lives in static data, which is per execution, so a silenced run of the burst spent it (C11). The messages table is the shared truth, as for the burst itself.
+- **Send carries the name (8 Nov, later, intro v1, code only).** In the tester's fifth run (C5, 164670) the status tap still went out with no name, and 7 of the 24 first replies after the menu since 25 Oct had none, although the prompt asks for it twice. Send's last step now opens a model's reply right after the system's greeting with "כאן מיכאל מהומי'ז." (the prompt's own example, and the form the model uses most). The menu counts when it is in Sort's `last_bot` or is the chat's last outbound message, the test manners v4 uses. A greeting the draft kept comes first ("היי, כאן מיכאל מהומי'ז. …").
+  - **Not added:** to a reply that has "מיכאל" or "העוזר הדיגיטלי" already, to a canned line, or after a short "I'm checking" that already went out this turn. The payment ack's own name is `Worth a word?`'s, not Send's.
 
 **Recorded, added and updated are deeds (6 Nov, epoch 99).** "רשמתי", "רשמנו", "הוספתי", "הוספנו" and "עדכנתי" are in the deeds guard's verbs (`wa_truth.TOOLED_VERBS`, with `n8n_whatsapp_outage.py`'s copy), so they are true only when a tool ran this turn; Try again's reason names them. The tester's C6.4 said "רשמתי את הפרטים" with no tool. Over the retained executions, 23 real replies used one of the five, and only that one had no tool.
 
@@ -69,6 +71,12 @@ The user is the builder. The client is Homies.
   - "קריאה למחלקת הניקיון" becomes "קריאה" (notify_team: "Never which department").
   - A cut that would leave under three words of its sentence, or end on a lead-in ("מה שבטוח."), is not made. A sentence that is nothing but the team ("היא אצל צוות החשמל.") stays too.
   - The replay changes 10 more replies, each one of these forms.
+
+**A request for a manager is never "recorded" to the tenant (8 Nov, later, Send's manager v1, code only).** The note a manager request gets is quiet, and the prompt says so: "על הרישום הזה אתה לא מספר לו, גם לא אחר כך כשהוא שואל מתי יחזרו אליו". In the tester's fifth run (C9.4, 164822) the truth check sent the first draft back, and the retry wrote "וגם הבקשה שלך לדבר עם מנהל רשומה", from C9.1's notify_team. The same claim went out on 29 Oct and in the 5 Nov run's C9.4. So Send cuts it.
+- **What counts:** a request to speak with a manager, a person or the management ("לדבר עם מנהל", "הבקשה שלך למנהל"), and a recording or passing word ("רשומה", "נרשמה", "רשמתי", "העברתי", "עדכנתי", "התקבלה" …), within five words of each other in one clause. "אני מבין שאתה רוצה לדבר עם מנהל" alone is untouched.
+- **What goes, smallest first:** from the joining word ("וגם", "ובנוסף", "והבקשה", or the recording verb itself); else the clause with the comma before it; else, when the sentence opens with it, the clause and its comma, with an "אבל" after it; else the whole sentence.
+- **What never goes:** a ticket number or a link. A cut that would leave a lead-in alone ("מה שבטוח.") takes the sentence instead.
+- The replay changes 6 replies, each one of these claims, including two 5 Oct "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי". The phone agent's same slip is not touched (chatbot first).
 
 **"For when" is asking when, not promising (8 Nov, Send's promise v5).** promise v4 lets "יחזרו אליך" through after "מתי", since asking when promises nothing; "למתי" is the same question. Without it, the tester's C9.4 lost its honest "תאריך או שעה מדויקת למתי יחזרו אליך אין לי", and "מה שכן, …" went out alone.
 

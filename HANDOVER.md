@@ -8,6 +8,16 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 8 Nov, later: the tester's fifth run fixed in Send** (`n8n_whatsapp_retest5.py`; live and the UChat copy, both read back; code only, still epoch 99). The fifth run (45 messages, 20:12-21:34 PH; executions 164557-164977) had no serious fail and two others, each the model's own words against a text it has:
+>   - **C5 R2 (164670):** after the menu, the status tap's draft opened "בשמחה, בוא נראה." with no name, although the prompt asks for it twice. 7 of the 24 first replies after the menu since 25 Oct had no name. **intro v1** (Send's last step) now opens such a reply with "כאן מיכאל מהומי'ז.", after a greeting the draft kept. It is skipped when the reply already has "מיכאל" or "העוזר הדיגיטלי", on a canned line, and when a short "I'm checking" already went out this turn.
+>   - **C9.4 R15 (164822):** the truth check sent back a first draft ("רשמתי את כל מה שאמרת", with no tool that turn), and the retry wrote "וגם הבקשה שלך לדבר עם מנהל רשומה", from C9.1's quiet notify_team. The same claim went out on 29 Oct and in the 5 Nov run's C9.4. **manager v1** (after voice v2) cuts a clause that says a request for a manager or a person was recorded or passed on: from its joining word, else with its comma, else the sentence. It never cuts a ticket number, and never a clause where the request and the recording word are more than five words apart.
+>   - **Checked:**
+>     - The gate passes 527/527 on live. There are 26 new cases, including both drafts word for word. Two old 5 Oct expectations now lose "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי", as R15 wants.
+>     - The replay: 2,294 drafts gain the name in the two after-the-menu states, 6 lose a manager claim, and nothing is broken. All 17 pins are unchanged.
+>   - **Rollback:** `python scripts/n8n_whatsapp_retest5.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest5.json`), then `python scripts/n8n_uchat.py --apply`.
+>   - **Owed: the tester's rerun of C5 and C9.** No ticket prep: the run's six open tickets (255-1415-26 to 255-1420-26) stay, so C5 lists the newest three and says 6 open. C10's "6 open in all" was the tool's own `open_total`, which is right.
+>   - **Seen, not changed:** C5 said "שלוש קריאות פתוחות" for two open tickets and one cancelled. The lookup lists the three newest of any status, and the model called them all open. The phone agent's same manager slip (the 3 Nov entry below) stays open.
+>
 > **LIVE 8 Nov, evening: Send's voice v2** (`n8n_whatsapp_voice2.py`; live and the UChat copy, both read back; code only, still epoch 99). This is from the owner's own test of the fixes below (executions 164335-164424). That test passed the count (20 in all, 4 for the lift) and the cheque, where voice v1 turned the draft's "כדי שנוכל לסדר" into "כדי שאוכל לסדר".
 >   - **Two more forms went out, and are now cut:** "…, אבל זה כרגע אצל הצוות שמטפל בזה" (the 29 Oct form) and "קריאה למחלקת הניקיון". A cut that would leave a fragment ("מה שבטוח.") is not made.
 >   - **Checked:** the gate passes 501/501 on live, with 11 new cases including both drafts word for word. The replay changes 10 more replies, each one of the forms. All 17 pins are unchanged.
@@ -25,7 +35,7 @@ appended to.
 >     - The replay changes 19 of 1,342 replies, each one of the forms, and leaves nothing empty or broken.
 >     - The live function answers the test number with found 3, `open_total` 20 and the note. For the lift it answers 4, "of the kind asked about".
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest4.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest4.json`), then `python scripts/n8n_uchat.py --apply`. The function is rolled back by a revert PR on `main`.
->   - **Owed: the tester's full fifth run** (owner: "i want to make sure the test all pass"): every conversation, in the guide's order.
+>   - **The tester's full fifth run ran on 8 Nov, evening** (owner: "i want to make sure the test all pass"): two fails, fixed in the entry above.
 >     - Before it, the number's 21 open test tickets in Bar Kochba 23 (255-1393-26 to 255-1414-26) were set to `cancelled` in our system. 0 notices were queued and OXS was not touched. The one ticket still open on the number is 255-1321-26, a September payment ticket in הרצל 112, left alone.
 >     - So C6.2 records a new standing order (255-1395-26 is cancelled) and emails clixteam579@gmail.com, as designed.
 >
@@ -177,7 +187,7 @@ appended to.
 >       - he opened the leak request himself (real ticket 255-1390-26, kept);
 >       - "when will the manager call?" got no time and no promise.
 >       - Vapi's judge passed all three checks.
->     - **Open, the owner's call: one slip.** The no-time answer added "הבקשה שלך לדבר עם מנהל רשומה", which tells the caller about the quiet note. The chatbot made the same slip in the checklist run (7.1-7.3). Both prompts share the when-line "ומרגיע אותו במה שנכון עכשיו, שהפנייה נפתחה או שרשמת את זה". Fix it in both, or neither, if the owner asks.
+>     - **Open, the owner's call: one slip.** The no-time answer added "הבקשה שלך לדבר עם מנהל רשומה", which tells the caller about the quiet note. The chatbot made the same slip in the checklist run (7.1-7.3). Both prompts share the when-line "ומרגיע אותו במה שנכון עכשיו, שהפנייה נפתחה או שרשמת את זה". Fix it in both, or neither, if the owner asks. **8 Nov, later:** the chatbot's half is closed in Send's code (manager v1, after the tester's fifth run failed it on R15). The phone's half stays open.
 >     - **Also heard, unrelated to the change:** "מה השם שלך כדי שיפתח פנייה?" ("so that he opens"). It was the model's own text; no voice_guard rule makes it.
 >   - **Not changed:**
 >     - the debt-call agent, which on a request for a person still says someone from the team will call back, and ends the call;

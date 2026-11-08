@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### LIVE: the tester's fifth run fixed in Send (intro v1, manager v1; the owner pasted its report)
+- **The fifth run** (every conversation, 45 messages, 20:12-21:34 PH; the UChat copy's executions 164557-164977, all read with their drafts):
+  - No serious fail and two others: C5 R2 and C9.4 R15.
+  - The fourth run's voice forms did not come back. C10's "6 open in all" was the tool's own `open_total`, matching the run's six open tickets (255-1415-26 to 255-1420-26).
+- **C5 R2 (164670):**
+  - Sort handed the model the menu line and the status tap, and the draft opened "בשמחה, בוא נראה." with no name.
+  - The prompt asks for the name twice: after the system's greeting, and for a tap "גם למי שכבר דיבר איתך קודם".
+  - Of the first replies after the menu since 25 Oct, 7 of 24 had no name, 3 of the 7 after the status tap.
+- **C9.4 R15 (164822):**
+  - The first draft ("רשמתי את כל מה שאמרת", no tool that turn) was sent back by the truth check.
+  - The retry wrote "וגם הבקשה שלך לדבר עם מנהל רשומה", from C9.1's quiet notify_team. The prompt: "על הרישום הזה אתה לא מספר לו, גם לא אחר כך כשהוא שואל מתי יחזרו אליו".
+  - All replies were read for the claim: 29 Oct, the 5 Nov run's C9.4, and this one.
+- **Built** (`scripts/n8n_whatsapp_retest5.py`, Send only, code only, still epoch 99):
+  - **manager v1**, after voice v2: the clause with the claim goes. It goes from its joining word, else with its comma, else, when the sentence opens with it, with its comma and an "אבל" after it, else the sentence. A ticket number stays.
+  - **intro v1**, last: a reply right after the menu with no name opens "כאן מיכאל מהומי'ז.".
+- **Gate:**
+  - The first candidate passed 499 of 501. The two fails were 5 Oct fixture cases (#14, #33) whose "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי." is the R15 claim, so their expectation moved with manager v1.
+  - The first join also took any ו-word: a one-line "שוב ושוב רשמתי …" would have lost "ושוב". The join was narrowed to "וגם/ובנוסף/וכן", "והבקשה" and the recording verb itself.
+  - Then 527/527 on the candidate and on live, with 26 new cases. The replay counts the name openings rather than listing them.
+- **Replay** (1,396 drafts): 2,294 gain the name in the two after-the-menu states. 6 lose a manager claim: today's, 5 Nov's, 29 Oct's, and three "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי". Nothing is empty and there is no fragment.
+- **Live:** live, then the UChat copy. Read back: both steps identical to the patcher's, voice v2 kept, `-99-uchat`. Snapshot: `local/n8n-whatsapp-live-08nov-before-retest5.json`.
+- **Seen, not changed:** C5's "שלוש קריאות פתוחות" for two open tickets and one cancelled (255-1414-26).
+- **Owed:** the tester's rerun of C5 and C9, with no ticket prep.
+
 ### Ready for the tester's full run: the test number's open tickets cancelled (owner: "i want to make sure the test all pass")
 - **Why:** the test number had 21 open tickets from four runs and two tests, so status answers listed them all: 20 in all in C5's place, and 4 lift tickets in C2's. A real tenant has a few. The owner's word on 5 Nov set the way it is done.
 - **Done:** the 21 in Bar Kochba 23 (255-1393-26 to 255-1414-26) were PATCHed to `cancelled`, by id and only while still open.
