@@ -8,11 +8,14 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **BUILT 8 Nov, NOT LIVE YET: the phone's standing order** (Yariv's change 3 on the phone, after WhatsApp's; owner: "ok let sgo").
->   - **The function:** PR #6 (`fix/standing-order-phone`), CI green, not merged. Merging puts it live through `deploy-function`. No new secrets.
->   - **The incoming agent:** `request_standing_order` in INTAKE_TOOLS and one prompt sentence (`demo-inbound.md`), in the repo only. The compare with live shows only those two. Push AFTER the merge: `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`. Until the function is live, the tool would answer "no charge on this call".
->   - **The debt agent:** nothing to push. Its request is emailed once the function is live.
->   - **Claude-played:** the caller with no number was asked the name, a number and the address in turn, and the request was read back, with no ticket and no note. Two calls are still being played.
+> **LIVE 8 Nov: the phone's standing order** (Yariv's change 3 on the phone, after WhatsApp's; owner: "ok let sgo").
+>   - **The function:** PR #6 merged (`cccb24c`); CI deployed **debt-tools v149**, code only. `standingOrderByCall`: a tenant on file is found by the call's own number and asked nothing; otherwise the name, a number and the building, as open_request asks. The debt agent's path emails collections too. `probe-` calls never email.
+>   - **The incoming agent** (`10ae859a`): `request_standing_order` and the prompt sentence, pushed with `--keep-voice`. Read back equal to the repo, voice `ba765d50`.
+>   - **Proven without AI on live:** the four asking steps answer need_name, need_phone, need_building and street_unknown, and write nothing. 255-1408-26 was recorded, emailed (n8n 163709, Brevo "250 OK" to clixteam579@gmail.com) and set to cancelled.
+>   - **Claude-played** (`scripts/voice_qa_standing_phone.json`), 3 calls, clean: on file, from a line with no number, and "how do I pay?" (still a payment ticket and a note).
+>   - **Owed: the owner's call.** 077-6687949, then 9: "אפשר לשלם את הוועד בהוראת קבע?". A number typed on the call never finds the WhatsApp request 255-1395-26, so the +63 gets a new request and an email. If the agent does not answer, check the Vapi wallet first.
+>   - **Rollback:** the agent from the previous commit's `vapi_tools.py` and `demo-inbound.md` with the same `vapi_sync.py` command; the function by a revert PR on `main`.
+>   - **Found, not fixed:** `rescue_request` tests `matchBuilding` for "ok", which it never returns ("found"), so the WhatsApp last resort never finds the building in what was said.
 >
 > **LIVE 6 Nov, epoch 99: the tester's third run fixed** (`n8n_whatsapp_retest3.py`; live and `-99-uchat`, both read back).
 >   - **What it changes:**

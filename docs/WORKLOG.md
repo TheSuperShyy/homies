@@ -11,7 +11,22 @@ conversation that produced it.
 
 ## 2026-11-08
 
-### The phone's standing order: built, PR #6 green, not live yet (Yariv's change 3 on the phone; owner: "ok what is the next feature", then "ok let sgo")
+### LIVE: the phone's standing order, debt-tools v149 and the incoming agent (Yariv's change 3 on the phone; owner: "ok what is the next feature", then "ok let sgo")
+- **Merged** PR #6 as `cccb24c`. The main run's `checks` and `deploy-function` passed, and the deploy answered HTTP 201: **debt-tools v149 ACTIVE**, code only, no secret pushed or deleted. The function on `feature/chatbot` equals `main`'s.
+- **The probe on live** (`probe_standing_call.py`, no AI and no call; call id `test-standing-1108-154316`):
+  - The four asking steps answered need_name, need_phone, need_building and street_unknown, and wrote nothing.
+  - The writing step recorded **255-1408-26** (by phone, the standing-order marker, flat 2), then it was set to cancelled.
+  - n8n run 163709 sent the email, with channel voice, and Brevo accepted it for clixteam579@gmail.com ("250 2.0.0 OK").
+  - Left behind: that cancelled request and the probe's one interaction row.
+- **Pushed** with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`, after the compare showed only the prompt and the new tool. Read back: no difference from the repo; voice `ba765d50` kept; model gpt-5.6-sol.
+- **Claude-played, all three calls:**
+  - the tenant on file: the tool at once, the reference read back, and "על המועד אין לי מידע, ואני לא רוצה לנחש" when asked when they will call;
+  - "how do I pay?": still a payment ticket and a note, with no standing order recorded.
+- **Not used:** the Vapi wallet check, because it places a $0 failed call in Vapi's list.
+- **Found, not fixed:** `rescue_request` (the WhatsApp last resort) tests `matchBuilding` for status "ok", which it never returns ("found"), so its fallback that finds the building in what was said never matches. One cause at a time; the rescue is rare.
+- **Owed:** the owner's own call (077-6687949, then 9).
+
+### Before the merge: the phone's standing order built (8 Nov)
 - **Why this one next:** it is the only item from the 4 Nov list with nothing blocking it.
   - #1 (elevators into OXS) is built and off, waiting on the owner's go.
   - #4 (the debt list) waits on OXS's export file, #5 (department routing) on Homies, and #6 (the phone delay) on Omnitelecom.
@@ -27,8 +42,7 @@ conversation that produced it.
   - **Locally:** syntax ok, 43 of 46 node tests. The 3 failures are check_route's, reading `dashboard/lib/call.ts`: the fresh worktree checked it out with CRLF and the test's pattern wants LF. The same tests pass 7/7 in the main tree, and CI is Linux.
 - **The agent** (`vapi_tools.py`, `docs/assistant/demo-inbound.md`): the new tool on the incoming agent, and the chatbot's sentence in phone words ("…בלי פנייה ובלי הערה").
   - **Compare with the live agent** (read only): only the prompt (9,304 -> 9,441 chars) and the new tool differ.
-- **Claude-played** (`scripts/voice_qa_standing_phone.json`, `voice_qa.py bundle --candidate`), from a line with no number: the full name, then a number (read back in words), then the address with the flat in one question, then "רשמתי את הבקשה להוראת קבע! מספר הבקשה הוא אחת חמש ארבע שש". No ticket, no note, nothing promised. The number was asked as "לאיזה מספר טלפון אפשר לחזור?", which hints at a callback; tickets ask the same way. The on-file call and "how do I pay?" are still being played.
-- **Owed:** the merge (it puts the function live), a probe of the phone path (`probe_standing_call.py` in the scratchpad: four steps that write nothing, then one recorded request in flat 2, emailed to our inbox and set to cancelled), the Vapi push, and the owner's call.
+- **Claude-played** (`scripts/voice_qa_standing_phone.json`, `voice_qa.py bundle --candidate`), from a line with no number: the full name, then a number (read back in words), then the address with the flat in one question, then "רשמתי את הבקשה להוראת קבע! מספר הבקשה הוא אחת חמש ארבע שש". No ticket, no note, nothing promised. The number was asked as "לאיזה מספר טלפון אפשר לחזור?", which hints at a callback; tickets ask the same way. The other two calls are in the LIVE entry above.
 
 ## 2026-11-06
 
