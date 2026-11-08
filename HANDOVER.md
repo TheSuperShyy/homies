@@ -25,9 +25,9 @@ appended to.
 >     - The replay changes 19 of 1,342 replies, each one of the forms, and leaves nothing empty or broken.
 >     - The live function answers the test number with found 3, `open_total` 20 and the note. For the lift it answers 4, "of the kind asked about".
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest4.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest4.json`), then `python scripts/n8n_uchat.py --apply`. The function is rolled back by a revert PR on `main`.
->   - **Owed: the tester's fifth run,** of C1, C2, C3, C5, C6 (from step 3), C9, then C10.
->     - The test number has 20 open tickets from the runs (255-1393-26 to 255-1413-26), so a status answer now says about 20.
->     - Cancelling them is the owner's call: they are mirrored into OXS ("dont touch them").
+>   - **Owed: the tester's full fifth run** (owner: "i want to make sure the test all pass"): every conversation, in the guide's order.
+>     - Before it, the number's 21 open test tickets in Bar Kochba 23 (255-1393-26 to 255-1414-26) were set to `cancelled` in our system. 0 notices were queued and OXS was not touched. The one ticket still open on the number is 255-1321-26, a September payment ticket in הרצל 112, left alone.
+>     - So C6.2 records a new standing order (255-1395-26 is cancelled) and emails clixteam579@gmail.com, as designed.
 >
 > **LIVE 8 Nov: the phone's standing order** (Yariv's change 3 on the phone, after WhatsApp's; owner: "ok let sgo").
 >   - **The function:** PR #6 merged (`cccb24c`); CI deployed **debt-tools v149**, code only. `standingOrderByCall`: a tenant on file is found by the call's own number and asked nothing; otherwise the name, a number and the building, as open_request asks. The debt agent's path emails collections too. `probe-` calls never email.

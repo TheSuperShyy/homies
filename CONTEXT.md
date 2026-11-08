@@ -77,6 +77,7 @@ The user is the builder. The client is Homies.
 **A limit is the bot's, not the tenant's (6 Nov, both channels).** In a danger or gas follow-up the bot says what it did, never what it cannot give. The prompt says it with its own idiom, "הכלל הזה הוא בשבילך, לא בשבילו", not with a quoted forbidden phrase.
 
 **A tester's run comes from one number, so the bot sees one tenant.** What one conversation sets carries into the next: the name, the feminine, an emergency. `grok-tenant-tester.md` orders the conversations around it. Judge a carried state as correct, not as a slip.
+- **Before a full run, that number's open test tickets in Bar Kochba 23 are set to `cancelled` in our system** (never `resolved`, which queues the closed-ticket message; never in OXS). Status answers then list only the run's own tickets, as a real tenant's would. Done on 5 Nov (33) and 8 Nov (21), both with 0 notices queued.
 
 **A standing order is recorded and emailed to collections (the client, 4 Nov review; Yariv's change 3; live on WhatsApp 5 Nov, epoch 96, debt-tools v148).**
 - **Why email:** OXS's API has one-time payments only, so nothing of ours can set one up. Homies want the request by email, not in another system to watch.

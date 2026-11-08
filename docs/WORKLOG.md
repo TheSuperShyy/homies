@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### Ready for the tester's full run: the test number's open tickets cancelled (owner: "i want to make sure the test all pass")
+- **Why:** the test number had 21 open tickets from four runs and two tests, so status answers listed them all: 20 in all in C5's place, and 4 lift tickets in C2's. A real tenant has a few. The owner's word on 5 Nov set the way it is done.
+- **Done:** the 21 in Bar Kochba 23 (255-1393-26 to 255-1414-26) were PATCHed to `cancelled`, by id and only while still open.
+  - All 21 changed.
+  - `ticket_notices` stayed at 2 rows: `cancelled` queues nothing, since 036's trigger is on `resolved`.
+  - No OXS call was made.
+- **Left open:** 255-1321-26, a payment ticket from 23 Sep in הרצל 112, outside the test building.
+- **The run:** every conversation in the guide's order. The guide is unchanged since the third run.
+
 ### LIVE: Send's voice v2 (the owner pasted their own test of the fixes)
 - **The owner's test** (11 messages, 18:43-18:57 PH; executions 164335-164424):
   - The count held both ways: 20 "בסך הכול", and 4 lift tickets with the update added to 255-1409-26.
