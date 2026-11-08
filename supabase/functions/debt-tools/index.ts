@@ -2906,6 +2906,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // 8 Nov: how many of their tickets are open in all, set only when that is
     // more than the open ones listed (the WhatsApp lookup by number, below).
     let openTotal: number | undefined;
+    // 8 Nov, later: true when that count is of the kind asked about, not of them all.
+    let openOfKind = false;
 
     const serial = serialOf(args?.reference);
     if (serial) {
@@ -3038,6 +3040,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
             ["open", "in_progress", "needs_review"].includes(String(r.status));
           const openAll = picked.filter(isOpen).length;
           if (openAll > rows.filter(isOpen).length) openTotal = openAll;
+          // Asked about the lift, it is the lift's tickets that were counted:
+          // "4 open in all" would have been said of 4 out of 20 (8 Nov, later).
+          openOfKind = !!type && !typeUnmatched;
         }
       }
     }
@@ -3199,7 +3204,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
             "by its description; if none fits, ask him."
           : "",
         openTotal
-          ? "The resident has " + openTotal + " open tickets in all, more than are listed here. " +
+          ? "The resident has " + openTotal + " open tickets " +
+            (openOfKind ? "of the kind asked about" : "in all") + ", more than are listed here. " +
             "When you say what is open, give that number, and say these are the newest."
           : "",
       ].filter(Boolean).join(" ") || undefined,

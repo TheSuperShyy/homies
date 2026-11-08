@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### LIVE: the count names its kind (PR #8, debt-tools v151; owner: "so what will i test on the chatbot")
+- **Found while writing the owner's test list:** read-only on live, `type=elevator` for the test number gave `open_total` 4 with "The resident has 4 open tickets in all". Those were 4 lift tickets out of 20, so Michael would have said a wrong total.
+- **Fixed:** asked about one kind, the note says "of the kind asked about"; "in all" is only for no kind, or a kind that matched nothing.
+  - PR #8 (`fix/status-open-kind`, cut from `origin/main`): syntax ok, 46/46, CI `checks` green, merged as `d12c62d`.
+  - CI deployed debt-tools v151 ACTIVE.
+- **Read back on live:** the lift gives 4 "of the kind asked about"; no kind gives 20 "in all".
+
 ### LIVE: the tester's fourth run fixed (voice v1, promise v5, debt-tools v150; the owner pasted its report)
 - **The fourth run** (C1-C7, C9, C11, C8, C10; 46 messages, 16:11-17:33 PH):
   - No serious fail. The five fails were all R4: C1.4, C1.5, C2, C3's follow-up and C6.4.

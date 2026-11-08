@@ -13,11 +13,12 @@ appended to.
 >     - **Send's voice v1** (the five R4 fails): "כדי שידעו …" is cut, "כדי שנוכל" becomes "כדי שאוכל", "רשמתי … לצוות" becomes "… במערכת", and "נשלח לך עדכון" becomes "יישלח לך עדכון".
 >     - **Send's promise v5:** "למתי יחזרו אליך" is a when, not a promise. C9.4's honest answer had been cut, leaving "מה שכן, …" alone.
 >     - **get_request_status on WhatsApp:** still three listed, plus `open_total` and a note when more are open. C5 and C10.3 said "three open" while 17 and then 20 were.
+>     - **PR #8 (`d12c62d`, debt-tools v151):** asked about one kind, the note says "of the kind asked about". v150 said "4 open tickets in all" for 4 lift tickets out of 20.
 >   - **No text a model reads changed.** The memory stays at epoch 99 (`-99`, `-99-uchat`), and all 17 pins are unchanged.
 >   - **Checked:**
 >     - The gate passes 490/490 on live. There are 17 new cases on the executions' own drafts, and three old expectations moved with voice v1.
 >     - The replay changes 19 of 1,342 replies, each one of the forms, and leaves nothing empty or broken.
->     - The live function answers the test number with found 3, `open_total` 20 and the note.
+>     - The live function answers the test number with found 3, `open_total` 20 and the note. For the lift it answers 4, "of the kind asked about".
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest4.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest4.json`), then `python scripts/n8n_uchat.py --apply`. The function is rolled back by a revert PR on `main`.
 >   - **Owed: the tester's fifth run,** of C1, C2, C3, C5, C6 (from step 3), C9, then C10.
 >     - The test number has 20 open tickets from the runs (255-1393-26 to 255-1413-26), so a status answer now says about 20.

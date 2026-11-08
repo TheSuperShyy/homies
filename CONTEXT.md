@@ -67,7 +67,7 @@ The user is the builder. The client is Homies.
 
 **"For when" is asking when, not promising (8 Nov, Send's promise v5).** promise v4 lets "יחזרו אליך" through after "מתי", since asking when promises nothing; "למתי" is the same question. Without it, the tester's C9.4 lost its honest "תאריך או שעה מדויקת למתי יחזרו אליך אין לי", and "מה שכן, …" went out alone.
 
-**A status lookup by number says how many are open (8 Nov, debt-tools v150, `open_total`).** It still lists the three newest of the sender's tickets, and returns `open_total` with a note to give that number whenever more are open than listed. It reads 50 a side to count them. In the fourth run, "three open" was said twice while 17 and then 20 were open.
+**A status lookup by number says how many are open (8 Nov, debt-tools v150, `open_total`).** It still lists the three newest of the sender's tickets, and returns `open_total` with a note to give that number whenever more are open than listed. It reads 50 a side to count them. In the fourth run, "three open" was said twice while 17 and then 20 were open. Asked about one kind (the lift), it counts that kind, and the note says "of the kind asked about" (debt-tools v151); "in all" is only for a lookup with no kind, or one whose kind matched nothing.
 
 **A limit is the bot's, not the tenant's (6 Nov, both channels).** In a danger or gas follow-up the bot says what it did, never what it cannot give. The prompt says it with its own idiom, "הכלל הזה הוא בשבילך, לא בשבילו", not with a quoted forbidden phrase.
 
