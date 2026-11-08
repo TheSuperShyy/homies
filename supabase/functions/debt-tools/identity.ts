@@ -85,6 +85,15 @@ export function reporterNameOf(value: unknown): string | null {
   return name;
 }
 
+/**
+ * A call id scripts/check_tools.py mints ("probe-<run>-<n>"). Its rows are
+ * deleted at the end of the run, and nothing it does may reach a person: the
+ * standing-order email to collections skips it (8 Nov).
+ */
+export function isProbeCall(callId: unknown): boolean {
+  return String(callId ?? "").startsWith("probe-");
+}
+
 /** A yes from a tool argument. n8n's $fromAI and some models send "true". */
 export function flagOf(value: unknown): boolean {
   return value === true || String(value ?? "").trim().toLowerCase() === "true";

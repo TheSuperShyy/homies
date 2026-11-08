@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  callNumberOf, flagOf, phoneOf, reporterLine, reporterNameOf, requiredChannels,
+  callNumberOf, flagOf, isProbeCall, phoneOf, reporterLine, reporterNameOf, requiredChannels,
   sipUserOf, ticketGate,
 } from "../supabase/functions/debt-tools/identity.ts";
 
@@ -108,4 +108,12 @@ test("reporterLine names who reported for the OXS copy", () => {
   assert.equal(reporterLine("יוסי כהן", "+972501234567"), " [דיווח: יוסי כהן, +972501234567]");
   assert.equal(reporterLine(null, "+972501234567"), " [דיווח: +972501234567]");
   assert.equal(reporterLine(null, null), "");
+});
+
+// 8 Nov: the standing-order email skips check_tools.py's calls, and only those.
+test("isProbeCall: check_tools.py's ids, nothing else", () => {
+  assert.equal(isProbeCall("probe-1108-101500-7"), true);
+  assert.equal(isProbeCall("wa:972501234567"), false);
+  assert.equal(isProbeCall("019a2b3c-real-vapi-call"), false);
+  assert.equal(isProbeCall(undefined), false);
 });
