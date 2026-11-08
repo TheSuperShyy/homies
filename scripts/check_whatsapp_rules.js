@@ -235,7 +235,9 @@ function cases(E) {
       + ', אבל אל דאגה. פתחתי לכם קריאת שירות מספר 255-1339-26. הצוות שלנו יטפל בזה. במה אוכל לעזור עוד?');
   const DONT_WORRY = "היי! כאן מיכאל מהומי'ז. אני מבין, זה ממש לא נעים ללכת במדרגות ככה. אל דאגה, אני אפתח קריאת שירות כדי שיטפלו בתאורה. באיזה בניין אתם גרים ובאיזו דירה?";
   expect('27 Sep 14:52, first contact (v3): "אל דאגה," is reassurance and stays',
-    say({ reply: DONT_WORRY, S: { greeted: false }, said: 'hi, lights' }), DONT_WORRY);
+    say({ reply: DONT_WORRY, S: { greeted: false }, said: 'hi, lights' }),
+    // 8 Nov: with voice v1 "כדי שיטפלו בתאורה" (someone else handling it) goes; "אל דאגה" stays all the same.
+    (String(P.code.send_body || '').indexOf("const vv = 'voice v") !== -1) ? DONT_WORRY.replace(' כדי שיטפלו בתאורה', '') : DONT_WORRY);
   expect('the only sentence: the promise clause goes, the sentence stays',
     say({ reply: 'אני מעביר את זה לצוות, נחזור בהקדם.', said: 'question' }), 'אני מעביר את זה לצוות.');
   expect('a comma clause goes',
@@ -326,8 +328,10 @@ function cases(E) {
     'אני לא יכול להגיד לך מתי בדיוק יחזרו אליך. הצוות קיבל את הפנייה שלך ויטפל בה. במה אוכל לעזור לך עוד?');
   same('v3: "מתי או אם יחזרו אליך" is a question, not a promise',
     'אני לא יכול להבטיח מתי או אם יחזרו אליך, אבל העברתי את זה הלאה. במה אוכל לעזור לך עוד?');
-  same('v3: a note to the team, reported, stays ("רשמתי לצוות שלנו שיחזרו אליך")',
-    'בטח, רשמתי לצוות שלנו שיחזרו אליך דחוף. יש עוד משהו?');
+  expect('v3: a note to the team, reported, stays ("רשמתי לצוות שלנו שיחזרו אליך")',
+    say({ reply: 'בטח, רשמתי לצוות שלנו שיחזרו אליך דחוף. יש עוד משהו?', said: 'question' }),
+    // 8 Nov: with voice v1 the note is in the system, not "for our team"; the promise filter's answer is the same.
+    (String(P.code.send_body || '').indexOf("const vv = 'voice v") !== -1) ? 'בטח, רשמתי במערכת שיחזרו אליך דחוף. יש עוד משהו?' : 'בטח, רשמתי לצוות שלנו שיחזרו אליך דחוף. יש עוד משהו?');
   same('v3: the tenant\'s own want stays ("שאתה מחכה שיחזרו אליך")',
     'עדכנתי את הצוות שאתה מחכה שיחזרו אליך. יש עוד משהו?');
   same('v3: a wish stays ("אני מקווה שיחזרו אליך בהקדם")', 'אני מקווה שיחזרו אליך בהקדם. יש עוד משהו?');
@@ -410,8 +414,11 @@ function cases(E) {
   expect('v3: a reply that is all promise still loses it, even down to "anything else?"',
     say({ reply: 'הם יחזרו אליך בהקדם. במה אוכל לעזור לך עוד?', said: 'when?' }), 'במה אוכל לעזור לך עוד?');
   // The 37 live replies (scripts/wa_promise_live_05oct.json): raw draft in, v3 out.
+  // 8 Nov: with voice v1, #11's "רשמתי לצוות שלנו" is "רשמתי במערכת"; the file keeps what v3 sent that day.
+  const voiced = (String(P.code.send_body || '').indexOf("const vv = 'voice v") !== -1);
   for (const k of P.promise_live || []) {
-    expect('5 Oct live #' + k.n + ' (' + k.case + ')', say({ reply: k.raw, said: k.said }), k.want);
+    const want = voiced ? String(k.want).replace('רשמתי לצוות שלנו', 'רשמתי במערכת') : k.want;
+    expect('5 Oct live #' + k.n + ' (' + k.case + ')', say({ reply: k.raw, said: k.said }), want);
   }
 
   // 29 Oct, late (n8n_whatsapp_checkword.py, execution 138931): "הכל בסדר 🙂" opened a ₪2,000 debt. The
@@ -502,6 +509,68 @@ function cases(E) {
     expect('a closed ticket the lookup found is named the same way',
       () => content(E, { reply: 'הקריאה על המעלית כבר נסגרה. משהו קורה איתה שוב?', steps: [{ action: { tool: 'get_request_status' }, observation: obs({ ok: true, found: 1, requests: [{ reference: '255-1390-26', status: 'closed' }] }) }] }),
       'הקריאה (255-1390-26) על המעלית כבר נסגרה. משהו קורה איתה שוב?');
+  }
+
+  // 8 Nov (scripts/n8n_whatsapp_retest4.py, the tester's fourth run, R4 five times): the model's own
+  // "they" and "we" against the prompt's one-voice sentence, the same forms 6 times since 29 Oct in all
+  // 1,343 replies. The drafts below are the executions' own, word for word.
+  if (P.code && String(P.code.send_body || '').indexOf("const vv = 'voice v") !== -1) {
+    console.log(NL + "--- Send: Michael speaks for himself (8 Nov, the tester's fourth run) ---");
+    const obs = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+    const LIFT = { action: { tool: 'get_request_status' }, observation: obs({ ok: true, found: 1, requests: [{ reference: '255-1409-26', status: 'open' }] }) };
+    const ADDLIFT = { action: { tool: 'add_request_detail' }, observation: obs({ ok: true, reference: '255-1409-26' }) };
+    const ADDLEAK = { action: { tool: 'add_request_detail' }, observation: obs({ ok: true, reference: '255-1410-26' }) };
+    const NOTE = { action: { tool: 'notify_team' }, observation: obs({ ok: true, reason: 'caller_request' }) };
+    expect('C2 exactly (163807): "כדי שידעו …" goes, to the end of its clause',
+      () => content(E, { reply: 'ממש מבאס שזה מתעכב. בדקתי שוב, והקריאה (255-1409-26) עדיין פתוחה במערכת. הוספתי אליה עכשיו את העדכון שלך שהמעלית עדיין לא עובדת, כדי שידעו שהמצב נמשך. ' + NL + NL + 'החמיר משהו מאז או שזה פשוט עומד באותו מצב?', steps: [LIFT, ADDLIFT], said: 'שוב אני, המעלית עדיין לא עובדת' }),
+      'ממש לא נעים שזה מתעכב. בדקתי שוב, והקריאה (255-1409-26) עדיין פתוחה במערכת. הוספתי אליה עכשיו את העדכון שלך שהמעלית עדיין לא עובדת. החמיר משהו מאז או שזה פשוט עומד באותו מצב?');
+    expect('C3 exactly (163833): after the ticket number, the clause goes and the number stays',
+      () => content(E, { reply: 'טוב שזה רק טפטוף בינתיים ולא זרימה חזקה. הוספתי את העדכון הזה לקריאה (255-1410-26) כדי שידעו בדיוק מה המצב.' + NL + NL + 'יש עוד משהו שאני יכול לעזור בו היום?', steps: [ADDLEAK], said: 'זה רק טפטוף בינתיים' }),
+      'טוב שזה רק טפטוף בינתיים ולא זרימה חזקה. הוספתי את העדכון הזה לקריאה (255-1410-26). יש עוד משהו שאני יכול לעזור בו היום?');
+    expect('C1.5 exactly (163788): "רשמתי עכשיו לצוות" becomes "רשמתי עכשיו במערכת"',
+      () => content(E, { reply: 'אני מבין את התסכול שלך, אבל באמת שאין לי אפשרות לראות מתי בדיוק יגיעו. המערכת מראה שהקריאה עדיין פתוחה, ורשמתי עכשיו לצוות שאתה מחכה לתשובה ולטיפול במעלית.' + NL + NL + 'יש החמרה במצב או שזה עדיין ככה?', steps: [LIFT, NOTE], said: 'נו אז מתי??' }),
+      'אני מבין את התסכול שלך, אבל באמת שאין לי אפשרות לראות מתי בדיוק יגיעו. המערכת מראה שהקריאה (255-1409-26) עדיין פתוחה, ורשמתי עכשיו במערכת שאתה מחכה לתשובה ולטיפול במעלית. יש החמרה במצב או שזה עדיין ככה?');
+    expect('C1.4 exactly (163780): "נשלח לך עדכון" becomes "יישלח לך עדכון"',
+      () => content(E, { reply: 'אני אגיד לך דוגרי, כרגע אין לי תאריך או שעה מדויקים לתת לך. הקריאה פתוחה וממתינה לטיפול, וברגע שייסגרו אותה נשלח לך עדכון מסודר לכאן.' + NL + NL + 'משהו השתנה או שזה עדיין אותו דבר? 🙏', steps: [LIFT], said: 'מתי מגיעים לתקן?' }),
+      'אני אגיד לך דוגרי, כרגע אין לי תאריך או שעה מדויקים לתת לך. הקריאה (255-1409-26) פתוחה וממתינה לטיפול, וברגע שייסגרו אותה יישלח לך עדכון מסודר לכאן. משהו השתנה או שזה עדיין אותו דבר? 🙏');
+    expect('C6.4 exactly (163962, the retry): "כדי שנוכל" becomes "כדי שאוכל"',
+      () => content(E, { reply: 'הבנתי, בערך 500 ש"ח באמצע יולי. הכל בסדר, כשתוכל למצוא את הצילום או האישור פשוט תשלח לי אותו לכאן כדי שנוכל לאמת את זה במערכת.' + NL + NL + 'יש עוד משהו שאוכל לעזור בו בינתיים?', steps: [], said: 'בערך 500 שקל, באמצע יולי. אין לי תמונה עכשיו' }),
+      'הבנתי, בערך 500 ש"ח באמצע יולי. הכל בסדר, כשתוכל למצוא את הצילום או האישור פשוט תשלח לי אותו לכאן כדי שאוכל לאמת את זה במערכת. יש עוד משהו שאוכל לעזור בו בינתיים?');
+    expect('"תישלח לך הודעה" for a message (feminine noun)',
+      say({ reply: 'כשהקריאה תיסגר נשלח לך הודעה לכאן. משהו השתנה?' }), 'כשהקריאה תיסגר תישלח לך הודעה לכאן. משהו השתנה?');
+    expect('a reply that opens with the clause loses it up to its comma (27 Aug)',
+      say({ reply: 'כדי שיוכלו לעזור כמה שיותר מהר, אפשר לכתוב בכמה מילים על מה הפנייה?' }), 'אפשר לכתוב בכמה מילים על מה הפנייה?');
+    expect('inside a question (5 Nov): the question stays, the team goes',
+      say({ reply: 'הקריאה על המעלית עדיין פתוחה. תרצה שאוסיף אליה שאתה מחכה כבר שבוע כדי שהצוות יראה את זה?' }),
+      'הקריאה על המעלית עדיין פתוחה. תרצה שאוסיף אליה שאתה מחכה כבר שבוע?');
+    expect('a clause followed by more of the sentence: only the clause goes',
+      say({ reply: 'הוספתי לקריאה כדי שידעו מה המצב, ואם משהו ישתנה פשוט תכתוב לי. החמיר משהו?' }),
+      'הוספתי לקריאה, ואם משהו ישתנה פשוט תכתוב לי. החמיר משהו?');
+    expect('"השארתי הערה לצוות שלנו" becomes "השארתי הערה במערכת"',
+      say({ reply: 'השארתי הערה לצוות שלנו על זה. משהו נוסף?' }), 'השארתי הערה במערכת על זה. משהו נוסף?');
+    for (const same of [
+      'צילום של הצ\'ק יעזור, כדי שאוכל לאמת את זה במערכת. תוכל לשלוח לי אותו לכאן?',
+      'הוספתי את זה כדי שידעו שקריאה 255-1409-26 דחופה. משהו השתנה?',
+      'כדי שידעו מה קרה. משהו נוסף?',
+      'אני העוזר הדיגיטלי בצוות השירות של הומי\'ז. במה אוכל לעזור?',
+      'כשסוגרים את הקריאה, נשלחת עליה הודעה לכאן. משהו השתנה מאז?',
+    ]) {
+      expect('untouched: ' + same.slice(0, 40), say({ reply: same }), same);
+    }
+  }
+
+  // 8 Nov (scripts/n8n_whatsapp_retest4.py, the tester's C9.4, execution 164030): "ומתי המנהל יחזור אליי?"
+  // was answered "תאריך או שעה מדויקת למתי יחזרו אליך אין לי, …", and promise v4, which lets "יחזרו אליך"
+  // through after "מתי", did not know "למתי": the sentence was cut whole and "מה שכן, …" went alone.
+  if (P.code && String(P.code.send_body || '').indexOf("const pv = 'promise v5'") !== -1) {
+    console.log(NL + "--- Send: \"for when\" is asking when, not promising (8 Nov, the tester's C9.4) ---");
+    const C94 = 'תאריך או שעה מדויקת למתי יחזרו אליך אין לי, אני אומר את זה בפשטות. מה שכן, הקריאה על הניקיון בחדר המדרגות כבר פתוחה ומעודכנת אצלנו. ';
+    expect('C9.4 exactly (164030): the honest sentence stays',
+      () => content(E, { reply: C94 + NL + NL + 'יש עוד משהו שקשור לניקיון שחשוב לך שאוסיף לקריאה בינתיים?', steps: [], said: 'ומתי המנהל יחזור אליי?' }),
+      C94.trim() + ' יש עוד משהו שקשור לניקיון שחשוב לך שאוסיף לקריאה בינתיים?');
+    expect('the promise itself is still cut',
+      say({ reply: 'הקריאה על הניקיון פתוחה. יחזרו אליך מחר בבוקר. משהו השתנה מאז?' }),
+      'הקריאה על הניקיון פתוחה. משהו השתנה מאז?');
   }
 
   // 6 Nov (scripts/n8n_whatsapp_retest3.py, the tester's C11, executions 159008-159015): "שלום", "יש בעיה"

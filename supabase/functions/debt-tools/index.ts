@@ -2903,6 +2903,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // 5 Oct: the category named matched nothing in the caller's own flat, so
     // the flat's requests come back whole (see below).
     let typeUnmatched = false;
+    // 8 Nov: how many of their tickets are open in all, set only when that is
+    // more than the open ones listed (the WhatsApp lookup by number, below).
+    let openTotal: number | undefined;
 
     const serial = serialOf(args?.reference);
     if (serial) {
@@ -2998,9 +3001,11 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       const mine = reporterPhone(ctx);
       if (mine) {
         const type = String(args?.type ?? "").trim();
+        // 8 Nov: 50 a side, not 5. Only three are listed, but the count of the
+        // open ones below has to see them all.
         const own = (q: any) => {
           if (type !== "payment") q = q.or("type.is.null,type.neq.payment");
-          return q.order("created_at", { ascending: false }).limit(5);
+          return q.order("created_at", { ascending: false }).limit(50);
         };
         const { data: who } = await db.from("residents").select("id").eq("phone", mine);
         const ids = (who ?? []).map((r: any) => String(r.id));
@@ -3024,6 +3029,15 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           }
           rows = picked.slice(0, 3);
           byPhone = true;
+          // THE THREE NEWEST ARE NOT ALL THERE IS (8 Nov, the Grok tester's
+          // fourth run). "יש לך שלוש קריאות פתוחות", in C5 and again in C10,
+          // while the number had 17 and then 20 open: three came back, every
+          // one open, and nothing said there were more. The list stays three;
+          // the count says how many are open.
+          const isOpen = (r: any) =>
+            ["open", "in_progress", "needs_review"].includes(String(r.status));
+          const openAll = picked.filter(isOpen).length;
+          if (openAll > rows.filter(isOpen).length) openTotal = openAll;
         }
       }
     }
@@ -3177,11 +3191,18 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // it was about rather than reading the list.
       identify_needed: namedNothing || undefined,
       type_unmatched: typeUnmatched || undefined,
-      note: typeUnmatched
-        ? "The category you passed matched none of " + (byPhone ? "their" : "this flat's") +
-          " requests, so these are all of them, newest first. Find the one the resident means " +
-          "by its description; if none fits, ask him."
-        : undefined,
+      open_total: openTotal,
+      note: [
+        typeUnmatched
+          ? "The category you passed matched none of " + (byPhone ? "their" : "this flat's") +
+            " requests, so these are all of them, newest first. Find the one the resident means " +
+            "by its description; if none fits, ask him."
+          : "",
+        openTotal
+          ? "The resident has " + openTotal + " open tickets in all, more than are listed here. " +
+            "When you say what is open, give that number, and say these are the newest."
+          : "",
+      ].filter(Boolean).join(" ") || undefined,
       requests: (rows ?? []).map((r) => ({
         reference: r.reference,
         status: r.status, // open | in_progress | resolved | cancelled

@@ -85,7 +85,8 @@ def sends():
     new = new[:a] + NP.FILTER + new[z:]
     a, z = new.index(D.OLD_START), new.index(D.ANCHOR)
     new = new[:a] + D.BLOCK + " " + new[z:]
-    marks = lambda b: "%s, %s" % ("promise v4" if "'promise v4'" in b else "promise v3" if "'promise v3'" in b else "promise ?",
+    marks = lambda b: "%s, %s" % ("promise v5" if "'promise v5'" in b else "promise v4" if "'promise v4'" in b
+                                  else "promise v3" if "'promise v3'" in b else "promise ?",
                                   "danger v4" if "'danger v4'" in b else "danger v3" if "'danger v3'" in b else "danger ?")
     return body, new, marks(body), marks(new)
 

@@ -8,6 +8,21 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 8 Nov: the tester's fourth run fixed** (the owner pasted its report). `n8n_whatsapp_retest4.py` on live and the UChat copy, both read back; PR #7 merged as `363cf35`, so CI deployed **debt-tools v150**.
+>   - **What it changes:**
+>     - **Send's voice v1** (the five R4 fails): "כדי שידעו …" is cut, "כדי שנוכל" becomes "כדי שאוכל", "רשמתי … לצוות" becomes "… במערכת", and "נשלח לך עדכון" becomes "יישלח לך עדכון".
+>     - **Send's promise v5:** "למתי יחזרו אליך" is a when, not a promise. C9.4's honest answer had been cut, leaving "מה שכן, …" alone.
+>     - **get_request_status on WhatsApp:** still three listed, plus `open_total` and a note when more are open. C5 and C10.3 said "three open" while 17 and then 20 were.
+>   - **No text a model reads changed.** The memory stays at epoch 99 (`-99`, `-99-uchat`), and all 17 pins are unchanged.
+>   - **Checked:**
+>     - The gate passes 490/490 on live. There are 17 new cases on the executions' own drafts, and three old expectations moved with voice v1.
+>     - The replay changes 19 of 1,342 replies, each one of the forms, and leaves nothing empty or broken.
+>     - The live function answers the test number with found 3, `open_total` 20 and the note.
+>   - **Rollback:** `python scripts/n8n_whatsapp_retest4.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest4.json`), then `python scripts/n8n_uchat.py --apply`. The function is rolled back by a revert PR on `main`.
+>   - **Owed: the tester's fifth run,** of C1, C2, C3, C5, C6 (from step 3), C9, then C10.
+>     - The test number has 20 open tickets from the runs (255-1393-26 to 255-1413-26), so a status answer now says about 20.
+>     - Cancelling them is the owner's call: they are mirrored into OXS ("dont touch them").
+>
 > **LIVE 8 Nov: the phone's standing order** (Yariv's change 3 on the phone, after WhatsApp's; owner: "ok let sgo").
 >   - **The function:** PR #6 merged (`cccb24c`); CI deployed **debt-tools v149**, code only. `standingOrderByCall`: a tenant on file is found by the call's own number and asked nothing; otherwise the name, a number and the building, as open_request asks. The debt agent's path emails collections too. `probe-` calls never email.
 >   - **The incoming agent** (`10ae859a`): `request_standing_order` and the prompt sentence, pushed with `--keep-voice`. Read back equal to the repo, voice `ba765d50`.
@@ -30,7 +45,7 @@ appended to.
 >   - **The one miss, judged to pass:** C9.4's "when" ended "יש עוד משהו על חדר המדרגות שחשוב לך שאוסיף לקריאה?". It is a question about his ticket, which the prompt allows; the guide's R5 now says so (CONTEXT has the rule). The owner may still want no "יש עוד משהו" opener at all while he waits: one more prompt sentence.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest3.py --restore` (snapshot `local/n8n-whatsapp-live-06nov-before-retest3.json`), then `python scripts/n8n_uchat.py --apply`.
 >   - **C10.1 was answered** (159074, UChat "ok" at 10:20:53 UTC) and never seen by the tester. Only the +63 phone can show whether it arrived (18:20 PH).
->   - **Owed:** the tester reruns C1, C2, C5, C6 (from step 3), C9, C11, then C10. C10 never ran past its first step.
+>   - **The tester's rerun ran on 8 Nov** (the fourth run, the full plan). C2 now names the ticket, C5 and C11 say who he is, and C10 ran all seven steps. What it found is the 8 Nov entry above.
 >
 > **LIVE 6 Nov: the incoming phone agent sends gas to the gas company too** (Yariv's change 2 on the phone). The chatbot's line, word for word; no ticket, no note. Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` after a field-by-field compare with live, which showed only the prompt and notify_team's text differing. Read back equal to the repo. Claude-played 3 calls (`scripts/voice_qa_gas.json`): both gas calls got the line with no tool; smoke still got the note and the urgent ticket. **Owed:** the owner's call, 077-6687949 then 9, "יש ריח של גז בחדר המדרגות".
 >

@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-11-08
 
+### LIVE: the tester's fourth run fixed (voice v1, promise v5, debt-tools v150; the owner pasted its report)
+- **The fourth run** (C1-C7, C9, C11, C8, C10; 46 messages, 16:11-17:33 PH):
+  - No serious fail. The five fails were all R4: C1.4, C1.5, C2, C3's follow-up and C6.4.
+  - The third run's fixes held: C2 names the ticket, C5 and C11 say who he is, and C10 ran all seven steps.
+- **Read against the UChat copy's executions (163758-164209), each with its draft:**
+  - **The five R4s** were the model's own words against the prompt's one-voice sentence: "נשלח לך עדכון", "רשמתי עכשיו לצוות" (notify_team had run), "כדי שידעו" twice after add_request_detail, and "כדי שנוכל". The last came from the retry; the first draft had "כדי שאוכל".
+  - **C9.4** (164030): the draft "תאריך או שעה מדויקת למתי יחזרו אליך אין לי, …" was cut whole by promise v4, which knows "מתי" and not "למתי", so "מה שכן, …" went out alone.
+  - **C5** (163885) **and C10.3** (164159): the lookup listed three tickets, all open, with nothing saying there were more. The requests table had 17 and then 20 open for the number.
+- **All 1,343 replies sent were read** for the forms: 6 since the 29 Oct one-voice change. A prompt sentence would be a rule on top of one the model already has.
+- **Built:**
+  - voice v1 and promise v5 in Send (`scripts/n8n_whatsapp_retest4.py`, code only, epoch unchanged);
+  - `open_total` in get_request_status (PR #7, `fix/status-open-total` cut from `origin/main`; syntax ok, 46/46 node tests, CI `checks` green).
+- **Gate:**
+  - 490/490 on the candidate, then on live.
+  - 17 new cases use the executions' own drafts, plus what must not change.
+  - Three old expectations moved with voice v1: 27 Sep's "כדי שיטפלו בתאורה", v3's note "רשמתי לצוות שלנו", and 5 Oct live #11. The 5 Oct file is left as it was.
+- **Replay:** 19 of 1,342 replies change, each one of the forms (word diffs read), with nothing empty and no fragment. No pin moved.
+- **Not played:** no text a model reads changed, and the cases are the real drafts.
+- **Live:**
+  - The live bot first, then the UChat copy, both read back (voice v1, promise v5, ref v1, `-99-uchat`). Snapshot: `local/n8n-whatsapp-live-08nov-before-retest4.json`.
+  - PR #7 merged as `363cf35`, and CI deployed debt-tools v150 ACTIVE.
+  - The test number now gets found 3, `open_total` 20 and the note.
+- **Left as they are (the tester's notes, not fails):**
+  - "בשמחה" before a status or the committee: the prompt asks for it there.
+  - "דוגרי": the tester counts it as colloquial, not slang.
+  - "הכל טוב" on a turn with no lookup: allclear v1 runs only when tools ran.
+  - C10.1's ticket line: danger v5 replaced a question about the smoke.
+  - C11's committee facts: still owed to Homies.
+- **Owed:** the tester's fifth run (C1, C2, C3, C5, C6 from step 3, C9, C10). The 20 open test tickets are the owner's to cancel or keep.
+
 ### LIVE: the phone's standing order, debt-tools v149 and the incoming agent (Yariv's change 3 on the phone; owner: "ok what is the next feature", then "ok let sgo")
 - **Merged** PR #6 as `cccb24c`. The main run's `checks` and `deploy-function` passed, and the deploy answered HTTP 201: **debt-tools v149 ACTIVE**, code only, no secret pushed or deleted. The function on `feature/chatbot` equals `main`'s.
 - **The probe on live** (`probe_standing_call.py`, no AI and no call; call id `test-standing-1108-154316`):
