@@ -74,7 +74,11 @@ The user is the builder. The client is Homies.
   - The address is `COLLECTIONS_EMAIL` in `.env`, written into the node at `--apply`. **Until Homies give theirs, it is our team inbox (clixteam579@gmail.com).**
   - The sender is Brevo's verified `testclix46@gmail.com`, until Homies have their own.
 - **If OXS's API can start one** (the owner asked them on 5 Nov), this becomes the fallback, not the route.
-- **The phone agent's** request still lands in the dashboard only, with no email, until its version is built.
+- **On the phone (8 Nov, after the chatbot, the owner's order):**
+  - **The incoming agent** has its own `request_standing_order` (`vapi_tools.py`, INTAKE_TOOLS), and the prompt says it is the whole answer: no payment ticket, no note. debt-tools' `standingOrderByCall` finds a tenant on file by the call's own number and asks nothing; otherwise the name, a number to reach them and the building, the way open_request asks (ticketGate, always on here).
+  - **One open request per tenant on file, or per the call's own number.** A number typed on the call finds nothing: anyone can say anyone's number, and "already recorded" would tell them about someone else's request.
+  - **The debt agent's** existing path (it rang a tenant it knows) is emailed too, with the number it rang. Its Vapi tool is unchanged.
+  - **check_tools.py's probes never email** (`isProbeCall`): its ids start with `probe-`, and a run would otherwise write to collections once `COLLECTIONS_EMAIL` is theirs.
 
 **Sandbox work never touches production (26 Oct, the owner: "make sure the prod is not being affected the sandbox is independent").**
 - Feature 19 has its own Chatwoot account, its own n8n workflows and its own backend function (`debt-tools-sandbox`).

@@ -51,7 +51,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Who is calling and what a ticket still needs (feature 17, 22 Oct). Pure, so
 // Node can test it: scripts/check_identity.test.ts.
 import {
-  callNumberOf, flagOf, phoneOf, reporterLine, reporterNameOf, requiredChannels, ticketGate,
+  callNumberOf, flagOf, isProbeCall, phoneOf, reporterLine, reporterNameOf, requiredChannels,
+  ticketGate,
 } from "./identity.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
@@ -1339,6 +1340,100 @@ async function standingOrderByChat(args: any, ctx: CallContext) {
   return { ok: true, recorded: true, recorded_now: true, reference: data.reference };
 }
 
+// An incoming call (8 Nov 2026, Yariv's change 3 on the phone, after WhatsApp's).
+// WHO. The call's own number, as every phone tool reads it: on file for exactly
+// one tenant, it gives the name, the building and the flat, and nobody is asked
+// anything. Staff ringing from inside the office have no number (callNumberOf),
+// and a foreign one is dropped (phoneOf), so otherwise the name and a number to
+// reach them come the way a ticket's do (ticketGate: need_name, then
+// need_phone), and the building through matchBuilding in open_request's words.
+// The name is required here whatever NAME_REQUIRED_CHANNELS says: collections
+// has to know whose payment it is.
+// THE SAME REQUEST AGAIN. One open per tenant on file, or per the call's own
+// number. A number typed on the call finds nothing: anyone can say anyone's
+// number, and "already recorded" would tell them about someone else's request.
+// Same marker as the other two paths, the same email, never mirrored into OXS.
+async function standingOrderByCall(args: any, ctx: CallContext) {
+  const said = String(args?.said ?? "").trim().slice(0, 500);
+  const callPhone = reporterPhone(ctx);
+  let r: any = null;
+  if (callPhone) {
+    const { data: rows } = await db.from("residents").select("id,full_name,building,unit")
+      .eq("phone", callPhone).limit(2);
+    r = rows?.length === 1 ? rows[0] : null;
+  }
+
+  if (r || callPhone) {
+    let open = db.from("requests").select("reference").eq("oxs_ref", STANDING_ORDER_REF)
+      .in("status", ["open", "in_progress", "needs_review"]).limit(1);
+    open = r ? open.eq("resident_id", r.id) : open.eq("reported_by_phone", callPhone);
+    const { data: had } = await open;
+    if (had?.length) {
+      return withSpoken({ ok: true, recorded: true, recorded_now: false, already_recorded: true,
+                          reference: had[0].reference });
+    }
+  }
+
+  let building = r ? String(r.building ?? "").trim() : "";
+  let unit = r ? unitOf(r.unit) : null;
+  if (!building && String(args?.building ?? "").trim()) {
+    const m = await matchBuilding(args?.building);
+    if (m.status === "found") {
+      building = String(m.building.address);
+      unit = unitOf(args?.unit);
+    } else if (m.status === "need_number" || m.status === "number_off_street") {
+      return { ok: true, recorded: false, building_found: false,
+               reason: m.status === "need_number" ? "need_number" : "number_not_on_street",
+               street: m.street.street, numbers_we_manage: m.numbers };
+    } else if (m.status === "ambiguous") {
+      return { ok: true, recorded: false, building_found: false, reason: "ambiguous",
+               candidates: m.candidates.map((b: any) => b.address).slice(0, 5) };
+    } else if (m.status === "street_unknown"
+               && (/\d/.test(String(args?.building)) || latinStreet(String(args?.building)))) {
+      // As on WhatsApp: a street with no number anywhere was not an address
+      // (the model's own placeholder), and is asked for below as need_building.
+      return { ok: true, recorded: false, building_found: false, reason: "street_unknown",
+               ...(latinStreet(String(args?.building)) ? { hint: LATIN_HINT } : {}) };
+    }
+  }
+
+  const name = (r ? reporterNameOf(r.full_name) : null) ?? reporterNameOf(args?.reporter_name);
+  const phone = callPhone ?? typedPhoneOf(args?.reporter_phone);
+  const missing = ticketGate({
+    channel: "voice", dialled: false, enforced: new Set(["voice"]),
+    name, nameDeclined: flagOf(args?.name_declined),
+    phone, phoneDeclined: flagOf(args?.phone_declined),
+  });
+  if (missing) return { ok: true, recorded: false, reason: missing };
+  if (!building) return { ok: true, recorded: false, reason: "need_building" };
+
+  const { data, error } = await db.from("requests").insert({
+    resident_id: r?.id ?? null,
+    interaction_id: await interactionId(ctx),
+    type: "other",
+    description:
+      "בקשה להוראת קבע. הדייר ביקש בשיחת טלפון להסדיר את התשלום החודשי " +
+      "בהוראת קבע — יש ליצור איתו קשר להסדרה." + (said ? " מה שאמר: " + said : ""),
+    building,
+    unit,
+    urgency: "normal",
+    opened_via: channel(ctx),
+    reported_by_phone: phone,
+    reported_by_name: name,
+    oxs_ref: STANDING_ORDER_REF,
+  }).select("reference").single();
+  if (error) return { ok: false, error: error.message };
+
+  if (!isProbeCall(ctx.callId)) {
+    const emailed = await standingOrderMail({
+      reference: data.reference, name: name ?? "", phone: phone ?? "", building, unit: unit ?? "",
+      said, channel: "voice",
+    });
+    console.log("standing order", data.reference, emailed ? "handed to the email" : "NOT emailed");
+  }
+  return withSpoken({ ok: true, recorded: true, recorded_now: true, reference: data.reference });
+}
+
 // The sentence with no tool behind it. Same shapes as the WhatsApp backstop
 // (scripts/n8n_whatsapp_teamnote.py SAID), in phone forms: "I told / will
 // pass this to the team" (a verb and a destination), the sentence the prompt
@@ -2549,6 +2644,9 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // WhatsApp (5 Nov, Yariv's change 3): no call and no charges, so who is
     // asking is the number they write from. Its own path: standingOrderByChat.
     if (channel(ctx) === "whatsapp") return await standingOrderByChat(args, ctx);
+    // An incoming call (8 Nov, the same change on the phone): nobody was rung
+    // and nothing owed is on the call, so who is asking is told on the call.
+    if (!dialled(ctx)) return await standingOrderByCall(args, ctx);
     if (!ctx.charges.length) return { ok: false, error: "no charge on this call" };
     const iid = await interactionId(ctx);
 
@@ -2618,9 +2716,18 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
     // The flag is already written and the resident already said yes. A failed
     // insert loses the ticket, not the outcome, so it is reported and not thrown.
-    return error
-      ? { ok: true, request_opened: false, error: error.message }
-      : withSpoken({ ok: true, reference: data.reference });
+    if (error) return { ok: true, request_opened: false, error: error.message };
+
+    // 8 Nov: collections hears of it by email, as on WhatsApp (Yariv's change 3).
+    // The number is the one this call rang. Never for check_tools.py's probes.
+    if (!isProbeCall(ctx.callId)) {
+      const emailed = await standingOrderMail({
+        reference: data.reference, name: (await residentName(ctx.residentId)) ?? "",
+        phone: ctx.callerPhone ?? "", building, unit: ctx.unit ?? "", said: "", channel: "voice",
+      });
+      console.log("standing order", data.reference, emailed ? "handed to the email" : "NOT emailed");
+    }
+    return withSpoken({ ok: true, reference: data.reference });
   },
 
   /**

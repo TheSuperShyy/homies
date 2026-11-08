@@ -1,0 +1,165 @@
+{
+ "_about": "The phone agent's standing order (8 Nov, Yariv's change 3 after WhatsApp's): recorded with request_standing_order alone, the reference read back, nothing promised; a caller not on file is asked the name, a number and the building; 'how do I pay?' is still a payment ticket and a note.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {
+   "_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. A second call with the same building and type returns the first reference with duplicate: true.",
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "save_partial_request": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>",
+   "partial": true
+  },
+  "add_request_detail": {
+   "ok": true,
+   "reference": "<ticket>"
+  },
+  "notify_team": {
+   "ok": true,
+   "team_notified": true
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "get_balance": {
+   "ok": true,
+   "found": 0
+  },
+  "get_service_info": {
+   "ok": true,
+   "found": false,
+   "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+  },
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "_rule": "Incoming calls (the debt agent's version takes no arguments and returns `recorded`). The scenario's `caller.on_file` true: recorded at once. Otherwise, in this order: no reporter_name and no name_declined -> need_name; then, when the scenario's `caller.call_has_number` is false and there is no reporter_phone and no phone_declined -> need_phone; then no building naming Bar Kochba (בר כוכבא) with 23 -> need_building; then recorded. A second call after recorded returns already.",
+   "recorded": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_name": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_name"
+   },
+   "need_phone": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_phone"
+   },
+   "need_building": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_building"
+   },
+   "already": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": false,
+    "already_recorded": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   }
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "id": "in_standing_on_file",
+   "agent": "inbound",
+   "title": "incoming call: a tenant on file asks for a standing order",
+   "time": "10:20",
+   "weekday_he": "ראשון",
+   "ticket": "255-1545-26",
+   "caller": {
+    "persona": "דנה, 45. Calm, polite, a little in a hurry.",
+    "on_file": true,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 6. Pays the building fee each month by bank transfer and keeps forgetting.",
+    "wants": "To pay the building fee by standing order (הוראת קבע) from now on.",
+    "tendencies": "Asks 'אפשר לעבור להוראת קבע על הוועד?'. If asked for card or bank details, says she would rather not on the phone. Before hanging up asks once when someone will call her to set it up."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_standing_unknown",
+   "agent": "inbound",
+   "title": "incoming call from a line with no number: a standing order",
+   "time": "16:05",
+   "weekday_he": "שלישי",
+   "ticket": "255-1546-26",
+   "caller": {
+    "persona": "יוסי לוי, 62. Friendly, answers what he is asked, no more.",
+    "on_file": false,
+    "call_has_number": false,
+    "knows": "Calling from his office line. Lives at בר כוכבא 23, apartment 4. His mobile is 052-7654321.",
+    "wants": "To set up a standing order for the building fee.",
+    "tendencies": "Opens with 'רציתי לשאול אם אפשר לשלם את הוועד בהוראת קבע'. Gives his name, then his number, then the address, each when asked."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_pay_how",
+   "agent": "inbound",
+   "title": "incoming call: how do I pay the fee (unchanged: a payment ticket and a note)",
+   "time": "12:40",
+   "weekday_he": "שני",
+   "ticket": "255-1547-26",
+   "caller": {
+    "persona": "רונית, 50. Direct.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 3. Her name is רונית כהן.",
+    "wants": "To pay this month's building fee and know how.",
+    "tendencies": "Asks 'איך אני משלמת את הוועד החודש?'. Gives her name and address when asked."
+   },
+   "fixtures": {}
+  }
+ ]
+}

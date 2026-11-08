@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **BUILT 8 Nov, NOT LIVE YET: the phone's standing order** (Yariv's change 3 on the phone, after WhatsApp's; owner: "ok let sgo").
+>   - **The function:** PR #6 (`fix/standing-order-phone`), CI green, not merged. Merging puts it live through `deploy-function`. No new secrets.
+>   - **The incoming agent:** `request_standing_order` in INTAKE_TOOLS and one prompt sentence (`demo-inbound.md`), in the repo only. The compare with live shows only those two. Push AFTER the merge: `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`. Until the function is live, the tool would answer "no charge on this call".
+>   - **The debt agent:** nothing to push. Its request is emailed once the function is live.
+>   - **Claude-played:** the caller with no number was asked the name, a number and the address in turn, and the request was read back, with no ticket and no note. Two calls are still being played.
+>
 > **LIVE 6 Nov, epoch 99: the tester's third run fixed** (`n8n_whatsapp_retest3.py`; live and `-99-uchat`, both read back).
 >   - **What it changes:**
 >     - Send's ref v1 names the one ticket the tools gave when the reply names none (C2).

@@ -9,6 +9,27 @@ conversation that produced it.
 
 ---
 
+## 2026-11-08
+
+### The phone's standing order: built, PR #6 green, not live yet (Yariv's change 3 on the phone; owner: "ok what is the next feature", then "ok let sgo")
+- **Why this one next:** it is the only item from the 4 Nov list with nothing blocking it.
+  - #1 (elevators into OXS) is built and off, waiting on the owner's go.
+  - #4 (the debt list) waits on OXS's export file, #5 (department routing) on Homies, and #6 (the phone delay) on Omnitelecom.
+  - The owner asked whether Omnitelecom's missing reply holds this up. It does not: the incoming line (077-6687949, then 9) works today, and only outgoing debt calls wait on them.
+- **What the phone had:** the incoming agent had no standing-order tool, so a request would have become a payment ticket plus a note. The debt agent's tool recorded the request but emailed nobody.
+- **The function** (PR #6, `fix/standing-order-phone`, cut from `origin/main`; CI `checks` green in 18 s):
+  - `standingOrderByCall`, for an incoming call (nobody rung, nothing owed on the call):
+    - a tenant on file is found by the call's own number and asked nothing;
+    - otherwise the name, a number to reach them and the building, through ticketGate (always on here) and matchBuilding, in open_request's words.
+  - **One open request** per tenant on file, or per the call's own number. A number typed on the call finds nothing, so nobody hears of someone else's request.
+  - **The debt agent's path** emails collections too, with the number it rang.
+  - **`isProbeCall`** (identity.ts, tested): check_tools.py's `probe-` calls never email.
+  - **Locally:** syntax ok, 43 of 46 node tests. The 3 failures are check_route's, reading `dashboard/lib/call.ts`: the fresh worktree checked it out with CRLF and the test's pattern wants LF. The same tests pass 7/7 in the main tree, and CI is Linux.
+- **The agent** (`vapi_tools.py`, `docs/assistant/demo-inbound.md`): the new tool on the incoming agent, and the chatbot's sentence in phone words ("…בלי פנייה ובלי הערה").
+  - **Compare with the live agent** (read only): only the prompt (9,304 -> 9,441 chars) and the new tool differ.
+- **Claude-played** (`scripts/voice_qa_standing_phone.json`, `voice_qa.py bundle --candidate`), from a line with no number: the full name, then a number (read back in words), then the address with the flat in one question, then "רשמתי את הבקשה להוראת קבע! מספר הבקשה הוא אחת חמש ארבע שש". No ticket, no note, nothing promised. The number was asked as "לאיזה מספר טלפון אפשר לחזור?", which hints at a callback; tickets ask the same way. The on-file call and "how do I pay?" are still being played.
+- **Owed:** the merge (it puts the function live), a probe of the phone path (`probe_standing_call.py` in the scratchpad: four steps that write nothing, then one recorded request in flat 2, emailed to our inbox and set to cancelled), the Vapi push, and the owner's call.
+
 ## 2026-11-06
 
 ### LIVE: the tester's third run fixed (epoch 99; the owner pasted its report)

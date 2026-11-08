@@ -739,6 +739,58 @@ INTAKE_TOOLS = [
         wait=True,
         waiting="שנייה, אני בודק.",
     ),
+    # 8 Nov, Yariv's change 3 on the phone, after WhatsApp's (5 Nov): OXS has
+    # one-time payments only, so a standing order is recorded and emailed to
+    # collections (debt-tools standingOrderByCall). The debt agent's own tool
+    # above takes no arguments: it rings a tenant it already knows. This one
+    # asks for what an incoming call does not carry, the way open_request does.
+    _fn(
+        "request_standing_order",
+        "Call when the caller asks to pay the monthly building fee by standing order "
+        "(הוראת קבע), or asks whether they can pay that way. It records the request for "
+        "the collections team, who set it up with them. It is the whole answer: no ticket "
+        "(open_request), no note (notify_team), and nothing asked about a card or a bank "
+        "account. Like a note it is quiet: what they hear is that you recorded it.\n"
+        "A caller whose number is on file is found by it and asked nothing. Otherwise it "
+        "records nothing yet and answers what is missing, one thing at a time: need_name "
+        "(ask for their full name), need_phone (this call came with no number of its own: "
+        "ask for a number to reach them, read it back in words), need_building (ask for "
+        "the building and the apartment in one question), or building_found false with "
+        "open_request's reasons (on a phone line ask for the street once more). Call "
+        "again with what they said. Someone who will not give a name or a number, after "
+        "hearing once that it is so the request is under their name, still gets it: "
+        "name_declined or phone_declined true.\n"
+        "recorded_now true: say you recorded their request and read the reference back. "
+        "already_recorded true: it was already recorded, with that reference. Either way "
+        "nothing more: nobody who will call, no date, no procedure.",
+        {
+            "said": {
+                "type": "string",
+                "description": "What they asked, in Hebrew, in their words.",
+            },
+            "reporter_name": {
+                "type": "string",
+                "description": "Their full name as they said it on this call, only after "
+                               "need_name. Leave out rather than guess.",
+            },
+            "name_declined": {
+                "type": "boolean",
+                "description": "true only when they heard why and still would not give it.",
+            },
+            "reporter_phone": {
+                "type": "string",
+                "description": "Only after need_phone: the number they gave, in digits.",
+            },
+            "phone_declined": {
+                "type": "boolean",
+                "description": "true only when they would not give a number after need_phone.",
+            },
+            **LOCATION,
+        },
+        ["said"],
+        wait=True,
+        waiting="רגע, אני רושם את זה.",
+    ),
 ]
 
 
