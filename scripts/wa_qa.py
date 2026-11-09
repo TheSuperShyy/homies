@@ -557,6 +557,17 @@ LINK = re.compile(r"https?://\S+")
 LATIN = re.compile(r"[A-Za-z]{2,}")
 EMERGENCY = re.compile(r"(^|\D)(100|101|102|103)(\D|$)|משטרה|מכבי אש|מד\"א|מדא(?=[\s,.!?]|$)|כבאות|מגן דוד")
 OFFICE = re.compile(r"077-?6687949|homies-management|בצלאל 1")
+# 9 Nov (n8n_whatsapp_feedback9.py): after office hours (outside Sun-Thu 09:00-17:00, Israel) an urgent call
+# also gets Homies' emergency line, the office number, so it is no "office-unasked" there.
+URGENT_CALL = re.compile(r"קריא(?:ה|ת)(?: ה?שירות)? (?:ה)?(?:דחופה|חירום)|הקריאה הדחופה")
+
+
+def after_hours(s):
+    try:
+        hour = int(str(s.get("time", "12:00")).split(":")[0])
+    except ValueError:
+        return False
+    return s.get("weekday") in (5, 6) or hour < 9 or hour >= 17
 GREET = re.compile(r"^(שלום רב|שלום|היי|הי|אהלן|בוקר טוב|צהריים טובים|ערב טוב|לילה טוב|שבוע טוב|שבת שלום|חג שמח|יום טוב)"
                    r"( לכם| לך| לכולם)?(?=[\s,.!:;]|$)")
 HOUR_WORDS = ("בוקר טוב", "צהריים טובים", "ערב טוב")
@@ -636,7 +647,8 @@ def rubric(turn, res, ctx):
         if m:
             flag("slash-form", h, m)
         m = OFFICE.search(h)
-        if m and not s.get("office_allowed"):
+        if m and not s.get("office_allowed") and not (after_hours(s) and URGENT_CALL.search(h)
+                                                      and m.group(0).replace("-", "") == "0776687949"):
             flag("office-unasked", h, m)
         no_links = LINK.sub("", h)
         m = LATIN.search(no_links)

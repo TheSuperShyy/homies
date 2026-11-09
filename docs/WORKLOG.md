@@ -33,7 +33,7 @@ conversation that produced it.
     - Send's danger v6 keeps a sentence whose only "advice" is that number and a verb of calling, after hours only. Any other number, advice or "on the way" still goes.
     - Gas is unchanged: the gas company's line, at any hour.
   - **The two exceptions are named:** the one-voice sentence names the lift company and the collections team; "nobody is sent anywhere" names gas and an urgent fault after hours.
-  - **Measured:** the prompt went from 24,527 to 25,958 characters.
+  - **Measured:** the prompt went from 24,527 to 26,021 characters (after the fix below).
 - **Checked:**
   - The gate on the candidate passes 560/560 cases. 25 are new: 10 for danger v6 (Yariv's own 2.2 and 2.3 sentences go out whole), 7 for promise v6 and 8 for the inject's hours.
   - The replay: 0 of 1,355 resident messages change through Sort and the notes, 0 of 1,405 replies through Send, and 0 guard verdicts.
@@ -44,7 +44,19 @@ conversation that produced it.
     - Two old danger cases keyed to "v5" exactly now take v5 or v6, and the v4 block takes v4 to v6.
     - wa_qa's player text gives the after-hours clock line.
     - `--watch` no longer flags "צוות הגבייה".
-  - **Running:** a blind Claude-played run of `scripts/wa_qa_feedback9.json` on the candidate (5 scenarios: the lift arc, the leak, the standing order, a flood on Friday night and the same flood on Sunday noon). Its grade decides the pins and the apply.
+  - **The blind Claude-played run** of `scripts/wa_qa_feedback9.json` on the candidate had 5 scenarios: the lift arc, the leak, the standing order, a flood on Friday night and the same flood on Sunday noon. It scored 13 turns, 21/21 expectations, and no guard rejection.
+    - **What the handsets got:**
+      - The lift: the first question asked which lift, if more than one. The opening named the lift company, as did "when?" and the status tap.
+      - The leak: the first reply said a professional on his behalf comes first and asked about the main pipe or the roof. The call opened only after the plumber named the main pipe.
+      - The standing order: "ומישהו מצוות הגבייה ייצור איתך קשר בטלפון" went out whole.
+      - The flood after hours: the urgent call and 077-6687949, both times, with no advice. In hours: the urgent call only.
+    - **One miss, fixed:** on the second "נו אז מתי??" (Yariv's 2.4) the reply did something new but dropped the lift company. The prompt's general "not the same reason twice" won over the lift line's "גם כשהוא שואל שוב".
+      - The lift line now says it outright: "וגם כשהוא שואל שוב מתי, חברת המעליות נשארת בתשובה, לצד מה שאתה עושה עכשיו בשבילו". The prompt is 26,021 characters, `fbca40b23dd0`; the gate still passes 560/560.
+      - A one-scenario blind re-run of the lift is running.
+    - **The rubric** (`wa_qa.py`) flagged the after-hours line "office-unasked". It now allows Homies' number after hours on a reply that names an urgent call.
+    - **Seen, not changed:**
+      - Three "name-mid-conversation" flags come from the deck: a chat marked mid-conversation with nothing in memory.
+      - Danger's ARRIVE cut "אתה יודע מאיפה בדיוק המים יוצאים…?" from the in-hours flood. It reads "יוצאים" as someone coming out; that was so before this change too.
 - **Repo vs live:** the repo carries epoch 100's prompt (`prompt.md`, taken by the auto housekeeping commit 64ce5c2) and `MEMORY_EPOCH = 100`. Live and the UChat copy are still epoch 99.
 
 ### LIVE: standing-order requests email Homies' collections address (Yariv's 5.2)

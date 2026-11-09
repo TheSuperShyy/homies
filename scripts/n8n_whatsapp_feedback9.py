@@ -25,6 +25,9 @@ What is still to do, in his words:
       telephone emergency centre", 077-6687949.
 
 WHAT CHANGES
+  (A blind Claude-played run of scripts/wa_qa_feedback9.json passed 21/21, but its second "when??" dropped
+  the lift company: the prompt's general "not the same reason twice" won over "גם כשהוא שואל שוב". The lift
+  line now says it outright: on a second "when" the lift company stays, beside what Michael does now.)
   - The prompt: the lift (a fact: the lift company repairs, we pass it on and follow it, when depends on
     them; said when a lift call opens, when he asks when, and on its status) and its intake details; the
     leak; the standing order's callback; the emergency line after hours. The one-voice sentence names its
@@ -64,7 +67,7 @@ LIFT_FACT = (
     "קריאה על מעלית נפתחת אצלנו, ואנחנו מעבירים לחברת המעליות את המידע ואת המשך הטיפול, עוקבים אחרי "
     "הקריאה ולוחצים עליהם לטפל בה בדחיפות. מתי יבואו לתקן תלוי בהם, לא בנו. את זה הדייר שומע ממך, "
     "במילים שלך, כשאתה פותח קריאה על מעלית, יחד עם מספר הקריאה בהומי'ז, וכשהוא שואל מתי יתקנו אותה "
-    "או מה המצב שלה, גם כשהוא שואל שוב.")
+    "או מה המצב שלה. וגם כשהוא שואל שוב מתי, חברת המעליות נשארת בתשובה, לצד מה שאתה עושה עכשיו בשבילו.")
 
 PROMPT_EDITS = [
     # The one voice, and nobody sent anywhere: each names its exceptions, written further on.

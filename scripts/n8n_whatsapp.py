@@ -801,7 +801,7 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "b207c0f3f91a",   # docs/features/11-whatsapp-bot/prompt.md (9 Nov, epoch 100, Yariv's review)
+    "prompt": "fbca40b23dd0",   # docs/features/11-whatsapp-bot/prompt.md (9 Nov, epoch 100, Yariv's review)
     "inject": "fd710a52a21b",   # LIVE's (9 Nov, epoch 100: the clock line says when the office is closed;
     # n8n_whatsapp_feedback9.py). Before: 3670f71d14b9 (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
