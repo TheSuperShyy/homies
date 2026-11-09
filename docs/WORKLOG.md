@@ -53,6 +53,7 @@ conversation that produced it.
     - **One miss, fixed:** on the second "נו אז מתי??" (Yariv's 2.4) the reply did something new but dropped the lift company. The prompt's general "not the same reason twice" won over the lift line's "גם כשהוא שואל שוב".
       - The lift line now says it outright: "וגם כשהוא שואל שוב מתי, חברת המעליות נשארת בתשובה, לצד מה שאתה עושה עכשיו בשבילו". The prompt is 26,021 characters, `fbca40b23dd0`; the gate still passes 560/560.
       - A one-scenario blind re-run of the lift is running.
+      - CONTEXT keeps the lesson under "How a prompt fault is fixed": a general rule beats a softer specific one, so the specific line names what stays.
     - **The rubric** (`wa_qa.py`) flagged the after-hours line "office-unasked". It now allows Homies' number after hours on a reply that names an urgent call.
     - **Seen, not changed:**
       - Three "name-mid-conversation" flags come from the deck: a chat marked mid-conversation with nothing in memory.

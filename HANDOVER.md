@@ -12,7 +12,7 @@ appended to.
 >   - **What:** the lift company line and the lift details asked; water in a flat is the flat's first; a standing order's callback by collections (promise v6); Homies' emergency line after hours (the inject's office-hours mark, danger v6).
 >   - **The repo is ahead of live.** `prompt.md` and `MEMORY_EPOCH = 100` are epoch 100's. Live and the UChat copy are epoch 99 (`-99`, `-99-uchat`).
 >   - **Checked:** the gate on the candidate passes 560/560, and the replay changes nothing (0 of 1,405 replies). The gate on live passes 537/537 with its 17 pins.
->   - **The blind Claude-played run:** 21/21 expectations, no guard rejection. Its one miss, the lift company dropped on a second "when", is fixed in the lift line; a one-scenario re-run of the lift is running.
+>   - **The blind Claude-played run:** 21/21 expectations, no guard rejection. Its one miss, the lift company dropped on a second "when", is fixed in the lift line; a one-scenario re-run of the lift is running. CONTEXT ("How a prompt fault is fixed") keeps the lesson: a general rule beats a softer specific "again".
 >   - **To finish:**
 >     1. Grade the lift re-run: `python scripts/wa_qa.py grade --run <scratchpad>/qa9b --deck <scratchpad>/deck-lift9.json`.
 >     2. If its second "when" names the lift company, set the four pins in `check_whatsapp_rules.py`: prompt `fbca40b23dd0`, inject `fd710a52a21b`, open_request `27c544f39122`, request_standing_order `9d18f612c2fd`.
