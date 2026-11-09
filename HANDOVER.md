@@ -34,6 +34,7 @@ appended to.
 >   - **PR #9 merged as `088ca4c`.** Vercel built production from it ("Deployment has completed"), after the token was set.
 >   - **The owner's test press, 08:53:01 UTC (10:53 Israel), "Ring עידו":** Omni took the lead (200, "inserted 1"); external_id `f068dfae-…-20261109T085301`.
 >     - **No call reached Vapi, or our endpoint:** nothing on Vapi by 08:58:44 UTC (the only call today was the 08:52:45 credit check), and Supabase's logs show no `route` line from the router in the 24 h up to 09:15 UTC. So either Ido's phone rang unanswered (a ring nobody answers never reaches Vapi), or the dialer did not dial (List 2 not playing, or Omni's side).
+>     - **Vapi was in credit** before the press (08:52 UTC) and after (09:19 UTC).
 >     - **The phone never rang** (the owner, "none rang"). So the dialer took the lead and did not dial. We hold no call-log login (only `TOKOMNI_TOKEN`, campaign, dialer and List 2 ids), so the reason is Omni's to find.
 >     - **Owed:**
 >       - the reply to Omni, which is drafted and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew). It gives the time, the id and that no call was dialled, and asks whether List 2 is on Play, and whether the dialer sees the bot (208) as available;

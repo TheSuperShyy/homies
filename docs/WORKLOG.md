@@ -25,6 +25,7 @@ conversation that produced it.
 - **"can you check if it reach the endpoint or no":** Omni's endpoint yes (200, inserted 1). Ours no.
   - Supabase's function logs had 0 `route` lines (the router's line for every call Vapi asks about) from 08:45 to 09:15 UTC, and 0 in the 24 h before. The same window held 19 boot and shutdown lines and 9 other POSTs, so the source works.
   - `logs.all` is gone (410). The new endpoint is `.../analytics/endpoints/logs`, `FROM logs WHERE source = '…'`.
+- **Vapi's credit, on the owner's ask:** in credit at 08:52 UTC (just before the press) and at 09:19 UTC (`vapi_transfer.py --balance`). Credit cannot stop a ring anyway: the dialer rings the phone first, and Vapi joins only after an answer.
 - **The owner: "none rang".** The staff phone never rang, so the dialer took the lead and did not dial. Our side is clean end to end. We hold no Tokomni call-log login.
   - The Omni email is updated to say so. It asks two things: whether List 2 is on Play with "always continue", and whether the dialer sees the bot (208) as available. Their 8 Nov answer said dialling depends on the bot's availability.
 
