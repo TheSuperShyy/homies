@@ -86,12 +86,46 @@ export function externalIdFor(residentId: string | null, at: Date): string {
   return `${residentId || 'test'}-${stamp}`;
 }
 
-/** Tokomni's answer as one short line: the JSON's message, an HTML page's title, or the text. */
+/** How many leads Tokomni says went in (`inserted_count`, Omni's v1 answer), or null when it does not say. */
+export function leadsAdded(body: string): number | null {
+  try {
+    const j = JSON.parse(String(body ?? '').trim());
+    return j && typeof j === 'object' && typeof j.inserted_count === 'number' ? j.inserted_count : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The first item of a list Tokomni returns, as its reason or as JSON. */
+function firstReason(x: unknown): string {
+  const first = Array.isArray(x) ? x[0] : x;
+  if (first && typeof first === 'object') {
+    const o = first as Record<string, unknown>;
+    const why = o.reason ?? o.error ?? o.message ?? o.msg;
+    return typeof why === 'string' ? why : JSON.stringify(first);
+  }
+  return String(first ?? '');
+}
+
+/**
+ * Tokomni's answer as one short line. Omni's v1 answer (8 Nov) says how many went
+ * in and why any did not: "inserted 1", "inserted 0, blacklisted 1", "failed: …",
+ * "invalid: …". Otherwise the JSON's message, an HTML page's title, or the text.
+ */
 export function answerText(body: string): string {
   const text = String(body ?? '').trim();
   try {
     const j = JSON.parse(text);
     if (j && typeof j === 'object') {
+      const count = (x: unknown) => (Array.isArray(x) ? x.length : x ? 1 : 0);
+      if (typeof j.inserted_count === 'number' || count(j.failed_items) || count(j.blacklisted_items) || count(j.invalid)) {
+        const parts: string[] = [];
+        if (typeof j.inserted_count === 'number') parts.push(`inserted ${j.inserted_count}`);
+        if (count(j.blacklisted_items)) parts.push(`blacklisted ${count(j.blacklisted_items)}`);
+        if (count(j.failed_items)) parts.push(`failed: ${firstReason(j.failed_items)}`);
+        if (count(j.invalid)) parts.push(`invalid: ${firstReason(j.invalid)}`);
+        return parts.join(', ').slice(0, 200);
+      }
       const msg = j.error_msg ?? j.message ?? j.msg ?? j.error;
       return String(typeof msg === 'string' ? msg : JSON.stringify(j)).slice(0, 200);
     }
