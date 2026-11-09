@@ -721,6 +721,14 @@ so there is no translation beside the replies and no English around them. Its bu
 the run's own text (the English test message in 5.5, the payment link). An English twin, if one is ever asked
 for, comes from `build_en.py`, not from English added back into this page.
 
+**Its Google Form is made by the owner's own Google account, from the published page's data (9 Nov).** There
+is no Google credential on this PC, and Drive cannot take a form with its questions, so
+`local/artifacts/michael-simulation/build_form.py` writes `form/create_form.gs`. That is a Google Apps Script
+which the owner runs once in script.google.com. It makes the form ("Michael Simulated Run": the reviewer's
+name, then for each of the 30 steps a required ✓ / ✗ and a comment) and logs its two links. It reads the 30
+steps from `index.html`, the published build. `build.py` no longer runs, because the checklist it reads has
+renamed its gas and emergency tests since 3 Nov. Each run of the script makes a new form.
+
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before
 every balance, which the 29 Oct change had already ended for numbers on file. Each

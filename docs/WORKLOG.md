@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-09
 
+### A Google Form for "Michael Simulated Run" (owner: "remember the artifact we created … createa google form for this one")
+- **The page could not be read from this session:** the Artifact tool asks for a yes ("made by someone else") that no one can give here. Its source is local: `local/artifacts/michael-simulation/`.
+- **No direct route to Google:** there is no Google credential in `.env`, the Google connectors are not connected in this session, and Drive cannot take a form with its questions anyway.
+- **So:** `build_form.py` writes `form/create_form.gs`, a Google Apps Script the owner runs once in script.google.com, under their own account.
+  - It reads the 30 steps from `index.html`, the published build of 3 Nov. `build.py` itself fails now (KeyError `e1`), because the checklist renamed its gas and emergency tests.
+  - The form: title "Michael Simulated Run", a Hebrew description, the reviewer's name (required), and one section per chat.
+  - Each of the 30 steps gets a required "האם התשובה של מיכאל נכונה?" (✓ נכון / ✗ לא נכון), whose help text holds the message, the reply, what the bot did and what it should do, plus a comment box.
+- **Checked:** `node --check` parses it. Run against a stand-in for FormApp it gave 5 sections, 30 questions, 30 comment boxes and the name field, with no error. The longest help text is 586 characters.
+  - The only link in it is the run's placeholder `pay.example.co.il`, and there are no phone numbers.
+  - Both files stay in the gitignored `local/`.
+
 ### LIVE: the "ticket closed" template synced into UChat (owner: "ok fix the sync on the uchat")
 - **Why:** asked what is left on the chatbot, the read showed that Meta had approved `ticket_resolved_he` on the UChat number's account (`wa_templates.py --waba 2117787955519632`). UChat's own list (`POST /whatsapp-template/list`) still had only `payment_link_he`.
   - debt-tools' `ticketNoticesViaUchat` sends only what UChat lists as APPROVED. Without the sync, a notice would sit as `template_not_synced`.

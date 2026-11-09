@@ -258,6 +258,11 @@ appended to.
 >     - It refuses any English outside the run's own text.
 >     - `build_en.py` and `translations.json` still build the English page it replaced, as `index-en.html`. That file is not published, and is there only if the owner asks for an English twin.
 >   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
+>   - **A Google Form of it (9 Nov, owner: "createa google form for this one"):** `local/artifacts/michael-simulation/form/create_form.gs`, written by `build_form.py` from the published `index.html`.
+>     - The owner pastes it into script.google.com and runs `createMichaelForm`.
+>     - It makes "Michael Simulated Run" in their Google account: the reviewer's name, 5 sections, and 30 required ✓ / ✗ questions with the message, the reply, what the bot did and what it should do, each with a comment box. It logs the edit link and the reviewers' link.
+>     - Run once against a stand-in for Google Forms, it gave 61 items with no error. It is not yet made in Google.
+>     - The page itself could not be read from this session: it asks for a yes no one can give here. `build.py` no longer runs, because the checklist's tests were renamed since 3 Nov.
 > - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*). **Live version `1793783418-3bf0`** (4 Nov, 09:10 UTC, still shared by link). The ManyChat point is DONE, on the owner's word, and says simply that:
 >     - the website link exists;
 >     - a quote request reaches the chat inbox;
