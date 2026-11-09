@@ -34,9 +34,9 @@ appended to.
 >   - **PR #9 merged as `088ca4c`.** Vercel built production from it ("Deployment has completed"), after the token was set.
 >   - **The owner's test press, 08:53:01 UTC (10:53 Israel), "Ring עידו":** Omni took the lead (200, "inserted 1"); external_id `f068dfae-…-20261109T085301`.
 >     - **No call reached Vapi, or our endpoint:** nothing on Vapi by 08:58:44 UTC (the only call today was the 08:52:45 credit check), and Supabase's logs show no `route` line from the router in the 24 h up to 09:15 UTC. So either Ido's phone rang unanswered (a ring nobody answers never reaches Vapi), or the dialer did not dial (List 2 not playing, or Omni's side).
+>     - **The phone never rang** (the owner, "none rang"). So the dialer took the lead and did not dial. We hold no call-log login (only `TOKOMNI_TOKEN`, campaign, dialer and List 2 ids), so the reason is Omni's to find.
 >     - **Owed:**
->       - whether Ido's phone rang;
->       - the reply to Omni with the time and the id, which is drafted, and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew, with a line to add either way);
+>       - the reply to Omni, which is drafted and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew). It gives the time, the id and that no call was dialled, and asks whether List 2 is on Play, and whether the dialer sees the bot (208) as available;
 >       - `tokomni_lead.py --check` again once a call does come.
 >
 > **8 Nov, later: Omni answered about the dialer's 404s, and the dialer test page is rebuilt for their lead API. Built, not live** (made live 9 Nov, the entry above) (their email: `local/omnitelecom/2026-11-08-lead-api-v1.txt`). The 404s since 29 Oct were Omni's: the address in their first document was wrong, and the 27 Oct token was a dashboard token, which they have deleted.
