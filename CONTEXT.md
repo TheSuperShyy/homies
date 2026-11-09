@@ -44,6 +44,20 @@ The user is the builder. The client is Homies.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
 - **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
+**Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; built as epoch 100 by `n8n_whatsapp_feedback9.py`; live once its check passes, see HANDOVER).**
+- **The lift company repairs a lift.** Homies opens the call, passes the details and the handling to the company that services and maintains the lift, follows the call and presses them; when they come depends on them.
+  - The tenant hears it when a lift call opens (with the call number at Homies), on "when?", on its status, and again on a second "when".
+  - This and the collections call below are the only places someone other than Michael appears, and the one-voice sentence names them. They are the client's account of his own process, so they are true. Everywhere else, one voice holds.
+- **What the lift company needs is asked:** what is happening, which lift when there is more than one, the floor it is stuck on. Only what the tenant has not said.
+- **Water in a flat starts as the flat's.** A leak or damp inside the flat, even from the ceiling or a wall, needs a professional on the tenant's behalf first.
+  - Michael says so gently and asks whether it is known to come from the common property (the main pipe, the roof). If it is, it is a call.
+  - This supersedes the owner's 16 Sep "a fault of unclear origin is the building's to check".
+- **A standing order's tenant hears that someone from collections will phone him,** never when. Send's promise v6 lets that sentence through only on a turn whose tools recorded a standing order.
+- **After office hours, an urgent call also gets Homies' telephone emergency centre, 077-6687949** (the office number).
+  - "After hours" is outside Sun-Thu 09:00-17:00 Israel time, the client's hours in the facts. The inject says it, and Send's danger v6 keeps that one sentence, only then.
+  - In office hours nothing changes: the urgent call and its number only.
+  - Gas keeps the gas company's line at any hour.
+
 **After an emergency, Send's danger step guards only the emergency (6 Nov, epoch 97, danger v5).** It is awake on a turn that opened an urgent ticket or an emergency note, when the reply names the urgent ticket, or when a recent outbound message does and this turn's tools handled nothing else. A turn whose tools handled another matter (a note that is not an emergency, a ticket that is not urgent, a balance, a link, a service answer, a standing order) goes as the model wrote it. It appends one line only, "הקריאה הדחופה שלך פתוחה, מספר …".
 - **Why:** the Grok tester's C9. Awake on any message after an urgent ticket, it cut "הכי מהר" and "בזהירות" out of good replies and stuck the urgent ticket on each, which woke it again.
 
@@ -95,11 +109,11 @@ The user is the builder. The client is Homies.
 **A standing order is recorded and emailed to collections (the client, 4 Nov review; Yariv's change 3; live on WhatsApp 5 Nov, epoch 96, debt-tools v148).**
 - **Why email:** OXS's API has one-time payments only, so nothing of ours can set one up. Homies want the request by email, not in another system to watch.
 - **The bot:** one tool, `request_standing_order`, the moment a tenant asks for one, asks whether they can pay by one, or says yes. It replaces the link, the ticket and the note.
-  - It says it recorded the request, with its number. It names nobody who will call or set it up, and asks for no card or bank details.
+  - It says it recorded the request, with its number, and asks for no card or bank details. Since Yariv's 9 Nov review (epoch 100, built) it adds that someone from collections will phone; never when, never how it is set up.
   - A number on file is asked nothing. A number not on file is asked once for its full name, building and flat. The building gets open_request's answers.
 - **The record:** one open request per number, with the phone agent's marker (`oxs_ref` `standing_order`, type `other`). A second ask gets the same number and no second email. It is never mirrored into OXS.
 - **The email:** debt-tools posts to the n8n workflow "Homies — Standing order email" (`scripts/n8n_standing_order_email.py`), which sends it through Brevo, Chatwoot's relay. Supabase can't reach the mail ports, but n8n can.
-  - The address is `COLLECTIONS_EMAIL` in `.env`, written into the node at `--apply`. **Until Homies give theirs, it is our team inbox (clixteam579@gmail.com).**
+  - The address is `COLLECTIONS_EMAIL` in `.env`, written into the node at `--apply`. **Since 9 Nov it is Homies' own collections address, the one Yariv gave in his review (it was our team inbox before).** A test chat that asks for a standing order reaches them.
   - The sender is Brevo's verified `testclix46@gmail.com`, until Homies have their own.
 - **If OXS's API can start one** (the owner asked them on 5 Nov), this becomes the fallback, not the route.
 - **On the phone (8 Nov, after the chatbot, the owner's order; live: debt-tools v149, the incoming agent `10ae859a`):**
@@ -4928,7 +4942,8 @@ not what to do and not what not to do, even when asked directly what to do
 now: what the bot has to give is what it did and that the team knows. Why
 the direct question is named: the first pass forbade instructions and the
 model still answered "מה אני עושה עכשיו?" with a don't-list and "the team is
-on its way". The cost, stated: a resident in danger hears no number from
+on its way". **9 Nov, the client: after office hours an urgent call also gets Homies' own emergency
+line (the standing decisions at the top).** The cost, stated: a resident in danger hears no number from
 us. The client asked for exactly this.
 
 **A fault inside the resident's own flat is theirs (16 Sep, owner).** Common
@@ -4936,7 +4951,9 @@ property and the building's systems are tickets; the resident's fixtures
 (a blocked sink, a tap, an appliance, painting) are said to be theirs,
 kindly, with no ticket and an offer to help with something else; a fault of
 unclear origin (a leak from above, water in a wall) is the building's to
-check, so a ticket. Doubt goes to a ticket, never to a guess.
+check, so a ticket. Doubt goes to a ticket, never to a guess. **Superseded for water on 9 Nov by the
+client** (Yariv's review, 3.2): a leak in the flat needs the tenant's own professional first, unless it
+is known to come from the common property (the standing decisions at the top).
 
 **Voice verifies the building like chat does (16 Sep).** The webhook's gate
 is "the building came from the caller's words" (`!dialled(ctx)`), not the

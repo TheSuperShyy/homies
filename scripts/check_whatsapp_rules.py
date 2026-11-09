@@ -507,7 +507,9 @@ def added_this_turn(rd):
                     if tool in ("add_request_detail", "open_request") and ADDED_OK.search(str(s.get("observation"))):
                         return True
     return False
-TEAM_VOICE = re.compile(r"(?<![א-ת])(?!(?:מ|ב)צוות השירות)[א-ת]{0,3}צוות|(?<![א-ת])[א-ת]{0,3}הנהלה"
+# 9 Nov (n8n_whatsapp_feedback9.py): "someone from the collections team will phone you" is said on a
+# standing order, at the client's word, so "צוות הגבייה" is not someone acting in Michael's place.
+TEAM_VOICE = re.compile(r"(?<![א-ת])(?!(?:מ|ב)צוות השירות)(?!(?:מ|ב|ל)?צוות הגבייה)[א-ת]{0,3}צוות|(?<![א-ת])[א-ת]{0,3}הנהלה"
                         r"|(?<![א-ת])ו?[הל]מנהל(?![א-ת])"
                         r"|(?<![א-ת])[ושכ]?(העברתי|העברנו|אעביר|נעביר|יבדקו|יטפלו|יחזרו|יעדכנו|ידאגו"
                         r"|נבדוק|נטפל|נחזור|נעדכן|שנוכל)(?![א-ת])")

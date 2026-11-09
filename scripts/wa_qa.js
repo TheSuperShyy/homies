@@ -34,7 +34,8 @@ function build(X) {
     .map(([k, v]) => [k, compile(args, 'return (' + v + ');', k)]));
   return {
     isGreeting: compile(['text'], X.sort_greeting + NL + 'return isGreeting;', 'Sort greeting test'),
-    send: compile(['$json', '$'], 'return (' + X.send_body + ');', 'Send'),
+    // `$now` since 9 Nov (n8n_whatsapp_feedback9.py): danger v6 reads the office hours off the scenario's clock.
+    send: compile(['$json', '$', '$now'], 'return (' + X.send_body + ');', 'Send'),
     sendRest: compile(['$json', '$'], 'return (' + X.send_rest + ');', 'Send the rest'),
     two: compile(['$json', '$'], 'return (' + X.two_parts + ');', 'Two parts?'),
     reply: map(X.reply_usable, ['$json', '$runIndex', '$']),
@@ -149,7 +150,7 @@ function run(E, clock, o) {
 
   // Send, and the payment split.
   let sent;
-  try { sent = JSON.parse(E.send({ output: o.output || '' }, $)); } catch (e) { sent = { content: 'THREW ' + e.message }; }
+  try { sent = JSON.parse(E.send({ output: o.output || '' }, $, $now)); } catch (e) { sent = { content: 'THREW ' + e.message }; }
   let two = false;
   try { two = E.two({}, $) === true; } catch (e) { two = false; }
   const handset = [];

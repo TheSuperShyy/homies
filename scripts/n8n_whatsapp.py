@@ -230,7 +230,12 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 99
+MEMORY_EPOCH = 100
+# 99 -> 100, 9 Nov (n8n_whatsapp_feedback9.py, Yariv's written review of the simulated run): the lift company
+# repairs (said on opening, on "when?" and on the status) and the lift details asked; a leak in the flat is the
+# flat's until it is known to come from the common property; a standing order's tenant hears that collections
+# will phone; after office hours an urgent call also gets our emergency line, and the inject says when the
+# office is closed. With them, code: Send's danger v6 and promise v6.
 # 98 -> 99, 6 Nov (n8n_whatsapp_retest3.py, the tester's third run): the name after the system's greeting
 # to someone already in memory, the manager's "when" ends on the matter; with them, code: Send's ref v1
 # names the one ticket the tools gave, `Still the last word?` reads a burst after the menu whole, and the
@@ -796,8 +801,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "5043db415c92",   # docs/features/11-whatsapp-bot/prompt.md (6 Nov, epoch 99, the tester's third run)
-    "inject": "3670f71d14b9",   # LIVE's (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
+    "prompt": "b207c0f3f91a",   # docs/features/11-whatsapp-bot/prompt.md (9 Nov, epoch 100, Yariv's review)
+    "inject": "fd710a52a21b",   # LIVE's (9 Nov, epoch 100: the clock line says when the office is closed;
+    # n8n_whatsapp_feedback9.py). Before: 3670f71d14b9 (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in
     # n8n_whatsapp_untemplate.py is not folded yet
     # The five tool descriptions, via tools_text(). Added 1 Sep evening: a

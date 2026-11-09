@@ -229,7 +229,9 @@ Build it yourself from these rules (the production expression; keep the brackets
 - If the payment-ack model wrote an ack (see below): add ` [הודעה קצרה כבר יצאה אליו ממך ברגע
   זה: "<the ack>". היא כבר אצלו. אל תחזור עליה, אל תפתח שוב בזה שאתה בודק, ואם היא כבר בירכה
   והציגה אותך אל תעשה את זה שוב. ההודעה שאתה כותב עכשיו היא התשובה עצמה, הודעה אחת, בלי §§§.]`
-- Always last: ` [השעה בישראל עכשיו HH:mm, יום <weekday>.]` from the scenario's clock.
+- Always last: ` [השעה בישראל עכשיו HH:mm, יום <weekday>.]` from the scenario's clock. When that clock is
+  outside office hours (Friday, Saturday, or before 09:00 or from 17:00 on any other day; 9 Nov,
+  n8n_whatsapp_feedback9.py) it is ` [השעה בישראל עכשיו HH:mm, יום <weekday>, מחוץ לשעות הפעילות של המשרד.]`.
 
 The model's memory holds the last 12 messages of this conversation: the texts above as
 they were built (brackets included) and its own replies. Tool calls and results are not

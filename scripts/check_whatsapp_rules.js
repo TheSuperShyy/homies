@@ -28,7 +28,8 @@ function build(X) {
     .map(([k, v]) => [k, compile(args, 'return (' + v + ');', k)]));
   return {
     isGreeting: compile(['text'], X.sort_greeting + NL + 'return isGreeting;', 'Sort greeting test'),
-    send: compile(['$json', '$'], 'return (' + X.send_body + ');', 'Send'),
+    // `$now` since 9 Nov (n8n_whatsapp_feedback9.py): danger v6 reads the office hours; none reads as open.
+    send: compile(['$json', '$', '$now'], 'return (' + X.send_body + ');', 'Send'),
     reply: map(X.reply_usable, ['$json', '$runIndex', '$']),
     second: map(X.second_try, ['$json', '$runIndex', '$']),
     // 5 Oct: the last resort without a model (scripts/n8n_whatsapp_safetynet.py).
@@ -60,9 +61,9 @@ function turn(o) {
     'Say it now': { all: () => { if (!o.ackSent) throw new Error('unexecuted'); return [{ json: {} }]; } },
   };
   const $ = (name) => { if (!nodes[name]) throw new Error('no node ' + name); return nodes[name]; };
-  return { $json: o.canned ? { text: o.reply } : { output: o.reply }, $ };
+  return { $json: o.canned ? { text: o.reply } : { output: o.reply }, $, $now: o.now };
 }
-const sent = (E, o) => { const m = turn(o); return JSON.parse(E.send(m.$json, m.$)); };
+const sent = (E, o) => { const m = turn(o); return JSON.parse(E.send(m.$json, m.$, m.$now)); };
 const content = (E, o) => sent(E, o).content;
 
 function mask(s) {
@@ -798,7 +799,7 @@ function cases(E) {
         said: 'בר כוכבא 23. מה אני עושה בינתיים, לכבות חשמל??', steps: URGENT }), OPENED_LINE);
     // 6 Nov, danger v5 (n8n_whatsapp_retest.py): the step appends one line only, the plain one. "וזה הדבר
     // היחיד שאני יכול לעשות מכאן" was the line the owner disliked on 5 Nov; v4 still appended it to a question.
-    const V5 = String(P.code.send_body || '').indexOf("const dv = 'danger v5'") !== -1;
+    const V5 = /const dv = 'danger v[56]'/.test(String(P.code.send_body || ''));  // v6 (9 Nov) keeps v5's line
     const APPENDED = V5 ? 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.' : PUSHED;
     expect('pushed for a number to call: only the ticket line',
       say({ reply: 'אין לי מספר לתת לך להתקשר אליו ישירות, אבל הצוות עודכן ומטפל בזה. בבקשה תמשיך להישאר רחוק מהאזור המסוכן.',
@@ -843,7 +844,7 @@ function cases(E) {
       say({ reply: GAS, said: 'יש ריח של גז בחדר המדרגות', S: { last_bot: PUSHED } }), GAS);
     // 19 Oct, danger v4 (the "when will they come?" paragraph): who and whether,
     // under "I can't see / know", and a fronted "I can't promise", are honest.
-    if (/const dv = 'danger v[45]'/.test(String(P.code.send_body || ''))) {
+    if (/const dv = 'danger v[456]'/.test(String(P.code.send_body || ''))) {
       const WHO = 'פתחתי קריאה דחופה, 255-1349-26, והצוות כבר יודע על העשן. מי יבוא ומתי, את זה אני לא רואה מכאן. אני כאן איתך.';
       expect('v4: "who is coming and when, I can\'t see from here" stays whole', say({ reply: WHO, said: 'מישהו בא??', S: { last_bot: PUSHED } }), WHO);
       const WHETHER = 'אם ומתי מישהו מגיע, את זה אני לא יכול לדעת מכאן, כי את זה קובעים בצוות. ' + PUSHED;
@@ -1491,6 +1492,80 @@ function cases(E) {
     expect('mend: a second draft that is a copy too: the fixed line, never the copy',
       md2({ T: { first_truth_ok: false }, retry: ASK_NUM, rows: [ASK_NUM] }), FIX2);
     expect('mend: the same second draft with nothing sent before goes out', md2({ T: { first_truth_ok: false }, retry: ASK_NUM, rows: [] }), ASK_NUM);
+  }
+  // 9 Nov (scripts/n8n_whatsapp_feedback9.py): Yariv's written review of the simulated run.
+  const SB9 = String((P.code || {}).send_body || '');
+  const ob9 = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
+  const clock9 = (time, weekday) => ({ setZone: () => ({ toFormat: () => time, weekday }) });
+  if (SB9.indexOf("const dv = 'danger v6'") !== -1) {
+    console.log(NL + "--- Send: after hours an urgent call gets our emergency line too (9 Nov, Yariv's 6.2 / 6.3) ---");
+    const FRI = clock9('21:10', 5);
+    const EARLY = clock9('08:30', 1);
+    const SUN = clock9('12:20', 7);
+    const URG = [{ action: { tool: 'open_request', toolInput: { urgency: 'emergency' } }, observation: ob9({ ok: true, reference: '255-1349-26' }) }];
+    const OPEN9 = 'פתחתי לך קריאה דחופה, מספר 255-1349-26.';
+    const HOTL = 'מכיוון שעכשיו מחוץ לשעות הפעילות, אפשר להתקשר עכשיו למוקד החירום הטלפוני שלנו, 077-6687949.';
+    expect('after hours (Friday night): the ticket and our emergency line both stay',
+      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }), OPEN9 + ' ' + HOTL);
+    expect('before 09:00 on a weekday: the same',
+      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: EARLY }), OPEN9 + ' ' + HOTL);
+    expect('in office hours the line goes and the ticket stays',
+      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }), OPEN9);
+    expect('no clock (a replay, an old test) reads as open: the line goes',
+      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG }), OPEN9);
+    expect('after hours, any other number still goes',
+      () => content(E, { reply: OPEN9 + ' אפשר גם להתקשר למד"א ב-101.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }), OPEN9);
+    expect('after hours, advice in the same sentence as our line still goes',
+      () => content(E, { reply: OPEN9 + ' תתרחק מהמים ותתקשר למוקד שלנו, 077-6687949.', said: 'מה לעשות?', steps: URG, now: FRI }), OPEN9);
+    expect('after hours, pressed with no tool this turn: the line stays beside the urgent ticket',
+      () => content(E, { reply: 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + HOTL, said: 'מה לעשות??', S: { last_bot: OPEN9 }, now: FRI }),
+      'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + HOTL);
+    expect('after hours, "someone is on the way" still goes',
+      () => content(E, { reply: OPEN9 + ' הצוות כבר בדרך אלייך.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }), OPEN9);
+    // Yariv's own lift sentences (2.2 and 2.3) go out whole, even where this step is awake.
+    const HIGH = [{ action: { tool: 'open_request', toolInput: { urgency: 'high', type: 'elevator' } }, observation: ob9({ ok: true, reference: '255-1600-26' }) }];
+    const Y22 = "פתחתי את הקריאה בדחיפות גבוהה על המעלית בבר כוכבא 23, רשמתי אותה על דירה 2, מספר הקריאה בהומי'ז הוא 255-1600-26. "
+      + 'אנחנו מעבירים את המידע והמשך הטיפול לחברת המעליות, ועוקבים אחריה. יש עוד משהו שאפשר לעזור בו בינתיים?';
+    expect("Yariv's 2.2: the lift company sentence goes whole", () => content(E, { reply: Y22, said: 'בר כוכבא 23 דירה 2', steps: HIGH }), Y22);
+    const Y23 = 'אני מצטער, אבל זה לא תלוי בנו, זה תלוי בחברת המעליות האחראית על השירות והתחזוקה של המעלית, ואנחנו עושים את מירב המאמצים מולם. משהו השתנה מאז הבוקר?';
+    const LOOK = [{ action: { tool: 'get_request_status' }, observation: ob9({ ok: true, found: 1, requests: [{ reference: '255-1600-26', status: 'open' }] }) }];
+    expect("Yariv's 2.3: right after the lift ticket, his answer goes whole",
+      () => content(E, { reply: Y23, said: 'מתי מגיעים לתקן?', S: { last_bot: Y22 }, steps: LOOK }), Y23);
+  }
+  if (SB9.indexOf("const pv = 'promise v6'") !== -1) {
+    console.log(NL + "--- Send: a standing order's call from collections is no promise (9 Nov, Yariv's 5.2) ---");
+    const SOREC = { action: { tool: 'request_standing_order' }, observation: ob9({ ok: true, recorded: true, recorded_now: true, reference: '255-1392-26' }) };
+    const SOAGAIN = { action: { tool: 'request_standing_order' }, observation: ob9({ ok: true, already_recorded: true, reference: '255-1392-26' }) };
+    const CBK = 'רשמתי את הבקשה שלך להוראת קבע, מספר 255-1392-26, ומישהו מצוות הגבייה ייצור איתך קשר בטלפון. יש עוד משהו שאוכל לעזור בו?';
+    const BACK = 'רשמתי את הבקשה שלך להוראת קבע, מספר 255-1392-26, ומישהו מצוות הגבייה יחזור אליך בטלפון. יש עוד משהו שאוכל לעזור בו?';
+    expect('recorded this turn: "someone from collections will call you" stays', () => content(E, { reply: CBK, said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }), CBK);
+    expect('"will get back to you by phone" stays the same way', () => content(E, { reply: BACK, said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }), BACK);
+    expect('already recorded: the same', () => content(E, { reply: CBK, said: 'אפשר לעשות הוראת קבע?', steps: [SOAGAIN] }), CBK);
+    expect('recorded by the first pass, carried by Try again: the same', () => {
+      const m = turn({ reply: CBK, said: 'אפשר לעשות הוראת קבע?', steps: [] });
+      const $ = (nm) => (nm === 'Try again'
+        ? { first: () => ({ json: { first_steps: [{ tool: 'request_standing_order', observation: ob9({ ok: true, recorded: true, reference: '255-1392-26' }) }] } }) }
+        : m.$(nm));
+      return JSON.parse(E.send(m.$json, $)).content;
+    }, CBK);
+    expect('no standing order this turn: the same promise is still cut',
+      () => content(E, { reply: CBK, said: 'אפשר לעשות הוראת קבע?', steps: [] }).indexOf('ייצור איתך קשר') === -1, true);
+    expect('a standing order turn does not let "soon" through',
+      () => content(E, { reply: CBK.replace('בטלפון', 'בקרוב'), said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }).indexOf('בקרוב') === -1, true);
+    expect('a standing order turn does not let "we will call you" through',
+      () => content(E, { reply: CBK.replace('ומישהו מצוות הגבייה ייצור איתך קשר', 'וניצור איתך קשר'), said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }).indexOf('ניצור איתך קשר') === -1, true);
+  }
+  if (String((P.code || {}).inject || '').indexOf('מחוץ לשעות הפעילות של המשרד') !== -1) {
+    console.log(NL + '--- the inject: the clock line says when the office is closed (9 Nov) ---');
+    const at = (time, weekday) => String(E.inject({ greeted: true, text: 'x', tap_now: false }, clock9(time, weekday), who$()));
+    expect('Sunday 12:20: open, nothing said', () => at('12:20', 7).includes('מחוץ לשעות'), false);
+    expect('Thursday 16:59: open', () => at('16:59', 4).includes('מחוץ לשעות'), false);
+    expect('Thursday 17:00: closed', () => at('17:00', 4).includes('מחוץ לשעות הפעילות של המשרד'), true);
+    expect('Monday 08:59: closed', () => at('08:59', 1).includes('מחוץ לשעות'), true);
+    expect('Monday 09:00: open', () => at('09:00', 1).includes('מחוץ לשעות'), false);
+    expect('Friday noon: closed', () => at('12:00', 5).includes('מחוץ לשעות'), true);
+    expect('Saturday noon: closed', () => at('12:00', 6).includes('מחוץ לשעות'), true);
+    expect('the bracket still closes and the text follows', () => at('21:10', 5).includes(', מחוץ לשעות הפעילות של המשרד.]' + NL + 'x'), true);
   }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;

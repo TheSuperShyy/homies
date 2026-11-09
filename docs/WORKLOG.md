@@ -11,6 +11,53 @@ conversation that produced it.
 
 ## 2026-11-09
 
+### BUILT, not live (epoch 100): Yariv's written review of the simulated run (owner: "Feedbacks", 13 screenshots of the "Michael Simulated Run" page)
+- **What the screenshots are:** Yariv's marks and comments on the 3 Nov simulated run (`local/artifacts/michael-simulation`), which live only in his browser.
+  - Marked wrong: 2.2, 2.3, 3.2 (the address turn), 4.1, 5.2.
+  - Marked right, with a note: 2.1, 5.1 (his note only repeats the line: nothing to change), 7.2.
+  - Not marked, with a comment: 1.1, 2.4, 6.2, 6.3.
+- **Read against today's bot, not the run.** The run is from 3 Nov. Since then gas gets the gas company's line (5 Nov). The 7.2 sentence he wanted a comma in ("…כבר רשומה.") has been cut since 8 Nov by manager v2: Michael no longer tells the tenant a manager request is recorded.
+- **His asks, and what was built** (`scripts/n8n_whatsapp_feedback9.py`, epoch 99 -> 100):
+  - **The lift (2.1-2.4, 4.1).**
+    - A facts line: the lift company that services and maintains the lift does the repair. Homies opens the call, passes the details and the handling to it, follows the call and presses them; when they come depends on them.
+    - The tenant hears it when a lift call opens (with "the call number at Homies"), on "when?", on the status, and again on a second "when".
+    - What is still missing is asked: what is happening, which lift when there is more than one, the floor it is stuck on.
+  - **Water in a flat (3.2).** "ומה שלא ברור ממי בא, נזילה מלמעלה, מים בקיר, הבניין בודק: קריאה" is replaced.
+    - A leak or damp inside the flat, even from the ceiling or a wall, is an event in the private flat: first a professional on the tenant's behalf.
+    - Michael says so gently and asks whether it is known to come from the common property (the main pipe, the roof). If it is, he opens a call.
+    - open_request's fault_location no longer names "the flat above" a building fault. This supersedes the owner's 16 Sep rule (CONTEXT).
+  - **The standing order (5.2).** The prompt and request_standing_order: the tenant hears that someone from the collections team will phone him, never when. Send's promise v6 keeps "ייצור איתך קשר" / "יחזור אליך" only on a turn whose tools recorded a standing order.
+  - **After hours (6.2, 6.3).**
+    - The inject's clock line adds ", מחוץ לשעות הפעילות של המשרד" outside Sun-Thu 09:00-17:00, Israel time.
+    - Then the prompt adds Homies' telephone emergency centre, 077-6687949, to an urgent call, and to the answer when the tenant presses.
+    - Send's danger v6 keeps a sentence whose only "advice" is that number and a verb of calling, after hours only. Any other number, advice or "on the way" still goes.
+    - Gas is unchanged: the gas company's line, at any hour.
+  - **The two exceptions are named:** the one-voice sentence names the lift company and the collections team; "nobody is sent anywhere" names gas and an urgent fault after hours.
+  - **Measured:** the prompt went from 24,527 to 25,958 characters.
+- **Checked:**
+  - The gate on the candidate passes 560/560 cases. 25 are new: 10 for danger v6 (Yariv's own 2.2 and 2.3 sentences go out whole), 7 for promise v6 and 8 for the inject's hours.
+  - The replay: 0 of 1,355 resident messages change through Sort and the notes, 0 of 1,405 replies through Send, and 0 guard verdicts.
+  - Only the four pins wait: the prompt, the inject, open_request and request_standing_order.
+  - The gate on live: 537/537, and all 17 pins unchanged. The new cases run only on v6.
+  - **Harness changes:**
+    - Send gets `$now` in check_whatsapp_rules.js and wa_qa.js; a missing one reads as office hours.
+    - Two old danger cases keyed to "v5" exactly now take v5 or v6, and the v4 block takes v4 to v6.
+    - wa_qa's player text gives the after-hours clock line.
+    - `--watch` no longer flags "צוות הגבייה".
+  - **Running:** a blind Claude-played run of `scripts/wa_qa_feedback9.json` on the candidate (5 scenarios: the lift arc, the leak, the standing order, a flood on Friday night and the same flood on Sunday noon). Its grade decides the pins and the apply.
+- **Repo vs live:** the repo carries epoch 100's prompt (`prompt.md`, taken by the auto housekeeping commit 64ce5c2) and `MEMORY_EPOCH = 100`. Live and the UChat copy are still epoch 99.
+
+### LIVE: standing-order requests email Homies' collections address (Yariv's 5.2)
+- `COLLECTIONS_EMAIL` in `.env` is now the address Yariv wrote. The old `.env` is in `local/env-backups/.env.before-collections-09nov`.
+- `python scripts/n8n_standing_order_email.py --apply --publish` updated "Homies — Standing order email" (`qwFc7ObfclFHMsuD`) in place. Read back, the node's address is his and the workflow is active.
+- No test email was sent: `--test` would write to their inbox.
+- From now on a test chat that asks for a standing order, the tester's C6.2 included, emails Homies' collections.
+
+### Not changed, answered instead (a draft for Yariv, given to the owner)
+- **1.1, "why does a hello get these two buttons first?":** the fixed opening the system sends without AI, with the two commonest actions as shortcuts; typing anything works too. The choice is his: no buttons, or other or more (up to three, for example the committee payment).
+- **7.2, "how does the manager request work, where does it go?":** the chat is tagged and assigned to the department's group in the team inbox, with a note of what the tenant asked. Staff answer in the same chat, and the bot stops once a person answers. Until then Michael keeps helping.
+- **Asked back:** gas after hours (only the gas company's line, or the emergency line too), and whether Sun-Thu 09:00-17:00 are the hours to use.
+
 ### LIVE: the dialer test page on Omni's lead API, with the new lead token (the owner pasted the token: "here it is")
 - **Token:** 323 characters, `eyJ…`. Its claims say issued 8 Nov 2026, expires 8 Nov 2027. Written to `.env` and `dashboard/.env.local` (one `TOKOMNI_TOKEN` line each, read back equal) and never printed.
 - **Checked without a lead:** `POST https://api.tokomni.cc/api/v1/dialer/campaign/` with the body `[]` gives 400 "No JSON data provided". The same with a wrong token gives 401 "Invalid or expired access token". So the token passes their check.

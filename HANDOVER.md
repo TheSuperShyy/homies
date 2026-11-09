@@ -8,6 +8,21 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **BUILT, not live: epoch 100, Yariv's written review of the simulated run** (`scripts/n8n_whatsapp_feedback9.py`; owner: "Feedbacks"; WORKLOG 9 Nov, CONTEXT has the rules).
+>   - **What:** the lift company line and the lift details asked; water in a flat is the flat's first; a standing order's callback by collections (promise v6); Homies' emergency line after hours (the inject's office-hours mark, danger v6).
+>   - **The repo is ahead of live.** `prompt.md` and `MEMORY_EPOCH = 100` are epoch 100's. Live and the UChat copy are epoch 99 (`-99`, `-99-uchat`).
+>   - **Checked:** the gate on the candidate passes 560/560, and the replay changes nothing (0 of 1,405 replies). The gate on live passes 537/537 with its 17 pins.
+>   - **To finish:**
+>     1. Grade the blind Claude-played run: `python scripts/wa_qa.py grade --run <scratchpad>/qa9`, then `report` (deck `scripts/wa_qa_feedback9.json`).
+>     2. If it is clean, set the four pins in `check_whatsapp_rules.py`: prompt `b207c0f3f91a`, inject `fd710a52a21b`, open_request `27c544f39122`, request_standing_order `9d18f612c2fd`.
+>     3. `python scripts/n8n_whatsapp_feedback9.py --apply`, then the gate on live.
+>     4. `python scripts/n8n_uchat.py --apply`, then read both back.
+>   - **Rollback after the apply:** `python scripts/n8n_whatsapp_feedback9.py --restore` (the snapshot `local/n8n-whatsapp-live-09nov-before-feedback9.json` is written at apply), then `n8n_uchat.py --apply`, and put `MEMORY_EPOCH`, `EPOCH_COVERS` and `prompt.md` back.
+>   - **Owed after live:** the owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault after 17:00. The phone agent follows the chatbot, on the owner's word.
+>   - **For Yariv (drafted to the owner):** the 1.1 menu is his decision (no buttons, or other or more); gas after hours (the gas company's line only, or the emergency line too); whether Sun-Thu 09:00-17:00 are the hours to use.
+>
+> **LIVE 9 Nov: standing-order requests email Homies' collections** (Yariv's 5.2). `COLLECTIONS_EMAIL` in `.env` is his address. "Homies — Standing order email" (`qwFc7ObfclFHMsuD`) was read back with it, active. No test email was sent. A test chat that asks for a standing order now reaches Homies' inbox.
+>
 > **LIVE 9 Nov: the "ticket closed" message on the UChat number** (owner: "ok fix the sync on the uchat").
 >   - `wa_templates.py --waba 2117787955519632` shows `ticket_resolved_he` APPROVED at Meta, alongside `payment_link_he`. UChat's own list still had only the payment link.
 >   - UChat's `POST /whatsapp-template/sync` answered 200 `{"status":"ok"}`. Read back, `/whatsapp-template/list` lists both templates APPROVED.
@@ -144,7 +159,7 @@ appended to.
 >   - **Proven without AI:** a probe from the owner's +63 recorded 255-1392-26, and Brevo accepted the email for the team inbox (n8n run 156199). A second ask returned the same number and sent nothing. 255-1392-26 was then set to cancelled, so the owner's handset test runs the whole path.
 >   - **Claude-played:** 3 conversations, 16/16 expectations (`scripts/wa_qa_standing.json`). The gate is all green on live, with 441 cases and 0 of 1,183 replies changed.
 >   - **Waiting on the owner:**
->     - Homies' collections email address. Set `COLLECTIONS_EMAIL` in `.env`, then `python scripts/n8n_standing_order_email.py --apply`. It goes to clixteam579@gmail.com until then.
+>     - ~~Homies' collections email address~~ done 9 Nov: Yariv gave it, `.env` has it and the workflow was re-applied (the block at the top).
 >     - The handset test from the +63: "אפשר לעשות הוראת קבע?", then check that inbox.
 >   - **Rollback:** `n8n_whatsapp_standing.py --restore`, then `n8n_uchat.py --apply`. The function's path is harmless without the tool.
 >   - **The phone agent** still records the request without an email, until its version is built.
