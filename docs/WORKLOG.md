@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-09
 
+### The 11/9 report (in chat, `/reporter`)
+- Given in chat: 9 done bullets and 2 Will lines.
+  - Done: Yariv's review live on the WhatsApp assistant, with answers to his questions; the elevator company and the lift details; a leak in a flat needs the tenant's own plumber first; standing orders to Homies' collections email with the callback line; the emergency line after office hours; the "ticket closed" message synced into UChat; the Google Form for the test chats; the dialer page live on Omnitelecom's new lead system; their dialer never rang, nothing on our side in the way.
+  - Will: the owner's phone tests and the office hours with Yariv; the dialer again once Omnitelecom answers.
+  - Left out: the read-only check of where reviewers' marks are saved.
+
 ### LIVE (epoch 100): Yariv's written review of the simulated run (owner: "Feedbacks", 13 screenshots of the "Michael Simulated Run" page)
 - **What the screenshots are:** Yariv's marks and comments on the 3 Nov simulated run (`local/artifacts/michael-simulation`), which live only in his browser.
   - Marked wrong: 2.2, 2.3, 3.2 (the address turn), 4.1, 5.2.
