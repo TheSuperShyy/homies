@@ -28,7 +28,16 @@ appended to.
 >     - C5.5 answered "I don't remember the fault" with show_menu and a feminine line copied from C10.6 ("הנה האפשרויות שלנו, תוכלי…"), after the tenant had written in the masculine twice.
 >     - C5.3's feminine is C10's Noa, carried on the one number, as designed.
 >
-> **8 Nov, later: Omni answered about the dialer's 404s, and the dialer test page is rebuilt for their lead API. Built, not live** (their email: `local/omnitelecom/2026-11-08-lead-api-v1.txt`). The 404s since 29 Oct were Omni's: the address in their first document was wrong, and the 27 Oct token was a dashboard token, which they have deleted.
+> **LIVE 9 Nov, 08:49-08:52 UTC: the dialer test page on Omni's lead API, with the new lead token** (the owner pasted the token).
+>   - **The token** (323 characters, `eyJ…`, issued 8 Nov, expires 8 Nov 2027) is in `.env` and `dashboard/.env.local`, and in Vercel's `TOKOMNI_TOKEN`. That entry is sensitive, for production and preview, PATCHed with `VERCEL_ADMIN_KEY` and read back updated at 08:49 UTC.
+>   - **Checked without a lead:** `POST []` with the token gives 400 "No JSON data provided"; a wrong token gives 401 "Invalid or expired access token".
+>   - **PR #9 merged as `088ca4c`.** Vercel built production from it ("Deployment has completed"), after the token was set.
+>   - **Owed, in order:**
+>     1. The owner presses Ring once on `/dialer` for a staff phone, in calling hours.
+>     2. `python scripts/tokomni_lead.py --check`: does Vapi show `X-External-Id`?
+>     3. A reply to Omni with the exact time sent.
+>
+> **8 Nov, later: Omni answered about the dialer's 404s, and the dialer test page is rebuilt for their lead API. Built, not live** (made live 9 Nov, the entry above) (their email: `local/omnitelecom/2026-11-08-lead-api-v1.txt`). The 404s since 29 Oct were Omni's: the address in their first document was wrong, and the 27 Oct token was a dashboard token, which they have deleted.
 >   - **Built:**
 >     - PR #9 (`fix/dialer-api-v1`) has CI green and a Vercel preview built. It is **not merged**.
 >     - The page sends to `api.tokomni.cc/api/v1/dialer/campaign/` with the token as a Bearer header. A press counts as sent only on a 200 that took the lead.

@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-09
 
+### LIVE: the dialer test page on Omni's lead API, with the new lead token (the owner pasted the token: "here it is")
+- **Token:** 323 characters, `eyJ…`. Its claims say issued 8 Nov 2026, expires 8 Nov 2027. Written to `.env` and `dashboard/.env.local` (one `TOKOMNI_TOKEN` line each, read back equal) and never printed.
+- **Checked without a lead:** `POST https://api.tokomni.cc/api/v1/dialer/campaign/` with the body `[]` gives 400 "No JSON data provided". The same with a wrong token gives 401 "Invalid or expired access token". So the token passes their check.
+- **Vercel:** the one `TOKOMNI_TOKEN` entry (sensitive, production and preview, last set 28 Oct) was PATCHed with `VERCEL_ADMIN_KEY`. Read back, it was updated at 08:49 UTC.
+- **PR #9:** CLEAN and green, merged as `088ca4c` (squash). Main's Vercel status for homies-dashboard reads "Deployment has completed". The token was set before the merge, so the production build carries it.
+- **Owed:** the owner's Ring on `/dialer` for a staff phone in calling hours, then `tokomni_lead.py --check`, then the time to Omni.
+
 ### Read only: are Yariv's marks on "Michael Simulated Run" saved? (owner: "can you check if the artifact yariv did comment on save on our database")
 - **Not in our database, by design.** The page writes nothing to Supabase. Its marks go to the artifact's own database on claude.ai (`marks/<viewer id>`) when the viewer may write, else to that viewer's own browser (localStorage `homies-michael-simulation-v1`). It has no results export.
 - **Not readable from this session's login:**

@@ -3730,6 +3730,9 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **external_id:** up to 64 characters from A-Z a-z 0-9 - _ . : (ours is 52). It reaches the bot as the SIP header `X-External-Id`.
     - **Omni recommends staying on the dialer**, not SIP out through 208 or their click-to-call. It has redial attempts, a blacklist and lead reports. Their next step is a health check: one lead to a staff member's phone, the exact time sent to them, and a look on Vapi for `X-External-Id`.
     - `scripts/tokomni_lead.py` sends one test lead from בר כוכבא 23, with the resident id and the moment as the external_id.
+    - **Live since 9 Nov:** the lead token is in `.env`, `dashboard/.env.local` and Vercel, and PR #9 is merged (`088ca4c`).
+      - A token is checked without adding a lead by `POST []`: 400 "No JSON data provided" means it is accepted, 401 "Invalid or expired access token" means it is not.
+      - Vercel's `TOKOMNI_TOKEN` is sensitive, so it is changed by PATCHing its entry's value (`VERCEL_ADMIN_KEY`). It cannot be read back, only its `updatedAt`. Then production must build again (a merge to `main` does it).
   - **List 2 stays on all the time,** so a new lead is rung at once, at any hour. Omni has no calling hours, so our side sends only in calling hours.
   - **Omni's three rules for List 2:**
     - It needs Play pressed once.
