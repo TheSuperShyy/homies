@@ -44,7 +44,7 @@ The user is the builder. The client is Homies.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
 - **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
-**Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; built as epoch 100 by `n8n_whatsapp_feedback9.py`; live once its check passes, see HANDOVER).**
+**Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; live 9 Nov as epoch 100 by `n8n_whatsapp_feedback9.py`, on live and the UChat copy).**
 - **The lift company repairs a lift.** Homies opens the call, passes the details and the handling to the company that services and maintains the lift, follows the call and presses them; when they come depends on them.
   - The tenant hears it when a lift call opens (with the call number at Homies), on "when?" and on its status. On a second "when" the lift company stays in the answer, beside what Michael does now (a check, a note that he is waiting): the prompt's general "not the same reason twice" gives way here, and the lift line says so outright.
   - This and the collections call below are the only places someone other than Michael appears, and the one-voice sentence names them. They are the client's account of his own process, so they are true. Everywhere else, one voice holds.
@@ -109,7 +109,7 @@ The user is the builder. The client is Homies.
 **A standing order is recorded and emailed to collections (the client, 4 Nov review; Yariv's change 3; live on WhatsApp 5 Nov, epoch 96, debt-tools v148).**
 - **Why email:** OXS's API has one-time payments only, so nothing of ours can set one up. Homies want the request by email, not in another system to watch.
 - **The bot:** one tool, `request_standing_order`, the moment a tenant asks for one, asks whether they can pay by one, or says yes. It replaces the link, the ticket and the note.
-  - It says it recorded the request, with its number, and asks for no card or bank details. Since Yariv's 9 Nov review (epoch 100, built) it adds that someone from collections will phone; never when, never how it is set up.
+  - It says it recorded the request, with its number, and asks for no card or bank details. Since Yariv's 9 Nov review (epoch 100) it adds that someone from collections will phone; never when, never how it is set up.
   - A number on file is asked nothing. A number not on file is asked once for its full name, building and flat. The building gets open_request's answers.
 - **The record:** one open request per number, with the phone agent's marker (`oxs_ref` `standing_order`, type `other`). A second ask gets the same number and no second email. It is never mirrored into OXS.
 - **The email:** debt-tools posts to the n8n workflow "Homies — Standing order email" (`scripts/n8n_standing_order_email.py`), which sends it through Brevo, Chatwoot's relay. Supabase can't reach the mail ports, but n8n can.

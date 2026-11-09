@@ -11,7 +11,7 @@ conversation that produced it.
 
 ## 2026-11-09
 
-### BUILT, not live (epoch 100): Yariv's written review of the simulated run (owner: "Feedbacks", 13 screenshots of the "Michael Simulated Run" page)
+### LIVE (epoch 100): Yariv's written review of the simulated run (owner: "Feedbacks", 13 screenshots of the "Michael Simulated Run" page)
 - **What the screenshots are:** Yariv's marks and comments on the 3 Nov simulated run (`local/artifacts/michael-simulation`), which live only in his browser.
   - Marked wrong: 2.2, 2.3, 3.2 (the address turn), 4.1, 5.2.
   - Marked right, with a note: 2.1, 5.1 (his note only repeats the line: nothing to change), 7.2.
@@ -52,13 +52,19 @@ conversation that produced it.
       - The flood after hours: the urgent call and 077-6687949, both times, with no advice. In hours: the urgent call only.
     - **One miss, fixed:** on the second "נו אז מתי??" (Yariv's 2.4) the reply did something new but dropped the lift company. The prompt's general "not the same reason twice" won over the lift line's "גם כשהוא שואל שוב".
       - The lift line now says it outright: "וגם כשהוא שואל שוב מתי, חברת המעליות נשארת בתשובה, לצד מה שאתה עושה עכשיו בשבילו". The prompt is 26,021 characters, `fbca40b23dd0`; the gate still passes 560/560.
-      - A one-scenario blind re-run of the lift is running.
+      - **The blind re-run of the lift passed 4/4, with no flag and no guard rejection.** The second "נו אז מתי??" noted that he is waiting and added "ההגעה עצמה בידיים של חברת המעליות, ושעה עדיין אין לי". The opening now also said the flat ("ורשמתי אותה על דירה 2").
       - CONTEXT keeps the lesson under "How a prompt fault is fixed": a general rule beats a softer specific one, so the specific line names what stays.
     - **The rubric** (`wa_qa.py`) flagged the after-hours line "office-unasked". It now allows Homies' number after hours on a reply that names an urgent call.
     - **Seen, not changed:**
       - Three "name-mid-conversation" flags come from the deck: a chat marked mid-conversation with nothing in memory.
       - Danger's ARRIVE cut "אתה יודע מאיפה בדיוק המים יוצאים…?" from the in-hours flood. It reads "יוצאים" as someone coming out; that was so before this change too.
-- **Repo vs live:** the repo carries epoch 100's prompt (`prompt.md`, taken by the auto housekeeping commit 64ce5c2) and `MEMORY_EPOCH = 100`. Live and the UChat copy are still epoch 99.
+- **Pins:** prompt `fbca40b23dd0`, inject `fd710a52a21b`, open_request `27c544f39122`, request_standing_order `9d18f612c2fd`. The gate on the candidate then passed: 17/17 pins, 560/560.
+- **Applied:**
+  - `n8n_whatsapp_feedback9.py --apply` wrote live, after a snapshot in `local/n8n-whatsapp-live-09nov-before-feedback9.json`. A second run reports nothing to do.
+  - The gate on live passes 560/560 with 17/17 pins.
+  - `n8n_uchat.py --apply` regenerated the UChat copy. The translator `FIVPZiM5udeXFacS`, the hand-over `EYePE3S0E6t1kojj` and the bot `mKheBsTxtcMhPxu7` are all active.
+- **Read back, live and the UChat copy:** active; prompt `fbca40b23dd0`; memory `-100` and `-100-uchat`; danger v6 and promise v6 in Send; the hours mark in the inject; the callback in request_standing_order; all 17 pins equal.
+- **Owed:** the owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault after 17:00. The phone agent follows on the owner's word.
 
 ### LIVE: standing-order requests email Homies' collections address (Yariv's 5.2)
 - `COLLECTIONS_EMAIL` in `.env` is now the address Yariv wrote. The old `.env` is in `local/env-backups/.env.before-collections-09nov`.

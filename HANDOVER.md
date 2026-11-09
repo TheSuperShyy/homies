@@ -8,19 +8,26 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **BUILT, not live: epoch 100, Yariv's written review of the simulated run** (`scripts/n8n_whatsapp_feedback9.py`; owner: "Feedbacks"; WORKLOG 9 Nov, CONTEXT has the rules).
->   - **What:** the lift company line and the lift details asked; water in a flat is the flat's first; a standing order's callback by collections (promise v6); Homies' emergency line after hours (the inject's office-hours mark, danger v6).
->   - **The repo is ahead of live.** `prompt.md` and `MEMORY_EPOCH = 100` are epoch 100's. Live and the UChat copy are epoch 99 (`-99`, `-99-uchat`).
->   - **Checked:** the gate on the candidate passes 560/560, and the replay changes nothing (0 of 1,405 replies). The gate on live passes 537/537 with its 17 pins.
->   - **The blind Claude-played run:** 21/21 expectations, no guard rejection. Its one miss, the lift company dropped on a second "when", is fixed in the lift line; a one-scenario re-run of the lift is running. CONTEXT ("How a prompt fault is fixed") keeps the lesson: a general rule beats a softer specific "again".
->   - **To finish:**
->     1. Grade the lift re-run: `python scripts/wa_qa.py grade --run <scratchpad>/qa9b --deck <scratchpad>/deck-lift9.json`.
->     2. If its second "when" names the lift company, set the four pins in `check_whatsapp_rules.py`: prompt `fbca40b23dd0`, inject `fd710a52a21b`, open_request `27c544f39122`, request_standing_order `9d18f612c2fd`.
->     3. `python scripts/n8n_whatsapp_feedback9.py --apply`, then the gate on live.
->     4. `python scripts/n8n_uchat.py --apply`, then read both back.
->   - **Rollback after the apply:** `python scripts/n8n_whatsapp_feedback9.py --restore` (the snapshot `local/n8n-whatsapp-live-09nov-before-feedback9.json` is written at apply), then `n8n_uchat.py --apply`, and put `MEMORY_EPOCH`, `EPOCH_COVERS` and `prompt.md` back.
->   - **Owed after live:** the owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault after 17:00. The phone agent follows the chatbot, on the owner's word.
->   - **For Yariv (drafted to the owner):** the 1.1 menu is his decision (no buttons, or other or more); gas after hours (the gas company's line only, or the emergency line too); whether Sun-Thu 09:00-17:00 are the hours to use.
+> **LIVE 9 Nov: epoch 100, Yariv's written review of the simulated run** (`scripts/n8n_whatsapp_feedback9.py`; owner: "Feedbacks"; WORKLOG 9 Nov, CONTEXT has the rules). Live and the UChat copy, both read back.
+>   - **What:**
+>     - The lift company is named on opening, on "when?" (a second one too) and on the status, and the lift details are asked.
+>     - Water in a flat needs the tenant's professional first, unless it is known to come from the common property.
+>     - A standing order's tenant hears collections will phone (promise v6).
+>     - Homies' emergency line, 077-6687949, comes with an urgent call outside Sun-Thu 09:00-17:00 (the inject's office-hours mark, danger v6).
+>   - **Read back, live (`u2JjrbcNPYyyh3yl`) and the UChat copy (`mKheBsTxtcMhPxu7`):** active; prompt `fbca40b23dd0` (26,021 characters); memory `-100` and `-100-uchat`; danger v6 and promise v6 in Send; the hours mark in the inject; the callback in request_standing_order; all 17 pins equal.
+>   - **Checked:**
+>     - The gate on live passes 560/560 with 17/17 pins. The replay changed 0 of 1,405 real replies.
+>     - The blind Claude-played run passed 21/21; its one miss (a second "when" without the lift company) is fixed. A blind re-run of the lift passed 4/4, with no flag.
+>     - A Claude run checks the logic, not Gemini's own wording.
+>   - **Rollback:** `python scripts/n8n_whatsapp_feedback9.py --restore` (snapshot `local/n8n-whatsapp-live-09nov-before-feedback9.json`), then `python scripts/n8n_uchat.py --apply`. Then revert this commit's `MEMORY_EPOCH`, `EPOCH_COVERS`, `prompt.md` and pins.
+>   - **Every tenant's memory started fresh** with the epoch, as each prompt change does.
+>   - **Owed:**
+>     - The owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault after 17:00 (the after-hours line shows only then).
+>     - The phone agent gets the same changes after the chatbot, on the owner's word.
+>   - **For Yariv (drafted to the owner):**
+>     - The 1.1 menu is his decision: no buttons, or other or more.
+>     - Gas after hours: the gas company's line only, or the emergency line too.
+>     - Whether Sun-Thu 09:00-17:00 are the hours to use.
 >
 > **LIVE 9 Nov: standing-order requests email Homies' collections** (Yariv's 5.2). `COLLECTIONS_EMAIL` in `.env` is his address. "Homies — Standing order email" (`qwFc7ObfclFHMsuD`) was read back with it, active. No test email was sent. A test chat that asks for a standing order now reaches Homies' inbox.
 >

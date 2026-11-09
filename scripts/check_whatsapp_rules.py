@@ -117,7 +117,8 @@ PINS = {
     # inject cases and by Node runs of Show the photos (a photo before the words, one before the last reply,
     # Sort's own, a failed download, five photos with a PDF among them). What Gemini makes of a real photo is
     # the owner's handset test, not a Claude play: Claude cannot stand in for the model's eyes.
-    'Answer the resident / input': '3670f71d14b9',
+    # 9 Nov (n8n_whatsapp_feedback9.py, epoch 100): the clock line says when the office is closed.
+    'Answer the resident / input': 'fd710a52a21b',
     'add_request_detail / tool': 'b2fc05691540',
     # 5 Oct (n8n_whatsapp_straight.py, epoch 74): the prompt and get_balance's
     # text, after a Claude-played check of 11 situations through the would-be
@@ -211,7 +212,12 @@ PINS = {
     # chat in memory, both opened "כאן מיכאל מהומי'ז"; the manager's when named 255-1405-26 with no
     # "recorded", its question on the stairwell ("יש עוד משהו על חדר המדרגות שחשוב לך שאוסיף לקריאה?", the
     # deck's one miss, on its words); 11/12.
-    'Answer the resident / system': '5043db415c92',
+    # 9 Nov (n8n_whatsapp_feedback9.py, epoch 100, Yariv's written review of the simulated run): the lift
+    # company, the lift details, water in a flat, the standing order's call from collections, the emergency
+    # line after hours. Claude-played blind on the candidate (scripts/wa_qa_feedback9.json): 5 conversations,
+    # 13 turns, 21/21, no guard rejection; its one miss (a second "when" without the lift company) was fixed
+    # in the lift line and a blind re-run of the lift went 4/4 with no flag.
+    'Answer the resident / system': 'fbca40b23dd0',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -230,7 +236,7 @@ PINS = {
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
     'get_payment_link / tool': '2dd75e741bfc',   # 5 Nov, epoch 96: a standing order is not a link
-    'request_standing_order / tool': '37ade364721f',   # 5 Nov, epoch 96: new (n8n_whatsapp_standing.py)
+    'request_standing_order / tool': '9d18f612c2fd',   # 5 Nov, epoch 96: new; 9 Nov, epoch 100: collections will phone
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
@@ -241,7 +247,8 @@ PINS = {
     # after need_name, once (the owner: "ok we need to include the name in that wtf"); debt-tools v138
     # names a tenant on file from the record and asks the rest (NAME_REQUIRED_CHANNELS voice,whatsapp).
     # 5 Nov (n8n_whatsapp_gas.py, epoch 95): urgency's emergency no longer lists gas; gas is never a ticket.
-    'open_request / tool': '754a2e751e63',
+    # 9 Nov (n8n_whatsapp_feedback9.py, epoch 100): fault_location no longer names "the flat above" a building fault.
+    'open_request / tool': '27c544f39122',
     'show_menu / tool': '427d364be55d',
     'verify_address / tool': 'a2a85a3d4068',
 }
