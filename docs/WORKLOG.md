@@ -25,6 +25,11 @@ conversation that produced it.
   - What it did: opened `https://script.new` in the default browser, a new Apps Script project in the owner's Google account.
   - It also put the script on the clipboard. `Set-Clipboard` failed, but `clip` worked with the text written as UTF-16 with a BOM: 15,881 characters read back, equal to the file.
   - Left to the owner: paste, save, Run `createMichaelForm`, allow.
+- **Made, 08:32 UTC (16:32 PH, the owner's screenshots):**
+  - The first run did nothing. The paste had gone inside the new project's `myFunction`, so `createMichaelForm` was nested and not in the menu, and `myFunction` ran empty.
+  - After Ctrl+A and a fresh paste, `createMichaelForm` ran in 44 s and logged both links.
+  - The reviewers' link, fetched signed out, answers 200 with the title "Michael Simulated Run" and the 30 questions, so people outside the account can fill it in.
+  - The links are kept in `local/artifacts/michael-simulation/form/links.txt`, not in the public repo.
 
 ### LIVE: the "ticket closed" template synced into UChat (owner: "ok fix the sync on the uchat")
 - **Why:** asked what is left on the chatbot, the read showed that Meta had approved `ticket_resolved_he` on the UChat number's account (`wa_templates.py --waba 2117787955519632`). UChat's own list (`POST /whatsapp-template/list`) still had only `payment_link_he`.

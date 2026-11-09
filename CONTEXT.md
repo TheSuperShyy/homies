@@ -728,6 +728,7 @@ which the owner runs once in script.google.com. It makes the form ("Michael Simu
 name, then for each of the 30 steps a required ✓ / ✗ and a comment) and logs its two links. It reads the 30
 steps from `index.html`, the published build. `build.py` no longer runs, because the checklist it reads has
 renamed its gas and emergency tests since 3 Nov. Each run of the script makes a new form.
+- **Made 9 Nov.** Its links are in `form/links.txt` (local), never in the public repo, the same as the Sheet links. A paste into a new project lands inside its empty `myFunction` unless everything is selected first. The function then is not in the Run menu, and `myFunction` runs empty: Ctrl+A before Ctrl+V.
 - **A session without browser control cannot press Run for the owner.** It can open `https://script.new`, which makes a new Apps Script project in the owner's own logged-in browser, and put the script on the clipboard. PowerShell's `Set-Clipboard` fails from these shells ("Requested Clipboard operation did not succeed"). `clip` works with the text written as UTF-16 with a BOM (`cmd /c "clip < file"`), and Hebrew survives.
 
 **A tester checklist states what the live prompt says, not what seems right**
