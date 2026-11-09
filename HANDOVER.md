@@ -258,6 +258,7 @@ appended to.
 >     - It refuses any English outside the run's own text.
 >     - `build_en.py` and `translations.json` still build the English page it replaced, as `index-en.html`. That file is not published, and is there only if the owner asks for an English twin.
 >   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
+>   - **Reviewers' marks (checked 9 Nov):** never in Supabase. A reviewer who may write saves to the page's own database, and everyone sees it with their name. One who may not keeps them in their browser only, and there is no export. This session's login cannot read the page's database or comments: it was published from another claude.ai account. Whether Yariv's marks were saved shows only by opening the link as that account.
 >   - **A Google Form of it (9 Nov, owner: "createa google form for this one"):** `local/artifacts/michael-simulation/form/create_form.gs`, written by `build_form.py` from the published `index.html`.
 >     - The owner pastes it into script.google.com and runs `createMichaelForm`.
 >     - It makes "Michael Simulated Run" in their Google account: 5 sections, and 30 required ✓ / ✗ questions with the message, the reply, what the bot did and what it should do, each with a comment box. It logs the edit link and the reviewers' link.

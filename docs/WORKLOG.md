@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-09
 
+### Read only: are Yariv's marks on "Michael Simulated Run" saved? (owner: "can you check if the artifact yariv did comment on save on our database")
+- **Not in our database, by design.** The page writes nothing to Supabase. Its marks go to the artifact's own database on claude.ai (`marks/<viewer id>`) when the viewer may write, else to that viewer's own browser (localStorage `homies-michael-simulation-v1`). It has no results export.
+- **Not readable from this session's login:**
+  - `ArtifactData list marks` was refused, because the artifact is "public from outside the user's organization".
+  - `ArtifactComments read` needs a yes no one can give here.
+  - In this login's list it shows as "(shared)". The other Homies pages (the checklists, "Yariv's Feedback Status") are not listed at all, which means they come from another organization.
+- **Also read:** this login's own "רשימת בדיקת הבוט" is the bridal studio's checklist, not Homies'. Its `marks` collection and comment threads are empty, and it saves to `results`.
+- **How to see Yariv's:** open the link signed in as the account that published it. His marks show under each reply with his name if they were saved to the page. If they show nowhere, they stayed on his device.
+
 ### A Google Form for "Michael Simulated Run" (owner: "remember the artifact we created … createa google form for this one")
 - **The page could not be read from this session:** the Artifact tool asks for a yes ("made by someone else") that no one can give here. Its source is local: `local/artifacts/michael-simulation/`.
 - **No direct route to Google:** there is no Google credential in `.env`, the Google connectors are not connected in this session, and Drive cannot take a form with its questions anyway.

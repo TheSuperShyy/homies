@@ -721,6 +721,13 @@ so there is no translation beside the replies and no English around them. Its bu
 the run's own text (the English test message in 5.5, the payment link). An English twin, if one is ever asked
 for, comes from `build_en.py`, not from English added back into this page.
 
+**Where its reviewers' marks are kept (checked 9 Nov).** Never in our Supabase: the page saves only to its own
+artifact database on claude.ai.
+- A reviewer the platform lets write saves `marks/<their id>` (`items`: step id -> ✓/✗ and comment). Every viewer then sees it under each reply, with the reviewer's name.
+- One who cannot write keeps their marks in their own browser only (`homies-michael-simulation-v1` in localStorage). They see "הסימונים שלך נשמרים בדפדפן הזה…".
+- The page has no results export, so local marks reach us only from that person's screen.
+- The page was published from another claude.ai account than the one these sessions log in with. `ArtifactData` refuses its database ("a public artifact from outside the user's organization"), and comments need a yes no session can give. So check it by opening the link signed in as the account that published it.
+
 **Its Google Form is made by the owner's own Google account, from the published page's data (9 Nov).** There
 is no Google credential on this PC, and Drive cannot take a form with its questions, so
 `local/artifacts/michael-simulation/build_form.py` writes `form/create_form.gs`. That is a Google Apps Script
