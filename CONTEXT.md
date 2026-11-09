@@ -3733,6 +3733,10 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
     - **Live since 9 Nov:** the lead token is in `.env`, `dashboard/.env.local` and Vercel, and PR #9 is merged (`088ca4c`).
       - A token is checked without adding a lead by `POST []`: 400 "No JSON data provided" means it is accepted, 401 "Invalid or expired access token" means it is not.
       - **The first lead ever accepted:** 9 Nov, 08:53:01 UTC, "200: inserted 1". No call reached Vapi in the next 6 minutes. Accepted is not dialled: only a call on Vapi (or Omni's own log) shows the dialer rang and someone answered.
+      - **Whether a call reached our endpoint:** the router logs `route <call id> <agent>` on every `assistant-request`. Zero route lines means Vapi never asked us, so nothing reached the bot.
+      - **Supabase's function logs since 23 Sep 2026:** `GET /v1/projects/<ref>/analytics/endpoints/logs` with `SUPABASE_ACCESS_TOKEN`. `logs.all` answers 410.
+        - One table in ClickHouse SQL: `SELECT timestamp, event_message FROM logs WHERE source = 'function_logs'` (console) or `'function_edge_logs'` (requests). `source_name` is unknown, whatever the changelog says.
+        - `iso_timestamp_start`/`_end` span at most 24 h.
       - Vercel's `TOKOMNI_TOKEN` is sensitive, so it is changed by PATCHing its entry's value (`VERCEL_ADMIN_KEY`). It cannot be read back, only its `updatedAt`. Then production must build again (a merge to `main` does it).
   - **List 2 stays on all the time,** so a new lead is rung at once, at any hour. Omni has no calling hours, so our side sends only in calling hours.
   - **Omni's three rules for List 2:**

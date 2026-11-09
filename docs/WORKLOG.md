@@ -22,6 +22,9 @@ conversation that produced it.
   - `tokomni_lead.py --check`, then a watch of Vapi until 08:58:44 UTC: no phone call at all. The only call today is 08:52:45, the credit check's web call.
   - So the phone either rang unanswered, or was not dialled.
   - The reply to Omni, with the time, the external_id, the number and the API's answer, is drafted in Hebrew in `local/omnitelecom/2026-11-09-health-check-email.txt`, for the owner to send.
+- **"can you check if it reach the endpoint or no":** Omni's endpoint yes (200, inserted 1). Ours no.
+  - Supabase's function logs had 0 `route` lines (the router's line for every call Vapi asks about) from 08:45 to 09:15 UTC, and 0 in the 24 h before. The same window held 19 boot and shutdown lines and 9 other POSTs, so the source works.
+  - `logs.all` is gone (410). The new endpoint is `.../analytics/endpoints/logs`, `FROM logs WHERE source = '…'`.
 
 ### Read only: are Yariv's marks on "Michael Simulated Run" saved? (owner: "can you check if the artifact yariv did comment on save on our database")
 - **Not in our database, by design.** The page writes nothing to Supabase. Its marks go to the artifact's own database on claude.ai (`marks/<viewer id>`) when the viewer may write, else to that viewer's own browser (localStorage `homies-michael-simulation-v1`). It has no results export.

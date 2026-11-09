@@ -33,7 +33,7 @@ appended to.
 >   - **Checked without a lead:** `POST []` with the token gives 400 "No JSON data provided"; a wrong token gives 401 "Invalid or expired access token".
 >   - **PR #9 merged as `088ca4c`.** Vercel built production from it ("Deployment has completed"), after the token was set.
 >   - **The owner's test press, 08:53:01 UTC (10:53 Israel), "Ring עידו":** Omni took the lead (200, "inserted 1"); external_id `f068dfae-…-20261109T085301`.
->     - **No call reached Vapi:** nothing by 08:58:44 UTC, and the only call today was the 08:52:45 credit check. So either Ido's phone rang unanswered (a ring nobody answers never reaches Vapi), or the dialer did not dial (List 2 not playing, or Omni's side).
+>     - **No call reached Vapi, or our endpoint:** nothing on Vapi by 08:58:44 UTC (the only call today was the 08:52:45 credit check), and Supabase's logs show no `route` line from the router in the 24 h up to 09:15 UTC. So either Ido's phone rang unanswered (a ring nobody answers never reaches Vapi), or the dialer did not dial (List 2 not playing, or Omni's side).
 >     - **Owed:**
 >       - whether Ido's phone rang;
 >       - the reply to Omni with the time and the id, which is drafted, and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew, with a line to add either way);
