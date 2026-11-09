@@ -17,6 +17,11 @@ conversation that produced it.
 - **Vercel:** the one `TOKOMNI_TOKEN` entry (sensitive, production and preview, last set 28 Oct) was PATCHed with `VERCEL_ADMIN_KEY`. Read back, it was updated at 08:49 UTC.
 - **PR #9:** CLEAN and green, merged as `088ca4c` (squash). Main's Vercel status for homies-dashboard reads "Deployment has completed". The token was set before the merge, so the production build carries it.
 - **Owed:** the owner's Ring on `/dialer` for a staff phone in calling hours, then `tokomni_lead.py --check`, then the time to Omni.
+- **The press (the owner, "check if this went through and the status of the call"):** "Ring עידו" at 08:53:01 UTC.
+  - The page showed Tokomni's "200: inserted 1", the first lead that ever went in.
+  - `tokomni_lead.py --check`, then a watch of Vapi until 08:58:44 UTC: no phone call at all. The only call today is 08:52:45, the credit check's web call.
+  - So the phone either rang unanswered, or was not dialled.
+  - The reply to Omni, with the time, the external_id, the number and the API's answer, is drafted in Hebrew in `local/omnitelecom/2026-11-09-health-check-email.txt`, for the owner to send.
 
 ### Read only: are Yariv's marks on "Michael Simulated Run" saved? (owner: "can you check if the artifact yariv did comment on save on our database")
 - **Not in our database, by design.** The page writes nothing to Supabase. Its marks go to the artifact's own database on claude.ai (`marks/<viewer id>`) when the viewer may write, else to that viewer's own browser (localStorage `homies-michael-simulation-v1`). It has no results export.
