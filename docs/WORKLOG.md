@@ -21,6 +21,10 @@ conversation that produced it.
 - **Checked:** `node --check` parses it. Run against a stand-in for FormApp it gave 5 sections, 30 questions, 30 comment boxes and the name field, with no error. The longest help text is 586 characters.
   - The only link in it is the run's placeholder `pay.example.co.il`, and there are no phone numbers.
   - Both files stay in the gitignored `local/`.
+- **Then the owner: "no open it yourself".** This session has no browser control (no Claude in Chrome, no built-in browser), so it cannot paste or press Run.
+  - What it did: opened `https://script.new` in the default browser, a new Apps Script project in the owner's Google account.
+  - It also put the script on the clipboard. `Set-Clipboard` failed, but `clip` worked with the text written as UTF-16 with a BOM: 15,881 characters read back, equal to the file.
+  - Left to the owner: paste, save, Run `createMichaelForm`, allow.
 
 ### LIVE: the "ticket closed" template synced into UChat (owner: "ok fix the sync on the uchat")
 - **Why:** asked what is left on the chatbot, the read showed that Meta had approved `ticket_resolved_he` on the UChat number's account (`wa_templates.py --waba 2117787955519632`). UChat's own list (`POST /whatsapp-template/list`) still had only `payment_link_he`.

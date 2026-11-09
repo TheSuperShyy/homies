@@ -262,6 +262,7 @@ appended to.
 >     - The owner pastes it into script.google.com and runs `createMichaelForm`.
 >     - It makes "Michael Simulated Run" in their Google account: the reviewer's name, 5 sections, and 30 required ✓ / ✗ questions with the message, the reply, what the bot did and what it should do, each with a comment box. It logs the edit link and the reviewers' link.
 >     - Run once against a stand-in for Google Forms, it gave 61 items with no error. It is not yet made in Google.
+>     - On "no open it yourself", `https://script.new` was opened in the owner's browser and the script put on the clipboard. They paste it, save, and Run `createMichaelForm`. Without browser control a session cannot press Run itself.
 >     - The page itself could not be read from this session: it asks for a yes no one can give here. `build.py` no longer runs, because the checklist's tests were renamed since 3 Nov.
 > - **"Yariv's Feedback Status"** https://claude.ai/artifact/CsEig9njyhwj2G1kXZBjWY (slug `60182b09-166c-4283-9b32-ee9ff1780ca9`): 27 points with status. **In Hebrew, right to left, since version `1793714588-73fa`** (owner: *"remove the one in the picture and make everything hebrew"*). **Live version `1793783418-3bf0`** (4 Nov, 09:10 UTC, still shared by link). The ManyChat point is DONE, on the owner's word, and says simply that:
 >     - the website link exists;
