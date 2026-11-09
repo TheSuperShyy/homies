@@ -9,6 +9,17 @@ conversation that produced it.
 
 ---
 
+## 2026-11-09
+
+### LIVE: the "ticket closed" template synced into UChat (owner: "ok fix the sync on the uchat")
+- **Why:** asked what is left on the chatbot, the read showed that Meta had approved `ticket_resolved_he` on the UChat number's account (`wa_templates.py --waba 2117787955519632`). UChat's own list (`POST /whatsapp-template/list`) still had only `payment_link_he`.
+  - debt-tools' `ticketNoticesViaUchat` sends only what UChat lists as APPROVED. Without the sync, a notice would sit as `template_not_synced`.
+- **Done:** `POST /whatsapp-template/sync`, which answered 200 `{"status":"ok"}`. Read back, the list shows both templates APPROVED, he, UTILITY.
+- **The queue, read first:** `ticket_notices` has 2 rows, both `sent` to the owner's +63 (23 Sep, 6 Oct). Nothing was waiting, so the sync sent nothing by itself.
+- **Not yet seen end to end on the UChat number:** the next ticket closed for a WhatsApp tenant will show it.
+
+---
+
 ## 2026-11-08
 
 ### LIVE: the tester's C5/C9 retest passed, and Send's manager v2 (the owner pasted the retest's report)

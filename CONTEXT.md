@@ -570,6 +570,7 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   - **4 Nov:** `payment_link_he` was submitted there on the owner's go, PENDING. `ticket_resolved_he` is not submitted yet.
   - **The command:** `wa_templates.py create <name> --waba 2117787955519632`. `--waba` targets an account other than `.env`'s.
   - **debt-tools reads UChat's own template list (APPROVED only), not Meta's,** so an approval reaches the bot only after UChat's `/whatsapp-template/sync`.
+  - **Both templates are APPROVED there and synced into UChat:** `payment_link_he` on 5 Nov, and `ticket_resolved_he` on 9 Nov (Meta's approval came after 5 Nov; the sync was run on the owner's go). So a ticket that closes now gets the "ticket closed" message from the UChat number, even 24 h after the tenant last wrote. A notice whose template UChat has not synced waits (`template_not_synced`) and goes out once it is synced.
   - The account is "ASTDX - Smart Link" `2117787955519632`, in business ASTDX `1679634916736747`. That is the WABA entity in the number's own `health_status`. The number's display name is "hadas 1".
   - Graph also lists the number under a WABA named "hadas 1" (`1389698653006050`). That is not the one `health_status` names.
   - **Its payment block has been gone since 4 Nov, 07:30 UTC,** after the owner added a card:

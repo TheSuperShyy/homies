@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 9 Nov: the "ticket closed" message on the UChat number** (owner: "ok fix the sync on the uchat").
+>   - `wa_templates.py --waba 2117787955519632` shows `ticket_resolved_he` APPROVED at Meta, alongside `payment_link_he`. UChat's own list still had only the payment link.
+>   - UChat's `POST /whatsapp-template/sync` answered 200 `{"status":"ok"}`. Read back, `/whatsapp-template/list` lists both templates APPROVED.
+>   - debt-tools' notice sender (`ticketNoticesViaUchat`) sends only what that list approves. So the next ticket closed for a WhatsApp tenant gets the message, even 24 h after their last message.
+>   - **Queue checked first:** `ticket_notices` has only 2 rows, both sent to the owner's +63 in September and October. Nothing old was waiting to go out.
+>   - **Not yet seen end to end on the UChat number:** the next close will show it. A close on the dashboard queues the notice, and the job drains it every 2 minutes.
+>
 > **LIVE 8 Nov, night: the tester's C5/C9 retest passed, and Send's manager v2** (`n8n_whatsapp_manager2.py`; live and the UChat copy, both read back; code only, still epoch 99). Together with the fifth run, every conversation in the guide now passes.
 >   - **C5 (165050):** the model named itself ("היי, אני מיכאל מהומי'ז"; manners cut the "היי") and gave 6 open, with the three newest. intro v1 had nothing to add.
 >   - **C9.4 (165118):**
@@ -102,7 +109,7 @@ appended to.
 >     - "רואה" joins one voice;
 >     - the when-line reassures with the matter he told, so a manager request is never "recorded";
 >     - the link's close is singular, and a balance opens with "כמובן".
->   - **Kept, the owner's call:** the closing-message sentence. It IS in the prompt ("…כשסוגרים אותה, נשלחת עליה הודעה לכאן"); the 6 Nov read missed it. On the UChat number `ticket_resolved_he` is still PENDING at Meta, so outside 24 h the message does not go out yet.
+>   - **Kept, the owner's call:** the closing-message sentence. It IS in the prompt ("…כשסוגרים אותה, נשלחת עליה הודעה לכאן"); the 6 Nov read missed it. On the UChat number `ticket_resolved_he` was then PENDING at Meta. **Since 9 Nov it is APPROVED and synced into UChat**, so the message does go out, outside 24 h too.
 >   - **Checked:**
 >     - gate 446/446 on live (5 new danger v5 cases), with 0 of 1,183 replies changed;
 >     - Claude-played on WhatsApp (`scripts/wa_qa_retest.json`): 4 conversations, 12 turns, 18/18;
