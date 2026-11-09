@@ -724,8 +724,8 @@ for, comes from `build_en.py`, not from English added back into this page.
 **Its Google Form is made by the owner's own Google account, from the published page's data (9 Nov).** There
 is no Google credential on this PC, and Drive cannot take a form with its questions, so
 `local/artifacts/michael-simulation/build_form.py` writes `form/create_form.gs`. That is a Google Apps Script
-which the owner runs once in script.google.com. It makes the form ("Michael Simulated Run": the reviewer's
-name, then for each of the 30 steps a required ✓ / ✗ and a comment) and logs its two links. It reads the 30
+which the owner runs once in script.google.com. It makes the form ("Michael Simulated Run": for each of the 30
+steps a required ✓ / ✗ and a comment, with no reviewer's name, on the owner's word) and logs its two links. It reads the 30
 steps from `index.html`, the published build. `build.py` no longer runs, because the checklist it reads has
 renamed its gas and emergency tests since 3 Nov. Each run of the script makes a new form.
 - **Made 9 Nov.** Its links are in `form/links.txt` (local), never in the public repo, the same as the Sheet links. A paste into a new project lands inside its empty `myFunction` unless everything is selected first. The function then is not in the Run menu, and `myFunction` runs empty: Ctrl+A before Ctrl+V.

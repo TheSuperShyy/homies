@@ -260,7 +260,8 @@ appended to.
 >   - **It is a snapshot of the bot on 3 Nov.** After a prompt change the replies are stale. A new run costs about $1.25 (`run-2026-11-03/drive.py`, through `wa_qa.py`), then rebuild; ask the owner first.
 >   - **A Google Form of it (9 Nov, owner: "createa google form for this one"):** `local/artifacts/michael-simulation/form/create_form.gs`, written by `build_form.py` from the published `index.html`.
 >     - The owner pastes it into script.google.com and runs `createMichaelForm`.
->     - It makes "Michael Simulated Run" in their Google account: the reviewer's name, 5 sections, and 30 required ✓ / ✗ questions with the message, the reply, what the bot did and what it should do, each with a comment box. It logs the edit link and the reviewers' link.
+>     - It makes "Michael Simulated Run" in their Google account: 5 sections, and 30 required ✓ / ✗ questions with the message, the reply, what the bot did and what it should do, each with a comment box. It logs the edit link and the reviewers' link.
+>     - **No reviewer's name** (owner, 9 Nov: "no need for the name of the examiner"). The script has dropped it. The live form, made with it, has it deleted in Google's editor: the editor was opened for the owner, and the edit link is checked (302 to sign-in, where a wrong id gives 404).
 >     - Run once against a stand-in for Google Forms, it gave 61 items with no error.
 >     - On "no open it yourself", `https://script.new` was opened in the owner's browser and the script put on the clipboard. Without browser control a session cannot press Run itself.
 >     - **MADE 9 Nov, 08:32 UTC**, by the owner's run in their own account. Their first run picked the template's `myFunction`, because the paste had landed inside it; the second picked `createMichaelForm`.

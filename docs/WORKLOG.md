@@ -30,6 +30,10 @@ conversation that produced it.
   - After Ctrl+A and a fresh paste, `createMichaelForm` ran in 44 s and logged both links.
   - The reviewers' link, fetched signed out, answers 200 with the title "Michael Simulated Run" and the 30 questions, so people outside the account can fill it in.
   - The links are kept in `local/artifacts/michael-simulation/form/links.txt`, not in the public repo.
+- **Then: "no need for the name of the examiner".**
+  - `build_form.py` dropped the "שם הבודק" question. Rebuilt, `create_form.gs` has no name, and the stand-in run gives 5 sections, 30 questions and 30 comment boxes.
+  - The live form was made with the name question, and no session can reach the owner's Google account. So its editor was opened in the owner's browser, to delete the question there: click it, then the bin.
+  - The edit link from the screenshot is checked signed out: it gives 302 to sign-in, and a wrong id gives 404.
 
 ### LIVE: the "ticket closed" template synced into UChat (owner: "ok fix the sync on the uchat")
 - **Why:** asked what is left on the chatbot, the read showed that Meta had approved `ticket_resolved_he` on the UChat number's account (`wa_templates.py --waba 2117787955519632`). UChat's own list (`POST /whatsapp-template/list`) still had only `payment_link_he`.
