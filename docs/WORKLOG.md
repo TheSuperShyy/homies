@@ -31,6 +31,11 @@ conversation that produced it.
   - Every list shows ▶ in Play/Hold. "test 1/0" has kept a new lead since 26 Oct.
   - So ▶ is the Play button, the lists are on hold, and the lead is waiting in List 2 undialled. "Active" is not "playing", whatever Omni's 8 Nov answer said.
   - Play dials every new lead in List 2 at once, so the second one has to be identified first.
+- **List 2 played, and still nothing:**
+  - The owner pressed Play (⏸ showing by 09:24 UTC) and Ring twice more. Vercel's request log reads `dialer 054…353 200 debt <id>-20261109T092111`, then `…T093258`.
+  - By 09:38 UTC: no phone call on Vapi since 08:50, and no router line in Supabase's logs.
+  - The email to Omni was rewritten (owner: "ok draft an email to their side") with all three leads, their ids and times, and List 2 on hold and then played.
+  - It asks what happened to each lead, whether the Homies_Bot dialer sees the bot (208) as available, and whether another setting blocks dialling (hours, agent assignment).
 - **The owner: "none rang".** The staff phone never rang, so the dialer took the lead and did not dial. Our side is clean end to end. We hold no Tokomni call-log login.
   - The Omni email is updated to say so. It asks two things: whether List 2 is on Play with "always continue", and whether the dialer sees the bot (208) as available. Their 8 Nov answer said dialling depends on the bot's availability.
 

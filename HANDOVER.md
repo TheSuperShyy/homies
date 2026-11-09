@@ -38,7 +38,8 @@ appended to.
 >     - **Tokomni (the owner's screenshot): List 2 is on hold.** Its last run was 25 Oct, it has 2 new leads waiting (ours among them), and every list shows the ▶ Play button.
 >       - Pressing ▶ on List 2 dials both new leads at once, so the owner checks who the second is first.
 >       - After that, never Stop or Hold it again.
->       - If Play makes it ring, the Omni email is not needed.
+>       - **It did not:** Play was pressed (⏸ by 09:24 UTC), then two more Rings (09:21:11 and 09:32:58 UTC, both 200). By 09:38 UTC no call had reached Vapi or our router.
+>       - **Owed:** the owner sends Omni the rewritten email (`local/omnitelecom/2026-11-09-health-check-email.txt`): three leads, and is the bot (208) available to their dialer?
 >     - **The phone never rang** (the owner, "none rang"). So the dialer took the lead and did not dial. We hold no call-log login (only `TOKOMNI_TOKEN`, campaign, dialer and List 2 ids), so the reason is Omni's to find.
 >     - **Owed:**
 >       - the reply to Omni, which is drafted and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew). It gives the time, the id and that no call was dialled, and asks whether List 2 is on Play, and whether the dialer sees the bot (208) as available;
