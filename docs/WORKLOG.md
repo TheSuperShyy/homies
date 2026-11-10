@@ -62,6 +62,7 @@ conversation that produced it.
   - a WhatsApp number in Chatwoot. The Israeli number is UChat's, and the US test number's account read BLOCKED (141006) on 4 Nov;
   - a check of the channel's own parts, which the UChat copy replaces: in and out, the menu, typing, hand to a person, the closed-ticket notice, and the tool server's sends.
 - Nothing changed. CONTEXT and HANDOVER carry the decision.
+- **14:22 UTC, read only (owner: "ok so the chatbot is in the chatwoot now?"): not yet.** The UChat copy took every message today, the last at 13:28 UTC. The Chatwoot bot (`u2JjrbcNPYyyh3yl`) is active and current, but n8n holds no run of it.
 
 ### LIVE: the debt call's payment link answers in time (debt-tools v152, PR #10; the debt agent's tools; 20 s on the 208 line; owner: "ok fix the payment link not being sent")
 - **The cause, traced before anything changed** (26 Oct, Vapi `01a17807`): the tool was called 50.2 s into the call and Vapi answered for it at 60.2 s, "timeout of 10000ms exceeded". The function finished about 12 s after it started.
