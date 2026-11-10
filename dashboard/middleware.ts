@@ -74,8 +74,13 @@ export async function middleware(request: NextRequest) {
   // 026 closed the tables again, so this redirect is back to being what it
   // always was — the polite half of the lock. RLS is the security boundary:
   // delete this file and a logged-out visitor sees empty tables, not data.
+  //
+  // /review (10 Nov) is the one other page a logged-out visitor may open: the reviewers' page, where
+  // Yariv's team marks Michael's replies. It shows nothing without the key in its link, and its data is
+  // reached only through migration 040's two key-checking functions, so RLS still holds the line.
   const path = request.nextUrl.pathname;
-  if (!user && path !== '/login') {
+  const open = path === '/login' || path === '/review';
+  if (!user && !open) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
   // Signed in and on /login: nothing to do there — go to the dashboard.
