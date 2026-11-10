@@ -41,6 +41,7 @@ appended to.
 >     - ~~The first real message.~~ **Proven 15:54 UTC:** the owner's "היי" reached inbox 1, and the greeting went out with both buttons and WhatsApp's id 4 s later; logged, and the runs are green. **Still owed: the tap** (the first AI answer on the route). Then `check_whatsapp_rules.py --watch` from 15:26 UTC.
 >     - **UChat's app is still subscribed to the number's WABA,** so UChat still receives the messages; its flow's call to n8n now fails silently. Taking it off is the owner's, in WhatsApp Manager. Never disconnect inside UChat before checking that it does not deregister the number.
 >     - **The number watch** (`OzdMMziMU4T4GOrb`) still watches the retired test number. Re-point it from `.env` when wanted.
+>     - **The debt call's payment link now takes the Chatwoot path** (`WHATSAPP_VIA=chatwoot`): `whatsappDeliver()` with the model's line, not the UChat path that v152 sped up and proved at 4.4 s at 12:45 UTC. That path took about 12 s on 26 Oct, inside today's 20 s limits but unproven since the move. Re-prove it with `python scripts/probe_paylink_call.py --template --apply` (a real WhatsApp to the owner's handset: the owner's go). No debt call can happen while the dialer does not ring.
 >   - **Rollback (minutes), in this order:**
 >     1. `rails runner`: inbox 1's channel back to `WHATSAPP_TEST_*` (phone +15550459005, its id and WABA), then `register_callback`.
 >     2. Remove the Israeli number's phone-level override.
