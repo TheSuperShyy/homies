@@ -23,8 +23,10 @@ conversation that produced it.
   - **The status tap:** the lift company, with no time.
   - It checks the text's logic, not Gemini. Whether Gemini still adds speed is the tester's retest.
 - **Then:** the two pins moved (`8546b335b582`, `c683a1079612`). The gate went all green on the candidate and then on live (566/566, every pin), and `n8n_uchat.py --apply` carried it to the UChat copy. Snapshot: `local/n8n-whatsapp-live-10nov-before-retest7.json`.
+- **The tester's brief was checked, as CONTEXT asks whenever an epoch moves:** unchanged. C1.4 and R12 already say "keeps pressing them" with no speed, and R10 forbids anyone "on the way", a professional sent included.
 - **Owed:**
   - **The tester's retest of the touched steps:** C1, C2, C3 steps 2-3, then C8 from 23:00 PH (17:00 Israel), which reaches the after-hours line for the first time. About 11 messages, about 44 US cents.
+    - It ran the whole guide on both earlier "short" retests, so this paste says it is not the full plan and caps it at 12 messages (CONTEXT, the outside tester).
   - **The incoming phone agent's lift line** has the same "לטפל בה בדחיפות". Chatbot first.
 
 ### Read only: what is left on the two phone agents (owner: "so what do we have left in the voice agent both inbound and outbound")

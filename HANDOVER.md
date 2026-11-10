@@ -42,6 +42,7 @@ appended to.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS`, the two phrase lists and the two pins.
 >   - **Owed:**
 >     - **The owner's Grok retest:** C1, C2, C3 steps 2-3, then C8 from 23:00 PH (17:00 Israel), which is the first run to reach the after-hours line. About 11 messages, about 44 US cents.
+>       - The paste caps it at 12 messages: on both earlier "short" retests it ran the whole guide (CONTEXT, the outside tester). When its report comes, read it against the UChat copy's executions from the run's start.
 >     - **The incoming phone agent's lift line** (`docs/assistant/demo-inbound.md`) still says "לטפל בה בדחיפות". It gets the same change, on the owner's word.
 >   - **Not changed, watched:** the bare "anything else" (R5: C1.3 and C6.5, as in the sixth run) and the plural "you" (C3.2, C11.4). Both were in the 8 Nov runs at the same steps, and no text causes them.
 >
