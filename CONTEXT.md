@@ -3404,7 +3404,8 @@ on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
   - how real tenants write;
   - 11 conversations;
   - the rules R1 to R25.
-- **It mirrors the live prompt and the tester checklist.** A change to what Michael should do changes the brief in the same commit.
+- **It mirrors the live prompt and the tester checklist.** A change to what Michael should do changes the brief in the same commit. Epoch 100 (9 Nov) missed this, and the brief caught up the next day; check the brief whenever an epoch moves.
+- **C8 depends on the hour since epoch 100.** An urgent fault outside office hours (Sun-Thu 09:00-17:00 Israel) also gets Homies' emergency line, so the brief has the tester note the Israel time and judges C8 by it. A weekday run between 15:00 and 23:00 PH only ever sees the in-hours answer.
 - **It costs real money, unlike `wa_qa.py`:** real model calls, about 4 cents a reply. It also opens real test tickets, and they stay.
 
 ## How the WhatsApp bot is tested without a model call

@@ -22,7 +22,8 @@ appended to.
 >   - **Rollback:** `python scripts/n8n_whatsapp_feedback9.py --restore` (snapshot `local/n8n-whatsapp-live-09nov-before-feedback9.json`), then `python scripts/n8n_uchat.py --apply`. Then revert this commit's `MEMORY_EPOCH`, `EPOCH_COVERS`, `prompt.md` and pins.
 >   - **Every tenant's memory started fresh** with the epoch, as each prompt change does.
 >   - **Owed:**
->     - The owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault after 17:00 (the after-hours line shows only then).
+>     - The owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault outside office hours. The emergency line shows only then: before 09:00 or from 17:00 Israel time Sun-Thu, and all Friday and Saturday. On a weekday in PH time, that is before 15:00 or from 23:00.
+>     - The Grok tester's short retest. Its guide (`grok-tenant-tester.md`) follows epoch 100 since 10 Nov; the plan is in WORKLOG 10 Nov. Its C6.2 sends no email while the test number's 255-1417-26 stays open.
 >     - The phone agent gets the same changes after the chatbot, on the owner's word.
 >   - **For Yariv (drafted to the owner):**
 >     - The 1.1 menu is his decision: no buttons, or other or more.

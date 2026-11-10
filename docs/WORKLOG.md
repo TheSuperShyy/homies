@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The Grok brief follows epoch 100, and a short retest for it (owner: "ok give me instructions to test it on grok")
+- **A miss, now fixed:** CONTEXT says a change to what Michael should do changes `grok-tenant-tester.md` in the same commit. Epoch 100's commit (a5eb8ac) left it behind, so it still said "never the lift company", "a ticket for water from the ceiling" and "no emergency numbers".
+- **The guide now:**
+  - C1, C2, C5: the lift company does the repair, said on opening, on "when?" (a second one too) and on the status. He asks which lift, answered `יש רק מעלית אחת`.
+  - C3: water from the ceiling gets no ticket yet, then a new step 3 (the tenant's plumber says it comes from the main pipes) gets the ticket.
+  - C6.2: the collections call, already-recorded included. C7: no Homies number at any hour.
+  - C8: the tester notes the Israel time. Outside Sun-Thu 09:00-17:00 the reply also gives 077-6687949, and "מוקד החירום" is fine as the line's name.
+  - The rules R4, R10, R11, R12, R13, R14, R17 and R23 carry the same exceptions.
+- **The retest given to the owner** (pasted to Grok with the guide): C1, C2, C3 steps 2-3, C5 step 1, C6 step 2, C7 step 1, C8. That is about 16 messages, roughly 60 US cents at the guide's 4 cents a reply.
+- **C6.2 sends no email:** the test number already has 255-1417-26 open (WhatsApp, 8 Nov). That is one open request per number, so the answer is "already recorded" and no second email goes. If it is closed before the run, C6.2 emails Homies' collections for real.
+- **When:** at 07:28 UTC (09:28 Israel, 15:28 PH) the office was open. The new emergency line shows only outside office hours: on a weekday, before 15:00 or from 23:00 PH time.
+- **HANDOVER corrected:** its owed line said the after-hours line shows only after 17:00. It shows before 09:00 and on Friday and Saturday too.
+
 ### Read only: is Yariv's review on the chatbot? (owner: "did we change the chatbot based on yariv comment?")
 - **Yes, still live.** Read back from n8n: live (`u2JjrbcNPYyyh3yl`) and the UChat copy (`mKheBsTxtcMhPxu7`) are both active, last updated 9 Nov 13:46 and 13:47 UTC (the epoch 100 apply), with memory `-100`, danger v6, promise v6, the lift company, the leak rule, the after-hours line and the collections callback all present.
 - Nothing written. The answer per comment went to the owner in chat.
