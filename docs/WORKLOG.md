@@ -11,7 +11,12 @@ conversation that produced it.
 
 ## 2026-11-10
 
-### The tester checklist on localhost (owner: "CREATE ONE IN LOCALHOS")
+### Corrected: the checklist is Michael's replies with ✓ / ✗ (owner: "I TOLD YOU TO MAINTAIN ONLY THE REPLY OF THE BOT", then "WHERE IS THE LOCALHOST OF THE CHECK AND X")
+- The owner's checklist is the 3 Nov simulation: each message with the reply Michael gave, and ✓, ✗ and a comment on each reply (3 Nov: "make the checklist like a simulation so each reply have the check and x and a comment"). The Google Doc content, the PDF and the first localhost page below were the tester-instructions format instead.
+- **localhost now serves the simulation:** `local/checklist/serve.py` serves `local/artifacts/michael-simulation/index.html` at http://localhost:8787 (127.0.0.1, Host localhost only). Checked: 200, it renders with the counts at "0 of 30", and opened in the owner's browser. Its marks stay in that browser. The wrong page (`page.html`) and its empty `marks.json` were removed.
+- **Owed:** the bot's current replies. A new simulated run of the 34 chat messages (live code and prompt, stand-in tools) costs about $1.50 and waits for the owner's go.
+
+### The tester checklist on localhost (owner: "CREATE ONE IN LOCALHOS"), the wrong format, see above
 - `python local/checklist/serve.py` serves the checklist at http://localhost:8787: `page.html` filled with the JSON, read again on every load. It has the 5 Nov look, with right / wrong, a note per test, progress, filters and a copy button. The dashboard step (8.1) reads "לעשות".
 - **Marks are saved to `local/checklist/marks.json`** through the server, so they outlive the browser and can be read back. The page falls back to the browser alone when the server is down. Listens on 127.0.0.1 and answers only to Host localhost.
 - Checked: the page loads (200, 35 tests), a mark saves and reads back, an unknown test id is dropped, another Host is refused (403), and the screenshot reads right (number left to right). marks.json was left empty. Opened in the owner's browser; the server runs in this session's background.
