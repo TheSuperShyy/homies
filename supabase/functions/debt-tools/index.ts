@@ -54,6 +54,9 @@ import {
   callNumberOf, flagOf, isProbeCall, phoneOf, reporterLine, reporterNameOf, requiredChannels,
   ticketGate,
 } from "./identity.ts";
+// How long the caller waits for the debt call's payment link (10 Nov). Pure, so
+// Node can test it: scripts/check_paylink.test.ts.
+import { DELIVERY_WAITS_MS, pollUntil, stopwatch, windowOpen } from "./paylink.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
 import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
@@ -1896,7 +1899,9 @@ async function whatsappLine(f: {
         model: "google/gemini-2.5-flash", temperature: 0.6, max_tokens: 160,
         messages: [{ role: "system", content: system }, { role: "user", content: user }],
       }),
-      signal: AbortSignal.timeout(6000),
+      // 10 Nov: 4 s, was 6. The tenant is on the line; a slow model means the
+      // link alone, which is what this already falls back to.
+      signal: AbortSignal.timeout(4000),
     });
     const j = await res.json().catch(() => null);
     return String(j?.choices?.[0]?.message?.content ?? "")
@@ -2098,8 +2103,10 @@ async function uc(method: string, path: string, body?: unknown) {
   return { status: res.status, j: await res.json().catch(() => null) as any };
 }
 
+type UchatContact = { ns: string; id: number; lastIn: number };
+
 /** The resident's contact on the UChat number, by phone; null if they never wrote to it. */
-async function uchatContact(toE164: string): Promise<{ ns: string; id: number; lastIn: number } | null> {
+async function uchatContact(toE164: string): Promise<UchatContact | null> {
   const digits = toE164.replace(/\D+/g, "");
   const r = await uc("GET", "/subscriber/get-info-by-user-id?user_id=" + encodeURIComponent(digits));
   const s = r.j?.data;
@@ -2113,24 +2120,35 @@ async function uchatContact(toE164: string): Promise<{ ns: string; id: number; l
   };
 }
 
-/** Did WhatsApp take what we just sent? A bot message since `after` carries `mid` when it did. */
+/**
+ * Did WhatsApp take what we just sent? A bot message since `after` carries `mid`
+ * when it did. 10 Nov: asked a few times and stopped at the first yes, where it
+ * was one look after a fixed 2 s. On a debt call the tenant waits on the line
+ * for this answer.
+ */
 async function uchatDelivered(ns: string, after: number): Promise<boolean> {
-  await new Promise((r) => setTimeout(r, 2000));
-  const r = await uc("GET", "/subscriber/chat-messages?user_ns=" + encodeURIComponent(ns) + "&include_bot=1&limit=5");
-  return (r.j?.data ?? []).some((m: any) =>
-    m?.type !== "in" && Number(m?.ts ?? 0) >= after / 1000 - 5 && String(m?.mid ?? "").length > 0);
+  return await pollUntil(async () => {
+    const r = await uc("GET", "/subscriber/chat-messages?user_ns=" + encodeURIComponent(ns) + "&include_bot=1&limit=5");
+    return (r.j?.data ?? []).some((m: any) =>
+      m?.type !== "in" && Number(m?.ts ?? 0) >= after / 1000 - 5 && String(m?.mid ?? "").length > 0);
+  }, DELIVERY_WAITS_MS);
 }
 
-async function uchatDeliver(toE164: string, text: string): Promise<Delivery> {
+/**
+ * Free text to the tenant, inside their 24 hours. `known` is the contact when
+ * the caller has already looked it up (null: they never wrote to the number),
+ * so it is not looked up twice while someone waits on the line.
+ */
+async function uchatDeliver(toE164: string, text: string, known?: UchatContact | null): Promise<Delivery> {
   if (!Deno.env.get("UCHAT_API_KEY")) {
     console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
     return { sent: false, reason: "unavailable" };
   }
   const last4 = toE164.replace(/\D+/g, "").slice(-4);
   try {
-    const c = await uchatContact(toE164);
+    const c = known !== undefined ? known : await uchatContact(toE164);
     // No contact: they never wrote to the number, so the window is shut.
-    if (!c || Date.now() - c.lastIn > 24 * 3600 * 1000) {
+    if (!c || !windowOpen(c.lastIn, Date.now())) {
       return { sent: false, reason: "outside_window", conversationId: c?.id ?? 0 };
     }
     const t0 = Date.now();
@@ -2229,6 +2247,7 @@ async function uchatTemplates(): Promise<Record<string, UchatTemplate>> {
  */
 async function uchatTemplate(
   toE164: string, name: string, t: UchatTemplate, params: Record<string, string>,
+  known?: UchatContact | null,
 ): Promise<{ sent: true; contactId: number } | { sent: false; reason: string; contactId?: number }> {
   const p: Record<string, string> = {};
   for (const [k, v] of Object.entries(params)) p[`BODY_{{${k}}}`] = String(v);
@@ -2238,7 +2257,9 @@ async function uchatTemplate(
     content: { namespace: t.namespace, name, lang: t.lang, params: p },
   });
   if (r.status >= 300 || r.j?.status === "error") return { sent: false, reason: "post_refused_" + r.status };
-  const c = await uchatContact(toE164);
+  // A contact the caller already holds is not looked up again. One UChat has
+  // just made, for a tenant who never wrote, is.
+  const c = known ?? await uchatContact(toE164);
   if (!c) return { sent: false, reason: "no_contact" };
   if (!(await uchatDelivered(c.ns, t0))) return { sent: false, reason: "no_whatsapp_id", contactId: c.id };
   return { sent: true, contactId: c.id };
@@ -2378,7 +2399,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // so the id and the string are one lookup and cannot disagree --
       // oxsReportedBy() matches the reporter on that exact string, and a
       // near-miss there costs the name on the call.
-      if (!sent) {
+      // Never for a probe (10 Nov): a test of this tool must not write into OXS.
+      if (!sent && !isProbeCall(ctx.callId)) {
         const m = await matchBuilding(r.building);
         if (m.status === "found") {
           await oxsMirror(String(m.building.id), description, unit || null,
@@ -2391,7 +2413,27 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       return { reference: String(t.reference) };
     };
 
-    const got = await oxsLinkFor(r, unit);
+    // 10 Nov: the tenant is on the line while this runs, and on 26 Oct it ran
+    // past Vapi's tool timeout (about 12 s against 10), so the model was told
+    // the tool had failed and improvised. What does not depend on each other
+    // now runs together: the OXS link, the tenant's UChat contact (which says
+    // whether their 24 hours are open) and UChat's template list. A test number
+    // is never looked up on UChat: it gets no message.
+    const sw = stopwatch();
+    const isTest = TEST_PREFIXES.some((p) => String(r.phone).startsWith(p));
+    const uchat = viaUchat();
+    const uchatOn = uchat && !isTest && !!Deno.env.get("UCHAT_API_KEY");
+    // A probe may ask for the template although the window is open, so the path
+    // a debt call takes can be proven on a phone that wrote to us today.
+    const forceTemplate = isProbeCall(ctx.callId) && args?.force_template === true;
+    const [got, contact, synced] = await Promise.all([
+      oxsLinkFor(r, unit),
+      uchatOn ? uchatContact(String(r.phone)).catch(() => null) : Promise.resolve(null),
+      uchatOn
+        ? uchatTemplates().catch(() => ({} as Record<string, UchatTemplate>))
+        : Promise.resolve({} as Record<string, UchatTemplate>),
+    ]);
+    sw.lap("lookups");
     if (!got.ok) {
       row.note = got.reason;
       await record();
@@ -2400,20 +2442,36 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     row.apartment_id = got.apartmentId;
     row.payer_id = got.payerId;
     row.link = got.link;
-    if (TEST_PREFIXES.some((p) => String(r.phone).startsWith(p))) {
+    if (isTest) {
       row.note = "test_number";
       await record();
       return miss("test_number");
     }
 
-    const line = await whatsappLine({
-      first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
-      building: r.building ?? "", unit, months: monthsHe(periods), amount,
-    });
-    const linkText = (line ? line + "\n" : "") + got.link;
-    let d = viaUchat()
-      ? await uchatDeliver(String(r.phone), linkText)
-      : await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), linkText);
+    const withLine = async () => {
+      const line = await whatsappLine({
+        first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
+        building: r.building ?? "", unit, months: monthsHe(periods), amount,
+      });
+      sw.lap("line");
+      return (line ? line + "\n" : "") + got.link;
+    };
+    let d: Delivery;
+    if (!uchat) {
+      d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), await withLine());
+      sw.lap("text");
+    } else if (!uchatOn) {
+      console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
+      d = { sent: false, reason: "unavailable" };
+    } else if (!forceTemplate && windowOpen(contact?.lastIn ?? 0, Date.now())) {
+      // Their 24 hours are open, so free text can go, and only now is the
+      // model's line worth its seconds. On a shut window the template is the
+      // message, and until 10 Nov the line was written first and thrown away.
+      d = await uchatDeliver(String(r.phone), await withLine(), contact);
+      sw.lap("text");
+    } else {
+      d = { sent: false, reason: "outside_window", conversationId: contact?.id ?? 0 };
+    }
 
     // 23 Sep: a debt call is OUTBOUND -- we ring someone who has not written to
     // us -- so Meta's 24-hour window is shut by default and the free-text link
@@ -2432,12 +2490,13 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     };
     // Through UChat a template needs no conversation first: UChat makes the
     // contact, so a resident who never wrote to the number can still get it.
-    if (viaUchat() && !d.sent && d.reason === "outside_window") {
-      const ut = (await uchatTemplates())[PAYMENT_TEMPLATE];
+    if (uchat && !d.sent && d.reason === "outside_window") {
+      const ut = synced[PAYMENT_TEMPLATE];
       if (!ut) {
         console.warn("payment link template not synced (uchat)", PAYMENT_TEMPLATE, last4);
       } else {
-        const sent = await uchatTemplate(String(r.phone), PAYMENT_TEMPLATE, ut, linkParams);
+        const sent = await uchatTemplate(String(r.phone), PAYMENT_TEMPLATE, ut, linkParams, contact);
+        sw.lap("template");
         if (sent.sent) {
           viaTemplate = true;
           d = { sent: true, conversationId: sent.contactId };
@@ -2447,7 +2506,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         }
       }
     }
-    const shut = !viaUchat() && !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
+    const shut = !uchat && !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
     if (shut) {
       const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
       const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
@@ -2467,8 +2526,12 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     }
     row.status = d.sent ? "sent" : "requested";
     row.note = d.sent ? (viaTemplate ? "whatsapp_template" : "whatsapp") : d.reason;
-    await record();
-    const filed = await fileTicket(d.sent, d.sent ? null : d.reason);
+    // The row and the office's ticket do not depend on each other.
+    const [, filed] = await Promise.all([record(), fileTicket(d.sent, d.sent ? null : d.reason)]);
+    sw.lap("rows");
+    // Never the link or the text: the last digits, how it went, and each step's time.
+    console.log("payment link timing ms", last4,
+      d.sent ? (viaTemplate ? "template" : "text") : d.reason, sw.text());
     if (!d.sent) return withSpoken(miss(d.reason, filed));
     // The reference is the office's record of a link that went; the agent is
     // not asked to read it out, so no spoken form is attached here.
