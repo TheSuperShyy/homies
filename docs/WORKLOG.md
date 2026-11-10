@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Read only: what is left on the two phone agents (owner: "so what do we have left in the voice agent both inbound and outbound")
+- **Answered in chat from HANDOVER, with two live reads at about 12:05 UTC.**
+- **The incoming agent** is live and equal to the repo (14,534 characters, updated 10 Nov 11:00 UTC). Left: the owner's test call and the first-call check of the office-hours block; Yariv on which key reaches the emergency centre; lift reports into OXS from the phone (built, off, the owner's go); what the phone has no counterpart for (the caller known by his number, the payment link, the "closed" message); the permanent menu key and the delay on Omni's leg; department routing (Homies).
+- **The debt agent** as it is live: gpt-5.6-sol with no reasoning level and no fast tier (the 25 Oct speed settings went to the incoming agent only), prompt 5,008 characters, last updated 26 Oct, voicemail detection on, 7 tools. Its prompt still names the team three times.
+  - Blocked by the dialer (the entries below). Its newest call is still 26 Oct.
+  - The 208 number's server timeout is still 10 s on live and in `vapi_sip.py`: the 26 Oct payment-link fix (20 s) still waits on the owner's go.
+  - Still open from HANDOVER: the debt list from the OXS export (no file yet), one voice and the manager handling, the per-call feminine voice, the identity check that takes any reply, "call me later" that nothing schedules, browser rehearsals that count as attempts, and the external_id header not yet seen.
+- **Both:** no card on the Vapi account, so a top-up before go-live; then the approval of Homies and the staff training.
+- Nothing changed. CONTEXT and HANDOVER are unchanged: every item is already in HANDOVER.
+
 ### Before the apply: the seventh run read, and the fix built (epoch 102; the owner pasted Grok's report)
 - **The run:** the full guide again, not the short retest. 11 conversations, 41 messages, 18:26-19:52 PH (10:26-11:52 UTC, 12:26-13:52 Israel, inside office hours, so C8's after-hours line was not reached again). The UChat copy's executions 169956-170367, all `success`, one per message, all on epoch 101 (live since 10:15 UTC).
 - **The report matches what went out.** Its "double space" in C3.4 is a 🙏 again, and its C10.7 shows a 🙂 that was never sent. The tester skipped C5.2 by itself.
