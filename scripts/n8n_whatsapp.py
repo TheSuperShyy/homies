@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 101
+MEMORY_EPOCH = 102
+# 101 -> 102, 10 Nov, later (n8n_whatsapp_retest7.py, the tester's seventh run): the lift line loses "לטפל בה
+# בדחיפות", which every lift ticket since epoch 100 gave back as "כמה שיותר מהר"; and Send's promise list (v7)
+# knows "נשלח איש מקצוע / בעל מקצוע".
 # 100 -> 101, 10 Nov (n8n_whatsapp_retest6.py, the tester's sixth run): the one-voice sentence names its exception
 # by the matter ("רק במעלית ובהוראת קבע זה אחרת"), not by who; epoch 100's "חוץ מחברת המעליות ומצוות הגבייה" had
 # the run pass things on to "the team" five times. No code changes with it.
@@ -804,8 +807,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "ce596f4e9f9a",   # docs/features/11-whatsapp-bot/prompt.md (10 Nov, epoch 101, the one-voice exception
-    # by the matter). Before: fbca40b23dd0 (9 Nov, epoch 100, Yariv's review)
+    "prompt": "8546b335b582",   # docs/features/11-whatsapp-bot/prompt.md (10 Nov, later, epoch 102, the lift line
+    # without "urgently"). Before: ce596f4e9f9a (10 Nov, epoch 101, the one-voice exception by the matter);
+    # fbca40b23dd0 (9 Nov, epoch 100, Yariv's review)
     "inject": "fd710a52a21b",   # LIVE's (9 Nov, epoch 100: the clock line says when the office is closed;
     # n8n_whatsapp_feedback9.py). Before: 3670f71d14b9 (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
     # item; n8n_whatsapp_photo.py). Before: 29 Oct, night, epoch 90, addto's true photo note. AGENT_NEW in

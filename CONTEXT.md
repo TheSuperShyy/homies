@@ -60,6 +60,7 @@ The user is the builder. The client is Homies.
   - The tenant hears it when a lift call opens (with the call number at Homies), on "when?" and on its status. On a second "when" the lift company stays in the answer, beside what Michael does now (a check, a note that he is waiting): the prompt's general "not the same reason twice" gives way here, and the lift line says so outright.
   - This and the collections call below are the only places someone other than Michael appears. They are the client's account of his own process, so they are true. Everywhere else, one voice holds.
   - **The one-voice sentence points to them by the matter, not by who** (10 Nov, epoch 101): "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך". Epoch 100 named them ("חוץ מחברת המעליות ומצוות הגבייה") on "you don't say you passed something on", and the tester's next run passed things on to "the team" five times.
+  - **The press has no speed** (10 Nov, later, epoch 102): the line says "ולוחצים עליהם", as Yariv did ("we press them", "we make every effort with them"). Its earlier "לטפל בה בדחיפות" was ours, and every lift ticket since epoch 100 gave it back as "כמה שיותר מהר" ("ונוודא שהם מגיעים לטפל כמה שיותר מהר"): a promise of what depends on them.
 - **What the lift company needs is asked:** what is happening, which lift when there is more than one, the floor it is stuck on. Only what the tenant has not said.
 - **Water in a flat starts as the flat's.** A leak or damp inside the flat, even from the ceiling or a wall, needs a professional on the tenant's behalf first.
   - Michael says so gently and asks whether it is known to come from the common property (the main pipe, the roof). If it is, it is a call.
@@ -108,6 +109,8 @@ The user is the builder. The client is Homies.
   - Never "בבקשה", and never a request for something named ("הבקשה שלך להוראת קבע"). One "to the team" still counts.
   - The joining word is the first within four words of the claim, so "וגם רשמתי …" goes from "וגם". A lone "אבל" before it goes with it, from its comma.
   - The replay changes 9 old drafts, all under the representative tap.
+
+**"A professional will be sent" is a promise (10 Nov, later, Send's promise v7).** "נשלח / ישלחו" takes "איש מקצוע / בעל מקצוע" beside "מישהו / טכנאי" (the tester's seventh run, C3.3: "נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה" on a main-pipe ticket). The leak rule's "בעל מקצוע מטעמך", with no "נשלח" before it, stays, and so does the cleaning facts' "נשלח מחליף".
 
 **"For when" is asking when, not promising (8 Nov, Send's promise v5).** promise v4 lets "יחזרו אליך" through after "מתי", since asking when promises nothing; "למתי" is the same question. Without it, the tester's C9.4 lost its honest "תאריך או שעה מדויקת למתי יחזרו אליך אין לי", and "מה שכן, …" went out alone.
 
@@ -178,6 +181,7 @@ The user is the builder. The client is Homies.
   - **A clause can make the team the subject of an action.** "קריאת שירות בדחיפות חירום והצוות יודע, מיד" was read as the team acting at once ("והם קיבלו את הדיווח מיד", "ועל זה עכשיו"). The bot is the subject of what the bot does.
   - **A list of example words loses its cases.** The paragraph described the opening word case by case, then quoted "בשמחה", "כמובן", "אוי, לא נעים" in one row, and the first was said on a fault (5 Nov, 155838). Put each example inside its own case (epoch 94), as with "אוקיי" before it.
   - **A tool answer the bot is not told about is narrated as the usual act.** `duplicate: true` came back and the reply still said "פתחתי קריאה". The answer itself says what happened, in fields that cannot read as the act (`already_open: true, opened_now: false`; v145, WhatsApp only).
+  - **"בדחיפות" in a fact came back as a promise of speed.** The lift line's "ולוחצים עליהם לטפל בה בדחיפות" gave every lift ticket "כמה שיותר מהר", and the sixth run's main pipe borrowed it (10 Nov, epoch 102). A fact says what is done, not how fast: how fast is the one thing the bot cannot know.
   - **"חירום" in the prompt came back as an emergency service alerted.** "עדכנתי מיד בדחיפות חירום" (155798). The prompt says "דחופה" (epoch 93), and the tools define "a person in danger" themselves.
   - **Stop at noise.** After the systematic cause is gone, a slip in 1 run of 6 is not answered with more text. Record it and let the checks keep counting.
   - **Moving a step moves what follows it.** When the second note moved to the topic turn, the tool's "what the resident hears afterwards" came with it. Its branch for a matter past the bot ("the details the team will need") then handed the committee fee back once ("כדי שידעו איך להמשיך מכאן", 28 Oct). After moving a tool call, read the tool's own "afterwards" text for the new place.
@@ -3850,6 +3854,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **These rules are Hebrew heuristics.** A missed honest phrasing shows in `--watch` as "the model wrote a promise and the filter cut it". Add its words to the rules and a case for it.
   - **Seen 7 Oct, not fixed: an honest "whether" sentence is cut.** "אני לא יכול להגיד אם יגיעו היום", "אם יגיעו היום, את זה רק הצוות יודע" and "לא יודע אם יחזרו אליך" were all cut in the Claude-played chats: an אם clause under "can't say / don't know" is neither negated nor asked about. The tenant then asks again and gets no answer, and the next line can open on a "them" with nothing before it. The fix belongs in `n8n_whatsapp_nopromise.py`, with these three as cases, on the owner's word.
   - **Seen 7 Oct, not fixed: the emergency step's ARRIVE list matches the bare word "מגיע".** So in an emergency, "אתה יודע מאיפה הריח מגיע?" is cut as an arrival promise, and the reply ends on the ticket number alone (`n8n_whatsapp_danger.py`).
+- **A case block for a Send version runs on every later version (10 Nov).** `promiseV(body) >= N` in `check_whatsapp_rules.js`. The 8 Nov "למתי" block was keyed to "promise v5" exactly and stopped running, without a word, when epoch 100 made Send v6. Key a new block the same way.
 - **The gate takes a dump whole when it adds or removes nodes (5 Oct).** `check_whatsapp_rules.py --candidate` and `check_patchers_idle.py` laid a dump over live by node name, which kept removed nodes and dropped new ones: it tested code that would never run. A dump with different node names is now the would-be workflow, nodes and wires; one with the same names is laid over live as before.
 
 **A ticket's status and urgency are the team's (owner, same message).**

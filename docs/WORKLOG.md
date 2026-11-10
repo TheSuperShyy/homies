@@ -11,6 +11,42 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Before the apply: the seventh run read, and the fix built (epoch 102; the owner pasted Grok's report)
+- **The run:** the full guide again, not the short retest. 11 conversations, 41 messages, 18:26-19:52 PH (10:26-11:52 UTC, 12:26-13:52 Israel, inside office hours, so C8's after-hours line was not reached again). The UChat copy's executions 169956-170367, all `success`, one per message, all on epoch 101 (live since 10:15 UTC).
+- **The report matches what went out.** Its "double space" in C3.4 is a 🙏 again, and its C10.7 shows a 🙂 that was never sent. The tester skipped C5.2 by itself.
+- **The team is gone:** no reply named a team (five in the sixth run).
+- **Real fails, each the model's own draft:**
+  - **R10, C1.3 (169970), the lift ticket's opening:** "אנחנו נעקוב אחרי זה ונוודא שהם מגיעים לטפל כמה שיותר מהר". C1.5's draft also had "ואנחנו ממשיכים ללחוץ עליהם כדי שיגיעו בהקדם", which Send cut.
+  - **R10, C3.3 (170031), a main-pipe ticket:** "נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה". Send cut the same reply's "נעדכן אותך" but did not know "איש מקצוע".
+  - **R5:** a bare "anything else" while the matter waits, C1.3 and C6.5, as in the sixth run.
+  - **R3:** C3.2 "הבאתם", "יצא לכם"; C11.4 "שלכם", "אצלכם".
+  - **R6:** C11.4 "בשמחה, אני בודק".
+- **True claims, checked against the tools:**
+  - C1.6's "רשמתי אצלנו שוב" had a notify_team note, and C2.1's "הוספתי לקריאה" an add_request_detail.
+  - C4.1's "ניסיתי לפתוח קריאה" had an open_request that found no such street.
+  - C11.4's cleaning facts, the substitute cleaner included, are get_service_info's own words.
+- **The causes, measured over both 8 Nov runs (110 replies), the sixth run (48) and this one (41):**
+  - **The lift.** Every lift ticket opened since epoch 100 promised speed: the sixth run's "ולוחצים עליהם להגיע כמה שיותר מהר", this run's C1.3, and C1.5's cut draft. The five lift turns on 8 Nov, before the lift line, promised none. Every other "כמה שיותר מהר" in all three sets is the manager line's "so I can help you as fast as possible".
+    - The lift line says "ולוחצים עליהם לטפל בה בדחיפות". Yariv's own words (2.2, 2.3/2.4, 4.1) are "we pass it on and follow it", "we make every effort with them" and "we press them": "urgently" was ours.
+    - The sixth run's C3.3 borrowed it for a main pipe ("וניגש לזה כמה שיותר מהר").
+  - **The professional.** Send's promise list cuts "נשלח מישהו / טכנאי" and did not know "איש מקצוע". The prompt already says Michael sends nobody ("ולא שולח אף אחד").
+  - **Not new, so not this round.** The bare "anything else" at these two steps was in 4 of the 5 comparable 8 Nov replies. C11.4's plural "you" was in both 8 Nov runs ("אצלכם"). No text causes either.
+- **The fix** (`scripts/n8n_whatsapp_retest7.py`, epoch 101 -> 102):
+  - **The prompt:** "ולוחצים עליהם לטפל בה בדחיפות" -> "ולוחצים עליהם". The rest of the lift line is unchanged. 26,007 -> 25,991 characters, prompt `8546b335b582`.
+  - **Send's promise list (v7):** "נשלח / ישלחו" now takes "איש מקצוע / בעל מקצוע" too.
+    - It changes in Send, in Reply usable? (twice) and in Try again, from `n8n_whatsapp_nopromise.PHRASES` = `n8n_whatsapp_retry.PROMISE_PHRASES`.
+    - Try again's note moves with it (`c683a1079612`).
+    - The patcher refuses unless every live copy holds the repo's whole list first.
+- **Checked so far:**
+  - **The gate on the candidate: 566/566 cases.** Four are new for v7. The 8 Nov "למתי" block was keyed to "promise v5" exactly and had not run since epoch 100; it now runs on any later version, as the v6 block does (`promiseV()` in `check_whatsapp_rules.js`).
+  - **The replay:** 1 of 1,494 replies changes, this run's C3.3, which keeps its ticket and loses the professional and the update. 0 of 1,444 messages change. The only red is the two pins, as expected.
+  - **`check_patchers_idle.py`:** the candidate differs from live as is only in the epoch's number in the refusals, fresh, patch and retest7 going idle, and retry no longer updating Try again's note.
+  - **The blind Claude-played lift arc** (`scripts/wa_qa_retest7.json`) is running on the candidate. It is the scenario of epoch 100 and the sixth run, plus a check for C1.3's words.
+- **Also seen, not changed:**
+  - C6.4's note names the tenant "הדמיון", the invented street from C4 in the same chat. It is a note, with no email: only a standing order emails collections.
+  - C11 introduced himself twice. The two messages came 19 s apart and the first reply needed a retry, so the second still saw the menu as the last thing sent.
+- **Owed:** the incoming phone agent's lift line (`docs/assistant/demo-inbound.md`) has the same "לטפל בה בדחיפות". Chatbot first.
+
 ### What we can do about the dialer (owner: "so check what can we do"; read only, and the reply to Omni rewritten for the owner to send)
 - **Our lead token can only add leads.**
   - Decoded here, it carries the PBX domain and a year's expiry, and no scope.

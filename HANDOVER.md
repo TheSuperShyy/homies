@@ -31,6 +31,17 @@ appended to.
 >   - **For Yariv, the owner's call:** on the phone the emergency centre is the number the caller has just dialled. Which key reaches it after hours? Until he says, Michael gives the number as it is.
 >   - **Rollback:** the previous commit's `docs/assistant/demo-inbound.md` and `scripts/vapi_tools.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` from Git Bash.
 >
+> **BUILT, NOT LIVE YET: epoch 102, the tester's seventh run** (`scripts/n8n_whatsapp_retest7.py`; the owner pasted Grok's report; WORKLOG 10 Nov). The repo is ahead of live: `prompt.md`, `MEMORY_EPOCH` 102, `EPOCH_COVERS` and Send's promise phrases (v7) are the candidate's.
+>   - **What:**
+>     - The lift line loses "לטפל בה בדחיפות". Every lift ticket since epoch 100 gave it back as "כמה שיותר מהר" (C1.3 "ונוודא שהם מגיעים לטפל כמה שיותר מהר").
+>     - Send's promise list knows "נשלח איש מקצוע / בעל מקצוע" (C3.3).
+>   - **To finish:**
+>     1. Read the blind lift arc's grade (`scripts/wa_qa_retest7.json`).
+>     2. Move the two pins in `check_whatsapp_rules.py`: the prompt to `8546b335b582`, Try again's note to `c683a1079612`.
+>     3. Run `python scripts/n8n_whatsapp_retest7.py --apply`, then `python scripts/n8n_uchat.py --apply`.
+>     4. Run the gate on live.
+>   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert this commit's `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS` and the two phrase lists.
+>
 > **LIVE 10 Nov: epoch 101, the tester's sixth run** (`scripts/n8n_whatsapp_retest6.py`; the owner pasted Grok's report; WORKLOG 10 Nov). Live and the UChat copy, both read back.
 >   - **What:** the one-voice sentence's exception is named by the matter, "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך", not by who. Epoch 100's "חוץ מחברת המעליות ומצוות הגבייה" had the run pass things on to "the team" five times (C3.3, C8.1, C8.2, C10.1, C11.3) and promise speed once (C3.3). The same steps named nobody in both 8 Nov runs.
 >   - **Read back, live (`u2JjrbcNPYyyh3yl`, 10:14 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 10:15 UTC):** active; prompt `ce596f4e9f9a` (26,007 characters); memory `-101` and `-101-uchat`; tool texts unchanged; danger v6 and promise v6 in Send.

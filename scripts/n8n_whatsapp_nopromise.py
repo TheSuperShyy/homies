@@ -147,6 +147,10 @@ MARK = "const pv = 'promise v4';"
 # בעניין" are out: handled, with no time, is the owner's reassurance. "במהרה"
 # and "במהירות האפשרית" are in: v2 caught them only through "יטפל בזה" ("הצוות
 # שלנו יטפל בזה במהירות האפשרית", the live lift and leak tickets).
+# v7, 10 Nov (n8n_whatsapp_retest7.py): "איש מקצוע" and "בעל מקצוע" beside
+# "מישהו" and "טכנאי" after "נשלח / ישלחו". The tester's seventh run (C3.3,
+# 170031) sent "נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה" on a main-pipe ticket.
+# "בעל מקצוע מטעמך" with no "נשלח" before it is the leak rule's, and stays.
 TIMES = "בהקדם|בקרוב|בימים הקרובים|בשעות הקרובות|בהמשך היום|במהרה|במהירות האפשרית"
 PHRASES = (TIMES + "|"
            "אנחנו על זה|אני על זה|"
@@ -155,7 +159,7 @@ PHRASES = (TIMES + "|"
            "(ייצרו|יצרו|ייצור|יצור|ניצור|תיצור) ((אתכם|איתכם|איתך|אתך) קשר|קשר (אתכם|איתכם|איתך|אתך))|"
            "(יעדכנו|יעדכן|נעדכן|אעדכן) (אתכם|אותך)|"
            "בדרך (אליכם|אליך|אלייך)|(עזרה|מישהו|הצוות|הטכנאי) בדרך|"
-           "הטכנאי יגיע|מישהו יגיע|(נשלח|ישלחו) ((אליכם|אליך|אלייך) )?(מישהו|טכנאי)|"
+           "הטכנאי יגיע|מישהו יגיע|(נשלח|ישלחו) ((אליכם|אליך|אלייך) )?(מישהו|טכנאי|איש מקצוע|בעל מקצוע)|"
            "יגיעו? (אליכם|אליך|אלייך|בקרוב|היום|מחר)")
 # 18 Oct, late: `echo` and `clerk` read the same phrases in a chat about a manager
 # (n8n_whatsapp_retry.PROMISE_PHRASES, a copy, since retry cannot import this file).

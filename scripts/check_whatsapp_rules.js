@@ -65,6 +65,9 @@ function turn(o) {
 }
 const sent = (E, o) => { const m = turn(o); return JSON.parse(E.send(m.$json, m.$, m.$now)); };
 const content = (E, o) => sent(E, o).content;
+// 10 Nov: Send's promise version as a number, so a block for vN keeps running on every later version
+// (the v5 block was keyed to 'promise v5' exactly and stopped running when epoch 100 made it v6).
+const promiseV = (body) => { const m = String(body || '').match(/const pv = 'promise v(\d+)'/); return m ? +m[1] : 0; };
 
 function mask(s) {
   return String(s).replace(/https?:\/\/\S+/g, '<link>').replace(/\+?\d{9,15}/g, '<phone>')
@@ -727,7 +730,7 @@ function cases(E) {
   // 8 Nov (scripts/n8n_whatsapp_retest4.py, the tester's C9.4, execution 164030): "ומתי המנהל יחזור אליי?"
   // was answered "תאריך או שעה מדויקת למתי יחזרו אליך אין לי, …", and promise v4, which lets "יחזרו אליך"
   // through after "מתי", did not know "למתי": the sentence was cut whole and "מה שכן, …" went alone.
-  if (P.code && String(P.code.send_body || '').indexOf("const pv = 'promise v5'") !== -1) {
+  if (P.code && promiseV(P.code.send_body) >= 5) {
     console.log(NL + "--- Send: \"for when\" is asking when, not promising (8 Nov, the tester's C9.4) ---");
     const C94 = 'תאריך או שעה מדויקת למתי יחזרו אליך אין לי, אני אומר את זה בפשטות. מה שכן, הקריאה על הניקיון בחדר המדרגות כבר פתוחה ומעודכנת אצלנו. ';
     expect('C9.4 exactly (164030): the honest sentence stays',
@@ -1532,7 +1535,7 @@ function cases(E) {
     expect("Yariv's 2.3: right after the lift ticket, his answer goes whole",
       () => content(E, { reply: Y23, said: 'מתי מגיעים לתקן?', S: { last_bot: Y22 }, steps: LOOK }), Y23);
   }
-  if (SB9.indexOf("const pv = 'promise v6'") !== -1) {
+  if (promiseV(SB9) >= 6) {
     console.log(NL + "--- Send: a standing order's call from collections is no promise (9 Nov, Yariv's 5.2) ---");
     const SOREC = { action: { tool: 'request_standing_order' }, observation: ob9({ ok: true, recorded: true, recorded_now: true, reference: '255-1392-26' }) };
     const SOAGAIN = { action: { tool: 'request_standing_order' }, observation: ob9({ ok: true, already_recorded: true, reference: '255-1392-26' }) };
@@ -1554,6 +1557,24 @@ function cases(E) {
       () => content(E, { reply: CBK.replace('בטלפון', 'בקרוב'), said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }).indexOf('בקרוב') === -1, true);
     expect('a standing order turn does not let "we will call you" through',
       () => content(E, { reply: CBK.replace('ומישהו מצוות הגבייה ייצור איתך קשר', 'וניצור איתך קשר'), said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }).indexOf('ניצור איתך קשר') === -1, true);
+  }
+  // 10 Nov (scripts/n8n_whatsapp_retest7.py): the tester's seventh run, C3.3 (170031). A main-pipe ticket
+  // went out with "נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה": the list knew "נשלח מישהו / טכנאי" only.
+  if (promiseV(SB9) >= 7) {
+    console.log(NL + '--- Send: "a professional will be sent" is a promise too (10 Nov, the tester\'s C3.3) ---');
+    const PIPE = [{ action: { tool: 'open_request' }, observation: ob9({ ok: true, reference: '255-1428-26', reference_spoken: 'אחת ארבע שתיים שמונה' }) }];
+    const C33 = 'הבנתי. פתחתי עכשיו קריאה על הנזילה (המספר שלה הוא 255-1428-26), ורשמתי אותה על הדירה שלך. '
+      + 'נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה. כשהקריאה תיסגר נעדכן אותך בהודעה לכאן. יש עוד משהו שאוכל לעזור בו עכשיו?';
+    expect('C3.3 exactly (170031): the professional and the update go, the ticket stays',
+      () => content(E, { reply: C33, said: 'האינסטלטור שלי היה פה אתמול, והוא אמר שזה מהצנרת הראשית של הבניין', steps: PIPE }),
+      'הבנתי. פתחתי עכשיו קריאה על הנזילה (המספר שלה הוא 255-1428-26), ורשמתי אותה על הדירה שלך. יש עוד משהו שאוכל לעזור בו עכשיו?');
+    expect('"וישלחו אליך בעל מקצוע" goes with its clause',
+      say({ reply: 'פתחתי קריאה על הגג, מספר 255-1339-26, וישלחו אליך בעל מקצוע לבדוק. משהו השתנה מאז?', said: 'roof' }),
+      'פתחתי קריאה על הגג, מספר 255-1339-26. משהו השתנה מאז?');
+    const LEAK = 'לא נעים בכלל. כשמדובר בנזילה בתוך הדירה, קודם כל צריך בעל מקצוע מטעמך שיבדוק מאיפה זה מגיע. יצא לך כבר לבדוק את זה עם בעל מקצוע?';
+    expect("the leak rule's own professional, with no \"sent\": byte-identical", say({ reply: LEAK, said: 'יורדים מים מהתקרה' }), LEAK);
+    const CLEAN = 'לכל בניין מוצמד מנקה קבוע, ואם הוא לא יכול להגיע, נשלח מחליף באותו יום. תרצה לדעת עוד משהו על הניקיון?';
+    expect('the cleaning facts\' "נשלח מחליף": byte-identical', say({ reply: CLEAN, said: 'מה כולל הועד' }), CLEAN);
   }
   if (String((P.code || {}).inject || '').indexOf('מחוץ לשעות הפעילות של המשרד') !== -1) {
     console.log(NL + '--- the inject: the clock line says when the office is closed (9 Nov) ---');
