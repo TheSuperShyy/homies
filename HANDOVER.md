@@ -21,6 +21,12 @@ appended to.
 >   - **The probe writes to one handset only:** flat 2 of the test building, and only when that number is the owner's (`OXS_MIRROR_PHONES`). Its open ticket is never mirrored into OXS.
 >   - **Rollback:** a revert PR on `main`; the previous commit's `vapi_tools.py` and `vapi_sip.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply` and `python scripts/vapi_sip.py --route on --apply`.
 >
+> **READ 10 Nov, ~13:00 UTC: the tests have 53 open calls in Homies' OXS** (owner: *"how many tickets have we opened in oxs while testing?"*; WORKLOG and CONTEXT 10 Nov). Read only; nothing written.
+>   - **53, counted both ways:** our `requests` rows with an OXS `_id` in `oxs_ref`, and the same ids read back from OXS for בר כוכבא 23. All from the owner's +63 (the one mirrored number), all WhatsApp, 24 Sep to 10 Nov; 37 since the Grok runs began on 5 Nov.
+>   - **All 53 are open in OXS.** Our table has 36 `cancelled` and 1 `resolved`; the mirror never updates OXS, so that never reached it.
+>   - **Every Grok run adds about five more,** since it writes from the +63. The retest running now had added 255-1433-26 (the lift) by 12:54 UTC.
+>   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
+>
 > **DECIDED 10 Nov: the bot moves back to Chatwoot after the owner's tests of the current bot** (owner: *"we will migrate to chatwoot after im done with the testing of the current bot"*; WORKLOG and CONTEXT 10 Nov). Not started. Until then the UChat copy (`mKheBsTxtcMhPxu7`) stays the bot in use.
 >   - **The bot is ready there:** the Chatwoot workflow `u2JjrbcNPYyyh3yl` is the main one and gets every change first. It read back with epoch 102 at 12:27 UTC today.
 >   - **Settle first:** which WhatsApp number goes into Chatwoot. The Israeli number is UChat's; the US test number's account read BLOCKED (141006) on 4 Nov.

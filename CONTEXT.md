@@ -1733,6 +1733,14 @@ test would be easier.** A ticket the live mirror missed is pushed with
 `scripts/oxs_mirror_backfill.py`, one at a time and only for a number already
 on the list — backfilling is not a second decision, but widening is.
 
+**The mirror only creates; nothing of ours updates or closes a call in OXS (counted 10 Nov).**
+53 of our tickets hold an OXS `_id`, all from the +63, all WhatsApp, all בר כוכבא 23, and read
+back from OXS (GET only) all 53 are open there. In our table 36 of them are `cancelled` and 1
+`resolved`: that never reached OXS, so staff see 53 open calls in that building. Count them by
+`oxs_ref` holding a real `_id` (not `standing_order` or `partial:*`) and match the ids in
+`GET /service-calls?buildingId=…&status=open|close`; the text marker sits in
+`serviceCallData.description`, not `description`.
+
 **A third gate, by ticket type (5 Nov), built OFF.** Yariv asked in the 4 Nov
 review for every elevator report to open in OXS, classified as elevator.
 `OXS_MIRROR_TYPES` lists the types that go in for ANY reporter, test prefixes
@@ -3447,6 +3455,9 @@ on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
 - **It mirrors the live prompt and the tester checklist.** A change to what Michael should do changes the brief in the same commit. Epoch 100 (9 Nov) missed this, and the brief caught up the next day; check the brief whenever an epoch moves.
 - **C8 depends on the hour since epoch 100.** An urgent fault outside office hours (Sun-Thu 09:00-17:00 Israel) also gets Homies' emergency line, so the brief has the tester note the Israel time and judges C8 by it. A weekday run between 15:00 and 23:00 PH only ever sees the in-hours answer.
 - **It costs real money, unlike `wa_qa.py`:** real model calls, about 4 cents a reply. It also opens real test tickets, and they stay.
+- **Every ticket it opens is also an open call in Homies' OXS.** It writes from the owner's +63, the one
+  number the OXS mirror copies, so each ticket lands as a service call in בר כוכבא 23: about five a full
+  run, 37 of the 53 mirrored calls by 10 Nov (since 5 Nov). Say so with the price when a run is proposed.
 - **Its copy of the chat drops some emoji and adds others** (10 Nov: the "stray space" it reported in C3.4 was a 🙏, twice, and C1.2's 😊 was missing; the seventh run's C10.7 showed a 🙂 that was never sent). Read its emoji counts and typos against the executions before acting on them.
 - **Asked for a short retest, it runs the whole guide** (10 Nov, twice: 48 and then 41 messages where 16 were asked, about $1.60-1.90 a run instead of about 60 cents). The guide's own plan of ~45 messages wins over a paste that only says "short". A retest paste says it is not the full plan, lists the steps, and caps the messages ("no more than 12 messages in total, then stop"). Read the report's message count before comparing it with what was asked.
 

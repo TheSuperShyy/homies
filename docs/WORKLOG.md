@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Read only: how many tickets the tests opened in OXS (owner: "how many tickets have we opened in oxs while testing?")
+- **53, and the two counts agree:**
+  - **Our `requests`:** 63 rows have `oxs_ref` set; 10 are our own markers (`standing_order` 5, `partial:*` 5), and 53 hold an OXS `_id`. All 53 are WhatsApp, from the owner's +63 (the one number in `OXS_MIRROR_PHONES`), in בר כוכבא 23, from 24 Sep to 10 Nov 12:54 UTC.
+  - **OXS, GET only** (`/service-calls?buildingId=…&status=open`, 3 pages, and `status=close`): all 53 ids are there, all `open`. The building's other 3 calls are closed and not ours. Our text marker sits in `serviceCallData.description`.
+- **The Grok runs are most of them:** it writes from the +63, so every ticket it opens is mirrored.
+  - 37 since 5 Nov: 5 on 5 Nov, 10 on 6 Nov, 11 on 8 Nov and 11 on 10 Nov.
+  - 10 Nov: the sixth run's 255-1422..1426, the seventh's 255-1427..1431, and the retest's 255-1433-26 (12:54 UTC, the lift).
+- **Our status is not OXS's:** our table has 36 of the 53 `cancelled` and 1 `resolved`, while all 53 are open in OXS. The mirror only creates; nothing of ours updates or closes a call there.
+- **By type:** elevator 11, plumbing 8, cleaning 8, maintenance 7, fire_safety 7, electrical 6, lighting 4, gardening 1, payment 1.
+- **Not run:** `check_oxs_mirror.py --apply`, which creates and deletes a call. Nothing was written anywhere. CONTEXT has the mirror's one-way nature and the tester's OXS cost; HANDOVER has the count.
+
 ### Decided: the bot goes back to Chatwoot after the current tests (owner: "ok the test is undergoing and we will migrate to chatwoot after im done with the testing of the current bot")
 - **Not started.** The owner's Grok retest of epoch 102 is running on the UChat copy, which stays the bot in use until the move.
 - **The bot needs no rebuild:** the Chatwoot workflow (`u2JjrbcNPYyyh3yl`) is the main one, and every change goes to it first. Read back at 12:27 UTC today, it carries epoch 102 (prompt `8546b335b582`, memory `-102`, promise v7), the same texts as the UChat copy.
