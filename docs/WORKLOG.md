@@ -9,6 +9,12 @@ conversation that produced it.
 
 ---
 
+## 2026-11-10
+
+### Read only: is Yariv's review on the chatbot? (owner: "did we change the chatbot based on yariv comment?")
+- **Yes, still live.** Read back from n8n: live (`u2JjrbcNPYyyh3yl`) and the UChat copy (`mKheBsTxtcMhPxu7`) are both active, last updated 9 Nov 13:46 and 13:47 UTC (the epoch 100 apply), with memory `-100`, danger v6, promise v6, the lift company, the leak rule, the after-hours line and the collections callback all present.
+- Nothing written. The answer per comment went to the owner in chat.
+
 ## 2026-11-09
 
 ### The 11/9 report (in chat, `/reporter`)
