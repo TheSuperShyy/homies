@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### LIVE (epoch 102): the tester's seventh run, its two promises fixed at their cause (the owner pasted its report)
+- **Live, both bots, read back:** live (`u2JjrbcNPYyyh3yl`, 12:27:00 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 12:27:28 UTC) are active.
+  - Prompt `8546b335b582` (25,991 characters), equal to prompt.md, with "לטפל בה בדחיפות" gone. The tool texts are unchanged (`81322f5daf6b`).
+  - Memory `-102` and `-102-uchat`, and promise v7 in Send. The one phrase list is in Send, Reply usable? (twice) and Try again.
+  - A second `--apply` run says nothing to do.
+- **The blind Claude-played lift arc** (`scripts/wa_qa_retest7.json`) on the candidate: 5 turns, 5/5, no guard rejection, no flag.
+  - **Opening:** "את התיקון עצמו עושה חברת המעליות … אנחנו מעבירים להם את כל הפרטים, עוקבים אחרי הקריאה ולוחצים עליהם. מתי הם מגיעים לתקן תלוי בהם, לא בנו", with 255-1600-26, ending on a question about the lift.
+  - **"When?":** "בידיים של חברת המעליות", with no time.
+  - **The second "when":** the lift company stays, and he adds a note that the tenant is waiting and a question about a neighbour who needs the lift.
+  - **The status tap:** the lift company, with no time.
+  - It checks the text's logic, not Gemini. Whether Gemini still adds speed is the tester's retest.
+- **Then:** the two pins moved (`8546b335b582`, `c683a1079612`). The gate went all green on the candidate and then on live (566/566, every pin), and `n8n_uchat.py --apply` carried it to the UChat copy. Snapshot: `local/n8n-whatsapp-live-10nov-before-retest7.json`.
+- **Owed:**
+  - **The tester's retest of the touched steps:** C1, C2, C3 steps 2-3, then C8 from 23:00 PH (17:00 Israel), which reaches the after-hours line for the first time. About 11 messages, about 44 US cents.
+  - **The incoming phone agent's lift line** has the same "לטפל בה בדחיפות". Chatbot first.
+
 ### Read only: what is left on the two phone agents (owner: "so what do we have left in the voice agent both inbound and outbound")
 - **Answered in chat from HANDOVER, with two live reads at about 12:05 UTC.**
 - **The incoming agent** is live and equal to the repo (14,534 characters, updated 10 Nov 11:00 UTC). Left: the owner's test call and the first-call check of the office-hours block; Yariv on which key reaches the emergency centre; lift reports into OXS from the phone (built, off, the owner's go); what the phone has no counterpart for (the caller known by his number, the payment link, the "closed" message); the permanent menu key and the delay on Omni's leg; department routing (Homies).

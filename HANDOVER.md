@@ -31,16 +31,19 @@ appended to.
 >   - **For Yariv, the owner's call:** on the phone the emergency centre is the number the caller has just dialled. Which key reaches it after hours? Until he says, Michael gives the number as it is.
 >   - **Rollback:** the previous commit's `docs/assistant/demo-inbound.md` and `scripts/vapi_tools.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` from Git Bash.
 >
-> **BUILT, NOT LIVE YET: epoch 102, the tester's seventh run** (`scripts/n8n_whatsapp_retest7.py`; the owner pasted Grok's report; WORKLOG 10 Nov). The repo is ahead of live: `prompt.md`, `MEMORY_EPOCH` 102, `EPOCH_COVERS` and Send's promise phrases (v7) are the candidate's.
+> **LIVE 10 Nov: epoch 102, the tester's seventh run** (`scripts/n8n_whatsapp_retest7.py`; the owner pasted Grok's report; WORKLOG 10 Nov). Live and the UChat copy, both read back.
 >   - **What:**
->     - The lift line loses "לטפל בה בדחיפות". Every lift ticket since epoch 100 gave it back as "כמה שיותר מהר" (C1.3 "ונוודא שהם מגיעים לטפל כמה שיותר מהר").
->     - Send's promise list knows "נשלח איש מקצוע / בעל מקצוע" (C3.3).
->   - **To finish:**
->     1. Read the blind lift arc's grade (`scripts/wa_qa_retest7.json`).
->     2. Move the two pins in `check_whatsapp_rules.py`: the prompt to `8546b335b582`, Try again's note to `c683a1079612`.
->     3. Run `python scripts/n8n_whatsapp_retest7.py --apply`, then `python scripts/n8n_uchat.py --apply`.
->     4. Run the gate on live.
->   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert this commit's `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS` and the two phrase lists.
+>     - The lift line's press has no speed: "ולוחצים עליהם", as Yariv said it. Its "לטפל בה בדחיפות" came back in every lift ticket since epoch 100 as "כמה שיותר מהר" (the run's C1.3: "ונוודא שהם מגיעים לטפל כמה שיותר מהר").
+>     - Send's promise list (v7) cuts "נשלח / ישלחו" with "איש מקצוע / בעל מקצוע" (the run's C3.3: "נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה").
+>   - **Read back, live (`u2JjrbcNPYyyh3yl`, 12:27:00 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 12:27:28 UTC):** active; prompt `8546b335b582` (25,991 characters); memory `-102` and `-102-uchat`; tool texts unchanged; promise v7 and the one phrase list in Send, Reply usable? and Try again.
+>   - **Checked:**
+>     - The gate passes 566/566 with every pin, on the candidate and on live. The replay changed 1 of 1,494 replies, the run's own C3.3.
+>     - The blind lift arc (`scripts/wa_qa_retest7.json`) passed 5/5: the lift company on opening, on both "when"s and on the status, with no time and no speed.
+>   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS`, the two phrase lists and the two pins.
+>   - **Owed:**
+>     - **The owner's Grok retest:** C1, C2, C3 steps 2-3, then C8 from 23:00 PH (17:00 Israel), which is the first run to reach the after-hours line. About 11 messages, about 44 US cents.
+>     - **The incoming phone agent's lift line** (`docs/assistant/demo-inbound.md`) still says "לטפל בה בדחיפות". It gets the same change, on the owner's word.
+>   - **Not changed, watched:** the bare "anything else" (R5: C1.3 and C6.5, as in the sixth run) and the plural "you" (C3.2, C11.4). Both were in the 8 Nov runs at the same steps, and no text causes them.
 >
 > **LIVE 10 Nov: epoch 101, the tester's sixth run** (`scripts/n8n_whatsapp_retest6.py`; the owner pasted Grok's report; WORKLOG 10 Nov). Live and the UChat copy, both read back.
 >   - **What:** the one-voice sentence's exception is named by the matter, "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך", not by who. Epoch 100's "חוץ מחברת המעליות ומצוות הגבייה" had the run pass things on to "the team" five times (C3.3, C8.1, C8.2, C10.1, C11.3) and promise speed once (C3.3). The same steps named nobody in both 8 Nov runs.
@@ -50,8 +53,8 @@ appended to.
 >     - `check_patchers_idle.py`: only feedback9 refusing on the epoch differs from live as it was.
 >     - The blind Claude-played check (`scripts/wa_qa_retest6.json`) passed 11/11 in 7 turns. The lift company came on opening, on both "when"s and on the status, the collections call came, and no team appeared anywhere.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest6.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest6.json`), then `python scripts/n8n_uchat.py --apply`. Then revert this commit's `MEMORY_EPOCH`, `EPOCH_COVERS`, `prompt.md` and pin.
->   - **Owed:** the owner's Grok retest of the touched steps: C1, C3 steps 2-3, C6 step 2, C11 steps 1-3, C8, then C10 step 1 after 5 minutes. That is 16 messages, about 64 US cents. Run from 23:00 PH, C8 also shows the after-hours line, which no run has reached yet.
->   - **Not changed, watched in the retest:** R5's bare "anything else meanwhile" (C1.4, C6.5). The prompt already forbids it while the matter is open, and no text causes it.
+>   - **Owed:** ~~the owner's Grok retest of the touched steps.~~ It came back on 10 Nov as a full run again (41 messages, in office hours). No team anywhere, and its two promises led to epoch 102 above.
+>   - **Not changed, watched in the retest:** R5's bare "anything else meanwhile" (C1.4, C6.5). It stayed in the seventh run (C1.3, C6.5). It was there on 8 Nov too, so it is left (epoch 102 above).
 >
 > **LIVE 9 Nov: epoch 100, Yariv's written review of the simulated run** (`scripts/n8n_whatsapp_feedback9.py`; owner: "Feedbacks"; WORKLOG 9 Nov, CONTEXT has the rules). Live and the UChat copy, both read back.
 >   - **What:**

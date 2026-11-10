@@ -221,7 +221,12 @@ PINS = {
     # the matter ("רק במעלית ובהוראת קבע זה אחרת"), not by who. Claude-played blind on the candidate
     # (scripts/wa_qa_retest6.json): the lift and the standing order, 7 turns, 11/11, no guard rejection; the
     # lift company on opening, on both "when"s and on the status, the collections call, and no team anywhere.
-    'Answer the resident / system': 'ce596f4e9f9a',
+    # 10 Nov, later (n8n_whatsapp_retest7.py, epoch 102, the tester's seventh run): the lift line's press loses
+    # "לטפל בה בדחיפות", which every lift ticket since epoch 100 gave back as "כמה שיותר מהר". Claude-played
+    # blind on the candidate (scripts/wa_qa_retest7.json): the lift arc, 5 turns, 5/5, no guard rejection, no
+    # flag; the lift company on opening ("עוקבים אחרי הקריאה ולוחצים עליהם. מתי הם מגיעים לתקן תלוי בהם"), on
+    # both "when"s and on the status, with no time and no speed.
+    'Answer the resident / system': '8546b335b582',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -235,7 +240,10 @@ PINS = {
     # and the note's reason names them. Claude-played the retry on C6.4's real first draft (158913, "רשמתי
     # את הפרטים…" with no tool): sent back by `deeds`, the second pass noted the details with notify_team,
     # never mentioned it, and asked for the cheque's photo, with no "we" and nothing fixed.
-    'Try again / note': '80f711f381c4',
+    # 10 Nov, later (n8n_whatsapp_retest7.py, promise v7): the note's copy of the promise phrases gains
+    # "נשלח / ישלחו" + "איש מקצוע / בעל מקצוע", as Send's and Reply usable?'s do; nothing else in it moves.
+    # It is n8n_whatsapp_retry.py's own note (check_patchers_idle: retry no longer updates it).
+    'Try again / note': 'c683a1079612',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
