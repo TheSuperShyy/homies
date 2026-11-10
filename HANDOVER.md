@@ -98,7 +98,13 @@ appended to.
 >       - After that, never Stop or Hold it again.
 >       - **It did not:** Play was pressed (⏸ by 09:24 UTC), then two more Rings (09:21:11 and 09:32:58 UTC, both 200). By 09:38 UTC no call had reached Vapi or our router.
 >       - **Owed:** the owner sends Omni the rewritten email (`local/omnitelecom/2026-11-09-health-check-email.txt`): three leads, and is the bot (208) available to their dialer?
->     - **10 Nov, about 11:15 UTC, read only:** still no dialer call on Vapi since the three leads. A hand call from extension 200 reached the incoming agent on 9 Nov, 13:53 UTC, so 208 itself works. Omni's 8 Nov email, re-read in Hebrew, matches our request in every field and leaves "the bot's availability" (the dialer rings only for a free agent) or a failed outgoing call, both on their side. The lead rows in Tokomni's panel would tell: still "New" means it never tried. The reply below is still the next step.
+>     - **10 Nov, about 11:15 UTC, read only:** still no dialer call on Vapi since the three leads. A hand call from extension 200 reached the incoming agent on 9 Nov, 13:53 UTC, so 208 itself works. Omni's 8 Nov email, re-read in Hebrew, matches our request in every field and leaves "the bot's availability" (the dialer rings only for a free agent) or a failed outgoing call, both on their side. The lead rows in Tokomni's panel would tell: still "New" means it never tried.
+>     - **What we can do (10 Nov, WORKLOG has the reasons), in order:**
+>       1. The owner sends `local/omnitelecom/2026-11-10-health-check-email.txt`. It replaces the 9 Nov draft named below: the same three times, plus the hand call, the 26 Oct hand lists and four questions.
+>       2. In Tokomni, the owner or Ido reads the List 2 row (Play or Hold, how many New), then makes a list by hand with Ido's number and presses Play, as on 26 Oct. A ring means only List 2's API leads are stuck.
+>       3. With the dashboard's email and password in `.env`, we can read their call log (`calllog_login`) and see what the dialer did with each lead.
+>       4. Our own outgoing calls through a line (the 2 Nov plan) wait on Omni's SIP details or the Zadarma line. The Vapi account has no outgoing line.
+>     - **Our lead token can only add leads:** the API allows POST alone, so nothing of ours reads a list or a lead.
 >     - **The phone never rang** (the owner, "none rang"). So the dialer took the lead and did not dial. We hold no call-log login (only `TOKOMNI_TOKEN`, campaign, dialer and List 2 ids), so the reason is Omni's to find.
 >     - **Owed:**
 >       - the reply to Omni, which is drafted and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew). It gives the time, the id and that no call was dialled, and asks whether List 2 is on Play, and whether the dialer sees the bot (208) as available;

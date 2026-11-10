@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### What we can do about the dialer (owner: "so check what can we do"; read only, and the reply to Omni rewritten for the owner to send)
+- **Our lead token can only add leads.**
+  - Decoded here, it carries the PBX domain and a year's expiry, and no scope.
+  - Asked read-only, the API allows POST alone on `/api/v1/dialer/campaign/`: GET answers 405 with "Allow: POST, OPTIONS". The list's own address and the index answer 404, and every documentation path a 403 page.
+  - So nothing of ours can read List 2 or what became of a lead.
+- **The bot's side is as it was.** The SIP address `e9f95429` is active, unchanged since 25 Oct, and asks our function per call. The Vapi account holds one credential, Cartesia. It has no outgoing line, so Vapi cannot place a phone call itself today.
+- **What worked before:** on 26 Oct, lists made by hand in the panel were dialled and reached the bot ("test 2026" ran 17 s before the debt agent's 83 s call, and a `dialer-` call came at 09:52 UTC). The dialer's settings then: Homies_Bot, 5 channels, the only participant "Bot EXT 208", "Never stop" on. List 2 has never rung a lead that came through the API.
+- **So, in order:**
+  1. **The reply Omni asked for** (their step 7: the exact time of the test lead). It is rewritten for today as `local/omnitelecom/2026-11-10-health-check-email.txt`, Hebrew with an English check copy: the three times and ids, the list on Hold against their "always continue", the hand call that reached the bot, the hand lists of 26 Oct, and four questions. The owner sends it. The 9 Nov draft is kept beside it.
+  2. **Two minutes in Tokomni, the owner or Ido.** Read the List 2 row: Play or Hold, and how many are New. Then make a list by hand with Ido's number and press Play, as on 26 Oct. A ring means the dialer and the bot are fine and only List 2's API leads are stuck. No ring means the dialer has lost the bot.
+  3. **Their call log, if the owner gives the dashboard's email and password.** `calllog_login`, from their own document, lists outgoing calls by time and status. With the login in `.env` we can see what the dialer did with each lead.
+  4. **Our own outgoing calls through a line, if Omni cannot fix the dialer:** the 2 Nov plan. It needs Omni's SIP details, which they advised against on 8 Nov, or the Zadarma line (18 Oct, no details yet).
+- **Not done:** no lead was sent, and nothing was written to Omni's side.
+- CONTEXT is unchanged: no rule. HANDOVER's dialer block has the order.
+
 ### Read only: Omni's 8 Nov email again, in Hebrew, against the dialer that does not ring (owner, pasting the thread: "look at this does this help us to identify the problem in the dialer")
 - **What was pasted:** Omni's 8 Nov answer in its Hebrew original, under our 9 Nov question about where the API key was sent. Nothing in it is newer than the three test leads of 9 Nov.
   - Saved as `local/omnitelecom/2026-11-08-lead-api-v1-hebrew.txt`.
