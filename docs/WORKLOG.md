@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The closed-ticket message on the Chatwoot route: it triggers, and WhatsApp refuses the template (owner: "can you close a ticket any ticket only 1 to check if the follow up message will trigger")
+- **Closed one ticket:** 255-1433-26 (the run-8 lift, WhatsApp, the owner's +63, בר כוכבא 23), set `resolved` in `requests` at 16:14:00 UTC. Only ours: its OXS call stays open.
+- **It triggers:** `queue_ticket_resolved_notice` queued `ticket_resolved_he` at 16:14:04. The 16:14:30 notices run sent it into Chatwoot conversation 1 at 16:14:31.
+- **WhatsApp refused it:** "(#132001) Template name does not exist in the translation". The `ticket_notices` row is `failed`, attempt 1. A failed row is not retried, so a resend needs it set back to `pending`.
+- **Why, most likely:** Meta lists the number (id ..077) under two WABAs.
+  - "ASTDX - Smart Link" (`2117787955519632`, inbox 1's `business_account_id`) holds `ticket_resolved_he` and `payment_link_he`, both `he` and APPROVED. That is also what Chatwoot's sync read.
+  - "hadas 1" (`1389698653006050`, the number's display name) holds only `hello_world`.
+  - UChat's sends find the templates (the debt link's `payment_link_he` went at 12:45 UTC today); ours, through Chatwoot with the HOMIES token, do not. So ours are looked up in "hadas 1".
+  - Free text is unaffected: the 15:54 greeting went out.
+- **What the message would have said** (the template filled in): "…הקריאה שלכם מספר 255-1433-26 (המעלית תקועה בקומה 3 מהבוקר | יש רק מעלית אחת | הדייר שוב שואל מתי מגיעים ומחכה ) טופלה ונסגרה…".
+  - `{{2}}` carries the whole description, so the bot's own notes about the tenant (added with `add_request_detail`) would reach the tenant.
+  - The template's wording is plural ("שלכם", "כתבו"), the owner's text of 22-23 Sep.
+- **Ways out, for the owner:**
+  - (1) The same two templates in "hadas 1" (`wa_templates.py create … --waba 1389698653006050`): a write in Meta, the owner's go, then Meta's approval.
+  - (2) Meanwhile, the notices and links through UChat again (`WHATSAPP_VIA=uchat`, that one secret): proven today, until UChat's trial ends around 16 Nov.
+- Nothing else was changed. The ticket stays resolved.
+
 ### LIVE: the bot is back on Chatwoot, on the owner's Israeli number (owner: "move to the chatwoot now that it passed")
 - **Checked before anything moved:**
   - The Israeli number is CONNECTED, CLOUD_API, quality GREEN, and its WABA (`2117787955519632`) is approved.
