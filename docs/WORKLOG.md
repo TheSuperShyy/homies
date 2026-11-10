@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Read only: the tester's after-hours check of C8 ran inside office hours (the owner pasted its report)
+- **When:** 13:27-13:29 UTC, 15:27 Israel (21:27 PH), a Tuesday: office hours. So the emergency line rightly did not show, and it has still never gone out from the real bot. The UChat copy's executions 170607 and 170616.
+- **What went out:**
+  - **C8.1:** the smoke was added to the urgent ticket opened 15 minutes before (255-1435-26, add_request_detail), with no new ticket and no new OXS call. Then he asked "זה עדיין באותה קומה?".
+  - **C8.2:** the first draft said "פתחתי … והוספתי" with no tool that turn, and the truth check sent it back. The retry looked the ticket up and wrote "כמו שציינתי, פתחתי קריאה דחופה על העשן, והוספתי את העדכון שלך לקריאה 255-1435-26.": both deeds are true from earlier in the chat, with no question.
+- **A note that keeps coming back:** "as I said" when a rule makes him say something again: "כמו שציינתי" (sixth run C7.2, this C8.2) and "כמו שהזכרתי" (run 8 C1.5, the lift on "when?"). It is tone, not a rule. Raised with the owner, not changed.
+- **Still owed:** C8 after 23:00 PH (17:00 Israel), or before 15:00 PH on a weekday.
+
 ### Read only: the short retest of epoch 102 (run 8), read against the executions (the owner pasted its report)
 - **The run:** the capped retest as asked: C1, C2, C3 steps 2-3 and C8, 11 messages, 12:52-13:14 UTC (14:52-15:14 Israel, a Tuesday).
   - It was inside office hours again, so the after-hours line has still not been seen on the real bot.

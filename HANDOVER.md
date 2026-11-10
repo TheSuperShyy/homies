@@ -67,7 +67,7 @@ appended to.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS`, the two phrase lists and the two pins.
 >   - **Owed:**
 >     - ~~The owner's Grok retest~~ **Done, 10 Nov 12:52-13:14 UTC (run 8, 11 messages, capped as asked):** both fixes held, in the drafts too. No speed, no professional sent, the lift company on opening, on both "when"s and in C2 (WORKLOG 10 Nov).
->     - **Still owed: the after-hours line.** Run 8 was inside office hours (14:52-15:14 Israel), so 077-6687949 has still never gone out from the real bot. C8 alone after 23:00 PH, or before 15:00 PH on a weekday (2 messages), from Grok or the owner's phone.
+>     - **Still owed: the after-hours line.** Run 8 (14:52-15:14 Israel) and the C8-only check after it (15:27 Israel) were both inside office hours, so 077-6687949 has still never gone out from the real bot. C8 alone after 23:00 PH, or before 15:00 PH on a weekday (2 messages), from Grok or the owner's phone.
 >     - **The incoming phone agent's lift line** (`docs/assistant/demo-inbound.md`) still says "לטפל בה בדחיפות". It gets the same change, on the owner's word.
 >   - **Not changed, watched:** the bare "anything else" (R5: C1.3 and C6.5, as in the sixth run) and the plural "you" (C3.2, C11.4). Both were in the 8 Nov runs at the same steps, and no text causes them.
 >
