@@ -608,6 +608,18 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   debt call's link and the "done" notice. `WHATSAPP_VIA=chatwoot` plus an `--apply` moves back.
   Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
   mirror's key.
+- **Since the move to Chatwoot (10 Nov), a template for the bot's number lives in TWO WhatsApp accounts.**
+  Meta lists the number under "ASTDX - Smart Link" `2117787955519632` and "hadas 1" `1389698653006050`.
+  - **Our sends (Chatwoot, the HOMIES token) look templates up in "hadas 1".** Proven 10 Nov to a fictional
+    number: `hello_world`, there only, was found (#131058, test numbers only), while `ticket_resolved_he`, then
+    only in ASTDX, was not (#132001). So a template missing from "hadas 1" is refused, with no error shown.
+  - **Chatwoot's template list comes from inbox 1's `business_account_id`, ASTDX,** and the tool server sends
+    only what that list has (`template_not_synced` otherwise). So a new template goes to both:
+    `wa_templates.py create <name> --apply` (`.env`'s WABA is ASTDX) and `... --waba 1389698653006050 --apply`.
+    Then Chatwoot's sync.
+  - UChat's own sends find templates in ASTDX, which is why the 4-5 Nov submissions worked there.
+- **The closed-ticket message quotes only the report** (039, 10 Nov): `{{2}}` is the description before the
+  first " | ", so what the bot adds to a ticket ("הדייר שוב שואל...") never reaches the tenant.
 - **Templates belong to the number's own WhatsApp account.** No template leaves UChat until it is
   approved there and synced into UChat. Inside 24 hours, free text goes.
   - **4 Nov:** `payment_link_he` was submitted there on the owner's go, PENDING. `ticket_resolved_he` is not submitted yet.

@@ -19,6 +19,9 @@ conversation that produced it.
 - **Submitted to "hadas 1" at 16:19 UTC** (`wa_templates.py create … --waba 1389698653006050 --apply`, the owner's go): `ticket_resolved_he` (id `4675959222649546`) and `payment_link_he` (id `30145416878382371`), the same wording as approved before, UTILITY / he, both PENDING.
 - **039 applied** (`supabase/039_notice_first_description.sql`, through the Management API's `/database/query`, as 037 was): `{{2}}` is the report before the first " | ", so the bot's own notes no longer reach the tenant. 255-1433-26 reads "המעלית תקועה בקומה 3 מהבוקר". Read back: SECURITY DEFINER, `search_path` pinned, `split_part` in, and the trigger enabled.
 - **Next:** on approval, the 16:14 notice row goes back to `pending` with the clean `{{2}}`, and the 2-minute run sends it through Chatwoot. If Meta is slow, `WHATSAPP_VIA=uchat` carries it meanwhile.
+- **Standing, recorded in CONTEXT:**
+  - A template for the bot's number goes to both accounts: ASTDX feeds Chatwoot's list and is `.env`'s WABA since the move, and "hadas 1" is where our sends look.
+  - The closed-ticket message quotes only the report.
 
 ### The closed-ticket message on the Chatwoot route: it triggers, and WhatsApp refuses the template (owner: "can you close a ticket any ticket only 1 to check if the follow up message will trigger")
 - **Closed one ticket:** 255-1433-26 (the run-8 lift, WhatsApp, the owner's +63, בר כוכבא 23), set `resolved` in `requests` at 16:14:00 UTC. Only ours: its OXS call stays open.
