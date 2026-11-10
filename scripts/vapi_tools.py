@@ -268,10 +268,23 @@ def _open_request(location):
                 "nothing. A house number the street does not have: say which "
                 "numbers on that street Homies manages, and ask. Never say a "
                 "ticket exists before this returns a reference.\n"
+                # 10 Nov, the chatbot's epoch 100 (Yariv's 3.2): water inside a flat
+                # starts as the flat's, so "anything of unclear origin" is gone.
                 "A fault in the resident's own fixtures, a blocked sink, a tap, an "
-                "appliance inside the flat, is theirs and not a ticket; common "
-                "property, the building's systems, and anything of unclear origin "
-                "(a leak from above, water in a wall) is.\n"
+                "appliance, the flat's own electricity or lighting, is theirs and not a "
+                "ticket; common property and the building's systems are. Water inside a "
+                "flat, even from the ceiling or out of a wall, starts as the flat's: a "
+                "ticket only once it is known to come from the common property (the main "
+                "pipe, the roof).\n"
+                # 10 Nov (Yariv's 2.1): what the lift company needs.
+                "A lift ticket carries what the lift company needs as well: which lift "
+                "when the building has more than one, and the floor it is stuck on. What "
+                "they tell you after it opened goes on with add_request_detail.\n"
+                # 10 Nov: the chatbot's 5 Nov "already open" answer, said in words,
+                # because this agent gets `duplicate` and nothing that explains it.
+                "duplicate true means a request for this fault was already open and what "
+                "they said was added to it: tell them there is already an open request, "
+                "with that number, never that you opened one.\n"
                 # 22 Oct, feature 17: the two new refusals.
                 "It also needs who is reporting. Without reporter_name it opens "
                 "nothing and answers need_name: ask for their name and call again. "
@@ -569,18 +582,26 @@ INTAKE_TOOLS = [
         "you stay the only one the caller deals with.\n"
         "Call it the moment the caller's ask is past you: paying dues or arranging a "
         "payment (that one is also a ticket, open_request with type `payment`; put "
-        "its number in this description when you have it), a charge they dispute, a "
+        "its number in this description when you have it), a "
         "document they need (invoice, receipt, "
         "confirmation), moving in or out or a change of tenant, a contract, a price "
-        "quote, the committee's own business, a "
+        "quote, the committee members' own business (not the monthly committee fee, "
+        "which is yours), a "
         "caller you cannot understand and who cannot understand you (reason "
-        "`language`), or anything else only a person at Homies can complete. A plain "
-        "how-much-do-I-owe question is get_balance's; a fault is open_request's; a "
-        "ticket's status is get_request_status's. Those you do yourself.\n"
+        "`language`), or anything else only a person at Homies can complete. A "
+        "how-much-do-I-owe question, and why they are charged what they are, even "
+        "when they say it is wrong, is get_balance's: what it returns is the answer; "
+        "a fault is open_request's; a ticket's status is get_request_status's; a "
+        "standing order is request_standing_order's. Those you do yourself. So is a "
+        "payment or a refund they say the record does not show: you check it with "
+        "them against the balance, and this records it, once, with what they told "
+        "you (how much, when, how); no correction or refund is promised.\n"
         "A request to speak with a manager or a person: call this right away (reason "
         "caller_request, with whatever they have said). Like every note it is quiet: "
         "what they hear from you is that you care and are doing all you can to help "
-        "them, never that someone has been told.\n"
+        "them, never that someone has been told, and never that their request for a "
+        "manager was recorded, also not later when they ask when someone will get "
+        "back to them.\n"
         # 16 Sep, the client's review: no national numbers and no safety
         # instructions from the bot. The note and the ticket are the whole
         # response to an emergency, so they come first.
@@ -619,7 +640,8 @@ INTAKE_TOOLS = [
                 "enum": INTAKE_NOTE_REASONS,
                 "description": (
                     "payment = paying dues, a payment arrangement, instalments; "
-                    "billing = a disputed charge or a document they need; move = "
+                    "billing = a payment or a refund the record does not show, or a "
+                    "document they need; move = "
                     "moving in or out, a change of tenant; contract = a contract; "
                     "quote = a price quote; emergency = a person in danger; "
                     "caller_request = they asked for a person; language = you and "
@@ -675,7 +697,8 @@ INTAKE_TOOLS = [
         "it — whole, or just the digits — and the lookup is forgiving. With no "
         "reference, the building and apartment find their recent requests. What comes "
         "back is everything you know: it does not say when a technician will come or "
-        "who is handling it.",
+        "who is handling it. When you tell them what it shows, name the request by "
+        "its number.",
         {
             "reference": {
                 "type": "string",
@@ -704,12 +727,18 @@ INTAKE_TOOLS = [
     ),
     _fn(
         "get_balance",
-        "Call when the caller asks how much is owed on an apartment, or whether the "
-        "building fee is paid. Building and apartment identify them; a full name works "
-        "if they offer one. Read the amount as words. You can read a balance and you "
+        "Call when the caller asks how much is owed on an apartment, whether the "
+        "building fee is paid, or why they are charged what they are, and when they "
+        "say an amount is too high or wrong: what it returns is the record, and the "
+        "record is your answer (which months are open, how much each, the total). "
+        "Building and apartment identify them; a full name works "
+        "if they offer one. Read the amounts as words. You can read a balance and you "
         "cannot touch one: read it if they asked how much, and then, if they want to "
         "pay or arrange payments, that is a ticket (open_request, type `payment`) and "
-        "a note (notify_team); a receipt or a dispute is a note. Do not send "
+        "a note (notify_team); a standing order is request_standing_order; a receipt "
+        "they need is a note. A payment they say the record does not show is checked "
+        "with them against what this returns, then noted (notify_team, reason "
+        "billing) with how much, when and how they paid. Do not send "
         "them to the office. found 0 means no apartment matched and nothing was read: "
         "that is not a zero balance. Say you could not find it and check the address "
         "with them.",
@@ -750,7 +779,8 @@ INTAKE_TOOLS = [
         "(הוראת קבע), or asks whether they can pay that way. It records the request for "
         "the collections team, who set it up with them. It is the whole answer: no ticket "
         "(open_request), no note (notify_team), and nothing asked about a card or a bank "
-        "account. Like a note it is quiet: what they hear is that you recorded it.\n"
+        "account. What they hear is that you recorded it, and that someone from the "
+        "collections team will phone them about it.\n"
         "A caller whose number is on file is found by it and asked nothing. Otherwise it "
         "records nothing yet and answers what is missing, one thing at a time: need_name "
         "(ask for their full name), need_phone (this call came with no number of its own: "
@@ -760,9 +790,11 @@ INTAKE_TOOLS = [
         "again with what they said. Someone who will not give a name or a number, after "
         "hearing once that it is so the request is under their name, still gets it: "
         "name_declined or phone_declined true.\n"
-        "recorded_now true: say you recorded their request and read the reference back. "
-        "already_recorded true: it was already recorded, with that reference. Either way "
-        "nothing more: nobody who will call, no date, no procedure.",
+        "recorded_now true: say you recorded their request, read the reference back, and "
+        "say that someone from the collections team will phone them about it. "
+        "already_recorded true: it was already recorded, with that reference, and the "
+        "same call from collections stands. Never when, and nothing about how it is set "
+        "up.",
         {
             "said": {
                 "type": "string",

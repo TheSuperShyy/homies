@@ -348,7 +348,7 @@ def repo_tools(target):
 def resolve(prompt, variables):
     for k, v in variables.items():
         prompt = prompt.replace("{{%s}}" % k, v)
-    return render_now(render_greeting(prompt))
+    return render_hours(render_now(render_greeting(prompt)))
 
 
 # The opening line greets by the hour since 22 Sep: a Liquid `{% %}` block that
@@ -398,6 +398,29 @@ def render_greeting(text, hour=None):
 def render_now(text, now=None):
     t = jerusalem_now() if now is None else now
     return NOW_EXPR.sub(lambda m: t.strftime(m.group(1)), text)
+
+
+# 10 Nov: the inbound prompt says whether the office is open (Sun-Thu 09:00-17:00,
+# Israel), because an urgent fault also gets the emergency centre only while it is
+# closed (the client's 9 Nov review, as on WhatsApp since epoch 100). It is a second
+# Liquid block: assigns for `wd`, `hr` and `closed` that end at their own endif, then
+# one `{% if closed > 0 %}A{% else %}B{% endif %}`. Vapi renders it at the start of
+# the call; left raw here, the model would read both branches.
+HOURS_SETUP = re.compile(r"\{%\s*assign\s+wd\s.*?\{%\s*endif\s*%\}", re.S)
+HOURS_BLOCK = re.compile(r"\{%\s*if\s+closed\s*>\s*0\s*%\}(.*?)\{%\s*else\s*%\}(.*?)\{%\s*endif\s*%\}", re.S)
+
+
+def office_closed(now):
+    """Outside Sun-Thu 09:00-17:00. Python's Monday is 0, so Friday is 4 and Saturday 5."""
+    return now.weekday() in (4, 5) or now.hour < 9 or now.hour >= 17
+
+
+def render_hours(text, now=None):
+    if "assign wd" not in text:
+        return text
+    closed = office_closed(jerusalem_now() if now is None else now)
+    text = HOURS_SETUP.sub("", text, count=1)
+    return HOURS_BLOCK.sub(lambda m: m.group(1) if closed else m.group(2), text)
 
 
 # What the tools answer. Fixed, so both halves of a pair get the same facts back

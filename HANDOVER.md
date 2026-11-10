@@ -8,6 +8,29 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 10 Nov, 11:00 UTC: the incoming phone agent acts like the chatbot** (owner: *"make sure the voice agent inbound acts like the chatbot as well"*; WORKLOG 10 Nov; `docs/assistant/demo-inbound.md`, "10 Nov"). The incoming agent `10ae859a` only. The debt agent is unchanged.
+>   - **What a caller gets now, as on WhatsApp:**
+>     - **A lift:** which lift and which floor are asked; on opening, on "when?" and on the status he hears that the lift company does the repair and that Homies passes it on and presses them.
+>     - **Water inside a flat:** the tenant's own professional first, unless it is known to come from the common property. Then a request.
+>     - **A standing order:** recorded, with its number, and someone from collections will phone. Never when.
+>     - **An urgent fault outside Sun-Thu 09:00-17:00 Israel:** the urgent request and its number, and also the emergency centre, 077-6687949, said in words. In office hours only the request.
+>     - **"A person or a computer?":** the digital assistant on Homies' service team. Never "a person".
+>     - **Money:** "why am I charged" is answered from the months and amounts on record. A payment the record does not show is checked with the caller and noted, with nothing promised.
+>     - **A manager:** as since 3 Nov, and the quiet note is never mentioned later either.
+>     - No police or insurance, no "emergency", nothing about another tenant, nothing outside Homies' matters.
+>   - **Read back:** no difference from the repo. Prompt `d10101912171` (14,534 characters), 8 tools on Supabase, voice `ba765d50`, gpt-5.6-sol at `low` on the fast tier, speed settings unchanged.
+>   - **Checked with Claude only, no spend:** seven blind calls (`scripts/voice_qa_likechat.json`), all as the rules say. It checks the text, not gpt-5.6-sol.
+>   - **Owed: the owner's call,** 077-6687949, then 9. If the agent does not answer, check the Vapi wallet first.
+>     - "המעלית אצלנו תקועה", then "מתי יבואו לתקן?" twice.
+>     - "יש לי נזילה מהתקרה באמבטיה".
+>     - "אני מדבר עם בן אדם או עם מחשב?", then "אפשר לשלם את הוועד בהוראת קבע?".
+>     - "למה אני מחויב?" with בר כוכבא 23, flat 2.
+>     - After 17:00 Israel (23:00 PH), or on a Friday or Saturday: "יש עשן בחדר המדרגות". Only then does the emergency centre show.
+>   - **Owed after the first call, read only:** the call's system message must read "המשרד פתוח עכשיו" or "המשרד סגור עכשיו", with no `{%` left in it (`GET /call?assistantId=10ae859a-…`, the first `system` message). The block is proven on liquidjs and its tags on a real debt call; `%w` is not yet seen on Vapi. If it is raw, roll back.
+>   - **Still different from the chatbot, because the phone has no such thing:** no payment link (wanting to pay is a request and a note); a caller's requests and balance are found by the address, not by his number; a tenant on file is still asked his name and address; no "closed" message; and no code filters a call, so the prompt is the only guard.
+>   - **For Yariv, the owner's call:** on the phone the emergency centre is the number the caller has just dialled. Which key reaches it after hours? Until he says, Michael gives the number as it is.
+>   - **Rollback:** the previous commit's `docs/assistant/demo-inbound.md` and `scripts/vapi_tools.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` from Git Bash.
+>
 > **LIVE 10 Nov: epoch 101, the tester's sixth run** (`scripts/n8n_whatsapp_retest6.py`; the owner pasted Grok's report; WORKLOG 10 Nov). Live and the UChat copy, both read back.
 >   - **What:** the one-voice sentence's exception is named by the matter, "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך", not by who. Epoch 100's "חוץ מחברת המעליות ומצוות הגבייה" had the run pass things on to "the team" five times (C3.3, C8.1, C8.2, C10.1, C11.3) and promise speed once (C3.3). The same steps named nobody in both 8 Nov runs.
 >   - **Read back, live (`u2JjrbcNPYyyh3yl`, 10:14 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 10:15 UTC):** active; prompt `ce596f4e9f9a` (26,007 characters); memory `-101` and `-101-uchat`; tool texts unchanged; danger v6 and promise v6 in Send.
@@ -35,7 +58,7 @@ appended to.
 >   - **Owed:**
 >     - The owner's handset for a stuck lift, water from the ceiling, a standing order, and an urgent fault outside office hours. The emergency line shows only then: before 09:00 or from 17:00 Israel time Sun-Thu, and all Friday and Saturday. On a weekday in PH time, that is before 15:00 or from 23:00.
 >     - ~~The Grok tester's short retest.~~ It came back on 10 Nov as a full run (48 messages, in office hours), and its fails led to epoch 101 above. C6.2 sent no email: 255-1417-26 is still open, so it answered "already recorded".
->     - The phone agent gets the same changes after the chatbot, on the owner's word.
+>     - ~~The phone agent gets the same changes after the chatbot, on the owner's word.~~ Done 10 Nov, 11:00 UTC (the block at the top).
 >   - **For Yariv (drafted to the owner):**
 >     - The 1.1 menu is his decision: no buttons, or other or more.
 >     - Gas after hours: the gas company's line only, or the emergency line too.
@@ -102,7 +125,7 @@ appended to.
 >     - The replay: 2,294 drafts gain the name in the two after-the-menu states, 6 lose a manager claim, and nothing is broken. All 17 pins are unchanged.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest5.py --restore` (snapshot `local/n8n-whatsapp-live-08nov-before-retest5.json`), then `python scripts/n8n_uchat.py --apply`.
 >   - **The rerun of C5 and C9 passed** (8 Nov, night; the entry above). C10's "6 open in all" was the tool's own `open_total`, which is right.
->   - **Seen, not changed:** C5 said "שלוש קריאות פתוחות" for two open tickets and one cancelled. The lookup lists the three newest of any status, and the model called them all open. The phone agent's same manager slip (the 3 Nov entry below) stays open.
+>   - **Seen, not changed:** C5 said "שלוש קריאות פתוחות" for two open tickets and one cancelled. The lookup lists the three newest of any status, and the model called them all open. The phone agent's same manager slip (the 3 Nov entry below) stayed open until 10 Nov, when its prompt and notify_team took the chatbot's sentence (the block at the top).
 >
 > **LIVE 8 Nov, evening: Send's voice v2** (`n8n_whatsapp_voice2.py`; live and the UChat copy, both read back; code only, still epoch 99). This is from the owner's own test of the fixes below (executions 164335-164424). That test passed the count (20 in all, 4 for the lift) and the cheque, where voice v1 turned the draft's "כדי שנוכל לסדר" into "כדי שאוכל לסדר".
 >   - **Two more forms went out, and are now cut:** "…, אבל זה כרגע אצל הצוות שמטפל בזה" (the 29 Oct form) and "קריאה למחלקת הניקיון". A cut that would leave a fragment ("מה שבטוח.") is not made.
@@ -273,7 +296,7 @@ appended to.
 >       - he opened the leak request himself (real ticket 255-1390-26, kept);
 >       - "when will the manager call?" got no time and no promise.
 >       - Vapi's judge passed all three checks.
->     - **Open, the owner's call: one slip.** The no-time answer added "הבקשה שלך לדבר עם מנהל רשומה", which tells the caller about the quiet note. The chatbot made the same slip in the checklist run (7.1-7.3). Both prompts share the when-line "ומרגיע אותו במה שנכון עכשיו, שהפנייה נפתחה או שרשמת את זה". Fix it in both, or neither, if the owner asks. **8 Nov, later:** the chatbot's half is closed in Send's code (manager v1, after the tester's fifth run failed it on R15). The phone's half stays open.
+>     - **Open, the owner's call: one slip.** The no-time answer added "הבקשה שלך לדבר עם מנהל רשומה", which tells the caller about the quiet note. The chatbot made the same slip in the checklist run (7.1-7.3). Both prompts share the when-line "ומרגיע אותו במה שנכון עכשיו, שהפנייה נפתחה או שרשמת את זה". Fix it in both, or neither, if the owner asks. **8 Nov, later:** the chatbot's half is closed in Send's code (manager v1, after the tester's fifth run failed it on R15). The phone's half stayed open until 10 Nov: its prompt and notify_team now say the note is not mentioned later either, and a Claude-played "when will the manager call?" heard no such claim.
 >     - **Also heard, unrelated to the change:** "מה השם שלך כדי שיפתח פנייה?" ("so that he opens"). It was the model's own text; no voice_guard rule makes it.
 >   - **Not changed:**
 >     - the debt-call agent, which on a request for a person still says someone from the team will call back, and ends the call;

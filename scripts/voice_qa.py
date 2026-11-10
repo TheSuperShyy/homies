@@ -154,10 +154,15 @@ def bundle(run, deck_path=DECK, candidate=False, name_required=None, cap=None):
             first = first.replace("{{%s}}" % k, v)
         hh, mm = (int(x) for x in s["time"].split(":"))
         import datetime
-        now = datetime.datetime(2026, 10, 5, hh, mm)
-        prompt = P.render_now(P.render_greeting(prompt, hh), now)
+        # 10 Nov: the scenario's own weekday, because the prompt now says whether
+        # the office is open. 4 Oct 2026 is a Sunday; an unknown day is Monday.
+        days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
+        day = days.index(s["weekday_he"]) if s.get("weekday_he") in days else 1
+        now = datetime.datetime(2026, 10, 4 + day, hh, mm)
+        prompt = P.render_hours(P.render_now(P.render_greeting(prompt, hh), now), now)
         first = P.render_now(P.render_greeting(first, hh), now)
         left = [v for v in re.findall(r"\{\{[^}]+\}\}", prompt + first) if v != "{{...}}"]
+        left += re.findall(r"\{%[^%]*%\}", prompt + first)
         if left:
             sys.exit("%s: unresolved placeholders %s" % (s["id"], sorted(set(left))))
         write(os.path.join(run, "context_%s.md" % s["id"]), "\n".join([

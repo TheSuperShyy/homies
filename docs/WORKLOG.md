@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### LIVE: the incoming phone agent acts like the chatbot (owner: "make sure the voice agent inbound acts like the chatbot as well")
+- **Live 11:00:00 UTC, the incoming agent `10ae859a` only.** Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`.
+  - The compare before it showed only the prompt and five tool texts differing. No call was in progress.
+  - Read back: no difference from the repo. Prompt `d10101912171` (14,534 characters), 8 tools on Supabase, voice `ba765d50`, gpt-5.6-sol at `low` on the fast tier. On live only `model.messages` and `model.tools` changed, so the 25 Oct speed settings are as they were.
+- **Why now:** HANDOVER had "the phone agent gets the same changes after the chatbot, on the owner's word" since epoch 100. Read rule by rule against the chatbot's prompt, the phone still had the superseded water rule ("the building checks"), sent a disputed charge to the team, said "emergency", told a standing order's caller nobody would call, and had no line for "a person or a computer?".
+- **What moved** (`docs/assistant/demo-inbound.md`, "10 Nov", has each with its reason; fence 9,441 → 14,534 characters, 13,922 rendered in office hours):
+  - **Yariv's 9 Nov review:** the lift company on opening, on "when?" and on the status, and the lift's details asked; water in a flat needs the tenant's professional first; collections will phone about a standing order; an urgent fault while the office is closed also gets the emergency centre; one voice names its exceptions by the matter (epoch 101's form).
+  - **The chatbot's own rules:** who he is and the honest "digital assistant"; money answered from the record; the word for the person by case; the shape of a "when" answer and something new on a second ask; the manager note quiet later too; "urgent", never "emergency"; no police or insurance; a deed needs a tool; only Homies' matters and nothing about another tenant.
+  - **Five tool texts** (`scripts/vapi_tools.py`, intake only): open_request, notify_team, get_balance, get_request_status, request_standing_order. The debt agent's tools are byte-identical, and it was not pushed.
+- **The office-hours block** is the one new mechanism. A Liquid block in the fence works out Sun-Thu 09:00-17:00 Jerusalem time and prints one of two sentences.
+  - liquidjs, the engine Vapi uses (10.30.1 here), renders it right at twelve instants (summer time, the Friday midnight), with strict filters and variables.
+  - `prompt_probe.render_hours()` is new and gives the same text byte for byte; `voice_qa.py bundle` now renders each card for its own weekday.
+  - A real debt call of 26 Oct shows Vapi renders tags inside a system prompt (six in the template, none raw in the call). `%w` itself is not yet seen on Vapi.
+- **Checked with Claude only, no spend** (`scripts/voice_qa_likechat.json`, seven blind calls, each on its own player):
+  - **The lift:** the floor and which lift asked one at a time, then "את התיקון עצמו עושה חברת המעליות … מתי יבואו לתקן תלוי בהם, לא בנו" with the number. On the second "when" he added the elderly neighbours to the request, looked it up again, and kept the lift company.
+  - **Water from her bathroom ceiling:** "קודם כל צריך בעל מקצוע מִטַּעֲמֵךְ … כבר התברר שזה בא מתקלה ברכוש המשותף?", and a request only after "the plumber said the main pipe".
+  - **"A person or a computer?":** "אני העוזר הדיגיטלי בצוות השירות של הומי'ז". Then the standing order at once, its number, and "מישהו מצוות הגבייה ייצור אִתָּךְ קשר בטלפון". Asked when: no date.
+  - **Smoke at 21:10:** the urgent note first, then the name, the address and the urgent request, then the emergency centre with the number in words. "What do I do now?" got what he did, the number and the centre, no advice and no question.
+  - **A manager, Friday 17:20:** a quiet note, a warm ask, the cleaning request opened by himself. "When will the manager call?" got no date and no "your request is recorded". No emergency centre for a matter that is not urgent.
+  - **"Why am I charged a thousand?":** four open months, 250 each, a thousand in all, "במערכת שלנו". The August payment was checked (how much, when, how), noted under `billing`, and nothing was promised. The neighbour's payments were refused.
+  - **A car broken into:** sorrow first, plainly not Homies', a request for the stuck gate, and no police or insurance.
+- **One replay.** The break-in call mirrored the caller's anger ("זה מכעיס מאוד"). The chatbot's "care, never nerves" sentence, left out at first, went in, and that one call was played again. It still said "מרגיז", which the chatbot's own sentence does not rule out either, so it stays there.
+- **Not carried, because the phone has no such thing:** the payment link, finding a caller's requests or balance by his number, a tenant on file recognised by his number, the "closed" message, and Send's filters. Nothing stands between the model and the voice on a call.
+- **Not run:** a simulated or a real call (no spend without a go), and the Vapi wallet check, which places a call.
+- **Also fixed:** `docs/knowledge/homies.md` still said there is no separate emergency line. Its row now carries the client's 9 Nov fact, so `facts_check.py` passes it on both channels (16 missing → 14; the rest are stale since September).
+- **Owed:** the owner's call, 077-6687949 then 9 (HANDOVER has what to say). The first call also shows whether Vapi rendered the office-hours block.
+- **Undo:** the previous commit's `docs/assistant/demo-inbound.md` and `scripts/vapi_tools.py`, then the same push command.
+
 ### LIVE (epoch 101): the tester's sixth run, read against the executions, and its cause fixed (the owner pasted its report)
 - **Live, both bots, read back:** live (`u2JjrbcNPYyyh3yl`, 10:14:32 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 10:15:32 UTC) are active with prompt `ce596f4e9f9a` (26,007 characters), memory `-101` and `-101-uchat`, the tool texts unchanged (`81322f5daf6b`), and danger v6 and promise v6 in Send. The new sentence is there and the old clause is gone. A second `--apply` run says nothing to do.
 - **The blind Claude-played check** of `scripts/wa_qa_retest6.json` on the candidate: 2 conversations, 7 turns, 11/11 expectations, no guard rejection.

@@ -1,0 +1,284 @@
+{
+ "_about": "The incoming phone agent carries the chatbot's rules (10 Nov, owner: \"make sure the voice agent inbound acts like the chatbot as well\"): the lift company on opening and on both \"when\"s, with the lift's details asked; water in a flat needs the tenant's professional first; a standing order hears that collections will phone; an urgent fault outside office hours also gets the emergency centre; the honest answer to \"a person or a computer?\"; a disputed charge answered from the record and a missing payment recorded, nothing promised; no other tenant's details; no police or insurance for a matter that is not Homies'. in_manager_when is the 6 Nov card (voice_qa_retest.json), unchanged.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {
+   "_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. A second call with the same building and type returns the first reference with duplicate: true.",
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "save_partial_request": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>",
+   "partial": true
+  },
+  "add_request_detail": {
+   "ok": true,
+   "reference": "<ticket>"
+  },
+  "notify_team": {
+   "ok": true,
+   "team_notified": true
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "get_balance": {
+   "ok": true,
+   "found": 0
+  },
+  "get_service_info": {
+   "ok": true,
+   "found": false,
+   "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+  },
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "_rule": "Incoming calls (the debt agent's version takes no arguments and returns `recorded`). The scenario's `caller.on_file` true: recorded at once. Otherwise, in this order: no reporter_name and no name_declined -> need_name; then, when the scenario's `caller.call_has_number` is false and there is no reporter_phone and no phone_declined -> need_phone; then no building naming Bar Kochba (בר כוכבא) with 23 -> need_building; then recorded. A second call after recorded returns already.",
+   "recorded": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   },
+   "need_name": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_name"
+   },
+   "need_phone": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_phone"
+   },
+   "need_building": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_building"
+   },
+   "already": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": false,
+    "already_recorded": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   }
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "id": "in_lift_when",
+   "agent": "inbound",
+   "title": "incoming call: the lift is stuck, then when will it be fixed, twice",
+   "time": "10:40",
+   "weekday_he": "שלישי",
+   "ticket": "255-1561-26",
+   "caller": {
+    "persona": "אבי כהן, 52. Practical, a little impatient, short answers.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 7. The building has two lifts. The right-hand one (הימנית) has been stuck on the third floor since the morning. Nobody is inside it.",
+    "wants": "The lift fixed, and to know when.",
+    "tendencies": "Opens with 'המעלית אצלנו בבניין תקועה'. Says which lift and which floor only when asked. Gives his name and address when asked. After a request is opened asks 'ומתי יבואו לתקן?'. Whatever the answer, asks once more, impatient: 'אבל מתי? יש פה אנשים מבוגרים בבניין'. Then thanks and hangs up."
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "requests": [
+      {
+       "reference": "<ticket>",
+       "reference_spoken": "<spoken>",
+       "status": "open",
+       "type": "elevator",
+       "urgency": "high",
+       "opened": "today",
+       "last_update": "today",
+       "description": "what open_request was given on this call"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "in_water_ceiling",
+   "agent": "inbound",
+   "title": "incoming call: water from the bathroom ceiling in her flat",
+   "time": "14:15",
+   "weekday_he": "שני",
+   "ticket": "255-1562-26",
+   "caller": {
+    "persona": "מיכל לוי, 38. Worried, polite. Speaks of herself in the feminine.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 4. Since last night water drips from her bathroom ceiling. A plumber she called this morning told her it comes from the building's main pipe in the wall (הצנרת הראשית של הבניין).",
+    "wants": "Someone from Homies to deal with the leak.",
+    "tendencies": "Opens with 'יש לי נזילה מהתקרה באמבטיה, אני צריכה שמישהו יבוא'. Does not mention the plumber at first. If told she needs a professional of her own, asks once 'אתם לא יכולים לשלוח מישהו?'. Mentions what the plumber said only when asked whether it is known where the water comes from, or after that. Gives her name and address when asked."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_standing_person",
+   "agent": "inbound",
+   "title": "incoming call: a person or a computer? then a standing order, then when will they call",
+   "time": "11:05",
+   "weekday_he": "ראשון",
+   "ticket": "255-1563-26",
+   "caller": {
+    "persona": "דנה, 45. Direct, a little suspicious of automated lines.",
+    "on_file": true,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 6. Pays the building fee each month by bank transfer and keeps forgetting.",
+    "wants": "To pay the building fee by standing order (הוראת קבע) from now on.",
+    "tendencies": "Before anything else asks 'רגע, אני מדברת עם בן אדם או עם מחשב?'. Whatever the answer, goes on: 'טוב. אפשר לעבור להוראת קבע על הוועד?'. Before hanging up asks once when someone will call her to set it up."
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_smoke_night",
+   "agent": "inbound",
+   "title": "incoming call, after office hours: smoke in the stairwell, then what do I do now",
+   "time": "21:10",
+   "weekday_he": "רביעי",
+   "ticket": "255-1564-26",
+   "caller": {
+    "persona": "יוסי מזרחי, 60. Alarmed, talks fast.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 9. Smoke is coming out of the electricity cabinet in the stairwell on the second floor. He is standing on the stairs.",
+    "wants": "Someone to come now.",
+    "tendencies": "Opens with the smoke, not the address. Gives his name and address when asked. After hearing what was done asks 'ומה אני עושה עכשיו?'. Then presses once: 'אז אין אף אחד שאפשר לדבר איתו עכשיו?'. Then hangs up."
+   },
+   "fixtures": {
+    "notify_team": {
+     "ok": true,
+     "team_notified": true
+    }
+   }
+  },
+  {
+   "id": "in_manager_when",
+   "agent": "inbound",
+   "title": "incoming call: wants a manager, then the cleaning, then when will the manager call",
+   "time": "17:20",
+   "weekday_he": "שישי",
+   "ticket": "255-1543-26",
+   "caller": {
+    "persona": "אבי, 55. Angry, short sentences, does not want to explain to a bot.",
+    "knows": "Lives at בר כוכבא 23, apartment 3. The stairwell has not been cleaned for two weeks.",
+    "wants": "To speak to a manager, and the stairwell cleaned.",
+    "tendencies": "Opens with 'I want to speak to a manager'. Refuses once to explain to a bot. Then says the stairwell has not been cleaned for two weeks, gives his name and address when asked. Then asks: so when will the manager call me back?"
+   },
+   "fixtures": {}
+  },
+  {
+   "id": "in_money_dispute",
+   "agent": "inbound",
+   "title": "incoming call: why am I charged a thousand, I paid August, and does the neighbour pay",
+   "time": "16:30",
+   "weekday_he": "שני",
+   "ticket": "255-1565-26",
+   "caller": {
+    "persona": "שרה, 55. Annoyed about money, speaks of herself in the feminine.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 3. Her name is שרה גולן. She got a notice that she owes a thousand shekels. She paid August's fee, 250 shekels, by bank transfer on 10 August.",
+    "wants": "To know why she is charged a thousand, and to have August fixed.",
+    "tendencies": "Opens with 'למה אני מחויבת באלף שקל?'. Gives her address when asked. After hearing the months says 'אבל את אוגוסט שילמתי'. Says how much, when and how only when asked. Then asks 'ואגב, השכן מדירה חמש, הוא משלם בכלל?'. Then asks whether she will get the money back."
+   },
+   "fixtures": {
+    "get_balance": {
+     "ok": true,
+     "found": 1,
+     "resident": "שרה גולן",
+     "building": "בר כוכבא 23, תל אביב - יפו",
+     "unit": "3",
+     "owed_total": 1000,
+     "owed_months": [
+      {
+       "period": "2026-07",
+       "amount": 250
+      },
+      {
+       "period": "2026-08",
+       "amount": 250
+      },
+      {
+       "period": "2026-09",
+       "amount": 250
+      },
+      {
+       "period": "2026-10",
+       "amount": 250
+      }
+     ],
+     "in_review": [],
+     "_rule": "This is the answer for apartment 3 of Bar Kochba 23, or for her name. Any other apartment: found 0."
+    }
+   }
+  },
+  {
+   "id": "in_car_breakin",
+   "agent": "inbound",
+   "title": "incoming call: his car was broken into in the building's car park",
+   "time": "09:30",
+   "weekday_he": "ראשון",
+   "ticket": "255-1566-26",
+   "caller": {
+    "persona": "אלון ברק, 33. Upset, wants someone to take responsibility.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 11. Last night someone broke into his car in the building's car park and took a bag. The car park gate has been stuck open for a week.",
+    "wants": "To know what Homies will do about it.",
+    "tendencies": "Opens with 'פרצו לי לרכב בחניון של הבניין'. Mentions the gate only if asked how they got in, or if nothing is offered. Asks once 'אז למי אני פונה, למשטרה? לביטוח?'. Gives his name and address when asked."
+   },
+   "fixtures": {}
+  }
+ ]
+}

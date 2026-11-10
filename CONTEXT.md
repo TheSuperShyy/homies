@@ -33,6 +33,17 @@ The user is the builder. The client is Homies.
 - **Keep the checks light.** A new check earns its place by a bug it would have caught. No live probes, no spend.
 - n8n and the phone agents still deploy by their own scripts and gates.
 
+**The incoming phone agent carries the chatbot's rules (10 Nov; the owner: *"make sure the voice agent inbound acts like the chatbot as well"*; live 11:00 UTC).**
+- **One Michael on both channels.** What the chatbot's prompt decides (who he is, what a lift, a leak, a standing order, an urgent fault, a charge and a manager request get, and what he never says) is in the phone's fence too, in phone words. `docs/assistant/demo-inbound.md`, "10 Nov", lists each rule with the chatbot's epoch.
+- **Chatbot first still holds for new rules.** A chatbot change leaves a twin owed on the phone: say so in HANDOVER and in the report, and carry it on the owner's word. He has asked for it twice (3 Nov, 10 Nov), so never leave it unsaid.
+- **A carried rule is rewritten, not copied:** "פנייה" for "קריאה", "מתקשר" for "דייר", numbers in words, one question a turn, no quotation marks around example words. The tool texts move with the fence (`scripts/vapi_tools.py`, INTAKE_TOOLS only), and text that says the opposite goes first: the old water rule, "a charge they dispute" in notify_team, "nobody who will call" in request_standing_order.
+- **What the phone cannot follow, and why:** the payment link, the sender's number as identity (requests, balance, the tenant on file), the "closed" message, photos and the menu have no phone counterpart; these are capabilities, not wording. Send's filters have none either: nothing stands between the model and the voice, so on the phone the fence is the only guard.
+- **One difference kept on purpose:** a claimed payment gets no screenshot request, since a call cannot receive one. Michael checks the details, says what the system shows, and says he recorded what he was told.
+- **The hour comes from Vapi, not from the model.** The fence carries a Liquid block that works out Sun-Thu 09:00-17:00 Jerusalem time and prints "the office is open now" or "the office is closed now" with the emergency-centre sentence.
+  - It stays inside what the greeting block already uses (assign, the date filter with the timezone, if / elsif / else). Check a change to it on liquidjs, the engine Vapi uses, before pushing.
+  - `prompt_probe.render_hours()` renders it for the offline harness, and `voice_qa.py bundle` gives each card its own weekday. A deck's `weekday_he` now decides which sentence the played model reads.
+- **A change is played before it is pushed:** `scripts/voice_qa_likechat.json` holds one call per carried rule. Play only the calls a change touches.
+
 **Gas is the gas company's: no ticket, no note, one fixed line (the client, 4 Nov review; Yariv's change 2; live on WhatsApp 5 Nov, epoch 95).**
 - **The answer:** a gas report (a smell, a leak, any gas fault) gets exactly "במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?"
   - It opens no ticket, leaves no note and asks no address.
@@ -91,7 +102,7 @@ The user is the builder. The client is Homies.
 - **What counts:** a request to speak with a manager, a person or the management ("לדבר עם מנהל", "הבקשה שלך למנהל"), and a recording or passing word ("רשומה", "נרשמה", "רשמתי", "העברתי", "עדכנתי", "התקבלה" …), within five words of each other in one clause. "אני מבין שאתה רוצה לדבר עם מנהל" alone is untouched.
 - **What goes, smallest first:** from the joining word ("וגם", "ובנוסף", "והבקשה", or the recording verb itself); else the clause with the comma before it; else, when the sentence opens with it, the clause and its comma, with an "אבל" after it; else the whole sentence.
 - **What never goes:** a ticket number or a link. A cut that would leave a lead-in alone ("מה שבטוח.") takes the sentence instead.
-- The replay changes 6 replies, each one of these claims, including two 5 Oct "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי". The phone agent's same slip is not touched (chatbot first).
+- The replay changes 6 replies, each one of these claims, including two 5 Oct "עדכנתי את הצוות שאתה רוצה לדבר עם נציג אנושי". The phone agent's same slip was left then (chatbot first) and closed on 10 Nov in its prompt and notify_team; a call has no Send, so there the text is the whole guard.
 - **manager v2 (8 Nov, night, from the C5/C9 retest):** the first draft for "ומתי המנהל יחזור אליי?" said "וגם רשמתי במערכת את הבקשה שלך", with no "manager" in it. The truth check caught it, but a retry or the passive would not have been caught.
   - When the tenant's own words this turn name a manager or a person, "הבקשה / הפנייה (שלך)", "בקשתך" and "פנייתך" count as the request.
   - Never "בבקשה", and never a request for something named ("הבקשה שלך להוראת קבע"). One "to the team" still counts.
@@ -3379,7 +3390,7 @@ says. His ask: *"the agent should be like hi how are you this is michael from ho
 - **The incoming phone agent handles a request for a manager the chatbot's way since 3 Nov, 14:23 UTC** (owner: *"i want the voice agent to be sounding like the chatbot when the person wants a manager it will act like how the chatbot handles everything"*; `docs/assistant/demo-inbound.md`, "3 Nov").
   - The request is noted at once (caller_request) and quietly. The caller hears that Michael cares and is doing all he can, then, if the matter is not known yet, a gentle "what happened?". Once it is known, even from before the request, the matter is his to the end.
   - The chatbot's one voice comes with it, in phone words: no team, manager or management in anything he says, and a note is "a note in our system". `notify_team`'s own text and the "team note" wording in three other intake tools moved with the prompt, because on WhatsApp the tool text beat prompt-only fixes twice.
-  - So a change to how the chatbot speaks, or how it handles a manager, now has a twin on the incoming agent. Carry it across only when the owner asks; chatbot first still holds.
+  - So a change to how the chatbot speaks, or how it handles a manager, now has a twin on the incoming agent. Carry it across only when the owner asks; chatbot first still holds. **10 Nov: the owner asked again, for everything, so the twin now covers the whole fence (the standing decisions at the top).**
   - **The debt agent still hands a request for a person to the team.** Its prompt says someone from the team will call back, and it ends the call. It was not part of the 3 Nov change.
 
 ## A gatekeeper model's NONE is not a guard; the necessary condition goes in code
