@@ -646,8 +646,12 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
 - **A WhatsApp change goes to `u2JjrbcNPYyyh3yl` only.** `n8n_uchat.py --apply` or `--wire` refuses without
   `--back-to-uchat`, because it would switch the copy back on while UChat's app still gets the number's
   messages, and both bots would answer. An older rollback line ending in `n8n_uchat.py --apply` skips it.
-- **The tool server sends through Chatwoot** (`WHATSAPP_VIA=chatwoot`, set alone through the Management
-  API). Inbox 1's templates are the Israeli WABA's (`ticket_resolved_he`, `payment_link_he`, APPROVED).
+- **The tool server's template sends go through UChat until "hadas 1" approves the templates**
+  (`WHATSAPP_VIA=uchat` since 16:47:53 UTC on 10 Nov; it was `chatwoot` from 15:28). Our Chatwoot route looks
+  templates up in "hadas 1", where both are PENDING. UChat's looks them up in ASTDX, where they are APPROVED.
+  Only the closed-ticket message and the debt call's link leave through UChat; the conversation stays on
+  Chatwoot. When both read APPROVED in "hadas 1", set `chatwoot` again (alone, the Management API, and `.env`).
+  Inbox 1's templates are the Israeli WABA's (`ticket_resolved_he`, `payment_link_he`, APPROVED).
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
 - **UChat's app is still subscribed to the number's WABA.** Taking it off is the owner's, in WhatsApp Manager.

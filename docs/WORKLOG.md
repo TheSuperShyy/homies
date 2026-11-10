@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The tester checklist as a PDF (owner: "send via pdf and open in file manager")
+- The owner stopped a Claude Doc (its outline was made and opened, then left empty) and asked for a PDF instead.
+- `local/checklist/michael-checklist-2026-11-11.pdf`: 9 pages, A4, built from the JSON by `local/checklist/build_pdf.py`. Headless Chrome prints the HTML, in Noto Sans Hebrew and Poppins like the 5 Nov checklist.
+- Each test shows the message as a WhatsApp bubble beside what Michael should do, then right and wrong boxes and a note line. Page 1 has spaces for name, date and the totals. The three "with" notes gained English lines.
+- Checked: every page rendered and read back, and the bot's number prints left to right. Opened in File Explorer with the file selected.
+
+### The closed-ticket message through UChat until Meta approves (the fallback named at 16:19)
+- **16:45 UTC:** both templates were still PENDING in "hadas 1" after 25 minutes (APPROVED in ASTDX).
+- **16:47:53 UTC:** `WHATSAPP_VIA=uchat`, set alone through the Management API (read back) and in `.env` (backup `local/env-backups/.env.before-uchat-fallback-2026-11-10`). A `send_ticket_notices` call with nothing pending answered `via: "uchat"` six seconds later.
+- **Resent:** 255-1433-26's failed row went back to `pending`, with its `{{2}}` cut to the report as 039 does ("המעלית תקועה בקומה 3 מהבוקר"). The 2-minute run sent it through UChat at 16:48:34 UTC: `sent`, attempt 2. The UChat path marks `sent` only once WhatsApp's id is there.
+- The debt call's payment link is back on the UChat path that v152 proved at 4.4 s.
+- **Next:** when "hadas 1" shows both APPROVED, set `WHATSAPP_VIA=chatwoot` again (the secret and `.env`). Then the next closed ticket proves the Chatwoot route with WhatsApp's id.
+
 ### The tester checklist, updated for Google Docs (owner: "ok create a checklist again on google docs now not artifact the updated one")
 - **Not created yet:** the Google Drive connector needs re-authorising in this session, and no Drive or Docs tool is available. The owner reconnects it in claude.ai, Settings, Connectors.
 - **The content is ready:** `local/checklist/michael-checklist-2026-11-11.json`, 8 sections and 35 tests, Hebrew with English lines. It is in `local/` because it names the bot's number.
