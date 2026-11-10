@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Read only: Omni's 8 Nov email again, in Hebrew, against the dialer that does not ring (owner, pasting the thread: "look at this does this help us to identify the problem in the dialer")
+- **What was pasted:** Omni's 8 Nov answer in its Hebrew original, under our 9 Nov question about where the API key was sent. Nothing in it is newer than the three test leads of 9 Nov.
+  - Saved as `local/omnitelecom/2026-11-08-lead-api-v1-hebrew.txt`.
+  - The English copy has step 7 wrong ("we were informed of the exact time"). Omni ask us to tell them the exact time of the test lead, and then they check their side.
+- **Our request against it, field by field** (`dashboard/lib/dialer.ts` on `main`, and `.env`): the address, the Bearer header, List 2's id (`TOKOMNI_CAMPAIGN_ID` equals the email's), the number in local digits, and the 52-character external_id, which the email itself calls valid. Its own table says a 200 with `inserted_count` means the lead is in List 2. Nothing on our side is left to fix.
+- **What it says keeps an accepted lead from ringing:**
+  - List 2 stopped by hand. True for the first lead; Play was pressed at about 09:24 UTC.
+  - A blacklisted number. The first answer said inserted 1.
+  - The same lead still waiting. Ours carry the moment, so each is new.
+  - "According to the bot's availability". The 27 Oct email explains it: the bot's extension is the dialer's agent, and a lead is rung only for a free agent.
+- **Vapi since 8 Nov, read at about 11:15 UTC:** three calls. Two are the wallet checks. The third is a phone call of 9 Nov, 13:53:43 UTC, 40 s, from extension 200 to 208, answered by the incoming agent: the caller asked whether Michael is a real person, then about a flooded flat, and hung up at the name. No call carries a `dialer-` name. So 208 reaches the bot, and the dialer has rung nobody in 26 hours.
+- **Where that leaves it:** with the list playing and nothing rung, their own emails leave two causes. The dialer does not see the bot as a free agent, or it tries and the call fails on the way out. We hold no login to their call log, so only Omni, or the lead rows in Tokomni's panel, can tell which: rows still "New" mean it never tried.
+- **Next, unchanged:** the 9 Nov reply (`local/omnitelecom/2026-11-09-health-check-email.txt`) gives the three times and asks exactly this. The pasted thread does not show it as sent.
+- CONTEXT is unchanged: no rule. HANDOVER gets one line in the dialer block.
+
 ### LIVE: the incoming phone agent acts like the chatbot (owner: "make sure the voice agent inbound acts like the chatbot as well")
 - **Live 11:00:00 UTC, the incoming agent `10ae859a` only.** Pushed with `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`.
   - The compare before it showed only the prompt and five tool texts differing. No call was in progress.
