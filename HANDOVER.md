@@ -25,7 +25,7 @@ appended to.
 >   - **53, counted both ways:** our `requests` rows with an OXS `_id` in `oxs_ref`, and the same ids read back from OXS for בר כוכבא 23. All from the owner's +63 (the one mirrored number), all WhatsApp, 24 Sep to 10 Nov; 37 since the Grok runs began on 5 Nov.
 >   - **All 53 are open in OXS.** Our table has 36 `cancelled` and 1 `resolved`; the mirror never updates OXS, so that never reached it.
 >   - **At about 13:15 UTC: 54 open in OXS for the building, all ours, none of Homies' own** (the retest added 255-1434-26). Our table has 18 open there: 17 mirrored plus the standing order 255-1417-26.
->   - **Every Grok run adds about five more,** since it writes from the +63. The retest running now had added 255-1433-26 (the lift) by 12:54 UTC.
+>   - **Every Grok run adds about five more,** since it writes from the +63. The short retest (run 8) added three: 255-1433-26, 255-1434-26 and 255-1435-26, so 55 in all after it.
 >   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
 >
 > **DECIDED 10 Nov: the bot moves back to Chatwoot after the owner's tests of the current bot** (owner: *"we will migrate to chatwoot after im done with the testing of the current bot"*; WORKLOG and CONTEXT 10 Nov). Not started. Until then the UChat copy (`mKheBsTxtcMhPxu7`) stays the bot in use.
@@ -66,8 +66,8 @@ appended to.
 >     - The blind lift arc (`scripts/wa_qa_retest7.json`) passed 5/5: the lift company on opening, on both "when"s and on the status, with no time and no speed.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS`, the two phrase lists and the two pins.
 >   - **Owed:**
->     - **The owner's Grok retest:** C1, C2, C3 steps 2-3, then C8 from 23:00 PH (17:00 Israel), which is the first run to reach the after-hours line. About 11 messages, about 44 US cents.
->       - The paste caps it at 12 messages: on both earlier "short" retests it ran the whole guide (CONTEXT, the outside tester). When its report comes, read it against the UChat copy's executions from the run's start.
+>     - ~~The owner's Grok retest~~ **Done, 10 Nov 12:52-13:14 UTC (run 8, 11 messages, capped as asked):** both fixes held, in the drafts too. No speed, no professional sent, the lift company on opening, on both "when"s and in C2 (WORKLOG 10 Nov).
+>     - **Still owed: the after-hours line.** Run 8 was inside office hours (14:52-15:14 Israel), so 077-6687949 has still never gone out from the real bot. C8 alone after 23:00 PH, or before 15:00 PH on a weekday (2 messages), from Grok or the owner's phone.
 >     - **The incoming phone agent's lift line** (`docs/assistant/demo-inbound.md`) still says "לטפל בה בדחיפות". It gets the same change, on the owner's word.
 >   - **Not changed, watched:** the bare "anything else" (R5: C1.3 and C6.5, as in the sixth run) and the plural "you" (C3.2, C11.4). Both were in the 8 Nov runs at the same steps, and no text causes them.
 >

@@ -3458,7 +3458,7 @@ on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
 - **Every ticket it opens is also an open call in Homies' OXS.** It writes from the owner's +63, the one
   number the OXS mirror copies, so each ticket lands as a service call in בר כוכבא 23: about five a full
   run, 37 of the 53 mirrored calls by 10 Nov (since 5 Nov). Say so with the price when a run is proposed.
-- **Its copy of the chat drops some emoji and adds others** (10 Nov: the "stray space" it reported in C3.4 was a 🙏, twice, and C1.2's 😊 was missing; the seventh run's C10.7 showed a 🙂 that was never sent). Read its emoji counts and typos against the executions before acting on them.
+- **Its copy of the chat drops some emoji and adds others** (10 Nov: the "stray space" it reported in C3.4 was a 🙏, twice, and C1.2's 😊 was missing; the seventh run's C10.7 showed a 🙂 that was never sent; run 8's C1.3 put a trailing 🙏 mid-message). Read its emoji counts, their places and its typos against the executions before acting on them.
 - **Asked for a short retest, it runs the whole guide** (10 Nov, twice: 48 and then 41 messages where 16 were asked, about $1.60-1.90 a run instead of about 60 cents). The guide's own plan of ~45 messages wins over a paste that only says "short". A retest paste says it is not the full plan, lists the steps, and caps the messages ("no more than 12 messages in total, then stop"). Read the report's message count before comparing it with what was asked.
 
 ## How the WhatsApp bot is tested without a model call

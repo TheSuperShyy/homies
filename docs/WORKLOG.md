@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Read only: the short retest of epoch 102 (run 8), read against the executions (the owner pasted its report)
+- **The run:** the capped retest as asked: C1, C2, C3 steps 2-3 and C8, 11 messages, 12:52-13:14 UTC (14:52-15:14 Israel, a Tuesday).
+  - It was inside office hours again, so the after-hours line has still not been seen on the real bot.
+  - The UChat copy's executions 170476-170578, all `success`, all on epoch 102.
+- **The report matches what went out,** except one emoji: C1.3's 🙏 went out at the end, and the tester's copy shows it mid-message.
+- **Both fixes held, in the drafts too:**
+  - **C1.3:** no speed. The first draft named the ticket "1433", so the truth check sent it back. That draft said "ונעקוב אחרי זה כדי לראות שהם מגיעים", with no speed. The retry went out: 255-1433-26, the lift company, "לוחצים עליהם ועוקבים אחרי הקריאה … מתי יבואו לתקן כבר תלוי בהם", and whether there is more than one lift.
+  - **C3.3:** the ticket 255-1434-26 and a question about the leak, with no professional sent.
+  - **Both "when"s and C2:** the lift company stays, with no time. The second "when" added a note to the ticket and asked about a medical need.
+- **Every claim had its tool:**
+  - C1.4's, C1.6's and C2.1's "הוספתי" each had add_request_detail.
+  - C8.2's "הערה דחופה במערכת" is C8.1's notify_team (emergency).
+- **Real, and not new:**
+  - **R5:** C1.4's bare "יש עוד משהו שאוכל לעזור בו בינתיים?", right after the detail was added.
+  - **R3:** C1.3's "יש לכם יותר ממעלית אחת בבניין?".
+  - Both were in the 8 Nov runs at the same steps. No tool text asks for "anything else": it is in the prompt only as a don't, and at the end of the gas line.
+- **Notes, by design or tone:**
+  - C8 has no caring word: the emergency paragraph gives him only the ticket.
+  - C8.2 asks nothing, as R13 wants.
+  - "ורשמתי אותה על דירה 2" on a main pipe is the prompt's usual line for every ticket, not where the fault is filed.
+  - "מעולה" (C1.4) and "כמו שהזכרתי" (C1.5) are tone.
+- **OXS:** the three tickets were mirrored, 55 in all, every one open there.
+- Nothing changed. HANDOVER: the retest is done and the after-hours line is still owed. CONTEXT: the tester's copy also moves emoji.
+
 ### Read only: how many tickets the tests opened in OXS (owner: "how many tickets have we opened in oxs while testing?")
 - **53, and the two counts agree:**
   - **Our `requests`:** 63 rows have `oxs_ref` set; 10 are our own markers (`standing_order` 5, `partial:*` 5), and 53 hold an OXS `_id`. All 53 are WhatsApp, from the owner's +63 (the one number in `OXS_MIRROR_PHONES`), in בר כוכבא 23, from 24 Sep to 10 Nov 12:54 UTC.
