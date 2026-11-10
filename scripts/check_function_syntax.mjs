@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 const dir = new URL("../supabase/functions/debt-tools/", import.meta.url);
 const out = mkdtempSync(join(tmpdir(), "debt-tools-"));
 let bad = 0;
-for (const name of ["identity.ts", "route.ts", "index.ts"]) {
+for (const name of ["identity.ts", "route.ts", "paylink.ts", "index.ts"]) {
   try {
     const js = stripTypeScriptTypes(readFileSync(new URL(name, dir), "utf8"), { mode: "transform" });
     const path = join(out, name.replace(/\.ts$/, ".mjs"));
