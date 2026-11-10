@@ -28,6 +28,8 @@ appended to.
 >   - **Every Grok run adds about five more,** since it writes from the +63. The short retest (run 8) added three: 255-1433-26, 255-1434-26 and 255-1435-26, so 55 in all after it. The after-hours check added 255-1436-26: 56.
 >   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
 >
+> **OWED: the tester checklist as a Google Doc** (owner, 11 Nov: *"create a checklist again on google docs now not artifact the updated one"*). The content is ready in `local/checklist/michael-checklist-2026-11-11.json` (35 tests, Hebrew with English lines, brought to the bot of 11 Nov). It waits for the Google Drive connector, which needs re-authorising in claude.ai. Create the Doc with the google-workspace skill, not an artifact. The artifact checklists are stale since 5 Nov.
+>
 > **LIVE 10 Nov, 15:26 UTC: THE BOT IS BACK ON CHATWOOT, on the owner's Israeli number** (owner: *"move to the chatwoot now that it passed"*; WORKLOG and CONTEXT 10 Nov). "The live bot" means the Chatwoot one again.
 >   - **The route now:** Meta → Chatwoot inbox 1 (the Israeli number since 15:26:43 UTC) → agent bot 1 → n8n `u2JjrbcNPYyyh3yl` → replies through Chatwoot. The UChat copy `mKheBsTxtcMhPxu7` is off (15:26:09).
 >   - **Read back:**

@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The tester checklist, updated for Google Docs (owner: "ok create a checklist again on google docs now not artifact the updated one")
+- **Not created yet:** the Google Drive connector needs re-authorising in this session, and no Drive or Docs tool is available. The owner reconnects it in claude.ai, Settings, Connectors.
+- **The content is ready:** `local/checklist/michael-checklist-2026-11-11.json`, 8 sections and 35 tests, Hebrew with English lines. It is in `local/` because it names the bot's number.
+  - Built from the 5 Nov checklist (`local/artifacts/michael-checklist/index.html`, 30 tests) and brought to the bot of 11 Nov:
+    - the lift company and which lift (1.3-1.6);
+    - water from the ceiling first to the tenant's professional, then a ticket after "the main pipe" (new 3.2b);
+    - collections phones about a standing order;
+    - the after-hours emergency line on smoke;
+    - "a message comes when the ticket closes" may be said;
+    - gas at any hour;
+    - the manager's matter and "when will the manager call?" (new);
+    - the same lift again (new);
+    - closing a ticket sends the message (new, for dashboard users).
+  - The "how to test" part gains office hours and on-file versus not. The "in every reply" part gains the two exceptions to one voice, the no-promises rule, and singular address.
+- The artifact checklists are stale since 5 Nov and were not republished, as the owner asked.
+
 ### Fixing the closed-ticket message (owner: "fix it i thought we submit for it")
 - **The account our route uses, proven with no one receiving anything** (both sent with Chatwoot's token from the number, to +1 202 555 0123, in the range kept for fiction):
   - `hello_world`, which exists only in "hadas 1", came back #131058, "can only be sent from the Public Test Numbers": found, and refused for its sender.
