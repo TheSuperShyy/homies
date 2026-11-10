@@ -27,6 +27,7 @@ conversation that produced it.
 - **Checked so far:**
   - The gate on the candidate: 560/560 cases; the replay changes 0 of 1,453 replies; the only red is the prompt pin, as expected.
   - `check_patchers_idle.py` on the dump against a dump of live as is: the only differences are feedback9 now refusing on the epoch, and fresh, patch and retest6 going idle.
+  - The blind Claude-played check is running on the candidate: `scripts/wa_qa_retest6.json`, the lift and the standing order copied from `wa_qa_feedback9.json`, the two places the new sentence points to. Committed before the apply because the repo is now ahead of live (HANDOVER).
 - **Not changed this round:**
   - **R5 (C1.4, C6.5):** the prompt already says it ("'יש עוד משהו?' שואלים רק כשהעניין שלו באמת נגמר"), and no text causes it. C6.5's bare "anything else meanwhile" was also in the fourth run and the owner's 8 Nov test, unflagged then. One cause at a time; the retest shows whether it stays.
   - **Grok's notes:** "מעצבן" (C1.3), "זאת חוויה נוראית" (C4.2), "כמו שציינתי" (C7.2) and C11.4's length. C9.4's sidestep is manager v2's cut, by design. C10.3b closed on "רק רציתי לדעת מה פתוח". C10.6 is the menu, by design. The cleaning facts in C11.4 ("לכל בניין מוצמד מנקה קבוע", "אב הבית מפקח") are get_service_info's own facts.

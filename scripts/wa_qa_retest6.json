@@ -1,0 +1,364 @@
+{
+ "_about": "10 Nov, retest6: the two scenarios epoch 101's one-voice wording touches (the lift company, the collections call), copied from wa_qa_feedback9.json",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`, <flat> the resident's flat in `knows`, <id> the scenario id.",
+  "open_request": {
+   "_rule": "building names Bar Kochba in Hebrew (בר כוכבא, any spacing) with the number 23: opened. Bar Kochba in Hebrew with no number: need_number. Bar Kochba in Latin letters, or any other street: street_unknown. No building at all: need_building. A second call with the same building and the same type returns the FIRST ticket's reference as `duplicate` (the ticket service's 30-minute duplicate guard: same building, same type, still open); a different type gets the next serial (255-1510-26 -> 255-1511-26).",
+   "opened": {
+    "ok": true,
+    "opened": true,
+    "reference": "<ticket>",
+    "building": "בר כוכבא 23",
+    "reporter_unit": "<the reporter_unit passed>"
+   },
+   "need_number": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ],
+    "note": "Nothing was opened. Ask for what is missing in one short question: the building (street and number) and, in the same question, the apartment they live in if you do not have it yet. If they answer with the building only, open the ticket with it; do not ask again. Just ask: no reason why you need it, nothing about what you will do with it."
+   },
+   "street_unknown": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "street_unknown"
+   },
+   "need_building": {
+    "ok": true,
+    "opened": false,
+    "building_found": false,
+    "reason": "need_building"
+   },
+   "duplicate": {
+    "ok": true,
+    "reference": "<the first ticket's reference>",
+    "duplicate": true
+   }
+  },
+  "get_request_status": {
+   "ok": true,
+   "found": 0,
+   "as_of": "live",
+   "other_open": 0,
+   "requests": []
+  },
+  "notify_team": {
+   "ok": true,
+   "reason": "other"
+  },
+  "show_menu": {
+   "ok": true,
+   "menu": "shown under your next message"
+  },
+  "verify_address": {
+   "_rule": "Bar Kochba in Hebrew with 23: found. Bar Kochba in Hebrew without a number: need_number. Anything else: street_unknown.",
+   "found": {
+    "ok": true,
+    "building_found": true,
+    "address": "בר כוכבא 23, תל אביב-יפו"
+   },
+   "need_number": {
+    "ok": true,
+    "building_found": false,
+    "reason": "need_number",
+    "numbers_we_manage": [
+     "23"
+    ]
+   },
+   "street_unknown": {
+    "ok": true,
+    "building_found": false,
+    "reason": "street_unknown"
+   }
+  },
+  "get_service_info": {
+   "_rule": "Match the topic's words against each entry's `words` (any one is enough); every entry that matches comes back in `topics` as {title, facts}. Nothing matches: not_found.",
+   "catalogue": [
+    {
+     "title": "ניהול ועד בית",
+     "words": [
+      "ועד",
+      "ניהול",
+      "גבייה",
+      "גביה",
+      "תקציב",
+      "כספים",
+      "הנהלת חשבונות",
+      "דוח",
+      "דוחות",
+      "מאזן",
+      "קבלה",
+      "קבלות",
+      "הוראת קבע",
+      "לשלם",
+      "תשלום"
+     ],
+     "facts": [
+      "בונים לבניין תקציב שנתי מותאם למבנה ולמערכות שבו.",
+      "גובים את דמי הוועד מהדיירים, ושולחים קבלה דיגיטלית לכל מי ששילם.",
+      "אפשר לשלם בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים.",
+      "אחת לשבוע עושים התאמות בנק, רושמים הוצאות ומעדכנים את דוח המאזן.",
+      "מול ספקים חיצוניים הומיז מתנהלת, ולא הדיירים."
+     ]
+    },
+    {
+     "title": "הדברה",
+     "words": [
+      "הדברה",
+      "מדביר",
+      "גוקים",
+      "ג'וקים",
+      "גו'קים",
+      "נמלים",
+      "מזיקים",
+      "עכברים",
+      "חולדות",
+      "צרעות",
+      "מקקים"
+     ],
+     "facts": [
+      "ההדברה עונתית ומקיפה את כל הבניין: לובי, חניונים, קומות המגורים, חדרי מדרגות, ארונות, ופתחי ביוב וניקוז.",
+      "מודיעים לדיירים ולוועד לפחות שבוע מראש, עם הנחיות למה לעשות לפני ההדברה ודגשי בטיחות אחריה.",
+      "אחרי ההדברה יש אישור ואחריות לשנים עשר חודשים. האישור נשמר בתיק הבניין.",
+      "גם מקרים נקודתיים כמו קן צרעות או חולדות בחדר האשפה מטופלים."
+     ]
+    },
+    {
+     "title": "שיפוצים",
+     "words": [
+      "שיפוץ",
+      "שיפוצים",
+      "לשפץ",
+      "ריצוף",
+      "צביעה",
+      "גבס",
+      "איטום"
+     ],
+     "facts": [
+      "הומיז מבצעת שיפוצים לדירות ולבתים פרטיים: ריצוף, צבע, אינסטלציה, חשמל, עבודות איטום ועבודות גבס.",
+      "זה לא חלק מדמי ועד הבית. מי שמתעניין מקבל הצעת מחיר, וזה נרשם לצוות."
+     ]
+    },
+    {
+     "title": "ניהול נכסים לבעלי דירות",
+     "words": [
+      "ניהול נכס",
+      "ניהול נכסים",
+      "בעל דירה",
+      "להשכיר",
+      "שוכר",
+      "שוכרים",
+      "חוזה שכירות",
+      "משכיר"
+     ],
+     "facts": [
+      "שירות לבעלי דירות, לא לדיירי הבניין: איתור ובדיקת שוכרים, הכנת חוזה, טיפול בתקלות בנכס ודוחות קבועים לבעלים.",
+      "מי ששואל על זה הוא בדרך כלל בעל נכס, וזה נרשם לצוות כדי שיחזרו אליו."
+     ]
+    }
+   ],
+   "not_found": {
+    "ok": true,
+    "found": false,
+    "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."
+   }
+  },
+  "get_payment_link": {
+   "ok": true,
+   "found": true,
+   "link": "https://pay.example.co.il/t/<id>",
+   "building": "בר כוכבא 23",
+   "apartment": "<flat>"
+  },
+  "get_balance": {
+   "_rule": "name or phone missing: need_identity (list what is missing). The card's full name and phone together (any spacing or hyphens): the scenario's balance fixture. Anything else: identity_failed.",
+   "need_identity": {
+    "ok": true,
+    "found": 0,
+    "need_identity": true,
+    "missing": [
+     "<name and/or phone>"
+    ]
+   },
+   "identity_failed": {
+    "ok": true,
+    "found": 0,
+    "identity_failed": true
+   }
+  },
+  "add_request_detail": {
+   "ok": false,
+   "error": "not found"
+  },
+  "request_standing_order": {
+   "_rule": "On file (the scenario has `who`): recorded, with the scenario's `ticket` as reference. A second call in the same chat returns the same reference with already_recorded true. Not on file (no `who`): a call with no reporter_name returns need_name; a call with reporter_name and a building naming Bar Kochba in Hebrew with 23 returns recorded with the scenario's `ticket`; Bar Kochba with no number: need_number; any other street: street_unknown.",
+   "recorded": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": true,
+    "reference": "<ticket>"
+   },
+   "again": {
+    "ok": true,
+    "recorded": true,
+    "recorded_now": false,
+    "already_recorded": true,
+    "reference": "<ticket>"
+   },
+   "need_name": {
+    "ok": true,
+    "recorded": false,
+    "reason": "need_name"
+   }
+  }
+ },
+ "scenarios": [
+  {
+   "time": "12:20",
+   "weekday": 7,
+   "weekday_he": "ראשון",
+   "iso": "2026-11-08T12:20:00+02:00",
+   "greeted": true,
+   "ticket": "255-1600-26",
+   "id": "lift_arc",
+   "title": "2.1-2.4 and 4.1: a stuck lift, not on file; when?; when again?; the status tap",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 2, המספר שלו לא רשום. המעלית תקועה מהבוקר והוא מתוסכל.",
+    "script": [
+     {
+      "say": "המעלית תקועה בקומה 3 מהבוקר"
+     },
+     {
+      "say": "בר כוכבא 23 דירה 2. יש בבניין רק מעלית אחת"
+     },
+     {
+      "say": "מתי מגיעים לתקן?"
+     },
+     {
+      "say": "נו אז מתי??"
+     },
+     {
+      "say": "מצב קריאה קיימת"
+     }
+    ]
+   },
+   "fixtures": {
+    "get_request_status": {
+     "ok": true,
+     "found": 1,
+     "as_of": "live",
+     "other_open": 0,
+     "by_phone": true,
+     "requests": [
+      {
+       "reference": "255-1600-26",
+       "status": "open",
+       "type": "elevator",
+       "urgency": "high",
+       "opened": "2026-11-08",
+       "last_update": "2026-11-08",
+       "description": "המעלית תקועה בקומה 3 מהבוקר"
+      }
+     ]
+    }
+   },
+   "expect": [
+    {
+     "type": "called",
+     "tool": "open_request",
+     "name": "the lift call is opened"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "1600",
+     "name": "its number is given"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "חברת (ה)?מעליות",
+     "name": "the lift company is named"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "בקרוב|בהקדם|מחר|תוך (שעה|יום|יומיים)",
+     "name": "no time is promised"
+    }
+   ],
+   "judge": [
+    "details: before or right after opening, does Michael ask only what is still missing about the lift (here: which lift, if more than one), without re-asking the floor or what happened?",
+    "lift_company: on opening, on 'when?' and on the status, does the tenant hear that the lift company does the repair, that Homies passes it on and follows it, and that the timing depends on them, in natural words and without a time?",
+    "again: on the second 'when??', does Michael keep that line but add something new instead of repeating the same sentence?",
+    "natural: warm, plain Hebrew, singular masculine, a question at the end while the matter is open?"
+   ]
+  },
+  {
+   "time": "12:20",
+   "weekday": 7,
+   "weekday_he": "ראשון",
+   "iso": "2026-11-08T12:20:00+02:00",
+   "greeted": true,
+   "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
+   "ticket": "255-1392-26",
+   "id": "standing_callback",
+   "title": "5.2: on file, a standing order; collections will phone",
+   "resident": {
+    "persona": "אסף קליקס, בר כוכבא 23 דירה 2. רוצה לעבור להוראת קבע.",
+    "script": [
+     {
+      "say": "אפשר לעשות הוראת קבע לועד בית?"
+     },
+     {
+      "say": "סבבה תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {},
+   "expect": [
+    {
+     "type": "called",
+     "tool": "request_standing_order",
+     "name": "the request is recorded"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no service call"
+    },
+    {
+     "type": "not_called",
+     "tool": "notify_team",
+     "name": "no note"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "1392",
+     "name": "the request's number"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "גבייה",
+     "name": "the collections team is named"
+    },
+    {
+     "type": "bot_regex",
+     "regex": "טלפון|טלפוני|יתקשר|יתקשרו|ייצור|יצור|יחזור",
+     "name": "he hears that they will phone him"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "בקרוב|בהקדם|היום|מחר|מייל",
+     "name": "no when, no email"
+    }
+   ],
+   "judge": [
+    "callback: does the tenant hear that the request is recorded, with its number, and that someone from the collections team will contact him by phone, with no time?",
+    "natural: warm, plain Hebrew, singular masculine?"
+   ]
+  }
+ ]
+}
