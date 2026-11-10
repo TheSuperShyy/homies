@@ -67,6 +67,7 @@ The user is the builder. The client is Homies.
 - **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
 **Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; live 9 Nov as epoch 100 by `n8n_whatsapp_feedback9.py`, on live and the UChat copy).**
+- **The comments themselves, word for word with English:** `docs/discovery/feedback-yariv-2026-11-09.md` (written 10 Nov from the owner's 13 screenshots). Read the comment there before changing what it decided: some are whole sentences Yariv wrote for Michael to say (2.2, 2.3 and most of 3.2).
 - **The lift company repairs a lift.** Homies opens the call, passes the details and the handling to the company that services and maintains the lift, follows the call and presses them; when they come depends on them.
   - The tenant hears it when a lift call opens (with the call number at Homies), on "when?" and on its status. On a second "when" the lift company stays in the answer, beside what Michael does now (a check, a note that he is waiting): the prompt's general "not the same reason twice" gives way here, and the lift line says so outright.
   - This and the collections call below are the only places someone other than Michael appears. They are the client's account of his own process, so they are true. Everywhere else, one voice holds.

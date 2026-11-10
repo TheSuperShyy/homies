@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Yariv's 9 Nov comments, word for word with English (owner: "GIVE ME THE LIST ON WHAT ARE THE COMMENTS TRANS TO ENG")
+- **Which pictures:** the owner's 13 screenshots of 9 Nov, 12:55 UTC ("Feedbacks"), sent to the other session. No picture came with today's message, and no feedback picture is in any folder, so they were taken from that session's transcript and each one was read by eye. A search of all eight transcripts of this project found no other batch of feedback pictures.
+- **13 screenshots, 12 comments:** the 6.3 screenshot came twice. Five are marked wrong (2.2, 2.3, 3.2, 4.1, 5.2), three right with a note (2.1, 5.1, 7.2), and four are not marked (1.1, 2.4, 6.2, 6.3). That matches the 9 Nov entry below.
+- **Kept:** `docs/discovery/feedback-yariv-2026-11-09.md`. Each comment as written, its English, and what the tenant sent and Michael answered beside it. The English uses the words of the run's English page (`translations.json`): ticket, apartment.
+- **Not certain:** the comment boxes of 1.1, 2.2 and 2.3 show a scroll bar, so a line below the picture's edge may be missing.
+- The list was given to the owner in chat, about 17:15 UTC. HANDOVER and CONTEXT point to the file from their 9 Nov blocks. Nothing on the bot changed, and nothing was sent or spent.
+
 ### Corrected: the checklist is Michael's replies with ✓ / ✗ (owner: "I TOLD YOU TO MAINTAIN ONLY THE REPLY OF THE BOT", then "WHERE IS THE LOCALHOST OF THE CHECK AND X")
 - The owner's checklist is the 3 Nov simulation: each message with the reply Michael gave, and ✓, ✗ and a comment on each reply (3 Nov: "make the checklist like a simulation so each reply have the check and x and a comment"). The Google Doc content, the PDF and the first localhost page below were the tester-instructions format instead.
 - **localhost now serves the simulation:** `local/checklist/serve.py` serves `local/artifacts/michael-simulation/index.html` at http://localhost:8787 (127.0.0.1, Host localhost only). Checked: 200, it renders with the counts at "0 of 30", and opened in the owner's browser. Its marks stay in that browser. The wrong page (`page.html`) and its empty `marks.json` were removed.

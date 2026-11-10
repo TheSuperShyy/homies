@@ -105,6 +105,7 @@ appended to.
 >   - **Not changed, watched in the retest:** R5's bare "anything else meanwhile" (C1.4, C6.5). It stayed in the seventh run (C1.3, C6.5). It was there on 8 Nov too, so it is left (epoch 102 above).
 >
 > **LIVE 9 Nov: epoch 100, Yariv's written review of the simulated run** (`scripts/n8n_whatsapp_feedback9.py`; owner: "Feedbacks"; WORKLOG 9 Nov, CONTEXT has the rules). Live and the UChat copy, both read back.
+>   - **The comments word for word, with English** (10 Nov, the owner asked for the list): `docs/discovery/feedback-yariv-2026-11-09.md`. 13 screenshots, 12 comments, since 6.3 came twice. The screenshots are in no folder: they are in session `36ccbf2c`'s transcript, the message of 9 Nov 12:55 UTC. The boxes of 1.1, 2.2 and 2.3 show a scroll bar, so a line may be missing.
 >   - **What:**
 >     - The lift company is named on opening, on "when?" (a second one too) and on the status, and the lift details are asked.
 >     - Water in a flat needs the tenant's professional first, unless it is known to come from the common property.
