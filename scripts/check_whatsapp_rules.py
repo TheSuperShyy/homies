@@ -217,7 +217,11 @@ PINS = {
     # line after hours. Claude-played blind on the candidate (scripts/wa_qa_feedback9.json): 5 conversations,
     # 13 turns, 21/21, no guard rejection; its one miss (a second "when" without the lift company) was fixed
     # in the lift line and a blind re-run of the lift went 4/4 with no flag.
-    'Answer the resident / system': 'fbca40b23dd0',
+    # 10 Nov (n8n_whatsapp_retest6.py, epoch 101, the tester's sixth run): the one-voice exception is named by
+    # the matter ("רק במעלית ובהוראת קבע זה אחרת"), not by who. Claude-played blind on the candidate
+    # (scripts/wa_qa_retest6.json): the lift and the standing order, 7 turns, 11/11, no guard rejection; the
+    # lift company on opening, on both "when"s and on the status, the collections call, and no team anywhere.
+    'Answer the resident / system': 'ce596f4e9f9a',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

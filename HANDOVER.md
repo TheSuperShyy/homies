@@ -8,22 +8,16 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **BUILT 10 Nov, NOT LIVE YET: epoch 101, the tester's sixth run** (`scripts/n8n_whatsapp_retest6.py`; the owner pasted Grok's report; WORKLOG 10 Nov).
+> **LIVE 10 Nov: epoch 101, the tester's sixth run** (`scripts/n8n_whatsapp_retest6.py`; the owner pasted Grok's report; WORKLOG 10 Nov). Live and the UChat copy, both read back.
 >   - **What:** the one-voice sentence's exception is named by the matter, "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך", not by who. Epoch 100's "חוץ מחברת המעליות ומצוות הגבייה" had the run pass things on to "the team" five times (C3.3, C8.1, C8.2, C10.1, C11.3) and promise speed once (C3.3). The same steps named nobody in both 8 Nov runs.
->   - **The repo is ahead of live:**
->     - `prompt.md` (prompt `ce596f4e9f9a`, 26,007 characters), `MEMORY_EPOCH = 101` and `EPOCH_COVERS` say epoch 101.
->     - Live and the UChat copy are still epoch 100 (`fbca40b23dd0`, `-100`).
->     - Until `n8n_whatsapp_retest6.py --apply`, the `fresh` and `patch` dry runs on live are not idle. Never `--apply` them alone.
->     - The prompt pin in `check_whatsapp_rules.py` still holds epoch 100's value, so the gate on live stays green until the apply.
+>   - **Read back, live (`u2JjrbcNPYyyh3yl`, 10:14 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 10:15 UTC):** active; prompt `ce596f4e9f9a` (26,007 characters); memory `-101` and `-101-uchat`; tool texts unchanged; danger v6 and promise v6 in Send.
 >   - **Checked:**
->     - The gate on the candidate passes 560/560; the replay changes 0 of 1,453 replies; the prompt pin is the only red.
->     - `check_patchers_idle.py` shows only feedback9 refusing on the epoch, and fresh, patch and retest6 going idle.
->   - **To finish:**
->     1. The blind Claude-played check of `scripts/wa_qa_retest6.json` (the lift and the standing order) on the candidate. It must show the lift company on opening, on both "when"s and on the status, and the collections call.
->     2. Then `--pins` and the new pin, `--apply`, the gate on live, `n8n_uchat.py --apply`, and a read-back of both bots.
->     3. Then the owner's Grok retest of the touched steps.
->   - **Rollback after the apply:** `python scripts/n8n_whatsapp_retest6.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest6.json`), then `python scripts/n8n_uchat.py --apply`, then revert the commit.
->   - **Not changed, watched in the retest:** R5's bare "anything else meanwhile" (C1.4, C6.5). The prompt already forbids it while the matter is open.
+>     - The gate passes 560/560 with every pin, on the candidate and on live. The replay changed 0 of 1,453 replies.
+>     - `check_patchers_idle.py`: only feedback9 refusing on the epoch differs from live as it was.
+>     - The blind Claude-played check (`scripts/wa_qa_retest6.json`) passed 11/11 in 7 turns. The lift company came on opening, on both "when"s and on the status, the collections call came, and no team appeared anywhere.
+>   - **Rollback:** `python scripts/n8n_whatsapp_retest6.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest6.json`), then `python scripts/n8n_uchat.py --apply`. Then revert this commit's `MEMORY_EPOCH`, `EPOCH_COVERS`, `prompt.md` and pin.
+>   - **Owed:** the owner's Grok retest of the touched steps: C1, C3 steps 2-3, C6 step 2, C11 steps 1-3, C8, then C10 step 1 after 5 minutes. That is 16 messages, about 64 US cents. Run from 23:00 PH, C8 also shows the after-hours line, which no run has reached yet.
+>   - **Not changed, watched in the retest:** R5's bare "anything else meanwhile" (C1.4, C6.5). The prompt already forbids it while the matter is open, and no text causes it.
 >
 > **LIVE 9 Nov: epoch 100, Yariv's written review of the simulated run** (`scripts/n8n_whatsapp_feedback9.py`; owner: "Feedbacks"; WORKLOG 9 Nov, CONTEXT has the rules). Live and the UChat copy, both read back.
 >   - **What:**

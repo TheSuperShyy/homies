@@ -11,7 +11,16 @@ conversation that produced it.
 
 ## 2026-11-10
 
-### The tester's sixth run, read against the executions, and its cause fixed (epoch 101, BUILT; the owner pasted its report)
+### LIVE (epoch 101): the tester's sixth run, read against the executions, and its cause fixed (the owner pasted its report)
+- **Live, both bots, read back:** live (`u2JjrbcNPYyyh3yl`, 10:14:32 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 10:15:32 UTC) are active with prompt `ce596f4e9f9a` (26,007 characters), memory `-101` and `-101-uchat`, the tool texts unchanged (`81322f5daf6b`), and danger v6 and promise v6 in Send. The new sentence is there and the old clause is gone. A second `--apply` run says nothing to do.
+- **The blind Claude-played check** of `scripts/wa_qa_retest6.json` on the candidate: 2 conversations, 7 turns, 11/11 expectations, no guard rejection.
+  - The lift company was there on opening ("את התיקון עצמו עושה חברת המעליות…"), on "when?" ("את המועד קובעת חברת המעליות"), on the second "when" ("…עדיין בידיים של חברת המעליות, שאנחנו ממשיכים ללחוץ עליה") and on the status tap.
+  - The standing order: "ומישהו מצוות הגבייה יתקשר אליך לגבי זה", with 255-1392-26.
+  - No team anywhere. The one flag, "name-mid-conversation", is the deck's, as on 9 Nov.
+- **Then:** the pin moved to `ce596f4e9f9a`, the gate on the candidate and then on live went all green (560/560, every pin), and `n8n_uchat.py --apply` carried it to the UChat copy. Snapshot: `local/n8n-whatsapp-live-10nov-before-retest6.json`.
+- **Owed:** the tester's retest of the touched steps (C1, C3 steps 2-3, C6 step 2, C11 steps 1-3, C8, then C10 step 1), 16 messages, about 64 US cents. From 23:00 PH it also reaches the after-hours line.
+
+### Before the apply: the sixth run read, and the fix built (epoch 101)
 - **The run:** the full guide, not the short retest. 11 conversations, 48 messages, 15:54-17:37 PH (07:54-09:37 UTC, 09:54-11:37 Israel, inside office hours, so C8's after-hours line was not reached). The UChat copy's executions 169368-169866, all `success`, one per message.
 - **The report matches what went out, reply for reply.** Its "stray space" in C3.4 is a 🙏, and C1.2 had a 😊: its copy of the chat drops some emoji.
 - **Real fails, each the model's own draft that Send let through:**
