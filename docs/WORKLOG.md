@@ -20,6 +20,7 @@ conversation that produced it.
   - 10 Nov: the sixth run's 255-1422..1426, the seventh's 255-1427..1431, and the retest's 255-1433-26 (12:54 UTC, the lift).
 - **Our status is not OXS's:** our table has 36 of the 53 `cancelled` and 1 `resolved`, while all 53 are open in OXS. The mirror only creates; nothing of ours updates or closes a call there.
 - **By type:** elevator 11, plumbing 8, cleaning 8, maintenance 7, fire_safety 7, electrical 6, lighting 4, gardening 1, payment 1.
+- **Read again at about 13:15 UTC** (owner: "how many tickets are open in all on bar kochba"): OXS has 54 open calls for בר כוכבא 23, all ours (the retest added 255-1434-26 at 13:09 UTC) and none of Homies' own. Our table has 18 open there: 17 mirrored plus the standing order 255-1417-26 (84 in all: 56 cancelled, 10 resolved). Homies manages no other building on that street.
 - **Not run:** `check_oxs_mirror.py --apply`, which creates and deletes a call. Nothing was written anywhere. CONTEXT has the mirror's one-way nature and the tester's OXS cost; HANDOVER has the count.
 
 ### Decided: the bot goes back to Chatwoot after the current tests (owner: "ok the test is undergoing and we will migrate to chatwoot after im done with the testing of the current bot")

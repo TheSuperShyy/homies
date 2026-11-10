@@ -24,6 +24,7 @@ appended to.
 > **READ 10 Nov, ~13:00 UTC: the tests have 53 open calls in Homies' OXS** (owner: *"how many tickets have we opened in oxs while testing?"*; WORKLOG and CONTEXT 10 Nov). Read only; nothing written.
 >   - **53, counted both ways:** our `requests` rows with an OXS `_id` in `oxs_ref`, and the same ids read back from OXS for בר כוכבא 23. All from the owner's +63 (the one mirrored number), all WhatsApp, 24 Sep to 10 Nov; 37 since the Grok runs began on 5 Nov.
 >   - **All 53 are open in OXS.** Our table has 36 `cancelled` and 1 `resolved`; the mirror never updates OXS, so that never reached it.
+>   - **At about 13:15 UTC: 54 open in OXS for the building, all ours, none of Homies' own** (the retest added 255-1434-26). Our table has 18 open there: 17 mirrored plus the standing order 255-1417-26.
 >   - **Every Grok run adds about five more,** since it writes from the +63. The retest running now had added 255-1433-26 (the lift) by 12:54 UTC.
 >   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
 >
