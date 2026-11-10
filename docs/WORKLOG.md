@@ -11,6 +11,30 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### LIVE: the bot is back on Chatwoot, on the owner's Israeli number (owner: "move to the chatwoot now that it passed")
+- **Checked before anything moved:**
+  - The Israeli number is CONNECTED, CLOUD_API, quality GREEN, and its WABA (`2117787955519632`) is approved.
+  - The US test number's WABA is BLOCKED (141006, payment method), so it could carry no notice or link.
+  - Chatwoot's token (inbox 1's `api_key` is `WHATSAPP_ACCESS_TOKEN`, the HOMIES system user, compared by hash) answered `success: true` to a read receipt on the number's latest message, which was already read.
+  - On the server, `register_callback` only subscribes the app and sets the phone-level override. Registration with a PIN is in `perform`, which was not called, and updating a channel runs no remote setup.
+- **The cutover, one sitting:**
+  1. **15:26:09:** the UChat copy `mKheBsTxtcMhPxu7` switched off. The first try of the server step failed before reaching the server (a Windows `/tmp` path); the second ran 34 s later.
+  2. **15:26:43:** inbox 1's channel took the Israeli number through its own model in `rails runner`: phone, `phone_number_id` and `business_account_id`, with the `api_key` and verify token kept. The provider check passed.
+     - Then `Whatsapp::WebhookSetupService#register_callback`: HOMIES subscribed to the WABA, and the phone-level override set to `/webhooks/whatsapp/<the number>`.
+     - Then the template sync: `ticket_resolved_he` and `payment_link_he`, both APPROVED.
+     - The script would have put the channel back and switched the UChat copy on again had any step failed.
+  3. **15:27:** the live bot's two typing nodes moved to the Israeli number, with the credential that answered `success` there all day (`scripts/n8n_whatsapp_tochatwoot.py`). The gate was all green on the candidate (566/566, replay 0 changes) and then on live.
+  4. **15:28:22:** the tool server's `WHATSAPP_VIA` → `chatwoot`, that one secret alone through the Management API. No code was deployed, and the OXS mirror's keys are untouched. The 15:28:30 notices run answered without `via: "uchat"`, so it took the Chatwoot route. Nothing was pending.
+- **Also:**
+  - `n8n_uchat.py --apply` / `--wire` now refuse without `--back-to-uchat`. Its `write()` activates the copy, and UChat's app still gets the number's messages, so both bots would answer.
+  - `.env`'s three `WHATSAPP_*` ids are the Israeli number's, and the test number's are kept as `WHATSAPP_TEST_*`. So `n8n_whatsapp_newnumber.py` reports nothing to do instead of moving the dots back.
+  - The menu is the same two buttons on both bots, so the tester's guide needs nothing.
+- **Not changed:**
+  - UChat's app is still subscribed to the WABA.
+  - The number watch still watches the test number.
+  - The test number's override points at a Chatwoot path no inbox has now.
+- **Owed:** the first real message on the new route: the owner's "היי", then a tap.
+
 ### Read only: the after-hours line, seen on the real bot for the first time (the owner pasted the tester's C8 report)
 - **When:** 15:02-15:04 UTC, 17:02 Israel (23:02 PH), a Tuesday: outside office hours. The UChat copy's executions 170780 and 170793. The report matches what went out, word for word.
 - **C8.1:** an emergency note (notify_team) and an urgent ticket, 255-1436-26. Then: "אנחנו עכשיו מחוץ לשעות הפעילות של המשרד, אבל מוקד החירום שלנו פעיל ב-077-6687949 ואתה יכול להתקשר לשם אם צריך." Send's danger v6 kept it whole: our own line and a verb of calling, after hours.

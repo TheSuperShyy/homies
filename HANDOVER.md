@@ -28,10 +28,25 @@ appended to.
 >   - **Every Grok run adds about five more,** since it writes from the +63. The short retest (run 8) added three: 255-1433-26, 255-1434-26 and 255-1435-26, so 55 in all after it. The after-hours check added 255-1436-26: 56.
 >   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
 >
-> **DECIDED 10 Nov: the bot moves back to Chatwoot after the owner's tests of the current bot** (owner: *"we will migrate to chatwoot after im done with the testing of the current bot"*; WORKLOG and CONTEXT 10 Nov). Not started. Until then the UChat copy (`mKheBsTxtcMhPxu7`) stays the bot in use.
->   - **The bot is ready there:** the Chatwoot workflow `u2JjrbcNPYyyh3yl` is the main one and gets every change first. It read back with epoch 102 at 12:27 UTC today.
->   - **Settle first:** which WhatsApp number goes into Chatwoot. The Israeli number is UChat's; the US test number's account read BLOCKED (141006) on 4 Nov.
->   - **After the move, retest the channel only:** messages in and out, the menu buttons, typing, hand to a person, the closed-ticket notice, the tool server's sends (`WHATSAPP_VIA`).
+> **LIVE 10 Nov, 15:26 UTC: THE BOT IS BACK ON CHATWOOT, on the owner's Israeli number** (owner: *"move to the chatwoot now that it passed"*; WORKLOG and CONTEXT 10 Nov). "The live bot" means the Chatwoot one again.
+>   - **The route now:** Meta → Chatwoot inbox 1 (the Israeli number since 15:26:43 UTC) → agent bot 1 → n8n `u2JjrbcNPYyyh3yl` → replies through Chatwoot. The UChat copy `mKheBsTxtcMhPxu7` is off (15:26:09).
+>   - **Read back:**
+>     - Meta: the number CONNECTED; its phone-level webhook is Chatwoot's `/webhooks/whatsapp/<the number>`.
+>     - Chatwoot: inbox 1's channel holds the Israeli number, its id and WABA `2117787955519632`. Its templates `ticket_resolved_he` and `payment_link_he` are APPROVED.
+>     - n8n: the two typing nodes call the Israeli number (`scripts/n8n_whatsapp_tochatwoot.py`). The gate is all green on live (566/566).
+>     - The tool server: `WHATSAPP_VIA=chatwoot`. The 15:28:30 notices run took the Chatwoot route, with nothing pending.
+>   - **Guard:** `n8n_uchat.py --apply` / `--wire` refuse without `--back-to-uchat`. Rollback lines in the blocks below that end with `n8n_uchat.py --apply` skip that step now.
+>   - **`.env`:** `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the Israeli number's. The test number's are `WHATSAPP_TEST_*`. Backup: `local/env-backups/.env.before-chatwoot-move-2026-11-10`.
+>   - **Owed:**
+>     - **The first real message on the new route:** the owner's "היי" from their phone, then a tap. Read the n8n run of `u2JjrbcNPYyyh3yl`, the Chatwoot conversation in inbox 1 and the `messages` row. Then run `check_whatsapp_rules.py --watch` from 15:26 UTC.
+>     - **UChat's app is still subscribed to the number's WABA,** so UChat still receives the messages; its flow's call to n8n now fails silently. Taking it off is the owner's, in WhatsApp Manager. Never disconnect inside UChat before checking that it does not deregister the number.
+>     - **The number watch** (`OzdMMziMU4T4GOrb`) still watches the retired test number. Re-point it from `.env` when wanted.
+>   - **Rollback (minutes), in this order:**
+>     1. `rails runner`: inbox 1's channel back to `WHATSAPP_TEST_*` (phone +15550459005, its id and WABA), then `register_callback`.
+>     2. Remove the Israeli number's phone-level override.
+>     3. `n8n_whatsapp_tochatwoot.py --restore`.
+>     4. Set `WHATSAPP_VIA=uchat` on the function and in `.env`.
+>     5. Activate `mKheBsTxtcMhPxu7`, and `n8n_uchat.py --apply --back-to-uchat` if it drifted.
 >
 > **LIVE 10 Nov, 11:00 UTC: the incoming phone agent acts like the chatbot** (owner: *"make sure the voice agent inbound acts like the chatbot as well"*; WORKLOG 10 Nov; `docs/assistant/demo-inbound.md`, "10 Nov"). The incoming agent `10ae859a` only. The debt agent is unchanged.
 >   - **What a caller gets now, as on WhatsApp:**
@@ -451,7 +466,7 @@ appended to.
 >   - UChat sits in front of it through "UCHAT — Chatwoot-compatible API" `FIVPZiM5udeXFacS`, with "UCHAT — Hand to a person" `EYePE3S0E6t1kojj`.
 >   - All three are active. The live bot is untouched.
 > - **Live tools, and since 3 Nov 11:21 UTC everyone who writes gets through** (`UCHAT_TEST_PHONES=all`, the owner's call after Ido's message was dropped as "not a test phone"). Its tickets are real, like on the live bot. A list of numbers in `UCHAT_TEST_PHONES` brings the filter back.
-> - **Re-run `python scripts/n8n_uchat.py --apply` after any change on live,** or the copy drifts. Never edit the copies by hand.
+> - ~~Re-run `python scripts/n8n_uchat.py --apply` after any change on live.~~ **Not since 10 Nov:** the bot is on Chatwoot again and the copy is off; the script refuses without `--back-to-uchat` (the block at the top).
 > - **UCHAT IS SET UP LIKE OUR CHATWOOT SINCE 3 Nov, ~11:00 UTC** (owner: *"ok just make uchat like the settings we have on the chatwoot"*). feature.md, "Set up like our Chatwoot".
 >   - **Departments:** agent groups with Chatwoot's names: collections `20217`, operations `20219`, management `20221`, service `20223`. `UCHAT_GROUPS` in `.env` maps Chatwoot team 1-4 to them.
 >     - All four use Least Assigned: UChat always gives a group's chat to a member, and has no "nobody".

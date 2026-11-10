@@ -776,6 +776,14 @@ def tester(cfg, user_ns):
 def main():
     args = sys.argv[1:]
     apply = "--apply" in args
+    # 10 Nov 2026: the bot runs on Chatwoot again (the owner: "move to the chatwoot now that it passed").
+    # The Israeli number sits in Chatwoot's inbox 1 and the UChat copy is switched off. --apply would
+    # switch the copy back on (write() activates every workflow it writes), and since UChat's app still
+    # gets the number's messages, both bots would answer. Only a rollback to UChat may do it.
+    if (apply or "--wire" in args) and "--back-to-uchat" not in args:
+        sys.exit("REFUSING: since 10 Nov the bot runs on Chatwoot (CONTEXT, HANDOVER). --apply or --wire "
+                 "would switch the UChat copy back on and both bots would answer. Only for a rollback to "
+                 "UChat: add --back-to-uchat (and undo the Chatwoot side first: HANDOVER, the rollback).")
     cfg = config(apply or "--wire" in args or "--tester" in args)
     if "--uchat" in args:
         return uchat_setup()

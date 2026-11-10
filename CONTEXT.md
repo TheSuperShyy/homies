@@ -625,9 +625,24 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
 - **The phone agents' notes stay in Chatwoot's Voice inbox** until a UChat ticket list exists.
   Only UChat's dashboard can create one.
 
-**10 Nov: the bot goes back to Chatwoot after the owner's tests of the current bot** (owner: *"we will
-migrate to chatwoot after im done with the testing of the current bot"*). Until the move is made, the UChat
-copy stays the bot in use and the lines above hold.
+**10 Nov, 15:26 UTC: the bot is back on Chatwoot, on the owner's Israeli number** (owner: *"move to the
+chatwoot now that it passed"*, after *"we will migrate to chatwoot after im done with the testing of the
+current bot"*). This supersedes the 3 Nov line above: "the live bot" means the Chatwoot one again.
+- **Where it runs:** Chatwoot inbox 1 holds the Israeli number (moved in `rails runner` the 2 Nov way, then
+  `register_callback`; the US test number left it). The bot is `u2JjrbcNPYyyh3yl`, and the UChat copy
+  `mKheBsTxtcMhPxu7` is switched off.
+- **A WhatsApp change goes to `u2JjrbcNPYyyh3yl` only.** `n8n_uchat.py --apply` or `--wire` refuses without
+  `--back-to-uchat`, because it would switch the copy back on while UChat's app still gets the number's
+  messages, and both bots would answer. An older rollback line ending in `n8n_uchat.py --apply` skips it.
+- **The tool server sends through Chatwoot** (`WHATSAPP_VIA=chatwoot`, set alone through the Management
+  API). Inbox 1's templates are the Israeli WABA's (`ticket_resolved_he`, `payment_link_he`, APPROVED).
+- **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
+  the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
+- **UChat's app is still subscribed to the number's WABA.** Taking it off is the owner's, in WhatsApp Manager.
+  Never "disconnect" the number inside UChat without first checking that it does not deregister the number:
+  a deregistered number answers nobody until it is registered again with its PIN.
+
+Before the move (10 Nov, morning), the decision as it was taken:
 - **The bot needs no rebuild.** The Chatwoot workflow `u2JjrbcNPYyyh3yl` is the main one: every change goes
   to it first, and `n8n_uchat.py` copies it to UChat. The prompt, the tool texts and Send's filters are the
   same in both (read back equal on 10 Nov, epoch 102), so what is tested on UChat holds for what Michael says.
@@ -709,7 +724,8 @@ Three facts hold with or without a move:
   while the video was being made.
 
 **3 Nov, later: a UChat version of the bot exists beside the live one.**
-`scripts/n8n_uchat.py` regenerates it from live, the way the sandbox is made:
+`scripts/n8n_uchat.py` regenerates it from live, the way the sandbox is made
+(since 10 Nov its `--apply` refuses without `--back-to-uchat`: the bot is on Chatwoot again, above):
 the live bot's own logic, with its Chatwoot calls answered by a translator
 workflow that works through UChat's API. It runs the live tools. **Since 3
 Nov it answers everyone** on its own number (`UCHAT_TEST_PHONES=all`; the owner:
