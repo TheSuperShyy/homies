@@ -826,6 +826,22 @@ renamed its gas and emergency tests since 3 Nov. Each run of the script makes a 
 - **Made 9 Nov.** Its links are in `form/links.txt` (local), never in the public repo, the same as the Sheet links. A paste into a new project lands inside its empty `myFunction` unless everything is selected first. The function then is not in the Run menu, and `myFunction` runs empty: Ctrl+A before Ctrl+V.
 - **A session without browser control cannot press Run for the owner.** It can open `https://script.new`, which makes a new Apps Script project in the owner's own logged-in browser, and put the script on the clipboard. PowerShell's `Set-Clipboard` fails from these shells ("Requested Clipboard operation did not succeed"). `clip` works with the text written as UTF-16 with a BOM (`cmd /c "clip < file"`), and Hebrew survives.
 
+**Since 10 Nov the review is the dashboard's `/review` page, and every Send reaches our database** (owner:
+*"I TOLD YOU TO MAINTAIN ONLY THE REPLY OF THE BOT"*, then *"push it live to vercel make sure the data can be saved
+on a database so we can retrieve it add a send button"*).
+- **"The checklist" means Michael's actual replies, each with ✓, ✗ and a comment.** It is never the tester-instructions page (send this, plus what he should do). That page was rebuilt three times on 10 Nov by mistake: as Google Doc content, a PDF and a localhost page.
+- **The replies come from real chats, the Grok test runs** (*"we have grok"*), not a new paid simulation. The first set, `grok-2026-11-10`, has 44 steps:
+  - run 8 for the lift, the water and the smoke;
+  - the 17:02 after-hours smoke chat;
+  - run 7 for the rest.
+  - Payment links are replaced by a placeholder.
+- **The link is `https://homies-dashboard.vercel.app/review?k=<key>`, open without a login.**
+  - The key is in `local/checklist/review-link.txt`, never in the repo.
+  - The replies live in `review_sets` (migration 040), never in the repo, because they quote a real flat's balance.
+  - Without the key the page shows only "הקישור לא תקין".
+- **Each Send is one row in `reply_reviews`.** Read them with `python scripts/reply_reviews.py` (`--csv` for a sheet).
+- **A new set:** `local/checklist/review-set/build_set.py --upload`, after editing its time windows.
+
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before
 every balance, which the 29 Oct change had already ended for numbers on file. Each

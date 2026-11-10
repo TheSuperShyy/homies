@@ -11,6 +11,33 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The reviewers' page on Vercel, saved to our database (owner: "ok push it live to vercel make sure the data can be saved on a database so we can retrieve it add a send button", then "wait dont run the chat test we have grok wtf also focus no deployng the checklist in vercel")
+- **No paid run.** The simulated run was set up (deck and bundle, prompt `8546b335b582`) but never started; nothing was spent. The replies come from the Grok chats instead.
+- **The replies:** the 210 messages of 10 Nov from the owner's number, in `messages` (source `uchat`), split into sessions:
+  - runs 6 and 7 (07:54-11:51 UTC);
+  - run 8 (12:52);
+  - C8 in hours (13:27) and after hours (15:02).
+  - Set `grok-2026-11-10` takes the newest version of each case, 44 steps in 8 chats: run 8 for the lift, water and smoke, the after-hours smoke chat, and run 7 for the rest. Payment links were replaced and checked absent.
+  - Built by `local/checklist/review-set/build_set.py`, local because it quotes a real flat's balance.
+- **Migration 040** (`supabase/040_reply_reviews.sql`), applied through the Management API and read back:
+  - `review_sets` and `reply_reviews`, both with RLS on, a staff read policy, and no anon table rights;
+  - `review_set(key)` and `submit_reply_review(key, marks)`: SECURITY DEFINER, `search_path` pinned, execute for anon.
+  - The set was stored with a 24-character key, saved to `local/checklist/review-link.txt`.
+- **The page, PR #11** (worktree from `origin/main`, branch `review-page`, deleted after the merge):
+  - `dashboard/app/review` (server page plus client board, in the dashboard's tokens and both themes);
+  - `middleware.ts` lets `/review` through;
+  - `scripts/reply_reviews.py` reads the results.
+- **Checked before merging,** on a local production build:
+  - tsc and `next build` passed; with the key 200 and 44 steps; a wrong key gives the error page; `/tickets` still 307s to `/login`.
+  - At 390 px there was no overflow (Playwright) and no page errors.
+  - ✓ on 1.1 and ✗ with a note on 1.3, then Send, stored exactly those marks (1 right, 1 wrong, of 44). A reload kept them. The test row was deleted.
+  - CI and both Vercel previews passed. Squash-merged at 17:32:43 UTC (`1377845`).
+- **Checked live** (https://homies-dashboard.vercel.app, 40 s after the merge):
+  - with the key 200 and 44 steps, and no overflow at 390 px;
+  - Send saved `{1.1: pass}`, and that test row was deleted;
+  - without the key, "הקישור לא תקין"; `/tickets` logged out still goes to `/login`; no page errors.
+- The localhost server for the 3 Nov page was stopped.
+
 ### Yariv's 9 Nov comments, word for word with English (owner: "GIVE ME THE LIST ON WHAT ARE THE COMMENTS TRANS TO ENG")
 - **Which pictures:** the owner's 13 screenshots of 9 Nov, 12:55 UTC ("Feedbacks"), sent to the other session. No picture came with today's message, and no feedback picture is in any folder, so they were taken from that session's transcript and each one was read by eye. A search of all eight transcripts of this project found no other batch of feedback pictures.
 - **13 screenshots, 12 comments:** the 6.3 screenshot came twice. Five are marked wrong (2.2, 2.3, 3.2, 4.1, 5.2), three right with a note (2.1, 5.1, 7.2), and four are not marked (1.1, 2.4, 6.2, 6.3). That matches the 9 Nov entry below.
