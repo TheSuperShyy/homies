@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The tester's sixth run, read against the executions, and its cause fixed (epoch 101, BUILT; the owner pasted its report)
+- **The run:** the full guide, not the short retest. 11 conversations, 48 messages, 15:54-17:37 PH (07:54-09:37 UTC, 09:54-11:37 Israel, inside office hours, so C8's after-hours line was not reached). The UChat copy's executions 169368-169866, all `success`, one per message.
+- **The report matches what went out, reply for reply.** Its "stray space" in C3.4 is a 🙏, and C1.2 had a 😊: its copy of the chat drops some emoji.
+- **Real fails, each the model's own draft that Send let through:**
+  - R4, someone other than Michael, five times: C3.3 "התקלה נמסרה לטיפול" (169451), C8.1 "והוספתי מיד הערה דחופה לצוות" (169736), C8.2 "והעברתי הערה דחופה לצוות" (169755), C10.1 "שאוכל לעדכן את הצוות" (169773), C11.3 "אנשים מהצוות של הומי'ז … מחכה לטיפול שלהם" (169714).
+  - R10: C3.3 "וניגש לזה כמה שיותר מהר".
+  - R5, a bare "anything else meanwhile" while the matter waits: C1.4 (169392) and C6.5 (169588).
+- **The cause, measured:**
+  - On 8 Nov the same steps ran twice with the same tools: the fourth run (164071-164127) and the fifth (164861-164909). None named a team ("פתחתי עכשיו קריאה דחופה על העשן…", "האמת שאין לי במערכת שם של מי בדיוק ייגש לטפל בזה").
+  - The model is the same (gemini-3.1-pro-preview, temperature 1). Epoch 100 changed only the prompt, the inject, open_request and request_standing_order.
+  - Its one-voice sentence gained ", חוץ מחברת המעליות ומצוות הגבייה, וגם עליהם רק מה שכתוב בהמשך". That exception is named by who, a team among them, and hangs on "you don't say you passed something on".
+  - C3.3 also borrowed the lift's own hand-off ("מעבירים … את המשך הטיפול … לוחצים עליהם לטפל בה בדחיפות") for a main pipe.
+- **The fix** (`scripts/n8n_whatsapp_retest6.py`, prompt only, epoch 100 -> 101): the sentence is again what it was up to epoch 99, and the exception follows as its own sentence, named by the matter the way "בגז זה אחרת" is: "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך". The lift company and the collections team are named only in their own lines, which are unchanged. 26,021 -> 26,007 characters, prompt `ce596f4e9f9a`.
+- **Checked so far:**
+  - The gate on the candidate: 560/560 cases; the replay changes 0 of 1,453 replies; the only red is the prompt pin, as expected.
+  - `check_patchers_idle.py` on the dump against a dump of live as is: the only differences are feedback9 now refusing on the epoch, and fresh, patch and retest6 going idle.
+- **Not changed this round:**
+  - **R5 (C1.4, C6.5):** the prompt already says it ("'יש עוד משהו?' שואלים רק כשהעניין שלו באמת נגמר"), and no text causes it. C6.5's bare "anything else meanwhile" was also in the fourth run and the owner's 8 Nov test, unflagged then. One cause at a time; the retest shows whether it stays.
+  - **Grok's notes:** "מעצבן" (C1.3), "זאת חוויה נוראית" (C4.2), "כמו שציינתי" (C7.2) and C11.4's length. C9.4's sidestep is manager v2's cut, by design. C10.3b closed on "רק רציתי לדעת מה פתוח". C10.6 is the menu, by design. The cleaning facts in C11.4 ("לכל בניין מוצמד מנקה קבוע", "אב הבית מפקח") are get_service_info's own facts.
+  - Seen in passing: show_menu's answer to the model still says "שלושת הכפתורים" while the menu has two.
+- **The guide's C5.1** said the lift company for the lift ticket in a list. The prompt says it when he asks about the lift ticket itself, so the guide now does too.
+
 ### The Grok brief follows epoch 100, and a short retest for it (owner: "ok give me instructions to test it on grok")
 - **A miss, now fixed:** CONTEXT says a change to what Michael should do changes `grok-tenant-tester.md` in the same commit. Epoch 100's commit (a5eb8ac) left it behind, so it still said "never the lift company", "a ticket for water from the ceiling" and "no emergency numbers".
 - **The guide now:**

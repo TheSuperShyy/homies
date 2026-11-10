@@ -120,7 +120,7 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 ### C5 · יוסי · checking a ticket
 1. Send `היי`, then tap `מצב קריאה קיימת`.
    - The system just greeted you, so he says who he is, even though you spoke before. Then a human sentence and what the system found by your number, such as C1's ticket. He asks for a ticket number only if he found nothing. (R2, R9)
-   - For the lift ticket, he says its repair is with the lift company, with no time. (R12)
+   - When you ask about the lift ticket itself, he says its repair is with the lift company, with no time. A list of your newest tickets need not say it for each one. (R12)
 2. Send `דיווחתי לפני שבוע ואף אחד לא בא`.
    - Expect real sorrow, then what the system shows. If he can't find the report, he asks for its number. No date. (R10)
 
