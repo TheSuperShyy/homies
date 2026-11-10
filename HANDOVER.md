@@ -105,6 +105,7 @@ appended to.
 >       3. With the dashboard's email and password in `.env`, we can read their call log (`calllog_login`) and see what the dialer did with each lead.
 >       4. Our own outgoing calls through a line (the 2 Nov plan) wait on Omni's SIP details or the Zadarma line. The Vapi account has no outgoing line.
 >     - **Our lead token can only add leads:** the API allows POST alone, so nothing of ours reads a list or a lead.
+>     - **The Vapi account has no card on it (the owner, 10 Nov), and that is not why no call comes:** it was in credit at 11:53 UTC, and the dialer rings the tenant before Vapi is involved. No card means no automatic top-up: when the credit runs out the bot answers nobody and Vapi records nothing. The amount shows only on the billing page.
 >     - **The phone never rang** (the owner, "none rang"). So the dialer took the lead and did not dial. We hold no call-log login (only `TOKOMNI_TOKEN`, campaign, dialer and List 2 ids), so the reason is Omni's to find.
 >     - **Owed:**
 >       - the reply to Omni, which is drafted and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew). It gives the time, the id and that no call was dialled, and asks whether List 2 is on Play, and whether the dialer sees the bot (208) as available;

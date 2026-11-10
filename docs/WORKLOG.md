@@ -23,6 +23,9 @@ conversation that produced it.
   2. **Two minutes in Tokomni, the owner or Ido.** Read the List 2 row: Play or Hold, and how many are New. Then make a list by hand with Ido's number and press Play, as on 26 Oct. A ring means the dialer and the bot are fine and only List 2's API leads are stuck. No ring means the dialer has lost the bot.
   3. **Their call log, if the owner gives the dashboard's email and password.** `calllog_login`, from their own document, lists outgoing calls by time and status. With the login in `.env` we can see what the dialer did with each lead.
   4. **Our own outgoing calls through a line, if Omni cannot fix the dialer:** the 2 Nov plan. It needs Omni's SIP details, which they advised against on 8 Nov, or the Zadarma line (18 Oct, no details yet).
+- **The Vapi account's credit, on the owner's question ("my vapi does not have any cards link to it is that why we are not getting any calls"):** in credit at 11:53 UTC (`vapi_transfer.py --balance`, which leaves a $0 failed row in the call list).
+  - It is not the cause. The account was in credit 16 s before the first lead and 2 minutes before the second on 9 Nov (the two check rows), and it answered the extension 200 call that afternoon. And the dialer rings the tenant first: Vapi joins only after an answer, so its credit cannot stop a ring.
+  - What no card does mean: no automatic top-up. When the prepaid credit runs out the bot answers nobody, and Vapi records no refused call, as on 23 Oct. The amount left shows only on the billing page of the Vapi dashboard.
 - **Not done:** no lead was sent, and nothing was written to Omni's side.
 - CONTEXT is unchanged: no rule. HANDOVER's dialer block has the order.
 
