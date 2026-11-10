@@ -38,7 +38,7 @@ appended to.
 >   - **Guard:** `n8n_uchat.py --apply` / `--wire` refuse without `--back-to-uchat`. Rollback lines in the blocks below that end with `n8n_uchat.py --apply` skip that step now.
 >   - **`.env`:** `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the Israeli number's. The test number's are `WHATSAPP_TEST_*`. Backup: `local/env-backups/.env.before-chatwoot-move-2026-11-10`.
 >   - **Owed:**
->     - **The first real message on the new route:** the owner's "היי" from their phone, then a tap. Read the n8n run of `u2JjrbcNPYyyh3yl`, the Chatwoot conversation in inbox 1 and the `messages` row. Then run `check_whatsapp_rules.py --watch` from 15:26 UTC.
+>     - ~~The first real message.~~ **Proven 15:54 UTC:** the owner's "היי" reached inbox 1, and the greeting went out with both buttons and WhatsApp's id 4 s later; logged, and the runs are green. **Still owed: the tap** (the first AI answer on the route). Then `check_whatsapp_rules.py --watch` from 15:26 UTC.
 >     - **UChat's app is still subscribed to the number's WABA,** so UChat still receives the messages; its flow's call to n8n now fails silently. Taking it off is the owner's, in WhatsApp Manager. Never disconnect inside UChat before checking that it does not deregister the number.
 >     - **The number watch** (`OzdMMziMU4T4GOrb`) still watches the retired test number. Re-point it from `.env` when wanted.
 >   - **Rollback (minutes), in this order:**

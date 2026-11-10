@@ -33,7 +33,8 @@ conversation that produced it.
   - UChat's app is still subscribed to the WABA.
   - The number watch still watches the test number.
   - The test number's override points at a Chatwoot path no inbox has now.
-- **Owed:** the first real message on the new route: the owner's "היי", then a tap.
+- **The first real message, 15:54 UTC (the owner's "היי"):** it reached Chatwoot inbox 1 (conversation 1, the owner's contact) with WhatsApp's id. The bot's greeting went out 4 s later with both buttons and its own WhatsApp id (status `sent`). The `messages` log has both rows, and the five n8n runs of `u2JjrbcNPYyyh3yl` are green.
+- **Owed:** the tap, which is the first AI answer on the new route.
 
 ### Read only: the after-hours line, seen on the real bot for the first time (the owner pasted the tester's C8 report)
 - **When:** 15:02-15:04 UTC, 17:02 Israel (23:02 PH), a Tuesday: outside office hours. The UChat copy's executions 170780 and 170793. The report matches what went out, word for word.
