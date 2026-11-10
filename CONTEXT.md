@@ -625,6 +625,18 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
 - **The phone agents' notes stay in Chatwoot's Voice inbox** until a UChat ticket list exists.
   Only UChat's dashboard can create one.
 
+**10 Nov: the bot goes back to Chatwoot after the owner's tests of the current bot** (owner: *"we will
+migrate to chatwoot after im done with the testing of the current bot"*). Until the move is made, the UChat
+copy stays the bot in use and the lines above hold.
+- **The bot needs no rebuild.** The Chatwoot workflow `u2JjrbcNPYyyh3yl` is the main one: every change goes
+  to it first, and `n8n_uchat.py` copies it to UChat. The prompt, the tool texts and Send's filters are the
+  same in both (read back equal on 10 Nov, epoch 102), so what is tested on UChat holds for what Michael says.
+- **What the move touches is the channel:** the number, messages in and out, the menu buttons, typing, hand
+  to a person, the closed-ticket notice, and the tool server's sends (`WHATSAPP_VIA=chatwoot` plus an
+  `--apply`, above). Those are what gets retested on Chatwoot.
+- **Which number goes into Chatwoot is settled first.** The Israeli number is UChat's (its WABA, above). The
+  Chatwoot test number's account read BLOCKED (141006) on 4 Nov. Templates belong to the number's WABA.
+
 **Later the same evening the owner asked for a Hebrew Google Sheet comparing the two, leaning to
 Chatwoot** (*"make sure we lean more to chatwoot"*). The sheet does not undo the line above. The
 UChat bot is still the one in use until the owner says otherwise. How the sheet is kept (where it

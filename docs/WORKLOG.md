@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Decided: the bot goes back to Chatwoot after the current tests (owner: "ok the test is undergoing and we will migrate to chatwoot after im done with the testing of the current bot")
+- **Not started.** The owner's Grok retest of epoch 102 is running on the UChat copy, which stays the bot in use until the move.
+- **The bot needs no rebuild:** the Chatwoot workflow (`u2JjrbcNPYyyh3yl`) is the main one, and every change goes to it first. Read back at 12:27 UTC today, it carries epoch 102 (prompt `8546b335b582`, memory `-102`, promise v7), the same texts as the UChat copy.
+- **What the move needs:**
+  - a WhatsApp number in Chatwoot. The Israeli number is UChat's, and the US test number's account read BLOCKED (141006) on 4 Nov;
+  - a check of the channel's own parts, which the UChat copy replaces: in and out, the menu, typing, hand to a person, the closed-ticket notice, and the tool server's sends.
+- Nothing changed. CONTEXT and HANDOVER carry the decision.
+
 ### LIVE: the debt call's payment link answers in time (debt-tools v152, PR #10; the debt agent's tools; 20 s on the 208 line; owner: "ok fix the payment link not being sent")
 - **The cause, traced before anything changed** (26 Oct, Vapi `01a17807`): the tool was called 50.2 s into the call and Vapi answered for it at 60.2 s, "timeout of 10000ms exceeded". The function finished about 12 s after it started.
   - **Why 10 s:** the 208 number's server said 10 and the tool's own server said nothing. The call's overrides carry only the variables, so the number's limit governed the tool.

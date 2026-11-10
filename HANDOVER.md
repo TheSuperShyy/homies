@@ -21,6 +21,11 @@ appended to.
 >   - **The probe writes to one handset only:** flat 2 of the test building, and only when that number is the owner's (`OXS_MIRROR_PHONES`). Its open ticket is never mirrored into OXS.
 >   - **Rollback:** a revert PR on `main`; the previous commit's `vapi_tools.py` and `vapi_sip.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply` and `python scripts/vapi_sip.py --route on --apply`.
 >
+> **DECIDED 10 Nov: the bot moves back to Chatwoot after the owner's tests of the current bot** (owner: *"we will migrate to chatwoot after im done with the testing of the current bot"*; WORKLOG and CONTEXT 10 Nov). Not started. Until then the UChat copy (`mKheBsTxtcMhPxu7`) stays the bot in use.
+>   - **The bot is ready there:** the Chatwoot workflow `u2JjrbcNPYyyh3yl` is the main one and gets every change first. It read back with epoch 102 at 12:27 UTC today.
+>   - **Settle first:** which WhatsApp number goes into Chatwoot. The Israeli number is UChat's; the US test number's account read BLOCKED (141006) on 4 Nov.
+>   - **After the move, retest the channel only:** messages in and out, the menu buttons, typing, hand to a person, the closed-ticket notice, the tool server's sends (`WHATSAPP_VIA`).
+>
 > **LIVE 10 Nov, 11:00 UTC: the incoming phone agent acts like the chatbot** (owner: *"make sure the voice agent inbound acts like the chatbot as well"*; WORKLOG 10 Nov; `docs/assistant/demo-inbound.md`, "10 Nov"). The incoming agent `10ae859a` only. The debt agent is unchanged.
 >   - **What a caller gets now, as on WhatsApp:**
 >     - **A lift:** which lift and which floor are asked; on opening, on "when?" and on the status he hears that the lift company does the repair and that Homies passes it on and presses them.
@@ -406,6 +411,7 @@ appended to.
 >   - The Chatwoot copy (`u2JjrbcNPYyyh3yl`, the US test number) still runs, untouched.
 >   - Voice team notes and ticket notices still go through Chatwoot.
 >   - Ask the owner before switching anything off on the Chatwoot side.
+>   - **10 Nov: back to Chatwoot after the owner's tests** (the DECIDED block at the top).
 >
 > **THE REST CONNECTED TO UCHAT, 3 NOV EVENING (owner: *"lets connect everything in the uchat?"*).** Feature 21, "Connected on 3 Nov evening"; WORKLOG 3 Nov.
 >   - **Live:** the UChat copy logs to `messages` for the dashboard (source 'uchat', ids 'uchat:<n>', 17:25 UTC). The tool server is debt-tools **v140** with `WHATSAPP_VIA=uchat`: photos from UChat pass its fence, and the debt call's link and the "done" notice leave from the UChat number.
