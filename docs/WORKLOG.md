@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Fixing the closed-ticket message (owner: "fix it i thought we submit for it")
+- **The account our route uses, proven with no one receiving anything** (both sent with Chatwoot's token from the number, to +1 202 555 0123, in the range kept for fiction):
+  - `hello_world`, which exists only in "hadas 1", came back #131058, "can only be sent from the Public Test Numbers": found, and refused for its sender.
+  - `ticket_resolved_he`, which exists only in "ASTDX", came back #132001, not found.
+  - So our sends look up templates in "hadas 1" (`1389698653006050`), where the number's name comes from. The 4-5 Nov submissions went to "ASTDX - Smart Link", the account UChat sends through.
+- **Submitted to "hadas 1" at 16:19 UTC** (`wa_templates.py create … --waba 1389698653006050 --apply`, the owner's go): `ticket_resolved_he` (id `4675959222649546`) and `payment_link_he` (id `30145416878382371`), the same wording as approved before, UTILITY / he, both PENDING.
+- **039 applied** (`supabase/039_notice_first_description.sql`, through the Management API's `/database/query`, as 037 was): `{{2}}` is the report before the first " | ", so the bot's own notes no longer reach the tenant. 255-1433-26 reads "המעלית תקועה בקומה 3 מהבוקר". Read back: SECURITY DEFINER, `search_path` pinned, `split_part` in, and the trigger enabled.
+- **Next:** on approval, the 16:14 notice row goes back to `pending` with the clean `{{2}}`, and the 2-minute run sends it through Chatwoot. If Meta is slow, `WHATSAPP_VIA=uchat` carries it meanwhile.
+
 ### The closed-ticket message on the Chatwoot route: it triggers, and WhatsApp refuses the template (owner: "can you close a ticket any ticket only 1 to check if the follow up message will trigger")
 - **Closed one ticket:** 255-1433-26 (the run-8 lift, WhatsApp, the owner's +63, בר כוכבא 23), set `resolved` in `requests` at 16:14:00 UTC. Only ours: its OXS call stays open.
 - **It triggers:** `queue_ticket_resolved_notice` queued `ticket_resolved_he` at 16:14:04. The 16:14:30 notices run sent it into Chatwoot conversation 1 at 16:14:31.
