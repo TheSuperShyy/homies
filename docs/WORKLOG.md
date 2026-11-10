@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### Read only: the after-hours line, seen on the real bot for the first time (the owner pasted the tester's C8 report)
+- **When:** 15:02-15:04 UTC, 17:02 Israel (23:02 PH), a Tuesday: outside office hours. The UChat copy's executions 170780 and 170793. The report matches what went out, word for word.
+- **C8.1:** an emergency note (notify_team) and an urgent ticket, 255-1436-26. Then: "אנחנו עכשיו מחוץ לשעות הפעילות של המשרד, אבל מוקד החירום שלנו פעיל ב-077-6687949 ואתה יכול להתקשר לשם אם צריך." Send's danger v6 kept it whole: our own line and a verb of calling, after hours.
+- **C8.2:** what he did, the number, and "מוקד החירום הטלפוני שלנו עונה לתקלות דחופות במספר 077-6687949". No advice, nobody on the way, no question.
+- **A new ticket here, an added detail at 15:27:** the duplicate guard in open_request holds one ticket per place and kind for 30 minutes. 15:27 was 15 minutes after 255-1435-26 opened, and 17:02 was nearly two hours after. That is by design: "the leak is back" later is a new fact with its own row.
+- **Notes:** "אם צריך" is soft for smoke; there is no caring word (by design in an emergency); "שלנו" is the line's own name in Yariv's words.
+- **So every one of Yariv's 9 Nov asks has now gone out from the real WhatsApp bot:** the lift company and its details, water in a flat, the standing order's call from collections, the emergency line after hours, and gas to the gas company.
+- **OXS:** 255-1436-26 was mirrored, so 56 calls in all.
+- Nothing changed.
+
 ### Read only: the tester's after-hours check of C8 ran inside office hours (the owner pasted its report)
 - **When:** 13:27-13:29 UTC, 15:27 Israel (21:27 PH), a Tuesday: office hours. So the emergency line rightly did not show, and it has still never gone out from the real bot. The UChat copy's executions 170607 and 170616.
 - **What went out:**

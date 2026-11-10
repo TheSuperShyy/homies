@@ -78,7 +78,7 @@ The user is the builder. The client is Homies.
   - This supersedes the owner's 16 Sep "a fault of unclear origin is the building's to check".
 - **A standing order's tenant hears that someone from collections will phone him,** never when. Send's promise v6 lets that sentence through only on a turn whose tools recorded a standing order.
 - **After office hours, an urgent call also gets Homies' telephone emergency centre, 077-6687949** (the office number).
-  - "After hours" is outside Sun-Thu 09:00-17:00 Israel time, the client's hours in the facts. The inject says it, and Send's danger v6 keeps that one sentence, only then.
+  - "After hours" is outside Sun-Thu 09:00-17:00 Israel time, the client's hours in the facts. The inject says it, and Send's danger v6 keeps that one sentence, only then. Seen on the real bot on 10 Nov at 17:02 Israel: both smoke replies gave the line, kept whole by Send.
   - In office hours nothing changes: the urgent call and its number only.
   - Gas keeps the gas company's line at any hour.
 

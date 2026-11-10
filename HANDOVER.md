@@ -25,7 +25,7 @@ appended to.
 >   - **53, counted both ways:** our `requests` rows with an OXS `_id` in `oxs_ref`, and the same ids read back from OXS for בר כוכבא 23. All from the owner's +63 (the one mirrored number), all WhatsApp, 24 Sep to 10 Nov; 37 since the Grok runs began on 5 Nov.
 >   - **All 53 are open in OXS.** Our table has 36 `cancelled` and 1 `resolved`; the mirror never updates OXS, so that never reached it.
 >   - **At about 13:15 UTC: 54 open in OXS for the building, all ours, none of Homies' own** (the retest added 255-1434-26). Our table has 18 open there: 17 mirrored plus the standing order 255-1417-26.
->   - **Every Grok run adds about five more,** since it writes from the +63. The short retest (run 8) added three: 255-1433-26, 255-1434-26 and 255-1435-26, so 55 in all after it.
+>   - **Every Grok run adds about five more,** since it writes from the +63. The short retest (run 8) added three: 255-1433-26, 255-1434-26 and 255-1435-26, so 55 in all after it. The after-hours check added 255-1436-26: 56.
 >   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
 >
 > **DECIDED 10 Nov: the bot moves back to Chatwoot after the owner's tests of the current bot** (owner: *"we will migrate to chatwoot after im done with the testing of the current bot"*; WORKLOG and CONTEXT 10 Nov). Not started. Until then the UChat copy (`mKheBsTxtcMhPxu7`) stays the bot in use.
@@ -67,7 +67,7 @@ appended to.
 >   - **Rollback:** `python scripts/n8n_whatsapp_retest7.py --restore` (snapshot `local/n8n-whatsapp-live-10nov-before-retest7.json`), then `python scripts/n8n_uchat.py --apply`. Then revert `prompt.md`, `MEMORY_EPOCH`, `EPOCH_COVERS`, the two phrase lists and the two pins.
 >   - **Owed:**
 >     - ~~The owner's Grok retest~~ **Done, 10 Nov 12:52-13:14 UTC (run 8, 11 messages, capped as asked):** both fixes held, in the drafts too. No speed, no professional sent, the lift company on opening, on both "when"s and in C2 (WORKLOG 10 Nov).
->     - **Still owed: the after-hours line.** Run 8 (14:52-15:14 Israel) and the C8-only check after it (15:27 Israel) were both inside office hours, so 077-6687949 has still never gone out from the real bot. C8 alone after 23:00 PH, or before 15:00 PH on a weekday (2 messages), from Grok or the owner's phone.
+>     - ~~The after-hours line.~~ **Seen on the real bot, 10 Nov 15:02 UTC (17:02 Israel):** both C8 replies gave 077-6687949, with an urgent ticket (255-1436-26) and an emergency note, no advice, nobody on the way. So every one of Yariv's 9 Nov asks has now gone out from the real WhatsApp bot.
 >     - **The incoming phone agent's lift line** (`docs/assistant/demo-inbound.md`) still says "לטפל בה בדחיפות". It gets the same change, on the owner's word.
 >   - **Not changed, watched:** the bare "anything else" (R5: C1.3 and C6.5, as in the sixth run) and the plural "you" (C3.2, C11.4). Both were in the 8 Nov runs at the same steps, and no text causes them.
 >
