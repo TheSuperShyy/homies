@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### The tester checklist on localhost (owner: "CREATE ONE IN LOCALHOS")
+- `python local/checklist/serve.py` serves the checklist at http://localhost:8787: `page.html` filled with the JSON, read again on every load. It has the 5 Nov look, with right / wrong, a note per test, progress, filters and a copy button. The dashboard step (8.1) reads "לעשות".
+- **Marks are saved to `local/checklist/marks.json`** through the server, so they outlive the browser and can be read back. The page falls back to the browser alone when the server is down. Listens on 127.0.0.1 and answers only to Host localhost.
+- Checked: the page loads (200, 35 tests), a mark saves and reads back, an unknown test id is dropped, another Host is refused (403), and the screenshot reads right (number left to right). marks.json was left empty. Opened in the owner's browser; the server runs in this session's background.
+- The three "with" notes' English moved into the JSON (`withEn`), and `build_pdf.py` reads them from there.
+
 ### The tester checklist as a PDF (owner: "send via pdf and open in file manager")
 - The owner stopped a Claude Doc (its outline was made and opened, then left empty) and asked for a PDF instead.
 - `local/checklist/michael-checklist-2026-11-11.pdf`: 9 pages, A4, built from the JSON by `local/checklist/build_pdf.py`. Headless Chrome prints the HTML, in Noto Sans Hebrew and Poppins like the 5 Nov checklist.
