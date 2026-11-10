@@ -33,6 +33,17 @@ The user is the builder. The client is Homies.
 - **Keep the checks light.** A new check earns its place by a bug it would have caught. No live probes, no spend.
 - n8n and the phone agents still deploy by their own scripts and gates.
 
+**A tool the caller waits on answers inside Vapi's timeout (10 Nov, the debt call's payment link; the owner: *"ok fix the payment link not being sent"*).**
+- **Where the limit comes from.** On a call through the 208 number, a tool whose own server names no timeout was cut off at the number's `server.timeoutSeconds` (26 Oct: 10 s, "timeout of 10000ms exceeded"). A slow tool names its own in `SERVER_TIMEOUTS` (`scripts/vapi_tools.py`), and the number says 20.
+- **A timeout is not a refusal.** The function goes on after Vapi stops waiting, so the model is told "failed" about something that then happens, and it improvises. So make the tool fast first, and only then widen the wait.
+- **What makes it fast** (`supabase/functions/debt-tools/paylink.ts`):
+  - what does not depend on each other runs together;
+  - nothing is worked out before it is known to be needed: the model's line only when the tenant's 24 hours are open;
+  - a wait is a few early looks that stop at the first yes, never one long sleep.
+- **Both agents' tools run next to the database:** the Tokyo pin, since 25 Oct on the incoming agent and 10 Nov on the debt agent.
+- **Prove it without a call.** `scripts/probe_paylink_call.py` posts the tool call a debt call makes, to the owner's own handset only. `--template` is the path a debt call takes. Free text has the model write a line, so it is a paid run and needs a go.
+- **A probe never writes to the client.** A call id that starts `probe-` gets no OXS mirror, as it gets no email.
+
 **The incoming phone agent carries the chatbot's rules (10 Nov; the owner: *"make sure the voice agent inbound acts like the chatbot as well"*; live 11:00 UTC).**
 - **One Michael on both channels.** What the chatbot's prompt decides (who he is, what a lift, a leak, a standing order, an urgent fault, a charge and a manager request get, and what he never says) is in the phone's fence too, in phone words. `docs/assistant/demo-inbound.md`, "10 Nov", lists each rule with the chatbot's epoch.
 - **Chatbot first still holds for new rules.** A chatbot change leaves a twin owed on the phone: say so in HANDOVER and in the report, and carry it on the owner's word. He has asked for it twice (3 Nov, 10 Nov), so never leave it unsaid.

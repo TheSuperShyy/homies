@@ -17,7 +17,9 @@ list gets the debt agent with that tenant's figures.
 
 1. The 208 address names no agent. It names a server: debt-tools, with the
    `x-homies-secret` and `x-region: ap-northeast-1` headers the agents use, and
-   10 seconds to answer. Vapi sends it `assistant-request` as each call starts.
+   20 seconds to answer (10 until 10 Nov, when that limit was found cutting off
+   the debt call's payment link). Vapi sends it `assistant-request` as each call
+   starts.
 2. A dialer call is one whose caller name starts `dialer-` (Omni's dialer names
    its calls `dialer-<the number it rang>`). Its number is `callNumberOf()`,
    the same reading as feature 17, from the SIP URI.

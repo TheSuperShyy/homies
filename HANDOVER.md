@@ -8,6 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 10 Nov, 12:44-12:48 UTC: the debt call's payment link answers in time** (owner: *"ok fix the payment link not being sent"*; WORKLOG 10 Nov; CONTEXT has the rule).
+>   - **What was wrong (26 Oct, `01a17807`):** `send_payment_link` took about 12 s and Vapi stopped waiting at 10, so the model improvised "the office will send it" with a wrong number.
+>   - **Live now:**
+>     - **debt-tools v152** (PR #10, `c1d5efe`): the lookups run together, the model's line is written only when free text can go, and WhatsApp's id is looked for early.
+>     - **The debt agent `4bc03b57`:** its tools and report server run in Tokyo, a worker is warm when the call connects, and `send_payment_link` waits 20 s. Prompt, voice and model unchanged.
+>     - **The 208 number:** 20 s, was 10.
+>   - **Proven:** the template, the path a debt call takes, to the owner's own handset. It answered in 4.4 s with `sent: true`, WhatsApp's id is on the message, and ticket 255-1432-26 is resolved. No call and no AI: `python scripts/probe_paylink_call.py --template --apply`.
+>   - **Owed:**
+>     - **The free-text run,** for a tenant who wrote in the last 24 hours: `python scripts/probe_paylink_call.py --apply`. It spends about 0.03 US cents on OpenRouter, so it waits on the owner's go.
+>     - **A real debt call,** once the dialer rings. Then read the call's tool timing on Vapi: `send_payment_link` should answer in about 5 s, with no timeout line.
+>   - **The probe writes to one handset only:** flat 2 of the test building, and only when that number is the owner's (`OXS_MIRROR_PHONES`). Its open ticket is never mirrored into OXS.
+>   - **Rollback:** a revert PR on `main`; the previous commit's `vapi_tools.py` and `vapi_sip.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply` and `python scripts/vapi_sip.py --route on --apply`.
+>
 > **LIVE 10 Nov, 11:00 UTC: the incoming phone agent acts like the chatbot** (owner: *"make sure the voice agent inbound acts like the chatbot as well"*; WORKLOG 10 Nov; `docs/assistant/demo-inbound.md`, "10 Nov"). The incoming agent `10ae859a` only. The debt agent is unchanged.
 >   - **What a caller gets now, as on WhatsApp:**
 >     - **A lift:** which lift and which floor are asked; on opening, on "when?" and on the status he hears that the lift company does the repair and that Homies passes it on and presses them.
@@ -1365,7 +1378,7 @@ its stated time.
   - **Works:** the routing, and the name, heard as הומיז.
   - **Broke: `send_payment_link` passed Vapi's 10 s limit.** The function finished about 11 s after the call: link not delivered (`outside_window`, and the template did not go), office ticket `255-1384-26`. Michael then improvised the office number wrong: "0 7 7 687949", missing a 6.
   - **Likely cause:** the 208 number's `server.timeoutSeconds: 10` from feature 18. The agents' own server has none (Vapi's default is 20).
-  - **Fix waiting on the owner's go:** 20 s in `vapi_sip.py` `router_server()`, then `--route on --apply`.
+  - **FIXED 10 Nov** (the block at the top): the tool now answers in about 4 s, its own server waits 20 s, and the 208 number says 20.
 - **DONE 26 Oct: the WhatsApp bot tested against Yariv's feedback, Claude-played, nothing spent** (`docs/assistant/transcripts/2026-10-26-yariv/summary.md`).
   - **Result:** 22 conversations, 122 of 122 expectations, no reply blocked. Every point passes except the standing order (partly: no link exists) and the unknown street (one extra re-ask).
   - **Open, the owner's to decide:**

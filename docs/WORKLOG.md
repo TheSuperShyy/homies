@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-11-10
 
+### LIVE: the debt call's payment link answers in time (debt-tools v152, PR #10; the debt agent's tools; 20 s on the 208 line; owner: "ok fix the payment link not being sent")
+- **The cause, traced before anything changed** (26 Oct, Vapi `01a17807`): the tool was called 50.2 s into the call and Vapi answered for it at 60.2 s, "timeout of 10000ms exceeded". The function finished about 12 s after it started.
+  - **Why 10 s:** the 208 number's server said 10 and the tool's own server said nothing. The call's overrides carry only the variables, so the number's limit governed the tool.
+  - **Why 12 s:** every step ran after the one before. Nine database trips, the OXS link, a model-written line, UChat's contact, the template list, the send, the contact again, one fixed 2 s wait and a read-back, then two writes. On a debt call the tenant has not written to us, so the template is the message and the model's line was written and thrown away.
+  - **And from the wrong side of the ocean:** the debt agent's tools had no region pin (25 Oct pinned the incoming agent only), so each database trip crossed to Tokyo and back.
+  - **Read today, from here:** UChat's contact lookup takes about 1.0 s and its template list about 0.7 s.
+- **The function** (PR #10 merged as `c1d5efe`, CI green; the pipeline deployed **debt-tools v152** at 12:44:35 UTC, code only; this branch holds the same files):
+  - the link, the contact and the template list are fetched together;
+  - the model's line is written only when the tenant's 24 hours are open, in 4 s at most (was 6);
+  - WhatsApp's id is looked for at 0.7, 1.6 and 3.0 s, and the first yes ends the wait;
+  - the contact in hand is not looked up again, the two writes go together, and one log line gives each step's time.
+  - `paylink.ts` holds the timing rules, with `scripts/check_paylink.test.ts`: 7 tests, written first and seen failing. All 55 node tests pass.
+  - **For probes only:** a call id that starts `probe-` may ask for the template although the window is open, and its open ticket is never mirrored into OXS.
+- **Proven on live, with no call and no AI** (`python scripts/probe_paylink_call.py --template --apply`, 12:45:40 UTC, to the owner's own handset):
+  - answered in **4.4 s**, `sent: true`;
+  - `payment_links` says sent / whatsapp_template, and the ticket is **255-1432-26**, resolved;
+  - UChat shows WhatsApp's id on our message of 12:45:49 UTC, so WhatsApp took it. It is also the first payment link this function has sent through UChat.
+- **Vapi, pushed by hand after a field-by-field compare, both read back equal to the repo:**
+  - **The debt agent** (`4bc03b57`, 12:47:51 UTC, `vapi_sync.py debt --keep-voice --apply`): its seven tools and its report server are pinned to Tokyo, `status-update` warms a worker as the call connects, and `send_payment_link`'s own server waits 20 s (`SERVER_TIMEOUTS` in `vapi_tools.py`). Its prompt, first message, voice and model are unchanged. The incoming agent is byte-identical.
+  - **The 208 number** (12:48:28 UTC, `vapi_sip.py --route on --apply`): 20 s, was 10.
+- **Not proven:**
+  - **Free text,** for a tenant who wrote to us in the last 24 hours. It shares the code up to the send, but it has the model write a line, which is OpenRouter, about 0.03 US cents a run. Not run without a go. The run is `python scripts/probe_paylink_call.py --apply`.
+  - **A real call.** The debt agent is reached only through Omni's dialer, which does not ring. So whether Vapi takes the tool's own 20 s over the number's has not been seen; both now say 20.
+  - **The step times.** The log line is in the function, but the log service served only boot lines today.
+- **A slip, contained:** one compare printed the tools' shared secret into this session's output. Nothing was written, committed or sent, and the compare now hides it.
+- **Left as it was:** the plural wording of the model's line and of the template, and what the agent says while it waits.
+- **Rollback:** a revert PR on `main` for the function; the previous commit's `vapi_tools.py` and `vapi_sip.py`, then the same two push commands.
+
 ### LIVE (epoch 102): the tester's seventh run, its two promises fixed at their cause (the owner pasted its report)
 - **Live, both bots, read back:** live (`u2JjrbcNPYyyh3yl`, 12:27:00 UTC) and the UChat copy (`mKheBsTxtcMhPxu7`, 12:27:28 UTC) are active.
   - Prompt `8546b335b582` (25,991 characters), equal to prompt.md, with "לטפל בה בדחיפות" gone. The tool texts are unchanged (`81322f5daf6b`).

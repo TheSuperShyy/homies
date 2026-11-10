@@ -144,7 +144,10 @@ def router_server():
     url, secret = env_value("SUPABASE_URL").rstrip("/"), env_value("TOOL_SECRET")
     if not url or not secret:
         sys.exit("SUPABASE_URL and TOOL_SECRET must be set in .env")
-    return {"url": url + "/functions/v1/debt-tools", "timeoutSeconds": 10,
+    # 10 Nov: 20 s, was 10. The router itself answers in well under a second, but
+    # on the 26 Oct debt call this number's 10 s was what cut send_payment_link
+    # off (vapi_tools.py, SERVER_TIMEOUTS). 20 is Vapi's own default.
+    return {"url": url + "/functions/v1/debt-tools", "timeoutSeconds": 20,
             "headers": {"x-homies-secret": secret, "x-region": FUNCTION_REGION}}
 
 

@@ -826,6 +826,24 @@ INTAKE_TOOLS = [
 ]
 
 
+# How long Vapi waits for a tool that needs more than its default, in seconds,
+# written on the tool's own server so no other setting decides it.
+#
+# 10 Nov, send_payment_link. On the first real debt call (26 Oct, 01a17807) the
+# tenant said yes, the tool took about 12 s, and Vapi gave up at 10: "Your server
+# rejected `tool-calls` webhook. Error: timeout of 10000ms exceeded". The only 10
+# anywhere was the 208 number's own server (vapi_sip.py, the router), and the
+# tool's server said nothing, so the number's limit governed the tool. The model
+# was told the tool had failed and improvised "the office will send it" with a
+# wrong office number, while the function was still sending.
+#
+# The function now answers in about 4 s (debt-tools v152: lookups together, no
+# model line when the template is the message). This is the margin above that:
+# UChat, OXS or WhatsApp having a slow moment must not turn a link that was sent
+# into "it was not".
+SERVER_TIMEOUTS = {"send_payment_link": 20}
+
+
 def with_server(tools, url, secret, mode="header", region=None):
     """Point every tool at whichever host is standing up the webhooks.
 
@@ -850,5 +868,8 @@ def with_server(tools, url, secret, mode="header", region=None):
             if region:
                 headers["x-region"] = region
             t["server"] = {"url": url, "headers": headers}
+            wait = SERVER_TIMEOUTS.get(t["function"]["name"])
+            if wait:
+                t["server"]["timeoutSeconds"] = wait
         out.append(t)
     return out
