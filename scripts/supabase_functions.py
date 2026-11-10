@@ -68,6 +68,8 @@ IDENTITY = os.path.join(ROOT, "supabase", "functions", SLUG, "identity.ts")
 ROUTE = os.path.join(ROOT, "supabase", "functions", SLUG, "route.ts")
 # 29 Oct: the balance's name check that takes Latin letters, also pure.
 NAMES = os.path.join(ROOT, "supabase", "functions", SLUG, "names.ts")
+# 10 Nov: how long the caller waits for the debt call's payment link, also pure.
+PAYLINK = os.path.join(ROOT, "supabase", "functions", SLUG, "paylink.ts")
 API = "https://api.supabase.com"
 
 # api.supabase.com sits behind Cloudflare, which rejects urllib's default
@@ -103,7 +105,7 @@ def differs_from_main():
     """
     subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin", "main"], check=True)
     stale = []
-    for path in (SRC, IDENTITY, ROUTE, NAMES):
+    for path in (SRC, IDENTITY, ROUTE, NAMES, PAYLINK):
         rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
         r = subprocess.run(["git", "-C", ROOT, "show", "origin/main:" + rel],
                            capture_output=True)
@@ -207,10 +209,12 @@ def main():
     identity_src = open(IDENTITY, encoding="utf-8").read()
     route_src = open(ROUTE, encoding="utf-8").read()
     names_src = open(NAMES, encoding="utf-8").read()
+    paylink_src = open(PAYLINK, encoding="utf-8").read()
     files = [("index.ts", src), ("identity.ts", identity_src),
-             ("route.ts", route_src), ("names.ts", names_src)]
-    print("files          index.ts %d chars, identity.ts %d chars, route.ts %d chars, names.ts %d chars"
-          % (len(src), len(identity_src), len(route_src), len(names_src)))
+             ("route.ts", route_src), ("names.ts", names_src), ("paylink.ts", paylink_src)]
+    print("files          index.ts %d chars, identity.ts %d chars, route.ts %d chars, names.ts %d chars, "
+          "paylink.ts %d chars"
+          % (len(src), len(identity_src), len(route_src), len(names_src), len(paylink_src)))
 
     print("project        %s" % ref)
     print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
