@@ -24,7 +24,7 @@ conversation that produced it.
   - liquidjs, the engine Vapi uses (10.30.1 here), renders it right at twelve instants (summer time, the Friday midnight), with strict filters and variables.
   - `prompt_probe.render_hours()` is new and gives the same text byte for byte; `voice_qa.py bundle` now renders each card for its own weekday.
   - A real debt call of 26 Oct shows Vapi renders tags inside a system prompt (six in the template, none raw in the call). `%w` itself is not yet seen on Vapi.
-- **Checked with Claude only, no spend** (`scripts/voice_qa_likechat.json`, seven blind calls, each on its own player):
+- **Checked with Claude only, no spend** (`scripts/voice_qa_likechat.json`, seven blind calls, each on its own player; the transcripts are kept in `local/voice-tests/2026-11-10-likechat/`, outside the repo):
   - **The lift:** the floor and which lift asked one at a time, then "את התיקון עצמו עושה חברת המעליות … מתי יבואו לתקן תלוי בהם, לא בנו" with the number. On the second "when" he added the elderly neighbours to the request, looked it up again, and kept the lift company.
   - **Water from her bathroom ceiling:** "קודם כל צריך בעל מקצוע מִטַּעֲמֵךְ … כבר התברר שזה בא מתקלה ברכוש המשותף?", and a request only after "the plumber said the main pipe".
   - **"A person or a computer?":** "אני העוזר הדיגיטלי בצוות השירות של הומי'ז". Then the standing order at once, its number, and "מישהו מצוות הגבייה ייצור אִתָּךְ קשר בטלפון". Asked when: no date.
