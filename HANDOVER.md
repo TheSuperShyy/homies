@@ -15,8 +15,13 @@ appended to.
 >   - **Read it any time:** `python scripts/chatwoot_teams.py` (read only; exit 1 when a department is silent on WhatsApp). Seat or unseat with `--add` / `--remove <department> <agent id> --apply`.
 >   - **Prove it without the bot:** `python scripts/n8n_handover_test.py --manager`. It passed at 07:31 UTC: the request mentioned Management and the matter Collections, and the owner's login got both mentions. It writes on conversation 53 only and cleans it.
 >   - **A seat needs two things, or its mention is dropped in silence:** membership of the WhatsApp inbox and of its department's team.
+>   - **Seen from a real message, 11 Nov 07:38 UTC, on the Israeli number:** the owner's "אני לא רוצה לדבר עם בוט, תביא לי מנהל" (conversation 1).
+>     - 07:38:37: the private note, "@הנהלה דייר צריך מישהו מכם. סיבה: הדייר ביקש לדבר עם בן אדם. …". Team Management, `handover` and `handover-management`.
+>     - 07:38:38: Michael's reply, with WhatsApp's id and no word of a manager: "אני מיכאל מהומי'ז. אני אעשה כל מה שאפשר כדי לעזור. תספר לי מה העניין, כדי שאוכל לטפל בזה כמה שיותר מהר?". It is also the first AI answer on that number.
+>     - Conversation 1 tops the login's Mentions view.
+>   - **The bell is not the proof.** Chatwoot keeps one notification per login and conversation. The bot's own reply a second later replaced the mention's entry with "new message" (#2712), as #2708 replaced #2707 in the proof. Read the Mentions view, or the notifications with `includes[]=read`.
 >   - **Owed:**
->     - **The owner's handset,** in office hours: "אני לא רוצה לדבר עם בוט, תביא לי מנהל". The whole chain from the Israeli number is not yet seen.
+>     - **The pause check, the owner's (asked 11 Nov, about 07:45 UTC):** a public reply from the owner's login in conversation 1 must assign the chat to that login and quiet the bot; a private note does not. 15 minutes after the chat's last message the ticker unassigns it and the bot answers again.
 >     - **Homies' people per department,** from the owner. Creating a login emails the person, so it is the owner's to do or to order. Then `--add` them and `--remove` the stand-in.
 >   - **Do not run the full `n8n_handover_test.py` or its `--clean`:** conversation 44 is a real person's thread now (the file's header).
 >   - **Rollback:** `python scripts/chatwoot_teams.py --remove management 2 --apply`, then `collections` and `operations`.

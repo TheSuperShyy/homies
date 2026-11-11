@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### Read only: the owner's real manager request, seen end to end; and a reply for the pause check (owner: "give me a reply for the manager i wanna check if chatwoot pause for hiuman intervention works"), about 07:45 UTC
+- **The real message, 07:38:05 UTC, from the owner's handset to the Israeli number** (conversation 1): "אני לא רוצה לדבר עם בוט, תביא לי מנהל".
+  - 07:38:37: "Hand to a person" ran (`caller_request`, the model's `management`, in hours, not skipped) and posted the private note "@הנהלה דייר צריך מישהו מכם. סיבה: הדייר ביקש לדבר עם בן אדם. …".
+  - 07:38:38: Michael's reply went out with WhatsApp's id: "אני מיכאל מהומי'ז. אני אעשה כל מה שאפשר כדי לעזור. תספר לי מה העניין, כדי שאוכל לטפל בזה כמה שיותר מהר?". No manager, no team. It is the first AI answer on that number.
+  - 07:38:39-40: assigned to Management, labelled `handover` and `handover-management`.
+  - Conversation 1 tops the owner's login's Mentions view. So the chain that was "not proven" two hours ago is seen.
+- **The bell shows it as a new message, not a mention.** The login's notifications, read with `includes[]=read`: #2712 `participating_conversation_new_message` for conversation 1 at 07:38:41, read the same second (the chat was open on the owner's screen), and no mention entry. Chatwoot keeps one notification per login and conversation, so the bot's reply replaced the mention's entry. In the 07:31 proof #2708 replaced #2707 the same way. Whether the mention's push and email went out in that second was not read (no server log read).
+- **How the pause works, read from live** (the bot's Sort, "Human replied?", "Assign to the replier"; the ticker's "Quiet for 15 minutes?"):
+  - a public reply from a person's login assigns the chat to that login; a private note does not;
+  - on the tenant's next message Sort sees a person on the chat (or `bot-off`, or resolved) and the bot does not answer;
+  - every minute the ticker looks: 15 minutes after the chat's last message from either side it unassigns the chat, strips `bot-off` and the handover labels, and the bot answers again.
+- **Given to the owner:** the manager's reply to send from Chatwoot, "שלום, כאן מנהל השירות של הומי'ז. ראיתי שביקשת לדבר עם מנהל, אז אני כאן. ספר לי בבקשה מה קרה, ואני אטפל בזה.", the handset line to send after it, and what to look for.
+- Nothing was changed, sent or spent by this session. HANDOVER has the seen chain and the pause check as owed; CONTEXT has the bell.
+
 ### LIVE, Chatwoot only: a manager request's mention reaches a person in every department (owner: "make sure when a manager is requested like i dont want to talk to a bot give me a manager it should mention the people on the right deparment. but the bot is still the same just the chatwoot side changes")
 - **What was there already:** since 14 Sep a manager request makes a private note in Chatwoot that @mentions a department's team ("Homies — Hand to a person", `oB66atFlWwtkSGgN`), and a second one for the matter once the tenant names it. The mention is the only alert; the team assignment notifies nobody.
 - **Read from live before anything changed:**

@@ -72,6 +72,7 @@ The user is the builder. The client is Homies.
 - **So every department always has at least one person a mention reaches.** `python scripts/chatwoot_teams.py` reads it and exits 1 when one is silent. The owner's login stands in for the departments Homies has not staffed yet.
 - **"Who is told" is a Chatwoot matter, never a bot one.** Michael still says nothing to the tenant about a manager or a team (one voice), and the department stays the model's judgment with the reason's default: no keyword table.
 - **Prove it without the bot:** `python scripts/n8n_handover_test.py --manager`, on conversation 53 only.
+- **The bell is not the proof of a mention.** Chatwoot keeps one notification per login and conversation, so on a real chat the bot's own reply, a second after the note, replaces the mention's entry with "new message". The proof is the note itself and the login's Mentions view. `--manager` sees the notification only because nothing follows the note on 53.
 
 **Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; live 9 Nov as epoch 100 by `n8n_whatsapp_feedback9.py`, on live and the UChat copy).**
 - **The comments themselves, word for word with English:** `docs/discovery/feedback-yariv-2026-11-09.md` (written 10 Nov from the owner's 13 screenshots). Read the comment there before changing what it decided: some are whole sentences Yariv wrote for Michael to say (2.2, 2.3 and most of 3.2).
