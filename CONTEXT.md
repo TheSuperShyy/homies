@@ -66,6 +66,14 @@ The user is the builder. The client is Homies.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
 - **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
+**The OXS copy list holds four numbers since 11 Nov: the owner's, and Homies' own two people in the test building** (the owner, after hearing that flat 1's and flat 3's tickets were not in OXS and that adding them is a write there: *"so make sure when they open a ticket it will be opened to oxs directly"*).
+- **Who is on the list is the owner's decision, in so many words, one person at a time.** Being a tenant on file in OXS puts nobody on it: the owner assumed it did (*"ido number and yariv number register in oxs ... it will open a ticket to oxs right"*), and their six tickets were in our system only. Never add a number to make a test easier.
+- **A person can have more than one number.** Flat 1 has the number registered in OXS and the number its tenant writes from, under one name. Both went on, or the tickets that matter would not go.
+- **`scripts/oxs_mirror_list.py` reads and changes it:** by flat of the test building, never printing a number, `.env` and the live secret together, read back by digest. No code is deployed for it.
+- **The list is not "the owner's handset" any more.** A guard that means the owner's own phone reads `OWNER_TEST_PHONE`. Before widening a list, look for what else reads it.
+- **A copied ticket goes into OXS on the building it is for,** and the mirror still only creates: nothing of ours closes or updates a call there.
+- **Everyone else's ticket still stays in our system.** The every-reporter type switch (`OXS_MIRROR_TYPES`) is off.
+
 **A department's mention must reach a person (11 Nov; the owner: *"make sure when a manager is requested ... it should mention the people on the right department. but the bot is still the same just the chatwoot side changes"*).**
 - **What a manager request does in Chatwoot.** A private note that @mentions a department's team, and another for the matter once the tenant names it. In real runs the model sends the request itself to Management and the matter by its reason (a charge to Collections, a fault to Operations).
 - **The mention is the only alert, and it can land on nobody in silence.** Chatwoot notifies only the team's members who are administrators or members of the conversation's inbox. An empty team, or a seat never added to the inbox, gets a note nobody hears. Until 11 Nov three of the four departments were empty.
@@ -1803,6 +1811,8 @@ decision of the same size as this one; do not add a number to it because a
 test would be easier.** A ticket the live mirror missed is pushed with
 `scripts/oxs_mirror_backfill.py`, one at a time and only for a number already
 on the list — backfilling is not a second decision, but widening is.
+*Widened on 11 Nov, on the owner's word, to flats 1 and 3 of the test building:
+four numbers. See "The OXS copy list holds four numbers" near the top.*
 
 **The mirror only creates; nothing of ours updates or closes a call in OXS (counted 10 Nov).**
 53 of our tickets hold an OXS `_id`, all from the +63, all WhatsApp, all בר כוכבא 23, and read

@@ -8,6 +8,16 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 11 Nov, 09:08 UTC: TICKETS FROM FLATS 1 AND 3 OF THE TEST BUILDING OPEN IN OXS TOO** (owner, after hearing that those tickets were not in OXS and that adding them is a write there: *"so make sure when they open a ticket it will be opened to oxs directly"*; WORKLOG 11 Nov; CONTEXT has the rule).
+>   - **The copy list (`OXS_MIRROR_PHONES`) holds four numbers:** the owner's +63 (flat 2), flat 1's two (the number registered in OXS and the number its tenant writes from, the same name on both), and flat 3's one. Flats 1 and 3 are Homies' own two people.
+>   - **What changed:** the one live secret, set alone through the Management API and read back by its digest, and the same line in `.env` (copy: `local/env-backups/.env.before-oxs-mirror-list-2026-11-11T0908Z`). No code was deployed. The every-reporter type switch (`OXS_MIRROR_TYPES`) is still off.
+>   - **Read it or change it:** `python scripts/oxs_mirror_list.py` shows the list by flat and never a number, and exits 1 when live and `.env` differ. `--add-flat` / `--remove-flat <flat> --apply` change both together. Only flats of the test building, and only on the owner's word.
+>   - **From now on** a ticket from one of those numbers is created in OXS at the same moment: on WhatsApp, and on a call that arrives with that number. It goes into OXS on whatever building the ticket is for.
+>   - **Not seen yet:** a ticket of theirs in OXS. This change wrote nothing to OXS; their next ticket is the first write. Each number on the list is the exact string their earlier tickets carry as reporter, so the comparison will match.
+>   - **Not backfilled:** their six earlier tickets (five from flat 1, the newest 11 Nov 08:40 UTC; one from flat 3). `scripts/oxs_mirror_backfill.py` can push one now that the numbers are on the list; nobody asked.
+>   - **"On the list" no longer means "the owner's handset".** `.env` has `OWNER_TEST_PHONE` for that, and `probe_paylink_call.py` reads it since today. `n8n_uchat.py` falls back to the list only when `UCHAT_TEST_PHONES` is unset; it is set.
+>   - **Rollback:** `python scripts/oxs_mirror_list.py --remove-flat 1 3 --apply`.
+>
 > **LIVE 11 Nov, 08:46 UTC: THE REVIEWERS' PAGE HAS A SECOND SECTION, Yariv's comments beside our answers** (owner: *"ok push live"*; PR #12, squash-merged as `9c48f0f`; WORKLOG 11 Nov; CONTEXT has the rules).
 >   - **The link** is the reviewers' own, with the same key: `https://homies-dashboard.vercel.app/review/yariv?k=<key>`, or the tab "ההערות של יריב" on `/review`. Without the key, or with a wrong one, it shows only "the link is not valid".
 >   - **What it shows:** the 12 comments of 9 Nov, one row each: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), the comment as Yariv wrote it on the right and our answer on the left. Hebrew only.
@@ -59,7 +69,7 @@ appended to.
 >   - **Owed:**
 >     - **The free-text run,** for a tenant who wrote in the last 24 hours: `python scripts/probe_paylink_call.py --apply`. It spends about 0.03 US cents on OpenRouter, so it waits on the owner's go.
 >     - **A real debt call,** once the dialer rings. Then read the call's tool timing on Vapi: `send_payment_link` should answer in about 5 s, with no timeout line.
->   - **The probe writes to one handset only:** flat 2 of the test building, and only when that number is the owner's (`OXS_MIRROR_PHONES`). Its open ticket is never mirrored into OXS.
+>   - **The probe writes to one handset only:** flat 2 of the test building, and only when that number is the owner's (`OWNER_TEST_PHONE` in `.env` since 11 Nov; before that `OXS_MIRROR_PHONES`, which now holds other people's numbers too). Its open ticket is never mirrored into OXS.
 >   - **Rollback:** a revert PR on `main`; the previous commit's `vapi_tools.py` and `vapi_sip.py`, then `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply` and `python scripts/vapi_sip.py --route on --apply`.
 >
 > **READ 10 Nov, ~13:00 UTC: the tests have 53 open calls in Homies' OXS** (owner: *"how many tickets have we opened in oxs while testing?"*; WORKLOG and CONTEXT 10 Nov). Read only; nothing written.
@@ -67,7 +77,7 @@ appended to.
 >   - **All 53 are open in OXS.** Our table has 36 `cancelled` and 1 `resolved`; the mirror never updates OXS, so that never reached it.
 >   - **At about 13:15 UTC: 54 open in OXS for the building, all ours, none of Homies' own** (the retest added 255-1434-26). Our table has 18 open there: 17 mirrored plus the standing order 255-1417-26.
 >   - **Every Grok run adds about five more,** since it writes from the +63. The short retest (run 8) added three: 255-1433-26, 255-1434-26 and 255-1435-26, so 55 in all after it. The after-hours check added 255-1436-26: 56.
->   - **Read again 11 Nov, 08:56 UTC** (owner: *"does the ticket is open in the oxs? every ticket is open in the oxs"*): still 56, all open in OXS, none closed, and nothing else open in that building. Of the 116 tickets our agents have opened (72 WhatsApp, 44 phone), those 56 are the only ones in OXS, all WhatsApp from the one mirrored number. The live switches were re-read: one number on the list, and `OXS_MIRROR_TYPES` (every lift report, from anyone) still absent. So a real tenant's ticket does not reach OXS today.
+>   - **Read again 11 Nov, 08:56 UTC** (owner: *"does the ticket is open in the oxs? every ticket is open in the oxs"*): still 56, all open in OXS, none closed, and nothing else open in that building. Of the 116 tickets our agents have opened (72 WhatsApp, 44 phone), those 56 are the only ones in OXS, all WhatsApp from the one mirrored number. The live switches were re-read: one number on the list, and `OXS_MIRROR_TYPES` (every lift report, from anyone) still absent. So a real tenant's ticket does not reach OXS today. **Twelve minutes later the list grew to four numbers** (the block at the top).
 >   - Closing or editing them in OXS is a write there: only on the owner's explicit go.
 >
 > **DONE 10 Nov, about 16:55 UTC: the tester checklist as a PDF** (owner: *"send via pdf and open in file manager"*, replacing the Google Docs ask). `local/checklist/michael-checklist-2026-11-11.pdf`, 9 pages, 35 tests, built from the JSON beside it by `python local/checklist/build_pdf.py`. A change to the tests goes into the JSON, then rebuild. **WRONG FORMAT, corrected by the owner:** *"I TOLD YOU TO MAINTAIN ONLY THE REPLY OF THE BOT"*. "The checklist" means **Michael's actual replies, each with ✓, ✗ and a comment**, never the send-this / expected-behaviour format above. No Google Doc and no paid simulation is owed: the owner said *"we have grok"*.

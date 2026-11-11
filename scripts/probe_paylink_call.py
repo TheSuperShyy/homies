@@ -12,8 +12,11 @@ tool cannot wait for a call to prove it. This posts the same `tool-calls` messag
 for one tenant, and times the answer.
 
 WHO GETS THE MESSAGE. Flat 2 of the test building and nobody else: the owner's own handset
-(.env's OXS_MIRROR_PHONES holds that number, and the debt list's row must match it). The link in
+(.env's OWNER_TEST_PHONE holds that number, and the debt list's row must match it). The link in
 the message is that flat's real OXS link. Do not open it.
+Until 11 Nov this read OXS_MIRROR_PHONES, which then held the owner's number and nothing else.
+That day flats 1 and 3, two real people at Homies, joined that list on the owner's word, so "is
+on the list" stopped meaning "is the owner's handset". The owner's number has its own name now.
 
 THE TEMPLATE. A debt call rings someone who has not written to us, so their 24 hours are shut
 and the link goes as the Meta template payment_link_he. The owner's handset usually HAS written
@@ -92,10 +95,10 @@ def row_for_the_owner(e):
                  "(After four calls a tenant leaves the list: scripts/bk_reset_attempts.py.)"
                  % (len(rows), UNIT))
     row = rows[0]
-    own = [p.strip() for p in e.get("OXS_MIRROR_PHONES", "").split(",") if p.strip()]
-    if row["phone"] not in own:
-        sys.exit("Flat %s's number is not the owner's handset (OXS_MIRROR_PHONES). Refusing: this "
-                 "probe messages a real phone." % UNIT)
+    own = e.get("OWNER_TEST_PHONE", "").strip()
+    if not own or row["phone"] != own:
+        sys.exit("Flat %s's number is not the owner's handset (OWNER_TEST_PHONE in .env). Refusing: "
+                 "this probe messages a real phone." % UNIT)
     return row
 
 

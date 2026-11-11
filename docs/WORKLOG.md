@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: tickets from flats 1 and 3 of the test building open in OXS too (owner: "so make sure when they open a ticket it will be opened to oxs directly"), 09:08 UTC
+- **The word for it.** The owner had asked whether Ido's and Yariv's tickets open in OXS and was told no, that the list holds one number, and that adding theirs is a write into Homies' OXS which waits on the owner's word. The owner then gave it. That is the explicit go the 26 Aug rule asks for, for these people and no others.
+- **Who "they" are, read by flat with no number printed:** flat 1 has two numbers under one name, the one registered in OXS (`source` `oxs`, 1 ticket, 24 Sep) and the one its tenant writes from (`source` `agent`, 4 tickets, the newest today at 08:40 UTC, and the contact of Chatwoot conversation 44). Flat 3 has one (`oxs`, 1 ticket, 19 Oct). All three went on: with only the registered number, flat 1's real tickets would still stay out.
+- **New: `scripts/oxs_mirror_list.py`,** with `scripts/oxs_mirror_list_test.py` (12 tests, written first and seen failing).
+  - With no argument it shows the list by flat, the mirror's key and the type switch, and whether the live list is `.env`'s. It exits 1 when they differ.
+  - `--add-flat` / `--remove-flat <flat>` take every usable number on file for that flat of the one test building; a dry run unless `--apply`.
+  - `--apply` copies `.env` to `local/env-backups/`, rewrites the one line, sets the one live secret through the Management API and reads its digest back. It refuses when live and `.env` differ, and it would refuse an empty list. No code is deployed.
+  - It never prints a number.
+- **Applied at 09:08:47 UTC:** `--add-flat 1 3 --apply`. `.env`'s one line (copy: `local/env-backups/.env.before-oxs-mirror-list-2026-11-11T0908Z`; every other line identical), the live secret HTTP 201, read back equal. A second run reported nothing to do. The list reads "flat 2 x1, flat 1 x2, flat 3 x1", live the same.
+- **Checked that the comparison will match:** each of the three numbers is the exact string their earlier tickets carry in `reported_by_phone` (4, 1 and 1 tickets), which is what the function compares.
+- **What else read the list as "the owner's number", found before leaving:**
+  - `probe_paylink_call.py` took any number on the list as the owner's handset. Its flat is fixed at 2, so it could not have reached anyone else, but the guard had lost its meaning. `.env` now has `OWNER_TEST_PHONE` (the list's first entry, added with nothing else changed), and the probe requires exactly that. Its dry run still names the owner's handset.
+  - `n8n_uchat.py` falls back to the list for its test phones only when `UCHAT_TEST_PHONES` is unset. It is set, so nothing changes; the UChat copy is off anyway.
+  - `oxs_mirror_backfill.py` and the function use it as a list, which is what it is.
+- **Not done:** nothing was written to OXS, and no ticket of theirs has opened since, so the first new one is the proof. Their six earlier tickets were not backfilled: not asked. The every-reporter type switch is still off.
+- **Said to the owner:** a ticket of theirs goes into OXS on whatever building it is for, and stays open there until Homies closes it.
+- **Rollback:** `python scripts/oxs_mirror_list.py --remove-flat 1 3 --apply`.
+
 ### A question answered, read only: is every ticket opened in OXS (owner: "does the ticket is open in the oxs? every ticket is open in the oxs"), 08:56 UTC
 - **No. Only tickets from the one test number are copied into OXS.** Read from the live function's secrets (names and a digest, no values): `OXS_KEY_REQUESTS` present, `OXS_MIRROR_PHONES` present and equal to `.env`'s list of one number, `OXS_MIRROR_TYPES` absent. So the "every lift report, from anyone" switch (Yariv, 4 Nov) is still off.
 - **Our table:** our agents have opened 116 tickets, 72 on WhatsApp and 44 by phone. 56 carry a real OXS id (24 hex), all of them WhatsApp. 10 more hold our own markers in `oxs_ref` (`standing_order`, `partial:*`), which are not OXS ids. So 60 are in our system only, the phone agent's 44 among them.
