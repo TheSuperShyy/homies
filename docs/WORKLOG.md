@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### A quick smoke test, read only (owner: "do a quick smoke test dont edit anything just a quick one"), 09:38 UTC
+- **How:** GET requests, plus one unsigned POST the tool server must refuse. No message sent, no ticket opened, nothing spent, nothing changed. The script stayed in the session's scratch folder.
+- **27 checks, all passed:**
+  - **n8n:** the bot, "Hand to a person", the minute ticker, the standing-order email and the voice team note are all on. The bot's last 20 runs succeeded, and no workflow had a failed run in 24 hours.
+  - **Chatwoot:** every department's mention reaches somebody; the bot is linked to the WhatsApp inbox; the newest tenant message the bot answered (11 Nov 07:52 UTC, conversation 93) went out 3 s later with WhatsApp's id.
+  - **The OXS copy list:** live equal to `.env`, four numbers (flat 2 x1, flat 1 x2, flat 3 x1), the every-reporter switch off, the key in place.
+  - **The tool server:** debt-tools v155 ACTIVE, and 401 without its secret. v155 is the pipeline's code-only deploy on PR #12's merge at 08:46 UTC; that PR did not touch the function.
+  - **The live dashboard:** `/login` 200; `/review` with the key 200 with 44 replies, Send and both tabs; `/review/yariv` with the key 200 with 12 rows; without the key only "הקישור לא תקין"; `/tickets` logged out 307 to `/login`.
+  - **Vapi, read only:** both agents are there, as last pushed on 10 Nov (11:00 and 12:47 UTC), on gpt-5.6-sol.
+  - **OpenRouter:** $35.29 in the wallet.
+  - **The local site:** both sections answer on `localhost:8787`.
+- **The bot's gate on live:** all 566 cases pass, in 2.3 s.
+- **`--watch` since the move (10 Nov 15:26 UTC): 12 real resident turns, 3 flagged,** all in flat 1's lift chat of 11 Nov, 08:40-08:41 UTC (runs 172653, 172661, 172668).
+  - Each has the plural "אצלכם" in Michael's question, which the owner's address rule forbids. It is the watched item of epoch 102's notes, now three replies running on the lift question.
+  - 172661 also has "כדי שאוכל לעדכן אותם" (the clerk's reason) and "והעברנו". The last is the lift line's own exception, so it is expected.
+- **Not changed, as asked.** Said to the owner.
+
 ### LIVE: tickets from flats 1 and 3 of the test building open in OXS too (owner: "so make sure when they open a ticket it will be opened to oxs directly"), 09:08 UTC
 - **The word for it.** The owner had asked whether Ido's and Yariv's tickets open in OXS and was told no, that the list holds one number, and that adding theirs is a write into Homies' OXS which waits on the owner's word. The owner then gave it. That is the explicit go the 26 Aug rule asks for, for these people and no others.
 - **Who "they" are, read by flat with no number printed:** flat 1 has two numbers under one name, the one registered in OXS (`source` `oxs`, 1 ticket, 24 Sep) and the one its tenant writes from (`source` `agent`, 4 tickets, the newest today at 08:40 UTC, and the contact of Chatwoot conversation 44). Flat 3 has one (`oxs`, 1 ticket, 19 Oct). All three went on: with only the registered number, flat 1's real tickets would still stay out.
