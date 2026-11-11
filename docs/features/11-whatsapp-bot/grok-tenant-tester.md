@@ -106,7 +106,9 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
    - Water inside the flat, even from the ceiling, gets no ticket yet. He says gently that this is in the private flat, so first a professional of your own checks where it comes from. (R11)
    - He asks whether it is already known to come from the building's shared parts, such as the main pipes or the roof. (R11)
 3. Send `האינסטלטור שלי היה פה אתמול, והוא אמר שזה מהצנרת הראשית של הבניין`.
-   - Now it is the building's: a ticket with its number, possibly after the building and apartment. (R9, R11)
+   - Now it is the building's, so he asks whether to open a ticket, with the building and apartment in the same question if you are not on file. He opens nothing yet. (R11)
+   - Answer `כן, תפתח בבקשה`, with `בר כוכבא 23 דירה 2` if he asked for it.
+   - Then a ticket with its number. (R9, R11)
 4. Open with `המנורה בכניסה לבניין קצת מהבהבת. לא צריך קריאה, רק רציתי שתדעו`.
    - Expect a short word that accepts it, with no ticket and no persuading. (R22)
 
