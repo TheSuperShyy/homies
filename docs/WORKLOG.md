@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### The retest for line v1, given to the owner (owner: "ok give me instructions"), 15:45 UTC
+- **Asked first, "so is it fix":** yes, in the live code, proven on the four failed replies. The watch from 15:21 saw 0 tenant turns, so no real chat has shown it yet.
+- **The retest, pasted to Grok after `grok-emergency-line-test.md`:** E3 and E4 only, about 5 messages, any hour. H2 and H8 are judged strictly in every reply that gives 077-6687949. An invitation passes; any plural fails H8; any order, even singular and after "בבקשה", fails H2 (the brief itself makes a bare order only a note). The summary adds one line per reply: the line as an invitation, yes or no.
+- **Told the owner:** from the +63, E3 and E4 each open a real urgent ticket, in Homies' OXS too.
+
 ### LIVE: our emergency line comes as an invitation, never an order (the owner pasted Grok's report of the emergency-line run), 15:21 UTC, Send's line v1
 - **The report:** E1 to E4 at 16:02-16:16 Israel (14:02-14:16 UTC), 7 messages, on file: yes. The tickets were 255-1440-26 (the lobby light), 255-1441-26 (the lift, urgent) and 255-1442-26 (smoke, urgent).
   - **No serious fails.** The line came once in each of the three emergencies, gas was word for word, and the lobby light got no number.
