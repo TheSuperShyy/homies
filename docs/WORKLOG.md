@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### Two questions answered, read only: does the bot meet Yariv's 9 Nov comments, and does it mention a manager request (owner: "this is just a question"), about 07:15 UTC
+- **Against the 12 comments** (`docs/discovery/feedback-yariv-2026-11-09.md`), from the prompt in the repo (epoch 102) and the real replies logged on 10 Nov:
+  - Fully met: 2.1, 2.2, 2.3, 2.4, 4.1 (the lift) and 3.2 (water in a flat).
+  - Met with a gap: 5.2, since no email has reached Homies' inbox yet (the test number's 255-1417-26 is still open, so each test answers "already recorded"), and Michael still gives a request number of ours. 6.2 and 6.3, since the emergency centre comes with an urgent fault after hours, but gas, Yariv's own example, gets only the gas company's line; that was asked back and no answer is on record.
+  - Questions, not changes: 1.1 (the two buttons, Yariv's decision) and 7.2's "how does it work"; both have answers drafted for the owner to send. 5.1 asked for nothing.
+- **A manager request, said to the owner:** Michael does not tell the tenant that it was recorded or passed on. The prompt says so ("על הרישום הזה אתה לא מספר לו"), and Send's manager v2 cuts the claim. The staff see it: notify_team leaves a note and assigns the chat in the team inbox. Yariv marked the 3 Nov reply right while it still said "כבר רשומה", and asked only for a comma there.
+- Nothing was changed, sent or spent.
+
 ### Health check of the WhatsApp bot and everything around it (owner: "do a health check on everything the chatbot, chatwoot and stuff"), 07:10 UTC, read only
 - **Meta:** the number is CONNECTED, quality GREEN, and its phone-level webhook goes to Chatwoot.
   - **Its name is "hadas 1",** and it is limited to TIER_250. Health says the display name is not approved and the business has not passed business verification. No name change is pending.
