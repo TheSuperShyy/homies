@@ -205,6 +205,11 @@ twice.
 - **Teams are empty apart from the owner's login in Service, so a mention
   reaches one PC today.** By design until the seats exist; the note, labels
   and priority land either way.
+  **11 Nov: that was worse than it reads.** A manager request goes to
+  Management, not Service (5 real runs of 6), so its mention reached nobody
+  at all. The owner's login now sits in all four teams, and
+  `scripts/chatwoot_teams.py` exits 1 when a department is silent. A new seat
+  still needs both: the WhatsApp inbox and its department's team.
 - **A seat with "new conversation" notifications on gets pinged at the first
   bot reply of every conversation**, because `Show it in Open` flips
   pending → open with the bot token and Chatwoot treats that as a bot handoff.

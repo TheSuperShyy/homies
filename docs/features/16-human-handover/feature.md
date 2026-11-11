@@ -4,6 +4,20 @@
 **Depends on:** [11-whatsapp-bot](../11-whatsapp-bot/feature.md), [12-chatwoot](../12-chatwoot/feature.md)
 **Status:** built and wired live 3 Sep, alert proven on the owner's PC the same day (Windows toast). Switched off for WhatsApp on 13 Sep, **back on 14 Sep as a *team note*** — the same mention, new words; see the two notes below. **The inbound voice agent joined the same afternoon** (the Voice section below). The toggle half (a person's reply silences the bot; the 15-minute handback) has been live throughout.
 
+> **11 Nov: a mention has to reach somebody.** Owner: *"make sure when a
+> manager is requested ... it should mention the people on the right
+> department. but the bot is still the same just the chatwoot side changes."*
+> Read from live that day: the bot sends a manager request to Management (5
+> real runs of 6), and Management, Collections and Operations had no members,
+> so the note was written and nobody was told. The owner's login now sits in
+> all four teams as a stand-in until Homies' people are seated
+> (`scripts/chatwoot_teams.py`, which also reads who each department's mention
+> reaches and exits 1 when one is silent). `scripts/n8n_handover_test.py
+> --manager` proves the request and its matter on conversation 53. The
+> sub-workflow, the ticker and the bot are unchanged. Conversation 44 is a
+> real person's thread now: see the harness's header before running the full
+> set.
+
 > **14 Sep, afternoon — voice joined.** Owner: *"for the inbound voice agent
 > i want it to have tough durability as well like the one we have in the
 > chatbot."* The voice `transfer_to_human` had told the model to promise a
@@ -235,6 +249,11 @@ Function exactly as before.
    team at 10:46:40, same result.
 7. A reply from a seat claims the thread; 15 quiet minutes later it is
    unassigned, the handover labels are gone, and the bot resumes.
+8. No department is silent: `python scripts/chatwoot_teams.py` exits 0, and
+   `python scripts/n8n_handover_test.py --manager` passes in office hours (a
+   manager request mentions Management, its matter mentions Collections, and
+   a member of each gets the `conversation_mention`). **Passed 11 Nov, 07:31
+   UTC,** with the owner's login as the member.
 
 ## Out of scope
 

@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE, Chatwoot only: a manager request's mention reaches a person in every department (owner: "make sure when a manager is requested like i dont want to talk to a bot give me a manager it should mention the people on the right deparment. but the bot is still the same just the chatwoot side changes")
+- **What was there already:** since 14 Sep a manager request makes a private note in Chatwoot that @mentions a department's team ("Homies — Hand to a person", `oB66atFlWwtkSGgN`), and a second one for the matter once the tenant names it. The mention is the only alert; the team assignment notifies nobody.
+- **Read from live before anything changed:**
+  - **The wiring is whole.** On the bot (`u2JjrbcNPYyyh3yl`), `notify_team`, "Team note this turn?" and "Let the team know" are present, and the last passes the model's `reason`, `department` and `description` to the sub-workflow. The sub-workflow is active and equal to the repo, node for node.
+  - **Which department a manager request goes to.** The tester's chats of 8 and 10 Nov left 34 runs on the UChat copy's hand-over, with the same prompt and tool text. Their six `caller_request` notes named Management five times and Service once. The matter that follows goes by its reason: a charge or a payment to Collections, a fault or the cleaning to Operations.
+  - **Who that reached.** Chatwoot has two logins: the owner's (administrator, #2) and "seat2 test". Collections, Operations and Management had no members. Service had the owner's login, from the 3 Sep alert test. So for a manager request the note was written and nobody was told.
+- **Changed, Chatwoot only, 07:29 UTC:** the owner's login is seated in Management, Collections and Operations, as a stand-in until Homies' people are seated. `python scripts/chatwoot_teams.py --add <department> 2 --apply`, three times, each read back; a second run reports nothing to do.
+- **New: `scripts/chatwoot_teams.py`,** with `scripts/chatwoot_teams_test.py` (12 tests, written first and seen failing).
+  - With no argument it reads, per inbox, who each department's mention reaches, and exits 1 when a department is silent on WhatsApp.
+  - `--add` / `--remove <department> <agent id>` seat and unseat; a dry run unless `--apply`. It invites nobody.
+  - It holds Chatwoot's rule: a team mention notifies only the members who are administrators or members of the conversation's inbox. One test keeps its department ids equal to the workflow's `TEAMS`.
+- **Proven at 07:31 UTC (09:31 Israel, a Wednesday), with no AI and nothing sent to WhatsApp:** `python scripts/n8n_handover_test.py --manager` (new) sends the sub-workflow the two calls the bot makes, on test conversation 53, with the real clock.
+  - **The request** (`caller_request`, `management`): a new private note, "[@הנהלה](mention://team/3/management) דייר צריך מישהו מכם. סיבה: הדייר ביקש לדבר עם בן אדם. …", the conversation with Management, `handover-management`, and the owner's login got `conversation_mention` #2707.
+  - **The matter** (`billing`, no department): "[@גבייה](mention://team/1/collections) …", Collections, `handover-collections`, and `conversation_mention` #2708.
+  - All 12 checks passed. 53 was cleaned after (the two notes stay), and the temporary harness workflow is deleted.
+- **Not touched:** the bot (still updated 10 Nov 15:26:59 UTC, epoch 102), the sub-workflow (27 Sep) and the ticker (14 Sep), all read after the run. What Michael says to the tenant is the same: nothing about a manager or a team.
+- **Side effect:** the owner's login now gets every department's mention in office hours, by bell, push and email (its own settings), the tester's chats included. The proof sent it two.
+- **Not proven:** the whole chain from a real message on the Israeli number. No AI answer has gone out on that number yet. The owner's "אני לא רוצה לדבר עם בוט, תביא לי מנהל" from the handset, in office hours, proves it: the note in the conversation, and the mention in Chatwoot's Mentions view.
+- **Owed, the owner's:** who Homies' people are in each department. Each one is created in Chatwoot (Settings, Agents; that emails them), added to the WhatsApp inbox, then seated with `--add`. Then the stand-in comes out with `--remove`.
+- **Found, not changed:** conversation 44, one of the harness's two test conversations, is a real person's thread now (a named contact at Homies). The full harness and `--clean` write on it. `--manager` and `--one` use 53 only, and the file's header says so.
+- **The phone agent** shares the sub-workflow through "Homies — Voice team note", so its notes reach the same people; nothing is owed there.
+- **Rollback:** `python scripts/chatwoot_teams.py --remove management 2 --apply`, then the same for `collections` and `operations`.
+
 ### Two questions answered, read only: does the bot meet Yariv's 9 Nov comments, and does it mention a manager request (owner: "this is just a question"), about 07:15 UTC
 - **Against the 12 comments** (`docs/discovery/feedback-yariv-2026-11-09.md`), from the prompt in the repo (epoch 102) and the real replies logged on 10 Nov:
   - Fully met: 2.1, 2.2, 2.3, 2.4, 4.1 (the lift) and 3.2 (water in a flat).

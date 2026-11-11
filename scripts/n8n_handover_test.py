@@ -3,7 +3,27 @@
 
     python scripts/n8n_handover_test.py              # run the eight cases, print Chatwoot state after each
     python scripts/n8n_handover_test.py --one        # case 1 only: one real page of the Service team, for a live alert test
+    python scripts/n8n_handover_test.py --manager    # a manager request as the bot sends it, on 53 only: was the right
+                                                     # department mentioned, and was a person in it told? Cleans 53 after.
     python scripts/n8n_handover_test.py --clean      # strip what the run left on the test conversations
+
+11 NOV: CONVERSATION 44 IS A REAL PERSON'S THREAD NOW. Its contact is a named
+person at Homies who wrote to the bot from their own handset, not the Meta test
+number this file was written against. Cases 6-7 and `--clean` write on it
+(notes, labels, team, attributes). A private note never reaches the contact,
+but do not run the full set or `--clean` without the owner's word. `--manager`
+and `--one` touch 53 only (contact "Clix Solution").
+
+--manager (11 Nov, the owner: "make sure when a manager is requested ... it
+should mention the people on the right department")
+Two calls with the real clock, exactly the two the bot makes: the request
+itself (`caller_request`, with the department the model gave in 5 real runs of
+6, `management`), then the matter once the tenant names it (`billing`, no
+department, so the reason picks Collections). After each: the note must carry
+that team's mention, the team must be on the conversation, and the login whose
+token this is must get a `conversation_mention` if it sits in that team.
+Outside office hours no note is posted (it waits for 09:00), and this says so.
+The two notes stay on 53; everything else is taken off again.
 
 WHY A HARNESS
 The public n8n API cannot run a workflow directly, and the sub-workflow has
@@ -50,9 +70,11 @@ CASES
 """
 import json
 import os
+import re
 import secrets
 import sys
 import time
+import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -94,8 +116,91 @@ def state(cid):
             "last_note": (notes[-1]["content"][:170].replace("\n", " | ") if notes else None)}
 
 
-def clean():
-    for cid in TEST_CONVERSATIONS:
+def last_note(cid):
+    """The newest private note on a conversation, whole."""
+    msgs = cw("GET", "/api/v1/accounts/%d/conversations/%d/messages" % (ACCOUNT, cid))
+    notes = [x for x in (msgs.get("payload", []) if isinstance(msgs, dict) else [])
+             if x.get("private") and x.get("message_type") == 1]
+    return notes[-1] if notes else None
+
+
+def mentions_of(cid):
+    """`conversation_mention` notifications of the login whose token this is, for one conversation."""
+    r = cw("GET", "/api/v1/accounts/%d/notifications?page=1" % ACCOUNT)
+    rows = ((r.get("data") or {}).get("payload") or []) if isinstance(r, dict) else []
+    return [n for n in rows if n.get("notification_type") == "conversation_mention"
+            and (n.get("primary_actor") or {}).get("id") == cid]
+
+
+def manager_proof(call):
+    """A manager request, then its matter, as the bot sends them. Returns True when all held."""
+    cid = 53
+    # The same table the note's mention is built from.
+    teams = {k: int(v) for k, v in re.findall(
+        r"(\w+):\s*(\d+)", re.search(r"const TEAMS = \{([^}]*)\}", H.DECIDE).group(1))}
+    me = cw("GET", "/api/v1/profile")
+    print("the login that would be told: %s (#%s)" % (me.get("available_name") or me.get("name"), me.get("id")))
+    steps = [
+        ("a manager is asked for", "management",
+         {"reason": "caller_request", "department": "management",
+          "description": "בדיקת מערכת: הדייר לא רוצה לדבר עם בוט ומבקש מנהל"}),
+        ("then the matter: a charge he disputes", "collections",
+         {"reason": "billing", "department": "",
+          "description": "בדיקת מערכת: הדייר אומר שחייבו אותו פעמיים על ועד הבית"}),
+    ]
+    ok_all = True
+    for label, dept, extra in steps:
+        seen = {n.get("id") for n in mentions_of(cid)}
+        before = last_note(cid)
+        body = dict({"conv_id": cid, "phone": "+972500000000", "source": "tool",
+                     "mode": "new", "now_override": ""}, **extra)
+        r = call(body)
+        print("\n%s -> %s" % (label, json.dumps(r, ensure_ascii=False)))
+        if not (isinstance(r, dict) and r.get("ok")):
+            print("   FAIL: the workflow did not report ok")
+            ok_all = False
+            continue
+        if not r.get("in_hours"):
+            print("   Outside office hours (Sun-Thu 09:00-17:00 Israel): no note is posted now, "
+                  "it waits for 09:00. Nothing more to check.")
+            continue
+        note = last_note(cid)
+        fresh = note is not None and (before is None or note.get("id") != before.get("id"))
+        text = (note or {}).get("content") or ""
+        want = "mention://team/%d/%s" % (teams[dept], dept)
+        st = state(cid)
+        in_team = any(m.get("id") == me.get("id")
+                      for m in cw("GET", "/api/v1/accounts/%d/teams/%d/team_members" % (ACCOUNT, teams[dept])))
+        told = []
+        if in_team:
+            for _ in range(10):          # the notification is made by a background job
+                told = [n for n in mentions_of(cid) if n.get("id") not in seen]
+                if told:
+                    break
+                time.sleep(2)
+        checks = [
+            ("a new private note was posted", fresh),
+            ("it mentions the %s team" % dept, fresh and want in text),
+            ("the department decided is %s" % dept, r.get("department") == dept),
+            ("the conversation is with the %s team" % dept, st.get("team") == dept),
+            ("labelled handover-%s" % dept, "handover-" + dept in (st.get("labels") or [])),
+        ]
+        if in_team:
+            checks.append(("this login, a member of %s, got the mention" % dept, bool(told)))
+        for what, good in checks:
+            print("   %s  %s" % ("PASS" if good else "FAIL", what))
+            ok_all = ok_all and bool(good)
+        if not in_team:
+            print("   ----  this login is not in %s, so its notifications cannot show the alert" % dept)
+        if fresh:
+            print("   the note:\n      " + text.replace("\n", "\n      "))
+        if told:
+            print("   notification #%s, created %s" % (told[0].get("id"), told[0].get("created_at")))
+    return ok_all
+
+
+def clean(cids=TEST_CONVERSATIONS):
+    for cid in cids:
         base = "/api/v1/accounts/%d/conversations/%d" % (ACCOUNT, cid)
         # The duplicate guard only counts an OPEN conversation, so a test thread
         # somebody resolved in Chatwoot makes every duplicate case report `ok`
@@ -181,6 +286,16 @@ def main():
                 print("   %d: %s" % (cid, json.dumps(state(cid), ensure_ascii=False)))
 
         print("\nbefore 53:", json.dumps(state(53), ensure_ascii=False))
+        # `--manager`: the two notes a manager request makes, on 53 only.
+        if "--manager" in sys.argv:
+            good = manager_proof(call)
+            print()
+            clean((53,))
+            print("\nRESULT: %s" % ("a manager request mentions the right department, and its people are told"
+                                   if good else "NOT as it should be, see the FAIL lines"))
+            if not good:
+                raise SystemExit(1)      # the `finally` below still deletes the harness
+            return
         # `--one`: a single real page, with the real clock, so a person in the
         # Service team can watch the notification arrive on their PC.
         if "--one" in sys.argv:

@@ -66,6 +66,13 @@ The user is the builder. The client is Homies.
   - A case in `check_whatsapp_rules.js` keeps the chosen line whole there.
 - **The incoming phone agent does the same since 6 Nov** (`docs/assistant/demo-inbound.md`, "6 Nov"): the same line and the same two sentences, and gas left notify_team's emergency list there too. The debt agent has no danger wording, so it is unchanged.
 
+**A department's mention must reach a person (11 Nov; the owner: *"make sure when a manager is requested ... it should mention the people on the right department. but the bot is still the same just the chatwoot side changes"*).**
+- **What a manager request does in Chatwoot.** A private note that @mentions a department's team, and another for the matter once the tenant names it. In real runs the model sends the request itself to Management and the matter by its reason (a charge to Collections, a fault to Operations).
+- **The mention is the only alert, and it can land on nobody in silence.** Chatwoot notifies only the team's members who are administrators or members of the conversation's inbox. An empty team, or a seat never added to the inbox, gets a note nobody hears. Until 11 Nov three of the four departments were empty.
+- **So every department always has at least one person a mention reaches.** `python scripts/chatwoot_teams.py` reads it and exits 1 when one is silent. The owner's login stands in for the departments Homies has not staffed yet.
+- **"Who is told" is a Chatwoot matter, never a bot one.** Michael still says nothing to the tenant about a manager or a team (one voice), and the department stays the model's judgment with the reason's default: no keyword table.
+- **Prove it without the bot:** `python scripts/n8n_handover_test.py --manager`, on conversation 53 only.
+
 **Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; live 9 Nov as epoch 100 by `n8n_whatsapp_feedback9.py`, on live and the UChat copy).**
 - **The comments themselves, word for word with English:** `docs/discovery/feedback-yariv-2026-11-09.md` (written 10 Nov from the owner's 13 screenshots). Read the comment there before changing what it decided: some are whole sentences Yariv wrote for Michael to say (2.2, 2.3 and most of 3.2).
 - **The lift company repairs a lift.** Homies opens the call, passes the details and the handling to the company that services and maintains the lift, follows the call and presses them; when they come depends on them.

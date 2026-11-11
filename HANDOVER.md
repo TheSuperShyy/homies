@@ -8,6 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 11 Nov, 07:29 UTC, Chatwoot only: every department's mention reaches a person** (owner: *"make sure when a manager is requested ... it should mention the people on the right department. but the bot is still the same just the chatwoot side changes"*; WORKLOG 11 Nov; CONTEXT has the rule).
+>   - **How a manager request reaches staff:** `notify_team` → "Let the team know" → "Homies — Hand to a person" (`oB66atFlWwtkSGgN`), which posts a private note that @mentions a department's team. In real runs the request itself goes to Management (5 of 6; once Service), and the matter that follows goes by its reason. Michael tells the tenant nothing of it.
+>   - **What was wrong:** Management, Collections and Operations had no members, so that note was written and nobody was told.
+>   - **Now:** the owner's login (#2, administrator) sits in all four teams, as a stand-in until Homies' people are seated. It gets every department's mention in office hours, by bell, push and email.
+>   - **Read it any time:** `python scripts/chatwoot_teams.py` (read only; exit 1 when a department is silent on WhatsApp). Seat or unseat with `--add` / `--remove <department> <agent id> --apply`.
+>   - **Prove it without the bot:** `python scripts/n8n_handover_test.py --manager`. It passed at 07:31 UTC: the request mentioned Management and the matter Collections, and the owner's login got both mentions. It writes on conversation 53 only and cleans it.
+>   - **A seat needs two things, or its mention is dropped in silence:** membership of the WhatsApp inbox and of its department's team.
+>   - **Owed:**
+>     - **The owner's handset,** in office hours: "אני לא רוצה לדבר עם בוט, תביא לי מנהל". The whole chain from the Israeli number is not yet seen.
+>     - **Homies' people per department,** from the owner. Creating a login emails the person, so it is the owner's to do or to order. Then `--add` them and `--remove` the stand-in.
+>   - **Do not run the full `n8n_handover_test.py` or its `--clean`:** conversation 44 is a real person's thread now (the file's header).
+>   - **Rollback:** `python scripts/chatwoot_teams.py --remove management 2 --apply`, then `collections` and `operations`.
+>
 > **LIVE 10 Nov, 12:44-12:48 UTC: the debt call's payment link answers in time** (owner: *"ok fix the payment link not being sent"*; WORKLOG 10 Nov; CONTEXT has the rule).
 >   - **What was wrong (26 Oct, `01a17807`):** `send_payment_link` took about 12 s and Vapi stopped waiting at 10, so the model improvised "the office will send it" with a wrong number.
 >   - **Live now:**
