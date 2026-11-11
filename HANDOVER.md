@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **NOTED 11 Nov, 13:20 UTC: HOMIES HAS ITS OWN EMERGENCY HOTLINE, A DEPARTMENT, FOR ANY TYPE OF EMERGENCY. ITS NUMBER HAS NOT REACHED US** (owner: *"when we have like an emergency any type of emergency we have a direct hotline specially built for that its a department the number is not given to us yet"*; CONTEXT, under Yariv's 9 Nov review, lists where the number stands; WORKLOG 11 Nov).
+>   - **Today, unchanged:** an urgent fault outside Sun-Thu 09:00-17:00 Israel gets the urgent ticket plus 077-6687949, the office line Yariv gave on 9 Nov as the emergency centre. In office hours the ticket only. Gas gets the gas company only, at any hour. The incoming phone agent does the same. An emergency's Chatwoot note goes to Operations.
+>   - **When the number comes:** it replaces 077-6687949 as the emergency number on WhatsApp (inject, facts, Send's danger v6, gate cases, tester brief, new epoch, through the gate), then in the phone agent's prompt in spoken form. The office line stays for everything else.
+>   - **Open with it:** at any hour or after hours only; gas beside the gas company ("any type" reads as yes).
+>   - **The reply to Yariv** (`local/yariv/2026-11-11-reply-to-9nov-review.txt`, ours to draft, the owner's to send) still gives 077-6687949 in 6.2 and still asks whether gas gets the emergency centre after hours.
+>
 > **LIVE 11 Nov, 12:02 UTC: A HELLO GETS MICHAEL'S INTRO, NO BUTTONS** (owner: *"lets remove the button each hi so every opening message will receive the intro only"*, then the exact shape after examples: *"Hi good morning or good afternoon. this is michael from homies how can i help you today"*; `scripts/n8n_whatsapp_hiintro.py`, epoch 103; WORKLOG and CONTEXT 11 Nov).
 >   - **What a bare hello gets now:** "היי, <בוקר טוב / צהריים טובים / ערב טוב> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" ("היי" alone before 05:00), as plain text. The next reply neither greets nor says who he is.
 >   - **The greeting goes out Canned reply? → Type for a moment → Send,** not through `Send menu` (execution 173085). The 12:02 write missed Send's own `greeting ||` button branch, so the owner's "היי" at 12:04 UTC got the new intro WITH both buttons. **That branch was removed at 12:07 UTC** (the same script, code only). The old tails still get their buttons.

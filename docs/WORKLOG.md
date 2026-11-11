@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### A fact from the owner, recorded: Homies has its own emergency hotline, a department, for any type of emergency, and its number has not reached us (owner: "ok so when we have like an emergency any type of emergency we have a direct hotline specially built for that its a department the number is not given to us yet"), 13:20 UTC
+- **Read only, what happens today:** an urgent fault outside Sun-Thu 09:00-17:00 Israel gets the urgent ticket plus 077-6687949, which Yariv gave on 9 Nov as "our telephone emergency centre" (`docs/discovery/feedback-yariv-2026-11-09.md`, 6.2). It is the office line. In office hours the ticket only. Gas gets the gas company only, at any hour. The incoming phone agent does the same since 10 Nov. Before epoch 100 the facts said the opposite, "אין קו חירום נפרד".
+- **Where 077-6687949 stands as the emergency number,** so the swap is quick when the number comes: the inject's after-hours sentence and the facts' טלפון line (`scripts/n8n_whatsapp_feedback9.py`), the sentence Send's danger v6 keeps, the gate's `HOTL` cases (`scripts/check_whatsapp_rules.js`), the Grok tester's brief, and the phone agent's office paragraph in spoken form (`docs/assistant/demo-inbound.md`). The office line itself stays wherever it means the office.
+- **Open until the number comes:** at any hour or after hours only; gas beside the gas company ("any type" reads as yes). An emergency's Chatwoot note goes to Operations today.
+- **Nothing changed live.** CONTEXT and HANDOVER carry it.
+
 ### A hello gets Michael's intro, no buttons (owner: "lets remove the button each hi so every opening message will receive the intro only the michael from homies how can i help you", then "the intro should be like Hi good morning or good afternoon. this is michael from homies how can i help you today"), live 12:02 UTC, epoch 103
 - **Shown first, as the 27 Sep table asks:** three example exchanges (a hello, a first message with the problem, "what can I do here?"). He gave the exact shape back.
 - **`scripts/n8n_whatsapp_hiintro.py`, one write to the live bot:**
