@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### The local site gets a second section: Yariv's comments beside our answers (owner: "ok now create a new section on a localhost in natural local native hebrew about that one on the right its yariv comment and on the left that answer"), 08:13 UTC
+- **Where:** http://localhost:8787/yariv, on the same local server as Michael's replies (`local/checklist/serve.py`). Each page has a tab to the other. Local only, under `local/`, so nothing of it is in the repo.
+- **What it shows:** one row per comment of the 9 Nov review, 12 in all: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), Yariv's comment as written on the right, and our answer on the left. Hebrew only, right to left, in the replies page's own look (the dashboard's tokens, light and dark). Under 760 px the two stack, the comment first.
+- **The Hebrew is written as Hebrew,** not carried over from the English list: "הוספנו", "תיקנו", "לא נגענו בזה", "ימים א' עד ה'", "בידיים של חברת המעליות". The comments are Yariv's own words from `docs/discovery/feedback-yariv-2026-11-09.md`, untouched.
+- **One source:** `local/yariv/replies.json`, built into `local/yariv/index.html` by `python local/yariv/build_page.py` (refuses anything but 12 comments with both sides). The server reads the file on every load, so a rebuild shows on refresh.
+- **`serve.py`:** `/yariv` added, and `--open yariv` opens on it. The replies page is served as it is on disk with only a tab strip added under `<body>`; the file itself is not touched, so the published copy and the Google Form builder are unaffected.
+- **Checked:**
+  - 200 on `/` and `/yariv`, 404 elsewhere, 403 for another Host, 12 rows, and the tab strip on `/`.
+  - Headless Chrome screenshots, read: at 1280 px in light and in dark, the comment is on the right and the answer on the left; at 520 px they stack and nothing overflows.
+  - The first build broke the ticket number 255-1600-26 across two lines. Numbers, hours and the email address are now kept whole and left to right; the crops of 5.2, 6.2, 6.3 and 7.2 read right ("ב-OXS.", "077-6687949.", "ב-4 בנובמבר", "(Chatwoot)").
+- **Running:** started from this session as a background task and opened in the owner's browser. It stops when this session ends; `python local/checklist/serve.py --open yariv` starts it again.
+- Nothing was sent or spent, and the bot is untouched. HANDOVER has the block; CONTEXT is unchanged: a local page, not a rule.
+
 ### The reply to Yariv, item by item (owner: "so make it like this 1.1 complying - answer on question 1.2 complying - answer to the question"), and the owner's pause check read from the chat, about 08:10 UTC
 - **The format, corrected by the owner:** one line per comment in Yariv's numbering: the number, a status word, " - ", the answer. The paragraph-per-topic version below is replaced. `local/yariv/2026-11-11-reply-to-9nov-review.txt` now holds this version, in Hebrew and in English. Memory keeps the shape for the next numbered list.
   - **Status words:** בוצע (complying) for 2.1, 2.2, 2.3, 2.4, 3.2, 4.1, 5.2, 6.2 and 6.3; 6.2 says "with one question on gas". ללא שינוי (no change) for 5.1. תשובה (answer) for 1.1 and 7.2, because 1.1 was a question that changed nothing and 7.2's sentence no longer exists.

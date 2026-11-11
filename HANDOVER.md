@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LOCAL 11 Nov, 08:13 UTC: the local site has a second section, Yariv's comments beside our answers** (owner: *"create a new section on a localhost in natural local native hebrew about that one on the right its yariv comment and on the left that answer"*; WORKLOG 11 Nov).
+>   - **Where:** http://localhost:8787/yariv on this PC only. `/` is still Michael's replies of 3 Nov; each page has a tab to the other.
+>   - **What it shows:** the 12 comments of 9 Nov, one row each: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), the comment as Yariv wrote it on the right and our answer on the left. Hebrew only.
+>   - **To change it:** edit `local/yariv/replies.json`, run `python local/yariv/build_page.py`, refresh. The WhatsApp reply in `local/yariv/2026-11-11-reply-to-9nov-review.txt` is a separate text with the same substance; a change of substance goes into both.
+>   - **To start it:** `python local/checklist/serve.py --open yariv`. It was started from the 11 Nov session as a background task, so it stops when that session ends.
+>   - All of it is under `local/`, out of the public repo.
+>
 > **LIVE 11 Nov, 07:29 UTC, Chatwoot only: every department's mention reaches a person** (owner: *"make sure when a manager is requested ... it should mention the people on the right department. but the bot is still the same just the chatwoot side changes"*; WORKLOG 11 Nov; CONTEXT has the rule).
 >   - **How a manager request reaches staff:** `notify_team` → "Let the team know" → "Homies — Hand to a person" (`oB66atFlWwtkSGgN`), which posts a private note that @mentions a department's team. In real runs the request itself goes to Management (5 of 6; once Service), and the matter that follows goes by its reason. Michael tells the tenant nothing of it.
 >   - **What was wrong:** Management, Collections and Operations had no members, so that note was written and nobody was told.
@@ -58,7 +65,7 @@ appended to.
 >   - **The replies:** set `grok-2026-11-10`, 44 steps in 8 chats, from the 10 Nov Grok chats in `messages`. They are stored in `review_sets` (migration 040, applied and read back), not in the repo. Rebuild with `local/checklist/review-set/build_set.py --upload`, which keeps the key.
 >   - **The results:** every Send is a row in `reply_reviews`. Read them with `python scripts/reply_reviews.py` (each ✗ with its note), or `--csv`. Both tables are RLS-locked; a visitor reaches them only through `review_set()` and `submit_reply_review()`, which check the key.
 >   - **Owed (the owner's):** send the link to Yariv's team.
->   - The localhost pages are retired: `local/checklist/serve.py` served the 3 Nov page, and its server was stopped. An empty Claude Doc outline, "Michael — tester checklist", sits in the owner's claude.ai; delete it only if they ask. The artifact checklists are stale since 5 Nov.
+>   - The localhost pages were retired on 10 Nov: `local/checklist/serve.py` served the 3 Nov page, and its server was stopped. **Back on 11 Nov with a second section, for the owner's own use** (the block at the top). An empty Claude Doc outline, "Michael — tester checklist", sits in the owner's claude.ai; delete it only if they ask. The artifact checklists are stale since 5 Nov.
 >
 > **LIVE 10 Nov, 15:26 UTC: THE BOT IS BACK ON CHATWOOT, on the owner's Israeli number** (owner: *"move to the chatwoot now that it passed"*; WORKLOG and CONTEXT 10 Nov). "The live bot" means the Chatwoot one again.
 >   - **The route now:** Meta → Chatwoot inbox 1 (the Israeli number since 15:26:43 UTC) → agent bot 1 → n8n `u2JjrbcNPYyyh3yl` → replies through Chatwoot. The UChat copy `mKheBsTxtcMhPxu7` is off (15:26:09).
