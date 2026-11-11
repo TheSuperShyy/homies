@@ -16,6 +16,7 @@ appended to.
 >   - **Not seen yet:** a ticket of theirs in OXS. This change wrote nothing to OXS; their next ticket is the first write. Each number on the list is the exact string their earlier tickets carry as reporter, so the comparison will match.
 >   - **Not backfilled:** their six earlier tickets (five from flat 1, the newest 11 Nov 08:40 UTC; one from flat 3). `scripts/oxs_mirror_backfill.py` can push one now that the numbers are on the list; nobody asked.
 >   - **"On the list" no longer means "the owner's handset".** `.env` has `OWNER_TEST_PHONE` for that, and `probe_paylink_call.py` reads it since today. `n8n_uchat.py` falls back to the list only when `UCHAT_TEST_PHONES` is unset; it is set.
+>   - **Decided 11 Nov, 09:28 UTC: the every-reporter type switch stays OFF** (owner: *"ok keep it off for now only the 4 can open a ticket rn"*). Only these four numbers' tickets go into OXS. Everyone else can still open a ticket with Michael, and it stays in our system. For production the owner has to say so first; read back that minute: four numbers, the type switch off, live equal to `.env`.
 >   - **Rollback:** `python scripts/oxs_mirror_list.py --remove-flat 1 3 --apply`.
 >
 > **LIVE 11 Nov, 08:46 UTC: THE REVIEWERS' PAGE HAS A SECOND SECTION, Yariv's comments beside our answers** (owner: *"ok push live"*; PR #12, squash-merged as `9c48f0f`; WORKLOG 11 Nov; CONTEXT has the rules).

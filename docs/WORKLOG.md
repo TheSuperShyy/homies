@@ -34,6 +34,7 @@ conversation that produced it.
   - **Where it lands:** our system, always. OXS only for a number on the list, or for a ticket type named in `OXS_MIRROR_TYPES`, which is built and off. So as set today a real tenant's ticket would not reach OXS, known number or not.
   - **In OXS, a copied ticket from an unknown number** is filed on the building with its category, the flat, our reference and a line with the name and number given; OXS's own reporter field is filled only when OXS has a tenant for that flat.
   - **Said to the owner:** the type switch is the one for production, it needs their word, and go-live is the time for it, since until then every tester ticket would land in OXS as well.
+- **Decided by the owner, 09:28 UTC: "ok keep it off for now only the 4 can open a ticket rn".** The type switch stays off. Read back that minute: four numbers on the list, the type switch off, the live list equal to `.env`'s. Nothing was changed. CONTEXT and HANDOVER carry the decision.
 
 ### A question answered, read only: is every ticket opened in OXS (owner: "does the ticket is open in the oxs? every ticket is open in the oxs"), 08:56 UTC
 - **No. Only tickets from the one test number are copied into OXS.** Read from the live function's secrets (names and a digest, no values): `OXS_KEY_REQUESTS` present, `OXS_MIRROR_PHONES` present and equal to `.env`'s list of one number, `OXS_MIRROR_TYPES` absent. So the "every lift report, from anyone" switch (Yariv, 4 Nov) is still off.

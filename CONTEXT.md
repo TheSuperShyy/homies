@@ -72,7 +72,7 @@ The user is the builder. The client is Homies.
 - **`scripts/oxs_mirror_list.py` reads and changes it:** by flat of the test building, never printing a number, `.env` and the live secret together, read back by digest. No code is deployed for it.
 - **The list is not "the owner's handset" any more.** A guard that means the owner's own phone reads `OWNER_TEST_PHONE`. Before widening a list, look for what else reads it.
 - **A copied ticket goes into OXS on the building it is for,** and the mirror still only creates: nothing of ours closes or updates a call there.
-- **Everyone else's ticket still stays in our system.** The every-reporter type switch (`OXS_MIRROR_TYPES`) is off.
+- **Everyone else's ticket still stays in our system.** The every-reporter type switch (`OXS_MIRROR_TYPES`) is off, **and it stays off until the owner says otherwise** (11 Nov, after hearing it is the switch production needs: *"ok keep it off for now only the 4 can open a ticket rn"*). Do not turn it on for go-live, for lift reports or for a test without that word.
 
 **A department's mention must reach a person (11 Nov; the owner: *"make sure when a manager is requested ... it should mention the people on the right department. but the bot is still the same just the chatwoot side changes"*).**
 - **What a manager request does in Chatwoot.** A private note that @mentions a department's team, and another for the matter once the tenant names it. In real runs the model sends the request itself to Management and the matter by its reason (a charge to Collections, a fault to Operations).
