@@ -103,7 +103,9 @@ def main():
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
     by = {n["name"]: n for n in live["nodes"]}
     key = by["Conversation so far"]["parameters"].get("sessionKey")
-    if key == NEW_KEY and LIFT_NEW in prompt_of(live) and PV_NEW in by["Send"]["parameters"]["jsonBody"]:
+    # A later epoch owns the memory key (11 Nov: hiintro, 103); the fix is still this carrier's to check.
+    later = W.MEMORY_EPOCH > EPOCH and key == "={{ $json.to }}-%d" % W.MEMORY_EPOCH
+    if (key == NEW_KEY or later) and LIFT_NEW in prompt_of(live) and PV_NEW in by["Send"]["parameters"]["jsonBody"]:
         print("Nothing to do. Live already has the seventh run's fix, epoch %d." % EPOCH)
         return
     if key != OLD_KEY:

@@ -129,6 +129,7 @@ SEND_IF_OLD = "if ($('Sort').first().json.greeting ||"
 SEND_IF_NEW = "if (!two && ($('Sort').first().json.greeting ||"
 SEND_CLOSE_OLD = ".trim()))) { body.content_type"
 SEND_CLOSE_NEW = ".trim())))) { body.content_type"
+SEND_CLOSE_HIINTRO = "/👋 כאן הומי'ז[.] במה אפשר לעזור[?]/.test(t))) { body.content_type"   # 11 Nov
 
 # --------------------------------------------------------------------------
 # 2. The three new nodes.
@@ -192,8 +193,11 @@ def main():
          "Send: splits the reply on %s and posts the first half" % SEP)
     edit("Send", "jsonBody", SEND_IF_OLD, SEND_IF_NEW,
          "Send: the menu rows are suppressed when the reply splits (open)")
-    edit("Send", "jsonBody", SEND_CLOSE_OLD, SEND_CLOSE_NEW,
-         "Send: the menu rows are suppressed when the reply splits (close)")
+    # 11 Nov (n8n_whatsapp_hiintro.py): the condition's last alternative, the intro echo, is gone, so it now
+    # closes after the 8 Oct tail's test. The split's guard (SEND_IF_NEW) still opens it: nothing to do.
+    if SEND_CLOSE_HIINTRO not in (by["Send"]["parameters"].get("jsonBody") or ""):
+        edit("Send", "jsonBody", SEND_CLOSE_OLD, SEND_CLOSE_NEW,
+             "Send: the menu rows are suppressed when the reply splits (close)")
 
     # --- Two parts? -------------------------------------------------------
     if "Two parts?" not in by:

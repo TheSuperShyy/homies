@@ -76,7 +76,14 @@ JS = os.path.join(HERE, "wa_qa.js")
 DECK = os.path.join(HERE, "wa_qa_scenarios.json")
 ALLOWED_EMOJI = set("🙂😊🙏👍💪🤝")
 TAPS = {"open": "פתיחת קריאת שירות", "status": "מצב קריאה קיימת", "other": "לדבר עם נציג"}
-MENU_TAIL = " " + W.GREETING_TAIL   # 8 Oct: "👋 כאן הומי'ז. במה אפשר לעזור?"
+MENU_TAIL = " " + W.GREETING_TAIL   # 11 Nov: "👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?"
+
+
+def menu_line_at(hhmm):
+    """Sort's greeting since 11 Nov (n8n_whatsapp_hiintro.py): "היי, " and the clock's word, then the tail;
+    "היי" alone before 05:00."""
+    w = hour_word(hhmm)
+    return ("היי" if w == "שלום" else "היי, " + w) + MENU_TAIL
 
 
 # ---------------------------------------------------------------------------
@@ -459,7 +466,7 @@ def live_turn(code, s, t):
     """What the live code does with one message (turn's body; play calls it too)."""
     kind = t.get("kind", "text")
     text = "" if kind == "file" else str(t.get("text") or "")
-    menu_line = hour_word(s["time"]) + MENU_TAIL
+    menu_line = menu_line_at(s["time"])
     if kind == "text" and node_run({"mode": "sort", "code": code, "texts": [text]})[0]:
         return {"menu": True, "system_sends": menu_line, "buttons": list(TAPS.values()),
                 "record": {"resident": text, "kind": "menu"}}
@@ -862,7 +869,7 @@ def grade(run):
             recent = convo[-11:] + [{"direction": "inbound", "body": text}]
             convo.append({"direction": "inbound", "body": text})
             if kind == "menu":
-                last_bot = hour_word(s["time"]) + MENU_TAIL
+                last_bot = menu_line_at(s["time"])
                 convo.append({"direction": "outbound", "body": last_bot})
                 greeted = True
                 meta.append({"kind": "menu", "handset": [last_bot], "buttons": True})

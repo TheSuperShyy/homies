@@ -230,7 +230,11 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 102
+MEMORY_EPOCH = 103
+# 102 -> 103, 11 Nov (n8n_whatsapp_hiintro.py): a bare hello gets "היי, <the hour's greeting> 👋 כאן מיכאל
+# מהומי'ז. במה אוכל לעזור לך היום?" with no buttons. The prompt's greeting paragraph says the system now gave his
+# name, so the next reply neither greets nor says who he is; the tap paragraph no longer says the buttons came with
+# the greeting.
 # 101 -> 102, 10 Nov, later (n8n_whatsapp_retest7.py, the tester's seventh run): the lift line loses "לטפל בה
 # בדחיפות", which every lift ticket since epoch 100 gave back as "כמה שיותר מהר"; and Send's promise list (v7)
 # knows "נשלח איש מקצוע / בעל מקצוע".
@@ -807,8 +811,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "8546b335b582",   # docs/features/11-whatsapp-bot/prompt.md (10 Nov, later, epoch 102, the lift line
-    # without "urgently"). Before: ce596f4e9f9a (10 Nov, epoch 101, the one-voice exception by the matter);
+    "prompt": "a5b5db23f7ca",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, epoch 103, the greeting introduces
+    # Michael, no buttons). Before: 8546b335b582 (10 Nov, later, epoch 102, the lift line without "urgently");
+    # ce596f4e9f9a (10 Nov, epoch 101, the one-voice exception by the matter);
     # fbca40b23dd0 (9 Nov, epoch 100, Yariv's review)
     "inject": "fd710a52a21b",   # LIVE's (9 Nov, epoch 100: the clock line says when the office is closed;
     # n8n_whatsapp_feedback9.py). Before: 3670f71d14b9 (2 Nov, epoch 92: the photo is seen when Show the photos put it on the
@@ -993,7 +998,13 @@ TAP_LINE = {
 # himself after a tap (the 23 Sep rule). Carried by n8n_whatsapp_menuline.py;
 # live Send also keeps knowing the old tail, for chats whose last menu went
 # out before the change.
-GREETING_TAIL = "👋 כאן הומי'ז. במה אפשר לעזור?"
+# 11 Nov: the greeting introduces Michael and carries no buttons (owner: "lets remove the button each hi so
+# every opening message will receive the intro only", then "Hi good morning or good afternoon. this is michael
+# from homies how can i help you today"). "היי, " and the clock's word go before the wave ("היי" alone before
+# 05:00). Carried by n8n_whatsapp_hiintro.py; live Send and Still the last word? keep knowing the 8 Oct tail,
+# for chats whose last menu went out before the change.
+GREETING_TAIL = "👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?"
+GREETING_TAIL_OCT = "👋 כאן הומי'ז. במה אפשר לעזור?"     # 8 Oct - 11 Nov
 GREETING_TAIL_BEFORE = "👋 במה אפשר לעזור?"   # 23 Sep - 8 Oct
 
 MENU = {
@@ -1013,7 +1024,7 @@ MENU = {
         # part that never moves, and it is what every guard anchors on now:
         # check_greeting(), live Send's echo clause, the prompt's ownership
         # clause. The text here is a worked example of the noon form.
-        "body": {"text": "צהריים טובים " + GREETING_TAIL},
+        "body": {"text": "היי, צהריים טובים " + GREETING_TAIL},
         "footer": {"text": "אפשר גם לבחור מהרשימה"},
         "action": {
             "button": "אפשרויות",

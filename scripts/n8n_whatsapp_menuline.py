@@ -70,7 +70,7 @@ ECHO_NEW = " " + G.SEND_ECHO + NEW_TAIL_RE + ".test(t) || "
 AFTER_OLD = "|| lastOut.indexOf('👋 במה אפשר לעזור?') !== -1;"
 AFTER_NEW = "|| lastOut.indexOf('👋 במה אפשר לעזור?') !== -1 || " + NEW_TAIL_RE + ".test(lastOut);"
 
-assert SORT_NEW.endswith('"') and W.GREETING_TAIL in SORT_NEW
+assert SORT_NEW.endswith('"') and W.GREETING_TAIL_OCT in SORT_NEW
 assert ("const afterMenu = /במה אפשר לעזור/.test(String(S.last_bot || '')) " + AFTER_NEW) in M.FILTER, \
     "manners.FILTER and this carrier disagree on the afterMenu statement"
 
@@ -108,6 +108,9 @@ def restore():
 def main():
     if "--restore" in sys.argv:
         return restore()
+    if "--apply" in sys.argv:
+        sys.exit("SUPERSEDED 11 Nov by n8n_whatsapp_hiintro.py: the greeting introduces Michael and carries no "
+                 "buttons. This carrier would put the 8 Oct menu back. Never --apply it.")
     apply = "--apply" in sys.argv
     prompt = W.system_prompt()                     # check_greeting(): the prompt quotes GREETING_TAIL
     W.check_memory_epoch(prompt=prompt, inject=U.AGENT_NEW, tools=W.tools_text())
@@ -117,7 +120,7 @@ def main():
     # A later epoch owns the prompt and the memory key (18 Oct: askfirst, 79). Sort
     # and Send stay this carrier's, and check_greeting() still holds the tail.
     later = W.MEMORY_EPOCH > OLD_EPOCH + 1
-    old_prompt = prompt.replace(W.GREETING_TAIL, W.GREETING_TAIL_BEFORE)
+    old_prompt = prompt.replace(W.GREETING_TAIL_OCT, W.GREETING_TAIL_BEFORE)
 
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
     nodes, conns = live["nodes"], live["connections"]

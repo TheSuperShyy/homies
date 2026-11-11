@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### A hello gets Michael's intro, no buttons (owner: "lets remove the button each hi so every opening message will receive the intro only the michael from homies how can i help you", then "the intro should be like Hi good morning or good afternoon. this is michael from homies how can i help you today"), live 12:02 UTC, epoch 103
+- **Shown first, as the 27 Sep table asks:** three example exchanges (a hello, a first message with the problem, "what can I do here?"). He gave the exact shape back.
+- **`scripts/n8n_whatsapp_hiintro.py`, one write to the live bot:**
+  - Sort's MENU says "היי, <clock> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", and `Send menu` posts it as plain text.
+  - Send is at manners v5: after the intro a second greeting and a leading name are cut, and the old menu keeps its name; the intro-only echo gets no buttons.
+  - `Still the last word?` knows the intro.
+  - The prompt's greeting and tap paragraphs: 7 sentence edits, 25,991 → 25,850 characters, `8546b335b582` → `a5b5db23f7ca`.
+  - Memory: epoch 102 → 103.
+- **The repo moved first:**
+  - `prompt.md`;
+  - `GREETING_TAIL` (the 8 Oct tail kept as `GREETING_TAIL_OCT`), `MEMORY_EPOCH`, `EPOCH_COVERS`;
+  - `wa_qa.menu_line_at`;
+  - `n8n_whatsapp_menuline.py` marked superseded (its `--apply` refuses);
+  - `twobeat` and `retest7` taught the new forms, so neither refuses on them.
+- **The gate:** 11 new cases (manners v5), and the old intro-echo case version-keyed. They cover:
+  - after the intro, the greeting and the name are cut and none is added;
+  - "who are you" keeps the name, and the old menu still gets the name;
+  - Send menu is plain text, and Sort's sentence is right;
+  - `Still the last word?` sees the intro, and reads it past a burst.
+  - One draft case was wrong: the canned greeting never goes through Send (Menu? → Send menu). Corrected before the run.
+- **Checked before the write:**
+  - the dry run, with Sort and the last-word code compiled by node;
+  - 577/577 on the candidate;
+  - the replay: 0 of 1,476 messages and 0 of 1,526 replies changed in the old states, nothing broken;
+  - the idle check, against the same check on today's live: no patcher newly non-idle, and 59 of 69 were already not idle before (pre-existing).
+- **After the write:**
+  - the read-back matched;
+  - the re-run reported nothing to do;
+  - 577/577 passed on live.
+- **Owed:** the owner's "היי" on his phone. No phone twin: no buttons there, and its opener already names Michael.
+
 ### A quick smoke test, read only (owner: "do a quick smoke test dont edit anything just a quick one"), 09:38 UTC
 - **How:** GET requests, plus one unsigned POST the tool server must refuse. No message sent, no ticket opened, nothing spent, nothing changed. The script stayed in the session's scratch folder.
 - **27 checks, all passed:**

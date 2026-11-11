@@ -226,7 +226,11 @@ PINS = {
     # blind on the candidate (scripts/wa_qa_retest7.json): the lift arc, 5 turns, 5/5, no guard rejection, no
     # flag; the lift company on opening ("עוקבים אחרי הקריאה ולוחצים עליהם. מתי הם מגיעים לתקן תלוי בהם"), on
     # both "when"s and on the status, with no time and no speed.
-    'Answer the resident / system': '8546b335b582',
+    # 11 Nov (n8n_whatsapp_hiintro.py, epoch 103): a bare hello gets "היי, <clock> 👋 כאן מיכאל מהומי'ז. במה אוכל
+    # לעזור לך היום?" with no buttons. The greeting paragraph quotes it and says it gave his name, so the next reply
+    # neither greets nor says who he is; the tap paragraph no longer says the buttons came with the greeting. Cases
+    # and the replay on the candidate; no model run (the owner's rule; his own phone is the test).
+    'Answer the resident / system': 'a5b5db23f7ca',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -365,6 +369,10 @@ def extract(wf):
         # 6 Nov (n8n_whatsapp_retest3.py): which run answers a burst, the text it hands the model,
         # and whether it tells the model the menu went out.
         "last_word": (by.get("Still the last word?") or {}).get("parameters", {}).get("jsCode", ""),
+        # 11 Nov (n8n_whatsapp_hiintro.py): the greeting's sentence in Sort, and what posts it.
+        "sort_menu": (code[max(0, code.find("const MENU = {") - 400):code.find("};", code.find("const MENU = {")) + 2]
+                      if "const MENU = {" in code else ""),
+        "send_menu_body": (by.get("Send menu") or {}).get("parameters", {}).get("jsonBody", ""),
     }
 
 

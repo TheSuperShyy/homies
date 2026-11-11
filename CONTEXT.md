@@ -107,6 +107,17 @@ The user is the builder. The client is Homies.
 **A ticket the tools found is named by its number (6 Nov, epoch 99, Send's ref v1).** When this turn's tools gave exactly one ticket (a lookup that found one, an add, an open) and the reply names no reference, Send puts the number in brackets after the first word for the ticket: "הוספתי לקריאה (255-1403-26) את העדכון שלך…". Several tickets, none, or a reply that already has a number: untouched.
 - **Why code:** the tester's C2 failed twice. Epoch 98's tool-text clause held in some Gemini turns and not in the one that spoke of the add rather than the lookup. On the retained real turns it changes 7 of 133 replies, each the same missing number.
 
+**Since 11 Nov a bare hello gets Michael's intro, with no buttons (epoch 103, `scripts/n8n_whatsapp_hiintro.py`).** Owner: *"lets remove the button each hi so every opening message will receive the intro only"*. After examples (the 27 Sep table says to show them first), he gave the exact shape: *"Hi good morning or good afternoon. this is michael from homies how can i help you today"*.
+- **The sentence:** "היי, <the clock's greeting> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" ("היי" alone before 05:00), from Sort, posted by `Send menu` as plain text. It replaces the 8 Oct menu (company name and two buttons).
+- **"היי" plus the clock's greeting in one line is his choice for this sentence.** The 27 Sep "never two greetings in one message" still binds the model's replies.
+- **Right after it, the reply neither greets nor says who he is:** the system said both.
+  - The prompt says so in the greeting paragraph. The tap paragraph no longer says the buttons came with the greeting; they now come only in the options list, after he was introduced.
+  - Send's manners v5 cuts a second greeting and a leading name after the intro (`introNamed`), and keeps the name after the OLD menu.
+  - intro v1 adds the name only after the old menu.
+  - The echo clause no longer gives buttons to an intro-only reply.
+- **Still as before:** the options list keeps its buttons. A first message that is not a bare hello opens with the clock's greeting and the name, from the model. The rep-tap hello is unchanged.
+- The sentence below about the name after the system's greeting holds only for the old menu now.
+
 **After the system's greeting, Michael says who he is, even to someone in memory (6 Nov, epoch 99).** A tester's run, or a tenant coming back, has earlier chats in the buffer, and the tap paragraph's "if this is your first message to this person" let the name drop (C5). The condition is gone.
 - **A burst after the menu** is read whole by `Still the last word?` (lastword v2): a menu logged after the burst's messages (it is logged once it has gone out) is read past, the bare hello it answered is left out, and `last_bot` is the menu whenever the newest outbound row is the menu.
 - **Why there and not in Sort:** Sort's `last_bot` lives in static data, which is per execution, so a silenced run of the burst spent it (C11). The messages table is the shared truth, as for the burst itself.

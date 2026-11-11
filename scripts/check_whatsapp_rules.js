@@ -68,6 +68,8 @@ const content = (E, o) => sent(E, o).content;
 // 10 Nov: Send's promise version as a number, so a block for vN keeps running on every later version
 // (the v5 block was keyed to 'promise v5' exactly and stopped running when epoch 100 made it v6).
 const promiseV = (body) => { const m = String(body || '').match(/const pv = 'promise v(\d+)'/); return m ? +m[1] : 0; };
+// 11 Nov: Send's manners version, the same way (n8n_whatsapp_hiintro.py made it v5).
+const mannersV = (body) => { const m = String(body || '').match(/const mv = 'manners v(\d+)'/); return m ? +m[1] : 0; };
 
 function mask(s) {
   return String(s).replace(/https?:\/\/\S+/g, '<link>').replace(/\+?\d{9,15}/g, '<phone>')
@@ -741,6 +743,55 @@ function cases(E) {
       'הקריאה על הניקיון פתוחה. משהו השתנה מאז?');
   }
 
+  // 11 Nov (scripts/n8n_whatsapp_hiintro.py, manners v5; owner: "lets remove the button each hi so every opening
+  // message will receive the intro only", then "Hi good morning or good afternoon. this is michael from homies how
+  // can i help you today"): a bare hello gets "היי, <clock> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" with no
+  // buttons. Right after it the reply neither greets nor says who he is: the system said both.
+  if (mannersV(P.code && P.code.send_body) >= 5) {
+    console.log(NL + "--- Send: after the intro that names Michael (11 Nov, manners v5) ---");
+    const INTRO = 'היי, צהריים טובים 👋 כאן מיכאל מהומי' + "'" + 'ז. במה אוכל לעזור לך היום?';
+    const LIFT = 'אוי, לא נעים להיתקע בלי מעלית. באיזה בניין ובאיזו דירה זה?';
+    const OUT = [{ direction: 'outbound', body: INTRO }];
+    expect('after the intro (Sort says so): a second hello and the name are cut',
+      say({ reply: "היי, כאן מיכאל מהומי'ז. " + LIFT, said: 'המעלית תקועה', S: { last_bot: INTRO } }), LIFT);
+    expect("after the intro (the last message out says so): the hour's greeting is cut",
+      say({ reply: 'צהריים טובים! ' + LIFT, said: 'המעלית תקועה', rows: OUT }), LIFT);
+    expect('after the intro: a name alone is cut too',
+      say({ reply: "כאן מיכאל מהומי'ז. " + LIFT, said: 'המעלית תקועה', rows: OUT }), LIFT);
+    expect('after the intro: no name is added (intro v1 keys on the old menu only)',
+      say({ reply: LIFT, said: 'המעלית תקועה', S: { last_bot: INTRO } }), LIFT);
+    expect('after the intro: asked who he is, the name stays',
+      say({ reply: "כאן מיכאל מצוות השירות של הומי'ז. במה אוכל לעזור?", said: 'מי זה?', S: { last_bot: INTRO } }),
+      "כאן מיכאל מצוות השירות של הומי'ז. במה אוכל לעזור?");
+    expect('after the OLD menu the name is still added (a chat whose last menu went out before 11 Nov)',
+      say({ reply: LIFT, said: 'המעלית תקועה', S: { last_bot: MENU_TEXT } }), "כאן מיכאל מהומי'ז. " + LIFT);
+    // The greeting itself goes out through `Send menu` (Menu? -> Type for a moment (menu)), never through Send,
+    // so its buttons are Send menu's to drop (the case below); Send's `greeting ||` branch is not on its road.
+    expect('the canned intro passes Send untouched', say({ canned: true, reply: INTRO }), INTRO);
+    if (P.code.send_menu_body !== undefined) {
+      expect('Send menu posts plain text', () => /input_select|content_attributes/.test(P.code.send_menu_body), false);
+    }
+    if (P.code.sort_menu !== undefined) {
+      expect("Sort: the greeting is \"היי, \" + the clock's word + the intro",
+        () => P.code.sort_menu.indexOf("const HI = HH < 5 ? 'היי' : 'היי, ' + HELLO;") !== -1
+          && P.code.sort_menu.indexOf('content: HI + " 👋 כאן מיכאל מהומי' + "'" + 'ז. במה אוכל לעזור לך היום?",') !== -1, true);
+    }
+    if (E.lastWord) {
+      const lw = (S, rows) => {
+        const $ = (name) => { if (name === 'Sort') return { first: () => ({ json: S }) }; throw new Error('no node ' + name); };
+        return E.lastWord({ all: () => rows.map((r) => ({ json: r })) }, $);
+      };
+      const INTRO_ROW = { direction: 'outbound', body: INTRO, external_id: '40002', message_type: 'text' };
+      const LIFT_IN = { direction: 'inbound', body: 'המעלית תקועה', external_id: '40003', message_type: 'text' };
+      const HI_IN = { direction: 'inbound', body: 'היי', external_id: '40001', message_type: 'text' };
+      const S1 = { message_id: '40003', text: 'המעלית תקועה', last_bot: '', photo: false };
+      expect('last word: right after the intro, the model is told what the system sent',
+        () => { const r = lw(S1, [LIFT_IN, INTRO_ROW, HI_IN]); return r.length === 1 ? r[0].json.last_bot : 'none'; }, INTRO);
+      expect('last word: the intro on top of a burst is read past, and the hello it answered left out',
+        () => { const r = lw(S1, [INTRO_ROW, LIFT_IN, HI_IN]); return r.length === 1 ? r[0].json.text : 'none'; }, 'המעלית תקועה');
+    }
+  }
+
   // 6 Nov (scripts/n8n_whatsapp_retest3.py, the tester's C11, executions 159008-159015): "שלום", "יש בעיה"
   // and the fault, seconds apart. The menu was logged after the other two, so the backlog stopped on it at
   // once, and Sort's note that the menu went out had been spent by a silenced run.
@@ -1199,8 +1250,15 @@ function cases(E) {
   expect('opener: the plural shape is still sent back', op('היי! במה אוכל לעזור לכם היום?'), false);
   expect('opener: a real answer passes', op('איזה מעצבן. באיזה בניין ובאיזו דירה?'), true);
   expect('opener: the נציג tap is exempt', op('היי! במה אוכל לעזור לך היום?', { tap: 'other' }), true);
-  expect('menu rule: the bare singular opener with the name, first contact, gets the buttons',
-    () => sent(E, { reply: "היי, כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", S: { greeted: false }, said: 'hi' }).content_type, 'input_select');
+  // 11 Nov (n8n_whatsapp_hiintro.py, manners v5): the greeting introduces Michael and carries no buttons, so a
+  // reply that is only that intro gets none either. Before v5 it got the menu's two.
+  if (mannersV(P.code && P.code.send_body) >= 5) {
+    expect('menu rule (manners v5): the bare singular opener with the name, first contact, gets no buttons',
+      () => sent(E, { reply: "היי, כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", S: { greeted: false }, said: 'hi' }).content_type !== 'input_select', true);
+  } else {
+    expect('menu rule: the bare singular opener with the name, first contact, gets the buttons',
+      () => sent(E, { reply: "היי, כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", S: { greeted: false }, said: 'hi' }).content_type, 'input_select');
+  }
 
 
   console.log(NL + '--- the representative says hi (1 Oct evening, execution 74529) ---');
