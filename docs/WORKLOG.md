@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### A question answered, read only: how the checklist saves (owner: "the check list how to save it? is it auto save?"), about 08:25 UTC
+- **The local page** (`localhost:8787/`, the 3 Nov replies): a ✓ or ✗ saves at once and a comment 0.7 s after the typing stops, into that browser's own storage (`homies-michael-simulation-v1`). There is no Send, nothing reaches a database, and we cannot read those marks.
+- **The live page** (the dashboard's `/review?k=…`): marks are kept in the reviewer's browser as they go, and reach `reply_reviews` only on "שליחה". Every send is its own row; `python scripts/reply_reviews.py` reads them.
+- Read from the two pages' code (`local/artifacts/michael-simulation/index.html`; `dashboard/app/review/ReviewBoard.tsx` on main). Nothing changed.
+
 ### The local site gets a second section: Yariv's comments beside our answers (owner: "ok now create a new section on a localhost in natural local native hebrew about that one on the right its yariv comment and on the left that answer"), 08:13 UTC
 - **Where:** http://localhost:8787/yariv, on the same local server as Michael's replies (`local/checklist/serve.py`). Each page has a tab to the other. Local only, under `local/`, so nothing of it is in the repo.
 - **What it shows:** one row per comment of the 9 Nov review, 12 in all: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), Yariv's comment as written on the right, and our answer on the left. Hebrew only, right to left, in the replies page's own look (the dashboard's tokens, light and dark). Under 760 px the two stack, the comment first.
