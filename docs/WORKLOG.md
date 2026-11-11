@@ -28,6 +28,7 @@ conversation that produced it.
 - **Not done:** nothing was written to OXS, and no ticket of theirs has opened since, so the first new one is the proof. Their six earlier tickets were not backfilled: not asked. The every-reporter type switch is still off.
 - **Said to the owner:** a ticket of theirs goes into OXS on whatever building it is for, and stays open there until Homies closes it.
 - **Rollback:** `python scripts/oxs_mirror_list.py --remove-flat 1 3 --apply`.
+- **Asked next, answered read only: "so every ticket now in barkochba will now open a ticket in oxs?"** No: the rule goes by the sender's number, not by the building. The building has 10 flats in our copy of OXS and five people on file, in flats 1, 2 and 3. Four of their numbers are on the list. The fifth, the number registered in OXS for flat 2, is not. A ticket about that building from any other number stays in our system, and a ticket from a listed number goes into OXS whatever building it is for. There is no by-building switch.
 
 ### A question answered, read only: is every ticket opened in OXS (owner: "does the ticket is open in the oxs? every ticket is open in the oxs"), 08:56 UTC
 - **No. Only tickets from the one test number are copied into OXS.** Read from the live function's secrets (names and a digest, no values): `OXS_KEY_REQUESTS` present, `OXS_MIRROR_PHONES` present and equal to `.env`'s list of one number, `OXS_MIRROR_TYPES` absent. So the "every lift report, from anyone" switch (Yariv, 4 Nov) is still off.
