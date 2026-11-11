@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### The 11/11 report (in chat, `/reporter`), 16:36 UTC, revised after epoch 106
+- **Span:** everything since the 11/10 report (15:58 UTC on 10 Nov): that night's late work (16:14-17:32 UTC) and all of 11 Nov.
+- **Revised once:** epoch 106 (the entry below) went live at 16:41 UTC, five minutes after the first version; the live memory key `-106` was read with one GET. The revision adds the yes before a ticket, puts flooding in the emergency bullet and the error line in the test bullet, and widens two Will lines.
+- **Given:** 10 done bullets and 3 Will lines.
+  - **Done:**
+    - the hello's intro with no buttons;
+    - every emergency, gas to flooding, gets the emergency line at any hour instead of a ticket;
+    - a ticket only after the tenant's yes;
+    - the line tested with Grok and on the owner's phone, made an invitation and kept from turning into the error line;
+    - a manager request's mention reaches a person in every department, and the pause seen;
+    - Ido's and Yariv's tickets in OXS too;
+    - the ticket-closed message through UChat, quoting only the report;
+    - the reviewers' page with Send;
+    - the reply to Yariv's 12 comments, and its section on the page;
+    - the number still "hadas 1" at TIER_250 until business verification.
+  - **Will:** the owner's retest of the line and the yes; the incoming phone agent's twin for both; Homies' people seated in Chatwoot's departments once Yariv sends names.
+  - **Left out:** the health check and the smoke test (all clear), the read-only questions, the local checklist pages, the checklists in the wrong format, Yariv's comments in English, and the 13:20 UTC hotline fact.
+- **CONTEXT and HANDOVER: nothing from this.** A report sets no rule and changes nothing live, and each Will line is already an owed item in HANDOVER (the owner's check, the phone agent's twin, Homies' people per department).
+
 ### LIVE: a ticket only after the resident's yes; anything urgent gets our line; our line is never a copy (owner: "i told you all types of emergency like flooding, and stuff that needs urgent call, also we need to make sure we dont open a service call without confirmation"), 16:41 UTC, epoch 106
 - **What the owner sent:** a Chatwoot screenshot of Yariv's chat. At 16:19 UTC Yariv wrote "אני חייב דחוף מישהו / כל הבניין נזילת מים / מה עושים" (173670). Michael opened urgent ticket 255-1445-26 on flat 3, with urgency high, the value left once epoch 105 removed `emergency`, and asked where the leak was. Flat 3 is mirrored, so it is in OXS. We delete nothing there.
 - **Found in the same hour's executions:** the owner's checks of epoch 105 went right for smoke (173656) and gas (173684, 173693). His lift test (173705) got Mend's fixed line, "סליחה, משהו השתבש לי בתשובה". Both drafts, a caring word and our line word for word, were within 15% of the smoke reply sent at 16:19, and since epoch 105 an emergency turn runs no tool, which was the copy guard's only way out.
