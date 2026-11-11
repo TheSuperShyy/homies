@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### The reply to Yariv, item by item (owner: "so make it like this 1.1 complying - answer on question 1.2 complying - answer to the question"), and the owner's pause check read from the chat, about 08:10 UTC
+- **The format, corrected by the owner:** one line per comment in Yariv's numbering: the number, a status word, " - ", the answer. The paragraph-per-topic version below is replaced. `local/yariv/2026-11-11-reply-to-9nov-review.txt` now holds this version, in Hebrew and in English. Memory keeps the shape for the next numbered list.
+  - **Status words:** בוצע (complying) for 2.1, 2.2, 2.3, 2.4, 3.2, 4.1, 5.2, 6.2 and 6.3; 6.2 says "with one question on gas". ללא שינוי (no change) for 5.1. תשובה (answer) for 1.1 and 7.2, because 1.1 was a question that changed nothing and 7.2's sentence no longer exists.
+- **The owner's pause check, read from Chatwoot (read only), all on the Israeli number:**
+  - 07:45:21 UTC: the reply as the manager, sent from the owner's login with WhatsApp's id; the chat was assigned to that login.
+  - 07:45:42 "האינסטלטור שלי היה פה אתמול, והוא אמר שזה מהצנרת הראשית של הבניין" and 07:48:49 "היי": no reply from Michael. The pause holds.
+  - 07:52:08: the owner resolved the chat. 07:52:21 "היי??": a NEW chat, 93, and Michael's greeting at 07:52:24 with WhatsApp's id.
+  - **Why a new chat:** inbox 1 has "lock to single conversation" off, so Chatwoot starts a new conversation when the contact's last one is resolved. It starts unassigned, so the bot answers at once.
+  - **Read on the way:** the ticker fetches `status=open` only, so resolved chat 1 keeps its assignee and `handover` labels. Harmless, for the reason above. Chatwoot has no automation rules.
+  - Not exercised today: the 15-minute hand-back on a chat left open.
+- **The 7.2 line to Yariv now says both ways back:** Michael returns when the representative resolves the chat, or after a quarter of an hour of quiet in it.
+- Nothing was changed, sent or spent. HANDOVER has the pause as seen; CONTEXT is unchanged.
+
 ### A reply to Yariv's 12 comments, drafted (owner: "ok now send me a reply for all those list yariv have"; nothing sent), about 08:00 UTC
 - **Where:** `local/yariv/2026-11-11-reply-to-9nov-review.txt` (gitignored): the Hebrew message, an English check copy and three notes. Given to the owner in chat; the owner sends it.
 - **The shape:** the owner's WhatsApp update to Yariv. "עדכון קצר לגבי ההתקדמות, …", one plain paragraph per topic opening "לגבי …,", first person plural, no bold, "תודה!". Seven paragraphs for the 12 comments: the opening message (1.1), the lift (2.1-2.4, 4.1), a leak in a flat (3.2), the payment link (5.1), a standing order (5.2), urgent faults after hours (6.2, 6.3), a manager request (7.2). Yariv is addressed in forms that read the same for a man or a woman, and in the plural for what Homies decides.

@@ -21,7 +21,12 @@ appended to.
 >     - Conversation 1 tops the login's Mentions view.
 >   - **The bell is not the proof.** Chatwoot keeps one notification per login and conversation. The bot's own reply a second later replaced the mention's entry with "new message" (#2712), as #2708 replaced #2707 in the proof. Read the Mentions view, or the notifications with `includes[]=read`.
 >   - **Owed:**
->     - **The pause check, the owner's (asked 11 Nov, about 07:45 UTC):** a public reply from the owner's login in conversation 1 must assign the chat to that login and quiet the bot; a private note does not. 15 minutes after the chat's last message the ticker unassigns it and the bot answers again.
+>     - ~~The pause check, the owner's.~~ **Seen on the Israeli number, 11 Nov 07:45-07:52 UTC:**
+>       - 07:45:21: the owner's reply as the manager went out from Chatwoot with WhatsApp's id, and the chat was assigned to that login.
+>       - 07:45:42 and 07:48:49: two tenant messages, and Michael stayed silent.
+>       - 07:52:08: the owner resolved the chat. 07:52:21: the next message opened a new chat (93), since inbox 1 does not lock a contact to one conversation, and Michael answered at 07:52:24.
+>       - So a person's reply pauses the bot, and resolving gives the tenant back to it at once. The other way back, 15 quiet minutes on a chat left open, was not exercised today (last seen in September).
+>       - The ticker reads open chats only, so a resolved chat keeps its assignee and its `handover` labels. That is harmless: the next message starts a new chat.
 >     - **Homies' people per department,** from the owner. Creating a login emails the person, so it is the owner's to do or to order. Then `--add` them and `--remove` the stand-in.
 >   - **Do not run the full `n8n_handover_test.py` or its `--clean`:** conversation 44 is a real person's thread now (the file's header).
 >   - **Rollback:** `python scripts/chatwoot_teams.py --remove management 2 --apply`, then `collections` and `operations`.
@@ -152,7 +157,7 @@ appended to.
 >     - ~~The Grok tester's short retest.~~ It came back on 10 Nov as a full run (48 messages, in office hours), and its fails led to epoch 101 above. C6.2 sent no email: 255-1417-26 is still open, so it answered "already recorded".
 >     - ~~The phone agent gets the same changes after the chatbot, on the owner's word.~~ Done 10 Nov, 11:00 UTC (the block at the top).
 >   - **For Yariv (drafted to the owner):**
->     - **11 Nov: a reply to all 12 comments is drafted,** `local/yariv/2026-11-11-reply-to-9nov-review.txt` (Hebrew in the WhatsApp shape, with an English check copy; owner: *"send me a reply for all those list yariv have"*). The owner sends it. It asks four things: the 1.1 buttons, the working hours, gas after hours, and names and emails per department for the Chatwoot logins. Whether it was sent is not known here.
+>     - **11 Nov: a reply to all 12 comments is drafted,** `local/yariv/2026-11-11-reply-to-9nov-review.txt` (Hebrew with the same in English; owner: *"send me a reply for all those list yariv have"*, then *"so make it like this 1.1 complying - answer on question"*, so it is one line per comment: the number, a status word, the answer). The owner sends it. It asks four things: the 1.1 buttons, the working hours, gas after hours, and names and emails per department for the Chatwoot logins. Whether it was sent is not known here.
 >     - The 1.1 menu is his decision: no buttons, or other or more.
 >     - Gas after hours: the gas company's line only, or the emergency line too.
 >     - Whether Sun-Thu 09:00-17:00 are the hours to use.
