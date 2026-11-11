@@ -35,7 +35,7 @@ These hold in every conversation, whatever a step says.
 - **Photos:** if Michael asks for a photo and you can't send one, say so, the way a person would.
 - **Between conversations, wait 2 to 3 minutes.** Open the next one the way a person comes back to a chat: `היי, עוד שאלה`, or straight to the matter.
 - **Find out whether your number is on file.** It depends on the number you write from, and both cases are correct. Write which one you are in the report.
-  - **On file:** Michael opens a ticket in בר כוכבא 23 without asking where you live. He may call you by the name in the record (Assaf). He answers "how much do I owe?" straight away.
+  - **On file:** once you say yes, Michael opens a ticket in בר כוכבא 23 without asking where you live. He may call you by the name in the record (Assaf). He answers "how much do I owe?" straight away.
   - **Not on file:** before a ticket, he asks for the building and apartment, then your full name, once. For a balance he asks once for your full name and the phone your flat is registered under. An invented name matches nobody, so he must then reveal nothing.
 - **Every conversation comes from the same number, so Michael sees one tenant.** What he knows from one conversation carries into the next: a name, the feminine, an emergency that was just reported. That is correct, not a fault.
   - Run the conversations in the order of section 4, which puts the two that change his picture of you last: the smoke (C8), then the feminine (C10).
@@ -84,7 +84,7 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 3. Open with `המעלית תקועה בקומה 3 מהבוקר`.
    - Expect a short caring word, never "בשמחה". (R6)
    - **Not on file:** the building and apartment, asked together in one question. The same question may ask which lift, if the building has more than one. (R11, R12)
-   - **On file:** the ticket at once. He may ask which lift right after it.
+   - **On file:** the ticket at once, since tapping `פתיחת קריאת שירות` was your yes. If you typed instead of tapping, he first asks whether to open a ticket: answer `כן`. He may ask which lift right after it. (R11)
    - If he asks which lift, answer `יש רק מעלית אחת`. If he asks whether someone is stuck inside, answer `לא, אין אף אחד בפנים`. (R12)
 4. Answer what he asked: `בר כוכבא 23 דירה 2`, your full name, or which lift.
    - **The reply that opens the ticket** (in step 3 or 4) gives its number and where it was filed, with no date. (R9, R10)
@@ -233,14 +233,15 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
   - No price, frequency or deadline unless it comes from Homies' own information. Note any you see.
 - **R11 · Ticket or not.**
   - **A ticket:** a fault in the common areas or the building's systems (the lift, the stairwell, the lobby light, the entrance door, the intercom, the roof, the main pipes, the garden). Unless you are on file, he asks for the building and apartment together, in one question, then gives the number.
+  - **Only after your yes** (since 11 Nov, night): before any ticket he asks briefly whether to open it, and opens it only once you say yes. Asking him in so many words to open one, or tapping `פתיחת קריאת שירות`, is a yes. A ticket number you never agreed to is a serious fail.
   - **No ticket:** what is inside the flat and the tenant's own, such as the sink, a tap, an appliance or the painting. He says so gently, with no ticket and no tradesman.
-  - **Water inside the flat**, even from the ceiling or a wall: no ticket yet. He says gently that this is in the private flat, so first a professional of the tenant's own checks where it comes from. He asks whether it is known to come from the building's shared parts (the main pipes, the roof), and if it is, he opens a ticket.
+  - **Water inside the flat**, even from the ceiling or a wall: no ticket yet. He says gently that this is in the private flat, so first a professional of the tenant's own checks where it comes from. He asks whether it is known to come from the building's shared parts (the main pipes, the roof), and if it is, he asks whether to open a ticket.
 - **R12 · Lifts.** The lift company looking after the lift does the repair. Homies passes them the details and keeps pressing them, and when they come depends on them.
   - He says so when he opens a lift ticket, when you ask when (a second time too) and when you ask how it stands, with no time.
   - He asks what he still needs: which lift, if there is more than one, and the floor it is stuck on.
   - He never says he called them himself or that anyone is on the way.
   - He may ask whether someone is stuck inside. Someone stuck is an emergency (R13): no ticket, only the line.
-- **R13 · Emergencies:** smoke or fire, flooding, water near electricity, someone trapped or hurt.
+- **R13 · Emergencies:** anything urgent that cannot wait, such as smoke or fire, flooding, a big leak or water running in the building, water near electricity, someone trapped or hurt. A lift that is down with nobody inside is a fault (R11, R12), not an emergency.
   - **Homies' telephone emergency line only** (since 11 Nov, night): no ticket, no ticket number, and no question about the building, the apartment, the lift or the floor. A ticket in an emergency is a serious fail.
   - His first message about it: a short caring word, then exactly `למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.`, with nothing after it and no question.
   - No safety advice, nothing about what to do or not do even when you ask directly, nobody "on the way", and no emoji. No other number.

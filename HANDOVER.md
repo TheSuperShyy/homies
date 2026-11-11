@@ -8,13 +8,36 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 11 Nov, 16:41 UTC: A TICKET ONLY AFTER THE RESIDENT'S YES; ANYTHING URGENT GETS THE LINE; OUR LINE IS NEVER A COPY** (owner, with a screenshot of Yariv's chat: *"i told you all types of emergency like flooding, and stuff that needs urgent call, also we need to make sure we dont open a service call without confirmation"*; `scripts/n8n_whatsapp_confirm.py`, epoch 106; WORKLOG and CONTEXT 11 Nov).
+>   - **Why:**
+>     - At 16:19 UTC Yariv wrote "אני חייב דחוף מישהו / כל הבניין נזילת מים / מה עושים" (173670). Michael opened urgent ticket 255-1445-26 on flat 3 with urgency high, the value left once epoch 105 removed `emergency`. Flat 3 is mirrored, so the ticket is in OXS. It stays; test tickets and real ones are never deleted by us.
+>     - At 16:31 the owner's lift test (173705) got "סליחה, משהו השתבש לי בתשובה". The copy guard counted the fixed line as a repeat of the smoke reply.
+>   - **What changed:**
+>     - **Urgent:** an emergency is anything urgent that cannot wait, a big leak or water running in the building included.
+>     - **Lift:** a lift that is down with nobody stuck is a fault, not an emergency. Kept as Yariv designed it; the owner has not ruled on it.
+>     - **The yes:** before any ticket Michael asks whether to open it, and opens only after a yes. An explicit request or the open-a-call tap counts as one. This is in the prompt, open_request, and Try again's note in all 4 places.
+>     - **Tools:** notify_team gets no note for anything urgent.
+>     - **Repeat v2:** in the 4 copy guards, a reply giving 077-6687949 is never a copy.
+>   - **Read back:** prompt `df3d9bf635d0` (26,398 characters), tools `b10df5bd95db`, memory key `-106`, repeat v2 in 4 of 4 nodes. The re-run reports nothing to do.
+>   - **Checked:**
+>     - **The gate:** 10 new cases, 9 of them seen failing first on a candidate carrying only the repeat v2 label. All 621 pass on the candidate and on live.
+>     - **The replay:** no real reply or message changes.
+>     - **Pins:** the prompt, Try again's note, open_request and notify_team moved.
+>     - **Patchers:** none would write over it; lineonly now refuses as superseded.
+>     - **The watch:** its new check flags 173670 as "a ticket opened with no yes from the resident".
+>     - No model run.
+>   - **Owed: the owner's check.** Use the updated emergency-line brief: E1 now has the yes step, and E5 is Yariv's leak. Then `check_whatsapp_rules.py --watch 2026-11-11T16:41`.
+>   - **Owed: the incoming phone agent's twin.** It still opens an urgent ticket, and opens tickets without asking.
+>   - **Briefs:** `grok-emergency-line-test.md` (E1's yes, E5, H10) and `grok-tenant-tester.md` (C1, C3, R11, R13).
+>   - **Rollback:** `python scripts/n8n_whatsapp_confirm.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-confirm.json`, epoch 105 as it was), then `git revert` the repo side.
+>
 > **LIVE 11 Nov, 16:15 UTC: AN EMERGENCY GETS OUR EMERGENCY LINE ONLY, NO TICKET** (owner, seeing 255-1444-26 from his retest: *"it still open a call"*, then *"I DONT WANT IT TO OPEN A TICKET CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE"*; `scripts/n8n_whatsapp_lineonly.py`, epoch 105; WORKLOG and CONTEXT 11 Nov).
 >   - **What a tenant gets now:** in an emergency (a person in danger or hurt, someone stuck in a lift, fire, smoke, flooding, water near electricity), a short caring word, then "למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.", with no question. No ticket, no note, no building question. Pressed, he gives the line again in other words. Gas is unchanged, and a lift that is down with nobody inside is still a ticket.
 >   - **Where the tickets came from:** open_request with urgency emergency, and notify_team with reason emergency, whose note also makes debt-tools' backstop open a needs_review ticket, mirrored into OXS for a mirrored number. Both are gone from the prompt and the tool texts, and neither tool offers `emergency` any more.
 >   - **Send's danger v8:** awake when the reply gives our line and no other tool ran. A tool-less emergency reply still has advice, other numbers and "on the way" cut. A line that a cut removed comes back, and a reply cut to nothing becomes the line. No old ticket number is added to such a reply.
 >   - **Read back:** prompt `4770de1fc59a` (26,030 characters), tools `3ce12829999d`, memory key `-105`, danger v8 present, line v1 still in place. The re-run reports nothing to do.
 >   - **Checked:** 12 new cases, 9 of them seen failing first on a v8 label without the code. The gate passes all 611 on the candidate and on live, and the replay changes no real reply or message. The pins moved for the prompt and three tools. No other patcher would write over it; the hotline patcher now refuses as superseded. No model run, as for epochs 103 and 104.
->   - **Owed: the owner's own check.** The retest was given at 16:30 UTC: E2, E3 and E4 of the updated brief, in a new Grok chat, with H5 strict (any ticket or question about where fails). E1 is left out, so the run should open nothing in OXS. When the report comes, check it against the executions after 16:15 UTC, then `check_whatsapp_rules.py --watch 2026-11-11T16:15`.
+>   - **The owner's checks after it:** smoke (173656) and gas (173684, 173693) came out right. Then the lift test (173705) hit the copy guard, and Yariv's leak (173670) got a ticket. Both are fixed by epoch 106 (top block).
 >   - **Briefs:** `grok-emergency-line-test.md` (E3, E4, H2, H5) and `grok-tenant-tester.md` (C8, R12, R13, R23) now expect no ticket.
 >   - **Owed: the incoming phone agent's twin.** It still opens an urgent ticket and gives the line after hours only (`docs/assistant/demo-inbound.md`).
 >   - **The test tickets stay:** the two runs opened 255-1440-26 to 255-1444-26, four of them urgent, in OXS too from the +63. Test tickets are never deleted.

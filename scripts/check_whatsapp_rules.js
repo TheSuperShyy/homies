@@ -77,6 +77,8 @@ const dangerV = (body) => { const m = String(body || '').match(/const dv = 'dang
 const HOTS = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
 // 11 Nov, evening (n8n_whatsapp_line.py): Send's line step, the same way. 0 where there is none.
 const lineV = (body) => { const m = String(body || '').match(/const lv = 'line v(\d+)'/); return m ? +m[1] : 0; };
+// 11 Nov, night (n8n_whatsapp_confirm.py): the copy guard's version, read from Reply usable?'s `repeat`. 1 before the label.
+const repeatV = (code) => { const m = String(code || '').match(/const rpv = 'repeat v(\d+)'/); return m ? +m[1] : (code ? 1 : 0); };
 
 function mask(s) {
   return String(s).replace(/https?:\/\/\S+/g, '<link>').replace(/\+?\d{9,15}/g, '<phone>')
@@ -1569,6 +1571,43 @@ function cases(E) {
     expect('mend: a second draft that is a copy too: the fixed line, never the copy',
       md2({ T: { first_truth_ok: false }, retry: ASK_NUM, rows: [ASK_NUM] }), FIX2);
     expect('mend: the same second draft with nothing sent before goes out', md2({ T: { first_truth_ok: false }, retry: ASK_NUM, rows: [] }), ASK_NUM);
+  }
+  // 11 Nov, night (n8n_whatsapp_confirm.py, repeat v2, epoch 106). The owner's lift test at 16:31 UTC (173705) got
+  // "סליחה, משהו השתבש לי בתשובה": his reply, a caring word and our line word for word, was a near-copy of the smoke
+  // reply sent minutes before, so `repeat` sent both drafts back and Mend put the fixed line in their place. A reply
+  // that gives our emergency line is never a copy. The same write: a ticket only after his yes, and an emergency is
+  // anything urgent that cannot wait (Yariv's "כל הבניין נזילת מים" got urgent ticket 255-1445-26 at 16:19, 173670).
+  if (repeatV(((P.code || {}).reply_usable || {}).repeat) >= 2) {
+    console.log(NL + '--- `repeat`: a reply that gives our emergency line is never a copy (11 Nov, night, 173705) ---');
+    const SMOKE10 = 'זה נשמע מסוכן. ' + HOTS;
+    const LIFT10 = 'זה מלחיץ מאוד. ' + HOTS;
+    const LIFT10B = 'זה מצב חירום. ' + HOTS;
+    expect('173705: the lift reply right after the smoke reply passes',
+      rp(LIFT10, [inb('המעלית נתקעה בין הקומות ויש מישהו בפנים!!'), outb(SMOKE10)]), true);
+    expect('the same line word for word, twice, passes too', rp(SMOKE10, [inb('עדיין יש עשן!!'), outb(SMOKE10)]), true);
+    expect('a copy without our line is still a copy', rp(ASK_NUM, ROWS_114536), false);
+    expect('Try again does not name a copy that gives our line',
+      () => noteOf(LIFT10, 'המעלית נתקעה', [inb('המעלית נתקעה'), outb(SMOKE10)]).includes('חזרה כמעט מילה במילה'), false);
+    if (E.mend && E.claimed.claimed) {
+      const md3 = (o) => () => JSON.parse(E.mend({ output: o.retry }, world(o))).output;
+      expect('173705: mend keeps a first draft with our line, even beside the same line sent',
+        md3({ T: { first_truth_ok: true, first_output: LIFT10 }, retry: LIFT10B, rows: [SMOKE10] }), LIFT10);
+      expect('mend: a second draft with our line goes out, never the fixed line',
+        md3({ T: { first_truth_ok: false }, retry: LIFT10B, rows: [SMOKE10] }), LIFT10B);
+    }
+    const TA10 = String((P.code || {}).try_again || '');
+    expect('Try again: "open it now" only once he said yes',
+      () => TA10.indexOf('אם יש מה לפתוח, תפתח עכשיו') === -1 && TA10.indexOf('אם יש מה לפתוח והוא כבר אמר כן, תפתח עכשיו') !== -1, true);
+    const PR10 = String((P.code || {}).prompt || '');
+    if (PR10) {
+      expect('prompt: a service call only after his yes, asked briefly before any ticket',
+        () => PR10.indexOf('אבל רק אחרי שהוא אמר שהוא רוצה אותה') !== -1 && PR10.indexOf('לפני כל קריאה אתה שואל אותו בקצרה אם לפתוח אותה') !== -1
+          && PR10.indexOf('וכשיש לך מה קרה, באיזה בניין, והכן שלו, הכלי בא לפני המילים') !== -1, true);
+      expect('prompt: an emergency is anything urgent that cannot wait, a big leak and water running in the building included',
+        () => PR10.indexOf('מקרה חירום, כלומר כל דבר דחוף שלא יכול לחכות') !== -1 && PR10.indexOf('נזילה גדולה או מים שזורמים בבניין') !== -1, true);
+      expect('prompt: a lift that is down with nobody stuck stays a fault',
+        () => PR10.indexOf('מעלית שלא עובדת כשאף אחד לא תקוע בה היא לא מקרה חירום') !== -1, true);
+    }
   }
   // 9 Nov (scripts/n8n_whatsapp_feedback9.py): Yariv's written review of the simulated run.
   const SB9 = String((P.code || {}).send_body || '');

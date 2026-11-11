@@ -11,6 +11,32 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: a ticket only after the resident's yes; anything urgent gets our line; our line is never a copy (owner: "i told you all types of emergency like flooding, and stuff that needs urgent call, also we need to make sure we dont open a service call without confirmation"), 16:41 UTC, epoch 106
+- **What the owner sent:** a Chatwoot screenshot of Yariv's chat. At 16:19 UTC Yariv wrote "אני חייב דחוף מישהו / כל הבניין נזילת מים / מה עושים" (173670). Michael opened urgent ticket 255-1445-26 on flat 3, with urgency high, the value left once epoch 105 removed `emergency`, and asked where the leak was. Flat 3 is mirrored, so it is in OXS. We delete nothing there.
+- **Found in the same hour's executions:** the owner's checks of epoch 105 went right for smoke (173656) and gas (173684, 173693). His lift test (173705) got Mend's fixed line, "סליחה, משהו השתבש לי בתשובה". Both drafts, a caring word and our line word for word, were within 15% of the smoke reply sent at 16:19, and since epoch 105 an emergency turn runs no tool, which was the copy guard's only way out.
+- **`scripts/n8n_whatsapp_confirm.py`, one write:**
+  - **The prompt,** 4 edits, 26,030 → 26,398 characters, `4770de1fc59a` → `df3d9bf635d0`:
+    - a common-parts fault: Michael asks briefly whether to open a ticket, with the building and flat in the same question when he lacks them, and opens it only after a yes. An explicit request is a yes. "The tool before the words" now waits for the yes too, and so does water from the common parts;
+    - an emergency is anything urgent that cannot wait, a big leak or water running in the building included. A lift that is down with nobody stuck is a fault, not an emergency.
+  - **The tools,** `3ce12829999d` → `b10df5bd95db`:
+    - open_request: never for anything urgent, and never without the resident's yes. A payment arrangement waits for the yes too, and urgency calls a lift that is down "high".
+    - notify_team: anything urgent gets no note.
+  - **Try again:** "אם יש מה לפתוח, תפתח עכשיו עם open_request" waits for his yes, in all 4 places.
+  - **The copy guard, repeat v2,** in Reply usable?, Claimed a ticket?, Mend the reply and Try again: a text that gives 077-6687949 is never a copy.
+  - **Memory:** epoch 105 → 106.
+- **The lift:** kept as a ticket, after the yes, because it is Yariv's 9 Nov design. Said to the owner in one line, so he can rule on it.
+- **Checks:**
+  - **The gate:** 10 new cases (`repeatV >= 2`): the lift after the smoke, the same line twice, a copy without the line still a copy, Try again's note, Mend's two drafts, and three prompt cases. 9 were seen failing on a candidate with only the repeat v2 label; the tenth is a guard. All 621 pass on the candidate and on live.
+  - **The replay:** no real reply and no tenant message changes.
+  - **Pins:** the prompt, Try again's note, open_request and notify_team moved. No model run.
+  - **Patchers:** only the expected ones differ; lineonly now refuses as superseded.
+  - **Read back:** as written. The re-run reports nothing to do.
+- **The watch:** a new flag, "a ticket opened with no yes from the resident". It is raised when open_request answered ok, the previous message offered no ticket, and the resident neither asked for one nor tapped to open one. Run since 16:15, it flags exactly 173670.
+- **The briefs:**
+  - `grok-emergency-line-test.md`: E1 has the yes step, E5 is Yariv's leak, and H10 is new.
+  - `grok-tenant-tester.md`: C1's typed path, C3's yes step, R11's "only after your yes", and R13's anything urgent.
+- **Owed:** the owner's check with the updated brief, then `--watch 2026-11-11T16:41`. The incoming phone agent's twin: it still opens urgent tickets, and opens tickets without asking.
+
 ### The retest for epoch 105, given to the owner (owner: "give me instructions to test the emergency services"), 16:30 UTC
 - **The retest, pasted to Grok in a new chat after the updated `grok-emergency-line-test.md`:** E2, E3 and E4 only, about 6 messages, any hour. H5 is judged strictly: a ticket number, "פתחתי קריאה" or "עדכנתי", or a question about the building, the apartment, the lift or the floor in E3 or E4 is a serious fail. The summary adds one line per reply: no ticket, yes or no.
 - **E1 left out:** it opens a real ticket for the lobby light. So the whole run should open nothing in OXS, and the owner can check exactly that.

@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 105
+MEMORY_EPOCH = 106
+# 105 -> 106, 11 Nov, later that night (n8n_whatsapp_confirm.py): a ticket opens only after the resident's yes; an
+# emergency is anything urgent that cannot wait (a big leak, water running in the building); a lift that is down with
+# nobody stuck stays a fault. The copy guard (repeat v2) never counts a reply that gives our line as a copy.
 # 104 -> 105, 11 Nov, night (n8n_whatsapp_lineonly.py): an emergency gets our emergency line only, with no ticket, no
 # note and no building question; his first message about it is a caring word and the line, word for word, with no
 # question. open_request and notify_team no longer take an emergency. Send's danger v8 wakes on the line too.
@@ -817,8 +820,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "4770de1fc59a",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, night, epoch 105, an emergency gets
-    # our line only, no ticket). Before: 682eb096d52a (11 Nov, later, epoch 104, our emergency line at any hour, gas
+    "prompt": "df3d9bf635d0",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, later that night, epoch 106, a ticket
+    # only after his yes; anything urgent is an emergency). Before: 4770de1fc59a (11 Nov, night, epoch 105, an
+    # emergency gets our line only, no ticket); 682eb096d52a (11 Nov, later, epoch 104, our emergency line at any hour, gas
     # too); a5b5db23f7ca (11 Nov, epoch 103, the greeting introduces Michael, no buttons);
     # 8546b335b582 (10 Nov, later, epoch 102, the lift line without "urgently");
     # ce596f4e9f9a (10 Nov, epoch 101, the one-voice exception by the matter);
@@ -842,7 +846,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "3ce12829999d",  # 11 Nov, night, epoch 105 (n8n_whatsapp_lineonly.py): open_request, notify_team and
+    "tools": "b10df5bd95db",  # 11 Nov, later that night, epoch 106 (n8n_whatsapp_confirm.py): open_request only after
+    # the resident's yes, and never for anything urgent; notify_team: anything urgent gets no note.
+    # Before: "3ce12829999d", 11 Nov, night, epoch 105 (n8n_whatsapp_lineonly.py): open_request, notify_team and
     # verify_address no longer take an emergency; it gets our line only.
     # Before: "81322f5daf6b", 6 Nov, epoch 98: get_request_status names each ticket by its reference.
     # Before: "ba8a80ac42ff", 5 Nov, epoch 96: LIVE's tools after n8n_whatsapp_standing.py (get_payment_link: a

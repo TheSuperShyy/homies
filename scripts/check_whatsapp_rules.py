@@ -238,7 +238,10 @@ PINS = {
     # ticket, no note, no building question and no question at the end. The owner: "I DONT WANT IT TO OPEN A TICKET
     # CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE". Cases (12 new, danger v8) and the replay on the
     # candidate; no model run, as for epochs 103 and 104.
-    'Answer the resident / system': '4770de1fc59a',
+    # 11 Nov, later that night (n8n_whatsapp_confirm.py, epoch 106): a ticket only after the resident's yes; an
+    # emergency is anything urgent that cannot wait (Yariv's "כל הבניין נזילת מים" had got urgent ticket 255-1445-26).
+    # The owner: "we need to make sure we dont open a service call without confirmation". No model run.
+    'Answer the resident / system': 'df3d9bf635d0',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -255,7 +258,9 @@ PINS = {
     # 10 Nov, later (n8n_whatsapp_retest7.py, promise v7): the note's copy of the promise phrases gains
     # "נשלח / ישלחו" + "איש מקצוע / בעל מקצוע", as Send's and Reply usable?'s do; nothing else in it moves.
     # It is n8n_whatsapp_retry.py's own note (check_patchers_idle: retry no longer updates it).
-    'Try again / note': 'c683a1079612',
+    # 11 Nov, later that night (n8n_whatsapp_confirm.py, epoch 106): "if there is something to open, open it now"
+    # waits for his yes, in all four places; and its copy reason never names a draft that gives our line.
+    'Try again / note': '89a706c8f03b',
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
@@ -265,16 +270,19 @@ PINS = {
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': 'a05d3b3ceb2a',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    'notify_team / tool': '82a6b8569159',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas; 11 Nov, night
-    # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`
+    # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`; later that night
+    # (confirm.py, epoch 106): nor for anything else urgent, like a big leak
     # 30 Oct, morning (n8n_whatsapp_name.py, epoch 91): reporter_name and name_declined, and when to ask: only
     # after need_name, once (the owner: "ok we need to include the name in that wtf"); debt-tools v138
     # names a tenant on file from the record and asks the rest (NAME_REQUIRED_CHANNELS voice,whatsapp).
     # 5 Nov (n8n_whatsapp_gas.py, epoch 95): urgency's emergency no longer lists gas; gas is never a ticket.
     # 9 Nov (n8n_whatsapp_feedback9.py, epoch 100): fault_location no longer names "the flat above" a building fault.
     # 11 Nov, night (n8n_whatsapp_lineonly.py, epoch 105): never for an emergency, and urgency has no `emergency`.
-    'open_request / tool': '84f9583a7353',
+    # 11 Nov, later that night (n8n_whatsapp_confirm.py, epoch 106): never without the resident's yes, and never for
+    # anything urgent; a lift that is down with nobody inside is a fault, urgency high.
+    'open_request / tool': '6bf840fa6406',
     'show_menu / tool': '427d364be55d',
     'verify_address / tool': '1d0288dbbe17',   # 11 Nov, night (lineonly.py): no "location during an emergency"
 }
@@ -536,6 +544,24 @@ ADDED_CLAIM = re.compile(r"(?<![א-ת])ו?(הוספתי|צירפתי|עדכנת�
 ADDED_OK = re.compile(r'\\*"ok\\*"\s*:\s*true')
 
 
+def opened_this_turn(rd):
+    """Whether open_request answered ok on any pass of this run."""
+    for run in rd.get("Answer the resident") or []:
+        for out in ((run.get("data") or {}).get("main") or []):
+            for it in out or []:
+                for s in ((it or {}).get("json") or {}).get("intermediateSteps") or []:
+                    if ((s or {}).get("action") or {}).get("tool") == "open_request" \
+                            and ADDED_OK.search(str(s.get("observation"))):
+                        return True
+    return False
+# 11 Nov, later that night (n8n_whatsapp_confirm.py): a ticket opens only after the resident's yes. Michael's last
+# message offered one (a question about opening a ticket), or the resident asked for one in so many words.
+OFFERED = re.compile(r"(?:לפתוח|שאפתח|אפתח)[^.!?\n]{0,60}קריא[^.!?\n]{0,40}\?|קריא[^.!?\n]{0,60}(?:לפתוח|שאפתח|אפתח)"
+                     r"[^.!?\n]{0,40}\?")
+ASKED_TICKET = re.compile(r"(?<![א-ת])ו?(?:תפתח|תפתחי|תפתחו|פתח|לפתוח|אפשר לפתוח)(?![א-ת])[^.!?\n]{0,30}קריא"
+                          r"|קריא[^.!?\n]{0,30}(?<![א-ת])(?:תפתח|לפתוח)(?![א-ת])")
+
+
 def added_this_turn(rd):
     """Whether add_request_detail or open_request answered ok on any pass of this run."""
     for run in rd.get("Answer the resident") or []:
@@ -641,6 +667,12 @@ def watch(since):
         rep_tap = S.get("tap") == "other"
         if not canned and after_menu and not rep_tap and sent and BOT_HELLO.match(LEAD.sub("", sent[0][1])):
             flags.append("a greeting right after the menu (%s)" % sent[0][0])
+        # 11 Nov, later that night (n8n_whatsapp_confirm.py): no ticket without the resident's yes. 173670 opened
+        # 255-1445-26 straight after the hello, on "כל הבניין נזילת מים".
+        if not canned and opened_this_turn(rd) and S.get("tapped_open") is not True \
+                and not OFFERED.search(prev + " " + str(S.get("last_bot") or "")) \
+                and not ASKED_TICKET.search(str(S.get("text") or "")):
+            flags.append("a ticket opened with no yes from the resident")
         # 1 Oct evening: the לדבר עם נציג tap opens "hi, how are you, this is
         # Michael" (n8n_whatsapp_rephello.py). The name is the one thing the
         # filter cannot add, so its absence is a flag; the hello's form is read.
