@@ -655,6 +655,10 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
   Inbox 1's templates are the Israeli WABA's (`ticket_resolved_he`, `payment_link_he`, APPROVED).
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
+- **The number's WhatsApp name is "hadas 1", and Meta caps what we start at 250 conversations a day** (read 11 Nov: `verified_name` "hadas 1", `messaging_limit_tier` TIER_250).
+  - Meta's health reasons: the display name is not approved, and the business has not passed business verification. No name change is pending.
+  - Only conversations we open count: the closed-ticket message and a payment link outside 24 hours. Replies to tenants do not.
+  - The name and the limit change in Meta Business Manager (business verification, then a display-name request). That is the owner's or Yariv's to do.
 - **UChat's app is still subscribed to the number's WABA.** Taking it off is the owner's, in WhatsApp Manager.
   Never "disconnect" the number inside UChat without first checking that it does not deregister the number:
   a deregistered number answers nobody until it is registered again with its PIN.

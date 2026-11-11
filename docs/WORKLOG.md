@@ -9,6 +9,29 @@ conversation that produced it.
 
 ---
 
+## 2026-11-11
+
+### Health check of the WhatsApp bot and everything around it (owner: "do a health check on everything the chatbot, chatwoot and stuff"), 07:10 UTC, read only
+- **Meta:** the number is CONNECTED, quality GREEN, and its phone-level webhook goes to Chatwoot.
+  - **Its name is "hadas 1",** and it is limited to TIER_250. Health says the display name is not approved and the business has not passed business verification. No name change is pending.
+  - **Both templates are still PENDING in "hadas 1"** (submitted 16:19 UTC on 10 Nov). In ASTDX they are APPROVED.
+  - Listing ASTDX's subscribed apps returns Meta's own 500 ("unknown error", twice); this does not block anything. SIP calling is "blocked", but it is not used.
+- **The Chatwoot server:** up 24 days, all six containers up for 3 weeks (Postgres healthy), disk 9%, 5.7 GB of memory free. The Sidekiq queues are empty with 0 retries. The 5 dead jobs are from 27 Oct (widget and agent cleanup) and harmless.
+  - Inbox 1: the Israeli number, the WABA ending 9632, linked to "Homies bot" → n8n `homies-whatsapp`.
+  - **Traffic since the move:** 1 incoming message (the owner's "היי", 15:54 UTC, answered) and 1 failed (the 16:14 template, #132001, from before the fallback). No Meta POSTs in the last 3 hours.
+- **n8n, since 15:26 UTC on 10 Nov:** no errors in any workflow.
+  - the bot: 7 runs, all successful;
+  - ticket notices: 472 runs; handback: 944 runs;
+  - number watch: 188 runs, still on the retired test number;
+  - the UChat copy is off. The UChat translator and hand-over are on but have no runs.
+- **The rules gate:** all 566 cases pass on live. `--watch` since 15:26 found 1 resident turn and nothing broken.
+- **Supabase:** auth, db, rest and storage are healthy. Realtime read UNHEALTHY once and healthy on recheck; the dashboard doesn't use it.
+  - `debt-tools` v154 is ACTIVE and answers 401 without its secret. `WHATSAPP_VIA` is `uchat` in the secret and in `.env`.
+  - ticket_notices: 3 sent, none pending or failed. reply_reviews: 0 sends yet.
+- **OpenRouter:** $35.68 in the wallet.
+- **UChat:** the tool server's key is neither `.env` key. The TEAM key gets 403 "Manage Flow Permission Required" on templates, and the CLIX key reads a workspace with none. So the fallback's last proof stays the 16:48 UTC send on 10 Nov; re-testing it means sending a message.
+- **The dashboard:** /login 200, and /review 200 shows the error page without the key.
+
 ## 2026-11-10
 
 ### The reviewers' page on Vercel, saved to our database (owner: "ok push it live to vercel make sure the data can be saved on a database so we can retrieve it add a send button", then "wait dont run the chat test we have grok wtf also focus no deployng the checklist in vercel")
