@@ -1648,10 +1648,52 @@ function cases(E) {
         expect('v7 prompt: our line is no longer tied to the office hours',
           () => PR7.indexOf('רק כשכתוב לך שעכשיו מחוץ לשעות הפעילות') === -1 && PR7.indexOf('ומחוץ לשעות הפעילות גם את המוקד') === -1
             && PR7.indexOf('ומתקלה דחופה מחוץ לשעות הפעילות') === -1, true);
-        expect('v7 prompt: every urgent fault, at any hour, politely, from his first message about it',
-          () => PR7.indexOf('על כל תקלה דחופה, בכל שעה, אתה גם מפנה אותו בנימוס למוקד החירום הטלפוני שלנו, 077-6687949') !== -1
-            && PR7.indexOf('כבר בהודעה הראשונה שלך על המקרה, גם אם עוד לא פתחת את הקריאה') !== -1, true);
+        if (dangerV(SB9) < 8) {   // v8's prompt has no urgent ticket in it (the block below)
+          expect('v7 prompt: every urgent fault, at any hour, politely, from his first message about it',
+            () => PR7.indexOf('על כל תקלה דחופה, בכל שעה, אתה גם מפנה אותו בנימוס למוקד החירום הטלפוני שלנו, 077-6687949') !== -1
+              && PR7.indexOf('כבר בהודעה הראשונה שלך על המקרה, גם אם עוד לא פתחת את הקריאה') !== -1, true);
+        }
         expect('v7 prompt: the gas sentence, word for word, carries our line', () => PR7.indexOf('"' + GAS7 + '"') !== -1, true);
+      }
+    }
+    if (dangerV(SB9) >= 8) {
+      // 11 Nov, night (n8n_whatsapp_lineonly.py, danger v8). The owner, on seeing 255-1444-26 open in OXS: "I DONT WANT
+      // IT TO OPEN A TICKET CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE". An emergency gets no ticket
+      // and no note now, so its turn has no tool at all: the step wakes on our line in the reply instead, and still
+      // cuts advice, other numbers and "on the way". A cut that takes the line gives it back, and an old urgent ticket
+      // in the chat adds no number to a new emergency.
+      console.log(NL + '--- Send: an emergency gets our line only, no ticket (11 Nov, night, the owner) ---');
+      const SAY8 = 'זה נשמע מסוכן. ' + HOTS;
+      expect('v8: an emergency with no tool: his line goes whole',
+        () => content(E, { reply: SAY8, said: 'יש עשן בחדר המדרגות, ממש מריח שרוף', now: SUN }), SAY8);
+      expect('v8: advice beside the line, no tool: the advice goes, the line stays',
+        () => content(E, { reply: 'זה נשמע מסוכן. תתרחק מהעשן ותצא מהבניין. ' + HOTS, said: 'יש עשן בחדר המדרגות', now: SUN }), SAY8);
+      expect('v8: another number, no tool: it goes, our line stays',
+        () => content(E, { reply: 'זה נשמע מסוכן. אפשר להתקשר גם לכיבוי אש ב-102. ' + HOTS, said: 'יש עשן בחדר המדרגות', now: SUN }), SAY8);
+      expect('v8: "on the way", no tool: it goes',
+        () => content(E, { reply: SAY8 + ' הצוות כבר בדרך אליך.', said: 'יש עשן בחדר המדרגות', now: SUN }), SAY8);
+      expect("v8: advice in the line's own sentence: the sentence goes and our line comes back",
+        () => content(E, { reply: 'זה נשמע מסוכן. תתרחק מהעשן ותתקשר למוקד שלנו, 077-6687949.', said: 'יש עשן בחדר המדרגות', now: SUN }), SAY8);
+      expect('v8: everything cut, no tool: our line alone',
+        () => content(E, { reply: 'תצא מהבניין ותתקשר ל-102 או למוקד שלנו, 077-6687949.', said: 'יש עשן בחדר המדרגות', now: SUN }), HOTS);
+      const OLD8 = 'פתחתי קריאה דחופה, מספר 255-1444-26. ' + HOTS;
+      expect('v8: an old urgent ticket in the chat and a new emergency: no old number is added',
+        () => content(E, { reply: 'זה נשמע מסוכן. תתרחק מהעשן. ' + HOTS, said: 'יש עשן בחדר המדרגות', S: { last_bot: OLD8 }, now: SUN }), SAY8);
+      const PRESS8 = 'זה באמת מלחיץ. המוקד הטלפוני שלנו למקרי חירום הוא המקום לזה עכשיו, 077-6687949.';
+      expect('v8: pressed, no tool: the line again, and no question is added',
+        () => content(E, { reply: PRESS8, said: 'מה אני עושה עכשיו? שמישהו יבוא מהר!', S: { last_bot: SAY8 }, now: SUN }), PRESS8);
+      const PR8 = String((P.code || {}).prompt || '');
+      if (PR8) {
+        expect('v8 prompt: an emergency opens no ticket and no note, and asks no building',
+          () => PR8.indexOf('אתה לא פותח קריאה, גם כשזאת תקלה ברכוש המשותף, לא רושם הערה ולא שואל באיזה בניין או באיזו דירה') !== -1, true);
+        expect('v8 prompt: our line word for word, in his first message about it, and the message ends there',
+          () => PR8.indexOf('מילה במילה: "' + HOTS + '" ושם ההודעה נגמרת, בלי שאלה') !== -1
+            && PR8.indexOf('כבר בהודעה הראשונה שלך על המקרה') !== -1, true);
+        expect('v8 prompt: no urgent ticket and no urgent note asked for anywhere',
+          () => ['קריאת שירות דחופה', 'רושם הערה דחופה', 'שפתחת קריאה דחופה', 'מה המספר של הקריאה, וגם את המוקד']
+            .every((w) => PR8.indexOf(w) === -1), true);
+        expect('v8 prompt: a message about an emergency may end without a question',
+          () => PR8.indexOf('חוץ מההודעות על מקרה חירום') !== -1, true);
       }
     }
     // Yariv's own lift sentences (2.2 and 2.3) go out whole, even where this step is awake.

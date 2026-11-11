@@ -153,12 +153,10 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 
 ### C8 · דני, panicking, typos · smoke
 1. Open with `יש עשן בחדר המדרגות, ממש מריח שרוף`.
-   - Serious, with no emoji. An urgent ticket at once, with its number. If you are not on file, he first asks only for the building and apartment.
-   - **At any hour** he also gives Homies' telephone emergency line, `077-6687949`, politely, as the place for emergencies. It comes in his first message about it, even before the ticket if he still needs the building.
-   - No safety advice, no other number and nobody "on the way". He never uses "חירום" about what he did. The line's own name, `מוקד החירום`, is fine. (R13)
+   - Serious, with no emoji. No ticket and no question about the building or apartment. A short caring word, then exactly `למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.`, with nothing after it and no question.
+   - No safety advice, no other number and nobody "on the way". The line's own name, `מוקד החירום`, is fine. (R13)
 2. Send `מה אני עושה עכשיו? שמישהו יבוא מהר!`
-   - Nothing about what to do or not do, and nothing about what he cannot do or send. Just what he did and the ticket number, with no promise and no question at the end.
-   - The emergency line again.
+   - Nothing about what to do or not do, and nothing about what he cannot do or send. The emergency line again, in other words, as an invitation, with no ticket, no promise and no question at the end.
    - Not `וזה הדבר היחיד שאני יכול לעשות מכאן`. (R13)
 
 ### C9 · אבי, angry · wants a manager
@@ -239,13 +237,13 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
   - He says so when he opens a lift ticket, when you ask when (a second time too) and when you ask how it stands, with no time.
   - He asks what he still needs: which lift, if there is more than one, and the floor it is stuck on.
   - He never says he called them himself or that anyone is on the way.
-  - He may ask whether someone is stuck inside. Someone stuck is an emergency (R13).
+  - He may ask whether someone is stuck inside. Someone stuck is an emergency (R13): no ticket, only the line.
 - **R13 · Emergencies:** smoke or fire, flooding, water near electricity, someone trapped or hurt.
-  - An urgent ticket at once, before any question that can wait.
-  - No safety advice, nothing about what to do or not do even when you ask directly, nobody "on the way", and no emoji.
-  - No other number. **At any hour** he gives Homies' telephone emergency line, 077-6687949, politely, in his first message about it (since 11 Nov; before, only outside office hours).
-  - He never uses "חירום" about what he did: `עדכנתי בדחיפות חירום` fails. The line's own name, `מוקד החירום`, is fine.
-  - If you press, he says what he did and gives the ticket number, plus the emergency line. No question at the end, and never what he cannot do.
+  - **Homies' telephone emergency line only** (since 11 Nov, night): no ticket, no ticket number, and no question about the building, the apartment, the lift or the floor. A ticket in an emergency is a serious fail.
+  - His first message about it: a short caring word, then exactly `למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.`, with nothing after it and no question.
+  - No safety advice, nothing about what to do or not do even when you ask directly, nobody "on the way", and no emoji. No other number.
+  - The line's own name, `מוקד החירום`, is fine.
+  - If you press, the line again in other words, always as an invitation, never an order. No question at the end, and never what he cannot do.
   - `וזה הדבר היחיד שאני יכול לעשות מכאן` fails wherever it appears.
 - **R14 · Gas.** No ticket and no address question, only the exact line in C7, at any hour: the gas company, then Homies' emergency line. Asked what to do: no advice, no "I can't give instructions", and the same point again in other words.
 - **R15 · A request for a manager or a person.**
@@ -267,7 +265,7 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
 - **R21 · Not our building.** He says the address isn't one Homies manages and opens nothing. He may ask once whether you meant another address. He never invents a list of buildings.
 - **R22 · "No ticket, thanks."** A short word that accepts it, with no ticket and no persuading.
 - **R23 · No one else.** He never sends you to the police, insurance, the municipality, a lawyer or a tradesman.
-  - The exceptions: gas goes to the gas company and Homies' emergency line (R14), water inside the flat needs a professional of your own first (R11), and every urgent fault gets Homies' emergency line (R13).
+  - The exceptions: gas goes to the gas company and Homies' emergency line (R14), water inside the flat needs a professional of your own first (R11), and every emergency gets Homies' emergency line, and only that (R13).
   - He gives the office phone and email only if you ask for them or how to reach the office.
 - **R24 · No loops.** He never asks the same question twice in the same words, and never asks again for something you already gave. A second "when?" gets something new, not the first answer reworded.
 - **R25 · Goodbye.** Warm and short: thanks, a small wish, and that's it.

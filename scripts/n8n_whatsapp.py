@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 104
+MEMORY_EPOCH = 105
+# 104 -> 105, 11 Nov, night (n8n_whatsapp_lineonly.py): an emergency gets our emergency line only, with no ticket, no
+# note and no building question; his first message about it is a caring word and the line, word for word, with no
+# question. open_request and notify_team no longer take an emergency. Send's danger v8 wakes on the line too.
 # 103 -> 104, 11 Nov, later (n8n_whatsapp_hotline.py): every urgent fault gets our emergency line, 077-6687949, at
 # any hour and politely, from his first message about it; the gas sentence gains it after the gas company. Send's
 # danger v7 keeps the line at any hour and adds one sentence on the emergency turn when the reply has none.
@@ -814,8 +817,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "682eb096d52a",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, later, epoch 104, our emergency line
-    # at any hour, gas too). Before: a5b5db23f7ca (11 Nov, epoch 103, the greeting introduces Michael, no buttons);
+    "prompt": "4770de1fc59a",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, night, epoch 105, an emergency gets
+    # our line only, no ticket). Before: 682eb096d52a (11 Nov, later, epoch 104, our emergency line at any hour, gas
+    # too); a5b5db23f7ca (11 Nov, epoch 103, the greeting introduces Michael, no buttons);
     # 8546b335b582 (10 Nov, later, epoch 102, the lift line without "urgently");
     # ce596f4e9f9a (10 Nov, epoch 101, the one-voice exception by the matter);
     # fbca40b23dd0 (9 Nov, epoch 100, Yariv's review)
@@ -838,7 +842,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "81322f5daf6b",  # 6 Nov, epoch 98: get_request_status names each ticket by its reference.
+    "tools": "3ce12829999d",  # 11 Nov, night, epoch 105 (n8n_whatsapp_lineonly.py): open_request, notify_team and
+    # verify_address no longer take an emergency; it gets our line only.
+    # Before: "81322f5daf6b", 6 Nov, epoch 98: get_request_status names each ticket by its reference.
     # Before: "ba8a80ac42ff", 5 Nov, epoch 96: LIVE's tools after n8n_whatsapp_standing.py (get_payment_link: a
     # standing order is not a link). request_standing_order is outside this hash, like add_request_detail.
     # Before: "60094344bcd8", 5 Nov, epoch 95: LIVE's tools after n8n_whatsapp_gas.py (notify_team: never for gas).

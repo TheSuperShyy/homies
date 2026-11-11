@@ -234,7 +234,11 @@ PINS = {
     # any hour and politely, from his first message about it, even before the ticket; the gas sentence gains it after
     # the gas company. The owner: "0776687949 this is the hotline so all the emergency service redirect them here in
     # a polite way". Cases (13 new, danger v7) and the replay on the candidate; no model run, as for epoch 103.
-    'Answer the resident / system': '682eb096d52a',
+    # 11 Nov, night (n8n_whatsapp_lineonly.py, epoch 105): an emergency gets our line only, word for word, with no
+    # ticket, no note, no building question and no question at the end. The owner: "I DONT WANT IT TO OPEN A TICKET
+    # CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE". Cases (12 new, danger v8) and the replay on the
+    # candidate; no model run, as for epochs 103 and 104.
+    'Answer the resident / system': '4770de1fc59a',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -261,16 +265,18 @@ PINS = {
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '8909a4a81ff0',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
-    # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas
+    'notify_team / tool': 'a05d3b3ceb2a',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas; 11 Nov, night
+    # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`
     # 30 Oct, morning (n8n_whatsapp_name.py, epoch 91): reporter_name and name_declined, and when to ask: only
     # after need_name, once (the owner: "ok we need to include the name in that wtf"); debt-tools v138
     # names a tenant on file from the record and asks the rest (NAME_REQUIRED_CHANNELS voice,whatsapp).
     # 5 Nov (n8n_whatsapp_gas.py, epoch 95): urgency's emergency no longer lists gas; gas is never a ticket.
     # 9 Nov (n8n_whatsapp_feedback9.py, epoch 100): fault_location no longer names "the flat above" a building fault.
-    'open_request / tool': '27c544f39122',
+    # 11 Nov, night (n8n_whatsapp_lineonly.py, epoch 105): never for an emergency, and urgency has no `emergency`.
+    'open_request / tool': '84f9583a7353',
     'show_menu / tool': '427d364be55d',
-    'verify_address / tool': 'a2a85a3d4068',
+    'verify_address / tool': '1d0288dbbe17',   # 11 Nov, night (lineonly.py): no "location during an emergency"
 }
 
 

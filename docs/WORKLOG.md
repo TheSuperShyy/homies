@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: an emergency gets our emergency line only, no ticket (owner: "I DONT WANT IT TO OPEN A TICKET CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE"), 16:15 UTC, epoch 105
+- **What the owner saw:** his retest of E3 and E4 (15:54-16:02 UTC) gave the line politely, but opened urgent tickets 255-1443-26 and 255-1444-26, in OXS too from the +63. He sent the smoke reply's screenshot, "it still open a call", then the message above. Epoch 104 had read his "redirect them here" as the line beside the urgent ticket.
+- **Where the tickets came from (executions 173586 and 173610):** each emergency turn called notify_team with reason emergency, then open_request with urgency emergency. The note alone also makes debt-tools' backstop open a needs_review ticket, mirrored into OXS for a mirrored number (found for gas on 5 Nov). Both calls were asked for by the prompt ("אתה פותח מיד קריאת שירות דחופה ורושם הערה דחופה") and by the tool texts ("go on and open the ticket too", "Use emergency only for…").
+- **`scripts/n8n_whatsapp_lineonly.py`, one write:**
+  - **The prompt,** 5 edits, 25,972 → 26,030 characters, `682eb096d52a` → `4770de1fc59a`:
+    - the danger paragraph: an emergency (a person in danger or hurt, someone stuck in a lift, fire, smoke, flooding, water near electricity) opens no ticket, on the common parts too, writes no note and asks no building. His first message is a short caring word, then, word for word, "למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.", and it ends there. Pressed, the line again in other words, with no question;
+    - "nobody is sent anywhere", the office phone and the line's fact line say "emergency" where they said "urgent fault";
+    - the rule that every message ends with a question excepts the messages about an emergency.
+  - **The tools,** `81322f5daf6b` → `3ce12829999d`. open_request: never for an emergency, and urgency loses `emergency`. notify_team: never for an emergency, and reason loses `emergency`; the description and department glosses drop it too. verify_address: no "location during an emergency".
+  - **Send, danger v8:** awake on a reply that gives our line when no other tool ran, since an emergency turn now has no tool. Advice, other numbers and "on the way" are still cut. A line that a cut removed comes back, and a reply cut to nothing becomes the line. An urgent ticket found only in the chat's past adds no number to such a reply.
+  - **Memory:** epoch 104 → 105.
+- **Why the line is word for word:** described ("בנימוס"), Gemini wrote orders in the Grok run; shown, in the gas sentence, it came out word for word in the same run.
+- **Checks:**
+  - **The gate:** 12 new cases (`dangerV >= 8`), 9 of them seen failing on a candidate with the v8 label and none of the code. The 3 that already passed are guards. The v7 prompt case that quoted the urgent ticket now runs only below v8. All 611 pass on the candidate and on live.
+  - **The replay:** no real reply and no tenant message changes.
+  - **Pins:** the prompt, open_request, notify_team and verify_address moved, as expected. No model run, as for epochs 103 and 104.
+  - **Patchers:** only the expected ones differ. lineonly and patch go idle; hotline refuses as superseded (it wants epoch 103); fresh and retest7 go from refusing to idle.
+  - **Read back:** prompt, tools, memory key `-105` and danger v8 as written. The re-run reports nothing to do.
+- **The briefs:** `grok-emergency-line-test.md` (the purpose, any hour, E3, E4, H2, H5, the verdicts) and `grok-tenant-tester.md` (C8, R12, R13, R23) expect no ticket.
+- **Owed:** the owner's own check, then `--watch 2026-11-11T16:15`. The incoming phone agent's twin still opens an urgent ticket.
+
 ### The retest for line v1, given to the owner (owner: "ok give me instructions"), 15:45 UTC
 - **Asked first, "so is it fix":** yes, in the live code, proven on the four failed replies. The watch from 15:21 saw 0 tenant turns, so no real chat has shown it yet.
 - **The retest, pasted to Grok after `grok-emergency-line-test.md`:** E3 and E4 only, about 5 messages, any hour. H2 and H8 are judged strictly in every reply that gives 077-6687949. An invitation passes; any plural fails H8; any order, even singular and after "בבקשה", fails H2 (the brief itself makes a bare order only a note). The summary adds one line per reply: the line as an invitation, yes or no.

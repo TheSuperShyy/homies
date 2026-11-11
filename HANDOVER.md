@@ -8,6 +8,18 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 11 Nov, 16:15 UTC: AN EMERGENCY GETS OUR EMERGENCY LINE ONLY, NO TICKET** (owner, seeing 255-1444-26 from his retest: *"it still open a call"*, then *"I DONT WANT IT TO OPEN A TICKET CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE"*; `scripts/n8n_whatsapp_lineonly.py`, epoch 105; WORKLOG and CONTEXT 11 Nov).
+>   - **What a tenant gets now:** in an emergency (a person in danger or hurt, someone stuck in a lift, fire, smoke, flooding, water near electricity), a short caring word, then "למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.", with no question. No ticket, no note, no building question. Pressed, he gives the line again in other words. Gas is unchanged, and a lift that is down with nobody inside is still a ticket.
+>   - **Where the tickets came from:** open_request with urgency emergency, and notify_team with reason emergency, whose note also makes debt-tools' backstop open a needs_review ticket, mirrored into OXS for a mirrored number. Both are gone from the prompt and the tool texts, and neither tool offers `emergency` any more.
+>   - **Send's danger v8:** awake when the reply gives our line and no other tool ran. A tool-less emergency reply still has advice, other numbers and "on the way" cut. A line that a cut removed comes back, and a reply cut to nothing becomes the line. No old ticket number is added to such a reply.
+>   - **Read back:** prompt `4770de1fc59a` (26,030 characters), tools `3ce12829999d`, memory key `-105`, danger v8 present, line v1 still in place. The re-run reports nothing to do.
+>   - **Checked:** 12 new cases, 9 of them seen failing first on a v8 label without the code. The gate passes all 611 on the candidate and on live, and the replay changes no real reply or message. The pins moved for the prompt and three tools. No other patcher would write over it; the hotline patcher now refuses as superseded. No model run, as for epochs 103 and 104.
+>   - **Owed: the owner's own check.** "יש עשן בחדר המדרגות, ממש מריח שרוף" should now get the caring word and the line, and nothing should open in OXS. Then `check_whatsapp_rules.py --watch 2026-11-11T16:15`.
+>   - **Briefs:** `grok-emergency-line-test.md` (E3, E4, H2, H5) and `grok-tenant-tester.md` (C8, R12, R13, R23) now expect no ticket.
+>   - **Owed: the incoming phone agent's twin.** It still opens an urgent ticket and gives the line after hours only (`docs/assistant/demo-inbound.md`).
+>   - **The test tickets stay:** the two runs opened 255-1440-26 to 255-1444-26, four of them urgent, in OXS too from the +63. Test tickets are never deleted.
+>   - **Rollback:** `python scripts/n8n_whatsapp_lineonly.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-lineonly.json`, which has line v1 in it), then `git revert` the repo side (prompt.md, the epoch, the covers, the pins, the gate's cases, the briefs).
+>
 > **LIVE 11 Nov, 15:21 UTC: OUR EMERGENCY LINE COMES AS AN INVITATION, NEVER AN ORDER** (the owner pasted Grok's report of the emergency-line run; `scripts/n8n_whatsapp_line.py`, Send's line v1; WORKLOG and CONTEXT 11 Nov). Prompt, tools and memory unchanged: still epoch 104.
 >   - **Why:** the run (14:02-14:16 UTC, 7 messages) found the line in all three emergencies, gas word for word and no number on the lobby light, but given as an order: "(בבקשה) תתקשרו עכשיו למוקד החירום שלנו" three times (executions 173373, 173391, 173403) and a bare "תתקשר עכשיו" once (173419). The words were Gemini's own; Send passed them through and no tool's text carries a plural.
 >   - **What Send does now, in any reply that gives 077-6687949:** an order to call or dial at the start of a sentence or clause becomes "אפשר להתקשר" / "אפשר לחייג", with a "בבקשה" or "אנא" before it dropped. A plural "you" calling anywhere else becomes singular ("כדאי שתתקשר", "אם תתקשר"). A reply without the number is not touched.
@@ -15,11 +27,11 @@ appended to.
 >   - **Checked:** 9 new cases, 8 of them seen failing on live first, the four real replies among them; the gate passes all 600 on the candidate and on live. The replay changes exactly those four replies out of 1,542, and none of 1,493 tenant messages. No other patcher's dry run changes. No model run.
 >   - **The watch's plural list** gains "תתקשרו" and "תחייגו". The 13:43 watch said "nothing broke the rules" over the three plural replies; re-run, it flags them.
 >   - **Left as it is:** E2.2's "והם יעזרו לך" after the line, which Grok noted as harmless and is true of the line.
->   - **Owed: one look at the new wording.** The retest was given to the owner at 15:45 UTC: E3 and E4 of the brief, run by Grok, with H2 and H8 strict (an order or a plural fails). From the +63 each opens a real urgent ticket, in Homies' OXS too. When the report comes, check it against the executions after 15:21 UTC, then `check_whatsapp_rules.py --watch 2026-11-11T15:21`.
+>   - **The retest ran, 15:54-16:02 UTC:** the line came polite and singular ("בבקשה להתקשר"), but both turns opened urgent tickets, 255-1443-26 and 255-1444-26, in OXS too. That led to epoch 105 (above).
 >   - **Rollback:** `python scripts/n8n_whatsapp_line.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-line.json`), then `git revert` the repo side. Its snapshot has the 13:43 change in it; the 13:43 rollback below takes line v1 away too.
 >
 > **LIVE 11 Nov, 13:43 UTC: EVERY EMERGENCY GETS HOMIES' EMERGENCY LINE, 077-6687949, AT ANY HOUR, SAID POLITELY** (owner: *"0776687949 this is the hotline so all the emergency service redirect them here in a polite way"*, after *"we have a direct hotline specially built for that its a department"*; `scripts/n8n_whatsapp_hotline.py`, epoch 104; WORKLOG and CONTEXT 11 Nov). The hotline is the office number Michael already gave after hours.
->   - **What a tenant gets now:**
+>   - **Superseded at 16:15 UTC by epoch 105 (top block): an emergency no longer gets a ticket or a note.** What this block gave:
 >     - **An urgent fault, at any hour:** the urgent ticket and its number plus the line, in his first message about it, even before the ticket when the building is still needed. Pressed, the line again.
 >     - **Gas:** the gas company, then the line, word for word. Still no ticket.
 >     - Until today the line came only outside Sun-Thu 09:00-17:00 Israel, and gas got the gas company only.
