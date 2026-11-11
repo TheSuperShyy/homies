@@ -230,7 +230,11 @@ PINS = {
     # לעזור לך היום?" with no buttons. The greeting paragraph quotes it and says it gave his name, so the next reply
     # neither greets nor says who he is; the tap paragraph no longer says the buttons came with the greeting. Cases
     # and the replay on the candidate; no model run (the owner's rule; his own phone is the test).
-    'Answer the resident / system': 'a5b5db23f7ca',
+    # 11 Nov, later (n8n_whatsapp_hotline.py, epoch 104): every urgent fault gets our emergency line, 077-6687949, at
+    # any hour and politely, from his first message about it, even before the ticket; the gas sentence gains it after
+    # the gas company. The owner: "0776687949 this is the hotline so all the emergency service redirect them here in
+    # a polite way". Cases (13 new, danger v7) and the replay on the candidate; no model run, as for epoch 103.
+    'Answer the resident / system': '682eb096d52a',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -373,6 +377,8 @@ def extract(wf):
         "sort_menu": (code[max(0, code.find("const MENU = {") - 400):code.find("};", code.find("const MENU = {")) + 2]
                       if "const MENU = {" in code else ""),
         "send_menu_body": (by.get("Send menu") or {}).get("parameters", {}).get("jsonBody", ""),
+        # 11 Nov (n8n_whatsapp_hotline.py): the prompt, so a case can hold what it says about our emergency line.
+        "prompt": ((by["Answer the resident"]["parameters"].get("options") or {}).get("systemMessage") or ""),
     }
 
 

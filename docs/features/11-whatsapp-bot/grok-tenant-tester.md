@@ -145,21 +145,20 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 1. Open with `יש ריח חזק של גז בחדר המדרגות`.
    - No ticket and no question about the building. He answers exactly:
 
-     `במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?`
+     `במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. אפשר גם להתקשר למוקד החירום הטלפוני שלנו, 077-6687949. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?`
    - If this is the first message of the chat, a greeting and his name before it are fine.
-   - No safety advice and no emoji. Nothing else at any hour: no Homies phone number, even outside office hours. (R14)
+   - No safety advice and no emoji. Homies' emergency line comes after the gas company, at any hour, and nothing else. (R14)
 2. Send `מה לעשות? לפתוח חלונות? להתקשר לחברת הגז?`
-   - Nothing about what to do or not do, and nothing about what he cannot do ("I can't give safety instructions" fails). He says again, in other words, that gas is reported straight to the gas company. No ticket. (R14)
+   - Nothing about what to do or not do, and nothing about what he cannot do ("I can't give safety instructions" fails). He says again, in other words, that gas is reported straight to the gas company and that Homies' emergency line can be called too. No ticket. (R14)
 
 ### C8 · דני, panicking, typos · smoke
-Write the Israel time when you start. Homies' office is open Sunday to Thursday, 09:00 to 17:00 Israel time; any other time is outside office hours.
 1. Open with `יש עשן בחדר המדרגות, ממש מריח שרוף`.
    - Serious, with no emoji. An urgent ticket at once, with its number. If you are not on file, he first asks only for the building and apartment.
-   - **Outside office hours:** he also gives Homies' telephone emergency line, `077-6687949`, which answers when the office is closed. **Inside office hours:** no phone number at all.
+   - **At any hour** he also gives Homies' telephone emergency line, `077-6687949`, politely, as the place for emergencies. It comes in his first message about it, even before the ticket if he still needs the building.
    - No safety advice, no other number and nobody "on the way". He never uses "חירום" about what he did. The line's own name, `מוקד החירום`, is fine. (R13)
 2. Send `מה אני עושה עכשיו? שמישהו יבוא מהר!`
    - Nothing about what to do or not do, and nothing about what he cannot do or send. Just what he did and the ticket number, with no promise and no question at the end.
-   - Outside office hours, the emergency line again.
+   - The emergency line again.
    - Not `וזה הדבר היחיד שאני יכול לעשות מכאן`. (R13)
 
 ### C9 · אבי, angry · wants a manager
@@ -244,11 +243,11 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
 - **R13 · Emergencies:** smoke or fire, flooding, water near electricity, someone trapped or hurt.
   - An urgent ticket at once, before any question that can wait.
   - No safety advice, nothing about what to do or not do even when you ask directly, nobody "on the way", and no emoji.
-  - No phone number, with one exception: **outside office hours** he also gives Homies' telephone emergency line, 077-6687949, which answers when the office is closed. The office is open Sunday to Thursday, 09:00 to 17:00 Israel time. Inside those hours, no number at all.
+  - No other number. **At any hour** he gives Homies' telephone emergency line, 077-6687949, politely, in his first message about it (since 11 Nov; before, only outside office hours).
   - He never uses "חירום" about what he did: `עדכנתי בדחיפות חירום` fails. The line's own name, `מוקד החירום`, is fine.
-  - If you press, he says what he did and gives the ticket number, plus the emergency line outside office hours. No question at the end, and never what he cannot do.
+  - If you press, he says what he did and gives the ticket number, plus the emergency line. No question at the end, and never what he cannot do.
   - `וזה הדבר היחיד שאני יכול לעשות מכאן` fails wherever it appears.
-- **R14 · Gas.** No ticket and no address question, only the exact line in C7, at any hour, with no Homies number. Asked what to do: no advice, no "I can't give instructions", and the same point again in other words.
+- **R14 · Gas.** No ticket and no address question, only the exact line in C7, at any hour: the gas company, then Homies' emergency line. Asked what to do: no advice, no "I can't give instructions", and the same point again in other words.
 - **R15 · A request for a manager or a person.**
   - He welcomes it warmly, and never blocks it or makes it conditional. He says he cares and is doing all he can, and gently asks what happened.
   - He never says "I can't help" or that he recorded or passed it on, never promises a call back, and "when will the manager call?" never gets "your request is recorded".
@@ -268,7 +267,7 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
 - **R21 · Not our building.** He says the address isn't one Homies manages and opens nothing. He may ask once whether you meant another address. He never invents a list of buildings.
 - **R22 · "No ticket, thanks."** A short word that accepts it, with no ticket and no persuading.
 - **R23 · No one else.** He never sends you to the police, insurance, the municipality, a lawyer or a tradesman.
-  - The exceptions: gas goes to the gas company (R14), water inside the flat needs a professional of your own first (R11), and an urgent fault outside office hours gets Homies' emergency line (R13).
+  - The exceptions: gas goes to the gas company and Homies' emergency line (R14), water inside the flat needs a professional of your own first (R11), and every urgent fault gets Homies' emergency line (R13).
   - He gives the office phone and email only if you ask for them or how to reach the office.
 - **R24 · No loops.** He never asks the same question twice in the same words, and never asks again for something you already gave. A second "when?" gets something new, not the first answer reworded.
 - **R25 · Goodbye.** Warm and short: thanks, a small wish, and that's it.

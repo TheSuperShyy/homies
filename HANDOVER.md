@@ -8,11 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **NOTED 11 Nov, 13:20 UTC: HOMIES HAS ITS OWN EMERGENCY HOTLINE, A DEPARTMENT, FOR ANY TYPE OF EMERGENCY. ITS NUMBER HAS NOT REACHED US** (owner: *"when we have like an emergency any type of emergency we have a direct hotline specially built for that its a department the number is not given to us yet"*; CONTEXT, under Yariv's 9 Nov review, lists where the number stands; WORKLOG 11 Nov).
->   - **Today, unchanged:** an urgent fault outside Sun-Thu 09:00-17:00 Israel gets the urgent ticket plus 077-6687949, the office line Yariv gave on 9 Nov as the emergency centre. In office hours the ticket only. Gas gets the gas company only, at any hour. The incoming phone agent does the same. An emergency's Chatwoot note goes to Operations.
->   - **When the number comes:** it replaces 077-6687949 as the emergency number on WhatsApp (inject, facts, Send's danger v6, gate cases, tester brief, new epoch, through the gate), then in the phone agent's prompt in spoken form. The office line stays for everything else.
->   - **Open with it:** at any hour or after hours only; gas beside the gas company ("any type" reads as yes).
->   - **The reply to Yariv** (`local/yariv/2026-11-11-reply-to-9nov-review.txt`, ours to draft, the owner's to send) still gives 077-6687949 in 6.2 and still asks whether gas gets the emergency centre after hours.
+> **LIVE 11 Nov, 13:43 UTC: EVERY EMERGENCY GETS HOMIES' EMERGENCY LINE, 077-6687949, AT ANY HOUR, SAID POLITELY** (owner: *"0776687949 this is the hotline so all the emergency service redirect them here in a polite way"*, after *"we have a direct hotline specially built for that its a department"*; `scripts/n8n_whatsapp_hotline.py`, epoch 104; WORKLOG and CONTEXT 11 Nov). The hotline is the office number Michael already gave after hours.
+>   - **What a tenant gets now:**
+>     - **An urgent fault, at any hour:** the urgent ticket and its number plus the line, in his first message about it, even before the ticket when the building is still needed. Pressed, the line again.
+>     - **Gas:** the gas company, then the line, word for word. Still no ticket.
+>     - Until today the line came only outside Sun-Thu 09:00-17:00 Israel, and gas got the gas company only.
+>   - **Send's danger v7:** keeps the line at any hour; a word of recommending beside it ("אני ממליץ", "כדאי") is no longer advice. On the turn that opened the urgent ticket or the emergency note, a reply with no line gets "למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.", after the ticket's sentence or else before the closing question.
+>   - **Read back:** the prompt `682eb096d52a` (25,972 characters); memory key `-104`; danger v7 present; the office-hours test gone. The re-run reports nothing to do.
+>   - **Checked:** the gate passes all 591 cases on the candidate and on live (13 new, seen failing first on a v7 label without the code). The replay changes 5 old replies, each an old line given with 077-6687949 that v6 cut and v7 keeps. No patcher would write over it; the hello patcher now refuses as superseded. No model run, as for epoch 103.
+>   - **Owed: the owner's own check.** The safe one is gas, "יש ריח של גז בחדר המדרגות": no ticket. A smoke message opens a real urgent ticket, and from the +63 it also opens in Homies' OXS. Then `check_whatsapp_rules.py --watch 2026-11-11T13:43`.
+>   - **Owed: the incoming phone agent's twin.** It still gives the line after hours only (`docs/assistant/demo-inbound.md`).
+>   - **Stale now:** item 6.2 of the reply to Yariv (`local/yariv/2026-11-11-reply-to-9nov-review.txt`) and of the live reviewers' page (`/review/yariv`) describe the after-hours rule and ask about gas.
+>   - **Chatwoot:** an emergency's note goes to the Operations team. The hotline is a department of its own; its people need a team and logins for the note to reach them.
+>   - **Rollback:** `python scripts/n8n_whatsapp_hotline.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-hotline.json`), then `git revert` the repo side (prompt.md, the epoch, the pin, the gate's cases).
 >
 > **LIVE 11 Nov, 12:02 UTC: A HELLO GETS MICHAEL'S INTRO, NO BUTTONS** (owner: *"lets remove the button each hi so every opening message will receive the intro only"*, then the exact shape after examples: *"Hi good morning or good afternoon. this is michael from homies how can i help you today"*; `scripts/n8n_whatsapp_hiintro.py`, epoch 103; WORKLOG and CONTEXT 11 Nov).
 >   - **What a bare hello gets now:** "היי, <בוקר טוב / צהריים טובים / ערב טוב> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" ("היי" alone before 05:00), as plain text. The next reply neither greets nor says who he is.
@@ -190,7 +198,7 @@ appended to.
 >     - The lift company is named on opening, on "when?" (a second one too) and on the status, and the lift details are asked.
 >     - Water in a flat needs the tenant's professional first, unless it is known to come from the common property.
 >     - A standing order's tenant hears collections will phone (promise v6).
->     - Homies' emergency line, 077-6687949, comes with an urgent call outside Sun-Thu 09:00-17:00 (the inject's office-hours mark, danger v6).
+>     - Homies' emergency line, 077-6687949, comes with an urgent call outside Sun-Thu 09:00-17:00 (the inject's office-hours mark, danger v6). **Since 11 Nov, 13:43 UTC: at any hour, gas too (danger v7, epoch 104; the top block).**
 >   - **Read back, live (`u2JjrbcNPYyyh3yl`) and the UChat copy (`mKheBsTxtcMhPxu7`):** active; prompt `fbca40b23dd0` (26,021 characters); memory `-100` and `-100-uchat`; danger v6 and promise v6 in Send; the hours mark in the inject; the callback in request_standing_order; all 17 pins equal.
 >   - **Checked:**
 >     - The gate on live passes 560/560 with 17/17 pins. The replay changed 0 of 1,405 real replies.

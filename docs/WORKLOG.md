@@ -11,6 +11,36 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: every emergency gets Homies' emergency line, 077-6687949, at any hour, said politely (owner: "0776687949 this is the hotline so all the emergency service redirect them here in a polite way"), 13:43 UTC, epoch 104
+- **The hotline is the number Michael already gave:** the office line, which Yariv named "our telephone emergency centre" on 9 Nov. What changed is when: every urgent fault at any hour, not only outside Sun-Thu 09:00-17:00 Israel, and gas too. On gas I had said "I'll add the hotline next to the gas company unless you say otherwise"; the owner answered with the number and "all the emergency service".
+- **`scripts/n8n_whatsapp_hotline.py`, one write to the live bot:**
+  - **The prompt,** 5 sentence edits, 25,850 → 25,972 characters, `a5b5db23f7ca` → `682eb096d52a`:
+    - the line at any hour, politely ("words that invite the call, not as if you pass him on"), from his first message about it, even before the ticket;
+    - the pressed reply names it at any hour;
+    - "nobody is sent anywhere" and "the office phone is only for ..." lose "outside office hours";
+    - the gas sentence, word for word, gains "אפשר גם להתקשר למוקד החירום הטלפוני שלנו, 077-6687949." after the gas company, and its "what do I do?" answer does too.
+  - **Send, danger v7:** the line stays at any hour, since the office-hours test is gone, and a word of recommending beside it is no longer advice. On the turn that opened the urgent ticket or the emergency note, a reply with no line gets "למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.", right after the ticket's sentence or else before the closing question. A later turn adds nothing.
+  - **Memory:** epoch 103 → 104.
+- **The repo moved first:** prompt.md (the patcher's own edits, each anchor once), `MEMORY_EPOCH`, `EPOCH_COVERS`, the prompt's pin, the tester's brief.
+- **The gate:**
+  - 13 new cases for danger v7, three of them on the prompt; `extract()` now hands the cases the prompt.
+  - The v5 and v4 blocks are keyed by number (`dangerV`): `danger v[56]` and `v[456]` would have stopped running at v7.
+  - The 9 Nov block runs on v6 and v7, each with its own answers.
+- **Checked before the write:**
+  - 578/578 on live with the new cases in, dormant on v6;
+  - red first: a candidate labelled v7 without the code failed 18 cases;
+  - the dry run, with Send compiled by node;
+  - 591/591 on the candidate, all 17 pins equal with the new prompt pin;
+  - the replay: 5 of 1,535 replies change, each an old reply giving 077-6687949 that v6 cut (no clock reads as open) and v7 keeps; 0 of 1,486 messages; nothing broken;
+  - the idle check against the same check on live: no patcher would write over it. `hiintro` now refuses as superseded ("not epoch 102's"); `fresh`, `patch`, `retest7` and `hotline` itself are idle.
+- **After the write:** the read-back matched (the prompt, `-104`, danger v7, the office-hours test gone, the added sentence present); the re-run reported nothing to do; 591/591 on live.
+- **No model run,** as for epoch 103: the owner's phone is the test.
+- **Owed:**
+  - The owner's own check. Gas is the safe one ("יש ריח של גז בחדר המדרגות"): no ticket. A smoke message opens a real urgent ticket, and from the +63 it also opens in Homies' OXS.
+  - `--watch 2026-11-11T13:43` once real turns come in.
+  - The incoming phone agent's twin: it still gives the line after hours only.
+- **Stale now:** item 6.2 of the reply to Yariv and of the live `/review/yariv` page.
+
 ### A fact from the owner, recorded: Homies has its own emergency hotline, a department, for any type of emergency, and its number has not reached us (owner: "ok so when we have like an emergency any type of emergency we have a direct hotline specially built for that its a department the number is not given to us yet"), 13:20 UTC
 - **Read only, what happens today:** an urgent fault outside Sun-Thu 09:00-17:00 Israel gets the urgent ticket plus 077-6687949, which Yariv gave on 9 Nov as "our telephone emergency centre" (`docs/discovery/feedback-yariv-2026-11-09.md`, 6.2). It is the office line. In office hours the ticket only. Gas gets the gas company only, at any hour. The incoming phone agent does the same since 10 Nov. Before epoch 100 the facts said the opposite, "אין קו חירום נפרד".
 - **Where 077-6687949 stands as the emergency number,** so the swap is quick when the number comes: the inject's after-hours sentence and the facts' טלפון line (`scripts/n8n_whatsapp_feedback9.py`), the sentence Send's danger v6 keeps, the gate's `HOTL` cases (`scripts/check_whatsapp_rules.js`), the Grok tester's brief, and the phone agent's office paragraph in spoken form (`docs/assistant/demo-inbound.md`). The office line itself stays wherever it means the office.

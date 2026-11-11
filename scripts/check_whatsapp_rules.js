@@ -70,6 +70,11 @@ const content = (E, o) => sent(E, o).content;
 const promiseV = (body) => { const m = String(body || '').match(/const pv = 'promise v(\d+)'/); return m ? +m[1] : 0; };
 // 11 Nov: Send's manners version, the same way (n8n_whatsapp_hiintro.py made it v5).
 const mannersV = (body) => { const m = String(body || '').match(/const mv = 'manners v(\d+)'/); return m ? +m[1] : 0; };
+// 11 Nov: Send's danger version, the same way (n8n_whatsapp_hotline.py made it v7: our emergency line at any hour).
+// The v5 and v4 blocks below were keyed to 'danger v[56]' and 'danger v[456]' and would have stopped at v7.
+const dangerV = (body) => { const m = String(body || '').match(/const dv = 'danger v(\d+)'/); return m ? +m[1] : 0; };
+// 11 Nov (n8n_whatsapp_hotline.py, danger v7): the one sentence Send adds when an emergency turn's reply has no line.
+const HOTS = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
 
 function mask(s) {
   return String(s).replace(/https?:\/\/\S+/g, '<link>').replace(/\+?\d{9,15}/g, '<phone>')
@@ -847,17 +852,22 @@ function cases(E) {
     const ALERT = [{ action: { tool: 'notify_team', toolInput: { reason: 'emergency' } }, observation: ob({ ok: true }) }];
     const OPENED_LINE = 'הבנתי, תודה! פתחתי קריאת חירום עבורך, מספר הקריאה הוא 255-1349-26. אני כאן לכל עדכון.';
     const PUSHED = 'פתחתי לך קריאה דחופה, מספר 255-1349-26, וזה הדבר היחיד שאני יכול לעשות מכאן.';
-    expect('the first word of an emergency: "right away" goes, the question for the address stays',
+    // 11 Nov, danger v7: the turn that opened the urgent ticket or the emergency note always carries our line.
+    const V7 = dangerV(P.code.send_body) >= 7;
+    expect('the first word of an emergency: "right away" goes, the question for the address stays'
+      + (V7 ? ', and our emergency line comes before it' : ''),
       say({ reply: 'אוי ואבוי! זה נשמע מסוכן מאוד! אני מעביר את זה לצוות החירום שלנו באופן מיידי. באיזה בניין מדובר?',
         said: 'יש מים שנוזלים מהתקרה בחדר מדרגות ישר על המנורה!!! מה עושים??', steps: ALERT }),
-      'אוי ואבוי! זה נשמע מסוכן מאוד! באיזה בניין מדובר?');
-    expect('the ticket opened: "on the way" and every instruction go, the ticket and its number stay',
+      V7 ? 'אוי ואבוי! זה נשמע מסוכן מאוד! ' + HOTS + ' באיזה בניין מדובר?' : 'אוי ואבוי! זה נשמע מסוכן מאוד! באיזה בניין מדובר?');
+    expect('the ticket opened: "on the way" and every instruction go, the ticket and its number stay'
+      + (V7 ? ', our emergency line right after the ticket' : ''),
       say({ reply: 'הבנתי, תודה! פתחתי קריאת חירום עבורך, מספר הקריאה הוא 255-1349-26. הצוות שלנו כבר בדרך לטפל בזה. לגבי כיבוי חשמל - '
         + 'אל תנסה לגעת בשום דבר שקשור לחשמל או למים בעצמך. בבקשה תתרחק מהאזור הרטוב. הבטיחות שלך היא הכי חשובה עכשיו. אני כאן לכל עדכון.',
-        said: 'בר כוכבא 23. מה אני עושה בינתיים, לכבות חשמל??', steps: URGENT }), OPENED_LINE);
+        said: 'בר כוכבא 23. מה אני עושה בינתיים, לכבות חשמל??', steps: URGENT }),
+      V7 ? 'הבנתי, תודה! פתחתי קריאת חירום עבורך, מספר הקריאה הוא 255-1349-26. ' + HOTS + ' אני כאן לכל עדכון.' : OPENED_LINE);
     // 6 Nov, danger v5 (n8n_whatsapp_retest.py): the step appends one line only, the plain one. "וזה הדבר
     // היחיד שאני יכול לעשות מכאן" was the line the owner disliked on 5 Nov; v4 still appended it to a question.
-    const V5 = /const dv = 'danger v[56]'/.test(String(P.code.send_body || ''));  // v6 (9 Nov) keeps v5's line
+    const V5 = dangerV(P.code.send_body) >= 5;  // v6 (9 Nov) and v7 (11 Nov) keep v5's line
     const APPENDED = V5 ? 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26.' : PUSHED;
     expect('pushed for a number to call: only the ticket line',
       say({ reply: 'אין לי מספר לתת לך להתקשר אליו ישירות, אבל הצוות עודכן ומטפל בזה. בבקשה תמשיך להישאר רחוק מהאזור המסוכן.',
@@ -902,7 +912,7 @@ function cases(E) {
       say({ reply: GAS, said: 'יש ריח של גז בחדר המדרגות', S: { last_bot: PUSHED } }), GAS);
     // 19 Oct, danger v4 (the "when will they come?" paragraph): who and whether,
     // under "I can't see / know", and a fronted "I can't promise", are honest.
-    if (/const dv = 'danger v[456]'/.test(String(P.code.send_body || ''))) {
+    if (dangerV(P.code.send_body) >= 4) {
       const WHO = 'פתחתי קריאה דחופה, 255-1349-26, והצוות כבר יודע על העשן. מי יבוא ומתי, את זה אני לא רואה מכאן. אני כאן איתך.';
       expect('v4: "who is coming and when, I can\'t see from here" stays whole', say({ reply: WHO, said: 'מישהו בא??', S: { last_bot: PUSHED } }), WHO);
       const WHETHER = 'אם ומתי מישהו מגיע, את זה אני לא יכול לדעת מכאן, כי את זה קובעים בצוות. ' + PUSHED;
@@ -1562,8 +1572,13 @@ function cases(E) {
   const SB9 = String((P.code || {}).send_body || '');
   const ob9 = (o) => JSON.stringify([{ results: [{ toolCallId: 'wa', result: JSON.stringify(o) }] }]);
   const clock9 = (time, weekday) => ({ setZone: () => ({ toFormat: () => time, weekday }) });
-  if (SB9.indexOf("const dv = 'danger v6'") !== -1) {
-    console.log(NL + "--- Send: after hours an urgent call gets our emergency line too (9 Nov, Yariv's 6.2 / 6.3) ---");
+  if (dangerV(SB9) >= 6) {
+    // 11 Nov (n8n_whatsapp_hotline.py, danger v7). The owner: "0776687949 this is the hotline so all the emergency
+    // service redirect them here in a polite way". The line stays at any hour, and the turn whose tools opened the
+    // urgent ticket or the emergency note always carries it: HOTS, when the reply has none. v6 keeps its own answers.
+    const V7 = dangerV(SB9) >= 7;
+    console.log(NL + (V7 ? '--- Send: an urgent call gets our emergency line at any hour (11 Nov, the owner) ---'
+      : "--- Send: after hours an urgent call gets our emergency line too (9 Nov, Yariv's 6.2 / 6.3) ---"));
     const FRI = clock9('21:10', 5);
     const EARLY = clock9('08:30', 1);
     const SUN = clock9('12:20', 7);
@@ -1574,19 +1589,69 @@ function cases(E) {
       () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }), OPEN9 + ' ' + HOTL);
     expect('before 09:00 on a weekday: the same',
       () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: EARLY }), OPEN9 + ' ' + HOTL);
-    expect('in office hours the line goes and the ticket stays',
-      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }), OPEN9);
-    expect('no clock (a replay, an old test) reads as open: the line goes',
-      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG }), OPEN9);
-    expect('after hours, any other number still goes',
-      () => content(E, { reply: OPEN9 + ' אפשר גם להתקשר למד"א ב-101.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }), OPEN9);
-    expect('after hours, advice in the same sentence as our line still goes',
-      () => content(E, { reply: OPEN9 + ' תתרחק מהמים ותתקשר למוקד שלנו, 077-6687949.', said: 'מה לעשות?', steps: URG, now: FRI }), OPEN9);
+    expect(V7 ? 'in office hours the line stays too' : 'in office hours the line goes and the ticket stays',
+      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }), V7 ? OPEN9 + ' ' + HOTL : OPEN9);
+    expect(V7 ? 'no clock (a replay, an old test): the line stays' : 'no clock (a replay, an old test) reads as open: the line goes',
+      () => content(E, { reply: OPEN9 + ' ' + HOTL, said: 'בר כוכבא 23 דירה 2', steps: URG }), V7 ? OPEN9 + ' ' + HOTL : OPEN9);
+    expect(V7 ? 'any other number still goes, and our line takes its place' : 'after hours, any other number still goes',
+      () => content(E, { reply: OPEN9 + ' אפשר גם להתקשר למד"א ב-101.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }),
+      V7 ? OPEN9 + ' ' + HOTS : OPEN9);
+    expect(V7 ? 'advice in the same sentence as our line still goes, and our line comes back on its own'
+      : 'after hours, advice in the same sentence as our line still goes',
+      () => content(E, { reply: OPEN9 + ' תתרחק מהמים ותתקשר למוקד שלנו, 077-6687949.', said: 'מה לעשות?', steps: URG, now: FRI }),
+      V7 ? OPEN9 + ' ' + HOTS : OPEN9);
     expect('after hours, pressed with no tool this turn: the line stays beside the urgent ticket',
       () => content(E, { reply: 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + HOTL, said: 'מה לעשות??', S: { last_bot: OPEN9 }, now: FRI }),
       'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + HOTL);
-    expect('after hours, "someone is on the way" still goes',
-      () => content(E, { reply: OPEN9 + ' הצוות כבר בדרך אלייך.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }), OPEN9);
+    expect(V7 ? '"someone is on the way" still goes, and our line comes' : 'after hours, "someone is on the way" still goes',
+      () => content(E, { reply: OPEN9 + ' הצוות כבר בדרך אלייך.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: FRI }),
+      V7 ? OPEN9 + ' ' + HOTS : OPEN9);
+    if (V7) {
+      const LINE7 = 'אפשר להתקשר עכשיו למוקד החירום הטלפוני שלנו, 077-6687949.';
+      expect('v7: in office hours, pressed with no tool this turn: the line stays beside the urgent ticket',
+        () => content(E, { reply: 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + LINE7, said: 'מה לעשות??', S: { last_bot: OPEN9 }, now: SUN }),
+        'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + LINE7);
+      expect('v7: an urgent ticket whose reply has no line: our line right after the ticket, before the question',
+        () => content(E, { reply: OPEN9 + ' יש עוד משהו שחשוב שאדע על המצב שם?', said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }),
+        OPEN9 + ' ' + HOTS + ' יש עוד משהו שחשוב שאדע על המצב שם?');
+      const ALERT7 = [{ action: { tool: 'notify_team', toolInput: { reason: 'emergency' } }, observation: ob9({ ok: true }) }];
+      expect('v7: the emergency note before any ticket (no building yet): our line comes before the question',
+        () => content(E, { reply: 'זה נשמע מסוכן. באיזה בניין זה קורה?', said: 'יש עשן בחדר המדרגות!!', steps: ALERT7, now: SUN }),
+        'זה נשמע מסוכן. ' + HOTS + ' באיזה בניין זה קורה?');
+      const OWN7 = OPEN9 + ' אני ממליץ להתקשר עכשיו למוקד החירום הטלפוני שלנו, 077-6687949. יש עוד משהו שחשוב שאדע?';
+      expect('v7: his own polite line stays, "I recommend" included, and none is added',
+        () => content(E, { reply: OWN7, said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }), OWN7);
+      const BARE7 = OPEN9 + ' אפשר להתקשר למוקד החירום שלנו בטלפון 0776687949.';
+      expect('v7: the number written without a dash counts: none is added',
+        () => content(E, { reply: BARE7, said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }), BARE7);
+      expect('v7: "I recommend" with advice in the same sentence still goes, and our line comes on its own',
+        () => content(E, { reply: OPEN9 + ' כדאי לצאת מהבניין ולהתקשר למוקד שלנו, 077-6687949.', said: 'מה לעשות?', steps: URG, now: SUN }),
+        OPEN9 + ' ' + HOTS);
+      expect('v7: everything cut: the urgent ticket line, then our line',
+        () => content(E, { reply: 'הצוות כבר בדרך אלייך.', said: 'בר כוכבא 23 דירה 2', steps: URG, now: SUN }),
+        'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. ' + HOTS);
+      const NORM7 = [{ action: { tool: 'open_request', toolInput: { urgency: 'normal', type: 'cleaning' } }, observation: ob9({ ok: true, reference: '255-1398-26' }) }];
+      const CLEAN7 = 'פתחתי קריאה על הניקיון בחדר המדרגות, מספר 255-1398-26. יש עוד משהו שאוכל לעזור בו?';
+      expect('v7: a ticket that is not urgent gets no line',
+        () => content(E, { reply: CLEAN7, said: 'לא ניקו את חדר המדרגות', steps: NORM7, now: SUN }), CLEAN7);
+      const AGAIN7 = 'הקריאה הדחופה שלך פתוחה, מספר 255-1349-26. משהו השתנה מאז?';
+      expect('v7: a later turn with no tool and no line: none is added (it came with the ticket)',
+        () => content(E, { reply: AGAIN7, said: 'עדיין יש עשן', S: { last_bot: OPEN9 + ' ' + HOTS }, now: SUN }), AGAIN7);
+      const GAS7 = 'במקרה של גז, צריך לפנות לחברת הגז שמספקת את הגז לבניין ולדווח לה ישירות. '
+        + 'אפשר גם להתקשר למוקד החירום הטלפוני שלנו, 077-6687949. יש עוד משהו בבניין שאני יכול לבדוק בשבילך?';
+      expect('v7: the gas sentence with our line goes whole, even right after an urgent ticket, in office hours',
+        () => content(E, { reply: GAS7, said: 'יש ריח של גז בחדר המדרגות', S: { last_bot: OPEN9 }, now: SUN }), GAS7);
+      const PR7 = String((P.code || {}).prompt || '');
+      if (PR7) {
+        expect('v7 prompt: our line is no longer tied to the office hours',
+          () => PR7.indexOf('רק כשכתוב לך שעכשיו מחוץ לשעות הפעילות') === -1 && PR7.indexOf('ומחוץ לשעות הפעילות גם את המוקד') === -1
+            && PR7.indexOf('ומתקלה דחופה מחוץ לשעות הפעילות') === -1, true);
+        expect('v7 prompt: every urgent fault, at any hour, politely, from his first message about it',
+          () => PR7.indexOf('על כל תקלה דחופה, בכל שעה, אתה גם מפנה אותו בנימוס למוקד החירום הטלפוני שלנו, 077-6687949') !== -1
+            && PR7.indexOf('כבר בהודעה הראשונה שלך על המקרה, גם אם עוד לא פתחת את הקריאה') !== -1, true);
+        expect('v7 prompt: the gas sentence, word for word, carries our line', () => PR7.indexOf('"' + GAS7 + '"') !== -1, true);
+      }
+    }
     // Yariv's own lift sentences (2.2 and 2.3) go out whole, even where this step is awake.
     const HIGH = [{ action: { tool: 'open_request', toolInput: { urgency: 'high', type: 'elevator' } }, observation: ob9({ ok: true, reference: '255-1600-26' }) }];
     const Y22 = "פתחתי את הקריאה בדחיפות גבוהה על המעלית בבר כוכבא 23, רשמתי אותה על דירה 2, מספר הקריאה בהומי'ז הוא 255-1600-26. "

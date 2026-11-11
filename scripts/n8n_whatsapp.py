@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 103
+MEMORY_EPOCH = 104
+# 103 -> 104, 11 Nov, later (n8n_whatsapp_hotline.py): every urgent fault gets our emergency line, 077-6687949, at
+# any hour and politely, from his first message about it; the gas sentence gains it after the gas company. Send's
+# danger v7 keeps the line at any hour and adds one sentence on the emergency turn when the reply has none.
 # 102 -> 103, 11 Nov (n8n_whatsapp_hiintro.py): a bare hello gets "היי, <the hour's greeting> 👋 כאן מיכאל
 # מהומי'ז. במה אוכל לעזור לך היום?" with no buttons. The prompt's greeting paragraph says the system now gave his
 # name, so the next reply neither greets nor says who he is; the tap paragraph no longer says the buttons came with
@@ -811,8 +814,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "a5b5db23f7ca",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, epoch 103, the greeting introduces
-    # Michael, no buttons). Before: 8546b335b582 (10 Nov, later, epoch 102, the lift line without "urgently");
+    "prompt": "682eb096d52a",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, later, epoch 104, our emergency line
+    # at any hour, gas too). Before: a5b5db23f7ca (11 Nov, epoch 103, the greeting introduces Michael, no buttons);
+    # 8546b335b582 (10 Nov, later, epoch 102, the lift line without "urgently");
     # ce596f4e9f9a (10 Nov, epoch 101, the one-voice exception by the matter);
     # fbca40b23dd0 (9 Nov, epoch 100, Yariv's review)
     "inject": "fd710a52a21b",   # LIVE's (9 Nov, epoch 100: the clock line says when the office is closed;
