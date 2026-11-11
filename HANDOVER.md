@@ -152,6 +152,7 @@ appended to.
 >     - ~~The Grok tester's short retest.~~ It came back on 10 Nov as a full run (48 messages, in office hours), and its fails led to epoch 101 above. C6.2 sent no email: 255-1417-26 is still open, so it answered "already recorded".
 >     - ~~The phone agent gets the same changes after the chatbot, on the owner's word.~~ Done 10 Nov, 11:00 UTC (the block at the top).
 >   - **For Yariv (drafted to the owner):**
+>     - **11 Nov: a reply to all 12 comments is drafted,** `local/yariv/2026-11-11-reply-to-9nov-review.txt` (Hebrew in the WhatsApp shape, with an English check copy; owner: *"send me a reply for all those list yariv have"*). The owner sends it. It asks four things: the 1.1 buttons, the working hours, gas after hours, and names and emails per department for the Chatwoot logins. Whether it was sent is not known here.
 >     - The 1.1 menu is his decision: no buttons, or other or more.
 >     - Gas after hours: the gas company's line only, or the emergency line too.
 >     - Whether Sun-Thu 09:00-17:00 are the hours to use.

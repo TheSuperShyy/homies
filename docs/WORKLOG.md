@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### A reply to Yariv's 12 comments, drafted (owner: "ok now send me a reply for all those list yariv have"; nothing sent), about 08:00 UTC
+- **Where:** `local/yariv/2026-11-11-reply-to-9nov-review.txt` (gitignored): the Hebrew message, an English check copy and three notes. Given to the owner in chat; the owner sends it.
+- **The shape:** the owner's WhatsApp update to Yariv. "עדכון קצר לגבי ההתקדמות, …", one plain paragraph per topic opening "לגבי …,", first person plural, no bold, "תודה!". Seven paragraphs for the 12 comments: the opening message (1.1), the lift (2.1-2.4, 4.1), a leak in a flat (3.2), the payment link (5.1), a standing order (5.2), urgent faults after hours (6.2, 6.3), a manager request (7.2). Yariv is addressed in forms that read the same for a man or a woman, and in the plural for what Homies decides.
+- **Checked before writing, read only:**
+  - the lift, the leak, the after-hours line and the gas line against the prompt in the repo (epoch 102) and the replies of 10-11 Nov;
+  - **the standing order's email has not reached Homies yet:** "Homies — Standing order email" (`qwFc7ObfclFHMsuD`, address changed 9 Nov 13:20 UTC) keeps two runs, both of 8 Nov. The message says so and asks Yariv to confirm the first one;
+  - the email carries the name, the phone, the building and the flat (`n8n_standing_order_email.py`);
+  - gas's one line is the client's own, from the 4 Nov review (CONTEXT), so the message asks whether the emergency centre should join it after hours;
+  - the manager paragraph follows this morning's real request and the pause as read from live.
+- **It asks Yariv four things:** the 1.1 buttons, the working hours (Sun-Thu 09:00-17:00), gas after hours, and names and emails per department for the Chatwoot logins.
+- **Said to the owner:** the sentence "from the moment a representative answers, Michael stops" rests on the pause check the owner is running.
+- Nothing was changed, sent or spent. HANDOVER points to the file from the 9 Nov block's "For Yariv". CONTEXT is unchanged: a draft, not a rule.
+
 ### Read only: the owner's real manager request, seen end to end; and a reply for the pause check (owner: "give me a reply for the manager i wanna check if chatwoot pause for hiuman intervention works"), about 07:45 UTC
 - **The real message, 07:38:05 UTC, from the owner's handset to the Israeli number** (conversation 1): "אני לא רוצה לדבר עם בוט, תביא לי מנהל".
   - 07:38:37: "Hand to a person" ran (`caller_request`, the model's `management`, in hours, not skipped) and posted the private note "@הנהלה דייר צריך מישהו מכם. סיבה: הדייר ביקש לדבר עם בן אדם. …".
