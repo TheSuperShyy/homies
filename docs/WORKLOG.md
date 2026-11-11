@@ -25,6 +25,7 @@ conversation that produced it.
 - **The test Sends were removed,** four files in all, each listed before it was deleted. No Send of the owner's existed yet.
 - **Said to the owner:** this local page is the 3 Nov replies, not today's; a local Send stays on this PC and reaches neither the database nor Yariv.
 - The server was restarted and the page opened in the owner's browser. Nothing in the repo changed besides this log and HANDOVER. The bot is untouched.
+- **The owner's first Send, read back at their ask ("i try sending answer check if it was saved"):** saved at 08:27:25 UTC as `local/checklist/sent/2026-11-11T08-27-25Z.json`: 1.1 marked right, no comment. The live page's `reply_reviews` still has 0 sends (`python scripts/reply_reviews.py`).
 
 ### A question answered, read only: how the checklist saves (owner: "the check list how to save it? is it auto save?"), about 08:25 UTC
 - **The local page** (`localhost:8787/`, the 3 Nov replies): a ✓ or ✗ saves at once and a comment 0.7 s after the typing stops, into that browser's own storage (`homies-michael-simulation-v1`). There is no Send, nothing reaches a database, and we cannot read those marks.
