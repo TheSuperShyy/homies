@@ -22,6 +22,16 @@
 
 .wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; }
 
+/* The page's two sections (11 Nov): Michael's replies, and Yariv's comments beside our answers. The strip
+   sits above the bar and scrolls away; the bar is what stays. */
+.tabs { background: var(--panel); border-bottom: 1px solid var(--line); }
+.tabsInner { display: flex; flex-wrap: wrap; gap: 6px; padding-block: 8px; }
+.tab {
+  text-decoration: none; border: 1px solid var(--line-2); border-radius: 99px; padding: 3px 14px;
+  font-size: 14px; color: var(--muted);
+}
+.tab[aria-current='page'] { background: var(--ink); border-color: var(--ink); color: var(--panel); font-weight: 600; }
+
 /* The bar: counts, filters and Send stay in reach while scrolling. */
 .bar { position: sticky; top: 0; z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line); }
 .barInner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 10px; }

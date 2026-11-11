@@ -78,8 +78,10 @@ export async function middleware(request: NextRequest) {
   // /review (10 Nov) is the one other page a logged-out visitor may open: the reviewers' page, where
   // Yariv's team marks Michael's replies. It shows nothing without the key in its link, and its data is
   // reached only through migration 040's two key-checking functions, so RLS still holds the line.
+  // /review/yariv (11 Nov) is its second section, Yariv's comments beside our answers. It asks the same
+  // function whether the key is real and shows nothing without it.
   const path = request.nextUrl.pathname;
-  const open = path === '/login' || path === '/review';
+  const open = path === '/login' || path === '/review' || path === '/review/yariv';
   if (!user && !open) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
