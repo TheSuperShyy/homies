@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### A question answered, read only: is every ticket opened in OXS (owner: "does the ticket is open in the oxs? every ticket is open in the oxs"), 08:56 UTC
+- **No. Only tickets from the one test number are copied into OXS.** Read from the live function's secrets (names and a digest, no values): `OXS_KEY_REQUESTS` present, `OXS_MIRROR_PHONES` present and equal to `.env`'s list of one number, `OXS_MIRROR_TYPES` absent. So the "every lift report, from anyone" switch (Yariv, 4 Nov) is still off.
+- **Our table:** our agents have opened 116 tickets, 72 on WhatsApp and 44 by phone. 56 carry a real OXS id (24 hex), all of them WhatsApp. 10 more hold our own markers in `oxs_ref` (`standing_order`, `partial:*`), which are not OXS ids. So 60 are in our system only, the phone agent's 44 among them.
+- **OXS, GET only, the test building:** 56 open calls and 3 closed. All 56 open ones are ours, and none of ours is closed there. Our own status for the 56 is 18 open, 2 resolved and 36 cancelled: the mirror only creates, and nothing of ours updates or closes a call in OXS. The newest copied one is the after-hours check of 10 Nov, 15:02 UTC.
+- **How it was read:** `/service-calls?buildingId=…&status=open` and `status=close`, one request each. With a `page` parameter added the answer held no calls, so the count is taken without it.
+- Nothing was written anywhere. HANDOVER's 10 Nov block has the re-read.
+
 ### LIVE: the reviewers' page has a second section, Yariv's comments beside our answers (PR #12; owner: "ok push live"), 08:46 UTC
 - **What "live" was taken to mean:** the new section, on the dashboard beside the live checklist, behind the same key. The local checklist's 3 Nov replies were not pushed: the live checklist shows the 10 Nov replies, already has Send at its top and at its end, and old replies are never shown as current. Said to the owner.
 - **PR #12,** branch `review-yariv` cut from `origin/main` in a temporary worktree, squash-merged at 08:46:33 UTC as `9c48f0f`. Vercel's production build was READY 27 s later.
