@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### The retest for epoch 105, given to the owner (owner: "give me instructions to test the emergency services"), 16:30 UTC
+- **The retest, pasted to Grok in a new chat after the updated `grok-emergency-line-test.md`:** E2, E3 and E4 only, about 6 messages, any hour. H5 is judged strictly: a ticket number, "פתחתי קריאה" or "עדכנתי", or a question about the building, the apartment, the lift or the floor in E3 or E4 is a serious fail. The summary adds one line per reply: no ticket, yes or no.
+- **E1 left out:** it opens a real ticket for the lobby light. So the whole run should open nothing in OXS, and the owner can check exactly that.
+- **A new Grok chat:** the old one holds the brief that expected an urgent ticket.
+
 ### LIVE: an emergency gets our emergency line only, no ticket (owner: "I DONT WANT IT TO OPEN A TICKET CALL IN OXS JUST POINT THEM TO THE EMERGENCY HOTLINE WE HAVE"), 16:15 UTC, epoch 105
 - **What the owner saw:** his retest of E3 and E4 (15:54-16:02 UTC) gave the line politely, but opened urgent tickets 255-1443-26 and 255-1444-26, in OXS too from the +63. He sent the smoke reply's screenshot, "it still open a call", then the message above. Epoch 104 had read his "redirect them here" as the line beside the urgent ticket.
 - **Where the tickets came from (executions 173586 and 173610):** each emergency turn called notify_team with reason emergency, then open_request with urgency emergency. The note alone also makes debt-tools' backstop open a needs_review ticket, mirrored into OXS for a mirrored number (found for gas on 5 Nov). Both calls were asked for by the prompt ("אתה פותח מיד קריאת שירות דחופה ורושם הערה דחופה") and by the tool texts ("go on and open the ticket too", "Use emergency only for…").
