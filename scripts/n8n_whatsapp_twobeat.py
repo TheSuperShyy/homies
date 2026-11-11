@@ -191,8 +191,10 @@ def main():
 
     edit("Send", "jsonBody", SEND_T_OLD, SEND_T_NEW,
          "Send: splits the reply on %s and posts the first half" % SEP)
-    edit("Send", "jsonBody", SEND_IF_OLD, SEND_IF_NEW,
-         "Send: the menu rows are suppressed when the reply splits (open)")
+    # 11 Nov (n8n_whatsapp_hiintro.py): the greeting branch is gone, so the guard opens straight onto the rest.
+    if "if (!two && (" not in (by["Send"]["parameters"].get("jsonBody") or ""):
+        edit("Send", "jsonBody", SEND_IF_OLD, SEND_IF_NEW,
+             "Send: the menu rows are suppressed when the reply splits (open)")
     # 11 Nov (n8n_whatsapp_hiintro.py): the condition's last alternative, the intro echo, is gone, so it now
     # closes after the 8 Oct tail's test. The split's guard (SEND_IF_NEW) still opens it: nothing to do.
     if SEND_CLOSE_HIINTRO not in (by["Send"]["parameters"].get("jsonBody") or ""):

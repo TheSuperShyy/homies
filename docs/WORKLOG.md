@@ -40,7 +40,12 @@ conversation that produced it.
   - the read-back matched;
   - the re-run reported nothing to do;
   - 577/577 passed on live.
-- **Owed:** the owner's "היי" on his phone. No phone twin: no buttons there, and its opener already names Michael.
+- **The owner's "היי" at 12:04 UTC (his screenshot, 20:04 his time) came back with the new intro AND both buttons.**
+  - Execution 173085: Sort said `greeting` true and `_menu` false, so the greeting went Canned reply? → Type for a moment → Send. It never reached `Send menu`, which only takes the `_menu` road.
+  - Send's own `greeting ||` branch attached the buttons. My draft case had assumed the opposite, and the old cases ("the menu buttons still attach to the menu") had pointed at the real road.
+- **Fixed at 12:07 UTC** (the same script, a code-only step for a bot already at epoch 103): Send's `greeting ||` branch removed.
+  - Checks: the canned intro gets no buttons, and the old menu text still gets them. 578/578 on the candidate and on live, the replay changed 0 replies, and no patcher became newly non-idle (twobeat taught the guard's new opening).
+- **Owed:** the owner's "היי" again. No phone twin: no buttons there, and its opener already names Michael.
 
 ### A quick smoke test, read only (owner: "do a quick smoke test dont edit anything just a quick one"), 09:38 UTC
 - **How:** GET requests, plus one unsigned POST the tool server must refuse. No message sent, no ticket opened, nothing spent, nothing changed. The script stayed in the session's scratch folder.

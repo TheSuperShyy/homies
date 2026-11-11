@@ -84,6 +84,12 @@ AFTER_NEW = ("const introNamed = " + INTRO_RE + ".test(String(S.last_bot || '') 
              "const afterMenu = introNamed || " + AFTER_TAIL)
 KEEP_OLD = "const keepName = askedWho || afterMenu || repTap || (!mid && !ackNamed);"
 KEEP_NEW = "const keepName = askedWho || (afterMenu && !introNamed) || repTap || (!mid && !ackNamed);"
+# 11 Nov, 12:05 UTC: the first write left Send's own `greeting ||` branch. The canned greeting goes out Canned
+# reply? -> Type for a moment -> Send (execution 173085: Sort greeting true, _menu false), not through Send menu,
+# and that branch gave the owner's hello the intro WITH the two buttons. A greeting gets no buttons now; the old
+# tails' echo alternatives still give a menu sentence of before 11 Nov its buttons.
+GREET_BTN_OLD = "if (!two && ($('Sort').first().json.greeting || "
+GREET_BTN_NEW = "if (!two && ("
 ECHO_ALT = (" || (/מיכאל מהומי'ז/.test(t) && $('Sort').first().json.greeted !== true && "
             "/^(היי|הי|שלום|שלום רב|אהלן|בוקר טוב|צהריים טובים|ערב טוב)[,!.]?( (כאן |אני )?מיכאל מהומי'ז( כאן)?"
             "[.,!]?)? ?במה (אפשר|אוכל|נוכל) לעזור( לכם| לך| לכם היום| לך היום)?\\??$/.test(t.replace("
@@ -138,7 +144,8 @@ def hiintro(wf):
     by["Send menu"]["parameters"]["jsonBody"] = once(by["Send menu"]["parameters"]["jsonBody"], MENU_SEND_OLD,
                                                      MENU_SEND_NEW)
     body = by["Send"]["parameters"]["jsonBody"]
-    for old, new in ((MV_OLD, MV_NEW), (AFTER_OLD, AFTER_NEW), (KEEP_OLD, KEEP_NEW), (ECHO_ALT, "")):
+    for old, new in ((MV_OLD, MV_NEW), (AFTER_OLD, AFTER_NEW), (KEEP_OLD, KEEP_NEW), (ECHO_ALT, ""),
+                     (GREET_BTN_OLD, GREET_BTN_NEW)):
         body = once(body, old, new)
     by["Send"]["parameters"]["jsonBody"] = body
     lw = by["Still the last word?"]["parameters"]
@@ -156,14 +163,20 @@ def main():
     live = W.api("GET", "/api/v1/workflows/%s" % WORKFLOW_ID)
     by = {n["name"]: n for n in live["nodes"]}
     key = by["Conversation so far"]["parameters"].get("sessionKey")
-    if key == NEW_KEY and W.GREETING_TAIL in by["Sort"]["parameters"]["jsCode"] \
-            and MV_NEW in by["Send"]["parameters"]["jsonBody"]:
+    at_103 = key == NEW_KEY and W.GREETING_TAIL in by["Sort"]["parameters"]["jsCode"] \
+        and MV_NEW in by["Send"]["parameters"]["jsonBody"]
+    if at_103 and GREET_BTN_OLD not in by["Send"]["parameters"]["jsonBody"]:
         print("Nothing to do. Live already greets with Michael's intro and no buttons, epoch %d." % EPOCH)
         return
-    if key != OLD_KEY:
+    if at_103:
+        # The 12:02 write is live; only Send's greeting branch is left (code only, the epoch stays).
+        new = copy.deepcopy(live)
+        snd = {n["name"]: n for n in new["nodes"]}["Send"]["parameters"]
+        snd["jsonBody"] = once(snd["jsonBody"], GREET_BTN_OLD, GREET_BTN_NEW)
+    elif key != OLD_KEY:
         sys.exit("REFUSING: the memory key is %r, not epoch 102's. Read live first." % key)
-
-    new = hiintro(live)
+    else:
+        new = hiintro(live)
     if prompt_of(new) != W.system_prompt():
         sys.exit("REFUSING: the would-be prompt is not docs/features/11-whatsapp-bot/prompt.md's. "
                  "Edit the document first; live follows it.")
@@ -176,7 +189,7 @@ def main():
     print("prompt   : %s (%d chars) -> %s (%d chars)" % (W.epoch_hash(prompt_of(live)), len(prompt_of(live)),
                                                          W.epoch_hash(prompt_of(new)), len(prompt_of(new))))
     print("tools    : %s (unchanged: %s)" % (W.epoch_hash(tools_of(new)), tools_of(new) == tools_of(live)))
-    print("Send     : manners v4 -> v5; the echo clause's intro-only buttons removed")
+    print("Send     : manners v5; the intro-only echo and Send's own greeting branch give no buttons")
     print("memory   : %s -> %s (every buffer starts fresh)" % (OLD_KEY, NEW_KEY))
     print("changed  : %s" % ", ".join(n["name"] for n in new["nodes"] if n != by[n["name"]]))
 
@@ -196,6 +209,8 @@ def main():
     back = W.api("GET", "/api/v1/workflows/%s" % live["id"])
     bb = {n["name"]: n for n in back["nodes"]}
     print("\nwritten  : %d nodes, active=%s" % (len(back["nodes"]), back.get("active")))
+    print("  Send's greeting branch: %s" % ("gone" if GREET_BTN_OLD not in bb["Send"]["parameters"]["jsonBody"]
+                                          else "STILL THERE"))
     print("  prompt %s (want %s); memory key %s; Sort's tail %s; Send menu %s; manners v5 %s; last word %s"
           % (W.epoch_hash(prompt_of(back)), W.epoch_hash(prompt_of(new)),
              bb["Conversation so far"]["parameters"]["sessionKey"],

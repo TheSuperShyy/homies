@@ -765,9 +765,13 @@ function cases(E) {
       "כאן מיכאל מצוות השירות של הומי'ז. במה אוכל לעזור?");
     expect('after the OLD menu the name is still added (a chat whose last menu went out before 11 Nov)',
       say({ reply: LIFT, said: 'המעלית תקועה', S: { last_bot: MENU_TEXT } }), "כאן מיכאל מהומי'ז. " + LIFT);
-    // The greeting itself goes out through `Send menu` (Menu? -> Type for a moment (menu)), never through Send,
-    // so its buttons are Send menu's to drop (the case below); Send's `greeting ||` branch is not on its road.
-    expect('the canned intro passes Send untouched', say({ canned: true, reply: INTRO }), INTRO);
+    // The greeting goes out Canned reply? -> Type for a moment -> Send (execution 173085, 11 Nov 12:04 UTC), and
+    // the first write left Send's own `greeting ||` branch: the owner's hello got the intro WITH the buttons.
+    expect('the canned intro passes Send untouched, with no buttons',
+      () => { const b = sent(E, { canned: true, reply: INTRO }); return b.content + '|' + (b.content_type === 'input_select'); },
+      INTRO + '|false');
+    expect('a menu sentence of before 11 Nov still gets its buttons (the old tail)',
+      () => sent(E, { canned: true, reply: MENU_TEXT }).content_type, 'input_select');
     if (P.code.send_menu_body !== undefined) {
       expect('Send menu posts plain text', () => /input_select|content_attributes/.test(P.code.send_menu_body), false);
     }

@@ -108,7 +108,8 @@ The user is the builder. The client is Homies.
 - **Why code:** the tester's C2 failed twice. Epoch 98's tool-text clause held in some Gemini turns and not in the one that spoke of the add rather than the lookup. On the retained real turns it changes 7 of 133 replies, each the same missing number.
 
 **Since 11 Nov a bare hello gets Michael's intro, with no buttons (epoch 103, `scripts/n8n_whatsapp_hiintro.py`).** Owner: *"lets remove the button each hi so every opening message will receive the intro only"*. After examples (the 27 Sep table says to show them first), he gave the exact shape: *"Hi good morning or good afternoon. this is michael from homies how can i help you today"*.
-- **The sentence:** "היי, <the clock's greeting> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" ("היי" alone before 05:00), from Sort, posted by `Send menu` as plain text. It replaces the 8 Oct menu (company name and two buttons).
+- **The sentence:** "היי, <the clock's greeting> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" ("היי" alone before 05:00), from Sort. It replaces the 8 Oct menu (company name and two buttons).
+- **It goes out Canned reply? → Type for a moment → Send** (execution 173085), not through `Send menu`, which only takes the `_menu` road. So the buttons were Send's to drop: its `greeting ||` branch is gone. A greeting gets buttons only if it carries an old tail, the menu of before 11 Nov. On 11 Nov the first write missed this, and the owner's hello came back with the intro and both buttons.
 - **"היי" plus the clock's greeting in one line is his choice for this sentence.** The 27 Sep "never two greetings in one message" still binds the model's replies.
 - **Right after it, the reply neither greets nor says who he is:** the system said both.
   - The prompt says so in the greeting paragraph. The tap paragraph no longer says the buttons came with the greeting; they now come only in the options list, after he was introduced.
