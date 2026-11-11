@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LOCAL: a Send button at the end of the local checklist (owner: "i dont find the send button put it at the end of the checklist"), 08:25 UTC
+- **Which page:** the local site's replies page, `localhost:8787/`. It kept each mark in the browser and had no Send at all. The live `/review` page already has one at its top and a big one at its end ("שליחת הסימונים"), read from its code on main.
+- **What was added, in `local/checklist/serve.py` only:** the page on disk is untouched; the button and its script are added on the way out, like the tab strip.
+  - **The button,** "שליחת הסימונים", after the last reply and before "מחיקת הסימונים שלי", with a line saying what it does and the same confirmations as the live page ("נשלח, תודה! 1 נכון, 1 לא נכון.").
+  - **`POST /send`** takes the browser's marks and writes them on this PC: every Send in `local/checklist/sent/<UTC time>.json`, the last in `local/checklist/marks.json`. Each row carries the check's number, the message, Michael's replies, the mark and the comment, in the checklist's order. Steps that are not on the page are dropped, a comment alone is kept, and nothing marked is refused.
+  - **Only this site's own page may send:** the Host check as before, the same Origin, and a header another site's page cannot add. Checked: 403 without the header, with another Origin and with another Host; 400 for nothing marked and for a body that is not JSON.
+  - **`python local/checklist/serve.py --last`** prints the last Send in plain lines.
+- **Tests first:** `local/checklist/serve_test.py`, 11 tests, written before the code and seen failing (9 errors and 1 failure).
+- **Proven in a real browser** (Playwright, its own fresh profile): one Send button, below the last reply and above the delete button; with nothing marked it says so; ✓ on 1.1, ✗ on 2.1 with a Hebrew comment, then Send: the page confirmed, and the file held both rows with the comment whole. No script errors.
+  - **Found by that run and fixed:** two Sends inside one second shared a file name, so the second replaced the first. The later one now gets a number; a test holds it.
+  - curl mangled the Hebrew of a comment on its way in (its own argument encoding on Windows); the browser's did not.
+- **The test Sends were removed,** four files in all, each listed before it was deleted. No Send of the owner's existed yet.
+- **Said to the owner:** this local page is the 3 Nov replies, not today's; a local Send stays on this PC and reaches neither the database nor Yariv.
+- The server was restarted and the page opened in the owner's browser. Nothing in the repo changed besides this log and HANDOVER. The bot is untouched.
+
 ### A question answered, read only: how the checklist saves (owner: "the check list how to save it? is it auto save?"), about 08:25 UTC
 - **The local page** (`localhost:8787/`, the 3 Nov replies): a ✓ or ✗ saves at once and a comment 0.7 s after the typing stops, into that browser's own storage (`homies-michael-simulation-v1`). There is no Send, nothing reaches a database, and we cannot read those marks.
 - **The live page** (the dashboard's `/review?k=…`): marks are kept in the reviewer's browser as they go, and reach `reply_reviews` only on "שליחה". Every send is its own row; `python scripts/reply_reviews.py` reads them.

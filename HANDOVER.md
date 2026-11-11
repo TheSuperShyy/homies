@@ -12,7 +12,9 @@ appended to.
 >   - **Where:** http://localhost:8787/yariv on this PC only. `/` is still Michael's replies of 3 Nov; each page has a tab to the other.
 >   - **What it shows:** the 12 comments of 9 Nov, one row each: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), the comment as Yariv wrote it on the right and our answer on the left. Hebrew only.
 >   - **To change it:** edit `local/yariv/replies.json`, run `python local/yariv/build_page.py`, refresh. The WhatsApp reply in `local/yariv/2026-11-11-reply-to-9nov-review.txt` is a separate text with the same substance; a change of substance goes into both.
->   - **To start it:** `python local/checklist/serve.py --open yariv`. It was started from the 11 Nov session as a background task, so it stops when that session ends.
+>   - **The replies page has a Send button at its end since 08:25 UTC** (owner: *"i dont find the send button put it at the end of the checklist"*). "שליחת הסימונים" sits after the last reply. It saves the browser's marks on this PC, each with its message and Michael's reply: every Send in `local/checklist/sent/<UTC time>.json`, the last one in `local/checklist/marks.json`. **Read them with `python local/checklist/serve.py --last`.** Nothing goes to the database or off this PC.
+>   - **That page is the 3 Nov replies, not today's.** Today's replies and the Send that reaches `reply_reviews` are on the dashboard's `/review` (it has the same button at its end).
+>   - **To start it:** `python local/checklist/serve.py --open yariv` (or with no flag for the replies). It was started from the 11 Nov session as a background task, so it stops when that session ends.
 >   - All of it is under `local/`, out of the public repo.
 >
 > **LIVE 11 Nov, 07:29 UTC, Chatwoot only: every department's mention reaches a person** (owner: *"make sure when a manager is requested ... it should mention the people on the right department. but the bot is still the same just the chatwoot side changes"*; WORKLOG 11 Nov; CONTEXT has the rule).
