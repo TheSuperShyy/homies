@@ -241,7 +241,10 @@ PINS = {
     # 11 Nov, later that night (n8n_whatsapp_confirm.py, epoch 106): a ticket only after the resident's yes; an
     # emergency is anything urgent that cannot wait (Yariv's "כל הבניין נזילת מים" had got urgent ticket 255-1445-26).
     # The owner: "we need to make sure we dont open a service call without confirmation". No model run.
-    'Answer the resident / system': 'df3d9bf635d0',
+    # 11 Nov, night (n8n_whatsapp_warmline.py, epoch 107): pressed in an emergency, "בחום ... שאפשר להתקשר עכשיו
+    # למוקד החירום שלנו" in place of "המוקד הוא המקום לזה עכשיו", which came back word for word as a cold reply; the
+    # caring word is "על מה שהוא עובר". From the owner's Grok run of 18:45-19:07 Israel. No model run.
+    'Answer the resident / system': 'f1bd90ad0259',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -393,6 +396,9 @@ def extract(wf):
         "send_menu_body": (by.get("Send menu") or {}).get("parameters", {}).get("jsonBody", ""),
         # 11 Nov (n8n_whatsapp_hotline.py): the prompt, so a case can hold what it says about our emergency line.
         "prompt": ((by["Answer the resident"]["parameters"].get("options") or {}).get("systemMessage") or ""),
+        # 11 Nov, night (n8n_whatsapp_warmline.py): the memory key, so a prompt-only epoch's cases can be keyed to it
+        # and go back with it on a restore.
+        "memory_key": ((by.get("Conversation so far") or {}).get("parameters") or {}).get("sessionKey") or "",
     }
 
 

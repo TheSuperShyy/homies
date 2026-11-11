@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 106
+MEMORY_EPOCH = 107
+# 106 -> 107, 11 Nov, night (n8n_whatsapp_warmline.py): pressed in an emergency, he hears again, warmly, that he can
+# call our line now ("אפשר להתקשר עכשיו"), in place of "the line is the place for this now"; the caring word is about
+# what he is going through.
 # 105 -> 106, 11 Nov, later that night (n8n_whatsapp_confirm.py): a ticket opens only after the resident's yes; an
 # emergency is anything urgent that cannot wait (a big leak, water running in the building); a lift that is down with
 # nobody stuck stays a fault. The copy guard (repeat v2) never counts a reply that gives our line as a copy.
@@ -820,8 +823,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "df3d9bf635d0",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, later that night, epoch 106, a ticket
-    # only after his yes; anything urgent is an emergency). Before: 4770de1fc59a (11 Nov, night, epoch 105, an
+    "prompt": "f1bd90ad0259",   # docs/features/11-whatsapp-bot/prompt.md (11 Nov, night, epoch 107, pressed in an
+    # emergency: the line again as a warm invitation). Before: df3d9bf635d0 (11 Nov, later that night, epoch 106, a
+    # ticket only after his yes; anything urgent is an emergency); 4770de1fc59a (11 Nov, night, epoch 105, an
     # emergency gets our line only, no ticket); 682eb096d52a (11 Nov, later, epoch 104, our emergency line at any hour, gas
     # too); a5b5db23f7ca (11 Nov, epoch 103, the greeting introduces Michael, no buttons);
     # 8546b335b582 (10 Nov, later, epoch 102, the lift line without "urgently");

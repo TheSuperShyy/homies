@@ -8,6 +8,24 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 11 Nov, 17:36 UTC: PRESSED IN AN EMERGENCY, THE LINE AGAIN AS A WARM INVITATION** (the owner pasted two Grok reports; `scripts/n8n_whatsapp_warmline.py`, epoch 107; WORKLOG and CONTEXT 11 Nov).
+>   - **The reports:**
+>     - **18:24-18:37 Israel, before epoch 106:** E3's error, "סליחה, משהו השתבש לי בתשובה" (173705), was the copy guard that epoch 106 fixed.
+>     - **18:45-19:07 Israel, on epoch 106, E1-E5:** no fails, checked against the executions.
+>       - E1 asked "לפתוח על זה קריאת שירות?" and opened 255-1446-26 only after the yes.
+>       - Gas was word for word.
+>       - The lift, smoke and Yariv's leak each got the exact line, with no ticket.
+>     - **Notes, on tone only:** the pressed replies played our own description back, "המוקד הטלפוני שלנו הוא המקום לטפל בזה עכשיו. המספר הוא 077-6687949." (cold, close to a brush-off), and the caring word was only "זה באמת דחוף".
+>   - **What changed, the prompt only:**
+>     - Pressed: "בחום ובמילים אחרות, שאפשר להתקשר עכשיו למוקד החירום שלנו, עם המספר".
+>     - The caring word is "על מה שהוא עובר".
+>     - Memory: epoch 106 → 107.
+>   - **Also fixed, repo only:** the watch's copy check (`wa_truth.repeats_py`) flagged two correct emergency replies (173805, 173823), since it did not know repeat v2. It does now, and so does `REPEAT_FN`, which matches all four live guards word for word. No patcher's dry run changed.
+>   - **Read back:** prompt `f1bd90ad0259` (26,422 characters), memory key `-107`. The re-run reports nothing to do.
+>   - **Checked:** 2 new cases, keyed to the memory epoch (`epochV`, from the memory key the gate now extracts). Both were seen failing on a candidate with only the new key. All 623 pass on the candidate and on live. The replay changes nothing, only the prompt's pin moved, and there was no model run.
+>   - **Owed:** a look at one pressed reply, E3 or E4 step 2 of the brief, then `--watch 2026-11-11T17:36`.
+>   - **Rollback:** `python scripts/n8n_whatsapp_warmline.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-warmline.json`), then `git revert`.
+>
 > **LIVE 11 Nov, 16:41 UTC: A TICKET ONLY AFTER THE RESIDENT'S YES; ANYTHING URGENT GETS THE LINE; OUR LINE IS NEVER A COPY** (owner, with a screenshot of Yariv's chat: *"i told you all types of emergency like flooding, and stuff that needs urgent call, also we need to make sure we dont open a service call without confirmation"*; `scripts/n8n_whatsapp_confirm.py`, epoch 106; WORKLOG and CONTEXT 11 Nov).
 >   - **Why:**
 >     - At 16:19 UTC Yariv wrote "אני חייב דחוף מישהו / כל הבניין נזילת מים / מה עושים" (173670). Michael opened urgent ticket 255-1445-26 on flat 3 with urgency high, the value left once epoch 105 removed `emergency`. Flat 3 is mirrored, so the ticket is in OXS. It stays; test tickets and real ones are never deleted by us.
@@ -26,7 +44,7 @@ appended to.
 >     - **Patchers:** none would write over it; lineonly now refuses as superseded.
 >     - **The watch:** its new check flags 173670 as "a ticket opened with no yes from the resident".
 >     - No model run.
->   - **Owed: the owner's check.** Use the updated emergency-line brief: E1 now has the yes step, and E5 is Yariv's leak. Then `check_whatsapp_rules.py --watch 2026-11-11T16:41`.
+>   - **The owner's check ran, 16:45-17:07 UTC:** every rule passed (the block above).
 >   - **Owed: the incoming phone agent's twin.** It still opens an urgent ticket, and opens tickets without asking.
 >   - **Briefs:** `grok-emergency-line-test.md` (E1's yes, E5, H10) and `grok-tenant-tester.md` (C1, C3, R11, R13).
 >   - **Rollback:** `python scripts/n8n_whatsapp_confirm.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-confirm.json`, epoch 105 as it was), then `git revert` the repo side.

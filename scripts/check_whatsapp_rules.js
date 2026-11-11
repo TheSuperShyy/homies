@@ -77,6 +77,9 @@ const dangerV = (body) => { const m = String(body || '').match(/const dv = 'dang
 const HOTS = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
 // 11 Nov, evening (n8n_whatsapp_line.py): Send's line step, the same way. 0 where there is none.
 const lineV = (body) => { const m = String(body || '').match(/const lv = 'line v(\d+)'/); return m ? +m[1] : 0; };
+// 11 Nov, night (n8n_whatsapp_warmline.py): the memory epoch, from the key's tail ("={{ $json.to }}-107" -> 107), for
+// a prompt-only change with no code version of its own.
+const epochV = (key) => { const m = String(key || '').match(/-(\d+)\s*$/); return m ? +m[1] : 0; };
 // 11 Nov, night (n8n_whatsapp_confirm.py): the copy guard's version, read from Reply usable?'s `repeat`. 1 before the label.
 const repeatV = (code) => { const m = String(code || '').match(/const rpv = 'repeat v(\d+)'/); return m ? +m[1] : (code ? 1 : 0); };
 
@@ -1608,6 +1611,18 @@ function cases(E) {
       expect('prompt: a lift that is down with nobody stuck stays a fault',
         () => PR10.indexOf('מעלית שלא עובדת כשאף אחד לא תקוע בה היא לא מקרה חירום') !== -1, true);
     }
+  }
+  if (epochV((P.code || {}).memory_key) >= 107) {
+    // 11 Nov, night (n8n_whatsapp_warmline.py, epoch 107). The owner's Grok run at 18:45-19:07 Israel passed every
+    // rule, but the pressed replies came back as our own description: "המוקד הטלפוני שלנו הוא המקום לטפל בזה עכשיו.
+    // המספר הוא 077-6687949." (E4.2), cold and close to a hand-off, and the caring word was only "זה באמת דחוף".
+    console.log(NL + '--- prompt: pressed in an emergency, the line again as a warm invitation (11 Nov, night) ---');
+    const PR11 = String((P.code || {}).prompt || '');
+    expect('pressed: he hears again, warmly, that he can call our line now, with the number',
+      () => PR11.indexOf('בחום ובמילים אחרות, שאפשר להתקשר עכשיו למוקד החירום שלנו, עם המספר') !== -1
+        && PR11.indexOf('שהמוקד הוא המקום לזה עכשיו') === -1, true);
+    expect('the caring word is about what he is going through',
+      () => PR11.indexOf('מילה קצרה ואכפתית משלך על מה שהוא עובר') !== -1, true);
   }
   // 9 Nov (scripts/n8n_whatsapp_feedback9.py): Yariv's written review of the simulated run.
   const SB9 = String((P.code || {}).send_body || '');

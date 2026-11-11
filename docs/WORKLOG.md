@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: pressed in an emergency, the line again as a warm invitation (the owner pasted two Grok reports), 17:36 UTC, epoch 107
+- **The first report** (18:24-18:37 Israel, E2-E4, on epoch 105): E3's "סליחה, משהו השתבש לי בתשובה" was 173705, the copy guard that epoch 106 had already fixed.
+- **The second report** (18:45-19:07 Israel, E1-E5, on epoch 106): no fails. The executions agree.
+  - E1 asked "לפתוח על זה קריאת שירות?" and opened 255-1446-26 only after "כן, תפתח בבקשה".
+  - Gas was word for word.
+  - The lift, smoke and Yariv's leak each got the exact line, with no ticket. The E3 error did not come back.
+- **Its notes, on tone, both from our own prompt words:**
+  - Pressed, both replies opened "המוקד הטלפוני שלנו הוא המקום לטפל בזה עכשיו", and E4.2 ended with "המספר הוא 077-6687949" (no invitation, cold). The prompt had said "שהמוקד הוא המקום לזה עכשיו, עם המספר".
+  - The caring word came back as "זה באמת / בהחלט דחוף".
+- **`scripts/n8n_whatsapp_warmline.py`, the prompt only,** 2 edits, `df3d9bf635d0` → `f1bd90ad0259`, 26,398 → 26,422 characters:
+  - pressed: "בחום ובמילים אחרות, שאפשר להתקשר עכשיו למוקד החירום שלנו, עם המספר";
+  - the caring word: "על מה שהוא עובר".
+  - Epoch 106 → 107. The owner asked for the line "in a polite way", and as with the gas sentence, the words are shown, not described.
+- **The watch, fixed (repo only):** since 16:41 it flagged E4.1 and E5.1 (173805, 173823) as repeats. Its Python copy check (`wa_truth.repeats_py`) did not know repeat v2, so both flags were false. It knows it now. `REPEAT_FN`, the guards' canonical text, carries repeat v2 too and matches all four live guards word for word. The patchers' dry runs are unchanged (batch, firstword and typing are the documented baseline).
+- **Checks:**
+  - **The gate:** 2 new cases keyed to the memory epoch. `extract()` now hands the cases the memory key, for a prompt-only change with no code version. Both failed on a candidate carrying only the new key. All 623 pass on the candidate and on live.
+  - **The replay:** nothing changes.
+  - **Pins:** only the prompt's moved. No model run.
+- **Owed:** a look at one pressed reply, then `--watch 2026-11-11T17:36`.
+
 ### The 11/11 report (in chat, `/reporter`), 16:36 UTC, revised after epoch 106
 - **Span:** everything since the 11/10 report (15:58 UTC on 10 Nov): that night's late work (16:14-17:32 UTC) and all of 11 Nov.
 - **Revised once:** epoch 106 (the entry below) went live at 16:41 UTC, five minutes after the first version; the live memory key `-106` was read with one GET. The revision adds the yes before a ticket, puts flooding in the emergency bullet and the error line in the test bullet, and widens two Will lines.

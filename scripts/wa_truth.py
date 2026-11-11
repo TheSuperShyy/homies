@@ -150,10 +150,14 @@ REPEAT_FN = (
     "const sentRep = () => { try { return $('Anything newer?').all().map(r => (r || { }).json || { })"
     ".filter(x => x.direction === 'outbound').slice(0, " + str(REP_LAST) + ").map(x => normRep(x.body)).filter(Boolean); } "
     "catch (e) { return []; } }; "
-    "const repeats = (t) => { const n = normRep(t); if (!n) return false; "
+    # 11 Nov, night (n8n_whatsapp_confirm.py, repeat v2): a text that gives our emergency line is never a copy. Two
+    # emergencies in one chat each get the line word for word, and the second went out as Mend's fixed line (173705).
+    "const repeats = (t) => { const rpv = 'repeat v2'; const n = normRep(t); if (!n || /0?77[-" + BS + "s]?668[-"
+    + BS + "s]?7949/.test(String(t || ''))) return false; "
     "return sentRep().some(b => nearRep(n, b)); }; "
 )
 assert "}}" not in REPEAT_FN, "a }} inside the repeat test ends an expression early"
+HOT_PY = r"0?77[-\s]?668[-\s]?7949"
 
 
 def _norm_rep(s):
@@ -175,9 +179,10 @@ def _edits(a, b):
 def repeats_py(text, sent):
     """REPEAT_FN's repeats(), in Python: `text` nearly letter for letter one of the
     `sent` bodies (the bot's messages the phone already got, NEWEST FIRST; only the
-    first REP_LAST are read, as the guard reads them)."""
+    first REP_LAST are read, as the guard reads them). Our emergency line is never a copy (repeat v2)."""
+    import re
     n = _norm_rep(text)
-    if not n:
+    if not n or re.search(HOT_PY, str(text or "")):
         return False
     for body in list(sent)[:REP_LAST]:
         b = _norm_rep(body)
