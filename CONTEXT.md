@@ -853,6 +853,16 @@ on a database so we can retrieve it add a send button"*).
   - Without the key the page shows only "הקישור לא תקין".
 - **Each Send is one row in `reply_reviews`.** Read them with `python scripts/reply_reviews.py` (`--csv` for a sheet).
 - **A new set:** `local/checklist/review-set/build_set.py --upload`, after editing its time windows.
+- **A checklist page ends with a Send button** (11 Nov, on the local page: *"i dont find the send button put it at the end of the checklist"*). The live page has one at its top and one at its end. The local page (`local/checklist/serve.py`) saves its sends on this PC; `--last` reads the last one.
+
+**The reviewers' page has a second section since 11 Nov: Yariv's comments beside our answers** (owner: *"create a new section ... in natural local native hebrew ... on the right its yariv comment and on the left that answer"*, then *"ok push live"*; PR #12).
+- **`/review/yariv`, behind the same key.** One row per comment of the 9 Nov review: the comment as written on the right, our answer on the left, the check's number and a status word. A tab strip on both sections carries the key.
+- **A reply to Yariv's numbered comments is item by item:** the number, a status word (בוצע, ללא שינוי, תשובה), the answer. "Done" only where the bot really does it; a question that changed nothing is "answer".
+- **The Hebrew is written as Hebrew,** never carried over from the English list.
+- **What may sit in the public repo is decided by whose words they are.** Yariv's comments and our answers are in `dashboard/app/review/yariv/replies.ts`. Michael's replies quote real chats, so they stay in the database.
+- **"Push live" for a page means the dashboard on Vercel, through a PR to `main`.** The local checklist's 3 Nov replies were not pushed: old replies are never shown as current.
+- **A red Vercel build at `next/font` is Google's answer, not the change.** Next 14.2.15 dies on a font link that does not end in `.woff2` ("Cannot read properties of null (reading '1')", `app/layout.tsx`). It is rare (8 good fetches of 8 on 11 Nov) and a rerun passes. Fonts kept in the repo, or a newer Next, would end it; neither is done.
+- **Build a dashboard change in a worktree with its own `npm ci`.** A junction to another checkout's `node_modules` breaks `next build` across drives. On a Windows checkout three tests of `check_route.test.ts` fail on line endings, with or without a change; CI is the judge.
 
 **A tester checklist states what the live prompt says, not what seems right**
 (3 Nov, "Michael Test Checklist"): its first draft expected name and phone before

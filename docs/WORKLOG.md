@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: the reviewers' page has a second section, Yariv's comments beside our answers (PR #12; owner: "ok push live"), 08:46 UTC
+- **What "live" was taken to mean:** the new section, on the dashboard beside the live checklist, behind the same key. The local checklist's 3 Nov replies were not pushed: the live checklist shows the 10 Nov replies, already has Send at its top and at its end, and old replies are never shown as current. Said to the owner.
+- **PR #12,** branch `review-yariv` cut from `origin/main` in a temporary worktree, squash-merged at 08:46:33 UTC as `9c48f0f`. Vercel's production build was READY 27 s later.
+  - **`/review/yariv`:** one row for each of the twelve comments: the check's number, a status word, the comment as written on the right and our answer on the left. Hebrew only. Under 760 px they stack, the comment first.
+  - **The same key opens it.** The key check moved from `page.tsx` to `set.ts`, and `middleware.ts` lets `/review/yariv` through. Without the key, or with a wrong one, it shows only "הקישור לא תקין".
+  - **`Tabs.tsx`:** a tab strip on both sections, with the key in each link.
+  - **The text is in `yariv/replies.ts`,** written from `local/yariv/replies.json` so no comment was retyped. `local/yariv/to_dashboard.py` (saved afterwards) does it again; checked: its output equals the file on main, byte for byte.
+  - **`whole.ts`** keeps a ticket number, a phone number, an hour and the email address whole and left to right.
+  - **`scripts/check_review_yariv.test.ts`:** 8 tests, written first and seen failing.
+- **Checked before the merge:** `tsc`; a production build that lists `/review/yariv`; a real browser on that build at 1280 px and 390 px (twelve rows, the comment on the right, no overflow, the tabs keep the key, the replies' Send still at their end, "the link is not valid" without the key and with a wrong one, `/tickets` logged out goes to `/login`); CI's `checks` green.
+- **Checked live at 08:47 UTC:** the same browser run against `https://homies-dashboard.vercel.app`: all held. It pressed no Send, and `reply_reviews` still has 0 sends.
+- **What went wrong on the way, none of it from the change:**
+  - **The dashboard's build can die while fetching its fonts.** `next/font` (Next 14.2.15, `app/layout.tsx`) failed with "Cannot read properties of null (reading '1')" at `google/loader.js:112`, which is a font link from Google that does not end in `.woff2`. Once locally (the retry passed) and once on Vercel's first preview (an empty commit reran it, and it passed). Eight fetches in a row from here were all well formed, so it is rare. The lasting fix would be fonts kept in the repo or a newer Next. Not done: not asked.
+  - **Three tests of `check_route.test.ts` fail on this Windows checkout,** with or without the change. They read `dashboard/lib/call.ts`, which autocrlf checks out with CRLF, and their pattern wants LF. They pass on CI.
+  - **A junction to the main checkout's `node_modules` breaks `next build`** across drives ("Can't resolve './D:/…'"). `npm ci` in the worktree took 33 s.
+  - **`git worktree remove` stopped on "Filename too long".** The folder went with PowerShell's long-path form; the copied `.env.local` was checked gone first.
+- **Cleaned up:** the worktree, the local branch and the remote branch.
+- **Not changed:** the bot, the database, the live checklist's replies and its Send. The phone agent has no part in this.
+- HANDOVER has the block at the top and a line in the reviewers' page block. CONTEXT has the rules, the font failure included.
+
 ### LOCAL: a Send button at the end of the local checklist (owner: "i dont find the send button put it at the end of the checklist"), 08:25 UTC
 - **Which page:** the local site's replies page, `localhost:8787/`. It kept each mark in the browser and had no Send at all. The live `/review` page already has one at its top and a big one at its end ("שליחת הסימונים"), read from its code on main.
 - **What was added, in `local/checklist/serve.py` only:** the page on disk is untouched; the button and its script are added on the way out, like the tab strip.

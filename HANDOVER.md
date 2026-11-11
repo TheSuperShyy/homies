@@ -8,6 +8,15 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 11 Nov, 08:46 UTC: THE REVIEWERS' PAGE HAS A SECOND SECTION, Yariv's comments beside our answers** (owner: *"ok push live"*; PR #12, squash-merged as `9c48f0f`; WORKLOG 11 Nov; CONTEXT has the rules).
+>   - **The link** is the reviewers' own, with the same key: `https://homies-dashboard.vercel.app/review/yariv?k=<key>`, or the tab "ההערות של יריב" on `/review`. Without the key, or with a wrong one, it shows only "the link is not valid".
+>   - **What it shows:** the 12 comments of 9 Nov, one row each: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), the comment as Yariv wrote it on the right and our answer on the left. Hebrew only.
+>   - **Where the text lives:** `dashboard/app/review/yariv/replies.ts` on `main`. It is in the public repo because nothing in it is a tenant's. Michael's replies stay in the database.
+>   - **To change a comment or an answer:** edit `local/yariv/replies.json` (the one source), `python local/yariv/build_page.py` for the local page, and for live a branch from `origin/main`, `python local/yariv/to_dashboard.py <that checkout>`, `node --test scripts/check_review_yariv.test.ts`, a PR, CI, merge.
+>   - **Checked live at 08:47 UTC** in a real browser at 1280 px and 390 px: twelve rows, the comment on the right, nothing overflows, both tabs keep the key, the replies' Send is still at their end, and a logged-out visitor to `/tickets` still goes to the login. The check pressed no Send: `reply_reviews` has 0 sends.
+>   - **If a Vercel build of the dashboard goes red with `next/font` and "Cannot read properties of null (reading '1')": rerun it.** It is Google Fonts answering with a font link this Next version cannot read, in `app/layout.tsx`. It happened once locally and once on PR #12's first preview; each rerun passed. For a production build, use Redeploy in Vercel.
+>   - **Not pushed:** the local checklist's 3 Nov replies. The live checklist shows the 10 Nov replies and already has Send at its top and its end.
+>
 > **LOCAL 11 Nov, 08:13 UTC: the local site has a second section, Yariv's comments beside our answers** (owner: *"create a new section on a localhost in natural local native hebrew about that one on the right its yariv comment and on the left that answer"*; WORKLOG 11 Nov).
 >   - **Where:** http://localhost:8787/yariv on this PC only. `/` is still Michael's replies of 3 Nov; each page has a tab to the other.
 >   - **What it shows:** the 12 comments of 9 Nov, one row each: the check's number, a status word (בוצע 9, ללא שינוי 1, תשובה 2), the comment as Yariv wrote it on the right and our answer on the left. Hebrew only.
@@ -66,6 +75,7 @@ appended to.
 >   - **The link** is `https://homies-dashboard.vercel.app/review?k=<key>`. The key is in `local/checklist/review-link.txt`; never put it in the repo. It opens without a login; without the key it shows only "the link is not valid".
 >   - **The replies:** set `grok-2026-11-10`, 44 steps in 8 chats, from the 10 Nov Grok chats in `messages`. They are stored in `review_sets` (migration 040, applied and read back), not in the repo. Rebuild with `local/checklist/review-set/build_set.py --upload`, which keeps the key.
 >   - **The results:** every Send is a row in `reply_reviews`. Read them with `python scripts/reply_reviews.py` (each ✗ with its note), or `--csv`. Both tables are RLS-locked; a visitor reaches them only through `review_set()` and `submit_reply_review()`, which check the key.
+>   - **Since 11 Nov, 08:46 UTC it has a second section,** `/review/yariv`, with a tab strip on both (PR #12; the block at the top). The key check is in `dashboard/app/review/set.ts`, and `middleware.ts` lets both paths through.
 >   - **Owed (the owner's):** send the link to Yariv's team.
 >   - The localhost pages were retired on 10 Nov: `local/checklist/serve.py` served the 3 Nov page, and its server was stopped. **Back on 11 Nov with a second section, for the owner's own use** (the block at the top). An empty Claude Doc outline, "Michael — tester checklist", sits in the owner's claude.ai; delete it only if they ask. The artifact checklists are stale since 5 Nov.
 >
