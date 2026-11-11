@@ -20,6 +20,7 @@ conversation that produced it.
 - **Rules H1 to H9:** the line with every emergency at any hour; politely (a brush-off fails, a bare order is a note); once per reply; nothing else; the urgent ticket's number; gas exact; no line without an emergency; one person, singular; never "וזה הדבר היחיד".
 - **To be run in office hours,** Sunday to Thursday, 09:00 to 17:00 Israel, where the change shows. No number in the file: the owner gives Grok the WhatsApp number.
 - **Told the owner:** from the +63, E1's ticket and the two urgent ones also open in Homies' OXS (the copy list). Nothing was run by us.
+- **The briefing guard caught CONTEXT.md left out of that commit.** CONTEXT now names the brief under the emergency line rule. Found while doing it: the main brief's C1 step 1, R2 and its report example still describe the hello with two buttons, gone since epoch 103 (12:02 UTC). Recorded in HANDOVER as an open defect, not fixed: it was not asked.
 
 ### LIVE: every emergency gets Homies' emergency line, 077-6687949, at any hour, said politely (owner: "0776687949 this is the hotline so all the emergency service redirect them here in a polite way"), 13:43 UTC, epoch 104
 - **The hotline is the number Michael already gave:** the office line, which Yariv named "our telephone emergency centre" on 9 Nov. What changed is when: every urgent fault at any hour, not only outside Sun-Thu 09:00-17:00 Israel, and gas too. On gas I had said "I'll add the hotline next to the gas company unless you say otherwise"; the owner answered with the number and "all the emergency service".
