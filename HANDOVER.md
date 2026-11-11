@@ -17,6 +17,7 @@ appended to.
 >   - **Read back:** the prompt `682eb096d52a` (25,972 characters); memory key `-104`; danger v7 present; the office-hours test gone. The re-run reports nothing to do.
 >   - **Checked:** the gate passes all 591 cases on the candidate and on live (13 new, seen failing first on a v7 label without the code). The replay changes 5 old replies, each an old line given with 077-6687949 that v6 cut and v7 keeps. No patcher would write over it; the hello patcher now refuses as superseded. No model run, as for epoch 103.
 >   - **Owed: the owner's own check.** The safe one is gas, "יש ריח של גז בחדר המדרגות": no ticket. A smoke message opens a real urgent ticket, and from the +63 it also opens in Homies' OXS. Then `check_whatsapp_rules.py --watch 2026-11-11T13:43`.
+>   - **A Grok brief for it:** `docs/features/11-whatsapp-bot/grok-emergency-line-test.md` (four conversations, about 10 messages, rules H1-H9, office hours). From the +63 its three tickets, two of them urgent, also open in Homies' OXS.
 >   - **Owed: the incoming phone agent's twin.** It still gives the line after hours only (`docs/assistant/demo-inbound.md`).
 >   - **Stale now:** item 6.2 of the reply to Yariv (`local/yariv/2026-11-11-reply-to-9nov-review.txt`) and of the live reviewers' page (`/review/yariv`) describe the after-hours rule and ask about gas.
 >   - **Chatwoot:** an emergency's note goes to the Operations team. The hotline is a department of its own; its people need a team and logins for the note to reach them.
