@@ -1,0 +1,48 @@
+/* Yariv's comments beside our answers. The dashboard's own tokens, on top of review.module.css's .page
+   (the green of "done" is that page's --pass). In a right-to-left grid the first column is the right one,
+   so the comment comes first in the markup and sits on the right; the answer sits on the left. */
+
+.section { --ask: #8A6A12; --ask-soft: rgba(196, 150, 26, .16); font-size: 15.5px; line-height: 1.65; }
+:global(html[data-theme='dark']) .section { --ask: #EAB308; --ask-soft: rgba(234, 179, 8, .14); }
+
+.wide { max-width: 1080px; margin: 0 auto; padding-inline: 16px; }
+
+.counts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; border-radius: 99px; padding: 2px 12px;
+  font-size: 13px; font-weight: 600; white-space: nowrap;
+}
+.done { color: var(--pass); background: var(--pass-soft); }
+.same { color: var(--muted); background: var(--panel-2); border: 1px solid var(--line-2); }
+.answered { color: var(--ask); background: var(--ask-soft); }
+.sub { font-weight: 500; }
+
+/* Which side is whose, said once above the rows on a wide screen, and on each block on a narrow one. */
+.heads { display: none; }
+.rows { list-style: none; margin: 14px 0 0; padding: 0 0 8px; display: grid; gap: 12px; }
+.row {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 20px 18px; display: grid; gap: 10px;
+}
+.rowTop { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.check { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--font-poppins), sans-serif; font-variant-numeric: tabular-nums; }
+.rowTop .pill { margin-inline-start: auto; }
+.cols { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+.label { font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.text { border-radius: 4px 10px 10px 4px; padding: 10px 14px; overflow-wrap: anywhere; display: grid; gap: 8px; }
+.text p { margin: 0; }
+.comment .text { background: var(--panel-2); border-inline-start: 3px solid var(--line-2); color: var(--ink); }
+.answer .text { background: var(--panel-2); border-inline-start: 3px solid var(--ink); color: var(--ink); }
+.whole { white-space: nowrap; direction: ltr; unicode-bidi: isolate; }
+.foot { margin: 0; padding-block: 18px 44px; color: var(--muted); font-size: 13.5px; }
+
+@media (min-width: 760px) {
+  .heads {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 28px;
+    padding: 18px 20px 0; font-weight: 700; font-size: 14px; color: var(--muted);
+  }
+  .rows { margin-top: 8px; }
+  .cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 28px; }
+  .label { display: none; }
+}

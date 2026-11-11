@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { browserClient } from '@/lib/supabase-browser';
+import ReviewTabs from './Tabs';
 import styles from './review.module.css';
 
 // One review set: chats of steps, each step a message (or a button tap) and Michael's replies to it.
@@ -106,6 +107,7 @@ export default function ReviewBoard({ set, reviewKey }: { set: ReviewSet; review
 
   return (
     <div className={styles.page} dir="rtl" lang="he">
+      <ReviewTabs reviewKey={reviewKey} current="replies" />
       <header className={styles.bar}>
         <div className={`${styles.wrap} ${styles.barInner}`}>
           <span className={styles.barTitle}>בדיקת התשובות של מיכאל</span>
