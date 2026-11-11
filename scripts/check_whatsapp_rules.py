@@ -553,9 +553,11 @@ REF = re.compile(r"\b\d{3}-\d{3,6}-\d{2}\b")
 # 1 Oct: the bot writes to one person, masculine until she writes about herself
 # in the feminine (n8n_whatsapp_gender.py). One copy, read by --watch here and by
 # wa_qa.py's rubric. "you" in the plural, as a pronoun or a verb:
+# 11 Nov, evening: "תתקשרו" and "תחייגו" too. The owner's Grok run had "תתקשרו עכשיו למוקד החירום שלנו" three
+# times, and this watch said "nothing broke the rules" (Send's line v1 now makes it "אפשר להתקשר").
 PLURAL_YOU = re.compile(r"(?:^|\W)(?:ו|ש|כש)?(אתם|לכם|אתכם|אליכם|שלכם|איתכם|עבורכם|בשבילכם|אצלכם|"
                         r"מכם|ממכם|עליכם|תרצו|תוכלו|תצטרכו|תשלחו|תכתבו|תגידו|תספרו|תבדקו|תעדכנו|"
-                        r"תפנו|תבחרו|תקבלו|תראו|תשלמו|ספרו)(?=\W|$)")
+                        r"תפנו|תבחרו|תקבלו|תראו|תשלמו|ספרו|תתקשרו|תחייגו)(?=\W|$)")
 # "you", masculine only and feminine only. Future 2nd person masculine is also
 # 3rd person feminine ("היא תוכל"), so a hit is read, not trusted.
 MASC_YOU = re.compile(r"(?:^|\W)(?:ו|ש|כש)?(אתה|תוכל|תרצה|תצטרך|תשלח|תכתוב|תגיד|תספר|תבדוק|תעדכן|"

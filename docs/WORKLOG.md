@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-11-11
 
+### LIVE: our emergency line comes as an invitation, never an order (the owner pasted Grok's report of the emergency-line run), 15:21 UTC, Send's line v1
+- **The report:** E1 to E4 at 16:02-16:16 Israel (14:02-14:16 UTC), 7 messages, on file: yes. The tickets were 255-1440-26 (the lobby light), 255-1441-26 (the lift, urgent) and 255-1442-26 (smoke, urgent).
+  - **No serious fails.** The line came once in each of the three emergencies, gas was word for word, and the lobby light got no number.
+  - **Fails, H8:** the plural "תתקשרו" in E3.1, E3.2 and E4.1.
+  - **Notes:** the bare orders in E3.1 and E4.2, and E2.2's "והם יעזרו לך".
+- **The cause, from the executions of that hour (173342 to 173419):** the words were Gemini's own. Send passed them through: in 173373 it cut only ", כדי שיטפלו בזה מיד". No tool's text has a plural.
+  - The prompt describes the politeness ("בנימוס", "במילים שמזמינות אותו להתקשר"). Gemini wrote "בבקשה" before an order, in the plural of public notices.
+  - The gas sentence shows the words ("אפשר גם להתקשר"), and in the same run gas came out polite and singular (173355, 173361).
+- **`scripts/n8n_whatsapp_line.py`, one write, Send only:** a step "line v1", right after danger v7. In a reply that gives 077-6687949:
+  - an order to call or dial at the start of a sentence or clause becomes "אפשר להתקשר" / "אפשר לחייג", with "בבקשה" or "אנא" before it dropped;
+  - a plural "you" calling anywhere else becomes singular ("כדאי שתתקשרו" → "כדאי שתתקשר", "אם תתקשרו" → "אם תתקשר");
+  - a reply without the number is not touched.
+- **Why in Send and not in the prompt:** it is certain, it can be checked with no model run (for epochs 103 and 104 the owner's own phone is the test), and it spends no epoch, since EPOCH_COVERS reads the prompt, the inject and the tools.
+- **Checks:**
+  - **The gate:** 9 new cases (`lineV`), built from the four real replies, gas's "what do I do?", the office number, a dial order, "כדאי ש" and "אם". 8 were seen failing on live, and the harness reproduced live's own output word for word; gas passed both before and after. Then the block was keyed to line v1. All 600 cases pass on the candidate and on live; live alone passed 591 before the write.
+  - **The replay:** of 1,542 real replies, only the four Grok replies change, each the intended way. None of 1,493 tenant messages change.
+  - **Patchers:** live and the candidate give the same dry-run status for every patcher but the new one.
+  - **Read back:** line v1 present, right before the ref step; the prompt is still `682eb096d52a`; the memory key is still `-104`. The re-run reports nothing to do.
+- **The watch:** `PLURAL_YOU` gains "תתקשרו" and "תחייגו". The 13:43 watch said "nothing broke the rules" over the three plural replies; re-run, it flags exactly those three.
+- **Left as it is:** E2.2's "והם יעזרו לך", which Grok called harmless and is true of the line.
+- **Owed:** one look at the new wording, E3 or E4 again or the next real emergency. Then `--watch 2026-11-11T15:21`.
+
 ### A Grok brief for the emergency line (owner: "give me something to test with grok"), 13:50 UTC
 - **`docs/features/11-whatsapp-bot/grok-emergency-line-test.md`:** four conversations, about 10 messages, in the main brief's shape (hard limits, real-tenant writing, the steps, the rules, the verdicts, the report).
   - E1, the lobby light: a normal ticket and no number at all.

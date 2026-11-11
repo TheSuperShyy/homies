@@ -75,6 +75,8 @@ const mannersV = (body) => { const m = String(body || '').match(/const mv = 'man
 const dangerV = (body) => { const m = String(body || '').match(/const dv = 'danger v(\d+)'/); return m ? +m[1] : 0; };
 // 11 Nov (n8n_whatsapp_hotline.py, danger v7): the one sentence Send adds when an emergency turn's reply has no line.
 const HOTS = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
+// 11 Nov, evening (n8n_whatsapp_line.py): Send's line step, the same way. 0 where there is none.
+const lineV = (body) => { const m = String(body || '').match(/const lv = 'line v(\d+)'/); return m ? +m[1] : 0; };
 
 function mask(s) {
   return String(s).replace(/https?:\/\/\S+/g, '<link>').replace(/\+?\d{9,15}/g, '<phone>')
@@ -1661,6 +1663,54 @@ function cases(E) {
     const LOOK = [{ action: { tool: 'get_request_status' }, observation: ob9({ ok: true, found: 1, requests: [{ reference: '255-1600-26', status: 'open' }] }) }];
     expect("Yariv's 2.3: right after the lift ticket, his answer goes whole",
       () => content(E, { reply: Y23, said: 'מתי מגיעים לתקן?', S: { last_bot: Y22 }, steps: LOOK }), Y23);
+  }
+  if (lineV(SB9) >= 1) {
+    // 11 Nov, evening (n8n_whatsapp_line.py, line v1). The owner's Grok run of the emergency line, 16:02-16:16 Israel:
+    // the line came with every emergency, but as an order, three times in the plural ("תתקשרו עכשיו", executions
+    // 173373, 173391, 173403) and once bare ("תתקשר עכשיו", 173419). The owner asked for the line "in a polite way",
+    // and his address rule is one person, never the plural. Wherever Michael gives 077-6687949, an order to call
+    // becomes "אפשר להתקשר", and a plural "you" calling there is singular.
+    console.log(NL + '--- Send: our emergency line comes as an invitation, never an order (11 Nov, the Grok run) ---');
+    const WED = clock9('16:11', 3);
+    const em = (ref) => [{ action: { tool: 'open_request', toolInput: { urgency: 'emergency' } }, observation: ob9({ ok: true, reference: ref }) },
+      { action: { tool: 'notify_team', toolInput: { reason: 'emergency' } }, observation: ob9({ ok: true, reason: 'emergency' }) }];
+    const LIFT1 = 'פתחתי קריאה דחופה על המעלית (255-1441-26). תתקשרו עכשיו למוקד החירום שלנו, 077-6687949. באיזו קומה היא נתקעה?';
+    expect('173373 (the lift): "תתקשרו עכשיו" becomes "אפשר להתקשר עכשיו", the ticket and the question stay',
+      () => content(E, { reply: 'פתחתי קריאה דחופה על המעלית (255-1441-26). תתקשרו עכשיו למוקד החירום שלנו, 077-6687949, כדי שיטפלו בזה מיד. באיזו קומה היא נתקעה?',
+        said: 'המעלית נתקעה בין הקומות ויש מישהו בפנים!!', steps: em('255-1441-26'), now: WED }),
+      'פתחתי קריאה דחופה על המעלית (255-1441-26). אפשר להתקשר עכשיו למוקד החירום שלנו, 077-6687949. באיזו קומה היא נתקעה?');
+    const ADDED = [{ action: { tool: 'add_request_detail', toolInput: { detail: 'בין 2 ל3', reference: '255-1441-26' } }, observation: ob9({ ok: true, reference: '255-1441-26' }) }];
+    expect('173391 (the floor added): "בבקשה תתקשרו" becomes "אפשר להתקשר"',
+      () => content(E, { reply: 'הוספתי את זה לקריאה, תודה. בבקשה תתקשרו עכשיו למוקד החירום שלנו, 077-6687949.',
+        said: 'בין 2 ל3', S: { last_bot: LIFT1 }, steps: ADDED, now: WED }),
+      'הוספתי את זה לקריאה (255-1441-26), תודה. אפשר להתקשר עכשיו למוקד החירום שלנו, 077-6687949.');
+    const SMOKE1 = 'פתחתי מיד קריאה דחופה (מספר 255-1442-26). בבקשה תתקשרו עכשיו למוקד החירום שלנו במספר 077-6687949, הם זמינים בדיוק למקרים כאלה.';
+    expect('173403 (smoke): the same, and the rest of his sentence stays',
+      () => content(E, { reply: SMOKE1, said: 'יש עשן בחדר המדרגות, ממש מריח שרוף', steps: em('255-1442-26'), now: WED }),
+      'פתחתי מיד קריאה דחופה (מספר 255-1442-26). אפשר להתקשר עכשיו למוקד החירום שלנו במספר 077-6687949, הם זמינים בדיוק למקרים כאלה.');
+    expect('173419 (pressed, no tool): the bare order "תתקשר עכשיו" becomes "אפשר להתקשר עכשיו"',
+      () => content(E, { reply: 'פתחתי קריאה דחופה שמספרה 255-1442-26. תתקשר עכשיו למוקד החירום שלנו, 077-6687949.',
+        said: 'מה אני עושה עכשיו? שמישהו יבוא מהר!', S: { last_bot: SMOKE1 }, now: WED }),
+      'פתחתי קריאה דחופה שמספרה 255-1442-26. אפשר להתקשר עכשיו למוקד החירום שלנו, 077-6687949.');
+    expect('the formal order to dial becomes "אפשר לחייג"',
+      () => content(E, { reply: 'פתחתי לך קריאה דחופה, מספר 255-1349-26. חייגו עכשיו למוקד החירום שלנו, 077-6687949.',
+        said: 'בר כוכבא 23 דירה 2', steps: em('255-1349-26'), now: WED }),
+      'פתחתי לך קריאה דחופה, מספר 255-1349-26. אפשר לחייג עכשיו למוקד החירום שלנו, 077-6687949.');
+    expect('"כדאי שתתקשרו" is singular: "כדאי שתתקשר"',
+      () => content(E, { reply: 'פתחתי לך קריאה דחופה, מספר 255-1349-26. כדאי שתתקשרו עכשיו למוקד החירום שלנו, 077-6687949.',
+        said: 'בר כוכבא 23 דירה 2', steps: em('255-1349-26'), now: WED }),
+      'פתחתי לך קריאה דחופה, מספר 255-1349-26. כדאי שתתקשר עכשיו למוקד החירום שלנו, 077-6687949.');
+    expect('"if you call" keeps its meaning, in the singular',
+      () => content(E, { reply: 'פתחתי לך קריאה דחופה, מספר 255-1349-26. אם תתקשרו למוקד החירום שלנו, 077-6687949, יענו שם בכל שעה.',
+        said: 'בר כוכבא 23 דירה 2', steps: em('255-1349-26'), now: WED }),
+      'פתחתי לך קריאה דחופה, מספר 255-1349-26. אם תתקשר למוקד החירום שלנו, 077-6687949, יענו שם בכל שעה.');
+    const GAS2 = 'על גז צריך לדווח ישר לחברת הגז של הבניין. אתה מוזמן גם להתקשר עכשיו למוקד החירום שלנו במספר 077-6687949 והם יעזרו לך.';
+    expect('173361 (gas, "what do I do?"): an invitation already, it goes whole',
+      () => content(E, { reply: GAS2, said: 'מה לעשות? לפתוח חלונות?', now: WED }), GAS2);
+    expect('the office number on request, no emergency: an order to call becomes an invitation there too',
+      () => content(E, { reply: 'הטלפון של המשרד הוא 077-6687949, תתקשר בשעות הפעילות. יש עוד משהו שאוכל לעזור בו?',
+        said: 'מה הטלפון של המשרד?', now: WED }),
+      'הטלפון של המשרד הוא 077-6687949, אפשר להתקשר בשעות הפעילות. יש עוד משהו שאוכל לעזור בו?');
   }
   if (promiseV(SB9) >= 6) {
     console.log(NL + "--- Send: a standing order's call from collections is no promise (9 Nov, Yariv's 5.2) ---");
