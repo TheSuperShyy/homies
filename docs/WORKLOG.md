@@ -42,6 +42,12 @@ conversation that produced it.
   - The staff seated with `chatwoot_teams.py`.
   - The switch.
 - Nothing changed live.
+- **The sheet** (owner: "open a gsheet for that"):
+  - No Google connector is attached to this session, and no workflow on Homies' n8n holds a Google credential. So it was built as an .xlsx, in Hebrew and right to left, for Homies to fill in.
+  - Where: `local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`, outside git. It was opened in File Explorer.
+  - Tab "מה צריך": the 17 items plus "אחרי זה, אצלנו", with a status dropdown.
+  - Tab "צוות": name, email, department and admin, with dropdowns.
+  - Uploaded to Drive, it opens as a Google Sheet.
 
 ### LIVE: an emergency's reply follows the owner's own reference, in Michael's words (owner: "this should be a format it should still be dynamic but that is the reference"), 09:18:36 UTC, epoch 108
 - **The owner's message**, right after the route switch: "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מידיי,בבקשה תתקשר למוקד החירום שלנו כדי תוכל לקבל מענה בהקדם , 0776687949". Since epoch 105 the prompt had asked for a caring word and then our fixed sentence word for word ("למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו").
