@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### The 11/12 report (in chat, `/reporter`), 14:57 UTC
+- **Span:** the owner's 12 Nov (Philippine time), everything after the 11/11 report (16:36 UTC on 11 Nov): the late Grok retest and epoch 107, and 12 Nov UTC up to the Tokomni 500 (13:39 UTC). Before it, read again on live: linepass reports nothing to do, all 653 cases pass, `--watch 2026-11-12T12:06` clean (2 turns, at 13:48 UTC).
+- **Given:** 9 done bullets and 3 Will lines.
+  - **Done:**
+    - the owner's standard as the base of every emergency reply;
+    - the number and the "please" found at risk in the new wording and kept whole before it went live;
+    - the Grok run of the standard, every new emergency reply to our line with nothing opened in OXS;
+    - the plural near-promise fixed and retested;
+    - the yes before a ticket retested;
+    - the ticket-closed message and the debt call's payment link back on the main route;
+    - the go-live sheet for Homies;
+    - Omni's 208 marked offline, switched on;
+    - the Ring's 500 inside Omni's system, with a note for them.
+  - **Will:** Homies' real number once they give Facebook access, the PIN and the staff list; the incoming phone agent's twin; the Ring again once Omni fixes the 500.
+  - **Left out:** epoch 107 (superseded by 108 and 109), emoji v2's full stop, the read-only dialer checks before the 500, the review of the owner's own sheet, the Grok briefs.
+- **CONTEXT and HANDOVER: nothing from this.** A report sets no rule and changes nothing live, and each Will line is already owed in HANDOVER (Homies go-live, the twin, Omni's 500).
+
 ### The 500 is their server failing on our token, before any lead (owner: "can we fix that since the number its alr in the tokomni platform is there a way to just ring the number there"), 13:39 UTC
 - **Probes that ring nobody** (no lead in any of them):
   - `POST []` with our token: **500**, their crash page. On 9 Nov the same gave 400 "No JSON data provided".
