@@ -15,7 +15,8 @@ appended to.
 >     - voice v4 cuts "כדי שיעזרו";
 >     - emoji v2 leaves a full stop where a dropped emoji ended a sentence (E1.1's note).
 >   - **Checked:** 653/653 on the candidate and on live. The replay improves 14 old replies and breaks none. Prompt and epoch 109 are unchanged.
->   - **Owed:** `--watch 2026-11-12T12:06`; the incoming phone agent's twin.
+>   - **Proven 12:26-12:28 UTC:** the owner's Grok re-run of E3 passed (175876, 175884). Both went out on the first pass in the singular, and the watch since 12:06 is clean.
+>   - **Owed:** the incoming phone agent's twin.
 >   - **Rollback:** `python scripts/n8n_whatsapp_linepass.py --restore`, then `git revert`.
 >
 > **LIVE 12 Nov, 10:44:33 UTC: THE OWNER'S STANDARD IS THE BASE OF EVERY EMERGENCY REPLY** (owner: *"add this on the context like the basis of what the bot should answer make this the main standard"*; `scripts/n8n_whatsapp_standard.py`, epoch 109; WORKLOG and CONTEXT 12 Nov).
