@@ -361,6 +361,9 @@ appended to.
 >     - **Owed:**
 >       - the reply to Omni, which is drafted and the owner sends it (`local/omnitelecom/2026-11-09-health-check-email.txt`, Hebrew). It gives the time, the id and that no call was dialled, and asks whether List 2 is on Play, and whether the dialer sees the bot (208) as available;
 >       - `tokomni_lead.py --check` again once a call does come.
+>     - **12 Nov, Omni found it (09:21 UTC, `local/omnitelecom/2026-11-12-208-was-disconnected.txt`):** the dialer dials only while 208 is marked as an available agent, and it was marked disconnected. They were switching it to available, so the three 9 Nov leads would ring Ido's phone. Each lead gets one attempt, and 208 takes one call at a time.
+>       - **Read at 10:41 UTC:** no call on Vapi since 9 Nov 13:53 UTC, and Vapi is in credit. So no dialer call had reached the bot 80 minutes after their email.
+>       - **Owed:** Ido says whether his phone rang today; Omni says whether 208 still shows as available and whether the leads were dialled. If they were missed, a second attempt from Omni or a fresh Ring when Ido is ready. Then `tokomni_lead.py --check` within two hours of the call.
 >
 > **8 Nov, later: Omni answered about the dialer's 404s, and the dialer test page is rebuilt for their lead API. Built, not live** (made live 9 Nov, the entry above) (their email: `local/omnitelecom/2026-11-08-lead-api-v1.txt`). The 404s since 29 Oct were Omni's: the address in their first document was wrong, and the 27 Oct token was a dashboard token, which they have deleted.
 >   - **Built:**

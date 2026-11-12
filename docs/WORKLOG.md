@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### Read only: the dialer after Omni's answer (the owner pasted Omni's email: "i called ido again today check for the status"), 10:41 UTC
+- **Omni, 09:21 UTC** (kept in `local/omnitelecom/2026-11-12-208-was-disconnected.txt`): the three 9 Nov leads are in List 2, never dialled. Their dialer dials only when the bot's extension 208 is marked as an available agent, and it was marked disconnected. There is no hours window, and nothing is wrong in our settings. They were moving it to available, so the three leads would ring Ido's phone. Each lead gets one attempt (more on request), and 208 takes one call at a time.
+- **Vapi, read with a GET since 9 Nov 00:00 UTC:** no phone call after 9 Nov 13:53 UTC (the hand call from extension 200), so nothing at all today. The other three entries are credit checks. `vapi_transfer.py --balance`: in credit.
+- **So, 80 minutes after their email,** no dialer call has reached the bot. Either the dialer has not dialled yet, or Ido's phone rang and nobody answered: a ring nobody answers never reaches Vapi, and with one attempt each, missed leads are spent.
+- **A press today could not be seen from our side.** The page keeps no record, and Vercel's runtime-logs API only streams new lines (it timed out with none).
+- Said to the owner: ask Ido whether his phone rang today and when, and ask Omni whether 208 still shows as available and whether the three leads were dialled. A press on Ring when Ido is ready adds a fresh lead. Nothing was changed, sent or pressed.
+
 ### Homies wants to use the bot now: the list of what we need from them, given in chat (owner: "so homies want to use the chatbot we have now what do we need", with "meta, email of the staff, main number")
 - **Where things stand:**
   - The bot runs on the owner's test number, in the owner's own Meta business (ASTDX). The number is named "hadas 1", the business is unverified, and Meta caps what we start at 250 people a day.
