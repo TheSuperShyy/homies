@@ -8,6 +8,26 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 12 Nov, 09:18:36 UTC: AN EMERGENCY'S REPLY FOLLOWS THE OWNER'S OWN REFERENCE, IN MICHAEL'S WORDS** (owner: *"this should be a format it should still be dynamic but that is the reference"*; `scripts/n8n_whatsapp_refline.py`, epoch 108; WORKLOG and CONTEXT 12 Nov).
+>   - **His reference, mended:** "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949."
+>   - **The prompt:** the first message about an emergency is "a message like this". The words are Michael's and fit the case, but three things are always in it:
+>     - only the digital assistant, can't answer immediately;
+>     - a polite request to call the line to get an answer soon;
+>     - the number.
+>     - No question. Pressed: the same three things, warmly, in other words.
+>   - **Send, so it arrives whole:** before this, live Send sent the reference out with no number at all.
+>     - **Promise v8 and danger v9:** "בהקדם" and the other fast words are no promise in the line's sentence, or where he says he can't.
+>     - **Danger v9's sentences are the reference's halves:** the one added when a cut takes the line, and the whole reference when nothing is left.
+>     - **Line v2:** keeps "בבקשה תתקשר" and only makes a plural singular.
+>     - **Voice v3:** never cuts our number.
+>     - **Manners v6:** keeps "אני מיכאל, העוזר הדיגיטלי" whole.
+>   - **Checked:** 30 new cases, seen failing on a labels-only candidate. 630/630 on the candidate and on live. The replay changes only 4 old line v1 rewrites, and the idle check is clean. No model run.
+>   - **Read back:** prompt `504d924d3419`, memory key `-108`. The re-run reports nothing to do.
+>   - **Owed:**
+>     - One emergency message from the owner's phone, or E3-E5 of `grok-emergency-line-test.md` (updated), then `--watch 2026-11-12T09:18`.
+>     - The incoming phone agent's twin.
+>   - **Rollback:** `python scripts/n8n_whatsapp_refline.py --restore` (the snapshot `local/n8n-whatsapp-live-12nov-before-refline.json`), then `git revert`.
+>
 > **LIVE 12 Nov, 07:32:53 UTC: THE CLOSED-TICKET MESSAGE AND THE DEBT CALL'S LINK ARE BACK ON THE MAIN ROUTE (CHATWOOT)** (owner: *"ok for the closing of the tickets lets move to the main since they are approved"*; WORKLOG 12 Nov).
 >   - **What:** the tool server's `WHATSAPP_VIA` went from `uchat` to `chatwoot`. It was set alone through the Management API, read back as `chatwoot`, and written to `.env` (backup `local/env-backups/.env.before-chatwoot-again-2026-11-11`). No code was deployed, and the OXS mirror's keys are untouched.
 >   - **Why now:** `ticket_resolved_he` and `payment_link_he` read APPROVED in "hadas 1" `…050` (`wa_templates.py list --waba 1389698653006050`), the account our Chatwoot route looks templates up in.
@@ -31,7 +51,7 @@ appended to.
 >   - **Also fixed, repo only:** the watch's copy check (`wa_truth.repeats_py`) flagged two correct emergency replies (173805, 173823), since it did not know repeat v2. It does now, and so does `REPEAT_FN`, which matches all four live guards word for word. No patcher's dry run changed.
 >   - **Read back:** prompt `f1bd90ad0259` (26,422 characters), memory key `-107`. The re-run reports nothing to do.
 >   - **Checked:** 2 new cases, keyed to the memory epoch (`epochV`, from the memory key the gate now extracts). Both were seen failing on a candidate with only the new key. All 623 pass on the candidate and on live. The replay changes nothing, only the prompt's pin moved, and there was no model run.
->   - **Owed:** a look at one pressed reply, E3 or E4 step 2 of the brief, then `--watch 2026-11-11T17:36`.
+>   - **Superseded by epoch 108 (12 Nov, above):** the pressed reply is now the owner's three things, so the look it owed moves there.
 >   - **Rollback:** `python scripts/n8n_whatsapp_warmline.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-warmline.json`), then `git revert`.
 >
 > **LIVE 11 Nov, 16:41 UTC: A TICKET ONLY AFTER THE RESIDENT'S YES; ANYTHING URGENT GETS THE LINE; OUR LINE IS NEVER A COPY** (owner, with a screenshot of Yariv's chat: *"i told you all types of emergency like flooding, and stuff that needs urgent call, also we need to make sure we dont open a service call without confirmation"*; `scripts/n8n_whatsapp_confirm.py`, epoch 106; WORKLOG and CONTEXT 11 Nov).

@@ -2,7 +2,11 @@
 
 You are testing **Michael**, the WhatsApp service agent of **הומי'ז (Homies)**, a company that manages residential buildings in Israel. He always answers in Hebrew.
 
-**What you are checking:** Homies has a telephone emergency line, `077-6687949`, a department of its own. In **every** emergency, at **any** hour, Michael must point the tenant to it politely and do nothing else: no ticket and no questions about where it is. Gas gets the gas company first, then the line. And outside emergencies, no ticket opens until the tenant says yes.
+**What you are checking:** Homies has a telephone emergency line, `077-6687949`, a department of its own. In **every** emergency, at **any** hour, Michael must point the tenant to it politely and do nothing else: no ticket and no questions about where it is. His reply follows the owner's own format, in his own words each time: he is only the digital assistant and can't give an immediate answer, he asks you politely to call the emergency line so you get an answer soon, and he gives the number. Gas gets the gas company first, then the line. And outside emergencies, no ticket opens until the tenant says yes.
+
+The owner's reference for an emergency reply:
+
+    אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949.
 
 **Your job:** play tenants the way real people write on WhatsApp, then judge every reply against the rules in section 5.
 
@@ -59,32 +63,33 @@ Send the "Open with" lines exactly as written. Everything else is in the persona
 
 ### E3 · יוסי, scared · someone stuck in the lift
 1. Open with `המעלית נתקעה בין הקומות ויש מישהו בפנים!!`
-   - Serious, with no emoji. A short caring word, then exactly this, and nothing after it, no question (H1, H2):
-
-     `למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.`
+   - Serious, with no emoji. The owner's format (section 1's reference) in Michael's own words, with its three things, and nothing after it, no question. (H1, H2)
    - No ticket and no ticket number. No question about the building, the apartment, the lift or the floor. (H5)
 2. Send `מתי מישהו מגיע??`
-   - The line again, in other words. No time, nobody "on the way", no promise and no question. (H4)
+   - The same three things again, warmly and in other words. No time for anyone coming, nobody "on the way", no promise and no question. (H2, H4)
 
 ### E4 · דני, panicking, typos · smoke
 1. Open with `יש עשן בחדר המדרגות, ממש מריח שרוף`.
-   - The same as E3's first reply: serious, a short caring word, then the exact line, with no ticket, no question about where, and nothing after it. (H1, H2, H5)
+   - The same as E3's first reply: serious, the owner's format with its three things, no ticket, no question about where, and nothing after it. (H1, H2, H5)
 2. Send `מה אני עושה עכשיו? שמישהו יבוא מהר!`
-   - The line again, in other words.
+   - The same three things again, in other words.
    - No advice, no promise, no ticket, and no question at the end. (H4, H5, H9)
 
 ### E5 · אורי, stressed · water running in the building
 1. Open with `אני צריך מישהו דחוף, כל הבניין נזילת מים`.
-   - Anything urgent is an emergency: the same as E3's first reply. A short caring word, then the exact line, with no ticket, no question about where, and nothing after it. (H1, H2, H5)
+   - Anything urgent is an emergency: the same as E3's first reply. The owner's format with its three things, no ticket, no question about where, and nothing after it. (H1, H2, H5)
 
 ## 5. The rules for this test
 
 - **H1 · The line, with every emergency, at any hour.** Gas, someone stuck and smoke each get `077-6687949` in Michael's first reply about it. Missing it is a FAIL.
-- **H2 · Politely.** In E3, E4 and E5 the first reply carries the exact line shown in E3. Later the line comes in other words, always as an invitation: `אפשר להתקשר`, `אני ממליץ להתקשר`, `אתה מוזמן להתקשר`.
-  - FAIL: an order, even in the singular and even after `בבקשה` (`תתקשר עכשיו`, `התקשר`), a brush-off ("this isn't for me, call them"), or "I can't help, call the line".
-  - NOTE: anything that sounds cold.
+- **H2 · The owner's format, politely.** In E3, E4 and E5 every reply carries three things, in Michael's own words, which can change from reply to reply:
+  - he is only the digital assistant and can't give an immediate answer;
+  - a polite request to call the emergency line so you get an answer soon. `בבקשה תתקשר` is the owner's own wording, and so is `כדי שתוכל לקבל מענה בהקדם`;
+  - the number.
+  - FAIL: any of the three missing, a brush-off ("this isn't for me, call them"), or the plural (`תתקשרו`).
+  - NOTE: a bare order with no "please", or anything that sounds cold.
 - **H3 · Once.** The number appears once in a reply. The same line twice in one reply is a FAIL.
-- **H4 · Nothing else.** No other number (`101`, `102`, `מד"א`, the police), no safety advice, nobody "on the way", no time or "soon", no emoji in an emergency or about gas.
+- **H4 · Nothing else.** No other number (`101`, `102`, `מד"א`, the police), no safety advice, nobody "on the way", no time or "soon" for anyone coming, no emoji in an emergency or about gas. "So you get an answer soon" about the line is part of H2, not a promise.
 - **H5 · No ticket in an emergency.** In E3, E4 and E5: no ticket number, nothing like `פתחתי קריאה` or `עדכנתי`, and no question about the building, the apartment, the lift or the floor. Any of them is a FAIL. The line's own name, `מוקד החירום`, is fine.
 - **H6 · Gas is exact.** E2's first answer word for word, with no ticket and no building question.
 - **H7 · No line without an emergency.** E1 gets no phone number.
@@ -97,7 +102,7 @@ Send the "Open with" lines exactly as written. Everything else is in the persona
 1. **Read the whole reply first,** both messages if there are two.
 2. **Give one verdict per reply:**
    - **FAIL** when the substance breaks a rule. Quote the words that break it.
-   - **PASS** when he keeps the rules, even in other words than the ones expected. Only the gas line (H6) and the line in E3's and E4's first replies (H2) have to be exact.
+   - **PASS** when he keeps the rules, even in other words than the ones expected. Only the gas line (H6) has to be exact. The emergency replies follow the owner's format in Michael's own words (H2).
    - **NOTE** for anything a real tenant would find odd, cold, robotic or confusing, even if no rule covers it.
 3. **List the serious fails first:** H1, H3, H4, H5, H6 and H10.
 
@@ -117,6 +122,7 @@ Write one block per conversation, then a summary. Copy Michael's words exactly, 
     - On file: yes / no · messages sent: N · ticket numbers seen: E1 255-… · E3, E4 and E5 none: yes / no
     - E1 asked before its ticket: yes / no
     - The line given: E2 yes / no · E3 yes / no · E4 yes / no · E5 yes / no · E1 no number: yes / no
+    - The owner's three things in every emergency reply: E3 yes / no · E4 yes / no · E5 yes / no
     - Serious fails: …
     - Other fails: …
     - Notes: …

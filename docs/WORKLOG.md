@@ -11,6 +11,45 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### LIVE: an emergency's reply follows the owner's own reference, in Michael's words (owner: "this should be a format it should still be dynamic but that is the reference"), 09:18:36 UTC, epoch 108
+- **The owner's message**, right after the route switch: "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מידיי,בבקשה תתקשר למוקד החירום שלנו כדי תוכל לקבל מענה בהקדם , 0776687949". Since epoch 105 the prompt had asked for a caring word and then our fixed sentence word for word ("למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו").
+- **What live Send did to it** (each variant run through the epoch-107 code before anything was written):
+  - The reference itself went out as "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי." with no number. Promise v7 read "בהקדם" as our own promise and cut its sentence. With no tool in the turn and no number left, danger v8 had nothing to wake on, so it could not give the line back.
+  - "כמה שיותר מהר", "הכי מהר" and "באופן מיידי" read as "on the way" to danger v8, which cut the sentence and put the old fixed one in its place.
+  - Line v1 turned "בבקשה תתקשר" into "אפשר להתקשר", "please" and all.
+  - Voice v2 cut a "כדי שיוכלו…" clause even with our number inside it.
+  - Mid-chat, manners v5 cut "אני מיכאל, " from "אני מיכאל, העוזר הדיגיטלי…" and left a broken opening.
+  - The reply guards let every variant through. The echo guard sends an "אני מבין ש…" opener back once, as before.
+- **`scripts/n8n_whatsapp_refline.py`, one write:**
+  - **The prompt,** 3 edits, `f1bd90ad0259` → `504d924d3419`, 26,422 → 26,576 characters:
+    - The first message about an emergency is "a message like this", the reference with its spelling and punctuation mended, its number written `077-6687949`. The words are Michael's and fit the case, but three things are always in it:
+      - he is only the digital assistant and can't answer immediately;
+      - a polite request to call the emergency line to get an answer soon;
+      - the number.
+      - There is no question.
+    - Pressed: the same three things, warmly and in other words.
+    - "ולא מה שאתה לא נותן" became "ולא הרשימה הזאת של מה שאתה לא נותן", so it no longer reads against "I can't answer immediately".
+  - **Send:**
+    - **Promise v8 and danger v9:** in a message that gives our line, "בהקדם" and the other "fast" words are not our promise where their sentence is about the line or says we can't. "On the way", "we'll be in touch" and advice are still cut.
+    - **Danger v9's sentences are the reference's halves:** the one added when a cut takes the line is its second half, and the one used when nothing is left is the whole reference.
+    - **Line v2:** only a plural "you" calling becomes singular ("תתקשרו", "התקשרו", "חייגו").
+    - **Voice v3:** never cuts a clause that holds our number.
+    - **Manners v6:** keeps "אני מיכאל, העוזר הדיגיטלי" whole.
+  - **Memory:** epoch 107 → 108.
+  - **Not changed:** the tools (they say "our emergency line only", with no wording), gas (its own sentence, gas company first), and no ticket and no note in an emergency.
+- **Checks:**
+  - **The gate:** 30 new cases (9 for line v2, 21 for the reference). All were seen failing on a labels-only candidate (42 fails there, the old v7/v8 cases that now expect the new sentences included). All 630 pass on the candidate and on live.
+  - **The replay:** 4 of 1,567 past replies change, all of them line v1's old "אפשר להתקשר" coming back as "(בבקשה) תתקשר". Nothing else moves.
+  - **The idle check:** compared with live, only refline, patch and fresh became idle. Line, voice2 and warmline refuse as superseded.
+  - **Pins:** only the prompt's moved. No model run.
+- **Live:** written at 09:18:36 UTC. Read back as prompt `504d924d3419`, memory key `-108`, Send as written. The re-run reports nothing to do. Snapshot `local/n8n-whatsapp-live-12nov-before-refline.json`.
+- **Briefs:**
+  - `grok-emergency-line-test.md` (purpose, E3-E5, H2, H4, judging, summary) expects the owner's format with its three things, not the old sentence.
+  - The main brief's C8 and R13 do too.
+- **Owed:**
+  - One emergency message from the owner's phone, or E3-E5 of the brief, then `--watch 2026-11-12T09:18`.
+  - The incoming phone agent's twin.
+
 ### LIVE: the closed-ticket message back on the main route, Chatwoot (owner: "ok for the closing of the tickets lets move to the main since they are approved"), 07:32:53 UTC
 - **Before:** `wa_templates.py list --waba 1389698653006050` showed `ticket_resolved_he` and `payment_link_he` APPROVED in "hadas 1", the account our Chatwoot route looks templates up in. Both had been PENDING since 16:19 UTC on 10 Nov. The live secret read `uchat` (set 16:47:55 UTC, 10 Nov), and the 2-minute notices run (`pvMuradcJOASapF0`) answered `via: "uchat"`, with nothing pending.
 - **The switch:** `WHATSAPP_VIA` went to `chatwoot`, set alone through the Management API (HTTP 201) and read back as `chatwoot` (updated 07:32:53 UTC). `.env` matches, with a backup in `local/env-backups/.env.before-chatwoot-again-2026-11-11`. No code was deployed, and the OXS mirror's keys are untouched.

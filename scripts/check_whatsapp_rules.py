@@ -244,7 +244,12 @@ PINS = {
     # 11 Nov, night (n8n_whatsapp_warmline.py, epoch 107): pressed in an emergency, "בחום ... שאפשר להתקשר עכשיו
     # למוקד החירום שלנו" in place of "המוקד הוא המקום לזה עכשיו", which came back word for word as a cold reply; the
     # caring word is "על מה שהוא עובר". From the owner's Grok run of 18:45-19:07 Israel. No model run.
-    'Answer the resident / system': 'f1bd90ad0259',
+    # 12 Nov (n8n_whatsapp_refline.py, epoch 108): an emergency's first message is "a message like this", the owner's
+    # own reference ("אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שתוכל
+    # לקבל מענה בהקדם: 077-6687949."), in his words and fitting the case, the three things always in it and no
+    # question; pressed, the same three things. The owner: "this should be a format it should still be dynamic but
+    # that is the reference". Cases and the replay on the candidate; no model run.
+    'Answer the resident / system': '504d924d3419',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

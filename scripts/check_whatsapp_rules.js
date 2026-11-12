@@ -74,7 +74,13 @@ const mannersV = (body) => { const m = String(body || '').match(/const mv = 'man
 // The v5 and v4 blocks below were keyed to 'danger v[56]' and 'danger v[456]' and would have stopped at v7.
 const dangerV = (body) => { const m = String(body || '').match(/const dv = 'danger v(\d+)'/); return m ? +m[1] : 0; };
 // 11 Nov (n8n_whatsapp_hotline.py, danger v7): the one sentence Send adds when an emergency turn's reply has no line.
-const HOTS = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
+// 12 Nov (n8n_whatsapp_refline.py, danger v9): the owner's reference is the model now, and Send's sentences are its two
+// halves: HOTS when a cut takes the line, HOTA (the whole reference) when nothing is left. Before v9 both were the old one.
+const HOTS7 = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
+const HOTS9 = 'בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949.';
+const REF9 = 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. ' + HOTS9;
+const HOTS = dangerV((P.code || {}).send_body) >= 9 ? HOTS9 : HOTS7;
+const HOTA = dangerV((P.code || {}).send_body) >= 9 ? REF9 : HOTS7;
 // 11 Nov, evening (n8n_whatsapp_line.py): Send's line step, the same way. 0 where there is none.
 const lineV = (body) => { const m = String(body || '').match(/const lv = 'line v(\d+)'/); return m ? +m[1] : 0; };
 // 11 Nov, night (n8n_whatsapp_warmline.py): the memory epoch, from the key's tail ("={{ $json.to }}-107" -> 107), for
@@ -1612,7 +1618,7 @@ function cases(E) {
         () => PR10.indexOf('מעלית שלא עובדת כשאף אחד לא תקוע בה היא לא מקרה חירום') !== -1, true);
     }
   }
-  if (epochV((P.code || {}).memory_key) >= 107) {
+  if (epochV((P.code || {}).memory_key) === 107) {   // epoch 108 says the pressed reply its own way (below)
     // 11 Nov, night (n8n_whatsapp_warmline.py, epoch 107). The owner's Grok run at 18:45-19:07 Israel passed every
     // rule, but the pressed replies came back as our own description: "המוקד הטלפוני שלנו הוא המקום לטפל בזה עכשיו.
     // המספר הוא 077-6687949." (E4.2), cold and close to a hand-off, and the caring word was only "זה באמת דחוף".
@@ -1728,8 +1734,8 @@ function cases(E) {
         () => content(E, { reply: SAY8 + ' הצוות כבר בדרך אליך.', said: 'יש עשן בחדר המדרגות', now: SUN }), SAY8);
       expect("v8: advice in the line's own sentence: the sentence goes and our line comes back",
         () => content(E, { reply: 'זה נשמע מסוכן. תתרחק מהעשן ותתקשר למוקד שלנו, 077-6687949.', said: 'יש עשן בחדר המדרגות', now: SUN }), SAY8);
-      expect('v8: everything cut, no tool: our line alone',
-        () => content(E, { reply: 'תצא מהבניין ותתקשר ל-102 או למוקד שלנו, 077-6687949.', said: 'יש עשן בחדר המדרגות', now: SUN }), HOTS);
+      expect(dangerV(SB9) >= 9 ? "v9: everything cut, no tool: the owner's reference, whole" : 'v8: everything cut, no tool: our line alone',
+        () => content(E, { reply: 'תצא מהבניין ותתקשר ל-102 או למוקד שלנו, 077-6687949.', said: 'יש עשן בחדר המדרגות', now: SUN }), HOTA);
       const OLD8 = 'פתחתי קריאה דחופה, מספר 255-1444-26. ' + HOTS;
       expect('v8: an old urgent ticket in the chat and a new emergency: no old number is added',
         () => content(E, { reply: 'זה נשמע מסוכן. תתרחק מהעשן. ' + HOTS, said: 'יש עשן בחדר המדרגות', S: { last_bot: OLD8 }, now: SUN }), SAY8);
@@ -1740,9 +1746,11 @@ function cases(E) {
       if (PR8) {
         expect('v8 prompt: an emergency opens no ticket and no note, and asks no building',
           () => PR8.indexOf('אתה לא פותח קריאה, גם כשזאת תקלה ברכוש המשותף, לא רושם הערה ולא שואל באיזה בניין או באיזו דירה') !== -1, true);
-        expect('v8 prompt: our line word for word, in his first message about it, and the message ends there',
-          () => PR8.indexOf('מילה במילה: "' + HOTS + '" ושם ההודעה נגמרת, בלי שאלה') !== -1
-            && PR8.indexOf('כבר בהודעה הראשונה שלך על המקרה') !== -1, true);
+        if (epochV((P.code || {}).memory_key) < 108) {   // 108: the owner's reference, in his words (below)
+          expect('v8 prompt: our line word for word, in his first message about it, and the message ends there',
+            () => PR8.indexOf('מילה במילה: "' + HOTS + '" ושם ההודעה נגמרת, בלי שאלה') !== -1
+              && PR8.indexOf('כבר בהודעה הראשונה שלך על המקרה') !== -1, true);
+        }
         expect('v8 prompt: no urgent ticket and no urgent note asked for anywhere',
           () => ['קריאת שירות דחופה', 'רושם הערה דחופה', 'שפתחת קריאה דחופה', 'מה המספר של הקריאה, וגם את המוקד']
             .every((w) => PR8.indexOf(w) === -1), true);
@@ -1760,7 +1768,7 @@ function cases(E) {
     expect("Yariv's 2.3: right after the lift ticket, his answer goes whole",
       () => content(E, { reply: Y23, said: 'מתי מגיעים לתקן?', S: { last_bot: Y22 }, steps: LOOK }), Y23);
   }
-  if (lineV(SB9) >= 1) {
+  if (lineV(SB9) === 1) {   // v2 (12 Nov) keeps "בבקשה תתקשר": its own block below
     // 11 Nov, evening (n8n_whatsapp_line.py, line v1). The owner's Grok run of the emergency line, 16:02-16:16 Israel:
     // the line came with every emergency, but as an order, three times in the plural ("תתקשרו עכשיו", executions
     // 173373, 173391, 173403) and once bare ("תתקשר עכשיו", 173419). The owner asked for the line "in a polite way",
@@ -1807,6 +1815,94 @@ function cases(E) {
       () => content(E, { reply: 'הטלפון של המשרד הוא 077-6687949, תתקשר בשעות הפעילות. יש עוד משהו שאוכל לעזור בו?',
         said: 'מה הטלפון של המשרד?', now: WED }),
       'הטלפון של המשרד הוא 077-6687949, אפשר להתקשר בשעות הפעילות. יש עוד משהו שאוכל לעזור בו?');
+  }
+  if (lineV(SB9) >= 2) {
+    // 12 Nov (n8n_whatsapp_refline.py, line v2). The owner's own reference asks "בבקשה תתקשר למוקד החירום שלנו", and
+    // line v1 made it "אפשר להתקשר", "please" and all. A plural "you" calling is still singular; nothing else moves.
+    console.log(NL + "--- Send: our line as the owner writes it, \"בבקשה תתקשר\", and never in the plural (12 Nov) ---");
+    const WED2 = clock9('16:11', 3);
+    const em2 = (ref) => [{ action: { tool: 'open_request', toolInput: { urgency: 'emergency' } }, observation: ob9({ ok: true, reference: ref }) },
+      { action: { tool: 'notify_team', toolInput: { reason: 'emergency' } }, observation: ob9({ ok: true, reason: 'emergency' }) }];
+    expect('173373 (the lift): "תתקשרו עכשיו" is singular, the ticket and the question stay',
+      () => content(E, { reply: 'פתחתי קריאה דחופה על המעלית (255-1441-26). תתקשרו עכשיו למוקד החירום שלנו, 077-6687949, כדי שיטפלו בזה מיד. באיזו קומה היא נתקעה?',
+        said: 'המעלית נתקעה בין הקומות ויש מישהו בפנים!!', steps: em2('255-1441-26'), now: WED2 }),
+      'פתחתי קריאה דחופה על המעלית (255-1441-26). תתקשר עכשיו למוקד החירום שלנו, 077-6687949. באיזו קומה היא נתקעה?');
+    expect('173403 (smoke): "בבקשה תתקשרו" becomes "בבקשה תתקשר", the rest of his sentence stays',
+      () => content(E, { reply: 'פתחתי מיד קריאה דחופה (מספר 255-1442-26). בבקשה תתקשרו עכשיו למוקד החירום שלנו במספר 077-6687949, הם זמינים בדיוק למקרים כאלה.',
+        said: 'יש עשן בחדר המדרגות, ממש מריח שרוף', steps: em2('255-1442-26'), now: WED2 }),
+      'פתחתי מיד קריאה דחופה (מספר 255-1442-26). בבקשה תתקשר עכשיו למוקד החירום שלנו במספר 077-6687949, הם זמינים בדיוק למקרים כאלה.');
+    expect('"בבקשה התקשרו" (formal plural) becomes "בבקשה תתקשר"',
+      () => content(E, { reply: 'זה נשמע מפחיד. בבקשה התקשרו עכשיו למוקד החירום שלנו: 077-6687949.', said: 'יש עשן!!', now: WED2 }),
+      'זה נשמע מפחיד. בבקשה תתקשר עכשיו למוקד החירום שלנו: 077-6687949.');
+    expect('"חייגו" becomes "תחייג"',
+      () => content(E, { reply: 'זה נשמע מפחיד. חייגו עכשיו למוקד החירום שלנו: 077-6687949.', said: 'יש עשן!!', now: WED2 }),
+      'זה נשמע מפחיד. תחייג עכשיו למוקד החירום שלנו: 077-6687949.');
+    expect('"כדאי שתתקשרו" is singular: "כדאי שתתקשר"',
+      () => content(E, { reply: 'פתחתי לך קריאה דחופה, מספר 255-1349-26. כדאי שתתקשרו עכשיו למוקד החירום שלנו, 077-6687949.',
+        said: 'בר כוכבא 23 דירה 2', steps: em2('255-1349-26'), now: WED2 }),
+      'פתחתי לך קריאה דחופה, מספר 255-1349-26. כדאי שתתקשר עכשיו למוקד החירום שלנו, 077-6687949.');
+    const KEEP2 = ['זה באמת מלחיץ. תתקשר עכשיו למוקד החירום שלנו, 077-6687949.',
+      'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשרי למוקד החירום שלנו כדי שתוכלי לקבל מענה בהקדם: 077-6687949.',
+      'הטלפון של המשרד הוא 077-6687949, תתקשר בשעות הפעילות. יש עוד משהו שאוכל לעזור בו?',
+      'על גז צריך לדווח ישר לחברת הגז של הבניין. אתה מוזמן גם להתקשר עכשיו למוקד החירום שלנו במספר 077-6687949 והם יעזרו לך.'];
+    for (const k of KEEP2) {
+      expect('singular, as he wrote it, goes whole: ' + k.slice(0, 48), () => content(E, { reply: k, said: 'מה לעשות?', now: WED2 }), k);
+    }
+  }
+  if (dangerV(SB9) >= 9) {
+    // 12 Nov (n8n_whatsapp_refline.py, epoch 108). The owner sent the reply he wants for an emergency, "this should be a
+    // format it should still be dynamic but that is the reference": "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה
+    // מידיי,בבקשה תתקשר למוקד החירום שלנו כדי תוכל לקבל מענה בהקדם , 0776687949". Run through live Send (epoch 107)
+    // it went out with no number at all: promise v7 read "בהקדם" as our promise, and nothing was left to say it was an
+    // emergency. "כמה שיותר מהר" next to the line read as "on the way" and the old fixed sentence took its place.
+    console.log(NL + "--- Send: the owner's own emergency reply reaches him whole, the number always in it (12 Nov) ---");
+    const NOW9 = clock9('09:40', 4);
+    const go = (reply, said, o) => () => content(E, Object.assign({ reply, said: said || 'יש הצפה בחדר המדרגות, המים זורמים לכל מקום', now: NOW9 }, o || {}));
+    const OWNER = 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מידיי,בבקשה תתקשר למוקד החירום שלנו כדי תוכל לקבל מענה בהקדם , 0776687949';
+    const WHOLE9 = [
+      ['his reference, as Send writes it', REF9],
+      ['his reference, one sentence with a comma', 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי, בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949.'],
+      ['a caring word first, "כמה שיותר מהר"', 'זה נשמע מפחיד. אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי, אז בבקשה תתקשר עכשיו למוקד החירום שלנו כדי שתקבל עזרה כמה שיותר מהר: 077-6687949.'],
+      ['pressed: "הכי מהר"', 'אני מבין שזה דחוף. כעוזר דיגיטלי אני לא יכול לשלוח מישהו, ולכן הכי מהר זה להתקשר עכשיו למוקד החירום שלנו: 077-6687949.'],
+      ['"באופן מיידי" where he says he can\'t', 'אני רק העוזר הדיגיטלי ואין לי אפשרות לעזור לך באופן מיידי. בבקשה תתקשר למוקד החירום שלנו כדי לקבל מענה מהיר: 077-6687949.'],
+      ['"בהקדם" where he says he can\'t', 'אני רק העוזר הדיגיטלי ואין לי אפשרות לטפל בזה בהקדם. בבקשה תתקשר למוקד החירום שלנו: 077-6687949.'],
+      ['"במהירות האפשרית" in the line\'s sentence', 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו, 077-6687949, כדי לקבל מענה במהירות האפשרית.'],
+      ['the number inside a "כדי שיוכלו" clause stays (voice v3)', 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שיוכלו לעזור לך מיד: 077-6687949.'],
+      ['to a woman', 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשרי למוקד החירום שלנו כדי שתוכלי לקבל מענה בהקדם: 077-6687949.'],
+    ];
+    for (const [name, reply] of WHOLE9) expect('v9: ' + name + ': whole', go(reply), reply);
+    expect('v9: his own text as he typed it, the bare number too: whole, only the space before the comma tidied (as always)',
+      go(OWNER), OWNER.replace('בהקדם , ', 'בהקדם, '));
+    const NAMED9 = "אני מיכאל, העוזר הדיגיטלי של הומי'ז, ואין לי אפשרות לתת מענה מיידי. " + HOTS9;
+    expect('manners v6: mid-chat, "אני מיכאל, העוזר הדיגיטלי" stays whole', go(NAMED9), NAMED9);
+    expect('manners v6: mid-chat, a plain "מיכאל מהומי\'ז" is still cut',
+      say({ reply: "צהריים טובים, מיכאל מהומי'ז. אני מבין שיש תקלה בתאורה. באיזה בניין ובאיזו דירה?", said: 'the elevator is stuck too' }),
+      'אני מבין שיש תקלה בתאורה. באיזה בניין ובאיזו דירה?');
+    expect('v9: "on the way" beside his reference still goes',
+      go('זה נשמע מסוכן. ' + HOTS9 + ' טכנאי כבר בדרך אליך.'), 'זה נשמע מסוכן. ' + HOTS9);
+    expect('v9: "we will be in touch soon" beside his reference still goes',
+      go('אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. ניצור איתך קשר בהקדם. ' + HOTS9), REF9);
+    expect('v9: advice beside his reference still goes',
+      go('אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. תתרחק מהמים ותכבה את החשמל. ' + HOTS9), REF9);
+    expect('v9: without our line, "soon" is still our promise and goes',
+      () => content(E, { reply: 'רשמתי את זה ונחזור אליך בהקדם. יש עוד משהו?', said: 'הדלת של הלובי לא נסגרת', now: NOW9 }).indexOf('בהקדם') === -1, true);
+    expect('v9: a cut that takes the line gives back the reference\'s second half',
+      go('אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. תצא מהבניין ותתקשר למוקד שלנו, 077-6687949.'), REF9);
+    const PR9 = String((P.code || {}).prompt || '');
+    if (PR9) {
+      expect("v9 prompt: his reference, quoted once, in his first message about it, and Send's sentences are its halves",
+        () => PR9.split('הוא הודעה כמו זאת: "' + REF9 + '"').length === 2 && PR9.indexOf('כבר בהודעה הראשונה שלך על המקרה, הוא הודעה כמו זאת') !== -1
+          && REF9 === HOTA && REF9.endsWith(HOTS), true);
+      expect('v9 prompt: his words fit the case, and the three things are always in it, with no question',
+        () => PR9.indexOf('המילים שלך ולפי המקרה, אבל שלושה דברים נמצאים בה תמיד: שאתה רק העוזר הדיגיטלי ואין לך אפשרות לתת מענה מיידי, '
+          + 'בקשה בנימוס שיתקשר למוקד החירום שלנו כדי לקבל מענה בהקדם, והמספר. ושם ההודעה נגמרת, בלי שאלה.') !== -1, true);
+      expect('v9 prompt: pressed, the same three things, warmly, in other words',
+        () => PR9.indexOf('הוא שומע ממך שוב, בחום ובמילים אחרות, את אותם שלושה דברים, ולא מוסיף שאלה') !== -1
+          && PR9.indexOf('שאפשר להתקשר עכשיו למוקד החירום שלנו, עם המספר') === -1, true);
+      expect('v9 prompt: the old fixed sentence is gone, and nothing reads against "I can\'t answer immediately"',
+        () => PR9.indexOf(HOTS7) === -1 && PR9.indexOf('מילה קצרה ואכפתית משלך על מה שהוא עובר') === -1
+          && PR9.indexOf('ולא הרשימה הזאת של מה שאתה לא נותן') !== -1 && PR9.indexOf('ולא מה שאתה לא נותן') === -1, true);
+    }
   }
   if (promiseV(SB9) >= 6) {
     console.log(NL + "--- Send: a standing order's call from collections is no promise (9 Nov, Yariv's 5.2) ---");
