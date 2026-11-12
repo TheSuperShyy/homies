@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### Read only: the owner's Ring to Ido came back as a 500 from Tokomni (the owner's screenshot of /dialer, no words), 13:30 UTC
+- **The page said:** "Not sent to <Ido's number>: Tokomni refused it (500: 500 Internal Server Error)". So that press added no lead and rang nothing, which answers the 12:27 entry's question for it.
+- **Theirs, not ours:**
+  - A 500 is none of the answers in Omni's 8 Nov document (200, 207, 400, 401, 502). The body was their server's own crash page, not a JSON answer.
+  - Their server is up: a GET of the address, with no token, answers 405 in under 2 s.
+  - Nothing changed on our side since the three 9 Nov presses they accepted: `dashboard/lib/dialer.ts` and `dialer-rules.ts` since 8 Nov (e4d13ec), Vercel's `TOKOMNI_TOKEN` since 9 Nov 08:49 UTC and `TOKOMNI_CAMPAIGN_ID` since 2 Nov (read from Vercel's env list, values not read).
+  - New on their side today: 208 switched to available (their 09:21 email), with three leads for the same number still waiting. Either could be what their code trips on; that is a guess for them to check.
+- **Not done:** no lead sent from `tokomni_lead.py` to see whether it clears, since a lead that goes in rings Ido's phone. The press time is not visible from here (the page keeps no record, Vercel's log API only streams).
+- **Said to the owner:** the 500 is Omni's, with a short Hebrew line for their thread that asks them to look at their server log at the press time. Nothing was changed, sent or pressed.
+
 ### The owner's Grok re-run of E3 after the fix: passed, the plural gone (the owner pasted Grok's report), 12:26-12:28 UTC
 - 175876 and 175884 each went out on the first pass, Send unchanged:
   - E3.1: "זה אירוע חירום שדורש חילוץ מיידי. אני רק העוזר הדיגיטלי, לכן בבקשה תתקשר עכשיו בדחיפות למוקד הטלפוני שלנו במספר 077-6687949."
