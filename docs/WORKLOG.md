@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### The 500 is their server failing on our token, before any lead (owner: "can we fix that since the number its alr in the tokomni platform is there a way to just ring the number there"), 13:39 UTC
+- **Probes that ring nobody** (no lead in any of them):
+  - `POST []` with our token: **500**, their crash page. On 9 Nov the same gave 400 "No JSON data provided".
+  - The same with a wrong token, and with none: 401, the normal answers.
+  - So their server accepts our token and then crashes, whatever we send. Ido's number, the waiting leads and our request are ruled out. We can't fix it from here.
+- **The token:** claims `domain_name`, `domain_uuid`, `iat`, `exp`, `jti` (values not printed); issued 8 Nov 10:12 UTC, valid to 8 Nov 2027. Expired would be 401, not 500.
+- **Vapi since 12 Nov 00:00 UTC:** one call, the 10:41 webCall credit check. No dialer call has reached the bot since Omni's 09:21 email; an unanswered ring wouldn't show here.
+- **Ringing the number from Tokomni itself** (our key only adds leads, so it is the owner in Tokomni's dashboard, from what we know of it):
+  - List 2 first: the three 9 Nov leads say New (not dialled) or tried. ▶ showing means it is on hold, and pressing it rings Ido three times in a row.
+  - Click-to-call: rang Ido through to the bot on 26 Oct and 1 Nov without the API; always Michael, no external_id.
+  - A new list from an Excel sheet: the dialer itself, so it waits on 208 too; never into List 2 through its edit (wipes List 2), and the leading 0 kept (26 Oct's "test 1/0" never dialled).
+- **Said to the owner:** the above, and a new Hebrew note for Omni with the three answers and 15:39 Israel as a time to look at. Nothing pressed or sent beyond the three empty probes.
+
 ### Read only: the owner's Ring to Ido came back as a 500 from Tokomni (the owner's screenshot of /dialer, no words), 13:30 UTC
 - **The page said:** "Not sent to <Ido's number>: Tokomni refused it (500: 500 Internal Server Error)". So that press added no lead and rang nothing, which answers the 12:27 entry's question for it.
 - **Theirs, not ours:**
