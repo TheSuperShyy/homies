@@ -15,6 +15,7 @@ conversation that produced it.
 - **Before:** `wa_templates.py list --waba 1389698653006050` showed `ticket_resolved_he` and `payment_link_he` APPROVED in "hadas 1", the account our Chatwoot route looks templates up in. Both had been PENDING since 16:19 UTC on 10 Nov. The live secret read `uchat` (set 16:47:55 UTC, 10 Nov), and the 2-minute notices run (`pvMuradcJOASapF0`) answered `via: "uchat"`, with nothing pending.
 - **The switch:** `WHATSAPP_VIA` went to `chatwoot`, set alone through the Management API (HTTP 201) and read back as `chatwoot` (updated 07:32:53 UTC). `.env` matches, with a backup in `local/env-backups/.env.before-chatwoot-again-2026-11-11`. No code was deployed, and the OXS mirror's keys are untouched.
 - **The same switch moves the debt call's payment link** to `whatsappDeliver()`. That path is unproven since the move. No debt call can happen while the dialer does not ring, and its probe sends a real WhatsApp to the owner's handset, so it waits for his go.
+- **After:** the first notices run after the switch (175308, 07:34:30 UTC) answered `{"ok":true,"sent":0,…}` with no `via: "uchat"`, so it took the Chatwoot route. Nothing was pending.
 - **Owed:** the next closed ticket proves the route with WhatsApp's id.
 
 ## 2026-11-11
