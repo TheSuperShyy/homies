@@ -8,6 +8,14 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 12 Nov, 07:32:53 UTC: THE CLOSED-TICKET MESSAGE AND THE DEBT CALL'S LINK ARE BACK ON THE MAIN ROUTE (CHATWOOT)** (owner: *"ok for the closing of the tickets lets move to the main since they are approved"*; WORKLOG 12 Nov).
+>   - **What:** the tool server's `WHATSAPP_VIA` went from `uchat` to `chatwoot`. It was set alone through the Management API, read back as `chatwoot`, and written to `.env` (backup `local/env-backups/.env.before-chatwoot-again-2026-11-11`). No code was deployed, and the OXS mirror's keys are untouched.
+>   - **Why now:** `ticket_resolved_he` and `payment_link_he` read APPROVED in "hadas 1" `…050` (`wa_templates.py list --waba 1389698653006050`), the account our Chatwoot route looks templates up in.
+>   - **Proven so far:** the 2-minute notices run (`pvMuradcJOASapF0`) answered `via: "uchat"` until the switch, and nothing was pending.
+>   - **Owed:** the next closed ticket proves the route with WhatsApp's id (a `ticket_notices` row `sent`, and the message in Chatwoot inbox 1 with its `source_id`).
+>   - **Also moved by the same switch:** the debt call's payment link, which now takes `whatsappDeliver()`. That path is unproven since the move, and no debt call can happen while the dialer does not ring. Its probe (`probe_paylink_call.py --template --apply`) sends a real WhatsApp to the owner's handset, so it needs the owner's go.
+>   - **Rollback:** `WHATSAPP_VIA=uchat` the same way (the scratch script `whatsapp_via.py uchat --apply`, or the Management API by hand), until UChat's trial ends around 16 Nov.
+>
 > **LIVE 11 Nov, 17:36 UTC: PRESSED IN AN EMERGENCY, THE LINE AGAIN AS A WARM INVITATION** (the owner pasted two Grok reports; `scripts/n8n_whatsapp_warmline.py`, epoch 107; WORKLOG and CONTEXT 11 Nov).
 >   - **The reports:**
 >     - **18:24-18:37 Israel, before epoch 106:** E3's error, "סליחה, משהו השתבש לי בתשובה" (173705), was the copy guard that epoch 106 fixed.
@@ -184,7 +192,7 @@ appended to.
 >     - Meta: the number CONNECTED; its phone-level webhook is Chatwoot's `/webhooks/whatsapp/<the number>`.
 >     - Chatwoot: inbox 1's channel holds the Israeli number, its id and WABA `2117787955519632`. Its templates `ticket_resolved_he` and `payment_link_he` are APPROVED.
 >     - n8n: the two typing nodes call the Israeli number (`scripts/n8n_whatsapp_tochatwoot.py`). The gate is all green on live (566/566).
->     - The tool server: `WHATSAPP_VIA=chatwoot` from 15:28 UTC; **`uchat` since 16:47:53 UTC** (the fallback, below).
+>     - The tool server: `WHATSAPP_VIA=chatwoot` from 15:28 UTC; `uchat` from 16:47:53 UTC (the fallback, below); **`chatwoot` again since 07:32:53 UTC on 12 Nov** (the top block).
 >   - **Guard:** `n8n_uchat.py --apply` / `--wire` refuse without `--back-to-uchat`. Rollback lines in the blocks below that end with `n8n_uchat.py --apply` skip that step now.
 >   - **`.env`:** `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the Israeli number's. The test number's are `WHATSAPP_TEST_*`. Backup: `local/env-backups/.env.before-chatwoot-move-2026-11-10`.
 >   - **Owed:**
@@ -196,8 +204,8 @@ appended to.
 >       - **No real traffic since the move:** the last message was the owner's "היי" at 15:54 UTC, answered. The tap (the first AI answer on Chatwoot) is still unproven.
 >       - **Templates still PENDING** in "hadas 1", below.
 >     - **Templates go to two accounts now** (CONTEXT): `.env`'s `WHATSAPP_WABA_ID` is ASTDX `…632`, Chatwoot's template list. Our sends look in "hadas 1" `…050`. A new template needs `wa_templates.py create <name> --apply` **and** `--waba 1389698653006050 --apply`.
->     - **THE FALLBACK SINCE 16:47:53 UTC: `WHATSAPP_VIA=uchat`** (set alone through the Management API, read back, and in `.env`; backup `local/env-backups/.env.before-uchat-fallback-2026-11-10`). The closed-ticket message and the debt call's link leave the number through UChat, whose templates are ASTDX's (APPROVED). A `send_ticket_notices` call with nothing pending answered `via: "uchat"` at 16:47:59. **255-1433-26's message was resent and sent at 16:48:34 UTC** (the UChat path marks `sent` only with WhatsApp's id), its `{{2}}` the report only.
->     - **Still open:** both templates PENDING in "hadas 1" `…050` (ids `4675959222649546`, `30145416878382371`; submitted 16:19 UTC). When both read APPROVED there: `WHATSAPP_VIA=chatwoot` again (alone, and `.env`), then prove the Chatwoot route on the next closed ticket with WhatsApp's id, and the debt link with `python scripts/probe_paylink_call.py --template --apply` (a real WhatsApp to the owner's handset: the owner's go).
+>     - **THE FALLBACK FROM 16:47:53 UTC ON 10 NOV TO 07:32:53 UTC ON 12 NOV: `WHATSAPP_VIA=uchat`** (set alone through the Management API, read back, and in `.env`; backup `local/env-backups/.env.before-uchat-fallback-2026-11-10`). The closed-ticket message and the debt call's link leave the number through UChat, whose templates are ASTDX's (APPROVED). A `send_ticket_notices` call with nothing pending answered `via: "uchat"` at 16:47:59. **255-1433-26's message was resent and sent at 16:48:34 UTC** (the UChat path marks `sent` only with WhatsApp's id), its `{{2}}` the report only.
+>     - **Done 12 Nov, 07:32:53 UTC (the top block): both read APPROVED, and `WHATSAPP_VIA=chatwoot` again.** Before: both templates PENDING in "hadas 1" `…050` (ids `4675959222649546`, `30145416878382371`; submitted 16:19 UTC). When both read APPROVED there: `WHATSAPP_VIA=chatwoot` again (alone, and `.env`), then prove the Chatwoot route on the next closed ticket with WhatsApp's id, and the debt link with `python scripts/probe_paylink_call.py --template --apply` (a real WhatsApp to the owner's handset: the owner's go).
 >     - ~~A template from the Chatwoot route is refused (16:14 UTC).~~ Cause and fix above: our sends look in "hadas 1" (proven, `hello_world` #131058), the templates were only in ASTDX (#132001). 039 is applied: `{{2}}` holds the report only.
 >     - **The debt call's payment link is back on the UChat path** that v152 sped up and proved at 4.4 s (12:45 UTC), while the fallback holds. The Chatwoot path (`whatsappDeliver()` with the model's line, about 12 s on 26 Oct) is unproven since the move. No debt call can happen while the dialer does not ring.
 >   - **Rollback (minutes), in this order:**

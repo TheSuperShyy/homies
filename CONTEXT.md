@@ -649,8 +649,8 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   'uchat:<n>', because UChat numbers our messages from 1, the range Chatwoot's ids are in. A
   photo's `message_external_id` carries the same prefix. Anything new that reads the log or
   matches ids must expect both.
-- **The tool server sends WhatsApp through UChat** (`WHATSAPP_VIA=uchat`, debt-tools v140): the
-  debt call's link and the "done" notice. `WHATSAPP_VIA=chatwoot` plus an `--apply` moves back.
+- **The tool server sends WhatsApp through Chatwoot again** (`WHATSAPP_VIA=chatwoot` since 07:32:53 UTC on
+  12 Nov): the debt call's link and the "done" notice. `WHATSAPP_VIA=uchat` is the fallback, set the same way.
   Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
   mirror's key.
 - **Since the move to Chatwoot (10 Nov), a template for the bot's number lives in TWO WhatsApp accounts.**
@@ -691,11 +691,11 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
 - **A WhatsApp change goes to `u2JjrbcNPYyyh3yl` only.** `n8n_uchat.py --apply` or `--wire` refuses without
   `--back-to-uchat`, because it would switch the copy back on while UChat's app still gets the number's
   messages, and both bots would answer. An older rollback line ending in `n8n_uchat.py --apply` skips it.
-- **The tool server's template sends go through UChat until "hadas 1" approves the templates**
-  (`WHATSAPP_VIA=uchat` since 16:47:53 UTC on 10 Nov; it was `chatwoot` from 15:28). Our Chatwoot route looks
-  templates up in "hadas 1", where both are PENDING. UChat's looks them up in ASTDX, where they are APPROVED.
-  Only the closed-ticket message and the debt call's link leave through UChat; the conversation stays on
-  Chatwoot. When both read APPROVED in "hadas 1", set `chatwoot` again (alone, the Management API, and `.env`).
+- **The tool server's template sends are back on Chatwoot** (`WHATSAPP_VIA=chatwoot` since 07:32:53 UTC on
+  12 Nov, on the owner's *"ok for the closing of the tickets lets move to the main since they are approved"*).
+  Our Chatwoot route looks templates up in "hadas 1", where `ticket_resolved_he` and `payment_link_he` read
+  APPROVED on 12 Nov. From 16:47:53 UTC on 10 Nov they went through UChat, whose templates are ASTDX's; UChat
+  stays the fallback (`uchat`, alone, the Management API, and `.env`) until its trial ends around 16 Nov.
   Inbox 1's templates are the Israeli WABA's (`ticket_resolved_he`, `payment_link_he`, APPROVED).
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
