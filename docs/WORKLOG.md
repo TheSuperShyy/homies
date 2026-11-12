@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### Read only: the owner's Ring to Ido from the dashboard (owner: "can you check if the test call from the homies dashboard works i called ido"), 12:27 UTC
+- **Vapi:** `tokomni_lead.py --check` found no phone call in the last two hours. A GET of every call since 12 Nov 00:00 UTC found one entry, a webCall at 10:41 UTC (a credit check), and no phone call at all. The last phone call is still 9 Nov 13:53 UTC.
+- **Our side is ready:** Vapi's "Omni extension 208" (`e9f95429`) reads active, with the bot attached, last changed 10 Nov.
+- **Not visible from here:** the page keeps no record, Vercel's runtime logs only stream new lines, and our Omni key only adds leads (their call reports need a login we do not have).
+- **So the call stopped before the bot,** in one of three places:
+  - Omni's dialer did not dial. 208 still unavailable in their dialer (their 09:21 email) is the likely cause, or the lead was not added; the page shows which right after the press.
+  - Ido's phone rang and nobody answered, which spends the lead's one attempt.
+  - Ido answered and Omni's hand-over to 208 failed.
+- Said to the owner: ask Ido whether it rang and what he heard, and what the page said after the press. Nothing was changed, sent or pressed.
+
 ### LIVE: the owner's Grok run of the standard, read against the executions, and its one fail fixed (the owner pasted Grok's report), 12:06:21 UTC, code only
 - **The run** (13:31-13:53 Israel, 11:32-11:54 UTC, 175738-175816): Grok ran E1-E5 and sent 9 messages.
   - E1 asked before opening 255-1447-26.
