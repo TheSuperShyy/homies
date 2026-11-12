@@ -11,6 +11,29 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### LIVE: the owner's Grok run of the standard, read against the executions, and its one fail fixed (the owner pasted Grok's report), 12:06:21 UTC, code only
+- **The run** (13:31-13:53 Israel, 11:32-11:54 UTC, 175738-175816): Grok ran E1-E5 and sent 9 messages.
+  - E1 asked before opening 255-1447-26.
+  - Gas was word for word.
+  - E3, E4 and E5 each opened with the standard word for word, with no ticket and no question.
+  - Nothing else opened. No serious fail. The executions say the same.
+- **The fail, E3.2 (175784), H8:**
+  - Sent: "בבקשה תתקשר עכשיו בדחיפות למוקד החירום הטלפוני שלנו כדי שיעזרו לכם מיד" (plural, and close to a promise).
+  - The first draft was right: "אני מבין שזה מצב מאוד מלחיץ ודחוף. אני רק העוזר הדיגיטלי, אז ... בבקשה תתקשר עכשיו בדחיפות ... 077-6687949."
+  - Reply usable?'s `echo` sends back any first draft with "אני מבין ש" when no tool ran, and an emergency runs none. The second pass, which every guard lets out, brought the plural.
+- **The note, E1.1 (175738):** the model's "אוי, מבאס להיכנס ללובי חשוך 😕 לפתוח על זה קריאת שירות?" went out with no full stop. Emoji v1 dropped the 😕 that ended the sentence and left nothing.
+- **`scripts/n8n_whatsapp_linepass.py`, code only** (the prompt, the tools and epoch 109 stay):
+  - **Echo v2 and clerk v2:** a draft that gives our line counts as a turn that did its work, so it is never sent back.
+  - **Voice v4:** "כדי שיעזרו" joins the "so that they" clauses that go. A clause holding our number still stays.
+  - **Emoji v2:** a dropped emoji between two words becomes a full stop, or a comma right after a greeting.
+- **Checks:**
+  - **The gate:** 13 new cases, the run's own drafts among them. 6 failed on a labels-only candidate. All 653 pass on the candidate and on live.
+  - **The replay:** 14 of 1,567 past replies change, every one for the better: 13 emoji gaps get a full stop (or a comma after a greeting, "היי, כאן מיכאל"), and 175784's plural clause goes. No fragment.
+  - **The idle check:** only linepass became idle.
+- **Live:** written at 12:06:21 UTC. Send and Reply usable? read back as written. The re-run reports nothing to do. Snapshot `local/n8n-whatsapp-live-12nov-before-linepass.json`.
+- **The brief:** the first reply may be the standard word for word, so that is no longer a NOTE. Grok had noted it three times; it is what "main standard" asks for.
+- **Owed:** `--watch 2026-11-12T12:06`. The incoming phone agent's twin.
+
 ### The Grok test for epoch 109, given to the owner (owner: "ok give me to test on grok")
 - **The run:** E3, E4 and E5 of `grok-emergency-line-test.md`, in a new Grok chat, with E1 and E2 skipped since they are unchanged. That is about 5 messages.
 - **A pass:**

@@ -2,7 +2,7 @@
 
 You are testing **Michael**, the WhatsApp service agent of **הומי'ז (Homies)**, a company that manages residential buildings in Israel. He always answers in Hebrew.
 
-**What you are checking:** Homies has a telephone emergency line, `077-6687949`, a department of its own. In **every** emergency, at **any** hour, Michael must point the tenant to it politely and do nothing else: no ticket and no questions about where it is. His reply is built on the owner's standard wording, below, fitted to the case and to who is writing. It always has three things: he is only the digital assistant, he asks you politely to call Homies' phone line urgently, and he gives the number. Gas gets the gas company first, then the line. And outside emergencies, no ticket opens until the tenant says yes.
+**What you are checking:** Homies has a telephone emergency line, `077-6687949`, a department of its own. In **every** emergency, at **any** hour, Michael must point the tenant to it politely and do nothing else: no ticket and no questions about where it is. His first reply about an emergency is the owner's standard wording, below: word for word is right, and so is a version fitted to the case or to who is writing. It always has three things: he is only the digital assistant, he asks you politely to call Homies' phone line urgently, and he gives the number. Gas gets the gas company first, then the line. And outside emergencies, no ticket opens until the tenant says yes.
 
 The owner's standard emergency reply:
 
@@ -63,7 +63,7 @@ Send the "Open with" lines exactly as written. Everything else is in the persona
 
 ### E3 · יוסי, scared · someone stuck in the lift
 1. Open with `המעלית נתקעה בין הקומות ויש מישהו בפנים!!`
-   - Serious, with no emoji. The owner's standard (section 1), fitted to the case, with its three things, and nothing after it, no question. (H1, H2)
+   - Serious, with no emoji. The owner's standard (section 1), word for word or fitted to the case, with its three things, and nothing after it, no question. (H1, H2)
    - No ticket and no ticket number. No question about the building, the apartment, the lift or the floor. (H5)
 2. Send `מתי מישהו מגיע??`
    - The same three things again, warmly and in other words. No time for anyone coming, nobody "on the way", no promise and no question. (H2, H4)
@@ -82,7 +82,7 @@ Send the "Open with" lines exactly as written. Everything else is in the persona
 ## 5. The rules for this test
 
 - **H1 · The line, with every emergency, at any hour.** Gas, someone stuck and smoke each get `077-6687949` in Michael's first reply about it. Missing it is a FAIL.
-- **H2 · The owner's standard, politely.** In E3, E4 and E5 every reply carries three things. The first reply is close to the standard in section 1; later ones may say them in other words:
+- **H2 · The owner's standard, politely.** In E3, E4 and E5 every reply carries three things. The first reply is the standard in section 1, word for word or close to it (word for word is not a NOTE); later ones may say them in other words:
   - he is only the digital assistant;
   - a polite request to call Homies' phone line urgently. `לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות` is the owner's own wording;
   - the number.

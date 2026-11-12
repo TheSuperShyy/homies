@@ -92,6 +92,10 @@ const lineV = (body) => { const m = String(body || '').match(/const lv = 'line v
 const epochV = (key) => { const m = String(key || '').match(/-(\d+)\s*$/); return m ? +m[1] : 0; };
 // 11 Nov, night (n8n_whatsapp_confirm.py): the copy guard's version, read from Reply usable?'s `repeat`. 1 before the label.
 const repeatV = (code) => { const m = String(code || '').match(/const rpv = 'repeat v(\d+)'/); return m ? +m[1] : (code ? 1 : 0); };
+// 12 Nov, after the Grok run of epoch 109 (n8n_whatsapp_linepass.py): the echo guard's, voice's and emoji's versions.
+const echoV = (code) => { const m = String(code || '').match(/const ecv = 'echo v(\d+)'/); return m ? +m[1] : (code ? 1 : 0); };
+const voiceV = (body) => { const m = String(body || '').match(/const vv = 'voice v(\d+)'/); return m ? +m[1] : 0; };
+const emojiV = (body) => { const m = String(body || '').match(/const ev = 'emoji v(\d+)'/); return m ? +m[1] : 0; };
 
 function mask(s) {
   return String(s).replace(/https?:\/\/\S+/g, '<link>').replace(/\+?\d{9,15}/g, '<phone>')
@@ -1946,6 +1950,48 @@ function cases(E) {
       expect('v10 prompt: pressed, the same three things, warmly, in other words',
         () => PR10.indexOf('הוא שומע ממך שוב, בחום ובמילים אחרות, את אותם שלושה דברים, ולא מוסיף שאלה') !== -1, true);
     }
+  }
+  // 12 Nov, the owner's Grok run of epoch 109 (13:31-13:53 Israel; n8n_whatsapp_linepass.py). E3.2 (175784) failed H8
+  // with "כדי שיעזרו לכם מיד": its first draft was right, but `echo` sends back any "אני מבין ש" when no tool ran, and an
+  // emergency runs none; the second pass, which every guard lets out, brought the plural. E1.1 (175738) lost its full
+  // stop: the 😕 that ended "...חשוך" was dropped with nothing in its place.
+  if (echoV(((P.code || {}).reply_usable || {}).echo) >= 2) {
+    console.log(NL + '--- Reply usable?: a draft that gives our line goes out on the first pass (12 Nov, the Grok run, 175784) ---');
+    const g12 = (id, output) => () => E.reply[id]({ output, intermediateSteps: [] }, 0, turn({ said: 'מתי מישהו מגיע??' }).$);
+    const D1 = 'אני מבין שזה מצב מאוד מלחיץ ודחוף. אני רק העוזר הדיגיטלי, אז כדי להזעיק עזרה כמה שיותר מהר, בבקשה תתקשר עכשיו בדחיפות למוקד החירום הטלפוני שלנו במספר 077-6687949.';
+    expect('175784: the first draft, "אני מבין ש..." with our line, is no echo', g12('echo', D1), true);
+    expect('echo: the same opener without our line still goes back', g12('echo', 'אני מבין שהמעלית תקועה. באיזה בניין זה?'), false);
+    expect('clerk: "כדי שאוכל" beside our line is no clerk',
+      g12('clerk', 'אני רק העוזר הדיגיטלי, וכדי שאוכל לעזור הכי מהר בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.'), true);
+    expect('clerk: "כדי שאוכל" without our line still goes back', g12('clerk', 'כדי שאוכל לעזור, באיזה בניין זה?'), false);
+  }
+  if (voiceV(SB9) >= 4) {
+    console.log(NL + '--- Send: "כדי שיעזרו" goes like the other "so that they" clauses (12 Nov, the Grok run, 175784) ---');
+    const D2 = 'זה באמת מלחיץ, אבל אני רק העוזר הדיגיטלי. בבקשה תתקשר עכשיו בדחיפות למוקד החירום הטלפוני שלנו כדי שיעזרו לכם מיד, המספר הוא 077-6687949.';
+    expect('175784, the second draft: the plural clause goes, our line and the number stay',
+      () => content(E, { reply: D2, said: 'מתי מישהו מגיע??' }),
+      'זה באמת מלחיץ, אבל אני רק העוזר הדיגיטלי. בבקשה תתקשר עכשיו בדחיפות למוקד החירום הטלפוני שלנו, המספר הוא 077-6687949.');
+    const ADDV = { action: { tool: 'add_request_detail' }, observation: ob9({ ok: true, reference: '255-1409-26' }) };
+    expect('outside an emergency the same clause goes too',
+      () => content(E, { reply: 'הוספתי את זה לקריאה (255-1409-26) כדי שיעזרו לך מהר יותר. משהו השתנה מאז?', steps: [ADDV], said: 'עדיין לא עובד' }),
+      'הוספתי את זה לקריאה (255-1409-26). משהו השתנה מאז?');
+    const KEEPV = 'בבקשה תתקשר למוקד החירום שלנו כדי שיעזרו לך מיד: 077-6687949.';
+    expect('a clause that holds our number stays (voice v3)', () => content(E, { reply: KEEPV, said: 'יש עשן' }), KEEPV);
+  }
+  if (emojiV(SB9) >= 2) {
+    console.log(NL + '--- Send: an emoji that ended a sentence leaves a full stop (12 Nov, the Grok run, 175738) ---');
+    expect('175738 exactly: "חשוך 😕 לפתוח" becomes "חשוך. לפתוח"',
+      say({ reply: 'אוי, מבאס להיכנס ללובי חשוך 😕 לפתוח על זה קריאת שירות?', said: 'האור בלובי לא עובד כבר יומיים' }),
+      'אוי, לא נעים להיכנס ללובי חשוך. לפתוח על זה קריאת שירות?');
+    expect('two in a row leave one full stop',
+      say({ reply: 'אוי, לא נעים להיכנס ללובי חשוך 😕😕 לפתוח על זה קריאת שירות?', said: 'x' }),
+      'אוי, לא נעים להיכנס ללובי חשוך. לפתוח על זה קריאת שירות?');
+    expect('after a full stop nothing is added',
+      say({ reply: 'וזה באמת לא מצב נעים. 😔 באיזה בניין ובאיזו דירה?', said: 'lights' }), 'וזה באמת לא מצב נעים. באיזה בניין ובאיזו דירה?');
+    expect('at the start nothing is added', say({ reply: '😕 אוי, לא נעים. באיזה בניין?', said: 'x' }), 'אוי, לא נעים. באיזה בניין?');
+    expect('at the end nothing is added', say({ reply: 'תודה שפנית אלינו! 👋', said: 'thanks' }), 'תודה שפנית אלינו!');
+    expect('right after a greeting it is a comma', say({ reply: "היי 👋 כאן מיכאל מהומי'ז. במה אפשר לעזור?", said: 'היי', S: { greeted: false } }),
+      "היי, כאן מיכאל מהומי'ז. במה אפשר לעזור?");
   }
   if (promiseV(SB9) >= 6) {
     console.log(NL + "--- Send: a standing order's call from collections is no promise (9 Nov, Yariv's 5.2) ---");

@@ -113,6 +113,11 @@ The user is the builder. The client is Homies.
     - **Promise v8 and danger v9:** in a message that gives the line, "בהקדם", "במהרה", "במהירות (האפשרית)", "הכי מהר", "כמה שיותר מהר", "במיידי" and "באופן מיידי" are not our promise where their sentence is about the line or says we can't. "On the way", "we'll be in touch" and advice are still cut.
     - **Send's own two sentences are the standard's halves** (danger v10, epoch 109; danger v9 had the reference's). HOTS, added when a cut takes the line, is "לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.". HOTA, sent when nothing is left, is the whole standard.
     - **Live Send let the standard through whole before epoch 109.** That covers the caring-word and pressed variants too, and right after the menu no "כאן מיכאל" is put in front. An en dash before the number becomes a comma, as every dash does.
+    - **A draft that gives our line goes out on the first pass** (12 Nov, 12:06 UTC, `scripts/n8n_whatsapp_linepass.py`):
+      - Reply usable?'s echo v2 and clerk v2 count such a draft as a turn that did its work, like a tool.
+      - Before, an emergency draft opening "אני מבין ש..." was sent back. The second pass, which no guard checks, then brought E3.2's plural "כדי שיעזרו לכם מיד" in the owner's Grok run (175784).
+      - Voice v4 cuts "כדי שיעזרו" with the other "so that they" clauses.
+      - Emoji v2 leaves a full stop where a dropped emoji ended a sentence, or a comma right after a greeting.
     - **Voice v3** never cuts a clause with our number in it.
     - **Manners v6** keeps "אני מיכאל, העוזר הדיגיטלי" whole mid-chat.
   - **Epoch 107's words, kept for the record:** a short caring word, then, word for word, "למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949."; pressed, "בחום ובמילים אחרות, שאפשר להתקשר עכשיו למוקד החירום שלנו".

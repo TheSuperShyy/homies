@@ -8,6 +8,16 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 12 Nov, 12:06:21 UTC: THE GROK RUN OF THE STANDARD PASSED; ITS ONE FAIL IS FIXED IN CODE** (the owner pasted Grok's report; `scripts/n8n_whatsapp_linepass.py`; WORKLOG 12 Nov).
+>   - **The run (11:32-11:54 UTC):** E3, E4 and E5 opened with the standard word for word, with no ticket. E1 asked before opening its ticket, and gas was exact.
+>   - **The fail, E3.2's plural "כדי שיעזרו לכם מיד":** the `echo` guard had sent back a right first draft ("אני מבין ש..." plus our line), and the unguarded second pass slipped. Now:
+>     - echo v2 and clerk v2 never send back a draft that gives our line;
+>     - voice v4 cuts "כדי שיעזרו";
+>     - emoji v2 leaves a full stop where a dropped emoji ended a sentence (E1.1's note).
+>   - **Checked:** 653/653 on the candidate and on live. The replay improves 14 old replies and breaks none. Prompt and epoch 109 are unchanged.
+>   - **Owed:** `--watch 2026-11-12T12:06`; the incoming phone agent's twin.
+>   - **Rollback:** `python scripts/n8n_whatsapp_linepass.py --restore`, then `git revert`.
+>
 > **LIVE 12 Nov, 10:44:33 UTC: THE OWNER'S STANDARD IS THE BASE OF EVERY EMERGENCY REPLY** (owner: *"add this on the context like the basis of what the bot should answer make this the main standard"*; `scripts/n8n_whatsapp_standard.py`, epoch 109; WORKLOG and CONTEXT 12 Nov).
 >   - **The standard** (the owner's words, a full stop added): "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949."
 >   - **The prompt:** it replaces epoch 108's reference as "the basis of your answer", fitted to the case and to who writes. Its three things are always in it (only the digital assistant; a polite request to call our phone line urgently; the number), with no question. Pressed: unchanged.
