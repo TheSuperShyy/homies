@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### The Grok test for epoch 109, given to the owner (owner: "ok give me to test on grok")
+- **The run:** E3, E4 and E5 of `grok-emergency-line-test.md`, in a new Grok chat, with E1 and E2 skipped since they are unchanged. That is about 5 messages.
+- **A pass:**
+  - each first reply is close to the standard, with its three things, no question, no ticket and no building question;
+  - each pressed reply gives the same three things in other words;
+  - nothing new opens in OXS from the owner's number.
+- **Then:** read the report against the executions, and `--watch 2026-11-12T10:44`.
+
 ### LIVE: the owner's standard is the base of every emergency reply (owner: "add this on the context like the basis of what the bot should answer make this the main standard"), 10:44:33 UTC, epoch 109
 - **The owner's text:** "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949". It replaces the morning's reference (epoch 108).
 - **Live Send first** (epoch 108 code, before anything was written): the standard went out whole, and so did a woman's "תתקשרי", a caring word before it and a pressed variant. Right after the menu no "כאן מיכאל" was put in front of it. An en dash before the number becomes a comma, as every dash does. The guards pass it; the echo guard returns an "אני מבין ש…" opener once, as before.

@@ -15,7 +15,7 @@ appended to.
 >   - **Checked:** 10 new cases plus 4 prompt checks, seen failing on a labels-only candidate (17 fails there). 640/640 on the candidate and on live. The replay changes nothing, and the idle check is clean. No model run.
 >   - **Read back:** prompt `fe1f06ca0f84`, memory key `-109`. The re-run reports nothing to do.
 >   - **Owed:**
->     - one emergency message from the owner's phone, then `--watch 2026-11-12T10:44`;
+>     - the owner's Grok run of E3-E5 (given 12 Nov, WORKLOG), or one emergency message from his phone, then `--watch 2026-11-12T10:44`;
 >     - the incoming phone agent's twin.
 >   - **Rollback:** `python scripts/n8n_whatsapp_standard.py --restore` (the snapshot `local/n8n-whatsapp-live-12nov-before-standard.json`), then `git revert`.
 >
