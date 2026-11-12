@@ -249,7 +249,11 @@ PINS = {
     # לקבל מענה בהקדם: 077-6687949."), in his words and fitting the case, the three things always in it and no
     # question; pressed, the same three things. The owner: "this should be a format it should still be dynamic but
     # that is the reference". Cases and the replay on the candidate; no model run.
-    'Answer the resident / system': '504d924d3419',
+    # 12 Nov, later (n8n_whatsapp_standard.py, epoch 109): the owner's standard takes the reference's place, "this
+    # message, the basis of your answer": "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות
+    # למוקד הטלפוני שלנו - 077-6687949.", fitted to the case and to who writes, its three things always in it. The
+    # owner: "add this on the context like the basis of what the bot should answer make this the main standard".
+    'Answer the resident / system': 'fe1f06ca0f84',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained

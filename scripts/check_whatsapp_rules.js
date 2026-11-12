@@ -79,8 +79,12 @@ const dangerV = (body) => { const m = String(body || '').match(/const dv = 'dang
 const HOTS7 = 'למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו: 077-6687949.';
 const HOTS9 = 'בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949.';
 const REF9 = 'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. ' + HOTS9;
-const HOTS = dangerV((P.code || {}).send_body) >= 9 ? HOTS9 : HOTS7;
-const HOTA = dangerV((P.code || {}).send_body) >= 9 ? REF9 : HOTS7;
+// 12 Nov, later (n8n_whatsapp_standard.py, danger v10): the owner's standard takes the reference's place, the same way.
+const HOTS10 = 'לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.';
+const REF10 = 'אני רק העוזר הדיגיטלי, ' + HOTS10;
+const DV0 = dangerV((P.code || {}).send_body);
+const HOTS = DV0 >= 10 ? HOTS10 : (DV0 >= 9 ? HOTS9 : HOTS7);
+const HOTA = DV0 >= 10 ? REF10 : (DV0 >= 9 ? REF9 : HOTS7);
 // 11 Nov, evening (n8n_whatsapp_line.py): Send's line step, the same way. 0 where there is none.
 const lineV = (body) => { const m = String(body || '').match(/const lv = 'line v(\d+)'/); return m ? +m[1] : 0; };
 // 11 Nov, night (n8n_whatsapp_warmline.py): the memory epoch, from the key's tail ("={{ $json.to }}-107" -> 107), for
@@ -1886,10 +1890,11 @@ function cases(E) {
       go('אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. תתרחק מהמים ותכבה את החשמל. ' + HOTS9), REF9);
     expect('v9: without our line, "soon" is still our promise and goes',
       () => content(E, { reply: 'רשמתי את זה ונחזור אליך בהקדם. יש עוד משהו?', said: 'הדלת של הלובי לא נסגרת', now: NOW9 }).indexOf('בהקדם') === -1, true);
-    expect('v9: a cut that takes the line gives back the reference\'s second half',
-      go('אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. תצא מהבניין ותתקשר למוקד שלנו, 077-6687949.'), REF9);
+    expect('v9: a cut that takes the line gives back Send\'s own line sentence',
+      go('אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. תצא מהבניין ותתקשר למוקד שלנו, 077-6687949.'),
+      'אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. ' + HOTS);
     const PR9 = String((P.code || {}).prompt || '');
-    if (PR9) {
+    if (PR9 && epochV((P.code || {}).memory_key) === 108) {   // 109: the owner's standard (below)
       expect("v9 prompt: his reference, quoted once, in his first message about it, and Send's sentences are its halves",
         () => PR9.split('הוא הודעה כמו זאת: "' + REF9 + '"').length === 2 && PR9.indexOf('כבר בהודעה הראשונה שלך על המקרה, הוא הודעה כמו זאת') !== -1
           && REF9 === HOTA && REF9.endsWith(HOTS), true);
@@ -1902,6 +1907,44 @@ function cases(E) {
       expect('v9 prompt: the old fixed sentence is gone, and nothing reads against "I can\'t answer immediately"',
         () => PR9.indexOf(HOTS7) === -1 && PR9.indexOf('מילה קצרה ואכפתית משלך על מה שהוא עובר') === -1
           && PR9.indexOf('ולא הרשימה הזאת של מה שאתה לא נותן') !== -1 && PR9.indexOf('ולא מה שאתה לא נותן') === -1, true);
+    }
+  }
+  if (dangerV(SB9) >= 10) {
+    // 12 Nov, later (n8n_whatsapp_standard.py, epoch 109). The owner: "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי
+    // חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949" and "add this on the context like the basis of what
+    // the bot should answer make this the main standard". It takes the morning's reference's place, and Send's own two
+    // sentences are its halves. Live Send (epoch 108) already let it through whole.
+    console.log(NL + "--- Send: the owner's standard emergency reply goes whole (12 Nov, later) ---");
+    const NOW10 = clock9('11:30', 4);
+    const go10 = (reply, said, o) => () => content(E, Object.assign({ reply, said: said || 'יש הצפה בחדר המדרגות, המים זורמים לכל מקום', now: NOW10 }, o || {}));
+    const OWN10 = 'אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949';
+    const WHOLE10 = [
+      ['the standard as he wrote it', OWN10],
+      ['the standard as the prompt quotes it, with a full stop', REF10],
+      ['to a woman', REF10.replace('תתקשר', 'תתקשרי')],
+      ['a caring word first', 'זה נשמע מפחיד. ' + REF10],
+      ['pressed, in other words', 'אני מבין שזה דחוף. אני רק העוזר הדיגיטלי, אז בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.'],
+    ];
+    for (const [name, reply] of WHOLE10) expect('v10: ' + name + ': whole', go10(reply), reply);
+    expect('v10: right after the menu, no "כאן מיכאל" is put in front of it', go10(REF10, 'יש הצפה', { S: { last_bot: MENU_TEXT } }), REF10);
+    expect('v10: an en dash before the number becomes a comma, as every dash does',
+      go10(REF10.replace(' - ', ' – ')), REF10.replace(' - ', ', '));
+    expect('v10: everything cut, no tool: the standard, whole', go10('תצא מהבניין ותתקשר ל-102 או למוקד שלנו, 077-6687949.', 'יש עשן בחדר המדרגות'), REF10);
+    expect("v10: a cut that takes the line gives back the standard's second half",
+      go10('אני רק העוזר הדיגיטלי. תצא מהבניין ותתקשר למוקד שלנו, 077-6687949.', 'יש עשן בחדר המדרגות'), 'אני רק העוזר הדיגיטלי. ' + HOTS10);
+    expect('v10: "on the way" beside the standard still goes', go10(REF10 + ' טכנאי כבר בדרך אליך.'), REF10);
+    const PR10 = String((P.code || {}).prompt || '');
+    if (PR10) {
+      expect("v10 prompt: the standard, quoted once as the basis of his answer, and Send's sentences are its halves",
+        () => PR10.split('הוא ההודעה הזאת, שהיא הבסיס לתשובה שלך: "' + REF10 + '"').length === 2
+          && REF10 === HOTA && REF10.endsWith(HOTS), true);
+      expect('v10 prompt: fitted to the case and to who writes, the three things always in it, and no question',
+        () => PR10.indexOf('אפשר להתאים אותה למקרה ולמי שכותב, אבל שלושה דברים נמצאים בה תמיד: שאתה רק העוזר הדיגיטלי, '
+          + 'בקשה בנימוס שיתקשר בדחיפות למוקד הטלפוני שלנו, והמספר. ושם ההודעה נגמרת, בלי שאלה.') !== -1, true);
+      expect("v10 prompt: neither the morning's reference nor the old fixed sentence is left",
+        () => PR10.indexOf(REF9) === -1 && PR10.indexOf('הוא הודעה כמו זאת') === -1 && PR10.indexOf(HOTS7) === -1, true);
+      expect('v10 prompt: pressed, the same three things, warmly, in other words',
+        () => PR10.indexOf('הוא שומע ממך שוב, בחום ובמילים אחרות, את אותם שלושה דברים, ולא מוסיף שאלה') !== -1, true);
     }
   }
   if (promiseV(SB9) >= 6) {

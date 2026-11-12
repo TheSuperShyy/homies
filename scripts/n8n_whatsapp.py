@@ -230,7 +230,11 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 108
+MEMORY_EPOCH = 109
+# 108 -> 109, 12 Nov, later (n8n_whatsapp_standard.py): the owner's standard is the base of an emergency's first message,
+# "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.",
+# fitted to the case and to who writes, its three things always in it; it replaces the morning's reference. Send's
+# danger v10 makes its own two sentences the standard's halves.
 # 107 -> 108, 12 Nov (n8n_whatsapp_refline.py): an emergency's first message is the owner's own reference, in Michael's
 # words, with its three things always in it (only the digital assistant, can't answer immediately; please call our
 # emergency line to get an answer soon; the number); pressed, the same three things. Send keeps it whole (promise v8,
@@ -827,8 +831,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "504d924d3419",   # docs/features/11-whatsapp-bot/prompt.md (12 Nov, epoch 108, an emergency's first
-    # message is the owner's reference in Michael's words). Before: f1bd90ad0259 (11 Nov, night, epoch 107, pressed in an
+    "prompt": "fe1f06ca0f84",   # docs/features/11-whatsapp-bot/prompt.md (12 Nov, later, epoch 109, the owner's
+    # standard is the base of an emergency's first message). Before: 504d924d3419 (12 Nov, epoch 108, the owner's
+    # reference in Michael's words); f1bd90ad0259 (11 Nov, night, epoch 107, pressed in an
     # emergency: the line again as a warm invitation); df3d9bf635d0 (11 Nov, later that night, epoch 106, a
     # ticket only after his yes; anything urgent is an emergency); 4770de1fc59a (11 Nov, night, epoch 105, an
     # emergency gets our line only, no ticket); 682eb096d52a (11 Nov, later, epoch 104, our emergency line at any hour, gas

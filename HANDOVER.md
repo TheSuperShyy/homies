@@ -8,6 +8,17 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 12 Nov, 10:44:33 UTC: THE OWNER'S STANDARD IS THE BASE OF EVERY EMERGENCY REPLY** (owner: *"add this on the context like the basis of what the bot should answer make this the main standard"*; `scripts/n8n_whatsapp_standard.py`, epoch 109; WORKLOG and CONTEXT 12 Nov).
+>   - **The standard** (the owner's words, a full stop added): "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949."
+>   - **The prompt:** it replaces epoch 108's reference as "the basis of your answer", fitted to the case and to who writes. Its three things are always in it (only the digital assistant; a polite request to call our phone line urgently; the number), with no question. Pressed: unchanged.
+>   - **Send, danger v10:** its own two sentences are the standard's halves. Live Send already let the standard through whole.
+>   - **Checked:** 10 new cases plus 4 prompt checks, seen failing on a labels-only candidate (17 fails there). 640/640 on the candidate and on live. The replay changes nothing, and the idle check is clean. No model run.
+>   - **Read back:** prompt `fe1f06ca0f84`, memory key `-109`. The re-run reports nothing to do.
+>   - **Owed:**
+>     - one emergency message from the owner's phone, then `--watch 2026-11-12T10:44`;
+>     - the incoming phone agent's twin.
+>   - **Rollback:** `python scripts/n8n_whatsapp_standard.py --restore` (the snapshot `local/n8n-whatsapp-live-12nov-before-standard.json`), then `git revert`.
+>
 > **12 Nov: HOMIES WANTS TO USE THE BOT NOW** (owner: *"so homies want to use the chatbot we have now what do we need"*). The list of what we need from them was given in chat (WORKLOG 12 Nov):
 >   - Meta: the admin of their "office homies" account, business verification, the display name, a payment card;
 >   - the number: which one (assumed: the ManyChat one), its two-step PIN, ManyChat off in the same sitting;
@@ -30,9 +41,7 @@ appended to.
 >     - **Manners v6:** keeps "אני מיכאל, העוזר הדיגיטלי" whole.
 >   - **Checked:** 30 new cases, seen failing on a labels-only candidate. 630/630 on the candidate and on live. The replay changes only 4 old line v1 rewrites, and the idle check is clean. No model run.
 >   - **Read back:** prompt `504d924d3419`, memory key `-108`. The re-run reports nothing to do.
->   - **Owed:**
->     - One emergency message from the owner's phone, or E3-E5 of `grok-emergency-line-test.md` (updated), then `--watch 2026-11-12T09:18`.
->     - The incoming phone agent's twin.
+>   - **Superseded at 10:44 UTC by epoch 109 (above):** the owner's standard took the reference's place. Send's keep-whole fixes (promise v8, line v2, voice v3, manners v6) stay.
 >   - **Rollback:** `python scripts/n8n_whatsapp_refline.py --restore` (the snapshot `local/n8n-whatsapp-live-12nov-before-refline.json`), then `git revert`.
 >
 > **LIVE 12 Nov, 07:32:53 UTC: THE CLOSED-TICKET MESSAGE AND THE DEBT CALL'S LINK ARE BACK ON THE MAIN ROUTE (CHATWOOT)** (owner: *"ok for the closing of the tickets lets move to the main since they are approved"*; WORKLOG 12 Nov).

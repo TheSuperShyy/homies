@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### LIVE: the owner's standard is the base of every emergency reply (owner: "add this on the context like the basis of what the bot should answer make this the main standard"), 10:44:33 UTC, epoch 109
+- **The owner's text:** "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949". It replaces the morning's reference (epoch 108).
+- **Live Send first** (epoch 108 code, before anything was written): the standard went out whole, and so did a woman's "תתקשרי", a caring word before it and a pressed variant. Right after the menu no "כאן מיכאל" was put in front of it. An en dash before the number becomes a comma, as every dash does. The guards pass it; the echo guard returns an "אני מבין ש…" opener once, as before.
+- **`scripts/n8n_whatsapp_standard.py`, one write:**
+  - **The prompt,** 1 edit, `504d924d3419` → `fe1f06ca0f84`, 26,576 → 26,551 characters. The first message about an emergency is "this message, the basis of your answer": the standard, with a full stop added. He may fit it to the case and to who writes. Three things are always in it: only the digital assistant; a polite request to call our phone line urgently; the number. There is no question. Pressed: unchanged.
+  - **Send, danger v10:** HOTS (added when a cut takes the line) is the standard's second half, and HOTA (sent when nothing is left) is the whole standard. Promise v8, line v2, voice v3 and manners v6 are unchanged.
+  - **Memory:** epoch 108 → 109.
+- **Checks:**
+  - **The gate:** 10 new cases and 4 prompt checks. The v9 prompt checks are keyed to epoch 108, and the v9 case for a cut that takes the line expects Send's own sentence. A labels-only candidate failed 17 cases: the fallback sentences, the prompt, and older cases that now expect the new sentence. All 640 pass on the candidate and on live.
+  - **The replay:** nothing changes.
+  - **The idle check:** only standard, patch and fresh became idle. Refline refuses as superseded.
+  - **Pins:** only the prompt's moved. No model run.
+- **Live:** written at 10:44:33 UTC. Read back as prompt `fe1f06ca0f84`, memory key `-109`, Send as written. The re-run reports nothing to do. Snapshot `local/n8n-whatsapp-live-12nov-before-standard.json`.
+- **Briefs:** `grok-emergency-line-test.md` (purpose, the standard, E3-E5, H2, H4, judging) and the main brief's C8 and R13 expect the standard.
+- **Owed:**
+  - One emergency message from the owner's phone, then `--watch 2026-11-12T10:44`.
+  - The incoming phone agent's twin.
+
 ### Read only: the dialer after Omni's answer (the owner pasted Omni's email: "i called ido again today check for the status"), 10:41 UTC
 - **Omni, 09:21 UTC** (kept in `local/omnitelecom/2026-11-12-208-was-disconnected.txt`): the three 9 Nov leads are in List 2, never dialled. Their dialer dials only when the bot's extension 208 is marked as an available agent, and it was marked disconnected. There is no hours window, and nothing is wrong in our settings. They were moving it to available, so the three leads would ring Ido's phone. Each lead gets one attempt (more on request), and 208 takes one call at a time.
 - **Vapi, read with a GET since 9 Nov 00:00 UTC:** no phone call after 9 Nov 13:53 UTC (the hand call from extension 200), so nothing at all today. The other three entries are credit checks. `vapi_transfer.py --balance`: in credit.

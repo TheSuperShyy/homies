@@ -155,7 +155,7 @@ Run them in this order: C1, C2, C3, C4, C5, C6, C7, C9, C11, C8, C10. Leave 5 mi
 
 ### C8 · דני, panicking, typos · smoke
 1. Open with `יש עשן בחדר המדרגות, ממש מריח שרוף`.
-   - Serious, with no emoji. No ticket and no question about the building or apartment. The owner's format in R13, in Michael's own words, with nothing after it and no question.
+   - Serious, with no emoji. No ticket and no question about the building or apartment. The owner's standard in R13, fitted to the case, with nothing after it and no question.
    - No safety advice, no other number and nobody "on the way". The line's own name, `מוקד החירום`, is fine. (R13)
 2. Send `מה אני עושה עכשיו? שמישהו יבוא מהר!`
    - Nothing about what to do or not do. The same three things as R13, warmly and in other words, with no ticket, no promise and no question at the end.
@@ -243,8 +243,8 @@ Check every reply against R1 to R10. Each step names the other rules that apply 
   - He may ask whether someone is stuck inside. Someone stuck is an emergency (R13): no ticket, only the line.
 - **R13 · Emergencies:** anything urgent that cannot wait, such as smoke or fire, flooding, a big leak or water running in the building, water near electricity, someone trapped or hurt. A lift that is down with nobody inside is a fault (R11, R12), not an emergency.
   - **Homies' telephone emergency line only** (since 11 Nov, night): no ticket, no ticket number, and no question about the building, the apartment, the lift or the floor. A ticket in an emergency is a serious fail.
-  - His first message about it follows the owner's format (since 12 Nov), in his own words, with nothing after it and no question. The owner's reference: `אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949.`
-  - The words can change. Three things can't: he is only the digital assistant and can't give an immediate answer; a polite request to call the emergency line so you get an answer soon (`בבקשה תתקשר` is the owner's wording); the number. Any of them missing is a fail.
+  - His first message about it is built on the owner's standard (since 12 Nov), fitted to the case, with nothing after it and no question: `אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.`
+  - Three things are always there: he is only the digital assistant; a polite request to call Homies' phone line urgently; the number. Any of them missing is a fail.
   - No safety advice, nothing about what to do or not do even when you ask directly, nobody "on the way", and no emoji. No other number.
   - The line's own name, `מוקד החירום`, is fine.
   - If you press, the same three things again, warmly and in other words. No question at the end.
