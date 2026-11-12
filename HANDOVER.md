@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **12 Nov: HOMIES WANTS TO USE THE BOT NOW** (owner: *"so homies want to use the chatbot we have now what do we need"*). The list of what we need from them was given in chat (WORKLOG 12 Nov):
+>   - Meta: the admin of their "office homies" account, business verification, the display name, a payment card;
+>   - the number: which one (assumed: the ManyChat one), its two-step PIN, ManyChat off in the same sitting;
+>   - staff: name, email and department for each, at least one per department;
+>   - their OK: OXS for every resident, and an after-hours switch time.
+>   - **Waiting on Homies.** Then on us: the number into Chatwoot inbox 1, the two templates re-submitted on their account, the staff seated, the switch.
+>
 > **LIVE 12 Nov, 09:18:36 UTC: AN EMERGENCY'S REPLY FOLLOWS THE OWNER'S OWN REFERENCE, IN MICHAEL'S WORDS** (owner: *"this should be a format it should still be dynamic but that is the reference"*; `scripts/n8n_whatsapp_refline.py`, epoch 108; WORKLOG and CONTEXT 12 Nov).
 >   - **His reference, mended:** "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949."
 >   - **The prompt:** the first message about an emergency is "a message like this". The words are Michael's and fit the case, but three things are always in it:

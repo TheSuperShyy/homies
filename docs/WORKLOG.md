@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-11-12
 
+### Homies wants to use the bot now: the list of what we need from them, given in chat (owner: "so homies want to use the chatbot we have now what do we need", with "meta, email of the staff, main number")
+- **Where things stand:**
+  - The bot runs on the owner's test number, in the owner's own Meta business (ASTDX). The number is named "hadas 1", the business is unverified, and Meta caps what we start at 250 people a day.
+  - Homies' real number is on Meta's Cloud API through the old ManyChat bot (`11-whatsapp-bot/context.md`, 10 Sep). Taking it over is a hard switch and needs whoever holds their "office homies" Meta account.
+- **The list given:**
+  1. **Meta:**
+     - The admin of "office homies", for a screen-share or as a partner on the WhatsApp account that holds the number.
+     - Business verification, if it is not done yet: company registration, proof of address, website and email.
+     - The display name.
+     - A payment card on the WhatsApp account, for the messages we start.
+     - A logo and a description, optional.
+  2. **The number:**
+     - Which one. We assume the ManyChat one residents already use.
+     - Its two-step PIN, or a reset by their admin.
+     - Who runs ManyChat, so it goes off in the same sitting (otherwise both bots answer).
+     - A different number must be off every WhatsApp app and must receive Meta's code. If the call lands in their phone menu, Omni has to route it to a person.
+  3. **Staff:**
+     - Name, email and department (גבייה, תפעול, הנהלה, שירות) for each person. A login emails them an invite.
+     - At least one person per department, or a hand-off there reaches nobody.
+     - One or two admins, and a training time.
+     - Optionally their own address for the inbox: one DNS record.
+  4. **Their OK on:**
+     - OXS tickets for every resident (today 4 numbers).
+     - A switch time after hours.
+     - A heads-up: ManyChat's old chats stay in ManyChat, and its Make/Monday "done" message stops, since ours replaces it.
+- **Then on us:**
+  - The number into Chatwoot inbox 1 (`12-chatwoot/feature.md`, "Moving the number"; the Meta steps in `docs/handover/meta-anydesk-session.md`, written 14 Aug for the pre-Chatwoot setup).
+  - The two templates re-submitted on their account.
+  - The staff seated with `chatwoot_teams.py`.
+  - The switch.
+- Nothing changed live.
+
 ### LIVE: an emergency's reply follows the owner's own reference, in Michael's words (owner: "this should be a format it should still be dynamic but that is the reference"), 09:18:36 UTC, epoch 108
 - **The owner's message**, right after the route switch: "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מידיי,בבקשה תתקשר למוקד החירום שלנו כדי תוכל לקבל מענה בהקדם , 0776687949". Since epoch 105 the prompt had asked for a caring word and then our fixed sentence word for word ("למקרי חירום יש לנו מוקד טלפוני ייעודי, ואפשר להתקשר אליו עכשיו").
 - **What live Send did to it** (each variant run through the epoch-107 code before anything was written):
