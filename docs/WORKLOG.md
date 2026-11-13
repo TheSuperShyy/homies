@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-13
 
+### A question answered, read only: has the new emergency reply been tested on the chatbot (owner: "for the chatbot have we test the new implementation based on the emergency situation reply"), 07:52 UTC
+- **Yes, on the live bot, through the owner's Grok run of 12 Nov** (11:32-11:54 UTC, E1-E5, 9 messages):
+  - E3-E5 each opened with the standard word for word, with no ticket and no question.
+  - E1 asked before its ticket, and gas was word for word.
+  - The one fail, E3.2's plural near-promise, was fixed in code (12:06:21 UTC). The owner's E3 re-run passed (12:26-12:28 UTC).
+- **Read again now:** all 653 cases pass on live, and `--watch 2026-11-12T12:06` is still the same 2 turns, with nothing broken. No chat has reached the bot since the re-run.
+- **Not re-run after the fix:** E4 and E5. The fix changed only Send's clean-up and the echo/clerk guards, and the replay of 1,567 past replies moved nothing else, so no run is needed.
+- The incoming phone agent's twin is still owed.
+
 ### The email for Omnitelecom about the lead API's 500 (owner: "create a email for omnitelecom"), 07:20 UTC
 - **First, read only, so the email says what is true now** (no lead in any probe, nothing rang):
   - `POST []` with our token at 07:19:25 UTC (09:19:25 Israel): **still 500**, the stock Flask/Werkzeug page ("The server encountered an internal error and was unable to complete your request...").
