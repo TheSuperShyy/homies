@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-13
 
+### The email for Omnitelecom about the lead API's 500 (owner: "create a email for omnitelecom"), 07:20 UTC
+- **First, read only, so the email says what is true now** (no lead in any probe, nothing rang):
+  - `POST []` with our token at 07:19:25 UTC (09:19:25 Israel): **still 500**, the stock Flask/Werkzeug page ("The server encountered an internal error and was unable to complete your request...").
+  - A wrong token (07:19:38) and no token (07:19:41) still get 401, each with its JSON error.
+  - Vapi since 12 Nov 00:00 UTC: no phone call, only the 10:41 webCall credit check. None of the three 9 Nov leads has reached the bot since Omni set 208 to available.
+- **The draft:** `local/omnitelecom/2026-11-13-lead-api-500-email.txt` (outside git), in Hebrew, with an English check copy. It is a reply in the same health-check thread as their 12 Nov email.
+  - It thanks them for 208 and reports the 500 on the owner's Ring.
+  - The empty request: 500 now, 400 on 9 Nov. Wrong and no token: 401.
+  - Both probe times (12 Nov about 15:39 Israel, 13 Nov 09:19:25 Israel), and nothing changed on our side since 9 Nov.
+  - **Asks:** their server log; whether anything changed since 9 Nov, or a new token is needed; whether the three leads were dialled and with what result, with a second try at an agreed time so someone answers.
+  - After their fix: an empty request first (400 means fixed), then one test lead coordinated with them.
+  - No phone number is in it. The owner sends it; nothing was sent from here.
+- HANDOVER's dialer block says so.
+
 ### A question answered, read only: what is emailed to Yariv or Homies' team (owner: "can i ask what is being directly emailed to yariv or the team"), 06:25 UTC
 - **Only one thing: a standing-order request.**
   - "Homies — Standing order email" (`qwFc7ObfclFHMsuD`) is active, and its To address equals `COLLECTIONS_EMAIL`, Homies' collections address from Yariv's review.
