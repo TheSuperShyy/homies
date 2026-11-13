@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-13
 
+### The Grok re-test of the fix, given to the owner (owner: "ok give me the instruction to grok so that i can run a test on that fix"), 07:55 UTC
+- **The run:** E1, E4 and E5 of `grok-emergency-line-test.md`, in a new Grok chat, with a short block on top that overrides its plan. That is 5 messages.
+  - E2 (gas) is unchanged.
+  - E3 already passed after the fix (12:26-12:28 UTC, 12 Nov).
+- **What it watches, the fix's three targets:**
+  - H8: every reply singular (`לכם`, `תתקשרו`);
+  - H4: no "כדי שיעזרו ... מיד";
+  - two sentences run together with no full stop, a NOTE (emoji v2, E1.1's case).
+- **Carried state:** the bot keeps 12 turns per number (`MEMORY_TURNS`), and epoch 109 is unchanged, so Michael remembers the 12 Nov run. The block tells Grok not to count that as a slip.
+- E1 opens one test ticket in OXS after the yes, as on 12 Nov.
+- **Then:** read the report against the executions, and `--watch 2026-11-12T12:06`.
+
 ### A question answered, read only: has the new emergency reply been tested on the chatbot (owner: "for the chatbot have we test the new implementation based on the emergency situation reply"), 07:52 UTC
 - **Yes, on the live bot, through the owner's Grok run of 12 Nov** (11:32-11:54 UTC, E1-E5, 9 messages):
   - E3-E5 each opened with the standard word for word, with no ticket and no question.
