@@ -9,6 +9,20 @@ conversation that produced it.
 
 ---
 
+## 2026-11-13
+
+### A question answered, read only: what is emailed to Yariv or Homies' team (owner: "can i ask what is being directly emailed to yariv or the team"), 06:25 UTC
+- **Only one thing: a standing-order request.**
+  - "Homies — Standing order email" (`qwFc7ObfclFHMsuD`) is active, and its To address equals `COLLECTIONS_EMAIL`, Homies' collections address from Yariv's review.
+  - It fires when a tenant asks for a standing order on WhatsApp or on either phone agent. The subject is "בקשה להוראת קבע:" with the name, building and flat. The body gives the phone, the request's number and the tenant's own words.
+  - It is sent through Brevo from `testclix46@gmail.com` until Homies have their own sender.
+- **None has reached Homies yet.**
+  - The newest standing-order request is 8 Nov 12:42 UTC, before the address became theirs on 9 Nov.
+  - n8n holds no run of the workflow.
+  - That request is still open, so the same number asking again gets the same request and no second email.
+- **Chatwoot mail goes only to its logins:** invites, password resets, and mention or assignment emails. Its 2 logins are ours, and every department's mention reaches Assaf Clix only. Nothing goes to Homies until their staff get logins, which is the owner's word.
+- Nothing else in the repo sends email. Nothing was changed or sent.
+
 ## 2026-11-12
 
 ### The 11/12 report (in chat, `/reporter`), 14:57 UTC
