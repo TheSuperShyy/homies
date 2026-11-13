@@ -17,7 +17,7 @@ appended to.
 >   - **Checked:** 653/653 on the candidate and on live. The replay improves 14 old replies and breaks none. Prompt and epoch 109 are unchanged.
 >   - **Proven 12:26-12:28 UTC:** the owner's Grok re-run of E3 passed (175876, 175884). Both went out on the first pass in the singular, and the watch since 12:06 is clean.
 >   - **Owed:**
->     - the owner's Grok re-test of E1, E4 and E5 (given 13 Nov, WORKLOG), then read against the executions and `--watch 2026-11-12T12:06`;
+>     - the owner's Grok re-test of E1, E4 and E5 (given 13 Nov, WORKLOG), then read against the executions and `--watch 2026-11-12T12:06`. **Under way:** E1 and E4 ran 08:31-08:38 UTC. E1 opened 255-1448-26 on the yes. E4.2 (177964) is singular but says "כדי שיטפלו בזה מיד" next to our number: voice v3 keeps a clause with the number, and promise v8 allows "fast" words next to the line. That is for review once Grok's report is in. E5 has not run yet;
 >     - the incoming phone agent's twin.
 >   - **Rollback:** `python scripts/n8n_whatsapp_linepass.py --restore`, then `git revert`.
 >

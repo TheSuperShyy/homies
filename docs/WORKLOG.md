@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-13
 
+### The 11/13 report (in chat, `/reporter`, after the first try at 08:40 UTC died on a dropped connection), 08:55 UTC
+- **Span:** 13 Nov, from 05:53 UTC. Nothing ran between the 11/12 report (14:57 UTC) and then.
+- **The owner's re-test is under way, read with `--watch 2026-11-13T07:55` and the executions:**
+  - E1 (177935, 177943, 08:31-08:33 UTC): he asked first, then opened 255-1448-26 on the yes. No number.
+  - E4.1 (177956, 08:37 UTC): the standard, fitted ("כמו עשן בבניין").
+  - E4.2 (177964, 08:38 UTC): singular, first pass. Sent: "אני מבין שזה מלחיץ, אבל מכיוון שאני רק העוזר הדיגיטלי, חשוב מאוד שתתקשר עכשיו בדחיפות למוקד הטלפוני שלנו כדי שיטפלו בזה מיד - 077-6687949."
+  - The watch flags E4.2 twice:
+    - "שיטפלו": voice v4 cuts a "כדי שיטפלו" clause, but voice v3 keeps any clause that holds our number, and this one ends with it. "מיד" next to the line is what promise v8 and danger v9 allow since the owner's own "בהקדם" (epoch 108).
+    - "אני מבין ש": echo v2 lets such a draft out on purpose when it gives our line; the watch's own copy does not know that yet.
+  - E5 and Grok's report are still to come. Nothing changed.
+- **Given:** 3 done bullets and 3 Will lines.
+  - **Done:**
+    - what is emailed to Homies, only a standing-order request and none yet;
+    - the email to Omni (the 500 still there, the three leads never reached the bot);
+    - the re-test so far, singular and no ticket in an emergency.
+  - **Will:**
+    - finish the re-test and review E4.2's "כדי שיטפלו בזה מיד";
+    - the Ring again after Omni's fix;
+    - the incoming phone agent's twin.
+  - **Left out:** the 500 explained (a question), the re-read of 653/653 (the re-test bullet carries it), and Homies' real number (unchanged since 11/12).
+
 ### The Grok re-test of the fix, given to the owner (owner: "ok give me the instruction to grok so that i can run a test on that fix"), 07:55 UTC
 - **The run:** E1, E4 and E5 of `grok-emergency-line-test.md`, in a new Grok chat, with a short block on top that overrides its plan. That is 5 messages.
   - E2 (gas) is unchanged.
