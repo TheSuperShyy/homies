@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### Sample debt calls for a no and other turns, given in chat (owner: "what about a no or something different scenarios"), 10:05 UTC
+- **Given, from the live prompt and the debt tools' own descriptions:** no to the link (asked roughly when, the words kept as said), a flat no (no push, the office number), not now; already paid (proof to the email, no argument); a date named; a standing order (a request, the office sets it up); the amount disputed and money tight (someone from the team gets back, nobody put through), with ownership, a request for a person and language the same; someone else answers (a message, no reason); "is this really Homies?" (the office number); a fault mid-call (a request and its number, then back to the link).
+- **Read on the three real calls' tool calls, and said in two lines:**
+  - 13 Nov 08:20: after "no minute", Michael asked when to call back; Ido's "שבוע" went into `log_promise_to_pay` (`said: שבוע`) and the outcome `promised`. Ido promised no payment.
+  - 13 Nov 08:21: "what is this payment about?" got the already-paid line (no tool called), and the email came out as "אופיס. מקף, management, נקודה, נקודה A" though the call carried the full spoken form.
+- Nothing changed. HANDOVER's 15 Nov block now names both as seen and not changed; CONTEXT: nothing new.
+
 ### A sample debt call in English, given in chat (owner: "i want it to be conversational / so give me like a sample script translated into english"), 09:55 UTC
 - **Given:** one morning call to Ido (flat 1, January to August, 2,000 shekels) as the live prompt shapes it since 09:41: the opening, glad to hear it, the minute named, the facts and the link offer, a "wow" heard without the amount again, the link sent, the close. Plus three ways the start can go (a bad day, asked back, not now). Framed as one way a call could go: Michael words each call himself.
 - **Where real calls so far differed, said in two lines:** on 13 Nov the facts and the link offer came in one breath with no question at the end; and when Ido had no minute (13 Nov, 15 Nov) Michael asked when to call back, once promising "we'll call you back in a week", which nothing books.

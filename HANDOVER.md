@@ -12,6 +12,7 @@ appended to.
 >   - **The debt agent `4bc03b57` only,** one sentence of its prompt (5,067 characters): glad for the tenant in a few words when things are good, nothing about himself unless asked, then a minute "to talk about the balance open on the flat" in place of "a minute for something important". The opening line, the name check before money, the facts, the link offer and the closing are unchanged. The incoming agent is untouched.
 >   - **Pushed prompt-only and read back equal;** tools, first message and every other field unchanged. Snapshot `local/vapi-debt-live-15nov-before-glad.json`.
 >   - **Owed:** one real call to hear it, the owner's Ring to Ido on /dialer (one press, in calling hours), then its transcript on Vapi.
+>   - **Seen on the real calls, not changed:** on 13 Nov a "no minute" became "when shall we call back?", and Ido's "a week" was recorded as a promise to pay (`log_promise_to_pay`, outcome `promised`); and "what is this payment about?" got the already-paid line with the email garbled. The prompt has no callback outcome.
 
 > **LIVE 12 Nov, 12:06:21 UTC: THE GROK RUN OF THE STANDARD PASSED; ITS ONE FAIL IS FIXED IN CODE** (the owner pasted Grok's report; `scripts/n8n_whatsapp_linepass.py`; WORKLOG 12 Nov).
 >   - **The run (11:32-11:54 UTC):** E3, E4 and E5 opened with the standard word for word, with no ticket. E1 asked before opening its ticket, and gas was exact.
