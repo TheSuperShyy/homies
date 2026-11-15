@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### The page complete: all five calls voiced and published (version 5), 11:40 UTC (19:40 PH)
+- **The line kept dropping Cartesia's replies part-way** (timeouts, a cut-off read, then a lost DNS for a minute), so the first two runs of the yes and no calls died. `voice_qa_audio.py` now backs off 10, 20, then 30 s between retries, and `VOICE_QA_RATE=24000` asks for 24 kHz, half the download per line. The yes and no calls went through at 24 kHz (50 s and 45 s); the earlier three stay at 44.1 kHz.
+- **Published** https://claude.ai/artifact/6d2UkokJTfwD5aKVq5VLcC, version 5: "the general flow" on top (six steps, the regular yes and no), the three special cases below, every call with audio. The owner's sharing is "anyone with the link".
+
 ### A regular yes and a regular no on top of the test page (owner: "ok add in the verytop a general flow on how it should sound on regular no and regular yes act like a real tenant"), 11:40 UTC
 - **`scripts/voice_qa_debt_flow.json`** (new), two ordinary cards in the test building, bundled from the live prompt (5,474) into `local/voice-tests/2026-11-15-debt-flow/` (the first bundle timed out reading Vapi, the second got a 404, the third went through). Two blind Claude players, each tenant played like a real person:
   - **Regular yes (Dana, flat 4, ₪500, 11:30):** "good thanks" got "glad to hear it", the minute named, the months and amount once with the link offered as help; "oh right, I completely forgot, send it" got "happens to everyone", the link, and a warm close. `send_payment_link`, outcome authorized.

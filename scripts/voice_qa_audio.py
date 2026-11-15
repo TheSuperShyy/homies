@@ -35,7 +35,9 @@ VOICE = {"inbound": {"id": "ba765d50-19c6-4b3e-bc15-9de3b45f82f7", "speed": None
 CALLER_VOICE = "84b969ad-19c7-428d-b742-48d387f7f138"   # Gil, "Friendly Host", a library voice
 # A card may name its own caller voice (`caller_voice`): 8 Oct, a woman on the line is
 # Yael, "Casual Presence" (1daba551-...), a female Hebrew library voice on our key.
-RATE = 44100
+# 15 Nov: VOICE_QA_RATE=24000 halves each line's download, for a line that keeps
+# dropping Cartesia's replies part-way; 44.1 kHz stays the default.
+RATE = int(os.environ.get("VOICE_QA_RATE", "44100"))
 REPS = G.replacements()
 chars = {"homies": 0, "ours": 0}
 
@@ -72,7 +74,10 @@ def tts(key, voice_id, text, speed=None, dict_id=None):
         except (TimeoutError, urllib.error.URLError, http.client.IncompleteRead, ConnectionError) as e:
             if attempt == 3:
                 raise
+            # A dropped line or lost DNS needs a moment; back off 10, 20, then 30 s.
             print("Cartesia slow (%s), retrying" % e, flush=True)
+            import time
+            time.sleep(10 * (attempt + 1))
     with wave.open(io.BytesIO(raw)) as w:
         return w.readframes(w.getnframes())
 
