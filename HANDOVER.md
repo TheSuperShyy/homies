@@ -36,6 +36,11 @@ appended to.
 >   - Meta: the admin of their "office homies" account, business verification, the display name, a payment card;
 >   - the number: which one (assumed: the ManyChat one), its two-step PIN, ManyChat off in the same sitting;
 >   - staff: name, email and department for each, at least one per department;
+>     - **15 Nov: the list arrived** (the owner's screenshot). It has 9 people plus the sheet's example row "צוות CLIX". Two are "מנהל על", administrators: the CEO and the VP, in Management. Seven are "רגיל", agents.
+>       - It is mapped onto our four teams in `local/golive/homies-staff-2026-11-15.csv` (gitignored: names and emails stay out of the public repo).
+>       - Three are our picks: the office manager and the general office go to Service, and maintenance goes to Operations.
+>       - Every seat goes into both inboxes, so a mention reaches it.
+>       - **Not created:** each login emails an invite (from `testclix46@gmail.com` through Brevo), and once in, staff would see the test chats and be pinged by test hand-overs. It waits for the owner's go, and his word on when.
 >   - their OK: OXS for every resident, and an after-hours switch time.
 >   - **Waiting on Homies.** Then on us: the number into Chatwoot inbox 1, the two templates re-submitted on their account, the staff seated, the switch.
 >

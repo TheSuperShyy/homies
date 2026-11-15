@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### Homies' staff list for Chatwoot, mapped and not yet created (the owner's screenshot: "here the list of the employees"), 09:40 UTC
+- **The list:** 10 rows.
+  - One is the sheet's example: "צוות CLIX", a sample Gmail address, its department cell our template's own instruction. Clix already has its admin seat in all four teams.
+  - 9 people: 2 "מנהל על" (the CEO and the VP, management) and 7 "רגיל".
+- **Mapped onto our four teams** by the bot's own department definitions (`notify_team`): collections = money; operations = faults, technicians, works; management = complaints, contracts, quotes, moving, the committee; service = anything else.
+  - Administrators, in management: the CEO and the VP.
+  - Agents:
+    - operations: the two in operations and suppliers, and the maintenance manager (our pick);
+    - service: the office manager and the general office mailbox (our picks);
+    - collections and service: the general collections mailbox and the collections and service person.
+  - All in both inboxes, so a mention reaches them.
+  - Note for the CEO and VP: management is also pinged by every chat nobody claims within 10 minutes (`escalate1`).
+- **Kept outside git:** `local/golive/homies-staff-2026-11-15.csv`. No names or emails in the repo.
+- **Not created:** each login emails an invite (from our Brevo sender, `testclix46@gmail.com`, which may land in spam). Once in, staff see the test number's chats and get pinged by test hand-overs. So it waits for the owner's go and timing.
+
 ### A question answered: can the owner ring Ido with the dialer now (owner: "so i can now call ido with the dialer"), 09:28 UTC
 - **Yes.** The lead API answers again (check 1, 09:23:35 UTC), and Vapi was in credit at 09:18 with 208 and the debt agent active. It is 11:28 Israel on a Sunday, inside the dialer's hours (Sunday to Thursday 09:00-20:00, `inCallingHours`).
 - **Said:**
