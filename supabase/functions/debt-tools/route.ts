@@ -91,6 +91,28 @@ export const GENDER_FORMS: Record<string, string> = {
     'השם לא מכריע אם זה גבר או אישה. פנה בזכר, ביחיד: אתה, שלְךָ, לְךָ, איתְּךָ, תגיד, תשלח, תבדוק, תסגור, תוכל, תרצה.',
 };
 
+/**
+ * 15 Nov, the owner: "make sure the gender is correct, this is a very critical part
+ * of the agent". The debt agent's voice carries the masculine address dictionary,
+ * which says a bare לך / שלך / איתך in the masculine, and the live model often
+ * leaves those words bare. So a call to a woman (gender 'f', decided from the
+ * record and the name before the dial) carries the same voice with the feminine
+ * dictionary, as the Call button's call does (dashboard/lib/call.ts, voiceFor). The
+ * whole voice is copied because Vapi does not document whether a voice override
+ * merges or replaces. A man, a name for both, a missing or non-Cartesia voice: null,
+ * and the call keeps the assistant's own voice.
+ */
+export const FEMININE_DICT = 'pdict_yXyrirkyZTjGL99Es7F9Ax';
+
+export function voiceForGender(
+  gender: string,
+  voice: Record<string, any> | null | undefined,
+  feminineDict: string = FEMININE_DICT,
+): Record<string, any> | null {
+  if (gender !== 'f' || !voice || voice.provider !== 'cartesia' || !feminineDict) return null;
+  return { ...voice, pronunciationDictId: feminineDict };
+}
+
 /** The debt agent's variables for one queue row, as the Call button composes them. */
 export function debtVariables(
   p: Record<string, any>,
