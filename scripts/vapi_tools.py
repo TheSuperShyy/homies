@@ -87,8 +87,13 @@ POSTURE = {
     "description": "The highest posture the call reached, not the current one. Hot is a floor.",
 }
 
+# 15 Nov, the owner: "we need to resolve this by ourself". Money that is tight and
+# a disputed balance are the call's own to handle (the debt prompt says how: the
+# link, pay this month; what the system shows, then did it go through or the
+# receipt), so `hardship` and `dispute` are no longer reasons to hand a call over.
+# Offered, they were taken: a reason on the list is an invitation.
 TRANSFER_REASONS = [
-    "hardship", "dispute", "distress", "language", "not_understood", "caller_request",
+    "distress", "language", "not_understood", "caller_request",
     # 11 Aug. "That flat is not mine", "I have no keys", "the protocol was never
     # signed" — one shape, and the one that replaced flag_not_handed_over. The
     # agent does not act on the claim; the apartment is paused and a person
@@ -386,7 +391,9 @@ DEBT_TOOLS = [
     ),
     _fn(
         "log_disputed_payment",
-        "Call when the resident says they have already paid. Do not ask when or how. "
+        # 15 Nov: "Do not ask when or how" is gone. The owner wants the agent to
+        # ask whether the payment went through, or for the receipt.
+        "Call when the resident says they have already paid. "
         "Do not send anything alongside this. If they named one apartment, pass it as "
         "`unit` so only that apartment is disputed.",
         dict(UNIT_ON_CALL),

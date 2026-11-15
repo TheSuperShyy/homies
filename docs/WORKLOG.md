@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: the debt call handles tight money and disputes itself (owner, on the sample's two hand-overs: "Like i told you we need to resolve this by ourself", with two references, "this is just a reference"), 10:03:17 UTC
+- **The references:** no money: understanding, the link goes to WhatsApp, pay whenever it suits, but please make a payment within this month so it does not pile up. A dispute ("too much", "already paid"): our system shows the balance still open, this much; did your payment go through? Or send the receipt so we can verify. Thank you.
+- **`docs/features/10-debt-followup/prompt.md`** (5,067 → 5,441 characters):
+  - the tools paragraph: hardship and a disputed debt are off the hand-over list (distress, ownership, a request for a person and language stay), and "he sends proof to the email and nobody argues" moved into the money sentence;
+  - the sentence that gave "difficulty, a claim or another date" an ear and the right tool now says both are Michael's own: for no money the link and the ask to pay this month; for too much or already paid, what the system shows (still open, which months, how much), then did it go through or the receipt to the email, and thanks; a date is still recorded without persuasion; "no arguing: what the system shows is what you say, and the receipt is what is checked";
+  - the amount-once bullet lets the figures be said again to someone who disputes them, as the reference does.
+  - Described, not scripted; a "15 Nov, later" note above the prompt.
+- **`scripts/vapi_tools.py`:** `TRANSFER_REASONS` loses `hardship` and `dispute` (on `transfer_to_human` and on `log_call_outcome`'s `transfer_reason`); `log_disputed_payment` loses "Do not ask when or how". The function is unchanged: it still accepts both reasons from an older assistant, and an already-paid claim still records a dispute with a receipt requested.
+- **Pushed:** the live tools equalled the repo's before (all 7); GET, the system message and the rebuilt tools swapped in, the whole `model` PATCHed. Read back: prompt and tools equal the repo, first message and every other field unchanged. Snapshot `local/vapi-debt-live-15nov-before-own-money.json`.
+- **No paid test.** The check is the owner's Ring to Ido, playing "money's tight" or "I already paid".
+- **Memory:** money-answers-from-the-system extended to the debt agent.
+
 ### Sample debt calls for a no and other turns, given in chat (owner: "what about a no or something different scenarios"), 10:05 UTC
 - **Given, from the live prompt and the debt tools' own descriptions:** no to the link (asked roughly when, the words kept as said), a flat no (no push, the office number), not now; already paid (proof to the email, no argument); a date named; a standing order (a request, the office sets it up); the amount disputed and money tight (someone from the team gets back, nobody put through), with ownership, a request for a person and language the same; someone else answers (a message, no reason); "is this really Homies?" (the office number); a fault mid-call (a request and its number, then back to the link).
 - **Read on the three real calls' tool calls, and said in two lines:**
