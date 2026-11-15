@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### The five calls played again on the pointed-words prompt and published (version 7), 12:17 UTC (20:17 PH)
+- **Every same-spelled word came out pointed, by the right gender** (`local/voice-tests/2026-11-15-debt-{money,flow}-v2/`):
+  - about Michael himself: "אני רוֹאֶה" (Avi, Michal), "אני לא רוֹצֶה להגיד לְךָ משהו לא נכון" (Ron), "אני אהיה קצר";
+  - to the men: "רוֹצֶה שאשלח", "תודה שֶׁהִקְדַּשְׁתָּ לי דקה" (Omer, the word that slipped), "רוֹצֶה שאחזור על זה?" (Avi), "אֵלֶיךָ", "אֶצְלְךָ" (Ron);
+  - to the women: "רוֹצָה?" (Michal), "לָךְ", "שלָךְ" throughout, "תוכלי, תבדקי, תשלחי, תשלימי".
+  - The callers' own lines keep their gender (מדברת, חייבת, יודעת, מסיימת; מדבר, יודע, שולח); Dana's "אני רואה" is not in her new call.
+- **Also better this time:** asked whether the link is "August only", Michael said honestly he can't tell what it will show (it is the whole balance), instead of promising August. Ron's partial payment and interest: "I don't know, and I don't want to tell you something wrong".
+- **Voiced** at 24 kHz, one process per call (the too-much call uploaded at 64 kbps, 1.9 MB having stalled before). **Published** https://claude.ai/artifact/6d2UkokJTfwD5aKVq5VLcC version 7, with an "updated" note at the top on the gender fix; the link note now says the link carries the whole balance.
+
 ### LIVE: the debt agent points the words the voice cannot tell (owner: "make sure the gender on the female and male are correct there are a few slips on the gender identifier"), 11:55:52 UTC
 - **Read first:** the written Hebrew of all five test calls was right (feminine to Dana and Michal, masculine to Ron, Avi and Omer; Yael voiced the women, Gil the men), and every address word was pointed (לָךְ / לְךָ) as `{{gender_forms}}` shows the model.
 - **Probes on Homies' Cartesia (the live voice `ba765d50`, sonic-3.5), log-mel DTW against pointed references, noise floor = the same text twice** (`scratchpad/dict_probe.py`, `word_probe.py`; ~370 characters):
