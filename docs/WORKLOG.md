@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: a dialer call to a woman carries the feminine dictionary (PR #13), and the gender checked layer by layer (owner: "just make sure the gender is correct this is a very critical part of the agent"), 12:55 UTC
+- **Why this, after the prompt fix:** the Claude-played calls pointed every address word, but the live model pointed 0 of 7 on 5 Oct, so on a real dialer call to a woman its bare לך / שלך go through the masculine dictionary and come out masculine. The Call button has sent the feminine dictionary since 8 Oct; the dialer route never did.
+- **PR #13, merged as `9c8c460`, deployed by CI (checks and deploy-function green):**
+  - `route.ts` `voiceForGender(gender, voice, dict)`: the voice with the feminine dictionary for 'f', else null; `FEMININE_DICT` is the Call button's (a test holds them equal).
+  - `index.ts` `assistantFor`: for a woman, reads the debt agent's live voice from Vapi (2.5 s, kept 10 minutes per worker) and adds it to `assistantOverrides`; any failure leaves the call as before.
+  - `check_route.test.ts`: 9 pass. All CI tests: 65 pass (locally the three dashboard-composer tests fail in a fresh worktree only because autocrlf writes CRLF; LF as on CI passes).
+- **Function secret `VAPI_PRIVATE_KEY`** set on `nmxlhlmcnnggnnuxyelt` through the Management API (201; 21 → 22 secrets; digest equals `.env`'s).
+- **Proven on the live function, no call placed:** Ido's test row (source agent) set to gender 'f' for the probe and restored to NULL in a `finally`; an `assistant-request` shaped like Omni's dialer call returned the debt agent, gender f, and the voice with the feminine dictionary and every other field equal to the live voice. As a man: no voice override. The real tenant on the list (Yariv's row) was not touched.
+- **The other layers, read:** every fixed line is gender-safe (the opener's "מה נשמע", the idle lines, "רגע, אני רושם את זה"; no voicemail message). The call list today: 3 people, all men. Name→gender: of 8,130 residents with a phone, 427 have two names of different genders in their first two words; the first word is usually the first name ("קטי משה"), but about 8 look stored surname first with a man's-name surname ("עזרא רחל", "זמיר ענת"), and 3 are undecided. None is on the call list. Not changed: fixing it moves both `first_name` and the gender in the queue view.
+- **This branch:** `9c8c460` cherry-picked (`7e680ee`), so the function here equals main again; the worktree `../Homie-gender` removed.
+
 ### The five calls played again on the pointed-words prompt and published (version 7), 12:17 UTC (20:17 PH)
 - **Every same-spelled word came out pointed, by the right gender** (`local/voice-tests/2026-11-15-debt-{money,flow}-v2/`):
   - about Michael himself: "אני רוֹאֶה" (Avi, Michal), "אני לא רוֹצֶה להגיד לְךָ משהו לא נכון" (Ron), "אני אהיה קצר";
