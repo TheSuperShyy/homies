@@ -1,0 +1,124 @@
+{
+ "_about": "15 Nov: the owner's \"now test it have a conversation in the bg using cartesia\", after the debt agent began to handle tight money and disputes itself (10:03 UTC, worded as a guide 10:07). One call per case the owner named: no money, too much, already paid. Each also tests the opening's small talk (glad to hear it, answer only when asked, the minute named). Claude plays both the agent's model, on the live prompt and tools, and the tenant. Variables composed the way dashboard/lib/call.ts composes them. Nothing is dialled.",
+ "defaults": {
+  "_how": "The debt tools are answered by voice_qa.debt_tool from the deployed code; these are kept for the record and for `play`.",
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "open_request": {
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   }
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "id": "nov15_tight",
+   "agent": "debt",
+   "title": "Money's tight this month: a friendly young father, doing fine otherwise",
+   "time": "12:20",
+   "weekday_he": "ראשון",
+   "ticket": "255-1601-26",
+   "phone_last4": "4471",
+   "months": 3,
+   "vars": {
+    "first_name": "רון",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 6",
+    "months_phrase": "יוני, יולי ואוגוסט",
+    "breakdown_phrase": "750 על דירה 6",
+    "amount": "750",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "רון, 34. Friendly and easy-going, a new baby at home. Answers a how-are-you warmly ('all good thank God'). Speaks about himself in the masculine.",
+    "knows": "He is רון, apartment 6 in בר כוכבא 23. He knows he is a few months behind on the committee fee. This month is tight: the baby, and his salary comes in only on the 10th.",
+    "wants": "Not to be pushed, and to pay when he can.",
+    "tendencies": "Says money is tight right now before anything else is agreed. Asks whether he can pay part of it. Asks if there is any interest or fine. If he does not feel pushed, agrees to get the link and pay after the 10th."
+   }
+  },
+  {
+   "id": "nov15_too_much",
+   "agent": "debt",
+   "title": "Too much: a busy woman sure she only owes for August",
+   "time": "17:40",
+   "weekday_he": "ראשון",
+   "ticket": "255-1602-26",
+   "phone_last4": "2093",
+   "months": 4,
+   "vars": {
+    "first_name": "מיכל",
+    "gender": "f",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 3",
+    "months_phrase": "מאי, יוני, יולי ואוגוסט",
+    "breakdown_phrase": "1000 על דירה 3",
+    "amount": "1000",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "מיכל, 45. Polite but tired, at the end of a long day; answers a how-are-you with 'so-so, a crazy day'. Speaks about herself in the feminine.",
+    "knows": "She is מיכל, apartment 3 in בר כוכבא 23. She is sure she paid May to July: she gave a bank transfer in early July, she thinks for three months, and she would have to look in her bank app to see if it went through. She knows August is unpaid.",
+    "wants": "For the amount to be corrected to what she really owes.",
+    "tendencies": "Says 'a thousand? that's way too much, I only owe for August'. Says she paid by bank transfer in July. Is unsure whether the transfer actually went through. Asks where to send the confirmation. May offer to pay August now."
+   }
+  },
+  {
+   "id": "nov15_paid",
+   "agent": "debt",
+   "title": "Already paid: a direct man who transferred it last week",
+   "time": "10:15",
+   "weekday_he": "ראשון",
+   "ticket": "255-1603-26",
+   "phone_last4": "5528",
+   "months": 2,
+   "vars": {
+    "first_name": "אבי",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 8",
+    "months_phrase": "יולי ואוגוסט",
+    "breakdown_phrase": "500 על דירה 8",
+    "amount": "500",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "אבי, 52. Direct and a little impatient, not rude. Answers a how-are-you with 'fine, and you?'. Speaks about himself in the masculine.",
+    "knows": "He is אבי, apartment 8 in בר כוכבא 23. He paid the 500 for July and August by bank transfer last Thursday, and the confirmation is in his bank app.",
+    "wants": "For the record to be fixed and not to be called about it again.",
+    "tendencies": "Says 'I already paid it, last week, by bank transfer'. Asks why he is being called if he paid. Agrees to send the confirmation when asked, and asks where. May ask whether he will be called again."
+   }
+  }
+ ]
+}

@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: the money answers worded as a guide, not a script (owner: "i dont want it to be a strict script rather an example or a guide only"), 10:07:38 UTC; the Cartesia test started (owner: "now test it have a conversation in the bg using cartesia")
+- **`docs/features/10-debt-followup/prompt.md`** (5,441 → 5,474 characters): the money sentence now says "what is written here is a direction, not wording: you fit it to the person and to what he says, in your own words", and the two answers follow as "for example" (understanding, the link to WhatsApp, pay when it suits, a polite ask to pay this month; and what the system shows, then did it go through or the receipt, and thanks), with no fixed order. "שידאג" became a plain polite ask.
+- **Pushed prompt-only** (tools equal the repo, checked first); read back equal; nothing else changed. Rollback: this sentence back, or the 10:03 snapshot `local/vapi-debt-live-15nov-before-own-money.json` for the whole money change.
+- **The test, Claude-played and free except Cartesia:** `scripts/voice_qa_debt_money.json` (new), three cards in the test building, one per case the owner named, each also testing the small talk: `nov15_tight` (money tight, answers "all good"), `nov15_too_much` (thinks she owes only August, "so-so"), `nov15_paid` (paid last week, asks back). `voice_qa.py bundle` read the live prompt (5,474) and tools into `local/voice-tests/2026-11-15-debt-money/`; three background players, blind to what is tested, each play the agent's model and the tenant. Audio next, through `voice_qa_audio.py`.
+
 ### LIVE: the debt call handles tight money and disputes itself (owner, on the sample's two hand-overs: "Like i told you we need to resolve this by ourself", with two references, "this is just a reference"), 10:03:17 UTC
 - **The references:** no money: understanding, the link goes to WhatsApp, pay whenever it suits, but please make a payment within this month so it does not pile up. A dispute ("too much", "already paid"): our system shows the balance still open, this much; did your payment go through? Or send the receipt so we can verify. Thank you.
 - **`docs/features/10-debt-followup/prompt.md`** (5,067 → 5,441 characters):

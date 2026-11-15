@@ -9,6 +9,7 @@ Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
 > **LIVE 15 Nov, 10:03:17 UTC: the debt call handles tight money and disputes itself, no hand-over** (owner: *"Like i told you we need to resolve this by ourself"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov, later"; `scripts/vapi_tools.py`).
+>   - **Worded as a guide since 10:07:38 UTC** (owner: *"not a strict script rather an example or a guide only"*): the prompt calls these a direction, not wording, and gives both answers as "for example".
 >   - **Tight money:** understanding, the link goes to WhatsApp and is paid whenever it suits, and a polite ask to pay within this month so it does not pile up.
 >   - **"Too much" or "already paid":** what the system shows (still open, which months, how much), then "did your payment go through?" or the receipt to the office email so it can be checked, and thanks. An already-paid claim still calls `log_disputed_payment`.
 >   - **Still handed over:** distress, "the apartment isn't mine", a request for a person, a language they can't share. `TRANSFER_REASONS` has no `hardship` or `dispute` now.
