@@ -550,6 +550,7 @@ appended to.
 >   - **15 Nov: no answer yet**, so a follow-up is drafted, again for the owner to send: `local/oxs/2026-11-15-standing-order-follow-up-email.txt`, Hebrew and English, a reply in the same thread. It asks the same one question.
 >   - **15 Nov, later: rev 1.9 of the spec answers it, and the answer is no.**
 >     - **The owner's copy:** `docs/features/16-human-handover/OXS_External_API_v1 (5).pdf`, untracked. The rev 1.3 copy lives in `local/media/`, outside the public repo.
+>       - **Since 15 Nov, 13:20 UTC, git ignores it in this checkout** (`.git/info/exclude`, local only), so neither session can commit OXS's spec to the public repo. It also stops the briefing hook from counting it as uncommitted work. It is still on disk where the owner put it. A new clone would show it again; keep it out of any commit.
 >     - **No endpoint starts a standing order.** The only one that touches them is DELETE of a payer (tenants module, `full`), and it cancels them.
 >     - **So the follow-up asks what the doc already answers.** The open question is where a payer sets one up, and whether the payment link can.
 >     - **That question is drafted, replacing the follow-up:** `local/oxs/2026-11-15-standing-order-link-email.txt`, Hebrew and English, a reply in the same thread. Its follow-ups go out only after OXS says yes. The owner sends it.

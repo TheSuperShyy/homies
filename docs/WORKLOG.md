@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### The briefing files after the two played calls, and the OXS spec kept out of git (the briefing hook), 13:20 UTC
+- **The hook stopped the turn.** The last commit carried WORKLOG and HANDOVER but not CONTEXT. The only uncommitted file was `docs/features/16-human-handover/OXS_External_API_v1 (5).pdf`, the owner's copy of OXS's spec (rev 1.9), untracked since 17:39 PH.
+- **The PDF stays out of the public repo.** No version of OXS's spec has ever been committed: rev 1.3 lives in `local/media/`, and HANDOVER already called this one untracked on purpose. It is now ignored in this checkout through `.git/info/exclude` (local only) and stays on disk where the owner put it. HANDOVER says so.
+- **CONTEXT** gets the standing facts of the played calls:
+  - the third deck `voice_qa_debt_busy.json`, beside the test page and not on it;
+  - the tool answers coming from `voice_qa.debt_tool`;
+  - the callback gap: a time said on a debt call is recorded nowhere (13 Nov real, 15 Nov played).
+- **HANDOVER** already had the gap (13:12 entry), and now has the PDF line.
+
 ### Two more debt calls, played and voiced: busy but yes, and a no while driving (owner: "give me a simulation recording of overall flow like a real tenant that is busy but still say say / and a no saying they are driving"), 13:12 UTC
 - **`scripts/voice_qa_debt_busy.json`** (new), two cards beside the regular yes and no, in the test building:
   - **Yossi** (m, flat 5, ₪500 for July and August, Monday 12:40): a contractor picking up on site.
