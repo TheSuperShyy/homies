@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### A sample debt call in English, given in chat (owner: "i want it to be conversational / so give me like a sample script translated into english"), 09:55 UTC
+- **Given:** one morning call to Ido (flat 1, January to August, 2,000 shekels) as the live prompt shapes it since 09:41: the opening, glad to hear it, the minute named, the facts and the link offer, a "wow" heard without the amount again, the link sent, the close. Plus three ways the start can go (a bad day, asked back, not now). Framed as one way a call could go: Michael words each call himself.
+- **Where real calls so far differed, said in two lines:** on 13 Nov the facts and the link offer came in one breath with no question at the end; and when Ido had no minute (13 Nov, 15 Nov) Michael asked when to call back, once promising "we'll call you back in a week", which nothing books.
+- Nothing changed. CONTEXT and HANDOVER: nothing new, since the change behind the sample is already in both (the 09:41 entry).
+
 ### LIVE: the debt call's small talk, glad to hear it, then the minute named (owner: "so make the voice agent the debt collection like nice like ask hwo the person is doing and then if they are happy then it can say like oh glad to hear / do you have a minute to talk about the balance you have active on the apartment?"), 09:41:58 UTC
 - **Read first, the three dialer calls to Ido** (13 Nov 08:20 and 08:21, 15 Nov 09:29 UTC, the debt agent `4bc03b57`, `first_name` עידו on each):
   - Ido: "בסדר המצב". Michael: "יופי תודה גם אצלי בסדר יש לך דקה לעניין חשוב". He answered a how-are-you nobody asked and asked for "a minute for something important" (two players found the phrase heavy on 7 Oct).
