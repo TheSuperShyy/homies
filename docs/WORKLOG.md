@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### A question answered, read only: will invited staff get the link and get in (owner, with the staff sheet: "if we invite these people are they going to receive the link and be able to access the chatwoot by that time"), 13:45 UTC
+- **Answered from today's checks (the 11:13 render and the 11:46 Hebrew invite):** adding an agent emails the invite at once, in Hebrew; the button opens the password page (locale he, 6+ characters); saving signs them in, Chatwoot in Hebrew; the link has no time limit; "Forgot password?" sends a new one.
+- **Looked up now (public DNS):** Homies' mail is Google (aspmx.l.google.com). gmail.com's DMARC is `p=none` (subdomains quarantine), so our `testclix46@gmail.com` through Brevo is not refused by policy but is a likely spam-folder case at Google. Said: check spam, or invite one person first.
+- **Also said:** the email shows CLIX and Assaf Clix (rename first if Homies is wanted); staff see the test number's chats and test hand-overs until the real number is live; 9 people (the sample row skipped). Nothing created; the logins wait for the owner's go.
+
 ### The two played calls published as their own page (owner: "open this in artifact", the local index.html), 13:37 UTC
 - **Published** "Busy and Driving Calls", https://claude.ai/artifact/4ouCqujnyAEVFSEURP4q4K (version 1, icon "phone"). It is private: only the owner opens it until he shares it from the page's Share menu.
 - **Same content as the local page**, rebuilt for the artifact. Each call has its player, chips (tenant and flat, amount and months, day and time, length), a one-line summary, and the conversation with the Hebrew right to left over its English.
