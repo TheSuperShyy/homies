@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### A WhatsApp message on Chatwoot's access levels, drafted (owner: "create a simple whatsapp message explain like Hey regarding the permission levels: here are the capabilities of different access level"), 08:50 UTC
+- In English, opening with the owner's own words, for whoever chooses Homies' roles.
+- **Agent, for most staff:** sees the chats of the inboxes he is in and of his department; replies, notes, assigns, labels and resolves; is notified when his department is tagged; edits contacts.
+- **Administrator, for one or two managers:** all of that, plus:
+  - every chat;
+  - staff and their access level;
+  - departments, labels, automations and the WhatsApp settings;
+  - reports and satisfaction scores;
+  - deleting chats and contacts, and exporting contacts.
+- It ends by asking who should be an administrator. Nothing was sent.
+
 ### A question answered, read only: Chatwoot's permission levels as they stand (owner: "in chatwoot whats the difference in different permission level we have rn"), 08:45 UTC
 - **Read from our Chatwoot** (4.16.2, account 2):
   - Assaf Clix (#2): administrator, in both inboxes and all four departments.
