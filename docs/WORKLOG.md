@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### Read: rev 1.9 of the OXS API spec has no way to start a standing order (owner: "i put a new oxs api docs in the root folder it should have the ability to create a standing order i think")
+- **The file is not in the root.** It is `docs/features/16-human-handover/OXS_External_API_v1 (5).pdf`, untracked, added at 17:39: revision 1.9, 37 pages (rev 1.3 had 12).
+- **New since 1.3:**
+  - the collection summary (1.5);
+  - the tenants module (1.6): read an apartment's payers, and with a `full` key add, update and remove them;
+  - maintenance (1.7, read only);
+  - service-call fields, `reportedBy` and notes (1.8-1.9).
+  - In 1.9, closing a call through the API notifies its reporter and the building's managers.
+- **Standing orders: no endpoint creates one.** They come up in two places only:
+  - `DELETE /apartments/:apartmentId/payers/:payerId` records that the payer left, and that cancels their credit-card and bank standing orders for the flat. The API cannot restore them: the payer has to "set up a new standing order", and the spec doesn't say where;
+  - the control center's debt figure, which doesn't count standing orders.
+- **So nothing changes:** a standing-order request is still recorded and emailed to collections. Today's drafted follow-up to OXS asks what the spec now answers.
+- Nothing was called on OXS.
+
 ### The Cartesia test of the debt call's money answers: three calls, published as a page (owner: "status on what is already done. also send it as a artfiact"), 11:00 UTC
 - **Played** (Claude, blind, the live prompt of 10:07 and its tools; `local/voice-tests/2026-11-15-debt-money/transcripts/`):
   - **Money's tight (Ron, flat 6, ₪750):** "all good" got "great, glad to hear it", then the minute named for the open balance. On the baby and the tight month: congratulations, the months and the amount once, the link to pay whenever it suits. Partial payment and interest: "I have no information on that", then the polite ask to settle it this month. He pays after the 10th: `send_payment_link` and `log_promise_to_pay` with his words, outcome promised.

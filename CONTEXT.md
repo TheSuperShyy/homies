@@ -206,6 +206,9 @@ The user is the builder. The client is Homies.
   - The address is `COLLECTIONS_EMAIL` in `.env`, written into the node at `--apply`. **Since 9 Nov it is Homies' own collections address, the one Yariv gave in his review (it was our team inbox before).** A test chat that asks for a standing order reaches them.
   - The sender is Brevo's verified `testclix46@gmail.com`, until Homies have their own.
 - **If OXS's API can start one** (the owner asked them on 5 Nov), this becomes the fallback, not the route.
+  - **Rev 1.9 of the spec (read 15 Nov) still has no way to start one.** Standing orders appear only under `DELETE /apartments/:apartmentId/payers/:payerId` (tenants module, `full` key).
+    - That call records that a payer left, and it cancels their credit-card and bank standing orders for the flat. The API cannot restore them.
+    - We hold no tenants key. Never call that endpoint.
 - **On the phone (8 Nov, after the chatbot, the owner's order; live: debt-tools v149, the incoming agent `10ae859a`):**
   - **The incoming agent** has its own `request_standing_order` (`vapi_tools.py`, INTAKE_TOOLS), and the prompt says it is the whole answer: no payment ticket, no note. debt-tools' `standingOrderByCall` finds a tenant on file by the call's own number and asks nothing; otherwise the name, a number to reach them and the building, the way open_request asks (ticketGate, always on here).
   - **One open request per tenant on file, or per the call's own number.** A number typed on the call finds nothing: anyone can say anyone's number, and "already recorded" would tell them about someone else's request.
