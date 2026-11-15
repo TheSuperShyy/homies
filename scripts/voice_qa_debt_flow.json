@@ -1,0 +1,97 @@
+{
+ "_about": "15 Nov: the owner's \"add in the verytop a general flow on how it should sound on regular no and regular yes act like a real tenant\". Two ordinary calls on the live debt prompt (10:07 UTC): a tenant who simply says yes to the link, and one who simply says no. Claude plays the agent's model and the tenant, like a real person. Nothing is dialled.",
+ "defaults": {
+  "_how": "The debt tools are answered by voice_qa.debt_tool from the deployed code; these are kept for the record and for `play`.",
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "open_request": {
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   }
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "id": "flow_yes",
+   "agent": "debt",
+   "title": "A regular yes",
+   "time": "11:30",
+   "weekday_he": "ראשון",
+   "ticket": "255-1611-26",
+   "phone_last4": "8812",
+   "months": 2,
+   "vars": {
+    "first_name": "דנה",
+    "gender": "f",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 4",
+    "months_phrase": "יולי ואוגוסט",
+    "breakdown_phrase": "500 על דירה 4",
+    "amount": "500",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347",
+   "caller": {
+    "persona": "דנה, 39. Friendly and relaxed, working from home today. Answers a how-are-you with 'good thanks'. Speaks about herself in the feminine.",
+    "knows": "She is דנה, apartment 4 in בר כוכבא 23. She vaguely remembers she hasn't paid the committee fee for a couple of months; it simply slipped her mind.",
+    "wants": "To sort it out easily and get back to work.",
+    "tendencies": "Says 'oh right, I completely forgot'. Agrees to the link without fuss. May ask whether it comes on WhatsApp. Says thanks and goodbye."
+   }
+  },
+  {
+   "id": "flow_no",
+   "agent": "debt",
+   "title": "A regular no",
+   "time": "16:10",
+   "weekday_he": "ראשון",
+   "ticket": "255-1612-26",
+   "phone_last4": "3307",
+   "months": 3,
+   "vars": {
+    "first_name": "עומר",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 7",
+    "months_phrase": "יוני, יולי ואוגוסט",
+    "breakdown_phrase": "750 על דירה 7",
+    "amount": "750",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "עומר, 41. Polite but brief, a little guarded with calls about money. Answers a how-are-you with 'fine'. Speaks about himself in the masculine.",
+    "knows": "He is עומר, apartment 7 in בר כוכבא 23. He knows he is behind on the committee fee. He has the money, but he prefers to pay in his own way and his own time, and he does not like getting links from phone calls.",
+    "wants": "No link, and not to commit to anything on this call.",
+    "tendencies": "Says 'no thanks, I don't need a link, I'll take care of it myself'. If asked when, stays vague ('soon', 'I'll see'). Does not argue about the amount. Ends the call politely."
+   }
+  }
+ ]
+}

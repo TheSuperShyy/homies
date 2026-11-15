@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### A regular yes and a regular no on top of the test page (owner: "ok add in the verytop a general flow on how it should sound on regular no and regular yes act like a real tenant"), 11:40 UTC
+- **`scripts/voice_qa_debt_flow.json`** (new), two ordinary cards in the test building, bundled from the live prompt (5,474) into `local/voice-tests/2026-11-15-debt-flow/` (the first bundle timed out reading Vapi, the second got a 404, the third went through). Two blind Claude players, each tenant played like a real person:
+  - **Regular yes (Dana, flat 4, ₪500, 11:30):** "good thanks" got "glad to hear it", the minute named, the months and amount once with the link offered as help; "oh right, I completely forgot, send it" got "happens to everyone", the link, and a warm close. `send_payment_link`, outcome authorized.
+  - **Regular no (Omer, flat 7, ₪750, 16:10):** "fine thanks" got "great, good to hear", the minute; "no thanks, I'll sort it myself" got "totally fine, however suits you" and one light question about when; "soon, I'll see" was recorded as said, no date (`log_promise_to_pay`, outcome promised, as the tool's description allows a vague answer). No push, no second offer.
+- **The page** gets a "general flow" section at the very top: six steps of how a call should sound, then the two calls; the three special cases below it. Voiced on Cartesia as before, one process per call.
+
 ### An email to OXS asking how a tenant sets up a standing order, and whether a link can do it, drafted (owner: "ok draft an email for that one in simple terms"; nothing sent)
 - **Why:** rev 1.9 of the spec shows the API can't start one, so the morning's follow-up asks what the doc already answers.
 - **What it asks**, in Hebrew and English: how a tenant sets up a standing order themselves in OXS, and whether there is a link to send them for it, like the payment link. If there is, Michael sends it on WhatsApp.
