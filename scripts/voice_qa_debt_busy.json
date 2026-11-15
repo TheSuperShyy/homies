@@ -1,0 +1,97 @@
+{
+ "_about": "15 Nov: the owner's \"give me a simulation recording of overall flow like a real tenant that is busy but still say [yes], and a no saying they are driving\". Two more ordinary calls beside voice_qa_debt_flow.json's regular yes and no, on the live debt prompt: a tenant who is busy but gives the minute and takes the link, and one who says no because she is driving. Claude plays the agent's model and the tenant, like a real person. Nothing is dialled.",
+ "defaults": {
+  "_how": "The debt tools are answered by voice_qa.debt_tool from the deployed code; these are kept for the record and for `play`.",
+  "send_payment_link": {
+   "ok": true,
+   "sent": true,
+   "to_last4": "<the phone's last four digits on the card>"
+  },
+  "log_promise_to_pay": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "request_standing_order": {
+   "ok": true,
+   "reference": "<ticket>",
+   "reference_spoken": "<spoken>"
+  },
+  "log_disputed_payment": {
+   "ok": true,
+   "charges_written": "<number of months>"
+  },
+  "open_request": {
+   "opened": {
+    "ok": true,
+    "reference": "<ticket>",
+    "reference_spoken": "<spoken>"
+   }
+  },
+  "transfer_to_human": {
+   "ok": true
+  },
+  "log_call_outcome": {
+   "ok": true,
+   "charges_bumped": "<number of months>"
+  }
+ },
+ "scenarios": [
+  {
+   "id": "busy_yes",
+   "agent": "debt",
+   "title": "Busy, but says yes",
+   "time": "12:40",
+   "weekday_he": "שני",
+   "ticket": "255-1613-26",
+   "phone_last4": "5520",
+   "months": 2,
+   "vars": {
+    "first_name": "יוסי",
+    "gender": "m",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 5",
+    "months_phrase": "יולי ואוגוסט",
+    "breakdown_phrase": "500 על דירה 5",
+    "amount": "500",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller": {
+    "persona": "יוסי, 45, a renovation contractor. Picks up at a job site between two tasks, with work going on around him. Short and a bit rushed, but not rude. Answers a how-are-you with something like 'busy, busy'. Speaks about himself in the masculine.",
+    "knows": "He is יוסי, apartment 5 in בר כוכבא 23. He knows he owes something on the committee fee; he meant to pay and didn't get to it.",
+    "wants": "To get it done fast: hear what it is, get the link, and get back to work.",
+    "tendencies": "Says he's a bit busy but agrees to the minute ('yes but quickly', 'go ahead, quickly'). Says 'yes, send it to WhatsApp'. May cut in with 'ok ok, send it' when the agent talks long. Does not argue. Says thanks and bye fast."
+   }
+  },
+  {
+   "id": "driving_no",
+   "agent": "debt",
+   "title": "Driving, says no",
+   "time": "17:20",
+   "weekday_he": "שלישי",
+   "ticket": "255-1614-26",
+   "phone_last4": "4471",
+   "months": 1,
+   "vars": {
+    "first_name": "שירן",
+    "gender": "f",
+    "building": "בר כוכבא 23, תל אביב - יפו",
+    "apartments_phrase": "דירה 8",
+    "months_phrase": "אוגוסט",
+    "breakdown_phrase": "250 על דירה 8",
+    "amount": "250",
+    "alt_payment": "none",
+    "callback_number": "077-6687949",
+    "verification_email": "אופיס, שטרודל, הומיז, מקף, מנג'מנט, נקודה, סי, או, נקודה, איי, אל"
+   },
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347",
+   "caller": {
+    "persona": "שירן, 34. Answers on the car's speaker on her way home from work, in traffic. Friendly, but she cannot talk now and keeps it short. Speaks about herself in the feminine.",
+    "knows": "She is שירן, apartment 8 in בר כוכבא 23. She doesn't know the details of any balance offhand.",
+    "wants": "Not to talk about money now, because she is driving. She doesn't mind hearing from them another time.",
+    "tendencies": "Says something like 'sorry, I'm driving right now, I can't talk'. Does not want to go into details while driving. If asked when is better, says something like 'tomorrow morning'. Wants to end the call quickly and politely."
+   }
+  }
+ ]
+}

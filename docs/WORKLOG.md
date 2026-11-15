@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### Two more debt calls, played and voiced: busy but yes, and a no while driving (owner: "give me a simulation recording of overall flow like a real tenant that is busy but still say say / and a no saying they are driving"), 13:12 UTC
+- **`scripts/voice_qa_debt_busy.json`** (new), two cards beside the regular yes and no, in the test building:
+  - **Yossi** (m, flat 5, ₪500 for July and August, Monday 12:40): a contractor picking up on site.
+  - **Shiran** (f, flat 8, ₪250 for August, Tuesday 17:20): on the car speaker in traffic.
+- **The bundle** came from the live debt prompt, 5,737 characters as updated at 12:44:36 UTC (reasoning low), into `local/voice-tests/2026-11-15-debt-busy/`. The first try got a 404 from Vapi and the next two timed out on the line. A direct GET answered 200 in 3.5 s, and the fourth try went through.
+- **Played by two blind Claude players**, each playing the model and the tenant from `PLAYER.md`, the rendered context and the card alone. Tool answers came from `voice_qa.debt_tool`, the deployed function's shapes, through a scratchpad helper.
+  - **Busy, yes (9 turns):**
+    - "busy busy here on site" got "then I'll keep it short and won't hold you up" and the minute named.
+    - "go ahead, just quickly" got the three facts once and the link offered.
+    - "send it to WhatsApp" got `send_payment_link` and "sent, to the number ending 5520, finish when you have a moment".
+    - Then `log_call_outcome` authorized and "good luck with the work".
+  - **Driving, no (5 turns):**
+    - "sorry, I'm driving, I can't really talk" got no money talk at all: "no problem at all, drive safely! When would suit you better?" (feminine: סעי, לָךְ).
+    - "tomorrow morning" got `log_call_outcome` office_to_contact and "all good, so we'll talk tomorrow morning. Have a good drive".
+- **Seen, not changed:** Michael says "we'll talk tomorrow morning", and no tool records a callback time, so nothing schedules it. It is the same gap as the 13 Nov real call, where Ido's "a week" became a promise to pay: the prompt has no callback outcome.
+- **Voiced** at 24 kHz, one process per call. Cartesia stalled once and the retry went through. Homies' account took 979 characters and ours 194. The calls run 49 s and 24 s. They are in `local/voice-tests/2026-11-15-debt-busy/audio/` (`index.html` with both players and the transcripts, opened in the owner's browser). The published test page is not changed.
+
 ### LIVE: the debt agent gets the incoming agent's speed settings (owner: "ok so the latency is super slow we need to make sure its fasst"), 12:42-12:44 UTC
 - **Measured first:** today's one real call with turns, Omni's dialer call to Ido at 09:29 UTC, averaged 2.55 s a turn: waiting for the end of speech 0.80, transcriber 0.33, model 0.72, voice 0.69 (Vapi's `performanceMetrics.turnLatencies`).
 - **Compared with the incoming agent, read live:** the same transcriber (Deepgram nova-3, he), the same start/stop speaking plans and the same voice; but the debt agent had no `reasoningEffort` (the model's medium), no `serviceTier`, and no `chunkPlan.minCharacters` (Vapi's default, 30). The incoming agent has had low / fast / 10 since 22-25 Oct.
