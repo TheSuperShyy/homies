@@ -4352,6 +4352,8 @@ example, gender and all.
 
 **The debt call answers tight money and disputes itself (15 Nov, the owner: "we need to resolve this by ourself").** No money: understanding, the link to WhatsApp, pay whenever it suits, and please pay within this month so it does not pile up. "Too much" or "already paid": what the system shows (still open, months, amount), then did the payment go through, or the receipt to the office email so it can be checked. Neither is handed to the team (`hardship` and `dispute` are off `TRANSFER_REASONS`); distress, ownership, a request for a person and language still are. It is the WhatsApp bot's money rule, on the debt call. The prompt gives both answers as an example and a direction, never as wording (the owner, 10:07: *"an example or a guide only"*).
 
+**A payment link is for the call's whole balance, or one apartment's, never one month** (`send_payment_link` sums the charges `targets()` returns). An agent that offers it "for August" promises what the link does not do (seen in the 15 Nov Cartesia test).
+
 **A prompt-only push when live equals the repo:** GET the assistant, swap the system message, PATCH the whole `model` back, read back. Vapi's edge refuses Python's default User-Agent (403), so every script sends its own.
 
 **Verify a push by reading the assistant back, never by trusting the write.**

@@ -90,7 +90,8 @@
     "knows": "She is מיכל, apartment 3 in בר כוכבא 23. She is sure she paid May to July: she gave a bank transfer in early July, she thinks for three months, and she would have to look in her bank app to see if it went through. She knows August is unpaid.",
     "wants": "For the amount to be corrected to what she really owes.",
     "tendencies": "Says 'a thousand? that's way too much, I only owe for August'. Says she paid by bank transfer in July. Is unsure whether the transfer actually went through. Asks where to send the confirmation. May offer to pay August now."
-   }
+   },
+   "caller_voice": "1daba551-67af-465e-a189-f91495aa2347"
   },
   {
    "id": "nov15_paid",

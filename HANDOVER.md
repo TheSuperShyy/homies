@@ -14,6 +14,7 @@ appended to.
 >   - **"Too much" or "already paid":** what the system shows (still open, which months, how much), then "did your payment go through?" or the receipt to the office email so it can be checked, and thanks. An already-paid claim still calls `log_disputed_payment`.
 >   - **Still handed over:** distress, "the apartment isn't mine", a request for a person, a language they can't share. `TRANSFER_REASONS` has no `hardship` or `dispute` now.
 >   - **Pushed** prompt and tools, read back equal to the repo. Snapshot `local/vapi-debt-live-15nov-before-own-money.json`; rollback is PATCHing its `model` back and reverting both files.
+>   - **Tested Claude-played and voiced with Cartesia** (11:00 UTC): money tight, too much, already paid, all three as asked, no hand-over. Page: https://claude.ai/artifact/6d2UkokJTfwD5aKVq5VLcC. Seen, not changed: a link offered for one month still carries the whole balance, and partial payment or interest has no answer in the prompt.
 >   - **Owed:** one real call to hear it (the owner's Ring to Ido, playing one of these).
 >
 > **LIVE 15 Nov, 09:41:58 UTC: the debt call's small talk is warmer and the minute is named** (owner: *"ask how the person is doing and then if they are happy then it can say like oh glad to hear / do you have a minute to talk about the balance you have active on the apartment?"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov").

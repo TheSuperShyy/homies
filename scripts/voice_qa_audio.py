@@ -61,10 +61,18 @@ def tts(key, voice_id, text, speed=None, dict_id=None):
         body["pronunciation_dict_id"] = dict_id
     req = urllib.request.Request("https://api.cartesia.ai/tts/bytes", data=json.dumps(body).encode("utf-8"), method="POST",
                                  headers={"X-API-Key": key, "Cartesia-Version": "2026-03-01", "Content-Type": "application/json"})
-    try:
-        raw = urllib.request.urlopen(req, timeout=120).read()
-    except urllib.error.HTTPError as e:
-        sys.exit("Cartesia %s: %s" % (e.code, e.read()[:300]))
+    # 15 Nov: Cartesia timed out mid-run once; a slow line is retried, not fatal.
+    import http.client
+    for attempt in range(4):
+        try:
+            raw = urllib.request.urlopen(req, timeout=120).read()
+            break
+        except urllib.error.HTTPError as e:
+            sys.exit("Cartesia %s: %s" % (e.code, e.read()[:300]))
+        except (TimeoutError, urllib.error.URLError, http.client.IncompleteRead, ConnectionError) as e:
+            if attempt == 3:
+                raise
+            print("Cartesia slow (%s), retrying" % e, flush=True)
     with wave.open(io.BytesIO(raw)) as w:
         return w.readframes(w.getnframes())
 
@@ -88,38 +96,48 @@ def silence(sec):
 
 
 cards = {s["id"]: s for s in json.load(open(os.path.join(RUN, "deck.json"), encoding="utf-8"))["scenarios"]}
-waits = {a: json.load(open(os.path.join(RUN, "live_%s.json" % a), encoding="utf-8"))["waiting_lines"] for a in ("inbound", "debt")}
+# 15 Nov: only the agents the run bundled (a debt-only deck has no live_inbound.json).
+waits = {a: json.load(open(os.path.join(RUN, "live_%s.json" % a), encoding="utf-8"))["waiting_lines"]
+         for a in ("inbound", "debt") if os.path.exists(os.path.join(RUN, "live_%s.json" % a))}
+# 15 Nov: VOICE_QA_ONLY=id,id renders only those calls (the rest keep their MP3 and
+# still appear in index.html), so one failed call is redone without paying for all.
+ONLY = {x for x in os.environ.get("VOICE_QA_ONLY", "").split(",") if x}
 pages = []
 for fn in sorted(os.listdir(os.path.join(RUN, "transcripts"))):
     if not fn.endswith(".json"):
         continue
     sid = fn[:-5]
     agent = cards[sid]["agent"]
+    render = not ONLY or sid in ONLY
     t = json.load(open(os.path.join(RUN, "transcripts", fn), encoding="utf-8"))
     audio, rows = [], []
     for turn in t["turns"]:
         for rnd in turn.get("rounds") or []:
             for call in rnd:
                 w = waits[agent].get(call.get("tool"))
-                if w:
+                if w and render:
                     pcm, _ = michael(agent, w)
                     audio += [pcm, silence(0.6)]
                 rows.append(("tool", "%s %s" % (call.get("tool"), json.dumps(call.get("arguments") or {}, ensure_ascii=False)), ""))
         if "agent" in turn:
-            pcm, spoken = michael(agent, turn["agent"])
-            audio += [pcm, silence(0.45)]
+            if render:
+                pcm, spoken = michael(agent, turn["agent"])
+                audio += [pcm, silence(0.45)]
             rows.append(("Michael", turn["agent"], turn.get("en", "")))
         elif "caller" in turn:
-            audio += [caller(turn["caller"], cards[sid].get("caller_voice") or CALLER_VOICE), silence(0.45)]
+            if render:
+                audio += [caller(turn["caller"], cards[sid].get("caller_voice") or CALLER_VOICE), silence(0.45)]
             rows.append(("Caller", turn["caller"], turn.get("en", "")))
+    pages.append((sid, cards[sid]["title"], rows))
+    if not render:
+        continue
     wav_path = os.path.join(OUT, sid + ".wav")
     with wave.open(wav_path, "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(b"".join(audio))
     mp3 = os.path.join(OUT, sid + ".mp3")
     subprocess.run(["ffmpeg", "-v", "quiet", "-y", "-i", wav_path, "-b:a", "128k", mp3], check=True)
     os.remove(wav_path)
-    pages.append((sid, cards[sid]["title"], rows))
-    print("rendered", sid, "->", mp3)
+    print("rendered", sid, "->", mp3, flush=True)
 
 css = ("body{font-family:system-ui,sans-serif;max-width:900px;margin:24px auto;padding:0 16px;background:#fafafa;color:#222}"
        "h1{font-size:22px}h2{font-size:17px;margin-top:32px}audio{width:100%;margin:8px 0}"

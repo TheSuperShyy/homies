@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### The Cartesia test of the debt call's money answers: three calls, published as a page (owner: "status on what is already done. also send it as a artfiact"), 11:00 UTC
+- **Played** (Claude, blind, the live prompt of 10:07 and its tools; `local/voice-tests/2026-11-15-debt-money/transcripts/`):
+  - **Money's tight (Ron, flat 6, ₪750):** "all good" got "great, glad to hear it", then the minute named for the open balance. On the baby and the tight month: congratulations, the months and the amount once, the link to pay whenever it suits. Partial payment and interest: "I have no information on that", then the polite ask to settle it this month. He pays after the 10th: `send_payment_link` and `log_promise_to_pay` with his words, outcome promised.
+  - **Too much (Michal, flat 3, ₪1,000):** "so-so, a crazy day" got "oh, then I'll try to keep it short". "I only owe August": what the system shows (May to August, a thousand), then "did your May to July payment go through?"; unsure, so check the app and send the receipt to the office email, thanks; `log_disputed_payment`. She pays August now: the link, outcome disputed.
+  - **Already paid (Avi, flat 8, ₪500):** "fine, and you?" got "glad to hear it, all good with me too, thanks for asking". Paid last week: still open, July and August, five hundred; "did the transfer go through?"; the receipt by email, letter by letter; "will you call again?" got "I can't say; once it arrives it'll be checked". `log_disputed_payment`, outcome disputed.
+  - No hand-over in any of them, and no amount said twice except to the one who disputed it.
+- **Seen, not changed:**
+  - Michal's link was offered "to close August", but `send_payment_link` sums every charge on the call (or one apartment's), never one month, so the link asks for the full ₪1,000.
+  - Partial payment and interest have no answer anywhere in the prompt, so Michael says he doesn't know.
+- **Voiced** with `voice_qa_audio.py` (Michael on Homies' Cartesia, the live voice `ba765d50`; callers on ours, Gil and Yael). Cartesia was slow and dropped once: the script now retries a timeout or a dropped connection, and `VOICE_QA_ONLY=id` renders only that call (the rest keep their MP3); a debt-only run no longer needs `live_inbound.json`. The third call alone: 1,207 characters on Homies' account, 334 on ours; the first two went uncounted (their run crashed before its count).
+- **Published:** "Michael's Debt Test Calls", https://claude.ai/artifact/6d2UkokJTfwD5aKVq5VLcC (version 2): the three MP3s (the third at 64 kbps, since the 1.7 MB upload stalled twice), what happened, the calls in Hebrew and English, the two notes above. Simulated, said so on the page.
+
 ### LIVE: the money answers worded as a guide, not a script (owner: "i dont want it to be a strict script rather an example or a guide only"), 10:07:38 UTC; the Cartesia test started (owner: "now test it have a conversation in the bg using cartesia")
 - **`docs/features/10-debt-followup/prompt.md`** (5,441 → 5,474 characters): the money sentence now says "what is written here is a direction, not wording: you fit it to the person and to what he says, in your own words", and the two answers follow as "for example" (understanding, the link to WhatsApp, pay when it suits, a polite ask to pay this month; and what the system shows, then did it go through or the receipt, and thanks), with no fixed order. "שידאג" became a plain polite ask.
 - **Pushed prompt-only** (tools equal the repo, checked first); read back equal; nothing else changed. Rollback: this sentence back, or the 10:03 snapshot `local/vapi-debt-live-15nov-before-own-money.json` for the whole money change.
