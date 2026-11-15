@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### The Chatwoot invite Homies' staff would get, rendered and shown, not sent (owner: "here is i want to make sure, the invite how it looks and how it works"), 11:13 UTC
+- **Rendered on the server, read only.**
+  - Chatwoot's own mailer drew the invite for a user built in memory: read-only, an undeliverable address, the token method stubbed, inside a rolled-back transaction. `.message` renders and never delivers. No login was created and no email was sent.
+  - The page is `local/golive/chatwoot-invite-preview.html` (gitignored), with a bar on top for the sender and subject. It was opened in the owner's browser.
+- **What it says:**
+  - From "Homies <testclix46@gmail.com>".
+  - The subject is "הוראות אישור", in Hebrew because account 2's language is Hebrew. The body is Chatwoot's English: "Workspace invitation / You're invited to join CLIX / Hi <name>, Assaf Clix invited you to join the CLIX workspace on Chatwoot. Create your account to start collaborating with your team." Then "Invited by Assaf Clix, Workspace CLIX", an "Accept invitation" button, and "This email was sent by Chatwoot".
+  - "CLIX" is account 2's name. "Assaf Clix" is the login behind CHATWOOT_API_TOKEN (#2), the inviter both by API and from that login's Settings → Agents.
+- **How it works, read from the code on the box (4.16.2):**
+  - Adding an agent (`AgentBuilder`) creates the login and sends this email at once.
+  - The button opens `chat.srv1879140.hstgr.cloud/app/auth/password/edit?reset_password_token=…`. That is "Set new password", in English (DEFAULT_LOCALE en): a password twice, at least 6 characters.
+  - Saving it confirms the account and signs them in (`DeviseOverrides::PasswordsController#update`, then `setAuthCredentials` and a redirect to /app).
+  - The link has no time limit. `update` finds the token without Devise's 6-hour check, so it works until used, or until a newer link replaces it.
+  - An admin cannot resend it, since the agents API has no resend. For a lost email, "Forgot password?" on the sign-in page sends a new link, and saving that password confirms the account the same way.
+- **Not changed:** the workspace name, the inviter's name and the sender. Each is the owner's call. Logins still wait for his go.
+
 ### Read: rev 1.9 of the OXS API spec has no way to start a standing order (owner: "i put a new oxs api docs in the root folder it should have the ability to create a standing order i think")
 - **The file is not in the root.** It is `docs/features/16-human-handover/OXS_External_API_v1 (5).pdf`, untracked, added at 17:39: revision 1.9, 37 pages (rev 1.3 had 12).
 - **New since 1.3:**

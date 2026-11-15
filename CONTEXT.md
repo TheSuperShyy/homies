@@ -81,6 +81,12 @@ The user is the builder. The client is Homies.
 - **"Who is told" is a Chatwoot matter, never a bot one.** Michael still says nothing to the tenant about a manager or a team (one voice), and the department stays the model's judgment with the reason's default: no keyword table.
 - **Prove it without the bot:** `python scripts/n8n_handover_test.py --manager`, on conversation 53 only.
 - **The bell is not the proof of a mention.** Chatwoot keeps one notification per login and conversation, so on a real chat the bot's own reply, a second after the note, replaces the mention's entry with "new message". The proof is the note itself and the login's Mentions view. `--manager` sees the notification only because nothing follows the note on 53.
+- **A new login's invite (read on 4.16.2 on 15 Nov; rendered without sending in `local/golive/chatwoot-invite-preview.html`).**
+  - Adding an agent creates the login and emails the invite at once.
+  - It comes from `MAILER_SENDER_EMAIL` ("Homies <testclix46@gmail.com>"). The subject is in the account's language ("הוראות אישור") and the body is Chatwoot's English. It names the account ("join the CLIX workspace") and the admin who added the person (the API token's login, Assaf Clix).
+  - Its "Accept invitation" button opens "Set new password" (6+ characters, in English). Saving it confirms the account and signs them in.
+  - The link never times out until it is used: `PasswordsController#update` skips the 6-hour check.
+  - An admin cannot resend it. For a lost one, "Forgot password?" gives a new link that confirms the account the same way.
 
 **Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; live 9 Nov as epoch 100 by `n8n_whatsapp_feedback9.py`, on live and the UChat copy).**
 - **The comments themselves, word for word with English:** `docs/discovery/feedback-yariv-2026-11-09.md` (written 10 Nov from the owner's 13 screenshots). Read the comment there before changing what it decided: some are whole sentences Yariv wrote for Michael to say (2.2, 2.3 and most of 3.2).
