@@ -9,6 +9,28 @@ conversation that produced it.
 
 ---
 
+## 2026-11-15
+
+### A question answered, read only: Chatwoot's permission levels as they stand (owner: "in chatwoot whats the difference in different permission level we have rn"), 08:45 UTC
+- **Read from our Chatwoot** (4.16.2, account 2):
+  - Assaf Clix (#2): administrator, in both inboxes and all four departments.
+  - seat2 test (#4): agent, in the WhatsApp inbox only and in no department.
+  - "Homies bot" (agent bot #1): the bot's own key, not a person.
+  - No custom roles: the account's features have no `custom_roles` (an Enterprise feature).
+- **The difference, from the policies in the running container** (`app/policies`):
+  - **An agent** sees a conversation only if he is in its inbox, or in the team it is assigned to (`agent_can_view_conversation?`).
+  - **Both roles** can reply, write notes, assign, label, resolve, edit contacts, and make saved replies and their own macros.
+  - **Admin only:**
+    - every conversation;
+    - people and roles;
+    - inboxes (the WhatsApp connection and its templates);
+    - teams, label and custom-field definitions;
+    - automations, campaigns, webhooks and the bot;
+    - reports and CSAT;
+    - deleting conversations and contacts, and contact import/export;
+    - the account's settings.
+- Nothing changed.
+
 ## 2026-11-13
 
 ### The 11/13 report (in chat, `/reporter`, after the first try at 08:40 UTC died on a dropped connection), 08:55 UTC
