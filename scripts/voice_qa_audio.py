@@ -91,7 +91,21 @@ def michael(agent, text):
     return tts(HOMIES, v["id"], spoken, v["speed"], DICT_M), spoken
 
 
-def caller(text, voice=CALLER_VOICE):
+# 15 Nov: a caller's "I see / want / hope" is spelled the same for a man and a woman,
+# and the library voice guesses (a woman's "אני רואה" came out leaning masculine).
+# The test caller is a simulated person, so its own words are pointed by its gender
+# before voicing; the transcript keeps the speech-to-text spelling.
+SELF = {"רואה": ("רוֹאֶה", "רוֹאָה"), "רוצה": ("רוֹצֶה", "רוֹצָה"), "עושה": ("עוֹשֶׂה", "עוֹשָׂה"),
+        "קונה": ("קוֹנֶה", "קוֹנָה"), "מקווה": ("מְקַוֶּה", "מְקַוָּה"), "שותה": ("שׁוֹתֶה", "שׁוֹתָה")}
+
+
+def point_self(text, gender):
+    i = 1 if gender == "f" else 0
+    return re.sub(r"(?<=אני )(%s)(?![֐-׿])" % "|".join(SELF), lambda m: SELF[m.group(1)][i], text)
+
+
+def caller(text, voice=CALLER_VOICE, gender="m"):
+    text = point_self(text, gender)
     chars["ours"] += len(text)
     return tts(OURS, voice, text)
 
@@ -131,7 +145,8 @@ for fn in sorted(os.listdir(os.path.join(RUN, "transcripts"))):
             rows.append(("Michael", turn["agent"], turn.get("en", "")))
         elif "caller" in turn:
             if render:
-                audio += [caller(turn["caller"], cards[sid].get("caller_voice") or CALLER_VOICE), silence(0.45)]
+                audio += [caller(turn["caller"], cards[sid].get("caller_voice") or CALLER_VOICE,
+                                 (cards[sid].get("vars") or {}).get("gender", "m")), silence(0.45)]
             rows.append(("Caller", turn["caller"], turn.get("en", "")))
     pages.append((sid, cards[sid]["title"], rows))
     if not render:

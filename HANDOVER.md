@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 15 Nov, 11:55:52 UTC: the debt agent writes same-spelled words pointed, so the voice says each in the right gender** (owner: *"make sure the gender on the female and male are correct"*; WORKLOG 15 Nov; `prompt.md`, "15 Nov, evening").
+>   - **Cause, measured on the live voice:** pointed address words are read right (a pointed לָךְ stays feminine even under the masculine dictionary); bare words spelled alike for both genders are guessed ("שהקדשת" to a man came out feminine).
+>   - **Fix:** one prompt bullet: about himself always masculine (רוֹאֶה, רוֹצֶה, מְקַוֶּה), to the tenant by gender (רוֹצֶה / רוֹצָה, שֶׁשָּׁאַלְתָּ / שֶׁשָּׁאַלְתְּ). Prompt 5,737 characters; rollback: the bullet out of `prompt.md` and the same prompt-only push.
+>   - **Open, known:** the dialer path does not send the feminine dictionary for women (the Call button does). Harmless while the model points every address word; closing it needs the whole voice in the override (a Vapi key in the function, or a copy of the voice).
+>
 > **LIVE 15 Nov, 10:03:17 UTC: the debt call handles tight money and disputes itself, no hand-over** (owner: *"Like i told you we need to resolve this by ourself"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov, later"; `scripts/vapi_tools.py`).
 >   - **Worded as a guide since 10:07:38 UTC** (owner: *"not a strict script rather an example or a guide only"*): the prompt calls these a direction, not wording, and gives both answers as "for example".
 >   - **Tight money:** understanding, the link goes to WhatsApp and is paid whenever it suits, and a polite ask to pay within this month so it does not pile up.

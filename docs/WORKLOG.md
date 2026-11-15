@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: the debt agent points the words the voice cannot tell (owner: "make sure the gender on the female and male are correct there are a few slips on the gender identifier"), 11:55:52 UTC
+- **Read first:** the written Hebrew of all five test calls was right (feminine to Dana and Michal, masculine to Ron, Avi and Omer; Yael voiced the women, Gil the men), and every address word was pointed (לָךְ / לְךָ) as `{{gender_forms}}` shows the model.
+- **Probes on Homies' Cartesia (the live voice `ba765d50`, sonic-3.5), log-mel DTW against pointed references, noise floor = the same text twice** (`scratchpad/dict_probe.py`, `word_probe.py`; ~370 characters):
+  - "יש לָךְ דקה לדבר?" under the masculine dictionary reads feminine (1.505 to feminine, 1.615 to masculine, floor 1.541); under the feminine one too. So a pointed word passes the masculine dictionary, as the 7 Oct research said, and the dictionary was not the cause.
+  - The slips were bare words spelled the same for both genders: "תודה שהקדשת לי דקה" to Omer read feminine (1.571 vs 1.619; m-vs-f 1.609 over a floor of 1.367, the clearest); Michael's own "מה שאני רואה במערכת" leaned feminine and Dana's own "אני רואה" leaned masculine (both within a weak separation).
+- **The fix, `docs/features/10-debt-followup/prompt.md`** (5,474 → 5,737 characters): one bullet in the words-and-pronunciation rules: a word spelled the same in masculine and feminine is written pointed; about himself always masculine (אני רוֹאֶה, רוֹצֶה, מְקַוֶּה), to the tenant by gender (רוֹצֶה / רוֹצָה, שֶׁשָּׁאַלְתָּ / שֶׁשָּׁאַלְתְּ, שֶׁהִקְדַּשְׁתָּ / שֶׁהִקְדַּשְׁתְּ). Pushed prompt-only, read back equal, tools and every other field unchanged. A "15 Nov, evening" note above the prompt.
+- **The test's own callers:** `voice_qa_audio.py` points a test caller's "אני רואה / רוצה / עושה / קונה / מקווה / שותה" by the card's gender before voicing (Dana's "אני רוֹאָה"); the transcript keeps the speech-to-text spelling.
+- **Not changed, known:** the dialer path never sends the feminine dictionary (the Call button does, `dashboard/lib/call.ts` `voiceFor`); it only matters when the model leaves an address word bare, which none of the five calls did. Closing it needs the agent's whole voice in the override, so a Vapi key in the function or a copy of the voice.
+- **Re-played:** all five calls on the new prompt (`local/voice-tests/2026-11-15-debt-{money,flow}-v2/`), five blind players; voicing and the page follow.
+
 ### The page complete: all five calls voiced and published (version 5), 11:40 UTC (19:40 PH)
 - **The line kept dropping Cartesia's replies part-way** (timeouts, a cut-off read, then a lost DNS for a minute), so the first two runs of the yes and no calls died. `voice_qa_audio.py` now backs off 10, 20, then 30 s between retries, and `VOICE_QA_RATE=24000` asks for 24 kHz, half the download per line. The yes and no calls went through at 24 kHz (50 s and 45 s); the earlier three stay at 44.1 kHz.
 - **Published** https://claude.ai/artifact/6d2UkokJTfwD5aKVq5VLcC, version 5: "the general flow" on top (six steps, the regular yes and no), the three special cases below, every call with audio. The owner's sharing is "anyone with the link".
