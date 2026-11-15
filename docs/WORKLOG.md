@@ -30,6 +30,25 @@ conversation that produced it.
   3. whether the API shows that a standing order is active.
 - **Where:** `local/oxs/2026-11-15-standing-order-link-email.txt` (gitignored), signed "Clix Solution, for Homies" with no person's name. It replaces the morning's follow-up draft. The owner sends it.
 
+### LIVE 11:46:58 UTC: Chatwoot's invite in natural Hebrew (owner: "make ir natural local hebrew")
+- **One added file; Chatwoot's own file is untouched.**
+  - The file is `deploy/chatwoot/overrides/confirmation_instructions.he.html.erb`. Rails renders a template's `.he` variant over the plain one when the mail renders in Hebrew, and the mailer renders in the account's language (he).
+  - It keeps the English file's four cases and links. It is written for Israeli staff, in wording that suits a man or a woman (the list has both), right to left.
+  - The subject is set in the template (`message.subject`): "הוזמנת להצטרף ל-CLIX ב-Chatwoot", in place of "הוראות אישור".
+  - Every link carries `locale=he`, so the password page opens in Chatwoot's own Hebrew ("הגדר סיסמה חדשה"). Checked: `selectedLocale: 'he'` with it, 'en' without. The page has no `dir`, so the Hebrew may sit left to right; that is Chatwoot's page.
+- **It reads:** "הזמנה לצוות / הוזמנת להצטרף ל-CLIX / שלום <name>, קיבלת הזמנה מ-Assaf Clix להצטרף לצוות של CLIX ב-Chatwoot. כדי להיכנס, נשאר רק לבחור סיסמה." Then "הזמנה מאת" and "חשבון", the button "אישור ההזמנה", and "אם הכפתור לא עובד, אפשר להיכנס דרך הקישור הזה."
+- **Tested before live, read only.**
+  - The render ran in the rails container from a temporary view path holding Chatwoot's mailer views plus the new file, with an in-memory user and `.message`.
+  - The Hebrew account got the Hebrew file. A render with no account (en) still got Chatwoot's English one.
+  - The temporary folder was removed.
+- **Deployed by `scripts/chatwoot_invite_he.py --apply`.**
+  - It uploaded the file and `docker-compose.override.yml` to /opt/chatwoot. The override is a read-only mount into sidekiq only, since invites go out with deliver_later and the job renders them.
+  - `docker compose config` was valid. Only sidekiq was recreated (--no-deps), on the same image (13ca92b8711a).
+  - After it: rails untouched (up 4 weeks), the dashboard answering 200, sidekiq processing with 0 errors, the file inside it equal to the repo's by sha256. A second dry run says nothing to do.
+- **Still English:** the footer "This email was sent by Chatwoot" (the layout every Chatwoot email shares) and the "Forgot password?" email (`reset_password_instructions`).
+- **Not changed:** the workspace name (CLIX) and the inviter (Assaf Clix), both shown in the email. No login was created.
+- **The preview** `local/golive/chatwoot-invite-preview.html` now holds the Hebrew version, opened in the owner's browser.
+
 ### A question answered, read only: is the invite in Hebrew (owner: "so its hebrew right"), 11:22 UTC
 - **Only the subject.**
   - "הוראות אישור" comes from `devise.he.yml`, because the mailer runs in account 2's language.

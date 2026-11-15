@@ -57,8 +57,11 @@ appended to.
 >       - Every seat goes into both inboxes, so a mention reaches it.
 >       - **Not created:** each login emails an invite (from `testclix46@gmail.com` through Brevo), and once in, staff would see the test chats and be pinged by test hand-overs. It waits for the owner's go, and his word on when.
 >       - **15 Nov: the invite was rendered and shown to the owner, not sent** (`local/golive/chatwoot-invite-preview.html`, WORKLOG 15 Nov).
->         - From "Homies <testclix46@gmail.com>", with the subject "הוראות אישור" over an English body: "Assaf Clix invited you to join the CLIX workspace on Chatwoot".
->         - Only the subject is Hebrew. The body and the set-password page are English. Inside, Chatwoot is in Hebrew, the account's language.
+>         - **LIVE 11:46:58 UTC: the invite is in natural Hebrew** (the owner: "make ir natural local hebrew"). `scripts/chatwoot_invite_he.py` mounts `deploy/chatwoot/overrides/confirmation_instructions.he.html.erb` into sidekiq; Chatwoot's own file is untouched.
+>           - From "Homies <testclix46@gmail.com>". The subject is "הוזמנת להצטרף ל-CLIX ב-Chatwoot". It reads "קיבלת הזמנה מ-Assaf Clix להצטרף לצוות של CLIX ב-Chatwoot", right to left, with the button "אישור ההזמנה".
+>           - The link opens the password page in Chatwoot's Hebrew (`locale=he`). Inside, Chatwoot is in Hebrew, the account's language.
+>           - Still English: the footer line every Chatwoot email shares, and the "Forgot password?" email.
+>           - To change a word, edit the file in the repo and run the script again; it recreates sidekiq, since production Rails caches templates.
 >         - The "Accept invitation" button opens a set-password page (6+ characters). Saving it confirms the account and signs them in.
 >         - The link does not expire until used. An admin cannot resend it; "Forgot password?" is the way back.
 >         - The workspace name (CLIX) and the inviter's name show in it. Whether to change them first is the owner's call.

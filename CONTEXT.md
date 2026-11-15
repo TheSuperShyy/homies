@@ -83,9 +83,16 @@ The user is the builder. The client is Homies.
 - **The bell is not the proof of a mention.** Chatwoot keeps one notification per login and conversation, so on a real chat the bot's own reply, a second after the note, replaces the mention's entry with "new message". The proof is the note itself and the login's Mentions view. `--manager` sees the notification only because nothing follows the note on 53.
 - **A new login's invite (read on 4.16.2 on 15 Nov; rendered without sending in `local/golive/chatwoot-invite-preview.html`).**
   - Adding an agent creates the login and emails the invite at once.
-  - It comes from `MAILER_SENDER_EMAIL` ("Homies <testclix46@gmail.com>"). The subject is in the account's language ("הוראות אישור") and the body is Chatwoot's English. It names the account ("join the CLIX workspace") and the admin who added the person (the API token's login, Assaf Clix).
-  - Its "Accept invitation" button opens "Set new password" (6+ characters, in English). Saving it confirms the account and signs them in.
-  - Only the subject is Hebrew. The body is English text written into the template, and pages before login follow `DEFAULT_LOCALE` (en). The dashboard then uses the person's own language setting, or else the account's (Hebrew).
+  - It comes from `MAILER_SENDER_EMAIL` ("Homies <testclix46@gmail.com>"). It names the account (CLIX) and the admin who added the person (the API token's login, Assaf Clix).
+  - **Since 15 Nov 11:46 UTC it is in Hebrew for a Hebrew account.**
+    - The file is `deploy/chatwoot/overrides/confirmation_instructions.he.html.erb`, mounted read-only into sidekiq by `deploy/chatwoot/docker-compose.override.yml` and deployed by `scripts/chatwoot_invite_he.py`.
+    - Rails renders a template's `.he` variant over the plain one when the mail renders in Hebrew, and ApplicationMailer renders in the account's language. So Chatwoot's English file stays as shipped, and an image update keeps both.
+    - Sidekiq only, because invites go out with deliver_later.
+    - The subject is set inside the template ("הוזמנת להצטרף ל-CLIX ב-Chatwoot"). Devise's own Hebrew subject was "הוראות אישור".
+    - Its links carry `locale=he`, which SwitchLocale reads first, so the password page opens in Chatwoot's Hebrew.
+  - Still English: the footer of the layout every Chatwoot email shares ("This email was sent by Chatwoot") and the "Forgot password?" email. Pages before login without `locale` follow `DEFAULT_LOCALE` (en).
+  - The dashboard uses the person's own language setting, or else the account's (Hebrew).
+  - The "אישור ההזמנה" button opens "Set new password" (6+ characters). Saving it confirms the account and signs them in.
   - The link never times out until it is used: `PasswordsController#update` skips the 6-hour check.
   - An admin cannot resend it. For a lost one, "Forgot password?" gives a new link that confirms the account the same way.
 

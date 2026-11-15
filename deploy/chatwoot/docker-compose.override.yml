@@ -1,0 +1,24 @@
+# Homies: Chatwoot's invite email in Hebrew (15 Nov 2026; the owner: "make it natural
+# local hebrew").
+#
+# docker compose merges this file into docker-compose.yml by itself (same folder,
+# the default override name), so every `docker compose up -d` keeps it, and
+# `docker compose config` shows the merged result. Volumes merge by target path,
+# so sidekiq keeps its storage volume from x-base.
+#
+# It adds ONE read-only file to the sidekiq container: the Hebrew version of the
+# confirmation / invite email (overrides/confirmation_instructions.he.html.erb,
+# which explains itself). Rails renders a template's .he variant over the plain one
+# whenever the mail renders in Hebrew, and Chatwoot renders it in the account's
+# language. Chatwoot's own English file stays as the image ships it, so an image
+# update keeps both.
+#
+# sidekiq only: invites go out with deliver_later, so the job renders them, never
+# rails. Recreating sidekiq leaves the dashboard and Meta's webhooks running.
+#
+# Deployed by scripts/chatwoot_invite_he.py. Undo: delete this file and the
+# overrides/ file on the box, then `docker compose up -d --no-deps sidekiq`.
+services:
+  sidekiq:
+    volumes:
+      - ./overrides/confirmation_instructions.he.html.erb:/app/app/views/devise/mailer/confirmation_instructions.he.html.erb:ro

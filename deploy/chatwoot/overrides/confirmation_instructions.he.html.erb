@@ -1,0 +1,147 @@
+<%#
+  Homies: Chatwoot's confirmation / invite email in Hebrew (15 Nov 2026; the owner:
+  "make it natural local hebrew").
+
+  Rails renders a template's .he variant over the plain one whenever the mail is
+  rendered in Hebrew, and ApplicationMailer#switch_locale renders it in the
+  account's language, which is he for Homies. Chatwoot's own English file
+  (app/views/devise/mailer/confirmation_instructions.html.erb, 4.16.2) is not
+  touched, and this one keeps its logic: the same four cases, the same links.
+
+  What differs: Hebrew written for Israeli staff, not translated word for word;
+  wording that suits a man or a woman (the list has both); right to left; a real
+  subject instead of Devise's "הוראות אישור"; and locale=he on every link, so the
+  page it opens is in Chatwoot's Hebrew too (SwitchLocale reads params[:locale]
+  first).
+
+  Mounted read-only into the sidekiq container by docker-compose.override.yml
+  (invites go out with deliver_later, so the job renders them). Deployed by
+  scripts/chatwoot_invite_he.py.
+%>
+<%
+  brand_name = global_config['BRAND_NAME'] || 'Chatwoot'
+  recipient_name = @resource.name.presence || @resource.email
+  account_user = @resource&.account_users&.first
+  inviter = account_user&.inviter
+  account_name = account_user&.account&.name
+  invited_user = inviter.present? && @resource.unconfirmed_email.blank?
+
+  mail_subject = "אישור כתובת המייל שלך ב-#{brand_name}"
+  eyebrow = 'ברוכים הבאים'
+  heading = 'נשאר רק לאשר את כתובת המייל'
+  intro_text = "ברוכים הבאים ל-#{brand_name}. לפני שמתחילים, צריך לוודא שכתובת המייל הזאת באמת שלך."
+  supporting_text = 'זה לוקח רגע.'
+  action_text = 'אישור החשבון'
+  action_url = frontend_url('auth/confirmation', confirmation_token: @token, locale: 'he')
+  detail_rows = []
+  detail_rows << ['המייל החדש', @resource.unconfirmed_email] if @resource.unconfirmed_email.present?
+
+  if @resource.unconfirmed_email.present?
+    mail_subject = 'אישור כתובת המייל החדשה'
+    eyebrow = 'עדכון מייל'
+    heading = 'אישור כתובת המייל החדשה'
+    intro_text = "קיבלנו בקשה לעדכן את כתובת המייל בחשבון שלך ב-#{brand_name}."
+    supporting_text = 'כדי לסיים את השינוי, צריך לאשר את הכתובת החדשה.'
+    action_text = 'אישור הכתובת'
+  elsif @resource.confirmed?
+    mail_subject = "החשבון שלך ב-#{brand_name} מוכן"
+    eyebrow = 'החשבון מוכן'
+    heading = 'החשבון שלך מוכן'
+    intro_text = "החשבון שלך ב-#{brand_name} כבר פעיל."
+    supporting_text = 'אפשר להיכנס מהכפתור למטה ולהמשיך מאיפה שהפסקת.'
+    action_text = 'כניסה לחשבון'
+    action_url = frontend_url('auth/sign_in', locale: 'he')
+    detail_rows = []
+  elsif invited_user
+    place = account_name.presence || brand_name
+    mail_subject = account_name.present? ? "הוזמנת להצטרף ל-#{account_name} ב-#{brand_name}" : "הוזמנת להצטרף ל-#{brand_name}"
+    eyebrow = 'הזמנה לצוות'
+    heading = "הוזמנת להצטרף ל-#{place}"
+    intro_text = if account_name.present?
+      "קיבלת הזמנה מ-#{inviter.name} להצטרף לצוות של #{account_name} ב-#{brand_name}."
+    else
+      "קיבלת הזמנה מ-#{inviter.name} להצטרף ל-#{brand_name}."
+    end
+    supporting_text = 'כדי להיכנס, נשאר רק לבחור סיסמה.'
+    action_text = 'אישור ההזמנה'
+    action_url = frontend_url(
+      'auth/password/edit',
+      reset_password_token: @resource.send(:set_reset_password_token),
+      locale: 'he'
+    )
+    detail_rows = [['הזמנה מאת', inviter.name]]
+    detail_rows << ['חשבון', account_name] if account_name.present?
+  end
+
+  message.subject = mail_subject
+%>
+<tr>
+  <td dir="rtl" style="padding: 0 0 16px; text-align: right;">
+    <span style="display: inline-block; padding: 6px 10px; border-radius: 999px; background-color: #EFF6FF; color: #1D4ED8; font-size: 12px; line-height: 12px; font-weight: 700;">
+      <%= eyebrow %>
+    </span>
+  </td>
+</tr>
+<tr>
+  <td dir="rtl" style="padding: 0 0 12px; text-align: right;">
+    <h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 700; color: #0F172A;"><%= heading %></h1>
+  </td>
+</tr>
+<tr>
+  <td dir="rtl" style="padding: 0 0 8px; text-align: right;">
+    <p style="margin: 0; font-size: 15px; line-height: 23px; color: #334155;">שלום <%= recipient_name %>,</p>
+  </td>
+</tr>
+<tr>
+  <td dir="rtl" style="padding: 0 0 10px; text-align: right;">
+    <p style="margin: 0; font-size: 15px; line-height: 23px; color: #475569;"><%= intro_text %></p>
+  </td>
+</tr>
+<tr>
+  <td dir="rtl" style="padding: 0 0 <%= detail_rows.any? ? '16px' : '24px' %>; text-align: right;">
+    <p style="margin: 0; font-size: 15px; line-height: 23px; color: #475569;"><%= supporting_text %></p>
+  </td>
+</tr>
+<% if detail_rows.any? %>
+  <tr>
+    <td style="padding: 0 0 24px;">
+      <table dir="rtl" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width: 100%; border: 1px solid #DCE7F5; border-radius: 16px; background-color: #F8FBFF;">
+        <% detail_rows.each_with_index do |(label, value), index| %>
+          <tr>
+            <td dir="rtl" style="padding: 16px 18px; text-align: right;<%= ' border-top: 1px solid #E2E8F0;' unless index.zero? %>">
+              <p style="margin: 0 0 4px; font-size: 13px; line-height: 18px; font-weight: 700; color: #64748B;"><%= label %></p>
+              <p style="margin: 0; font-size: 15px; line-height: 22px; font-weight: 600; color: #0F172A;"><%= value %></p>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </td>
+  </tr>
+<% end %>
+<tr>
+  <td style="padding: 0 0 24px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0;">
+      <tr>
+        <td bgcolor="#2781F6" style="border-radius: 14px; background-color: #2781F6;">
+          <%= link_to(
+            action_text,
+            action_url,
+            style: 'display:block; width:100%; box-sizing:border-box; padding:12px 24px; font-size:15px; line-height:20px; font-weight:700; color:#FFFFFF; text-align:center; text-decoration:none;'
+          ) %>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td dir="rtl" style="padding: 0 0 20px; text-align: right;">
+    <p style="margin: 0; font-size: 14px; line-height: 21px; color: #64748B;">
+      אם הכפתור לא עובד, אפשר להיכנס דרך
+      <%= link_to(
+        'הקישור הזה',
+        action_url,
+        style: 'color:#2781F6; text-decoration:none; font-weight:600;'
+      ) %>.
+    </p>
+  </td>
+</tr>
