@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### The two played calls published as their own page (owner: "open this in artifact", the local index.html), 13:37 UTC
+- **Published** "Busy and Driving Calls", https://claude.ai/artifact/4ouCqujnyAEVFSEURP4q4K (version 1, icon "phone"). It is private: only the owner opens it until he shares it from the page's Share menu.
+- **Same content as the local page**, rebuilt for the artifact. Each call has its player, chips (tenant and flat, amount and months, day and time, length), a one-line summary, and the conversation with the Hebrew right to left over its English.
+- **The tool calls read in plain words:** "Sent the payment link to the phone ending 5520" and "Recorded the call's outcome: authorized / office_to_contact".
+- **The two MP3s** (49 s and 24 s) are published beside the page.
+- **The source** is `build_busy_page.py` in the session scratchpad, which reads the two transcripts. The text is not retyped.
+- **The callback gap is not on the page.** It was told to the owner in chat and is in HANDOVER.
+
 ### The briefing files after the two played calls, and the OXS spec kept out of git (the briefing hook), 13:20 UTC
 - **The hook stopped the turn.** The last commit carried WORKLOG and HANDOVER but not CONTEXT. The only uncommitted file was `docs/features/16-human-handover/OXS_External_API_v1 (5).pdf`, the owner's copy of OXS's spec (rev 1.9), untracked since 17:39 PH.
 - **The PDF stays out of the public repo.** No version of OXS's spec has ever been committed: rev 1.3 lives in `local/media/`, and HANDOVER already called this one untracked on purpose. It is now ignored in this checkout through `.git/info/exclude` (local only) and stays on disk where the owner put it. HANDOVER says so.
