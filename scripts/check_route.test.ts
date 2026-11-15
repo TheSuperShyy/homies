@@ -5,7 +5,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { stripTypeScriptTypes } from "node:module";
 import {
-  callDirection, debtVariables, FIXED_DEFAULTS, GENDER_FORMS, isDialerCall, routeOf,
+  callDirection, debtVariables, FEMININE_DICT, FIXED_DEFAULTS, GENDER_FORMS, isDialerCall, routeOf,
+  voiceForGender,
 } from "../supabase/functions/debt-tools/route.ts";
 
 // The 21 Oct dialer call (01a15d92), with the number swapped for a test one.
@@ -95,4 +96,23 @@ test("a dialer call hands the debt agent what the Call button would", () => {
   ]) {
     assert.deepEqual(debtVariables(row, PHONE), button(row, PHONE));
   }
+});
+
+test("voiceForGender: a woman's call carries the feminine dictionary and the rest of the voice as it is", () => {
+  const voice = { provider: "cartesia", voiceId: "v1", pronunciationDictId: "pdict_masc",
+    chunkPlan: { formatPlan: { replacements: [{ type: "exact", key: "a", value: "b" }] } } };
+  const f = voiceForGender("f", voice, "pdict_fem");
+  assert.deepEqual(f, { ...voice, pronunciationDictId: "pdict_fem" });
+  assert.equal(voice.pronunciationDictId, "pdict_masc");          // the original is not touched
+  assert.equal(voiceForGender("m", voice, "pdict_fem"), null);       // a man keeps the voice
+  assert.equal(voiceForGender("unknown", voice, "pdict_fem"), null); // so does a name for both
+  assert.equal(voiceForGender("f", null, "pdict_fem"), null);        // no voice read: nothing sent
+  assert.equal(voiceForGender("f", { provider: "11labs", voiceId: "x" }, "pdict_fem"), null);
+  assert.equal(voiceForGender("f", voice, "")?.pronunciationDictId, undefined);
+});
+
+test("voiceForGender: the dialer and the Call button use the same feminine dictionary", () => {
+  const callTs = readFileSync(new URL("../dashboard/lib/call.ts", import.meta.url), "utf8");
+  assert.ok(callTs.includes(FEMININE_DICT), "dashboard/lib/call.ts names another feminine dictionary");
+  assert.equal(voiceForGender("f", { provider: "cartesia", voiceId: "v" })?.pronunciationDictId, FEMININE_DICT);
 });
