@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: the debt call's small talk, glad to hear it, then the minute named (owner: "so make the voice agent the debt collection like nice like ask hwo the person is doing and then if they are happy then it can say like oh glad to hear / do you have a minute to talk about the balance you have active on the apartment?"), 09:41:58 UTC
+- **Read first, the three dialer calls to Ido** (13 Nov 08:20 and 08:21, 15 Nov 09:29 UTC, the debt agent `4bc03b57`, `first_name` עידו on each):
+  - Ido: "בסדר המצב". Michael: "יופי תודה גם אצלי בסדר יש לך דקה לעניין חשוב". He answered a how-are-you nobody asked and asked for "a minute for something important" (two players found the phrase heavy on 7 Oct).
+  - The logged first line lacks the name and "מה נשמע" on two calls, but Ido answered each as a how-are-you, and the words ran 3 s with no interruption; not chased.
+- **`docs/features/10-debt-followup/prompt.md`, one sentence of the system prompt** (5,008 → 5,067 characters), described, not scripted:
+  - if things are good, he is glad for them in a few words;
+  - he talks about himself only if asked (was: "if they asked you too, answer briefly");
+  - the minute he asks for is to talk about the balance open on the flat (was "לעניין חשוב");
+  - the details that follow are "במה מדובר" (was "למה התקשרת"), since the reason is already said.
+  - Unchanged: the opening line, money only after the name question is answered, the three facts, the amount once, the link offer, the closing. A "15 Nov" note above the prompt says why.
+- **Pushed prompt-only:** the live prompt equalled the repo's before; GET, the system message swapped, the whole `model` PATCHed back (a first try was refused at Vapi's edge for Python's default User-Agent, nothing written). Read back: the prompt equals the repo, the first message, the 7 tools and every other model field the same; only `latestVersion` moved. Voice untouched. Snapshot `local/vapi-debt-live-15nov-before-glad.json`.
+- **No paid test run** (the owner's rule). The check is a real call: one Ring to Ido on /dialer, inside calling hours, then the transcript.
+- **Rollback:** PATCH the snapshot's `model` back, and revert the sentence.
+
 ### Homies' staff list for Chatwoot, mapped and not yet created (the owner's screenshot: "here the list of the employees"), 09:40 UTC
 - **The list:** 10 rows.
   - One is the sheet's example: "צוות CLIX", a sample Gmail address, its department cell our template's own instruction. Clix already has its admin seat in all four teams.

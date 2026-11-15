@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 15 Nov, 09:41:58 UTC: the debt call's small talk is warmer and the minute is named** (owner: *"ask how the person is doing and then if they are happy then it can say like oh glad to hear / do you have a minute to talk about the balance you have active on the apartment?"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov").
+>   - **The debt agent `4bc03b57` only,** one sentence of its prompt (5,067 characters): glad for the tenant in a few words when things are good, nothing about himself unless asked, then a minute "to talk about the balance open on the flat" in place of "a minute for something important". The opening line, the name check before money, the facts, the link offer and the closing are unchanged. The incoming agent is untouched.
+>   - **Pushed prompt-only and read back equal;** tools, first message and every other field unchanged. Snapshot `local/vapi-debt-live-15nov-before-glad.json`.
+>   - **Owed:** one real call to hear it, the owner's Ring to Ido on /dialer (one press, in calling hours), then its transcript on Vapi.
+
 > **LIVE 12 Nov, 12:06:21 UTC: THE GROK RUN OF THE STANDARD PASSED; ITS ONE FAIL IS FIXED IN CODE** (the owner pasted Grok's report; `scripts/n8n_whatsapp_linepass.py`; WORKLOG 12 Nov).
 >   - **The run (11:32-11:54 UTC):** E3, E4 and E5 opened with the standard word for word, with no ticket. E1 asked before opening its ticket, and gas was exact.
 >   - **The fail, E3.2's plural "כדי שיעזרו לכם מיד":** the `echo` guard had sent back a right first draft ("אני מבין ש..." plus our line), and the unguarded second pass slipped. Now:

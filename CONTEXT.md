@@ -4348,6 +4348,10 @@ example, gender and all.
 
 ## The voice prompts
 
+**The debt call's small talk (15 Nov, the owner):** after the opening's how-are-you, Michael is glad for the tenant in a few words when things are good, says nothing about himself unless asked, and asks for a minute "to talk about the balance open on the flat", naming it, not "something important". Money is still named only after the opening's name question is answered. Described in the prompt, not scripted.
+
+**A prompt-only push when live equals the repo:** GET the assistant, swap the system message, PATCH the whole `model` back, read back. Vapi's edge refuses Python's default User-Agent (403), so every script sends its own.
+
 **Verify a push by reading the assistant back, never by trusting the write.**
 `vapi_sync.py --apply` printing OK means the PATCH returned 200, not that the
 assistant carries what you meant. GET it afterwards and compare the system
