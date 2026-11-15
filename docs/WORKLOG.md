@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### Omnitelecom's answer on the 500: our check 1 passes (the owner pasted their email: "focus on this one"), 09:23 UTC
+- **Their email** (kept in `local/omnitelecom/2026-11-15-omni-answer-500.txt`). They ask us to run two checks:
+  1. An empty request should answer 400.
+  2. One test lead should answer 200 and reach the bot in about 30 s.
+  - They also ask us to resend the three leads that got the 500: 12 Nov 15:27 and 15:31, and 13 Nov 09:03, Israel time (the owner's Ring presses).
+  - The three unanswered calls (the 9 Nov leads): List 2 dials two leads at once and 208 takes one call at a time, so one call in each pair could not be answered. With one attempt per lead, those three will not be dialled again.
+- **Check 1, run:** `POST []` with our token at 09:23:35 UTC (11:23:35 Israel) answered 400 "No JSON data provided". The 500 is fixed. No lead went in.
+- **Check 2 not run:** a lead rings Ido's phone, so it waits for the owner's go and for Ido to be ready.
+  - Recommended: one lead (`tokomni_lead.py --apply`, or Ring on /dialer), then `tokomni_lead.py --check`.
+  - The three refused leads were the same test to the same phone, so that one lead stands in for them. If Omni still wants them, they go one at a time, each after the last call ends.
+- **For go-live:** with two dialled at once and one call at a time on 208, every second answered debt call would find the bot busy. Before real debtors, List 2 should dial one lead at a time, or 208 should take more calls. That goes in the update to Omni.
+- **Earlier, interrupted (the owner: "can you check if vapi is still working?"):**
+  - Vapi is in credit. Both agents and 208 (`e9f95429`) are active, Cartesia is there, and debt-tools answers 401 without the key.
+  - Two dialer calls reached the debt agent on 13 Nov at 08:20 and 08:21 UTC, as HANDOVER now says.
+  - The owner's four web calls today (09:16-09:17 UTC) never carried the caller's audio. Three ended with `call.in-progress.error-assistant-did-not-receive-customer-audio`. In the fourth, the bot greeted and the caller hung up with nothing heard.
+
 ### A follow-up to OXS on the standing-order API, drafted (owner: "we need to do a follow up email on the oxs"; nothing sent), 08:58 UTC
 - **Which thread:** our 5 Nov email to support@oxs.co.il, the only one we have sent OXS. The owner's "follow up" says it went out and no answer has come. It asked whether the API can start a standing order for a tenant who says yes, and for a key if it can.
 - **The draft:** `local/oxs/2026-11-15-standing-order-follow-up-email.txt` (gitignored), Hebrew and English, as a reply in that thread.
