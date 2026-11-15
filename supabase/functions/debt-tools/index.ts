@@ -59,7 +59,7 @@ import {
 import { DELIVERY_WAITS_MS, pollUntil, stopwatch, windowOpen } from "./paylink.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
-import { callDirection, debtVariables, FIXED_DEFAULTS, isDialerCall, routeOf } from "./route.ts";
+import { callDirection, debtVariables, FEMININE_DICT, FIXED_DEFAULTS, isDialerCall, routeOf, voiceForGender } from "./route.ts";
 import { sameNameAnyScript } from "./names.ts";
 
 const db = createClient(
@@ -4868,6 +4868,32 @@ async function salvage(interactionId: string | null, ctx: CallContext, transcrip
  * answer every call on this line got before, and always an answer, because a
  * failed reply makes Vapi hang the caller up. Numbers are never logged.
  */
+// The debt agent's live voice, for a call to a woman (route.ts, voiceForGender). Read
+// from Vapi and kept ten minutes per worker, so most calls pay nothing for it; a
+// failure is not kept, and it never throws: the call then keeps its own voice.
+let debtVoice: { at: number; voice: Record<string, unknown> | null } | null = null;
+async function liveDebtVoice(): Promise<Record<string, unknown> | null> {
+  const key = Deno.env.get("VAPI_PRIVATE_KEY");
+  if (!key) return null;
+  if (debtVoice && Date.now() - debtVoice.at < 10 * 60_000) return debtVoice.voice;
+  try {
+    const res = await fetch(`https://api.vapi.ai/assistant/${DEBT_ASSISTANT_YARIV}`, {
+      headers: { Authorization: `Bearer ${key}`, "User-Agent": "homies-debt-tools" },
+      signal: AbortSignal.timeout(2500),
+    });
+    if (!res.ok) {
+      console.error("route: voice read", res.status);
+      return null;
+    }
+    const voice = (await res.json())?.voice ?? null;
+    debtVoice = { at: Date.now(), voice };
+    return voice;
+  } catch (e) {
+    console.error("route: voice read failed", String(e));
+    return null;
+  }
+}
+
 async function assistantFor(message: any): Promise<Record<string, unknown>> {
   const intake = { assistantId: INTAKE_ASSISTANT_YARIV };
   try {
@@ -4889,10 +4915,15 @@ async function assistantFor(message: any): Promise<Record<string, unknown>> {
       verification_email: Deno.env.get("HOMIES_VERIFICATION_EMAIL_SAY") ?? FIXED_DEFAULTS.verification_email,
       alt_payment: Deno.env.get("HOMIES_ALT_PAYMENT") ?? FIXED_DEFAULTS.alt_payment,
     };
-    return {
-      assistantId: DEBT_ASSISTANT_YARIV,
-      assistantOverrides: { variableValues: debtVariables(route.row, route.phone, fixed) },
-    };
+    const variableValues = debtVariables(route.row, route.phone, fixed);
+    const assistantOverrides: Record<string, unknown> = { variableValues };
+    if (variableValues.gender === "f") {
+      const voice = voiceForGender("f", await liveDebtVoice(),
+        Deno.env.get("CARTESIA_DICT_FEMININE") ?? FEMININE_DICT);
+      if (voice) assistantOverrides.voice = voice;
+      console.log("route voice", voice ? "feminine dictionary" : "kept (no voice read)");
+    }
+    return { assistantId: DEBT_ASSISTANT_YARIV, assistantOverrides };
   } catch (e) {
     console.error("route threw; the incoming agent answers", String(e));
     return intake;
