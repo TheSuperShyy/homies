@@ -538,6 +538,7 @@ appended to.
 >     - **The owner's copy:** `docs/features/16-human-handover/OXS_External_API_v1 (5).pdf`, untracked. The rev 1.3 copy lives in `local/media/`, outside the public repo.
 >     - **No endpoint starts a standing order.** The only one that touches them is DELETE of a payer (tenants module, `full`), and it cancels them.
 >     - **So the follow-up asks what the doc already answers.** The open question is where a payer sets one up, and whether the payment link can.
+>     - **That question is drafted, replacing the follow-up:** `local/oxs/2026-11-15-standing-order-link-email.txt`, Hebrew and English, a reply in the same thread. Its follow-ups go out only after OXS says yes. The owner sends it.
 >
 > **5 Nov: a brief for the owner's Grok bot to test Michael as a real tenant:** `docs/features/11-whatsapp-bot/grok-tenant-tester.md` (owner: *"create an md file for grok bot on how to test the agent properly like a real tenant"*).
 >   - **What it holds:** 11 conversations (about 45 messages, about $2 of the bot's model), the 25 rules with the checklist's expectations, and a report format.

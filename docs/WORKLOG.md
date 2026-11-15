@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### An email to OXS asking how a tenant sets up a standing order, and whether a link can do it, drafted (owner: "ok draft an email for that one in simple terms"; nothing sent)
+- **Why:** rev 1.9 of the spec shows the API can't start one, so the morning's follow-up asks what the doc already answers.
+- **What it asks**, in Hebrew and English: how a tenant sets up a standing order themselves in OXS, and whether there is a link to send them for it, like the payment link. If there is, Michael sends it on WhatsApp.
+- **The follow-ups wait for OXS's yes** and are kept in the same file:
+  1. whether the API gives that link for a tenant;
+  2. whether it covers both card and bank;
+  3. whether the API shows that a standing order is active.
+- **Where:** `local/oxs/2026-11-15-standing-order-link-email.txt` (gitignored), signed "Clix Solution, for Homies" with no person's name. It replaces the morning's follow-up draft. The owner sends it.
+
 ### The Chatwoot invite Homies' staff would get, rendered and shown, not sent (owner: "here is i want to make sure, the invite how it looks and how it works"), 11:13 UTC
 - **Rendered on the server, read only.**
   - Chatwoot's own mailer drew the invite for a user built in memory: read-only, an undeliverable address, the token method stubbed, inside a rolled-back transaction. `.message` renders and never delivers. No login was created and no email was sent.
