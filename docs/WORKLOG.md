@@ -58,6 +58,11 @@ conversation that produced it.
 - **Still English:** the footer "This email was sent by Chatwoot" (the layout every Chatwoot email shares) and the "Forgot password?" email (`reset_password_instructions`).
 - **Not changed:** the workspace name (CLIX) and the inviter (Assaf Clix), both shown in the email. No login was created.
 - **The preview** `local/golive/chatwoot-invite-preview.html` now holds the Hebrew version, opened in the owner's browser.
+- **11:57:05 UTC, second deploy: the one-letter prefixes join the Hebrew way.**
+  - A Hebrew name takes ל/מ/ב straight on (להומיז, מיריב לוי). Anything else takes a hyphen (ל-CLIX, מ-Assaf Clix, ב-Chatwoot).
+  - Without it, a workspace renamed to הומיז would have read "ל-הומיז".
+  - Tested read-only first. Today's names render as before. Hebrew names set on in-memory, read-only copies gave "הוזמנת להצטרף להומיז ב-Chatwoot" and "קיבלת הזמנה מיריב לוי". English is unchanged. The saved names were still CLIX and Assaf Clix after the test.
+  - The script backed up the first version on the box (`.bak-20261115115515`) and recreated sidekiq again: rails untouched, 0 errors, the file equal to the repo's.
 
 ### A question answered, read only: is the invite in Hebrew (owner: "so its hebrew right"), 11:22 UTC
 - **Only the subject.**

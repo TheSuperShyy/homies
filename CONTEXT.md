@@ -90,6 +90,7 @@ The user is the builder. The client is Homies.
     - Sidekiq only, because invites go out with deliver_later.
     - The subject is set inside the template ("הוזמנת להצטרף ל-CLIX ב-Chatwoot"). Devise's own Hebrew subject was "הוראות אישור".
     - Its links carry `locale=he`, which SwitchLocale reads first, so the password page opens in Chatwoot's Hebrew.
+    - Names go in with the one-letter prefix joined the Hebrew way: straight onto a Hebrew name (להומיז, מיריב לוי), with a hyphen onto anything else (ל-CLIX, ב-Chatwoot).
   - Still English: the footer of the layout every Chatwoot email shares ("This email was sent by Chatwoot") and the "Forgot password?" email. Pages before login without `locale` follow `DEFAULT_LOCALE` (en).
   - The dashboard uses the person's own language setting, or else the account's (Hebrew).
   - The "אישור ההזמנה" button opens "Set new password" (6+ characters). Saving it confirms the account and signs them in.

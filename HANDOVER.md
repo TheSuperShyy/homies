@@ -67,6 +67,7 @@ appended to.
 >           - The link opens the password page in Chatwoot's Hebrew (`locale=he`). Inside, Chatwoot is in Hebrew, the account's language.
 >           - Still English: the footer line every Chatwoot email shares, and the "Forgot password?" email.
 >           - To change a word, edit the file in the repo and run the script again; it recreates sidekiq, since production Rails caches templates.
+>           - The one-letter prefixes join the Hebrew way (11:57 deploy). If the workspace is renamed to הומיז, the email reads "להומיז" with nothing else to change.
 >         - The "Accept invitation" button opens a set-password page (6+ characters). Saving it confirms the account and signs them in.
 >         - The link does not expire until used. An admin cannot resend it; "Forgot password?" is the way back.
 >         - The workspace name (CLIX) and the inviter's name show in it. Whether to change them first is the owner's call.

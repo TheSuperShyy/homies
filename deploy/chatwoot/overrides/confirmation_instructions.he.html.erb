@@ -25,11 +25,14 @@
   inviter = account_user&.inviter
   account_name = account_user&.account&.name
   invited_user = inviter.present? && @resource.unconfirmed_email.blank?
+  # Hebrew joins a one-letter prefix (ל, מ, ב) straight onto a Hebrew word and with a
+  # hyphen onto anything else: להומיז, מיריב לוי, but ל-CLIX, ב-Chatwoot.
+  join = ->(prefix, name) { name.to_s.match?(/\A[א-ת]/) ? "#{prefix}#{name}" : "#{prefix}-#{name}" }
 
-  mail_subject = "אישור כתובת המייל שלך ב-#{brand_name}"
+  mail_subject = "אישור כתובת המייל שלך #{join.('ב', brand_name)}"
   eyebrow = 'ברוכים הבאים'
   heading = 'נשאר רק לאשר את כתובת המייל'
-  intro_text = "ברוכים הבאים ל-#{brand_name}. לפני שמתחילים, צריך לוודא שכתובת המייל הזאת באמת שלך."
+  intro_text = "ברוכים הבאים #{join.('ל', brand_name)}. לפני שמתחילים, צריך לוודא שכתובת המייל הזאת באמת שלך."
   supporting_text = 'זה לוקח רגע.'
   action_text = 'אישור החשבון'
   action_url = frontend_url('auth/confirmation', confirmation_token: @token, locale: 'he')
@@ -40,27 +43,31 @@
     mail_subject = 'אישור כתובת המייל החדשה'
     eyebrow = 'עדכון מייל'
     heading = 'אישור כתובת המייל החדשה'
-    intro_text = "קיבלנו בקשה לעדכן את כתובת המייל בחשבון שלך ב-#{brand_name}."
+    intro_text = "קיבלנו בקשה לעדכן את כתובת המייל בחשבון שלך #{join.('ב', brand_name)}."
     supporting_text = 'כדי לסיים את השינוי, צריך לאשר את הכתובת החדשה.'
     action_text = 'אישור הכתובת'
   elsif @resource.confirmed?
-    mail_subject = "החשבון שלך ב-#{brand_name} מוכן"
+    mail_subject = "החשבון שלך #{join.('ב', brand_name)} מוכן"
     eyebrow = 'החשבון מוכן'
     heading = 'החשבון שלך מוכן'
-    intro_text = "החשבון שלך ב-#{brand_name} כבר פעיל."
+    intro_text = "החשבון שלך #{join.('ב', brand_name)} כבר פעיל."
     supporting_text = 'אפשר להיכנס מהכפתור למטה ולהמשיך מאיפה שהפסקת.'
     action_text = 'כניסה לחשבון'
     action_url = frontend_url('auth/sign_in', locale: 'he')
     detail_rows = []
   elsif invited_user
     place = account_name.presence || brand_name
-    mail_subject = account_name.present? ? "הוזמנת להצטרף ל-#{account_name} ב-#{brand_name}" : "הוזמנת להצטרף ל-#{brand_name}"
-    eyebrow = 'הזמנה לצוות'
-    heading = "הוזמנת להצטרף ל-#{place}"
-    intro_text = if account_name.present?
-      "קיבלת הזמנה מ-#{inviter.name} להצטרף לצוות של #{account_name} ב-#{brand_name}."
+    mail_subject = if account_name.present?
+      "הוזמנת להצטרף #{join.('ל', account_name)} #{join.('ב', brand_name)}"
     else
-      "קיבלת הזמנה מ-#{inviter.name} להצטרף ל-#{brand_name}."
+      "הוזמנת להצטרף #{join.('ל', brand_name)}"
+    end
+    eyebrow = 'הזמנה לצוות'
+    heading = "הוזמנת להצטרף #{join.('ל', place)}"
+    intro_text = if account_name.present?
+      "קיבלת הזמנה #{join.('מ', inviter.name)} להצטרף לצוות של #{account_name} #{join.('ב', brand_name)}."
+    else
+      "קיבלת הזמנה #{join.('מ', inviter.name)} להצטרף #{join.('ל', brand_name)}."
     end
     supporting_text = 'כדי להיכנס, נשאר רק לבחור סיסמה.'
     action_text = 'אישור ההזמנה'
