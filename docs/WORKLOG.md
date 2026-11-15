@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### A follow-up to OXS on the standing-order API, drafted (owner: "we need to do a follow up email on the oxs"; nothing sent), 08:58 UTC
+- **Which thread:** our 5 Nov email to support@oxs.co.il, the only one we have sent OXS. The owner's "follow up" says it went out and no answer has come. It asked whether the API can start a standing order for a tenant who says yes, and for a key if it can.
+- **The draft:** `local/oxs/2026-11-15-standing-order-follow-up-email.txt` (gitignored), Hebrew and English, as a reply in that thread.
+  - It asks for an update and restates the one question in short.
+  - It adds that we are getting ready to go live with Homies' tenants, and asks who to contact if someone else handles it.
+  - Still one question only: the follow-up questions in the 5 Nov file go out after a yes. No key values in it. The owner sends it.
+- HANDOVER's 5 Nov line says so.
+
 ### A WhatsApp message on Chatwoot's access levels, drafted (owner: "create a simple whatsapp message explain like Hey regarding the permission levels: here are the capabilities of different access level"), 08:50 UTC
 - In English, opening with the owner's own words, for whoever chooses Homies' roles.
 - **Agent, for most staff:** sees the chats of the inboxes he is in and of his department; replies, notes, assigns, labels and resolves; is notified when his department is tagged; edits contacts.
