@@ -85,6 +85,7 @@ The user is the builder. The client is Homies.
   - Adding an agent creates the login and emails the invite at once.
   - It comes from `MAILER_SENDER_EMAIL` ("Homies <testclix46@gmail.com>"). The subject is in the account's language ("הוראות אישור") and the body is Chatwoot's English. It names the account ("join the CLIX workspace") and the admin who added the person (the API token's login, Assaf Clix).
   - Its "Accept invitation" button opens "Set new password" (6+ characters, in English). Saving it confirms the account and signs them in.
+  - Only the subject is Hebrew. The body is English text written into the template, and pages before login follow `DEFAULT_LOCALE` (en). The dashboard then uses the person's own language setting, or else the account's (Hebrew).
   - The link never times out until it is used: `PasswordsController#update` skips the 6-hour check.
   - An admin cannot resend it. For a lost one, "Forgot password?" gives a new link that confirms the account the same way.
 

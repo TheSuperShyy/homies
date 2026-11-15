@@ -26,6 +26,14 @@ conversation that produced it.
   3. whether the API shows that a standing order is active.
 - **Where:** `local/oxs/2026-11-15-standing-order-link-email.txt` (gitignored), signed "Clix Solution, for Homies" with no person's name. It replaces the morning's follow-up draft. The owner sends it.
 
+### A question answered, read only: is the invite in Hebrew (owner: "so its hebrew right"), 11:22 UTC
+- **Only the subject.**
+  - "הוראות אישור" comes from `devise.he.yml`, because the mailer runs in account 2's language.
+  - The body is English text written into Chatwoot's template, which has no Hebrew version.
+  - The "Set new password" page is English too: before login, the page follows `DEFAULT_LOCALE`, which is en.
+- **Inside, Chatwoot is in Hebrew.** `App.vue` uses the person's own language setting if there is one, and the account's (he) otherwise. Neither login on account 2 has its own setting (`ui_settings.locale` nil), so a new seat starts in Hebrew.
+- Nothing changed.
+
 ### The Chatwoot invite Homies' staff would get, rendered and shown, not sent (owner: "here is i want to make sure, the invite how it looks and how it works"), 11:13 UTC
 - **Rendered on the server, read only.**
   - Chatwoot's own mailer drew the invite for a user built in memory: read-only, an undeliverable address, the token method stubbed, inside a rolled-back transaction. `.message` renders and never delivers. No login was created and no email was sent.

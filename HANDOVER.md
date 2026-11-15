@@ -58,6 +58,7 @@ appended to.
 >       - **Not created:** each login emails an invite (from `testclix46@gmail.com` through Brevo), and once in, staff would see the test chats and be pinged by test hand-overs. It waits for the owner's go, and his word on when.
 >       - **15 Nov: the invite was rendered and shown to the owner, not sent** (`local/golive/chatwoot-invite-preview.html`, WORKLOG 15 Nov).
 >         - From "Homies <testclix46@gmail.com>", with the subject "הוראות אישור" over an English body: "Assaf Clix invited you to join the CLIX workspace on Chatwoot".
+>         - Only the subject is Hebrew. The body and the set-password page are English. Inside, Chatwoot is in Hebrew, the account's language.
 >         - The "Accept invitation" button opens a set-password page (6+ characters). Saving it confirms the account and signs them in.
 >         - The link does not expire until used. An admin cannot resend it; "Forgot password?" is the way back.
 >         - The workspace name (CLIX) and the inviter's name show in it. Whether to change them first is the owner's call.
