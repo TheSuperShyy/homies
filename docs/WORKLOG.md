@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### A question answered: can the owner ring Ido with the dialer now (owner: "so i can now call ido with the dialer"), 09:28 UTC
+- **Yes.** The lead API answers again (check 1, 09:23:35 UTC), and Vapi was in credit at 09:18 with 208 and the debt agent active. It is 11:28 Israel on a Sunday, inside the dialer's hours (Sunday to Thursday 09:00-20:00, `inCallingHours`).
+- **Said:**
+  - Ido first, since one press is one attempt.
+  - One press only: two leads are dialled at once and one is lost.
+  - The page should say sent, and the call should come within about 30 s.
+  - Then `tokomni_lead.py --check` reads the call and its `X-External-Id`.
+
 ### Omnitelecom's answer on the 500: our check 1 passes (the owner pasted their email: "focus on this one"), 09:23 UTC
 - **Their email** (kept in `local/omnitelecom/2026-11-15-omni-answer-500.txt`). They ask us to run two checks:
   1. An empty request should answer 400.
