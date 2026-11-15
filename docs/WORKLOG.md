@@ -11,7 +11,18 @@ conversation that produced it.
 
 ## 2026-11-15
 
-### LIVE: a dialer call to a woman carries the feminine dictionary (PR #13), and the gender checked layer by layer (owner: "just make sure the gender is correct this is a very critical part of the agent"), 12:55 UTC
+### LIVE: the debt agent gets the incoming agent's speed settings (owner: "ok so the latency is super slow we need to make sure its fasst"), 12:42-12:44 UTC
+- **Measured first:** today's one real call with turns, Omni's dialer call to Ido at 09:29 UTC, averaged 2.55 s a turn: waiting for the end of speech 0.80, transcriber 0.33, model 0.72, voice 0.69 (Vapi's `performanceMetrics.turnLatencies`).
+- **Compared with the incoming agent, read live:** the same transcriber (Deepgram nova-3, he), the same start/stop speaking plans and the same voice; but the debt agent had no `reasoningEffort` (the model's medium), no `serviceTier`, and no `chunkPlan.minCharacters` (Vapi's default, 30). The incoming agent has had low / fast / 10 since 22-25 Oct.
+- **Applied to the debt agent `4bc03b57`:**
+  - `model.reasoningEffort` low and `model.serviceTier` fast, PATCHed on the live model (12:42:18 UTC), prompt and tools unchanged; `scripts/vapi_sync.py`'s debt target carries both, so a sync keeps them.
+  - `voice.chunkPlan.minCharacters` 10 through `vapi_set_voice.py --agent debt --apply` (12:44:36 UTC, after a dropped-connection retry); the dry run and the read-back show it as the only voice change. `AGENT_VOICE` carries it.
+  - A woman's call copies the live voice (PR #13), so it gets the 10 within its 10-minute cache.
+- **Expected, from the incoming agent's 23-25 Oct measurements:** the model's median about 0.9 s and its slowest tenth about 1.3 s (was 2.1-2.7 s); the voice start about 0.3 s sooner. Cost: about 1.5 US cents a minute more for the fast tier.
+- **Not changed:** the 0.8 s wait for the end of speech (onNoPunctuationSeconds). 0.5 / 0.1 cut hesitant callers off on 23 Oct; 0.65 was never measured. Lowering it needs the paid `--integrity` run first.
+- **Owed:** one real call (the owner's Ring to Ido), then `vapi_latency.py` on it.
+
+### LIVE: a dialer call to a woman carries the feminine dictionary (PR #13), and the gender checked layer by layer (owner: "just make sure the gender is correct this is a very critical part of the agent"), merged 12:26:54 UTC
 - **Why this, after the prompt fix:** the Claude-played calls pointed every address word, but the live model pointed 0 of 7 on 5 Oct, so on a real dialer call to a woman its bare לך / שלך go through the masculine dictionary and come out masculine. The Call button has sent the feminine dictionary since 8 Oct; the dialer route never did.
 - **PR #13, merged as `9c8c460`, deployed by CI (checks and deploy-function green):**
   - `route.ts` `voiceForGender(gender, voice, dict)`: the voice with the feminine dictionary for 'f', else null; `FEMININE_DICT` is the Call button's (a test holds them equal).

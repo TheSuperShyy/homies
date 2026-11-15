@@ -705,7 +705,16 @@ TARGETS = {
             # come back, that note is the argument for dropping the model again
             # -- and it is a decision for the owner, who has now made the
             # opposite one once.
-            "model": {"provider": "openai", "model": "gpt-5.6-sol"},
+            # 15 NOV: the incoming agent's speed settings, on the owner's "the latency
+            # is super slow we need to make sure its fast". The 15 Nov dialer call to
+            # Ido took 2.55 s a turn (endpointing 0.80, transcriber 0.33, model 0.72,
+            # voice 0.69). `serviceTier` fast cut the incoming model's median from
+            # 1.14-1.43 s to 0.90 s and its slowest tenth from 2.1-2.7 s to 1.3 s (23 Oct),
+            # at about 1.5 cents a minute more; `reasoningEffort` low is the incoming
+            # agent's too (unset is this model's medium). The voice's minCharacters 10 is
+            # vapi_set_voice.py's. Undo: drop both keys.
+            "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low",
+                      "serviceTier": "fast"},
         },
         # "Echo Stone" — this agent takes a cloned voice when one exists. See
         # cloned_voice() below. The debt agent and not the inbound one because

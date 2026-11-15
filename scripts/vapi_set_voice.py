@@ -145,8 +145,9 @@ FALLBACK = {"provider": "vapi", "voiceId": "Elliot", "version": "2", "language":
 # not have it. Back to A: voice "4486a4a7-9ef6-44d4-88e8-10eab571b577", speed
 # 0.8, emotion "happy", then `--agent inbound --apply`.
 AGENT_VOICE = {
+    # 15 Nov: min_characters 10 on the debt line too ("the latency is super slow").
     "Debt Follow-up (he)": {"voice": None, "speed": None, "emotion": None,
-                            "dict_env": "CARTESIA_DICT_DEBT"},
+                            "dict_env": "CARTESIA_DICT_DEBT", "min_characters": 10},
     "Inbound Intake (he)": {"voice": None, "speed": None, "emotion": None,
                             "dict_env": "CARTESIA_DICT_INBOUND", "min_characters": 10},
 }

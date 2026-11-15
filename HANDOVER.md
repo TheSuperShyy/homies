@@ -8,10 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 15 Nov, 12:42-12:44 UTC: the debt agent runs the incoming agent's speed settings** (owner: *"the latency is super slow we need to make sure its fast"*; WORKLOG 15 Nov). `reasoningEffort` low, `serviceTier` fast (about 1.5 cents a minute more), voice `minCharacters` 10; in `vapi_sync.py` and `vapi_set_voice.py` too. Before: 2.55 s a turn on the 09:29 call (endpointing 0.80, transcriber 0.33, model 0.72, voice 0.69). The 0.8 s end-of-speech wait is unchanged on purpose (needs the paid integrity run before lowering). Owed: one real call, then `vapi_latency.py`.
+>
 > **LIVE 15 Nov, 11:55:52 UTC: the debt agent writes same-spelled words pointed, so the voice says each in the right gender** (owner: *"make sure the gender on the female and male are correct"*; WORKLOG 15 Nov; `prompt.md`, "15 Nov, evening").
 >   - **Cause, measured on the live voice:** pointed address words are read right (a pointed לָךְ stays feminine even under the masculine dictionary); bare words spelled alike for both genders are guessed ("שהקדשת" to a man came out feminine).
 >   - **Fix:** one prompt bullet: about himself always masculine (רוֹאֶה, רוֹצֶה, מְקַוֶּה), to the tenant by gender (רוֹצֶה / רוֹצָה, שֶׁשָּׁאַלְתָּ / שֶׁשָּׁאַלְתְּ). Prompt 5,737 characters; rollback: the bullet out of `prompt.md` and the same prompt-only push.
->   - **Closed 12:55 UTC (PR #13, `9c8c460`, deployed):** a dialer call to a woman carries the feminine dictionary, the rest of the voice read live from Vapi (function secret `VAPI_PRIVATE_KEY`, set today). Proven with an `assistant-request` probe on Ido's test row flipped to 'f' and restored. A man keeps the voice.
+>   - **Closed 12:26:54 UTC (PR #13, `9c8c460`, deployed):** a dialer call to a woman carries the feminine dictionary, the rest of the voice read live from Vapi (function secret `VAPI_PRIVATE_KEY`, set today). Proven with an `assistant-request` probe on Ido's test row flipped to 'f' and restored. A man keeps the voice.
 >   - **Residue, not changed:** about 8 of 8,130 residents look stored surname first with a man's-name surname ("עזרא רחל"), so the name reads them as men, and the opener would say the surname. None is on the call list; fix both `first_name` and the gender in the queue view before real debtors.
 >
 > **LIVE 15 Nov, 10:03:17 UTC: the debt call handles tight money and disputes itself, no hand-over** (owner: *"Like i told you we need to resolve this by ourself"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov, later"; `scripts/vapi_tools.py`).
