@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **LIVE 15 Nov, 13:53 UTC: Yariv has a Chatwoot login** (owner: *"ok send to yariv only"*; WORKLOG 15 Nov). Agent #6, administrator, in management and both inboxes; the invite email went out (sidekiq job finished without error). Until he sets a password he shows as "has not confirmed the invite" (`chatwoot_teams.py`). The other 8 on `local/golive/homies-staff-2026-11-15.csv` wait for the owner's go; the same three steps seat each (`POST /agents`, `POST /inbox_members` per inbox, `chatwoot_teams.py --add <team> <id> --apply`).
+> **LIVE 15 Nov: all 9 of Homies' staff have Chatwoot logins** (owner: *"ok send to yariv only"*, then *"ok so send to everyone else"*; WORKLOG 15 Nov). Yariv (#6) at 13:53 UTC, the other 8 (#7–#14) at 15:00–15:07 UTC; one invite email per login, every sidekiq job finished without error. Administrators: Yariv and the VP, in management; the 7 agents per the sheet (operations 3, service 4, two of them also in collections). Everyone is in both inboxes. Until a person sets a password they show as "has not confirmed the invite" (`chatwoot_teams.py`). Ids with names: `local/golive/chatwoot-logins-2026-11-15.json` (gitignored). A test that hands over now pings real staff.
 >
 > **LIVE 15 Nov, 12:42-12:44 UTC: the debt agent runs the incoming agent's speed settings** (owner: *"the latency is super slow we need to make sure its fast"*; WORKLOG 15 Nov). `reasoningEffort` low, `serviceTier` fast (about 1.5 cents a minute more), voice `minCharacters` 10; in `vapi_sync.py` and `vapi_set_voice.py` too. Before: 2.55 s a turn on the 09:29 call (endpointing 0.80, transcriber 0.33, model 0.72, voice 0.69). The 0.8 s end-of-speech wait is unchanged on purpose (needs the paid integrity run before lowering). Owed: one real call, then `vapi_latency.py`.
 >
@@ -68,7 +68,7 @@ appended to.
 >       - It is mapped onto our four teams in `local/golive/homies-staff-2026-11-15.csv` (gitignored: names and emails stay out of the public repo).
 >       - Three are our picks: the office manager and the general office go to Service, and maintenance goes to Operations.
 >       - Every seat goes into both inboxes, so a mention reaches it.
->       - **Not created:** each login emails an invite (from `testclix46@gmail.com` through Brevo), and once in, staff would see the test chats and be pinged by test hand-overs. It waits for the owner's go, and his word on when.
+>       - **Created 15 Nov on the owner's go:** Yariv at 13:53 UTC, the other 8 at 15:00–15:07 UTC (the top of this file). Each login emailed its invite (from `testclix46@gmail.com` through Brevo); once in, staff see the test chats and are pinged by test hand-overs.
 >       - **15 Nov: the invite was rendered and shown to the owner, not sent** (`local/golive/chatwoot-invite-preview.html`, WORKLOG 15 Nov).
 >         - **LIVE 11:46:58 UTC: the invite is in natural Hebrew** (the owner: "make ir natural local hebrew"). `scripts/chatwoot_invite_he.py` mounts `deploy/chatwoot/overrides/confirmation_instructions.he.html.erb` into sidekiq; Chatwoot's own file is untouched.
 >           - From "Homies <testclix46@gmail.com>". The subject is "הוזמנת להצטרף ל-CLIX ב-Chatwoot". It reads "קיבלת הזמנה מ-Assaf Clix להצטרף לצוות של CLIX ב-Chatwoot", right to left, with the button "אישור ההזמנה".
@@ -80,7 +80,7 @@ appended to.
 >         - The link does not expire until used. An admin cannot resend it; "Forgot password?" is the way back.
 >         - The workspace name (CLIX) and the inviter's name show in it. Whether to change them first is the owner's call.
 >   - their OK: OXS for every resident, and an after-hours switch time.
->   - **Waiting on Homies.** Then on us: the number into Chatwoot inbox 1, the two templates re-submitted on their account, the staff seated, the switch.
+>   - **Waiting on Homies.** Then on us: the number into Chatwoot inbox 1, the two templates re-submitted on their account, the switch (the staff were seated 15 Nov).
 >
 > **LIVE 12 Nov, 09:18:36 UTC: AN EMERGENCY'S REPLY FOLLOWS THE OWNER'S OWN REFERENCE, IN MICHAEL'S WORDS** (owner: *"this should be a format it should still be dynamic but that is the reference"*; `scripts/n8n_whatsapp_refline.py`, epoch 108; WORKLOG and CONTEXT 12 Nov).
 >   - **His reference, mended:** "אני רק העוזר הדיגיטלי ואין לי אפשרות לתת מענה מיידי. בבקשה תתקשר למוקד החירום שלנו כדי שתוכל לקבל מענה בהקדם: 077-6687949."

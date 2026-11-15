@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: the other 8 of Homies' staff have Chatwoot logins and their invites went out (owner: "ok so send to everyone else"), 15:00–15:07 UTC
+- **Created through Chatwoot's API, the way Yariv's was** (`POST /agents`, which sends the invite, then `POST /inbox_members` for inboxes 1 and 2): the 8 remaining rows of `local/golive/homies-staff-2026-11-15.csv`. The sheet's example row "צוות CLIX" stays skipped; Yariv (#6) already had his. A dry run first: no row already had a login, no two rows shared an email. Logins 3 → 11; ids with names are in `local/golive/chatwoot-logins-2026-11-15.json` (gitignored, so no names here).
+  - #7: administrator, management (the VP);
+  - #8, #10, #11: agents, operations (two from operations and suppliers, and the maintenance manager);
+  - #9, #12: agents, service (the office manager, and the general office's shared mailbox);
+  - #13, #14: agents, collections and service (the collections department's shared mailbox, and one person).
+- **One create timed out after the server had made it:** #13's `POST /agents` went through, the line lost the answer, and the script's retry got 422 "User has already been taken", which left the login without its inboxes. Found by email in the login list and added to both inboxes. Its one invite is the 15:05:32 job; the retry sent no second one.
+- **Seated:** inboxes 1 (WhatsApp, members 3 → 11) and 2 (voice, 2 → 10), nobody removed; teams by `chatwoot_teams.py --add <team> <ids> --apply`, each read back: management is Assaf Clix, Yariv and #7; operations Assaf Clix and 3; service Assaf Clix and 4; collections Assaf Clix and 2.
+- **The invites went out:** sidekiq ran one `Devise::Mailer#confirmation_instructions` job per login, User/7 to User/14, 15:00:11 to 15:06:48 UTC; all 8 performed, no error or retry in the log. Inbox or spam at Homies' Google mail is not visible from here.
+- **Now true:** all 9 staff on the sheet have logins, each "has not confirmed the invite" until they set a password. Test hand-overs now ping real staff in the department's team (the 10-minute unclaimed escalation pings management), and staff see the test number's chats.
+
 ### LIVE: Yariv's Chatwoot login created and his invite sent, the only one (owner: "ok send to yariv only"), 13:53 UTC
 - **Created through Chatwoot's API** with the admin token (`POST /agents`, which is what sends the invite): agent #6, "יריב לוי", administrator, as the staff sheet maps him; the sheet is `local/golive/homies-staff-2026-11-15.csv`. Checked first that no login had his email; logins 2 → 3.
 - **Seated:** inboxes 1 (WhatsApp, members 2 → 3) and 2 (voice, 1 → 2) by `POST /inbox_members`, nobody removed; management by `chatwoot_teams.py --add management 6 --apply`, read back with Assaf Clix and Yariv.
