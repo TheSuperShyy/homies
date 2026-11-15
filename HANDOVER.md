@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 15 Nov, 13:53 UTC: Yariv has a Chatwoot login** (owner: *"ok send to yariv only"*; WORKLOG 15 Nov). Agent #6, administrator, in management and both inboxes; the invite email went out (sidekiq job finished without error). Until he sets a password he shows as "has not confirmed the invite" (`chatwoot_teams.py`). The other 8 on `local/golive/homies-staff-2026-11-15.csv` wait for the owner's go; the same three steps seat each (`POST /agents`, `POST /inbox_members` per inbox, `chatwoot_teams.py --add <team> <id> --apply`).
+>
 > **LIVE 15 Nov, 12:42-12:44 UTC: the debt agent runs the incoming agent's speed settings** (owner: *"the latency is super slow we need to make sure its fast"*; WORKLOG 15 Nov). `reasoningEffort` low, `serviceTier` fast (about 1.5 cents a minute more), voice `minCharacters` 10; in `vapi_sync.py` and `vapi_set_voice.py` too. Before: 2.55 s a turn on the 09:29 call (endpointing 0.80, transcriber 0.33, model 0.72, voice 0.69). The 0.8 s end-of-speech wait is unchanged on purpose (needs the paid integrity run before lowering). Owed: one real call, then `vapi_latency.py`.
 >
 > **LIVE 15 Nov, 11:55:52 UTC: the debt agent writes same-spelled words pointed, so the voice says each in the right gender** (owner: *"make sure the gender on the female and male are correct"*; WORKLOG 15 Nov; `prompt.md`, "15 Nov, evening").

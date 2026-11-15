@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-15
 
+### LIVE: Yariv's Chatwoot login created and his invite sent, the only one (owner: "ok send to yariv only"), 13:53 UTC
+- **Created through Chatwoot's API** with the admin token (`POST /agents`, which is what sends the invite): agent #6, "יריב לוי", administrator, as the staff sheet maps him; the sheet is `local/golive/homies-staff-2026-11-15.csv`. Checked first that no login had his email; logins 2 → 3.
+- **Seated:** inboxes 1 (WhatsApp, members 2 → 3) and 2 (voice, 1 → 2) by `POST /inbox_members`, nobody removed; management by `chatwoot_teams.py --add management 6 --apply`, read back with Assaf Clix and Yariv.
+- **The invite went out:** sidekiq's `Devise::Mailer#confirmation_instructions` for User/6 ran at 13:53:26 and finished at 13:53:27 UTC with no error, handed to the Brevo relay. The log has no INFO line for the template or the relay's answer; the Hebrew template has been mounted in sidekiq since 11:46 for this Hebrew account. Inbox or spam at Homies' Google mail is not visible from here.
+- **Said to the owner:** the subject and sender, check spam, the link has no time limit, "Forgot password?" sends a new one; as a management member Yariv is pinged by test hand-overs to management and by the 10-minute unclaimed escalation, and sees the test number's chats. The other 8 are not invited.
+
 ### A question answered, read only: will invited staff get the link and get in (owner, with the staff sheet: "if we invite these people are they going to receive the link and be able to access the chatwoot by that time"), 13:45 UTC
 - **Answered from today's checks (the 11:13 render and the 11:46 Hebrew invite):** adding an agent emails the invite at once, in Hebrew; the button opens the password page (locale he, 6+ characters); saving signs them in, Chatwoot in Hebrew; the link has no time limit; "Forgot password?" sends a new one.
 - **Looked up now (public DNS):** Homies' mail is Google (aspmx.l.google.com). gmail.com's DMARC is `p=none` (subdomains quarantine), so our `testclix46@gmail.com` through Brevo is not refused by policy but is a likely spam-folder case at Google. Said: check spam, or invite one person first.
