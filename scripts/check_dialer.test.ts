@@ -107,3 +107,18 @@ test("leadsAdded: inserted_count when Tokomni gives it, else null", () => {
   assert.equal(leadsAdded("<html></html>"), null);
   assert.equal(leadsAdded(""), null);
 });
+
+test("the wait for Tokomni fits inside the page's time limit, and the message says the same wait", async () => {
+  const { readFileSync } = await import("node:fs");
+  const dialer = readFileSync(new URL("../dashboard/lib/dialer.ts", import.meta.url), "utf8");
+  const page = readFileSync(new URL("../dashboard/app/(app)/dialer/page.tsx", import.meta.url), "utf8");
+  const i18n = readFileSync(new URL("../dashboard/lib/i18n.ts", import.meta.url), "utf8");
+  const waitMs = Number(/TOKOMNI_WAIT_MS = ([\d_]+)/.exec(dialer)?.[1].replace(/_/g, ""));
+  const limitS = Number(/export const maxDuration = (\d+)/.exec(page)?.[1]);
+  assert.ok(dialer.includes("AbortSignal.timeout(TOKOMNI_WAIT_MS)"), "the fetch must use TOKOMNI_WAIT_MS");
+  // Room left for the database checks and the redirect, or Vercel cuts the press off as an error page.
+  assert.ok(waitMs > 0 && limitS > 0 && waitMs + 4000 <= limitS * 1000, `waits ${waitMs} ms in a ${limitS} s page`);
+  const net = /'dialer\.errNet':\s*\{ he: '([^']*)',\s*en: '([^']*)'/.exec(i18n);
+  assert.ok(net, "dialer.errNet not found");
+  for (const text of [net![1], net![2]]) assert.ok(text.includes(String(waitMs / 1000)), `message does not say ${waitMs / 1000}: ${text}`);
+});

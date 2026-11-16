@@ -565,8 +565,9 @@ const S = {
                           en: 'No ring within a minute? List 2 may be stopped (Play in Tokomni), or the number may still be in List 2 from an earlier send. Lead id: {id}' },
   'dialer.errHttp':     { he: 'לא נשלח ל-{number}: טוקומני סירב ({status}: {answer}).',
                           en: 'Not sent to {number}: Tokomni refused it ({status}: {answer}).' },
-  'dialer.errNet':      { he: 'לא ברור אם {number} נשלח: אין תשובה מטוקומני ({answer}). בדקו ב-List 2 לפני שלוחצים שוב.',
-                          en: 'Unclear whether {number} was sent: no answer from Tokomni ({answer}). Check List 2 before pressing again.' },
+  // 25 is TOKOMNI_WAIT_MS in lib/dialer.ts. On 16 Nov a press Tokomni never answered still rang.
+  'dialer.errNet':      { he: 'טוקומני לא ענה תוך 25 שניות ({answer}), אז לא ברור אם {number} נכנס. ייתכן שכן: חכו דקה לצלצול לפני שלוחצים שוב, כדי שלא יחייגו אליו פעמיים.',
+                          en: 'Tokomni did not answer within 25 seconds ({answer}), so it is unclear whether {number} went in. It may have: wait a minute for the ring before pressing again, so it is not rung twice.' },
   'dialer.errDb':       { he: 'לא נשלח ל-{number}: הבדיקה מול רשימת הדיירים נכשלה ({answer}).',
                           en: 'Not sent to {number}: the check against the residents failed ({answer}).' },
   'dialer.errTenant':   { he: 'לא נשלח: {number} רשום לדייר ב{building}. כאן מחייגים רק לאנשי בניין הבדיקה ולמספרים שאינם של דיירים.',

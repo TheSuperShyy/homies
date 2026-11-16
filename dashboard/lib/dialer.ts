@@ -29,6 +29,8 @@ import {
 // take (blacklisted, or the same number and external_id already waiting) is in
 // the answer, so a 200 that took nothing is not "sent". 401 is the token.
 const INSERT = 'https://api.tokomni.cc/api/v1/dialer/campaign/';
+/** How long a press waits for Tokomni's answer; the page's message says the same number. */
+export const TOKOMNI_WAIT_MS = 25_000;
 export const TEST_BUILDING = 'בר כוכבא 23, תל אביב - יפו';
 
 const QUEUE_COLUMNS = 'resident_id,phone,first_name,amount,attempt';
@@ -114,9 +116,12 @@ export async function dial(typed: string): Promise<Record<string, string>> {
         number: local,
       }),
       cache: 'no-store',
-      // Under Vercel's ten seconds for the whole function, so a slow Tokomni
-      // still comes back as "no answer" rather than as an error page.
-      signal: AbortSignal.timeout(8000),
+      // Tokomni usually answers in under two seconds, but on 16 Nov it took more
+      // than the eight we waited, and the lead went in and rang anyway while the
+      // page said "unclear". So the wait is 25 s, under the page's 30 s
+      // (maxDuration in app/(app)/dialer/page.tsx), so a Tokomni slower still
+      // comes back as "no answer" rather than as an error page.
+      signal: AbortSignal.timeout(TOKOMNI_WAIT_MS),
     });
     status = res.status;
     body = await res.text();
