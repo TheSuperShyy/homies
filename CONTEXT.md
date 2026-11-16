@@ -4386,7 +4386,7 @@ example, gender and all.
 
 **Which AI runs what (read live, 16 Nov):** the WhatsApp assistant runs Gemini 3.1 Pro (`google/gemini-3.1-pro-preview`) through OpenRouter, and so does its sandbox. Both voice agents run OpenAI gpt-5.6-sol on Vapi. One more model call sits in debt-tools: the line above the payment link sent on WhatsApp after a debt call is written by Gemini 2.5 Flash through OpenRouter (`whatsappLine`, the function's own `OPENROUTER_API_KEY`, which holds the bot's key ending 3f9), and the link goes alone if that call fails. So all of Homies' OpenRouter spend is on the bot's account.
 
-**OpenRouter spend by day is not readable with our keys** (16 Nov): `/api/v1/activity` needs a management key, and n8n keeps only the live bot's newest 100 runs. A key reads its total and the current UTC day, week (from Monday) and month (`/api/v1/key`). Between those, the balance readings logged in the WORKLOG are the only history, so log one whenever OpenRouter is read.
+**OpenRouter spend by day is not readable with our keys** (16 Nov): `/api/v1/activity` needs a management key, and n8n keeps only the live bot's newest 100 runs. A key reads its total and the current UTC day, week (from Monday) and month (`/api/v1/key`). Between those, the balance readings logged in the WORKLOG are the only history, so log one whenever OpenRouter is read. To split it by day, count the bot's replies per day in `messages` (outbound, sender bot) and price them at the rate between two readings (4 to 5 cents a reply in November).
 
 **A prompt-only push when live equals the repo:** GET the assistant, swap the system message, PATCH the whole `model` back, read back. Vapi's edge refuses Python's default User-Agent (403), so every script sends its own.
 

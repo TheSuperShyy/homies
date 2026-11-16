@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The same, last week only (owner: "no focus only last week"), 09:10 UTC
+- **About $8 for Mon 9 to Sun 15 Nov (UTC days).**
+  - **Measured:** $3.00 from 11 Nov 07:10 UTC to now. The balance readings bracket it, and nothing has been spent today.
+  - **Worked out:** the rest is Tue 10 Nov. Monday has no messages at all.
+- **How Tuesday is priced:**
+  - The bot's replies come from `messages` (direction outbound, sender bot). Per UTC day: 10 Nov 105, 11 Nov 54, 12 Nov 16, 13 Nov 4; none on 9, 14 or 15 Nov. That is 179 in the week: 104 through UChat and 75 through n8n's Chatwoot route.
+  - Between the 4 Nov and 11 Nov readings, $17.85 bought 336 replies, $0.053 each. Since 11 Nov, $3.00 bought 74, $0.041 each.
+  - So Tuesday is about $5.60 at the first rate, or $4.30 at the second, and the week $7.30 to $8.60.
+- The owner's OpenRouter Activity page has the exact day-by-day figure.
+
 ### A question answered, read only: OpenRouter spend since last week (owner: "how much openrouter we did spent since last week"), 08:57 UTC
 - **The bot's account (the key ending 3f9: the WhatsApp bot, its sandbox and debt-tools' payment line):** $60 bought, $27.32 spent, $32.68 left. This month (from 1 Nov UTC) $23.96, today $0 (`/api/v1/key`: usage_monthly, usage_daily).
 - **Split by the readings in this log:** $6.47 spent by 4 Nov 07:00 UTC, $24.32 by 11 Nov 07:10, $24.71 by 09:38, $27.32 now. So about $17.85 from 4 to 11 Nov (about $2.55 a day) and $3.00 since 11 Nov 07:10 (about $0.60 a day).
