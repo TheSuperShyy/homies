@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The owner's dialer call to Ido at 11:08 UTC: transcript and recording given, and the opening measured at 1.30 s, was 4.52 (owner: "give me the transscript and the recording of the call i made minutes ago"; read only)
+- **The call:** `01a1e40a`, debt agent, 23 s, the tenant hung up (Q.850 16). Recording, SIP capture and log are in `local/calls/2026-11-16/` (`110802-*`, gitignored). An MP3 for the owner is `call-2026-11-16-1908-PH.mp3`, opened in File Explorer.
+- **What was said:** Michael's lines were checked on his own channel with local faster-whisper; the tenant's are from Vapi's live transcript. Whisper heard a hallucinated "thank you" on the tenant's quiet channel, so it is not used for the tenant.
+  - Michael: "צהריים טובים, עידו? מדבר מיכאל מהצוות של הומי'ז, מה נשמע?" This is the whole opener. Vapi's transcript drops the last words.
+  - Tenant: "בסדר מה קורה". Michael: "יופי, שמח לשמוע? יש לך דקה לדבר על היתרה שפתוחה לך לדירה?"
+    - The model wrote "שמח לשמוע" with a question mark, and it was spoken as a question. Seen, not changed.
+  - Tenant: "לא." Michael: "אין בעיה. מתי יהיה לך נוח שנחזור אליך?"
+    - The callback question again, with nowhere to record the answer: the 13 Nov gap.
+- **The opening, from Omni's authed INVITE (11:08:02.647) to Michael's first word (03.947): 1.30 s, against 4.52 s at 10:11.**
+  - The INVITE to Vapi's 200 OK took 0.88 s (was 2.90). debt-tools answered in 526 ms on a running Tokyo worker (was 2,395 cold).
+  - Vapi's answer to the first word took 0.42 s. The opener was word for word the 10:11 one (afternoon, Ido), and Vapi still had it 57 minutes later. A tenant's name it has not said would add about 1 s.
+- **Replies are still slow:** 3.98 s and 2.71 s from the tenant's last word to Michael's (`vapi_latency.py --turns`). These are the first measured turns since the 15 Nov speed settings. Not looked into.
+
 ### LIVE 10:54-10:55 UTC: a call's opening no longer waits for debt-tools to start, and the dialer page waits 25 s for Tokomni (owner: "make the opening faster so there's no silence also fix the error on our side"; PR #14, `3a099cd`)
 - **Correction to the 10:11 entry below:** the 1.9 s "before Vapi asked us" was ours. Supabase's request log for that call (`log_attributes`: `execution_time_ms` 2,395, `x_envoy_upstream_service_time` 2,031) puts its arrival at about 10:11:29.78, 0.2 s after Omni's authed INVITE. The 10:11 call's 4.5 s:
   - 0.2 s from the INVITE until Vapi's assistant-request reached Supabase;
