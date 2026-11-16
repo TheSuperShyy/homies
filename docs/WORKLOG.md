@@ -37,14 +37,20 @@ conversation that produced it.
   - `VALUES` still names the Brevo settings, which `n8n_standing_order_email.py` imports: n8n still sends the standing-order email through Brevo.
 - **Still open:** the 9 invites sent on 15 Nov sit in spam until each person clicks "Report not spam"; nothing was resent. Gmail's limit is about 500 recipients a day. For go-live, a sender on Homies' own domain.
 
-### The word "יתרה" out of the debt call (Yariv, forwarded by the owner: "Remove that word from the script because he didn't say it correctly"), being played, NOT live yet
+### LIVE 12:55:43 UTC: the word "יתרה" out of the debt call (Yariv, forwarded by the owner: "Remove that word from the script because he didn't say it correctly")
 - **Yariv's suggestion, as he wrote it:** "You have something to do there. I saw on our system you need to pay by August, something like that."
-- **`prompt.md` (debt), three places and one bullet:**
+- **`prompt.md` (debt), three places and one bullet ("16 Nov, afternoon"):**
   - step 3 asks for the quick minute because there is something to sort out about the apartment's payment;
   - step 4 says what Michael saw in our system, what is left to pay;
   - the dispute answer says the payment is still open;
-  - a new bullet in the word rules keeps the word out of the call even when the tenant says it, and gives what to say instead. Prompt 6,166 -> 6,287 characters; opener and tools unchanged (dry run).
-- **Played on the candidate:** `local/voice-tests/2026-11-16-debt-flow-noword/` (yes and no, Claude players, no OpenRouter).
+  - a new bullet in the word rules keeps the word out of the call even when the tenant says it, and gives what to say instead.
+- **Played on the candidate** (`local/voice-tests/2026-11-16-debt-flow-noword/`, yes and no, Claude players, no OpenRouter): no "יתרה" in either call.
+  - Dana: "רציתי לסדר איתָּךְ משהו לגבי התשלום של הדירה, יש לָךְ דקה קטנה?", then "אני רוֹאֶה אצלנו במערכת שנשאר לשלם על ועד הבית של דירה ארבע, על יולי ואוגוסט, סך הכול חמש מאות שקלים".
+  - Omer: "יש משהו שצריך לסדר לגבי התשלום של הדירה. יש לך דקה קטנה?".
+  - Both 13 turns, as at 12:12. Omer's "soon, I'll see" is still logged as a promise (the open question).
+- **Voiced:** 1,746 characters on Homies' Cartesia account, 245 on ours; page `local/voice-tests/2026-11-16-noword-page/index.html`, opened for the owner. Local speech-to-text heard the new lines right. In both calls it heard "התפספס" as "יתפספס" (perhaps "פשוט התפספס" run together): not changed, one to listen for.
+- **Pushed the prompt only** (`push_debt_prompt.py` in the session scratchpad): snapshot `local/vapi-debt-live-16nov-before-no-yitra.json`; read back equal, 6,287 characters; the only fields that differ from the snapshot are the system message, `latestVersion` (v13 to v14) and `updatedAt`.
+- **Not changed:** the incoming phone line's prompt has the word once, in its list of what it can check ("לבדוק יתרת תשלומים"), so it may say it when someone asks for their balance. The artifact "Four-Step Debt Calls" still plays the 12:12 version.
 
 ### The staff's Chatwoot invite lands in spam, its button dead (the owner: "the email invitation was sent in the spam and is not clickable"), 12:25 UTC, read only
 - **Why it can't be clicked:** Gmail turns off the links of any message it files as spam (Outlook does the same in Junk). The links themselves are right: absolute https to `chat.srv1879140.hstgr.cloud/app/auth/password/edit?locale=he&reset_password_token=…` (the template and the 15 Nov preview). Out of spam the button works.

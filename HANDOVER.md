@@ -8,17 +8,20 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **LIVE 16 Nov 12:12:26 UTC: the debt call warms up first, in the owner's four steps** (the owner's second pasted take; WORKLOG 16 Nov; `prompt.md`, "16 Nov, later").
+> **LIVE 16 Nov 12:12:26 UTC: the debt call warms up first, in the owner's four steps** (the owner's second pasted take; WORKLOG 16 Nov; `prompt.md`, "16 Nov, later"). **Since 12:55:43 UTC without the word "יתרה"** (Yariv: the voice says it wrong; `prompt.md`, "16 Nov, afternoon").
 >   - **The steps:**
 >     1. The opener: "היי, {{first_name}}? [greeting by the hour]! מדבר מיכאל מהצוות של הומי'ז, מה נשמע?". The name is the identity question.
 >     2. A light "יופי, אחלה" and "תפסתי אוֹתְךָ / אוֹתָךְ בזמן נוח לשנייה?".
->     3. A quick minute about a balance on the apartment, never called small.
->     4. The details and "does it ring a bell, or did it just slip through?". The link only after they react.
+>     3. A quick minute, because there is something to sort out about the apartment's payment (Yariv's words). Never called small, and never "יתרה": a word rule keeps it out even when the tenant says it.
+>     4. What Michael saw in our system, what is left to pay (house committee, apartments, months, amount), and "does it ring a bell, or did it just slip through?". The link only after they react.
 >     - A no at any step: a short sorry and the WhatsApp link, no callback slot.
 >   - **Played and voiced first:** yes, no, busy and driving all went as written. The owner's page is the artifact "Four-Step Debt Calls", https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p (private until shared; source `four-step-page/build.py` in the session scratchpad); the local copy is `local/voice-tests/2026-11-16-steps-page/index.html`.
 >     - Seen: a busy tenant who already said "תגיד מהר" is still asked for the minute. That is the owner's call: skip step 3 after an explicit go-ahead?
 >     - Calls are about 6 turns longer than the 11:24 version.
->   - **Rollback:** to the 11:24 version, PATCH `model` and `firstMessage` from `local/vapi-debt-live-16nov-before-four-steps.json`. To 15 Nov, use `local/vapi-debt-live-16nov-before-reason-first.json`.
+>   - **Without "יתרה", played and voiced (yes and no):** the word is gone from both, and local speech-to-text heard the new lines right. Page `local/voice-tests/2026-11-16-noword-page/index.html`; the artifact still plays the 12:12 version.
+>     - To listen for: speech-to-text heard "התפספס" as "יתפספס" in both calls. Not changed.
+>     - Not changed: the incoming phone line still has the word once ("לבדוק יתרת תשלומים" in its tool list).
+>   - **Rollback:** to the 12:12 version (with "יתרה"), PATCH `model` from `local/vapi-debt-live-16nov-before-no-yitra.json`. To the 11:24 version, PATCH `model` and `firstMessage` from `local/vapi-debt-live-16nov-before-four-steps.json`. To 15 Nov, use `local/vapi-debt-live-16nov-before-reason-first.json`.
 >   - **Owed:** one real call to hear it (the owner's Ring to Ido).
 >
 > **LIVE 16 Nov 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out** (**superseded 12:12:26 UTC** by the four steps above; its no-path stays) (the owner pasted a review of the 11:08 call to Ido; WORKLOG 16 Nov; `docs/features/10-debt-followup/prompt.md`, "16 Nov").
