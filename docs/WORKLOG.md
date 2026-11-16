@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The four-step test calls published as an artifact, "Four-Step Debt Calls" (owner: "open the test compilation in an artifact so i can hear it"), 12:18 UTC
+- https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p, version 1. **Private until the owner shares it** from the page's Share menu.
+- **The page:** the four steps at the top (Hebrew with English), then the four calls (yes, no, busy, driving). Each call has its player, every turn in Hebrew with English under it, Michael's turns labelled by step, the tools in plain words, and the two things seen (busy asked for the minute twice; "soon, we'll see" logged as a promise).
+- **Its source** is built by `four-step-page/build.py` in the session scratchpad from the `-steps` runs' transcripts. A later edit rebuilds it the same way, or reads the published page first.
+- **Audio:** 64 kbps copies in `local/voice-tests/2026-11-16-steps-page/audio64/`. Publishing them from the scratchpad was refused by a Read permission rule; from the project folder they went.
+
 ### LIVE 12:12:26 UTC: the owner's four steps, after all four played calls went as written (Claude players, Cartesia, no OpenRouter)
 - **Played on the candidate** (`2026-11-16-debt-{flow,busy}-steps`), the same four cards as 11:30:
   - **Regular yes (Dana):** "טוב תודה", then "אחלה, יופי לשמוע. תפסתי אוֹתָךְ בזמן נוח לשנייה?", then "יש לָךְ דקה קטנה...?", then the facts and "זה מוכר לָךְ, או שאולי זה פשוט התפספס?". She forgot; "קורה, אין שום בעיה", then the link offer, sent.

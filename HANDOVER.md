@@ -15,7 +15,7 @@ appended to.
 >     3. A quick minute about a balance on the apartment, never called small.
 >     4. The details and "does it ring a bell, or did it just slip through?". The link only after they react.
 >     - A no at any step: a short sorry and the WhatsApp link, no callback slot.
->   - **Played and voiced first:** yes, no, busy and driving all went as written; the page is `local/voice-tests/2026-11-16-steps-page/index.html`.
+>   - **Played and voiced first:** yes, no, busy and driving all went as written. The owner's page is the artifact "Four-Step Debt Calls", https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p (private until shared; source `four-step-page/build.py` in the session scratchpad); the local copy is `local/voice-tests/2026-11-16-steps-page/index.html`.
 >     - Seen: a busy tenant who already said "תגיד מהר" is still asked for the minute. That is the owner's call: skip step 3 after an explicit go-ahead?
 >     - Calls are about 6 turns longer than the 11:24 version.
 >   - **Rollback:** to the 11:24 version, PATCH `model` and `firstMessage` from `local/vapi-debt-live-16nov-before-four-steps.json`. To 15 Nov, use `local/vapi-debt-live-16nov-before-reason-first.json`.
