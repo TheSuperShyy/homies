@@ -110,10 +110,11 @@ appended to.
 >           - Still English: the footer line every Chatwoot email shares, and the "Forgot password?" email.
 >           - To change a word, edit the file in the repo and run the script again; it recreates sidekiq, since production Rails caches templates.
 >           - The one-letter prefixes join the Hebrew way (11:57 deploy). If the workspace is renamed to הומיז, the email reads "להומיז" with nothing else to change.
->         - The "Accept invitation" button opens a set-password page (6+ characters). Saving it confirms the account and signs them in.
+>         - The "Accept invitation" button opens a set-password page: at least 6 characters, with an uppercase and a lowercase English letter, a number and a symbol (Ido's first three tries on 16 Nov were refused for it). Saving it confirms the account and signs them in.
 >         - The link does not expire until used. An admin cannot resend it; "Forgot password?" is the way back.
 >         - **16 Nov: it lands in spam at Homies' Google mail, with its links switched off** (the owner). "Report not spam" makes it work. Since 16 Nov 12:46 UTC Chatwoot sends through Gmail itself, so a "Forgot password?" reset should reach the inbox (the top of this file).
 >         - The workspace name (CLIX) and the inviter's name show in it. Whether to change them first is the owner's call.
+>         - **16 Nov 16:06 UTC: a step-by-step video for staff:** the email, the button, the password rules and the next sign-in, on the real pages. It is `local/chatwoot-video/chatwoot-first-login-he.mp4` (English copy `-en.mp4`), and `build.py` there rebuilds it. The address in it is chat.srv1879140.hstgr.cloud, so a new domain means a rebuild.
 >   - their OK: OXS for every resident, and an after-hours switch time.
 >   - **Waiting on Homies.** Then on us: the number into Chatwoot inbox 1, the two templates re-submitted on their account, the switch (the staff were seated 15 Nov).
 >

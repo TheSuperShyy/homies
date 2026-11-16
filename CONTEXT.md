@@ -91,11 +91,12 @@ The user is the builder. The client is Homies.
     - The subject is set inside the template ("הוזמנת להצטרף ל-CLIX ב-Chatwoot"). Devise's own Hebrew subject was "הוראות אישור".
     - Its links carry `locale=he`, which SwitchLocale reads first, so the password page opens in Chatwoot's Hebrew.
     - Names go in with the one-letter prefix joined the Hebrew way: straight onto a Hebrew name (להומיז, מיריב לוי), with a hyphen onto anything else (ל-CLIX, ב-Chatwoot).
-  - Still English: the footer of the layout every Chatwoot email shares ("This email was sent by Chatwoot") and the "Forgot password?" email. Pages before login without `locale` follow `DEFAULT_LOCALE` (en).
+  - Still English: the footer of the layout every Chatwoot email shares ("This email was sent by Chatwoot") and the "Forgot password?" email. Pages before login without `locale` follow `DEFAULT_LOCALE` (en). The sign-in page with `locale=he` is blank, because Chatwoot's Hebrew strings break it (16 Nov), so staff sign in on the English one.
   - The dashboard uses the person's own language setting, or else the account's (Hebrew).
-  - The "אישור ההזמנה" button opens "Set new password" (6+ characters). Saving it confirms the account and signs them in.
+  - The "אישור ההזמנה" button opens "Set new password". The password is 6-128 characters, with at least one uppercase A-Z, one lowercase a-z, one number and one special character (`config/initializers/secure_password.rb`); anything else gets a 422. Saving it confirms the account and signs them in.
   - The link never times out until it is used: `PasswordsController#update` skips the 6-hour check.
   - An admin cannot resend it. For a lost one, "Forgot password?" gives a new link that confirms the account the same way.
+  - **The staff's how-to video (16 Nov):** `local/chatwoot-video/`, Hebrew for staff with an English copy, made from the real pages. `build.py` rebuilds it, so a new address or new wording takes about two minutes.
 
 **Yariv's written review of 9 Nov decides five things (his comments on the 3 Nov simulated run; live 9 Nov as epoch 100 by `n8n_whatsapp_feedback9.py`, on live and the UChat copy).**
 - **The comments themselves, word for word with English:** `docs/discovery/feedback-yariv-2026-11-09.md` (written 10 Nov from the owner's 13 screenshots). Read the comment there before changing what it decided: some are whole sentences Yariv wrote for Michael to say (2.2, 2.3 and most of 3.2).

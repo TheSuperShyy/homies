@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### A step-by-step video for staff: accept the Chatwoot invite and choose a password (the owner: "lets create a video step by step on how to create account in chatwoot how to setup the password"), 16:06 UTC
+- **Two files, 53 s each, 1920x1080, 1.6 and 1.8 MB (small enough for WhatsApp):**
+  - `local/chatwoot-video/chatwoot-first-login-he.mp4`, Hebrew captions, for the staff;
+  - `-en.mp4`, the same video with English captions, for the owner to check.
+  - Gitignored. Opened in the owner's File Explorer. `local/chatwoot-video/build.py` rebuilds both in about two minutes each, for example for a new address.
+- **What it shows, on the real pages, with captions, a cursor and highlights drawn over them:**
+  1. the invite email, from our 15 Nov render of the live Hebrew template, with the greeting as "ישראל ישראלי". Then how to find it: search "Chatwoot", check the spam folder too, and mark it "not spam" first, because a spam mail's button is dead;
+  2. the "אישור ההזמנה" button;
+  3. Chatwoot's Hebrew password page ("הגדר סיסמה חדשה"). A demo password is typed masked, a panel of the rules ticks as each is met, and a tip says to switch the keyboard to English and use Shift for a capital;
+  4. the same password in "אמת סיסמה";
+  5. "שלח", then a card: the account is ready, Chatwoot opens and you are signed in.
+  - Then next time: the address, the sign-in page (email and password), and "Forgot your password?" for a new link. It ends on a card with the address.
+- **Nothing was submitted:** the browser aborted any request that was not a GET, and none was attempted. The password page was opened with a dummy token, and its button was never pressed: the click is only drawn. No login was created or changed.
+- **Found while checking the facts (read only, on the box):**
+  - **The password rule is stricter than "6 characters".** `config/initializers/secure_password.rb` wants at least one uppercase A-Z, one lowercase a-z, one number and one special character. Devise sets the length, 6-128.
+  - **Correction to the 13:40 entry: Ido's password was set at 13:34:44, on the fourth try.** The first three tries (13:34:28, :33 and :37 UTC) were refused with "Password must contain at least 1 uppercase character ... at least 1 special character". The fourth set the password and opened /app. The rule is what trips people up, so the video spends the most time there.
+  - **`/app/login?locale=he` is a blank page.** Chatwoot's Hebrew strings break it (vue-i18n "Invalid linked format"). The plain `/app/login` is English and works, after the Hebrew password page too and in a browser set to Hebrew, and the root address goes to it. So the video's sign-in part is English, with Hebrew captions.
+
 ### A question answered, read only: are today's voice agent changes live (the owner: "the voice agent is live right the changes"), 15:32 UTC
 - **Yes.** The debt agent (`4bc03b57`) was last updated at 12:55:43 UTC. Its system prompt is the whole "## System prompt" section of `docs/features/10-debt-followup/prompt.md`, including "### הפתיחה" (6,287 characters), and its `firstMessage` equals the opener there.
   - So the four steps, the payment link only after the tenant reacts, and a no that gets a sorry and the WhatsApp link are all live.
