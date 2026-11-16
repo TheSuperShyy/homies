@@ -27,6 +27,9 @@ os.makedirs(OUT, exist_ok=True)
 HOMIES = T.load_key("CARTESIA_YARIV_API_KEY")
 OURS = T.load_key("CARTESIA_API_KEY")
 DICT_M = re.search(r"^CARTESIA_DICT_INBOUND=(.*)$", io.open(".env", encoding="utf-8").read(), re.M).group(1).strip()
+# 16 Nov: a call to a woman carries the feminine dictionary live (the Call button since 8 Oct, the dialer
+# since PR #13), so her test call is voiced with it too; a man's and an unknown name's keep the masculine one.
+DICT_F = re.search(r"^CARTESIA_DICT_FEMININE=(.*)$", io.open(".env", encoding="utf-8").read(), re.M).group(1).strip()
 # Mirrors scripts/vapi_set_voice.py's AGENT_VOICE. Since 7 Oct evening both agents
 # speak with the 31 Aug clone; until then the incoming line was clone A
 # (4486a4a7…, speed 0.8, the happy tag), dropped for sounding "like a karaoke mic".
@@ -82,13 +85,13 @@ def tts(key, voice_id, text, speed=None, dict_id=None):
         return w.readframes(w.getnframes())
 
 
-def michael(agent, text):
+def michael(agent, text, gender="m"):
     v = VOICE[agent]
     # Vapi cuts a turn into chunks at sentence ends and runs the guard on each one.
     chunks = [c for c in re.split(r"(?<=[.?!])\s+", text.strip()) if c]
     spoken = " ".join((v["tag"] + guard(c)) for c in chunks)
     chars["homies"] += len(spoken)
-    return tts(HOMIES, v["id"], spoken, v["speed"], DICT_M), spoken
+    return tts(HOMIES, v["id"], spoken, v["speed"], DICT_F if gender == "f" else DICT_M), spoken
 
 
 # 15 Nov: a caller's "I see / want / hope" is spelled the same for a man and a woman,
@@ -127,6 +130,7 @@ for fn in sorted(os.listdir(os.path.join(RUN, "transcripts"))):
         continue
     sid = fn[:-5]
     agent = cards[sid]["agent"]
+    tenant = (cards[sid].get("vars") or {}).get("gender", "m")
     render = not ONLY or sid in ONLY
     t = json.load(open(os.path.join(RUN, "transcripts", fn), encoding="utf-8"))
     audio, rows = [], []
@@ -135,12 +139,12 @@ for fn in sorted(os.listdir(os.path.join(RUN, "transcripts"))):
             for call in rnd:
                 w = waits[agent].get(call.get("tool"))
                 if w and render:
-                    pcm, _ = michael(agent, w)
+                    pcm, _ = michael(agent, w, tenant)
                     audio += [pcm, silence(0.6)]
                 rows.append(("tool", "%s %s" % (call.get("tool"), json.dumps(call.get("arguments") or {}, ensure_ascii=False)), ""))
         if "agent" in turn:
             if render:
-                pcm, spoken = michael(agent, turn["agent"])
+                pcm, spoken = michael(agent, turn["agent"], tenant)
                 audio += [pcm, silence(0.45)]
             rows.append(("Michael", turn["agent"], turn.get("en", "")))
         elif "caller" in turn:

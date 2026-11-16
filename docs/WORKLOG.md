@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The new debt script played and voiced with Cartesia, 11:30-11:40 UTC (owner: "lets test first using cartesia")
+- **Four ordinary calls on the live prompt of 11:24.** Blind Claude players, one per call; `voice_qa.py bundle` on `voice_qa_debt_flow.json` and `voice_qa_debt_busy.json`, runs `local/voice-tests/2026-11-16-debt-{flow,busy}/`. All four openers rendered by gender: Dana and Shiran got אוֹתָךְ, Omer and Yossi אוֹתְךָ.
+  - **Regular yes (Dana):** "yes sure, what's up". Michael at once: the house committee payment for flat four, July and August, 500 shekels, "only to make sure it didn't slip through", and the link. Dana: "I completely forgot". Michael: "קורה לכולם", sent (the number's last four), warm close.
+  - **Regular no (Omer):** "go ahead, what's it about". The same reason and facts, 750 shekels. Omer: "no thanks, I don't need a link, I'll sort it myself".
+    - Michael: "no problem at all, do you know roughly when?"; Omer: "soon, we'll see". That was logged as a promise to pay with `said` only, outcome `promised`.
+    - The tool asks for a vague answer to go in `said`, so this is not new. Seen, not changed.
+  - **Busy but yes (Yossi):** "in the middle of work, say it quick". "אני אהיה קצר", the facts and the link, sent, "good luck with work".
+  - **Driving, says no (Shiran):** "not really, sorry, I'm driving". "No problem, sorry for the interruption", and one offer: the link on WhatsApp to look at whenever. She said yes; sent; "drive safely". The new no path, as written.
+  - No how-are-you, no "glad to hear", no callback slot asked for anywhere. All address words pointed right.
+  - The fixed closing "יום טוב, ולהתראות" ends the evening call too; it is the hang-up phrase.
+- **Voiced** with Michael's live voice: 2,576 characters on Homies' Cartesia account, 454 on ours.
+  - `voice_qa_audio.py` now voices a woman's call with the feminine dictionary (`CARTESIA_DICT_FEMININE`), as the live dialer and the Call button do; before, every test call had the masculine one.
+  - The audio is in each run's `audio/`.
+- **Local page** `local/voice-tests/2026-11-16-page/index.html` (gitignored), built by `build16.py` in the session scratchpad. It holds the four calls, the audio, the Hebrew with English under it, and the tools in plain words. Opened in the owner's browser; not published.
+
 ### LIVE 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out (the owner pasted a review of the 11:08 call)
 - **The review, pasted without a note:**
   - asking how he is and then naming "the balance open on the flat" felt like a bait-and-switch;

@@ -13,7 +13,7 @@ appended to.
 >   - **After the yes:** the apartment payment, what the system shows (apartments, months, amount), and "only to make sure it did not slip through". **On a no or busy:** a short sorry and one offer, the link on WhatsApp. No callback slot is asked for, since nothing records one.
 >   - `send_payment_link` now fits "to pay now or when it suits them". The harness renders the gender branch (`prompt_probe.render_gender`).
 >   - **Rollback:** PATCH the snapshot's `model` and `firstMessage` back (`local/vapi-debt-live-16nov-before-reason-first.json`), then revert `prompt.md` and `vapi_tools.py`.
->   - **Owed:** one real call to hear it (the owner's Ring to Ido). The test pages of 15 Nov show the old opener until played again.
+>   - **Played and voiced 11:30-11:40 UTC** (yes, no, busy, driving): every call as written. The page is `local/voice-tests/2026-11-16-page/index.html`, opened for the owner. The test pages of 15 Nov show the old opener. **Owed:** one real call to hear it (the owner's Ring to Ido).
 >
 > **LIVE 16 Nov 10:54-10:55 UTC: debt-tools is kept warm in Tokyo, so a call's opening no longer waits for a worker to start** (owner: *"make the opening faster so there's no silence also fix the error on our side"*; PR #14 `3a099cd`; WORKLOG 16 Nov).
 >   - **Running in the database:**
