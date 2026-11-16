@@ -13,6 +13,10 @@ import { IconAlert, IconCheck, IconInfo, IconPhoneOut } from '@/components/icons
 // Everything that decides whether a press may go out is in lib/dialer.ts. This
 // action only carries the form there and comes back to the page with the
 // outcome in the URL, the Debts page's shape, so a refresh cannot press again.
+// A press waits up to 25 s for Tokomni (TOKOMNI_WAIT_MS in lib/dialer.ts), so
+// the function needs more than Vercel's default ten seconds.
+export const maxDuration = 30;
+
 async function ring(formData: FormData) {
   'use server';
   const outcome = await dial(String(formData.get('number') ?? ''));
