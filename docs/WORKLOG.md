@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### Ido's invite again (the owner: "ok now send on the ido again"), 13:05 UTC, NOT sent
+- **What "the ido" is:** the owner's login added "Ido Clix" (administrator, the owner's own Clix address) from the dashboard at 10:16:08 UTC (rails log: `POST /api/v1/accounts/2/agents` from the owner's IP). Its invite went out through Brevo at 10:16 (sidekiq job `dbdfd0fd`) and landed in spam: that was the report this afternoon.
+- **At 12:50:08–12:50:21 UTC the owner's login removed 9 logins from the dashboard:** #6, #7 and #9–#14 (8 of the 9 staff), and #15 (Ido Clix).
+  - Left: #2 Assaf Clix, #4 seat2 test, #5 Sandbox Admin, and #8 (operations agent, unconfirmed).
+  - `chatwoot_teams.py`: every department's mention still reaches Assaf Clix (exit 0).
+- **Not re-created:** a privacy guard on this PC refused the `POST /agents`, because the command held the owner's own address. The guard's own ways out:
+  - the owner adds Ido from the dashboard (Settings → Agents → Add agent, as at 10:16);
+  - or sets the address in `.env` for a script to read;
+  - or runs the command with `!`.
+  - The invite then goes through Gmail (sidekiq holds smtp.gmail.com since 12:46).
+
 ### LIVE 12:46 UTC: Chatwoot's email goes out through Gmail itself (the owner: "so how can we fix it", then the app password for testclix46)
 - **What changed:** `/opt/chatwoot/.env` sends through `smtp.gmail.com:587`, logging in as `testclix46@gmail.com` with the owner's app password (`GMAIL_APP_PASSWORD` in `.env`). The From stays "Homies <testclix46@gmail.com>". Only SMTP_ADDRESS, SMTP_USERNAME and SMTP_PASSWORD changed: every other line was compared with the backup, `.env.bak-20261116124629`.
 - **Why it fixes the spam:** mail that leaves from Gmail's own server is signed by gmail.com, so it passes Google's check (DMARC). Mail through Brevo never could.
