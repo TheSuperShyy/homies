@@ -14,7 +14,7 @@ appended to.
 >     - job 2 `purge-cron-run-details` runs daily;
 >     - the secret is in the vault as `debt_tools_tool_secret`, copied from `.env` TOOL_SECRET.
 >     - Read it with `python scripts/keep_warm.py`, stop it with `--off`. **If TOOL_SECRET ever changes, run `--apply` again,** or every ping gets 401 and the opening goes cold again.
->   - **Why:** the 10:11 dialer call waited 2.4 s for debt-tools on a cold worker, 1.7 s of it starting up. A warm one answers in about 0.15 s. Free-plan workers retire about 75 s after they start, so about one call in ten may still find none running.
+>   - **Why:** the 10:11 dialer call waited 2.4 s for debt-tools on a cold worker, 1.7 s of it starting up. A warm one answers in about 0.15 s. **Checked 10:56-11:01: 6 of 8 probes warm (0.14-0.34 s), 2 cold (about 1.4 s).** Free-plan workers are dropped when idle (`EarlyDrop`) after 8 to 75 s, so pings make most calls warm, not all. The cold case is debt-tools' own start (one 5,000-line bundle, 1-1.7 s); a small function only for the routing question would start faster.
 >   - **/dialer** waits 25 s for Tokomni (was 8 s; on 16 Nov a press that timed out still rang). The "unclear" message says to wait a minute for the ring before pressing again.
 >   - **Not changed, Vapi's side:** a fixed opening Vapi has not said recently (any new tenant's name) starts about 1.3 s after the voice connects; a repeated one starts in 0.3-0.4 s. The levers are a shorter first sentence or an opening written by the model. Both change the opener, so it is the owner's call; show examples first.
 >   - **Owed:** one real dialer call to measure the new opening, from Omni's INVITE to Michael's first word (4.52 s on 16 Nov 10:11). Vapi's SIP capture and log on GET /call give it.

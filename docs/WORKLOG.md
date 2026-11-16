@@ -41,7 +41,12 @@ conversation that produced it.
   - Cartesia itself gives first audio for this opening in 0.32-0.46 s on WebSocket, fresh connection or not. It makes the whole opening in 0.9-1.2 s over REST, and the first sentence alone in 0.5-0.8 s.
   - A Vapi support thread says the fixed first message is made whole and cached. So a tenant's name never heard before costs about 1 s there.
   - The levers left both change the opener the owner approved: a shorter first sentence, or an opening written by the model. That is the owner's call (greeting rule: show examples first).
-- **Still running at commit time:** a voice idle test (rounds 15 minutes apart, from 10:45) and 8 route probes 37 s apart (from about 10:56).
+- **Checked after it went live (10:56-11:01 UTC), and it is most calls, not all:**
+  - 8 route probes 37 s apart: 6 found a warm worker, 135-339 ms on the server (294-513 ms round trip from here); 2 found a new one, 1,361 and 1,444 ms. Before 041, every call found none: 2.4 s on the 10:11 call, 1.0 s on the 10:41 probe.
+  - 20 pings: median 155 ms. A new worker's first requests take 0.45-1.5 s; one took 7.1 s.
+  - Every worker shutdown is `EarlyDrop` (the shutdown event's `reason`): the runtime drops an idle worker when it chooses, after 8, 22 or 75 s. A ping every 15 s cannot hold one.
+  - The cold cost is debt-tools itself: one 5,000-line bundle with supabase-js from esm.sh, starting up in 1-1.7 s.
+- **The voice does not go cold.** After 15 idle minutes, Cartesia gave first audio in 438 ms, with or without the dictionary, the same as warm (rounds at 10:45 and 11:00; the third was stopped). So the 1.3 s for a new opening is Vapi's handling of the fixed first message.
 
 ### The owner's dialer test to Ido, 10:11 UTC: "unclear whether it was sent" (a timeout), but it went in and rang; the phone hung up 2 s in, after about 4.5 s of silence (owner's screenshot of /dialer; read only)
 - **The page:** "Unclear whether ... was sent: no answer from Tokomni (TimeoutError ...)". The page waits 8 s for Tokomni's answer (`dashboard/lib/dialer.ts`), and Tokomni answered later than that.
