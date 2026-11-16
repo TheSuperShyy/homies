@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### A question answered, read only: how many invited staff have created their account or logged in (owner: "how many members did logged in or created an account in chatwoot that we sent invitation from"), 09:36 UTC
+- **None of the 9.**
+  - Read from Chatwoot's database with one SELECT on `users` joined to account 2's `account_users`.
+  - Logins #6 to #14 all have `confirmed_at` empty and `sign_in_count` 0, with no sign-in time. So nobody has set a password from the invite, and nobody has signed in.
+  - The invites went out on Sunday 15 Nov: Yariv at 13:53 UTC, the other 8 at 15:00 to 15:07 UTC. That is 15:53 and 17:00 Israel time, about 17 to 19 hours before this read.
+- **Whether the emails arrived can't be read from here.** `SMTP_KEY` is Brevo's SMTP key (`xsmtpsib`), and the delivery and open events need a Brevo API key. Sidekiq handed every invite to the relay without error (15 Nov).
+- **Said:** none yet, check spam (the sender is `testclix46@gmail.com`), and "Forgot password?" sends a fresh link.
+
 ### The same, last week only (owner: "no focus only last week"), 09:10 UTC
 - **About $8 for Mon 9 to Sun 15 Nov (UTC days).**
   - **Measured:** $3.00 from 11 Nov 07:10 UTC to now. The balance readings bracket it, and nothing has been spent today.
