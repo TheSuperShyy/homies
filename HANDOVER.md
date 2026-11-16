@@ -952,14 +952,14 @@ appended to.
 > - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T15:27`, and again the next morning.
 >
 > **BACK UP 14:17 UTC, 29 Oct: the bot now runs on the key ending 3f9, on a separate OpenRouter account** (owner: *"we have multiple api key in our env just pick one"*).
-> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $6.46 on 3 Nov 06:54 UTC ($9.85 on 29 Oct, from $10 bought; about $0.70 a day), and the key's cap is $1000. `check_openrouter.py` reads it.
+> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $32.68 on 16 Nov 08:57 UTC ($60 bought, $27.32 spent; $23.96 of it in November: about $2.55 a day from 4 to 11 Nov, $0.60 a day since), and the key's cap is $1000. `check_openrouter.py` reads it.
 > - **How it was switched:** `n8n_openrouter_key.py OPENROUTER_API_KEY_ACCOUNT_B --apply` created credential `Ovw71DEq1eufagGk` ("Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)") and repointed the live bot's model node. The workflow is active. `N8N_OPENROUTER_CRED_ID` is updated.
 > - **The sandbox** was rebuilt on it, round 51.
 > - A one-off call with the bot's model at max_tokens 8192 went through first.
 > - The old credential (`EWgicRGk9KUNJ4O1`, the CAPPED15 key ending 0d6) is untouched. **Rollback:** `n8n_openrouter_key.py` with a `.env` variable holding the old key.
 > - **Why this key:** the key ending 0d6 had hit its $15 cap at about 13:26 UTC ("Forbidden"). The key ending 427 is the one abandoned on 25 Sep. The `.env` comment that sat above the 3f9 line meant 427, and it now says so.
-> - **Not switched:** the Edge Function's own `OPENROUTER_API_KEY` secret (the one model-written line above a debt call's WhatsApp payment link) still holds the capped key. That line is skipped until `supabase_functions.py --apply --oxs-mirror` pushes the new value.
-> - **The main account** (keys 0d6 and 427) has $20.31, and something keeps spending it through the 427 key.
+> - **The Edge Function's own `OPENROUTER_API_KEY` secret** (the one model-written line above a debt call's WhatsApp payment link) holds the 3f9 key too (digest compared, 16 Nov). So that line is written, and billed to this account.
+> - **The main account** (keys 0d6 and 427) is at −$0.17 on 16 Nov ($345 bought, $345.17 spent). It spent about $80 since 29 Oct, none of it through 0d6 this month, so through another key on it (427 before). Nothing of Homies runs on it.
 > - Every model call fails with `Forbidden - perhaps check your credentials?`. That 403 is the cap, not a bad credential.
 > - The sandbox bot goes to "Could not answer" (the owner: "why the chatbot not responding"), and **so does the live WhatsApp bot**, which runs on the same key.
 > - **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Nothing needs redeploying afterwards. `check_openrouter.py` shows when it is back.

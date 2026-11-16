@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### A question answered, read only: OpenRouter spend since last week (owner: "how much openrouter we did spent since last week"), 08:57 UTC
+- **The bot's account (the key ending 3f9: the WhatsApp bot, its sandbox and debt-tools' payment line):** $60 bought, $27.32 spent, $32.68 left. This month (from 1 Nov UTC) $23.96, today $0 (`/api/v1/key`: usage_monthly, usage_daily).
+- **Split by the readings in this log:** $6.47 spent by 4 Nov 07:00 UTC, $24.32 by 11 Nov 07:10, $24.71 by 09:38, $27.32 now. So about $17.85 from 4 to 11 Nov (about $2.55 a day) and $3.00 since 11 Nov 07:10 (about $0.60 a day).
+- **Not readable from here: the figure from Monday 9 Nov exactly.**
+  - OpenRouter's per-day activity needs a management key (403 "Only management keys can fetch activity" with ours).
+  - n8n keeps the live bot's runs only from 12 Nov (the newest 100), and none for the sandbox.
+  - The owner's OpenRouter Activity page has it.
+- **The main account (the key ending 0d6, capped at $15 and used up):** $345 bought and $345.17 spent, so −$0.17. It spent about $80 since 29 Oct 14:09 UTC ($264.69 then). None of it went through 0d6 this month (usage_monthly 0), so another key on that account spent it; 427 is the one seen before. Nothing of Homies runs on it.
+- **debt-tools' `OPENROUTER_API_KEY` secret holds the 3f9 key** (digest compared with `.env`). So the payment link's line is written and billed to the bot's account. HANDOVER's 29 Oct line saying it still held the capped key is corrected, and its balances are brought up to date.
+
 ### A question answered, read only: which AI models Homies runs (owner: "what llm homies use"), 08:52 UTC
 - **Read live, GET only** (`llm_inventory.py` in the session scratchpad: every n8n workflow's AI nodes and every Vapi assistant):
   - **The WhatsApp assistant:** `google/gemini-3.1-pro-preview` through OpenRouter, on the live workflow `u2JjrbcNPYyyh3yl` (active). The sandbox `SI4iUJJnLG5ghY6n` and the inactive UChat copy run the same.
