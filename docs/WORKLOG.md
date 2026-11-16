@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### A question answered, read only: which AI models Homies runs (owner: "what llm homies use"), 08:52 UTC
+- **Read live, GET only** (`llm_inventory.py` in the session scratchpad: every n8n workflow's AI nodes and every Vapi assistant):
+  - **The WhatsApp assistant:** `google/gemini-3.1-pro-preview` through OpenRouter, on the live workflow `u2JjrbcNPYyyh3yl` (active). The sandbox `SI4iUJJnLG5ghY6n` and the inactive UChat copy run the same.
+  - **Both voice agents:** OpenAI `gpt-5.6-sol` with reasoning low (incoming `10ae859a`, debt `4bc03b57`). Vapi's sample assistant "Riley" (gpt-4.1) is not ours.
+  - **debt-tools** (live, equal to main): the one line above the payment link it sends on WhatsApp after a debt call is written by `google/gemini-2.5-flash` through OpenRouter (`whatsappLine`, temperature 0.6, 160 tokens). If that call fails, the link goes alone.
+- **CONTEXT** gets the list as a standing fact. **HANDOVER:** nothing to act on, no open item.
+
 ### A question answered, read only: is the debt call fast now (owner: "SO IS THE VOICE AGENT FAST AGAIN"), 08:31 UTC
 - **Not measured yet.** No call has reached Vapi since the change of 15 Nov 12:42-12:44 UTC. The last debt call is still the 09:29 UTC dialer call to Ido: 2.55 s a turn (Vapi's split: end of speech 0.80, transcriber 0.33, model 0.72, voice 0.69).
 - **The settings are still on**, read live: `reasoningEffort` low, `serviceTier` fast, voice `minCharacters` 10 (updated 12:44:36 UTC), and the end-of-speech wait 0.8 s (0.3 s on punctuation) as before. The incoming agent `10ae859a` has the same.
