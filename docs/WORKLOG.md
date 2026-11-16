@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### Ido re-added by the owner, and the invite through Gmail worked (the owner: "what is the availability", with a screenshot of the Edit Agent form), 13:40 UTC, read only
+- **#16 "Ido Clix ADMIN":** the owner added it from the dashboard at 13:15:28 UTC (`POST /agents` from the owner's IP). In the database it is administrator (`account_users.role` 1), availability online (0), auto-offline on. The screenshot's form shows the role as "agent", unsaved.
+- **The invite went out through Gmail:** sidekiq job `032765c1` ran 13:15:28–13:15:29 with no error. **Ido set a password at 13:34:28 UTC** (four `PUT /auth/password` from an Israeli address; `confirmed_at` set; `sign_in_count` still 0). So the email arrived and its button worked: the first real proof of the 12:46 switch.
+- **Availability** is the agent's status: online (the owner's translated dashboard says "connected"), busy or offline. Chatwoot hands new conversations out automatically only to online agents, and auto-assignment is off in inboxes 1, 2 and 3. Here it only shows a status, and it never blocks login or mentions.
+
 ### Ido's invite again (the owner: "ok now send on the ido again"), 13:05 UTC, NOT sent
 - **What "the ido" is:** the owner's login added "Ido Clix" (administrator, the owner's own Clix address) from the dashboard at 10:16:08 UTC (rails log: `POST /api/v1/accounts/2/agents` from the owner's IP). Its invite went out through Brevo at 10:16 (sidekiq job `dbdfd0fd`) and landed in spam: that was the report this afternoon.
 - **At 12:50:08–12:50:21 UTC the owner's login removed 9 logins from the dashboard:** #6, #7 and #9–#14 (8 of the 9 staff), and #15 (Ido Clix).
