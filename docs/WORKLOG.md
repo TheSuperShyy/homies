@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The staff's Chatwoot invite lands in spam, its button dead (the owner: "the email invitation was sent in the spam and is not clickable"), 12:25 UTC, read only
+- **Why it can't be clicked:** Gmail turns off the links of any message it files as spam (Outlook does the same in Junk). The links themselves are right: absolute https to `chat.srv1879140.hstgr.cloud/app/auth/password/edit?locale=he&reset_password_token=…` (the template and the 15 Nov preview). Out of spam the button works.
+- **Why it is spam:** the From is `testclix46@gmail.com`, but the mail leaves through Brevo (`smtp-relay.brevo.com:587`, read in the live `/opt/chatwoot/.env`, no secret printed). Brevo can sign only for a domain authenticated with it, and nobody can authenticate gmail.com. So nothing in the mail proves it came from Gmail: gmail.com's DMARC fails (its record: `p=none; sp=quarantine`), and Google files such mail as spam. `homies-management.co.il` is on Google Workspace (MX aspmx.l.google.com), so every staff mailbox meets that filter.
+  - Not proven from a header: the delivered mail's "Show original" would show it, and no mailbox at Homies is ours to read.
+- **The 9 invites still work.** At 12:21 UTC none had been used (`confirmed_at` empty, `sign_in_count` 0, `reset_password_sent_at` still 15 Nov for #6–#14), and the link has no time limit. "Report not spam" moves the mail to the inbox and turns its links on. Nothing resent.
+- **New mail (resets, new staff, mention emails) needs a sender Google can verify.** Both ways need the owner:
+  - an App password on `testclix46@gmail.com` (2-Step Verification on), then Chatwoot sends through `smtp.gmail.com:587` as the same address. The VPS reaches it (its banner read at 12:21 UTC). Gmail's limit is about 500 recipients a day.
+  - or Homies' domain authenticated in Brevo (DKIM and a DMARC record in `homies-management.co.il`'s DNS, which has no SPF and no DMARC on 16 Nov), then a `@homies-management.co.il` sender. Their DNS is theirs to change.
+- Read only: DNS over DoH, the live `.env`'s mail lines, sidekiq's log, the users table. Nothing changed on the server. HANDOVER (the staff logins line, the invite block) and CONTEXT (the Chatwoot logins paragraph) updated.
+
 ### The four-step test calls published as an artifact, "Four-Step Debt Calls" (owner: "open the test compilation in an artifact so i can hear it"), 12:18 UTC
 - https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p, version 1. **Private until the owner shares it** from the page's Share menu.
 - **The page:** the four steps at the top (Hebrew with English), then the four calls (yes, no, busy, driving). Each call has its player, every turn in Hebrew with English under it, Michael's turns labelled by step, the tools in plain words, and the two things seen (busy asked for the minute twice; "soon, we'll see" logged as a promise).
