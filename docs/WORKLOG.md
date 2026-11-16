@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The owner's dialer test to Ido, 10:11 UTC: "unclear whether it was sent" (a timeout), but it went in and rang; the phone hung up 2 s in, after about 4.5 s of silence (owner's screenshot of /dialer; read only)
+- **The page:** "Unclear whether ... was sent: no answer from Tokomni (TimeoutError ...)". The page waits 8 s for Tokomni's answer (`dashboard/lib/dialer.ts`), and Tokomni answered later than that.
+- **It went in anyway:** Omni's dialer sent the call to 208 at 10:11:29.4 UTC (`tokomni_lead.py --check`: call `01a1e3d7`, debt agent, `dialer-<number>`). So pressing again would ring Ido a second time.
+- **The call, from Vapi's SIP capture and log** (recordings, capture and log in `local/calls/2026-11-16/`, gitignored):
+  - 10:11:29.4 INVITE from Omni's FreeSWITCH; 401 and the authed INVITE at 29.57;
+  - 10:11:31.49 debt-tools booted cold; 10:11:32.12 `route ... debt` (our part: about 0.65 s);
+  - 10:11:32.30 Vapi answers 200 OK; 10:11:33.92 Michael's first word (Cartesia opened at 32.60);
+  - 10:11:34.38 BYE from Omni, Q.850 cause 16 NORMAL_CLEARING (a normal hang-up on their side); `customer-ended-call`, 2.04 s, $0.0024.
+  - The phone's channel is digital silence the whole time; no transcript. Whoever answered heard about 4.5 s of nothing and hung up half a second into the greeting. Whether Ido answered is his to say.
+- **The opening silence is not new:** from Omni's INVITE to Michael's first word, the 8 phone calls since 1 Nov took 1.83-4.52 s (15 Nov 09:29 1.83, 13 Nov 2.54 and 4.29, 9 Nov 4.34, 3 Nov 2.55, 2 Nov 2.82, 1 Nov 3.95); today's is the slowest.
+  - Our function is not the slow part: boot to route 0.4-0.85 s on all four dialer calls.
+  - The rest is before Vapi asks us (INVITE to boot: about 0.6-2 s; today 1.9 s, Vapi's side or Supabase's cold path, not visible from here) and Michael's voice starting after the answer (0.44 s on 15 Nov, 1.6 s today).
+- **Speed still unmeasured on replies:** the call had no turns, so `vapi_latency.py` has nothing to measure yet.
+
+
 ### A question answered, read only: how many invited staff have created their account or logged in (owner: "how many members did logged in or created an account in chatwoot that we sent invitation from"), 09:36 UTC
 - **None of the 9.**
   - Read from Chatwoot's database with one SELECT on `users` joined to account 2's `account_users`.
