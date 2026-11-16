@@ -185,9 +185,11 @@ twice.
 - The conversations list returns 25 per page. The handback fetch is capped
   there (pre-existing); the escalation fetch filters on the `handover` label
   so it stays small.
-- SMTP is live since 6 Sep (Brevo free relay, `scripts/chatwoot_smtp.py`):
-  invites, password resets and the email channel on *assigned*/*mentioned*
-  now work once a seat turns them on.
+- SMTP is live since 6 Sep (`scripts/chatwoot_smtp.py`): invites, password
+  resets and the email channel on *assigned*/*mentioned* work once a seat
+  turns them on. It went through Brevo's free relay, and since 16 Nov it goes
+  through Gmail's own server as the same sender, because Homies' Google mail
+  filed the Brevo mail as spam.
 - The representatives work on PCs. Browser push is already served by this
   install (the dashboard config carries the VAPID public key and `/sw.js`
   answers 200, checked 3 Sep); a mention becomes a Windows toast from Chrome

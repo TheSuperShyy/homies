@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### LIVE 12:46 UTC: Chatwoot's email goes out through Gmail itself (the owner: "so how can we fix it", then the app password for testclix46)
+- **What changed:** `/opt/chatwoot/.env` sends through `smtp.gmail.com:587`, logging in as `testclix46@gmail.com` with the owner's app password (`GMAIL_APP_PASSWORD` in `.env`). The From stays "Homies <testclix46@gmail.com>". Only SMTP_ADDRESS, SMTP_USERNAME and SMTP_PASSWORD changed: every other line was compared with the backup, `.env.bak-20261116124629`.
+- **Why it fixes the spam:** mail that leaves from Gmail's own server is signed by gmail.com, so it passes Google's check (DMARC). Mail through Brevo never could.
+- **Checked:**
+  - Before anything changed, Gmail took the login from the VPS (235 2.7.0 Accepted, no mail sent).
+  - After the switch, the running sidekiq holds the values (the password by digest, and byte by byte with no stray end).
+  - One plain test went out from inside sidekiq, the way Chatwoot sends, to clixteam579@gmail.com. smtp.gmail.com accepted it at 12:49 UTC (Message-ID `6afafbe13c4a_a8ba8912fb@…`). Which folder it landed in can't be read from here.
+- **Only sidekiq was recreated.** Every mail Chatwoot sends goes out from a sidekiq job (`User#send_devise_notification` uses deliver_later, and notifications do the same), so the dashboard and Meta's webhooks never stopped. rails holds the old Brevo values until its next recreate and sends no mail itself. The Hebrew invite template is still mounted.
+- **A slip, put right:** the first write went through a Windows text-mode pipe, which turned every line end into \r\n. Compose strips them: the running values were checked, and the 6 Sep lines had carried \r\n since then with Brevo working. Still, the file was set back to plain line ends at once, and the script now pipes bytes.
+- **`scripts/chatwoot_smtp.py` rewritten:**
+  - A provider: gmail, or brevo as the way back.
+  - Lines replaced in place after a backup, sidekiq alone recreated, then a read-back. `--test-to` sends the test.
+  - `VALUES` still names the Brevo settings, which `n8n_standing_order_email.py` imports: n8n still sends the standing-order email through Brevo.
+- **Still open:** the 9 invites sent on 15 Nov sit in spam until each person clicks "Report not spam"; nothing was resent. Gmail's limit is about 500 recipients a day. For go-live, a sender on Homies' own domain.
+
 ### The word "יתרה" out of the debt call (Yariv, forwarded by the owner: "Remove that word from the script because he didn't say it correctly"), being played, NOT live yet
 - **Yariv's suggestion, as he wrote it:** "You have something to do there. I saw on our system you need to pay by August, something like that."
 - **`prompt.md` (debt), three places and one bullet:**
