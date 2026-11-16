@@ -9,6 +9,15 @@ conversation that produced it.
 
 ---
 
+## 2026-11-16
+
+### A question answered, read only: is the debt call fast now (owner: "SO IS THE VOICE AGENT FAST AGAIN"), 08:31 UTC
+- **Not measured yet.** No call has reached Vapi since the change of 15 Nov 12:42-12:44 UTC. The last debt call is still the 09:29 UTC dialer call to Ido: 2.55 s a turn (Vapi's split: end of speech 0.80, transcriber 0.33, model 0.72, voice 0.69).
+- **The settings are still on**, read live: `reasoningEffort` low, `serviceTier` fast, voice `minCharacters` 10 (updated 12:44:36 UTC), and the end-of-speech wait 0.8 s (0.3 s on punctuation) as before. The incoming agent `10ae859a` has the same.
+- **Little to expect from them.** The incoming agent has had these settings since 25 Oct. On its five latest calls with turns (1-9 Nov), a reply took 2.0, 2.6, 3.0, 3.2 and 3.3 s on average (model 0.9-1.7, voice 0.3-0.6, end of speech 0.3-0.9, transcriber 0.1-0.4). The debt agent's three calls before the change took 2.6, 2.6 and 3.6 s. So the gain is a few tenths of a second at most, inside the swing between calls.
+- **What would move it, neither touched:** the 0.8 s end-of-speech wait (shorter cut hesitant callers off on 23 Oct, so the paid `--integrity` run first) and the model (a faster one changes the Hebrew; the owner's call).
+- **Said:** not proven and probably about the same; one Ring to Ido on /dialer, then `vapi_latency.py` reads it. Read with two GET-only scripts in the session scratchpad (`debt_speed_check.py`, `speed_compare.py`).
+
 ## 2026-11-15
 
 ### LIVE: the other 8 of Homies' staff have Chatwoot logins and their invites went out (owner: "ok so send to everyone else"), 15:00–15:07 UTC

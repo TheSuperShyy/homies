@@ -4382,7 +4382,7 @@ example, gender and all.
 
 **Homies' staff have Chatwoot logins since 15 Nov, each made on the owner's word (Yariv first, then the other 8).** Adding an agent through the API emails the Hebrew invite at once; the link has no time limit. The sender is still `testclix46@gmail.com` through Brevo, so the invite may land in spam at Homies' Google mail. On our line a `POST /agents` can time out after the server has done it: the retry then gets 422 "User has already been taken" and the login exists without its inboxes, so read the login list by email before calling one failed (15 Nov, #13).
 
-**Both voice agents run the same speed settings since 15 Nov:** gpt-5.6-sol at `reasoningEffort` low on `serviceTier` fast, and the voice starts after 10 characters (`minCharacters`). The end-of-speech wait stays 0.8 s (0.3 s on punctuation): shorter cut hesitant callers off on 23 Oct.
+**Both voice agents run the same speed settings since 15 Nov:** gpt-5.6-sol at `reasoningEffort` low on `serviceTier` fast, and the voice starts after 10 characters (`minCharacters`). The end-of-speech wait stays 0.8 s (0.3 s on punctuation): shorter cut hesitant callers off on 23 Oct. These settings do not make a reply fast on their own: on the incoming agent's five latest calls with turns (1-9 Nov), a reply still took 2.0-3.3 s on average (Vapi's split: model 0.9-1.7, voice 0.3-0.6, end of speech 0.3-0.9, transcriber 0.1-0.4). The levers left are the 0.8 s wait and the model.
 
 **A prompt-only push when live equals the repo:** GET the assistant, swap the system message, PATCH the whole `model` back, read back. Vapi's edge refuses Python's default User-Agent (403), so every script sends its own.
 
