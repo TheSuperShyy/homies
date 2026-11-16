@@ -8,13 +8,20 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **16 Nov about 11:50 UTC: `prompt.md` (debt) is AHEAD of the live agent.**
->   - **In the repo, not pushed:** the owner's four steps (how are you; "יופי, אחלה", a good time for a second?; a quick minute about a balance on the apartment; the details and "does it ring a bell, or did it just slip through?", the link only after they react). The opener asks "מה נשמע?" again.
->   - **Live** is still the 11:24 reason-first version (the opener asks "a good time for a second?" and the reason comes right after the yes).
->   - Being played on the candidate (`voice_qa.py bundle --run DIR --deck ... --candidate`) for the owner to hear first. **Push it only after that**, as the 11:24 push was made: prompt and opener only, a snapshot first, read back after.
->   - Do not describe the live call from `prompt.md` until then.
+> **LIVE 16 Nov 12:12:26 UTC: the debt call warms up first, in the owner's four steps** (the owner's second pasted take; WORKLOG 16 Nov; `prompt.md`, "16 Nov, later").
+>   - **The steps:**
+>     1. The opener: "היי, {{first_name}}? [greeting by the hour]! מדבר מיכאל מהצוות של הומי'ז, מה נשמע?". The name is the identity question.
+>     2. A light "יופי, אחלה" and "תפסתי אוֹתְךָ / אוֹתָךְ בזמן נוח לשנייה?".
+>     3. A quick minute about a balance on the apartment, never called small.
+>     4. The details and "does it ring a bell, or did it just slip through?". The link only after they react.
+>     - A no at any step: a short sorry and the WhatsApp link, no callback slot.
+>   - **Played and voiced first:** yes, no, busy and driving all went as written; the page is `local/voice-tests/2026-11-16-steps-page/index.html`.
+>     - Seen: a busy tenant who already said "תגיד מהר" is still asked for the minute. That is the owner's call: skip step 3 after an explicit go-ahead?
+>     - Calls are about 6 turns longer than the 11:24 version.
+>   - **Rollback:** to the 11:24 version, PATCH `model` and `firstMessage` from `local/vapi-debt-live-16nov-before-four-steps.json`. To 15 Nov, use `local/vapi-debt-live-16nov-before-reason-first.json`.
+>   - **Owed:** one real call to hear it (the owner's Ring to Ido).
 >
-> **LIVE 16 Nov 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out** (the owner pasted a review of the 11:08 call to Ido; WORKLOG 16 Nov; `docs/features/10-debt-followup/prompt.md`, "16 Nov").
+> **LIVE 16 Nov 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out** (**superseded 12:12:26 UTC** by the four steps above; its no-path stays) (the owner pasted a review of the 11:08 call to Ido; WORKLOG 16 Nov; `docs/features/10-debt-followup/prompt.md`, "16 Nov").
 >   - **Opener:** "היי, {{first_name}}? [greeting by the hour], מדבר מיכאל מהצוות של הומי'ז. תפסתי [אוֹתְךָ / אוֹתָךְ by `gender`] בזמן נוח לשנייה?" No "how are you". The name is still the identity question, so money waits for the answer.
 >   - **After the yes:** the apartment payment, what the system shows (apartments, months, amount), and "only to make sure it did not slip through". **On a no or busy:** a short sorry and one offer, the link on WhatsApp. No callback slot is asked for, since nothing records one.
 >   - `send_payment_link` now fits "to pay now or when it suits them". The harness renders the gender branch (`prompt_probe.render_gender`).

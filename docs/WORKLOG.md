@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### LIVE 12:12:26 UTC: the owner's four steps, after all four played calls went as written (Claude players, Cartesia, no OpenRouter)
+- **Played on the candidate** (`2026-11-16-debt-{flow,busy}-steps`), the same four cards as 11:30:
+  - **Regular yes (Dana):** "טוב תודה", then "אחלה, יופי לשמוע. תפסתי אוֹתָךְ בזמן נוח לשנייה?", then "יש לָךְ דקה קטנה...?", then the facts and "זה מוכר לָךְ, או שאולי זה פשוט התפספס?". She forgot; "קורה, אין שום בעיה", then the link offer, sent.
+  - **Regular no (Omer):** all four steps; the link offered after his reaction and refused; "soon, we'll see" logged as a promise again.
+  - **Busy but yes (Yossi):** "עמוס עמוס" got "אוי, אז אני אקצר" and the good-time question. He said "תגיד מהר" and **was still asked for a quick minute**: one ask too many for someone who already said go ahead. Then the facts, the link, sent.
+  - **Driving (Shiran):** "סליחה שתפסתי אוֹתָךְ באמצע נהיגה!" and the link, sent, "נסיעה טובה".
+  - The gender of every address word was right. Each call is 13 turns against 7 in the reason-first version (the driving one 7). Voiced, the calls run 41-69 s against 37-54 s, before any real reply wait.
+- **Voiced:** 3,314 characters on Homies' Cartesia account, 540 on ours. Local page `local/voice-tests/2026-11-16-steps-page/index.html`, opened for the owner (`build16b.py` in the session scratchpad).
+- **Pushed prompt and opener only** (the link tool's text was already the repo's):
+  - snapshot `local/vapi-debt-live-16nov-before-four-steps.json`;
+  - read back equal, prompt 6,166 characters;
+  - the only fields that differ from the snapshot are `firstMessage`, the system message, `latestVersion` and `updatedAt`.
+
 ### The owner's four steps written into the debt prompt and being played, NOT live yet (the owner pasted a second take: "that exact 4-step conversational flow you wrote works really well"; "also dont use openrouter credits"), from about 11:45 UTC
 - **The take:** the first call's structure was right and only its Hebrew was stiff. The flow:
   1. warm intro and how are you;

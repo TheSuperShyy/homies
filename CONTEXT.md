@@ -4367,7 +4367,7 @@ example, gender and all.
 
 ## The voice prompts
 
-**16 Nov, later: the owner went back to warming up first, in four steps (`prompt.md`, "16 Nov, later"; in the repo and being played, not live yet). How are you; a light "יופי, אחלה" and a good time for a second?; a quick minute about a balance on the apartment, never called small; then the details ending "does it ring a bell, or did it just slip through?", and the link only after they react. A no at any step keeps the sorry and the WhatsApp link below. `voice_qa.py bundle --candidate` plays the candidate's own opener since then.** Until it is pushed, live is still this:
+**16 Nov, later: the owner went back to warming up first, in four steps (`prompt.md`, "16 Nov, later"; LIVE since 12:12:26 UTC, after four played calls went as written). How are you; a light "יופי, אחלה" and a good time for a second?; a quick minute about a balance on the apartment, never called small; then the details ending "does it ring a bell, or did it just slip through?", and the link only after they react. A no at any step keeps the sorry and the WhatsApp link below. `voice_qa.py bundle --candidate` plays the candidate's own opener since then. Its test page is `local/voice-tests/2026-11-16-steps-page/index.html`.** It replaced, except for the no-path, this (live 11:24-12:12 UTC):
 
 **The debt call says why at once, with no small talk (16 Nov, the owner's pasted review of the 11:08 call; it replaced 15 Nov's how-are-you, glad to hear it and a minute named):**
 - **The opener** asks the name and whether it is a good time for a second ("תפסתי אוֹתְךָ / אוֹתָךְ בזמן נוח לשנייה?", pointed by `gender`).
