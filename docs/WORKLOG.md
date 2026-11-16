@@ -42,6 +42,15 @@ conversation that produced it.
   - `VALUES` still names the Brevo settings, which `n8n_standing_order_email.py` imports: n8n still sends the standing-order email through Brevo.
 - **Still open:** the 9 invites sent on 15 Nov sit in spam until each person clicks "Report not spam"; nothing was resent. Gmail's limit is about 500 recipients a day. For go-live, a sender on Homies' own domain.
 
+### The artifact "Four-Step Debt Calls" updated with the calls without "יתרה" (the owner: "update the artifact with the new calls"), version 2, 13:47 UTC
+- **Same link,** https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p. It is shared as "Anyone with the link" now (the owner's setting), so whoever has the link hears version 2.
+- **The calls:**
+  - yes and no from `2026-11-16-debt-flow-noword`;
+  - busy, re-played for the page on the live prompt (`2026-11-16-debt-busy-noword`, one Claude player), because its 12:12 call said "יתרה" at step 3. No word now: "אני אקצר: יש משהו לסדר לגבי התשלום של הדירה, יש לְךָ דקה?", then "ראיתי אצלנו במערכת שנשאר לשלם ועד בית על דירה חמש...". It still asks for the minute after "yes, but quick" (the owner's open question, noted on the page). Voiced: 864 characters on Homies' Cartesia account, 156 on ours;
+  - driving is the 12:12 call: it ends before step 3, and the footer says so.
+- **The step cards** carry the new lines of steps 2-4; the intro says Michael no longer says the word since 12:55 UTC.
+- **Source:** `four-step-page/build.py` in the session scratchpad, each call naming its audio; 64 kbps copies in `local/voice-tests/2026-11-16-noword-page/audio64/`.
+
 ### LIVE 12:55:43 UTC: the word "יתרה" out of the debt call (Yariv, forwarded by the owner: "Remove that word from the script because he didn't say it correctly")
 - **Yariv's suggestion, as he wrote it:** "You have something to do there. I saw on our system you need to pay by August, something like that."
 - **`prompt.md` (debt), three places and one bullet ("16 Nov, afternoon"):**

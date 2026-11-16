@@ -15,10 +15,10 @@ appended to.
 >     3. A quick minute, because there is something to sort out about the apartment's payment (Yariv's words). Never called small, and never "יתרה": a word rule keeps it out even when the tenant says it.
 >     4. What Michael saw in our system, what is left to pay (house committee, apartments, months, amount), and "does it ring a bell, or did it just slip through?". The link only after they react.
 >     - A no at any step: a short sorry and the WhatsApp link, no callback slot.
->   - **Played and voiced first:** yes, no, busy and driving all went as written. The owner's page is the artifact "Four-Step Debt Calls", https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p (private until shared; source `four-step-page/build.py` in the session scratchpad); the local copy is `local/voice-tests/2026-11-16-steps-page/index.html`.
+>   - **Played and voiced first:** yes, no, busy and driving all went as written. The owner's page is the artifact "Four-Step Debt Calls", https://claude.ai/artifact/Vn54ZfvytKHPsNpSRvhU6p (anyone with the link can open it; version 2 has the calls without "יתרה"; source `four-step-page/build.py` in the session scratchpad); the local copy is `local/voice-tests/2026-11-16-steps-page/index.html`.
 >     - Seen: a busy tenant who already said "תגיד מהר" is still asked for the minute. That is the owner's call: skip step 3 after an explicit go-ahead?
 >     - Calls are about 6 turns longer than the 11:24 version.
->   - **Without "יתרה", played and voiced (yes and no):** the word is gone from both, and local speech-to-text heard the new lines right. Page `local/voice-tests/2026-11-16-noword-page/index.html`; the artifact still plays the 12:12 version.
+>   - **Without "יתרה", played and voiced (yes and no):** the word is gone from both, and local speech-to-text heard the new lines right. Page `local/voice-tests/2026-11-16-noword-page/index.html`. The artifact has them since version 2 (13:47 UTC), with busy re-played too; driving is the 12:12 call, which ends before step 3.
 >     - To listen for: speech-to-text heard "התפספס" as "יתפספס" in both calls. Not changed.
 >     - Not changed: the incoming phone line still has the word once ("לבדוק יתרת תשלומים" in its tool list).
 >   - **Rollback:** to the 12:12 version (with "יתרה"), PATCH `model` from `local/vapi-debt-live-16nov-before-no-yitra.json`. To the 11:24 version, PATCH `model` and `firstMessage` from `local/vapi-debt-live-16nov-before-four-steps.json`. To 15 Nov, use `local/vapi-debt-live-16nov-before-reason-first.json`.
