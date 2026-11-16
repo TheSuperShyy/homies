@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The word "יתרה" out of the debt call (Yariv, forwarded by the owner: "Remove that word from the script because he didn't say it correctly"), being played, NOT live yet
+- **Yariv's suggestion, as he wrote it:** "You have something to do there. I saw on our system you need to pay by August, something like that."
+- **`prompt.md` (debt), three places and one bullet:**
+  - step 3 asks for the quick minute because there is something to sort out about the apartment's payment;
+  - step 4 says what Michael saw in our system, what is left to pay;
+  - the dispute answer says the payment is still open;
+  - a new bullet in the word rules keeps the word out of the call even when the tenant says it, and gives what to say instead. Prompt 6,166 -> 6,287 characters; opener and tools unchanged (dry run).
+- **Played on the candidate:** `local/voice-tests/2026-11-16-debt-flow-noword/` (yes and no, Claude players, no OpenRouter).
+
 ### The staff's Chatwoot invite lands in spam, its button dead (the owner: "the email invitation was sent in the spam and is not clickable"), 12:25 UTC, read only
 - **Why it can't be clicked:** Gmail turns off the links of any message it files as spam (Outlook does the same in Junk). The links themselves are right: absolute https to `chat.srv1879140.hstgr.cloud/app/auth/password/edit?locale=he&reset_password_token=…` (the template and the 15 Nov preview). Out of spam the button works.
 - **Why it is spam:** the From is `testclix46@gmail.com`, but the mail leaves through Brevo (`smtp-relay.brevo.com:587`, read in the live `/opt/chatwoot/.env`, no secret printed). Brevo can sign only for a domain authenticated with it, and nobody can authenticate gmail.com. So nothing in the mail proves it came from Gmail: gmail.com's DMARC fails (its record: `p=none; sp=quarantine`), and Google files such mail as spam. `homies-management.co.il` is on Google Workspace (MX aspmx.l.google.com), so every staff mailbox meets that filter.
