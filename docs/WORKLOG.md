@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### The owner's four steps written into the debt prompt and being played, NOT live yet (the owner pasted a second take: "that exact 4-step conversational flow you wrote works really well"; "also dont use openrouter credits"), from about 11:45 UTC
+- **The take:** the first call's structure was right and only its Hebrew was stiff. The flow:
+  1. warm intro and how are you;
+  2. a light "יופי, אחלה" and "תגיד/תגידי, תפסתי אותך בזמן נוח לשנייה?";
+  3. "רציתי רק לשאול אם יש לך דקה קטנה לדבר על איזו יתרה קטנה שמופיעה אצלנו במערכת לגבי הדירה";
+  4. the details (house committee, flat, months, amount) ending "רציתי רק לבדוק איתך אם זה מוכר לך או שאולי זה פשוט התפספס?". The link waits until they react.
+- **Written into `prompt.md`** as a direction, not wording (its rule 1, and the owner's "guide only" of 15 Nov):
+  - The opener is "היי, {{first_name}}? [greeting by the hour]! מדבר מיכאל מהצוות של הומי'ז, מה נשמע?". The name stays a question because it is the identity check. The gender branch went with "תפסתי אותך", which moved to step 2; the pointing bullet gains אוֹתְךָ / אוֹתָךְ.
+  - The balance is never called small, since it is not always.
+  - Kept from 11:24: a no or a busy tenant at any step gets a short sorry and one offer, the link on WhatsApp, and no callback slot.
+  - Note "16 Nov, later" above the prompt.
+- **`voice_qa.py bundle --candidate`** now takes the first message from the candidate prompt's '### הפתיחה' blockquote, not the live one, so a new opening is heard before it is pushed. Its flags go after `--run DIR`.
+- **Playing (Claude players, Cartesia to follow, no OpenRouter):** runs `local/voice-tests/2026-11-16-debt-{flow,busy}-steps/`, the same four cards as the 11:30 test.
+  - Regular no (Omer) went through all four steps: "יופי. תפסתי אוֹתְךָ...?", then "יש לְךָ דקה קטנה?", then the facts and "זה מוכר לְךָ, או שאולי זה פשוט התפספס?". The link came after his reaction. His "soon, we'll see" was logged as a promise again. 13 turns, against 7 in the reason-first version: each added step is one more reply wait (2.7-4 s on the 11:08 call).
+  - Driving (Shiran): "סליחה שתפסתי אוֹתָךְ באמצע נהיגה!" and the link, sent.
+  - The yes and the busy calls were still playing at commit time.
+
 ### The new debt script played and voiced with Cartesia, 11:30-11:40 UTC (owner: "lets test first using cartesia")
 - **Four ordinary calls on the live prompt of 11:24.** Blind Claude players, one per call; `voice_qa.py bundle` on `voice_qa_debt_flow.json` and `voice_qa_debt_busy.json`, runs `local/voice-tests/2026-11-16-debt-{flow,busy}/`. All four openers rendered by gender: Dana and Shiran got אוֹתָךְ, Omer and Yossi אוֹתְךָ.
   - **Regular yes (Dana):** "yes sure, what's up". Michael at once: the house committee payment for flat four, July and August, 500 shekels, "only to make sure it didn't slip through", and the link. Dana: "I completely forgot". Michael: "קורה לכולם", sent (the number's last four), warm close.

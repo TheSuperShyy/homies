@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **16 Nov about 11:50 UTC: `prompt.md` (debt) is AHEAD of the live agent.**
+>   - **In the repo, not pushed:** the owner's four steps (how are you; "יופי, אחלה", a good time for a second?; a quick minute about a balance on the apartment; the details and "does it ring a bell, or did it just slip through?", the link only after they react). The opener asks "מה נשמע?" again.
+>   - **Live** is still the 11:24 reason-first version (the opener asks "a good time for a second?" and the reason comes right after the yes).
+>   - Being played on the candidate (`voice_qa.py bundle --run DIR --deck ... --candidate`) for the owner to hear first. **Push it only after that**, as the 11:24 push was made: prompt and opener only, a snapshot first, read back after.
+>   - Do not describe the live call from `prompt.md` until then.
+>
 > **LIVE 16 Nov 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out** (the owner pasted a review of the 11:08 call to Ido; WORKLOG 16 Nov; `docs/features/10-debt-followup/prompt.md`, "16 Nov").
 >   - **Opener:** "היי, {{first_name}}? [greeting by the hour], מדבר מיכאל מהצוות של הומי'ז. תפסתי [אוֹתְךָ / אוֹתָךְ by `gender`] בזמן נוח לשנייה?" No "how are you". The name is still the identity question, so money waits for the answer.
 >   - **After the yes:** the apartment payment, what the system shows (apartments, months, amount), and "only to make sure it did not slip through". **On a no or busy:** a short sorry and one offer, the link on WhatsApp. No callback slot is asked for, since nothing records one.

@@ -136,9 +136,13 @@ def bundle(run, deck_path=DECK, candidate=False, name_required=None, cap=None):
         prompt, first, tools = P.live_prompt(P.TARGETS[target])
         if candidate:
             # 22 Oct, feature 17: the working tree's prompt and tools, so a
-            # change is played before it is synced. The live first message
-            # stays; the candidate does not change it.
+            # change is played before it is synced. 16 Nov: the opener too, when
+            # the prompt carries it (the debt prompt's '### הפתיחה' blockquote is
+            # the first message), so a new opening is heard before it is live.
             prompt = P.file_prompt(P.TARGETS[target], os.path.join(ROOT, P.TARGETS[target]["doc"]))
+            opener = re.search(r"### (?:Opening|הפתיחה)\s*\n+> (.+)", prompt)
+            if opener:
+                first = opener.group(1).strip()
             tools = P.repo_tools(P.TARGETS[target])
         live[target] = (prompt, first, tools)
         print("%-8s live prompt %d chars, first message %d chars, tools: %s"
