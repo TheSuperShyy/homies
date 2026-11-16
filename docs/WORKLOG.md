@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### A question answered, read only: are today's voice agent changes live (the owner: "the voice agent is live right the changes"), 15:32 UTC
+- **Yes.** The debt agent (`4bc03b57`) was last updated at 12:55:43 UTC. Its system prompt is the whole "## System prompt" section of `docs/features/10-debt-followup/prompt.md`, including "### הפתיחה" (6,287 characters), and its `firstMessage` equals the opener there.
+  - So the four steps, the payment link only after the tenant reacts, and a no that gets a sorry and the WhatsApp link are all live.
+  - יתרה appears once, in the rule that bans it. gpt-5.6-sol, reasoning low, Cartesia sonic-3.5.
+- **The faster opening is live too:** PR #14 merged 10:54 UTC, and the owner's 11:08 call opened in 1.30 s.
+- To compare the live prompt with the file, cut the section at the next "## " heading, not at "### הפתיחה" (that cut leaves the file 241 characters short).
+
 ### Ido re-added by the owner, and the invite through Gmail worked (the owner: "what is the availability", with a screenshot of the Edit Agent form), 13:40 UTC, read only
 - **#16 "Ido Clix ADMIN":** the owner added it from the dashboard at 13:15:28 UTC (`POST /agents` from the owner's IP). In the database it is administrator (`account_users.role` 1), availability online (0), auto-offline on. The screenshot's form shows the role as "agent", unsaved.
 - **The invite went out through Gmail:** sidekiq job `032765c1` ran 13:15:28–13:15:29 with no error. **Ido set a password at 13:34:28 UTC** (four `PUT /auth/password` from an Israeli address; `confirmed_at` set; `sign_in_count` still 0). So the email arrived and its button worked: the first real proof of the 12:46 switch.
