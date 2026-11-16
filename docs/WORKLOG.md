@@ -11,6 +11,38 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### LIVE 10:54-10:55 UTC: a call's opening no longer waits for debt-tools to start, and the dialer page waits 25 s for Tokomni (owner: "make the opening faster so there's no silence also fix the error on our side"; PR #14, `3a099cd`)
+- **Correction to the 10:11 entry below:** the 1.9 s "before Vapi asked us" was ours. Supabase's request log for that call (`log_attributes`: `execution_time_ms` 2,395, `x_envoy_upstream_service_time` 2,031) puts its arrival at about 10:11:29.78, 0.2 s after Omni's authed INVITE. The 10:11 call's 4.5 s:
+  - 0.2 s from the INVITE until Vapi's assistant-request reached Supabase;
+  - 2.4 s debt-tools on a cold worker: booted 31.49 (1.7 s after the request arrived), route 32.12, answered 32.17;
+  - 0.13 s to Vapi's 200 OK (32.30);
+  - 1.6 s from the 200 OK to Michael's first word (33.92).
+- **A warm worker:** route probes (`route_probe.py` in the session scratchpad: a fake dialer call for flat 1, number read from the database, rings nobody, writes nothing) took 1,003 ms server-side cold and 139-163 ms warm. The router's one lookup takes about 27 ms inside the database (EXPLAIN ANALYZE).
+- **Why nothing kept it warm:**
+  - On the free plan a worker stops taking requests about 75 s after it starts, busy or not: every shutdown in the function logs of 13-16 Nov comes 75 s after its boot.
+  - n8n's 2-minute caller (ua `n8n`, Hostinger in Frankfurt) hits debt-tools with no `x-region`. Its workers start in eu-central-1, take about 1 s each, and never served a Tokyo call: the 10:11 call and a 10:41 probe each started their own worker.
+- **Changed and live:** PR #14 merged 10:54:12 UTC; CI deployed the function at 10:54:46; both Vercel projects READY on `3a099cd`.
+  - `supabase/041_keep_debt_tools_warm.sql` and `scripts/keep_warm.py`, applied at 10:55:
+    - pg_cron and pg_net are enabled;
+    - job 1 `keep-debt-tools-warm` runs every 15 s and posts `{"message":{"type":"keep-warm"}}` pinned to ap-northeast-1;
+    - the secret comes from the vault as `debt_tools_tool_secret`, put there from `.env` TOOL_SECRET by the script and never printed;
+    - job 2 `purge-cron-run-details` deletes run rows older than a day, at 03:17 UTC.
+    - The first ping ran at 10:55:41 and got 200 `{"ok":true,"warm":true,"voice":true,"ms":64}`.
+  - debt-tools: `keep-warm` does the cold parts once per worker (a `residents` read, and the debt agent's voice for a woman's call). A woman's dialer call now reads the voice beside the queue lookup, not after it.
+  - /dialer:
+    - waits up to 25 s for Tokomni (`TOKOMNI_WAIT_MS`, was 8), with the page's `maxDuration` at 30;
+    - the "unclear" message says to wait a minute for the ring before pressing again;
+    - Tokomni's `POST []` answered in 0.32-1.43 s at 10:44.
+  - Tests: 67/67 (LF line endings; the 3 call.ts tests fail only in a CRLF checkout), plus two new guards.
+  - Cherry-picked onto feature/chatbot (`5ff4ce3`); the changed files equal main.
+- **Cost:** about 173,000 function calls a month at 4 a minute, on the free plan's 500,000. The project used about 22,000 a month before (731 in the 24 h to 10:30).
+- **Not changed, on Vapi's side:** the 1.3-1.6 s from Vapi's answer to Michael's first word.
+  - When Vapi has said the exact opening recently, Michael starts 0.3-0.4 s after the voice connects: 13 Nov 08:21 came a minute after 08:20, and 15 Nov 09:29 after the 09:16-09:17 calls. A new sentence takes about 1.3 s. Every phone call in Vapi's 14-day history fits this.
+  - Cartesia itself gives first audio for this opening in 0.32-0.46 s on WebSocket, fresh connection or not. It makes the whole opening in 0.9-1.2 s over REST, and the first sentence alone in 0.5-0.8 s.
+  - A Vapi support thread says the fixed first message is made whole and cached. So a tenant's name never heard before costs about 1 s there.
+  - The levers left both change the opener the owner approved: a shorter first sentence, or an opening written by the model. That is the owner's call (greeting rule: show examples first).
+- **Still running at commit time:** a voice idle test (rounds 15 minutes apart, from 10:45) and 8 route probes 37 s apart (from about 10:56).
+
 ### The owner's dialer test to Ido, 10:11 UTC: "unclear whether it was sent" (a timeout), but it went in and rang; the phone hung up 2 s in, after about 4.5 s of silence (owner's screenshot of /dialer; read only)
 - **The page:** "Unclear whether ... was sent: no answer from Tokomni (TimeoutError ...)". The page waits 8 s for Tokomni's answer (`dashboard/lib/dialer.ts`), and Tokomni answered later than that.
 - **It went in anyway:** Omni's dialer sent the call to 208 at 10:11:29.4 UTC (`tokomni_lead.py --check`: call `01a1e3d7`, debt agent, `dialer-<number>`). So pressing again would ring Ido a second time.
