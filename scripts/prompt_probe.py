@@ -348,7 +348,7 @@ def repo_tools(target):
 def resolve(prompt, variables):
     for k, v in variables.items():
         prompt = prompt.replace("{{%s}}" % k, v)
-    return render_hours(render_now(render_greeting(prompt)))
+    return render_hours(render_now(render_greeting(render_gender(prompt, variables.get("gender")))))
 
 
 # The opening line greets by the hour since 22 Sep: a Liquid `{% %}` block that
@@ -393,6 +393,15 @@ def render_greeting(text, hour=None):
         return text
     h = jerusalem_now().hour if hour is None else hour
     return GREETING_BLOCK.sub(lambda m: pick_branch(m.group(0), h), text)
+
+
+# 16 Nov: the debt opener says "תפסתי אותך" with אותך pointed by the tenant's gender: a Liquid if on
+# `gender` that Vapi renders from the call's variables ('f' feminine; 'm' and 'unknown' masculine).
+GENDER_BLOCK = re.compile(r'\{%-?\s*if\s+gender\s*==\s*"f"\s*-?%\}(.*?)\{%-?\s*else\s*-?%\}(.*?)\{%-?\s*endif\s*-?%\}', re.S)
+
+
+def render_gender(text, gender=None):
+    return GENDER_BLOCK.sub(lambda m: m.group(1) if gender == "f" else m.group(2), text)
 
 
 def render_now(text, now=None):

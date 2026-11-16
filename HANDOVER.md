@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 16 Nov 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out** (the owner pasted a review of the 11:08 call to Ido; WORKLOG 16 Nov; `docs/features/10-debt-followup/prompt.md`, "16 Nov").
+>   - **Opener:** "היי, {{first_name}}? [greeting by the hour], מדבר מיכאל מהצוות של הומי'ז. תפסתי [אוֹתְךָ / אוֹתָךְ by `gender`] בזמן נוח לשנייה?" No "how are you". The name is still the identity question, so money waits for the answer.
+>   - **After the yes:** the apartment payment, what the system shows (apartments, months, amount), and "only to make sure it did not slip through". **On a no or busy:** a short sorry and one offer, the link on WhatsApp. No callback slot is asked for, since nothing records one.
+>   - `send_payment_link` now fits "to pay now or when it suits them". The harness renders the gender branch (`prompt_probe.render_gender`).
+>   - **Rollback:** PATCH the snapshot's `model` and `firstMessage` back (`local/vapi-debt-live-16nov-before-reason-first.json`), then revert `prompt.md` and `vapi_tools.py`.
+>   - **Owed:** one real call to hear it (the owner's Ring to Ido). The test pages of 15 Nov show the old opener until played again.
+>
 > **LIVE 16 Nov 10:54-10:55 UTC: debt-tools is kept warm in Tokyo, so a call's opening no longer waits for a worker to start** (owner: *"make the opening faster so there's no silence also fix the error on our side"*; PR #14 `3a099cd`; WORKLOG 16 Nov).
 >   - **Running in the database:**
 >     - pg_cron job 1 `keep-debt-tools-warm` posts `keep-warm` to debt-tools every 15 s, pinned to ap-northeast-1;
@@ -38,7 +45,7 @@ appended to.
 >   - **Tested Claude-played and voiced with Cartesia** (11:00 UTC): money tight, too much, already paid, all three as asked, no hand-over. Page: https://claude.ai/artifact/6d2UkokJTfwD5aKVq5VLcC. Since 11:40 UTC the page opens with "the general flow": six steps and two ordinary calls, a regular yes (Dana) and a regular no (Omer), played like real tenants (`scripts/voice_qa_debt_flow.json`); the special cases follow. Its page source is built by a script in the session scratchpad, so a later edit rebuilds it from the transcripts or reads the published page first. Since version 7 (12:17 UTC) all five are the replays on the pointed-words prompt (`local/voice-tests/2026-11-15-debt-{money,flow}-v2/`), each voiced. Seen, not changed: a link offered for one month still carries the whole balance, and partial payment or interest has no answer in the prompt.
 >   - **Owed:** one real call to hear it (the owner's Ring to Ido, playing one of these).
 >
-> **LIVE 15 Nov, 09:41:58 UTC: the debt call's small talk is warmer and the minute is named** (owner: *"ask how the person is doing and then if they are happy then it can say like oh glad to hear / do you have a minute to talk about the balance you have active on the apartment?"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov").
+> **LIVE 15 Nov, 09:41:58 UTC: the debt call's small talk is warmer and the minute is named** (**superseded 16 Nov 11:24 UTC:** no small talk, the reason first; the top entry) (owner: *"ask how the person is doing and then if they are happy then it can say like oh glad to hear / do you have a minute to talk about the balance you have active on the apartment?"*; WORKLOG 15 Nov; `docs/features/10-debt-followup/prompt.md`, "15 Nov").
 >   - **The debt agent `4bc03b57` only,** one sentence of its prompt (5,067 characters): glad for the tenant in a few words when things are good, nothing about himself unless asked, then a minute "to talk about the balance open on the flat" in place of "a minute for something important". The opening line, the name check before money, the facts, the link offer and the closing are unchanged. The incoming agent is untouched.
 >   - **Pushed prompt-only and read back equal;** tools, first message and every other field unchanged. Snapshot `local/vapi-debt-live-15nov-before-glad.json`.
 >   - **Owed:** one real call to hear it, the owner's Ring to Ido on /dialer (one press, in calling hours), then its transcript on Vapi.

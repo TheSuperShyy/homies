@@ -147,6 +147,7 @@ def bundle(run, deck_path=DECK, candidate=False, name_required=None, cap=None):
     for s in deck["scenarios"]:
         prompt, first, tools = live[s["agent"]]
         values = dict(s.get("vars") or {})
+        gender = values.get("gender")
         if "gender" in values:
             values["gender_forms"] = forms.get(values.pop("gender"), forms["unknown"])
         for k, v in values.items():
@@ -159,6 +160,7 @@ def bundle(run, deck_path=DECK, candidate=False, name_required=None, cap=None):
         days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
         day = days.index(s["weekday_he"]) if s.get("weekday_he") in days else 1
         now = datetime.datetime(2026, 10, 4 + day, hh, mm)
+        prompt, first = P.render_gender(prompt, gender), P.render_gender(first, gender)
         prompt = P.render_hours(P.render_now(P.render_greeting(prompt, hh), now), now)
         first = P.render_now(P.render_greeting(first, hh), now)
         left = [v for v in re.findall(r"\{\{[^}]+\}\}", prompt + first) if v != "{{...}}"]

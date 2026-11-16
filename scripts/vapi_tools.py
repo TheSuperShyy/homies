@@ -318,7 +318,7 @@ DEBT_TOOLS = [
         # 20 Sep, owner: the link goes to WhatsApp during the call, and the
         # agent says so -- where it went, which number, please complete it --
         # in its own words. The result carries `sent` and never a URL.
-        "Call once the resident has agreed to settle, and once per call. The payment "
+        "Call once the resident has agreed to get the link, to pay now or when it suits them, and once per call. The payment "
         "link goes to their WhatsApp, at the number Homies has on file for them; "
         "nothing is charged and no card is involved. The result says whether it went "
         "(sent true or false). When it went, tell them in your own words where it "

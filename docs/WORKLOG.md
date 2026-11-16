@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-11-16
 
+### LIVE 11:24:00 UTC: the debt call says why at once, and a no gets an easy way out (the owner pasted a review of the 11:08 call)
+- **The review, pasted without a note:**
+  - asking how he is and then naming "the balance open on the flat" felt like a bait-and-switch;
+  - "שמח לשמוע?" came out as a question;
+  - "the balance open to you for the apartment" sounds translated;
+  - answering a no with "when shall we call you back?" reads like a telemarketer.
+  - It gave an opener ("היי עידו, צהריים טובים! ... תפסתי אותך בזמן נוח לשנייה? אני מתקשר רגע לגבי התשלום של הדירה."), a blame-free pivot ("ראיתי אצלנו במערכת שנשארה איזו יתרה קטנה פתוחה ... רק לוודא ... שזה לא סתם התפספס"), and for a no: "sorry for the interruption, talk later today, or should I send a WhatsApp message?".
+- **Applied, in meaning, where it met standing rules:**
+  - **Opener (fixed line, Vapi speaks it):** "היי, {{first_name}}? [בוקר טוב / צהריים טובים / ערב טוב], מדבר מיכאל מהצוות של הומי'ז. תפסתי [אוֹתְךָ / אוֹתָךְ] בזמן נוח לשנייה?"
+    - אותך is pointed by a Liquid branch on `gender`: 'f' feminine, 'm' and 'unknown' masculine.
+    - The name is still a question, because it is the identity check: no word about money before it is answered. So the review's "I'm calling about the apartment payment" comes right after the yes instead.
+  - **Prompt, described not scripted:**
+    - no small talk before the reason ("whoever is asked how they are and then hears about a payment feels tricked");
+    - after the yes: the apartment payment, what Michael sees in the system, the three facts with the amount, and that he only wants to make sure it did not slip through ("a check, not a blame"). "A small balance" is not used, since a balance is not always small;
+    - a no or a busy tenant: no pressure and no callback slot asked for. A short sorry for the interruption, and one offer: the payment link on WhatsApp, to look at when it suits them;
+    - "talk later today" is left out, because nothing records a callback time;
+    - "לא מתנצלים על עצם השיחה" went from the money sentence, since the sorry contradicted it.
+  - **`send_payment_link`:** "agreed to settle" became "agreed to get the link, to pay now or when it suits them", so the tool does not refuse the busy case.
+  - **The harness:** `prompt_probe.render_gender` renders the branch, and `voice_qa.py` uses it before checking for unresolved placeholders.
+- **Pushed prompt, opener and that one tool text only:**
+  - snapshot `local/vapi-debt-live-16nov-before-reason-first.json`;
+  - read back equal to the repo, prompt 5,961 characters; field by field, the only other change is Vapi's `latestVersion` v11 → v12.
+- **Checked, free:**
+  - the opener rendered for m, f and unknown at 09, 14 and 19;
+  - `voice_qa.py bundle` built both flow calls from the live agent (Omer אוֹתְךָ, Dana אוֹתָךְ);
+  - node tests 59/59, name flow OK.
+- **Not played or voiced** (the owner's real call is the test). The test pages of 15 Nov are out of date until played again.
+- **Cost of the name in the opener:** the line is about 80 characters and unique per tenant. Vapi makes it whole before playing, so expect about 1.3 s or a little more after Vapi answers on a new name.
+
 ### The owner's dialer call to Ido at 11:08 UTC: transcript and recording given, and the opening measured at 1.30 s, was 4.52 (owner: "give me the transscript and the recording of the call i made minutes ago"; read only)
 - **The call:** `01a1e40a`, debt agent, 23 s, the tenant hung up (Q.850 16). Recording, SIP capture and log are in `local/calls/2026-11-16/` (`110802-*`, gitignored). An MP3 for the owner is `call-2026-11-16-1908-PH.mp3`, opened in File Explorer.
 - **What was said:** Michael's lines were checked on his own channel with local faster-whisper; the tenant's are from Vapi's live transcript. Whisper heard a hallucinated "thank you" on the tenant's quiet channel, so it is not used for the tenant.
