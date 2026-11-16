@@ -4894,12 +4894,34 @@ async function liveDebtVoice(): Promise<Record<string, unknown> | null> {
   }
 }
 
+/**
+ * The keep-warm ping (supabase/040_keep_debt_tools_warm.sql): pg_cron posts
+ * `keep-warm` every 15 s, pinned to Tokyo as Vapi's calls are, so a call's
+ * `assistant-request` finds a worker already running. On 16 Nov the first call
+ * after a quiet spell waited 2.4 s here, 1.7 s of it a worker starting, before
+ * Vapi could answer the line; a warm worker routes it in about 0.15 s. A worker
+ * on this plan lives about 75 s, so the ping comes well inside that.
+ *
+ * It does the cold parts once per worker: the connection to the database, and
+ * the debt agent's voice for a woman's call. Never throws.
+ */
+async function keepWarm(): Promise<Record<string, unknown>> {
+  const started = Date.now();
+  const { error } = await db.from("residents").select("id").limit(1);
+  const voice = await liveDebtVoice();
+  return { ok: !error, warm: true, voice: Boolean(voice), ms: Date.now() - started };
+}
+
 async function assistantFor(message: any): Promise<Record<string, unknown>> {
   const intake = { assistantId: INTAKE_ASSISTANT_YARIV };
   try {
     const call = { ...(message?.call ?? {}) };
     if (!call.customer) call.customer = message?.customer ?? {};
     const phone = isDialerCall(call) ? callNumberOf(call) : null;
+    // A woman's call needs the live voice. Asked now, beside the database rather
+    // than after it, so a worker that has not kept it yet costs the longer of the
+    // two, not both. A man's call never waits for it. Never throws.
+    const voiceRead = phone ? liveDebtVoice() : Promise.resolve(null);
     let rows: unknown[] = [];
     if (phone) {
       const { data, error } = await db.from("v_debt_call_queue_person")
@@ -4918,7 +4940,7 @@ async function assistantFor(message: any): Promise<Record<string, unknown>> {
     const variableValues = debtVariables(route.row, route.phone, fixed);
     const assistantOverrides: Record<string, unknown> = { variableValues };
     if (variableValues.gender === "f") {
-      const voice = voiceForGender("f", await liveDebtVoice(),
+      const voice = voiceForGender("f", await voiceRead,
         Deno.env.get("CARTESIA_DICT_FEMININE") ?? FEMININE_DICT);
       if (voice) assistantOverrides.voice = voice;
       console.log("route voice", voice ? "feminine dictionary" : "kept (no voice read)");
@@ -4958,6 +4980,11 @@ Deno.serve(async (req) => {
   if (type && !calls.length) {
     if (type === "assistant-request") {
       return new Response(JSON.stringify(await assistantFor(message)), {
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (type === "keep-warm") {
+      return new Response(JSON.stringify(await keepWarm()), {
         headers: { "content-type": "application/json" },
       });
     }

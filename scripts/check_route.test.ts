@@ -116,3 +116,19 @@ test("voiceForGender: the dialer and the Call button use the same feminine dicti
   assert.ok(callTs.includes(FEMININE_DICT), "dashboard/lib/call.ts names another feminine dictionary");
   assert.equal(voiceForGender("f", { provider: "cartesia", voiceId: "v" })?.pronunciationDictId, FEMININE_DICT);
 });
+
+test("keep-warm: the pg_cron ping and the function agree, and the ping is pinned where Vapi's calls run", () => {
+  const index = readFileSync(new URL("../supabase/functions/debt-tools/index.ts", import.meta.url), "utf8");
+  const job = readFileSync(new URL("../supabase/041_keep_debt_tools_warm.sql", import.meta.url), "utf8");
+  // The function answers the ping by name; anything unnamed is only "ignored" and warms nothing.
+  assert.ok(index.includes('type === "keep-warm"'), "index.ts no longer answers keep-warm");
+  assert.ok(job.includes('{"message":{"type":"keep-warm"}}'), "041 pings with another message type");
+  // Vapi's calls are pinned to Tokyo (the phone number's and the agents' x-region); a ping that is not
+  // starts its workers elsewhere and never serves a call (n8n's from Frankfurt, 16 Nov).
+  assert.ok(job.includes("'x-region', 'ap-northeast-1'"), "041's ping lost its Tokyo pin");
+  // Workers stop taking requests about 75 s after they start; the ping must come well inside that.
+  const every = Number(/'(\d+) seconds'/.exec(job)?.[1]);
+  assert.ok(every > 0 && every <= 20, `041 pings every ${every} s; keep it at 20 s or less`);
+  // The secret comes from the vault, never from the file.
+  assert.ok(job.includes("vault.decrypted_secrets"), "041 must read the secret from the vault");
+});
