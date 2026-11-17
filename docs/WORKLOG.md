@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### A question answered, read only: how a chat started from Chatwoot works with the bot (the owner: "ok now how will it work"), 13:50 UTC
+- **Read in the live Sort code** (`u2JjrbcNPYyyh3yl`, lines 40-85):
+  - an outgoing public message from a `user` claims the conversation (`_claim`, then `Assign to the replier`);
+  - the bot keeps out while a User is assigned, a `bot-off` label is on, or the conversation is resolved;
+  - Chatwoot's own AgentBot assignment is not a takeover.
+- **So the flow is:**
+  - a contact, then a template from the inbox;
+  - the conversation is assigned to the sender and the bot stays out;
+  - the tenant's reply opens 24 hours of free text for that agent;
+  - no reply in 24 hours means templates only again;
+  - removing the assignee hands the chat back to the bot.
+- **The gap:** a general opener template (only `ticket_resolved_he` and `payment_link_he` exist). It is offered as a draft for the owner to approve. CONTEXT has the three switches.
+
 ### A question answered, read only: can Chatwoot start a WhatsApp chat with a new number (the owner: "can we add a new contact like whatsapp like chat a new phone number"), 13:40 UTC
 - Yes: Contacts → New contact, then a new conversation in inbox 1 ("WhatsApp — Homies", `Channel::Whatsapp`, provider `whatsapp_cloud`).
 - WhatsApp allows only an approved template to a number that has not written in 24 hours. Inbox 1's synced templates, read live: `ticket_resolved_he` and `payment_link_he`, both APPROVED, UTILITY, he. Neither fits a first message.
