@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### The general staff opener `homies_hello_he` submitted to Meta on both WABAs (the owner: "it should be like for everyone for example a new person that is not related", then "ok"), 14:47:51 UTC
+- **The owner turned down the two drafts with a subject blank,** which were tied to a matter. Wanted: one text for anyone, a tenant or a person with no tie to Homies.
+- **The text:** "שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?". No blanks; gender-neutral; ends on a question so the reply opens the 24 hours. Category MARKETING, since a general message is tied to no transaction. The owner was told it costs a little more and offers an opt-out.
+- **`templates.md` gained the section.** The first dry run caught "category" read whole, explanation and all, so the reason went to its own bullet and the category is just `MARKETING`.
+- **Submitted with `wa_templates.py create homies_hello_he --apply` and again with `--waba 1389698653006050 --apply`:** id `4804153076538574` on `…632`, id `1971092067601403` on "hadas 1" `…050`. Both PENDING.
+- **Told to the owner before submitting:** WhatsApp's opt-in rule. Messaging strangers who block or report it lowers the number's rating, which is already TIER_250, Meta's limit of 250 new chats a day.
+
 ### The staff opener template drafted, two options, nothing submitted (the owner: "ok draft the template"), 14:00 UTC
 - For starting a WhatsApp chat with a new number from Chatwoot, where a number that has not written in 24 hours can get only an approved template.
 - **Name `service_followup_he`, UTILITY, he.** Written to `templates.md`'s rules: no variable at the start or end, gender-neutral (no gendered verb, no plural, no slash), ending on a question so the reply opens the window. The subject sits in a variable to keep it a service message, not marketing.

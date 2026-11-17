@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **SUBMITTED 17 Nov 14:47:51 UTC: the staff opener template `homies_hello_he`, PENDING Meta's review** (the owner's "ok"; WORKLOG 17 Nov; `docs/features/11-whatsapp-bot/templates.md`).
+>   - The text: "שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?". MARKETING, he, no blanks. For a staff member opening a chat from Chatwoot with any number, tenant or not.
+>   - **On both WABAs, as the two-account rule says:** `.env`'s `…632` (Chatwoot's list), id `4804153076538574`; "hadas 1" `…050` (where sends are looked up), id `1971092067601403`.
+>   - **Next:** `python scripts/wa_templates.py` and `--waba 1389698653006050` until both read APPROVED, then `wa_templates.py chatwoot` until inbox 1 has it, then tell the owner it is in Chatwoot's template picker. A REJECTED reason is printed by `list`.
+
 > **LIVE 17 Nov 13:05-13:06 UTC: a standing order is answered with the payment link first, on WhatsApp (epoch 110) and on the debt call** (the owner: "ok go ahead and make the change"; WORKLOG 17 Nov; CONTEXT, "The owner's decision, 17 Nov").
 >   - **WhatsApp, 13:05:15 UTC** (`scripts/n8n_whatsapp_standinglink.py`):
 >     - prompt `2c95b2d3aaa6`, tools `244f68113181`, memory `-110`;

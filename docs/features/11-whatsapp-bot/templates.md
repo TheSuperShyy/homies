@@ -90,3 +90,33 @@ variable, which Meta's reviewers read).
   - `{{3}}` — the OXS payment link, verbatim. **Never written to a log, never
     read aloud, never printed whole anywhere.**
 - **examples:** `יולי 2026` · `450` · `https://example.com/pay/sample`
+
+---
+
+## homies_hello_he
+
+- **What:** a general first message a staff member sends from Chatwoot to open a
+  WhatsApp chat with any number that has not written to us in 24 hours: a tenant,
+  or someone with no tie to Homies yet. Once they reply, the staff member writes
+  freely for 24 hours. A staff member's message assigns the conversation to them,
+  so the bot keeps out of it (CONTEXT, Sort's three off switches).
+- **Decided:** owner, 17 Nov 2026: *"it should be like for everyone for example a
+  new person that is not related"*, then *"ok"* to this wording. The same text for
+  everyone, no blanks, so there is nothing to fill in.
+- **Sender:** a staff member, by hand, from Chatwoot (inbox 1, a new
+  conversation, this template). Nothing automatic sends it.
+- **Accounts:** created on both WABAs: `.env`'s (`…632`, Chatwoot's template
+  list) and "hadas 1" (`…050`, where the number's sends are looked up).
+- **Opt-in:** WhatsApp's policy wants people who agreed to hear from Homies. A
+  stranger who blocks or reports it lowers the number's rating (TIER_250 already).
+- **Why MARKETING:** a general message tied to no transaction. Meta decides the
+  category in the end.
+- **category:** MARKETING
+- **language:** he
+- **body:**
+
+```
+שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?
+```
+
+- **variables:** none
