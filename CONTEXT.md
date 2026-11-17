@@ -5872,19 +5872,38 @@ is **403 on the other's endpoints**. Probing with one key and concluding "no
 permission" or "endpoint gone" is the trap; try the other key first.
 
 **`/buildings/:id/tenants` is where tenant names and mobiles live (24 Sep).**
-Not `/debts`, which is nearly always empty, and not the apartments list, which
-carries only `_id`, `number` and `orderIndex`. There is no per-apartment detail
+Not `/debts`, which lists only apartments that owe (it carries their owners'
+mobiles), and not the apartments list, which carries only `_id`, `number` and
+`orderIndex`. There is no per-apartment detail
 endpoint — `/apartments/:aid` returns nothing.
 
-**The OXS debts endpoint is a collections ledger, not an arrears list.** Stated
-in `oxs_debt_sync.py`'s docstring since 11 Aug and reconfirmed 24 Sep: a sweep
-of all 177 active buildings returns **one** debtor row, while our own charges
-table holds 558 unpaid. A case reaches `/debts` only once it escalates past
-ordinary chasing. Arrears are computed from payment records
-(`oxs_arrears.py`, `import_arrears.py`), and those are the only writers of
-`charges`. **Anyone alarmed by an empty `/debts` should read that docstring
-before reporting it** — the 11 Aug version of this script nearly marked 169 real
-debts as paid on the same misreading.
+**The OXS debts endpoints are live since OXS API rev 1.10** (the owner's spec v7,
+rev 1.11, read 17 Nov; `local/omnitelecom/OXS_External_API_v1 (7).pdf`,
+gitignored; the v5 file we had was rev 1.9).
+- **Before rev 1.10** they read a summary OXS no longer updated. That is why the
+  11 Aug and 24 Sep sweeps found one debtor row, and why `charges` is computed
+  from payment records (`oxs_arrears.py`, `import_arrears.py`). Those are still
+  the only writers of `charges`, and `oxs_debt_sync.py` is still report-only.
+- **Now** each debt endpoint is calculated at the moment of the call (`GET /debts`
+  at most a minute old), with the rules of the building payments screen
+  (תשלומים). Monthly payments count from their month, standing orders once their
+  month has passed, special payments from the day they are created, and unpaid
+  earlier years.
+- **A row carries two totals:** `totalDebt` (overdue, without this month) and
+  `totalDebtWithCurrentMonth`. It has no `_id` any more (use `apartmentId`), and
+  no `paymentNotes` or `apartment.notes`. `oxs_debt_sync.py`'s `oxs_ref` from
+  `_id` is therefore empty.
+- **Read 17 Nov about 11:50 UTC with `OXS_KEY_DEBTS`:** 1,233 apartments owe, in 164
+  buildings, and 1,171 rows carry a mobile. Our `charges` has unpaid rows for 147
+  residents, so the debt calls work from a far smaller list than OXS's. Whether
+  to call from OXS's live debts instead is the owner's decision: which total,
+  which years, and whether special payments count.
+- **Rev 1.11 adds building bank accounts**, for tenants who pay by transfer.
+  `GET /bank-accounts` and `GET /buildings/:id/bank-accounts`, which the finance
+  key reads, give bank, branch, account number, owner and `isApproved`. Give the
+  details to tenants only when `isApproved` is 2. On 17 Nov all 174 buildings
+  with an account were approved. The debt prompt's `{{alt_payment}}` could carry
+  them.
 
 **The WhatsApp number is Meta's test number, and that is an allow-list of five
 (24 Sep).** Every successful send to date has gone to a number already on it,

@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### OXS's new API spec read: debts are live (rev 1.10) and buildings have bank accounts (rev 1.11) (the owner: "new API key docs in the root folder and check it out ... I think it's the version 7"), 11:56 UTC, read only
+- **The file:** `OXS_External_API_v1 (7).pdf`, in Downloads and copied into `local/omnitelecom/` (gitignored, so out of the public repo). 39 pages, "Revision 1.11". The v5 file we worked from (`docs/features/16-human-handover/`, excluded) is rev 1.9, so two revisions are new. Both texts were extracted with PyMuPDF and compared; the session scratchpad holds them.
+- **Rev 1.10: the four debt endpoints are live.**
+  - They are calculated at the moment of the call (`GET /debts` at most a minute old), with the rules of each building's payments screen (תשלומים). Before, they read a summary OXS no longer updated and "for most companies returned no debts at all". That is what our 11 Aug and 24 Sep sweeps saw.
+  - A row has `totalDebt` (overdue) and `totalDebtWithCurrentMonth`, but no own `_id` (use `apartmentId`), no `paymentNotes`, no `apartment.notes`.
+  - A bad page or year is now 400.
+- **Rev 1.11:** `GET /bank-accounts` and `GET /buildings/:buildingId/bank-accounts` give a building's account (bank, branch, number, owner, `isApproved`; give it to tenants only when it is 2). The finance module is called פיננסים on OXS's key screen now. No existing key or response changed.
+- **Read live, one call each with `OXS_KEY_DEBTS`, only counts printed:**
+  - `GET /debts` answered in 5.0 s: 1,233 apartments owe, in 164 buildings, and 1,171 rows carry a mobile.
+  - `GET /bank-accounts`: 174 buildings, all approved.
+  - Our `charges`: unpaid rows for 147 residents, paid rows for 359.
+  - The shekel totals were given to the owner in chat and are not written here (public repo).
+- **Our code:** nothing breaks. The only reader of the debt rows' `_id` is `oxs_debt_sync.py` (`oxs_ref`), which has been report-only since 11 Aug. CONTEXT's "collections ledger, nearly always empty" paragraph is rewritten to the new state.
+- **Owed: the owner's decision** on whether the debt calls should work from OXS's live debts (which total, which years, special payments). That would replace or check the arrears computed from payment records.
+
 ### LIVE 10:47-10:55 UTC: the debt call thinks less, hangs itself up, and answers the payment link at once (the owner: "the delay is super trash ... and its not ending the call after saying bye", then "ok fix that make it fast")
 - **What the owner's call showed (16 Nov 15:37 UTC, `01a1e501`):**
   - 2.4-4.2 s a reply inside Vapi, 3.1 s on average: model 1.1 s (2.3 on the first turn), end of speech 0.8 s on 5 of 6 turns, voice 0.6 s, transcriber 0.45 s.

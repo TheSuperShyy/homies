@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **FOUND 17 Nov, read only: OXS's debts API is live now (rev 1.10), and it lists far more debtors than our list** (the owner's new spec, `local/omnitelecom/OXS_External_API_v1 (7).pdf`, rev 1.11, gitignored; WORKLOG 17 Nov; CONTEXT, "The OXS debts endpoints are live").
+>   - `GET /debts` now matches OXS's payments screen. In August and September it was a stale summary with one row, which is why we compute `charges` from payment records.
+>   - At about 11:50 UTC: 1,233 apartments owe, in 164 buildings, 1,171 of them with a mobile. Our `charges` has unpaid rows for 147 residents.
+>   - **Owed: the owner's decision** on whether the debt calls should work from OXS's live debts: which total (overdue `totalDebt`, or with this month), which years, and whether special payments count.
+>   - Nothing of ours broke: the row lost `_id`, `paymentNotes` and `apartment.notes`, and only the report-only `oxs_debt_sync.py` read `_id`.
+>   - Rev 1.11 adds building bank accounts (all 174 approved on 17 Nov), usable as the transfer details the debt prompt's `{{alt_payment}}` already allows.
+
 > **LIVE 17 Nov 10:47-10:55 UTC: the debt call thinks less, hangs itself up, and answers the payment link at once** (the owner: *"the delay is super trash"*, *"its not ending the call after saying bye"*, then *"ok fix that make it fast"*; WORKLOG 17 Nov).
 >   - **Vapi (10:47:42):**
 >     - `reasoningEffort` minimal (was low).
