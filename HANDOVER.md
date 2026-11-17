@@ -16,8 +16,9 @@ appended to.
 >     - Claude-played `standing_link` and `standing_call`: 15/15 expectations, no guard, no flag;
 >     - snapshot `local/n8n-whatsapp-live-17nov-before-standinglink.json`, put back with `--restore`.
 >   - **The debt agent, 13:06:01 UTC:** one prompt sentence after "קישור לא מקריאים אף פעם.", and `request_standing_order` and `send_payment_link`'s texts. `prompt.md` equals live (6,597 characters). Snapshot `local/vapi-debt-live-17nov-before-standing.json`.
+>   - **The owner's first handset try, 13:27:54 UTC (run 188263): the reply was right but took 61 s, and the owner said "the bot did not reply".** Flat 2's link, the הוראת קבע line and the collections question went out as two messages, both with WhatsApp ids (13:28:55 and 13:28:57). The time was Gemini thinking: the ack 12.1 s (897 completion tokens for one line), the tool step 9.4 s, the reply 25.8 s (2,459 completion tokens). In the 800 runs before it, no run took over 12 s.
 >   - **Owed:**
->     - the owner's handset: ask the WhatsApp bot for a standing order from the test number, and see the הוראת קבע choices on the page the link opens (seen so far only in its text);
+>     - the owner's handset: see the הוראת קבע choices on the page the link opens (seen so far only in its text), and watch how long the next replies take;
 >     - `check_whatsapp_rules.py --watch 2026-11-17T13:05`, again the next morning;
 >     - Yariv's OK (he set the old process);
 >     - the incoming phone agent's twin.

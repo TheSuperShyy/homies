@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### "the bot did not reply" (the owner, after the first standing-order try): it did, in 61 s, 13:30 UTC, read only
+- **n8n run 188263:** "אפשר להסדיר הוראת קבע?" arrived at 13:27:54 UTC. The reply went out through Chatwoot as two messages at 13:28:55 and 13:28:57, both `sent` with a WhatsApp id (`source_id`), so WhatsApp took them.
+- **The reply was the new rule's:** "בשמחה 👍 אני ניגש רגע להוציא את זה מהמערכת." then flat 2's link, personal, "בדף שיפתח לך תוכל לבחור באפשרות של הוראת קבע (באשראי או דרך הבנק)", and "זה מסתדר לך, או שנוח לך יותר שמישהו מצוות הגבייה יתקשר אליך להסדיר את זה?".
+- **Where the 61 s went:**
+  - the 4 s wait for more messages;
+  - the ack model 12.1 s (897 completion tokens against 573 in);
+  - the first answering call 9.4 s (614 completion tokens, ending in the tool call);
+  - `get_payment_link` 3.8 s;
+  - the second answering call 25.8 s (2,459 completion tokens for about a hundred words);
+  - the two-part send about 3 s.
+  - So it was Gemini 3.1 Pro thinking.
+- **Not normal:** in the 800 runs listed before it, none took over 12 s.
+- **What it was and was not:** OpenRouter's endpoints page shows the model up (100% over 30 minutes) but no latency figures. The ack call, which today's change did not touch, was slow too.
+- **Not changed.** A lower thinking setting on the bot's OpenRouter calls would trade Hebrew quality for speed, and that is the owner's call.
+
 ### LIVE 13:05:15 UTC (WhatsApp, epoch 110) and 13:06:01 UTC (the debt agent): a standing order is answered with the payment link first
 - **The played test (Claude players, nothing spent; the scratchpad's `wa_qa_standing`):**
   - `standing_link`: "בטח, אפשר 🙂 זה הקישור האישי שלך לדירה 4 בבר כוכבא 23: [link] בדף שנפתח בוחרים הוראת קבע, באשראי או דרך הבנק. הקישור מיועד רק לדירה שלך ... זה מסתדר לך, או שנוח לך יותר שמישהו מצוות הגבייה יתקשר אליך?". Nothing was recorded after "מסתדר לי, תודה".

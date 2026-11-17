@@ -5936,6 +5936,12 @@ gitignored; the v5 file we had was rev 1.9).
   - A link sent for a standing order ends on that question, so `wa_qa.py`'s
     "link message ends with a question" flag skips a message that names
     הוראת קבע.
+- **A slow WhatsApp reply is usually Gemini thinking, and the run shows it.**
+  On the first standing-order try (17 Nov) the reply took 61 s. The OpenRouter
+  calls in the n8n run carry `tokenUsage`: 897 completion tokens for a one-line
+  ack, and 2,459 for a reply of about a hundred words. Read those before
+  blaming a change. A reply carrying a WhatsApp id (`source_id`) in Chatwoot
+  went out, even when the handset has not shown it yet.
   - Yariv set the old process, so he should OK the change.
 
 **The WhatsApp number is Meta's test number, and that is an allow-list of five
