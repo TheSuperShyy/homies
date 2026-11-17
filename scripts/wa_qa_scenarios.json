@@ -1840,6 +1840,173 @@
     "no_parrot: is no reply a repeat of an earlier one, in the same or nearly the same words?",
     "rep_opening: on the tap, hi, the name and how he is, and only that; then a word on his answer and how to help?"
    ]
+  },
+  {
+   "id": "standing_link",
+   "title": "A standing order, answered with the payment link (17 Nov, epoch 110)",
+   "time": "11:00",
+   "weekday": 2,
+   "weekday_he": "שלישי",
+   "iso": "2026-11-17T11:00:00+02:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה לעבור להוראת קבע",
+    "script": [
+     {
+      "say": "היי, אפשר להסדיר הוראת קבע לוועד הבית?"
+     },
+     {
+      "say": "מסתדר לי, תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_payment_link": {
+     "ok": true,
+     "found": true,
+     "link": "https://pay.example.co.il/t/abc123",
+     "building": "בר כוכבא 23",
+     "apartment": "4"
+    },
+    "request_standing_order": {
+     "ok": true,
+     "recorded": true,
+     "reference": "255-1700-26"
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "get_payment_link",
+     "turn": 0,
+     "name": "link fetched at the ask"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "https://pay\\.example\\.co\\.il/t/abc123",
+     "name": "the link as returned"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "הוראת קבע",
+     "name": "says the page sets up a standing order"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "גבייה",
+     "name": "offers the collections call"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
+     "regex": "\\?",
+     "name": "turn 0 ends on the question"
+    },
+    {
+     "type": "not_called",
+     "tool": "request_standing_order",
+     "name": "nothing recorded when the link suits them"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no ticket"
+    },
+    {
+     "type": "last_no_question",
+     "name": "goodbye without a question"
+    }
+   ],
+   "judge": [
+    "standing_link: did the resident get their link at once, with a short line that on the page they choose a standing order (by card or through the bank), and the question whether that works or they would rather someone from the collections team phoned them?",
+    "link_on_own_line: is the link on a line of its own, exactly as returned, and marked personal?",
+    "goodbye: warm close with no question after 'מסתדר לי, תודה'?"
+   ]
+  },
+  {
+   "id": "standing_call",
+   "title": "A standing order, but they would rather be phoned (17 Nov, epoch 110)",
+   "time": "11:00",
+   "weekday": 2,
+   "weekday_he": "שלישי",
+   "iso": "2026-11-17T11:00:00+02:00",
+   "resident": {
+    "persona": "דייר בבר כוכבא 23 דירה 4 שרוצה הוראת קבע ומעדיף שיתקשרו אליו",
+    "script": [
+     {
+      "say": "אפשר לעשות הוראת קבע?"
+     },
+     {
+      "say": "עדיף שיתקשרו אליי"
+     },
+     {
+      "say": "תודה",
+      "closing": true
+     }
+    ]
+   },
+   "fixtures": {
+    "get_payment_link": {
+     "ok": true,
+     "found": true,
+     "link": "https://pay.example.co.il/t/abc123",
+     "building": "בר כוכבא 23",
+     "apartment": "4"
+    },
+    "request_standing_order": {
+     "ok": true,
+     "recorded": true,
+     "reference": "255-1700-26"
+    }
+   },
+   "expect": [
+    {
+     "type": "called_on_turn",
+     "tool": "get_payment_link",
+     "turn": 0,
+     "name": "link first"
+    },
+    {
+     "type": "called_on_turn",
+     "tool": "request_standing_order",
+     "turn": 1,
+     "name": "recorded when they prefer the call"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "255-1700-26",
+     "name": "the request's number"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 1,
+     "regex": "גבייה",
+     "name": "collections will phone"
+    },
+    {
+     "type": "bot_not_regex",
+     "regex": "בהקדם|תוך \\S+ (שעות|ימים)|עד מחר|עוד היום",
+     "name": "never when"
+    },
+    {
+     "type": "not_called",
+     "tool": "open_request",
+     "name": "no ticket"
+    },
+    {
+     "type": "last_no_question",
+     "name": "goodbye without a question"
+    }
+   ],
+   "judge": [
+    "standing_call: after 'עדיף שיתקשרו אליי', did he say he recorded the request, give its number, and that someone from the collections team will phone, never when?",
+    "no_second_link: was the link not sent again on the second turn?",
+    "goodbye: warm close with no question after 'תודה'?"
+   ]
   }
  ]
 }

@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### A standing order answered with the payment link first: WhatsApp epoch 110 written and gated, NOT live (the owner, after three examples: "ok thats better", then "ok go ahead and make the change"), 13:10 UTC
+- **Why:** the 4 Nov rule ("a standing order gets no link"; `n8n_whatsapp_standing.py`, epoch 96) rested on OXS's API having one-time payments only. The page our link opens offers a standing order by card and a digital bank one (read from its text today). Yariv's 9 Nov process (email to collections, a team member phones) becomes the second option.
+- **Live read first (epoch 109, prompt `fe1f06ca0f84`, 26,551 characters):**
+  - the prompt's "הוראת קבע היא לא הסדר תשלום ולא קישור: ... רושם את הבקשה ... ושמישהו מצוות הגבייה ייצור איתו קשר בטלפון, בלי מתי.";
+  - `get_payment_link`: "A standing order ... is not this ... and gets no link";
+  - `request_standing_order`: "Call it the moment a resident asks for one".
+  - No other node's text says otherwise. Sort's mentions are comments, and Send's checks a recorded `request_standing_order`. Live equalled `prompt.md`.
+- **The change (`scripts/n8n_whatsapp_standinglink.py`, one write):**
+  - The prompt's sentence: whoever asks gets their personal link, a short line that on the page they choose a standing order (card or bank), and the question whether that works or they would rather someone from collections phoned them. Whoever prefers the call, or gets no link, is recorded exactly as before. 26,795 characters, `2c95b2d3aaa6`.
+  - `get_payment_link` is the first answer to a standing order, closing with that question instead of its usual close.
+  - `request_standing_order` is for the phone call or when no link came back.
+  - Memory 109 -> 110. Repo: `prompt.md` (taken by the 13:01 housekeeping commit), `MEMORY_EPOCH` 110 and `EPOCH_COVERS` (tools `244f68113181`).
+- **Gate on the dump:** all 653 cases pass; the full replay changes none of the 1,585 sent replies and breaks nothing; three pins fail as intended (prompt, `get_payment_link`, `request_standing_order`).
+- **Idle check:** 68 of 78 not idle on live as it is (a dump of live) and 66 on the candidate. The only newcomer is `n8n_whatsapp_standard`, refusing on the moved memory key, as one-time carriers do.
+- **Played test (Claude players, nothing spent):** two scenarios added to `wa_qa_scenarios.json` as text, keeping its CRLF and indentation. A first attempt rewrote the whole file and was reverted. `standing_link` expects the link at the ask, "הוראת קבע", the collections offer, a question, and nothing recorded. `standing_call` expects the link first, then the request recorded on turn 1 with its number, collections, and never when. Bundled from the dump into the scratchpad's `wa_qa_standing`; two players running.
+- **The debt agent's part:** dry run only (scratchpad `debt_standing.py`). Its prompt gains "מי שרוצה הוראת קבע מסדיר גם אותה באותו קישור: ... אתה מציע לשלוח לו את הקישור לוואטסאפ, ומי שנוח לו יותר שמישהו מצוות הגבייה יתקשר אליו, אתה רושם את הבקשה שלו בכלי שיש לך לזה." (6,377 -> 6,597 characters). `request_standing_order` and `send_payment_link`'s texts follow, the latter also saying "on its way" since this morning's change.
+
 ### OXS's new API spec read: debts are live (rev 1.10) and buildings have bank accounts (rev 1.11) (the owner: "new API key docs in the root folder and check it out ... I think it's the version 7"), 11:56 UTC, read only
 - **The file:** `OXS_External_API_v1 (7).pdf`, in Downloads and copied into `local/omnitelecom/` (gitignored, so out of the public repo). 39 pages, "Revision 1.11". The v5 file we worked from (`docs/features/16-human-handover/`, excluded) is rev 1.9, so two revisions are new. Both texts were extracted with PyMuPDF and compared; the session scratchpad holds them.
 - **Rev 1.10: the four debt endpoints are live.**

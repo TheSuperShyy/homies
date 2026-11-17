@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 109
+MEMORY_EPOCH = 110
+# 109 -> 110, 17 Nov (n8n_whatsapp_standinglink.py): a standing order is answered with the payment link first, since
+# the page it opens offers one (card or bank); the question whether that works or they would rather collections
+# phoned them; request_standing_order for the phone call or when no link came back.
 # 108 -> 109, 12 Nov, later (n8n_whatsapp_standard.py): the owner's standard is the base of an emergency's first message,
 # "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות למוקד הטלפוני שלנו - 077-6687949.",
 # fitted to the case and to who writes, its three things always in it; it replaces the morning's reference. Send's
@@ -831,7 +834,8 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "fe1f06ca0f84",   # docs/features/11-whatsapp-bot/prompt.md (12 Nov, later, epoch 109, the owner's
+    "prompt": "2c95b2d3aaa6",   # docs/features/11-whatsapp-bot/prompt.md (17 Nov, epoch 110, a standing order is
+    # answered with the payment link first). Before: fe1f06ca0f84 (12 Nov, later, epoch 109, the owner's
     # standard is the base of an emergency's first message). Before: 504d924d3419 (12 Nov, epoch 108, the owner's
     # reference in Michael's words); f1bd90ad0259 (11 Nov, night, epoch 107, pressed in an
     # emergency: the line again as a warm invitation); df3d9bf635d0 (11 Nov, later that night, epoch 106, a
@@ -860,7 +864,8 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "b10df5bd95db",  # 11 Nov, later that night, epoch 106 (n8n_whatsapp_confirm.py): open_request only after
+    "tools": "244f68113181",  # 17 Nov, epoch 110 (n8n_whatsapp_standinglink.py): get_payment_link is the first answer
+    # to a standing order. Before: b10df5bd95db, 11 Nov, later that night, epoch 106 (n8n_whatsapp_confirm.py): open_request only after
     # the resident's yes, and never for anything urgent; notify_team: anything urgent gets no note.
     # Before: "3ce12829999d", 11 Nov, night, epoch 105 (n8n_whatsapp_lineonly.py): open_request, notify_team and
     # verify_address no longer take an emergency; it gets our line only.

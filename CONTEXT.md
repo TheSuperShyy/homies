@@ -5919,6 +5919,20 @@ gitignored; the v5 file we had was rev 1.9).
   from the link we already send. Not yet seen rendered for a Homies building: the
   owner checks once on the test flat's link. Never print or log a link: whoever
   holds it sees and pays that apartment's balance.
+- **The owner's decision, 17 Nov: a standing order is answered with the payment
+  link first** ("ok thats better", then "ok go ahead and make the change", after
+  three examples). This replaces the 4 Nov rule, which was based on OXS's API
+  having one-time payments only, that a standing order gets no link.
+  - Whoever asks gets their personal link, a short line that on the page they
+    choose a standing order (card or bank), and the question whether that works
+    or they would rather someone from the collections team phoned them.
+  - Yariv's 9 Nov process stays as the second option, for whoever prefers the
+    call or gets no link: request_standing_order records it, the email goes to
+    collections, and a team member phones the tenant.
+  - WhatsApp: epoch 110, `scripts/n8n_whatsapp_standinglink.py`. The debt
+    agent: one prompt sentence and its two tool texts. The incoming phone
+    agent's twin is owed.
+  - Yariv set the old process, so he should OK the change.
 
 **The WhatsApp number is Meta's test number, and that is an allow-list of five
 (24 Sep).** Every successful send to date has gone to a number already on it,

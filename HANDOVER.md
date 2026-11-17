@@ -8,6 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **IN PROGRESS 17 Nov: WhatsApp epoch 110, a standing order answered with the payment link first. Written and gated, NOT LIVE** (the owner: "ok go ahead and make the change"; WORKLOG 17 Nov; CONTEXT, "The owner's decision, 17 Nov").
+>   - **The repo is ahead of live.** `docs/features/11-whatsapp-bot/prompt.md` has the new sentence (committed by the 13:01 UTC housekeeping commit). `n8n_whatsapp.py` has `MEMORY_EPOCH = 110` and the new `EPOCH_COVERS` (prompt `2c95b2d3aaa6`, tools `244f68113181`). Live is still epoch 109.
+>   - **Until `python scripts/n8n_whatsapp_standinglink.py --apply` ships it, never `--apply` another WhatsApp patcher:** `manners`, `teamnote`, `nopage` and `patch` follow the repo's prompt and epoch and would carry it untested. To drop it instead, revert those repo changes.
+>   - **Gate on the dump, so far:**
+>     - all 653 cases pass;
+>     - the replay changes none of the 1,585 replies;
+>     - the only failures are the three intended pins (the prompt, `get_payment_link`, `request_standing_order`);
+>     - the idle check adds only `n8n_whatsapp_standard`'s refusal on the moved memory key (68 of 78 not idle on live as is, 66 on the candidate).
+>   - **Still to do:**
+>     - the played test (`standing_link`, `standing_call`, two new scenarios in `wa_qa_scenarios.json`; run in the session scratchpad, `wa_qa_standing`);
+>     - then the new pins from `check_whatsapp_rules.py --pins`, `--apply`, the gate on live, the owner's handset, and `--watch`.
+>   - **The debt agent's part:** prepared as a dry run (scratchpad `debt_standing.py`: one prompt sentence after "קישור לא מקריאים אף פעם.", and `request_standing_order` and `send_payment_link`'s texts). Not applied. The incoming phone agent's twin is owed.
+
 > **FOUND 17 Nov, read only: OXS's debts API is live now (rev 1.10), and it lists far more debtors than our list** (the owner's new spec, `local/omnitelecom/OXS_External_API_v1 (7).pdf`, rev 1.11, gitignored; WORKLOG 17 Nov; CONTEXT, "The OXS debts endpoints are live").
 >   - `GET /debts` now matches OXS's payments screen. In August and September it was a stale summary with one row, which is why we compute `charges` from payment records.
 >   - At about 11:50 UTC: 1,233 apartments owe, in 164 buildings, 1,171 of them with a mobile. Our `charges` has unpaid rows for 147 residents.
