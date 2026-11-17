@@ -5929,9 +5929,13 @@ gitignored; the v5 file we had was rev 1.9).
   - Yariv's 9 Nov process stays as the second option, for whoever prefers the
     call or gets no link: request_standing_order records it, the email goes to
     collections, and a team member phones the tenant.
-  - WhatsApp: epoch 110, `scripts/n8n_whatsapp_standinglink.py`. The debt
-    agent: one prompt sentence and its two tool texts. The incoming phone
-    agent's twin is owed.
+  - Live 17 Nov. WhatsApp at 13:05 UTC: epoch 110,
+    `scripts/n8n_whatsapp_standinglink.py`. The debt agent at 13:06 UTC: one
+    prompt sentence and its two tool texts. The incoming phone agent's twin is
+    owed.
+  - A link sent for a standing order ends on that question, so `wa_qa.py`'s
+    "link message ends with a question" flag skips a message that names
+    הוראת קבע.
   - Yariv set the old process, so he should OK the change.
 
 **The WhatsApp number is Meta's test number, and that is an allow-list of five

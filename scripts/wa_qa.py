@@ -724,7 +724,9 @@ def rubric(turn, res, ctx):
                 fx = next((c.get("result") or {} for c in calls if c["name"] == "get_payment_link"), {})
                 if fx.get("link") and fx["link"] != u2:
                     flag("link-changed", h)
-            if h.rstrip().endswith("?"):
+            # 17 Nov, epoch 110: a link sent for a standing order closes on the
+            # question whether the page suits them or collections should phone.
+            if h.rstrip().endswith("?") and "הוראת קבע" not in h:
                 flag("link-message-ends-with-question", h)
             if not re.search(r"אישי|רק לדירה|לדירה שלכם|לדירה שלך|לא להעביר|לא מעבירים|אל תעבירו", h):
                 flag("link-not-marked-personal", h)

@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### LIVE 13:05:15 UTC (WhatsApp, epoch 110) and 13:06:01 UTC (the debt agent): a standing order is answered with the payment link first
+- **The played test (Claude players, nothing spent; the scratchpad's `wa_qa_standing`):**
+  - `standing_link`: "בטח, אפשר 🙂 זה הקישור האישי שלך לדירה 4 בבר כוכבא 23: [link] בדף שנפתח בוחרים הוראת קבע, באשראי או דרך הבנק. הקישור מיועד רק לדירה שלך ... זה מסתדר לך, או שנוח לך יותר שמישהו מצוות הגבייה יתקשר אליך?". Nothing was recorded after "מסתדר לי, תודה".
+  - `standing_call`: the same link first. After "עדיף שיתקשרו אליי": "רשמתי את הבקשה שלך להוראת קבע, מספר 255-1700-26, ומישהו מצוות הגבייה יתקשר אליך לגבי זה."
+  - Graded through the live code: 15/15 expectations, nothing guarded. Send kept the collections offer.
+  - The rubric's "link message ends with a question" flag fired on both, as intended. `wa_qa.py` now skips it for a message naming הוראת קבע.
+- **The pins** for the prompt, `get_payment_link` and `request_standing_order` are the new values. The gate on the candidate went all green, then `--apply`.
+- **Written at 13:05:15 UTC and read back:** prompt `2c95b2d3aaa6`, tools `244f68113181`, memory `-110`. A second run reports nothing to do. The gate on live is green (653). The idle check on a dump of live gives 66 of 78, the same as the candidate's.
+- **The debt agent** (scratchpad `debt_standing.py --apply`, 13:06:01 UTC; snapshot `local/vapi-debt-live-17nov-before-standing.json`). Read back: the prompt (6,597 characters), both tool texts, secrets, reasoning minimal, endCall and the opener as before. `prompt.md` equals live, with a line in its 17 Nov section.
+- **Owed:**
+  - the owner's handset (a standing order asked on WhatsApp, and the page's הוראת קבע choices seen rendered);
+  - `--watch 2026-11-17T13:05` tonight and in the morning;
+  - Yariv's OK;
+  - the incoming phone agent's twin.
+
 ### A standing order answered with the payment link first: WhatsApp epoch 110 written and gated, NOT live (the owner, after three examples: "ok thats better", then "ok go ahead and make the change"), 13:10 UTC
 - **Why:** the 4 Nov rule ("a standing order gets no link"; `n8n_whatsapp_standing.py`, epoch 96) rested on OXS's API having one-time payments only. The page our link opens offers a standing order by card and a digital bank one (read from its text today). Yariv's 9 Nov process (email to collections, a team member phones) becomes the second option.
 - **Live read first (epoch 109, prompt `fe1f06ca0f84`, 26,551 characters):**

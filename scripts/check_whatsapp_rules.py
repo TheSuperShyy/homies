@@ -253,7 +253,11 @@ PINS = {
     # message, the basis of your answer": "אני רק העוזר הדיגיטלי, לקריאות דחופות ואירועי חירום בבקשה תתקשר בדחיפות
     # למוקד הטלפוני שלנו - 077-6687949.", fitted to the case and to who writes, its three things always in it. The
     # owner: "add this on the context like the basis of what the bot should answer make this the main standard".
-    'Answer the resident / system': 'fe1f06ca0f84',
+    # 17 Nov (n8n_whatsapp_standinglink.py, epoch 110): a standing order is answered with the payment link first, its
+    # page offering one (card or bank), and the question whether that works or collections should phone; the
+    # request is recorded for that call or when no link came back. Claude-played standing_link and standing_call on
+    # the candidate (scratchpad run wa_qa_standing): 15/15 expectations, no guard, no flag.
+    'Answer the resident / system': '2c95b2d3aaa6',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -276,8 +280,8 @@ PINS = {
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
-    'get_payment_link / tool': '2dd75e741bfc',   # 5 Nov, epoch 96: a standing order is not a link
-    'request_standing_order / tool': '9d18f612c2fd',   # 5 Nov, epoch 96: new; 9 Nov, epoch 100: collections will phone
+    'get_payment_link / tool': '638004604c2e',   # 5 Nov, epoch 96: a standing order is not a link; 17 Nov, epoch 110: it is the first answer to one
+    'request_standing_order / tool': '30d4131d9bd1',   # 5 Nov, epoch 96: new; 9 Nov, epoch 100: collections will phone; 17 Nov, epoch 110: for that call or no link
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
