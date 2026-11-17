@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **CHECKED 17 Nov, 09:10 UTC: BOTH WHATSAPP TEMPLATES WORK ON THE CHATWOOT ROUTE** (owner: *"make sure the templatated message are working ok"*; WORKLOG 17 Nov).
+>   - **The "ticket closed" message:** test ticket 255-1448-26 (the owner's handset, flat 2) was closed in `requests` at 09:09:26 UTC. The notices run sent `ticket_resolved_he` at 09:10:31 with WhatsApp's id (Chatwoot conversation 93, message 3464). Its OXS call stays open.
+>   - **The payment link:** the owner's Ring to Ido, 16 Nov at 15:38 UTC. Free text was refused (his 24 hours were shut), then `payment_link_he` went 2 s later with WhatsApp's id, filled in right, and Michael said it was sent.
+>   - **Both read APPROVED** in "hadas 1" and ASTDX, and both are synced into Chatwoot.
+>   - **Chatwoot has had no delivered or read receipts since the move (10 Nov):** every message of ours stays `sent`. WhatsApp's id is the furthest we see; delivery shows on the phone.
+>
 > **LIVE 16 Nov 12:12:26 UTC: the debt call warms up first, in the owner's four steps** (the owner's second pasted take; WORKLOG 16 Nov; `prompt.md`, "16 Nov, later"). **Since 12:55:43 UTC without the word "יתרה"** (Yariv: the voice says it wrong; `prompt.md`, "16 Nov, afternoon").
 >   - **The steps:**
 >     1. The opener: "היי, {{first_name}}? [greeting by the hour]! מדבר מיכאל מהצוות של הומי'ז, מה נשמע?". The name is the identity question.
@@ -140,8 +146,9 @@ appended to.
 >   - **What:** the tool server's `WHATSAPP_VIA` went from `uchat` to `chatwoot`. It was set alone through the Management API, read back as `chatwoot`, and written to `.env` (backup `local/env-backups/.env.before-chatwoot-again-2026-11-11`). No code was deployed, and the OXS mirror's keys are untouched.
 >   - **Why now:** `ticket_resolved_he` and `payment_link_he` read APPROVED in "hadas 1" `…050` (`wa_templates.py list --waba 1389698653006050`), the account our Chatwoot route looks templates up in.
 >   - **Proven so far:** the 2-minute notices run (`pvMuradcJOASapF0`) answered `via: "uchat"` until the switch. The first run after it (175308, 07:34:30 UTC) answered without `via: "uchat"`, so it takes the Chatwoot route, the same sign as on 10 Nov at 15:28:30. Nothing was pending.
->   - **Owed:** the next closed ticket proves the route with WhatsApp's id (a `ticket_notices` row `sent`, and the message in Chatwoot inbox 1 with its `source_id`).
->   - **Also moved by the same switch:** the debt call's payment link, which now takes `whatsappDeliver()`. That path is unproven since the move, and no debt call can happen while the dialer does not ring. Its probe (`probe_paylink_call.py --template --apply`) sends a real WhatsApp to the owner's handset, so it needs the owner's go.
+>   - **Proven 17 Nov, 09:10:31 UTC** (the block at the top): test ticket 255-1448-26's message went with WhatsApp's id (a `ticket_notices` row `sent`, Chatwoot message 3464 with its `source_id`).
+>   - **Also moved by the same switch:** the debt call's payment link, which now takes `whatsappDeliver()`. **Proven 16 Nov, 15:38 UTC** on the owner's Ring to Ido: free text refused, then the template with WhatsApp's id (the block at the top).
+>     - The probe's `--template` does not force the template on this route (`force_template` is read on the UChat branch only). So `probe_paylink_call.py` on Chatwoot writes the model's line and sends free text to a handset that wrote in the last 24 hours.
 >   - **Rollback:** `WHATSAPP_VIA=uchat` the same way (the scratch script `whatsapp_via.py uchat --apply`, or the Management API by hand), until UChat's trial ends around 16 Nov.
 >
 > **LIVE 11 Nov, 17:36 UTC: PRESSED IN AN EMERGENCY, THE LINE AGAIN AS A WARM INVITATION** (the owner pasted two Grok reports; `scripts/n8n_whatsapp_warmline.py`, epoch 107; WORKLOG and CONTEXT 11 Nov).
@@ -335,7 +342,7 @@ appended to.
 >     - **THE FALLBACK FROM 16:47:53 UTC ON 10 NOV TO 07:32:53 UTC ON 12 NOV: `WHATSAPP_VIA=uchat`** (set alone through the Management API, read back, and in `.env`; backup `local/env-backups/.env.before-uchat-fallback-2026-11-10`). The closed-ticket message and the debt call's link leave the number through UChat, whose templates are ASTDX's (APPROVED). A `send_ticket_notices` call with nothing pending answered `via: "uchat"` at 16:47:59. **255-1433-26's message was resent and sent at 16:48:34 UTC** (the UChat path marks `sent` only with WhatsApp's id), its `{{2}}` the report only.
 >     - **Done 12 Nov, 07:32:53 UTC (the top block): both read APPROVED, and `WHATSAPP_VIA=chatwoot` again.** Before: both templates PENDING in "hadas 1" `…050` (ids `4675959222649546`, `30145416878382371`; submitted 16:19 UTC). When both read APPROVED there: `WHATSAPP_VIA=chatwoot` again (alone, and `.env`), then prove the Chatwoot route on the next closed ticket with WhatsApp's id, and the debt link with `python scripts/probe_paylink_call.py --template --apply` (a real WhatsApp to the owner's handset: the owner's go).
 >     - ~~A template from the Chatwoot route is refused (16:14 UTC).~~ Cause and fix above: our sends look in "hadas 1" (proven, `hello_world` #131058), the templates were only in ASTDX (#132001). 039 is applied: `{{2}}` holds the report only.
->     - **The debt call's payment link is back on the UChat path** that v152 sped up and proved at 4.4 s (12:45 UTC), while the fallback holds. The Chatwoot path (`whatsappDeliver()` with the model's line, about 12 s on 26 Oct) is unproven since the move. No debt call can happen while the dialer does not ring.
+>     - **The debt call's payment link is back on the UChat path** that v152 sped up and proved at 4.4 s (12:45 UTC), while the fallback holds. The Chatwoot path (`whatsappDeliver()` with the model's line, about 12 s on 26 Oct) was proven on 16 Nov at 15:38 UTC (the block at the top).
 >   - **Rollback (minutes), in this order:**
 >     1. `rails runner`: inbox 1's channel back to `WHATSAPP_TEST_*` (phone +15550459005, its id and WABA), then `register_callback`.
 >     2. Remove the Israeli number's phone-level override.

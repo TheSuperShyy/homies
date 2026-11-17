@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### The two WhatsApp templates checked on the Chatwoot route (the owner: "make sure the templatated message are working ok"), 09:15 UTC
+- **Both work on the route they have taken since 12 Nov, 07:32:53 UTC (`WHATSAPP_VIA=chatwoot`).** Each went out with WhatsApp's id on it, filled in correctly.
+- **Approved and synced:** `ticket_resolved_he` and `payment_link_he` read APPROVED in "hadas 1" `…050`, where our sends look, and in ASTDX `…632`. Both are synced into Chatwoot inbox 1 (`wa_templates.py list --waba 1389698653006050`, `wa_templates.py`, `wa_templates.py chatwoot`).
+- **The "ticket closed" message, sent for the check (the first on this route):**
+  - No ticket had closed since the switch. The last `ticket_notices` row was 10 Nov's, sent through UChat.
+  - Closed one test ticket: 255-1448-26 (the owner's handset, flat 2 of בר כוכבא 23, WhatsApp, the lobby light, 13 Nov), set `resolved` in `requests` at 09:09:26 UTC. Only ours: its OXS call stays open.
+  - The trigger queued `ticket_resolved_he` at 09:09:26, with `{{1}}` 255-1448-26 and `{{2}}` "האור בלובי לא עובד". The 09:10:30 notices run sent it: `sent`, attempt 1, no error, Chatwoot conversation 93, message 3464 at 09:10:31 UTC with WhatsApp's id.
+  - It reads: "שלום, כאן מיכאל מהומי'ז. הקריאה שלכם מספר 255-1448-26 (האור בלובי לא עובד) טופלה ונסגרה. אם משהו עדיין לא בסדר, פשוט כתבו לנו כאן."
+- **The payment link, proven by a real call, so no probe was sent:**
+  - The call was the owner's Ring to Ido (flat 1), Vapi `01a1e501`, on 16 Nov at 15:37-15:38 UTC. Ido said "תשלח לי" after step 4.
+  - Free text was refused first, as a debt call expects: Chatwoot's message 3462 at 15:38:07 failed because "the WhatsApp 24-hour customer service window is closed".
+  - `payment_link_he` followed in the same conversation (94) at 15:38:09 as message 3463, with WhatsApp's id. It held the eight months, the amount and the link, with nothing left unfilled.
+  - Michael then said "שלחתי לך עכשיו בוואטסאפ…", so the tool answered in time. `payment_links` reads `sent` / `whatsapp_template`, and ticket 255-1449-26 is resolved.
+  - That call's model line, written before the shut window was found, is most likely the $0.0003 of OpenRouter spend on 16 Nov (the entry below).
+- **Found: since the move to the Israeli number (10 Nov), Chatwoot gets no delivered or read receipts.**
+  - All 86 of our messages in inbox 1 since then stay `sent`. Up to the week of 2 Nov, on the test number, they turned `delivered` and `read`.
+  - Nothing reached the bot's n8n workflow after 09:10:32 either. The number's app-level callback is that workflow's `homies-whatsapp`; the phone-level one is Chatwoot's.
+  - So WhatsApp's id is the furthest our side sees. A template that WhatsApp takes and then fails to deliver would still read `sent`; delivery shows on the phone.
+  - Not changed.
+- **`probe_paylink_call.py --template` does not force the template on this route.** `force_template` is read only on the UChat branch. On Chatwoot the probe has the model write its line (OpenRouter), and it sends free text when the handset wrote in the last 24 hours. Its WhatsApp-id check reads UChat. Not run, and not changed.
+
 ### A question answered, read only: OpenRouter spend yesterday (the owner: "how much open router credit we spent yesterday"), 07:59 UTC
 - **About $0.0003 on 16 Nov, a fraction of a cent.**
   - The bot's account is on the key ending 3f9, which both `.env` names hold. It reads $27.32 spent of $60, so $32.68 left, the same as at 16 Nov 08:57 UTC.

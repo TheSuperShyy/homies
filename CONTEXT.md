@@ -688,7 +688,8 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   photo's `message_external_id` carries the same prefix. Anything new that reads the log or
   matches ids must expect both.
 - **The tool server sends WhatsApp through Chatwoot again** (`WHATSAPP_VIA=chatwoot` since 07:32:53 UTC on
-  12 Nov): the debt call's link and the "done" notice. `WHATSAPP_VIA=uchat` is the fallback, set the same way.
+  12 Nov): the debt call's link and the "done" notice, both proven on it with WhatsApp's id (16 and 17 Nov, below).
+  `WHATSAPP_VIA=uchat` is the fallback, set the same way.
   Deploy it with `--apply --oxs-mirror` while the OXS mirror is on: a plain `--apply` deletes the
   mirror's key.
 - **Since the move to Chatwoot (10 Nov), a template for the bot's number lives in TWO WhatsApp accounts.**
@@ -735,6 +736,16 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
   APPROVED on 12 Nov. From 16:47:53 UTC on 10 Nov they went through UChat, whose templates are ASTDX's; UChat
   stays the fallback (`uchat`, alone, the Management API, and `.env`) until its trial ends around 16 Nov.
   Inbox 1's templates are the Israeli WABA's (`ticket_resolved_he`, `payment_link_he`, APPROVED).
+  - **Both are proven on this route with WhatsApp's id:**
+    - the closed-ticket message on test ticket 255-1448-26 (17 Nov, 09:10:31 UTC);
+    - the debt call's link on the owner's Ring to Ido (16 Nov, 15:38 UTC): free text was refused first, then the template went 2 s later.
+  - **`probe_paylink_call.py --template` forces the template only through UChat.** On Chatwoot the function
+    does not read `force_template`, so the probe has the model write its line (OpenRouter) and sends free text
+    when the handset wrote in the last 24 hours. Its WhatsApp-id check reads UChat too.
+- **Since the move (10 Nov), Chatwoot gets no delivered or read receipts for the Israeli number.** Our messages
+  stay `sent` (86 by 17 Nov), while on the test number they turned `delivered` and `read`. Nothing reaches the
+  bot's n8n workflow (the number's app-level callback) either. So WhatsApp's id is the furthest our side sees:
+  a message WhatsApp takes and later fails to deliver still reads `sent`, and delivery shows only on the phone.
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
 - **The number's WhatsApp name is "hadas 1", and Meta caps what we start at 250 conversations a day** (read 11 Nov: `verified_name` "hadas 1", `messaging_limit_tier` TIER_250).
