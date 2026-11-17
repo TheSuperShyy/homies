@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### LIVE 10:47-10:55 UTC: the debt call thinks less, hangs itself up, and answers the payment link at once (the owner: "the delay is super trash ... and its not ending the call after saying bye", then "ok fix that make it fast")
+- **What the owner's call showed (16 Nov 15:37 UTC, `01a1e501`):**
+  - 2.4-4.2 s a reply inside Vapi, 3.1 s on average: model 1.1 s (2.3 on the first turn), end of speech 0.8 s on 5 of 6 turns, voice 0.6 s, transcriber 0.45 s.
+  - About 8 s from "send me" to the next words: the webhook for `send_payment_link` took 8.31 s. Its rows were written 8.2 s in, and its record says `whatsapp_template` on the Chatwoot route (`WHATSAPP_VIA=chatwoot` since 12 Nov). So the time went on the model's line, Chatwoot's lookups and the template send.
+  - No hang-up: "מעולה, תודה עידו, יום טוב ולהתראות" was spoken twice, and Vapi's log (`presignedLogUrl` on GET /call; Supabase's `logs.all` is gone, 410) has no hang-up event, so the end-call phrases never matched. Ido's "ביי" came after; no `pipeline.cleared` there says `wasInterruption`; the model answered it with an empty response. Likely cause: `minCharacters` 10 (15 Nov) sends the text to the voice in small pieces. The last phrase that hung up was 13 Nov 08:20.
+- **Vapi, 10:47:42 UTC** (script in the session scratchpad, `debt_fast.py`; snapshot `local/vapi-debt-live-17nov-before-fast.json`):
+  - `reasoningEffort` low -> minimal (Vapi's spec allows minimal, none, low, medium, high, xhigh).
+  - Vapi's hang-up tool `{"type": "endCall"}` added (8 tools).
+  - Four exact Hebrew replacements in the system prompt (6,287 -> 6,377 characters): the tools list ends "ואחרי הפרידה לנתק"; after the link tool answers, the link is "כבר בדרך אליו" and he finishes the payment "כשהוא מגיע"; the outcome is logged "בלי לומר שום דבר באותו תור", then the goodbye once and the hang-up in the same turn; the closing bullet says "פעם אחת בלבד" and hangs up with the closing words.
+  - Read back: prompt, reasoning, endCall, the seven tools with their secrets, opener, voice, transcriber and phrases as intended. `prompt.md` updated to equal live (a "17 Nov" section too).
+- **A mistake, put right in 8 minutes:** the same push set `onNoPunctuationSeconds` 0.8 -> 0.5. CONTEXT already said 0.5 / 0.1 cut hesitant callers off on 23 Oct, and lowering it needs the paid `--integrity` run first. Back to 0.8 at 10:55:35 UTC; no call came in between (Vapi's call list from 10:40).
+- **debt-tools, PR #15, merged 10:53:04 UTC (`d49128c`), deployed 10:53:47 (version 160; keep-warm 200 in 0.63 s):**
+  - `send_payment_link` waits only for the link (`oxsLinkFor`, database reads) and answers. The lookups, the model's line, the send, WhatsApp's id and the office's rows run after the answer through `EdgeRuntime.waitUntil` (`background()`).
+  - The agent gets `ON_ITS_WAY`: on its way, never arrived. A send that fails afterwards files the OPEN ticket as before.
+  - One send per call while it is going (`claimOnce`).
+  - Tests: `check_paylink.test.ts` 10/10; CI green. The three `check_route.test.ts` failures on this PC are the same on main (CRLF in `dashboard/lib/call.ts`).
+  - Cherry-picked onto feature/chatbot (`2c0720b`); the worktree used for the PR was removed.
+- **Owed:** one real call (the owner's Ring to Ido on /dialer) to see the hang-up, the single goodbye, the minimal reasoning's Hebrew, the link's wait, and Vapi's split. Lowering the 0.8 s wait goes through `vapi_sim_inbound.py --integrity` first (paid, price first).
+
 ### The two WhatsApp templates checked on the Chatwoot route (the owner: "make sure the templatated message are working ok"), 09:15 UTC
 - **Both work on the route they have taken since 12 Nov, 07:32:53 UTC (`WHATSAPP_VIA=chatwoot`).** Each went out with WhatsApp's id on it, filled in correctly.
 - **Approved and synced:** `ticket_resolved_he` and `payment_link_he` read APPROVED in "hadas 1" `…050`, where our sends look, and in ASTDX `…632`. Both are synced into Chatwoot inbox 1 (`wa_templates.py list --waba 1389698653006050`, `wa_templates.py`, `wa_templates.py chatwoot`).

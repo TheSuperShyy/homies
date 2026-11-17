@@ -8,6 +8,19 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 17 Nov 10:47-10:55 UTC: the debt call thinks less, hangs itself up, and answers the payment link at once** (the owner: *"the delay is super trash"*, *"its not ending the call after saying bye"*, then *"ok fix that make it fast"*; WORKLOG 17 Nov).
+>   - **Vapi (10:47:42):**
+>     - `reasoningEffort` minimal (was low).
+>     - Vapi's hang-up tool (`endCall`). The prompt logs the outcome in a silent turn, then says the goodbye once and hangs up in the same turn.
+>     - The link is "already on its way" once the tool answers.
+>     - The end-call phrases stay as a backup. They never matched on the 16 Nov call (no hang-up event in Vapi's log), likely since `minCharacters` 10.
+>   - **The end-of-speech wait stays 0.8 s.** It was set to 0.5 by mistake and put back at 10:55:35, with no calls in between. 0.5 cut hesitant callers off on 23 Oct; any lower value goes through the paid `vapi_sim_inbound.py --integrity` run first.
+>   - **debt-tools, PR #15, deployed 10:53:47 (version 160):** `send_payment_link` answers once the link exists (was about 8 s). The send, WhatsApp's id and the office's rows run after the answer. A failed send files the OPEN ticket as before.
+>   - **Rollback:**
+>     - Vapi: PATCH `model` from `local/vapi-debt-live-17nov-before-fast.json`.
+>     - debt-tools: revert `d49128c` on main through a PR.
+>   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
+
 > **CHECKED 17 Nov, 09:10 UTC: BOTH WHATSAPP TEMPLATES WORK ON THE CHATWOOT ROUTE** (owner: *"make sure the templatated message are working ok"*; WORKLOG 17 Nov).
 >   - **The "ticket closed" message:** test ticket 255-1448-26 (the owner's handset, flat 2) was closed in `requests` at 09:09:26 UTC. The notices run sent `ticket_resolved_he` at 09:10:31 with WhatsApp's id (Chatwoot conversation 93, message 3464). Its OXS call stays open.
 >   - **The payment link:** the owner's Ring to Ido, 16 Nov at 15:38 UTC. Free text was refused (his 24 hours were shut), then `payment_link_he` went 2 s later with WhatsApp's id, filled in right, and Michael said it was sent.
