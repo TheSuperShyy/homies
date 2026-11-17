@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### A question answered, read only: can Chatwoot start a WhatsApp chat with a new number (the owner: "can we add a new contact like whatsapp like chat a new phone number"), 13:40 UTC
+- Yes: Contacts → New contact, then a new conversation in inbox 1 ("WhatsApp — Homies", `Channel::Whatsapp`, provider `whatsapp_cloud`).
+- WhatsApp allows only an approved template to a number that has not written in 24 hours. Inbox 1's synced templates, read live: `ticket_resolved_he` and `payment_link_he`, both APPROVED, UTILITY, he. Neither fits a first message.
+- A general opener ("שלום {{1}}, כאן מיכאל מהומי'ז. …") needs Meta's approval. It was offered to the owner as a draft first; nothing submitted.
+
 ### "the bot did not reply" (the owner, after the first standing-order try): it did, in 61 s, 13:30 UTC, read only
 - **n8n run 188263:** "אפשר להסדיר הוראת קבע?" arrived at 13:27:54 UTC. The reply went out through Chatwoot as two messages at 13:28:55 and 13:28:57, both `sent` with a WhatsApp id (`source_id`), so WhatsApp took them.
 - **The reply was the new rule's:** "בשמחה 👍 אני ניגש רגע להוציא את זה מהמערכת." then flat 2's link, personal, "בדף שיפתח לך תוכל לבחור באפשרות של הוראת קבע (באשראי או דרך הבנק)", and "זה מסתדר לך, או שנוח לך יותר שמישהו מצוות הגבייה יתקשר אליך להסדיר את זה?".
