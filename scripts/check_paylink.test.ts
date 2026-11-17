@@ -8,8 +8,32 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  DELIVERY_WAITS_MS, WINDOW_MS, pollUntil, stopwatch, windowOpen,
+  DELIVERY_WAITS_MS, ON_ITS_WAY, WINDOW_MS, claimOnce, pollUntil, stopwatch, windowOpen,
 } from "../supabase/functions/debt-tools/paylink.ts";
+
+// 17 Nov: the tenant no longer waits on the line for WhatsApp (the owner's test
+// call waited about 8 s here). The tool answers once the link exists, so what it
+// tells the agent, and that one call sends one link, are the rules to hold.
+test("ON_ITS_WAY: the agent says the link is on its way, never that it arrived", () => {
+  assert.match(ON_ITS_WAY, /on its way/);
+  assert.match(ON_ITS_WAY, /do not say it has already arrived/);
+});
+
+test("claimOnce: one send per call while it is going, free again once released", () => {
+  const sending = new Set<string>();
+  assert.equal(claimOnce(sending, "interaction-1"), true);
+  assert.equal(claimOnce(sending, "interaction-1"), false);
+  assert.equal(claimOnce(sending, "interaction-2"), true);
+  sending.delete("interaction-1");
+  assert.equal(claimOnce(sending, "interaction-1"), true);
+});
+
+test("claimOnce: without an interaction id there is nothing to hold", () => {
+  const sending = new Set<string>();
+  assert.equal(claimOnce(sending, null), true);
+  assert.equal(claimOnce(sending, null), true);
+  assert.equal(sending.size, 0);
+});
 
 const HOUR = 3600 * 1000;
 
