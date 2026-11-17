@@ -9,6 +9,15 @@ conversation that produced it.
 
 ---
 
+## 2026-11-17
+
+### A question answered, read only: OpenRouter spend yesterday (the owner: "how much open router credit we spent yesterday"), 07:59 UTC
+- **About $0.0003 on 16 Nov, a fraction of a cent.**
+  - The bot's account is on the key ending 3f9, which both `.env` names hold. It reads $27.32 spent of $60, so $32.68 left, the same as at 16 Nov 08:57 UTC.
+  - `/api/v1/key`: usage_weekly $0.0002604 (the UTC week from Monday 16 Nov), usage_daily $0 (17 Nov so far), usage_monthly $23.96.
+- **The owner's 16 Nov (Philippine time) starts on 15 Nov at 16:00 UTC.** Those 8 hours are not in the weekly figure. The bot sent no replies on 15 Nov (`messages`, as read on 16 Nov at 09:10), so they cost nothing either.
+- Yesterday's test calls used Claude players and Cartesia, not OpenRouter.
+
 ## 2026-11-16
 
 ### A step-by-step video for staff: accept the Chatwoot invite and choose a password (the owner: "lets create a video step by step on how to create account in chatwoot how to setup the password"), 16:06 UTC

@@ -988,7 +988,7 @@ appended to.
 > - **Owed:** the owner's handset on the live number, then `check_whatsapp_rules.py --watch 2026-10-29T15:27`, and again the next morning.
 >
 > **BACK UP 14:17 UTC, 29 Oct: the bot now runs on the key ending 3f9, on a separate OpenRouter account** (owner: *"we have multiple api key in our env just pick one"*).
-> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $32.68 on 16 Nov 08:57 UTC ($60 bought, $27.32 spent; $23.96 of it in November: about $2.55 a day from 4 to 11 Nov, $0.60 a day since), and the key's cap is $1000. `check_openrouter.py` reads it.
+> - **The new key:** `OPENROUTER_API_KEY_ACCOUNT_B` in `.env`, also `OPENROUTER_API_KEY`. That account has $32.68 on 16 Nov 08:57 UTC ($60 bought, $27.32 spent; $23.96 of it in November: about $2.55 a day from 4 to 11 Nov, $0.60 a day since), and the key's cap is $1000. Still $32.68 on 17 Nov 07:59 UTC: 16 Nov cost about $0.0003. `check_openrouter.py` reads it.
 > - **How it was switched:** `n8n_openrouter_key.py OPENROUTER_API_KEY_ACCOUNT_B --apply` created credential `Ovw71DEq1eufagGk` ("Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)") and repointed the live bot's model node. The workflow is active. `N8N_OPENROUTER_CRED_ID` is updated.
 > - **The sandbox** was rebuilt on it, round 51.
 > - A one-off call with the bot's model at max_tokens 8192 went through first.
