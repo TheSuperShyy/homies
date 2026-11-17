@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### Yariv's two videos: "i cant add users it says its not found" (the owner), 15:09 UTC, read only
+- **The videos:** two WhatsApp clips in Downloads, 21:59 PHT, 12 s and 6 s. Frames were pulled with ffmpeg into the session scratchpad.
+- **What they show:** Yariv's Chatwoot (CLIX, Hebrew). In the new-message box he typed a mobile in local 05… form into "אל:". It gave "לא נמצאו תוצאות", To and Via turned red, and Send did nothing.
+- **Cause:**
+  - The box searches existing contacts only, and this number is no contact. Chatwoot's contact search, read only, found none with or without the leading 0.
+  - Chatwoot stores numbers as +972…, so a search with the leading 0 misses even an existing one.
+- **Answer given:**
+  - create the contact under Contacts with +972 and no leading 0;
+  - pick it by name in "אל:";
+  - choose "WhatsApp — Homies" in "דרך:";
+  - the first message is the approved opener, which is still PENDING at Meta.
+  - A short English message for Yariv went with it.
+- **`homies_hello_he`** was still PENDING on both WABAs at 15:09 UTC. No phone number goes into this repo.
+
 ### The general staff opener `homies_hello_he` submitted to Meta on both WABAs (the owner: "it should be like for everyone for example a new person that is not related", then "ok"), 14:47:51 UTC
 - **The owner turned down the two drafts with a subject blank,** which were tied to a matter. Wanted: one text for anyone, a tenant or a person with no tie to Homies.
 - **The text:** "שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?". No blanks; gender-neutral; ends on a question so the reply opens the 24 hours. Category MARKETING, since a general message is tied to no transaction. The owner was told it costs a little more and offers an opt-out.
