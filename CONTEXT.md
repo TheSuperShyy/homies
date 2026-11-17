@@ -5904,6 +5904,13 @@ gitignored; the v5 file we had was rev 1.9).
   details to tenants only when `isApproved` is 2. On 17 Nov all 174 buildings
   with an account were approved. The debt prompt's `{{alt_payment}}` could carry
   them.
+- **No endpoint creates a standing order, even in rev 1.11** (the owner asked, 17 Nov).
+  The only standing-order effect in the API is a cancellation:
+  `DELETE /apartments/:id/payers/:payerId` ("tenant left") cancels the payer's card
+  and bank standing orders for that apartment, and that cannot be undone through
+  the API. Never call it. A tenant sets a standing order up themselves (by card in
+  OXS's tenant app, or with a bank form), so our request still goes to the office
+  by email.
 
 **The WhatsApp number is Meta's test number, and that is an allow-list of five
 (24 Sep).** Every successful send to date has gone to a number already on it,
