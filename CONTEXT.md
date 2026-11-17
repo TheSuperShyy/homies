@@ -5911,6 +5911,14 @@ gitignored; the v5 file we had was rev 1.9).
   the API. Never call it. A tenant sets a standing order up themselves (by card in
   OXS's tenant app, or with a bank form), so our request still goes to the office
   by email.
+- **The payment link is also the way to a standing order** (17 Nov, read from the
+  page itself). The link we send opens OXS's tenant payment page
+  (`www.pro.oxs.co.il/tenant/…`, titled "OXS: תשלום וועד בית באשראי"). That page's
+  text offers "הוראת קבע בכרטיס אשראי" and "הוראת קבע בנקאית דיגיטלית", and for a
+  payer who has one, "שימו לב! קיימת הוראת קבע פעילה". So a tenant can set one up
+  from the link we already send. Not yet seen rendered for a Homies building: the
+  owner checks once on the test flat's link. Never print or log a link: whoever
+  holds it sees and pays that apartment's balance.
 
 **The WhatsApp number is Meta's test number, and that is an allow-list of five
 (24 Sep).** Every successful send to date has gone to a number already on it,
