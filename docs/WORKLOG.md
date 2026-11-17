@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-17
 
+### The staff opener template drafted, two options, nothing submitted (the owner: "ok draft the template"), 14:00 UTC
+- For starting a WhatsApp chat with a new number from Chatwoot, where a number that has not written in 24 hours can get only an approved template.
+- **Name `service_followup_he`, UTILITY, he.** Written to `templates.md`'s rules: no variable at the start or end, gender-neutral (no gendered verb, no plural, no slash), ending on a question so the reply opens the window. The subject sits in a variable to keep it a service message, not marketing.
+- **A**, recommended, the sender by name: "שלום {{1}}, כאן {{2}} מהומי'ז. אני פונה אליך בנוגע ל{{3}}. נוח לך שנדבר על זה כאן?" (examples: דני · אור · קריאת השירות על המעלית). The sender is the one the conversation is assigned to.
+- **B**, the team: "שלום {{1}}, כאן צוות השירות של הומי'ז. אנחנו פונים אליך בנוגע ל{{2}}. נוח לך שנדבר על זה כאן?".
+- **Next, on the owner's choice:**
+  - a section in `docs/features/11-whatsapp-bot/templates.md`;
+  - `python scripts/wa_templates.py create service_followup_he` on the WABA of inbox 1's number, then `list` until APPROVED;
+  - then it shows in Chatwoot's template picker.
+
 ### A question answered, read only: how a chat started from Chatwoot works with the bot (the owner: "ok now how will it work"), 13:50 UTC
 - **Read in the live Sort code** (`u2JjrbcNPYyyh3yl`, lines 40-85):
   - an outgoing public message from a `user` claims the conversation (`_claim`, then `Assign to the replier`);
