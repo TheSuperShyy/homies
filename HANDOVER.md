@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **FOUND 18 Nov, read only: Chatwoot account 2's language is English (`locale` en, the account record last changed 17 Nov 14:26 UTC; who did it is not recorded).** It was Hebrew. Staff with no language of their own see English, and the Hebrew invite email no longer applies. **Owed: the owner's word on setting it back to Hebrew.** Not changed.
+> **DONE 18 Nov: the staff video "how to add a new contact and open a WhatsApp chat"** (the owner: "give me a tutorial video on how to create a new contact").
+>   - `local/chatwoot-video/chatwoot-new-contact-he.mp4` (66 s, 2.1 MB, Hebrew captions, for the staff) and `-en.mp4` (2.3 MB, for the owner to check), gitignored. Opened in File Explorer.
+>   - Built by `local/chatwoot-video/build_contact.py` on the real Chatwoot. Every request but the sign-in was blocked, so nothing was created. The Hebrew interface was shown by changing the locale in the browser's own copy of the account. The demo is ישראל ישראלי, +972500000000. Contact sheet: `sheet-contact-he.png`.
+>   - Its last step, "בחר תבנית", works only once `homies_hello_he` is approved.
+
 > **SUBMITTED 17 Nov 14:47:51 UTC: the staff opener template `homies_hello_he`, PENDING Meta's review** (the owner's "ok"; WORKLOG 17 Nov; `docs/features/11-whatsapp-bot/templates.md`).
 >   - The text: "שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?". MARKETING, he, no blanks. For a staff member opening a chat from Chatwoot with any number, tenant or not.
 >   - **On both WABAs, as the two-account rule says:** `.env`'s `…632` (Chatwoot's list), id `4804153076538574`; "hadas 1" `…050` (where sends are looked up), id `1971092067601403`.

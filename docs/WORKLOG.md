@@ -9,6 +9,31 @@ conversation that produced it.
 
 ---
 
+## 2026-11-18
+
+### The staff video "how to add a new contact and open a WhatsApp chat", built (the owner: "give me a tutorial video on how to create a new contact"), 16:35 UTC
+- **Built by a background agent from yesterday's invite video** (`local/chatwoot-video/build.py`, untouched). Its script is `local/chatwoot-video/build_contact.py`, which rebuilds both languages in about 12 minutes with `--sheet`.
+- **Files:** `chatwoot-new-contact-he.mp4` (65.9 s, 1920x1080, 2.1 MB) and `-en.mp4` (2.3 MB), plus contact sheets `sheet-contact-he.png` and `-en.png`, all gitignored. Reviewed from the Hebrew sheet before handing over, then opened in File Explorer.
+- **The steps, with the real labels:**
+  1. "איש קשר" in the side menu;
+  2. ⋮, then "הוסף איש קשר";
+  3. "ערוך את פרטי איש הקשר": first and last name (ישראל ישראלי);
+  4. the phone: IL +972, and 500000000 typed without the 0, with a "חשוב" caption that Chatwoot saves +972… and a 05… search finds nothing;
+  5. "שמור איש קשר", drawn only, then a "saved" card;
+  6. "הודעה", and the name in "אל:";
+  7. "דרך:" WhatsApp — Homies, then "בחר תבנית".
+  - Then a card with the opener's text, `homies_hello_he`, and the 24-hour rule, and an end card: "+972 ובלי ה-0 שבהתחלה".
+- **Nothing written to Chatwoot:**
+  - one sign-in for the final run, with every non-GET blocked (3 profile PUTs on load among them) and no live-updates socket;
+  - the demo contact's search and inbox list were answered inside the browser;
+  - the template list was not opened, because the opener is still PENDING;
+  - the contact list, the inbox page and the admin's name and email are blurred, and the update banner is hidden.
+  - Three sign-ins in all (exploring, one failed render, the final), each leaving a session token on the admin login.
+- **Found:** account 2's `locale` is `en` (the account row last updated 17 Nov 14:26 UTC; the audit log is empty). It was Hebrew. The video shows Hebrew by changing the locale in the browser's copy of the account only.
+- **Recorded with the timezone set to Israel,** because the country default follows the PC's timezone (PH on this PC).
+- **An agent slip:** it deleted the top-level .png and .mp4 files in the session scratchpad. None was a project file; the subfolders survived.
+- **`homies_hello_he`:** still PENDING on both WABAs at 16:35 UTC, about 1 h 50 min after submission.
+
 ## 2026-11-17
 
 ### Yariv's two videos: "i cant add users it says its not found" (the owner), 15:09 UTC, read only
