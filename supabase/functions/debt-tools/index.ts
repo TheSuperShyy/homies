@@ -56,7 +56,7 @@ import {
 } from "./identity.ts";
 // How long the caller waits for the debt call's payment link (10 Nov). Pure, so
 // Node can test it: scripts/check_paylink.test.ts.
-import { DELIVERY_WAITS_MS, pollUntil, stopwatch, windowOpen } from "./paylink.ts";
+import { DELIVERY_WAITS_MS, ON_ITS_WAY, claimOnce, pollUntil, stopwatch, windowOpen } from "./paylink.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
 import { callDirection, debtVariables, FEMININE_DICT, FIXED_DEFAULTS, isDialerCall, routeOf, voiceForGender } from "./route.ts";
@@ -2265,6 +2265,26 @@ async function uchatTemplate(
   return { sent: true, contactId: c.id };
 }
 
+// The work a tool hands on after its answer has gone (17 Nov: the payment link's
+// send). Supabase's edge runtime keeps the worker alive for a promise passed to
+// EdgeRuntime.waitUntil; where there is none (Node's tests) it simply runs.
+// Never throws.
+declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined;
+function background(p: Promise<unknown>): void {
+  try {
+    if (typeof EdgeRuntime !== "undefined" && typeof EdgeRuntime?.waitUntil === "function") {
+      EdgeRuntime.waitUntil(p);
+      return;
+    }
+  } catch {
+    // fall through: the promise runs on its own
+  }
+  p.catch(() => {});
+}
+
+/** Interaction ids whose payment link is being sent right now (claimOnce). */
+const SENDING = new Set<string>();
+
 // ---------------------------------------------------------------------------
 // The tools
 // ---------------------------------------------------------------------------
@@ -2416,9 +2436,17 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // 10 Nov: the tenant is on the line while this runs, and on 26 Oct it ran
     // past Vapi's tool timeout (about 12 s against 10), so the model was told
     // the tool had failed and improvised. What does not depend on each other
-    // now runs together: the OXS link, the tenant's UChat contact (which says
-    // whether their 24 hours are open) and UChat's template list. A test number
-    // is never looked up on UChat: it gets no message.
+    // runs together: the tenant's UChat contact (which says whether their 24
+    // hours are open) and UChat's template list. A test number is never looked
+    // up on UChat: it gets no message.
+    //
+    // 17 Nov (the owner, after a test call that waited about 8 s here: "the
+    // delay is super trash ... make it fast"): only the link is waited for while
+    // the tenant is on the line. The UChat lookups, the send, WhatsApp's id and
+    // the office's rows run after the answer (background()), and the agent is
+    // told the link is on its way (ON_ITS_WAY), never that it arrived. A send
+    // that fails there files the OPEN ticket exactly as before, so the office
+    // sends the link by hand.
     const sw = stopwatch();
     const isTest = TEST_PREFIXES.some((p) => String(r.phone).startsWith(p));
     const uchat = viaUchat();
@@ -2426,14 +2454,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // A probe may ask for the template although the window is open, so the path
     // a debt call takes can be proven on a phone that wrote to us today.
     const forceTemplate = isProbeCall(ctx.callId) && args?.force_template === true;
-    const [got, contact, synced] = await Promise.all([
-      oxsLinkFor(r, unit),
-      uchatOn ? uchatContact(String(r.phone)).catch(() => null) : Promise.resolve(null),
-      uchatOn
-        ? uchatTemplates().catch(() => ({} as Record<string, UchatTemplate>))
-        : Promise.resolve({} as Record<string, UchatTemplate>),
-    ]);
-    sw.lap("lookups");
+    const got = await oxsLinkFor(r, unit);
+    sw.lap("link");
     if (!got.ok) {
       row.note = got.reason;
       await record();
@@ -2447,95 +2469,113 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       await record();
       return miss("test_number");
     }
+    const key = iid ? String(iid) : null;
+    if (!claimOnce(SENDING, key)) return { ok: true, sent: true, again: true, to_last4: last4, note: ON_ITS_WAY };
 
-    const withLine = async () => {
-      const line = await whatsappLine({
-        first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
-        building: r.building ?? "", unit, months: monthsHe(periods), amount,
-      });
-      sw.lap("line");
-      return (line ? line + "\n" : "") + got.link;
-    };
-    let d: Delivery;
-    if (!uchat) {
-      d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), await withLine());
-      sw.lap("text");
-    } else if (!uchatOn) {
-      console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
-      d = { sent: false, reason: "unavailable" };
-    } else if (!forceTemplate && windowOpen(contact?.lastIn ?? 0, Date.now())) {
-      // Their 24 hours are open, so free text can go, and only now is the
-      // model's line worth its seconds. On a shut window the template is the
-      // message, and until 10 Nov the line was written first and thrown away.
-      d = await uchatDeliver(String(r.phone), await withLine(), contact);
-      sw.lap("text");
-    } else {
-      d = { sent: false, reason: "outside_window", conversationId: contact?.id ?? 0 };
-    }
+    let answered = 0;
+    const deliver = async () => {
+      const [contact, synced] = await Promise.all([
+        uchatOn ? uchatContact(String(r.phone)).catch(() => null) : Promise.resolve(null),
+        uchatOn
+          ? uchatTemplates().catch(() => ({} as Record<string, UchatTemplate>))
+          : Promise.resolve({} as Record<string, UchatTemplate>),
+      ]);
+      sw.lap("lookups");
 
-    // 23 Sep: a debt call is OUTBOUND -- we ring someone who has not written to
-    // us -- so Meta's 24-hour window is shut by default and the free-text link
-    // above is refused (`outside_window`). That was the normal case for this
-    // agent, not an edge case: the owner's own 22 Sep call ended with "the
-    // office will send it". A Meta template is allowed to cross that window, so
-    // the link goes again as `payment_link_he` into the same conversation, and
-    // from here on the call behaves exactly as if the first message had landed.
-    // Only for outside_window: `no_contact` and `no_conversation` mean there is
-    // nowhere to send anything, and a template does not create a conversation.
-    let viaTemplate = false;
-    const linkParams = {
-      "1": monthsHe(periods).join(", ") || "ועד הבית",
-      "2": String(amount),
-      "3": got.link,
-    };
-    // Through UChat a template needs no conversation first: UChat makes the
-    // contact, so a resident who never wrote to the number can still get it.
-    if (uchat && !d.sent && d.reason === "outside_window") {
-      const ut = synced[PAYMENT_TEMPLATE];
-      if (!ut) {
-        console.warn("payment link template not synced (uchat)", PAYMENT_TEMPLATE, last4);
+      const withLine = async () => {
+        const line = await whatsappLine({
+          first_name: String(r.full_name ?? "").trim().split(/\s+/)[0] ?? "",
+          building: r.building ?? "", unit, months: monthsHe(periods), amount,
+        });
+        sw.lap("line");
+        return (line ? line + "\n" : "") + got.link;
+      };
+      let d: Delivery;
+      if (!uchat) {
+        d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), await withLine());
+        sw.lap("text");
+      } else if (!uchatOn) {
+        console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
+        d = { sent: false, reason: "unavailable" };
+      } else if (!forceTemplate && windowOpen(contact?.lastIn ?? 0, Date.now())) {
+        // Their 24 hours are open, so free text can go, and only now is the
+        // model's line worth its seconds. On a shut window the template is the
+        // message, and until 10 Nov the line was written first and thrown away.
+        d = await uchatDeliver(String(r.phone), await withLine(), contact);
+        sw.lap("text");
       } else {
-        const sent = await uchatTemplate(String(r.phone), PAYMENT_TEMPLATE, ut, linkParams, contact);
-        sw.lap("template");
-        if (sent.sent) {
-          viaTemplate = true;
-          d = { sent: true, conversationId: sent.contactId };
-          console.log("payment link sent as template (uchat)", sent.contactId, last4);
+        d = { sent: false, reason: "outside_window", conversationId: contact?.id ?? 0 };
+      }
+
+      // 23 Sep: a debt call is OUTBOUND -- we ring someone who has not written to
+      // us -- so Meta's 24-hour window is shut by default and the free-text link
+      // above is refused (`outside_window`). That was the normal case for this
+      // agent, not an edge case: the owner's own 22 Sep call ended with "the
+      // office will send it". A Meta template is allowed to cross that window, so
+      // the link goes again as `payment_link_he` into the same conversation, and
+      // from here on the call behaves exactly as if the first message had landed.
+      // Only for outside_window: `no_contact` and `no_conversation` mean there is
+      // nowhere to send anything, and a template does not create a conversation.
+      let viaTemplate = false;
+      const linkParams = {
+        "1": monthsHe(periods).join(", ") || "ועד הבית",
+        "2": String(amount),
+        "3": got.link,
+      };
+      // Through UChat a template needs no conversation first: UChat makes the
+      // contact, so a resident who never wrote to the number can still get it.
+      if (uchat && !d.sent && d.reason === "outside_window") {
+        const ut = synced[PAYMENT_TEMPLATE];
+        if (!ut) {
+          console.warn("payment link template not synced (uchat)", PAYMENT_TEMPLATE, last4);
         } else {
-          console.error("payment link template refused (uchat)", last4, sent.reason.slice(0, 80));
+          const sent = await uchatTemplate(String(r.phone), PAYMENT_TEMPLATE, ut, linkParams, contact);
+          sw.lap("template");
+          if (sent.sent) {
+            viaTemplate = true;
+            d = { sent: true, conversationId: sent.contactId };
+            console.log("payment link sent as template (uchat)", sent.contactId, last4);
+          } else {
+            console.error("payment link template refused (uchat)", last4, sent.reason.slice(0, 80));
+          }
         }
       }
-    }
-    const shut = !uchat && !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
-    if (shut) {
-      const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
-      const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
-      const t = admin && bot ? (await syncedTemplates(admin))[PAYMENT_TEMPLATE] : undefined;
-      if (!t) {
-        console.warn("payment link template not synced", PAYMENT_TEMPLATE, last4);
-      } else {
-        const sent = await sendTemplate(admin, bot, shut, PAYMENT_TEMPLATE, t, linkParams);
-        if (sent.sent) {
-          viaTemplate = true;
-          d = { sent: true, conversationId: shut };
-          console.log("payment link sent as template", shut, last4);
+      const shut = !uchat && !d.sent && d.reason === "outside_window" ? d.conversationId ?? 0 : 0;
+      if (shut) {
+        const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
+        const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
+        const t = admin && bot ? (await syncedTemplates(admin))[PAYMENT_TEMPLATE] : undefined;
+        if (!t) {
+          console.warn("payment link template not synced", PAYMENT_TEMPLATE, last4);
         } else {
-          console.error("payment link template refused", shut, last4, sent.reason.slice(0, 80));
+          const sent = await sendTemplate(admin, bot, shut, PAYMENT_TEMPLATE, t, linkParams);
+          if (sent.sent) {
+            viaTemplate = true;
+            d = { sent: true, conversationId: shut };
+            console.log("payment link sent as template", shut, last4);
+          } else {
+            console.error("payment link template refused", shut, last4, sent.reason.slice(0, 80));
+          }
         }
       }
-    }
-    row.status = d.sent ? "sent" : "requested";
-    row.note = d.sent ? (viaTemplate ? "whatsapp_template" : "whatsapp") : d.reason;
-    // The row and the office's ticket do not depend on each other.
-    const [, filed] = await Promise.all([record(), fileTicket(d.sent, d.sent ? null : d.reason)]);
-    sw.lap("rows");
-    // Never the link or the text: the last digits, how it went, and each step's time.
-    console.log("payment link timing ms", last4,
-      d.sent ? (viaTemplate ? "template" : "text") : d.reason, sw.text());
-    if (!d.sent) return withSpoken(miss(d.reason, filed));
-    // The reference is the office's record of a link that went; the agent is
-    // not asked to read it out, so no spoken form is attached here.
-    return { ok: true, sent: true, to_last4: last4, ...filed };
+      row.status = d.sent ? "sent" : "requested";
+      row.note = d.sent ? (viaTemplate ? "whatsapp_template" : "whatsapp") : d.reason;
+      // The row and the office's ticket do not depend on each other. A send that
+      // failed files the OPEN ticket: the office sends the link by hand.
+      await Promise.all([record(), fileTicket(d.sent, d.sent ? null : d.reason)]);
+      sw.lap("rows");
+      // Never the link or the text: the last digits, how it went, when the agent
+      // was answered, and each step's time.
+      console.log("payment link timing ms", last4,
+        d.sent ? (viaTemplate ? "template" : "text") : d.reason, `answered ${answered},`, sw.text());
+    };
+    answered = sw.total();
+    background(
+      deliver()
+        .catch((e) => console.error("payment link delivery threw", last4, String(e).slice(0, 120)))
+        .finally(() => { if (key) SENDING.delete(key); }),
+    );
+    return { ok: true, sent: true, to_last4: last4, note: ON_ITS_WAY };
   },
 
   /**

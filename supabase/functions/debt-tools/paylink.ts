@@ -30,6 +30,30 @@ export function windowOpen(lastInMs: number, nowMs: number): boolean {
 export const DELIVERY_WAITS_MS = [700, 900, 1400];
 
 /**
+ * 17 Nov (the owner, after a test call that waited about 8 s for the link: "the
+ * delay is super trash ... make it fast"): the tenant no longer waits on the
+ * line for WhatsApp. send_payment_link answers once the link exists; the send,
+ * WhatsApp's id and the office's rows finish after the answer. So the agent is
+ * told the link is on its way, never that it arrived. A send that fails later
+ * files the OPEN ticket as before, and the office sends the link by hand.
+ */
+export const ON_ITS_WAY = "The link is on its way to their WhatsApp, to the number we have. Say it is on its "
+  + "way and ask them to finish the payment when it arrives; do not say it has already arrived.";
+
+/**
+ * One send per call while it is still going: a second ask in the same call is
+ * told the link is on its way instead of sending it twice (the row that says
+ * "sent" is only written when the send is done). `key` is the call's
+ * interaction id; without one there is nothing to hold.
+ */
+export function claimOnce(inFlight: Set<string>, key: string | null): boolean {
+  if (!key) return true;
+  if (inFlight.has(key)) return false;
+  inFlight.add(key);
+  return true;
+}
+
+/**
  * Ask `check` after each wait and stop at the first yes. A read that throws is
  * a "not yet": the next wait asks again. False only when every wait was used.
  */
