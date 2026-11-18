@@ -5937,6 +5937,7 @@ gitignored; the v5 file we had was rev 1.9).
       minute. Only a real message from a handset shows them staying.
     - **A WhatsApp turn with a tool costs about $0.11 on OpenRouter** (gemini-3.1-pro-preview, measured
       18 Nov: about 37k tokens in and 3.4k out over the ack model, the answer and the pass after the tool).
+    - **Tested on a handset with Grok:** `docs/features/11-whatsapp-bot/grok-bank-transfer-test.md` (rules T1-T8).
 - **No endpoint creates a standing order, even in rev 1.11** (the owner asked, 17 Nov).
   The only standing-order effect in the API is a cancellation:
   `DELETE /apartments/:id/payers/:payerId` ("tenant left") cancels the payer's card

@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### A Grok brief for the bank-transfer hand-over (the owner: "ok give me instructions in grok so i can test that"), 10:32 UTC
+- **`docs/features/11-whatsapp-bot/grok-bank-transfer-test.md`**, in the shape of the emergency-line brief: two conversations in the same chat, six messages.
+  - B1: a transfer and the account details asked; "ומתי זה יגיע?"; a different question ("מה כלול בדמי הוועד?") to show he keeps answering; a goodbye.
+  - B2: "אני רוצה לדבר עם נציג. אני רוצה לשלם בהעברה..." and a goodbye.
+  - Rules T1-T8: handed to collections in his own words, no account details, no time, not the card link instead, asked again the same story, keeps answering, singular, how a reply ends.
+- **Conversation 93 resolved at 10:29:27 UTC** (inbox 1 has no CSAT survey and does not lock a contact to one chat), so the owner's run opens a fresh chat and the labels can be watched from nothing. It keeps its note and its `bank-transfer` label.
+- About 50 US cents of OpenRouter for the six replies (two with a tool at about $0.11 each).
+
 ### LIVE 10:17:53 UTC, WhatsApp epoch 111: a bank transfer goes to a person from collections, and Michael says so (Yariv; the owner: "ok go ahead, keep answering and submit the template")
 - **The Claude-played check on the candidate** (`scripts/wa_qa_banktransfer.json`, two blind players, `wa_qa.py grade`): 19/19 expectations, nothing guarded, no flag.
   - Asked: "היי אסף, כן, אפשר לשלם את ועד הבית בהעברה בנקאית 🙂 את פרטי החשבון אין לי כאן, אז העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך אותם כאן בצ'אט. יש עוד משהו שאוכל לעזור לך בו בינתיים?"
