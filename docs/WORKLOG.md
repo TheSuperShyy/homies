@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### A question answered, read only: is the template approved at Meta (the owner: "so is the templated message approved in the meta"), 08:48 UTC
+- **`homies_hello_he`, the staff opener: still PENDING** on both WABAs ("hadas 1" `…050` and `…632`), and listed PENDING in Chatwoot. Submitted 17 Nov 14:47:51 UTC, so about 18 h in review.
+- `ticket_resolved_he` and `payment_link_he` stay APPROVED on both, and synced.
+
 ### A natural Hebrew voice-over on the new-contact video (the owner: "add a voice over a natural hebrew on the adding a new contact in the chatwoot and check if the template has been approved"), 08:41 UTC
 - **The template:** `homies_hello_he` is still PENDING on both WABAs at 08:22 and 08:41 UTC, about 18 h after submission. Chatwoot already lists it, PENDING.
 - **The narration** (`local/chatwoot-video/voice_contact.py`, gitignored):
