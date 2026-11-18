@@ -5938,6 +5938,13 @@ gitignored; the v5 file we had was rev 1.9).
     - **A WhatsApp turn with a tool costs about $0.11 on OpenRouter** (gemini-3.1-pro-preview, measured
       18 Nov: about 37k tokens in and 3.4k out over the ack model, the answer and the pass after the tool).
     - **Tested on a handset with Grok:** `docs/features/11-whatsapp-bot/grok-bank-transfer-test.md` (rules T1-T8).
+    - **The memory follows the phone, not the chat** (key `<phone>-<epoch>`, 12 messages), so a resolved chat
+      does not make Michael forget an earlier hand-over. That is why the hand-over is called every time it is
+      asked (epoch 112, written 18 Nov): a repeat while it is still open is dropped by "Hand to a person".
+- **Chatwoot 4.16 clears a conversation's `waiting_since` on every bot reply** (`Message#clear_waiting_since_on_outgoing_response`,
+  read 18 Nov). The handback ticker's served rule reads 0 as "a person answered", so every handover's `handover`
+  labels come off a minute after Michael answers, and the 10- and 25-minute ladder cannot start. The team and the
+  `bank-transfer` label stay. Not changed; a fix would key the ticker on a person's own reply instead.
 - **No endpoint creates a standing order, even in rev 1.11** (the owner asked, 17 Nov).
   The only standing-order effect in the API is a cancellation:
   `DELETE /apartments/:id/payers/:payerId` ("tenant left") cancels the payer's card

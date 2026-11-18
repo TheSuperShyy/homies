@@ -2072,6 +2072,23 @@ function cases(E) {
       expect('Reply usable? ' + id + ' lets the line through', () => E.reply[id]({ output: BTL, intermediateSteps: [BT] }, 0, turn({ steps: [BT], said: ASK }).$), true);
     }
   }
+  // 18 Nov, later (scripts/n8n_whatsapp_bankagain.py, epoch 112, banknote v1). The owner's Grok run of epoch 111: in a
+  // fresh chat the memory held an earlier hand-over, Michael said "already with collections" and called nothing
+  // (190483), and later only the backstop fired, as `other`, to Service (190520). The note now also goes when the
+  // tenant's message names a transfer or the account details and the reply names collections.
+  if (String((P.code || {}).team_note || '').indexOf('banknote v') !== -1 || process.env.BANKNOTE_FORCE) {
+    console.log(NL + '--- 18 Nov, later: a transfer asked and a reply about collections, so the note goes (Grok, 190483) ---');
+    const G1 = 'הבקשה שלך כבר נמצאת אצל צוות הגבייה 🙂 הם ישלחו לך את פרטי החשבון ממש לכאן. יש עוד משהו שאוכל לעזור בו בינתיים?';
+    const G1S = 'היי, אפשר לשלם את ועד הבית בהעברה בנקאית? מה פרטי החשבון?';
+    expect('190483 exactly: no tool, "already with collections", the note goes',
+      () => E.teamNote({ output: G1 }, turn({ steps: [], said: G1S }).$), true);
+    expect('"מספר החשבון" asked, the same',
+      () => E.teamNote({ output: 'זה אצל נציג מצוות הגבייה, והוא ישלח לך כאן את מספר החשבון. יש עוד משהו?' }, turn({ steps: [], said: 'מה מספר החשבון להעברה?' }).$), true);
+    expect('collections in the reply but no transfer asked: not this clause',
+      () => E.teamNote({ output: 'דמי הוועד כוללים גם את הגבייה של חברת הניהול. יש עוד משהו?' }, turn({ steps: [], said: 'מה כלול בדמי הוועד?' }).$), false);
+    expect('a transfer asked but no collections in the reply: not this clause',
+      () => E.teamNote({ output: 'אפשר לשלם בהעברה בנקאית. יש עוד משהו?' }, turn({ steps: [], said: G1S }).$), false);
+  }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }

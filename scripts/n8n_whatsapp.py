@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 111
+MEMORY_EPOCH = 112
+# 111 -> 112, 18 Nov, later (n8n_whatsapp_bankagain.py): the owner's Grok run found the memory held an earlier hand-over
+# and notify_team said not to call again, so a fresh chat got "already with collections" and no note; now it is called
+# every time it is asked, and banknote v1 sends the note to Collections whatever the model called.
 # 110 -> 111, 18 Nov (n8n_whatsapp_banktransfer.py): a bank transfer goes to a person from collections, and Michael
 # says so (Yariv; the owner: "keep answering"): notify_team reason bank_transfer, the one note the resident hears about;
 # the one-voice sentence names it beside the lift and the standing order; get_payment_link leaves it to notify_team.
@@ -868,7 +871,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "e2bc35955dd0",  # 18 Nov, epoch 111 (n8n_whatsapp_banktransfer.py): notify_team hands a bank transfer to
+    "tools": "af9086ec97c8",  # 18 Nov, later, epoch 112 (n8n_whatsapp_bankagain.py): notify_team calls the bank-transfer
+    # hand-over every time it is asked, and a request for a person about it gets the same words.
+    # Before: e2bc35955dd0, 18 Nov, epoch 111 (n8n_whatsapp_banktransfer.py): notify_team hands a bank transfer to
     # collections and says so; get_payment_link leaves it to notify_team.
     # Before: 244f68113181, 17 Nov, epoch 110 (n8n_whatsapp_standinglink.py): get_payment_link is the first answer
     # to a standing order. Before: b10df5bd95db, 11 Nov, later that night, epoch 106 (n8n_whatsapp_confirm.py): open_request only after

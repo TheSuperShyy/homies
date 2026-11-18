@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The owner's Grok run of epoch 111, checked against the runs: the handset passed, Collections was not told; epoch 112 written and gated, NOT live, 11:30 UTC
+- **Grok's report (pasted by the owner):** 6 messages, 6 replies, no fail. Notes: no "נציג" in either opening, "כבר" in B1.1 leaning on an earlier chat, B1.2 not saying where the details come, and B2.1's "אני עושה כל מה שאפשר כדי לזרז את זה".
+- **What the runs show (conversation 95, a fresh chat after conversation 93 was resolved):**
+  - **B1.1 (execution 190483): no tool call.** The memory is keyed by the phone (`-111`), not the chat, and held the 10:20 synthetic hand-over, and notify_team said "Asked about it again, it is already with collections: say so, without calling again". So Michael said "הבקשה שלך כבר נמצאת אצל צוות הגבייה" and no note, team or label reached conversation 95. Grok could not see that.
+  - **B1.2 (190494):** the model wrote "...אבל הבקשה שלך כבר רשומה אצל צוות הגבייה והם ישלחו לך את הפרטים לכאן", and Send cut that clause: "רשומה אצל צוות" is a recorded-with-the-team claim the one-voice guards take out. "זה אצל נציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון" goes out whole (checked through live Send).
+  - **B2.1 (190520): no tool call either.** "Team note this turn?" fired as a backstop on "הם ייצרו איתך קשר" (which Send then cut), with reason `other`, so "Hand to a person" 190523 sent the note to **Service** ("משהו שרק בן אדם מהצוות יכול לסדר"), not Collections. The reply carried the manager-request words ("אני עושה כל מה שאפשר כדי לזרז את זה").
+  - **The handover labels came off within a minute again** (190541, served), on real messages this time. **Chatwoot 4.16 clears `waiting_since` on every bot reply** (`Message#clear_waiting_since_on_outgoing_response`: "Bot responses also clear waiting_since"). The handback ticker reads 0 as "a person answered", so every handover's `handover` labels go a minute after Michael's reply, and the 10- and 25-minute ladder cannot start. Not new today: it holds for every handover, manager requests included. The team and the `bank-transfer` label stay. Not changed.
+- **Epoch 112, `scripts/n8n_whatsapp_bankagain.py` (written and gated, NOT live):**
+  - **notify_team:** "without calling again" becomes "every time they ask for it, call this again, even when you passed them on earlier or remember doing so (you cannot see whether that was closed; a repeat while it is still open is dropped by the system). A request for a person about it is this same hand-over, told in these words, not the words for a manager request."
+  - **Team note this turn? (banknote v1):** the note also goes when the tenant's message names a transfer or the account details (העברה בנקאית, בהעברה, פרטי/מספר החשבון, לחשבון הבנק) and the reply names collections, whatever the model called.
+  - **Let the team know:** with no notify_team call (the backstop), the reason is `bank_transfer` when the tenant's message names a transfer or the account details, else `other` as before.
+  - **Memory 111 -> 112** (`EPOCH_COVERS` tools `af9086ec97c8`; the prompt is unchanged). It also forgets the synthetic hand-over on the owner's number.
+- **Checked:**
+  - **4 new gate cases (banknote), seen failing on live first** (2 of 670 failed there). On the dump: 670/670, the replay changes nothing, nothing broken, and only `notify_team`'s pin fails.
+  - **The clause over all real history:** 3 tenant turns ever named a transfer, all today's tests, and each was followed by a reply naming collections, so the note would have gone on each. No false positive.
+  - The backstop's reason on mocked turns: `bank_transfer` for a transfer or the account number, `other` for anything else, and a tool's own reason untouched.
+  - The idle check against a fresh live baseline: only `n8n_whatsapp_banktransfer` adds a refusal (the moved key); `bankagain`, `fresh` and `patch` go idle once live matches.
+  - **Running:** a Claude-played check of the failure itself (`scripts/wa_qa_bankagain.json`: memory holding the earlier hand-over, then asked again, and a representative plus a transfer).
+
 ### A Grok brief for the bank-transfer hand-over (the owner: "ok give me instructions in grok so i can test that"), 10:32 UTC
 - **`docs/features/11-whatsapp-bot/grok-bank-transfer-test.md`**, in the shape of the emergency-line brief: two conversations in the same chat, six messages.
   - B1: a transfer and the account details asked; "ומתי זה יגיע?"; a different question ("מה כלול בדמי הוועד?") to show he keeps answering; a goodbye.
