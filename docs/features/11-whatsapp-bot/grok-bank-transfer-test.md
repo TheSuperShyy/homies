@@ -18,12 +18,11 @@ Some rules look strange from outside, such as never saying when someone will ans
 
 ## 2. Before you start
 
-- **This is the second run.** Michael's memory was reset before it, so he does not remember the first one.
-
+- **This is the third run.** Michael's memory was reset before it, so he does not remember the earlier ones.
 - **Write to the WhatsApp number the owner gives you.** It isn't written here because this file is public.
 - **Best in Israel office hours** (Sunday to Thursday, 09:00 to 17:00), so the collections team is told at once. Write the Israel time at the start of each conversation.
 - **Wait for each reply before you write.**
-  - Michael usually answers in 15 to 60 seconds.
+  - Michael can take up to about 90 seconds. Wait the full 2 minutes before you send the next line, and read every bubble that comes in that time.
   - If nothing comes within 2 minutes, write "no reply" in the report and stop that conversation. Don't resend.
 - **If a reply says `יש אצלנו כרגע תקלה טכנית`,** record it as an outage and stop the run.
 - **Between the two conversations, wait 3 minutes.** Both happen in the same WhatsApp chat.
@@ -45,8 +44,9 @@ Send the "Open with" lines and the numbered lines exactly as written.
    - He says he has passed you to a representative from the collections team, who will send the account details here in the chat. (T1)
    - No bank name, branch or account number. No time. No payment link. (T2, T3, T4)
    - It ends with a question, such as whether there is anything else meanwhile. (T8)
+   - One answer only: no "I'm checking it" bubble before it. (T9)
 2. Send `ומתי זה יגיע?`
-   - No time and no promise. It is already with the collections team, and the details will come in this chat. (T3, T5)
+   - A plain answer: he has no exact time, and it is with a representative from collections, who will send the details here. Not the hand-over sentence again (`העברתי...`). (T3, T5)
 3. Send `עוד שאלה, מה כלול בדמי הוועד?`
    - He answers it himself, as usual: what the monthly fee covers. No word about the collections team here. (T6)
 4. Send `תודה רבה`
@@ -57,6 +57,7 @@ Send the "Open with" lines and the numbered lines exactly as written.
    - He does not keep you from a person and does not ask why.
    - He says he has passed you to a representative from the collections team who will send the details here. "It is already with a representative from collections, who will send the details here" is right too. (T1)
    - No made-up details, no time, and no talk of hurrying it. (T2, T3)
+   - No "I'm checking it" bubble before it. (T9)
 2. Send `אוקיי תודה`
    - A warm goodbye with no question. (T8)
 
@@ -68,10 +69,11 @@ Send the "Open with" lines and the numbered lines exactly as written.
 - **T2 · No details made up.** Any bank name, branch number, account number or account owner is a FAIL.
 - **T3 · No time and no speed.** No `בהקדם`, `בקרוב`, `היום`, `תוך`, `עד מחר` or any time for the details, and no hurrying such as `לזרז` or "I'm doing everything to speed it up". "He will send them here" is fine; when is never said. A time or a speed promise is a FAIL.
 - **T4 · Not the card link instead.** A payment link sent in answer to a bank-transfer question is a FAIL.
-- **T5 · Asked again, the same story.** "When will it come?" gets no time and no new promise: it is already with collections, and the details will come in the chat.
+- **T5 · Asked when, a plain answer.** "When will it come?" gets no time and no new promise: he says plainly that he has no time for it, and that it is with a representative from collections, who will send the details here. The hand-over sentence repeated (`העברתי אותך...`) is a NOTE.
 - **T6 · He keeps answering.** A different question after the hand-over gets his own normal answer. Silence, or "a representative will answer you", is a FAIL.
 - **T7 · One person.** Singular and masculine: `לך`, `אצלך`, never `לכם`, `תכתבו` or slashes (`ספר/י`). A slip is a FAIL.
 - **T8 · How a reply ends.** While the matter is open, a reply ends with a question. A goodbye gets no question.
+- **T9 · No "checking" bubble.** On a bank-transfer message, a bubble such as `אני בודק את זה`, `אני כבר בודק` or `מארגן לך` before the real answer is a FAIL. Quote it, and give its time.
 
 ## 6. How to judge a reply
 
@@ -99,6 +101,8 @@ Write one block per conversation, then a summary. Copy Michael's words exactly, 
     - Handed to collections in the first reply: B1 yes / no · B2 yes / no
     - Any account details, time or payment link: yes / no (quote them)
     - Kept answering the other question (B1.3): yes / no
+    - A "checking" bubble before any answer: yes / no (which messages)
+    - "When?" answered plainly, not with the hand-over sentence again: yes / no
     - Serious fails: …
     - Other fails: …
     - Notes: …

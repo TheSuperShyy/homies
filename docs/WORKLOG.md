@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### LIVE 11:50:53 UTC, WhatsApp epoch 113: no "checking" note on a transfer, and "when?" answered plainly (the owner: "push it live then give me grok instructions again")
+- **Pushed before the Claude-played check came back,** on the owner's word: `notify_team`'s pin moved to `ec89b066d496`, and the gate on the dump was all green (673/673).
+- **`n8n_whatsapp_bankwhen.py --apply`:** the bot at 11:50:53, with tools `cc6616c65c25`, memory key `-113`, and notify_team and "A word first?" as written (snapshot `local/n8n-whatsapp-live-18nov-before-bankwhen.json`). The re-run reports nothing to do, and the gate on live is 673/673, all green.
+- **Conversation 96 resolved at 11:51:13 UTC** (the second Grok run; team Collections, `bank-transfer`), so the third run opens a fresh chat.
+- **The Grok brief, third run:** wait the full 2 minutes (answers can take about 90 s); T5 asks for a plain "when" answer; T9 fails a "checking" bubble before an answer.
+
 ### The owner's second Grok run (epoch 112) checked against the runs, and epoch 113 written and gated, NOT live, 12:10 UTC
 - **Grok's report:** 6 messages, 9 bubbles. A serious fail on B1.1 (no hand-over in the first reply, "כדי להעביר לך את פרטי התשלום המדויקים") and a T8 fail. Notes: a new "checking now" bubble before each real answer, the hand-over twice in B1.2, and "when?" not answered directly. The "לזרז" wording was gone.
 - **What the runs show (conversation 96):**
