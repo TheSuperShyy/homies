@@ -67,6 +67,7 @@ appended to.
 >     - "when?" got a plain answer with no new note;
 >     - every reply carries WhatsApp's id;
 >     - the first answer took 59 s.
+>   - **Yariv's update, drafted 12:35 UTC** (`local/yariv/2026-11-18-update.txt`, the owner sends it): both asks, and a request for at least one collections person connected to the system.
 >   - **Rollback:** `python scripts/n8n_whatsapp_bankwhen.py --restore`, then `git revert`.
 >
 > **LIVE 18 Nov, 11:27:37 UTC: WHATSAPP EPOCH 112, THE BANK-TRANSFER HAND-OVER IS CALLED EVERY TIME IT IS ASKED** (the owner's Grok run of epoch 111, then *"ok push it live then give me grok instructions again"*; WORKLOG 18 Nov).

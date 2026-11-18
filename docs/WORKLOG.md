@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The update for Yariv on his two asks (the owner: "give me the update message for yariv"), 12:35 UTC
+- **A Hebrew WhatsApp text in the owner's format** ("עדכון קצר לגבי ההתקדמות:", one "לגבי ..." paragraph per topic, "תודה!"), saved in `local/yariv/2026-11-18-update.txt` (gitignored). The owner sends it.
+- **The bank transfer:** done as he asked, a representative from collections sends the details in the chat. The chat is assigned to Collections with the `bank-transfer` label and a notification; no details and no time from the bot; it keeps answering until a representative replies; tested on a phone. It asks for at least one collections person connected to the system, since the notifications reach us today.
+- **The opener:** the second opening message with an open field, its wording, both opening messages waiting for WhatsApp's approval, and one paragraph with no line breaks in the field.
+
 ### Proven on a handset: the owner's third Grok run of the bank-transfer hand-over, epoch 113, read from the runs (the owner: "ok so everything i set?"), 12:27 UTC
 - **11:57-12:12 UTC, conversation 97 (a fresh chat), six tenant messages; every reply carries WhatsApp's id. Read from the executions and Chatwoot before Grok's report arrived.**
   - B1.1 (190687): `notify_team` `bank_transfer`, no payment-ack note, "היי אסף, צהריים טובים! 🙂 העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון. יש עוד משהו שאני יכול לעזור בו בינתיים?" (59 s after the message). The note to @גבייה (190691) went at 11:58:30.
