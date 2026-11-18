@@ -290,7 +290,7 @@ PINS = {
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '9ad4809c1e14',     # 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    'notify_team / tool': '3554214aa17b',     # 18 Nov, later, epoch 112 (bankagain.py): the bank-transfer hand-over is called every time it is asked, and a request for a person gets the same words (moved on the owner's "push it live", the Claude-played check of wa_qa_bankagain.json still running). 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas; 11 Nov, night
     # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`; later that night
     # (confirm.py, epoch 106): nor for anything else urgent, like a big leak

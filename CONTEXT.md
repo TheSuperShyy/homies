@@ -5940,7 +5940,9 @@ gitignored; the v5 file we had was rev 1.9).
     - **Tested on a handset with Grok:** `docs/features/11-whatsapp-bot/grok-bank-transfer-test.md` (rules T1-T8).
     - **The memory follows the phone, not the chat** (key `<phone>-<epoch>`, 12 messages), so a resolved chat
       does not make Michael forget an earlier hand-over. That is why the hand-over is called every time it is
-      asked (epoch 112, written 18 Nov): a repeat while it is still open is dropped by "Hand to a person".
+      asked (epoch 112, live since 18 Nov 11:27:37 UTC). A repeat is dropped by "Hand to a person" only while
+      the chat still has its `handover` label, which Chatwoot 4.16 lets go a minute after the bot's reply (below),
+      so a later repeat posts a second note to Collections.
 - **Chatwoot 4.16 clears a conversation's `waiting_since` on every bot reply** (`Message#clear_waiting_since_on_outgoing_response`,
   read 18 Nov). The handback ticker's served rule reads 0 as "a person answered", so every handover's `handover`
   labels come off a minute after Michael answers, and the 10- and 25-minute ladder cannot start. The team and the

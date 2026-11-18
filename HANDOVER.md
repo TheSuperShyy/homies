@@ -58,12 +58,13 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
-> **WRITTEN AND GATED 18 Nov, 11:30 UTC, NOT LIVE: WhatsApp epoch 112, the bank-transfer hand-over called every time** (the owner's Grok run of epoch 111; WORKLOG 18 Nov).
->   - **Why:** on the handset the run passed, but in a fresh chat (conversation 95) the memory held an earlier hand-over and Michael said "already with collections" with no tool call (190483), and later the backstop sent the note to Service as `other` (190520). **Until epoch 112 is applied, a tenant who asks again in a new chat may reach nobody.**
->   - **`python scripts/n8n_whatsapp_bankagain.py --apply`** writes notify_team (call it every time; a request for a person gets the same words), banknote v1 in "Team note this turn?", the backstop's `bank_transfer` reason in "Let the team know", and memory `-111` -> `-112`. Run no other WhatsApp patcher's `--apply` before it: the repo is ahead of live.
->   - **Gated:** 670/670 (4 new, seen failing on live), the replay changes nothing, only `notify_team`'s pin fails, and the idle check adds only `n8n_whatsapp_banktransfer`'s refusal. A Claude-played check is running.
->   - **Found, not changed: Chatwoot 4.16 clears `waiting_since` on every bot reply,** so the ticker takes every handover's `handover` labels off a minute after Michael answers, and the escalation ladder cannot start. The team and the `bank-transfer` label stay.
->   - **Rollback after an apply:** `python scripts/n8n_whatsapp_bankagain.py --restore` (snapshot `local/n8n-whatsapp-live-18nov-before-bankagain.json`), then `git revert`.
+> **LIVE 18 Nov, 11:27:37 UTC: WHATSAPP EPOCH 112, THE BANK-TRANSFER HAND-OVER IS CALLED EVERY TIME IT IS ASKED** (the owner's Grok run of epoch 111, then *"ok push it live then give me grok instructions again"*; WORKLOG 18 Nov).
+>   - **Why:** Grok's first run passed on the handset, but in a fresh chat the memory (keyed by the phone) held an earlier hand-over. Michael said "already with collections" with no tool call (190483), and later the backstop sent the note to Service as `other` (190520).
+>   - **Now:** notify_team calls the hand-over every time it is asked, and a request for a person about it gets the same words. banknote v1 in "Team note this turn?" sends the note whenever the tenant names a transfer or the account details and the reply names collections. The backstop's reason is `bank_transfer` for a transfer.
+>   - **Read back:** tools `af9086ec97c8`, memory key `-112`, the re-run idle, the gate on live 670/670. The pin was moved before the Claude-played check (`scripts/wa_qa_bankagain.json`) came back, on the owner's word.
+>   - **Repeats:** a second ask more than a minute later posts a second note, since Chatwoot 4.16 takes the `handover` label off a minute after the bot's reply (CONTEXT). That is noisier, not lost.
+>   - **Owed:** the owner's second Grok run (`grok-bank-transfer-test.md`; conversation 95 resolved at 11:27:55 UTC so it opens a fresh chat). Then, in Chatwoot, check the note's team is Collections each time.
+>   - **Rollback:** `python scripts/n8n_whatsapp_bankagain.py --restore` (snapshot `local/n8n-whatsapp-live-18nov-before-bankagain.json`), then `git revert`.
 >
 > **LIVE 18 Nov, 10:17:53 UTC: WHATSAPP EPOCH 111, A BANK TRANSFER GOES TO A PERSON FROM COLLECTIONS, AND MICHAEL SAYS SO** (Yariv; the owner: *"ok go ahead, keep answering and submit the template"*; WORKLOG and CONTEXT 18 Nov).
 >   - **What a tenant gets:** "אני מעביר אותך עכשיו לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון להעברה. יש עוד משהו שאוכל לעזור בו בינתיים?" (live, 10:20:21 UTC). He never gives account details or a time, and he keeps answering until a person replies.

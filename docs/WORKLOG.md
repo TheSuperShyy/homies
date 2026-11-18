@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### LIVE 11:27:37 UTC, WhatsApp epoch 112: the bank-transfer hand-over is called every time it is asked (the owner: "ok push it live then give me grok instructions again")
+- **Pushed before the Claude-played check came back,** on the owner's word: `notify_team`'s pin moved to `3554214aa17b`, and the gate on the dump was all green (670/670).
+- **`n8n_whatsapp_bankagain.py --apply`:** the bot at 11:27:37, with tools `af9086ec97c8`, memory key `-112`, and notify_team, "Team note this turn?" and "Let the team know" as written (snapshot `local/n8n-whatsapp-live-18nov-before-bankagain.json`). The re-run reports nothing to do, and the gate on live is 670/670, all green.
+- **Conversation 95 resolved at 11:27:55 UTC** (Grok's first run, whose note had gone to Service), so the retest opens a fresh chat; the epoch also reset the memory.
+- **The Grok brief, second run:** `grok-bank-transfer-test.md` now says the memory was reset, fails B1.1 when it only says "already with collections", and counts a speed promise ("לזרז") as a T3 fail.
+- **How repeats behave now:** "Hand to a person" drops a repeat only while the chat still has its `handover` label. Chatwoot 4.16 takes that label away a minute after Michael's reply (the waiting_since finding above), so a second ask more than a minute later posts a second note to Collections. That is noisier, not lost.
+
 ### The owner's Grok run of epoch 111, checked against the runs: the handset passed, Collections was not told; epoch 112 written and gated, NOT live, 11:30 UTC
 - **Grok's report (pasted by the owner):** 6 messages, 6 replies, no fail. Notes: no "נציג" in either opening, "כבר" in B1.1 leaning on an earlier chat, B1.2 not saying where the details come, and B2.1's "אני עושה כל מה שאפשר כדי לזרז את זה".
 - **What the runs show (conversation 95, a fresh chat after conversation 93 was resolved):**
