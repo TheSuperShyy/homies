@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The opener with a free field submitted to Meta on both WABAs (the owner: "ok go ahead, keep answering and submit the template"), 09:55:11-09:55:28 UTC
+- **`homies_message_he`**, MARKETING, he: "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Staff type their own message into `{{1}}`; Chatwoot shows a box for it. Example given to Meta: "רצינו לעדכן שביום שלישי תהיה הפסקת מים בבניין בין 10:00 ל-12:00."
+- **Submitted with `wa_templates.py create homies_message_he --apply` and again with `--waba 1389698653006050 --apply`:** id `1766335894444792` on `…632`, id `1677261424140865` on "hadas 1" `…050`. Both PENDING.
+- The section is in `docs/features/11-whatsapp-bot/templates.md` (what staff type: one paragraph, no line breaks; why a fixed start and end; the fallback if Meta refuses it as too open). `homies_hello_he` stays as the fixed one.
+
 ### Planned, not built: Yariv's two asks (the owner pasted them, "plan this"), 09:55 UTC
 - **Yariv, 18 Nov about 09:36 UTC:**
   - "אם דייר מבקש לבצע תשלום באמצעות העברה בנקאית, צריך לסמן את הצ'ט ככה שזה מועבר לנציג. בעצם שהבוט יגיד לו אני מעביר אותך לנציג לצורך קבלת הפרטים ולהעביר את הצ'ט".

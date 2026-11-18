@@ -120,3 +120,44 @@ variable, which Meta's reviewers read).
 ```
 
 - **variables:** none
+
+---
+
+## homies_message_he
+
+- **What:** the same kind of first message as `homies_hello_he`, with a box for the
+  staff member's own words. They pick it in Chatwoot (inbox 1, a new conversation)
+  and type what they want to say into `{{1}}`: a building notice, a payment
+  reminder, a question. Chatwoot 4.16 shows a box for each blank and will not send
+  until it is filled (`WhatsAppTemplateParser.vue`, read 18 Nov). Once the person
+  replies, the staff member writes freely for 24 hours, and the bot keeps out of a
+  conversation a staff member opened (CONTEXT, Sort's three off switches).
+- **Decided:** Yariv, 18 Nov 2026: *"מזכיר שאמרנו שתהיה לנו רובריקה שנוכל להכניס
+  הודעות שונות לצורך פתיחת שיחה ולא משהו קבוע (לא רק משהו קבוע)"*. The owner OK'd
+  this wording the same day (*"ok go ahead ... submit the template"*).
+  `homies_hello_he` stays as the fixed one.
+- **Sender:** a staff member, by hand, from Chatwoot. Nothing automatic sends it.
+- **Accounts:** created on both WABAs: `.env`'s (`…632`, Chatwoot's template
+  list) and "hadas 1" (`…050`, where the number's sends are looked up).
+- **What staff type:** one paragraph. Meta refuses a filled-in blank that holds a
+  line break, a tab or four spaces in a row, and the whole message stays under
+  1,024 characters.
+- **Why a fixed start and end:** Meta refuses a template whose body opens or
+  closes with a blank.
+- **Opt-in:** as for `homies_hello_he`. WhatsApp's policy wants people who agreed
+  to hear from Homies, and a stranger who blocks or reports it lowers the number's
+  rating (TIER_250).
+- **Why MARKETING:** what goes in the box is anything, tied to no transaction.
+  Meta decides the category in the end. If Meta refuses it as too open, the
+  fallback is a few fixed templates, one per purpose.
+- **category:** MARKETING
+- **language:** he
+- **body:**
+
+```
+שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן.
+```
+
+- **variables:**
+  - `{{1}}` — the staff member's message, one paragraph
+- **examples:** `רצינו לעדכן שביום שלישי תהיה הפסקת מים בבניין בין 10:00 ל-12:00.`
