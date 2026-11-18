@@ -14,6 +14,9 @@ conversation that produced it.
 ### LIVE 11:50:53 UTC, WhatsApp epoch 113: no "checking" note on a transfer, and "when?" answered plainly (the owner: "push it live then give me grok instructions again")
 - **Pushed before the Claude-played check came back,** on the owner's word: `notify_team`'s pin moved to `ec89b066d496`, and the gate on the dump was all green (673/673).
 - **`n8n_whatsapp_bankwhen.py --apply`:** the bot at 11:50:53, with tools `cc6616c65c25`, memory key `-113`, and notify_team and "A word first?" as written (snapshot `local/n8n-whatsapp-live-18nov-before-bankwhen.json`). The re-run reports nothing to do, and the gate on live is 673/673, all green.
+- **12:00 UTC, epoch 113's Claude-played check came back** (`scripts/wa_qa_bankwhen.json`): 8/8 expectations, no guard, no flag.
+  - The ack model still wrote "הבנתי, אני בודק את זה בשבילך עכשיו.", and ackhold held it. The handset got only "היי אסף, כן, אפשר לשלם את ועד הבית בהעברה בנקאית. העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן בצ'אט את פרטי החשבון. יש עוד משהו שאוכל לעזור לך בו בינתיים?"
+  - "ומתי זה יגיע?" had no tool call and got "זמן מדויק אין לי, כי את פרטי החשבון שולח נציג מצוות הגבייה ולא אני. הבקשה שלך כבר אצלו, והוא ישלח לך אותם כאן בצ'אט. רוצה שאבדוק לך בינתיים כמה עומד לתשלום, כדי שתדע איזה סכום להעביר?"
 - **Conversation 96 resolved at 11:51:13 UTC** (the second Grok run; team Collections, `bank-transfer`), so the third run opens a fresh chat.
 - **The Grok brief, third run:** wait the full 2 minutes (answers can take about 90 s); T5 asks for a plain "when" answer; T9 fails a "checking" bubble before an answer.
 
