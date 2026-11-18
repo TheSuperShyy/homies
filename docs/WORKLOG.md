@@ -14,11 +14,7 @@ conversation that produced it.
 ### LIVE 13:54:49 UTC, Send linkline v1: the payment link goes out on a line of its own (the owner's one-conversation Grok report: "FAIL P2: the link isn't on its own line")
 - **Grok's report (conversation 98, 13:40-13:45 UTC):** P1, P3 and T1-T7 passed; P2 failed ("[קישור] כשאתה נכנס לקישור..." on one line). Notes: "קודם כל," with nothing after it, and "🙏." (an emoji then a full stop).
 - **The runs:**
-  - 190914: `get_payment_link`, and the model wrote the link on its own line ("...בבר כוכבא 23:
-
-<link>
-
-כשאתה נכנס לקישור...").
+  - 190914: `get_payment_link`, and the model wrote the link on its own line, with a blank line before and after it (`...בבר כוכבא 23:\n\n<link>\n\nכשאתה נכנס לקישור...`).
   - 190927: `notify_team` `bank_transfer`; "Hand to a person" 190929 noted Collections, and the chat ends on Collections with `bank-transfer`.
   - 190944: the goodbye.
 - **Cause: Send, not the model.** Send's first clean-up `.replace(/\s{2,}/g, ' ')` turns any run of two or more blanks into one space, so the blank lines around the link became spaces. A single line break survives it, which is why the question kept its own line. Reproduced through live Send with a dummy link.
