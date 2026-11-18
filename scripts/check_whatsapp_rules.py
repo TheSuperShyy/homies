@@ -257,7 +257,11 @@ PINS = {
     # page offering one (card or bank), and the question whether that works or collections should phone; the
     # request is recorded for that call or when no link came back. Claude-played standing_link and standing_call on
     # the candidate (scratchpad run wa_qa_standing): 15/15 expectations, no guard, no flag.
-    'Answer the resident / system': '2c95b2d3aaa6',
+    # 18 Nov (n8n_whatsapp_banktransfer.py, epoch 111): a bank transfer goes to a person from collections, and Michael
+    # says so (Yariv; the owner: "keep answering"): the one-voice sentence names a third matter, the tool list gains it,
+    # and a sentence after the standing order's. Claude-played bt_on_file and bt_rep_after_hours on the candidate
+    # (scripts/wa_qa_banktransfer.json, scratchpad run qa_bt): 19/19 expectations, no guard, no flag.
+    'Answer the resident / system': '7960ab31d1a1',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -280,13 +284,13 @@ PINS = {
     'Worth a word? / input': '0d3156ee53a4',
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
-    'get_payment_link / tool': '638004604c2e',   # 5 Nov, epoch 96: a standing order is not a link; 17 Nov, epoch 110: it is the first answer to one
+    'get_payment_link / tool': '38638c4b2eea',   # 5 Nov, epoch 96: a standing order is not a link; 17 Nov, epoch 110: it is the first answer to one; 18 Nov, epoch 111: a bank transfer is notify_team's
     'request_standing_order / tool': '30d4131d9bd1',   # 5 Nov, epoch 96: new; 9 Nov, epoch 100: collections will phone; 17 Nov, epoch 110: for that call or no link
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '82a6b8569159',     # 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    'notify_team / tool': '9ad4809c1e14',     # 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas; 11 Nov, night
     # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`; later that night
     # (confirm.py, epoch 106): nor for anything else urgent, like a big leak

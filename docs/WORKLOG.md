@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### LIVE 10:17:53 UTC, WhatsApp epoch 111: a bank transfer goes to a person from collections, and Michael says so (Yariv; the owner: "ok go ahead, keep answering and submit the template")
+- **The Claude-played check on the candidate** (`scripts/wa_qa_banktransfer.json`, two blind players, `wa_qa.py grade`): 19/19 expectations, nothing guarded, no flag.
+  - Asked: "היי אסף, כן, אפשר לשלם את ועד הבית בהעברה בנקאית 🙂 את פרטי החשבון אין לי כאן, אז העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך אותם כאן בצ'אט. יש עוד משהו שאוכל לעזור לך בו בינתיים?"
+  - "ומתי זה יגיע?": no time and no second note; already with collections, and the offer to check the balance meanwhile. Send cut "והפרטים יגיעו אליך לכאן" (a promise), and the rest read whole.
+  - A representative plus a transfer, after hours: "בטח, אין בעיה. העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן בצ'אט את פרטי החשבון להעברה..." That turn called notify_team twice, which led to the "Let the team know" fix (entry below).
+- **Pins moved** after it: the prompt `7960ab31d1a1`, `get_payment_link` `38638c4b2eea`, `notify_team` `9ad4809c1e14`. The gate on the candidate: all green.
+- **Applied (`n8n_whatsapp_banktransfer.py --apply`, 10:17:44-10:17:56 UTC):**
+  - the Chatwoot label `bank-transfer`, id 25;
+  - "Hand to a person" written at 10:17:50, routing as written (snapshot `local/n8n-handover-live-18nov-before-banktransfer.json`);
+  - the bot at 10:17:53: prompt `7960ab31d1a1`, tools `e2bc35955dd0`, memory key `-111`; notify_team, get_payment_link and "Let the team know" as written (snapshot `local/n8n-whatsapp-live-18nov-before-banktransfer.json`).
+  - The re-run reports nothing to do. The gate on live: 666/666, all green.
+- **One live message, from the owner's test contact (conversation 93), with `wa_qa.py live`** (a synthetic Chatwoot webhook into the live bot; the reply is real): "היי, אפשר לשלם את ועד הבית בהעברה בנקאית? מה פרטי החשבון?" at 10:19:32 UTC.
+  - Execution 190397: `notify_team` with reason `bank_transfer`, department collections, "הדייר שואל אם אפשר לשלם ועד בית בהעברה בנקאית ומבקש את פרטי החשבון."
+  - The reply went out with WhatsApp's id (message 3471, 10:20:21): "בשמחה. אני מעביר אותך עכשיו לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון להעברה. יש עוד משהו שאוכל לעזור בו בינתיים?"
+  - "Hand to a person" 190400 (mode new, in office hours): the private note 3470 "@גבייה דייר צריך מישהו מכם. / סיבה: הדייר רוצה לשלם בהעברה בנקאית ומחכה לפרטי החשבון. / ... / מה לעשות: לשלוח לדייר כאן, בשיחה הזאת, את פרטי החשבון של הבניין שלו. ...", the chat assigned to Collections, the labels `handover`, `handover-collections` and `bank-transfer`.
+  - **20 s later the ticker took the two handover labels off** (190410, mode served). A test artefact: the synthetic message is not in Chatwoot, so the chat's `waiting_since` stayed 0, and the ticker reads 0 as answered. A real tenant's message sets it, and only a person's public reply clears it. `bank-transfer` stayed, as written. The typing call failed (400, no `to`) for the same reason.
+  - `--watch` since 10:17: 1 resident turn, nothing broke the rules.
+- **Cost of that one turn: about $0.11 on OpenRouter** (27.41537705 -> 27.53019505). Three model calls: the ack model 677 in / 1,895 out (thinking, then NONE), the answer 17,984 in / 1,494 out, and the second pass after the tool 18,078 in / 56 out. The plan had said "a fraction of a cent"; that was wrong for a turn with a tool on this model.
+- **Found, not changed:** the tool server records the note's reason as `caller_request` (the observation reads `{"ok":true,"reason":"caller_request"}`), because `transfer_to_human`'s list in debt-tools and the CHECK on `call_outcomes.transfer_reason` do not know `bank_transfer`, the same fallback the 20 Aug and 14 Sep comments there call a quiet lie. The Chatwoot note takes its reason from the call itself, so the staff side is right. The fix is a migration widening the CHECK, then the word in the list through a PR to main, in that order.
+- **Left on conversation 93:** the note, the team Collections and the label `bank-transfer` (test traces stay). The owner's login, the stand-in in Collections, got the mention, and the owner's handset got the reply without having written.
+
 ### WhatsApp epoch 111 written and gated, NOT live: a bank transfer goes to a person from collections, and Michael says so (the owner: "ok go ahead, keep answering and submit the template"), 10:11 UTC
 - **The owner's two answers to the plan:** Michael keeps answering while a bank-transfer chat waits for collections (the 3 Sep handover rule), and the template goes to Meta (done 09:55, the entry below).
 - **What is written, all in the repo and NOT on live yet:**

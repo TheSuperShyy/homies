@@ -58,13 +58,17 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
-> **WRITTEN AND GATED 18 Nov, 10:11 UTC, NOT LIVE: WhatsApp epoch 111, a bank transfer goes to a person from collections** (Yariv; the owner: *"ok go ahead, keep answering and submit the template"*; WORKLOG 18 Nov).
->   - **The repo is ahead of live until `python scripts/n8n_whatsapp_banktransfer.py --apply`.** Until then run no other WhatsApp patcher's `--apply`: `n8n_whatsapp_patch.py` would push the new `prompt.md` to live without the epoch bump or the tool texts.
->   - **What `--apply` does:** the bot (`u2JjrbcNPYyyh3yl`): three prompt sentences, `notify_team` (a paragraph and `bank_transfer` in its reason list), one sentence of `get_payment_link`, memory `-110` -> `-111`, and "Let the team know" takes the bank_transfer call when a turn has two notes. "Hand to a person" (`oB66atFlWwtkSGgN`): `bank_transfer` always to Collections, its own reason line, the label `bank-transfer`, and the note's "send the account details here". Chatwoot: the label `bank-transfer` is created.
->   - **Michael keeps answering** while the chat waits (the owner's answer). A person's reply pauses him, and resolving gives the tenant back.
->   - **Gated:** 666/666 on live and candidate, the replay changes nothing, only the three intended pins fail, and the idle check adds only `n8n_whatsapp_standinglink`'s refusal. A Claude-played check of two scenarios is running; the pins move after it.
->   - **Before real tenants:** a real Homies person in the Collections team and inbox 1 (today the owner's login stands in). **Owed:** the incoming phone agent's twin.
->   - **Rollback after an apply:** `python scripts/n8n_whatsapp_banktransfer.py --restore` (snapshots `local/n8n-whatsapp-live-18nov-before-banktransfer.json` and `local/n8n-handover-live-18nov-before-banktransfer.json`), then `git revert`.
+> **LIVE 18 Nov, 10:17:53 UTC: WHATSAPP EPOCH 111, A BANK TRANSFER GOES TO A PERSON FROM COLLECTIONS, AND MICHAEL SAYS SO** (Yariv; the owner: *"ok go ahead, keep answering and submit the template"*; WORKLOG and CONTEXT 18 Nov).
+>   - **What a tenant gets:** "אני מעביר אותך עכשיו לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון להעברה. יש עוד משהו שאוכל לעזור בו בינתיים?" (live, 10:20:21 UTC). He never gives account details or a time, and he keeps answering until a person replies.
+>   - **What staff get:** "Hand to a person" assigns the chat to Collections, labels it `handover`, `handover-collections` and `bank-transfer` (Chatwoot label id 25), and posts a note that @mentions Collections: "סיבה: הדייר רוצה לשלם בהעברה בנקאית ומחכה לפרטי החשבון ... מה לעשות: לשלוח לדייר כאן ... את פרטי החשבון של הבניין שלו". `bank-transfer` stays after a person answers; the handover labels go.
+>   - **Read back:** bot prompt `7960ab31d1a1`, tools `e2bc35955dd0`, memory key `-111`; the patcher's re-run reports nothing to do; the gate on live 666/666, all green; `--watch` from 10:17 clean.
+>   - **Proven by one synthetic message from the owner's test contact** (`wa_qa.py live`, conversation 93): the tool call, the reply with WhatsApp's id, the note, the team and the labels. The ticker then took the handover labels off, because a synthetic message leaves `waiting_since` at 0. A real message keeps them, so a real one from a handset is still the last proof.
+>   - **Cost:** a turn with a tool costs about $0.11 on OpenRouter on this model (the test turn, measured).
+>   - **Owed:**
+>     - the tool server records the note's reason as `caller_request`: a migration widening the CHECK on `call_outcomes.transfer_reason`, then `bank_transfer` in debt-tools' `transfer_to_human` list through a PR to main, in that order;
+>     - a real Homies person in the Collections team and inbox 1 before real tenants (today the owner's login stands in);
+>     - the incoming phone agent's twin.
+>   - **Rollback:** `python scripts/n8n_whatsapp_banktransfer.py --restore` (both snapshots), then `git revert` (prompt.md, the epoch, the pins, n8n_handover.py's DECIDE). The label can stay.
 >
 > **SUBMITTED 18 Nov, 09:55 UTC: the opener with a free field, `homies_message_he`, PENDING Meta's review** (the owner's *"submit the template"*; `templates.md`). "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Chatwoot shows staff a box for `{{1}}`. Ids `1766335894444792` (`…632`) and `1677261424140865` ("hadas 1"). Check with `python scripts/wa_templates.py list --waba 1389698653006050`. Once approved: one send to the owner's handset, and the new-contact video's template step redone.
 >
