@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### LIVE 13:54:49 UTC, Send linkline v1: the payment link goes out on a line of its own (the owner's one-conversation Grok report: "FAIL P2: the link isn't on its own line")
+- **Grok's report (conversation 98, 13:40-13:45 UTC):** P1, P3 and T1-T7 passed; P2 failed ("[קישור] כשאתה נכנס לקישור..." on one line). Notes: "קודם כל," with nothing after it, and "🙏." (an emoji then a full stop).
+- **The runs:**
+  - 190914: `get_payment_link`, and the model wrote the link on its own line ("...בבר כוכבא 23:
+
+<link>
+
+כשאתה נכנס לקישור...").
+  - 190927: `notify_team` `bank_transfer`; "Hand to a person" 190929 noted Collections, and the chat ends on Collections with `bank-transfer`.
+  - 190944: the goodbye.
+- **Cause: Send, not the model.** Send's first clean-up `.replace(/\s{2,}/g, ' ')` turns any run of two or more blanks into one space, so the blank lines around the link became spaces. A single line break survives it, which is why the question kept its own line. Reproduced through live Send with a dummy link.
+- **Fix, `scripts/n8n_whatsapp_linkline.py`:** a last step at the very end of Send, after every guard. A link goes on its own line, and a comma, full stop, semicolon or colon right after it goes. A reply without a link is returned as is.
+  - A first try that moved the link inside the clean-up step left a stray comma where the promise cutter had taken a clause after the link; an existing case caught it.
+  - Code only: no epoch, no pin.
+- **Checked:**
+  - 4 new cases, 2 of them seen failing on live; the two link cases of 27 Sep are now version-aware.
+  - On the dump: 677/677; the replay changes 23 replies, every one a link reply (5 are two-part messages whose link sits past the display cut), and nothing broken.
+  - Live: the re-run reports nothing to do, and the gate is 677/677. The memory key is still `-114`.
+- **Not changed:** "קודם כל," (the model's wording) and "🙏." (an emoji then a full stop).
+
 ### A one-conversation Grok brief: a standing order, then a bank transfer and where (the owner: "i want to see in a single conversation, payment via standing order then ask if it can be a bank transfer and where", "im gonna use grok"), 13:20 UTC
 - **`docs/features/11-whatsapp-bot/grok-standing-order-transfer-test.md`:** one conversation, three messages.
   - "היי, אני רוצה לשלם את ועד הבית בהוראת קבע. איך עושים את זה?" must get the personal link at once, a word that it is personal, a line that on the page you choose a standing order (card or bank), and the question about a call from collections.

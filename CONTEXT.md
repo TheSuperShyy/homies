@@ -5946,6 +5946,7 @@ gitignored; the v5 file we had was rev 1.9).
     - **A transfer ask gets no payment-ack note** (ackhold v1 in "A word first?", epoch 113, live since 18 Nov 11:50:53 UTC):
       the note ("אני בודק את זה...") promised what Michael does not do, and the real answer can take a minute.
       "When?" gets a plain answer (no time, with a representative from collections), with no new note.
+- **Send's first clean-up joins paragraphs:** `.replace(/\s{2,}/g, ' ')` turns a blank line into a space, though a single line break survives. So since 18 Nov (linkline v1) a last step at the very end of Send puts a link back on a line of its own, after every guard.
 - **Chatwoot 4.16 clears a conversation's `waiting_since` on every bot reply** (`Message#clear_waiting_since_on_outgoing_response`,
   read 18 Nov). The handback ticker's served rule reads 0 as "a person answered", so every handover's `handover`
   labels come off a minute after Michael answers, and the 10- and 25-minute ladder cannot start. The team and the

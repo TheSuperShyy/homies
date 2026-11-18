@@ -186,7 +186,10 @@ function cases(E) {
     say({ reply: "אני מיכאל מהומי'ז, ואשמח לעזור! במה אפשר לעזור?", said: 'question' }), 'במה אפשר לעזור?');
   expect('a link after the name keeps every character, loses only the ו',
     say({ reply: "היי! אני מיכאל מהומי'ז, והנה הקישור לתשלום: https://pay.example.co.il/abc123 אפשר לשלם עד מחר.", said: 'hi, the link?' }),
-    'היי! הנה הקישור לתשלום: https://pay.example.co.il/abc123 אפשר לשלם עד מחר.');
+    // 18 Nov (linkline v1): the link then goes on a line of its own, after every guard.
+    String((P.code || {}).send_body || '').indexOf('linkline v') !== -1
+      ? 'היי! הנה הקישור לתשלום:\nhttps://pay.example.co.il/abc123\nאפשר לשלם עד מחר.'
+      : 'היי! הנה הקישור לתשלום: https://pay.example.co.il/abc123 אפשר לשלם עד מחר.');
   expect('an amount after the name keeps its decimal point',
     say({ reply: `אני מיכאל מהומי'ז, והיתרה שלכם היא 1,234.50 ש"ח. רוצים קישור לתשלום?`, said: 'how much' }),
     `היתרה שלכם היא 1,234.50 ש"ח. רוצים קישור לתשלום?`);
@@ -328,7 +331,10 @@ function cases(E) {
     say({ reply: 'פתחתי קריאה 255-1339-26. הצוות יחזור אליכם בהקדם🙂 במה עוד?', said: 'question' }), 'פתחתי קריאה 255-1339-26. במה עוד?');
   expect('a link loses only the promise clause after it',
     say({ reply: 'הנה הקישור: https://pay.example.co.il/abc123, ואם יש בעיה אני אטפל בזה. הקישור אישי.', said: 'question' }),
-    'הנה הקישור: https://pay.example.co.il/abc123. הקישור אישי.');
+    // 18 Nov (linkline v1): the link then goes on a line of its own, and the full stop after it goes.
+    String((P.code || {}).send_body || '').indexOf('linkline v') !== -1
+      ? 'הנה הקישור:\nhttps://pay.example.co.il/abc123\nהקישור אישי.'
+      : 'הנה הקישור: https://pay.example.co.il/abc123. הקישור אישי.');
   const MENU_LIKE = 'אפשר לפתוח קריאת שירות, לבדוק מצב קריאה קיימת או לברר יתרה, ונציג יחזור אליכם בהקדם.';
   expect('menu-like text: the promise goes',
     say({ reply: MENU_LIKE, said: 'what can you do' }), 'אפשר לפתוח קריאת שירות, לבדוק מצב קריאה קיימת או לברר יתרה.');
@@ -2103,6 +2109,28 @@ function cases(E) {
       () => E.word({ output: ACK2 }, turn({ said: 'אני רוצה לדבר עם נציג. אני רוצה לשלם בהעברה ואין לי את פרטי החשבון' }).$), false);
     expect('a payment link ask still gets its note',
       () => E.word({ output: 'בודק לך את זה רגע.' }, turn({ said: 'אני רוצה לשלם את החוב שלי, אפשר לקבל קישור לתשלום?' }).$), true);
+  }
+  // 18 Nov, evening (scripts/n8n_whatsapp_linkline.py, Send linkline v1). The owner's one-conversation Grok run
+  // (190914): the model wrote the payment link on a line of its own, with blank lines around it, and Send's first
+  // clean-up (`/\s{2,}/g` -> ' ') turned the blank lines into spaces, so the link went out inline. The link is put
+  // back on its own line; a reply with no link is untouched.
+  if (String((P.code || {}).send_body || '').indexOf('linkline v') !== -1 || process.env.LINKLINE_FORCE) {
+    console.log(NL + '--- 18 Nov, evening: the payment link goes out on a line of its own (the owner\'s Grok run, 190914) ---');
+    const LINK = 'https://www.pro.oxs.co.il/abc1234';
+    const GPL = { action: { tool: 'get_payment_link', toolInput: {} }, observation: ob9({ ok: true, found: true, link: LINK, building: 'בר כוכבא 23', apartment: '2' }) };
+    const SAID = 'היי, אני רוצה לשלם את ועד הבית בהוראת קבע. איך עושים את זה?';
+    const RAW = 'קודם כל, זה הקישור האישי שלך לתשלום על דירה 2 בבר כוכבא 23:\n\n' + LINK + '\n\nכשאתה נכנס לקישור, אתה יכול לבחור לשלם בהוראת קבע (באשראי או בבנק). הקישור הזה הוא אישי לדירה שלך, אז רק אל תעביר אותו הלאה 🙏.\nמסתדר לך, או שנוח לך יותר שמישהו מצוות הגבייה יתקשר אליך?';
+    expect('190914 exactly: the link stands on a line of its own',
+      () => content(E, { reply: RAW, said: SAID, steps: [GPL] }).indexOf('23:\n' + LINK + '\nכשאתה') !== -1, true);
+    expect('a link inside a sentence is moved to its own line',
+      say({ reply: 'זה הקישור שלך: ' + LINK + ' הקישור אישי לדירה שלך. מסתדר לך?', said: SAID, steps: [GPL] }),
+      'זה הקישור שלך:\n' + LINK + '\nהקישור אישי לדירה שלך. מסתדר לך?');
+    expect('a link already on its own line is left as it is',
+      say({ reply: 'זה הקישור שלך:\n' + LINK + '\nהקישור אישי. מסתדר לך?', said: SAID, steps: [GPL] }),
+      'זה הקישור שלך:\n' + LINK + '\nהקישור אישי. מסתדר לך?');
+    const NOLINK = 'פתחתי לך קריאה, מספר 255-1339-26.\n\nיש עוד משהו שאוכל לעזור בו?';
+    expect('a reply with no link is untouched (blank lines still become a space)',
+      say({ reply: NOLINK, said: 'roof' }), 'פתחתי לך קריאה, מספר 255-1339-26. יש עוד משהו שאוכל לעזור בו?');
   }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
