@@ -2089,6 +2089,21 @@ function cases(E) {
     expect('a transfer asked but no collections in the reply: not this clause',
       () => E.teamNote({ output: 'אפשר לשלם בהעברה בנקאית. יש עוד משהו?' }, turn({ steps: [], said: G1S }).$), false);
   }
+  // 18 Nov, later still (scripts/n8n_whatsapp_bankwhen.py, epoch 113, ackhold v1). The owner's second Grok run: on each
+  // transfer ask the payment-ack note went first ("...כדי להעביר לך את פרטי התשלום המדויקים", 190583; "...ומארגן לך את
+  // כל מה שצריך כדי לשלם", 190634), promising what Michael does not do, and B1.1's real answer then took 67 s, so the
+  // note read as the reply. A transfer or the account details in the tenant's words now hold the note.
+  if (String((P.code || {}).word_gate || '').indexOf('ackhold v') !== -1 || process.env.ACKHOLD_FORCE) {
+    console.log(NL + "--- 18 Nov, later still: a bank transfer gets no 'checking' note (the owner's second Grok run) ---");
+    const ACK1 = 'הבנתי, אני בודק את זה ממש עכשיו כדי להעביר לך את פרטי התשלום המדויקים.';
+    const ACK2 = 'הבנתי אותך, אני כבר בודק את זה ומארגן לך את כל מה שצריך כדי לשלם.';
+    expect('190583 exactly: the note is held',
+      () => E.word({ output: ACK1 }, turn({ said: 'היי, אפשר לשלם את ועד הבית בהעברה בנקאית? מה פרטי החשבון?' }).$), false);
+    expect('190634 exactly: the note is held',
+      () => E.word({ output: ACK2 }, turn({ said: 'אני רוצה לדבר עם נציג. אני רוצה לשלם בהעברה ואין לי את פרטי החשבון' }).$), false);
+    expect('a payment link ask still gets its note',
+      () => E.word({ output: 'בודק לך את זה רגע.' }, turn({ said: 'אני רוצה לשלם את החוב שלי, אפשר לקבל קישור לתשלום?' }).$), true);
+  }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }

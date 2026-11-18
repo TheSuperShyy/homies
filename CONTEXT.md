@@ -5943,6 +5943,9 @@ gitignored; the v5 file we had was rev 1.9).
       asked (epoch 112, live since 18 Nov 11:27:37 UTC). A repeat is dropped by "Hand to a person" only while
       the chat still has its `handover` label, which Chatwoot 4.16 lets go a minute after the bot's reply (below),
       so a later repeat posts a second note to Collections.
+    - **A transfer ask gets no payment-ack note** (ackhold v1 in "A word first?", epoch 113, written 18 Nov):
+      the note ("אני בודק את זה...") promised what Michael does not do, and the real answer can take a minute.
+      "When?" gets a plain answer (no time, with a representative from collections), with no new note.
 - **Chatwoot 4.16 clears a conversation's `waiting_since` on every bot reply** (`Message#clear_waiting_since_on_outgoing_response`,
   read 18 Nov). The handback ticker's served rule reads 0 as "a person answered", so every handover's `handover`
   labels come off a minute after Michael answers, and the 10- and 25-minute ladder cannot start. The team and the

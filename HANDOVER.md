@@ -58,6 +58,12 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **WRITTEN AND GATED 18 Nov, 12:10 UTC, NOT LIVE: WhatsApp epoch 113, no "checking" note on a transfer, and "when?" answered plainly** (the owner's second Grok run; WORKLOG 18 Nov).
+>   - **Why:** the payment-ack note went out first on each transfer ask ("...כדי להעביר לך את פרטי התשלום המדויקים") while the real answer took 67 s, so Grok read the note as the reply. And "ומתי זה יגיע?" got the hand-over sentence again.
+>   - **`python scripts/n8n_whatsapp_bankwhen.py --apply`** writes ackhold v1 in "A word first?", notify_team's "asked only when" clause, and memory `-112` -> `-113`. Run no other WhatsApp patcher's `--apply` before it.
+>   - **Gated:** 673/673 (2 new seen failing on live); the replay changes no reply; the ack goes out on 5 fewer messages, all today's transfer tests. A Claude-played check is running.
+>   - **Rollback after an apply:** `python scripts/n8n_whatsapp_bankwhen.py --restore` (snapshot `local/n8n-whatsapp-live-18nov-before-bankwhen.json`), then `git revert`.
+>
 > **LIVE 18 Nov, 11:27:37 UTC: WHATSAPP EPOCH 112, THE BANK-TRANSFER HAND-OVER IS CALLED EVERY TIME IT IS ASKED** (the owner's Grok run of epoch 111, then *"ok push it live then give me grok instructions again"*; WORKLOG 18 Nov).
 >   - **Why:** Grok's first run passed on the handset, but in a fresh chat the memory (keyed by the phone) held an earlier hand-over. Michael said "already with collections" with no tool call (190483), and later the backstop sent the note to Service as `other` (190520).
 >   - **Now:** notify_team calls the hand-over every time it is asked, and a request for a person about it gets the same words. banknote v1 in "Team note this turn?" sends the note whenever the tenant names a transfer or the account details and the reply names collections. The backstop's reason is `bank_transfer` for a transfer.

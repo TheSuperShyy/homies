@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The owner's second Grok run (epoch 112) checked against the runs, and epoch 113 written and gated, NOT live, 12:10 UTC
+- **Grok's report:** 6 messages, 9 bubbles. A serious fail on B1.1 (no hand-over in the first reply, "כדי להעביר לך את פרטי התשלום המדויקים") and a T8 fail. Notes: a new "checking now" bubble before each real answer, the hand-over twice in B1.2, and "when?" not answered directly. The "לזרז" wording was gone.
+- **What the runs show (conversation 96):**
+  - **B1.1 (190583) was right but slow.** notify_team with `bank_transfer`; "Hand to a person" 190591 noted Collections. The answer "העברתי את הפנייה שלך לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון להעברה בנקאית 👍 יש עוד משהו שאפשר לעשות בשבילך בינתיים?" went at 11:33:51, 67 s after the message: the answer model thought for 4,562 tokens.
+  - **What Grok saw as B1.1 was the payment-ack note,** sent at once: "הבנתי, אני בודק את זה ממש עכשיו כדי להעביר לך את פרטי התשלום המדויקים." Grok took it for the reply and sent B1.2 at 11:33:41, before the real answer. So the first hand-over bubble under B1.2 was B1.1's.
+  - **B1.2 (190588):** its own ack ("הבנתי שזה בנוגע לתשלום, אני כבר בודק את זה בשבילך.") and the hand-over sentence again, because epoch 112 says "every time they ask for it". 190608 skipped it as a repeat, since the label was still on.
+  - **B2.1 (190634):** the ack "הבנתי אותך, אני כבר בודק את זה ומארגן לך את כל מה שצריך כדי לשלם." and a right hand-over. 190640 posted a second note to Collections, the label having gone at 11:35:40.
+  - **Every note went to Collections,** and no "לזרז".
+- **Epoch 113, `scripts/n8n_whatsapp_bankwhen.py` (written and gated, NOT live):**
+  - **A word first? (ackhold v1):** the payment-ack note is held when the tenant's words name a bank transfer or the account details.
+  - **notify_team:** a new call for every ask to pay by transfer or for the details. Asked only when, no new call and no new hand-over sentence: no time for it, and a representative from collections will send the details here. That also stops a "when?" pinging Collections again.
+  - **Memory 112 -> 113** (`EPOCH_COVERS` tools `cc6616c65c25`; the prompt is unchanged).
+- **Checked:**
+  - 3 new gate cases (ackhold), 2 seen failing on live. On the dump: 673/673, and the replay changes no reply. The ack gate lets a note out on 82 of 1,552 messages, against 87 on live: the 5 transfer messages of today's tests. Only `notify_team`'s pin fails.
+  - The idle check against live: only `n8n_whatsapp_bankagain` adds a refusal (the moved key).
+  - **Running:** a Claude-played check of ask, "when?", thanks (`scripts/wa_qa_bankwhen.json`).
+
 ### LIVE 11:27:37 UTC, WhatsApp epoch 112: the bank-transfer hand-over is called every time it is asked (the owner: "ok push it live then give me grok instructions again")
 - **Pushed before the Claude-played check came back,** on the owner's word: `notify_team`'s pin moved to `3554214aa17b`, and the gate on the dump was all green (670/670).
 - **`n8n_whatsapp_bankagain.py --apply`:** the bot at 11:27:37, with tools `af9086ec97c8`, memory key `-112`, and notify_team, "Team note this turn?" and "Let the team know" as written (snapshot `local/n8n-whatsapp-live-18nov-before-bankagain.json`). The re-run reports nothing to do, and the gate on live is 670/670, all green.
