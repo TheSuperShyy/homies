@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### A question answered, read only: can the WhatsApp bot give bank details for a transfer (Yariv, pasted by the owner: "if a tenant asks to make a bank transfer and not a credit card payment, does the bot know how to give him the account details? Or does it transfer the referral to a representative"), 08:40 UTC
+- **No, and it does not hand the tenant to a person either.** Read from the live bot (`u2JjrbcNPYyyh3yl`, updated 17 Nov 13:05:15 UTC) and the tool server. Not tried on the live bot, because a reply spends OpenRouter credits.
+  - It knows a transfer is accepted. The prompt's facts read "תשלום: עד ה־10 בכל חודש, בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים", and the 1 and 13 Sep replies said just that.
+  - It holds no bank, branch or account number: none is in the prompt, the tool texts or `get_service_info`'s topics. An unmatched topic answers "say you do not have that detail ... do not guess".
+  - By its tool texts, "how or where to pay" gets `get_payment_link`: the tenant's own OXS page, by card, or a standing order by card or bank. A detail it cannot give is at most a `notify_team` note to collections, and the one-voice rule keeps it from telling the tenant anything was passed on.
+- **The details exist now:** OXS rev 1.11 gives each building's account (CONTEXT, 17 Nov; all 174 buildings with one were approved). Giving them is the owner's and Yariv's call. Nothing changed.
+
 ### Which projects on this PC spend OpenRouter credits (the owner: "check the entire file manager if any of our project is spending open router credits"), 07:46 UTC, read only
 - **Scanned:** D:\work, D:\c, D:\gruk and the user's Documents, Desktop, Downloads, OneDrive and vapi-backups, with no game folders, node_modules or .git (scratchpad `or_scan.py`, key endings only). It found 8 distinct `sk-or-` keys and about 30 projects whose files mention OpenRouter.
 - **Each key's spend, from OpenRouter's `/key` and `/credits`:**

@@ -5916,6 +5916,8 @@ gitignored; the v5 file we had was rev 1.9).
   details to tenants only when `isApproved` is 2. On 17 Nov all 174 buildings
   with an account were approved. The debt prompt's `{{alt_payment}}` could carry
   them.
+  - **The WhatsApp bot has none today (18 Nov):** it says a transfer is accepted, but no account
+    details are in its prompt, tools or service facts. A "how do I pay" gets the payment link.
 - **No endpoint creates a standing order, even in rev 1.11** (the owner asked, 17 Nov).
   The only standing-order effect in the API is a cancellation:
   `DELETE /apartments/:id/payers/:payerId` ("tenant left") cancels the payer's card
