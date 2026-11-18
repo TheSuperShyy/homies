@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The test page updated to the latest test (the owner: "ok open it in artifact the updated one"), 14:05 UTC
+- **The first page (DbFUq9…) was gone:** the publish answered "deleted, or you no longer have write access". So the latest test went to a new artifact.
+- **The new page: "Bank Transfer Hand-over Test", https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs** (private until the owner shares it).
+  - Conversation 98: the standing order, then the bank transfer and where (15:40-15:45 Israel time).
+  - The quick "checking" note, labelled as such, and the link reply with the link hidden; a line under it says the link went inline in this test and has had its own line since 15:54.
+  - The staff note to @גבייה, the assignment and the labels.
+  - The source is the session scratchpad's `bt_page/build98.py`. Only the font stylesheet's address is on the page.
+
 ### LIVE 13:54:49 UTC, Send linkline v1: the payment link goes out on a line of its own (the owner's one-conversation Grok report: "FAIL P2: the link isn't on its own line")
 - **Grok's report (conversation 98, 13:40-13:45 UTC):** P1, P3 and T1-T7 passed; P2 failed ("[קישור] כשאתה נכנס לקישור..." on one line). Notes: "קודם כל," with nothing after it, and "🙏." (an emoji then a full stop).
 - **The runs:**
