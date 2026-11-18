@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### A natural Hebrew voice-over on the new-contact video (the owner: "add a voice over a natural hebrew on the adding a new contact in the chatwoot and check if the template has been approved"), 08:41 UTC
+- **The template:** `homies_hello_he` is still PENDING on both WABAs at 08:22 and 08:41 UTC, about 18 h after submission. Chatwoot already lists it, PENDING.
+- **The narration** (`local/chatwoot-video/voice_contact.py`, gitignored):
+  - One line per segment, 15 in all, in spoken Hebrew in the captions' plural, not the captions read out. Spelled for the voice: "צ'אט ווּט", "הוֹמִיז", and the country code as words.
+  - Voiced on our own Cartesia key (`CARTESIA_API_KEY`) with Gil, "Friendly Host" (`84b969ad`), sonic-3.5, he. Never Homies' key: Michael's clone is theirs.
+  - 916 characters, then 263 and one line more for the redos.
+- **Checked with local speech-to-text** (faster-whisper large-v3-turbo). Four lines came back wrong and were rewritten:
+  - "צ'אטווּט" heard as "צ'טווית", now "צ'אט ווּט";
+  - "הוסף איש קשר" heard as "הוסיף" and then "מוסיף", now "ובוחרים להוסיף איש קשר";
+  - "ממלאים" lost its first syllable, so the line now starts "עכשיו";
+  - "אל" heard as "על", now "אֶל".
+- **`build_contact.py he --voice`** (`Rec.seg`/`close`):
+  - each segment lasts at least its clip plus 0.65 s, never less than the recording's own holds;
+  - each segment's first frame is recorded;
+  - ffmpeg mixes every clip in 0.25 s after its segment starts (`mux_voice`).
+- **One sign-in;** the 2 profile PUTs were blocked, and the contact search and the demo contact were answered in the browser.
+- **Result:** `chatwoot-new-contact-he.mp4`, 88.5 s, 3.2 MB, h264 and aac. The transcribed soundtrack has every line, in order, inside its segment, with no overlap; "תודה רבה" at the end is the transcriber on silence. The English copy stays silent. Opened in File Explorer.
+
 ### A question answered, read only: can the WhatsApp bot give bank details for a transfer (Yariv, pasted by the owner: "if a tenant asks to make a bank transfer and not a credit card payment, does the bot know how to give him the account details? Or does it transfer the referral to a representative"), 08:40 UTC
 - **No, and it does not hand the tenant to a person either.** Read from the live bot (`u2JjrbcNPYyyh3yl`, updated 17 Nov 13:05:15 UTC) and the tool server. Not tried on the live bot, because a reply spends OpenRouter credits.
   - It knows a transfer is accepted. The prompt's facts read "תשלום: עד ה־10 בכל חודש, בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים", and the 1 and 13 Sep replies said just that.
