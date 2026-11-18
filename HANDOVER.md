@@ -58,6 +58,10 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **PLANNED 18 Nov, 09:55 UTC, not built: Yariv's two asks** (the owner: "plan this"; WORKLOG 18 Nov has the plan).
+>   - **A bank transfer goes to a person from collections:** Michael says so, and the chat is handed over through the live "Hand to a person" (own reason and label, Collections mentioned). Waiting on the owner: does Michael keep answering while the chat waits (recommended) or go quiet? Before real tenants, a real person in Collections. The incoming phone agent's twin is owed.
+>   - **An opener with a free field:** a second template, `homies_message_he`, "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Chatwoot shows staff a box for `{{1}}`. Waiting on the owner's OK on the wording, then it is submitted on both WABAs.
+>
 > **CHECKED 17 Nov, 09:10 UTC: BOTH WHATSAPP TEMPLATES WORK ON THE CHATWOOT ROUTE** (owner: *"make sure the templatated message are working ok"*; WORKLOG 17 Nov).
 >   - **The "ticket closed" message:** test ticket 255-1448-26 (the owner's handset, flat 2) was closed in `requests` at 09:09:26 UTC. The notices run sent `ticket_resolved_he` at 09:10:31 with WhatsApp's id (Chatwoot conversation 93, message 3464). Its OXS call stays open.
 >   - **The payment link:** the owner's Ring to Ido, 16 Nov at 15:38 UTC. Free text was refused (his 24 hours were shut), then `payment_link_he` went 2 s later with WhatsApp's id, filled in right, and Michael said it was sent.

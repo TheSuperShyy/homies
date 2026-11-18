@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### Planned, not built: Yariv's two asks (the owner pasted them, "plan this"), 09:55 UTC
+- **Yariv, 18 Nov about 09:36 UTC:**
+  - "אם דייר מבקש לבצע תשלום באמצעות העברה בנקאית, צריך לסמן את הצ'ט ככה שזה מועבר לנציג. בעצם שהבוט יגיד לו אני מעביר אותך לנציג לצורך קבלת הפרטים ולהעביר את הצ'ט".
+  - "לגבי ההודעת פתיחה - מזכיר שאמרנו שתהיה לנו רובריקה שנוכל להכניס הודעות שונות לצורך פתיחת שיחה ולא משהו קבוע (לא רק משהו קבוע)".
+- **1. A bank transfer goes to a person from collections.** What is already live carries most of it:
+  - `notify_team` → "Let the team know" → "Homies — Hand to a person" (`oB66atFlWwtkSGgN`, active) assigns the department's team, adds `handover` labels and posts a private note that @mentions the team. The handback ticker (`IVNR5iNn7bQS8JgP`) runs every minute.
+  - A person's public reply pauses the bot, and resolving gives the tenant back (seen 11 Nov).
+  - **The change:** a reason of its own (bank transfer → Collections, its own label, so the 24-hour duplicate drop of "payment" notes cannot swallow it). Michael says, in his words, that he is passing the tenant to someone from collections who will send the account details in the chat, with no when, and ends on a question.
+  - The one-voice exception gets a third matter: "רק במעלית ובהוראת קבע" becomes lift, standing order and bank transfer. `get_payment_link`'s text stops claiming a transfer ask, so the two tools do not compete. The prompt's payment line stays.
+  - Through `check_whatsapp_rules.py` (new cases seen failing first, replay, watch), with the epoch bumped and a snapshot for rollback. Claude-played first, then one real message from the owner's handset on the owner's go.
+  - **Before real tenants:** a real Homies person in the Collections team and inbox 1 (today the owner's login stands in for all four teams).
+  - **Owed:** the incoming phone agent's twin.
+  - **For the owner:** while the chat waits, does Michael keep answering if the tenant writes again (recommended; the 3 Sep decision), or go quiet with `bot-off`?
+- **2. An opener with a free field.** Chatwoot 4.16 already makes a box for each `{{n}}` in a template when staff pick it in a new conversation, and it will not send until each box is filled (`NewConversation/components/WhatsappTemplate.vue` → `WhatsAppTemplateParser.vue`, read on the box).
+  - **Proposed:** a second template, `homies_message_he`: "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Staff type their own message into `{{1}}`. `homies_hello_he` (fixed, PENDING) stays: Yariv said "not only fixed".
+  - Meta's rules for it: a blank may not open or close the body (hence the fixed start and end), the typed text may not hold line breaks, and the whole stays under 1,024 characters. Most likely MARKETING. If Meta refuses it as too open, the fallback is a few fixed templates, one per purpose.
+  - **Steps:** the owner's OK on the wording, then `templates.md` and `wa_templates.py create` on both WABAs, Meta's review, Chatwoot's sync, one send to the owner's handset, and the new-contact video's template step redone.
+- Recommended order: 2 first, since Meta's review takes time, then 1.
+
 ### A question answered, read only: is the template approved at Meta (the owner: "so is the templated message approved in the meta"), 08:48 UTC
 - **`homies_hello_he`, the staff opener: still PENDING** on both WABAs ("hadas 1" `…050` and `…632`), and listed PENDING in Chatwoot. Submitted 17 Nov 14:47:51 UTC, so about 18 h in review.
 - `ticket_resolved_he` and `payment_link_he` stay APPROVED on both, and synced.
