@@ -58,6 +58,8 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **18 Nov, 13:16:33 UTC: the memory key is `-114` (n8n_whatsapp_fresh.py, the key only), for the owner's one-conversation Grok run** (`grok-standing-order-transfer-test.md`: a standing order, then a bank transfer and where). Conversation 97 is resolved. The texts are epoch 113's.
+>
 > **LIVE 18 Nov, 11:50:53 UTC: WHATSAPP EPOCH 113, NO "CHECKING" NOTE ON A TRANSFER, AND "WHEN?" ANSWERED PLAINLY** (the owner's second Grok run, then *"push it live then give me grok instructions again"*; WORKLOG 18 Nov).
 >   - **Why:** the payment-ack note ("...כדי להעביר לך את פרטי התשלום המדויקים") went first while the real answer took 67 s, so Grok read the note as the reply. And "ומתי זה יגיע?" got the hand-over sentence again.
 >   - **Now:** ackhold v1 holds that note when the tenant names a transfer or the account details. notify_team, asked only when: no new call and no new hand-over sentence, just no time and a representative from collections.

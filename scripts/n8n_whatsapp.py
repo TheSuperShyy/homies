@@ -230,7 +230,9 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 113
+MEMORY_EPOCH = 114
+# 113 -> 114, 18 Nov, evening (n8n_whatsapp_fresh.py): the memory key only, so the owner's single-conversation Grok
+# test (a standing order, then a bank transfer and where) starts without the bank-transfer tests in its buffer.
 # 112 -> 113, 18 Nov, later still (n8n_whatsapp_bankwhen.py): the owner's second Grok run; a transfer ask gets no
 # payment-ack note (ackhold v1), and "when?" gets a plain answer with no new call and no second hand-over sentence.
 # 111 -> 112, 18 Nov, later (n8n_whatsapp_bankagain.py): the owner's Grok run found the memory held an earlier hand-over

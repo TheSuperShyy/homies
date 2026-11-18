@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### A one-conversation Grok brief: a standing order, then a bank transfer and where (the owner: "i want to see in a single conversation, payment via standing order then ask if it can be a bank transfer and where", "im gonna use grok"), 13:20 UTC
+- **`docs/features/11-whatsapp-bot/grok-standing-order-transfer-test.md`:** one conversation, three messages.
+  - "היי, אני רוצה לשלם את ועד הבית בהוראת קבע. איך עושים את זה?" must get the personal link at once, a word that it is personal, a line that on the page you choose a standing order (card or bank), and the question about a call from collections.
+  - "ואפשר גם בהעברה בנקאית? לאיזה חשבון מעבירים?" must get the bank-transfer hand-over: no details, no time, not the link again, no checking bubble.
+  - "סבבה, תודה" gets a goodbye.
+  - Rules P1-P3 and T1-T7. Grok never opens the link and writes `[קישור]` in its place.
+  - The call-from-collections branch is deliberately not taken, so no standing-order email goes to Homies' collections.
+- **The memory reset for a clean run: `n8n_whatsapp_fresh.py --apply`, memory key -113 -> -114** at 13:16:33 UTC (MEMORY_EPOCH 114; the key only, no text change; snapshot `local/n8n-whatsapp-live-before-fresh-e113.json`). The gate on live: 673/673. The bot carries only test numbers today, so the reset costs nothing.
+- **Conversation 97 resolved** (the third bank-transfer run), so the run opens a fresh chat.
+
 ### The last bank-transfer test as an artifact (the owner: "get the conversation in an artifact", then "only include the last hour the last test regarding what yariv wants on the payment information"), 12:45 UTC
 - **"Bank Transfer Hand-over Test", https://claude.ai/artifact/DbFUq9hBdZF9qMidvpamPt** (private: the owner shares it).
   - Conversation 97 only (the third Grok run, 13:57-14:12 Israel time): the 6 tenant messages and Michael's 6 replies, each marked delivered by WhatsApp's id.
