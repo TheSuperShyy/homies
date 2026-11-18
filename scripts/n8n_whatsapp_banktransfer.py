@@ -22,14 +22,17 @@ WHAT CHANGES, in one write per workflow:
                      department collections, at once; then say so; asked again, it is already with them).
                      "Nobody else is in it" gets its exception. The `reason` list gains bank_transfer.
   get_payment_link   one sentence: a bank transfer is not this link; it is notify_team's, instead.
+  Let the team know  the note's reason, department and description come from the bank_transfer call when the
+                     turn has one, else from the first notify_team call as before. The Claude-played check found a
+                     "representative AND a bank transfer" message calls notify_team twice (caller_request, then
+                     bank_transfer), and the first-call lookup sent that note to Management as "asked for a person".
   Memory             epoch 110 -> 111.
   Hand to a person   "Decide the routing": reason bank_transfer always goes to Collections, reads "הדייר רוצה
                      לשלם בהעברה בנקאית ומחכה לפרטי החשבון", adds the `bank-transfer` label, and the note's last
                      line says to send the account details here. n8n_handover.py's DECIDE is the source; live
                      follows it.
   Chatwoot           the label `bank-transfer` in account 2, created if missing.
-Not changed: Send, Reply usable?, Try again, Team note this turn?, Let the team know. They already treat
-notify_team as done, and check_whatsapp_rules.js's 18 Nov block proves the line goes out whole and a time is still
+Not changed: Send, Reply usable?, Try again, Team note this turn?. They already treat notify_team as done, and check_whatsapp_rules.js's 18 Nov block proves the line goes out whole and a time is still
 cut. The incoming phone agent's twin is owed (the owner: WhatsApp first); the debt agent is not included.
 
 EVERY CHANGE HERE SHIPS THROUGH scripts/check_whatsapp_rules.py. The bot in use is this workflow (Chatwoot,
@@ -101,6 +104,15 @@ LINK_EDITS = (
      "asks for the account details, is handed to collections with notify_team (reason bank_transfer) instead."),
 )
 
+# "Let the team know": the three inputs read off the turn's notify_team call. Built by n8n_whatsapp_teamnote.py on
+# 14 Sep (tool_arg, first call wins); that patcher refuses on today's workflow, so this one owns the change.
+FIND = "const s = ($('Answer the resident').first().json.intermediateSteps || []).find(x => ((x.action || {}).tool) === 'notify_team');"
+PREFER = ("const all = ($('Answer the resident').first().json.intermediateSteps || []).filter(x => ((x.action || { }).tool) === 'notify_team'); "
+          "const why = (x) => { try { let q = x.action.toolInput; if (typeof q === 'string') q = JSON.parse(q); "
+          "if (q && q.input && typeof q.input === 'object') q = q.input; return String((q || { }).reason || ''); } catch (e) { return ''; } }; "
+          "const s = all.find(x => why(x) === 'bank_transfer') || all[0];")
+LET_FIELDS = ("reason", "department", "description")
+
 # "Homies — Hand to a person", node "Decide the routing". The same edits are in n8n_handover.py's DECIDE.
 DECIDE_EDITS = (
     ("const DEPT_BY_REASON = { payment: 'collections', billing: 'collections',\n",
@@ -144,6 +156,9 @@ def banktransfer(wf):
     for old, new in NOTIFY_BODY_EDITS:
         body = once(body, old, new)
     p["jsonBody"] = body
+    v = by["Let the team know"]["parameters"]["workflowInputs"]["value"]
+    for f in LET_FIELDS:
+        v[f] = once(v[f], FIND, PREFER)
     return out
 
 
@@ -197,7 +212,7 @@ def main():
     nb = {n["name"]: n for n in new["nodes"]}
     if not bot_done:
         changed = [n["name"] for n in new["nodes"] if n != by[n["name"]]]
-        if sorted(changed) != sorted(["Answer the resident", "notify_team", "get_payment_link"]):
+        if sorted(changed) != sorted(["Answer the resident", "notify_team", "get_payment_link", "Let the team know"]):
             sys.exit("REFUSING: unexpected nodes would change: %s" % changed)
         if W.MEMORY_EPOCH != EPOCH:
             sys.exit("REFUSING: n8n_whatsapp.MEMORY_EPOCH is %d, not %d. Move the repo first." % (W.MEMORY_EPOCH, EPOCH))
@@ -267,7 +282,7 @@ def main():
             W.epoch_hash(prompt_of(back)), W.epoch_hash(prompt_of(new)),
             W.epoch_hash(tools_of(back)), W.epoch_hash(tools_of(new)),
             bb["Conversation so far"]["parameters"]["sessionKey"]))
-        for node in ("notify_team", "get_payment_link"):
+        for node in ("notify_team", "get_payment_link", "Let the team know"):
             print("  %s: %s" % (node, "as written" if bb[node]["parameters"] == nb[node]["parameters"] else "DIFFERS"))
     print("Re-run without --apply to confirm it reports nothing to do.")
 
