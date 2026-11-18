@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### Which projects on this PC spend OpenRouter credits (the owner: "check the entire file manager if any of our project is spending open router credits"), 07:46 UTC, read only
+- **Scanned:** D:\work, D:\c, D:\gruk and the user's Documents, Desktop, Downloads, OneDrive and vapi-backups, with no game folders, node_modules or .git (scratchpad `or_scan.py`, key endings only). It found 8 distinct `sk-or-` keys and about 30 projects whose files mention OpenRouter.
+- **Each key's spend, from OpenRouter's `/key` and `/credits`:**
+  - e3c (MIYO_SUSHI-CallAnalyzer, main account): today $0.003, this week $0.89, month $12.54. The biggest local spender.
+  - 4fa (Ronit-Project, its own account, $38.72 left): week $0.59, month $1.27.
+  - 3f9 (Homies, account B, $32.58 left): week $0.09, month $24.05 (mostly before this week).
+  - 956 ("Desktop files", its own $20 account, $16.92 left): week $0.0004.
+  - Idle: 0d6 (Homies, $15 cap used up), eef (JOBNIMBUS) and c0d (MIYO_SUSHI). The last two share a $35 account at −$0.17.
+  - 427 answers 401, revoked. It was in Theramatch, Documents\GitHub (Clix CRM), Apify-v3, MIYO-SUSHI, inventory-project-clix, vapi-demo-site and a commented Homie line.
+- **The main account (0d6 and e3c here): $395 bought, $389.48 used, $5.52 left.** It was $375 / $374.75 on 17 Nov morning and $345 / $345.17 on 16 Nov. About $44 went in two days, and the keys on this PC account for about $1 of it. So the spender's key lives off this PC (a server, a deployed app, an n8n credential or a teammate's machine), probably the one that replaced 427.
+- **Not found from here:** no key found is a management key (`is_provisioning_key` false, `/keys` refused). The account's Activity page names the key.
+
 ### The staff video "how to add a new contact and open a WhatsApp chat", built (the owner: "give me a tutorial video on how to create a new contact"), 16:35 UTC
 - **Built by a background agent from yesterday's invite video** (`local/chatwoot-video/build.py`, untouched). Its script is `local/chatwoot-video/build_contact.py`, which rebuilds both languages in about 12 minutes with `--sheet`.
 - **Files:** `chatwoot-new-contact-he.mp4` (65.9 s, 1920x1080, 2.1 MB) and `-en.mp4` (2.3 MB), plus contact sheets `sheet-contact-he.png` and `-en.png`, all gitignored. Reviewed from the Hebrew sheet before handing over, then opened in File Explorer.

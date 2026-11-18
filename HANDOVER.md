@@ -1048,7 +1048,11 @@ appended to.
 > - The old credential (`EWgicRGk9KUNJ4O1`, the CAPPED15 key ending 0d6) is untouched. **Rollback:** `n8n_openrouter_key.py` with a `.env` variable holding the old key.
 > - **Why this key:** the key ending 0d6 had hit its $15 cap at about 13:26 UTC ("Forbidden"). The key ending 427 is the one abandoned on 25 Sep. The `.env` comment that sat above the 3f9 line meant 427, and it now says so.
 > - **The Edge Function's own `OPENROUTER_API_KEY` secret** (the one model-written line above a debt call's WhatsApp payment link) holds the 3f9 key too (digest compared, 16 Nov). So that line is written, and billed to this account.
-> - **The main account** (keys 0d6 and 427) is at −$0.17 on 16 Nov ($345 bought, $345.17 spent). It spent about $80 since 29 Oct, none of it through 0d6 this month, so through another key on it (427 before). Nothing of Homies runs on it.
+> - **The main account (18 Nov 07:46 UTC): $395 bought, $389.48 used, $5.52 left.** It was −$0.17 on 16 Nov ($345 / $345.17) and $375 / $374.75 on 17 Nov morning, so $50 was added and about $44 spent in two days.
+>   - On this PC its keys are 0d6 (Homies, capped at $15 and used up, nothing this month) and e3c (MIYO_SUSHI CallAnalyzer, $0.89 this week). So nearly all of that spend is through a key that is not on this PC.
+>   - **Key 427, which seven projects' files carry, answers 401 (revoked).**
+>   - Only the account's Activity page, or a management key, can name the spender: none of the 8 keys found is one.
+>   - Nothing of Homies runs on it.
 > - Every model call fails with `Forbidden - perhaps check your credentials?`. That 403 is the cap, not a bad credential.
 > - The sandbox bot goes to "Could not answer" (the owner: "why the chatbot not responding"), and **so does the live WhatsApp bot**, which runs on the same key.
 > - **Only the owner can fix it:** raise the key's limit in OpenRouter → Keys, and top up the wallet. Nothing needs redeploying afterwards. `check_openrouter.py` shows when it is back.
