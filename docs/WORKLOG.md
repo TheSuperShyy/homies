@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The chat page made a plain conversation (the owner: "dont say its grok make it a normal conversation"), 14:10 UTC
+- Version 2 of https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs, now titled "Standing Order and Bank Transfer".
+  - The tenant is "אסף", with no Grok and no "test" anywhere.
+  - My two lines under the bubbles are gone, and so is the summary strip.
+  - The hidden link sits on a line of its own, and the footer reads plainly (the chat moved to collections, the label, the note).
+  - The words of the chat are unchanged.
+
 ### The test page updated to the latest test (the owner: "ok open it in artifact the updated one"), 14:05 UTC
 - **The first page (DbFUq9…) was gone:** the publish answered "deleted, or you no longer have write access". So the latest test went to a new artifact.
 - **The new page: "Bank Transfer Hand-over Test", https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs** (private until the owner shares it).
