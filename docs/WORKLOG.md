@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### Proven on a handset: the owner's third Grok run of the bank-transfer hand-over, epoch 113, read from the runs (the owner: "ok so everything i set?"), 12:27 UTC
+- **11:57-12:12 UTC, conversation 97 (a fresh chat), six tenant messages; every reply carries WhatsApp's id. Read from the executions and Chatwoot before Grok's report arrived.**
+  - B1.1 (190687): `notify_team` `bank_transfer`, no payment-ack note, "היי אסף, צהריים טובים! 🙂 העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון. יש עוד משהו שאני יכול לעזור בו בינתיים?" (59 s after the message). The note to @גבייה (190691) went at 11:58:30.
+  - B1.2 (190706): no tool call, "אין לי זמן מדויק לתת לך, אבל העניין נמצא אצל נציג מצוות הגבייה והוא ישלח לך את הפרטים לכאן. יש עוד משהו שאפשר לעזור בו?"
+  - B1.3: `get_service_info`, answered himself. B1.4: a goodbye with no question.
+  - B2.1 (190736): `notify_team` `bank_transfer`, no ack, "העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון להעברה. יש עוד משהו שאוכל לעשות בשבילך בינתיים?" A second note to @גבייה (190740), because the label had gone by then. B2.2: a goodbye.
+  - The chat ends open, on the team Collections, with `bank-transfer`. The `handover` labels went as Chatwoot 4.16 does (CONTEXT).
+- **What stays open, none of it blocking:**
+  - `homies_message_he` PENDING at Meta.
+  - A real Homies person in Collections before real tenants.
+  - The incoming phone agent's twin.
+  - The tool server's log reason (`caller_request`).
+  - Chatwoot's label-dropping, which affects every handover.
+  - The first answer to a transfer can take about a minute (the model's thinking).
+
 ### LIVE 11:50:53 UTC, WhatsApp epoch 113: no "checking" note on a transfer, and "when?" answered plainly (the owner: "push it live then give me grok instructions again")
 - **Pushed before the Claude-played check came back,** on the owner's word: `notify_team`'s pin moved to `ec89b066d496`, and the gate on the dump was all green (673/673).
 - **`n8n_whatsapp_bankwhen.py --apply`:** the bot at 11:50:53, with tools `cc6616c65c25`, memory key `-113`, and notify_team and "A word first?" as written (snapshot `local/n8n-whatsapp-live-18nov-before-bankwhen.json`). The re-run reports nothing to do, and the gate on live is 673/673, all green.

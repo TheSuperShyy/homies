@@ -5937,7 +5937,7 @@ gitignored; the v5 file we had was rev 1.9).
       minute. Only a real message from a handset shows them staying.
     - **A WhatsApp turn with a tool costs about $0.11 on OpenRouter** (gemini-3.1-pro-preview, measured
       18 Nov: about 37k tokens in and 3.4k out over the ack model, the answer and the pass after the tool).
-    - **Tested on a handset with Grok:** `docs/features/11-whatsapp-bot/grok-bank-transfer-test.md` (rules T1-T8).
+    - **Tested on a handset with Grok:** `docs/features/11-whatsapp-bot/grok-bank-transfer-test.md` (rules T1-T9). The third run, on epoch 113 (18 Nov 11:57-12:12 UTC, conversation 97), came out right on both the handset and the staff side.
     - **The memory follows the phone, not the chat** (key `<phone>-<epoch>`, 12 messages), so a resolved chat
       does not make Michael forget an earlier hand-over. That is why the hand-over is called every time it is
       asked (epoch 112, live since 18 Nov 11:27:37 UTC). A repeat is dropped by "Hand to a person" only while

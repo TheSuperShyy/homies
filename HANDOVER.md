@@ -62,7 +62,11 @@ appended to.
 >   - **Why:** the payment-ack note ("...כדי להעביר לך את פרטי התשלום המדויקים") went first while the real answer took 67 s, so Grok read the note as the reply. And "ומתי זה יגיע?" got the hand-over sentence again.
 >   - **Now:** ackhold v1 holds that note when the tenant names a transfer or the account details. notify_team, asked only when: no new call and no new hand-over sentence, just no time and a representative from collections.
 >   - **Read back:** tools `cc6616c65c25`, memory key `-113`, the re-run idle, the gate on live 673/673. The pin moved before the Claude-played check (`scripts/wa_qa_bankwhen.json`) came back, on the owner's word; it came back 8/8 at 12:00 UTC.
->   - **Owed:** the owner's third Grok run (`grok-bank-transfer-test.md`; conversation 96 resolved at 11:51 UTC, so it opens a fresh chat).
+>   - **Proven on a handset, the owner's third Grok run (11:57-12:12 UTC, conversation 97):**
+>     - both transfer asks were handed to Collections with no payment-ack note, and each note went to @גבייה;
+>     - "when?" got a plain answer with no new note;
+>     - every reply carries WhatsApp's id;
+>     - the first answer took 59 s.
 >   - **Rollback:** `python scripts/n8n_whatsapp_bankwhen.py --restore`, then `git revert`.
 >
 > **LIVE 18 Nov, 11:27:37 UTC: WHATSAPP EPOCH 112, THE BANK-TRANSFER HAND-OVER IS CALLED EVERY TIME IT IS ASKED** (the owner's Grok run of epoch 111, then *"ok push it live then give me grok instructions again"*; WORKLOG 18 Nov).
