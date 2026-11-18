@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The last bank-transfer test as an artifact (the owner: "get the conversation in an artifact", then "only include the last hour the last test regarding what yariv wants on the payment information"), 12:45 UTC
+- **"Bank Transfer Hand-over Test", https://claude.ai/artifact/DbFUq9hBdZF9qMidvpamPt** (private: the owner shares it).
+  - Conversation 97 only (the third Grok run, 13:57-14:12 Israel time): the 6 tenant messages and Michael's 6 replies, each marked delivered by WhatsApp's id.
+  - The two staff notes to @גבייה, shown as visible in Chatwoot only, and the assignment and label lines.
+  - A summary on top and how the chat ended. Phone numbers are hidden, and the page has no links. Source: the session scratchpad's `bt_page/`.
+- The whole history first asked for (2,531 messages with the owner's number since 9 Aug) was not built: the owner narrowed it to the last test.
+
 ### The update for Yariv on his two asks (the owner: "give me the update message for yariv"), 12:35 UTC
 - **A Hebrew WhatsApp text in the owner's format** ("עדכון קצר לגבי ההתקדמות:", one "לגבי ..." paragraph per topic, "תודה!"), saved in `local/yariv/2026-11-18-update.txt` (gitignored). The owner sends it.
 - **The bank transfer:** done as he asked, a representative from collections sends the details in the chat. The chat is assigned to Collections with the `bank-transfer` label and a notification; no details and no time from the bot; it keeps answering until a representative replies; tested on a phone. It asks for at least one collections person connected to the system, since the notifications reach us today.

@@ -67,6 +67,7 @@ appended to.
 >     - "when?" got a plain answer with no new note;
 >     - every reply carries WhatsApp's id;
 >     - the first answer took 59 s.
+>   - **The third test as a page:** https://claude.ai/artifact/DbFUq9hBdZF9qMidvpamPt ("Bank Transfer Hand-over Test", private until the owner shares it).
 >   - **Yariv's update, drafted 12:35 UTC** (`local/yariv/2026-11-18-update.txt`, the owner sends it): both asks, and a request for at least one collections person connected to the system.
 >   - **Rollback:** `python scripts/n8n_whatsapp_bankwhen.py --restore`, then `git revert`.
 >
