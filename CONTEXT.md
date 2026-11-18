@@ -103,7 +103,7 @@ The user is the builder. The client is Homies.
 - **The lift company repairs a lift.** Homies opens the call, passes the details and the handling to the company that services and maintains the lift, follows the call and presses them; when they come depends on them.
   - The tenant hears it when a lift call opens (with the call number at Homies), on "when?" and on its status. On a second "when" the lift company stays in the answer, beside what Michael does now (a check, a note that he is waiting): the prompt's general "not the same reason twice" gives way here, and the lift line says so outright.
   - This and the collections call below are the only places someone other than Michael appears. They are the client's account of his own process, so they are true. Everywhere else, one voice holds.
-  - **The one-voice sentence points to them by the matter, not by who** (10 Nov, epoch 101): "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך". Epoch 100 named them ("חוץ מחברת המעליות ומצוות הגבייה") on "you don't say you passed something on", and the tester's next run passed things on to "the team" five times.
+  - **The one-voice sentence points to them by the matter, not by who** (10 Nov, epoch 101): "רק במעלית ובהוראת קבע זה אחרת, כמו שכתוב בהמשך". **A third matter, decided 18 Nov (epoch 111, written, not live yet; HANDOVER):** "רק במעלית, בהוראת קבע ובהעברה בנקאית זה אחרת" — a bank transfer below. Epoch 100 named them ("חוץ מחברת המעליות ומצוות הגבייה") on "you don't say you passed something on", and the tester's next run passed things on to "the team" five times.
   - **The press has no speed** (10 Nov, later, epoch 102): the line says "ולוחצים עליהם", as Yariv did ("we press them", "we make every effort with them"). Its earlier "לטפל בה בדחיפות" was ours, and every lift ticket since epoch 100 gave it back as "כמה שיותר מהר" ("ונוודא שהם מגיעים לטפל כמה שיותר מהר"): a promise of what depends on them.
 - **What the lift company needs is asked:** what is happening, which lift when there is more than one, the floor it is stuck on. Only what the tenant has not said.
 - **Water in a flat starts as the flat's.** A leak or damp inside the flat, even from the ceiling or a wall, needs a professional on the tenant's behalf first.
@@ -5921,6 +5921,14 @@ gitignored; the v5 file we had was rev 1.9).
   them.
   - **The WhatsApp bot has none today (18 Nov):** it says a transfer is accepted, but no account
     details are in its prompt, tools or service facts. A "how do I pay" gets the payment link.
+  - **A bank transfer goes to a person from collections, and Michael says so** (Yariv, 18 Nov: "שהבוט
+    יגיד לו אני מעביר אותך לנציג לצורך קבלת הפרטים ולהעביר את הצ'ט"; the owner: "keep answering").
+    Epoch 111, written and gated, not live yet (HANDOVER). It is the one note the tenant hears about:
+    `notify_team` with reason `bank_transfer`; "Hand to a person" sends it to Collections whatever
+    `department` says, with the labels `handover`, `handover-collections` and `bank-transfer` and a note
+    that says to send the building's account details in the chat. Michael tells the tenant he passed
+    them to a representative from collections who will send the details here, never when, never made-up
+    details, and keeps answering until a person replies. The incoming phone agent's twin is owed.
 - **No endpoint creates a standing order, even in rev 1.11** (the owner asked, 17 Nov).
   The only standing-order effect in the API is a cancellation:
   `DELETE /apartments/:id/payers/:payerId` ("tenant left") cancels the payer's card

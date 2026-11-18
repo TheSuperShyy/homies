@@ -2046,6 +2046,32 @@ function cases(E) {
     expect('Saturday noon: closed', () => at('12:00', 6).includes('מחוץ לשעות'), true);
     expect('the bracket still closes and the text follows', () => at('21:10', 5).includes(', מחוץ לשעות הפעילות של המשרד.]' + NL + 'x'), true);
   }
+  // 18 Nov (scripts/n8n_whatsapp_banktransfer.py, epoch 111). Yariv: "שהבוט יגיד לו אני מעביר אותך לנציג לצורך קבלת
+  // הפרטים ולהעביר את הצ'ט", and the owner: "keep answering". A bank transfer is the one note the tenant hears about:
+  // notify_team with reason bank_transfer hands the chat to collections ("Hand to a person"), and Michael says so in
+  // his own words. Send must keep that line, a time must still be cut, and the note must fire, on every guard.
+  {
+    console.log(NL + '--- 18 Nov: a bank transfer goes to a person from collections, and Michael says so (Yariv) ---');
+    const BT = { action: { tool: 'notify_team', toolInput: { reason: 'bank_transfer', department: 'collections',
+      description: 'הדייר רוצה לשלם בהעברה בנקאית ומבקש את פרטי החשבון' } }, observation: ob9({ ok: true }) };
+    const ASK = 'אני רוצה לשלם בהעברה בנקאית, מה פרטי החשבון?';
+    const REP = 'אפשר לדבר עם נציג? אני רוצה לשלם בהעברה בנקאית';
+    const BTL = 'העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון. יש עוד משהו שאוכל לעזור בו בינתיים?';
+    const BTM = 'אני מעביר אותך לנציג מצוות הגבייה, שישלח לך כאן את פרטי החשבון של הבניין. יש עוד משהו שאוכל לעזור בו בינתיים?';
+    const BTA = 'זה כבר אצל נציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון. יש עוד משהו שאוכל לעזור בו בינתיים?';
+    expect('the line goes out whole', say({ reply: BTL, said: ASK, steps: [BT] }), BTL);
+    expect('"אני מעביר אותך" goes out whole', say({ reply: BTM, said: ASK, steps: [BT] }), BTM);
+    expect('the same after they asked for a representative', say({ reply: BTL, said: REP, steps: [BT] }), BTL);
+    expect('asked again, "already with collections" goes out whole', say({ reply: BTA, said: 'נו, מתי יגיעו הפרטים?', steps: [] }), BTA);
+    expect('a time is still cut', () => content(E, { reply: BTL.replace('ישלח לך כאן', 'ישלח לך בהקדם'), said: ASK, steps: [BT] }).indexOf('בהקדם') === -1, true);
+    expect('"will get back to you" is still cut', () => content(E, { reply: BTL.replace('והוא ישלח לך כאן את פרטי החשבון', 'והוא יחזור אליך עם פרטי החשבון'), said: ASK, steps: [BT] }).indexOf('יחזור אליך') === -1, true);
+    expect('the note fires on the call', () => E.teamNote({ output: BTL }, turn({ steps: [BT], said: ASK }).$), true);
+    expect('the note fires on the line alone, as a backstop', () => E.teamNote({ output: BTL }, turn({ steps: [], said: ASK }).$), true);
+    for (const id of ['phantom', 'deeds', 'echo', 'clerk', 'repeat']) {
+      if (!E.reply[id]) continue;
+      expect('Reply usable? ' + id + ' lets the line through', () => E.reply[id]({ output: BTL, intermediateSteps: [BT] }, 0, turn({ steps: [BT], said: ASK }).$), true);
+    }
+  }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }

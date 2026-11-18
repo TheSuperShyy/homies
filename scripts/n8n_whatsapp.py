@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 110
+MEMORY_EPOCH = 111
+# 110 -> 111, 18 Nov (n8n_whatsapp_banktransfer.py): a bank transfer goes to a person from collections, and Michael
+# says so (Yariv; the owner: "keep answering"): notify_team reason bank_transfer, the one note the resident hears about;
+# the one-voice sentence names it beside the lift and the standing order; get_payment_link leaves it to notify_team.
 # 109 -> 110, 17 Nov (n8n_whatsapp_standinglink.py): a standing order is answered with the payment link first, since
 # the page it opens offers one (card or bank); the question whether that works or they would rather collections
 # phoned them; request_standing_order for the phone call or when no link came back.
@@ -834,7 +837,8 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "2c95b2d3aaa6",   # docs/features/11-whatsapp-bot/prompt.md (17 Nov, epoch 110, a standing order is
+    "prompt": "7960ab31d1a1",   # docs/features/11-whatsapp-bot/prompt.md (18 Nov, epoch 111, a bank transfer goes to
+    # a person from collections, and Michael says so). Before: 2c95b2d3aaa6 (17 Nov, epoch 110, a standing order is
     # answered with the payment link first). Before: fe1f06ca0f84 (12 Nov, later, epoch 109, the owner's
     # standard is the base of an emergency's first message). Before: 504d924d3419 (12 Nov, epoch 108, the owner's
     # reference in Michael's words); f1bd90ad0259 (11 Nov, night, epoch 107, pressed in an
@@ -864,7 +868,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "244f68113181",  # 17 Nov, epoch 110 (n8n_whatsapp_standinglink.py): get_payment_link is the first answer
+    "tools": "e2bc35955dd0",  # 18 Nov, epoch 111 (n8n_whatsapp_banktransfer.py): notify_team hands a bank transfer to
+    # collections and says so; get_payment_link leaves it to notify_team.
+    # Before: 244f68113181, 17 Nov, epoch 110 (n8n_whatsapp_standinglink.py): get_payment_link is the first answer
     # to a standing order. Before: b10df5bd95db, 11 Nov, later that night, epoch 106 (n8n_whatsapp_confirm.py): open_request only after
     # the resident's yes, and never for anything urgent; notify_team: anything urgent gets no note.
     # Before: "3ce12829999d", 11 Nov, night, epoch 105 (n8n_whatsapp_lineonly.py): open_request, notify_team and

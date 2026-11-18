@@ -58,9 +58,15 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
-> **PLANNED 18 Nov, 09:55 UTC, not built: Yariv's two asks** (the owner: "plan this"; WORKLOG 18 Nov has the plan).
->   - **A bank transfer goes to a person from collections:** Michael says so, and the chat is handed over through the live "Hand to a person" (own reason and label, Collections mentioned). Waiting on the owner: does Michael keep answering while the chat waits (recommended) or go quiet? Before real tenants, a real person in Collections. The incoming phone agent's twin is owed.
->   - **An opener with a free field:** a second template, `homies_message_he`, "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Chatwoot shows staff a box for `{{1}}`. Waiting on the owner's OK on the wording, then it is submitted on both WABAs.
+> **WRITTEN AND GATED 18 Nov, 10:11 UTC, NOT LIVE: WhatsApp epoch 111, a bank transfer goes to a person from collections** (Yariv; the owner: *"ok go ahead, keep answering and submit the template"*; WORKLOG 18 Nov).
+>   - **The repo is ahead of live until `python scripts/n8n_whatsapp_banktransfer.py --apply`.** Until then run no other WhatsApp patcher's `--apply`: `n8n_whatsapp_patch.py` would push the new `prompt.md` to live without the epoch bump or the tool texts.
+>   - **What `--apply` does:** the bot (`u2JjrbcNPYyyh3yl`): three prompt sentences, `notify_team` (a paragraph and `bank_transfer` in its reason list), one sentence of `get_payment_link`, memory `-110` -> `-111`. "Hand to a person" (`oB66atFlWwtkSGgN`): `bank_transfer` always to Collections, its own reason line, the label `bank-transfer`, and the note's "send the account details here". Chatwoot: the label `bank-transfer` is created.
+>   - **Michael keeps answering** while the chat waits (the owner's answer). A person's reply pauses him, and resolving gives the tenant back.
+>   - **Gated:** 666/666 on live and candidate, the replay changes nothing, only the three intended pins fail, and the idle check adds only `n8n_whatsapp_standinglink`'s refusal. A Claude-played check of two scenarios is running; the pins move after it.
+>   - **Before real tenants:** a real Homies person in the Collections team and inbox 1 (today the owner's login stands in). **Owed:** the incoming phone agent's twin.
+>   - **Rollback after an apply:** `python scripts/n8n_whatsapp_banktransfer.py --restore` (snapshots `local/n8n-whatsapp-live-18nov-before-banktransfer.json` and `local/n8n-handover-live-18nov-before-banktransfer.json`), then `git revert`.
+>
+> **SUBMITTED 18 Nov, 09:55 UTC: the opener with a free field, `homies_message_he`, PENDING Meta's review** (the owner's *"submit the template"*; `templates.md`). "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Chatwoot shows staff a box for `{{1}}`. Ids `1766335894444792` (`…632`) and `1677261424140865` ("hadas 1"). Check with `python scripts/wa_templates.py list --waba 1389698653006050`. Once approved: one send to the owner's handset, and the new-contact video's template step redone.
 >
 > **CHECKED 17 Nov, 09:10 UTC: BOTH WHATSAPP TEMPLATES WORK ON THE CHATWOOT ROUTE** (owner: *"make sure the templatated message are working ok"*; WORKLOG 17 Nov).
 >   - **The "ticket closed" message:** test ticket 255-1448-26 (the owner's handset, flat 2) was closed in `requests` at 09:09:26 UTC. The notices run sent `ticket_resolved_he` at 09:10:31 with WhatsApp's id (Chatwoot conversation 93, message 3464). Its OXS call stays open.

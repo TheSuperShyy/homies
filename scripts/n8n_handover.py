@@ -142,12 +142,14 @@ const reason = String(inp.reason || (ca.handover_reason || 'other'));
 // 14 Sep: the reasons name the MATTER (what the resident wants), because the
 // note is what the team reads, and the department follows it. The model may
 // still override `department` by judgment.
-const DEPT_BY_REASON = { payment: 'collections', billing: 'collections',
+const DEPT_BY_REASON = { payment: 'collections', billing: 'collections', bank_transfer: 'collections',
                          move: 'management', contract: 'management', quote: 'management',
                          emergency: 'operations' };
 let dept;
 if (mode === 'new') {
-  dept = VALID.includes(inp.department) ? inp.department
+  // 18 Nov: a bank transfer always goes to Collections, whatever `department` says: they send the details.
+  dept = reason === 'bank_transfer' ? 'collections'
+       : VALID.includes(inp.department) ? inp.department
        : (DEPT_BY_REASON[reason] || 'service');
 } else {
   dept = VALID.includes(ca.handover_department) ? ca.handover_department : 'service';
@@ -203,6 +205,8 @@ if (mode === 'served') {
   const add = ['handover', 'handover-' + dept];
   if (mode === 'new' && !inHours) add.push('after-hours');
   if (mode.startsWith('escalate')) add.push('escalated');
+  // 18 Nov (Yariv: mark the chat): a bank transfer is marked as such, and the mark outlives `served`.
+  if (reason === 'bank_transfer') add.push('bank-transfer');
   for (const l of add) if (!want.includes(l)) want.push(l);
 }
 
@@ -213,6 +217,8 @@ if (mode === 'served') {
 const REASON = {
   payment: 'הדייר רוצה לשלם או להסדיר תשלום',
   billing: 'הדייר לא מסכים עם חיוב, או צריך מסמך (חשבונית, קבלה, אישור)',
+  // 18 Nov (n8n_whatsapp_banktransfer.py): the one note the bot tells the resident about.
+  bank_transfer: 'הדייר רוצה לשלם בהעברה בנקאית ומחכה לפרטי החשבון',
   move: 'דייר נכנס לדירה או עוזב אותה',
   contract: 'משהו בחוזה',
   quote: 'הדייר מבקש הצעת מחיר',
@@ -265,7 +271,8 @@ if (mode === 'new' || mode === 'page') {
                + reach + ' כשסיימתם, סוגרים את השיחה הזאת כאן (Resolve).'
                + (urgent ? ' אם אף אחד לא סוגר או עונה כאן תוך 10 דקות, ההנהלה מקבלת את זה גם.' : ''));
   } else {
-    lines.push('מה לעשות: לענות לדייר כאן, בשיחה הזאת' + (urgent ? ', עכשיו' : '')
+    lines.push('מה לעשות: ' + (reason === 'bank_transfer' ? 'לשלוח לדייר כאן, בשיחה הזאת, את פרטי החשבון של הבניין שלו'
+                                                     : 'לענות לדייר כאן, בשיחה הזאת') + (urgent ? ', עכשיו' : '')
                + '. ברגע שמישהו מכם עונה, הבוט מפסיק לענות לו.'
                + (urgent ? ' אם אף אחד לא עונה תוך 10 דקות, ההנהלה מקבלת את זה גם.'
                          : ' עד אז הבוט ממשיך לענות לו במקומכם.'));

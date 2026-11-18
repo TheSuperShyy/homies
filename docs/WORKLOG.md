@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### WhatsApp epoch 111 written and gated, NOT live: a bank transfer goes to a person from collections, and Michael says so (the owner: "ok go ahead, keep answering and submit the template"), 10:11 UTC
+- **The owner's two answers to the plan:** Michael keeps answering while a bank-transfer chat waits for collections (the 3 Sep handover rule), and the template goes to Meta (done 09:55, the entry below).
+- **What is written, all in the repo and NOT on live yet:**
+  - `scripts/n8n_whatsapp_banktransfer.py` (new): one write per workflow, with snapshots and `--restore`.
+  - **The prompt** (`prompt.md` first, live follows it): the one-voice sentence names a third matter ("רק במעלית, בהוראת קבע ובהעברה בנקאית זה אחרת"); the list of what his tools do gains "מעביר לנציג מצוות הגבייה מי שרוצה לשלם בהעברה בנקאית"; after the standing order's sentence, the account details are not his, he never makes them up, and whoever wants to pay by transfer or asks for the details is passed to a representative from collections with the note tool and told so, never when. A dated note in `prompt.md` says why. System prompt 26,795 -> 27,134 characters, `2c95b2d3aaa6` -> `7960ab31d1a1`.
+  - **`notify_team`:** a paragraph (a bank transfer is the one note the resident hears about: reason `bank_transfer`, department collections, at once; then say so, never when; asked again, it is already with collections, no second call); "Apart from a bank transfer, nobody else is in it"; the `reason` list in its body gains `bank_transfer`.
+  - **`get_payment_link`:** one sentence: a bank transfer is not this link; it is notify_team's, instead.
+  - **Memory** 110 -> 111 (`MEMORY_EPOCH`, `EPOCH_COVERS` prompt `7960ab31d1a1`, tools `e2bc35955dd0`).
+  - **"Homies — Hand to a person" (`oB66atFlWwtkSGgN`), "Decide the routing":** `bank_transfer` always goes to Collections (whatever `department` says), reads "הדייר רוצה לשלם בהעברה בנקאית ומחכה לפרטי החשבון", adds the label `bank-transfer` (it outlives `served`), and the note's last line becomes "מה לעשות: לשלוח לדייר כאן, בשיחה הזאת, את פרטי החשבון של הבניין שלו. ...". `n8n_handover.py`'s DECIDE is the source; the patcher refuses unless live's edited code equals it.
+  - **Chatwoot:** the label `bank-transfer` (account 2) is created at `--apply`.
+- **Not changed, because they already do the right thing:** Send, Reply usable?, Try again, Team note this turn?, Let the team know. `check_whatsapp_rules.js` has 13 new cases (18 Nov block), all passing on live BEFORE any change: the line ("העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון...") goes out whole, also after "אפשר לדבר עם נציג?"; "בהקדם" and "יחזור אליך" are still cut; the note fires on the call and, as a backstop, on the line alone; phantom, deeds, echo, clerk and repeat let it through.
+- **Checked:**
+  - The gate on the dump with `--replay`: 666/666 cases on live and on the candidate; the replay of 1,539 tenant messages and every reply changes nothing, nothing broken. Only the three intended pins fail (the prompt, `notify_team`, `get_payment_link`), waiting on the Claude-played check.
+  - The idle check against the dump, compared with one against live: only `n8n_whatsapp_standinglink` adds a refusal (the moved key); `n8n_whatsapp_fresh` and `n8n_whatsapp_patch` go idle once live matches the repo.
+  - The routing code on stubs (node, a small DateTime stand-in for luxon): a transfer with `department` service goes to Collections with the three labels and the new lines; after hours adds `after-hours` and waits for 09:00; asked again in 10 minutes is skipped; `served` leaves only `bank-transfer`; a payment note reads as before.
+  - **Running:** a Claude-played check of two scenarios on the candidate (`scripts/wa_qa_banktransfer.json`: asked then asked again, in office hours; a representative plus a transfer, after hours). Run directory in the session scratchpad (`qa_bt`).
+- **Next:** grade it, move the three pins, then `--apply`, the gate on live, one message from the owner's handset, and `--watch`. The incoming phone agent's twin is owed; the debt agent is not included.
+
 ### The opener with a free field submitted to Meta on both WABAs (the owner: "ok go ahead, keep answering and submit the template"), 09:55:11-09:55:28 UTC
 - **`homies_message_he`**, MARKETING, he: "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Staff type their own message into `{{1}}`; Chatwoot shows a box for it. Example given to Meta: "רצינו לעדכן שביום שלישי תהיה הפסקת מים בבניין בין 10:00 ל-12:00."
 - **Submitted with `wa_templates.py create homies_message_he --apply` and again with `--waba 1389698653006050 --apply`:** id `1766335894444792` on `…632`, id `1677261424140865` on "hadas 1" `…050`. Both PENDING.
