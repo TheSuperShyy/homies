@@ -71,7 +71,7 @@ appended to.
 >     - "when?" got a plain answer with no new note;
 >     - every reply carries WhatsApp's id;
 >     - the first answer took 59 s.
->   - **The latest test as a page:** https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs ("Standing Order and Bank Transfer", version 2: a plain conversation, the tenant "אסף", no Grok or test wording; conversation 98; private until the owner shares it). The first page, DbFUq9…, is gone.
+>   - **The latest test as a page:** https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs ("Standing Order and Bank Transfer", version 3: the phone chat only, the 7 messages both phones saw, no back end; conversation 98; shared as anyone with the link). The first page, DbFUq9…, is gone.
 >   - **Yariv's update, drafted 12:35 UTC** (`local/yariv/2026-11-18-update.txt`, the owner sends it): both asks, and a request for at least one collections person connected to the system.
 >   - **Rollback:** `python scripts/n8n_whatsapp_bankwhen.py --restore`, then `git revert`.
 >

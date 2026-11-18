@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-18
 
+### The chat page as a phone chat only (the owner: "i need it to look like whatsapp only nothing happening in the backend or chatwoot only whatsap"), 14:15 UTC
+- **Version 3 of https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs**, now shared as anyone with the link (the owner set it).
+- **Only the 7 messages the two phones saw:** the tenant's 3, with read ticks, and Michael's 4, the quick "checking" note included.
+  - A phone-chat look: the business header "הומי'ז · שירות לקוחות", a date chip, green and white bubbles with tails and times, light and dark.
+  - No staff note, no labels, no Chatwoot lines, no delivery markers.
+  - No WhatsApp logo or name: only the look.
+- **The link is shown as `www.pro.oxs.co.il/•••••••`** on a line of its own, its private part hidden. The source is the session scratchpad's `bt_page/build_wa.py`.
+
 ### The chat page made a plain conversation (the owner: "dont say its grok make it a normal conversation"), 14:10 UTC
 - Version 2 of https://claude.ai/artifact/6kabicNbN56Axj3bBmAsLs, now titled "Standing Order and Bank Transfer".
   - The tenant is "אסף", with no Grok and no "test" anywhere.
