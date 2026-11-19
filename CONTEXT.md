@@ -5931,7 +5931,11 @@ gitignored; the v5 file we had was rev 1.9).
     details, and keeps answering until a person replies. **The incoming phone line has it since 19 Nov, 08:30:58
     UTC:** the representative "will contact them with the account details", never when. On the phone
     debt-tools posts the voice note with the reason it stored, so `bank_transfer` had to enter its list (v161,
-    PR #16, migration 042) or the note would have gone to Management. The debt agent is not included.
+    PR #16, migration 042) or the note would have gone to Management. **The debt call has it since 09:15:01
+    UTC** (the owner: "ok apply the chatbot rule to the voice agent as well"): the same words, and
+    `transfer_to_human` with `bank_transfer` pages Collections in the Voice inbox (debt-tools v162, PR #17),
+    written from the call because that tool has no free text. The debt agent's other hand-overs still page
+    nobody; they reach `call_outcomes` and the call list only.
     - **When a turn has two notes** ("a representative, and I want to pay by transfer" calls notify_team
       with caller_request and bank_transfer), "Let the team know" takes the bank_transfer call, so the
       note still goes to Collections. Any other turn takes the first call, as before.

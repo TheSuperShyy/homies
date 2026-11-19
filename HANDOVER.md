@@ -58,6 +58,18 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **LIVE 19 Nov, 09:15:01 UTC: THE DEBT CALL PASSES A BANK TRANSFER TO COLLECTIONS TOO** (the owner: *"ok apply the chatbot rule to the voice agent as well"*; WORKLOG 19 Nov; `prompt.md`, "19 Nov").
+>   - **The tenant hears** that Michael passed the request to a representative from collections, who will contact them with the account details, never when. Then the call closes, as every hand-over does.
+>   - **Live, in order:**
+>     - debt-tools v162 (PR #17, `37869d4`): `bank_transfer` from the debt agent pages Collections in the Voice inbox. The note is written from the call: who, the flat, what is left to pay. The agent's other hand-overs still page nobody;
+>     - the debt agent `4bc03b57`: three prompt insertions and `transfer_to_human`, voice untouched.
+>   - **`vapi_sync.py debt` is the push again.** After the 15-17 Nov scratchpad patches the repo was behind live: `endCall`, reasoning minimal, and two tool texts. All three were captured on 19 Nov and compared equal, field by field. A patch written straight to Vapi has to land in `vapi_sync.py` / `vapi_tools.py` the same day.
+>   - **Proven without a call:** a probe as the debt agent went to Collections with `bank-transfer` (conversation 100, resolved). It had no number only because the owner's +63 is foreign.
+>   - **Owed:** a real debt call that asks to pay by bank transfer.
+>   - **Rollback:**
+>     - the agent: `git revert` the bank-transfer commit (not the one before it, which only levels the repo with live), then `N8N_BASE_URL= python scripts/vapi_sync.py debt --keep-voice --apply`; or PATCH `model` from `local/vapi-debt-live-19nov-before-banktransfer.json`;
+>     - the server: a revert PR on main.
+>
 > **LIVE 19 Nov, 08:30:58 UTC: THE INCOMING PHONE LINE PASSES A BANK TRANSFER TO COLLECTIONS, AS WHATSAPP DOES** (the owner: *"ok give the phone line the same transfer as whatsapp"*; WORKLOG 19 Nov).
 >   - **The caller hears** that Michael passed the request to a representative from collections, who will contact them with the account details, never when. Asked only when, there is no new note.
 >   - **Live, in order:**

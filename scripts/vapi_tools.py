@@ -100,6 +100,11 @@ TRANSFER_REASONS = [
     # checks it. It is the only reason that changes anything besides the record,
     # which is why it is a reason and not a separate tool.
     "ownership",
+    # 19 Nov (the owner: "ok apply the chatbot rule to the voice agent as well"): a tenant who wants to pay by bank
+    # transfer, or asks for the account details, is passed to collections, who send them. debt-tools pages
+    # Collections for this reason on the debt agent (its other hand-overs page nobody, as before); migration 042
+    # stores it.
+    "bank_transfer",
 ]
 
 # The apartment a write is about, on a call that covers more than one.
@@ -431,7 +436,13 @@ DEBT_TOOLS = [
         "does not connect anyone to anyone, so do not say you are putting them through "
         "and never ask them to hold. Close the call after calling it. Use reason "
         "`ownership` when they say an apartment is not theirs or was never handed over "
-        "to them, and pass that apartment as `unit`.",
+        "to them, and pass that apartment as `unit`. Use reason `bank_transfer` when they "
+        "want to pay by bank transfer or ask for the account details: you do not have them "
+        "and never make them up. What you tell them is that you passed their request to a "
+        "representative from the collections team, who will contact them with the account "
+        "details, never when; this pages that team with their number. Asked only when, "
+        "there is no second call: say you do not have a time for it, and that it is with "
+        "the collections team.",
         {
             "reason": {"type": "string", "enum": TRANSFER_REASONS},
             "posture_reached": POSTURE,

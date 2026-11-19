@@ -11,6 +11,40 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### LIVE 09:15:01 UTC: the debt call passes a bank transfer to collections too (the owner: "ok apply the chatbot rule to the voice agent as well")
+- **Read as the debt agent:** the incoming line got the rule at 08:30, and "as well" named the other voice agent.
+- **What the tenant hears:** Michael has no account details and never makes them up. `alt_payment` was `none` on all eight recent debt calls.
+  - Whoever wants to pay by bank transfer, or asks for the details, hears that he passed the request to a representative from the collections team, who will contact them with the account details, never when.
+  - Asked only when, there is no second call. Then the call closes, as every hand-over does.
+- **Why the server had to change first:** the debt agent's `transfer_to_human` wrote `call_outcomes` and the call list only, because only the incoming agent's hand-overs post a voice note (`isIntake`). So "a representative will contact you" would have had nobody behind it.
+- **Found on the way: the repo was behind the live debt agent.**
+  - 17 Nov's scratchpad patches had written `endCall`, reasoning `minimal` and two tool texts (`send_payment_link`, `request_standing_order`) straight to Vapi, and only `prompt.md` was brought level.
+  - A `vapi_sync.py debt` run would have dropped the hang-up and put reasoning back to low.
+  - All three are now in `vapi_sync.py` (`extra_tools`, `minimal`) and `vapi_tools.py`, and live and repo then compared equal, field by field (only 1.0 against 1).
+  - The sync's tool listing now prints a tool without a function (endCall) instead of crashing on it.
+- **Live, in order:**
+  1. **debt-tools v162, PR #17** (`37869d4`, squash-merged 09:12:17 UTC, CI green, deployed 09:12:46 UTC):
+     - `transfer_to_human` with `bank_transfer` from the debt agent (`isDebtAgent`, by assistant id) posts the voice note, department collections.
+     - The note is written from the call: the person rung, the flat, what is left to pay.
+     - The dashboard's call list names the reason (העברה בנקאית, for both phone agents) instead of the code.
+     - The same lines are on feature/chatbot; index.ts equals main's. Main's three `check_route` tests fail in a fresh Windows worktree only (CRLF checkout; CI on Linux is green).
+  2. **The debt agent `4bc03b57`, `vapi_sync.py debt --keep-voice --apply` at 09:15:01 UTC** (snapshot `local/vapi-debt-live-19nov-before-banktransfer.json`):
+     - `prompt.md`, three insertions in the fence (6,597 -> 6,877 characters):
+       - the hand-over list gains "מי שרוצה לשלם בהעברה בנקאית";
+       - "אתה לא אומר שאתה מעביר" gains "אותו", so passing the request is not the call transfer it forbids;
+       - one sentence after the standing order, the chatbot's own, worded for the phone.
+     - `vapi_tools.py`: `bank_transfer` in `TRANSFER_REASONS` (so in `log_call_outcome` too), and `transfer_to_human`'s text says what to tell them and that a "when?" gets no second call.
+     - Read back equal: prompt, tools, opener. The voice is unchanged (so the router's feminine dictionary still applies), tool secrets kept, reasoning minimal, endCall in place.
+- **Proven without a call:** one `transfer_to_human` envelope as the debt agent on a dialer call. Call id `probe-debtbank-20261119T091409`, the test flat, which is on the debt call list at 2,000 ש"ח.
+  - It answered `team_notified: true` in 2.4 s. `call_outcomes` stored `bank_transfer`, and the disposition reads `transfer:bank_transfer`.
+  - "Hand to a person" made conversation 100 in the Voice inbox for Collections, with `handover`, `handover-collections` and `bank-transfer`.
+  - The note: "סיבה: הדייר רוצה לשלם בהעברה בנקאית ומחכה לפרטי החשבון", the address, and "מה הדייר רוצה: אסף קליקס: לשלם בהעברה בנקאית את 2000 ש"ח שנשארו לשלם. זה עלה בשיחת גבייה שלנו."
+  - No number on it: the owner's +63 is foreign and dropped by design. A debt call dials an Israeli number, and then the note says to send the account details to it.
+  - Conversation 100 resolved.
+- **Not proven:**
+  - Michael's words on a real debt call (the owner's Ring on /dialer, asking to pay by bank transfer). No played calls, on "don't overtest".
+  - The debt agent's other hand-overs (distress, ownership, a person, language) still page nobody, as before.
+
 ### LIVE 08:30:58 UTC: the incoming phone line passes a bank transfer to collections, as WhatsApp does (the owner: "ok give the phone line the same transfer as whatsapp")
 - **What a caller hears:** Michael has no account details and never makes them up. A caller who wants to pay by bank transfer, or asks for the details, is passed to a representative from the collections team, "who will contact them with the account details", never when. Asked only when, he says he has no time for it, with no new note.
 - **Why the server had to change first:**
