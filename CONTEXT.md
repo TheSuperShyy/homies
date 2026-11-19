@@ -5978,8 +5978,9 @@ gitignored; the v5 file we had was rev 1.9).
   three examples). This replaces the 4 Nov rule, which was based on OXS's API
   having one-time payments only, that a standing order gets no link.
   - Whoever asks gets their personal link, a short line that on the page they
-    choose a standing order (card or bank), and the question whether that works
-    or they would rather someone from the collections team phoned them.
+    choose a standing order (by credit card since 19 Nov; "card or bank" until
+    then), and the question whether that works or they would rather someone from
+    the collections team phoned them.
   - Yariv's 9 Nov process stays as the second option, for whoever prefers the
     call or gets no link: request_standing_order records it, the email goes to
     collections, and a team member phones the tenant.
@@ -5990,6 +5991,21 @@ gitignored; the v5 file we had was rev 1.9).
   - A link sent for a standing order ends on that question, so `wa_qa.py`'s
     "link message ends with a question" flag skips a message that names
     הוראת קבע.
+- **Yariv's decision, 19 Nov: the link is for paying by credit card, and it is the
+  only way the bot offers** (forwarded by the owner: *"דרך הקישור זה צריך להיות ברור
+  שניתן רק באשראי ... ואז אם הדייר יגיד (רק אם יגיד) שהוא רוצה באפשרות אחרת נניח של
+  צקים או בנק, אז שהבוט יעביר לנציגים שלנו (המטרה ... לדחוף אותם לתשלום באשראי)"*).
+  The page may offer a bank standing order; the bot never says so.
+  - When the link goes out, Michael says it is for paying by credit card. He never
+    offers or lists another way, and the facts line no longer lists them.
+  - Only a tenant who asks for another way reaches collections: a bank transfer as
+    on 18 Nov (the account details in the chat), a standing order from the bank by
+    `request_standing_order` (collections phone), and cheques, cash or anything
+    else by `notify_team` reason `payment`, told like a bank transfer ("a
+    representative from collections will get back to you here", never when).
+  - WhatsApp epoch 115, `scripts/n8n_whatsapp_cardonly.py`. The debt agent still
+    says the page's standing order is "באשראי או בבנק", and the incoming agent has
+    no cheques rule: both twins are owed, on the owner's word.
 - **A slow WhatsApp reply is usually Gemini thinking, and the run shows it.**
   On the first standing-order try (17 Nov) the reply took 61 s. The OpenRouter
   calls in the n8n run carry `tokenUsage`: 897 completion tokens for a one-line
