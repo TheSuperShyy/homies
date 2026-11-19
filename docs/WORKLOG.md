@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### Yariv's update redone with the phone agents' card-only rule (the owner: "only the whatsapp status message for yariv"), 12:40 UTC
+- `local/yariv/2026-11-19-update.txt` rewritten. Its voice paragraph now says both phone agents follow WhatsApp's rule:
+  - by credit card, and another way only when asked;
+  - on debt calls, the link and the standing order are by credit card;
+  - a standing order from the bank is recorded;
+  - a bank transfer, cheques or cash go to a collections representative, who will contact them;
+  - the collections alert carries the tenant's phone and flat.
+- The other paragraphs are unchanged. Given as the Hebrew text only, as asked.
+
 ### The card-only rerun as a phone-chat page (the owner: "create the artifact for the messages on how i converse with the bot like before"), 12:30 UTC
 - https://claude.ai/artifact/ETLNtTAB9vH4FqvPcfTCeo, "Card-Only Payments", version 1, private. Sharing is set from the page's Share menu; the session cannot change it.
 - Built like 18 Nov's page (version 3 of 6kabicNbN56Axj3bBmAsLs), by scratchpad `bt_page/build_co.py`:
