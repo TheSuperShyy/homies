@@ -222,6 +222,7 @@ const S = {
   'reason.move':           { he: 'כניסה או יציאה מדירה', en: 'moving' },
   'reason.quote':          { he: 'הצעת מחיר',    en: 'quote' },
   'reason.ownership':      { he: 'בעלות',        en: 'ownership' },
+  'reason.bank_transfer':  { he: 'העברה בנקאית', en: 'bank transfer' },   // 19 Nov: both phone agents and WhatsApp
 
   'urgency.low':       { he: 'נמוכה',   en: 'Low' },
   'urgency.normal':    { he: 'רגילה',   en: 'Normal' },
