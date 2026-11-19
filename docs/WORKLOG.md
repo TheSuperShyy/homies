@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### The update for Yariv, drafted (the owner: "give me the update message for yariv"), 11:40 UTC
+- `local/yariv/2026-11-19-update.txt` (gitignored), in the 18 Oct shape, four topics:
+  - the card-only rule, and the other ways only on request;
+  - both phone agents' bank transfer;
+  - the two openers approved and in Chatwoot's list;
+  - the reminder that a collections person has to be logged in for the alerts to reach Homies.
+- **Read for it:** `homies_hello_he` and `homies_message_he` read APPROVED in "hadas 1" and synced (APPROVED) into inbox 1, both MARKETING as submitted. HANDOVER and CONTEXT now say so.
+- **Left out on purpose:** the phone agents' card-only twin. The debt agent still says the link's standing order is "באשראי או בבנק", and that waits on the owner's word.
+
 ### The owner's Grok rerun of epoch 116: every rule PASS, and our side agrees (the owner pasted the report), 11:14-11:23 UTC
 - **Grok:** five messages, seven bubbles, no fail.
   - The link "בכרטיס אשראי" at once, no other way named.

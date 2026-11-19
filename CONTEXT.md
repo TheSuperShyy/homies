@@ -705,6 +705,8 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   - **A template with blanks gets a box per blank in Chatwoot (4.16, read 18 Nov):** the new-conversation
     template picker (`WhatsAppTemplateParser.vue`) asks staff to fill each `{{n}}` and will not send until all
     are filled. Meta's side: a blank may not open or close the body, and the typed text may not hold line breaks.
+  - **The two staff openers are approved on both accounts and synced into inbox 1** (read 19 Nov, about 11:35
+    UTC): `homies_hello_he` (fixed) and `homies_message_he` (a free field), both MARKETING, as submitted.
 - **The closed-ticket message quotes only the report** (039, 10 Nov): `{{2}}` is the description before the
   first " | ", so what the bot adds to a ticket ("הדייר שוב שואל...") never reaches the tenant.
 - **Templates belong to the number's own WhatsApp account.** No template leaves UChat until it is

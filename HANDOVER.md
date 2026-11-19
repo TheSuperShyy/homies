@@ -18,6 +18,9 @@ appended to.
 >   - Built by `local/chatwoot-video/build_contact.py` on the real Chatwoot. Every request but the sign-in was blocked, so nothing was created. The Hebrew interface was shown by changing the locale in the browser's own copy of the account. The demo is ישראל ישראלי, +972500000000. Contact sheet: `sheet-contact-he.png`.
 >   - Its last step, "בחר תבנית", works only once `homies_hello_he` is approved.
 
+> **APPROVED (read 19 Nov, about 11:35 UTC): `homies_hello_he` and `homies_message_he`, on both accounts, and synced into Chatwoot inbox 1** (`wa_templates.py list --waba 1389698653006050` and `wa_templates.py chatwoot`; both MARKETING, as submitted). Staff see both in the new-conversation template list.
+>   - **Still owed from the two blocks below:** one send to the owner's handset, and the new-contact video's template step redone.
+>
 > **SUBMITTED 17 Nov 14:47:51 UTC: the staff opener template `homies_hello_he`, PENDING Meta's review** (the owner's "ok"; WORKLOG 17 Nov; `docs/features/11-whatsapp-bot/templates.md`).
 >   - The text: "שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?". MARKETING, he, no blanks. For a staff member opening a chat from Chatwoot with any number, tenant or not.
 >   - **On both WABAs, as the two-account rule says:** `.env`'s `…632` (Chatwoot's list), id `4804153076538574`; "hadas 1" `…050` (where sends are looked up), id `1971092067601403`.
