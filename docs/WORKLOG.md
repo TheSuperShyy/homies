@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### The owner's Grok rerun of epoch 116: every rule PASS, and our side agrees (the owner pasted the report), 11:14-11:23 UTC
+- **Grok:** five messages, seven bubbles, no fail.
+  - The link "בכרטיס אשראי" at once, no other way named.
+  - The standing order "בכרטיס אשראי" with the call question.
+  - "הבקשה שלך להוראת קבע נרשמה (מספר 255-1417-26), ומישהו מצוות הגבייה ייצור איתך קשר בטלפון".
+  - "העברתי אותך לנציג מצוות הגבייה שיכתוב לך כאן לגבי תשלום בשיקים".
+  - A goodbye with no question.
+  - Its one note: the number is an older one. Right: it is the test number's request already on record, as the brief said.
+- **The runs (conversation 102):**
+  - message 3, `request_standing_order` `already_recorded`, and the number given; "Let the team know" did not run, so sonote v1 held and no Service note came;
+  - message 4, `notify_team` reason `payment`, and Send kept "שיכתוב לך כאן" whole;
+  - Chatwoot holds one note, to Collections ("סיבה: הדייר רוצה לשלם או להסדיר תשלום").
+- **Still owed:** Yariv's OK; the watch on real traffic; the phone twins (the debt agent's "באשראי או בבנק", the incoming agent's cheques) on the owner's word.
+
 ### LIVE 11:08:45 UTC, WhatsApp epoch 116: the owner's Grok run of 115 checked against the runs, two lines fixed and a stray note stopped (the owner pasted the report)
 - **The report** (conversation 101, 10:49-10:57 UTC):
   - messages 1, 2 and 5 PASS;

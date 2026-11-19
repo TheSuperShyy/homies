@@ -63,7 +63,8 @@ appended to.
 >   - **A standing order:** the number is given every time, also when it was already recorded.
 >   - **sonote v1:** a turn where `request_standing_order` recorded the request makes no backstop note. Since 9 Nov, "ייצור איתך קשר" after a standing order had also paged Service.
 >   - `scripts/n8n_whatsapp_cardwords.py`; 699/699 cases, the replay changes nothing, the gate on live is green. No Claude round: the cases cover the defects.
->   - **For the rerun:** conversation 101 resolved, and the brief updated (`grok-card-only-test.md`). Message 3 sends no new email: the test number's request is already on record.
+>   - **The owner's Grok rerun passed every rule** (11:14-11:23 UTC, conversation 102, left open). Our side agrees: the number given on an already-recorded request, "שיכתוב לך כאן" kept, one note only (Collections), no Service note.
+>   - **Still owed:** Yariv's OK, the watch on real traffic, and the phone twins.
 >   - Rollback: `python scripts/n8n_whatsapp_cardwords.py --restore` (back to 115).
 >
 > **LIVE 19 Nov, 10:25:12 UTC: WHATSAPP EPOCH 115, THE LINK IS FOR PAYING BY CREDIT CARD; ANOTHER WAY ONLY WHEN ASKED, TO COLLECTIONS** (Yariv, forwarded by the owner; WORKLOG 19 Nov; CONTEXT, "Yariv's decision, 19 Nov").

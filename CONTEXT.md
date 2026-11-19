@@ -6005,6 +6005,8 @@ gitignored; the v5 file we had was rev 1.9).
     representative from collections will write to you here", never when. Not "will
     get back to you": Send's promise cutter takes `יחזור אליך` (epoch 116, after the
     owner's Grok run showed the cut).
+  - Proven on the owner's Grok rerun (19 Nov, conversation 102): every rule passed,
+    and Chatwoot held one note, to Collections.
   - A turn where `request_standing_order` recorded the request makes no backstop
     team note (sonote v1, epoch 116). Its "collections will phone you" is backed by
     the request, emailed to collections; before, it also paged Service.
