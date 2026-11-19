@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### A Grok brief for epoch 115 (the owner: "give me instructions to send on grok to test that new features"), 10:45 UTC
+- `docs/features/11-whatsapp-bot/grok-card-only-test.md`, in the format of the 18 Nov briefs. One conversation, five messages:
+  1. how to pay;
+  2. a standing order;
+  3. "no credit card, a standing order from the bank?";
+  4. cheques;
+  5. goodbye.
+- The rules: P1-P2 (the link at once, personal), K1-K2 (a credit card said; no other way named before the tenant asks), S1-S2 (the card standing order and the call question; the bank one recorded with a number), C1-C4 (cheques to a representative from collections; no time; not the link instead; no "checking" bubble), G and E.
+- **Before it:** no bot run since the 10:25:12 deploy, so the memory is fresh. Yesterday's Grok conversation 98 (open, `bank-transfer`) was resolved so the run opens a clean one.
+- **Real effects of the run:**
+  - message 3 records a standing-order request and emails `COLLECTIONS_EMAIL` (Yariv's address, HANDOVER 9 Nov);
+  - message 4's note pages Collections in Chatwoot.
+
 ### LIVE 10:25:12 UTC, WhatsApp epoch 115: the link is for paying by credit card, another way only when asked, to collections (Yariv, forwarded by the owner as a screenshot), from 09:40 UTC
 - **Live:** `n8n_whatsapp_cardonly.py --apply` at 10:25:12 UTC (snapshot `local/n8n-whatsapp-live-19nov-before-cardonly.json`).
   - Read back: prompt `6eceba0a40ef`, tools `5f1ff18896a1`, memory `-115`, all seven nodes as written. A second run reports nothing to do.

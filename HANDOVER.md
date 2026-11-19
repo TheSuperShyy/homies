@@ -71,6 +71,10 @@ appended to.
 >     - Yariv's OK;
 >     - the twins: the debt agent still says "בדף שהוא פותח בוחרים הוראת קבע, באשראי או בבנק", and the incoming agent has no cheques rule.
 >   - Rollback: `python scripts/n8n_whatsapp_cardonly.py --restore`.
+>   - **The owner's Grok brief:** `docs/features/11-whatsapp-bot/grok-card-only-test.md`. One conversation, five messages: how to pay, a standing order, a standing order from the bank, cheques, goodbye.
+>     - Before it, nothing had written to the bot since the deploy (memory fresh), and yesterday's conversation 98 was resolved so the run opens a clean one.
+>     - Message 3 records a real standing-order request, and its email goes to `COLLECTIONS_EMAIL` (Yariv's).
+>     - Message 4's note pages Collections in Chatwoot (reason `payment`, labels `handover`, `handover-collections`).
 >
 > **LIVE 19 Nov, 09:15:01 UTC: THE DEBT CALL PASSES A BANK TRANSFER TO COLLECTIONS TOO** (the owner: *"ok apply the chatbot rule to the voice agent as well"*; WORKLOG 19 Nov; `prompt.md`, "19 Nov").
 >   - **The tenant hears** that Michael passed the request to a representative from collections, who will contact them with the account details, never when. Then the call closes, as every hand-over does.
