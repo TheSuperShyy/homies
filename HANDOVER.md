@@ -61,6 +61,12 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **LIVE 19 Nov, 12:20 UTC: THE CARD-ONLY RULE ON BOTH PHONE AGENTS** (the owner: *"apply the card only rule to the voice agents as well"*; WORKLOG 19 Nov).
+>   - **The debt agent `4bc03b57`:** the link is offered "לתשלום בכרטיס אשראי"; the page's standing order is on a card; other ways only when asked. A standing order from the bank is recorded. Cheques, cash or another way are `transfer_to_human` reason `payment`, which pages Collections (debt-tools v163, PR #18).
+>   - **The incoming agent `10ae859a`:** asked how to pay, the caller hears "by credit card"; other ways only when asked; cheques, cash or another way go to `notify_team` reason `payment`, told like a bank transfer.
+>   - Proven without a call: a `payment` probe as the debt agent went to Collections (conversation 103, resolved). Owed: a real call.
+>   - **Rollback:** PATCH `model` from `local/vapi-{debt,inbound}-live-19nov-before-cardonly.json`, or `git revert` this commit and sync both with `--keep-voice`; the server, a revert PR on main.
+>
 > **LIVE 19 Nov, 11:08:45 UTC: WHATSAPP EPOCH 116, THE GROK RUN OF 115 FIXED** (the owner pasted the report; WORKLOG 19 Nov).
 >   - **Cheques:** the line now says the representative "will write to you here" (`יכתוב לך כאן`). Send's promise cutter had taken 115's "שיחזור אליך כאן", and the tenant got only "העברתי אותך לנציג מצוות הגבייה."
 >   - **A standing order:** the number is given every time, also when it was already recorded.

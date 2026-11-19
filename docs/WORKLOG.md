@@ -11,6 +11,26 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### LIVE 12:20 UTC: the card-only rule on both phone agents (the owner: "apply the card only rule to the voice agents as well")
+- **debt-tools v163, PR #18** (`c0eae1f`, merged 12:17:20 UTC, CI green, deployed 12:17:54 UTC):
+  - the debt agent's `transfer_to_human` with reason `payment` (cheques, cash or another way but a card) posts the voice note to Collections, like `bank_transfer` since PR #17;
+  - the note says "לשלם בדרך אחרת מכרטיס אשראי (למשל צ'קים או מזומן)" and what is left to pay.
+  - The same lines are on feature/chatbot; index.ts equals main's.
+- **The debt agent `4bc03b57`** (`vapi_sync.py debt --keep-voice --apply`, 12:20:11 UTC; snapshot `local/vapi-debt-live-19nov-before-cardonly.json`):
+  - seven insertions in `prompt.md`'s fence (6,877 -> 7,206 characters): the link "לתשלום בכרטיס אשראי"; no other way offered or listed; the page's standing order "בכרטיס אשראי" (was "באשראי או בבנק"); a standing order from the bank recorded like the call one; any way but a card is collections', only when asked (cheques, cash or another way told "שייצור איתו קשר לגבי זה"); the hand-over list's "שלא בכרטיס אשראי";
+  - `vapi_tools.py`: `payment` in `TRANSFER_REASONS`, `transfer_to_human`'s sentence for it, `send_payment_link` (card only, the standing order on a card), `request_standing_order` (also from the bank).
+- **The incoming agent `10ae859a`** (`vapi_sync.py inbound --keep-voice --apply`, 12:20:12 UTC; snapshot `local/vapi-inbound-live-19nov-before-cardonly.json`):
+  - five insertions in `demo-inbound.md`'s fence (14,955 -> 15,310 characters): asked how to pay, by credit card, no other way offered; any way but a card is collections', only when asked; cheques, cash or another way to a representative with the note tool; the one-voice and tools sentences say "a payment not by credit card";
+  - `notify_team`'s text and its `payment` gloss say the same;
+  - the agent sends no link, so "how do I pay?" stays a payment ticket and a note, and a standing order stays `request_standing_order`.
+- **Read back:** both prompts and tools equal to the repo; voices unchanged (the debt router's feminine dictionary still applies); tool secrets kept; the debt agent's reasoning minimal and endCall in place.
+- **Proven without a call:** one `transfer_to_human` envelope as the debt agent with reason `payment` (call id `probe-debtpay-20261119T121820`, the test flat, 2,000 ש"ח owed).
+  - It answered `team_notified: true` in 2.0 s and stored `payment` (disposition `transfer:payment`).
+  - It made conversation 103 in the Voice inbox, for Collections, with `handover` and `handover-collections`; the note: "סיבה: הדייר רוצה לשלם או להסדיר תשלום", the address, and "אסף קליקס: לשלם בדרך אחרת מכרטיס אשראי (למשל צ'קים או מזומן) את 2000 ש"ח שנשארו לשלם".
+  - Resolved afterwards.
+  - The incoming agent's `payment` note was already a working path (isIntake), so it was not probed.
+- **Not proven:** the agents' own words on a real call.
+
 ### The update for Yariv, drafted (the owner: "give me the update message for yariv"), 11:40 UTC
 - `local/yariv/2026-11-19-update.txt` (gitignored), in the 18 Oct shape, four topics:
   - the card-only rule, and the other ways only on request;

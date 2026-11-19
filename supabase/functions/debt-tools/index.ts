@@ -4413,13 +4413,16 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         console.error("voice note threw", ctx.callId, String(e));
         team_notified = false;
       }
-    } else if (reason === "bank_transfer" && isDebtAgent(ctx)) {
+    } else if ((reason === "bank_transfer" || reason === "payment") && isDebtAgent(ctx)) {
       // 19 Nov (the owner: "ok apply the chatbot rule to the voice agent as well"): the debt agent tells a
       // tenant who wants to pay by bank transfer that a representative from collections will contact them with
-      // the account details, so Collections is paged here exactly as for the incoming agent. Its other
+      // the account details, so Collections is paged here exactly as for the incoming agent. Later the same
+      // day ("apply the card only rule to the voice agents as well", Yariv's rule): cheques, cash or any other
+      // way but a card is reason `payment`, told the same way, so it pages Collections too. Its other
       // hand-overs still reach only this row and the call list, as before. Its tool has no free text (a
-      // spoken-argument risk, vapi_tools.py), so the note is written from the call: the person we rang, and
-      // what is left to pay.
+      // spoken-argument risk, vapi_tools.py), so the note is written from the call: the person we rang, the
+      // way (a bank transfer, or another way but a card, which the staff ask about when they call), and what is
+      // left to pay.
       const who = await residentName(ctx.residentId);
       const building = String(ctx.building ?? "").trim();
       const units = [...new Set(ctx.charges.map((c) => String(c.unit ?? "").trim()).filter(Boolean))];
@@ -4434,7 +4437,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           label: await voiceLabel(building, unit),
           reason,
           department: "collections",
-          description: ((who ? who + ": " : "") + "לשלם בהעברה בנקאית"
+          description: ((who ? who + ": " : "")
+            + (reason === "bank_transfer" ? "לשלם בהעברה בנקאית" : "לשלם בדרך אחרת מכרטיס אשראי (למשל צ'קים או מזומן)")
             + (owed ? ` את ${owed} ש"ח שנשארו לשלם` : "") + ". זה עלה בשיחת גבייה שלנו.").slice(0, 500),
           source: "tool",
         });

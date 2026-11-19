@@ -6014,9 +6014,13 @@ gitignored; the v5 file we had was rev 1.9).
     the request, emailed to collections; before, it also paged Service.
   - WhatsApp epoch 115, `scripts/n8n_whatsapp_cardonly.py`, live 19 Nov at
     10:25:12 UTC (Claude-played 28/28, the gate on live green). The owner's Grok
-    brief for it: `docs/features/11-whatsapp-bot/grok-card-only-test.md`. The debt agent still
-    says the page's standing order is "באשראי או בבנק", and the incoming agent has
-    no cheques rule: both twins are owed, on the owner's word.
+    brief for it: `docs/features/11-whatsapp-bot/grok-card-only-test.md`.
+  - **Both phone agents carry it since 19 Nov, 12:20 UTC** (the owner's word):
+    - the debt agent offers the link as credit card only, with the standing order on a card, and records one
+      from the bank;
+    - the incoming agent says payment is by credit card;
+    - on both, cheques, cash or another way go to collections as reason `payment`, told like a bank transfer;
+    - on the debt agent, debt-tools v163 (PR #18) pages Collections for `payment`, as for `bank_transfer`.
 - **A slow WhatsApp reply is usually Gemini thinking, and the run shows it.**
   On the first standing-order try (17 Nov) the reply took 61 s. The OpenRouter
   calls in the n8n run carry `tokenUsage`: 897 completion tokens for a one-line

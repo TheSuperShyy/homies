@@ -105,6 +105,10 @@ TRANSFER_REASONS = [
     # Collections for this reason on the debt agent (its other hand-overs page nobody, as before); migration 042
     # stores it.
     "bank_transfer",
+    # 19 Nov, later (the owner: "apply the card only rule to the voice agents as well"; Yariv: the link is credit
+    # card only, another way only when asked, to collections): cheques, cash or another way but a card. debt-tools
+    # pages Collections for it on the debt agent as for bank_transfer (PR #18); migration 030 stores it.
+    "payment",
 ]
 
 # The apartment a write is about, on a call that covers more than one.
@@ -325,8 +329,11 @@ DEBT_TOOLS = [
         # in its own words. The result carries `sent` and never a URL.
         # 17 Nov (written straight to live that day, captured here on 19 Nov): a standing order is set up from
         # the same link, and the link is "on its way" once the tool answers (PR #15 sends after the answer).
+        # 19 Nov, later (Yariv's card-only rule): the page's standing order is on a credit card, and the link is
+        # offered as credit card only.
         "Call once the resident has agreed to get the link, to pay now or when it suits them, or to set up a "
-        "standing order on the page it opens (card or bank), and once per call. The payment "
+        "standing order on the page it opens (on a credit card), and once per call. It is paid by credit card: "
+        "say so when you offer it, and never offer another way to pay. The payment "
         "link goes to their WhatsApp, at the number Homies has on file for them; "
         "nothing is charged and no card is involved. The result says whether it is on its way "
         "(sent true) or not (sent false). When it is on its way, tell them in your own words where it "
@@ -396,7 +403,8 @@ DEBT_TOOLS = [
         "request_standing_order",
         # 17 Nov (written straight to live that day, captured here on 19 Nov): the link comes first.
         "Call once per call, only when the resident wants a standing order and would rather someone from the "
-        "collections team phoned them than set it up from the payment link on WhatsApp, or when send_payment_link "
+        "collections team phoned them than set it up from the payment link on WhatsApp, wants it from their bank "
+        "account rather than on a credit card, or when send_payment_link "
         "did not send the link. Never after a decline. This records the request; it does not set one up.",
     ),
     _fn(
@@ -442,7 +450,10 @@ DEBT_TOOLS = [
         "representative from the collections team, who will contact them with the account "
         "details, never when; this pages that team with their number. Asked only when, "
         "there is no second call: say you do not have a time for it, and that it is with "
-        "the collections team.",
+        "the collections team. Use reason `payment` when, of their own accord, they want to pay by "
+        "cheques, in cash or any other way but a credit card or a bank transfer: tell them you "
+        "passed their request to a representative from the collections team, who will contact "
+        "them about it, never when; this pages that team too.",
         {
             "reason": {"type": "string", "enum": TRANSFER_REASONS},
             "posture_reached": POSTURE,
@@ -606,8 +617,8 @@ INTAKE_TOOLS = [
         "on this call, and keep the call. A note is a quiet record, not a transfer "
         "and not a message to anyone: nobody is connected, nobody is put through, and "
         "you stay the only one the caller deals with.\n"
-        "Call it the moment the caller's ask is past you: paying dues or arranging a "
-        "payment other than by bank transfer (that one is also a ticket, open_request with type `payment`; put "
+        "Call it the moment the caller's ask is past you: paying dues by credit card or arranging a "
+        "payment (that one is also a ticket, open_request with type `payment`; put "
         "its number in this description when you have it), a "
         "document they need (invoice, receipt, "
         "confirmation), moving in or out or a change of tenant, a contract, a price "
@@ -630,14 +641,22 @@ INTAKE_TOOLS = [
         "back to them.\n"
         # 19 Nov: the WhatsApp bot's bank-transfer paragraph (epochs 111-113), in phone terms: the details come
         # later from collections, not "here in the chat", and it is never a ticket.
-        "A bank transfer is the one note the caller hears about. You do not have the account details and never "
+        # 19 Nov, later (Yariv's card-only rule, the owner: "apply the card only rule to the voice agents as
+        # well"): payment is by credit card, no other way is offered, and any other way the caller asks for
+        # himself is handed to collections and told, like a bank transfer.
+        "Payment is by credit card, and that is the only way you mention: never offer or list another way. A "
+        "payment by anything but a credit card is the one note the caller hears about, and only when they ask to "
+        "pay that way themselves. You do not have the account details and never "
         "make them up. A caller who wants to pay by bank transfer, or asks for the account details to transfer "
         "to, is handed to the collections team with this call, at once: reason bank_transfer, department "
         "collections, with what they asked and how to reach them if they said it. It is not a ticket. Then tell "
         "them, in your own words, that you have passed their request to a representative from the collections "
         "team, who will contact them with the account details: never when, nothing more promised, then whether "
-        "there is anything else you can help with meanwhile. Every time they ask to pay by transfer or for the "
-        "details, call this again; asked only when the details will come, there is no new call and no new "
+        "there is anything else you can help with meanwhile. The same for a caller who wants to pay by cheques, "
+        "in cash or any other way but a credit card: reason payment, department collections, with the way they "
+        "named; tell them you passed their request to a representative from the collections team, who will "
+        "contact them about it, never when. Every time they ask to pay by transfer, for the details or another way "
+        "but a card, call this again; asked only when the details will come, there is no new call and no new "
         "hand-over sentence: say plainly that you have no time for it, and that it is with a representative "
         "from collections.\n"
         # 16 Sep, the client's review: no national numbers and no safety
@@ -666,7 +685,8 @@ INTAKE_TOOLS = [
         "on, or do it, as the one handling it. After a matter only a person at Homies "
         "can finish: that you have recorded their request, then what is still missing "
         "from it (when, how much, what exactly), one question at a time; only when "
-        "nothing is left to ask, what else you can do now. Apart from a bank transfer, nobody else is in it: no "
+        "nothing is left to ask, what else you can do now. Apart from a payment that is not by credit card, nobody "
+        "else is in it: no "
         "team, no manager, no one who will check, handle or get back to them, nothing "
         "passed on to anyone, no when, no promise, and never that help is on the way. "
         "Never the office phone unless they ask how to reach the office. `department` "
@@ -677,7 +697,8 @@ INTAKE_TOOLS = [
                 "type": "string",
                 "enum": INTAKE_NOTE_REASONS,
                 "description": (
-                    "payment = paying dues, a payment arrangement, instalments; "
+                    "payment = paying dues, a payment arrangement, instalments, or paying by cheques, in cash or "
+                    "another way but a card (department collections); "
                     "billing = a payment or a refund the record does not show, or a "
                     "document they need; move = "
                     "moving in or out, a change of tenant; contract = a contract; "
