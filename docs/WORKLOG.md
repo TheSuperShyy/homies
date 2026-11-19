@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### The 11/19 report (in chat, `/reporter`), 15:00 UTC
+- **Span:** 19 Nov from 08:25 UTC, everything in this day's entries below. The 18 Nov work is not in it.
+- **Given:** 8 done bullets and 4 Will lines.
+  - **Done:**
+    - the phone line and the debt calls hand a bank transfer to collections;
+    - WhatsApp's link is said to be for a credit card only, and cheques, cash or the bank go to collections (Yariv);
+    - the cut cheques reply and the missing standing-order number fixed, then every rule passed the owner's rerun;
+    - the stray Service note after a standing order stopped;
+    - both phone agents card-only, with the collections note probed;
+    - both openers approved and in the list;
+    - the chat page;
+    - Yariv's update.
+  - **Will:**
+    - watch real WhatsApp traffic;
+    - real calls on both phone agents;
+    - a collections person logged in;
+    - the openers' test send and the video's step.
+- **Left out on purpose:** the repo brought level with the live debt agent (internal), the Grok brief and the Claude-played check (the rerun's result is the news).
+
 ### Yariv's update redone with the phone agents' card-only rule (the owner: "only the whatsapp status message for yariv"), 12:40 UTC
 - `local/yariv/2026-11-19-update.txt` rewritten. Its voice paragraph now says both phone agents follow WhatsApp's rule:
   - by credit card, and another way only when asked;
