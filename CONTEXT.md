@@ -5928,7 +5928,10 @@ gitignored; the v5 file we had was rev 1.9).
     `department` says, with the labels `handover`, `handover-collections` and `bank-transfer` and a note
     that says to send the building's account details in the chat. Michael tells the tenant he passed
     them to a representative from collections who will send the details here, never when, never made-up
-    details, and keeps answering until a person replies. The incoming phone agent's twin is owed.
+    details, and keeps answering until a person replies. **The incoming phone line has it since 19 Nov, 08:30:58
+    UTC:** the representative "will contact them with the account details", never when. On the phone
+    debt-tools posts the voice note with the reason it stored, so `bank_transfer` had to enter its list (v161,
+    PR #16, migration 042) or the note would have gone to Management. The debt agent is not included.
     - **When a turn has two notes** ("a representative, and I want to pay by transfer" calls notify_team
       with caller_request and bank_transfer), "Let the team know" takes the bank_transfer call, so the
       note still goes to Collections. Any other turn takes the first call, as before.

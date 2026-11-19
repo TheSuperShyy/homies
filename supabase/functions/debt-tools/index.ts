@@ -4270,11 +4270,18 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
     // move, contract, quote, other). The WhatsApp bot had been sending them
     // for a day and every one was stored as `caller_request` -- the same
     // quiet lie, one channel over. Migration 030 widened the CHECK.
+    //
+    // 18 Nov: `bank_transfer` (migration 042). A tenant who wants to pay by
+    // bank transfer is passed to collections, who send the account details.
+    // On the inbound phone agent the voice note below is posted with THIS
+    // reason, so without the word here the note went to Management as
+    // "asked for a person" and lost its label and its line for staff.
     const reasons = [
       "hardship", "dispute", "distress", "language", "not_understood",
       "caller_request", "ownership",
       "out_of_scope", "emergency", "repeated_failure",
       "payment", "billing", "move", "contract", "quote", "other",
+      "bank_transfer",
     ];
     const reason = reasons.includes(args?.reason) ? args.reason : "caller_request";
 

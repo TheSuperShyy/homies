@@ -487,6 +487,9 @@ INTAKE_TRANSFER_REASONS = [
 INTAKE_NOTE_REASONS = [
     "payment", "billing", "move", "contract", "quote",
     "emergency", "caller_request", "language", "other",
+    # 19 Nov (the owner: "ok give the phone line the same transfer as whatsapp"): a bank transfer, handed to
+    # collections and told to the caller. debt-tools v161 (PR #16) and migration 042 store it as itself.
+    "bank_transfer",
 ]
 
 # Six tools: four writes and two reads.
@@ -588,7 +591,7 @@ INTAKE_TOOLS = [
         "and not a message to anyone: nobody is connected, nobody is put through, and "
         "you stay the only one the caller deals with.\n"
         "Call it the moment the caller's ask is past you: paying dues or arranging a "
-        "payment (that one is also a ticket, open_request with type `payment`; put "
+        "payment other than by bank transfer (that one is also a ticket, open_request with type `payment`; put "
         "its number in this description when you have it), a "
         "document they need (invoice, receipt, "
         "confirmation), moving in or out or a change of tenant, a contract, a price "
@@ -609,6 +612,18 @@ INTAKE_TOOLS = [
         "them, never that someone has been told, and never that their request for a "
         "manager was recorded, also not later when they ask when someone will get "
         "back to them.\n"
+        # 19 Nov: the WhatsApp bot's bank-transfer paragraph (epochs 111-113), in phone terms: the details come
+        # later from collections, not "here in the chat", and it is never a ticket.
+        "A bank transfer is the one note the caller hears about. You do not have the account details and never "
+        "make them up. A caller who wants to pay by bank transfer, or asks for the account details to transfer "
+        "to, is handed to the collections team with this call, at once: reason bank_transfer, department "
+        "collections, with what they asked and how to reach them if they said it. It is not a ticket. Then tell "
+        "them, in your own words, that you have passed their request to a representative from the collections "
+        "team, who will contact them with the account details: never when, nothing more promised, then whether "
+        "there is anything else you can help with meanwhile. Every time they ask to pay by transfer or for the "
+        "details, call this again; asked only when the details will come, there is no new call and no new "
+        "hand-over sentence: say plainly that you have no time for it, and that it is with a representative "
+        "from collections.\n"
         # 16 Sep, the client's review: no national numbers and no safety
         # instructions from the bot. The note and the ticket are the whole
         # response to an emergency, so they come first.
@@ -635,7 +650,7 @@ INTAKE_TOOLS = [
         "on, or do it, as the one handling it. After a matter only a person at Homies "
         "can finish: that you have recorded their request, then what is still missing "
         "from it (when, how much, what exactly), one question at a time; only when "
-        "nothing is left to ask, what else you can do now. Nobody else is in it: no "
+        "nothing is left to ask, what else you can do now. Apart from a bank transfer, nobody else is in it: no "
         "team, no manager, no one who will check, handle or get back to them, nothing "
         "passed on to anyone, no when, no promise, and never that help is on the way. "
         "Never the office phone unless they ask how to reach the office. `department` "
@@ -651,7 +666,8 @@ INTAKE_TOOLS = [
                     "document they need; move = "
                     "moving in or out, a change of tenant; contract = a contract; "
                     "quote = a price quote; emergency = a person in danger; "
-                    "caller_request = they asked for a person; language = you and "
+                    "caller_request = they asked for a person; bank_transfer = they want to pay by "
+                    "bank transfer or ask for the account details (department collections); language = you and "
                     "the caller do not share a language; other = anything else "
                     "past you."
                 ),

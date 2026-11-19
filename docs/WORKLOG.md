@@ -9,6 +9,30 @@ conversation that produced it.
 
 ---
 
+## 2026-11-19
+
+### LIVE 08:30:58 UTC: the incoming phone line passes a bank transfer to collections, as WhatsApp does (the owner: "ok give the phone line the same transfer as whatsapp")
+- **What a caller hears:** Michael has no account details and never makes them up. A caller who wants to pay by bank transfer, or asks for the details, is passed to a representative from the collections team, "who will contact them with the account details", never when. Asked only when, he says he has no time for it, with no new note.
+- **Why the server had to change first:**
+  - On the phone, debt-tools posts the voice note itself, with the reason it stored, and its allow-list turned any unknown word into `caller_request`.
+  - So a phone bank-transfer note would have reached Management as "asked for a person", without the label or the line for staff. WhatsApp's note never depended on it: "Let the team know" takes the model's own reason.
+  - Both n8n routers keep their own old lists, and neither is on the phone's path.
+- **Live, in order:**
+  1. **Migration 042** (`supabase/042_bank_transfer_reason.sql`): `call_outcomes.transfer_reason` allows `bank_transfer`. Applied 08:2x UTC and read back; every older value is still allowed.
+  2. **debt-tools v161, PR #16** (`7f998e6`, squash-merged 08:27:26 UTC, CI green, deployed 08:27:54 UTC): `bank_transfer` in `transfer_to_human`'s list. The same line is on feature/chatbot, and index.ts equals main's.
+  3. **"Hand to a person", `scripts/n8n_handover_bankvoice.py`:** a phone bank-transfer note with a number says "שולחים לדייר את פרטי החשבון של הבניין שלו, בוואטסאפ או בטלפון, למספר שלמעלה"; without a number it falls back to the address as before. Snapshot `local/n8n-handover-live-19nov-before-bankvoice.json`; checked on stubs (with a number, without one, a payment note unchanged).
+  4. **The inbound agent (`10ae859a`, Yariv's account), `vapi_sync.py inbound --keep-voice --apply` at 08:30:58 UTC:**
+     - live matched the repo before the edit (last written 10 Nov);
+     - three prompt changes in `docs/assistant/demo-inbound.md`: what the tools do, the one-voice sentence ("רק במעלית, בהוראת קבע ובהעברה בנקאית"), and a paragraph after the lift's;
+     - `notify_team` in `scripts/vapi_tools.py`: the paragraph, `bank_transfer` in its reasons, "paying dues" narrowed to "other than by bank transfer", and "Apart from a bank transfer, nobody else is in it";
+     - read back equal, with the voice untouched.
+- **Proven without a call:** one `notify_team` envelope as the inbound agent (call id `probe-phonebank-20261119T083213`, the test flat, the owner's number).
+  - It answered `reason: bank_transfer`, `team_notified: true` in 2.2 s, and `call_outcomes` stored `bank_transfer`.
+  - "Hand to a person" 192866 put the note in the Voice inbox (conversation 99) for Collections, with `handover`, `handover-collections` and `bank-transfer`, and "סיבה: הדייר רוצה לשלם בהעברה בנקאית ומחכה לפרטי החשבון".
+  - Its last line read "no number": the owner's +63 is foreign, and `phoneOf` drops a foreign caller's number by design.
+  - Conversation 99 resolved afterwards.
+- **Not proven:** the agent's own words on a real call (the next real call, or the owner's). The debt agent is not included.
+
 ## 2026-11-18
 
 ### The chat page as a phone chat only (the owner: "i need it to look like whatsapp only nothing happening in the backend or chatwoot only whatsap"), 14:15 UTC

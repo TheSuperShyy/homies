@@ -58,6 +58,20 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **LIVE 19 Nov, 08:30:58 UTC: THE INCOMING PHONE LINE PASSES A BANK TRANSFER TO COLLECTIONS, AS WHATSAPP DOES** (the owner: *"ok give the phone line the same transfer as whatsapp"*; WORKLOG 19 Nov).
+>   - **The caller hears** that Michael passed the request to a representative from collections, who will contact them with the account details, never when. Asked only when, there is no new note.
+>   - **Live, in order:**
+>     - migration 042 (`bank_transfer` storable);
+>     - debt-tools v161 (PR #16, `7f998e6`): the reason is stored and posted as itself; before, the phone note would have gone to Management as "asked for a person";
+>     - "Hand to a person": a phone note with a number says to send the account details to it;
+>     - the inbound agent `10ae859a`: three prompt changes and `notify_team`, voice untouched.
+>   - **Proven without a call:** a probe note went to Collections in the Voice inbox with `bank-transfer` (conversation 99, resolved). A foreign number such as the owner's +63 is dropped by design, so that note had no number.
+>   - **Owed:** a real call to hear the words.
+>   - **Rollback:**
+>     - the agent: `git revert`, then `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`;
+>     - "Hand to a person": `python scripts/n8n_handover_bankvoice.py --restore`;
+>     - the server: a revert PR on main. Migration 042 is additive and can stay.
+>
 > **LIVE 18 Nov, 13:54:49 UTC: Send linkline v1, the payment link on a line of its own** (the owner's one-conversation Grok run, conversation 98, failed P2 only). Send's first clean-up had turned the blank lines around the link into spaces. A last step now puts a link on its own line, after every guard. Gate 677/677. Rollback: `python scripts/n8n_whatsapp_linkline.py --restore`.
 >
 > **18 Nov, 13:16:33 UTC: the memory key is `-114` (n8n_whatsapp_fresh.py, the key only), for the owner's one-conversation Grok run** (`grok-standing-order-transfer-test.md`: a standing order, then a bank transfer and where). Conversation 97 is resolved. The texts are epoch 113's.

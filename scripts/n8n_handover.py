@@ -264,7 +264,10 @@ if (mode === 'new' || mode === 'page') {
     // How to reach them: the number, else the address, else say plainly that
     // the call left neither and what is above is all there is.
     const now_ = urgent ? ' עכשיו' : '';
-    const reach = phone ? 'מתקשרים לדייר' + now_ + ' למספר שלמעלה.'
+    // 19 Nov (n8n_handover_bankvoice.py): a bank transfer owes the caller the account details.
+    const reach = (phone && reason === 'bank_transfer')
+                ? 'שולחים לדייר את פרטי החשבון של הבניין שלו, בוואטסאפ או בטלפון, למספר שלמעלה.'
+                : phone ? 'מתקשרים לדייר' + now_ + ' למספר שלמעלה.'
                 : (where ? 'אין מספר, אז מתקשרים לדייר' + now_ + ' לפי הכתובת שלמעלה.'
                          : 'בשיחה לא נשאר לא מספר ולא כתובת. יש רק מה שכתוב למעלה.');
     lines.push('מה לעשות: זאת הייתה שיחת טלפון עם הבוט והיא כבר נגמרה, אז מה שכותבים כאן הדייר לא רואה. '
