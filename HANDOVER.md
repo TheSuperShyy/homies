@@ -73,6 +73,7 @@ appended to.
 >   - **sonote v1:** a turn where `request_standing_order` recorded the request makes no backstop note. Since 9 Nov, "ייצור איתך קשר" after a standing order had also paged Service.
 >   - `scripts/n8n_whatsapp_cardwords.py`; 699/699 cases, the replay changes nothing, the gate on live is green. No Claude round: the cases cover the defects.
 >   - **The owner's Grok rerun passed every rule** (11:14-11:23 UTC, conversation 102, left open). Our side agrees: the number given on an already-recorded request, "שיכתוב לך כאן" kept, one note only (Collections), no Service note.
+>   - **As a page:** https://claude.ai/artifact/ETLNtTAB9vH4FqvPcfTCeo ("Card-Only Payments", private, on the account signed in since 19 Nov midday). It holds the 11 messages both phones saw, the link hidden, and no backend. Built by scratchpad `bt_page/build_co.py`.
 >   - **Still owed:** Yariv's OK, the watch on real traffic, and the phone twins.
 >   - Rollback: `python scripts/n8n_whatsapp_cardwords.py --restore` (back to 115).
 >

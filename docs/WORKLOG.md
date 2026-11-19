@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### The card-only rerun as a phone-chat page (the owner: "create the artifact for the messages on how i converse with the bot like before"), 12:30 UTC
+- https://claude.ai/artifact/ETLNtTAB9vH4FqvPcfTCeo, "Card-Only Payments", version 1, private. Sharing is set from the page's Share menu; the session cannot change it.
+- Built like 18 Nov's page (version 3 of 6kabicNbN56Axj3bBmAsLs), by scratchpad `bt_page/build_co.py`:
+  - a phone-chat look with only the 11 messages both phones saw in conversation 102 (5 from the tenant, 6 from Michael);
+  - no staff note, labels or Chatwoot lines;
+  - the link shown as `www.pro.oxs.co.il/•••••••`;
+  - Israel times; dated Thursday 19 Nov.
+- The messages came from Chatwoot with every link masked before they were written to disk (`bt_page/conv102.json`).
+- Published under the account now signed in to the session. The 18 Nov page lives on the previous one.
+
 ### LIVE 12:20 UTC: the card-only rule on both phone agents (the owner: "apply the card only rule to the voice agents as well")
 - **debt-tools v163, PR #18** (`c0eae1f`, merged 12:17:20 UTC, CI green, deployed 12:17:54 UTC):
   - the debt agent's `transfer_to_human` with reason `payment` (cheques, cash or another way but a card) posts the voice note to Collections, like `bank_transfer` since PR #17;
