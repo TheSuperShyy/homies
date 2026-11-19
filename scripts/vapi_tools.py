@@ -318,11 +318,14 @@ DEBT_TOOLS = [
         # 20 Sep, owner: the link goes to WhatsApp during the call, and the
         # agent says so -- where it went, which number, please complete it --
         # in its own words. The result carries `sent` and never a URL.
-        "Call once the resident has agreed to get the link, to pay now or when it suits them, and once per call. The payment "
+        # 17 Nov (written straight to live that day, captured here on 19 Nov): a standing order is set up from
+        # the same link, and the link is "on its way" once the tool answers (PR #15 sends after the answer).
+        "Call once the resident has agreed to get the link, to pay now or when it suits them, or to set up a "
+        "standing order on the page it opens (card or bank), and once per call. The payment "
         "link goes to their WhatsApp, at the number Homies has on file for them; "
-        "nothing is charged and no card is involved. The result says whether it went "
-        "(sent true or false). When it went, tell them in your own words where it "
-        "went -- WhatsApp, the number we have -- and ask them to complete it; when it "
+        "nothing is charged and no card is involved. The result says whether it is on its way "
+        "(sent true) or not (sent false). When it is on its way, tell them in your own words where it "
+        "is going -- WhatsApp, the number we have -- and ask them to complete it when it arrives; when it "
         "did not, say the office will send it and give the office number, without "
         "saying why. Never read a link aloud: the result never contains one. Either "
         "way a request is filed for the office: when the link went it is filed as "
@@ -386,8 +389,10 @@ DEBT_TOOLS = [
     ),
     _fn(
         "request_standing_order",
-        "Call once per call, only after the resident says yes to a standing order. "
-        "Never after a decline. This records the request; it does not set one up.",
+        # 17 Nov (written straight to live that day, captured here on 19 Nov): the link comes first.
+        "Call once per call, only when the resident wants a standing order and would rather someone from the "
+        "collections team phoned them than set it up from the payment link on WhatsApp, or when send_payment_link "
+        "did not send the link. Never after a decline. This records the request; it does not set one up.",
     ),
     _fn(
         "log_disputed_payment",

@@ -713,9 +713,16 @@ TARGETS = {
             # at about 1.5 cents a minute more; `reasoningEffort` low is the incoming
             # agent's too (unset is this model's medium). The voice's minCharacters 10 is
             # vapi_set_voice.py's. Undo: drop both keys.
-            "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "low",
+            # 17 NOV: `reasoningEffort` minimal, on the owner's "the delay is super trash"
+            # (WORKLOG 17 Nov, written straight to live by a scratchpad patch). Captured
+            # here on 19 Nov, so a sync does not put `low` back.
+            "model": {"provider": "openai", "model": "gpt-5.6-sol", "reasoningEffort": "minimal",
                       "serviceTier": "fast"},
         },
+        # 17 Nov: Vapi's hang-up tool, after the function tools. Michael logs the outcome, says the goodbye once and
+        # hangs up in the same turn, because the end-call phrases stopped matching (prompt.md, "17 Nov"). Written
+        # straight to live that day and captured here on 19 Nov, so a sync does not drop it.
+        "extra_tools": [{"type": "endCall"}],
         # "Echo Stone" — this agent takes a cloned voice when one exists. See
         # cloned_voice() below. The debt agent and not the inbound one because
         # the voice being cloned is male and this prompt is already masculine
@@ -1133,7 +1140,8 @@ def build(target, first_message, system_prompt):
         # call (21-23 Oct). The request now crosses once, not once per query.
         # Undo: drop `region`.
         region = FUNCTION_REGION if host == "supabase" else None
-        body["model"]["tools"] = with_server(target["tools"], url, secret, mode, region)
+        body["model"]["tools"] = with_server(target["tools"], url, secret, mode, region) + [
+            dict(t) for t in target.get("extra_tools", [])]
 
     report = report_server()
     if report:
@@ -1226,7 +1234,8 @@ def main():
         shown = attached[0]["server"]["url"].split("?")[0]
         print("tools         : %d -> %s [%s]" % (len(attached), shown, host))
         for t in attached:
-            print("                %s" % t["function"]["name"])
+            # Vapi's own tools (endCall, 17 Nov) carry a type and no function.
+            print("                %s" % ((t.get("function") or {}).get("name") or t.get("type")))
     elif target.get("tools"):
         print("tools         : NONE ATTACHED — set SUPABASE_URL + TOOL_SECRET,")
         print("                or WEB_APP_URL + APPS_SCRIPT_SECRET, in .env")
