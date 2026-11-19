@@ -1170,6 +1170,11 @@ function isIntake(ctx: CallContext): boolean {
   return !!ctx.assistantId && INTAKE_ASSISTANT_IDS.has(ctx.assistantId);
 }
 
+/** The debt agent on the live account, by id for the same reason as isIntake (19 Nov). */
+function isDebtAgent(ctx: CallContext): boolean {
+  return !!ctx.assistantId && ctx.assistantId === DEBT_ASSISTANT_YARIV;
+}
+
 /**
  * Who the Chatwoot contact is. The CALL is the identity (`voice:call:<id>`),
  * because it is the one thing that cannot change between the first note of
@@ -4402,6 +4407,35 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
           reason,
           department: String(args?.department ?? "").trim(),
           description: ((who ? who + ": " : "") + String(args?.description ?? "").trim()).slice(0, 500),
+          source: "tool",
+        });
+      } catch (e) {
+        console.error("voice note threw", ctx.callId, String(e));
+        team_notified = false;
+      }
+    } else if (reason === "bank_transfer" && isDebtAgent(ctx)) {
+      // 19 Nov (the owner: "ok apply the chatbot rule to the voice agent as well"): the debt agent tells a
+      // tenant who wants to pay by bank transfer that a representative from collections will contact them with
+      // the account details, so Collections is paged here exactly as for the incoming agent. Its other
+      // hand-overs still reach only this row and the call list, as before. Its tool has no free text (a
+      // spoken-argument risk, vapi_tools.py), so the note is written from the call: the person we rang, and
+      // what is left to pay.
+      const who = await residentName(ctx.residentId);
+      const building = String(ctx.building ?? "").trim();
+      const units = [...new Set(ctx.charges.map((c) => String(c.unit ?? "").trim()).filter(Boolean))];
+      const unit = String(args?.unit ?? "").trim() || String(ctx.unit ?? "").trim() || units.join(", ");
+      const owed = Number(ctx.amount) || ctx.charges.reduce((s, c) => s + (Number(c.amount) || 0), 0);
+      try {
+        team_notified = await voiceNote({
+          call_id: ctx.callId,
+          phone: ctx.callerPhone ?? "",
+          building, unit,
+          identifier: voiceIdentity(ctx.callId),
+          label: await voiceLabel(building, unit),
+          reason,
+          department: "collections",
+          description: ((who ? who + ": " : "") + "לשלם בהעברה בנקאית"
+            + (owed ? ` את ${owed} ש"ח שנשארו לשלם` : "") + ". זה עלה בשיחת גבייה שלנו.").slice(0, 500),
           source: "tool",
         });
       } catch (e) {
