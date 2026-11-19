@@ -2110,6 +2110,39 @@ function cases(E) {
     expect('a payment link ask still gets its note',
       () => E.word({ output: 'בודק לך את זה רגע.' }, turn({ said: 'אני רוצה לשלם את החוב שלי, אפשר לקבל קישור לתשלום?' }).$), true);
   }
+  // 19 Nov (scripts/n8n_whatsapp_cardonly.py, epoch 115, ackhold v2 / banknote v2). Yariv: "דרך הקישור זה צריך להיות
+  // ברור שניתן רק באשראי", and another way (cheques, bank) to a representative only when the tenant asks. Cheques and
+  // cash in the tenant's words hold the payment-ack note as a transfer does, and with collections in the reply they send
+  // the note. A word that only contains the letters (שיקום, a renovation) does not.
+  if (String((P.code || {}).word_gate || '').indexOf('ackhold v2') !== -1 || process.env.CARDONLY_FORCE) {
+    console.log(NL + "--- 19 Nov: cheques or cash get no 'checking' note either (Yariv: the link is card only) ---");
+    const ACK = 'הבנתי, אני בודק את זה ממש עכשיו כדי להעביר לך את פרטי התשלום המדויקים.';
+    expect("cheques asked: the note is held",
+      () => E.word({ output: ACK }, turn({ said: "אפשר לשלם את ועד הבית בצ'קים?" }).$), false);
+    expect("Yariv's spelling, צקים: held",
+      () => E.word({ output: ACK }, turn({ said: 'אני משלם רק בצקים, אפשר?' }).$), false);
+    expect("שיקים: held",
+      () => E.word({ output: ACK }, turn({ said: 'אפשר לשלם בשיקים דחויים?' }).$), false);
+    expect("cash: held",
+      () => E.word({ output: ACK }, turn({ said: 'אפשר לשלם את הוועד במזומן?' }).$), false);
+    expect("a transfer is still held",
+      () => E.word({ output: ACK }, turn({ said: 'היי, אפשר לשלם את ועד הבית בהעברה בנקאית? מה פרטי החשבון?' }).$), false);
+    expect("a payment link ask still gets its note",
+      () => E.word({ output: 'בודק לך את זה רגע.' }, turn({ said: 'אני רוצה לשלם את החוב שלי, אפשר לקבל קישור לתשלום?' }).$), true);
+    expect("שיקום is not a cheque: the note goes",
+      () => E.word({ output: 'בודק לך את זה רגע.' }, turn({ said: 'כמה צריך לשלם על השיקום של הלובי?' }).$), true);
+  }
+  if (String((P.code || {}).team_note || '').indexOf('banknote v2') !== -1 || process.env.CARDONLY_FORCE) {
+    console.log(NL + '--- 19 Nov: cheques asked and a reply about collections, so the note goes (Yariv) ---');
+    expect("cheques asked, no tool, collections in the reply: the note goes",
+      () => E.teamNote({ output: "זה אצל נציג מצוות הגבייה 🙂 הוא יחזור אליך כאן לגבי התשלום בצ'קים. יש עוד משהו שאוכל לעזור בו בינתיים?" },
+                       turn({ steps: [], said: "אפשר לשלם בצ'קים?" }).$), true);
+    expect("cash asked, no collections in the reply: not this clause",
+      () => E.teamNote({ output: 'אפשר לשלם בקישור האישי, בכרטיס אשראי. מסתדר לך?' }, turn({ steps: [], said: 'אפשר לשלם במזומן?' }).$), false);
+    expect("a transfer asked and collections in the reply: still the note",
+      () => E.teamNote({ output: 'זה אצל נציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון. יש עוד משהו?' },
+                       turn({ steps: [], said: 'מה מספר החשבון להעברה?' }).$), true);
+  }
   // 18 Nov, evening (scripts/n8n_whatsapp_linkline.py, Send linkline v1). The owner's one-conversation Grok run
   // (190914): the model wrote the payment link on a line of its own, with blank lines around it, and Send's first
   // clean-up (`/\s{2,}/g` -> ' ') turned the blank lines into spaces, so the link went out inline. The link is put

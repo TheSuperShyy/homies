@@ -58,6 +58,15 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **WRITTEN AND GATED 19 Nov, NOT LIVE: WHATSAPP EPOCH 115, THE LINK IS FOR PAYING BY CREDIT CARD; ANOTHER WAY ONLY WHEN ASKED, TO COLLECTIONS** (Yariv, forwarded by the owner; WORKLOG 19 Nov; CONTEXT, "Yariv's decision, 19 Nov").
+>   - `scripts/n8n_whatsapp_cardonly.py`: the prompt (nine edits), three tool texts, ackhold v2 / banknote v2 / otherpay v1, memory 114 -> 115.
+>   - **The repo is ahead of live:** `n8n_whatsapp.py` is at MEMORY_EPOCH 115 and prompt.md has the new fence.
+>     - Until `--apply`, run no other WhatsApp patcher's `--apply`.
+>     - `check_whatsapp_rules.py` on live fails the four pins until then, as expected.
+>   - The gate on the dump is green except the four intended pins (687/687 cases, replay 0 of 1,608), and the idle check is as before. The Claude-played check (`wa_qa_cardonly.json`, run `qa_co`) decides the pins and the write.
+>   - Rollback after a write: `python scripts/n8n_whatsapp_cardonly.py --restore`.
+>   - Twins owed: the debt agent's "באשראי או בבנק" and the incoming agent's cheques.
+>
 > **LIVE 19 Nov, 09:15:01 UTC: THE DEBT CALL PASSES A BANK TRANSFER TO COLLECTIONS TOO** (the owner: *"ok apply the chatbot rule to the voice agent as well"*; WORKLOG 19 Nov; `prompt.md`, "19 Nov").
 >   - **The tenant hears** that Michael passed the request to a representative from collections, who will contact them with the account details, never when. Then the call closes, as every hand-over does.
 >   - **Live, in order:**

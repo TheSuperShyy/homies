@@ -11,6 +11,34 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### WhatsApp epoch 115 written and gated, NOT live: the link is for paying by credit card, another way only when asked, to collections (Yariv, forwarded by the owner as a screenshot), from 09:40 UTC
+- **Yariv's words**, on the one-conversation run (190914: "אתה יכול לבחור לשלם בהוראת קבע (באשראי או בבנק)"): "דרך הקישור זה צריך להיות ברור שניתן רק באשראי. ואז אם הדייר יגיד (רק אם יגיד) שהוא רוצה באפשרות אחרת נניח של צקים או בנק, אז שהבוט יעביר לנציגים שלנו (המטרה שלנו לעודד את כולם או יותר נכון לדחוף אותם לתשלום באשראי)".
+- **Where "card or bank" came from:**
+  - 17 Nov's epoch 110 sentence (the page offers a standing order "באשראי או בבנק");
+  - `get_payment_link` ("by card or through the bank");
+  - the facts line, which listed every way to pay ("בהעברה בנקאית, הוראת קבע, כרטיס אשראי או שיקים").
+- **`scripts/n8n_whatsapp_cardonly.py`** (epoch 114 -> 115) does it in one write:
+  - nine prompt edits (prompt.md's fence written by `--doc`);
+  - `get_payment_link`, `request_standing_order` and `notify_team`;
+  - three code pieces:
+    - ackhold v2 ("A word first?"): cheques or cash hold the payment-ack note;
+    - banknote v2 ("Team note this turn?"): cheques or cash asked, with collections in the reply, send the note;
+    - otherpay v1 ("Let the team know"): with no `notify_team` call, cheques or cash make the backstop's reason `payment`, which "Hand to a person" sends to Collections.
+- **Decisions taken in it:**
+  - Cheques, cash or another way go to `notify_team` with reason `payment`. Migration 030 stores it and "Hand to a person" routes it to Collections, so there is no new reason and no migration.
+  - A standing order from the bank goes to `request_standing_order` (Yariv's 9 Nov process: collections phone).
+  - No link is pushed at someone who asked for another way, as with the bank transfer since 18 Nov.
+- **The gate on the dump:**
+  - 687/687 cases (10 new), and the replay changes none of 1,608 replies.
+  - Only the four intended pins fail: prompt `6eceba0a40ef`, `get_payment_link` `ace4be7fc6de`, `notify_team` `459a202de3e4`, `request_standing_order` `aa8a569348f1`.
+  - The idle check adds nothing: the same three ran as on 18 Nov, and bankwhen now refuses on the moved key.
+  - The backstop's reason, tested on the dump: 9/9 (scratchpad `let_test3.js`).
+- **The Claude-played check is running:** `scripts/wa_qa_cardonly.json`, three scenarios (how to pay; a standing order, then from the bank; cheques, then a bank transfer), scratchpad run `qa_co`.
+- **Not live.** `n8n_whatsapp.py` is at MEMORY_EPOCH 115 and prompt.md carries the new prompt, so the repo is ahead of live until `--apply`.
+- **Twins owed, on the owner's word:**
+  - the debt agent ("בדף שהוא פותח בוחרים הוראת קבע, באשראי או בבנק");
+  - the incoming agent (no cheques rule).
+
 ### LIVE 09:15:01 UTC: the debt call passes a bank transfer to collections too (the owner: "ok apply the chatbot rule to the voice agent as well")
 - **Read as the debt agent:** the incoming line got the rule at 08:30, and "as well" named the other voice agent.
 - **What the tenant hears:** Michael has no account details and never makes them up. `alt_payment` was `none` on all eight recent debt calls.

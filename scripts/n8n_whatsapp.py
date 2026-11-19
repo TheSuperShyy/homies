@@ -230,7 +230,9 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 114
+MEMORY_EPOCH = 115
+# 114 -> 115, 19 Nov (n8n_whatsapp_cardonly.py): Yariv, forwarded by the owner: the link is for paying by credit card
+# only, and another way (cheques, bank) goes to a representative from collections, only when the tenant asks.
 # 113 -> 114, 18 Nov, evening (n8n_whatsapp_fresh.py): the memory key only, so the owner's single-conversation Grok
 # test (a standing order, then a bank transfer and where) starts without the bank-transfer tests in its buffer.
 # 112 -> 113, 18 Nov, later still (n8n_whatsapp_bankwhen.py): the owner's second Grok run; a transfer ask gets no
@@ -844,7 +846,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "7960ab31d1a1",   # docs/features/11-whatsapp-bot/prompt.md (18 Nov, epoch 111, a bank transfer goes to
+    "prompt": "6eceba0a40ef",   # docs/features/11-whatsapp-bot/prompt.md (19 Nov, epoch 115, the link is for paying
+    # by credit card only, and another way goes to collections only when asked; Yariv). Before: 7960ab31d1a1
+    # (18 Nov, epoch 111, a bank transfer goes to
     # a person from collections, and Michael says so). Before: 2c95b2d3aaa6 (17 Nov, epoch 110, a standing order is
     # answered with the payment link first). Before: fe1f06ca0f84 (12 Nov, later, epoch 109, the owner's
     # standard is the base of an emergency's first message). Before: 504d924d3419 (12 Nov, epoch 108, the owner's
@@ -875,7 +879,10 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "cc6616c65c25",  # 18 Nov, later still, epoch 113 (n8n_whatsapp_bankwhen.py): "when?" gets a plain answer,
+    "tools": "5f1ff18896a1",  # 19 Nov, epoch 115 (n8n_whatsapp_cardonly.py): get_payment_link is card only and
+    # offers no other way; request_standing_order also for a standing order from the bank; notify_team hands cheques,
+    # cash or another way to collections, told like a bank transfer.
+    # Before: cc6616c65c25, 18 Nov, later still, epoch 113 (n8n_whatsapp_bankwhen.py): "when?" gets a plain answer,
     # no new call and no second hand-over sentence.
     # Before: af9086ec97c8, 18 Nov, later, epoch 112 (n8n_whatsapp_bankagain.py): notify_team calls the bank-transfer
     # hand-over every time it is asked, and a request for a person about it gets the same words.
