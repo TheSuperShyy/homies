@@ -11,7 +11,24 @@ conversation that produced it.
 
 ## 2026-11-19
 
-### WhatsApp epoch 115 written and gated, NOT live: the link is for paying by credit card, another way only when asked, to collections (Yariv, forwarded by the owner as a screenshot), from 09:40 UTC
+### LIVE 10:25:12 UTC, WhatsApp epoch 115: the link is for paying by credit card, another way only when asked, to collections (Yariv, forwarded by the owner as a screenshot), from 09:40 UTC
+- **Live:** `n8n_whatsapp_cardonly.py --apply` at 10:25:12 UTC (snapshot `local/n8n-whatsapp-live-19nov-before-cardonly.json`).
+  - Read back: prompt `6eceba0a40ef`, tools `5f1ff18896a1`, memory `-115`, all seven nodes as written. A second run reports nothing to do.
+  - The gate on live is all green: 687/687 cases, and the replay changes none of the replies.
+- **The Claude-played check** (`scripts/wa_qa_cardonly.json`, scratchpad run `qa_co`, three Claude players, nothing spent): 28/28 expectations, no guard, no flag.
+  - How to pay: "משלמים בכרטיס אשראי, דרך הקישור האישי שלך לדירה 2 בבר כוכבא 23:" with the link, and no other way named.
+  - A standing order: "זה הקישור האישי שלך לתשלום בכרטיס אשראי, ובדף שנפתח בוחרים הוראת קבע בכרטיס", then the collections-call question. After "אין לי כרטיס אשראי, אפשר הוראת קבע מהבנק?": `request_standing_order`, "רשמתי את הבקשה שלך להוראת קבע מחשבון הבנק, מספר 255-1700-26. מישהו מצוות הגבייה ייצור איתך קשר בטלפון לגבי זה."
+  - Cheques: `notify_team` reason `payment`, department collections, "תשלום בצ'קים מסדירים מול צוות הגבייה, אז העברתי אותך לנציג מהצוות, והוא יחזור אליך כאן לגבי זה". Then the bank transfer: `bank_transfer`, "את פרטי החשבון אין לי כאן, אז העברתי אותך לנציג מצוות הגבייה, והוא ישלח לך אותם כאן בצ'אט".
+  - **The first grade said 27/28, with three "name-mid-conversation" flags. Both came from the deck, not the bot:**
+    - `greeted: true`, copied from the bank decks, made the grader read turn 0 as mid-conversation. The players, following PLAYER.md (which has no `greeted`), built it as a first message, where Michael introducing himself is right.
+    - `arg_equals` wanted every `notify_team` call to be `payment`, and the scenario's second call is the bank transfer.
+    - The deck was corrected (a fresh chat, which epoch 115 makes every chat; an argument check for the two reasons), and the same transcripts were regraded.
+- **The pins** for the prompt, `get_payment_link`, `request_standing_order` and `notify_team` then moved, and the gate on the candidate went all green before `--apply`.
+- **Owed:**
+  - `check_whatsapp_rules.py --watch 2026-11-19T10:25` tonight and in the morning;
+  - the owner's handset (ask how to pay; ask to pay by cheques);
+  - Yariv's OK;
+  - the two phone twins (below).
 - **Yariv's words**, on the one-conversation run (190914: "אתה יכול לבחור לשלם בהוראת קבע (באשראי או בבנק)"): "דרך הקישור זה צריך להיות ברור שניתן רק באשראי. ואז אם הדייר יגיד (רק אם יגיד) שהוא רוצה באפשרות אחרת נניח של צקים או בנק, אז שהבוט יעביר לנציגים שלנו (המטרה שלנו לעודד את כולם או יותר נכון לדחוף אותם לתשלום באשראי)".
 - **Where "card or bank" came from:**
   - 17 Nov's epoch 110 sentence (the page offers a standing order "באשראי או בבנק");
@@ -33,8 +50,6 @@ conversation that produced it.
   - Only the four intended pins fail: prompt `6eceba0a40ef`, `get_payment_link` `ace4be7fc6de`, `notify_team` `459a202de3e4`, `request_standing_order` `aa8a569348f1`.
   - The idle check adds nothing: the same three ran as on 18 Nov, and bankwhen now refuses on the moved key.
   - The backstop's reason, tested on the dump: 9/9 (scratchpad `let_test3.js`).
-- **The Claude-played check is running:** `scripts/wa_qa_cardonly.json`, three scenarios (how to pay; a standing order, then from the bank; cheques, then a bank transfer), scratchpad run `qa_co`.
-- **Not live.** `n8n_whatsapp.py` is at MEMORY_EPOCH 115 and prompt.md carries the new prompt, so the repo is ahead of live until `--apply`.
 - **Twins owed, on the owner's word:**
   - the debt agent ("בדף שהוא פותח בוחרים הוראת קבע, באשראי או בבנק");
   - the incoming agent (no cheques rule).

@@ -222,7 +222,7 @@
    "weekday": 4,
    "weekday_he": "חמישי",
    "iso": "2026-11-19T11:00:00+02:00",
-   "greeted": true,
+   "greeted": false,
    "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
    "ticket": "255-1700-26",
    "id": "co_how",
@@ -296,7 +296,7 @@
    "weekday": 4,
    "weekday_he": "חמישי",
    "iso": "2026-11-19T11:00:00+02:00",
-   "greeted": true,
+   "greeted": false,
    "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
    "ticket": "255-1700-26",
    "id": "co_standing_bank",
@@ -398,7 +398,7 @@
    "weekday": 4,
    "weekday_he": "חמישי",
    "iso": "2026-11-19T11:00:00+02:00",
-   "greeted": true,
+   "greeted": false,
    "who": " [הפונה מזוהה במערכת: אסף, בר כוכבא 23, תל אביב - יפו, דירה 2.]",
    "ticket": "255-1700-26",
    "id": "co_cheques",
@@ -431,11 +431,14 @@
      "name": "cheques handed to collections at the ask"
     },
     {
-     "type": "arg_equals",
+     "type": "arg_contains",
      "tool": "notify_team",
      "arg": "reason",
-     "value": "payment",
-     "name": "reason payment for cheques"
+     "words": [
+      "payment",
+      "bank_transfer"
+     ],
+     "name": "each note's reason is payment (cheques) or bank_transfer (the transfer); arg_equals wanted every call to be payment"
     },
     {
      "type": "turn_regex",

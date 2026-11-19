@@ -6003,8 +6003,8 @@ gitignored; the v5 file we had was rev 1.9).
     `request_standing_order` (collections phone), and cheques, cash or anything
     else by `notify_team` reason `payment`, told like a bank transfer ("a
     representative from collections will get back to you here", never when).
-  - WhatsApp epoch 115, `scripts/n8n_whatsapp_cardonly.py`: written and gated on
-    19 Nov, not live until the Claude-played check passes. The debt agent still
+  - WhatsApp epoch 115, `scripts/n8n_whatsapp_cardonly.py`, live 19 Nov at
+    10:25:12 UTC (Claude-played 28/28, the gate on live green). The debt agent still
     says the page's standing order is "באשראי או בבנק", and the incoming agent has
     no cheques rule: both twins are owed, on the owner's word.
 - **A slow WhatsApp reply is usually Gemini thinking, and the run shows it.**
