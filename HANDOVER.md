@@ -58,6 +58,14 @@ appended to.
 >     - debt-tools: revert `d49128c` on main through a PR.
 >   - **Owed: one real call** (the owner's Ring to Ido on /dialer): the hang-up, a single goodbye, the Hebrew at minimal reasoning, the link's wait, and `vapi_latency.py` for the split.
 
+> **LIVE 19 Nov, 11:08:45 UTC: WHATSAPP EPOCH 116, THE GROK RUN OF 115 FIXED** (the owner pasted the report; WORKLOG 19 Nov).
+>   - **Cheques:** the line now says the representative "will write to you here" (`יכתוב לך כאן`). Send's promise cutter had taken 115's "שיחזור אליך כאן", and the tenant got only "העברתי אותך לנציג מצוות הגבייה."
+>   - **A standing order:** the number is given every time, also when it was already recorded.
+>   - **sonote v1:** a turn where `request_standing_order` recorded the request makes no backstop note. Since 9 Nov, "ייצור איתך קשר" after a standing order had also paged Service.
+>   - `scripts/n8n_whatsapp_cardwords.py`; 699/699 cases, the replay changes nothing, the gate on live is green. No Claude round: the cases cover the defects.
+>   - **For the rerun:** conversation 101 resolved, and the brief updated (`grok-card-only-test.md`). Message 3 sends no new email: the test number's request is already on record.
+>   - Rollback: `python scripts/n8n_whatsapp_cardwords.py --restore` (back to 115).
+>
 > **LIVE 19 Nov, 10:25:12 UTC: WHATSAPP EPOCH 115, THE LINK IS FOR PAYING BY CREDIT CARD; ANOTHER WAY ONLY WHEN ASKED, TO COLLECTIONS** (Yariv, forwarded by the owner; WORKLOG 19 Nov; CONTEXT, "Yariv's decision, 19 Nov").
 >   - **The tenant sees:**
 >     - the link "for paying by credit card", and no other way named;

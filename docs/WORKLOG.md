@@ -11,6 +11,37 @@ conversation that produced it.
 
 ## 2026-11-19
 
+### LIVE 11:08:45 UTC, WhatsApp epoch 116: the owner's Grok run of 115 checked against the runs, two lines fixed and a stray note stopped (the owner pasted the report)
+- **The report** (conversation 101, 10:49-10:57 UTC):
+  - messages 1, 2 and 5 PASS;
+  - message 3 FAIL S2 (no request number);
+  - message 4 FAIL C1 in part (no word of what comes next);
+  - NOTEs: the link message ends on an invitation; "באותו קישור ששלחתי לך" and then the link again; message 4 short and cold; the name אסף.
+- **What the runs show, so not Grok's misreading:**
+  - **Message 4 (193143):** `notify_team` reason `payment`, department collections. The model wrote "העברתי אותך לנציג מצוות הגבייה שיחזור אליך כאן לגבי תשלום בשיקים", as epoch 115 told it ("שיחזור אליו כאן"). Send's promise cutter (promise v8) took "שיחזור אליך כאן ...", so the tenant got "העברתי אותך לנציג מצוות הגבייה."
+    - The bank transfer's "ישלח לך כאן את פרטי החשבון" was never a promise phrase, so it passes.
+    - The Claude-played co_cheques turn 0 had the same cut. Its expectations checked only "גבייה" and the question mark, and I read the model's text instead of the handset's.
+  - **Message 3 (193126):** `request_standing_order` answered `already_recorded` (the test number has one from earlier tests), so no new email went out. The model said "רשמתי" without the number; the tool text tied the number to "recorded".
+  - **A second note on message 3, which Grok could not see:** "Team note this turn?"'s promise test read "מישהו מצוות הגבייה ייצור איתך קשר" as an unbacked promise. With no `notify_team` call, the backstop paged **Service** ("משהו שרק בן אדם מהצוות יכול לסדר").
+    - Send already lets that sentence through after a recorded standing order (its SO test), but the note never knew it.
+    - So every standing order recorded since 9 Nov has likely paged Service as well.
+  - Message 4's own note was right: Collections, "סיבה: הדייר רוצה לשלם או להסדיר תשלום". It has no labels left, because the ticker strips them after Michael answers (the known Chatwoot 4.16 `waiting_since` behaviour).
+  - The NOTEs: the link message's invitation is the payment template's close, by design. אסף is the name on file for the number.
+- **`scripts/n8n_whatsapp_cardwords.py`** (epoch 115 -> 116), one write:
+  - the prompt: "שיחזור אליו כאן לגבי זה" -> "שיכתוב לו כאן לגבי זה";
+  - `notify_team`: "who will get back to them about it here" -> "who will write to them here about it";
+  - `request_standing_order`: the number every time, also when already recorded;
+  - "Team note this turn?", sonote v1: no backstop note on a turn where `request_standing_order` recorded the request (recorded or already_recorded true).
+- **Checked:**
+  - 699/699 cases. The 12 new ones cover 193126 recorded and already recorded (no note), the same words with nothing recorded and with need_name (still the note), the cheques line through Send in two wordings, 193143's "שיחזור אליך" still cut, and every Reply usable? guard letting the line through.
+  - The replay changes nothing, the idle check is as before, and the gate on live is all green.
+  - No Claude round, on "don't overtest": the defects were Send's cut and the backstop, both deterministic and covered by the cases. The model-side change is one phrase, and Gemini's choice of words is what the owner's Grok rerun shows.
+- **For the rerun:**
+  - conversation 101 resolved;
+  - the brief now accepts "will write to you here", exempts the link message's close from rule E, and says the number is on file as אסף;
+  - `scripts/wa_qa_cardonly.json`'s co_cheques checks the handset keeps "(יכתוב|ישלח) לך כאן".
+- **Owed:** the owner's Grok rerun; the watch since 10:25 UTC; the internal record of WhatsApp notes still reads `caller_request` (the n8n router's old list, said this morning).
+
 ### A Grok brief for epoch 115 (the owner: "give me instructions to send on grok to test that new features"), 10:45 UTC
 - `docs/features/11-whatsapp-bot/grok-card-only-test.md`, in the format of the 18 Nov briefs. One conversation, five messages:
   1. how to pay;

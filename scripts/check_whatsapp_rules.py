@@ -266,7 +266,12 @@ PINS = {
     # texts. Claude-played co_how, co_standing_bank and co_cheques on the candidate (scripts/wa_qa_cardonly.json,
     # scratchpad run qa_co): 28/28 expectations, no guard, no flag, after two deck corrections (a fresh chat, and
     # an argument check that let the scenario's second, bank-transfer note through).
-    'Answer the resident / system': '6eceba0a40ef',
+    # 19 Nov, later (n8n_whatsapp_cardwords.py, epoch 116): the owner's Grok run of 115. Cheques' line says the
+    # representative "will write to you here" (Send's promise cutter took "שיחזור אליך כאן", 193143), and the
+    # standing order's number is given also when it was already recorded (193126). Checked by the cases: the line
+    # goes out whole through Send and every Reply usable? guard; no Claude round (one phrase, and Gemini's choice
+    # of words is the owner's Grok rerun to show).
+    'Answer the resident / system': '89c2cc1bd0cd',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -290,12 +295,12 @@ PINS = {
     'Worth a word? / system': 'f5f04e9b3f08',
     'get_balance / tool': '1753e9c90dba',
     'get_payment_link / tool': 'ace4be7fc6de',   # 19 Nov, epoch 115: card only, no other way offered; 5 Nov, epoch 96: a standing order is not a link; 17 Nov, epoch 110: it is the first answer to one; 18 Nov, epoch 111: a bank transfer is notify_team's
-    'request_standing_order / tool': 'aa8a569348f1',   # 19 Nov, epoch 115: also a standing order from the bank; 5 Nov, epoch 96: new; 9 Nov, epoch 100: collections will phone; 17 Nov, epoch 110: for that call or no link
+    'request_standing_order / tool': 'd7b6a79585b7',   # 19 Nov, later, epoch 116: the number also when already recorded; 19 Nov, epoch 115: also a standing order from the bank; 5 Nov, epoch 96: new; 9 Nov, epoch 100: collections will phone; 17 Nov, epoch 110: for that call or no link
     # 19 Oct: called first, with nothing; the number they write from finds their
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '459a202de3e4',     # 19 Nov, epoch 115 (cardonly.py): cheques, cash or another way to collections, told like a bank transfer. 18 Nov, later still, epoch 113 (bankwhen.py): asked only when, no new call and no second hand-over sentence (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankwhen.json then came back 8/8, no guard, no flag). 18 Nov, later, epoch 112 (bankagain.py): the bank-transfer hand-over is called every time it is asked, and a request for a person gets the same words (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankagain.json then came back 15/15, no guard, no flag). 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    'notify_team / tool': '3340ffc0f974',     # 19 Nov, later, epoch 116 (cardwords.py): cheques' representative "will write to them here". 19 Nov, epoch 115 (cardonly.py): cheques, cash or another way to collections, told like a bank transfer. 18 Nov, later still, epoch 113 (bankwhen.py): asked only when, no new call and no second hand-over sentence (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankwhen.json then came back 8/8, no guard, no flag). 18 Nov, later, epoch 112 (bankagain.py): the bank-transfer hand-over is called every time it is asked, and a request for a person gets the same words (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankagain.json then came back 15/15, no guard, no flag). 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas; 11 Nov, night
     # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`; later that night
     # (confirm.py, epoch 106): nor for anything else urgent, like a big leak

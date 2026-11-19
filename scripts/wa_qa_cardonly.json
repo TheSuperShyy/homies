@@ -449,6 +449,12 @@
     {
      "type": "turn_regex",
      "turn": 0,
+     "regex": "(יכתוב|ישלח) לך כאן",
+     "name": "the clause reached the handset: the representative will write here (Send cut 'will get back to you', 193143)"
+    },
+    {
+     "type": "turn_regex",
+     "turn": 0,
      "regex": "\\?",
      "name": "turn 0 ends on a question"
     },

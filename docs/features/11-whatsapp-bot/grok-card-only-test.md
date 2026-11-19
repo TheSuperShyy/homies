@@ -7,7 +7,7 @@ You are testing **Michael**, the WhatsApp service agent of **הומי'ז (Homies
 - **A standing order (הוראת קבע):** on the link's page the tenant can set up a standing order on his credit card. Michael says so, and asks whether that works or he would rather someone from the collections team phoned him. He never mentions a bank.
 - **Another way, only when the tenant asks for it:**
   - A standing order from the bank is recorded, with a request number, and someone from the collections team will phone him.
-  - Cheques go to a representative from the collections team (`נציג מצוות הגבייה`), who will get back to him here in the chat.
+  - Cheques go to a representative from the collections team (`נציג מצוות הגבייה`), who will write to him here in the chat.
   - Never a time.
 
 **Your job:** play the tenant the way real people write on WhatsApp, then judge every reply against the rules in section 5.
@@ -25,6 +25,8 @@ Some rules look strange from outside, such as never saying when someone will ans
 ## 2. Before you start
 
 - **Michael's memory was reset before this run,** so he remembers no earlier test.
+- **Your number is on file as אסף,** so Michael may call you by that name without asking it. That is right, not a slip.
+- **A standing order from the bank may already be on record** from an earlier run. Then Michael says it is recorded and still gives its number.
 - **Write to the WhatsApp number the owner gives you.** It isn't written here because this file is public.
 - **Best in Israel office hours** (Sunday to Thursday, 09:00 to 17:00), so the collections team is told at once. Write the Israel time at the start.
 - **Wait for each reply before you write.**
@@ -55,7 +57,7 @@ Some rules look strange from outside, such as never saying when someone will ans
    - He says he recorded your request for a standing order, gives its number (it looks like `255-…`), and says someone from the collections team will phone you about it. (S2)
    - No time. Not the link again as the answer. (C2, S2)
 4. Send `ואם אני רוצה לשלם בצ'קים? ככה אני רגיל`
-   - He says he passed you to a representative from the collections team, who will get back to you here in the chat. (C1)
+   - He says he passed you to a representative from the collections team, who will write to you here in the chat. (C1)
    - No time, not the link again, and no "I'm checking" bubble before this answer. (C2, C3, C4)
    - It ends with a question, such as whether there is anything else meanwhile. (E)
 5. Send `סבבה, תודה`
@@ -69,12 +71,12 @@ Some rules look strange from outside, such as never saying when someone will ans
 - **K2 · No other way offered.** In messages 1 and 2, naming any other way to pay is a FAIL: a bank transfer, a bank, a standing order from the bank, cheques or cash, including `(באשראי או בבנק)`. In messages 3 and 4 you raised them yourself, so naming them there is fine.
 - **S1 · The standing order on the card.** He says the page offers a standing order on the credit card, and asks whether that works or you would rather someone from the collections team phoned you. Missing either is a FAIL.
 - **S2 · A standing order from the bank is recorded.** He says he recorded your request, gives its number, and says someone from the collections team will phone you. FAIL: he says it can be done on the link's page, sends the link as the answer, gives no number, says he can't help, or sends you to call the office.
-- **C1 · Cheques go to collections.** He says, in his own words, that he passed you to a representative (`נציג`) from the collections team (`צוות הגבייה`), who will get back to you here. FAIL: he says only a credit card is possible and stops there, says he can't help, sends you to call the office, names "a manager" or "the management" in place of collections, or says nothing about the hand-over.
+- **C1 · Cheques go to collections.** He says, in his own words, that he passed you to a representative (`נציג`) from the collections team (`צוות הגבייה`), and that the representative will write to you here in the chat (`יכתוב לך כאן` or the like). FAIL: he says only a credit card is possible and stops there, says he can't help, sends you to call the office, names "a manager" or "the management" in place of collections, says nothing about the hand-over, or stops at "I passed you on" with nothing about what comes next.
 - **C2 · No time and no speed.** No `בהקדם`, `בקרוב`, `היום`, `תוך`, `עד מחר` or any time, and no hurrying such as `לזרז`. A time or a speed promise is a FAIL.
 - **C3 · Not the link instead.** The payment link sent again as the answer to the cheques question is a FAIL. A short word that the card link is also there is a NOTE.
 - **C4 · No "checking" bubble on the cheques answer.** A bubble such as `אני בודק את זה` or `כדי להעביר לך את פרטי התשלום` before the cheques answer is a FAIL.
 - **G · One person.** Singular and masculine: `לך`, `אצלך`, never `לכם`, `תכתבו` or slashes (`ספר/י`). A slip is a FAIL.
-- **E · How a reply ends.** While a matter is open, a reply ends with a question. A goodbye gets no question.
+- **E · How a reply ends.** While a matter is open, a reply ends with a question. A goodbye gets no question. The one exception is the plain payment link (message 1): it closes with an invitation to write here if anything is unclear, the way the payment template closes, and that is right.
 
 ## 6. How to judge a reply
 

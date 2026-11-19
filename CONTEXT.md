@@ -6001,8 +6001,13 @@ gitignored; the v5 file we had was rev 1.9).
   - Only a tenant who asks for another way reaches collections: a bank transfer as
     on 18 Nov (the account details in the chat), a standing order from the bank by
     `request_standing_order` (collections phone), and cheques, cash or anything
-    else by `notify_team` reason `payment`, told like a bank transfer ("a
-    representative from collections will get back to you here", never when).
+    else by `notify_team` reason `payment`, told like a bank transfer: "a
+    representative from collections will write to you here", never when. Not "will
+    get back to you": Send's promise cutter takes `יחזור אליך` (epoch 116, after the
+    owner's Grok run showed the cut).
+  - A turn where `request_standing_order` recorded the request makes no backstop
+    team note (sonote v1, epoch 116). Its "collections will phone you" is backed by
+    the request, emailed to collections; before, it also paged Service.
   - WhatsApp epoch 115, `scripts/n8n_whatsapp_cardonly.py`, live 19 Nov at
     10:25:12 UTC (Claude-played 28/28, the gate on live green). The owner's Grok
     brief for it: `docs/features/11-whatsapp-bot/grok-card-only-test.md`. The debt agent still

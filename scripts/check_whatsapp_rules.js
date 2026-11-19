@@ -2143,6 +2143,39 @@ function cases(E) {
       () => E.teamNote({ output: 'זה אצל נציג מצוות הגבייה, והוא ישלח לך כאן את פרטי החשבון. יש עוד משהו?' },
                        turn({ steps: [], said: 'מה מספר החשבון להעברה?' }).$), true);
   }
+  // 19 Nov, later (scripts/n8n_whatsapp_cardwords.py, epoch 116, sonote v1). The owner's Grok run of epoch 115:
+  // cheques' "שיחזור אליך כאן" was cut by Send's promise cutter (193143), so the line now says "will write to you here";
+  // and the standing order from the bank (193126) also made a note to Service, because "ייצור איתך קשר" read as an
+  // unbacked promise. A recorded standing order backs it, as Send's SO already knew.
+  if (String((P.code || {}).team_note || '').indexOf('sonote v') !== -1 || process.env.SONOTE_FORCE) {
+    console.log(NL + '--- 19 Nov, later: a recorded standing order makes no note, and cheques keep "here" (Grok, 193126/193143) ---');
+    const SOR = (extra) => ({ action: { tool: 'request_standing_order', toolInput: { said: 'x' } },
+      observation: ob9(Object.assign({ ok: true, recorded: true, reference: '255-1700-26' }, extra || {})) });
+    const SOL = 'כמובן, רשמתי את הבקשה שלך להוראת קבע מחשבון הבנק, ומישהו מצוות הגבייה ייצור איתך קשר טלפוני כדי להסדיר את זה. יש עוד משהו שאני יכול לעזור בו?';
+    const SOS = 'אין לי כרטיס אשראי. אפשר הוראת קבע מהבנק?';
+    expect("193126 exactly, recorded: no note",
+      () => E.teamNote({ output: SOL }, turn({ steps: [SOR({ recorded_now: true })], said: SOS }).$), false);
+    expect("193126 exactly, already recorded: no note",
+      () => E.teamNote({ output: SOL }, turn({ steps: [SOR({ recorded_now: false, already_recorded: true })], said: SOS }).$), false);
+    expect("the same words with nothing recorded: still the note",
+      () => E.teamNote({ output: SOL }, turn({ steps: [], said: SOS }).$), true);
+    expect("a standing order that was not recorded (need_name): still the note",
+      () => E.teamNote({ output: SOL }, turn({ steps: [{ action: { tool: 'request_standing_order', toolInput: {} },
+        observation: ob9({ ok: true, recorded: false, reason: 'need_name' }) }], said: SOS }).$), true);
+    const CQ = { action: { tool: 'notify_team', toolInput: { reason: 'payment', department: 'collections',
+      description: "רוצה לשלם בצ'קים" } }, observation: ob9({ ok: true }) };
+    const CQS = "ואם אני רוצה לשלם בצ'קים? ככה אני רגיל";
+    const CQL = 'העברתי אותך לנציג מצוות הגבייה שיכתוב לך כאן לגבי תשלום בשיקים. אפשר לעזור בעוד משהו בינתיים?';
+    const CQM = "העברתי אותך לנציג מצוות הגבייה, והוא יכתוב לך כאן לגבי התשלום בצ'קים. יש עוד משהו שאוכל לעזור בו בינתיים?";
+    expect('the cheques line goes out whole', say({ reply: CQL, said: CQS, steps: [CQ] }), CQL);
+    expect('"והוא יכתוב לך כאן" goes out whole', say({ reply: CQM, said: CQS, steps: [CQ] }), CQM);
+    expect('193143 exactly: "שיחזור אליך כאן" is still cut',
+      () => content(E, { reply: 'העברתי אותך לנציג מצוות הגבייה שיחזור אליך כאן לגבי תשלום בשיקים. אפשר לעזור בעוד משהו בינתיים?', said: CQS, steps: [CQ] }).indexOf('יחזור') === -1, true);
+    for (const id of ['phantom', 'deeds', 'echo', 'clerk', 'repeat']) {
+      if (!E.reply[id]) continue;
+      expect('Reply usable? ' + id + ' lets the cheques line through', () => E.reply[id]({ output: CQL, intermediateSteps: [CQ] }, 0, turn({ steps: [CQ], said: CQS }).$), true);
+    }
+  }
   // 18 Nov, evening (scripts/n8n_whatsapp_linkline.py, Send linkline v1). The owner's one-conversation Grok run
   // (190914): the model wrote the payment link on a line of its own, with blank lines around it, and Send's first
   // clean-up (`/\s{2,}/g` -> ' ') turned the blank lines into spaces, so the link went out inline. The link is put
