@@ -13,7 +13,7 @@ conversation that produced it.
 
 ### Why Michael did not introduce himself this morning (the owner, screenshot: "i noticed michael did not introduced himself"), read only, 08:10 UTC
 - **The run:** 195345, 07:52 UTC, on the new key. So the new key is proven: the model answered and `get_payment_link` ran.
-- **The model's own text** had no name ("בוקר טוب אסף! הנה הקישור..."), and Send cut nothing.
+- **The model's own text** had no name ("בוקר טוב אסף! הנה הקישור..."), and Send cut nothing.
 - **The cause is Sort's window, by design:**
   - `greeted` is true when the same phone wrote in the last 24 hours ("A person greets again after a day of silence — and so does Michael").
   - The owner's last message was 19 Nov 11:24 UTC (the Grok rerun), 20.5 hours before.
