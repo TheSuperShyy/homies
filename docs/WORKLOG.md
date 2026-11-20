@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-20
 
+### The 11/20 report (in chat, `/reporter`), 10:25 UTC
+- **Span:** 20 Nov from 07:15 UTC, everything in this day's entries below. The 11/19 report covered 19 Nov.
+- **Given:** 6 done bullets and 4 Will lines.
+  - **Done:**
+    - the new AI key on the bot, its test copy and the debt calls;
+    - why the intro was skipped this morning;
+    - the 8-hour intro, live;
+    - the handset test: it works, and the tester's two fails were its own;
+    - the slow first reply;
+    - the standing-order request on a plain ask.
+  - **Will:**
+    - the first reply's wait on real messages;
+    - why the standing-order request was tried;
+    - real calls on both phone agents;
+    - a collections person logged in.
+- **Left out on purpose:**
+  - the `.env` incident (internal, restored by the owner);
+  - the Grok brief, the clock tool and the brief's two-line fix (the test's result is the news);
+  - the phone number in the public repo (told to the owner);
+  - the openers' test send (still owed, in HANDOVER).
+
 ### The owner's Grok run of greetgap, read against the runs: the intro after 8 quiet hours works, and Grok's two fails come from a message it never sent (the owner pasted the report), 09:53 UTC
 - **The report:**
   - message 1 FAIL I1 (no name);
