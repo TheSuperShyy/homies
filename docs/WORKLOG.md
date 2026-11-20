@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-20
 
+### LIVE 07:49 UTC: the owner's new OpenRouter key everywhere (the owner: "ok i have the new openrouter api key in the env use that")
+- **`.env`:**
+  - The owner had restored it (153 names, `GMAIL_APP_PASSWORD` back), removed the old OpenRouter lines, and added the key as `OPEN_ROUTER_API_KEY`.
+  - Backed up to `local/env-backups/.env.before-new-openrouter-2026-11-20`, then renamed to `OPENROUTER_API_KEY` (the name every reader uses) with a dated comment.
+  - `N8N_OPENROUTER_CRED_ID` now holds the new credential.
+  - Every write went through a temp file and a rename.
+  - The rebuilt copy in `local/env-backups/` is no longer needed.
+- **`check_openrouter.py`:** label `sk-or-v1-3bf...163`; cap $50, none spent; wallet $60 bought, $29.44 spent, $30.56 left. It is the same account as the 3f9 key, whose key was deleted.
+- **The live bot:**
+  - snapshot `local/n8n-whatsapp-live-20nov-before-newkey.json`;
+  - `n8n_openrouter_key.py OPENROUTER_API_KEY --apply` created `UXxk6HWGqt7Onw0s` and repointed "OpenRouter";
+  - read back: active, only that node changed, connections equal.
+- **The sandbox bot** (`SI4iUJJnLG5ghY6n`, snapshot `local/n8n-sandbox-live-20nov-before-newkey.json`): repointed to the same credential, still active, only that node changed.
+- **debt-tools' secret** `OPENROUTER_API_KEY` on the live project: POST 201, and the digest equals `.env`'s. 22 secrets.
+- **Left as they were:** the dead `Ovw71DEq1eufagGk`, the 27 Sep credential with the same name, and the inactive UCHAT workflow.
+- **Not proven:** a real model answer. No paid probe ("dont use openrouter credits"), so the next tenant message is the proof.
+
 ### .env emptied by my mistake while removing the OpenRouter keys (the owner: "ok remove all the api key for open router in the env"), 07:39 UTC
 - **What happened:** my Python one-off called `open(".env", "wb")` before building the text, and the join then raised a TypeError (bytes separator, str lines). The file was left at 0 bytes.
 - **Live is not touched:** n8n, Supabase, Vercel and Vapi keep their own copies. Only local scripts read `.env`.

@@ -8,9 +8,18 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **`.env` IS EMPTY (20 Nov 07:39 UTC, my failed write while removing the OpenRouter keys).** Live systems are not affected. Either the owner's Ctrl+Z in the open VS Code tab brings the text back (then delete the three `OPENROUTER_API_KEY*` lines), or copy `local/env-backups/.env.rebuilt-2026-11-20` into place. That copy is the 12 Nov backup without the OpenRouter keys and with `WHATSAPP_VIA=chatwoot`, but it lacks `GMAIL_APP_PASSWORD` (16 Nov; the Chatwoot server's SMTP password). Write `.env` only through a temp file and a rename.
->
-> **FOUND 20 Nov 07:15 UTC, read only: both OpenRouter keys in `.env` are refused** (`OPENROUTER_API_KEY` and `OPENROUTER_API_KEY_ACCOUNT_B`: HTTP 401 "User not found" on `/auth/key` and `/credits`, so the key or its account is gone). The WhatsApp bot's model node uses the n8n credential "Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)". Its value can't be read from here, but if it holds the same key, the next tenant message gets no AI answer. The last bot run was 19 Nov 11:24 UTC, and every run then succeeded. With a dead key, the debt call's line above the payment link comes back empty, so the link goes alone. **Owed: a working key from the owner,** in `.env`, the n8n credential and the Supabase secret. Then run `python scripts/check_openrouter.py`.
+> **LIVE 20 Nov 07:49 UTC: a new OpenRouter key (the owner's, label `sk-or-v1-3bf...163`).** The old keys (3f9 and the rest) answered 401 "User not found".
+> - **Where it is:**
+>   - `.env` `OPENROUTER_API_KEY`, the only OpenRouter key line left (the owner restored `.env` and removed the others);
+>   - the live bot's model node, through credential `UXxk6HWGqt7Onw0s` "Homies OpenRouter (OPENROUTER_API_KEY)", and the sandbox's too;
+>   - debt-tools' `OPENROUTER_API_KEY` secret (digest equal to `.env`'s).
+> - **Same account as before:** $60 bought, $29.44 spent, $30.56 left; the key has a $50 cap.
+> - **Left as they were:**
+>   - the dead credential `Ovw71DEq1eufagGk` (ACCOUNT_B) on n8n;
+>   - the 27 Sep credential with the same name as the new one;
+>   - the inactive UCHAT workflow, still on the dead credential.
+> - **Not proven:** a real bot answer on the new key. No paid probe was run, so the next tenant message is the proof.
+> - **`.env` lesson (20 Nov):** my failed write emptied it once; the owner's Ctrl+Z brought it back. Write `.env` only through a temp file and a rename. Backup taken at `local/env-backups/.env.before-new-openrouter-2026-11-20`.
 >
 > **FOUND 18 Nov, read only: Chatwoot account 2's language is English (`locale` en, the account record last changed 17 Nov 14:26 UTC; who did it is not recorded).** It was Hebrew. Staff with no language of their own see English, and the Hebrew invite email no longer applies. **Owed: the owner's word on setting it back to Hebrew.** Not changed.
 > **DONE 18 Nov: the staff video "how to add a new contact and open a WhatsApp chat"** (the owner: "give me a tutorial video on how to create a new contact").
