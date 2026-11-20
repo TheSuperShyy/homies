@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-20
 
+### .env emptied by my mistake while removing the OpenRouter keys (the owner: "ok remove all the api key for open router in the env"), 07:39 UTC
+- **What happened:** my Python one-off called `open(".env", "wb")` before building the text, and the join then raised a TypeError (bytes separator, str lines). The file was left at 0 bytes.
+- **Live is not touched:** n8n, Supabase, Vercel and Vapi keep their own copies. Only local scripts read `.env`.
+- **Earlier, while looking at the lines:** a raw print showed the commented-out CAPPED15 key in this session's tool output. It was not committed or sent anywhere.
+- **Recovery:**
+  - No newer copy was found in the session transcripts or in VS Code's local history for this path.
+  - The newest backup is `local/env-backups/.env.before-chatwoot-again-2026-11-11` (12 Nov 07:32 UTC).
+  - Rebuilt from it at `local/env-backups/.env.rebuilt-2026-11-20` (written to a temp file, then renamed). The three OpenRouter key lines are gone, their comment is replaced by a dated note, and `WHATSAPP_VIA=chatwoot` is set (12 Nov).
+  - **Missing from it:** `GMAIL_APP_PASSWORD` (16 Nov). It is still on the Chatwoot server as the SMTP password. Anything else unlogged between 12 and 20 Nov is missing too.
+- **Not yet put in place:** the owner's Ctrl+Z in the open `.env` tab may bring back the exact 20 Nov text, so `.env` is left alone until they try it.
+
 ### Is the OpenRouter key active? No (the owner: "is the openrouter key we have active"), read only, 07:15 UTC
 - **`scripts/check_openrouter.py`:** HTTP 401 "User not found" on `/auth/key`. The same check on `OPENROUTER_API_KEY_ACCOUNT_B` gives 401 on `/auth/key` and `/credits`. Nothing was spent and no key was printed.
 - **Who uses it:**
