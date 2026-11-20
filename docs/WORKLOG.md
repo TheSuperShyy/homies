@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-20
 
+### Why Michael did not introduce himself this morning (the owner, screenshot: "i noticed michael did not introduced himself"), read only, 08:10 UTC
+- **The run:** 195345, 07:52 UTC, on the new key. So the new key is proven: the model answered and `get_payment_link` ran.
+- **The model's own text** had no name ("בוקר טוب אסף! הנה הקישור..."), and Send cut nothing.
+- **The cause is Sort's window, by design:**
+  - `greeted` is true when the same phone wrote in the last 24 hours ("A person greets again after a day of silence — and so does Michael").
+  - The owner's last message was 19 Nov 11:24 UTC (the Grok rerun), 20.5 hours before.
+  - So the turn carried "[אתם כבר באמצע שיחה. לא מציגים את עצמך שוב ...]", and the model greeted back without the name, as the greeting rule says for mid-conversation.
+  - Yesterday's first Grok message (11:14 UTC) was the same: 115's run at 10:49 UTC was inside the window.
+- **Offered to the owner with examples, NOT changed** (the greeting rule: show examples first): a window of 8 hours instead of 24. The intro would come in the answer bubble, after the "checking" line.
+
 ### LIVE 07:49 UTC: the owner's new OpenRouter key everywhere (the owner: "ok i have the new openrouter api key in the env use that")
 - **`.env`:**
   - The owner had restored it (153 names, `GMAIL_APP_PASSWORD` back), removed the old OpenRouter lines, and added the key as `OPEN_ROUTER_API_KEY`.

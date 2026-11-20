@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **OPEN 20 Nov 08:10 UTC: Michael's intro after a gap.** The owner noticed no intro on "היי, איך אני משלם את ועד הבית?" (run 195345, 20.5 hours after his last message). Sort counts a phone as mid-conversation for 24 hours, so this is by design. **Owed: the owner's word** on 8 hours instead of 24 (examples given in chat). Then a one-line Sort patch, its cases in `check_whatsapp_rules.js`, and the usual gate. The bot's first answer on the new key is proven by this run.
+>
 > **LIVE 20 Nov 07:49 UTC: a new OpenRouter key (the owner's, label `sk-or-v1-3bf...163`).** The old keys (3f9 and the rest) answered 401 "User not found".
 > - **Where it is:**
 >   - `.env` `OPENROUTER_API_KEY`, the only OpenRouter key line left (the owner restored `.env` and removed the others);
