@@ -45,6 +45,8 @@ function build(X) {
     teamNote: compile(['$json', '$'], 'return (' + X.team_note + ');', 'Team note this turn?'),
     // 6 Nov (scripts/n8n_whatsapp_retest3.py): a Code node's body, run as n8n runs it.
     lastWord: X.last_word ? compile(['$input', '$'], X.last_word, 'Still the last word?') : null,
+    // 20 Nov (scripts/n8n_whatsapp_greetgap.py): Sort's window, with `Date` a stand-in clock.
+    greetWindow: X.sort_window ? compile(['store', 'from', 'Date'], X.sort_window + NL + 'return greeted;', 'Sort greeting window') : null,
   };
 }
 
@@ -128,6 +130,37 @@ function cases(E) {
   for (const t of ['hello good afternoon, the lights are out', 'בוקר טוב, מה נשמע?', 'hey whatsup',
     'לילה טוב, שלום', 'שלום, יש נזילה', 'היי מיכאל', 'hi is this homies support?', 'היתרה שלי?', '']) {
     expect('model, not the menu: ' + JSON.stringify(t), () => E.isGreeting(t), false);
+  }
+
+  // 20 Nov (scripts/n8n_whatsapp_greetgap.py): run 195345, the owner's "היי, איך אני משלם את ועד הבית?" 20.5 hours
+  // after his last message, was answered as mid-conversation, with no name. He chose 8 hours from examples.
+  if (E.greetWindow) {
+    console.log(NL + '--- Sort: how long a phone stays mid-conversation (20 Nov, the owner: 8 hours) ---');
+    const H = 60 * 60 * 1000;
+    const T0 = Date.UTC(2026, 10, 20, 7, 52, 47);
+    const P1 = '972500000001';
+    const win = (seen, ago) => () => {
+      const store = { greeted: seen === undefined ? {} : { [P1]: ago === undefined ? seen : T0 - ago } };
+      return E.greetWindow(store, P1, { now: () => T0 });
+    };
+    expect('window: a phone never seen writes a first message', win(undefined), false);
+    expect('window: the old true/false format counts as stale', win(true), false);
+    expect('window: two hours after its last message, mid-conversation', win(0, 2 * H), true);
+    expect('window: every message stamps the time', () => {
+      const store = { greeted: { [P1]: T0 - 2 * H } };
+      E.greetWindow(store, P1, { now: () => T0 });
+      return store.greeted[P1];
+    }, T0);
+    if (String((P.code || {}).sort_window || '').indexOf('greetgap v1') !== -1) {
+      expect('greetgap v1: 7 hours 59 minutes of quiet, still mid-conversation', win(0, 8 * H - 60000), true);
+      expect('greetgap v1: 8 hours of quiet, a first message again', win(0, 8 * H), false);
+      expect('195345 exactly (20.5 hours after the last message): a first message, so Michael gives his name',
+        win(0, 20.5 * H), false);
+      expect('greetgap v1: another phone in the store does not count', () => {
+        const store = { greeted: { '972500000002': T0 - 60000 } };
+        return E.greetWindow(store, P1, { now: () => T0 });
+      }, false);
+    }
   }
 
   console.log(NL + "--- Send: the owner's greeting table (27 Sep, \"greet back once, never twice\") ---");

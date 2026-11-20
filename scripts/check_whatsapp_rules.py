@@ -426,7 +426,17 @@ def extract(wf):
         # 11 Nov, night (n8n_whatsapp_warmline.py): the memory key, so a prompt-only epoch's cases can be keyed to it
         # and go back with it on a restore.
         "memory_key": ((by.get("Conversation so far") or {}).get("parameters") or {}).get("sessionKey") or "",
+        # 20 Nov (n8n_whatsapp_greetgap.py): how long a phone stays mid-conversation, so Michael's intro after a gap is
+        # a case. From the store line to the stamp, run with a stand-in clock.
+        "sort_window": sort_window(code),
     }
+
+
+def sort_window(code):
+    a = code.find("store.greeted = store.greeted || {};")
+    stamp = "store.greeted[from] = Date.now();"
+    b = code.find(stamp, a)
+    return code[a:b + len(stamp)] if a != -1 and b != -1 else ""
 
 
 def conds_raw(by, name, cid):

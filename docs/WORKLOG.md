@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-20
 
+### LIVE 08:41:47 UTC: Michael introduces himself again after 8 quiet hours (the owner: "ok go ahead with 8 hours and push it live and give me script to test via grok")
+- **`scripts/n8n_whatsapp_greetgap.py`, Sort only:** `greeted` is true while the phone wrote in the last 8 hours (`GREET_GAP`, marked greetgap v1), not 24.
+  - Nothing else moves: the prompt, the tools and the memory key (`-116`) stay.
+  - Everything that reads `greeted` is unchanged.
+- **Corrected before the brief (my example to the owner was wrong):** on a first message, `Worth a word?` is told to greet by the clock and name Michael. Send then takes both out of the answer, so the intro is in the "checking" bubble, not the link's. With no ack, the answer opens with the name.
+- **Gate:**
+  - `check_whatsapp_rules.py` gained `sort_window` (the store line to the stamp, run with a stand-in clock) and 8 cases: never seen, the old boolean, 2 h, the stamp, 7 h 59 m, 8 h, 195345's 20.5 h, and another phone.
+  - The candidate: 707/707, and the replay changes nothing. Live before the write: 703, the 4 general window cases included.
+  - `check_patchers_idle.py`: the candidate against live dumped as-is, and the only difference is greetgap itself.
+  - `--apply` read back: Sort as written, no other node, active. The re-run reports nothing to do. Live after the write: 707/707.
+- **Test aid, `scripts/n8n_greet_clock.py`:**
+  - It moves OWNER_TEST_PHONE's stored time back 9 hours, never a tenant's, and never prints the number. It refuses while a run is in flight.
+  - Run at 08:43 UTC. Read back: the phone at 23:43:28 UTC on 19 Nov, the other 608 phones and every store key unchanged, the nodes unchanged.
+  - n8n's public API takes `staticData` on PUT.
+- **The Grok brief:** `docs/features/11-whatsapp-bot/grok-greet-gap-test.md`.
+  - Three messages: how to pay, a standing order, thanks.
+  - Rules I1-I3 (the intro once, not twice, not again), P, K, S, G and E.
+  - Message 1 must be the first thing the phone sends.
+- **Memory:** `owner-greeting-rule` updated with the 8 hours.
+- **Not done:** the sandbox keeps 24 hours. Recent epochs did not regenerate it either.
+
 ### Why Michael did not introduce himself this morning (the owner, screenshot: "i noticed michael did not introduced himself"), read only, 08:10 UTC
 - **The run:** 195345, 07:52 UTC, on the new key. So the new key is proven: the model answered and `get_payment_link` ran.
 - **The model's own text** had no name ("בוקר טוב אסף! הנה הקישור..."), and Send cut nothing.

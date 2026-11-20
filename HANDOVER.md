@@ -8,7 +8,16 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **OPEN 20 Nov 08:10 UTC: Michael's intro after a gap.** The owner noticed no intro on "היי, איך אני משלם את ועד הבית?" (run 195345, 20.5 hours after his last message). Sort counts a phone as mid-conversation for 24 hours, so this is by design. **Owed: the owner's word** on 8 hours instead of 24 (examples given in chat). Then a one-line Sort patch, its cases in `check_whatsapp_rules.js`, and the usual gate. The bot's first answer on the new key is proven by this run.
+> **LIVE 20 Nov 08:41:47 UTC: Michael introduces himself again after 8 quiet hours, not 24** (greetgap v1). The owner saw no intro on "היי, איך אני משלם את ועד הבית?" (run 195345, 20.5 hours after his last message), was shown examples, and said "ok go ahead with 8 hours and push it live and give me script to test via grok".
+> - **What changed:** `scripts/n8n_whatsapp_greetgap.py` changes Sort only, with no epoch (no model-facing text moved). Snapshot `local/n8n-whatsapp-live-20nov-before-greetgap.json`, `--restore` to undo.
+> - **Gate:**
+>   - on the candidate, 707/707 (8 new window cases), and the replay changes nothing;
+>   - the idle check differs from live as-is only in greetgap itself;
+>   - on live after the write, 707/707.
+> - **For the test:** `scripts/n8n_greet_clock.py --apply` set the owner's test phone's last message to 9 hours back (08:43 UTC; other phones and nodes unchanged on read-back).
+> - **The Grok brief:** `docs/features/11-whatsapp-bot/grok-greet-gap-test.md`, three messages. Message 1 must be the first thing his phone sends.
+> - **Owed:** the owner's Grok run, read against the runs; then `check_whatsapp_rules.py --watch 2026-11-20T08:41`.
+> - **Not done:** the sandbox copy keeps the 24-hour window. Recent epochs did not regenerate it either.
 >
 > **LIVE 20 Nov 07:49 UTC: a new OpenRouter key (the owner's, label `sk-or-v1-3bf...163`).** The old keys (3f9 and the rest) answered 401 "User not found".
 > - **Where it is:**

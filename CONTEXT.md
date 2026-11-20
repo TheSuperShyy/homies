@@ -3050,6 +3050,18 @@ none. Right after the system's menu or a first-word ack that greeted: none.
 Never two in one message. Greetings were reversed six times between 20 and
 25 Sep; this table is the reference now, and a change to it is the owner's.
 
+**"First reply" means the first after 8 quiet hours, since 20 Nov 08:41 UTC**
+(greetgap v1, `scripts/n8n_whatsapp_greetgap.py`; the owner, shown examples:
+"ok go ahead with 8 hours"). Sort's `greeted` is true while the same phone wrote
+in the last 8 hours; it was 24 hours. Past that, the ack (when there is one)
+greets by the clock and names Michael, and Send takes both out of the answer;
+with no ack, the answer opens with the name. A bare hello gets Sort's canned
+intro whatever the gap. The window is a case in `check_whatsapp_rules.js`.
+`scripts/n8n_greet_clock.py --apply` moves the owner's test phone (only
+OWNER_TEST_PHONE) back 9 hours, so a test of the intro needs no 8-hour wait.
+It writes the store through the public API's `staticData`, which n8n accepts
+and keeps.
+
 ## The model is Gemini 3.1 Pro since 19 Oct, and the token cap bounds its thinking
 
 19 Oct 12:22 UTC, on the owner's word after Yariv's and Ido's chats that afternoon
