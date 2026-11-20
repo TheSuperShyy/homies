@@ -3060,7 +3060,9 @@ intro whatever the gap. The window is a case in `check_whatsapp_rules.js`.
 `scripts/n8n_greet_clock.py --apply` moves the owner's test phone (only
 OWNER_TEST_PHONE) back 9 hours, so a test of the intro needs no 8-hour wait.
 It writes the store through the public API's `staticData`, which n8n accepts
-and keeps.
+and keeps. Proven on the handset by run 195532 (20 Nov 09:39 UTC): the intro in
+the answer's first beat, none in the link's. n8n keeps only about 300 bot runs
+(back to 17 Nov on 20 Nov), so a question about older turns needs our own logs.
 
 ## The model is Gemini 3.1 Pro since 19 Oct, and the token cap bounds its thinking
 

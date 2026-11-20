@@ -20,14 +20,15 @@ You are testing **Michael**, the WhatsApp service agent of **הומי'ז (Homies
 ## 2. Before you start
 
 - **Message 1 must be the first thing this phone sends Michael.** The phone was set up for this run as if it had not written for 9 hours. Anything sent before message 1, even a single "היי", starts the conversation, and then Michael rightly does not introduce himself again. If that happens, stop and say so in the report.
+- **Send message 1 yourself, even if the same words are already in the chat.** Anything already in the chat was sent before this run. Judge only the replies to the messages you send.
 - **Don't open with a bare hello.** A message that is only a greeting always gets a fixed welcome, whatever the gap, so it cannot show this change. Message 1 below has a question in it on purpose.
 - **Michael still remembers earlier chats with this number.** A real tenant who comes back has history too. What is new is only that after 8 quiet hours he introduces himself again.
 - **Your number is on file as אסף,** so Michael may call you by that name without asking it. That is right, not a slip, and a name alone is not a greeting.
 - **Write to the WhatsApp number the owner gives you.** It isn't written here because this file is public.
 - **Write the Israel time at the start.** Michael's greeting follows the clock in Israel: `בוקר טוב` before 12:00, `צהריים טובים` until 17:00, `ערב טוב` after.
 - **Wait for each reply before you write.**
-  - Michael can take up to about 90 seconds. Wait the full 2 minutes before you send the next line, and read every bubble that comes in that time. The link may come in a bubble of its own.
-  - If nothing comes within 2 minutes, write "no reply" in the report and stop. Don't resend.
+  - Michael can take up to about 2 and a half minutes. Wait the full 3 minutes before you send the next line, and read every bubble that comes in that time. The link may come in a bubble of its own.
+  - If nothing comes within 3 minutes, write "no reply" in the report and stop. Don't resend.
 - **If a reply says `יש אצלנו כרגע תקלה טכנית`,** record it as an outage and stop the run.
 
 ## 3. Sound like a real tenant

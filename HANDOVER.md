@@ -8,15 +8,21 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **LIVE 20 Nov 08:41:47 UTC: Michael introduces himself again after 8 quiet hours, not 24** (greetgap v1). The owner saw no intro on "היי, איך אני משלם את ועד הבית?" (run 195345, 20.5 hours after his last message), was shown examples, and said "ok go ahead with 8 hours and push it live and give me script to test via grok".
+> **LIVE 20 Nov 08:41:47 UTC: Michael introduces himself again after 8 quiet hours, not 24** (greetgap v1), and the handset shows it. The owner saw no intro on "היי, איך אני משלם את ועד הבית?" (run 195345, 20.5 hours after his last message), was shown examples, and said "ok go ahead with 8 hours and push it live and give me script to test via grok".
 > - **What changed:** `scripts/n8n_whatsapp_greetgap.py` changes Sort only, with no epoch (no model-facing text moved). Snapshot `local/n8n-whatsapp-live-20nov-before-greetgap.json`, `--restore` to undo.
 > - **Gate:**
 >   - on the candidate, 707/707 (8 new window cases), and the replay changes nothing;
 >   - the idle check differs from live as-is only in greetgap itself;
 >   - on live after the write, 707/707.
-> - **For the test:** `scripts/n8n_greet_clock.py --apply` set the owner's test phone's last message to 9 hours back (08:43 UTC; other phones and nodes unchanged on read-back).
-> - **The Grok brief:** `docs/features/11-whatsapp-bot/grok-greet-gap-test.md`, three messages. Message 1 must be the first thing his phone sends.
-> - **Owed:** the owner's Grok run, read against the runs; then `check_whatsapp_rules.py --watch 2026-11-20T08:41`.
+> - **Proven live:** run 195532 (09:39 UTC), the test phone's first message after the gap. The intro is in the answer's first beat ("בוקר טוב אסף. כאן מיכאל מהומי'ז."), and the link's beat has none.
+>   - The owner's Grok report called it an I3 fail, and called 195345 an I1 fail. Grok never sent message 1: the same words were already in the chat, from before the change.
+>   - The watch since 08:41: 1 turn, 1 flag, on the standing-order reply ("הבנתי ש...", "ייצור איתך קשר"), not on the greeting.
+> - **Open:**
+>   - **The wait.** That first-message turn took 2 min 13 s. Gemini thought 53 s on the ack (for NONE) and 56 s on the answer, against 12 s and 18 s in 195345. It is one run, and n8n keeps only about 300, so read the next first message's times.
+>   - **The standing-order tool.** The model called `request_standing_order` on a plain standing-order ask (195532), against the prompt and the tool's description. It answered `already_recorded` on the test number, so nothing went out. A tenant with nothing on record would have had a request recorded and collections emailed. It is a first: the four plain asks n8n keeps from 17-19 Nov got the link only.
+> - **Test aids:**
+>   - `scripts/n8n_greet_clock.py --apply` moves only the owner's test phone back 9 hours. A rerun needs it first, because the phone wrote at 09:39 UTC.
+>   - The brief is `docs/features/11-whatsapp-bot/grok-greet-gap-test.md`. It now tells Grok to send message 1 itself even when the words are already in the chat, and to wait 3 minutes.
 > - **Not done:** the sandbox copy keeps the 24-hour window. Recent epochs did not regenerate it either.
 >
 > **LIVE 20 Nov 07:49 UTC: a new OpenRouter key (the owner's, label `sk-or-v1-3bf...163`).** The old keys (3f9 and the rest) answered 401 "User not found".

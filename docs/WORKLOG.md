@@ -11,6 +11,35 @@ conversation that produced it.
 
 ## 2026-11-20
 
+### The owner's Grok run of greetgap, read against the runs: the intro after 8 quiet hours works, and Grok's two fails come from a message it never sent (the owner pasted the report), 09:53 UTC
+- **The report:**
+  - message 1 FAIL I1 (no name);
+  - message 2 FAIL I3 (the name mid-conversation), and about 3 minutes to answer;
+  - message 3 not sent;
+  - a NOTE: the old request 255-1417-26 came up unasked.
+- **What the runs show:**
+  - **Grok never sent message 1.** It found the same words already in the chat. The reply it judged is run 195345: the owner's own message at 07:52 UTC, 49 minutes before greetgap went live, the one in his screenshot. Sort read `greeted` true under the 24-hour window.
+  - **Its message 2 was the phone's first after the gap:** run 195532, 09:39:03 UTC.
+    - `greeted` was false: the clock had been set at 08:43 to 23:43 UTC on 19 Nov.
+    - The ack model wrote NONE, so the answer's first beat carried the intro: "בוקר טוב אסף. כאן מיכאל מהומי'ז. ...".
+    - The link beat had no greeting and no name. So the "I3 fail" is the change doing its job, and only once (I2 holds).
+  - The store holds 09:39:03 UTC for the phone now, so anything it sends before 17:39 UTC is mid-conversation.
+  - The reply ended on the call question, which Grok could not see on screen: "זה מסתדר לך לעשות את זה דרך הקישור, או שנוח לך יותר לחכות שיתקשרו אליך?".
+- **The wait, 2 min 13 s in n8n:**
+  - The ack model took 52.9 s (4,237 output tokens, all for NONE) and the answer model 55.8 s (5,580). In 195345 they took 12.5 s (811) and 18.1 s (1,671).
+  - The 34 mid-conversation turns n8n still keeps (since 17 Nov) had the ack at 12.0 s median, 34.3 s at most.
+  - 195532 is the only first-message turn n8n keeps (it holds about 300 bot runs), so whether the first-message line makes Gemini think longer is not known yet. The next first message will show it.
+- **The old request:** after `get_payment_link`, the model also called `request_standing_order` on the plain ask, and it answered `already_recorded` 255-1417-26 (the test number's, open since 8 Nov).
+  - The prompt and the tool's description both say a standing-order ask gets the link and the call question, and a request is recorded only for a call, the bank, or no link.
+  - Nothing new was recorded or emailed here. With nothing on record, it would have been.
+  - **A first:** the four plain asks n8n keeps (188263, 190914, 193119, 193213, 17-19 Nov) got `get_payment_link` only, and the two bank asks (193126, 193220) `request_standing_order` only. 195532 is also the only first-message turn among them, so one case, no cause shown.
+- **The watch since 08:41:** 1 turn, 1 flagged (195532), on the standing-order reply, not the greeting:
+  - "הבנתי ש..." in the answer's first beat;
+  - "ייצור איתך קשר", the standing-order sentence, which Send keeps on a turn whose tool answered `recorded`.
+  - No Service note: "Team note this turn?" passed nothing on.
+- **The brief, two lines:** Grok sends message 1 itself even when the words are already in the chat, and it waits 3 minutes, not 2 (this turn took 2 min 13 s). A rerun needs `n8n_greet_clock.py --apply` first.
+- Nothing in the bot changed.
+
 ### LIVE 08:41:47 UTC: Michael introduces himself again after 8 quiet hours (the owner: "ok go ahead with 8 hours and push it live and give me script to test via grok")
 - **`scripts/n8n_whatsapp_greetgap.py`, Sort only:** `greeted` is true while the phone wrote in the last 8 hours (`GREET_GAP`, marked greetgap v1), not 24.
   - Nothing else moves: the prompt, the tools and the memory key (`-116`) stay.
