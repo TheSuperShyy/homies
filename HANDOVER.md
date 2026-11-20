@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **FOUND 20 Nov 07:15 UTC, read only: both OpenRouter keys in `.env` are refused** (`OPENROUTER_API_KEY` and `OPENROUTER_API_KEY_ACCOUNT_B`: HTTP 401 "User not found" on `/auth/key` and `/credits`, so the key or its account is gone). The WhatsApp bot's model node uses the n8n credential "Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)". Its value can't be read from here, but if it holds the same key, the next tenant message gets no AI answer. The last bot run was 19 Nov 11:24 UTC, and every run then succeeded. With a dead key, the debt call's line above the payment link comes back empty, so the link goes alone. **Owed: a working key from the owner,** in `.env`, the n8n credential and the Supabase secret. Then run `python scripts/check_openrouter.py`.
+>
 > **FOUND 18 Nov, read only: Chatwoot account 2's language is English (`locale` en, the account record last changed 17 Nov 14:26 UTC; who did it is not recorded).** It was Hebrew. Staff with no language of their own see English, and the Hebrew invite email no longer applies. **Owed: the owner's word on setting it back to Hebrew.** Not changed.
 > **DONE 18 Nov: the staff video "how to add a new contact and open a WhatsApp chat"** (the owner: "give me a tutorial video on how to create a new contact").
 >   - `local/chatwoot-video/chatwoot-new-contact-he.mp4`, gitignored, for the staff: **since 18 Nov 08:40 UTC it has a Hebrew voice-over.**

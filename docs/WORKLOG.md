@@ -9,6 +9,16 @@ conversation that produced it.
 
 ---
 
+## 2026-11-20
+
+### Is the OpenRouter key active? No (the owner: "is the openrouter key we have active"), read only, 07:15 UTC
+- **`scripts/check_openrouter.py`:** HTTP 401 "User not found" on `/auth/key`. The same check on `OPENROUTER_API_KEY_ACCOUNT_B` gives 401 on `/auth/key` and `/credits`. Nothing was spent and no key was printed.
+- **Who uses it:**
+  - The WhatsApp bot's model node, `google/gemini-3.1-pro-preview`, through the n8n credential "Homies OpenRouter (OPENROUTER_API_KEY_ACCOUNT_B)". The public API won't list credentials (403), so its value and date can't be read.
+  - debt-tools' line above the debt call's payment link, `OPENROUTER_API_KEY`. On a failure it returns "", so the link goes alone.
+- **The bot's last runs:** 19 Nov 11:21-11:24 UTC, all successful. There has been no run since, so no real message has hit the key yet.
+- **Owed:** a working key from the owner, then the three places and the check.
+
 ## 2026-11-19
 
 ### The 11/19 report (in chat, `/reporter`), 15:00 UTC
