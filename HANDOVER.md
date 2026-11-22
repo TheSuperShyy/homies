@@ -12,7 +12,7 @@ appended to.
 > - **What we see:** today's `homies_hello_he` to the owner's handset has a WhatsApp id. So do the 16 Nov payment link and the 17 Nov "ticket closed". Meta's `template_analytics` counts no send of any of the four between 12 and 21 Nov, and `pricing_analytics` shows only free replies. ASTDX delivered paid templates on 9 Nov.
 > - **Why we never saw it:** Meta's status updates reach no system of ours. Chatwoot has had none since 10 Nov, and no POST from Meta reached it today.
 > - **Owed:**
->   - the owner's look at the "hadas 1" account's payment settings in WhatsApp Manager (Business Settings → Accounts → WhatsApp accounts → the account → Settings → Payment settings);
+>   - the owner's look at the "hadas 1" account's payment settings in WhatsApp Manager (Business Settings → Accounts → WhatsApp accounts → the account → Settings → Payment settings). Link given 22 Nov: `https://business.facebook.com/wa/manage/home/?business_id=1679634916736747&waba_id=1389698653006050`. Both "hadas 1" (…050) and "ASTDX - Smart Link" (…632) list the number, both in business ASTDX. The earlier card went on …632 only, and Meta counts the number's traffic under …050 since 9 Nov;
 >   - getting Meta's status updates to us, so a failure shows its reason;
 >   - then one template to the handset, seen on the phone.
 > - **For the launch:** the "ticket closed" message and a payment link outside the 24 hours don't arrive until this is fixed. The same check applies to Homies' account (the go-live sheet's card).

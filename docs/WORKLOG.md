@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The link to the payment settings (the owner: "give me link"), read only, 08:05 UTC
+- **Both accounts that list the number are in business "ASTDX" (`1679634916736747`):** "hadas 1" `1389698653006050` and "ASTDX - Smart Link" `2117787955519632`. Read with `owner_business_info`, which works with our token where the funding fields don't.
+  - The number's `health_status` names …632 (AVAILABLE).
+  - Meta's counts put the number's traffic under …632 until 9 Nov and under …050 ("hadas 1") since 9 Nov.
+  - The owner's earlier card went on …632 only ("The card went on the UChat number's account only").
+- **Given:**
+  - WhatsApp Manager on "hadas 1": `https://business.facebook.com/wa/manage/home/?business_id=1679634916736747&waba_id=1389698653006050`;
+  - the same for …632;
+  - the Business Settings path, Accounts → WhatsApp accounts → hadas 1 → Settings → Payment settings.
+
 ### Why the staff opener "isn't sent" (the owner's screenshot of conversation 104: "why its not sent"), read only, 07:55 UTC
 - **Chatwoot sent it and Meta took it:** message 3621, `homies_hello_he` to contact #1 (the owner's +63, …514), status `sent`, with a wamid, at 07:33 UTC. Nothing of ours refused it.
 - **One grey tick is all Chatwoot shows on this number:**
