@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The card is on "hadas 1" (the owner: "ok i added the card on hadas 1"), read only, 08:25 UTC
+- **`currency`:** "hadas 1" (…050) now reads ARS, where it was unset an hour before. So billing is set up there, in Argentine pesos like …632.
+- **`health_status`:** unchanged. The WABA entity is …632, AVAILABLE; the business is LIMITED (141010); calling over SIP is off (138024/138025).
+- **Not sent by us** (money on each send needs its own go). The owner resends the opener from Chatwoot and looks on the phone.
+
 ### "Will I get charged 33 USD?" No: pesos (the owner's screenshot of "ASTDX - Smart Link", "Approximate charges $ 32.75"), read only, 08:15 UTC
 - **`currency`:** "ASTDX - Smart Link" (…632) ARS. "hadas 1" (…050) none: the field is unset.
 - **The $32.75 is 32.75 Argentine pesos,** a few US cents. It is `pricing_analytics`' only paid row this month: 9 Nov, UTILITY, REGULAR, country PH, volume 2. That is two templates to the owner's number while the bot ran on UChat.
