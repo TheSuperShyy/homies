@@ -982,6 +982,7 @@ on a database so we can retrieve it add a send button"*).
   - The replies live in `review_sets` (migration 040), never in the repo, because they quote a real flat's balance.
   - Without the key the page shows only "הקישור לא תקין".
 - **Each Send is one row in `reply_reviews`.** Read them with `python scripts/reply_reviews.py` (`--csv` for a sheet).
+  - **Checked 22 Nov with a rolled-back call:** the function stores marks on old and new steps alike and drops an unknown step id. As of that day no real Send had been made on any set.
 - **A new set:** `local/checklist/review-set/build_set.py --upload`, after editing its time windows.
 - **Since 22 Nov the set holds two batches, with a dropdown on the page (PR #21)** (the owner: "also on the answer", after the one on Yariv's comments).
   - The batches: "התשובות החדשות, 12-20 בנובמבר" (chats 9-14, 21 answers) and "שיחות הבדיקה של 10 בנובמבר" (chats 1-8, 44, unchanged and byte-equal to before).

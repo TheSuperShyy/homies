@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Will a Send be saved? Yes, checked (the owner: "ok so will the data be saved when submitted?"), 10:45 UTC
+- **`reply_reviews` is empty:** no reviewer has pressed Send on any set yet.
+- **`submit_reply_review` may be called by anon:** `has_function_privilege` true.
+- **A Send in a rolled-back transaction**, with the live key: marks on 1.1 (old, pass), 9.1 (new, fail with a note), 14.1 (a note only) and 99.9 (no such step). It returned a row id, total 65, passed 1, failed 1, and dropped 99.9. After the rollback, `reply_reviews` still had 0 rows.
+- **The browser's road:** an anon call to `review_set` on the REST API returned the set with 14 chats and 65 steps. The page renders with the same public URL and key, so the Send button's client has them too.
+- Until Send, the marks stay in that browser (`localStorage`, per set). Each Send stores every mark as one row, and every Send is kept. They are read with `python scripts/reply_reviews.py`.
+
 ### LIVE ~10:35 UTC: the reviewers' page always loads the latest (the owner's screenshot at 10:19 UTC of the old 10 Nov page: "look it goes back like this"; PR #22, `9e81700`)
 - **Read first:**
   - the database held the new set (14 chats, batches, the new title);

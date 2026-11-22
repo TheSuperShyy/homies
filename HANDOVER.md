@@ -17,6 +17,7 @@ appended to.
 >   - Built by `local/checklist/review-set/build_set.py --upload`. The key and link are unchanged.
 >   - A later batch continues the chat numbers (10 Nov's ids and any sent reviews stay valid).
 > - **Since PR #22 (`9e81700`) nothing on the reviewers' page is cached and its tabs are plain links.** The owner had seen the old set in a tab opened before the update. A tab that old needs one reload.
+> - **A Send is saved** (checked 22 Nov with a rolled-back call: old and new steps stored, an unknown id dropped). No real Send yet. Read sends with `python scripts/reply_reviews.py`.
 >
 > **22 Nov, PROVEN 08:32 UTC: EVERY TEMPLATE GOES OUT FROM THE BOT'S NUMBER AGAIN, AND CHATWOOT SEES DELIVERED AND READ** (the owner's screenshots; WORKLOG and CONTEXT 22 Nov). The staff opener from #106's reply box reads `read` in Chatwoot (message 3627), the first status update since 10 Nov. It came after the card on "hadas 1" and the HOMIES subscription. The history follows.
 > - **Found:** from 9 Nov to 22 Nov no template went out from "hadas 1" (…050), where Meta counts the number. The 16 Nov payment link and the 17 Nov "ticket closed" had WhatsApp ids, and Meta's `template_analytics` shows no send. The account had no billing at all (no `currency`).
