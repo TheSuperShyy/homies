@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Why the staff opener "isn't sent" (the owner's screenshot of conversation 104: "why its not sent"), read only, 07:55 UTC
+- **Chatwoot sent it and Meta took it:** message 3621, `homies_hello_he` to contact #1 (the owner's +63, …514), status `sent`, with a wamid, at 07:33 UTC. Nothing of ours refused it.
+- **One grey tick is all Chatwoot shows on this number:**
+  - No POST from Meta reached `/webhooks/whatsapp` today. On 20 Nov only the two incoming messages did, and nothing after the bot's replies. Per day, 18-22 Nov: 21, 10, 2, 0, 0.
+  - The number's `webhook_configuration`: `phone_number` is Chatwoot's, `application` is n8n's `homies-whatsapp` (the bot). The bot's 9 runs at 07:32-07:33 were Chatwoot's own events.
+  - Traefik keeps no access log, and n8n's log has nothing.
+- **Meta's own counts say no template has gone out from "hadas 1":**
+  - `pricing_analytics` since 1 Nov: only SERVICE / FREE_CUSTOMER_SERVICE (9-19 Nov). ASTDX shows UTILITY REGULAR ×2 on 9 Nov (UChat's paid templates).
+  - `template_analytics` 12-21 Nov: no sends for any of the four templates. So the 16 Nov `payment_link_he` and the 17 Nov `ticket_resolved_he`, both with wamids, never went out.
+  - The counts lag: 20-22 Nov are not in yet, so today's send can't be read there.
+- **The reason is in Meta's failure status, which reaches neither Chatwoot nor n8n.** The likely ones:
+  - the account's billing: every template here would be paid, and only free replies went out;
+  - for a MARKETING template, Meta's limits per person.
+  - health_status shows the WABA AVAILABLE and the business 141010. Our token can't read the WABA's payment fields (BSP only, code 10).
+- **Told the owner:** check the account's payment settings in WhatsApp Manager. Nothing changed.
+
 ### Do the templates go to Meta again at the move to Homies' number? Yes (the owner: "ok so when we will migrate from the homies actual number that they currently use now we will need to submit them all over again?"), answered from the records, 07:40 UTC
 - **Templates belong to the WhatsApp account, not the number** (`wa_templates.py`'s docstring). The plan keeps the number on Homies' own account, so all four are submitted there.
 - **How long Meta took on ours:**

@@ -8,6 +8,15 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **FOUND 22 Nov, read only: no template has gone out from the bot's number since at least 12 Nov** (the owner's screenshot, "why its not sent"; WORKLOG and CONTEXT 22 Nov).
+> - **What we see:** today's `homies_hello_he` to the owner's handset has a WhatsApp id. So do the 16 Nov payment link and the 17 Nov "ticket closed". Meta's `template_analytics` counts no send of any of the four between 12 and 21 Nov, and `pricing_analytics` shows only free replies. ASTDX delivered paid templates on 9 Nov.
+> - **Why we never saw it:** Meta's status updates reach no system of ours. Chatwoot has had none since 10 Nov, and no POST from Meta reached it today.
+> - **Owed:**
+>   - the owner's look at the "hadas 1" account's payment settings in WhatsApp Manager (Business Settings → Accounts → WhatsApp accounts → the account → Settings → Payment settings);
+>   - getting Meta's status updates to us, so a failure shows its reason;
+>   - then one template to the handset, seen on the phone.
+> - **For the launch:** the "ticket closed" message and a payment link outside the 24 hours don't arrive until this is fixed. The same check applies to Homies' account (the go-live sheet's card).
+>
 > **CHECKED 22 Nov, read only: not set to launch on Homies' number today** (the owner: "we have a deadline until later today we need to launch the chatbot live so are we set for the chatbot"; WORKLOG 22 Nov; the go-live sheet `local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`).
 > - **Ready:** the bot (active, unchanged since 20 Nov), and the number "hadas 1" CONNECTED and GREEN. All four templates are APPROVED on both of our accounts and synced into inbox 1 (read 22 Nov); they go to Homies' account again at the move.
 > - **Missing, from Homies:**
