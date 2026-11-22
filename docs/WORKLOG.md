@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### "What if they already have an existing app?" (the owner), read only, 09:05 UTC
+- **Make (`make_api.py`, GET only):** Homies' organisation has no WhatsApp connection: Google ×2, Monday ×2 (one "SQUARE"), Slack. The old flow's WhatsApp side is ManyChat's own app. So an app Homies already has is not part of today's bot.
+- **Told the owner:**
+  - An existing app can be used if it belongs to Homies' business and is a Business-type app. Add WhatsApp to it if it isn't there, then the same steps from the system user on.
+  - On an existing app, change nothing else: not its webhook, not its tokens, not its products. Our token is separate.
+  - If it already has a WhatsApp callback URL, tell us the domain first.
+  - When in doubt, a new app keeps our setup apart.
+
 ### The owner will set up Homies' Meta side directly (the owner: "no i will access homies fb as is and edit their meta for devs and stuff"), 08:55 UTC
 - **No partner access, then.** The owner signs in to Homies' Meta and makes a Homies-owned app and system-user token. We submit the four templates with it while ManyChat still runs the number.
 - **`wa_templates.py --account homies`, new:** reads `HOMIES_WHATSAPP_TOKEN` and `HOMIES_WHATSAPP_WABA_ID` from `.env`, and refuses while they are empty. Without it, our own account as before. Checked: `list` on ours unchanged (4 templates on …632), and the Homies account refuses.

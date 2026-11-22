@@ -715,6 +715,11 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
     and `HOMIES_WHATSAPP_WABA_ID` in `.env` (the empty lines are there since 22 Nov).
   - **The command:** `wa_templates.py --account homies list | create <name> [--apply]`. It refuses while those
     lines are empty, and without `--account` it works on our account as before.
+  - **An app Homies already has will do** if it belongs to their business and is a Business-type app.
+    - Change nothing else on it (webhook, tokens, products), since something of theirs may run on it. Our
+      system-user token is separate from theirs.
+    - Homies' Make has no WhatsApp connection (read 22 Nov), and ManyChat uses its own app, so no existing
+      Homies app carries today's bot.
   - **Early too:** a card on their account (its currency chosen on purpose) and business verification.
   - **Waits for the switch:** subscribing an app to their WABA (`wa_subscribe.py`). Until then nothing of
     theirs comes to our side while ManyChat answers.
