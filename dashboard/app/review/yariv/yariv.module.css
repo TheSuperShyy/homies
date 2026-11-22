@@ -7,6 +7,17 @@
 
 .wide { max-width: 1080px; margin: 0 auto; padding-inline: 16px; }
 
+/* The dropdown above the rows (22 Nov): all comments, only the later ones, or only the twelve of 9 Nov. */
+.view {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 0;
+  font-size: 14px; font-weight: 600; color: var(--muted);
+}
+.view select {
+  font: inherit; font-weight: 600; color: var(--ink); background: var(--panel); max-width: 100%;
+  border: 1px solid var(--line-2); border-radius: 10px; padding: 6px 12px; cursor: pointer;
+}
+.view select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
 .counts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
 .pill {
   display: inline-flex; align-items: center; gap: 6px; border-radius: 99px; padding: 2px 12px;

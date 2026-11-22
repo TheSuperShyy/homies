@@ -2,7 +2,7 @@
 //   node --test scripts/check_review_yariv.test.ts
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { REPLIES, STATUSES, countByStatus } from "../dashboard/app/review/yariv/replies.ts";
+import { REPLIES, STATUSES, VIEWS, countByStatus, itemsFor, toView } from "../dashboard/app/review/yariv/replies.ts";
 import { paragraphs, runs } from "../dashboard/app/review/yariv/whole.ts";
 
 test("the page carries Yariv's twelve comments of 9 Nov in his numbering, then the three of 18-19 Nov", () => {
@@ -24,6 +24,20 @@ test("every comment has both sides, and a status the page knows", () => {
     assert.ok(i.answer.trim().length > 0, `${i.id} has no answer`);
     assert.ok(STATUSES.includes(i.status), `${i.id}: ${i.status}`);
   }
+});
+
+test("the dropdown: all fifteen, only the three since 9 Nov, or only the twelve of 9 Nov", () => {
+  assert.deepEqual([...VIEWS], ["all", "new", "old"]);
+  assert.equal(itemsFor("all", REPLIES.items).length, 15);
+  assert.deepEqual(itemsFor("new", REPLIES.items).map((i) => i.id), ["n18-1", "n18-2", "n19-1"]);
+  assert.equal(itemsFor("old", REPLIES.items).length, 12);
+  assert.ok(itemsFor("old", REPLIES.items).every((i) => !i.id.startsWith("n")));
+});
+
+test("the dropdown address: only all, new or old; anything else, a repeated one included, is all", () => {
+  assert.equal(toView("new"), "new");
+  assert.equal(toView("old"), "old");
+  for (const v of [undefined, "", "x", "NEW", ["new"]]) assert.equal(toView(v), "all", String(v));
 });
 
 test("the counts at the top: twelve done, one unchanged, two answers", () => {
