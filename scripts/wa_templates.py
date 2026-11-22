@@ -76,11 +76,23 @@ def templates_from_doc():
 
 def main():
     e = env()
-    token = e.get("WHATSAPP_ACCESS_TOKEN", "").strip()
-    waba = e.get("WHATSAPP_WABA_ID", "").strip()
-    if not token or not waba:
-        sys.exit("WHATSAPP_ACCESS_TOKEN / WHATSAPP_WABA_ID missing from .env")
     args = sys.argv[1:]
+    # 22 Nov: Homies' own account is reached with Homies' own system-user token (the owner sets it up in their
+    # Business Settings), so the templates can be approved there while ManyChat still runs the number:
+    #   python scripts/wa_templates.py --account homies list | create <name> [--apply]
+    # reads HOMIES_WHATSAPP_TOKEN and HOMIES_WHATSAPP_WABA_ID from .env. Without it, our own account as before.
+    prefix = "WHATSAPP_"
+    if "--account" in args:
+        i = args.index("--account")
+        if args[i + 1].strip().lower() != "homies":
+            sys.exit("--account takes only 'homies'")
+        prefix = "HOMIES_WHATSAPP_"
+        del args[i:i + 2]
+    token = e.get(prefix + ("ACCESS_TOKEN" if prefix == "WHATSAPP_" else "TOKEN"), "").strip()
+    waba = e.get(prefix + "WABA_ID", "").strip()
+    if not token or not waba:
+        sys.exit("%s missing from .env" % ("WHATSAPP_ACCESS_TOKEN / WHATSAPP_WABA_ID" if prefix == "WHATSAPP_"
+                                           else "HOMIES_WHATSAPP_TOKEN / HOMIES_WHATSAPP_WABA_ID"))
     if "--waba" in args:  # a number on another account needs its own copy of every template
         i = args.index("--waba")
         waba = args[i + 1].strip()

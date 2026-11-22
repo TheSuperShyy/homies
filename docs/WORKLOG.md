@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The owner will set up Homies' Meta side directly (the owner: "no i will access homies fb as is and edit their meta for devs and stuff"), 08:55 UTC
+- **No partner access, then.** The owner signs in to Homies' Meta and makes a Homies-owned app and system-user token. We submit the four templates with it while ManyChat still runs the number.
+- **`wa_templates.py --account homies`, new:** reads `HOMIES_WHATSAPP_TOKEN` and `HOMIES_WHATSAPP_WABA_ID` from `.env`, and refuses while they are empty. Without it, our own account as before. Checked: `list` on ours unchanged (4 templates on …632), and the Homies account refuses.
+- **`.env`:** two empty lines for those names at the bottom, with a comment. Backup first (`local/env-backups/.env.before-homies-wa-lines-2026-11-22`), then a temp file and a rename; 155 settings became 157.
+- **Steps given to the owner:**
+  - an app under Homies' business with the WhatsApp product;
+  - a system user (Admin) with that app and their WhatsApp account assigned;
+  - a never-expiring token with whatsapp_business_management, whatsapp_business_messaging and business_management, put into `.env`;
+  - a card on their WhatsApp account (choose the currency on purpose, since ours became ARS);
+  - business verification;
+  - nothing on the number or on ManyChat's app.
+
 ### Templates on Homies' account before the switch? Yes (the owner: "can we upload the template for approvals while the number is still running the old automation"), answered, 08:45 UTC
 - **Templates belong to the WABA, not to the number or the platform** (`wa_templates.py`'s docstring). So they can be approved on Homies' account while ManyChat keeps the number. Neither ManyChat nor the tenants see anything.
 - **What it takes:**
