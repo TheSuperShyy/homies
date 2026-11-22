@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### LIVE ~10:35 UTC: the reviewers' page always loads the latest (the owner's screenshot at 10:19 UTC of the old 10 Nov page: "look it goes back like this"; PR #22, `9e81700`)
+- **Read first:**
+  - the database held the new set (14 chats, batches, the new title);
+  - four fetches of the live page all served it (`x-vercel-cache: MISS`, age 0);
+  - so the owner's tab showed an old copy, most likely loaded before 10:08 and reused when switching tabs.
+- **Changed, so it cannot come back:**
+  - `/review` and `/review/yariv` are `force-dynamic` with `fetchCache = 'force-no-store'`;
+  - `Tabs.tsx` uses plain `<a>` links instead of `next/link`;
+  - page tests 13/13; PR checks green; squash-merged; deployed.
+- **Live:** both pages answer `cache-control: private, no-cache, no-store, max-age=0, must-revalidate`, the tabs are plain links, the answers page has its dropdown and 14 chats, and Yariv's has 15 rows.
+- **Told the owner:** reload the open tab once (Ctrl+Shift+R). After that, the tabs always load the current page.
+- Built in the worktree `d:/work/Homie-wt-fresh`, removed after the merge.
+
 ### LIVE ~10:30 UTC: Michael's answers get the new/old dropdown, and the newest answers (the owner's screenshot of /review: "also on the answer"; PR #21, `a102eed`)
 - **The page showed only the 10 Nov chats,** so "new" had to be built first. The owner's test number's runs since 11 Nov were read from `messages`, and the newest run of each change was taken:
   - 12 Nov 11:32-11:54: the ticket after a yes (9), gas (10), and emergencies (11): smoke and flooding, with the lift from the 12:26 re-run after the plural fix;

@@ -988,6 +988,10 @@ on a database so we can retrieve it add a send button"*).
   - The new chats are the newest run of each change: the ticket yes, gas and the emergency line (12 Nov, the lift from the 12:26 re-run), bank transfer (18 Nov), card only (19 Nov), the intro after 8 hours (20 Nov).
   - `data.batches` names them and each chat has `batch`. A set without them shows no dropdown. `show=<batch>` is in the address, and "send" still sends every mark.
   - **Step ids stay `<chat>.<step>`, numbered on:** `scripts/reply_reviews.py` sorts them as numbers, so a new batch continues the chat numbers rather than inventing a prefix. The set id `grok-2026-11-10` stays, because reviews point at it. The upload now uses `scripts/reply_reviews.sql`.
+- **The reviewers' page is never cached, and its tabs are plain links (22 Nov, PR #22).** The owner saw the 10 Nov set again after the new one went live ("look it goes back like this"), while the server served the new one on every fetch.
+  - Both pages are `force-dynamic` with `fetchCache = 'force-no-store'` (the set's fetch is a supabase-js POST with an Authorization header). The responses say `no-store`.
+  - The tabs are `<a>`, not `next/link`, so a tab opened before an update reloads from the current deployment.
+  - A reviewer still holding an old tab reloads it once.
 - **The `messages` table holds the model's text, not always what the handset got.** A two-part reply is logged with "§§§", and an emoji Send later changed is still there. So a set step built from it is the model's words.
   - The sent text lives in n8n's runs (Send, Send the rest), kept only back to about five days (about 300 runs).
   - The 20 Nov step uses run 195532's sent text. The older ones split "§§§" into bubbles.
