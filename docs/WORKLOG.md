@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The token waits on a second admin of Homies' business (the owner's AnyDesk screenshot of Business Settings → Requests, 17:17 Israel time), read only
+- **What it shows:**
+  - "You requested to generate an access token on הומי'ז ניהול ואחזקת מבנים", status "הבקשה נשלחה";
+  - sent from Yariv's account a minute before, expiring in 7 days;
+  - for the app HOMIES, with manage_app_solution, whatsapp_business_manage_events, whatsapp_business_management and whatsapp_business_messaging.
+  - Meta's note: the request needs another admin's approval, and the admins have been told.
+- **So no token yet.** Templates wait on it. The permissions cover what we need (templates; sending at the switch). business_management is not on it and is not needed for the templates.
+- **Told the owner:** another admin of Homies' business (not Yariv's account) approves it under Business Settings → Requests → "דרושה בדיקה". Then the token is generated and copied once into `.env` with the WABA ID.
+
 ### Which app: the existing "HOMIES" (the owner's screenshot of the app list in Homies' Meta for Developers), answered
 - **The list holds one app,** "HOMIES". The page before showed it in Homies' business with the WhatsApp use case, their number and an empty webhook.
 - **Told the owner:** use it, no new or test app. Nothing listens through it (no callback URL). Pick it when generating the system user's token, and change nothing else on it.
