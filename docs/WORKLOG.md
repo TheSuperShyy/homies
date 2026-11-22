@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### LIVE ~10:30 UTC: Michael's answers get the new/old dropdown, and the newest answers (the owner's screenshot of /review: "also on the answer"; PR #21, `a102eed`)
+- **The page showed only the 10 Nov chats,** so "new" had to be built first. The owner's test number's runs since 11 Nov were read from `messages`, and the newest run of each change was taken:
+  - 12 Nov 11:32-11:54: the ticket after a yes (9), gas (10), and emergencies (11): smoke and flooding, with the lift from the 12:26 re-run after the plural fix;
+  - 18 Nov 11:57-12:12 (12): bank transfer, "when?", what the fee covers, a person;
+  - 19 Nov 11:14-11:23 (13): card only, standing order, bank standing order, cheques, goodbye;
+  - 20 Nov 09:39 (14): the intro after 8 hours, as Send sent it (run 195532), in two bubbles.
+  - 21 new answers in all. The 10 Nov 44 are byte-equal to what was live (checked), and no review had been sent on the set.
+- **Dashboard (PR #21):**
+  - `batches.ts` (`toBatchView`, `chatsFor`);
+  - `ReviewBoard.tsx`: a "להציג" dropdown under the intro when the set has `data.batches`, its counts per choice, `show` kept in the address by `history.replaceState`, and the bar's counts following the view;
+  - `page.tsx` passes `show`;
+  - `scripts/check_review_batches.test.ts`, with Yariv's 13/13 locally;
+  - PR checks green, squash-merged, the production deploy succeeded.
+- **Data:** `local/checklist/review-set/build_set.py` (gitignored; backup `.bak-2026-11-22`) writes chats 9-14 as batch `new` and 1-8 as `old`, with the batches' labels, a new intro and date, and the title "התשובות של מיכאל בשיחות הבדיקה". It uploads with `scripts/reply_reviews.sql` (the scratchpad helper it named is gone). `--upload` kept the key, and `review-link.txt` is unchanged.
+- **Read live with the key (not printed):**
+  - options "כל התשובות (65)", "התשובות החדשות, 12-20 בנובמבר (21)", "שיחות הבדיקה של 10 בנובמבר (44)";
+  - all shows 14 chats, `show=new` chats 9-14, `show=old` chats 1-8.
+- Built in the worktree `d:/work/Homie-wt-answers`, removed after the merge.
+
 ### LIVE ~09:55 UTC: a dropdown for Yariv's new and old comments (the owner: "create a dropdown so i can see whats the new feedback and old one"; PR #20, `2086bc3`)
 - **`/review/yariv`:** "להציג" with "כל ההערות (15)", "ההערות החדשות, 18-19 בנובמבר (3)" and "הסקירה של 9 בנובמבר (12)".
   - The choice is `show` in the address (`new` / `old`; all leaves it out). The page stays server-rendered and a view can be linked.

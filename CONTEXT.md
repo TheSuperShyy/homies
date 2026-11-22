@@ -983,6 +983,14 @@ on a database so we can retrieve it add a send button"*).
   - Without the key the page shows only "הקישור לא תקין".
 - **Each Send is one row in `reply_reviews`.** Read them with `python scripts/reply_reviews.py` (`--csv` for a sheet).
 - **A new set:** `local/checklist/review-set/build_set.py --upload`, after editing its time windows.
+- **Since 22 Nov the set holds two batches, with a dropdown on the page (PR #21)** (the owner: "also on the answer", after the one on Yariv's comments).
+  - The batches: "התשובות החדשות, 12-20 בנובמבר" (chats 9-14, 21 answers) and "שיחות הבדיקה של 10 בנובמבר" (chats 1-8, 44, unchanged and byte-equal to before).
+  - The new chats are the newest run of each change: the ticket yes, gas and the emergency line (12 Nov, the lift from the 12:26 re-run), bank transfer (18 Nov), card only (19 Nov), the intro after 8 hours (20 Nov).
+  - `data.batches` names them and each chat has `batch`. A set without them shows no dropdown. `show=<batch>` is in the address, and "send" still sends every mark.
+  - **Step ids stay `<chat>.<step>`, numbered on:** `scripts/reply_reviews.py` sorts them as numbers, so a new batch continues the chat numbers rather than inventing a prefix. The set id `grok-2026-11-10` stays, because reviews point at it. The upload now uses `scripts/reply_reviews.sql`.
+- **The `messages` table holds the model's text, not always what the handset got.** A two-part reply is logged with "§§§", and an emoji Send later changed is still there. So a set step built from it is the model's words.
+  - The sent text lives in n8n's runs (Send, Send the rest), kept only back to about five days (about 300 runs).
+  - The 20 Nov step uses run 195532's sent text. The older ones split "§§§" into bubbles.
 - **A checklist page ends with a Send button** (11 Nov, on the local page: *"i dont find the send button put it at the end of the checklist"*). The live page has one at its top and one at its end. The local page (`local/checklist/serve.py`) saves its sends on this PC; `--last` reads the last one.
 
 **The reviewers' page has a second section since 11 Nov: Yariv's comments beside our answers** (owner: *"create a new section ... in natural local native hebrew ... on the right its yariv comment and on the left that answer"*, then *"ok push live"*; PR #12).
