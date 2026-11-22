@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### "Will I get charged 33 USD?" No: pesos (the owner's screenshot of "ASTDX - Smart Link", "Approximate charges $ 32.75"), read only, 08:15 UTC
+- **`currency`:** "ASTDX - Smart Link" (…632) ARS. "hadas 1" (…050) none: the field is unset.
+- **The $32.75 is 32.75 Argentine pesos,** a few US cents. It is `pricing_analytics`' only paid row this month: 9 Nov, UTILITY, REGULAR, country PH, volume 2. That is two templates to the owner's number while the bot ran on UChat.
+  - The page's other figures: 365 deliveries, 363 of them free (replies inside 24 hours), no calls.
+- **What it adds:** the card works on …632. "hadas 1" has no currency, so it has likely never had billing set up, which fits no paid template going out from it since 9 Nov.
+
 ### The link to the payment settings (the owner: "give me link"), read only, 08:05 UTC
 - **Both accounts that list the number are in business "ASTDX" (`1679634916736747`):** "hadas 1" `1389698653006050` and "ASTDX - Smart Link" `2117787955519632`. Read with `owner_business_info`, which works with our token where the funding fields don't.
   - The number's `health_status` names …632 (AVAILABLE).

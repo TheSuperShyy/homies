@@ -758,6 +758,10 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
     there. ASTDX did deliver two paid UTILITY templates on 9 Nov.
   - **So a WhatsApp id proves only that Meta took the message.** The reason it failed is in the failure status,
     which reaches no system of ours.
+  - **"ASTDX - Smart Link" bills in Argentine pesos (`currency` ARS), and "hadas 1" has no currency at all
+    (22 Nov).** The "$" in Meta's billing pages is pesos: this month's "$ 32.75" is two UTILITY templates to the
+    owner's PH number on 9 Nov, a few US cents. An account with no currency has had no billing set up, which
+    fits "hadas 1" sending no paid template.
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
 - **The number's WhatsApp name is "hadas 1", and Meta caps what we start at 250 conversations a day** (read 11 Nov: `verified_name` "hadas 1", `messaging_limit_tier` TIER_250).
