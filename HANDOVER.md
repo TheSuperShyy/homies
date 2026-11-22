@@ -19,6 +19,7 @@ appended to.
 >   - at least one person per department signed in (every mention reaches only the owner's login).
 > - **Missing, from the owner:** a top-up of the AI wallet ($30.31, about 275 turns with a tool), and a higher cap on the key ($50, $49.75 left).
 > - **Not today in any case:** the templates on Homies' account (a day or two at Meta), and business verification (days; until then 250 people a day for messages we start).
+>   - **The templates go in as soon as we have access to Homies' account, before the switch day,** with `wa_templates.py create <name> --waba <their id> --apply` for each of the four. The bot's replies need none.
 >
 > **LIVE 20 Nov 08:41:47 UTC: Michael introduces himself again after 8 quiet hours, not 24** (greetgap v1), and the handset shows it. The owner saw no intro on "היי, איך אני משלם את ועד הבית?" (run 195345, 20.5 hours after his last message), was shown examples, and said "ok go ahead with 8 hours and push it live and give me script to test via grok".
 > - **What changed:** `scripts/n8n_whatsapp_greetgap.py` changes Sort only, with no epoch (no model-facing text moved). Snapshot `local/n8n-whatsapp-live-20nov-before-greetgap.json`, `--restore` to undo.

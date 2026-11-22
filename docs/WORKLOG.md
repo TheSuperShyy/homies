@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Do the templates go to Meta again at the move to Homies' number? Yes (the owner: "ok so when we will migrate from the homies actual number that they currently use now we will need to submit them all over again?"), answered from the records, 07:40 UTC
+- **Templates belong to the WhatsApp account, not the number** (`wa_templates.py`'s docstring). The plan keeps the number on Homies' own account, so all four are submitted there.
+- **How long Meta took on ours:**
+  - the two UTILITY ones, submitted to "hadas 1" on 10 Nov 16:19 UTC, read APPROVED on 12 Nov 07:32 UTC;
+  - `homies_hello_he` (MARKETING), submitted 17 Nov 14:47 UTC, was still PENDING 18 h later and read APPROVED on 19 Nov 11:35 UTC.
+- **Told the owner:** submit them as soon as we have access to Homies' account, before the switch day. The bot's replies need no template.
+- Moving their number into our account instead would keep the approvals, but it would sit under our unverified business (TIER_250). Not recommended.
+
 ### Are the templates approved, all of them? Yes (the owner: "btw is the templated message approved all of it"), read only, 07:30 UTC
 - `wa_templates.py` on `.env`'s WABA (…632) and on "hadas 1" (…050), then `wa_templates.py chatwoot`: `ticket_resolved_he` and `payment_link_he` (UTILITY), `homies_hello_he` and `homies_message_he` (MARKETING) are all APPROVED on both, and all four are synced into Chatwoot inbox 1. "hadas 1" also has Meta's `hello_world`.
 - They belong to these two accounts. At the move to Homies' own account they are submitted there again, as the launch check says.
