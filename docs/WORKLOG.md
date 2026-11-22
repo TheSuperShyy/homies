@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Why the owner's conversations stack (the owner's screenshot: "why is it stacking like this"), read only, 08:30 UTC
+- **Contact #1's conversations in inbox 1:** #104, #105 and #106 were each created at their own send (07:33, 08:07, 08:19 UTC), all `pending`, each with "Assaf Clix self-assigned". That is Chatwoot's "New conversation" form: it opens a new conversation every time.
+  - #102 (19 Nov's Grok run) is still open. #1 (August) and the rest are resolved.
+- **Inbox 1's `lock_to_single_conversation` is false.** When it is on, Chatwoot's ConversationBuilder reuses the contact's last conversation, both for a new incoming message and for a new conversation from the form.
+  - Not changed. It would put tenants back into resolved conversations, which carry labels such as `handover`, and those decide when the bot keeps quiet. So it is checked before it is turned on.
+- **Told the owner:** send from the open conversation's reply box (the WhatsApp icon) to stay in it, and resolve the extra ones. The 08:19 message shows one tick because it went out before 08:24.
+
 ### LIVE 08:24:46 UTC: HOMIES subscribed to "hadas 1", with Meta's events sent to Chatwoot (the owner: "ok fix it")
 - **`scripts/wa_subscribe.py`, new.** Read only by default.
   - `--waba X --apply` subscribes HOMIES with `override_callback_uri` set to the number's live phone override (Chatwoot) and Chatwoot's verify token.
