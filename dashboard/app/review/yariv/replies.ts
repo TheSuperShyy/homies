@@ -25,11 +25,28 @@ export type Replies = {
   updated: string;
   labels: {
     comment: string; answer: string; check: string; given: string;
+    show: string; showAll: string; showNew: string; showOld: string;
     done: string; same: string; answered: string;
     countDone: string; countSame: string; countAnswered: string;
   };
   items: Reply[];
 };
+
+// 22 Nov, the owner: "create a dropdown so i can see whats the new feedback and old one". A comment Yariv sent
+// after the 9 Nov review carries `given`, so the dropdown shows all of them, only those, or only the twelve.
+export const VIEWS = ['all', 'new', 'old'] as const;
+export type View = (typeof VIEWS)[number];
+
+// The `show` query parameter as the page gets it; anything else, a repeated one included, is all.
+export function toView(v: unknown): View {
+  return typeof v === 'string' && (VIEWS as readonly string[]).includes(v) ? (v as View) : 'all';
+}
+
+export function itemsFor(view: View, items: Reply[]): Reply[] {
+  if (view === 'new') return items.filter((i) => i.given);
+  if (view === 'old') return items.filter((i) => !i.given);
+  return items;
+}
 
 export function countByStatus(items: Reply[]): Record<Status, number> {
   const n: Record<Status, number> = { done: 0, same: 0, answered: 0 };
@@ -51,7 +68,11 @@ export const REPLIES: Replies = {
     "countDone": "בוצעו",
     "countSame": "ללא שינוי",
     "countAnswered": "תשובות לשאלות",
-    "given": "הערה מ-"
+    "given": "הערה מ-",
+    "show": "להציג",
+    "showAll": "כל ההערות",
+    "showNew": "ההערות החדשות, 18-19 בנובמבר",
+    "showOld": "הסקירה של 9 בנובמבר"
   },
   "items": [
     {

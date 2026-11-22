@@ -3,14 +3,16 @@ import ReviewTabs from '../Tabs';
 import { loadReviewSet } from '../set';
 import base from '../review.module.css';
 import styles from './yariv.module.css';
-import { REPLIES, STATUSES, countByStatus, type Reply } from './replies';
+import { REPLIES, STATUSES, VIEWS, countByStatus, itemsFor, toView, type Reply, type View } from './replies';
+import ViewSelect from './ViewSelect';
 import { paragraphs, runs } from './whole';
 
 // The reviewers' page, second section (owner, 11 Nov: "create a new section ... on the right its yariv
 // comment and on the left that answer", then "ok push live"). One row for each of Yariv's twelve comments
 // of 9 Nov: the comment as written on the right, our answer on the left, with the check's number and a
 // status word. Hebrew only. Since 22 Nov his later comments follow, headed by the day he wrote them
-// (`given`) in place of a check's number.
+// (`given`) in place of a check's number, and a dropdown shows all, only those, or only the twelve.
+// The dropdown's choice is `show` in the address; the counts follow what is shown.
 //
 // It opens with the same key as Michael's replies (middleware.ts lets /review/yariv through), so one link
 // from the owner reaches both sections and a visitor without it sees neither. The content is in
@@ -23,6 +25,7 @@ export const metadata: Metadata = {
 const L = REPLIES.labels;
 const WORD: Record<Reply['status'], string> = { done: L.done, same: L.same, answered: L.answered };
 const COUNT: Record<Reply['status'], string> = { done: L.countDone, same: L.countSame, answered: L.countAnswered };
+const VIEW_TEXT: Record<View, string> = { all: L.showAll, new: L.showNew, old: L.showOld };
 
 function Text({ text }: { text: string }) {
   return (
@@ -36,7 +39,11 @@ function Text({ text }: { text: string }) {
   );
 }
 
-export default async function YarivPage({ searchParams }: { searchParams: { k?: string | string[] } }) {
+export default async function YarivPage({
+  searchParams,
+}: {
+  searchParams: { k?: string | string[]; show?: string | string[] };
+}) {
   const key = typeof searchParams.k === 'string' ? searchParams.k : '';
   const set = await loadReviewSet(key);
   if (!set) {
@@ -47,7 +54,10 @@ export default async function YarivPage({ searchParams }: { searchParams: { k?: 
       </main>
     );
   }
-  const n = countByStatus(REPLIES.items);
+  const view = toView(searchParams.show);
+  const shown = itemsFor(view, REPLIES.items);
+  const n = countByStatus(shown);
+  const options = VIEWS.map((v) => ({ value: v, text: `${VIEW_TEXT[v]} (${itemsFor(v, REPLIES.items).length})` }));
   return (
     <div className={`${base.page} ${styles.section}`} dir="rtl" lang="he">
       <ReviewTabs reviewKey={key} current="yariv" />
@@ -55,6 +65,7 @@ export default async function YarivPage({ searchParams }: { searchParams: { k?: 
         <header className={base.intro}>
           <h1>{REPLIES.title}</h1>
           <p className={base.lede}>{REPLIES.lede}</p>
+          <ViewSelect reviewKey={key} view={view} label={L.show} options={options} />
           <ul className={styles.counts}>
             {STATUSES.filter((s) => n[s] > 0).map((s) => (
               <li key={s}>
@@ -72,7 +83,7 @@ export default async function YarivPage({ searchParams }: { searchParams: { k?: 
         </div>
 
         <ol className={styles.rows}>
-          {REPLIES.items.map((i) => (
+          {shown.map((i) => (
             <li key={i.id} className={styles.row} id={`c-${i.id.replace('.', '-')}`}>
               <div className={styles.rowTop}>
                 <h2 className={styles.check}>
