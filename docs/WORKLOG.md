@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The resend did not arrive (the owner: "i dont receive anything"); where Meta's notices go, read only, 08:20 UTC
+- **The card alone did not fix it:** 08:07:55's opener had a wamid and never reached the phone.
+- **Chatwoot sends with our own token:** inbox 1's `api_key` digest equals `.env`'s `WHATSAPP_ACCESS_TOKEN`. `debug_token`: app 885069647663983 "HOMIES", SYSTEM_USER, valid, never expires. Its `webhook_configuration` is as we read it: `phone_number` Chatwoot, `application` n8n.
+- **`subscribed_apps`:**
+  - "hadas 1" (…050) has **no app subscribed**;
+  - "ASTDX - Smart Link" (…632) answered HTTP 500 (Meta's unknown error), so it is not known there.
+  - Meta counts the number's traffic under …050 since 9 Nov, and no status update has reached us since 10 Nov. So the lack of any app on …050 is the likely reason no notice (delivered, read, failed) arrives.
+- **Next, the owner's:** `ticket_resolved_he` (UTILITY) from Chatwoot to the handset. If it arrives, billing works now and only the MARKETING openers are held back.
+- **If it does not arrive:** subscribe HOMIES to …050 (`POST /1389698653006050/subscribed_apps`), so the failure status reaches Chatwoot with its reason. It is a write to the owner's Meta account and waits on their go. Chatwoot drops a second webhook for a message it already has (its source_id check), so a doubled incoming message would not become two.
+
 ### The opener resent after the card (the owner's screenshot of conversation 105, one tick), read only, 08:09 UTC
 - **Message 3623, `homies_hello_he` to the owner's +63, 08:07:55 UTC:** status `sent`, with a wamid. Meta took it, as it took 07:33's.
 - **`template_analytics` for `homies_hello_he`:** 0 sent on 20, 21 and 22 Nov. Today is not counted yet, so this proves nothing either way.
