@@ -9,6 +9,29 @@ conversation that produced it.
 
 ---
 
+## 2026-11-22
+
+### Are we set to launch the chatbot today? Not on Homies' number yet (the owner: "we have a deadline until later today we need to launch the chatbot live so are we set for the chatbot"), read only, 07:20 UTC
+- **"Live" is the 12 Nov go-live sheet** (`local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`): the bot on the number tenants write to today, ManyChat's.
+- **Our side, read now:**
+  - The bot `u2JjrbcNPYyyh3yl` is active and unchanged since greetgap (20 Nov 08:43 UTC). No runs since 20 Nov 10:00 UTC: nobody has written.
+  - The AI wallet: $30.31 left of $60 bought, about 275 turns with a tool at 18 Nov's $0.11. The key's cap is $50, $49.75 of it unspent.
+  - The bot's number today (+972 …029, "hadas 1"): CONNECTED, quality GREEN, TIER_250, business not verified (141010), display name "hadas 1".
+  - Chatwoot (`chatwoot_teams.py`): every department's mention reaches only Assaf Clix (#2), the owner's login. 4 logins. Of Homies' staff only #8 is left (16 Nov), and #8 never confirmed.
+  - OXS (`oxs_mirror_list.py`): the mirror holds 4 numbers (flat 2 ×1, flat 1 ×2, flat 3 ×1), and live equals `.env`. Every other tenant's ticket stays in our system.
+- **Homies' side, per our records (nothing logged after the 15 Nov staff list):**
+  - Meta admin for "office homies";
+  - the number's two-step PIN;
+  - whoever turns ManyChat off;
+  - the OK for OXS tickets for every tenant;
+  - a switch time;
+  - business verification, the display name and a payment card on their WhatsApp account.
+- **Not doable today in any case:**
+  - The templates re-submitted on their account (Meta takes a day or two). Until then the "ticket closed" notice and a payment link outside the 24 hours wait.
+  - Business verification (days). Until then messages we start reach at most 250 people a day.
+- **Known and open:** the 2 min 13 s first-message turn and the standing-order tool on a plain ask, one run each.
+- Given to the owner. Nothing changed.
+
 ## 2026-11-20
 
 ### The 11/20 report (in chat, `/reporter`), 10:25 UTC
