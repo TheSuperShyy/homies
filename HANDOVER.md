@@ -213,7 +213,7 @@ appended to.
 >
 > **SUBMITTED 18 Nov, 09:55 UTC: the opener with a free field, `homies_message_he`, PENDING Meta's review** (the owner's *"submit the template"*; `templates.md`). "שלום, כאן צוות השירות של הומי'ז. {{1}} אם יש שאלה, אפשר לכתוב לנו כאן." Chatwoot shows staff a box for `{{1}}`. Ids `1766335894444792` (`…632`) and `1677261424140865` ("hadas 1"). Check with `python scripts/wa_templates.py list --waba 1389698653006050`. Once approved: one send to the owner's handset, and the new-contact video's template step redone.
 >
-> **CHECKED 17 Nov, 09:10 UTC: BOTH WHATSAPP TEMPLATES WORK ON THE CHATWOOT ROUTE** (owner: *"make sure the templatated message are working ok"*; WORKLOG 17 Nov).
+> **CHECKED 17 Nov, 09:10 UTC: BOTH WHATSAPP TEMPLATES WORK ON THE CHATWOOT ROUTE** (owner: *"make sure the templatated message are working ok"*; WORKLOG 17 Nov). **WRONG, found 22 Nov:** the check stopped at WhatsApp's id. Meta's counts show neither message went out (the FOUND 22 Nov block at the top).
 >   - **The "ticket closed" message:** test ticket 255-1448-26 (the owner's handset, flat 2) was closed in `requests` at 09:09:26 UTC. The notices run sent `ticket_resolved_he` at 09:10:31 with WhatsApp's id (Chatwoot conversation 93, message 3464). Its OXS call stays open.
 >   - **The payment link:** the owner's Ring to Ido, 16 Nov at 15:38 UTC. Free text was refused (his 24 hours were shut), then `payment_link_he` went 2 s later with WhatsApp's id, filled in right, and Michael said it was sent.
 >   - **Both read APPROVED** in "hadas 1" and ASTDX, and both are synced into Chatwoot.
