@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### LIVE ~09:55 UTC: a dropdown for Yariv's new and old comments (the owner: "create a dropdown so i can see whats the new feedback and old one"; PR #20, `2086bc3`)
+- **`/review/yariv`:** "להציג" with "כל ההערות (15)", "ההערות החדשות, 18-19 בנובמבר (3)" and "הסקירה של 9 בנובמבר (12)".
+  - The choice is `show` in the address (`new` / `old`; all leaves it out). The page stays server-rendered and a view can be linked.
+  - The counts follow the view.
+  - `ViewSelect.tsx` is the one client component. `toView` and `itemsFor` are in `replies.ts`.
+- **Checked:** the test 11/11 locally (the three views; the address, where a repeated or unknown `show` means all); PR checks green; squash-merged; the dashboard's production deploy succeeded.
+  - Live, with the key (not printed): all 15 rows, `show=new` 3 (the dated ones), `show=old` 12 (none dated), `show=bogus` 15, and the right option selected each time.
+- Written from a scratchpad script (`yariv_view.py`), because a `\'` inside a bash heredoc broke the tool's quoting. Built in the worktree `d:/work/Homie-wt-view`, removed after the merge.
+
 ### LIVE 09:33:38 UTC: the reviewers' page carries Yariv's comments of 18-19 Nov, and four answers are brought up to date (the owner: "update it with the new feedbacks from yariv"; PR #19, `ee62637`)
 - **"The checklist"** is the dashboard's `/review` page. Its Yariv section held his 12 comments of 9 Nov, last updated 11 Nov.
 - **Added, in his own words** (from this WORKLOG's 18 and 19 Nov entries), each headed by the day he wrote it:

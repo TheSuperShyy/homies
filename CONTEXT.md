@@ -990,6 +990,9 @@ on a database so we can retrieve it add a send button"*).
   - **Since 22 Nov (PR #19) Yariv's later comments follow the twelve** (the owner: "update it with the new feedbacks from yariv"): 18 Nov bank transfer, 18 Nov opener with a free field, 19 Nov card only.
     - Each is in his own words, headed by the day he wrote it (`given`, ids `n18-1`, `n18-2`, `n19-1`) instead of a check's number.
     - A comment the owner forwarded only in English is not added, because the page quotes Yariv as written. That covers 16 Nov's "יתרה" on the debt call.
+  - **A dropdown above the rows since 22 Nov (PR #20)** (the owner: "create a dropdown so i can see whats the new feedback and old one"). It offers "כל ההערות", "ההערות החדשות, 18-19 בנובמבר" and "הסקירה של 9 בנובמבר", each with its count.
+    - The choice is `show=new|old` in the address, beside the key, so `...&show=new` links straight to the new ones. Any other value means all.
+    - The counts at the top follow what is shown. "New" means an item with `given`. When more comments come, the "new" label's dates are edited in `replies.ts`.
   - **An answer the bot has outgrown is rewritten in place,** never left as current. On 22 Nov: 2.2 (the yes before a ticket; someone stuck in the lift is an emergency), 5.2 (the link first for a standing order), 6.2 and 6.3 (anything urgent, any hour, only the line; gas gets the gas company and the line).
 - **A reply to Yariv's numbered comments is item by item:** the number, a status word (בוצע, ללא שינוי, תשובה), the answer. "Done" only where the bot really does it; a question that changed nothing is "answer".
 - **The Hebrew is written as Hebrew,** never carried over from the English list.

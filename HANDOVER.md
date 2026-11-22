@@ -12,6 +12,7 @@ appended to.
 > - Bank transfer, the opener with a free field, and card only, each in his words with our answer.
 > - 2.2, 5.2, 6.2 and 6.3 are rewritten to what the bot does now. The "stale 6.2" noted on 12 Nov is closed.
 > - The source is `dashboard/app/review/yariv/replies.ts` on `main` (not on `feature/chatbot`). A change there goes through a PR.
+> - **Since PR #20 (`2086bc3`), a dropdown picks all, the new ones (`&show=new`) or the 9 Nov ones (`&show=old`).** Checked live: 15 / 3 / 12 rows.
 >
 > **22 Nov, PROVEN 08:32 UTC: EVERY TEMPLATE GOES OUT FROM THE BOT'S NUMBER AGAIN, AND CHATWOOT SEES DELIVERED AND READ** (the owner's screenshots; WORKLOG and CONTEXT 22 Nov). The staff opener from #106's reply box reads `read` in Chatwoot (message 3627), the first status update since 10 Nov. It came after the card on "hadas 1" and the HOMIES subscription. The history follows.
 > - **Found:** from 9 Nov to 22 Nov no template went out from "hadas 1" (…050), where Meta counts the number. The 16 Nov payment link and the 17 Nov "ticket closed" had WhatsApp ids, and Meta's `template_analytics` shows no send. The account had no billing at all (no `currency`).
