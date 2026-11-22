@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Ready to move to Homies' number? Our side yes, theirs not yet (the owner: "so are we ready to migrate to the actual phone number?"), read only, 08:38 UTC
+- **Read again, unchanged since 07:20:**
+  - the AI wallet $30.31, and the key's cap $50 with $49.75 left;
+  - every department's mention reaches only Assaf Clix (#2);
+  - the OXS mirror holds 4 numbers.
+- **What today added:** the new account's three steps are known and each is one command: a card, the four templates, and the HOMIES subscription (`wa_subscribe.py`).
+- **Told the owner:**
+  - Homies' six items are still open (Meta admin on a call, PIN, ManyChat off, the OXS OK, a person per department, a switch time), plus the wallet and the cap from the owner.
+  - The best order: their admin on a call as early as possible, then the templates, card and subscription at once, then the switch after hours. Replies work from the first minute; the template messages follow Meta's approval.
+
 ### Proven: the staff opener arrives and Meta's updates reach Chatwoot (the owner: "ok i sent it now it sends"), 08:33 UTC
 - **Message 3627, `homies_hello_he`, sent from #106's reply box at 08:32:01 UTC:** Chatwoot's status is `read`. Three POSTs from Meta reached `/webhooks/whatsapp` after 08:25, the first status updates since 10 Nov.
 - **So both fixes hold:**
