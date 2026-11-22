@@ -14,7 +14,7 @@ appended to.
 > - **Still not arriving:** the MARKETING staff opener `homies_hello_he` (07:33 and 08:07 UTC, both with WhatsApp ids). Meta holds it back, and the reason is in a failure status that reaches none of our systems (likely its per-person marketing limit, 131049).
 > - **Why we see no status:** no app is subscribed to "hadas 1" (`subscribed_apps` empty). Chatwoot sends with our HOMIES token (app 885069647663983), whose phone override is Chatwoot. "ASTDX - Smart Link" (…632) answers `subscribed_apps` with HTTP 500.
 > - **Owed:**
->   - the owner's go to subscribe HOMIES to …050 (`POST /1389698653006050/subscribed_apps`). That should bring the delivered/read ticks and failure reasons into Chatwoot, and Chatwoot drops a duplicate incoming webhook by source_id;
+>   - ~~the owner's go to subscribe HOMIES to …050~~ **Done 08:24:46 UTC** (the owner: "ok fix it"; `scripts/wa_subscribe.py --waba 1389698653006050 --apply`, events to Chatwoot's phone webhook; `--remove` undoes it). **Owed: the proof.** The owner resends the opener, then its status is read in Chatwoot: delivered ticks, or failed with the reason;
 >   - the opener sent once to a phone other than the owner's;
 >   - the same billing check on Homies' own account at the move (the go-live sheet's card).
 > - **The 32.75 "$" on ASTDX's billing page is pesos:** two UTILITY templates to PH on 9 Nov, a few US cents.

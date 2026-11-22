@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### LIVE 08:24:46 UTC: HOMIES subscribed to "hadas 1", with Meta's events sent to Chatwoot (the owner: "ok fix it")
+- **`scripts/wa_subscribe.py`, new.** Read only by default.
+  - `--waba X --apply` subscribes HOMIES with `override_callback_uri` set to the number's live phone override (Chatwoot) and Chatwoot's verify token.
+  - `--remove` undoes it.
+  - It prints no token or number.
+- **Before:**
+  - "hadas 1" (…050) had no app subscribed;
+  - the number's `webhook_configuration`: `phone_number` Chatwoot, `application` n8n's `homies-whatsapp`.
+- **Done:**
+  - POST `success: true`.
+  - Meta's verification GET reached Chatwoot at 08:24:46 and passed (.env's verify token equals inbox 1's, by digest).
+  - Read back: HOMIES (885069647663983) with the Chatwoot override. The number's `webhook_configuration` is unchanged.
+- **Safe by construction:** Chatwoot drops a doubled incoming message by its source_id. Sort refuses a raw Meta post to n8n, because it has no shared secret (`_rejected: 'bad secret'`). So nothing can be answered twice.
+- **Not proven yet:** a status update arriving. The owner resends the opener, and its status is read in Chatwoot: delivered ticks, or failed with Meta's reason.
+- **Rollback:** `python scripts/wa_subscribe.py --waba 1389698653006050 --remove`.
+
 ### The "ticket closed" template reached the handset (the owner's screenshot of conversation 106: "i receive it"), 08:22 UTC
 - **`ticket_resolved_he` (UTILITY)** went from Chatwoot at 08:19 UTC with `255-1448-26` and `בדיקה`, and the owner's phone shows it.
 - **So the card on "hadas 1" fixed the paid UTILITY templates:** the "ticket closed" message and the payment link. Before it (16 and 17 Nov) neither went out.
