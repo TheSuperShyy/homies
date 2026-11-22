@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Which app: the existing "HOMIES" (the owner's screenshot of the app list in Homies' Meta for Developers), answered
+- **The list holds one app,** "HOMIES". The page before showed it in Homies' business with the WhatsApp use case, their number and an empty webhook.
+- **Told the owner:** use it, no new or test app. Nothing listens through it (no callback URL). Pick it when generating the system user's token, and change nothing else on it.
+
 ### Inside Homies' Meta (the owner's AnyDesk screenshot of Meta for Developers, 17:06 Israel time), read only
 - **What it shows:** Homies' own app, named "HOMIES" (not ours), in Homies' business, on the WhatsApp use case's configuration page.
   - Their WhatsApp account "הומי'ז ניהול ואחזקת מבנים" holds **+972 77-668-7949, Registered**: Homies' main line, the same number Michael gives for emergencies.
