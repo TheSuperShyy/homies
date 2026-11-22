@@ -18,7 +18,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function ReviewPage({ searchParams }: { searchParams: { k?: string | string[] } }) {
+export default async function ReviewPage({
+  searchParams,
+}: {
+  searchParams: { k?: string | string[]; show?: string | string[] };
+}) {
   const key = typeof searchParams.k === 'string' ? searchParams.k : '';
   const set = await loadReviewSet(key);
   if (!set) {
@@ -29,5 +33,7 @@ export default async function ReviewPage({ searchParams }: { searchParams: { k?:
       </main>
     );
   }
-  return <ReviewBoard set={set} reviewKey={key} />;
+  // 22 Nov: `show` picks a batch of the set (the newest answers, or the 10 Nov ones); ReviewBoard checks it.
+  const show = typeof searchParams.show === 'string' ? searchParams.show : undefined;
+  return <ReviewBoard set={set} reviewKey={key} initialView={show} />;
 }
