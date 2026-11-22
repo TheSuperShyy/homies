@@ -3,6 +3,12 @@ import ReviewBoard from './ReviewBoard';
 import { loadReviewSet } from './set';
 import styles from './review.module.css';
 
+// 22 Nov: the owner saw the 10 Nov set again after the new one went live ("look it goes back like this"), while
+// the server was serving the new one. So nothing on the reviewers' page is cached: not the page, and not the
+// set's fetch (supabase-js posts with an Authorization header, which Next may otherwise keep).
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 // The reviewers' page (owner, 10 Nov: "push it live to vercel make sure the data can be saved on a
 // database so we can retrieve it add a send button"). It shows Michael's real replies, and each one is
 // marked right or wrong, with a comment. "Send" stores the marks in reply_reviews (migration 040).

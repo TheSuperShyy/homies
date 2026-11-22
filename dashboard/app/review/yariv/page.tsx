@@ -7,6 +7,12 @@ import { REPLIES, STATUSES, VIEWS, countByStatus, itemsFor, toView, type Reply, 
 import ViewSelect from './ViewSelect';
 import { paragraphs, runs } from './whole';
 
+// 22 Nov: the owner saw the 10 Nov set again after the new one went live ("look it goes back like this"), while
+// the server was serving the new one. So nothing on the reviewers' page is cached: not the page, and not the
+// set's fetch (supabase-js posts with an Authorization header, which Next may otherwise keep).
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 // The reviewers' page, second section (owner, 11 Nov: "create a new section ... on the right its yariv
 // comment and on the left that answer", then "ok push live"). One row for each of Yariv's twelve comments
 // of 9 Nov: the comment as written on the right, our answer on the left, with the check's number and a
