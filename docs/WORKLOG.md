@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The "ticket closed" template reached the handset (the owner's screenshot of conversation 106: "i receive it"), 08:22 UTC
+- **`ticket_resolved_he` (UTILITY)** went from Chatwoot at 08:19 UTC with `255-1448-26` and `בדיקה`, and the owner's phone shows it.
+- **So the card on "hadas 1" fixed the paid UTILITY templates:** the "ticket closed" message and the payment link. Before it (16 and 17 Nov) neither went out.
+- **The MARKETING openers still don't arrive:** `homies_hello_he` at 07:33 and again at 08:07, after the card. Meta holds them back for a reason we can't read, since its failure status doesn't reach us. The usual one is its per-person limit on marketing messages (131049), which is tighter for an unverified business and can be particular to one number.
+- **Told the owner:**
+  - connect HOMIES to "hadas 1" (`subscribed_apps`), so the failure status and the delivered/read ticks reach Chatwoot (waits on their go);
+  - or send the opener once to a phone other than theirs.
+
 ### The resend did not arrive (the owner: "i dont receive anything"); where Meta's notices go, read only, 08:20 UTC
 - **The card alone did not fix it:** 08:07:55's opener had a wamid and never reached the phone.
 - **Chatwoot sends with our own token:** inbox 1's `api_key` digest equals `.env`'s `WHATSAPP_ACCESS_TOKEN`. `debug_token`: app 885069647663983 "HOMIES", SYSTEM_USER, valid, never expires. Its `webhook_configuration` is as we read it: `phone_number` Chatwoot, `application` n8n.

@@ -8,18 +8,16 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **FOUND 22 Nov, read only: no template has gone out from the bot's number since at least 12 Nov** (the owner's screenshot, "why its not sent"; WORKLOG and CONTEXT 22 Nov).
-> - **What we see:** today's `homies_hello_he` to the owner's handset has a WhatsApp id. So do the 16 Nov payment link and the 17 Nov "ticket closed". Meta's `template_analytics` counts no send of any of the four between 12 and 21 Nov, and `pricing_analytics` shows only free replies. ASTDX delivered paid templates on 9 Nov.
-> - **"hadas 1" had no billing currency** ("ASTDX - Smart Link" has ARS, Argentine pesos). So "hadas 1" had likely never had billing set up. The "$ 32.75" on ASTDX's page is pesos, for two paid messages on 9 Nov.
-> - **The owner added a card to "hadas 1" (22 Nov, by 08:05 UTC).** Its currency then read ARS, and the number's health is unchanged (WABA AVAILABLE, business 141010). **Resent 08:07:55 UTC (conversation 105, message 3623, WhatsApp id): it did not reach the phone.**
-> - **Found 08:20 UTC:** no app is subscribed to "hadas 1" (…050), where Meta counts the number since 9 Nov. That is the likely reason no status update reaches us. Chatwoot sends with our own HOMIES token (app 885069647663983), which is right.
-> - **Next:** the owner sends the UTILITY `ticket_resolved_he` from Chatwoot (`{{1}}` a reference, `{{2}}` a few words). If it arrives, billing works and only MARKETING is held back. If not, subscribe HOMIES to …050 on the owner's go, and read the failure status.
-> - **Why we never saw it:** Meta's status updates reach no system of ours. Chatwoot has had none since 10 Nov, and no POST from Meta reached it today.
+> **22 Nov: THE PAID TEMPLATES GO OUT AGAIN FROM THE BOT'S NUMBER; THE MARKETING OPENERS STILL DON'T** (the owner's screenshots; WORKLOG and CONTEXT 22 Nov).
+> - **Found:** from 9 Nov to 22 Nov no template went out from "hadas 1" (…050), where Meta counts the number. The 16 Nov payment link and the 17 Nov "ticket closed" had WhatsApp ids, and Meta's `template_analytics` shows no send. The account had no billing at all (no `currency`).
+> - **Fixed by the owner, 22 Nov by 08:05 UTC:** a card on "hadas 1" (currency ARS, Argentine pesos, as on …632). **Proven 08:19 UTC:** `ticket_resolved_he` from Chatwoot reached the owner's phone (conversation 106). So the "ticket closed" message and the payment link, both UTILITY, work.
+> - **Still not arriving:** the MARKETING staff opener `homies_hello_he` (07:33 and 08:07 UTC, both with WhatsApp ids). Meta holds it back, and the reason is in a failure status that reaches none of our systems (likely its per-person marketing limit, 131049).
+> - **Why we see no status:** no app is subscribed to "hadas 1" (`subscribed_apps` empty). Chatwoot sends with our HOMIES token (app 885069647663983), whose phone override is Chatwoot. "ASTDX - Smart Link" (…632) answers `subscribed_apps` with HTTP 500.
 > - **Owed:**
->   - the owner's look at the "hadas 1" account's payment settings in WhatsApp Manager (Business Settings → Accounts → WhatsApp accounts → the account → Settings → Payment settings). Link given 22 Nov: `https://business.facebook.com/wa/manage/home/?business_id=1679634916736747&waba_id=1389698653006050`. Both "hadas 1" (…050) and "ASTDX - Smart Link" (…632) list the number, both in business ASTDX. The earlier card went on …632 only, and Meta counts the number's traffic under …050 since 9 Nov;
->   - getting Meta's status updates to us, so a failure shows its reason;
->   - then one template to the handset, seen on the phone.
-> - **For the launch:** the "ticket closed" message and a payment link outside the 24 hours don't arrive until this is fixed. The same check applies to Homies' account (the go-live sheet's card).
+>   - the owner's go to subscribe HOMIES to …050 (`POST /1389698653006050/subscribed_apps`). That should bring the delivered/read ticks and failure reasons into Chatwoot, and Chatwoot drops a duplicate incoming webhook by source_id;
+>   - the opener sent once to a phone other than the owner's;
+>   - the same billing check on Homies' own account at the move (the go-live sheet's card).
+> - **The 32.75 "$" on ASTDX's billing page is pesos:** two UTILITY templates to PH on 9 Nov, a few US cents.
 >
 > **CHECKED 22 Nov, read only: not set to launch on Homies' number today** (the owner: "we have a deadline until later today we need to launch the chatbot live so are we set for the chatbot"; WORKLOG 22 Nov; the go-live sheet `local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`).
 > - **Ready:** the bot (active, unchanged since 20 Nov), and the number "hadas 1" CONNECTED and GREEN. All four templates are APPROVED on both of our accounts and synced into inbox 1 (read 22 Nov); they go to Homies' account again at the move.

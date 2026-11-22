@@ -763,6 +763,12 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
     owner's PH number on 9 Nov, a few US cents. An account with no currency has had no billing set up, which
     fits "hadas 1" sending no paid template. **The owner added a card to "hadas 1" on 22 Nov, by 08:05 UTC.**
     Its currency then read ARS too, so its "$" is pesos as well.
+  - **After the card, UTILITY templates arrive and MARKETING ones don't (22 Nov).** `ticket_resolved_he` reached the
+    owner's phone at 08:19 UTC. The staff opener `homies_hello_he` (MARKETING), sent at 07:33 and 08:07, did not.
+    Meta holds marketing templates back per person (131049 is the usual code), more tightly for an unverified
+    business. A test of an opener therefore needs a phone other than the owner's, or the failure status.
+  - **No app is subscribed to "hadas 1"** (`GET /1389698653006050/subscribed_apps` is empty). It is the likely
+    reason no status update reaches Chatwoot since the number's traffic moved under that account on 9 Nov.
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
 - **The number's WhatsApp name is "hadas 1", and Meta caps what we start at 250 conversations a day** (read 11 Nov: `verified_name` "hadas 1", `messaging_limit_tier` TIER_250).
