@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { browserClient } from '@/lib/supabase-browser';
 import ReviewTabs from './Tabs';
+import { chatsFor, toBatchView, type Batch } from './batches';
 import styles from './review.module.css';
 
 // One review set: chats of steps, each step a message (or a button tap) and Michael's replies to it.
@@ -15,8 +16,12 @@ export type Step = {
   buttons?: string[];
   note?: string;
 };
-export type Chat = { n: number; title: string; steps: Step[] };
-export type ReviewSet = { id: string; title: string; data: { intro?: string; date?: string; chats: Chat[] } };
+export type Chat = { n: number; title: string; steps: Step[]; batch?: string };
+export type ReviewSet = {
+  id: string;
+  title: string;
+  data: { intro?: string; date?: string; chats: Chat[]; batches?: Batch[] };
+};
 
 type Mark = { m: 'pass' | 'fail' | null; n: string };
 type Marks = Record<string, Mark>;
@@ -32,9 +37,22 @@ type Filter = (typeof FILTERS)[number]['id'];
 const EMPTY: Mark = { m: null, n: '' };
 const latin = (s: string) => /^[A-Za-z]/.test(s.trim());
 
-export default function ReviewBoard({ set, reviewKey }: { set: ReviewSet; reviewKey: string }) {
+export default function ReviewBoard({
+  set,
+  reviewKey,
+  initialView,
+}: {
+  set: ReviewSet;
+  reviewKey: string;
+  initialView?: string;
+}) {
   const storeKey = `homies-review:${set.id}`;
-  const steps = useMemo(() => set.data.chats.flatMap((c) => c.steps), [set]);
+  const batches = useMemo(() => set.data.batches ?? [], [set]);
+  // Which batch is shown (22 Nov). The choice is `show` in the address, kept without a reload, so a view can
+  // be linked to; the counts in the bar follow it, and "send" still sends every mark.
+  const [view, setView] = useState(() => toBatchView(initialView, batches));
+  const chats = useMemo(() => chatsFor(view, set.data.chats), [view, set]);
+  const steps = useMemo(() => chats.flatMap((c) => c.steps), [chats]);
   const [marks, setMarks] = useState<Marks>({});
   const [notesOpen, setNotesOpen] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState<Filter>('all');
@@ -64,6 +82,18 @@ export default function ReviewBoard({ set, reviewKey }: { set: ReviewSet; review
   const passed = steps.filter((s) => marks[s.id]?.m === 'pass').length;
   const failed = steps.filter((s) => marks[s.id]?.m === 'fail').length;
   const total = steps.length;
+
+  function pickView(v: string) {
+    setView(v);
+    try {
+      const u = new URL(window.location.href);
+      if (v === 'all') u.searchParams.delete('show');
+      else u.searchParams.set('show', v);
+      window.history.replaceState(null, '', u.toString());
+    } catch {
+      /* the view still changes */
+    }
+  }
 
   function setMark(id: string, m: 'pass' | 'fail') {
     setMarks((prev) => {
@@ -145,9 +175,24 @@ export default function ReviewBoard({ set, reviewKey }: { set: ReviewSet; review
           <h1>{set.title}</h1>
           {set.data.date && <p className={styles.date}>{set.data.date}</p>}
           {set.data.intro && <p className={styles.lede}>{set.data.intro}</p>}
+          {batches.length > 0 && (
+            <label className={styles.view}>
+              <span>להציג</span>
+              <select value={view} onChange={(e) => pickView(e.target.value)}>
+                <option value="all">
+                  כל התשובות ({set.data.chats.reduce((k, c) => k + c.steps.length, 0)})
+                </option>
+                {batches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.label} ({chatsFor(b.id, set.data.chats).reduce((k, c) => k + c.steps.length, 0)})
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </section>
 
-        {set.data.chats.map((c) => (
+        {chats.map((c) => (
           <section key={c.n} className={styles.chat}>
             <div className={styles.chatHead}>
               <h2>
