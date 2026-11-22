@@ -11,18 +11,25 @@ conversation that produced it.
 
 ## 2026-11-22
 
-### The card is on "hadas 1" (the owner: "ok i added the card on hadas 1"), read only, 08:25 UTC
+### The opener resent after the card (the owner's screenshot of conversation 105, one tick), read only, 08:09 UTC
+- **Message 3623, `homies_hello_he` to the owner's +63, 08:07:55 UTC:** status `sent`, with a wamid. Meta took it, as it took 07:33's.
+- **`template_analytics` for `homies_hello_he`:** 0 sent on 20, 21 and 22 Nov. Today is not counted yet, so this proves nothing either way.
+- **The phone is the proof:** asked the owner whether it arrived.
+  - If it did not, the next send is the UTILITY `ticket_resolved_he` from Chatwoot's list. That tells billing apart from Meta's per-person limits on MARKETING templates.
+- Today's earlier clock times in this file were guesses that ran ahead of the real time. They are corrected to before 08:08 UTC.
+
+### The card is on "hadas 1" (the owner: "ok i added the card on hadas 1"), read only, 08:05 UTC
 - **`currency`:** "hadas 1" (…050) now reads ARS, where it was unset an hour before. So billing is set up there, in Argentine pesos like …632.
 - **`health_status`:** unchanged. The WABA entity is …632, AVAILABLE; the business is LIMITED (141010); calling over SIP is off (138024/138025).
 - **Not sent by us** (money on each send needs its own go). The owner resends the opener from Chatwoot and looks on the phone.
 
-### "Will I get charged 33 USD?" No: pesos (the owner's screenshot of "ASTDX - Smart Link", "Approximate charges $ 32.75"), read only, 08:15 UTC
+### "Will I get charged 33 USD?" No: pesos (the owner's screenshot of "ASTDX - Smart Link", "Approximate charges $ 32.75"), read only, 08:02 UTC
 - **`currency`:** "ASTDX - Smart Link" (…632) ARS. "hadas 1" (…050) none: the field is unset.
 - **The $32.75 is 32.75 Argentine pesos,** a few US cents. It is `pricing_analytics`' only paid row this month: 9 Nov, UTILITY, REGULAR, country PH, volume 2. That is two templates to the owner's number while the bot ran on UChat.
   - The page's other figures: 365 deliveries, 363 of them free (replies inside 24 hours), no calls.
 - **What it adds:** the card works on …632. "hadas 1" has no currency, so it has likely never had billing set up, which fits no paid template going out from it since 9 Nov.
 
-### The link to the payment settings (the owner: "give me link"), read only, 08:05 UTC
+### The link to the payment settings (the owner: "give me link"), read only, 07:58 UTC
 - **Both accounts that list the number are in business "ASTDX" (`1679634916736747`):** "hadas 1" `1389698653006050` and "ASTDX - Smart Link" `2117787955519632`. Read with `owner_business_info`, which works with our token where the funding fields don't.
   - The number's `health_status` names …632 (AVAILABLE).
   - Meta's counts put the number's traffic under …632 until 9 Nov and under …050 ("hadas 1") since 9 Nov.
@@ -32,7 +39,7 @@ conversation that produced it.
   - the same for …632;
   - the Business Settings path, Accounts → WhatsApp accounts → hadas 1 → Settings → Payment settings.
 
-### Why the staff opener "isn't sent" (the owner's screenshot of conversation 104: "why its not sent"), read only, 07:55 UTC
+### Why the staff opener "isn't sent" (the owner's screenshot of conversation 104: "why its not sent"), read only, 07:50 UTC
 - **Chatwoot sent it and Meta took it:** message 3621, `homies_hello_he` to contact #1 (the owner's +63, …514), status `sent`, with a wamid, at 07:33 UTC. Nothing of ours refused it.
 - **One grey tick is all Chatwoot shows on this number:**
   - No POST from Meta reached `/webhooks/whatsapp` today. On 20 Nov only the two incoming messages did, and nothing after the bot's replies. Per day, 18-22 Nov: 21, 10, 2, 0, 0.
