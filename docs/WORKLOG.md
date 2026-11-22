@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Are the templates approved, all of them? Yes (the owner: "btw is the templated message approved all of it"), read only, 07:30 UTC
+- `wa_templates.py` on `.env`'s WABA (…632) and on "hadas 1" (…050), then `wa_templates.py chatwoot`: `ticket_resolved_he` and `payment_link_he` (UTILITY), `homies_hello_he` and `homies_message_he` (MARKETING) are all APPROVED on both, and all four are synced into Chatwoot inbox 1. "hadas 1" also has Meta's `hello_world`.
+- They belong to these two accounts. At the move to Homies' own account they are submitted there again, as the launch check says.
+
 ### Are we set to launch the chatbot today? Not on Homies' number yet (the owner: "we have a deadline until later today we need to launch the chatbot live so are we set for the chatbot"), read only, 07:20 UTC
 - **"Live" is the 12 Nov go-live sheet** (`local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`): the bot on the number tenants write to today, ManyChat's.
 - **Our side, read now:**

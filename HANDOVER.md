@@ -9,7 +9,7 @@ Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
 > **CHECKED 22 Nov, read only: not set to launch on Homies' number today** (the owner: "we have a deadline until later today we need to launch the chatbot live so are we set for the chatbot"; WORKLOG 22 Nov; the go-live sheet `local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`).
-> - **Ready:** the bot (active, unchanged since 20 Nov), and the number "hadas 1" CONNECTED and GREEN.
+> - **Ready:** the bot (active, unchanged since 20 Nov), and the number "hadas 1" CONNECTED and GREEN. All four templates are APPROVED on both of our accounts and synced into inbox 1 (read 22 Nov); they go to Homies' account again at the move.
 > - **Missing, from Homies:**
 >   - the "office homies" Meta admin on a screen share;
 >   - the number's PIN;
