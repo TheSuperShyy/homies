@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### The 11/22 report (in chat, `/reporter`), 16:25 UTC
+- **Span:** 22 Nov, from the launch check at 07:20 UTC to the token request at 15:17 UTC. That is everything in this day's entries below. Nothing was worked on 21 Nov, and the 11/20 report covered 20 Nov.
+- **Given:** 7 done bullets and 3 Will lines.
+  - **Done:**
+    - the launch check: our side is ready, and Homies still has to turn their old bot off and pick a time;
+    - the automatic messages that had quietly not gone out for about ten days, fixed;
+    - WhatsApp's delivery updates connected to the staff inbox;
+    - Homies' own WhatsApp account read (their main number and a card on it), and the access key requested;
+    - the review checklist: Yariv's three new comments, and four answers brought up to date;
+    - the 21 newest test answers and the new/old dropdown;
+    - the stale-page fix and the Send check.
+  - **Will:**
+    - the automatic messages on Homies' account before the switch, once a second admin approves;
+    - a person from each Homies team in the staff inbox;
+    - the AI account topped up and its limit raised.
+- **Left out on purpose:**
+  - the 32.75 ARS billing question (money only as something to act on);
+  - why conversations stack (a how-to, given to the owner);
+  - the payment-settings link and the reading of each send (folded into the fix);
+  - `wa_templates.py --account homies` and the two `.env` lines (folded into the first Will line).
+
 ### The token waits on a second admin of Homies' business (the owner's AnyDesk screenshot of Business Settings → Requests, 17:17 Israel time), read only
 - **What it shows:**
   - "You requested to generate an access token on הומי'ז ניהול ואחזקת מבנים", status "הבקשה נשלחה";
