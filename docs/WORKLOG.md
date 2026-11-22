@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Templates on Homies' account before the switch? Yes (the owner: "can we upload the template for approvals while the number is still running the old automation"), answered, 08:45 UTC
+- **Templates belong to the WABA, not to the number or the platform** (`wa_templates.py`'s docstring). So they can be approved on Homies' account while ManyChat keeps the number. Neither ManyChat nor the tenants see anything.
+- **What it takes:**
+  - Homies' admin assigns our business, ASTDX `1679634916736747`, as a partner on their WhatsApp account, with message templates (or full control);
+  - the owner assigns that account to our system user in ASTDX's Business Settings;
+  - then `wa_templates.py create <name> --waba <theirs>` dry, then `--apply`, for the four.
+- **Also doable early, without touching ManyChat:** a card on their account, and business verification if it is not done (days; it lifts TIER_250).
+- **Waits for the switch:** the HOMIES subscription (`wa_subscribe.py`), so nothing of theirs reaches our side while ManyChat answers.
+- **The fallback:** their admin creates the four in WhatsApp Manager from our text (`templates.md`).
+
 ### Ready to move to Homies' number? Our side yes, theirs not yet (the owner: "so are we ready to migrate to the actual phone number?"), read only, 08:38 UTC
 - **Read again, unchanged since 07:20:**
   - the AI wallet $30.31, and the key's cap $50 with $49.75 left;
