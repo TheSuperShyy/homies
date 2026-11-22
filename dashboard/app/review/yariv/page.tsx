@@ -9,7 +9,8 @@ import { paragraphs, runs } from './whole';
 // The reviewers' page, second section (owner, 11 Nov: "create a new section ... on the right its yariv
 // comment and on the left that answer", then "ok push live"). One row for each of Yariv's twelve comments
 // of 9 Nov: the comment as written on the right, our answer on the left, with the check's number and a
-// status word. Hebrew only.
+// status word. Hebrew only. Since 22 Nov his later comments follow, headed by the day he wrote them
+// (`given`) in place of a check's number.
 //
 // It opens with the same key as Michael's replies (middleware.ts lets /review/yariv through), so one link
 // from the owner reaches both sections and a visitor without it sees neither. The content is in
@@ -75,7 +76,16 @@ export default async function YarivPage({ searchParams }: { searchParams: { k?: 
             <li key={i.id} className={styles.row} id={`c-${i.id.replace('.', '-')}`}>
               <div className={styles.rowTop}>
                 <h2 className={styles.check}>
-                  {L.check} <span className={styles.num}>{i.id}</span>
+                  {i.given ? (
+                    <>
+                      {L.given}
+                      {i.given}
+                    </>
+                  ) : (
+                    <>
+                      {L.check} <span className={styles.num}>{i.id}</span>
+                    </>
+                  )}
                 </h2>
                 <span className={`${styles.pill} ${styles[i.status]}`}>
                   {WORD[i.status]}

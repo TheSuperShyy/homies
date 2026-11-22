@@ -1,13 +1,21 @@
-// The reviewers' page, second section: Yariv's comments of 9 Nov, each beside our answer.
+// The reviewers' page, second section: Yariv's comments (9 Nov, then 18-19 Nov), each beside our answer.
 //   node --test scripts/check_review_yariv.test.ts
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { REPLIES, STATUSES, countByStatus } from "../dashboard/app/review/yariv/replies.ts";
 import { paragraphs, runs } from "../dashboard/app/review/yariv/whole.ts";
 
-test("the page carries Yariv's twelve comments, each once, in Yariv's own numbering", () => {
+test("the page carries Yariv's twelve comments of 9 Nov in his numbering, then the three of 18-19 Nov", () => {
   assert.deepEqual(REPLIES.items.map((i) => i.id),
-    ["1.1", "2.1", "2.2", "2.3", "2.4", "3.2", "4.1", "5.1", "5.2", "6.2", "6.3", "7.2"]);
+    ["1.1", "2.1", "2.2", "2.3", "2.4", "3.2", "4.1", "5.1", "5.2", "6.2", "6.3", "7.2",
+     "n18-1", "n18-2", "n19-1"]);
+});
+
+test("a later comment carries the day Yariv wrote it; the twelve of 9 Nov carry their check's number only", () => {
+  for (const i of REPLIES.items) {
+    if (i.id.startsWith("n")) assert.match(i.given ?? "", /^\d{1,2} בנובמבר$/, i.id);
+    else assert.equal(i.given, undefined, i.id);
+  }
 });
 
 test("every comment has both sides, and a status the page knows", () => {
@@ -18,8 +26,8 @@ test("every comment has both sides, and a status the page knows", () => {
   }
 });
 
-test("the counts at the top: nine done, one unchanged, two answers", () => {
-  assert.deepEqual(countByStatus(REPLIES.items), { done: 9, same: 1, answered: 2 });
+test("the counts at the top: twelve done, one unchanged, two answers", () => {
+  assert.deepEqual(countByStatus(REPLIES.items), { done: 12, same: 1, answered: 2 });
 });
 
 test("what the page says around the comments is Hebrew, as on the replies page", () => {
