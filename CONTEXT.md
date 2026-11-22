@@ -987,6 +987,10 @@ on a database so we can retrieve it add a send button"*).
 
 **The reviewers' page has a second section since 11 Nov: Yariv's comments beside our answers** (owner: *"create a new section ... in natural local native hebrew ... on the right its yariv comment and on the left that answer"*, then *"ok push live"*; PR #12).
 - **`/review/yariv`, behind the same key.** One row per comment of the 9 Nov review: the comment as written on the right, our answer on the left, the check's number and a status word. A tab strip on both sections carries the key.
+  - **Since 22 Nov (PR #19) Yariv's later comments follow the twelve** (the owner: "update it with the new feedbacks from yariv"): 18 Nov bank transfer, 18 Nov opener with a free field, 19 Nov card only.
+    - Each is in his own words, headed by the day he wrote it (`given`, ids `n18-1`, `n18-2`, `n19-1`) instead of a check's number.
+    - A comment the owner forwarded only in English is not added, because the page quotes Yariv as written. That covers 16 Nov's "יתרה" on the debt call.
+  - **An answer the bot has outgrown is rewritten in place,** never left as current. On 22 Nov: 2.2 (the yes before a ticket; someone stuck in the lift is an emergency), 5.2 (the link first for a standing order), 6.2 and 6.3 (anything urgent, any hour, only the line; gas gets the gas company and the line).
 - **A reply to Yariv's numbered comments is item by item:** the number, a status word (בוצע, ללא שינוי, תשובה), the answer. "Done" only where the bot really does it; a question that changed nothing is "answer".
 - **The Hebrew is written as Hebrew,** never carried over from the English list.
 - **What may sit in the public repo is decided by whose words they are.** Yariv's comments and our answers are in `dashboard/app/review/yariv/replies.ts`. Michael's replies quote real chats, so they stay in the database.

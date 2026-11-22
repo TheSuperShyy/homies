@@ -11,6 +11,28 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### LIVE 09:33:38 UTC: the reviewers' page carries Yariv's comments of 18-19 Nov, and four answers are brought up to date (the owner: "update it with the new feedbacks from yariv"; PR #19, `ee62637`)
+- **"The checklist"** is the dashboard's `/review` page. Its Yariv section held his 12 comments of 9 Nov, last updated 11 Nov.
+- **Added, in his own words** (from this WORKLOG's 18 and 19 Nov entries), each headed by the day he wrote it:
+  - `n18-1`: a bank transfer goes to a person from collections. The answer: what Michael says, the chat to Collections with `bank-transfer` and a note, Michael answering until a person does, the same on both phone agents, and that no Homies person is in Collections yet.
+  - `n18-2`: an opener with a free field. The answer: both openers approved on 19 Nov and in staff's template list; the fixed one reached the phone on 22 Nov; both go to Homies' account before the move.
+  - `n19-1`: card only. The answer: the link said to be by card and no other way named; another way only when asked, to collections; a bank standing order by email, as in 5.2; the same on the phones.
+- **Rewritten, since the bot moved on after 11 Nov** (read from the live prompt today):
+  - 2.2: the yes before a ticket, and someone stuck in the lift is an emergency;
+  - 5.2: a standing order gets the link first, and the call or the bank goes to collections by email. No email has gone yet: "Homies — Standing order email" has no run since 9 Nov;
+  - 6.2: anything urgent, any hour, gets only 077-6687949. Gas gets the gas company and the line, which settles the old gas question; its status note is removed;
+  - 6.3: the same when asked again.
+- **Left out:**
+  - 16 Nov's "יתרה" (debt call; the owner forwarded it only in English);
+  - 17 Nov's videos (adding a contact in Chatwoot, answered with the staff video);
+  - 18 Nov's question on bank details (answered inside `n18-1`).
+- **Shipped:**
+  - `page.tsx` heads a dated comment "הערה מ-<day>", where it heads a 9 Nov one "בדיקה <n>";
+  - the test holds 15 ids, 12/1/2 and the day (9/9 locally);
+  - PR checks green (types, tests, both Vercel previews), squash-merged, and the dashboard's production deploy succeeded.
+  - Read live with the key (not printed): the three comments, the dated heading, the new 5.2 and 6.2, "עודכן ב-22 בנובמבר 2026", and the old 6.2 text gone.
+- Built in the worktree `d:/work/Homie-wt-review` from `origin/main`, removed after the merge.
+
 ### "What if they already have an existing app?" (the owner), read only, 09:05 UTC
 - **Make (`make_api.py`, GET only):** Homies' organisation has no WhatsApp connection: Google ×2, Monday ×2 (one "SQUARE"), Slack. The old flow's WhatsApp side is ManyChat's own app. So an app Homies already has is not part of today's bot.
 - **Told the owner:**

@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 22 Nov 09:33:38 UTC: the reviewers' page (`/review/yariv`) carries Yariv's comments of 18-19 Nov** (the owner: "update it with the new feedbacks from yariv"; PR #19, `ee62637`; WORKLOG and CONTEXT 22 Nov).
+> - Bank transfer, the opener with a free field, and card only, each in his words with our answer.
+> - 2.2, 5.2, 6.2 and 6.3 are rewritten to what the bot does now. The "stale 6.2" noted on 12 Nov is closed.
+> - The source is `dashboard/app/review/yariv/replies.ts` on `main` (not on `feature/chatbot`). A change there goes through a PR.
+>
 > **22 Nov, PROVEN 08:32 UTC: EVERY TEMPLATE GOES OUT FROM THE BOT'S NUMBER AGAIN, AND CHATWOOT SEES DELIVERED AND READ** (the owner's screenshots; WORKLOG and CONTEXT 22 Nov). The staff opener from #106's reply box reads `read` in Chatwoot (message 3627), the first status update since 10 Nov. It came after the card on "hadas 1" and the HOMIES subscription. The history follows.
 > - **Found:** from 9 Nov to 22 Nov no template went out from "hadas 1" (…050), where Meta counts the number. The 16 Nov payment link and the 17 Nov "ticket closed" had WhatsApp ids, and Meta's `template_analytics` shows no send. The account had no billing at all (no `currency`).
 > - **Fixed by the owner, 22 Nov by 08:05 UTC:** a card on "hadas 1" (currency ARS, Argentine pesos, as on …632). **Proven 08:19 UTC:** `ticket_resolved_he` from Chatwoot reached the owner's phone (conversation 106). So the "ticket closed" message and the payment link, both UTILITY, work.
