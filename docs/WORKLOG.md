@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Inside Homies' Meta (the owner's AnyDesk screenshot of Meta for Developers, 17:06 Israel time), read only
+- **What it shows:** Homies' own app, named "HOMIES" (not ours), in Homies' business, on the WhatsApp use case's configuration page.
+  - Their WhatsApp account "הומי'ז ניהול ואחזקת מבנים" holds **+972 77-668-7949, Registered**: Homies' main line, the same number Michael gives for emergencies.
+  - "Add payment to send business-initiated messages" is done, so a card is already on their account.
+  - The webhook fields are empty and "Subscribe webhooks" is off. Business verification is not done ("up to 2 numbers ... once you complete business verification, up to 20").
+- **Told the owner:**
+  - leave the callback URL, the verify token, "Verify and save", "Remove subscription" and "Subscribe webhooks" alone until the switch;
+  - next is the system user and its token for this app (with their WhatsApp account), put into `.env`;
+  - the `business_id` in the address is the business, not the WhatsApp account's ID.
+
 ### Will a Send be saved? Yes, checked (the owner: "ok so will the data be saved when submitted?"), 10:45 UTC
 - **`reply_reviews` is empty:** no reviewer has pressed Send on any set yet.
 - **`submit_reply_review` may be called by anon:** `has_function_privilege` true.
