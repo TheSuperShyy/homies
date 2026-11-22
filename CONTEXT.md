@@ -707,6 +707,17 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
     are filled. Meta's side: a blank may not open or close the body, and the typed text may not hold line breaks.
   - **The two staff openers are approved on both accounts and synced into inbox 1** (read 19 Nov, about 11:35
     UTC): `homies_hello_he` (fixed) and `homies_message_he` (a free field), both MARKETING, as submitted.
+- **Homies' own account gets the four templates before the switch, with Homies' own token (22 Nov).** The owner
+  asked to have them approved while ManyChat still runs the number. Templates belong to the account, so nothing
+  there touches the number or ManyChat.
+  - **The owner chose to work inside Homies' Meta directly** ("no i will access homies fb as is"), not partner access
+    for ASTDX. The owner makes a Homies app and a never-expiring system-user token, and fills `HOMIES_WHATSAPP_TOKEN`
+    and `HOMIES_WHATSAPP_WABA_ID` in `.env` (the empty lines are there since 22 Nov).
+  - **The command:** `wa_templates.py --account homies list | create <name> [--apply]`. It refuses while those
+    lines are empty, and without `--account` it works on our account as before.
+  - **Early too:** a card on their account (its currency chosen on purpose) and business verification.
+  - **Waits for the switch:** subscribing an app to their WABA (`wa_subscribe.py`). Until then nothing of
+    theirs comes to our side while ManyChat answers.
 - **The closed-ticket message quotes only the report** (039, 10 Nov): `{{2}}` is the description before the
   first " | ", so what the bot adds to a ticket ("הדייר שוב שואל...") never reaches the tenant.
 - **Templates belong to the number's own WhatsApp account.** No template leaves UChat until it is

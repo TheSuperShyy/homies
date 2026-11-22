@@ -22,6 +22,7 @@ conversation that produced it.
   - a card on their WhatsApp account (choose the currency on purpose, since ours became ARS);
   - business verification;
   - nothing on the number or on ManyChat's app.
+- **CONTEXT** holds the standing decision (Homies' templates before the switch, with their own token; the subscription waits). The stop hook caught that it was missing from the first commit. HANDOVER already had the plan.
 
 ### Templates on Homies' account before the switch? Yes (the owner: "can we upload the template for approvals while the number is still running the old automation"), answered, 08:45 UTC
 - **Templates belong to the WABA, not to the number or the platform** (`wa_templates.py`'s docstring). So they can be approved on Homies' account while ManyChat keeps the number. Neither ManyChat nor the tenants see anything.
