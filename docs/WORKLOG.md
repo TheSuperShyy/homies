@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-22
 
+### Proven: the staff opener arrives and Meta's updates reach Chatwoot (the owner: "ok i sent it now it sends"), 08:33 UTC
+- **Message 3627, `homies_hello_he`, sent from #106's reply box at 08:32:01 UTC:** Chatwoot's status is `read`. Three POSTs from Meta reached `/webhooks/whatsapp` after 08:25, the first status updates since 10 Nov.
+- **So both fixes hold:**
+  - the card on "hadas 1": UTILITY at 08:19, MARKETING at 08:32;
+  - the HOMIES subscription: delivered and read now show in Chatwoot, and a failure would show its reason.
+  - Why 08:07's opener failed after the card is not known: no status came then. Most likely the card took a few minutes to take effect.
+- Today's earlier messages (07:33, 08:07, 08:19) stay `sent`. Meta doesn't send their updates again.
+
 ### Why the owner's conversations stack (the owner's screenshot: "why is it stacking like this"), read only, 08:30 UTC
 - **Contact #1's conversations in inbox 1:** #104, #105 and #106 were each created at their own send (07:33, 08:07, 08:19 UTC), all `pending`, each with "Assaf Clix self-assigned". That is Chatwoot's "New conversation" form: it opens a new conversation every time.
   - #102 (19 Nov's Grok run) is still open. #1 (August) and the rest are resolved.

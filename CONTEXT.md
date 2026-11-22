@@ -772,6 +772,9 @@ current bot"*). This supersedes the 3 Nov line above: "the live bot" means the C
     **Since 22 Nov 08:24 UTC HOMIES is subscribed there** (`scripts/wa_subscribe.py --waba 1389698653006050
     --apply`, the owner's "ok fix it"), with the events sent to Chatwoot's phone webhook. `--remove` undoes it.
     At the move to Homies' own account, the same subscription goes on their WABA.
+    **Proven 08:32 UTC:** the staff opener from Chatwoot read `read`, the first status update since 10 Nov. Since
+    then a Chatwoot status of `delivered` / `read` on this number is real delivery, and `failed` carries Meta's
+    reason.
 - **`.env`'s `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WABA_ID` and `WHATSAPP_REGISTER_PIN` are the bot's number's,**
   the Israeli one; the retired test number's are `WHATSAPP_TEST_*`.
 - **The number's WhatsApp name is "hadas 1", and Meta caps what we start at 250 conversations a day** (read 11 Nov: `verified_name` "hadas 1", `messaging_limit_tier` TIER_250).

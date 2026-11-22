@@ -8,15 +8,14 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **22 Nov: THE PAID TEMPLATES GO OUT AGAIN FROM THE BOT'S NUMBER; THE MARKETING OPENERS STILL DON'T** (the owner's screenshots; WORKLOG and CONTEXT 22 Nov).
+> **22 Nov, PROVEN 08:32 UTC: EVERY TEMPLATE GOES OUT FROM THE BOT'S NUMBER AGAIN, AND CHATWOOT SEES DELIVERED AND READ** (the owner's screenshots; WORKLOG and CONTEXT 22 Nov). The staff opener from #106's reply box reads `read` in Chatwoot (message 3627), the first status update since 10 Nov. It came after the card on "hadas 1" and the HOMIES subscription. The history follows.
 > - **Found:** from 9 Nov to 22 Nov no template went out from "hadas 1" (…050), where Meta counts the number. The 16 Nov payment link and the 17 Nov "ticket closed" had WhatsApp ids, and Meta's `template_analytics` shows no send. The account had no billing at all (no `currency`).
 > - **Fixed by the owner, 22 Nov by 08:05 UTC:** a card on "hadas 1" (currency ARS, Argentine pesos, as on …632). **Proven 08:19 UTC:** `ticket_resolved_he` from Chatwoot reached the owner's phone (conversation 106). So the "ticket closed" message and the payment link, both UTILITY, work.
 > - **Still not arriving:** the MARKETING staff opener `homies_hello_he` (07:33 and 08:07 UTC, both with WhatsApp ids). Meta holds it back, and the reason is in a failure status that reaches none of our systems (likely its per-person marketing limit, 131049).
 > - **Why we see no status:** no app is subscribed to "hadas 1" (`subscribed_apps` empty). Chatwoot sends with our HOMIES token (app 885069647663983), whose phone override is Chatwoot. "ASTDX - Smart Link" (…632) answers `subscribed_apps` with HTTP 500.
 > - **Owed:**
->   - ~~the owner's go to subscribe HOMIES to …050~~ **Done 08:24:46 UTC** (the owner: "ok fix it"; `scripts/wa_subscribe.py --waba 1389698653006050 --apply`, events to Chatwoot's phone webhook; `--remove` undoes it). **Owed: the proof.** The owner resends the opener, then its status is read in Chatwoot: delivered ticks, or failed with the reason;
->   - the opener sent once to a phone other than the owner's;
->   - the same billing check on Homies' own account at the move (the go-live sheet's card).
+>   - ~~the owner's go to subscribe HOMIES to …050~~ **Done 08:24:46 UTC** (the owner: "ok fix it"; `scripts/wa_subscribe.py --waba 1389698653006050 --apply`, events to Chatwoot's phone webhook; `--remove` undoes it). **Proven 08:32 UTC:** the opener reads `read`;
+>   - **at the move to Homies' own account, all three again on their WABA:** a card, the four templates, and the HOMIES subscription (`wa_subscribe.py --waba <theirs> --apply`).
 > - **The 32.75 "$" on ASTDX's billing page is pesos:** two UTILITY templates to PH on 9 Nov, a few US cents.
 >
 > **CHECKED 22 Nov, read only: not set to launch on Homies' number today** (the owner: "we have a deadline until later today we need to launch the chatbot live so are we set for the chatbot"; WORKLOG 22 Nov; the go-live sheet `local/golive/העלאת הבוט לאוויר - מה צריך מהומיז.xlsx`).
