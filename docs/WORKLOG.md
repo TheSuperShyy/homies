@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The owner's screenshot of People is a different portfolio (AnyDesk, 11:50 Israel time), read only, 09:50 UTC
+- **What it shows:** Settings → Users → People of a portfolio named "Homies" (business id …7261), with one person, Yariv Levi, full access. The page is in English through the browser's translation.
+- **Not the one that matters:** CLIX, the HOMIES app, their WhatsApp account and the token request are in "הומי'ז ניהול ואחזקת מבנים" (business id …2992, the earlier screenshots' addresses). Its People list is what shows who can approve. Meta's note there says the other admins were told, so it has more than one.
+- **Told the owner:** switch to that portfolio (the business name at the top of Settings) and read People there. If Yariv is its only admin too, the temporary token is the way for the templates.
+
 ### Another way than the second admin? For the templates, yes (the owner: "is there other way to do it"), answered, 09:48 UTC
 - **A temporary token:** the HOMIES app's WhatsApp API Setup page gives a token of Yariv's own (24 hours, with the WhatsApp permissions), and Graph API Explorer gives one for about an hour. Either is enough to submit the four templates with `wa_templates.py --account homies`, so Meta's review can start now. If it too asks for another admin, the second way.
 - **No token at all:** the four created by hand in their WhatsApp Manager from `docs/features/11-whatsapp-bot/templates.md`.
