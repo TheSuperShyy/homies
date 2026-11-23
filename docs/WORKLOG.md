@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### "YOU TOLD ME WE ONLY NEED SYSTEM USER TOKEN" (the owner), answered, 11:50 UTC
+- **What was said at 08:15 UTC:** "Yes, mostly", with the app's Configuration page as "most likely one visit", unless the app secret goes into `.env`. That was too buried; the owner took it as token only.
+- **Meta's override doc (read now):**
+  - a `messages` webhook goes to the number's override first, then the WABA's, then the app's own callback URL;
+  - only some fields can be overridden (messages among them);
+  - it doesn't say whether the app must also subscribe the `messages` field itself.
+  - Chatwoot's connect step passes `subscribed_fields` itself, so the app setting may not be needed. That is known only on the night.
+- **Told the owner:** the token does the switch. The app's own webhook setting is the one thing it can't reach. Two choices:
+  - the secret now (2 minutes on AnyDesk);
+  - or skip it, and if no message arrives after the switch, AnyDesk then (a few more minutes down) or roll back.
+  - Recommended: the first.
+
 ### What to do on AnyDesk on Yariv's PC (the owner: "in short what do i need to do with anydesk on yariv pc"), answered, 11:41 UTC
 - **Read now, with their token:** their WhatsApp account's billing is set (currency USD), so no card is owed. Business not verified. `HOMIES_APP_SECRET` is not in `.env` yet.
 - **Told the owner:**
