@@ -11,6 +11,25 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### What's left before the switch, and the downtime (the owner: "ok so what do we need to do and give me the possible downtime"), answered, 11:33 UTC
+- **Read now, nothing written:**
+  - The `switch_to_homies.py` dry run: their token never expires; 077-668-7949 is CONNECTED, GREEN, name APPROVED; the four templates are APPROVED; `validates : True`; ManyChat is the only app connected.
+  - The AI wallet: $30.31 left ($60 in, $29.69 used). The key's cap: $49.75 of $50 left.
+- **Told the owner, still to do:**
+  - from Homies: a switch time after hours, and who switches ManyChat's replies off; one person per department signed in to Chatwoot; the OK for OXS tickets for every tenant;
+  - their HOMIES app's secret in `.env` beforehand. If Meta wants the app's own webhook (the `messages` field), it is then set from here in seconds, not on AnyDesk in the middle of the switch;
+  - from the owner: a wallet top-up and a higher cap;
+  - later: business verification. Until then, 250 conversations a day that we start; replies are not limited.
+- **Downtime, as told:**
+  - about 1-2 minutes with no WhatsApp reply, from ManyChat going off until `--apply` ends;
+  - the sitting takes about 15 minutes;
+  - phone calls to the number are not affected;
+  - a rollback takes about 2 minutes.
+- **Recommended: on the night, ManyChat's replies are switched off, not disconnected (`--manychat-is-off`).**
+  - A message in the gap then waits in ManyChat's inbox instead of reaching no one.
+  - The number's registration is not touched. We can't see from here whether ManyChat's Disconnect deregisters the number. If it did, the 6-digit PIN would be needed: 10-15 minutes or more.
+- **What could stretch it:** the app's webhook (above), and ManyChat's Disconnect.
+
 ### A guidebook PDF: connecting WhatsApp (Meta) to a chatbot (the owner: "create a documentation pdf file for me so that this wont happen again ... different scenarios like existing bot that needs to be replaced ... steps with screenshots and arrows in english like a guidebook"), 11:12 UTC
 - **Why the owner asked:** the Homies system-user token waited on the second admin. The owner asked why: two full admins in "הומי'ז ניהול ואחזקת מבנים" means Meta wants the other admin to approve a permanent token, the requester never can, and working inside Yariv's personal login made the request his.
 - **The file:** `local/meta-guide/Meta-WhatsApp-Setup-Guide.pdf`, 15 A4 pages, 2.5 MB, gitignored because the screenshots are the client's. Opened in File Explorer. The text (`guide_content.md`) was written here from CONTEXT, HANDOVER and this log. Layout and figures came from a helper agent, `build_guide.py` (fig/, guide.html, preview/), which rebuilds it in about a minute.

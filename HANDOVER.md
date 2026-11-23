@@ -60,6 +60,12 @@ appended to.
 >       - The four templates are APPROVED on their account.
 >       - **Before `--apply`:** the owner's go, and ManyChat's WhatsApp off (it is the only app on their number), or both bots answer.
 >       - The token has no business_management, so their WABA list can't be read; the number's `health_status` names the WABA. No new request is needed, since a system user's token reaches whatever the system user holds.
+>       - **Told the owner 23 Nov 11:33 UTC (what's left, and the downtime; WORKLOG):**
+>         - Downtime: about 1-2 minutes with no WhatsApp reply. The sitting takes about 15 minutes, a rollback about 2.
+>         - Recommended: on the night, ManyChat's replies are switched off, not disconnected (`--manychat-is-off`). A message in the gap then waits in ManyChat's inbox, and the number's registration is not touched.
+>         - Owed:
+>           - their HOMIES app's secret in `.env` beforehand, so the app-level webhook, if Meta wants it, is set from here;
+>           - the wallet top-up ($30.31 left) and a higher cap.
 >     - **The approver (23 Nov):** People in "הומי'ז ניהול ואחזקת מבנים" lists two with full access, Yariv and one other admin (name kept out of the repo). A Hebrew how-to video for that admin is in `local/meta-approve-video/meta-approve-request-he.mp4`, and a voiced copy (the Ronit video's Cartesia "Ayala", Clix's key) is `meta-approve-request-he-voice.mp4`. `build.py [--voice]` rebuilds them.
 >     - **Two portfolios on Yariv's login (23 Nov):** "Homies" (…7261), where he is the only person, and "הומי'ז ניהול ואחזקת מבנים" (…2992), which holds CLIX, the HOMIES app, their WhatsApp account and the request. The approver is in the second one's People list.
 >     - **The templates need not wait for it (told the owner 23 Nov):** a temporary token from the HOMIES app's WhatsApp API Setup page (24 hours) is enough for `wa_templates.py --account homies`. Or the four can be created by hand in their WhatsApp Manager from `templates.md`. The system user token is still needed before the switch.
