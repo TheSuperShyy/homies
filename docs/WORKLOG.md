@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### What the owner needs to publish their app ("ok so what do i need"), answered, 14:25 UTC
+- **Told the owner:**
+  - App settings → Basic: category "Business and pages", the app icon, and a data-deletion URL if asked (the privacy-policy link). The privacy policy is already set.
+  - Save, then Publish.
+  - Leave the callback URL, verify token and "Subscribe webhooks" alone.
+- **The icon:** `local/homies-app-icon-1024.png`, Homies-Logo.png (332 px) scaled to 1024×1024. Shown in File Explorer; it goes to Yariv's PC over AnyDesk.
+
 ### ManyChat stays on until the owner says so (the owner: "after i do this dont turn off the manychat ok until i say so"), 14:20 UTC
 - Recorded in HANDOVER. After the app is published, nothing is switched and ManyChat is not touched until the owner's word in chat.
 - Publishing their app changes nothing for ManyChat: their app is not subscribed to their WhatsApp account; only ManyChat's is.
