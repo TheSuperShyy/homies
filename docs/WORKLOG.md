@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Anything else needed besides the token, the app id and the secret? (the owner), answered, 13:25 UTC
+- **From Meta:** only the WhatsApp account ID back in `HOMIES_WHATSAPP_WABA_ID`. It was still empty at 13:25 UTC. Both scripts find their number through it: the switch, and the typing nodes.
+- **The token's reach, confirmed:** templates, sending, the WABA subscription, and the number's status and profile. The card, verification, people and any new token stay in their Meta. None is needed for the switch: the card is on, and verification comes later.
+
 ### Are we set? The app secret is in and checked, the switch script sets the app's webhook, and the WABA ID needs putting back (the owner: "are we set i put the app id and secret and the system user in the settings"), 13:20 UTC
 - **The owner's 13:15 UTC save of `.env`:** the app secret went over `HOMIES_WHATSAPP_TOKEN`, and the app id over `HOMIES_WHATSAPP_WABA_ID`.
 - **Fixed, after a backup** (`local/env-backups/.env.before-homies-app-secret-fix-2026-11-23T2119`):
