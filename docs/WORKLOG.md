@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The phone agent's rules against the updated chatbot (the owner: "i mean is the rules the same or similar to the new updated chatbot?"), read live again, 09:06 UTC
+- **The same:**
+  - Michael from the service team, an honest digital assistant when asked, "I" only;
+  - a manager request handled the chatbot's way;
+  - money answers from the system;
+  - payment by card only, with other ways going to collections and a standing order recorded;
+  - the lift company, and gas to the gas company;
+  - one person, masculine until shown otherwise.
+- **Behind the chatbot (its changes of 11-12 Nov):**
+  - **Emergencies:** someone in danger gets an urgent note at once, then the name, the address and an urgent ticket. Office details go only to someone who asks, and to an urgent fault while the office is closed.
+  - **Gas:** word for word, the gas company and "anything else in the building?". Asked again, the gas company again. Never the line. The chatbot gives the line after the gas company.
+  - **Tickets:** opened without asking first.
+- **Can't apply on a call:** the payment link in the chat, the "ticket closed" message, and the re-introduction after 8 quiet hours.
+
 ### Is the voice agent the same as the chatbot? A separate agent with nearly the same rules; two twins still owed (the owner: "ok is the voice agent the same as the chatbot?"), read only, 09:00 UTC
 - **Read live from Vapi (GET only):** the incoming agent `10ae859a`, last changed 19 Nov 12:20:12 UTC (card-only), on openai `gpt-5.6-sol`, prompt 15,310 characters, 8 tools. The debt agent `4bc03b57` was changed at the same minute. The chatbot runs on Gemini in n8n.
 - **Carried:** the chatbot's rules of 10 Nov, and the bank transfer and card-only rules of 19 Nov.
