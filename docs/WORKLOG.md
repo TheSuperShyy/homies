@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The guidebook PDF, updated with today's two lessons (the owner: "ok right now edit the pdf"), 11:52 UTC
+- **Added (`local/meta-guide/guide_content.md`, rebuilt; still 15 pages; opened in File Explorer):**
+  - **Section 1:** a new row, "We thought the token was all we needed": the token can't change the app's own settings; copy the app secret with the token.
+  - **Section 2:** the app's settings change with the app secret.
+  - **Section 3:** the app secret is item 3 of the client list, now 10 items.
+  - **4.5:** a tip, "In the same visit: copy the app secret" (App settings → Basic → Show).
+  - **4.10:** the webhook is the app's own setting (set it logged in, or with the secret). On a live number, subscribing the app is the switch itself.
+  - **Section 6:**
+    - The day-before list now has the token and the app secret, and staff in the new inbox for each department. It used to say "App subscribed", which on a live number is the switch.
+    - The switch: the old bot's replies go off, not Disconnect, and the number is connected right away.
+    - Expected downtime: 1-2 minutes; calls are not affected; a rollback takes 2 minutes; and what stretches it.
+  - **Section 7:** "Nothing arrives after connecting the number".
+  - **Section 8:** "App secret".
+- `build_guide.py`: "In the same visit:" gets the tip box. Section 1's new row was cut short, so the table stays on one page.
+
 ### "YOU TOLD ME WE ONLY NEED SYSTEM USER TOKEN" (the owner), answered, 11:50 UTC
 - **What was said at 08:15 UTC:** "Yes, mostly", with the app's Configuration page as "most likely one visit", unless the app secret goes into `.env`. That was too buried; the owner took it as token only.
 - **Meta's override doc (read now):**
