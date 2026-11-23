@@ -78,6 +78,10 @@ appended to.
 >               - Meta's own box on its WhatsApp setup page (the owner's screenshot) says an unpublished app gets only test webhooks, no real messages.
 >               - Publishing doesn't touch ManyChat: App settings → Basic, then Publish. The category is not set and the icon is the default; the public privacy policy is set.
 >               - `switch_to_homies.py --apply` now needs `--app-is-published`. Runbook, "Still needed".
+>             - **PUBLISHED, by the owner's word (23 Nov ~14:20 UTC).**
+>               - Their Publish page read "All required app settings are complete", and the owner pressed Publish.
+>               - Read with the app secret: the category is now Business, the privacy policy is set, and the icon is still the default (not required).
+>               - The mode itself can't be read with the app secret. Confirm by eye that the yellow "unpublished" box is gone from the app's WhatsApp setup page; then `--app-is-published` is honest.
 >             - **THE OWNER, 23 Nov 14:20 UTC: "after i do this dont turn off the manychat ok until i say so".**
 >               - After the app is published, nothing is switched and ManyChat is not touched (no `--apply`, nothing in ManyChat, no `MANYCHAT_API_KEY` call that changes anything) until the owner says so in chat.
 >               - Publishing alone leaves ManyChat answering as before.

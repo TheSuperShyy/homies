@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Their app published (the owner: "ok its published check now"), checked as far as Meta lets us, 14:30 UTC
+- **The owner's screenshot before it:** the Publish page read "All required app settings are complete", with the WhatsApp use case listed. The owner then pressed Publish.
+- **Read with the app secret:**
+  - the category is now "Business", and the privacy policy is set;
+  - the icon is still Meta's default. Publishing didn't need it.
+  - App mode has no Graph field (`app_mode`, `is_in_development_mode`, `status` and others are unknown fields), so "published" can't be confirmed from here.
+- **Told the owner:** the one proof is the app's WhatsApp setup page without the yellow "unpublished" box. A screenshot next time on AnyDesk. Nothing else changes, and ManyChat stays on until the owner says so.
+
 ### What the owner needs to publish their app ("ok so what do i need"), answered, 14:25 UTC
 - **Told the owner:**
   - App settings → Basic: category "Business and pages", the app icon, and a data-deletion URL if asked (the privacy-policy link). The privacy policy is already set.
