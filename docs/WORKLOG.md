@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### What to do on AnyDesk on Yariv's PC (the owner: "in short what do i need to do with anydesk on yariv pc"), answered, 11:41 UTC
+- **Read now, with their token:** their WhatsApp account's billing is set (currency USD), so no card is owed. Business not verified. `HOMIES_APP_SECRET` is not in `.env` yet.
+- **Told the owner:**
+  - now: the HOMIES app's secret into `.env` as `HOMIES_APP_SECRET` (App settings → Basic), with nothing else changed;
+  - on the night, if ManyChat opens on that PC: its replies off, not Disconnect;
+  - later: business verification.
+
 ### What's left before the switch, and the downtime (the owner: "ok so what do we need to do and give me the possible downtime"), answered, 11:33 UTC
 - **Read now, nothing written:**
   - The `switch_to_homies.py` dry run: their token never expires; 077-668-7949 is CONNECTED, GREEN, name APPROVED; the four templates are APPROVED; `validates : True`; ManyChat is the only app connected.
