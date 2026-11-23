@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Is it the same number on the HOMIES app? Yes (the owner: "is the number the same on the app i sent you last night"), the screenshot looked at again, 08:43 UTC
+- **The 22 Nov 15:06 UTC screenshot** (the HOMIES app, WhatsApp use case, Configuration) shows, under their WhatsApp account "הומי'ז ניהול ואחזקת מבנים", **+972 77-668-7949, Registered**. That is the number above. The phone number ID is on it too; it is not written here.
+- On the same page: the callback URL and verify token are empty, "Remove subscription" is greyed out, "Subscribe webhooks" is off, and the payment step is ticked. So the app is not connected to the number's messages, as read on 22 Nov.
+
 ### Which number is Homies'? 077-668-7949 (the owner: "so what number is the homies one"), answered from the records, 08:42 UTC
 - **Homies' number:** +972 77-668-7949, Registered on their WhatsApp account "הומי'ז ניהול ואחזקת מבנים" (the 22 Nov screenshot). It is also their office line (`docs/knowledge/homies.md`, `HOMIES_CALLBACK_NUMBER`) and the emergency line Michael gives. ManyChat's replies send tenants to call it too.
 - **The bot's number today is ours:** "hadas 1" (+972 …029), in ASTDX.
