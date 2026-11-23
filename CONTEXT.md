@@ -743,7 +743,7 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
       unless the app's secret is in `.env`.
     - **That webhook is needed, not a maybe (Meta's docs, read 23 Nov):**
       - Webhook fields are subscribed at the app level (App Dashboard → WhatsApp → Configuration). `subscribed_apps` documents no fields of its own, and their app has none.
-      - Not scripted yet. With `HOMIES_APP_SECRET`, it is one `POST /{app-id}/subscriptions` right after inbox 1 takes their number, since the callback has to verify against inbox 1.
+      - Scripted 23 Nov. `switch_to_homies.py --apply` sets it with `HOMIES_APP_SECRET` (in `.env`, checked) right after inbox 1 takes their number, since the callback has to verify against inbox 1. `--restore` removes it.
   - **Meta's prices since 1 Oct 2026 (read 23 Nov):**
     - Replies inside the 24-hour window are free up to 1,000 a month per number, then charged.
     - Utility templates are charged even inside the window.

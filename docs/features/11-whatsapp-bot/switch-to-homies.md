@@ -26,8 +26,9 @@ read-only checks below have run. ManyChat still answers on Homies' number, and o
      Chatwoot;
    - the template sync.
    If a step fails, inbox 1 is back on the test number in the same run.
-   **Not done by the script:** their app's own webhook (callback URL, verify token, the `messages` field). See the
-   list below.
+   - Then the script sets their app's own webhook with `HOMIES_APP_SECRET`: the callback is the override just set,
+     with inbox 1's verify token and the `messages` field. `--apply` refuses without the secret, unless
+     `--app-webhook-by-hand`, and `--restore` removes it.
 3. **The typing dots:**
    - `python scripts/n8n_whatsapp_tohomies.py --dump F`;
    - then `python scripts/check_whatsapp_rules.py --candidate F --replay`, which must be all green;
@@ -54,13 +55,13 @@ read-only checks below have run. ManyChat still answers on Homies' number, and o
 
 ## Still needed from Homies before the switch
 
-- **Their HOMIES app's secret, in `.env` as `HOMIES_APP_SECRET`** (App settings → Basic). It is for their app's own
-  webhook:
-  - Meta's docs subscribe webhook fields at the app level (read 23 Nov). The WABA subscription documents no fields of
-    its own, and their app has none, so this is needed.
-  - With the secret, it is one `POST /{app-id}/subscriptions` (callback URL, verify token, `messages`) right after step
-    2 moves inbox 1, since the callback has to verify against inbox 1. Not scripted yet.
-  - Without the secret, someone logged in to their Meta sets it on the app's WhatsApp → Configuration page.
+- ~~Their HOMIES app's secret~~ **in `.env` since 23 Nov 13:19 UTC** (`HOMIES_APP_ID`, `HOMIES_APP_SECRET`).
+  - Checked: it opens their app, whose own webhook is still empty.
+  - The app's webhook is needed: Meta's docs subscribe webhook fields at the app level, and the WABA subscription
+    documents none of its own (read 23 Nov).
+  - Step 2 sets it.
+- **`HOMIES_WHATSAPP_WABA_ID` is empty again.** At 13:15 UTC the app id was saved over it. The owner puts the
+  WhatsApp account ID (…0527) back, from the HOMIES app → WhatsApp → API Setup.
 - Who turns ManyChat's WhatsApp off at the switch, and when (the switch time).
 - At least one person per department signed in to Chatwoot. Today every mention reaches only the owner's login.
 - The OK for OXS tickets for every tenant. The mirror holds four test numbers today.

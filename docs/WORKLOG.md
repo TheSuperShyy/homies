@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Are we set? The app secret is in and checked, the switch script sets the app's webhook, and the WABA ID needs putting back (the owner: "are we set i put the app id and secret and the system user in the settings"), 13:20 UTC
+- **The owner's 13:15 UTC save of `.env`:** the app secret went over `HOMIES_WHATSAPP_TOKEN`, and the app id over `HOMIES_WHATSAPP_WABA_ID`.
+- **Fixed, after a backup** (`local/env-backups/.env.before-homies-app-secret-fix-2026-11-23T2119`):
+  - the token is back, from the owner's own line;
+  - `HOMIES_APP_ID` (…6232) and `HOMIES_APP_SECRET` are on lines of their own.
+  - Checked with Meta: the secret opens their app HOMIES, and the token belongs to it. Their app's own webhook is empty.
+- **The WABA ID can't be recovered from here.** It is in no backup or log, and the token can't list WhatsApp accounts (`/me/assigned_whatsapp_business_accounts` is empty). The owner puts it back (…0527, from the HOMIES app's WhatsApp → API Setup).
+- **`switch_to_homies.py` now sets the app's own webhook (step 4 of its docstring):**
+  - Right after the inbox moves, `POST /{app}/subscriptions` with an app token: `whatsapp_business_account`, the `messages` field, the callback register_callback just set, and inbox 1's verify token.
+  - The preflight shows the app's webhook, and whether inbox 1's verify token matches `CHATWOOT_WA_VERIFY_TOKEN`. It does: checked by digest, and `state()` now carries `verify_token_sha`.
+  - `--apply` refuses without the secret, unless `--app-webhook-by-hand`. On a failure it says: set it by hand, or `--restore`.
+  - `--restore` removes the app's webhook when the snapshot says it had none before.
+  - Tested read only: the secret is OK, the webhook is none, the verify token matches. The full preflight waits for the WABA ID.
+- **The screenshot:**
+  - ManyChat is a partner with full control on their WhatsApp account (Business Settings → WhatsApp accounts → Partners). That is its connection, and it stays until a few days after the switch.
+  - Their business has a second WhatsApp account (…039 in the address), which answers "This API is not supported for this WhatsApp Business Account". Ours is …0527.
+
 ### The guidebook checked against Meta's docs and our notes, and corrected (the owner: "make sure its accurate and correct"), 12:05 UTC
 - **Read:** Meta's pages on webhook overrides, Cloud API webhooks, managing webhooks, messaging limits and pricing, plus our own notes (CONTEXT 21 Aug, WORKLOG Oct-Nov).
 - **Wrong, now fixed:**

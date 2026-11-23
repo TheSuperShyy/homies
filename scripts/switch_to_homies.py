@@ -20,12 +20,19 @@ HOW, the way 2 Nov and 10 Nov moved inbox 1 (WORKLOG):
      <chatwoot>/webhooks/whatsapp/<their number>. From then on Meta sends their number's messages to Chatwoot.
   3. The channel's template sync (their WABA's templates).
   If any step fails, the channel is put back as it was, in the same run.
+  4. Their app's OWN webhook: POST /{their app}/subscriptions with an app token (HOMIES_APP_SECRET), object
+     whatsapp_business_account, the messages field, callback = the override register_callback just set, and inbox 1's
+     verify token (CHATWOOT_WA_VERIFY_TOKEN, checked against the inbox by digest). Meta's docs subscribe webhook fields
+     at the app level and subscribed_apps documents none of its own (read 23 Nov); their app had none, so without this
+     step nothing may arrive. --apply refuses without the secret unless --app-webhook-by-hand says someone sets it in
+     their Meta (the app's WhatsApp -> Configuration page). If it fails, the message says: by hand, or --restore.
 The two typing nodes in n8n are scripts/n8n_whatsapp_tohomies.py, run after this. Inbound and replies go through
 Chatwoot, and the tool server sends through inbox 1, so nothing else names the number.
 
 --restore: the channel back to the snapshot's number and ids with our own token (WHATSAPP_ACCESS_TOKEN, checked against
 the snapshot's digest), register_callback for our app, the template sync; then, with Homies' token, their override
-cleared and their HOMIES app unsubscribed from their WABA, so ManyChat has the number alone again.
+cleared and their HOMIES app unsubscribed from their WABA, so ManyChat has the number alone again; and their app's own
+webhook removed, when the snapshot says it had none before.
 
 The snapshot (local/switch-homies-snapshot.json, ignored by git) holds numbers and ids, never a token.
 """
@@ -51,6 +58,7 @@ SSH = ["ssh", "-i", os.path.join(os.path.expanduser("~"), ".ssh", "homies_vps"),
 GRAPH = "https://graph.facebook.com/v21.0"
 INBOX_ID = 1
 TEMPLATES = ("ticket_resolved_he", "payment_link_he", "homies_hello_he", "homies_message_he")
+APP_OBJECT = "whatsapp_business_account"
 
 
 def env():
@@ -99,6 +107,7 @@ def state(ch)
     'business_account_id' => pc['business_account_id'],
     'api_key_sha' => Digest::SHA256.hexdigest(pc['api_key'].to_s)[0, 12],
     'verify_token_set' => pc['webhook_verify_token'].present?,
+    'verify_token_sha' => Digest::SHA256.hexdigest(pc['webhook_verify_token'].to_s)[0, 12],
     'templates' => (ch.message_templates || []).map { |t| [t['name'], t['status']] } }
 end
 out = { 'mode' => P['mode'], 'before' => state(ch) }
@@ -189,14 +198,47 @@ def homies_side(e):
     apps = graph(tok, "GET", "/%s/subscribed_apps" % waba)
     names = [a.get("whatsapp_business_api_data", {}).get("name") for a in apps.get("data", [])]
     print("connected   : %s" % (", ".join(names) or "no app"))
-    return {"token": tok, "waba": waba, "phone_id": p["id"], "e164": e164, "templates": have, "apps": names}
+    return {"token": tok, "waba": waba, "phone_id": p["id"], "e164": e164, "templates": have, "apps": names,
+            "app_id": str(d.get("app_id") or ""), "app_name": d.get("application")}
+
+
+def describe_subs(subs):
+    if not subs:
+        return "none"
+    return "; ".join("%s, active %s, fields %s" % (urllib.parse.urlparse(s.get("callback_url") or "").netloc or "-",
+                                                   s.get("active"), ",".join(f.get("name", "?") for f in s.get("fields", [])))
+                     for s in subs)
+
+
+def their_app(e, h):
+    """Their app's own webhook, read with an app token (app id|HOMIES_APP_SECRET). None without the secret."""
+    app_id = h["app_id"]
+    if e.get("HOMIES_APP_ID") and e["HOMIES_APP_ID"] != app_id:
+        sys.exit("HOMIES_APP_ID in .env (%s) is not the app of their token (%s)." % (mask(e["HOMIES_APP_ID"]), mask(app_id)))
+    secret = e.get("HOMIES_APP_SECRET", "")
+    if not secret:
+        print("their app   : %s %s | secret MISSING (HOMIES_APP_SECRET), so its own webhook can't be set from here"
+              % (h["app_name"], mask(app_id)))
+        return None
+    app_tok = "%s|%s" % (app_id, secret)
+    d = graph(app_tok, "GET", "/debug_token", input_token=h["token"])
+    if not (d.get("data", {}).get("is_valid") and str(d.get("data", {}).get("app_id")) == app_id):
+        sys.exit("HOMIES_APP_SECRET does not open app %s: %s" % (mask(app_id), d.get("_error") or d))
+    subs = graph(app_tok, "GET", "/%s/subscriptions" % app_id)
+    if "_http" in subs:
+        sys.exit("their app's subscriptions: %s" % subs["_error"])
+    wa = [s for s in subs.get("data", []) if s.get("object") == APP_OBJECT]
+    print("their app   : %s %s | secret OK | own webhook: %s" % (h["app_name"], mask(app_id), describe_subs(wa)))
+    return {"id": app_id, "token": app_tok, "before": wa}
 
 
 def main():
     e = env()
     restore = "--restore" in sys.argv
     apply = "--apply" in sys.argv
+    by_hand = "--app-webhook-by-hand" in sys.argv
     h = homies_side(e)
+    app = their_app(e, h)
 
     if restore:
         if not os.path.exists(SNAPSHOT):
@@ -213,6 +255,12 @@ def main():
                         {"webhook_configuration": {"override_callback_uri": ""}})
         unsub = graph(h["token"], "DELETE", "/%s/subscribed_apps" % h["waba"])
         print("their override cleared: %s | their HOMIES app unsubscribed: %s" % (cleared, unsub))
+        if app and snap.get("their_app_webhook_before") == []:
+            gone = graph(app["token"], "DELETE", "/%s/subscriptions" % app["id"], object=APP_OBJECT)
+            print("their app's own webhook removed (it had none before): %s" % gone)
+        elif "their_app_webhook_before" in snap and snap["their_app_webhook_before"]:
+            print("NOTE        : their app had its own webhook before the switch (%s); left as it is now."
+                  % describe_subs(snap["their_app_webhook_before"]))
         print("Restored. Turn ManyChat's WhatsApp replies back on, and send a test to each number.")
         return
 
@@ -234,6 +282,15 @@ def main():
     if others:
         print("NOTE        : still connected to their number: %s. Both would answer, so its WhatsApp replies go off first."
               % ", ".join(others))
+    vt = e.get("CHATWOOT_WA_VERIFY_TOKEN", "")
+    vt_ok = bool(vt) and sha(vt) == now.get("verify_token_sha")
+    print("verify token: inbox %d's %s CHATWOOT_WA_VERIFY_TOKEN in .env" % (INBOX_ID, "matches" if vt_ok else "does NOT match"))
+    if app and vt_ok:
+        print("would set   : their app's own webhook (%s, messages) to the address register_callback sets, right after it"
+              % APP_OBJECT)
+    elif not by_hand:
+        print("NOTE        : --apply refuses until HOMIES_APP_SECRET (and a matching verify token) are in .env, or add"
+              " --app-webhook-by-hand if someone sets the app's webhook in their Meta during the switch.")
 
     if not apply:
         print("\nDry run: nothing written, in Chatwoot or at Meta.")
@@ -242,11 +299,17 @@ def main():
         sys.exit("The move does not validate in Chatwoot. Refusing.")
     if others and "--manychat-is-off" not in sys.argv:
         sys.exit("Refusing while %s is connected. Turn its WhatsApp replies off, then add --manychat-is-off." % ", ".join(others))
+    if not (app and vt_ok) and not by_hand:
+        sys.exit("Refusing: their app's own webhook can't be set from here (see the NOTE above).")
 
     os.makedirs(os.path.dirname(SNAPSHOT), exist_ok=True)
     if not os.path.exists(SNAPSHOT):
-        json.dump({k: now[k] for k in ("phone_number", "phone_number_id", "business_account_id", "api_key_sha")},
-                  open(SNAPSHOT, "w", encoding="utf-8"), indent=1)
+        snap = {k: now[k] for k in ("phone_number", "phone_number_id", "business_account_id", "api_key_sha")}
+        if app:
+            snap["their_app_webhook_before"] = [{"object": s.get("object"), "active": s.get("active"),
+                                                 "callback_url": urllib.parse.urlparse(s.get("callback_url") or "").netloc,
+                                                 "fields": s.get("fields", [])} for s in app["before"]]
+        json.dump(snap, open(SNAPSHOT, "w", encoding="utf-8"), indent=1)
         print("snapshot    : %s" % os.path.relpath(SNAPSHOT, ROOT))
     res = rails({"mode": "apply", "inbox_id": INBOX_ID, "target": target})
     if res.get("error"):
@@ -256,7 +319,23 @@ def main():
     apps = graph(h["token"], "GET", "/%s/subscribed_apps" % h["waba"])
     wc = graph(h["token"], "GET", "/%s" % h["phone_id"], fields="webhook_configuration").get("webhook_configuration", {})
     print("connected   : %s" % ", ".join(a.get("whatsapp_business_api_data", {}).get("name") or "?" for a in apps.get("data", [])))
-    print("their number's messages go to: %s" % urllib.parse.urlparse(wc.get("phone_number") or "").netloc)
+    callback = wc.get("phone_number") or ""
+    print("their number's messages go to: %s" % urllib.parse.urlparse(callback).netloc)
+    if app and vt_ok:
+        if not callback:
+            sys.exit("FAILED: no phone-level override to copy, so their app's own webhook was not set. "
+                     "Set it by hand, or roll back now: --restore, then ManyChat's replies on.")
+        res2 = graph(app["token"], "POST", "/%s/subscriptions" % app["id"], object=APP_OBJECT,
+                     callback_url=callback, verify_token=vt, fields="messages")
+        if res2.get("_http") or not res2.get("success"):
+            sys.exit("FAILED: their app's own webhook: %s. Messages may not reach Chatwoot. Set it by hand (their app -> "
+                     "WhatsApp -> Configuration: the callback above, inbox 1's verify token, the messages field), or roll "
+                     "back now: --restore, then ManyChat's replies on." % (res2.get("_error") or res2))
+        subs = graph(app["token"], "GET", "/%s/subscriptions" % app["id"])
+        print("their app's own webhook: %s" % describe_subs([s for s in subs.get("data", []) if s.get("object") == APP_OBJECT]))
+    else:
+        print("NOW BY HAND : their app -> WhatsApp -> Configuration: callback %s, inbox 1's verify token, the messages "
+              "field. Nothing may arrive until it is set." % urllib.parse.urlparse(callback).netloc)
     print("Switched. Next: scripts/n8n_whatsapp_tohomies.py (typing), then a test message from a phone.")
 
 
