@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Which number is Homies'? 077-668-7949 (the owner: "so what number is the homies one"), answered from the records, 08:42 UTC
+- **Homies' number:** +972 77-668-7949, Registered on their WhatsApp account "הומי'ז ניהול ואחזקת מבנים" (the 22 Nov screenshot). It is also their office line (`docs/knowledge/homies.md`, `HOMIES_CALLBACK_NUMBER`) and the emergency line Michael gives. ManyChat's replies send tenants to call it too.
+- **The bot's number today is ours:** "hadas 1" (+972 …029), in ASTDX.
+- That ManyChat answers on it follows from it being the number registered on their account. The token's read of the account's numbers and connected apps confirms it.
+
 ### Homies' existing app and portfolio, reused (the owner: "so i just reused their old app and portfolio the one running their old bot"), answered, 08:30 UTC
 - **The portfolio has to be theirs:** 077-668-7949 and its WhatsApp account are in it, and the templates go on that account.
 - **The app doesn't carry the old bot:** HOMIES' webhook was empty and off in the 22 Nov screenshot, and ManyChat runs through its own app (22 Nov). A token on HOMIES adds our access beside it and changes nothing for ManyChat.
